@@ -28,13 +28,17 @@ RSpec.describe CollectionCardArchiveWorker, type: :worker do
     end
 
     before do
-      collection_cards.each do |card|
-        user.add_role(Role::EDITOR, card.collection)
-      end
-      user.add_role(Role::EDITOR, subcollection_card.collection)
+      user.add_role(Role::EDITOR, collection)
     end
 
     context 'with collection cards' do
+      before do
+        collection_card_collections.each do |card|
+          create(:activity, actor: user, target: card.record, action: 6)
+        end
+        create(:activity, actor: user, target: subcollection_card.record, action: 6)
+      end
+
       it 'archives all cards and their records' do
         run_worker
         collection_cards.each(&:reload)
@@ -59,6 +63,38 @@ RSpec.describe CollectionCardArchiveWorker, type: :worker do
             expect(ActivityAndNotificationBuilder).not_to receive(:call).with(builder_args)
           end
         end
+        run_worker
+      end
+    end
+
+    context 'with a collection you did not participate in' do
+      it 'should not notifiy you' do
+        expect(ActivityAndNotificationBuilder).not_to receive(:call)
+        run_worker
+      end
+    end
+
+    context 'participated in an item in a sub collection' do
+      let(:run_worker) do
+        CollectionCardArchiveWorker.new.perform(
+          [collection_card_collections.first.id],
+          user.id,
+        )
+      end
+      let!(:activity) { create(:activity, actor: user, target: subcollection_card.record, action: 6) }
+
+      let(:builder_args) do
+        {
+          actor: user,
+          target: anything,
+          action: :archived,
+          subject_user_ids: [user.id],
+          subject_group_ids: [],
+        }
+      end
+
+      it 'should notify you' do
+        expect(ActivityAndNotificationBuilder).to receive(:call).with(builder_args)
         run_worker
       end
     end

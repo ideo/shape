@@ -80,6 +80,11 @@ class Role < ApplicationRecord
     identifier.select(&:present?).join('_')
   end
 
+  def label
+    return name unless name.to_sym == VIEWER && resource.is_a?(Collection::SubmissionBox)
+    'participant'
+  end
+
   def duplicate!(assign_resource: nil, dont_save: false)
     r = amoeba_dup
     r.resource = assign_resource if assign_resource.present?

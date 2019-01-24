@@ -151,7 +151,8 @@ class PopoutMenu extends React.Component {
               >
                 <button
                   onClick={loading ? () => null : onClick}
-                  className={`menu-${name}`}
+                  data-cy={`PopoutMenu_${_.camelCase(name)}`}
+                  className={`menu-${_.kebabCase(name)}`}
                 >
                   {iconLeft}
                   {name}

@@ -29,6 +29,7 @@ const fakeApiStore = ({
       .fn()
       .mockReturnValue(Promise.resolve({ data: [] })),
     searchCollections: jest.fn().mockReturnValue(Promise.resolve({ data: [] })),
+    loadCurrentUserGroups: jest.fn(),
     searchRoles: jest.fn().mockReturnValue(Promise.resolve({ data: [] })),
     setCurrentUserId: jest.fn(),
     findOrganizationById: jest.fn().mockReturnValue({ name: 'abc' }),
@@ -38,12 +39,18 @@ const fakeApiStore = ({
       .fn()
       .mockReturnValue(Promise.resolve({ key: 'x' })),
     findThreadForRecord: jest.fn(),
+    loadNextThreadPage: jest.fn(),
     createTemplateInstance: jest.fn(),
     moveCards: jest.fn(),
     linkCards: jest.fn(),
     duplicateCards: jest.fn(),
     checkInMyCollection: jest.fn(),
     unreadActivityCount: 0,
+
+    usersThreadPagesToLoad: 1,
+    loadingThreads: false,
+    hasOlderThreads: false,
+
     currentUserId: '1',
     currentUser: {
       id: '1',

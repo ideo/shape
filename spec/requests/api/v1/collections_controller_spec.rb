@@ -334,6 +334,45 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
   end
 
+  describe 'POST #clear_collection_cover' do
+    let!(:collection) { create(:collection, add_editors: [user]) }
+    let(:collection_card) do
+      create(:collection_card_image, order: 0, width: 1, parent: collection, is_cover: true)
+    end
+    let(:path) { "/api/v1/collections/#{collection.id}/clear_collection_cover" }
+
+    before do
+      user.add_role(Role::VIEWER, collection_card.item)
+      post(path)
+    end
+
+    it 'should clear the cover from the collection' do
+      expect(collection_card.reload.is_cover).to be false
+    end
+  end
+
+  describe 'PATCH #submit' do
+    let(:submission_box) { create(:submission_box, hide_submissions: true) }
+    let(:submissions_collection) { submission_box.submissions_collection }
+    let(:collection) { create(:collection, :submission, parent_collection: submissions_collection, add_editors: [user]) }
+    let(:path) { "/api/v1/collections/#{collection.id}/submit" }
+
+    before do
+      submission_box.setup_submissions_collection!
+      collection.submission_attrs['hidden'] = true
+      collection.save
+    end
+
+    it 'should submit the submission' do
+      expect(Roles::MergeToChild).to receive(:call).with(
+        parent: submission_box,
+        child: collection,
+      )
+      patch(path)
+      expect(collection.reload.submission_attrs['hidden']).to be false
+    end
+  end
+
   describe 'DELETE #destroy' do
     let(:path) { "/api/v1/collections/#{collection.id}" }
 

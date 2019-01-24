@@ -14,6 +14,8 @@ class CommentThread < ApplicationRecord
   has_many :users_threads, dependent: :destroy
   has_many :groups_threads, dependent: :destroy
 
+  after_update :update_firestore_users_threads
+
   def unread_comments_for(user)
     ut = users_threads.where(user_id: user.id).first
     return [] unless ut.present?
@@ -104,6 +106,15 @@ class CommentThread < ApplicationRecord
         batch.delete("comments/#{c.id}")
       end
     end
+  end
+
+  def update_firestore_users_threads
+    # we want the serialized users_threads to store the comment_thread.updated_at
+    # so that within firestore you can get the "20 most recent"
+    FirestoreBatchWriter.perform_in(
+      3.seconds,
+      users_threads.compact.map(&:batch_job_identifier),
+    )
   end
 
   private

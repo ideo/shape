@@ -1,6 +1,6 @@
 class SerializableRole < BaseJsonSerializer
   type 'roles'
-  attributes :name
+  attributes :name, :label
 
   has_many :users do
     data do

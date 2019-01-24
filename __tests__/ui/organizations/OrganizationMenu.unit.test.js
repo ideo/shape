@@ -1,3 +1,4 @@
+import googleTagManager from '~/vendor/googleTagManager'
 import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
 import Organization from '~/stores/jsonApi/Organization'
 import { fakeGroup } from '#/mocks/data'
@@ -5,6 +6,7 @@ import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 
 jest.mock('../../../app/javascript/stores/jsonApi/Organization')
+jest.mock('../../../app/javascript/vendor/googleTagManager')
 
 describe('OrganizationMenu', () => {
   let component, props, wrapper
@@ -21,6 +23,7 @@ describe('OrganizationMenu', () => {
       onClose: jest.fn(),
       organization: {
         save: jest.fn(),
+        create: jest.fn(),
         name: 'Space',
         primary_group: {
           id: 1,
@@ -130,13 +133,13 @@ describe('OrganizationMenu', () => {
   })
 
   describe('createOrganization', () => {
-    let saveFn
+    let createFn
 
     beforeEach(async () => {
-      saveFn = jest.fn().mockReturnValue(Promise.resolve({}))
+      createFn = jest.fn().mockReturnValue(Promise.resolve({}))
       Organization.mockImplementation(() => ({
         id: 3,
-        save: saveFn,
+        create: createFn,
         assign: jest.fn(),
       }))
       await component.createOrganization({ name: 'hello' })
@@ -153,7 +156,14 @@ describe('OrganizationMenu', () => {
     })
 
     it('should save the newly created organization', () => {
-      expect(saveFn).toHaveBeenCalled()
+      expect(createFn).toHaveBeenCalled()
+    })
+
+    it('should call googleTagManager.push', () => {
+      expect(googleTagManager.push).toHaveBeenCalledWith({
+        event: 'formSubmission',
+        formType: 'New Org',
+      })
     })
 
     describe('with orgCreated state', () => {

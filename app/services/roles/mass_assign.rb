@@ -1,5 +1,5 @@
 module Roles
-  class MassAssign
+  class MassAssign < SimpleService
     include Roles::SharedMethods
 
     attr_reader :errors, :added_users, :added_groups,

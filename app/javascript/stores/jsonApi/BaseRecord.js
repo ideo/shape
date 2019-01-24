@@ -1,5 +1,5 @@
 import { computed } from 'mobx'
-import { Model, initModelRef } from 'datx'
+import { Model, initModelRef, setModelMetaKey } from 'datx'
 import { jsonapi, modelToJsonApi } from 'datx-jsonapi'
 import _ from 'lodash'
 
@@ -56,7 +56,23 @@ class BaseRecord extends jsonapi(Model) {
     if (this.attributesForAPI) {
       data.attributes = _.pick(data.attributes, this.attributesForAPI)
     }
+    delete data.relationships
     return data
+  }
+
+  async create() {
+    // similar to datx save but using our toJsonApi() to scrub the data
+    const res = await this.apiStore.request(`${this.internalType}`, 'POST', {
+      data: this.toJsonApi(),
+    })
+    setModelMetaKey(this, 'jsonapiPersisted', true)
+    return res.replaceData(this).data
+  }
+
+  patch() {
+    this.apiStore.request(`${this.internalType}/${this.id}`, 'PATCH', {
+      data: this.toJsonApi(),
+    })
   }
 }
 

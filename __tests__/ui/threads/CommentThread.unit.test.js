@@ -34,6 +34,14 @@ describe('CommentThread', () => {
         props.thread.latestUnreadComments.length
       )
     })
+
+    it('makes the StyledCommentsWrapper clickable', () => {
+      const styledWrapper = wrapper.find('StyledCommentsWrapper').get(0)
+      expect(styledWrapper.props.clickable).toBeTruthy()
+      styledWrapper.props.onClick()
+      // should call the function passed in to CommentThread
+      expect(props.onClick).toHaveBeenCalled()
+    })
   })
 
   describe('with expanded thread', () => {

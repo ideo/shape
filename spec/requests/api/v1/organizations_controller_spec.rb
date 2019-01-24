@@ -3,7 +3,7 @@ require 'rails_helper'
 describe Api::V1::OrganizationsController, type: :request, json: true, auth: true do
   let(:user) { @user }
 
-  context 'serialzable organization' do
+  context 'serializable organization' do
     let!(:organization) { create(:organization) }
     let(:path) { '/api/v1/organizations/current' }
 
@@ -195,7 +195,8 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
     let(:params) do
       json_api_params(
         'organizations',
-        'name': 'Acme Inc 2.0',
+        name: 'Acme Inc 2.0',
+        domain_whitelist: 'acme.com,subsidiary.acme.com',
       )
     end
 
@@ -209,10 +210,12 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
       expect(json['data']['attributes']).to match_json_schema('organization')
     end
 
-    it 'updates the name' do
+    it 'updates the name and domain_whitelist' do
       expect(organization.name).not_to eq('Acme Inc 2.0')
       patch(path, params: params)
-      expect(organization.reload.name).to eq('Acme Inc 2.0')
+      organization.reload
+      expect(organization.name).to eq('Acme Inc 2.0')
+      expect(organization.domain_whitelist).to match_array(%w[acme.com subsidiary.acme.com])
     end
 
     context 'setting in app billing' do
@@ -287,6 +290,30 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
       expect(organization.terms_text_item_id).to be 3
       patch(path, params: params)
       expect(organization.terms_text_item_id).not_to be nil
+    end
+  end
+
+  describe 'GET #check_payments' do
+    let!(:current_user) { @user }
+    let!(:organization) { create(:organization, admin: user) }
+    let(:path) { "/api/v1/organizations/#{organization.id}/check_payments" }
+    let(:payment_method) { double('payment_method', id: 234) }
+    let(:network_organization) { double('network organization', id: 22) }
+    before do
+      allow(NetworkApi::Organization).to receive(:find_by_external_id).with(organization.id).and_return(network_organization)
+      allow(NetworkApi::PaymentMethod).to receive(:find).with(
+        organization_id: network_organization.id,
+        default: true,
+      ).and_return([payment_method])
+    end
+
+    it 'calls NetworkApi::PaymentMethod to check status' do
+      expect(NetworkApi::PaymentMethod).to receive(:find).with(
+        organization_id: network_organization.id,
+        default: true,
+      )
+      get(path)
+      expect(response.status).to eq(200)
     end
   end
 end

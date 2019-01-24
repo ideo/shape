@@ -4,7 +4,7 @@ import { observable, action } from 'mobx'
 import { observer } from 'mobx-react'
 import styled from 'styled-components'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
-import MenuItem from '@material-ui/core/MenuItem'
+import { Grid, Hidden, MenuItem } from '@material-ui/core'
 
 import trackError from '~/utils/trackError'
 import isEmail from '~/utils/isEmail'
@@ -21,9 +21,9 @@ import EmailCSVUploader from '~/ui/global/EmailCSVUploader'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import { apiStore, uiStore } from '~/stores'
 
-const RightAligner = styled.span`
-  margin-right: 30px;
-  min-width: 97px;
+const RightAligner = styled(Grid)`
+  padding-right: 78px;
+  min-width: 175px; /* 97px + padding */
 `
 RightAligner.displayName = 'StyledRightAligner'
 
@@ -255,15 +255,17 @@ class RolesAdd extends React.Component {
       <div>
         {this.loading && <InlineLoader />}
         {this.renderPillList()}
-        <Row>
-          <AutoComplete
-            options={[]}
-            optionSearch={this.onSearch}
-            onOptionSelect={this.onUserSelected}
-            placeholder="email address or username"
-            creatable
-          />
-          <RightAligner>
+        <Grid container>
+          <Grid item xs={12} sm style={{ marginBottom: '15px' }}>
+            <AutoComplete
+              options={[]}
+              optionSearch={this.onSearch}
+              onOptionSelect={this.onUserSelected}
+              placeholder="email address or username"
+              creatable
+            />
+          </Grid>
+          <RightAligner item>
             <RowItemRight>
               <Select
                 classes={{ root: 'select', selectMenu: 'selectMenu' }}
@@ -281,7 +283,7 @@ class RolesAdd extends React.Component {
               </Select>
             </RowItemRight>
           </RightAligner>
-        </Row>
+        </Grid>
         <Row>
           <StyledFormControlLabel
             classes={{ label: 'form-control' }}
@@ -294,7 +296,9 @@ class RolesAdd extends React.Component {
             }
             label="Notify people"
           />
-          <EmailCSVUploader onComplete={this.handleEmailInput} />
+          <Hidden only="xs">
+            <EmailCSVUploader onComplete={this.handleEmailInput} />
+          </Hidden>
         </Row>
         <FormActionsContainer style={{ paddingBottom: '0' }}>
           <FormButton

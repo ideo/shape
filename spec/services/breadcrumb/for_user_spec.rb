@@ -71,6 +71,7 @@ RSpec.describe Breadcrumb::ForUser, type: :service do
 
     context 'with access to only direct ancestor' do
       before do
+        subcollection.unanchor!
         user.add_role(Role::VIEWER, subcollection)
       end
 

@@ -5,10 +5,11 @@ import styled from 'styled-components'
 import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Collapse } from '@material-ui/core'
+import v from '~/utils/variables'
 
 import { ShowMoreButton } from '~/ui/global/styled/forms'
 import { Heading3, DisplayText } from '~/ui/global/styled/typography'
-import { Row, RowItemLeft, RowItemRight } from '~/ui/global/styled/layout'
+import { Row, RowItemLeft } from '~/ui/global/styled/layout'
 import SearchButton from '~/ui/global/SearchButton'
 import DropdownIcon from '~/ui/icons/DropdownIcon'
 import RolesAdd from '~/ui/roles/RolesAdd'
@@ -34,7 +35,13 @@ const FooterArea = styled.div`
 `
 
 const StyledHeaderRow = styled(Row)`
+  flex-wrap: wrap;
+  justify-content: space-between;
   margin-left: 0;
+
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    width: 100%;
+  }
 `
 const StyledRow = styled(Row)`
   cursor: pointer;
@@ -189,7 +196,7 @@ class RolesMenu extends React.Component {
 
   deleteRoles = (role, entity, opts = {}) => {
     const { ownerId, ownerType } = this.props
-    role.API_delete(entity, ownerId, ownerType, opts).then(res => {
+    return role.API_delete(entity, ownerId, ownerType, opts).then(res => {
       // We should do a page reload to get the correct user's new org
       if (opts.organizationChange) {
         this.props.routingStore.routeTo('homepage')
@@ -254,6 +261,7 @@ class RolesMenu extends React.Component {
 
   render() {
     const {
+      record,
       addCallout,
       canEdit,
       ownerType,
@@ -276,13 +284,11 @@ class RolesMenu extends React.Component {
         <ScrollArea>
           <StyledHeaderRow align="flex-end">
             <Heading3>{title}</Heading3>
-            <RowItemRight>
-              <SearchButton
-                value={this.state.searchText}
-                onChange={this.handleSearchChange}
-                onClear={this.clearSearch}
-              />
-            </RowItemRight>
+            <SearchButton
+              value={this.state.searchText}
+              onChange={this.handleSearchChange}
+              onClear={this.clearSearch}
+            />
           </StyledHeaderRow>
 
           {groups.map(group => {
@@ -327,6 +333,7 @@ class RolesMenu extends React.Component {
                           key={`${combined.entity.id}_${
                             combined.entity.internalType
                           }_r${combined.role.id}`}
+                          record={record}
                           role={combined.role}
                           roleTypes={roleTypes}
                           roleLabels={

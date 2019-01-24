@@ -26,6 +26,14 @@ RSpec.describe DataReport::Internal, type: :service do
         it 'should calculate the number of participants in the organization' do
           expect(report.call[:value]).to eq 3
         end
+
+        context 'with return_records: true' do
+          let(:report) { DataReport::Internal.new(data_item, return_records: true) }
+
+          it 'should return the actor_ids instead of the count' do
+            expect(report.call[:value].pluck(:actor_id)).to match_array(activities.pluck(:actor_id))
+          end
+        end
       end
 
       context 'with a viewer measure' do

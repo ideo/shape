@@ -118,7 +118,7 @@ describe('ScaleQuestion', () => {
               .find('Question')
               .find('StyledDisplayText')
               .props().alt
-          ).toEqual('How satisifed are you with your current magic wand?')
+          ).toEqual('How satisfied are you with your current magic wand?')
           expect(
             wrapper
               .find('Question')
@@ -141,7 +141,7 @@ describe('ScaleQuestion', () => {
               .find('Question')
               .find('StyledDisplayText')
               .props().alt
-          ).toEqual('How satisifed are you with your current magic wand?')
+          ).toEqual('How satisfied are you with your current magic wand?')
         })
 
         it('should not render input', () => {

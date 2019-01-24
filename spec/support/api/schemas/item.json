@@ -8,6 +8,7 @@
     "data_settings": { "type": ["object", "null"] },
     "url": { "type": ["string", "null"] },
     "thumbnail_url": { "type": ["string", "null"] },
+    "previous_thumbnail_urls": { "type": ["array", "null"] },
     "icon_url": { "type": ["string", "null"] },
     "breadcrumb": { "type": ["array", "null"] },
     "can_edit": { "type": ["boolean"] },

@@ -182,6 +182,18 @@ describe('ActivityLogBox', () => {
     })
   })
 
+  describe('renderComments', () => {
+    beforeEach(() => {
+      component.changePage('comments')
+    })
+
+    it('should render a CommentThreadContainer with loadingThreads prop', () => {
+      const ctc = wrapper.find('CommentThreadContainer')
+      expect(ctc.exists()).toBeTruthy()
+      expect(ctc.props().loadingThreads).toEqual(props.apiStore.loadingThreads)
+    })
+  })
+
   describe('handleMoveStart', () => {
     it('should update uiStore activityLogMoving', () => {
       component.handleMoveStart()

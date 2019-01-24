@@ -6,18 +6,18 @@ module Breadcrumb
     def initialize(object, user)
       @object = object
       @user = user
+      @collections = Collection.where(id: @object.breadcrumb)
     end
 
     def viewable
       @viewable ||= select_breadcrumb_items_cascading do |item|
-        user_can?(VIEW_ROLE, item) ||
-          user_can?(EDIT_ROLE, item)
+        user_can?(:view, item)
       end
     end
 
     def editable
       @editable ||= select_breadcrumb_items_cascading do |item|
-        user_can?(EDIT_ROLE, item)
+        user_can?(:edit, item)
       end
     end
 
@@ -73,9 +73,11 @@ module Breadcrumb
     end
 
     # we directly look up has_role_by_identifier for the breadcrumb, e.g. [5] becomes "Collection_5"
-    def user_can?(role_name, breadcrumb_item)
+    def user_can?(action, breadcrumb_item)
       return true if @user.has_cached_role?(Role::SUPER_ADMIN)
-      @user.has_role_by_identifier?(role_name, "Collection_#{breadcrumb_item}")
+      collection = @collections.select { |c| c.id == breadcrumb_item }.first
+      return false unless collection.present?
+      collection.send("can_#{action}?", @user)
     end
   end
 end

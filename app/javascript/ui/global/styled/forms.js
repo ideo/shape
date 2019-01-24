@@ -127,11 +127,15 @@ export const ShowMoreButton = styled.button`
   text-align: center;
   font-family: ${v.fonts.sans};
   font-size: 0.875rem;
-  color: ${v.colors.commonMedium};
+  color: ${props =>
+    props.darkBg ? v.colors.commonLight : v.colors.commonDark};
   &:hover {
-    color: ${v.colors.black};
+    color: ${props => (props.darkBg ? v.colors.commonMedium : v.colors.black)};
   }
 `
+ShowMoreButton.defaultProps = {
+  darkBg: false,
+}
 ShowMoreButton.displayName = 'ShowMoreButton'
 
 /** @component */
@@ -371,6 +375,7 @@ StyledAutosizeInput.displayName = 'StyledAutosizeInput'
 /** @component */
 export const EditAvatarButton = styled.button`
   cursor: auto;
+  display: block;
   ${props =>
     props.canEdit &&
     `

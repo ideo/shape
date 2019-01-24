@@ -171,6 +171,7 @@ class PageHeader extends React.Component {
           handleClick={this.showObjectRoleDialog}
           roles={record.roles}
           canEdit={record.can_edit}
+          rolesMenuOpen={!!uiStore.rolesMenuOpen}
         />
       )
     }

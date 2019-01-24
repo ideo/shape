@@ -1,5 +1,12 @@
 require 'rails_helper'
 
+def batch_reindex(klass)
+  klass.search_import.find_in_batches do |batch|
+    klass.searchkick_index.import(batch)
+  end
+  klass.searchkick_index.refresh
+end
+
 describe Api::V1::SearchController, type: :request, json: true, auth: true, search: true, create_org: true do
   describe 'GET #search' do
     let!(:current_user) { @user }
@@ -33,7 +40,6 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
     let(:find_collection) { collections.first }
 
     before do
-      expect(current_user.has_role?(Role::MEMBER, organization.primary_group))
       Collection.reindex
       Collection.searchkick_index.refresh
       # Let ElasticSearch indexing finish (even though it seems to be synchronous)
@@ -43,6 +49,7 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
     context 'if user can view collection' do
       it 'returns a 200' do
         get(path, params: { query: '' })
+        expect(current_user.has_role?(Role::MEMBER, organization.primary_group))
         expect(response.status).to eq(200)
       end
 
@@ -60,7 +67,7 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
       end
 
       it 'returns collection that matches sub-item text search' do
-        Collection.reindex # just re-index again because this test sometimes fails
+        batch_reindex(Collection) # just re-index again because this test sometimes fails
         text = collection_with_text.collection_cards.first.item.plain_content
         get(path, params: { query: text })
         expect(json['data'].size).to eq(1)
@@ -133,8 +140,7 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
         end
 
         before do
-          Collection.reindex
-          Collection.searchkick_index.refresh
+          batch_reindex(Collection)
         end
 
         context 'updated within date range' do
@@ -203,8 +209,7 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
         end
 
         before do
-          Collection.reindex
-          Collection.searchkick_index.refresh
+          batch_reindex(Collection)
         end
 
         it 'should return all collections with no actual query' do
@@ -222,7 +227,7 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
     context 'if user cannot view collection' do
       before do
         current_user.remove_role(Role::EDITOR, find_collection)
-        Collection.reindex
+        batch_reindex(Collection)
       end
 
       it 'returns empty array' do
@@ -235,7 +240,7 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
       before do
         current_user.remove_role(Role::EDITOR, find_collection)
         current_user.add_role(Role::VIEWER, find_collection)
-        Collection.reindex
+        batch_reindex(Collection)
       end
 
       it 'returns collection that matches name search' do
@@ -252,7 +257,7 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
       end
 
       before do
-        Collection.reindex
+        batch_reindex(Collection)
       end
 
       it 'does not return collection that has same name in another org' do
@@ -260,6 +265,53 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
         expect(json['data'].size).to be(1)
         expect(json['data'].first['id'].to_i).to eq(find_collection.id)
       end
+    end
+  end
+
+  describe 'GET #search_users_and_groups' do
+    let!(:current_user) { @user }
+    let!(:organization) { current_user.current_organization }
+    let!(:other_user) do
+      # make sure name is something unique because @user has a random name which could otherwise match
+      create(:user, add_to_org: organization, first_name: 'Veryunique', last_name: 'Lastname', email: 'abc123xyz@emailz.net')
+    end
+    let!(:similar_user) do
+      create(:user, add_to_org: organization, first_name: @user.first_name)
+    end
+    let(:path) { '/api/v1/search/users_and_groups' }
+
+    before do
+      User.reindex
+      Group.reindex
+    end
+
+    it 'should find users in the org by name' do
+      get(path, params: { query: 'Veryunique' })
+      expect(json['data'].size).to be(1)
+      expect(json['data'].first['id'].to_i).to eq(other_user.id)
+    end
+
+    it 'should find users in the org by partial name match' do
+      get(path, params: { query: 'Veryu' })
+      expect(json['data'].size).to be(1)
+      expect(json['data'].first['id'].to_i).to eq(other_user.id)
+    end
+
+    it 'should find users in the org by partial email match' do
+      get(path, params: { query: 'abc123' })
+      expect(json['data'].size).to be(1)
+      expect(json['data'].first['id'].to_i).to eq(other_user.id)
+    end
+
+    it 'should find similar named users' do
+      get(path, params: { query: @user.first_name })
+      expect(json['data'].select { |d| d['type'] == 'users' }.count).to be 2
+    end
+
+    it 'should find org groups' do
+      # the org is named "first_name last_name organization"
+      get(path, params: { query: @user.first_name })
+      expect(json['data'].select { |d| d['type'] == 'groups' }.count).to be 3
     end
   end
 end

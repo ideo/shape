@@ -47,13 +47,17 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
     end
   end
 
+  def check_payments
+    @organization.update_payment_status
+    render jsonapi: @organization
+  end
+
   private
 
   def organization_params
     params_allowed = [
       :name,
-      :domain,
-      :whitelist,
+      :domain_whitelist,
       :handle,
       :deactivated,
       :terms_text_item_id,

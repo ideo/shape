@@ -79,7 +79,11 @@ class Api::V1::RolesController < Api::V1::BaseController
 
   def authorize_remove_role_from_record
     # you can always choose to "leave" something even if not editor
-    return true if @user && @user.id == current_user.id
+    if json_api_params[:group_ids].blank? &&
+      json_api_params[:user_ids].count == 1 &&
+      json_api_params[:user_ids].first.to_i == current_user.id
+      return true
+    end
     authorize! :manage, record
   end
 

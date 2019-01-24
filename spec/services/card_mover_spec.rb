@@ -18,9 +18,6 @@ RSpec.describe CardMover, type: :service do
       card_action: card_action,
     )
   end
-  let(:instance_double) do
-    double('Roles::MassAssign')
-  end
 
   before do
     moving_cards.each do |card|
@@ -28,9 +25,6 @@ RSpec.describe CardMover, type: :service do
     end
     user.add_role(Role::EDITOR, from_collection)
     user.add_role(Role::EDITOR, to_collection)
-
-    allow(Roles::MassAssign).to receive(:new).and_return(instance_double)
-    allow(instance_double).to receive(:call).and_return(true)
   end
 
   describe '#call' do
@@ -43,55 +37,15 @@ RSpec.describe CardMover, type: :service do
         expect(to_collection.reload.collection_cards.first(3)).to match_array moving_cards
       end
 
-      context 'with same roles anchor' do
-        before do
-          moving_cards.each do |card|
-            card.record.update(roles_anchor_collection_id: to_collection.id)
-          end
-        end
-
-        it 'should not assign any permissions' do
-          expect(Roles::MassAssign).not_to receive(:new)
-          card_mover.call
-        end
-      end
-
-      context 'with all roles from record included on to_collection' do
-        let(:other_user) { create(:user) }
+      context 'with roles' do
+        let(:moving_cards) { [from_collection.collection_cards.first] }
         let(:card) { moving_cards.first }
-
-        before do
-          user.add_role(Role::VIEWER, to_collection)
-        end
-
-        it 'should not assign any permissions and destroy card roles' do
-          expect(Roles::MassAssign).not_to receive(:new)
-          expect(card.record.roles).not_to be_empty
-          card_mover.call
-          expect(card.record.roles).to be_empty
-        end
-      end
-
-      context 'with different roles' do
-        let(:card) { moving_cards.first }
-        let(:other_user) { create(:user) }
-        let(:group) { create(:group) }
-
-        before do
-          # add a different role onto card.record so that it has more roles than the to_collection
-          other_user.add_role(Role::VIEWER, card.record)
-          # add a different role onto to_collection
-          group.add_role(Role::EDITOR, to_collection)
-        end
 
         it 'should assign permissions' do
           # will assign roles from the to_collection down to the card.record
-          expect(Roles::MassAssign).to receive(:new).with(
-            object: card.record,
-            role_name: Role::EDITOR,
-            users: [user],
-            groups: [group],
-            propagate_to_children: true,
+          expect(Roles::MergeToChild).to receive(:call).with(
+            parent: to_collection,
+            child: card.record,
           )
           card_mover.call
         end
@@ -134,7 +88,7 @@ RSpec.describe CardMover, type: :service do
       end
 
       it 'should not assign any permissions' do
-        expect(Roles::MassAssign).not_to receive(:new)
+        expect(Roles::MergeToChild).not_to receive(:new)
         card_mover.call
       end
     end

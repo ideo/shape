@@ -6,11 +6,10 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :load_and_authorize_collection_update, only: %i[update]
   before_action :load_collection_with_cards, only: %i[show update]
 
+  before_action :log_viewing_activities, only: %i[show]
   before_action :check_cache, only: %i[show]
   def show
-    log_organization_view_activity
     check_getting_started_shell
-    log_collection_activity(:viewed)
     render_collection
   end
 
@@ -41,6 +40,13 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     else
       render_api_errors @collection.errors
     end
+  end
+
+  load_and_authorize_resource only: %i[clear_collection_cover]
+  def clear_collection_cover
+    @collection.clear_collection_cover
+    @collection.reload
+    render_collection
   end
 
   before_action :load_and_authorize_collection_destroy, only: %i[destroy]
@@ -74,12 +80,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def submit
-    @collection.submission_attrs['hidden'] = false
-    Roles::MergeToChild.call(
-      parent: @collection.parent_submission_box,
-      child: @collection,
-    )
-    if @collection.save
+    if @collection.submit_submission!
       render jsonapi: @collection,
              include: Collection.default_relationships_for_api
     else
@@ -93,10 +94,20 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     if @collection.archived? || @collection.organization.deactivated?
       head(404)
     end
+    if @collection.is_a?(Collection::SubmissionsCollection)
+      last_modified = @collection.submission_box.updated_at.utc
+    else
+      last_modified = @collection.updated_at.utc
+    end
     fresh_when(
-      last_modified: @collection.updated_at.utc,
+      last_modified: last_modified,
       etag: @collection.cache_key(params[:card_order]),
     )
+  end
+
+  def log_viewing_activities
+    log_organization_view_activity
+    log_collection_activity(:viewed)
   end
 
   def load_and_authorize_template_and_parent
@@ -157,7 +168,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
                   .first
     current_user.precache_roles_for(
       [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],
-      @collection.children_and_linked_children,
+      ([@collection] + Collection.where(id: @collection.breadcrumb)),
     )
   end
 

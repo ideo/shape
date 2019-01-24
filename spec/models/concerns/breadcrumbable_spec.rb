@@ -46,6 +46,8 @@ describe Breadcrumbable, type: :concern do
 
       context 'with only item viewable' do
         before do
+          subcollection.unanchor_and_inherit_roles_from_anchor!
+          item.unanchor_and_inherit_roles_from_anchor!
           user.add_role(Role::VIEWER, subcollection)
           user.add_role(Role::VIEWER, item)
         end

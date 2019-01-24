@@ -3,7 +3,6 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import CoverImageToggleIcon from '~/ui/icons/CoverImageToggleIcon'
-import v from '~/utils/variables'
 
 @observer
 class CoverImageToggle extends React.Component {
@@ -19,7 +18,7 @@ class CoverImageToggle extends React.Component {
     return (
       <CardActionHolder
         className="show-on-hover"
-        color={card.is_cover ? v.colors.black : v.colors.commonMedium}
+        active={card.is_cover}
         onClick={this.toggle}
         tooltipText={
           card.is_cover ? 'remove as cover image' : 'make cover image'

@@ -85,16 +85,21 @@ class User < ApplicationRecord
   searchkick callbacks: false, word_start: %i[name handle email]
   after_commit :reindex
   alias searchkick_reindex reindex
-  scope :search_import, -> { includes(:roles) }
+  scope :search_import, -> { where(status: %i[active pending]) }
 
   def search_data
     {
       name: name&.downcase,
       handle: handle&.downcase,
-      email: email&.downcase,
+      email: email_search_tokens,
       status: status,
       organization_ids: organization_ids,
     }
+  end
+
+  def email_search_tokens
+    parts = email.downcase.split('@')
+    "#{email} #{parts.join(' ')}"
   end
 
   def should_index?
@@ -241,22 +246,16 @@ class User < ApplicationRecord
     groups.where(organization_id: organization.id).pluck(:id)
   end
 
-  def current_org_groups_roles_identifiers
-    return [] if current_organization.blank?
-
-    org_group_ids = organization_group_ids(current_organization).uniq
-
-    return [] if org_group_ids.blank?
-
-    Role.joins(:groups_roles)
-        .where(GroupsRole.arel_table[:group_id].in(org_group_ids))
-        .map(&:identifier)
-  end
-
   def role_via_org_groups(name, resource_identifier)
     Role.where(name: name, resource_identifier: resource_identifier)
         .joins(:groups_roles)
         .where(GroupsRole.arel_table[:group_id].in(group_ids))
+  end
+
+  def role_via_current_org_groups(name, resource_identifier)
+    Role.where(name: name, resource_identifier: resource_identifier)
+        .joins(:groups_roles)
+        .where(GroupsRole.arel_table[:group_id].in(current_org_group_ids))
   end
 
   def current_org_groups_and_special_groups
@@ -323,7 +322,8 @@ class User < ApplicationRecord
 
   def archive!
     archived!
-    DeprovisionUserWorker.perform_async(id)
+    # NOTE: this is disabled, was creating way too many Zendesk tickets
+    # DeprovisionUserWorker.perform_async(id)
   end
 
   private

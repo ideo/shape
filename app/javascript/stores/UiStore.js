@@ -431,12 +431,14 @@ export default class UiStore {
   setViewingCollection(collection = null) {
     this.previousViewingCollection = this.viewingCollection
     this.viewingCollection = collection
+    this.viewingItem = null
     this.deselectCards()
   }
 
   @action
   setViewingItem(item = null) {
     this.previousViewingCollection = this.viewingCollection
+    this.viewingCollection = null
     this.viewingItem = item
   }
 

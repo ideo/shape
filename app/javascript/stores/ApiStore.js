@@ -38,6 +38,12 @@ class ApiStore extends jsonapi(datxCollection) {
   currentCommentThreadIds = []
 
   @observable
+  usersThreadPagesToLoad = 1
+  @observable
+  loadingThreads = false
+  @observable
+  hasOlderThreads = false
+  @observable
   currentPageThreadKey = null
 
   @observable
@@ -66,6 +72,14 @@ class ApiStore extends jsonapi(datxCollection) {
   @action
   setCurrentPageThreadKey(key) {
     this.currentPageThreadKey = key
+  }
+
+  @action
+  loadNextThreadPage() {
+    this.update('loadingThreads', true)
+    // this triggers an observable reaction in firestore.js
+    // and then hasOlderThreads will potentially get set to true/false
+    this.usersThreadPagesToLoad += 1
   }
 
   @action
@@ -151,7 +165,6 @@ class ApiStore extends jsonapi(datxCollection) {
     )
     const roles = res.data
     resource.roles = roles
-    roles.forEach(role => (role.resource = resource))
     this.add(roles, 'roles')
     return roles
   }
@@ -272,7 +285,8 @@ class ApiStore extends jsonapi(datxCollection) {
         )
         if (res.data && res.data.id) {
           thread = res.data
-          // thread.importComments(thread.unread_comments, { unread: true })
+          // make sure to fetch the first page of comments
+          thread.API_fetchComments()
         } else {
           // if still not found, set up a new empty record
           thread = new CommentThread(
@@ -434,7 +448,6 @@ class ApiStore extends jsonapi(datxCollection) {
         record.roles = roles
       }
       _.each(roles, role => {
-        role.resource = record
         role.updateCount(status, res.meta.total)
         // first page load should automatically set role.users and role.groups via datx
         // next page loads we need to manually concatenate
@@ -445,6 +458,12 @@ class ApiStore extends jsonapi(datxCollection) {
     } catch (e) {
       console.warn('Error with searchRoles', e.message)
     }
+  }
+
+  checkCurrentOrganizationPayments() {
+    return this.request(
+      `organizations/${this.currentUserOrganizationId}/check_payments`
+    )
   }
 
   // default action for updating any basic apiStore value

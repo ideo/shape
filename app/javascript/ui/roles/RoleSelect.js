@@ -1,18 +1,24 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
+import Grid from '@material-ui/core/Grid'
 import MenuItem from '@material-ui/core/MenuItem'
 import styled from 'styled-components'
 import { DisplayText, SubText } from '~/ui/global/styled/typography'
-import { Row, RowItemLeft } from '~/ui/global/styled/layout'
+import { Row } from '~/ui/global/styled/layout'
 import { Select } from '~/ui/global/styled/forms'
 import LeaveIcon from '~/ui/icons/LeaveIcon'
 import Tooltip from '~/ui/global/Tooltip'
 import Avatar from '~/ui/global/Avatar'
 import { uiStore } from '~/stores'
 
-const MinRowItem = styled.span`
-  min-width: 110px;
+const minRowStyle = {
+  minWidth: '110px',
+}
+
+const RowItemGrid = styled(Grid)`
+  align-self: center;
+  margin-left: 14px;
 `
 
 const LeaveIconHolder = styled.button`
@@ -20,11 +26,6 @@ const LeaveIconHolder = styled.button`
   width: 16px;
 `
 LeaveIconHolder.displayName = 'StyledLeaveIconHolder'
-
-const CenterAlignedSingleItem = styled.div`
-  margin-top: 6px;
-`
-CenterAlignedSingleItem.displayName = 'StyledCenterAlignedSingleItem'
 
 const DisplayTextPadded = DisplayText.extend`
   /* match the padding of MuiSelect */
@@ -34,21 +35,19 @@ const DisplayTextPadded = DisplayText.extend`
 
 class RoleSelect extends React.Component {
   get isGuestOrAdminGroup() {
-    const { role } = this.props
-    if (role.resource && role.resource.internalType === 'groups') {
-      return role.resource.isGuestOrAdmin
+    const { record } = this.props
+    if (record && record.internalType === 'groups') {
+      return record.isGuestOrAdmin
     }
     return false
   }
 
   get resourceType() {
-    const { role } = this.props
-    if (role.resource.internalType === 'groups') {
-      return role.resource.is_primary || role.resource.is_guest
-        ? 'organization'
-        : 'group'
+    const { record } = this.props
+    if (record.internalType === 'groups') {
+      return record.is_primary || record.is_guest ? 'organization' : 'group'
     }
-    return role.resource.internalType.slice(0, -1)
+    return record.internalType.slice(0, -1)
   }
 
   onRoleRemove = ev => {
@@ -106,7 +105,7 @@ class RoleSelect extends React.Component {
   }
 
   render() {
-    const { enabled, role, roleTypes, entity } = this.props
+    const { enabled, record, role, roleTypes, entity } = this.props
     let select
     if (!this.isGuestOrAdminGroup && enabled) {
       select = (
@@ -134,8 +133,8 @@ class RoleSelect extends React.Component {
     const showLeaveIcon =
       enabled ||
       (entity.isCurrentUser &&
-        !role.resource.system_required &&
-        !role.resource.pinned_and_locked)
+        !record.system_required &&
+        !record.pinned_and_locked)
     return (
       <Row>
         <span>
@@ -147,20 +146,21 @@ class RoleSelect extends React.Component {
             linkToCollectionId={entity.user_profile_collection_id}
           />
         </span>
-        <RowItemLeft>
-          {entity.name && entity.name.trim().length > 0 ? (
-            <div>
+        <RowItemGrid container justify="space-between">
+          <Grid item xs={12} sm>
+            {entity.name && entity.name.trim().length > 0 ? (
+              <Grid container direction="column">
+                <DisplayText>{this.renderName()}</DisplayText>
+                <SubText>{entity.email}</SubText>
+              </Grid>
+            ) : (
               <DisplayText>{this.renderName()}</DisplayText>
-              <br />
-              <SubText>{entity.email}</SubText>
-            </div>
-          ) : (
-            <CenterAlignedSingleItem>
-              <DisplayText>{this.renderName()}</DisplayText>
-            </CenterAlignedSingleItem>
-          )}
-        </RowItemLeft>
-        <MinRowItem>{select}</MinRowItem>
+            )}
+          </Grid>
+          <Grid item style={minRowStyle}>
+            {select}
+          </Grid>
+        </RowItemGrid>
         {showLeaveIcon && (
           <Tooltip
             classes={{ tooltip: 'Tooltip' }}
@@ -179,6 +179,7 @@ class RoleSelect extends React.Component {
 }
 
 RoleSelect.propTypes = {
+  record: MobxPropTypes.objectOrObservableObject.isRequired,
   role: MobxPropTypes.objectOrObservableObject.isRequired,
   roleTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
   entity: MobxPropTypes.objectOrObservableObject.isRequired,

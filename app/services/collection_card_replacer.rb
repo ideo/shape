@@ -20,6 +20,7 @@ class CollectionCardReplacer
     @errors = @item.errors
     assign_item_attributes
     result = @item.save
+    check_parent_collection_cover
     update_template_instances
     result
   end
@@ -32,6 +33,7 @@ class CollectionCardReplacer
     @item.attributes = Item.new(
       id: @item.id,
       created_at: @item.created_at,
+      roles_anchor_collection_id: @item.roles_anchor_collection_id,
       updated_at: Time.now,
     ).attributes
     # set the passed in attrs
@@ -41,6 +43,11 @@ class CollectionCardReplacer
     # this needs to happen after the @item.becomes
     return unless @attrs[:filestack_file_attributes].present?
     @item.filestack_file_attributes = @attrs[:filestack_file_attributes]
+  end
+
+  def check_parent_collection_cover
+    return unless @replacing_card.should_update_parent_collection_cover?
+    @replacing_card.parent.cache_cover!
   end
 
   def update_template_instances

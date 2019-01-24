@@ -16,7 +16,7 @@ const collections = [
 ]
 const collection = collections[0]
 let wrapper, apiStore, uiStore, routingStore, undoStore
-let props
+let props, component
 
 beforeEach(() => {
   apiStore = fakeApiStore({
@@ -36,7 +36,9 @@ beforeEach(() => {
     collection,
     isHomepage: false,
   }
+  collection.API_fetchCards.mockClear()
   wrapper = shallow(<CollectionPage.wrappedComponent {...props} />)
+  component = wrapper.instance()
 })
 
 describe('CollectionPage', () => {
@@ -65,6 +67,11 @@ describe('CollectionPage', () => {
 
       it('should close the blank content tool', () => {
         expect(uiStore.closeBlankContentTool).toHaveBeenCalled()
+      })
+
+      it('should reload the data', () => {
+        expect(collection.API_fetchCards).toHaveBeenCalled()
+        expect(component.cardsFetched).toBe(true)
       })
     })
   })

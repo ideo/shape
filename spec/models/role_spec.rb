@@ -14,8 +14,8 @@ RSpec.describe Role, type: :model do
       expect(
         Role.user_resources(
           user: user,
-          resource_type: 'Group'
-        )
+          resource_type: 'Group',
+        ),
       ).to match_array(groups)
     end
 
@@ -24,8 +24,8 @@ RSpec.describe Role, type: :model do
         Role.user_resources(
           user: user,
           resource_type: 'Group',
-          role_name: Role::ADMIN
-        )
+          role_name: Role::ADMIN,
+        ),
       ).to match_array([groups[0]])
     end
 
@@ -34,9 +34,28 @@ RSpec.describe Role, type: :model do
         Role.user_resources(
           user: user,
           resource_type: 'Group',
-          role_name: [Role::ADMIN, Role::MEMBER]
-        )
+          role_name: [Role::ADMIN, Role::MEMBER],
+        ),
       ).to match_array([groups[0], groups[1]])
+    end
+  end
+
+  describe '#label' do
+    context 'default' do
+      let(:role) { create(:role, name: Role::VIEWER) }
+      it 'should return the role.name' do
+        expect(role.name).to eq('viewer')
+        expect(role.label).to eq('viewer')
+      end
+    end
+
+    context 'with a SubmissionBox' do
+      let(:role) { create(:role, name: Role::VIEWER, resource: create(:submission_box)) }
+
+      it 'should return "participant" for the viewer role' do
+        expect(role.name).to eq('viewer')
+        expect(role.label).to eq('participant')
+      end
     end
   end
 end

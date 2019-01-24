@@ -3,11 +3,12 @@ module DataReport
     # 1. measure determines the base query
     # 2. filters add themselves to the query
     # 3. timeframe = within these dates
-    def initialize(data_item)
+    def initialize(data_item, override_measures: {}, return_records: false)
       @data_item = data_item
-      @measure = data_item.d_measure
-      @filters = data_item.d_filters
-      @timeframe = data_item.d_timeframe
+      @measure = override_measures[:d_measure] || data_item.d_measure
+      @filters = override_measures[:d_filters] || data_item.d_filters
+      @timeframe = override_measures[:d_timeframe] || data_item.d_timeframe
+      @return_records = return_records
       @data = {
         # e.g. if there was a chart of values...
         values: [],

@@ -49,6 +49,7 @@ describe Collection::UserProfile, type: :model do
     end
 
     it 'should set the user as editor of profile and items' do
+      user_profile.reload
       expect(user_profile.can_edit?(user)).to be true
       expect(user_profile.collection_cards.first.record.can_edit?(user)).to be true
     end

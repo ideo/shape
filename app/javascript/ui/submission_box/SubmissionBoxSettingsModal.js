@@ -265,7 +265,7 @@ class SubmissionBoxSettingsModal extends React.Component {
             classes={{ label: 'form-control' }}
             control={
               <Checkbox
-                checked={this.props.collection.submissions_hidden}
+                checked={this.props.collection.hide_submissions}
                 onChange={this.updateHidden}
                 value="yes"
               />

@@ -41,6 +41,7 @@ RSpec.describe CollectionCardReplacer, type: :service do
       let(:item) { collection_card.item }
 
       before do
+        item.unanchor_and_inherit_roles_from_anchor!
         user.add_role(Role::EDITOR, item)
       end
 
@@ -65,13 +66,29 @@ RSpec.describe CollectionCardReplacer, type: :service do
         expect(item.can_edit?(user)).to be true
       end
 
+      context 'with anchored roles' do
+        before do
+          user.add_role(Role::VIEWER, parent)
+          parent.reset_permissions!
+          item.reload
+        end
+
+        it 'preserves the anchored roles' do
+          expect(item.roles).to be_empty
+          expect(item.can_view?(user)).to be true
+          builder.replace
+          expect(item.can_view?(user)).to be true
+        end
+      end
+
       context 'with filestack_file_attributes' do
+        let(:new_image_url) { 'https://process.filestackapi.com/AKbadkt4jRcKqMsj60Izaz/resize=width:1200,fit:max/rotate=deg:exif/wvW29dKNT8q4kpa6NrTK' }
         let(:params) do
           {
             item_attributes: {
               type: 'Item::FileItem',
               filestack_file_attributes: {
-                url: 'https://process.filestackapi.com/AKbadkt4jRcKqMsj60Izaz/resize=width:1200,fit:max/rotate=deg:exif/wvW29dKNT8q4kpa6NrTK',
+                url: new_image_url,
                 handle: 'wvW29dKNT8q4kpa6NrTK',
                 filename: 'Elephant_statue_in_Butterfly_Park.jpg',
                 size: 6_812_242,
@@ -93,6 +110,23 @@ RSpec.describe CollectionCardReplacer, type: :service do
           expect(item.is_a?(Item::FileItem)).to be true
           # should clear any previous attrs
           expect(item.text_data.present?).to be false
+        end
+
+        context 'with collection cover' do
+          let(:collection_card) do
+            create(:collection_card_image, parent: parent)
+          end
+
+          before do
+            parent.cache_cover!
+          end
+
+          it 'should update the cover if needed' do
+            expect(parent.cached_cover['image_url']).to eq item.image_url
+            builder.replace
+            expect(item.image_url).to eq new_image_url
+            expect(parent.cached_cover['image_url']).to eq new_image_url
+          end
         end
       end
     end

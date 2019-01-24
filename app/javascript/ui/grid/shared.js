@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import styled, { css } from 'styled-components'
 
+import hexToRgba from '~/utils/hexToRgba'
 import v from '~/utils/variables'
 import Truncator from 'react-truncator'
 
@@ -159,6 +160,18 @@ export const StyledGridCardInner = styled.div`
   *::selection {
     background: transparent;
   }
+
+  .overlay {
+    position: absolute;
+    right: 0;
+    top: 0;
+    ${props =>
+      (props.filter === 'transparent_gray' || props.forceFilter) &&
+      `
+      background: ${hexToRgba(v.colors.black, 0.4)};
+    `} width: 100%;
+    height: 100%;
+  }
 `
 StyledGridCardInner.displayName = 'StyledGridCardInner'
 
@@ -167,7 +180,7 @@ const TopActions = css`
   display: flex;
   position: absolute;
   top: 0.35rem;
-  z-index: ${v.zIndex.gridCardTop};
+  z-index: ${v.zIndex.popoutMenu};
 `
 export const StyledTopLeftActions = styled.div`
   ${TopActions};

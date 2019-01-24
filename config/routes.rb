@@ -21,6 +21,7 @@ Rails.application.routes.draw do
       resources :collections, except: %i[index] do
         member do
           get 'in_my_collection'
+          post 'clear_collection_cover'
           patch 'submit'
         end
         collection do
@@ -74,6 +75,7 @@ Rails.application.routes.draw do
         member do
           patch 'add_terms_text'
           patch 'remove_terms_text'
+          get 'check_payments'
         end
         resources :collections, only: %i[create]
         resources :groups, only: %i[index]
@@ -83,7 +85,6 @@ Rails.application.routes.draw do
       resources :users do
         collection do
           get 'me'
-          get 'search'
           post 'create_from_emails'
           patch 'update_current_user'
           post 'switch_org'

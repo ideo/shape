@@ -8,13 +8,13 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
     let(:card_ids) { collection.collection_cards.collect(&:id) }
 
     before do
-      Roles::MassAssign.new(
+      Roles::MassAssign.call(
         object: collection,
         role_name: Role::EDITOR,
         users: [user],
         propagate_to_children: true,
         synchronous: true,
-      ).call
+      )
     end
 
     context 'with access to all items' do
@@ -83,6 +83,7 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
       let(:system_collection) { false }
 
       before do
+        hidden_item.unanchor_and_inherit_roles_from_anchor!
         user.remove_role(Role::EDITOR, hidden_item)
         CollectionCardDuplicationWorker.new.perform(
           card_ids,

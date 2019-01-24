@@ -29,7 +29,10 @@ class HomeController < ApplicationController
     if (u = User.find(params[:id]))
       sign_in(:user, u)
     end
-    redirect_to root_url
+    respond_to do |format|
+      format.html { redirect_to root_url }
+      format.json { render jsonapi: u }
+    end
   end
 
   private

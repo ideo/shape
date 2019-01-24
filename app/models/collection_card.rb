@@ -16,6 +16,7 @@ class CollectionCard < ApplicationRecord
 
   before_create :assign_default_height_and_width
   after_update :update_collection_cover, if: :saved_change_to_is_cover?
+  after_update :touch_collection, if: :saved_change_to_filter?
   after_create :update_parent_card_count!
   after_save :set_collection_as_master_template,
              if: :test_collection_within_master_template_after_save?
@@ -32,6 +33,12 @@ class CollectionCard < ApplicationRecord
   scope :ordered, -> { order(order: :asc) }
   scope :pinned, -> { where(pinned: true) }
   scope :unpinned, -> { where(pinned: false) }
+  scope :visible, -> { where(hidden: false) }
+
+  enum filter: {
+    nothing: 0,
+    transparent_gray: 1,
+  }
 
   amoeba do
     enable
@@ -292,6 +299,19 @@ class CollectionCard < ApplicationRecord
     end
   end
 
+  def update_collection_cover
+    parent.cached_cover ||= {}
+    if is_cover
+      # A new cover was selected so turn off other covers
+      parent.collection_cards.where.not(id: id).update_all(is_cover: false)
+      parent.cached_cover['no_cover'] = false
+    else
+      # The cover was de-selected so turn off the cover on the collection
+      parent.cached_cover['no_cover'] = true
+    end
+    parent.cache_cover!
+  end
+
   private
 
   def assign_default_height_and_width
@@ -324,19 +344,6 @@ class CollectionCard < ApplicationRecord
     errors.add(:parent, 'is read-only so you can\'t save this card') if parent.read_only?
   end
 
-  def update_collection_cover
-    parent.cached_cover ||= {}
-    if is_cover
-      # A new cover was selected so turn off other covers
-      parent.collection_cards.where.not(id: id).update_all(is_cover: false)
-      parent.cached_cover['no_cover'] = false
-    else
-      # The cover was de-selected so turn off the cover on the collection
-      parent.cached_cover['no_cover'] = true
-    end
-    parent.cache_cover!
-  end
-
   def update_parent_card_count!
     parent.cache_card_count!
   end
@@ -348,5 +355,10 @@ class CollectionCard < ApplicationRecord
 
   def set_collection_as_master_template
     collection.update(master_template: true)
+  end
+
+  def touch_collection
+    return unless collection.present?
+    collection.touch
   end
 end

@@ -17,8 +17,7 @@ module Roles
 
       # if parent includes all roles, child can just reanchor to parent and remove its own roles
       if @parent.includes_all_roles? @child
-        @child.update(roles_anchor_collection_id: @parent.roles_anchor.id)
-        @child.roles.destroy_all
+        @child.reanchor!(parent: @parent, propagate: true)
         return
       end
 
