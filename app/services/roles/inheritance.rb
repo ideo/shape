@@ -35,7 +35,7 @@ module Roles
         end
         return false
       end
-      max_updated = [@parent.roles.maximum(:updated_at) || 0, child.roles.maximum(:updated_at) || 0].max
+      max_updated = [@parent.roles.maximum(:updated_at) || 1.year.ago, child.roles.maximum(:updated_at) || 1.year.ago].max
       if !cached || cached['updated_at'].to_time.to_i < max_updated.to_i
         child.cached_inheritance = {
           updated_at: child.roles.maximum(:updated_at),

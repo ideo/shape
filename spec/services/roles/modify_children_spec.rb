@@ -10,7 +10,7 @@ RSpec.describe Roles::ModifyChildren, type: :service do
   let(:users) { [user] }
   let(:groups) { [group] }
   let(:method) { 'add' }
-  let(:add_to_children) do
+  let(:modify_children) do
     Roles::ModifyChildren.new(
       role_name: role_name,
       parent: collection,
@@ -34,21 +34,21 @@ RSpec.describe Roles::ModifyChildren, type: :service do
     end
 
     it 'should create new roles for each user/item' do
-      expect { add_to_children.call }.to change(UsersRole, :count).by(6)
+      expect { modify_children.call }.to change(UsersRole, :count).by(6)
     end
 
     it 'should create new roles for each group/item' do
-      expect { add_to_children.call }.to change(GroupsRole, :count).by(6)
+      expect { modify_children.call }.to change(GroupsRole, :count).by(6)
     end
 
     it 'should add editor role to all card items' do
-      expect(add_to_children.call).to be true
+      expect(modify_children.call).to be true
       user.reload
       expect(collection.items.all? { |i| user.has_role?(:editor, i) }).to be true
     end
 
     it 'should add editor role to all card items' do
-      expect(add_to_children.call).to be true
+      expect(modify_children.call).to be true
       group.reload
       expect(collection.items.all? { |i| user.has_role?(:editor, i) }).to be true
     end
@@ -61,7 +61,7 @@ RSpec.describe Roles::ModifyChildren, type: :service do
 
       it 'should add editor role to sub-collection' do
         expect(collection.children).to include(subcollection)
-        expect(add_to_children.call).to be true
+        expect(modify_children.call).to be true
         expect(user.has_role?(:editor, subcollection)).to be true
       end
     end
@@ -75,7 +75,7 @@ RSpec.describe Roles::ModifyChildren, type: :service do
       end
 
       it 'should include all users from parent' do
-        expect(add_to_children.call).to be true
+        expect(modify_children.call).to be true
         expect(collection.items.first.editors[:users]).to match_array(users)
       end
     end
@@ -95,7 +95,7 @@ RSpec.describe Roles::ModifyChildren, type: :service do
       it 'should call MassAssign to save roles on the child item' do
         # 1 subcollection and 5 items should all get modified
         expect(Roles::MassAssign).to receive(:call).exactly(6).times
-        expect(add_to_children.call).to be true
+        expect(modify_children.call).to be true
       end
     end
 
@@ -123,7 +123,7 @@ RSpec.describe Roles::ModifyChildren, type: :service do
               object: submission,
             ),
           )
-          add_to_children.call
+          modify_children.call
         end
       end
 
@@ -134,23 +134,26 @@ RSpec.describe Roles::ModifyChildren, type: :service do
               object: submission,
             ),
           )
-          add_to_children.call
+          modify_children.call
         end
       end
     end
 
     context 'with private child' do
-      let(:other_user) { create(:user) }
-      let!(:collection) { create(:collection, add_editors: [other_user]) }
+      let(:other_users) { create_list(:user, 2) }
+      let(:other_user) { other_users.first }
+      let!(:collection) { create(:collection, add_editors: other_users) }
 
       before do
         subcollection.unanchor_and_inherit_roles_from_anchor!
         other_user.remove_role(Role::EDITOR, subcollection)
+        # simulate a time difference, otherwise the seconds will match and think its cached
+        subcollection.roles.first.update(updated_at: 20.seconds.from_now)
       end
 
       it 'should not add the parent roles to the child' do
         expect(Roles::MassAssign).not_to receive(:call)
-        add_to_children.call
+        modify_children.call
       end
     end
   end

@@ -276,7 +276,7 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
     end
   end
 
-  describe 'GET #will_become_private', only: true do
+  describe 'GET #will_become_private' do
     let(:other_user) { create(:user) }
     let(:parent) { create(:collection, add_editors: [user]) }
     let(:collection) { create(:collection, parent_collection: parent) }
@@ -289,9 +289,9 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
           remove_identifiers: ["User_#{user.id}"],
         }
       }
-      it 'should return false' do
+      it 'should return true' do
         get(path, params: params)
-        expect(json['inherit']).to be false
+        expect(response.body).to eq 'true'
       end
     end
 
@@ -302,9 +302,9 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
           remove_identifiers: ["User_#{other_user.id}"],
         }
       }
-      it 'should return true' do
+      it 'should return false' do
         get(path, params: params)
-        expect(json['inherit']).to be true
+        expect(response.body).to eq 'false'
       end
     end
 
@@ -320,9 +320,9 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
             remove_identifiers: ["Group_#{group.id}"],
           }
         }
-        it 'should return false' do
+        it 'should return true' do
           get(path, params: params)
-          expect(json['inherit']).to be false
+          expect(response.body).to eq 'true'
         end
       end
 
@@ -336,9 +336,9 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
             remove_identifiers: ["Group_#{group.id}"],
           }
         }
-        it 'should return true' do
+        it 'should return false' do
           get(path, params: params)
-          expect(json['inherit']).to be true
+          expect(response.body).to eq 'false'
         end
       end
     end
