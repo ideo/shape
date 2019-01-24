@@ -116,6 +116,7 @@ module Roles
         action: action,
         subject_user_ids: @added_users.pluck(:id),
         subject_group_ids: @added_groups.pluck(:id),
+        should_notify: should_notify?,
       )
     end
 
