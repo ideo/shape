@@ -9,15 +9,14 @@ RSpec.describe Roles::Inheritance, type: :service do
   let(:inheritance) do
     Roles::Inheritance.new(collection)
   end
+  let(:all_objects) do
+    [collection] + collection.children
+  end
+  let(:editors) { create_list(:user, 2) }
+  let(:viewers) { create_list(:user, 2) }
+  let(:item) { collection.items.first }
 
   describe '#inherit_from_parent?' do
-    let(:all_objects) do
-      [collection] + collection.children
-    end
-    let(:editors) { create_list(:user, 2) }
-    let(:viewers) { create_list(:user, 2) }
-    let(:item) { collection.items.first }
-
     context 'same editors and viewers on all items' do
       before do
         all_objects.each(&:unanchor_and_inherit_roles_from_anchor!)
@@ -129,6 +128,28 @@ RSpec.describe Roles::Inheritance, type: :service do
         it 'should return true because group members == editors' do
           expect(inheritance.inherit_from_parent?(item)).to be true
         end
+      end
+    end
+  end
+
+  # private_child? is generally just doing !inherit_from_parent so we don't need to
+  # duplicate everything above
+  describe '#private_child?' do
+    before do
+      add_roles(Role::EDITOR, editors, collection)
+      add_roles(Role::EDITOR, editors[0], item)
+    end
+
+    it 'returns true when child has less editors than parent' do
+      expect(inheritance.private_child?(item)).to be true
+    end
+
+    context 'cached_inheritance' do
+      it 'caches the inheritance settings on the item' do
+        expect(item.cached_inheritance).to be nil
+        expect(inheritance.private_child?(item)).to be true
+        # now the setting should be cached
+        expect(item.cached_inheritance['private']).to be true
       end
     end
   end

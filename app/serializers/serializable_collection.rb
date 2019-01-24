@@ -80,7 +80,7 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   attribute :is_private do
-    # TODO: replace with cached attr
+    # NOTE: this will return the cached value if found
     Roles::Inheritance.new(@object.parent).private_child?(@object)
   end
 

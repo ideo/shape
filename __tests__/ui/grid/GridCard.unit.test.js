@@ -174,6 +174,19 @@ describe('GridCard', () => {
         expect(wrapper.find('GenericFileItemCover').exists()).toBeTruthy()
       })
     })
+
+    describe('with a private item', () => {
+      beforeEach(() => {
+        props.card.record = { ...fakeTextItem, is_private: true }
+        props.record = props.card.record
+        props.cardType = 'items'
+        rerender()
+      })
+
+      it('renders a HiddenIconButton', () => {
+        expect(wrapper.find('HiddenIconButton').exists()).toBeTruthy()
+      })
+    })
   })
   // -------------------
   // <--- end 'with item'

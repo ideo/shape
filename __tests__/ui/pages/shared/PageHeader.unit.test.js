@@ -64,6 +64,19 @@ describe('PageHeader', () => {
       })
     })
 
+    describe('for a private item', () => {
+      beforeEach(() => {
+        fakeTextItem.can_edit = true
+        fakeTextItem.is_private = true
+        props.record = fakeTextItem
+        wrapper.setProps(props)
+      })
+
+      it('should render the HiddenIconButton', () => {
+        expect(wrapper.find('HiddenIconButton').exists()).toBeTruthy()
+      })
+    })
+
     describe('for a normal collection', () => {
       it('should render the breadcrumb', () => {
         expect(wrapper.find('Breadcrumb').prop('record')).toEqual(

@@ -53,6 +53,11 @@ const SharedRecordMixin = superclass =>
       return this.apiStore.request(apiPath, 'PATCH', { data })
     }
 
+    API_restorePermissions() {
+      const apiPath = `${this.internalType}/${this.id}/restore_permissions`
+      return this.apiStore.request(apiPath, 'PATCH')
+    }
+
     pushUndo({ snapshot, message = '', apiCall } = {}) {
       let undoApiCall = apiCall
       if (!apiCall) {
