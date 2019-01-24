@@ -8,6 +8,7 @@ RSpec.describe Roles::MassAssign, type: :service do
   let(:role_name) { :editor }
   let(:propagate_to_children) { false }
   let(:invited_by) { nil }
+  let(:send_invites) { true }
   let(:new_role) { false }
   let(:assign_role) do
     Roles::MassAssign.new(
@@ -17,6 +18,7 @@ RSpec.describe Roles::MassAssign, type: :service do
       groups: groups,
       propagate_to_children: propagate_to_children,
       invited_by: invited_by,
+      send_invites: send_invites,
       new_role: new_role,
     )
   end
@@ -158,6 +160,7 @@ RSpec.describe Roles::MassAssign, type: :service do
           action: :added_editor,
           subject_user_ids: users.pluck(:id),
           subject_group_ids: groups.pluck(:id),
+          should_notify: true,
         )
         assign_role.call
       end
@@ -265,6 +268,20 @@ RSpec.describe Roles::MassAssign, type: :service do
           )
           expect(ActivityAndNotificationBuilder).to receive(:call)
           assign_role.call
+        end
+
+        context 'with notifications turned off by the inviter' do
+          let(:send_invites) { false }
+
+          it 'should not send an email or notifications' do
+            expect(InvitationMailer).not_to receive(:invite)
+            expect(ActivityAndNotificationBuilder).to receive(:call).with(
+              hash_including(
+                should_notify: false,
+              ),
+            )
+            assign_role.call
+          end
         end
       end
 

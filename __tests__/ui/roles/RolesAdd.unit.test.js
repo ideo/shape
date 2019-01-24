@@ -5,6 +5,7 @@ jest.mock('../../../app/javascript/stores')
 
 let props
 let wrapper
+let defaultOpts
 
 describe('RolesAdd', () => {
   beforeEach(() => {
@@ -18,6 +19,7 @@ describe('RolesAdd', () => {
       ownerType: 'collections',
     }
     wrapper = mount(<RolesAdd {...props} />)
+    defaultOpts = { sendInvites: true }
   })
 
   describe('_autocompleteSearch', () => {
@@ -191,7 +193,8 @@ describe('RolesAdd', () => {
         component.handleSave().then(() => {
           expect(props.onCreateRoles).toHaveBeenCalledWith(
             [{ id: 1 }],
-            'viewer'
+            'viewer',
+            defaultOpts
           )
           done()
         })
@@ -207,7 +210,29 @@ describe('RolesAdd', () => {
         component.handleSave().then(() => {
           expect(props.onCreateRoles).toHaveBeenCalledWith(
             registeredUsers,
-            'viewer'
+            'viewer',
+            defaultOpts
+          )
+          done()
+        })
+      })
+    })
+
+    describe('without invites', () => {
+      const ev = { target: {} }
+
+      beforeEach(() => {
+        ev.target.checked = false
+        component.handleSendInvitesToggle(ev)
+        component.selectedUsers = registeredUsers
+      })
+
+      it('should send the flag to silence invites', done => {
+        component.handleSave().then(() => {
+          expect(props.onCreateRoles).toHaveBeenCalledWith(
+            registeredUsers,
+            'viewer',
+            { sendInvites: false }
           )
           done()
         })

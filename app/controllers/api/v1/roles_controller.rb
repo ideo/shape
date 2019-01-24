@@ -26,6 +26,7 @@ class Api::V1::RolesController < Api::V1::BaseController
       mass_assignment_params.merge(
         invited_by: current_user,
         new_role: !is_switching,
+        send_invites: send_invites_bool,
       ),
     )
     if service.call
@@ -100,5 +101,10 @@ class Api::V1::RolesController < Api::V1::BaseController
 
   def record
     @collection || @item || @group || @role.resource
+  end
+
+  def send_invites_bool
+    return true unless json_api_params.has_key?(:send_invites)
+    json_api_params[:send_invites]
   end
 end

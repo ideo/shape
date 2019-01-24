@@ -12,6 +12,7 @@ module Roles
                    propagate_to_children: false,
                    synchronous: false,
                    invited_by: nil,
+                   send_invites: true,
                    new_role: false)
       @object = object
       @role_name = role_name
@@ -20,6 +21,7 @@ module Roles
       @propagate_to_children = propagate_to_children
       @synchronous = synchronous
       @invited_by = invited_by
+      @send_invites = send_invites
       # new role, as opposed to switching roles e.g. editor/viewer on the same object
       @new_role = new_role
       @added_users = []
@@ -36,7 +38,7 @@ module Roles
       unanchor_object # from shared methods
       assign_role_to_users
       setup_org_membership if newly_invited?
-      notify_users if newly_invited?
+      notify_users if should_notify?
       assign_role_to_groups
       add_editors_as_comment_thread_followers
       add_group_members_as_comment_thread_followers
@@ -50,6 +52,10 @@ module Roles
 
     def newly_invited?
       @invited_by && @new_role
+    end
+
+    def should_notify?
+      newly_invited? && @send_invites
     end
 
     def assign_role_to_users
@@ -110,6 +116,7 @@ module Roles
         action: action,
         subject_user_ids: @added_users.pluck(:id),
         subject_group_ids: @added_groups.pluck(:id),
+        should_notify: should_notify?,
       )
     end
 

@@ -222,6 +222,7 @@ class RolesMenu extends React.Component {
       group_ids: groupIds,
       user_ids: userIds,
       is_switching: opts.isSwitching,
+      send_invites: opts.sendInvites,
     }
     return apiStore
       .request(`${ownerType}/${ownerId}/roles`, 'POST', data)

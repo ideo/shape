@@ -3,11 +3,13 @@ import PropTypes from 'prop-types'
 import { observable, action } from 'mobx'
 import { observer } from 'mobx-react'
 import styled from 'styled-components'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
 import { Grid, Hidden, MenuItem } from '@material-ui/core'
 
 import trackError from '~/utils/trackError'
 import isEmail from '~/utils/isEmail'
 import {
+  Checkbox,
   FormButton,
   FormActionsContainer,
   Select,
@@ -25,12 +27,18 @@ const RightAligner = styled(Grid)`
 `
 RightAligner.displayName = 'StyledRightAligner'
 
+const StyledFormControlLabel = styled(FormControlLabel)`
+  margin-top: -10px;
+`
+
 @observer
 class RolesAdd extends React.Component {
   @observable
   selectedUsers = []
   @observable
   selectedRole = ''
+  @observable
+  sendInvites = true
   @observable
   loading = false
 
@@ -151,6 +159,7 @@ class RolesAdd extends React.Component {
   }
 
   handleSave = async () => {
+    const { sendInvites } = this
     const emails = this.selectedUsers
       .filter(selected => !selected.id)
       .map(selected => selected.email)
@@ -164,7 +173,8 @@ class RolesAdd extends React.Component {
     }
     const roles = await this.props.onCreateRoles(
       [...created.data, ...fullUsers],
-      this.selectedRole
+      this.selectedRole,
+      { sendInvites }
     )
     this.setLoading(false)
     this.resetSelectedUsers()
@@ -174,6 +184,11 @@ class RolesAdd extends React.Component {
   @action
   handleRoleSelect = ev => {
     this.selectedRole = ev.target.value
+  }
+
+  @action
+  handleSendInvitesToggle = ev => {
+    this.sendInvites = ev.target.checked
   }
 
   @action
@@ -269,11 +284,22 @@ class RolesAdd extends React.Component {
             </RowItemRight>
           </RightAligner>
         </Grid>
-        <Hidden only="xs">
-          <Row>
+        <Row>
+          <StyledFormControlLabel
+            classes={{ label: 'form-control' }}
+            control={
+              <Checkbox
+                checked={!!this.sendInvites}
+                onChange={this.handleSendInvitesToggle}
+                value="yes"
+              />
+            }
+            label="Notify people"
+          />
+          <Hidden only="xs">
             <EmailCSVUploader onComplete={this.handleEmailInput} />
-          </Row>
-        </Hidden>
+          </Hidden>
+        </Row>
         <FormActionsContainer style={{ paddingBottom: '0' }}>
           <FormButton
             onClick={this.confirmSave}
