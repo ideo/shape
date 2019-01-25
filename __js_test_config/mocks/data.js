@@ -340,6 +340,9 @@ export const fakeThread = {
   comments: [fakeComment, fakeComment, fakeComment],
   users_thread: {
     subscribed: true,
+    get currentSubscribed() {
+      return this.subscribed
+    }
   },
   latestUnreadComments: [fakeComment, fakeComment],
   API_saveComment: jest.fn().mockReturnValue(Promise.resolve({})),
