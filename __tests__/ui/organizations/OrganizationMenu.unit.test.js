@@ -162,7 +162,8 @@ describe('OrganizationMenu', () => {
     it('should call googleTagManager.push', () => {
       expect(googleTagManager.push).toHaveBeenCalledWith({
         event: 'formSubmission',
-        formType: 'New Org',
+        // because we have an existing org in apiStore in this case
+        formType: 'Additional Org',
       })
     })
 
