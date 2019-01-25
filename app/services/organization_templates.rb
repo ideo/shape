@@ -16,7 +16,9 @@ class OrganizationTemplates < SimpleService
     return if @org.getting_started_collection.present? || getting_started_template.blank?
 
     # create Getting Started collection for the org and the first admin user
-    OrganizationTemplatesWorker.perform_async(
+    OrganizationTemplatesWorker.perform_in(
+      # for some reason the org sometimes wasn't being found right away
+      3.seconds,
       @org.id,
       getting_started_template.id,
       @user.id,

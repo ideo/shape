@@ -4,7 +4,6 @@ import { Fragment } from 'react'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import ConfirmationDialog from '~/ui/global/modals/ConfirmationDialog'
 import CloseSubtractIcon from '~/ui/icons/CloseSubtractIcon'
-import apiSaveModel from '~/utils/apiSaveModel'
 import trackError from '~/utils/trackError'
 
 @inject('apiStore')
@@ -30,7 +29,7 @@ class BillingMenu extends React.Component {
     const organization = this.props.apiStore.currentUser.current_organization
     organization.deactivated = true
     try {
-      await apiSaveModel(organization)
+      await organization.patch()
       runInAction(() => {
         this.alert = true
       })
