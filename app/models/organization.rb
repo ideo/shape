@@ -364,13 +364,6 @@ class Organization < ApplicationRecord
       active: true,
     ).first
     return unless subscription
-    # TODO: fix when Network allows cancellation without a payment_method
-    payment_method = NetworkApi::PaymentMethod.find(
-      organization_id: network_organization.id,
-      default: true,
-    ).first
-    return unless payment_method
-
     subscription.cancel(immediately: true)
   end
 

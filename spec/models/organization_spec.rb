@@ -212,7 +212,6 @@ describe Organization, type: :model do
         let(:organization) { create(:organization, deactivated: false) }
         let(:network_organization) { double('network_organization', id: 345) }
         let(:subscription) { double('subscription') }
-        let(:payment_method) { double(id: 456) }
 
         before do
           allow(organization).to receive(:network_organization).and_return(network_organization)
@@ -221,10 +220,6 @@ describe Organization, type: :model do
             organization_id: network_organization.id,
             active: true,
           ).and_return([subscription])
-          allow(NetworkApi::PaymentMethod).to receive(:find).with(
-            organization_id: network_organization.id,
-            default: true,
-          ).and_return([payment_method])
         end
 
         it 'cancels the existing subscription' do
@@ -232,16 +227,6 @@ describe Organization, type: :model do
             immediately: true,
           )
           organization.update_attributes(deactivated: true)
-        end
-
-        context 'with no payment_method' do
-          let(:payment_method) { nil }
-
-          it 'updates the organization but does not cancel the subscription' do
-            expect(subscription).not_to receive(:cancel)
-            organization.update_attributes(deactivated: true)
-            expect(organization.deactivated).to be true
-          end
         end
       end
 
