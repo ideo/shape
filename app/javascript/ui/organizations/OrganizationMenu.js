@@ -83,6 +83,7 @@ class OrganizationMenu extends React.Component {
       runInAction(() => {
         this.isLoading = true
       })
+      const hasOrg = !!apiStore.currentUserOrganization
       await newOrg.create()
       await apiStore.currentUser.switchOrganization(newOrg.id, {
         redirectPath: 'homepage',
@@ -90,9 +91,8 @@ class OrganizationMenu extends React.Component {
       uiStore.update('orgCreated', true)
       googleTagManager.push({
         event: 'formSubmission',
-        formType: 'New Org',
+        formType: hasOrg ? 'Additional Org' : 'New Org',
       })
-
       onClose()
     } catch (err) {
       uiStore.alert(err.error ? err.error[0] : 'There was an error.')

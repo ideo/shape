@@ -2,6 +2,9 @@
 
 const googleTagManager = {
   push: params => {
+    if (process.env.SHAPE_APP === 'localhost') {
+      console.log('dataLayer.push', params)
+    }
     window.dataLayer = window.dataLayer || []
     return window.dataLayer.push(params)
   },
