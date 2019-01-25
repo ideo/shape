@@ -119,7 +119,7 @@ class Api::V1::RolesController < Api::V1::BaseController
   end
 
   def send_invites_bool
-    return true unless json_api_params.has_key?(:send_invites)
+    return true unless json_api_params.key?(:send_invites)
     json_api_params[:send_invites]
   end
 end
