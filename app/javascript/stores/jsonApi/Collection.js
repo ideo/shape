@@ -463,7 +463,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   reopenTest = () => this._performTestAction('reopen')
 
-  submitSubmission = () =>
+  API_submitSubmission = () =>
     this.apiStore.request(`collections/${this.id}/submit`, 'PATCH')
 
   async _fetchSubmissionTest() {

@@ -121,27 +121,37 @@ describe Resourceable, type: :concern do
 
   context 'getting all editors and viewers' do
     let(:group_members) { create_list(:user, 2) }
+    let(:other_user) { group_members.first }
     let(:group) { create(:group, add_members: group_members) }
 
-    describe '#editor_user_ids' do
+    describe '#user_and_group_identifiers_with_edit_access' do
       before do
         user.add_role(Role::EDITOR, collection)
         group.add_role(Role::EDITOR, collection)
+        other_user.add_role(Role::VIEWER, collection)
       end
 
-      it 'gets all the editor user ids including group members' do
-        expect(collection.editor_user_ids).to match_array([user.id] + group_members.map(&:id))
+      it 'gets all editor user and group identifiers' do
+        expect(collection.user_and_group_identifiers_with_edit_access).to match_array([
+          "User_#{user.id}",
+          "Group_#{group.id}",
+        ])
       end
     end
 
-    describe '#viewer_user_ids' do
+    describe '#user_and_group_identifiers_with_view_access' do
       before do
         user.add_role(Role::VIEWER, collection)
         group.add_role(Role::VIEWER, collection)
+        other_user.add_role(Role::EDITOR, collection)
       end
 
-      it 'gets all the viewer user ids including group members' do
-        expect(collection.viewer_user_ids).to match_array([user.id] + group_members.map(&:id))
+      it 'gets combined viewer and editor user and group identifiers' do
+        expect(collection.user_and_group_identifiers_with_view_access).to match_array([
+          "User_#{user.id}",
+          "User_#{other_user.id}",
+          "Group_#{group.id}",
+        ])
       end
     end
   end

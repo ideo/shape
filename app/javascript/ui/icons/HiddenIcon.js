@@ -1,6 +1,6 @@
 import Icon from './Icon'
 
-const OkIcon = () => (
+const HiddenIcon = () => (
   <Icon fill>
     <svg
       version="1.1"
@@ -30,4 +30,4 @@ const OkIcon = () => (
   </Icon>
 )
 
-export default OkIcon
+export default HiddenIcon

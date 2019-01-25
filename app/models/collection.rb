@@ -24,7 +24,8 @@ class Collection < ApplicationRecord
                  :cached_org_properties,
                  :cached_card_count,
                  :submission_attrs,
-                 :getting_started_shell
+                 :getting_started_shell,
+                 :cached_inheritance
 
   # callbacks
   after_touch :touch_related_cards, unless: :destroyed?

@@ -409,4 +409,35 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       end
     end
   end
+
+  describe 'PATCH #restore_permissions' do
+    let!(:parent) { create(:collection) }
+    let(:path) { "/api/v1/collections/#{collection.id}/restore_permissions" }
+
+    context 'without edit access to the collection' do
+      let!(:collection) { create(:collection, parent_collection: parent) }
+
+      it 'returns a 401' do
+        patch(path)
+        expect(response.status).to eq(401)
+      end
+    end
+
+    context 'with edit access to the collection' do
+      let!(:collection) { create(:collection, add_editors: [user], parent_collection: parent) }
+
+      it 'returns a 200' do
+        patch(path)
+        expect(response.status).to eq(200)
+      end
+
+      it 'calls Roles::MergeToChild' do
+        expect(Roles::MergeToChild).to receive(:call).with(
+          parent: parent,
+          child: collection,
+        )
+        patch(path)
+      end
+    end
+  end
 end

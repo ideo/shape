@@ -3,15 +3,15 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import Modal from '~/ui/global/modals/Modal'
 import RolesMenu from '~/ui/roles/RolesMenu'
 
-@inject('uiStore', 'apiStore')
+@inject('uiStore')
 @observer
 class RolesModal extends React.Component {
   handleClose = async ev => {
-    const { apiStore, uiStore, record, open } = this.props
+    const { uiStore, record, open } = this.props
     if (open) {
       if (uiStore.viewingRecord === record) {
         // re-fetch record in case roles were altered during RolesMenu searching/editing
-        await apiStore.fetch(record.internalType, record.id, true)
+        await record.refetch()
       }
       uiStore.closeRolesMenu()
     }
@@ -42,7 +42,6 @@ RolesModal.propTypes = {
 }
 RolesModal.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default RolesModal

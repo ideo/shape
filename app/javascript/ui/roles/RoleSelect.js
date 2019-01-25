@@ -50,11 +50,12 @@ class RoleSelect extends React.Component {
     return record.internalType.slice(0, -1)
   }
 
-  onRoleRemove = ev => {
+  onRoleRemove = async ev => {
     ev.preventDefault()
-    const { entity } = this.props
+    const { record, role, entity } = this.props
     let prompt
     let confirmText
+    let iconName = 'Leave'
     if (entity.isCurrentUser) {
       prompt = `Are you sure you want to leave this ${this.resourceType}?`
       confirmText = 'Leave'
@@ -63,10 +64,30 @@ class RoleSelect extends React.Component {
         ${this.renderName()} from this ${this.resourceType}?`
       confirmText = 'Remove'
     }
+
+    let becomesPrivate = false
+    if (record.internalType !== 'groups' && !record.is_private) {
+      becomesPrivate = await record.API_willBecomePrivate({
+        removing: entity,
+        roleName: role.name,
+      })
+    }
+    if (becomesPrivate) {
+      const parentName = record.parent
+        ? `"${record.parent.name}"`
+        : 'the parent collection'
+      iconName = 'Hidden'
+      prompt += ` This change will break permission inheritance from ${parentName}.`
+      prompt += ` New people added to ${parentName} will no longer get access to "${
+        record.name
+      }".`
+      // confirmText = 'Continue'
+    }
+
     uiStore.confirm({
       prompt,
       confirmText,
-      iconName: 'Leave',
+      iconName,
       onConfirm: () => this.deleteRole(false),
     })
   }

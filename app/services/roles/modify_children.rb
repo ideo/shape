@@ -42,7 +42,6 @@ module Roles
         # If the user can edit, then continue adding the roles
         next unless @user.nil? || child.can_edit?(@user)
         # don't modify private children, other than unhidden submissions
-
         next if @inheritance.private_child?(child) && !unhidden_submission?(child)
 
         # just alter the roles at this one level, since we are already searching through *all* levels of children

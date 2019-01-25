@@ -4,7 +4,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   load_and_authorize_resource except: %i[update destroy in_my_collection]
   # NOTE: these have to be in the following order
   before_action :load_and_authorize_collection_update, only: %i[update]
-  before_action :load_collection_with_cards, only: %i[show update]
+  before_action :load_collection_with_roles, only: %i[show update]
 
   before_action :log_viewing_activities, only: %i[show]
   before_action :check_cache, only: %i[show]
@@ -81,11 +81,16 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def submit
     if @collection.submit_submission!
-      render jsonapi: @collection,
-             include: Collection.default_relationships_for_api
+      render_collection
     else
       render_api_errors @collection.errors
     end
+  end
+
+  def restore_permissions
+    Roles::MergeToChild.call(parent: @collection.parent, child: @collection)
+    render_collection
+    # no error case needed... ?
   end
 
   private
@@ -161,7 +166,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     authorize! :manage, @collection
   end
 
-  def load_collection_with_cards
+  def load_collection_with_roles
     @collection = Collection
                   .where(id: params[:id])
                   .includes(Collection.default_relationships_for_query)

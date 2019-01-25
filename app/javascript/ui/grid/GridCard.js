@@ -23,7 +23,7 @@ import CollectionIcon from '~/ui/icons/CollectionIcon'
 import EditButton from '~/ui/reporting/EditButton'
 import FullScreenIcon from '~/ui/icons/FullScreenIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
-import HiddenIcon from '~/ui/icons/HiddenIcon'
+import HiddenIconButton from '~/ui/icons/HiddenIconButton'
 import Download from '~/ui/grid/Download'
 import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
 import RequiredCollectionIcon from '~/ui/icons/RequiredCollectionIcon'
@@ -199,11 +199,22 @@ class GridCard extends React.Component {
 
   get renderHidden() {
     const { record } = this.props
-    if (record.submission_attrs && record.submission_attrs.hidden) {
+    const { isItem } = this
+    if (
+      record.is_private ||
+      (record.isSubmission && record.submission_attrs.hidden)
+    ) {
       return (
-        <StyledBottomLeftIcon small iconAmount={1} iconPos={2}>
-          <HiddenIcon />
-        </StyledBottomLeftIcon>
+        <HiddenIconButton
+          clickable={record.can_edit && record.is_private}
+          size="sm"
+          record={record}
+          IconWrapper={({ children }) => (
+            <StyledBottomLeftIcon small iconAmount={1} iconPos={isItem ? 1 : 2}>
+              {children}
+            </StyledBottomLeftIcon>
+          )}
+        />
       )
     }
     return null
