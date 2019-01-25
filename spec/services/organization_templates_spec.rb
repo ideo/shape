@@ -9,7 +9,7 @@ RSpec.describe OrganizationTemplates, type: :service do
   let(:service) { OrganizationTemplates.new(organization, user) }
 
   before do
-    allow(OrganizationTemplatesWorker).to receive(:perform_async)
+    allow(OrganizationTemplatesWorker).to receive(:perform_in)
     allow(FilestackFile).to receive(:create_from_url).and_return(filestack_file)
     allow_any_instance_of(User)
       .to receive(:current_user_collection).and_return(user_collection)
@@ -134,7 +134,8 @@ RSpec.describe OrganizationTemplates, type: :service do
       end
 
       it 'invokes the OrganizationTemplatesWorker' do
-        expect(OrganizationTemplatesWorker).to have_received(:perform_async).with(
+        expect(OrganizationTemplatesWorker).to have_received(:perform_in).with(
+          3.seconds,
           organization.id,
           getting_started_template.id,
           user.id,
