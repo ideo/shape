@@ -308,6 +308,20 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
       end
     end
 
+    context 'with a collection in My Collection (UserCollection as parent)' do
+      let(:parent) { create(:user_collection, add_editors: [user]) }
+      let(:params) {
+        {
+          role_name: 'editor',
+          remove_identifiers: ["User_#{user.id}"],
+        }
+      }
+      it 'should always return false' do
+        get(path, params: params)
+        expect(response.body).to eq 'false'
+      end
+    end
+
     context 'with groups' do
       let(:group) { create(:group, add_members: [other_user]) }
       let(:editor_group) { create(:group, add_members: [user]) }

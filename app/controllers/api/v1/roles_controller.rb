@@ -64,17 +64,22 @@ class Api::V1::RolesController < Api::V1::BaseController
   end
 
   def will_become_private
-    inheritance = Roles::Inheritance.new(record.parent)
+    parent = record.parent
+    inheritance = Roles::Inheritance.new(parent)
     remove_identifiers = if params[:remove_identifiers].is_a?(Array)
                            params[:remove_identifiers]
                          else
                            [params[:remove_identifiers]]
                          end
-    inherit = inheritance.inherit_from_parent?(
-      record,
-      remove_identifiers: remove_identifiers,
-      role_name: params[:role_name],
-    )
+    if parent.is_a?(Collection::UserCollection)
+      inherit = true
+    else
+      inherit = inheritance.inherit_from_parent?(
+        record,
+        remove_identifiers: remove_identifiers,
+        role_name: params[:role_name],
+      )
+    end
     render json: !inherit
   end
 

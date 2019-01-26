@@ -240,6 +240,12 @@ module Resourceable
     end
   end
 
+  def private?
+    return false if parent&.is_a?(Collection::UserCollection)
+    # NOTE: this will return the cached value if found
+    Roles::Inheritance.new(parent).private_child?(self)
+  end
+
   private
 
   # only makes sense to call this method if there are no roles and you have unanchored the resource
