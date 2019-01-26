@@ -260,7 +260,7 @@ class CollectionGrid extends React.Component {
         newOrder !== placeholder.order
       if (positionChanged) {
         // NOTE: this will modify observable card attrs, for later save/update
-        placeholder.order = newOrder
+        // placeholder.order = newOrder
         this.positionCards(stateCards, {
           dragging: positionedCard.id,
           hoveringOver: hoveringOver.order,
@@ -307,30 +307,30 @@ class CollectionGrid extends React.Component {
         card.cardType === 'placeholder' || card.cardType === 'blank'
       if (card.id === cardId || placeholder) return null
       // only run this check if we're within the reasonable row bounds
-      if (
-        card.position.yPos <= dragY + 15 &&
-        card.position.yPos + card.position.height >= dragY - 15
-      ) {
+      const { position } = card
+      const sameRow =
+        position.yPos <= dragY && position.yPos + position.height >= dragY
+      const withinCard =
+        dragX >= position.xPos - 20 &&
+        dragX <= position.xPos + position.width - 20
+      if (sameRow && withinCard) {
         const mousePos = { x: dragX, y: dragY }
-        // const cardCenter = {
-        //   x: card.position.xPos + (card.position.width / 2),
-        //   y: card.position.yPos + (card.position.height / 2),
-        // }
+
         const cardTL = {
-          x: card.position.xPos,
-          y: card.position.yPos,
+          x: position.xPos,
+          y: position.yPos,
         }
         const cardTR = {
-          x: card.position.xPos + card.position.width,
-          y: card.position.yPos,
+          x: position.xPos + position.width,
+          y: position.yPos,
         }
         const cardBL = {
-          x: card.position.xPos,
-          y: card.position.yPos + card.position.height,
+          x: position.xPos,
+          y: position.yPos + position.height,
         }
         const cardBR = {
-          x: card.position.xPos + card.position.width,
-          y: card.position.yPos + card.position.height,
+          x: position.xPos + position.width,
+          y: position.yPos + position.height,
         }
         const distanceTL = calculateDistance(mousePos, cardTL)
         const distanceTR = calculateDistance(mousePos, cardTR)
@@ -344,10 +344,10 @@ class CollectionGrid extends React.Component {
         )
         let direction = 'left'
         if (
-          dragY > card.position.yPos &&
+          dragY > position.yPos &&
           (distance === distanceBR ||
             distance === distanceTR ||
-            dragY > card.position.yPos + card.position.height)
+            dragY > position.yPos + position.height)
         ) {
           direction = 'right'
         }
@@ -612,6 +612,7 @@ class CollectionGrid extends React.Component {
           position={card.position}
           record={record}
           onDrag={this.onDrag}
+          // hoveringOver={null || move || drop}
           onDragOrResizeStop={this.onDragOrResizeStop}
           onResize={this.onResize}
           onResizeStop={this.onResizeStop}

@@ -133,7 +133,12 @@ class MovableGridCard extends React.PureComponent {
     }
 
     const pageMargin = window.innerWidth - v.maxWidth
-    const cardX = e.pageX - pageMargin / 2
+    let cardX = e.pageX
+    if (window.innerWidth >= v.maxWidth) {
+      cardX -= pageMargin / 2
+    } else {
+      cardX -= 35
+    }
     const cardY = e.pageY - TOP_SCROLL_TRIGGER
     this.setState({
       x: cardX - position.width / 2,
