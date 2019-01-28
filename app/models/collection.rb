@@ -719,6 +719,15 @@ class Collection < ApplicationRecord
   # =================================
   # <--- end boolean checks
 
+  def any_parent_unsubscribed?(user)
+    record_unsubscribed = false
+    parents.each do |r|
+      record_unsubscribed = record_unsubscribed?(r, user)
+      break if record_unsubscribed
+    end
+    record_unsubscribed
+  end
+
   private
 
   def organization_blank?
@@ -758,5 +767,12 @@ class Collection < ApplicationRecord
 
   def now_master_template?
     saved_change_to_master_template? && master_template?
+  end
+
+  def record_unsubscribed?(record, user)
+    return false if record.comment_thread.nil?
+    users_thread = record.comment_thread.users_thread_for(user)
+    return false if users_thread.nil?
+    !users_thread.subscribed
   end
 end

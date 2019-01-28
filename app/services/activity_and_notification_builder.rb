@@ -130,25 +130,13 @@ class ActivityAndNotificationBuilder < SimpleService
     )
   end
 
-  def should_record_receive_notifications(record, user)
-    return true if record.comment_thread.nil?
-    users_thread = record.comment_thread.users_thread_for(user)
-    return true if users_thread.nil?
-    users_thread.subscribed
-  end
-
   def should_receive_notifications?(user)
     return true if @target.is_a? Group
-    return false if @target.comment_thread.nil?
-    users_thread = @target.comment_thread.users_thread_for(user)
-    return false if users_thread.nil?
-    return false unless users_thread.subscribed
 
-    should_receive = true
-    @target.parents.each do |r|
-      should_receive = should_record_receive_notifications(r, user)
-      break unless should_receive
-    end
-    should_receive
+    parents_unsubscribed = @target.any_parent_unsubscribed?(user)
+    return !parents_unsubscribed if @target.comment_thread.nil?
+    users_thread = @target.comment_thread.users_thread_for(user)
+    return !parents_unsubscribed if users_thread.nil?
+    users_thread.subscribed
   end
 end

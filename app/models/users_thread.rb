@@ -6,6 +6,9 @@ class UsersThread < ApplicationRecord
 
   before_create do
     self.last_viewed_at = Time.now
+    if comment_thread.record.is_a? Collection
+      self.subscribed = comment_thread.record.any_parent_unsubscribed?(user) ? false : subscribed
+    end
   end
 
   # gets cached on serialized_for_firestore

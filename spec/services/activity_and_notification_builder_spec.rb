@@ -100,6 +100,10 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
                  subscribed: false)
         end
 
+        before do
+          users_thread.destroy
+        end
+
         it 'creates notifications for each user' do
           expect { builder.call }.to change(Notification, :count).by(1)
         end

@@ -14,4 +14,21 @@ describe UsersThread, type: :model do
       expect(users_thread.updated_at).to eq(comment_thread.updated_at)
     end
   end
+
+  describe 'before_create' do
+    context 'when a parent has been unsubscribed' do
+      let!(:user) { create(:user) }
+      let!(:parent_record) { create(:collection) }
+      let(:record) { create(:collection, parent_collection: parent_record) }
+      let!(:parent_comment_thread) { create(:collection_comment_thread, record: parent_record) }
+      let!(:parent_users_thread) { create(:users_thread, comment_thread: parent_comment_thread, user: user, subscribed: false) }
+
+      let!(:comment_thread) { create(:collection_comment_thread, record: record) }
+      let!(:users_thread) { create(:users_thread, comment_thread: comment_thread, user: user) }
+
+      it 'should unsubscribe the new users thread' do
+        expect(users_thread.subscribed).to be false
+      end
+    end
+  end
 end
