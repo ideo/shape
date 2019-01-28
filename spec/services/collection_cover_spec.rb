@@ -110,25 +110,23 @@ RSpec.describe CollectionCover, type: :service do
 
     context 'with private sub-items' do
       let(:users) { create_list(:user, 3) }
-      let!(:collection) { create(:collection) }
+      let(:editor) { users[0] }
+      let(:viewer) { users[1] }
+      let!(:collection) { create(:collection, add_editors: [editor], add_viewers: [viewer]) }
       let!(:private_text_item) { create(:collection_card_text, parent: collection) }
       let!(:text_item) { create(:collection_card_text, parent: collection) }
       let!(:private_image_item) { create(:collection_card_image, parent: collection) }
       let!(:video_item) { create(:collection_card_video, parent: collection) }
       let(:shared_data) { [collection, text_item.item, video_item.item] }
       let(:private_data) { [private_text_item.item, private_image_item.item] }
-      let(:editor) { users[0] }
-      let(:viewer) { users[1] }
 
       before do
-        shared_data.each do |obj|
-          obj.unanchor_and_inherit_roles_from_anchor!
-          editor.add_role(Role::EDITOR, obj)
-          viewer.add_role(Role::VIEWER, obj)
-        end
         private_data.each do |obj|
           obj.unanchor_and_inherit_roles_from_anchor!
+          # private data does not include the viewer
           editor.add_role(Role::EDITOR, obj)
+          # the `private_child?` caching only checks for updated_at to the second, have to fudge that
+          obj.roles.first.update(updated_at: 10.seconds.from_now)
         end
       end
 
