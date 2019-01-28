@@ -13,7 +13,8 @@ class ActivityAndNotificationBuilder < SimpleService
     content: nil,
     source: nil,
     destination: nil,
-    organization: nil
+    organization: nil,
+    should_notify: true
   )
     @actor = actor
     @target = target
@@ -32,11 +33,12 @@ class ActivityAndNotificationBuilder < SimpleService
     @errors = []
     @activity = nil
     @created_notifications = []
+    @should_notify = should_notify
   end
 
   def call
     create_activity
-    return unless @activity&.should_notify?
+    return unless @should_notify && @activity&.should_notify?
     create_notifications
     store_in_firestore
   end

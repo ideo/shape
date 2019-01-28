@@ -12,11 +12,6 @@ describe InvitationsController, type: :request do
       it 'redirects to signup with the user email' do
         expect(get(path)).to redirect_to(sign_up_url(email: pending_user.email))
       end
-
-      it 'stores the token in session' do
-        get(path)
-        expect(session[:pending_user_token]).to eq pending_user.invitation_token
-      end
     end
 
     context 'without a pending user' do

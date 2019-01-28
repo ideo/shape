@@ -5,7 +5,6 @@ import styled from 'styled-components'
 import Section from '~/ui/shared/components/molecules/Section'
 import AlertDialog from '~/ui/global/modals/AlertDialog'
 import Avatar from '~/ui/global/Avatar'
-import apiSaveModel from '~/utils/apiSaveModel'
 import trackError from '~/utils/trackError'
 import v from '~/utils/variables'
 
@@ -41,7 +40,7 @@ class ReactivateAccount extends React.Component {
     const organization = this.props.apiStore.currentUserOrganization
     organization.deactivated = false
     try {
-      await apiSaveModel(organization)
+      await organization.patch()
       runInAction(() => {
         this.working = false
         this.alert = true

@@ -23,21 +23,31 @@ Rails.application.routes.draw do
           get 'in_my_collection'
           post 'clear_collection_cover'
           patch 'submit'
+          patch 'restore_permissions'
         end
         collection do
           post 'create_template'
           post 'set_submission_box_template'
         end
         resources :collection_cards, only: :index
-        resources :roles, only: %i[index create destroy]
+        resources :roles, only: %i[index create destroy] do
+          collection do
+            get 'will_become_private'
+          end
+        end
       end
       resources :items, except: %i[index] do
         member do
           post 'duplicate'
           patch 'archive'
           get 'in_my_collection'
+          patch 'restore_permissions'
         end
-        resources :roles, only: %i[index create destroy]
+        resources :roles, only: %i[index create destroy] do
+          collection do
+            get 'will_become_private'
+          end
+        end
       end
       resources :test_collections, only: %i[show] do
         member do

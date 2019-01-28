@@ -31,6 +31,9 @@ module Roles
           propagate_to_children: true,
         ).call
       end
+
+      # run this check one last time now that we have merged, in case we can clean things up
+      @child.reanchor!(parent: @parent, propagate: true) if @parent.includes_all_roles? @child
     end
 
     def parent_permissions

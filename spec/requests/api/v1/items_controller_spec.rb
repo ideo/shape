@@ -193,4 +193,35 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
       expect(json['data']['attributes']['id']).not_to eq(item.id)
     end
   end
+
+  describe 'PATCH #restore_permissions' do
+    let!(:collection) { create(:collection) }
+    let(:path) { "/api/v1/items/#{item.id}/restore_permissions" }
+
+    context 'without edit access to the item' do
+      let!(:item) { create(:text_item, parent_collection: collection) }
+
+      it 'returns a 401' do
+        patch(path)
+        expect(response.status).to eq(401)
+      end
+    end
+
+    context 'with edit access to the item' do
+      let!(:item) { create(:text_item, add_editors: [user], parent_collection: collection) }
+
+      it 'returns a 200' do
+        patch(path)
+        expect(response.status).to eq(200)
+      end
+
+      it 'calls Roles::MergeToChild' do
+        expect(Roles::MergeToChild).to receive(:call).with(
+          parent: item.parent,
+          child: item,
+        )
+        patch(path)
+      end
+    end
+  end
 end

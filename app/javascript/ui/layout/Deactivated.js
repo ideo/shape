@@ -34,6 +34,7 @@ class Deactivated extends React.Component {
     const {
       apiStore: { currentUserOrganization: organization },
     } = this.props
+    if (!organization) return ''
     return (
       <PageContainer>
         <Wrapper>

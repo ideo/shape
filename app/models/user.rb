@@ -127,12 +127,12 @@ class User < ApplicationRecord
     users
   end
 
-  def self.from_omniauth(auth, pending_user)
+  def self.from_omniauth(auth)
     user = where(provider: auth.provider, uid: auth.uid).first
 
     unless user
-      # if not found, look up by same email
-      user = pending_user || User.find_or_initialize_by(email: auth.info.email)
+      # if not found by provider, look up by email
+      user = User.find_or_initialize_by(email: auth.info.email)
       user.status = User.statuses[:active]
       user.invitation_token = nil
       user.password = Devise.friendly_token(40)

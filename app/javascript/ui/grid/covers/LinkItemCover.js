@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Flex, Box } from 'reflexbox'
@@ -48,11 +49,37 @@ class LinkItemCover extends React.Component {
   }
 
   clamp() {
-    const desiredNameLen =
-      uiStore.windowWidth > v.responsive.largeBreakpoint ? 40 : 28
-    const desiredContentLen =
-      uiStore.windowWidth > v.responsive.largeBreakpoint ? 80 : 40
-    const { item } = this.props
+    const textBreakpoints = [
+      {
+        desiredNameLen: 53,
+        desiredContentLen: 90,
+      },
+      {
+        breakpoint: v.responsive.smallBreakpoint,
+        desiredNameLen: 46,
+        desiredContentLen: 79,
+      },
+      {
+        breakpoint: v.responsive.medBreakpoint,
+        desiredNameLen: 35,
+        desiredContentLen: 61,
+      },
+      {
+        breakpoint: v.responsive.largeBreakpoint,
+        desiredNameLen: 40,
+        desiredContentLen: 80,
+      },
+    ]
+    let { desiredNameLen, desiredContentLen } = textBreakpoints.reduce(
+      (prev, i) =>
+        i.breakpoint && uiStore.windowWidth > i.breakpoint ? i : prev,
+      textBreakpoints[0]
+    )
+    const { item, cardHeight } = this.props
+    if (cardHeight > 1) {
+      desiredNameLen *= 2
+      desiredContentLen *= 2
+    }
     const { name, content } = item
     let truncatedName = name || ''
     let truncatedContent = content || ''
@@ -116,6 +143,11 @@ class LinkItemCover extends React.Component {
 
 LinkItemCover.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
+  cardHeight: PropTypes.number,
+}
+
+LinkItemCover.defaultProps = {
+  cardHeight: 1,
 }
 
 export default LinkItemCover

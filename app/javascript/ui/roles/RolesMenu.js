@@ -136,6 +136,7 @@ class RolesMenu extends React.Component {
 
     this.setState(prevState => ({
       groups,
+      pendingPanelOpen: counts.active === 0 && counts.pending > 0,
       page: {
         pending:
           status === 'pending' || status === 'both'
@@ -194,16 +195,16 @@ class RolesMenu extends React.Component {
 
   clearSearch = () => this.updateSearchText('')
 
-  deleteRoles = (role, entity, opts = {}) => {
+  deleteRoles = async (role, entity, opts = {}) => {
     const { ownerId, ownerType } = this.props
-    return role.API_delete(entity, ownerId, ownerType, opts).then(res => {
+    role.API_delete(entity, ownerId, ownerType, opts).then(res => {
       // We should do a page reload to get the correct user's new org
       if (opts.organizationChange) {
         this.props.routingStore.routeTo('homepage')
         window.location.reload()
       }
       if (!opts.isSwitching) {
-        this.initializeRolesAndGroups({ skipSearch: true })
+        this.initializeRolesAndGroups()
       }
       return {}
     })
@@ -222,6 +223,7 @@ class RolesMenu extends React.Component {
       group_ids: groupIds,
       user_ids: userIds,
       is_switching: opts.isSwitching,
+      send_invites: opts.sendInvites,
     }
     return apiStore
       .request(`${ownerType}/${ownerId}/roles`, 'POST', data)

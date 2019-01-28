@@ -26,6 +26,7 @@ class Api::V1::RolesController < Api::V1::BaseController
       mass_assignment_params.merge(
         invited_by: current_user,
         new_role: !is_switching,
+        send_invites: send_invites_bool,
       ),
     )
     if service.call
@@ -62,6 +63,26 @@ class Api::V1::RolesController < Api::V1::BaseController
     end
   end
 
+  def will_become_private
+    parent = record.parent
+    inheritance = Roles::Inheritance.new(parent)
+    remove_identifiers = if params[:remove_identifiers].is_a?(Array)
+                           params[:remove_identifiers]
+                         else
+                           [params[:remove_identifiers]]
+                         end
+    if parent.is_a?(Collection::UserCollection)
+      inherit = true
+    else
+      inherit = inheritance.inherit_from_parent?(
+        record,
+        remove_identifiers: remove_identifiers,
+        role_name: params[:role_name],
+      )
+    end
+    render json: !inherit
+  end
+
   private
 
   def role_params
@@ -79,8 +100,8 @@ class Api::V1::RolesController < Api::V1::BaseController
   def authorize_remove_role_from_record
     # you can always choose to "leave" something even if not editor
     if json_api_params[:group_ids].blank? &&
-      json_api_params[:user_ids].count == 1 &&
-      json_api_params[:user_ids].first.to_i == current_user.id
+       json_api_params[:user_ids].count == 1 &&
+       json_api_params[:user_ids].first.to_i == current_user.id
       return true
     end
     authorize! :manage, record
@@ -100,5 +121,10 @@ class Api::V1::RolesController < Api::V1::BaseController
 
   def record
     @collection || @item || @group || @role.resource
+  end
+
+  def send_invites_bool
+    return true unless json_api_params.key?(:send_invites)
+    json_api_params[:send_invites]
   end
 end

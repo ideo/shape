@@ -28,6 +28,10 @@ class SerializableItem < BaseJsonSerializer
     []
   end
 
+  attribute :is_private do
+    @object.private?
+  end
+
   attribute :filestack_file_url do
     @object.cached_filestack_file_url || ''
   end

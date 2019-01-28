@@ -3,6 +3,10 @@ import { Model, initModelRef, setModelMetaKey } from 'datx'
 import { jsonapi, modelToJsonApi } from 'datx-jsonapi'
 import _ from 'lodash'
 
+// NOTE: DATX_PERSISTED_KEY matches internals in datx, they don't export this;
+// so it is possible that this could change when updating datx.
+const DATX_PERSISTED_KEY = 'jsonapiPersisted'
+
 class BaseRecord extends jsonapi(Model) {
   constructor(...args) {
     super(...args)
@@ -29,6 +33,10 @@ class BaseRecord extends jsonapi(Model) {
 
   get internalType() {
     return this.meta.type
+  }
+
+  get baseApiPath() {
+    return `${this.internalType}/${this.id}`
   }
 
   get className() {
@@ -60,15 +68,20 @@ class BaseRecord extends jsonapi(Model) {
     return data
   }
 
+  refetch() {
+    this.apiStore.fetch(this.internalType, this.id, true)
+  }
+
   async create() {
     // similar to datx save but using our toJsonApi() to scrub the data
     const res = await this.apiStore.request(`${this.internalType}`, 'POST', {
       data: this.toJsonApi(),
     })
-    setModelMetaKey(this, 'jsonapiPersisted', true)
+    setModelMetaKey(this, DATX_PERSISTED_KEY, true)
     return res.replaceData(this).data
   }
 
+  // not called `update` because that's already a thing
   patch() {
     this.apiStore.request(`${this.internalType}/${this.id}`, 'PATCH', {
       data: this.toJsonApi(),

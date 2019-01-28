@@ -9,7 +9,11 @@ class SerializableUser < BaseJsonSerializer
   end
 
   belongs_to :current_organization
-  has_many :organizations
+  has_many :organizations do
+    data do
+      @object.organizations.active
+    end
+  end
   has_many :groups do
     data { @object.current_org_groups_and_special_groups }
   end

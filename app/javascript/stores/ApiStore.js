@@ -112,7 +112,7 @@ class ApiStore extends jsonapi(datxCollection) {
   get currentOrgIsDeactivated() {
     const org =
       this.currentUserOrganization || this.currentUser.current_organization
-    if (!org) return true
+    if (!org) return false
     return org.deactivated
   }
 

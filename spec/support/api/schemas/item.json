@@ -20,7 +20,8 @@
     "question_type": { "type": ["string", "null"] },
     "chart_data": { "type": ["object", "null"] },
     "data_source_type": { "type": ["string", "null"] },
-    "data_source_id": { "type": ["number", "null"] }
+    "data_source_id": { "type": ["number", "null"] },
+    "is_private": { "type": ["boolean"] }
   },
   "required": ["type"]
 }

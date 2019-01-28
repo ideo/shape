@@ -14,12 +14,11 @@ import RolesModal from '~/ui/roles/RolesModal'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
-import HiddenIcon from '~/ui/icons/HiddenIcon'
+import HiddenIconButton from '~/ui/icons/HiddenIconButton'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import SystemIcon from '~/ui/icons/SystemIcon'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
 import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
-import Tooltip from '~/ui/global/Tooltip'
 import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
 import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
@@ -228,17 +227,17 @@ class PageHeader extends React.Component {
   }
 
   get hiddenIcon() {
-    if (this.isCurrentlyHiddenSubmission) {
+    const { record } = this.props
+    if (record.is_private || this.isCurrentlyHiddenSubmission) {
       return (
-        <Tooltip
-          classes={{ tooltip: 'Tooltip' }}
-          title="Your submission is hidden. Click to make it visible to others."
-          placement="top"
-        >
-          <IconHolder align="right">
-            <HiddenIcon />
-          </IconHolder>
-        </Tooltip>
+        <HiddenIconButton
+          clickable
+          size="lg"
+          record={record}
+          IconWrapper={({ children }) => (
+            <IconHolder align="right">{children}</IconHolder>
+          )}
+        />
       )
     }
     return null
@@ -323,7 +322,7 @@ class PageHeader extends React.Component {
       return (
         <HeaderFormButton
           color={v.colors.alert}
-          onClick={record.submitSubmission}
+          onClick={record.API_submitSubmission}
           disabled={uiStore.launchButtonLoading}
         >
           Submit

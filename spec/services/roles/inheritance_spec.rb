@@ -9,15 +9,14 @@ RSpec.describe Roles::Inheritance, type: :service do
   let(:inheritance) do
     Roles::Inheritance.new(collection)
   end
+  let(:all_objects) do
+    [collection] + collection.children
+  end
+  let(:editors) { create_list(:user, 2) }
+  let(:viewers) { create_list(:user, 2) }
+  let(:item) { collection.items.first }
 
   describe '#inherit_from_parent?' do
-    let(:all_objects) do
-      [collection] + collection.children
-    end
-    let(:editors) { create_list(:user, 2) }
-    let(:viewers) { create_list(:user, 2) }
-    let(:item) { collection.items.first }
-
     context 'same editors and viewers on all items' do
       before do
         all_objects.each(&:unanchor_and_inherit_roles_from_anchor!)
@@ -96,39 +95,73 @@ RSpec.describe Roles::Inheritance, type: :service do
       end
     end
 
-    context 'when adding new roles, passing in potential child roles' do
+    context 'when removing roles, passing in potential removed users and groups' do
       let(:addtl_viewer) { create(:user) }
 
-      before do
-        add_roles(Role::EDITOR, editors, all_objects)
-        add_roles(Role::VIEWER, viewers, all_objects)
+      context 'where role exists on parent' do
+        before do
+          addtl_viewer.add_role(Role::VIEWER, collection)
+          addtl_viewer.add_role(Role::VIEWER, item)
+        end
+
+        it 'should return false to indicate breaking inheritance' do
+          expect(
+            inheritance.inherit_from_parent?(item, remove_identifiers: ["User_#{addtl_viewer.id}"]),
+          ).to be false
+        end
       end
 
-      it 'returns true for child' do
-        add_roles(Role::VIEWER, addtl_viewer, collection)
-        add_user_ids = [addtl_viewer.id]
-        inherit = inheritance.inherit_from_parent?(
-          item,
-          add_user_ids: add_user_ids,
-          role_name: Role::VIEWER,
-        )
-        expect(inherit).to be true
+      context 'where role does not exist on parent' do
+        before do
+          addtl_viewer.add_role(Role::VIEWER, item)
+        end
+
+        it 'should return true to indicate matching inheritance' do
+          expect(
+            inheritance.inherit_from_parent?(item, remove_identifiers: ["User_#{addtl_viewer.id}"]),
+          ).to be true
+        end
       end
     end
+  end
 
-    context 'with group members' do
-      context 'group includes same users' do
-        let(:group_members) { editors }
-        let(:group) { create(:group, add_members: group_members) }
+  # private_child? is generally just doing !inherit_from_parent so we don't need to
+  # duplicate everything above
+  describe '#private_child?' do
+    before do
+      add_roles(Role::EDITOR, editors, collection)
+      add_roles(Role::EDITOR, editors[0], item)
+    end
 
-        before do
-          add_roles(Role::EDITOR, editors, collection)
-          add_roles(Role::EDITOR, group, item)
-        end
+    it 'returns true when child has less editors than parent' do
+      expect(inheritance.private_child?(item)).to be true
+    end
 
-        it 'should return true because group members == editors' do
-          expect(inheritance.inherit_from_parent?(item)).to be true
-        end
+    context 'cached_inheritance' do
+      it 'caches the inheritance settings on the item' do
+        expect(item.cached_inheritance).to be nil
+        expect(inheritance.private_child?(item)).to be true
+        # now the setting should be cached
+        expect(item.cached_inheritance['private']).to be true
+      end
+
+      it 'will re-cache the settings on the item if item is reanchored' do
+        expect(inheritance.private_child?(item)).to be true
+        # now the setting should be cached
+        expect(item.cached_inheritance['private']).to be true
+        item.reanchor!
+        expect(item.reload.cached_inheritance['private']).to be false
+      end
+
+      it 'will re-cache the settings on the item if the roles change' do
+        expect(inheritance.private_child?(item)).to be true
+        # now the setting should be cached
+        expect(item.cached_inheritance['private']).to be true
+        add_roles(Role::EDITOR, editors, item)
+        # the caching only checks for updated_at to the second, have to fudge that
+        item.roles.first.update(updated_at: 10.seconds.from_now)
+        expect(inheritance.private_child?(item)).to be false
+        expect(item.cached_inheritance['private']).to be false
       end
     end
   end

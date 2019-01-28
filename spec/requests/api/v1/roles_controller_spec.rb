@@ -275,4 +275,86 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
       end
     end
   end
+
+  describe 'GET #will_become_private' do
+    let(:other_user) { create(:user) }
+    let(:parent) { create(:collection, add_editors: [user]) }
+    let(:collection) { create(:collection, parent_collection: parent) }
+    let(:path) { "/api/v1/collections/#{collection.id}/roles/will_become_private" }
+
+    context 'when making a change that would cause the child to become private' do
+      let(:params) {
+        {
+          role_name: 'editor',
+          remove_identifiers: ["User_#{user.id}"],
+        }
+      }
+      it 'should return true' do
+        get(path, params: params)
+        expect(response.body).to eq 'true'
+      end
+    end
+
+    context 'when making a change that would not cause the child to become private' do
+      let(:params) {
+        {
+          role_name: 'editor',
+          remove_identifiers: ["User_#{other_user.id}"],
+        }
+      }
+      it 'should return false' do
+        get(path, params: params)
+        expect(response.body).to eq 'false'
+      end
+    end
+
+    context 'with a collection in My Collection (UserCollection as parent)' do
+      let(:parent) { create(:user_collection, add_editors: [user]) }
+      let(:params) {
+        {
+          role_name: 'editor',
+          remove_identifiers: ["User_#{user.id}"],
+        }
+      }
+      it 'should always return false' do
+        get(path, params: params)
+        expect(response.body).to eq 'false'
+      end
+    end
+
+    context 'with groups' do
+      let(:group) { create(:group, add_members: [other_user]) }
+      let(:editor_group) { create(:group, add_members: [user]) }
+      let(:parent) { create(:collection, add_editors: [editor_group, user], add_viewers: [group]) }
+
+      context 'when making a change that would cause the child to become private' do
+        let(:params) {
+          {
+            role_name: 'editor',
+            remove_identifiers: ["Group_#{group.id}"],
+          }
+        }
+        it 'should return true' do
+          get(path, params: params)
+          expect(response.body).to eq 'true'
+        end
+      end
+
+      context 'when making a change that would not cause the child to become private' do
+        let(:parent) { create(:collection, add_editors: [editor_group, user]) }
+        let(:collection) { create(:collection, parent_collection: parent, add_editors: [editor_group, user, group]) }
+        let(:params) {
+          {
+            role_name: 'editor',
+            # user is still an editor even if you remove them from the group
+            remove_identifiers: ["Group_#{group.id}"],
+          }
+        }
+        it 'should return false' do
+          get(path, params: params)
+          expect(response.body).to eq 'false'
+        end
+      end
+    end
+  end
 end

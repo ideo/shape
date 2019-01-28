@@ -86,7 +86,7 @@ class MarketingPage extends React.Component {
 
             <Center>
               <ResponsiveInlineBlock>
-                <a href="/login">
+                <a className="get-early-access-header" href="/login">
                   <MarketingCallToAction>
                     {this.state.pageTexts.buttonTopLeft}
                   </MarketingCallToAction>
@@ -125,7 +125,7 @@ class MarketingPage extends React.Component {
               </InvertMarketingH1>
             </Box>
             <Box w={1} pt={[46, 65]} pb={[46, 74]} mb={[10, 0]}>
-              <a href="/login">
+              <a className="get-early-access-footer" href="/login">
                 <MarketingCallToAction href="/login">
                   {this.state.pageTexts.buttonFooter}
                 </MarketingCallToAction>
