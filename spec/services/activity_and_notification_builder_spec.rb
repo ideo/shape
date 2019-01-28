@@ -3,7 +3,8 @@ require 'rails_helper'
 RSpec.describe ActivityAndNotificationBuilder, type: :service do
   let(:organization) { create(:organization) }
   let(:actor) { create(:user, add_to_org: organization) }
-  let(:target) { create(:collection) }
+  let(:target_parent) { create(:collection, organization: organization) }
+  let(:target) { create(:collection, parent_collection: target_parent) }
   let(:action) { :archived }
   let(:subject_users) { create_list(:user, 1) }
   let(:subject_groups) { [] }
@@ -84,6 +85,22 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
         end
 
         it 'creates notifications for just one user' do
+          expect { builder.call }.to change(Notification, :count).by(1)
+        end
+      end
+
+      context 'when unsubscribed user at a higher parent level' do
+        let!(:parent_comment_thread) do
+          create(:collection_comment_thread, record: target.parent)
+        end
+        let!(:parent_users_thread) do
+          create(:users_thread,
+                 comment_thread: parent_comment_thread,
+                 user: subject_users[0],
+                 subscribed: false)
+        end
+
+        it 'creates notifications for each user' do
           expect { builder.call }.to change(Notification, :count).by(1)
         end
       end
