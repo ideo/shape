@@ -106,7 +106,13 @@ class GridCard extends React.Component {
         case ITEM_TYPES.VIDEO:
           return <VideoItemCover item={record} dragging={this.props.dragging} />
         case ITEM_TYPES.LINK:
-          return <LinkItemCover item={record} dragging={this.props.dragging} />
+          return (
+            <LinkItemCover
+              item={record}
+              cardHeight={card.height}
+              dragging={this.props.dragging}
+            />
+          )
 
         case ITEM_TYPES.CHART:
           return <ChartItemCover item={record} testCollection={card.parent} />
