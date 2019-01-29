@@ -293,13 +293,6 @@ class User < ApplicationRecord
     user_profiles.where(organization_id: organization_id).first
   end
 
-  # -- override has_many relation for SUPER_ADMIN purposes --
-  def organizations
-    return super unless has_cached_role?(Role::SUPER_ADMIN)
-
-    Organization.all
-  end
-
   def add_network_admin(org_id)
     change_network_admin :add, org_id
   end

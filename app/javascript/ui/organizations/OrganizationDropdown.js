@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import styled from 'styled-components'
@@ -7,6 +8,8 @@ import { runInAction, observable } from 'mobx'
 import Avatar from '~/ui/global/Avatar'
 import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
 import SearchBar from '~/ui/layout/SearchBar'
+
+const MAX_ORGS_IN_LIST = 10
 
 const IconHolder = styled.span`
   .org_avatar {
@@ -42,6 +45,11 @@ function fuzzyMatch(str, pattern) {
 class OrganizationDropdown extends React.Component {
   @observable
   searchText = ''
+
+  constructor(props) {
+    super(props)
+    this.searchOrganizations = _.debounce(this._searchOrganizations, 300)
+  }
 
   openOrgMenu = (page = 'organizationPeople') => {
     this.props.uiStore.update('organizationMenuPage', page)
@@ -114,8 +122,24 @@ class OrganizationDropdown extends React.Component {
   }
 
   handleSearchChange = text => {
+    const { apiStore } = this.props
+    const { currentUser } = apiStore
     runInAction(() => {
       this.searchText = text
+    })
+    if (currentUser.is_super_admin) {
+      this.searchOrganizations()
+    }
+  }
+
+  async _searchOrganizations() {
+    const { apiStore } = this.props
+    const { currentUser } = apiStore
+    const res = await apiStore.searchOrganizations(
+      this.searchText.toLowerCase()
+    )
+    runInAction(() => {
+      currentUser.organizations.replace(res.data)
     })
   }
 
@@ -127,14 +151,15 @@ class OrganizationDropdown extends React.Component {
 
   get organizationItems() {
     const { apiStore } = this.props
-    const orgItems = apiStore.currentUser.organizations
+    const { currentUser } = apiStore
+    const orgItems = currentUser.organizations
       .filter(org => org.id !== this.currentOrganization.id)
       .sort((orgA, orgB) => orgA.name.localeCompare(orgB.name))
       .filter(org => {
-        if (apiStore.currentUser.organizations.length <= 10) return org
-        if (this.searchText === '') return org
+        if (this.searchText === '' || currentUser.is_super_admin) return org
         return fuzzyMatch(org.name.toLowerCase(), this.searchText.toLowerCase())
       })
+      .slice(0, MAX_ORGS_IN_LIST)
       .map(org => {
         const avatar = (
           <IconHolder>
@@ -189,6 +214,7 @@ class OrganizationDropdown extends React.Component {
 
   render() {
     const { apiStore, uiStore } = this.props
+    const { currentUser } = apiStore
     return (
       <div>
         <TruncatedPopoutMenu
@@ -198,7 +224,8 @@ class OrganizationDropdown extends React.Component {
           menuOpen={this.props.open}
           hideDotMenu
           groupExtraComponent={{
-            organizations: apiStore.currentUser.organizations.length > 10 && (
+            organizations: (currentUser.is_super_admin ||
+              currentUser.organizations.length > MAX_ORGS_IN_LIST) && (
               <StyledSearchHolder>
                 <SearchBar
                   value={this.searchText}
