@@ -4,6 +4,7 @@ describe RolifyExtensions, type: :concern do
   let(:organization) { create(:organization) }
   let(:collection) { create(:collection, organization: organization) }
   let(:user) { create(:user) }
+  let(:group) { create(:group, organization: organization) }
 
   before do
     organization.setup_user_membership(user)
@@ -173,8 +174,18 @@ describe RolifyExtensions, type: :concern do
 
     it 'should remove content editor role and upgrade to editor' do
       user.upgrade_to_edit_role(collection)
-      user.reload
       expect(collection.can_edit?(user)).to be true
+    end
+
+    context 'for a group' do
+      before do
+        group.add_role(Role::VIEWER, collection)
+      end
+
+      it 'should remove viewer role and upgrade to editor' do
+        group.upgrade_to_edit_role(collection)
+        expect(collection.can_edit?(group)).to be true
+      end
     end
   end
 end

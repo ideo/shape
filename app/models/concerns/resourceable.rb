@@ -206,6 +206,9 @@ module Resourceable
     # NOTE: these next two steps have to happen back to back
     inherit_roles_from_parent!(roles_anchor)
     unanchor!
+    # special case for QuestionItems because they don't really retain any roles
+    return unless is_a? Collection::TestCollection
+    question_items.each(&:reanchor!)
   end
 
   def unanchor!
@@ -223,8 +226,8 @@ module Resourceable
         cached_attributes, '{cached_inheritance}', '{"private": false, "updated_at": "#{Time.current}"}'::jsonb
       )
     ))
-    return unless propagate && is_a?(Collection)
     roles.destroy_all
+    return unless propagate && is_a?(Collection)
 
     [Item, Collection].each do |klass|
       klass
