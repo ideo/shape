@@ -36,6 +36,16 @@ class Api::V1::SearchController < Api::V1::BaseController
     )
   end
 
+  before_action :authenticate_super_admin!, only: %i[organizations]
+  def organizations
+    # very simple text search for now, just for admin usage
+    results = Organization
+              .where('LOWER(name) LIKE LOWER(?)', "%#{params[:query]}%")
+              .order('LOWER(name) ASC')
+              .limit(10)
+    render jsonapi: results, include: %i[primary_group]
+  end
+
   private
 
   def capture_query_params
