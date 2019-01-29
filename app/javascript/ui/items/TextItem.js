@@ -39,7 +39,8 @@ const DockedToolbar = styled.div`
 `
 
 const StyledContainer = styled.div`
-  ${props => props.fullPageView && `padding: 2rem 0.5rem;`} padding-top: 25px;
+  padding-top: 25px;
+  ${props => props.fullPageView && `padding: 2rem 0.5rem;`};
   .editor-pill {
     ${props =>
       !props.fullPageView &&
