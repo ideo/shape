@@ -159,9 +159,21 @@ RSpec.describe Roles::Inheritance, type: :service do
         expect(item.cached_inheritance['private']).to be true
         add_roles(Role::EDITOR, editors, item)
         # the caching only checks for updated_at to the second, have to fudge that
-        item.roles.first.update(updated_at: 10.seconds.from_now)
+        item.roles.first.update(updated_at: 1.minute.from_now)
         expect(inheritance.private_child?(item)).to be false
         expect(item.cached_inheritance['private']).to be false
+      end
+
+      it 'will re-cache the settings on the item if the parent roles change' do
+        expect(inheritance.private_child?(item)).to be true
+        # now the setting should be cached
+        expect(item.cached_inheritance['private']).to be true
+        add_roles(Role::EDITOR, editors, item)
+        # the caching only checks for updated_at to the second, have to fudge that
+        collection.roles.first.update(updated_at: 1.minute.from_now)
+        expect(inheritance.private_child?(item)).to be false
+        expect(item.cached_inheritance['private']).to be false
+        expect(item.cached_inheritance['updated_at']).not_to be nil
       end
     end
   end
