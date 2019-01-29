@@ -398,6 +398,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     _.assign(card, updates)
 
     this._reorderCards()
+
     const data = this.toJsonApiWithCards()
     // we don't want to receive updates which are just going to try to re-render
     data.cancel_sync = true
@@ -408,11 +409,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   // after we reorder a single card, we want to make sure everything goes into sequential order
   @action
   _reorderCards() {
-    // ****
-    // TODO: make this work with card pagination!!
+    // NOTE: this should work ok even if there are infinite scroll / pagination cards
+    // not being displayed offscreen...
     if (this.collection_cards) {
-      this.collection_cards.replace(_.sortBy(this.collection_cards, 'order'))
-      _.each(this.collection_cards, (card, i) => {
+      _.each(_.sortBy(this.collection_cards, 'order'), (card, i) => {
         card.order = i
       })
     }

@@ -360,6 +360,7 @@ export default class UiStore {
       }
       return true
     })
+    if (!cols) cols = 1
 
     let update = {
       ...this.defaultGridSettings,
