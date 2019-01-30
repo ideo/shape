@@ -76,7 +76,8 @@ RSpec.describe Roles::ModifyChildren, type: :service do
 
       it 'should include all users from parent' do
         expect(modify_children.call).to be true
-        expect(collection.items.first.editors[:users]).to match_array(users)
+        item = collection.items.first.reload
+        expect(item.editors[:users]).to match_array(users)
       end
     end
 
