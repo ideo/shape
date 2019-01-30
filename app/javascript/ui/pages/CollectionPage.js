@@ -92,6 +92,9 @@ class CollectionPage extends React.Component {
       if (undoStore.undoAfterRoute) {
         undoStore.performUndoAfterRoute()
       }
+      if (uiStore.actionAfterRoute) {
+        uiStore.performActionAfterRoute()
+      }
     })
 
     // setViewingCollection has to happen first bc we use it in openBlankContentTool
@@ -319,7 +322,10 @@ class CollectionPage extends React.Component {
     const { isSubmissionBox, requiresTestDesigner } = collection
     const { movingCardIds, cardAction } = uiStore
     // only tell the Grid to hide "movingCards" if we're moving and not linking
-    const uiMovingCardIds = cardAction === 'move' ? movingCardIds : []
+    const uiMovingCardIds =
+      ['move', 'moveWithinCollection'].indexOf(cardAction) > -1
+        ? movingCardIds
+        : []
 
     return (
       <Fragment>

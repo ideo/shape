@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import FlipMove from 'react-flip-move'
 import Rnd from 'react-rnd'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 
 import { uiStore } from '~/stores'
 import v from '~/utils/variables'
@@ -31,6 +31,24 @@ const StyledResizeIcon = styled.div`
     width: 60%;
     height: 60%;
   }
+`
+
+const pulse = keyframes`
+  50% {
+    outline: 8px solid ${v.colors.primaryLightest};
+  }
+`
+
+const InnerCardWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  ${props =>
+    props.animatedOutline &&
+    `
+    outline: 2px solid ${v.colors.primaryMedium};
+    outline-offset: 5px;
+    animation: ${pulse} 0.5s ease-out;
+  `};
 `
 
 const cardCSSTransition = 'transform 0.4s, width 0.25s, height 0.25s'
@@ -342,7 +360,9 @@ class MovableGridCard extends React.PureComponent {
       isUserCollection,
       isSharedCollection,
       lastPinnedCard,
-      hoveringOver,
+      hoveringOverLeft,
+      hoveringOverRight,
+      holdingOver,
     } = this.props
 
     let {
@@ -415,9 +435,18 @@ class MovableGridCard extends React.PureComponent {
     let transition = dragging || resizing ? 'none' : cardCSSTransition
     if (dragging) {
       transform = `translate(${xAdjust}px, ${yAdjust}px) rotate(3deg)`
-    } else if (hoveringOver) {
+      // if (uiStore.hoveringOver && uiStore.hoveringOver.holdingOver) {
+      //   transform = `translate(${xAdjust}px, ${yAdjust}px) scaleX(0.8) scaleY(0.8)`
+      // }
+    } else if (hoveringOverLeft) {
       zIndex = v.zIndex.cardHovering
       transform = 'translate(32px, -32px)'
+      transition = cardHoverTransition
+    } else if (hoveringOverRight) {
+      zIndex = v.zIndex.cardHovering
+      if (holdingOver) {
+        transform = 'scaleX(1.2) scaleY(1.2)'
+      }
       transition = cardHoverTransition
     }
 
@@ -484,16 +513,15 @@ class MovableGridCard extends React.PureComponent {
             transition,
           }}
         >
-          <div
+          <InnerCardWrapper
+            animatedOutline={hoveringOverRight && !holdingOver}
             style={{
-              width: '100%',
-              height: '100%',
               transform,
               transition,
             }}
           >
             <GridCard {...cardProps} />
-          </div>
+          </InnerCardWrapper>
         </Rnd>
       </StyledCardWrapper>
     )
@@ -506,7 +534,9 @@ MovableGridCard.propTypes = {
   canEditCollection: PropTypes.bool.isRequired,
   isUserCollection: PropTypes.bool.isRequired,
   isSharedCollection: PropTypes.bool.isRequired,
-  hoveringOver: PropTypes.bool.isRequired,
+  hoveringOverLeft: PropTypes.bool.isRequired,
+  hoveringOverRight: PropTypes.bool.isRequired,
+  holdingOver: PropTypes.bool.isRequired,
   position: PropTypes.shape(propShapes.position).isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   parent: MobxPropTypes.objectOrObservableObject.isRequired,

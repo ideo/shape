@@ -221,7 +221,7 @@ class MoveModal extends React.Component {
 
     return (
       <div>
-        {uiStore.movingCardIds.length > 0 && (
+        {uiStore.shouldOpenMoveModal && (
           <div>
             <StyledSnackbar classes={{ root: 'Snackbar' }} open>
               {this.isLoading ? (
