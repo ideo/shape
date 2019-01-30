@@ -6,7 +6,7 @@ import styled from 'styled-components'
 import _ from 'lodash'
 
 import v from '~/utils/variables'
-import { Heading1 } from '~/ui/global/styled/typography'
+import { Heading1, Heading1TypographyCss } from '~/ui/global/styled/typography'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 
 const StyledName = styled.div`
@@ -24,14 +24,11 @@ StyledName.displayName = 'StyledName'
 const StyledEditableName = styled.div`
   display: block;
   .input__name {
-    margin-bottom: 0.5rem;
-    margin-top: 0.5rem;
+    margin-top: 0.6rem;
     input {
+      ${Heading1TypographyCss};
       z-index: ${v.zIndex.aboveClickWrapper};
       position: relative;
-      font-size: ${props => props.fontSize}rem;
-      font-family: ${v.fonts.sans};
-      font-weight: ${v.weights.medium};
       background-color: transparent;
       border-left: none;
       border-top: none;
