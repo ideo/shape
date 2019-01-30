@@ -15,8 +15,32 @@ import ChannelManager from '~/utils/ChannelManager'
 // Only used if there are other viewers
 const UNLOCK_IN_MILLISECONDS = 5000
 
+const DockedToolbar = styled.div`
+  background: white;
+  box-sizing: border-box;
+  height: 32px;
+  left: 0;
+  margin-bottom: 20px;
+  padding: 5px 10px 0;
+  ${props => props.fullPageView && `padding-left: 36px`};
+  position: fixed;
+  ${props => `top: ${props.fullPageView ? v.headerHeight : 0}px`};
+  width: 100%;
+  z-index: 100;
+  ${props =>
+    // Hack because headerHeight doesn't close the gap to-the-pixel
+    props.fullPageView &&
+    `
+    margin-top: -4px;
+    @media only screen and (max-width: ${v.responsive.muiSmBreakpoint}px) {
+      margin-top: -7px;
+    }
+  `};
+`
+
 const StyledContainer = styled.div`
-  ${props => props.fullPageView && `padding: 2rem 0.5rem;`} padding-top: 25px;
+  padding-top: 25px;
+  ${props => props.fullPageView && `padding: 2rem 0.5rem;`};
   .editor-pill {
     ${props =>
       !props.fullPageView &&
@@ -395,15 +419,14 @@ class TextItem extends React.Component {
 
     return (
       <StyledContainer className="no-drag" fullPageView={fullPageView}>
-        {this.canEdit && (
-          <TextItemToolbar fullPageView={fullPageView} onExpand={onExpand} />
-        )}
-        <CloseButton
-          data-cy="TextItemClose"
-          onClick={this.cancel}
-          size={fullPageView ? 'lg' : 'sm'}
-          position={fullPageView ? 'absolute' : 'fixed'}
-        />
+        <DockedToolbar fullPageView={fullPageView}>
+          {this.canEdit && <TextItemToolbar onExpand={onExpand} />}
+          <CloseButton
+            data-cy="TextItemClose"
+            onClick={this.cancel}
+            size={fullPageView ? 'lg' : 'sm'}
+          />
+        </DockedToolbar>
         {this.renderEditorPill}
 
         <QuillStyleWrapper>

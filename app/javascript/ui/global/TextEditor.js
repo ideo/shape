@@ -87,7 +87,7 @@ class TextEditor extends React.Component {
     return (
       <form>
         <EditorWrapper>
-          <TextItemToolbar fullPageView onExpand={() => {}} />
+          <TextItemToolbar onExpand={() => {}} />
           <QuillStyleWrapper>
             <ReactQuill {...quillProps} value={this.textData} />
           </QuillStyleWrapper>

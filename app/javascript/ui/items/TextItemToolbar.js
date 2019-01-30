@@ -26,22 +26,8 @@ const IconButton = styled(StyledButton)`
   width: 25px !important;
 `
 
-function styles(props) {
-  const allStyles = []
-  if (!props.fullPageView) {
-    allStyles.top = '0'
-    allStyles.background = 'white'
-    allStyles.paddingTop = '5px'
-    allStyles.position = 'fixed'
-    allStyles.height = '32px'
-    allStyles.marginBottom = '20px'
-    allStyles.zIndex = 100
-  }
-  return allStyles
-}
-
 const TextItemToolbar = props => (
-  <div id="quill-toolbar" style={styles(props)}>
+  <div id="quill-toolbar">
     <span className="ql-formats">
       <StyledButton className="ql-header ql-format-reg" value="">
         T
