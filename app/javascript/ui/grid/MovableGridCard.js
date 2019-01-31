@@ -33,9 +33,9 @@ const StyledResizeIcon = styled.div`
   }
 `
 
-const pulse = keyframes`
+const bounceAnim = keyframes`
   50% {
-    outline: 8px solid ${v.colors.primaryLightest};
+    transform: scaleX(1.125) scaleY(1.125);
   }
 `
 
@@ -43,11 +43,9 @@ const InnerCardWrapper = styled.div`
   width: 100%;
   height: 100%;
   ${props =>
-    props.animatedOutline &&
+    props.animatedBounce &&
     `
-    outline: 2px solid ${v.colors.primaryMedium};
-    outline-offset: 5px;
-    animation: ${pulse} 0.5s ease-out;
+    animation: ${bounceAnim} 0.25s ease-out;
   `};
 `
 
@@ -435,18 +433,13 @@ class MovableGridCard extends React.PureComponent {
     let transition = dragging || resizing ? 'none' : cardCSSTransition
     if (dragging) {
       transform = `translate(${xAdjust}px, ${yAdjust}px) rotate(3deg)`
-      // if (uiStore.hoveringOver && uiStore.hoveringOver.holdingOver) {
-      //   transform = `translate(${xAdjust}px, ${yAdjust}px) scaleX(0.8) scaleY(0.8)`
-      // }
     } else if (hoveringOverLeft) {
       zIndex = v.zIndex.cardHovering
       transform = 'translate(32px, -32px)'
       transition = cardHoverTransition
     } else if (hoveringOverRight) {
       zIndex = v.zIndex.cardHovering
-      if (holdingOver) {
-        transform = 'scaleX(1.2) scaleY(1.2)'
-      }
+      transform = 'scaleX(1.075) scaleY(1.075)'
       transition = cardHoverTransition
     }
 
@@ -514,7 +507,7 @@ class MovableGridCard extends React.PureComponent {
           }}
         >
           <InnerCardWrapper
-            animatedOutline={hoveringOverRight && !holdingOver}
+            animatedBounce={holdingOver}
             style={{
               transform,
               transition,

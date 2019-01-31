@@ -10,7 +10,7 @@ import Loader from '~/ui/layout/Loader'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 
-const CARD_HOLD_TIME = 1 * 1000
+const CARD_HOLD_TIME = 0.4 * 1000
 
 const StyledGrid = styled.div`
   margin-top: 50px;
@@ -201,7 +201,7 @@ class CollectionGrid extends React.Component {
     const { hoveringOver, cards } = this.state
     const placeholder = _.find(cards, { cardType: 'placeholder' }) || {}
     const original = _.find(cards, { id: placeholder.originalId })
-    const { apiStore, uiStore, collection } = this.props
+    const { uiStore, collection } = this.props
     this.clearDragTimeout()
     let moved = false
     if (placeholder && original) {
@@ -244,31 +244,17 @@ class CollectionGrid extends React.Component {
         this.positionCardsFromProps()
       }
       collection.confirmEdit({ onCancel, onConfirm: updateCollectionCard })
-    } else if (hoveringOver && hoveringOver.holdingOver) {
-      // the case where we hovered + held over a collection and now want to move cards + reroute
+    } else if (hoveringOver && hoveringOver.direction === 'right') {
+      // the case where we hovered in the drop zone of a collection and now want to move cards + reroute
       const hoveringRecord = hoveringOver.card.record
       // timeout is just a stupid thing so that Draggable doesn't complain about unmounting
       setTimeout(() => {
         uiStore.setMovingCards([cardId], {
           cardAction: 'moveWithinCollection',
         })
-        // TODO: set up the action for dropping over an item + turning into a collection
         if (hoveringRecord.internalType === 'collections') {
-          this.setState({ hoveringOver: null }, async () => {
-            const data = {
-              to_id: hoveringRecord.id,
-              from_id: collection.id,
-              collection_card_ids: [cardId],
-              placement: 'beginning',
-            }
-            uiStore.update('movingIntoCollection', hoveringRecord)
-            await apiStore.moveCards(data)
-            uiStore.update('actionAfterRoute', () => {
-              uiStore.setMovingCards([])
-              uiStore.reselectCardIds([cardId])
-              uiStore.update('movingIntoCollection', null)
-            })
-            this.props.routingStore.routeTo('collections', hoveringRecord.id)
+          this.setState({ hoveringOver: null }, () => {
+            this.moveCardsIntoCollection([cardId], hoveringRecord)
           })
         }
       })
@@ -278,9 +264,26 @@ class CollectionGrid extends React.Component {
     }
   }
 
+  async moveCardsIntoCollection(cardIds, hoveringRecord) {
+    const { collection, uiStore, apiStore } = this.props
+    const data = {
+      to_id: hoveringRecord.id,
+      from_id: collection.id,
+      collection_card_ids: cardIds,
+      placement: 'beginning',
+    }
+    uiStore.update('movingIntoCollection', hoveringRecord)
+    await apiStore.moveCards(data)
+    uiStore.update('actionAfterRoute', () => {
+      uiStore.setMovingCards([])
+      uiStore.reselectCardIds(cardIds)
+      uiStore.update('movingIntoCollection', null)
+    })
+    this.props.routingStore.routeTo('collections', hoveringRecord.id)
+  }
+
   onDrag = (cardId, dragPosition) => {
     if (!this.props.canEditCollection) return
-    this.clearDragTimeout()
 
     const positionedCard = _.find(this.state.cards, { id: cardId })
     const placeholderKey = `${cardId}-placeholder`
@@ -296,8 +299,14 @@ class CollectionGrid extends React.Component {
       const hoveringOverChanged =
         hoveringOver.card.order !== previousHoverOrder ||
         hoveringOver.direction !== previousHoveringOver.direction
-
-      if (hoveringOver.direction === 'right') {
+      // guard clause to exit if we are not hovering over a new card or card zone
+      if (!hoveringOverChanged) return
+      this.clearDragTimeout()
+      // NOTE: currently, only collections trigger this "right" hover zone
+      if (
+        hoveringOver.direction === 'right' &&
+        !this.fakeCardType(hoveringOver.card.cardType)
+      ) {
         const dragTimeoutId = setTimeout(() => {
           hoveringOver.holdingOver = true
           this.setHoveringOverProperties(hoveringOver.card, hoveringOver)
@@ -305,8 +314,7 @@ class CollectionGrid extends React.Component {
         }, CARD_HOLD_TIME)
         this.setState({ dragTimeoutId })
       }
-      // guard clause to exit if we are not hovering a new card
-      if (!hoveringOverChanged) return
+
       if (!placeholder) {
         placeholder = this.createPlaceholderCard(positionedCard)
         stateCards.push(placeholder)
@@ -315,9 +323,12 @@ class CollectionGrid extends React.Component {
       placeholder.order = parseFloat(hoveringOver.card.order) - 0.5
       placeholder.width = hoveringOver.card.width
       placeholder.height = hoveringOver.card.height
+    } else {
+      this.clearDragTimeout()
     }
-    if (!hoveringOver || hoveringOver.direction !== 'left')
+    if (!hoveringOver || hoveringOver.direction !== 'left') {
       stateCards = _.reject(stateCards, { cardType: 'placeholder' })
+    }
 
     this.setState({ hoveringOver }, () => {
       this.positionCards(stateCards, {
@@ -372,8 +383,11 @@ class CollectionGrid extends React.Component {
         const { order, record } = card
         // approx 70px at full width
         const leftAreaSize = gridW * 0.23
-        const direction =
-          dragX >= position.xPos + leftAreaSize ? 'right' : 'left'
+        let direction = 'left'
+        if (card.record && card.record.internalType === 'collections') {
+          // only collections have a "hover right" area
+          direction = dragX >= position.xPos + leftAreaSize ? 'right' : 'left'
+        }
         hoveringOver = {
           order,
           direction,
@@ -628,6 +642,10 @@ class CollectionGrid extends React.Component {
     )
   }
 
+  fakeCardType = cardType =>
+    // "fake" cards are the placeholder ones we create
+    _.includes(['placeholder', 'blank', 'empty', 'pagination'], cardType)
+
   renderPositionedCards = () => {
     const grid = []
     const { collection, canEditCollection, routingStore, uiStore } = this.props
@@ -639,9 +657,7 @@ class CollectionGrid extends React.Component {
       i += 1
       let record = {}
       let { cardType } = card
-      if (
-        !_.includes(['placeholder', 'blank', 'empty', 'pagination'], cardType)
-      ) {
+      if (!this.fakeCardType(cardType)) {
         // TODO: some kind of error catch if no record?
         if (card.record) {
           ;({ record } = card)
