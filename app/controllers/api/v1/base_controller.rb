@@ -100,9 +100,9 @@ class Api::V1::BaseController < ApplicationController
 
   def current_api_token
     return if authorization_token_from_header.blank?
-    @current_api_token ||= ApiToken.find_by(
+    @current_api_token ||= ApiToken.where(
       token: authorization_token_from_header,
-    )
+    ).includes(application_organization: :organization).first
   end
 
   def authorization_token_from_header

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190201191608) do
+ActiveRecord::Schema.define(version: 20190201202932) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -49,11 +49,26 @@ ActiveRecord::Schema.define(version: 20190201191608) do
 
   create_table "api_tokens", force: :cascade do |t|
     t.text "token"
-    t.bigint "organization_id"
+    t.bigint "application_organization_id"
     t.bigint "created_by_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["organization_id", "token"], name: "index_api_tokens_on_organization_id_and_token"
+    t.index ["application_organization_id", "token"], name: "index_api_tokens_on_app_org_id_and_token", unique: true
+  end
+
+  create_table "application_organizations", force: :cascade do |t|
+    t.bigint "application_id"
+    t.bigint "organization_id"
+    t.bigint "root_collection_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["application_id", "organization_id"], name: "index_app_org_on_app_id_org_id", unique: true
+  end
+
+  create_table "applications", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "collection_cards", force: :cascade do |t|
@@ -74,8 +89,8 @@ ActiveRecord::Schema.define(version: 20190201191608) do
     t.boolean "image_contain", default: false
     t.boolean "is_cover", default: false
     t.datetime "unarchived_at"
-    t.boolean "hidden", default: false
     t.integer "filter", default: 1
+    t.boolean "hidden", default: false
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
@@ -102,14 +117,14 @@ ActiveRecord::Schema.define(version: 20190201191608) do
     t.integer "submission_box_type"
     t.bigint "submission_box_id"
     t.integer "test_status"
-    t.integer "processing_status"
     t.integer "question_item_id"
     t.bigint "test_collection_id"
+    t.integer "processing_status"
     t.bigint "collection_to_test_id"
     t.datetime "unarchived_at"
     t.jsonb "cached_test_scores"
-    t.bigint "roles_anchor_collection_id"
     t.boolean "hide_submissions", default: false
+    t.bigint "roles_anchor_collection_id"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
