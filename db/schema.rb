@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190117195055) do
+ActiveRecord::Schema.define(version: 20190201191608) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -45,6 +45,15 @@ ActiveRecord::Schema.define(version: 20190117195055) do
     t.datetime "updated_at", null: false
     t.index ["activity_id"], name: "index_activity_subjects_on_activity_id"
     t.index ["subject_type", "subject_id"], name: "index_activity_subjects_on_subject_type_and_subject_id"
+  end
+
+  create_table "api_tokens", force: :cascade do |t|
+    t.text "token"
+    t.bigint "organization_id"
+    t.bigint "created_by_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["organization_id", "token"], name: "index_api_tokens_on_organization_id_and_token"
   end
 
   create_table "collection_cards", force: :cascade do |t|
