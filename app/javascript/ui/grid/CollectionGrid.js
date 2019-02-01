@@ -249,11 +249,8 @@ class CollectionGrid extends React.Component {
       const hoveringRecord = hoveringOver.card.record
       this.moveCardsIntoCollection([cardId], hoveringRecord)
     } else {
-      if (
-        uiStore.activeDragTarget &&
-        uiStore.activeDragTarget.componentType === 'Breadcrumb'
-      ) {
-        this.moveCardsIntoCollection([cardId], uiStore.activeDragTarget.record)
+      if (uiStore.activeDragTarget) {
+        this.moveCardsIntoCollection([cardId], uiStore.activeDragTarget.item)
       }
       // reset back to normal
       this.positionCardsFromProps()
