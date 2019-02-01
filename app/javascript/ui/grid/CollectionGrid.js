@@ -247,18 +247,14 @@ class CollectionGrid extends React.Component {
     } else if (hoveringOver && hoveringOver.direction === 'right') {
       // the case where we hovered in the drop zone of a collection and now want to move cards + reroute
       const hoveringRecord = hoveringOver.card.record
-      // timeout is just a stupid thing so that Draggable doesn't complain about unmounting
-      setTimeout(() => {
-        uiStore.setMovingCards([cardId], {
-          cardAction: 'moveWithinCollection',
-        })
-        if (hoveringRecord.internalType === 'collections') {
-          this.setState({ hoveringOver: null }, () => {
-            this.moveCardsIntoCollection([cardId], hoveringRecord)
-          })
-        }
-      })
+      this.moveCardsIntoCollection([cardId], hoveringRecord)
     } else {
+      if (
+        uiStore.activeDragTarget &&
+        uiStore.activeDragTarget.componentType === 'Breadcrumb'
+      ) {
+        this.moveCardsIntoCollection([cardId], uiStore.activeDragTarget.record)
+      }
       // reset back to normal
       this.positionCardsFromProps()
     }
@@ -266,20 +262,28 @@ class CollectionGrid extends React.Component {
 
   async moveCardsIntoCollection(cardIds, hoveringRecord) {
     const { collection, uiStore, apiStore } = this.props
-    const data = {
-      to_id: hoveringRecord.id,
-      from_id: collection.id,
-      collection_card_ids: cardIds,
-      placement: 'beginning',
-    }
-    uiStore.update('movingIntoCollection', hoveringRecord)
-    await apiStore.moveCards(data)
-    uiStore.update('actionAfterRoute', () => {
-      uiStore.setMovingCards([])
-      uiStore.reselectCardIds(cardIds)
-      uiStore.update('movingIntoCollection', null)
+    // timeout is just a stupid thing so that Draggable doesn't complain about unmounting
+    setTimeout(() => {
+      uiStore.setMovingCards(cardIds, {
+        cardAction: 'moveWithinCollection',
+      })
+      this.setState({ hoveringOver: null }, async () => {
+        const data = {
+          to_id: hoveringRecord.id,
+          from_id: collection.id,
+          collection_card_ids: cardIds,
+          placement: 'beginning',
+        }
+        uiStore.update('movingIntoCollection', hoveringRecord)
+        await apiStore.moveCards(data)
+        uiStore.update('actionAfterRoute', () => {
+          uiStore.setMovingCards([])
+          uiStore.reselectCardIds(cardIds)
+          uiStore.update('movingIntoCollection', null)
+        })
+        this.props.routingStore.routeTo('collections', hoveringRecord.id)
+      })
     })
-    this.props.routingStore.routeTo('collections', hoveringRecord.id)
   }
 
   onDrag = (cardId, dragPosition) => {
