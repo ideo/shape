@@ -181,12 +181,12 @@ export default class UiStore {
   }
 
   @action
-  addDragTarget(identifier, coordinates, componentType) {
+  addDragTarget(item, coordinates, componentType) {
     const existingTarget = this.dragTargets.find(
-      target => target.identifier === identifier
+      target => target.item.identifier === item.identifier
     )
     if (existingTarget) return
-    this.dragTargets.push({ identifier, coordinates, componentType })
+    this.dragTargets.push({ item, coordinates, componentType })
   }
 
   @action
