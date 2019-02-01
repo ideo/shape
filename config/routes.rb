@@ -115,6 +115,9 @@ Rails.application.routes.draw do
           get 'user_notifications'
         end
       end
+      scope :filestack do
+        get 'token', to: 'filestack#token', as: :filestack_token
+      end
       scope :search do
         get '/', to: 'search#search', as: :search
         get 'users_and_groups', to: 'search#users_and_groups', as: :search_users_and_groups
