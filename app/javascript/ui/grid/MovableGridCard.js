@@ -127,6 +127,11 @@ class MovableGridCard extends React.PureComponent {
 
   handleDrag = (e, data, dX, dY) => {
     const { position } = this.props
+    // Global dragging should use screen coordinates
+    // TODO this could also be a HOC that publishes to the UI store
+    const { pageX, pageY } = e
+    uiStore.drag({ x: pageX, y: pageY })
+
     // x, y represent the current drag position
     const { x, y } = data
 
@@ -431,8 +436,14 @@ class MovableGridCard extends React.PureComponent {
     }
     let transform = null
     let transition = dragging || resizing ? 'none' : cardCSSTransition
+    // TODO this should actually check it's a breadcrumb
+    const draggedOverBreadcrumb = !!uiStore.activeDragTarget
     if (dragging) {
       transform = `translate(${xAdjust}px, ${yAdjust}px) rotate(3deg)`
+      if (draggedOverBreadcrumb) {
+        transform = 'scaleX(0.25) scaleY(0.25) translate(0px, -82px)'
+        transition = cardHoverTransition
+      }
     } else if (hoveringOverLeft) {
       zIndex = v.zIndex.cardHovering
       transform = 'translate(32px, -32px)'

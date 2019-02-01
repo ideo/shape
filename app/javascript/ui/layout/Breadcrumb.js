@@ -1,13 +1,12 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import { Link } from 'react-router-dom'
 import { floor, round, sumBy, compact } from 'lodash'
 
-import { apiStore, routingStore } from '~/stores'
-import Tooltip from '~/ui/global/Tooltip'
+import { apiStore } from '~/stores'
 import v, { ITEM_TYPES } from '~/utils/variables'
+import BreadcrumbItem from './BreadcrumbItem'
 
 const BreadcrumbPadding = styled.div`
   height: 1.7rem;
@@ -26,24 +25,6 @@ const StyledBreadcrumbWrapper = styled.div`
   letter-spacing: 1.1px;
 `
 StyledBreadcrumbWrapper.displayName = 'StyledBreadcrumb'
-
-const StyledBreadcrumbCaret = styled.div`
-  display: inline-block;
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
-  top: 0px;
-  position: relative;
-  vertical-align: top;
-`
-
-const StyledBreadcrumbItem = styled.div`
-  display: inline-block;
-  a {
-    color: ${v.colors.commonDark};
-    text-decoration: none;
-    display: inline-block;
-  }
-`
 
 @observer
 class Breadcrumb extends React.Component {
@@ -80,6 +61,7 @@ class Breadcrumb extends React.Component {
     }
     record.breadcrumb.map(item => {
       const [klass, id, crumbName] = item
+      const identifier = `${klass}_${id}`
       let name = crumbName
       const crumbRecord = apiStore.find(klass, id)
       if (crumbRecord) {
@@ -95,6 +77,7 @@ class Breadcrumb extends React.Component {
         name,
         truncatedName: null,
         ellipses: false,
+        identifier,
       })
     })
     return compact(items)
@@ -150,35 +133,6 @@ class Breadcrumb extends React.Component {
     return items
   }
 
-  breadcrumbItem = (item, index) => {
-    const numItems = this.items().length
-    const showCaret = index < numItems - 1
-    let path
-    if (item.id === 'homepage') {
-      path = routingStore.pathTo('homepage')
-    } else {
-      path = routingStore.pathTo(item.klass, item.id)
-    }
-    return (
-      <Fragment key={path}>
-        <StyledBreadcrumbItem data-cy="Breadcrumb">
-          {item.ellipses || item.truncatedName ? (
-            <Tooltip
-              classes={{ tooltip: 'Tooltip' }}
-              title={item.name}
-              placement="top"
-            >
-              <Link to={path}>{item.truncatedName}…</Link>
-            </Tooltip>
-          ) : (
-            <Link to={path}>{item.name}</Link>
-          )}
-        </StyledBreadcrumbItem>
-        {showCaret && <StyledBreadcrumbCaret>&#62;</StyledBreadcrumbCaret>}
-      </Fragment>
-    )
-  }
-
   render() {
     const { record, isHomepage } = this.props
     const { inMyCollection, breadcrumb } = record
@@ -188,6 +142,7 @@ class Breadcrumb extends React.Component {
       inMyCollection !== null &&
       breadcrumb &&
       breadcrumb.length > 0
+    const numItems = this.items().length
     // We need a ref to wrapper so we always render that
     // Tried using innerRef on styled component but it isn't available on mount
     return (
@@ -195,9 +150,14 @@ class Breadcrumb extends React.Component {
         {!renderItems && <BreadcrumbPadding />}
         {renderItems && (
           <StyledBreadcrumbWrapper>
-            {this.truncateItems(this.items()).map((item, index) =>
-              this.breadcrumbItem(item, index)
-            )}
+            {this.truncateItems(this.items()).map((item, index) => (
+              <BreadcrumbItem
+                identifier={item.identifier}
+                item={item}
+                index={index}
+                numItems={numItems}
+              />
+            ))}
           </StyledBreadcrumbWrapper>
         )}
       </div>
@@ -205,6 +165,7 @@ class Breadcrumb extends React.Component {
   }
 }
 
+// TODO move wrapped props to certain place?
 Breadcrumb.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   isHomepage: PropTypes.bool.isRequired,

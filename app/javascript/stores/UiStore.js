@@ -156,6 +156,10 @@ export default class UiStore {
   actionAfterRoute = null
   @observable
   movingIntoCollection = null
+  @observable
+  dragTargets = []
+  @observable
+  activeDragTarget = null
 
   @action
   toggleEditingCardId(cardId) {
@@ -174,6 +178,34 @@ export default class UiStore {
   @action
   stopDragging() {
     this.dragging = false
+  }
+
+  @action
+  addDragTarget(identifier, coordinates, componentType) {
+    const existingTarget = this.dragTargets.find(
+      target => target.identifier === identifier
+    )
+    if (existingTarget) return
+    this.dragTargets.push({ identifier, coordinates, componentType })
+  }
+
+  @action
+  drag(coordinates) {
+    const anyTarget = this.dragTargetsOverlap(coordinates)
+    this.activeDragTarget = anyTarget
+  }
+
+  dragTargetsOverlap(dragCoordinates) {
+    const { x, y } = dragCoordinates
+
+    return this.dragTargets.find(target => {
+      const overlap =
+        x < target.coordinates.left ||
+        x > target.coordinates.right ||
+        y > target.coordinates.bottom ||
+        y < target.coordinates.top
+      return !overlap
+    })
   }
 
   @action
