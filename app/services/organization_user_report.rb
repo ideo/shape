@@ -15,16 +15,15 @@ class OrganizationUserReport
       ]
       Organization.where(deactivated: false).find_each do |org|
         users = org.users.active
-        recent = users.where('last_active_at > ?', 3.months.ago)
         csv << [
           org.name,
           users.count,
-          recent.count,
+          org.active_users_count,
           org.has_payment_method,
           org.overdue_at,
           org.trial_ends_at,
           org.in_app_billing,
-          org.in_app_billing ? recent.count * Organization::PRICE_PER_USER : 'N/A',
+          org.in_app_billing ? org.active_users_count * Organization::PRICE_PER_USER : 'N/A',
         ]
       end
     end
