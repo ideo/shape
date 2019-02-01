@@ -45,7 +45,8 @@ class BreadcrumbItem extends React.Component {
     }
     const { currentlyDraggedOn } = this.props
     const showDrag =
-      currentlyDraggedOn && currentlyDraggedOn.identifier === item.identifier
+      currentlyDraggedOn &&
+      currentlyDraggedOn.item.identifier === item.identifier
     return (
       <Fragment key={path}>
         <StyledBreadcrumbItem

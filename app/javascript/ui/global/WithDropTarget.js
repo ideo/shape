@@ -11,7 +11,7 @@ function WithDropTarget(Wrapped) {
     }
 
     componentDidMount() {
-      const { identifier } = this.props
+      const { item } = this.props
       this.disposers = {}
       this.disposers.dropTargeted = observe(
         uiStore,
@@ -20,7 +20,7 @@ function WithDropTarget(Wrapped) {
           const currentTarget = change.newValue
           if (!currentTarget) {
             this.setState({ currentlyDraggedOn: null })
-          } else if (currentTarget.identifier === identifier) {
+          } else if (currentTarget.item.identifier === item.identifier) {
             this.setState({ currentlyDraggedOn: currentTarget })
           } else {
             this.setState({ currentlyDraggedOn: null })
@@ -30,8 +30,8 @@ function WithDropTarget(Wrapped) {
     }
 
     componentWillReceiveProps(newProps) {
-      const { identifier } = newProps
-      uiStore.addDragTarget(identifier, this.coordinates, 'Breadcrumb')
+      const { item } = newProps
+      uiStore.addDragTarget(item, this.coordinates, 'Breadcrumb')
     }
 
     get coordinates() {
