@@ -8,7 +8,12 @@ module Api
       # modify represents all the non-read-only actions
       alias_action :create, :update, :destroy, to: :modify
 
+      cannot :modify, :all
+
       if organization.persisted? && organization.active?
+        # Allow read-only access to all content
+        # this organization has access to
+
         can :read, Organization, id: organization.id
 
         can :read, User do |user|
@@ -17,21 +22,16 @@ module Api
 
         can :read, Group, organization_id: organization.id
 
-        can :create, Collection
         can :read, Collection, organization_id: organization.id
-        can :manage, Collection, organization_id: organization.id
 
-        can :create, CollectionCard
-        can :manage, CollectionCard do |coll_card|
+        can :read, CollectionCard do |coll_card|
           coll_card.parent.try(:organization_id) == organization.id
         end
 
-        can :create, Item
-        can :manage, Item do |item|
+        can :read, Item do |item|
           item.parent.try(:organization_id) == organization.id
         end
       else
-        cannot :modify, :all
         cannot :read, :all
       end
     end

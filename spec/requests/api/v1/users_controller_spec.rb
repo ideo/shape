@@ -70,6 +70,22 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
       get(path)
       expect(json['data']['attributes']).to match_json_schema('user_me')
     end
+
+    context 'with Application API Token', auth: false, create_org: false do
+      let!(:api_token) { create(:api_token) }
+      let!(:user) { api_token.application_user }
+
+      it 'returns a 200' do
+        get(path, headers: headers_with_token(api_token.token))
+        expect(response.status).to eq(200)
+      end
+
+      it 'matches User ID' do
+        get(path, headers: headers_with_token(api_token.token))
+        expect(json['data']['id'].to_i).to eq(user.id)
+        expect(assigns(:current_user)).to eq(user)
+      end
+    end
   end
 
   # describe 'GET #search', search: true do

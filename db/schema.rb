@@ -49,11 +49,13 @@ ActiveRecord::Schema.define(version: 20190201202932) do
 
   create_table "api_tokens", force: :cascade do |t|
     t.text "token"
-    t.bigint "application_organization_id"
+    t.bigint "application_id"
+    t.bigint "organization_id"
     t.bigint "created_by_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["application_organization_id", "token"], name: "index_api_tokens_on_app_org_id_and_token", unique: true
+    t.index ["application_id", "organization_id"], name: "index_api_tokens_on_app_id_org_id"
+    t.index ["token"], name: "index_api_tokens_on_token"
   end
 
   create_table "application_organizations", force: :cascade do |t|
@@ -67,8 +69,10 @@ ActiveRecord::Schema.define(version: 20190201202932) do
 
   create_table "applications", force: :cascade do |t|
     t.string "name"
+    t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_applications_on_user_id"
   end
 
   create_table "collection_cards", force: :cascade do |t|

@@ -86,8 +86,9 @@ class Api::V1::BaseController < ApplicationController
 
   def current_ability
     return @current_ability if @current_ability.present?
-    if current_api_token.present?
-      @current_ability = Api::OrganizationAbility.new(current_organization)
+    if current_api_token.present? &&
+       current_api_token.organization_id.present?
+      @current_ability = Api::OrganizationAbility.new(current_api_token.organization)
     else
       @current_ability = Ability.new(current_user)
     end
@@ -102,7 +103,12 @@ class Api::V1::BaseController < ApplicationController
     return if authorization_token_from_header.blank?
     @current_api_token ||= ApiToken.where(
       token: authorization_token_from_header,
-    ).includes(application_organization: :organization).first
+    ).includes(:organization, application: [:user]).first
+    if @current_api_token.present? &&
+       @current_api_token.application_user.present?
+      sign_in(@current_api_token.application_user)
+    end
+    @current_api_token
   end
 
   def authorization_token_from_header
