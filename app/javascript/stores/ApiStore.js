@@ -481,7 +481,7 @@ class ApiStore extends jsonapi(datxCollection) {
     )
   }
 
-  beginFilestackTokenPoller() {
+  beginTokenRefreshPoller() {
     if (this.filestackTokenInterval) {
       clearInterval(this.filestackTokenInterval)
     }
