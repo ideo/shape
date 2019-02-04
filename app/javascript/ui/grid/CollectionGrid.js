@@ -230,6 +230,7 @@ class CollectionGrid extends React.Component {
         updates.width = width
         updates.height = height
       }
+      // TODO add same template confirmation for multi-item moving
       if (uiStore.selectedCardIds.length > 0) {
         const selectedCards = _.map(uiStore.selectedCardIds, selectedCardId =>
           _.find(cards, { id: selectedCardId })
@@ -264,10 +265,16 @@ class CollectionGrid extends React.Component {
     } else if (hoveringOver && hoveringOver.direction === 'right') {
       // the case where we hovered in the drop zone of a collection and now want to move cards + reroute
       const hoveringRecord = hoveringOver.card.record
-      this.moveCardsIntoCollection([cardId], hoveringRecord)
+      this.moveCardsIntoCollection(
+        [cardId, ...uiStore.selectedCardIds],
+        hoveringRecord
+      )
     } else {
       if (uiStore.activeDragTarget) {
-        this.moveCardsIntoCollection([cardId], uiStore.activeDragTarget.item)
+        this.moveCardsIntoCollection(
+          [cardId, ...uiStore.selectedCardIds],
+          uiStore.activeDragTarget.item
+        )
       }
       // reset back to normal
       this.positionCardsFromProps()
