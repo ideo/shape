@@ -406,6 +406,19 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.request(apiPath, 'PATCH', { data })
   }
 
+  API_batchUpdateCards({ cards, undoMessage } = {}) {
+    const jsonData = this.toJsonApiWithCards()
+    this.pushUndo({
+      snapshot: jsonData.attributes,
+      message: undoMessage,
+    })
+    this._reorderCards()
+    // TODO try and find way to update cards after pushing undo
+    const data = this.toJsonApiWithCards()
+    const apiPath = `collections/${this.id}`
+    return this.apiStore.request(apiPath, 'PATCH', { data })
+  }
+
   // after we reorder a single card, we want to make sure everything goes into sequential order
   @action
   _reorderCards() {
