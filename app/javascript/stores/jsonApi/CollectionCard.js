@@ -47,7 +47,7 @@ class CollectionCard extends BaseRecord {
   }
 
   get isTextItem() {
-    return this.record.type === ITEM_TYPES.TEXT
+    return this.record && this.record.type === ITEM_TYPES.TEXT
   }
 
   get isPinned() {

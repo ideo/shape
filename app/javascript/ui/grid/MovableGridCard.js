@@ -168,9 +168,9 @@ class MovableGridCard extends React.PureComponent {
     })
 
     if (!this.state.dragging) {
-      uiStore.resetSelectionAndBCT()
+      uiStore.closeBlankContentTool()
       // close the MoveMenu to prevent weird behaviors
-      uiStore.closeMoveMenu()
+      uiStore.closeMoveMenu({ deselect: false })
       uiStore.startDragging()
       this.setState({
         dragging: true,

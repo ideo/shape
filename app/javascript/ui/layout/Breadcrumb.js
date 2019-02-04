@@ -59,6 +59,7 @@ class Breadcrumb extends React.Component {
         ellipses: false,
       })
     }
+    if (!record.breadcrumb) return items
     record.breadcrumb.map(item => {
       const [klass, id, crumbName] = item
       const identifier = `${klass}_${id}`

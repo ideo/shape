@@ -230,20 +230,37 @@ class CollectionGrid extends React.Component {
         updates.width = width
         updates.height = height
       }
-      // If a template, warn that any instances will be updated
-      const updateCollectionCard = () => {
-        // this will assign the update attributes to the card
-        this.props.updateCollection({
-          card: original,
-          updates,
+      if (uiStore.selectedCardIds.length > 0) {
+        const selectedCards = _.map(uiStore.selectedCardIds, selectedCardId =>
+          _.find(cards, { id: selectedCardId })
+        ).filter(card => card.id !== original.id)
+        selectedCards.push(original)
+        const sortedSelectedCards = _.sortBy(selectedCards, 'order')
+        _.each(sortedSelectedCards, (card, idx) => {
+          const sortedOrder = updates.order + (idx + 1) * 0.1
+          card.order = sortedOrder
+        })
+        this.props.batchUpdateCollection({
+          cards: sortedSelectedCards,
           undoMessage,
         })
         this.positionCardsFromProps()
+      } else {
+        // If a template, warn that any instances will be updated
+        const updateCollectionCard = () => {
+          // this will assign the update attributes to the card
+          this.props.updateCollection({
+            card: original,
+            updates,
+            undoMessage,
+          })
+          this.positionCardsFromProps()
+        }
+        const onCancel = () => {
+          this.positionCardsFromProps()
+        }
+        collection.confirmEdit({ onCancel, onConfirm: updateCollectionCard })
       }
-      const onCancel = () => {
-        this.positionCardsFromProps()
-      }
-      collection.confirmEdit({ onCancel, onConfirm: updateCollectionCard })
     } else if (hoveringOver && hoveringOver.direction === 'right') {
       // the case where we hovered in the drop zone of a collection and now want to move cards + reroute
       const hoveringRecord = hoveringOver.card.record
@@ -285,7 +302,6 @@ class CollectionGrid extends React.Component {
 
   onDrag = (cardId, dragPosition) => {
     if (!this.props.canEditCollection) return
-
     const positionedCard = _.find(this.state.cards, { id: cardId })
     const placeholderKey = `${cardId}-placeholder`
     let stateCards = [...this.state.cards]
@@ -331,9 +347,11 @@ class CollectionGrid extends React.Component {
       stateCards = _.reject(stateCards, { cardType: 'placeholder' })
     }
 
+    const { uiStore } = this.props
     this.setState({ hoveringOver }, () => {
       this.positionCards(stateCards, {
         dragging: positionedCard.id,
+        otherDrags: uiStore.selectedCardIds,
         dragType: 'hover',
       })
     })
@@ -488,6 +506,11 @@ class CollectionGrid extends React.Component {
       // we don't actually want to "re-position" the dragging card
       // because its position is being determined by the drag (i.e. mouse cursor)
       if (opts.dragging === card.id) {
+        return
+      }
+
+      // if we're dragging multiple cards, also don't show them
+      if (opts.otherDrags && opts.otherDrags.indexOf(card.id) > -1) {
         return
       }
       let position = {}
@@ -734,6 +757,7 @@ const gridConfigProps = {
 CollectionGrid.propTypes = {
   ...gridConfigProps,
   updateCollection: PropTypes.func.isRequired,
+  batchUpdateCollection: PropTypes.func.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   blankContentToolState: MobxPropTypes.objectOrObservableObject,
   cardProperties: MobxPropTypes.arrayOrObservableArray.isRequired,
