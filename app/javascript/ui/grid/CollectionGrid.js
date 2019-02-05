@@ -318,6 +318,7 @@ class CollectionGrid extends React.Component {
   }
 
   onDragStart = (cardId, dragPosition) => {
+    console.log('ondragstart')
     const { uiStore } = this.props
     const { cards } = this.state
     if (uiStore.selectedCardIds.length > 0) {
@@ -553,9 +554,7 @@ class CollectionGrid extends React.Component {
       }
 
       // if we're dragging multiple cards, also don't show them
-      if (opts.otherDrags && opts.otherDrags.indexOf(card.id) > -1) {
-        if (!card.followDrag && card.beforeVisuallyHidden) return
-      }
+      if (!card.followDrag && card.beforeVisuallyHidden) return
 
       let position = {}
       let filled = false
