@@ -42,6 +42,7 @@ const bounceAnim = keyframes`
 const InnerCardWrapper = styled.div`
   width: 100%;
   height: 100%;
+  width: 100%;
   ${props =>
     props.animatedBounce &&
     `
@@ -429,6 +430,9 @@ class MovableGridCard extends React.PureComponent {
       lastPinnedCard,
     }
 
+    const draggingMultiple =
+      cardProps.dragging && uiStore.selectedCardIds.length > 0
+
     let zIndex = 0
     if (!moveComplete) zIndex = v.zIndex.cardDragging
     if (uiStore.cardMenuOpen.id === card.id) {
@@ -524,7 +528,11 @@ class MovableGridCard extends React.PureComponent {
               transition,
             }}
           >
-            <GridCard {...cardProps} holdingOver={hoveringOverRight} />
+            <GridCard
+              {...cardProps}
+              draggingMultiple={draggingMultiple}
+              holdingOver={hoveringOverRight}
+            />
           </InnerCardWrapper>
         </Rnd>
       </StyledCardWrapper>

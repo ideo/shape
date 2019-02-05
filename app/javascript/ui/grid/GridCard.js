@@ -355,6 +355,7 @@ class GridCard extends React.Component {
       record,
       canEditCollection,
       dragging,
+      draggingMultiple,
       menuOpen,
       lastPinnedCard,
       testCollectionCard,
@@ -374,6 +375,7 @@ class GridCard extends React.Component {
         className="gridCard"
         id={`gridCard-${card.id}`}
         dragging={dragging}
+        draggingMultiple={draggingMultiple}
         testCollectionCard={testCollectionCard}
         // mostly for E2E checking purposes
         data-width={card.width}
@@ -479,6 +481,7 @@ GridCard.propTypes = {
   lastPinnedCard: PropTypes.bool,
   testCollectionCard: PropTypes.bool,
   searchResult: PropTypes.bool,
+  draggingMultiple: PropTypes.bool,
 }
 
 GridCard.defaultProps = {
@@ -491,6 +494,7 @@ GridCard.defaultProps = {
   menuOpen: false,
   lastPinnedCard: false,
   testCollectionCard: false,
+  draggingMultiple: false,
   searchResult: false,
 }
 
