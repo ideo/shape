@@ -98,6 +98,11 @@ export const StyledGridCard = styled.div`
     z-index: ${v.zIndex.gridCardTop};
   }
   `};
+  ${props =>
+    props.draggingMultiple &&
+    `
+      box-shadow: -5px 5px 0 5px ${v.colors.secondaryLight};
+    `};
 `
 StyledGridCard.displayName = 'StyledGridCard'
 
