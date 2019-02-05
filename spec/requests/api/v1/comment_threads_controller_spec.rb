@@ -141,22 +141,42 @@ describe Api::V1::CommentThreadsController, type: :request, json: true, auth: tr
 
     before do
       user.add_role(Role::EDITOR, comment_thread.record)
-      comment_thread.users_thread_for(user).update(subscribed: false)
     end
 
-    it 'returns a 200' do
-      patch(path, params: {})
-      expect(response.status).to eq(200)
+    context 'with pre-existing users_thread' do
+      before do
+        comment_thread.users_thread_for(user).update(subscribed: false)
+      end
+
+      it 'returns a 200' do
+        patch(path, params: {})
+        expect(response.status).to eq(200)
+      end
+
+      it 'sets subscribed on the user thread to true' do
+        patch(path, params: {})
+        expect(comment_thread.users_thread_for(user).subscribed).to be true
+      end
+
+      it 'updates firestore' do
+        expect_any_instance_of(CommentThread).to receive(:update_firestore_users_threads)
+        patch(path, params: {})
+      end
     end
 
-    it 'sets subscribed on the user thread to true' do
-      patch(path, params: {})
-      expect(comment_thread.users_thread_for(user).subscribed).to be true
-    end
+    context 'with no pre-existing users_thread' do
+      let!(:comment_thread) { create(:item_comment_thread, num_comments: 1) }
 
-    it 'updates firestore' do
-      expect_any_instance_of(CommentThread).to receive(:update_firestore_users_threads)
-      patch(path, params: {})
+      it 'returns a 200' do
+        patch(path, params: {})
+        expect(response.status).to eq(200)
+      end
+
+      it 'creates a user thread with subscribed == true' do
+        expect(comment_thread.users_thread_for(user)).to be nil
+        patch(path, params: {})
+        expect(comment_thread.users_thread_for(user).subscribed).to be true
+      end
     end
   end
 

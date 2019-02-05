@@ -4,6 +4,8 @@ class SerializableCommentThread < BaseJsonSerializer
   belongs_to :record
 
   has_one :users_thread do
-    @object.users_thread_for(@current_user)
+    data do
+      @object.users_thread_for(@current_user)
+    end
   end
 end

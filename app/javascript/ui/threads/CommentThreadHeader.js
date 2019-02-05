@@ -130,11 +130,12 @@ class CommentThreadHeader extends React.Component {
 
   toggleSubscribe = ev => {
     ev.preventDefault()
+    ev.stopPropagation()
     const { thread } = this.props
     const { users_thread } = thread
-    if (!users_thread) return
-    users_thread.unsubscribedFromEmail = false
-    if (users_thread.currentSubscribed) {
+    if (users_thread) users_thread.unsubscribedFromEmail = false
+    const subscribed = users_thread ? users_thread.currentSubscribed : false
+    if (subscribed) {
       thread.API_unsubscribe()
       users_thread.subscribed = false
       uiStore.popupAlert({
@@ -144,7 +145,9 @@ class CommentThreadHeader extends React.Component {
       })
     } else {
       thread.API_subscribe()
-      users_thread.subscribed = true
+      // if users_thread update the subscribe attr for immediate UI feedback
+      if (users_thread) users_thread.subscribed = true
+      // if no users thread, it will create one and get it back from the API
     }
   }
 
@@ -187,18 +190,23 @@ class CommentThreadHeader extends React.Component {
     const {
       thread: { users_thread },
     } = this.props
-    if (!users_thread) return null
-    const tooltipText = users_thread.currentSubscribed ? 'Unfollow' : 'Follow'
+    const subscribed = users_thread ? users_thread.currentSubscribed : false
+    const tooltipText = subscribed ? 'Unfollow' : 'Follow'
     return (
-      <FollowHolder isFollowed={users_thread.currentSubscribed}>
+      <FollowHolder isFollowed={subscribed}>
         <Tooltip
           classes={{ tooltip: 'Tooltip' }}
           title={tooltipText}
           placement="top"
         >
-          <button onClick={this.toggleSubscribe}>
+          <span
+            onClick={this.toggleSubscribe}
+            role="button"
+            tabIndex={0}
+            onKeyDown={() => null}
+          >
             <FollowIcon />
-          </button>
+          </span>
         </Tooltip>
       </FollowHolder>
     )

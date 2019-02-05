@@ -195,6 +195,8 @@ class CommentThreadContainer extends React.Component {
 
   get threads() {
     const { apiStore } = this.props
+    // double check to filter out ones you've just unsubscribed from
+    // as well as keeping the current page thread available
     return apiStore.currentThreads.filter(
       t =>
         t.key === apiStore.currentPageThreadKey ||
