@@ -232,11 +232,15 @@ class CollectionGrid extends React.Component {
       }
       // TODO add same template confirmation for multi-item moving
       if (uiStore.selectedCardIds.length > 0) {
+        cards.each(card => (card.hidden = false))
         const selectedCards = _.map(uiStore.selectedCardIds, selectedCardId =>
           _.find(cards, { id: selectedCardId })
-        ).filter(card => card.id !== original.id)
-        selectedCards.push(original)
-        const sortedSelectedCards = _.sortBy(selectedCards, 'order')
+        )
+        const filteredSelectedCards = selectedCards.filter(
+          card => card.id !== original.id
+        )
+        filteredSelectedCards.push(original)
+        const sortedSelectedCards = _.sortBy(filteredSelectedCards, 'order')
         _.each(sortedSelectedCards, (card, idx) => {
           const sortedOrder = updates.order + (idx + 1) * 0.1
           card.order = sortedOrder
@@ -307,6 +311,32 @@ class CollectionGrid extends React.Component {
     })
   }
 
+  onDragStart = (cardId, dragPosition) => {
+    const { uiStore } = this.props
+    const { cards } = this.state
+    if (uiStore.selectedCardIds.length > 0) {
+      const selectedCards = _.map(uiStore.selectedCardIds, selectedCardId =>
+        _.find(cards, { id: selectedCardId })
+      ).filter(card => card.id !== cardId)
+      // Mark each selected card to follow the drag for a short amount of time
+      _.each(selectedCards, card => {
+        card.followDrag = true
+      })
+      setTimeout(() => {
+        _.each(selectedCards, card => {
+          console.log(card.record.name)
+          card.followDrag = false
+          card.hidden = true
+        })
+        const stateCards = [...this.state.cards]
+        this.positionCards(stateCards, {
+          dragging: cardId,
+          dragType: 'hover',
+        })
+      }, 450)
+    }
+  }
+
   onDrag = (cardId, dragPosition) => {
     if (!this.props.canEditCollection) return
     const positionedCard = _.find(this.state.cards, { id: cardId })
@@ -354,11 +384,10 @@ class CollectionGrid extends React.Component {
       stateCards = _.reject(stateCards, { cardType: 'placeholder' })
     }
 
-    const { uiStore } = this.props
     this.setState({ hoveringOver }, () => {
       this.positionCards(stateCards, {
+        dragPosition,
         dragging: positionedCard.id,
-        otherDrags: uiStore.selectedCardIds,
         dragType: 'hover',
       })
     })
@@ -509,6 +538,7 @@ class CollectionGrid extends React.Component {
       // we may need to amend this
       sortedCards = _.sortBy(cards, 'order')
     }
+    const { uiStore } = this.props
     _.each(sortedCards, (card, i) => {
       // we don't actually want to "re-position" the dragging card
       // because its position is being determined by the drag (i.e. mouse cursor)
@@ -519,6 +549,13 @@ class CollectionGrid extends React.Component {
       // if we're dragging multiple cards, also don't show them
       if (opts.otherDrags && opts.otherDrags.indexOf(card.id) > -1) {
         return
+      }
+
+      // stop showing dragged selected cards that aren't following the drag anymore
+      if (opts.dragging && uiStore.selectedCardIds.indexOf(card.id) > -1) {
+        console.log('why does it not stop dragging', card.followDrag)
+        if (!card.followDrag) return
+        console.log('wtf')
       }
       let position = {}
       let filled = false
@@ -659,6 +696,14 @@ class CollectionGrid extends React.Component {
           row += 1
           if (!matrix[row]) matrix.push(_.fill(Array(cols), null))
         }
+        if (
+          opts.dragging &&
+          uiStore.selectedCardIds.indexOf(card.id) > -1 &&
+          card.followDrag
+        ) {
+          card.position.xPos = opts.dragPosition.dragX
+          card.position.yPos = opts.dragPosition.dragY
+        }
       }
     })
     // update cards in state
@@ -709,6 +754,7 @@ class CollectionGrid extends React.Component {
           position={card.position}
           record={record}
           onDrag={this.onDrag}
+          onDragStart={this.onDragStart}
           hoveringOverLeft={
             card.hoveringOver && card.hoveringOver.direction === 'left'
           }

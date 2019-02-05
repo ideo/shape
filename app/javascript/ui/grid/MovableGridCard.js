@@ -92,10 +92,15 @@ class MovableGridCard extends React.PureComponent {
     const initialOffsetX = e.screenX - e.target.getBoundingClientRect().x
     const initialOffsetY = e.screenY - e.target.getBoundingClientRect().y
 
+    const offsetPosition = {
+      x: initialOffsetX,
+      y: initialOffsetY,
+    }
     this.setState({
       initialOffsetX,
       initialOffsetY,
     })
+    this.props.onDragStart(this.props.card.id, offsetPosition)
   }
 
   scrollUp = (timestamp, clientY) => {
@@ -553,6 +558,7 @@ MovableGridCard.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
   onDrag: PropTypes.func.isRequired,
+  onDragStart: PropTypes.func.isRequired,
   onResize: PropTypes.func.isRequired,
   onDragOrResizeStop: PropTypes.func.isRequired,
   routeTo: PropTypes.func.isRequired,
