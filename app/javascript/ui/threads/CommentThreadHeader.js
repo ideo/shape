@@ -5,7 +5,7 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
 
-import { routingStore, uiStore } from '~/stores'
+import { apiStore, routingStore, uiStore } from '~/stores'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import CommentIconFilled from '~/ui/icons/CommentIconFilled'
 import Link from '~/ui/global/Link'
@@ -89,6 +89,18 @@ class CommentThreadHeader extends React.Component {
 
   componentDidMount() {
     this.countLines()
+    if (routingStore.query) {
+      if (routingStore.query.unsubscribe) {
+        const { thread } = this.props
+        const { users_thread } = thread
+        if (thread.key !== apiStore.currentPageThreadKey) return
+        if (!users_thread) return
+        if (users_thread.currentSubscribed) {
+          users_thread.unsubscribedFromEmail = true
+          this.toggleSubscribe({ preventDefault: () => {} })
+        }
+      }
+    }
   }
 
   @action
@@ -120,7 +132,9 @@ class CommentThreadHeader extends React.Component {
     ev.preventDefault()
     const { thread } = this.props
     const { users_thread } = thread
-    if (users_thread.subscribed) {
+    if (!users_thread) return
+    users_thread.unsubscribedFromEmail = false
+    if (users_thread.currentSubscribed) {
       thread.API_unsubscribe()
       users_thread.subscribed = false
       uiStore.popupAlert({
@@ -174,9 +188,9 @@ class CommentThreadHeader extends React.Component {
       thread: { users_thread },
     } = this.props
     if (!users_thread) return null
-    const tooltipText = users_thread.subscribed ? 'Unfollow' : 'Follow'
+    const tooltipText = users_thread.currentSubscribed ? 'Unfollow' : 'Follow'
     return (
-      <FollowHolder isFollowed={users_thread.subscribed}>
+      <FollowHolder isFollowed={users_thread.currentSubscribed}>
         <Tooltip
           classes={{ tooltip: 'Tooltip' }}
           title={tooltipText}

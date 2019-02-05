@@ -1,6 +1,7 @@
 import CommentThreadHeader, {
   FollowHolder,
 } from '~/ui/threads/CommentThreadHeader'
+
 import { fakeThread } from '#/mocks/data'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import { routingStore, uiStore } from '~/stores'
@@ -210,6 +211,18 @@ describe('CommentThreadHeader', () => {
       it('should set user_thread subscribed to true when clicking', () => {
         button.simulate('click', fakeEv)
         expect(props.thread.users_thread.subscribed).toBe(true)
+      })
+    })
+
+    describe('componentDidMount when on the unsubscribe route opt', () => {
+      beforeEach(() => {
+        props.thread.users_thread.subscribed = true
+        routingStore.query = { unsubscribe: true }
+        wrapper = shallow(<CommentThreadHeader {...props} />)
+      })
+
+      it('should set a local property to keep the unsubscribed state in ui', () => {
+        expect(props.thread.users_thread.unsubscribedFromEmail).toBe(false)
       })
     })
   })
