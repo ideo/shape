@@ -6,7 +6,7 @@ class Application < ApplicationRecord
   has_many :application_organizations
   has_many :organizations, through: :application_organizations
 
-  before_validation :create_user
+  before_validation :create_user, on: :create
 
   private
 

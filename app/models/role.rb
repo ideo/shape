@@ -24,6 +24,7 @@ class Role < ApplicationRecord
   MEMBER = :member
   ADMIN = :admin
   SUPER_ADMIN = :super_admin
+  APPLICATION_USER = :application_user
 
   amoeba do
     enable
