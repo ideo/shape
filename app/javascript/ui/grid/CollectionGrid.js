@@ -199,6 +199,7 @@ class CollectionGrid extends React.Component {
 
   onDragOrResizeStop = (cardId, dragType) => {
     const { hoveringOver, cards } = this.state
+    // TODO we have to put the selected card that was hidden back into the cards array
     const placeholder = _.find(cards, { cardType: 'placeholder' }) || {}
     const original = _.find(cards, { id: placeholder.originalId })
     const { uiStore, collection } = this.props
@@ -232,7 +233,6 @@ class CollectionGrid extends React.Component {
       }
       // TODO add same template confirmation for multi-item moving
       if (uiStore.selectedCardIds.length > 0) {
-        cards.each(card => (card.hidden = false))
         const selectedCards = _.map(uiStore.selectedCardIds, selectedCardId =>
           _.find(cards, { id: selectedCardId })
         )
@@ -333,7 +333,7 @@ class CollectionGrid extends React.Component {
           dragging: cardId,
           dragType: 'hover',
         })
-      }, 450)
+      }, 850)
     }
   }
 
