@@ -318,7 +318,6 @@ class CollectionGrid extends React.Component {
   }
 
   onDragStart = (cardId, dragPosition) => {
-    console.log('ondragstart')
     const { uiStore } = this.props
     const { cards } = this.state
     if (uiStore.selectedCardIds.length > 0) {
@@ -340,7 +339,7 @@ class CollectionGrid extends React.Component {
           dragging: cardId,
           dragType: 'hover',
         })
-      }, 650)
+      }, 300)
     }
   }
 
@@ -700,8 +699,11 @@ class CollectionGrid extends React.Component {
           uiStore.selectedCardIds.indexOf(card.id) > -1 &&
           card.followDrag
         ) {
-          card.position.xPos = opts.dragPosition.dragX
-          card.position.yPos = opts.dragPosition.dragY
+          // TODO get actualy card width
+          const halfWidth = (card.width * 312) / 2 + 40
+          const halfHeight = (card.height * 252) / 2 - 40
+          card.position.xPos = opts.dragPosition.dragX - halfWidth
+          card.position.yPos = opts.dragPosition.dragY - halfHeight
         }
       }
     })
