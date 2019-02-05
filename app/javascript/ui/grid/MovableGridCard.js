@@ -369,6 +369,7 @@ class MovableGridCard extends React.PureComponent {
       isUserCollection,
       isSharedCollection,
       lastPinnedCard,
+      hidden,
       hoveringOverLeft,
       hoveringOverRight,
       holdingOver,
@@ -462,6 +463,9 @@ class MovableGridCard extends React.PureComponent {
       transform = 'scaleX(1.075) scaleY(1.075)'
       transition = cardHoverTransition
     }
+    if (hidden) {
+      console.log('still hidden', card.record && card.record.name)
+    }
 
     return (
       <StyledCardWrapper
@@ -470,6 +474,7 @@ class MovableGridCard extends React.PureComponent {
         zIndex={zIndex}
         onClick={this.handleWrapperClick}
         innerRef={c => (this.gridCardRef = c)}
+        style={{ display: hidden ? 'none' : 'block' }}
       >
         <Rnd
           ref={c => {
@@ -558,6 +563,7 @@ MovableGridCard.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
   onDrag: PropTypes.func.isRequired,
+  hidden: PropTypes.bool,
   onDragStart: PropTypes.func.isRequired,
   onResize: PropTypes.func.isRequired,
   onDragOrResizeStop: PropTypes.func.isRequired,
@@ -567,6 +573,7 @@ MovableGridCard.propTypes = {
 }
 
 MovableGridCard.defaultProps = {
+  hidden: false,
   lastPinnedCard: false,
 }
 

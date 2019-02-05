@@ -205,6 +205,11 @@ class CollectionGrid extends React.Component {
     const { uiStore, collection } = this.props
     this.clearDragTimeout()
     let moved = false
+    _.each(cards, card => {
+      card.tempHidden = false
+      card.beforeVisuallyHidden = false
+      card.followDrag = false
+    })
     if (placeholder && original) {
       const fields = ['order', 'width', 'height']
       const placeholderPosition = _.pick(placeholder, fields)
@@ -236,6 +241,7 @@ class CollectionGrid extends React.Component {
         const selectedCards = _.map(uiStore.selectedCardIds, selectedCardId =>
           _.find(cards, { id: selectedCardId })
         )
+        _.each(selectedCards, card => (card.tempHidden = false))
         const filteredSelectedCards = selectedCards.filter(
           card => card.id !== original.id
         )
@@ -321,19 +327,19 @@ class CollectionGrid extends React.Component {
       // Mark each selected card to follow the drag for a short amount of time
       _.each(selectedCards, card => {
         card.followDrag = true
+        card.beforeVisuallyHidden = true
       })
       setTimeout(() => {
         _.each(selectedCards, card => {
-          console.log(card.record.name)
           card.followDrag = false
-          card.hidden = true
+          card.tempHidden = true
         })
         const stateCards = [...this.state.cards]
         this.positionCards(stateCards, {
           dragging: cardId,
           dragType: 'hover',
         })
-      }, 850)
+      }, 650)
     }
   }
 
@@ -548,15 +554,9 @@ class CollectionGrid extends React.Component {
 
       // if we're dragging multiple cards, also don't show them
       if (opts.otherDrags && opts.otherDrags.indexOf(card.id) > -1) {
-        return
+        if (!card.followDrag && card.beforeVisuallyHidden) return
       }
 
-      // stop showing dragged selected cards that aren't following the drag anymore
-      if (opts.dragging && uiStore.selectedCardIds.indexOf(card.id) > -1) {
-        console.log('why does it not stop dragging', card.followDrag)
-        if (!card.followDrag) return
-        console.log('wtf')
-      }
       let position = {}
       let filled = false
       // find an open row that can fit the current card
@@ -755,6 +755,7 @@ class CollectionGrid extends React.Component {
           record={record}
           onDrag={this.onDrag}
           onDragStart={this.onDragStart}
+          hidden={card.tempHidden}
           hoveringOverLeft={
             card.hoveringOver && card.hoveringOver.direction === 'left'
           }
