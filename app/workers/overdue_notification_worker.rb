@@ -2,9 +2,7 @@ class OverdueNotificationWorker
   include Sidekiq::Worker
 
   def perform
-    Organization.billable.where.not(
-      overdue_at: nil,
-    ).find_each do |organization|
+    Organization.overdue.find_each do |organization|
       days_overdue = (Time.current - organization.overdue_at).to_i / 1.day
 
       next unless days_overdue == 1 || days_overdue == 7 || days_overdue >= 10

@@ -161,16 +161,17 @@ module RolifyExtensions
   end
 
   def upgrade_to_edit_role(resource)
-    return unless is_a? User
+    return unless is_a?(User) || is_a?(Group)
     return true if resource.can_edit? self
-
     other_roles = Role
                   .for_resource(resource)
                   .where.not(name: resource.class.edit_role)
     other_roles.each do |role|
-      # `remove_role` will too aggressively destroy the entire role, so just remove the user
-      role.users.destroy(self) if role.present?
+      # `remove_role` will too aggressively destroy the entire role, so just remove the user/group
+      role.users.destroy(self) if is_a?(User)
+      role.groups.destroy(self) if is_a?(Group)
     end
+    reset_cached_roles!
     add_role(resource.class.edit_role, resource)
   end
 

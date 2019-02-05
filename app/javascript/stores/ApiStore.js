@@ -151,6 +151,10 @@ class ApiStore extends jsonapi(datxCollection) {
     )
   }
 
+  searchOrganizations(query) {
+    return this.request(`search/organizations?query=${query}`)
+  }
+
   searchCollections(params) {
     const defaultParams = { query: '' }
     return this.request(

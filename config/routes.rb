@@ -120,6 +120,7 @@ Rails.application.routes.draw do
       scope :search do
         get '/', to: 'search#search', as: :search
         get 'users_and_groups', to: 'search#users_and_groups', as: :search_users_and_groups
+        get 'organizations', to: 'search#organizations', as: :search_organizations
       end
       # unauthenticated routes:
       resources :survey_responses, only: %i[show create] do

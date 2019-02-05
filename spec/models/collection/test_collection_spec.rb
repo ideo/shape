@@ -35,6 +35,23 @@ describe Collection::TestCollection, type: :model do
         expect(test_collection.can_edit?(user)).to be true
         expect(item.can_edit?(user)).to be true
       end
+
+      context 'with roles anchored to itself' do
+        before do
+          test_collection.unanchor_and_inherit_roles_from_anchor!
+        end
+
+        it 'sets up the anchored roles on the items' do
+          expect(test_collection.roles_anchor.id).to eq test_collection.id
+          test_collection.reload
+          items = test_collection.items
+          item = items.first
+          expect(items.all? { |i| i.roles_anchor_collection_id == test_collection.id }).to be true
+          expect(item.roles_anchor).to eq test_collection
+          expect(test_collection.can_edit?(user)).to be true
+          expect(item.can_edit?(user)).to be true
+        end
+      end
     end
 
     describe '#add_test_tag' do
