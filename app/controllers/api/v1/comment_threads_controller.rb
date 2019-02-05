@@ -59,7 +59,7 @@ class Api::V1::CommentThreadsController < Api::V1::BaseController
   private
 
   def thread_relations
-    [:record]
+    %i[record users_thread]
   end
 
   def comment_thread_params

@@ -12,6 +12,7 @@ class CommentThread < ApplicationRecord
            -> { order(updated_at: :desc) },
            dependent: :destroy
   has_many :users_threads, dependent: :destroy
+  has_one :users_thread
   has_many :groups_threads, dependent: :destroy
 
   after_update :update_firestore_users_threads
