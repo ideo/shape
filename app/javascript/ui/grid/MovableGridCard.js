@@ -459,9 +459,6 @@ class MovableGridCard extends React.PureComponent {
       transform = 'scaleX(1.075) scaleY(1.075)'
       transition = cardHoverTransition
     }
-    if (hidden) {
-      console.log('still hidden', card.record && card.record.name)
-    }
 
     return (
       <StyledCardWrapper

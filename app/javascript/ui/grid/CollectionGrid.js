@@ -339,7 +339,7 @@ class CollectionGrid extends React.Component {
           dragging: cardId,
           dragType: 'hover',
         })
-      }, 300)
+      }, 370)
     }
   }
 
@@ -555,6 +555,19 @@ class CollectionGrid extends React.Component {
       // if we're dragging multiple cards, also don't show them
       if (!card.followDrag && card.beforeVisuallyHidden) return
 
+      if (
+        opts.dragging &&
+        uiStore.selectedCardIds.indexOf(card.id) > -1 &&
+        card.followDrag
+      ) {
+        // TODO get actualy card width
+        const halfWidth = (card.width * 312) / 2 + 150
+        const halfHeight = (card.height * 252) / 2 - 30
+        card.position.xPos = opts.dragPosition.dragX - halfWidth
+        card.position.yPos = opts.dragPosition.dragY - halfHeight
+        return
+      }
+
       let position = {}
       let filled = false
       // find an open row that can fit the current card
@@ -693,17 +706,6 @@ class CollectionGrid extends React.Component {
         } else {
           row += 1
           if (!matrix[row]) matrix.push(_.fill(Array(cols), null))
-        }
-        if (
-          opts.dragging &&
-          uiStore.selectedCardIds.indexOf(card.id) > -1 &&
-          card.followDrag
-        ) {
-          // TODO get actualy card width
-          const halfWidth = (card.width * 312) / 2 + 40
-          const halfHeight = (card.height * 252) / 2 - 40
-          card.position.xPos = opts.dragPosition.dragX - halfWidth
-          card.position.yPos = opts.dragPosition.dragY - halfHeight
         }
       }
     })
