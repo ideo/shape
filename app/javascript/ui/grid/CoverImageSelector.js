@@ -108,7 +108,7 @@ class CoverImageSelector extends React.Component {
         .map(ccard => ({
           cardId: ccard.id,
           title: ccard.record.name,
-          imageUrl: ccard.record.filestack_file_url,
+          imageUrl: ccard.record.imageUrl({ resize: { width: 128 } }),
         })),
       9
     )
