@@ -30,7 +30,7 @@ Then('I should see a {string}', selector => {
 })
 
 Then('I should not see a {string}', selector => {
-  cy.locateDataOrClass(selector).should('not.be.visible')
+  cy.locateDataOrClass(selector).should('not.exist')
 })
 
 Then('I should see {int} {string}', (num, el) => {
