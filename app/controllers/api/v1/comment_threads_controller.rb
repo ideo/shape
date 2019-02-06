@@ -39,7 +39,7 @@ class Api::V1::CommentThreadsController < Api::V1::BaseController
   end
 
   def subscribe
-    if toggle_subscribed(true)
+    if @comment_thread.subscribe!(current_user)
       render jsonapi: @comment_thread, include: thread_relations
     else
       # TODO: what should the error here be?
@@ -48,7 +48,7 @@ class Api::V1::CommentThreadsController < Api::V1::BaseController
   end
 
   def unsubscribe
-    if toggle_subscribed(false)
+    if @comment_thread.unsubscribe!(current_user)
       render jsonapi: @comment_thread, include: thread_relations
     else
       # TODO: what should the error here be?
@@ -92,14 +92,5 @@ class Api::V1::CommentThreadsController < Api::V1::BaseController
                        .includes(:record, comments: [:author])
                        .page(params[:page])
                        .per(10)
-  end
-
-  def toggle_subscribed(to_subscribe)
-    users_thread = @comment_thread.users_threads.find_or_create_by(user_id: current_user.id)
-    return false if users_thread.nil?
-    users_thread.subscribed = to_subscribe
-    users_thread.save
-    @comment_thread.update_firestore_users_threads
-    users_thread
   end
 end

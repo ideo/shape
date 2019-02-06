@@ -121,10 +121,27 @@ class CommentThread < ApplicationRecord
     )
   end
 
+  def subscribe!(user)
+    toggle_subscribed(true, user)
+  end
+
+  def unsubscribe!(user)
+    toggle_subscribed(false, user)
+  end
+
   private
 
   def inherit_record_organization_id
     return true if organization.present?
     self.organization_id = record.organization_id
+  end
+
+  def toggle_subscribed(to_subscribe, user)
+    users_thread = users_threads.find_or_create_by(user_id: user.id)
+    return false if users_thread.nil?
+    users_thread.subscribed = to_subscribe
+    users_thread.save
+    update_firestore_users_threads
+    users_thread
   end
 end
