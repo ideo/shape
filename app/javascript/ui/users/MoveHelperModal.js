@@ -7,7 +7,7 @@ import DialogContent from '@material-ui/core/DialogContent'
 import FormControl from '@material-ui/core/FormControl'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 
-import { FormButton, Checkbox } from '~/ui/global/styled/forms'
+import { TextButton, Checkbox } from '~/ui/global/styled/forms'
 import v from '~/utils/variables'
 
 const SpecialDisplayHeading = styled.p`
@@ -122,7 +122,7 @@ class MoveHelperModal extends React.Component {
             </FormControl>
 
             <div className="button--center">
-              <FormButton disabled={this.isLoading}>Close</FormButton>
+              <TextButton disabled={this.isLoading}>Close</TextButton>
             </div>
           </form>
         </StyledDialogContent>
