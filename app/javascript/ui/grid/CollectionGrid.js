@@ -332,7 +332,7 @@ class CollectionGrid extends React.Component {
       // Mark each selected card to follow the drag for a short amount of time
       _.each(selectedCards, card => {
         card.followDrag = true
-        card.beforeVisuallyHidden = true
+        card.tempHidden = false
       })
       setTimeout(() => {
         _.each(selectedCards, card => {
@@ -554,12 +554,14 @@ class CollectionGrid extends React.Component {
       // we don't actually want to "re-position" the dragging card
       // because its position is being determined by the drag (i.e. mouse cursor)
       if (opts.dragging === card.id) {
-        console.log('here first')
         return
       }
 
       // if we're dragging multiple cards, also don't show them
-      if (!card.followDrag && card.beforeVisuallyHidden) return
+      if (card.tempHidden) {
+        console.log('not rendering because before visually hidden')
+        return
+      }
 
       if (
         opts.dragging &&
@@ -571,7 +573,7 @@ class CollectionGrid extends React.Component {
         const halfHeight = (card.height * 252) / 2 - 30
         card.position.xPos = opts.dragPosition.dragX - halfWidth
         card.position.yPos = opts.dragPosition.dragY - halfHeight
-        console.log('here', card.followDrag)
+        console.log('not rendering because selected and following drag')
         return
       }
 
@@ -716,7 +718,6 @@ class CollectionGrid extends React.Component {
         }
       }
     })
-    console.log('position cards', cards.length)
     // update cards in state
     this.setState(
       {
