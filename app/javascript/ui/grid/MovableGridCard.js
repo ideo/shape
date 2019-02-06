@@ -86,6 +86,7 @@ class MovableGridCard extends React.PureComponent {
   }
 
   handleStart = (e, data) => {
+    if (e.preventDefault) e.preventDefault()
     this.scrolling = false
     // initialOffset tracks the coordinates *within* the card where you clicked,
     // e.g. bottom left corner of the card itself

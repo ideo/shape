@@ -205,6 +205,7 @@ class CollectionGrid extends React.Component {
     const { uiStore, collection } = this.props
     this.clearDragTimeout()
     let moved = false
+    // reset temporary card states that are used to create the drag animation
     _.each(cards, card => {
       card.tempHidden = false
       card.beforeVisuallyHidden = false
@@ -218,6 +219,14 @@ class CollectionGrid extends React.Component {
       moved = !_.isEqual(placeholderPosition, originalPosition)
     }
 
+    const selectedCards = _.map(uiStore.selectedCardIds, selectedCardId =>
+      _.find(cards, { id: selectedCardId })
+    )
+    _.each(selectedCards, card => {
+      card.tempHidden = false
+      card.beforeVisuallyHidden = false
+      card.followDrag = false
+    })
     if (moved) {
       // we want to update this card to match the placeholder
       const { order } = placeholder
@@ -238,10 +247,6 @@ class CollectionGrid extends React.Component {
       }
       // TODO add same template confirmation for multi-item moving
       if (uiStore.selectedCardIds.length > 0) {
-        const selectedCards = _.map(uiStore.selectedCardIds, selectedCardId =>
-          _.find(cards, { id: selectedCardId })
-        )
-        _.each(selectedCards, card => (card.tempHidden = false))
         const filteredSelectedCards = selectedCards.filter(
           card => card.id !== original.id
         )
@@ -549,6 +554,7 @@ class CollectionGrid extends React.Component {
       // we don't actually want to "re-position" the dragging card
       // because its position is being determined by the drag (i.e. mouse cursor)
       if (opts.dragging === card.id) {
+        console.log('here first')
         return
       }
 
@@ -565,6 +571,7 @@ class CollectionGrid extends React.Component {
         const halfHeight = (card.height * 252) / 2 - 30
         card.position.xPos = opts.dragPosition.dragX - halfWidth
         card.position.yPos = opts.dragPosition.dragY - halfHeight
+        console.log('here', card.followDrag)
         return
       }
 
@@ -709,6 +716,7 @@ class CollectionGrid extends React.Component {
         }
       }
     })
+    console.log('position cards', cards.length)
     // update cards in state
     this.setState(
       {
