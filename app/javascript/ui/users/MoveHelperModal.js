@@ -109,6 +109,7 @@ class MoveHelperModal extends React.Component {
             <FormControl component="fieldset" required>
               <FormControlLabel
                 classes={{ label: 'form-control' }}
+                style={{ textAlign: 'left' }}
                 control={
                   <Checkbox
                     checked={this.dontShowChecked}
