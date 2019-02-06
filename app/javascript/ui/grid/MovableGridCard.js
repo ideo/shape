@@ -524,7 +524,7 @@ class MovableGridCard extends React.PureComponent {
               transition,
             }}
           >
-            <GridCard {...cardProps} />
+            <GridCard {...cardProps} holdingOver={hoveringOverRight} />
           </InnerCardWrapper>
         </Rnd>
       </StyledCardWrapper>

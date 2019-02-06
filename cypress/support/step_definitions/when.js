@@ -1,7 +1,7 @@
 /* global When */
 import _ from 'lodash'
 
-const FLIPMOVE_DELAY = 350
+const FLIPMOVE_DELAY = 600
 
 // ----------------------
 // Creating content (BCT)

@@ -2,22 +2,28 @@ import PropTypes from 'prop-types'
 import styled, { css } from 'styled-components'
 import v from '~/utils/variables'
 
-const Heading1Css = css`
+export const Heading1TypographyCss = css`
   color: ${v.colors.black};
   font-family: ${v.fonts.sans};
   font-size: 1.75rem;
   font-weight: ${v.weights.book};
   line-height: 2rem;
+  text-transform: none;
+
+  @media only screen and (max-width: ${v.responsive.largeBreakpoint}px) {
+    font-size: 1.5rem;
+    line-height: 1.75rem;
+  }
+`
+const Heading1Css = css`
+  ${Heading1TypographyCss};
   margin-bottom: 0.5rem;
   margin-top: 0.5rem;
-  text-transform: none;
   white-space: ${props =>
     props.wrapLine ? 'normal' : 'nowrap'}; /* better this way for responsive? */
 
   @media only screen and (max-width: ${v.responsive.largeBreakpoint}px) {
     padding: 1rem 0;
-    font-size: 1.5rem;
-    line-height: 1.75rem;
   }
 `
 /** @component */

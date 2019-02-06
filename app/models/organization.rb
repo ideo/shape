@@ -59,6 +59,11 @@ class Organization < ApplicationRecord
 
   scope :active, -> { where(deactivated: false) }
   scope :billable, -> { active.where(in_app_billing: true) }
+  scope :overdue, -> do
+    billable
+      .where.not(overdue_at: nil)
+      .where(arel_table[:active_users_count].gt(0))
+  end
 
   def can_view?(user)
     primary_group.can_view?(user) || admin_group.can_view?(user) || guest_group.can_view?(user)

@@ -406,13 +406,18 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.request(apiPath, 'PATCH', { data })
   }
 
+  @computed
+  get sortedCards() {
+    return _.sortBy(this.collection_cards, 'order')
+  }
+
   // after we reorder a single card, we want to make sure everything goes into sequential order
   @action
   _reorderCards() {
     // NOTE: this should work ok even if there are infinite scroll / pagination cards
     // not being displayed offscreen...
     if (this.collection_cards) {
-      _.each(_.sortBy(this.collection_cards, 'order'), (card, i) => {
+      _.each(this.sortedCards, (card, i) => {
         card.order = i
       })
     }

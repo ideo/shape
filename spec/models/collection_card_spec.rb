@@ -331,6 +331,18 @@ RSpec.describe CollectionCard, type: :model do
       expect(collection_card_link.new_record?).to be true
       expect(collection_card_link.link?).to be true
     end
+
+    context 'with pinned original card' do
+      let(:collection_card) { create(:collection_card, pinned: true) }
+
+      it 'should reset the pinned status' do
+        expect(collection_card.primary?).to be true
+        expect(collection_card.pinned?).to be true
+        expect(collection_card_link.new_record?).to be true
+        expect(collection_card_link.link?).to be true
+        expect(collection_card_link.pinned?).to be false
+      end
+    end
   end
 
   describe '#increment_card_orders!' do

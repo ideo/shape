@@ -160,7 +160,10 @@ class CollectionCard < ApplicationRecord
   end
 
   def copy_into_new_link_card
-    amoeba_dup.becomes!(CollectionCard::Link)
+    amoeba_dup.tap do |card|
+      # always unset this, links should not be pinned just because the original was
+      card.pinned = false
+    end.becomes!(CollectionCard::Link)
   end
 
   def system_required?

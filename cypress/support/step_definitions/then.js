@@ -15,8 +15,7 @@ Then('I should see the value {string} in a {string}', (text, el) => {
 })
 
 Then('I should see a {string} in the first card', el => {
-  cy.locateDataOrClass('GridCard')
-    .first()
+  cy.get('[data-cy="GridCard"][data-order="0"]')
     .locateDataOrClass(el)
     .should('be.visible')
 })
@@ -30,7 +29,7 @@ Then('I should see a {string}', selector => {
 })
 
 Then('I should not see a {string}', selector => {
-  cy.locateDataOrClass(selector).should('not.be.visible')
+  cy.locateDataOrClass(selector).should('not.exist')
 })
 
 Then('I should see {int} {string}', (num, el) => {
@@ -39,12 +38,12 @@ Then('I should see {int} {string}', (num, el) => {
     .should('eq', num)
 })
 
-Then('I should see the {word} card as {word}', (pos, size) => {
+Then('I should see the {word} of {int} cards as {word}', (pos, count, size) => {
   // size e.g. "2x1" so we split on 'x'
   const sizes = size.split('x')
   const [width, height] = sizes
-  const selector = cy.locateDataOrClass('GridCard')
-  const cardEl = pos === 'last' ? selector.last() : selector.first()
+  const order = pos === 'last' ? count - 1 : 0
+  const cardEl = cy.get(`[data-cy="GridCard"][data-order="${order}"]`)
   cardEl.should('have.attr', 'data-width', width)
   cardEl.should('have.attr', 'data-height', height)
 })
