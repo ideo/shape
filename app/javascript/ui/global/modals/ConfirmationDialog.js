@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
+import { FormControlLabel, Grid } from '@material-ui/core'
 import styled from 'styled-components'
 
 import {
@@ -24,14 +24,10 @@ StyledFormControlLabel.displayName = 'snoozeDialogMessage'
 const ConfirmOption = ConfirmText.extend`
   color: black;
   display: block;
-  float: left;
-  margin-bottom: 70px;
-  margin-left: 35px;
-  margin-right: 30px;
-  width: 190px;
-
-  &:last-child {
-    margin-right: 0;
+  margin: 0 auto 70px;
+  max-width: 190px;
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    margin-bottom: 24px;
   }
 `
 
@@ -92,9 +88,6 @@ class ConfirmationDialog extends React.PureComponent {
       <Dialog {...modalProps}>
         <form>
           <p data-cy="ConfirmPrompt">{prompt}</p>
-          {options.map(option => (
-            <ConfirmOption key={option}>{option}</ConfirmOption>
-          ))}
           {onToggleSnoozeDialog && (
             <StyledFormControlLabel
               classes={{ label: 'form-control' }}
@@ -112,22 +105,32 @@ class ConfirmationDialog extends React.PureComponent {
               label="Please don’t show me this warning for a while."
             />
           )}
-          <FormActionsContainer style={{ clear: 'both' }}>
-            <this.ButtonEl
-              data-cy="CancelButton"
-              maxWidth={options.length ? 200 : 150}
-              onClick={this.handleCancel}
-            >
-              {cancelText}
-            </this.ButtonEl>
-            <this.ButtonEl
-              data-cy="ConfirmButton"
-              maxWidth={options.length ? 200 : 150}
-              onClick={this.handleConfirm}
-            >
-              {confirmText}
-            </this.ButtonEl>
-          </FormActionsContainer>
+          <Grid container>
+            <Grid item xs={options.length ? 12 : true} sm>
+              {options[0] && <ConfirmOption>{options[0]}</ConfirmOption>}
+              <FormActionsContainer>
+                <this.ButtonEl
+                  data-cy="CancelButton"
+                  maxWidth={options.length ? 200 : 150}
+                  onClick={this.handleCancel}
+                >
+                  {cancelText}
+                </this.ButtonEl>
+              </FormActionsContainer>
+            </Grid>
+            <Grid item xs={options.length ? 12 : true} sm>
+              {options[1] && <ConfirmOption>{options[1]}</ConfirmOption>}
+              <FormActionsContainer>
+                <this.ButtonEl
+                  data-cy="ConfirmButton"
+                  maxWidth={options.length ? 200 : 150}
+                  onClick={this.handleConfirm}
+                >
+                  {confirmText}
+                </this.ButtonEl>
+              </FormActionsContainer>
+            </Grid>
+          </Grid>
         </form>
       </Dialog>
     )
