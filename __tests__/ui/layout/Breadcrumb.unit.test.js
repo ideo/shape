@@ -12,23 +12,28 @@ props.record.breadcrumb = [
   ['collections', 99, 'Use Cases'],
 ]
 
-let wrapper, titles
+let wrapper, titles, component
 
-describe('StyledBreadcrumb', () => {
+const rerender = (newProps = props) => {
+  wrapper = shallow(<Breadcrumb {...newProps} />)
+  component = wrapper.instance()
+  titles = component.items().map(i => i.name)
+}
+
+describe('Breadcrumb', () => {
   beforeEach(() => {
     props.record.inMyCollection = false
-    wrapper = shallow(<Breadcrumb {...props} />)
-    titles = wrapper
-      .find('Link')
-      .children()
-      .map(link => link.text())
+    rerender()
   })
 
-  it('renders each item as a link', () => {
-    expect(wrapper.find('Link')).toHaveLength(props.record.breadcrumb.length)
+  it('renders each item as a BreadcrumbItem', () => {
+    expect(wrapper.find('BreadcrumbItem')).toHaveLength(
+      props.record.breadcrumb.length
+    )
   })
 
   it('has all link titles', () => {
+    titles = component.items().map(i => i.name)
     expect(titles).toEqual(['My Workspace', 'Use Cases'])
   })
 })
@@ -41,15 +46,15 @@ describe('With Narrow Window', () => {
         offsetWidth: 400,
       },
     }
-    wrapper = shallow(<Breadcrumb {...props} />)
-    titles = wrapper
-      .find('Link')
-      .children()
-      .map(link => link.text())
+    rerender()
   })
 
   it('truncates to …', () => {
-    expect(titles).toEqual(['My Collection', '…', 'Use Cases'])
+    const truncated = component.truncateItems(component.items())
+    expect(truncated[0].name).toEqual('My Collection')
+    expect(truncated[0].ellipses).toBeFalsy()
+    expect(truncated[1].name).toEqual('My Workspace')
+    expect(truncated[1].ellipses).toBeTruthy()
   })
 })
 
@@ -61,15 +66,11 @@ describe('In My Collection', () => {
         offsetWidth: 900,
       },
     }
-    wrapper = shallow(<Breadcrumb {...props} />)
-    titles = wrapper
-      .find('Link')
-      .children()
-      .map(link => link.text())
+    rerender()
   })
 
-  it('renders each item as a link', () => {
-    expect(wrapper.find('Link')).toHaveLength(
+  it('renders each item as a BreadcrumbItem', () => {
+    expect(wrapper.find('BreadcrumbItem')).toHaveLength(
       props.record.breadcrumb.length + 1
     )
   })
@@ -81,7 +82,7 @@ describe('In My Collection', () => {
 
 describe('BreadcrumbPadding', () => {
   beforeEach(() => {
-    wrapper = shallow(<Breadcrumb {...props} isHomepage />)
+    rerender({ ...props, isHomepage: true })
   })
 
   it('renders BreadcrumbPadding if isHomepage', () => {

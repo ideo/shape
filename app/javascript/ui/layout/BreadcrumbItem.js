@@ -33,7 +33,7 @@ const StyledBreadcrumbItem = styled.div`
 `
 
 @observer
-class BreadcrumbItem extends React.Component {
+export class BaseBreadcrumbItem extends React.Component {
   render() {
     const { item, index, numItems } = this.props
     const showCaret = index < numItems - 1
@@ -73,7 +73,7 @@ class BreadcrumbItem extends React.Component {
 }
 
 // TODO move wrapped props to certain place?
-BreadcrumbItem.propTypes = {
+BaseBreadcrumbItem.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   index: PropTypes.number.isRequired,
   numItems: PropTypes.number.isRequired,
@@ -81,9 +81,12 @@ BreadcrumbItem.propTypes = {
   currentlyDraggedOn: MobxPropTypes.objectOrObservableObject,
 }
 
-BreadcrumbItem.defaultProps = {
+BaseBreadcrumbItem.defaultProps = {
   forwardedRef: React.createRef(),
   currentlyDraggedOn: null,
 }
 
-export default WithDropTarget(BreadcrumbItem)
+// need to explicitly name it for tests because of the HOC wrappers
+const BreadcrumbItem = WithDropTarget(BaseBreadcrumbItem)
+BreadcrumbItem.displayName = 'BreadcrumbItem'
+export default BreadcrumbItem

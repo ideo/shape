@@ -24,7 +24,7 @@ const StyledBreadcrumbWrapper = styled.div`
   color: ${v.colors.commonDark};
   letter-spacing: 1.1px;
 `
-StyledBreadcrumbWrapper.displayName = 'StyledBreadcrumb'
+StyledBreadcrumbWrapper.displayName = 'StyledBreadcrumbWrapper'
 
 @observer
 class Breadcrumb extends React.Component {
@@ -142,7 +142,6 @@ class Breadcrumb extends React.Component {
       inMyCollection !== null &&
       breadcrumb &&
       breadcrumb.length > 0
-    const numItems = this.items().length
     // We need a ref to wrapper so we always render that
     // Tried using innerRef on styled component but it isn't available on mount
     return (
@@ -152,10 +151,11 @@ class Breadcrumb extends React.Component {
           <StyledBreadcrumbWrapper>
             {this.truncateItems(this.items()).map((item, index) => (
               <BreadcrumbItem
+                key={item.id}
                 identifier={item.identifier}
                 item={item}
                 index={index}
-                numItems={numItems}
+                numItems={this.items().length}
               />
             ))}
           </StyledBreadcrumbWrapper>
@@ -165,7 +165,6 @@ class Breadcrumb extends React.Component {
   }
 }
 
-// TODO move wrapped props to certain place?
 Breadcrumb.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   isHomepage: PropTypes.bool.isRequired,
