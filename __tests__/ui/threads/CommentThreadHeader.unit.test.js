@@ -9,7 +9,8 @@ import { routingStore, uiStore } from '~/stores'
 jest.mock('../../../app/javascript/stores')
 
 let wrapper, props
-const fakeEv = { preventDefault: jest.fn() }
+
+const fakeEv = { preventDefault: jest.fn(), stopPropagation: jest.fn() }
 
 describe('CommentThreadHeader', () => {
   describe('with a thread', () => {
@@ -158,7 +159,7 @@ describe('CommentThreadHeader', () => {
       wrapper = shallow(<CommentThreadHeader {...props} />)
       button = wrapper
         .find(FollowHolder)
-        .find('button')
+        .find('span[role="button"]')
         .first()
     })
 
