@@ -351,11 +351,9 @@ class CollectionGrid extends React.Component {
       stateCards = _.reject(stateCards, { cardType: 'placeholder' })
     }
 
-    const { uiStore } = this.props
     this.setState({ hoveringOver }, () => {
       this.positionCards(stateCards, {
         dragging: positionedCard.id,
-        otherDrags: uiStore.selectedCardIds,
         dragType: 'hover',
       })
     })
