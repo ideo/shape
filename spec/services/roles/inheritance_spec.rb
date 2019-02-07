@@ -123,6 +123,42 @@ RSpec.describe Roles::Inheritance, type: :service do
         end
       end
     end
+
+    context 'when adding roles, passing in potential added users and groups' do
+      let(:other_viewers) { create_list(:user, 2) }
+      let(:first_viewer) { other_viewers.first }
+      let(:addtl_viewer) { other_viewers.last }
+
+      context 'where roles will match on the child' do
+        before do
+          other_viewers.each do |user|
+            user.add_role(Role::VIEWER, collection)
+          end
+        end
+
+        it 'should return true to indicate it will inherit' do
+          # if we add both viewers then child will match parent
+          expect(
+            inheritance.inherit_from_parent?(item, add_identifiers: ["User_#{addtl_viewer.id}", "User_#{first_viewer.id}"]),
+          ).to be true
+        end
+      end
+
+      context 'where roles will not match on the child' do
+        before do
+          other_viewers.each do |user|
+            user.add_role(Role::VIEWER, collection)
+          end
+        end
+
+        it 'should return false to indicate it should not inherit' do
+          # if we add addtl_viewer then child still will not match parent, first_viewer is missing
+          expect(
+            inheritance.inherit_from_parent?(item, add_identifiers: ["User_#{addtl_viewer.id}"]),
+          ).to be false
+        end
+      end
+    end
   end
 
   # private_child? is generally just doing !inherit_from_parent so we don't need to
