@@ -101,7 +101,7 @@ export const StyledGridCard = styled.div`
   ${props =>
     props.draggingMultiple &&
     `
-      box-shadow: -5px 5px 0 5px ${v.colors.secondaryLight};
+      box-shadow: -10px 10px 0 0px ${v.colors.secondaryLight};
     `};
 `
 StyledGridCard.displayName = 'StyledGridCard'

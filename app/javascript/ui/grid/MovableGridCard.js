@@ -432,7 +432,7 @@ class MovableGridCard extends React.PureComponent {
     }
 
     const draggingMultiple =
-      cardProps.dragging && uiStore.selectedCardIds.length > 0
+      cardProps.dragging && uiStore.multiMoveCardIds.length > 0
 
     let zIndex = 0
     if (!moveComplete) zIndex = v.zIndex.cardDragging

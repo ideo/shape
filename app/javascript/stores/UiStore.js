@@ -198,7 +198,6 @@ export default class UiStore {
       target => target.item.identifier === item.identifier
     )
     if (existingTarget) return
-    console.log('add drop target', coordinates)
     this.dragTargets.push({ item, coordinates, componentType })
   }
 
