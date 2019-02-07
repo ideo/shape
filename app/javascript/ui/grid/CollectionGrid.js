@@ -268,10 +268,15 @@ class CollectionGrid extends React.Component {
       this.moveCardsIntoCollection(uiStore.multiMoveCardIds, hoveringRecord)
     } else {
       if (uiStore.activeDragTarget) {
-        this.moveCardsIntoCollection(
-          uiStore.multiMoveCardIds,
-          uiStore.activeDragTarget.item
-        )
+        let targetRecord = uiStore.activeDragTarget.item
+        if (uiStore.activeDragTarget.item.id === 'homepage') {
+          const { apiStore } = this.props
+          targetRecord = {
+            id: apiStore.currentUserCollectionId,
+            internalType: 'collections',
+          }
+        }
+        this.moveCardsIntoCollection(uiStore.multiMoveCardIds, targetRecord)
       }
       // reset back to normal
       this.positionCardsFromProps()
