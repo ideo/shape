@@ -82,6 +82,7 @@ const fakeUiStore = {
   toggleEditingCardId: jest.fn(),
   autocompleteMenuClosed: jest.fn(),
   captureKeyboardGridClick: jest.fn(),
+  popupAlert: jest.fn(),
 }
 
 export default fakeUiStore

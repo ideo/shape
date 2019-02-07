@@ -402,6 +402,7 @@ ActiveRecord::Schema.define(version: 20190201202932) do
     t.bigint "comment_thread_id"
     t.datetime "last_viewed_at"
     t.datetime "created_at", null: false
+    t.boolean "subscribed", default: true
     t.index ["user_id", "comment_thread_id"], name: "by_users_comment_thread", unique: true
   end
 

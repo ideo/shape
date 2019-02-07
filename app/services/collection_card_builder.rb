@@ -48,6 +48,10 @@ class CollectionCardBuilder
         # will also cache roles identifier and update breadcrumb
         record.save
 
+        if @parent_collection.is_a? Collection::SubmissionsCollection
+          @parent_collection.follow_submission_box(@user)
+        end
+
         if @parent_collection.master_template?
           # we just added a template card, so update the instances
           @parent_collection.queue_update_template_instances

@@ -5,13 +5,14 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
 
-import { routingStore } from '~/stores'
-import Link from '~/ui/global/Link'
-import Moment from '~/ui/global/Moment'
-import v, { ITEM_TYPES } from '~/utils/variables'
+import { apiStore, routingStore, uiStore } from '~/stores'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import CommentIconFilled from '~/ui/icons/CommentIconFilled'
+import Link from '~/ui/global/Link'
+import FollowIcon from '~/ui/icons/FollowIcon'
 import TextIcon from '~/ui/icons/TextIcon'
+import Tooltip from '~/ui/global/Tooltip'
+import v, { ITEM_TYPES } from '~/utils/variables'
 
 const StyledHeader = styled.div`
   align-items: flex-start;
@@ -36,8 +37,9 @@ const StyledHeader = styled.div`
     display: flex;
     flex-basis: content;
     height: 12px;
-    width: 25px;
-    margin-left: 10px;
+    width: 20px;
+    margin-left: 4px;
+    margin-top: 5px;
     svg {
       margin-left: 4px;
       height: 100%;
@@ -70,6 +72,16 @@ export const ThumbnailHolder = styled.span`
 `
 ThumbnailHolder.displayName = 'ThumbnailHolder'
 
+export const FollowHolder = styled.span`
+  color: ${props =>
+    props.isFollowed ? v.colors.commonLight : v.colors.secondaryLight};
+  height: 15px;
+  margin-left: 7px;
+  margin-right: 8px;
+  margin-top: 3px;
+  width: 15px;
+`
+
 @observer
 class CommentThreadHeader extends React.Component {
   @observable
@@ -77,6 +89,18 @@ class CommentThreadHeader extends React.Component {
 
   componentDidMount() {
     this.countLines()
+    if (routingStore.query) {
+      if (routingStore.query.unsubscribe) {
+        const { thread } = this.props
+        const { users_thread } = thread
+        if (thread.key !== apiStore.currentPageThreadKey) return
+        if (!users_thread) return
+        if (users_thread.currentSubscribed) {
+          users_thread.unsubscribedFromEmail = true
+          this.toggleSubscribe({ preventDefault: () => {} })
+        }
+      }
+    }
   }
 
   @action
@@ -104,6 +128,29 @@ class CommentThreadHeader extends React.Component {
     return routingStore.pathTo('homepage')
   }
 
+  toggleSubscribe = ev => {
+    ev.preventDefault()
+    ev.stopPropagation()
+    const { thread } = this.props
+    const { users_thread } = thread
+    if (users_thread) users_thread.unsubscribedFromEmail = false
+    const subscribed = users_thread ? users_thread.currentSubscribed : false
+    if (subscribed) {
+      thread.API_unsubscribe()
+      users_thread.subscribed = false
+      uiStore.popupAlert({
+        iconName: 'Hidden',
+        open: 'info',
+        prompt: `You have stopped following ${thread.record.name}`,
+      })
+    } else {
+      thread.API_subscribe()
+      // if users_thread update the subscribe attr for immediate UI feedback
+      if (users_thread) users_thread.subscribed = true
+      // if no users thread, it will create one and get it back from the API
+    }
+  }
+
   renderThumbnail() {
     const { record } = this
     let content
@@ -128,6 +175,7 @@ class CommentThreadHeader extends React.Component {
 
   renderUnreadCount = () => {
     const { thread } = this.props
+    if (!thread.unreadCount) return null
     return (
       <span className={`unread ${thread.unreadCount && 'show-unread'}`}>
         <span className="inner">
@@ -135,6 +183,32 @@ class CommentThreadHeader extends React.Component {
           <CommentIconFilled />
         </span>
       </span>
+    )
+  }
+
+  renderFollow = () => {
+    const {
+      thread: { users_thread },
+    } = this.props
+    const subscribed = users_thread ? users_thread.currentSubscribed : false
+    const tooltipText = subscribed ? 'Unfollow' : 'Follow'
+    return (
+      <FollowHolder isFollowed={subscribed}>
+        <Tooltip
+          classes={{ tooltip: 'Tooltip' }}
+          title={tooltipText}
+          placement="top"
+        >
+          <span
+            onClick={this.toggleSubscribe}
+            role="button"
+            tabIndex={0}
+            onKeyDown={() => null}
+          >
+            <FollowIcon />
+          </span>
+        </Tooltip>
+      </FollowHolder>
     )
   }
 
@@ -156,10 +230,8 @@ class CommentThreadHeader extends React.Component {
         </Dotdotdot>
         {thread && (
           <Fragment>
-            <span className="timestamp">
-              <Moment date={thread.updated_at} />
-            </span>
             {this.renderUnreadCount()}
+            {this.renderFollow()}
           </Fragment>
         )}
       </StyledHeader>

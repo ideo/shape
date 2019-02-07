@@ -10,10 +10,7 @@
     <% @comment_threads.each do |comment_thread| %>
       <div class="CommentThread">
         <div class="CommentThread__title">
-          <a
-            class="CommentThread__StyledHeader"
-            href="<%= frontend_url_for(comment_thread.record) %>?open=comments"
-          >
+          <span class="CommentThread__StyledHeader">
               <span class="CommentThread__ThumbnailHolder">
                 <% if comment_thread.record.is_a? Collection %>
                   <% if comment_thread.record.cached_cover && comment_thread.record.cached_cover["image_url"] %>
@@ -29,15 +26,29 @@
                 >
                 <% end %>
               </span>
-            <div style="overflow: hidden; text-overflow: ellipsis; -webkit-box-orient: vertical; display: -webkit-box; -webkit-line-clamp: 2;">
+            <a
+              href="<%= frontend_url_for(comment_thread.record) %>?open=comments"
+              style="overflow: hidden; text-overflow: ellipsis; -webkit-box-orient: vertical; display: -webkit-box; -webkit-line-clamp: 2;"
+              class="CommentThread_link"
+            >
               <span class="name"><%= comment_thread.record.name %></span>
-            </div>
+            </a>
+            <a
+              class="CommentThread_unfollow CommentThread_link"
+              href="<%= frontend_url_for(comment_thread.record) %>?open=comments&unsubscribe=true"
+            >
+              <img src="https://process.filestackapi.com/AhSviFaSOQwS4o2dzycl0z/rotate=deg:exif/kDSgrfETQyurA7nHyxhj"
+                class="CommentThread_unfollow_icon"
+                alt="unfollow"
+              />
+              <span>Unfollow</span>
+            </a>
             <span class="CommentThread_timestamp">
               <span class="Moment">
                 <%= comment_thread.updated_at.strftime('%b %e - %l:%M %p') %>
               </span>
             </span>
-          </a>
+          </span>
         </div>
         <div class="Comments">
         <% comment_thread.comments.where('created_at > ?', @last_notification_mail_sent).each do |comment| %>

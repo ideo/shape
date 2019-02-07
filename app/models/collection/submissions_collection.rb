@@ -22,4 +22,12 @@ class Collection
         .map(&:types)
     end
   end
+
+  def follow_submission_box(user)
+    comment_thread = submission_box.comment_thread
+    return if comment_thread.nil?
+    users_thread = comment_thread.users_thread_for(user)
+    return if users_thread.present?
+    comment_thread.add_user_follower!(user.id)
+  end
 end

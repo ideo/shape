@@ -100,13 +100,13 @@ describe Api::V1::CommentThreadsController, type: :request, json: true, auth: tr
   describe 'POST #create' do
     let(:path) { '/api/v1/comment_threads' }
     let(:collection) { create(:collection) }
-    let(:params) {
+    let(:params) do
       json_api_params(
         'comment_threads',
         record_id: collection.id,
         record_type: 'Collection',
       )
-    }
+    end
 
     context 'with access to record' do
       before do
@@ -132,6 +132,76 @@ describe Api::V1::CommentThreadsController, type: :request, json: true, auth: tr
       it 'returns a 401' do
         expect(response.status).to eq(401)
       end
+    end
+  end
+
+  describe 'PATCH #subscribe' do
+    let!(:comment_thread) { create(:item_comment_thread, num_comments: 1, add_followers: [user]) }
+    let(:path) { "/api/v1/comment_threads/#{comment_thread.id}/subscribe" }
+
+    before do
+      user.add_role(Role::EDITOR, comment_thread.record)
+    end
+
+    context 'with pre-existing users_thread' do
+      before do
+        comment_thread.users_thread_for(user).update(subscribed: false)
+      end
+
+      it 'returns a 200' do
+        patch(path, params: {})
+        expect(response.status).to eq(200)
+      end
+
+      it 'sets subscribed on the user thread to true' do
+        patch(path, params: {})
+        expect(comment_thread.users_thread_for(user).subscribed).to be true
+      end
+
+      it 'updates firestore' do
+        expect_any_instance_of(CommentThread).to receive(:update_firestore_users_threads)
+        patch(path, params: {})
+      end
+    end
+
+    context 'with no pre-existing users_thread' do
+      let!(:comment_thread) { create(:item_comment_thread, num_comments: 1) }
+
+      it 'returns a 200' do
+        patch(path, params: {})
+        expect(response.status).to eq(200)
+      end
+
+      it 'creates a user thread with subscribed == true' do
+        expect(comment_thread.users_thread_for(user)).to be nil
+        patch(path, params: {})
+        expect(comment_thread.users_thread_for(user).subscribed).to be true
+      end
+    end
+  end
+
+  describe 'PATCH #unsubscribe' do
+    let!(:comment_thread) { create(:item_comment_thread, num_comments: 1, add_followers: [user]) }
+    let(:path) { "/api/v1/comment_threads/#{comment_thread.id}/unsubscribe" }
+
+    before do
+      user.add_role(Role::EDITOR, comment_thread.record)
+      comment_thread.users_thread_for(user).update(subscribed: true)
+    end
+
+    it 'returns a 200' do
+      patch(path, params: {})
+      expect(response.status).to eq(200)
+    end
+
+    it 'sets subscribed on the user thread to true' do
+      patch(path, params: {})
+      expect(comment_thread.users_thread_for(user).subscribed).to be false
+    end
+
+    it 'updates firestore' do
+      expect_any_instance_of(CommentThread).to receive(:update_firestore_users_threads)
+      patch(path, params: {})
     end
   end
 end

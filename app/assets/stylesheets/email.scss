@@ -275,10 +275,7 @@ button {
   display: flex;
   height: 70px;
   font-family: $gotham-font;
-  font-size: 23px;
-  .name {
-    text-transform: uppercase;
-  }
+  font-size: 20px;
 }
 
 .CommentThread__title {
@@ -309,6 +306,32 @@ button {
     object-fit: cover;
     width: 100%;
   }
+}
+
+.CommentThread_unfollow {
+  color: white;
+  font-family: $gotham-font;
+  min-width: 120px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 2.25px;
+  line-height: 13px;
+  text-transform: uppercase;
+  padding-top: 8px;
+  padding-left: 5px;
+  padding-right: 10px;
+  margin-left: auto;
+}
+
+.CommentThread_unfollow_icon {
+  display: inline-block;
+  height: 15px;
+  vertical-align: bottom;
+  width: 15px;
+}
+
+.CommentThread_link {
+  color: white;
 }
 
 .CommentThread_timestamp {

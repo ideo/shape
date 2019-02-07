@@ -120,6 +120,7 @@ export class FirebaseClient {
     this.userThreadListener = db
       .collection('users_threads')
       .where('data.attributes.identifier', '==', `${orgId}_${userId}`)
+      .where('data.attributes.subscribed', '==', true)
       .orderBy('data.attributes.updated_at', 'desc')
       .limit(PER_PAGE * pages)
       .onSnapshot(

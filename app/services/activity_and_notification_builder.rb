@@ -73,6 +73,7 @@ class ActivityAndNotificationBuilder < SimpleService
       .find_each do |user|
       next if user.id == @actor.id
       next if @omit_user_ids.include? user.id
+      next unless should_receive_notifications?(user) && @action != :mentioned
       if @combine
         if (notif = combine_existing_notifications(user.id))
           @created_notifications << notif
@@ -129,5 +130,15 @@ class ActivityAndNotificationBuilder < SimpleService
       3.seconds,
       @created_notifications.compact.map(&:batch_job_identifier),
     )
+  end
+
+  def should_receive_notifications?(user)
+    return true if @target.is_a? Group
+
+    parents_unsubscribed = @target.any_parent_unsubscribed?(user)
+    return !parents_unsubscribed if @target.comment_thread.nil?
+    users_thread = @target.comment_thread.users_thread_for(user)
+    return !parents_unsubscribed if users_thread.nil?
+    users_thread.subscribed
   end
 end

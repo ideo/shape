@@ -36,10 +36,24 @@ RSpec.describe CommentThread, type: :model do
     let(:user) { create(:user) }
 
     it 'should create a user thread for the given user' do
-      expect {
+      expect do
         comment_thread.add_user_follower!(user.id)
-      }.to change(comment_thread.users_threads, :count).by(1)
+      end.to change(comment_thread.users_threads, :count).by(1)
       expect(user.comment_threads).to include(comment_thread)
+    end
+
+    context 'with an existing unsubscribed user thread' do
+      let!(:users_thread) do
+        create(:users_thread,
+               comment_thread: comment_thread,
+               user: user,
+               subscribed: false)
+      end
+
+      it 'should not subscribe the user' do
+        existing_ut = comment_thread.users_threads.find_by(user_id: user.id)
+        expect(existing_ut.subscribed).to be false
+      end
     end
   end
 
@@ -49,9 +63,9 @@ RSpec.describe CommentThread, type: :model do
     let(:group) { create(:group, add_members: [user]) }
 
     it 'should create a group thread and user thread the group\'s users' do
-      expect {
+      expect do
         comment_thread.add_group_follower!(group.id)
-      }.to change(comment_thread.groups_threads, :count).by(1)
+      end.to change(comment_thread.groups_threads, :count).by(1)
       expect(user.comment_threads).to include(comment_thread)
     end
   end
@@ -66,6 +80,36 @@ RSpec.describe CommentThread, type: :model do
         [users_thread.batch_job_identifier],
       )
       comment_thread.update(updated_at: Time.now)
+    end
+  end
+
+  describe '#subscribe!' do
+    let(:comment_thread) { create(:collection_comment_thread) }
+    let(:user) { create(:user) }
+    let(:subscription) { comment_thread.subscribe!(user) }
+
+    it 'should add the user as subscriber' do
+      expect(FirestoreBatchWriter).to receive(:perform_in)
+      expect {
+        subscription
+      }.to change(user.users_threads, :count).by(1)
+      # subscription is the users_thread
+      expect(subscription.subscribed).to be true
+    end
+  end
+
+  describe '#unsubscribe!' do
+    let(:comment_thread) { create(:collection_comment_thread) }
+    let(:user) { create(:user) }
+    let(:subscription) { comment_thread.unsubscribe!(user) }
+
+    it 'should add the user as unsubscriber' do
+      expect(FirestoreBatchWriter).to receive(:perform_in)
+      expect {
+        subscription
+      }.to change(user.users_threads, :count).by(1)
+      # subscription is the users_thread
+      expect(subscription.subscribed).to be false
     end
   end
 end

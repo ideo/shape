@@ -131,6 +131,25 @@ RSpec.describe CollectionCardBuilder, type: :service do
         expect_any_instance_of(Collection).to receive(:cache_cover!)
         expect(builder.create).to be true
       end
+
+      context 'when item is a submission' do
+        let(:submission_box) do
+          create(:submission_box,
+                 organization: organization,
+                 add_viewers: [user])
+        end
+        let(:parent) { create(:submissions_collection, submission_box: submission_box) }
+        let!(:comment_thread) { create(:collection_comment_thread, record: submission_box) }
+
+        before do
+          builder.create
+        end
+
+        it 'should subscribe the submitter to the submission box' do
+          users_thread = comment_thread.users_thread_for(user)
+          expect(users_thread.subscribed).to be true
+        end
+      end
     end
 
     context 'error because the item has no type' do

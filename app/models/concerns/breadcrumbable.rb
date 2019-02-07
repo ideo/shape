@@ -98,6 +98,15 @@ module Breadcrumbable
     breadcrumb.include?(collection.id)
   end
 
+  def any_parent_unsubscribed?(user)
+    record_unsubscribed = false
+    parents.each do |r|
+      record_unsubscribed = record_unsubscribed?(r, user)
+      break if record_unsubscribed
+    end
+    record_unsubscribed
+  end
+
   private
 
   def calculate_breadcrumb
@@ -114,5 +123,12 @@ module Breadcrumbable
 
   def calculate_breadcrumb?
     breadcrumb.blank?
+  end
+
+  def record_unsubscribed?(record, user)
+    return false if record.comment_thread.nil?
+    users_thread = record.comment_thread.users_thread_for(user)
+    return false if users_thread.nil?
+    !users_thread.subscribed
   end
 end
