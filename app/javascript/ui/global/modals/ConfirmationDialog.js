@@ -20,12 +20,41 @@ const StyledFormControlLabel = styled(FormControlLabel)`
 `
 StyledFormControlLabel.displayName = 'snoozeDialogMessage'
 
+const OrLabel = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: ${v.colors.primaryDark};
+  font-family: ${v.fonts.sans};
+  font-size: 1rem;
+  text-align: center;
+  > span {
+    margin-bottom: 3em;
+  }
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    border-bottom: thin solid ${v.colors.primaryDark};
+    display: block;
+    height: auto;
+    margin: 30px 0;
+    > span {
+      background-color: ${v.colors.white};
+      display: inline-block;
+      margin-bottom: 0;
+      padding: 5px 10px;
+      position: absolute;
+      transform: translate(-50%, -50%);
+    }
+  }
+`
+
 const OptionImage = styled.img`
   display: block;
   margin: 0 auto 20px;
-  max-width: 100%;
+  max-width: 90%;
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
     max-width: 40%;
+    margin-bottom: 10px;
   }
 `
 
@@ -35,7 +64,7 @@ const ConfirmOption = ConfirmText.extend`
   margin: 0 auto 70px;
   max-width: 190px;
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
-    margin-bottom: 24px;
+    margin-bottom: 20px;
   }
 `
 
@@ -133,8 +162,10 @@ class ConfirmationDialog extends React.PureComponent {
               </FormActionsContainer>
             </Grid>
             {twoColumn && (
-              <Grid item xs sm={1} style={{ color: v.colors.primaryDark }}>
-                or
+              <Grid item xs={12} sm={1} style={{ color: v.colors.primaryDark }}>
+                <OrLabel>
+                  <span>or</span>
+                </OrLabel>
               </Grid>
             )}
             <Grid item xs={twoColumn ? 12 : true} sm>
