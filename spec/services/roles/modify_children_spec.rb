@@ -156,6 +156,16 @@ RSpec.describe Roles::ModifyChildren, type: :service do
         expect(Roles::MassAssign).not_to receive(:call)
         modify_children.call
       end
+
+      context 'when the child will match inheritance' do
+        # now we are re-adding other_user back, so the inheritance should match
+        let(:users) { [other_user, user] }
+
+        it 'should add the parent roles to the child' do
+          expect(Roles::MassAssign).to receive(:call)
+          modify_children.call
+        end
+      end
     end
   end
 end

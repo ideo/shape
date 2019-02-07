@@ -42,7 +42,7 @@ module Roles
         # If the user can edit, then continue adding the roles
         next unless @user.nil? || child.can_edit?(@user)
         # don't modify private children, other than unhidden submissions
-        next if @inheritance.private_child?(child) && !unhidden_submission?(child)
+        next unless will_inherit_from_parent?(child) || unhidden_submission?(child)
 
         # just alter the roles at this one level, since we are already searching through *all* levels of children
         params = {
@@ -63,6 +63,11 @@ module Roles
 
     def unhidden_submission?(child)
       child.is_a?(Collection) && child.submission? && !child.submission_attrs['hidden']
+    end
+
+    def will_inherit_from_parent?(child)
+      add_identifiers = (@subject_users + @subject_groups).map { |i| Role.object_identifier(i) }
+      @inheritance.inherit_from_parent?(child, add_identifiers: add_identifiers, role_name: @role_name)
     end
 
     def modify_anchored_children(children)
