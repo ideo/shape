@@ -2,6 +2,11 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
   deserializable_resource :organization, only: %i[create update]
   load_and_authorize_resource except: %i[create]
 
+  before_action :load_and_filter_organizations, only: %i[index]
+  def index
+    render jsonapi: @organizations, expose: { index: true }
+  end
+
   # The logged-in user's current organization context
   def current
     render jsonapi: current_organization, include: %i[primary_group terms_text_item]
@@ -53,6 +58,15 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
   end
 
   private
+
+  def load_and_filter_organizations
+    @organizations = current_user.organizations
+    e_id = @filter[:external_id]
+    return @organizations unless e_id.present?
+    @organizations = @organizations
+                     .joins(:external_records)
+                     .where(ExternalRecord.arel_table[:external_id].eq(e_id))
+  end
 
   def organization_params
     params_allowed = [

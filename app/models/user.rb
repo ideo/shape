@@ -51,6 +51,7 @@ class User < ApplicationRecord
            class_name: 'Collection::UserProfile',
            inverse_of: :created_by,
            foreign_key: :created_by_id
+  has_one :application
 
   belongs_to :current_organization,
              class_name: 'Organization',
@@ -95,6 +96,18 @@ class User < ApplicationRecord
       status: status,
       organization_ids: organization_ids,
     }
+  end
+
+  alias organizations_through_groups organizations
+  def organizations
+    if application_bot?
+      return application.organizations
+    end
+    organizations_through_groups
+  end
+
+  def application_bot?
+    application.present?
   end
 
   def email_search_tokens

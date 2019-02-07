@@ -85,6 +85,8 @@ class Collection < ApplicationRecord
            through: :collection_cards,
            source: :collection
 
+  has_many :external_records, as: :externalizable, dependent: :destroy
+
   has_one :comment_thread, as: :record, dependent: :destroy
 
   delegate :parent, :pinned, :pinned?, :pinned_and_locked?,

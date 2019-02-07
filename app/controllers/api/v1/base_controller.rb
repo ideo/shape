@@ -1,6 +1,7 @@
 class Api::V1::BaseController < ApplicationController
   before_action :check_api_authentication!
   before_action :check_cancel_sync
+  before_action :check_filters
 
   respond_to :json
 
@@ -109,6 +110,10 @@ class Api::V1::BaseController < ApplicationController
       sign_in(@current_api_token.application_user)
     end
     @current_api_token
+  end
+
+  def check_filters
+    @filter = params[:filter] || {}
   end
 
   def authorization_token_from_header

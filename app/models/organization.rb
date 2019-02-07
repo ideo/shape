@@ -13,6 +13,8 @@ class Organization < ApplicationRecord
   has_many :items, through: :collections, dependent: :destroy
   has_many :groups, dependent: :destroy
   has_many :api_tokens, dependent: :destroy
+  has_many :application_organizations, dependent: :destroy
+  has_many :external_records, as: :externalizable, dependent: :destroy
   belongs_to :primary_group,
              class_name: 'Group',
              dependent: :destroy,

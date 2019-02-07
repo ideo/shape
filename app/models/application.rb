@@ -5,6 +5,7 @@ class Application < ApplicationRecord
   has_many :api_tokens
   has_many :application_organizations
   has_many :organizations, through: :application_organizations
+  has_many :external_records
 
   before_validation :create_user, on: :create
 

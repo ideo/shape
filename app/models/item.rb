@@ -35,6 +35,8 @@ class Item < ApplicationRecord
            inverse_of: :item,
            dependent: :destroy
 
+  has_many :external_records, as: :externalizable, dependent: :destroy
+
   delegate :parent, :pinned, :pinned?, :pinned_and_locked?,
            to: :parent_collection_card, allow_nil: true
   delegate :organization, to: :parent, allow_nil: true

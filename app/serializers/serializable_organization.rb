@@ -6,6 +6,10 @@ class SerializableOrganization < BaseJsonSerializer
   belongs_to :admin_group
   belongs_to :terms_text_item
 
+  attribute :current_user_collection_id, if: -> { @index } do
+    @current_user.current_user_collection(@object.id)&.id
+  end
+
   attribute :is_within_trial_period do
     @object.within_trial_period?
   end
