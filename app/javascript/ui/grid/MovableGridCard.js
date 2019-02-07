@@ -466,6 +466,9 @@ class MovableGridCard extends React.PureComponent {
         zIndex={zIndex}
         onClick={this.handleWrapperClick}
         innerRef={c => (this.gridCardRef = c)}
+        style={{
+          display: card.isBeingMultiMoved && !dragging ? 'none' : 'block',
+        }}
       >
         <Rnd
           ref={c => {
