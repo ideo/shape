@@ -303,6 +303,8 @@ class User < ApplicationRecord
 
   def in_my_collection?(item_or_collection)
     uc = current_user_collection
+    # e.g. SuperAdmin doesn't always have a user collection
+    return false unless uc.present?
     @in_my_collection ||= (
       uc.collections_and_linked_collections.select(:id, :name) + uc.items_and_linked_items.select(:id, :name)
     ).map(&:resource_identifier)
