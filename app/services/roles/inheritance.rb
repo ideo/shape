@@ -5,8 +5,8 @@ module Roles
     end
 
     def inherit_from_parent?(child, add_identifiers: [], remove_identifiers: [], role_name: '')
-      # Yes if there are no child roles yet
-      return true if child.same_roles_anchor?(@parent)
+      # If we are proposing removing identifiers, we still want to check if it will become private
+      return true if child.same_roles_anchor?(@parent) && remove_identifiers.blank?
       if add_identifiers.empty? && remove_identifiers.empty? && role_name.blank?
         # generic case: check that both Editors and Viewers would inherit
         # NOTE: Role::CONTENT_EDITOR is not yet represented here, because it's
