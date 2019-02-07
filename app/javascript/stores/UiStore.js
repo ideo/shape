@@ -160,6 +160,8 @@ export default class UiStore {
   dragTargets = []
   @observable
   activeDragTarget = null
+  @observable
+  multiMoveCardIds = []
 
   @action
   toggleEditingCardId(cardId) {
@@ -171,13 +173,21 @@ export default class UiStore {
   }
 
   @action
-  startDragging() {
+  startDragging(cardId) {
     this.dragging = true
+    if (this.selectedCardIds.length > 0) {
+      // If the dragged card is also selected, then we're doing a multi-move
+      // with all selected cards.
+      if (this.selectedCardIds.indexOf(cardId.toString()) > -1) {
+        this.multiMoveCardIds = [...this.selectedCardIds]
+      }
+    }
   }
 
   @action
   stopDragging() {
     this.dragging = false
+    this.multiMoveCardIds = []
   }
 
   @action

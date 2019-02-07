@@ -231,18 +231,18 @@ class CollectionGrid extends React.Component {
         updates.height = height
       }
       // TODO add same template confirmation for multi-item moving
-      if (uiStore.selectedCardIds.length > 0) {
-        const selectedCards = _.map(uiStore.selectedCardIds, selectedCardId =>
-          _.find(cards, { id: selectedCardId })
-        ).filter(card => card.id !== original.id)
-        selectedCards.push(original)
-        const sortedSelectedCards = _.sortBy(selectedCards, 'order')
-        _.each(sortedSelectedCards, (card, idx) => {
+      if (uiStore.multiMoveCardIds.length > 0) {
+        const multiMoveCards = _.map(
+          uiStore.multiMoveCardIds,
+          multiMoveCardId => _.find(cards, { id: multiMoveCardId })
+        )
+        const sortedMovedCards = _.sortBy(multiMoveCards, 'order')
+        _.each(sortedMovedCards, (card, idx) => {
           const sortedOrder = updates.order + (idx + 1) * 0.1
           card.order = sortedOrder
         })
         this.props.batchUpdateCollection({
-          cards: sortedSelectedCards,
+          cards: sortedMovedCards,
           undoMessage,
         })
         this.positionCardsFromProps()
@@ -393,6 +393,7 @@ class CollectionGrid extends React.Component {
     const { dragX, dragY } = dragPosition
     const { gutter, gridW } = this.props
     _.each(this.state.cards, card => {
+      if (card.isBeingMultiMoved) return null
       const placeholder =
         card.cardType === 'placeholder' || card.cardType === 'blank'
       if (card.id === cardId || placeholder) return null
@@ -517,7 +518,8 @@ class CollectionGrid extends React.Component {
       }
 
       // if we're dragging multiple cards, also don't show them
-      if (opts.otherDrags && opts.otherDrags.indexOf(card.id) > -1) {
+      if (opts.dragging && card.isBeingMultiMoved) {
+        card.position = {}
         return
       }
       let position = {}

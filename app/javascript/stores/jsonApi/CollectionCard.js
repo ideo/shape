@@ -223,6 +223,14 @@ class CollectionCard extends BaseRecord {
       .filter(card => selectedCardIds.indexOf(card.id) > -1)
   }
 
+  get isSelected() {
+    return uiStore.selectedCardIds.indexOf(this.id) > -1
+  }
+
+  get isBeingMultiMoved() {
+    return uiStore.multiMoveCardIds.indexOf(this.id) > -1
+  }
+
   async API_archiveSelf() {
     try {
       await this.apiStore.archiveCards({
