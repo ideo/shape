@@ -82,4 +82,34 @@ RSpec.describe CommentThread, type: :model do
       comment_thread.update(updated_at: Time.now)
     end
   end
+
+  describe '#subscribe!' do
+    let(:comment_thread) { create(:collection_comment_thread) }
+    let(:user) { create(:user) }
+    let(:subscription) { comment_thread.subscribe!(user) }
+
+    it 'should add the user as subscriber' do
+      expect(FirestoreBatchWriter).to receive(:perform_in)
+      expect {
+        subscription
+      }.to change(user.users_threads, :count).by(1)
+      # subscription is the users_thread
+      expect(subscription.subscribed).to be true
+    end
+  end
+
+  describe '#unsubscribe!' do
+    let(:comment_thread) { create(:collection_comment_thread) }
+    let(:user) { create(:user) }
+    let(:subscription) { comment_thread.unsubscribe!(user) }
+
+    it 'should add the user as unsubscriber' do
+      expect(FirestoreBatchWriter).to receive(:perform_in)
+      expect {
+        subscription
+      }.to change(user.users_threads, :count).by(1)
+      # subscription is the users_thread
+      expect(subscription.subscribed).to be false
+    end
+  end
 end
