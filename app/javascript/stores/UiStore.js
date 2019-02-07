@@ -181,6 +181,8 @@ export default class UiStore {
       if (this.selectedCardIds.indexOf(cardId.toString()) > -1) {
         this.multiMoveCardIds = [...this.selectedCardIds]
       }
+    } else {
+      this.multiMoveCardIds = [cardId]
     }
   }
 
