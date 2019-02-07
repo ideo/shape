@@ -743,4 +743,15 @@ describe Organization, type: :model do
       end
     end
   end
+
+  describe '#can_view?' do
+    let(:organization) { create(:organization) }
+    let(:user) { create(:user) }
+
+    it 'returns true if user has application user role' do
+      expect(organization.can_view?(user)).to be false
+      user.add_role(Role::APPLICATION_USER, organization)
+      expect(organization.can_view?(user)).to be true
+    end
+  end
 end

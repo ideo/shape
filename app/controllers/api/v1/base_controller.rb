@@ -79,11 +79,41 @@ class Api::V1::BaseController < ApplicationController
   end
 
   def check_api_authentication!
-    head(401) unless user_signed_in? && current_user.active?
+    return if user_signed_in? && current_user.active?
+    return if current_api_token.present?
+    head(401)
+  end
+
+  def current_ability
+    return @current_ability if @current_ability.present?
+    if current_api_token.present? &&
+       current_api_token.organization_id.present?
+      @current_ability = Api::OrganizationAbility.new(current_api_token.organization)
+    else
+      @current_ability = Ability.new(current_user)
+    end
   end
 
   def current_organization
-    @current_organization ||= current_user.try(:current_organization)
+    @current_organization ||= current_user.try(:current_organization) ||
+                              current_api_token.try(:organization)
+  end
+
+  def current_api_token
+    return if authorization_token_from_header.blank?
+    @current_api_token ||= ApiToken.where(
+      token: authorization_token_from_header,
+    ).includes(:organization, application: [:user]).first
+    if @current_api_token.present? &&
+       @current_api_token.application_user.present?
+      sign_in(@current_api_token.application_user)
+    end
+    @current_api_token
+  end
+
+  def authorization_token_from_header
+    return if request.headers['AUTHORIZATION'].blank?
+    request.headers['AUTHORIZATION'].sub(/^Bearer\s+/, '')
   end
 
   def check_cancel_sync

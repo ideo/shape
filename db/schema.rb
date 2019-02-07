@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190122183523) do
+ActiveRecord::Schema.define(version: 20190201202932) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -45,6 +45,34 @@ ActiveRecord::Schema.define(version: 20190122183523) do
     t.datetime "updated_at", null: false
     t.index ["activity_id"], name: "index_activity_subjects_on_activity_id"
     t.index ["subject_type", "subject_id"], name: "index_activity_subjects_on_subject_type_and_subject_id"
+  end
+
+  create_table "api_tokens", force: :cascade do |t|
+    t.text "token"
+    t.bigint "application_id"
+    t.bigint "organization_id"
+    t.bigint "created_by_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["application_id", "organization_id"], name: "index_api_tokens_on_app_id_org_id"
+    t.index ["token"], name: "index_api_tokens_on_token"
+  end
+
+  create_table "application_organizations", force: :cascade do |t|
+    t.bigint "application_id"
+    t.bigint "organization_id"
+    t.bigint "root_collection_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["application_id", "organization_id"], name: "index_app_org_on_app_id_org_id", unique: true
+  end
+
+  create_table "applications", force: :cascade do |t|
+    t.string "name"
+    t.bigint "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_applications_on_user_id"
   end
 
   create_table "collection_cards", force: :cascade do |t|

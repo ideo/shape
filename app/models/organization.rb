@@ -5,12 +5,14 @@ class Organization < ApplicationRecord
   PRICE_PER_USER = 5.00
   SUPER_ADMIN_EMAIL = ENV['SUPER_ADMIN_EMAIL'] || 'admin@shape.space'.freeze
 
+  include Resourceable
   extend FriendlyId
   friendly_id :slug_candidates, use: %i[slugged finders history]
 
   has_many :collections, dependent: :destroy
   has_many :items, through: :collections, dependent: :destroy
   has_many :groups, dependent: :destroy
+  has_many :api_tokens, dependent: :destroy
   belongs_to :primary_group,
              class_name: 'Group',
              dependent: :destroy,
@@ -44,6 +46,10 @@ class Organization < ApplicationRecord
              dependent: :destroy,
              optional: true
 
+  resourceable roles: [Role::APPLICATION_USER],
+               edit_role: '',
+               view_role: Role::APPLICATION_USER
+
   after_create :create_groups
   before_update :parse_domain_whitelist
   after_update :update_network_name, :update_group_names, if: :saved_change_to_name?
@@ -66,6 +72,7 @@ class Organization < ApplicationRecord
   end
 
   def can_view?(user)
+    return true if user.has_role?(Role::APPLICATION_USER, self)
     primary_group.can_view?(user) || admin_group.can_view?(user) || guest_group.can_view?(user)
   end
 
@@ -107,6 +114,12 @@ class Organization < ApplicationRecord
     check_email_domains_and_join_org_group(user)
 
     # Set this as the user's current organization if they don't have one
+    user.switch_to_organization(self) if user.current_organization_id.blank?
+  end
+
+  def setup_bot_user_membership(user)
+    Collection::UserCollection.find_or_create_for_user(user, self)
+    user.add_role(Role::APPLICATION_USER, self)
     user.switch_to_organization(self) if user.current_organization_id.blank?
   end
 
@@ -313,6 +326,10 @@ class Organization < ApplicationRecord
     self.terms_text_item = item
     save
     item
+  end
+
+  def roles_anchor_collection_id
+    nil
   end
 
   private

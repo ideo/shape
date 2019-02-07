@@ -8,11 +8,20 @@ class RemoveUserRolesFromOrganizationWorker
     role_ids = collection_role_ids
     role_ids += group_role_ids
     role_ids += item_role_ids
+    role_ids += application_user_role_ids
 
     UsersRole.where(role_id: role_ids, user_id: @user.id).destroy_all
   end
 
   private
+
+  def application_user_role_ids
+    @user.roles
+         .where(
+           name: Role::APPLICATION_USER,
+         )
+         .pluck(:id)
+  end
 
   def collection_role_ids
     @user.collections

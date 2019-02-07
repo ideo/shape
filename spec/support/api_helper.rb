@@ -23,4 +23,10 @@ module ApiHelper
       }.merge(merge_data)
     }.to_json
   end
+
+  def headers_with_token(token)
+    {
+      'AUTHORIZATION' => "Bearer #{token}",
+    }
+  end
 end

@@ -66,7 +66,7 @@ RSpec.describe Roles::MassAssign, type: :service do
     end
 
     context 'with object that can\'t be assigned roles' do
-      let!(:object) { create(:organization) }
+      let!(:object) { create(:notification) }
 
       it 'returns errors' do
         expect(assign_role.call).to be false
