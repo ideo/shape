@@ -1,6 +1,9 @@
 import { uiStore } from '~/stores'
 import { observe } from 'mobx'
 
+const PADDING_V = 20
+const PADDING_H = 40
+
 function WithDropTarget(Wrapped) {
   class DropTarget extends React.Component {
     state = { currentlyDraggedOn: null }
@@ -40,10 +43,10 @@ function WithDropTarget(Wrapped) {
       const rect = element.getBoundingClientRect()
       const { top, right, bottom, left } = rect
       return {
-        top,
-        right,
-        bottom,
-        left,
+        top: top - PADDING_V,
+        right: right + PADDING_H,
+        bottom: bottom + PADDING_V,
+        left: left - PADDING_H,
       }
     }
 

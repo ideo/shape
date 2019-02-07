@@ -86,6 +86,7 @@ class MovableGridCard extends React.PureComponent {
   }
 
   handleStart = (e, data) => {
+    e.preventDefault()
     this.scrolling = false
     // initialOffset tracks the coordinates *within* the card where you clicked,
     // e.g. bottom left corner of the card itself
@@ -445,7 +446,7 @@ class MovableGridCard extends React.PureComponent {
     if (dragging) {
       transform = `translate(${xAdjust}px, ${yAdjust}px) rotate(3deg)`
       if (draggedOverBreadcrumb) {
-        transform = 'scaleX(0.25) scaleY(0.25) translate(0px, -82px)'
+        transform = 'scaleX(0.75) scaleY(0.75) translate(0px, 180px)'
         transition = cardHoverTransition
       }
     } else if (hoveringOverLeft) {
