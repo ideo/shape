@@ -4,21 +4,19 @@ module Roles
       @parent = parent
     end
 
-    def inherit_from_parent?(child, remove_identifiers: [], role_name: '')
+    def inherit_from_parent?(child, add_identifiers: [], remove_identifiers: [], role_name: '')
       # Yes if there are no child roles yet
-      return true if child.same_roles_anchor?(@parent) && remove_identifiers.empty?
-      if remove_identifiers.empty? && role_name.blank?
+      return true if child.same_roles_anchor?(@parent)
+      if add_identifiers.empty? && remove_identifiers.empty? && role_name.blank?
         # generic case: check that both Editors and Viewers would inherit
         # NOTE: Role::CONTENT_EDITOR is not yet represented here, because it's
         # not a selectable role on the frontend.
         inherit_role_from_parent?(child, role_name: Role::EDITOR) &&
           inherit_role_from_parent?(child, role_name: Role::VIEWER)
       elsif role_name
-        inherit_role_from_parent?(
-          child,
-          remove_identifiers: remove_identifiers,
-          role_name: role_name,
-        )
+        @add_identifiers = add_identifiers
+        @remove_identifiers = remove_identifiers
+        inherit_role_from_parent?(child, role_name: role_name)
       else
         false
       end
@@ -48,12 +46,12 @@ module Roles
 
     private
 
-    def inherit_role_from_parent?(child, remove_identifiers: [], role_name:)
+    def inherit_role_from_parent?(child, role_name:)
       @parent_allowed_identifiers = allowed_identifiers(@parent, role_name)
       proposed_identifiers = allowed_identifiers(child, role_name)
-      if remove_identifiers.present?
-        proposed_identifiers -= remove_identifiers
-      end
+      proposed_identifiers -= @remove_identifiers if @remove_identifiers.present?
+      proposed_identifiers += @add_identifiers if @add_identifiers.present?
+      proposed_identifiers.uniq!
       should_inherit?(proposed_identifiers)
     end
 
