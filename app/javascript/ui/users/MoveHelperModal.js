@@ -7,7 +7,7 @@ import DialogContent from '@material-ui/core/DialogContent'
 import FormControl from '@material-ui/core/FormControl'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 
-import { FormButton, Checkbox } from '~/ui/global/styled/forms'
+import { TextButton, Checkbox } from '~/ui/global/styled/forms'
 import v from '~/utils/variables'
 
 const SpecialDisplayHeading = styled.p`
@@ -26,12 +26,24 @@ const StyledDialog = styled(Dialog)`
     text-align: center;
     padding: 20px;
     padding-top: 35px;
-    max-width: 445px;
-    min-width: 540px;
+    max-width: 540px;
     width: 100%;
+
+    @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+      margin: 0;
+      max-width: 100%;
+      min-height: 100vh;
+    }
   }
 `
 StyledDialog.displayName = 'StyledDialog'
+
+const StyledDialogContent = styled(DialogContent)`
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    /* clear the Move Modal pill regardless of screen size */
+    padding-bottom: 120px !important;
+  }
+`
 
 @inject('uiStore')
 @observer
@@ -86,17 +98,18 @@ class MoveHelperModal extends React.Component {
           invisible: true,
         }}
       >
-        <DialogContent>
+        <StyledDialogContent>
           <form onSubmit={this.handleSubmit}>
             <img
               src="https://s3-us-west-2.amazonaws.com/assets.shape.space/move_helper_diagram.png"
               alt="Diagram showing moving items between multiple collections"
-              style={{ width: '410px', marginBottom: '40px' }}
+              style={{ width: '100%', maxWidth: '410px', marginBottom: '40px' }}
             />
             <SpecialDisplayHeading>{this.helperText}</SpecialDisplayHeading>
             <FormControl component="fieldset" required>
               <FormControlLabel
                 classes={{ label: 'form-control' }}
+                style={{ textAlign: 'left' }}
                 control={
                   <Checkbox
                     checked={this.dontShowChecked}
@@ -110,10 +123,10 @@ class MoveHelperModal extends React.Component {
             </FormControl>
 
             <div className="button--center">
-              <FormButton disabled={this.isLoading}>Close</FormButton>
+              <TextButton disabled={this.isLoading}>Close</TextButton>
             </div>
           </form>
-        </DialogContent>
+        </StyledDialogContent>
       </StyledDialog>
     )
   }
