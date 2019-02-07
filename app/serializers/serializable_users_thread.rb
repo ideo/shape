@@ -2,7 +2,7 @@ class SerializableUsersThread < BaseJsonSerializer
   type 'users_threads'
   attributes :last_viewed_at, :updated_at,
              # just store these as attributes, don't need the whole relation
-             :comment_thread_id, :user_id
+             :comment_thread_id, :user_id, :subscribed
   # this is a calculated value from UsersThread
   attribute :unread_count
 

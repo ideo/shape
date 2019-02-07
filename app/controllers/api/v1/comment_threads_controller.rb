@@ -1,5 +1,6 @@
 class Api::V1::CommentThreadsController < Api::V1::BaseController
   deserializable_resource :comment_thread, class: DeserializableCommentThread, only: %i[create]
+  load_and_authorize_resource :comment_thread, only: %i[subscribe unsubscribe]
 
   before_action :load_users_comment_threads, only: %i[index]
   def index
@@ -37,10 +38,28 @@ class Api::V1::CommentThreadsController < Api::V1::BaseController
     end
   end
 
+  def subscribe
+    if @comment_thread.subscribe!(current_user)
+      render jsonapi: @comment_thread, include: thread_relations
+    else
+      # TODO: what should the error here be?
+      render_api_errors @comment_thread.errors
+    end
+  end
+
+  def unsubscribe
+    if @comment_thread.unsubscribe!(current_user)
+      render jsonapi: @comment_thread, include: thread_relations
+    else
+      # TODO: what should the error here be?
+      render_api_errors @comment_thread.errors
+    end
+  end
+
   private
 
   def thread_relations
-    [:record]
+    %i[record users_thread]
   end
 
   def comment_thread_params

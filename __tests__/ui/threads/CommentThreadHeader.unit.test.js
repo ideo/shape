@@ -1,11 +1,16 @@
-import CommentThreadHeader from '~/ui/threads/CommentThreadHeader'
+import CommentThreadHeader, {
+  FollowHolder,
+} from '~/ui/threads/CommentThreadHeader'
+
 import { fakeThread } from '#/mocks/data'
-import { ITEM_TYPES } from '~/utils/variables'
-import { routingStore } from '~/stores'
+import v, { ITEM_TYPES } from '~/utils/variables'
+import { routingStore, uiStore } from '~/stores'
 
 jest.mock('../../../app/javascript/stores')
 
 let wrapper, props
+
+const fakeEv = { preventDefault: jest.fn(), stopPropagation: jest.fn() }
 
 describe('CommentThreadHeader', () => {
   describe('with a thread', () => {
@@ -142,6 +147,84 @@ describe('CommentThreadHeader', () => {
     it('should not render the timestamp or unreadCount', () => {
       expect(wrapper.find('Moment').exists()).toBeFalsy()
       expect(wrapper.find('CommentIcon').exists()).toBeFalsy()
+    })
+  })
+
+  describe('subscriptions', () => {
+    let button
+    beforeEach(() => {
+      props = {
+        thread: fakeThread,
+      }
+      wrapper = shallow(<CommentThreadHeader {...props} />)
+      button = wrapper
+        .find(FollowHolder)
+        .find('span[role="button"]')
+        .first()
+    })
+
+    describe('when subscribed', () => {
+      beforeEach(() => {
+        props.thread.users_thread.subscribed = true
+        wrapper = shallow(<CommentThreadHeader {...props} />)
+      })
+
+      it('should render the follow icon in dark color', () => {
+        const holder = wrapper.find(FollowHolder)
+        expect(holder).toHaveStyleRule('color', v.colors.commonLight)
+      })
+
+      it('should call API_unsubscribe when clicking', () => {
+        button.simulate('click', fakeEv)
+        expect(props.thread.API_unsubscribe).toHaveBeenCalled()
+      })
+
+      it('should set user_thread subscribed to false when clicking', () => {
+        button.simulate('click', fakeEv)
+        expect(props.thread.users_thread.subscribed).toBe(false)
+      })
+
+      it('should show an alert when clicking', () => {
+        button.simulate('click', fakeEv)
+        expect(uiStore.popupAlert).toHaveBeenCalled()
+      })
+    })
+
+    describe('when unsubscribed', () => {
+      beforeEach(() => {
+        props = {
+          thread: fakeThread,
+        }
+        props.thread.users_thread.subscribed = false
+        wrapper = shallow(<CommentThreadHeader {...props} />)
+      })
+
+      it('should render the follow icon in dark color', () => {
+        const holder = wrapper.find(FollowHolder)
+        expect(holder).toHaveStyleRule('color', v.colors.secondaryLight)
+      })
+
+      it('should call API_subscribe when clicking', () => {
+        button.simulate('click', fakeEv)
+        expect(props.thread.API_subscribe).toHaveBeenCalled()
+      })
+
+      it('should set user_thread subscribed to true when clicking', () => {
+        button.simulate('click', fakeEv)
+        expect(props.thread.users_thread.subscribed).toBe(true)
+      })
+    })
+
+    describe('componentDidMount when on the unsubscribe route opt', () => {
+      beforeEach(() => {
+        props.thread.users_thread.subscribed = true
+        routingStore.query = { unsubscribe: true }
+        wrapper = shallow(<CommentThreadHeader {...props} />)
+      })
+
+      it('should set a local property to keep the unsubscribed state in ui', () => {
+        expect(props.thread.users_thread.unsubscribedFromEmail).toBe(false)
+      })
     })
   })
 })

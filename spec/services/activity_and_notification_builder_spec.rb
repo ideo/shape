@@ -3,7 +3,8 @@ require 'rails_helper'
 RSpec.describe ActivityAndNotificationBuilder, type: :service do
   let(:organization) { create(:organization) }
   let(:actor) { create(:user, add_to_org: organization) }
-  let(:target) { create(:collection) }
+  let(:target_parent) { create(:collection, organization: organization) }
+  let(:target) { create(:collection, parent_collection: target_parent) }
   let(:action) { :archived }
   let(:subject_users) { create_list(:user, 1) }
   let(:subject_groups) { [] }
@@ -28,6 +29,12 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
       destination: destination,
     )
   end
+  let!(:comment_thread) { create(:collection_comment_thread, record: target) }
+  let!(:users_thread) { create(:users_thread, comment_thread: comment_thread, user: subject_users[0], subscribed: true) }
+
+  before do
+    target.reload
+  end
 
   describe '#call' do
     it 'creates one new activity' do
@@ -36,6 +43,16 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
 
     context 'with multiple users' do
       let(:subject_users) { create_list(:user, 2) }
+
+      before do
+        subject_users.each do |user|
+          next if user.users_threads.any?
+          create(:users_thread,
+                 comment_thread: comment_thread,
+                 user: user,
+                 subscribed: true)
+        end
+      end
 
       it 'creates notifications for each user' do
         expect { builder.call }.to change(Notification, :count).by(2)
@@ -60,10 +77,53 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
           expect { builder.call }.not_to change(ActivitySubject, :count)
         end
       end
+
+      context 'with one unsubscribed user' do
+        before do
+          subject_users[1].users_threads[0].update(subscribed: false)
+          subject_users[1].reload
+        end
+
+        it 'creates notifications for just one user' do
+          expect { builder.call }.to change(Notification, :count).by(1)
+        end
+      end
+
+      context 'when unsubscribed user at a higher parent level' do
+        let!(:parent_comment_thread) do
+          create(:collection_comment_thread, record: target.parent)
+        end
+        let!(:parent_users_thread) do
+          create(:users_thread,
+                 comment_thread: parent_comment_thread,
+                 user: subject_users[0],
+                 subscribed: false)
+        end
+
+        before do
+          users_thread.destroy
+        end
+
+        it 'creates notifications for each user' do
+          expect { builder.call }.to change(Notification, :count).by(1)
+        end
+      end
     end
 
     context 'with a user and a group' do
       let(:subject_groups) { [create(:group, add_members: [create(:user)])] }
+
+      before do
+        subject_groups.each do |group|
+          group.members[:users].each do |user|
+            next if user.users_threads.any?
+            create(:users_thread,
+                   comment_thread: comment_thread,
+                   user: user,
+                   subscribed: true)
+          end
+        end
+      end
 
       it 'creates notifications for each user and each user in group' do
         expect { builder.call }.to change(Notification, :count).by(2)
@@ -166,6 +226,16 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
           create_list(:user, 2),
           create_list(:user, 2, status: :archived),
         ].flatten
+      end
+
+      before do
+        subject_users.each do |user|
+          next if user.users_threads.any?
+          create(:users_thread,
+                 comment_thread: comment_thread,
+                 user: user,
+                 subscribed: true)
+        end
       end
 
       it 'does not create notifications for the archived users' do

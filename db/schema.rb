@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190117195055) do
+ActiveRecord::Schema.define(version: 20190122183523) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -374,6 +374,7 @@ ActiveRecord::Schema.define(version: 20190117195055) do
     t.bigint "comment_thread_id"
     t.datetime "last_viewed_at"
     t.datetime "created_at", null: false
+    t.boolean "subscribed", default: true
     t.index ["user_id", "comment_thread_id"], name: "by_users_comment_thread", unique: true
   end
 

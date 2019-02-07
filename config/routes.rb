@@ -101,10 +101,12 @@ Rails.application.routes.draw do
         end
         resources :roles, only: %i[destroy]
       end
-      resources :comment_threads, only: %i[index show create] do
+      resources :comment_threads, only: %i[index show create subscribe unsubscribe] do
         resources :comments, only: %i[index create]
         member do
           post 'view', action: 'view'
+          patch 'subscribe'
+          patch 'unsubscribe'
         end
         collection do
           get 'find_by_record/:record_type/:record_id', action: 'find_by_record'

@@ -275,6 +275,7 @@ class ApiStore extends jsonapi(datxCollection) {
         this.__removeModel(ct)
       }
     })
+    this.setCurrentPageThreadKey(null)
   }
 
   async findOrBuildCommentThread(record) {

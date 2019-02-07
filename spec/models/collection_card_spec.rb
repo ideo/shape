@@ -100,15 +100,16 @@ RSpec.describe CollectionCard, type: :model do
       let(:card) { create(:collection_card_collection) }
 
       it 'should touch its collection if filter attribute changed' do
-        expect {
+        card.update(filter: 'transparent_gray')
+        expect do
           card.update(filter: 'nothing')
-        }.to change(card.collection, :updated_at)
+        end.to change(card.collection, :updated_at)
       end
 
       it 'should not touch its collection if filter attribute did not change' do
-        expect {
+        expect do
           card.update(height: 2)
-        }.not_to change(card.collection, :updated_at)
+        end.not_to change(card.collection, :updated_at)
       end
     end
   end

@@ -77,6 +77,7 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
     context 'with a submissions_collection parent' do
       let(:submission_box) { create(:submission_box, add_editors: [user], add_viewers: [viewer]) }
       let(:parent) { create(:submissions_collection, submission_box: submission_box) }
+      let!(:comment_thread) { create(:collection_comment_thread, record: submission_box) }
 
       it 'should create a new collection that is marked as a "submission"' do
         expect(instance.template).to eq template
@@ -101,6 +102,12 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
         expect(instance.collection_cards.first.record.can_edit?(user)).to be true
         expect(instance.can_view?(viewer)).to be true
         expect(instance.collection_cards.first.record.can_view?(viewer)).to be true
+      end
+
+      it 'should subscribe the user to the comment thread' do
+        expect(instance.can_edit?(user)).to be true
+        users_thread = comment_thread.users_thread_for(user)
+        expect(users_thread.subscribed).to be true
       end
     end
 

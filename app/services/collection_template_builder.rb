@@ -46,6 +46,7 @@ class CollectionTemplateBuilder
         # definitely could be a better way than copying the viewer roles only to delete them...
         @collection.roles.where(name: Role::VIEWER).destroy_all
       end
+      @parent.follow_submission_box(@created_by)
       @created_by.upgrade_to_edit_role(@collection)
     end
     # capture newly added roles
@@ -109,5 +110,13 @@ class CollectionTemplateBuilder
 
   def creating_a_submission?
     @parent.is_a? Collection::SubmissionsCollection
+  end
+
+  def follow_submission_box
+    comment_thread = @parent.submission_box.comment_thread
+    return if comment_thread.nil?
+    users_thread = comment_thread.users_thread_for(@created_by)
+    return if users_thread.present?
+    comment_thread.add_user_follower!(@created_by.id)
   end
 end

@@ -85,12 +85,18 @@ const fakeApiStore = ({
         key: 'abc-1',
         record: { name: 'abc' },
         comments: [],
+        users_thread: {
+          subscribed: true,
+        },
       },
       {
         id: '2',
         key: 'abc-2',
         record: { name: 'xyz' },
         comments: [],
+        users_thread: {
+          subscribed: true,
+        },
       },
     ],
     collections: [],
