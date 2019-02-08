@@ -194,7 +194,6 @@ class MovableGridCard extends React.PureComponent {
     document.body.style['overflow-y'] = 'auto'
     this.props.onDragOrResizeStop(this.props.card.id, type)
     this.setState({ dragging: false, resizing: false }, () => {
-      console.log('moveablegridcard:stop, props called')
       const timeoutId = setTimeout(() => {
         // have this item remain "on top" while it animates back
         this.setState({
@@ -202,7 +201,6 @@ class MovableGridCard extends React.PureComponent {
         })
         this.scrolling = false
       }, 350)
-      console.log('moveablegridcard:stop, stop dragging')
       uiStore.stopDragging()
       this.setState({
         timeoutId,
