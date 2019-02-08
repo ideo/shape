@@ -85,5 +85,6 @@ BreadcrumbItem.defaultProps = {
   forwardedRef: React.createRef(),
   currentlyDraggedOn: null,
 }
+BreadcrumbItem.displayName = 'BreadcrumbItem'
 
 export default WithDropTarget(BreadcrumbItem)

@@ -245,6 +245,7 @@ class CollectionGrid extends React.Component {
           cards: sortedMovedCards,
           undoMessage,
         })
+        console.log('----- I am position cards')
         this.positionCardsFromProps()
       } else {
         // If a template, warn that any instances will be updated
@@ -265,6 +266,11 @@ class CollectionGrid extends React.Component {
     } else if (hoveringOver && hoveringOver.direction === 'right') {
       // the case where we hovered in the drop zone of a collection and now want to move cards + reroute
       const hoveringRecord = hoveringOver.card.record
+      console.log(
+        'onDragStop, beginning',
+        uiStore.multiMoveCardIds.map(id => id),
+        uiStore.movingCardIds.map(id => id)
+      )
       this.moveCardsIntoCollection(uiStore.multiMoveCardIds, hoveringRecord)
     } else {
       if (uiStore.activeDragTarget) {
@@ -304,6 +310,11 @@ class CollectionGrid extends React.Component {
           uiStore.reselectCardIds(cardIds)
           uiStore.update('movingIntoCollection', null)
         })
+        console.log(
+          'onDragStop, finished',
+          uiStore.multiMoveCardIds.map(id => id),
+          uiStore.movingCardIds.map(id => id)
+        )
         this.props.routingStore.routeTo('collections', hoveringRecord.id)
       })
     })
@@ -356,6 +367,12 @@ class CollectionGrid extends React.Component {
       stateCards = _.reject(stateCards, { cardType: 'placeholder' })
     }
 
+    const { uiStore } = this.props
+    console.log(
+      'onDrag',
+      uiStore.multiMoveCardIds.map(id => id),
+      uiStore.movingCardIds.map(id => id)
+    )
     this.setState({ hoveringOver }, () => {
       this.positionCards(stateCards, {
         dragging: positionedCard.id,
@@ -514,11 +531,17 @@ class CollectionGrid extends React.Component {
       // we don't actually want to "re-position" the dragging card
       // because its position is being determined by the drag (i.e. mouse cursor)
       if (opts.dragging === card.id) {
+        console.log('being draggged')
+        return
+      }
+
+      if (card.isBeingMoved) {
         return
       }
 
       // if we're dragging multiple cards, also don't show them
       if (opts.dragging && card.isBeingMultiMoved) {
+        console.log('multi-drag')
         card.position = {}
         return
       }
@@ -663,6 +686,14 @@ class CollectionGrid extends React.Component {
         }
       }
     })
+    const { uiStore } = this.props
+    console.log('positioncards', cards.length, uiStore.movingCardIds.length)
+    if (uiStore.movingCardIds.length > 0) {
+      console.log(
+        'positioncards, moving cards',
+        uiStore.movingCardIds.map(id => id)
+      )
+    }
     // update cards in state
     this.setState(
       {
@@ -700,6 +731,7 @@ class CollectionGrid extends React.Component {
       }
       const { cardMenuOpen } = uiStore
       if (!card.position) return
+      const shouldHide = card.isBeingMultiMoved || card.isBeingMoved
       grid.push(
         <MovableGridCard
           key={card.id}
@@ -727,6 +759,7 @@ class CollectionGrid extends React.Component {
           lastPinnedCard={
             card.isPinnedAndLocked && i === this.state.cards.length - 1
           }
+          hidden={shouldHide}
         />
       )
     })
@@ -741,6 +774,11 @@ class CollectionGrid extends React.Component {
 
     const minHeight = rows * (gridSettings.gridH + gridSettings.gutter)
 
+    console.log(
+      'collectiongrid:render',
+      this.state.cards.length,
+      uiStore.movingCardIds.length
+    )
     return (
       <StyledGrid minHeight={minHeight}>
         {sorting && (

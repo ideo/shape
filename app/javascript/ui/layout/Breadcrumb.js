@@ -24,7 +24,7 @@ const StyledBreadcrumbWrapper = styled.div`
   color: ${v.colors.commonDark};
   letter-spacing: 1.1px;
 `
-StyledBreadcrumbWrapper.displayName = 'StyledBreadcrumb'
+StyledBreadcrumbWrapper.displayName = 'StyledBreadcrumbWrapper'
 
 @observer
 class Breadcrumb extends React.Component {
@@ -97,6 +97,10 @@ class Breadcrumb extends React.Component {
   charsToTruncateForItems = items =>
     this.totalNameLength(items) - this.calculateMaxChars()
 
+  get truncatedItems() {
+    return this.truncateItems(this.items())
+  }
+
   truncateItems = items => {
     let charsLeftToTruncate = this.charsToTruncateForItems(items)
     // If we are within allowable number of chars, return items
@@ -151,13 +155,15 @@ class Breadcrumb extends React.Component {
         {!renderItems && <BreadcrumbPadding />}
         {renderItems && (
           <StyledBreadcrumbWrapper>
-            {this.truncateItems(this.items()).map((item, index) => (
-              <BreadcrumbItem
-                identifier={item.identifier}
-                item={item}
-                index={index}
-                numItems={numItems}
-              />
+            {this.truncatedItems.map((item, index) => (
+              <span className="breadcrumb_item" key={item.name}>
+                <BreadcrumbItem
+                  identifier={item.identifier}
+                  item={item}
+                  index={index}
+                  numItems={numItems}
+                />
+              </span>
             ))}
           </StyledBreadcrumbWrapper>
         )}

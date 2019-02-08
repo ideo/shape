@@ -227,6 +227,10 @@ class CollectionCard extends BaseRecord {
     return uiStore.selectedCardIds.indexOf(this.id) > -1
   }
 
+  get isBeingMoved() {
+    return uiStore.movingCardIds.indexOf(this.id) > -1
+  }
+
   get isBeingMultiMoved() {
     return uiStore.multiMoveCardIds.indexOf(this.id) > -1
   }

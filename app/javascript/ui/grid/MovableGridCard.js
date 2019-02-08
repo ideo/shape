@@ -192,8 +192,9 @@ class MovableGridCard extends React.PureComponent {
   handleStop = type => ev => {
     this.scrolling = false
     document.body.style['overflow-y'] = 'auto'
+    this.props.onDragOrResizeStop(this.props.card.id, type)
     this.setState({ dragging: false, resizing: false }, () => {
-      this.props.onDragOrResizeStop(this.props.card.id, type)
+      console.log('moveablegridcard:stop, props called')
       const timeoutId = setTimeout(() => {
         // have this item remain "on top" while it animates back
         this.setState({
@@ -201,6 +202,7 @@ class MovableGridCard extends React.PureComponent {
         })
         this.scrolling = false
       }, 350)
+      console.log('moveablegridcard:stop, stop dragging')
       uiStore.stopDragging()
       this.setState({
         timeoutId,
@@ -365,6 +367,7 @@ class MovableGridCard extends React.PureComponent {
       isUserCollection,
       isSharedCollection,
       lastPinnedCard,
+      hidden,
       hoveringOverLeft,
       hoveringOverRight,
       holdingOver,
@@ -432,7 +435,7 @@ class MovableGridCard extends React.PureComponent {
     }
 
     const draggingMultiple =
-      cardProps.dragging && uiStore.multiMoveCardIds.length > 0
+      cardProps.dragging && uiStore.multiMoveCardIds.length > 1
 
     let zIndex = 0
     if (!moveComplete) zIndex = v.zIndex.cardDragging
@@ -467,7 +470,7 @@ class MovableGridCard extends React.PureComponent {
         onClick={this.handleWrapperClick}
         innerRef={c => (this.gridCardRef = c)}
         style={{
-          display: card.isBeingMultiMoved && !dragging ? 'none' : 'block',
+          display: !dragging && hidden ? 'none' : 'block',
         }}
       >
         <Rnd
@@ -562,10 +565,12 @@ MovableGridCard.propTypes = {
   routeTo: PropTypes.func.isRequired,
   menuOpen: PropTypes.bool.isRequired,
   lastPinnedCard: PropTypes.bool,
+  hidden: PropTypes.bool,
 }
 
 MovableGridCard.defaultProps = {
   lastPinnedCard: false,
+  hidden: false,
 }
 
 export default MovableGridCard

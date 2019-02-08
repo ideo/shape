@@ -682,5 +682,6 @@ export default class UiStore {
     if (!_.isFunction(this.actionAfterRoute)) return
     this.actionAfterRoute()
     this.actionAfterRoute = null
+    console.log('afterroute')
   }
 }

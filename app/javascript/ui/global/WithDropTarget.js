@@ -61,11 +61,11 @@ function WithDropTarget(Wrapped) {
       )
     }
   }
-  DropTarget.displayName = `DropTarget(${Wrapped.displayName || Wrapped.name})`
+  const name = `DropTarget(${Wrapped.displayName || Wrapped.name})`
+  DropTarget.displayName = name
 
-  function forwardRef(props, ref) {
-    return <DropTarget {...props} ref={ref} />
-  }
+  const forwardRef = (props, ref) => <DropTarget {...props} ref={ref} />
+  forwardRef.displayName = name
   return React.forwardRef(forwardRef)
 }
 
