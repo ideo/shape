@@ -113,6 +113,35 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
     end
   end
 
+  describe 'GET #index' do
+    let!(:organizations) { create_list(:organization, 2, member: user) }
+    let(:other_org) { create(:organization) }
+    let(:path) { '/api/v1/organizations' }
+
+    it 'returns a 200' do
+      get(path)
+      expect(response.status).to eq(200)
+    end
+
+    it 'returns organizations linked to user' do
+      get(path)
+      expect(json['data'].count).to eq 2
+      expect(json['data'].map { |i| i['id'].to_i }).to match_array(organizations.pluck(:id))
+    end
+
+    context 'with external_id filter' do
+      let(:organization) { organizations.first }
+      let(:external_record) { create(:external_record, externalizable: organization, external_id: 99) }
+      let(:path) { "/api/v1/organizations?filter[external_id]=#{external_record.external_id}" }
+
+      it 'returns organization(s) matching external_id' do
+        get(path)
+        expect(json['data'].count).to eq 1
+        expect(json['data'].first['id'].to_i).to eq organization.id
+      end
+    end
+  end
+
   describe 'GET #current' do
     let!(:organization) { create(:organization) }
     let(:path) { '/api/v1/organizations/current' }
