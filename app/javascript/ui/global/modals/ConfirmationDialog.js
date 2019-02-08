@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
+import { FormControlLabel, Grid } from '@material-ui/core'
 import styled from 'styled-components'
 
 import {
@@ -21,17 +20,51 @@ const StyledFormControlLabel = styled(FormControlLabel)`
 `
 StyledFormControlLabel.displayName = 'snoozeDialogMessage'
 
+const OrLabel = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: ${v.colors.primaryDark};
+  font-family: ${v.fonts.sans};
+  font-size: 1rem;
+  text-align: center;
+  > span {
+    margin-bottom: 3em;
+  }
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    border-bottom: thin solid ${v.colors.primaryDark};
+    display: block;
+    height: auto;
+    margin: 30px 0;
+    > span {
+      background-color: ${v.colors.white};
+      display: inline-block;
+      margin-bottom: 0;
+      padding: 5px 10px;
+      position: absolute;
+      transform: translate(-50%, -50%);
+    }
+  }
+`
+
+const OptionImage = styled.img`
+  display: block;
+  margin: 0 auto 20px;
+  max-width: 90%;
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    max-width: 40%;
+    margin-bottom: 10px;
+  }
+`
+
 const ConfirmOption = ConfirmText.extend`
   color: black;
   display: block;
-  float: left;
-  margin-bottom: 70px;
-  margin-left: 35px;
-  margin-right: 30px;
-  width: 190px;
-
-  &:last-child {
-    margin-right: 0;
+  margin: 0 auto 70px;
+  max-width: 190px;
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    margin-bottom: 20px;
   }
 `
 
@@ -63,38 +96,40 @@ class ConfirmationDialog extends React.PureComponent {
     return this.props.open === 'confirm'
   }
 
-  get ButtonEl() {
-    if (this.props.options.length) return OptionsButton
-    return TextButton
-  }
-
   render() {
     const {
+      cancelImage,
+      cancelPrompt,
       cancelText,
+      confirmImage,
+      confirmPrompt,
       confirmText,
-      options,
       prompt,
       onToggleSnoozeDialog,
       snoozeChecked,
       image,
     } = this.props
 
+    // TODO: as far as I can tell, no remaining instance of this dialogue uses the a `props.image`
+
+    const twoColumn = !!(confirmPrompt || cancelPrompt)
+    const bigModal = !!(image || twoColumn)
+
     const modalProps = {
       ...this.props,
       onClose: this.handleCancel,
       open: this.isOpen,
-      maxWidth: image ? 'md' : 'sm',
+      maxWidth: bigModal ? 'md' : 'sm',
       iconImageOverride: image,
-      backgroundColor: image ? v.colors.white : v.colors.commonDark,
+      backgroundColor: bigModal ? v.colors.white : v.colors.commonDark,
     }
+
+    const ButtonEl = bigModal ? OptionsButton : TextButton
 
     return (
       <Dialog {...modalProps}>
         <form>
-          <p data-cy="ConfirmPrompt">{prompt}</p>
-          {options.map(option => (
-            <ConfirmOption key={option}>{option}</ConfirmOption>
-          ))}
+          {prompt && <p data-cy="ConfirmPrompt">{prompt}</p>}
           {onToggleSnoozeDialog && (
             <StyledFormControlLabel
               classes={{ label: 'form-control' }}
@@ -112,22 +147,41 @@ class ConfirmationDialog extends React.PureComponent {
               label="Please don’t show me this warning for a while."
             />
           )}
-          <FormActionsContainer style={{ clear: 'both' }}>
-            <this.ButtonEl
-              data-cy="CancelButton"
-              maxWidth={options.length ? 200 : 150}
-              onClick={this.handleCancel}
-            >
-              {cancelText}
-            </this.ButtonEl>
-            <this.ButtonEl
-              data-cy="ConfirmButton"
-              maxWidth={options.length ? 200 : 150}
-              onClick={this.handleConfirm}
-            >
-              {confirmText}
-            </this.ButtonEl>
-          </FormActionsContainer>
+          <Grid container justify="center">
+            <Grid item xs={twoColumn ? 12 : true} sm>
+              {cancelImage && <OptionImage src={cancelImage} alt="" />}
+              {cancelPrompt && <ConfirmOption>{cancelPrompt}</ConfirmOption>}
+              <FormActionsContainer>
+                <ButtonEl
+                  data-cy="CancelButton"
+                  maxWidth="200"
+                  onClick={this.handleCancel}
+                >
+                  {cancelText}
+                </ButtonEl>
+              </FormActionsContainer>
+            </Grid>
+            {twoColumn && (
+              <Grid item xs={12} sm={1} style={{ color: v.colors.primaryDark }}>
+                <OrLabel>
+                  <span>or</span>
+                </OrLabel>
+              </Grid>
+            )}
+            <Grid item xs={twoColumn ? 12 : true} sm>
+              {confirmImage && <OptionImage src={confirmImage} alt="" />}
+              {confirmPrompt && <ConfirmOption>{confirmPrompt}</ConfirmOption>}
+              <FormActionsContainer>
+                <ButtonEl
+                  data-cy="ConfirmButton"
+                  maxWidth="200"
+                  onClick={this.handleConfirm}
+                >
+                  {confirmText}
+                </ButtonEl>
+              </FormActionsContainer>
+            </Grid>
+          </Grid>
         </form>
       </Dialog>
     )
@@ -138,11 +192,14 @@ ConfirmationDialog.propTypes = {
   ...Dialog.childPropTypes,
   prompt: PropTypes.string,
   open: PropTypes.string,
-  options: MobxPropTypes.arrayOrObservableArray,
   image: PropTypes.string,
   onConfirm: PropTypes.func,
   onCancel: PropTypes.func,
+  confirmImage: PropTypes.string,
+  confirmPrompt: PropTypes.string,
   confirmText: PropTypes.string,
+  cancelImage: PropTypes.string,
+  cancelPrompt: PropTypes.string,
   cancelText: PropTypes.string,
   onToggleSnoozeDialog: PropTypes.func,
   snoozeChecked: PropTypes.bool,
@@ -151,11 +208,14 @@ ConfirmationDialog.defaultProps = {
   ...Dialog.defaultProps,
   prompt: '',
   open: '',
-  options: [],
   image: null,
   onConfirm: null,
   onCancel: null,
+  confirmImage: null,
+  confirmPrompt: null,
   confirmText: 'OK',
+  cancelImage: null,
+  cancelPrompt: null,
   cancelText: 'Cancel',
   onToggleSnoozeDialog: null,
   snoozeChecked: false,

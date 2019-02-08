@@ -79,7 +79,8 @@ class Dialog extends React.PureComponent {
     }
     const icon = ICONS[`${iconName}Icon`]
     const iconEl = icon ? React.createElement(icon) : ''
-    return <IconHolder>{iconEl}</IconHolder>
+    if (iconEl) return <IconHolder>{iconEl}</IconHolder>
+    return null
   }
 
   render() {

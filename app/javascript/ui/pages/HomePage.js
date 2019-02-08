@@ -1,5 +1,6 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import backOutImage from '~/assets/back_out_of_new_org.png'
+import askForInvitationImage from '~/assets/ask_for_invitation.png'
+import createNewOrgImage from '~/assets/create_new_org.png'
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -25,13 +26,14 @@ class HomePage extends React.Component {
     const { uiStore } = this.props
     return new Promise((resolve, reject) => {
       uiStore.confirm({
-        options: [
-          'Are you looking for your team? You may need to ask for an invitation.',
-          'Create an organization and invite your team to get started!',
-        ],
-        image: backOutImage,
+        confirmImage: createNewOrgImage,
         confirmText: 'Create Organization',
+        confirmPrompt:
+          'Create an organization and invite your team to get started!',
+        cancelImage: askForInvitationImage,
         cancelText: 'Come back later',
+        cancelPrompt:
+          'Are you looking for your team? You may need to ask for an invitation.',
         onConfirm: () => resolve(true),
         onCancel: () => resolve(false),
       })
