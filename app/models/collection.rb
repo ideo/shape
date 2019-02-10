@@ -6,6 +6,7 @@ class Collection < ApplicationRecord
   include HasActivities
   include Templateable
   include Testable
+  include Externalizable
 
   resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
@@ -84,8 +85,6 @@ class Collection < ApplicationRecord
   has_many :collections_and_linked_collections,
            through: :collection_cards,
            source: :collection
-
-  has_many :external_records, as: :externalizable, dependent: :destroy
 
   has_one :comment_thread, as: :record, dependent: :destroy
 

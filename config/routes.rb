@@ -18,7 +18,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :activities, only: %i[create]
-      resources :collections, except: %i[index] do
+      resources :collections do
         member do
           get 'in_my_collection'
           post 'clear_collection_cover'
@@ -36,7 +36,7 @@ Rails.application.routes.draw do
           end
         end
       end
-      resources :items, except: %i[index] do
+      resources :items do
         member do
           post 'duplicate'
           patch 'archive'

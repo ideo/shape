@@ -6,6 +6,11 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :load_and_authorize_collection_update, only: %i[update]
   before_action :load_collection_with_roles, only: %i[show update]
 
+  before_action :require_and_apply_filters, only: %i[index]
+  def index
+    render jsonapi: @collections, include: params[:include]
+  end
+
   before_action :log_viewing_activities, only: %i[show]
   before_action :check_cache, only: %i[show]
   def show
@@ -215,5 +220,9 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def broadcast_parent_collection_updates
     CollectionUpdateBroadcaster.call(@parent_collection, current_user)
+  end
+
+  def load_and_filter_collections
+    load_and_filter_index(:collections)
   end
 end

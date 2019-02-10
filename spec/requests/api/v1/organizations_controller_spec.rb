@@ -129,9 +129,16 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
       expect(json['data'].map { |i| i['id'].to_i }).to match_array(organizations.pluck(:id))
     end
 
-    context 'with external_id filter' do
+    context 'with external_id filter', api_token: true do
       let(:organization) { organizations.first }
-      let(:external_record) { create(:external_record, externalizable: organization, external_id: 99) }
+      let(:external_record) do
+        create(
+          :external_record,
+          externalizable: organization,
+          external_id: 99,
+          application_id: @api_token.application.id,
+        )
+      end
       let(:path) { "/api/v1/organizations?filter[external_id]=#{external_record.external_id}" }
 
       it 'returns organization(s) matching external_id' do

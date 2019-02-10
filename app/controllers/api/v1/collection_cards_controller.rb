@@ -28,10 +28,12 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def create
     card_params = collection_card_params
     type = card_params.delete(:type) || 'primary'
+    external_id = card_params.delete(:external_id)
     # CollectionCardBuilder type expects 'primary' or 'link'
     type = 'link' if type == 'CollectionCard::Link'
     builder = CollectionCardBuilder.new(params: card_params,
                                         type: type,
+                                        external_id: external_id,
                                         parent_collection: @collection,
                                         user: current_user)
 
@@ -312,6 +314,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :is_cover,
       :filter,
       :hidden,
+      :external_id,
       collection_attributes: %i[
         id
         type

@@ -5,6 +5,7 @@ class Item < ApplicationRecord
   include HasFilestackFile
   include RealtimeEditorsViewers
   include HasActivities
+  include Externalizable
 
   resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
@@ -34,8 +35,6 @@ class Item < ApplicationRecord
            class_name: 'CollectionCard::Link',
            inverse_of: :item,
            dependent: :destroy
-
-  has_many :external_records, as: :externalizable, dependent: :destroy
 
   delegate :parent, :pinned, :pinned?, :pinned_and_locked?,
            to: :parent_collection_card, allow_nil: true

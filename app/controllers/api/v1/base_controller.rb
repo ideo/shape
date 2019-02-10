@@ -1,7 +1,6 @@
 class Api::V1::BaseController < ApplicationController
   before_action :check_api_authentication!
   before_action :check_cancel_sync
-  before_action :check_filters
 
   respond_to :json
 
@@ -60,7 +59,7 @@ class Api::V1::BaseController < ApplicationController
   end
 
   def render_api_errors(errors)
-    render jsonapi_errors: errors, status: :bad_request
+    render jsonapi_errors: errors, status: :bad_request # or :unprocessable_entity?
   end
 
   rescue_from CanCan::AccessDenied do |exception|
@@ -68,6 +67,33 @@ class Api::V1::BaseController < ApplicationController
   end
 
   private
+
+  # items/collections don't have an unfiltered index, so filtering is required
+  def require_and_apply_filters
+    @filter = params[:filter] || {}
+    # this is the only applicable filter for now
+    head(400) unless @filter[:external_id].present?
+    apply_filters
+  end
+
+  def apply_filters
+    @filter = params[:filter] || {}
+    @page = params[:page].try(:[], :number) || 1
+    return unless @filter.present?
+    # this is the only applicable filter for now
+    return unless @filter[:external_id].present?
+    controller_name = params[:controller].split('/').last
+    klass = controller_name.classify.safe_constantize
+    application = @current_api_token&.application || current_user.application
+    head(400) unless application.present?
+    records = klass.where_external_id(
+      @filter[:external_id],
+      application_id: application.id,
+    ).page(@page)
+    instance_variable_set(
+      "@#{controller_name}", records
+    )
+  end
 
   def render_collection(include: nil)
     # include collection_cards for UI to receive any updates
@@ -110,10 +136,6 @@ class Api::V1::BaseController < ApplicationController
       sign_in(@current_api_token.application_user)
     end
     @current_api_token
-  end
-
-  def check_filters
-    @filter = params[:filter] || {}
   end
 
   def authorization_token_from_header

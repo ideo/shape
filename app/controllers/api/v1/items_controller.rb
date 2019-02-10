@@ -3,6 +3,11 @@ class Api::V1::ItemsController < Api::V1::BaseController
   load_and_authorize_resource :collection_card, only: :create
   load_and_authorize_resource except: %i[update in_my_collection]
 
+  before_action :require_and_apply_filters, only: %i[index]
+  def index
+    render jsonapi: @items, include: params[:include]
+  end
+
   def show
     log_item_activity(:viewed)
     render jsonapi: @item,
@@ -103,5 +108,9 @@ class Api::V1::ItemsController < Api::V1::BaseController
       action: activity,
       content: @item.content,
     )
+  end
+
+  def load_and_filter_items
+    load_and_filter_index(:items)
   end
 end
