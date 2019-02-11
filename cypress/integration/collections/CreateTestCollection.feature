@@ -20,6 +20,7 @@ Feature: Creating a Test Collection
     And I wait for "@apiLaunchTest" to finish
     And I wait for 1 second
 
+    Then I should see "Usefulness" in a "ChartItemCover"
     # assuming the collection cover is not truncated...
     Then I should see a collection card named "Test Prototype Feedback Design"
     Then I should see "Get Link" in a "HeaderFormButton"
