@@ -24,6 +24,7 @@ Rails.application.routes.draw do
           post 'clear_collection_cover'
           patch 'submit'
           patch 'restore_permissions'
+          delete 'roles'
         end
         collection do
           post 'create_template'
@@ -32,6 +33,7 @@ Rails.application.routes.draw do
         resources :collection_cards, only: :index
         resources :roles, only: %i[index create destroy] do
           collection do
+            delete '', action: 'destroy'
             get 'will_become_private'
           end
         end
@@ -45,6 +47,7 @@ Rails.application.routes.draw do
         end
         resources :roles, only: %i[index create destroy] do
           collection do
+            delete '', action: 'destroy'
             get 'will_become_private'
           end
         end
@@ -76,7 +79,11 @@ Rails.application.routes.draw do
         member do
           patch 'archive'
         end
-        resources :roles, only: %i[index create destroy]
+        resources :roles, only: %i[index create destroy] do
+          collection do
+            delete '', action: 'destroy'
+          end
+        end
       end
       resources :organizations, except: :delete do
         collection do
