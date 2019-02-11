@@ -17,7 +17,6 @@ Then('I should see the value {string} in a {string}', (text, el) => {
 Then('I should see a {string} in the first card', el => {
   cy.locateDataOrClass('GridCard')
     .first()
-    .locateDataOrClass(el)
     .should('be.visible')
 })
 
