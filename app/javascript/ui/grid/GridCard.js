@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import styled from 'styled-components'
 
 import ChartItemCover from '~/ui/grid/covers/ChartItemCover'
 import ContainImage from '~/ui/grid/ContainImage'
@@ -16,6 +17,7 @@ import GenericFileItemCover from '~/ui/grid/covers/GenericFileItemCover'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 import DataItemCover from '~/ui/grid/covers/DataItemCover'
 
+import Loader from '~/ui/layout/Loader'
 import Activity from '~/stores/jsonApi/Activity'
 import ActionMenu from '~/ui/grid/ActionMenu'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
@@ -39,6 +41,13 @@ import {
   StyledGridCardInner,
   StyledTopRightActions,
 } from './shared'
+
+const LoaderWrapper = styled.div`
+  z-index: ${v.zIndex.gridCardTop};
+  position: absolute;
+  top: 0;
+  left: 25%;
+`
 
 @observer
 class GridCard extends React.Component {
@@ -355,6 +364,11 @@ class GridCard extends React.Component {
     const firstCardInRow = card.position && card.position.x === 0
     const tagEditorOpen = uiStore.tagsModalOpenId === card.id
 
+    const movingIntoCollection =
+      record.internalType === 'collections' &&
+      uiStore.movingIntoCollection &&
+      uiStore.movingIntoCollection.id === record.id
+
     return (
       <StyledGridCard
         className="gridCard"
@@ -369,7 +383,7 @@ class GridCard extends React.Component {
         onContextMenu={this.openContextMenu}
         innerRef={c => (this.gridCardRef = c)}
         onMouseLeave={this.closeContextMenu}
-        selected={this.isSelected}
+        selected={this.isSelected || this.props.holdingOver}
       >
         {canEditCollection &&
           (!card.isPinnedAndLocked || lastPinnedCard) && (
@@ -433,6 +447,12 @@ class GridCard extends React.Component {
           filter={card.filter}
           forceFilter={!this.hasCover}
         >
+          {movingIntoCollection && (
+            <LoaderWrapper>
+              <Loader containerHeight="100%" size={50} />
+            </LoaderWrapper>
+          )}
+
           {this.renderInner}
         </StyledGridCardInner>
         <TagEditorModal
@@ -454,6 +474,7 @@ GridCard.propTypes = {
   isSharedCollection: PropTypes.bool,
   handleClick: PropTypes.func,
   dragging: PropTypes.bool,
+  holdingOver: PropTypes.bool,
   menuOpen: PropTypes.bool,
   lastPinnedCard: PropTypes.bool,
   testCollectionCard: PropTypes.bool,
@@ -466,6 +487,7 @@ GridCard.defaultProps = {
   isSharedCollection: false,
   handleClick: () => null,
   dragging: false,
+  holdingOver: false,
   menuOpen: false,
   lastPinnedCard: false,
   testCollectionCard: false,

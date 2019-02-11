@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import FlipMove from 'react-flip-move'
 import Rnd from 'react-rnd'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 
 import { uiStore } from '~/stores'
 import v from '~/utils/variables'
@@ -33,7 +33,24 @@ const StyledResizeIcon = styled.div`
   }
 `
 
+const bounceAnim = keyframes`
+  50% {
+    transform: scaleX(1.125) scaleY(1.125);
+  }
+`
+
+const InnerCardWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  ${props =>
+    props.animatedBounce &&
+    `
+    animation: ${bounceAnim} 0.25s ease-out;
+  `};
+`
+
 const cardCSSTransition = 'transform 0.4s, width 0.25s, height 0.25s'
+const cardHoverTransition = 'transform 0.2s'
 const TOP_SCROLL_TRIGGER = 210
 
 class MovableGridCard extends React.PureComponent {
@@ -97,7 +114,7 @@ class MovableGridCard extends React.PureComponent {
     if (!this.scrolling) return null
     if (
       window.innerHeight + window.scrollY >=
-      document.body.offsetHeight + uiStore.gridSettings.gridH
+      document.body.offsetHeight + uiStore.gridSettings.gridH * 2
     ) {
       return window.requestAnimationFrame(this.scrollDown)
     }
@@ -133,7 +150,12 @@ class MovableGridCard extends React.PureComponent {
     }
 
     const pageMargin = window.innerWidth - v.maxWidth
-    const cardX = e.pageX - pageMargin / 2
+    let cardX = e.pageX
+    if (window.innerWidth >= v.maxWidth) {
+      cardX -= pageMargin / 2
+    } else {
+      cardX -= 35
+    }
     const cardY = e.pageY - TOP_SCROLL_TRIGGER
     this.setState({
       x: cardX - position.width / 2,
@@ -160,11 +182,11 @@ class MovableGridCard extends React.PureComponent {
     this.props.onDrag(this.props.card.id, dragPosition)
   }
 
-  handleStop = ev => {
+  handleStop = type => ev => {
     this.scrolling = false
     document.body.style['overflow-y'] = 'auto'
     this.setState({ dragging: false, resizing: false }, () => {
-      this.props.onDragOrResizeStop(this.props.card.id)
+      this.props.onDragOrResizeStop(this.props.card.id, type)
       const timeoutId = setTimeout(() => {
         // have this item remain "on top" while it animates back
         this.setState({
@@ -336,6 +358,9 @@ class MovableGridCard extends React.PureComponent {
       isUserCollection,
       isSharedCollection,
       lastPinnedCard,
+      hoveringOverLeft,
+      hoveringOverRight,
+      holdingOver,
     } = this.props
 
     let {
@@ -404,6 +429,20 @@ class MovableGridCard extends React.PureComponent {
     if (uiStore.cardMenuOpen.id === card.id) {
       zIndex = v.zIndex.aboveClickWrapper
     }
+    let transform = null
+    let transition = dragging || resizing ? 'none' : cardCSSTransition
+    if (dragging) {
+      transform = `translate(${xAdjust}px, ${yAdjust}px) rotate(3deg)`
+    } else if (hoveringOverLeft) {
+      zIndex = v.zIndex.cardHovering
+      transform = 'translate(32px, -32px)'
+      transition = cardHoverTransition
+    } else if (hoveringOverRight) {
+      zIndex = v.zIndex.cardHovering
+      transform = 'scaleX(1.075) scaleY(1.075)'
+      transition = cardHoverTransition
+    }
+
     return (
       <StyledCardWrapper
         className={uiStore.isTouchDevice && cols === 1 ? 'touch-device' : ''}
@@ -419,10 +458,10 @@ class MovableGridCard extends React.PureComponent {
           bounds={null}
           onDragStart={this.handleStart}
           onDrag={this.handleDrag}
-          onDragStop={this.handleStop}
+          onDragStop={this.handleStop('drag')}
           onResizeStart={this.handleStart}
           onResize={this.handleResize}
-          onResizeStop={this.handleStop}
+          onResizeStop={this.handleStop('resize')}
           minWidth={minWidth}
           minHeight={minHeight}
           maxWidth={maxWidth}
@@ -453,7 +492,6 @@ class MovableGridCard extends React.PureComponent {
             topLeft: false,
             topRight: false,
           }}
-          // resizeGrid={resizeGrid}
           extendsProps={{
             handleComponent: {
               bottomRight: () => (
@@ -465,20 +503,18 @@ class MovableGridCard extends React.PureComponent {
           }}
           style={{
             // animate grid items that are moving as they're being displaced
-            transition: dragging || resizing ? 'none' : cardCSSTransition,
+            transition,
           }}
         >
-          <div
+          <InnerCardWrapper
+            animatedBounce={holdingOver}
             style={{
-              width: '100%',
-              height: '100%',
-              transform: dragging
-                ? `translate(${xAdjust}px, ${yAdjust}px) rotate(3deg)`
-                : '',
+              transform,
+              transition,
             }}
           >
-            <GridCard {...cardProps} />
-          </div>
+            <GridCard {...cardProps} holdingOver={hoveringOverRight} />
+          </InnerCardWrapper>
         </Rnd>
       </StyledCardWrapper>
     )
@@ -491,6 +527,9 @@ MovableGridCard.propTypes = {
   canEditCollection: PropTypes.bool.isRequired,
   isUserCollection: PropTypes.bool.isRequired,
   isSharedCollection: PropTypes.bool.isRequired,
+  hoveringOverLeft: PropTypes.bool.isRequired,
+  hoveringOverRight: PropTypes.bool.isRequired,
+  holdingOver: PropTypes.bool.isRequired,
   position: PropTypes.shape(propShapes.position).isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   parent: MobxPropTypes.objectOrObservableObject.isRequired,

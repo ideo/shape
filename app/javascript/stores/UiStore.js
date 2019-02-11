@@ -152,6 +152,10 @@ export default class UiStore {
   newCards = []
   @observable
   autocompleteValues = 0
+  @observable
+  actionAfterRoute = null
+  @observable
+  movingIntoCollection = null
 
   @action
   toggleEditingCardId(cardId) {
@@ -292,9 +296,23 @@ export default class UiStore {
     if (deselect) this.deselectCards()
   }
 
+  @action
+  setMovingCards(ids, { cardAction } = {}) {
+    this.movingCardIds.replace(ids)
+    this.cardAction = cardAction
+  }
+
   @computed
   get isMovingCards() {
     return this.movingCardIds.length && this.cardAction === 'move'
+  }
+
+  @computed
+  get shouldOpenMoveModal() {
+    return (
+      this.movingCardIds.length > 0 &&
+      this.cardAction !== 'moveWithinCollection'
+    )
   }
 
   // NOTE: because we aren't tracking a difference between "closed" and null,
@@ -360,6 +378,7 @@ export default class UiStore {
       }
       return true
     })
+    if (!cols) cols = 1
 
     let update = {
       ...this.defaultGridSettings,
@@ -612,5 +631,12 @@ export default class UiStore {
   @action
   autocompleteMenuClosed() {
     this.autocompleteValues = 0
+  }
+
+  @action
+  performActionAfterRoute() {
+    if (!_.isFunction(this.actionAfterRoute)) return
+    this.actionAfterRoute()
+    this.actionAfterRoute = null
   }
 }

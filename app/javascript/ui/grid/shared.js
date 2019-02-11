@@ -77,7 +77,7 @@ export const StyledGridCard = styled.div`
     return 'pointer'
   }};
   height: 100%;
-  opacity: ${props => (props.dragging ? '0.95' : '1')};
+  opacity: ${props => (props.dragging ? '0.75' : '1')};
   padding: 0;
   position: relative;
   width: 100%;

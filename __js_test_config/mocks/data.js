@@ -226,6 +226,7 @@ export const fakeCollection = {
   },
   card_order: 'order',
   collection_cards: fakeCards,
+  sortedCards: fakeCards,
   parent_collection_card: fakeCollectionCard,
   // This is a computed property on the collection store
   cardIds: _.map(fakeCards, c => c.id),

@@ -100,11 +100,12 @@ export default {
     activityLog: 251,
     // NOTE: if globalHeader is > pageHeader
     // then it will also be above the EditableName ClickWrapper
+    cardDragging: 222,
     globalHeader: 221,
     pageHeader: 220,
-    cardDragging: 210,
     popoutMenu: 201,
     scrollIndicator: 200,
+    cardHovering: 160,
     gridCard: 150,
     gridCardTop: 151,
     commentMentions: 100,
