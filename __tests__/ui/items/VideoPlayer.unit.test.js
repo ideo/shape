@@ -27,14 +27,14 @@ describe('VideoPlayer', () => {
       wrapper = shallow(
         <VideoPlayer
           {...props}
-          url={`https://ford.rev.vbrick.com/#/videos/${fordVideoId}`}
+          url={`https://videosat.ford.com/#/videos/${fordVideoId}`}
         />
       )
     })
 
     it('renders an iframe with vbrick embed', () => {
       expect(wrapper.find('iframe').props().src).toEqual(
-        `https://ford.rev.vbrick.com/embed?id=${fordVideoId}`
+        `https://videosat.ford.com/embed?id=${fordVideoId}`
       )
     })
   })

@@ -29,7 +29,7 @@ class VideoPlayer extends React.PureComponent {
       player = <ReactPlayer {...this.props} onError={onError} />
     } else {
       if (videoId.service === 'vbrick') {
-        embedSrc = `https://ford.rev.vbrick.com/embed?id=${videoId.id}`
+        embedSrc = `https://videosat.ford.com/embed?id=${videoId.id}`
         if (playing) {
           embedSrc += '&autoplay'
         }

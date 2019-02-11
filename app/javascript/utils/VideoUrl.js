@@ -6,9 +6,9 @@ import v from '~/utils/variables'
 import { parseUrl } from './url'
 
 // e.g.
-// https://ford.rev.vbrick.com/#/videos/08ebc122-eaa4-4ae4-839a-8497c044d409 (public)
-// https://ford.rev.vbrick.com/#/videos/20706f6e-4ae0-4b2a-b715-1be405e0f280 (private)
-const VBRICK_DOMAIN = 'ford.rev.vbrick.com'
+// https://videosat.ford.com/#/videos/08ebc122-eaa4-4ae4-839a-8497c044d409 (public)
+// https://videosat.ford.com/#/videos/20706f6e-4ae0-4b2a-b715-1be405e0f280 (private)
+const VBRICK_DOMAIN = 'videosat.ford.com'
 
 class VideoUrl {
   // Returns object with video { service, id, normalizedUrl }
