@@ -74,7 +74,7 @@ When('I add an open response question', () => {
     .click()
   cy.wait('@apiCreateCollectionCard')
   // have to wait for the flipmove fade-in
-  cy.wait(FLIPMOVE_DELAY + 1000)
+  cy.wait(FLIPMOVE_DELAY + 3000)
   cy.locateDataOrClass('.QuestionSelectHolder')
     .eq(3)
     .find('.select')
