@@ -15,11 +15,11 @@ Feature: Creating a Test Collection
     # Scenario: Setting up the questions and launching the test
     When I add a video
     And I add a test description
+    And I add an open response question
     When I click the "HeaderFormButton" containing "Get Feedback"
     And I wait for "@apiLaunchTest" to finish
     And I wait for 1 second
 
-    Then I should see "Usefulness" in a "ChartItemCover"
     # assuming the collection cover is not truncated...
     Then I should see a collection card named "Test Prototype Feedback Design"
     Then I should see "Get Link" in a "HeaderFormButton"
