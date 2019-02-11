@@ -264,7 +264,14 @@ class CollectionGrid extends React.Component {
     } else if (hoveringOver && hoveringOver.direction === 'right') {
       // the case where we hovered in the drop zone of a collection and now want to move cards + reroute
       const hoveringRecord = hoveringOver.card.record
-      this.moveCardsIntoCollection(uiStore.multiMoveCardIds, hoveringRecord)
+      uiStore.setMovingCards([cardId], {
+        cardAction: 'moveWithinCollection',
+      })
+      if (hoveringRecord.internalType === 'collections') {
+        this.setState({ hoveringOver: null }, () => {
+          this.moveCardsIntoCollection([cardId], hoveringRecord)
+        })
+      }
     } else {
       if (uiStore.activeDragTarget) {
         let targetRecord = uiStore.activeDragTarget.item

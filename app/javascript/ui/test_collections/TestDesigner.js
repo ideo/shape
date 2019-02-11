@@ -127,8 +127,8 @@ class TestDesigner extends React.Component {
   }
 
   archiveMediaCardsIfDefaultState() {
-    const { collection_cards } = this.props.collection
-    const [first, second, third] = collection_cards
+    const { sortedCards } = this.props.collection
+    const [first, second, third] = sortedCards
     // basic check to see if we are (roughly) in the default state
     const defaultState =
       first &&
@@ -137,7 +137,7 @@ class TestDesigner extends React.Component {
       first.card_question_type === 'question_media' &&
       second.card_question_type === 'question_description' &&
       third.card_question_type === 'question_useful' &&
-      collection_cards.length === 4
+      sortedCards.length === 4
     if (!defaultState) return false
     // archive the media and description card when switching to testType -> collection
     return first.API_archiveCards(_.map([first, second], 'id'))
@@ -316,8 +316,8 @@ class TestDesigner extends React.Component {
 
   render() {
     const { collection } = this.props
-    const cardCount = collection.collection_cards.length
-    const inner = collection.collection_cards.map((card, i) => {
+    const cardCount = collection.sortedCards.length
+    const inner = collection.sortedCards.map((card, i) => {
       let position
       const item = card.record
       // blank item can occur briefly while the placeholder card/item is being replaced
