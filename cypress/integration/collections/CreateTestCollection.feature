@@ -15,7 +15,6 @@ Feature: Creating a Test Collection
     # Scenario: Setting up the questions and launching the test
     When I add a video
     And I add a test description
-    And I add an open response question
     When I click the "HeaderFormButton" containing "Get Feedback"
     And I wait for "@apiLaunchTest" to finish
     And I wait for 1 second
