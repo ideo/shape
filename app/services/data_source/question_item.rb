@@ -3,6 +3,10 @@ module DataSource
 
     private
 
+    def test_collection
+      chart_item.parent
+    end
+
     def chart_item
       context[:chart_item]
     end
@@ -56,35 +60,38 @@ module DataSource
       # NOTE: the only currently supported data_source is a question_item
       survey_answers = question_item.completed_survey_answers
       {
-        label: chart_item.name,
+        label: test_collection.name,
         type: 'question_items',
         total: survey_answers.count,
         data: grouped_response_data(survey_answers),
       }
     end
 
+    def org_survey_answers
+      QuestionAnswer
+        .joins(:question)
+        .where(
+          Item::QuestionItem.arel_table[:question_type].eq(
+            question_item.question_type,
+          ),
+        )
+        .joins(survey_response: :test_collection)
+        .where(
+          SurveyResponse.arel_table[:status].eq(:completed),
+        )
+        .where(
+          Collection::TestCollection.arel_table[:organization_id].eq(
+            test_collection.organization_id,
+          ),
+        )
+    end
+
     def org_data
-      survey_answers = QuestionAnswer
-                       .joins(:question)
-                       .where(
-                         Item::QuestionItem.arel_table[:question_type].eq(
-                           question_item.question_type,
-                         )
-                       )
-                       .joins(survey_response: :test_collection)
-                       .where(
-                         SurveyResponse.arel_table[:status].eq(:completed),
-                       )
-                       .where(
-                         Collection::TestCollection.arel_table[:organization_id].eq(
-                           chart_item.organization_id,
-                         ),
-                       )
       {
-        label: chart_item.organization.name,
+        label: test_collection.organization.name,
         type: 'org_wide',
-        total: survey_answers.count,
-        data: grouped_response_data(survey_answers),
+        total: org_survey_answers.count,
+        data: grouped_response_data(org_survey_answers),
       }
     end
   end

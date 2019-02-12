@@ -201,7 +201,7 @@ RSpec.describe Item, type: :model do
         question_item = create(:question_item, parent_collection_card: parent_collection_card)
         expect(question_item.search_data[:content]).to eq('')
 
-        chart_item = create(:chart_item, parent_collection_card: parent_collection_card)
+        chart_item = create(:chart_item, :with_question_item, parent_collection_card: parent_collection_card)
         expect(chart_item.search_data[:content]).to eq('')
       end
     end

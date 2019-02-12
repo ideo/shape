@@ -2,9 +2,7 @@ require 'rails_helper'
 
 RSpec.describe DataSource::External, type: :service do
   let(:chart_item) do
-    create(:chart_item,
-           data_source: nil,
-           url: 'https://creativedifference.ideo.com/api/v4/quality_scores')
+    create(:chart_item, :with_remote_url)
   end
 
   subject {
@@ -53,7 +51,7 @@ RSpec.describe DataSource::External, type: :service do
           body: {
             data: {},
             errors: [
-              'Something bad happpened',
+              'Something bad happened',
             ]
           }
         }.deep_stringify_keys)
