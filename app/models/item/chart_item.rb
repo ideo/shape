@@ -3,14 +3,14 @@ class Item
     belongs_to :data_source, polymorphic: true, optional: true
 
     def chart_data
-      if data_source_type == 'Item::QuestionItem'
+      if url.present?
+        DataSource::External.call(
+          chart_item: self,
+        )
+      elsif data_source.is_a?(Item::QuestionItem)
         DataSource::QuestionItem.call(
           chart_item: self,
           question_item: data_source,
-        )
-      elsif url.present?
-        DataSource::External.call(
-          chart_item: self,
         )
       else
         {}

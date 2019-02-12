@@ -6,67 +6,39 @@ RSpec.describe Item::ChartItem, type: :model do
   end
 
   describe 'chart_data' do
-    let!(:chart_item) { create(:chart_item) }
+    let(:chart_data) { chart_item.chart_data }
 
-    context 'when the data source is a non-question item' do
-      let!(:fake_item) { create(:text_item) }
+    context 'with question item' do
+      let!(:chart_item) { create(:chart_item, :with_question_item) }
 
-      before do
-        chart_item.update_attribute(:data_source, fake_item)
-      end
-
-      it 'should return nothing' do
-        expect(chart_item.chart_data).to be_nil
+      it 'calls DataSource::QuestionItem' do
+        allow(DataSource::QuestionItem).to receive(:call).and_return(data: {})
+        expect(DataSource::QuestionItem).to receive(:call).with(
+          chart_item: chart_item,
+          question_item: chart_item.data_source,
+        )
+        expect(chart_data).to eq(data: {})
       end
     end
 
-    context 'when the data source is a question item with responses' do
-      let(:organization) { create(:organization) }
-      let(:test_collection) { create(:test_collection, num_cards: 1, organization: organization) }
-      let(:other_test_collection) { create(:test_collection, :with_responses, organization: organization) }
-      let!(:survey_response) { create(:survey_response, test_collection: test_collection) }
-      let!(:question_item) { survey_response.question_items.select(&:question_useful?).first }
-      let!(:question_answer) do
-        create(:question_answer,
-               survey_response: survey_response,
-               question: question_item)
-      end
-      let!(:chart_item) { create(:chart_item, data_source: question_item) }
-      let(:card) { test_collection.collection_cards.first }
+    context 'with remote url' do
+      let!(:chart_item) { create(:chart_item, :with_remote_url) }
 
-      before do
-        survey_response.update_attribute(:status, :completed)
-        other_test_collection.reload
-        card.update(item: chart_item)
-      end
-
-      it 'should return an array of question scale to amount' do
-        expect(chart_item.chart_data).to eq(
-          datasets: [
-            {
-              label: test_collection.name,
-              type: 'question_items',
-              total: 1,
-              data: [
-                { num_responses: 1, answer: 1 },
-                { num_responses: 0, answer: 2 },
-                { num_responses: 0, answer: 3 },
-                { num_responses: 0, answer: 4 },
-              ],
-            },
-            {
-              label: test_collection.organization.name,
-              type: 'org_wide',
-              total: 6,
-              data: [
-                { num_responses: 6, answer: 1 },
-                { num_responses: 0, answer: 2 },
-                { num_responses: 0, answer: 3 },
-                { num_responses: 0, answer: 4 },
-              ],
-            },
-          ],
+      it 'calls DataSource::External' do
+        allow(DataSource::External).to receive(:call).and_return(data: {})
+        expect(DataSource::External).to receive(:call).with(
+          chart_item: chart_item,
         )
+        expect(chart_data).to eq(data: {})
+      end
+    end
+
+    context 'with unsupported data source' do
+      let!(:fake_item) { create(:text_item) }
+      let!(:chart_item) { create(:chart_item, data_source: fake_item) }
+
+      it 'should return empty hash' do
+        expect(chart_data).to eq({})
       end
     end
   end
