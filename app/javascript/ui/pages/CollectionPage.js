@@ -120,6 +120,7 @@ class CollectionPage extends React.Component {
       const message = `${collection.processing_status}...`
       uiStore.popupSnackbar({ message })
     }
+    uiStore.update('dragTargets', [])
   }
 
   async checkSubmissionBox() {

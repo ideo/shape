@@ -73,7 +73,7 @@ module Breadcrumb
         type: type,
         id: object.id,
         name: object.name,
-        can_edit: editable.include?(object.id),
+        can_edit: object == @object ? object.can_edit?(@user) : editable.include?(object.id),
       }
     end
 

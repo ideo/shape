@@ -33,6 +33,14 @@ function WithDropTarget(Wrapped) {
       uiStore.addDragTarget(this.props.item, this.coordinates, 'Breadcrumb')
     }
 
+    componentDidUpdate(prevProps) {
+      uiStore.addDragTarget(this.props.item, this.coordinates, 'Breadcrumb')
+    }
+
+    componentWillUnmount() {
+      uiStore.removeDragTarget(this.props.item, this.coordinates, 'Breadcrumb')
+    }
+
     get coordinates() {
       if (!this.innerWrappedRef) return null
       const element = this.innerWrappedRef.current

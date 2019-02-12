@@ -200,6 +200,13 @@ export default class UiStore {
     this.dragTargets.push({ item, coordinates, componentType })
   }
 
+  removeDragTarget(item, coordinates, componentType) {
+    _.remove(
+      this.dragTargets,
+      target => target.item.identifier === item.identifier
+    )
+  }
+
   @action
   drag(coordinates) {
     const anyTarget = this.dragTargetsOverlap(coordinates)

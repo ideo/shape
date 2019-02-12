@@ -198,7 +198,6 @@ class CollectionGrid extends React.Component {
   }
 
   onDragOrResizeStop = (cardId, dragType) => {
-    console.log('onDragOrResizeStop')
     const { hoveringOver, cards } = this.state
     const placeholder = _.find(cards, { cardType: 'placeholder' }) || {}
     const original = _.find(cards, { id: placeholder.originalId })
