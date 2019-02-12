@@ -1,7 +1,7 @@
 class SerializableItem < BaseJsonSerializer
   include SerializedExternalId
   type 'items'
-  attributes :type, :name, :content, :text_data,
+  attributes :name, :content, :text_data,
              :url, :thumbnail_url, :icon_url, :question_type,
              :data_source_type, :data_source_id, :data_settings,
              :previous_thumbnail_urls
@@ -15,6 +15,10 @@ class SerializableItem < BaseJsonSerializer
   has_one :parent_collection_card
   has_one :parent
   belongs_to :data_source
+
+  attribute :class_type do
+    @object.type || @object.class.name
+  end
 
   attribute :tag_list do
     @object.cached_tag_list || []

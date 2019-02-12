@@ -7,7 +7,7 @@ class SerializableSimpleCollection < BaseJsonSerializer
     @object.cached_cover || {}
   end
 
-  attribute :type do
+  attribute :class_type do
     @object.type || @object.class.name
   end
 

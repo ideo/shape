@@ -39,7 +39,7 @@ class SerializableCollection < BaseJsonSerializer
     @object.cached_test_scores || {}
   end
 
-  attribute :type do
+  attribute :class_type do
     @object.type || @object.class.name
   end
 
