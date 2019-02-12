@@ -24,7 +24,6 @@ Rails.application.routes.draw do
           post 'clear_collection_cover'
           patch 'submit'
           patch 'restore_permissions'
-          delete 'roles'
         end
         collection do
           post 'create_template'
@@ -99,7 +98,7 @@ Rails.application.routes.draw do
         resources :users, only: %i[index]
       end
       delete 'sessions' => 'sessions#destroy'
-      resources :users do
+      resources :users, except: :index do
         collection do
           get 'me'
           post 'create_from_emails'

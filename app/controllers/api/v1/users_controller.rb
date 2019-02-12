@@ -1,16 +1,4 @@
 class Api::V1::UsersController < Api::V1::BaseController
-  # All the other users in this org
-  # /organizations/:id/users
-  load_and_authorize_resource :organization, only: %i[index]
-  def index
-    # show all other active users in the organization
-    @users = User.all_active_except(current_user.id, in_org: @organization)
-    render jsonapi: @users, fields:
-      {
-        users: User.basic_api_fields,
-      }
-  end
-
   load_and_authorize_resource only: %i[show]
   def show
     render jsonapi: @user, include: [
