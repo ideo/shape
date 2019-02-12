@@ -1,11 +1,11 @@
 import { action, runInAction, observable, computed } from 'mobx'
 import { Collection as datxCollection, assignModel, ReferenceType } from 'datx'
 import { jsonapi } from 'datx-jsonapi'
-import { apiUrl } from '~/utils/url'
 import _ from 'lodash'
 import moment from 'moment-mini'
 import queryString from 'query-string'
 
+import { apiUrl } from '~/utils/url'
 import trackError from '~/utils/trackError'
 import Activity from './jsonApi/Activity'
 import Collection from './jsonApi/Collection'
@@ -52,6 +52,10 @@ class ApiStore extends jsonapi(datxCollection) {
   @observable
   usableTemplates = []
 
+  // doesn't have any need to be observable...
+  filestackToken = {}
+  filestackTokenInterval = null
+
   fetch(type, id, skipCache = false) {
     return super.fetch(type, id, { skipCache })
   }
@@ -63,9 +67,15 @@ class ApiStore extends jsonapi(datxCollection) {
     return super.request(apiUrl(path), method, data, options)
   }
 
+  async requestJson(path, method, data, options = {}) {
+    const res = await this.request(path, method, data, options)
+    return res.__response.data
+  }
+
   @action
-  setCurrentUserInfo({ id, organizationId }) {
+  setCurrentUserInfo({ id, filestackToken, organizationId }) {
     this.currentUserId = id
+    this.filestackToken = filestackToken
     this.currentUserOrganizationId = organizationId || null
   }
 
@@ -132,6 +142,7 @@ class ApiStore extends jsonapi(datxCollection) {
       const currentUser = res.data
       this.setCurrentUserInfo({
         id: currentUser.id,
+        filestackToken: currentUser.filestack_token,
         organizationId:
           currentUser.current_organization &&
           currentUser.current_organization.id,
@@ -417,11 +428,11 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   async checkInMyCollection(record) {
-    const res = await this.request(
+    const inMyCollection = await this.requestJson(
       `${record.internalType}/${record.id}/in_my_collection`
     )
     runInAction(() => {
-      record.inMyCollection = res.__response.data
+      record.inMyCollection = inMyCollection
     })
   }
 
@@ -469,6 +480,25 @@ class ApiStore extends jsonapi(datxCollection) {
     return this.request(
       `organizations/${this.currentUserOrganizationId}/check_payments`
     )
+  }
+
+  beginTokenRefreshPoller() {
+    if (this.filestackTokenInterval) {
+      clearInterval(this.filestackTokenInterval)
+    }
+    // token expires in an hour, attempt refresh every 20m just to be safe
+    this.filestackTokenInterval = setInterval(() => {
+      this.refreshFilestackToken()
+    }, 1000 * 60 * 20)
+  }
+
+  async refreshFilestackToken() {
+    try {
+      this.filestackToken = await this.requestJson('filestack/token')
+    } catch (e) {
+      trackError(e, { source: 'refreshFilestackToken', name: 'fetchToken' })
+    }
+    return this.filestackToken
   }
 
   // default action for updating any basic apiStore value

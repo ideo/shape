@@ -8,6 +8,8 @@ class FilestackFile < ApplicationRecord
   after_create :process_image, if: :image?
   after_destroy :delete_on_filestack, unless: :url_being_used?
 
+  TOKEN_EXPIRATION = 1.hour
+
   amoeba do
     enable
     recognize []
@@ -55,15 +57,47 @@ class FilestackFile < ApplicationRecord
 
   def self.filestack_security
     raise 'FilestackSecurity needs FILESTACK_API_SECRET to be set' if ENV['FILESTACK_API_SECRET'].blank?
-    FilestackSecurity.new(ENV['FILESTACK_API_SECRET'], options: { call: %w[read store pick] })
+    FilestackSecurity.new(
+      ENV['FILESTACK_API_SECRET'],
+      options: {
+        expiry: TOKEN_EXPIRATION.to_i,
+        call: %w[read store pick convert stat exif],
+      },
+    )
+  end
+
+  def self.security_token
+    security = filestack_security
+    {
+      policy: security.policy,
+      signature: security.signature,
+    }
+  end
+
+  def self.signed_url(handle)
+    token = security_token
+    %(https://process.filestackapi.com/#{ENV['FILESTACK_API_KEY']}
+      /security=policy:#{token[:policy]},signature:#{token[:signature]}
+      /rotate=deg:exif
+      /#{handle}
+    ).gsub(/\s+/, '')
+  end
+
+  def signed_url
+    FilestackFile.signed_url(handle)
   end
 
   def filestack_filelink
-    @filelink ||= FilestackFilelink.new(
-      handle: handle,
+    FilestackFilelink.new(
+      handle,
       apikey: ENV['FILESTACK_API_KEY'],
       security: FilestackFile.filestack_security,
     )
+  end
+
+  def secure_url
+    # Allow other opts other than default rotate=deg:exif?
+    filestack_filelink.transform.rotate(deg: 'exif').url
   end
 
   def process_image

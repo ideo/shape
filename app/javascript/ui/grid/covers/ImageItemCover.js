@@ -17,7 +17,7 @@ class ImageItemCover extends React.PureComponent {
   render() {
     const { contain, item } = this.props
     const retina = window.devicePixelRatio && window.devicePixelRatio > 1
-    const imageUrl = item.imageUrl(retina ? 2400 : 1200)
+    const imageUrl = item.imageUrl({ resize: { width: retina ? 2400 : 1200 } })
     return <StyledImageCover url={imageUrl} contain={contain} />
   }
 }

@@ -72,6 +72,7 @@ export const fakeImageItemAttrs = {
     url:
       'https://www.nasa.gov/sites/default/files/styles/full_width_feature/public/thumbnails/image/iss052e023801_0.jpg',
   },
+  imageUrl: jest.fn(),
   inherited_tag_list: [],
   can_edit: false,
   parent_collection_card: fakeCollectionCard,
