@@ -5,7 +5,7 @@ import styled from 'styled-components'
 import { floor, round, sumBy, compact } from 'lodash'
 
 import { apiStore } from '~/stores'
-import v, { ITEM_TYPES } from '~/utils/variables'
+import v from '~/utils/variables'
 import BreadcrumbItem from './BreadcrumbItem'
 
 const BreadcrumbPadding = styled.div`
@@ -52,30 +52,29 @@ class Breadcrumb extends React.Component {
     const items = []
     if (record.inMyCollection) {
       items.push({
-        klass: 'collections',
+        type: 'collections',
         id: 'homepage',
         name: 'My Collection',
+        can_edit_content: true,
         truncatedName: null,
         ellipses: false,
       })
     }
     if (!record.breadcrumb) return items
     record.breadcrumb.map(item => {
-      const [klass, id, crumbName] = item
-      const identifier = `${klass}_${id}`
-      let name = crumbName
-      const crumbRecord = apiStore.find(klass, id)
-      if (crumbRecord) {
-        if (crumbRecord.type === ITEM_TYPES.LINK) {
-          // link items have no page to link to
-          return null
-        }
-        name = crumbRecord.name
-      }
+      const { type, id } = item
+      // let { name } = item
+      const identifier = `${type}_${id}`
+      // const crumbRecord = apiStore.find(type, id)
+      // if (crumbRecord) {
+      //   if (crumbRecord.type === ITEM_TYPES.LINK) {
+      //     // link items have no page to link to
+      //     return null
+      //   }
+      //   name = crumbRecord.name
+      // }
       return items.push({
-        klass,
-        id,
-        name,
+        ...item,
         truncatedName: null,
         ellipses: false,
         identifier,

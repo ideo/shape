@@ -175,12 +175,11 @@ export default class UiStore {
   @action
   startDragging(cardId) {
     this.dragging = true
-    if (this.selectedCardIds.length > 0) {
-      // If the dragged card is also selected, then we're doing a multi-move
-      // with all selected cards.
-      if (this.selectedCardIds.indexOf(cardId.toString()) > -1) {
-        this.multiMoveCardIds = [...this.selectedCardIds]
-      }
+    if (
+      this.selectedCardIds.length > 0 &&
+      this.selectedCardIds.indexOf(cardId.toString()) > -1
+    ) {
+      this.multiMoveCardIds = [...this.selectedCardIds]
     } else {
       this.multiMoveCardIds = [cardId]
     }
@@ -189,7 +188,7 @@ export default class UiStore {
   @action
   stopDragging() {
     this.dragging = false
-    this.multiMoveCardIds = []
+    this.activeDragTarget = null
   }
 
   @action

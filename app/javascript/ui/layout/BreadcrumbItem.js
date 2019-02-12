@@ -41,7 +41,7 @@ class BreadcrumbItem extends React.Component {
     if (item.id === 'homepage') {
       path = routingStore.pathTo('homepage')
     } else {
-      path = routingStore.pathTo(item.klass, item.id)
+      path = routingStore.pathTo(item.type, item.id)
     }
     const { currentlyDraggedOn } = this.props
     const showDrag =

@@ -198,6 +198,7 @@ class CollectionGrid extends React.Component {
   }
 
   onDragOrResizeStop = (cardId, dragType) => {
+    console.log('onDragOrResizeStop')
     const { hoveringOver, cards } = this.state
     const placeholder = _.find(cards, { cardType: 'placeholder' }) || {}
     const original = _.find(cards, { id: placeholder.originalId })
@@ -264,24 +265,25 @@ class CollectionGrid extends React.Component {
     } else if (hoveringOver && hoveringOver.direction === 'right') {
       // the case where we hovered in the drop zone of a collection and now want to move cards + reroute
       const hoveringRecord = hoveringOver.card.record
-      uiStore.setMovingCards([cardId], {
+      uiStore.setMovingCards(uiStore.multiMoveCardIds, {
         cardAction: 'moveWithinCollection',
       })
       if (hoveringRecord.internalType === 'collections') {
         this.setState({ hoveringOver: null }, () => {
-          this.moveCardsIntoCollection([cardId], hoveringRecord)
+          this.moveCardsIntoCollection(uiStore.multiMoveCardIds, hoveringRecord)
         })
       }
     } else {
       if (uiStore.activeDragTarget) {
-        let targetRecord = uiStore.activeDragTarget.item
+        const { apiStore } = this.props
+        const targetRecord = uiStore.activeDragTarget.item
         if (uiStore.activeDragTarget.item.id === 'homepage') {
-          const { apiStore } = this.props
-          targetRecord = {
-            id: apiStore.currentUserCollectionId,
-            internalType: 'collections',
-          }
+          targetRecord.id = apiStore.currentUserCollectionId
         }
+        console.log('multiMoveCardIds', [...uiStore.multiMoveCardIds])
+        uiStore.setMovingCards(uiStore.multiMoveCardIds, {
+          cardAction: 'moveWithinCollection',
+        })
         this.moveCardsIntoCollection(uiStore.multiMoveCardIds, targetRecord)
       }
       // reset back to normal
@@ -291,8 +293,8 @@ class CollectionGrid extends React.Component {
 
   async moveCardsIntoCollection(cardIds, hoveringRecord) {
     const { collection, uiStore, apiStore } = this.props
-    // timeout is just a stupid thing so that Draggable doesn't complain about unmounting
-    if (!hoveringRecord.can_edit_content) {
+    const can_edit = hoveringRecord.can_edit_content || hoveringRecord.can_edit
+    if (!can_edit) {
       setTimeout(() => {
         uiStore.confirm({
           prompt:
@@ -314,6 +316,7 @@ class CollectionGrid extends React.Component {
       })
       return
     }
+    // timeout is just a stupid thing so that Draggable doesn't complain about unmounting
     setTimeout(() => {
       this.setState({ hoveringOver: null }, async () => {
         const data = {
@@ -322,13 +325,11 @@ class CollectionGrid extends React.Component {
           collection_card_ids: cardIds,
           placement: 'beginning',
         }
-        uiStore.setMovingCards(cardIds, {
-          cardAction: 'moveWithinCollection',
-        })
         uiStore.update('movingIntoCollection', hoveringRecord)
         await apiStore.moveCards(data)
         uiStore.update('actionAfterRoute', () => {
           uiStore.setMovingCards([])
+          uiStore.update('multiMoveCardIds', [])
           uiStore.reselectCardIds(cardIds)
           uiStore.update('movingIntoCollection', null)
         })
@@ -340,6 +341,7 @@ class CollectionGrid extends React.Component {
   cancelDrag() {
     const { uiStore } = this.props
     uiStore.setMovingCards([])
+    uiStore.update('multiMoveCardIds', [])
     uiStore.stopDragging()
     this.positionCardsFromProps()
   }

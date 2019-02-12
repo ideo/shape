@@ -192,8 +192,8 @@ class MovableGridCard extends React.PureComponent {
   handleStop = type => ev => {
     this.scrolling = false
     document.body.style['overflow-y'] = 'auto'
-    this.props.onDragOrResizeStop(this.props.card.id, type)
     this.setState({ dragging: false, resizing: false }, () => {
+      this.props.onDragOrResizeStop(this.props.card.id, type)
       const timeoutId = setTimeout(() => {
         // have this item remain "on top" while it animates back
         this.setState({

@@ -42,7 +42,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
 
   get parentPath() {
     if (this.breadcrumb && this.breadcrumb.length > 1) {
-      const [type, id] = this.breadcrumb[this.breadcrumb.length - 2]
+      const { type, id } = this.breadcrumb[this.breadcrumb.length - 2]
       return routingStore.pathTo(type, id)
     }
     return routingStore.pathTo('homepage')

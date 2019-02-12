@@ -30,11 +30,7 @@ function WithDropTarget(Wrapped) {
           }
         }
       )
-    }
-
-    componentWillReceiveProps(newProps) {
-      const { item } = newProps
-      uiStore.addDragTarget(item, this.coordinates, 'Breadcrumb')
+      uiStore.addDragTarget(this.props.item, this.coordinates, 'Breadcrumb')
     }
 
     get coordinates() {
