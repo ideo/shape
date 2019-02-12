@@ -245,6 +245,7 @@ class CollectionGrid extends React.Component {
           cards: sortedMovedCards,
           undoMessage,
         })
+        uiStore.update('multiMoveCardIds', [])
         this.positionCardsFromProps()
       } else {
         // If a template, warn that any instances will be updated
@@ -255,6 +256,7 @@ class CollectionGrid extends React.Component {
             updates,
             undoMessage,
           })
+          uiStore.update('multiMoveCardIds', [])
           this.positionCardsFromProps()
         }
         const onCancel = () => {
@@ -280,7 +282,6 @@ class CollectionGrid extends React.Component {
         if (uiStore.activeDragTarget.item.id === 'homepage') {
           targetRecord.id = apiStore.currentUserCollectionId
         }
-        console.log('multiMoveCardIds', [...uiStore.multiMoveCardIds])
         uiStore.setMovingCards(uiStore.multiMoveCardIds, {
           cardAction: 'moveWithinCollection',
         })
