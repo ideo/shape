@@ -495,7 +495,7 @@ class ApiStore extends jsonapi(datxCollection) {
     try {
       this.filestackToken = await this.requestJson('filestack/token')
     } catch (e) {
-      console.warn('Unable to refresh filestack token')
+      trackError(e, { source: 'refreshFilestackToken', name: 'fetchToken' })
     }
     return this.filestackToken
   }
