@@ -8,8 +8,8 @@ const props = {
   isHomepage: false,
 }
 props.record.breadcrumb = [
-  ['collections', 1, 'My Workspace'],
-  ['collections', 99, 'Use Cases'],
+  { type: 'collections', id: 1, name: 'My Workspace' },
+  { type: 'collections', id: 99, name: 'Use Cases' },
 ]
 
 let wrapper, component, titles
