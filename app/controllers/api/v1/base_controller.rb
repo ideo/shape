@@ -38,6 +38,7 @@ class Api::V1::BaseController < ApplicationController
     {
       current_user: current_user,
       current_ability: current_ability,
+      current_api_token: current_api_token,
     }
   end
 

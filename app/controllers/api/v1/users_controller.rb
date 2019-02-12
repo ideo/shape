@@ -36,13 +36,13 @@ class Api::V1::UsersController < Api::V1::BaseController
 
   # Create new pending users from email addresses
   def create_from_emails
-    cpu = CreatePendingUsers.new(
+    service = FindOrCreateUsersByEmail.new(
       emails: json_api_params[:emails],
     )
-    if cpu.call
-      render jsonapi: cpu.users
+    if service.call
+      render jsonapi: service.users
     else
-      render_api_errors cpu.failed_emails
+      render_api_errors service.failed_emails
     end
   end
 
