@@ -292,6 +292,28 @@ class CollectionGrid extends React.Component {
   async moveCardsIntoCollection(cardIds, hoveringRecord) {
     const { collection, uiStore, apiStore } = this.props
     // timeout is just a stupid thing so that Draggable doesn't complain about unmounting
+    if (!hoveringRecord.can_edit_content) {
+      setTimeout(() => {
+        uiStore.confirm({
+          prompt:
+            'You only have view access to this collection. Would you like to keep moving the cards?',
+          confirmText: 'Continue',
+          iconName: 'Alert',
+          onConfirm: () => {
+            this.cancelDrag()
+            uiStore.reselectCardIds(cardIds)
+            uiStore.openMoveMenu({
+              from: collection.id,
+              cardAction: 'move',
+            })
+          },
+          onCancel: () => {
+            this.cancelDrag()
+          },
+        })
+      })
+      return
+    }
     setTimeout(() => {
       this.setState({ hoveringOver: null }, async () => {
         const data = {
@@ -313,6 +335,13 @@ class CollectionGrid extends React.Component {
         this.props.routingStore.routeTo('collections', hoveringRecord.id)
       })
     })
+  }
+
+  cancelDrag() {
+    const { uiStore } = this.props
+    uiStore.setMovingCards([])
+    uiStore.stopDragging()
+    this.positionCardsFromProps()
   }
 
   onDrag = (cardId, dragPosition) => {
