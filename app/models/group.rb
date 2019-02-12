@@ -3,6 +3,7 @@ class Group < ApplicationRecord
   include HasFilestackFile
   include Archivable
   include HasActivities
+  include Externalizable
   after_archive :after_archive_group
 
   prepend RolifyExtensions # Prepend so it can call rolify methods using super

@@ -73,7 +73,7 @@ class Api::V1::BaseController < ApplicationController
   def require_and_apply_filters
     @filter = params[:filter] || {}
     # this is the only applicable filter for now
-    head(400) unless @filter[:external_id].present?
+    return head(400) unless @filter[:external_id].present?
     apply_filters
   end
 
@@ -86,7 +86,7 @@ class Api::V1::BaseController < ApplicationController
     controller_name = params[:controller].split('/').last
     klass = controller_name.classify.safe_constantize
     application = @current_api_token&.application || current_user.application
-    head(400) unless application.present?
+    return head(400) unless application.present?
     records = klass.where_external_id(
       @filter[:external_id],
       application_id: application.id,
