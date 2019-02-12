@@ -1,4 +1,5 @@
 class SerializableCollection < BaseJsonSerializer
+  include SerializedExternalId
   type 'collections'
 
   attributes :created_at, :updated_at, :name, :organization_id,

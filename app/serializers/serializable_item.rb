@@ -1,4 +1,5 @@
 class SerializableItem < BaseJsonSerializer
+  include SerializedExternalId
   type 'items'
   attributes :type, :name, :content, :text_data,
              :url, :thumbnail_url, :icon_url, :question_type,

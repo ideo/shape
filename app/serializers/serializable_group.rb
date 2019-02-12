@@ -1,4 +1,5 @@
 class SerializableGroup < BaseJsonSerializer
+  include SerializedExternalId
   type 'groups'
   attributes :name, :handle
   attribute :is_primary do
