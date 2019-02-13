@@ -49,10 +49,29 @@ const StyledHeaderRow = styled(Row)`
     width: 100%;
   }
 `
-const StyledRow = styled(Row)`
+const GroupHeader = styled.div`
+  background-color: ${v.colors.white};
   cursor: pointer;
-  margin-left: 0;
+  margin-bottom: 15px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  ${props =>
+    props.open &&
+    `&:after {
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
+      content: "";
+      display: block;
+      position: absolute;
+      height: 7px;
+      width: 100%;
+    }`};
 `
+const StyledRow = styled(Row)`
+  margin-left: 0;
+  margin-bottom: 0;
+`
+
 const StyledCollapseToggle = styled.button`
   .icon {
     width: 24px;
@@ -303,25 +322,28 @@ class RolesMenu extends React.Component {
 
             return (
               <div key={panelTitle}>
-                <StyledRow
+                <GroupHeader
                   align="center"
                   onClick={() => this.togglePanel(group)}
+                  open={this.isOpenPanel(group)}
                 >
-                  <DisplayText>
-                    {panelTitle} ({count})
-                  </DisplayText>
-                  <RowItemLeft style={{ marginLeft: '0px' }}>
-                    {this.isOpenPanel(group) ? (
-                      <StyledCollapseToggle aria-label="Collapse">
-                        <DropdownIcon />
-                      </StyledCollapseToggle>
-                    ) : (
-                      <StyledExpandToggle aria-label="Expand">
-                        <DropdownIcon />
-                      </StyledExpandToggle>
-                    )}
-                  </RowItemLeft>
-                </StyledRow>
+                  <StyledRow>
+                    <DisplayText>
+                      {panelTitle} ({count})
+                    </DisplayText>
+                    <RowItemLeft style={{ marginLeft: '0px' }}>
+                      {this.isOpenPanel(group) ? (
+                        <StyledCollapseToggle aria-label="Collapse">
+                          <DropdownIcon />
+                        </StyledCollapseToggle>
+                      ) : (
+                        <StyledExpandToggle aria-label="Expand">
+                          <DropdownIcon />
+                        </StyledExpandToggle>
+                      )}
+                    </RowItemLeft>
+                  </StyledRow>
+                </GroupHeader>
                 <Collapse
                   in={this.isOpenPanel(group)}
                   timeout="auto"
