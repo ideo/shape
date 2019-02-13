@@ -222,10 +222,10 @@ class CollectionPage extends React.Component {
     uiStore.trackEvent('update', this.collection)
   }
 
-  batchUpdateCollection = ({ card, updates, undoMessage } = {}) => {
+  batchUpdateCollection = ({ cards, updates, undoMessage } = {}) => {
     const { collection } = this.props
     // this will assign the update attrs to the card and push an undo action
-    collection.API_batchUpdateCards({ card, undoMessage })
+    collection.API_batchUpdateCards({ cards, updates, undoMessage })
     const { uiStore } = this.props
     uiStore.trackEvent('update', this.collection)
   }

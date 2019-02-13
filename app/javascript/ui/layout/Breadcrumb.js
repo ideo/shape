@@ -54,6 +54,7 @@ class Breadcrumb extends React.Component {
       items.push({
         type: 'collections',
         id: 'homepage',
+        identifier: 'homepage',
         name: 'My Collection',
         can_edit_content: true,
         truncatedName: null,
@@ -63,16 +64,7 @@ class Breadcrumb extends React.Component {
     if (!record.breadcrumb) return items
     record.breadcrumb.map(item => {
       const { type, id } = item
-      // let { name } = item
       const identifier = `${type}_${id}`
-      // const crumbRecord = apiStore.find(type, id)
-      // if (crumbRecord) {
-      //   if (crumbRecord.type === ITEM_TYPES.LINK) {
-      //     // link items have no page to link to
-      //     return null
-      //   }
-      //   name = crumbRecord.name
-      // }
       return items.push({
         ...item,
         truncatedName: null,

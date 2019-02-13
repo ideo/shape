@@ -403,8 +403,17 @@ class ApiStore extends jsonapi(datxCollection) {
     collection.API_fetchCards()
   }
 
-  moveCards(data) {
-    return this.request('collection_cards/move', 'PATCH', data)
+  async moveCards(data) {
+    const res = await this.request('collection_cards/move', 'PATCH', data)
+    const fromCollection = this.find('collections', data.from_id)
+    if (data.to_id !== data.from_id) {
+      runInAction(() => {
+        fromCollection.collection_cards.replace([])
+      })
+    } else {
+      await fromCollection.API_fetchCards()
+    }
+    return res
   }
 
   linkCards(data) {

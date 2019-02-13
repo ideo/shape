@@ -34,6 +34,7 @@ function WithDropTarget(Wrapped) {
     }
 
     componentDidUpdate(prevProps) {
+      // uiStore will check if the target already exists
       uiStore.addDragTarget(this.props.item, this.coordinates, 'Breadcrumb')
     }
 

@@ -406,12 +406,20 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.request(apiPath, 'PATCH', { data })
   }
 
-  API_batchUpdateCards({ cards, undoMessage } = {}) {
+  API_batchUpdateCards({ cards, updates, undoMessage } = {}) {
     const jsonData = this.toJsonApiWithCards()
     this.pushUndo({
       snapshot: jsonData.attributes,
       message: undoMessage,
     })
+
+    // now actually make the change to the card(s)
+    const sortedCards = _.sortBy(cards, 'order')
+    _.each(sortedCards, (card, idx) => {
+      const sortedOrder = updates.order + (idx + 1) * 0.1
+      card.order = sortedOrder
+    })
+
     this._reorderCards()
     // TODO try and find way to update cards after pushing undo
     const data = this.toJsonApiWithCards()
