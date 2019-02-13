@@ -72,7 +72,6 @@ const selectStyles = theme => ({
   clearIndicator: () => ({}),
   container: () => ({}),
   control: () => ({
-    width: '370px',
     paddingLeft: '24px',
     display: 'flex',
     alignItems: 'center',
@@ -234,6 +233,7 @@ class AutoComplete extends React.Component {
     return (
       <div className={classes.root}>
         <Input
+          fullWidth
           inputComponent={SelectWrappedWithStyles}
           inputProps={{
             classes,

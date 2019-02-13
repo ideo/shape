@@ -28,6 +28,11 @@ const ScrollArea = styled.div`
   -webkit-overflow-scrolling: touch;
 `
 
+const FooterBreak = styled.div`
+  border-top: 1px solid ${v.colors.commonMedium};
+  width: 100%;
+`
+
 const FooterArea = styled.div`
   flex: 0 0 auto;
   padding-top: 24px;
@@ -360,16 +365,21 @@ class RolesMenu extends React.Component {
           })}
         </ScrollArea>
         {canEdit && (
-          <FooterArea menuOpen={uiStore.autocompleteValues > 0}>
-            <Heading3>{addCallout}</Heading3>
-            <RolesAdd
-              roleTypes={addRoleTypes}
-              roleLabels={submissionBox ? { viewer: 'participant' } : {}}
-              onCreateRoles={this.createRoles}
-              onCreateUsers={this.onCreateUsers}
-              ownerType={ownerType}
-            />
-          </FooterArea>
+          <Fragment>
+            <Row>
+              <FooterBreak />
+            </Row>
+            <FooterArea menuOpen={uiStore.autocompleteValues > 0}>
+              <RolesAdd
+                title={addCallout}
+                roleTypes={addRoleTypes}
+                roleLabels={submissionBox ? { viewer: 'participant' } : {}}
+                onCreateRoles={this.createRoles}
+                onCreateUsers={this.onCreateUsers}
+                ownerType={ownerType}
+              />
+            </FooterArea>
+          </Fragment>
         )}
       </Fragment>
     )

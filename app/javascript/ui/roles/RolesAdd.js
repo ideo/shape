@@ -15,6 +15,7 @@ import {
   Select,
 } from '~/ui/global/styled/forms'
 import { Row, RowItemRight } from '~/ui/global/styled/layout'
+import { Heading3 } from '~/ui/global/styled/typography'
 import AutoComplete from '~/ui/global/AutoComplete'
 import PillList from '~/ui/global/PillList'
 import EmailCSVUploader from '~/ui/global/EmailCSVUploader'
@@ -250,40 +251,39 @@ class RolesAdd extends React.Component {
   }
 
   render() {
-    const { roleTypes } = this.props
+    const { title, roleTypes } = this.props
     return (
       <div>
+        <Row style={{ marginBottom: 0 }}>
+          <Heading3>{title}</Heading3>
+          <RowItemRight>
+            <Select
+              classes={{ root: 'select', selectMenu: 'selectMenu' }}
+              displayEmpty
+              disableUnderline
+              name="role"
+              onChange={this.handleRoleSelect}
+              value={this.selectedRole}
+            >
+              {roleTypes.map(roleType => (
+                <MenuItem key={roleType} value={roleType}>
+                  {this.labelFor(roleType)}
+                </MenuItem>
+              ))}
+            </Select>
+          </RowItemRight>
+        </Row>
         {this.loading && <InlineLoader />}
         {this.renderPillList()}
-        <Grid container>
-          <Grid item xs={12} sm style={{ marginBottom: '15px' }}>
-            <AutoComplete
-              options={[]}
-              optionSearch={this.onSearch}
-              onOptionSelect={this.onUserSelected}
-              placeholder="email address or username"
-              creatable
-            />
-          </Grid>
-          <RightAligner item>
-            <RowItemRight>
-              <Select
-                classes={{ root: 'select', selectMenu: 'selectMenu' }}
-                displayEmpty
-                disableUnderline
-                name="role"
-                onChange={this.handleRoleSelect}
-                value={this.selectedRole}
-              >
-                {roleTypes.map(roleType => (
-                  <MenuItem key={roleType} value={roleType}>
-                    {this.labelFor(roleType)}
-                  </MenuItem>
-                ))}
-              </Select>
-            </RowItemRight>
-          </RightAligner>
-        </Grid>
+        <Row style={{ marginBottom: '15px' }}>
+          <AutoComplete
+            options={[]}
+            optionSearch={this.onSearch}
+            onOptionSelect={this.onUserSelected}
+            placeholder="email address or username"
+            creatable
+          />
+        </Row>
         <Row>
           <StyledFormControlLabel
             classes={{ label: 'form-control' }}
@@ -322,6 +322,7 @@ RolesAdd.propTypes = {
   onCreateRoles: PropTypes.func.isRequired,
   onCreateUsers: PropTypes.func.isRequired,
   ownerType: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
 }
 RolesAdd.defaultProps = {
   roleLabels: {},
