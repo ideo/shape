@@ -1,5 +1,5 @@
 module DataReport
-  class External < Base
+  class NetworkAppMetric < Base
     def call
       calculate
       @data

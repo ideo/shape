@@ -48,7 +48,25 @@ FactoryBot.define do
     end
 
     factory :data_item, class: 'Item::DataItem' do
-      data_settings { { d_measure: 'participants', d_timeframe: 'ever' } }
+      trait :report_type_collections_and_items do
+        report_type :report_type_collections_and_items
+        data_settings { { d_measure: 'participants', d_timeframe: 'ever' } }
+      end
+
+      trait :report_type_network_app_metric do
+        report_type :report_type_network_app_metric
+        url 'https://profile.ideo.com/api/v1/app_metrics'
+      end
+
+      trait :report_type_record do
+        content(
+          data: {
+            value: 0,
+            values: [{ date: '2018-11-13', amount: 613 }],
+          },
+        )
+        report_type :report_type_record
+      end
     end
 
     after(:build) do |item, evaluator|

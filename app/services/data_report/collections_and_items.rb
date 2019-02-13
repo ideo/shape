@@ -1,5 +1,5 @@
 module DataReport
-  class Internal < Base
+  class CollectionsAndItems < Base
     def call
       if @measure == 'records'
         # special case

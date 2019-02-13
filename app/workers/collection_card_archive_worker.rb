@@ -46,7 +46,7 @@ class CollectionCardArchiveWorker
       d_timeframe: 'ever',
       d_filters: [{ 'type' => 'Collection', 'target' => record.id }],
     }
-    report = DataReport::Internal.new(record, override_measures: measures, return_records: true).call
+    report = DataReport::CollectionsAndItems.new(record, override_measures: measures, return_records: true).call
     report[:value]
   end
 end

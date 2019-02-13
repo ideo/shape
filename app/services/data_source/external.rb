@@ -2,7 +2,7 @@ module DataSource
   class External < Base
     def call
       # Query external data source
-      http_response = HTTParty.get(chart_item.url)
+      http_response = HTTParty.get(item.url)
       if success_http_status_codes.include?(http_response.code)
         @attributes = http_response.body['data']['attributes']
       else
@@ -32,8 +32,8 @@ module DataSource
       }
     end
 
-    def chart_item
-      context[:chart_item]
+    def item
+      context[:item]
     end
 
     def success_http_status_codes
