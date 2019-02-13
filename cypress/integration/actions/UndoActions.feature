@@ -8,17 +8,17 @@ Feature: Undo actions
 
     And I create a normal collection named "Hello World"
     And I resize the last card to 2x2
-    Then I should see the last card as 2x2
+    Then I should see the last of 3 cards as 2x2
 
     When I reorder the first two cards
     Then I should see a "CollectionCover" in the first card
 
     When I resize the first card to 3x1
-    Then I should see the first card as 3x1
+    Then I should see the first of 3 cards as 3x1
 
     When I undo with CTRL+Z
     Then I should see "Card resize undone" in a ".MuiSnackbarContent-message"
-    Then I should see the first card as 1x1
+    Then I should see the first of 3 cards as 1x1
     And I close the snackbar
 
     When I undo with CTRL+Z
@@ -38,7 +38,7 @@ Feature: Undo actions
     Then the URL should match the captured URL
     Then I should see "Card resize undone" in a ".MuiSnackbarContent-message"
     And I close the snackbar
-    Then I should see the last card as 1x1
+    Then I should see the last of 3 cards as 1x1
 
     # empty stack
     When I undo with CTRL+Z

@@ -42,7 +42,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
 
   get parentPath() {
     if (this.breadcrumb && this.breadcrumb.length > 1) {
-      const [type, id] = this.breadcrumb[this.breadcrumb.length - 2]
+      const { type, id } = this.breadcrumb[this.breadcrumb.length - 2]
       return routingStore.pathTo(type, id)
     }
     return routingStore.pathTo('homepage')
@@ -110,10 +110,18 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return this.isVideo || this.isLink
   }
 
-  get originalImageUrl() {
-    const { filestack_file_url } = this
-    if (!filestack_file_url) return ''
-    return filestack_file_url.replace(/resize=width:[0-9]*,fit:max\//, '')
+  imageUrl(filestackOpts = {}) {
+    const { filestack_file, filestack_handle } = this
+    if (!filestack_handle) return ''
+    let mimetype = ''
+    if (filestack_file) {
+      mimetype = filestack_file.mimetype
+    }
+    return FilestackUpload.imageUrl({
+      handle: filestack_handle,
+      mimetype,
+      filestackOpts,
+    })
   }
 
   get measure() {
@@ -145,15 +153,6 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return (
       this.data_settings.d_filters &&
       _.find(this.data_settings.d_filters, { type: 'Collection' })
-    )
-  }
-
-  imageUrl(width = 1200) {
-    const { filestack_file_url } = this
-    if (!filestack_file_url) return ''
-    return filestack_file_url.replace(
-      /resize=width:[0-9]*/,
-      `resize=width:${width}`
     )
   }
 

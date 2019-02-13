@@ -10,6 +10,10 @@ class SerializableCurrentUser < SerializableUser
     GoogleAuthService.create_custom_token(@object.id)
   end
 
+  attribute :filestack_token do
+    FilestackFile.security_token
+  end
+
   attribute :current_user_collection_id do
     @object.current_user_collection_id.to_s
   end

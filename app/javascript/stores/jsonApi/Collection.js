@@ -398,6 +398,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     _.assign(card, updates)
 
     this._reorderCards()
+
     const data = this.toJsonApiWithCards()
     // we don't want to receive updates which are just going to try to re-render
     data.cancel_sync = true
@@ -405,14 +406,39 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.request(apiPath, 'PATCH', { data })
   }
 
+  API_batchUpdateCards({ cards, updates, undoMessage } = {}) {
+    const jsonData = this.toJsonApiWithCards()
+    this.pushUndo({
+      snapshot: jsonData.attributes,
+      message: undoMessage,
+    })
+
+    // now actually make the change to the card(s)
+    const sortedCards = _.sortBy(cards, 'order')
+    _.each(sortedCards, (card, idx) => {
+      const sortedOrder = updates.order + (idx + 1) * 0.1
+      card.order = sortedOrder
+    })
+
+    this._reorderCards()
+    // TODO try and find way to update cards after pushing undo
+    const data = this.toJsonApiWithCards()
+    const apiPath = `collections/${this.id}`
+    return this.apiStore.request(apiPath, 'PATCH', { data })
+  }
+
+  @computed
+  get sortedCards() {
+    return _.sortBy(this.collection_cards, 'order')
+  }
+
   // after we reorder a single card, we want to make sure everything goes into sequential order
   @action
   _reorderCards() {
-    // ****
-    // TODO: make this work with card pagination!!
+    // NOTE: this should work ok even if there are infinite scroll / pagination cards
+    // not being displayed offscreen...
     if (this.collection_cards) {
-      this.collection_cards.replace(_.sortBy(this.collection_cards, 'order'))
-      _.each(this.collection_cards, (card, i) => {
+      _.each(this.sortedCards, (card, i) => {
         card.order = i
       })
     }

@@ -11,6 +11,33 @@ RSpec.describe FilestackFile, type: :model do
     it { should have_one :item }
   end
 
+  describe '.security_token' do
+    it 'should return a filestack token' do
+      expect(FilestackFile.security_token.keys).to match_array(%i[policy signature])
+    end
+  end
+
+  describe '.signed_url' do
+    let(:handle) { 'xyz123' }
+
+    it 'should return a signed filestack URL' do
+      signed_url = FilestackFile.signed_url(handle)
+      expect(signed_url).to include("https://process.filestackapi.com/#{ENV['FILESTACK_API_KEY']}")
+      expect(signed_url).to include('security=policy:')
+      expect(signed_url).to include(handle)
+    end
+  end
+
+  describe '#signed_url' do
+    let(:filestack_file) { create(:filestack_file) }
+    let(:signed_url) { 'https://process.filestackapi.com/signed/url' }
+
+    it 'should call the class method to return a signed filestack URL' do
+      expect(FilestackFile).to receive(:signed_url).and_return(signed_url)
+      expect(filestack_file.signed_url).to eq signed_url
+    end
+  end
+
   describe '#filename_without_extension' do
     context 'with apple.jpg' do
       let(:filestack_file) { build(:filestack_file, filename: 'apple.jpg') }

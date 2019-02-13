@@ -8,24 +8,24 @@ const props = {
   isHomepage: false,
 }
 props.record.breadcrumb = [
-  ['collections', 1, 'My Workspace'],
-  ['collections', 99, 'Use Cases'],
+  { type: 'collections', id: 1, name: 'My Workspace' },
+  { type: 'collections', id: 99, name: 'Use Cases' },
 ]
 
-let wrapper, titles
+let wrapper, component, titles
 
 describe('StyledBreadcrumb', () => {
   beforeEach(() => {
     props.record.inMyCollection = false
     wrapper = shallow(<Breadcrumb {...props} />)
-    titles = wrapper
-      .find('Link')
-      .children()
-      .map(link => link.text())
+    component = wrapper.instance()
+    titles = component.truncatedItems.map(t => t.name)
   })
 
-  it('renders each item as a link', () => {
-    expect(wrapper.find('Link')).toHaveLength(props.record.breadcrumb.length)
+  it('renders each item as a breadcrumb item', () => {
+    expect(wrapper.find('.breadcrumb_item')).toHaveLength(
+      props.record.breadcrumb.length
+    )
   })
 
   it('has all link titles', () => {
@@ -42,14 +42,12 @@ describe('With Narrow Window', () => {
       },
     }
     wrapper = shallow(<Breadcrumb {...props} />)
-    titles = wrapper
-      .find('Link')
-      .children()
-      .map(link => link.text())
+    component = wrapper.instance()
+    titles = component.truncatedItems
   })
 
   it('truncates to …', () => {
-    expect(titles).toEqual(['My Collection', '…', 'Use Cases'])
+    expect(titles[1].ellipses).toBe(true)
   })
 })
 
@@ -62,14 +60,12 @@ describe('In My Collection', () => {
       },
     }
     wrapper = shallow(<Breadcrumb {...props} />)
-    titles = wrapper
-      .find('Link')
-      .children()
-      .map(link => link.text())
+    component = wrapper.instance()
+    titles = component.truncatedItems.map(t => t.name)
   })
 
-  it('renders each item as a link', () => {
-    expect(wrapper.find('Link')).toHaveLength(
+  it('renders each item as a breadcrumb item', () => {
+    expect(wrapper.find('.breadcrumb_item')).toHaveLength(
       props.record.breadcrumb.length + 1
     )
   })

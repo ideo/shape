@@ -5,6 +5,7 @@ import Dotdotdot from 'react-dotdotdot'
 import Hypher from 'hypher'
 import english from 'hyphenation.en-us'
 
+import FilestackUpload from '~/utils/FilestackUpload'
 import v from '~/utils/variables'
 import PlainLink from '~/ui/global/PlainLink'
 import { CardHeading } from '~/ui/global/styled/typography'
@@ -230,6 +231,16 @@ class CollectionCover extends React.Component {
     )
   }
 
+  get coverImageUrl() {
+    const { cover } = this.props.collection
+    if (cover.image_handle) {
+      return FilestackUpload.imageUrl({
+        handle: cover.image_handle,
+      })
+    }
+    return cover.image_url
+  }
+
   handleClick = e => {
     const { dragging, uiStore } = this.props
     const makingSelection =
@@ -249,7 +260,7 @@ class CollectionCover extends React.Component {
     return (
       <StyledCollectionCover
         data-cy="CollectionCover"
-        url={cover.image_url}
+        url={this.coverImageUrl}
         isSpecialCollection={collection.isSpecialCollection}
         // onClick can be null, is used by SearchResultsInfinite
         onClick={onClick}

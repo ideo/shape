@@ -18,6 +18,7 @@ Feature: Creating a Test Collection
     And I add an open response question
     When I click the "HeaderFormButton" containing "Get Feedback"
     And I wait for "@apiLaunchTest" to finish
+    And I wait for 1 second
 
     Then I should see "Usefulness" in a "ChartItemCover"
     # assuming the collection cover is not truncated...

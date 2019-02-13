@@ -11,8 +11,8 @@ class SerializableGroup < BaseJsonSerializer
     @object.admin?
   end
   attribute :filestack_file_url do
-    if @object.filestack_file_url.present?
-      @object.filestack_file_url
+    if @object.filestack_file_signed_url.present?
+      @object.filestack_file_signed_url
     else
       'https://s3-us-west-2.amazonaws.com/assets.shape.space/group-avatar.png'
     end
