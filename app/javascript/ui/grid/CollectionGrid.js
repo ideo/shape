@@ -192,6 +192,8 @@ class CollectionGrid extends React.Component {
 
   // reset the grid back to its original state
   positionCardsFromProps = () => {
+    const { uiStore } = this.props
+    uiStore.update('multiMoveCardIds', [])
     this.setState({ hoveringOver: null }, () => {
       this.positionCards(this.props.collection.collection_cards)
     })
@@ -212,12 +214,17 @@ class CollectionGrid extends React.Component {
       moved = !_.isEqual(placeholderPosition, originalPosition)
     }
 
+    const multiMoveCards = _.map(uiStore.multiMoveCardIds, multiMoveCardId =>
+      _.find(cards, { id: multiMoveCardId })
+    )
     if (moved) {
       // we want to update this card to match the placeholder
       const { order } = placeholder
       let { width, height } = placeholder
       const updates = { order }
       let undoMessage = 'Card move undone'
+      let updateCollectionCard
+      const onCancel = () => this.positionCardsFromProps()
       // don't resize the card for a drag, only for an actual resize
       if (dragType === 'resize') {
         // just some double-checking validations
@@ -229,36 +236,54 @@ class CollectionGrid extends React.Component {
         }
         updates.width = width
         updates.height = height
+
+        // If a template, warn that any instances will be updated
+        updateCollectionCard = () => {
+          // this will assign the update attributes to the card
+          this.props.updateCollection({
+            card: original,
+            updates,
+            undoMessage,
+          })
+          this.positionCardsFromProps()
+        }
       }
-      // If a template, warn that any instances will be updated
-      const updateCollectionCard = () => {
-        // this will assign the update attributes to the card
-        this.props.updateCollection({
-          card: original,
-          updates,
-          undoMessage,
-        })
-        this.positionCardsFromProps()
+      // TODO add same template confirmation for multi-item moving
+      if (uiStore.multiMoveCardIds.length > 0) {
+        updateCollectionCard = () => {
+          this.props.batchUpdateCollection({
+            cards: multiMoveCards,
+            updates,
+            undoMessage,
+          })
+          this.positionCardsFromProps()
+        }
       }
-      const onCancel = () => {
-        this.positionCardsFromProps()
-      }
+
       collection.confirmEdit({ onCancel, onConfirm: updateCollectionCard })
     } else if (hoveringOver && hoveringOver.direction === 'right') {
       // the case where we hovered in the drop zone of a collection and now want to move cards + reroute
       const hoveringRecord = hoveringOver.card.record
-      // timeout is just a stupid thing so that Draggable doesn't complain about unmounting
-      setTimeout(() => {
-        uiStore.setMovingCards([cardId], {
+      uiStore.setMovingCards(uiStore.multiMoveCardIds, {
+        cardAction: 'moveWithinCollection',
+      })
+      if (hoveringRecord.internalType === 'collections') {
+        this.setState({ hoveringOver: null }, () => {
+          this.moveCardsIntoCollection(uiStore.multiMoveCardIds, hoveringRecord)
+        })
+      }
+    } else {
+      if (uiStore.activeDragTarget) {
+        const { apiStore } = this.props
+        const targetRecord = uiStore.activeDragTarget.item
+        if (uiStore.activeDragTarget.item.id === 'homepage') {
+          targetRecord.id = apiStore.currentUserCollectionId
+        }
+        uiStore.setMovingCards(uiStore.multiMoveCardIds, {
           cardAction: 'moveWithinCollection',
         })
-        if (hoveringRecord.internalType === 'collections') {
-          this.setState({ hoveringOver: null }, () => {
-            this.moveCardsIntoCollection([cardId], hoveringRecord)
-          })
-        }
-      })
-    } else {
+        this.moveCardsIntoCollection(uiStore.multiMoveCardIds, targetRecord)
+      }
       // reset back to normal
       this.positionCardsFromProps()
     }
@@ -266,25 +291,60 @@ class CollectionGrid extends React.Component {
 
   async moveCardsIntoCollection(cardIds, hoveringRecord) {
     const { collection, uiStore, apiStore } = this.props
-    const data = {
-      to_id: hoveringRecord.id,
-      from_id: collection.id,
-      collection_card_ids: cardIds,
-      placement: 'beginning',
+    const can_edit = hoveringRecord.can_edit_content || hoveringRecord.can_edit
+    if (!can_edit) {
+      uiStore.confirm({
+        prompt:
+          'You only have view access to this collection. Would you like to keep moving the cards?',
+        confirmText: 'Continue',
+        iconName: 'Alert',
+        onConfirm: () => {
+          this.cancelDrag()
+          uiStore.reselectCardIds(cardIds)
+          uiStore.openMoveMenu({
+            from: collection.id,
+            cardAction: 'move',
+          })
+        },
+        onCancel: () => {
+          this.cancelDrag()
+        },
+      })
+      return
     }
-    uiStore.update('movingIntoCollection', hoveringRecord)
-    await apiStore.moveCards(data)
-    uiStore.update('actionAfterRoute', () => {
-      uiStore.setMovingCards([])
-      uiStore.reselectCardIds(cardIds)
-      uiStore.update('movingIntoCollection', null)
+    this.setState({ hoveringOver: null }, async () => {
+      const data = {
+        to_id: hoveringRecord.id.toString(),
+        from_id: collection.id.toString(),
+        collection_card_ids: cardIds,
+        placement: 'beginning',
+      }
+      await apiStore.moveCards(data)
+      const afterMove = () => {
+        uiStore.setMovingCards([])
+        uiStore.update('multiMoveCardIds', [])
+        uiStore.reselectCardIds(cardIds)
+        uiStore.update('movingIntoCollection', null)
+      }
+      if (data.to_id === data.from_id) {
+        afterMove()
+      } else {
+        uiStore.update('movingIntoCollection', hoveringRecord)
+        uiStore.update('actionAfterRoute', afterMove)
+        this.props.routingStore.routeTo('collections', hoveringRecord.id)
+      }
     })
-    this.props.routingStore.routeTo('collections', hoveringRecord.id)
+  }
+
+  cancelDrag() {
+    const { uiStore } = this.props
+    uiStore.setMovingCards([])
+    uiStore.stopDragging()
+    this.positionCardsFromProps()
   }
 
   onDrag = (cardId, dragPosition) => {
     if (!this.props.canEditCollection) return
-
     const positionedCard = _.find(this.state.cards, { id: cardId })
     const placeholderKey = `${cardId}-placeholder`
     let stateCards = [...this.state.cards]
@@ -367,6 +427,7 @@ class CollectionGrid extends React.Component {
     const { dragX, dragY } = dragPosition
     const { gutter, gridW } = this.props
     _.each(this.state.cards, card => {
+      if (card.isBeingMultiMoved) return null
       const placeholder =
         card.cardType === 'placeholder' || card.cardType === 'blank'
       if (card.id === cardId || placeholder) return null
@@ -487,6 +548,19 @@ class CollectionGrid extends React.Component {
       // we don't actually want to "re-position" the dragging card
       // because its position is being determined by the drag (i.e. mouse cursor)
       if (opts.dragging === card.id) {
+        return
+      }
+
+      if (card.isBeingMoved) {
+        return
+      }
+
+      if (card.tempHidden) {
+        return
+      }
+
+      // if we're dragging multiple cards, also don't show them
+      if (opts.dragging && card.isBeingMultiMoved) {
         return
       }
       let position = {}
@@ -666,7 +740,8 @@ class CollectionGrid extends React.Component {
         }
       }
       const { cardMenuOpen } = uiStore
-      if (!card.position) return
+      if (_.isEmpty(card.position)) return
+      const shouldHide = card.isBeingMultiMoved || card.isBeingMoved
       grid.push(
         <MovableGridCard
           key={card.id}
@@ -694,6 +769,7 @@ class CollectionGrid extends React.Component {
           lastPinnedCard={
             card.isPinnedAndLocked && i === this.state.cards.length - 1
           }
+          hidden={shouldHide}
         />
       )
     })
@@ -733,6 +809,7 @@ const gridConfigProps = {
 CollectionGrid.propTypes = {
   ...gridConfigProps,
   updateCollection: PropTypes.func.isRequired,
+  batchUpdateCollection: PropTypes.func.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   blankContentToolState: MobxPropTypes.objectOrObservableObject,
   cardProperties: MobxPropTypes.arrayOrObservableArray.isRequired,

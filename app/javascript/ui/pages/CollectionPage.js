@@ -120,6 +120,7 @@ class CollectionPage extends React.Component {
       const message = `${collection.processing_status}...`
       uiStore.popupSnackbar({ message })
     }
+    uiStore.update('dragTargets', [])
   }
 
   async checkSubmissionBox() {
@@ -221,6 +222,14 @@ class CollectionPage extends React.Component {
     uiStore.trackEvent('update', this.collection)
   }
 
+  batchUpdateCollection = ({ cards, updates, undoMessage } = {}) => {
+    const { collection } = this.props
+    // this will assign the update attrs to the card and push an undo action
+    collection.API_batchUpdateCards({ cards, updates, undoMessage })
+    const { uiStore } = this.props
+    uiStore.trackEvent('update', this.collection)
+  }
+
   get submissionsPageSeparator() {
     const { collection } = this.props
     const { submissionTypeName, submissions_collection } = collection
@@ -265,6 +274,7 @@ class CollectionPage extends React.Component {
         <CollectionGrid
           {...gridSettings}
           updateCollection={this.updateCollection}
+          batchUpdateCollection={this.batchUpdateCollection}
           collection={submissions_collection}
           canEditCollection={false}
           // Pass in cardProperties so grid will re-render when they change
@@ -340,6 +350,7 @@ class CollectionPage extends React.Component {
                 // pull in cols, gridW, gridH, gutter
                 {...gridSettings}
                 updateCollection={this.updateCollection}
+                batchUpdateCollection={this.batchUpdateCollection}
                 collection={collection}
                 canEditCollection={collection.can_edit_content}
                 // Pass in cardProperties so grid will re-render when they change
