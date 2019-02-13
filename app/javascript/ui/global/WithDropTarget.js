@@ -30,11 +30,16 @@ function WithDropTarget(Wrapped) {
           }
         }
       )
+      uiStore.addDragTarget(this.props.item, this.coordinates, 'Breadcrumb')
     }
 
-    componentWillReceiveProps(newProps) {
-      const { item } = newProps
-      uiStore.addDragTarget(item, this.coordinates, 'Breadcrumb')
+    componentDidUpdate(prevProps) {
+      // uiStore will check if the target already exists
+      uiStore.addDragTarget(this.props.item, this.coordinates, 'Breadcrumb')
+    }
+
+    componentWillUnmount() {
+      uiStore.removeDragTarget(this.props.item, this.coordinates, 'Breadcrumb')
     }
 
     get coordinates() {

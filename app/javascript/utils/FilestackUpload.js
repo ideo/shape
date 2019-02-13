@@ -1,6 +1,8 @@
 import axios from 'axios'
 import filestack from 'filestack-js'
 
+import { apiStore } from '~/stores'
+
 const API_KEY = process.env.FILESTACK_API_KEY
 
 export const MAX_SIZE = 25 * 1024 * 1024
@@ -30,7 +32,7 @@ const dropPaneDefaults = {
 
 class FilestackUpload {
   static get client() {
-    return filestack.init(API_KEY)
+    return filestack.init(API_KEY, apiStore.filestackToken)
   }
 
   static async processFiles(filesUploaded) {
@@ -43,9 +45,7 @@ class FilestackUpload {
         url: file.url,
         docInfo: null,
       }
-      if (file.mimetype.split('/')[0] === 'image') {
-        fileAttrs.url = this.transformedImageUrl(file.handle)
-      } else if (file.mimetype === 'application/pdf') {
+      if (file.mimetype === 'application/pdf') {
         const docinfoUrl = this.client.transform(file.handle, {
           output: { docinfo: true },
         })
@@ -85,10 +85,17 @@ class FilestackUpload {
     })
   }
 
-  static transformedImageUrl(handle) {
-    return this.client.transform(handle, {
+  static imageUrl({ handle = '', mimetype = '', filestackOpts = {} } = {}) {
+    const params = {
       rotate: { deg: 'exif' },
-    })
+      ...filestackOpts,
+    }
+    if (mimetype.indexOf('svg') > -1) {
+      // svg doesn't allow these transforms
+      delete params.rotate
+      delete params.resize
+    }
+    return this.client.transform(handle, params)
   }
 
   static preview(handle, id) {

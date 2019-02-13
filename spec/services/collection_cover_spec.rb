@@ -54,6 +54,7 @@ RSpec.describe CollectionCover, type: :service do
       it 'skips the first image item and gets the manually selected image' do
         expect(collection_cover['image_url']).to_not be_nil
         expect(collection_cover['image_url']).to eq image_item.item.filestack_file_url
+        expect(collection_cover['image_handle']).to eq image_item.item.filestack_file_handle
       end
     end
 
@@ -70,6 +71,7 @@ RSpec.describe CollectionCover, type: :service do
 
       it 'sets the linked image card as the cover' do
         expect(collection_cover['image_url']).to eq link_image.item.filestack_file_url
+        expect(collection_cover['image_handle']).to eq link_image.item.filestack_file_handle
         expect(collection_cover['card_ids']).to include(link_image.id)
       end
     end
@@ -81,6 +83,7 @@ RSpec.describe CollectionCover, type: :service do
 
       it 'does not select any image item' do
         expect(collection_cover['image_url']).to be_nil
+        expect(collection_cover['image_handle']).to be_nil
         expect(collection_cover['no_cover']).to be true
       end
     end
