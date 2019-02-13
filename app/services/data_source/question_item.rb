@@ -1,6 +1,5 @@
 module DataSource
   class QuestionItem < Base
-
     private
 
     def test_collection
@@ -43,15 +42,18 @@ module DataSource
     end
 
     def base_data
-      (1..4).map { |n| { num_responses: 0, answer: n } }
+      (1..4).map { |n| { column_total: 0, value: n, column: n } }
     end
 
     def grouped_response_data(survey_answers)
       data = base_data
       counts = survey_answers.group(QuestionAnswer.arel_table[:answer_number]).count
+      total = survey_answers.count
       counts.each do |answer_number, count|
-        answer_data = data.find { |d| d[:answer] == answer_number }
-        answer_data[:num_responses] = count
+        percentage = total.positive? ? ((count.to_f / total.to_f) * 100).to_int : 0
+        answer_data = data.find { |d| d[:column] == answer_number }
+        answer_data[:value] = count
+        answer_data[:label] = "#{percentage}%"
       end
       data
     end

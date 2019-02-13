@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { observable, runInAction } from 'mobx'
 import {
   VictoryAxis,
   VictoryBar,
@@ -11,7 +10,6 @@ import {
 } from 'victory'
 import styled from 'styled-components'
 
-import { apiStore } from '~/stores'
 import { Heading1, Heading3 } from '~/ui/global/styled/typography'
 import { theme, themeLabelStyles } from '~/ui/test_collections/shared'
 import Tooltip from '~/ui/global/Tooltip'
@@ -51,28 +49,17 @@ Tick.propTypes = {
 
 @observer
 class ChartItemCover extends React.Component {
-  @observable
-  data = null
-
-  componentDidMount() {
-    this.fetchData()
-  }
-
-  async fetchData() {
-    const { item } = this.props
-    const { data_source_id } = item
-    const data = await apiStore.fetch('items', data_source_id)
-    runInAction(() => (this.data = data.data))
+  get data() {
+    return this.props.item.chart_data
   }
 
   render() {
-    const { item } = this.props
     return (
       <CoverContainer data-cy="ChartItemCover">
         {this.data && (
           <div>
-            <Heading1>{item.data_source.title}</Heading1>
-            <Heading3>{item.data_source.subtitle}</Heading3>
+            <Heading1>{this.data.title}</Heading1>
+            <Heading3>{this.data.subtitle}</Heading3>
           </div>
         )}
         <VictoryChart
@@ -109,47 +96,50 @@ class ChartItemCover extends React.Component {
             ]}
           />
           <VictoryGroup offset={30}>
-            {this.data.datasets.map(d => (
-              <VictoryBar
-                key={d.type}
-                padding={10}
-                data={d.data}
-                barWidth={30}
-                x="column"
-                y={datum => Math.max(datum.value, 0.5)}
-                labels={(datum, active) => datum.type === datum.value}
-                events={[
-                  {
-                    target: 'data',
-                    eventHandlers: {
-                      onMouseOver: () => [
-                        {
-                          target: 'labels',
-                          mutation: props => {
-                            const { datum } = props
-                            return {
-                              text: `${datum.column_total}/${
-                                datum.total
-                              } \ntotal`,
-                              style: Object.assign({}, themeLabelStyles, {
-                                fontSize: 9,
-                                maxWidth: 20,
-                              }),
-                            }
-                          },
+            {this.data.datasets.map(
+              d =>
+                console.log('d', { ...d }) || (
+                  <VictoryBar
+                    key={d.type}
+                    padding={10}
+                    data={[...d.data]}
+                    barWidth={30}
+                    x="column"
+                    y={datum => Math.max(datum.value, 0.5)}
+                    labels={(datum, active) => datum.label}
+                    events={[
+                      {
+                        target: 'data',
+                        eventHandlers: {
+                          onMouseOver: () => [
+                            {
+                              target: 'labels',
+                              mutation: props => {
+                                const { datum } = props
+                                return {
+                                  text: `${datum.column_total}/${
+                                    datum.total
+                                  } \ntotal`,
+                                  style: Object.assign({}, themeLabelStyles, {
+                                    fontSize: 9,
+                                    maxWidth: 20,
+                                  }),
+                                }
+                              },
+                            },
+                          ],
+                          onMouseOut: () => [
+                            {
+                              target: 'labels',
+                              mutation: props => null,
+                            },
+                          ],
                         },
-                      ],
-                      onMouseOut: () => [
-                        {
-                          target: 'labels',
-                          mutation: props => null,
-                        },
-                      ],
-                    },
-                  },
-                ]}
-              />
-            ))}
+                      },
+                    ]}
+                  />
+                )
+            )}
           </VictoryGroup>
           <VictoryLegend
             x={4}
