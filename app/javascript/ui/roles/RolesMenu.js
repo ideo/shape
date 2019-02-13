@@ -35,6 +35,7 @@ const FooterArea = styled.div`
 `
 
 const StyledHeaderRow = styled(Row)`
+  flex: 0 0 auto;
   flex-wrap: wrap;
   justify-content: space-between;
   margin-left: 0;
@@ -282,16 +283,15 @@ class RolesMenu extends React.Component {
 
     return (
       <Fragment>
+        <StyledHeaderRow align="flex-end">
+          <Heading3>{title}</Heading3>
+          <SearchButton
+            value={this.state.searchText}
+            onChange={this.handleSearchChange}
+            onClear={this.clearSearch}
+          />
+        </StyledHeaderRow>
         <ScrollArea>
-          <StyledHeaderRow align="flex-end">
-            <Heading3>{title}</Heading3>
-            <SearchButton
-              value={this.state.searchText}
-              onChange={this.handleSearchChange}
-              onClear={this.clearSearch}
-            />
-          </StyledHeaderRow>
-
           {groups.map(group => {
             const { panelTitle, entities, count, status } = group
             if (entities.length === 0) return null
