@@ -38,7 +38,11 @@ class SerializableItem < BaseJsonSerializer
   end
 
   attribute :filestack_file_url do
-    @object.cached_filestack_file_url || ''
+    @object.filestack_file_signed_url
+  end
+
+  attribute :filestack_handle do
+    @object.filestack_file_handle
   end
 
   belongs_to :filestack_file

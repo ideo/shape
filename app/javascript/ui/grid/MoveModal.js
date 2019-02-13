@@ -78,7 +78,20 @@ class MoveModal extends React.Component {
       cardAction,
     })
     if (error) {
-      uiStore.alert(error)
+      if (!viewingCollection.can_edit_content) {
+        uiStore.confirm({
+          prompt: error,
+          confirmText: 'Continue',
+          iconName: 'Alert',
+          onConfirm: () => {},
+          onCancel: () => {
+            uiStore.setMovingCards([])
+            uiStore.update('selectedCardIds', [])
+          },
+        })
+      } else {
+        uiStore.alert(error)
+      }
       return
     }
     let data = {
@@ -147,7 +160,7 @@ class MoveModal extends React.Component {
 
   moveErrors = ({ viewingCollection, movingFromCollection, cardAction }) => {
     if (!viewingCollection.can_edit_content) {
-      return "You don't have permission to move items to this collection"
+      return 'You only have view access to this collection. Would you like to keep moving the cards?'
     } else if (
       // don't allow moving cards from templates to non-templates
       cardAction === 'move' &&
@@ -221,7 +234,7 @@ class MoveModal extends React.Component {
 
     return (
       <div>
-        {uiStore.movingCardIds.length > 0 && (
+        {uiStore.shouldOpenMoveModal && (
           <div>
             <StyledSnackbar classes={{ root: 'Snackbar' }} open>
               {this.isLoading ? (

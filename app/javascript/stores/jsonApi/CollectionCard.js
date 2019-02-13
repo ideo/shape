@@ -47,7 +47,7 @@ class CollectionCard extends BaseRecord {
   }
 
   get isTextItem() {
-    return this.record.type === ITEM_TYPES.TEXT
+    return this.record && this.record.type === ITEM_TYPES.TEXT
   }
 
   get isPinned() {
@@ -221,6 +221,18 @@ class CollectionCard extends BaseRecord {
     return this.apiStore
       .findAll('collection_cards')
       .filter(card => selectedCardIds.indexOf(card.id) > -1)
+  }
+
+  get isSelected() {
+    return uiStore.selectedCardIds.indexOf(this.id) > -1
+  }
+
+  get isBeingMoved() {
+    return uiStore.movingCardIds.indexOf(this.id) > -1
+  }
+
+  get isBeingMultiMoved() {
+    return uiStore.multiMoveCardIds.indexOf(this.id) > -1
   }
 
   async API_archiveSelf() {

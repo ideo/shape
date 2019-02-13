@@ -1,7 +1,7 @@
 /* global When */
 import _ from 'lodash'
 
-const FLIPMOVE_DELAY = 350
+const FLIPMOVE_DELAY = 600
 
 // ----------------------
 // Creating content (BCT)
@@ -74,7 +74,7 @@ When('I add an open response question', () => {
     .click()
   cy.wait('@apiCreateCollectionCard')
   // have to wait for the flipmove fade-in
-  cy.wait(FLIPMOVE_DELAY)
+  cy.wait(FLIPMOVE_DELAY + 3000)
   cy.locateDataOrClass('.QuestionSelectHolder')
     .eq(3)
     .find('.select')

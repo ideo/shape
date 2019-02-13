@@ -36,17 +36,17 @@ module Breadcrumb
       end
     end
 
-    # Checks if user can view this breadcrumb item,
-    # by checking if they have view rights on anything within the breadcrumb chain
-    def can_view_item?(breadcrumb_item)
-      viewable.include?(breadcrumb_item)
-    end
-
-    # Checks if user can edit this breadcrumb item,
-    # by checking if they have edit rights on anything within the breadcrumb chain
-    def can_edit_item?(breadcrumb_item)
-      editable.include?(breadcrumb_item)
-    end
+    # # Checks if user can view this breadcrumb item,
+    # # by checking if they have view rights on anything within the breadcrumb chain
+    # def can_view_item?(breadcrumb_item)
+    #   viewable.include?(breadcrumb_item)
+    # end
+    #
+    # # Checks if user can edit this breadcrumb item,
+    # # by checking if they have edit rights on anything within the breadcrumb chain
+    # def can_edit_item?(breadcrumb_item)
+    #   editable.include?(breadcrumb_item)
+    # end
 
     private
 
@@ -68,8 +68,13 @@ module Breadcrumb
 
     # API expects downcase, pluralized classname (e.g. 'collections')
     def breadcrumb_item_for_api(object)
-      klass = object.class.base_class.name.downcase.pluralize
-      [klass, object.id, object.name]
+      type = object.class.base_class.name.downcase.pluralize
+      {
+        type: type,
+        id: object.id,
+        name: object.name,
+        can_edit: object == @object ? object.can_edit?(@user) : editable.include?(object.id),
+      }
     end
 
     # we directly look up has_role_by_identifier for the breadcrumb, e.g. [5] becomes "Collection_5"

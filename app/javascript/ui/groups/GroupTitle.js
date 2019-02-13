@@ -56,19 +56,24 @@ class GroupTitle extends React.Component {
     this.editing = !this.editing
   }
 
+  @action
   updateGroupName = ev => {
     const { group } = this.props
     group.name = ev.target.value
   }
 
+  @action
   updateGroupHandle = ev => {
     const { group } = this.props
     group.handle = ev.target.value
   }
 
+  @action
   updateGroupAvatar(fileData) {
     const { group } = this.props
-    group.filestack_file_url = fileData.url
+    group.filestack_file_url = FilestackUpload.imageUrl({
+      handle: fileData.handle,
+    })
     group.assign('filestack_file_attributes', fileData)
   }
 

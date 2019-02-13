@@ -8,6 +8,7 @@ module HasFilestackFile
     accepts_nested_attributes_for :filestack_file
 
     delegate :url, to: :filestack_file, prefix: true, allow_nil: true
+    delegate :handle, to: :filestack_file, prefix: true, allow_nil: true
   end
 
   class_methods do
@@ -40,5 +41,9 @@ module HasFilestackFile
     return object if filestack_file.blank?
     object.filestack_file = filestack_file.duplicate!
     object
+  end
+
+  def filestack_file_signed_url
+    self&.filestack_file&.signed_url
   end
 end

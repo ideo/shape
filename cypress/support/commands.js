@@ -84,7 +84,7 @@ Cypress.Commands.add('resizeCard', (pos, size) => {
   cy.window().then(win => {
     const collection = win.uiStore.viewingCollection
     const f = pos === 'last' ? _.last : _.first
-    const card = f(collection.collection_cards)
+    const card = f(collection.sortedCards)
     collection.API_updateCards({
       card,
       updates: { width, height },
@@ -98,7 +98,8 @@ Cypress.Commands.add('resizeCard', (pos, size) => {
 Cypress.Commands.add('reorderFirstTwoCards', () => {
   cy.window().then(win => {
     const collection = win.uiStore.viewingCollection
-    const card = _.first(collection.collection_cards)
+    collection._reorderCards()
+    const card = _.first(collection.sortedCards)
     collection.API_updateCards({
       card,
       updates: { order: 1.5 },

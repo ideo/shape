@@ -45,7 +45,7 @@ describe('MoveModal', () => {
           cardAction: '',
         })
         expect(message).toEqual(
-          "You don't have permission to move items to this collection"
+          'You only have view access to this collection. Would you like to keep moving the cards?'
         )
       })
     })
@@ -124,7 +124,7 @@ describe('MoveModal', () => {
       })
 
       it('should show a warning', () => {
-        expect(uiStore.alert).toHaveBeenCalled()
+        expect(uiStore.confirm).toHaveBeenCalled()
       })
     })
 

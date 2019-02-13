@@ -104,8 +104,8 @@ RSpec.describe Breadcrumb::ForUser, type: :service do
 
     it 'should have pluralize, underscored items' do
       breadcrumb = Breadcrumb::ForUser.new(item, user).viewable_to_api
-      expect(breadcrumb.first[0]).to eq('collections')
-      expect(breadcrumb.last[0]).to eq('items')
+      expect(breadcrumb.first[:type]).to eq('collections')
+      expect(breadcrumb.last[:type]).to eq('items')
     end
   end
 end
