@@ -42,6 +42,7 @@ const bounceAnim = keyframes`
 const InnerCardWrapper = styled.div`
   width: 100%;
   height: 100%;
+  width: 100%;
   ${props =>
     props.animatedBounce &&
     `
@@ -85,6 +86,7 @@ class MovableGridCard extends React.PureComponent {
   }
 
   handleStart = (e, data) => {
+    e.preventDefault()
     this.scrolling = false
     // initialOffset tracks the coordinates *within* the card where you clicked,
     // e.g. bottom left corner of the card itself
@@ -127,6 +129,11 @@ class MovableGridCard extends React.PureComponent {
 
   handleDrag = (e, data, dX, dY) => {
     const { position } = this.props
+    // Global dragging should use screen coordinates
+    // TODO this could also be a HOC that publishes to the UI store
+    const { pageX, pageY } = e
+    uiStore.drag({ x: pageX, y: pageY })
+
     // x, y represent the current drag position
     const { x, y } = data
 
@@ -163,10 +170,10 @@ class MovableGridCard extends React.PureComponent {
     })
 
     if (!this.state.dragging) {
-      uiStore.resetSelectionAndBCT()
+      uiStore.closeBlankContentTool()
       // close the MoveMenu to prevent weird behaviors
-      uiStore.closeMoveMenu()
-      uiStore.startDragging()
+      uiStore.closeMoveMenu({ deselect: false })
+      uiStore.startDragging(this.props.card.id)
       this.setState({
         dragging: true,
         moveComplete: false,
@@ -358,6 +365,7 @@ class MovableGridCard extends React.PureComponent {
       isUserCollection,
       isSharedCollection,
       lastPinnedCard,
+      hidden,
       hoveringOverLeft,
       hoveringOverRight,
       holdingOver,
@@ -424,6 +432,9 @@ class MovableGridCard extends React.PureComponent {
       lastPinnedCard,
     }
 
+    const draggingMultiple =
+      cardProps.dragging && uiStore.multiMoveCardIds.length > 1
+
     let zIndex = 0
     if (!moveComplete) zIndex = v.zIndex.cardDragging
     if (uiStore.cardMenuOpen.id === card.id) {
@@ -431,8 +442,14 @@ class MovableGridCard extends React.PureComponent {
     }
     let transform = null
     let transition = dragging || resizing ? 'none' : cardCSSTransition
+    // TODO this should actually check it's a breadcrumb
+    const draggedOverBreadcrumb = !!uiStore.activeDragTarget
     if (dragging) {
       transform = `translate(${xAdjust}px, ${yAdjust}px) rotate(3deg)`
+      if (draggedOverBreadcrumb) {
+        transform = 'scaleX(0.75) scaleY(0.75) translate(0px, 180px)'
+        transition = cardHoverTransition
+      }
     } else if (hoveringOverLeft) {
       zIndex = v.zIndex.cardHovering
       transform = 'translate(32px, -32px)'
@@ -450,6 +467,9 @@ class MovableGridCard extends React.PureComponent {
         zIndex={zIndex}
         onClick={this.handleWrapperClick}
         innerRef={c => (this.gridCardRef = c)}
+        style={{
+          display: !dragging && hidden ? 'none' : 'block',
+        }}
       >
         <Rnd
           ref={c => {
@@ -513,7 +533,11 @@ class MovableGridCard extends React.PureComponent {
               transition,
             }}
           >
-            <GridCard {...cardProps} holdingOver={hoveringOverRight} />
+            <GridCard
+              {...cardProps}
+              draggingMultiple={draggingMultiple}
+              holdingOver={hoveringOverRight}
+            />
           </InnerCardWrapper>
         </Rnd>
       </StyledCardWrapper>
@@ -539,10 +563,12 @@ MovableGridCard.propTypes = {
   routeTo: PropTypes.func.isRequired,
   menuOpen: PropTypes.bool.isRequired,
   lastPinnedCard: PropTypes.bool,
+  hidden: PropTypes.bool,
 }
 
 MovableGridCard.defaultProps = {
   lastPinnedCard: false,
+  hidden: false,
 }
 
 export default MovableGridCard

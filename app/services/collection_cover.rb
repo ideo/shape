@@ -18,7 +18,10 @@ class CollectionCover < SimpleService
     media = media_item(cover_media_item_card)
     text = media_item(first_text_item_card)
     {
+      # NOTE: image_url should only be used on the frontend for video items, e.g. a youtube image url
       image_url: media[:content],
+      # image items use handle so that they can generate a secure filestack URL
+      image_handle: media[:handle],
       text: text[:content],
       # these next attributes are just for knowing when to re-generate
       card_ids: [text[:card_id], media[:card_id]].compact,
@@ -55,6 +58,8 @@ class CollectionCover < SimpleService
       card_order: card.order,
       item_id: card.item.id,
       content: card.item.type == 'Item::TextItem' ? cover_text(card.item) : card.item.image_url,
+      # this will just return nil e.g. for text items
+      handle: card.item.filestack_file_handle,
     }
   end
 
