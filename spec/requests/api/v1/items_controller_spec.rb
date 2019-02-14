@@ -3,25 +3,21 @@ require 'rails_helper'
 describe Api::V1::ItemsController, type: :request, json: true, auth: true do
   let(:user) { @user }
 
-  describe 'GET #index' do
+  describe 'GET #index', api_token: true do
     let(:path) { '/api/v1/items' }
 
+    # these index actions are essentially testing Collection::FilteredIndexLoader
     it 'returns a 422 unless filter param is present' do
       get(path)
       expect(response.status).to eq(422)
     end
 
-    it 'returns a 422 unless api_token is present' do
-      get(path, params: { filter: { external_id: '99' } })
-      expect(response.status).to eq(422)
-    end
-
-    it 'returns a 200 if filter param and api_token are present', api_token: true do
+    it 'returns a 200 if filter param and api_token are present' do
       get(path, params: { filter: { external_id: '99' } })
       expect(response.status).to eq(200)
     end
 
-    context 'with api token and external_id', auth: false, api_token: true do
+    context 'with api token and external_id', auth: false do
       let(:item) { create(:text_item) }
       let!(:external_record) do
         create(:external_record, external_id: '99', externalizable: item, application: @api_token.application)

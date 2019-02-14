@@ -4,11 +4,11 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
   let(:user) { @user }
 
   describe 'GET #index' do
-    let(:path) { '/api/v1/groups' }
-
     context 'with logged in user', create_org: true do
+      let(:organization) { user.current_organization }
+      let(:path) { "/api/v1/organizations/#{organization.id}/groups" }
       let!(:groups) do
-        create_list(:group, 2, organization: user.current_organization, add_members: [user])
+        create_list(:group, 2, organization: organization, add_members: [user])
       end
       let!(:other_org) { create(:organization, member: user) }
       let!(:other_group) { create(:group, organization: other_org) }
@@ -25,6 +25,7 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
     end
 
     context 'with api token and external_id', auth: false, api_token: true do
+      let(:path) { '/api/v1/groups' }
       let(:group) { create(:group) }
       let!(:external_record) do
         create(:external_record, external_id: '99', externalizable: group, application: @api_token.application)
@@ -188,12 +189,6 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
         it 'creates the group in the passed in organization' do
           post(path, params: params)
           expect(Group.find(json['data']['id']).organization_id).to eq organization.id
-        end
-
-        it 'calls switch_to_organization on the user' do
-          expect(user.current_organization).not_to eq organization
-          post(path, params: params)
-          expect(user.reload.current_organization).to eq organization
         end
       end
     end

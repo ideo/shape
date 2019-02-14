@@ -70,6 +70,10 @@ class Api::V1::GroupsController < Api::V1::BaseController
   end
 
   def load_user_groups
+    unless current_organization.present?
+      @groups = []
+      return
+    end
     @groups = current_user.groups.where(organization_id: current_organization.id).order(name: :asc)
   end
 

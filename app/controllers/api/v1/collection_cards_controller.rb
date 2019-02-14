@@ -121,7 +121,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
              meta: { moving_cards: mover.moving_cards.pluck(:id).map(&:to_s) },
              expose: { current_record: @to_collection }
     else
-      render json: { errors: mover.errors }, status: :bad_request
+      render json: { errors: mover.errors }, status: :unprocessable_entity
     end
   end
 
@@ -241,7 +241,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       end
     end
     if @errors.present?
-      render json: { errors: @errors }, status: :bad_request
+      render json: { errors: @errors }, status: :unprocessable_entity
       return
     end
     true
