@@ -27,6 +27,9 @@ describe('DataItemCover', () => {
         d_timeframe: 'ever',
       },
       report_type: 'report_type_collections_and_items',
+      isReportTypeCollectionsItems: true,
+      isReportTypeNetworkAppMetric: false,
+      isReportTypeRecord: false,
       // simulate model helper methods
       measure: 'participants',
       measureTooltip: 'participants',
@@ -59,6 +62,7 @@ describe('DataItemCover', () => {
   describe('with an ever timeframe', () => {
     beforeEach(() => {
       props.item.timeframe = 'ever'
+
       wrapper.setProps(props)
     })
 
@@ -82,7 +86,7 @@ describe('DataItemCover', () => {
     })
 
     it('renders the within text explaining the data', () => {
-      expect(wrapper.find('.withinText').text()).toContain('within the')
+      expect(wrapper.find('.titleAndControls').text()).toContain('within the')
     })
 
     describe('when editing', () => {
@@ -208,6 +212,36 @@ describe('DataItemCover', () => {
         wrapper.instance().onSelectTarget({ custom: 1 })
         expect(apiStore.fetch).toHaveBeenCalledWith('collections', 1)
       })
+    })
+  })
+
+  describe('with a record report type', () => {
+    beforeEach(() => {
+      props.item.report_type = 'report_type_report'
+      props.item.name = 'My Static Data'
+      props.item.isReportTypeCollectionsItems = false
+      props.item.isReportTypeRecord = true
+      props.item.data = {
+        values: [
+          { amount: 24, date: '2018-09-10' },
+          { amount: 27, date: '2018-09-11' },
+        ],
+      }
+      render()
+    })
+
+    it('should render name', () => {
+      expect(
+        wrapper
+          .find('StyledDisplayText')
+          .children()
+          .first()
+          .text()
+      ).toEqual('My Static Data')
+    })
+
+    it('should not show editing controls', () => {
+      expect(wrapper.find('.editableMetric').exists()).toBe(false)
     })
   })
 })
