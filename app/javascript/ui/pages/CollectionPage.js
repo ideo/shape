@@ -308,6 +308,19 @@ class CollectionPage extends React.Component {
     </div>
   )
 
+  transparentLoader = () => (
+    <div
+      style={{
+        marginTop: v.headerHeight,
+        position: 'fixed',
+        top: 0,
+        left: 'calc(50% - 50px)',
+      }}
+    >
+      <Loader />
+    </div>
+  )
+
   render() {
     const { collection, isHomepage, uiStore } = this.props
     if (!collection) {
@@ -321,6 +334,7 @@ class CollectionPage extends React.Component {
       collection.meta.snapshot.can_edit === undefined ||
       (!this.cardsFetched && collection.collection_cards.length === 0) ||
       uiStore.isLoading
+    const isTransparentLoading = !!uiStore.movingIntoCollection
 
     const {
       blankContentToolState,
@@ -381,6 +395,7 @@ class CollectionPage extends React.Component {
           </PageContainer>
         )}
         {isLoading && this.loader()}
+        {!isLoading && isTransparentLoading && this.transparentLoader()}
       </Fragment>
     )
   }
