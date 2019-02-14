@@ -7,10 +7,6 @@ class SerializableSimpleCollection < BaseJsonSerializer
     @object.cached_cover || {}
   end
 
-  attribute :class_type do
-    @object.type || @object.class.name
-  end
-
   attribute :breadcrumb, if: -> { @force_breadcrumbs } do
     Breadcrumb::ForUser.new(
       @object,

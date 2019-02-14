@@ -217,9 +217,9 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
         )
       end
 
-      it 'returns a 400 with organization errors' do
+      it 'returns a 422 with organization errors' do
         post(path, params: params)
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
         expect(json['errors'].first['title']).to eq 'Invalid name'
       end
     end

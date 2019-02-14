@@ -6,7 +6,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :load_and_authorize_collection_update, only: %i[update]
   before_action :load_collection_with_roles, only: %i[show update]
 
-  before_action :require_and_apply_filters, only: %i[index]
+  before_action :load_and_filter_index, only: %i[index]
   def index
     render jsonapi: @collections, include: params[:include]
   end
@@ -131,7 +131,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     if @parent_collection.inside_a_master_template?
       # we don't allow creating instances inside of master templates --
       # can get too convoluted to handle nested "trickling down" of template updates
-      head(400)
+      head(:unprocessable_entity)
       return
     end
     # we are creating a template in this collection so authorize edit_content
@@ -166,7 +166,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     @collection = Collection.find(params[:id])
     # you can only destroy a submission box that hasn't been set up yet
     unless @collection.destroyable?
-      head(401)
+      head(:unauthorized)
     end
     authorize! :manage, @collection
   end
@@ -220,9 +220,5 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def broadcast_parent_collection_updates
     CollectionUpdateBroadcaster.call(@parent_collection, current_user)
-  end
-
-  def load_and_filter_collections
-    load_and_filter_index(:collections)
   end
 end

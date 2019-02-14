@@ -204,9 +204,9 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
 
     context 'trying to create inside a template' do
       let(:to_collection) { create(:collection, master_template: true, organization: organization) }
-      it 'returns a 400' do
+      it 'returns a 422' do
         post(path, params: params)
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
     end
   end

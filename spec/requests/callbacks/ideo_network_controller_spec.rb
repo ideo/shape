@@ -25,7 +25,7 @@ describe 'Ideo Profile API Requests' do
           params: { event: 'invoice.something' }.to_json,
           headers: valid_headers,
         )
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
     end
 
@@ -41,7 +41,7 @@ describe 'Ideo Profile API Requests' do
             params: { event: 'invoice.payment_failed', included: [application_organization] }.to_json,
             headers: valid_headers,
           )
-          expect(response.status).to eq(400)
+          expect(response.status).to eq(422)
         end
 
         it 'can not find application organization, responds with bad request' do
@@ -50,7 +50,7 @@ describe 'Ideo Profile API Requests' do
             params: { event: 'invoice.payment_failed', included: [payment_method] }.to_json,
             headers: valid_headers,
           )
-          expect(response.status).to eq(400)
+          expect(response.status).to eq(422)
         end
       end
 
@@ -100,7 +100,7 @@ describe 'Ideo Profile API Requests' do
           params: { event: 'payment_method.something' }.to_json,
           headers: valid_headers,
         )
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
     end
 
@@ -111,7 +111,7 @@ describe 'Ideo Profile API Requests' do
           params: { event: 'payment_method.created' }.to_json,
           headers: valid_headers,
         )
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
 
       it 'responds with bad request if no application organization is found' do
@@ -120,7 +120,7 @@ describe 'Ideo Profile API Requests' do
           params: { data: { relationships: { application_organizations: { relationships: { application_organization: { data: { id: 123 } } } } } }, event: 'payment_method.created' }.to_json,
           headers: valid_headers,
         )
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
 
       it 'responds with bad request if unable to find organization' do
@@ -156,7 +156,7 @@ describe 'Ideo Profile API Requests' do
             params: { event: 'payment_method.expiring', included: [application_organization] }.to_json,
             headers: valid_headers,
           )
-          expect(response.status).to eq(400)
+          expect(response.status).to eq(422)
         end
       end
 
@@ -167,7 +167,7 @@ describe 'Ideo Profile API Requests' do
             params: { event: 'payment_method.expiring', data: { attributes: { id: payment_method_id } }, included: [] }.to_json,
             headers: valid_headers,
           )
-          expect(response.status).to eq(400)
+          expect(response.status).to eq(422)
         end
       end
 
@@ -297,13 +297,13 @@ describe 'Ideo Profile API Requests' do
     end
 
     context 'unsupported event' do
-      it 'returns a 400' do
+      it 'returns a 422' do
         post(
           '/callbacks/ideo_network/users',
           params: { uid: uid, event: :transformed, data: { attributes: user_data } }.to_json,
           headers: valid_headers,
         )
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
     end
 

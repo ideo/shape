@@ -5,13 +5,9 @@ class Api::V1::GroupsController < Api::V1::BaseController
 
   # All the current user's groups in this org
   # /organizations/:id/groups
-  before_action :apply_filters, only: %i[index]
+  before_action :load_user_groups, only: %i[index]
+  before_action :load_and_filter_index, only: %i[index]
   def index
-    # may have already prepopulated @groups in `apply_filters`
-    if @groups.nil?
-      organization_id = @organization.try(:id) || current_organization.id
-      @groups = current_user.groups.where(organization_id: organization_id).order(name: :asc)
-    end
     render jsonapi: @groups
   end
 
@@ -19,7 +15,7 @@ class Api::V1::GroupsController < Api::V1::BaseController
     render jsonapi: @group, include: [roles: %i[users groups]]
   end
 
-  before_action :check_group_organization, only: %i[create]
+  before_action :check_group_organization_param, only: %i[create]
   before_action :authorize_current_organization, only: %i[create]
   def create
     external_id = params[:group].delete(:external_id)
@@ -63,17 +59,18 @@ class Api::V1::GroupsController < Api::V1::BaseController
 
   private
 
-  def check_group_organization
+  def check_group_organization_param
     organization_id = params[:group].delete(:organization_id)
     return unless organization_id.present?
-    organization = Organization.find(organization_id)
-    authorize! :read, organization
-    current_user.switch_to_organization(organization)
-    @current_organization = organization
+    @current_organization = Organization.find(organization_id)
   end
 
   def authorize_current_organization
     authorize! :read, current_organization
+  end
+
+  def load_user_groups
+    @groups = current_user.groups.where(organization_id: current_organization.id).order(name: :asc)
   end
 
   def group_params

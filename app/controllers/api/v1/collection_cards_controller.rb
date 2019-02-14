@@ -9,7 +9,6 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :check_cache, only: %i[index]
   before_action :load_collection_cards, only: %i[index]
   def index
-    params[:page] ||= 1
     params[:card_order] ||= @collection.default_card_order
     render jsonapi: @collection_cards,
            include: [
@@ -158,7 +157,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def check_cache
     fresh_when(
       last_modified: @collection.updated_at.utc,
-      etag: "#{@collection.cache_key(params[:card_order])}/cards/#{params[:page]}",
+      etag: "#{@collection.cache_key(params[:card_order])}/cards/#{@page}",
     )
   end
 
@@ -175,7 +174,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     @collection_cards = @collection.collection_cards_viewable_by(
       current_user,
       card_order: params[:card_order],
-      page: params[:page] || 1,
+      page: @page,
       per_page: per_page,
       hidden: params[:hidden].present?,
     )

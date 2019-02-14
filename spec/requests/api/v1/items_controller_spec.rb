@@ -6,14 +6,14 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
   describe 'GET #index' do
     let(:path) { '/api/v1/items' }
 
-    it 'returns a 400 unless filter param is present' do
+    it 'returns a 422 unless filter param is present' do
       get(path)
-      expect(response.status).to eq(400)
+      expect(response.status).to eq(422)
     end
 
-    it 'returns a 400 unless api_token is present' do
+    it 'returns a 422 unless api_token is present' do
       get(path, params: { filter: { external_id: '99' } })
-      expect(response.status).to eq(400)
+      expect(response.status).to eq(422)
     end
 
     it 'returns a 200 if filter param and api_token are present', api_token: true do

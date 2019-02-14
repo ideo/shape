@@ -3,7 +3,7 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
   load_and_authorize_resource except: %i[create]
 
   before_action :load_user_organizations, only: %i[index]
-  before_action :apply_filters, only: %i[index]
+  before_action :load_and_filter_index, only: %i[index]
   def index
     render jsonapi: @organizations, expose: { index: true }
   end

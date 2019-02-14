@@ -16,10 +16,6 @@ class SerializableItem < BaseJsonSerializer
   has_one :parent
   belongs_to :data_source
 
-  attribute :class_type do
-    @object.type || @object.class.name
-  end
-
   attribute :tag_list do
     @object.cached_tag_list || []
   end

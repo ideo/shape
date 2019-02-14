@@ -252,9 +252,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
 
     context 'with errors' do
-      it 'returns a 400 bad request' do
+      it 'returns a 422 bad request' do
         post(path, params: bad_params)
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
     end
 
@@ -646,9 +646,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         to_collection.recalculate_breadcrumb!
       end
 
-      it 'returns a 400' do
+      it 'returns a 422' do
         post(path, params: params)
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
     end
 

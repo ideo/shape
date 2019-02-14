@@ -39,10 +39,6 @@ class SerializableCollection < BaseJsonSerializer
     @object.cached_test_scores || {}
   end
 
-  attribute :class_type do
-    @object.type || @object.class.name
-  end
-
   attribute :breadcrumb, if: -> { @current_record.nil? || @object == @current_record } do
     Breadcrumb::ForUser.new(
       @object,
