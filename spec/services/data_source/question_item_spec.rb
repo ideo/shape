@@ -56,11 +56,6 @@ RSpec.describe DataSource::QuestionItem, type: :service do
       ])
     end
 
-    pending 'returns title and subtitle' do
-      expect(subject[:title]).to eq('Question Title')
-      expect(subject[:subtitle]).to eq('Question Subtitle')
-    end
-
     it 'returns columns of 1 to 4' do
       expect(subject[:columns]).to eq([
         { title: 1 },

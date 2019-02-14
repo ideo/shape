@@ -7,7 +7,7 @@ RSpec.describe DataSource::External, type: :service do
 
   subject {
     DataSource::External.call(
-      chart_item: chart_item,
+      item: chart_item,
     )
   }
 
