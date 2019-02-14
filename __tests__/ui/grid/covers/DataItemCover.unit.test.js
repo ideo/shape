@@ -26,6 +26,7 @@ describe('DataItemCover', () => {
         d_measure: 'participants',
         d_timeframe: 'ever',
       },
+      report_type: 'report_type_collections_and_items',
       // simulate model helper methods
       measure: 'participants',
       measureTooltip: 'participants',

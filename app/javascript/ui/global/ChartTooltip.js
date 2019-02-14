@@ -67,6 +67,20 @@ class ChartTooltip extends React.Component {
     return 0
   }
 
+  get fontSizes() {
+    const { cardArea } = this.props
+    if (cardArea === 1) {
+      return {
+        tooltip: '20px',
+        label: '20px',
+      }
+    }
+    return {
+      tooltip: '12px',
+      label: '10px',
+    }
+  }
+
   renderAmountMark(datum, totalData) {
     if (this.isFirstMaxPoint) return true
     if (this.isFirstMinPoint) return true
@@ -93,7 +107,7 @@ class ChartTooltip extends React.Component {
           style={{
             fill: 'white',
             fontFamily: v.fonts.sans,
-            fontSize: '12px',
+            fontSize: this.fontSizes.tooltip,
             fontWeight: 'normal',
           }}
           text={text}
@@ -113,7 +127,7 @@ class ChartTooltip extends React.Component {
               {...this.props}
               dx={dx}
               dy={-5}
-              style={{ fontSize: '10px', fontWeight: 'normal' }}
+              style={{ fontSize: this.fontSizes.label, fontWeight: 'normal' }}
               text={`${datum.amount}`}
               orientation="top"
               pointerLength={0}
@@ -138,10 +152,12 @@ ChartTooltip.propTypes = {
   textRenderer: PropTypes.func.isRequired,
   maxAmount: PropTypes.number,
   minAmount: PropTypes.number,
+  cardArea: PropTypes.number,
 }
 ChartTooltip.defaultProps = {
   maxAmount: 0,
   minAmount: 0,
+  cardArea: 1,
 }
 
 export default ChartTooltip
