@@ -215,7 +215,18 @@ export const QuillStyleWrapper = styled.div`
       margin-bottom: 0.75rem;
     }
 
+    h3 {
+      font-size: 0.8125rem;
+      letter-spacing: 1px;
+      margin-bottom: 0.8125rem;
+      text-transform: none;
+    }
+
     p {
+      font-family: ${v.fonts.sans};
+      font-size: 1rem;
+      letter-spacing: 0;
+      line-height: 1.5rem;
       margin-bottom: 0.625rem;
     }
 
