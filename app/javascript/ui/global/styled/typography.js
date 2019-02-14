@@ -219,7 +219,7 @@ export const QuillStyleWrapper = styled.div`
       font-size: 0.8125rem;
       letter-spacing: 1px;
       margin-bottom: 0.8125rem;
-      text-transform: none;
+      text-transform: uppercase;
     }
 
     p {
