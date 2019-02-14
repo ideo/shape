@@ -53,17 +53,17 @@ module Breadcrumb
     # Iterates through breacrumb items and yields them to a block
     # The first item to yield true then triggers returning all subsequent items
     def select_breadcrumb_items_cascading
-      can = false
+      can = true
 
-      @object.breadcrumb.select do |breadcrumb_item|
+      @object.breadcrumb.reverse.select do |breadcrumb_item|
         # If we haven't reached an item they can view,
         # check to see if they can see it
-        if can
-          true
+        if !can
+          false
         else
           can = yield(breadcrumb_item)
         end
-      end
+      end.reverse
     end
 
     # API expects downcase, pluralized classname (e.g. 'collections')
