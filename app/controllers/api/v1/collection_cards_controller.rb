@@ -289,6 +289,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :image_contain,
       :is_cover,
       :filter,
+      :replaceable,
     )
   end
 

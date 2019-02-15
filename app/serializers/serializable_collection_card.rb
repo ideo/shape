@@ -16,6 +16,10 @@ class SerializableCollectionCard < BaseJsonSerializer
     @current_ability ? @current_ability.can?(:edit_content, (@parent || @object.try(:parent))) : false
   end
 
+  attribute :is_master_template_card do
+    @object.master_template_card?
+  end
+
   belongs_to :item
   belongs_to :collection
   belongs_to :parent do

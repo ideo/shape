@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
+import styled from 'styled-components'
 
 import ChartItemCover from '~/ui/grid/covers/ChartItemCover'
 import ContainImage from '~/ui/grid/ContainImage'
@@ -21,6 +23,7 @@ import ActionMenu from '~/ui/grid/ActionMenu'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import EditButton from '~/ui/reporting/EditButton'
+import { Checkbox, FormButton } from '~/ui/global/styled/forms'
 import FullScreenIcon from '~/ui/icons/FullScreenIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import HiddenIconButton from '~/ui/icons/HiddenIconButton'
@@ -39,6 +42,26 @@ import {
   StyledGridCardInner,
   StyledTopRightActions,
 } from './shared'
+
+const CenteredContainer = styled.div`
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 6px;
+  left: calc(50% - 90px);
+  padding: 20px 15px 0;
+  position: absolute;
+  text-align: center;
+  top: calc(50% - 50px);
+  width: 180px;
+  z-index: ${v.zIndex.gridCardTop};
+`
+
+const StyledFormControlLabel = styled(FormControlLabel)`
+  .form-control {
+    font-size: 1rem;
+    font-weight: 300;
+    margin-right: 20px;
+  }
+`
 
 @observer
 class GridCard extends React.Component {
@@ -236,6 +259,34 @@ class GridCard extends React.Component {
     )
   }
 
+  renderReplaceControl() {
+    const { card } = this.props
+    if (!card.is_master_template_card) return null
+    return (
+      <CenteredContainer>
+        <FormButton
+          color={card.replaceable ? v.colors.alert : v.colors.transparent}
+          disabled={!card.replaceable}
+        >
+          Replace
+        </FormButton>
+        <StyledFormControlLabel
+          classes={{ label: 'form-control' }}
+          style={{ textAlign: 'center' }}
+          control={
+            <Checkbox
+              classes={{ root: 'checkbox' }}
+              color={v.colors.black}
+              checked={card.replaceable}
+              onChange={this.handleReplaceableToggle}
+            />
+          }
+          label="Show"
+        />
+      </CenteredContainer>
+    )
+  }
+
   openMenu = () => {
     const { card } = this.props
     if (this.props.menuOpen) {
@@ -313,6 +364,13 @@ class GridCard extends React.Component {
     return !!record.thumbnail_url
   }
 
+  handleReplaceableToggle = e => {
+    e.preventDefault()
+    const { card } = this.props
+    card.replaceable = !card.replaceable
+    card.save()
+  }
+
   handleClick = e => {
     const { card, dragging, record } = this.props
     if (dragging) return
@@ -383,6 +441,7 @@ class GridCard extends React.Component {
           !card.isPinnedAndLocked && (
             <GridCardHotspot card={card} dragging={dragging} position="left" />
           )}
+        {record.isMedia && this.renderReplaceControl()}
         {!record.menuDisabled &&
           uiStore.textEditingItem !== record && (
             <StyledTopRightActions

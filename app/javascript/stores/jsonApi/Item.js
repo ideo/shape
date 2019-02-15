@@ -56,6 +56,10 @@ class Item extends SharedRecordMixin(BaseRecord) {
     )
   }
 
+  get isMedia() {
+    return this.isImage || this.isVideo
+  }
+
   get pdfCoverUrl() {
     return FilestackUpload.pdfCoverUrl(this.filestack_file.handle)
   }

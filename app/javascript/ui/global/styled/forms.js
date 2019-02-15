@@ -96,12 +96,12 @@ export const FormButton = styled.button`
   }
   ${props =>
     props.disabled &&
-    `background-color: white;
+    `background-color: transparent;
       border: 1px solid ${v.colors.commonMedium};
       color:  ${v.colors.commonMedium};
       cursor: initial;
       &:hover, &:focus {
-        background-color: white;
+        background-color: transparent;
       }
     `};
 `
@@ -286,6 +286,13 @@ Select.displayName = 'StyledSelect'
 
 /** @component */
 export const Checkbox = styled(MuiCheckbox)`
+  &.checkbox {
+    ${props =>
+      props.color &&
+      `
+      color: ${props.color};
+    `};
+  }
   &.checkbox--error {
     color: ${v.colors.alert};
   }
