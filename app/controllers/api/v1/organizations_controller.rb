@@ -5,7 +5,7 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
   before_action :load_user_organizations, only: %i[index]
   before_action :load_and_filter_index, only: %i[index]
   def index
-    render jsonapi: @organizations, expose: { index: true }
+    render jsonapi: @organizations, expose: { include_user_collection_ids: true }
   end
 
   # The logged-in user's current organization context

@@ -7,7 +7,7 @@ class SerializableOrganization < BaseJsonSerializer
   belongs_to :admin_group
   belongs_to :terms_text_item
 
-  attribute :current_user_collection_id, if: -> { @index } do
+  attribute :current_user_collection_id, if: -> { @include_user_collection_ids } do
     @current_user.current_user_collection(@object.id)&.id
   end
 

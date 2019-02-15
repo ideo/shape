@@ -7,10 +7,10 @@ module Controller
       @filter = params[:filter] || {}
       @page = page
       @errors = []
-      @results = []
     end
 
     def call
+      init_results
       return error_422 if required_filters_not_present
       apply_filters
       return error_422 if @errors.present?
@@ -19,6 +19,12 @@ module Controller
     end
 
     private
+
+    def init_results
+      # if the controller had already set something like "@organizations"
+      # that will still get returned if no filters are applied
+      @results = @controller.instance_variable_get("@#{controller_name}") || []
+    end
 
     def error_422
       @controller.head(:unprocessable_entity)
