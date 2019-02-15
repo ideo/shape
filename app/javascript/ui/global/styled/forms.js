@@ -97,8 +97,8 @@ export const FormButton = styled.button`
   ${props =>
     props.disabled &&
     `background-color: transparent;
-      border: 1px solid ${v.colors.commonMedium};
-      color:  ${v.colors.commonMedium};
+      border: 1px solid ${props.overrideOutlineColor || v.colors.commonMedium};
+      color:  ${props.overrideOutlineColor || v.colors.commonMedium};
       cursor: initial;
       &:hover, &:focus {
         background-color: transparent;

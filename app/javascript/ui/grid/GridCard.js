@@ -265,8 +265,9 @@ class GridCard extends React.Component {
     return (
       <CenteredContainer>
         <FormButton
-          color={card.replaceable ? v.colors.alert : v.colors.transparent}
+          color={v.colors.alert}
           disabled={!card.replaceable}
+          overrideOutlineColor="#88807D"
         >
           Replace
         </FormButton>
@@ -279,6 +280,7 @@ class GridCard extends React.Component {
               color={v.colors.black}
               checked={card.replaceable}
               onChange={this.handleReplaceableToggle}
+              value="yes"
             />
           }
           label="Show"
@@ -364,10 +366,9 @@ class GridCard extends React.Component {
     return !!record.thumbnail_url
   }
 
-  handleReplaceableToggle = e => {
-    e.preventDefault()
+  handleReplaceableToggle = ev => {
     const { card } = this.props
-    card.replaceable = !card.replaceable
+    card.replaceable = ev.target.checked
     card.save()
   }
 
