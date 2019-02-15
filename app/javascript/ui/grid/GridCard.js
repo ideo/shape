@@ -372,7 +372,7 @@ class GridCard extends React.Component {
         onContextMenu={this.openContextMenu}
         innerRef={c => (this.gridCardRef = c)}
         onMouseLeave={this.closeContextMenu}
-        selected={this.isSelected || this.props.holdingOver}
+        selected={this.isSelected || this.props.hoveringOver}
       >
         {canEditCollection &&
           (!card.isPinnedAndLocked || lastPinnedCard) && (
@@ -457,7 +457,7 @@ GridCard.propTypes = {
   isSharedCollection: PropTypes.bool,
   handleClick: PropTypes.func,
   dragging: PropTypes.bool,
-  holdingOver: PropTypes.bool,
+  hoveringOver: PropTypes.bool,
   menuOpen: PropTypes.bool,
   lastPinnedCard: PropTypes.bool,
   testCollectionCard: PropTypes.bool,
@@ -471,7 +471,7 @@ GridCard.defaultProps = {
   isSharedCollection: false,
   handleClick: () => null,
   dragging: false,
-  holdingOver: false,
+  hoveringOver: false,
   menuOpen: false,
   lastPinnedCard: false,
   testCollectionCard: false,
