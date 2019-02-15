@@ -5,6 +5,7 @@ class Item < ApplicationRecord
   include HasFilestackFile
   include RealtimeEditorsViewers
   include HasActivities
+  include Externalizable
 
   resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,

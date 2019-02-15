@@ -162,6 +162,18 @@ ActiveRecord::Schema.define(version: 20190213230015) do
     t.index ["comment_thread_id"], name: "index_comments_on_comment_thread_id"
   end
 
+  create_table "external_records", force: :cascade do |t|
+    t.string "external_id"
+    t.bigint "application_id"
+    t.string "externalizable_type"
+    t.bigint "externalizable_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["application_id"], name: "index_external_records_on_application_id"
+    t.index ["external_id", "application_id", "externalizable_type"], name: "index_uniq_external_id", unique: true
+    t.index ["externalizable_type", "externalizable_id"], name: "index_on_externalizable"
+  end
+
   create_table "filestack_files", force: :cascade do |t|
     t.string "url"
     t.string "handle"

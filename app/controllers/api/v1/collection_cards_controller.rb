@@ -9,7 +9,6 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :check_cache, only: %i[index]
   before_action :load_collection_cards, only: %i[index]
   def index
-    params[:page] ||= 1
     params[:card_order] ||= @collection.default_card_order
     render jsonapi: @collection_cards,
            include: [
@@ -28,10 +27,12 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def create
     card_params = collection_card_params
     type = card_params.delete(:type) || 'primary'
+    external_id = card_params.delete(:external_id)
     # CollectionCardBuilder type expects 'primary' or 'link'
     type = 'link' if type == 'CollectionCard::Link'
     builder = CollectionCardBuilder.new(params: card_params,
                                         type: type,
+                                        external_id: external_id,
                                         parent_collection: @collection,
                                         user: current_user)
 
@@ -120,7 +121,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
              meta: { moving_cards: mover.moving_cards.pluck(:id).map(&:to_s) },
              expose: { current_record: @to_collection }
     else
-      render json: { errors: mover.errors }, status: :bad_request
+      render json: { errors: mover.errors }, status: :unprocessable_entity
     end
   end
 
@@ -156,7 +157,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def check_cache
     fresh_when(
       last_modified: @collection.updated_at.utc,
-      etag: "#{@collection.cache_key(params[:card_order])}/cards/#{params[:page]}",
+      etag: "#{@collection.cache_key(params[:card_order])}/cards/#{@page}",
     )
   end
 
@@ -173,7 +174,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     @collection_cards = @collection.collection_cards_viewable_by(
       current_user,
       card_order: params[:card_order],
-      page: params[:page] || 1,
+      page: @page,
       per_page: per_page,
       hidden: params[:hidden].present?,
     )
@@ -240,7 +241,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       end
     end
     if @errors.present?
-      render json: { errors: @errors }, status: :bad_request
+      render json: { errors: @errors }, status: :unprocessable_entity
       return
     end
     true
@@ -312,6 +313,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :is_cover,
       :filter,
       :hidden,
+      :external_id,
       collection_attributes: %i[
         id
         type

@@ -1,7 +1,7 @@
 {
   "type": "object",
   "properties": {
-    "type": { "type": "string" },
+    "class_type": { "type": "string" },
     "name": { "type": ["string", "null"] },
     "content": { "type": ["string", "null"] },
     "text_data": { "type": "object" },
@@ -24,5 +24,5 @@
     "data_source_id": { "type": ["number", "null"] },
     "is_private": { "type": ["boolean"] }
   },
-  "required": ["type"]
+  "required": ["class_type"]
 }

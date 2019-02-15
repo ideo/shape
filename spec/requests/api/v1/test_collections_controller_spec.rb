@@ -21,7 +21,7 @@ describe Api::V1::TestCollectionsController, type: :request, json: true, auth: t
 
       it 'should not allow the launch action' do
         patch(path)
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
     end
 

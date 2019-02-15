@@ -97,6 +97,28 @@ RSpec.describe CollectionCardBuilder, type: :service do
           expect(builder.collection_card.pinned?).to be true
         end
       end
+
+      context 'with external_id', api_token: true do
+        let(:builder) do
+          CollectionCardBuilder.new(
+            params: params.merge(
+              collection_attributes: {
+                name: 'Cool Collection',
+              },
+            ),
+            parent_collection: parent,
+            user: @api_token.application.user,
+            external_id: '99',
+          )
+        end
+
+        it 'should create the external_record' do
+          expect {
+            builder.create
+          }.to change(ExternalRecord, :count).by(1)
+          expect(builder.collection_card.record.external_records.last.external_id).to eq '99'
+        end
+      end
     end
 
     context 'success creating card with item' do
