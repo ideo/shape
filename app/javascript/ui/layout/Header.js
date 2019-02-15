@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
@@ -37,10 +38,34 @@ const StyledAvatarAndDropdown = styled.div`
 `
 StyledAvatarAndDropdown.displayName = 'StyledAvatarAndDropdown'
 
-// TODO trying to fix alignment issues
-// const MaxWidthInnerContainer = styled.div`
-//   max-width: 1320px;
-// `
+export const BasicHeader = ({ orgMenu }) => (
+  <FixedHeader zIndex={v.zIndex.globalHeader}>
+    <MaxWidthContainer>
+      <Flex align="center" justify="space-between">
+        <Box>
+          <PlainLink to="/">
+            <Logo />
+          </PlainLink>
+        </Box>
+      </Flex>
+      {orgMenu && (
+        <OrganizationMenu
+          organization={{}}
+          userGroups={[]}
+          onClose={() => null}
+          open={orgMenu}
+          locked
+        />
+      )}
+    </MaxWidthContainer>
+  </FixedHeader>
+)
+BasicHeader.propTypes = {
+  orgMenu: PropTypes.bool,
+}
+BasicHeader.defaultProps = {
+  orgMenu: false,
+}
 
 @inject('apiStore', 'routingStore')
 @observer
@@ -137,19 +162,8 @@ class Header extends React.Component {
     const { apiStore, routingStore } = this.props
     const { currentUser } = apiStore
     if (!currentUser.current_organization) {
-      if (!currentUser.terms_accepted) return ''
       // user needs to set up their Org, will see the Org popup before proceeding
-      return (
-        <div>
-          <OrganizationMenu
-            organization={{}}
-            userGroups={[]}
-            onClose={() => null}
-            open={uiStore.organizationMenuOpen}
-            locked
-          />
-        </div>
-      )
+      return <BasicHeader orgMenu={uiStore.organizationMenuOpen} />
     }
     const { userDropdownOpen, orgDropdownOpen } = this.state
     const primaryGroup = currentUser.current_organization.primary_group

@@ -7,6 +7,7 @@ Rails.application.routes.draw do
 
   unauthenticated do
     root to: 'home#marketing'
+    get 'terms', to: 'home#marketing'
   end
 
   authenticated :user do
