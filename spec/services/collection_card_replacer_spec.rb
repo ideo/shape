@@ -35,6 +35,22 @@ RSpec.describe CollectionCardReplacer, type: :service do
       end
     end
 
+    context 'error when trying to replace non-replaceable card' do
+      let(:collection_card) { parent.collection_cards.first }
+      let(:item) { collection_card.item }
+
+      before do
+        collection_card.update(replaceable: false)
+        item.unanchor_and_inherit_roles_from_anchor!
+        user.add_role(Role::EDITOR, item)
+      end
+
+      it 'should return an error about requiring an item' do
+        expect(builder.replace).to be false
+        expect(builder.errors.full_messages).to eq ['Replaceable is false, cannot replace']
+      end
+    end
+
     context 'successfully replacing a card\'s item' do
       # will be a text card by default, even though this is technically not a replaceable type
       let(:collection_card) { parent.collection_cards.first }

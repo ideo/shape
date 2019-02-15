@@ -10,6 +10,7 @@
     "link": { "type": "boolean" },
     "can_move": { "type": "boolean" },
     "pinned": { "type": "boolean" },
+    "replaceable": { "type": "boolean" },
     "pinned_and_locked": { "type": "boolean" },
     "image_contain": { "type": "boolean" },
     "is_cover": { "type": "boolean" },

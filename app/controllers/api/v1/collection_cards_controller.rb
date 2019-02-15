@@ -312,6 +312,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :is_cover,
       :filter,
       :hidden,
+      :replaceable,
       collection_attributes: %i[
         id
         type
