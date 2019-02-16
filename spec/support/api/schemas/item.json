@@ -22,7 +22,8 @@
     "chart_data": { "type": ["object", "null"] },
     "data_source_type": { "type": ["string", "null"] },
     "data_source_id": { "type": ["number", "null"] },
-    "is_private": { "type": ["boolean"] }
+    "is_private": { "type": ["boolean"] },
+    "has_replaced_media": { "type": ["boolean"] }
   },
   "required": ["type"]
 }
