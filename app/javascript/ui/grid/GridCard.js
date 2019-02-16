@@ -262,7 +262,10 @@ class GridCard extends React.Component {
 
   renderReplaceControl() {
     const { card, canEditCollection } = this.props
+    if (!canEditCollection) return null
     if (!card.is_master_template_card && !card.isPinned) return null
+    if (!card.is_master_template_card && card.record.has_replaced_media)
+      return null
     return (
       <CenteredContainer removeBackground={card.is_master_template_card}>
         <FormButton

@@ -40,6 +40,10 @@ class SerializableItem < BaseJsonSerializer
     @object.filestack_file_handle
   end
 
+  attribute :has_replaced_media do
+    @object.replaced_media?
+  end
+
   belongs_to :filestack_file
 
   attribute :breadcrumb, if: -> { @object == @current_record || @force_breadcrumbs } do
