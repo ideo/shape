@@ -332,6 +332,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         :image,
         :archived,
         :question_type,
+        :report_type,
         text_data: {},
         filestack_file_attributes: [
           :url,

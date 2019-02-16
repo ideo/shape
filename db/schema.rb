@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190207083622) do
+ActiveRecord::Schema.define(version: 20190213230015) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -93,8 +93,8 @@ ActiveRecord::Schema.define(version: 20190207083622) do
     t.boolean "image_contain", default: false
     t.boolean "is_cover", default: false
     t.datetime "unarchived_at"
-    t.boolean "hidden", default: false
     t.integer "filter", default: 1
+    t.boolean "hidden", default: false
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
@@ -121,14 +121,14 @@ ActiveRecord::Schema.define(version: 20190207083622) do
     t.integer "submission_box_type"
     t.bigint "submission_box_id"
     t.integer "test_status"
-    t.integer "processing_status"
     t.integer "question_item_id"
     t.bigint "test_collection_id"
+    t.integer "processing_status"
     t.bigint "collection_to_test_id"
     t.datetime "unarchived_at"
     t.jsonb "cached_test_scores"
-    t.bigint "roles_anchor_collection_id"
     t.boolean "hide_submissions", default: false
+    t.bigint "roles_anchor_collection_id"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
@@ -252,6 +252,7 @@ ActiveRecord::Schema.define(version: 20190207083622) do
     t.datetime "unarchived_at"
     t.jsonb "data_settings"
     t.bigint "roles_anchor_collection_id"
+    t.integer "report_type"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
     t.index ["created_at"], name: "index_items_on_created_at"

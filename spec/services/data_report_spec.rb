@@ -1,11 +1,15 @@
 require 'rails_helper'
 
-RSpec.describe DataReport::Internal, type: :service do
+RSpec.describe DataReport::CollectionsAndItems, type: :service do
   let(:organization) { create(:organization_without_groups) }
   # parent needed for calculations that lookup org id
   let(:parent_collection) { create(:collection, organization: organization) }
-  let(:data_item) { create(:data_item, parent_collection: parent_collection) }
-  let(:report) { DataReport::Internal.new(data_item) }
+  let(:data_item) do
+    create(:data_item,
+           :report_type_collections_and_items,
+           parent_collection: parent_collection)
+  end
+  let(:report) { DataReport::CollectionsAndItems.new(data_item) }
 
   describe '#call' do
     context 'filtering by organization' do
@@ -28,7 +32,7 @@ RSpec.describe DataReport::Internal, type: :service do
         end
 
         context 'with return_records: true' do
-          let(:report) { DataReport::Internal.new(data_item, return_records: true) }
+          let(:report) { DataReport::CollectionsAndItems.new(data_item, return_records: true) }
 
           it 'should return the actor_ids instead of the count' do
             expect(report.call[:value].pluck(:actor_id)).to match_array(activities.pluck(:actor_id))

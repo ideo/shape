@@ -20,6 +20,7 @@ describe('DataItemCreator', () => {
       item_attributes: {
         data_settings: { d_measure: 'viewers', d_timeframe: 'ever' },
         type: ITEM_TYPES.DATA,
+        report_type: 'report_type_collections_and_items',
         name: 'Report',
       },
     })
