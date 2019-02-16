@@ -85,7 +85,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
     params.require(:item).permit(
       :type,
       :name,
-      :content,
+      :external_id,
       { text_data: {} },
       { data_settings: [
         :d_measure,
@@ -98,6 +98,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
       :tag_list,
       :thumbnail_url,
       filestack_file_attributes: Item.filestack_file_attributes_whitelist,
+      content: {},
     )
   end
 

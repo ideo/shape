@@ -325,7 +325,6 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         :id,
         :type,
         :name,
-        :content,
         :url,
         :thumbnail_url,
         :icon_url,
@@ -333,6 +332,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         :archived,
         :question_type,
         :report_type,
+        :external_id,
+        content: {},
         text_data: {},
         filestack_file_attributes: [
           :url,
