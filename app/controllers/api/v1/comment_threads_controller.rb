@@ -90,7 +90,7 @@ class Api::V1::CommentThreadsController < Api::V1::BaseController
                        .where(organization_id: current_user.current_organization_id)
                        .order(updated_at: :desc)
                        .includes(:record, comments: [:author])
-                       .page(params[:page])
+                       .page(@page)
                        .per(10)
   end
 end

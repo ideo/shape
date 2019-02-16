@@ -91,6 +91,10 @@ RSpec.configure do |config|
     log_in_as_user
   end
 
+  config.before(:each, api_token: true) do
+    log_in_with_api_token
+  end
+
   # `create_org` only makes sense within specs also tagged `auth`
   config.before(:each, create_org: true) do
     # @user from `log_in_as_user` above

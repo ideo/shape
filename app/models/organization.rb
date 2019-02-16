@@ -6,6 +6,7 @@ class Organization < ApplicationRecord
   SUPER_ADMIN_EMAIL = ENV['SUPER_ADMIN_EMAIL'] || 'admin@shape.space'.freeze
 
   include Resourceable
+  include Externalizable
   extend FriendlyId
   friendly_id :slug_candidates, use: %i[slugged finders history]
 
@@ -13,6 +14,7 @@ class Organization < ApplicationRecord
   has_many :items, through: :collections, dependent: :destroy
   has_many :groups, dependent: :destroy
   has_many :api_tokens, dependent: :destroy
+  has_many :application_organizations, dependent: :destroy
   belongs_to :primary_group,
              class_name: 'Group',
              dependent: :destroy,

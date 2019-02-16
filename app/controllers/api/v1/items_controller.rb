@@ -3,6 +3,11 @@ class Api::V1::ItemsController < Api::V1::BaseController
   load_and_authorize_resource :collection_card, only: :create
   load_and_authorize_resource except: %i[update in_my_collection]
 
+  before_action :load_and_filter_index, only: %i[index]
+  def index
+    render jsonapi: @items, include: params[:include]
+  end
+
   def show
     log_item_activity(:viewed)
     render jsonapi: @item,
