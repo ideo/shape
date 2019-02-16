@@ -46,6 +46,8 @@ module Controller
     def apply_filters
       return if @filter.empty?
       filter_external_id
+      filter_parent_id
+      @results.page(@page)
     end
 
     def load_controller_instance_variable
@@ -55,7 +57,7 @@ module Controller
     end
 
     def filter_external_id
-      return unless @filter[:external_id].present?
+      return if @filter[:external_id].blank?
       unless @application.present?
         @errors << 'application required to filter by external_id'
         return false
@@ -63,7 +65,14 @@ module Controller
       @results = klass.where_external_id(
         @filter[:external_id],
         application_id: @application.id,
-      ).page(@page)
+      )
+    end
+
+    def filter_parent_id
+      return if @filter[:parent_id].blank?
+      @results = klass.where(
+        parent_id: @filter[:parent_id],
+      )
     end
   end
 end
