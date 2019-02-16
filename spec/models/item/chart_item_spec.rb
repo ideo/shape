@@ -21,18 +21,6 @@ RSpec.describe Item::ChartItem, type: :model do
       end
     end
 
-    context 'with remote url' do
-      let!(:chart_item) { create(:chart_item, :with_remote_url) }
-
-      it 'calls DataSource::External' do
-        allow(DataSource::External).to receive(:call).and_return(data: {})
-        expect(DataSource::External).to receive(:call).with(
-          chart_item: chart_item,
-        )
-        expect(chart_data).to eq(data: {})
-      end
-    end
-
     context 'with unsupported data source' do
       let!(:fake_item) { create(:text_item) }
       let!(:chart_item) { create(:chart_item, data_source: fake_item) }
