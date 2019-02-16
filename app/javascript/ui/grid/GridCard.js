@@ -44,7 +44,8 @@ import {
 } from './shared'
 
 const CenteredContainer = styled.div`
-  background: rgba(255, 255, 255, 0.6);
+  background-color: ${props =>
+    props.removeBackground ? 'rgba(255, 255, 255, 0.6)' : 'none'};
   border-radius: 6px;
   left: calc(50% - 90px);
   padding: 20px 15px 0;
@@ -260,39 +261,49 @@ class GridCard extends React.Component {
   }
 
   renderReplaceControl() {
-    const { card } = this.props
-    if (!card.is_master_template_card) return null
+    const { card, canEditCollection } = this.props
+    if (!card.is_master_template_card && !card.isPinned) return null
     return (
-      <CenteredContainer>
+      <CenteredContainer removeBackground={card.is_master_template_card}>
         <FormButton
           color={v.colors.alert}
           disabled={!card.replaceable}
           overrideOutlineColor="#88807D"
+          onClick={this.handleReplace}
+          style={{
+            display:
+              !card.is_master_template_card && card.replaceable
+                ? 'block'
+                : 'none',
+          }}
         >
           Replace
         </FormButton>
-        <Tooltip
-          classes={{ tooltip: 'Tooltip' }}
-          title={`${
-            card.replaceable ? "don't show" : 'show'
-          } the Replace button`}
-          placement="bottom"
-        >
-          <StyledFormControlLabel
-            classes={{ label: 'form-control' }}
-            style={{ textAlign: 'center' }}
-            control={
-              <Checkbox
-                classes={{ root: 'checkbox' }}
-                color={v.colors.black}
-                checked={card.replaceable}
-                onChange={this.handleReplaceableToggle}
-                value="yes"
+        {card.is_master_template_card &&
+          canEditCollection && (
+            <Tooltip
+              classes={{ tooltip: 'Tooltip' }}
+              title={`${
+                card.replaceable ? "don't show" : 'show'
+              } the Replace button`}
+              placement="bottom"
+            >
+              <StyledFormControlLabel
+                classes={{ label: 'form-control' }}
+                style={{ textAlign: 'center' }}
+                control={
+                  <Checkbox
+                    classes={{ root: 'checkbox' }}
+                    color={v.colors.black}
+                    checked={card.replaceable}
+                    onChange={this.handleReplaceableToggle}
+                    value="yes"
+                  />
+                }
+                label="Show"
               />
-            }
-            label="Show"
-          />
-        </Tooltip>
+            </Tooltip>
+          )}
       </CenteredContainer>
     )
   }
@@ -372,6 +383,12 @@ class GridCard extends React.Component {
       return !!record.cover.image_url
     }
     return !!record.thumbnail_url
+  }
+
+  handleReplace = ev => {
+    ev.preventDefault()
+    const { card } = this.props
+    card.beginReplacing()
   }
 
   handleReplaceableToggle = ev => {
