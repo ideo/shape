@@ -271,20 +271,28 @@ class GridCard extends React.Component {
         >
           Replace
         </FormButton>
-        <StyledFormControlLabel
-          classes={{ label: 'form-control' }}
-          style={{ textAlign: 'center' }}
-          control={
-            <Checkbox
-              classes={{ root: 'checkbox' }}
-              color={v.colors.black}
-              checked={card.replaceable}
-              onChange={this.handleReplaceableToggle}
-              value="yes"
-            />
-          }
-          label="Show"
-        />
+        <Tooltip
+          classes={{ tooltip: 'Tooltip' }}
+          title={`${
+            card.replaceable ? "don't show" : 'show'
+          } the Replace button`}
+          placement="bottom"
+        >
+          <StyledFormControlLabel
+            classes={{ label: 'form-control' }}
+            style={{ textAlign: 'center' }}
+            control={
+              <Checkbox
+                classes={{ root: 'checkbox' }}
+                color={v.colors.black}
+                checked={card.replaceable}
+                onChange={this.handleReplaceableToggle}
+                value="yes"
+              />
+            }
+            label="Show"
+          />
+        </Tooltip>
       </CenteredContainer>
     )
   }
