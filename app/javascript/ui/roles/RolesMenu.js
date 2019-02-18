@@ -36,7 +36,7 @@ const FooterBreak = styled.div`
 const FooterArea = styled.div`
   flex: 0 0 auto;
   padding-top: 24px;
-  padding-bottom: ${props => (props.menuOpen ? 100 : 30)}px;
+  padding-bottom: 30px;
 `
 
 const StyledHeaderRow = styled(Row)`
@@ -391,7 +391,7 @@ class RolesMenu extends React.Component {
             <Row>
               <FooterBreak />
             </Row>
-            <FooterArea menuOpen={uiStore.autocompleteValues > 0}>
+            <FooterArea>
               <RolesAdd
                 title={addCallout}
                 roleTypes={addRoleTypes}

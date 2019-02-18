@@ -281,6 +281,7 @@ class RolesAdd extends React.Component {
             optionSearch={this.onSearch}
             onOptionSelect={this.onUserSelected}
             placeholder="email address or username"
+            menuPlacement="top"
             creatable
           />
         </Row>
