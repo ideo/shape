@@ -7,7 +7,6 @@ import Input from '@material-ui/core/Input'
 import Chip from '@material-ui/core/Chip'
 import AsyncCreatable from 'react-select/lib/AsyncCreatable'
 import Select from 'react-select'
-import { pick } from 'lodash'
 
 import Loader from '~/ui/layout/Loader'
 import Option from '~/ui/global/AutocompleteOption'
