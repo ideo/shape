@@ -323,11 +323,10 @@ class RolesMenu extends React.Component {
             return (
               <div key={panelTitle}>
                 <GroupHeader
-                  align="center"
                   onClick={() => this.togglePanel(group)}
                   open={this.isOpenPanel(group)}
                 >
-                  <StyledRow>
+                  <StyledRow align="center">
                     <DisplayText>
                       {panelTitle} ({count})
                     </DisplayText>
