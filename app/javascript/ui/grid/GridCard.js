@@ -47,7 +47,7 @@ const CenteredContainer = styled.div`
   background-color: ${props =>
     props.removeBackground ? 'rgba(255, 255, 255, 0.6)' : 'none'};
   border-radius: 6px;
-  left: calc(50% - 90px);
+  left: calc(50% - 105px);
   padding: 20px 15px 0;
   position: absolute;
   text-align: center;
