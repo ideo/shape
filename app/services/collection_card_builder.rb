@@ -1,9 +1,8 @@
 class CollectionCardBuilder
   attr_reader :collection_card, :errors
 
-  def initialize(params:, parent_collection:, user: nil, type: 'primary', external_id: nil)
+  def initialize(params:, parent_collection:, user: nil, type: 'primary')
     @collection_card = parent_collection.send("#{type}_collection_cards").build(params)
-    @external_id = external_id
     @errors = @collection_card.errors
     @user = user
     @parent_collection = parent_collection
@@ -46,7 +45,12 @@ class CollectionCardBuilder
           @collection_card.parent.cache_cover! if @collection_card.should_update_parent_collection_cover?
           @collection_card.update_collection_cover if @collection_card.is_cover
           @collection_card.increment_card_orders!
-          add_external_record
+          if @collection_card.record.external_id.present?
+            record.add_external_id(
+              @collection_card.record.external_id,
+              @user.application&.id,
+            )
+          end
           record.reload
           # will also cache roles identifier and update breadcrumb
           record.save
@@ -62,17 +66,5 @@ class CollectionCardBuilder
         end
       end
     end
-  end
-
-  def add_external_record
-    return unless @external_id && @user.application
-
-    ex = @collection_card.record.external_records.create(
-      external_id: @external_id,
-      application: @user.application,
-    )
-    return true unless ex.errors.present?
-    @collection_card.errors.add(:external_id, 'must be unique')
-    raise ActiveRecord::Rollback
   end
 end

@@ -3,6 +3,7 @@ module Externalizable
 
   included do
     has_many :external_records, as: :externalizable, dependent: :destroy
+    attr_accessor :external_id
   end
 
   class_methods do
@@ -11,5 +12,14 @@ module Externalizable
         .where(ExternalRecord.arel_table[:external_id].in(external_id))
         .where(ExternalRecord.arel_table[:application_id].eq(application_id))
     end
+  end
+
+  def add_external_id(external_id, application_id)
+    return true if external_records.create(
+      external_id: external_id,
+      application_id: application_id,
+    )
+    errors.add(:external_id, 'must be unique')
+    raise ActiveRecord::Rollback
   end
 end
