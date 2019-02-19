@@ -387,8 +387,10 @@ class DataItemCover extends React.Component {
   }
 
   get fillColor() {
-    const { fill } = this.props.item.data
-    if (fill) return fill
+    if (this.props.item.data) {
+      const { fill } = this.props.item.data
+      if (fill) return fill
+    }
     return '#000000'
   }
 

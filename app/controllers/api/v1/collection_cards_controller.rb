@@ -28,6 +28,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     card_params = collection_card_params
     type = card_params.delete(:type) || 'primary'
     external_id = card_params.delete(:external_id)
+
     # CollectionCardBuilder type expects 'primary' or 'link'
     type = 'link' if type == 'CollectionCard::Link'
     builder = CollectionCardBuilder.new(params: card_params,
@@ -162,7 +163,9 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def load_and_authorize_parent_collection_for_index
-    @collection = Collection.find(params[:collection_id])
+    @collection = Collection.find(
+      params[:collection_id].presence || params[:filter][:collection_id],
+    )
     authorize! :read, @collection
   end
 

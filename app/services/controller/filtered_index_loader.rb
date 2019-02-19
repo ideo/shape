@@ -46,7 +46,7 @@ module Controller
     def apply_filters
       return if @filter.empty?
       filter_external_id
-      filter_parent_id
+      filter_collection_id
       @results.page(@page)
     end
 
@@ -68,10 +68,10 @@ module Controller
       )
     end
 
-    def filter_parent_id
-      return if @filter[:parent_id].blank?
+    def filter_collection_id
+      return if @filter[:collection_id].blank?
       @results = klass.where(
-        parent_id: @filter[:parent_id],
+        collection_id: @filter[:collection_id],
       )
     end
   end
