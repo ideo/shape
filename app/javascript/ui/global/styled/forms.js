@@ -62,6 +62,7 @@ export const Label = styled.label`
 `
 Label.displayName = 'StyledLabel'
 
+/* eslint-disable no-nested-ternary */
 /** @component */
 export const FormButton = styled.button`
   width: ${props => (props.width ? props.width : 183)}px;
@@ -90,9 +91,11 @@ export const FormButton = styled.button`
   &:hover,
   &:focus {
     background-color: ${props =>
-      props.color === v.colors.primaryDark
-        ? v.colors.primaryDarkest
-        : v.colors.commonDark};
+      props.disabledHover
+        ? props.color
+        : props.color === v.colors.primaryDark
+          ? v.colors.primaryDarkest
+          : v.colors.commonDark};
   }
   ${props =>
     props.disabled &&

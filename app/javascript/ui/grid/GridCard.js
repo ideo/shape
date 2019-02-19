@@ -266,12 +266,12 @@ class GridCard extends React.Component {
     if (!card.is_master_template_card && !card.isPinned) return null
     if (!card.is_master_template_card && card.record.has_replaced_media)
       return null
-    console.log('hmm', card.is_master_template_card, card.replaceable)
     return (
       <CenteredContainer removeBackground={card.is_master_template_card}>
         <FormButton
           color={v.colors.alert}
           disabled={!card.replaceable}
+          disabledHover={card.is_master_template_card}
           overrideOutlineColor="#88807D"
           onClick={this.handleReplace}
           style={{
@@ -390,9 +390,10 @@ class GridCard extends React.Component {
   }
 
   handleReplace = ev => {
-    ev.preventDefault()
     const { card } = this.props
-    card.beginReplacing()
+    if (card.is_master_template_card) return false
+    ev.preventDefault()
+    return card.beginReplacing()
   }
 
   handleReplaceableToggle = ev => {
