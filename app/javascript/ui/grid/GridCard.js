@@ -266,6 +266,7 @@ class GridCard extends React.Component {
     if (!card.is_master_template_card && !card.isPinned) return null
     if (!card.is_master_template_card && card.record.has_replaced_media)
       return null
+    console.log('hmm', card.is_master_template_card, card.replaceable)
     return (
       <CenteredContainer removeBackground={card.is_master_template_card}>
         <FormButton
@@ -275,7 +276,7 @@ class GridCard extends React.Component {
           onClick={this.handleReplace}
           style={{
             display:
-              !card.is_master_template_card && card.replaceable
+              card.is_master_template_card || card.replaceable
                 ? 'block'
                 : 'none',
           }}
