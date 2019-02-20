@@ -11,7 +11,7 @@
     "can_move": { "type": "boolean" },
     "pinned": { "type": "boolean" },
     "is_master_template_card": { "type": "boolean" },
-    "replaceable": { "type": "boolean" },
+    "show_replace": { "type": "boolean" },
     "pinned_and_locked": { "type": "boolean" },
     "image_contain": { "type": "boolean" },
     "is_cover": { "type": "boolean" },

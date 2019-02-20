@@ -16,11 +16,6 @@ class CollectionCardReplacer
       @errors = @replacing_card.errors
       return false
     end
-    unless @replacing_card.replaceable
-      @replacing_card.errors.add(:replaceable, 'is false, cannot replace')
-      @errors = @replacing_card.errors
-      return false
-    end
     # now capture errors on the item
     @errors = @item.errors
     assign_item_attributes

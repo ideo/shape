@@ -270,13 +270,13 @@ class GridCard extends React.Component {
       <CenteredContainer removeBackground={card.is_master_template_card}>
         <FormButton
           color={v.colors.alert}
-          disabled={!card.replaceable}
+          disabled={!card.show_replace}
           disabledHover={card.is_master_template_card}
           overrideOutlineColor="#88807D"
           onClick={this.handleReplace}
           style={{
             display:
-              card.is_master_template_card || card.replaceable
+              card.is_master_template_card || card.show_replace
                 ? 'block'
                 : 'none',
           }}
@@ -288,7 +288,7 @@ class GridCard extends React.Component {
             <Tooltip
               classes={{ tooltip: 'Tooltip' }}
               title={`${
-                card.replaceable ? "don't show" : 'show'
+                card.show_replace ? "don't show" : 'show'
               } the Replace button`}
               placement="bottom"
             >
@@ -299,8 +299,8 @@ class GridCard extends React.Component {
                   <Checkbox
                     classes={{ root: 'checkbox' }}
                     color={v.colors.black}
-                    checked={card.replaceable}
-                    onChange={this.handleReplaceableToggle}
+                    checked={card.show_replace}
+                    onChange={this.handleReplaceToggle}
                     value="yes"
                   />
                 }
@@ -396,9 +396,9 @@ class GridCard extends React.Component {
     return card.beginReplacing()
   }
 
-  handleReplaceableToggle = ev => {
+  handleReplaceToggle = ev => {
     const { card } = this.props
-    card.replaceable = ev.target.checked
+    card.show_replace = ev.target.checked
     card.save()
   }
 

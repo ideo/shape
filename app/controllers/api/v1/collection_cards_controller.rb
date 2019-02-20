@@ -289,7 +289,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :image_contain,
       :is_cover,
       :filter,
-      :replaceable,
+      :show_replace,
     )
   end
 
@@ -313,7 +313,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :is_cover,
       :filter,
       :hidden,
-      :replaceable,
+      :show_replace,
       collection_attributes: %i[
         id
         type

@@ -2,7 +2,7 @@ class SerializableCollectionCard < BaseJsonSerializer
   type 'collection_cards'
   attributes :order, :width, :height, :parent_id, :type, :pinned,
              :image_contain, :card_question_type, :is_cover, :filter, :hidden,
-             :replaceable
+             :show_replace
 
   attribute :link do
     @object.is_a? CollectionCard::Link
