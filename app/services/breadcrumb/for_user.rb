@@ -58,10 +58,10 @@ module Breadcrumb
       @object.breadcrumb.reverse.select do |breadcrumb_item|
         # If we haven't reached an item they can view,
         # check to see if they can see it
-        if !can
-          false
-        else
+        if can
           can = yield(breadcrumb_item)
+        else
+          false
         end
       end.reverse
     end

@@ -286,7 +286,6 @@ class CollectionPage extends React.Component {
             template: collection.submission_template,
           }}
           movingCardIds={[]}
-          movingCards={false}
           sorting
         />
         <FloatingActionButton
@@ -364,8 +363,8 @@ class CollectionPage extends React.Component {
                 cardProperties={collection.cardProperties}
                 // Pass in BCT state so grid will re-render when open/closed
                 blankContentToolState={blankContentToolState}
-                // passing length prop seems to properly trigger a re-render
-                movingCards={uiStore.movingCardIds.length}
+                // to trigger a re-render
+                movingCardIds={uiStore.movingCardIds}
                 // don't add the extra row for submission box
                 addEmptyCard={!isSubmissionBox}
               />
