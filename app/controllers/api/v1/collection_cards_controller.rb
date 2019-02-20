@@ -3,7 +3,6 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   load_and_authorize_resource except: %i[move replace]
   before_action :load_and_authorize_parent_collection, only: %i[create replace]
   before_action :load_and_authorize_parent_collection_for_update, only: %i[update]
-  after_action :broadcast_collection_create_updates, only: %i[create update]
 
   before_action :load_and_authorize_parent_collection_for_index, only: %i[index]
   before_action :check_cache, only: %i[index]
@@ -41,6 +40,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       current_user.reload.reset_cached_roles!
       card.reload
       create_notification(card, :created)
+      broadcast_collection_create_updates
       render jsonapi: card,
              include: [:parent, record: [:filestack_file]],
              expose: { current_record: card.record }
@@ -62,6 +62,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     @collection_card.attributes = collection_card_update_params
     if @collection_card.save
       create_notification(@collection_card, :edited)
+      broadcast_collection_create_updates
       render jsonapi: @collection_card.reload
     else
       render_api_errors @collection_card.errors
@@ -334,7 +335,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         :question_type,
         :report_type,
         :external_id,
-        content: {},
+        :content,
         data_content: {},
         filestack_file_attributes: [
           :url,

@@ -47,7 +47,8 @@ module Controller
       return if @filter.empty?
       filter_external_id
       filter_collection_id
-      @results.page(@page)
+      # if results is an empty array it won't be pagination-friendly
+      @results.present? ? @results.page(@page) : @results
     end
 
     def load_controller_instance_variable
