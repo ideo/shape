@@ -25,7 +25,7 @@ class Api::V1::SurveyResponsesController < Api::V1::BaseController
     # had to just use json_api_params
     id = json_api_params['data']['attributes']['test_collection_id']
     @collection = Collection::TestCollection.find(id)
-    head(400) unless @collection.present? && @collection.live? && @collection.active?
+    head(:unprocessable_entity) unless @collection.present? && @collection.live? && @collection.active?
   end
 
   def load_and_authorize_survey_response
@@ -34,11 +34,11 @@ class Api::V1::SurveyResponsesController < Api::V1::BaseController
     # responses
     @survey_response = SurveyResponse.find_by(id: params[:id])
     if current_user.nil?
-      head 404
+      head :not_found
       return false
     end
     if @survey_response.user_id && @survey_response.user_id != current_user.id
-      head 404
+      head :not_found
       return false
     end
     true

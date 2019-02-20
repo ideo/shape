@@ -26,12 +26,12 @@ class TextItemCreator extends React.Component {
     super(props)
     // see: https://github.com/quilljs/quill/issues/1134#issuecomment-265065953
     this.onTextChange = _.debounce(this._onTextChange, 1000)
-    this.item = new Item({ text_data: {} })
+    this.item = new Item({ data_content: {} })
     this.item.can_edit_content = true
   }
 
   _onTextChange = itemTextData => {
-    this.item.text_data = itemTextData
+    this.item.data_content = itemTextData
   }
 
   expand() {
@@ -54,7 +54,7 @@ class TextItemCreator extends React.Component {
       item_attributes: {
         // name will get created in Rails
         content: this.item.content,
-        text_data: this.item.text_data,
+        data_content: this.item.data_content,
         type: ITEM_TYPES.TEXT,
       },
     })

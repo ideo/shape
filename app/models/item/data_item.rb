@@ -5,7 +5,14 @@ class Item
                    :d_filters,
                    :d_timeframe
 
-    validate :data_settings_validations
+    # For storing cached chart data
+    serialize :content, JSON
+
+    validates :report_type, presence: true
+    validate :collections_and_items_validations, if: :report_type_collections_and_items?
+    validate :network_app_metric_validations, if: :report_type_network_app_metric?
+    validate :record_validations, if: :report_type_record?
+
     VALID_MEASURES = %w[
       participants
       viewers
@@ -21,31 +28,36 @@ class Item
       week
     ].freeze
 
-    def report
-      external_report? ? external_report : internal_report
-    end
+    enum report_type: {
+      report_type_collections_and_items: 0,
+      report_type_network_app_metric: 1,
+      report_type_record: 2,
+    }
 
     def data
-      report.call
+      if report_type_record?
+        content
+      elsif report_type_network_app_metric?
+        DataReport::NetworkAppMetric.new(self).call
+      elsif report_type_collections_and_items?
+        DataReport::CollectionsAndItems.new(self).call
+      end
     end
 
     private
 
-    def external_report?
-      url.present?
+    def record_validations
+      return if content.present?
+      errors.add(:content, 'must be present')
     end
 
-    def internal_report
-      DataReport::Internal.new(self)
+    def network_app_metric_validations
+      return if url.present?
+      errors.add(:url, 'must be present')
     end
 
-    def external_report
-      DataReport::External.new(self)
-    end
-
-    def data_settings_validations
-      if !external_report? &&
-         !VALID_MEASURES.include?(d_measure.to_s)
+    def collections_and_items_validations
+      if !VALID_MEASURES.include?(d_measure.to_s)
         errors.add(:data_settings, "measure must be one of #{VALID_MEASURES.join(', ')}")
       end
       return if VALID_TIMEFRAMES.include?(d_timeframe.to_s)

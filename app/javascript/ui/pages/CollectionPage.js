@@ -344,13 +344,6 @@ class CollectionPage extends React.Component {
 
     // submissions_collection will only exist for submission boxes
     const { isSubmissionBox, requiresTestDesigner } = collection
-    const { movingCardIds, cardAction } = uiStore
-    // only tell the Grid to hide "movingCards" if we're moving and not linking
-    const uiMovingCardIds =
-      ['move', 'moveWithinCollection'].indexOf(cardAction) > -1
-        ? movingCardIds
-        : []
-
     return (
       <Fragment>
         <PageHeader record={collection} isHomepage={isHomepage} />
@@ -371,7 +364,6 @@ class CollectionPage extends React.Component {
                 cardProperties={collection.cardProperties}
                 // Pass in BCT state so grid will re-render when open/closed
                 blankContentToolState={blankContentToolState}
-                movingCardIds={uiMovingCardIds}
                 // passing length prop seems to properly trigger a re-render
                 movingCards={uiStore.movingCardIds.length}
                 // don't add the extra row for submission box

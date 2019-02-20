@@ -297,7 +297,7 @@ describe 'Ideo Profile API Requests' do
     end
 
     context 'unsupported event' do
-      it 'returns a 400' do
+      it 'returns a 422' do
         post(
           '/callbacks/ideo_network/users',
           params: { uid: uid, event: :transformed, data: { attributes: user_data } }.to_json,

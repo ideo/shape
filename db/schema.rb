@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190201202932) do
+ActiveRecord::Schema.define(version: 20190220003415) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -162,6 +162,18 @@ ActiveRecord::Schema.define(version: 20190201202932) do
     t.index ["comment_thread_id"], name: "index_comments_on_comment_thread_id"
   end
 
+  create_table "external_records", force: :cascade do |t|
+    t.string "external_id"
+    t.bigint "application_id"
+    t.string "externalizable_type"
+    t.bigint "externalizable_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["application_id"], name: "index_external_records_on_application_id"
+    t.index ["external_id", "application_id", "externalizable_type"], name: "index_uniq_external_id", unique: true
+    t.index ["externalizable_type", "externalizable_id"], name: "index_on_externalizable"
+  end
+
   create_table "filestack_files", force: :cascade do |t|
     t.string "url"
     t.string "handle"
@@ -228,7 +240,7 @@ ActiveRecord::Schema.define(version: 20190201202932) do
     t.jsonb "breadcrumb"
     t.integer "filestack_file_id"
     t.string "url"
-    t.jsonb "text_data"
+    t.jsonb "data_content"
     t.string "thumbnail_url"
     t.jsonb "cached_attributes", default: {}
     t.datetime "archived_at"
@@ -240,6 +252,7 @@ ActiveRecord::Schema.define(version: 20190201202932) do
     t.datetime "unarchived_at"
     t.jsonb "data_settings"
     t.bigint "roles_anchor_collection_id"
+    t.integer "report_type"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
     t.index ["created_at"], name: "index_items_on_created_at"

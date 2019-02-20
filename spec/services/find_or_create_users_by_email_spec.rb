@@ -1,11 +1,11 @@
 require 'rails_helper'
 
-RSpec.describe CreatePendingUsers, type: :service do
+RSpec.describe FindOrCreateUsersByEmail, type: :service do
   let(:emails) { Array.new(3).map { Faker::Internet.email } }
 
   describe '#call' do
     let(:emails) { Array.new(3).map { Faker::Internet.email } }
-    let(:subject) { CreatePendingUsers.new(emails: emails) }
+    let(:subject) { FindOrCreateUsersByEmail.new(emails: emails) }
 
     it 'should return pending users for all emails' do
       subject.call
@@ -15,7 +15,7 @@ RSpec.describe CreatePendingUsers, type: :service do
     end
 
     it 'should strip any whitespace' do
-      cpu = CreatePendingUsers.new(emails: ['email@address.com '])
+      cpu = FindOrCreateUsersByEmail.new(emails: ['email@address.com '])
       cpu.call
       expect(cpu.users.first.email).to eq('email@address.com')
     end

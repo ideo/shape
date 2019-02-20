@@ -188,7 +188,7 @@ class TextItem extends React.Component {
       (!currentEditor || currentEditor.id !== currentUserId)
     ) {
       this.cancelKeyUp = true
-      this.props.onUpdatedData(data.item_text_data)
+      this.props.onUpdatedData(data.item_data_content)
       this.cancelKeyUp = false
     }
 
@@ -286,7 +286,7 @@ class TextItem extends React.Component {
     const { item } = this.props
     const { quillEditor } = this
     item.content = quillEditor.root.innerHTML
-    item.text_data = quillEditor.getContents()
+    item.data_content = quillEditor.getContents()
     return item
   }
 
@@ -349,7 +349,7 @@ class TextItem extends React.Component {
 
   get textData() {
     const { item } = this.props
-    return item.toJSON().text_data
+    return item.toJSON().data_content
   }
 
   onKeyUp = (content, delta, source, editor) => {
@@ -366,7 +366,7 @@ class TextItem extends React.Component {
     const { item, onSave, fullPageView } = this.props
     const { quillEditor } = this
     item.content = quillEditor.root.innerHTML
-    item.text_data = quillEditor.getContents()
+    item.data_content = quillEditor.getContents()
     if (fullPageView) {
       await onSave(item, { cancel_sync: !this.leaving })
     } else {

@@ -62,6 +62,7 @@ class TestSurveyPage extends React.Component {
         `/tests/${window.nextAvailableId}`
       )
     }
+    apiStore.filestackToken = window.filestackToken
   }
 
   createSurveyResponse = async () => {
