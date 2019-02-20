@@ -335,7 +335,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         :report_type,
         :external_id,
         content: {},
-        text_data: {},
+        data_content: {},
         filestack_file_attributes: [
           :url,
           :handle,

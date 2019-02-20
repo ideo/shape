@@ -45,7 +45,7 @@ class TextEditor extends React.Component {
     setTimeout(() => {
       runInAction(() => {
         item.content = quillEditor.root.innerHTML
-        item.text_data = quillEditor.getContents()
+        item.data_content = quillEditor.getContents()
       })
     }, 5)
   }
@@ -67,7 +67,7 @@ class TextEditor extends React.Component {
 
   get textData() {
     const { item } = this.props
-    return item.toJSON().text_data
+    return item.toJSON().data_content
   }
 
   render() {

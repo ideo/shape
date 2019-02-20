@@ -48,7 +48,7 @@ RSpec.describe CollectionCardReplacer, type: :service do
       # NOTE: these tests very similar to collection_cards_controller#replace
       it 'updates the existing item with the new type' do
         expect(item.is_a?(Item::TextItem)).to be true
-        expect(item.text_data.present?).to be true
+        expect(item.data_content.present?).to be true
         expect do
           builder.replace
         end.not_to change(Item, :count)
@@ -57,7 +57,7 @@ RSpec.describe CollectionCardReplacer, type: :service do
         item = Item.find(id)
         expect(item.is_a?(Item::LinkItem)).to be true
         # should clear any previous attrs
-        expect(item.text_data.present?).to be false
+        expect(item.data_content.present?).to be false
       end
 
       it 'preserves the roles' do
@@ -109,7 +109,7 @@ RSpec.describe CollectionCardReplacer, type: :service do
           item = Item.find(id)
           expect(item.is_a?(Item::FileItem)).to be true
           # should clear any previous attrs
-          expect(item.text_data.present?).to be false
+          expect(item.data_content.present?).to be false
         end
 
         context 'with collection cover' do

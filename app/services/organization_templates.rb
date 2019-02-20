@@ -85,7 +85,7 @@ class OrganizationTemplates < SimpleService
         <h3>EXPERTISE</h3><p>vacuum tubes, calligraphy</p>
         <h3>LOCATION</h3><p>Metropolis</p>
       ),
-      text_data: {
+      data_content: {
         "ops": [
           { "insert": 'BIOGRAPHY' },
           { "insert": "\n", "attributes": { "header": 3 } },

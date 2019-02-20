@@ -322,7 +322,7 @@ class Organization < ApplicationRecord
       type: 'Item::TextItem',
       name: "#{name} Terms",
       content: 'Terms',
-      text_data: { a: {} },
+      data_content: { a: {} },
     )
     admin_group.add_role(Role::EDITOR, item)
     self.terms_text_item = item

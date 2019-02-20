@@ -86,7 +86,8 @@ class Api::V1::ItemsController < Api::V1::BaseController
       :type,
       :name,
       :external_id,
-      { text_data: {} },
+      :content,
+      { data_content: {} },
       { data_settings: [
         :d_measure,
         :d_timeframe,
@@ -98,7 +99,6 @@ class Api::V1::ItemsController < Api::V1::BaseController
       :tag_list,
       :thumbnail_url,
       filestack_file_attributes: Item.filestack_file_attributes_whitelist,
-      content: {},
     )
   end
 

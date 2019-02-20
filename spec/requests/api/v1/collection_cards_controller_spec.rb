@@ -184,7 +184,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         # create with a nested item
         item_attributes: {
           content: 'This is my item content',
-          text_data: { ops: [{ insert: 'This is my item content.' }] },
+          data_content: { ops: [{ insert: 'This is my item content.' }] },
           type: 'Item::TextItem',
         },
       }

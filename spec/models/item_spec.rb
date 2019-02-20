@@ -120,14 +120,14 @@ RSpec.describe Item, type: :model do
     end
 
     it 'will update the collection cover if needed' do
-      item.text_data = { ops: [{ insert: 'Howdy doody.' }] }
+      item.data_content = { ops: [{ insert: 'Howdy doody.' }] }
       item.update_parent_collection_if_needed
       expect(collection.cached_cover['item_id_text']).to eq item.id
       expect(collection.cached_cover['text']).to eq item.plain_content
     end
 
     it 'will not update the collection cover if not needed' do
-      second_item.text_data = { ops: [{ insert: 'Lorem ipsum 123.' }] }
+      second_item.data_content = { ops: [{ insert: 'Lorem ipsum 123.' }] }
       second_item.update_parent_collection_if_needed
       expect(collection.cached_cover['item_id_text']).not_to eq second_item.id
       expect(collection.cached_cover['text']).not_to eq second_item.plain_content

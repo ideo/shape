@@ -128,7 +128,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
             item_attributes: {
               name: 'My item name',
               content: 'My Text Content goes here',
-              text_data: { ops: [] },
+              data_content: { ops: [] },
               type: 'Item::TextItem',
             },
           ),
@@ -230,7 +230,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
             item_attributes: {
               content: 'Test Content',
               type: 'Item::TextItem',
-              text_data: 'xyz',
+              data_content: 'xyz',
             },
           ),
           parent_collection: parent,

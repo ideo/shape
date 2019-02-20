@@ -23,7 +23,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
     'type',
     'name',
     'content',
-    'text_data',
+    'data_content',
     'url',
     'image',
     'archived',
@@ -185,7 +185,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
 }
 
 Item.defaults = {
-  text_data: '',
+  data_content: '',
   can_edit: false,
   data: {
     values: [],
