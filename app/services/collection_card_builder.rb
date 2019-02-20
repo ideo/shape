@@ -11,6 +11,8 @@ class CollectionCardBuilder
   def create
     hide_helper_for_user
     if @collection_card.record.present?
+      # capture this here before `save` is called at which point the accessor will be nil
+      @external_id = @collection_card.record.external_id
       create_collection_card
     else
       @collection_card.errors.add(:record, "can't be blank")
@@ -29,7 +31,6 @@ class CollectionCardBuilder
   def create_collection_card
     # NOTE: for now you can *only* create pinned cards in a master template
     @collection_card.pinned = true if @collection_card.master_template_card?
-
     # TODO: rollback transaction if these later actions fail; add errors, return false
     CollectionCard.transaction do
       @collection_card.save.tap do |result|
@@ -45,12 +46,7 @@ class CollectionCardBuilder
           @collection_card.parent.cache_cover! if @collection_card.should_update_parent_collection_cover?
           @collection_card.update_collection_cover if @collection_card.is_cover
           @collection_card.increment_card_orders!
-          if @collection_card.record.external_id.present?
-            record.add_external_id(
-              @collection_card.record.external_id,
-              @user.application&.id,
-            )
-          end
+          add_external_record
           record.reload
           # will also cache roles identifier and update breadcrumb
           record.save
@@ -66,5 +62,13 @@ class CollectionCardBuilder
         end
       end
     end
+  end
+
+  def add_external_record
+    return unless @external_id.present? && @user.application.present?
+    @collection_card.record.add_external_id(
+      @external_id,
+      @user.application.id,
+    )
   end
 end

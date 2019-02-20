@@ -104,11 +104,11 @@ RSpec.describe CollectionCardBuilder, type: :service do
             params: params.merge(
               collection_attributes: {
                 name: 'Cool Collection',
+                external_id: '99',
               },
             ),
             parent_collection: parent,
             user: @api_token.application.user,
-            external_id: '99',
           )
         end
 
