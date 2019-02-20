@@ -5,6 +5,11 @@ module SessionHelper
     @user
   end
 
+  def log_in_with_api_token
+    @api_token ||= create(:api_token)
+    login_as(@api_token.application.user)
+  end
+
   # This used to be a method on Organization -- no longer used outside of tests
   def create_org_for_user(user)
     name = [user.first_name, user.last_name, 'Organization'].compact.join(' ')

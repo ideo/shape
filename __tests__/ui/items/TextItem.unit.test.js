@@ -27,7 +27,9 @@ describe('TextItem', () => {
   })
 
   it('passes the text content to Quill', () => {
-    expect(wrapper.find('Quill').props().value).toEqual(fakeTextItem.text_data)
+    expect(wrapper.find('Quill').props().value).toEqual(
+      fakeTextItem.data_content
+    )
   })
 
   describe('can view', () => {

@@ -1,4 +1,5 @@
 class SerializableCollection < BaseJsonSerializer
+  include SerializedExternalId
   type 'collections'
 
   attributes :created_at, :updated_at, :name, :organization_id,
@@ -36,10 +37,6 @@ class SerializableCollection < BaseJsonSerializer
 
   attribute :test_scores do
     @object.cached_test_scores || {}
-  end
-
-  attribute :type do
-    @object.type || @object.class.name
   end
 
   attribute :breadcrumb, if: -> { @current_record.nil? || @object == @current_record } do

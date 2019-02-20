@@ -59,7 +59,7 @@ module RealtimeEditorsViewers
     }
     data = defaults.merge!(merge_data)
     if is_a?(Item::TextItem)
-      data[:item_text_data] = text_data.as_json
+      data[:item_data_content] = data_content.as_json
     end
     ActionCable.server.broadcast stream_name, data
   end

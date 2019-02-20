@@ -85,7 +85,7 @@ class TextItemCover extends React.Component {
 
   textChange = itemTextData => {
     const { item } = this.state
-    item.text_data = itemTextData
+    item.data_content = itemTextData
     this.setState({ item })
   }
 
@@ -151,7 +151,7 @@ class TextItemCover extends React.Component {
 
   renderDefault() {
     const { item } = this.props
-    const textData = item.toJSON().text_data
+    const textData = item.toJSON().data_content
     const quillProps = {
       // ref is used to get the height of the div in checkTextAreaHeight
       ref: c => {

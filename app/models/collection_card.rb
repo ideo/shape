@@ -11,6 +11,8 @@ class CollectionCard < ApplicationRecord
 
   # this really is only appropriate for CollectionCard::Primary but defined globally here
   accepts_nested_attributes_for :collection, :item
+  # for the purpose of accepting this param via deserializable
+  attr_accessor :external_id
 
   before_validation :assign_order, if: :assign_order?
 

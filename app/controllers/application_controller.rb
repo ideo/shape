@@ -7,6 +7,6 @@ class ApplicationController < ActionController::Base
 
   def authenticate_super_admin!
     authenticate_user!
-    head(401) unless current_user.has_cached_role?(Role::SUPER_ADMIN)
+    head(:unauthorized) unless current_user.has_cached_role?(Role::SUPER_ADMIN)
   end
 end

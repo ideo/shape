@@ -13,6 +13,17 @@ describe User, type: :model do
     it { should have_many :comments }
     it { should have_many :activities_as_actor }
     it { should have_many :notifications }
+
+    context 'as application bot user' do
+      let(:organizations) { create_list(:organization, 2) }
+      let!(:application) { create(:application, add_orgs: organizations) }
+      let(:user) { application.user }
+
+      it 'should find organizations via the application' do
+        expect(user.organizations).to match_array organizations
+        expect(user.organizations).to match_array application.organizations
+      end
+    end
   end
 
   context 'validations' do

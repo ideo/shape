@@ -2,6 +2,12 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
   deserializable_resource :organization, only: %i[create update]
   load_and_authorize_resource except: %i[create]
 
+  before_action :load_user_organizations, only: %i[index]
+  before_action :load_and_filter_index, only: %i[index]
+  def index
+    render jsonapi: @organizations, expose: { include_user_collection_ids: true }
+  end
+
   # The logged-in user's current organization context
   def current
     render jsonapi: current_organization, include: %i[primary_group terms_text_item]
@@ -53,6 +59,10 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
   end
 
   private
+
+  def load_user_organizations
+    @organizations = current_user.organizations
+  end
 
   def organization_params
     params_allowed = [
