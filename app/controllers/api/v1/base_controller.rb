@@ -20,6 +20,7 @@ class Api::V1::BaseController < ApplicationController
       'Item::ChartItem': SerializableItem,
       'Item::DataItem': SerializableDataItem,
       'Collection::UserCollection': SerializableCollection,
+      'Collection::ApplicationCollection': SerializableCollection,
       'Collection::SharedWithMeCollection': SerializableCollection,
       'Collection::Global': SerializableCollection,
       'Collection::TestCollection': SerializableCollection,

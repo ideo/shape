@@ -231,7 +231,7 @@ class User < ApplicationRecord
       self.current_organization = self.current_user_collection = nil
     else
       self.current_organization = organization
-      self.current_user_collection = collections.user_collection.find_by_organization_id(organization.id)
+      self.current_user_collection = current_user_collection(organization.id)
     end
     # make sure user picks up new roles / relationships
     save && reload
