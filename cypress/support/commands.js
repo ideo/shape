@@ -4,7 +4,7 @@ import _ from 'lodash'
 // https://on.cypress.io/custom-commands
 
 Cypress.Commands.add('login', ({ userId } = {}) => {
-  cy.request('GET', `/login_as.json?id=${userId}`)
+  cy.request('GET', `/login_as?id=${userId}`)
   cy.wait(100)
 })
 

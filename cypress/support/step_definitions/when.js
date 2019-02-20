@@ -21,6 +21,10 @@ When('I create a text item', num => {
   cy.createTextItem()
 })
 
+When('I create a data item', num => {
+  cy.createDataItem()
+})
+
 // ----------------------
 // Resizing/moving cards
 // ----------------------

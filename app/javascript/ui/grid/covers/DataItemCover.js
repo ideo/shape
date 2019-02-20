@@ -482,6 +482,7 @@ class DataItemCover extends React.Component {
         className="cancelGridClick"
         editable={item.can_edit_content}
         editing={this.editing}
+        data-cy="DataItemCover"
       >
         {item.isReportTypeCollectionsItems && item.timeframe === 'ever'
           ? this.renderSingleValue()
