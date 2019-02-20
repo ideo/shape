@@ -120,7 +120,7 @@ class Organization < ApplicationRecord
   end
 
   def setup_bot_user_membership(user)
-    Collection::UserCollection.find_or_create_for_user(user, self)
+    Collection::ApplicationCollection.find_or_create_for_bot_user(user, self)
     user.add_role(Role::APPLICATION_USER, self)
     user.switch_to_organization(self) if user.current_organization_id.blank?
   end

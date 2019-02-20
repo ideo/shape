@@ -6,11 +6,11 @@ RSpec.describe ApplicationOrganization, type: :model do
     let(:application_user) { application_organization.application_user }
     let(:organization) { application_organization.organization }
 
-    describe '#create_user_and_add_to_organization' do
+    describe '#add_bot_user_to_organization' do
       it 'creates global collection' do
         expect {
           create(:application_organization)
-        }.to change(Collection::UserCollection, :count).by(1)
+        }.to change(Collection::ApplicationCollection, :count).by(1)
       end
 
       it 'adds user as editor' do

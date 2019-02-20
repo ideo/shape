@@ -231,7 +231,7 @@ class User < ApplicationRecord
       self.current_organization = self.current_user_collection = nil
     else
       self.current_organization = organization
-      self.current_user_collection = collections.user.find_by_organization_id(organization.id)
+      self.current_user_collection = collections.user_collection.find_by_organization_id(organization.id)
     end
     # make sure user picks up new roles / relationships
     save && reload
@@ -244,9 +244,8 @@ class User < ApplicationRecord
       # if within same org, we already have the current_user_collection id
       return Collection.find(current_user_collection_id)
     end
-
-    # TODO: rename "user" to user_collection
-    collections.user.find_by_organization_id(org_id)
+    type = bot_user? ? 'Application' : 'User'
+    collections.find_by(organization_id: org_id, type: "Collection::#{type}Collection")
   end
 
   def current_shared_collection(org_id = current_organization_id)
@@ -332,6 +331,10 @@ class User < ApplicationRecord
     archived!
     # NOTE: this is disabled, was creating way too many Zendesk tickets
     # DeprovisionUserWorker.perform_async(id)
+  end
+
+  def bot_user?
+    application.present?
   end
 
   private
