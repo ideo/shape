@@ -431,7 +431,7 @@ class DataItemCover extends React.Component {
           )}
         </AboveChartContainer>
         {this.formattedValues.length >= 2 && (
-          <ChartContainer>
+          <ChartContainer data-cy="ChartContainer">
             <OrganicGrid />
             <VictoryChart
               theme={theme}
