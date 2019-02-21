@@ -48,6 +48,7 @@ const nearMonth = (momentDate, timeframe) => {
   } else if (endDiff <= endAllowance) {
     return mEnd
   }
+
   return false
 }
 
@@ -56,9 +57,11 @@ const TickLabel = props => {
   if (props.x === 0) dx = 12
   if (props.x === 450) dx = -12
   const updatedStyle = Object.assign({}, props.style, {
-    fontSize: '10px',
+    fontSize: props.fontSize,
   })
-  return <VictoryLabel {...props} dx={dx} dy={5} style={updatedStyle} />
+  return (
+    <VictoryLabel {...props} dx={dx} dy={props.dy || 5} style={updatedStyle} />
+  )
 }
 
 const StyledDataItemCover = styled.div`
@@ -375,7 +378,7 @@ class DataItemCover extends React.Component {
     )
   }
 
-  displayXAxisText = (d, i) => {
+  displayMonthlyXAxisText = (d, i) => {
     const { item } = this.props
     const { timeframe } = item
     const utc = utcMoment(d)
@@ -385,6 +388,8 @@ class DataItemCover extends React.Component {
     }
     return ''
   }
+
+  displayEveryXAxisText = (d, i) => `${utcMoment(d).format('YYYY')}`
 
   get fillColor() {
     if (this.props.item.data) {
@@ -396,24 +401,56 @@ class DataItemCover extends React.Component {
 
   get chartAreaStyle() {
     const { item } = this.props
-    if (item.isReportTypeCollectionsItems) {
+    if (item.isReportTypeRecord) {
       return {
-        data: { fill: 'url(#organicGrid)' },
+        data: { fill: this.fillColor },
         labels: {
-          fill: 'black',
+          fontSize: 18,
         },
       }
     }
     return {
-      data: { fill: this.fillColor },
+      data: { fill: 'url(#organicGrid)' },
       labels: {
-        fontSize: 18,
+        fill: 'black',
+      },
+    }
+  }
+
+  get chartAxisStyle() {
+    const { item } = this.props
+    if (item.isReportTypeRecord) {
+      return {
+        axis: {
+          stroke: v.colors.commonMedium,
+          strokeWidth: 30,
+          transform: 'translateY(26px)',
+        },
+      }
+    }
+    return {
+      axis: {
+        stroke: v.colors.commonMedium,
+        strokeWidth: 25,
+        transform: 'translateY(22px)',
       },
     }
   }
 
   renderTimeframeValues() {
-    const { card } = this.props
+    const { card, item } = this.props
+    let tickLabelStyle = {}
+    if (item.isReportTypeRecord) {
+      tickLabelStyle = {
+        fontSize: '18px',
+        dy: -5,
+      }
+    } else {
+      tickLabelStyle = {
+        fontSize: '10px',
+        dy: 5,
+      }
+    }
     return (
       <Fragment>
         <AboveChartContainer>
@@ -428,7 +465,7 @@ class DataItemCover extends React.Component {
             </DisplayText>
           )}
         </AboveChartContainer>
-        {this.formattedValues.length >= 2 && (
+        {this.formattedValues.length >= 0 && (
           <ChartContainer>
             <OrganicGrid />
             <VictoryChart
@@ -437,18 +474,6 @@ class DataItemCover extends React.Component {
               padding={{ top: 0, left: 0, right: 0, bottom: 0 }}
               containerComponent={<VictoryVoronoiContainer />}
             >
-              <VictoryAxis
-                tickLabelComponent={<TickLabel />}
-                tickFormat={this.displayXAxisText}
-                offsetY={13}
-                style={{
-                  axis: {
-                    stroke: v.colors.commonMedium,
-                    strokeWidth: 25,
-                    transform: 'translateY(22px)',
-                  },
-                }}
-              />
               <VictoryArea
                 labels={d => d.amount}
                 labelComponent={
@@ -463,6 +488,21 @@ class DataItemCover extends React.Component {
                 data={this.formattedValues}
                 y="amount"
                 x="month"
+              />
+              <VictoryAxis
+                tickLabelComponent={
+                  <TickLabel
+                    fontSize={tickLabelStyle.fontSize}
+                    dy={tickLabelStyle.dy}
+                  />
+                }
+                tickFormat={
+                  item.isReportTypeRecord
+                    ? this.displayEveryXAxisText
+                    : this.displayMonthlyXAxisText
+                }
+                offsetY={13}
+                style={this.chartAxisStyle}
               />
             </VictoryChart>
           </ChartContainer>
