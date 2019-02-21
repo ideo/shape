@@ -1,6 +1,6 @@
 # Serve up static pages
 class HomeController < ApplicationController
-  before_action :authenticate_user!, except: %i[login sign_up login_as marketing]
+  before_action :authenticate_user!, only: %i[index]
   before_action :set_omniauth_state
 
   def index
@@ -22,6 +22,16 @@ class HomeController < ApplicationController
     end
     # might be nil which is ok
     @email = params[:email]
+  end
+
+  def sign_out_and_redirect
+    sign_out(current_user) if user_signed_in?
+    url = NetworkApi::Authentication.provider_auth_url(
+      provider: params[:provider],
+      redirect_url: ENV['BASE_HOST'],
+      cookies: cookies,
+    )
+    redirect_to url
   end
 
   before_action :require_dev_env, only: [:login_as]
