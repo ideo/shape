@@ -8,4 +8,4 @@ Feature: Data Item
     Then I should see 1 for the single data value
 
     When I select "viewers" on the "measure" select on the report item
-    Then I should see 80 for the single data value
+    Then I should see 16 for the single data value
