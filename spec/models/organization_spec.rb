@@ -300,17 +300,14 @@ describe Organization, type: :model do
     let(:getting_started) { create(:global_collection) }
     let!(:subcollection_cards) { create_list(:collection_card_collection, 2, parent: getting_started) }
     let!(:item_cards) { create_list(:collection_card_text, 2, parent: getting_started) }
-    let!(:marked_collection) { create(:collection, shared_with_organization: true, organization: organization) }
     let!(:organization) do
       # adding `member: user` will call user.setup_user_membership_and_collections
-      marked_collection.update(shared_with_organization: true)
       create(:organization, domain_whitelist: ['ideo.com'], getting_started_collection: getting_started, member: user)
     end
 
-    it 'should create a UserCollection, SharedWithMeCollection, shared with organization collection and Getting Started collection for the user' do
-      expect(user.collections.size).to eq(3)
+    it 'should create a UserCollection, SharedWithMeCollection and Getting Started collection for the user' do
       # SharedWithMe and Getting Started live within the user collection
-      expect(user.current_user_collection.collections.size).to eq(3)
+      expect(user.current_user_collection.collections.size).to eq(2)
     end
 
     it 'should set the Getting Started copy collections to getting_started_shell' do
@@ -754,6 +751,22 @@ describe Organization, type: :model do
       expect(organization.can_view?(user)).to be false
       user.add_role(Role::APPLICATION_USER, organization)
       expect(organization.can_view?(user)).to be true
+    end
+  end
+
+  describe '#add_shared_with_org_collections' do
+    let(:organization) { create(:organization) }
+    let(:user) { create(:user) }
+    let(:collection) { create(:collection, organization: organization, shared_with_organization: true) }
+
+    it 'links the collection to the user\'s My Collection' do
+      expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
+        [user.id],
+        [],
+        [collection.id],
+        [],
+      )
+      organization.add_shared_with_org_collections(user)
     end
   end
 end
