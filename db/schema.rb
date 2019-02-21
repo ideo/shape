@@ -10,11 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< Updated upstream
 ActiveRecord::Schema.define(version: 20190220003415) do
-=======
-ActiveRecord::Schema.define(version: 20190215192116) do
->>>>>>> Stashed changes
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -97,8 +93,8 @@ ActiveRecord::Schema.define(version: 20190215192116) do
     t.boolean "image_contain", default: false
     t.boolean "is_cover", default: false
     t.datetime "unarchived_at"
-    t.integer "filter", default: 0
     t.boolean "hidden", default: false
+    t.integer "filter", default: 1
     t.boolean "show_replace", default: true
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
