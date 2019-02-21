@@ -57,17 +57,12 @@ namespace :cypress do
   def create_events(organization)
     15.times do |_i|
       user = FactoryBot.create(:user)
-      activity = FactoryBot.create(:activity,
-                                   organization: organization,
-                                   actor: user,
-                                   action: :viewed,
-                                   target: Collection.last,
-                                   created_at: Date.today - rand(100))
+      FactoryBot.create(:activity,
+                        organization: organization,
+                        actor: user,
+                        action: :viewed,
+                        target: Collection.last,
+                        created_at: Date.today - rand(100))
     end
-    # create 10 users
-    # for each user
-    # # create create a viewed event for a random collection random date between
-    # # a few months
-    # #
   end
 end
