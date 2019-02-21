@@ -641,7 +641,7 @@ describe Collection, type: :model do
       end
 
       it 'updates cached cover text to match item updates' do
-        item.text_data = { ops: [{ insert: 'Howdy doody.' }] }
+        item.data_content = { ops: [{ insert: 'Howdy doody.' }] }
         collection.update_cover_text!(item)
         expect(collection.cached_cover['text']).to eq 'Howdy doody.'
       end

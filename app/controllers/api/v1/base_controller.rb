@@ -1,6 +1,7 @@
 class Api::V1::BaseController < ApplicationController
   before_action :check_api_authentication!
   before_action :check_cancel_sync
+  before_action :check_page_param
 
   respond_to :json
 
@@ -38,6 +39,7 @@ class Api::V1::BaseController < ApplicationController
     {
       current_user: current_user,
       current_ability: current_ability,
+      current_api_token: current_api_token,
     }
   end
 
@@ -59,7 +61,7 @@ class Api::V1::BaseController < ApplicationController
   end
 
   def render_api_errors(errors)
-    render jsonapi_errors: errors, status: :bad_request
+    render jsonapi_errors: errors, status: :unprocessable_entity
   end
 
   rescue_from CanCan::AccessDenied do |exception|
@@ -67,6 +69,21 @@ class Api::V1::BaseController < ApplicationController
   end
 
   private
+
+  def load_and_filter_index
+    # currently the only usage of filtering is for API applications + external_ids,
+    # so escape if we are not in that context
+    return unless current_application.present?
+    # This will return:
+    # - 422 error if appropriate
+    # - results, which will also get set into the instance variable e.g. @collections
+    Controller::FilteredIndexLoader.call(
+      controller: self,
+      params: params,
+      page: @page,
+      application: current_application,
+    )
+  end
 
   def render_collection(include: nil)
     # include collection_cards for UI to receive any updates
@@ -81,7 +98,7 @@ class Api::V1::BaseController < ApplicationController
   def check_api_authentication!
     return if user_signed_in? && current_user.active?
     return if current_api_token.present?
-    head(401)
+    head(:unauthorized)
   end
 
   def current_ability
@@ -95,8 +112,12 @@ class Api::V1::BaseController < ApplicationController
   end
 
   def current_organization
-    @current_organization ||= current_user.try(:current_organization) ||
-                              current_api_token.try(:organization)
+    @current_organization ||= begin
+      current_user.try(:current_organization) ||
+        current_api_token.try(:organization) ||
+        # e.g. /organizations/1/...
+        @organization
+    end
   end
 
   def current_api_token
@@ -111,6 +132,14 @@ class Api::V1::BaseController < ApplicationController
     @current_api_token
   end
 
+  def current_application
+    @current_application ||= begin
+      @current_api_token&.application ||
+        # this second case is more useful in specs (login_as(api_user))
+        current_user.application
+    end
+  end
+
   def authorization_token_from_header
     return if request.headers['AUTHORIZATION'].blank?
     request.headers['AUTHORIZATION'].sub(/^Bearer\s+/, '')
@@ -119,5 +148,11 @@ class Api::V1::BaseController < ApplicationController
   def check_cancel_sync
     return unless json_api_params[:data]
     @cancel_sync = json_api_params[:data].delete :cancel_sync
+  end
+
+  def check_page_param
+    @page = params[:page].try(:to_i) ||
+            params[:page].try(:[], :number) ||
+            1
   end
 end

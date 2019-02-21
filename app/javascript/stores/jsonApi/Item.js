@@ -23,7 +23,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
     'type',
     'name',
     'content',
-    'text_data',
+    'data_content',
     'url',
     'image',
     'archived',
@@ -31,6 +31,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
     'thumbnail_url',
     'filestack_file_attributes',
     'data_settings',
+    'report_type',
   ]
 
   get justText() {
@@ -58,6 +59,18 @@ class Item extends SharedRecordMixin(BaseRecord) {
 
   get isMedia() {
     return this.isImage || this.isVideo
+  }
+
+  get isReportTypeCollectionsItems() {
+    return this.report_type === 'report_type_collections_and_items'
+  }
+
+  get isReportTypeNetworkAppMetric() {
+    return this.report_type === 'report_type_network_app_metric'
+  }
+
+  get isReportTypeRecord() {
+    return this.report_type === 'report_type_record'
   }
 
   get pdfCoverUrl() {
@@ -176,7 +189,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
 }
 
 Item.defaults = {
-  text_data: '',
+  data_content: '',
   can_edit: false,
   data: {
     values: [],

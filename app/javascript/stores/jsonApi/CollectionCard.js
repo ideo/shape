@@ -228,7 +228,10 @@ class CollectionCard extends BaseRecord {
   }
 
   get isBeingMoved() {
-    return uiStore.movingCardIds.indexOf(this.id) > -1
+    const { movingCardIds, cardAction } = uiStore
+    // only count "being moved" for the move actions (not link, duplicate, etc)
+    if (!_.includes(['move', 'moveWithinCollection'], cardAction)) return false
+    return movingCardIds.indexOf(this.id) > -1
   }
 
   get isBeingMultiMoved() {

@@ -109,7 +109,10 @@ class Api::V1::RolesController < Api::V1::BaseController
 
   def mass_assignment_params
     users = User.where(id: json_api_params[:user_ids])
-    groups = Group.where(id: json_api_params[:group_ids])
+    groups = Group.where(
+      id: json_api_params[:group_ids],
+      organization_id: current_organization.id,
+    )
     {
       object: record,
       role_name: role_params[:name],

@@ -40,7 +40,7 @@ class Api::V1::QuestionAnswersController < Api::V1::BaseController
 
   def load_survey_response
     @survey_response = SurveyResponse.find_by_session_uid(params[:survey_response_id])
-    head(400) unless @survey_response.present? && @survey_response.test_collection.live?
+    head(:unprocessable_entity) unless @survey_response.present? && @survey_response.test_collection.live?
   end
 
   def build_question_answer

@@ -11,7 +11,7 @@ class SerializableCurrentUser < SerializableUser
   end
 
   attribute :filestack_token do
-    FilestackFile.security_token
+    FilestackFile.security_token(read_only: false)
   end
 
   attribute :current_user_collection_id do

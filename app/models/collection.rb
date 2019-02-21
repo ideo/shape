@@ -6,6 +6,7 @@ class Collection < ApplicationRecord
   include HasActivities
   include Templateable
   include Testable
+  include Externalizable
 
   resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,

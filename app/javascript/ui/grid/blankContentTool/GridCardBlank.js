@@ -284,6 +284,7 @@ class GridCardBlank extends React.Component {
       item_attributes: {
         type: ITEM_TYPES.DATA,
         name: 'Report',
+        report_type: 'report_type_collections_and_items',
         data_settings: {
           d_measure: 'participants',
           d_timeframe: 'ever',

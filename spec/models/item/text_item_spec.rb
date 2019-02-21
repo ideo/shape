@@ -3,11 +3,11 @@ require 'rails_helper'
 RSpec.describe Item::TextItem, type: :model do
   context 'validations' do
     it { should validate_presence_of(:content) }
-    it { should validate_presence_of(:text_data) }
+    it { should validate_presence_of(:data_content) }
   end
 
   context 'instance methods' do
-    let(:text_data) do
+    let(:data_content) do
       {
         ops: [
           { insert: "How might we do &lt;b&gt;X&lt;/b&gt;\n\n" },
@@ -16,10 +16,10 @@ RSpec.describe Item::TextItem, type: :model do
         ],
       }
     end
-    let(:text_item) { create(:text_item, name: nil, content: '<p>How might we do <b>X</b></p>', text_data: text_data) }
+    let(:text_item) { create(:text_item, name: nil, content: '<p>How might we do <b>X</b></p>', data_content: data_content) }
 
     describe '#plain_content' do
-      it 'should create plaintext content based on text_data' do
+      it 'should create plaintext content based on data_content' do
         expect(text_item.plain_content).to eq 'How might we do X | What if we were to do that thing?'
       end
     end

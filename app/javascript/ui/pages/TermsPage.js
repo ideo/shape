@@ -10,7 +10,7 @@ import {
   QuillStyleWrapper,
 } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
-import Header from '~/ui/layout/Header'
+import Header, { BasicHeader } from '~/ui/layout/Header'
 import PageContainer from '~/ui/layout/PageContainer'
 import termsMarkdown from '~/markdown/TermsOfUse'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
@@ -53,7 +53,7 @@ class TermsPage extends React.PureComponent {
         readOnly: true,
         theme: null,
       }
-      const textData = organization.terms_text_item.toJSON().text_data
+      const textData = organization.terms_text_item.toJSON().data_content
       inner = (
         <div>
           <StyledTitle>{organization.name} Terms of Use</StyledTitle>
@@ -63,12 +63,13 @@ class TermsPage extends React.PureComponent {
         </div>
       )
     }
+    const loggedIn = !!apiStore.currentUser
     return (
       <div>
-        <Header />
+        {loggedIn ? <Header /> : <BasicHeader />}
         <PageContainer marginTop={v.headerHeightCompact}>
           <Heading1>Legal</Heading1>
-          <OverdueBanner />
+          {loggedIn && <OverdueBanner />}
           {inner}
         </PageContainer>
       </div>

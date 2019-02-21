@@ -5,6 +5,7 @@ class Application < ApplicationRecord
   has_many :api_tokens
   has_many :application_organizations
   has_many :organizations, through: :application_organizations
+  has_many :external_records
 
   before_validation :create_user, on: :create
 
@@ -18,6 +19,8 @@ class Application < ApplicationRecord
       uid: uid,
       provider: 'shape',
       password: Devise.friendly_token(40),
+      # set terms_accepted, otherwise will get 401 unauthorized
+      terms_accepted: true,
     )
   end
 end

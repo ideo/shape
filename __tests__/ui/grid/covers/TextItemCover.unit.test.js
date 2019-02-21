@@ -25,8 +25,8 @@ describe('TextItemCover', () => {
     component = wrapper.instance()
   })
 
-  it('renders Quill with item.text_data', () => {
-    expect(wrapper.find('Quill').props().value).toBe(item.text_data)
+  it('renders Quill with item.data_content', () => {
+    expect(wrapper.find('Quill').props().value).toBe(item.data_content)
   })
 
   it('renders Read More if text height exceeds the viewable area', () => {

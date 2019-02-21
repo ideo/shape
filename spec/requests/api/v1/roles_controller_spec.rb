@@ -38,8 +38,8 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
     end
   end
 
-  describe 'POST #create' do
-    let(:organization) { create(:organization) }
+  describe 'POST #create', create_org: true do
+    let(:organization) { user.current_organization }
     let(:users) { create_list(:user, 3) }
     let(:user_ids) { users.map(&:id) }
     let(:users_json) { json_included_objects_of_type('users') }
@@ -73,6 +73,40 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
           ),
         )
         post(path, params: params)
+      end
+
+      context 'granting access to a group' do
+        let(:params) {
+          {
+            'role': { 'name': role_name },
+            'group_ids': [group.id],
+            'is_switching': false,
+          }.to_json
+        }
+
+        context 'with group in the same org' do
+          let!(:group) { create(:group, organization: organization, add_admins: [user]) }
+          it 'adds the role to the group' do
+            expect(Roles::MassAssign).to receive(:new).with(
+              hash_including(
+                groups: [group],
+              ),
+            )
+            post(path, params: params)
+          end
+        end
+
+        context 'with group in a different org' do
+          let!(:group) { create(:group, add_admins: [user]) }
+          it 'does not add the role to the group' do
+            expect(Roles::MassAssign).not_to receive(:new).with(
+              hash_including(
+                groups: [group],
+              ),
+            )
+            post(path, params: params)
+          end
+        end
       end
     end
 

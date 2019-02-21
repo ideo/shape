@@ -1,10 +1,10 @@
 {
   "type": "object",
   "properties": {
-    "type": { "type": "string" },
+    "class_type": { "type": "string" },
     "name": { "type": ["string", "null"] },
     "content": { "type": ["string", "null"] },
-    "text_data": { "type": "object" },
+    "data_content": { "type": "object" },
     "data_settings": { "type": ["object", "null"] },
     "url": { "type": ["string", "null"] },
     "thumbnail_url": { "type": ["string", "null"] },
@@ -25,5 +25,5 @@
     "is_private": { "type": ["boolean"] },
     "has_replaced_media": { "type": ["boolean"] }
   },
-  "required": ["type"]
+  "required": ["class_type"]
 }
