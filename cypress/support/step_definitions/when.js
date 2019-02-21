@@ -166,3 +166,28 @@ When('I fill out the organization name with {string}', orgName => {
     .click()
     .type(orgName)
 })
+
+// ----------------------
+// Items
+// ----------------------
+
+When('I edit the report item', () => {
+  cy.locate('CardAction-Edit')
+    .first()
+    .click()
+  cy.wait(100)
+})
+
+When(
+  'I select {string} on the {string} select on the report item',
+  (option, select) => {
+    cy.locate(`DataReportSelect-${select}`)
+      .first()
+      .click()
+    cy.wait(50)
+    cy.locate(`DataReportOption-${option}`)
+      .first()
+      .click()
+    cy.wait(50)
+  }
+)

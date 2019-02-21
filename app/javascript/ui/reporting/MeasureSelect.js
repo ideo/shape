@@ -95,6 +95,7 @@ class MeasureSelect extends React.Component {
   }
 
   render() {
+    const { dataSettingsName } = this.props
     return (
       <form className="form" style={{ display: 'inline-block' }}>
         <Select
@@ -108,6 +109,7 @@ class MeasureSelect extends React.Component {
           value={this.currentValue}
           inline
           open={this.menuOpen}
+          data-cy={`DataReportSelect-${dataSettingsName}`}
         >
           {this.measures.map(opt => (
             <SelectOption
@@ -115,6 +117,7 @@ class MeasureSelect extends React.Component {
               key={opt.value}
               value={opt.value}
               disabled={opt.value === 'contentMenu' && this.contentSelected}
+              data-cy={`DataReportOption-${opt.value}`}
             >
               {opt.name}
               {opt.value === 'contentMenu' && (

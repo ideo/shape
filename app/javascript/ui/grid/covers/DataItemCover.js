@@ -367,7 +367,9 @@ class DataItemCover extends React.Component {
     return (
       <Fragment>
         <Heading3>{this.measureControl}</Heading3>
-        <HugeNumber className="count">{item.data.value}</HugeNumber>
+        <HugeNumber className="count" data-cy="DataReport-count">
+          {item.data.value}
+        </HugeNumber>
         <SmallHelperText color={v.colors.black}>
           {this.titleAndControls}
         </SmallHelperText>

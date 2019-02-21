@@ -5,3 +5,7 @@ Feature: Data Item
 
     And I create a data item
     Then I should see a "DataItemCover" in the first card
+    Then I should see 1 for the single data value
+
+    When I select "viewers" on the "measure" select on the report item
+    Then I should see 80 for the single data value

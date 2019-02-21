@@ -206,7 +206,7 @@ class PopoutMenu extends React.Component {
             onClick={onClick}
             size={isCard ? 28 : 14}
             className={`${className} menu-toggle`}
-            data-cy={`BctButton-more`}
+            data-cy={isBct ? 'BctButton-more' : 'PopoutMenu'}
           >
             {icon}
           </MenuToggle>

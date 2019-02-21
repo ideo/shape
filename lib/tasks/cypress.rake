@@ -24,6 +24,7 @@ namespace :cypress do
     # via dependent: :destroy this will also remove everything in the test area
     my_collection.collections.where(name: 'Cypress Test Area').destroy_all
     create_cards(my_collection, user)
+    create_events(organization)
   end
 
   def create_cards(collection, user)
@@ -51,5 +52,22 @@ namespace :cypress do
       user: user,
     )
     builder.create
+  end
+
+  def create_events(organization)
+    15.times do |_i|
+      user = FactoryBot.create(:user)
+      activity = FactoryBot.create(:activity,
+                                   organization: organization,
+                                   actor: user,
+                                   action: :viewed,
+                                   target: Collection.last,
+                                   created_at: Date.today - rand(100))
+    end
+    # create 10 users
+    # for each user
+    # # create create a viewed event for a random collection random date between
+    # # a few months
+    # #
   end
 end
