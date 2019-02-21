@@ -88,6 +88,7 @@ class Organization < ApplicationRecord
     Collection::UserCollection.find_or_create_for_user(user, self)
     find_or_create_user_getting_started_collection(user, synchronous: synchronous)
     setup_user_membership(user)
+    add_shared_with_org_collections(user)
   end
 
   # This gets called from Roles::MassRemove after leaving a primary/guest group
@@ -117,6 +118,17 @@ class Organization < ApplicationRecord
 
     # Set this as the user's current organization if they don't have one
     user.switch_to_organization(self) if user.current_organization_id.blank?
+  end
+
+  def add_shared_with_org_collections(user)
+    collections_to_share = collections.where(shared_with_organization: true)
+    return unless collections_to_share.any?
+    LinkToSharedCollectionsWorker.perform_async(
+      [user.id],
+      [],
+      collections_to_share.map(&:id),
+      [],
+    )
   end
 
   def setup_bot_user_membership(user)
