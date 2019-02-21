@@ -289,15 +289,11 @@ Select.displayName = 'StyledSelect'
 
 /** @component */
 export const Checkbox = styled(MuiCheckbox)`
-  &.checkbox {
-    ${props =>
-      props.color &&
-      `
-      color: ${props.color};
-    `};
-  }
   &.checkbox--error {
     color: ${v.colors.alert};
+  }
+  &.checkbox--black {
+    color: ${v.colors.black} !important;
   }
   &.checkbox--white,
   &.checkbox--checked-white {

@@ -1,8 +1,6 @@
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
-import styled from 'styled-components'
 
 import ChartItemCover from '~/ui/grid/covers/ChartItemCover'
 import ContainImage from '~/ui/grid/ContainImage'
@@ -23,7 +21,6 @@ import ActionMenu from '~/ui/grid/ActionMenu'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import EditButton from '~/ui/reporting/EditButton'
-import { Checkbox, FormButton } from '~/ui/global/styled/forms'
 import FullScreenIcon from '~/ui/icons/FullScreenIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import HiddenIconButton from '~/ui/icons/HiddenIconButton'
@@ -36,33 +33,13 @@ import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
 import Tooltip from '~/ui/global/Tooltip'
 import { routingStore, uiStore } from '~/stores'
 import v, { ITEM_TYPES } from '~/utils/variables'
+import ReplaceCardButton from '~/ui/grid/ReplaceCardButton'
 import {
   StyledGridCard,
   StyledBottomLeftIcon,
   StyledGridCardInner,
   StyledTopRightActions,
 } from './shared'
-
-const CenteredContainer = styled.div`
-  background-color: ${props =>
-    props.removeBackground ? 'rgba(255, 255, 255, 0.6)' : 'none'};
-  border-radius: 6px;
-  left: calc(50% - 105px);
-  padding: 20px 15px 0;
-  position: absolute;
-  text-align: center;
-  top: calc(50% - 50px);
-  width: 180px;
-  z-index: ${v.zIndex.gridCardTop};
-`
-
-const StyledFormControlLabel = styled(FormControlLabel)`
-  .form-control {
-    font-size: 1rem;
-    font-weight: 300;
-    margin-right: 20px;
-  }
-`
 
 @observer
 class GridCard extends React.Component {
@@ -267,48 +244,12 @@ class GridCard extends React.Component {
     if (!card.is_master_template_card && card.record.has_replaced_media)
       return null
     return (
-      <CenteredContainer removeBackground={card.is_master_template_card}>
-        <FormButton
-          color={v.colors.alert}
-          disabled={!card.show_replace}
-          disabledHover={card.is_master_template_card}
-          overrideOutlineColor="#88807D"
-          onClick={this.handleReplace}
-          style={{
-            display:
-              card.is_master_template_card || card.show_replace
-                ? 'block'
-                : 'none',
-          }}
-        >
-          Replace
-        </FormButton>
-        {card.is_master_template_card &&
-          canEditCollection && (
-            <Tooltip
-              classes={{ tooltip: 'Tooltip' }}
-              title={`${
-                card.show_replace ? "don't show" : 'show'
-              } the Replace button`}
-              placement="bottom"
-            >
-              <StyledFormControlLabel
-                classes={{ label: 'form-control' }}
-                style={{ textAlign: 'center' }}
-                control={
-                  <Checkbox
-                    classes={{ root: 'checkbox' }}
-                    color={v.colors.black}
-                    checked={card.show_replace}
-                    onChange={this.handleReplaceToggle}
-                    value="yes"
-                  />
-                }
-                label="Show"
-              />
-            </Tooltip>
-          )}
-      </CenteredContainer>
+      <ReplaceCardButton
+        card={card}
+        canEditCollection={canEditCollection}
+        // observe button update
+        showReplace={card.show_replace}
+      />
     )
   }
 
@@ -387,19 +328,6 @@ class GridCard extends React.Component {
       return !!record.cover.image_url
     }
     return !!record.thumbnail_url
-  }
-
-  handleReplace = ev => {
-    const { card } = this.props
-    if (card.is_master_template_card) return false
-    ev.preventDefault()
-    return card.beginReplacing()
-  }
-
-  handleReplaceToggle = ev => {
-    const { card } = this.props
-    card.show_replace = ev.target.checked
-    card.save()
   }
 
   handleClick = e => {
