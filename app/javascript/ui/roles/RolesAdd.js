@@ -113,8 +113,10 @@ class RolesAdd extends React.Component {
     }
     if (!existing) {
       this.selectedUsers.push(entity)
-      // TODO: notify modal to scroll...
-      // uiStore.modalScrollOverflow()
+      // add a delay so that the selected users can render
+      setTimeout(() => {
+        uiStore.scrollToBottomOfModal()
+      }, 100)
     }
   }
 
