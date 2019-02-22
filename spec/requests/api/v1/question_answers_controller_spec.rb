@@ -34,9 +34,9 @@ describe Api::V1::QuestionAnswersController, type: :request, json: true do
     context 'with invalid test collection' do
       let(:test_collection) { create(:test_collection, test_status: :closed) }
 
-      it 'returns a 400' do
+      it 'returns a 422' do
         post(path, params: params)
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
     end
   end
@@ -82,9 +82,9 @@ describe Api::V1::QuestionAnswersController, type: :request, json: true do
     context 'with invalid test collection' do
       let(:test_collection) { create(:test_collection, test_status: :closed) }
 
-      it 'returns a 400' do
+      it 'returns a 422' do
         patch(path, params: params)
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
     end
   end

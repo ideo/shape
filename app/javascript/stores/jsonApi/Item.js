@@ -23,7 +23,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
     'type',
     'name',
     'content',
-    'text_data',
+    'data_content',
     'url',
     'image',
     'archived',
@@ -31,6 +31,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
     'thumbnail_url',
     'filestack_file_attributes',
     'data_settings',
+    'report_type',
   ]
 
   get justText() {
@@ -51,9 +52,31 @@ class Item extends SharedRecordMixin(BaseRecord) {
   get canReplace() {
     if (!this.can_edit_content) return false
     return _.includes(
-      [ITEM_TYPES.IMAGE, ITEM_TYPES.FILE, ITEM_TYPES.VIDEO, ITEM_TYPES.LINK],
+      [
+        ITEM_TYPES.IMAGE,
+        ITEM_TYPES.FILE,
+        ITEM_TYPES.VIDEO,
+        ITEM_TYPES.LINK,
+        ITEM_TYPES.EXTERNAL_IMAGE,
+      ],
       this.type
     )
+  }
+
+  get isMedia() {
+    return this.isImage || this.isVideo
+  }
+
+  get isReportTypeCollectionsItems() {
+    return this.report_type === 'report_type_collections_and_items'
+  }
+
+  get isReportTypeNetworkAppMetric() {
+    return this.report_type === 'report_type_network_app_metric'
+  }
+
+  get isReportTypeRecord() {
+    return this.report_type === 'report_type_record'
   }
 
   get pdfCoverUrl() {
@@ -79,7 +102,10 @@ class Item extends SharedRecordMixin(BaseRecord) {
   }
 
   get isImage() {
-    return this.filestack_file && this.mimeBaseType === 'image'
+    return (
+      this.type === ITEM_TYPES.EXTERNAL_IMAGE ||
+      (this.filestack_file && this.mimeBaseType === 'image')
+    )
   }
 
   get isText() {
@@ -111,6 +137,9 @@ class Item extends SharedRecordMixin(BaseRecord) {
   }
 
   imageUrl(filestackOpts = {}) {
+    if (this.type === ITEM_TYPES.EXTERNAL_IMAGE) {
+      return this.url
+    }
     const { filestack_file, filestack_handle } = this
     if (!filestack_handle) return ''
     let mimetype = ''
@@ -172,7 +201,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
 }
 
 Item.defaults = {
-  text_data: '',
+  data_content: '',
   can_edit: false,
   data: {
     values: [],

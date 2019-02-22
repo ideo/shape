@@ -3,13 +3,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   load_and_authorize_resource except: %i[move replace]
   before_action :load_and_authorize_parent_collection, only: %i[create replace]
   before_action :load_and_authorize_parent_collection_for_update, only: %i[update]
-  after_action :broadcast_collection_create_updates, only: %i[create update]
 
   before_action :load_and_authorize_parent_collection_for_index, only: %i[index]
   before_action :check_cache, only: %i[index]
   before_action :load_collection_cards, only: %i[index]
   def index
-    params[:page] ||= 1
     params[:card_order] ||= @collection.default_card_order
     render jsonapi: @collection_cards,
            include: [
@@ -28,6 +26,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def create
     card_params = collection_card_params
     type = card_params.delete(:type) || 'primary'
+
     # CollectionCardBuilder type expects 'primary' or 'link'
     type = 'link' if type == 'CollectionCard::Link'
     builder = CollectionCardBuilder.new(params: card_params,
@@ -41,6 +40,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       current_user.reload.reset_cached_roles!
       card.reload
       create_notification(card, :created)
+      broadcast_collection_create_updates
       render jsonapi: card,
              include: [:parent, record: [:filestack_file]],
              expose: { current_record: card.record }
@@ -62,6 +62,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     @collection_card.attributes = collection_card_update_params
     if @collection_card.save
       create_notification(@collection_card, :edited)
+      broadcast_collection_create_updates
       render jsonapi: @collection_card.reload
     else
       render_api_errors @collection_card.errors
@@ -120,7 +121,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
              meta: { moving_cards: mover.moving_cards.pluck(:id).map(&:to_s) },
              expose: { current_record: @to_collection }
     else
-      render json: { errors: mover.errors }, status: :bad_request
+      render json: { errors: mover.errors }, status: :unprocessable_entity
     end
   end
 
@@ -156,12 +157,14 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def check_cache
     fresh_when(
       last_modified: @collection.updated_at.utc,
-      etag: "#{@collection.cache_key(params[:card_order])}/cards/#{params[:page]}",
+      etag: "#{@collection.cache_key(params[:card_order])}/cards/#{@page}",
     )
   end
 
   def load_and_authorize_parent_collection_for_index
-    @collection = Collection.find(params[:collection_id])
+    @collection = Collection.find(
+      params[:collection_id].presence || params[:filter][:collection_id],
+    )
     authorize! :read, @collection
   end
 
@@ -173,7 +176,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     @collection_cards = @collection.collection_cards_viewable_by(
       current_user,
       card_order: params[:card_order],
-      page: params[:page] || 1,
+      page: @page,
       per_page: per_page,
       hidden: params[:hidden].present?,
     )
@@ -240,7 +243,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       end
     end
     if @errors.present?
-      render json: { errors: @errors }, status: :bad_request
+      render json: { errors: @errors }, status: :unprocessable_entity
       return
     end
     true
@@ -289,6 +292,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :image_contain,
       :is_cover,
       :filter,
+      :show_replace,
     )
   end
 
@@ -312,25 +316,29 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :is_cover,
       :filter,
       :hidden,
+      :show_replace,
       collection_attributes: %i[
         id
         type
         name
         template_id
         master_template
+        external_id
       ],
       item_attributes: [
         :id,
         :type,
         :name,
-        :content,
         :url,
         :thumbnail_url,
         :icon_url,
         :image,
         :archived,
         :question_type,
-        text_data: {},
+        :report_type,
+        :external_id,
+        :content,
+        data_content: {},
         filestack_file_attributes: [
           :url,
           :handle,

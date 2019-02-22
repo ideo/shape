@@ -5,6 +5,7 @@ class Item < ApplicationRecord
   include HasFilestackFile
   include RealtimeEditorsViewers
   include HasActivities
+  include Externalizable
 
   resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
@@ -204,6 +205,13 @@ class Item < ApplicationRecord
   def touch_related_cards
     try(:parent_collection_card).try(:touch)
     cards_linked_to_this_item.update_all(updated_at: updated_at)
+  end
+
+  def replaced_media?
+    return false unless filestack_file.present?
+    templated_from_item = try(:parent_collection_card).try(:templated_from).try(:item)
+    return false unless templated_from_item
+    templated_from_item.filestack_file.handle != filestack_file.handle
   end
 
   def chart_data

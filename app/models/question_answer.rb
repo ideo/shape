@@ -36,7 +36,8 @@ class QuestionAnswer < ApplicationRecord
     item = open_response_item
     return create_open_response_item if item.blank?
     return destroy_open_response_item_and_card if answer_text.blank?
-    item.set_ops_from_plain_text(answer_text)
+    item.content = answer_text
+    item.import_plaintext_content(answer_text)
     item.save
   end
 
@@ -46,9 +47,7 @@ class QuestionAnswer < ApplicationRecord
       item_attributes: {
         type: 'Item::TextItem',
         content: answer_text,
-        text_data: {
-          ops: TextToQuillOps.call(answer_text),
-        },
+        data_content: QuillContentConverter.new(answer_text).text_to_quill_ops,
       },
     }
     builder = CollectionCardBuilder.new(

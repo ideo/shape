@@ -3,6 +3,7 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 
 import ErrorBoundary from '~/ui/global/ErrorBoundary'
 import MarketingPage from '~/ui/pages/MarketingPage'
+import TermsPage from '~/ui/pages/TermsPage'
 import v from '~/utils/variables'
 
 class MarketingRoutes extends React.Component {
@@ -28,6 +29,7 @@ class MarketingRoutes extends React.Component {
         <MuiThemeProvider theme={this.theme}>
           <Switch>
             <Route exact path="/" component={MarketingPage} />
+            <Route exact path="/terms" component={TermsPage} />
           </Switch>
         </MuiThemeProvider>
       </ErrorBoundary>

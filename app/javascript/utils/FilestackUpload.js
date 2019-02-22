@@ -90,7 +90,7 @@ class FilestackUpload {
       rotate: { deg: 'exif' },
       ...filestackOpts,
     }
-    if (mimetype.indexOf('svg') > -1) {
+    if (mimetype.match(/gif|svg/)) {
       // svg doesn't allow these transforms
       delete params.rotate
       delete params.resize

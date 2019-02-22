@@ -1,4 +1,5 @@
 import pluralize from 'pluralize'
+import { startCase } from 'lodash'
 import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { runInAction, observable, computed } from 'mobx'
@@ -217,12 +218,12 @@ class DataItemCover extends React.Component {
     )
   }
 
-  get withinText() {
+  get collectionsAndItemsControls() {
     const { item } = this.props
     const { timeframe } = item
     if (timeframe === 'ever') {
       return (
-        <span className="withinText">
+        <span className="titleAndControls">
           within {!item.collectionFilter ? 'the ' : ''}
           {this.targetControl} {this.timeframeControl}
         </span>
@@ -239,6 +240,17 @@ class DataItemCover extends React.Component {
         </SmallHelperText>
       </Fragment>
     )
+  }
+
+  get titleAndControls() {
+    const { item } = this.props
+    const { name, data_settings } = item
+    if (item.isReportTypeNetworkAppMetric) {
+      return startCase(data_settings.d_measure)
+    } else if (item.isReportTypeCollectionsItems) {
+      return this.collectionsAndItemsControls
+    }
+    return name
   }
 
   onSelectTimeframe = value => {
@@ -357,7 +369,7 @@ class DataItemCover extends React.Component {
         <Heading3>{this.measureControl}</Heading3>
         <HugeNumber className="count">{item.data.value}</HugeNumber>
         <SmallHelperText color={v.colors.black}>
-          {this.withinText}
+          {this.titleAndControls}
         </SmallHelperText>
       </Fragment>
     )
@@ -374,11 +386,40 @@ class DataItemCover extends React.Component {
     return ''
   }
 
+  get fillColor() {
+    if (this.props.item.data) {
+      const { fill } = this.props.item.data
+      if (fill) return fill
+    }
+    return '#000000'
+  }
+
+  get chartAreaStyle() {
+    const { item } = this.props
+    if (item.isReportTypeCollectionsItems) {
+      return {
+        data: { fill: 'url(#organicGrid)' },
+        labels: {
+          fill: 'black',
+        },
+      }
+    }
+    return {
+      data: { fill: this.fillColor },
+      labels: {
+        fontSize: 18,
+      },
+    }
+  }
+
   renderTimeframeValues() {
+    const { card } = this.props
     return (
       <Fragment>
         <AboveChartContainer>
-          <DisplayText>{this.withinText}</DisplayText>
+          <DisplayText color={this.fillColor}>
+            {this.titleAndControls}
+          </DisplayText>
           <br />
           {this.formattedValues.length < 2 && (
             <DisplayText className="noDataMessage">
@@ -415,14 +456,10 @@ class DataItemCover extends React.Component {
                     minAmount={this.minAmount}
                     maxAmount={this.maxAmount}
                     textRenderer={this.renderLabelText}
+                    cardArea={card.width * card.height}
                   />
                 }
-                style={{
-                  data: { fill: 'url(#organicGrid)' },
-                  labels: {
-                    fill: 'black',
-                  },
-                }}
+                style={this.chartAreaStyle}
                 data={this.formattedValues}
                 y="amount"
                 x="month"
@@ -446,7 +483,7 @@ class DataItemCover extends React.Component {
         editable={item.can_edit_content}
         editing={this.editing}
       >
-        {item.timeframe === 'ever'
+        {item.isReportTypeCollectionsItems && item.timeframe === 'ever'
           ? this.renderSingleValue()
           : this.renderTimeframeValues()}
       </StyledDataItemCover>

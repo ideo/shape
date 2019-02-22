@@ -1,16 +1,4 @@
 class Api::V1::UsersController < Api::V1::BaseController
-  # All the other users in this org
-  # /organizations/:id/users
-  load_and_authorize_resource :organization, only: %i[index]
-  def index
-    # show all other active users in the organization
-    @users = User.all_active_except(current_user.id, in_org: @organization)
-    render jsonapi: @users, fields:
-      {
-        users: User.basic_api_fields,
-      }
-  end
-
   load_and_authorize_resource only: %i[show]
   def show
     render jsonapi: @user, include: [
@@ -36,13 +24,13 @@ class Api::V1::UsersController < Api::V1::BaseController
 
   # Create new pending users from email addresses
   def create_from_emails
-    cpu = CreatePendingUsers.new(
+    service = FindOrCreateUsersByEmail.new(
       emails: json_api_params[:emails],
     )
-    if cpu.call
-      render jsonapi: cpu.users
+    if service.call
+      render jsonapi: service.users
     else
-      render_api_errors cpu.failed_emails
+      render_api_errors service.failed_emails
     end
   end
 

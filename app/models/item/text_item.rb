@@ -1,20 +1,24 @@
 class Item
   class TextItem < Item
     validates :content, presence: true
-    validates :text_data, presence: true
+    validates :data_content, presence: true
+    before_validation :import_html_content_if_blank, on: :create
     has_one :question_answer, inverse_of: :open_response_item
 
-    def set_ops_from_plain_text(text)
-      text_data['ops'] = TextToQuillOps.call(text)
-      self.content = text
+    def import_plaintext_content(text)
+      self.data_content = QuillContentConverter.new(text).text_to_quill_ops
+    end
+
+    def import_html_content(html)
+      self.data_content = QuillContentConverter.new(html).html_to_quill_ops
     end
 
     # build up a plaintext string of all the text content, with elements separated by pipes "|"
     # e.g. "Mission Statement | How might we do x..."
     def plain_content(only_first_line: false, splitter: ' | ')
-      return '' unless text_data.present? && text_data['ops'].present?
+      return '' unless data_content.present? && data_content['ops'].present?
       text = ''
-      text_data['ops'].each_with_index do |data, i|
+      data_content['ops'].each_with_index do |data, i|
         # strip out escaped strings e.g. "&lt;strong&gt;" if someone typed raw HTML
         # strip out extra whitespaces/newlines
         t = StripTags.new(data['insert']).call
@@ -39,6 +43,11 @@ class Item
         self.name = plain_content.split(' | ').first
       end
       truncate_name
+    end
+
+    def import_html_content_if_blank
+      return if data_content.present?
+      import_html_content(content)
     end
   end
 end

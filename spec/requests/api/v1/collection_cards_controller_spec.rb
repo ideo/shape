@@ -184,7 +184,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         # create with a nested item
         item_attributes: {
           content: 'This is my item content',
-          text_data: { ops: [{ insert: 'This is my item content.' }] },
+          data_content: { ops: [{ insert: 'This is my item content.' }] },
           type: 'Item::TextItem',
         },
       }
@@ -252,9 +252,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
 
     context 'with errors' do
-      it 'returns a 400 bad request' do
+      it 'returns a 422 bad request' do
         post(path, params: bad_params)
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
     end
 
@@ -458,6 +458,27 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
+    context 'trying to move inside itself' do
+      let!(:from_collection) do
+        create(:collection, organization: to_collection.organization, add_editors: [user])
+      end
+      let!(:subcollection_card) { create(:collection_card, parent: from_collection) }
+      let!(:to_collection) { create(:collection, add_editors: [user]) }
+      let(:moving_cards) { [subcollection_card] }
+
+      before do
+        to_collection.update(
+          parent_collection_card: subcollection_card,
+        )
+        user.add_role(Role::EDITOR, to_collection)
+      end
+
+      it 'returns a 422 unprocessable_entity' do
+        patch(path, params: params)
+        expect(response.status).to eq(422)
+      end
+    end
+
     context 'with content editor access for to_collection' do
       let(:editor) { create(:user) }
       let(:viewer) { create(:user) }
@@ -646,9 +667,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         to_collection.recalculate_breadcrumb!
       end
 
-      it 'returns a 400' do
+      it 'returns a 422' do
         post(path, params: params)
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
     end
 

@@ -1,6 +1,7 @@
 class SerializableItem < BaseJsonSerializer
+  include SerializedExternalId
   type 'items'
-  attributes :type, :name, :content, :text_data,
+  attributes :name, :content, :data_content,
              :url, :thumbnail_url, :icon_url, :question_type,
              :data_source_type, :data_source_id, :data_settings,
              :previous_thumbnail_urls
@@ -38,6 +39,10 @@ class SerializableItem < BaseJsonSerializer
 
   attribute :filestack_handle do
     @object.filestack_file_handle
+  end
+
+  attribute :has_replaced_media do
+    @object.replaced_media?
   end
 
   belongs_to :filestack_file

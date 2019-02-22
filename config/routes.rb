@@ -7,6 +7,7 @@ Rails.application.routes.draw do
 
   unauthenticated do
     root to: 'home#marketing'
+    get 'terms', to: 'home#marketing'
   end
 
   authenticated :user do
@@ -18,7 +19,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :activities, only: %i[create]
-      resources :collections, except: %i[index] do
+      resources :collections do
         member do
           get 'in_my_collection'
           post 'clear_collection_cover'
@@ -29,14 +30,15 @@ Rails.application.routes.draw do
           post 'create_template'
           post 'set_submission_box_template'
         end
-        resources :collection_cards, only: :index
+        resources :collection_cards, only: %i[index]
         resources :roles, only: %i[index create destroy] do
           collection do
+            delete '', action: 'destroy'
             get 'will_become_private'
           end
         end
       end
-      resources :items, except: %i[index] do
+      resources :items do
         member do
           post 'duplicate'
           patch 'archive'
@@ -45,6 +47,7 @@ Rails.application.routes.draw do
         end
         resources :roles, only: %i[index create destroy] do
           collection do
+            delete '', action: 'destroy'
             get 'will_become_private'
           end
         end
@@ -76,7 +79,11 @@ Rails.application.routes.draw do
         member do
           patch 'archive'
         end
-        resources :roles, only: %i[index create destroy]
+        resources :roles, only: %i[index create destroy] do
+          collection do
+            delete '', action: 'destroy'
+          end
+        end
       end
       resources :organizations, except: :delete do
         collection do
@@ -92,7 +99,7 @@ Rails.application.routes.draw do
         resources :users, only: %i[index]
       end
       delete 'sessions' => 'sessions#destroy'
-      resources :users do
+      resources :users, except: :index do
         collection do
           get 'me'
           post 'create_from_emails'
@@ -159,8 +166,7 @@ Rails.application.routes.draw do
   get :login, to: 'home#login', as: :login
   get :login_as, to: 'home#login_as', as: :login_as
   get :sign_up, to: 'home#sign_up', as: :sign_up
-
-  # get '/marketing', to: 'home#marketing'
+  get 'sign_out_and_redirect/:provider', to: 'home#sign_out_and_redirect'
 
   # catch all mailer preview paths
   get '/rails/mailers/*path' => 'rails/mailers#preview'

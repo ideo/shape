@@ -1,0 +1,82 @@
+{
+  "id": "3ecb7b8a-c666-49b2-ba76-43f2b9a6fbe2",
+  "type": "chart_data",
+  "attributes": {
+    "title": "Creative Qualities",
+    "subtitle": "Your scores for 509 survey respondents",
+    "datasets": [
+      {
+        "label": "Q1 2019",
+        "data": [
+          { "value": 25, "column": "Purpose" },
+          { "value": 20, "column": "Looking Out" },
+          { "value": 15, "column": "Experimentation" },
+          { "value": 45, "column": "Collaboration" },
+          { "value": 35, "column": "Empowerment" },
+          { "value": 34, "column": "Refinement" }
+        ]
+      },
+      {
+        "label": "Q1 2018",
+        "data": [
+          { "value": 20, "column": "Purpose" },
+          { "value": 25, "column": "Looking Out" },
+          { "value": 14, "column": "Experimentation" },
+          { "value": 45, "column": "Collaboration" },
+          { "value": 30, "column": "Empowerment" },
+          { "value": 32, "column": "Refinement" }
+        ]
+      }
+    ],
+    "columns": [
+      {
+        "title": "Purpose",
+        "description": "The degree to which there is alignment about a meaningful change that leadership and employees want to make in the world.",
+        "icon_url": "https://assets.creativedifference.com/purpose.png"
+      },
+      {
+        "title": "Looking Out",
+        "description": "The degree to which employees get insights and inspiration from beyond the company’s walls. ",
+        "icon_url": "https://assets.creativedifference.com/looking_out.png"
+      },
+      {
+        "title": "Experimentation",
+        "description": "The degree to which a company is able to explore new ideas quickly and inexpensively, and evolve them towards a successful solution.",
+        "icon_url": "https://assets.creativedifference.com/experimentation.png"
+      },
+      {
+        "title": "Collaboration",
+        "description": "The degree to which employees of different roles and within different departments work together to bring new ideas forward.",
+        "icon_url": "https://assets.creativedifference.com/collaboration.png"
+      },
+      {
+        "title": "Empowerment",
+        "description": "The degree to which the organization provides a clear path for employees to create change.",
+        "icon_url": "https://assets.creativedifference.com/empowerment.png"
+      },
+      {
+        "title": "Refinement",
+        "description": "The degree to which the strategy, product, and design functions within a company play nicely with the execution roles as new ideas move towards implementation.",
+        "icon_url": "https://assets.creativedifference.com/refinement.png"
+      }
+    ],
+    "filters": [
+      {
+        "title": "Other Public Business Unit",
+        "params": { "business_unit_id": "78" }
+      },
+      {
+        "title": "All In Your Industry",
+        "params": { "industry_id": "56" }
+      },
+      {
+        "title": "All Organizations",
+        "params": { "all": "true" }
+      }
+    ]
+  },
+  "relationships": [],
+  "links": {
+    "self": "https://creativedifference.ideo.com/api/v4/scores"
+  }
+}

@@ -48,9 +48,9 @@ class ItemPage extends React.Component {
     })
   }
 
-  updateItem = itemTextData => {
+  updateItem = dataContent => {
     const { item } = this.state
-    item.text_data = itemTextData
+    item.data_content = dataContent
     this.setState({ item })
   }
 
@@ -87,6 +87,7 @@ class ItemPage extends React.Component {
             fullPageView
           />
         )
+      case ITEM_TYPES.EXTERNAL_IMAGE:
       case ITEM_TYPES.FILE:
         return (
           <ImageItem

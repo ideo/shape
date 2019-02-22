@@ -23,6 +23,16 @@ class BaseRecord extends jsonapi(Model) {
     return this.meta.id
   }
 
+  // We call `type` (the STI attribute) `class_type` in the API so that it doesn't confuse json-api-client
+  // however the frontend still refers to it as `type`
+  get type() {
+    return this.class_type
+  }
+
+  set type(t) {
+    this.class_type = t
+  }
+
   get persisted() {
     return !!this.id && this.id > 0
   }

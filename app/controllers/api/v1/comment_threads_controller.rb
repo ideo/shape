@@ -22,6 +22,8 @@ class Api::V1::CommentThreadsController < Api::V1::BaseController
   before_action :build_thread_and_authorize_record, only: %i[create]
   def create
     if @comment_thread.save
+      # add the creator synchronously
+      @comment_thread.add_user_follower!(current_user.id)
       AddCommentThreadFollowers.perform_async(@comment_thread.id)
       render jsonapi: @comment_thread, include: thread_relations
     else
@@ -90,7 +92,7 @@ class Api::V1::CommentThreadsController < Api::V1::BaseController
                        .where(organization_id: current_user.current_organization_id)
                        .order(updated_at: :desc)
                        .includes(:record, comments: [:author])
-                       .page(params[:page])
+                       .page(@page)
                        .per(10)
   end
 end

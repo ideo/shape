@@ -11,7 +11,9 @@ describe Api::V1::FilestackController, type: :request, json: true, auth: true do
     end
 
     it 'calls FilestackFile.security_token to get a new token' do
-      expect(FilestackFile).to receive(:security_token).and_return(security_token)
+      expect(FilestackFile).to receive(:security_token)
+        .with(read_only: false)
+        .and_return(security_token)
       get(path)
       expect(response.status).to be 200
       expect(response.body).to eq(security_token.to_json)

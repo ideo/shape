@@ -536,7 +536,7 @@ class MovableGridCard extends React.PureComponent {
             <GridCard
               {...cardProps}
               draggingMultiple={draggingMultiple}
-              holdingOver={hoveringOverRight}
+              hoveringOver={hoveringOverRight}
             />
           </InnerCardWrapper>
         </Rnd>
