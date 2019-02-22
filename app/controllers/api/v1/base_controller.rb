@@ -15,6 +15,7 @@ class Api::V1::BaseController < ApplicationController
       'Item::VideoItem': SerializableItem,
       'Item::TextItem': SerializableItem,
       'Item::FileItem': SerializableItem,
+      'Item::ExternalImageItem': SerializableItem,
       'Item::LinkItem': SerializableItem,
       'Item::QuestionItem': SerializableItem,
       'Item::ChartItem': SerializableItem,

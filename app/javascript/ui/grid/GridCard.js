@@ -92,6 +92,8 @@ class GridCard extends React.Component {
               searchResult={searchResult}
             />
           )
+        case ITEM_TYPES.EXTERNAL_IMAGE:
+          return <ImageItemCover item={record} contain={card.image_contain} />
         case ITEM_TYPES.FILE: {
           if (record.isPdfFile) {
             return <PdfFileItemCover item={record} />
@@ -114,7 +116,6 @@ class GridCard extends React.Component {
               dragging={this.props.dragging}
             />
           )
-
         case ITEM_TYPES.CHART:
           return <ChartItemCover item={record} testCollection={card.parent} />
 

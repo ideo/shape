@@ -87,6 +87,7 @@ class ItemPage extends React.Component {
             fullPageView
           />
         )
+      case ITEM_TYPES.EXTERNAL_IMAGE:
       case ITEM_TYPES.FILE:
         return (
           <ImageItem

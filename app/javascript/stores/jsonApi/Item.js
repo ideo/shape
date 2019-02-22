@@ -52,7 +52,13 @@ class Item extends SharedRecordMixin(BaseRecord) {
   get canReplace() {
     if (!this.can_edit_content) return false
     return _.includes(
-      [ITEM_TYPES.IMAGE, ITEM_TYPES.FILE, ITEM_TYPES.VIDEO, ITEM_TYPES.LINK],
+      [
+        ITEM_TYPES.IMAGE,
+        ITEM_TYPES.FILE,
+        ITEM_TYPES.VIDEO,
+        ITEM_TYPES.LINK,
+        ITEM_TYPES.EXTERNAL_IMAGE,
+      ],
       this.type
     )
   }
@@ -96,7 +102,10 @@ class Item extends SharedRecordMixin(BaseRecord) {
   }
 
   get isImage() {
-    return this.filestack_file && this.mimeBaseType === 'image'
+    return (
+      this.type === ITEM_TYPES.EXTERNAL_IMAGE ||
+      (this.filestack_file && this.mimeBaseType === 'image')
+    )
   }
 
   get isText() {
@@ -128,6 +137,9 @@ class Item extends SharedRecordMixin(BaseRecord) {
   }
 
   imageUrl(filestackOpts = {}) {
+    if (this.type === ITEM_TYPES.EXTERNAL_IMAGE) {
+      return this.url
+    }
     const { filestack_file, filestack_handle } = this
     if (!filestack_handle) return ''
     let mimetype = ''
