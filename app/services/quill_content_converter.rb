@@ -24,6 +24,8 @@ class QuillContentConverter < SimpleService
       quill_ops.push(insert: "\n", attributes: { header: header })
       current_string = ''
     end
+    # Write to ops if we still have any current string,
+    # or there was no content
     if quill_ops.blank? || current_string.present?
       quill_ops.push(insert: current_string)
     end

@@ -77,7 +77,7 @@ class CollectionCover < SimpleService
   end
 
   def first_media_item_card
-    first_shareable_item_card(type: ['Item::FileItem', 'Item::VideoItem'])
+    first_shareable_item_card(type: ['Item::FileItem', 'Item::VideoItem', 'Item::ExternalImageItem'])
   end
 
   def first_text_item_card
