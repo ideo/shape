@@ -113,6 +113,8 @@ class RolesAdd extends React.Component {
     }
     if (!existing) {
       this.selectedUsers.push(entity)
+      // TODO: notify modal to scroll...
+      // uiStore.modalScrollOverflow()
     }
   }
 

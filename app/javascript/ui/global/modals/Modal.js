@@ -121,6 +121,16 @@ Dialog.defaultProps = {
 }
 
 class Modal extends React.Component {
+  constructor(props) {
+    super(props)
+    this.contentArea = React.createRef()
+  }
+
+  handleScrollOverflow = () => {
+    const { contentArea } = this
+    contentArea.scrollTop = contentArea.scrollHeight
+  }
+
   handleClose = ev => {
     ev.preventDefault()
     const { onClose } = this.props
@@ -179,6 +189,7 @@ class Modal extends React.Component {
           classes={{
             root: ['modal__padding', noScroll && 'modal__no-scroll'].join(' '),
           }}
+          innerRef={e => (this.contentArea = e)}
         >
           {children}
         </DialogContent>
