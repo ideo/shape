@@ -38,6 +38,24 @@ RSpec.describe QuillContentConverter, type: :service do
       end
     end
 
+    context 'with mixed header and p tags' do
+      let!(:content) do
+        '<h1>Title</h1><p>some other</p><p>paragraphs</p><h3>Subtitle</h3><p>and a conclusion</p>'
+      end
+
+      it 'generates quill operations' do
+        expect(html_to_quill_ops).to eq(
+          ops: [
+            { insert: 'Title' },
+            { insert: "\n", attributes: { header: 1 } },
+            { insert: "some other\nparagraphs\nSubtitle" },
+            { insert: "\n", attributes: { header: 3 } },
+            { insert: 'and a conclusion' },
+          ],
+        )
+      end
+    end
+
     context 'with no html in text' do
       let!(:content) { 'Amazing Text Here' }
 
