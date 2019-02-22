@@ -153,13 +153,12 @@ class LinkCreator extends React.Component {
 
   createExternalImageItem = () => {
     const { url } = this.state
+    const name = _.last(url.split('/'))
     const attrs = {
       item_attributes: {
         type: ITEM_TYPES.EXTERNAL_IMAGE,
         url,
-        name: 'External Image',
-        content: url,
-        thumbnail_url: url,
+        name,
         icon_url: '',
       },
     }

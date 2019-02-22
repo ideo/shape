@@ -3,7 +3,7 @@ class Item
     validates :url, presence: true
 
     def image_url
-      thumbnail_url
+      url
     end
   end
 end
