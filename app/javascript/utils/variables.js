@@ -6,6 +6,7 @@ export const ITEM_TYPES = {
   QUESTION: 'Item::QuestionItem',
   CHART: 'Item::ChartItem',
   DATA: 'Item::DataItem',
+  EXTERNAL_IMAGE: 'Item::ExternalImageItem',
 }
 
 export const COLLECTION_TYPES = {

@@ -120,6 +120,13 @@ class LinkItemCover extends React.Component {
     )
   }
 
+  get isImage() {
+    const {
+      item: { url },
+    } = this.props
+    return url.match(/\.(jpeg|jpg|gif|png)$/) !== null
+  }
+
   render() {
     const { item } = this.props
     const { url, thumbnail_url } = item
@@ -127,13 +134,15 @@ class LinkItemCover extends React.Component {
     return (
       <StyledLinkCover>
         <StyledImageCover url={thumbnail_url} bgColor={v.colors.black}>
-          <Flex className="inner" align="center" justify="center">
-            <Box style={{ width: '100%' }}>
-              <CardHeading className="name">{truncatedName}</CardHeading>
-              <p className="content">{truncatedContent}</p>
-              <GridCardIconWithName text={url} icon={this.icon} />
-            </Box>
-          </Flex>
+          {!this.isImage && (
+            <Flex className="inner" align="center" justify="center">
+              <Box style={{ width: '100%' }}>
+                <CardHeading className="name">{truncatedName}</CardHeading>
+                <p className="content">{truncatedContent}</p>
+                <GridCardIconWithName text={url} icon={this.icon} />
+              </Box>
+            </Flex>
+          )}
           <div className="overlay" />
         </StyledImageCover>
       </StyledLinkCover>
