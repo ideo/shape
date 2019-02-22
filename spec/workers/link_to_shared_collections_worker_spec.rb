@@ -70,5 +70,15 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
         expect(user.current_shared_collection.link_collection_cards.count).to eq(0)
       end
     end
+
+    context 'with a bot user' do
+      let(:application) { create(:application, add_orgs: [organization]) }
+      let(:user) { application.user }
+
+      it 'should not create any links for that user' do
+        expect(user.current_user_collection.link_collection_cards.count).to eq(0)
+        expect(user.current_shared_collection).to be nil
+      end
+    end
   end
 end

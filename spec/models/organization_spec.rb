@@ -327,6 +327,20 @@ describe Organization, type: :model do
     end
   end
 
+  describe '#setup_bot_user_membership' do
+    let(:application) { create(:application) }
+    let(:user) { application.user }
+    let(:organization) { create(:organization) }
+
+    it 'should create an ApplicationCollection for the user' do
+      expect(user.current_organization).to be nil
+      expect {
+        organization.setup_bot_user_membership(user)
+      }.to change(Collection::ApplicationCollection, :count).by(1)
+      expect(user.current_organization).to eq(organization)
+    end
+  end
+
   describe '#remove_user_membership' do
     let(:organization) { create(:organization) }
     let(:other_org) { create(:organization) }
