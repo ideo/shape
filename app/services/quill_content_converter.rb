@@ -13,15 +13,15 @@ class QuillContentConverter < SimpleService
     html = Nokogiri::HTML.fragment(@content)
     current_string = ''
     html.children.each do |element|
-      t = element.children[0].text
+      t = element.children.present? ? element.children[0].text : element.text
       current_string += current_string.present? ? "\n#{t}" : t
-      next unless %w[h1 h2 h3].include? element.name
+      next unless %w[h1 h2 h3].include?(element.name)
       header = element.name.gsub(/\D/, '').to_i
       quill_ops.push(insert: current_string)
       quill_ops.push(insert: "\n", attributes: { header: header })
       current_string = ''
     end
-    if current_string.blank?
+    if quill_ops.blank? || current_string.present?
       quill_ops.push(insert: current_string)
     end
     { ops: quill_ops }
