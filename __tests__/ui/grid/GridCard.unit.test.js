@@ -288,8 +288,20 @@ describe('GridCard', () => {
     })
   })
 
+  describe('when hoveringOver', () => {
+    beforeEach(() => {
+      props.hoveringOver = true
+      rerender()
+    })
+
+    it('renders the colored to indicate selection', () => {
+      expect(wrapper.find('StyledGridCard').props().selected).toBe(true)
+    })
+  })
+
   describe('when selected', () => {
     beforeEach(() => {
+      props.hoveringOver = false
       uiStore.toggleSelectedCardId(props.card.id)
       rerender()
     })

@@ -77,6 +77,11 @@ const calcSectionHeight = props => {
 const StyledCardContent = styled.div`
   .top,
   .bottom {
+    font-family: ${v.fonts.sans};
+    font-size: 1rem;
+    letter-spacing: 0;
+    line-height: 1.375rem;
+
     position: absolute;
     right: 1.5rem;
     width: ${props => calcSectionWidth(props)};
@@ -86,7 +91,7 @@ const StyledCardContent = styled.div`
     top: ${props => props.gutter / 2 + pad}px;
   }
   .bottom {
-    bottom: ${props => (props.height === 1 ? 6 : pad)}px;
+    bottom: ${props => (props.height === 1 ? 4 : pad)}px;
   }
   ${props =>
     props.width > 1 &&

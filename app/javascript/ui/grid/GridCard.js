@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import styled from 'styled-components'
 
 import ChartItemCover from '~/ui/grid/covers/ChartItemCover'
 import ContainImage from '~/ui/grid/ContainImage'
@@ -17,7 +16,6 @@ import GenericFileItemCover from '~/ui/grid/covers/GenericFileItemCover'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 import DataItemCover from '~/ui/grid/covers/DataItemCover'
 
-import Loader from '~/ui/layout/Loader'
 import Activity from '~/stores/jsonApi/Activity'
 import ActionMenu from '~/ui/grid/ActionMenu'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
@@ -35,19 +33,13 @@ import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
 import Tooltip from '~/ui/global/Tooltip'
 import { routingStore, uiStore } from '~/stores'
 import v, { ITEM_TYPES } from '~/utils/variables'
+import ReplaceCardButton from '~/ui/grid/ReplaceCardButton'
 import {
   StyledGridCard,
   StyledBottomLeftIcon,
   StyledGridCardInner,
   StyledTopRightActions,
 } from './shared'
-
-const LoaderWrapper = styled.div`
-  z-index: ${v.zIndex.gridCardTop};
-  position: absolute;
-  top: 0;
-  left: 25%;
-`
 
 @observer
 class GridCard extends React.Component {
@@ -100,6 +92,8 @@ class GridCard extends React.Component {
               searchResult={searchResult}
             />
           )
+        case ITEM_TYPES.EXTERNAL_IMAGE:
+          return <ImageItemCover item={record} contain={card.image_contain} />
         case ITEM_TYPES.FILE: {
           if (record.isPdfFile) {
             return <PdfFileItemCover item={record} />
@@ -122,7 +116,6 @@ class GridCard extends React.Component {
               dragging={this.props.dragging}
             />
           )
-
         case ITEM_TYPES.CHART:
           return <ChartItemCover item={record} testCollection={card.parent} />
 
@@ -245,6 +238,22 @@ class GridCard extends React.Component {
     )
   }
 
+  renderReplaceControl() {
+    const { card, canEditCollection } = this.props
+    if (!canEditCollection) return null
+    if (!card.is_master_template_card && !card.isPinned) return null
+    if (!card.is_master_template_card && card.record.has_replaced_media)
+      return null
+    return (
+      <ReplaceCardButton
+        card={card}
+        canEditCollection={canEditCollection}
+        // observe button update
+        showReplace={card.show_replace}
+      />
+    )
+  }
+
   openMenu = () => {
     const { card } = this.props
     if (this.props.menuOpen) {
@@ -358,17 +367,13 @@ class GridCard extends React.Component {
       draggingMultiple,
       menuOpen,
       lastPinnedCard,
+
       testCollectionCard,
       searchResult,
     } = this.props
 
     const firstCardInRow = card.position && card.position.x === 0
     const tagEditorOpen = uiStore.tagsModalOpenId === card.id
-
-    const movingIntoCollection =
-      record.internalType === 'collections' &&
-      uiStore.movingIntoCollection &&
-      uiStore.movingIntoCollection.id === record.id
 
     return (
       <StyledGridCard
@@ -385,7 +390,7 @@ class GridCard extends React.Component {
         onContextMenu={this.openContextMenu}
         innerRef={c => (this.gridCardRef = c)}
         onMouseLeave={this.closeContextMenu}
-        selected={this.isSelected || this.props.holdingOver}
+        selected={this.isSelected || this.props.hoveringOver}
       >
         {canEditCollection &&
           (!card.isPinnedAndLocked || lastPinnedCard) && (
@@ -396,6 +401,7 @@ class GridCard extends React.Component {
           !card.isPinnedAndLocked && (
             <GridCardHotspot card={card} dragging={dragging} position="left" />
           )}
+        {record.isMedia && this.renderReplaceControl()}
         {!record.menuDisabled &&
           uiStore.textEditingItem !== record && (
             <StyledTopRightActions
@@ -449,12 +455,6 @@ class GridCard extends React.Component {
           filter={card.filter}
           forceFilter={!this.hasCover}
         >
-          {movingIntoCollection && (
-            <LoaderWrapper>
-              <Loader containerHeight="100%" size={50} />
-            </LoaderWrapper>
-          )}
-
           {this.renderInner}
         </StyledGridCardInner>
         <TagEditorModal
@@ -476,7 +476,7 @@ GridCard.propTypes = {
   isSharedCollection: PropTypes.bool,
   handleClick: PropTypes.func,
   dragging: PropTypes.bool,
-  holdingOver: PropTypes.bool,
+  hoveringOver: PropTypes.bool,
   menuOpen: PropTypes.bool,
   lastPinnedCard: PropTypes.bool,
   testCollectionCard: PropTypes.bool,
@@ -490,7 +490,7 @@ GridCard.defaultProps = {
   isSharedCollection: false,
   handleClick: () => null,
   dragging: false,
-  holdingOver: false,
+  hoveringOver: false,
   menuOpen: false,
   lastPinnedCard: false,
   testCollectionCard: false,

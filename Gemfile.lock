@@ -7,9 +7,9 @@ GIT
 
 GIT
   remote: https://github.com/ideo/network-api-ruby.git
-  revision: 5f328e2ebbc9b46c0b0c4022b74d8bc230a06052
+  revision: fa2ca070e29c595fea4463287889f7a6d128ed5b
   specs:
-    network-api-ruby (0.0.9)
+    network-api-ruby (0.0.11)
       json_api_client (~> 1.5, >= 1.5.3)
 
 GIT
@@ -99,7 +99,7 @@ GEM
     childprocess (0.9.0)
       ffi (~> 1.0, >= 1.0.11)
     coderay (1.1.2)
-    concurrent-ruby (1.1.3)
+    concurrent-ruby (1.1.4)
     connection_pool (2.2.1)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
@@ -143,7 +143,7 @@ GEM
       redis (>= 3.2, < 5.0)
     faraday (0.12.2)
       multipart-post (>= 1.2, < 3)
-    faraday_middleware (0.12.2)
+    faraday_middleware (0.13.1)
       faraday (>= 0.7.4, < 1.0)
     ffi (1.9.23)
     filestack (2.2.1)
@@ -211,7 +211,7 @@ GEM
     highline (1.7.10)
     httparty (0.16.1)
       multi_xml (>= 0.5.2)
-    i18n (1.2.0)
+    i18n (1.5.3)
       concurrent-ruby (~> 1.0)
     jbuilder (2.7.0)
       activesupport (>= 4.2.0)

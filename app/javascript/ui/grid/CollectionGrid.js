@@ -292,6 +292,7 @@ class CollectionGrid extends React.Component {
   async moveCardsIntoCollection(cardIds, hoveringRecord) {
     const { collection, uiStore, apiStore } = this.props
     const can_edit = hoveringRecord.can_edit_content || hoveringRecord.can_edit
+    uiStore.update('movingIntoCollection', hoveringRecord)
     if (!can_edit) {
       uiStore.confirm({
         prompt:
