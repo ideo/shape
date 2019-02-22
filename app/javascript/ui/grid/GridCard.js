@@ -33,6 +33,7 @@ import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
 import Tooltip from '~/ui/global/Tooltip'
 import { routingStore, uiStore } from '~/stores'
 import v, { ITEM_TYPES } from '~/utils/variables'
+import ReplaceCardButton from '~/ui/grid/ReplaceCardButton'
 import {
   StyledGridCard,
   StyledBottomLeftIcon,
@@ -237,6 +238,22 @@ class GridCard extends React.Component {
     )
   }
 
+  renderReplaceControl() {
+    const { card, canEditCollection } = this.props
+    if (!canEditCollection) return null
+    if (!card.is_master_template_card && !card.isPinned) return null
+    if (!card.is_master_template_card && card.record.has_replaced_media)
+      return null
+    return (
+      <ReplaceCardButton
+        card={card}
+        canEditCollection={canEditCollection}
+        // observe button update
+        showReplace={card.show_replace}
+      />
+    )
+  }
+
   openMenu = () => {
     const { card } = this.props
     if (this.props.menuOpen) {
@@ -384,6 +401,7 @@ class GridCard extends React.Component {
           !card.isPinnedAndLocked && (
             <GridCardHotspot card={card} dragging={dragging} position="left" />
           )}
+        {record.isMedia && this.renderReplaceControl()}
         {!record.menuDisabled &&
           uiStore.textEditingItem !== record && (
             <StyledTopRightActions

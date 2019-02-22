@@ -63,6 +63,10 @@ class Item extends SharedRecordMixin(BaseRecord) {
     )
   }
 
+  get isMedia() {
+    return this.isImage || this.isVideo
+  }
+
   get isReportTypeCollectionsItems() {
     return this.report_type === 'report_type_collections_and_items'
   }

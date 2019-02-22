@@ -306,7 +306,6 @@ describe Organization, type: :model do
     end
 
     it 'should create a UserCollection, SharedWithMeCollection and Getting Started collection for the user' do
-      expect(user.collections.size).to eq(3)
       # SharedWithMe and Getting Started live within the user collection
       expect(user.current_user_collection.collections.size).to eq(2)
     end
@@ -325,6 +324,20 @@ describe Organization, type: :model do
     it 'should set the user to be on the current organization' do
       expect(user.current_organization).to eq(organization)
       expect(user.current_user_collection_id).not_to be nil
+    end
+  end
+
+  describe '#setup_bot_user_membership' do
+    let(:application) { create(:application) }
+    let(:user) { application.user }
+    let(:organization) { create(:organization) }
+
+    it 'should create an ApplicationCollection for the user' do
+      expect(user.current_organization).to be nil
+      expect {
+        organization.setup_bot_user_membership(user)
+      }.to change(Collection::ApplicationCollection, :count).by(1)
+      expect(user.current_organization).to eq(organization)
     end
   end
 
@@ -752,6 +765,22 @@ describe Organization, type: :model do
       expect(organization.can_view?(user)).to be false
       user.add_role(Role::APPLICATION_USER, organization)
       expect(organization.can_view?(user)).to be true
+    end
+  end
+
+  describe '#add_shared_with_org_collections' do
+    let(:organization) { create(:organization) }
+    let(:user) { create(:user) }
+    let(:collection) { create(:collection, organization: organization, shared_with_organization: true) }
+
+    it 'links the collection to the user\'s My Collection' do
+      expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
+        [user.id],
+        [],
+        [collection.id],
+        [],
+      )
+      organization.add_shared_with_org_collections(user)
     end
   end
 end
