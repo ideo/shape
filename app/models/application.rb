@@ -8,6 +8,7 @@ class Application < ApplicationRecord
   has_many :external_records
 
   before_validation :create_user, on: :create
+  after_update :update_application_collection_names, if: :saved_change_to_name?
 
   private
 
@@ -22,5 +23,11 @@ class Application < ApplicationRecord
       # set terms_accepted, otherwise will get 401 unauthorized
       terms_accepted: true,
     )
+  end
+
+  def update_application_collection_names
+    application_organizations.map(&:root_collection).each do |collection|
+      collection.update(name: name)
+    end
   end
 end
