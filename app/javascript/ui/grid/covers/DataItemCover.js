@@ -54,8 +54,10 @@ const nearMonth = (momentDate, timeframe) => {
 
 const TickLabel = props => {
   let dx
-  if (props.x === 0) dx = 12
-  if (props.x === 450) dx = -12
+  console.log(props)
+  // We'll need to dynamically set this based on number of data points
+  if (props.x === 0) dx = props.dx
+  if (props.x === 450) dx = -props.dx
   const updatedStyle = Object.assign({}, props.style, {
     fontSize: props.fontSize,
   })
@@ -330,12 +332,26 @@ class DataItemCover extends React.Component {
   get formattedValues() {
     const { item } = this.props
     if (!item.data || !item.data.values) return []
+
+    if (item.data.values.length == 0) {
+      // if no values, use data.value
+      return [
+        {
+          amount: item.data.value,
+          date: new Date, // Where do we get date from if no values?
+          // date: item.data.date,
+          // month: item.data.date
+        }
+      ]
+    }
+
     const {
       data: { values },
     } = item
+
     return values.map((value, i) => ({
       ...value,
-      month: value.date,
+      month: value.date
     }))
   }
 
@@ -366,6 +382,8 @@ class DataItemCover extends React.Component {
   }
 
   renderSingleValue() {
+    // Need to overwrite this for Creative Qualities
+    // How?
     const { item } = this.props
     return (
       <Fragment>
@@ -389,7 +407,8 @@ class DataItemCover extends React.Component {
     return ''
   }
 
-  displayEveryXAxisText = (d, i) => `${utcMoment(d).format('YYYY')}`
+  // Why is this rendered so far to the side of the box?
+  displayEveryXAxisText = (d, i) => `${utcMoment(d).format('MM/DD/YY')}`
 
   get fillColor() {
     if (this.props.item.data) {
@@ -439,6 +458,7 @@ class DataItemCover extends React.Component {
 
   renderTimeframeValues() {
     const { card, item } = this.props
+    console.log("this.formattedValues: ", this.formattedValues)
     let tickLabelStyle = {}
     if (item.isReportTypeRecord) {
       tickLabelStyle = {
@@ -459,6 +479,7 @@ class DataItemCover extends React.Component {
           </DisplayText>
           <br />
           {this.formattedValues.length < 2 && (
+            // need to skip this for CQs with one value in data items
             <DisplayText className="noDataMessage">
               <br />
               Not enough data yet
@@ -486,6 +507,8 @@ class DataItemCover extends React.Component {
                 }
                 style={this.chartAreaStyle}
                 data={this.formattedValues}
+                // This makes the chart shape based on the values
+                domain={{x: [1, this.formattedValues.length], y: [0, 100]}}
                 y="amount"
                 x="month"
               />
@@ -494,6 +517,8 @@ class DataItemCover extends React.Component {
                   <TickLabel
                     fontSize={tickLabelStyle.fontSize}
                     dy={tickLabelStyle.dy}
+                    // this needs to be handled dynamically
+                    dx={20*this.formattedValues.length}
                   />
                 }
                 tickFormat={
