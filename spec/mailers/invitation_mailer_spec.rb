@@ -27,12 +27,13 @@ RSpec.describe InvitationMailer, type: :mailer do
       end
 
       context 'on staging env' do
-        # this is actually testing ApplicationMailer
+        # this is testing logic within ApplicationMailer
         let(:group) { create(:group, id: ::IDEO_PRODUCTS_GROUP_ID, organization: organization) }
         let!(:shape_app) { ENV['SHAPE_APP'] }
 
         before do
-          ENV['SHAPE_APP'] = 'staging'
+          # this for allowing Rails.env.test to test the restriction
+          ENV['SHAPE_APP'] = 'test-restriction'
         end
 
         after do
@@ -46,6 +47,10 @@ RSpec.describe InvitationMailer, type: :mailer do
 
           it 'sends the email' do
             expect(mail.to).to eq([user.email])
+          end
+
+          it 'adds the environment to the subject line' do
+            expect(mail.subject).to include('[Shape test-restriction]')
           end
         end
 
