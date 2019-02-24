@@ -6,7 +6,7 @@ class ApplicationMailer < ActionMailer::Base
   layout 'mailer'
 
   def mail(**args)
-    if args[:users].present? && ENV['SHAPE_APP'] == 'staging'
+    if args[:users].present? && ENV['SHAPE_APP'] != 'production'
       products_group_user_ids = Group.find(::IDEO_PRODUCTS_GROUP_ID).user_ids
       args[:to] = args[:users].select { |u| products_group_user_ids.include?(u.id) }.map(&:email)
     end
