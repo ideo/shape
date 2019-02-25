@@ -36,6 +36,7 @@ export const theme = objectAssignDeep({}, VictoryTheme.grayscale, {
   axis: {
     style: {
       tickLabels: themeLabelStyles,
+      axisLabel: themeLabelStyles,
     },
   },
   group: {

@@ -54,7 +54,7 @@ const nearMonth = (momentDate, timeframe) => {
 
 const TickLabel = props => {
   let dx
-  console.log(props)
+  // console.log("Tick Label props: ", props)
   // We'll need to dynamically set this based on number of data points
   if (props.x === 0) dx = props.dx
   if (props.x === 450) dx = -props.dx
@@ -329,33 +329,38 @@ class DataItemCover extends React.Component {
     uiStore.toggleEditingCardId(card.id)
   }
 
-  get formattedValues() {
+  get valuesFromDataItem() {
     const { item } = this.props
     if (!item.data || !item.data.values) return []
-
-    if (item.data.values.length == 0) {
-      // if no values, use data.value
-      return [
-        {
-          amount: item.data.value,
-          date: new Date, // Where do we get date from if no values?
-          // date: item.data.date,
-          // month: item.data.date
-        }
-      ]
-    }
 
     const {
       data: { values },
     } = item
 
-    return values.map((value, i) => ({
+    return values
+  }
+
+  get formattedValues() {
+    // build duplicate
+      let duplicateValue = Object.assign({}, this.valuesFromDataItem[0])
+      duplicateValue.date = utcMoment(duplicateValue.date).subtract('3', 'months').format('YYYY-MM-DD')
+      duplicateValue.month = duplicateValue.date
+      duplicateValue.isDuplicate = true
+
+    const mappedValues = this.valuesFromDataItem.map((value, i) => ({
       ...value,
       month: value.date
     }))
+
+    // check if need duplicate
+    if (mappedValues.length == 1) {
+      mappedValues.push(duplicateValue)
+    }
+
+    return mappedValues
   }
 
-  renderLabelText = (datum, isLastDataPoint) => {
+  renderTooltipText = (datum, isLastDataPoint) => {
     const { item } = this.props
     const { timeframe, measureTooltip } = item
     const momentDate = utcMoment(datum.date)
@@ -408,7 +413,7 @@ class DataItemCover extends React.Component {
   }
 
   // Why is this rendered so far to the side of the box?
-  displayEveryXAxisText = (d, i) => `${utcMoment(d).format('MM/DD/YY')}`
+  formatXAxisDate = (d, i) => `${utcMoment(d).format('MM/DD/YY')}`
 
   get fillColor() {
     if (this.props.item.data) {
@@ -445,6 +450,11 @@ class DataItemCover extends React.Component {
           strokeWidth: 30,
           transform: 'translateY(26px)',
         },
+        axisLabel: {
+          padding: 0,
+          fontSize: '18px',
+          dy: -5,
+        }
       }
     }
     return {
@@ -456,21 +466,61 @@ class DataItemCover extends React.Component {
     }
   }
 
+  get chartAxis() {
+    // if single value => axis label
+    const values = this.valuesFromDataItem
+    const { item } = this.props
+
+    let tickLabelStyle = {}
+      if (item.isReportTypeRecord) {
+        tickLabelStyle = {
+          fontSize: '18px',
+          dy: -5,
+        }
+      } else {
+        tickLabelStyle = {
+          fontSize: '10px',
+          dy: 5,
+        }
+      }
+
+    return values.length > 1 ? (
+      <VictoryAxis
+        tickLabelComponent={
+          <TickLabel
+            fontSize={tickLabelStyle.fontSize}
+            dy={tickLabelStyle.dy}
+            // this needs to be handled dynamically
+            // 20 is fine for 2-3 data points but too crowded for 4
+            dx={20*this.formattedValues.length}
+          />
+        }
+        tickFormat={
+          item.isReportTypeRecord
+            ? this.formatXAxisDate
+            : this.displayMonthlyXAxisText
+        }
+        offsetY={13}
+        style={this.chartAxisStyle}
+      />
+    ) : (
+      <VictoryAxis
+        axisLabelComponent={
+          <TickLabel
+            fontSize={tickLabelStyle.fontSize}
+          />
+        }
+        style={this.chartAxisStyle}
+        tickFormat={(t) => null}
+        offsetY={13}
+        label={this.formatXAxisDate(values[0].date)}
+      />
+    )
+  }
+
   renderTimeframeValues() {
     const { card, item } = this.props
-    console.log("this.formattedValues: ", this.formattedValues)
-    let tickLabelStyle = {}
-    if (item.isReportTypeRecord) {
-      tickLabelStyle = {
-        fontSize: '18px',
-        dy: -5,
-      }
-    } else {
-      tickLabelStyle = {
-        fontSize: '10px',
-        dy: 5,
-      }
-    }
+
     return (
       <Fragment>
         <AboveChartContainer>
@@ -479,7 +529,6 @@ class DataItemCover extends React.Component {
           </DisplayText>
           <br />
           {this.formattedValues.length < 2 && (
-            // need to skip this for CQs with one value in data items
             <DisplayText className="noDataMessage">
               <br />
               Not enough data yet
@@ -497,11 +546,13 @@ class DataItemCover extends React.Component {
             >
               <VictoryArea
                 labels={d => d.amount}
+                // ChartTooltip shows highest and lowest values
+                // no matter then amount of data points
                 labelComponent={
                   <ChartTooltip
                     minAmount={this.minAmount}
                     maxAmount={this.maxAmount}
-                    textRenderer={this.renderLabelText}
+                    textRenderer={this.renderTooltipText}
                     cardArea={card.width * card.height}
                   />
                 }
@@ -512,23 +563,7 @@ class DataItemCover extends React.Component {
                 y="amount"
                 x="month"
               />
-              <VictoryAxis
-                tickLabelComponent={
-                  <TickLabel
-                    fontSize={tickLabelStyle.fontSize}
-                    dy={tickLabelStyle.dy}
-                    // this needs to be handled dynamically
-                    dx={20*this.formattedValues.length}
-                  />
-                }
-                tickFormat={
-                  item.isReportTypeRecord
-                    ? this.displayEveryXAxisText
-                    : this.displayMonthlyXAxisText
-                }
-                offsetY={13}
-                style={this.chartAxisStyle}
-              />
+              {this.chartAxis}
             </VictoryChart>
           </ChartContainer>
         )}
@@ -538,6 +573,7 @@ class DataItemCover extends React.Component {
 
   render() {
     const { item, uiStore } = this.props
+    console.log("render")
     if (uiStore.isNewCard(item.id)) {
       uiStore.removeNewCard(item.id)
       this.toggleEditing()
@@ -545,7 +581,7 @@ class DataItemCover extends React.Component {
     return (
       <StyledDataItemCover
         className="cancelGridClick"
-        editable={item.can_edit_content}
+        editable={item.can_edit_content} // do we need to conditionally disable this?
         editing={this.editing}
       >
         {item.isReportTypeCollectionsItems && item.timeframe === 'ever'
