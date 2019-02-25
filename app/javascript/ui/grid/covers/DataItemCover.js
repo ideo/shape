@@ -529,6 +529,10 @@ class DataItemCover extends React.Component {
           </DisplayText>
           <br />
           {this.formattedValues.length < 2 && (
+            // how do we want to handle this?
+            // do we want to allow non-Record reports have 1 point?
+            // Right now we are hacking around this by duplicating
+            // the lone data point for biz units with one scored survey
             <DisplayText className="noDataMessage">
               <br />
               Not enough data yet
