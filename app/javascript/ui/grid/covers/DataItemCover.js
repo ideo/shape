@@ -554,8 +554,8 @@ class DataItemCover extends React.Component {
                 // no matter then amount of data points
                 labelComponent={
                   <ChartTooltip
-                    minAmount={this.minAmount}
-                    maxAmount={this.maxAmount}
+                    // minAmount={this.minAmount}
+                    // maxAmount={this.maxAmount}
                     textRenderer={this.renderTooltipText}
                     cardArea={card.width * card.height}
                   />
