@@ -48,6 +48,24 @@ describe('ChartTooltip', () => {
     })
   })
 
+  describe('for an item with 2 data points (1 modified duplicate)', () => {
+    beforeEach(() => {
+      props.data = [
+        { date: '2018-07-01', amount: 10, _x: 1 },
+        { date: '2018-10-01', amount: 10, _x: 2 },
+      ]
+      render()
+    })
+
+    it('should render a tooltip', () => {
+      expect(wrapper.find('VictoryTooltip').exists()).toBe(true)
+    })
+
+    it('should not render an active tooltip', () => {
+      expect(wrapper.find('VictoryTooltip').length).toBe(1)
+    })
+  })
+
   describe('on the lowest value item', () => {
     it('should render a tooltip', () => {
       expect(wrapper.find('VictoryTooltip').exists()).toBe(true)

@@ -345,8 +345,7 @@ class DataItemCover extends React.Component {
       month: value.date
     }))
 
-    // build duplicate
-    // check if need duplicate
+    // check if need duplicate value, add if required
     if (mappedValues.length == 1) {
       let duplicateValue = Object.assign({}, this.valuesFromDataItem[0])
       duplicateValue.date = utcMoment(duplicateValue.date).subtract('3', 'months').format('YYYY-MM-DD')
@@ -385,8 +384,6 @@ class DataItemCover extends React.Component {
   }
 
   renderSingleValue() {
-    // Need to overwrite this for Creative Qualities
-    // How?
     const { item } = this.props
     return (
       <Fragment>
@@ -412,7 +409,6 @@ class DataItemCover extends React.Component {
     return ''
   }
 
-  // Why is this rendered so far to the side of the box?
   formatXAxisDate = (d, i) => `${utcMoment(d).format('MM/DD/YY')}`
 
   get fillColor() {

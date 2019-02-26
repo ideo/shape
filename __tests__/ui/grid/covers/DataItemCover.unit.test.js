@@ -215,7 +215,7 @@ describe('DataItemCover', () => {
     })
   })
 
-  describe('with a record report type', () => {
+  describe('with a record report type with 2+ values', () => {
     beforeEach(() => {
       props.item.report_type = 'report_type_report'
       props.item.name = 'My Static Data'
@@ -225,6 +225,7 @@ describe('DataItemCover', () => {
         values: [
           { amount: 24, date: '2018-09-10' },
           { amount: 27, date: '2018-09-11' },
+          { amount: 23, date: '2018-09-12' },
         ],
       }
       render()
@@ -242,6 +243,41 @@ describe('DataItemCover', () => {
 
     it('should not show editing controls', () => {
       expect(wrapper.find('.editableMetric').exists()).toBe(false)
+    })
+
+    describe('with a single data point in values', () => {
+      beforeEach(() => {
+        props.item.report_type = 'report_type_report'
+        props.item.name = 'My Lone Value Chart'
+        props.item.isReportTypeCollectionsItems = false
+        props.item.isReportTypeRecord = true
+        props.item.data = {
+          values: [{ amount: 24, date: '2018-09-10' }],
+        }
+        render()
+      })
+
+      it('should render name', () => {
+        expect(
+          wrapper
+            .find('StyledDisplayText')
+            .children()
+            .first()
+            .text()
+        ).toEqual('My Lone Value Chart')
+      })
+
+      it('should not show editing controls', () => {
+        expect(wrapper.find('.editableMetric').exists()).toBe(false)
+      })
+
+      it('should render one label on X axis of the chart', () => {
+        expect(wrapper.find('VictoryAxis').props().label).toEqual('09/10/18')
+      })
+
+      it('should render one for the data point on the chart', () => {
+        // console.log(wrapper.debug())
+      })
     })
   })
 })
