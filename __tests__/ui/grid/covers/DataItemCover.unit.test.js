@@ -274,10 +274,6 @@ describe('DataItemCover', () => {
       it('should render one label on X axis of the chart', () => {
         expect(wrapper.find('VictoryAxis').props().label).toEqual('09/10/18')
       })
-
-      it('should render one for the data point on the chart', () => {
-        // console.log(wrapper.debug())
-      })
     })
   })
 })
