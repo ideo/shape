@@ -367,7 +367,9 @@ class DataItemCover extends React.Component {
     return (
       <Fragment>
         <Heading3>{this.measureControl}</Heading3>
-        <HugeNumber className="count">{item.data.value}</HugeNumber>
+        <HugeNumber className="count" data-cy="DataReport-count">
+          {item.data.value}
+        </HugeNumber>
         <SmallHelperText color={v.colors.black}>
           {this.titleAndControls}
         </SmallHelperText>
@@ -429,7 +431,7 @@ class DataItemCover extends React.Component {
           )}
         </AboveChartContainer>
         {this.formattedValues.length >= 2 && (
-          <ChartContainer>
+          <ChartContainer data-cy="ChartContainer">
             <OrganicGrid />
             <VictoryChart
               theme={theme}
@@ -482,6 +484,7 @@ class DataItemCover extends React.Component {
         className="cancelGridClick"
         editable={item.can_edit_content}
         editing={this.editing}
+        data-cy="DataItemCover"
       >
         {item.isReportTypeCollectionsItems && item.timeframe === 'ever'
           ? this.renderSingleValue()

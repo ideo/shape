@@ -38,6 +38,22 @@ Then('I should see {int} {string}', (num, el) => {
     .should('eq', num)
 })
 
+Then('I should see {int} for the single data value', num => {
+  const dataValue = cy.get('[data-cy="DataReport-count"]')
+  dataValue.should('contain', num)
+})
+
+Then('I should see the single data value', () => {
+  const dataValue = cy.get('[data-cy="DataReport-count"]')
+  dataValue.should('exist')
+})
+
+Then('I should see an svg on the report item', () => {
+  cy.get('[data-cy="ChartContainer"] svg')
+    .first()
+    .should('exist')
+})
+
 Then('I should see the {word} of {int} cards as {word}', (pos, count, size) => {
   // size e.g. "2x1" so we split on 'x'
   const sizes = size.split('x')
