@@ -54,7 +54,6 @@ const nearMonth = (momentDate, timeframe) => {
 
 const TickLabel = props => {
   let dx
-  // console.log("Tick Label props: ", props)
   // We'll need to dynamically set this based on number of data points
   if (props.x === 0) dx = props.dx
   if (props.x === 450) dx = -props.dx
@@ -341,19 +340,18 @@ class DataItemCover extends React.Component {
   }
 
   get formattedValues() {
-    // build duplicate
-      let duplicateValue = Object.assign({}, this.valuesFromDataItem[0])
-      duplicateValue.date = utcMoment(duplicateValue.date).subtract('3', 'months').format('YYYY-MM-DD')
-      duplicateValue.month = duplicateValue.date
-      duplicateValue.isDuplicate = true
-
-    const mappedValues = this.valuesFromDataItem.map((value, i) => ({
+    let mappedValues = this.valuesFromDataItem.map((value, i) => ({
       ...value,
       month: value.date
     }))
 
+    // build duplicate
     // check if need duplicate
     if (mappedValues.length == 1) {
+      let duplicateValue = Object.assign({}, this.valuesFromDataItem[0])
+      duplicateValue.date = utcMoment(duplicateValue.date).subtract('3', 'months').format('YYYY-MM-DD')
+      duplicateValue.month = duplicateValue.date
+      duplicateValue.isDuplicate = true
       mappedValues.push(duplicateValue)
     }
 
@@ -472,17 +470,17 @@ class DataItemCover extends React.Component {
     const { item } = this.props
 
     let tickLabelStyle = {}
-      if (item.isReportTypeRecord) {
-        tickLabelStyle = {
-          fontSize: '18px',
-          dy: -5,
-        }
-      } else {
-        tickLabelStyle = {
-          fontSize: '10px',
-          dy: 5,
-        }
+    if (item.isReportTypeRecord) {
+      tickLabelStyle = {
+        fontSize: '18px',
+        dy: -5,
       }
+    } else {
+      tickLabelStyle = {
+        fontSize: '10px',
+        dy: 5,
+      }
+    }
 
     return values.length > 1 ? (
       <VictoryAxis
@@ -528,18 +526,14 @@ class DataItemCover extends React.Component {
             {this.titleAndControls}
           </DisplayText>
           <br />
-          {this.formattedValues.length < 2 && (
-            // how do we want to handle this?
-            // do we want to allow non-Record reports have 1 point?
-            // Right now we are hacking around this by duplicating
-            // the lone data point for biz units with one scored survey
+          {this.formattedValues.length < 1 && (
             <DisplayText className="noDataMessage">
               <br />
               Not enough data yet
             </DisplayText>
           )}
         </AboveChartContainer>
-        {this.formattedValues.length >= 0 && (
+        {this.formattedValues.length > 0 && (
           <ChartContainer>
             <OrganicGrid />
             <VictoryChart
@@ -554,8 +548,6 @@ class DataItemCover extends React.Component {
                 // no matter then amount of data points
                 labelComponent={
                   <ChartTooltip
-                    // minAmount={this.minAmount}
-                    // maxAmount={this.maxAmount}
                     textRenderer={this.renderTooltipText}
                     cardArea={card.width * card.height}
                   />
@@ -577,7 +569,7 @@ class DataItemCover extends React.Component {
 
   render() {
     const { item, uiStore } = this.props
-    console.log("render")
+
     if (uiStore.isNewCard(item.id)) {
       uiStore.removeNewCard(item.id)
       this.toggleEditing()

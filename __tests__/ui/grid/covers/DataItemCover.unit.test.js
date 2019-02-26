@@ -139,26 +139,26 @@ describe('DataItemCover', () => {
     it('renders text for the label with month and year', () => {
       // NOTE: code pulls the actual month back by 1
       const datum = { date: '2018-10-01', amount: 34, month: 'Sep' }
-      const label = wrapper.instance().renderLabelText(datum)
+      const label = wrapper.instance().renderTooltipText(datum)
       expect(label).toContain('in September')
     })
 
     it('renders in last 30 days for label for last data item', () => {
       // NOTE: code pulls the actual month back by 1
       const datum = { date: '2018-10-01', amount: 34, month: 'Sep' }
-      const label = wrapper.instance().renderLabelText(datum, true)
+      const label = wrapper.instance().renderTooltipText(datum, true)
       expect(label).toContain('in last 30 days')
     })
 
     it('displays x-axis labels for dates near the end of the month', () => {
       let label
       // if it's not near month end, the label is blank
-      label = wrapper.instance().displayXAxisText('2018-10-06')
+      label = wrapper.instance().displayMonthlyXAxisText('2018-10-06')
       expect(label).toEqual('')
       // should display the short name of the month that previously ended
-      label = wrapper.instance().displayXAxisText('2018-01-02')
+      label = wrapper.instance().displayMonthlyXAxisText('2018-01-02')
       expect(label).toEqual('Dec')
-      label = wrapper.instance().displayXAxisText('2018-12-31')
+      label = wrapper.instance().displayMonthlyXAxisText('2018-12-31')
       expect(label).toEqual('Dec')
     })
 
