@@ -65,7 +65,7 @@ const StyledDataItemCover = styled.div`
   background-color: ${v.colors.commonLight};
   border-top: 2px solid ${v.colors.black};
   height: 100%;
-  padding: 15px 0;
+  padding: 15px 0 0;
   text-align: left;
 
   .editableMetric {
