@@ -435,6 +435,11 @@ class CollectionGrid extends React.Component {
     const { dragX, dragY } = dragPosition
     const { gutter, gridW, gridH } = this.props
     const { cards, matrix } = this.state
+    let placeholder = _.find(cards, { cardType: 'placeholder' })
+    if (placeholder) {
+      // always reset this setting, unless we manually position below
+      placeholder.skipPositioning = false
+    }
 
     // calculate row/col that we are dragging over (with some padding to account for our desired logic)
     const row = Math.floor((dragY + gutter * 0.5) / (gridH + gutter))
@@ -447,9 +452,9 @@ class CollectionGrid extends React.Component {
       const overlapped = _.find(cards, { id: overlapCardId })
       const { record, position } = overlapped
       if (overlapped.isBeingMultiMoved) return null
-      const placeholder =
+      const isPlaceholder =
         overlapped.cardType === 'placeholder' || overlapped.cardType === 'blank'
-      if (overlapped.id === cardId || placeholder) return null
+      if (overlapped.id === cardId || isPlaceholder) return null
 
       const leftAreaSize = gridW * 0.23
       let direction = 'left'
@@ -482,16 +487,16 @@ class CollectionGrid extends React.Component {
         near = _.find(cards, { id: _.last(_.compact(matrix[row - 1])) })
       }
       if (near) {
-        let placeholder = _.find(cards, { cardType: 'placeholder' })
         if (!placeholder) {
           const positionedCard = _.find(cards, { id: cardId })
-          placeholder = this.createPlaiceholderCard(positionedCard)
+          placeholder = this.createPlaceholderCard(positionedCard)
         }
-        // update the emptyCard attrs to move it to our desired spot.
-        // after drag is done, emptyCard will get reset anyway
+        // update the placeholder attrs to move it to our desired spot.
         placeholder.order = near.order + 0.5
         placeholder.width = 1
         placeholder.height = 1
+        // we want to skip positioning in positionCards because we are manually setting x/yPos
+        placeholder.skipPositioning = true
         placeholder.position = {
           x: row,
           y: col,
@@ -601,11 +606,7 @@ class CollectionGrid extends React.Component {
         return
       }
 
-      if (card.isBeingMoved) {
-        return
-      }
-
-      if (card.tempHidden) {
+      if (card.isBeingMoved || card.tempHidden || card.skipPositioning) {
         return
       }
 
