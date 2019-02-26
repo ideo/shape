@@ -7,6 +7,7 @@ Rails.application.routes.draw do
 
   unauthenticated do
     root to: 'home#marketing'
+    get 'terms', to: 'home#marketing'
   end
 
   authenticated :user do
@@ -165,8 +166,7 @@ Rails.application.routes.draw do
   get :login, to: 'home#login', as: :login
   get :login_as, to: 'home#login_as', as: :login_as
   get :sign_up, to: 'home#sign_up', as: :sign_up
-
-  # get '/marketing', to: 'home#marketing'
+  get 'sign_out_and_redirect/:provider', to: 'home#sign_out_and_redirect'
 
   # catch all mailer preview paths
   get '/rails/mailers/*path' => 'rails/mailers#preview'

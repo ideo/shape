@@ -69,7 +69,7 @@ const StyledDataItemCover = styled.div`
   background-color: ${v.colors.commonLight};
   border-top: 2px solid ${v.colors.black};
   height: 100%;
-  padding: 15px 0;
+  padding: 15px 0 0;
   text-align: left;
 
   .editableMetric {
@@ -391,7 +391,9 @@ class DataItemCover extends React.Component {
     return (
       <Fragment>
         <Heading3>{this.measureControl}</Heading3>
-        <HugeNumber className="count">{item.data.value}</HugeNumber>
+        <HugeNumber className="count" data-cy="DataReport-count">
+          {item.data.value}
+        </HugeNumber>
         <SmallHelperText color={v.colors.black}>
           {this.titleAndControls}
         </SmallHelperText>
@@ -534,7 +536,7 @@ class DataItemCover extends React.Component {
           )}
         </AboveChartContainer>
         {this.formattedValues.length > 0 && (
-          <ChartContainer>
+          <ChartContainer data-cy="ChartContainer">
             <OrganicGrid />
             <VictoryChart
               theme={theme}
@@ -579,6 +581,7 @@ class DataItemCover extends React.Component {
         className="cancelGridClick"
         editable={item.can_edit_content} // do we need to conditionally disable this?
         editing={this.editing}
+        data-cy="DataItemCover"
       >
         {item.isReportTypeCollectionsItems && item.timeframe === 'ever'
           ? this.renderSingleValue()

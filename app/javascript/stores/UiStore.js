@@ -162,6 +162,8 @@ export default class UiStore {
   activeDragTarget = null
   @observable
   multiMoveCardIds = []
+  @observable
+  modalContentRef = null
 
   @action
   toggleEditingCardId(cardId) {
@@ -688,5 +690,11 @@ export default class UiStore {
     if (!_.isFunction(this.actionAfterRoute)) return
     this.actionAfterRoute()
     this.actionAfterRoute = null
+  }
+
+  scrollToBottomOfModal() {
+    if (!this.modalContentRef) return
+    const node = this.modalContentRef.current
+    node.scrollTop = node.scrollHeight
   }
 }

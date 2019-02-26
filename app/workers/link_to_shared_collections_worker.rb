@@ -7,6 +7,8 @@ class LinkToSharedCollectionsWorker
     groups_to_add = Group.where(id: group_ids)
     objects = Collection.where(id: collection_ids) + Item.where(id: item_ids)
     (users_to_add + groups_to_add).each do |entity|
+      # bot users don't get anything shared in their ApplicationCollection
+      next if entity.try(:bot_user?)
       objects.each do |object|
         # Don't create any links if object was created by user
         next if object.try(:created_by_id) == entity.id

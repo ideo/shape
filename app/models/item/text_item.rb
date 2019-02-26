@@ -2,11 +2,15 @@ class Item
   class TextItem < Item
     validates :content, presence: true
     validates :data_content, presence: true
+    before_validation :import_html_content_if_blank, on: :create
     has_one :question_answer, inverse_of: :open_response_item
 
     def import_plaintext_content(text)
-      data_content['ops'] = TextToQuillOps.call(text)
-      self.content = text
+      self.data_content = QuillContentConverter.new(text).text_to_quill_ops
+    end
+
+    def import_html_content(html)
+      self.data_content = QuillContentConverter.new(html).html_to_quill_ops
     end
 
     # build up a plaintext string of all the text content, with elements separated by pipes "|"
@@ -39,6 +43,11 @@ class Item
         self.name = plain_content.split(' | ').first
       end
       truncate_name
+    end
+
+    def import_html_content_if_blank
+      return if data_content.present?
+      import_html_content(content)
     end
   end
 end

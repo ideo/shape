@@ -101,7 +101,8 @@ class Collection < ApplicationRecord
 
   scope :root, -> { where('jsonb_array_length(breadcrumb) = 1') }
   scope :not_custom_type, -> { where(type: nil) }
-  scope :user, -> { where(type: 'Collection::UserCollection') }
+  scope :user_collection, -> { where(type: 'Collection::UserCollection') }
+  scope :application_collection, -> { where(type: 'Collection::ApplicationCollection') }
   scope :shared_with_me, -> { where(type: 'Collection::SharedWithMeCollection') }
   scope :searchable, -> { where.not(type: unsearchable_types).or(where(type: nil)) }
   scope :data_collectable, -> { where.not(type: uncollectable_types).or(where(type: nil)) }

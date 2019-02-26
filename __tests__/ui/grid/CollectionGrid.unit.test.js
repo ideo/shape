@@ -1,5 +1,6 @@
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 
+import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 
 import { fakeTextItem, fakeCollection } from '#/mocks/data'
@@ -17,6 +18,7 @@ beforeEach(() => {
     sortBy: 'order',
     updateCollection: jest.fn(),
     cardProperties: [],
+    apiStore: fakeApiStore(),
     uiStore: fakeUiStore,
     routingStore: {
       routeTo: jest.fn(),

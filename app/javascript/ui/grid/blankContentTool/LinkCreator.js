@@ -76,6 +76,11 @@ class LinkCreator extends React.Component {
         meta,
         urlValid: 'link',
       })
+    } else if (meta && meta.url.match(/\.(jpeg|jpg|gif|png)$/) !== null) {
+      this.setState({
+        meta,
+        urlValid: 'image',
+      })
     } else {
       this.setState({ urlValid: false })
     }
@@ -102,6 +107,8 @@ class LinkCreator extends React.Component {
     if (!urlValid) return
     if (urlValid === 'link') {
       this.createLinkItem()
+    } else if (urlValid === 'image') {
+      this.createExternalImageItem()
     } else if (urlValid === 'video') {
       this.createVideoItem()
     }
@@ -140,6 +147,20 @@ class LinkCreator extends React.Component {
         type: 'CollectionCard::Link',
       }
       attrs[`${meta.recordType}_id`] = meta.recordId
+    }
+    this.props.createCard(attrs)
+  }
+
+  createExternalImageItem = () => {
+    const { url } = this.state
+    const name = _.last(url.split('/'))
+    const attrs = {
+      item_attributes: {
+        type: ITEM_TYPES.EXTERNAL_IMAGE,
+        url,
+        name,
+        icon_url: '',
+      },
     }
     this.props.createCard(attrs)
   }
