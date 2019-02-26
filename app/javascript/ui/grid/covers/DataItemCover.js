@@ -340,15 +340,17 @@ class DataItemCover extends React.Component {
   }
 
   get formattedValues() {
-    let mappedValues = this.valuesFromDataItem.map((value, i) => ({
+    const mappedValues = this.valuesFromDataItem.map((value, i) => ({
       ...value,
-      month: value.date
+      month: value.date,
     }))
 
     // check if need duplicate value, add if required
-    if (mappedValues.length == 1) {
-      let duplicateValue = Object.assign({}, this.valuesFromDataItem[0])
-      duplicateValue.date = utcMoment(duplicateValue.date).subtract('3', 'months').format('YYYY-MM-DD')
+    if (mappedValues.length === 1) {
+      const duplicateValue = Object.assign({}, this.valuesFromDataItem[0])
+      duplicateValue.date = utcMoment(duplicateValue.date)
+        .subtract('3', 'months')
+        .format('YYYY-MM-DD')
       duplicateValue.month = duplicateValue.date
       duplicateValue.isDuplicate = true
       mappedValues.push(duplicateValue)
@@ -450,7 +452,7 @@ class DataItemCover extends React.Component {
           padding: 0,
           fontSize: '18px',
           dy: -5,
-        }
+        },
       }
     }
     return {
@@ -488,7 +490,7 @@ class DataItemCover extends React.Component {
             dy={tickLabelStyle.dy}
             // this needs to be handled dynamically
             // 20 is fine for 2-3 data points but too crowded for 4
-            dx={20*this.formattedValues.length}
+            dx={20 * this.formattedValues.length}
           />
         }
         tickFormat={
@@ -501,13 +503,9 @@ class DataItemCover extends React.Component {
       />
     ) : (
       <VictoryAxis
-        axisLabelComponent={
-          <TickLabel
-            fontSize={tickLabelStyle.fontSize}
-          />
-        }
+        axisLabelComponent={<TickLabel fontSize={tickLabelStyle.fontSize} />}
         style={this.chartAxisStyle}
-        tickFormat={(t) => null}
+        tickFormat={t => null}
         offsetY={13}
         label={this.formatXAxisDate(values[0].date)}
       />
@@ -522,7 +520,7 @@ class DataItemCover extends React.Component {
   }
 
   renderTimeframeValues() {
-    const { card, item } = this.props
+    const { card } = this.props
 
     return (
       <Fragment>
