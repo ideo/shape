@@ -60,7 +60,7 @@ RSpec.describe Item::DataItem, type: :model do
       let!(:item) { create(:data_item, :report_type_record) }
 
       it 'should return content' do
-        expect(item.data).to eq(item.content)
+        expect(item.data).to eq(item.data_content)
       end
 
       it 'should not call NetworkAppMetric or CollectionsAndItems service' do
