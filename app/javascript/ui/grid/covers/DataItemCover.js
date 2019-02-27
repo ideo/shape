@@ -52,7 +52,7 @@ const nearMonth = (momentDate, timeframe) => {
   return false
 }
 
-const calculateTickLabelEdges = (labelText) => {
+const calculateTickLabelEdges = labelText => {
   if (!labelText) return 0
 
   return labelText.length * 5.5
@@ -412,8 +412,23 @@ class DataItemCover extends React.Component {
     const utc = utcMoment(d)
     const near = nearMonth(utc, timeframe)
     if (near) {
+      const nearDataPoints = item.data.values.filter(val => {
+        const valDate = utcMoment(val.date)
+        const nearVal = nearMonth(valDate, timeframe)
+        if (!nearVal) return false
+        const startDiff = Math.abs(valDate.diff(utc, 'days'))
+        if (startDiff < 8) return true
+        return false
+      })
+      if (nearDataPoints.length > 1) {
+        const allDates = item.data.values.map(val => val.date)
+        const currentIdx = allDates.indexOf(d)
+        if (currentIdx < allDates.length - 1) return ''
+      }
+
       return `${near.format('MMM')}`
     }
+    // Don't show the label if it's not within a certain month range
     return ''
   }
 
