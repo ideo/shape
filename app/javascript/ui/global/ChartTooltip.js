@@ -37,7 +37,6 @@ class ChartTooltip extends React.Component {
     return parseInt(index) === data.length - 1
   }
 
-
   isFirstPointOfType(typeAmount) {
     const { data, index } = this.props
     const all = data.filter(d => d.amount === typeAmount)

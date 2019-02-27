@@ -513,7 +513,7 @@ class DataItemCover extends React.Component {
 
   get maxDomain() {
     const { item } = this.props
-    const amounts = this.formattedValues.map((el) => el.amount)
+    const amounts = this.formattedValues.map(el => el.amount)
     const highestValue = Math.max(...amounts)
     return item.isReportTypeRecord ? 100 : highestValue
   }
@@ -555,7 +555,7 @@ class DataItemCover extends React.Component {
                 style={this.chartAreaStyle}
                 data={this.formattedValues}
                 // This makes the chart shape based on the values
-                domain={{x: [1, this.formattedValues.length], y: [0, this.maxDomain]}}
+                domain={{ x: [1, this.formattedValues.length], y: [0, this.maxDomain] }}
                 y="amount"
                 x="month"
               />
