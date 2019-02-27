@@ -465,7 +465,6 @@ class DataItemCover extends React.Component {
   }
 
   get chartAxis() {
-    // if single value => axis label
     const values = this.valuesFromDataItem
     const { item } = this.props
 
@@ -547,8 +546,6 @@ class DataItemCover extends React.Component {
             >
               <VictoryArea
                 labels={d => d.amount}
-                // ChartTooltip shows highest and lowest values
-                // no matter then amount of data points
                 labelComponent={
                   <ChartTooltip
                     textRenderer={this.renderTooltipText}
@@ -580,7 +577,7 @@ class DataItemCover extends React.Component {
     return (
       <StyledDataItemCover
         className="cancelGridClick"
-        editable={item.can_edit_content} // do we need to conditionally disable this?
+        editable={item.can_edit_content}
         editing={this.editing}
         data-cy="DataItemCover"
       >
