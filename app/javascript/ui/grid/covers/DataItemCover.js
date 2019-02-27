@@ -29,28 +29,9 @@ import DataTargetSelect from '~/ui/reporting/DataTargetSelect'
 import v from '~/utils/variables'
 import { theme } from '~/ui/test_collections/shared'
 import trackError from '~/utils/trackError'
+import monthEdge from '~/utils/monthEdge'
 
 const utcMoment = date => moment(`${date} 00+0000`).utc()
-const nearMonth = (momentDate, timeframe) => {
-  const mStart = momentDate.clone().startOf('month')
-  const mEnd = momentDate.clone().endOf('month')
-  const startAllowance = timeframe === 'day' ? 0 : 2
-  const endAllowance = timeframe === 'day' ? -1 : 3
-  const startDiff = Math.abs(mStart.diff(momentDate, 'days'))
-  const endDiff = Math.abs(
-    momentDate
-      .clone()
-      .endOf('month')
-      .diff(momentDate, 'days')
-  )
-  if (startDiff <= startAllowance) {
-    return mStart.subtract(1, 'month')
-  } else if (endDiff <= endAllowance) {
-    return mEnd
-  }
-
-  return false
-}
 
 const calculateTickLabelEdges = labelText => {
   if (!labelText) return 0
@@ -334,7 +315,7 @@ class DataItemCover extends React.Component {
     uiStore.toggleEditingCardId(card.id)
   }
 
-  get valuesFromDataItem() {
+  get dateItemValues() {
     const { item } = this.props
     if (!item.data || !item.data.values) return []
 
@@ -346,14 +327,14 @@ class DataItemCover extends React.Component {
   }
 
   get formattedValues() {
-    const mappedValues = this.valuesFromDataItem.map((value, i) => ({
+    const mappedValues = this.dateItemValues.map((value, i) => ({
       ...value,
       month: value.date,
     }))
 
     // check if need duplicate value, add if required
     if (mappedValues.length === 1) {
-      const duplicateValue = Object.assign({}, this.valuesFromDataItem[0])
+      const duplicateValue = Object.assign({}, this.dateItemValues[0])
       duplicateValue.date = utcMoment(duplicateValue.date)
         .subtract('3', 'months')
         .format('YYYY-MM-DD')
@@ -406,33 +387,36 @@ class DataItemCover extends React.Component {
     )
   }
 
-  displayMonthlyXAxisText = (d, i) => {
+  monthlyXAxisText = (date, index) => {
     const { item } = this.props
     const { timeframe } = item
-    const utc = utcMoment(d)
-    const near = nearMonth(utc, timeframe)
-    if (near) {
-      const nearDataPoints = item.data.values.filter(val => {
-        const valDate = utcMoment(val.date)
-        const nearVal = nearMonth(valDate, timeframe)
-        if (!nearVal) return false
-        const startDiff = Math.abs(valDate.diff(utc, 'days'))
-        if (startDiff < 8) return true
-        return false
+    const dateOperand = utcMoment(date)
+    const dateNearMonthEdge = monthEdge(dateOperand, timeframe)
+
+    if (dateNearMonthEdge) {
+      const datesNearOperandAndMonthEdge = this.dateItemValues.filter(val => {
+        const dateIteratee = utcMoment(val.date)
+        const valueNearMonthEdge = monthEdge(dateIteratee, timeframe)
+
+        if (!valueNearMonthEdge) return false
+
+        return Math.abs(dateIteratee.diff(dateOperand, 'days')) < 8
       })
-      if (nearDataPoints.length > 1) {
-        const allDates = item.data.values.map(val => val.date)
-        const currentIdx = allDates.indexOf(d)
-        if (currentIdx < allDates.length - 1) return ''
+
+      if (datesNearOperandAndMonthEdge.length > 1) {
+        const allDates = this.dateItemValues.map(val => val.date)
+        // Don't show date being operated on if it is not last one
+        // This is to avoid date labels piling up on top of each other
+        if (index < allDates.length - 1) return ''
       }
 
-      return `${near.format('MMM')}`
+      return `${dateNearMonthEdge.format('MMM')}`
     }
     // Don't show the label if it's not within a certain month range
     return ''
   }
 
-  formatXAxisDate = (d, i) => `${utcMoment(d).format('MM/DD/YY')}`
+  fullDate = (date, index) => `${utcMoment(date).format('MM/DD/YY')}`
 
   get fillColor() {
     if (this.props.item.data) {
@@ -486,7 +470,7 @@ class DataItemCover extends React.Component {
   }
 
   get chartAxis() {
-    const values = this.valuesFromDataItem
+    const values = this.dateItemValues
     const { item } = this.props
 
     let tickLabelStyle = {}
@@ -511,9 +495,7 @@ class DataItemCover extends React.Component {
           />
         }
         tickFormat={
-          item.isReportTypeRecord
-            ? this.formatXAxisDate
-            : this.displayMonthlyXAxisText
+          item.isReportTypeRecord ? this.fullDate : this.monthlyXAxisText
         }
         offsetY={13}
         style={this.chartAxisStyle}
@@ -524,7 +506,7 @@ class DataItemCover extends React.Component {
         style={this.chartAxisStyle}
         tickFormat={t => null}
         offsetY={13}
-        label={this.formatXAxisDate(values[0].date)}
+        label={this.fullDate(values[0].date)}
       />
     )
   }

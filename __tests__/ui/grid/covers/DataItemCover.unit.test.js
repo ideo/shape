@@ -153,12 +153,12 @@ describe('DataItemCover', () => {
     it('displays x-axis labels for dates near the end of the month', () => {
       let label
       // if it's not near month end, the label is blank
-      label = wrapper.instance().displayMonthlyXAxisText('2018-10-06')
+      label = wrapper.instance().monthlyXAxisText('2018-10-06')
       expect(label).toEqual('')
       // should display the short name of the month that previously ended
-      label = wrapper.instance().displayMonthlyXAxisText('2018-01-02')
+      label = wrapper.instance().monthlyXAxisText('2018-01-02')
       expect(label).toEqual('Dec')
-      label = wrapper.instance().displayMonthlyXAxisText('2018-12-31')
+      label = wrapper.instance().monthlyXAxisText('2018-12-31')
       expect(label).toEqual('Dec')
     })
 
