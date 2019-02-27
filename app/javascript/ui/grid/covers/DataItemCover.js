@@ -52,11 +52,17 @@ const nearMonth = (momentDate, timeframe) => {
   return false
 }
 
+const calculateTickLabelEdges = (labelText) => {
+  if (!labelText) return 0
+
+  return labelText.length * 5.5
+}
+
 const TickLabel = props => {
   let dx
-  // We'll need to dynamically set this based on number of data points
-  if (props.x === 0) dx = props.dx
-  if (props.x === 450) dx = -props.dx
+
+  if (props.x === 0) dx = calculateTickLabelEdges(props.text)
+  if (props.x === 450) dx = -calculateTickLabelEdges(props.text)
   const updatedStyle = Object.assign({}, props.style, {
     fontSize: props.fontSize,
   })
@@ -487,9 +493,6 @@ class DataItemCover extends React.Component {
           <TickLabel
             fontSize={tickLabelStyle.fontSize}
             dy={tickLabelStyle.dy}
-            // this needs to be handled dynamically
-            // 20 is fine for 2-3 data points but too crowded for 4
-            dx={20 * this.formattedValues.length}
           />
         }
         tickFormat={
