@@ -518,6 +518,10 @@ class DataItemCover extends React.Component {
     return item.isReportTypeRecord ? 100 : highestValue
   }
 
+  get chartDomain() {
+    return { x: [1, this.formattedValues.length], y: [0, this.maxDomain] }
+  }
+
   renderTimeframeValues() {
     const { card } = this.props
 
@@ -555,7 +559,7 @@ class DataItemCover extends React.Component {
                 style={this.chartAreaStyle}
                 data={this.formattedValues}
                 // This makes the chart shape based on the values
-                domain={{ x: [1, this.formattedValues.length], y: [0, this.maxDomain] }}
+                domain={this.chartDomain}
                 y="amount"
                 x="month"
               />
