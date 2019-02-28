@@ -1,6 +1,8 @@
 class TestsController < ApplicationController
   include ApplicationHelper
-  before_action :load_test_collection, only: %i[show]
+  include IdeoSsoHelper
+  before_action :load_test_collection, only: %i[show token_auth]
+  before_action :redirect_to_test, only: %i[show]
 
   def show
   end
@@ -11,10 +13,25 @@ class TestsController < ApplicationController
     render 'show'
   end
 
+  def token_auth
+    url = test_url(@collection)
+    if user_signed_in?
+      redirect_to url
+    else
+      store_location_for :user, url
+      redirect_to ideo_sso_token_auth_url(params[:token])
+    end
+  end
+
   private
 
   def load_test_collection
     @collection = Collection::TestCollection.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    redirect_to root_url
+  end
+
+  def redirect_to_test
     if @collection.submission_box_template_test?
       redirect_to_submission_box_test
     elsif @collection.collection_to_test.present?
@@ -27,8 +44,6 @@ class TestsController < ApplicationController
                                 omit_id: @collection.id,
                               )
     end
-  rescue ActiveRecord::RecordNotFound
-    redirect_to root_url
   end
 
   def redirect_to_collection_to_test(collection_to_test)

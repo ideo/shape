@@ -2,8 +2,10 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   def ideo
     @user = User.from_omniauth(request.env['omniauth.auth'])
     if @user.save
-      setup_org_membership
-      setup_network_roles
+      unless @user.limited?
+        setup_org_membership
+        setup_network_roles
+      end
       # this will throw if @user is not activated
       # will also redirect to stored path from any previous 401
       sign_in_and_redirect @user, event: :authentication

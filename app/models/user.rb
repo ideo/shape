@@ -60,7 +60,7 @@ class User < ApplicationRecord
              class_name: 'Collection',
              optional: true
 
-  validates :email, presence: true, uniqueness: true
+  validates :email, presence: true, uniqueness: true, if: :email_required?
   validates :uid, :provider, presence: true, if: :active?
   validates :uid, uniqueness: { scope: :provider }, if: :active?
 
@@ -75,6 +75,7 @@ class User < ApplicationRecord
     active: 0,
     pending: 1,
     archived: 2,
+    limited: 3,
   }
 
   # to turn off devise validatable for uniqueness of email
@@ -145,8 +146,17 @@ class User < ApplicationRecord
 
     unless user
       # if not found by provider, look up by email
-      user = User.find_or_initialize_by(email: auth.info.email)
-      user.status = User.statuses[:active]
+      if auth.extra.raw_info.type == 'User::Limited'
+        if auth.info.email.present?
+          user = User.find_or_initialize_by(email: auth.info.email)
+        else
+          user = User.find_or_initialize_by(phone: auth.extra.raw_info.phone)
+        end
+        user.status = User.statuses[:limited]
+      else
+        user = User.find_or_initialize_by(email: auth.info.email)
+        user.status = User.statuses[:active]
+      end
       user.invitation_token = nil
       user.password = Devise.friendly_token(40)
       user.password_confirmation = user.password
@@ -156,10 +166,13 @@ class User < ApplicationRecord
 
     # Update user on every auth
     user.email = auth.info.email
-    if auth.info.username.present?
-      user.handle = auth.info.username
-    elsif user.handle.blank?
-      user.generate_handle
+    user.phone = auth.extra.raw_info.phone
+    unless user.limited?
+      if auth.info.username.present?
+        user.handle = auth.info.username
+      elsif user.handle.blank?
+        user.generate_handle
+      end
     end
     user.first_name = auth.info.first_name
     user.last_name = auth.info.last_name
@@ -338,6 +351,10 @@ class User < ApplicationRecord
   end
 
   private
+
+  def email_required?
+    !limited?
+  end
 
   def change_network_admin(action, org_id)
     # must have uid for network request

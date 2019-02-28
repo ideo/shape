@@ -31,7 +31,21 @@ module IdeoSsoHelper
   end
 
   def ideo_sso_api_base_url
-    "#{ENV['IDEO_SSO_HOST']}#{ENV['IDEO_SSO_API_PATH']}"
+    URI.join(ENV['BASE_HOST'], ENV['IDEO_SSO_API_PATH'])
+  end
+
+  def ideo_sso_token_auth_url(token)
+    ideo_sso_oauth_url + "&auth_token=#{token}"
+  end
+
+  def ideo_sso_oauth_url
+    cookies['IdeoSSO-State'] ||= SecureRandom.uuid
+    ENV['IDEO_SSO_HOST'] +
+      '/oauth/authorize' \
+      "?client_id=#{ideo_sso_client_id}" \
+      "&redirect_uri=#{CGI.escape(ideo_sso_redirect_url.to_s)}" \
+      '&response_type=code' \
+      "&state=#{cookies['IdeoSSO-State']}"
   end
 
   def stripe_js_sdk_url
