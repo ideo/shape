@@ -5,9 +5,6 @@ class Item
                    :d_filters,
                    :d_timeframe
 
-    # For storing cached chart data
-    serialize :content, JSON
-
     validates :report_type, presence: true
     validate :collections_and_items_validations, if: :report_type_collections_and_items?
     validate :network_app_metric_validations, if: :report_type_network_app_metric?
@@ -36,7 +33,7 @@ class Item
 
     def data
       if report_type_record?
-        content
+        data_content
       elsif report_type_network_app_metric?
         DataReport::NetworkAppMetric.new(self).call
       elsif report_type_collections_and_items?
@@ -47,8 +44,8 @@ class Item
     private
 
     def record_validations
-      return if content.present?
-      errors.add(:content, 'must be present')
+      return if data_content.present?
+      errors.add(:data_content, 'must be present')
     end
 
     def network_app_metric_validations

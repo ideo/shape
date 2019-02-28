@@ -40,6 +40,7 @@ class ChartTooltip extends React.Component {
   isFirstPointOfType(typeAmount) {
     const { data, index } = this.props
     const all = data.filter(d => d.amount === typeAmount)
+
     if (!all.length) return false
     const firstIdx = all[0]._x - 1
     return parseInt(index) === firstIdx
@@ -81,9 +82,16 @@ class ChartTooltip extends React.Component {
     }
   }
 
+  get isTwoDuplicatePoints() {
+    const { data } = this.props
+    if (data.length !== 2) return false
+
+    return data[0].amount === data[1].amount
+  }
+
   renderAmountMark(datum, totalData) {
-    if (this.isFirstMaxPoint) return true
-    if (this.isFirstMinPoint) return true
+    if (this.isFirstMaxPoint && !this.isTwoDuplicatePoints) return true
+    if (this.isFirstMinPoint && !this.isTwoDuplicatePoints) return true
     if (this.isLastDataPoint) return true
     return false
   }

@@ -59,7 +59,7 @@ FactoryBot.define do
       end
 
       trait :report_type_record do
-        content(
+        data_content(
           value: 0,
           values: [{ date: '2018-11-13', amount: 613 }],
         )

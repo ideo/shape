@@ -139,26 +139,26 @@ describe('DataItemCover', () => {
     it('renders text for the label with month and year', () => {
       // NOTE: code pulls the actual month back by 1
       const datum = { date: '2018-10-01', amount: 34, month: 'Sep' }
-      const label = wrapper.instance().renderLabelText(datum)
+      const label = wrapper.instance().renderTooltipText(datum)
       expect(label).toContain('in September')
     })
 
     it('renders in last 30 days for label for last data item', () => {
       // NOTE: code pulls the actual month back by 1
       const datum = { date: '2018-10-01', amount: 34, month: 'Sep' }
-      const label = wrapper.instance().renderLabelText(datum, true)
+      const label = wrapper.instance().renderTooltipText(datum, true)
       expect(label).toContain('in last 30 days')
     })
 
     it('displays x-axis labels for dates near the end of the month', () => {
       let label
       // if it's not near month end, the label is blank
-      label = wrapper.instance().displayXAxisText('2018-10-06')
+      label = wrapper.instance().monthlyXAxisText('2018-10-06')
       expect(label).toEqual('')
       // should display the short name of the month that previously ended
-      label = wrapper.instance().displayXAxisText('2018-01-02')
+      label = wrapper.instance().monthlyXAxisText('2018-01-02')
       expect(label).toEqual('Dec')
-      label = wrapper.instance().displayXAxisText('2018-12-31')
+      label = wrapper.instance().monthlyXAxisText('2018-12-31')
       expect(label).toEqual('Dec')
     })
 
@@ -215,7 +215,7 @@ describe('DataItemCover', () => {
     })
   })
 
-  describe('with a record report type', () => {
+  describe('with a record report type with 2+ values', () => {
     beforeEach(() => {
       props.item.report_type = 'report_type_report'
       props.item.name = 'My Static Data'
@@ -225,6 +225,7 @@ describe('DataItemCover', () => {
         values: [
           { amount: 24, date: '2018-09-10' },
           { amount: 27, date: '2018-09-11' },
+          { amount: 23, date: '2018-09-12' },
         ],
       }
       render()
@@ -242,6 +243,37 @@ describe('DataItemCover', () => {
 
     it('should not show editing controls', () => {
       expect(wrapper.find('.editableMetric').exists()).toBe(false)
+    })
+
+    describe('with a single data point in values', () => {
+      beforeEach(() => {
+        props.item.report_type = 'report_type_report'
+        props.item.name = 'My Lone Value Chart'
+        props.item.isReportTypeCollectionsItems = false
+        props.item.isReportTypeRecord = true
+        props.item.data = {
+          values: [{ amount: 24, date: '2018-09-10' }],
+        }
+        render()
+      })
+
+      it('should render name', () => {
+        expect(
+          wrapper
+            .find('StyledDisplayText')
+            .children()
+            .first()
+            .text()
+        ).toEqual('My Lone Value Chart')
+      })
+
+      it('should not show editing controls', () => {
+        expect(wrapper.find('.editableMetric').exists()).toBe(false)
+      })
+
+      it('should render one label on X axis of the chart', () => {
+        expect(wrapper.find('VictoryAxis').props().label).toEqual('09/10/18')
+      })
     })
   })
 })

@@ -29,36 +29,27 @@ import DataTargetSelect from '~/ui/reporting/DataTargetSelect'
 import v from '~/utils/variables'
 import { theme } from '~/ui/test_collections/shared'
 import trackError from '~/utils/trackError'
+import monthEdge from '~/utils/monthEdge'
 
 const utcMoment = date => moment(`${date} 00+0000`).utc()
-const nearMonth = (momentDate, timeframe) => {
-  const mStart = momentDate.clone().startOf('month')
-  const mEnd = momentDate.clone().endOf('month')
-  const startAllowance = timeframe === 'day' ? 0 : 2
-  const endAllowance = timeframe === 'day' ? -1 : 3
-  const startDiff = Math.abs(mStart.diff(momentDate, 'days'))
-  const endDiff = Math.abs(
-    momentDate
-      .clone()
-      .endOf('month')
-      .diff(momentDate, 'days')
-  )
-  if (startDiff <= startAllowance) {
-    return mStart.subtract(1, 'month')
-  } else if (endDiff <= endAllowance) {
-    return mEnd
-  }
-  return false
+
+const calculateTickLabelEdges = labelText => {
+  if (!labelText) return 0
+
+  return labelText.length * 5.5
 }
 
 const TickLabel = props => {
   let dx
-  if (props.x === 0) dx = 12
-  if (props.x === 450) dx = -12
+
+  if (props.x === 0) dx = calculateTickLabelEdges(props.text)
+  if (props.x === 450) dx = -calculateTickLabelEdges(props.text)
   const updatedStyle = Object.assign({}, props.style, {
-    fontSize: '10px',
+    fontSize: props.fontSize,
   })
-  return <VictoryLabel {...props} dx={dx} dy={5} style={updatedStyle} />
+  return (
+    <VictoryLabel {...props} dx={dx} dy={props.dy || 5} style={updatedStyle} />
+  )
 }
 
 const StyledDataItemCover = styled.div`
@@ -324,19 +315,38 @@ class DataItemCover extends React.Component {
     uiStore.toggleEditingCardId(card.id)
   }
 
-  get formattedValues() {
+  get dateItemValues() {
     const { item } = this.props
     if (!item.data || !item.data.values) return []
+
     const {
       data: { values },
     } = item
-    return values.map((value, i) => ({
+
+    return values
+  }
+
+  get formattedValues() {
+    const mappedValues = this.dateItemValues.map((value, i) => ({
       ...value,
       month: value.date,
     }))
+
+    // check if need duplicate value, add if required
+    if (mappedValues.length === 1) {
+      const duplicateValue = Object.assign({}, this.dateItemValues[0])
+      duplicateValue.date = utcMoment(duplicateValue.date)
+        .subtract('3', 'months')
+        .format('YYYY-MM-DD')
+      duplicateValue.month = duplicateValue.date
+      duplicateValue.isDuplicate = true
+      mappedValues.push(duplicateValue)
+    }
+
+    return mappedValues
   }
 
-  renderLabelText = (datum, isLastDataPoint) => {
+  renderTooltipText = (datum, isLastDataPoint) => {
     const { item } = this.props
     const { timeframe, measureTooltip } = item
     const momentDate = utcMoment(datum.date)
@@ -377,16 +387,36 @@ class DataItemCover extends React.Component {
     )
   }
 
-  displayXAxisText = (d, i) => {
+  monthlyXAxisText = (date, index) => {
     const { item } = this.props
     const { timeframe } = item
-    const utc = utcMoment(d)
-    const near = nearMonth(utc, timeframe)
-    if (near) {
-      return `${near.format('MMM')}`
+    const dateOperand = utcMoment(date)
+    const dateNearMonthEdge = monthEdge(dateOperand, timeframe)
+
+    if (dateNearMonthEdge) {
+      const datesNearOperandAndMonthEdge = this.dateItemValues.filter(val => {
+        const dateIteratee = utcMoment(val.date)
+        const valueNearMonthEdge = monthEdge(dateIteratee, timeframe)
+
+        if (!valueNearMonthEdge) return false
+
+        return Math.abs(dateIteratee.diff(dateOperand, 'days')) < 8
+      })
+
+      if (datesNearOperandAndMonthEdge.length > 1) {
+        const allDates = this.dateItemValues.map(val => val.date)
+        // Don't show date being operated on if it is not last one
+        // This is to avoid date labels piling up on top of each other
+        if (index < allDates.length - 1) return ''
+      }
+
+      return `${dateNearMonthEdge.format('MMM')}`
     }
+    // Don't show the label if it's not within a certain month range
     return ''
   }
+
+  fullDate = (date, index) => `${utcMoment(date).format('MM/DD/YY')}`
 
   get fillColor() {
     if (this.props.item.data) {
@@ -398,24 +428,103 @@ class DataItemCover extends React.Component {
 
   get chartAreaStyle() {
     const { item } = this.props
-    if (item.isReportTypeCollectionsItems) {
+    if (item.isReportTypeRecord) {
       return {
-        data: { fill: 'url(#organicGrid)' },
+        data: { fill: this.fillColor },
         labels: {
-          fill: 'black',
+          fontSize: 18,
         },
       }
     }
     return {
-      data: { fill: this.fillColor },
+      data: { fill: 'url(#organicGrid)' },
       labels: {
-        fontSize: 18,
+        fill: 'black',
       },
     }
   }
 
+  get chartAxisStyle() {
+    const { item } = this.props
+    if (item.isReportTypeRecord) {
+      return {
+        axis: {
+          stroke: v.colors.commonMedium,
+          strokeWidth: 30,
+          transform: 'translateY(26px)',
+        },
+        axisLabel: {
+          padding: 0,
+          fontSize: '18px',
+          dy: -5,
+        },
+      }
+    }
+    return {
+      axis: {
+        stroke: v.colors.commonMedium,
+        strokeWidth: 25,
+        transform: 'translateY(22px)',
+      },
+    }
+  }
+
+  get chartAxis() {
+    const values = this.dateItemValues
+    const { item } = this.props
+
+    let tickLabelStyle = {}
+    if (item.isReportTypeRecord) {
+      tickLabelStyle = {
+        fontSize: '18px',
+        dy: -5,
+      }
+    } else {
+      tickLabelStyle = {
+        fontSize: '10px',
+        dy: 5,
+      }
+    }
+
+    return values.length > 1 ? (
+      <VictoryAxis
+        tickLabelComponent={
+          <TickLabel
+            fontSize={tickLabelStyle.fontSize}
+            dy={tickLabelStyle.dy}
+          />
+        }
+        tickFormat={
+          item.isReportTypeRecord ? this.fullDate : this.monthlyXAxisText
+        }
+        offsetY={13}
+        style={this.chartAxisStyle}
+      />
+    ) : (
+      <VictoryAxis
+        axisLabelComponent={<TickLabel fontSize={tickLabelStyle.fontSize} />}
+        style={this.chartAxisStyle}
+        tickFormat={t => null}
+        offsetY={13}
+        label={this.fullDate(values[0].date)}
+      />
+    )
+  }
+
+  get maxDomain() {
+    const { item } = this.props
+    const amounts = this.formattedValues.map(el => el.amount)
+    const highestValue = Math.max(...amounts)
+    return item.isReportTypeRecord ? 100 : highestValue
+  }
+
+  get chartDomain() {
+    return { x: [1, this.formattedValues.length], y: [0, this.maxDomain] }
+  }
+
   renderTimeframeValues() {
     const { card } = this.props
+
     return (
       <Fragment>
         <AboveChartContainer>
@@ -423,14 +532,14 @@ class DataItemCover extends React.Component {
             {this.titleAndControls}
           </DisplayText>
           <br />
-          {this.formattedValues.length < 2 && (
+          {this.formattedValues.length < 1 && (
             <DisplayText className="noDataMessage">
               <br />
               Not enough data yet
             </DisplayText>
           )}
         </AboveChartContainer>
-        {this.formattedValues.length >= 2 && (
+        {this.formattedValues.length > 0 && (
           <ChartContainer data-cy="ChartContainer">
             <OrganicGrid />
             <VictoryChart
@@ -439,33 +548,22 @@ class DataItemCover extends React.Component {
               padding={{ top: 0, left: 0, right: 0, bottom: 0 }}
               containerComponent={<VictoryVoronoiContainer />}
             >
-              <VictoryAxis
-                tickLabelComponent={<TickLabel />}
-                tickFormat={this.displayXAxisText}
-                offsetY={13}
-                style={{
-                  axis: {
-                    stroke: v.colors.commonMedium,
-                    strokeWidth: 25,
-                    transform: 'translateY(22px)',
-                  },
-                }}
-              />
               <VictoryArea
                 labels={d => d.amount}
                 labelComponent={
                   <ChartTooltip
-                    minAmount={this.minAmount}
-                    maxAmount={this.maxAmount}
-                    textRenderer={this.renderLabelText}
+                    textRenderer={this.renderTooltipText}
                     cardArea={card.width * card.height}
                   />
                 }
                 style={this.chartAreaStyle}
                 data={this.formattedValues}
+                // This makes the chart shape based on the values
+                domain={this.chartDomain}
                 y="amount"
                 x="month"
               />
+              {this.chartAxis}
             </VictoryChart>
           </ChartContainer>
         )}
@@ -475,6 +573,7 @@ class DataItemCover extends React.Component {
 
   render() {
     const { item, uiStore } = this.props
+
     if (uiStore.isNewCard(item.id)) {
       uiStore.removeNewCard(item.id)
       this.toggleEditing()
