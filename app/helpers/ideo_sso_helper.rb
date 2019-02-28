@@ -31,7 +31,7 @@ module IdeoSsoHelper
   end
 
   def ideo_sso_api_base_url
-    URI.join(ENV['BASE_HOST'], ENV['IDEO_SSO_API_PATH'])
+    URI.join(ENV['IDEO_SSO_HOST'], ENV['IDEO_SSO_API_PATH'])
   end
 
   def ideo_sso_token_auth_url(token)
