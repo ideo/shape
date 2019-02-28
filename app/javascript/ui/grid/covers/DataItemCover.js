@@ -64,7 +64,7 @@ const TickLabel = props => {
 const StyledDataItemCover = styled.div`
   background-color: ${v.colors.commonLight};
   border-top: 2px solid ${v.colors.black};
-  height: 100%;
+  height: calc(100% - 15px);
   padding: 15px 0 0;
   text-align: left;
 
