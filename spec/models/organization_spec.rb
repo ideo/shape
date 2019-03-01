@@ -332,11 +332,15 @@ describe Organization, type: :model do
     let(:user) { application.user }
     let(:organization) { create(:organization) }
 
-    it 'should create an ApplicationCollection for the user' do
-      expect(user.current_organization).to be nil
-      expect {
-        organization.setup_bot_user_membership(user)
-      }.to change(Collection::ApplicationCollection, :count).by(1)
+    it 'should add bot user to the organization' do
+      expect(user.has_role?(Role::APPLICATION_USER, organization)).to be false
+      organization.setup_bot_user_membership(user)
+      expect(user.reload.has_role?(Role::APPLICATION_USER, organization)).to be true
+    end
+
+    it 'should set current_organization if none assigned' do
+      expect(user.current_organization).to be_nil
+      organization.setup_bot_user_membership(user)
       expect(user.current_organization).to eq(organization)
     end
   end
