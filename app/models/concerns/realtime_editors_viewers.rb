@@ -18,6 +18,13 @@ module RealtimeEditorsViewers
     )
   end
 
+  def received_changes(data, user = nil)
+    publish_to_channel(
+      current_editor: user ? user.as_json : {},
+      data: data,
+    )
+  end
+
   # Track viewers by user_id
   # Using an increment counter was prone to dupe issues (e.g. same user with two browser windows open)
   def started_viewing(user, dont_notify: false)

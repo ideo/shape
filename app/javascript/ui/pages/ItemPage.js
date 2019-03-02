@@ -2,7 +2,6 @@ import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
-import ActionCableConsumer from '~/utils/ActionCableConsumer'
 import FilePreview from '~/ui/grid/covers/FilePreview'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import ImageItem from '~/ui/items/ImageItem'
@@ -10,7 +9,7 @@ import Loader from '~/ui/layout/Loader'
 import MoveModal from '~/ui/grid/MoveModal'
 import PageContainer from '~/ui/layout/PageContainer'
 import PageHeader from '~/ui/pages/shared/PageHeader'
-import TextItem from '~/ui/items/TextItem'
+import RealtimeTextItem from '~/ui/items/RealtimeTextItem'
 import VideoItem from '~/ui/items/VideoItem'
 import { ITEM_TYPES } from '~/utils/variables'
 
@@ -71,20 +70,19 @@ class ItemPage extends React.Component {
 
   // could be smarter or broken out once we want to do different things per type
   get content() {
+    const { apiStore } = this.props
     const { item } = this.state
-    const { currentUserId } = this.props.apiStore
     // similar function as in GridCard, could extract?
     switch (item.type) {
       case ITEM_TYPES.TEXT:
         return (
-          <TextItem
-            item={item}
-            actionCableConsumer={ActionCableConsumer}
-            currentUserId={currentUserId}
-            onUpdatedData={this.updateItem}
-            onSave={this.save}
-            onCancel={this.cancel}
-            fullPageView
+          <RealtimeTextItem
+            currentUserId={apiStore.currentUserId}
+            itemId={item.id}
+            quillContent={item.content}
+            quillData={item.toJSON().data_content}
+            canEdit
+            onSave={this.saveText}
           />
         )
       case ITEM_TYPES.EXTERNAL_IMAGE:
@@ -119,6 +117,13 @@ class ItemPage extends React.Component {
     item.save()
     const { uiStore } = this.props
     uiStore.trackEvent('update', item)
+  }
+
+  saveText = (content, dataContent) => {
+    const { item } = this.state
+    item.content = content
+    item.data_content = dataContent
+    item.save()
   }
 
   render() {
