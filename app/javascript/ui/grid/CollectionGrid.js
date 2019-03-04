@@ -806,10 +806,10 @@ class CollectionGrid extends React.Component {
           record={record}
           onDrag={this.onDrag}
           hoveringOverLeft={
-            card.hoveringOver && card.hoveringOver.direction === 'left'
+            !!card.hoveringOver && card.hoveringOver.direction === 'left'
           }
           hoveringOverRight={
-            card.hoveringOver && card.hoveringOver.direction === 'right'
+            !!card.hoveringOver && card.hoveringOver.direction === 'right'
           }
           holdingOver={!!card.holdingOver}
           onDragOrResizeStop={this.onDragOrResizeStop}
