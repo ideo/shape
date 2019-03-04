@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import Delta from 'quill-delta'
 import ReactQuill from 'react-quill'
 import styled from 'styled-components'
 
@@ -34,7 +35,11 @@ const DockedToolbar = styled.div`
 const StyledContainer = styled.div`
   padding-top: 25px;
   ${props => props.fullPageView && `padding: 2rem 0.5rem;`};
-  .editor-pill {
+  ${props =>
+    props.loading &&
+    `
+    background: gray;
+  `} .editor-pill {
     ${props =>
       !props.fullPageView &&
       `
@@ -62,7 +67,7 @@ const StyledContainer = styled.div`
 
 class RealtimeTextItem extends React.Component {
   channelName = 'ItemRealtimeChannel'
-  state = { quillData: null }
+  state = { quillData: null, loading: true }
   saveTimer = null
 
   constructor(props) {
@@ -79,20 +84,35 @@ class RealtimeTextItem extends React.Component {
   componentDidMount() {
     if (!this.reactQuillRef) return
     this.attachQuillRefs()
-    console.log('fasdkfj', this.props.quillData)
-    this.quillEditor.updateContents(this.props.quillData, 'silent')
+    this.applyDiff()
+    setTimeout(() => {
+      this.setState({ loading: false })
+    }, 100)
   }
 
   componentDidUpdate() {
-    console.log('update')
     this.attachQuillRefs()
+    if (!this.props.fullyLoaded) this.applyDiff()
   }
 
   componentWillUnmount() {
     ChannelManager.unsubscribeAllFromChannel(this.channelName)
   }
 
+  applyDiff() {
+    const remoteContents = new Delta(this.props.quillData)
+    // console.log('remote contents', remoteContents)
+    const editorContents = new Delta(this.quillEditor.getContents())
+    // console.log('editor contents', editorContents)
+    const remoteChanges = editorContents.diff(remoteContents)
+    // console.log('remote changes', remoteChanges)
+    if (remoteChanges.ops.length > 0) {
+      this.quillEditor.updateContents(remoteChanges, 'silent')
+    }
+  }
+
   applyDelta(delta) {
+    // const editorContents = new Delta(tmpl.quillEditor.getContents())
     const remoteChanges = delta
     if (remoteChanges.ops.length > 0) {
       // Make updates, to allow cursor to stay put
@@ -108,8 +128,6 @@ class RealtimeTextItem extends React.Component {
   }
 
   channelReceivedData = res => {
-    console.log('res', res)
-    console.log('check', res.current_editor.id, this.props.currentUserId)
     if (res.current_editor.id !== this.props.currentUserId) {
       if (!res.data || !res.data.delta) return
       this.applyDelta(res.data.delta)
@@ -130,9 +148,9 @@ class RealtimeTextItem extends React.Component {
   handleKeyUp = (content, delta, source, editor) => {
     if (source === 'user') {
       if (this.saveTimer) clearTimeout(this.saveTimer)
-      this.timer = setTimeout(() => {
+      this.saveTimer = setTimeout(() => {
         this.save()
-      }, 100)
+      }, 400)
       this.channel.perform('delta', {
         content,
         delta,
@@ -149,15 +167,18 @@ class RealtimeTextItem extends React.Component {
       },
       theme: 'snow',
       onChange: this.handleKeyUp,
-      readOnly: !this.props.canEdit,
+      readOnly: !this.props.canEdit && !this.state.loading,
       modules: {
         toolbar: '#quill-toolbar',
       },
     }
 
-    console.log('render')
     return (
-      <StyledContainer className="no-drag" fullPageView>
+      <StyledContainer
+        className="no-drag"
+        loading={this.state.loading}
+        fullPageView
+      >
         <DockedToolbar fullPageView>
           {this.props.canEdit && <TextItemToolbar onExpand={() => {}} />}
           <CloseButton

@@ -29,6 +29,7 @@ class PageWithApiWrapper extends React.Component {
     if (fetchType && fetchId) {
       const data = apiStore.find(fetchType, fetchId)
       if (data) {
+        data.fullyLoaded = false
         this.setState({ data })
       }
     }
@@ -83,7 +84,9 @@ class PageWithApiWrapper extends React.Component {
       .then(res => {
         if (this.unmounted) return
         const { data } = res
-        this.setState({ data })
+        this.setState({ data }, () => {
+          data.fullyLoaded = true
+        })
       })
       .catch(err => {
         uiStore.update('pageError', err)

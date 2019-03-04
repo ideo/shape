@@ -79,8 +79,9 @@ class ItemPage extends React.Component {
           <RealtimeTextItem
             currentUserId={apiStore.currentUserId}
             itemId={item.id}
-            quillContent={item.content}
+            quillContent={item.toJSON().content}
             quillData={item.toJSON().data_content}
+            fullyLoaded={item.fullyLoaded}
             canEdit
             onSave={this.saveText}
           />
@@ -123,7 +124,8 @@ class ItemPage extends React.Component {
     const { item } = this.state
     item.content = content
     item.data_content = dataContent
-    item.save()
+    console.log('save', dataContent)
+    item.API_updateWithoutSync({ cancel_sync: true })
   }
 
   render() {
