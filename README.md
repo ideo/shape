@@ -10,7 +10,12 @@ brew install yarn
 curl -L https://get.rvm.io | bash -s stable --auto-dotfiles --autolibs=enable --rails
 brew install postgresql
 brew install redis
+brew install elasticsearch
 brew install heroku/brew/heroku
+
+# use homebrew services to start elasticsearch and redis in the background
+brew services start redis
+brew services start elasticsearch
 ```
 
 Clone the app and install the gems:
@@ -62,21 +67,20 @@ yarn test
 ```
 
 ## Running your dev environment
-
 1. Run your webpack server:
 ```
-bin/webpack-dev-server
+heroku local webpack -f Procfile.development
 ```
 2. Run your sidekiq worker:
 ```
-bundle exec sidekiq -e ${RACK_ENV:-development} -C config/sidekiq.yml
+heroku local worker -f Procfile.development
 ```
 3. Run your rails server:
 ```
-bin/rails s
+rails s
 ```
 
-### Use ttab for quick dev environment setup
+### (Optional) Use ttab for quick dev environment setup
 Install ttab and [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli#download-and-install):
 ```
 npm install -g ttab
