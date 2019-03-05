@@ -421,6 +421,7 @@ export default class UiStore {
 
   @action
   updateColumnsToFit(windowWidth) {
+    if (this.viewingCollection && this.viewingCollection.isBoard) return
     let cols = null
     // shortcut for 4,3,2,1
     _.each(_.range(4, 0), numCols => {
