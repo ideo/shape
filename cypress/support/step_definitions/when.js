@@ -142,6 +142,26 @@ When('I capture the current URL', () => {
   cy.url().as('url')
 })
 
+When('I type some random things', () => {
+  cy.get(
+    '[data-cy="GridCard"][data-order="0"] [data-cy="CardAction-go to page"]'
+  )
+    .first()
+    .click()
+  cy.wait(1000)
+
+  let i = 0
+  while (i < 500) {
+    const randChar = Math.random()
+      .toString(36)
+      .substring(7)
+    const editor = cy.get('.ql-editor').first()
+    editor.type(randChar)
+    cy.wait(100)
+    i += 1
+  }
+})
+
 When('I logout and visit the Marketing Page', () => {
   cy.logout()
   // not sure what's up with this, seems to still be logged in if you don't wait
