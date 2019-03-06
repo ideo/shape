@@ -1,7 +1,14 @@
 import PropTypes from 'prop-types'
 import ReactPlayer from 'react-player'
+import styled from 'styled-components'
 
 import VideoUrl from '~/utils/VideoUrl'
+
+const VideoPlayerBackground = styled.div`
+  background: black;
+  height: ${props => props.height};
+  width: ${props => props.width};
+`
 
 class VideoPlayer extends React.PureComponent {
   state = {
@@ -26,7 +33,11 @@ class VideoPlayer extends React.PureComponent {
       if (videoId.service === 'vimeo') {
         onError = this.catchVimeoError
       }
-      player = <ReactPlayer {...this.props} onError={onError} />
+      player = (
+        <VideoPlayerBackground width={width} height={height}>
+          <ReactPlayer {...this.props} onError={onError} />
+        </VideoPlayerBackground>
+      )
     } else {
       if (videoId.service === 'vbrick') {
         embedSrc = `https://videosat.ford.com/embed?id=${videoId.id}`

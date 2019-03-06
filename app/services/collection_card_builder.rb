@@ -51,6 +51,10 @@ class CollectionCardBuilder
           # will also cache roles identifier and update breadcrumb
           record.save
 
+          if record.is_a?(Item::FileItem) && record.video?
+            record.transcode!
+          end
+
           if @parent_collection.is_a? Collection::SubmissionsCollection
             @parent_collection.follow_submission_box(@user)
           end

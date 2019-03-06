@@ -97,11 +97,13 @@ class GridCard extends React.Component {
         case ITEM_TYPES.FILE: {
           if (record.isPdfFile) {
             return <PdfFileItemCover item={record} />
-          }
-          if (record.isImage) {
+          } else if (record.isImage) {
             return <ImageItemCover item={record} contain={card.image_contain} />
-          }
-          if (record.filestack_file) {
+          } else if (record.isVideo) {
+            return (
+              <VideoItemCover item={record} dragging={this.props.dragging} />
+            )
+          } else if (record.filestack_file) {
             return <GenericFileItemCover item={record} />
           }
           return <div style={{ padding: '20px' }}>File not found.</div>
@@ -345,14 +347,14 @@ class GridCard extends React.Component {
       // TODO: could replace with preview
       Activity.trackActivity('downloaded', record)
       return
-    } else if (record.type === ITEM_TYPES.VIDEO || record.isImage) {
+    } else if (record.isVideo || record.isImage) {
       return
     } else if (record.mimeBaseType === 'image') {
       this.props.handleClick(e)
       return
     } else if (record.isGenericFile) {
       // TODO: could replace with preview
-      this.linkOffsite(record.filestack_file.url)
+      this.linkOffsite(record.fileUrl())
       return
     }
     this.props.handleClick(e)

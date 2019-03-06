@@ -54,7 +54,13 @@ class VideoItemCover extends React.Component {
     playing: false,
   }
 
-  componentDidMount() {}
+  get videoUrl() {
+    const { item } = this.props
+    if (item.filestack_file) {
+      return item.fileUrl()
+    }
+    return item.url
+  }
 
   playVideo = () => {
     const { item, dragging } = this.props
@@ -69,6 +75,17 @@ class VideoItemCover extends React.Component {
     const { item } = this.props
     const thumbnail = item.thumbnail_url
     const showPlayer = !thumbnail
+
+    if (item.pending_transcoding) {
+      return (
+        <StyledVideoCover>
+          <p>
+            Your video upload is currently processing. Please check back later.
+          </p>
+        </StyledVideoCover>
+      )
+    }
+
     return (
       <StyledVideoCover playing={this.state.playing || showPlayer}>
         {thumbnail && (
@@ -96,7 +113,7 @@ class VideoItemCover extends React.Component {
             </StyledTopLeftActions>
             <FullAbsolute>
               <VideoPlayer
-                url={item.url}
+                url={this.videoUrl}
                 controls
                 playing={this.state.playing}
                 width="100%"

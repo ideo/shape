@@ -21,7 +21,7 @@ RSpec.describe FilestackFile, type: :model do
     let(:handle) { 'xyz123' }
 
     it 'should return a signed filestack URL' do
-      signed_url = FilestackFile.signed_url(handle)
+      signed_url = FilestackFile.signed_url(handle, type: :image)
       expect(signed_url).to include("https://process.filestackapi.com/#{ENV['FILESTACK_API_KEY']}")
       expect(signed_url).to include('security=policy:')
       expect(signed_url).to include(handle)
