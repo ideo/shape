@@ -150,8 +150,17 @@ When('I type some random things', () => {
     .click()
   cy.wait(1000)
 
+  Cypress.on(
+    'uncaught:exception',
+    () =>
+      // returning false here prevents Cypress from
+      // failing the test
+      false
+  )
+
+  cy.wait(18000)
   let i = 0
-  while (i < 500) {
+  while (i < 200) {
     const randChar = Math.random()
       .toString(36)
       .substring(7)
