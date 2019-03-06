@@ -158,9 +158,10 @@ When('I type some random things', () => {
       false
   )
 
+  // This wait gives the user time to add themselves to the text item
   cy.wait(18000)
   let i = 0
-  while (i < 200) {
+  while (i < 500) {
     const randChar = Math.random()
       .toString(36)
       .substring(7)
