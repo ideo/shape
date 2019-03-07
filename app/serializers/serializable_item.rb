@@ -66,4 +66,8 @@ class SerializableItem < BaseJsonSerializer
     # might be nil, particularly in tests
     @object.pinned_and_locked? || false
   end
+
+  attribute :pending_transcoding do
+    @object.pending_transcoding_uuid.present?
+  end
 end

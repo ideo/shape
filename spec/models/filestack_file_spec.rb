@@ -21,9 +21,16 @@ RSpec.describe FilestackFile, type: :model do
     let(:handle) { 'xyz123' }
 
     it 'should return a signed filestack URL' do
-      signed_url = FilestackFile.signed_url(handle)
+      signed_url = FilestackFile.signed_url(handle, type: :image)
       expect(signed_url).to include("https://process.filestackapi.com/#{ENV['FILESTACK_API_KEY']}")
       expect(signed_url).to include('security=policy:')
+      expect(signed_url).to include(handle)
+    end
+
+    it 'should return a video conversion URL if type: :video' do
+      signed_url = FilestackFile.signed_url(handle, type: :video)
+      expect(signed_url).to include("https://process.filestackapi.com/#{ENV['FILESTACK_API_KEY']}")
+      expect(signed_url).to include('video_convert=preset:h264')
       expect(signed_url).to include(handle)
     end
   end

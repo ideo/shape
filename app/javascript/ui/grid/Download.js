@@ -15,11 +15,10 @@ class Download extends React.Component {
 
   render() {
     const { record } = this.props
-    const file = record.filestack_file
     return (
       <a
         className="show-on-hover"
-        href={file.url}
+        href={record.fileUrl()}
         target="_blank"
         rel="noopener noreferrer"
         onClick={this.trackDownload}

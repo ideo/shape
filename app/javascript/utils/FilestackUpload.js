@@ -5,10 +5,18 @@ import { apiStore } from '~/stores'
 
 const API_KEY = process.env.FILESTACK_API_KEY
 
-export const MAX_SIZE = 25 * 1024 * 1024
+export const MAX_SIZE = 75 * 1024 * 1024
 
 const imageUploadConfig = {
-  accept: ['.pdf', 'image/*', 'application/*', 'text/*', '.docx', '.ppt'],
+  accept: [
+    '.pdf',
+    'image/*',
+    'application/*',
+    'text/*',
+    '.docx',
+    '.ppt',
+    'video/*',
+  ],
   maxFiles: 1,
   imageMax: [7500, 7500],
   maxSize: MAX_SIZE,
@@ -83,6 +91,10 @@ class FilestackUpload {
       output: { format: 'png' },
       resize: { fit: 'max', width: 400 },
     })
+  }
+
+  static fileUrl({ handle = '' }) {
+    return this.client.transform(handle, {})
   }
 
   static imageUrl({ handle = '', mimetype = '', filestackOpts = {} } = {}) {
