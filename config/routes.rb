@@ -161,6 +161,7 @@ Rails.application.routes.draw do
   resources :reports, only: %i[show]
 
   get 'passthru', to: 'urls#passthru'
+  post 'webhooks/filestack', to: 'webhooks#filestack'
   get 'invitations/:token', to: 'invitations#accept', as: :accept_invitation
 
   get :login, to: 'home#login', as: :login

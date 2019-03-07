@@ -23,7 +23,8 @@
     "data_source_type": { "type": ["string", "null"] },
     "data_source_id": { "type": ["number", "null"] },
     "is_private": { "type": ["boolean"] },
-    "has_replaced_media": { "type": ["boolean"] }
+    "has_replaced_media": { "type": ["boolean"] },
+    "pending_transcoding": { "type": ["boolean"] }
   },
   "required": ["class_type"]
 }

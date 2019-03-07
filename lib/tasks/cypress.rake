@@ -59,8 +59,10 @@ namespace :cypress do
     15.times do |_i|
       user = FactoryBot.create(:user)
       FactoryBot.create(:activity,
-                        organization: organization,
-                        actor: user,
+                        # with cache_classes = false, it gets angry if you try to pass in the
+                        # actual model and not id (ActiveRecord::AssociationTypeMismatch)
+                        organization_id: organization.id,
+                        actor_id: user.id,
                         action: :viewed,
                         target: Collection.last,
                         created_at: Date.today - rand(100))

@@ -23,7 +23,8 @@ class Item < ApplicationRecord
                  :cached_filestack_file_url,
                  :cached_filestack_file_info,
                  :previous_thumbnail_urls,
-                 :cached_inheritance
+                 :cached_inheritance,
+                 :pending_transcoding_uuid
 
   # The card that 'holds' this item and determines its breadcrumb
   has_one :parent_collection_card,

@@ -121,7 +121,10 @@ class Item extends SharedRecordMixin(BaseRecord) {
   }
 
   get isVideo() {
-    return this.type === ITEM_TYPES.VIDEO
+    return (
+      this.type === ITEM_TYPES.VIDEO ||
+      (this.filestack_file && this.mimeBaseType === 'video')
+    )
   }
 
   get isLink() {
@@ -134,6 +137,14 @@ class Item extends SharedRecordMixin(BaseRecord) {
 
   get canSetACover() {
     return this.isVideo || this.isLink
+  }
+
+  fileUrl() {
+    const { filestack_handle } = this
+    if (!filestack_handle) return ''
+    return FilestackUpload.fileUrl({
+      handle: filestack_handle,
+    })
   }
 
   imageUrl(filestackOpts = {}) {
