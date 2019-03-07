@@ -26,7 +26,8 @@
       "__js_test_config"
     ],
     "moduleNameMapper": {
-      ".+\\.(css|styl|less|sass|scss|png|jpg|svg|ttf|woff|woff2|otf)$": "identity-obj-proxy"
+      ".+\\.(css|styl|less|sass|scss|png|jpg|svg|ttf|woff|woff2|otf)$": "identity-obj-proxy",
+      "ideo-sso": "<rootDir>/__mocks__/ideo-sso.js"
     },
     "testPathIgnorePatterns": [
       "/config/webpack/"
