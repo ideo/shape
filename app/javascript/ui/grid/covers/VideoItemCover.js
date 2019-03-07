@@ -103,10 +103,11 @@ class VideoItemCover extends React.Component {
             <InfoIconHolder>
               <AddVideoIcon />
             </InfoIconHolder>
-            <br />
-            Your video upload is currently processing.
-            <br />
-            Please check back later.
+            <div>
+              Your video upload is currently processing.
+              <br />
+              Please check back later.
+            </div>
           </DisplayText>
         </StyledVideoCover>
       )

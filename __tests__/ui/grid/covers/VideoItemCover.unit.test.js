@@ -36,4 +36,21 @@ describe('VideoItemCover', () => {
     expect(wrapper.find('VideoPlayer').props().playing).toBe(true)
     expect(wrapper.find('VideoPlayer').props().url).toEqual(fakeVideoItem.url)
   })
+
+  describe('with an item with a pending video transcode', () => {
+    beforeEach(() => {
+      wrapper = shallow(
+        <VideoItemCover
+          {...props}
+          item={{ ...fakeVideoItem, pending_transcoding: true }}
+        />
+      )
+    })
+
+    it('renders the "upload processing" message', () => {
+      expect(wrapper.find('StyledDisplayText div').text()).toContain(
+        'Your video upload is currently processing'
+      )
+    })
+  })
 })
