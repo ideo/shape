@@ -12,6 +12,7 @@ const render = async (apiStore, networkStore) => {
   )
 
   expect(wrapper.find(Loader).exists()).toBe(true)
+
   await Promise.all([networkStore.loadOrganization, networkStore.loadPlans])
   wrapper.update()
   expect(wrapper.find(Loader).exists()).toBe(false)
@@ -33,11 +34,11 @@ describe('BillingInformation', () => {
       currentUserOrganization: {
         active_users_count: 0,
         trial_users_count: 0,
-        trial_ends_at: '01/01/2022',
+        trial_ends_at: '2022-01-01',
         is_within_trial_period: true,
         price_per_user: 1.23,
-        current_billing_period_start: '01/01/2015',
-        current_billing_period_end: '01/31/2015',
+        current_billing_period_start: '2015-01-01',
+        current_billing_period_end: '2015-01-31',
         deactivated: false,
       },
     }

@@ -12,7 +12,11 @@ import Box from '~shared/components/atoms/Box'
 import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import Loader from '~/ui/layout/Loader'
 import trackError from '~/utils/trackError'
-import { formatAsDollarAmount, formatDate } from '~shared/utils/formatters'
+import {
+  formatAsDollarAmount,
+  dateParseISO,
+  formatDate,
+} from '~shared/utils/formatters'
 import v from '~/utils/variables'
 
 const Wrapper = styled.div`
@@ -142,6 +146,8 @@ class BillingInformation extends React.Component {
     const currentMonthlyRate =
       billableUserCount > 0 ? billableUserCount * price_per_user : 0
 
+    const formatISODate = d => formatDate(dateParseISO(d), 'MM/dd/yyyy')
+
     return (
       <Wrapper>
         <Section title="Billing Information">
@@ -196,7 +202,7 @@ class BillingInformation extends React.Component {
                       <Label>Start date:</Label>
                     </Grid>
                     <Grid item>
-                      {formatDate(current_billing_period_start, 'MM/DD/YYYY')}
+                      {formatISODate(current_billing_period_start)}
                     </Grid>
                   </Grid>
                   <Grid container justify="space-between" spacing={16}>
@@ -204,7 +210,7 @@ class BillingInformation extends React.Component {
                       <Label>End date:</Label>
                     </Grid>
                     <Grid item>
-                      {formatDate(current_billing_period_end, 'MM/DD/YYYY')}
+                      {formatISODate(current_billing_period_end)}
                     </Grid>
                   </Grid>
                   {is_within_trial_period && (
@@ -222,7 +228,7 @@ class BillingInformation extends React.Component {
                         <Grid item>
                           <Label>Trial expires:</Label>
                         </Grid>
-                        <Grid item>{trial_ends_at}</Grid>
+                        <Grid item>{formatISODate(trial_ends_at)}</Grid>
                       </Grid>
                     </div>
                   )}
