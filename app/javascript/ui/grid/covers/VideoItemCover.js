@@ -51,10 +51,10 @@ const StyledVideoCover = styled.div`
     props.pending &&
     `
     background: ${v.colors.commonDark};
-    height: calc(100% - 45px);
+    height: calc(100% - 40px);
     padding-left: 30px;
     padding-right: 30px;
-    padding-top: 45px;
+    padding-top: 40px;
     text-align: center;
     width: calc(100% - 60px);
   `};
@@ -63,7 +63,6 @@ StyledVideoCover.displayName = 'StyledVideoCover'
 
 const InfoIconHolder = styled.span`
   display: inline-block;
-  margin-bottom: 10px;
   height: 60px;
   width: 60px;
 `
