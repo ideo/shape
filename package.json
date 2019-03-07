@@ -78,6 +78,7 @@
     "babel-polyfill": "^6.26.0",
     "babel-preset-react": "^6.24.1",
     "caniuse-lite": "^1.0.30000830",
+    "date-fns": "2.0.0-alpha.27",
     "datx": "^0.11.4",
     "datx-jsonapi": "^0.11.4",
     "draft-js": "^0.10.5",
