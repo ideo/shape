@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { observable, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -7,7 +6,6 @@ import styled from 'styled-components'
 import CopyToClipboard from 'react-copy-to-clipboard'
 
 import ActivityLogButton from '~/ui/notifications/ActivityLogButton'
-import Breadcrumb from '~/ui/layout/Breadcrumb'
 import ActionMenu from '~/ui/grid/ActionMenu'
 import EditableName from '~/ui/pages/shared/EditableName'
 import RolesModal from '~/ui/roles/RolesModal'
@@ -328,7 +326,7 @@ class PageHeader extends React.Component {
   }
 
   render() {
-    const { record, isHomepage, uiStore } = this.props
+    const { record, uiStore } = this.props
     const tagEditorOpen =
       record.parent_collection_card &&
       uiStore.tagsModalOpenId === record.parent_collection_card.id
@@ -339,14 +337,6 @@ class PageHeader extends React.Component {
       <StyledHeader>
         <MaxWidthContainer>
           <RolesModal record={rolesRecord} open={!!uiStore.rolesMenuOpen} />
-          <Breadcrumb
-            record={record}
-            isHomepage={isHomepage}
-            // re-mount every time the record / breadcrumb changes
-            key={`${record.identifier}_${record.breadcrumbSize}`}
-            // force props update if windowWidth changes
-            windowWidth={uiStore.windowWidth}
-          />
           <div>
             <StyledTitleAndRoles
               className={record.isCurrentUserProfile ? 'user-profile' : ''}
@@ -465,16 +455,11 @@ class PageHeader extends React.Component {
 
 PageHeader.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
-  isHomepage: PropTypes.bool,
 }
 
 PageHeader.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
-}
-
-PageHeader.defaultProps = {
-  isHomepage: false,
 }
 
 export default PageHeader

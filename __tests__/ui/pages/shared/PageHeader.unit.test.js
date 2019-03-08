@@ -29,10 +29,6 @@ describe('PageHeader', () => {
         wrapper.setProps(props)
       })
 
-      it('should not render the breadcrumb', () => {
-        expect(wrapper.find('Breadcrumb').prop('isHomepage')).toBeTruthy()
-      })
-
       it('should render an EditableName with the record.name', () => {
         expect(wrapper.find('EditableName').props().name).toEqual(
           props.record.name
@@ -45,10 +41,6 @@ describe('PageHeader', () => {
         fakeTextItem.can_edit = true
         props.record = fakeTextItem
         wrapper.setProps(props)
-      })
-
-      it('should render the breadcrumb', () => {
-        expect(wrapper.find('Breadcrumb').prop('record')).toEqual(fakeTextItem)
       })
 
       it('should not render the roles', () => {
@@ -78,12 +70,6 @@ describe('PageHeader', () => {
     })
 
     describe('for a normal collection', () => {
-      it('should render the breadcrumb', () => {
-        expect(wrapper.find('Breadcrumb').prop('record')).toEqual(
-          fakeCollection
-        )
-      })
-
       it('passes canEdit through to EditableName', () => {
         expect(wrapper.find('EditableName').props().canEdit).toEqual(
           props.record.can_edit

@@ -373,7 +373,7 @@ class CollectionPage extends React.Component {
   )
 
   render() {
-    const { collection, isHomepage, uiStore } = this.props
+    const { collection, uiStore } = this.props
     if (!collection) {
       return this.loader()
     }
@@ -399,7 +399,7 @@ class CollectionPage extends React.Component {
     const { isSubmissionBox, requiresTestDesigner } = collection
     return (
       <Fragment>
-        <PageHeader record={collection} isHomepage={isHomepage} />
+        <PageHeader record={collection} />
         {!isLoading && (
           <PageContainer>
             <OverdueBanner />
@@ -450,16 +450,12 @@ class CollectionPage extends React.Component {
 
 CollectionPage.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
-  isHomepage: PropTypes.bool,
 }
 CollectionPage.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
   undoStore: MobxPropTypes.objectOrObservableObject.isRequired,
-}
-CollectionPage.defaultProps = {
-  isHomepage: false,
 }
 
 export default CollectionPage

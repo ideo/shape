@@ -1,9 +1,10 @@
 import Header from '~/ui/layout/Header'
 
 import fakeApiStore from '#/mocks/fakeApiStore'
+import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 
-import { fakeGroup } from '#/mocks/data'
+import { fakeCollection, fakeGroup, fakeTextItem } from '#/mocks/data'
 
 const group = fakeGroup
 
@@ -44,6 +45,42 @@ describe('Header', () => {
 
   it('does not show the user menu', () => {
     expect(wrapper.find('PopoutMenu').exists()).toBe(false)
+  })
+
+  describe('with a collection', () => {
+    beforeEach(() => {
+      fakeCollection.isNormalCollection = true
+      fakeCollection.breadcrumb = [{ id: 12 }]
+      // TODO: can't get this test to pass because we probably need to update this component to take uiStore as an arg in props
+      const uiStore = fakeUiStore
+      uiStore.viewingCollection = fakeCollection
+    })
+
+    it('should render the breadcrumb', () => {
+      expect(wrapper.find('Breadcrumb').prop('record')).toEqual(fakeCollection)
+    })
+
+    describe('on the homepage', () => {
+      beforeEach(() => {
+        fakeRoutingStore.isHomepage = true
+      })
+
+      it('should not render the breadcrumb', () => {
+        expect(wrapper.find('Breadcrumb').prop('isHomepage')).toBeTruthy()
+      })
+    })
+  })
+
+  describe('with an item', () => {
+    beforeEach(() => {
+      // TODO: can't get this test to pass because we probably need to update this component to take uiStore as an arg in props
+      const uiStore = fakeUiStore
+      uiStore.viewingItem = fakeTextItem
+    })
+
+    it('should render the breadcrumb', () => {
+      expect(wrapper.find('Breadcrumb').prop('record')).toEqual(fakeTextItem)
+    })
   })
 
   describe('with no current_organization', () => {

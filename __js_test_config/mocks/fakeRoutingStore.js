@@ -1,5 +1,6 @@
 const fakeRoutingStore = {
   previousPageBeforeSearch: null,
+  isHomepage: null,
   pathTo: jest.fn().mockReturnValue('/fake/path'),
   routeTo: jest.fn(),
   pathContains: jest.fn(),

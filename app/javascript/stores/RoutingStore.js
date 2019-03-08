@@ -11,6 +11,11 @@ class RoutingStore extends RouterStore {
   slug = () => apiStore.currentOrgSlug
 
   @computed
+  get isHomepage() {
+    return this.location.pathname === this.pathTo('homepage')
+  }
+
+  @computed
   get query() {
     return queryString.parse(this.location.search)
   }

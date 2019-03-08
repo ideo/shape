@@ -4,6 +4,7 @@ import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
 
+import Breadcrumb from '~/ui/layout/Breadcrumb'
 import Logo from '~/ui/layout/Logo'
 import PlainLink from '~/ui/global/PlainLink'
 import GlobalSearch from '~/ui/layout/GlobalSearch'
@@ -172,6 +173,7 @@ class Header extends React.Component {
     }
     const { userDropdownOpen, orgDropdownOpen } = this.state
     const primaryGroup = currentUser.current_organization.primary_group
+    const record = uiStore.viewingCollection || uiStore.viewingItem
     return (
       <Fragment>
         <FixedHeader zIndex={v.zIndex.globalHeader}>
@@ -181,6 +183,19 @@ class Header extends React.Component {
                 <PlainLink to={routingStore.pathTo('homepage')}>
                   <Logo noText width={46} />
                 </PlainLink>
+              </Box>
+
+              <Box auto>
+                {record && (
+                  <Breadcrumb
+                    record={record}
+                    isHomepage={routingStore.isHomepage}
+                    // re-mount every time the record / breadcrumb changes
+                    key={`${record.identifier}_${record.breadcrumbSize}`}
+                    // force props update if windowWidth changes
+                    windowWidth={uiStore.windowWidth}
+                  />
+                )}
               </Box>
 
               <Box flex>
