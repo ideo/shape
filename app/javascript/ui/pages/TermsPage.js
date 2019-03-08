@@ -67,7 +67,7 @@ class TermsPage extends React.PureComponent {
     return (
       <div>
         {loggedIn ? <Header /> : <BasicHeader />}
-        <PageContainer marginTop={v.headerHeightCompact}>
+        <PageContainer>
           <Heading1>Legal</Heading1>
           {loggedIn && <OverdueBanner />}
           {inner}

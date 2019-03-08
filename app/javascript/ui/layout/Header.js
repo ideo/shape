@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
 
@@ -19,6 +20,10 @@ import v from '~/utils/variables'
 import { uiStore } from '~/stores'
 
 /* global IdeoSSO */
+
+const HeaderSpacer = styled.div`
+  height: ${v.headerHeight}px;
+`
 
 const StyledAvatarAndDropdown = styled.div`
   display: inline-block;
@@ -168,51 +173,54 @@ class Header extends React.Component {
     const { userDropdownOpen, orgDropdownOpen } = this.state
     const primaryGroup = currentUser.current_organization.primary_group
     return (
-      <FixedHeader zIndex={v.zIndex.globalHeader}>
-        <MaxWidthContainer>
-          <Flex align="center" justify="space-between">
-            <Box>
-              <PlainLink to={routingStore.pathTo('homepage')}>
-                <Logo />
-              </PlainLink>
-            </Box>
+      <Fragment>
+        <FixedHeader zIndex={v.zIndex.globalHeader}>
+          <MaxWidthContainer>
+            <Flex align="center" justify="space-between">
+              <Box>
+                <PlainLink to={routingStore.pathTo('homepage')}>
+                  <Logo />
+                </PlainLink>
+              </Box>
 
-            <Box flex>
-              <GlobalSearch className="search-bar" />
-              <StyledAvatarAndDropdown>
-                {this.renderOrgDropdown}
-                <button
-                  className="orgBtn"
-                  data-cy="OrgMenuBtn"
-                  onClick={this.handleOrgClick(true)}
-                >
-                  <Avatar
-                    title={primaryGroup.name}
-                    url={primaryGroup.filestack_file_url}
-                    className="organization-avatar"
-                  />
-                </button>
-              </StyledAvatarAndDropdown>
-              <StyledAvatarAndDropdown>
-                {this.renderUserDropdown}
-                <button
-                  className="userBtn"
-                  onClick={this.handleUserClick(true)}
-                >
-                  <Avatar
-                    title={currentUser.name}
-                    url={currentUser.pic_url_square}
-                    className="user-avatar"
-                  />
-                </button>
-              </StyledAvatarAndDropdown>
-              {(userDropdownOpen || orgDropdownOpen) && (
-                <ClickWrapper clickHandlers={this.clickHandlers} />
-              )}
-            </Box>
-          </Flex>
-        </MaxWidthContainer>
-      </FixedHeader>
+              <Box flex>
+                <GlobalSearch className="search-bar" />
+                <StyledAvatarAndDropdown>
+                  {this.renderOrgDropdown}
+                  <button
+                    className="orgBtn"
+                    data-cy="OrgMenuBtn"
+                    onClick={this.handleOrgClick(true)}
+                  >
+                    <Avatar
+                      title={primaryGroup.name}
+                      url={primaryGroup.filestack_file_url}
+                      className="organization-avatar"
+                    />
+                  </button>
+                </StyledAvatarAndDropdown>
+                <StyledAvatarAndDropdown>
+                  {this.renderUserDropdown}
+                  <button
+                    className="userBtn"
+                    onClick={this.handleUserClick(true)}
+                  >
+                    <Avatar
+                      title={currentUser.name}
+                      url={currentUser.pic_url_square}
+                      className="user-avatar"
+                    />
+                  </button>
+                </StyledAvatarAndDropdown>
+                {(userDropdownOpen || orgDropdownOpen) && (
+                  <ClickWrapper clickHandlers={this.clickHandlers} />
+                )}
+              </Box>
+            </Flex>
+          </MaxWidthContainer>
+        </FixedHeader>
+        <HeaderSpacer />
+      </Fragment>
     )
   }
 }
