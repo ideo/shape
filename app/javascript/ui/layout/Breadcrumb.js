@@ -41,8 +41,11 @@ class Breadcrumb extends React.Component {
   }
 
   calculateMaxChars = () => {
-    if (!this.breadcrumbWrapper.current) return 80
-    const width = this.breadcrumbWrapper.current.offsetWidth
+    let width = this.props.containerWidth
+    if (!width) {
+      if (!this.breadcrumbWrapper.current) return 80
+      width = this.breadcrumbWrapper.current.offsetWidth
+    }
     // roughly .075 characters per pixel
     return round(width * 0.075)
   }
@@ -115,6 +118,7 @@ class Breadcrumb extends React.Component {
     let increment = items.length % 2 === 0
     let jumpBy = 1
     while (charsLeftToTruncate > 0) {
+      if (!items[index]) break
       if (items[index].name !== 'My Collection') {
         // Continue marking for truncation until we reduce it to be short enough
         items[index].ellipses = true
@@ -168,10 +172,12 @@ Breadcrumb.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   isHomepage: PropTypes.bool.isRequired,
   breadcrumbWrapper: PropTypes.oneOfType([PropTypes.element, PropTypes.object]),
+  containerWidth: PropTypes.number,
 }
 
 Breadcrumb.defaultProps = {
   breadcrumbWrapper: React.createRef(),
+  containerWidth: null,
 }
 
 export default Breadcrumb

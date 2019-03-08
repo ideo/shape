@@ -25,6 +25,8 @@ import v from '~/utils/variables'
 
 /* global IdeoSSO */
 
+const ACTIONS_MAX_WIDTH = 250
+
 const HeaderSpacer = styled.div`
   height: ${v.headerHeight}px;
 `
@@ -118,10 +120,19 @@ class Header extends React.Component {
   @observable
   actionsWidth = 0
 
+  @observable
+  breadcrumbsWidth = null
+
   @action
   updateActionsWidth(ref) {
     if (!ref) return
     this.actionsWidth = ref.offsetWidth
+  }
+
+  @action
+  updateBreadcrumbsWidth(ref) {
+    if (!ref) return
+    this.breadcrumbsWidth = ref.offsetWidth
   }
 
   handleOrgClick = open => () => {
@@ -300,7 +311,7 @@ class Header extends React.Component {
   }
 
   render() {
-    const { record } = this
+    const { breadcrumbsWidth, record } = this
     const { apiStore, routingStore, uiStore } = this.props
     const { currentUser } = apiStore
     if (!currentUser.current_organization) {
@@ -321,35 +332,38 @@ class Header extends React.Component {
               </Box>
 
               <Box auto>
-                {/* TODO: bug here when moving an immediate child of home collection */}
-                {record && (
-                  <Flex align="center">
-                    <Box>
-                      <Breadcrumb
-                        record={record}
-                        isHomepage={routingStore.isHomepage}
-                        // re-mount every time the record / breadcrumb changes
-                        key={`${record.identifier}_${record.breadcrumbSize}`}
-                        // force props update if windowWidth changes
-                        windowWidth={uiStore.windowWidth}
-                      />
-                    </Box>
-                    <Box>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'flex-end',
-                          whiteSpace: 'nowrap',
-                        }}
-                        ref={ref => {
-                          this.updateActionsWidth(ref)
-                        }}
-                      >
-                        {this.actions}
-                      </div>
-                    </Box>
-                  </Flex>
-                )}
+                <div ref={ref => this.updateBreadcrumbsWidth(ref)}>
+                  {/* TODO: bug here when moving an immediate child of home collection */}
+                  {record && (
+                    <Flex align="center">
+                      <Box>
+                        <Breadcrumb
+                          record={record}
+                          isHomepage={routingStore.isHomepage}
+                          // re-mount every time the record / breadcrumb changes
+                          key={`${record.identifier}_${record.breadcrumbSize}`}
+                          // force props update if windowWidth changes
+                          windowWidth={uiStore.windowWidth}
+                          containerWidth={breadcrumbsWidth - ACTIONS_MAX_WIDTH}
+                        />
+                      </Box>
+                      <Box>
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'flex-end',
+                            whiteSpace: 'nowrap',
+                          }}
+                          ref={ref => {
+                            this.updateActionsWidth(ref)
+                          }}
+                        >
+                          {this.actions}
+                        </div>
+                      </Box>
+                    </Flex>
+                  )}
+                </div>
               </Box>
 
               <Box flex align="center">
