@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { Fragment } from 'react'
-import { observable, action, computed } from 'mobx'
+import { observable, action, computed, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
 
@@ -111,11 +111,11 @@ BasicHeader.defaultProps = {
 @inject('apiStore', 'routingStore', 'uiStore')
 @observer
 class Header extends React.Component {
-  // TODO: Should this state be turned into mobx observables?
-  state = {
-    userDropdownOpen: false,
-    orgDropdownOpen: false,
-  }
+  @observable
+  userDropdownOpen = false
+
+  @observable
+  orgDropdownOpen = false
 
   @observable
   actionsWidth = 0
@@ -135,13 +135,15 @@ class Header extends React.Component {
     this.breadcrumbsWidth = ref.offsetWidth
   }
 
-  handleOrgClick = open => () => {
-    this.setState({ orgDropdownOpen: open })
-  }
+  handleOrgClick = open => () =>
+    runInAction(() => {
+      this.orgDropdownOpen = open
+    })
 
-  handleUserClick = open => () => {
-    this.setState({ userDropdownOpen: open })
-  }
+  handleUserClick = open => () =>
+    runInAction(() => {
+      this.userDropdownOpen = open
+    })
 
   handleMyProfile = () => {
     const { apiStore, routingStore } = this.props
@@ -155,9 +157,10 @@ class Header extends React.Component {
     window.open(IdeoSSO.profileUrl, '_blank')
   }
 
+  @action
   handleNotificationSettings = () => {
     this.props.routingStore.routeTo('/user_settings')
-    this.setState({ userDropdownOpen: false })
+    this.userDropdownOpen = false
   }
 
   handleLogout = () => {
@@ -281,7 +284,7 @@ class Header extends React.Component {
   }
 
   get renderOrgDropdown() {
-    const { orgDropdownOpen } = this.state
+    const { orgDropdownOpen } = this
     return (
       <OrganizationDropdown
         open={orgDropdownOpen}
@@ -291,7 +294,7 @@ class Header extends React.Component {
   }
 
   get renderUserDropdown() {
-    const { userDropdownOpen } = this.state
+    const { userDropdownOpen } = this
     if (!userDropdownOpen) return ''
     return (
       <PopoutMenu
@@ -311,14 +314,13 @@ class Header extends React.Component {
   }
 
   render() {
-    const { breadcrumbsWidth, record } = this
+    const { breadcrumbsWidth, record, userDropdownOpen, orgDropdownOpen } = this
     const { apiStore, routingStore, uiStore } = this.props
     const { currentUser } = apiStore
     if (!currentUser.current_organization) {
       // user needs to set up their Org, will see the Org popup before proceeding
       return <BasicHeader orgMenu={uiStore.organizationMenuOpen} />
     }
-    const { userDropdownOpen, orgDropdownOpen } = this.state
     const primaryGroup = currentUser.current_organization.primary_group
     return (
       <Fragment>
