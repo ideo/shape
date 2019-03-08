@@ -96,7 +96,7 @@ Avatar.propTypes = {
 Avatar.defaultProps = {
   url:
     'https://d3none3dlnlrde.cloudfront.net/assets/users/avatars/missing/square.jpg',
-  size: 34,
+  size: 32,
   className: '',
   title: 'Avatar',
   displayName: false,

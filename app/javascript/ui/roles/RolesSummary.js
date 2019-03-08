@@ -8,7 +8,6 @@ import v from '~/utils/variables'
 import Avatar from '~/ui/global/Avatar'
 
 const MAX_USERS_TO_SHOW = 5
-const AVATAR_SIZE = 30
 
 const StyledRolesSummary = styled.div`
   position: relative;
@@ -132,7 +131,6 @@ class RolesSummary extends React.Component {
         key={`${editor.internalType}_${editor.id}`}
         title={editor.nameWithHints || editor.name}
         url={editor.pic_url_square || editor.filestack_file_url}
-        size={AVATAR_SIZE}
         className="editor"
         // user_profile_collection_id will be null if its a group
         linkToCollectionId={editor.user_profile_collection_id}
@@ -152,7 +150,6 @@ class RolesSummary extends React.Component {
         key={`${viewer.internalType}_${viewer.id}`}
         title={viewer.nameWithHints || viewer.name}
         url={viewer.pic_url_square || viewer.filestack_file_url}
-        size={AVATAR_SIZE}
         className="viewer"
         // user_profile_collection_id will be null if its a group
         linkToCollectionId={viewer.user_profile_collection_id}

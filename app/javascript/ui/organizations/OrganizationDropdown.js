@@ -166,7 +166,6 @@ class OrganizationDropdown extends React.Component {
             <Avatar
               title={org.primary_group.name}
               url={org.primary_group.filestack_file_url}
-              size={32}
               className="org_avatar"
             />
           </IconHolder>

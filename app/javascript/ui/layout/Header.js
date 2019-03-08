@@ -370,7 +370,6 @@ class Header extends React.Component {
                       title={primaryGroup.name}
                       url={primaryGroup.filestack_file_url}
                       className="organization-avatar"
-                      size={30}
                     />
                   </button>
                 </StyledAvatarAndDropdown>
@@ -385,7 +384,6 @@ class Header extends React.Component {
                       title={currentUser.name}
                       url={currentUser.pic_url_square}
                       className="user-avatar"
-                      size={30}
                     />
                   </button>
                 </StyledAvatarAndDropdown>
