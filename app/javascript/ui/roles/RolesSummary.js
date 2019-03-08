@@ -48,7 +48,7 @@ StyledRoleTitle.displayName = 'StyledRoleTitle'
 
 const StyledSeparator = styled.div`
   width: 1px;
-  height: 30px;
+  height: 32px;
   background-color: ${v.colors.commonMedium};
   display: inline-block;
 `
@@ -57,12 +57,12 @@ const StyledAddUserBtn = styled.div`
   display: inline-block;
   vertical-align: top;
   margin-right: 0;
-  width: 30px;
-  height: 30px;
-  border-radius: 30px;
+  width: 32px;
+  height: 32px;
+  border-radius: 32px;
   background-color: white;
   color: ${v.colors.black};
-  line-height: 30px;
+  line-height: 32px;
   font-size: 1.5rem;
   text-align: center;
   cursor: pointer;

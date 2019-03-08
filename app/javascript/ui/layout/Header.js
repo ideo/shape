@@ -52,21 +52,22 @@ StyledAvatarAndDropdown.displayName = 'StyledAvatarAndDropdown'
 
 const StyledSeparator = styled.div`
   width: 1px;
-  height: 30px;
+  height: 32px;
   background-color: ${v.colors.commonMedium};
   display: inline-block;
   margin-left: 8px;
 `
 
 const StyledRoundBtn = styled.div`
+  box-sizing: border-box;
   display: inline-block;
   vertical-align: top;
-  width: 30px;
-  height: 30px;
-  border-radius: 30px;
+  width: 32px;
+  height: 32px;
+  border-radius: 32px;
   background-color: white;
   margin: 0 0 0 8px;
-  line-height: 30px;
+  line-height: 32px;
   font-size: 1.5rem;
   text-align: center;
   cursor: pointer;
@@ -235,7 +236,7 @@ class Header extends React.Component {
         // TODO hacky way to include the record on the card link
         record.parent_collection_card.record = record
         elements.push(
-          <StyledRoundBtn>
+          <StyledRoundBtn style={{ paddingLeft: '2px' }}>
             <ActionMenu
               key="action-menu"
               location="PageMenu"
