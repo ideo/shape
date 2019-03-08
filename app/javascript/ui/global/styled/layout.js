@@ -62,16 +62,20 @@ export const InlineRow = styled(Flex)`
 `
 InlineRow.displayName = 'StyledInlineRow'
 
-export const FixedHeader = styled.header`
-  z-index: ${props => props.zIndex};
-  position: fixed;
-  top: 0;
+export const StyledHeader = styled.header`
   width: calc(100% - ${v.containerPadding.horizontal}rem * 2);
-  background: ${v.colors.commonLight};
   padding: 1rem ${v.containerPadding.horizontal}rem;
   @media print {
     display: none;
   }
+`
+StyledHeader.displayName = 'StyledHeader'
+
+export const FixedHeader = styled(StyledHeader)`
+  z-index: ${props => props.zIndex};
+  position: fixed;
+  top: 0;
+  background: ${v.colors.commonLight};
 `
 FixedHeader.displayName = 'FixedHeader'
 

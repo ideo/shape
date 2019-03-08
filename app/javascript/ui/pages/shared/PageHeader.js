@@ -21,18 +21,12 @@ import LinkIconSm from '~/ui/icons/LinkIconSm'
 import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
-import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
+import { StyledHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import { SubduedHeading1 } from '~/ui/global/styled/typography'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import { FormButton } from '~/ui/global/styled/forms'
 import v from '~/utils/variables'
 /* global IdeoSSO */
-
-// NOTE: Header and PageHeader create sibling <header> elements on the page
-const FixedPageHeader = FixedHeader.extend`
-  top: ${v.globalHeaderHeight}px;
-  z-index: ${v.zIndex.pageHeader};
-`
 
 const IconHolder = styled.span`
   color: ${v.colors.commonDark};
@@ -342,7 +336,7 @@ class PageHeader extends React.Component {
     const rolesRecord = uiStore.rolesMenuOpen ? uiStore.rolesMenuOpen : record
 
     return (
-      <FixedPageHeader>
+      <StyledHeader>
         <MaxWidthContainer>
           <RolesModal record={rolesRecord} open={!!uiStore.rolesMenuOpen} />
           <Breadcrumb
@@ -464,7 +458,7 @@ class PageHeader extends React.Component {
           record={record}
           open={tagEditorOpen}
         />
-      </FixedPageHeader>
+      </StyledHeader>
     )
   }
 }
