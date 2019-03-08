@@ -64,7 +64,7 @@ InlineRow.displayName = 'StyledInlineRow'
 
 export const StyledHeader = styled.header`
   width: calc(100% - ${v.containerPadding.horizontal}rem * 2);
-  padding: 1rem ${v.containerPadding.horizontal}rem;
+  padding: 0 ${v.containerPadding.horizontal}rem;
   @media print {
     display: none;
   }
@@ -75,7 +75,8 @@ export const FixedHeader = styled(StyledHeader)`
   z-index: ${props => props.zIndex};
   position: fixed;
   top: 0;
-  background: ${v.colors.commonLight};
+  background: ${hexToRgba(v.colors.commonLight, 0.8)};
+  backdrop-filter: blur(8px);
 `
 FixedHeader.displayName = 'FixedHeader'
 

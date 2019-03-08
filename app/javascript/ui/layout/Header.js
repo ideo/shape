@@ -176,8 +176,8 @@ class Header extends React.Component {
       <Fragment>
         <FixedHeader zIndex={v.zIndex.globalHeader}>
           <MaxWidthContainer>
-            <Flex align="center" justify="space-between">
-              <Box>
+            <Flex align="center" style={{ minHeight: v.headerHeight }}>
+              <Box style={{ paddingRight: '12px' }}>
                 <PlainLink to={routingStore.pathTo('homepage')}>
                   <Logo noText width={46} />
                 </PlainLink>
