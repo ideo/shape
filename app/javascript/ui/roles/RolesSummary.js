@@ -24,11 +24,15 @@ StyledRolesSummary.displayName = 'StyledRolesSummary'
 
 const StyledAvatarGroup = styled.div`
   display: inline-block;
-  margin: 0 12px;
+  margin: 0 8px;
   .editor,
   .viewer {
     display: inline-block;
-    margin-right: 0;
+    margin-left: 0px;
+    margin-right: -10px;
+    &:last-child {
+      margin-right: 0;
+    }
   }
 `
 StyledAvatarGroup.displayName = 'StyledAvatarGroup'
@@ -58,7 +62,7 @@ const StyledAddUserBtn = styled.div`
   height: 30px;
   border-radius: 30px;
   background-color: white;
-  color: ${v.colors.commonMedium};
+  color: ${v.colors.black};
   line-height: 30px;
   font-size: 1.5rem;
   text-align: center;

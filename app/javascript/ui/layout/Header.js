@@ -31,9 +31,12 @@ const HeaderSpacer = styled.div`
 
 const StyledAvatarAndDropdown = styled.div`
   display: inline-block;
+  margin-left: 8px;
   .user-avatar,
-  .org-avatar {
+  .organization-avatar {
     cursor: pointer;
+    margin-left: 0;
+    margin-right: 0;
   }
   .user-menu,
   .org-menu {
@@ -50,9 +53,9 @@ StyledAvatarAndDropdown.displayName = 'StyledAvatarAndDropdown'
 const StyledSeparator = styled.div`
   width: 1px;
   height: 30px;
-  margin: 0 8px;
   background-color: ${v.colors.commonMedium};
   display: inline-block;
+  margin-left: 8px;
 `
 
 const StyledRoundBtn = styled.div`
@@ -62,6 +65,7 @@ const StyledRoundBtn = styled.div`
   height: 30px;
   border-radius: 30px;
   background-color: white;
+  margin: 0 0 0 8px;
   line-height: 30px;
   font-size: 1.5rem;
   text-align: center;
@@ -354,6 +358,7 @@ class Header extends React.Component {
                 <StyledAvatarAndDropdown>
                   {this.renderOrgDropdown}
                   <button
+                    style={{ display: 'block' }}
                     className="orgBtn"
                     data-cy="OrgMenuBtn"
                     onClick={this.handleOrgClick(true)}
@@ -362,12 +367,14 @@ class Header extends React.Component {
                       title={primaryGroup.name}
                       url={primaryGroup.filestack_file_url}
                       className="organization-avatar"
+                      size={30}
                     />
                   </button>
                 </StyledAvatarAndDropdown>
                 <StyledAvatarAndDropdown>
                   {this.renderUserDropdown}
                   <button
+                    style={{ display: 'block' }}
                     className="userBtn"
                     onClick={this.handleUserClick(true)}
                   >
@@ -375,6 +382,7 @@ class Header extends React.Component {
                       title={currentUser.name}
                       url={currentUser.pic_url_square}
                       className="user-avatar"
+                      size={30}
                     />
                   </button>
                 </StyledAvatarAndDropdown>
