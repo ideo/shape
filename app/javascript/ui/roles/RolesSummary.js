@@ -46,7 +46,7 @@ StyledRoleTitle.displayName = 'StyledRoleTitle'
 const StyledSeparator = styled.div`
   width: 1px;
   height: 30px;
-  background-color: ${v.colors.commonDark};
+  background-color: ${v.colors.commonMedium};
   display: inline-block;
 `
 
@@ -136,17 +136,11 @@ class RolesSummary extends React.Component {
       />
     ))
 
-    return (
-      <StyledAvatarGroup align="right">
-        <StyledRoleTitle>{this.roleLabel('editor')}</StyledRoleTitle>
-        {editors.length > 0 || viewers.length === 0 ? this.addUserBtn : ''}
-        {editorAvatars}
-      </StyledAvatarGroup>
-    )
+    return <StyledAvatarGroup align="right">{editorAvatars}</StyledAvatarGroup>
   }
 
   get renderViewers() {
-    const { viewers, editors } = this.viewersAndEditorsLimited
+    const { viewers } = this.viewersAndEditorsLimited
 
     if (viewers.length === 0) return ''
     const viewerAvatars = viewers.map(viewer => (
@@ -161,13 +155,7 @@ class RolesSummary extends React.Component {
         displayName
       />
     ))
-    return (
-      <StyledAvatarGroup>
-        <StyledRoleTitle>{this.roleLabel('viewer')}</StyledRoleTitle>
-        {editors.length === 0 ? this.addUserBtn : ''}
-        {viewerAvatars}
-      </StyledAvatarGroup>
-    )
+    return <StyledAvatarGroup>{viewerAvatars}</StyledAvatarGroup>
   }
 
   get addUserBtn() {
@@ -186,6 +174,7 @@ class RolesSummary extends React.Component {
           {this.renderEditors}
           {editors.length > 0 && viewers.length > 0 ? <StyledSeparator /> : ''}
           {this.renderViewers}
+          {this.addUserBtn}
         </div>
       </StyledRolesSummary>
     )

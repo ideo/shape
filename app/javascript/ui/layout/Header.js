@@ -47,6 +47,28 @@ const StyledAvatarAndDropdown = styled.div`
 `
 StyledAvatarAndDropdown.displayName = 'StyledAvatarAndDropdown'
 
+const StyledSeparator = styled.div`
+  width: 1px;
+  height: 30px;
+  margin: 0 8px;
+  background-color: ${v.colors.commonMedium};
+  display: inline-block;
+`
+
+const StyledRoundBtn = styled.div`
+  display: inline-block;
+  vertical-align: top;
+  width: 30px;
+  height: 30px;
+  border-radius: 30px;
+  background-color: white;
+  line-height: 30px;
+  font-size: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+`
+StyledRoundBtn.displayName = 'StyledRoundBtn'
+
 export const BasicHeader = ({ orgMenu }) => (
   <FixedHeader zIndex={v.zIndex.globalHeader}>
     <MaxWidthContainer>
@@ -200,8 +222,32 @@ class Header extends React.Component {
     const { record } = this
     const { uiStore } = this.props
     const elements = []
-    // 1. RolesSummary
     if (this.hasActions) {
+      // 1. ActionsMenu
+      if (record.parent_collection_card) {
+        // TODO hacky way to include the record on the card link
+        record.parent_collection_card.record = record
+        elements.push(
+          <StyledRoundBtn>
+            <ActionMenu
+              key="action-menu"
+              location="PageMenu"
+              className="card-menu"
+              card={record.parent_collection_card}
+              canEdit={record.can_edit}
+              canReplace={record.canReplace}
+              submissionBox={record.isSubmissionBox}
+              menuOpen={uiStore.pageMenuOpen}
+              onOpen={this.openMenu}
+              onLeave={this.closeMenu}
+              onMoveMenu={this.routeBack}
+              afterArchive={this.routeBack}
+            />
+          </StyledRoundBtn>,
+          <StyledSeparator />
+        )
+      }
+      // 2. RolesSummary
       elements.push(
         <RolesSummary
           key="roles"
@@ -209,29 +255,6 @@ class Header extends React.Component {
           roles={record.roles}
           canEdit={record.can_edit}
           rolesMenuOpen={!!uiStore.rolesMenuOpen}
-        />
-      )
-    }
-    // 2. CommentIcon (toggle ActivityLog)
-    elements.push(<ActivityLogButton key="activity" />)
-    if (this.hasActions && record.parent_collection_card) {
-      // TODO hacky way to include the record on the card link
-      record.parent_collection_card.record = record
-      // 3. ActionMenu actions
-      elements.push(
-        <ActionMenu
-          key="action-menu"
-          location="PageMenu"
-          className="card-menu"
-          card={record.parent_collection_card}
-          canEdit={record.can_edit}
-          canReplace={record.canReplace}
-          submissionBox={record.isSubmissionBox}
-          menuOpen={uiStore.pageMenuOpen}
-          onOpen={this.openMenu}
-          onLeave={this.closeMenu}
-          onMoveMenu={this.routeBack}
-          afterArchive={this.routeBack}
         />
       )
     }
@@ -309,8 +332,6 @@ class Header extends React.Component {
                           display: 'flex',
                           alignItems: 'flex-end',
                           whiteSpace: 'nowrap',
-                          height: '60px',
-                          marginTop: '-12px',
                         }}
                         ref={ref => {
                           this.updateActionsWidth(ref)
@@ -323,8 +344,13 @@ class Header extends React.Component {
                 )}
               </Box>
 
-              <Box flex>
+              <Box flex align="center">
                 <GlobalSearch className="search-bar" />
+                {record && (
+                  <StyledRoundBtn>
+                    <ActivityLogButton key="activity" />
+                  </StyledRoundBtn>
+                )}
                 <StyledAvatarAndDropdown>
                   {this.renderOrgDropdown}
                   <button
