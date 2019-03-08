@@ -179,7 +179,7 @@ class Header extends React.Component {
             <Flex align="center" justify="space-between">
               <Box>
                 <PlainLink to={routingStore.pathTo('homepage')}>
-                  <Logo />
+                  <Logo noText width={46} />
                 </PlainLink>
               </Box>
 
