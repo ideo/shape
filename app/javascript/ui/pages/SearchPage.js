@@ -155,7 +155,6 @@ class SearchPage extends React.Component {
 
     return (
       <Fragment>
-        <Header />
         <PageContainer>
           {this.renderSearchResults()}
           <MoveModal />

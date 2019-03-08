@@ -8,7 +8,6 @@ class SettingsPage extends React.PureComponent {
   render() {
     return (
       <div>
-        <Header />
         <PageContainer>
           <Heading1>Settings</Heading1>
           <OverdueBanner />

@@ -74,26 +74,29 @@ const StyledRoundBtn = styled.div`
 StyledRoundBtn.displayName = 'StyledRoundBtn'
 
 export const BasicHeader = ({ orgMenu }) => (
-  <FixedHeader zIndex={v.zIndex.globalHeader}>
-    <MaxWidthContainer>
-      <Flex align="center" justify="space-between">
-        <Box>
-          <PlainLink to="/">
-            <Logo />
-          </PlainLink>
-        </Box>
-      </Flex>
-      {orgMenu && (
-        <OrganizationMenu
-          organization={{}}
-          userGroups={[]}
-          onClose={() => null}
-          open={orgMenu}
-          locked
-        />
-      )}
-    </MaxWidthContainer>
-  </FixedHeader>
+  <Fragment>
+    <FixedHeader zIndex={v.zIndex.globalHeader}>
+      <MaxWidthContainer>
+        <Flex align="center" justify="space-between">
+          <Box>
+            <PlainLink to="/">
+              <Logo />
+            </PlainLink>
+          </Box>
+        </Flex>
+        {orgMenu && (
+          <OrganizationMenu
+            organization={{}}
+            userGroups={[]}
+            onClose={() => null}
+            open={orgMenu}
+            locked
+          />
+        )}
+      </MaxWidthContainer>
+    </FixedHeader>
+    <HeaderSpacer />
+  </Fragment>
 )
 BasicHeader.propTypes = {
   orgMenu: PropTypes.bool,

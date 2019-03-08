@@ -66,7 +66,7 @@ class TermsPage extends React.PureComponent {
     const loggedIn = !!apiStore.currentUser
     return (
       <div>
-        {loggedIn ? <Header /> : <BasicHeader />}
+        {!loggedIn && <BasicHeader />}
         <PageContainer>
           <Heading1>Legal</Heading1>
           {loggedIn && <OverdueBanner />}
