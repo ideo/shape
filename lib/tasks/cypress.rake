@@ -42,6 +42,12 @@ namespace :cypress do
     builder.create
 
     card = builder.collection_card
+
+    #####
+    u = User.find 33
+    u.add_role(Role::EDITOR, card.record)
+    #####
+
     builder = CollectionCardBuilder.new(
       params: {
         order: 0,

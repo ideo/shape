@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { observable } from 'mobx'
+import { action, observable } from 'mobx'
 import { ReferenceType } from 'datx'
 
 import { apiUrl } from '~/utils/url'
@@ -197,6 +197,11 @@ class Item extends SharedRecordMixin(BaseRecord) {
       this.data_settings.d_filters &&
       _.find(this.data_settings.d_filters, { type: 'Collection' })
     )
+  }
+
+  @action
+  updateRealtimeData(data) {
+    this.realtime_data_content.data = data
   }
 
   API_updateWithoutSync({ cancel_sync } = {}) {

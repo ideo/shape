@@ -1,7 +1,11 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
+import { computed, toJS } from 'mobx'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import Delta from 'quill-delta'
 import ReactQuill from 'react-quill'
 import styled from 'styled-components'
+import ot from 'quill-ot/lib/client'
 
 import ChannelManager from '~/utils/ChannelManager'
 import { CloseButton } from '~/ui/global/styled/buttons'
@@ -65,26 +69,46 @@ const StyledContainer = styled.div`
   }
 `
 
+@observer
 class RealtimeTextItem extends React.Component {
   channelName = 'ItemRealtimeChannel'
-  state = { quillData: null, loading: true }
+  state = { loading: true }
   saveTimer = null
+  otClient = null
+  combinedDelta = new Delta()
 
   constructor(props) {
     super(props)
+    const { item } = props
     this.reactQuillRef = undefined
     this.quillEditor = undefined
-    this.state.quillData = props.quillContent
-    this.channel = ChannelManager.subscribe(this.channelName, props.itemId, {
+    this.channel = ChannelManager.subscribe(this.channelName, item.id, {
       channelDisconnected: this.channelDisconnected,
       channelReceivedData: this.channelReceivedData,
     })
+
+    this.sendDeltas = _.debounce(this._sendDeltas, 100)
+
+    const otVersion = item.realtime_data_content.deltas.length
+    // console.log({ otVersion })
+    this.otClient = new ot.Client(otVersion || 0)
+    this.otClient.applyDelta = delta => {
+      // console.log('otClient.applyDelta', { delta })
+      this.applyDelta(delta)
+    }
+    this.otClient.sendDelta = (version, delta) => {
+      // console.log('otClient.sendDelta', { version, delta })
+      this.channel.perform('delta', {
+        version,
+        delta,
+      })
+    }
   }
 
   componentDidMount() {
     if (!this.reactQuillRef) return
     this.attachQuillRefs()
-    this.applyDiff()
+    // this.applyDiff()
     setTimeout(() => {
       this.setState({ loading: false })
     }, 100)
@@ -92,7 +116,7 @@ class RealtimeTextItem extends React.Component {
 
   componentDidUpdate() {
     this.attachQuillRefs()
-    if (!this.props.fullyLoaded) this.applyDiff()
+    // if (!this.props.fullyLoaded) this.applyDiff()
   }
 
   componentWillUnmount() {
@@ -100,7 +124,8 @@ class RealtimeTextItem extends React.Component {
   }
 
   applyDiff() {
-    const remoteContents = new Delta(this.props.quillData)
+    const { item } = this.props
+    const remoteContents = new Delta(toJS(item.realtime_data_content.data))
     // console.log('remote contents', remoteContents)
     const editorContents = new Delta(this.quillEditor.getContents())
     // console.log('editor contents', editorContents)
@@ -111,12 +136,13 @@ class RealtimeTextItem extends React.Component {
     }
   }
 
-  applyDelta(delta) {
+  applyDelta(data) {
     // const editorContents = new Delta(tmpl.quillEditor.getContents())
-    const remoteChanges = delta
+    const remoteChanges = data
     if (remoteChanges.ops.length > 0) {
       // Make updates, to allow cursor to stay put
-      this.quillEditor.updateContents(remoteChanges, 'silent')
+      // this.quillEditor.setContents(remoteChanges, 'silent')
+      this.props.item.updateRealtimeData(data)
     }
   }
 
@@ -128,11 +154,28 @@ class RealtimeTextItem extends React.Component {
   }
 
   channelReceivedData = res => {
+    if (!res.data || !res.data.delta) return
     if (res.current_editor.id !== this.props.currentUserId) {
-      if (!res.data || !res.data.delta) return
-      this.applyDelta(res.data.delta)
+      // const remoteDelta = new Delta(toJS(res.data.delta))
+      // console.log('crd applyFromServer', remoteDelta)
+      this.otClient.applyFromServer(res.data.data)
+      // update observable value to update ReactQuill
+      // console.log('setting', res.data.data)
+      // this.quillEditor.setContents(res.data.data, 'silent')
+    } else {
+      // console.log('crd serverAck')
+      this.otClient.serverAck()
     }
+    // console.log('THIS.VERSION >>', this.otClient.version)
   }
+
+  @computed
+  get dataContent() {
+    const { item } = this.props
+    return toJS(item.realtime_data_content.data)
+  }
+
+  cancel = ev => null
 
   save = () => {
     const { quillEditor } = this
@@ -145,18 +188,32 @@ class RealtimeTextItem extends React.Component {
     this.save()
   }
 
-  handleKeyUp = (content, delta, source, editor) => {
+  handleTextChange = (content, delta, source, editor) => {
     if (source === 'user') {
-      if (this.saveTimer) clearTimeout(this.saveTimer)
-      this.saveTimer = setTimeout(() => {
-        this.save()
-      }, 400)
-      this.channel.perform('delta', {
-        content,
-        delta,
-        source,
-      })
+      // if (this.saveTimer) clearTimeout(this.saveTimer)
+      // this.saveTimer = setTimeout(() => {
+      //   this.save()
+      // }, 1000)
+      // this.channel.perform('delta', {
+      //   content,
+      //   delta,
+      //   source,
+      // })
+      // console.log('otClient.applyFromClient', { delta })
+      // this.otClient.applyFromClient(delta)
+
+      this.addDelta(delta)
+      this.sendDeltas()
     }
+  }
+  addDelta = delta => {
+    this.combinedDelta = this.combinedDelta.compose(delta)
+    // console.log('combined', delta, this.combinedDelta)
+  }
+
+  _sendDeltas = () => {
+    this.otClient.applyFromClient(this.combinedDelta)
+    this.combinedDelta = new Delta()
   }
 
   render() {
@@ -166,7 +223,7 @@ class RealtimeTextItem extends React.Component {
         this.reactQuillRef = c
       },
       theme: 'snow',
-      onChange: this.handleKeyUp,
+      onChange: this.handleTextChange,
       readOnly: !this.props.canEdit && !this.state.loading,
       modules: {
         toolbar: '#quill-toolbar',
@@ -188,7 +245,7 @@ class RealtimeTextItem extends React.Component {
           />
         </DockedToolbar>
         <QuillStyleWrapper>
-          <ReactQuill {...quillProps} />
+          <ReactQuill {...quillProps} value={this.dataContent} />
         </QuillStyleWrapper>
       </StyledContainer>
     )
@@ -196,7 +253,7 @@ class RealtimeTextItem extends React.Component {
 }
 RealtimeTextItem.propTypes = {
   currentUserId: PropTypes.string.isRequired,
-  itemId: PropTypes.string.isRequired,
+  item: MobxPropTypes.objectOrObservableObject.isRequired,
   quillContent: PropTypes.node.isRequired,
   canEdit: PropTypes.bool,
   onSave: PropTypes.func,

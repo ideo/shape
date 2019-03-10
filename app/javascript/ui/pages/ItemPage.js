@@ -77,8 +77,8 @@ class ItemPage extends React.Component {
       case ITEM_TYPES.TEXT:
         return (
           <RealtimeTextItem
+            item={item}
             currentUserId={apiStore.currentUserId}
-            itemId={item.id}
             quillContent={item.toJSON().content}
             quillData={item.toJSON().data_content}
             fullyLoaded={item.fullyLoaded}

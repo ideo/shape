@@ -31,7 +31,56 @@ class Item
       text
     end
 
+    def transform_realtime_delta(delta, version)
+      rt_data = realtime_data_content
+      v = version.to_i
+      transformed_delta = delta
+      return delta if v.negative? || (v - realtime_data_version).abs > 20
+      rt_data.deltas.drop(v).each_with_index do |concurrent_delta, i|
+        puts "~~~~~~~~~~~ #{i}"
+        puts 'conc...'
+        puts concurrent_delta
+        puts 'before...'
+        puts transformed_delta
+        transformed_delta = QuillSchmoozer.transform(concurrent_delta, transformed_delta)
+        puts 'after...'
+        puts transformed_delta
+        puts '~~~~!~~~~'
+      end
+      rt_data.data = QuillSchmoozer.compose(rt_data.data, transformed_delta)
+
+      puts "VVVVVVVV version: #{rt_data.deltas.count}"
+      puts rt_data.data.to_json
+      puts '^^^^^^^^'
+
+      rt_data.deltas << transformed_delta
+      update_realtime_data_content(rt_data)
+
+      rt_data.data
+    end
+
+    def realtime_data_content
+      data = Cache.get(realtime_data_key) || { data: nil, deltas: [], version: 0 }
+      Mashie.new(data)
+    end
+
+    def realtime_data_version
+      realtime_data_content.deltas.count
+    end
+
+    def update_realtime_data_content(data)
+      Cache.set(realtime_data_key, data)
+    end
+
+    def delete_realtime_data_content
+      Cache.delete(realtime_data_key)
+    end
+
     private
+
+    def realtime_data_key
+      "#{self.class.base_class.name}_#{id}_realtime"
+    end
 
     # on_create callback
     def generate_name
