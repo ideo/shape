@@ -1,5 +1,5 @@
 class SerializableDataItem < SerializableItem
   attributes :data_settings,
-             :data,
+             :datasets,
              :report_type
 end

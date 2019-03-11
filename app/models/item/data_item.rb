@@ -31,7 +31,7 @@ class Item
       report_type_record: 2,
     }
 
-    def data
+    def datasets
       if report_type_record?
         data_content
       elsif report_type_network_app_metric?

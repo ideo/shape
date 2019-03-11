@@ -217,10 +217,13 @@ class Item extends SharedRecordMixin(BaseRecord) {
 Item.defaults = {
   data_content: '',
   can_edit: false,
-  data: {
-    values: [],
-    count: 0,
-  },
+  datasets: [
+    {
+      primary: true,
+      data: [],
+      count: 0,
+    },
+  ],
   data_settings: {
     d_measure: null,
   },

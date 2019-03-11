@@ -1,5 +1,6 @@
 module DataReport
   class CollectionsAndItems < Base
+
     def call
       if @measure == 'records'
         # special case
@@ -9,10 +10,23 @@ module DataReport
       return unless @query
       @query = filtered_query
       calculate
-      @data
+      datasets
     end
 
     private
+
+    def datasets
+      [
+        {
+          measure: @measure,
+          chart_type: 'area',
+          timeframe: @timeframe,
+          primary: true,
+          single_value: @data[:single_value],
+          data: @data[:values],
+        },
+      ]
+    end
 
     def combine_collection_and_item_reports
       # create temp DataItems to create item and collection reports
@@ -25,10 +39,10 @@ module DataReport
       item_data = d_items.data
       collection_data = d_collections.data
       # now combine the two reports
-      @data[:value] = item_data[:value] + collection_data[:value]
+      @data[:single_value] = item_data[:value] + collection_data[:value]
       @data[:values] =
         (item_data[:values] + collection_data[:values]).group_by { |x| x[:date] }.map do |date, values|
-          { date: date, amount: values.map { |x| x[:amount] }.sum }
+          { date: date, value: values.map { |x| x[:value] }.sum }
         end
       @data
     end
@@ -150,7 +164,7 @@ module DataReport
         ORDER BY series.date;
       }
       values = query_table.connection.execute(sql)
-                          .map { |val| { date: val['date'], amount: val['count'] } }
+                          .map { |val| { date: val['date'], value: val['count'] } }
                           .uniq { |i| i[:date] } # this will filter out dupe when final series.date == now()
 
       @data[:values] = values
@@ -167,8 +181,8 @@ module DataReport
       else
         return
       end
-      return @data[:value] = value if @return_records
-      @data[:value] = value.count
+      return @data[:single_value] = value if @return_records
+      @data[:single_value] = value.count
     end
   end
 end

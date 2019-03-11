@@ -19,6 +19,10 @@ class SerializableCollection < BaseJsonSerializer
   belongs_to :submission_template
   belongs_to :collection_to_test
 
+  attribute :item_collection_cover do
+    false # Hardcoded for now
+  end
+
   attribute :system_required do
     @object.system_required?
   end

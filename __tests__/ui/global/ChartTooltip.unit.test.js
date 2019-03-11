@@ -1,4 +1,4 @@
-import ChartTooltip from '~/ui/global/ChartTooltip'
+import ChartTooltip from '~/ui/global/charts/ChartTooltip'
 
 let props, wrapper, render, data
 describe('ChartTooltip', () => {

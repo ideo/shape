@@ -14,6 +14,11 @@ export const COLLECTION_TYPES = {
   TEST_DESIGN: 'Collection::TestDesign',
 }
 
+export const DATASET_CHART_TYPES = {
+  AREA: 'area',
+  LINE: 'line',
+}
+
 export const DATA_MEASURES = [
   { name: 'Participants', value: 'participants' },
   { name: 'Viewers', value: 'viewers' },
