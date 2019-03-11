@@ -90,7 +90,7 @@ class RealtimeTextItem extends React.Component {
       channelReceivedData: this.channelReceivedData,
     })
 
-    this.sendCombinedDelta = _.debounce(this._sendCombinedDelta, 450)
+    this.sendCombinedDelta = _.debounce(this._sendCombinedDelta, 350)
     // initialize from server data?
     // this.versionMatrix[currentUserId] = {
     //   version: 0,
@@ -166,13 +166,16 @@ class RealtimeTextItem extends React.Component {
   channelReceivedData = ({ current_editor, data }) => {
     if (!data || !data.delta) return
 
-    const remoteDelta = new Delta(toJS(data.delta))
+    const remoteDelta = new Delta(data.delta)
     // update our local version number
     this.version = data.version
     if (current_editor.id !== this.props.currentUserId) {
       // apply the incoming other person's delta
-      // const newRemDelta = remoteDelta.transform(this.combinedDelta)
-      this.quillEditor.updateContents(remoteDelta, 'silent')
+      const remoteDeltaWithLocalChanges = this.combinedDelta.transform(
+        remoteDelta
+      )
+      // console.log('UPDATE CONTENTS!!!!')
+      this.quillEditor.updateContents(remoteDeltaWithLocalChanges, 'silent')
       // this.props.item.updateRealtimeData(new Delta(data.data))
 
       if (this.combinedDelta.ops.length) {
@@ -181,8 +184,7 @@ class RealtimeTextItem extends React.Component {
       }
     } else if (this.lastSentDelta) {
       // ???
-      // ???
-      // ???
+      // console.log('UPDATE REALTIME')
       this.props.item.updateRealtimeData(
         new Delta(data.data).compose(this.combinedDelta)
       )

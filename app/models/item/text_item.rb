@@ -42,6 +42,24 @@ class Item
 
     def transform_realtime_delta(delta, version)
       rt_data = realtime_data_content
+      rt_data.data = QuillSchmoozer.compose(rt_data.data, delta)
+      rt_data.version += 1
+
+      update_realtime_data_content(rt_data)
+
+      puts "#{version} VVVVVVVV version: #{rt_data.version}"
+      puts rt_data.data.to_json
+      puts "^^^^^^^^\n\n"
+
+      {
+        delta: delta,
+        data: rt_data.data,
+        version: rt_data.version,
+      }
+    end
+
+    def __transform_realtime_delta(delta, version)
+      rt_data = realtime_data_content
       v = version.to_i
       transformed_delta = delta
       if (v - realtime_data_version).abs > 10
