@@ -20,8 +20,10 @@ class ItemRealtimeChannel < ApplicationCable::Channel
   def delta(data)
     item = Item.find(params[:id])
     # update delta with transformed one
-    data['data'] = item.transform_realtime_delta(data['delta'], data['version'])
-    item.received_changes(data, current_user)
+    new_data = item.threadlocked_transform_realtime_delta(data['delta'], data['version'])
+    if new_data
+      item.received_changes(new_data, current_user)
+    end
   rescue ActiveRecord::RecordNotFound
     nil
   end

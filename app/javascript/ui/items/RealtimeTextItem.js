@@ -5,7 +5,7 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import Delta from 'quill-delta'
 import ReactQuill from 'react-quill'
 import styled from 'styled-components'
-import ot from 'quill-ot/lib/client'
+// import ot from 'quill-ot/lib/client'
 
 import ChannelManager from '~/utils/ChannelManager'
 import { CloseButton } from '~/ui/global/styled/buttons'
@@ -74,7 +74,10 @@ class RealtimeTextItem extends React.Component {
   channelName = 'ItemRealtimeChannel'
   state = { loading: true }
   saveTimer = null
-  otClient = null
+
+  // initialize from server data?
+  version = 0
+  lastSentDelta = new Delta()
   combinedDelta = new Delta()
 
   constructor(props) {
@@ -87,26 +90,33 @@ class RealtimeTextItem extends React.Component {
       channelReceivedData: this.channelReceivedData,
     })
 
-    this.sendDeltas = _.debounce(this._sendDeltas, 100)
-
-    const otVersion = item.realtime_data_content.deltas.length
-    // console.log({ otVersion })
-    this.otClient = new ot.Client(otVersion || 0)
-    this.otClient.applyDelta = delta => {
-      // console.log('otClient.applyDelta', { delta })
-      this.applyDelta(delta)
-    }
-    this.otClient.sendDelta = (version, delta) => {
-      // console.log('otClient.sendDelta', { version, delta })
-      this.channel.perform('delta', {
-        version,
-        delta,
-      })
-    }
+    this.sendCombinedDelta = _.debounce(this._sendCombinedDelta, 450)
+    // initialize from server data?
+    // this.versionMatrix[currentUserId] = {
+    //   version: 0,
+    //   delta: null,
+    // }
   }
+
+  // delta
+  //   - send out, with User/Version matrix
+  //      - dk-2
+  //      - iz-1
+  //   ... keep typing, waits to send again until server response to send again
+  //   - server comes back with latest text?delta?
+  //      - dk-2
+  //      - iz-2
+  //   - now i say, great, my dk-2 has been received,
+  //     - how has my delta been changed... ?
+  //     - I can send out dk-3, which is everything else, start the whole thing over again
 
   componentDidMount() {
     if (!this.reactQuillRef) return
+    const { item } = this.props
+    this.version = item.realtime_data_content
+      ? item.realtime_data_content.version
+      : 0
+
     this.attachQuillRefs()
     // this.applyDiff()
     setTimeout(() => {
@@ -153,20 +163,64 @@ class RealtimeTextItem extends React.Component {
     this.quillEditor = this.reactQuillRef.getEditor()
   }
 
-  channelReceivedData = res => {
-    if (!res.data || !res.data.delta) return
-    if (res.current_editor.id !== this.props.currentUserId) {
-      // const remoteDelta = new Delta(toJS(res.data.delta))
-      // console.log('crd applyFromServer', remoteDelta)
-      this.otClient.applyFromServer(res.data.data)
-      // update observable value to update ReactQuill
-      // console.log('setting', res.data.data)
-      // this.quillEditor.setContents(res.data.data, 'silent')
-    } else {
-      // console.log('crd serverAck')
-      this.otClient.serverAck()
+  channelReceivedData = ({ current_editor, data }) => {
+    if (!data || !data.delta) return
+
+    const remoteDelta = new Delta(toJS(data.delta))
+    // update our local version number
+    this.version = data.version
+    if (current_editor.id !== this.props.currentUserId) {
+      // apply the incoming other person's delta
+      // const newRemDelta = remoteDelta.transform(this.combinedDelta)
+      this.quillEditor.updateContents(remoteDelta, 'silent')
+      // this.props.item.updateRealtimeData(new Delta(data.data))
+
+      if (this.combinedDelta.ops.length) {
+        // transform our awaiting content
+        this.combinedDelta = remoteDelta.transform(this.combinedDelta, true)
+      }
+    } else if (this.lastSentDelta) {
+      // ???
+      // ???
+      // ???
+      this.props.item.updateRealtimeData(
+        new Delta(data.data).compose(this.combinedDelta)
+      )
+
+      // if (!_.isEqual(this.lastSentDelta.ops, remoteDelta.ops)) {
+      //   console.log('not equal?')
+      //
+      //   const editorContents = new Delta(this.quillEditor.getContents())
+      //   if (!editorContents) return
+      //   const reverse = this.lastSentDelta.invert(editorContents)
+      //   try {
+      //     const remoteChanges = editorContents
+      //       .compose(reverse)
+      //       .compose(remoteDelta)
+      //       .diff(editorContents)
+      //
+      //     if (remoteChanges.ops.length) {
+      //       console.log({
+      //         prev: this.lastSentDelta.ops,
+      //         remoteChangesOps: remoteChanges.ops,
+      //         remoteDelta,
+      //       })
+      //
+      //       // update combinedDelta to reflect
+      //       console.log('<UPDATING>')
+      //       this.combinedDelta = remoteChanges.transform(
+      //         this.combinedDelta,
+      //         true
+      //       )
+      //       // apply any transforms that were made to our own delta
+      //       this.quillEditor.updateContents(remoteChanges, 'silent')
+      //       // this.props.item.updateRealtimeData(new Delta(data.data))
+      //     }
+      //   } catch (e) {
+      //     console.warn('unable to quill diff', { editorContents })
+      //   }
+      // }
     }
-    // console.log('THIS.VERSION >>', this.otClient.version)
   }
 
   @computed
@@ -202,18 +256,38 @@ class RealtimeTextItem extends React.Component {
       // console.log('otClient.applyFromClient', { delta })
       // this.otClient.applyFromClient(delta)
 
-      this.addDelta(delta)
-      this.sendDeltas()
+      this.combineAwaitingDeltas(delta)
+      this.sendCombinedDelta()
     }
   }
-  addDelta = delta => {
+  combineAwaitingDeltas = delta => {
     this.combinedDelta = this.combinedDelta.compose(delta)
     // console.log('combined', delta, this.combinedDelta)
   }
 
-  _sendDeltas = () => {
-    this.otClient.applyFromClient(this.combinedDelta)
+  _sendCombinedDelta = () => {
+    if (this.waitingForVersion === this.version) {
+      // try again in 0.5 sec
+      // console.log('WAITING...')
+      return setTimeout(this.sendCombinedDelta, 100)
+    }
+    if (!this.combinedDelta.ops.length) {
+      // console.log('NOTHING TO SEND')
+      return false
+    }
+
+    // this.otClient.applyFromClient(this.combinedDelta)
+    this.channel.perform('delta', {
+      version: this.version,
+      delta: this.combinedDelta,
+      user_id: this.props.currentUserId,
+    })
+    // console.log({ version: this.version })
+
+    this.waitingForVersion = this.version
+    this.lastSentDelta = new Delta(this.combinedDelta)
     this.combinedDelta = new Delta()
+    return this.combinedDelta
   }
 
   render() {
@@ -229,6 +303,8 @@ class RealtimeTextItem extends React.Component {
         toolbar: '#quill-toolbar',
       },
     }
+
+    // console.log('rander')
 
     return (
       <StyledContainer

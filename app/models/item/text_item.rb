@@ -31,14 +31,28 @@ class Item
       text
     end
 
+    def threadlocked_transform_realtime_delta(delta, version)
+      RedisClassy.redis = Cache.client
+      lock_name = "rt_text_id_#{id}"
+      puts "<SEMAPHORE>>>> locked? #{RedisMutex.new(lock_name).locked?}"
+      RedisMutex.with_lock(lock_name, block: 2) do
+        transform_realtime_delta(delta, version)
+      end
+    end
+
     def transform_realtime_delta(delta, version)
       rt_data = realtime_data_content
       v = version.to_i
       transformed_delta = delta
-      return delta if v.negative? || (v - realtime_data_version).abs > 20
+      if (v - realtime_data_version).abs > 10
+        # just return unchanged??
+        return {
+          delta: transformed_delta,
+          version: rt_data.version,
+        }
+      end
       rt_data.deltas.drop(v).each_with_index do |concurrent_delta, i|
-        puts "~~~~~~~~~~~ #{i}"
-        puts 'conc...'
+        puts "~~~~~~~~~~~ #{i} conc...."
         puts concurrent_delta
         puts 'before...'
         puts transformed_delta
@@ -49,14 +63,19 @@ class Item
       end
       rt_data.data = QuillSchmoozer.compose(rt_data.data, transformed_delta)
 
-      puts "VVVVVVVV version: #{rt_data.deltas.count}"
-      puts rt_data.data.to_json
-      puts '^^^^^^^^'
-
       rt_data.deltas << transformed_delta
+      rt_data.version = rt_data.deltas.count
       update_realtime_data_content(rt_data)
 
-      rt_data.data
+      puts "#{version} VVVVVVVV version: #{rt_data.version}"
+      puts rt_data.data.to_json
+      puts "^^^^^^^^\n\n"
+
+      {
+        delta: transformed_delta,
+        data: rt_data.data,
+        version: rt_data.version,
+      }
     end
 
     def realtime_data_content

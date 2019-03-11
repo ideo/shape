@@ -124,7 +124,6 @@ class ItemPage extends React.Component {
     const { item } = this.state
     item.content = content
     item.data_content = dataContent
-    console.log('save', dataContent)
     item.API_updateWithoutSync({ cancel_sync: true })
   }
 
