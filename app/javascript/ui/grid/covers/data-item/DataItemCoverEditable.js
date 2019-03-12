@@ -294,7 +294,6 @@ class DataItemCoverEditable extends React.Component {
 
   renderTimeframeValues() {
     const { card, item } = this.props
-
     return (
       <Fragment>
         <AboveChartContainer>

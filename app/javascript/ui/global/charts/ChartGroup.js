@@ -61,9 +61,9 @@ class ChartGroup extends React.PureComponent {
     return datasets.filter(dataset => !!dataset.primary)
   }
 
-  get primaryValues() {
-    if (!this.primaryDataset || !this.primaryDataset.values) return []
-    return this.primaryDataset.values
+  get primaryDatasetValues() {
+    if (!this.primaryDataset || !this.primaryDataset.data) return []
+    return this.primaryDataset.data
   }
 
   get isSmallChartStyle() {
@@ -102,17 +102,19 @@ class ChartGroup extends React.PureComponent {
     const dateNearMonthEdge = monthEdge(dateOperand, timeframe)
 
     if (dateNearMonthEdge) {
-      const datesNearOperandAndMonthEdge = this.primaryValues.filter(val => {
-        const dateIteratee = utcMoment(val.date)
-        const valueNearMonthEdge = monthEdge(dateIteratee, timeframe)
+      const datesNearOperandAndMonthEdge = this.primaryDatasetValues.filter(
+        val => {
+          const dateIteratee = utcMoment(val.date)
+          const valueNearMonthEdge = monthEdge(dateIteratee, timeframe)
 
-        if (!valueNearMonthEdge) return false
+          if (!valueNearMonthEdge) return false
 
-        return Math.abs(dateIteratee.diff(dateOperand, 'days')) < 8
-      })
+          return Math.abs(dateIteratee.diff(dateOperand, 'days')) < 8
+        }
+      )
 
       if (datesNearOperandAndMonthEdge.length > 1) {
-        const allDates = this.primaryValues.map(val => val.date)
+        const allDates = this.primaryDatasetValues.map(val => val.date)
         // Don't show date being operated on if it is not last one
         // This is to avoid date labels piling up on top of each other
         if (index < allDates.length - 1) return ''
@@ -164,7 +166,7 @@ class ChartGroup extends React.PureComponent {
       }
     }
 
-    return this.primaryValues > 1 ? (
+    return this.primaryDatasetValues > 1 ? (
       <VictoryAxis
         tickLabelComponent={
           <TickLabel
@@ -184,7 +186,7 @@ class ChartGroup extends React.PureComponent {
         style={this.chartAxisStyle}
         tickFormat={t => null}
         offsetY={13}
-        label={this.fullDate(this.primaryValues[0].date)}
+        label={this.fullDate(this.primaryDatasetValues[0].date)}
       />
     )
   }
@@ -203,18 +205,19 @@ class ChartGroup extends React.PureComponent {
     </NotEnoughDataContainer>
   )
 
-  renderDataset = dataset => {
+  renderDataset = (dataset, index) => {
     switch (dataset.type) {
       case DATASET_CHART_TYPES.AREA:
-        return <AreaChart dataset={dataset} />
+        return <AreaChart dataset={dataset} key={`dataset-${index}`} />
       case DATASET_CHART_TYPES.LINE:
-        return <LineChart dataset={dataset} />
+        return <LineChart dataset={dataset} key={`dataset-${index}`} />
       default:
-        return <div>Unsupported Chart Type</div>
+        return <div key={`dataset-${index}`}>Unsupported Chart Type</div>
     }
   }
 
   get renderCharts() {
+    let datasetIndex = 0
     return (
       <ChartContainer data-cy="ChartContainer">
         <OrganicGrid />
@@ -224,8 +227,10 @@ class ChartGroup extends React.PureComponent {
           padding={{ top: 0, left: 0, right: 0, bottom: 0 }}
           containerComponent={<VictoryVoronoiContainer />}
         >
-          {this.renderDataset(this.primaryDataset)}
-          {this.secondaryDatasets.map(dataset => this.renderDataset(dataset))}
+          {this.renderDataset(this.primaryDataset, datasetIndex)}
+          {this.secondaryDatasets.map(dataset =>
+            this.renderDataset(dataset, (datasetIndex += 1))
+          )}
           {this.chartAxis}
         </VictoryChart>
       </ChartContainer>
@@ -233,7 +238,7 @@ class ChartGroup extends React.PureComponent {
   }
 
   render() {
-    if (this.primaryValues.length === 0) {
+    if (this.primaryDatasetValues.length === 0) {
       return this.renderNotEnoughData()
     }
     return this.renderCharts

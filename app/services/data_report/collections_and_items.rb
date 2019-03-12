@@ -15,6 +15,15 @@ module DataReport
 
     private
 
+    def fake_values
+      1.upto(5).map do |i|
+        {
+          value: rand(50),
+          date: (6.months.ago + i.month).to_date
+        }
+      end
+    end
+
     def datasets
       [
         {
@@ -23,7 +32,7 @@ module DataReport
           timeframe: @timeframe,
           primary: true,
           single_value: @data[:single_value],
-          data: @data[:values],
+          data: fake_values #@data[:values],
         },
       ]
     end

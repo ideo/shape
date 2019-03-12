@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 import moment from 'moment-mini'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 
 export const utcMoment = date => moment(`${date} 00+0000`).utc()
 
-export const datasetPropType = PropTypes.arrayOf(
+export const datasetPropType = MobxPropTypes.arrayOrObservableArrayOf(
   PropTypes.shape({
     measure: PropTypes.string.isRequired,
     description: PropTypes.string,
@@ -15,7 +16,7 @@ export const datasetPropType = PropTypes.arrayOf(
     fill: PropTypes.string,
     max_domain: PropTypes.number,
     single_value: PropTypes.number,
-    data: PropTypes.arrayOf(
+    data: MobxPropTypes.arrayOrObservableArrayOf(
       PropTypes.shape({
         value: PropTypes.number.isRequired,
         date: PropTypes.string.isRequired,
