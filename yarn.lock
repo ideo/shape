@@ -12035,6 +12035,11 @@ querystringify@~1.0.0:
   resolved "https://registry.yarnpkg.com/querystringify/-/querystringify-1.0.0.tgz#6286242112c5b712fa654e526652bf6a13ff05cb"
   integrity sha1-YoYkIRLFtxL6ZU5SZlK/ahP/Bcs=
 
+quill-cursors@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/quill-cursors/-/quill-cursors-2.1.0.tgz#02c9fd5a03ddefb4e70d2b6cc8d84818bd59d962"
+  integrity sha512-IMNQ6rKh4FCW5nYefisozuP+wQnsHU3fZkevUltumpL8yhXND1nRJLeT6iMSmowvjZoJJoHWJRaGFHNVvrZC0g==
+
 quill-delta@^3.5.0:
   version "3.6.3"
   resolved "https://registry.yarnpkg.com/quill-delta/-/quill-delta-3.6.3.tgz#b19fd2b89412301c60e1ff213d8d860eac0f1032"

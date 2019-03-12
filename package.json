@@ -112,6 +112,7 @@
     "prettier": "^1.14.2",
     "prop-types": "^15.6.2",
     "query-string": "5.1.0",
+    "quill-cursors": "^2.1.0",
     "quill-delta": "^4.2.0",
     "quill-ot": "arslnb/quill-ot.js",
     "react": "^16.4.2",

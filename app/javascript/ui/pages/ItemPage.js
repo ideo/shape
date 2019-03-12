@@ -82,7 +82,6 @@ class ItemPage extends React.Component {
             quillContent={item.toJSON().content}
             quillData={item.toJSON().data_content}
             fullyLoaded={item.fullyLoaded}
-            canEdit
             onSave={this.saveText}
           />
         )

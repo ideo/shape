@@ -175,7 +175,7 @@ Chicharrones snackwave whatever, narwhal fanny pack mustache synth shoreditch. D
     // cy.wait(5)
     i += 1
     if (i % 15 === 0) {
-      cy.wait(400)
+      cy.wait(550)
     }
   }
 })

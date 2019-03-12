@@ -3,15 +3,17 @@ import PropTypes from 'prop-types'
 import { computed, toJS } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import Delta from 'quill-delta'
-import ReactQuill from 'react-quill'
+import ReactQuill, { Quill } from 'react-quill'
+import QuillCursors from 'quill-cursors'
 import styled from 'styled-components'
-// import ot from 'quill-ot/lib/client'
 
 import ChannelManager from '~/utils/ChannelManager'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import { QuillStyleWrapper } from '~/ui/global/styled/typography'
 import TextItemToolbar from '~/ui/items/TextItemToolbar'
 import v from '~/utils/variables'
+
+Quill.register('modules/cursors', QuillCursors)
 
 const DockedToolbar = styled.div`
   background: white;
@@ -90,7 +92,8 @@ class RealtimeTextItem extends React.Component {
       channelReceivedData: this.channelReceivedData,
     })
 
-    this.sendCombinedDelta = _.debounce(this._sendCombinedDelta, 350)
+    this.sendCombinedDelta = _.debounce(this._sendCombinedDelta, 500)
+    this.sendCursor = _.throttle(this._sendCursor, 50)
     // initialize from server data?
     // this.versionMatrix[currentUserId] = {
     //   version: 0,
@@ -133,28 +136,28 @@ class RealtimeTextItem extends React.Component {
     ChannelManager.unsubscribeAllFromChannel(this.channelName)
   }
 
-  applyDiff() {
-    const { item } = this.props
-    const remoteContents = new Delta(toJS(item.realtime_data_content.data))
-    // console.log('remote contents', remoteContents)
-    const editorContents = new Delta(this.quillEditor.getContents())
-    // console.log('editor contents', editorContents)
-    const remoteChanges = editorContents.diff(remoteContents)
-    // console.log('remote changes', remoteChanges)
-    if (remoteChanges.ops.length > 0) {
-      this.quillEditor.updateContents(remoteChanges, 'silent')
-    }
-  }
-
-  applyDelta(data) {
-    // const editorContents = new Delta(tmpl.quillEditor.getContents())
-    const remoteChanges = data
-    if (remoteChanges.ops.length > 0) {
-      // Make updates, to allow cursor to stay put
-      // this.quillEditor.setContents(remoteChanges, 'silent')
-      this.props.item.updateRealtimeData(data)
-    }
-  }
+  // applyDiff() {
+  //   const { item } = this.props
+  //   const remoteContents = new Delta(toJS(item.realtime_data_content.data))
+  //   // console.log('remote contents', remoteContents)
+  //   const editorContents = new Delta(this.quillEditor.getContents())
+  //   // console.log('editor contents', editorContents)
+  //   const remoteChanges = editorContents.diff(remoteContents)
+  //   // console.log('remote changes', remoteChanges)
+  //   if (remoteChanges.ops.length > 0) {
+  //     this.quillEditor.updateContents(remoteChanges, 'silent')
+  //   }
+  // }
+  //
+  // applyDelta(data) {
+  //   // const editorContents = new Delta(tmpl.quillEditor.getContents())
+  //   const remoteChanges = data
+  //   if (remoteChanges.ops.length > 0) {
+  //     // Make updates, to allow cursor to stay put
+  //     // this.quillEditor.setContents(remoteChanges, 'silent')
+  //     this.props.item.updateRealtimeData(data)
+  //   }
+  // }
 
   attachQuillRefs = () => {
     if (!this.reactQuillRef) return
@@ -163,12 +166,32 @@ class RealtimeTextItem extends React.Component {
     this.quillEditor = this.reactQuillRef.getEditor()
   }
 
-  channelReceivedData = ({ current_editor, data }) => {
-    if (!data || !data.delta) return
+  createCursor({ id, name }) {
+    const cursors = this.quillEditor.getModule('cursors')
+    cursors.createCursor(id, name, v.colors.tertiaryMedium)
+  }
 
+  channelReceivedData = ({ current_editor, data, num_viewers }) => {
+    // console.log({ current_editor, data, num_viewers })
+    if (data && data.delta) {
+      this.handleReceivedDelta({ current_editor, data })
+    }
+    if (data && data.range) {
+      this.handleReceivedRange({ current_editor, data })
+    }
+  }
+
+  handleReceivedRange = ({ current_editor, data }) => {
+    if (current_editor.id === this.props.currentUserId) return
+    // createCursor is like a find_or_create
+    this.createCursor(current_editor)
+    const cursors = this.quillEditor.getModule('cursors')
+    cursors.moveCursor(current_editor.id, data.range)
+  }
+
+  handleReceivedDelta = ({ current_editor, data }) => {
     const remoteDelta = new Delta(data.delta)
     // update our local version number
-    this.version = data.version
     if (current_editor.id !== this.props.currentUserId) {
       // apply the incoming other person's delta
       const remoteDeltaWithLocalChanges = this.combinedDelta.transform(
@@ -183,46 +206,14 @@ class RealtimeTextItem extends React.Component {
         this.combinedDelta = remoteDelta.transform(this.combinedDelta, true)
       }
     } else if (this.lastSentDelta) {
+      this.version = data.version
       // ???
       // console.log('UPDATE REALTIME')
       this.props.item.updateRealtimeData(
         new Delta(data.data).compose(this.combinedDelta)
       )
-
-      // if (!_.isEqual(this.lastSentDelta.ops, remoteDelta.ops)) {
-      //   console.log('not equal?')
-      //
-      //   const editorContents = new Delta(this.quillEditor.getContents())
-      //   if (!editorContents) return
-      //   const reverse = this.lastSentDelta.invert(editorContents)
-      //   try {
-      //     const remoteChanges = editorContents
-      //       .compose(reverse)
-      //       .compose(remoteDelta)
-      //       .diff(editorContents)
-      //
-      //     if (remoteChanges.ops.length) {
-      //       console.log({
-      //         prev: this.lastSentDelta.ops,
-      //         remoteChangesOps: remoteChanges.ops,
-      //         remoteDelta,
-      //       })
-      //
-      //       // update combinedDelta to reflect
-      //       console.log('<UPDATING>')
-      //       this.combinedDelta = remoteChanges.transform(
-      //         this.combinedDelta,
-      //         true
-      //       )
-      //       // apply any transforms that were made to our own delta
-      //       this.quillEditor.updateContents(remoteChanges, 'silent')
-      //       // this.props.item.updateRealtimeData(new Delta(data.data))
-      //     }
-      //   } catch (e) {
-      //     console.warn('unable to quill diff', { editorContents })
-      //   }
-      // }
     }
+    this.sendCursor()
   }
 
   @computed
@@ -258,20 +249,36 @@ class RealtimeTextItem extends React.Component {
       // console.log('otClient.applyFromClient', { delta })
       // this.otClient.applyFromClient(delta)
 
+      const cursors = this.quillEditor.getModule('cursors')
+      cursors.clearCursors()
+
       this.combineAwaitingDeltas(delta)
       this.sendCombinedDelta()
     }
   }
+
+  handleSelectionChange = (range, source, editor) => {
+    if (source === 'user') {
+      this.sendCursor()
+    }
+  }
+
   combineAwaitingDeltas = delta => {
     this.combinedDelta = this.combinedDelta.compose(delta)
     // console.log('combined', delta, this.combinedDelta)
   }
 
+  _sendCursor = () => {
+    this.channel.perform('cursor', {
+      range: this.quillEditor.getSelection(),
+    })
+  }
+
   _sendCombinedDelta = () => {
     if (this.waitingForVersion === this.version) {
-      // try again in 0.5 sec
-      // console.log('WAITING...')
-      return setTimeout(this.sendCombinedDelta, 100)
+      // try again in a little bit
+      console.log('WAITING...')
+      return setTimeout(this.sendCombinedDelta, 125)
     }
     if (!this.combinedDelta.ops.length) {
       // console.log('NOTHING TO SEND')
@@ -282,9 +289,9 @@ class RealtimeTextItem extends React.Component {
     this.channel.perform('delta', {
       version: this.version,
       delta: this.combinedDelta,
-      user_id: this.props.currentUserId,
+      current_user_id: this.props.currentUserId,
     })
-    // console.log({ version: this.version })
+    this.sendCursor()
 
     this.waitingForVersion = this.version
     this.lastSentDelta = new Delta(this.combinedDelta)
@@ -293,6 +300,8 @@ class RealtimeTextItem extends React.Component {
   }
 
   render() {
+    const { item } = this.props
+    const canEdit = item.can_edit_content
     const quillProps = {
       ...v.quillDefaults,
       ref: c => {
@@ -300,9 +309,13 @@ class RealtimeTextItem extends React.Component {
       },
       theme: 'snow',
       onChange: this.handleTextChange,
-      readOnly: !this.props.canEdit && !this.state.loading,
+      onChangeSelection: this.handleSelectionChange,
+      readOnly: !canEdit && !this.state.loading,
       modules: {
-        toolbar: '#quill-toolbar',
+        toolbar: canEdit ? '#quill-toolbar' : null,
+        cursors: {
+          hideDelayMs: 3000,
+        },
       },
     }
 
@@ -315,7 +328,7 @@ class RealtimeTextItem extends React.Component {
         fullPageView
       >
         <DockedToolbar fullPageView>
-          {this.props.canEdit && <TextItemToolbar onExpand={() => {}} />}
+          {canEdit && <TextItemToolbar onExpand={() => {}} />}
           <CloseButton
             data-cy="TextItemClose"
             onClick={this.cancel}
@@ -333,11 +346,9 @@ RealtimeTextItem.propTypes = {
   currentUserId: PropTypes.string.isRequired,
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   quillContent: PropTypes.node.isRequired,
-  canEdit: PropTypes.bool,
   onSave: PropTypes.func,
 }
 RealtimeTextItem.defaultProps = {
-  canEdit: false,
   onSave: () => {},
 }
 

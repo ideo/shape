@@ -12,7 +12,7 @@ class ItemRealtimeChannel < ApplicationCable::Channel
   def unsubscribed
     item = Item.find(params[:id])
     item.stopped_viewing(current_user, dont_notify: true)
-    item.stopped_editing(current_user)
+    # item.stopped_editing(current_user)
   rescue ActiveRecord::RecordNotFound
     nil
   end
@@ -24,6 +24,14 @@ class ItemRealtimeChannel < ApplicationCable::Channel
     if new_data
       item.received_changes(new_data, current_user)
     end
+  rescue ActiveRecord::RecordNotFound
+    nil
+  end
+
+  def cursor(data)
+    item = Item.find(params[:id])
+    # update delta with transformed one
+    item.received_changes(data, current_user)
   rescue ActiveRecord::RecordNotFound
     nil
   end
