@@ -17,6 +17,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
 
   def create
     if @item.save
+      # how do we also include the legend created afterward also?
       render jsonapi: @item, include: [roles: %i[users groups resource]], expose: { current_record: @item }
     else
       render_api_errors @item.errors
@@ -99,6 +100,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
       :tag_list,
       :thumbnail_url,
       filestack_file_attributes: Item.filestack_file_attributes_whitelist,
+      :legend_item_id,
     )
   end
 

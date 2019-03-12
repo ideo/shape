@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190220192800) do
+ActiveRecord::Schema.define(version: 20190312204433) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -75,6 +75,11 @@ ActiveRecord::Schema.define(version: 20190220192800) do
     t.index ["user_id"], name: "index_applications_on_user_id"
   end
 
+  create_table "collection_card_groups", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "collection_cards", force: :cascade do |t|
     t.integer "order", null: false
     t.integer "width"
@@ -96,6 +101,7 @@ ActiveRecord::Schema.define(version: 20190220192800) do
     t.integer "filter", default: 1
     t.boolean "hidden", default: false
     t.boolean "show_replace", default: true
+    t.integer "collection_card_group_id"
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
@@ -255,6 +261,7 @@ ActiveRecord::Schema.define(version: 20190220192800) do
     t.jsonb "data_settings"
     t.bigint "roles_anchor_collection_id"
     t.integer "report_type"
+    t.integer "legend_item_id"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
     t.index ["created_at"], name: "index_items_on_created_at"
