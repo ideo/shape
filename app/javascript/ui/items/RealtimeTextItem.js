@@ -81,6 +81,7 @@ class RealtimeTextItem extends React.Component {
   version = 0
   lastSentDelta = new Delta()
   combinedDelta = new Delta()
+  bufferDelta = new Delta()
 
   constructor(props) {
     super(props)
@@ -92,7 +93,7 @@ class RealtimeTextItem extends React.Component {
       channelReceivedData: this.channelReceivedData,
     })
 
-    this.sendCombinedDelta = _.debounce(this._sendCombinedDelta, 500)
+    this.sendCombinedDelta = _.debounce(this._sendCombinedDelta, 350)
     this.sendCursor = _.throttle(this._sendCursor, 50)
     // initialize from server data?
     // this.versionMatrix[currentUserId] = {
@@ -192,6 +193,9 @@ class RealtimeTextItem extends React.Component {
   handleReceivedDelta = ({ current_editor, data }) => {
     const remoteDelta = new Delta(data.delta)
     // update our local version number
+    if (!data.error) {
+      this.version = data.version
+    }
     if (current_editor.id !== this.props.currentUserId) {
       // apply the incoming other person's delta
       const remoteDeltaWithLocalChanges = this.combinedDelta.transform(
@@ -205,13 +209,21 @@ class RealtimeTextItem extends React.Component {
         // transform our awaiting content
         this.combinedDelta = remoteDelta.transform(this.combinedDelta, true)
       }
-    } else if (this.lastSentDelta) {
-      this.version = data.version
-      // ???
-      // console.log('UPDATE REALTIME')
-      this.props.item.updateRealtimeData(
-        new Delta(data.data).compose(this.combinedDelta)
-      )
+    } else if (current_editor.id === this.props.currentUserId) {
+      if (this.lastSentDelta && !data.error) {
+        // clear out our combinedDelta
+        // const newChanges = this.combinedDelta.diff(this.lastSentDelta)
+
+        // ???
+        // console.log('UPDATE REALTIME', { bd: this.bufferDelta.ops })
+        // this.props.item.updateRealtimeData(
+        //   new Delta(data.data).compose(this.bufferDelta)
+        // )
+        this.combinedDelta = new Delta(this.bufferDelta)
+        this.bufferDelta = new Delta()
+      } else if (data.error) {
+        this.sendCombinedDelta()
+      }
     }
     this.sendCursor()
   }
@@ -265,7 +277,7 @@ class RealtimeTextItem extends React.Component {
 
   combineAwaitingDeltas = delta => {
     this.combinedDelta = this.combinedDelta.compose(delta)
-    // console.log('combined', delta, this.combinedDelta)
+    this.bufferDelta = this.bufferDelta.compose(delta)
   }
 
   _sendCursor = () => {
@@ -295,7 +307,7 @@ class RealtimeTextItem extends React.Component {
 
     this.waitingForVersion = this.version
     this.lastSentDelta = new Delta(this.combinedDelta)
-    this.combinedDelta = new Delta()
+    this.bufferDelta = new Delta()
     return this.combinedDelta
   }
 

@@ -35,9 +35,11 @@ class Item
       RedisClassy.redis = Cache.client
       lock_name = "rt_text_id_#{id}"
       puts "<SEMAPHORE>>>> locked? #{RedisMutex.new(lock_name).locked?}"
-      RedisMutex.with_lock(lock_name, block: 2) do
+      RedisMutex.with_lock(lock_name, block: 0) do
         transform_realtime_delta(delta, version)
       end
+    rescue RedisMutex::LockError
+      false
     end
 
     def transform_realtime_delta(delta, version)

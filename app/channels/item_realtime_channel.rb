@@ -23,6 +23,8 @@ class ItemRealtimeChannel < ApplicationCable::Channel
     new_data = item.threadlocked_transform_realtime_delta(data['delta'], data['version'])
     if new_data
       item.received_changes(new_data, current_user)
+    else
+      item.received_changes({ error: 'failed' }, current_user)
     end
   rescue ActiveRecord::RecordNotFound
     nil
