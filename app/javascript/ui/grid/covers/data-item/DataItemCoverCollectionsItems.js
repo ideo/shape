@@ -18,30 +18,7 @@ import DataTargetSelect from '~/ui/reporting/DataTargetSelect'
 import v from '~/utils/variables'
 import trackError from '~/utils/trackError'
 import OrganicGridPng from '~/assets/organic_grid_black.png'
-
-const StyledDataItemCover = styled.div`
-  background-color: ${v.colors.commonLight};
-  border-top: 2px solid ${v.colors.black};
-  height: calc(100% - 15px);
-  padding: 15px 0 0;
-  text-align: left;
-
-  .editableMetric {
-    ${props =>
-      props.editable &&
-      `
-    &:hover {
-      background-color: ${v.colors.primaryLight};
-    }
-    ${props.editing &&
-      `
-      background-color: ${v.colors.primaryLight};
-`};
-`};
-  }
-`
-
-StyledDataItemCover.displayName = 'StyledDataItemCover'
+import StyledDataItemCover from './StyledDataItemCover'
 
 const GraphKey = styled.span`
   background: url(${OrganicGridPng});
@@ -56,7 +33,7 @@ const GraphKey = styled.span`
 // eslint-disable-next-line react/no-multi-comp
 @inject('uiStore', 'apiStore')
 @observer
-class DataItemCoverEditable extends React.Component {
+class DataItemCoverCollectionsItems extends React.Component {
   @observable
   targetCollection = null
 
@@ -304,7 +281,7 @@ class DataItemCoverEditable extends React.Component {
         </AboveChartContainer>
         <ChartGroup
           datasets={item.datasets}
-          showTooltipWithMeasureAndDate={item.isReportTypeCollectionsItems}
+          showMeasureInTooltip={item.isReportTypeCollectionsItems}
           width={card.width}
           height={card.height}
         />
@@ -334,14 +311,14 @@ class DataItemCoverEditable extends React.Component {
   }
 }
 
-DataItemCoverEditable.propTypes = {
+DataItemCoverCollectionsItems.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   card: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
-DataItemCoverEditable.wrappedComponent.propTypes = {
+DataItemCoverCollectionsItems.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
-export default DataItemCoverEditable
+export default DataItemCoverCollectionsItems

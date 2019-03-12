@@ -2,8 +2,8 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { runInAction, observable } from 'mobx'
 
 import trackError from '~/utils/trackError'
-import DataItemCoverEditable from '~/ui/grid/covers/data-item/DataItemCoverEditable'
-import DataItemCoverReadonly from '~/ui/grid/covers/data-item/DataItemCoverReadonly'
+import DataItemCoverCollectionsItems from '~/ui/grid/covers/data-item/DataItemCoverCollectionsItems'
+import DataItemCoverDisplayOnly from '~/ui/grid/covers/data-item/DataItemCoverDisplayOnly'
 
 // eslint-disable-next-line react/no-multi-comp
 @inject('apiStore')
@@ -34,9 +34,9 @@ class DataItemCover extends React.Component {
   render() {
     const { item, card } = this.props
     if (item.isReportTypeCollectionsItems) {
-      return <DataItemCoverEditable item={item} card={card} />
+      return <DataItemCoverCollectionsItems item={item} card={card} />
     }
-    return <DataItemCoverReadonly item={item} card={card} />
+    return <DataItemCoverDisplayOnly item={item} card={card} />
   }
 }
 

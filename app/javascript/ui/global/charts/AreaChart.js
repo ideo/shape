@@ -17,11 +17,10 @@ const formatValues = rawValues => {
   }))
 }
 
-const chartStyle = dataset => {
-  const { fill } = dataset
-  if (fill) {
+const chartStyle = style => {
+  if (style.fill) {
     return {
-      data: { fill },
+      data: { fill: style.fill },
       labels: {
         fontSize: 18,
       },
@@ -42,13 +41,12 @@ const AreaChart = ({ dataset, showMeasureInTooltip, cardArea = 1 }) => {
     values,
     maxDomain: dataset.max_domain,
   })
-  const tooltipMeasure = showMeasureInTooltip ? measure : null
   const tooltipFn = (datum, isLastDataPoint) =>
     renderTooltip({
       datum,
       isLastDataPoint,
       timeframe,
-      measure: tooltipMeasure,
+      measure: showMeasureInTooltip ? measure : null,
     })
   return (
     <VictoryArea
@@ -56,7 +54,7 @@ const AreaChart = ({ dataset, showMeasureInTooltip, cardArea = 1 }) => {
       labelComponent={
         <ChartTooltip textRenderer={tooltipFn} cardArea={cardArea} />
       }
-      style={chartStyle(dataset)}
+      style={chartStyle(dataset.style || {})}
       data={values}
       // This makes the chart shape based on the values
       domain={domain}

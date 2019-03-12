@@ -14,8 +14,11 @@ export const datasetPropType = PropTypes.shape({
   chart_type: PropTypes.string.isRequired,
   timeframe: PropTypes.string.isRequired,
   primary: PropTypes.bool.isRequired,
-  fill: PropTypes.string,
   max_domain: PropTypes.number,
+  style: PropTypes.shape({
+    fill: PropTypes.string,
+    dashWidth: PropTypes.number,
+  }),
   single_value: PropTypes.number,
   data: MobxPropTypes.arrayOrObservableArrayOf(
     PropTypes.shape({
@@ -28,7 +31,9 @@ export const datasetPropType = PropTypes.shape({
 export const primaryFillColorFromDatasets = datasets => {
   if (!datasets) return '#000000'
   const primary = datasets.filter(dataset => dataset.primary)
-  return primary ? primary.chartFill : '#000000'
+  return primary && primary.style && primary.style.fill
+    ? primary.style.fill
+    : '#000000'
 }
 
 export const chartDomainForDatasetValues = ({ values, maxDomain }) => {
@@ -68,9 +73,9 @@ export const renderTooltip = ({
   if (timeframe === 'day') {
     timeRange = `on ${momentDate.format('MMM D')}`
   }
-  let text = datum.value
+  let text = `${datum.value} `
   if (measure) {
-    text += ` ${pluralize(measure)}\n`
+    text += `${pluralize(measure)}\n`
   }
   text += isLastDataPoint ? `in last ${dayTimeframe}` : timeRange
   return text

@@ -1,4 +1,3 @@
-import { Fragment } from 'react'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { startCase } from 'lodash'
 
@@ -9,8 +8,9 @@ import {
   primaryFillColorFromDatasets,
   AboveChartContainer,
 } from '~/ui/global/charts/ChartUtils'
+import StyledDataItemCover from './StyledDataItemCover'
 
-class DataItemCoverReadonly extends React.PureComponent {
+class DataItemCoverDisplayOnly extends React.PureComponent {
   get title() {
     const { item } = this.props
     const { name, data_settings } = item
@@ -28,7 +28,7 @@ class DataItemCoverReadonly extends React.PureComponent {
   render() {
     const { card, item } = this.props
     return (
-      <Fragment>
+      <StyledDataItemCover>
         <AboveChartContainer>
           <DisplayText color={this.fillColor}>{this.title}</DisplayText>
           <br />
@@ -38,14 +38,14 @@ class DataItemCoverReadonly extends React.PureComponent {
           width={card.width}
           height={card.height}
         />
-      </Fragment>
+      </StyledDataItemCover>
     )
   }
 }
 
-DataItemCoverReadonly.propTypes = {
+DataItemCoverDisplayOnly.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   card: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
-export default DataItemCoverReadonly
+export default DataItemCoverDisplayOnly

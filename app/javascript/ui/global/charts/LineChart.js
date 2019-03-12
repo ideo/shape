@@ -18,28 +18,27 @@ const formatValues = values => {
   }))
 }
 
-const chartStyle = (fill, dashWidth) => ({
+const chartStyle = style => ({
   data: {
-    stroke: fill || '#000000',
+    stroke: style.fill || '#000000',
     strokeWidth: 2,
-    strokeDasharray: dashWidth,
+    strokeDasharray: style.dashWidth || 0,
   },
 })
 
-const LineChart = ({ dataset, showMeasureInTooltip, cardArea, dashWidth }) => {
+const LineChart = ({ dataset, showMeasureInTooltip, cardArea }) => {
   const { measure, timeframe } = dataset
   const values = formatValues(dataset.data)
   const domain = chartDomainForDatasetValues({
     values,
     maxDomain: dataset.max_domain,
   })
-  const tooltipMeasure = showMeasureInTooltip ? measure : null
   const tooltipFn = (datum, isLastDataPoint) =>
     renderTooltip({
       datum,
       isLastDataPoint,
       timeframe,
-      measure: tooltipMeasure,
+      measure: showMeasureInTooltip ? measure : null,
     })
   return (
     <VictoryLine
@@ -47,7 +46,7 @@ const LineChart = ({ dataset, showMeasureInTooltip, cardArea, dashWidth }) => {
       labelComponent={
         <ChartTooltip textRenderer={tooltipFn} cardArea={cardArea} />
       }
-      style={chartStyle(dataset.fill, dashWidth)}
+      style={chartStyle(dataset.style || {})}
       data={values}
       domain={domain}
       key={`dataset-${dataset.measure}`}
@@ -59,13 +58,11 @@ LineChart.propTypes = {
   dataset: datasetPropType.isRequired,
   showMeasureInTooltip: PropTypes.bool,
   cardArea: PropTypes.number,
-  dashWidth: PropTypes.number,
 }
 
 LineChart.defaultProps = {
   cardArea: 1,
   showMeasureInTooltip: false,
-  dashWidth: 0,
 }
 
 export default LineChart

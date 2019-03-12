@@ -176,26 +176,26 @@ class ChartGroup extends React.PureComponent {
   )
 
   renderDataset = (dataset, index) => {
-    const { showTooltipWithMeasure, width, height } = this.props
+    const { showMeasureInTooltip, width, height } = this.props
     const dashWidth = index * 2
     switch (dataset.chart_type) {
       case DATASET_CHART_TYPES.AREA:
         return AreaChart({
           dataset,
-          showTooltipWithMeasure,
+          showMeasureInTooltip,
           cardArea: width * height,
         })
       case DATASET_CHART_TYPES.LINE:
         return LineChart({
           dataset,
-          showTooltipWithMeasure,
+          showMeasureInTooltip,
           cardArea: width * height,
           dashWidth,
         })
       default:
         return AreaChart({
           dataset,
-          showTooltipWithMeasure,
+          showMeasureInTooltip,
           cardArea: width * height,
         })
     }
@@ -233,13 +233,13 @@ class ChartGroup extends React.PureComponent {
 
 ChartGroup.propTypes = {
   datasets: MobxPropTypes.arrayOrObservableArrayOf(datasetPropType).isRequired,
-  showTooltipWithMeasure: PropTypes.bool,
+  showMeasureInTooltip: PropTypes.bool,
   width: PropTypes.number,
   height: PropTypes.number,
 }
 
 ChartGroup.defaultProps = {
-  showTooltipWithMeasure: false,
+  showMeasureInTooltip: false,
   width: 1,
   height: 1,
 }
