@@ -36,6 +36,12 @@ const TickLabel = props => {
   )
 }
 
+const NotEnoughDataContainer = styled.div`
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+`
+
 const ChartContainer = styled.div`
   bottom: 0px;
   height: 92%;
@@ -46,14 +52,12 @@ const ChartContainer = styled.div`
 class ChartGroup extends React.PureComponent {
   get primaryDataset() {
     const { datasets } = this.props
-    if (!datasets) return null
-    if (datasets.length === 1) return datasets[0]
+    if (datasets.length <= 1) return datasets[0]
     return datasets.find(dataset => dataset.primary)
   }
 
   get secondaryDatasets() {
     const { datasets } = this.props
-    if (!datasets) return []
     return datasets.filter(dataset => !!dataset.primary)
   }
 
@@ -194,10 +198,9 @@ class ChartGroup extends React.PureComponent {
 
   // Oddly es-lint complains when this is a get function
   renderNotEnoughData = () => (
-    <DisplayText className="noDataMessage">
-      <br />
-      Not enough data yet
-    </DisplayText>
+    <NotEnoughDataContainer>
+      <DisplayText className="noDataMessage">Not enough data yet</DisplayText>
+    </NotEnoughDataContainer>
   )
 
   renderDataset = dataset => {

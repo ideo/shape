@@ -271,13 +271,19 @@ class DataItemCoverEditable extends React.Component {
     return name
   }
 
+  get primaryDataset() {
+    const { datasets } = this.props.item
+    if (datasets.length <= 1) return datasets[0]
+    return datasets.find(dataset => dataset.primary)
+  }
+
   renderSingleValue() {
-    const { item } = this.props
+    const { single_value } = this.primaryDataset ? this.primaryDataset : {}
     return (
       <Fragment>
         <Heading3>{this.measureControl}</Heading3>
         <HugeNumber className="count" data-cy="DataReport-count">
-          {item.data.value}
+          {single_value}
         </HugeNumber>
         <SmallHelperText color={v.colors.black}>
           {this.titleAndControls}
@@ -287,7 +293,7 @@ class DataItemCoverEditable extends React.Component {
   }
 
   renderTimeframeValues() {
-    const { card } = this.props
+    const { card, item } = this.props
 
     return (
       <Fragment>
@@ -298,7 +304,7 @@ class DataItemCoverEditable extends React.Component {
           <br />
         </AboveChartContainer>
         <ChartGroup
-          datasets={card.datasets}
+          datasets={item.datasets}
           width={card.width}
           height={card.height}
         />
