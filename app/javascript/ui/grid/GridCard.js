@@ -15,6 +15,7 @@ import VideoItemCover from '~/ui/grid/covers/VideoItemCover'
 import GenericFileItemCover from '~/ui/grid/covers/GenericFileItemCover'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 import DataItemCover from '~/ui/grid/covers/DataItemCover'
+import LegendItemCover from '~/ui/grid/covers/LegendItemCover'
 
 import Activity from '~/stores/jsonApi/Activity'
 import ActionMenu from '~/ui/grid/ActionMenu'
@@ -123,6 +124,9 @@ class GridCard extends React.Component {
 
         case ITEM_TYPES.DATA:
           return <DataItemCover height={height} item={record} card={card} />
+
+        case ITEM_TYPES.LEGEND:
+          return <LegendItemCover height={height} item={record} card={card} />
 
         default:
           return <div>{record.content}</div>
