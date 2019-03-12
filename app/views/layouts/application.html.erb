@@ -20,7 +20,7 @@
       if (typeof IdeoSSO === 'undefined') {
         window.IdeoSSO = {
           init: function() {},
-          baseApiUrl: '',
+          baseApiUrl: '<%= ENV['BASE_HOST'] %>',
         }
       }
       IdeoSSO.init(<%= ideo_sso_init_params.to_json.html_safe %>)
