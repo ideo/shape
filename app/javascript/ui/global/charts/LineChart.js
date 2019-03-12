@@ -4,41 +4,30 @@ import { VictoryLine } from 'victory'
 import ChartTooltip from '~/ui/global/charts/ChartTooltip'
 import { datasetPropType } from '~/ui/global/charts/ChartUtils'
 
-class LineChart extends React.PureComponent {
-  get values() {
-    const { values } = this.props.dataset
-    if (values) return values
-    return []
-  }
+const formatValues = values =>
+  values.map((datum, i) => ({
+    ...datum,
+    x: i,
+    y: datum.value,
+  }))
 
-  get formattedValues() {
-    return this.values.map((datum, i) => ({
-      ...datum,
-      x: i,
-      y: datum.value,
-    }))
-  }
+const chartStyle = fill => ({
+  data: { stroke: fill || '#000000' },
+})
 
-  get chartStyle() {
-    const { fill } = this.props.dataset
-    return {
-      data: { stroke: fill || '#000000' },
-    }
-  }
-
-  render() {
-    const { tooltipRenderFn, cardArea } = this.props
-    return (
-      <VictoryLine
-        labels={d => d.value}
-        labelComponent={
-          <ChartTooltip textRenderer={tooltipRenderFn} cardArea={cardArea} />
-        }
-        style={this.chartStyle}
-        data={this.formattedValues}
-      />
-    )
-  }
+const LineChart = ({ dataset, tooltipRenderFn, cardArea = 1 }) => {
+  const values = formatValues(dataset.data)
+  const tooltipFn = tooltipRenderFn || (datum => datum.value)
+  return (
+    <VictoryLine
+      labels={d => d.value}
+      labelComponent={
+        <ChartTooltip textRenderer={tooltipFn} cardArea={cardArea} />
+      }
+      style={chartStyle(dataset.fill)}
+      data={values}
+    />
+  )
 }
 
 LineChart.propTypes = {

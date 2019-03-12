@@ -304,6 +304,7 @@ class DataItemCoverEditable extends React.Component {
         </AboveChartContainer>
         <ChartGroup
           datasets={item.datasets}
+          showTooltipWithMeasureAndDate={item.isReportTypeCollectionsItems}
           width={card.width}
           height={card.height}
         />

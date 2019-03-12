@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import {
   VictoryAxis,
@@ -71,8 +72,8 @@ class ChartGroup extends React.PureComponent {
     return width <= 1 && height <= 1
   }
 
-  renderTooltipText = (datum, isLastDataPoint) => {
-    const { timeframe, measureTooltip } = this.primaryDataset
+  renderTooltipWithMeasureAndDate = (datum, isLastDataPoint) => {
+    const { timeframe, measure } = this.primaryDataset
     const momentDate = utcMoment(datum.date)
     let timeRange = `${momentDate
       .clone()
@@ -90,7 +91,7 @@ class ChartGroup extends React.PureComponent {
     if (timeframe === 'day') {
       timeRange = `on ${momentDate.format('MMM D')}`
     }
-    const text = `${datum.value} ${pluralize(measureTooltip)}\n
+    const text = `${datum.value} ${pluralize(measure)}\n
       ${isLastDataPoint ? `in last ${dayTimeframe}` : timeRange}`
 
     return text
@@ -191,13 +192,6 @@ class ChartGroup extends React.PureComponent {
     )
   }
 
-  get maxDomain() {
-    const { max_domain } = this.primaryDataset
-    if (max_domain) return max_domain
-    const values = this.formattedValues.map(el => el.value)
-    return Math.max(...values)
-  }
-
   // Oddly es-lint complains when this is a get function
   renderNotEnoughData = () => (
     <NotEnoughDataContainer>
@@ -206,13 +200,29 @@ class ChartGroup extends React.PureComponent {
   )
 
   renderDataset = (dataset, index) => {
-    switch (dataset.type) {
+    const { showTooltipWithMeasureAndDate, width, height } = this.props
+    const tooltipRenderFn = showTooltipWithMeasureAndDate
+      ? this.renderTooltipWithMeasureAndDate
+      : undefined
+    switch (dataset.chart_type) {
       case DATASET_CHART_TYPES.AREA:
-        return <AreaChart dataset={dataset} key={`dataset-${index}`} />
+        return AreaChart({
+          dataset,
+          tooltipRenderFn,
+          cardArea: width * height,
+        })
       case DATASET_CHART_TYPES.LINE:
-        return <LineChart dataset={dataset} key={`dataset-${index}`} />
+        return LineChart({
+          dataset,
+          tooltipRenderFn,
+          cardArea: width * height,
+        })
       default:
-        return <div key={`dataset-${index}`}>Unsupported Chart Type</div>
+        return AreaChart({
+          dataset,
+          tooltipRenderFn,
+          cardArea: width * height,
+        })
     }
   }
 
@@ -246,12 +256,14 @@ class ChartGroup extends React.PureComponent {
 }
 
 ChartGroup.propTypes = {
-  datasets: datasetPropType.isRequired,
+  datasets: MobxPropTypes.arrayOrObservableArrayOf(datasetPropType).isRequired,
+  showTooltipWithMeasureAndDate: PropTypes.bool,
   width: PropTypes.number,
   height: PropTypes.number,
 }
 
 ChartGroup.defaultProps = {
+  showTooltipWithMeasureAndDate: false,
   width: 1,
   height: 1,
 }
