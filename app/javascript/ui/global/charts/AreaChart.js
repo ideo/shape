@@ -6,6 +6,7 @@ import {
   datasetPropType,
   utcMoment,
   maxDomainForDataset,
+  renderTooltip,
 } from '~/ui/global/charts/ChartUtils'
 
 const formatValues = rawValues => {
@@ -47,10 +48,18 @@ const chartStyle = dataset => {
   }
 }
 
-const AreaChart = ({ dataset, tooltipRenderFn, cardArea = 1 }) => {
-  const tooltipFn = tooltipRenderFn || (datum => datum.value)
+const AreaChart = ({ dataset, showMeasureInTooltip, cardArea = 1 }) => {
+  const { measure, timeframe } = dataset
   const values = formatValues(dataset.data)
   const maxDomain = maxDomainForDataset(dataset)
+  const tooltipMeasure = showMeasureInTooltip ? measure : null
+  const tooltipFn = (datum, isLastDataPoint) =>
+    renderTooltip({
+      datum,
+      isLastDataPoint,
+      timeframe,
+      measure: tooltipMeasure,
+    })
   return (
     <VictoryArea
       labels={d => d.value}
@@ -69,12 +78,13 @@ const AreaChart = ({ dataset, tooltipRenderFn, cardArea = 1 }) => {
 
 AreaChart.propTypes = {
   dataset: datasetPropType.isRequired,
-  tooltipRenderFn: PropTypes.func.isRequired,
+  showMeasureInTooltip: PropTypes.bool,
   cardArea: PropTypes.number,
 }
 
 AreaChart.defaultProps = {
   cardArea: 1,
+  showMeasureInTooltip: false,
 }
 
 export default AreaChart

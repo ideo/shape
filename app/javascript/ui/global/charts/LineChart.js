@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import { VictoryLine } from 'victory'
 
 import ChartTooltip from '~/ui/global/charts/ChartTooltip'
-import { datasetPropType } from '~/ui/global/charts/ChartUtils'
+import { datasetPropType, renderTooltip } from '~/ui/global/charts/ChartUtils'
 
 const formatValues = values =>
   values.map((datum, i) => ({
@@ -15,9 +15,17 @@ const chartStyle = fill => ({
   data: { stroke: fill || '#000000' },
 })
 
-const LineChart = ({ dataset, tooltipRenderFn, cardArea = 1 }) => {
+const LineChart = ({ dataset, showMeasureInTooltip, cardArea = 1 }) => {
+  const { measure, timeframe } = dataset
   const values = formatValues(dataset.data)
-  const tooltipFn = tooltipRenderFn || (datum => datum.value)
+  const tooltipMeasure = showMeasureInTooltip ? measure : null
+  const tooltipFn = (datum, isLastDataPoint) =>
+    renderTooltip({
+      datum,
+      isLastDataPoint,
+      timeframe,
+      measure: tooltipMeasure,
+    })
   return (
     <VictoryLine
       labels={d => d.value}
@@ -32,12 +40,13 @@ const LineChart = ({ dataset, tooltipRenderFn, cardArea = 1 }) => {
 
 LineChart.propTypes = {
   dataset: datasetPropType.isRequired,
-  tooltipRenderFn: PropTypes.func.isRequired,
+  showMeasureInTooltip: PropTypes.bool,
   cardArea: PropTypes.number,
 }
 
 LineChart.defaultProps = {
   cardArea: 1,
+  showMeasureInTooltip: false,
 }
 
 export default LineChart

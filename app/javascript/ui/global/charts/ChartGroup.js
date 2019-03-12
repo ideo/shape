@@ -9,7 +9,6 @@ import {
 } from 'victory'
 
 import { DisplayText } from '~/ui/global/styled/typography'
-import pluralize from 'pluralize'
 import OrganicGrid from '~/ui/icons/OrganicGrid'
 import { theme } from '~/ui/test_collections/shared'
 import monthEdge from '~/utils/monthEdge'
@@ -70,31 +69,6 @@ class ChartGroup extends React.PureComponent {
   get isSmallChartStyle() {
     const { width, height } = this.props
     return width <= 1 && height <= 1
-  }
-
-  renderTooltipWithMeasureAndDate = (datum, isLastDataPoint) => {
-    const { timeframe, measure } = this.primaryDataset
-    const momentDate = utcMoment(datum.date)
-    let timeRange = `${momentDate
-      .clone()
-      .subtract(1, timeframe)
-      .format('MMM D')} - ${momentDate.format('MMM D')}`
-
-    let dayTimeframe = '7 days'
-    if (timeframe === 'month') {
-      timeRange = `in ${momentDate
-        .clone()
-        .subtract(1, 'month')
-        .format('MMMM')}`
-      dayTimeframe = '30 days'
-    }
-    if (timeframe === 'day') {
-      timeRange = `on ${momentDate.format('MMM D')}`
-    }
-    const text = `${datum.value} ${pluralize(measure)}\n
-      ${isLastDataPoint ? `in last ${dayTimeframe}` : timeRange}`
-
-    return text
   }
 
   monthlyXAxisText = (date, index) => {
@@ -200,27 +174,24 @@ class ChartGroup extends React.PureComponent {
   )
 
   renderDataset = (dataset, index) => {
-    const { showTooltipWithMeasureAndDate, width, height } = this.props
-    const tooltipRenderFn = showTooltipWithMeasureAndDate
-      ? this.renderTooltipWithMeasureAndDate
-      : undefined
+    const { showTooltipWithMeasure, width, height } = this.props
     switch (dataset.chart_type) {
       case DATASET_CHART_TYPES.AREA:
         return AreaChart({
           dataset,
-          tooltipRenderFn,
+          showTooltipWithMeasure,
           cardArea: width * height,
         })
       case DATASET_CHART_TYPES.LINE:
         return LineChart({
           dataset,
-          tooltipRenderFn,
+          showTooltipWithMeasure,
           cardArea: width * height,
         })
       default:
         return AreaChart({
           dataset,
-          tooltipRenderFn,
+          showTooltipWithMeasure,
           cardArea: width * height,
         })
     }
@@ -257,13 +228,13 @@ class ChartGroup extends React.PureComponent {
 
 ChartGroup.propTypes = {
   datasets: MobxPropTypes.arrayOrObservableArrayOf(datasetPropType).isRequired,
-  showTooltipWithMeasureAndDate: PropTypes.bool,
+  showTooltipWithMeasure: PropTypes.bool,
   width: PropTypes.number,
   height: PropTypes.number,
 }
 
 ChartGroup.defaultProps = {
-  showTooltipWithMeasureAndDate: false,
+  showTooltipWithMeasure: false,
   width: 1,
   height: 1,
 }

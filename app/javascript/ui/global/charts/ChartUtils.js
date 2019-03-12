@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import moment from 'moment-mini'
 import styled from 'styled-components'
+import pluralize from 'pluralize'
 
 import v from '~/utils/variables'
 
@@ -40,6 +41,37 @@ export const chartDomainForValues = (dataset, maxDomain) => ({
   x: [1, this.formattedValues.length],
   y: [0, maxDomain],
 })
+
+export const renderTooltip = ({
+  datum,
+  isLastDataPoint,
+  timeframe,
+  measure,
+}) => {
+  const momentDate = utcMoment(datum.date)
+  let timeRange = `${momentDate
+    .clone()
+    .subtract(1, timeframe)
+    .format('MMM D')} - ${momentDate.format('MMM D')}`
+
+  let dayTimeframe = '7 days'
+  if (timeframe === 'month') {
+    timeRange = `in ${momentDate
+      .clone()
+      .subtract(1, 'month')
+      .format('MMMM')}`
+    dayTimeframe = '30 days'
+  }
+  if (timeframe === 'day') {
+    timeRange = `on ${momentDate.format('MMM D')}`
+  }
+  let text = datum.value
+  if (measure) {
+    text += ` ${pluralize(measure)}\n`
+  }
+  text += isLastDataPoint ? `in last ${dayTimeframe}` : timeRange
+  return text
+}
 
 export const AboveChartContainer = styled.div`
   position: absolute;

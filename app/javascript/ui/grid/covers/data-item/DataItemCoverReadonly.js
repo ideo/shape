@@ -26,7 +26,7 @@ class DataItemCoverReadonly extends React.PureComponent {
   }
 
   render() {
-    const { card } = this.props
+    const { card, item } = this.props
     return (
       <Fragment>
         <AboveChartContainer>
@@ -34,7 +34,7 @@ class DataItemCoverReadonly extends React.PureComponent {
           <br />
         </AboveChartContainer>
         <ChartGroup
-          datasets={card.datasets}
+          datasets={item.datasets}
           width={card.width}
           height={card.height}
         />
