@@ -31,16 +31,19 @@ export const primaryFillColorFromDatasets = datasets => {
   return primary ? primary.chartFill : '#000000'
 }
 
-export const maxDomainForDataset = dataset => {
-  if (dataset.max_domain) return dataset.max_domain
-  const values = dataset.data.map(datum => datum.value)
-  return Math.max(...values)
+export const chartDomainForDatasetValues = ({ values, maxDomain }) => {
+  let domain
+  if (maxDomain) {
+    domain = maxDomain
+  } else {
+    const vals = values.map(datum => datum.value)
+    domain = Math.max(...vals)
+  }
+  return {
+    x: [1, values.length],
+    y: [0, domain],
+  }
 }
-
-export const chartDomainForValues = (dataset, maxDomain) => ({
-  x: [1, this.formattedValues.length],
-  y: [0, maxDomain],
-})
 
 export const renderTooltip = ({
   datum,
@@ -71,6 +74,25 @@ export const renderTooltip = ({
   }
   text += isLastDataPoint ? `in last ${dayTimeframe}` : timeRange
   return text
+}
+
+export const addDuplicateValueIfSingleValue = values => {
+  if (values.length === 0 || values.length > 1) return values
+
+  // Copy array so we can modify it
+  const valuesWithDupe = [...values]
+
+  // Add a duplicate value
+  const duplicateValue = Object.assign({ isDuplicate: true }, valuesWithDupe[0])
+  // Set date to 3 months ago
+  if (duplicateValue.date) {
+    duplicateValue.date = utcMoment(duplicateValue.date)
+      .subtract('3', 'months')
+      .format('YYYY-MM-DD')
+    if (duplicateValue.month) duplicateValue.month = duplicateValue.date
+  }
+  valuesWithDupe.push(duplicateValue)
+  return valuesWithDupe
 }
 
 export const AboveChartContainer = styled.div`

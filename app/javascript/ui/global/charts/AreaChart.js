@@ -4,30 +4,17 @@ import { VictoryArea } from 'victory'
 import ChartTooltip from '~/ui/global/charts/ChartTooltip'
 import {
   datasetPropType,
-  utcMoment,
-  maxDomainForDataset,
+  chartDomainForDatasetValues,
   renderTooltip,
+  addDuplicateValueIfSingleValue,
 } from '~/ui/global/charts/ChartUtils'
 
 const formatValues = rawValues => {
-  const mappedValues = rawValues.map((value, i) => ({
+  const formatted = addDuplicateValueIfSingleValue(rawValues)
+  return formatted.map((value, i) => ({
     ...value,
     month: value.date,
   }))
-
-  // We need to add a duplicate value if there is only 1 value,
-  // to properly display an area chart
-  if (mappedValues.length === 1) {
-    const duplicateValue = Object.assign({}, this.primaryValues[0])
-    duplicateValue.date = utcMoment(duplicateValue.date)
-      .subtract('3', 'months')
-      .format('YYYY-MM-DD')
-    duplicateValue.month = duplicateValue.date
-    duplicateValue.isDuplicate = true
-    mappedValues.push(duplicateValue)
-  }
-
-  return mappedValues
 }
 
 const chartStyle = dataset => {
@@ -50,8 +37,11 @@ const chartStyle = dataset => {
 
 const AreaChart = ({ dataset, showMeasureInTooltip, cardArea = 1 }) => {
   const { measure, timeframe } = dataset
-  const values = formatValues(dataset.data)
-  const maxDomain = maxDomainForDataset(dataset)
+  const values = formatValues(dataset.data || [])
+  const domain = chartDomainForDatasetValues({
+    values,
+    maxDomain: dataset.max_domain,
+  })
   const tooltipMeasure = showMeasureInTooltip ? measure : null
   const tooltipFn = (datum, isLastDataPoint) =>
     renderTooltip({
@@ -69,7 +59,7 @@ const AreaChart = ({ dataset, showMeasureInTooltip, cardArea = 1 }) => {
       style={chartStyle(dataset)}
       data={values}
       // This makes the chart shape based on the values
-      domain={maxDomain}
+      domain={domain}
       y="value"
       x="month"
     />

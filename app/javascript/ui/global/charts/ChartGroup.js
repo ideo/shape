@@ -56,14 +56,16 @@ class ChartGroup extends React.PureComponent {
     return datasets.find(dataset => dataset.primary)
   }
 
-  get secondaryDatasets() {
-    const { datasets } = this.props
-    return datasets.filter(dataset => !!dataset.primary)
-  }
-
   get primaryDatasetValues() {
     if (!this.primaryDataset || !this.primaryDataset.data) return []
     return this.primaryDataset.data
+  }
+
+  get secondaryDatasetsWithData() {
+    const { datasets } = this.props
+    return datasets.filter(
+      dataset => !dataset.primary && dataset.data.length > 0
+    )
   }
 
   get isSmallChartStyle() {
@@ -175,6 +177,7 @@ class ChartGroup extends React.PureComponent {
 
   renderDataset = (dataset, index) => {
     const { showTooltipWithMeasure, width, height } = this.props
+    const dashWidth = index * 2
     switch (dataset.chart_type) {
       case DATASET_CHART_TYPES.AREA:
         return AreaChart({
@@ -187,6 +190,7 @@ class ChartGroup extends React.PureComponent {
           dataset,
           showTooltipWithMeasure,
           cardArea: width * height,
+          dashWidth,
         })
       default:
         return AreaChart({
@@ -209,9 +213,10 @@ class ChartGroup extends React.PureComponent {
           containerComponent={<VictoryVoronoiContainer />}
         >
           {this.renderDataset(this.primaryDataset, datasetIndex)}
-          {this.secondaryDatasets.map(dataset =>
-            this.renderDataset(dataset, (datasetIndex += 1))
-          )}
+          {this.secondaryDatasetsWithData &&
+            this.secondaryDatasetsWithData.map(dataset =>
+              this.renderDataset(dataset, (datasetIndex += 1))
+            )}
           {this.chartAxis}
         </VictoryChart>
       </ChartContainer>
