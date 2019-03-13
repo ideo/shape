@@ -491,7 +491,6 @@ DEPENDENCIES
   active_record_query_trace
   acts-as-taggable-on
   amoeba
-  anycable (>= 0.6.0)
   anycable-rails (>= 0.6.2)
   appsignal
   autoprefixer-rails

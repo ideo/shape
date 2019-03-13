@@ -103,7 +103,9 @@ gem 'aasm', '~> 5.0'
 # mailchimp API
 gem 'gibbon', '~> 3.2'
 
-gem 'anycable', '>= 0.6.0'
+# Anycable for more performant ActionCable
+# Note: you must `brew install anycable-go` if you want to run it locally
+# See: https://docs.anycable.io/#/using_with_rails
 gem 'anycable-rails', '>= 0.6.2'
 
 group :development, :test do
