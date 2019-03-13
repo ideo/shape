@@ -1,3 +1,4 @@
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import DataItemCoverCollectionsItems from '~/ui/grid/covers/data-item/DataItemCoverCollectionsItems'
 import { fakeDataItemCollectionsItemsAttrs } from '#/mocks/data'
 import fakeUiStore from '#/mocks/fakeUiStore'
@@ -26,6 +27,10 @@ describe('DataItemCover', () => {
     render()
   })
 
+  it('renders snapshot', () => {
+    expectTreeToMatchSnapshot(wrapper)
+  })
+
   describe('without edit access', () => {
     beforeEach(() => {
       props.item.can_edit_content = false
@@ -42,10 +47,15 @@ describe('DataItemCover', () => {
     })
   })
 
-  describe('with an ever timeframe', () => {
+  describe('with an ever timeframe and single value', () => {
     beforeEach(() => {
+      props.item.can_edit_content = true
+      props.item.primaryDataset.timeframe = 'ever'
+      props.item.primaryDataset.single_value = 120
       props.item.datasets[0].timeframe = 'ever'
+      props.item.datasets[0].single_value = 120
       wrapper.setProps(props)
+      render()
     })
 
     it('renders the single data value', () => {
@@ -54,7 +64,7 @@ describe('DataItemCover', () => {
           .find('.count')
           .children()
           .text()
-      ).toContain(props.item.data.single_value)
+      ).toContain(120)
     })
 
     it('will enter editing state if user clicks on measure', () => {
@@ -101,12 +111,13 @@ describe('DataItemCover', () => {
 
   describe('with a month timeframe', () => {
     beforeEach(() => {
-      props.item.datasets[0].timeframe = 'month'
-      props.item.datasets[0].data = [
+      props.item.primaryDataset.timeframe = 'month'
+      props.item.primaryDataset.data = [
         { date: '2018-07-10', amount: 25 },
         { date: '2018-08-10', amount: 30 },
         { date: '2018-09-10', amount: 10 },
       ]
+      props.item.datasets[0] = props.item.primaryDataset
       render()
     })
 
@@ -122,49 +133,6 @@ describe('DataItemCover', () => {
 
     it('renders two editable buttons for measure and timeframe', () => {
       expect(wrapper.find('EditableButton').length).toEqual(2)
-    })
-
-    it('renders text for the label with month and year', () => {
-      // NOTE: code pulls the actual month back by 1
-      const datum = { date: '2018-10-01', amount: 34, month: 'Sep' }
-      const label = wrapper.instance().renderTooltipText(datum)
-      expect(label).toContain('in September')
-    })
-
-    it('renders in last 30 days for label for last data item', () => {
-      // NOTE: code pulls the actual month back by 1
-      const datum = { date: '2018-10-01', amount: 34, month: 'Sep' }
-      const label = wrapper.instance().renderTooltipText(datum, true)
-      expect(label).toContain('in last 30 days')
-    })
-
-    it('displays x-axis labels for dates near the end of the month', () => {
-      let label
-      // if it's not near month end, the label is blank
-      label = wrapper.instance().monthlyXAxisText('2018-10-06')
-      expect(label).toEqual('')
-      // should display the short name of the month that previously ended
-      label = wrapper.instance().monthlyXAxisText('2018-01-02')
-      expect(label).toEqual('Dec')
-      label = wrapper.instance().monthlyXAxisText('2018-12-31')
-      expect(label).toEqual('Dec')
-    })
-
-    describe('with not enough timeline data', () => {
-      beforeEach(() => {
-        props.item.data.values = []
-        render()
-      })
-
-      it('should show a not enough data message', () => {
-        expect(
-          wrapper
-            .find('.noDataMessage')
-            .children()
-            .at(1)
-            .text()
-        ).toContain('Not enough data yet')
-      })
     })
 
     describe('when editing', () => {
@@ -209,13 +177,12 @@ describe('DataItemCover', () => {
       props.item.name = 'My Static Data'
       props.item.isReportTypeCollectionsItems = false
       props.item.isReportTypeRecord = true
-      props.item.data = {
-        values: [
-          { amount: 24, date: '2018-09-10' },
-          { amount: 27, date: '2018-09-11' },
-          { amount: 23, date: '2018-09-12' },
-        ],
-      }
+      props.item.primaryDataset.data = [
+        { amount: 24, date: '2018-09-10' },
+        { amount: 27, date: '2018-09-11' },
+        { amount: 23, date: '2018-09-12' },
+      ]
+      props.item.datasets[0].data = props.item.primaryDataset.data
       render()
     })
 
@@ -239,9 +206,8 @@ describe('DataItemCover', () => {
         props.item.name = 'My Lone Value Chart'
         props.item.isReportTypeCollectionsItems = false
         props.item.isReportTypeRecord = true
-        props.item.data = {
-          values: [{ amount: 24, date: '2018-09-10' }],
-        }
+        props.item.primaryDataset.data = [{ amount: 24, date: '2018-09-10' }]
+        props.item.datasets[0].data = props.item.primaryDataset.data
         render()
       })
 
@@ -257,10 +223,6 @@ describe('DataItemCover', () => {
 
       it('should not show editing controls', () => {
         expect(wrapper.find('.editableMetric').exists()).toBe(false)
-      })
-
-      it('should render one label on X axis of the chart', () => {
-        expect(wrapper.find('VictoryAxis').props().label).toEqual('09/10/18')
       })
     })
   })

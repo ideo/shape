@@ -41,6 +41,19 @@ export const fakeTextItemAttrs = {
   parent_collection_card: fakeCollectionCard,
 }
 
+export const fakeDataset = {
+  measure: 'participants',
+  description: 'A description',
+  timeframe: 'month',
+  chart_type: 'area',
+  primary: true,
+  data: [
+    { date: '2018-07-10', value: 10 },
+    { date: '2018-08-10', value: 25 },
+    { date: '2018-09-10', value: 30 },
+  ],
+}
+
 export const fakeDataItemCollectionsItemsAttrs = {
   ...fakeTextItemAttrs,
   type: 'Item::DataItem',
@@ -51,21 +64,14 @@ export const fakeDataItemCollectionsItemsAttrs = {
   isReportTypeRecord: false,
   data_settings: {
     d_measure: 'participants',
-    d_timeframe: 'month',
+    d_timeframe: 'month'
   },
+  measure: {
+    name: 'Participants'
+  },
+  primaryDataset: fakeDataset,
   datasets: [
-    {
-      measure: 'participants',
-      description: 'A description',
-      timeframe: 'month',
-      chart_type: 'area',
-      primary: true,
-      data: [
-        { date: '2018-07-10', value: 10 },
-        { date: '2018-08-10', value: 25 },
-        { date: '2018-09-10', value: 30 },
-      ],
-    },
+    fakeDataset
   ],
 }
 

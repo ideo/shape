@@ -1,6 +1,6 @@
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import DataItemCoverDisplayOnly from '~/ui/grid/covers/data-item/DataItemCoverDisplayOnly'
 import { fakeDataItemRecordAttrs } from '#/mocks/data'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 const props = {}
 let wrapper, render
@@ -13,7 +13,9 @@ describe('DataItemCoverDisplayOnly', () => {
     render()
   })
 
-  expectTreeToMatchSnapshot(wrapper)
+  it('renders snapshot', () => {
+    expectTreeToMatchSnapshot(wrapper)
+  })
 
   it('should render name', () => {
     expect(

@@ -22,15 +22,15 @@ export const datasetPropType = PropTypes.shape({
   single_value: PropTypes.number,
   data: MobxPropTypes.arrayOrObservableArrayOf(
     PropTypes.shape({
-      value: PropTypes.number.isRequired,
-      date: PropTypes.string.isRequired,
+      value: PropTypes.number,
+      date: PropTypes.string,
     })
   ),
 })
 
 export const primaryFillColorFromDatasets = datasets => {
   if (!datasets) return '#000000'
-  const primary = datasets.filter(dataset => dataset.primary)
+  const primary = datasets.find(dataset => dataset.primary)
   return primary && primary.style && primary.style.fill
     ? primary.style.fill
     : '#000000'
@@ -96,7 +96,7 @@ export const addDuplicateValueIfSingleValue = values => {
       .format('YYYY-MM-DD')
     if (duplicateValue.month) duplicateValue.month = duplicateValue.date
   }
-  valuesWithDupe.push(duplicateValue)
+  valuesWithDupe.unshift(duplicateValue)
   return valuesWithDupe
 }
 

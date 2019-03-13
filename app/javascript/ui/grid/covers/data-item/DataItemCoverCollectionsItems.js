@@ -106,7 +106,7 @@ class DataItemCoverCollectionsItems extends React.Component {
 
   get correctGridSize() {
     const { item } = this.props
-    const { timeframe } = item
+    const { timeframe } = item.primaryDataset
     const size = timeframe === 'ever' ? 1 : 2
     return { width: size, height: size }
   }
@@ -140,7 +140,7 @@ class DataItemCoverCollectionsItems extends React.Component {
 
   get timeframeControl() {
     const { item } = this.props
-    const { timeframe } = item
+    const { timeframe } = item.primaryDataset
     const editable = item.can_edit_content
     if (this.editing) {
       return (
@@ -215,7 +215,7 @@ class DataItemCoverCollectionsItems extends React.Component {
 
   get collectionsAndItemsControls() {
     const { item } = this.props
-    const { timeframe } = item
+    const { timeframe } = item.primaryDataset
     if (timeframe === 'ever') {
       return (
         <span className="titleAndControls">
@@ -248,14 +248,9 @@ class DataItemCoverCollectionsItems extends React.Component {
     return name
   }
 
-  get primaryDataset() {
-    const { datasets } = this.props.item
-    if (datasets.length <= 1) return datasets[0]
-    return datasets.find(dataset => dataset.primary)
-  }
-
   renderSingleValue() {
-    const { single_value } = this.primaryDataset ? this.primaryDataset : {}
+    const { primaryDataset } = this.props.item
+    const { single_value } = primaryDataset
     return (
       <Fragment>
         <Heading3>{this.measureControl}</Heading3>
@@ -291,11 +286,13 @@ class DataItemCoverCollectionsItems extends React.Component {
 
   render() {
     const { item, uiStore } = this.props
+    const { timeframe } = item.primaryDataset
 
     if (uiStore.isNewCard(item.id)) {
       uiStore.removeNewCard(item.id)
       this.toggleEditing()
     }
+
     return (
       <StyledDataItemCover
         className="cancelGridClick"
@@ -303,7 +300,7 @@ class DataItemCoverCollectionsItems extends React.Component {
         editing={this.editing}
         data-cy="DataItemCover"
       >
-        {item.isReportTypeCollectionsItems && item.timeframe === 'ever'
+        {item.isReportTypeCollectionsItems && timeframe === 'ever'
           ? this.renderSingleValue()
           : this.renderTimeframeValues()}
       </StyledDataItemCover>
