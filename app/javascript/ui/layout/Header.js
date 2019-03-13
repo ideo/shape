@@ -4,6 +4,7 @@ import { Fragment } from 'react'
 import { observable, action, computed, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
+import Hidden from '@material-ui/core/Hidden'
 
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 import Logo from '~/ui/layout/Logo'
@@ -24,8 +25,6 @@ import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import v from '~/utils/variables'
 
 /* global IdeoSSO */
-
-const ACTIONS_MAX_WIDTH = 250
 
 const HeaderSpacer = styled.div`
   height: ${v.headerHeight}px;
@@ -240,47 +239,48 @@ class Header extends React.Component {
     )
   }
 
-  get actions() {
+  get rolesSummary() {
     const { record } = this
     const { uiStore } = this.props
-    const elements = []
-    if (this.hasActions) {
-      // 1. ActionsMenu
-      if (record.parent_collection_card) {
-        // TODO hacky way to include the record on the card link
-        record.parent_collection_card.record = record
-        elements.push(
-          <StyledRoundBtn style={{ paddingLeft: '2px' }}>
-            <ActionMenu
-              key="action-menu"
-              location="PageMenu"
-              className="card-menu"
-              card={record.parent_collection_card}
-              canEdit={record.can_edit}
-              canReplace={record.canReplace}
-              submissionBox={record.isSubmissionBox}
-              menuOpen={uiStore.pageMenuOpen}
-              onOpen={this.openMenu}
-              onLeave={this.closeMenu}
-              onMoveMenu={this.routeBack}
-              afterArchive={this.routeBack}
-            />
-          </StyledRoundBtn>,
-          <StyledSeparator />
-        )
-      }
-      // 2. RolesSummary
-      elements.push(
-        <RolesSummary
-          key="roles"
-          handleClick={this.showObjectRoleDialog}
-          roles={record.roles}
-          canEdit={record.can_edit}
-          rolesMenuOpen={!!uiStore.rolesMenuOpen}
-        />
+    if (!this.hasActions) return null
+    return (
+      <RolesSummary
+        key="roles"
+        handleClick={this.showObjectRoleDialog}
+        roles={record.roles}
+        canEdit={record.can_edit}
+        rolesMenuOpen={!!uiStore.rolesMenuOpen}
+      />
+    )
+  }
+
+  get actionMenu() {
+    const { record } = this
+    const { uiStore } = this.props
+    if (!this.hasActions) return null
+    if (record.parent_collection_card) {
+      // TODO hacky way to include the record on the card link
+      record.parent_collection_card.record = record
+      return (
+        <StyledRoundBtn style={{ paddingLeft: '2px' }}>
+          <ActionMenu
+            key="action-menu"
+            location="PageMenu"
+            className="card-menu"
+            card={record.parent_collection_card}
+            canEdit={record.can_edit}
+            canReplace={record.canReplace}
+            submissionBox={record.isSubmissionBox}
+            menuOpen={uiStore.pageMenuOpen}
+            onOpen={this.openMenu}
+            onLeave={this.closeMenu}
+            onMoveMenu={this.routeBack}
+            afterArchive={this.routeBack}
+          />
+        </StyledRoundBtn>
       )
     }
-    return elements
+    return null
   }
 
   get renderOrgDropdown() {
@@ -338,17 +338,32 @@ class Header extends React.Component {
                   {/* TODO: bug here when moving an immediate child of home collection */}
                   {record && (
                     <Flex align="center">
-                      <Box>
+                      <Hidden mdUp>
+                        {/* TODO: there must be a better way to have the maxWidth arg value set by breakpoint */}
                         <Breadcrumb
+                          maxDepth={1}
                           record={record}
                           isHomepage={routingStore.isHomepage}
                           // re-mount every time the record / breadcrumb changes
                           key={`${record.identifier}_${record.breadcrumbSize}`}
                           // force props update if windowWidth changes
                           windowWidth={uiStore.windowWidth}
-                          containerWidth={breadcrumbsWidth - ACTIONS_MAX_WIDTH}
+                          containerWidth={breadcrumbsWidth - this.actionsWidth}
                         />
-                      </Box>
+                      </Hidden>
+                      <Hidden smDown>
+                        <Box>
+                          <Breadcrumb
+                            record={record}
+                            isHomepage={routingStore.isHomepage}
+                            // re-mount every time the record / breadcrumb changes
+                            key={`${record.identifier}_${record.breadcrumbSize}`}
+                            // force props update if windowWidth changes
+                            windowWidth={uiStore.windowWidth}
+                            containerWidth={breadcrumbsWidth - this.actionsWidth}
+                          />
+                        </Box>
+                      </Hidden>
                       <Box>
                         <div
                           style={{
@@ -360,7 +375,15 @@ class Header extends React.Component {
                             this.updateActionsWidth(ref)
                           }}
                         >
-                          {this.actions}
+                          {this.actionMenu && (
+                            <Fragment>
+                              {this.actionMenu}
+                              <Hidden smDown>
+                                <StyledSeparator />
+                              </Hidden>
+                            </Fragment>
+                          )}
+                          <Hidden smDown>{this.rolesSummary}</Hidden>
                         </div>
                       </Box>
                     </Flex>
@@ -369,27 +392,33 @@ class Header extends React.Component {
               </Box>
 
               <Box flex align="center">
-                <GlobalSearch className="search-bar" />
+                <Hidden smDown>
+                  <GlobalSearch className="search-bar" />
+                </Hidden>
                 {record && (
-                  <StyledRoundBtn>
-                    <ActivityLogButton key="activity" />
-                  </StyledRoundBtn>
+                  <Hidden smDown>
+                    <StyledRoundBtn>
+                      <ActivityLogButton key="activity" />
+                    </StyledRoundBtn>
+                  </Hidden>
                 )}
-                <StyledAvatarAndDropdown>
-                  {this.renderOrgDropdown}
-                  <button
-                    style={{ display: 'block' }}
-                    className="orgBtn"
-                    data-cy="OrgMenuBtn"
-                    onClick={this.handleOrgClick(true)}
-                  >
-                    <Avatar
-                      title={primaryGroup.name}
-                      url={primaryGroup.filestack_file_url}
-                      className="organization-avatar"
-                    />
-                  </button>
-                </StyledAvatarAndDropdown>
+                <Hidden smDown>
+                  <StyledAvatarAndDropdown>
+                    {this.renderOrgDropdown}
+                    <button
+                      style={{ display: 'block' }}
+                      className="orgBtn"
+                      data-cy="OrgMenuBtn"
+                      onClick={this.handleOrgClick(true)}
+                    >
+                      <Avatar
+                        title={primaryGroup.name}
+                        url={primaryGroup.filestack_file_url}
+                        className="organization-avatar"
+                      />
+                    </button>
+                  </StyledAvatarAndDropdown>
+                </Hidden>
                 <StyledAvatarAndDropdown>
                   {this.renderUserDropdown}
                   <button
