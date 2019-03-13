@@ -9,6 +9,7 @@ import { animateScroll as scroll } from 'react-scroll'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 import ChannelManager from '~/utils/ChannelManager'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
+import FoamcoreGrid from '~/ui/grid/FoamcoreGrid'
 import FloatingActionButton from '~/ui/global/FloatingActionButton'
 import Loader from '~/ui/layout/Loader'
 import MoveModal from '~/ui/grid/MoveModal'
@@ -121,6 +122,25 @@ class CollectionPage extends React.Component {
       uiStore.popupSnackbar({ message })
     }
     uiStore.update('dragTargets', [])
+
+    if (collection.id === '203437') {
+      const cards = collection.collection_cards
+      console.log('special foamcore collection', cards.length)
+      if (cards.length) {
+        cards[0].x = 3
+        cards[0].y = 0
+        cards[1].x = 2
+        cards[1].y = 2
+        cards[2].x = 0
+        cards[2].y = 1
+        cards[3].x = 0
+        cards[3].y = 2
+        cards[4].x = 2
+        cards[4].y = 0
+        cards[5].x = 6
+        cards[5].y = 4
+      }
+    }
   }
 
   async checkSubmissionBox() {
@@ -194,6 +214,7 @@ class CollectionPage extends React.Component {
   @action
   setLoadedSubmissions = val => {
     const { uiStore } = this.props
+
     if (!this.collection) return
     const { submissions_collection } = this.collection
     if (submissions_collection && submissions_collection.cardIds.length) {
@@ -343,6 +364,36 @@ class CollectionPage extends React.Component {
 
     // submissions_collection will only exist for submission boxes
     const { isSubmissionBox, requiresTestDesigner } = collection
+    if (collection.id === '203437') {
+      return (
+        <Fragment>
+          <PageHeader record={collection} isHomepage={isHomepage} />
+          <PageContainer>
+            <FoamcoreGrid
+              // pull in cols, gridW, gridH, gutter
+              {...gridSettings}
+              updateCollection={this.updateCollection}
+              batchUpdateCollection={this.batchUpdateCollection}
+              collection={collection}
+              canEditCollection={collection.can_edit_content}
+              // Pass in cardProperties so grid will re-render when they change
+              cardProperties={collection.cardProperties}
+              // to trigger a re-render
+              movingCardIds={uiStore.movingCardIds}
+            />
+            <MoveModal />
+            {(uiStore.dragging || uiStore.cardMenuOpenAndPositioned) && (
+              <ClickWrapper
+                clickHandlers={[this.handleAllClick]}
+                onContextMenu={this.handleAllClick}
+              />
+            )}
+          </PageContainer>
+          {isLoading && this.loader()}
+          {!isLoading && isTransparentLoading && this.transparentLoader()}
+        </Fragment>
+      )
+    }
     return (
       <Fragment>
         <PageHeader record={collection} isHomepage={isHomepage} />
