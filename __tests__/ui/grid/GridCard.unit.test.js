@@ -147,34 +147,6 @@ describe('GridCard', () => {
       })
     })
 
-    describe('with a pdf file', () => {
-      beforeEach(() => {
-        props.card.record = { ...fakeFileItem }
-        props.record = props.card.record
-        props.record.isPdfFile = true
-        props.cardType = 'items'
-        rerender()
-      })
-
-      it('renders a generic file cover', () => {
-        expect(wrapper.find('PdfFileItemCover').exists()).toBeTruthy()
-      })
-    })
-
-    describe('with a generic file', () => {
-      beforeEach(() => {
-        props.card.record = { ...fakeFileItem }
-        props.record = props.card.record
-        props.record.isGenericFile = true
-        props.cardType = 'items'
-        rerender()
-      })
-
-      it('renders a generic file cover', () => {
-        expect(wrapper.find('GenericFileItemCover').exists()).toBeTruthy()
-      })
-    })
-
     describe('with a private item', () => {
       beforeEach(() => {
         props.card.record = { ...fakeTextItem, is_private: true }
@@ -200,12 +172,6 @@ describe('GridCard', () => {
         props.record = fakeCollection
         props.record.can_edit = false
         rerender()
-      })
-
-      it('renders the collection cover', () => {
-        expect(wrapper.find('CollectionCover').props().collection).toEqual(
-          fakeCollection
-        )
       })
 
       it('renders the collection icon', () => {
