@@ -2,7 +2,7 @@
   "name": "Shape",
   "private": true,
   "engines": {
-    "node": "~8.9.1",
+    "node": "8.9.1",
     "yarn": "^1.10.0"
   },
   "scripts": {
