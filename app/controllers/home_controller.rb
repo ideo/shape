@@ -28,7 +28,9 @@ class HomeController < ApplicationController
     sign_out(current_user) if user_signed_in?
     url = NetworkApi::Authentication.provider_auth_url(
       provider: params[:provider],
-      redirect_url: ENV['BASE_HOST'],
+      redirect_url: user_ideo_omniauth_callback_url(
+        host: ENV['BASE_HOST'],
+      ),
       cookies: cookies,
     )
     redirect_to url
