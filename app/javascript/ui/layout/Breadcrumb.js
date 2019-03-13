@@ -3,8 +3,9 @@ import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { floor, round, sumBy, compact } from 'lodash'
+import { Link } from 'react-router-dom'
 
-import { apiStore } from '~/stores'
+import { apiStore, routingStore } from '~/stores'
 import v from '~/utils/variables'
 import BreadcrumbItem from './BreadcrumbItem'
 
@@ -50,8 +51,16 @@ class Breadcrumb extends React.Component {
     return round(width * 0.075)
   }
 
-  items = () => {
-    const { record } = this.props
+  get previousItem() {
+    const items = this.items(false)
+    if (items.length > 1) {
+      return items[items.length - 2]
+    }
+    return null
+  }
+
+  items = (clamp = true) => {
+    const { maxDepth, record } = this.props
     const items = []
     if (record.inMyCollection) {
       items.push({
@@ -75,7 +84,8 @@ class Breadcrumb extends React.Component {
         identifier,
       })
     })
-    return compact(items)
+    const depth = clamp ? maxDepth * -1 || 0 : 0
+    return compact(items).slice(depth)
   }
 
   totalNameLength = items => {
@@ -133,6 +143,19 @@ class Breadcrumb extends React.Component {
     return items
   }
 
+  renderBackButton() {
+    const { backButton } = this.props
+    const item = this.previousItem
+    if (!backButton || !item) return null
+    let path
+    if (item.id === 'homepage') {
+      path = routingStore.pathTo('homepage')
+    } else {
+      path = routingStore.pathTo(item.type, item.id)
+    }
+    return <Link to={path}>&lt;</Link>
+  }
+
   render() {
     const { record, isHomepage } = this.props
     const { inMyCollection, breadcrumb } = record
@@ -150,6 +173,7 @@ class Breadcrumb extends React.Component {
         {!renderItems && <BreadcrumbPadding />}
         {renderItems && (
           <StyledBreadcrumbWrapper>
+            {this.renderBackButton()}
             {this.truncatedItems.map((item, index) => (
               <span className="breadcrumb_item" key={item.name}>
                 <BreadcrumbItem
@@ -173,11 +197,15 @@ Breadcrumb.propTypes = {
   isHomepage: PropTypes.bool.isRequired,
   breadcrumbWrapper: PropTypes.oneOfType([PropTypes.element, PropTypes.object]),
   containerWidth: PropTypes.number,
+  maxDepth: PropTypes.number,
+  backButton: PropTypes.bool,
 }
 
 Breadcrumb.defaultProps = {
   breadcrumbWrapper: React.createRef(),
   containerWidth: null,
+  maxDepth: null,
+  backButton: false,
 }
 
 export default Breadcrumb

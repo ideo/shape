@@ -342,6 +342,7 @@ class Header extends React.Component {
                         {/* TODO: there must be a better way to have the maxWidth arg value set by breakpoint */}
                         <Breadcrumb
                           maxDepth={1}
+                          backButton
                           record={record}
                           isHomepage={routingStore.isHomepage}
                           // re-mount every time the record / breadcrumb changes
