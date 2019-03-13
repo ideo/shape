@@ -40,6 +40,73 @@ export const fakeTextItemAttrs = {
   internalType: 'items',
   parent_collection_card: fakeCollectionCard,
 }
+
+export const fakeDataItemCollectionsItemsAttrs = {
+  ...fakeTextItemAttrs,
+  type: 'Item::DataItem',
+  data_content: null,
+  report_type: 'report_type_collections_and_items',
+  isReportTypeCollectionsItems: true,
+  isReportTypeNetworkAppMetric: false,
+  isReportTypeRecord: false,
+  data_settings: {
+    d_measure: 'participants',
+    d_timeframe: 'month',
+  },
+  datasets: [
+    {
+      measure: 'participants',
+      description: 'A description',
+      timeframe: 'month',
+      chart_type: 'area',
+      primary: true,
+      data: [
+        { date: '2018-07-10', value: 10 },
+        { date: '2018-08-10', value: 25 },
+        { date: '2018-09-10', value: 30 },
+      ],
+    },
+  ],
+}
+
+export const creativeDifferenceQualityDataset = {
+  measure: 'Purpose',
+  description:
+    'The degree to which there is alignment about a meaningful change that leadership and employees want to make in the world.',
+  timeframe: 'month',
+  chart_type: 'area',
+  single_value: 0,
+  primary: true,
+  style: {
+    fill: '#EFEFEF',
+    dashWidth: 2,
+  },
+  data: [
+    { date: '2018-07-10', value: 10 },
+    { date: '2018-08-10', value: 25 },
+    { date: '2018-09-10', value: 30 },
+  ],
+}
+
+export const fakeDataItemRecordAttrs = {
+  ...fakeTextItemAttrs,
+  type: 'Item::DataItem',
+  data_content: null,
+  report_type: 'report_type_record',
+  isReportTypeCollectionsItems: false,
+  isReportTypeNetworkAppMetric: false,
+  isReportTypeRecord: true,
+  datasets: [
+    creativeDifferenceQualityDataset,
+    {
+      ...creativeDifferenceQualityDataset,
+      measure: '95th Percentile',
+      primary: false,
+      chart_type: 'line'
+    }
+  ],
+}
+
 export const fakeTextItem = {
   ...fakeTextItemAttrs,
   rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
