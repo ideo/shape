@@ -116,7 +116,7 @@ Rails.application.configure do
   # require 'syslog/logger'
   # config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new 'app-name')
   #
-  config.action_cable.url = 'wss://ws.shape.space/cable'
+  config.action_cable.url = ENV['ACTION_CABLE_URL']
 
   if ENV['RAILS_LOG_TO_STDOUT'].present?
     logger           = ActiveSupport::Logger.new(STDOUT)
