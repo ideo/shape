@@ -55,7 +55,7 @@ describe('ChartGroup', () => {
       render()
     })
 
-    it('should render one label on X axis of the chart', () => {
+    it('renders one label on X axis of the chart', () => {
       expect(wrapper.find('VictoryAxis').props().label).toEqual('09/10/18')
     })
   })
@@ -67,7 +67,7 @@ describe('ChartGroup', () => {
       render()
     })
 
-    it('should show a not enough data message', () => {
+    it('renders not enough data message', () => {
       expect(
         wrapper
           .find('.noDataMessage')
