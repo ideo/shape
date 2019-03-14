@@ -28,7 +28,7 @@ module Shape
     # -- all .rb files in that directory are automatically loaded.
 
     # ActionCable settings
-    config.action_cable.url = ENV.fetch('ACTION_CABLE_URL') { 'ws://localhost:50051/cable' }
+    config.action_cable.url = ENV.fetch('ACTION_CABLE_URL') { 'ws://localhost:3000/cable' }
 
     # for serving gzipped assets
     config.middleware.use Rack::Deflater
