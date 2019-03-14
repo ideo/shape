@@ -36,14 +36,17 @@ module DataReport
       d_collections = @data_item.amoeba_dup
       d_collections.organization_id = @data_item.organization_id
       d_collections.d_measure = 'collections'
-      item_data = d_items.data
-      collection_data = d_collections.data
+      item_dataset = d_items.datasets.first
+      collection_dataset = d_collections.datasets.first
       # now combine the two reports
-      @data[:single_value] = item_data[:value] + collection_data[:value]
-      @data[:values] =
-        (item_data[:values] + collection_data[:values]).group_by { |x| x[:date] }.map do |date, values|
-          { date: date, value: values.map { |x| x[:value] }.sum }
-        end
+      @data[:single_value] = item_dataset[:single_value] + collection_dataset[:single_value]
+      all_values = (item_dataset[:data] + collection_dataset[:data]).group_by { |x| x[:date] }
+      @data[:values] = all_values.map do |date, values|
+        {
+          date: date,
+          value: values.map { |x| x[:value] }.sum,
+        }
+      end
       @data
     end
 
