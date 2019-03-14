@@ -75,11 +75,6 @@ ActiveRecord::Schema.define(version: 20190312204433) do
     t.index ["user_id"], name: "index_applications_on_user_id"
   end
 
-  create_table "collection_card_groups", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "collection_cards", force: :cascade do |t|
     t.integer "order", null: false
     t.integer "width"
@@ -101,7 +96,6 @@ ActiveRecord::Schema.define(version: 20190312204433) do
     t.integer "filter", default: 1
     t.boolean "hidden", default: false
     t.boolean "show_replace", default: true
-    t.integer "collection_card_group_id"
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
