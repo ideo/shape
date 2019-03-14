@@ -3,17 +3,25 @@ module DataReport
 
     def call
       if @measure == 'records'
-        # special case
-        return combine_collection_and_item_reports
+        collections_and_items_report_dataset
+      else
+        @query = generate_base_query
+        return [] unless @query
+        @query = filtered_query
+        if @timeframe == 'ever'
+          calculate_single_value
+        else
+          calculate_timeframe_values
+        end
       end
-      @query = generate_base_query
-      return unless @query
-      @query = filtered_query
-      calculate
       datasets
     end
 
     private
+
+    def collections_and_items_report_dataset
+
+    end
 
     def datasets
       [
@@ -22,13 +30,13 @@ module DataReport
           chart_type: 'area',
           timeframe: @timeframe,
           primary: true,
-          single_value: @data[:single_value],
-          data: @data[:values],
+          single_value: @single_value,
+          data: @data,
         },
       ]
     end
 
-    def combine_collection_and_item_reports
+    def collections_and_items_report_dataset
       # create temp DataItems to create item and collection reports
       d_items = @data_item.amoeba_dup
       d_items.organization_id = @data_item.organization_id
@@ -38,16 +46,16 @@ module DataReport
       d_collections.d_measure = 'collections'
       item_dataset = d_items.datasets.first
       collection_dataset = d_collections.datasets.first
-      # now combine the two reports
-      @data[:single_value] = item_dataset[:single_value] + collection_dataset[:single_value]
+      # Combine the two reports
+      # Call .to_i on single_value because it may be nil (only present if timeframe is `ever`)
+      @single_value = item_dataset[:single_value].to_i + collection_dataset[:single_value].to_i
       all_values = (item_dataset[:data] + collection_dataset[:data]).group_by { |x| x[:date] }
-      @data[:values] = all_values.map do |date, values|
+      @data = all_values.map do |date, values|
         {
           date: date,
           value: values.map { |x| x[:value] }.sum,
         }
       end
-      @data
     end
 
     def generate_base_query
@@ -119,14 +127,6 @@ module DataReport
       end
     end
 
-    def calculate
-      if @timeframe && @timeframe != 'ever'
-        calculate_timeframe_values
-      else
-        calculate_single_value
-      end
-    end
-
     def calculate_timeframe_values
       sql_table = query_table.table_name
       earliest = @query.select("min(#{sql_table}.created_at)").to_a.first.min
@@ -170,7 +170,7 @@ module DataReport
                           .map { |val| { date: val['date'], value: val['count'] } }
                           .uniq { |i| i[:date] } # this will filter out dupe when final series.date == now()
 
-      @data[:values] = values
+      @data = values
     end
 
     def calculate_single_value
@@ -184,8 +184,8 @@ module DataReport
       else
         return
       end
-      return @data[:single_value] = value if @return_records
-      @data[:single_value] = value.count
+      return @single_value = value if @return_records
+      @single_value = value.count
     end
   end
 end

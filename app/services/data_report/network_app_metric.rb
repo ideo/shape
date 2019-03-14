@@ -13,13 +13,13 @@ module DataReport
           chart_type: 'area',
           timeframe: 'month',
           primary: true,
-          data: values,
+          data: data,
         },
       ]
     end
 
-    def values
-      @values ||= base_query.map do |metric|
+    def data
+      @data ||= base_query.map do |metric|
         {
           date: Date.parse(metric['measured_at']).to_s,
           value: metric['number'],

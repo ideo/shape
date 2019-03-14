@@ -23,7 +23,7 @@ RSpec.describe Item::DataItem, type: :model do
     end
   end
 
-  describe '#data' do
+  describe '#datasets' do
     let(:network_app_metric_double) { double('DataReport::NetworkAppMetric', call: true) }
     let(:collections_and_items_double) { double('DataReport::CollectionsAndItems', call: true) }
 
@@ -42,7 +42,7 @@ RSpec.describe Item::DataItem, type: :model do
       it 'should call the CollectionsAndItems service' do
         expect(DataReport::CollectionsAndItems).to receive(:new)
         expect(collections_and_items_double).to receive(:call)
-        item.data
+        item.datasets
       end
     end
 
@@ -52,21 +52,21 @@ RSpec.describe Item::DataItem, type: :model do
       it 'should call the NetworkAppMetric service' do
         expect(DataReport::NetworkAppMetric).to receive(:new)
         expect(network_app_metric_double).to receive(:call)
-        item.data
+        item.datasets
       end
     end
 
     context 'for record data' do
       let!(:item) { create(:data_item, :report_type_record) }
 
-      it 'should return content' do
-        expect(item.data).to eq(item.data_content)
+      it 'should return datasets' do
+        expect(item.datasets).to eq(item.data_content['datasets'])
       end
 
       it 'should not call NetworkAppMetric or CollectionsAndItems service' do
         expect(DataReport::CollectionsAndItems).not_to receive(:new)
         expect(DataReport::NetworkAppMetric).not_to receive(:new)
-        item.data
+        item.datasets
       end
     end
   end

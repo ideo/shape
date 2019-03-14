@@ -60,8 +60,12 @@ FactoryBot.define do
 
       trait :report_type_record do
         data_content(
-          value: 0,
-          values: [{ date: '2018-11-13', amount: 613 }],
+          datasets: [
+            {
+              single_value: 0,
+              data: [{ date: '2018-11-13', amount: 613 }],
+            },
+          ],
         )
         report_type :report_type_record
       end

@@ -24,6 +24,7 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
           data_item.update(
             data_settings: {
               d_measure: 'participants',
+              d_timeframe: data_item.d_timeframe,
             },
           )
         end
@@ -57,6 +58,7 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
           data_item.update(
             data_settings: {
               d_measure: 'viewers',
+              d_timeframe: data_item.d_timeframe,
             },
           )
         end
@@ -76,6 +78,7 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
           data_item.update(
             data_settings: {
               d_measure: 'activity',
+              d_timeframe: data_item.d_timeframe,
             },
           )
         end
@@ -93,6 +96,7 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
           data_item.update(
             data_settings: {
               d_measure: 'collections',
+              d_timeframe: data_item.d_timeframe,
             },
           )
         end
@@ -112,6 +116,7 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
           data_item.update(
             data_settings: {
               d_measure: 'items',
+              d_timeframe: data_item.d_timeframe,
             },
           )
         end
@@ -124,13 +129,14 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
       end
 
       context 'with a content, items and collections measure' do
-        let(:collection) { create(:collection, organization: organization) }
+        let!(:collection) { create(:collection, organization: organization) }
         let!(:items) { create_list(:text_item, 5, parent_collection: collection) }
 
         before do
           data_item.update(
             data_settings: {
               d_measure: 'records',
+              d_timeframe: data_item.d_timeframe,
             },
           )
         end
@@ -176,6 +182,7 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
             data_settings: {
               d_measure: 'participants',
               d_filters: [{ type: 'Collection', target: parent_collection.id }],
+              d_timeframe: data_item.d_timeframe,
             },
           )
           expect(dataset[:single_value]).to eq 9
@@ -186,9 +193,10 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
             data_settings: {
               d_measure: 'participants',
               d_filters: [{ type: 'Collection', target: child_collection.id }],
+              d_timeframe: data_item.d_timeframe,
             },
           )
-          expect(dataset[:value]).to eq 8
+          expect(dataset[:single_value]).to eq 8
         end
 
         it 'calculates the number of participants in a child child collection, and the items in that collection' do
@@ -196,6 +204,7 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
             data_settings: {
               d_measure: 'participants',
               d_filters: [{ type: 'Collection', target: child_child_collection.id }],
+              d_timeframe: data_item.d_timeframe,
             },
           )
           expect(dataset[:single_value]).to eq 7
@@ -208,6 +217,7 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
             data_settings: {
               d_measure: 'viewers',
               d_filters: [{ type: 'Collection', target: parent_collection.id }],
+              d_timeframe: data_item.d_timeframe,
             },
           )
           expect(dataset[:single_value]).to eq 14
@@ -218,6 +228,7 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
             data_settings: {
               d_measure: 'viewers',
               d_filters: [{ type: 'Collection', target: child_collection.id }],
+              d_timeframe: data_item.d_timeframe,
             },
           )
           expect(dataset[:single_value]).to eq 9
@@ -228,6 +239,7 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
             data_settings: {
               d_measure: 'viewers',
               d_filters: [{ type: 'Collection', target: child_child_collection.id }],
+              d_timeframe: data_item.d_timeframe,
             },
           )
           expect(dataset[:single_value]).to eq 5
@@ -242,6 +254,7 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
             data_settings: {
               d_measure: 'collections',
               d_filters: [{ type: 'Collection', target: parent_collection.id }],
+              d_timeframe: data_item.d_timeframe,
             },
           )
         end
@@ -261,6 +274,7 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
             data_settings: {
               d_measure: 'items',
               d_filters: [{ type: 'Collection', target: parent_collection.id }],
+              d_timeframe: data_item.d_timeframe,
             },
           )
         end
@@ -282,6 +296,7 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
             data_settings: {
               d_measure: 'records',
               d_filters: [{ type: 'Collection', target: parent_collection.id }],
+              d_timeframe: data_item.d_timeframe,
             },
           )
         end
