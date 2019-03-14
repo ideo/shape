@@ -2,6 +2,8 @@ class CollectionCardBuilder
   attr_reader :collection_card, :errors
 
   def initialize(params:, parent_collection:, user: nil, type: 'primary')
+    @params = params
+    @type = type
     @collection_card = parent_collection.send("#{type}_collection_cards").build(params)
     @errors = @collection_card.errors
     @user = user
@@ -55,6 +57,10 @@ class CollectionCardBuilder
             record.transcode!
           end
 
+          if record.is_a?(Item::DataItem)
+            create_legend
+          end
+
           if @parent_collection.is_a? Collection::SubmissionsCollection
             @parent_collection.follow_submission_box(@user)
           end
@@ -74,5 +80,28 @@ class CollectionCardBuilder
       @external_id,
       @user.application.id,
     )
+  end
+
+  def create_legend
+    duplicate_params = @params.dup
+
+    legend_item_card_params = duplicate_params.to_h.deep_merge(
+      order: @params[:order] + 0.5,
+      item_attributes: {
+        type: 'Item::LegendItem',
+        data_content: {},
+      }
+    )
+    # make a card for the legend item
+    duplicate_card = @parent_collection
+      .send("#{@type}_collection_cards")
+      .build(legend_item_card_params)
+    duplicate_card.save
+    legend_item = duplicate_card.record
+    data_item = @collection_card.record
+    # associate data item with legend item
+    data_item.update(legend_item_id: legend_item.id)
+
+    @parent_collection.reorder_cards!
   end
 end
