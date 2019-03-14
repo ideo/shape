@@ -31,9 +31,9 @@ class Item
       report_type_record: 2,
     }
 
-    def data
+    def datasets
       if report_type_record?
-        data_content
+        data_content['datasets'] || []
       elsif report_type_network_app_metric?
         DataReport::NetworkAppMetric.new(self).call
       elsif report_type_collections_and_items?

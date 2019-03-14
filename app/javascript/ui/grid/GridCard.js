@@ -2,19 +2,11 @@ import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
-import ChartItemCover from '~/ui/grid/covers/ChartItemCover'
 import ContainImage from '~/ui/grid/ContainImage'
 import CoverImageToggle from '~/ui/grid/CoverImageToggle'
 import CoverImageSelector from '~/ui/grid/CoverImageSelector'
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
-import LinkItemCover from '~/ui/grid/covers/LinkItemCover'
-import TextItemCover from '~/ui/grid/covers/TextItemCover'
-import PdfFileItemCover from '~/ui/grid/covers/PdfFileItemCover'
-import ImageItemCover from '~/ui/grid/covers/ImageItemCover'
-import VideoItemCover from '~/ui/grid/covers/VideoItemCover'
-import GenericFileItemCover from '~/ui/grid/covers/GenericFileItemCover'
-import CollectionCover from '~/ui/grid/covers/CollectionCover'
-import DataItemCover from '~/ui/grid/covers/DataItemCover'
+import CoverRenderer from '~/ui/grid/CoverRenderer'
 
 import Activity from '~/stores/jsonApi/Activity'
 import ActionMenu from '~/ui/grid/ActionMenu'
@@ -75,73 +67,6 @@ class GridCard extends React.Component {
   get isSelected() {
     const { card } = this.props
     return uiStore.isSelected(card.id)
-  }
-
-  get renderInner() {
-    const { card, record, height, handleClick, searchResult } = this.props
-    if (this.isItem) {
-      switch (record.type) {
-        case ITEM_TYPES.TEXT:
-          return (
-            <TextItemCover
-              item={record}
-              height={height}
-              dragging={this.props.dragging}
-              cardId={card.id}
-              handleClick={handleClick}
-              searchResult={searchResult}
-            />
-          )
-        case ITEM_TYPES.EXTERNAL_IMAGE:
-          return <ImageItemCover item={record} contain={card.image_contain} />
-        case ITEM_TYPES.FILE: {
-          if (record.isPdfFile) {
-            return <PdfFileItemCover item={record} />
-          } else if (record.isImage) {
-            return <ImageItemCover item={record} contain={card.image_contain} />
-          } else if (record.isVideo) {
-            return (
-              <VideoItemCover item={record} dragging={this.props.dragging} />
-            )
-          } else if (record.filestack_file) {
-            return <GenericFileItemCover item={record} />
-          }
-          return <div style={{ padding: '20px' }}>File not found.</div>
-        }
-        case ITEM_TYPES.VIDEO:
-          return <VideoItemCover item={record} dragging={this.props.dragging} />
-        case ITEM_TYPES.LINK:
-          return (
-            <LinkItemCover
-              item={record}
-              cardHeight={card.height}
-              dragging={this.props.dragging}
-            />
-          )
-        case ITEM_TYPES.CHART:
-          return <ChartItemCover item={record} testCollection={card.parent} />
-
-        case ITEM_TYPES.DATA:
-          return <DataItemCover height={height} item={record} card={card} />
-
-        default:
-          return <div>{record.content}</div>
-      }
-    } else if (this.isCollection) {
-      return (
-        <CollectionCover
-          width={card.maxWidth}
-          height={card.maxHeight}
-          collection={record}
-          dragging={this.props.dragging}
-          inSubmissionsCollection={
-            card.parentCollection &&
-            card.parentCollection.isSubmissionsCollection
-          }
-        />
-      )
-    }
-    return <div />
   }
 
   get actionsColor() {
@@ -363,13 +288,15 @@ class GridCard extends React.Component {
   render() {
     const {
       card,
+      cardType,
+      handleClick,
       record,
+      height,
       canEditCollection,
       dragging,
       draggingMultiple,
       menuOpen,
       lastPinnedCard,
-
       testCollectionCard,
       searchResult,
     } = this.props
@@ -457,7 +384,15 @@ class GridCard extends React.Component {
           filter={card.filter}
           forceFilter={!this.hasCover}
         >
-          {this.renderInner}
+          <CoverRenderer
+            card={card}
+            cardType={cardType}
+            record={record}
+            height={height}
+            dragging={dragging}
+            searchResult={searchResult}
+            handleClick={handleClick}
+          />
         </StyledGridCardInner>
         <TagEditorModal
           canEdit={this.canEditCard}
