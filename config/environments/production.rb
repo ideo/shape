@@ -1,4 +1,7 @@
 
+# Load anycable on production only
+require 'anycable-rails'
+
 Rails.application.configure do
   config.webpacker.check_yarn_integrity = false # Settings specified here will take precedence over those in config/application.rb.
 
@@ -117,6 +120,10 @@ Rails.application.configure do
   # config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new 'app-name')
   #
   config.action_cable.url = ENV['ACTION_CABLE_URL']
+
+  config.session_store :cookie_store,
+                       key: '_any_cable_session',
+                       domain: '.shape.space'
 
   if ENV['RAILS_LOG_TO_STDOUT'].present?
     logger           = ActiveSupport::Logger.new(STDOUT)
