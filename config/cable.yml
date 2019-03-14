@@ -1,6 +1,7 @@
 production:
   adapter: any_cable
 development:
-  adapter: any_cable
+  adapter: redis
+  url: redis://localhost:6379
 test:
   adapter: test
