@@ -1,5 +1,5 @@
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import CoverRenderer from '~/ui/grid/CoverRenderer'
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import {
   fakeCollectionCard,
   fakeItemCard,

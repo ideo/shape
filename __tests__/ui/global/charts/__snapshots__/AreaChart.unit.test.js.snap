@@ -1,7 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[` 1`] = `undefined`;
-
 exports[`AreaChart renders snapshot 1`] = `
 <VictoryArea
   containerComponent={

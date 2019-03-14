@@ -43,6 +43,8 @@ class DataItemCoverDisplayOnly extends React.PureComponent {
   }
 }
 
+DataItemCoverDisplayOnly.displayName = 'DataItemCoverDisplayOnly'
+
 DataItemCoverDisplayOnly.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   card: MobxPropTypes.objectOrObservableObject.isRequired,

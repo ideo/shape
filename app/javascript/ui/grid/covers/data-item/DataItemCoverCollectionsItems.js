@@ -308,6 +308,8 @@ class DataItemCoverCollectionsItems extends React.Component {
   }
 }
 
+DataItemCoverCollectionsItems.displayName = 'DataItemCoverCollectionsItems'
+
 DataItemCoverCollectionsItems.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   card: MobxPropTypes.objectOrObservableObject.isRequired,

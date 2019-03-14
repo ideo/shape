@@ -1,0 +1,72 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DataItemCover renders snapshot 1`] = `
+<StyledDataItemCover
+  className="cancelGridClick"
+  data-cy="DataItemCover"
+  editing={false}
+>
+  <React.Fragment>
+    <styled.div>
+      <StyledDisplayText>
+        <React.Fragment>
+          <StyledHeading3>
+            <span>
+              Participants
+            </span>
+             per 
+            <span>
+              month
+            </span>
+          </StyledHeading3>
+          <SmallHelperText
+            color="#120f0e"
+          >
+            <styled.span />
+            <span
+              className="editableMetric"
+            >
+              <DataTargetButton
+                editable={false}
+                onClick={[Function]}
+                targetCollection={null}
+              />
+            </span>
+          </SmallHelperText>
+        </React.Fragment>
+      </StyledDisplayText>
+      <br />
+    </styled.div>
+    <ChartGroup
+      datasets={
+        Array [
+          Object {
+            "chart_type": "area",
+            "data": Array [
+              Object {
+                "date": "2018-07-10",
+                "value": 10,
+              },
+              Object {
+                "date": "2018-08-10",
+                "value": 25,
+              },
+              Object {
+                "date": "2018-09-10",
+                "value": 30,
+              },
+            ],
+            "description": "A description",
+            "measure": "participants",
+            "primary": true,
+            "timeframe": "month",
+          },
+        ]
+      }
+      height={1}
+      showMeasureInTooltip={true}
+      width={1}
+    />
+  </React.Fragment>
+</StyledDataItemCover>
+`;

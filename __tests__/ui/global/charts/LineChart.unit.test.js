@@ -1,5 +1,5 @@
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import LineChart from '~/ui/global/charts/LineChart'
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import { fakeDataset } from '#/mocks/data'
 
 const props = {}
