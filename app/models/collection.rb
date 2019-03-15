@@ -85,6 +85,11 @@ class Collection < ApplicationRecord
   has_many :collections_and_linked_collections,
            through: :collection_cards,
            source: :collection
+  has_many :collection_cover_item_joins, class_name: 'CollectionCoverItem'
+  has_many :collection_cover_items,
+           through: :collection_cover_item_joins,
+           class_name: 'Item',
+           source: :item
 
   has_one :comment_thread, as: :record, dependent: :destroy
 
@@ -108,7 +113,7 @@ class Collection < ApplicationRecord
   scope :data_collectable, -> { where.not(type: uncollectable_types).or(where(type: nil)) }
   scope :master_template, -> { where(master_template: true) }
 
-  accepts_nested_attributes_for :collection_cards
+  accepts_nested_attributes_for :collection_cards, :collection_cover_item_joins
 
   enum processing_status: {
     processing_breadcrumb: 1,
@@ -202,6 +207,7 @@ class Collection < ApplicationRecord
       :submission_template,
       :collection_to_test,
       :live_test_collection,
+      :collection_cover_items,
       roles: %i[pending_users users groups resource],
     ]
   end
@@ -428,7 +434,7 @@ class Collection < ApplicationRecord
     end
 
     cards = cards
-            .includes(:collection, item: [:filestack_file])
+            .includes(collection: [:collection_cover_items], item: [:filestack_file])
             .order(order)
             .page(page)
             .per(per_page)
