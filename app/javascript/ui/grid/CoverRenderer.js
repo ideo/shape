@@ -11,6 +11,7 @@ import CollectionCover from '~/ui/grid/covers/CollectionCover'
 import CollectionCoverItem from '~/ui/grid/covers/CollectionCoverItem'
 import DataItemCover from '~/ui/grid/covers/DataItemCover'
 import ChartItemCover from '~/ui/grid/covers/ChartItemCover'
+import LegendItemCover from '~/ui/grid/covers/LegendItemCover'
 
 import { ITEM_TYPES } from '~/utils/variables'
 
@@ -75,6 +76,9 @@ class CoverRenderer extends React.PureComponent {
 
         case ITEM_TYPES.DATA:
           return <DataItemCover height={height} item={record} card={card} />
+
+        case ITEM_TYPES.LEGEND:
+          return <LegendItemCover item={record} card={card} />
 
         default:
           return <div>{record.content}</div>

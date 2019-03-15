@@ -12,6 +12,13 @@ class Item
       data_items.map(&:d_measure).compact.uniq
     end
 
+    def active_comparisons
+      []
+      # data_items
+      #  .map { |item| item.data_content[:datasets] }
+      #  .select { |dataset| dataset[:primary] == "true" }
+    end
+
     # This could be its own service?
     def update_active_comparisons(active_comparisons)
       # for each dataset
