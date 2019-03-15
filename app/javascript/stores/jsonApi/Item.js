@@ -131,6 +131,10 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return this.type === ITEM_TYPES.LINK
   }
 
+  get isLegend() {
+    return this.type === ITEM_TYPES.LEGEND
+  }
+
   get canBeSetAsCover() {
     return this.isImage
   }
