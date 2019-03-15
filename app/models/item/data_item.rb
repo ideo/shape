@@ -33,7 +33,8 @@ class Item
 
     def datasets
       if report_type_record?
-        data_content['datasets'] || []
+        return [] if data_content['datasets'].blank?
+        data_content['datasets'].map(&:deep_symbolize_keys)
       elsif report_type_network_app_metric?
         DataReport::NetworkAppMetric.new(self).call
       elsif report_type_collections_and_items?

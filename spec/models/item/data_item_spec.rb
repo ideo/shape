@@ -37,36 +37,40 @@ RSpec.describe Item::DataItem, type: :model do
     end
 
     context 'for Shape collections and items' do
-      let!(:item) { create(:data_item, :report_type_collections_and_items) }
+      let!(:data_item) { create(:data_item, :report_type_collections_and_items) }
 
       it 'should call the CollectionsAndItems service' do
         expect(DataReport::CollectionsAndItems).to receive(:new)
         expect(collections_and_items_double).to receive(:call)
-        item.datasets
+        data_item.datasets
       end
     end
 
     context 'for network app metric' do
-      let!(:item) { create(:data_item, :report_type_network_app_metric) }
+      let!(:data_item) { create(:data_item, :report_type_network_app_metric) }
 
       it 'should call the NetworkAppMetric service' do
         expect(DataReport::NetworkAppMetric).to receive(:new)
         expect(network_app_metric_double).to receive(:call)
-        item.datasets
+        data_item.datasets
       end
     end
 
     context 'for record data' do
-      let!(:item) { create(:data_item, :report_type_record) }
+      let!(:data_item) { create(:data_item, :report_type_record) }
 
       it 'should return datasets' do
-        expect(item.datasets).to eq(item.data_content['datasets'])
+        expect(
+          data_item.datasets,
+        ).to eq(
+          data_item.data_content['datasets'].map(&:deep_symbolize_keys),
+        )
       end
 
       it 'should not call NetworkAppMetric or CollectionsAndItems service' do
         expect(DataReport::CollectionsAndItems).not_to receive(:new)
         expect(DataReport::NetworkAppMetric).not_to receive(:new)
-        item.datasets
+        data_item.datasets
       end
     end
   end
