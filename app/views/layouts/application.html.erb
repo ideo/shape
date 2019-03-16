@@ -17,6 +17,12 @@
       src="<%= ideo_sso_js_sdk_url %>">
     </script>
     <script>
+      if (typeof IdeoSSO === 'undefined') {
+        window.IdeoSSO = {
+          init: function() {},
+          baseApiUrl: '<%= ENV['BASE_HOST'] %>',
+        }
+      }
       IdeoSSO.init(<%= ideo_sso_init_params.to_json.html_safe %>)
       // useful variables for analytics
       window.analytics = {

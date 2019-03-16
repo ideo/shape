@@ -755,11 +755,18 @@ class CollectionGrid extends React.Component {
         }
       }
     })
+
+    let rows = matrix.length
+    if (!addEmptyCard && _.isEmpty(_.compact(_.last(matrix)))) {
+      // don't add space for an empty row if we don't want it to appear
+      rows -= 1
+    }
+
     // update cards in state
     this.setState(
       {
         cards,
-        rows: matrix.length,
+        rows,
         matrix,
       },
       () => {
