@@ -16,6 +16,7 @@ class Item
     def primary_datasets
       data_items
         .map(&:datasets)
+        .flatten
         .select { |dataset| dataset[:primary] == true }
     end
 
