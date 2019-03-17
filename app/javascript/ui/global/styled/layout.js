@@ -63,7 +63,8 @@ export const InlineRow = styled(Flex)`
 InlineRow.displayName = 'StyledInlineRow'
 
 export const StyledHeader = styled.header`
-  width: calc(100% - ${v.containerPadding.horizontal}rem * 2);
+  box-sizing: border-box;
+  width: 100%;
   padding: 0 ${v.containerPadding.horizontal}rem;
   @media print {
     display: none;

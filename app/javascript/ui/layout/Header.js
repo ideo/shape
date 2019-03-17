@@ -26,6 +26,13 @@ import v from '~/utils/variables'
 
 /* global IdeoSSO */
 
+const StyledFixedHeader = styled(FixedHeader)`
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+`
+
 const HeaderSpacer = styled.div`
   height: ${v.headerHeight}px;
 `
@@ -87,7 +94,7 @@ const StyledActivityLogBtn = styled(StyledRoundBtn)`
 
 export const BasicHeader = ({ orgMenu }) => (
   <Fragment>
-    <FixedHeader zIndex={v.zIndex.globalHeader}>
+    <StyledFixedHeader zIndex={v.zIndex.globalHeader}>
       <MaxWidthContainer>
         <Flex align="center" justify="space-between">
           <Box>
@@ -106,7 +113,7 @@ export const BasicHeader = ({ orgMenu }) => (
           />
         )}
       </MaxWidthContainer>
-    </FixedHeader>
+    </StyledFixedHeader>
     <HeaderSpacer />
   </Fragment>
 )
@@ -334,7 +341,7 @@ class Header extends React.Component {
     const primaryGroup = currentUser.current_organization.primary_group
     return (
       <Fragment>
-        <FixedHeader zIndex={v.zIndex.globalHeader}>
+        <StyledFixedHeader zIndex={v.zIndex.globalHeader}>
           <MaxWidthContainer>
             <Flex align="center" style={{ minHeight: v.headerHeight }}>
               <Box style={{ paddingRight: '12px' }}>
@@ -460,7 +467,7 @@ class Header extends React.Component {
               </Box>
             </Flex>
           </MaxWidthContainer>
-        </FixedHeader>
+        </StyledFixedHeader>
         <HeaderSpacer />
       </Fragment>
     )
