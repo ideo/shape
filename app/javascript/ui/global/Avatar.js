@@ -72,7 +72,7 @@ class Avatar extends React.Component {
         imgProps={{ onError: this.onError }}
         onClick={this.handleClick}
         cursor={linkToCollectionId || displayName ? 'pointer' : 'initial'}
-        responsive={responsive}
+        responsive={responsive ? 1 : 0}
       />
     )
     let content = renderAvatar
