@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom'
 import { apiStore, routingStore } from '~/stores'
 import v from '~/utils/variables'
 import BreadcrumbItem from './BreadcrumbItem'
+import ArrowIcon from '../icons/ArrowIcon'
 
 const BreadcrumbPadding = styled.div`
   height: 1.7rem;
@@ -26,6 +27,15 @@ const StyledBreadcrumbWrapper = styled.div`
   letter-spacing: 1.1px;
 `
 StyledBreadcrumbWrapper.displayName = 'StyledBreadcrumbWrapper'
+
+const IconContainer = styled.span`
+  color: ${v.colors.black};
+  display: inline-block;
+  height: 18px;
+  margin-right: 8px;
+  width: 12px;
+  vertical-align: middle;
+`
 
 @observer
 class Breadcrumb extends React.Component {
@@ -153,7 +163,13 @@ class Breadcrumb extends React.Component {
     } else {
       path = routingStore.pathTo(item.type, item.id)
     }
-    return <Link to={path}>&lt;</Link>
+    return (
+      <Link to={path}>
+        <IconContainer>
+          <ArrowIcon />
+        </IconContainer>
+      </Link>
+    )
   }
 
   render() {

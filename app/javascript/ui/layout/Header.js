@@ -339,18 +339,24 @@ class Header extends React.Component {
                   {record && (
                     <Flex align="center">
                       <Hidden mdUp>
-                        {/* TODO: there must be a better way to have the maxWidth arg value set by breakpoint */}
-                        <Breadcrumb
-                          maxDepth={1}
-                          backButton
-                          record={record}
-                          isHomepage={routingStore.isHomepage}
-                          // re-mount every time the record / breadcrumb changes
-                          key={`${record.identifier}_${record.breadcrumbSize}`}
-                          // force props update if windowWidth changes
-                          windowWidth={uiStore.windowWidth}
-                          containerWidth={breadcrumbsWidth - this.actionsWidth}
-                        />
+                        {/* TODO: there must be a better way to have the different prop values set by breakpoint */}
+                        <Box auto>
+                          <Breadcrumb
+                            maxDepth={1}
+                            backButton
+                            record={record}
+                            isHomepage={routingStore.isHomepage}
+                            // re-mount every time the record / breadcrumb changes
+                            key={`${record.identifier}_${
+                              record.breadcrumbSize
+                            }`}
+                            // force props update if windowWidth changes
+                            windowWidth={uiStore.windowWidth}
+                            containerWidth={
+                              breadcrumbsWidth - this.actionsWidth
+                            }
+                          />
+                        </Box>
                       </Hidden>
                       <Hidden smDown>
                         <Box>
@@ -358,10 +364,14 @@ class Header extends React.Component {
                             record={record}
                             isHomepage={routingStore.isHomepage}
                             // re-mount every time the record / breadcrumb changes
-                            key={`${record.identifier}_${record.breadcrumbSize}`}
+                            key={`${record.identifier}_${
+                              record.breadcrumbSize
+                            }`}
                             // force props update if windowWidth changes
                             windowWidth={uiStore.windowWidth}
-                            containerWidth={breadcrumbsWidth - this.actionsWidth}
+                            containerWidth={
+                              breadcrumbsWidth - this.actionsWidth
+                            }
                           />
                         </Box>
                       </Hidden>
@@ -416,6 +426,7 @@ class Header extends React.Component {
                         title={primaryGroup.name}
                         url={primaryGroup.filestack_file_url}
                         className="organization-avatar"
+                        responsive={false}
                       />
                     </button>
                   </StyledAvatarAndDropdown>
@@ -431,6 +442,7 @@ class Header extends React.Component {
                       title={currentUser.name}
                       url={currentUser.pic_url_square}
                       className="user-avatar"
+                      responsive={false}
                     />
                   </button>
                 </StyledAvatarAndDropdown>
