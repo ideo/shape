@@ -191,7 +191,6 @@ class MovableGridCard extends React.PureComponent {
 
   handleStop = type => ev => {
     this.scrolling = false
-    console.log('fuck', ev)
     document.body.style['overflow-y'] = 'auto'
     this.setState({ dragging: false, resizing: false }, () => {
       this.props.onDragOrResizeStop(this.props.card.id, type, ev)
@@ -442,23 +441,24 @@ class MovableGridCard extends React.PureComponent {
     if (uiStore.cardMenuOpen.id === card.id) {
       zIndex = v.zIndex.aboveClickWrapper
     }
-    let transform = null
+    let transform = `scale(${1 / zoomLevel})`
     let transition = dragging || resizing ? 'none' : cardCSSTransition
     // TODO this should actually check it's a breadcrumb
     const draggedOverBreadcrumb = !!uiStore.activeDragTarget
     if (dragging) {
-      transform = `translate(${xAdjust}px, ${yAdjust}px) rotate(3deg)`
+      transform += ` translate(${xAdjust}px, ${yAdjust}px) rotate(3deg)`
       if (draggedOverBreadcrumb) {
-        transform = 'scaleX(0.75) scaleY(0.75) translate(0px, 180px)'
+        transform += ' scaleX(0.75) scaleY(0.75) translate(0px, 180px)'
         transition = cardHoverTransition
       }
     } else if (hoveringOverLeft) {
       zIndex = v.zIndex.cardHovering
-      transform = 'translate(32px, -32px)'
+      const amount = 32 / zoomLevel
+      transform += ` translate(${amount}px, -${amount}px)`
       transition = cardHoverTransition
     } else if (hoveringOverRight) {
       zIndex = v.zIndex.cardHovering
-      transform = 'scaleX(1.075) scaleY(1.075)'
+      transform += ' scaleX(1.075) scaleY(1.075)'
       transition = cardHoverTransition
     }
 
@@ -532,7 +532,7 @@ class MovableGridCard extends React.PureComponent {
             animatedBounce={holdingOver}
             style={{
               transition,
-              transform: `scale(${1 / zoomLevel})`,
+              transform,
               transformOrigin: 'left top',
             }}
           >

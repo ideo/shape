@@ -126,6 +126,7 @@ class CollectionPage extends React.Component {
     if (collection.id === '203437') {
       const cards = collection.collection_cards
       console.log('special foamcore collection', cards.length)
+
       if (cards.length) {
         cards[0].x = 3
         cards[0].y = 0
@@ -139,6 +140,12 @@ class CollectionPage extends React.Component {
         cards[4].y = 0
         cards[5].x = 6
         cards[5].y = 4
+        cards[6].x = 1
+        cards[6].y = 0
+        cards[7].x = 3
+        cards[7].y = 1
+        cards[8].x = 2
+        cards[8].y = 1
       }
     }
   }

@@ -164,6 +164,8 @@ export default class UiStore {
   multiMoveCardIds = []
   @observable
   modalContentRef = null
+  @observable
+  dragCardMaster = null
 
   @action
   toggleEditingCardId(cardId) {
@@ -185,12 +187,14 @@ export default class UiStore {
     } else {
       this.multiMoveCardIds = [cardId]
     }
+    this.dragCardMaster = cardId
   }
 
   @action
   stopDragging() {
     this.dragging = false
     this.activeDragTarget = null
+    this.dragCardMaster = null
   }
 
   @action
