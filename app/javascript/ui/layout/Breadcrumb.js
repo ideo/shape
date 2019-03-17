@@ -129,6 +129,12 @@ class Breadcrumb extends React.Component {
 
     if (charsLeftToTruncate <= 0) return items
 
+    if (items.length === 1) {
+      const [item] = items
+      item.truncatedName = item.name.slice(0, this.calculateMaxChars())
+      return items
+    }
+
     // Item names are still too long, show ... in place of their name
     // Start at the midpoint, floor-ing to favor adding ellipses farther up the breadcrumb
     let index = floor((items.length - 1) / 2)
@@ -185,7 +191,7 @@ class Breadcrumb extends React.Component {
     // We need a ref to wrapper so we always render that
     // Tried using innerRef on styled component but it isn't available on mount
     return (
-      <div ref={this.breadcrumbWrapper} style={{ width: '80%' }}>
+      <div ref={this.breadcrumbWrapper}>
         {!renderItems && <BreadcrumbPadding />}
         {renderItems && (
           <StyledBreadcrumbWrapper>
