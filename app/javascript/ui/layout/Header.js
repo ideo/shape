@@ -75,6 +75,16 @@ const StyledRoundBtn = styled.div`
 `
 StyledRoundBtn.displayName = 'StyledRoundBtn'
 
+const StyledActivityLogBtn = styled(StyledRoundBtn)`
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    color: ${v.colors.white};
+    background: ${v.colors.secondaryDark};
+  }
+`
+
 export const BasicHeader = ({ orgMenu }) => (
   <Fragment>
     <FixedHeader zIndex={v.zIndex.globalHeader}>
@@ -407,11 +417,9 @@ class Header extends React.Component {
                   <GlobalSearch className="search-bar" />
                 </Hidden>
                 {record && (
-                  <Hidden smDown>
-                    <StyledRoundBtn>
-                      <ActivityLogButton key="activity" />
-                    </StyledRoundBtn>
-                  </Hidden>
+                  <StyledActivityLogBtn>
+                    <ActivityLogButton key="activity" />
+                  </StyledActivityLogBtn>
                 )}
                 <Hidden smDown>
                   <StyledAvatarAndDropdown>
