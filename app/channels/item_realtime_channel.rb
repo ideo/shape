@@ -20,7 +20,7 @@ class ItemRealtimeChannel < ApplicationCable::Channel
   def delta(data)
     item = Item.find(params[:id])
     # update delta with transformed one
-    new_data = item.threadlocked_transform_realtime_delta(data['delta'], data['version'])
+    new_data = item.threadlocked_transform_realtime_delta(Mashie.new(data))
     if new_data
       item.received_changes(new_data, current_user)
     else

@@ -31,88 +31,31 @@ class Item
       text
     end
 
-    def threadlocked_transform_realtime_delta(delta, version)
+    def threadlocked_transform_realtime_delta(data)
       RedisClassy.redis = Cache.client
       lock_name = "rt_text_id_#{id}"
-      puts "<SEMAPHORE>>>> locked? #{RedisMutex.new(lock_name).locked?}"
       RedisMutex.with_lock(lock_name, block: 0) do
-        transform_realtime_delta(delta, version)
+        transform_realtime_delta(
+          delta: data.delta,
+          version: data.version,
+          full_content: data.full_content,
+        )
       end
     rescue RedisMutex::LockError
       false
     end
 
-    def transform_realtime_delta(delta, version)
-      rt_data = realtime_data_content
-      rt_data.data = QuillSchmoozer.compose(rt_data.data, delta)
-      rt_data.version += 1
+    def transform_realtime_delta(delta:, version:, full_content:)
+      saved_version = data_content['version'].to_i
 
-      update_realtime_data_content(rt_data)
-
-      puts "#{version} VVVVVVVV version: #{rt_data.version}"
-      puts rt_data.data.to_json
-      puts "^^^^^^^^\n\n"
-
+      return false if version.to_i < saved_version
+      full_content['version'] = saved_version + 1
+      update_column(:data_content, full_content)
+      parent.try(:touch)
       {
         delta: delta,
-        data: rt_data.data,
-        version: rt_data.version,
+        version: full_content['version'],
       }
-    end
-
-    def __transform_realtime_delta(delta, version)
-      rt_data = realtime_data_content
-      v = version.to_i
-      transformed_delta = delta
-      if (v - realtime_data_version).abs > 10
-        # just return unchanged??
-        return {
-          delta: transformed_delta,
-          version: rt_data.version,
-        }
-      end
-      rt_data.deltas.drop(v).each_with_index do |concurrent_delta, i|
-        puts "~~~~~~~~~~~ #{i} conc...."
-        puts concurrent_delta
-        puts 'before...'
-        puts transformed_delta
-        transformed_delta = QuillSchmoozer.transform(concurrent_delta, transformed_delta)
-        puts 'after...'
-        puts transformed_delta
-        puts '~~~~!~~~~'
-      end
-      rt_data.data = QuillSchmoozer.compose(rt_data.data, transformed_delta)
-
-      rt_data.deltas << transformed_delta
-      rt_data.version = rt_data.deltas.count
-      update_realtime_data_content(rt_data)
-
-      puts "#{version} VVVVVVVV version: #{rt_data.version}"
-      puts rt_data.data.to_json
-      puts "^^^^^^^^\n\n"
-
-      {
-        delta: transformed_delta,
-        data: rt_data.data,
-        version: rt_data.version,
-      }
-    end
-
-    def realtime_data_content
-      data = Cache.get(realtime_data_key) || { data: nil, deltas: [], version: 0 }
-      Mashie.new(data)
-    end
-
-    def realtime_data_version
-      realtime_data_content.deltas.count
-    end
-
-    def update_realtime_data_content(data)
-      Cache.set(realtime_data_key, data)
-    end
-
-    def delete_realtime_data_content
-      Cache.delete(realtime_data_key)
     end
 
     private

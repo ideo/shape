@@ -199,11 +199,6 @@ class Item extends SharedRecordMixin(BaseRecord) {
     )
   }
 
-  @action
-  updateRealtimeData(data) {
-    this.realtime_data_content.data = data
-  }
-
   API_updateWithoutSync({ cancel_sync } = {}) {
     const { apiStore } = this
     const data = this.toJsonApi()

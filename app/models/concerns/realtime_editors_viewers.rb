@@ -65,9 +65,6 @@ module RealtimeEditorsViewers
       record_type: jsonapi_type_name,
     }
     data = defaults.merge!(merge_data)
-    if is_a?(Item::TextItem)
-      data[:item_data_content] = data_content.as_json
-    end
     ActionCable.server.broadcast stream_name, data
   end
 

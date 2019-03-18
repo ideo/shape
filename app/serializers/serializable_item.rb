@@ -70,8 +70,4 @@ class SerializableItem < BaseJsonSerializer
   attribute :pending_transcoding do
     @object.pending_transcoding_uuid.present?
   end
-
-  attribute :realtime_data_content, if: -> { @object.is_a? Item::TextItem } do
-    @object.realtime_data_content
-  end
 end

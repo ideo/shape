@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { computed, toJS } from 'mobx'
+import { toJS } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import Delta from 'quill-delta'
 import ReactQuill, { Quill } from 'react-quill'
@@ -76,12 +76,10 @@ class RealtimeTextItem extends React.Component {
   channelName = 'ItemRealtimeChannel'
   state = { loading: true }
   saveTimer = null
-
-  // initialize from server data?
   version = 0
-  lastSentDelta = new Delta()
   combinedDelta = new Delta()
   bufferDelta = new Delta()
+  contentSnapshot = new Delta()
 
   constructor(props) {
     super(props)
@@ -93,72 +91,31 @@ class RealtimeTextItem extends React.Component {
       channelReceivedData: this.channelReceivedData,
     })
 
-    this.sendCombinedDelta = _.debounce(this._sendCombinedDelta, 350)
-    this.sendCursor = _.throttle(this._sendCursor, 50)
-    // initialize from server data?
-    // this.versionMatrix[currentUserId] = {
-    //   version: 0,
-    //   delta: null,
-    // }
+    this.sendCombinedDelta = _.debounce(this._sendCombinedDelta, 200)
+    this.sendCursor = _.throttle(this._sendCursor, 100)
   }
-
-  // delta
-  //   - send out, with User/Version matrix
-  //      - dk-2
-  //      - iz-1
-  //   ... keep typing, waits to send again until server response to send again
-  //   - server comes back with latest text?delta?
-  //      - dk-2
-  //      - iz-2
-  //   - now i say, great, my dk-2 has been received,
-  //     - how has my delta been changed... ?
-  //     - I can send out dk-3, which is everything else, start the whole thing over again
 
   componentDidMount() {
     if (!this.reactQuillRef) return
     const { item } = this.props
-    this.version = item.realtime_data_content
-      ? item.realtime_data_content.version
-      : 0
+    this.version = item.data_content.version || 0
+    this.contentSnapshot = new Delta(item.data_content)
 
     this.attachQuillRefs()
-    // this.applyDiff()
     setTimeout(() => {
       this.setState({ loading: false })
     }, 100)
+
+    window.fake = text => this.receiveFakeData(text)
   }
 
   componentDidUpdate() {
     this.attachQuillRefs()
-    // if (!this.props.fullyLoaded) this.applyDiff()
   }
 
   componentWillUnmount() {
     ChannelManager.unsubscribeAllFromChannel(this.channelName)
   }
-
-  // applyDiff() {
-  //   const { item } = this.props
-  //   const remoteContents = new Delta(toJS(item.realtime_data_content.data))
-  //   // console.log('remote contents', remoteContents)
-  //   const editorContents = new Delta(this.quillEditor.getContents())
-  //   // console.log('editor contents', editorContents)
-  //   const remoteChanges = editorContents.diff(remoteContents)
-  //   // console.log('remote changes', remoteChanges)
-  //   if (remoteChanges.ops.length > 0) {
-  //     this.quillEditor.updateContents(remoteChanges, 'silent')
-  //   }
-  // }
-  //
-  // applyDelta(data) {
-  //   // const editorContents = new Delta(tmpl.quillEditor.getContents())
-  //   const remoteChanges = data
-  //   if (remoteChanges.ops.length > 0) {
-  //     // Make updates, to allow cursor to stay put
-  //     // this.quillEditor.setContents(remoteChanges, 'silent')
-  //     this.props.item.updateRealtimeData(data)
-  //   }
-  // }
 
   attachQuillRefs = () => {
     if (!this.reactQuillRef) return
@@ -190,77 +147,66 @@ class RealtimeTextItem extends React.Component {
     cursors.moveCursor(current_editor.id, data.range)
   }
 
+  receiveFakeData = (text = 'Abc') => {
+    const current_editor = { id: 99 }
+    const data = {
+      delta: { ops: [{ insert: text }] },
+    }
+    this.handleReceivedDelta({ current_editor, data })
+  }
+
   handleReceivedDelta = ({ current_editor, data }) => {
     const remoteDelta = new Delta(data.delta)
+
+    if (data.error) {
+      if (current_editor.id === this.props.currentUserId) {
+        // try again
+        this.sendCombinedDelta()
+      }
+      return
+    }
+
     // update our local version number
-    if (!data.error) {
+    if (data.version) {
       this.version = data.version
     }
+
+    // update for later sending appropriately composed version to be saved
+    this.contentSnapshot = this.contentSnapshot.compose(remoteDelta)
+
     if (current_editor.id !== this.props.currentUserId) {
-      // apply the incoming other person's delta
+      // apply the incoming other person's delta, accounting for our own changes,
+      // but prioritizing theirs
       const remoteDeltaWithLocalChanges = this.combinedDelta.transform(
         remoteDelta
       )
-      // console.log('UPDATE CONTENTS!!!!')
       this.quillEditor.updateContents(remoteDeltaWithLocalChanges, 'silent')
-      // this.props.item.updateRealtimeData(new Delta(data.data))
 
-      if (this.combinedDelta.ops.length) {
-        // transform our awaiting content
+      if (this.combinedDelta.length()) {
+        // transform our awaiting content, prioritizing the remote delta
         this.combinedDelta = remoteDelta.transform(this.combinedDelta, true)
       }
     } else if (current_editor.id === this.props.currentUserId) {
-      if (this.lastSentDelta && !data.error) {
-        // clear out our combinedDelta
-        // const newChanges = this.combinedDelta.diff(this.lastSentDelta)
-
-        // ???
-        // console.log('UPDATE REALTIME', { bd: this.bufferDelta.ops })
-        // this.props.item.updateRealtimeData(
-        //   new Delta(data.data).compose(this.bufferDelta)
-        // )
-        this.combinedDelta = new Delta(this.bufferDelta)
-        this.bufferDelta = new Delta()
-      } else if (data.error) {
-        this.sendCombinedDelta()
-      }
+      // clear out our combinedDelta
+      this.combinedDelta = this.bufferDelta.slice()
+      this.bufferDelta = new Delta()
     }
     this.sendCursor()
   }
 
-  @computed
   get dataContent() {
     const { item } = this.props
-    return toJS(item.realtime_data_content.data)
+    return toJS(item.data_content)
   }
 
   cancel = ev => null
 
-  save = () => {
-    const { quillEditor } = this
-    const content = quillEditor.root.innerHTML
-    const dataContent = quillEditor.getContents()
-    this.props.onSave(content, dataContent)
-  }
-
   channelDisconnected = () => {
-    this.save()
+    this._sendCombinedDelta()
   }
 
   handleTextChange = (content, delta, source, editor) => {
     if (source === 'user') {
-      // if (this.saveTimer) clearTimeout(this.saveTimer)
-      // this.saveTimer = setTimeout(() => {
-      //   this.save()
-      // }, 1000)
-      // this.channel.perform('delta', {
-      //   content,
-      //   delta,
-      //   source,
-      // })
-      // console.log('otClient.applyFromClient', { delta })
-      // this.otClient.applyFromClient(delta)
-
       const cursors = this.quillEditor.getModule('cursors')
       cursors.clearCursors()
 
@@ -287,26 +233,25 @@ class RealtimeTextItem extends React.Component {
   }
 
   _sendCombinedDelta = () => {
-    if (this.waitingForVersion === this.version) {
-      // try again in a little bit
-      console.log('WAITING...')
-      return setTimeout(this.sendCombinedDelta, 125)
-    }
     if (!this.combinedDelta.ops.length) {
-      // console.log('NOTHING TO SEND')
       return false
     }
+    if (this.waitingForVersion === this.version) {
+      // try again in a little bit
+      return setTimeout(this.sendCombinedDelta, 125)
+    }
 
-    // this.otClient.applyFromClient(this.combinedDelta)
+    // const contents = this.quillEditor.getContents()
     this.channel.perform('delta', {
       version: this.version,
       delta: this.combinedDelta,
+      full_content: this.contentSnapshot.compose(this.combinedDelta),
       current_user_id: this.props.currentUserId,
     })
     this.sendCursor()
 
     this.waitingForVersion = this.version
-    this.lastSentDelta = new Delta(this.combinedDelta)
+    // this.lastSentDelta = new Delta(this.combinedDelta)
     this.bufferDelta = new Delta()
     return this.combinedDelta
   }
