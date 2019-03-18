@@ -1,11 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe Item::TextItem, type: :model do
-  context 'validations' do
-    it { should validate_presence_of(:content) }
-    it { should validate_presence_of(:data_content) }
-  end
-
   context 'instance methods' do
     let(:data_content) do
       {

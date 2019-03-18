@@ -1,7 +1,5 @@
 class Item
   class TextItem < Item
-    validates :content, presence: true
-    validates :data_content, presence: true
     before_validation :import_html_content_if_blank, on: :create
     has_one :question_answer, inverse_of: :open_response_item
 
