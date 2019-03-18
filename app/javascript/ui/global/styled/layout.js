@@ -66,6 +66,7 @@ export const StyledHeader = styled.header`
   box-sizing: border-box;
   width: 100%;
   padding: 0 ${v.containerPadding.horizontal}rem;
+  position: relative; /* necessary to get above the FixedBoundary */
   @media print {
     display: none;
   }
