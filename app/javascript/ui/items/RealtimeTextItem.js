@@ -217,6 +217,7 @@ class RealtimeTextItem extends React.Component {
 
   channelDisconnected = () => {
     // TODO: do anything here? try to reconnect?
+    this.cancel()
   }
 
   handleTextChange = (content, delta, source, editor) => {
@@ -255,13 +256,17 @@ class RealtimeTextItem extends React.Component {
       return setTimeout(this.sendCombinedDelta, 125)
     }
 
+    const full_content = this.contentSnapshot.compose(this.combinedDelta)
     this.socketSend('delta', {
       version: this.version,
       delta: this.combinedDelta,
-      full_content: this.contentSnapshot.compose(this.combinedDelta),
+      full_content,
       current_user_id: this.props.currentUserId,
     })
     this.sendCursor()
+
+    // persist the change locally e.g. when we close the text box
+    this.props.item.data_content = full_content
 
     this.waitingForVersion = this.version
     // this.lastSentDelta = new Delta(this.combinedDelta)

@@ -42,7 +42,6 @@ Rails.application.routes.draw do
         member do
           post 'duplicate'
           patch 'archive'
-          get 'ping_collection'
           get 'in_my_collection'
           patch 'restore_permissions'
         end

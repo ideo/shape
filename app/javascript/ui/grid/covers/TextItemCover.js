@@ -85,12 +85,6 @@ class TextItemCover extends React.Component {
     routingStore.routeTo('items', item.id)
   }
 
-  textChange = itemTextData => {
-    const { item } = this.state
-    item.data_content = itemTextData
-    this.setState({ item })
-  }
-
   clearTextEditingItem = () => {
     const { item } = this.state
     if (uiStore.textEditingItem && uiStore.textEditingItem.id === item.id) {
@@ -106,12 +100,13 @@ class TextItemCover extends React.Component {
     this.clearTextEditingItem()
     const hasContent = stripTags(item.content).length
     if (!hasContent) {
+      // archive empty text item when you hit "X"
       const card = apiStore.find('collection_cards', this.props.cardId)
       card.API_archiveSelf({ undoable: false })
       return
     }
-    // broadcast updates e.g. if you just added some text
-    item.API_pingCollection()
+    // save final updates and broadcast to collection
+    item.API_updateWithoutSync()
 
     // TODO figure out why ref wasn't working
     // eslint-disable-next-line react/no-find-dom-node
@@ -151,8 +146,6 @@ class TextItemCover extends React.Component {
       <RealtimeTextItem
         item={item}
         currentUserId={apiStore.currentUser.id}
-        // onUpdatedData={this.textChange}
-        // onSave={this.save}
         onExpand={item.id ? this.expand : null}
         onCancel={this.blur}
       />

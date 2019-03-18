@@ -1,7 +1,7 @@
 const fakeApiStore = ({
   findResult = '',
   findAllResult = [],
-  requestResult = '',
+  requestResult = { data: {} },
 } = {}) => {
   return {
     add: jest.fn().mockName('add'),
