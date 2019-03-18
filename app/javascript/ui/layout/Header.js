@@ -325,13 +325,27 @@ class Header extends React.Component {
   }
 
   @computed
+  get isMobile() {
+    const { uiStore } = this.props
+    return (
+      uiStore.windowWidth && uiStore.windowWidth <= v.responsive.smallBreakpoint
+    )
+  }
+
+  @computed
   get record() {
     const { uiStore } = this.props
     return uiStore.viewingCollection || uiStore.viewingItem
   }
 
   render() {
-    const { breadcrumbsWidth, record, userDropdownOpen, orgDropdownOpen } = this
+    const {
+      isMobile,
+      breadcrumbsWidth,
+      record,
+      userDropdownOpen,
+      orgDropdownOpen,
+    } = this
     const { apiStore, routingStore, uiStore } = this.props
     const { currentUser } = apiStore
     if (!currentUser.current_organization) {
@@ -354,43 +368,19 @@ class Header extends React.Component {
                 <div ref={ref => this.updateBreadcrumbsWidth(ref)}>
                   {record && (
                     <Flex align="center">
-                      <Hidden mdUp>
-                        {/* TODO: there must be a better way to have the different prop values set by breakpoint */}
-                        <Box auto>
-                          <Breadcrumb
-                            maxDepth={1}
-                            backButton
-                            record={record}
-                            isHomepage={routingStore.isHomepage}
-                            // re-mount every time the record / breadcrumb changes
-                            key={`${record.identifier}_${
-                              record.breadcrumbSize
-                            }`}
-                            // force props update if windowWidth changes
-                            windowWidth={uiStore.windowWidth}
-                            containerWidth={
-                              breadcrumbsWidth - this.actionsWidth
-                            }
-                          />
-                        </Box>
-                      </Hidden>
-                      <Hidden smDown>
-                        <Box>
-                          <Breadcrumb
-                            record={record}
-                            isHomepage={routingStore.isHomepage}
-                            // re-mount every time the record / breadcrumb changes
-                            key={`${record.identifier}_${
-                              record.breadcrumbSize
-                            }`}
-                            // force props update if windowWidth changes
-                            windowWidth={uiStore.windowWidth}
-                            containerWidth={
-                              breadcrumbsWidth - this.actionsWidth
-                            }
-                          />
-                        </Box>
-                      </Hidden>
+                      <Box auto={isMobile}>
+                        <Breadcrumb
+                          maxDepth={isMobile ? 1 : null}
+                          backButton={isMobile}
+                          record={record}
+                          isHomepage={routingStore.isHomepage}
+                          // re-mount every time the record / breadcrumb changes
+                          key={`${record.identifier}_${record.breadcrumbSize}`}
+                          // force props update if windowWidth changes
+                          windowWidth={uiStore.windowWidth}
+                          containerWidth={breadcrumbsWidth - this.actionsWidth}
+                        />
+                      </Box>
                       <Box>
                         <div
                           style={{
