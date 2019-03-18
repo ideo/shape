@@ -79,10 +79,7 @@ class ItemPage extends React.Component {
           <RealtimeTextItem
             item={item}
             currentUserId={apiStore.currentUserId}
-            quillContent={item.toJSON().content}
-            quillData={item.toJSON().data_content}
-            fullyLoaded={item.fullyLoaded}
-            onSave={this.saveText}
+            fullPageView
           />
         )
       case ITEM_TYPES.EXTERNAL_IMAGE:

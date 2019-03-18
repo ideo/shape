@@ -97,31 +97,29 @@ class RealtimeTextItem extends React.Component {
 
   componentDidMount() {
     if (!this.reactQuillRef) return
-    const { item } = this.props
-    this.version = item.data_content.version || 0
-    this.contentSnapshot = new Delta(item.data_content)
-
-    this.attachQuillRefs()
+    this.initQuillRefsAndData()
     setTimeout(() => {
       this.setState({ loading: false })
     }, 100)
-
-    window.fake = text => this.receiveFakeData(text)
   }
 
   componentDidUpdate() {
-    this.attachQuillRefs()
+    this.initQuillRefsAndData()
   }
 
   componentWillUnmount() {
     ChannelManager.unsubscribeAllFromChannel(this.channelName)
   }
 
-  attachQuillRefs = () => {
+  initQuillRefsAndData = () => {
     if (!this.reactQuillRef) return
     if (typeof this.reactQuillRef.getEditor !== 'function') return
     if (this.quillEditor) return
     this.quillEditor = this.reactQuillRef.getEditor()
+
+    const { item } = this.props
+    this.version = item.data_content.version || 0
+    this.contentSnapshot = this.quillEditor.getContents()
   }
 
   createCursor({ id, name }) {
@@ -145,14 +143,6 @@ class RealtimeTextItem extends React.Component {
     this.createCursor(current_editor)
     const cursors = this.quillEditor.getModule('cursors')
     cursors.moveCursor(current_editor.id, data.range)
-  }
-
-  receiveFakeData = (text = 'Abc') => {
-    const current_editor = { id: 99 }
-    const data = {
-      delta: { ops: [{ insert: text }] },
-    }
-    this.handleReceivedDelta({ current_editor, data })
   }
 
   handleReceivedDelta = ({ current_editor, data }) => {
@@ -194,12 +184,29 @@ class RealtimeTextItem extends React.Component {
     this.sendCursor()
   }
 
+  get canEdit() {
+    return this.props.item.can_edit_content
+  }
+
   get dataContent() {
     const { item } = this.props
     return toJS(item.data_content)
   }
 
-  cancel = ev => null
+  cancel = ev => {
+    const { onCancel } = this.props
+    if (!this.canEdit) return onCancel(this.props.item, ev)
+    const item = this.getCurrentText()
+    return onCancel(item, ev)
+  }
+
+  getCurrentText() {
+    const { item } = this.props
+    const { quillEditor } = this
+    item.content = quillEditor.root.innerHTML
+    item.data_content = quillEditor.getContents()
+    return item
+  }
 
   channelDisconnected = () => {
     this._sendCombinedDelta()
@@ -241,7 +248,6 @@ class RealtimeTextItem extends React.Component {
       return setTimeout(this.sendCombinedDelta, 125)
     }
 
-    // const contents = this.quillEditor.getContents()
     this.channel.perform('delta', {
       version: this.version,
       delta: this.combinedDelta,
@@ -257,7 +263,7 @@ class RealtimeTextItem extends React.Component {
   }
 
   render() {
-    const { item } = this.props
+    const { item, onExpand, fullPageView } = this.props
     const canEdit = item.can_edit_content
     const quillProps = {
       ...v.quillDefaults,
@@ -276,20 +282,18 @@ class RealtimeTextItem extends React.Component {
       },
     }
 
-    // console.log('rander')
-
     return (
       <StyledContainer
         className="no-drag"
         loading={this.state.loading}
-        fullPageView
+        fullPageView={fullPageView}
       >
-        <DockedToolbar fullPageView>
-          {canEdit && <TextItemToolbar onExpand={() => {}} />}
+        <DockedToolbar fullPageView={fullPageView}>
+          {canEdit && <TextItemToolbar onExpand={onExpand} />}
           <CloseButton
             data-cy="TextItemClose"
             onClick={this.cancel}
-            size={'lg'}
+            size={fullPageView ? 'lg' : 'sm'}
           />
         </DockedToolbar>
         <QuillStyleWrapper>
@@ -299,14 +303,18 @@ class RealtimeTextItem extends React.Component {
     )
   }
 }
+
 RealtimeTextItem.propTypes = {
-  currentUserId: PropTypes.string.isRequired,
   item: MobxPropTypes.objectOrObservableObject.isRequired,
-  quillContent: PropTypes.node.isRequired,
-  onSave: PropTypes.func,
+  currentUserId: PropTypes.string.isRequired,
+  onExpand: PropTypes.func,
+  onCancel: PropTypes.func,
+  fullPageView: PropTypes.bool,
 }
 RealtimeTextItem.defaultProps = {
-  onSave: () => {},
+  onExpand: () => null,
+  onCancel: () => null,
+  fullPageView: false,
 }
 
 export default RealtimeTextItem

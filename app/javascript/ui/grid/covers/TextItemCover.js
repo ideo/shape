@@ -8,9 +8,8 @@ import { apiStore, routingStore, uiStore } from '~/stores'
 import v from '~/utils/variables'
 import { ShowMoreButton } from '~/ui/global/styled/forms'
 import { QuillStyleWrapper } from '~/ui/global/styled/typography'
-import ActionCableConsumer from '~/utils/ActionCableConsumer'
 import InlineLoader from '~/ui/layout/InlineLoader'
-import TextItem from '~/ui/items/TextItem'
+import RealtimeTextItem from '~/ui/items/RealtimeTextItem'
 import PaddedCardCover from './PaddedCardCover'
 
 const StyledReadMore = ShowMoreButton.extend`
@@ -61,7 +60,7 @@ class TextItemCover extends React.Component {
     return uiStore.textEditingItem === item
   }
 
-  handleClick = e => {
+  handleClick = async e => {
     e.stopPropagation()
     const { item, dragging, cardId, searchResult } = this.props
     if (dragging || uiStore.dragging || this.isEditing) return false
@@ -74,6 +73,7 @@ class TextItemCover extends React.Component {
       // likewise on search results, never pop open the inline editor
       return false
     }
+    await apiStore.fetch('items', item.id, true)
     uiStore.update('textEditingItem', this.state.item)
     return null
   }
@@ -137,12 +137,11 @@ class TextItemCover extends React.Component {
     const { item } = this.state
     if (!item) return ''
     return (
-      <TextItem
+      <RealtimeTextItem
         item={item}
-        actionCableConsumer={ActionCableConsumer}
         currentUserId={apiStore.currentUser.id}
-        onUpdatedData={this.textChange}
-        onSave={this.save}
+        // onUpdatedData={this.textChange}
+        // onSave={this.save}
         onExpand={item.id ? this.expand : null}
         onCancel={this.blur}
       />
