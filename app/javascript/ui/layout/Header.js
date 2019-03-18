@@ -352,7 +352,6 @@ class Header extends React.Component {
 
               <Box auto>
                 <div ref={ref => this.updateBreadcrumbsWidth(ref)}>
-                  {/* TODO: bug here when moving an immediate child of home collection */}
                   {record && (
                     <Flex align="center">
                       <Hidden mdUp>
