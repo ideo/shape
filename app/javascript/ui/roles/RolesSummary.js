@@ -7,7 +7,7 @@ import pluralize from 'pluralize'
 import v from '~/utils/variables'
 import Avatar from '~/ui/global/Avatar'
 
-const MAX_USERS_TO_SHOW = 5
+const MAX_USERS_TO_SHOW = 4
 
 const StyledRolesSummary = styled.div`
   position: relative;
@@ -24,6 +24,7 @@ StyledRolesSummary.displayName = 'StyledRolesSummary'
 const StyledAvatarGroup = styled.div`
   display: inline-block;
   margin: 0 8px;
+  .placeholder,
   .editor,
   .viewer {
     display: inline-block;
@@ -32,6 +33,9 @@ const StyledAvatarGroup = styled.div`
     &:last-child {
       margin-right: 0;
     }
+  }
+  .placeholder {
+    background-color: ${v.colors.commonMedium};
   }
 `
 StyledAvatarGroup.displayName = 'StyledAvatarGroup'
@@ -69,6 +73,23 @@ const StyledAddUserBtn = styled.div`
 `
 StyledAddUserBtn.displayName = 'StyledAddUserBtn'
 
+const MORE_EDITORS = (
+  <Avatar
+    title="...and more editors"
+    url=""
+    className="placeholder"
+    displayName
+  />
+)
+const MORE_VIEWERS = (
+  <Avatar
+    title="...and more viewers"
+    url=""
+    className="placeholder"
+    displayName
+  />
+)
+
 // NOTE: intentionally not an observer so that searching roles within the menu doesn't affect this list on the fly
 // however it will automatically update after you close the RolesModal
 class RolesSummary extends React.Component {
@@ -98,6 +119,8 @@ class RolesSummary extends React.Component {
   get viewersAndEditorsLimited() {
     let editors = _.sortBy(this.editors, ['first_name'])
     let viewers = _.sortBy(this.viewers, ['first_name'])
+    const editorCount = editors.length
+    const viewerCount = viewers.length
     editors = editors.slice(0, MAX_USERS_TO_SHOW)
 
     if (editors.length < MAX_USERS_TO_SHOW) {
@@ -107,7 +130,7 @@ class RolesSummary extends React.Component {
       viewers = []
     }
 
-    return { editors, viewers }
+    return { editors, editorCount, viewers, viewerCount }
   }
 
   roleLabel = roleName => {
@@ -120,7 +143,7 @@ class RolesSummary extends React.Component {
   }
 
   get renderEditors() {
-    const { editors, viewers } = this.viewersAndEditorsLimited
+    const { editors, viewers, editorCount } = this.viewersAndEditorsLimited
     // If there aren't any editors or viewers, render with add user button
     // If there aren't any editors but are viewers, don't render label/button
     if (editors.length === 0 && !this.props.canEdit) return ''
@@ -138,11 +161,16 @@ class RolesSummary extends React.Component {
       />
     ))
 
-    return <StyledAvatarGroup align="right">{editorAvatars}</StyledAvatarGroup>
+    return (
+      <StyledAvatarGroup align="right">
+        {editorCount > MAX_USERS_TO_SHOW && MORE_EDITORS}
+        {editorAvatars}
+      </StyledAvatarGroup>
+    )
   }
 
   get renderViewers() {
-    const { viewers } = this.viewersAndEditorsLimited
+    const { viewers, viewerCount } = this.viewersAndEditorsLimited
 
     if (viewers.length === 0) return ''
     const viewerAvatars = viewers.map(viewer => (
@@ -156,7 +184,12 @@ class RolesSummary extends React.Component {
         displayName
       />
     ))
-    return <StyledAvatarGroup>{viewerAvatars}</StyledAvatarGroup>
+    return (
+      <StyledAvatarGroup>
+        {viewerCount > MAX_USERS_TO_SHOW && MORE_VIEWERS}
+        {viewerAvatars}
+      </StyledAvatarGroup>
+    )
   }
 
   get addUserBtn() {
