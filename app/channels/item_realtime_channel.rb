@@ -2,7 +2,7 @@ class ItemRealtimeChannel < ApplicationCable::Channel
   # All public methods are exposed to consumers
 
   def subscribed
-    item = Item.find(params[:id])
+    reject unless item.can_edit_content? current_user
     item.started_viewing(current_user)
     stream_from item.stream_name
   rescue ActiveRecord::RecordNotFound
@@ -10,15 +10,12 @@ class ItemRealtimeChannel < ApplicationCable::Channel
   end
 
   def unsubscribed
-    item = Item.find(params[:id])
     item.stopped_viewing(current_user, dont_notify: true)
-    # item.stopped_editing(current_user)
   rescue ActiveRecord::RecordNotFound
     nil
   end
 
   def delta(data)
-    item = Item.find(params[:id])
     # update delta with transformed one
     new_data = item.threadlocked_transform_realtime_delta(Mashie.new(data))
     if new_data
@@ -31,10 +28,14 @@ class ItemRealtimeChannel < ApplicationCable::Channel
   end
 
   def cursor(data)
-    item = Item.find(params[:id])
-    # update delta with transformed one
     item.received_changes(data, current_user)
   rescue ActiveRecord::RecordNotFound
     nil
+  end
+
+  private
+
+  def item
+    @item ||= Item.find(params[:id])
   end
 end

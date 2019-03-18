@@ -212,6 +212,10 @@ class Item extends SharedRecordMixin(BaseRecord) {
         trackError(err, { name: 'item:update' })
       })
   }
+
+  API_pingCollection() {
+    return this.apiStore.request(`items/${this.id}/ping_collection`)
+  }
 }
 
 Item.defaults = {

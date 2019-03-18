@@ -45,6 +45,10 @@ module RealtimeEditorsViewers
     editing_cache_key
   end
 
+  def publish_error
+    ActionCable.server.broadcast stream_name, {}, code: :unprocessable_entity
+  end
+
   private
 
   def num_viewers

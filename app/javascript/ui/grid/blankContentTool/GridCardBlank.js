@@ -346,7 +346,7 @@ class GridCardBlank extends React.Component {
     this.createCard(
       {
         item_attributes: {
-          name: 'text',
+          name: 'Text',
           content: '',
           data_content: { ops: [] },
           type: ITEM_TYPES.TEXT,

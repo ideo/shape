@@ -1,6 +1,7 @@
 class Item
   class TextItem < Item
     before_validation :import_html_content_if_blank, on: :create
+    before_validation :rename_if_name_was_default, on: :update
     has_one :question_answer, inverse_of: :open_response_item
 
     def import_plaintext_content(text)
@@ -48,8 +49,9 @@ class Item
 
       return false if version.to_i < saved_version
       full_content['version'] = saved_version + 1
-      update_column(:data_content, full_content)
-      parent.try(:touch)
+      # NOTE: is a "full update" too heavy here for performance, or ok?
+      # it basically means it's calling a few related updates on the parent / cards
+      update(data_content: full_content)
       {
         delta: delta,
         version: full_content['version'],
@@ -77,6 +79,11 @@ class Item
     def import_html_content_if_blank
       return if data_content.present?
       import_html_content(content)
+    end
+
+    def rename_if_name_was_default
+      return unless name == 'Text'
+      generate_name
     end
   end
 end

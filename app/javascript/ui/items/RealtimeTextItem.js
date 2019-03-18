@@ -74,7 +74,7 @@ const StyledContainer = styled.div`
 @observer
 class RealtimeTextItem extends React.Component {
   channelName = 'ItemRealtimeChannel'
-  state = { loading: true }
+  // state = { loading: false }
   saveTimer = null
   version = 0
   combinedDelta = new Delta()
@@ -83,23 +83,22 @@ class RealtimeTextItem extends React.Component {
 
   constructor(props) {
     super(props)
-    const { item } = props
     this.reactQuillRef = undefined
     this.quillEditor = undefined
-    this.channel = ChannelManager.subscribe(this.channelName, item.id, {
-      channelDisconnected: this.channelDisconnected,
-      channelReceivedData: this.channelReceivedData,
-    })
-
     this.sendCombinedDelta = _.debounce(this._sendCombinedDelta, 200)
     this.sendCursor = _.throttle(this._sendCursor, 100)
   }
 
   componentDidMount() {
+    window.fake = () =>
+      ChannelManager.unsubscribeAllFromChannel(this.channelName)
+
+    this.subscribeToItemEditingChannel()
+
     if (!this.reactQuillRef) return
     this.initQuillRefsAndData()
     setTimeout(() => {
-      this.setState({ loading: false })
+      this.quillEditor.focus()
     }, 100)
   }
 
@@ -109,6 +108,14 @@ class RealtimeTextItem extends React.Component {
 
   componentWillUnmount() {
     ChannelManager.unsubscribeAllFromChannel(this.channelName)
+  }
+
+  subscribeToItemEditingChannel() {
+    const { item } = this.props
+    this.channel = ChannelManager.subscribe(this.channelName, item.id, {
+      channelDisconnected: this.channelDisconnected,
+      channelReceivedData: this.channelReceivedData,
+    })
   }
 
   initQuillRefsAndData = () => {
@@ -209,7 +216,7 @@ class RealtimeTextItem extends React.Component {
   }
 
   channelDisconnected = () => {
-    this._sendCombinedDelta()
+    // TODO: do anything here? try to reconnect?
   }
 
   handleTextChange = (content, delta, source, editor) => {
@@ -234,7 +241,7 @@ class RealtimeTextItem extends React.Component {
   }
 
   _sendCursor = () => {
-    this.channel.perform('cursor', {
+    this.socketSend('cursor', {
       range: this.quillEditor.getSelection(),
     })
   }
@@ -248,7 +255,7 @@ class RealtimeTextItem extends React.Component {
       return setTimeout(this.sendCombinedDelta, 125)
     }
 
-    this.channel.perform('delta', {
+    this.socketSend('delta', {
       version: this.version,
       delta: this.combinedDelta,
       full_content: this.contentSnapshot.compose(this.combinedDelta),
@@ -262,9 +269,24 @@ class RealtimeTextItem extends React.Component {
     return this.combinedDelta
   }
 
+  socketSend = (method, data) => {
+    const channel = ChannelManager.getChannel(
+      this.channelName,
+      this.props.item.id
+    )
+    if (!channel) {
+      console.warn('Disconnected from channel')
+      // try to reconnect?
+      // cancelling should close you out of the editor (i.e. force you to reopen/reconnect)
+      this.cancel()
+      return
+    }
+    this.channel.perform(method, data)
+  }
+
   render() {
-    const { item, onExpand, fullPageView } = this.props
-    const canEdit = item.can_edit_content
+    const { onExpand, fullPageView } = this.props
+    const { canEdit } = this
     const quillProps = {
       ...v.quillDefaults,
       ref: c => {
@@ -273,7 +295,8 @@ class RealtimeTextItem extends React.Component {
       theme: 'snow',
       onChange: this.handleTextChange,
       onChangeSelection: this.handleSelectionChange,
-      readOnly: !canEdit && !this.state.loading,
+      onBlur: this.cancel,
+      readOnly: !canEdit,
       modules: {
         toolbar: canEdit ? '#quill-toolbar' : null,
         cursors: {
@@ -285,7 +308,7 @@ class RealtimeTextItem extends React.Component {
     return (
       <StyledContainer
         className="no-drag"
-        loading={this.state.loading}
+        // loading={this.state.loading}
         fullPageView={fullPageView}
       >
         <DockedToolbar fullPageView={fullPageView}>
@@ -297,7 +320,7 @@ class RealtimeTextItem extends React.Component {
           />
         </DockedToolbar>
         <QuillStyleWrapper>
-          <ReactQuill {...quillProps} value={this.dataContent} />
+          <ReactQuill {...quillProps} defaultValue={this.dataContent} />
         </QuillStyleWrapper>
       </StyledContainer>
     )

@@ -62,6 +62,11 @@ class Api::V1::ItemsController < Api::V1::BaseController
     end
   end
 
+  def ping_collection
+    CollectionUpdateBroadcaster.call(@item.parent, current_user)
+    head :no_content
+  end
+
   load_resource only: %i[in_my_collection]
   def in_my_collection
     render json: current_user.in_my_collection?(@item)

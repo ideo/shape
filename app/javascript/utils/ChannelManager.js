@@ -25,7 +25,7 @@ class ChannelManager {
   channelId = (channel, recordId = 'home') => `${channel}_${recordId}`
 
   getChannel(channel, recordId) {
-    return this.channels.find(this.channelId(channel, recordId))
+    return this.channels[this.channelId(channel, recordId)]
   }
 
   unsubscribeAllFromChannel(channelName) {

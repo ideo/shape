@@ -12,6 +12,8 @@ import InlineLoader from '~/ui/layout/InlineLoader'
 import RealtimeTextItem from '~/ui/items/RealtimeTextItem'
 import PaddedCardCover from './PaddedCardCover'
 
+const stripTags = str => str.replace(/(<([^>]+)>)/gi, '')
+
 const StyledReadMore = ShowMoreButton.extend`
   z-index: ${v.zIndex.gridCard};
   position: absolute;
@@ -96,12 +98,21 @@ class TextItemCover extends React.Component {
     }
   }
 
-  blur = (item, ev) => {
+  blur = async (item, ev) => {
     if (this.unmounted) {
       return
     }
-    if (ev) ev.stopPropagation()
+    if (ev && ev.stopPropagation) ev.stopPropagation()
     this.clearTextEditingItem()
+    const hasContent = stripTags(item.content).length
+    if (!hasContent) {
+      const card = apiStore.find('collection_cards', this.props.cardId)
+      card.API_archiveSelf({ undoable: false })
+      return
+    }
+    // broadcast updates e.g. if you just added some text
+    item.API_pingCollection()
+
     // TODO figure out why ref wasn't working
     // eslint-disable-next-line react/no-find-dom-node
     const node = ReactDOM.findDOMNode(this)

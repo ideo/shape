@@ -77,7 +77,9 @@ class ItemPage extends React.Component {
       case ITEM_TYPES.TEXT:
         return (
           <RealtimeTextItem
+            onCancel={this.cancel}
             item={item}
+            key={item.data_content.version || 0}
             currentUserId={apiStore.currentUserId}
             fullPageView
           />
