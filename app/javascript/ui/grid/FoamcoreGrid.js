@@ -40,6 +40,7 @@ const BlankCard = styled.div.attrs({
   &:hover {
     background-color: ${v.colors.primaryLight} !important;
   }
+  z-index: 0;
 `
 
 const Grid = styled.div`
@@ -332,36 +333,26 @@ class FoamcoreGrid extends React.Component {
   }
 
   positionCards() {
-    const tempCards = []
-    const { uiStore } = this.props
-    let y = 0
-    let x = 0
-    let i = 0
-    while (y <= this.totalRows) {
-      x = 0
-      while (x <= COLS) {
-        const potentialCard = this.findCardForSpot({ x, y })
-        if (potentialCard) {
-          if (
-            this.dragging &&
-            potentialCard.isBeingMultiMoved &&
-            potentialCard.id !== uiStore.dragCardMaster
-          ) {
-            tempCards.push(this.positionBlank({ x, y, i }))
-          } else {
-            tempCards.push(this.positionCard(potentialCard, { x, y, i }))
-          }
-        } else if (this.blankCard.idx === i) {
-          tempCards.push(this.positionBct({ x, y, i }))
-        } else {
-          tempCards.push(this.positionBlank({ x, y, i }))
-        }
-        x += 1
-        i += 1
+    const { collection, uiStore } = this.props
+    const allCardsToLayout = [...collection.collection_cards]
+    if (this.hoverGridSpot) allCardsToLayout.push(this.hoverGridSpot)
+    if (this.dragGridSpot) allCardsToLayout.push(this.dragGridSpot)
+    const i = 0
+    const cardElements = allCardsToLayout.map(spot => {
+      const { x, y } = spot
+      if (!spot.id) {
+        return this.positionBlank({ x, y, i })
       }
-      y += 1
-    }
-    return tempCards
+      if (
+        this.dragging &&
+        spot.isBeingMultiMoved &&
+        spot.id !== uiStore.dragCardMaster
+      ) {
+        return this.positionBlank({ x, y, i })
+      }
+      return this.positionCard(spot, { x, y, i })
+    })
+    return cardElements
   }
 
   render() {

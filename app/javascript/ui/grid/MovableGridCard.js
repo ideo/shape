@@ -436,7 +436,7 @@ class MovableGridCard extends React.PureComponent {
     const draggingMultiple =
       cardProps.dragging && uiStore.multiMoveCardIds.length > 1
 
-    let zIndex = 0
+    let zIndex = 1
     if (!moveComplete) zIndex = v.zIndex.cardDragging
     if (uiStore.cardMenuOpen.id === card.id) {
       zIndex = v.zIndex.aboveClickWrapper
