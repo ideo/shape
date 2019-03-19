@@ -542,7 +542,7 @@ class Collection < ApplicationRecord
   end
 
   def update_cover_text!(text_item)
-    cached_cover['text'] = CollectionCover.cover_text(self, text_item)
+    cached_cover['text'] = DefaultCollectionCover.cover_text(self, text_item)
     save
   end
 
