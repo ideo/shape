@@ -55,6 +55,33 @@ describe Collection, type: :model do
       end
     end
 
+    describe '#collection_cover_cards' do
+      let!(:collection) { create(:collection, num_cards: 3) }
+      let(:collection_cards) { collection.collection_cards }
+
+      it 'should return [] if no cards are covers' do
+        expect(collection_cards.all? { |card| !card.is_cover? }).to be true
+        expect(collection.collection_cover_cards).to be_empty
+      end
+
+      it 'returns no collection_cover_items' do
+        expect(collection.collection_cover_items).to be_empty
+      end
+
+      context 'with one card marked as cover' do
+        let(:cover_card) { collection_cards.first }
+        before { cover_card.update(is_cover: true) }
+
+        it 'is returned' do
+          expect(collection.collection_cover_cards).to eq([cover_card])
+        end
+
+        it 'collection_cover_items returns card item' do
+          expect(collection.collection_cover_items).to eq([cover_card.item])
+        end
+      end
+    end
+
     describe '#destroy' do
       let(:user) { create(:user) }
       let!(:collection) { create(:collection, num_cards: 3, add_editors: [user]) }

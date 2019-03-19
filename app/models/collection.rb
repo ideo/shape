@@ -78,9 +78,10 @@ class Collection < ApplicationRecord
           dependent: :destroy
 
   has_many :collection_cover_cards,
-           -> { CollectionCard.is_cover },
+           -> { active.is_cover.ordered },
            class_name: 'CollectionCard::Primary',
-           inverse_of: :collection
+           foreign_key: :parent_id,
+           inverse_of: :parent
 
   has_many :items, through: :primary_collection_cards
   has_many :collections, through: :primary_collection_cards
