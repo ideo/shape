@@ -1,7 +1,9 @@
 import PropTypes from 'prop-types'
+import { lineChartDashWithForOrder } from '~/ui/global/charts/ChartUtils'
+
 import Icon from './Icon'
 
-const LineChartMeasure = ({ color, dashWidth }) => (
+const LineChartMeasure = ({ color, order }) => (
   <Icon fill>
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
       <line
@@ -11,7 +13,7 @@ const LineChartMeasure = ({ color, dashWidth }) => (
         y2="8"
         strokeWidth="2"
         stroke={color}
-        strokeDasharray={`${dashWidth} ${dashWidth}`}
+        strokeDasharray={`${lineChartDashWithForOrder(order)}`}
       />
     </svg>
   </Icon>
@@ -19,12 +21,12 @@ const LineChartMeasure = ({ color, dashWidth }) => (
 
 LineChartMeasure.propTypes = {
   color: PropTypes.string,
-  dashWidth: PropTypes.number,
+  order: PropTypes.number,
 }
 
 LineChartMeasure.defaultProps = {
   color: '#000000',
-  dashWidth: 0,
+  order: 0,
 }
 
 export default LineChartMeasure

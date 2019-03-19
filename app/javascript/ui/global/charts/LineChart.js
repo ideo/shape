@@ -7,6 +7,7 @@ import {
   renderTooltip,
   addDuplicateValueIfSingleValue,
   chartDomainForDatasetValues,
+  lineChartDashWithForOrder,
 } from '~/ui/global/charts/ChartUtils'
 
 const formatValues = values => {
@@ -18,13 +19,16 @@ const formatValues = values => {
   }))
 }
 
-const chartStyle = style => ({
-  data: {
-    stroke: style.fill || '#000000',
-    strokeWidth: 2,
-    strokeDasharray: style.dashWidth || 0,
-  },
-})
+const chartStyle = dataset => {
+  const { style } = dataset
+  return {
+    data: {
+      stroke: style.fill || '#000000',
+      strokeWidth: 2,
+      strokeDasharray: lineChartDashWithForOrder(dataset.order),
+    },
+  }
+}
 
 const LineChart = ({ dataset, showMeasureInTooltip, cardArea }) => {
   const { measure, timeframe } = dataset
@@ -46,7 +50,7 @@ const LineChart = ({ dataset, showMeasureInTooltip, cardArea }) => {
       labelComponent={
         <ChartTooltip textRenderer={tooltipFn} cardArea={cardArea} />
       }
-      style={chartStyle(dataset.style || {})}
+      style={chartStyle(dataset)}
       data={values}
       domain={domain}
       key={`dataset-${dataset.measure}`}

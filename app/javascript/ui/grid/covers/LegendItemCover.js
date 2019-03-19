@@ -32,8 +32,8 @@ const MeasureIconWrapper = styled.span`
 class LegendItemCover extends React.Component {
   @observable
   @action
-  toggleMeasure = (measure, selected) => {
-    const { item } = this.props
+  toggleMeasure = async (measure, selected) => {
+    const { item, card } = this.props
     const { selected_measures } = item.data_settings
     if (selected) {
       // Remove measure
@@ -43,7 +43,8 @@ class LegendItemCover extends React.Component {
       selected_measures.push(measure)
     }
     // item.data_settings.selected_measures = updatedMeasures
-    item.save()
+    await item.save()
+    card.parent.API_fetchCards()
   }
 
   renderComparisonMeasures = ({ selected }) => {
@@ -69,7 +70,7 @@ class LegendItemCover extends React.Component {
       icon = (
         <LineChartMeasure
           color={style.fill || '#000000'}
-          dashWidth={style.dashWidth}
+          order={measureData.order}
         />
       )
     }
@@ -104,6 +105,11 @@ class LegendItemCover extends React.Component {
 
 LegendItemCover.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
+  card: MobxPropTypes.objectOrObservableObject,
+}
+
+LegendItemCover.defaultProps = {
+  card: null,
 }
 
 export default LegendItemCover

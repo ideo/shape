@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { runInAction, observable } from 'mobx'
 
@@ -43,6 +44,12 @@ class DataItemCover extends React.Component {
 DataItemCover.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   card: MobxPropTypes.objectOrObservableObject.isRequired,
+  // eslint-disable-next-line react/no-unused-prop-types
+  datasetLength: PropTypes.number,
+}
+
+DataItemCover.defaultProps = {
+  datasetLength: 1,
 }
 
 DataItemCover.wrappedComponent.propTypes = {

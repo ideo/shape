@@ -15,7 +15,7 @@ import LegendItemCover from '~/ui/grid/covers/LegendItemCover'
 
 import { ITEM_TYPES } from '~/utils/variables'
 
-class CoverRenderer extends React.PureComponent {
+class CoverRenderer extends React.Component {
   get isItem() {
     return this.props.cardType === 'items'
   }
@@ -74,7 +74,16 @@ class CoverRenderer extends React.PureComponent {
           return <ChartItemCover item={record} testCollection={card.parent} />
 
         case ITEM_TYPES.DATA:
-          return <DataItemCover height={height} item={record} card={card} />
+          // We must pass in dataset length to trigger
+          // re-render when new datasets are added
+          return (
+            <DataItemCover
+              datasetLength={record.datasets.length}
+              height={height}
+              item={record}
+              card={card}
+            />
+          )
 
         case ITEM_TYPES.LEGEND:
           return <LegendItemCover item={record} card={card} />

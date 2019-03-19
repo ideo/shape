@@ -43,10 +43,12 @@ class Item
 
     # Datasets that may be filtered by legend
     def datasets
-      return all_datasets if selected_measures.blank?
       all_datasets.select do |dataset|
-        selected_measures.include?(dataset[:measure].to_s) ||
-          dataset[:order].zero?
+        dataset[:order].zero? ||
+          (
+            selected_measures.present? &&
+            selected_measures.include?(dataset[:measure].to_s)
+          )
       end
     end
 

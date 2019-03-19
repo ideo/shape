@@ -10,7 +10,7 @@ import {
 } from '~/ui/global/charts/ChartUtils'
 import StyledDataItemCover from './StyledDataItemCover'
 
-class DataItemCoverDisplayOnly extends React.PureComponent {
+class DataItemCoverDisplayOnly extends React.Component {
   get title() {
     const { item } = this.props
     const { name, data_settings } = item
