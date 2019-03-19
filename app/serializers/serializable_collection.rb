@@ -12,16 +12,13 @@ class SerializableCollection < BaseJsonSerializer
       @object.anchored_roles
     end
   end
+  has_many :collection_cover_items
   has_one :parent_collection_card
   has_one :parent
   has_one :live_test_collection
   belongs_to :submissions_collection
   belongs_to :submission_template
   belongs_to :collection_to_test
-
-  attribute :item_collection_cover do
-    false # Hardcoded for now
-  end
 
   attribute :system_required do
     @object.system_required?

@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 
+import { routingStore } from '~/stores'
 import LinkItemCover from '~/ui/grid/covers/LinkItemCover'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
 import PdfFileItemCover from '~/ui/grid/covers/PdfFileItemCover'
@@ -8,7 +9,6 @@ import ImageItemCover from '~/ui/grid/covers/ImageItemCover'
 import VideoItemCover from '~/ui/grid/covers/VideoItemCover'
 import GenericFileItemCover from '~/ui/grid/covers/GenericFileItemCover'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
-import CollectionCoverItem from '~/ui/grid/covers/CollectionCoverItem'
 import DataItemCover from '~/ui/grid/covers/DataItemCover'
 import ChartItemCover from '~/ui/grid/covers/ChartItemCover'
 import LegendItemCover from '~/ui/grid/covers/LegendItemCover'
@@ -33,7 +33,6 @@ class CoverRenderer extends React.PureComponent {
       handleClick,
       searchResult,
     } = this.props
-
     if (this.isItem) {
       switch (record.type) {
         case ITEM_TYPES.TEXT:
@@ -100,10 +99,24 @@ class CoverRenderer extends React.PureComponent {
     return <div />
   }
 
+  handleClickToCollection = () => {
+    const { card } = this.props
+    routingStore.routeTo('collections', card.record.id)
+  }
+
   render() {
-    const { itemCollectionCover } = this.props.record
-    if (itemCollectionCover) {
-      return <CollectionCoverItem itemComponent={this.renderCover} />
+    const { coverItem } = this.props
+    if (coverItem) {
+      return (
+        <div
+          onClick={this.handleClickToCollection}
+          onKeyDown={this.handleClickToCollection}
+          role="link"
+          tabIndex="0"
+        >
+          {this.renderCover}
+        </div>
+      )
     }
     return this.renderCover
   }
@@ -113,6 +126,7 @@ CoverRenderer.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   cardType: PropTypes.string.isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
+  coverItem: PropTypes.bool,
   height: PropTypes.number,
   dragging: PropTypes.bool,
   searchResult: PropTypes.bool,
@@ -123,6 +137,7 @@ CoverRenderer.defaultProps = {
   height: 1,
   dragging: false,
   searchResult: false,
+  coverItem: false,
   handleClick: () => null,
 }
 
