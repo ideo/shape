@@ -174,10 +174,15 @@ class MovableGridCard extends React.PureComponent {
       // close the MoveMenu to prevent weird behaviors
       uiStore.closeMoveMenu({ deselect: false })
       uiStore.startDragging(this.props.card.id)
-      this.setState({
-        dragging: true,
-        moveComplete: false,
-      })
+      this.setState(
+        {
+          dragging: true,
+          moveComplete: false,
+        },
+        () => {
+          this.props.onDragStart && this.props.onDragStart(this.props.card.id)
+        }
+      )
     }
     const dragPosition = {
       dragX: cardX,
@@ -390,8 +395,8 @@ class MovableGridCard extends React.PureComponent {
     }
 
     const { gridW, gridH, cols } = uiStore.gridSettings
-    const minWidth = gridW * 0.8
-    const minHeight = gridH * 0.8
+    const minWidth = (gridW * 0.8) / zoomLevel
+    const minHeight = (gridH * 0.8) / zoomLevel
     // need to always set Rnd maxWidth to 4 columns instead of `cols`
     // because of this issue: https://github.com/bokuweb/react-rnd/issues/221
     const maxWidth = uiStore.gridWidthFor(4)
@@ -441,7 +446,8 @@ class MovableGridCard extends React.PureComponent {
     if (uiStore.cardMenuOpen.id === card.id) {
       zIndex = v.zIndex.aboveClickWrapper
     }
-    let transform = `scale(${1 / zoomLevel})`
+    let transform = ``
+    const outerTransform = `scale(${1 / zoomLevel})`
     let transition = dragging || resizing ? 'none' : cardCSSTransition
     // TODO this should actually check it's a breadcrumb
     const draggedOverBreadcrumb = !!uiStore.activeDragTarget
@@ -490,7 +496,14 @@ class MovableGridCard extends React.PureComponent {
           maxHeight={maxHeight}
           dragAxis="none"
           cancel=".no-drag"
-          size={{ width, height }}
+          style={{
+            transform: outerTransform,
+            transformOrigin: 'top left',
+          }}
+          size={{
+            width,
+            height,
+          }}
           position={{ x, y }}
           default={{ width, height, x: xPos, y: yPos }}
           disableDragging={
