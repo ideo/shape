@@ -56,8 +56,8 @@ export default class UiStore {
     gridH: 250,
   }
   smallGridSettings = {
-    gutter: 20,
-    gridW: 250,
+    gutter: 14,
+    gridW: 253,
     gridH: 200,
   }
   @observable
