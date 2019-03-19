@@ -76,17 +76,14 @@ describe('ChartUtils', () => {
   describe('primaryFillColorFromDatasets', () => {
     it('returns fill if on primary dataset', () => {
       const datasets = [
-        { primary: true, style: { fill: '#EFEFEF' } },
-        { primary: false, style: { fill: '#330000' } },
+        { order: 0, style: { fill: '#EFEFEF' } },
+        { order: 1, style: { fill: '#330000' } },
       ]
       expect(primaryFillColorFromDatasets(datasets)).toEqual('#EFEFEF')
     })
 
     it('returns #000000 if no fill', () => {
-      const datasets = [
-        { primary: true },
-        { primary: false, style: { fill: '#330000' } },
-      ]
+      const datasets = [{ order: 0 }, { order: 1, style: { fill: '#330000' } }]
       expect(primaryFillColorFromDatasets(datasets)).toEqual('#000000')
     })
   })

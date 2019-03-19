@@ -272,7 +272,7 @@ class GridCard extends React.Component {
       // TODO: could replace with preview
       Activity.trackActivity('downloaded', record)
       return
-    } else if (record.isVideo || record.isImage) {
+    } else if (record.isVideo || record.isImage || record.isLegend) {
       return
     } else if (record.mimeBaseType === 'image') {
       this.props.handleClick(e)

@@ -29,7 +29,7 @@ module DataReport
           measure: @measure,
           chart_type: 'area',
           timeframe: @timeframe,
-          primary: true,
+          order: 0,
           single_value: @single_value,
           data: @data,
         },

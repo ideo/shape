@@ -62,14 +62,24 @@ FactoryBot.define do
         data_content(
           datasets: [
             {
+              measure: 'IDEO',
               single_value: 0,
-              data: [{ date: '2018-11-13', amount: 613 }],
+              order: 0,
+              data: [{ date: '2018-10-03', amount: 80 }],
+            },
+            {
+              measure: 'All Organizations',
+              single_value: 0,
+              order: 1,
+              data: [{ date: '2018-11-13', amount: 24 }],
             },
           ],
         )
         report_type :report_type_record
       end
     end
+
+    factory :legend_item, class: 'Item::LegendItem'
 
     after(:build) do |item, evaluator|
       if evaluator.parent_collection

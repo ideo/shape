@@ -13,7 +13,7 @@ export const datasetPropType = PropTypes.shape({
   description: PropTypes.string,
   chart_type: PropTypes.string.isRequired,
   timeframe: PropTypes.string.isRequired,
-  primary: PropTypes.bool.isRequired,
+  order: PropTypes.number.isRequired,
   max_domain: PropTypes.number,
   style: PropTypes.shape({
     fill: PropTypes.string,

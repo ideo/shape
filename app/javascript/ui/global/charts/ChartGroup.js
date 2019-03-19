@@ -53,7 +53,7 @@ class ChartGroup extends React.PureComponent {
   get primaryDataset() {
     const { datasets } = this.props
     if (datasets.length <= 1) return datasets[0]
-    return datasets.find(dataset => dataset.primary)
+    return datasets.find(dataset => dataset.order === 0)
   }
 
   get primaryDatasetValues() {
@@ -64,7 +64,7 @@ class ChartGroup extends React.PureComponent {
   get secondaryDatasetsWithData() {
     const { datasets } = this.props
     return datasets.filter(
-      dataset => !dataset.primary && dataset.data.length > 0
+      dataset => dataset.order !== 0 && dataset.data.length > 0
     )
   }
 

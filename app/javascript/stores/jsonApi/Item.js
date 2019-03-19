@@ -97,6 +97,10 @@ class Item extends SharedRecordMixin(BaseRecord) {
     )
   }
 
+  get isLegend() {
+    return this.type === ITEM_TYPES.LEGEND
+  }
+
   get isDownloadable() {
     return this.isGenericFile || this.isPdfFile
   }
@@ -129,10 +133,6 @@ class Item extends SharedRecordMixin(BaseRecord) {
 
   get isLink() {
     return this.type === ITEM_TYPES.LINK
-  }
-
-  get isLegend() {
-    return this.type === ITEM_TYPES.LEGEND
   }
 
   get canBeSetAsCover() {
@@ -172,7 +172,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
     const { datasets } = this
     if (!datasets) return null
     if (datasets.length <= 1) return datasets[0]
-    return datasets.find(dataset => dataset.primary)
+    return datasets.find(dataset => dataset.order === 0)
   }
 
   get measure() {
@@ -226,7 +226,7 @@ Item.defaults = {
   can_edit: false,
   datasets: [
     {
-      primary: true,
+      order: 0,
       data: [],
       count: 0,
     },

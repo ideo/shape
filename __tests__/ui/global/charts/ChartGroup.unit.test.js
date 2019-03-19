@@ -11,7 +11,7 @@ describe('ChartGroup', () => {
       fakeDataset,
       {
         ...fakeDataset,
-        primary: false,
+        order: 1,
         chart_type: 'line',
       },
     ]

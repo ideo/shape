@@ -1,48 +1,50 @@
 class Item
   class LegendItem < Item
-    has_many :data_items, class_name: 'Item::DataItem'
+    has_many :data_items, class_name: 'Item::DataItem', inverse_of: :legend_item
+
+    store_accessor :data_settings,
+                   :selected_measures
 
     # TODO
     # validate :link_item_to_legend?, if: :primary_measure_matches?
 
     def name
-      "Compare To"
+      'Compare To'
     end
 
     def primary_measure
-      primary_datasets.first[:measure]
+      return if primary_datasets.blank?
+      sample_dataset = primary_datasets.first
+      {
+        measure: sample_dataset[:measure],
+        style: sample_dataset[:style],
+      }
     end
 
-    def primary_datasets
-      data_items
-        .map(&:datasets)
-        .flatten
-        .select { |dataset| dataset[:primary] == true }
-    end
-
-    def active_comparisons
-      []
-      # data_items
-      #  .map { |item| item.data_content[:datasets] }
-      #  .select { |dataset| dataset[:primary] == "true" }
-    end
-
-    # This could be its own service?
-    def update_active_comparisons(active_comparisons)
-      # for each dataset
-      # update their data_content/datasets
-      # setting requested comparisons to be active
+    # Comparisons are non-primary measures from all linked datasets
+    def comparison_measures
+      non_primary_datasets
+        .each_with_object({}) do |dataset, h|
+          next if h[dataset[:measure]].present?
+          h[dataset[:measure]] = {
+            measure: dataset[:measure],
+            style: dataset[:style],
+          }
+        end.values
     end
 
     private
 
-    def link_to_legend(item)
-      item.update(legend_item_id: id)
+    def primary_datasets
+      datasets.select { |dataset| dataset[:order].zero? }
     end
 
-    def primary_measure_matches?(item)
-      dataset = item.datasets.find { |dataset| dataset[:primary] == true }
-      dataset[:measure] == primary_measure
+    def non_primary_datasets
+      datasets.reject { |dataset| dataset[:order].zero? }
+    end
+
+    def datasets
+      @datasets ||= data_items.map(&:all_datasets).flatten
     end
   end
 end

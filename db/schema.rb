@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190312204433) do
+ActiveRecord::Schema.define(version: 20190314211046) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -103,6 +103,15 @@ ActiveRecord::Schema.define(version: 20190312204433) do
     t.index ["type"], name: "index_collection_cards_on_type"
   end
 
+  create_table "collection_cover_items", force: :cascade do |t|
+    t.bigint "collection_id"
+    t.bigint "item_id"
+    t.integer "order"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["collection_id", "item_id"], name: "index_collection_cover_items_on_collection_id_and_item_id", unique: true
+  end
+
   create_table "collections", force: :cascade do |t|
     t.string "name"
     t.string "type"
@@ -122,9 +131,9 @@ ActiveRecord::Schema.define(version: 20190312204433) do
     t.integer "submission_box_type"
     t.bigint "submission_box_id"
     t.integer "test_status"
-    t.integer "processing_status"
     t.integer "question_item_id"
     t.bigint "test_collection_id"
+    t.integer "processing_status"
     t.bigint "collection_to_test_id"
     t.datetime "unarchived_at"
     t.jsonb "cached_test_scores"

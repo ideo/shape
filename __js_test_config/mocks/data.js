@@ -46,7 +46,7 @@ export const fakeDataset = {
   description: 'A description',
   timeframe: 'month',
   chart_type: 'area',
-  primary: true,
+  order: 0,
   data: [
     { date: '2018-07-10', value: 10 },
     { date: '2018-08-10', value: 25 },
@@ -82,7 +82,7 @@ export const creativeDifferenceQualityDataset = {
   timeframe: 'month',
   chart_type: 'area',
   single_value: 0,
-  primary: true,
+  order: 0,
   style: {
     fill: '#EFEFEF',
     dashWidth: 2,
@@ -107,7 +107,7 @@ export const fakeDataItemRecordAttrs = {
     {
       ...creativeDifferenceQualityDataset,
       measure: '95th Percentile',
-      primary: false,
+      order: 1,
       chart_type: 'line'
     }
   ],

@@ -92,6 +92,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
       { data_settings: [
         :d_measure,
         :d_timeframe,
+        selected_measures: [],
         d_filters: %i[type target],
       ] },
       :url,
@@ -99,8 +100,8 @@ class Api::V1::ItemsController < Api::V1::BaseController
       :archived,
       :tag_list,
       :thumbnail_url,
-      filestack_file_attributes: Item.filestack_file_attributes_whitelist,
       :legend_item_id,
+      filestack_file_attributes: Item.filestack_file_attributes_whitelist,
     )
   end
 
