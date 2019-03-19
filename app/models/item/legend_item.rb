@@ -40,15 +40,17 @@ class Item
     end
 
     def primary_datasets
-      datasets.select { |dataset| dataset[:order].zero? }
+      datasets_with_data.select { |dataset| dataset[:order].zero? }
     end
 
     def non_primary_datasets
-      datasets.reject { |dataset| dataset[:order].zero? }
+      datasets_with_data.reject { |dataset| dataset[:order].zero? }
     end
 
-    def datasets
-      @datasets ||= data_items.map(&:all_datasets).flatten
+    def datasets_with_data
+      @datasets_with_data ||= data_items.map(&:all_datasets).flatten.select do |dataset|
+        dataset[:data].present? || dataset[:single_value].present?
+      end
     end
 
     def set_default_selected_measures
