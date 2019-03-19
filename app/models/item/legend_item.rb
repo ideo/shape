@@ -5,8 +5,7 @@ class Item
     store_accessor :data_settings,
                    :selected_measures
 
-    # TODO
-    # validate :link_item_to_legend?, if: :primary_measure_matches?
+    before_save :set_default_selected_measures
 
     def name
       'Compare To'
@@ -45,6 +44,10 @@ class Item
 
     def datasets
       @datasets ||= data_items.map(&:all_datasets).flatten
+    end
+
+    def set_default_selected_measures
+      self.selected_measures ||= []
     end
   end
 end

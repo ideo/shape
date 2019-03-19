@@ -32,6 +32,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
     'filestack_file_attributes',
     'data_settings',
     'report_type',
+    'selected_measures',
   ]
 
   get justText() {

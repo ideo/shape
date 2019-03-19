@@ -32,58 +32,56 @@ const MeasureIconWrapper = styled.span`
 class LegendItemCover extends React.Component {
   @observable
   @action
-  toggleMeasure = measure => {
+  toggleMeasure = (measure, selected) => {
     const { item } = this.props
-    const { selected_measures } = item
-    if (selected_measures.includes(measure)) {
+    const { selected_measures } = item.data_settings
+    if (selected) {
       // Remove measure
       selected_measures.remove(measure)
     } else {
       // Add measure
       selected_measures.push(measure)
     }
-    item.data_settings.selected_measures = selected_measures
+    // item.data_settings.selected_measures = updatedMeasures
     item.save()
   }
 
-  renderMeasure = ({ measureData, primary, hideIcon }) => {
-    const { measure, style } = measureData
-    let icon
-    if (!hideIcon) {
-      if (primary) {
-        icon = <AreaChartMeasure color={style.fill || '#000000'} />
-      } else {
-        icon = (
-          <LineChartMeasure
-            color={style.fill || '#000000'}
-            dashWidth={style.dashWidth}
-          />
-        )
-      }
-    }
-
-    return (
-      <Measure
-        key={`measure-${measure}`}
-        onClick={() => this.toggleMeasure(measure)}
-      >
-        {icon && <MeasureIconWrapper>{icon}</MeasureIconWrapper>}
-        <DisplayText>{measure}</DisplayText>
-      </Measure>
-    )
-  }
-
   renderComparisonMeasures = ({ selected }) => {
-    const { item } = this.props
-    const { comparison_measures } = item
-    const { selected_measures } = item.data_settings
-    if (!selected_measures || selected_measures.length === 0) return ''
+    const { selected_measures } = this.props.item.data_settings
+    if (selected && selected_measures.length === 0) return ''
+
+    const { comparison_measures } = this.props.item
     const measures = comparison_measures.filter(
       measureData =>
         selected === selected_measures.includes(measureData.measure)
     )
     return measures.map(measureData =>
-      this.renderMeasure({ measureData, primary: false, hideIcon: !selected })
+      this.renderMeasure({ measureData, primary: false, selected })
+    )
+  }
+
+  renderMeasure = ({ measureData, primary, selected }) => {
+    const { measure, style } = measureData
+    let icon
+    if (primary) {
+      icon = <AreaChartMeasure color={style.fill || '#000000'} />
+    } else if (selected) {
+      icon = (
+        <LineChartMeasure
+          color={style.fill || '#000000'}
+          dashWidth={style.dashWidth}
+        />
+      )
+    }
+
+    return (
+      <Measure
+        key={`measure-${measure}`}
+        onClick={() => this.toggleMeasure(measure, selected)}
+      >
+        {icon && <MeasureIconWrapper>{icon}</MeasureIconWrapper>}
+        <DisplayText>{measure}</DisplayText>
+      </Measure>
     )
   }
 
@@ -93,7 +91,7 @@ class LegendItemCover extends React.Component {
     return (
       <StyledLegendItem>
         <DisplayText>{item.name}</DisplayText>
-        {this.renderMeasure({ primary_measure, primary: true })}
+        {this.renderMeasure({ measureData: primary_measure, primary: true })}
         {this.renderComparisonMeasures({ selected: true })}
         <br />
         <DisplayText>+ Add Comparison</DisplayText>

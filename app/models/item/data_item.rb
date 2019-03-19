@@ -46,7 +46,7 @@ class Item
       return all_datasets if selected_measures.blank?
       all_datasets.select do |dataset|
         selected_measures.include?(dataset[:measure].to_s) ||
-          dataset[:primary] == true
+          dataset[:order].zero?
       end
     end
 
