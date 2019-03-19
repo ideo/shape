@@ -8,6 +8,7 @@ class OrganizationTemplates < SimpleService
     setup_template_collection
     setup_profile_template
     setup_profile_collection
+    # TODO: copy templates into template collection
     setup_getting_started_collection
     @org.save
   end
@@ -39,9 +40,12 @@ class OrganizationTemplates < SimpleService
     @org.save!
 
     @org.admin_group.add_role(Role::EDITOR, template_collection)
+    @org.primary_group.add_role(Role::VIEWER, template_collection)
+    template_collection.update(shared_with_organization: true)
+    # also make sure to share with the initial creator
     LinkToSharedCollectionsWorker.new.perform(
-      [@org.admin_group.user_ids],
-      [@org.admin_group.id],
+      [@org.primary_group.user_ids],
+      [],
       [template_collection.id],
       [],
     )
