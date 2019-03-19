@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190314211046) do
+ActiveRecord::Schema.define(version: 20190319185820) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -140,6 +140,7 @@ ActiveRecord::Schema.define(version: 20190314211046) do
     t.boolean "hide_submissions", default: false
     t.bigint "roles_anchor_collection_id"
     t.boolean "shared_with_organization", default: false
+    t.integer "cover_type", default: 0
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
@@ -264,6 +265,7 @@ ActiveRecord::Schema.define(version: 20190314211046) do
     t.jsonb "data_settings"
     t.bigint "roles_anchor_collection_id"
     t.integer "report_type"
+    t.integer "legend_item_id"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
     t.index ["created_at"], name: "index_items_on_created_at"

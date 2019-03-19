@@ -77,6 +77,11 @@ class Collection < ApplicationRecord
           inverse_of: :collection,
           dependent: :destroy
 
+  has_many :collection_cover_cards,
+           -> { CollectionCard.is_cover },
+           class_name: 'CollectionCard::Primary',
+           inverse_of: :collection
+
   has_many :items, through: :primary_collection_cards
   has_many :collections, through: :primary_collection_cards
   has_many :items_and_linked_items,
@@ -85,10 +90,8 @@ class Collection < ApplicationRecord
   has_many :collections_and_linked_collections,
            through: :collection_cards,
            source: :collection
-  has_many :collection_cover_item_joins, class_name: 'CollectionCoverItem'
   has_many :collection_cover_items,
-           through: :collection_cover_item_joins,
-           class_name: 'Item',
+           through: :collection_cover_cards,
            source: :item
 
   has_one :comment_thread, as: :record, dependent: :destroy
@@ -113,11 +116,16 @@ class Collection < ApplicationRecord
   scope :data_collectable, -> { where.not(type: uncollectable_types).or(where(type: nil)) }
   scope :master_template, -> { where(master_template: true) }
 
-  accepts_nested_attributes_for :collection_cards, :collection_cover_item_joins
+  accepts_nested_attributes_for :collection_cards
 
   enum processing_status: {
     processing_breadcrumb: 1,
     duplicating: 2,
+  }
+
+  enum cover_type: {
+    cover_type_default: 0,
+    cover_type_items: 1,
   }
 
   # Searchkick Config
@@ -515,7 +523,7 @@ class Collection < ApplicationRecord
   end
 
   def cache_cover
-    self.cached_cover = CollectionCover.call(self)
+    self.cached_cover = DefaultCollectionCover.call(self)
   end
 
   def cache_cover!

@@ -37,12 +37,6 @@ class Item < ApplicationRecord
            inverse_of: :item,
            dependent: :destroy
 
-  has_many :collection_cover_items
-  has_many :cover_for_collections,
-           through: :collection_cover_items,
-           source: :collection,
-           inverse_of: :collection_cover_items
-
   delegate :parent, :pinned, :pinned?, :pinned_and_locked?,
            to: :parent_collection_card, allow_nil: true
   delegate :organization, to: :parent, allow_nil: true
