@@ -317,14 +317,14 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :filter,
       :hidden,
       :show_replace,
-      collection_attributes: [
-        :id,
-        :type,
-        :name,
-        :template_id,
-        :master_template,
-        :external_id,
-        :cover_type,
+      collection_attributes: %i[
+        id
+        type
+        name
+        template_id
+        master_template
+        external_id
+        cover_type
       ],
       item_attributes: [
         :id,
