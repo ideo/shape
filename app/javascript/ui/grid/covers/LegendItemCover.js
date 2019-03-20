@@ -22,12 +22,14 @@ const Measure = styled.div`
   margin: 15px 0;
   position: relative;
 `
+Measure.displayName = 'Measure'
 
 const UnselectMeasure = styled(DisplayText)`
   position: absolute;
   right: 0;
   width: 16px;
 `
+UnselectMeasure.displayName = 'UnselectMeasure'
 
 const AreaChartMeasure = styled.span`
   display: inline-block;
@@ -72,14 +74,14 @@ class LegendItemCover extends React.Component {
       // Remove measure
       selected_measures.remove(measure)
     }
-    // item.data_settings.selected_measures = updatedMeasures
     await item.save()
     card.parent.API_fetchCards()
   }
 
   comparisonMeasures = ({ selected }) => {
     const { selected_measures } = this.props.item.data_settings
-    if (selected && selected_measures.length === 0) return ''
+
+    if (selected && selected_measures.length === 0) return []
 
     const { comparison_measures } = this.props.item
     return comparison_measures.filter(
@@ -96,7 +98,7 @@ class LegendItemCover extends React.Component {
     } else {
       icon = (
         <LineChartMeasure
-          color={style.fill || '#000000'}
+          color={(style && style.fill) || '#000000'}
           order={measureData.order}
         />
       )

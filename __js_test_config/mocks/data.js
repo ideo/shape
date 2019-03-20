@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { observable } from "mobx"
 
 const fakeJsonApiAttrs = {
   assign: jest.fn(),
@@ -73,6 +74,43 @@ export const fakeDataItemCollectionsItemsAttrs = {
   datasets: [
     fakeDataset
   ],
+}
+
+export const fakeLegendItemAttrs = {
+  ...fakeTextItemAttrs,
+  type: 'Item::LegendItem',
+  primary_measure: {
+    measure: 'Business Unit',
+    order: 0,
+    style: { fill: '#9874AB' }
+  },
+  comparison_measures: [
+    {
+      measure: '95th Percentile',
+      order: 1
+    },
+    {
+      measure: '75th Percentile',
+      order: 2
+    },
+  ],
+  data_settings: {
+    selected_measures: observable([
+      '95th Percentile'
+    ])
+  }
+}
+
+export const fakeLegendItem = {
+  ...fakeLegendItemAttrs,
+  rawAttributes: jest.fn().mockReturnValue(fakeLegendItemAttrs),
+  getRecordType: jest.fn().mockReturnValue('items'),
+  save: jest.fn().mockReturnValue(Promise.resolve({})),
+}
+
+export const fakeLegendItemCard = {
+  ...fakeItemCard,
+  record: fakeLegendItem
 }
 
 export const creativeDifferenceQualityDataset = {

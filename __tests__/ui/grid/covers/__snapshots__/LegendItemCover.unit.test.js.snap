@@ -1,0 +1,77 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LegendItemCover renders snapshot 1`] = `
+<styled.div>
+  <Styled(StyledDisplayText)>
+    My Cool Item
+  </Styled(StyledDisplayText)>
+  <Measure
+    key="measure-Business Unit"
+  >
+    <styled.span>
+      <styled.span
+        color="#9874AB"
+      />
+    </styled.span>
+    <StyledDisplayText>
+      Business Unit
+    </StyledDisplayText>
+  </Measure>
+  <Measure
+    key="measure-95th Percentile"
+  >
+    <styled.span>
+      <LineChartMeasure
+        color="#000000"
+        order={1}
+      />
+    </styled.span>
+    <StyledDisplayText>
+      95th Percentile
+    </StyledDisplayText>
+    <UnselectMeasure
+      onClick={[Function]}
+      role="button"
+    >
+      <XIcon />
+    </UnselectMeasure>
+  </Measure>
+  <br />
+  <styled.div>
+    <PopoutMenu
+      buttonStyle="comparison"
+      className=""
+      direction="right"
+      disabled={false}
+      groupExtraComponent={Object {}}
+      groupedMenuItems={Object {}}
+      hideDotMenu={false}
+      menuItems={
+        Array [
+          Object {
+            "name": "75th Percentile",
+            "onClick": [Function],
+          },
+        ]
+      }
+      menuOpen={false}
+      onClick={[Function]}
+      onMouseLeave={[Function]}
+      position={
+        Object {
+          "x": 10,
+          "y": 17,
+        }
+      }
+      width={200}
+      wrapperClassName="card-menu"
+    />
+    <StyledDisplayText
+      className="add-comparison-text"
+      onClick={[Function]}
+    >
+      Add Comparison
+    </StyledDisplayText>
+  </styled.div>
+</styled.div>
+`;
