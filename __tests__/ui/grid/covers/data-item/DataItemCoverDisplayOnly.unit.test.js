@@ -17,14 +17,14 @@ describe('DataItemCoverDisplayOnly', () => {
     expectTreeToMatchSnapshot(wrapper)
   })
 
-  it('should render name', () => {
+  it('should render measure name', () => {
     expect(
       wrapper
         .find('StyledDisplayText')
         .children()
         .first()
         .text()
-    ).toEqual(props.item.name)
+    ).toEqual(props.item.primaryDataset.measure)
   })
 
   it('should render a chart', () => {
@@ -35,5 +35,11 @@ describe('DataItemCoverDisplayOnly', () => {
       width: 1,
       height: 1,
     })
+  })
+
+  it('renders a tooltip', () => {
+    const tooltip = wrapper.find('Tooltip')
+    expect(tooltip.exists()).toBe(true)
+    expect(tooltip.props().title).toEqual(props.item.datasets[0].description)
   })
 })

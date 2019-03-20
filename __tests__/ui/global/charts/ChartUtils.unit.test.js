@@ -2,7 +2,7 @@ import {
   chartDomainForDatasetValues,
   renderTooltip,
   addDuplicateValueIfSingleValue,
-  primaryFillColorFromDatasets,
+  primaryFillColorFromDataset,
 } from '~/ui/global/charts/ChartUtils'
 
 describe('ChartUtils', () => {
@@ -73,18 +73,15 @@ describe('ChartUtils', () => {
     })
   })
 
-  describe('primaryFillColorFromDatasets', () => {
+  describe('primaryFillColorFromDataset', () => {
     it('returns fill if on primary dataset', () => {
-      const datasets = [
-        { order: 0, style: { fill: '#EFEFEF' } },
-        { order: 1, style: { fill: '#330000' } },
-      ]
-      expect(primaryFillColorFromDatasets(datasets)).toEqual('#EFEFEF')
+      const dataset = { order: 0, style: { fill: '#EFEFEF' } }
+      expect(primaryFillColorFromDataset(dataset)).toEqual('#EFEFEF')
     })
 
     it('returns #000000 if no fill', () => {
-      const datasets = [{ order: 0 }, { order: 1, style: { fill: '#330000' } }]
-      expect(primaryFillColorFromDatasets(datasets)).toEqual('#000000')
+      const dataset = { order: 0 }
+      expect(primaryFillColorFromDataset(dataset)).toEqual('#000000')
     })
   })
 })

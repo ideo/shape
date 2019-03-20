@@ -370,7 +370,10 @@ class GridCard extends React.Component {
                     onReassign={this.onCollectionCoverChange}
                   />
                 )}
-              {record.isData && <EditButton onClick={this.editCard} />}
+              {record.isData &&
+                record.isReportTypeCollectionsItems && (
+                  <EditButton onClick={this.editCard} />
+                )}
               {record.isImage &&
                 this.canContentEditCard && <ContainImage card={card} />}
               {(record.isImage || record.isText) && (

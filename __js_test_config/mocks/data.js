@@ -140,6 +140,7 @@ export const fakeDataItemRecordAttrs = {
   isReportTypeCollectionsItems: false,
   isReportTypeNetworkAppMetric: false,
   isReportTypeRecord: true,
+  primaryDataset: creativeDifferenceQualityDataset,
   datasets: [
     creativeDifferenceQualityDataset,
     {

@@ -34,12 +34,9 @@ export const datasetPropType = PropTypes.shape({
   ),
 })
 
-export const primaryFillColorFromDatasets = datasets => {
-  if (!datasets) return '#000000'
-  const primary = datasets.find(dataset => dataset.primary)
-  return primary && primary.style && primary.style.fill
-    ? primary.style.fill
-    : '#000000'
+export const primaryFillColorFromDataset = dataset => {
+  if (!dataset) return '#000000'
+  return dataset.style && dataset.style.fill ? dataset.style.fill : '#000000'
 }
 
 export const chartDomainForDatasetValues = ({ values, maxDomain }) => {

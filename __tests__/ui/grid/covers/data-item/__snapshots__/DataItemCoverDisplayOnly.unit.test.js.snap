@@ -6,8 +6,31 @@ exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
     <StyledDisplayText
       color="#EFEFEF"
     >
-      My Cool Item
+      Purpose
     </StyledDisplayText>
+    <Tooltip
+      classes={
+        Object {
+          "tooltip": "Tooltip",
+        }
+      }
+      placement="bottom"
+      title="The degree to which there is alignment about a meaningful change that leadership and employees want to make in the world."
+    >
+      <styled.div
+        color="#EFEFEF"
+      >
+        <InfoIcon
+          height={11}
+          style={
+            Object {
+              "fill": undefined,
+            }
+          }
+          width={11}
+        />
+      </styled.div>
+    </Tooltip>
     <br />
   </styled.div>
   <ChartGroup
@@ -31,7 +54,7 @@ exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
           ],
           "description": "The degree to which there is alignment about a meaningful change that leadership and employees want to make in the world.",
           "measure": "Purpose",
-          "primary": true,
+          "order": 0,
           "single_value": 0,
           "style": Object {
             "dashWidth": 2,
@@ -57,7 +80,7 @@ exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
           ],
           "description": "The degree to which there is alignment about a meaningful change that leadership and employees want to make in the world.",
           "measure": "95th Percentile",
-          "primary": false,
+          "order": 1,
           "single_value": 0,
           "style": Object {
             "dashWidth": 2,
