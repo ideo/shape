@@ -6,10 +6,10 @@ import pluralize from 'pluralize'
 
 import v from '~/utils/variables'
 
-export const lineChartDashWithForOrder = order => {
-  const dashWidths = ['1,2', '2,2', '3,1', '4,2', '3,3', '1,3']
-  if (dashWidths[order - 1]) return dashWidths[order - 1]
-  return dashWidths[0]
+export const lineChartDashWithForOrder = ({ order, scale = 1 }) => {
+  const dashWidths = [[2, 4], [3, 1], [4, 2], [2, 8], [8, 6], [1, 5]]
+  const values = dashWidths[order - 1] ? dashWidths[order - 1] : dashWidths[0]
+  return values.map(val => val * scale).join(',')
 }
 
 export const utcMoment = date => moment(`${date} 00+0000`).utc()

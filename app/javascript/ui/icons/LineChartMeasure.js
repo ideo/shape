@@ -8,12 +8,12 @@ const LineChartMeasure = ({ color, order }) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
       <line
         x1="0"
-        y1="8"
+        y1="9"
         x2="16"
-        y2="8"
+        y2="9"
         strokeWidth="2"
         stroke={color}
-        strokeDasharray={`${lineChartDashWithForOrder(order)}`}
+        strokeDasharray={`${lineChartDashWithForOrder({ order, scale: 0.8 })}`}
       />
     </svg>
   </Icon>

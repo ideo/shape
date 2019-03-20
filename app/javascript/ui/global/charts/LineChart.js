@@ -23,9 +23,12 @@ const chartStyle = dataset => {
   const { style } = dataset
   return {
     data: {
-      stroke: style.fill || '#000000',
-      strokeWidth: 2,
-      strokeDasharray: lineChartDashWithForOrder(dataset.order),
+      stroke: (style && style.fill) || '#000000',
+      strokeWidth: 3,
+      strokeDasharray: lineChartDashWithForOrder({
+        order: dataset.order,
+        scale: 1.5,
+      }),
     },
   }
 }
