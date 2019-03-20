@@ -150,9 +150,11 @@ class RealtimeTextItem extends React.Component {
     console.warn('Disconnected from channel')
     const { fullPageView } = this.props
     if (!fullPageView) {
+      // this will cancel you out of the editor back to view-only mode
       this.cancel()
       return
     }
+    // this will likewise put you into readOnly mode on the ItemPage
     this.setState({ disconnected: true })
   }
 
@@ -309,8 +311,6 @@ class RealtimeTextItem extends React.Component {
       this.props.item.id
     )
     if (!channel) {
-      // try to reconnect?
-      // cancelling should close you out of the editor (i.e. force you to reopen/reconnect)
       this.channelDisconnected()
       return
     }
