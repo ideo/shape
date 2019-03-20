@@ -12,7 +12,12 @@ class SerializableCollection < BaseJsonSerializer
       @object.anchored_roles
     end
   end
-  has_many :collection_cover_items
+  has_many :collection_cover_items do
+    data do
+      # Only include cover items if this collection has indicated to use them
+      @object.cover_type_items? ? @object.collection_cover_items : []
+    end
+  end
   has_one :parent_collection_card
   has_one :parent
   has_one :live_test_collection
