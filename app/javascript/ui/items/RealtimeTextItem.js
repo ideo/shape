@@ -75,8 +75,9 @@ const StyledContainer = styled.div`
 class RealtimeTextItem extends React.Component {
   channelName = 'ItemRealtimeChannel'
   // state = { loading: false }
+  state = { disconnected: false }
   saveTimer = null
-  version = 0
+  version = null
   combinedDelta = new Delta()
   bufferDelta = new Delta()
   contentSnapshot = new Delta()
@@ -90,40 +91,44 @@ class RealtimeTextItem extends React.Component {
   }
 
   componentDidMount() {
-    window.fake = () =>
-      ChannelManager.unsubscribeAllFromChannel(this.channelName)
-
     this.subscribeToItemEditingChannel()
 
     if (!this.reactQuillRef) return
-    this.initQuillRefsAndData()
+    this.initQuillRefsAndData({ initSnapshot: true })
     setTimeout(() => {
       this.quillEditor.focus()
     }, 100)
   }
 
-  componentDidUpdate() {
-    this.initQuillRefsAndData()
+  componentDidUpdate(prevProps) {
+    const initSnapshot = !prevProps.fullyLoaded && this.props.fullyLoaded
+    // if we just "fully loaded" then make sure to update this.contentSnapshot and version
+    this.initQuillRefsAndData({ initSnapshot })
   }
 
   componentWillUnmount() {
+    this.sendCombinedDelta.flush()
+    this.unmounted = true
     ChannelManager.unsubscribeAllFromChannel(this.channelName)
   }
 
   subscribeToItemEditingChannel() {
     const { item } = this.props
     this.channel = ChannelManager.subscribe(this.channelName, item.id, {
+      channelConnected: this.channelConnected,
       channelDisconnected: this.channelDisconnected,
       channelReceivedData: this.channelReceivedData,
     })
   }
 
-  initQuillRefsAndData = () => {
+  initQuillRefsAndData = ({ initSnapshot } = {}) => {
     if (!this.reactQuillRef) return
     if (typeof this.reactQuillRef.getEditor !== 'function') return
-    if (this.quillEditor) return
+    // if (!this.quillEditor) {
+    // }
     this.quillEditor = this.reactQuillRef.getEditor()
 
+    if (!initSnapshot) return
     const { item } = this.props
     this.version = item.data_content.version || 0
     this.contentSnapshot = this.quillEditor.getContents()
@@ -134,8 +139,25 @@ class RealtimeTextItem extends React.Component {
     cursors.createCursor(id, name, v.colors.tertiaryMedium)
   }
 
+  channelConnected = () => {
+    if (this.unmounted) return
+    this.setState({ disconnected: false })
+  }
+
+  channelDisconnected = () => {
+    if (this.unmounted) return
+    // TODO: do anything here? try to reconnect?
+    console.warn('Disconnected from channel')
+    const { fullPageView } = this.props
+    if (!fullPageView) {
+      this.cancel()
+      return
+    }
+    this.setState({ disconnected: true })
+  }
+
   channelReceivedData = ({ current_editor, data, num_viewers }) => {
-    // console.log({ current_editor, data, num_viewers })
+    if (this.unmounted) return
     if (data && data.delta) {
       this.handleReceivedDelta({ current_editor, data })
     }
@@ -155,17 +177,17 @@ class RealtimeTextItem extends React.Component {
   handleReceivedDelta = ({ current_editor, data }) => {
     const remoteDelta = new Delta(data.delta)
 
-    if (data.error) {
-      if (current_editor.id === this.props.currentUserId) {
-        // try again
-        this.sendCombinedDelta()
-      }
-      return
-    }
-
     // update our local version number
     if (data.version) {
       this.version = data.version
+    }
+
+    if (data.error) {
+      if (current_editor.id === this.props.currentUserId) {
+        // try again, perhaps by now we have the up-to-date version
+        this.sendCombinedDelta()
+      }
+      return
     }
 
     // update for later sending appropriately composed version to be saved
@@ -178,6 +200,8 @@ class RealtimeTextItem extends React.Component {
         remoteDelta
       )
       this.quillEditor.updateContents(remoteDeltaWithLocalChanges, 'silent')
+      // persist local changes
+      this.setItemDataContent()
 
       if (this.combinedDelta.length()) {
         // transform our awaiting content, prioritizing the remote delta
@@ -192,7 +216,9 @@ class RealtimeTextItem extends React.Component {
   }
 
   get canEdit() {
-    return this.props.item.can_edit_content
+    const { item, fullyLoaded } = this.props
+    const { disconnected } = this.state
+    return item.can_edit_content && fullyLoaded && !disconnected
   }
 
   get dataContent() {
@@ -202,22 +228,21 @@ class RealtimeTextItem extends React.Component {
 
   cancel = ev => {
     const { onCancel } = this.props
+    // NOTE: in non-fullPageView cancel also means "save current text"!
     if (!this.canEdit) return onCancel(this.props.item, ev)
-    const item = this.getCurrentText()
+    const item = this.setItemDataContent()
     return onCancel(item, ev)
   }
 
-  getCurrentText() {
+  setItemDataContent() {
     const { item } = this.props
     const { quillEditor } = this
     item.content = quillEditor.root.innerHTML
-    item.data_content = quillEditor.getContents()
+    item.data_content = {
+      ...quillEditor.getContents(),
+      version: this.version,
+    }
     return item
-  }
-
-  channelDisconnected = () => {
-    // TODO: do anything here? try to reconnect?
-    this.cancel()
   }
 
   handleTextChange = (content, delta, source, editor) => {
@@ -236,6 +261,11 @@ class RealtimeTextItem extends React.Component {
     }
   }
 
+  handleBlur = () => {
+    const { fullPageView } = this.props
+    if (!fullPageView) this.cancel()
+  }
+
   combineAwaitingDeltas = delta => {
     this.combinedDelta = this.combinedDelta.compose(delta)
     this.bufferDelta = this.bufferDelta.compose(delta)
@@ -251,12 +281,10 @@ class RealtimeTextItem extends React.Component {
     if (!this.combinedDelta.ops.length) {
       return false
     }
-    if (this.waitingForVersion === this.version) {
-      // try again in a little bit
-      return setTimeout(this.sendCombinedDelta, 125)
-    }
 
     const full_content = this.contentSnapshot.compose(this.combinedDelta)
+    // NOTE: will get rejected if this.version < server saved version,
+    // in which case the handleReceivedDelta error will try to resend
     this.socketSend('delta', {
       version: this.version,
       delta: this.combinedDelta,
@@ -266,10 +294,11 @@ class RealtimeTextItem extends React.Component {
     this.sendCursor()
 
     // persist the change locally e.g. when we close the text box
-    this.props.item.data_content = full_content
+    this.props.item.data_content = {
+      ...full_content,
+      version: this.version,
+    }
 
-    this.waitingForVersion = this.version
-    // this.lastSentDelta = new Delta(this.combinedDelta)
     this.bufferDelta = new Delta()
     return this.combinedDelta
   }
@@ -280,10 +309,9 @@ class RealtimeTextItem extends React.Component {
       this.props.item.id
     )
     if (!channel) {
-      console.warn('Disconnected from channel')
       // try to reconnect?
       // cancelling should close you out of the editor (i.e. force you to reopen/reconnect)
-      this.cancel()
+      this.channelDisconnected()
       return
     }
     this.channel.perform(method, data)
@@ -300,7 +328,7 @@ class RealtimeTextItem extends React.Component {
       theme: 'snow',
       onChange: this.handleTextChange,
       onChangeSelection: this.handleSelectionChange,
-      onBlur: this.cancel,
+      onBlur: this.handleBlur,
       readOnly: !canEdit,
       modules: {
         toolbar: canEdit ? '#quill-toolbar' : null,
@@ -335,13 +363,13 @@ class RealtimeTextItem extends React.Component {
 RealtimeTextItem.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   currentUserId: PropTypes.string.isRequired,
+  onCancel: PropTypes.func.isRequired,
+  fullyLoaded: PropTypes.bool.isRequired,
   onExpand: PropTypes.func,
-  onCancel: PropTypes.func,
   fullPageView: PropTypes.bool,
 }
 RealtimeTextItem.defaultProps = {
-  onExpand: () => null,
-  onCancel: () => null,
+  onExpand: null,
   fullPageView: false,
 }
 

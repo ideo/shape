@@ -84,9 +84,8 @@ class PageWithApiWrapper extends React.Component {
       .then(res => {
         if (this.unmounted) return
         const { data } = res
-        this.setState({ data }, () => {
-          data.fullyLoaded = true
-        })
+        data.fullyLoaded = true
+        this.setState({ data })
       })
       .catch(err => {
         uiStore.update('pageError', err)
@@ -146,6 +145,6 @@ export const ItemApiWrapper = routerProps => (
   <PageWithApiWrapper
     {...routerProps}
     fetchType="items"
-    render={item => <ItemPage item={item} />}
+    render={item => <ItemPage item={item} fullyLoaded={item.fullyLoaded} />}
   />
 )

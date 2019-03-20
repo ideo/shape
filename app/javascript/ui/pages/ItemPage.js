@@ -79,9 +79,10 @@ class ItemPage extends React.Component {
           <RealtimeTextItem
             onCancel={this.cancel}
             item={item}
-            key={item.data_content.version || 0}
             currentUserId={apiStore.currentUserId}
             fullPageView
+            // this is important so we have the right data_content snapshot
+            fullyLoaded={item.fullyLoaded}
           />
         )
       case ITEM_TYPES.EXTERNAL_IMAGE:

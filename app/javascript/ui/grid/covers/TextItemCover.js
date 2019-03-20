@@ -148,6 +148,8 @@ class TextItemCover extends React.Component {
         currentUserId={apiStore.currentUser.id}
         onExpand={item.id ? this.expand : null}
         onCancel={this.blur}
+        // if we are rendering editing then the item has been fetched
+        fullyLoaded
       />
     )
   }
