@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import CardMenuIcon from '~/ui/icons/CardMenuIcon'
 import MenuIcon from '~/ui/icons/MenuIcon'
+import PlusIcon from '~/ui/icons/PlusIcon'
 import { BctButton } from '~/ui/grid/shared'
 import v from '~/utils/variables'
 
@@ -64,6 +65,22 @@ export const StyledMenuWrapper = styled.div`
     (props.direction === 'right' ? 'left: 0; top: 42px;' : 'right: -32px;')};
 `
 StyledMenuWrapper.displayName = 'StyledMenuWrapper'
+
+export const ComparisonMenuToggle = styled.div`
+  background-color: ${v.colors.commonLight};
+  border-radius: 50%;
+  padding: 7px;
+  height: 15px;
+  width: 15px;
+  &:hover,
+  &:active {
+    background-color: ${v.colors.commonMedium};
+  }
+  .icon {
+    width: 15px;
+    height: 15px;
+  }
+`
 
 export const StyledMenu = styled.ul`
   background-color: white;
@@ -167,6 +184,34 @@ class PopoutMenu extends React.Component {
     return rendered
   }
 
+  buttonStyleIcon = buttonStyle => {
+    switch (buttonStyle) {
+      case 'bct':
+        return <MenuIcon viewBox="-11 -11 26 40" />
+      case 'card':
+        return (
+          <CardActionHolder>
+            <CardMenuIcon />
+          </CardActionHolder>
+        )
+      case 'comparison':
+        return <PlusIcon viewBox="0 0 5 18" />
+      default:
+        return <MenuIcon viewBox="0 0 5 18" />
+    }
+  }
+
+  buttonStyleMenuToggle = buttonStyle => {
+    switch (buttonStyle) {
+      case 'bct':
+        return BctButton
+      case 'comparison':
+        return ComparisonMenuToggle
+      default:
+        return StyledMenuToggle
+    }
+  }
+
   render() {
     const {
       className,
@@ -184,15 +229,9 @@ class PopoutMenu extends React.Component {
 
     const isBct = buttonStyle === 'bct'
     const isCard = buttonStyle === 'card'
-    const MenuToggle = isBct ? BctButton : StyledMenuToggle
-    let icon = <MenuIcon viewBox="0 0 5 18" />
-    if (isBct) icon = <MenuIcon viewBox="-11 -11 26 40" />
-    if (isCard)
-      icon = (
-        <CardActionHolder>
-          <CardMenuIcon />
-        </CardActionHolder>
-      )
+
+    const MenuToggle = this.buttonStyleMenuToggle(buttonStyle)
+    const icon = this.buttonStyleIcon(buttonStyle)
     return (
       <StyledMenuButtonWrapper
         className={`${wrapperClassName} ${menuOpen && ' open'}`}
