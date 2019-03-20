@@ -18,11 +18,8 @@ class ItemRealtimeChannel < ApplicationCable::Channel
   def delta(data)
     # update delta with transformed one
     new_data = item.threadlocked_transform_realtime_delta(Mashie.new(data))
-    if new_data
-      item.received_changes(new_data, current_user)
-    else
-      item.received_changes({ error: 'failed' }, current_user)
-    end
+    # new_data may include an error message
+    item.received_changes(new_data, current_user)
   rescue ActiveRecord::RecordNotFound
     nil
   end

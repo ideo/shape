@@ -41,13 +41,17 @@ class Item
         )
       end
     rescue RedisMutex::LockError
-      false
+      # error needs to alert the frontend to the latest version
+      { error: 'locked', version: data_content['version'].to_i }
     end
 
     def transform_realtime_delta(delta:, version:, full_content:)
       saved_version = data_content['version'].to_i
 
-      return false if version.to_i < saved_version
+      if version.to_i < saved_version
+        # error needs to alert the frontend to the latest version
+        return { error: 'locked', version: saved_version }
+      end
       full_content['version'] = saved_version + 1
       # NOTE: is a "full update" too heavy here for performance, or ok?
       # it basically means it's calling a few related updates on the parent / cards
@@ -59,10 +63,6 @@ class Item
     end
 
     private
-
-    def realtime_data_key
-      "#{self.class.base_class.name}_#{id}_realtime"
-    end
 
     # on_create callback
     def generate_name
