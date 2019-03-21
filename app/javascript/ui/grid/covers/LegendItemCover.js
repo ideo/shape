@@ -115,7 +115,7 @@ class LegendItemCover extends React.Component {
     const { measure, style } = measureData
     let icon
     if (primary) {
-      icon = <AreaChartMeasure color={style.fill || '#000000'} />
+      icon = <AreaChartMeasure color={(style && style.fill) || '#000000'} />
     } else {
       icon = (
         <LineChartMeasure
