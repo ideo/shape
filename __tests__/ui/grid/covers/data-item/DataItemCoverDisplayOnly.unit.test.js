@@ -31,7 +31,7 @@ describe('DataItemCoverDisplayOnly', () => {
     expect(wrapper.find('ChartGroup').exists()).toBe(true)
     expect(wrapper.find('ChartGroup').props()).toEqual({
       datasets: props.item.datasets,
-      showMeasureInTooltip: false,
+      simpleDateTooltip: true,
       width: 1,
       height: 1,
     })

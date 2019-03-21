@@ -8,7 +8,7 @@ let wrapper, render
 describe('AreaChart', () => {
   beforeEach(() => {
     props.dataset = fakeDataset
-    props.showMeasureInTooltip = true
+    props.simpleDateTooltip = true
     render = () => (wrapper = shallow(<AreaChart {...props} />))
     render()
   })

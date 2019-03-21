@@ -46,6 +46,7 @@ class Item < ApplicationRecord
 
   scope :questions, -> { where(type: 'Item::QuestionItem') }
   scope :data_items, -> { where(type: 'Item::DataItem') }
+  scope :legend_items, -> { where(type: 'Item::LegendItem') }
 
   before_validation :format_url, if: :saved_change_to_url?
   before_create :generate_name, unless: :name_present?

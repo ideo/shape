@@ -276,7 +276,7 @@ class DataItemCoverCollectionsItems extends React.Component {
         </AboveChartContainer>
         <ChartGroup
           datasets={item.datasets}
-          showMeasureInTooltip={item.isReportTypeCollectionsItems}
+          simpleDateTooltip={!item.isReportTypeCollectionsItems}
           width={card.width}
           height={card.height}
         />

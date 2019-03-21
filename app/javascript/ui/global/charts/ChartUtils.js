@@ -53,7 +53,10 @@ export const chartDomainForDatasetValues = ({ values, maxDomain }) => {
   }
 }
 
-export const renderTooltip = ({
+export const dateTooltipText = datum =>
+  `${datum.value} on ${utcMoment(datum.date).format('l')}`
+
+export const advancedTooltipText = ({
   datum,
   isLastDataPoint,
   timeframe,

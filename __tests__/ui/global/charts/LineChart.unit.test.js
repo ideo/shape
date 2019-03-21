@@ -8,7 +8,7 @@ let wrapper, render
 describe('LineChart', () => {
   beforeEach(() => {
     props.dataset = fakeDataset
-    props.showMeasureInTooltip = true
+    props.simpleDateTooltip = true
     render = () => (wrapper = shallow(<LineChart {...props} />))
     render()
   })

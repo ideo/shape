@@ -91,7 +91,7 @@ exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
       ]
     }
     height={1}
-    showMeasureInTooltip={false}
+    simpleDateTooltip={true}
     width={1}
   />
 </StyledDataItemCover>

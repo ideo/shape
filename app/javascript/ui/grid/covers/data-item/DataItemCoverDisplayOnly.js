@@ -1,5 +1,4 @@
 import { PropTypes as MobxPropTypes } from 'mobx-react'
-import { startCase } from 'lodash'
 import styled from 'styled-components'
 
 import { DisplayText } from '~/ui/global/styled/typography'
@@ -24,9 +23,6 @@ const StyledInfoIcon = styled.div`
 class DataItemCoverDisplayOnly extends React.Component {
   get title() {
     const { item } = this.props
-    const primaryDatasetMeasure =
-      item.primaryDataset && item.primaryDataset.measure
-    if (primaryDatasetMeasure) return startCase(primaryDatasetMeasure)
     return item.name
   }
 
@@ -68,6 +64,7 @@ class DataItemCoverDisplayOnly extends React.Component {
           datasets={item.datasets}
           width={card.width}
           height={card.height}
+          simpleDateTooltip
         />
       </StyledDataItemCover>
     )

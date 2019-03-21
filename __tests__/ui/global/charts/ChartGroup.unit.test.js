@@ -15,7 +15,7 @@ describe('ChartGroup', () => {
         chart_type: 'line',
       },
     ]
-    props.showMeasureInTooltip = true
+    props.simpleDateTooltip = true
     render = () => (wrapper = shallow(<ChartGroup {...props} />))
     render()
   })

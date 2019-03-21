@@ -109,7 +109,7 @@ class ChartTooltip extends React.PureComponent {
           cornerRadius={2}
           flyoutComponent={<DotFlyout />}
           height={40}
-          width={140}
+          width={180}
           dx={dx * 5}
           dy={0}
           style={{

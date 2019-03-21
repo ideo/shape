@@ -4,7 +4,8 @@ import { VictoryLine } from 'victory'
 import ChartTooltip from '~/ui/global/charts/ChartTooltip'
 import {
   datasetPropType,
-  renderTooltip,
+  dateTooltipText,
+  advancedTooltipText,
   addDuplicateValueIfSingleValue,
   chartDomainForDatasetValues,
   lineChartDashWithForOrder,
@@ -33,20 +34,25 @@ const chartStyle = dataset => {
   }
 }
 
-const LineChart = ({ dataset, showMeasureInTooltip, cardArea }) => {
+const LineChart = ({ dataset, simpleDateTooltip, cardArea }) => {
   const { measure, timeframe } = dataset
   const values = formatValues(dataset.data)
   const domain = chartDomainForDatasetValues({
     values,
     maxDomain: dataset.max_domain,
   })
-  const tooltipFn = (datum, isLastDataPoint) =>
-    renderTooltip({
-      datum,
-      isLastDataPoint,
-      timeframe,
-      measure: showMeasureInTooltip ? measure : null,
-    })
+  let tooltipFn
+  if (simpleDateTooltip) {
+    tooltipFn = datum => dateTooltipText(datum)
+  } else {
+    tooltipFn = (datum, isLastDataPoint) =>
+      advancedTooltipText({
+        datum,
+        isLastDataPoint,
+        timeframe,
+        measure,
+      })
+  }
   return (
     <VictoryLine
       labels={d => d.value}
@@ -63,13 +69,13 @@ const LineChart = ({ dataset, showMeasureInTooltip, cardArea }) => {
 
 LineChart.propTypes = {
   dataset: datasetPropType.isRequired,
-  showMeasureInTooltip: PropTypes.bool,
+  simpleDateTooltip: PropTypes.bool,
   cardArea: PropTypes.number,
 }
 
 LineChart.defaultProps = {
   cardArea: 1,
-  showMeasureInTooltip: false,
+  simpleDateTooltip: false,
 }
 
 export default LineChart
