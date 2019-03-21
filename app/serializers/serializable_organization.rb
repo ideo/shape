@@ -1,7 +1,8 @@
 class SerializableOrganization < BaseJsonSerializer
   include SerializedExternalId
   type 'organizations'
-  attributes :name, :domain_whitelist, :slug, :active_users_count, :trial_users_count, :in_app_billing, :deactivated, :terms_text_item_id
+  attributes :name, :domain_whitelist, :slug, :active_users_count, :has_payment_method,
+             :trial_users_count, :in_app_billing, :deactivated, :terms_text_item_id
   belongs_to :primary_group
   belongs_to :guest_group
   belongs_to :admin_group
