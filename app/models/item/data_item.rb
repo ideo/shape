@@ -52,6 +52,25 @@ class Item
       end
     end
 
+    def create_legend_item(parent_collection = nil)
+      parent_collection ||= parent
+      builder = CollectionCardBuilder.new(
+        params: {
+          order: parent_collection_card.order + 1,
+          item_attributes: {
+            type: 'Item::LegendItem',
+          },
+        },
+        parent_collection: parent_collection,
+      )
+      if builder.create
+        update(legend_item: builder.collection_card.record)
+      else
+        errors.add(:legend_item, builder.errors.full_messages.join('. '))
+        throw :abort
+      end
+    end
+
     private
 
     def load_datasets
@@ -85,24 +104,6 @@ class Item
 
     def create_legend_item?
       report_type_record? && legend_item.blank? && parent_collection_card.present?
-    end
-
-    def create_legend_item
-      builder = CollectionCardBuilder.new(
-        params: {
-          order: parent_collection_card.order + 1,
-          item_attributes: {
-            type: 'Item::LegendItem',
-          },
-        },
-        parent_collection: parent,
-      )
-      if builder.create
-        update(legend_item: builder.collection_card.record)
-      else
-        errors.add(:legend_item, builder.errors.full_messages.join('. '))
-        throw :abort
-      end
     end
   end
 end

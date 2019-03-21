@@ -63,15 +63,17 @@ FactoryBot.define do
           datasets: [
             {
               measure: 'IDEO',
+              chart_type: 'area',
               single_value: 0,
               order: 0,
-              data: [{ date: '2018-10-03', amount: 80 }],
+              data: [{ date: '2018-10-03', value: 80 }],
             },
             {
               measure: 'All Organizations',
+              chart_type: 'line',
               single_value: 0,
               order: 1,
-              data: [{ date: '2018-11-13', amount: 24 }],
+              data: [{ date: '2018-11-13', value: 24 }],
             },
           ],
         )

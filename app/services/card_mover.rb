@@ -19,6 +19,7 @@ class CardMover
     @existing_cards = []
     @pinned_cards = []
     @to_collection_cards = []
+    @legend_items_to_duplicate = []
     @errors = []
   end
 
@@ -27,6 +28,8 @@ class CardMover
     select_existing_cards
     select_pinned_cards
     select_to_collection_cards
+    include_legends_in_to_collection_cards
+    duplicate_or_link_legend_items
     move_cards_to_collection
     recalculate_cached_values
     update_template_instances
@@ -35,6 +38,14 @@ class CardMover
   end
 
   private
+
+  def move?
+    @card_action == 'move'
+  end
+
+  def link?
+    @card_action == 'link'
+  end
 
   def select_existing_cards
     cards = @to_collection.collection_cards
@@ -50,22 +61,24 @@ class CardMover
   end
 
   def select_to_collection_cards
-    if @card_action == 'move'
+    if move?
       # minus any we're moving (i.e. moving within the same collection)
       @existing_cards.reject! { |card| @moving_cards.include? card }
       unless @to_collection == @from_collection
         @should_update_from_cover = @moving_cards.any?(&:should_update_parent_collection_cover?)
       end
-    elsif @card_action == 'link'
+    elsif link?
       # for links, we build new link cards out of our selected moving ones
       @moving_cards = @moving_cards.map(&:copy_into_new_link_card)
     end
+
     # created joined array with moving_cards either at beginning or end
     if @placement == 'beginning'
       @to_collection_cards = (@pinned_cards + @moving_cards + @existing_cards)
     else
       @to_collection_cards = (@pinned_cards + @existing_cards + @moving_cards)
     end
+
     # uniq the array because we may be moving within the same collection
     @to_collection_cards.uniq!
   end
@@ -76,7 +89,7 @@ class CardMover
       # parent_id will already be set for existing_cards but no harm to indicate
       card.assign_attributes(parent_id: @to_collection.id, order: i)
       if @to_collection.master_template?
-        # currently any cards created in master_templates become pinned
+        # Currently any cards created in master_templates become pinned
         card.assign_attributes(pinned: true)
       end
       if card.changed?
@@ -88,7 +101,7 @@ class CardMover
   end
 
   def recalculate_cached_values
-    unless @card_action == 'link' || @from_collection == @to_collection
+    unless link? || @from_collection == @to_collection
       @from_collection.touch
       @from_collection.reload.reorder_cards!
       @from_collection.cache_card_count!
@@ -104,9 +117,75 @@ class CardMover
     @to_collection.queue_update_template_instances if @to_collection.master_template?
   end
 
+  def to_collection_data_items
+    @to_collection_cards.select do |card|
+      card.item&.is_a?(Item::DataItem)
+    end.map(&:item)
+  end
+
+  def to_collection_legend_items
+    @to_collection_cards.select do |card|
+      card.item.is_a?(Item::LegendItem)
+    end.map(&:item)
+  end
+
+  # If they are moving a data item that has a legend,
+  # but haven't selected the legend, move it as well
+  def include_legends_in_to_collection_cards
+    all_data_item_legends = to_collection_data_items.map(&:legend_item).compact
+    legends_missing = all_data_item_legends - to_collection_legend_items
+
+    # Return because all linked legends are included in the `to_collection`
+    return if legends_missing.blank?
+
+    to_collection_data_item_ids = to_collection_data_items.map(&:id)
+
+    # Include any legends that are missing
+    legends_missing.each do |legend_item|
+      # If the legend is only linked to data items in `to_collection`, move it
+      if (legend_item.data_item_ids - to_collection_data_item_ids).size.zero?
+        @moving_cards.push(legend_item.parent_collection_card)
+        @to_collection_cards.push(legend_item.parent_collection_card)
+      else
+        # Otherwise we need to create a new legend
+        @legend_items_to_duplicate.push(legend_item)
+      end
+    end
+  end
+
+  def duplicate_or_link_legend_items
+    return if @legend_items_to_duplicate.blank?
+
+    @legend_items_to_duplicate.each do |legend_item|
+      if move?
+        duplicate = legend_item.duplicate!(
+          for_user: nil,
+          copy_parent_card: true,
+          parent: @to_collection,
+          system_collection: false,
+          synchronous: true,
+        )
+        if duplicate.persisted?
+          # Connect to all data items it was connected to
+          # Only including data items now in the `to_collection`
+          add_to_data_items = to_collection_data_items & legend_item.data_items
+          add_to_data_items.each do |data_item|
+            data_item.update(legend_item: duplicate)
+          end
+        else
+          @errors << "Could not copy legend: #{duplicate.errors.full_messages.join('. ')}"
+        end
+      elsif link?
+        linked_card = legend_item.parent_collection_card.copy_into_new_link_card
+        @moved_cards.push(linked_card)
+        @to_collection_cards.push(linked_card)
+      end
+    end
+  end
+
   def to_collection_invalid
     # these only apply for moving actions
-    return unless @card_action == 'move'
+    return unless move?
     # Not allowed to move between organizations
     if @to_collection.organization_id != @from_collection.organization_id
       @errors << 'You can\'t move a collection to a different organization.'
@@ -132,7 +211,7 @@ class CardMover
 
   def assign_permissions
     return if @to_collection == @from_collection
-    return unless @card_action == 'move'
+    return unless move?
     @moving_cards.each do |card|
       Roles::MergeToChild.call(parent: @to_collection, child: card.record)
     end
