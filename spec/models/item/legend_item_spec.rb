@@ -9,10 +9,10 @@ RSpec.describe Item::LegendItem, type: :model do
       legend_item: legend_item)
   end
   let(:primary_dataset) do
-    data_item.datasets.find { |dataset| dataset[:order].zero? }
+    data_item.all_datasets.find { |dataset| dataset[:order].zero? }
   end
   let(:comparison_datasets) do
-    data_item.datasets.select { |dataset| dataset[:order] > 0 }
+    data_item.all_datasets.select { |dataset| dataset[:order] > 0 }
   end
 
   describe '#primary_measure' do
@@ -20,6 +20,7 @@ RSpec.describe Item::LegendItem, type: :model do
       expect(legend_item.primary_measure).to eq(
         measure: primary_dataset[:measure],
         style: primary_dataset[:style],
+        order: 0
       )
     end
   end
@@ -29,10 +30,11 @@ RSpec.describe Item::LegendItem, type: :model do
       expect(
         legend_item.comparison_measures,
       ).to eq(
-        comparison_datasets.map do |dataset|
+        comparison_datasets.map.with_index do |dataset, i|
           {
             measure: dataset[:measure],
             style: dataset[:style],
+            order: i + 1,
           }
         end,
       )

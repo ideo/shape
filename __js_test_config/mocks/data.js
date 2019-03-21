@@ -136,6 +136,7 @@ export const fakeDataItemRecordAttrs = {
   ...fakeTextItemAttrs,
   type: 'Item::DataItem',
   data_content: null,
+  name: 'Data Item',
   report_type: 'report_type_record',
   isReportTypeCollectionsItems: false,
   isReportTypeNetworkAppMetric: false,

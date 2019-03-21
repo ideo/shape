@@ -69,8 +69,12 @@ RSpec.describe Item::DataItem, type: :model do
   end
 
   describe '#datasets' do
-    let(:network_app_metric_double) { double('DataReport::NetworkAppMetric', call: true) }
-    let(:collections_and_items_double) { double('DataReport::CollectionsAndItems', call: true) }
+    let(:network_app_metric_double) do
+      double('DataReport::NetworkAppMetric', call: [])
+    end
+    let(:collections_and_items_double) do
+      double('DataReport::CollectionsAndItems', call: [])
+    end
 
     before do
       allow(DataReport::NetworkAppMetric).to receive(:new).and_return(
@@ -111,12 +115,18 @@ RSpec.describe Item::DataItem, type: :model do
         )
       end
       let(:legend) { data_item.legend_item }
+      let(:primary_dataset) do
+        data_item
+          .data_content['datasets']
+          .map(&:deep_symbolize_keys)
+          .find { |dataset| dataset[:order] == 0 }
+      end
 
-      it 'should return datasets' do
+      it 'should return dataset with order 0' do
         expect(
           data_item.datasets,
         ).to eq(
-          data_item.data_content['datasets'].map(&:deep_symbolize_keys),
+          [primary_dataset],
         )
       end
 
@@ -129,9 +139,9 @@ RSpec.describe Item::DataItem, type: :model do
       it 'does not filter if selected_measures is blank' do
         expect(legend.selected_measures.blank?).to be true
         expect(
-          data_item.all_datasets.map { |dataset| dataset[:measure] },
+          data_item.datasets,
         ).to match_array(
-          data_item.datasets.map { |dataset| dataset[:measure] },
+          [primary_dataset],
         )
       end
 

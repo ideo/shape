@@ -17,14 +17,14 @@ describe('DataItemCoverDisplayOnly', () => {
     expectTreeToMatchSnapshot(wrapper)
   })
 
-  it('should render measure name', () => {
+  it('should render item name', () => {
     expect(
       wrapper
-        .find('StyledDisplayText')
+        .find('StyledHeading3')
         .children()
         .first()
         .text()
-    ).toEqual(props.item.primaryDataset.measure)
+    ).toEqual(props.item.name)
   })
 
   it('should render a chart', () => {
