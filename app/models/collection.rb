@@ -77,6 +77,12 @@ class Collection < ApplicationRecord
           inverse_of: :collection,
           dependent: :destroy
 
+  has_many :collection_cover_cards,
+           -> { active.is_cover.ordered },
+           class_name: 'CollectionCard::Primary',
+           foreign_key: :parent_id,
+           inverse_of: :parent
+
   has_many :items, through: :primary_collection_cards
   has_many :collections, through: :primary_collection_cards
   has_many :items_and_linked_items,
@@ -85,6 +91,9 @@ class Collection < ApplicationRecord
   has_many :collections_and_linked_collections,
            through: :collection_cards,
            source: :collection
+  has_many :collection_cover_items,
+           through: :collection_cover_cards,
+           source: :item
 
   has_one :comment_thread, as: :record, dependent: :destroy
 
@@ -113,6 +122,11 @@ class Collection < ApplicationRecord
   enum processing_status: {
     processing_breadcrumb: 1,
     duplicating: 2,
+  }
+
+  enum cover_type: {
+    cover_type_default: 0,
+    cover_type_items: 1,
   }
 
   # Searchkick Config
@@ -202,6 +216,7 @@ class Collection < ApplicationRecord
       :submission_template,
       :collection_to_test,
       :live_test_collection,
+      :collection_cover_items,
       roles: %i[pending_users users groups resource],
     ]
   end
@@ -428,7 +443,7 @@ class Collection < ApplicationRecord
     end
 
     cards = cards
-            .includes(:collection, item: [:filestack_file])
+            .includes(collection: [:collection_cover_items], item: [:filestack_file])
             .order(order)
             .page(page)
             .per(per_page)
@@ -509,7 +524,7 @@ class Collection < ApplicationRecord
   end
 
   def cache_cover
-    self.cached_cover = CollectionCover.call(self)
+    self.cached_cover = DefaultCollectionCover.call(self)
   end
 
   def cache_cover!
@@ -527,7 +542,7 @@ class Collection < ApplicationRecord
   end
 
   def update_cover_text!(text_item)
-    cached_cover['text'] = CollectionCover.cover_text(self, text_item)
+    cached_cover['text'] = DefaultCollectionCover.cover_text(self, text_item)
     save
   end
 

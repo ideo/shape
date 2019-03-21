@@ -12,7 +12,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     render jsonapi: @collection_cards,
            include: [
              :parent,
-             record: [:filestack_file],
+             record: %i[filestack_file collection_cover_items],
            ],
            expose: {
              card_order: params[:card_order],
@@ -324,6 +324,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         template_id
         master_template
         external_id
+        cover_type
       ],
       item_attributes: [
         :id,

@@ -285,13 +285,35 @@ class GridCard extends React.Component {
     this.props.handleClick(e)
   }
 
+  get renderCover() {
+    const { card, height, dragging, searchResult, handleClick } = this.props
+    let { record, cardType } = this.props
+    const { collection_cover_items } = record
+    const coverItem =
+      collection_cover_items && collection_cover_items.length > 0
+    if (coverItem) {
+      // Instead use the item for the cover rather than the collection
+      record = collection_cover_items[0]
+      cardType = 'items'
+    }
+    return (
+      <CoverRenderer
+        card={card}
+        cardType={cardType}
+        coverItem={coverItem}
+        record={record}
+        height={height}
+        dragging={dragging}
+        searchResult={searchResult}
+        handleClick={handleClick}
+      />
+    )
+  }
+
   render() {
     const {
       card,
-      cardType,
-      handleClick,
       record,
-      height,
       canEditCollection,
       dragging,
       draggingMultiple,
@@ -384,15 +406,7 @@ class GridCard extends React.Component {
           filter={card.filter}
           forceFilter={!this.hasCover}
         >
-          <CoverRenderer
-            card={card}
-            cardType={cardType}
-            record={record}
-            height={height}
-            dragging={dragging}
-            searchResult={searchResult}
-            handleClick={handleClick}
-          />
+          {this.renderCover}
         </StyledGridCardInner>
         <TagEditorModal
           canEdit={this.canEditCard}

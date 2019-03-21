@@ -36,6 +36,7 @@ class CollectionCard < ApplicationRecord
   scope :pinned, -> { where(pinned: true) }
   scope :unpinned, -> { where(pinned: false) }
   scope :visible, -> { where(hidden: false) }
+  scope :is_cover, -> { where(is_cover: true) }
 
   enum filter: {
     nothing: 0,
