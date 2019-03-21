@@ -10,6 +10,8 @@ class ReportsController < ApplicationController
       @report = GciExport.projects_report
     elsif params[:id] == 'org-user-report'
       @report = OrganizationUserReport.all_user_counts
+    elsif params[:id] == 'shape-user-report'
+      @report = ShapeUserReport.all_users
     end
     respond_to do |format|
       format.any { send_data @report, filename: "#{params[:id]}-#{Date.today}.csv" }
