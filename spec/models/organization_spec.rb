@@ -297,7 +297,7 @@ describe Organization, type: :model do
 
   describe '#setup_user_membership_and_collections' do
     let(:user) { create(:user, email: 'jill@ideo.com') }
-    let(:getting_started) { create(:global_collection) }
+    let(:getting_started) { create(:global_collection, name: 'Getting Started') }
     let!(:subcollection_cards) { create_list(:collection_card_collection, 2, parent: getting_started) }
     let!(:item_cards) { create_list(:collection_card_text, 2, parent: getting_started) }
     let!(:organization) do
@@ -305,13 +305,15 @@ describe Organization, type: :model do
       create(:organization, domain_whitelist: ['ideo.com'], getting_started_collection: getting_started, member: user)
     end
 
-    it 'should create a UserCollection, SharedWithMeCollection and Getting Started collection for the user' do
+    it 'should create a UserCollection with SharedWithMeCollection and Getting Started collection for the user' do
       # SharedWithMe and Getting Started live within the user collection
       expect(user.current_user_collection.collections.size).to eq(2)
+      # SharedWithMe card is hidden for now
+      expect(user.current_user_collection.collection_cards.visible.count).to eq(1)
     end
 
     it 'should set the Getting Started copy collections to getting_started_shell' do
-      gs_copy = user.current_user_collection.collections.last
+      gs_copy = user.current_user_collection.collections.where(type: nil).last
       expect(gs_copy.cloned_from).to eq getting_started
       # all collections in the copy should be marked with the getting_started_shell attr
       expect(gs_copy.collections.map(&:getting_started_shell).all?).to eq true

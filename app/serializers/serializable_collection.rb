@@ -142,4 +142,8 @@ class SerializableCollection < BaseJsonSerializer
   attribute :test_collection_id, if: -> { @object.is_a?(Collection::TestDesign) } do
     @object.test_collection.id.to_s
   end
+
+  attribute :awaiting_updates do
+    @object.getting_started_shell || @object.awaiting_first_user_content
+  end
 end

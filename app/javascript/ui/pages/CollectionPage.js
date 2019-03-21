@@ -34,6 +34,7 @@ class CollectionPage extends React.Component {
   @observable
   cardsFetched = false
 
+  updatePoller = null
   editorTimeout = null
   channelName = 'CollectionViewingChannel'
 
@@ -95,6 +96,9 @@ class CollectionPage extends React.Component {
       if (uiStore.actionAfterRoute) {
         uiStore.performActionAfterRoute()
       }
+      if (collection.awaiting_updates) {
+        this.pollForUpdates()
+      }
     })
 
     // setViewingCollection has to happen first bc we use it in openBlankContentTool
@@ -121,6 +125,21 @@ class CollectionPage extends React.Component {
       uiStore.popupSnackbar({ message })
     }
     uiStore.update('dragTargets', [])
+  }
+
+  pollForUpdates() {
+    const { collection, apiStore } = this.props
+    this.updatePoller = setInterval(async () => {
+      console.log('pINNG!')
+      if (collection.awaiting_updates) {
+        const res = await apiStore.fetch('collections', collection.id, true)
+        if (!res.data.awaiting_updates) {
+          collection.API_fetchCards()
+        }
+      } else {
+        clearInterval(this.updatePoller)
+      }
+    }, 2000)
   }
 
   async checkSubmissionBox() {
@@ -183,7 +202,8 @@ class CollectionPage extends React.Component {
 
   async _reloadData() {
     const { collection } = this.props
-    collection.API_fetchCards({ per_page: collection.collection_cards.length })
+    const per_page = collection.collection_cards.length || 50
+    collection.API_fetchCards({ per_page })
     if (this.collection.submissions_collection) {
       this.setLoadedSubmissions(false)
       await this.collection.submissions_collection.API_fetchCards()
@@ -325,6 +345,7 @@ class CollectionPage extends React.Component {
     if (!collection) {
       return this.loader()
     }
+
     // NOTE: if we have first loaded the slimmer SerializableSimpleCollection via the CommentThread
     // then some fields like `can_edit` will be undefined.
     // So we check if the full Collection has loaded via the `can_edit` attr
@@ -332,6 +353,7 @@ class CollectionPage extends React.Component {
     const isLoading =
       collection.meta.snapshot.can_edit === undefined ||
       (!this.cardsFetched && collection.collection_cards.length === 0) ||
+      collection.awaiting_updates ||
       uiStore.isLoading
     const isTransparentLoading = !!uiStore.movingIntoCollection
 

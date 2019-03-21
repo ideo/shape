@@ -144,6 +144,7 @@ module Roles
     def link_to_shared_collections
       LinkToSharedCollectionsWorker.perform_async(
         shared_user_ids,
+        # NOTE: group_ids method here excludes Primary group
         group_ids,
         collections_to_link,
         items_to_link,
