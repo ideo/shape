@@ -55,11 +55,13 @@ describe('LegendItemCover', () => {
   })
 
   it('updates item when comparison is selected', () => {
-    const comparisonMenu = wrapper.find('PopoutMenu').at(0)
-    expect(comparisonMenu.props().menuItems.length).toEqual(
+    wrapper.find('.add-comparison-button').simulate('click')
+    const comparisonMenu = wrapper.find('StyledSelect').at(0)
+    expect(comparisonMenu.find('StyledSelectOption').length).toEqual(
       wrapper.instance().comparisonMeasures({ selected: false }).length
     )
-    comparisonMenu.props().menuItems[0].onClick()
+    const firstOption = comparisonMenu.find('StyledSelectOption').at(0)
+    firstOption.simulate('click')
     expect(props.item.save).toHaveBeenCalled()
     expect(props.card.parent.API_fetchCards).toHaveBeenCalled()
   })

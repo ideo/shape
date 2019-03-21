@@ -5,7 +5,6 @@ import styled from 'styled-components'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import CardMenuIcon from '~/ui/icons/CardMenuIcon'
 import MenuIcon from '~/ui/icons/MenuIcon'
-import PlusIcon from '~/ui/icons/PlusIcon'
 import { BctButton } from '~/ui/grid/shared'
 import v from '~/utils/variables'
 
@@ -65,23 +64,6 @@ export const StyledMenuWrapper = styled.div`
     (props.direction === 'right' ? 'left: 0; top: 42px;' : 'right: -32px;')};
 `
 StyledMenuWrapper.displayName = 'StyledMenuWrapper'
-
-export const ComparisonMenuToggle = styled.div`
-  background-color: ${v.colors.commonMedium};
-  transition: background-color 150ms;
-  border-radius: 50%;
-  padding: 7px;
-  height: 15px;
-  width: 15px;
-  &:hover,
-  &:active {
-    background-color: ${v.colors.commonDarkest};
-  }
-  .icon {
-    width: 15px;
-    height: 15px;
-  }
-`
 
 export const StyledMenu = styled.ul`
   background-color: white;
@@ -195,8 +177,6 @@ class PopoutMenu extends React.Component {
             <CardMenuIcon />
           </CardActionHolder>
         )
-      case 'comparison':
-        return <PlusIcon viewBox="0 0 5 18" />
       default:
         return <MenuIcon viewBox="0 0 5 18" />
     }
@@ -206,8 +186,6 @@ class PopoutMenu extends React.Component {
     switch (buttonStyle) {
       case 'bct':
         return BctButton
-      case 'comparison':
-        return ComparisonMenuToggle
       default:
         return StyledMenuToggle
     }

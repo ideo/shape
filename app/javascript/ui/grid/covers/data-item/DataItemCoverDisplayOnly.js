@@ -42,22 +42,24 @@ class DataItemCoverDisplayOnly extends React.Component {
     return (
       <StyledDataItemCover>
         <AboveChartContainer>
-          <Heading3 color={this.fillColor}>{this.title}</Heading3>
-          {tooltip && (
-            <Tooltip
-              classes={{ tooltip: 'Tooltip' }}
-              title={tooltip}
-              placement="bottom"
-            >
-              <StyledInfoIcon color={this.fillColor}>
-                <InfoIcon
-                  style={{ fill: v.colors.grayBoulder }}
-                  height={11}
-                  width={11}
-                />
-              </StyledInfoIcon>
-            </Tooltip>
-          )}
+          <Heading3 color={this.fillColor}>
+            {this.title}
+            {tooltip && (
+              <Tooltip
+                classes={{ tooltip: 'Tooltip' }}
+                title={tooltip}
+                placement="bottom"
+              >
+                <StyledInfoIcon color={this.fillColor}>
+                  <InfoIcon
+                    style={{ fill: v.colors.grayBoulder }}
+                    height={11}
+                    width={11}
+                  />
+                </StyledInfoIcon>
+              </Tooltip>
+            )}
+          </Heading3>
           <br />
         </AboveChartContainer>
         <ChartGroup

@@ -2,8 +2,9 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { observable, action } from 'mobx'
 
-import PopoutMenu from '~/ui/global/PopoutMenu'
+import { Select, SelectOption } from '~/ui/global/styled/forms'
 import XIcon from '~/ui/icons/XIcon'
+import PlusIcon from '~/ui/icons/PlusIcon'
 import v from '~/utils/variables'
 import { DisplayText, Heading3 } from '~/ui/global/styled/typography'
 import LineChartMeasure from '~/ui/icons/LineChartMeasure'
@@ -57,9 +58,22 @@ const StyledAddComparison = styled.div`
   > div {
     display: inline-block;
   }
-  .add-comparison-text {
-    margin-left: 8px;
+  &:hover,
+  &:active {
+    .icon {
+      background-color: ${v.colors.commonDarkest};
+    }
+    color: ${v.colors.commonDarkest};
+  }
+  .icon {
+    background-color: ${v.colors.commonMedium};
+    border-radius: 50%;
+    padding: 7px;
+    height: 15px;
+    width: 15px;
+    margin: -3px 8px 0 0;
     display: inline-block;
+    vertical-align: middle;
   }
 `
 
@@ -133,25 +147,48 @@ class LegendItemCover extends React.Component {
     })
   }
 
-  get comparisonMenuItems() {
+  get comparisonMenuOptions() {
     return this.comparisonMeasures({ selected: false }).map(measureData => {
       const { measure } = measureData
-      const onClick = () => {
-        this.setState({ comparisonMenuOpen: false }, () => {
-          this.toggleMeasure({ measure, show: true })
-        })
-      }
-      return {
-        name: measure,
-        onClick,
-      }
+      return measure
     })
+  }
+
+  handleComparisonMenuSelection = event => {
+    event.preventDefault()
+    const { value } = event.target
+    this.toggleMeasure({ measure: value, show: true })
+  }
+
+  get renderComparisonMenu() {
+    return (
+      <Select
+        classes={{ root: 'select', selectMenu: 'selectMenu' }}
+        displayEmpty
+        disableUnderline
+        name="role"
+        onChange={this.handleComparisonMenuSelection}
+        onClose={() => this.setState({ comparisonMenuOpen: false })}
+        open
+        inline
+      >
+        {this.comparisonMenuOptions.map(option => (
+          <SelectOption
+            classes={{ root: 'selectOption', selected: 'selected' }}
+            key={option}
+            value={option}
+          >
+            {option}
+          </SelectOption>
+        ))}
+      </Select>
+    )
   }
 
   render() {
     const { item } = this.props
-    const { comparisonMenuOpen } = this.state
     const { primary_measure } = item
+    const { comparisonMenuOpen } = this.state
     return (
       <StyledLegendItem>
         <StyledLegendTitle>{item.name}</StyledLegendTitle>
@@ -167,18 +204,13 @@ class LegendItemCover extends React.Component {
         )}
         <br />
         <StyledAddComparison>
-          <PopoutMenu
-            buttonStyle="comparison"
-            menuOpen={comparisonMenuOpen}
-            onClick={this.toggleComparisonMenu}
-            direction="right"
-            position={{ x: 10, y: 17 }}
-            menuItems={this.comparisonMenuItems}
-          />
+          {comparisonMenuOpen && this.renderComparisonMenu}
           <Heading3
             onClick={this.toggleComparisonMenu}
-            className="add-comparison-text"
+            role="button"
+            className="add-comparison-button"
           >
+            <PlusIcon viewBox="0 0 5 18" />
             Add Comparison
           </Heading3>
         </StyledAddComparison>

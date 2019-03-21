@@ -2,9 +2,9 @@
 
 exports[`LegendItemCover renders snapshot 1`] = `
 <styled.div>
-  <Styled(StyledDisplayText)>
+  <Styled(StyledHeading3)>
     My Cool Item
-  </Styled(StyledDisplayText)>
+  </Styled(StyledHeading3)>
   <Measure
     key="measure-Business Unit"
   >
@@ -38,40 +38,16 @@ exports[`LegendItemCover renders snapshot 1`] = `
   </Measure>
   <br />
   <styled.div>
-    <PopoutMenu
-      buttonStyle="comparison"
-      className=""
-      direction="right"
-      disabled={false}
-      groupExtraComponent={Object {}}
-      groupedMenuItems={Object {}}
-      hideDotMenu={false}
-      menuItems={
-        Array [
-          Object {
-            "name": "75th Percentile",
-            "onClick": [Function],
-          },
-        ]
-      }
-      menuOpen={false}
+    <StyledHeading3
+      className="add-comparison-button"
       onClick={[Function]}
-      onMouseLeave={[Function]}
-      position={
-        Object {
-          "x": 10,
-          "y": 17,
-        }
-      }
-      width={200}
-      wrapperClassName="card-menu"
-    />
-    <StyledDisplayText
-      className="add-comparison-text"
-      onClick={[Function]}
+      role="button"
     >
+      <PlusIcon
+        viewBox="0 0 5 18"
+      />
       Add Comparison
-    </StyledDisplayText>
+    </StyledHeading3>
   </styled.div>
 </styled.div>
 `;
