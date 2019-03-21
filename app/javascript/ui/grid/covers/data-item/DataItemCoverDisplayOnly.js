@@ -1,7 +1,7 @@
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
-import { DisplayText } from '~/ui/global/styled/typography'
+import { Heading3 } from '~/ui/global/styled/typography'
 import InfoIcon from '~/ui/icons/InfoIcon'
 import ChartGroup from '~/ui/global/charts/ChartGroup'
 import {
@@ -42,7 +42,7 @@ class DataItemCoverDisplayOnly extends React.Component {
     return (
       <StyledDataItemCover>
         <AboveChartContainer>
-          <DisplayText color={this.fillColor}>{this.title}</DisplayText>
+          <Heading3 color={this.fillColor}>{this.title}</Heading3>
           {tooltip && (
             <Tooltip
               classes={{ tooltip: 'Tooltip' }}

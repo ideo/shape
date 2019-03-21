@@ -67,14 +67,15 @@ export const StyledMenuWrapper = styled.div`
 StyledMenuWrapper.displayName = 'StyledMenuWrapper'
 
 export const ComparisonMenuToggle = styled.div`
-  background-color: ${v.colors.commonLight};
+  background-color: ${v.colors.commonMedium};
+  transition: background-color 150ms;
   border-radius: 50%;
   padding: 7px;
   height: 15px;
   width: 15px;
   &:hover,
   &:active {
-    background-color: ${v.colors.commonMedium};
+    background-color: ${v.colors.commonDarkest};
   }
   .icon {
     width: 15px;

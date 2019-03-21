@@ -4,7 +4,8 @@ import { observable, action } from 'mobx'
 
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import XIcon from '~/ui/icons/XIcon'
-import { DisplayText } from '~/ui/global/styled/typography'
+import v from '~/utils/variables'
+import { DisplayText, Heading3 } from '~/ui/global/styled/typography'
 import LineChartMeasure from '~/ui/icons/LineChartMeasure'
 
 const StyledLegendItem = styled.div`
@@ -12,7 +13,7 @@ const StyledLegendItem = styled.div`
   padding: 12px 15px 12px 10px;
 `
 
-const StyledLegendTitle = styled(DisplayText)`
+const StyledLegendTitle = styled(Heading3)`
   display: block;
   margin-bottom: 20px;
 `
@@ -28,6 +29,12 @@ const UnselectMeasure = styled(DisplayText)`
   position: absolute;
   right: 0;
   width: 16px;
+  color: ${v.colors.commonDark};
+  transition: color 150ms;
+  &:hover,
+  &:active {
+    color: black;
+  }
 `
 UnselectMeasure.displayName = 'UnselectMeasure'
 
@@ -168,12 +175,12 @@ class LegendItemCover extends React.Component {
             position={{ x: 10, y: 17 }}
             menuItems={this.comparisonMenuItems}
           />
-          <DisplayText
+          <Heading3
             onClick={this.toggleComparisonMenu}
             className="add-comparison-text"
           >
             Add Comparison
-          </DisplayText>
+          </Heading3>
         </StyledAddComparison>
       </StyledLegendItem>
     )
