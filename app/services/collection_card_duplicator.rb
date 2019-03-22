@@ -51,6 +51,6 @@ class CollectionCardDuplicator < SimpleService
 
     return unless mover.call
 
-    @new_cards += mover.new_legend_item_cards
+    @new_cards += mover.legend_item_cards
   end
 end

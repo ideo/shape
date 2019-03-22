@@ -1,17 +1,21 @@
 class LegendMover < SimpleService
-  attr_reader :errors, :new_legend_item_cards
+  attr_reader :errors, :legend_item_cards
 
   def initialize(to_collection:, cards:, action:)
     @to_collection = to_collection
     @cards = cards
     @action = action
     @errors = []
-    @legend_items_to_duplicate_or_link = []
-    @new_legend_item_cards = []
+    @legends_missing = []
+    @legend_items_to_duplicate = []
+    @legend_item_cards = []
   end
 
   def call
-    include_legends_in_to_collection_cards
+    find_missing_legends
+    return true if @legends_missing.blank?
+
+    select_legend_items_or_mark_for_duplication
     duplicate_or_link_legend_items
     @errors.blank?
   end
@@ -20,38 +24,38 @@ class LegendMover < SimpleService
 
   # If they are moving a data item that has a legend,
   # but haven't selected the legend, move it as well
-  def include_legends_in_to_collection_cards
-    legends_missing = to_collection_data_item_legends - to_collection_legend_items
+  def find_missing_legends
+    @legends_missing = to_collection_data_item_legends - to_collection_legend_items
+  end
 
-    # Return because all linked legends are included in the `to_collection`
-    return if legends_missing.blank?
-
+  def select_legend_items_or_mark_for_duplication
     to_collection_data_item_ids = to_collection_data_items.map(&:id)
 
     # Include any legends that are missing
-    legends_missing.each do |legend_item|
-      # If the legend is only linked to data items in `to_collection`, move it
+    @legends_missing.each do |legend_item|
+      # If the legend is only linked to data items in `to_collection`,
+      # add it to our selected cards
       if (legend_item.data_item_ids - to_collection_data_item_ids).size.zero?
-        @new_legend_item_cards.push(legend_item.parent_collection_card)
+        @legend_item_cards.push(legend_item.parent_collection_card)
       else
         # Otherwise we need to create a new legend
-        @legend_items_to_duplicate_or_link.push(legend_item)
+        @legend_items_to_duplicate.push(legend_item)
       end
     end
   end
 
   def duplicate_or_link_legend_items
-    @legend_items_to_duplicate_or_link.each do |legend_item|
+    @legend_items_to_duplicate.each do |legend_item|
       if move? || duplicate?
         duplicate = duplicate_legend_item(legend_item)
         next unless duplicate.persisted?
 
         if add_duplicate_legend_item_to_data_items(legend_item, duplicate)
-          @new_legend_item_cards.push(duplicate.parent_collection_card)
+          @legend_item_cards.push(duplicate.parent_collection_card)
         end
       elsif link?
         linked_card = legend_item.parent_collection_card.copy_into_new_link_card
-        @new_legend_item_cards.push(linked_card)
+        @legend_item_cards.push(linked_card)
       end
     end
   end

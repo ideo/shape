@@ -125,8 +125,8 @@ class CardMover
 
     return unless mover.call
 
-    @moving_cards += mover.new_legend_item_cards
-    @to_collection_cards += mover.new_legend_item_cards
+    @moving_cards += mover.legend_item_cards
+    @to_collection_cards += mover.legend_item_cards
   end
 
   def to_collection_invalid
