@@ -46,6 +46,8 @@ class CollectionCardDuplicator < SimpleService
       action: 'duplicate',
     )
 
+    debugger
+
     return unless mover.call
 
     @new_cards += mover.new_legend_item_cards
