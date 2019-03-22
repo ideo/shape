@@ -17,7 +17,6 @@ class Api::V1::ItemsController < Api::V1::BaseController
 
   def create
     if @item.save
-      # how do we also include the legend created afterward also?
       render jsonapi: @item, include: [roles: %i[users groups resource]], expose: { current_record: @item }
     else
       render_api_errors @item.errors
