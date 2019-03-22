@@ -22,6 +22,9 @@ class CollectionCardDuplicator < SimpleService
     # reverse cards for 'beginning' since they get duplicated one by one to the front
     @cards = @cards.reverse if @placement == 'beginning'
     @cards.each do |card|
+      # Skip if legend item - they will be moved over in `duplicate_legend_items`
+      next if card.item&.is_a?(Item::LegendItem)
+
       dup = card.duplicate!(
         for_user: @for_user,
         parent: @to_collection,
@@ -42,11 +45,9 @@ class CollectionCardDuplicator < SimpleService
   def duplicate_legend_items
     mover = LegendMover.new(
       to_collection: @to_collection,
-      cards: @to_collection.collection_cards + @new_cards,
+      cards: (@to_collection.collection_cards + @new_cards).uniq,
       action: 'duplicate',
     )
-
-    debugger
 
     return unless mover.call
 

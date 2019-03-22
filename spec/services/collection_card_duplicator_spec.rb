@@ -42,6 +42,11 @@ RSpec.describe CollectionCardDuplicator, type: :service do
           parent_collection: from_collection)
       end
       let(:legend_item) { data_item.legend_item }
+      let(:duplicated_data_items) do
+        to_collection.collection_cards.map(&:item).compact.select do |item|
+          item.is_a?(Item::DataItem)
+        end
+      end
 
       before do
         legend_item.reload # to make sure data_item_ids aren't cached
@@ -49,16 +54,34 @@ RSpec.describe CollectionCardDuplicator, type: :service do
         user.add_role(Role::EDITOR, data_item)
       end
 
-      it 'duplicates legend if not selected' do
-        expect(
-          to_collection.collection_cards.map(&:item).compact,
-        ).not_to include(legend_item)
-        expect {
-          service.call
-        }.not_to change(Item::LegendItem, :count)
-        expect(
-          to_collection.collection_cards.reload.map(&:item).compact,
-        ).to include(legend_item)
+      it 'links legend to duplicated data item' do
+        service.call
+        expect(duplicated_data_items.size).to eq(1)
+        expect(duplicated_data_items.first.cloned_from).to eq(data_item)
+      end
+
+      context 'if legend is not selected' do
+        before do
+          expect(moving_cards).not_to include(legend_item.parent_collection_card)
+        end
+
+        it 'duplicates legend' do
+          expect {
+            service.call
+          }.to change(Item::LegendItem, :count).by(1)
+        end
+      end
+
+      context 'if legend is selected' do
+        before do
+          moving_cards.push(legend_item.parent_collection_card)
+        end
+
+        it 'duplicates it' do
+          expect {
+            service.call
+          }.to change(Item::LegendItem, :count).by(1)
+        end
       end
 
       context 'with legend linked to other data items not duplicated' do
@@ -83,14 +106,14 @@ RSpec.describe CollectionCardDuplicator, type: :service do
 
         it 'leaves existing data item linked to legend item' do
           service.call
-          to_collection_legend_items = to_collection.collection_cards.select do |card|
+          to_collection_legend_items = to_collection.collection_cards.reload.select do |card|
             card.item&.is_a?(Item::LegendItem)
           end.map(&:item)
           expect(
             to_collection_legend_items.size,
           ).to eq(1)
-          expect(to_collection_legend_items.first).to eq(data_item.reload.legend_item)
-          expect(data_item_two.reload.legend_item).not_to eq(data_item.legend_item)
+          duplicated_legend_item = to_collection_legend_items.first
+          expect(data_item_two.reload.legend_item).not_to eq(duplicated_legend_item)
         end
       end
     end

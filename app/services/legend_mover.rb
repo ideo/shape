@@ -21,8 +21,7 @@ class LegendMover < SimpleService
   # If they are moving a data item that has a legend,
   # but haven't selected the legend, move it as well
   def include_legends_in_to_collection_cards
-    all_data_item_legends = to_collection_data_items.map(&:legend_item).compact
-    legends_missing = all_data_item_legends - to_collection_legend_items
+    legends_missing = to_collection_data_item_legends - to_collection_legend_items
 
     # Return because all linked legends are included in the `to_collection`
     return if legends_missing.blank?
@@ -45,10 +44,10 @@ class LegendMover < SimpleService
     @legend_items_to_duplicate_or_link.each do |legend_item|
       if move? || duplicate?
         duplicate = duplicate_legend_item(legend_item)
-        if duplicate.persisted? && add_duplicate_legend_item_to_data_items(legend_item, duplicate)
+        next unless duplicate.persisted?
+
+        if add_duplicate_legend_item_to_data_items(legend_item, duplicate)
           @new_legend_item_cards.push(duplicate.parent_collection_card)
-        else
-          @errors << "Could not copy legend: #{duplicate.errors.full_messages.join('. ')}"
         end
       elsif link?
         linked_card = legend_item.parent_collection_card.copy_into_new_link_card
@@ -58,13 +57,19 @@ class LegendMover < SimpleService
   end
 
   def duplicate_legend_item(legend_item)
-    legend_item.duplicate!(
+    duplicate = legend_item.duplicate!(
       for_user: nil,
       copy_parent_card: true,
       parent: @to_collection,
       system_collection: false,
       synchronous: true,
     )
+
+    return duplicate if duplicate.persisted?
+
+    @errors << "Could not copy legend: #{duplicate.errors.full_messages.join('. ')}"
+
+    duplicate
   end
 
   def add_duplicate_legend_item_to_data_items(original_legend_item, duplicate_legend_item)
@@ -85,13 +90,20 @@ class LegendMover < SimpleService
   def to_collection_data_items
     @cards.select do |card|
       card.item&.is_a?(Item::DataItem)
-    end.map(&:item)
+    end.map(&:item).uniq
+  end
+
+  def to_collection_data_item_legends
+    to_collection_data_items
+      .map(&:legend_item)
+      .compact
+      .uniq
   end
 
   def to_collection_legend_items
     @cards.select do |card|
       card.item.is_a?(Item::LegendItem)
-    end.map(&:item)
+    end.map(&:item).uniq
   end
 
   def link?
@@ -103,6 +115,6 @@ class LegendMover < SimpleService
   end
 
   def duplicate?
-    @duplicate == 'duplicate'
+    @action == 'duplicate'
   end
 end
