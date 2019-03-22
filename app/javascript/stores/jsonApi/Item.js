@@ -32,6 +32,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
     'filestack_file_attributes',
     'data_settings',
     'report_type',
+    'selected_measures',
   ]
 
   get justText() {
@@ -95,6 +96,10 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return (
       this.filestack_file && this.filestack_file.mimetype === 'application/pdf'
     )
+  }
+
+  get isLegend() {
+    return this.type === ITEM_TYPES.LEGEND
   }
 
   get isDownloadable() {
@@ -168,7 +173,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
     const { datasets } = this
     if (!datasets) return null
     if (datasets.length <= 1) return datasets[0]
-    return datasets.find(dataset => dataset.primary)
+    return datasets.find(dataset => dataset.order === 0)
   }
 
   get measure() {
@@ -222,7 +227,7 @@ Item.defaults = {
   can_edit: false,
   datasets: [
     {
-      primary: true,
+      order: 0,
       data: [],
       count: 0,
     },

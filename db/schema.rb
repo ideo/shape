@@ -103,6 +103,15 @@ ActiveRecord::Schema.define(version: 20190319185820) do
     t.index ["type"], name: "index_collection_cards_on_type"
   end
 
+  create_table "collection_cover_items", force: :cascade do |t|
+    t.bigint "collection_id"
+    t.bigint "item_id"
+    t.integer "order"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["collection_id", "item_id"], name: "index_collection_cover_items_on_collection_id_and_item_id", unique: true
+  end
+
   create_table "collections", force: :cascade do |t|
     t.string "name"
     t.string "type"
@@ -256,6 +265,7 @@ ActiveRecord::Schema.define(version: 20190319185820) do
     t.jsonb "data_settings"
     t.bigint "roles_anchor_collection_id"
     t.integer "report_type"
+    t.integer "legend_item_id"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
     t.index ["created_at"], name: "index_items_on_created_at"

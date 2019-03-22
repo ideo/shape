@@ -6,6 +6,12 @@ import pluralize from 'pluralize'
 
 import v from '~/utils/variables'
 
+export const lineChartDashWithForOrder = ({ order, scale = 1 }) => {
+  const dashWidths = [[2, 4], [3, 1], [4, 2], [2, 8], [8, 6], [1, 5]]
+  const values = dashWidths[order - 1] ? dashWidths[order - 1] : dashWidths[0]
+  return values.map(val => val * scale).join(',')
+}
+
 export const utcMoment = date => moment(`${date} 00+0000`).utc()
 
 export const datasetPropType = PropTypes.shape({
@@ -13,7 +19,7 @@ export const datasetPropType = PropTypes.shape({
   description: PropTypes.string,
   chart_type: PropTypes.string.isRequired,
   timeframe: PropTypes.string.isRequired,
-  primary: PropTypes.bool.isRequired,
+  order: PropTypes.number.isRequired,
   max_domain: PropTypes.number,
   style: PropTypes.shape({
     fill: PropTypes.string,
@@ -28,12 +34,9 @@ export const datasetPropType = PropTypes.shape({
   ),
 })
 
-export const primaryFillColorFromDatasets = datasets => {
-  if (!datasets) return '#000000'
-  const primary = datasets.find(dataset => dataset.primary)
-  return primary && primary.style && primary.style.fill
-    ? primary.style.fill
-    : '#000000'
+export const primaryFillColorFromDataset = dataset => {
+  if (!dataset) return '#000000'
+  return dataset.style && dataset.style.fill ? dataset.style.fill : '#000000'
 }
 
 export const chartDomainForDatasetValues = ({ values, maxDomain }) => {
@@ -50,7 +53,10 @@ export const chartDomainForDatasetValues = ({ values, maxDomain }) => {
   }
 }
 
-export const renderTooltip = ({
+export const dateTooltipText = datum =>
+  `${datum.value} on ${utcMoment(datum.date).format('l')}`
+
+export const advancedTooltipText = ({
   datum,
   isLastDataPoint,
   timeframe,

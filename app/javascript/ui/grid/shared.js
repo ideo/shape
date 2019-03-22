@@ -68,7 +68,7 @@ export const BctButton = styled.button`
 BctButton.displayName = 'BctButton'
 
 export const StyledGridCard = styled.div`
-  background: white;
+  background: ${props => props.background || 'white'};
   box-shadow: ${props =>
     props.dragging ? '1px 1px 5px 2px rgba(0, 0, 0, 0.25)' : ''};
   cursor: ${props => {

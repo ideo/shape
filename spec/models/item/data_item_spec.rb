@@ -23,9 +23,58 @@ RSpec.describe Item::DataItem, type: :model do
     end
   end
 
+  describe 'callbacks' do
+    describe '#create_legend_item' do
+      let(:collection) { create(:collection) }
+
+      context 'for report_type_collections_and_items' do
+        it 'does not create a legend' do
+          expect {
+            create(
+              :data_item,
+              :report_type_collections_and_items,
+              parent_collection: collection,
+            )
+          }.not_to change(Item::LegendItem, :count)
+        end
+      end
+
+      context 'for report_type_record' do
+        it 'creates and links a Item::LegendItem' do
+          expect {
+            create(
+              :data_item,
+              :report_type_record,
+              parent_collection: collection,
+            )
+          }.to change(Item::LegendItem, :count).by(1)
+        end
+
+        context 'if legend already exists' do
+          let!(:legend_item) { create(:legend_item) }
+
+          it 'does not create legend if already assigned' do
+            expect {
+              create(
+                :data_item,
+                :report_type_collections_and_items,
+                legend_item: legend_item,
+                parent_collection: collection,
+              )
+            }.not_to change(Item::LegendItem, :count)
+          end
+        end
+      end
+    end
+  end
+
   describe '#datasets' do
-    let(:network_app_metric_double) { double('DataReport::NetworkAppMetric', call: true) }
-    let(:collections_and_items_double) { double('DataReport::CollectionsAndItems', call: true) }
+    let(:network_app_metric_double) do
+      double('DataReport::NetworkAppMetric', call: [])
+    end
+    let(:collections_and_items_double) do
+      double('DataReport::CollectionsAndItems', call: [])
+    end
 
     before do
       allow(DataReport::NetworkAppMetric).to receive(:new).and_return(
@@ -57,13 +106,27 @@ RSpec.describe Item::DataItem, type: :model do
     end
 
     context 'for record data' do
-      let!(:data_item) { create(:data_item, :report_type_record) }
+      let(:collection) { create(:collection) }
+      let!(:data_item) do
+        create(
+          :data_item,
+          :report_type_record,
+          parent_collection: collection,
+        )
+      end
+      let(:legend) { data_item.legend_item }
+      let(:primary_dataset) do
+        data_item
+          .data_content['datasets']
+          .map(&:deep_symbolize_keys)
+          .find { |dataset| dataset[:order] == 0 }
+      end
 
-      it 'should return datasets' do
+      it 'should return dataset with order 0' do
         expect(
           data_item.datasets,
         ).to eq(
-          data_item.data_content['datasets'].map(&:deep_symbolize_keys),
+          [primary_dataset],
         )
       end
 
@@ -71,6 +134,30 @@ RSpec.describe Item::DataItem, type: :model do
         expect(DataReport::CollectionsAndItems).not_to receive(:new)
         expect(DataReport::NetworkAppMetric).not_to receive(:new)
         data_item.datasets
+      end
+
+      it 'does not filter if selected_measures is blank' do
+        expect(legend.selected_measures.blank?).to be true
+        expect(
+          data_item.datasets,
+        ).to match_array(
+          [primary_dataset],
+        )
+      end
+
+      context 'with legend item that has selected measures' do
+        let(:first_measure) { data_item.all_datasets.first[:measure] }
+        before do
+          legend.update(selected_measures: first_measure)
+        end
+
+        it 'filters datasets if selected_measures if present' do
+          expect(
+            [first_measure],
+          ).to match_array(
+            data_item.datasets.map { |dataset| dataset[:measure] },
+          )
+        end
       end
     end
   end

@@ -3332,8 +3332,8 @@ exports[`ChartGroup renders snapshot 1`] = `
         Object {
           "data": Object {
             "stroke": "#000000",
-            "strokeDasharray": 0,
-            "strokeWidth": 2,
+            "strokeDasharray": "3,6",
+            "strokeWidth": 3,
           },
         }
       }

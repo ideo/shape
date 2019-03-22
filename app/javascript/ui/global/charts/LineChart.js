@@ -4,9 +4,11 @@ import { VictoryLine } from 'victory'
 import ChartTooltip from '~/ui/global/charts/ChartTooltip'
 import {
   datasetPropType,
-  renderTooltip,
+  dateTooltipText,
+  advancedTooltipText,
   addDuplicateValueIfSingleValue,
   chartDomainForDatasetValues,
+  lineChartDashWithForOrder,
 } from '~/ui/global/charts/ChartUtils'
 
 const formatValues = values => {
@@ -18,35 +20,46 @@ const formatValues = values => {
   }))
 }
 
-const chartStyle = style => ({
-  data: {
-    stroke: style.fill || '#000000',
-    strokeWidth: 2,
-    strokeDasharray: style.dashWidth || 0,
-  },
-})
+const chartStyle = dataset => {
+  const { style } = dataset
+  return {
+    data: {
+      stroke: (style && style.fill) || '#000000',
+      strokeWidth: 3,
+      strokeDasharray: lineChartDashWithForOrder({
+        order: dataset.order,
+        scale: 1.5,
+      }),
+    },
+  }
+}
 
-const LineChart = ({ dataset, showMeasureInTooltip, cardArea }) => {
+const LineChart = ({ dataset, simpleDateTooltip, cardArea }) => {
   const { measure, timeframe } = dataset
   const values = formatValues(dataset.data)
   const domain = chartDomainForDatasetValues({
     values,
     maxDomain: dataset.max_domain,
   })
-  const tooltipFn = (datum, isLastDataPoint) =>
-    renderTooltip({
-      datum,
-      isLastDataPoint,
-      timeframe,
-      measure: showMeasureInTooltip ? measure : null,
-    })
+  let tooltipFn
+  if (simpleDateTooltip) {
+    tooltipFn = datum => dateTooltipText(datum)
+  } else {
+    tooltipFn = (datum, isLastDataPoint) =>
+      advancedTooltipText({
+        datum,
+        isLastDataPoint,
+        timeframe,
+        measure,
+      })
+  }
   return (
     <VictoryLine
       labels={d => d.value}
       labelComponent={
         <ChartTooltip textRenderer={tooltipFn} cardArea={cardArea} />
       }
-      style={chartStyle(dataset.style || {})}
+      style={chartStyle(dataset)}
       data={values}
       domain={domain}
       key={`dataset-${dataset.measure}`}
@@ -56,13 +69,13 @@ const LineChart = ({ dataset, showMeasureInTooltip, cardArea }) => {
 
 LineChart.propTypes = {
   dataset: datasetPropType.isRequired,
-  showMeasureInTooltip: PropTypes.bool,
+  simpleDateTooltip: PropTypes.bool,
   cardArea: PropTypes.number,
 }
 
 LineChart.defaultProps = {
   cardArea: 1,
-  showMeasureInTooltip: false,
+  simpleDateTooltip: false,
 }
 
 export default LineChart

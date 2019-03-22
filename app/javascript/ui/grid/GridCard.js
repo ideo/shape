@@ -272,7 +272,7 @@ class GridCard extends React.Component {
       // TODO: could replace with preview
       Activity.trackActivity('downloaded', record)
       return
-    } else if (record.isVideo || record.isImage) {
+    } else if (record.isVideo || record.isImage || record.isLegend) {
       return
     } else if (record.mimeBaseType === 'image') {
       this.props.handleClick(e)
@@ -285,22 +285,26 @@ class GridCard extends React.Component {
     this.props.handleClick(e)
   }
 
+  get coverItem() {
+    const { collection_cover_items } = this.props.record
+    if (!collection_cover_items || collection_cover_items.length === 0)
+      return null
+    return collection_cover_items[0]
+  }
+
   get renderCover() {
     const { card, height, dragging, searchResult, handleClick } = this.props
     let { record, cardType } = this.props
-    const { collection_cover_items } = record
-    const coverItem =
-      collection_cover_items && collection_cover_items.length > 0
-    if (coverItem) {
+    if (this.coverItem) {
       // Instead use the item for the cover rather than the collection
-      record = collection_cover_items[0]
+      record = this.coverItem
       cardType = 'items'
     }
     return (
       <CoverRenderer
         card={card}
         cardType={cardType}
-        coverItem={coverItem}
+        coverItem={this.coverItem}
         record={record}
         height={height}
         dragging={dragging}
@@ -308,6 +312,16 @@ class GridCard extends React.Component {
         handleClick={handleClick}
       />
     )
+  }
+
+  get transparentBackground() {
+    const { cardType, record } = this.props
+    // If this is a legend or data item, it's transparent
+    if (cardType === 'items' && (record.isLegend || record.isData)) return true
+    // If a data item and is a collection cover, it's transparent
+    if (this.coverItem && this.coverItem.isData) return true
+
+    return false
   }
 
   render() {
@@ -328,6 +342,7 @@ class GridCard extends React.Component {
 
     return (
       <StyledGridCard
+        background={this.transparentBackground ? 'transparent' : 'white'}
         className="gridCard"
         id={`gridCard-${card.id}`}
         dragging={dragging}
@@ -370,7 +385,10 @@ class GridCard extends React.Component {
                     onReassign={this.onCollectionCoverChange}
                   />
                 )}
-              {record.isData && <EditButton onClick={this.editCard} />}
+              {record.isData &&
+                record.isReportTypeCollectionsItems && (
+                  <EditButton onClick={this.editCard} />
+                )}
               {record.isImage &&
                 this.canContentEditCard && <ContainImage card={card} />}
               {(record.isImage || record.isText) && (

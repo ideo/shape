@@ -12,7 +12,7 @@ module DataReport
           measure: @measure,
           chart_type: 'area',
           timeframe: 'month',
-          primary: true,
+          order: 0,
           data: data,
         },
       ]

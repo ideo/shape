@@ -11,11 +11,11 @@ describe('ChartGroup', () => {
       fakeDataset,
       {
         ...fakeDataset,
-        primary: false,
+        order: 1,
         chart_type: 'line',
       },
     ]
-    props.showMeasureInTooltip = true
+    props.simpleDateTooltip = true
     render = () => (wrapper = shallow(<ChartGroup {...props} />))
     render()
   })

@@ -1,16 +1,17 @@
 import {
   chartDomainForDatasetValues,
-  renderTooltip,
+  dateTooltipText,
+  advancedTooltipText,
   addDuplicateValueIfSingleValue,
-  primaryFillColorFromDatasets,
+  primaryFillColorFromDataset,
 } from '~/ui/global/charts/ChartUtils'
 
 describe('ChartUtils', () => {
-  describe('renderTooltip', () => {
+  describe('advancedTooltipText', () => {
     it('renders text for the label with month and year', () => {
       // NOTE: code pulls the actual month back by 1
       const datum = { date: '2018-10-01', value: 34, month: 'Sep' }
-      const tooltip = renderTooltip({
+      const tooltip = advancedTooltipText({
         datum,
         isLastDataPoint: false,
         timefame: 'month',
@@ -22,13 +23,20 @@ describe('ChartUtils', () => {
     it('renders in last 30 days for label for last data item', () => {
       // NOTE: code pulls the actual month back by 1
       const datum = { date: '2018-10-01', value: 34, month: 'Sep' }
-      const tooltip = renderTooltip({
+      const tooltip = advancedTooltipText({
         datum,
         isLastDataPoint: true,
         timefame: 'month',
         measure: 'Participants',
       })
       expect(tooltip).toEqual('34 Participants\nin last 7 days')
+    })
+  })
+
+  describe('dateTooltipText', () => {
+    it('renders {value} on {date}', () => {
+      const datum = { date: '2018-10-01', value: 34, month: 'Sep' }
+      expect(dateTooltipText(datum)).toEqual('34 on 10/1/2018')
     })
   })
 
@@ -73,21 +81,15 @@ describe('ChartUtils', () => {
     })
   })
 
-  describe('primaryFillColorFromDatasets', () => {
+  describe('primaryFillColorFromDataset', () => {
     it('returns fill if on primary dataset', () => {
-      const datasets = [
-        { primary: true, style: { fill: '#EFEFEF' } },
-        { primary: false, style: { fill: '#330000' } },
-      ]
-      expect(primaryFillColorFromDatasets(datasets)).toEqual('#EFEFEF')
+      const dataset = { order: 0, style: { fill: '#EFEFEF' } }
+      expect(primaryFillColorFromDataset(dataset)).toEqual('#EFEFEF')
     })
 
     it('returns #000000 if no fill', () => {
-      const datasets = [
-        { primary: true },
-        { primary: false, style: { fill: '#330000' } },
-      ]
-      expect(primaryFillColorFromDatasets(datasets)).toEqual('#000000')
+      const dataset = { order: 0 }
+      expect(primaryFillColorFromDataset(dataset)).toEqual('#000000')
     })
   })
 })

@@ -53,7 +53,7 @@ class ChartGroup extends React.PureComponent {
   get primaryDataset() {
     const { datasets } = this.props
     if (datasets.length <= 1) return datasets[0]
-    return datasets.find(dataset => dataset.primary)
+    return datasets.find(dataset => dataset.order === 0)
   }
 
   get primaryDatasetValues() {
@@ -64,7 +64,7 @@ class ChartGroup extends React.PureComponent {
   get secondaryDatasetsWithData() {
     const { datasets } = this.props
     return datasets.filter(
-      dataset => !dataset.primary && dataset.data.length > 0
+      dataset => dataset.order !== 0 && dataset.data.length > 0
     )
   }
 
@@ -176,26 +176,26 @@ class ChartGroup extends React.PureComponent {
   )
 
   renderDataset = (dataset, index) => {
-    const { showMeasureInTooltip, width, height } = this.props
+    const { simpleDateTooltip, width, height } = this.props
     const dashWidth = index * 2
     switch (dataset.chart_type) {
       case DATASET_CHART_TYPES.AREA:
         return AreaChart({
           dataset,
-          showMeasureInTooltip,
+          simpleDateTooltip,
           cardArea: width * height,
         })
       case DATASET_CHART_TYPES.LINE:
         return LineChart({
           dataset,
-          showMeasureInTooltip,
+          simpleDateTooltip,
           cardArea: width * height,
           dashWidth,
         })
       default:
         return AreaChart({
           dataset,
-          showMeasureInTooltip,
+          simpleDateTooltip,
           cardArea: width * height,
         })
     }
@@ -233,13 +233,13 @@ class ChartGroup extends React.PureComponent {
 
 ChartGroup.propTypes = {
   datasets: MobxPropTypes.arrayOrObservableArrayOf(datasetPropType).isRequired,
-  showMeasureInTooltip: PropTypes.bool,
+  simpleDateTooltip: PropTypes.bool,
   width: PropTypes.number,
   height: PropTypes.number,
 }
 
 ChartGroup.defaultProps = {
-  showMeasureInTooltip: false,
+  simpleDateTooltip: false,
   width: 1,
   height: 1,
 }

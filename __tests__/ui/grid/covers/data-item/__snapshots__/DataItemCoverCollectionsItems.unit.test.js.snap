@@ -58,13 +58,13 @@ exports[`DataItemCover renders snapshot 1`] = `
             ],
             "description": "A description",
             "measure": "participants",
-            "primary": true,
+            "order": 0,
             "timeframe": "month",
           },
         ]
       }
       height={1}
-      showMeasureInTooltip={true}
+      simpleDateTooltip={false}
       width={1}
     />
   </React.Fragment>

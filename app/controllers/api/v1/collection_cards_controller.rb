@@ -9,6 +9,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :load_collection_cards, only: %i[index]
   def index
     params[:card_order] ||= @collection.default_card_order
+
     render jsonapi: @collection_cards,
            include: [
              :parent,

@@ -17,10 +17,10 @@ describe('DataItemCoverDisplayOnly', () => {
     expectTreeToMatchSnapshot(wrapper)
   })
 
-  it('should render name', () => {
+  it('should render item name', () => {
     expect(
       wrapper
-        .find('StyledDisplayText')
+        .find('StyledHeading3')
         .children()
         .first()
         .text()
@@ -31,9 +31,15 @@ describe('DataItemCoverDisplayOnly', () => {
     expect(wrapper.find('ChartGroup').exists()).toBe(true)
     expect(wrapper.find('ChartGroup').props()).toEqual({
       datasets: props.item.datasets,
-      showMeasureInTooltip: false,
+      simpleDateTooltip: true,
       width: 1,
       height: 1,
     })
+  })
+
+  it('renders a tooltip', () => {
+    const tooltip = wrapper.find('Tooltip')
+    expect(tooltip.exists()).toBe(true)
+    expect(tooltip.props().title).toEqual(props.item.datasets[0].description)
   })
 })
