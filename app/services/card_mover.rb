@@ -28,7 +28,6 @@ class CardMover
     select_existing_cards
     select_pinned_cards
     select_to_collection_cards
-    include_legends_in_to_collection_cards
     duplicate_or_link_legend_items
     move_cards_to_collection
     recalculate_cached_values
@@ -117,70 +116,17 @@ class CardMover
     @to_collection.queue_update_template_instances if @to_collection.master_template?
   end
 
-  def to_collection_data_items
-    @to_collection_cards.select do |card|
-      card.item&.is_a?(Item::DataItem)
-    end.map(&:item)
-  end
-
-  def to_collection_legend_items
-    @to_collection_cards.select do |card|
-      card.item.is_a?(Item::LegendItem)
-    end.map(&:item)
-  end
-
-  # If they are moving a data item that has a legend,
-  # but haven't selected the legend, move it as well
-  def include_legends_in_to_collection_cards
-    all_data_item_legends = to_collection_data_items.map(&:legend_item).compact
-    legends_missing = all_data_item_legends - to_collection_legend_items
-
-    # Return because all linked legends are included in the `to_collection`
-    return if legends_missing.blank?
-
-    to_collection_data_item_ids = to_collection_data_items.map(&:id)
-
-    # Include any legends that are missing
-    legends_missing.each do |legend_item|
-      # If the legend is only linked to data items in `to_collection`, move it
-      if (legend_item.data_item_ids - to_collection_data_item_ids).size.zero?
-        @moving_cards.push(legend_item.parent_collection_card)
-        @to_collection_cards.push(legend_item.parent_collection_card)
-      else
-        # Otherwise we need to create a new legend
-        @legend_items_to_duplicate.push(legend_item)
-      end
-    end
-  end
-
   def duplicate_or_link_legend_items
-    return if @legend_items_to_duplicate.blank?
+    mover = LegendMover.new(
+      to_collection: @to_collection,
+      cards: @to_collection_cards,
+      action: @card_action,
+    )
 
-    @legend_items_to_duplicate.each do |legend_item|
-      if move?
-        duplicate = legend_item.duplicate!(
-          for_user: nil,
-          copy_parent_card: true,
-          parent: @to_collection,
-          system_collection: false,
-          synchronous: true,
-        )
-        if duplicate.persisted?
-          # Connect to all data items it was connected to
-          # Only including data items now in the `to_collection`
-          add_to_data_items = to_collection_data_items & legend_item.data_items
-          add_to_data_items.each do |data_item|
-            data_item.update(legend_item: duplicate)
-          end
-        else
-          @errors << "Could not copy legend: #{duplicate.errors.full_messages.join('. ')}"
-        end
-      elsif link?
-        linked_card = legend_item.parent_collection_card.copy_into_new_link_card
-        @moved_cards.push(linked_card)
-        @to_collection_cards.push(linked_card)
-      end
-    end
+    return unless mover.call
+
+    @moving_cards += mover.new_legend_item_cards
+    @to_collection_cards += mover.new_legend_item_cards
   end
 
   def to_collection_invalid
