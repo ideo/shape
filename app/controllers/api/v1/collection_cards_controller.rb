@@ -294,6 +294,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :is_cover,
       :filter,
       :show_replace,
+      :order,
     )
   end
 
