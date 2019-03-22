@@ -30,11 +30,12 @@ class Item
       text
     end
 
-    def threadlocked_transform_realtime_delta(data)
+    def threadlocked_transform_realtime_delta(user, data)
       RedisClassy.redis = Cache.client
       lock_name = "rt_text_id_#{id}"
       RedisMutex.with_lock(lock_name, block: 0) do
         transform_realtime_delta(
+          user,
           delta: data.delta,
           version: data.version,
           full_content: data.full_content,
@@ -45,20 +46,26 @@ class Item
       { error: 'locked', version: data_content['version'].to_i }
     end
 
-    def transform_realtime_delta(delta:, version:, full_content:)
+    def transform_realtime_delta(user, delta:, version:, full_content:)
       saved_version = data_content['version'].to_i
 
       if version.to_i < saved_version
         # error needs to alert the frontend to the latest version
         return { error: 'locked', version: saved_version }
       end
-      full_content['version'] = saved_version + 1
+      new_version = saved_version + 1
+      full_content['version'] = new_version
+      full_content['last_10'] = data_content['last_10'] || []
+      full_content['last_10'] << { delta: delta, version: new_version, editor_id: user.id.to_s }
+      full_content['last_10'] = full_content['last_10'].last(10)
       # NOTE: is a "full update" too heavy here for performance, or ok?
       # it basically means it's calling a few related updates on the parent / cards
+      # update_column(:data_content, full_content)
       update(data_content: full_content)
       {
-        delta: delta,
+        delta: delta.as_json,
         version: full_content['version'],
+        last_10: full_content['last_10'].as_json,
       }
     end
 

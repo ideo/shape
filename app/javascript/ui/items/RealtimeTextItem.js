@@ -74,10 +74,10 @@ const StyledContainer = styled.div`
 @observer
 class RealtimeTextItem extends React.Component {
   channelName = 'ItemRealtimeChannel'
-  // state = { loading: false }
   state = { disconnected: false }
   saveTimer = null
   version = null
+  currentlySending = false
   combinedDelta = new Delta()
   bufferDelta = new Delta()
   contentSnapshot = new Delta()
@@ -160,7 +160,7 @@ class RealtimeTextItem extends React.Component {
 
   channelReceivedData = ({ current_editor, data, num_viewers }) => {
     if (this.unmounted) return
-    if (data && data.delta) {
+    if (data && data.version) {
       this.handleReceivedDelta({ current_editor, data })
     }
     if (data && data.range) {
@@ -177,44 +177,61 @@ class RealtimeTextItem extends React.Component {
   }
 
   handleReceivedDelta = ({ current_editor, data }) => {
-    const remoteDelta = new Delta(data.delta)
+    const { currentUserId } = this.props
 
     // update our local version number
     if (data.version) {
-      this.version = data.version
+      if (!data.error && data.last_10) {
+        const diff = data.version - this.version
+        if (diff > 0) {
+          _.each(data.last_10, previous => {
+            const delta = new Delta(previous.delta)
+            if (previous.version > this.version) {
+              if (previous.editor_id !== currentUserId) {
+                this.applyIncomingDelta(delta)
+              }
+              // update for later sending appropriately composed version to be saved
+              this.contentSnapshot = this.contentSnapshot.compose(delta)
+              this.version = previous.version
+            }
+          })
+        }
+      }
+      // this.version = data.version
     }
 
-    if (data.error) {
-      if (current_editor.id === this.props.currentUserId) {
-        // try again, perhaps by now we have the up-to-date version
-        this.sendCombinedDelta()
+    if (current_editor.id === currentUserId) {
+      // now we can successfully say that our delta was sent/received
+      this.currentlySending = false
+      if (data.error) {
+        return
       }
-      return
-    }
-
-    // update for later sending appropriately composed version to be saved
-    this.contentSnapshot = this.contentSnapshot.compose(remoteDelta)
-
-    if (current_editor.id !== this.props.currentUserId) {
-      // apply the incoming other person's delta, accounting for our own changes,
-      // but prioritizing theirs
-      const remoteDeltaWithLocalChanges = this.combinedDelta.transform(
-        remoteDelta
-      )
-      this.quillEditor.updateContents(remoteDeltaWithLocalChanges, 'silent')
-      // persist local changes
-      this.setItemDataContent()
-
-      if (this.combinedDelta.length()) {
-        // transform our awaiting content, prioritizing the remote delta
-        this.combinedDelta = remoteDelta.transform(this.combinedDelta, true)
-      }
-    } else if (current_editor.id === this.props.currentUserId) {
-      // clear out our combinedDelta
+      // clear out our combinedDelta with whatever had been typed in the meantime
       this.combinedDelta = this.bufferDelta.slice()
       this.bufferDelta = new Delta()
+      if (this.combinedDelta.length()) {
+        // if we had some waiting content
+        this.sendCombinedDelta()
+      }
     }
     this.sendCursor()
+  }
+
+  applyIncomingDelta(remoteDelta) {
+    // apply the incoming other person's delta, accounting for our own changes,
+    // but prioritizing theirs
+    const remoteDeltaWithLocalChanges = this.combinedDelta.transform(
+      remoteDelta
+    )
+    // make sure our local editor is up to date with changes..???????
+    this.quillEditor.updateContents(remoteDeltaWithLocalChanges, 'silent')
+    // persist local changes
+    this.setItemDataContent()
+
+    if (this.combinedDelta.length()) {
+      // transform our awaiting content, prioritizing the remote delta
+      this.combinedDelta = remoteDelta.transform(this.combinedDelta, true)
+    }
   }
 
   get canEdit() {
@@ -280,10 +297,11 @@ class RealtimeTextItem extends React.Component {
   }
 
   _sendCombinedDelta = () => {
-    if (!this.combinedDelta.ops.length) {
+    if (!this.combinedDelta.length() || this.currentlySending) {
       return false
     }
 
+    this.currentlySending = true
     const full_content = this.contentSnapshot.compose(this.combinedDelta)
     // NOTE: will get rejected if this.version < server saved version,
     // in which case the handleReceivedDelta error will try to resend
@@ -339,11 +357,7 @@ class RealtimeTextItem extends React.Component {
     }
 
     return (
-      <StyledContainer
-        className="no-drag"
-        // loading={this.state.loading}
-        fullPageView={fullPageView}
-      >
+      <StyledContainer className="no-drag" fullPageView={fullPageView}>
         <DockedToolbar fullPageView={fullPageView}>
           {canEdit && <TextItemToolbar onExpand={onExpand} />}
           <CloseButton
@@ -353,7 +367,7 @@ class RealtimeTextItem extends React.Component {
           />
         </DockedToolbar>
         <QuillStyleWrapper>
-          <ReactQuill {...quillProps} defaultValue={this.dataContent} />
+          <ReactQuill {...quillProps} value={this.dataContent} />
         </QuillStyleWrapper>
       </StyledContainer>
     )
