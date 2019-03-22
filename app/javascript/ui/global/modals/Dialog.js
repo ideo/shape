@@ -2,8 +2,9 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import MuiDialog from '@material-ui/core/Dialog'
 
+import Loader from '~/ui/layout/Loader'
 import v from '~/utils/variables'
-import ICONS from '~/ui/icons/dialogIcons'
+import ICONS, { iconNames } from '~/ui/icons/dialogIcons'
 
 const { CloseIcon } = ICONS
 
@@ -11,7 +12,10 @@ const StyledDialog = styled(MuiDialog)`
   .modal__paper {
     background-color: ${props => props.variant.backgroundColor};
     border-radius: 6px;
-    color: white;
+    color: ${props =>
+      props.variant.backgroundColor === v.colors.white
+        ? v.colors.black
+        : v.colors.white};
     opacity: 0.95;
     width: 100%;
     &-sm {
@@ -33,7 +37,7 @@ const ModalCloseButton = styled.button`
 ModalCloseButton.displayName = 'ModalCloseButton'
 
 const CenteredPaddedContent = styled.div`
-  padding: 30px 20px;
+  padding: 30px ${props => props.paddingSides}px;
   text-align: center;
 `
 
@@ -51,7 +55,7 @@ const ImageHolder = styled.span`
 const PromptText = styled.span`
   & p {
     font-weight: ${v.weights.book};
-    font-size: 1.25rem;
+    font-size: ${props => props.fontSize}rem;
     font-family: ${v.fonts.sans};
     margin-bottom: 40px;
     padding: 0;
@@ -61,11 +65,15 @@ const PromptText = styled.span`
 class Dialog extends React.PureComponent {
   handleClose = ev => {
     ev.preventDefault()
-    this.props.onClose()
+    const { onClose } = this.props
+    onClose && onClose()
   }
 
   get icon() {
-    const { iconName, iconImageOverride } = this.props
+    const { iconName, iconImageOverride, overrideWithLoader } = this.props
+    if (overrideWithLoader) {
+      return <Loader containerHeight="220px" />
+    }
     if (iconImageOverride) {
       return (
         <ImageHolder>
@@ -84,7 +92,7 @@ class Dialog extends React.PureComponent {
   }
 
   render() {
-    const { children, backgroundColor, open, maxWidth } = this.props
+    const { children, backgroundColor, onClose, open, maxWidth } = this.props
     return (
       <StyledDialog
         open={open}
@@ -101,12 +109,16 @@ class Dialog extends React.PureComponent {
         // using suggestion here: https://git.io/fpUnP
         variant={{ backgroundColor }}
       >
-        <ModalCloseButton onClick={this.handleClose}>
-          <CloseIcon />
-        </ModalCloseButton>
-        <CenteredPaddedContent>
+        {onClose && (
+          <ModalCloseButton onClick={this.handleClose}>
+            <CloseIcon />
+          </ModalCloseButton>
+        )}
+        <CenteredPaddedContent paddingSides={maxWidth === 'md' ? 50 : 20}>
           {this.icon}
-          <PromptText>{children}</PromptText>
+          <PromptText fontSize={maxWidth === 'md' ? 1.5 : 1.25}>
+            {children}
+          </PromptText>
         </CenteredPaddedContent>
       </StyledDialog>
     )
@@ -114,35 +126,22 @@ class Dialog extends React.PureComponent {
 }
 
 Dialog.propTypes = {
-  iconName: PropTypes.oneOf([
-    'Alert',
-    'Archive',
-    'Back',
-    'Celebrate',
-    'Close',
-    'CloseSubtractGroup',
-    'Clock',
-    'Hidden',
-    'Leave',
-    'Link',
-    'Mail',
-    'Ok',
-    'OverdueClock',
-    'Template',
-    'TestGraph',
-  ]),
+  iconName: PropTypes.oneOf(iconNames),
   iconImageOverride: PropTypes.string,
   children: PropTypes.node.isRequired,
   open: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
+  onClose: PropTypes.func,
   maxWidth: PropTypes.string,
   backgroundColor: PropTypes.oneOf(Object.values(v.colors)),
+  overrideWithLoader: PropTypes.bool,
 }
 Dialog.defaultProps = {
   iconName: 'Alert',
   maxWidth: 'xs', // 'xs' == 360px
   iconImageOverride: null,
   backgroundColor: v.colors.commonDark,
+  onClose: null,
+  overrideWithLoader: false,
 }
 // all propTypes except required `children` node, to be used by Information/ConfirmationModal
 const { children, ...childPropTypes } = Dialog.propTypes

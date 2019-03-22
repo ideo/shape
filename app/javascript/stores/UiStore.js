@@ -267,6 +267,15 @@ export default class UiStore {
   }
 
   @action
+  loadingDialog(props = {}) {
+    _.assign(this.dialogConfig, {
+      ...this.defaultDialogProps,
+      open: 'loading',
+      ...props,
+    })
+  }
+
+  @action
   setSnoozeChecked(val) {
     this.dialogConfig.snoozeChecked = val
   }

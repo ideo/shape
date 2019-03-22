@@ -128,16 +128,22 @@ class CollectionPage extends React.Component {
   }
 
   pollForUpdates() {
-    const { collection, apiStore } = this.props
+    const { collection, apiStore, uiStore } = this.props
     this.updatePoller = setInterval(async () => {
-      console.log('pINNG!')
       if (collection.awaiting_updates) {
         const res = await apiStore.fetch('collections', collection.id, true)
         if (!res.data.awaiting_updates) {
           collection.API_fetchCards()
+        } else if (!uiStore.dialogConfig.open !== 'loading') {
+          uiStore.loadingDialog({
+            prompt:
+              'Please wait while we build your account. This should take from 15 to 30 seconds.',
+            iconName: 'Celebrate',
+          })
         }
       } else {
         clearInterval(this.updatePoller)
+        uiStore.closeDialog()
       }
     }, 2000)
   }
