@@ -134,7 +134,7 @@ class CollectionPage extends React.Component {
         const res = await apiStore.fetch('collections', collection.id, true)
         if (!res.data.awaiting_updates) {
           collection.API_fetchCards()
-        } else if (!uiStore.dialogConfig.open !== 'loading') {
+        } else if (uiStore.dialogConfig.open !== 'loading') {
           uiStore.loadingDialog({
             prompt:
               'Please wait while we build your account. This should take from 15 to 30 seconds.',

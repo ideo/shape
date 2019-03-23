@@ -116,7 +116,10 @@ class Dialog extends React.PureComponent {
         )}
         <CenteredPaddedContent paddingSides={maxWidth === 'md' ? 50 : 20}>
           {this.icon}
-          <PromptText fontSize={maxWidth === 'md' ? 1.5 : 1.25}>
+          <PromptText
+            data-cy="DialogPrompt"
+            fontSize={maxWidth === 'md' ? 1.5 : 1.25}
+          >
             {children}
           </PromptText>
         </CenteredPaddedContent>
