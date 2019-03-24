@@ -368,7 +368,8 @@ class Header extends React.Component {
                 <div ref={ref => this.updateBreadcrumbsWidth(ref)}>
                   {record && (
                     <Flex align="center">
-                      <Box auto={isMobile}>
+                      {/* TODO: why doesnt <Box auto={isMobile}> work like this? */}
+                      <div style={{ flex: isMobile ? '1 1 auto' : '0 1 auto' }}>
                         <Breadcrumb
                           maxDepth={isMobile ? 1 : null}
                           backButton={isMobile}
@@ -380,7 +381,7 @@ class Header extends React.Component {
                           windowWidth={uiStore.windowWidth}
                           containerWidth={breadcrumbsWidth - this.actionsWidth}
                         />
-                      </Box>
+                      </div>
                       <Box>
                         <div
                           style={{
