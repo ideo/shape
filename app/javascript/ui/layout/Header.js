@@ -14,13 +14,11 @@ import Avatar from '~/ui/global/Avatar'
 import ActionMenu from '~/ui/grid/ActionMenu'
 import ActivityLogButton from '~/ui/notifications/ActivityLogButton'
 import RolesSummary from '~/ui/roles/RolesSummary'
-import OrganizationDropdown from '~/ui/organizations/OrganizationDropdown'
 import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
-import PopoutMenu from '~/ui/global/PopoutMenu'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import v from '~/utils/variables'
-import { generateUserMenu, generateComboMenu } from '~/ui/global/MenuItems'
+import MainMenuDropdown from '~/ui/global/MainMenuDropdown'
 
 /* global IdeoSSO */
 
@@ -159,11 +157,6 @@ class Header extends React.Component {
       this.userDropdownOpen = open
     })
 
-  @action
-  closeUserDropdown = () => {
-    this.userDropdownOpen = false
-  }
-
   showObjectRoleDialog = () => {
     const { record } = this
     const { uiStore } = this.props
@@ -178,6 +171,10 @@ class Header extends React.Component {
   closeMenu = () => {
     const { uiStore } = this.props
     uiStore.update('pageMenuOpen', false)
+  }
+
+  closeOrgMenu = () => {
+    this.props.uiStore.update('organizationMenuPage', null)
   }
 
   routeBack = ({ type } = {}) => {
@@ -257,8 +254,10 @@ class Header extends React.Component {
 
   get renderOrgDropdown() {
     const { orgDropdownOpen } = this
+    if (!orgDropdownOpen) return ''
     return (
-      <OrganizationDropdown
+      <MainMenuDropdown
+        context="org"
         open={orgDropdownOpen}
         onItemClick={this.handleOrgClick(false)}
       />
@@ -268,14 +267,12 @@ class Header extends React.Component {
   get renderUserDropdown() {
     const { userDropdownOpen, isMobile } = this
     if (!userDropdownOpen) return ''
-    const menuItems = isMobile ? generateComboMenu : generateUserMenu
+    const menuContext = isMobile ? 'combo' : 'user'
     return (
-      <PopoutMenu
-        className="user-menu"
-        width={220}
-        menuItems={menuItems({ onItemClick: this.closeUserDropdown })}
-        menuOpen={userDropdownOpen}
-        hideDotMenu
+      <MainMenuDropdown
+        context={menuContext}
+        open={userDropdownOpen}
+        onItemClick={this.handleUserClick(false)}
       />
     )
   }
@@ -374,6 +371,12 @@ class Header extends React.Component {
                     <ActivityLogButton key="activity" />
                   </StyledActivityLogBtn>
                 )}
+                <OrganizationMenu
+                  organization={currentUser.current_organization}
+                  userGroups={currentUser.groups}
+                  onClose={this.closeOrgMenu}
+                  open={uiStore.organizationMenuOpen}
+                />
                 <Hidden smDown>
                   <StyledAvatarAndDropdown>
                     {this.renderOrgDropdown}
