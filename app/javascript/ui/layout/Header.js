@@ -11,18 +11,16 @@ import Logo from '~/ui/layout/Logo'
 import PlainLink from '~/ui/global/PlainLink'
 import GlobalSearch from '~/ui/layout/GlobalSearch'
 import Avatar from '~/ui/global/Avatar'
-import ProfileIcon from '~/ui/icons/ProfileIcon'
-import SettingsIcon from '~/ui/icons/SettingsIcon'
 import ActionMenu from '~/ui/grid/ActionMenu'
 import ActivityLogButton from '~/ui/notifications/ActivityLogButton'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import OrganizationDropdown from '~/ui/organizations/OrganizationDropdown'
 import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
-import LeaveIcon from '~/ui/icons/LeaveIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import v from '~/utils/variables'
+import { generateUserMenu, generateComboMenu } from '~/ui/global/MenuItems'
 
 /* global IdeoSSO */
 
@@ -161,27 +159,9 @@ class Header extends React.Component {
       this.userDropdownOpen = open
     })
 
-  handleMyProfile = () => {
-    const { apiStore, routingStore } = this.props
-    routingStore.routeTo(
-      'collections',
-      apiStore.currentUser.user_profile_collection_id
-    )
-  }
-
-  handleAccountSettings = () => {
-    window.open(IdeoSSO.profileUrl, '_blank')
-  }
-
   @action
-  handleNotificationSettings = () => {
-    this.props.routingStore.routeTo('/user_settings')
+  closeUserDropdown = () => {
     this.userDropdownOpen = false
-  }
-
-  handleLogout = () => {
-    const { apiStore } = this.props
-    apiStore.currentUser.logout()
   }
 
   showObjectRoleDialog = () => {
@@ -221,31 +201,6 @@ class Header extends React.Component {
 
   get clickHandlers() {
     return [this.handleUserClick(false), this.handleOrgClick(false)]
-  }
-
-  get userMenuItems() {
-    const { apiStore } = this.props
-    const items = [
-      {
-        name: 'Account Settings',
-        icon: <SettingsIcon />,
-        onClick: this.handleAccountSettings,
-      },
-      {
-        name: 'Notification Settings',
-        icon: <SettingsIcon />,
-        onClick: this.handleNotificationSettings,
-      },
-      { name: 'Logout', icon: <LeaveIcon />, onClick: this.handleLogout },
-    ]
-    if (apiStore.currentUser.user_profile_collection_id) {
-      items.unshift({
-        name: 'My Profile',
-        icon: <ProfileIcon />,
-        onClick: this.handleMyProfile,
-      })
-    }
-    return items
   }
 
   get hasActions() {
@@ -311,13 +266,14 @@ class Header extends React.Component {
   }
 
   get renderUserDropdown() {
-    const { userDropdownOpen } = this
+    const { userDropdownOpen, isMobile } = this
     if (!userDropdownOpen) return ''
+    const menuItems = isMobile ? generateComboMenu : generateUserMenu
     return (
       <PopoutMenu
         className="user-menu"
         width={220}
-        menuItems={this.userMenuItems}
+        menuItems={menuItems({ onItemClick: this.closeUserDropdown })}
         menuOpen={userDropdownOpen}
         hideDotMenu
       />
