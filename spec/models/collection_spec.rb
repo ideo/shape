@@ -297,7 +297,7 @@ describe Collection, type: :model do
 
     context 'with a subcollection inside the system-generated getting started collection' do
       let(:parent_collection) { create(:global_collection) }
-      let!(:subcollection) { create(:collection, parent_collection: collection, organization: organization) }
+      let!(:subcollection) { create(:collection, num_cards: 2, parent_collection: collection, organization: organization) }
       let(:duplicate) do
         collection.duplicate!(
           for_user: user,
@@ -307,18 +307,21 @@ describe Collection, type: :model do
           synchronous: true,
         )
       end
+      let(:shell_collection) { duplicate.collections.first }
 
       before do
         organization.update(getting_started_collection: parent_collection)
+        duplicate
       end
 
       it 'should mark the duplicate child collection as a getting_started_shell' do
-        expect(duplicate.collections.first.getting_started_shell).to be true
+        expect(shell_collection.getting_started_shell).to be true
       end
 
-      it 'should not create any collection cards' do
-        expect(CollectionCardDuplicationWorker).not_to receive(:new)
-        expect(duplicate.collection_cards.count).to eq 0
+      it 'should not create any collection cards in the child collection' do
+        expect(shell_collection.cloned_from).to eq subcollection
+        expect(shell_collection.cloned_from.collection_cards.count).to eq 2
+        expect(shell_collection.collection_cards.count).to eq 0
       end
     end
   end
