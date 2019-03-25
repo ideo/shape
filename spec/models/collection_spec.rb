@@ -322,29 +322,33 @@ describe Collection, type: :model do
       end
     end
 
-    context 'with a collection inside the system-generated getting started collection' do
-      let(:getting_started_collection) { create(:global_collection, organization: organization) }
+    context 'with a subcollection inside the system-generated getting started collection' do
+      let(:parent_collection) { create(:global_collection) }
+      let!(:subcollection) { create(:collection, num_cards: 2, parent_collection: collection, organization: organization) }
       let(:duplicate) do
         collection.duplicate!(
           for_user: user,
           copy_parent_card: copy_parent_card,
           parent: parent,
           system_collection: true,
+          synchronous: true,
         )
       end
+      let(:shell_collection) { duplicate.collections.first }
 
       before do
-        parent_collection.update(cloned_from: getting_started_collection)
-        organization.update(getting_started_collection: getting_started_collection)
+        organization.update(getting_started_collection: parent_collection)
+        duplicate
       end
 
-      it 'should mark the duplicate as a getting_started_shell' do
-        expect(duplicate.getting_started_shell).to be true
+      it 'should mark the duplicate child collection as a getting_started_shell' do
+        expect(shell_collection.getting_started_shell).to be true
       end
 
-      it 'should not create any collection cards' do
-        expect(CollectionCardDuplicationWorker).not_to receive(:new)
-        expect(duplicate.collection_cards.count).to eq 0
+      it 'should not create any collection cards in the child collection' do
+        expect(shell_collection.cloned_from).to eq subcollection
+        expect(shell_collection.cloned_from.collection_cards.count).to eq 2
+        expect(shell_collection.collection_cards.count).to eq 0
       end
     end
   end

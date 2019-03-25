@@ -26,6 +26,7 @@ class Collection < ApplicationRecord
                  :cached_card_count,
                  :submission_attrs,
                  :getting_started_shell,
+                 :awaiting_first_user_content,
                  :cached_inheritance
 
   # callbacks
@@ -278,7 +279,7 @@ class Collection < ApplicationRecord
     # NOTE: parent is only nil in Colab import -- perhaps we should clean up any Colab import specific code?
     c.organization_id = parent.try(:organization_id) || organization_id
 
-    if system_collection && parent.try(:cloned_from).try(:getting_started?)
+    if system_collection && self.parent.try(:parent).try(:getting_started?)
       c.getting_started_shell = true
     end
 
@@ -315,6 +316,27 @@ class Collection < ApplicationRecord
 
     # pick up newly created relationships
     c.reload
+  end
+
+  def copy_all_cards_into!(
+    other_collection,
+    placement: 'beginning',
+    synchronous: false,
+    system_collection: false
+  )
+    cards = placement == 'beginning' ? collection_cards.reverse : collection_cards
+    cards.each do |card|
+      # ensures single copy, if existing copies already exist it will skip those
+      existing_records = other_collection.collection_cards.map(&:record)
+      next if existing_records.select { |r| r.cloned_from == card.record }.present?
+      card.duplicate!(
+        parent: other_collection,
+        placement: placement,
+        synchronous: synchronous,
+        # can allow copies to continue even if the user can't view the original content
+        system_collection: system_collection,
+      )
+    end
   end
 
   # NOTE: this refers to the first level of children
@@ -451,7 +473,7 @@ class Collection < ApplicationRecord
     # precache roles because these will be referred to in the serializers (e.g. can_edit?)
     user.precache_roles_for(
       [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],
-      cards.map(&:record),
+      cards.map(&:record).compact,
     )
 
     cards

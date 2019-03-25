@@ -6,8 +6,9 @@ import {
   StyledSnackbarContent,
   StyledSnackbarText,
 } from '~/ui/global/styled/material-ui'
-import ConfirmationDialog from '~/ui/global/modals/ConfirmationDialog'
 import AlertDialog from '~/ui/global/modals/AlertDialog'
+import ConfirmationDialog from '~/ui/global/modals/ConfirmationDialog'
+import LoadingDialog from '~/ui/global/modals/LoadingDialog'
 import CloseIcon from '~/ui/icons/CloseIcon'
 
 // This wrapper exists to listen on uiStore for dialogConfig changes
@@ -49,6 +50,7 @@ class DialogWrapper extends React.Component {
       <Fragment>
         <ConfirmationDialog {...uiStore.dialogConfig} />
         <AlertDialog {...uiStore.dialogConfig} />
+        <LoadingDialog {...uiStore.dialogConfig} />
         {this.renderSnackbar()}
       </Fragment>
     )

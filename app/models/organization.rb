@@ -86,9 +86,9 @@ class Organization < ApplicationRecord
   def setup_user_membership_and_collections(user, synchronous: false)
     # make sure they're on the org
     Collection::UserCollection.find_or_create_for_user(user, self)
-    find_or_create_user_getting_started_collection(user, synchronous: synchronous)
     setup_user_membership(user)
-    add_shared_with_org_collections(user)
+    find_or_create_user_getting_started_content(user, synchronous: synchronous)
+    add_shared_with_org_collections(user) if primary_group.can_view? user
   end
 
   # This gets called from Roles::MassRemove after leaving a primary/guest group
@@ -279,40 +279,18 @@ class Organization < ApplicationRecord
     )
   end
 
-  def find_or_create_user_getting_started_collection(user, synchronous: false)
+  def find_or_create_user_getting_started_content(user, synchronous: false)
     return if getting_started_collection.blank?
 
     user_collection = user.current_user_collection(id)
-    # should find it even if you had archived it
-    existing = Collection.find_by(
-      created_by: user,
-      organization: self,
-      cloned_from: getting_started_collection,
-    )
-    return existing if existing.present?
-
-    user_getting_started = getting_started_collection.duplicate!(
-      for_user: user,
-      parent: user_collection,
-      system_collection: true,
+    # this will copy them to the beginning
+    getting_started_collection.copy_all_cards_into!(
+      user_collection,
       synchronous: synchronous,
+      # allows copies to continue even if the user can't view the original content
+      system_collection: true,
     )
-
-    # Change from Collection::Global to regular colleciton
-    user_getting_started.update_attributes(type: nil)
-    user_getting_started = user_getting_started.becomes(Collection)
-
-    CollectionCardBuilder.new(
-      params: {
-        # put it after SharedWithMe
-        order: 1,
-        collection_id: user_getting_started.id,
-      },
-      parent_collection: user_collection,
-      user: user,
-    ).create
-    user_collection.reorder_cards!
-    user_getting_started
+    user_collection.update(awaiting_first_user_content: false)
   end
 
   def check_email_domains_and_join_org_group(user)
