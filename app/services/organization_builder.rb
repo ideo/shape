@@ -28,7 +28,7 @@ class OrganizationBuilder
         create_network_subscription
       else
         @user.current_user_collection(@organization.id).update(
-          awaiting_first_user_content: false
+          awaiting_first_user_content: false,
         )
       end
       true

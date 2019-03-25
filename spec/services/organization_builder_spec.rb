@@ -57,7 +57,11 @@ RSpec.describe OrganizationBuilder, type: :service do
       it 'should create the templates' do
         expect(OrganizationTemplates).to receive(:call).with(organization, user)
         builder.save
-        expect(user.user_profile_for_org(organization.id)).not_to be nil
+      end
+
+      it 'should call setup_user_membership for the first admin' do
+        expect(organization).to receive(:setup_user_membership).with(user).twice
+        builder.save
       end
 
       it 'should create the network organization' do
