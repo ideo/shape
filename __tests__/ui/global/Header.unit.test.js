@@ -15,9 +15,11 @@ describe('Header', () => {
     props = {
       apiStore: fakeApiStore(),
       routingStore: fakeRoutingStore,
+      uiStore: fakeUiStore,
     }
     props.apiStore.currentUser.current_organization.primary_group = group
-    wrapper = shallow(<Header.wrappedComponent {...props} />)
+    render = () => (wrapper = shallow(<Header.wrappedComponent {...props} />))
+    render()
   })
 
   it('renders the logo', () => {
@@ -51,9 +53,9 @@ describe('Header', () => {
     beforeEach(() => {
       fakeCollection.isNormalCollection = true
       fakeCollection.breadcrumb = [{ id: 12 }]
-      // TODO: can't get this test to pass because we probably need to update this component to take uiStore as an arg in props
-      const uiStore = fakeUiStore
-      uiStore.viewingCollection = fakeCollection
+      props.uiStore.viewingCollection = fakeCollection
+      // TODO: how do I properly reset this state? uiStore.viewingCollection persists outside this block
+      render()
     })
 
     it('should render the breadcrumb', () => {
@@ -62,7 +64,9 @@ describe('Header', () => {
 
     describe('on the homepage', () => {
       beforeEach(() => {
-        fakeRoutingStore.isHomepage = true
+        // TODO: how do I properly reset this state?
+        props.routingStore.isHomepage = true
+        render()
       })
 
       it('should not render the breadcrumb', () => {
@@ -71,11 +75,12 @@ describe('Header', () => {
     })
   })
 
-  describe('with an item', () => {
+  describe('with an editable item', () => {
     beforeEach(() => {
-      // TODO: can't get this test to pass because we probably need to update this component to take uiStore as an arg in props
-      const uiStore = fakeUiStore
-      uiStore.viewingItem = fakeTextItem
+      fakeTextItem.can_edit = true
+      props.uiStore.viewingItem = fakeTextItem
+      // TODO: how do I properly reset this state? uiStore.viewingItem persists outside this block
+      render()
     })
 
     it('should render the breadcrumb', () => {
@@ -97,12 +102,16 @@ describe('Header', () => {
   describe('when clicking on user', () => {
     let settings, logout
 
+    // TODO: I don't know why this suite can't find the dropdown.
     beforeEach(() => {
       wrapper
         .find('.userBtn')
         .first()
         .simulate('click')
-      const menuProps = wrapper.find('PopoutMenu').props()
+      const menuProps = wrapper
+        .find('.userDropdown')
+        .find('MainMenuDropdown')
+        .props()
       settings = menuProps.menuItems.find(
         item => item.name === 'Account Settings'
       )
@@ -110,8 +119,11 @@ describe('Header', () => {
     })
 
     it('renders the user menu', () => {
-      expect(wrapper.find('PopoutMenu').props().menuOpen).toBe(true)
-      expect(wrapper.find('PopoutMenu').exists()).toBe(true)
+      const MainMenuDropdown = wrapper
+        .find('.userDropdown')
+        .find('MainMenuDropdown')
+      expect(MainMenuDropdown.props().menuOpen).toBe(true)
+      expect(MainMenuDropdown.exists()).toBe(true)
     })
 
     it('has user settings option', () => {

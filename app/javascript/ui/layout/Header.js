@@ -378,7 +378,7 @@ class Header extends React.Component {
                   open={uiStore.organizationMenuOpen}
                 />
                 <Hidden smDown>
-                  <StyledAvatarAndDropdown>
+                  <StyledAvatarAndDropdown className="orgDropdown">
                     {this.renderOrgDropdown}
                     <button
                       style={{ display: 'block' }}
@@ -395,7 +395,7 @@ class Header extends React.Component {
                     </button>
                   </StyledAvatarAndDropdown>
                 </Hidden>
-                <StyledAvatarAndDropdown>
+                <StyledAvatarAndDropdown className="userDropdown">
                   {this.renderUserDropdown}
                   <button
                     style={{ display: 'block' }}

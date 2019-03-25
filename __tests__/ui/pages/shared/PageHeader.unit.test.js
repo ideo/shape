@@ -43,7 +43,7 @@ describe('PageHeader', () => {
         wrapper.setProps(props)
       })
 
-      it('should not render the roles', () => {
+      it('should render the roles', () => {
         expect(wrapper.find('RolesSummary').exists()).toBeTruthy()
       })
 
