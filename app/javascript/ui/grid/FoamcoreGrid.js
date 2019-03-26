@@ -152,15 +152,15 @@ class FoamcoreGrid extends React.Component {
   }
 
   onDragOrResizeStop = (cardId, dragType, ev) => {
-    console.log('drag stop', ev)
+    const { uiStore } = this.props
     // TODO clear the overridden drag positions when stop dragging
 
+    uiStore.stopDragging()
     runInAction(() => {
       this.dragging = false
+      // TODO not sure why stopDragging doesn't clear this out
+      uiStore.multiMoveCardIds = []
     })
-    if (dragType === 'resize') {
-      console.log('drag stop', ev)
-    }
   }
 
   onResize = (cardId, newSize) => {}
@@ -399,7 +399,6 @@ class FoamcoreGrid extends React.Component {
     allCardsToLayout = allCardsToLayout.filter(
       card => !card.isBeingMultiDragged
     )
-
     let addedHoverCard = this.hoverGridSpot
     const cardElements = allCardsToLayout.map(spot => {
       // If another real card is filling up the hover spot, don't render
