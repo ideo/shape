@@ -12,16 +12,24 @@ class CardMover
     @from_collection = from_collection
     @to_collection = to_collection
     @placement = placement
+    @card_action = card_action
+    @should_update_from_cover = false
     # retain array of cards being moved
     @moving_cards = cards.to_a
-    @card_action = card_action
+    @existing_cards = []
+    @pinned_cards = []
+    @to_collection_cards = []
+    @legend_items_to_duplicate = []
     @errors = []
   end
 
   def call
     return false if to_collection_invalid
-    gather_cards_in_destination
-    move_cards
+    select_existing_cards
+    select_pinned_cards
+    select_to_collection_cards
+    duplicate_or_link_legend_items
+    move_cards_to_collection
     recalculate_cached_values
     update_template_instances
     assign_permissions
@@ -30,59 +38,69 @@ class CardMover
 
   private
 
-  def gather_cards_in_destination
-    if @to_collection.master_template?
-      # for moving cards in a master template, all cards are pinned;
-      # so we don't need to "lock" the existing pinned cards to the front
-      @pinned_cards = []
-      @existing_cards = @to_collection.collection_cards.to_a
-    else
-      @pinned_cards = @to_collection.collection_cards.pinned.to_a
-      @existing_cards = @to_collection.collection_cards.unpinned.to_a
-    end
+  def move?
+    @card_action == 'move'
   end
 
-  def move_cards
-    # track if we should update their collection covers
-    @should_update_from_cover = false
-    @should_update_to_cover = false
-    if @card_action == 'move'
+  def link?
+    @card_action == 'link'
+  end
+
+  def select_existing_cards
+    cards = @to_collection.collection_cards
+    cards = cards.unpinned unless @to_collection.master_template?
+    @existing_cards = cards.to_a
+  end
+
+  def select_pinned_cards
+    # for moving cards in a master template, all cards are pinned;
+    # so we don't need to "lock" the existing pinned cards to the front
+    return if @to_collection.master_template?
+    @pinned_cards = @to_collection.collection_cards.pinned.to_a
+  end
+
+  def select_to_collection_cards
+    if move?
       # minus any we're moving (i.e. moving within the same collection)
       @existing_cards.reject! { |card| @moving_cards.include? card }
       unless @to_collection == @from_collection
         @should_update_from_cover = @moving_cards.any?(&:should_update_parent_collection_cover?)
       end
-    elsif @card_action == 'link'
+    elsif link?
       # for links, we build new link cards out of our selected moving ones
       @moving_cards = @moving_cards.map(&:copy_into_new_link_card)
     end
-    joined_cards = []
+
     # created joined array with moving_cards either at beginning or end
     if @placement == 'beginning'
-      joined_cards = (@pinned_cards + @moving_cards + @existing_cards)
+      @to_collection_cards = (@pinned_cards + @moving_cards + @existing_cards)
     else
-      joined_cards = (@pinned_cards + @existing_cards + @moving_cards)
+      @to_collection_cards = (@pinned_cards + @existing_cards + @moving_cards)
     end
+
     # uniq the array because we may be moving within the same collection
-    joined_cards.uniq!
+    @to_collection_cards.uniq!
+  end
+
+  def move_cards_to_collection
     # Reorder all cards based on order of joined_cards
-    joined_cards.each_with_index do |card, i|
+    @to_collection_cards.map.with_index do |card, i|
       # parent_id will already be set for existing_cards but no harm to indicate
       card.assign_attributes(parent_id: @to_collection.id, order: i)
       if @to_collection.master_template?
-        # currently any cards created in master_templates become pinned
+        # Currently any cards created in master_templates become pinned
         card.assign_attributes(pinned: true)
       end
       if card.changed?
         @should_update_to_cover ||= card.should_update_parent_collection_cover?
         card.save
       end
+      card
     end
-    @moving_cards
   end
 
   def recalculate_cached_values
-    unless @card_action == 'link' || @from_collection == @to_collection
+    unless link? || @from_collection == @to_collection
       @from_collection.touch
       @from_collection.reload.reorder_cards!
       @from_collection.cache_card_count!
@@ -98,9 +116,22 @@ class CardMover
     @to_collection.queue_update_template_instances if @to_collection.master_template?
   end
 
+  def duplicate_or_link_legend_items
+    mover = LegendMover.new(
+      to_collection: @to_collection,
+      cards: @to_collection_cards,
+      action: @card_action,
+    )
+
+    return unless mover.call
+
+    @moving_cards += mover.legend_item_cards
+    @to_collection_cards += mover.legend_item_cards
+  end
+
   def to_collection_invalid
     # these only apply for moving actions
-    return unless @card_action == 'move'
+    return unless move?
     # Not allowed to move between organizations
     if @to_collection.organization_id != @from_collection.organization_id
       @errors << 'You can\'t move a collection to a different organization.'
@@ -126,7 +157,7 @@ class CardMover
 
   def assign_permissions
     return if @to_collection == @from_collection
-    return unless @card_action == 'move'
+    return unless move?
     @moving_cards.each do |card|
       Roles::MergeToChild.call(parent: @to_collection, child: card.record)
     end

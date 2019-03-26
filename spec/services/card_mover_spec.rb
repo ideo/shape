@@ -93,6 +93,82 @@ RSpec.describe CardMover, type: :service do
       end
     end
 
+    context 'with data items that have legends' do
+      let!(:data_item) do
+        create(
+          :data_item,
+          :report_type_record,
+          parent_collection: from_collection)
+      end
+      let(:legend_item) { data_item.legend_item }
+
+      before do
+        legend_item.reload # to make sure data_item_ids aren't cached
+        moving_cards.push(data_item.parent_collection_card)
+        user.add_role(Role::EDITOR, data_item)
+      end
+
+      it 'moves legend if not selected' do
+        expect(
+          to_collection.collection_cards.map(&:item).compact,
+        ).not_to include(legend_item)
+        expect {
+          card_mover.call
+        }.not_to change(Item::LegendItem, :count)
+        expect(
+          to_collection.collection_cards.reload.map(&:item).compact,
+        ).to include(legend_item)
+      end
+
+      context 'with legend linked to other data items not moved' do
+        let!(:data_item_two) do
+          create(
+            :data_item,
+            :report_type_record,
+            parent_collection: from_collection,
+            legend_item: legend_item,
+          )
+        end
+
+        before do
+          user.add_role(Role::EDITOR, data_item_two)
+        end
+
+        it 'duplicates legend' do
+          expect {
+            card_mover.call
+          }.to change(Item::LegendItem, :count).by(1)
+        end
+
+        it 'leaves existing data item linked to legend item' do
+          card_mover.call
+          to_collection_legend_items = to_collection.collection_cards.select do |card|
+            card.item&.is_a?(Item::LegendItem)
+          end.map(&:item)
+          expect(
+            to_collection_legend_items.size,
+          ).to eq(1)
+          expect(to_collection_legend_items.first).to eq(data_item.reload.legend_item)
+          expect(data_item_two.reload.legend_item).not_to eq(data_item.legend_item)
+        end
+      end
+
+      context 'with card_action "link"' do
+        let(:card_action) { 'link' }
+        let(:linking_cards) { moving_cards }
+
+        it 'adds legend to included cards if not included' do
+          expect(
+            to_collection.collection_cards.map(&:item).compact,
+          ).not_to include(legend_item)
+          card_mover.call
+          expect(
+            to_collection.collection_cards.reload.map(&:item).compact,
+          ).to include(legend_item)
+        end
+      end
+    end
+
     context 'with invalid move' do
       let(:parent_collection) { create(:collection) }
       let(:parent_collection_card) { create(:collection_card, collection: parent_collection) }
