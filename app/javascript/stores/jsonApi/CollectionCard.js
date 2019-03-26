@@ -238,6 +238,10 @@ class CollectionCard extends BaseRecord {
     return uiStore.multiMoveCardIds.indexOf(this.id) > -1
   }
 
+  get isBeingMultiDragged() {
+    return uiStore.dragCardMaster !== this.id && this.isBeingMultiMoved
+  }
+
   async API_archiveSelf() {
     try {
       await this.apiStore.archiveCards({

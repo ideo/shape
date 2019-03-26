@@ -41,6 +41,10 @@ function getMapKey({ col, row }) {
   return `${col},${row}`
 }
 
+function isPointSame(first, other) {
+  return first.row === other.row && first.col === other.col
+}
+
 // needs to be an observer to observe changes to the collection + items
 @inject('apiStore', 'routingStore', 'uiStore')
 @observer
@@ -108,7 +112,7 @@ class FoamcoreGrid extends React.Component {
     const pageMargin = (window.innerWidth - v.maxWidth) / 2
     const hoverPos = {
       x: ev.pageX - pageMargin + this.gridRef.scrollLeft,
-      y: ev.pageY - 200 + this.gridRef.scrollTop,
+      y: ev.pageY - v.headerHeight + this.gridRef.scrollTop,
     }
     const overlap = this.findOverlap(hoverPos)
     runInAction(() => {
@@ -272,7 +276,7 @@ class FoamcoreGrid extends React.Component {
 
   findCardForSpot({ col, row }) {
     const cards = this.props.collection.collection_cards
-    return cards.find(card => card.col === col && card.row === row)
+    return cards.find(card => isPointSame(card, { col, row }))
   }
 
   positionForSpot({ col, row }) {
@@ -293,17 +297,20 @@ class FoamcoreGrid extends React.Component {
     }
   }
 
-  positionCard(card, { col, row }) {
+  positionCard(card) {
+    const { col, row } = card
     const { canEditCollection, collection, routingStore, uiStore } = this.props
     const position = this.positionForSpot({ col, row })
     const { cardMenuOpen } = uiStore
     const { zoomLevel } = this
     const beingDraggedOnSpot =
       this.dragging && this.getDraggedOnSpot({ col, row })
-    const hoverOverLeft =
+    const hoverOverLeft = !!(
       beingDraggedOnSpot && beingDraggedOnSpot.direction === 'left'
-    const hoverOverRight =
+    )
+    const hoverOverRight = !!(
       beingDraggedOnSpot && beingDraggedOnSpot.direction === 'right'
+    )
 
     return (
       <MovableGridCard
@@ -338,12 +345,12 @@ class FoamcoreGrid extends React.Component {
       this.dragging ||
       (this.hoverGridSpot.col === col && this.hoverGridSpot.row === row)
     ) {
-      // console.log('blank', position)
       return (
         <BlankCard
           onClick={this.handleBlankCardClick.bind(this, { col, row })}
           {...position}
           zoomLevel={zoomLevel}
+          key={`blank-${col}:${row}`}
           draggedOn
         />
       )
@@ -355,7 +362,6 @@ class FoamcoreGrid extends React.Component {
     const { canEditCollection, collection, routingStore } = this.props
     const position = this.positionForSpot({ col, row })
     // TODO this has to be documented
-    console.log('psotion', position)
     const blankContentTool = {
       id: 'blank',
       num: 0,
@@ -367,7 +373,7 @@ class FoamcoreGrid extends React.Component {
     const { zoomLevel } = this
     return (
       <MovableGridCard
-        key={blankContentTool.id}
+        key={`bct-${col}:${row}`}
         card={blankContentTool}
         cardType={blankContentTool.cardType}
         canEditCollection={canEditCollection}
@@ -383,25 +389,35 @@ class FoamcoreGrid extends React.Component {
   }
 
   positionCards() {
-    const { collection, uiStore } = this.props
+    const { collection } = this.props
     let allCardsToLayout = [...collection.collection_cards]
-    if (this.hoverGridSpot) allCardsToLayout.push(this.hoverGridSpot)
     if (this.blankContentTool) allCardsToLayout.push(this.blankContentTool)
     if (this.dragGridSpot.size)
       allCardsToLayout = [...allCardsToLayout, ...this.dragGridSpot.values()]
+
+    // Don't render cards that are being dragged along
+    allCardsToLayout = allCardsToLayout.filter(
+      card => !card.isBeingMultiDragged
+    )
+
+    let addedHoverCard = this.hoverGridSpot
     const cardElements = allCardsToLayout.map(spot => {
-      const { col, row } = spot
-      if (
-        !spot.id ||
-        (spot.isBeingMultiMoved && uiStore.dragCardMaster !== spot.id)
-      ) {
-        return this.positionBlank({ col, row })
+      // If another real card is filling up the hover spot, don't render
+      // the hover spot at all (which gets rendered after this loop)
+      if (spot.id && isPointSame(spot, this.hoverGridSpot)) {
+        addedHoverCard = null
       }
       if (spot.id === 'blank') {
-        return this.positionBct(spot, { col, row })
+        return this.positionBct(spot)
       }
-      return this.positionCard(spot, { col, row })
+      if (spot.id) {
+        return this.positionCard(spot)
+      }
+      return this.positionBlank(spot)
     })
+    if (addedHoverCard) {
+      cardElements.push(this.positionBlank(addedHoverCard))
+    }
     return cardElements
   }
 
