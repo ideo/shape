@@ -297,6 +297,9 @@ class Collection < ApplicationRecord
       c.parent_collection_card.collection = c
     end
 
+    # Method from Externalizable
+    duplicate_external_records(c)
+
     c.enable_org_view_access_if_allowed(parent)
 
     if collection_cards.any? && !c.getting_started_shell

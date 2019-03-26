@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190319185820) do
+ActiveRecord::Schema.define(version: 20190326201728) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -182,7 +182,7 @@ ActiveRecord::Schema.define(version: 20190319185820) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["application_id"], name: "index_external_records_on_application_id"
-    t.index ["external_id", "application_id", "externalizable_type"], name: "index_uniq_external_id", unique: true
+    t.index ["external_id", "application_id", "externalizable_type", "externalizable_id"], name: "index_external_records_common_fields"
     t.index ["externalizable_type", "externalizable_id"], name: "index_on_externalizable"
   end
 

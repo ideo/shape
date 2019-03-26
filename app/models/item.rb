@@ -146,6 +146,9 @@ class Item < ApplicationRecord
       i.parent_collection_card.item = i
     end
 
+    # Method from Externalizable
+    duplicate_external_records(i)
+
     # Method from HasFilestackFile
     filestack_file_duplicate!(i)
 
