@@ -392,6 +392,7 @@ describe Collection::TestCollection, type: :model do
     let!(:test_collection) do
       create(:test_collection, :completed, master_template: true, parent_collection: submission_template)
     end
+    let!(:test_instance) { create(:test_collection, template: test_collection) }
     let(:submission) { create(:collection, :submission, parent_collection: submission_box.submissions_collection) }
     let(:submission_test) { create(:test_collection, :completed, template: test_collection, parent_collection: submission) }
 
@@ -408,7 +409,8 @@ describe Collection::TestCollection, type: :model do
           expect(test_collection.test_design.present?).to be false
         end
 
-        it 'should call the UpdateTemplateInstancesWorker' do
+        it 'should call the UpdateTemplateInstancesWorker if there are any instances' do
+          expect(test_collection.templated_collections.count).to eq 1
           expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(test_collection.id)
           test_collection.launch!(initiated_by: user)
         end
