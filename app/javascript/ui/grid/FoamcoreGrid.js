@@ -106,9 +106,6 @@ class FoamcoreGrid extends React.Component {
   }
 
   handleMouseMove = ev => {
-    // TODO this re-renders so probably throttle it?
-    // TODO 170 and 200 should be based on actual values for header height and
-    // margins on the page
     const pageMargin = (window.innerWidth - v.maxWidth) / 2
     const hoverPos = {
       x: ev.pageX - pageMargin + this.gridRef.scrollLeft,
@@ -139,7 +136,6 @@ class FoamcoreGrid extends React.Component {
       x: dragPosition.dragX,
       y: dragPosition.dragY,
     }
-    // TODO move this somewhere where it's more efficient and doesn't rerender
     const overlapCoords = this.findOverlap(overlapPos)
     this.debouncedSetDraggedOnSpots(overlapCoords, dragPosition)
   }
@@ -153,8 +149,6 @@ class FoamcoreGrid extends React.Component {
 
   onDragOrResizeStop = (cardId, dragType, ev) => {
     const { uiStore } = this.props
-    // TODO clear the overridden drag positions when stop dragging
-
     uiStore.stopDragging()
     runInAction(() => {
       this.dragging = false
@@ -179,12 +173,10 @@ class FoamcoreGrid extends React.Component {
     if (!overlapCoords) {
       return
     }
-    // TODO refactor confusing different return types here
     const maybeCard = this.findCardForSpot(overlapCoords)
     if (maybeCard) {
       this.setCardDragSpot(maybeCard, dragPosition)
       if (uiStore.multiMoveCardIds.length > 1 && !recur) {
-        // TODO omg rename
         this.setMultiMoveDragSpots(overlapCoords, dragPosition)
       }
       return
@@ -193,7 +185,6 @@ class FoamcoreGrid extends React.Component {
       this.dragGridSpot.set(getMapKey(overlapCoords), overlapCoords)
     })
     if (uiStore.multiMoveCardIds.length > 1 && !recur) {
-      // TODO omg rename
       this.setMultiMoveDragSpots(overlapCoords, dragPosition)
     }
   }
@@ -288,6 +279,7 @@ class FoamcoreGrid extends React.Component {
       w: 1 * (gridW + gutter) - gutter,
       h: 1 * (gridH + gutter) - gutter,
     }
+    // TODO try and get rid of {x|y}Pos
     return {
       ...pos,
       xPos: pos.x,
@@ -371,6 +363,7 @@ class FoamcoreGrid extends React.Component {
       height: 1,
     }
     const { zoomLevel } = this
+    // TODO combine this rendering of MoveableGridCard with positionCard
     return (
       <MovableGridCard
         key={`bct-${col}:${row}`}
