@@ -319,24 +319,27 @@ class Collection < ApplicationRecord
   end
 
   def copy_all_cards_into!(
-    other_collection,
+    target_collection,
     placement: 'beginning',
     synchronous: false,
     system_collection: false
   )
-    cards = placement == 'beginning' ? collection_cards.reverse : collection_cards
+    cards = placement != 'end' ? collection_cards.reverse : collection_cards
+    duplicates = []
     cards.each do |card|
       # ensures single copy, if existing copies already exist it will skip those
-      existing_records = other_collection.collection_cards.map(&:record)
+      existing_records = target_collection.collection_cards.map(&:record)
       next if existing_records.select { |r| r.cloned_from == card.record }.present?
-      card.duplicate!(
-        parent: other_collection,
+      duplicates << card.duplicate!(
+        parent: target_collection,
         placement: placement,
         synchronous: synchronous,
         # can allow copies to continue even if the user can't view the original content
         system_collection: system_collection,
       )
     end
+    # return the set of created duplicates
+    CollectionCard.where(id: duplicates.pluck(:id))
   end
 
   # NOTE: this refers to the first level of children

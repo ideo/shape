@@ -167,7 +167,7 @@ describe Collection, type: :model do
     end
   end
 
-  describe '#duplicate' do
+  describe '#duplicate!' do
     let!(:user) { create(:user) }
     let!(:parent_collection_user) { create(:user) }
     let!(:collection_user) { create(:user) }
@@ -350,6 +350,29 @@ describe Collection, type: :model do
         expect(shell_collection.cloned_from.collection_cards.count).to eq 2
         expect(shell_collection.collection_cards.count).to eq 0
       end
+    end
+  end
+
+  describe '#copy_all_cards_into!' do
+    let(:source_collection) { create(:collection, num_cards: 3) }
+    let(:target_collection) { create(:collection, num_cards: 2) }
+
+    it 'copies all cards from source to target, to the beginning' do
+      source_collection.copy_all_cards_into!(target_collection, synchronous: true)
+      target_collection.reload
+      expect(target_collection.collection_cards.count).to eq 5
+      first_record = source_collection.collection_cards.first.record
+      expect(target_collection.collection_cards.first.record.cloned_from).to eq first_record
+    end
+
+    it 'copies all cards from source to target, to the specified order' do
+      source_collection.copy_all_cards_into!(target_collection, synchronous: true, placement: 1)
+      target_collection.reload
+      # first record should still be the original target_collection card
+      expect(target_collection.collection_cards.first.record.cloned_from).to be nil
+      first_record = source_collection.collection_cards.first.record
+      # check the second record
+      expect(target_collection.collection_cards.second.record.cloned_from).to eq first_record
     end
   end
 

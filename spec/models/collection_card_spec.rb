@@ -180,6 +180,17 @@ RSpec.describe CollectionCard, type: :model do
       end
     end
 
+    context 'with specified order placement' do
+      let!(:collection) { create(:collection, num_cards: 3, record_type: :collection) }
+      let(:collection_card) { collection.collection_cards.first }
+      let(:placement) { 1 }
+
+      it 'should place the duplicate in the middle of the collection' do
+        expect(duplicate.order).to eq 1
+        expect(collection.collection_cards.second).to eq duplicate
+      end
+    end
+
     context 'with pinned card from regular collection' do
       let!(:collection_card) { create(:collection_card_text, pinned: true) }
 
