@@ -49,7 +49,7 @@ class FoamcoreGrid extends React.Component {
   @observable
   positionedCards = []
   @observable
-  blankCard = { idx: null }
+  blankContentTool = null
   @observable
   zoomLevel = 1
   dragGridSpot = observable.map({})
@@ -77,9 +77,13 @@ class FoamcoreGrid extends React.Component {
     return !!this.getDraggedOnSpot(coords)
   }
 
-  handleBlankCardClick = data => {
+  handleBlankCardClick = ({ row, col }) => {
     runInAction(() => {
-      this.blankCard = data
+      this.blankContentTool = {
+        id: 'blank',
+        row,
+        col,
+      }
     })
   }
 
@@ -101,8 +105,9 @@ class FoamcoreGrid extends React.Component {
     // TODO this re-renders so probably throttle it?
     // TODO 170 and 200 should be based on actual values for header height and
     // margins on the page
+    const pageMargin = (window.innerWidth - v.maxWidth) / 2
     const hoverPos = {
-      x: ev.pageX - 170 + this.gridRef.scrollLeft,
+      x: ev.pageX - pageMargin + this.gridRef.scrollLeft,
       y: ev.pageY - 200 + this.gridRef.scrollTop,
     }
     const overlap = this.findOverlap(hoverPos)
@@ -333,12 +338,13 @@ class FoamcoreGrid extends React.Component {
       this.dragging ||
       (this.hoverGridSpot.col === col && this.hoverGridSpot.row === row)
     ) {
+      // console.log('blank', position)
       return (
         <BlankCard
           onClick={this.handleBlankCardClick.bind(this, { col, row })}
           {...position}
           zoomLevel={zoomLevel}
-          draggedOn={this.dragging && this.isBeingDraggedOn({ col, row })}
+          draggedOn
         />
       )
     }
@@ -349,7 +355,8 @@ class FoamcoreGrid extends React.Component {
     const { canEditCollection, collection, routingStore } = this.props
     const position = this.positionForSpot({ col, row })
     // TODO this has to be documented
-    const blankCard = {
+    console.log('psotion', position)
+    const blankContentTool = {
       id: 'blank',
       num: 0,
       cardType: 'blank',
@@ -360,14 +367,14 @@ class FoamcoreGrid extends React.Component {
     const { zoomLevel } = this
     return (
       <MovableGridCard
-        key={blankCard.id}
-        card={blankCard}
-        cardType={blankCard.cardType}
+        key={blankContentTool.id}
+        card={blankContentTool}
+        cardType={blankContentTool.cardType}
         canEditCollection={canEditCollection}
         isUserCollection={collection.isUserCollection}
         isSharedCollection={collection.isSharedCollection}
         position={position}
-        record={blankCard.record}
+        record={blankContentTool.record}
         routeTo={routingStore.routeTo}
         parent={collection}
         zoomLevel={zoomLevel}
@@ -379,6 +386,7 @@ class FoamcoreGrid extends React.Component {
     const { collection, uiStore } = this.props
     let allCardsToLayout = [...collection.collection_cards]
     if (this.hoverGridSpot) allCardsToLayout.push(this.hoverGridSpot)
+    if (this.blankContentTool) allCardsToLayout.push(this.blankContentTool)
     if (this.dragGridSpot.size)
       allCardsToLayout = [...allCardsToLayout, ...this.dragGridSpot.values()]
     const cardElements = allCardsToLayout.map(spot => {
@@ -388,6 +396,9 @@ class FoamcoreGrid extends React.Component {
         (spot.isBeingMultiMoved && uiStore.dragCardMaster !== spot.id)
       ) {
         return this.positionBlank({ col, row })
+      }
+      if (spot.id === 'blank') {
+        return this.positionBct(spot, { col, row })
       }
       return this.positionCard(spot, { col, row })
     })

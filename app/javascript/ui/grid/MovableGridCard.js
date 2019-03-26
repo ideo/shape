@@ -446,7 +446,7 @@ class MovableGridCard extends React.PureComponent {
     if (uiStore.cardMenuOpen.id === card.id) {
       zIndex = v.zIndex.aboveClickWrapper
     }
-    let transform = `scale(${1 / zoomLevel})`
+    let transform = `translateZ(0) scale(${1 / zoomLevel})`
     const adjustedWidth = width / zoomLevel
     const adjustedHeight = height / zoomLevel
     // const outerTransform = `scale(${1 / zoomLevel})`
@@ -547,6 +547,8 @@ class MovableGridCard extends React.PureComponent {
               transition,
               transform,
               transformOrigin: 'left top',
+              backfaceVisibility: 'hidden',
+              WebkitFontSmoothing: 'subpixel-antialiased',
             }}
           >
             <GridCard
