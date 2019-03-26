@@ -191,6 +191,7 @@ class MovableGridCard extends React.PureComponent {
     }
 
     this.dragPosition = dragPosition
+    this.props.card.dragPosition = dragPosition
     this.props.onDrag(this.props.card.id, dragPosition)
   }
 

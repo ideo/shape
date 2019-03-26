@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -59,6 +60,11 @@ class FoamcoreGrid extends React.Component {
   @observable
   draggingMap = []
 
+  constructor(props) {
+    super(props)
+    this.debouncedSetDraggedOnSpots = _.debounce(this.setDraggedOnSpots, 50)
+  }
+
   componentDidMount() {
     this.positionCards()
   }
@@ -116,7 +122,6 @@ class FoamcoreGrid extends React.Component {
   }
 
   onDrag = (cardId, dragPosition) => {
-    const { uiStore } = this.props
     runInAction(() => {
       this.dragging = true
     })
@@ -126,15 +131,8 @@ class FoamcoreGrid extends React.Component {
       y: dragPosition.dragY,
     }
     // TODO move this somewhere where it's more efficient and doesn't rerender
-    runInAction(() => {
-      this.dragGridSpot.clear()
-    })
     const overlapCoords = this.findOverlap(overlapPos)
-    this.setDraggedOnSpots(overlapCoords, dragPosition)
-    if (uiStore.multiMoveCardIds.length > 1) {
-      // TODO omg rename
-      this.setMultiMoveDragSpots(overlapCoords, dragPosition)
-    }
+    this.debouncedSetDraggedOnSpots(overlapCoords, dragPosition)
   }
 
   onDragStart = cardId => {
@@ -146,6 +144,7 @@ class FoamcoreGrid extends React.Component {
 
   onDragOrResizeStop = (cardId, dragType, ev) => {
     console.log('drag stop', ev)
+    // TODO clear the overridden drag positions when stop dragging
 
     runInAction(() => {
       this.dragging = false
@@ -157,24 +156,37 @@ class FoamcoreGrid extends React.Component {
 
   onResize = (cardId, newSize) => {}
 
-  setDraggedOnSpots(overlapCoords, dragPosition) {
+  setDraggedOnSpots(overlapCoords, dragPosition, recur) {
     /*
      * Sets the current spots that are being dragged on, whether it's a card
      * or a blank spot that then has to be rendered
      */
+    if (!recur) {
+      runInAction(() => {
+        this.dragGridSpot.clear()
+      })
+    }
+    const { uiStore } = this.props
     if (!overlapCoords) {
-      return null
+      return
     }
     // TODO refactor confusing different return types here
     const maybeCard = this.findCardForSpot(overlapCoords)
     if (maybeCard) {
       this.setCardDragSpot(maybeCard, dragPosition)
-      return maybeCard
+      if (uiStore.multiMoveCardIds.length > 1 && !recur) {
+        // TODO omg rename
+        this.setMultiMoveDragSpots(overlapCoords, dragPosition)
+      }
+      return
     }
     runInAction(() => {
       this.dragGridSpot.set(getMapKey(overlapCoords), overlapCoords)
     })
-    return overlapCoords
+    if (uiStore.multiMoveCardIds.length > 1 && !recur) {
+      // TODO omg rename
+      this.setMultiMoveDragSpots(overlapCoords, dragPosition)
+    }
   }
 
   determineDragMap(cardId) {
@@ -237,7 +249,7 @@ class FoamcoreGrid extends React.Component {
         col: mapped.col + masterPosition.col,
         row: mapped.row + masterPosition.row,
       }
-      this.setDraggedOnSpots(relativePosition, dragPosition)
+      this.setDraggedOnSpots(relativePosition, dragPosition, true)
     })
   }
 
@@ -287,6 +299,7 @@ class FoamcoreGrid extends React.Component {
       beingDraggedOnSpot && beingDraggedOnSpot.direction === 'left'
     const hoverOverRight =
       beingDraggedOnSpot && beingDraggedOnSpot.direction === 'right'
+
     return (
       <MovableGridCard
         key={card.id}
@@ -370,13 +383,9 @@ class FoamcoreGrid extends React.Component {
       allCardsToLayout = [...allCardsToLayout, ...this.dragGridSpot.values()]
     const cardElements = allCardsToLayout.map(spot => {
       const { col, row } = spot
-      if (!spot.id) {
-        return this.positionBlank({ col, row })
-      }
       if (
-        this.dragging &&
-        spot.isBeingMultiMoved &&
-        spot.id !== uiStore.dragCardMaster
+        !spot.id ||
+        (spot.isBeingMultiMoved && uiStore.dragCardMaster !== spot.id)
       ) {
         return this.positionBlank({ col, row })
       }
