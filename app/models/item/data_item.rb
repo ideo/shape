@@ -36,6 +36,8 @@ class Item
       report_type_record: 2,
     }
 
+    attr_accessor :dont_create_legend_item
+
     # All datasets available
     def all_datasets
       @all_datasets ||= load_datasets
@@ -50,6 +52,34 @@ class Item
             selected_measures.include?(dataset[:measure].to_s)
           )
       end
+    end
+
+    def create_legend_item(parent_collection = nil)
+      parent_collection ||= parent
+      builder = CollectionCardBuilder.new(
+        params: {
+          order: parent_collection_card.order + 1,
+          item_attributes: {
+            type: 'Item::LegendItem',
+          },
+        },
+        parent_collection: parent_collection,
+      )
+      if builder.create
+        update(legend_item: builder.collection_card.record)
+      else
+        errors.add(:legend_item, builder.errors.full_messages.join('. '))
+        throw :abort
+      end
+    end
+
+    # Override duplicate! so we can control legend item cloning
+    def duplicate!(**args)
+      self.dont_create_legend_item = true
+      duplicate = super(args)
+      return duplicate if duplicate.new_record? || duplicate.errors.present?
+
+      duplicate
     end
 
     private
@@ -84,25 +114,8 @@ class Item
     end
 
     def create_legend_item?
+      return false if dont_create_legend_item
       report_type_record? && legend_item.blank? && parent_collection_card.present?
-    end
-
-    def create_legend_item
-      builder = CollectionCardBuilder.new(
-        params: {
-          order: parent_collection_card.order + 1,
-          item_attributes: {
-            type: 'Item::LegendItem',
-          },
-        },
-        parent_collection: parent,
-      )
-      if builder.create
-        update(legend_item: builder.collection_card.record)
-      else
-        errors.add(:legend_item, builder.errors.full_messages.join('. '))
-        throw :abort
-      end
     end
   end
 end
