@@ -22,4 +22,13 @@ module Externalizable
     errors.add(:external_id, 'must be unique')
     raise ActiveRecord::Rollback
   end
+
+  def duplicate_external_records(externalizable)
+    external_records.map do |external_record|
+      dupe = external_record.amoeba_dup
+      dupe.externalizable = externalizable
+      dupe.save!
+      dupe
+    end
+  end
 end
