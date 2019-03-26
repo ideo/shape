@@ -40,9 +40,8 @@ const bounceAnim = keyframes`
 `
 
 const InnerCardWrapper = styled.div`
-  width: 100%;
-  height: 100%;
-  width: 100%;
+  width: ${props => props.width}px;
+  height: ${props => props.height}px;
   ${props =>
     props.animatedBounce &&
     `
@@ -447,8 +446,10 @@ class MovableGridCard extends React.PureComponent {
     if (uiStore.cardMenuOpen.id === card.id) {
       zIndex = v.zIndex.aboveClickWrapper
     }
-    let transform = ``
-    const outerTransform = `scale(${1 / zoomLevel})`
+    let transform = `scale(${1 / zoomLevel})`
+    const adjustedWidth = width / zoomLevel
+    const adjustedHeight = height / zoomLevel
+    // const outerTransform = `scale(${1 / zoomLevel})`
     let transition = dragging || resizing ? 'none' : cardCSSTransition
     // TODO this should actually check it's a breadcrumb
     const draggedOverBreadcrumb = !!uiStore.activeDragTarget
@@ -497,13 +498,9 @@ class MovableGridCard extends React.PureComponent {
           maxHeight={maxHeight}
           dragAxis="none"
           cancel=".no-drag"
-          style={{
-            transform: outerTransform,
-            transformOrigin: 'top left',
-          }}
           size={{
-            width,
-            height,
+            width: adjustedWidth,
+            height: adjustedHeight,
           }}
           position={{ x, y }}
           default={{ width, height, x: xPos, y: yPos }}
@@ -544,6 +541,8 @@ class MovableGridCard extends React.PureComponent {
         >
           <InnerCardWrapper
             animatedBounce={holdingOver}
+            width={width}
+            height={height}
             style={{
               transition,
               transform,

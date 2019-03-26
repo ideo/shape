@@ -62,7 +62,7 @@ class FoamcoreGrid extends React.Component {
 
   constructor(props) {
     super(props)
-    this.debouncedSetDraggedOnSpots = _.debounce(this.setDraggedOnSpots, 50)
+    this.debouncedSetDraggedOnSpots = _.debounce(this.setDraggedOnSpots, 25)
   }
 
   componentDidMount() {
@@ -402,7 +402,15 @@ class FoamcoreGrid extends React.Component {
           this.gridRef = ref
         }}
       >
-        <div style={{ position: 'absolute', top: 0, left: 0, zIndex: 250 }}>
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            zIndex: 900,
+            background: 'white',
+          }}
+        >
           <button onClick={this.handleZoomOut}>
             <h3>-</h3>
           </button>
