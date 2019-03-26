@@ -126,7 +126,6 @@ class CollectionPage extends React.Component {
     if (collection.id === '203437') {
       const cards = collection.collection_cards
       console.log('special foamcore collection', cards.length)
-
       if (cards.length) {
         cards[0].col = 3
         cards[0].row = 0

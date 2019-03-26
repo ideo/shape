@@ -384,6 +384,13 @@ class FoamcoreGrid extends React.Component {
         routeTo={routingStore.routeTo}
         parent={collection}
         zoomLevel={zoomLevel}
+        menuOpen={false}
+        holdingOver={false}
+        hoveringOverRight={false}
+        hoveringOverLeft={false}
+        onDragOrResizeStop={() => {}}
+        onResize={() => {}}
+        onDrag={() => {}}
       />
     )
   }
