@@ -351,6 +351,27 @@ describe Collection, type: :model do
         expect(shell_collection.collection_cards.count).to eq 0
       end
     end
+
+    context 'with external records' do
+      let!(:external_records) do
+        [
+          create(:external_record, externalizable: collection, external_id: '100'),
+          create(:external_record, externalizable: collection, external_id: '101'),
+        ]
+      end
+
+      it 'duplicates external records' do
+        expect(collection.external_records.reload.size).to eq(2)
+  
+        expect {
+          duplicate
+        }.to change(ExternalRecord, :count).by(2)
+
+        expect(duplicate.external_records.pluck(:external_id)).to match_array(
+          %w[100 101],
+        )
+      end
+    end
   end
 
   describe '#copy_all_cards_into!' do
