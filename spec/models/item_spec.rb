@@ -108,6 +108,27 @@ RSpec.describe Item, type: :model do
         expect { duplicate }.to change(FilestackFile, :count).by(1)
       end
     end
+
+    context 'with external records' do
+      let!(:external_records) do
+        [
+          create(:external_record, externalizable: item, external_id: '100'),
+          create(:external_record, externalizable: item, external_id: '101'),
+        ]
+      end
+
+      it 'duplicates external records' do
+        expect(item.external_records.size).to eq(2)
+
+        expect {
+          duplicate
+        }.to change(ExternalRecord, :count).by(2)
+
+        expect(duplicate.external_records.pluck(:external_id)).to match_array(
+          %w[100 101],
+        )
+      end
+    end
   end
 
   describe '#update_parent_collection_if_needed' do

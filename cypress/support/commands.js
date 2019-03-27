@@ -3,8 +3,8 @@ import _ from 'lodash'
 // commands please read more here:
 // https://on.cypress.io/custom-commands
 
-Cypress.Commands.add('login', ({ userId } = {}) => {
-  cy.request('GET', `/login_as?id=${userId}`)
+Cypress.Commands.add('login', ({ email } = {}) => {
+  cy.request('GET', `/login_as?email=${email}`)
   cy.wait(100)
 })
 

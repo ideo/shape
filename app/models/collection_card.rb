@@ -36,6 +36,7 @@ class CollectionCard < ApplicationRecord
   scope :pinned, -> { where(pinned: true) }
   scope :unpinned, -> { where(pinned: false) }
   scope :visible, -> { where(hidden: false) }
+  scope :is_cover, -> { where(is_cover: true) }
 
   enum filter: {
     nothing: 0,
@@ -100,8 +101,10 @@ class CollectionCard < ApplicationRecord
       else
         cc.order = 0
       end
-    else
+    elsif placement == 'end'
       cc.order = parent.collection_cards.count
+    elsif placement.is_a? Integer
+      cc.order = placement
     end
 
     unless shallow || link?
@@ -125,7 +128,7 @@ class CollectionCard < ApplicationRecord
     return cc unless cc.save
     # now that the card exists, we can recalculate the breadcrumb
     cc.record.recalculate_breadcrumb!
-    cc.increment_card_orders! if placement == 'beginning'
+    cc.increment_card_orders! if placement != 'end'
     if parent.master_template?
       # we just added a template card, so update the instances
       parent.queue_update_template_instances

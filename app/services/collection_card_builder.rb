@@ -2,6 +2,7 @@ class CollectionCardBuilder
   attr_reader :collection_card, :errors
 
   def initialize(params:, parent_collection:, user: nil, type: 'primary')
+    @params = params
     @collection_card = parent_collection.send("#{type}_collection_cards").build(params)
     @errors = @collection_card.errors
     @user = user

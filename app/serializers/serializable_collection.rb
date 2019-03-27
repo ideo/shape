@@ -12,6 +12,12 @@ class SerializableCollection < BaseJsonSerializer
       @object.anchored_roles
     end
   end
+  has_many :collection_cover_items do
+    data do
+      # Only include cover items if this collection has indicated to use them
+      @object.cover_type_items? ? @object.collection_cover_items : []
+    end
+  end
   has_one :parent_collection_card
   has_one :parent
   has_one :live_test_collection
@@ -137,5 +143,9 @@ class SerializableCollection < BaseJsonSerializer
 
   attribute :test_collection_id, if: -> { @object.is_a?(Collection::TestDesign) } do
     @object.test_collection.id.to_s
+  end
+
+  attribute :awaiting_updates do
+    @object.getting_started_shell || @object.awaiting_first_user_content
   end
 end

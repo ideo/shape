@@ -7,10 +7,7 @@ namespace :cypress do
 
     email = 'cypress-test@ideo.com'
     user = User.find_by(email: email)
-    unless user.present?
-      user = FactoryBot.create(:user, email: email, id: 4).becomes(User)
-      User.connection.execute('ALTER SEQUENCE users_id_seq RESTART WITH 5')
-    end
+    user ||= FactoryBot.create(:user, email: email).becomes(User)
     organization = Organization.find_by(name: 'CypressTest')
     unless organization.present?
       builder = OrganizationBuilder.new(

@@ -9,10 +9,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :load_collection_cards, only: %i[index]
   def index
     params[:card_order] ||= @collection.default_card_order
+
     render jsonapi: @collection_cards,
            include: [
              :parent,
-             record: [:filestack_file],
+             record: %i[filestack_file collection_cover_items],
            ],
            expose: {
              card_order: params[:card_order],
@@ -293,6 +294,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :is_cover,
       :filter,
       :show_replace,
+      :order,
     )
   end
 
@@ -324,6 +326,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         template_id
         master_template
         external_id
+        cover_type
       ],
       item_attributes: [
         :id,
@@ -338,6 +341,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         :report_type,
         :external_id,
         :content,
+        :legend_item_id,
         data_content: {},
         filestack_file_attributes: [
           :url,

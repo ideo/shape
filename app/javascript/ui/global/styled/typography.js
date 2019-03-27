@@ -50,6 +50,7 @@ export const Heading3 = styled.h3`
   font-size: 0.9375rem;
   font-weight: ${v.weights.medium};
   letter-spacing: 0.0625rem;
+  color: ${props => props.color || v.colors.black};
 `
 Heading3.displayName = 'StyledHeading3'
 

@@ -86,9 +86,9 @@ class Organization < ApplicationRecord
   def setup_user_membership_and_collections(user, synchronous: false)
     # make sure they're on the org
     Collection::UserCollection.find_or_create_for_user(user, self)
-    find_or_create_user_getting_started_collection(user, synchronous: synchronous)
     setup_user_membership(user)
-    add_shared_with_org_collections(user)
+    find_or_create_user_getting_started_content(user, synchronous: synchronous)
+    add_shared_with_org_collections(user) if primary_group.can_view? user
   end
 
   # This gets called from Roles::MassRemove after leaving a primary/guest group
@@ -279,6 +279,28 @@ class Organization < ApplicationRecord
     )
   end
 
+  def find_or_create_user_getting_started_content(user, synchronous: false)
+    return if getting_started_collection.blank?
+
+    user_collection = user.current_user_collection(id)
+
+    # NOTE: can remove this once all orgs are migrated
+    if getting_started_collection.name == 'Getting Started with Shape'
+      return find_or_create_user_getting_started_collection(user, synchronous: synchronous)
+    end
+
+    # this will copy them to the beginning
+    getting_started_collection.copy_all_cards_into!(
+      user_collection,
+      synchronous: synchronous,
+      # allows copies to continue even if the user can't view the original content
+      system_collection: true,
+    )
+    user_collection.save if user_collection.cached_attributes.delete 'awaiting_first_user_content'
+    user_collection
+  end
+
+  # NOTE: can remove this legacy method once all orgs are migrated
   def find_or_create_user_getting_started_collection(user, synchronous: false)
     return if getting_started_collection.blank?
 
@@ -304,8 +326,7 @@ class Organization < ApplicationRecord
 
     CollectionCardBuilder.new(
       params: {
-        # put it after SharedWithMe
-        order: 1,
+        order: 0,
         collection_id: user_getting_started.id,
       },
       parent_collection: user_collection,

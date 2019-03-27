@@ -103,11 +103,12 @@ gem 'aasm', '~> 5.0'
 # mailchimp API
 gem 'gibbon', '~> 3.2'
 
-# interact with JS functions
-gem "schmooze", "~> 0.2.0"
 # distributed mutex
 gem "redis-mutex", "~> 4.0.1"
 
+# performance tuning
+gem 'tunemygc'
+gem 'scout_apm'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -139,6 +140,8 @@ group :development do
   gem 'guard-rspec', require: false
   gem 'binding_of_caller'
   gem 'better_errors'
+  gem 'derailed_benchmarks'
+  gem 'stackprof'
 end
 
 group :test do

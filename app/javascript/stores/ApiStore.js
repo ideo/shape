@@ -7,6 +7,8 @@ import queryString from 'query-string'
 
 import { apiUrl } from '~/utils/url'
 import trackError from '~/utils/trackError'
+import googleTagManager from '~/vendor/googleTagManager'
+
 import Activity from './jsonApi/Activity'
 import Collection from './jsonApi/Collection'
 import CollectionCard from './jsonApi/CollectionCard'
@@ -485,10 +487,20 @@ class ApiStore extends jsonapi(datxCollection) {
     }
   }
 
-  checkCurrentOrganizationPayments() {
-    return this.request(
+  async checkCurrentOrganizationPayments() {
+    const { has_payment_method } = this.currentUserOrganization
+    const res = await this.request(
       `organizations/${this.currentUserOrganizationId}/check_payments`
     )
+    const org = res.data
+    if (!has_payment_method && org.has_payment_method) {
+      // payment method was successfully added
+      googleTagManager.push({
+        event: 'formSubmission',
+        formType: 'Added Payment Method',
+      })
+    }
+    return org
   }
 
   beginTokenRefreshPoller() {
