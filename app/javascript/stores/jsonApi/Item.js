@@ -32,6 +32,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
     'filestack_file_attributes',
     'data_settings',
     'report_type',
+    'selected_measures',
   ]
 
   get justText() {
@@ -95,6 +96,10 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return (
       this.filestack_file && this.filestack_file.mimetype === 'application/pdf'
     )
+  }
+
+  get isLegend() {
+    return this.type === ITEM_TYPES.LEGEND
   }
 
   get isDownloadable() {
@@ -164,31 +169,34 @@ class Item extends SharedRecordMixin(BaseRecord) {
     })
   }
 
+  get primaryDataset() {
+    const { datasets } = this
+    if (!datasets) return null
+    if (datasets.length <= 1) return datasets[0]
+    return datasets.find(dataset => dataset.order === 0)
+  }
+
   get measure() {
-    const { data_settings, name } = this
-    if (!data_settings || !data_settings.d_measure)
+    const { name } = this
+    const { measure } = this.primaryDataset
+    if (!measure)
       return {
         name,
       }
-    const measure = _.find(DATA_MEASURES, { value: data_settings.d_measure })
-    if (!measure) {
-      const measureName = _.capitalize(data_settings.d_measure)
-      return {
-        name: measureName,
-      }
+    const shapeMeasure = _.find(DATA_MEASURES, { value: measure })
+    if (shapeMeasure) return shapeMeasure
+    return {
+      name: _.capitalize(measure),
     }
-    return measure
   }
 
   get timeframe() {
-    const { data_settings } = this
-    if (!data_settings || !data_settings.d_timeframe) return ''
-    return data_settings.d_timeframe
+    const { timeframe } = this.primaryDataset
+    return timeframe || ''
   }
 
   get measureTooltip() {
-    const { measure } = this
-    return measure.tooltip || measure.name.toLowerCase()
+    return this.measure.tooltip || this.measure.name.toLowerCase()
   }
 
   get collectionFilter() {
@@ -217,10 +225,13 @@ class Item extends SharedRecordMixin(BaseRecord) {
 Item.defaults = {
   data_content: '',
   can_edit: false,
-  data: {
-    values: [],
-    count: 0,
-  },
+  datasets: [
+    {
+      order: 0,
+      data: [],
+      count: 0,
+    },
+  ],
   data_settings: {
     d_measure: null,
   },

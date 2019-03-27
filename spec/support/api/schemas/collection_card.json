@@ -16,7 +16,8 @@
     "image_contain": { "type": "boolean" },
     "is_cover": { "type": "boolean" },
     "filter": { "type": "string" },
-    "hidden": { "type": "boolean" }
+    "hidden": { "type": "boolean" },
+    "updated_at": { "type": "date" }
   },
-  "required": ["order", "width", "height", "class_type", "link"]
+  "required": ["order", "width", "height", "class_type", "link", "updated_at"]
 }

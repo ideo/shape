@@ -70,16 +70,6 @@ describe Collection::UserProfile, type: :model do
       expect(profiles.collection_cards.first.record).to eq user_profile
     end
 
-    it 'should create a linked card in the user\'s My Collection' do
-      # need to do this to pick up collection_card relation?
-      user_profile.reload
-      expect(user.current_user_collection.collection_cards.count).to eq 2
-      expect(user.current_user_collection.collection_cards.last.record).to eq user_profile
-      expect(
-        user.current_user_collection.collection_cards.last.is_a?(CollectionCard::Link),
-      ).to be true
-    end
-
     it 'should add the #profile tag' do
       expect(user_profile.cached_owned_tag_list).to match_array(['profile'])
     end

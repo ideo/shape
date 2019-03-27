@@ -1,4 +1,4 @@
-class CollectionCover < SimpleService
+class DefaultCollectionCover < SimpleService
   def initialize(collection)
     @collection = collection
     if collection.cached_cover.blank?
@@ -15,6 +15,10 @@ class CollectionCover < SimpleService
   end
 
   def call
+    # If this collection has items set as its cover,
+    # they are included as data in the collection serializer
+    return {} if @collection.cover_type_items?
+
     media = media_item(cover_media_item_card)
     text = media_item(first_text_item_card)
     {

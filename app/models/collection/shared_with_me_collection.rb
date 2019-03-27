@@ -24,6 +24,8 @@ class Collection
 
         parent_collection.primary_collection_cards.create(
           collection: collection,
+          # NOTE: we are hiding SharedWithMe from My Collection for now.
+          hidden: true,
         )
       end
 

@@ -24,7 +24,8 @@
     "data_source_id": { "type": ["number", "null"] },
     "is_private": { "type": ["boolean"] },
     "has_replaced_media": { "type": ["boolean"] },
-    "pending_transcoding": { "type": ["boolean"] }
+    "pending_transcoding": { "type": ["boolean"] },
+    "legend_item_id": { "type": ["number", "null"] }
   },
   "required": ["class_type"]
 }

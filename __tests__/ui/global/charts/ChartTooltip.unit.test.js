@@ -1,17 +1,17 @@
-import ChartTooltip from '~/ui/global/ChartTooltip'
+import ChartTooltip from '~/ui/global/charts/ChartTooltip'
 
 let props, wrapper, render, data
 describe('ChartTooltip', () => {
   beforeEach(() => {
     data = [
-      { date: '2018-07-01', amount: 10, _x: 1 },
-      { date: '2018-08-01', amount: 26, _x: 2 },
-      { date: '2018-09-01', amount: 90, _x: 3 },
-      { date: '2018-10-01', amount: 60, _x: 4 },
+      { date: '2018-07-01', value: 10, _x: 1 },
+      { date: '2018-08-01', value: 26, _x: 2 },
+      { date: '2018-09-01', value: 90, _x: 3 },
+      { date: '2018-10-01', value: 60, _x: 4 },
     ]
     props = {
-      minAmount: 10,
-      maxAmount: 90,
+      minValue: 10,
+      maxValue: 90,
       textRenderer: jest.fn(),
       data,
       datum: data[0],
@@ -51,8 +51,8 @@ describe('ChartTooltip', () => {
   describe('for an item with 2 data points (1 modified duplicate)', () => {
     beforeEach(() => {
       props.data = [
-        { date: '2018-07-01', amount: 10, _x: 1 },
-        { date: '2018-10-01', amount: 10, _x: 2 },
+        { date: '2018-07-01', value: 10, _x: 1 },
+        { date: '2018-10-01', value: 10, _x: 2 },
       ]
       render()
     })
@@ -101,8 +101,8 @@ describe('ChartTooltip', () => {
 
     describe('with two highest value items of same value', () => {
       beforeEach(() => {
-        data.push({ date: '2018-11-01', amount: 90 })
-        data.push({ date: '2018-12-01', amount: 58 })
+        data.push({ date: '2018-11-01', value: 90 })
+        data.push({ date: '2018-12-01', value: 58 })
         props.datum = data[4]
         props.index = 4
         render()

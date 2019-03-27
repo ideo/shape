@@ -7,11 +7,17 @@ export const ITEM_TYPES = {
   CHART: 'Item::ChartItem',
   DATA: 'Item::DataItem',
   EXTERNAL_IMAGE: 'Item::ExternalImageItem',
+  LEGEND: 'Item::LegendItem',
 }
 
 export const COLLECTION_TYPES = {
   TEST: 'Collection::TestCollection',
   TEST_DESIGN: 'Collection::TestDesign',
+}
+
+export const DATASET_CHART_TYPES = {
+  AREA: 'area',
+  LINE: 'line',
 }
 
 export const DATA_MEASURES = [

@@ -308,9 +308,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get cardProperties() {
-    return this.collection_cards.map(c =>
-      _.pick(c, ['id', 'order', 'width', 'height'])
-    )
+    return this.collection_cards.map(c => _.pick(c, ['id', 'updated_at']))
   }
 
   // this marks it with the "offset" special color

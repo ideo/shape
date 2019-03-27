@@ -34,10 +34,15 @@ class ManagePaymentMethods extends React.Component {
     const { currentUserOrganization } = apiStore
     try {
       await networkStore.loadOrganization(apiStore.currentUserOrganizationId)
-      if (networkStore.organization) {
+      const { organization } = networkStore
+      if (organization) {
         // if no org there's probably an error, e.g. on dev when the external_id org isn't there
-        await networkStore.loadPaymentMethods(networkStore.organization.id)
-        if (this.paymentMethods.length > 0 && currentUserOrganization.overdue) {
+        await networkStore.loadPaymentMethods(organization.id)
+        if (
+          (this.paymentMethods.length > 0 && currentUserOrganization.overdue) ||
+          !organization.has_payment_method
+        ) {
+          // double check if a payment method has actually been added
           apiStore.checkCurrentOrganizationPayments()
         }
       }

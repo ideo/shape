@@ -20,6 +20,7 @@ class Api::V1::BaseController < ApplicationController
       'Item::QuestionItem': SerializableItem,
       'Item::ChartItem': SerializableItem,
       'Item::DataItem': SerializableDataItem,
+      'Item::LegendItem': SerializableLegendItem,
       'Collection::UserCollection': SerializableCollection,
       'Collection::ApplicationCollection': SerializableCollection,
       'Collection::Board': SerializableCollection,

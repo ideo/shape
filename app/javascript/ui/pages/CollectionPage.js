@@ -35,6 +35,7 @@ class CollectionPage extends React.Component {
   @observable
   cardsFetched = false
 
+  updatePoller = null
   editorTimeout = null
   channelName = 'CollectionViewingChannel'
 
@@ -96,6 +97,9 @@ class CollectionPage extends React.Component {
       if (uiStore.actionAfterRoute) {
         uiStore.performActionAfterRoute()
       }
+      if (collection.awaiting_updates) {
+        this.pollForUpdates()
+      }
     })
 
     // setViewingCollection has to happen first bc we use it in openBlankContentTool
@@ -148,6 +152,27 @@ class CollectionPage extends React.Component {
         cards[8].row = 1
       }
     }
+  }
+
+  pollForUpdates() {
+    const { collection, apiStore, uiStore } = this.props
+    this.updatePoller = setInterval(async () => {
+      if (collection.awaiting_updates) {
+        const res = await apiStore.fetch('collections', collection.id, true)
+        if (!res.data.awaiting_updates) {
+          collection.API_fetchCards()
+        } else if (uiStore.dialogConfig.open !== 'loading') {
+          uiStore.loadingDialog({
+            prompt:
+              'Please wait while we build your account. This should take from 15 to 30 seconds.',
+            iconName: 'Celebrate',
+          })
+        }
+      } else {
+        clearInterval(this.updatePoller)
+        uiStore.closeDialog()
+      }
+    }, 2000)
   }
 
   async checkSubmissionBox() {
@@ -210,7 +235,8 @@ class CollectionPage extends React.Component {
 
   async _reloadData() {
     const { collection } = this.props
-    collection.API_fetchCards({ per_page: collection.collection_cards.length })
+    const per_page = collection.collection_cards.length || 50
+    collection.API_fetchCards({ per_page })
     if (this.collection.submissions_collection) {
       this.setLoadedSubmissions(false)
       await this.collection.submissions_collection.API_fetchCards()
@@ -353,6 +379,7 @@ class CollectionPage extends React.Component {
     if (!collection) {
       return this.loader()
     }
+
     // NOTE: if we have first loaded the slimmer SerializableSimpleCollection via the CommentThread
     // then some fields like `can_edit` will be undefined.
     // So we check if the full Collection has loaded via the `can_edit` attr
@@ -360,6 +387,7 @@ class CollectionPage extends React.Component {
     const isLoading =
       collection.meta.snapshot.can_edit === undefined ||
       (!this.cardsFetched && collection.collection_cards.length === 0) ||
+      collection.awaiting_updates ||
       uiStore.isLoading
     const isTransparentLoading = !!uiStore.movingIntoCollection
 
@@ -423,7 +451,9 @@ class CollectionPage extends React.Component {
                 // Pass in BCT state so grid will re-render when open/closed
                 blankContentToolState={blankContentToolState}
                 // to trigger a re-render
-                movingCardIds={uiStore.movingCardIds}
+                movingCardIds={
+                  uiStore.isMovingCards ? [...uiStore.movingCardIds] : []
+                }
                 // don't add the extra row for submission box
                 addEmptyCard={!isSubmissionBox}
               />

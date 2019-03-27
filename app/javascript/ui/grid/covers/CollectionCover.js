@@ -60,11 +60,11 @@ StyledCollectionCover.displayName = 'StyledCollectionCover'
 const pad = 16
 const calcSectionWidth = props => {
   if (props.width === 4) {
-    return `${props.gridW * 2 - props.gutter * 1}px`
+    return `${props.gridW * 2 - props.gutter * 2}px`
   } else if (props.width > 1) {
-    return `${props.gridW - props.gutter * 2}px`
+    return `${props.gridW - props.gutter * 3}px`
   }
-  return `calc(100% - ${props.gutter * 2}px)`
+  return `calc(100% - ${props.gutter * 3}px)`
 }
 
 const calcSectionHeight = props => {
