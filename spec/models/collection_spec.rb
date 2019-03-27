@@ -576,9 +576,20 @@ describe Collection, type: :model do
     context 'with a master_template' do
       let(:collection) { create(:collection, master_template: true, num_cards: 3) }
 
-      it 'should call the UpdateTemplateInstancesWorker' do
-        expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(collection.id)
-        collection.unarchive_cards!(cards, snapshot)
+      context 'with a template instance' do
+        let!(:instance) { create(:collection, template: collection) }
+
+        it 'should call the UpdateTemplateInstancesWorker' do
+          expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(collection.id)
+          collection.unarchive_cards!(cards, snapshot)
+        end
+      end
+
+      context 'without a template instance' do
+        it 'should not call the UpdateTemplateInstancesWorker' do
+          expect(UpdateTemplateInstancesWorker).not_to receive(:perform_async)
+          collection.unarchive_cards!(cards, snapshot)
+        end
       end
     end
   end
