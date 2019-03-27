@@ -24,7 +24,7 @@ module Controller
       # if the controller had already set something like "@organizations"
       # that will still get returned if no filters are applied
       @results = @controller.instance_variable_get("@#{controller_name}") || klass
-      @results = @results.active if klass.respond_to?(:active)
+      @results = @results.active if @results.respond_to?(:active)
       @results
     end
 
