@@ -507,7 +507,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         patch(path, params: params)
         combined_cards = to_collection.reload.collection_cards
         # expect to find moved cards at the front
-        expect(combined_cards.first(2)).to match_array moving_cards
+        expect(combined_cards.first(2)).to eq moving_cards
         expect(combined_cards.count).to eq 5
       end
 
@@ -535,6 +535,19 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       it 'creates an activity' do
         expect(ActivityAndNotificationBuilder).to receive(:call).twice
         patch(path, params: params)
+      end
+
+      context 'with specific order' do
+        before do
+          moving_cards.first.update(order: 1)
+          moving_cards.last.update(order: 0)
+        end
+
+        it 'moves new cards to the front of the collection and preserves order' do
+          patch(path, params: params)
+          combined_cards = to_collection.reload.collection_cards
+          expect(combined_cards.first).to eq moving_cards.last
+        end
       end
     end
   end
