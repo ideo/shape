@@ -23,7 +23,9 @@ module Controller
     def init_results
       # if the controller had already set something like "@organizations"
       # that will still get returned if no filters are applied
-      @results = @controller.instance_variable_get("@#{controller_name}") || []
+      @results = @controller.instance_variable_get("@#{controller_name}") || klass
+      @results = @results.active if klass.respond_to?(:active)
+      @results
     end
 
     def error_422
@@ -63,7 +65,7 @@ module Controller
         @errors << 'application required to filter by external_id'
         return false
       end
-      @results = klass.where_external_id(
+      @results = @results.where_external_id(
         @filter[:external_id],
         application_id: @application.id,
       )
@@ -71,7 +73,7 @@ module Controller
 
     def filter_collection_id
       return if @filter[:collection_id].blank?
-      @results = klass.where(
+      @results = @results.where(
         collection_id: @filter[:collection_id],
       )
     end
