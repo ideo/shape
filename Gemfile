@@ -109,6 +109,7 @@ gem "redis-mutex", "~> 4.0.1"
 # performance tuning
 gem 'tunemygc'
 gem 'scout_apm'
+gem 'barnes'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
