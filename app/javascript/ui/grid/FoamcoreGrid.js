@@ -14,7 +14,6 @@ import v from '~/utils/variables'
 
 const BlankCard = styled.div.attrs({
   style: ({ x, y, h, w, zoomLevel, draggedOn }) => ({
-    backgroundColor: draggedOn ? v.colors.primaryLight : 'transparent',
     height: `${h}px`,
     left: `${x}px`,
     top: `${y}px`,
@@ -22,6 +21,7 @@ const BlankCard = styled.div.attrs({
     width: `${w}px`,
   }),
 })`
+  background-color: ${v.colors.primaryLight};
   position: absolute;
   transform-origin: left top;
   &:hover {
@@ -60,7 +60,7 @@ class FoamcoreGrid extends React.Component {
   @observable
   dragging = false
   @observable
-  hoverGridSpot = {}
+  hoverGridSpot = { row: null, col: null }
   @observable
   draggingMap = []
   @observable
@@ -108,7 +108,7 @@ class FoamcoreGrid extends React.Component {
   }
 
   handleMouseMove = ev => {
-    const pageMargin = v.containerPadding.horizontal / 2
+    const pageMargin = v.containerPadding.horizontal
     const hoverPos = {
       x: ev.pageX - pageMargin + this.gridRef.scrollLeft,
       y: ev.pageY - v.headerHeight + this.gridRef.scrollTop,
@@ -292,6 +292,10 @@ class FoamcoreGrid extends React.Component {
   }
 
   setMultiMoveDragSpots(masterPosition, dragPosition) {
+    /* This method will set the dragged-over spots for the other cards that
+     * maybe are being dragged along with the one that the user is actually
+     * dragging. It will only be called if multiple cards are being dragged.
+     */
     this.draggingMap.forEach(mapped => {
       const relativePosition = {
         col: mapped.col + masterPosition.col,
@@ -381,10 +385,7 @@ class FoamcoreGrid extends React.Component {
   positionBlank({ row, col, width, height }) {
     const position = this.positionForSpot({ col, row, width, height })
     const { zoomLevel } = this
-    if (
-      this.dragging ||
-      (this.hoverGridSpot.col === col && this.hoverGridSpot.row === row)
-    ) {
+    if (this.dragging || isPointSame(this.hoverGridSpot, { col, row })) {
       return (
         <BlankCard
           onClick={this.handleBlankCardClick({ col, row })}
