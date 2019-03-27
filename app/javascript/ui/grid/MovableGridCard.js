@@ -155,7 +155,9 @@ class MovableGridCard extends React.PureComponent {
       this.scrolling = false
     }
 
-    const pageMargin = window.innerWidth - v.maxWidth
+    // TODO make this switch for normal collections
+    // const pageMargin = window.innerWidth - v.maxWidth
+    const pageMargin = v.containerPadding.horizontal / 2
     let cardX = e.pageX
     if (window.innerWidth >= v.maxWidth) {
       cardX -= pageMargin / 2

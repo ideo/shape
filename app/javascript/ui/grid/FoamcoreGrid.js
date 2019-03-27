@@ -31,7 +31,7 @@ const BlankCard = styled.div.attrs({
 `
 
 const Grid = styled.div`
-  min-height: 800px;
+  min-height: 1300px;
   overflow-x: scroll;
   overflow-y: scroll;
   position: relative;
@@ -108,7 +108,7 @@ class FoamcoreGrid extends React.Component {
   }
 
   handleMouseMove = ev => {
-    const pageMargin = (window.innerWidth - v.maxWidth) / 2
+    const pageMargin = v.containerPadding.horizontal / 2
     const hoverPos = {
       x: ev.pageX - pageMargin + this.gridRef.scrollLeft,
       y: ev.pageY - v.headerHeight + this.gridRef.scrollTop,
@@ -469,6 +469,7 @@ class FoamcoreGrid extends React.Component {
   }
 
   render() {
+    const { gridW } = this.props
     return (
       <Grid
         onMouseMove={this.handleMouseMove}
@@ -493,6 +494,7 @@ class FoamcoreGrid extends React.Component {
             <h3>+</h3>
           </button>
         </div>
+        <div style={{ width: `${gridW * 16}px`, height: '1px' }} />
         {this.positionCards().map(el => el)}
       </Grid>
     )
