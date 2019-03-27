@@ -1,6 +1,3 @@
-@master_templates = Collection.find ENV['ORG_MASTER_TEMPLATES_ID']
-@original_getting_started_collection = Collection.find(ENV['GETTING_STARTED_TEMPLATE_ID'])
-
 namespace :new_getting_started do
   desc 'update existing orgs for new getting_started experience'
   task update_templates: :environment do
@@ -37,7 +34,9 @@ end
 
 def find_or_create_org_getting_started_collection(org)
   return if org.getting_started_collection.present?
-  getting_started_collection = @original_getting_started_collection.duplicate!(
+  original_getting_started_collection = Collection.find(ENV['GETTING_STARTED_TEMPLATE_ID'])
+  return unless original_getting_started_collection.present?
+  getting_started_collection = original_getting_started_collection.duplicate!(
     copy_parent_card: true,
     parent: org.template_collection,
     system_collection: true,
@@ -56,11 +55,13 @@ def find_or_create_org_getting_started_collection(org)
 end
 
 def update_templates(org)
+  master_templates = Collection.find ENV['ORG_MASTER_TEMPLATES_ID']
+  return unless master_templates.present?
   puts "Updating templates for #{org.name}"
   if org.template_collection.present?
     puts "found template_collection #{org.template_collection.id}"
     # copy master templates -- will find or create
-    @master_templates.copy_all_cards_into!(org.template_collection)
+    master_templates.copy_all_cards_into!(org.template_collection)
     org.template_collection
 
     # Share Org Templates with organization
