@@ -392,7 +392,9 @@ class CollectionPage extends React.Component {
                 // Pass in BCT state so grid will re-render when open/closed
                 blankContentToolState={blankContentToolState}
                 // to trigger a re-render
-                movingCardIds={uiStore.movingCardIds}
+                movingCardIds={
+                  uiStore.isMovingCards ? [...uiStore.movingCardIds] : []
+                }
                 // don't add the extra row for submission box
                 addEmptyCard={!isSubmissionBox}
               />
