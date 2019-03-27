@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { action, observable, runInAction } from 'mobx'
+import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 // import _ from 'lodash'
 import styled from 'styled-components'
@@ -83,7 +83,7 @@ class FoamcoreGrid extends React.Component {
     return !!this.getDraggedOnSpot(coords)
   }
 
-  handleBlankCardClick = ({ row, col }) => {
+  handleBlankCardClick = ({ row, col }) => e => {
     runInAction(() => {
       this.blankContentTool = {
         id: 'blank',
@@ -302,7 +302,7 @@ class FoamcoreGrid extends React.Component {
   }
 
   findOverlap(dragPosition) {
-    const { x, y, width, height } = dragPosition
+    const { x, y } = dragPosition
     const { gridW, gridH, gutter } = this.props
 
     const { zoomLevel } = this
@@ -387,7 +387,7 @@ class FoamcoreGrid extends React.Component {
     ) {
       return (
         <BlankCard
-          onClick={this.handleBlankCardClick.bind(this, { col, row })}
+          onClick={this.handleBlankCardClick({ col, row })}
           {...position}
           zoomLevel={zoomLevel}
           key={`blank-${col}:${row}`}
@@ -449,7 +449,6 @@ class FoamcoreGrid extends React.Component {
     )
     let addedHoverCard = this.hoverGridSpot
     const cardElements = allCardsToLayout.map(spot => {
-      console.log('card', spot.id, spot.col, spot.row)
       // If another real card is filling up the hover spot, don't render
       // the hover spot at all (which gets rendered after this loop)
       if (spot.id && isPointSame(spot, this.hoverGridSpot)) {
