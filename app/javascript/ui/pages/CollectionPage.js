@@ -413,6 +413,7 @@ class CollectionPage extends React.Component {
               <CollectionGrid
                 // pull in cols, gridW, gridH, gutter
                 {...gridSettings}
+                cols={collection.isBoard ? 12 : gridSettings.cols}
                 updateCollection={this.updateCollection}
                 batchUpdateCollection={this.batchUpdateCollection}
                 collection={collection}

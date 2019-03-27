@@ -190,6 +190,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.isTestCollection || this.isTestDesign
   }
 
+  get isBoard() {
+    return this.type === 'Collection::Board'
+  }
+
   get requiresSubmissionBoxSettings() {
     if (!this.isSubmissionBox) return false
     // if type is null then it requires setup
