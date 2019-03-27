@@ -63,6 +63,8 @@ class FoamcoreGrid extends React.Component {
   hoverGridSpot = {}
   @observable
   draggingMap = []
+  @observable
+  placeholder = {}
 
   constructor(props) {
     super(props)
@@ -131,10 +133,16 @@ class FoamcoreGrid extends React.Component {
     runInAction(() => {
       this.dragging = true
     })
+    const {
+      collection: { collection_cards },
+    } = this.props
+    const card = _.find(collection_cards, { id: cardId })
     // TODO considering changing dragX in MoveableGridCard
     const overlapPos = {
       x: dragPosition.dragX,
       y: dragPosition.dragY,
+      width: card.width,
+      height: card.height,
     }
     const overlapCoords = this.findOverlap(overlapPos)
     this.debouncedSetDraggedOnSpots(overlapCoords, dragPosition)
@@ -148,8 +156,15 @@ class FoamcoreGrid extends React.Component {
   }
 
   onDragOrResizeStop = (cardId, dragType, ev) => {
-    const { uiStore } = this.props
+    const {
+      collection: { collection_cards },
+      uiStore,
+    } = this.props
     uiStore.stopDragging()
+    const card = _.find(collection_cards, ['id', cardId])
+    if (dragType === 'resize') {
+      this.resizeCard(card)
+    }
     runInAction(() => {
       this.dragging = false
       // TODO not sure why stopDragging doesn't clear this out
@@ -157,7 +172,40 @@ class FoamcoreGrid extends React.Component {
     })
   }
 
-  onResize = (cardId, newSize) => {}
+  onResize = (cardId, newSize) => {
+    const {
+      collection: { collection_cards },
+    } = this.props
+    const positionedCard = _.find(collection_cards, { id: cardId })
+
+    if (!this.placeholder) {
+      this.placeholder = this.positionBlank(positionedCard)
+    }
+    this.placeholder.width = newSize.width
+    this.placeholder.height = newSize.height
+  }
+
+  resizeCard = (card, data) => {
+    // // just some double-checking validations
+    // if (height > 2) height = 2
+    // if (width > 4) width = 4
+    // // set up action to undo
+    // if (original.height !== height || original.width !== width) {
+    //   undoMessage = 'Card resize undone'
+    // }
+    // updates.width = width
+    // updates.height = height
+    // // If a template, warn that any instances will be updated
+    // updateCollectionCard = () => {
+    //   // this will assign the update attributes to the card
+    //   this.props.updateCollection({
+    //     card: original,
+    //     updates,
+    //     undoMessage,
+    //   })
+    //   this.positionCardsFromProps()
+    // }
+  }
 
   setDraggedOnSpots(overlapCoords, dragPosition, recur) {
     /*
@@ -254,7 +302,7 @@ class FoamcoreGrid extends React.Component {
   }
 
   findOverlap(dragPosition) {
-    const { x, y } = dragPosition
+    const { x, y, width, height } = dragPosition
     const { gridW, gridH, gutter } = this.props
 
     const { zoomLevel } = this
@@ -270,14 +318,14 @@ class FoamcoreGrid extends React.Component {
     return cards.find(card => isPointSame(card, { col, row }))
   }
 
-  positionForSpot({ col, row }) {
+  positionForSpot({ col, row, width = 1, height = 1 }) {
     const { gridW, gridH, gutter } = this.props
     const { zoomLevel } = this
     const pos = {
       x: (col * (gridW + gutter)) / zoomLevel,
       y: (row * (gridH + gutter)) / zoomLevel,
-      w: 1 * (gridW + gutter) - gutter,
-      h: 1 * (gridH + gutter) - gutter,
+      w: width * (gridW + gutter) - gutter,
+      h: height * (gridH + gutter) - gutter,
     }
     // TODO try and get rid of {x|y}Pos
     return {
@@ -292,7 +340,7 @@ class FoamcoreGrid extends React.Component {
   positionCard(card) {
     const { col, row } = card
     const { canEditCollection, collection, routingStore, uiStore } = this.props
-    const position = this.positionForSpot({ col, row })
+    const position = this.positionForSpot(card)
     const { cardMenuOpen } = uiStore
     const { zoomLevel } = this
     const beingDraggedOnSpot =
@@ -330,8 +378,8 @@ class FoamcoreGrid extends React.Component {
     )
   }
 
-  positionBlank({ row, col }) {
-    const position = this.positionForSpot({ col, row })
+  positionBlank({ row, col, width, height }) {
+    const position = this.positionForSpot({ col, row, width, height })
     const { zoomLevel } = this
     if (
       this.dragging ||
