@@ -362,7 +362,6 @@ describe Collection, type: :model do
 
       it 'duplicates external records' do
         expect(collection.external_records.reload.size).to eq(2)
-  
         expect {
           duplicate
         }.to change(ExternalRecord, :count).by(2)
@@ -370,6 +369,15 @@ describe Collection, type: :model do
         expect(duplicate.external_records.pluck(:external_id)).to match_array(
           %w[100 101],
         )
+      end
+    end
+
+    context 'with submission_attrs' do
+      let!(:collection) { create(:collection, :submission) }
+
+      it 'clears out submission_attrs' do
+        expect(collection.submission?).to be true
+        expect(duplicate.submission?).to be false
       end
     end
   end
