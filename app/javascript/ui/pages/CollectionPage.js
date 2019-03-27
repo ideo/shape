@@ -125,33 +125,8 @@ class CollectionPage extends React.Component {
       const message = `${collection.processing_status}...`
       uiStore.popupSnackbar({ message })
     }
+
     uiStore.update('dragTargets', [])
-
-    if (collection.id === '203437') {
-      const cards = collection.collection_cards
-      console.log('special foamcore collection', cards.length)
-
-      if (cards.length) {
-        cards[0].col = 5
-        cards[0].row = 0
-        cards[1].col = 2
-        cards[1].row = 2
-        cards[2].col = 0
-        cards[2].row = 1
-        cards[3].col = 0
-        cards[3].row = 2
-        cards[4].col = 2
-        cards[4].row = 0
-        cards[5].col = 6
-        cards[5].row = 4
-        cards[6].col = 1
-        cards[6].row = 0
-        cards[7].col = 3
-        cards[7].row = 1
-        cards[8].col = 2
-        cards[8].row = 1
-      }
-    }
   }
 
   pollForUpdates() {
@@ -399,7 +374,7 @@ class CollectionPage extends React.Component {
 
     // submissions_collection will only exist for submission boxes
     const { isSubmissionBox, requiresTestDesigner } = collection
-    if (collection.id === '203437') {
+    if (collection.isBoard) {
       return (
         <Fragment>
           <PageHeader record={collection} isHomepage={isHomepage} />
@@ -441,7 +416,6 @@ class CollectionPage extends React.Component {
               <CollectionGrid
                 // pull in cols, gridW, gridH, gutter
                 {...gridSettings}
-                cols={collection.isBoard ? 12 : gridSettings.cols}
                 updateCollection={this.updateCollection}
                 batchUpdateCollection={this.batchUpdateCollection}
                 collection={collection}

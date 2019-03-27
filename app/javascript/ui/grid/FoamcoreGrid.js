@@ -449,6 +449,7 @@ class FoamcoreGrid extends React.Component {
     )
     let addedHoverCard = this.hoverGridSpot
     const cardElements = allCardsToLayout.map(spot => {
+      console.log('card', spot.id, spot.col, spot.row)
       // If another real card is filling up the hover spot, don't render
       // the hover spot at all (which gets rendered after this loop)
       if (spot.id && isPointSame(spot, this.hoverGridSpot)) {
