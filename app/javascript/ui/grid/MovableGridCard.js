@@ -67,6 +67,8 @@ class MovableGridCard extends React.PureComponent {
       initialOffsetY: 0,
       x: props.position.xPos,
       y: props.position.yPos,
+      resizeWidth: 0,
+      resizeHeight: 0,
     }
   }
 
@@ -205,6 +207,8 @@ class MovableGridCard extends React.PureComponent {
         // have this item remain "on top" while it animates back
         this.setState({
           moveComplete: true,
+          resizeWidth: 0,
+          resizeHeight: 0,
         })
         this.scrolling = false
       }, 350)
@@ -237,6 +241,7 @@ class MovableGridCard extends React.PureComponent {
     newSize.height = Math.max(Math.min(newSize.height, 2), 1)
     this.props.onResize(this.props.card.id, newSize)
     this.scrolling = false
+    this.setState({ resizeWidth: delta.width, resizeHeight: delta.height })
   }
 
   // this function gets passed down to the card, so it can place the onClick handler
@@ -384,7 +389,15 @@ class MovableGridCard extends React.PureComponent {
       position: { width },
     } = this.props
 
-    const { dragging, resizing, moveComplete, x, y } = this.state
+    const {
+      dragging,
+      resizing,
+      moveComplete,
+      resizeWidth,
+      resizeHeight,
+      x,
+      y,
+    } = this.state
 
     if (cardType === 'placeholder') {
       return this.renderPlaceholder()
@@ -449,8 +462,8 @@ class MovableGridCard extends React.PureComponent {
       zIndex = v.zIndex.aboveClickWrapper
     }
     let transform = `translateZ(0) scale(${1 / zoomLevel})`
-    const adjustedWidth = width / zoomLevel
-    const adjustedHeight = height / zoomLevel
+    const adjustedWidth = (width + resizeWidth) / zoomLevel
+    const adjustedHeight = (height + resizeHeight) / zoomLevel
     // const outerTransform = `scale(${1 / zoomLevel})`
     let transition = dragging || resizing ? 'none' : cardCSSTransition
     // TODO this should actually check it's a breadcrumb
@@ -505,7 +518,12 @@ class MovableGridCard extends React.PureComponent {
             height: adjustedHeight,
           }}
           position={{ x, y }}
-          default={{ width, height, x: xPos, y: yPos }}
+          default={{
+            width: adjustedWidth,
+            height: adjustedHeight,
+            x: xPos,
+            y: yPos,
+          }}
           disableDragging={
             !canEditCollection ||
             // NOTE: disabling dragging for touchscreens because of conflict with touch scrolling
@@ -543,8 +561,8 @@ class MovableGridCard extends React.PureComponent {
         >
           <InnerCardWrapper
             animatedBounce={holdingOver}
-            width={width}
-            height={height}
+            width={width + resizeWidth}
+            height={height + resizeHeight}
             style={{
               transition,
               transform,

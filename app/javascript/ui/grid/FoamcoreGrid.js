@@ -59,16 +59,16 @@ class FoamcoreGrid extends React.Component {
   dragGridSpot = observable.map({})
   @observable
   dragging = false
+  // TODO rename this now that it's also used for resize placeholder
   @observable
   hoverGridSpot = { row: null, col: null }
   @observable
   draggingMap = []
-  @observable
-  placeholder = {}
 
   constructor(props) {
     super(props)
     this.debouncedSetDraggedOnSpots = _.debounce(this.setDraggedOnSpots, 25)
+    this.throttledSetHoverGridSpot = _.throttle(this.setHoverGridSpot, 50)
   }
 
   componentDidMount() {
@@ -108,19 +108,13 @@ class FoamcoreGrid extends React.Component {
   }
 
   handleMouseMove = ev => {
+    if (this.dragging) return
     const pageMargin = v.containerPadding.horizontal
     const hoverPos = {
       x: ev.pageX - pageMargin + this.gridRef.scrollLeft,
       y: ev.pageY - v.headerHeight + this.gridRef.scrollTop,
     }
-    const overlap = this.findOverlap(hoverPos)
-    runInAction(() => {
-      if (overlap) {
-        this.hoverGridSpot = overlap
-      } else {
-        this.hoverGridSpot = {}
-      }
-    })
+    this.throttledSetHoverGridSpot(hoverPos)
   }
 
   handleMouseOut = ev => {
@@ -178,11 +172,11 @@ class FoamcoreGrid extends React.Component {
     } = this.props
     const positionedCard = _.find(collection_cards, { id: cardId })
 
-    if (!this.placeholder) {
-      this.placeholder = this.positionBlank(positionedCard)
+    if (!this.hoverGridSpot) {
+      this.hoverGridSpot = this.positionBlank(positionedCard)
     }
-    this.placeholder.width = newSize.width
-    this.placeholder.height = newSize.height
+    this.hoverGridSpot.width = newSize.width
+    this.hoverGridSpot.height = newSize.height
   }
 
   resizeCard = (card, data) => {
@@ -315,6 +309,19 @@ class FoamcoreGrid extends React.Component {
     const col = Math.floor(((x + gutter * 2) / (gridW + gutter)) * zoomLevel)
     if (row === -1 || col === -1) return null
     return { col, row }
+  }
+
+  setHoverGridSpot(hoverPos) {
+    const overlap = this.findOverlap(hoverPos)
+    runInAction(() => {
+      if (overlap) {
+        if (!this.hoverGridSpot.x) {
+          this.hoverGridSpot = overlap
+        }
+      } else {
+        this.hoverGridSpot = {}
+      }
+    })
   }
 
   findCardForSpot({ col, row }) {
