@@ -59,9 +59,11 @@ class FoamcoreGrid extends React.Component {
   dragGridSpot = observable.map({})
   @observable
   dragging = false
+  @observable
+  resizing = false
   // TODO rename this now that it's also used for resize placeholder
   @observable
-  hoverGridSpot = { row: null, col: null }
+  hoverGridSpot = { row: null, col: null, width: null, height: null }
   @observable
   draggingMap = []
 
@@ -69,6 +71,7 @@ class FoamcoreGrid extends React.Component {
     super(props)
     this.debouncedSetDraggedOnSpots = _.debounce(this.setDraggedOnSpots, 25)
     this.throttledSetHoverGridSpot = _.throttle(this.setHoverGridSpot, 50)
+    this.throttledSetResizeSpot = _.throttle(this.setResizeSpot, 25)
   }
 
   componentDidMount() {
@@ -108,7 +111,9 @@ class FoamcoreGrid extends React.Component {
   }
 
   handleMouseMove = ev => {
-    if (this.dragging) return
+    // Something about react synthetic events and throttling
+    ev.persist()
+    if (this.resizing) return
     const pageMargin = v.containerPadding.horizontal
     const hoverPos = {
       x: ev.pageX - pageMargin + this.gridRef.scrollLeft,
@@ -161,22 +166,24 @@ class FoamcoreGrid extends React.Component {
     }
     runInAction(() => {
       this.dragging = false
+      this.resizing = false
       // TODO not sure why stopDragging doesn't clear this out
       uiStore.multiMoveCardIds = []
     })
   }
 
   onResize = (cardId, newSize) => {
+    if (!this.resizing) {
+      runInAction(() => {
+        this.resizing = true
+      })
+    }
     const {
       collection: { collection_cards },
     } = this.props
     const positionedCard = _.find(collection_cards, { id: cardId })
 
-    if (!this.hoverGridSpot) {
-      this.hoverGridSpot = this.positionBlank(positionedCard)
-    }
-    this.hoverGridSpot.width = newSize.width
-    this.hoverGridSpot.height = newSize.height
+    this.throttledSetResizeSpot(positionedCard, newSize)
   }
 
   resizeCard = (card, data) => {
@@ -312,6 +319,7 @@ class FoamcoreGrid extends React.Component {
   }
 
   setHoverGridSpot(hoverPos) {
+    if (this.resizing) return
     const overlap = this.findOverlap(hoverPos)
     runInAction(() => {
       if (overlap) {
@@ -321,6 +329,21 @@ class FoamcoreGrid extends React.Component {
       } else {
         this.hoverGridSpot = {}
       }
+    })
+  }
+
+  setResizeSpot(positionedCard, newSize) {
+    runInAction(() => {
+      this.hoverGridSpot = {
+        row: positionedCard.row,
+        col: positionedCard.col,
+        width: newSize.width,
+        height: newSize.height,
+      }
+      // this.hoverGridSpot.row = positionedCard.row
+      // this.hoverGridSpot.col = positionedCard.col
+      // this.hoverGridSpot.width = newSize.width
+      // this.hoverGridSpot.height = newSize.height
     })
   }
 
@@ -455,13 +478,9 @@ class FoamcoreGrid extends React.Component {
     allCardsToLayout = allCardsToLayout.filter(
       card => !card.isBeingMultiDragged
     )
-    let addedHoverCard = this.hoverGridSpot
     const cardElements = allCardsToLayout.map(spot => {
       // If another real card is filling up the hover spot, don't render
       // the hover spot at all (which gets rendered after this loop)
-      if (spot.id && isPointSame(spot, this.hoverGridSpot)) {
-        addedHoverCard = null
-      }
       if (spot.id === 'blank') {
         return this.positionBct(spot)
       }
@@ -470,9 +489,7 @@ class FoamcoreGrid extends React.Component {
       }
       return this.positionBlank(spot)
     })
-    if (addedHoverCard) {
-      cardElements.push(this.positionBlank(addedHoverCard))
-    }
+    cardElements.push(this.positionBlank(this.hoverGridSpot))
     return cardElements
   }
 

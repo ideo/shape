@@ -39,14 +39,22 @@ const bounceAnim = keyframes`
   }
 `
 
-const InnerCardWrapper = styled.div`
-  width: ${props => props.width}px;
-  height: ${props => props.height}px;
+const InnerCardWrapper = styled.div.attrs({
+  style: ({ width, height, transition, transform }) => ({
+    transition,
+    transform,
+    height: `${height}px`,
+    width: `${width}px`,
+  }),
+})`
+  transform-origin: left top;
+  backface-visibility: hidden;
+  font-smoothing: subpixel-antialiased;
   ${props =>
     props.animatedBounce &&
     `
     animation: ${bounceAnim} 0.25s ease-out;
-  `};
+    `};
 `
 
 const cardCSSTransition = 'transform 0.4s, width 0.25s, height 0.25s'
@@ -563,13 +571,8 @@ class MovableGridCard extends React.PureComponent {
             animatedBounce={holdingOver}
             width={width + resizeWidth}
             height={height + resizeHeight}
-            style={{
-              transition,
-              transform,
-              transformOrigin: 'left top',
-              backfaceVisibility: 'hidden',
-              WebkitFontSmoothing: 'subpixel-antialiased',
-            }}
+            transition={transition}
+            transform={transform}
           >
             <GridCard
               {...cardProps}
