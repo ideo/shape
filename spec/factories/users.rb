@@ -52,5 +52,9 @@ FactoryBot.define do
         create(:activity, organization: user.current_organization, actor: user)
       end
     end
+
+    trait :application_bot do
+      application
+    end
   end
 end
