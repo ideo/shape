@@ -183,7 +183,9 @@ class FoamcoreGrid extends React.Component {
     } = this.props
     const positionedCard = _.find(collection_cards, { id: cardId })
 
-    this.throttledSetResizeSpot(positionedCard, newSize)
+    const { row, col } = positionedCard
+    const { width, height } = newSize
+    this.throttledSetResizeSpot({ col, row, height, width })
   }
 
   resizeCard = (card, data) => {
@@ -332,18 +334,14 @@ class FoamcoreGrid extends React.Component {
     })
   }
 
-  setResizeSpot(positionedCard, newSize) {
+  setResizeSpot({ row, col, width, height }) {
     runInAction(() => {
       this.hoverGridSpot = {
-        row: positionedCard.row,
-        col: positionedCard.col,
-        width: newSize.width,
-        height: newSize.height,
+        row,
+        col,
+        width,
+        height,
       }
-      // this.hoverGridSpot.row = positionedCard.row
-      // this.hoverGridSpot.col = positionedCard.col
-      // this.hoverGridSpot.width = newSize.width
-      // this.hoverGridSpot.height = newSize.height
     })
   }
 
