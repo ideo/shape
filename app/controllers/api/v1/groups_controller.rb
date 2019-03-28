@@ -70,11 +70,18 @@ class Api::V1::GroupsController < Api::V1::BaseController
   end
 
   def load_user_groups
-    unless current_organization.present?
+    if current_organization.blank?
       @groups = []
-      return
+    elsif current_api_token.present?
+      # Allow them access to any group in the org,
+      # the user doesn't have to be an admin on it
+      @groups = Group.where(organization_id: current_organization.id)
+                     .order(name: :asc)
+    else
+      @groups = current_user.groups
+                            .where(organization_id: current_organization.id)
+                            .order(name: :asc)
     end
-    @groups = current_user.groups.where(organization_id: current_organization.id).order(name: :asc)
   end
 
   def group_params
