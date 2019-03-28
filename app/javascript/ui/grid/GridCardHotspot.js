@@ -28,13 +28,13 @@ const HotspotLine = styled.div`
   height: 100%;
   background: ${v.colors.primaryLight};
   position: relative;
-  left: 7px;
+  left: 4px;
   width: ${props => props.gutter}px;
 `
 
 const StyledPlusIcon = styled.div`
   position: relative;
-  left: -10px;
+  left: -9px;
   width: 12px;
   color: white;
   font-size: 1.5rem;
