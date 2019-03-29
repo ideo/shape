@@ -342,6 +342,24 @@ class GridCardBlank extends React.Component {
     })
   }
 
+  createTextItem = item => {
+    this.createCard(
+      {
+        item_attributes: {
+          name: 'Text',
+          content: '',
+          data_content: { ops: [] },
+          type: ITEM_TYPES.TEXT,
+        },
+      },
+      {
+        afterCreate: card => {
+          this.props.uiStore.update('textEditingItem', card.record)
+        },
+      }
+    )
+  }
+
   closeBlankContentTool = () => {
     const { uiStore } = this.props
     if (
@@ -492,7 +510,8 @@ class GridCardBlank extends React.Component {
                 type="text"
                 creating={creating}
                 size={size}
-                onClick={this.startCreating('text')}
+                // onClick={this.startCreating('text')}
+                onClick={this.createTextItem}
                 Icon={AddTextIcon}
               />
             )}

@@ -174,6 +174,13 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
   describe 'POST #create' do
     let(:path) { '/api/v1/collection_cards' }
+    let(:item_attributes) do
+      {
+        content: 'This is my item content',
+        data_content: { ops: [{ insert: 'This is my item content.' }] },
+        type: 'Item::TextItem',
+      }
+    end
     let(:raw_params) do
       {
         order: 1,
@@ -182,11 +189,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         # parent_id is required to retrieve the parent collection without a nested route
         parent_id: collection.id,
         # create with a nested item
-        item_attributes: {
-          content: 'This is my item content',
-          data_content: { ops: [{ insert: 'This is my item content.' }] },
-          type: 'Item::TextItem',
-        },
+        item_attributes: item_attributes,
       }
     end
     let(:params) { json_api_params('collection_cards', raw_params) }
@@ -242,12 +245,40 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         post(path, params: params)
       end
 
-      it 'broadcasts collection updates' do
-        expect(CollectionUpdateBroadcaster).to receive(:call).with(
-          collection,
-          user,
-        )
-        post(path, params: params)
+      context 'broadcasting updates' do
+        context 'with a text item' do
+          let(:item_attributes) do
+            {
+              content: '',
+              data_content: {},
+              type: 'Item::TextItem',
+            }
+          end
+
+          it 'does not broadcast collection updates' do
+            # text items get created empty so we don't broadcast yet
+            expect(CollectionUpdateBroadcaster).not_to receive(:call)
+            post(path, params: params)
+          end
+        end
+
+        context 'with a link item' do
+          let(:item_attributes) do
+            {
+              content: 'This is my item content',
+              url: Faker::Internet.url('example.com'),
+              type: 'Item::LinkItem',
+            }
+          end
+
+          it 'broadcasts collection updates' do
+            expect(CollectionUpdateBroadcaster).to receive(:call).with(
+              collection,
+              user,
+            )
+            post(path, params: params)
+          end
+        end
       end
     end
 

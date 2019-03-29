@@ -103,6 +103,9 @@ gem 'aasm', '~> 5.0'
 # mailchimp API
 gem 'gibbon', '~> 3.2'
 
+# distributed mutex
+gem "redis-mutex", "~> 4.0.1"
+
 # performance tuning
 gem 'tunemygc'
 gem 'scout_apm'
