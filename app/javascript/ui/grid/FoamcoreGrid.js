@@ -63,14 +63,14 @@ class FoamcoreGrid extends React.Component {
   resizing = false
   // TODO rename this now that it's also used for resize placeholder
   @observable
-  hoverGridSpot = { row: null, col: null, width: null, height: null }
+  placeholderSpot = { row: null, col: null, width: null, height: null }
   @observable
   draggingMap = []
 
   constructor(props) {
     super(props)
     this.debouncedSetDraggedOnSpots = _.debounce(this.setDraggedOnSpots, 25)
-    this.throttledSetHoverGridSpot = _.throttle(this.setHoverGridSpot, 50)
+    this.throttledSetHoverSpot = _.throttle(this.setHoverSpot, 50)
     this.throttledSetResizeSpot = _.throttle(this.setResizeSpot, 25)
   }
 
@@ -90,6 +90,7 @@ class FoamcoreGrid extends React.Component {
     runInAction(() => {
       this.blankContentTool = {
         id: 'blank',
+        type: 'bct',
         row,
         col,
       }
@@ -119,12 +120,12 @@ class FoamcoreGrid extends React.Component {
       x: ev.pageX - pageMargin + this.gridRef.scrollLeft,
       y: ev.pageY - v.headerHeight + this.gridRef.scrollTop,
     }
-    this.throttledSetHoverGridSpot(hoverPos)
+    this.throttledSetHoverSpot(hoverPos)
   }
 
   handleMouseOut = ev => {
     runInAction(() => {
-      this.hoverGridSpot = {}
+      this.placeholderSpot = {}
     })
   }
 
@@ -165,6 +166,7 @@ class FoamcoreGrid extends React.Component {
       this.resizeCard(card)
     }
     runInAction(() => {
+      this.dragGridSpot.clear()
       this.dragging = false
       this.resizing = false
       // TODO not sure why stopDragging doesn't clear this out
@@ -215,6 +217,7 @@ class FoamcoreGrid extends React.Component {
      * Sets the current spots that are being dragged on, whether it's a card
      * or a blank spot that then has to be rendered
      */
+    if (!this.dragging) return
     if (!recur) {
       runInAction(() => {
         this.dragGridSpot.clear()
@@ -320,27 +323,33 @@ class FoamcoreGrid extends React.Component {
     return { col, row }
   }
 
-  setHoverGridSpot(hoverPos) {
+  setHoverSpot(hoverPos) {
     if (this.resizing) return
     const overlap = this.findOverlap(hoverPos)
     runInAction(() => {
       if (overlap) {
-        if (!this.hoverGridSpot.x) {
-          this.hoverGridSpot = overlap
+        // Don't place a hover card when there's already a card there.
+        if (this.findCardForSpot(overlap)) {
+          this.placeholderSpot = {}
+          return
+        }
+        if (!this.placeholderSpot.x) {
+          this.placeholderSpot = { ...overlap, type: 'hover' }
         }
       } else {
-        this.hoverGridSpot = {}
+        this.placeholderSpot = {}
       }
     })
   }
 
   setResizeSpot({ row, col, width, height }) {
     runInAction(() => {
-      this.hoverGridSpot = {
+      this.placeholderSpot = {
         row,
         col,
         width,
         height,
+        type: 'resize',
       }
     })
   }
@@ -410,16 +419,17 @@ class FoamcoreGrid extends React.Component {
     )
   }
 
-  positionBlank({ row, col, width, height }) {
+  positionBlank({ row, col, width, height }, type = 'generic') {
     const position = this.positionForSpot({ col, row, width, height })
     const { zoomLevel } = this
-    if (this.dragging || isPointSame(this.hoverGridSpot, { col, row })) {
+    if (this.dragging || isPointSame(this.placeholderSpot, { col, row })) {
       return (
         <BlankCard
           onClick={this.handleBlankCardClick({ col, row })}
           {...position}
           zoomLevel={zoomLevel}
           key={`blank-${col}:${row}`}
+          data-blank-type={type}
           draggedOn
         />
       )
@@ -485,9 +495,11 @@ class FoamcoreGrid extends React.Component {
       if (spot.id) {
         return this.positionCard(spot)
       }
-      return this.positionBlank(spot)
+      return this.positionBlank(spot, 'drag')
     })
-    cardElements.push(this.positionBlank(this.hoverGridSpot))
+    cardElements.push(
+      this.positionBlank(this.placeholderSpot, this.placeholderSpot.type)
+    )
     return cardElements
   }
 
