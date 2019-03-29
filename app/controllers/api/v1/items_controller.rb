@@ -9,7 +9,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
   end
 
   def show
-    log_item_activity(:viewed)
+    log_item_activity(:viewed) if current_api_token.blank?
     render jsonapi: @item,
            include: [:filestack_file, :parent, :parent_collection_card, roles: %i[users groups resource]],
            expose: { current_record: @item }
@@ -27,7 +27,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
   def update
     @item.attributes = item_params
     if @item.save
-      log_item_activity(:edited)
+      log_item_activity(:edited) if current_api_token.blank?
       CollectionUpdateBroadcaster.call(@item.parent, current_user)
       # cancel_sync means we don't want to render the item JSON
       return if @cancel_sync
