@@ -194,7 +194,6 @@ class CollectionPage extends React.Component {
     const submissionsId = submissions ? submissions.id : ''
 
     if (_.compact([currentId, submissionsId]).indexOf(data.record_id) > -1) {
-      this.setEditor(data.current_editor)
       if (
         !_.isEmpty(data.current_editor) &&
         data.current_editor.id === apiStore.currentUserId
@@ -202,8 +201,35 @@ class CollectionPage extends React.Component {
         // don't reload your own updates
         return
       }
+      if (data.data && data.data.item) {
+        const { item } = data.data
+        if (item && item.data_content) {
+          this.handleTextItemUpdate(item, data.current_editor)
+          return
+        }
+      }
+      this.setEditor(data.current_editor)
       this.reloadData()
     }
+  }
+
+  handleTextItemUpdate = (item, current_editor) => {
+    const { apiStore, uiStore } = this.props
+    const localItem = apiStore.find('items', item.id)
+    if (localItem) {
+      // update with incoming content UNLESS we are editing that item
+      if (
+        uiStore.textEditingItem &&
+        uiStore.textEditingItem.id === localItem.id
+      ) {
+        return
+      }
+      localItem.data_content = item.data_content
+    } else {
+      // we don't have the item, it must be a new card that we need to fetch
+      this.reloadData()
+    }
+    this.setEditor(current_editor)
   }
 
   async _reloadData() {

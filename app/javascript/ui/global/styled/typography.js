@@ -241,7 +241,12 @@ export const QuillStyleWrapper = styled.div`
       }
     }
 
+    .ql-container {
+      overflow: visible !important;
+    }
+
     .ql-cursor {
+      cursor: text;
       .ql-cursor-caret {
         animation: blink-animation 1s steps(5, start) infinite;
         width: 3px;

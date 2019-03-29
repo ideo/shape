@@ -223,7 +223,7 @@ class RealtimeTextItem extends React.Component {
     const remoteDeltaWithLocalChanges = this.combinedDelta.transform(
       remoteDelta
     )
-    // make sure our local editor is up to date with changes..???????
+    // make sure our local editor is up to date with changes.
     this.quillEditor.updateContents(remoteDeltaWithLocalChanges, 'silent')
     // persist local changes
     this.setItemDataContent()
@@ -280,9 +280,25 @@ class RealtimeTextItem extends React.Component {
     }
   }
 
-  handleBlur = () => {
+  handleBlur = (range, source, editor) => {
     const { fullPageView } = this.props
-    if (!fullPageView) this.cancel()
+    // Check if something is being linked, which causes a blur event
+    const linker = this.quillEditor.container.querySelector(
+      '.ql-tooltip:not(.ql-hidden)'
+    )
+    if (linker) {
+      // if the linker is open then we don't want to trigger blur/cancel
+      return
+    }
+    if (!fullPageView) {
+      setTimeout(() => {
+        const selection = editor.getSelection()
+        if (!selection) {
+          // we actually did blur, and not copy/paste which can also trigger onBlur
+          this.cancel()
+        }
+      }, 100)
+    }
   }
 
   combineAwaitingDeltas = delta => {
