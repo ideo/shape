@@ -41,6 +41,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       current_user.reload.reset_cached_roles!
       card.reload
       create_notification(card, :created)
+      # because TextItems get created empty, we don't broadcast their creation
       broadcast_collection_create_updates unless card.record.is_a?(Item::TextItem)
       render jsonapi: card,
              include: [:parent, record: [:filestack_file]],

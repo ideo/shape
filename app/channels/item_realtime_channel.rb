@@ -2,7 +2,9 @@ class ItemRealtimeChannel < ApplicationCable::Channel
   # All public methods are exposed to consumers
 
   def subscribed
-    reject unless item.can_edit_content? current_user
+    unless item.can_edit_content? current_user
+      return reject
+    end
     item.started_viewing(current_user)
     stream_from item.stream_name
   rescue ActiveRecord::RecordNotFound
@@ -10,7 +12,7 @@ class ItemRealtimeChannel < ApplicationCable::Channel
   end
 
   def unsubscribed
-    item.stopped_viewing(current_user, dont_notify: true)
+    item.stopped_viewing(current_user)
   rescue ActiveRecord::RecordNotFound
     nil
   end

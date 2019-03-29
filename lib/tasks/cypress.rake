@@ -22,7 +22,7 @@ namespace :cypress do
     # via dependent: :destroy this will also remove everything in the test area
     my_collection.collections.where(name: 'Cypress Test Area').destroy_all
     create_cards(my_collection, user)
-    # create_events(organization)
+    create_events(organization)
   end
 
   def create_cards(collection, user)
@@ -39,11 +39,6 @@ namespace :cypress do
     builder.create
 
     card = builder.collection_card
-
-    #####
-    u = User.find 33
-    u.add_role(Role::EDITOR, card.record)
-    #####
 
     builder = CollectionCardBuilder.new(
       params: {
