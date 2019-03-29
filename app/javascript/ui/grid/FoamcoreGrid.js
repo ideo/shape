@@ -50,6 +50,7 @@ function isPointSame(first, other) {
 @observer
 class FoamcoreGrid extends React.Component {
   gridRef = null
+  filledSpots = []
   @observable
   positionedCards = []
   @observable
@@ -76,6 +77,8 @@ class FoamcoreGrid extends React.Component {
 
   componentDidMount() {
     this.positionCards()
+    this.filledSpots = this.calculateFilledSpots()
+    console.log(this.filledSpots)
   }
 
   getDraggedOnSpot(coords) {
@@ -115,7 +118,7 @@ class FoamcoreGrid extends React.Component {
     // Something about react synthetic events and throttling
     ev.persist()
     if (this.resizing) return
-    const pageMargin = v.containerPadding.horizontal
+    const pageMargin = v.containerPadding.horizontal * 16 * this.zoomLevel
     const hoverPos = {
       x: ev.pageX - pageMargin + this.gridRef.scrollLeft,
       y: ev.pageY - v.headerHeight + this.gridRef.scrollTop,
@@ -144,8 +147,12 @@ class FoamcoreGrid extends React.Component {
       width: card.width,
       height: card.height,
     }
+    const cardDims = { width: card.width, height: card.height }
     const overlapCoords = this.findOverlap(overlapPos)
-    this.debouncedSetDraggedOnSpots(overlapCoords, dragPosition)
+    this.debouncedSetDraggedOnSpots(
+      { ...overlapCoords, ...cardDims },
+      dragPosition
+    )
   }
 
   onDragStart = cardId => {
@@ -378,8 +385,63 @@ class FoamcoreGrid extends React.Component {
     }
   }
 
+  calculateFilledSpots() {
+    const {
+      collection: { collection_cards },
+    } = this.props
+
+    const filledSpots = []
+    collection_cards.forEach(card => {
+      let { width, height } = card
+      const { row, col } = card
+      while (height > 0) {
+        while (width > 0) {
+          filledSpots.push({
+            card,
+            row: row + height - 1,
+            col: col + width - 1,
+          })
+          width -= 1
+        }
+        height -= 1
+      }
+    })
+    return filledSpots
+  }
+
+  findFilledSpot({ col, row }) {
+    return this.filledSpots.find(flsp => isPointSame(flsp, { col, row }))
+  }
+
+  calcEdgeCol({ col, row, width }) {
+    let tempCol = col + width
+    console.log('col', tempCol, width)
+    // TODO make 4 a constant
+    while (tempCol <= 4 - width) {
+      const filled = this.findFilledSpot({ col: tempCol, row })
+      if (filled) {
+        return tempCol
+      }
+      tempCol += 1
+    }
+    return 4
+  }
+
+  calcEdgeRow({ col, row, height }) {
+    let tempRow = row + height
+    // TODO make 4 a constant
+    while (tempRow <= 2 - height) {
+      const filled = this.findFilledSpot({ row: tempRow, col })
+      if (filled) {
+        return tempRow
+      }
+      tempRow += 1
+    }
+    return 2
+  }
+
   positionCard(card) {
-    const { col, row } = card
+    const { col, row, width, height } = card
     const { canEditCollection, collection, routingStore, uiStore } = this.props
     const position = this.positionForSpot(card)
     const { cardMenuOpen } = uiStore
@@ -415,6 +477,8 @@ class FoamcoreGrid extends React.Component {
         parent={collection}
         menuOpen={cardMenuOpen.id === card.id}
         zoomLevel={zoomLevel}
+        maxResizeCol={this.calcEdgeCol({ col, row, width })}
+        maxResizeRow={this.calcEdgeRow({ col, row, height })}
       />
     )
   }
