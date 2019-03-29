@@ -22,6 +22,7 @@ beforeEach(() => {
     apiStore,
     uiStore,
     fetchType: 'collections',
+    render: () => null,
   }
 
   wrapper = shallow(<PageWithApiWrapper.wrappedComponent {...props} />)

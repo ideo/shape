@@ -39,6 +39,7 @@ namespace :cypress do
     builder.create
 
     card = builder.collection_card
+
     builder = CollectionCardBuilder.new(
       params: {
         order: 0,
