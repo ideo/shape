@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe OverdueNotificationWorker, only: true, type: :worker do
+RSpec.describe OverdueNotificationWorker, type: :worker do
   describe '#perform' do
     let!(:in_app_billing_disabled) do
       create(:organization,
