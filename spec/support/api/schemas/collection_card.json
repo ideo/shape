@@ -5,6 +5,8 @@
     "order": { "type": "integer" },
     "width": { "type": "integer" },
     "height": { "type": "integer" },
+    "row": { "type": "integer" },
+    "col": { "type": "integer" },
     "class_type": { "type": "string" },
     "card_question_type": { "type": ["string", "null"] },
     "link": { "type": "boolean" },
