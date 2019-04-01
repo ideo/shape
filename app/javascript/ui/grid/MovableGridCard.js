@@ -137,7 +137,7 @@ class MovableGridCard extends React.PureComponent {
   }
 
   handleDrag = (e, data, dX, dY) => {
-    const { position, zoomLevel } = this.props
+    const { position } = this.props
     // Global dragging should use screen coordinates
     // TODO this could also be a HOC that publishes to the UI store
     const { pageX, pageY } = e
@@ -419,19 +419,14 @@ class MovableGridCard extends React.PureComponent {
       return this.renderPagination()
     }
 
-    const { gridW, gridH, cols } = uiStore.gridSettings
+    const { gridW, gridH, cols, gutter } = uiStore.gridSettings
     const minWidth = (gridW * 0.8) / zoomLevel
     const minHeight = (gridH * 0.8) / zoomLevel
     // need to always set Rnd maxWidth to 4 columns instead of `cols`
     // because of this issue: https://github.com/bokuweb/react-rnd/issues/221
-    const maxWidth = uiStore.gridWidthFor(maxResizeCol)
+    const maxWidth = maxResizeCol * (gridW + gutter)
     const maxHeight = uiStore.gridHeightFor(maxResizeRow, {
       useDefault: true,
-    })
-
-    console.log({
-      maxResizeRow,
-      maxResizeCol,
     })
 
     let xAdjust = 0
@@ -513,17 +508,6 @@ class MovableGridCard extends React.PureComponent {
           display: !dragging && hidden ? 'none' : 'block',
         }}
       >
-        <div
-          style={{
-            border: '1px solid blue',
-            position: 'absolute',
-            left: `${xPos}px`,
-            pointerEvents: 'none',
-            top: `${yPos}px`,
-            height: `${maxHeight}px`,
-            width: `${maxWidth}px`,
-          }}
-        />
         <Rnd
           ref={c => {
             this.rnd = c
