@@ -210,13 +210,18 @@ class MovableGridCard extends React.PureComponent {
     this.scrolling = false
     document.body.style['overflow-y'] = 'auto'
     this.setState({ dragging: false, resizing: false }, () => {
+      // Resizing has to be reset first, before the handler or the card dimensions
+      // will jump back in forth as the grid resizes the actual card while this
+      // resize state is still set.
+      this.setState({
+        resizeWidth: 0,
+        resizeHeight: 0,
+      })
       this.props.onDragOrResizeStop(this.props.card.id, type, ev)
       const timeoutId = setTimeout(() => {
         // have this item remain "on top" while it animates back
         this.setState({
           moveComplete: true,
-          resizeWidth: 0,
-          resizeHeight: 0,
         })
         this.scrolling = false
       }, 350)

@@ -45,6 +45,9 @@ function isPointSame(first, other) {
   return first.row === other.row && first.col === other.col
 }
 
+const MAX_CARD_W = 4
+const MAX_CARD_H = 2
+
 // needs to be an observer to observe changes to the collection + items
 @inject('apiStore', 'routingStore', 'uiStore')
 @observer
@@ -197,25 +200,20 @@ class FoamcoreGrid extends React.Component {
   }
 
   resizeCard = (card, data) => {
-    // // just some double-checking validations
-    // if (height > 2) height = 2
-    // if (width > 4) width = 4
-    // // set up action to undo
-    // if (original.height !== height || original.width !== width) {
-    //   undoMessage = 'Card resize undone'
-    // }
-    // updates.width = width
-    // updates.height = height
-    // // If a template, warn that any instances will be updated
-    // updateCollectionCard = () => {
-    //   // this will assign the update attributes to the card
-    //   this.props.updateCollection({
-    //     card: original,
-    //     updates,
-    //     undoMessage,
-    //   })
-    //   this.positionCardsFromProps()
-    // }
+    // just some double-checking validations
+    let undoMessage
+    const resizePlaceholder = this.placeholderSpot
+    let { height, width } = resizePlaceholder
+    if (height > MAX_CARD_H) height = MAX_CARD_H
+    if (width > MAX_CARD_W) width = MAX_CARD_W
+    // set up action to undo
+    if (card.height !== height || card.width !== width) {
+      undoMessage = 'Card resize undone'
+    }
+    const updates = {}
+    updates.width = width
+    updates.height = height
+    this.updateCardWithUndo(card, updates, undoMessage)
   }
 
   setDraggedOnSpots(overlapCoords, dragPosition, recur) {
@@ -439,6 +437,24 @@ class FoamcoreGrid extends React.Component {
       tempRow += 1
     }
     return 2
+  }
+
+  updateCardWithUndo(card, updates, undoMessage) {
+    // TODO combine with normal grid
+    const { collection } = this.props
+    // If a template, warn that any instances will be updated
+    const updateCollectionCard = () => {
+      // this will assign the update attributes to the card
+      this.props.updateCollection({
+        card,
+        updates,
+        undoMessage,
+      })
+    }
+    collection.confirmEdit({
+      onCancel: () => {},
+      onConfirm: updateCollectionCard,
+    })
   }
 
   positionCard(card) {
