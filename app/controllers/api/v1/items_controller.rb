@@ -9,7 +9,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
   end
 
   def show
-    log_item_activity(:viewed)
+    log_item_activity(:viewed) if log_activity?
     render jsonapi: @item,
            include: [:filestack_file, :parent, :parent_collection_card, roles: %i[users groups resource]],
            expose: { current_record: @item }
@@ -27,7 +27,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
   def update
     @item.attributes = item_params
     if @item.save
-      log_item_activity(:edited)
+      log_item_activity(:edited) if log_activity?
       broadcaster = CollectionUpdateBroadcaster.new(@item.parent, current_user)
       if @item.is_a? Item::TextItem
         broadcaster.text_item_updated(@item)
