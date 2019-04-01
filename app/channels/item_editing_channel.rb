@@ -1,3 +1,4 @@
+# TODO: This may not be used any more now that we have item_realtime_channel...
 class ItemEditingChannel < ApplicationCable::Channel
   # All public methods are exposed to consumers
 

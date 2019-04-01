@@ -39,7 +39,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def update
     updated = CollectionUpdater.call(@collection, collection_params)
     if updated
-      log_collection_activity(:edited) if current_api_token.blank?
+      log_collection_activity(:edited) if log_activity?
       return if @cancel_sync
       render_collection
     else
@@ -116,7 +116,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def log_viewing_activities
-    return if current_api_token.present?
+    return unless log_activity?
     log_organization_view_activity
     log_collection_activity(:viewed)
   end

@@ -137,6 +137,13 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
         },
       )
     end
+    let(:broadcaster) { double('broadcaster') }
+
+    before do
+      allow(CollectionUpdateBroadcaster).to receive(:new).and_return(broadcaster)
+      allow(broadcaster).to receive(:text_item_updated).and_return(true)
+      allow(broadcaster).to receive(:call).and_return(true)
+    end
 
     it 'returns a 200' do
       patch(path, params: params)
@@ -184,12 +191,24 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
       patch(path, params: params)
     end
 
-    it 'broadcasts collection updates' do
-      expect(CollectionUpdateBroadcaster).to receive(:call).with(
-        parent,
-        user,
-      )
-      patch(path, params: params)
+    context 'with a text item' do
+      let!(:item) { create(:text_item, add_editors: [user]) }
+
+      it 'broadcasts individual text updates' do
+        expect(broadcaster).to receive(:text_item_updated).with(
+          item,
+        )
+        patch(path, params: params)
+      end
+    end
+
+    context 'with a link item' do
+      let!(:item) { create(:link_item, add_editors: [user]) }
+
+      it 'broadcasts collection updates' do
+        expect(broadcaster).to receive(:call)
+        patch(path, params: params)
+      end
     end
 
     context 'with cancel_sync == true' do

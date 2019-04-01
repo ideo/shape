@@ -21,6 +21,7 @@ function WithDropTarget(Wrapped) {
         'activeDragTarget',
         change => {
           const currentTarget = change.newValue
+          if (this.unmounted) return
           if (!currentTarget) {
             this.setState({ currentlyDraggedOn: null })
           } else if (currentTarget.item.identifier === item.identifier) {
@@ -39,6 +40,7 @@ function WithDropTarget(Wrapped) {
     }
 
     componentWillUnmount() {
+      this.unmounted = true
       uiStore.removeDragTarget(this.props.item, this.coordinates, 'Breadcrumb')
     }
 
