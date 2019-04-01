@@ -22,7 +22,6 @@ class Collection < ApplicationRecord
                  :cached_cover,
                  :cached_tag_list,
                  :cached_owned_tag_list,
-                 :cached_org_properties,
                  :cached_card_count,
                  :submission_attrs,
                  :getting_started_shell,
@@ -269,6 +268,8 @@ class Collection < ApplicationRecord
     end
     # Clones collection and all embedded items/collections
     c = amoeba_dup
+    # clear out cached submission_attrs
+    c.cached_attributes.delete 'submission_attrs'
     c.cloned_from = self
     c.created_by = for_user
     c.tag_list = tag_list

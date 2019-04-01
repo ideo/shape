@@ -234,5 +234,23 @@ export const QuillStyleWrapper = styled.div`
     p + h3 {
       margin-top: 0.85rem;
     }
+
+    @keyframes blink-animation {
+      to {
+        visibility: hidden;
+      }
+    }
+
+    .ql-container {
+      overflow: visible !important;
+    }
+
+    .ql-cursor {
+      cursor: text;
+      .ql-cursor-caret {
+        animation: blink-animation 1s steps(5, start) infinite;
+        width: 3px;
+      }
+    }
   }
 `

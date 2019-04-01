@@ -103,10 +103,14 @@ gem 'aasm', '~> 5.0'
 # mailchimp API
 gem 'gibbon', '~> 3.2'
 
+# distributed mutex
+gem "redis-mutex", "~> 4.0.1"
+
 # performance tuning
 gem 'tunemygc'
 gem 'scout_apm'
 gem 'barnes'
+gem 'oj'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

@@ -41,7 +41,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       current_user.reload.reset_cached_roles!
       card.reload
       create_notification(card, :created)
-      broadcast_collection_create_updates
+      # because TextItems get created empty, we don't broadcast their creation
+      broadcast_collection_create_updates unless card.record.is_a?(Item::TextItem)
       render jsonapi: card,
              include: [:parent, record: [:filestack_file]],
              expose: { current_record: card.record }
@@ -200,7 +201,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def load_and_authorize_moving_collections
     @from_collection = Collection.find(json_api_params[:from_id])
-    @cards = CollectionCard.where(id: json_api_params[:collection_card_ids])
+    @cards = ordered_cards
     @to_collection = Collection.find(json_api_params[:to_id])
     authorize! :edit_content, @from_collection
     authorize! :edit_content, @to_collection
@@ -209,7 +210,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   # almost the same as above but needs to authorize read access for each card's record
   def load_and_authorize_linking_collections
     @from_collection = Collection.find(json_api_params[:from_id])
-    @cards = CollectionCard.where(id: json_api_params[:collection_card_ids])
+    @cards = ordered_cards
     @cards.each do |card|
       authorize! :read, card.record
     end
@@ -284,6 +285,10 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def broadcast_collection_archive_updates
     return unless @collection_cards.first.present?
     CollectionUpdateBroadcaster.call(@collection_cards.first.parent, current_user)
+  end
+
+  def ordered_cards
+    CollectionCard.ordered.where(id: json_api_params[:collection_card_ids])
   end
 
   def collection_card_update_params

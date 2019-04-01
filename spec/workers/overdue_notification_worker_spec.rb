@@ -45,16 +45,16 @@ RSpec.describe OverdueNotificationWorker, type: :worker do
              overdue_at: 9.days.ago,
              active_users_count: 1)
     end
-    let!(:overdue_10_days) do
+    let!(:overdue_14_days) do
       create(:organization,
              in_app_billing: true,
-             overdue_at: 10.days.ago,
+             overdue_at: 14.days.ago,
              active_users_count: 1)
     end
-    let!(:overdue_11_days) do
+    let!(:overdue_21_days) do
       create(:organization,
              in_app_billing: true,
-             overdue_at: 11.days.ago,
+             overdue_at: 21.days.ago,
              active_users_count: 1)
     end
     let!(:overdue_100_days) do
@@ -76,20 +76,20 @@ RSpec.describe OverdueNotificationWorker, type: :worker do
       allow(mailer).to receive(:deliver_later)
       allow(BillingOverdueMailer).to receive(:notify).and_return(mailer)
 
-      expect(mailer).to receive(:deliver_later).exactly(5).times
+      expect(mailer).to receive(:deliver_later).exactly(4).times
 
       expect(BillingOverdueMailer).not_to receive(:notify).with(in_app_billing_disabled)
       expect(BillingOverdueMailer).not_to receive(:notify).with(deactivated)
       expect(BillingOverdueMailer).not_to receive(:notify).with(overdue_at_not_set)
+      expect(BillingOverdueMailer).not_to receive(:notify).with(not_active)
       expect(BillingOverdueMailer).not_to receive(:notify).with(overdue_3_days)
       expect(BillingOverdueMailer).not_to receive(:notify).with(overdue_9_days)
-      expect(BillingOverdueMailer).not_to receive(:notify).with(not_active)
+      expect(BillingOverdueMailer).not_to receive(:notify).with(overdue_100_days)
 
       expect(BillingOverdueMailer).to receive(:notify).with(overdue_1_day)
       expect(BillingOverdueMailer).to receive(:notify).with(overdue_7_days)
-      expect(BillingOverdueMailer).to receive(:notify).with(overdue_10_days)
-      expect(BillingOverdueMailer).to receive(:notify).with(overdue_11_days)
-      expect(BillingOverdueMailer).to receive(:notify).with(overdue_100_days)
+      expect(BillingOverdueMailer).to receive(:notify).with(overdue_14_days)
+      expect(BillingOverdueMailer).to receive(:notify).with(overdue_21_days)
 
       OverdueNotificationWorker.new.perform
     end

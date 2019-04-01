@@ -244,7 +244,7 @@ export default class UiStore {
 
   alert(message, iconName = 'Alert') {
     this.popupAlert({
-      prompt: message,
+      prompt: message || 'Server Error',
       iconName,
     })
   }

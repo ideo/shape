@@ -242,11 +242,12 @@ class CollectionCard extends BaseRecord {
     return uiStore.dragCardMaster !== this.id && this.isBeingMultiMoved
   }
 
-  async API_archiveSelf() {
+  async API_archiveSelf({ undoable = true }) {
     try {
       await this.apiStore.archiveCards({
         cardIds: [this.id],
         collection: this.parentCollection,
+        undoable,
       })
       return
     } catch (e) {
