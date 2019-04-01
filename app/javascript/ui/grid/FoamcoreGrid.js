@@ -173,6 +173,8 @@ class FoamcoreGrid extends React.Component {
     const card = _.find(collection_cards, ['id', cardId])
     if (dragType === 'resize') {
       this.resizeCard(card)
+    } else {
+      this.moveCard(card)
     }
     runInAction(() => {
       this.dragGridSpot.clear()
@@ -199,7 +201,7 @@ class FoamcoreGrid extends React.Component {
     this.throttledSetResizeSpot({ col, row, height, width })
   }
 
-  resizeCard = (card, data) => {
+  resizeCard = card => {
     // just some double-checking validations
     let undoMessage
     const resizePlaceholder = this.placeholderSpot
@@ -214,6 +216,22 @@ class FoamcoreGrid extends React.Component {
     updates.width = width
     updates.height = height
     this.updateCardWithUndo(card, updates, undoMessage)
+  }
+
+  moveCard = (card, data) => {
+    const { uiStore } = this.props
+    const undoMessage = 'Card move undone'
+    // Different paths for dragging multiple cards vs one
+    if (uiStore.multiMoveCardIds.length < 2) {
+      const movePlaceholder = [...this.dragGridSpot.values][0]
+      // Save algorithm for what to do when dragging over card for collision
+      // resolution later
+      if (movePlaceholder.card) return
+
+      const { row, col } = movePlaceholder
+      const updates = { row, col }
+      this.updateCardWithUndo(card, updates, undoMessage)
+    }
   }
 
   setDraggedOnSpots(overlapCoords, dragPosition, recur) {
@@ -415,28 +433,26 @@ class FoamcoreGrid extends React.Component {
 
   calcEdgeCol({ col, row, width }, cardId) {
     let tempCol = col + width - 1
-    // TODO make 4 a constant
-    while (tempCol <= col + 4) {
+    while (tempCol <= col + MAX_CARD_W) {
       const filled = this.findFilledSpot({ col: tempCol, row }, cardId)
       if (filled) {
         return tempCol - col
       }
       tempCol += 1
     }
-    return 4
+    return MAX_CARD_W
   }
 
   calcEdgeRow({ col, row, height }, cardId) {
     let tempRow = row + height - 1
-    // TODO make 4 a constant
-    while (tempRow <= 2) {
+    while (tempRow <= MAX_CARD_H) {
       const filled = this.findFilledSpot({ row: tempRow, col }, cardId)
       if (filled) {
         return tempRow - row
       }
       tempRow += 1
     }
-    return 2
+    return MAX_CARD_H
   }
 
   updateCardWithUndo(card, updates, undoMessage) {
