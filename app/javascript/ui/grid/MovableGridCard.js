@@ -614,6 +614,7 @@ MovableGridCard.propTypes = {
   menuOpen: PropTypes.bool.isRequired,
   lastPinnedCard: PropTypes.bool,
   hidden: PropTypes.bool,
+  zoomLevel: PropTypes.number,
   maxResizeRow: PropTypes.number,
   maxResizeCol: PropTypes.number,
 }
@@ -621,6 +622,7 @@ MovableGridCard.propTypes = {
 MovableGridCard.defaultProps = {
   lastPinnedCard: false,
   hidden: false,
+  zoomLevel: 1,
   maxResizeRow: 2,
   maxResizeCol: 4,
 }
