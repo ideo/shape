@@ -11,7 +11,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     render jsonapi: @collections, include: params[:include]
   end
 
-  before_action :log_viewing_activities, only: %i[show]
+  before_action :log_viewing_activities, only: %i[show], if: :log_activity?
   before_action :check_cache, only: %i[show]
   def show
     check_getting_started_shell
@@ -116,7 +116,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def log_viewing_activities
-    return unless log_activity?
     log_organization_view_activity
     log_collection_activity(:viewed)
   end
