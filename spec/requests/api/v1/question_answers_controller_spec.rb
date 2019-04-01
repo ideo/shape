@@ -11,8 +11,7 @@ describe Api::V1::QuestionAnswersController, type: :request, json: true do
     let(:params) {
       json_api_params(
         'question_answers',
-        'answer_text': 'I do not like green eggs and ham.',
-        'answer_number': nil,
+        'answer_number': 2,
         'question_id': question.id,
       )
     }
@@ -36,6 +35,21 @@ describe Api::V1::QuestionAnswersController, type: :request, json: true do
 
       it 'returns a 422' do
         post(path, params: params)
+        expect(response.status).to eq(422)
+      end
+    end
+
+    context 'with no answer number' do
+      let(:params_without_answer) do
+        json_api_params(
+          'question_answers',
+          'answer_number': nil,
+          'question_id': question.id,
+        )
+      end
+
+      it 'returns a 422' do
+        post(path, params: params_without_answer)
         expect(response.status).to eq(422)
       end
     end
