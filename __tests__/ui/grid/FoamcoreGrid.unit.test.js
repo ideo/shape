@@ -181,6 +181,34 @@ describe('FoamcoreGrid', () => {
     })
   })
 
+  describe('calcEdgeCol/Row', () => {
+    describe('with a card that has no cards around it', () => {
+      beforeEach(() => {
+        cards[0].col = 1
+        cards[0].row = 1
+        cards[1].col = 8
+        cards[1].row = 1
+        cards[2].col = 1
+        cards[2].row = 5
+        wrapper = shallow(<FoamcoreGrid.wrappedComponent {...props} />)
+        instance = wrapper.instance()
+      })
+
+      it('should set the max column as the max card width', () => {
+        const edgeCol = instance.calcEdgeCol(cards[0], cards[0].id)
+        expect(edgeCol).toEqual(4)
+      })
+
+      it('should set the max row as the max card height', () => {
+        const edgeCol = instance.calcEdgeRow(cards[0], cards[0].id)
+        expect(edgeCol).toEqual(2)
+      })
+    })
+
+    describe('with a card that has horizontal contraints, 2 spaces apart', () => {})
+    describe('with a card that has vertical contraints, 1 space apart', () => {})
+  })
+
   describe('determineDragMap', () => {})
   describe('resizeCard', () => {})
   describe('moveCard', () => {})
