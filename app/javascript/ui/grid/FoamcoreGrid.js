@@ -173,6 +173,7 @@ class FoamcoreGrid extends React.Component {
     } = this.props
     uiStore.stopDragging()
     const card = _.find(collection_cards, ['id', cardId])
+
     if (dragType === 'resize') {
       this.resizeCard(card)
     } else {
@@ -225,10 +226,12 @@ class FoamcoreGrid extends React.Component {
     const undoMessage = 'Card move undone'
     // Different paths for dragging multiple cards vs one
     if (uiStore.multiMoveCardIds.length < 2) {
-      const movePlaceholder = [...this.dragGridSpot.values][0]
+      if (this.dragGridSpot.size < 1) return
+
+      const movePlaceholder = [...this.dragGridSpot.values()][0]
       // Save algorithm for what to do when dragging over card for collision
       // resolution later
-      if (movePlaceholder.card) return
+      if (movePlaceholder && movePlaceholder.card) return
 
       const { row, col } = movePlaceholder
       const updates = { row, col }

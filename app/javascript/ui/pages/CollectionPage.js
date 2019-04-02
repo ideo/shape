@@ -46,6 +46,7 @@ class CollectionPage extends React.Component {
 
   componentDidMount() {
     this.onAPILoad()
+    window.addEventListener('click', this.deselectAllCards);
   }
 
   componentDidUpdate(prevProps) {
@@ -67,6 +68,7 @@ class CollectionPage extends React.Component {
   componentWillUnmount() {
     // super.componentWillUnmount()
     ChannelManager.unsubscribeAllFromChannel(this.channelName)
+    window.removeEventListener('click', this.deselectAllCards);
   }
 
   get collection() {
@@ -185,6 +187,19 @@ class CollectionPage extends React.Component {
     const { uiStore } = this.props
     ev.preventDefault()
     uiStore.closeCardMenu()
+  }
+
+  deselectAllCards = (event) => {
+    const { uiStore } = this.props
+
+    const target = event.target
+    const role = target.getAttribute('role')
+    if (role && role === 'button') {
+      console.log("clicking a button, no deselecting to do")
+      return
+    }
+
+    uiStore.deselectCards()
   }
 
   receivedChannelData = async data => {
