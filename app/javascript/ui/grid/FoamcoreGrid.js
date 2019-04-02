@@ -81,6 +81,10 @@ class FoamcoreGrid extends React.Component {
     this.filledSpots = this.calculateFilledSpots()
   }
 
+  componentDidUpdate() {
+    this.filledSpots = this.calculateFilledSpots()
+  }
+
   getDraggedOnSpot(coords) {
     return this.dragGridSpot.get(getMapKey(coords))
   }
