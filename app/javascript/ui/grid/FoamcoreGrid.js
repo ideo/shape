@@ -78,10 +78,12 @@ class FoamcoreGrid extends React.Component {
   }
 
   componentDidMount() {
+    this.positionCards()
     this.filledSpots = this.calculateFilledSpots()
   }
 
   componentDidUpdate() {
+    this.positionCards()
     this.filledSpots = this.calculateFilledSpots()
   }
 
@@ -408,16 +410,18 @@ class FoamcoreGrid extends React.Component {
     const filledSpots = []
     collection_cards.forEach(card => {
       let { width, height } = card
+      const origWidth = width
       const { row, col } = card
       while (height > 0) {
         while (width > 0) {
           filledSpots.push({
             card,
-            row: row + height - 1,
-            col: col + width - 1,
+            row: row + height - 1, // 1 + 2 - 1 = 2 | 2
+            col: col + width - 1, // 0 + 2 - 1 = 1 | 0
           })
           width -= 1
         }
+        width = origWidth
         height -= 1
       }
     })

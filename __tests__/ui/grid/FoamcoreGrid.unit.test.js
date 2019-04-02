@@ -2,23 +2,27 @@ import FoamcoreGrid from '~/ui/grid/FoamcoreGrid'
 
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
-import { fakeCollection } from '#/mocks/data'
+import { fakeCollectionCard, fakeCollection } from '#/mocks/data'
 
-let props, wrapper, instance, cards
+let props, wrapper, instance, rerender, cards, cardA, cardB, cardC
+let idCounter = 0
+
+function createCard(data) {
+  idCounter += 1
+  const id = idCounter.toString()
+  return { ...fakeCollectionCard, ...data, id }
+}
 
 describe('FoamcoreGrid', () => {
   beforeEach(() => {
-    cards = fakeCollection.collection_cards
-    cards[0].col = 5
-    cards[0].row = 1
-    cards[1].col = 1
-    cards[1].row = 0
-    cards[1].width = 2
-    cards[1].height = 2
-    cards[2].col = 0
-    cards[2].row = 2
+    cardA = createCard({ col: 5, row: 1 })
+    cardB = createCard({ col: 1, row: 0, width: 2, height: 2 })
+    cardC = createCard({ col: 0, row: 2, width: 2 })
+    const collection = fakeCollection
+    collection.collection_cards = [cardA, cardB, cardC]
+
     props = {
-      collection: fakeCollection,
+      collection,
       canEditCollection: true,
       gridW: 200,
       gridH: 200,
@@ -33,23 +37,26 @@ describe('FoamcoreGrid', () => {
         push: jest.fn(),
       },
     }
-    wrapper = shallow(<FoamcoreGrid.wrappedComponent {...props} />)
-    instance = wrapper.instance()
+    rerender = () => {
+      wrapper = shallow(<FoamcoreGrid.wrappedComponent {...props} />)
+      instance = wrapper.instance()
+    }
+    rerender()
+    cards = props.collection.collection_cards
     instance.gridRef = { scrollLeft: 0, scrollTop: 0 }
   })
 
   describe('calculateFilledSpots', () => {
     it('maps out all the filled spots in the grid as an array', () => {
-      expect(instance.filledSpots.length).toEqual(6)
-      const firstSpot = { card: cards[0], row: 1, col: 5 }
+      expect(instance.filledSpots.length).toEqual(7)
+      const firstSpot = { card: cardA, row: 1, col: 5 }
       expect(instance.filledSpots).toContainEqual(firstSpot)
-      // const filledSpots = props.collection.collection_cards.map(card =>
-      //   instance.filledSpots.find(spot => {
-      //     return spot.row === card.row && spot.col === card.col
-      //   })
-      // )
-      // console.log('FS in test: ', instance.filledSpots)
-      // expect(filledSpots.length).toEqual(3)
+
+      const secondSpot = { card: cardB, row: 0, col: 1 }
+      expect(instance.filledSpots).toContainEqual(secondSpot)
+
+      const lastSpot = { card: cardC, row: 2, col: 1 }
+      expect(instance.filledSpots).toContainEqual(lastSpot)
     })
   })
 
@@ -186,14 +193,13 @@ describe('FoamcoreGrid', () => {
 
   describe('calcEdgeCol/Row', () => {
     beforeEach(() => {
-      cards[0].col = 1
-      cards[0].row = 1
-      cards[1].col = 8
-      cards[1].row = 1
-      cards[2].col = 9
-      cards[2].row = 9
+      cardA = createCard({ col: 1, row: 1 })
+      cardB = createCard({ col: 8, row: 1 })
+      cardC = createCard({ col: 9, row: 9 })
+      props.collection.collection_cards = [cardA, cardB, cardC]
     })
-    xdescribe('with a card that has no cards around it', () => {
+
+    describe('with a card that has no cards around it', () => {
       it('should set the max column as the max card width', () => {
         const edgeCol = instance.calcEdgeCol(cards[0], cards[0].id)
         expect(edgeCol).toEqual(4)
@@ -207,25 +213,28 @@ describe('FoamcoreGrid', () => {
 
     describe('with a card that has horizontal contraints, 2 spaces apart', () => {
       beforeEach(() => {
-        cards[1].col = 3
-        cards[1].row = 1
+        const otherCard = props.collection.collection_cards[1]
+        otherCard.row = 1
+        otherCard.col = 3
+        rerender()
       })
 
       it('has a maxResizeCol of 2', () => {
-        console.log(instance.filledSpots.map(obj => ({ row: obj.row, col: obj.col })))
-        const edgeCol = instance.calcEdgeCol(cards[0], cards[0].id)
+        const edgeCol = instance.calcEdgeCol(cardA, cardA.id)
         expect(edgeCol).toEqual(2)
       })
     })
 
-    xdescribe('with a card that has vertical contraints, 1 space apart', () => {
+    describe('with a card that has vertical contraints, 1 space apart', () => {
       beforeEach(() => {
-        cards[1].col = 1
-        cards[1].row = 2
+        const otherCard = props.collection.collection_cards[1]
+        otherCard.row = 2
+        otherCard.col = 1
+        rerender()
       })
 
       it('has maxResizeRow of 1', () => {
-        const edgeRow = instance.calcEdgeRow(cards[0], cards[0].id)
+        const edgeRow = instance.calcEdgeRow(cardA, cardA.id)
         expect(edgeRow).toEqual(1)
       })
     })
