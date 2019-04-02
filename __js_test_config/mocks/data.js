@@ -15,6 +15,8 @@ export const fakeCollectionCard = {
   order: 1,
   height: 1,
   width: 1,
+  row: 0,
+  col: 1,
   maxWidth: 1,
   maxHeight: 1,
   record: {},

@@ -68,7 +68,6 @@ class FoamcoreGrid extends React.Component {
   // TODO rename this now that it's also used for resize placeholder
   @observable
   placeholderSpot = { row: null, col: null, width: null, height: null }
-  @observable
   draggingMap = []
 
   constructor(props) {
@@ -79,7 +78,6 @@ class FoamcoreGrid extends React.Component {
   }
 
   componentDidMount() {
-    this.positionCards()
     this.filledSpots = this.calculateFilledSpots()
   }
 
@@ -159,12 +157,10 @@ class FoamcoreGrid extends React.Component {
 
   onDragStart = cardId => {
     const dragMap = this.determineDragMap(cardId)
-    runInAction(() => {
-      this.draggingMap = dragMap
-    })
+    this.draggingMap = dragMap
   }
 
-  onDragOrResizeStop = (cardId, dragType, ev) => {
+  onDragOrResizeStop = (cardId, dragType) => {
     const {
       collection: { collection_cards },
       uiStore,
