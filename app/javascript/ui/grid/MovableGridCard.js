@@ -101,11 +101,25 @@ class MovableGridCard extends React.PureComponent {
 
   scrollAmount = () => {
     // When zooming browser in or out, it doesn't work to use `1` as the unit,
-    // it must be scaled appropriately to the zoom level
-    // Also: there aren't great ways to get zoom level from the browser,
-    // this is the best I could find:
-    const browserZoom = window.devicePixelRatio || 1
-    return 1 / browserZoom
+    // There aren't any reliable ways to get the zoom level from all browsers.
+    // This library doesn't work: https://github.com/tombigel/detect-zoom.
+    // window.devicePixelRatio doesn't work on all browsers.
+    // Setting a div of a fixed width on the page and measuring it's width doesn't work.
+    //
+    // What we need is to return a value that is > 1 for zoomed in screens
+    // window.devicePixelRatio will be 1 for non-retina
+    // and retina is likely at 2, but if zoomed out to 50% is 1
+    //
+    let scrollAmount
+    if (window.devicePixelRatio >= 2) {
+      scrollAmount = window.devicePixelRatio
+    } else if (window.devicePixelRatio >= 1) {
+      scrollAmount = 2
+    } else {
+      // After testing out multiple values, this seemed to be the right balance
+      scrollAmount = 1.5 / window.devicePixelRatio
+    }
+    return scrollAmount
   }
 
   scrollUp = (timestamp, clientY) => {
