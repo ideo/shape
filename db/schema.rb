@@ -113,6 +113,15 @@ ActiveRecord::Schema.define(version: 20190327205722) do
     t.index ["type"], name: "index_collection_cards_on_type"
   end
 
+  create_table "collection_cover_items", force: :cascade do |t|
+    t.bigint "collection_id"
+    t.bigint "item_id"
+    t.integer "order"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["collection_id", "item_id"], name: "index_collection_cover_items_on_collection_id_and_item_id", unique: true
+  end
+
   create_table "collections", force: :cascade do |t|
     t.string "name"
     t.string "type"
