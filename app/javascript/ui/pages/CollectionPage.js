@@ -44,6 +44,10 @@ class CollectionPage extends React.Component {
     this.reloadData = _.debounce(this._reloadData, 1500)
   }
 
+  componentDidMount() {
+    this.loadCollectionCards({})
+  }
+
   componentDidUpdate(prevProps) {
     const { collection } = this.props
     const previousId = prevProps.collection.id
@@ -56,6 +60,7 @@ class CollectionPage extends React.Component {
       ChannelManager.unsubscribeAllFromChannel(this.channelName)
       // when navigating between collections, close BCT
       this.props.uiStore.closeBlankContentTool()
+      this.loadCollectionCards({})
     }
   }
 
@@ -390,6 +395,7 @@ class CollectionPage extends React.Component {
     // Also, checking meta.snapshot seems to load more consistently than just collection.can_edit
     const isLoading =
       collection.meta.snapshot.can_edit === undefined ||
+      (!this.cardsFetched && collection.collection_cards.length === 0) ||
       collection.awaiting_updates ||
       uiStore.isLoading
     const isTransparentLoading = !!uiStore.movingIntoCollection

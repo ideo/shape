@@ -87,12 +87,6 @@ class FoamcoreGrid extends React.Component {
   }
 
   componentDidMount() {
-    const maxRow = Math.ceil(this.visibleRows.max + this.visibleRows.num)
-    const maxCol = Math.ceil(this.visibleCols.max + this.visibleCols.num)
-    this.loadCards({
-      rows: [0, maxRow],
-      cols: [0, maxCol],
-    })
     this.filledSpots = this.calculateFilledSpots()
     window.addEventListener('scroll', this.handleScroll)
   }
@@ -109,8 +103,7 @@ class FoamcoreGrid extends React.Component {
     const { loadCollectionCards } = this.props
     // Track what we've loaded
     // Set these immediately so further calls won't load the same rows
-    if (rows[1] > this.loadedRows.max) this.loadedRows.max = rows[1]
-    if (cols[1] > this.loadedCols.max) this.loadedCols.max = cols[1]
+    this.updateMaxLoaded({ row: rows[1], col: cols[1] })
     loadCollectionCards({
       rows,
       cols,
@@ -162,6 +155,11 @@ class FoamcoreGrid extends React.Component {
       onCancel: () => {},
       onConfirm: updateCollectionCard,
     })
+  }
+
+  updateMaxLoaded = ({ row, col }) => {
+    if (row > this.loadedRows.max) this.loadedRows.max = row
+    if (col > this.loadedCols.max) this.loadedCols.max = col
   }
 
   get cardAndGutterWidth() {
@@ -719,6 +717,8 @@ class FoamcoreGrid extends React.Component {
 
     cards.forEach(card => {
       if (this.cardWithinViewPlusHalfPage(card)) {
+        // On first load we need to mark the max row and col loaded
+        this.updateMaxLoaded({ row: card.row, col: card.col })
         // Render cards in view, or within half screen
         displayCards.push(card)
       } else {
