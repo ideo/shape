@@ -158,4 +158,8 @@ class Api::V1::BaseController < ApplicationController
             params[:page].try(:[], :number) ||
             1
   end
+
+  def log_activity?
+    current_api_token.blank?
+  end
 end

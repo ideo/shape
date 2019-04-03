@@ -11,7 +11,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     render jsonapi: @collections, include: params[:include]
   end
 
-  before_action :log_viewing_activities, only: %i[show]
+  before_action :log_viewing_activities, only: %i[show], if: :log_activity?
   before_action :check_cache, only: %i[show]
   def show
     check_getting_started_shell
@@ -39,7 +39,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def update
     updated = CollectionUpdater.call(@collection, collection_params)
     if updated
-      log_collection_activity(:edited)
+      log_collection_activity(:edited) if log_activity?
       return if @cancel_sync
       render_collection
     else

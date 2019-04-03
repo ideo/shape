@@ -10,6 +10,8 @@ class QuestionAnswer < ApplicationRecord
 
   delegate :completed?, to: :survey_response, prefix: true
 
+  validates :answer_number, presence: true, if: :answer_number_required?
+
   after_commit :update_survey_response, on: %i[create destroy], if: :survey_response_present?
   after_commit :update_collection_test_scores, if: :survey_response_present?
   before_save :update_open_response_item, if: :update_open_response_item?
@@ -77,5 +79,9 @@ class QuestionAnswer < ApplicationRecord
     return if survey_response.destroyed?
     return unless survey_response.completed?
     survey_response.cache_test_scores!
+  end
+
+  def answer_number_required?
+    question&.scale_question?
   end
 end
