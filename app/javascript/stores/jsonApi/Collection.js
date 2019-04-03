@@ -29,6 +29,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   currentOrder = 'order'
   @observable
   totalPages = 1
+  recordsPerPage = 50
 
   attributesForAPI = [
     'name',
@@ -333,10 +334,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.collection_cards.length === 0
   }
 
-  get recordsPerPage() {
-    return this.isBoard ? 384 : 50
-  }
-
   @action
   addCard(card) {
     this.collection_cards.unshift(card)
@@ -393,13 +390,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     runInAction(() => {
       this.totalPages = links.last
       this.currentPage = page
-      if (page === 1 && !this.isBoard) {
+      if (!this.isBoard && page === 1) {
         // NOTE: If we ever want to "remember" collections where you've previously loaded 50+
         // we could think about handling this differently.
         this.collection_cards.replace(data)
       } else {
-        // For foam core collections we sometimes retrieve the same card twice
-        // so we must de-dupe
+        // For foam core collections we sometimes retrieve
+        // the same card twice so we must de-dupe
         this.collection_cards = _.unionBy(this.collection_cards, data, 'id')
       }
     })
