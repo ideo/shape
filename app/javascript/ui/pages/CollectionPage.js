@@ -44,10 +44,6 @@ class CollectionPage extends React.Component {
     this.reloadData = _.debounce(this._reloadData, 1500)
   }
 
-  componentDidMount() {
-    this.onAPILoad()
-  }
-
   componentDidUpdate(prevProps) {
     const { collection } = this.props
     const previousId = prevProps.collection.id
@@ -60,7 +56,6 @@ class CollectionPage extends React.Component {
       ChannelManager.unsubscribeAllFromChannel(this.channelName)
       // when navigating between collections, close BCT
       this.props.uiStore.closeBlankContentTool()
-      this.onAPILoad()
     }
   }
 
@@ -74,6 +69,18 @@ class CollectionPage extends React.Component {
     return this.props.collection
   }
 
+  loadCollectionCards = async ({ page, per_page, rows, cols }) => {
+    const { collection } = this.props
+    return collection
+      .API_fetchCards({ page, per_page, rows, cols })
+      .then(() => {
+        runInAction(() => {
+          this.cardsFetched = true
+          this.onAPILoad()
+        })
+      })
+  }
+
   async onAPILoad() {
     const {
       collection,
@@ -83,24 +90,19 @@ class CollectionPage extends React.Component {
       undoStore,
     } = this.props
     this.subscribeToChannel(collection.id)
-    // do this here, asynchronously -- don't need to await to perform other actions
-    collection.API_fetchCards().then(() => {
-      runInAction(() => {
-        this.cardsFetched = true
-      })
-      if (collection.collection_cards.length === 0) {
-        uiStore.openBlankContentTool()
-      }
-      if (undoStore.undoAfterRoute) {
-        undoStore.performUndoAfterRoute()
-      }
-      if (uiStore.actionAfterRoute) {
-        uiStore.performActionAfterRoute()
-      }
-      if (collection.awaiting_updates) {
-        this.pollForUpdates()
-      }
-    })
+
+    if (collection.collection_cards.length === 0) {
+      uiStore.openBlankContentTool()
+    }
+    if (undoStore.undoAfterRoute) {
+      undoStore.performUndoAfterRoute()
+    }
+    if (uiStore.actionAfterRoute) {
+      uiStore.performActionAfterRoute()
+    }
+    if (collection.awaiting_updates) {
+      this.pollForUpdates()
+    }
 
     // setViewingCollection has to happen first bc we use it in openBlankContentTool
     uiStore.setViewingCollection(collection)
@@ -135,7 +137,7 @@ class CollectionPage extends React.Component {
       if (collection.awaiting_updates) {
         const res = await apiStore.fetch('collections', collection.id, true)
         if (!res.data.awaiting_updates) {
-          collection.API_fetchCards()
+          this.loadCollectionCards({})
         } else if (uiStore.dialogConfig.open !== 'loading') {
           uiStore.loadingDialog({
             prompt:
@@ -236,8 +238,9 @@ class CollectionPage extends React.Component {
 
   async _reloadData() {
     const { collection } = this.props
-    const per_page = collection.collection_cards.length || 50
-    collection.API_fetchCards({ per_page })
+    const per_page =
+      collection.collection_cards.length || collection.recordsPerPage
+    this.loadCollectionCards({ per_page })
     if (this.collection.submissions_collection) {
       this.setLoadedSubmissions(false)
       await this.collection.submissions_collection.API_fetchCards()
@@ -387,7 +390,6 @@ class CollectionPage extends React.Component {
     // Also, checking meta.snapshot seems to load more consistently than just collection.can_edit
     const isLoading =
       collection.meta.snapshot.can_edit === undefined ||
-      (!this.cardsFetched && collection.collection_cards.length === 0) ||
       collection.awaiting_updates ||
       uiStore.isLoading
     const isTransparentLoading = !!uiStore.movingIntoCollection
@@ -408,6 +410,7 @@ class CollectionPage extends React.Component {
             <FoamcoreGrid
               // pull in cols, gridW, gridH, gutter
               {...gridSettings}
+              loadCollectionCards={this.loadCollectionCards}
               updateCollection={this.updateCollection}
               batchUpdateCollection={this.batchUpdateCollection}
               collection={collection}
@@ -442,6 +445,7 @@ class CollectionPage extends React.Component {
               <CollectionGrid
                 // pull in cols, gridW, gridH, gutter
                 {...gridSettings}
+                loadCollectionCards={this.loadCollectionCards}
                 updateCollection={this.updateCollection}
                 batchUpdateCollection={this.batchUpdateCollection}
                 collection={collection}

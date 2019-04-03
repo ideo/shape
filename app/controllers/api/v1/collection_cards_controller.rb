@@ -171,15 +171,25 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def load_collection_cards
-    # ensure per_page is between 50 and 200
-    per_page = [params[:per_page].to_i, CollectionCard::DEFAULT_PER_PAGE].max
-    per_page = [per_page, 200].min
+    if @collection.is_a?(Collection::Board)
+      scope = @collection.collection_cards_by_row_and_col(
+        rows: params[:rows].presence || [0,10],
+        cols: params[:cols].presence || [0,10],
+      )
+    else
+      # ensure per_page is between 50 and 200
+      per_page = [params[:per_page].to_i, CollectionCard::DEFAULT_PER_PAGE].max
+      per_page = [per_page, 200].min
+      scope = @collection.collection_cards_by_page(
+        page: @page,
+        per_page: per_page,
+      )
+    end
 
     @collection_cards = @collection.collection_cards_viewable_by(
       current_user,
+      scope: scope,
       card_order: params[:card_order],
-      page: @page,
-      per_page: per_page,
       hidden: params[:hidden].present?,
     )
   end

@@ -21,6 +21,7 @@ const BlankCard = styled.div.attrs({
     width: `${w}px`,
   }),
 })`
+  ${props => props.notRendered && `border: 1px solid ${v.colors.primaryDark};`}
   background-color: ${v.colors.primaryLight};
   position: absolute;
   transform-origin: left top;
@@ -68,6 +69,8 @@ class FoamcoreGrid extends React.Component {
   // TODO rename this now that it's also used for resize placeholder
   @observable
   placeholderSpot = { row: null, col: null, width: null, height: null }
+  loadedRows = { loading: false, max: 0 }
+  loadedCols = { loading: false, max: 0 }
   draggingMap = []
 
   constructor(props) {
@@ -75,14 +78,39 @@ class FoamcoreGrid extends React.Component {
     this.debouncedSetDraggedOnSpots = _.debounce(this.setDraggedOnSpots, 25)
     this.throttledSetHoverSpot = _.throttle(this.setHoverSpot, 50)
     this.throttledSetResizeSpot = _.throttle(this.setResizeSpot, 25)
+    this.thottledLoadAfterScroll = _.throttle(this.loadAfterScroll, 500)
   }
 
   componentDidMount() {
+    const maxRow = Math.ceil(this.visibleRows.max + this.visibleRows.num)
+    const maxCol = Math.ceil(this.visibleCols.max + this.visibleCols.num)
+    this.loadCards({
+      rows: [0, maxRow],
+      cols: [0, maxCol],
+    })
     this.filledSpots = this.calculateFilledSpots()
+    window.addEventListener('scroll', this.handleScroll)
   }
 
   componentDidUpdate() {
     this.filledSpots = this.calculateFilledSpots()
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.handleScroll)
+  }
+
+  loadCards({ rows, cols }) {
+    const { loadCollectionCards } = this.props
+    console.log('loadCards rows', rows, 'cols', cols)
+    // Track what we've loaded
+    // Set these immediately so further calls won't load the same rows
+    if (rows[1] > this.loadedRows.max) this.loadedRows.max = rows[1]
+    if (cols[1] > this.loadedCols.max) this.loadedCols.max = cols[1]
+    loadCollectionCards({
+      rows,
+      cols,
+    })
   }
 
   getDraggedOnSpot(coords) {
@@ -91,6 +119,61 @@ class FoamcoreGrid extends React.Component {
 
   isBeingDraggedOn(coords) {
     return !!this.getDraggedOnSpot(coords)
+  }
+
+  get cardAndGutterWidth() {
+    const { gridW, gutter } = this.props
+    return (gridW + gutter) / this.zoomLevel
+  }
+
+  get cardAndGutterHeight() {
+    const { gridH, gutter } = this.props
+    return (gridH + gutter) / this.zoomLevel
+  }
+
+  get pageMargins() {
+    return {
+      left: v.containerPadding.horizontal * 16 * this.zoomLevel,
+      top: v.headerHeight,
+    }
+  }
+
+  get visibleRows() {
+    if (!this.gridRef) return { min: null, max: null }
+
+    const top = this.gridRef.scrollTop
+    const gridHeight = window.innerHeight - this.pageMargins.top
+
+    const min = parseFloat((top / this.cardAndGutterHeight).toFixed(1))
+    const max = parseFloat(
+      ((top + gridHeight) / this.cardAndGutterHeight).toFixed(1)
+    )
+    const num = max - min
+
+    return {
+      min,
+      max,
+      num,
+    }
+  }
+
+  get visibleCols() {
+    if (!this.gridRef) return { min: null, max: null }
+
+    const left = this.gridRef.scrollLeft
+    const gridWidth = window.innerWidth - this.pageMargins.left
+
+    const min = parseFloat((left / this.cardAndGutterWidth).toFixed(1))
+    const max = parseFloat(
+      ((left + gridWidth) / this.cardAndGutterWidth).toFixed(1)
+    )
+    const num = max - min
+
+    return {
+      min,
+      max,
+      num,
+    }
   }
 
   handleBlankCardClick = ({ row, col }) => e => {
@@ -122,10 +205,9 @@ class FoamcoreGrid extends React.Component {
     // Something about react synthetic events and throttling
     ev.persist()
     if (this.resizing) return
-    const pageMargin = v.containerPadding.horizontal * 16 * this.zoomLevel
     const hoverPos = {
-      x: ev.pageX - pageMargin + this.gridRef.scrollLeft,
-      y: ev.pageY - v.headerHeight + this.gridRef.scrollTop,
+      x: ev.pageX - this.pageMargins.left + this.gridRef.scrollLeft,
+      y: ev.pageY - this.pageMargins.top + this.gridRef.scrollTop,
     }
     this.throttledSetHoverSpot(hoverPos)
   }
@@ -134,6 +216,39 @@ class FoamcoreGrid extends React.Component {
     runInAction(() => {
       this.placeholderSpot = {}
     })
+  }
+
+  loadAfterScroll = ev => {
+    // Load more cards if we are approaching a boundary
+    const visRows = this.visibleRows
+    const visCols = this.visibleCols
+
+    // Take current visible max row, see if that is <
+    if (this.loadedRows.max < visRows.max + visRows.num) {
+      // load more rows
+      const loadMinRow = this.loadedRows.max
+      const loadMaxRow = Math.ceil(loadMinRow + visRows.num)
+
+      this.loadCards({
+        cols: [0, this.loadedCols.max],
+        rows: [loadMinRow, loadMaxRow],
+      })
+    }
+
+    if (this.loadedCols.max < visCols.max + visCols.num) {
+      // Load more columns
+      const loadMinCol = this.loadedCols.max
+      const loadMaxCol = Math.ceil(loadMinCol + visCols.num)
+
+      this.loadCards({
+        rows: [0, this.loadedRows.max],
+        cols: [loadMinCol, loadMaxCol],
+      })
+    }
+  }
+
+  handleScroll = ev => {
+    this.thottledLoadAfterScroll(ev)
   }
 
   onDrag = (cardId, dragPosition) => {
@@ -490,7 +605,7 @@ class FoamcoreGrid extends React.Component {
 
     return (
       <MovableGridCard
-        key={card.id}
+        key={`card-${card.id}`}
         card={card}
         cardType={card.record.internalType}
         canEditCollection={canEditCollection}
@@ -572,14 +687,88 @@ class FoamcoreGrid extends React.Component {
     )
   }
 
-  positionCards() {
+  cardWithinViewPlusHalfPage = card => {
+    // Select all cards that are within view,
+    // plus half a screen on any side
+    const rows = this.visibleRows
+    const cols = this.visibleCols
+
+    const numRowsVisible = rows.max - rows.min
+    const numColsVisible = cols.max - cols.min
+    const halfRows = Math.ceil(numRowsVisible / 2)
+    const halfCols = Math.ceil(numColsVisible / 2)
+
+    const withinCols =
+      card.col > cols.min - halfCols && card.col < cols.max + halfCols
+    const withinRows =
+      card.row > rows.min - halfRows && card.row < rows.max + halfRows
+
+    return withinRows && withinCols
+  }
+
+  cardWithinViewPlusHalfPage = card => {
+    // Select all cards that are within view,
+    // plus half a screen on any side
+    const rows = this.visibleRows
+    const cols = this.visibleCols
+
+    const halfRows = Math.ceil(rows.num / 2)
+    const halfCols = Math.ceil(cols.num / 2)
+
+    const withinCols =
+      card.col > cols.min - halfCols && card.col < cols.max + halfCols
+    const withinRows =
+      card.row > rows.min - halfRows && card.row < rows.max + halfRows
+
+    return withinRows && withinCols
+  }
+
+  cardsToLayout = () => {
     const { collection } = this.props
-    let allCardsToLayout = [...collection.collection_cards]
+    const cards = [...collection.collection_cards]
+    const displayCards = []
+    let num = 0
+
+    cards.forEach(card => {
+      if (this.cardWithinViewPlusHalfPage(card)) {
+        // Render cards in view, or within half screen
+        displayCards.push(card)
+        num += 1
+      } else {
+        // Otherwise put blank card in place of this card
+        const position = this.positionForSpot({
+          col: card.col,
+          row: card.row,
+          width: card.width,
+          height: card.height,
+        })
+        displayCards.push(
+          <BlankCard
+            onClick={() => null}
+            {...position}
+            zoomLevel={this.zoomLevel}
+            key={`blank-${card.col}:${card.row}`}
+            data-blank-type="generic"
+            notRendered
+            draggedOn
+          />
+        )
+      }
+    })
+
+    console.log('rendering num cards', num)
+
+    return displayCards
+  }
+
+  positionCards() {
+    let allCardsToLayout = this.cardsToLayout()
     if (this.blankContentTool) allCardsToLayout.push(this.blankContentTool)
     if (this.dragGridSpot.size)
       allCardsToLayout = [...allCardsToLayout, ...this.dragGridSpot.values()]
 
     // Don't render cards that are being dragged along
+    // Or more than one 'page' out of view
     allCardsToLayout = allCardsToLayout.filter(
       card => !card.isBeingMultiDragged
     )
@@ -605,6 +794,7 @@ class FoamcoreGrid extends React.Component {
     return (
       <Grid
         onMouseMove={this.handleMouseMove}
+        onScroll={this.handleScroll}
         innerRef={ref => {
           this.gridRef = ref
         }}
@@ -647,6 +837,7 @@ FoamcoreGrid.propTypes = {
   cardProperties: MobxPropTypes.arrayOrObservableArray.isRequired,
   canEditCollection: PropTypes.bool.isRequired,
   movingCardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
+  loadCollectionCards: PropTypes.func.isRequired,
   sorting: PropTypes.bool,
 }
 FoamcoreGrid.wrappedComponent.propTypes = {

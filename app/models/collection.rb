@@ -407,9 +407,33 @@ class Collection < ApplicationRecord
     end
   end
 
+  def collection_cards_by_page(page: 1, per_page: CollectionCard::DEFAULT_PER_PAGE)
+    all_collection_cards.page(page).per(per_page)
+  end
+
+  # If a board, it handles pagination differently
+  # rows and cols params are arrays of [min, max]
+  def collection_cards_by_row_and_col(rows:, cols:)
+    table = CollectionCard.arel_table
+    all_collection_cards.where(
+      table[:row].gteq(rows[0])
+      .and(
+        table[:row].lt(rows[1]),
+      )
+      .and(
+        table[:col].gteq(cols[0]),
+      )
+      .and(
+        table[:col].lt(cols[1]),
+      ),
+    )
+  end
+
   def collection_cards_viewable_by(
     user,
-    card_order: nil, page: 1, per_page: CollectionCard::DEFAULT_PER_PAGE, hidden: false
+    scope: all_collection_cards,
+    card_order: nil,
+    hidden: false
   )
     order = { order: :asc }
     collection_order = nil
@@ -423,7 +447,11 @@ class Collection < ApplicationRecord
       end
     end
 
-    cards = all_collection_cards.active
+    cards = scope
+            .active
+            .includes(collection: [:collection_cover_items], item: [:filestack_file])
+            .order(order)
+
     # `hidden` means include both hidden and unhidden cards
     cards = cards.visible unless hidden
 
@@ -470,12 +498,6 @@ class Collection < ApplicationRecord
               .where('coalesce(users_roles.id, groups_roles.id) IS NOT NULL')
               .distinct
     end
-
-    cards = cards
-            .includes(collection: [:collection_cover_items], item: [:filestack_file])
-            .order(order)
-            .page(page)
-            .per(per_page)
 
     # precache roles because these will be referred to in the serializers (e.g. can_edit?)
     user.precache_roles_for(
