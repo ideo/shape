@@ -35,6 +35,9 @@ export const KEYS = {
   ESC: 27,
 }
 
+export const MAX_CARD_HEIGHT = 2
+export const MAX_CARD_WIDTH = 4
+
 export default {
   globalHeaderHeight: 82,
   headerHeight: 192,

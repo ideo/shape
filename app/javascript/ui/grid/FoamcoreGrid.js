@@ -2,40 +2,11 @@ import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-// import _ from 'lodash'
+
 import styled from 'styled-components'
+import v, { MAX_CARD_WIDTH, MAX_CARD_HEIGHT } from '~/utils/variables'
 
-// import CollectionSort from '~/ui/grid/CollectionSort'
-// import Loader from '~/ui/layout/Loader'
-// import MovableGridCard from '~/ui/grid/MovableGridCard'
-// import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
-import v from '~/utils/variables'
-
-const BlankCard = styled.div.attrs({
-  style: ({ x, y, h, w, zoomLevel, draggedOn }) => ({
-    height: `${h}px`,
-    left: `${x}px`,
-    top: `${y}px`,
-    transform: `scale(${1 / zoomLevel})`,
-    width: `${w}px`,
-  }),
-})`
-  background-color: ${v.colors.primaryLight};
-  position: absolute;
-  transform-origin: left top;
-  &:hover {
-    background-color: ${v.colors.primaryLight} !important;
-  }
-  z-index: 0;
-`
-
-const Grid = styled.div`
-  min-height: 1300px;
-  overflow-x: scroll;
-  overflow-y: scroll;
-  position: relative;
-`
 
 function getMapKey({ col, row }) {
   return `${col},${row}`
@@ -44,9 +15,6 @@ function getMapKey({ col, row }) {
 function isPointSame(first, other) {
   return first.row === other.row && first.col === other.col
 }
-
-const MAX_CARD_W = 4
-const MAX_CARD_H = 2
 
 // needs to be an observer to observe changes to the collection + items
 @inject('apiStore', 'routingStore', 'uiStore')
@@ -209,8 +177,8 @@ class FoamcoreGrid extends React.Component {
     let undoMessage
     const resizePlaceholder = this.placeholderSpot
     let { height, width } = resizePlaceholder
-    if (height > MAX_CARD_H) height = MAX_CARD_H
-    if (width > MAX_CARD_W) width = MAX_CARD_W
+    if (height > MAX_CARD_HEIGHT) height = MAX_CARD_HEIGHT
+    if (width > MAX_CARD_WIDTH) width = MAX_CARD_WIDTH
     // set up action to undo
     if (card.height !== height || card.width !== width) {
       undoMessage = 'Card resize undone'
@@ -440,26 +408,26 @@ class FoamcoreGrid extends React.Component {
 
   calcEdgeCol({ col, row, width }, cardId) {
     let tempCol = col + width - 1
-    while (tempCol <= col + MAX_CARD_W) {
+    while (tempCol <= col + MAX_CARD_WIDTH) {
       const filled = this.findFilledSpot({ col: tempCol, row }, cardId)
       if (filled) {
         return tempCol - col
       }
       tempCol += 1
     }
-    return MAX_CARD_W
+    return MAX_CARD_WIDTH
   }
 
   calcEdgeRow({ col, row, height }, cardId) {
     let tempRow = row + height - 1
-    while (tempRow <= MAX_CARD_H) {
+    while (tempRow <= MAX_CARD_HEIGHT) {
       const filled = this.findFilledSpot({ row: tempRow, col }, cardId)
       if (filled) {
         return tempRow - row
       }
       tempRow += 1
     }
-    return MAX_CARD_H
+    return MAX_CARD_HEIGHT
   }
 
   updateCardWithUndo(card, updates, undoMessage) {
@@ -535,7 +503,9 @@ class FoamcoreGrid extends React.Component {
           key={`blank-${col}:${row}`}
           data-blank-type={type}
           draggedOn
-        />
+        >
+          <StyledPlusIcon />
+        </BlankCard>
       )
     }
     return null
@@ -639,6 +609,41 @@ class FoamcoreGrid extends React.Component {
     )
   }
 }
+
+// Should this be its own component, especially if it will have click handling?
+const BlankCard = styled.div.attrs({
+  style: ({ x, y, h, w, zoomLevel, draggedOn }) => ({
+    height: `${h}px`,
+    left: `${x}px`,
+    top: `${y}px`,
+    transform: `scale(${1 / zoomLevel})`,
+    width: `${w}px`,
+  }),
+})`
+  background-color: ${v.colors.primaryLight};
+  position: absolute;
+  transform-origin: left top;
+  &:hover {
+    background-color: ${v.colors.primaryLight} !important;
+  }
+  z-index: 0;
+`
+// Copied over from GridCardHotspot. Should probably extract to own component.
+const StyledPlusIcon = styled.div`
+  position: relative;
+  left: -9px;
+  width: 12px;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+`
+
+const Grid = styled.div`
+  min-height: 1300px;
+  overflow-x: scroll;
+  overflow-y: scroll;
+  position: relative;
+`
 
 const gridConfigProps = {
   cols: PropTypes.number.isRequired,
