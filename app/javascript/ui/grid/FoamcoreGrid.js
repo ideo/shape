@@ -522,6 +522,7 @@ class FoamcoreGrid extends React.Component {
       blankType: null,
       width: 1,
       height: 1,
+      record: {},
     }
     const { zoomLevel } = this
     // TODO combine this rendering of MoveableGridCard with positionCard
@@ -614,8 +615,8 @@ class FoamcoreGrid extends React.Component {
 const BlankCard = styled.div.attrs({
   style: ({ x, y, h, w, zoomLevel, draggedOn }) => ({
     height: `${h}px`,
-    left: `${x}px`,
-    top: `${y}px`,
+    left: x ? `${x}px` : '0px',
+    top: y ?  `${y}px` : '0px',
     transform: `scale(${1 / zoomLevel})`,
     width: `${w}px`,
   }),
