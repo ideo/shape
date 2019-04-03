@@ -398,7 +398,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         // we could think about handling this differently.
         this.collection_cards.replace(data)
       } else {
-        this.collection_cards = this.collection_cards.concat(data)
+        // For foam core collections we sometimes retrieve the same card twice
+        // so we must de-dupe
+        this.collection_cards = _.unionBy(this.collection_cards, data, 'id')
       }
     })
   }

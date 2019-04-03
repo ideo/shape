@@ -12,6 +12,8 @@ import styled from 'styled-components'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import v from '~/utils/variables'
 
+// When you have attributes that will change a lot,
+// it's a performance gain to use `styled.div.attrs`
 const BlankCard = styled.div.attrs({
   style: ({ x, y, h, w, zoomLevel, draggedOn }) => ({
     height: `${h}px`,
@@ -21,8 +23,11 @@ const BlankCard = styled.div.attrs({
     width: `${w}px`,
   }),
 })`
-  ${props => props.notRendered && `border: 1px solid ${v.colors.primaryDark};`}
-  background-color: ${v.colors.primaryLight};
+  ${props =>
+    props.type === 'unrendered' &&
+    `border: 1px solid ${v.colors.primaryDark};`} ${props =>
+    props.type === 'blank' &&
+    `background-color: ${v.colors.primaryLight};`}
   position: absolute;
   transform-origin: left top;
   &:hover {
@@ -102,7 +107,6 @@ class FoamcoreGrid extends React.Component {
 
   loadCards({ rows, cols }) {
     const { loadCollectionCards } = this.props
-    console.log('loadCards rows', rows, 'cols', cols)
     // Track what we've loaded
     // Set these immediately so further calls won't load the same rows
     if (rows[1] > this.loadedRows.max) this.loadedRows.max = rows[1]
@@ -634,19 +638,22 @@ class FoamcoreGrid extends React.Component {
   positionBlank({ row, col, width, height }, type = 'generic') {
     const position = this.positionForSpot({ col, row, width, height })
     const { zoomLevel } = this
-    if (this.dragging || isPointSame(this.placeholderSpot, { col, row })) {
-      return (
-        <BlankCard
-          onClick={this.handleBlankCardClick({ col, row })}
-          {...position}
-          zoomLevel={zoomLevel}
-          key={`blank-${col}:${row}`}
-          data-blank-type={type}
-          draggedOn
-        />
-      )
-    }
-    return null
+    // TODO: removing this guard so we can use this for unrendered cards as SharedWithMeCollection
+    //
+    // if (this.dragging || isPointSame(this.placeholderSpot, { col, row })) {
+    return (
+      <BlankCard
+        onClick={this.handleBlankCardClick({ col, row })}
+        {...position}
+        type={type}
+        zoomLevel={zoomLevel}
+        key={`blank-${type}-${col}:${row}`}
+        data-blank-type={type}
+        draggedOn
+      />
+    )
+    // }
+    // return null
   }
 
   positionBct({ col, row }) {
@@ -727,36 +734,22 @@ class FoamcoreGrid extends React.Component {
     const { collection } = this.props
     const cards = [...collection.collection_cards]
     const displayCards = []
-    let num = 0
 
     cards.forEach(card => {
       if (this.cardWithinViewPlusHalfPage(card)) {
         // Render cards in view, or within half screen
         displayCards.push(card)
-        num += 1
       } else {
         // Otherwise put blank card in place of this card
-        const position = this.positionForSpot({
+        displayCards.push({
+          id: 'unrendered',
           col: card.col,
           row: card.row,
           width: card.width,
           height: card.height,
         })
-        displayCards.push(
-          <BlankCard
-            onClick={() => null}
-            {...position}
-            zoomLevel={this.zoomLevel}
-            key={`blank-${card.col}:${card.row}`}
-            data-blank-type="generic"
-            notRendered
-            draggedOn
-          />
-        )
       }
     })
-
-    console.log('rendering num cards', num)
 
     return displayCards
   }
@@ -770,18 +763,22 @@ class FoamcoreGrid extends React.Component {
     // Don't render cards that are being dragged along
     // Or more than one 'page' out of view
     allCardsToLayout = allCardsToLayout.filter(
-      card => !card.isBeingMultiDragged
+      card =>
+        !card.isBeingMultiDragged &&
+        _.isNumber(card.row) &&
+        _.isNumber(card.col)
     )
-    const cardElements = allCardsToLayout.map(spot => {
+    const cardElements = allCardsToLayout.map(cardOrBlank => {
       // If another real card is filling up the hover spot, don't render
       // the hover spot at all (which gets rendered after this loop)
-      if (spot.id === 'blank') {
-        return this.positionBct(spot)
+      if (cardOrBlank.id === 'blank') {
+        return this.positionBct(cardOrBlank)
+      } else if (cardOrBlank.id === 'unrendered') {
+        return this.positionBlank(cardOrBlank, 'unrendered')
+      } else if (cardOrBlank.id) {
+        return this.positionCard(cardOrBlank)
       }
-      if (spot.id) {
-        return this.positionCard(spot)
-      }
-      return this.positionBlank(spot, 'drag')
+      return this.positionBlank(cardOrBlank, 'drag')
     })
     cardElements.push(
       this.positionBlank(this.placeholderSpot, this.placeholderSpot.type)
