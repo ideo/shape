@@ -174,7 +174,12 @@ class RolesSummary extends React.Component {
     const { canEdit } = this.props
     if (!canEdit) return ''
     return (
-      <StyledAddUserBtn onClick={this.props.handleClick}>+</StyledAddUserBtn>
+      <StyledAddUserBtn
+        role="button"
+        onClick={this.props.handleClick}
+       >
+         +
+       </StyledAddUserBtn>
     )
   }
 
