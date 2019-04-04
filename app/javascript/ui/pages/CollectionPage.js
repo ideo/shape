@@ -46,7 +46,7 @@ class CollectionPage extends React.Component {
 
   componentDidMount() {
     this.onAPILoad()
-    window.addEventListener('click', this.deselectAllCards);
+    window.addEventListener('click', this.deselectAllCards)
   }
 
   componentDidUpdate(prevProps) {
@@ -68,7 +68,7 @@ class CollectionPage extends React.Component {
   componentWillUnmount() {
     // super.componentWillUnmount()
     ChannelManager.unsubscribeAllFromChannel(this.channelName)
-    window.removeEventListener('click', this.deselectAllCards);
+    window.removeEventListener('click', this.deselectAllCards)
   }
 
   get collection() {
@@ -191,8 +191,21 @@ class CollectionPage extends React.Component {
 
   deselectAllCards = (event) => {
     const { uiStore } = this.props
-
+    console.log(event.target)
     const target = event.target
+    const tagName = target.tagName
+
+    // check if parent is a button
+    if (tagName === 'SVG') {
+
+      while (true) {}
+    }
+
+    const ALLOWED_ELEMENTS = ['BUTTON', 'A']
+    if (ALLOWED_ELEMENTS.some((el) => el === tagName)){
+      console.log(`exiting because ${el} is an allowed element`)
+      return
+    }
     const role = target.getAttribute('role')
     if (role && role === 'button') {
       console.log("clicking a button, no deselecting to do")

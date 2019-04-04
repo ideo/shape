@@ -43,11 +43,22 @@ class GridCardEmpty extends React.Component {
   }
 
   render() {
-    const { card, dragging, showHotspot } = this.props
+    const {
+      card,
+      dragging,
+      showHotspot,
+      showHotEdge,
+    } = this.props
+
     return (
       <StyledGridCardEmpty>
         {showHotspot && (
-          <GridCardHotspot card={card} dragging={dragging} position="left" />
+          <GridCardHotspot
+            card={card}
+            dragging={dragging}
+            position="left"
+            showHotEdge={showHotEdge}
+           />
         )}
         {this.showHelper && (
           <StyledHotspotHelper>
@@ -64,6 +75,7 @@ GridCardEmpty.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   dragging: PropTypes.bool.isRequired,
   showHotspot: PropTypes.bool.isRequired,
+  showHotEdge: PropTypes.bool,
 }
 GridCardEmpty.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
