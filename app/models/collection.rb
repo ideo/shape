@@ -418,13 +418,13 @@ class Collection < ApplicationRecord
     all_collection_cards.where(
       table[:row].gteq(rows[0])
       .and(
-        table[:row].lt(rows[1]),
+        table[:row].lteq(rows[1]),
       )
       .and(
         table[:col].gteq(cols[0]),
       )
       .and(
-        table[:col].lt(cols[1]),
+        table[:col].lteq(cols[1]),
       ),
     )
   end
