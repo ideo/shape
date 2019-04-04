@@ -83,12 +83,16 @@ class FoamcoreGrid extends React.Component {
     this.debouncedSetDraggedOnSpots = _.debounce(this.setDraggedOnSpots, 25)
     this.throttledSetHoverSpot = _.throttle(this.setHoverSpot, 50)
     this.throttledSetResizeSpot = _.throttle(this.setResizeSpot, 25)
-    this.thottledLoadAfterScroll = _.debounce(this.loadAfterScroll, 250)
+    this.throttledLoadAfterScroll = _.debounce(this.loadAfterScroll, 250)
+    this.debouncedCalculateCardsToRender = _.debounce(
+      this.calculateCardsToRender,
+      50
+    )
   }
 
   componentDidMount() {
     this.filledSpots = this.calculateFilledSpots()
-    this.calculateCardsToRender()
+    this.debouncedCalculateCardsToRender()
     window.addEventListener('scroll', this.handleScroll)
   }
 
@@ -116,7 +120,7 @@ class FoamcoreGrid extends React.Component {
   loadAfterScroll = ev => {
     // Run position cards to re-render cards that were previously out of view
 
-    this.calculateCardsToRender()
+    this.debouncedCalculateCardsToRender()
 
     const visRows = this.visibleRows
     const visCols = this.visibleCols
@@ -313,7 +317,7 @@ class FoamcoreGrid extends React.Component {
         col,
       }
     })
-    this.calculateCardsToRender()
+    this.debouncedCalculateCardsToRender()
   }
 
   handleZoomOut = ev => {
@@ -321,7 +325,7 @@ class FoamcoreGrid extends React.Component {
     runInAction(() => {
       this.zoomLevel = this.zoomLevel + 1
     })
-    this.calculateCardsToRender()
+    this.debouncedCalculateCardsToRender()
   }
 
   handleZoomIn = ev => {
@@ -329,7 +333,7 @@ class FoamcoreGrid extends React.Component {
     runInAction(() => {
       this.zoomLevel = this.zoomLevel - 1
     })
-    this.calculateCardsToRender()
+    this.debouncedCalculateCardsToRender()
   }
 
   handleMouseMove = ev => {
@@ -345,11 +349,11 @@ class FoamcoreGrid extends React.Component {
 
   handleMouseOut = ev => {
     this.setPlaceholderSpot({})
-    this.calculateCardsToRender()
+    this.debouncedCalculateCardsToRender()
   }
 
   handleScroll = ev => {
-    this.thottledLoadAfterScroll(ev)
+    this.throttledLoadAfterScroll(ev)
   }
 
   onDrag = (cardId, dragPosition) => {
@@ -448,6 +452,7 @@ class FoamcoreGrid extends React.Component {
       const { row, col } = movePlaceholder
       const updates = { row, col }
       this.updateCardWithUndo(card, updates, undoMessage)
+      this.debouncedCalculateCardsToRender()
     }
   }
 
@@ -564,7 +569,7 @@ class FoamcoreGrid extends React.Component {
     } else {
       this.setPlaceholderSpot({})
     }
-    this.calculateCardsToRender()
+    this.debouncedCalculateCardsToRender()
   }
 
   setResizeSpot({ row, col, width, height }) {
@@ -575,7 +580,7 @@ class FoamcoreGrid extends React.Component {
       height,
       type: 'resize',
     })
-    this.calculateCardsToRender()
+    this.debouncedCalculateCardsToRender()
   }
 
   calculateFilledSpots() {
