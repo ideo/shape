@@ -40,6 +40,7 @@ const DockedToolbar = styled.div`
 
 const StyledContainer = styled.div`
   padding-top: 25px;
+
   ${props => props.fullPageView && `padding: 2rem 0.5rem;`};
   ${props =>
     props.loading &&
@@ -59,6 +60,7 @@ const StyledContainer = styled.div`
   ${props =>
     !props.fullPageView &&
     `
+    height: 100%;
     .ql-tooltip.ql-editing,
     .ql-tooltip.ql-flip {
       left: calc(50% - 150px) !important;
