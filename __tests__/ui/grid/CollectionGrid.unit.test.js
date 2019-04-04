@@ -16,6 +16,7 @@ beforeEach(() => {
     gridH: 200,
     gutter: 10,
     sortBy: 'order',
+    loadCollectionCards: jest.fn(),
     updateCollection: jest.fn(),
     cardProperties: [],
     apiStore: fakeApiStore(),
