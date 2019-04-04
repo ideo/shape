@@ -160,7 +160,9 @@ class ChartGroup extends React.PureComponent {
         }
         offsetY={13}
         style={this.chartAxisStyle}
-        axisComponent={<LineSegment transform="translate(0, 26) scale(0.9)" />}
+        axisComponent={
+          <LineSegment transform="translate(10 26) scale(0.955)" />
+        }
       />
     ) : (
       <VictoryAxis
@@ -168,7 +170,9 @@ class ChartGroup extends React.PureComponent {
         style={this.chartAxisStyle}
         tickFormat={t => null}
         offsetY={13}
-        axisComponent={<LineSegment transform="translate(0, 26) scale(0.9)" />}
+        axisComponent={
+          <LineSegment transform="translate(10 26) scale(0.955)" />
+        }
         label={this.fullDate(this.primaryDatasetValues[0].date)}
       />
     )

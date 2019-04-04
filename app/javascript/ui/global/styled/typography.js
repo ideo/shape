@@ -255,5 +255,9 @@ export const QuillStyleWrapper = styled.div`
         width: 3px;
       }
     }
+
+    .ql-editor {
+      overflow-x: hidden;
+    }
   }
 `
