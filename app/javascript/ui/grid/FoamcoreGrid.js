@@ -440,7 +440,7 @@ class FoamcoreGrid extends React.Component {
     // Different paths for dragging multiple cards vs one
     if (uiStore.multiMoveCardIds.length < 2) {
       if (this.dragGridSpot.size < 1) return
-      const movePlaceholder = [...this.dragGridSpot.values][0]
+      const movePlaceholder = [...this.dragGridSpot.values()][0]
       // Save algorithm for what to do when dragging over card for collision
       // resolution later
       if (movePlaceholder.card) return
