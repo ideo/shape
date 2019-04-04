@@ -111,31 +111,43 @@ class FoamcoreGrid extends React.Component {
   }
 
   loadAfterScroll = ev => {
+    const { collection } = this.props
     // Load more cards if we are approaching a boundary
     const visRows = this.visibleRows
     const visCols = this.visibleCols
+    const collectionMaxCol = collection.max_col_index
+    const collectionMaxRow = collection.max_row_index
 
-    // Take current visible max row, see if that is <
     if (this.loadedRows.max < visRows.max + visRows.num) {
       // load more rows
       const loadMinRow = this.loadedRows.max
-      const loadMaxRow = Math.ceil(loadMinRow + visRows.num)
+      let loadMaxRow = Math.ceil(loadMinRow + visRows.num)
 
-      this.loadCards({
-        cols: [0, this.loadedCols.max],
-        rows: [loadMinRow, loadMaxRow],
-      })
+      // Constrain max row to maximum on collection
+      if (loadMaxRow > collectionMaxRow) loadMaxRow = collectionMaxRow
+
+      if (loadMinRow < loadMaxRow) {
+        this.loadCards({
+          cols: [0, this.loadedCols.max],
+          rows: [loadMinRow, loadMaxRow],
+        })
+      }
     }
 
     if (this.loadedCols.max < visCols.max + visCols.num) {
       // Load more columns
       const loadMinCol = this.loadedCols.max
-      const loadMaxCol = Math.ceil(loadMinCol + visCols.num)
+      let loadMaxCol = Math.ceil(loadMinCol + visCols.num)
 
-      this.loadCards({
-        rows: [0, this.loadedRows.max],
-        cols: [loadMinCol, loadMaxCol],
-      })
+      // Constrain max col to maximum on collection
+      if (loadMaxCol > collectionMaxCol) loadMaxCol = collectionMaxCol
+
+      if (loadMinCol < loadMaxCol) {
+        this.loadCards({
+          rows: [0, this.loadedRows.max],
+          cols: [loadMinCol, loadMaxCol],
+        })
+      }
     }
   }
 
