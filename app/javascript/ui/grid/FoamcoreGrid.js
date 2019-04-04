@@ -26,7 +26,7 @@ const BlankCard = styled.div.attrs({
   ${props =>
     props.type === 'unrendered' &&
     `border: 1px solid ${v.colors.primaryDark};`} ${props =>
-    props.type === 'blank' &&
+    (props.type === 'blank' || props.type === 'drag') &&
     `background-color: ${v.colors.primaryLight};`}
   position: absolute;
   transform-origin: left top;
@@ -84,15 +84,15 @@ class FoamcoreGrid extends React.Component {
     this.throttledSetHoverSpot = _.throttle(this.setHoverSpot, 50)
     this.throttledSetResizeSpot = _.throttle(this.setResizeSpot, 25)
     this.throttledLoadAfterScroll = _.debounce(this.loadAfterScroll, 250)
-    this.debouncedCalculateCardsToRender = _.debounce(
+    this.throttledCalculateCardsToRender = _.throttle(
       this.calculateCardsToRender,
-      50
+      25
     )
   }
 
   componentDidMount() {
     this.filledSpots = this.calculateFilledSpots()
-    this.debouncedCalculateCardsToRender()
+    this.throttledCalculateCardsToRender()
     window.addEventListener('scroll', this.handleScroll)
   }
 
@@ -120,7 +120,7 @@ class FoamcoreGrid extends React.Component {
   loadAfterScroll = ev => {
     // Run position cards to re-render cards that were previously out of view
 
-    this.debouncedCalculateCardsToRender()
+    this.throttledCalculateCardsToRender()
 
     const visRows = this.visibleRows
     const visCols = this.visibleCols
@@ -317,7 +317,7 @@ class FoamcoreGrid extends React.Component {
         col,
       }
     })
-    this.debouncedCalculateCardsToRender()
+    this.throttledCalculateCardsToRender()
   }
 
   handleZoomOut = ev => {
@@ -325,7 +325,7 @@ class FoamcoreGrid extends React.Component {
     runInAction(() => {
       this.zoomLevel = this.zoomLevel + 1
     })
-    this.debouncedCalculateCardsToRender()
+    this.throttledCalculateCardsToRender()
   }
 
   handleZoomIn = ev => {
@@ -333,7 +333,7 @@ class FoamcoreGrid extends React.Component {
     runInAction(() => {
       this.zoomLevel = this.zoomLevel - 1
     })
-    this.debouncedCalculateCardsToRender()
+    this.throttledCalculateCardsToRender()
   }
 
   handleMouseMove = ev => {
@@ -349,7 +349,7 @@ class FoamcoreGrid extends React.Component {
 
   handleMouseOut = ev => {
     this.setPlaceholderSpot({})
-    this.debouncedCalculateCardsToRender()
+    this.throttledCalculateCardsToRender()
   }
 
   handleScroll = ev => {
@@ -452,7 +452,7 @@ class FoamcoreGrid extends React.Component {
       const { row, col } = movePlaceholder
       const updates = { row, col }
       this.updateCardWithUndo(card, updates, undoMessage)
-      this.debouncedCalculateCardsToRender()
+      this.throttledCalculateCardsToRender()
     }
   }
 
@@ -485,6 +485,7 @@ class FoamcoreGrid extends React.Component {
     if (uiStore.multiMoveCardIds.length > 1 && !recur) {
       this.setMultiMoveDragSpots(overlapCoords, dragPosition)
     }
+    this.throttledCalculateCardsToRender()
   }
 
   /*
@@ -569,7 +570,7 @@ class FoamcoreGrid extends React.Component {
     } else {
       this.setPlaceholderSpot({})
     }
-    this.debouncedCalculateCardsToRender()
+    this.throttledCalculateCardsToRender()
   }
 
   setResizeSpot({ row, col, width, height }) {
@@ -580,7 +581,7 @@ class FoamcoreGrid extends React.Component {
       height,
       type: 'resize',
     })
-    this.debouncedCalculateCardsToRender()
+    this.throttledCalculateCardsToRender()
   }
 
   calculateFilledSpots() {
@@ -657,9 +658,44 @@ class FoamcoreGrid extends React.Component {
     })
   }
 
+  renderMovableCard(card, key, opts) {
+    const { canEditCollection, collection, routingStore, uiStore } = this.props
+    const { cardMenuOpen } = uiStore
+    const cardType = card.record ? card.record.internalType : card.cardType
+    const position = this.positionForCoordinates(card)
+
+    return (
+      <MovableGridCard
+        key={key}
+        card={card}
+        cardType={cardType}
+        canEditCollection={canEditCollection}
+        isUserCollection={collection.isUserCollection}
+        isSharedCollection={collection.isSharedCollection}
+        position={position}
+        record={card.record}
+        onDrag={this.onDrag}
+        onDragStart={this.onDragStart}
+        hoveringOverLeft={opts.hoverOverLeft}
+        hoveringOverRight={opts.hoverOverRight}
+        holdingOver={!!card.holdingOver}
+        onDragOrResizeStop={this.onDragOrResizeStop}
+        onResize={this.onResize}
+        onResizeStop={this.onResizeStop}
+        routeTo={routingStore.routeTo}
+        parent={collection}
+        menuOpen={cardMenuOpen.id === card.id}
+        zoomLevel={this.zoomLevel}
+        maxResizeCol={this.calcEdgeCol(card, card.id)}
+        maxResizeRow={this.calcEdgeRow(card, card.id)}
+      />
+    )
+  }
+
   positionBlank({ row, col, width, height }, type = 'generic') {
     const position = this.positionForCoordinates({ col, row, width, height })
     const { zoomLevel } = this
+
     // TODO: removing this guard so we can use this for unrendered cards as SharedWithMeCollection
     //
     // if (this.dragging || isPointSame(this.placeholderSpot, { col, row })) {
@@ -768,40 +804,6 @@ class FoamcoreGrid extends React.Component {
 
     this.cardsToRender = cards
     return this.cardsToRender
-  }
-
-  renderMovableCard(card, key, opts) {
-    const { canEditCollection, collection, routingStore, uiStore } = this.props
-    const { cardMenuOpen } = uiStore
-    const cardType = card.record ? card.record.internalType : card.cardType
-    const position = this.positionForCoordinates(card)
-
-    return (
-      <MovableGridCard
-        key={key}
-        card={card}
-        cardType={cardType}
-        canEditCollection={canEditCollection}
-        isUserCollection={collection.isUserCollection}
-        isSharedCollection={collection.isSharedCollection}
-        position={position}
-        record={card.record}
-        onDrag={this.onDrag}
-        onDragStart={this.onDragStart}
-        hoveringOverLeft={opts.hoverOverLeft}
-        hoveringOverRight={opts.hoverOverRight}
-        holdingOver={!!card.holdingOver}
-        onDragOrResizeStop={this.onDragOrResizeStop}
-        onResize={this.onResize}
-        onResizeStop={this.onResizeStop}
-        routeTo={routingStore.routeTo}
-        parent={collection}
-        menuOpen={cardMenuOpen.id === card.id}
-        zoomLevel={this.zoomLevel}
-        maxResizeCol={this.calcEdgeCol(card, card.id)}
-        maxResizeRow={this.calcEdgeRow(card, card.id)}
-      />
-    )
   }
 
   render() {
