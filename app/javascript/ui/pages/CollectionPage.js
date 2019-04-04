@@ -46,7 +46,6 @@ class CollectionPage extends React.Component {
 
   componentDidMount() {
     this.onAPILoad()
-    window.addEventListener('click', this.deselectAllCards)
   }
 
   componentDidUpdate(prevProps) {
@@ -68,7 +67,6 @@ class CollectionPage extends React.Component {
   componentWillUnmount() {
     // super.componentWillUnmount()
     ChannelManager.unsubscribeAllFromChannel(this.channelName)
-    window.removeEventListener('click', this.deselectAllCards)
   }
 
   get collection() {
@@ -187,32 +185,6 @@ class CollectionPage extends React.Component {
     const { uiStore } = this.props
     ev.preventDefault()
     uiStore.closeCardMenu()
-  }
-
-  deselectAllCards = (event) => {
-    const { uiStore } = this.props
-    console.log(event.target)
-    const target = event.target
-    const tagName = target.tagName
-
-    // check if parent is a button
-    if (tagName === 'SVG') {
-
-      while (true) {}
-    }
-
-    const ALLOWED_ELEMENTS = ['BUTTON', 'A']
-    if (ALLOWED_ELEMENTS.some((el) => el === tagName)){
-      console.log(`exiting because ${el} is an allowed element`)
-      return
-    }
-    const role = target.getAttribute('role')
-    if (role && role === 'button') {
-      console.log("clicking a button, no deselecting to do")
-      return
-    }
-
-    uiStore.deselectCards()
   }
 
   receivedChannelData = async data => {
@@ -431,7 +403,11 @@ class CollectionPage extends React.Component {
     if (collection.isBoard) {
       return (
         <Fragment>
-          <PageHeader record={collection} isHomepage={isHomepage} />
+          <PageHeader
+            record={collection}
+            isHomepage={isHomepage}
+            onClick={uiStore.deselectAllCards}
+          />
           <PageContainer fullWidth={collection.isBoard}>
             <FoamcoreGrid
               // pull in cols, gridW, gridH, gutter
@@ -460,7 +436,11 @@ class CollectionPage extends React.Component {
     }
     return (
       <Fragment>
-        <PageHeader record={collection} isHomepage={isHomepage} />
+        <PageHeader
+          record={collection}
+          isHomepage={isHomepage}
+          onClick={uiStore.deselectCards}
+        />
         {!isLoading && (
           <PageContainer>
             <OverdueBanner />

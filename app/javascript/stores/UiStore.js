@@ -560,7 +560,10 @@ export default class UiStore {
   }
 
   @action
-  deselectCards() {
+  deselectCards(e) {
+    console.log(e)
+    console.log(this)
+    // add guard clauses as needed
     this.selectedCardIds.replace([])
   }
 

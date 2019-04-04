@@ -360,7 +360,7 @@ class GridCard extends React.Component {
         selected={this.isSelected || this.props.hoveringOver}
       >
         {canEditCollection &&
-          (!card.isPinnedAndLocked || lastPinnedCard) &&  (
+          (!card.isPinnedAndLocked || lastPinnedCard) && (
             <GridCardHotspot
               card={card}
               dragging={dragging}

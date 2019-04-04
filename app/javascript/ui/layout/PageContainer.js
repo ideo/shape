@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-
+import { uiStore } from '~/stores'
 import v from '~/utils/variables'
 
 const StyledContainer = styled.main`
@@ -16,7 +16,11 @@ const StyledContainer = styled.main`
 `
 
 const PageContainer = ({ children, fullWidth, marginTop }) => (
-  <StyledContainer marginTop={marginTop} fullWidth={fullWidth}>
+  <StyledContainer
+    onClick={uiStore.deselectCards}
+    marginTop={marginTop}
+    fullWidth={fullWidth}
+  >
     {children}
   </StyledContainer>
 )

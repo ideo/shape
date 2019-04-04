@@ -602,7 +602,7 @@ const BlankCard = styled.div.attrs({
   style: ({ x, y, h, w, zoomLevel, draggedOn }) => ({
     height: `${h}px`,
     left: x ? `${x}px` : '0px',
-    top: y ?  `${y}px` : '0px',
+    top: y ? `${y}px` : '0px',
     transform: `scale(${1 / zoomLevel})`,
     width: `${w}px`,
   }),
