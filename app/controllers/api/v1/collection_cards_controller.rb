@@ -172,9 +172,13 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def load_collection_cards
     if @collection.is_a?(Collection::Board)
+      # TODO: should we add any constraints to restrict loading to a
+      # maximum number of rows and columns?
+      rows = params[:rows].is_a?(Array) ? params[:rows] : [0, 10]
+      cols = params[:cols].is_a?(Array) ? params[:cols] : [0, 10]
       scope = @collection.collection_cards_by_row_and_col(
-        rows: params[:rows].presence || [0,10],
-        cols: params[:cols].presence || [0,10],
+        rows: rows,
+        cols: cols,
       )
     else
       # ensure per_page is between 50 and 200

@@ -115,6 +115,7 @@ class FoamcoreGrid extends React.Component {
 
   loadAfterScroll = ev => {
     // Run position cards to re-render cards that were previously out of view
+
     this.calculateCardsToRender()
 
     const visRows = this.visibleRows
@@ -556,7 +557,6 @@ class FoamcoreGrid extends React.Component {
       // Don't place a hover card when there's already a card there.
       if (this.findCardForSpot(coordinates)) {
         this.setPlaceholderSpot({})
-        return
       }
       if (!this.placeholderSpot.x) {
         this.setPlaceholderSpot({ ...coordinates, type: 'hover' })
@@ -708,7 +708,6 @@ class FoamcoreGrid extends React.Component {
   @action
   setPlaceholderSpot = placeholderSpot => {
     this.placeholderSpot = placeholderSpot
-    this.calculateCardsToRender()
   }
 
   @action
@@ -721,7 +720,7 @@ class FoamcoreGrid extends React.Component {
       if (this.cardWithinViewPlusPage(card)) {
         // On first load we need to mark the max row and col loaded
         this.updateMaxLoaded({ row: card.row, col: card.col })
-        // Render cards in view, or within half screen
+        // Render cards in view, or within one screen on any dimension
         cards.push(card)
       } else {
         // Otherwise put blank card in place of this card
@@ -740,7 +739,6 @@ class FoamcoreGrid extends React.Component {
       cards = [...cards, ...this.dragGridSpot.values()]
 
     // Don't render cards that are being dragged along
-    // Or more than one 'page' out of view
     cards = cards.filter(
       card =>
         !card.isBeingMultiDragged &&
