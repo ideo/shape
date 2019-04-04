@@ -66,8 +66,6 @@ describe('FoamcoreGrid', () => {
 
     beforeEach(() => {
       instance.throttledSetHoverSpot = jest.fn().mockReturnValue('')
-      // Must be mocked or else it creates a recursion issue, only in tests
-      instance.calculateCardsToRender = jest.fn()
       instance.handleMouseMove(fakeEv)
     })
 
@@ -83,8 +81,6 @@ describe('FoamcoreGrid', () => {
   describe('handleMouseMove', () => {
     beforeEach(() => {
       instance.placeholderSpot = { row: 1, col: 1 }
-      // Must be mocked or else it creates a recursion issue, only in tests
-      instance.calculateCardsToRender = jest.fn()
       instance.handleMouseOut()
     })
 
@@ -250,8 +246,6 @@ describe('FoamcoreGrid', () => {
       instance.loadedRows = { min: 0, max: 9 }
       instance.loadedCols = { min: 0, max: 9 }
       instance.loadCards = jest.fn()
-      // Must be mocked or else it creates a recursion issue, only in tests
-      instance.calculateCardsToRender = jest.fn()
     })
 
     describe('scrolling in loaded bounds', () => {
