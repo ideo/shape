@@ -438,6 +438,7 @@ class FoamcoreGrid extends React.Component {
     const undoMessage = 'Card move undone'
     // Different paths for dragging multiple cards vs one
     if (uiStore.multiMoveCardIds.length < 2) {
+      if (this.dragGridSpot.size < 1) return
       const movePlaceholder = [...this.dragGridSpot.values][0]
       // Save algorithm for what to do when dragging over card for collision
       // resolution later
@@ -585,16 +586,18 @@ class FoamcoreGrid extends React.Component {
     const filledSpots = []
     collection_cards.forEach(card => {
       let { width, height } = card
+      const origWidth = width
       const { row, col } = card
       while (height > 0) {
         while (width > 0) {
           filledSpots.push({
             card,
-            row: row + height - 1,
-            col: col + width - 1,
+            row: row + height - 1, // 1 + 2 - 1 = 2 | 2
+            col: col + width - 1, // 0 + 2 - 1 = 1 | 0
           })
           width -= 1
         }
+        width = origWidth
         height -= 1
       }
     })
@@ -633,11 +636,7 @@ class FoamcoreGrid extends React.Component {
   }
 
   positionCard(card) {
-    const { col, row, width, height } = card
-    const { canEditCollection, collection, routingStore, uiStore } = this.props
-    const position = this.positionForCoordinates(card)
-    const { cardMenuOpen } = uiStore
-    const { zoomLevel } = this
+    const { col, row } = card
     const beingDraggedOnSpot =
       this.dragging && this.getDraggedOnSpot({ col, row })
     const hoverOverLeft = !!(
@@ -647,32 +646,10 @@ class FoamcoreGrid extends React.Component {
       beingDraggedOnSpot && beingDraggedOnSpot.direction === 'right'
     )
 
-    return (
-      <MovableGridCard
-        key={`card-${card.id}`}
-        card={card}
-        cardType={card.record.internalType}
-        canEditCollection={canEditCollection}
-        isUserCollection={collection.isUserCollection}
-        isSharedCollection={collection.isSharedCollection}
-        position={position}
-        record={card.record}
-        onDrag={this.onDrag}
-        onDragStart={this.onDragStart}
-        hoveringOverLeft={hoverOverLeft}
-        hoveringOverRight={hoverOverRight}
-        holdingOver={!!card.holdingOver}
-        onDragOrResizeStop={this.onDragOrResizeStop}
-        onResize={this.onResize}
-        onResizeStop={this.onResizeStop}
-        routeTo={routingStore.routeTo}
-        parent={collection}
-        menuOpen={cardMenuOpen.id === card.id}
-        zoomLevel={zoomLevel}
-        maxResizeCol={this.calcEdgeCol({ col, row, width }, card.id)}
-        maxResizeRow={this.calcEdgeRow({ col, row, height }, card.id)}
-      />
-    )
+    return this.renderMovableCard(card, `card-${card.id}`, {
+      hoverOverLeft,
+      hoverOverRight,
+    })
   }
 
   positionBlank({ row, col, width, height }, type = 'generic') {
@@ -697,41 +674,18 @@ class FoamcoreGrid extends React.Component {
   }
 
   positionBct({ col, row }) {
-    const { canEditCollection, collection, routingStore } = this.props
-    const position = this.positionForCoordinates({ col, row })
     // TODO this has to be documented
     const blankContentTool = {
       id: 'blank',
       num: 0,
       cardType: 'blank',
       blankType: null,
+      col,
+      row,
       width: 1,
       height: 1,
     }
-    const { zoomLevel } = this
-    // TODO combine this rendering of MoveableGridCard with positionCard
-    return (
-      <MovableGridCard
-        key={`bct-${col}:${row}`}
-        card={blankContentTool}
-        cardType={blankContentTool.cardType}
-        canEditCollection={canEditCollection}
-        isUserCollection={collection.isUserCollection}
-        isSharedCollection={collection.isSharedCollection}
-        position={position}
-        record={blankContentTool.record}
-        routeTo={routingStore.routeTo}
-        parent={collection}
-        zoomLevel={zoomLevel}
-        menuOpen={false}
-        holdingOver={false}
-        hoveringOverRight={false}
-        hoveringOverLeft={false}
-        onDragOrResizeStop={() => {}}
-        onResize={() => {}}
-        onDrag={() => {}}
-      />
-    )
+    return this.renderMovableCard(blankContentTool, `bct-${col}:${row}`, {})
   }
 
   cardWithinViewPlusPage = card => {
@@ -811,6 +765,40 @@ class FoamcoreGrid extends React.Component {
 
     this.cardsToRender = cards
     return this.cardsToRender
+  }
+
+  renderMovableCard(card, key, opts) {
+    const { canEditCollection, collection, routingStore, uiStore } = this.props
+    const { cardMenuOpen } = uiStore
+    const cardType = card.record ? card.record.internalType : card.cardType
+    const position = this.positionForCoordinates(card)
+
+    return (
+      <MovableGridCard
+        key={key}
+        card={card}
+        cardType={cardType}
+        canEditCollection={canEditCollection}
+        isUserCollection={collection.isUserCollection}
+        isSharedCollection={collection.isSharedCollection}
+        position={position}
+        record={card.record}
+        onDrag={this.onDrag}
+        onDragStart={this.onDragStart}
+        hoveringOverLeft={opts.hoverOverLeft}
+        hoveringOverRight={opts.hoverOverRight}
+        holdingOver={!!card.holdingOver}
+        onDragOrResizeStop={this.onDragOrResizeStop}
+        onResize={this.onResize}
+        onResizeStop={this.onResizeStop}
+        routeTo={routingStore.routeTo}
+        parent={collection}
+        menuOpen={cardMenuOpen.id === card.id}
+        zoomLevel={this.zoomLevel}
+        maxResizeCol={this.calcEdgeCol(card, card.id)}
+        maxResizeRow={this.calcEdgeRow(card, card.id)}
+      />
+    )
   }
 
   render() {
