@@ -169,10 +169,7 @@ class Header extends React.Component {
     const primaryGroup = currentUser.current_organization.primary_group
     return (
       <FixedHeader
-        onClick={() => {
-          console.log('in Header.js, FixedHeader, click handler')
-          return uiStore.deselectAllCards
-        }}
+        onClick={uiStore.deselectCards}
         zIndex={v.zIndex.globalHeader}
       >
         <MaxWidthContainer>

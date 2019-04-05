@@ -845,13 +845,7 @@ class CollectionGrid extends React.Component {
 
     return (
       // add uiStore.deselectAllCards here?
-      <StyledGrid
-        minHeight={minHeight}
-        onClick={() => {
-          console.log('in CollectionGrid.js, click handler')
-          return uiStore.deselectAllCards
-        }}
-      >
+      <StyledGrid minHeight={minHeight} onClick={uiStore.deselectCards}>
         {sorting && (
           <SortContainer>
             <CollectionSort collection={collection} />

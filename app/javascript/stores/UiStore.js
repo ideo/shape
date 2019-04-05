@@ -559,12 +559,33 @@ export default class UiStore {
     return this.viewingCollection.cardIds
   }
 
-  @action
-  deselectCards(e) {
-    console.log(e)
-    console.log(this)
+  deselectCards = e => {
+    if (!e) return
+    console.log('deselectCards event: ', e)
+    console.log('deselectCards event: ', e.target)
+    const { target } = e
+    const role = target.getAttribute('role')
+    if (role) {
+      console.log('role is: ', role)
+    }
     // add guard clauses as needed
-    this.selectedCardIds.replace([])
+    if (role && role === 'button') return
+
+    if (target.tagName !== 'SVG') {
+      const parent = target.parentElement
+      if (parent.tagName === 'BUTTON') return
+      const grandparent = parent.parentElement
+      if (grandparent.tagName === 'BUTTON') return
+    }
+    const ALLOWED_ELEMENT_TAGS = ['BUTTON', 'INPUT']
+    // Don't deselect if clicking on button, input (search)
+    if (ALLOWED_ELEMENT_TAGS.some(el => el === target.tagName)) {
+      return
+    }
+
+    runInAction(() => {
+      this.selectedCardIds.replace([])
+    })
   }
 
   @action

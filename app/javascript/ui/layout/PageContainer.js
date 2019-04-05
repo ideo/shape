@@ -17,10 +17,7 @@ const StyledContainer = styled.main`
 
 const PageContainer = ({ children, fullWidth, marginTop }) => (
   <StyledContainer
-    onClick={() => {
-      console.log('in PageContainer, click handler')
-      return uiStore.deselectAllCards
-    }}
+    onClick={uiStore.deselectCards}
     marginTop={marginTop}
     fullWidth={fullWidth}
   >

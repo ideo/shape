@@ -341,12 +341,7 @@ class PageHeader extends React.Component {
     const rolesRecord = uiStore.rolesMenuOpen ? uiStore.rolesMenuOpen : record
 
     return (
-      <FixedPageHeader
-        onClick={() => {
-          console.log('in PageHeader.js FixedPageHeader, click handler')
-          return uiStore.deselectAllCards
-        }}
-      >
+      <FixedPageHeader onClick={uiStore.deselectCards}>
         <MaxWidthContainer>
           <RolesModal record={rolesRecord} open={!!uiStore.rolesMenuOpen} />
           <Breadcrumb
