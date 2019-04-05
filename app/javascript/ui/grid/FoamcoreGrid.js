@@ -736,11 +736,15 @@ class FoamcoreGrid extends React.Component {
     return this.renderMovableCard(blankContentTool, `bct-${col}:${row}`, {})
   }
 
-  cardWithinViewPlusPage = card => {
+  cardWithinViewPlusPage = ({
+    card,
+    visibleRows = null,
+    visibleCols = null,
+  }) => {
     // Select all cards that are within view,
     // plus half a screen on any side
-    const rows = this.visibleRows
-    const cols = this.visibleCols
+    const rows = visibleRows || this.visibleRows
+    const cols = visibleCols || this.visibleCols
 
     const numRows = Math.ceil(rows.num)
     const numCols = Math.ceil(cols.num)
@@ -764,8 +768,18 @@ class FoamcoreGrid extends React.Component {
     const collectionCards = [...collection.collection_cards]
     let cards = []
 
+    // Memoize so it doesn't call it every time `cardWithinViewPlusPage` is called
+    const rows = this.visibleRows
+    const cols = this.visibleCols
+
     collectionCards.forEach(card => {
-      if (this.cardWithinViewPlusPage(card)) {
+      if (
+        this.cardWithinViewPlusPage({
+          card,
+          visibleRows: rows,
+          visibleCols: cols,
+        })
+      ) {
         // On first load we need to mark the max row and col loaded
         this.updateMaxLoaded({ row: card.row, col: card.col })
         // Render cards in view, or within one screen on any dimension
@@ -808,7 +822,6 @@ class FoamcoreGrid extends React.Component {
     cards.push(
       this.positionBlank(this.placeholderSpot, this.placeholderSpot.type)
     )
-
     this.cardsToRender = cards
     return this.cardsToRender
   }
