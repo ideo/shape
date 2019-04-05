@@ -168,7 +168,13 @@ class Header extends React.Component {
     const { userDropdownOpen, orgDropdownOpen } = this.state
     const primaryGroup = currentUser.current_organization.primary_group
     return (
-      <FixedHeader zIndex={v.zIndex.globalHeader}>
+      <FixedHeader
+        onClick={() => {
+          console.log('in Header.js, FixedHeader, click handler')
+          return uiStore.deselectAllCards
+        }}
+        zIndex={v.zIndex.globalHeader}
+      >
         <MaxWidthContainer>
           <Flex align="center" justify="space-between">
             <Box>

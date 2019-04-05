@@ -403,11 +403,7 @@ class CollectionPage extends React.Component {
     if (collection.isBoard) {
       return (
         <Fragment>
-          <PageHeader
-            record={collection}
-            isHomepage={isHomepage}
-            onClick={uiStore.deselectAllCards}
-          />
+          <PageHeader record={collection} isHomepage={isHomepage} />
           <PageContainer fullWidth={collection.isBoard}>
             <FoamcoreGrid
               // pull in cols, gridW, gridH, gutter
