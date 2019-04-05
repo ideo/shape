@@ -31,24 +31,26 @@ describe('RolesSummary', () => {
     })
 
     it('renders editors', () => {
-      expect(
-        wrapper
-          .find('StyledRoleTitle')
-          .at(0)
-          .render()
-          .text()
-      ).toMatch(/editors/i)
+      // TODO: Ok to remove? Lables were omitted from the new design
+      // expect(
+      //   wrapper
+      //     .find('StyledRoleTitle')
+      //     .at(0)
+      //     .render()
+      //     .text()
+      // ).toMatch(/editors/i)
       expect(wrapper.find('[className="editor"]').length).toEqual(2)
     })
 
     it('renders viewers', () => {
-      expect(
-        wrapper
-          .find('StyledRoleTitle')
-          .at(1)
-          .render()
-          .text()
-      ).toMatch(/viewers/i)
+      // TODO: Ok to remove? Lables were omitted from the new design
+      // expect(
+      //   wrapper
+      //     .find('StyledRoleTitle')
+      //     .at(1)
+      //     .render()
+      //     .text()
+      // ).toMatch(/viewers/i)
       expect(wrapper.find('[className="viewer"]').length).toEqual(2)
     })
 
@@ -57,7 +59,8 @@ describe('RolesSummary', () => {
     })
   })
 
-  describe('with custom label', () => {
+  // TODO: What should we do about custom labels now that they are removed from design?
+  describe.skip('with custom label', () => {
     beforeEach(() => {
       const newProps = {
         ...emptyProps,
@@ -88,11 +91,12 @@ describe('RolesSummary', () => {
 
     it('renders 2 viewers and label', () => {
       expect(wrapper.find('[className="viewer"]').length).toEqual(2)
-      expect(wrapper.render().text()).toMatch(/viewers/i)
+      // expect(wrapper.render().text()).toMatch(/viewers/i)
     })
 
-    it('does not render editors label', () => {
-      expect(wrapper.render().text()).not.toMatch(/editors/i)
+    it('does not render editors', () => {
+      expect(wrapper.find('[className="editor"]').exists()).toBe(false)
+      // expect(wrapper.render().text()).not.toMatch(/editors/i)
     })
   })
 
@@ -107,11 +111,11 @@ describe('RolesSummary', () => {
 
     it('renders 2 editors and label', () => {
       expect(wrapper.find('[className="editor"]').length).toEqual(2)
-      expect(wrapper.render().text()).toMatch(/editors/i)
+      // expect(wrapper.render().text()).toMatch(/editors/i)
     })
 
     it('does not render viewers', () => {
-      expect(wrapper.render().text()).not.toMatch(/viewers/i)
+      // expect(wrapper.render().text()).not.toMatch(/viewers/i)
       expect(wrapper.find('[className="viewer"]').exists()).toBe(false)
     })
   })
@@ -133,8 +137,12 @@ describe('RolesSummary', () => {
       wrapper = shallow(<RolesSummary {...newProps} />)
     })
 
-    it('renders only 5 editors', () => {
-      expect(wrapper.find('[className="editor"]').length).toEqual(5)
+    it('renders only 4 editors', () => {
+      expect(wrapper.find('[className="editor"]').length).toEqual(4)
+    })
+
+    it('renders an additonal placeholder to indicate more', () => {
+      expect(wrapper.find('[className="placeholder"]').length).toEqual(1)
     })
 
     it('does not render any viewers or viewer label', () => {
