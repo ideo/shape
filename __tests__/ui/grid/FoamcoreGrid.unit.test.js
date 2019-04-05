@@ -132,6 +132,8 @@ describe('FoamcoreGrid', () => {
       instance.moveCard = jest.fn().mockReturnValue()
       instance.resizeCard = jest.fn().mockReturnValue()
       instance.dragging = true
+      // Stub this or else it causes mobx `Maximum call stack size exceeded`
+      instance.calculateCardsToRender = jest.fn()
       props.uiStore.multiMoveCardIds = [cards[0].id]
       instance.onDragOrResizeStop(cardId, 'move')
     })
@@ -140,6 +142,7 @@ describe('FoamcoreGrid', () => {
       expect(instance.dragGridSpot.size).toEqual(0)
       expect(instance.dragging).toEqual(false)
       expect(props.uiStore.multiMoveCardIds.length).toBe(0)
+      expect(instance.calculateCardsToRender).toHaveBeenCalled()
     })
 
     describe('when moving', () => {
@@ -149,6 +152,7 @@ describe('FoamcoreGrid', () => {
 
       it('should try and move the card with the found card', () => {
         expect(instance.moveCard).toHaveBeenCalledWith(cards[0])
+        expect(instance.calculateCardsToRender).toHaveBeenCalled()
       })
     })
 
@@ -160,10 +164,12 @@ describe('FoamcoreGrid', () => {
 
       it('should try and resize the card with the found card', () => {
         expect(instance.resizeCard).toHaveBeenCalledWith(cards[0])
+        expect(instance.calculateCardsToRender).toHaveBeenCalled()
       })
 
       it('should stop all resizing and moving', () => {
         expect(instance.resizing).toEqual(false)
+        expect(instance.calculateCardsToRender).toHaveBeenCalled()
       })
     })
   })
