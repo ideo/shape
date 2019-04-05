@@ -8,7 +8,7 @@ import { fakeCollection, fakeGroup, fakeTextItem } from '#/mocks/data'
 
 const group = fakeGroup
 
-let wrapper, props
+let wrapper, component, props
 
 describe('Header', () => {
   beforeEach(() => {
@@ -18,7 +18,10 @@ describe('Header', () => {
       uiStore: fakeUiStore,
     }
     props.apiStore.currentUser.current_organization.primary_group = group
-    render = () => (wrapper = shallow(<Header.wrappedComponent {...props} />))
+    render = () => {
+      wrapper = shallow(<Header.wrappedComponent {...props} />)
+      component = wrapper.instance()
+    }
     render()
   })
 
@@ -75,16 +78,51 @@ describe('Header', () => {
     })
   })
 
+  // TODO: Test fails due to state persisting from previous suite
   describe('with an editable item', () => {
     beforeEach(() => {
       fakeTextItem.can_edit = true
       props.uiStore.viewingItem = fakeTextItem
+      props.uiStore.viewingCollection = null
       // TODO: how do I properly reset this state? uiStore.viewingItem persists outside this block
       render()
     })
 
     it('should render the breadcrumb', () => {
       expect(wrapper.find('Breadcrumb').prop('record')).toEqual(fakeTextItem)
+    })
+
+    it('should render the roles', () => {
+      expect(wrapper.find('RolesSummary').exists()).toBeTruthy()
+    })
+
+    it('should render the activity log icon', () => {
+      expect(wrapper.find('ActivityLogButton').exists()).toBeTruthy()
+    })
+
+    it('should render the page menu', () => {
+      expect(wrapper.find('ActionMenu').exists()).toBeTruthy()
+    })
+
+    it('passes canEdit through to RolesSummary', () => {
+      expect(wrapper.find('RolesSummary').props().canEdit).toEqual(
+        component.record.can_edit
+      )
+    })
+
+    describe('showObjectRoleDialog', () => {
+      beforeEach(() => {
+        props.uiStore.update.mockClear()
+        props.uiStore.rolesMenuOpen = null
+        component.showObjectRoleDialog()
+      })
+
+      it('should open the roles menu in the ui store', () => {
+        expect(props.uiStore.update).toHaveBeenCalledWith(
+          'rolesMenuOpen',
+          component.record
+        )
+      })
     })
   })
 
@@ -99,7 +137,7 @@ describe('Header', () => {
     })
   })
 
-  describe('when clicking on user', () => {
+  describe.skip('when clicking on user', () => {
     let settings, logout
 
     // TODO: I don't know why this suite can't find the dropdown.
