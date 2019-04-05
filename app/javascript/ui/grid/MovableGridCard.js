@@ -175,6 +175,12 @@ class MovableGridCard extends React.PureComponent {
     }
   }
 
+  get scrollElement() {
+    const { scrollElement } = this.props
+    if (scrollElement) return scrollElement
+    return window
+  }
+
   scrollUp = (timestamp, clientY) => {
     if (clientY) this.clientY = clientY
     if (!this.scrolling) return null
@@ -182,7 +188,7 @@ class MovableGridCard extends React.PureComponent {
       return window.requestAnimationFrame(this.scrollUp)
     }
 
-    window.scrollBy(0, -this.scrollAmount())
+    this.scrollElement.scrollBy(0, -this.scrollAmount())
 
     return window.requestAnimationFrame(this.scrollUp)
   }
@@ -196,24 +202,22 @@ class MovableGridCard extends React.PureComponent {
       return window.requestAnimationFrame(this.scrollDown)
     }
 
-    window.scrollBy(0, this.scrollAmount())
+    this.scrollElement.scrollBy(0, this.scrollAmount())
 
     return window.requestAnimationFrame(this.scrollDown)
   }
 
   scrollLeft = timestamp => {
     if (!this.scrolling) return null
-    console.log('scrollLeft')
-    const scrollAmount = 2
-    window.scrollBy(-scrollAmount, 0)
+
+    this.scrollElement.scrollBy(-this.scrollAmount(), 0)
     return window.requestAnimationFrame(this.scrollLeft)
   }
 
   scrollRight = timestamp => {
     if (!this.scrolling) return null
-    console.log('scroll right')
-    const scrollAmount = 2
-    window.scrollBy(scrollAmount, 0)
+
+    this.scrollElement.scrollBy(this.scrollAmount(), 0)
     return window.requestAnimationFrame(this.scrollRight)
   }
 
@@ -692,6 +696,7 @@ MovableGridCard.propTypes = {
   zoomLevel: PropTypes.number,
   maxResizeRow: PropTypes.number,
   maxResizeCol: PropTypes.number,
+  scrollElement: MobxPropTypes.objectOrObservableObject,
   horizontalScroll: PropTypes.bool,
 }
 
@@ -701,6 +706,7 @@ MovableGridCard.defaultProps = {
   zoomLevel: 1,
   maxResizeRow: 2,
   maxResizeCol: 4,
+  scrollElement: null,
   horizontalScroll: false,
 }
 
