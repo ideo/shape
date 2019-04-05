@@ -66,7 +66,9 @@ class CollectionGrid extends React.Component {
   }
 
   componentDidMount() {
+    const { loadCollectionCards } = this.props
     this.initialize(this.props)
+    loadCollectionCards({})
   }
 
   componentWillReceiveProps(nextProps) {
@@ -781,7 +783,13 @@ class CollectionGrid extends React.Component {
 
   renderPositionedCards = () => {
     const grid = []
-    const { collection, canEditCollection, routingStore, uiStore } = this.props
+    const {
+      collection,
+      canEditCollection,
+      routingStore,
+      uiStore,
+      loadCollectionCards,
+    } = this.props
     let i = 0
     // unnecessary? we seem to need to preserve the array order
     // in order to not re-draw divs (make transform animation work)
@@ -828,6 +836,7 @@ class CollectionGrid extends React.Component {
           lastPinnedCard={
             card.isPinnedAndLocked && i === this.state.cards.length - 1
           }
+          loadCollectionCards={loadCollectionCards}
           hidden={shouldHide}
         />
       )
@@ -874,6 +883,7 @@ CollectionGrid.propTypes = {
   cardProperties: MobxPropTypes.arrayOrObservableArray.isRequired,
   canEditCollection: PropTypes.bool.isRequired,
   movingCardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
+  loadCollectionCards: PropTypes.func.isRequired,
   addEmptyCard: PropTypes.bool,
   submissionSettings: PropTypes.shape({
     type: PropTypes.string,

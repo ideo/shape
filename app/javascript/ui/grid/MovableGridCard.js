@@ -326,11 +326,13 @@ class MovableGridCard extends React.PureComponent {
   )
 
   renderPagination = () => {
+    const { loadCollectionCards } = this.props
     const collection = this.props.parent
     return (
       <PositionedGridCard {...this.styleProps()}>
         <GridCardPagination
           collection={collection}
+          loadCollectionCards={loadCollectionCards}
           nextPage={collection.nextPage}
         />
       </PositionedGridCard>
