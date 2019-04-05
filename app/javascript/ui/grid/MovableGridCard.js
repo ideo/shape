@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import _ from 'lodash'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import FlipMove from 'react-flip-move'
 import Rnd from 'react-rnd'
@@ -78,6 +79,10 @@ class MovableGridCard extends React.PureComponent {
       resizeWidth: 0,
       resizeHeight: 0,
     }
+    this.throttledScrollIfNearPageBounds = _.throttle(
+      this.scrollIfNearPageBounds,
+      50
+    )
   }
 
   componentWillReceiveProps({ position }) {
@@ -108,6 +113,45 @@ class MovableGridCard extends React.PureComponent {
     })
   }
 
+  scrollIfNearPageBounds = e => {
+    const { horizontalScroll, card } = this.props
+    const { gridW } = uiStore.gridSettings
+
+    document.body.style['overflow-y'] = 'hidden'
+
+    if (e.clientY < TOP_SCROLL_TRIGGER) {
+      // At top of viewport
+      this.scrolling = true
+      this.scrollUp(null, e.clientY)
+    } else if (e.clientY > window.innerHeight - TOP_SCROLL_TRIGGER) {
+      // At bottom of viewport
+      this.scrolling = true
+      this.scrollDown()
+    } else if (!horizontalScroll) {
+      this.scrolling = false
+      return
+    }
+
+    document.body.style['overflow-x'] = 'hidden'
+
+    // Horizontal Scroll
+
+    const cardWidth = (card.width * gridW) / 2
+    const leftMargin = v.containerPadding.horizontal * 16
+
+    // At right of viewport
+    if (e.clientX > window.innerWidth - cardWidth + leftMargin) {
+      this.scrolling = true
+      this.scrollRight()
+      // At left of viewport
+    } else if (e.clientX - cardWidth - leftMargin < 0) {
+      this.scrolling = true
+      this.scrollLeft()
+    } else {
+      this.scrolling = false
+    }
+  }
+
   scrollUp = (timestamp, clientY) => {
     if (clientY) this.clientY = clientY
     if (!this.scrolling) return null
@@ -136,6 +180,22 @@ class MovableGridCard extends React.PureComponent {
     return window.requestAnimationFrame(this.scrollDown)
   }
 
+  scrollLeft = timestamp => {
+    if (!this.scrolling) return null
+    console.log('scrollLeft')
+    const scrollAmount = 2
+    window.scrollBy(-scrollAmount, 0)
+    return window.requestAnimationFrame(this.scrollLeft)
+  }
+
+  scrollRight = timestamp => {
+    if (!this.scrolling) return null
+    console.log('scroll right')
+    const scrollAmount = 2
+    window.scrollBy(scrollAmount, 0)
+    return window.requestAnimationFrame(this.scrollRight)
+  }
+
   handleDrag = (e, data, dX, dY) => {
     const { position } = this.props
     // Global dragging should use screen coordinates
@@ -151,19 +211,7 @@ class MovableGridCard extends React.PureComponent {
       return
     }
 
-    document.body.style['overflow-y'] = 'hidden'
-
-    if (e.clientY < TOP_SCROLL_TRIGGER) {
-      // At top of viewport
-      this.scrolling = true
-      this.scrollUp(null, e.clientY)
-    } else if (e.clientY > window.innerHeight - TOP_SCROLL_TRIGGER) {
-      // At bottom of viewport
-      this.scrolling = true
-      this.scrollDown()
-    } else {
-      this.scrolling = false
-    }
+    this.throttledScrollIfNearPageBounds(e)
 
     // TODO make this switch for normal collections
     // const pageMargin = window.innerWidth - v.maxWidth
@@ -207,8 +255,10 @@ class MovableGridCard extends React.PureComponent {
   }
 
   handleStop = type => ev => {
+    const { horizontalScroll } = this.props
     this.scrolling = false
     document.body.style['overflow-y'] = 'auto'
+    if (horizontalScroll) document.body.style['overflow-x'] = 'auto'
     this.setState({ dragging: false, resizing: false }, () => {
       // Resizing has to be reset first, before the handler or the card dimensions
       // will jump back in forth as the grid resizes the actual card while this
@@ -619,6 +669,7 @@ MovableGridCard.propTypes = {
   zoomLevel: PropTypes.number,
   maxResizeRow: PropTypes.number,
   maxResizeCol: PropTypes.number,
+  horizontalScroll: PropTypes.bool,
 }
 
 MovableGridCard.defaultProps = {
@@ -627,6 +678,7 @@ MovableGridCard.defaultProps = {
   zoomLevel: 1,
   maxResizeRow: 2,
   maxResizeCol: 4,
+  horizontalScroll: false,
 }
 
 export default MovableGridCard

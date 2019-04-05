@@ -38,8 +38,8 @@ const BlankCard = styled.div.attrs({
 
 const Grid = styled.div`
   min-height: 1300px;
-  overflow-x: scroll;
-  overflow-y: scroll;
+  overflow-x: auto;
+  overflow-y: auto;
   position: relative;
 `
 
@@ -695,6 +695,7 @@ class FoamcoreGrid extends React.Component {
         zoomLevel={this.zoomLevel}
         maxResizeCol={this.calcEdgeCol(card, card.id)}
         maxResizeRow={this.calcEdgeRow(card, card.id)}
+        horizontalScroll
       />
     )
   }
