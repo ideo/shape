@@ -86,7 +86,7 @@ class FoamcoreGrid extends React.Component {
 
   constructor(props) {
     super(props)
-    this.debouncedSetDraggedOnSpots = _.debounce(this.setDraggedOnSpots, 25)
+    this.debouncedSetDraggedOnSpots = _.debounce(this.setDraggedOnSpots, 15)
     this.throttledSetHoverSpot = _.throttle(this.setHoverSpot, 50)
     this.throttledSetResizeSpot = _.throttle(this.setResizeSpot, 25)
     this.throttledLoadAfterScroll = _.debounce(this.loadAfterScroll, 250)
@@ -492,7 +492,7 @@ class FoamcoreGrid extends React.Component {
     if (uiStore.multiMoveCardIds.length > 1 && !recur) {
       this.setMultiMoveDragSpots(overlapCoords, dragPosition)
     }
-    this.throttledCalculateCardsToRender()
+    this.calculateCardsToRender()
   }
 
   /*
