@@ -52,6 +52,16 @@ describe('Header', () => {
     expect(wrapper.find('PopoutMenu').exists()).toBe(false)
   })
 
+  describe('closeOrgMenu', () => {
+    beforeEach(() => {
+      component.closeOrgMenu()
+    })
+
+    it('sets organization page to null', () => {
+      expect(component.organizationPage).toBeFalsy()
+    })
+  })
+
   describe('with a collection', () => {
     beforeEach(() => {
       fakeCollection.isNormalCollection = true

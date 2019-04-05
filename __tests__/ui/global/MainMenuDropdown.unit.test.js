@@ -1,9 +1,9 @@
-import OrganizationDropdown from '~/ui/organizations/OrganizationDropdown'
+import MainMenuDropdown from '~/ui/global/MainMenuDropdown'
 import { fakeOrganization } from '#/mocks/data'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 
-describe('OrganizationDropdown', () => {
+describe('MainMenuDropdown', () => {
   let component, wrapper, props, otherFakeOrg, itemNames
 
   beforeEach(() => {
@@ -31,33 +31,10 @@ describe('OrganizationDropdown', () => {
       'Billing',
       'Legal',
     ]
-    wrapper = shallow(<OrganizationDropdown.wrappedComponent {...props} />)
+    wrapper = shallow(<MainMenuDropdown.wrappedComponent {...props} />)
     component = wrapper.instance()
     props.uiStore.alert.mockClear()
     props.uiStore.confirm.mockClear()
-  })
-
-  describe('closeOrgMenu', () => {
-    beforeEach(() => {
-      component.closeOrgMenu()
-    })
-
-    it('sets organization page to null', () => {
-      expect(component.organizationPage).toBeFalsy()
-    })
-  })
-
-  describe('openOrgMenu', () => {
-    beforeEach(() => {
-      component.openOrgMenu('organizationPeople')
-    })
-
-    it('sets organization page to passed in page name', () => {
-      expect(props.uiStore.update).toHaveBeenCalledWith(
-        'organizationMenuPage',
-        'organizationPeople'
-      )
-    })
   })
 
   describe('menuItems', () => {
@@ -100,6 +77,19 @@ describe('OrganizationDropdown', () => {
     })
   })
 
+  describe('openOrgMenu', () => {
+    beforeEach(() => {
+      component.handleOrgPeople()
+    })
+
+    it('sets organization page to passed in page name', () => {
+      expect(props.uiStore.update).toHaveBeenCalledWith(
+        'organizationMenuPage',
+        'organizationPeople'
+      )
+    })
+  })
+
   describe('handleSwitchOrg', () => {
     const orgId = 1
     const fakeEv = { preventDefault: () => null }
@@ -128,10 +118,6 @@ describe('OrganizationDropdown', () => {
       component.handleZendesk()
     })
 
-    it('should call the on item click handler', () => {
-      expect(props.onItemClick).toHaveBeenCalled()
-    })
-
     it('should activate the Zendesk widget', () => {
       expect(global.zE.activate).toHaveBeenCalledWith({ hideOnClose: true })
     })
@@ -146,10 +132,6 @@ describe('OrganizationDropdown', () => {
       component.handleBilling()
     })
 
-    it('should call the on item click handler', () => {
-      expect(props.onItemClick).toHaveBeenCalled()
-    })
-
     it('should route to the billing page', () => {
       expect(props.routingStore.routeTo).toHaveBeenCalledWith('/billing')
     })
@@ -158,10 +140,6 @@ describe('OrganizationDropdown', () => {
   describe('handleLegal', () => {
     beforeEach(() => {
       component.handleLegal()
-    })
-
-    it('should call the on item click handler', () => {
-      expect(props.onItemClick).toHaveBeenCalled()
     })
 
     it('should route to the terms page', () => {
