@@ -354,9 +354,11 @@ class FoamcoreGrid extends React.Component {
     return cards.find(card => isPointSame(card, { col, row }))
   }
 
-  positionForSpot({ col, row, width = 1, height = 1 }) {
+  // Default to 1 so prevent console error
+  positionForSpot({ col = 1, row = 1, width = 1, height = 1 }) {
     const { gridW, gridH, gutter } = this.props
     const { zoomLevel } = this
+
     const pos = {
       x: (col * (gridW + gutter)) / zoomLevel,
       y: (row * (gridH + gutter)) / zoomLevel,
