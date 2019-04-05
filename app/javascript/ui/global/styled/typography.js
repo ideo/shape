@@ -205,7 +205,10 @@ export const HugeNumber = Heading1.extend`
 `
 
 export const QuillStyleWrapper = styled.div`
+  height: 100%;
   .quill {
+    height: 100%;
+
     h1 {
       ${TextItemHeading1Css};
       color: ${v.colors.black};
@@ -251,6 +254,10 @@ export const QuillStyleWrapper = styled.div`
         animation: blink-animation 1s steps(5, start) infinite;
         width: 3px;
       }
+    }
+
+    .ql-editor {
+      overflow-x: hidden;
     }
   }
 `

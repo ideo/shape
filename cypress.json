@@ -4,5 +4,6 @@
   "viewportHeight": 720,
   "userAgent": "cypress",
   "supportFile": "cypress/support/setup.js",
-  "pluginsFile": "cypress/support/plugins.js"
+  "pluginsFile": "cypress/support/plugins.js",
+  "chromeWebSecurity": false
 }

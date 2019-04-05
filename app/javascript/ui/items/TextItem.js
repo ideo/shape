@@ -55,6 +55,7 @@ const StyledContainer = styled.div`
   ${props =>
     !props.fullPageView &&
     `
+    height: 100%;
     .ql-tooltip.ql-editing,
     .ql-tooltip.ql-flip {
       left: calc(50% - 150px) !important;
