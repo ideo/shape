@@ -51,6 +51,12 @@ function isPointSame(first, other) {
   return first.row === other.row && first.col === other.col
 }
 
+const pageMargins = {
+  // v.containerPadding is in `em` units, so we multiply by 16
+  left: v.containerPadding.horizontal * 16,
+  top: v.headerHeight,
+}
+
 const MAX_CARD_W = 4
 const MAX_CARD_H = 2
 
@@ -218,18 +224,11 @@ class FoamcoreGrid extends React.Component {
     return (gridH + gutter) / this.zoomLevel
   }
 
-  get pageMargins() {
-    return {
-      left: v.containerPadding.horizontal * 16 * this.zoomLevel,
-      top: v.headerHeight,
-    }
-  }
-
   get visibleRows() {
     if (!this.gridRef) return { min: null, max: null }
 
     const top = this.gridRef.scrollTop
-    const gridHeight = window.innerHeight - this.pageMargins.top
+    const gridHeight = window.innerHeight - pageMargins.top
 
     const min = parseFloat((top / this.cardAndGutterHeight).toFixed(1))
     const max = parseFloat(
@@ -248,7 +247,7 @@ class FoamcoreGrid extends React.Component {
     if (!this.gridRef) return { min: null, max: null }
 
     const left = this.gridRef.scrollLeft
-    const gridWidth = window.innerWidth - this.pageMargins.left
+    const gridWidth = window.innerWidth - pageMargins.left
 
     const min = parseFloat((left / this.cardAndGutterWidth).toFixed(1))
     const max = parseFloat(
@@ -267,11 +266,17 @@ class FoamcoreGrid extends React.Component {
   coordinatesForPosition(position) {
     const { x, y } = position
     const { gridW, gridH, gutter } = this.props
-
     const { zoomLevel } = this
 
-    const row = Math.floor(((y + gutter * 0.5) / (gridH + gutter)) * zoomLevel)
-    const col = Math.floor(((x + gutter * 2) / (gridW + gutter)) * zoomLevel)
+    const colAmountLeft = x % (gridW + gutter)
+    const rowAmountLeft = y % (gridH + gutter)
+
+    // If in the gutter, return null
+    if (colAmountLeft > gridW || rowAmountLeft > gridH) return null
+
+    const col = Math.floor((x / (gridW + gutter)) * zoomLevel)
+    const row = Math.floor((y / (gridH + gutter)) * zoomLevel)
+
     if (row === -1 || col === -1) return null
     return { col, row }
   }
@@ -341,8 +346,8 @@ class FoamcoreGrid extends React.Component {
     ev.persist()
     if (this.resizing) return
     const hoverPos = {
-      x: ev.pageX - this.pageMargins.left + this.gridRef.scrollLeft,
-      y: ev.pageY - this.pageMargins.top + this.gridRef.scrollTop,
+      x: ev.pageX - pageMargins.left + this.gridRef.scrollLeft,
+      y: ev.pageY - pageMargins.top + this.gridRef.scrollTop,
     }
     this.throttledSetHoverSpot(hoverPos)
   }
@@ -403,6 +408,8 @@ class FoamcoreGrid extends React.Component {
       // TODO not sure why stopDragging doesn't clear this out
       uiStore.multiMoveCardIds = []
     })
+    // Run immediately without throttling
+    this.calculateCardsToRender()
   }
 
   onResize = (cardId, newSize) => {
@@ -447,12 +454,12 @@ class FoamcoreGrid extends React.Component {
       const movePlaceholder = [...this.dragGridSpot.values()][0]
       // Save algorithm for what to do when dragging over card for collision
       // resolution later
+
       if (movePlaceholder.card) return
 
       const { row, col } = movePlaceholder
       const updates = { row, col }
       this.updateCardWithUndo(card, updates, undoMessage)
-      this.throttledCalculateCardsToRender()
     }
   }
 
