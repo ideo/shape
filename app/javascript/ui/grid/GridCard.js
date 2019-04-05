@@ -348,6 +348,7 @@ class GridCard extends React.Component {
         dragging={dragging}
         draggingMultiple={draggingMultiple}
         testCollectionCard={testCollectionCard}
+        unclickable={testCollectionCard || record.isImage}
         // mostly for E2E checking purposes
         data-width={card.width}
         data-height={card.height}
