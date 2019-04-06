@@ -122,7 +122,9 @@ class Breadcrumb extends React.Component {
 
     // First try truncating any long items to 25 chars
     items.forEach(item => {
-      if (item.name.length > 25) item.truncatedName = item.name.slice(0, 24)
+      if (item.name && item.name.length > 25) {
+        item.truncatedName = item.name.slice(0, 24)
+      }
     })
 
     charsLeftToTruncate = this.charsToTruncateForItems(items)
