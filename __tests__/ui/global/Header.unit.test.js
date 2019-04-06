@@ -142,41 +142,20 @@ describe('Header', () => {
     })
   })
 
-  describe.skip('when clicking on user', () => {
-    let settings, logout
-
-    // TODO: I don't know why this suite can't find the dropdown.
+  describe('when clicking on user', () => {
     beforeEach(() => {
       wrapper
         .find('.userBtn')
         .first()
         .simulate('click')
-      const menuProps = wrapper
-        .find('.userDropdown')
-        .find('MainMenuDropdown')
-        .props()
-      settings = menuProps.menuItems.find(
-        item => item.name === 'Account Settings'
-      )
-      logout = menuProps.menuItems.find(item => item.name === 'Logout')
     })
 
     it('renders the user menu', () => {
       const MainMenuDropdown = wrapper
         .find('.userDropdown')
         .find('MainMenuDropdown')
-      expect(MainMenuDropdown.props().menuOpen).toBe(true)
+      expect(MainMenuDropdown.props().open).toBe(true)
       expect(MainMenuDropdown.exists()).toBe(true)
-    })
-
-    it('has user settings option', () => {
-      expect(settings).toBeDefined()
-      expect(settings.onClick).toBeInstanceOf(Function)
-    })
-
-    it('has logout option', () => {
-      expect(logout).toBeDefined()
-      expect(logout.onClick).toBeInstanceOf(Function)
     })
   })
 })
