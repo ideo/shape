@@ -324,6 +324,8 @@ class MainMenuDropdown extends React.Component {
   }
 }
 
+MainMenuDropdown.displayName = 'MainMenuDropdown'
+
 MainMenuDropdown.propTypes = {
   context: PropTypes.string.isRequired,
   onItemClick: PropTypes.func,

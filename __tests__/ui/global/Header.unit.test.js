@@ -15,7 +15,7 @@ describe('Header', () => {
     props = {
       apiStore: fakeApiStore(),
       routingStore: fakeRoutingStore,
-      uiStore: fakeUiStore,
+      uiStore: { ...fakeUiStore },
     }
     props.apiStore.currentUser.current_organization.primary_group = group
     render = () => {
@@ -67,7 +67,6 @@ describe('Header', () => {
       fakeCollection.isNormalCollection = true
       fakeCollection.breadcrumb = [{ id: 12 }]
       props.uiStore.viewingCollection = fakeCollection
-      // TODO: how do I properly reset this state? uiStore.viewingCollection persists outside this block
       render()
     })
 
@@ -77,7 +76,6 @@ describe('Header', () => {
 
     describe('on the homepage', () => {
       beforeEach(() => {
-        // TODO: how do I properly reset this state?
         props.routingStore.isHomepage = true
         render()
       })
@@ -88,13 +86,10 @@ describe('Header', () => {
     })
   })
 
-  // TODO: Test fails due to state persisting from previous suite
   describe('with an editable item', () => {
     beforeEach(() => {
       fakeTextItem.can_edit = true
       props.uiStore.viewingItem = fakeTextItem
-      props.uiStore.viewingCollection = null
-      // TODO: how do I properly reset this state? uiStore.viewingItem persists outside this block
       render()
     })
 
