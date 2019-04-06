@@ -54,12 +54,10 @@ describe('RolesSummary', () => {
 
     it('renders 2 viewers and label', () => {
       expect(wrapper.find('[className="viewer"]').length).toEqual(2)
-      // expect(wrapper.render().text()).toMatch(/viewers/i)
     })
 
     it('does not render editors', () => {
       expect(wrapper.find('[className="editor"]').exists()).toBe(false)
-      // expect(wrapper.render().text()).not.toMatch(/editors/i)
     })
   })
 
@@ -74,11 +72,9 @@ describe('RolesSummary', () => {
 
     it('renders 2 editors and label', () => {
       expect(wrapper.find('[className="editor"]').length).toEqual(2)
-      // expect(wrapper.render().text()).toMatch(/editors/i)
     })
 
     it('does not render viewers', () => {
-      // expect(wrapper.render().text()).not.toMatch(/viewers/i)
       expect(wrapper.find('[className="viewer"]').exists()).toBe(false)
     })
   })
