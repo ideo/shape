@@ -31,52 +31,15 @@ describe('RolesSummary', () => {
     })
 
     it('renders editors', () => {
-      // TODO: Ok to remove? Lables were omitted from the new design
-      // expect(
-      //   wrapper
-      //     .find('StyledRoleTitle')
-      //     .at(0)
-      //     .render()
-      //     .text()
-      // ).toMatch(/editors/i)
       expect(wrapper.find('[className="editor"]').length).toEqual(2)
     })
 
     it('renders viewers', () => {
-      // TODO: Ok to remove? Lables were omitted from the new design
-      // expect(
-      //   wrapper
-      //     .find('StyledRoleTitle')
-      //     .at(1)
-      //     .render()
-      //     .text()
-      // ).toMatch(/viewers/i)
       expect(wrapper.find('[className="viewer"]').length).toEqual(2)
     })
 
     it('does not render StyledAddUserBtn by default', () => {
       expect(wrapper.find('StyledAddUserBtn').exists()).toBe(false)
-    })
-  })
-
-  // TODO: What should we do about custom labels now that they are removed from design?
-  describe.skip('with custom label', () => {
-    beforeEach(() => {
-      const newProps = {
-        ...emptyProps,
-        roles: [editorRole, { ...viewerRole, label: 'participant' }],
-      }
-      wrapper = shallow(<RolesSummary {...newProps} />)
-    })
-
-    it('renders viewers with custom label', () => {
-      expect(
-        wrapper
-          .find('StyledRoleTitle')
-          .at(1)
-          .render()
-          .text()
-      ).toMatch(/participants/i)
     })
   })
 

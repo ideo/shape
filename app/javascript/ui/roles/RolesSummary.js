@@ -40,16 +40,6 @@ const StyledAvatarGroup = styled.div`
 `
 StyledAvatarGroup.displayName = 'StyledAvatarGroup'
 
-const StyledRoleTitle = styled.div`
-  font-family: ${v.fonts.sans};
-  text-align: ${props => props.align || 'left'};
-  color: ${v.colors.commonDark};
-  font-size: 1rem;
-  font-weight: ${v.weights.book};
-  margin: 0 0 6px 0;
-`
-StyledRoleTitle.displayName = 'StyledRoleTitle'
-
 const StyledSeparator = styled.div`
   width: 1px;
   height: 32px;
