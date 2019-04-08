@@ -28,6 +28,7 @@ import v from '~/utils/variables'
 import firebaseClient from '~/vendor/firestore'
 import MuiTheme, { BillingMuiTheme } from '~/ui/theme'
 import captureGlobalKeypress from '~/utils/captureGlobalKeypress'
+import { uiStore } from '~/stores'
 
 const AppWrapper = styled.div`
   /* used by terms of use modal to blur the whole site */
@@ -96,7 +97,10 @@ class Routes extends React.Component {
             <ZendeskWidget />
 
             <Header />
-            <FixedBoundary className="fixed_boundary" />
+            <FixedBoundary
+              onClick={uiStore.deselectCards}
+              className="fixed_boundary"
+            />
             <FixedActivityLogWrapper>
               <ActivityLogBox />
             </FixedActivityLogWrapper>
