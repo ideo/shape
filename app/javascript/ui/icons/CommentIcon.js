@@ -1,11 +1,16 @@
 import Icon from './Icon'
 
 const CommentIcon = () => (
-  <Icon fill>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
+  <Icon data-leave-cards-selected fill>
+    <svg
+      data-leave-cards-selected
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 50 50"
+    >
       <title>Comments</title>
-      <g>
+      <g data-leave-cards-selected>
         <path
+          data-leave-cards-selected
           d="M36.1,22.5c0.9,0,1.6,0.8,1.6,1.6s-0.8,1.6-1.6,1.6H13.8c-0.9,0-1.6-0.8-1.6-1.6s0.8-1.6,1.6-1.6
       H36.1z M36.1,14.3c0.9,0,1.6,0.8,1.6,1.6c0,0.9-0.8,1.6-1.6,1.6H13.8c-0.9,0-1.6-0.8-1.6-1.6c0-0.9,0.7-1.6,1.6-1.6H36.1z
        M43.3,31.7c0,0.1-0.2,0.3-0.5,0.3H23.4c0,0,0,0-0.1,0s-0.1,0-0.2,0H23h-0.1c0,0-0.1,0-0.1,0.1c0,0-0.1,0-0.1,0.1l-0.1,0.1

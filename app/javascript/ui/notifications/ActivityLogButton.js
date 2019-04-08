@@ -45,7 +45,6 @@ class ActivityLogButton extends React.Component {
 
   handleClick = ev => {
     ev.preventDefault()
-    ev.stopPropagation()
     this.toggleActivityLog()
   }
 
@@ -57,9 +56,11 @@ class ActivityLogButton extends React.Component {
         active={uiStore.activityLogOpen}
         onClick={this.handleClick}
       >
-        <CommentIcon />
+        <CommentIcon data-leave-cards-selected />
         {this.activityCount > 0 && (
-          <ActivityCount className="count">{this.activityCount}</ActivityCount>
+          <ActivityCount data-leave-cards-selected className="count">
+            {this.activityCount}
+          </ActivityCount>
         )}
       </CircledIcon>
     )
