@@ -141,6 +141,10 @@ class Modal extends React.Component {
     if (onClose) onClose()
   }
 
+  handleClick = ev => {
+    ev.stopPropagation()
+  }
+
   render() {
     const {
       children,
@@ -153,11 +157,15 @@ class Modal extends React.Component {
     } = this.props
     let wrappedTitle = title
     if (typeof title === 'string') {
-      wrappedTitle = <StyledHeading2>{title}</StyledHeading2>
+      wrappedTitle = (
+        <StyledHeading2 data-leave-cards-selected>{title}</StyledHeading2>
+      )
     }
     // TODO progamatically set disableAutoFocus
     return (
       <StyledDialog
+        onClick={this.handleClick}
+        data-leave-cards-selected
         classes={{ paper: 'modal__paper' }}
         disableAutoFocus
         open={open}
@@ -171,6 +179,8 @@ class Modal extends React.Component {
           for built-in scrolling to work (where title remains fixed at top)
         */}
         <StyledDialogTitle
+          onClick={this.handleClick}
+          data-leave-cards-selected
           classes={{ root: 'modal__padding' }}
           disableTypography
           id="sharing"
@@ -185,11 +195,16 @@ class Modal extends React.Component {
         </StyledDialogTitle>
         {/* if onClose is not supplied, then the modal is "locked" until user takes an action */}
         {_.isFunction(onClose) && (
-          <ModalCloseButton onClick={this.handleClose}>
-            <CloseIcon />
+          <ModalCloseButton
+            data-leave-cards-selected
+            onClick={this.handleClose}
+          >
+            <CloseIcon data-leave-cards-selected onClick={this.handleClick} />
           </ModalCloseButton>
         )}
         <StyledDialogContent
+          onClick={this.handleClick}
+          data-leave-cards-selected
           innerRef={this.contentArea}
           className={['modal__padding', noScroll && 'modal__no-scroll'].join(
             ' '
