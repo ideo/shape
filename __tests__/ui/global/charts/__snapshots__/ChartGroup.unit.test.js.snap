@@ -3820,7 +3820,7 @@ exports[`ChartGroup renders snapshot 1`] = `
       axisComponent={
         <LineSegment
           lineComponent={<Line />}
-          type="axis"
+          transform="translate(10 26) scale(0.955)"
         />
       }
       axisLabelComponent={

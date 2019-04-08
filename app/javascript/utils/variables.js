@@ -46,6 +46,7 @@ export default {
   containerPadding: {
     horizontal: 2,
   },
+  maxTitleLength: 144,
 
   // Keep in sync with assets/stylesheets/core/base.scss
   responsive: {

@@ -108,15 +108,37 @@ class MovableGridCard extends React.PureComponent {
     })
   }
 
+  scrollAmount = () => {
+    // When zooming browser in or out, it doesn't work to use `1` as the unit,
+    // There aren't any reliable ways to get the zoom level from all browsers.
+    // This library doesn't work: https://github.com/tombigel/detect-zoom.
+    // window.devicePixelRatio doesn't work on all browsers.
+    // Setting a div of a fixed width on the page and measuring it's width doesn't work.
+    //
+    // What we need is to return a value that is > 1 for zoomed in screens
+    // window.devicePixelRatio will be 1 for non-retina
+    // and retina is likely at 2, but if zoomed out to 50% is 1
+    //
+    let scrollAmount
+    if (window.devicePixelRatio >= 2) {
+      scrollAmount = window.devicePixelRatio
+    } else if (window.devicePixelRatio >= 1) {
+      scrollAmount = 2
+    } else {
+      // After testing out multiple values, this seemed to be the right balance
+      scrollAmount = 1.5 / window.devicePixelRatio
+    }
+    return scrollAmount
+  }
+
   scrollUp = (timestamp, clientY) => {
     if (clientY) this.clientY = clientY
     if (!this.scrolling) return null
     if (window.scrollY < 10) {
       return window.requestAnimationFrame(this.scrollUp)
     }
-    const scrollAmount = 1
 
-    window.scrollBy(0, -scrollAmount)
+    window.scrollBy(0, -this.scrollAmount())
 
     return window.requestAnimationFrame(this.scrollUp)
   }
@@ -129,9 +151,8 @@ class MovableGridCard extends React.PureComponent {
     ) {
       return window.requestAnimationFrame(this.scrollDown)
     }
-    const scrollAmount = 1
 
-    window.scrollBy(0, scrollAmount)
+    window.scrollBy(0, this.scrollAmount())
 
     return window.requestAnimationFrame(this.scrollDown)
   }
@@ -141,6 +162,8 @@ class MovableGridCard extends React.PureComponent {
     // Global dragging should use screen coordinates
     // TODO this could also be a HOC that publishes to the UI store
     const { pageX, pageY } = e
+    // When zooming browser in or out, it multiplies pageX and pageY by that zoom
+    // e.g. 50% zoom multiplies all coordinate values by 2
     uiStore.drag({ x: pageX, y: pageY })
 
     // x, y represent the current drag position
@@ -327,11 +350,13 @@ class MovableGridCard extends React.PureComponent {
   )
 
   renderPagination = () => {
+    const { loadCollectionCards } = this.props
     const collection = this.props.parent
     return (
       <PositionedGridCard {...this.styleProps()}>
         <GridCardPagination
           collection={collection}
+          loadCollectionCards={loadCollectionCards}
           nextPage={collection.nextPage}
         />
       </PositionedGridCard>

@@ -495,7 +495,10 @@ describe Collection, type: :model do
     context 'with pagination' do
       it 'should only show the appropriate page' do
         # just make a simple 1 per-page request
-        first_page = collection.collection_cards_viewable_by(user, per_page: 1)
+        scope = collection.collection_cards_by_page(
+          per_page: 1,
+        )
+        first_page = collection.collection_cards_viewable_by(user, scope: scope)
         expect(first_page).to match_array([cards.first])
       end
     end
@@ -508,6 +511,42 @@ describe Collection, type: :model do
       it 'should only show the un-hidden cards' do
         expect(collection.collection_cards_viewable_by(user)).to match_array(cards.where(hidden: false))
       end
+    end
+  end
+
+  describe '#collection_cards_by_page' do
+    let!(:collection) { create(:collection, num_cards: 3, record_type: :collection) }
+
+    it 'returns cards on page' do
+      expect(collection.collection_cards_by_page(page: 2, per_page: 1)).to eq(
+        [collection.collection_cards[1]]
+      )
+    end
+  end
+
+  describe '#collection_cards_by_row_and_col' do
+    let!(:collection) { create(:collection, num_cards: 4, record_type: :collection) }
+    let(:collection_cards) { collection.collection_cards }
+    let!(:matching_cards) do
+      collection_cards[0].update(row: 3, col: 5)
+      collection_cards[1].update(row: 6, col: 5)
+      [
+        collection_cards[0],
+        collection_cards[1],
+      ]
+    end
+    let!(:non_matching_cards) do
+      collection_cards[2].update(row: 2, col: 5)
+      collection_cards[3].update(row: 11, col: 5)
+    end
+
+    it 'returns cards matching row and col' do
+      expect(
+        collection.collection_cards_by_row_and_col(
+          rows: [3, 10],
+          cols: [4, 6],
+        )
+      ).to eq(matching_cards)
     end
   end
 

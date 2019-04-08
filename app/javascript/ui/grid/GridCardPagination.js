@@ -36,10 +36,12 @@ class GridCardPagination extends React.Component {
   }
 
   async fetchNextPage() {
-    const { collection, nextPage } = this.props
+    const { collection, nextPage, loadCollectionCards } = this.props
     if (nextPage > collection.totalPages) return
     this.update('loading', true)
-    await collection.API_fetchCards({ page: nextPage })
+    await loadCollectionCards({
+      page: nextPage,
+    })
     // just in case it loads the next page quickly, prevent quickly loading 2 pages in a row
     setTimeout(() => {
       this.update('loading', false)
@@ -73,6 +75,7 @@ class GridCardPagination extends React.Component {
 GridCardPagination.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   nextPage: PropTypes.number.isRequired,
+  loadCollectionCards: PropTypes.func.isRequired,
 }
 
 export default GridCardPagination

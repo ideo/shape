@@ -7,9 +7,9 @@ describe('GridCardPagination', () => {
     props = {
       collection: fakeCollection,
       nextPage: 2,
+      loadCollectionCards: jest.fn(() => Promise.resolve()),
     }
     props.collection.totalPages = 2
-    props.collection.API_fetchCards.mockClear()
     wrapper = shallow(<GridCardPagination {...props} />)
     component = wrapper.instance()
   })
@@ -20,7 +20,7 @@ describe('GridCardPagination', () => {
 
   it('calls collection.API_fetchCards on visibility trigger', () => {
     component.handleVisibilityChange(true)
-    expect(props.collection.API_fetchCards).toHaveBeenCalledWith({
+    expect(props.loadCollectionCards).toHaveBeenCalledWith({
       page: props.nextPage,
     })
   })
@@ -38,7 +38,7 @@ describe('GridCardPagination', () => {
 
     it('does not call collection.API_fetchCards', () => {
       component.handleVisibilityChange(true)
-      expect(props.collection.API_fetchCards).not.toHaveBeenCalled()
+      expect(props.loadCollectionCards).not.toHaveBeenCalled()
     })
   })
 })

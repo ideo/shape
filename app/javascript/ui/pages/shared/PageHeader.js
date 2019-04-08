@@ -42,6 +42,7 @@ const IconHolder = styled.span`
     props.align === 'left'
       ? 'margin-right: 12px;'
       : 'margin-left: 6px;'} margin-top: 12px;
+  overflow: hidden;
   width: 32px;
 
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {

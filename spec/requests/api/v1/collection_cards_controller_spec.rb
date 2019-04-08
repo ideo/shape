@@ -170,6 +170,42 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         end
       end
     end
+
+    context 'with Board collection' do
+      let!(:board_collection) do
+        create(:board_collection, num_cards: 4, add_editors: [user])
+      end
+      let(:board_collection_cards) { board_collection.collection_cards }
+      let(:path) do
+        "/api/v1/collections/#{board_collection.id}/collection_cards?rows[]=2&rows[]=4&cols[]=0&cols[]=2"
+      end
+      let!(:cards_included) do
+        board_collection_cards[0].update(row: 2, col: 0)
+        board_collection_cards[1].update(row: 4, col: 2)
+        [
+          board_collection_cards[0],
+          board_collection_cards[1],
+        ]
+      end
+      let!(:cards_excluded) do
+        board_collection_cards[2].update(row: 0, col: 0)
+        board_collection_cards[3].update(row: 2, col: 3)
+        [
+          board_collection_cards[2],
+          board_collection_cards[3],
+        ]
+      end
+      before do
+        board_collection.items.each { |i| user.add_role(Role::VIEWER, i) }
+      end
+
+      it 'includes cards with requested rows and columns' do
+        get(path)
+        expect(
+          json['data'].map { |card| card['id'].to_i },
+        ).to match_array(cards_included.map(&:id))
+      end
+    end
   end
 
   describe 'POST #create' do

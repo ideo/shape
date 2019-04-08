@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import {
+  LineSegment,
   VictoryAxis,
   VictoryChart,
   VictoryLabel,
@@ -124,6 +125,7 @@ class ChartGroup extends React.PureComponent {
       axis: {
         stroke: v.colors.commonMedium,
         strokeWidth: 25,
+        strokeLinecap: 'square',
         transform: 'translateY(22px)',
       },
     }
@@ -143,6 +145,8 @@ class ChartGroup extends React.PureComponent {
       }
     }
 
+    // NOTE: The transform property is for IE11 which doesn't recognize CSS
+    // transform properties on SVG
     return this.primaryDatasetValues > 1 ? (
       <VictoryAxis
         tickLabelComponent={
@@ -156,6 +160,9 @@ class ChartGroup extends React.PureComponent {
         }
         offsetY={13}
         style={this.chartAxisStyle}
+        axisComponent={
+          <LineSegment transform="translate(10 26) scale(0.955)" />
+        }
       />
     ) : (
       <VictoryAxis
@@ -163,6 +170,9 @@ class ChartGroup extends React.PureComponent {
         style={this.chartAxisStyle}
         tickFormat={t => null}
         offsetY={13}
+        axisComponent={
+          <LineSegment transform="translate(10 26) scale(0.955)" />
+        }
         label={this.fullDate(this.primaryDatasetValues[0].date)}
       />
     )

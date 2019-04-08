@@ -28,6 +28,7 @@ describe('FoamcoreGrid', () => {
       gridH: 200,
       gutter: 10,
       sortBy: 'order',
+      loadCollectionCards: jest.fn(() => Promise.resolve()),
       updateCollection: jest.fn(),
       cardProperties: [],
       apiStore: fakeApiStore(),
@@ -131,6 +132,8 @@ describe('FoamcoreGrid', () => {
       instance.moveCard = jest.fn().mockReturnValue()
       instance.resizeCard = jest.fn().mockReturnValue()
       instance.dragging = true
+      // Stub this or else it causes mobx `Maximum call stack size exceeded`
+      instance.calculateCardsToRender = jest.fn()
       props.uiStore.multiMoveCardIds = [cards[0].id]
       instance.onDragOrResizeStop(cardId, 'move')
     })
@@ -139,6 +142,7 @@ describe('FoamcoreGrid', () => {
       expect(instance.dragGridSpot.size).toEqual(0)
       expect(instance.dragging).toEqual(false)
       expect(props.uiStore.multiMoveCardIds.length).toBe(0)
+      expect(instance.calculateCardsToRender).toHaveBeenCalled()
     })
 
     describe('when moving', () => {
@@ -148,6 +152,7 @@ describe('FoamcoreGrid', () => {
 
       it('should try and move the card with the found card', () => {
         expect(instance.moveCard).toHaveBeenCalledWith(cards[0])
+        expect(instance.calculateCardsToRender).toHaveBeenCalled()
       })
     })
 
@@ -159,10 +164,12 @@ describe('FoamcoreGrid', () => {
 
       it('should try and resize the card with the found card', () => {
         expect(instance.resizeCard).toHaveBeenCalledWith(cards[0])
+        expect(instance.calculateCardsToRender).toHaveBeenCalled()
       })
 
       it('should stop all resizing and moving', () => {
         expect(instance.resizing).toEqual(false)
+        expect(instance.calculateCardsToRender).toHaveBeenCalled()
       })
     })
   })
@@ -237,6 +244,87 @@ describe('FoamcoreGrid', () => {
         const edgeRow = instance.calcEdgeRow(cardA, cardA.id)
         expect(edgeRow).toEqual(1)
       })
+    })
+  })
+
+  describe('loadAfterScroll', () => {
+    beforeEach(() => {
+      instance.loadedRows = { min: 0, max: 9 }
+      instance.loadedCols = { min: 0, max: 9 }
+      instance.loadCards = jest.fn()
+    })
+
+    describe('scrolling in loaded bounds', () => {
+      beforeEach(() => {
+        // `Object.defineProperty` is the only way I could find to stub getter methods
+        Object.defineProperty(instance, 'visibleCols', {
+          get: jest.fn().mockReturnValue({ min: 0, max: 4, num: 5 }),
+        })
+        Object.defineProperty(instance, 'visibleRows', {
+          get: jest.fn().mockReturnValue({ min: 1, max: 4, num: 4 }),
+        })
+      })
+
+      it('does not call loadCards if all in view', () => {
+        instance.loadAfterScroll()
+        expect(instance.loadCards).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('scrolling out of bounds vertically', () => {
+      beforeEach(() => {
+        Object.defineProperty(instance, 'visibleRows', {
+          get: jest.fn().mockReturnValue({ min: 4, max: 8, num: 4 }),
+        })
+        Object.defineProperty(instance, 'visibleCols', {
+          get: jest.fn().mockReturnValue({ min: 0, max: 4, num: 5 }),
+        })
+      })
+
+      it('calls loadMoreRows', () => {
+        const expectedRowsCols = {
+          cols: [0, 10],
+          rows: [10, 14],
+        }
+        instance.loadAfterScroll()
+        expect(instance.loadCards).toHaveBeenCalledWith(expectedRowsCols)
+      })
+    })
+
+    describe('scrolling out of bounds horizontally', () => {
+      beforeEach(() => {
+        Object.defineProperty(instance, 'visibleCols', {
+          get: jest.fn().mockReturnValue({ min: 2, max: 6, num: 5 }),
+        })
+        Object.defineProperty(instance, 'visibleRows', {
+          get: jest.fn().mockReturnValue({ min: 0, max: 3, num: 4 }),
+        })
+      })
+
+      it('calls loadMoreRows', () => {
+        const expectedRowsCols = {
+          cols: [10, 15],
+          rows: [0, 8],
+        }
+        instance.loadAfterScroll()
+        expect(instance.loadCards).toHaveBeenCalledWith(expectedRowsCols)
+      })
+    })
+  })
+
+  describe('loadCards', () => {
+    beforeEach(() => {
+      props.loadCollectionCards = jest.fn()
+      rerender()
+    })
+
+    it('calls props.loadCollectionCards', () => {
+      const rowsCols = {
+        cols: [10, 15],
+        rows: [0, 8],
+      }
+      instance.loadCards(rowsCols)
+      expect(props.loadCollectionCards).toHaveBeenCalledWith(rowsCols)
     })
   })
 

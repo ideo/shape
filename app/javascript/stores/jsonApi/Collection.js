@@ -29,6 +29,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   currentOrder = 'order'
   @observable
   totalPages = 1
+  recordsPerPage = 50
 
   attributesForAPI = [
     'name',
@@ -353,9 +354,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   async API_fetchCards({
     page = 1,
-    per_page = 50,
+    per_page = null,
     order,
     hidden = false,
+    rows,
+    cols,
   } = {}) {
     runInAction(() => {
       if (order) this.currentOrder = order
@@ -364,26 +367,37 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       page,
       per_page,
     }
+    if (!params.per_page) {
+      params.per_page = this.recordsPerPage
+    }
     if (this.currentOrder !== 'order') {
       params.card_order = this.currentOrder
     }
     if (hidden) {
       params.hidden = true
     }
+    if (rows && cols) {
+      params.rows = rows
+      params.cols = cols
+    }
     const apiPath = `collections/${
       this.id
-    }/collection_cards?${queryString.stringify(params)}`
+    }/collection_cards?${queryString.stringify(params, {
+      arrayFormat: 'bracket',
+    })}`
     const res = await this.apiStore.request(apiPath)
     const { data, links } = res
     runInAction(() => {
       this.totalPages = links.last
       this.currentPage = page
-      if (page === 1) {
+      if (!this.isBoard && page === 1) {
         // NOTE: If we ever want to "remember" collections where you've previously loaded 50+
         // we could think about handling this differently.
         this.collection_cards.replace(data)
       } else {
-        this.collection_cards = this.collection_cards.concat(data)
+        // For foam core collections we sometimes retrieve
+        // the same card twice so we must de-dupe
+        this.collection_cards = _.unionBy(this.collection_cards, data, 'id')
       }
     })
   }
