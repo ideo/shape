@@ -62,6 +62,29 @@ const cardCSSTransition = 'transform 0.4s, width 0.25s, height 0.25s'
 const cardHoverTransition = 'transform 0.2s'
 const TOP_SCROLL_TRIGGER = 210
 
+const scrollAmount = () => {
+  // When zooming browser in or out, it doesn't work to use `1` as the unit,
+  // There aren't any reliable ways to get the zoom level from all browsers.
+  // This library doesn't work: https://github.com/tombigel/detect-zoom.
+  // window.devicePixelRatio doesn't work on all browsers.
+  // Setting a div of a fixed width on the page and measuring it's width doesn't work.
+  //
+  // What we need is to return a value that is > 1 for zoomed in screens
+  // window.devicePixelRatio will be 1 for non-retina
+  // and retina is likely at 2, but if zoomed out to 50% is 1
+  //
+  let amount
+  if (window.devicePixelRatio >= 2) {
+    amount = window.devicePixelRatio
+  } else if (window.devicePixelRatio >= 1) {
+    amount = 2
+  } else {
+    // After testing out multiple values, this seemed to be the right balance
+    amount = 1.5 / window.devicePixelRatio
+  }
+  return amount
+}
+
 class MovableGridCard extends React.PureComponent {
   constructor(props) {
     super(props)
@@ -111,29 +134,6 @@ class MovableGridCard extends React.PureComponent {
       initialOffsetX,
       initialOffsetY,
     })
-  }
-
-  scrollAmount = () => {
-    // When zooming browser in or out, it doesn't work to use `1` as the unit,
-    // There aren't any reliable ways to get the zoom level from all browsers.
-    // This library doesn't work: https://github.com/tombigel/detect-zoom.
-    // window.devicePixelRatio doesn't work on all browsers.
-    // Setting a div of a fixed width on the page and measuring it's width doesn't work.
-    //
-    // What we need is to return a value that is > 1 for zoomed in screens
-    // window.devicePixelRatio will be 1 for non-retina
-    // and retina is likely at 2, but if zoomed out to 50% is 1
-    //
-    let scrollAmount
-    if (window.devicePixelRatio >= 2) {
-      scrollAmount = window.devicePixelRatio
-    } else if (window.devicePixelRatio >= 1) {
-      scrollAmount = 2
-    } else {
-      // After testing out multiple values, this seemed to be the right balance
-      scrollAmount = 1.5 / window.devicePixelRatio
-    }
-    return scrollAmount
   }
 
   scrollIfNearPageBounds = e => {
@@ -188,7 +188,7 @@ class MovableGridCard extends React.PureComponent {
       return window.requestAnimationFrame(this.scrollUp)
     }
 
-    this.scrollElement.scrollBy(0, -this.scrollAmount())
+    this.scrollElement.scrollBy(0, -scrollAmount())
 
     return window.requestAnimationFrame(this.scrollUp)
   }
@@ -202,7 +202,7 @@ class MovableGridCard extends React.PureComponent {
       return window.requestAnimationFrame(this.scrollDown)
     }
 
-    this.scrollElement.scrollBy(0, this.scrollAmount())
+    this.scrollElement.scrollBy(0, scrollAmount())
 
     return window.requestAnimationFrame(this.scrollDown)
   }
@@ -210,14 +210,14 @@ class MovableGridCard extends React.PureComponent {
   scrollLeft = timestamp => {
     if (!this.scrolling) return null
 
-    this.scrollElement.scrollBy(-this.scrollAmount(), 0)
+    this.scrollElement.scrollBy(-scrollAmount(), 0)
     return window.requestAnimationFrame(this.scrollLeft)
   }
 
   scrollRight = timestamp => {
     if (!this.scrolling) return null
 
-    this.scrollElement.scrollBy(this.scrollAmount(), 0)
+    this.scrollElement.scrollBy(scrollAmount(), 0)
     return window.requestAnimationFrame(this.scrollRight)
   }
 
