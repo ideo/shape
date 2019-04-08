@@ -561,18 +561,13 @@ export default class UiStore {
 
   deselectCards = e => {
     if (!e) return
-    console.log('UiStore#deselectCards target: ', e.target)
-    // let people select mutliple cards without deselecting
+    // let people interact w/ controls without deselecting cards
     const { target } = e
     const leaveCardsSelected = target.getAttribute('data-leave-cards-selected')
 
-    if (leaveCardsSelected) {
-      console.log('exiting b/c of data attribute: leave cards selected')
-      return
-    }
+    if (leaveCardsSelected) return
 
     runInAction(() => {
-      console.log('deselecting cards')
       this.selectedCardIds.replace([])
     })
   }
