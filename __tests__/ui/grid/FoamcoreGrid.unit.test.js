@@ -20,6 +20,7 @@ describe('FoamcoreGrid', () => {
     cardC = createCard({ col: 0, row: 2, width: 2 })
     const collection = fakeCollection
     collection.collection_cards = [cardA, cardB, cardC]
+    collection.confirmEdit = jest.fn()
 
     props = {
       collection,
@@ -194,6 +195,42 @@ describe('FoamcoreGrid', () => {
         col: cards[0].col,
         width: 2,
         height: 1,
+      })
+    })
+  })
+
+  describe('moveCard', () => {
+    beforeEach(() => {
+      instance.dragGridSpot.set('6,7', { col: 6, row: 7 })
+    })
+
+    it('calls updateCardWithUndo', () => {
+      instance.updateCardWithUndo = jest.fn()
+      instance.moveCard(cards[0])
+      expect(instance.updateCardWithUndo).toHaveBeenCalledWith(
+        cards[0],
+        {
+          col: 6,
+          row: 7,
+        },
+        'Card move undone'
+      )
+    })
+
+    it('calls props.collection.confirmEdit with props.updateCollection', () => {
+      instance.moveCard(cards[0])
+      expect(props.collection.confirmEdit).toHaveBeenCalled()
+    })
+
+    describe('when moving multiple cards', () => {
+      beforeEach(() => {
+        props.uiStore.multiMoveCardIds = [cards[0].id, cards[1].id]
+        rerender()
+      })
+
+      it('does not call props.collection.confirmEdit', () => {
+        instance.moveCard(cards[0])
+        expect(props.collection.confirmEdit).not.toHaveBeenCalled()
       })
     })
   })

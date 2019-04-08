@@ -346,7 +346,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (this.collection_cards) {
       data.attributes.collection_cards_attributes = _.map(
         this.collection_cards,
-        card => _.pick(card, ['id', 'order', 'width', 'height'])
+        card => _.pick(card, ['id', 'order', 'width', 'height', 'row', 'col'])
       )
     }
     return data

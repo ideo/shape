@@ -193,16 +193,18 @@ class FoamcoreGrid extends React.Component {
 
   updateCardWithUndo(card, updates, undoMessage) {
     // TODO combine with normal grid
-    const { collection } = this.props
+    const { collection, updateCollection } = this.props
     // If a template, warn that any instances will be updated
+
     const updateCollectionCard = () => {
       // this will assign the update attributes to the card
-      this.props.updateCollection({
+      updateCollection({
         card,
         updates,
         undoMessage,
       })
     }
+
     collection.confirmEdit({
       onCancel: () => {},
       onConfirm: updateCollectionCard,

@@ -15,6 +15,8 @@ class CollectionCard extends BaseRecord {
     'order',
     'width',
     'height',
+    'row',
+    'col',
     'reference',
     'parent_id',
     'collection_id',
