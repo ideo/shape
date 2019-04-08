@@ -465,6 +465,26 @@ class FoamcoreGrid extends React.Component {
     }
   }
 
+  moveCards = (cards, updates, undoMessage) => {
+    const { collection, batchUpdateCollection } = this.props
+
+    const onCancel = () => this.positionCardsFromProps()
+
+    const updateCollectionCard = () => {
+      batchUpdateCollection({
+        cards,
+        updates,
+        undoMessage,
+      })
+      this.positionCardsFromProps()
+    }
+
+    collection.confirmEdit({
+      onCancel,
+      onConfirm: updateCollectionCard,
+    })
+  }
+
   /*
    * Sets the current spots that are being dragged on, whether it's a card
    * or a blank spot that then has to be rendered
