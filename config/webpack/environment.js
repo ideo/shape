@@ -92,8 +92,27 @@ const addReactGlobal = env => {
   return env
 }
 
+const addCircularDependencyPlugin = env => {
+  const CircularDependencyPlugin = require('circular-dependency-plugin')
+
+  env.plugins.insert(
+    'CircularDependency',
+    new CircularDependencyPlugin({
+      // exclude detection of files based on a RegExp
+      exclude: /a\.js|node_modules/,
+      // add errors to webpack instead of warnings
+      failOnError: true,
+      // set the current working directory for displaying module paths
+      cwd: process.cwd(),
+    })
+  )
+
+  return env
+}
+
 const updateEnvironment = flow(
   DEV ? addReactHotLoader : identity,
+  DEV ? addCircularDependencyPlugin : identity,
   addReactGlobal,
   addReactSVGLoader,
   addTypescriptLoader,
