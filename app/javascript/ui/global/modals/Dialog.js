@@ -63,6 +63,10 @@ const PromptText = styled.span`
 `
 
 class Dialog extends React.PureComponent {
+  handleClick = ev => {
+    ev.stopPropagation()
+  }
+
   handleClose = ev => {
     ev.preventDefault()
     const { onClose } = this.props
@@ -102,6 +106,7 @@ class Dialog extends React.PureComponent {
           paperWidthMd: 'modal__paper-md',
         }}
         onClose={this.handleClose}
+        onClick={this.handleClick}
         onBackdropClick={this.handleClose}
         aria-labelledby="Confirmation"
         BackdropProps={{ invisible: true }}

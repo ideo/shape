@@ -567,10 +567,9 @@ class FoamcoreGrid extends React.Component {
   }
 
   render() {
-    const { gridW, uiStore } = this.props
+    const { gridW } = this.props
     return (
       <Grid
-        onClick={uiStore.deselectCards}
         onMouseMove={this.handleMouseMove}
         innerRef={ref => {
           this.gridRef = ref

@@ -175,11 +175,12 @@ class RolesSummary extends React.Component {
     if (!canEdit) return ''
     return (
       <StyledAddUserBtn
+        data-leave-cards-selected
         role="button"
         onClick={this.props.handleClick}
-       >
-         +
-       </StyledAddUserBtn>
+      >
+        +
+      </StyledAddUserBtn>
     )
   }
 

@@ -561,29 +561,18 @@ export default class UiStore {
 
   deselectCards = e => {
     if (!e) return
-    console.log('deselectCards event: ', e)
-    console.log('deselectCards event: ', e.target)
+    console.log('UiStore#deselectCards target: ', e.target)
+    // let people select mutliple cards without deselecting
     const { target } = e
-    const role = target.getAttribute('role')
-    if (role) {
-      console.log('role is: ', role)
-    }
-    // add guard clauses as needed
-    if (role && role === 'button') return
+    const leaveCardsSelected = target.getAttribute('data-leave-cards-selected')
 
-    if (target.tagName !== 'SVG') {
-      const parent = target.parentElement
-      if (parent.tagName === 'BUTTON') return
-      const grandparent = parent.parentElement
-      if (grandparent.tagName === 'BUTTON') return
-    }
-    const ALLOWED_ELEMENT_TAGS = ['BUTTON', 'INPUT']
-    // Don't deselect if clicking on button, input (search)
-    if (ALLOWED_ELEMENT_TAGS.some(el => el === target.tagName)) {
+    if (leaveCardsSelected) {
+      console.log('exiting b/c of data attribute: leave cards selected')
       return
     }
 
     runInAction(() => {
+      console.log('deselecting cards')
       this.selectedCardIds.replace([])
     })
   }

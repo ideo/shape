@@ -45,12 +45,14 @@ class ActivityLogButton extends React.Component {
 
   handleClick = ev => {
     ev.preventDefault()
+    ev.stopPropagation()
     this.toggleActivityLog()
   }
 
   render() {
     return (
       <CircledIcon
+        data-leave-cards-selected
         key="comments"
         active={uiStore.activityLogOpen}
         onClick={this.handleClick}

@@ -435,7 +435,7 @@ class CollectionPage extends React.Component {
         <PageHeader
           record={collection}
           isHomepage={isHomepage}
-          onClick={uiStore.deselectCards}
+          // onClick={uiStore.deselectCards}
         />
         {!isLoading && (
           <PageContainer>

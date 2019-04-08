@@ -214,7 +214,7 @@ class PopoutMenu extends React.Component {
     return (
       <StyledMenuButtonWrapper
         className={`${wrapperClassName} ${menuOpen && ' open'}`}
-        role="presentation"
+        role="presentation" // Why is this not button?
         onMouseLeave={onMouseLeave}
         hideDotMenu={hideDotMenu}
       >
