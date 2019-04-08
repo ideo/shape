@@ -144,7 +144,6 @@ class ApiStore extends jsonapi(datxCollection) {
       const currentUser = res.data
       this.setCurrentUserInfo({
         id: currentUser.id,
-        filestackToken: currentUser.filestack_token,
         organizationId:
           currentUser.current_organization &&
           currentUser.current_organization.id,
@@ -501,25 +500,6 @@ class ApiStore extends jsonapi(datxCollection) {
       })
     }
     return org
-  }
-
-  beginTokenRefreshPoller() {
-    if (this.filestackTokenInterval) {
-      clearInterval(this.filestackTokenInterval)
-    }
-    // token expires in an hour, attempt refresh every 20m just to be safe
-    this.filestackTokenInterval = setInterval(() => {
-      this.refreshFilestackToken()
-    }, 1000 * 60 * 20)
-  }
-
-  async refreshFilestackToken() {
-    try {
-      this.filestackToken = await this.requestJson('filestack/token')
-    } catch (e) {
-      trackError(e, { source: 'refreshFilestackToken', name: 'fetchToken' })
-    }
-    return this.filestackToken
   }
 
   // default action for updating any basic apiStore value

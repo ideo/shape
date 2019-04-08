@@ -60,7 +60,6 @@ class Routes extends React.Component {
     const { apiStore } = this.props
     apiStore.loadCurrentUser().then(() => {
       firebaseClient.authenticate(apiStore.currentUser.google_auth_token)
-      apiStore.beginTokenRefreshPoller()
     })
     document.addEventListener('keydown', captureGlobalKeypress)
   }
