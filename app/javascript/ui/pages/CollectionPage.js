@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import _ from 'lodash'
 import { Fragment } from 'react'
 import pluralize from 'pluralize'

@@ -5,7 +5,6 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import queryString from 'query-string'
 
 import Loader from '~/ui/layout/Loader'
-import Header from '~/ui/layout/Header'
 import Deactivated from '~/ui/layout/Deactivated'
 import MoveModal from '~/ui/grid/MoveModal'
 import PageContainer from '~/ui/layout/PageContainer'
