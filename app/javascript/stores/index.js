@@ -33,11 +33,12 @@ config.transformRequest = options => {
   return options
 }
 
-export const apiStore = new ApiStore()
 export const networkStore = new NetworkStore()
 export const routingStore = new RoutingStore()
 export const uiStore = new UiStore()
 export const undoStore = new UndoStore()
+// apiStore acts as a middleman for supplying other stores to models
+export const apiStore = new ApiStore({ routingStore, uiStore, undoStore })
 
 export default {
   apiStore,

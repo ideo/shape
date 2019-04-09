@@ -84,6 +84,7 @@ const fakeUiStore = {
   captureKeyboardGridClick: jest.fn(),
   popupAlert: jest.fn(),
   stopDragging: jest.fn(),
+  setSnoozeChecked: jest.fn(),
 }
 
 export default fakeUiStore
