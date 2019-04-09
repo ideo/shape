@@ -82,7 +82,7 @@ describe('CollectionPage', () => {
     })
 
     it('should update the collection cards through api', () => {
-      expect(collection.API_updateCards).toHaveBeenCalled()
+      expect(collection.API_updateCard).toHaveBeenCalled()
     })
 
     it('should track an event for updating the collection', () => {

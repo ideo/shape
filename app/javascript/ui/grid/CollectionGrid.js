@@ -224,10 +224,10 @@ class CollectionGrid extends React.Component {
       // we want to update this card to match the placeholder
       const { order } = placeholder
       let { width, height } = placeholder
-      const updates = { order }
       let undoMessage = 'Card move undone'
-      let updateCollectionCard
-      const onCancel = () => this.positionCardsFromProps()
+      const updates = []
+      const { trackCollectionUpdated } = this.props
+
       // don't resize the card for a drag, only for an actual resize
       if (dragType === 'resize') {
         // just some double-checking validations
@@ -237,33 +237,42 @@ class CollectionGrid extends React.Component {
         if (original.height !== height || original.width !== width) {
           undoMessage = 'Card resize undone'
         }
-        updates.width = width
-        updates.height = height
-
-        // If a template, warn that any instances will be updated
-        updateCollectionCard = () => {
-          // this will assign the update attributes to the card
-          this.props.updateCollection({
-            card: original,
-            updates,
-            undoMessage,
-          })
-          this.positionCardsFromProps()
-        }
+        updates.push({
+          card: original,
+          order,
+          width,
+          height,
+        })
       }
-      // TODO add same template confirmation for multi-item moving
       if (uiStore.multiMoveCardIds.length > 0) {
-        updateCollectionCard = () => {
-          this.props.batchUpdateCollection({
-            cards: multiMoveCards,
-            updates,
-            undoMessage,
+        // Set order for moved cards so they are between whole integers,
+        // and the backend will then take care of setting
+        // it properly amongst the entire collection
+        const sortedCards = _.sortBy(multiMoveCards, 'order')
+        _.each(sortedCards, (card, idx) => {
+          const sortedOrder = order + (idx + 1) * 0.1
+          updates.push({
+            card,
+            order: sortedOrder,
           })
-          this.positionCardsFromProps()
-        }
+        })
       }
 
-      collection.confirmEdit({ onCancel, onConfirm: updateCollectionCard })
+      const onConfirm = () => {
+        this.positionCardsFromProps()
+        trackCollectionUpdated()
+      }
+      const onCancel = () => this.positionCardsFromProps()
+
+      // Perform batch update on all cards,
+      // and show confirmation if this is a template
+      collection.API_batchUpdateCardsWithUndo({
+        updates,
+        updateAllCards: true,
+        undoMessage,
+        onConfirm,
+        onCancel,
+      })
     } else if (hoveringOver && hoveringOver.direction === 'right') {
       // the case where we hovered in the drop zone of a collection and now want to move cards + reroute
       const hoveringRecord = hoveringOver.card.record
@@ -876,8 +885,7 @@ const gridConfigProps = {
 
 CollectionGrid.propTypes = {
   ...gridConfigProps,
-  updateCollection: PropTypes.func.isRequired,
-  batchUpdateCollection: PropTypes.func.isRequired,
+  trackCollectionUpdated: PropTypes.func.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   blankContentToolState: MobxPropTypes.objectOrObservableObject,
   cardProperties: MobxPropTypes.arrayOrObservableArray.isRequired,

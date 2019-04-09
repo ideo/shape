@@ -340,14 +340,20 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     this._reorderCards()
   }
 
-  toJsonApiWithCards() {
+  toJsonApiWithCards(onlyCardIds = []) {
     const data = this.toJsonApi()
     // attach nested attributes of cards
     if (this.collection_cards) {
-      data.attributes.collection_cards_attributes = _.map(
-        this.collection_cards,
-        card => _.pick(card, card.batchUpdateAttributes)
-      )
+      const cardAttributes = []
+      _.each(this.collection_cards, card => {
+        if (
+          onlyCardIds.length === 0 ||
+          (onlyCardIds && cardAttributes.indexOf(card.id) !== -1)
+        ) {
+          cardAttributes.push(_.pick(card, card.batchUpdateAttributes))
+        }
+      })
+      data.attributes.collection_cards_attributes = cardAttributes
     }
     return data
   }
@@ -402,7 +408,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     })
   }
 
-  API_updateCards({ card, updates, undoMessage } = {}) {
+  API_updateCard({ card, updates, undoMessage } = {}) {
     // this works a little differently than the typical "undo" snapshot...
     // we snapshot the collection_cards.attributes so that they can be reverted
     const jsonData = this.toJsonApiWithCards()
@@ -422,72 +428,104 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.request(apiPath, 'PATCH', { data })
   }
 
-  API_batchUpdateCards({ cards, updates, undoMessage } = {}) {
-    const jsonData = this.toJsonApiWithCards()
-    this.pushUndo({
-      snapshot: jsonData.attributes,
-      message: undoMessage,
+  /*
+  Perform batch updates on multiple cards at once
+
+  updates (array)
+    An array of objects with a card reference and the updated attributes, e.g.
+    [
+      { card: card instance, order: 2  },
+      { card: card instance, order: 4  },
+    ]
+
+  updateAllCards (bool)
+    If true, it will send data to the API for all collection cards
+    (useful for regular collections where order needs to be updated on all cards).
+
+    If false, will only send data about updated cards.
+  */
+
+  API_batchUpdateCards({ updates, updateAllCards }) {
+    const updatesByCardId = {}
+    _.each(updates, update => {
+      updatesByCardId[update.card.id] = update
     })
 
-    // now actually make the change to the card(s)
-    const sortedCards = _.sortBy(cards, 'order')
-    _.each(sortedCards, (card, idx) => {
-      const sortedOrder = updates.order + (idx + 1) * 0.1
-      card.order = sortedOrder
+    // Apply all updates to in-memory cards
+    _.each(this.collection_cards, card => {
+      // Apply updates to each card
+      const cardUpdates = updatesByCardId[card.id]
+      if (cardUpdates) {
+        // Pick out allowed values and assign them
+        const allowedAttrs = _.pick(cardUpdates, card.batchUpdateAttributes)
+        _.forEach(allowedAttrs, (value, key) => {
+          card[key] = value
+        })
+      }
     })
 
-    this._reorderCards()
-    // TODO try and find way to update cards after pushing undo
-    const data = this.toJsonApiWithCards()
-    const apiPath = `collections/${this.id}`
-    return this.apiStore.request(apiPath, 'PATCH', { data })
+    const data = this.toJsonApiWithCards(
+      updateAllCards ? [] : _.keys(updatesByCardId)
+    )
+
+    // Persist updates to API
+    return this.apiStore.request(`collections/${this.id}`, 'PATCH', { data })
   }
 
+  /*
+  Perform batch updates on multiple cards at once
+
+  updates (array)
+    An array of objects with a card reference and the updated attributes, e.g.
+    [
+      { card: card instance, row: 4, col: 3  },
+      { card: card instance, row: 4, col: 4  },
+    ]
+
+  updateAllCards (bool)
+    If true, it will send data to the API for all collection cards
+    (useful for regular collections where order needs to be updated on all cards).
+
+    If false, will only send data about updated cards.
+
+  undoMessage (string) - a message to display if someone undoes the action
+  onConfirm (function) - a function to run once user confirms update
+  onCancel (function)  - a function to call if they cancel performing update
+
+  */
   API_batchUpdateCardsWithUndo({
     updates,
+    updateAllCards,
     undoMessage,
-    confirm,
-    confirmCancelFunction,
+    onConfirm,
+    onCancel,
   }) {
+    const cardIds = []
+    const updatesByCardId = {}
+    _.each(updates, update => {
+      cardIds.push(update.card.id)
+      updatesByCardId[update.card.id] = update
+    })
+
     const performUpdate = () => {
       // Store snapshot of existing cards so changes can be un-done
+      const cardsData = this.toJsonApiWithCards(updateAllCards ? [] : cardIds)
+
       this.pushUndo({
-        snapshot: this.toJsonApiWithCards().attributes,
+        snapshot: cardsData.attributes,
         message: undoMessage,
       })
 
-      // Now apply all updates to in-memory cards
-      const updatesByCardId = {}
-      _.map(updates, update => {
-        updatesByCardId[update.cardId] = update
-      })
-
-      _.each(this.collection_cards, card => {
-        // Apply updates to each card
-        const cardUpdates = updatesByCardId[card.id]
-        if (cardUpdates) {
-          // Pick out allowed values and assign them
-          const allowedAttrs = _.pick(cardUpdates, card.batchUpdateAttributes)
-          _.forEach(allowedAttrs, (value, key) => {
-            card[key] = value
-          })
+      return this.API_batchUpdateCards({ updates, updateAllCards }).then(
+        res => {
+          if (onConfirm) onConfirm()
         }
-      })
-
-      const data = this.toJsonApiWithCards()
-
-      // Persist updates to API
-      return this.apiStore.request(`collections/${this.id}`, 'PATCH', { data })
+      )
     }
 
-    // If confirm is not true, perform updates immediately
-    if (!confirm) return performUpdate()
-
-    performUpdate()
-
-    // Otherwise show a dialog
+    // Show a dialog if in a template
     return this.confirmEdit({
-      onCancel: confirmCancelFunction,
+      onCancel,
       onConfirm: performUpdate,
     })
   }

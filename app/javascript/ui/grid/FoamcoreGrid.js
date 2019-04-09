@@ -372,23 +372,22 @@ class FoamcoreGrid extends React.Component {
     } = this.props
     const card = _.find(collection_cards, { id: cardId })
     // TODO considering changing dragX in MoveableGridCard
-    const overlapPos = {
+    const cardPosition = {
       x: dragPosition.dragX,
       y: dragPosition.dragY,
       width: card.width,
       height: card.height,
     }
     const cardDims = { width: card.width, height: card.height }
-    const overlapCoords = this.coordinatesForPosition(overlapPos)
+    const cardCoords = this.coordinatesForPosition(cardPosition)
     this.debouncedSetDraggedOnSpots(
-      { ...overlapCoords, ...cardDims },
+      { ...cardCoords, ...cardDims },
       dragPosition
     )
   }
 
   onDragStart = cardId => {
-    const dragMap = this.determineDragMap(cardId)
-    this.draggingMap = dragMap
+    this.draggingMap = this.determineDragMap(cardId)
   }
 
   onDragOrResizeStop = (cardId, dragType) => {
@@ -403,7 +402,6 @@ class FoamcoreGrid extends React.Component {
     } else {
       this.moveCards(card)
     }
-    this.resetCardPositions()
   }
 
   onResize = (cardId, newSize) => {
@@ -437,67 +435,56 @@ class FoamcoreGrid extends React.Component {
     updates.width = width
     updates.height = height
     this.updateCardWithUndo(card, updates, undoMessage)
+    this.resetCardPositions()
   }
 
-  moveCards = singleCard => {
+  moveCards = masterCard => {
     if (this.dragGridSpot.size < 1) return
     const { collection } = this.props
-    const { multiMoveCardIds } = this.props.uiStore
     const undoMessage = 'Card move undone'
 
-    // Moving only one card
-    // if (multiMoveCardIds.length < 2) {
-    //   const movePlaceholder = [...this.dragGridSpot.values()][0]
-    //   // Save algorithm for what to do when dragging over card for collision
-    //   // resolution later
-    //   if (movePlaceholder.card) return
-    //   const { row, col } = movePlaceholder
-    //   const updates = { row, col }
-    //   this.updateCardWithUndo(card, updates, undoMessage)
-    // }
+    const movePlaceholder = [...this.dragGridSpot.values()][0]
+    if (movePlaceholder.card) return
+
+    const masterRow = movePlaceholder.row
+    const masterCol = movePlaceholder.col
+
+    const updates = []
+    // draggingMap has the relative row and column of all cards being moved
     //
-
-    let updates
-    if (multiMoveCardIds.length < 2) {
-      const movePlaceholder = [...this.dragGridSpot.values()][0]
-      if (movePlaceholder.card) return
-      const { row, col } = movePlaceholder
-      updates = [
-        {
-          cardId: singleCard.id,
-          row,
-          col,
-        },
-      ]
-    } else {
-      updates = _.map(multiMoveCardIds, cardId => {
-        const data = this.determineDragMap(cardId)
-        return {
-          cardId: data.card.id,
-          row: data.row,
-          col: data.col,
-        }
+    // TODO: currently it can set negative rows and columns
+    // if you move to the left-hand side of the board,
+    // so we need to address that in collision detection
+    this.draggingMap.forEach(map => {
+      updates.push({
+        card: map.card,
+        row: map.row + masterRow,
+        col: map.col + masterCol,
       })
-    }
+    })
 
-    const confirmCancelFunction = () => this.resetCardPositions()
+    const onConfirmOrCancel = () => {
+      this.resetCardPositions()
+    }
 
     collection.API_batchUpdateCardsWithUndo({
       updates,
       undoMessage,
-      confirm: true,
-      confirmCancelFunction,
+      onConfirm: onConfirmOrCancel,
+      onCancel: onConfirmOrCancel,
     })
   }
 
   // reset the grid back to its original state
   resetCardPositions() {
     const { uiStore } = this.props
+    console.log('resetCardPositions')
     runInAction(() => {
       this.dragGridSpot.clear()
       this.dragging = false
       this.resizing = false
       uiStore.multiMoveCardIds = []
+      uiStore.selectedCardIds = []
     })
     // Run immediately without throttling
     this.calculateCardsToRender()
@@ -546,7 +533,6 @@ class FoamcoreGrid extends React.Component {
   determineDragMap(cardId) {
     const { collection, uiStore } = this.props
 
-    if (uiStore.multiMoveCardIds.length < 2) return {}
     // The master card is the card currently being dragged
     const masterCard = collection.collection_cards.find(c => c.id === cardId)
     const movingCardIds = uiStore.multiMoveCardIds.filter(c => c.id !== cardId)

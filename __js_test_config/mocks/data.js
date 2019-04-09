@@ -347,7 +347,7 @@ export const fakeCollection = {
   // This is a computed property on the collection store
   cardIds: _.map(fakeCards, c => c.id),
   API_archive: jest.fn(),
-  API_updateCards: jest.fn(),
+  API_updateCard: jest.fn(),
   API_updateName: jest.fn(),
   API_getNextAvailableTest: jest.fn(),
   API_clearCollectionCover: jest.fn(),
