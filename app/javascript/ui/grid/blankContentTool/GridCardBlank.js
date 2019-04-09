@@ -13,6 +13,7 @@ import ReportIcon from '~/ui/icons/ReportIcon'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import SubmissionBoxIcon from '~/ui/icons/SubmissionBoxIcon'
+import FoamBoardIcon from '~/ui/icons/FoamBoardIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import FilestackUpload, { MAX_SIZE } from '~/utils/FilestackUpload'
 import { StyledGridCard } from '~/ui/grid/shared'
@@ -389,6 +390,7 @@ class GridCardBlank extends React.Component {
       case 'testCollection':
       case 'template':
       case 'submissionBox':
+      case 'foamBoard':
         inner = (
           <CollectionCreator
             type={creating}
@@ -458,16 +460,6 @@ class GridCardBlank extends React.Component {
         )
     }
 
-    const videoBctBox = (
-      <BctButtonBox
-        tooltip="Link video"
-        type="video"
-        creating={creating}
-        size={size}
-        onClick={this.startCreating('video')}
-        Icon={AddVideoIcon}
-      />
-    )
     const testBctBox = (
       <BctButtonBox
         tooltip="Get feedback"
@@ -488,21 +480,31 @@ class GridCardBlank extends React.Component {
         Icon={SubmissionBoxIcon}
       />
     )
+    const foamBoardBctBox = (
+      <BctButtonBox
+        tooltip="Create foamcore board"
+        type="foamBoard"
+        creating={creating}
+        size={size}
+        onClick={this.startCreating('foamBoard')}
+        Icon={FoamBoardIcon}
+      />
+    )
+    const collectionBctBox = (
+      <BctButtonBox
+        tooltip="Create collection"
+        type="collection"
+        creating={creating}
+        size={size}
+        onClick={this.startCreating('collection')}
+        Icon={AddCollectionIcon}
+      />
+    )
 
     return (
       <StyledBlankCreationTool replacing={isReplacing && !creating}>
         <Flex className="foreground" justify="space-between">
-          {!isReplacing &&
-            (!creating || creating === 'collection') && (
-              <BctButtonBox
-                tooltip="Create collection"
-                type="collection"
-                creating={creating}
-                size={size}
-                onClick={this.startCreating('collection')}
-                Icon={AddCollectionIcon}
-              />
-            )}
+          {/* First Row of Options */}
           {!isReplacing &&
             !creating && (
               <BctButtonBox
@@ -535,16 +537,28 @@ class GridCardBlank extends React.Component {
               Icon={AddLinkIcon}
             />
           )}
-          {((isReplacing && creating !== 'link') || creating === 'video') && (
-            <BctButtonRotation disabled={isReplacing}>
-              {videoBctBox}
-            </BctButtonRotation>
+          {(!creating || creating === 'video') && (
+            <BctButtonBox
+              tooltip="Link video"
+              type="video"
+              creating={creating}
+              size={size}
+              onClick={this.startCreating('video')}
+              Icon={AddVideoIcon}
+            />
           )}
-          {creating === 'testCollection' && (
-            <BctButtonRotation>{testBctBox}</BctButtonRotation>
+          {/* These are What to render on state change for second row */}
+          {creating === 'collection' && (
+            <BctButtonRotation>{collectionBctBox}</BctButtonRotation>
+          )}
+          {creating === 'foamBoard' && (
+            <BctButtonRotation>{foamBoardBctBox}</BctButtonRotation>
           )}
           {creating === 'submissionBox' && (
             <BctButtonRotation>{submissionBctBox}</BctButtonRotation>
+          )}
+          {creating === 'testCollection' && (
+            <BctButtonRotation>{testBctBox}</BctButtonRotation>
           )}
           {creating === 'data' && (
             <BctButtonRotation>
@@ -567,16 +581,16 @@ class GridCardBlank extends React.Component {
             </BctButtonRotation>
           )}
         </Flex>
-
+        {/* Second row display on initial load */}
         {!isReplacing &&
           !creating && (
             <Flex
               className="foreground foreground-bottom"
               justify="space-between"
             >
-              {videoBctBox}
+              {collectionBctBox}
+              {foamBoardBctBox}
               {submissionBctBox}
-              {testBctBox}
               <PopoutMenu
                 buttonStyle="bct"
                 menuOpen={this.state.bctMenuOpen}
@@ -592,6 +606,11 @@ class GridCardBlank extends React.Component {
                     name: 'Create Report',
                     iconLeft: <ReportIcon />,
                     onClick: this.createDefaultReportCard,
+                  },
+                  {
+                    name: 'Get Feedback',
+                    iconLeft: <TestCollectionIcon />,
+                    onClick: this.startCreating('testCollection'),
                   },
                 ]}
               />

@@ -31,6 +31,7 @@ class CollectionCreator extends React.Component {
     let dbType = null
     if (type === 'submissionBox') dbType = 'Collection::SubmissionBox'
     else if (type === 'testCollection') dbType = 'Collection::TestCollection'
+    else if (type === 'foamBoard') dbType = 'Collection::Board'
     createCard(
       {
         // `collection` is the collection being created within the card
@@ -88,6 +89,7 @@ CollectionCreator.propTypes = {
     'template',
     'testCollection',
     'submissionBox',
+    'foamBoard',
   ]),
   createCard: PropTypes.func.isRequired,
   closeBlankContentTool: PropTypes.func.isRequired,
