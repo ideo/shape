@@ -473,7 +473,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   /*
-  Perform batch updates on multiple cards at once
+  Perform batch updates on multiple cards at once,
+  and captures current cards state to undo to
 
   updates (array)
     An array of objects with a card reference and the updated attributes, e.g.
@@ -483,19 +484,19 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     ]
 
   updateAllCards (bool)
-    If false (default), will only send data about updated cards.
+    If false, will only send data about updated cards.
 
     If true, it will send data to the API for all collection cards
     (useful for regular collections where order needs to be updated on all cards).
 
   undoMessage (string) - a message to display if someone undoes the action
-  onConfirm (function) - a function to run once user confirms update
-  onCancel (function)  - a function to call if they cancel performing update
+  onConfirm (optional function) - a function to run once user confirms update
+  onCancel (optional function)  - a function to call if they cancel performing update
 
   */
   API_batchUpdateCardsWithUndo({
     updates,
-    updateAllCards,
+    updateAllCards = false,
     undoMessage,
     onConfirm,
     onCancel,

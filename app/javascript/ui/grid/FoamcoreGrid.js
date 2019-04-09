@@ -191,19 +191,6 @@ class FoamcoreGrid extends React.Component {
     }
   }
 
-  updateCardWithUndo(updates, undoMessage) {
-    const { collection, trackCollectionUpdated } = this.props
-
-    const onConfirm = () => trackCollectionUpdated()
-
-    // If a template, warn that any instances will be updated
-    collection.API_batchUpdateCardsWithUndo({
-      updates,
-      undoMessage,
-      onConfirm,
-    })
-  }
-
   updateMaxLoaded = ({ row, col }) => {
     if (row > this.loadedRows.max) this.loadedRows.max = row
     if (col > this.loadedCols.max) this.loadedCols.max = col
@@ -414,10 +401,10 @@ class FoamcoreGrid extends React.Component {
   }
 
   resizeCard = card => {
-    // just some double-checking validations
     let undoMessage
-    const resizePlaceholder = this.placeholderSpot
-    let { height, width } = resizePlaceholder
+    const { collection, trackCollectionUpdated } = this.props
+    let { height, width } = this.placeholderSpot
+    // Some double-checking validations
     if (height > MAX_CARD_H) height = MAX_CARD_H
     if (width > MAX_CARD_W) width = MAX_CARD_W
     // set up action to undo
@@ -431,7 +418,16 @@ class FoamcoreGrid extends React.Component {
         height,
       },
     ]
-    this.updateCardWithUndo(updates, undoMessage)
+
+    const onConfirm = () => trackCollectionUpdated()
+
+    // If a template, warn that any instances will be updated
+    collection.API_batchUpdateCardsWithUndo({
+      updates,
+      undoMessage,
+      onConfirm,
+    })
+
     this.resetCardPositions()
   }
 
@@ -475,7 +471,6 @@ class FoamcoreGrid extends React.Component {
   // reset the grid back to its original state
   resetCardPositions() {
     const { uiStore } = this.props
-    console.log('resetCardPositions')
     runInAction(() => {
       this.dragGridSpot.clear()
       this.dragging = false
