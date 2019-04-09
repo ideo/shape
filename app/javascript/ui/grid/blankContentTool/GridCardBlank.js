@@ -33,12 +33,30 @@ const StyledGridCardBlank = StyledGridCard.extend`
   background: transparent;
   cursor: auto;
   position: relative;
+  overflow: hidden;
   button {
     cursor: pointer;
     border: none;
     transition: all 300ms;
   }
+  &::after {
+    background-color: rgba(192, 219, 222, 0.5);
+    content: ' ';
+    display: block;
+    height: calc(100% + 15px);
+    left: 0;
+    filter: blur(5px);
+    position: absolute;
+    top: 0;
+    width: calc(100% + 15px);
+
+    left: -15px;
+    right: -15px;
+    top: -15px;
+    bottom: -15px;
+  }
 `
+StyledGridCardBlank.displayName = 'WeeStyledGridCardBlank'
 
 // width of card is constrained by gridW
 // vertical position is adjusted by gridH / 2 if card is 2 rows tall

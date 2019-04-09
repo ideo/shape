@@ -383,6 +383,7 @@ class MovableGridCard extends React.PureComponent {
     let transformOrigin = `${xPos}px ${yPos}px`
     if (card.id === 'blank') {
       transformOrigin = `${xPos + width / 2}px ${yPos + height / 2}px`
+      styleProps.height += 20
     }
 
     return (
