@@ -282,22 +282,6 @@ class CollectionPage extends React.Component {
     uiStore.trackEvent('update', this.collection)
   }
 
-  // updateCollection = ({ card, updates, undoMessage } = {}) => {
-  //   const { collection } = this.props
-  //   // this will assign the update attrs to the card and push an undo action
-  //   collection.API_updateCard({ card, updates, undoMessage })
-  //   const { uiStore } = this.props
-  //   uiStore.trackEvent('update', this.collection)
-  // }
-  //
-  // batchUpdateCollection = ({ cards, updates, undoMessage } = {}) => {
-  //   const { collection } = this.props
-  //   // this will assign the update attrs to the card and push an undo action
-  //   collection.API_batchUpdateCards({ sortedCards, updates, undoMessage })
-  //   const { uiStore } = this.props
-  //   uiStore.trackEvent('update', this.collection)
-  // }
-
   get submissionsPageSeparator() {
     const { collection } = this.props
     const { submissionTypeName, submissions_collection } = collection
@@ -341,8 +325,7 @@ class CollectionPage extends React.Component {
         {this.submissionsPageSeparator}
         <CollectionGrid
           {...gridSettings}
-          updateCollection={this.updateCollection}
-          batchUpdateCollection={this.batchUpdateCollection}
+          trackCollectionUpdated={this.trackCollectionUpdated}
           collection={submissions_collection}
           canEditCollection={false}
           // Pass in cardProperties so grid will re-render when they change
@@ -421,10 +404,9 @@ class CollectionPage extends React.Component {
             <FoamcoreGrid
               // pull in cols, gridW, gridH, gutter
               {...gridSettings}
-              loadCollectionCards={this.loadCollectionCards}
-              updateCollection={this.updateCollection}
-              batchUpdateCollection={this.batchUpdateCollection}
               collection={collection}
+              loadCollectionCards={this.loadCollectionCards}
+              trackCollectionUpdated={this.trackCollectionUpdated}
               canEditCollection={collection.can_edit_content}
               // Pass in cardProperties so grid will re-render when they change
               cardProperties={collection.cardProperties}

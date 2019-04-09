@@ -191,23 +191,16 @@ class FoamcoreGrid extends React.Component {
     }
   }
 
-  updateCardWithUndo(card, updates, undoMessage) {
-    // TODO combine with normal grid
-    const { collection, updateCollection } = this.props
+  updateCardWithUndo(updates, undoMessage) {
+    const { collection, trackCollectionUpdated } = this.props
+
+    const onConfirm = () => trackCollectionUpdated()
+
     // If a template, warn that any instances will be updated
-
-    const updateCollectionCard = () => {
-      // this will assign the update attributes to the card
-      updateCollection({
-        card,
-        updates,
-        undoMessage,
-      })
-    }
-
-    collection.confirmEdit({
-      onCancel: () => {},
-      onConfirm: updateCollectionCard,
+    collection.API_batchUpdateCardsWithUndo({
+      updates,
+      undoMessage,
+      onConfirm,
     })
   }
 
@@ -431,10 +424,14 @@ class FoamcoreGrid extends React.Component {
     if (card.height !== height || card.width !== width) {
       undoMessage = 'Card resize undone'
     }
-    const updates = {}
-    updates.width = width
-    updates.height = height
-    this.updateCardWithUndo(card, updates, undoMessage)
+    const updates = [
+      {
+        card,
+        width,
+        height,
+      },
+    ]
+    this.updateCardWithUndo(updates, undoMessage)
     this.resetCardPositions()
   }
 
@@ -895,9 +892,9 @@ const gridConfigProps = {
 
 FoamcoreGrid.propTypes = {
   ...gridConfigProps,
-  updateCollection: PropTypes.func.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   cardProperties: MobxPropTypes.arrayOrObservableArray.isRequired,
+  trackCollectionUpdated: PropTypes.func.isRequired,
   canEditCollection: PropTypes.bool.isRequired,
   movingCardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
   loadCollectionCards: PropTypes.func.isRequired,

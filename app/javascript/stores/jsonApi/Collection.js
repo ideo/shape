@@ -348,7 +348,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       _.each(this.collection_cards, card => {
         if (
           onlyCardIds.length === 0 ||
-          (onlyCardIds && cardAttributes.indexOf(card.id) !== -1)
+          (onlyCardIds && onlyCardIds.indexOf(card.id) !== -1)
         ) {
           cardAttributes.push(_.pick(card, card.batchUpdateAttributes))
         }
@@ -483,10 +483,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     ]
 
   updateAllCards (bool)
+    If false (default), will only send data about updated cards.
+
     If true, it will send data to the API for all collection cards
     (useful for regular collections where order needs to be updated on all cards).
-
-    If false, will only send data about updated cards.
 
   undoMessage (string) - a message to display if someone undoes the action
   onConfirm (function) - a function to run once user confirms update
