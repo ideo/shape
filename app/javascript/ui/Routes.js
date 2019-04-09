@@ -28,7 +28,6 @@ import v from '~/utils/variables'
 import firebaseClient from '~/vendor/firestore'
 import MuiTheme, { BillingMuiTheme } from '~/ui/theme'
 import captureGlobalKeypress from '~/utils/captureGlobalKeypress'
-import { uiStore } from '~/stores'
 
 const AppWrapper = styled.div`
   /* used by terms of use modal to blur the whole site */
@@ -79,7 +78,7 @@ class Routes extends React.Component {
   }
 
   render() {
-    const { apiStore, routingStore } = this.props
+    const { apiStore, routingStore, uiStore } = this.props
     if (!apiStore.currentUser) {
       return <Loader />
     }
