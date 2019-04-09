@@ -31,6 +31,7 @@ import BctButtonRotation from './BctButtonRotation'
 
 const StyledGridCardBlank = StyledGridCard.extend`
   background-color: ${v.colors.commonLight};
+  box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.1);
   cursor: auto;
   position: relative;
   overflow: hidden;
@@ -52,6 +53,7 @@ const StyledGridCardInner = styled.div`
 `
 const StyledBlankCreationTool = styled.div`
   padding: 2rem;
+  padding-top: 1rem;
   position: relative;
   .foreground {
     position: relative;

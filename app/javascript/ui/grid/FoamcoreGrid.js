@@ -600,8 +600,8 @@ class FoamcoreGrid extends React.Component {
         while (width > 0) {
           filledSpots.push({
             card,
-            row: row + height - 1, // 1 + 2 - 1 = 2 | 2
-            col: col + width - 1, // 0 + 2 - 1 = 1 | 0
+            row: row + height - 1,
+            col: col + width - 1,
           })
           width -= 1
         }

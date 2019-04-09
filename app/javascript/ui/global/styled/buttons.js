@@ -4,11 +4,16 @@ import styled from 'styled-components'
 import CloseIcon from '~/ui/icons/CloseIcon'
 import v from '~/utils/variables'
 
+/*
+ *
+ *    top: 7px;
+    right: 7px;
+*/
 /** @component */
 export const TopRightButton = styled.button`
   position: ${props => props.position};
-  top: ${props => (props.size === 'sm' ? '10px' : '12px')};
-  right: ${props => (props.size === 'sm' ? '15px' : '12px')};
+  top: ${props => (props.size === 'sm' ? '8px' : '12px')};
+  right: ${props => (props.size === 'sm' ? '12px' : '12px')};
   color: ${props => props.color};
   .icon {
     width: ${props => (props.size === 'sm' ? '12px' : '15px')};
