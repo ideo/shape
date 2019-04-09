@@ -58,14 +58,6 @@ ActiveRecord::Schema.define(version: 20190402225253) do
     t.index ["token"], name: "index_api_tokens_on_token"
   end
 
-  create_table "app_metrics", force: :cascade do |t|
-    t.string "metric"
-    t.float "value"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["metric", "created_at"], name: "index_app_metrics_on_metric_and_created_at"
-  end
-
   create_table "application_organizations", force: :cascade do |t|
     t.bigint "application_id"
     t.bigint "organization_id"
@@ -101,8 +93,8 @@ ActiveRecord::Schema.define(version: 20190402225253) do
     t.boolean "image_contain", default: false
     t.boolean "is_cover", default: false
     t.datetime "unarchived_at"
-    t.integer "filter", default: 0
     t.boolean "hidden", default: false
+    t.integer "filter", default: 1
     t.boolean "show_replace", default: true
     t.integer "row"
     t.integer "col"
