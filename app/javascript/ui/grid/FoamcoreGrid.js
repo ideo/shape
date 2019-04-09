@@ -401,17 +401,9 @@ class FoamcoreGrid extends React.Component {
     if (dragType === 'resize') {
       this.resizeCard(card)
     } else {
-      this.moveCard(card)
+      this.moveCards(card)
     }
-    runInAction(() => {
-      this.dragGridSpot.clear()
-      this.dragging = false
-      this.resizing = false
-      // TODO not sure why stopDragging doesn't clear this out
-      uiStore.multiMoveCardIds = []
-    })
-    // Run immediately without throttling
-    this.calculateCardsToRender()
+    this.resetCardPositions()
   }
 
   onResize = (cardId, newSize) => {
@@ -447,42 +439,68 @@ class FoamcoreGrid extends React.Component {
     this.updateCardWithUndo(card, updates, undoMessage)
   }
 
-  moveCard = (card, data) => {
-    const { uiStore } = this.props
+  moveCards = singleCard => {
+    if (this.dragGridSpot.size < 1) return
+    const { collection } = this.props
+    const { multiMoveCardIds } = this.props.uiStore
     const undoMessage = 'Card move undone'
-    // Different paths for dragging multiple cards vs one
-    if (uiStore.multiMoveCardIds.length < 2) {
-      if (this.dragGridSpot.size < 1) return
+
+    // Moving only one card
+    // if (multiMoveCardIds.length < 2) {
+    //   const movePlaceholder = [...this.dragGridSpot.values()][0]
+    //   // Save algorithm for what to do when dragging over card for collision
+    //   // resolution later
+    //   if (movePlaceholder.card) return
+    //   const { row, col } = movePlaceholder
+    //   const updates = { row, col }
+    //   this.updateCardWithUndo(card, updates, undoMessage)
+    // }
+    //
+
+    let updates
+    if (multiMoveCardIds.length < 2) {
       const movePlaceholder = [...this.dragGridSpot.values()][0]
-      // Save algorithm for what to do when dragging over card for collision
-      // resolution later
-
       if (movePlaceholder.card) return
-
       const { row, col } = movePlaceholder
-      const updates = { row, col }
-      this.updateCardWithUndo(card, updates, undoMessage)
+      updates = [
+        {
+          cardId: singleCard.id,
+          row,
+          col,
+        },
+      ]
+    } else {
+      updates = _.map(multiMoveCardIds, cardId => {
+        const data = this.determineDragMap(cardId)
+        return {
+          cardId: data.card.id,
+          row: data.row,
+          col: data.col,
+        }
+      })
     }
+
+    const confirmCancelFunction = () => this.resetCardPositions()
+
+    collection.API_batchUpdateCardsWithUndo({
+      updates,
+      undoMessage,
+      confirm: true,
+      confirmCancelFunction,
+    })
   }
 
-  moveCards = (cards, updates, undoMessage) => {
-    const { collection, batchUpdateCollection } = this.props
-
-    const onCancel = () => this.positionCardsFromProps()
-
-    const updateCollectionCard = () => {
-      batchUpdateCollection({
-        cards,
-        updates,
-        undoMessage,
-      })
-      this.positionCardsFromProps()
-    }
-
-    collection.confirmEdit({
-      onCancel,
-      onConfirm: updateCollectionCard,
+  // reset the grid back to its original state
+  resetCardPositions() {
+    const { uiStore } = this.props
+    runInAction(() => {
+      this.dragGridSpot.clear()
+      this.dragging = false
+      this.resizing = false
+      uiStore.multiMoveCardIds = []
     })
+    // Run immediately without throttling
+    this.calculateCardsToRender()
   }
 
   /*

@@ -346,7 +346,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (this.collection_cards) {
       data.attributes.collection_cards_attributes = _.map(
         this.collection_cards,
-        card => _.pick(card, ['id', 'order', 'width', 'height', 'row', 'col'])
+        card => _.pick(card, card.batchUpdateAttributes)
       )
     }
     return data
@@ -441,6 +441,55 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const data = this.toJsonApiWithCards()
     const apiPath = `collections/${this.id}`
     return this.apiStore.request(apiPath, 'PATCH', { data })
+  }
+
+  API_batchUpdateCardsWithUndo({
+    updates,
+    undoMessage,
+    confirm,
+    confirmCancelFunction,
+  }) {
+    const performUpdate = () => {
+      // Store snapshot of existing cards so changes can be un-done
+      this.pushUndo({
+        snapshot: this.toJsonApiWithCards().attributes,
+        message: undoMessage,
+      })
+
+      // Now apply all updates to in-memory cards
+      const updatesByCardId = {}
+      _.map(updates, update => {
+        updatesByCardId[update.cardId] = update
+      })
+
+      _.each(this.collection_cards, card => {
+        // Apply updates to each card
+        const cardUpdates = updatesByCardId[card.id]
+        if (cardUpdates) {
+          // Pick out allowed values and assign them
+          const allowedAttrs = _.pick(cardUpdates, card.batchUpdateAttributes)
+          _.forEach(allowedAttrs, (value, key) => {
+            card[key] = value
+          })
+        }
+      })
+
+      const data = this.toJsonApiWithCards()
+
+      // Persist updates to API
+      return this.apiStore.request(`collections/${this.id}`, 'PATCH', { data })
+    }
+
+    // If confirm is not true, perform updates immediately
+    if (!confirm) return performUpdate()
+
+    performUpdate()
+
+    // Otherwise show a dialog
+    return this.confirmEdit({
+      onCancel: confirmCancelFunction,
+      onConfirm: performUpdate,
+    })
   }
 
   @computed

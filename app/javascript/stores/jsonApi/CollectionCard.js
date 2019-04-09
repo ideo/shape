@@ -29,6 +29,8 @@ class CollectionCard extends BaseRecord {
     'filter',
   ]
 
+  batchUpdateAttributes = ['id', 'order', 'width', 'height', 'row', 'col']
+
   @observable
   maxWidth = this.width
   @observable
