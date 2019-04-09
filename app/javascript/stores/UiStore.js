@@ -561,15 +561,15 @@ export default class UiStore {
 
   deselectCards = e => {
     if (!e) return
-    // let people interact w/ controls without deselecting cards
     const { target } = e
+    // Material-UI dropdowns return objects as event targets for some reason
+    if (typeof target === 'object') return
+
     const leaveCardsSelected = target.getAttribute('data-leave-cards-selected')
 
     if (leaveCardsSelected) return
 
-    runInAction(() => {
-      this.selectedCardIds.replace([])
-    })
+    runInAction(() => this.selectedCardIds.replace([]))
   }
 
   @action
