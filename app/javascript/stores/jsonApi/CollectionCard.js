@@ -15,6 +15,8 @@ class CollectionCard extends BaseRecord {
     'order',
     'width',
     'height',
+    'row',
+    'col',
     'reference',
     'parent_id',
     'collection_id',
@@ -108,6 +110,8 @@ class CollectionCard extends BaseRecord {
   beginReplacing() {
     uiStore.openBlankContentTool({
       order: this.order,
+      row: this.row,
+      col: this.col,
       width: this.width,
       height: this.height,
       replacingId: this.id,

@@ -326,6 +326,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def collection_card_params
     params.require(:collection_card).permit(
       :order,
+      :row,
+      :col,
       :width,
       :height,
       :reference,
