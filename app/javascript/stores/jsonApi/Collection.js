@@ -4,7 +4,8 @@ import { ReferenceType } from 'datx'
 import pluralize from 'pluralize'
 import queryString from 'query-string'
 
-import { apiStore, routingStore, uiStore } from '~/stores'
+// TODO: remove this apiStore import by refactoring static methods that depend on it
+import { apiStore } from '~/stores'
 import { apiUrl } from '~/utils/url'
 
 import BaseRecord from './BaseRecord'
@@ -76,7 +77,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     } else {
       this.snoozedEditWarningsAt = Date.now()
     }
-    uiStore.setSnoozeChecked(!!this.snoozedEditWarningsAt)
+    this.uiStore.setSnoozeChecked(!!this.snoozedEditWarningsAt)
   }
 
   @action
@@ -88,7 +89,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (!this.isMasterTemplate || this.template_num_instances === 0)
       return false
     // if we already have the confirmation open, don't try to re-open
-    if (uiStore.dialogConfig.open === 'confirm') return false
+    if (this.uiStore.dialogConfig.open === 'confirm') return false
     const oneHourAgo = Date.now() - 1000 * 60 * 60
     if (!this.snoozedEditWarningsAt) return true
     if (this.snoozedEditWarningsAt < oneHourAgo) {
@@ -128,7 +129,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   // otherwise it will just call onConfirm()
   confirmEdit({ onCancel, onConfirm }) {
     if (!this.shouldShowEditWarning) return onConfirm()
-    uiStore.confirm({
+    this.uiStore.confirm({
       ...this.confirmEditOptions,
       onCancel: () => {
         if (onCancel) onCancel()
@@ -460,7 +461,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         message =
           'You must close any other live tests before launching this one.'
       }
-      uiStore.alert(message)
+      this.uiStore.alert(message)
       return false
     }
     return true
@@ -474,7 +475,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       let prompt = 'Are you sure you want to stop all active tests?'
       const num = this.template_num_instances
       prompt += ` ${num} ${pluralize('submission', num)} will be affected.`
-      return uiStore.confirm({
+      return this.uiStore.confirm({
         iconName: 'Alert',
         prompt,
         confirmText: 'Stop feedback',
@@ -516,6 +517,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   API_performTestAction = async actionName => {
+    const { uiStore } = this
     // this will disable any test launch/close/reopen buttons until loading is complete
     uiStore.update('launchButtonLoading', true)
     try {
@@ -568,7 +570,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       .request(`collections/${this.id}/clear_collection_cover`, 'POST')
       .catch(err => {
         console.warn(err)
-        uiStore.alert(
+        this.uiStore.alert(
           'Unable to change the collection cover. This may be a special collection that you cannot edit.'
         )
       })
@@ -582,7 +584,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       `test_collections/${this.id}/next_available`
     )
     if (!res.data) return
-    const path = routingStore.pathTo('collections', res.data.id)
+    const path = this.routingStore.pathTo('collections', res.data.id)
 
     this.setNextAvailableTestPath(`${path}?open=tests`)
   }
@@ -608,13 +610,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   async API_sortCards() {
-    const order = uiStore.collectionCardSortOrder
+    const order = this.uiStore.collectionCardSortOrder
     this.setReloading(true)
     await this.API_fetchCards({ order })
     this.setReloading(false)
   }
 
   static async createSubmission(parent_id, submissionSettings) {
+    const { uiStore } = this
     const { type, template } = submissionSettings
     if (type === 'template' && template) {
       const templateData = {
@@ -625,7 +628,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       uiStore.update('isLoading', true)
       const res = await apiStore.createTemplateInstance(templateData)
       uiStore.update('isLoading', false)
-      routingStore.routeTo('collections', res.data.id)
+      this.routingStore.routeTo('collections', res.data.id)
     } else {
       uiStore.openBlankContentTool({
         order: 0,

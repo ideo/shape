@@ -18,6 +18,16 @@ class BaseRecord extends jsonapi(Model) {
     }
   }
 
+  get uiStore() {
+    // uiStore gets supplied via apiStore
+    return this.apiStore.uiStore
+  }
+
+  get routingStore() {
+    // routingStore gets supplied via apiStore
+    return this.apiStore.routingStore
+  }
+
   @computed
   get id() {
     return this.meta.id
