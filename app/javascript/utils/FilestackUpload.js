@@ -102,10 +102,17 @@ class FilestackUpload {
     }
     if (mimetype.match(/gif|svg/)) {
       // svg doesn't allow these transforms
+      // and it would be good to know "animated gif" vs not, but we eliminate gif transform params for this reason
       delete params.rotate
       delete params.resize
     }
-    return this.client.transform(handle, params)
+    let url = this.client.transform(handle, params)
+    if (url.indexOf('http') === -1) {
+      // the transform API seems to just return back the handle if no params are provided
+      // so we need to change it into a CDN link
+      url = `https://cdn.filestackcontent.com/${handle}`
+    }
+    return url
   }
 
   static preview(handle, id) {
