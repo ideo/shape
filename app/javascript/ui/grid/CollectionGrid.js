@@ -259,7 +259,6 @@ class CollectionGrid extends React.Component {
       }
 
       const onConfirm = () => {
-        this.positionCardsFromProps()
         trackCollectionUpdated()
       }
       const onCancel = () => this.positionCardsFromProps()
@@ -273,6 +272,8 @@ class CollectionGrid extends React.Component {
         onConfirm,
         onCancel,
       })
+      // this should happen right away, not waiting for the API call (since locally we have the updated cards' positions)
+      this.positionCardsFromProps()
     } else if (hoveringOver && hoveringOver.direction === 'right') {
       // the case where we hovered in the drop zone of a collection and now want to move cards + reroute
       const hoveringRecord = hoveringOver.card.record
