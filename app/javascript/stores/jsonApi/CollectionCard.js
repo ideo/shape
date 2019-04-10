@@ -41,6 +41,18 @@ class CollectionCard extends BaseRecord {
     this.maxHeight = h
   }
 
+  // For cards that are positioned using row/col,
+  // this is the row that they extend to
+  get maxRow() {
+    return this.row + this.height - 1
+  }
+
+  // For cards that are positioned using row/col,
+  // this is the col that they extend to
+  get maxCol() {
+    return this.col + this.width - 1
+  }
+
   get isTestDesignCollection() {
     return this.record.type === COLLECTION_TYPES.TEST_DESIGN
   }
