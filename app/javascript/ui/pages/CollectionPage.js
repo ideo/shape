@@ -276,18 +276,7 @@ class CollectionPage extends React.Component {
     Collection.createSubmission(id, submissionSettings)
   }
 
-  updateCollection = ({ card, updates, undoMessage } = {}) => {
-    const { collection } = this.props
-    // this will assign the update attrs to the card and push an undo action
-    collection.API_updateCards({ card, updates, undoMessage })
-    const { uiStore } = this.props
-    uiStore.trackEvent('update', this.collection)
-  }
-
-  batchUpdateCollection = ({ cards, updates, undoMessage } = {}) => {
-    const { collection } = this.props
-    // this will assign the update attrs to the card and push an undo action
-    collection.API_batchUpdateCards({ cards, updates, undoMessage })
+  trackCollectionUpdated = () => {
     const { uiStore } = this.props
     uiStore.trackEvent('update', this.collection)
   }
@@ -335,8 +324,7 @@ class CollectionPage extends React.Component {
         {this.submissionsPageSeparator}
         <CollectionGrid
           {...gridSettings}
-          updateCollection={this.updateCollection}
-          batchUpdateCollection={this.batchUpdateCollection}
+          trackCollectionUpdated={this.trackCollectionUpdated}
           collection={submissions_collection}
           canEditCollection={false}
           // Pass in cardProperties so grid will re-render when they change
@@ -415,10 +403,9 @@ class CollectionPage extends React.Component {
             <FoamcoreGrid
               // pull in cols, gridW, gridH, gutter
               {...gridSettings}
-              loadCollectionCards={this.loadCollectionCards}
-              updateCollection={this.updateCollection}
-              batchUpdateCollection={this.batchUpdateCollection}
               collection={collection}
+              loadCollectionCards={this.loadCollectionCards}
+              trackCollectionUpdated={this.trackCollectionUpdated}
               canEditCollection={collection.can_edit_content}
               // Pass in cardProperties so grid will re-render when they change
               cardProperties={collection.cardProperties}
@@ -451,8 +438,7 @@ class CollectionPage extends React.Component {
                 // pull in cols, gridW, gridH, gutter
                 {...gridSettings}
                 loadCollectionCards={this.loadCollectionCards}
-                updateCollection={this.updateCollection}
-                batchUpdateCollection={this.batchUpdateCollection}
+                trackCollectionUpdated={this.trackCollectionUpdated}
                 collection={collection}
                 canEditCollection={collection.can_edit_content}
                 // Pass in cardProperties so grid will re-render when they change

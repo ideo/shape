@@ -85,6 +85,7 @@ const fakeUiStore = {
   captureKeyboardGridClick: jest.fn(),
   popupAlert: jest.fn(),
   stopDragging: jest.fn(),
+  multiMoveCardIds: [],
   setSnoozeChecked: jest.fn(),
 }
 
