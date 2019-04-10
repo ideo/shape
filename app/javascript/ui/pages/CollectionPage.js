@@ -383,7 +383,7 @@ class CollectionPage extends React.Component {
   )
 
   render() {
-    const { collection, uiStore } = this.props
+    const { collection, isHomepage, uiStore } = this.props
     if (!collection) {
       return this.loader()
     }
