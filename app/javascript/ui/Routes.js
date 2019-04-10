@@ -76,6 +76,15 @@ class Routes extends React.Component {
     uiStore.update('windowWidth', windowWidth)
   }
 
+  handleClick = e => {
+    const { target } = e
+    const { uiStore } = this.props
+
+    if (!target.getAttribute) return
+
+    if (target.getAttribute('data-deselect-on-click')) uiStore.deselectCards()
+  }
+
   render() {
     const { apiStore, routingStore } = this.props
     if (!apiStore.currentUser) {
@@ -86,7 +95,11 @@ class Routes extends React.Component {
       !routingStore.pathContains('/terms')
 
     return (
-      <AppWrapper blur={displayTermsPopup} id="AppWrapper">
+      <AppWrapper
+        onClick={this.handleClick}
+        blur={displayTermsPopup}
+        id="AppWrapper"
+      >
         <ErrorBoundary>
           <MuiThemeProvider theme={MuiTheme}>
             {/* Global components are rendered here */}

@@ -830,6 +830,7 @@ class FoamcoreGrid extends React.Component {
     const { gridW } = this.props
     return (
       <Grid
+        data-deselect-on-click
         onMouseMove={this.handleMouseMove}
         onScroll={this.handleScroll}
         innerRef={ref => {
