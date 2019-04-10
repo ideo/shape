@@ -108,7 +108,7 @@ class Routes extends React.Component {
             <ZendeskWidget />
 
             <Header />
-            <FixedBoundary className="fixed_boundary" />
+            <FixedBoundary className="fixed_boundary" data-deselect-on-click />
             <FixedActivityLogWrapper>
               <ActivityLogBox />
             </FixedActivityLogWrapper>
