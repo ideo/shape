@@ -59,14 +59,14 @@ class GridCardHotspot extends React.Component {
   }
 
   render() {
-    const { dragging, uiStore, position } = this.props
+    const { dragging, uiStore, position, showHotEdge } = this.props
     return (
       <StyledHotspot
         position={position}
         dragging={dragging}
         onClick={this.clickHotspot}
       >
-        <HotspotLine gutter={uiStore.gridSettings.gutter} />
+        {showHotEdge && <HotspotLine gutter={uiStore.gridSettings.gutter} />}
         <StyledPlusIcon>+</StyledPlusIcon>
       </StyledHotspot>
     )
@@ -77,12 +77,14 @@ GridCardHotspot.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   dragging: PropTypes.bool.isRequired,
   position: PropTypes.string,
+  showHotEdge: PropTypes.bool,
 }
 GridCardHotspot.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 GridCardHotspot.defaultProps = {
   position: 'right',
+  showHotEdge: true,
 }
 
 GridCardHotspot.displayName = 'GridCardHotspot'
