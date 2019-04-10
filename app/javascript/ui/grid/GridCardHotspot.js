@@ -69,7 +69,6 @@ class GridCardHotspot extends React.Component {
   render() {
     const { dragging, uiStore, position } = this.props
     const { icon, line } = this.hotspotMargins
-    console.log(icon, line)
 
     return (
       <StyledHotspot
