@@ -1,7 +1,6 @@
-import { uiStore } from '~/stores'
-import { apiUrl } from '~/utils/url'
 import { ReferenceType } from 'datx'
 
+import { apiUrl } from '~/utils/url'
 import Role from './Role'
 import BaseRecord from './BaseRecord'
 
@@ -34,7 +33,7 @@ class Group extends BaseRecord {
         this.apiStore.loadCurrentUser()
       }
     }
-    uiStore.confirm({
+    this.uiStore.confirm({
       prompt: 'Are you sure you want to archive this group?',
       confirmText: 'Archive',
       iconName: 'Archive',

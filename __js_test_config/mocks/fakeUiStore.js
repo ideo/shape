@@ -84,6 +84,7 @@ const fakeUiStore = {
   autocompleteMenuClosed: jest.fn(),
   captureKeyboardGridClick: jest.fn(),
   popupAlert: jest.fn(),
+  setSnoozeChecked: jest.fn(),
 }
 
 export default fakeUiStore
