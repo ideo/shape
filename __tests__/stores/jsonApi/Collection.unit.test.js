@@ -182,7 +182,7 @@ describe('Collection', () => {
     })
   })
 
-  describe('cardIdsBetweenByColRow', () => {
+  describe('board collection', () => {
     let cardIds
     beforeEach(() => {
       /*
@@ -195,7 +195,7 @@ describe('Collection', () => {
         - - - 3
         - - - 3
       */
-
+      collection.type = 'Collection::Board'
       const collCardAttrs = [
         { col: 0, row: 0, height: 1, width: 2 },
         { col: 3, row: 0, height: 1, width: 1 },
@@ -209,26 +209,53 @@ describe('Collection', () => {
       cardIds = collection.cardIds
     })
 
-    it('returns cards in rectangular area from two cards', () => {
-      expect(collection.cardIdsBetweenByColRow(cardIds[0], cardIds[1])).toEqual(
-        [cardIds[0], cardIds[1]]
-      )
+    describe('cardMatrix', () => {
+      it('returns array of arrays', () => {
+        const matrix = collection.cardMatrix
+        expect(matrix[0][0].id).toEqual(cardIds[0])
+        expect(matrix[0][1].id).toEqual(cardIds[0])
+        expect(matrix[0][2]).toEqual(undefined)
+        expect(matrix[0][3].id).toEqual(cardIds[1])
 
-      expect(collection.cardIdsBetweenByColRow(cardIds[2], cardIds[3])).toEqual(
-        [cardIds[2], cardIds[3]]
-      )
+        expect(matrix[1][0]).toEqual(undefined)
+        expect(matrix[1][1]).toEqual(undefined)
+        expect(matrix[1][2].id).toEqual(cardIds[2])
+        expect(matrix[1][3].id).toEqual(cardIds[2])
 
-      expect(collection.cardIdsBetweenByColRow(cardIds[0], cardIds[2])).toEqual(
-        [cardIds[0], cardIds[1], cardIds[2]]
-      )
+        expect(matrix[2][0]).toEqual(undefined)
+        expect(matrix[2][1]).toEqual(undefined)
+        expect(matrix[2][2]).toEqual(undefined)
+        expect(matrix[2][3].id).toEqual(cardIds[3])
 
-      expect(collection.cardIdsBetweenByColRow(cardIds[0], cardIds[3])).toEqual(
-        cardIds
-      )
+        expect(matrix[3][0]).toEqual(undefined)
+        expect(matrix[3][1]).toEqual(undefined)
+        expect(matrix[3][2]).toEqual(undefined)
+        expect(matrix[3][3].id).toEqual(cardIds[3])
+      })
+    })
 
-      expect(collection.cardIdsBetweenByColRow(cardIds[3], cardIds[0])).toEqual(
-        cardIds
-      )
+    describe('cardIdsBetweenByColRow', () => {
+      it('returns cards in rectangular area from two cards', () => {
+        expect(
+          collection.cardIdsBetweenByColRow(cardIds[0], cardIds[1])
+        ).toEqual([cardIds[0], cardIds[1]])
+
+        expect(
+          collection.cardIdsBetweenByColRow(cardIds[2], cardIds[3])
+        ).toEqual([cardIds[2], cardIds[3]])
+
+        expect(
+          collection.cardIdsBetweenByColRow(cardIds[0], cardIds[2])
+        ).toEqual([cardIds[0], cardIds[1], cardIds[2]])
+
+        expect(
+          collection.cardIdsBetweenByColRow(cardIds[0], cardIds[3])
+        ).toEqual(cardIds)
+
+        expect(
+          collection.cardIdsBetweenByColRow(cardIds[3], cardIds[0])
+        ).toEqual(cardIds)
+      })
     })
   })
 })
