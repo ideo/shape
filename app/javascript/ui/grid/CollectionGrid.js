@@ -863,7 +863,7 @@ class CollectionGrid extends React.Component {
     const minHeight = rows * (gridSettings.gridH + gridSettings.gutter)
 
     return (
-      <StyledGrid minHeight={minHeight}>
+      <StyledGrid data-deselect-on-click minHeight={minHeight}>
         {sorting && (
           <SortContainer>
             <CollectionSort collection={collection} />
