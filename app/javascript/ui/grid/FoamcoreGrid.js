@@ -38,8 +38,6 @@ const BlankCard = styled.div.attrs({
 
 const Grid = styled.div`
   min-height: 1300px;
-  overflow-x: scroll;
-  overflow-y: scroll;
   position: relative;
 `
 
@@ -191,24 +189,6 @@ class FoamcoreGrid extends React.Component {
     }
   }
 
-  updateCardWithUndo(card, updates, undoMessage) {
-    // TODO combine with normal grid
-    const { collection } = this.props
-    // If a template, warn that any instances will be updated
-    const updateCollectionCard = () => {
-      // this will assign the update attributes to the card
-      this.props.updateCollection({
-        card,
-        updates,
-        undoMessage,
-      })
-    }
-    collection.confirmEdit({
-      onCancel: () => {},
-      onConfirm: updateCollectionCard,
-    })
-  }
-
   updateMaxLoaded = ({ row, col }) => {
     if (row > this.loadedRows.max) this.loadedRows.max = row
     if (col > this.loadedCols.max) this.loadedCols.max = col
@@ -227,7 +207,7 @@ class FoamcoreGrid extends React.Component {
   get visibleRows() {
     if (!this.gridRef) return { min: null, max: null }
 
-    const top = this.gridRef.scrollTop
+    const top = window.scrollY
     const gridHeight = window.innerHeight - pageMargins.top
 
     const min = parseFloat((top / this.cardAndGutterHeight).toFixed(1))
@@ -246,7 +226,7 @@ class FoamcoreGrid extends React.Component {
   get visibleCols() {
     if (!this.gridRef) return { min: null, max: null }
 
-    const left = this.gridRef.scrollLeft
+    const left = window.scrollX
     const gridWidth = window.innerWidth - pageMargins.left
 
     const min = parseFloat((left / this.cardAndGutterWidth).toFixed(1))
@@ -370,23 +350,22 @@ class FoamcoreGrid extends React.Component {
     } = this.props
     const card = _.find(collection_cards, { id: cardId })
     // TODO considering changing dragX in MoveableGridCard
-    const overlapPos = {
+    const cardPosition = {
       x: dragPosition.dragX,
       y: dragPosition.dragY,
       width: card.width,
       height: card.height,
     }
     const cardDims = { width: card.width, height: card.height }
-    const overlapCoords = this.coordinatesForPosition(overlapPos)
+    const cardCoords = this.coordinatesForPosition(cardPosition)
     this.debouncedSetDraggedOnSpots(
-      { ...overlapCoords, ...cardDims },
+      { ...cardCoords, ...cardDims },
       dragPosition
     )
   }
 
   onDragStart = cardId => {
-    const dragMap = this.determineDragMap(cardId)
-    this.draggingMap = dragMap
+    this.draggingMap = this.determineDragMap(cardId)
   }
 
   onDragOrResizeStop = (cardId, dragType) => {
@@ -399,17 +378,8 @@ class FoamcoreGrid extends React.Component {
     if (dragType === 'resize') {
       this.resizeCard(card)
     } else {
-      this.moveCard(card)
+      this.moveCards(card)
     }
-    runInAction(() => {
-      this.dragGridSpot.clear()
-      this.dragging = false
-      this.resizing = false
-      // TODO not sure why stopDragging doesn't clear this out
-      uiStore.multiMoveCardIds = []
-    })
-    // Run immediately without throttling
-    this.calculateCardsToRender()
   }
 
   onResize = (cardId, newSize) => {
@@ -429,38 +399,85 @@ class FoamcoreGrid extends React.Component {
   }
 
   resizeCard = card => {
-    // just some double-checking validations
     let undoMessage
-    const resizePlaceholder = this.placeholderSpot
-    let { height, width } = resizePlaceholder
+    const { collection, trackCollectionUpdated } = this.props
+    let { height, width } = this.placeholderSpot
+    // Some double-checking validations
     if (height > MAX_CARD_H) height = MAX_CARD_H
     if (width > MAX_CARD_W) width = MAX_CARD_W
     // set up action to undo
     if (card.height !== height || card.width !== width) {
       undoMessage = 'Card resize undone'
     }
-    const updates = {}
-    updates.width = width
-    updates.height = height
-    this.updateCardWithUndo(card, updates, undoMessage)
+    const updates = [
+      {
+        card,
+        width,
+        height,
+      },
+    ]
+
+    const onConfirm = () => trackCollectionUpdated()
+
+    // If a template, warn that any instances will be updated
+    collection.API_batchUpdateCardsWithUndo({
+      updates,
+      undoMessage,
+      onConfirm,
+    })
+
+    this.resetCardPositions()
   }
 
-  moveCard = (card, data) => {
-    const { uiStore } = this.props
+  moveCards = masterCard => {
+    if (this.dragGridSpot.size < 1) return
+    const { collection } = this.props
     const undoMessage = 'Card move undone'
-    // Different paths for dragging multiple cards vs one
-    if (uiStore.multiMoveCardIds.length < 2) {
-      if (this.dragGridSpot.size < 1) return
-      const movePlaceholder = [...this.dragGridSpot.values()][0]
-      // Save algorithm for what to do when dragging over card for collision
-      // resolution later
 
-      if (movePlaceholder.card) return
+    const movePlaceholder = [...this.dragGridSpot.values()][0]
+    if (movePlaceholder.card) return
 
-      const { row, col } = movePlaceholder
-      const updates = { row, col }
-      this.updateCardWithUndo(card, updates, undoMessage)
+    const masterRow = movePlaceholder.row
+    const masterCol = movePlaceholder.col
+
+    const updates = []
+    // draggingMap has the relative row and column of all cards being moved
+    //
+    // TODO: currently it can set negative rows and columns
+    // if you move to the left-hand side of the board,
+    // so we need to address that in collision detection
+    this.draggingMap.forEach(map => {
+      updates.push({
+        card: map.card,
+        row: map.row + masterRow,
+        col: map.col + masterCol,
+      })
+    })
+
+    const onConfirmOrCancel = () => {
+      this.resetCardPositions()
     }
+
+    collection.API_batchUpdateCardsWithUndo({
+      updates,
+      undoMessage,
+      onConfirm: onConfirmOrCancel,
+      onCancel: onConfirmOrCancel,
+    })
+  }
+
+  // reset the grid back to its original state
+  resetCardPositions() {
+    const { uiStore } = this.props
+    runInAction(() => {
+      this.dragGridSpot.clear()
+      this.dragging = false
+      this.resizing = false
+      uiStore.multiMoveCardIds = []
+      uiStore.selectedCardIds = []
+    })
+    // Run immediately without throttling
+    this.calculateCardsToRender()
   }
 
   /*
@@ -506,7 +523,6 @@ class FoamcoreGrid extends React.Component {
   determineDragMap(cardId) {
     const { collection, uiStore } = this.props
 
-    if (uiStore.multiMoveCardIds.length < 2) return {}
     // The master card is the card currently being dragged
     const masterCard = collection.collection_cards.find(c => c.id === cardId)
     const movingCardIds = uiStore.multiMoveCardIds.filter(c => c.id !== cardId)
@@ -869,9 +885,9 @@ const gridConfigProps = {
 
 FoamcoreGrid.propTypes = {
   ...gridConfigProps,
-  updateCollection: PropTypes.func.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   cardProperties: MobxPropTypes.arrayOrObservableArray.isRequired,
+  trackCollectionUpdated: PropTypes.func.isRequired,
   canEditCollection: PropTypes.bool.isRequired,
   movingCardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
   loadCollectionCards: PropTypes.func.isRequired,

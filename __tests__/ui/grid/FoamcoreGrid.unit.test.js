@@ -20,6 +20,7 @@ describe('FoamcoreGrid', () => {
     cardC = createCard({ col: 0, row: 2, width: 2 })
     const collection = fakeCollection
     collection.collection_cards = [cardA, cardB, cardC]
+    collection.confirmEdit = jest.fn()
 
     props = {
       collection,
@@ -124,25 +125,39 @@ describe('FoamcoreGrid', () => {
     })
   })
 
-  describe('onDragOrResizeStop', () => {
-    let cardId
-
+  describe('resetCardPositions', () => {
     beforeEach(() => {
-      cardId = cards[0].id
-      instance.moveCard = jest.fn().mockReturnValue()
+      instance.moveCards = jest.fn().mockReturnValue()
       instance.resizeCard = jest.fn().mockReturnValue()
       instance.dragging = true
       // Stub this or else it causes mobx `Maximum call stack size exceeded`
       instance.calculateCardsToRender = jest.fn()
       props.uiStore.multiMoveCardIds = [cards[0].id]
-      instance.onDragOrResizeStop(cardId, 'move')
+      props.uiStore.selectedCardIds = [cards[0].id]
     })
 
     it('should stop all dragging', () => {
+      instance.resetCardPositions()
       expect(instance.dragGridSpot.size).toEqual(0)
       expect(instance.dragging).toEqual(false)
       expect(props.uiStore.multiMoveCardIds.length).toBe(0)
+      expect(props.uiStore.selectedCardIds.length).toBe(0)
       expect(instance.calculateCardsToRender).toHaveBeenCalled()
+    })
+  })
+
+  describe('onDragOrResizeStop', () => {
+    let cardId
+
+    beforeEach(() => {
+      cardId = cards[0].id
+      instance.moveCards = jest.fn().mockReturnValue()
+      instance.resizeCard = jest.fn().mockReturnValue()
+      instance.dragging = true
+      // Stub this or else it causes mobx `Maximum call stack size exceeded`
+      instance.calculateCardsToRender = jest.fn()
+      props.uiStore.multiMoveCardIds = [cards[0].id]
+      props.uiStore.selectedCardIds = [cards[0].id]
     })
 
     describe('when moving', () => {
@@ -150,9 +165,8 @@ describe('FoamcoreGrid', () => {
         instance.onDragOrResizeStop(cardId, 'move')
       })
 
-      it('should try and move the card with the found card', () => {
-        expect(instance.moveCard).toHaveBeenCalledWith(cards[0])
-        expect(instance.calculateCardsToRender).toHaveBeenCalled()
+      it('calls moveCards', () => {
+        expect(instance.moveCards).toHaveBeenCalledWith(cards[0])
       })
     })
 
@@ -162,14 +176,8 @@ describe('FoamcoreGrid', () => {
         instance.onDragOrResizeStop(cardId, 'resize')
       })
 
-      it('should try and resize the card with the found card', () => {
+      it('calls resizeCard', () => {
         expect(instance.resizeCard).toHaveBeenCalledWith(cards[0])
-        expect(instance.calculateCardsToRender).toHaveBeenCalled()
-      })
-
-      it('should stop all resizing and moving', () => {
-        expect(instance.resizing).toEqual(false)
-        expect(instance.calculateCardsToRender).toHaveBeenCalled()
       })
     })
   })
@@ -194,6 +202,101 @@ describe('FoamcoreGrid', () => {
         col: cards[0].col,
         width: 2,
         height: 1,
+      })
+    })
+  })
+
+  describe('resizeCard', () => {
+    beforeEach(() => {
+      instance.placeholderSpot = { width: 2, height: 2 }
+      // Stub this or else it causes mobx `Maximum call stack size exceeded`
+      instance.calculateCardsToRender = jest.fn()
+    })
+
+    it('calls collection.API_batchUpdateCardsWithUndo', () => {
+      instance.resizeCard(cards[0])
+      expect(
+        props.collection.API_batchUpdateCardsWithUndo
+      ).toHaveBeenCalledWith({
+        updates: [
+          {
+            card: cards[0],
+            width: 2,
+            height: 2,
+          },
+        ],
+        undoMessage: 'Card resize undone',
+        onConfirm: expect.any(Function),
+      })
+    })
+
+    it('calls resetCardPositions', () => {
+      instance.resetCardPositions = jest.fn()
+      instance.resizeCard(cards[0])
+      expect(instance.resetCardPositions).toHaveBeenCalled()
+    })
+  })
+
+  describe('moveCards', () => {
+    describe('when moving a single card', () => {
+      beforeEach(() => {
+        instance.dragGridSpot.set('6,7', { col: 6, row: 7 })
+        // Dragging map has relatively positioned cards from master card at 0,0
+        instance.draggingMap = [{ card: cards[0], row: 0, col: 0 }]
+        instance.moveCards(cards[0])
+      })
+
+      it('calls collection.API_batchUpdateCardsWithUndo', () => {
+        expect(
+          props.collection.API_batchUpdateCardsWithUndo
+        ).toHaveBeenCalledWith({
+          updates: [
+            {
+              card: cards[0],
+              col: 6,
+              row: 7,
+            },
+          ],
+          undoMessage: 'Card move undone',
+          onConfirm: expect.any(Function),
+          onCancel: expect.any(Function),
+        })
+      })
+    })
+
+    describe('when moving multiple cards', () => {
+      beforeEach(() => {
+        props.uiStore.multiMoveCardIds = [cards[0].id, cards[1].id]
+        rerender()
+        instance.dragGridSpot.set('6,7', { col: 6, row: 7 })
+        // Dragging map has relatively positioned cards from master card at 0,0
+        instance.draggingMap = [
+          { card: cards[0], row: 0, col: 0 },
+          { card: cards[1], row: 2, col: 2 },
+        ]
+        instance.moveCards(cards[0])
+      })
+
+      it('calls collection.API_batchUpdateCardsWithUndo', () => {
+        expect(
+          props.collection.API_batchUpdateCardsWithUndo
+        ).toHaveBeenCalledWith({
+          updates: [
+            {
+              card: cards[0],
+              col: 6,
+              row: 7,
+            },
+            {
+              card: cards[1],
+              col: 8,
+              row: 9,
+            },
+          ],
+          undoMessage: 'Card move undone',
+          onConfirm: expect.any(Function),
+          onCancel: expect.any(Function),
+        })
       })
     })
   })
@@ -329,7 +432,5 @@ describe('FoamcoreGrid', () => {
   })
 
   describe('determineDragMap', () => {})
-  describe('resizeCard', () => {})
-  describe('moveCard', () => {})
   describe('setResizeSpot', () => {})
 })
