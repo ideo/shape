@@ -1,8 +1,6 @@
 import axios from 'axios'
 import filestack from 'filestack-js'
 
-import { apiStore } from '~/stores'
-
 const API_KEY = process.env.FILESTACK_API_KEY
 
 export const MAX_SIZE = 75 * 1024 * 1024
@@ -40,7 +38,7 @@ const dropPaneDefaults = {
 
 class FilestackUpload {
   static get client() {
-    return filestack.init(API_KEY, apiStore.filestackToken)
+    return filestack.init(API_KEY)
   }
 
   static async processFiles(filesUploaded) {

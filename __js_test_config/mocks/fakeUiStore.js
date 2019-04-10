@@ -85,6 +85,7 @@ const fakeUiStore = {
   popupAlert: jest.fn(),
   stopDragging: jest.fn(),
   multiMoveCardIds: [],
+  setSnoozeChecked: jest.fn(),
 }
 
 export default fakeUiStore

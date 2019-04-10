@@ -433,7 +433,8 @@ class CollectionGrid extends React.Component {
       cardType: 'placeholder',
       record: original.record,
     }
-    const placeholder = new CollectionCard(data)
+    // NOTE: important to always initialize models supplying apiStore as the collection
+    const placeholder = new CollectionCard(data, this.props.apiStore)
     updateModelId(placeholder, placeholderKey)
     return placeholder
   }

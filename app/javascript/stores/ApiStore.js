@@ -24,7 +24,6 @@ import CommentThread from './jsonApi/CommentThread'
 import UsersThread from './jsonApi/UsersThread'
 import SurveyResponse from './jsonApi/SurveyResponse'
 import QuestionAnswer from './jsonApi/QuestionAnswer'
-import { undoStore } from './index'
 
 class ApiStore extends jsonapi(datxCollection) {
   @observable
@@ -57,6 +56,13 @@ class ApiStore extends jsonapi(datxCollection) {
   // doesn't have any need to be observable...
   filestackToken = {}
   filestackTokenInterval = null
+
+  constructor({ routingStore, uiStore, undoStore } = {}) {
+    super()
+    this.routingStore = routingStore
+    this.uiStore = uiStore
+    this.undoStore = undoStore
+  }
 
   fetch(type, id, skipCache = false) {
     return super.fetch(type, id, { skipCache })
@@ -144,7 +150,6 @@ class ApiStore extends jsonapi(datxCollection) {
       const currentUser = res.data
       this.setCurrentUserInfo({
         id: currentUser.id,
-        filestackToken: currentUser.filestack_token,
         organizationId:
           currentUser.current_organization &&
           currentUser.current_organization.id,
@@ -386,7 +391,7 @@ class ApiStore extends jsonapi(datxCollection) {
     )
     if (undoable) {
       const snapshot = collection.toJsonApiWithCards()
-      undoStore.pushUndoAction({
+      this.undoStore.pushUndoAction({
         message: 'Archive undone',
         apiCall: () => this.unarchiveCards({ cardIds, snapshot }),
         redirectPath: { type: 'collections', id: collection.id },
@@ -425,7 +430,7 @@ class ApiStore extends jsonapi(datxCollection) {
   async duplicateCards(data) {
     const res = await this.request('collection_cards/duplicate', 'POST', data)
     const collection = this.find('collections', data.to_id)
-    undoStore.pushUndoAction({
+    this.undoStore.pushUndoAction({
       message: 'Duplicate undone',
       apiCall: () =>
         this.archiveCards({
@@ -501,25 +506,6 @@ class ApiStore extends jsonapi(datxCollection) {
       })
     }
     return org
-  }
-
-  beginTokenRefreshPoller() {
-    if (this.filestackTokenInterval) {
-      clearInterval(this.filestackTokenInterval)
-    }
-    // token expires in an hour, attempt refresh every 20m just to be safe
-    this.filestackTokenInterval = setInterval(() => {
-      this.refreshFilestackToken()
-    }, 1000 * 60 * 20)
-  }
-
-  async refreshFilestackToken() {
-    try {
-      this.filestackToken = await this.requestJson('filestack/token')
-    } catch (e) {
-      trackError(e, { source: 'refreshFilestackToken', name: 'fetchToken' })
-    }
-    return this.filestackToken
   }
 
   // default action for updating any basic apiStore value
