@@ -87,6 +87,56 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     this.reloading = value
   }
 
+  cardIdsBetween(firstCardId, lastCardId) {
+    if (this.isBoard) {
+      return this.cardIdsBetweenByRowCol(firstCardId, lastCardId)
+    }
+    // For all other collection types, find cards by order
+    return this.cardIdsBetweenByOrder(firstCardId, lastCardId)
+  }
+
+  // Find all cards that are between these two card ids,
+  // using the card order
+  cardIdsBetweenByOrder(firstCardId, lastCardId) {
+    const firstIdx = this.cardIds.findIndex(id => id === firstCardId)
+    const lastIdx = this.cardIds.findIndex(id => id === lastCardId)
+    const cardIdsBetween = [...this.cardIds]
+    // Cards are in sorted order, so slice out the right card Ids
+    if (lastIdx > firstIdx) {
+      return cardIdsBetween.slice(firstIdx, lastIdx)
+    }
+    return cardIdsBetween.slice(lastIdx, firstIdx)
+  }
+
+  // Find all cards that are between these two card ids,
+  // using the card row & col
+  cardIdsBetweenByRowCol(firstCardId, lastCardId) {
+    const firstCard = this.collection_cards.find(
+      card => card.id === firstCardId
+    )
+    const lastCard = this.collection_cards.find(card => card.id === lastCardId)
+
+    // Construct a rectangle that has the min/max rows,
+    // because they may have selected top right -> bottom left,
+    // or top left -> bottom right
+    const minRow = _.min([firstCard.row, lastCard.row])
+    const maxRow = _.max([firstCard.row, lastCard.row])
+    const minCol = _.min([firstCard.col, lastCard.col])
+    const maxCol = _.max([firstCard.col, lastCard.col])
+
+    // Find all cards that are within the rectangle created
+    // between the first and last selected cards
+    const cardsBetween = this.collection_cards.filter(
+      card =>
+        card.row >= minRow &&
+        card.row <= maxRow &&
+        card.col >= minCol &&
+        card.col <= maxCol
+    )
+    // Return card ids
+    return cardsBetween.map(card => card.id)
+  }
+
   get shouldShowEditWarning() {
     if (!this.isMasterTemplate || this.template_num_instances === 0)
       return false
