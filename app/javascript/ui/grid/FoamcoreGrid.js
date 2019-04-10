@@ -38,8 +38,6 @@ const BlankCard = styled.div.attrs({
 
 const Grid = styled.div`
   min-height: 1300px;
-  overflow-x: scroll;
-  overflow-y: scroll;
   position: relative;
 `
 
@@ -227,7 +225,7 @@ class FoamcoreGrid extends React.Component {
   get visibleRows() {
     if (!this.gridRef) return { min: null, max: null }
 
-    const top = this.gridRef.scrollTop
+    const top = window.scrollY
     const gridHeight = window.innerHeight - pageMargins.top
 
     const min = parseFloat((top / this.cardAndGutterHeight).toFixed(1))
@@ -246,7 +244,7 @@ class FoamcoreGrid extends React.Component {
   get visibleCols() {
     if (!this.gridRef) return { min: null, max: null }
 
-    const left = this.gridRef.scrollLeft
+    const left = window.scrollX
     const gridWidth = window.innerWidth - pageMargins.left
 
     const min = parseFloat((left / this.cardAndGutterWidth).toFixed(1))
