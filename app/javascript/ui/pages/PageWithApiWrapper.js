@@ -137,7 +137,7 @@ export const MyCollectionApiWrapper = routerProps => (
     {...routerProps}
     fetchType="collections"
     fetchId={apiStore => apiStore.currentUserCollectionId}
-    render={collection => <CollectionPage collection={collection} isHomepage />}
+    render={collection => <CollectionPage collection={collection} />}
   />
 )
 

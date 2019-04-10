@@ -88,7 +88,6 @@ class Comment extends React.Component {
             title={author.name}
             url={author.pic_url_square}
             linkToCollectionId={author.user_profile_collection_id}
-            size={32}
             className="author-img"
           />
           <DisplayText className="author" color={v.colors.white}>
