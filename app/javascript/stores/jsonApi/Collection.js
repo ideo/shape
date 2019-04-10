@@ -42,7 +42,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   @computed
   get cardIds() {
-    return this.collection_cards.map(card => card.id)
+    const sortedCards = _.sortBy(this.collection_cards, card => card.order)
+    return sortedCards.map(card => card.id)
   }
 
   @computed
