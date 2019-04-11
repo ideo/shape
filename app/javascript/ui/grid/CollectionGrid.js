@@ -9,11 +9,12 @@ import CollectionSort from '~/ui/grid/CollectionSort'
 import Loader from '~/ui/layout/Loader'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
+import v from '~/utils/variables'
 
 const CARD_HOLD_TIME = 0.4 * 1000
 
 const StyledGrid = styled.div`
-  margin-top: 50px;
+  margin-top: ${v.pageContentMarginTop}px;
   min-height: ${props => props.minHeight}px;
   position: relative;
   width: 100%;

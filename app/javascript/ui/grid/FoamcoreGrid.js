@@ -45,6 +45,7 @@ const BlankCard = styled.div.attrs({
 
 const Grid = styled.div`
   min-height: 1300px;
+  margin-top: ${v.pageContentMarginTop}px;
   position: relative;
 `
 

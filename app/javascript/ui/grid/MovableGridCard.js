@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types'
-import _ from 'lodash'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import FlipMove from 'react-flip-move'
 import Rnd from 'react-rnd'
@@ -102,10 +101,6 @@ class MovableGridCard extends React.PureComponent {
       resizeWidth: 0,
       resizeHeight: 0,
     }
-    this.throttledScrollIfNearPageBounds = _.throttle(
-      this.scrollIfNearPageBounds,
-      50
-    )
   }
 
   componentWillReceiveProps({ position }) {
@@ -140,25 +135,24 @@ class MovableGridCard extends React.PureComponent {
     const { horizontalScroll, card } = this.props
     const { gridW } = uiStore.gridSettings
 
-    document.body.style['overflow-y'] = 'hidden'
-
+    // Vertical Scroll
     if (e.clientY < TOP_SCROLL_TRIGGER) {
       // At top of viewport
       this.scrolling = true
       this.scrollUp(null, e.clientY)
+      return
     } else if (e.clientY > window.innerHeight - TOP_SCROLL_TRIGGER) {
       // At bottom of viewport
       this.scrolling = true
       this.scrollDown()
-    } else if (!horizontalScroll) {
-      this.scrolling = false
       return
     }
 
-    document.body.style['overflow-x'] = 'hidden'
-
     // Horizontal Scroll
-
+    if (!horizontalScroll) {
+      this.scrolling = false
+      return
+    }
     const cardWidth = (card.width * gridW) / 2
     const leftMargin = v.containerPadding.horizontal * 16
 
@@ -238,7 +232,7 @@ class MovableGridCard extends React.PureComponent {
       return
     }
 
-    this.throttledScrollIfNearPageBounds(e)
+    this.scrollIfNearPageBounds(e)
 
     // TODO make this switch for normal collections
     // const pageMargin = window.innerWidth - v.maxWidth
