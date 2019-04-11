@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { observable, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -6,12 +5,8 @@ import { Flex } from 'reflexbox'
 import styled from 'styled-components'
 import CopyToClipboard from 'react-copy-to-clipboard'
 
-import ActivityLogButton from '~/ui/notifications/ActivityLogButton'
-import Breadcrumb from '~/ui/layout/Breadcrumb'
-import ActionMenu from '~/ui/grid/ActionMenu'
 import EditableName from '~/ui/pages/shared/EditableName'
 import RolesModal from '~/ui/roles/RolesModal'
-import RolesSummary from '~/ui/roles/RolesSummary'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import HiddenIconButton from '~/ui/icons/HiddenIconButton'
@@ -21,18 +16,12 @@ import LinkIconSm from '~/ui/icons/LinkIconSm'
 import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
-import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
+import { StyledHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import { SubduedHeading1 } from '~/ui/global/styled/typography'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import { FormButton } from '~/ui/global/styled/forms'
 import v from '~/utils/variables'
 /* global IdeoSSO */
-
-// NOTE: Header and PageHeader create sibling <header> elements on the page
-const FixedPageHeader = FixedHeader.extend`
-  top: ${v.globalHeaderHeight}px;
-  z-index: ${v.zIndex.pageHeader};
-`
 
 const IconHolder = styled.span`
   color: ${v.colors.commonDark};
@@ -74,25 +63,15 @@ const LiveTestIndicator = styled.span`
   padding-top: 1.33rem;
 `
 
-@inject('routingStore', 'uiStore')
+@inject('uiStore')
 @observer
 class PageHeader extends React.Component {
   @observable
   iconAndTagsWidth = 0
-  @observable
-  actionsWidth = 0
 
   get canEdit() {
     const { record } = this.props
     return record.can_edit_content && !record.system_required
-  }
-
-  get hasActions() {
-    const { record } = this.props
-    return (
-      record.internalType === 'items' ||
-      (!record.isUserCollection && !record.isSharedCollection)
-    )
   }
 
   @action
@@ -107,49 +86,10 @@ class PageHeader extends React.Component {
     this.iconAndTagsWidth = width
   }
 
-  @action
-  updateActionsWidth(ref) {
-    if (!ref) return
-    this.actionsWidth = ref.offsetWidth
-  }
-
-  showObjectRoleDialog = () => {
-    const { uiStore, record } = this.props
-    uiStore.update('rolesMenuOpen', record)
-  }
-
   updateRecordName = name => {
     const { record } = this.props
     // method exists on Item and Collection
     record.API_updateName(name)
-  }
-
-  openMenu = () => {
-    const { uiStore } = this.props
-    uiStore.update('pageMenuOpen', true)
-  }
-
-  closeMenu = () => {
-    const { uiStore } = this.props
-    uiStore.update('pageMenuOpen', false)
-  }
-
-  routeBack = ({ type } = {}) => {
-    const { record, routingStore } = this.props
-    if (
-      record.internalType === 'items' ||
-      type === 'move' ||
-      type === 'archive'
-    ) {
-      if (record.parent_collection_card.parent_id) {
-        routingStore.routeTo(
-          'collections',
-          record.parent_collection_card.parent_id
-        )
-      } else {
-        routingStore.routeTo('homepage')
-      }
-    }
   }
 
   handleTitleClick = () => {
@@ -157,47 +97,6 @@ class PageHeader extends React.Component {
     if (record.isCurrentUserProfile) {
       window.open(IdeoSSO.profileUrl, '_blank')
     }
-  }
-
-  get actions() {
-    const { record, uiStore } = this.props
-    const elements = []
-    // 1. RolesSummary
-    if (this.hasActions) {
-      elements.push(
-        <RolesSummary
-          key="roles"
-          handleClick={this.showObjectRoleDialog}
-          roles={record.roles}
-          canEdit={record.can_edit}
-          rolesMenuOpen={!!uiStore.rolesMenuOpen}
-        />
-      )
-    }
-    // 2. CommentIcon (toggle ActivityLog)
-    elements.push(<ActivityLogButton key="activity" />)
-    if (this.hasActions && record.parent_collection_card) {
-      // TODO hacky way to include the record on the card link
-      record.parent_collection_card.record = record
-      // 3. ActionMenu actions
-      elements.push(
-        <ActionMenu
-          key="action-menu"
-          location="PageMenu"
-          className="card-menu"
-          card={record.parent_collection_card}
-          canEdit={record.can_edit}
-          canReplace={record.canReplace}
-          submissionBox={record.isSubmissionBox}
-          menuOpen={uiStore.pageMenuOpen}
-          onOpen={this.openMenu}
-          onLeave={this.closeMenu}
-          onMoveMenu={this.routeBack}
-          afterArchive={this.routeBack}
-        />
-      )
-    }
-    return elements
   }
 
   openMoveMenuForTemplate = () => {
@@ -333,7 +232,7 @@ class PageHeader extends React.Component {
   }
 
   render() {
-    const { record, isHomepage, uiStore } = this.props
+    const { record, uiStore } = this.props
     const tagEditorOpen =
       record.parent_collection_card &&
       uiStore.tagsModalOpenId === record.parent_collection_card.id
@@ -341,19 +240,12 @@ class PageHeader extends React.Component {
     const rolesRecord = uiStore.rolesMenuOpen ? uiStore.rolesMenuOpen : record
 
     return (
-      <FixedPageHeader>
+      <StyledHeader>
         <MaxWidthContainer>
           <RolesModal record={rolesRecord} open={!!uiStore.rolesMenuOpen} />
-          <Breadcrumb
-            record={record}
-            isHomepage={isHomepage}
-            // re-mount every time the record / breadcrumb changes
-            key={`${record.identifier}_${record.breadcrumbSize}`}
-            // force props update if windowWidth changes
-            windowWidth={uiStore.windowWidth}
-          />
           <div>
             <StyledTitleAndRoles
+              data-deselect-on-click
               className={record.isCurrentUserProfile ? 'user-profile' : ''}
               justify="space-between"
             >
@@ -369,7 +261,6 @@ class PageHeader extends React.Component {
                   updateNameHandler={this.updateRecordName}
                   canEdit={this.canEdit}
                   extraWidth={this.iconAndTagsWidth}
-                  actionsWidth={this.actionsWidth}
                 />
                 {/* Can't use <Flex> if we want to attach refs... */}
                 <div
@@ -441,20 +332,6 @@ class PageHeader extends React.Component {
                   </Fragment>
                 )}
               </Flex>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'flex-end',
-                  whiteSpace: 'nowrap',
-                  height: '60px',
-                  marginTop: '-12px',
-                }}
-                ref={ref => {
-                  this.updateActionsWidth(ref)
-                }}
-              >
-                <Fragment>{this.actions}</Fragment>
-              </div>
             </StyledTitleAndRoles>
           </div>
         </MaxWidthContainer>
@@ -463,23 +340,17 @@ class PageHeader extends React.Component {
           record={record}
           open={tagEditorOpen}
         />
-      </FixedPageHeader>
+      </StyledHeader>
     )
   }
 }
 
 PageHeader.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
-  isHomepage: PropTypes.bool,
 }
 
 PageHeader.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
-}
-
-PageHeader.defaultProps = {
-  isHomepage: false,
 }
 
 export default PageHeader

@@ -12,6 +12,11 @@ class RoutingStore extends RouterStore {
   slug = () => apiStore.currentOrgSlug
 
   @computed
+  get isHomepage() {
+    return this.location.pathname === this.pathTo('homepage')
+  }
+
+  @computed
   get query() {
     return queryString.parse(this.location.search)
   }
@@ -39,6 +44,7 @@ class RoutingStore extends RouterStore {
     // close the org/roles menus if either are open when we route to a new page
     uiStore.update('organizationMenuPage', null)
     uiStore.update('rolesMenuOpen', null)
+    uiStore.setViewingCollection(null)
     uiStore.closeDialog()
     if (!id && type !== 'homepage') {
       // in this case, type is a path like '/' or '/terms'

@@ -14,6 +14,8 @@ class CollectionCard extends BaseRecord {
     'order',
     'width',
     'height',
+    'row',
+    'col',
     'reference',
     'parent_id',
     'collection_id',
@@ -25,6 +27,8 @@ class CollectionCard extends BaseRecord {
     'hidden',
     'filter',
   ]
+
+  batchUpdateAttributes = ['id', 'order', 'width', 'height', 'row', 'col']
 
   @observable
   maxWidth = this.width
@@ -256,8 +260,12 @@ class CollectionCard extends BaseRecord {
   }
 
   get isBeingMultiDragged() {
+    return !this.isDragCardMaster && this.isBeingMultiMoved
+  }
+
+  get isDragCardMaster() {
     const { uiStore } = this
-    return uiStore.dragCardMaster !== this.id && this.isBeingMultiMoved
+    return uiStore.dragCardMaster === this.id
   }
 
   async API_archiveSelf({ undoable = true }) {

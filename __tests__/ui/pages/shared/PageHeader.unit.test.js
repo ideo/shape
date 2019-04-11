@@ -29,10 +29,6 @@ describe('PageHeader', () => {
         wrapper.setProps(props)
       })
 
-      it('should not render the breadcrumb', () => {
-        expect(wrapper.find('Breadcrumb').prop('isHomepage')).toBeTruthy()
-      })
-
       it('should render an EditableName with the record.name', () => {
         expect(wrapper.find('EditableName').props().name).toEqual(
           props.record.name
@@ -45,22 +41,6 @@ describe('PageHeader', () => {
         fakeTextItem.can_edit = true
         props.record = fakeTextItem
         wrapper.setProps(props)
-      })
-
-      it('should render the breadcrumb', () => {
-        expect(wrapper.find('Breadcrumb').prop('record')).toEqual(fakeTextItem)
-      })
-
-      it('should not render the roles', () => {
-        expect(wrapper.find('RolesSummary').exists()).toBeTruthy()
-      })
-
-      it('should render the activity log icon', () => {
-        expect(wrapper.find('ActivityLogButton').exists()).toBeTruthy()
-      })
-
-      it('should render the page menu', () => {
-        expect(wrapper.find('ActionMenu').exists()).toBeTruthy()
       })
     })
 
@@ -78,20 +58,8 @@ describe('PageHeader', () => {
     })
 
     describe('for a normal collection', () => {
-      it('should render the breadcrumb', () => {
-        expect(wrapper.find('Breadcrumb').prop('record')).toEqual(
-          fakeCollection
-        )
-      })
-
       it('passes canEdit through to EditableName', () => {
         expect(wrapper.find('EditableName').props().canEdit).toEqual(
-          props.record.can_edit
-        )
-      })
-
-      it('passes canEdit through to RolesSummary', () => {
-        expect(wrapper.find('RolesSummary').props().canEdit).toEqual(
           props.record.can_edit
         )
       })
@@ -121,21 +89,6 @@ describe('PageHeader', () => {
 
     it('should call API_updateName on the record', () => {
       expect(props.record.API_updateName).toHaveBeenCalled()
-    })
-  })
-
-  describe('showObjectRoleDialog', () => {
-    beforeEach(() => {
-      props.uiStore.update.mockClear()
-      props.uiStore.rolesMenuOpen = null
-      component.showObjectRoleDialog()
-    })
-
-    it('should open the roles menu in the ui store', () => {
-      expect(props.uiStore.update).toHaveBeenCalledWith(
-        'rolesMenuOpen',
-        props.record
-      )
     })
   })
 

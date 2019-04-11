@@ -35,7 +35,7 @@ class AutocompleteOption extends React.Component {
     const { data } = this.props
     const entity = data.data
     const url = entity.pic_url_square || entity.filestack_file_url
-    return <Avatar url={url} title={entity.name} key={entity.id} size={38} />
+    return <Avatar url={url} title={entity.name} key={entity.id} />
   }
 
   renderCollectionAvatar() {
