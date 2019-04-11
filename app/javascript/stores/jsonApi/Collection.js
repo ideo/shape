@@ -42,8 +42,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   @computed
   get cardIds() {
-    const sortedCards = _.sortBy(this.collection_cards, card => card.order)
-    return sortedCards.map(card => card.id)
+    return this.sortedCards.map(card => card.id)
   }
 
   @computed
@@ -85,6 +84,87 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   @action
   setReloading(value) {
     this.reloading = value
+  }
+
+  cardIdsBetween(firstCardId, lastCardId) {
+    if (this.isBoard) {
+      return this.cardIdsBetweenByColRow(firstCardId, lastCardId)
+    }
+    // For all other collection types, find cards by order
+    return this.cardIdsBetweenByOrder(firstCardId, lastCardId)
+  }
+
+  // Find all cards that are between these two card ids,
+  // using the card order
+  cardIdsBetweenByOrder(firstCardId, lastCardId) {
+    const firstIdx = this.cardIds.findIndex(id => id === firstCardId)
+    const lastIdx = this.cardIds.findIndex(id => id === lastCardId)
+    const cardIdsBetween = [...this.cardIds]
+    // Cards are in sorted order, so slice out the right card Ids
+    if (lastIdx > firstIdx) {
+      return cardIdsBetween.slice(firstIdx, lastIdx)
+    }
+    return cardIdsBetween.slice(lastIdx, firstIdx)
+  }
+
+  get cardMatrix() {
+    // Get maximum dimensions of our card matrix
+    const maxCol = _.max(this.collection_cards.map(card => card.maxCol))
+    const maxRow = _.max(this.collection_cards.map(card => card.maxRow))
+
+    // Create matrix of arrays, each row having an array with the 'columns'
+    // Since row and col are zero-indexed, add 1
+    const matrix = _.map(new Array(maxRow + 1), row => new Array(maxCol + 1))
+
+    // Iterate through each card to populate the matrix
+    _.each(this.collection_cards, card => {
+      // Create a range with the min and max row and column that this card occupies
+      // range does not include last value, so increment max by 1
+      const rows = _.range(card.row, card.maxRow + 1)
+      const cols = _.range(card.col, card.maxCol + 1)
+
+      // Iterate over each to populate the matrix
+      _.each(rows, row => {
+        _.each(cols, col => {
+          matrix[row][col] = card
+        })
+      })
+    })
+    return matrix
+  }
+
+  minMaxRowColForCards = cards =>
+    // Find the min/max rows of what they have selected,
+    // keeping in mind a card's area needs to contribute to width/height
+    ({
+      minRow: _.min(cards.map(card => card.row)),
+      maxRow: _.max(cards.map(card => card.maxRow)),
+      minCol: _.min(cards.map(card => card.col)),
+      maxCol: _.max(cards.map(card => card.maxCol)),
+    })
+
+  // Find all cards that are between these two card ids,
+  // using the card row & col
+  cardIdsBetweenByColRow(firstCardId, lastCardId) {
+    const cards = this.collection_cards.filter(
+      card => card.id === firstCardId || card.id === lastCardId
+    )
+    const minMax = this.minMaxRowColForCards(cards)
+    const rowRange = _.range(minMax.minRow, minMax.maxRow + 1)
+    const colRange = _.range(minMax.mincol, minMax.maxCol + 1)
+
+    // Find all cards that are within the rectangle created
+    // between the first and last selected cards
+    const matrix = this.cardMatrix
+    const cardIds = []
+    _.each(rowRange, row => {
+      _.each(colRange, col => {
+        const card = matrix[row][col]
+        if (card && !_.includes(cardIds, card.id)) cardIds.push(card.id)
+      })
+    })
+
+    return cardIds
   }
 
   get shouldShowEditWarning() {
