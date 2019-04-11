@@ -81,6 +81,7 @@ class FoamcoreGrid extends React.Component {
   loadedRows = { loading: false, max: 0 }
   loadedCols = { loading: false, max: 0 }
   draggingMap = []
+  mouseDownAt = { x: null, y: null }
 
   constructor(props) {
     super(props)
@@ -291,6 +292,29 @@ class FoamcoreGrid extends React.Component {
 
   isBeingDraggedOn(coords) {
     return !!this.getDraggedOnSpot(coords)
+  }
+
+  handleMouseDownDrag = e => {
+    this.mouseDownAt = { x: e.clientX, y: e.clientY }
+  }
+
+  handleMouseUpDrag = e => {
+    const minX = _.min([e.clientX, this.mouseDownAt.x])
+    const maxX = _.max([e.clientX, this.mouseDownAt.x])
+    const minY = _.min([e.clientY, this.mouseDownAt.y])
+    const maxY = _.max([e.clientY, this.mouseDownAt.y])
+
+    // Reset for next drag
+    this.mouseDownAt = { x: null, y: null }
+
+    // Return if not dragging
+    if (maxX - minX < 20 || maxY - minY < 20) return
+
+    // Select all cards that this drag rectangle 'touches'
+    const topLeftCoords = this.coordinatesForPosition({ x: minX, y: minY })
+    const bottomRightCoords = this.coordinatesForPosition({ x: maxX, y: maxY })
+    const { collection } = this.props
+    collection.cardsBetween(topLeftCoords, bottomRightCoords)
   }
 
   handleBlankCardClick = ({ row, col }) => e => {
@@ -847,6 +871,8 @@ class FoamcoreGrid extends React.Component {
     return (
       <Grid
         onMouseMove={this.handleMouseMove}
+        onMouseDown={this.handleMouseDownDrag}
+        onMouseUp={this.handleMouseUpDrag}
         onScroll={this.handleScroll}
         innerRef={ref => {
           this.gridRef = ref
