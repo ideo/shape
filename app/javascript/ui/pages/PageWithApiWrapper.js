@@ -53,7 +53,7 @@ class PageWithApiWrapper extends React.Component {
     const { fetchId, apiStore, match } = this.props
     // strip non-numeric characters from id
     let paramsId = parseInt(match.params.id) || match.params.id
-    paramsId = paramsId.toString()
+    paramsId = paramsId ? paramsId.toString() : null
     if (!fetchId) return paramsId
     return fetchId(apiStore, paramsId)
   }
