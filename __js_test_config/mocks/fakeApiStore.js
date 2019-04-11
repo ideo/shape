@@ -1,3 +1,5 @@
+import fakeUiStore from './fakeUiStore'
+
 const fakeApiStore = ({
   findResult = '',
   findAllResult = [],
@@ -101,6 +103,10 @@ const fakeApiStore = ({
     ],
     collections: [],
     items: [],
+
+    uiStore: fakeUiStore,
+    undoStore: {},
+    routingStore: {},
   }
 }
 
