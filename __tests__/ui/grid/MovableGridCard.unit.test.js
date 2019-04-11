@@ -26,7 +26,7 @@ const props = {
   holdingOver: false,
 }
 
-let wrapper
+let wrapper, instance
 describe('MovableGridCard', () => {
   it('renders a placeholder card if cardType is "placeholder"', () => {
     props.cardType = 'placeholder'
@@ -105,6 +105,29 @@ describe('MovableGridCard', () => {
 
     it('passes hoveringOver to GridCard', () => {
       expect(wrapper.find('GridCard').props().hoveringOver).toBe(true)
+    })
+  })
+
+  describe('when scrollElement is provided', () => {
+    beforeEach(() => {
+      props.scrollElement = { scrollBy: jest.fn() }
+      wrapper = shallow(<MovableGridCard {...props} />)
+      instance = wrapper.instance()
+      instance.scrolling = true
+    })
+
+    describe('scrollRight', () => {
+      it('calls scrollBy on scrollElement', () => {
+        instance.scrollRight()
+        expect(props.scrollElement.scrollBy).toHaveBeenCalledWith(2, 0)
+      })
+    })
+
+    describe('scrollLeft', () => {
+      it('calls scrollBy on scrollElement', () => {
+        instance.scrollLeft()
+        expect(props.scrollElement.scrollBy).toHaveBeenCalledWith(-2, 0)
+      })
     })
   })
 })

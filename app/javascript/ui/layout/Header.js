@@ -308,9 +308,16 @@ class Header extends React.Component {
     const primaryGroup = currentUser.current_organization.primary_group
     return (
       <Fragment>
-        <StyledFixedHeader zIndex={v.zIndex.globalHeader}>
+        <StyledFixedHeader
+          data-deselect-on-click
+          zIndex={v.zIndex.globalHeader}
+        >
           <MaxWidthContainer>
-            <Flex align="center" style={{ minHeight: v.headerHeight }}>
+            <Flex
+              data-deselect-on-click
+              align="center"
+              style={{ minHeight: v.headerHeight }}
+            >
               <Box style={{ paddingRight: '12px' }}>
                 <PlainLink to={routingStore.pathTo('homepage')}>
                   <Logo noText width={46} />
@@ -320,7 +327,7 @@ class Header extends React.Component {
               <Box auto>
                 <div ref={ref => this.updateBreadcrumbsWidth(ref)}>
                   {record && (
-                    <Flex align="center">
+                    <Flex data-deselect-on-click align="center">
                       {/* TODO: why doesnt <Box auto={isMobile}> work like this? */}
                       <div style={{ flex: isMobile ? '1 1 auto' : '0 1 auto' }}>
                         <Breadcrumb
