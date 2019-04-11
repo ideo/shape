@@ -49,16 +49,32 @@ describe('FoamcoreGrid', () => {
   })
 
   describe('calculateFilledSpots', () => {
-    it('maps out all the filled spots in the grid as an array', () => {
-      expect(instance.filledSpots.length).toEqual(7)
-      const firstSpot = { card: cardA, row: 1, col: 5 }
-      expect(instance.filledSpots).toContainEqual(firstSpot)
+    it('maps out all the filled spots in the grid as a matrix', () => {
+      const { filledSpots } = instance
+      // 3 cards
+      expect(filledSpots.length).toEqual(3)
 
-      const secondSpot = { card: cardB, row: 0, col: 1 }
-      expect(instance.filledSpots).toContainEqual(secondSpot)
+      expect(filledSpots[1][5]).toEqual(cardA)
+      // height 2
+      expect(filledSpots[0][1]).toEqual(cardB)
+      expect(filledSpots[1][1]).toEqual(cardB)
+      // width 2
+      expect(filledSpots[2][0]).toEqual(cardC)
+      expect(filledSpots[2][1]).toEqual(cardC)
+      // empty spots
+      expect(filledSpots[0][0]).toBeUndefined()
+      expect(filledSpots[2][5]).toBeUndefined()
+    })
+  })
 
-      const lastSpot = { card: cardC, row: 2, col: 1 }
-      expect(instance.filledSpots).toContainEqual(lastSpot)
+  describe('findCardOverlap', () => {
+    it('finds filledSpot (or not) where a card is trying to be dragged', () => {
+      // similar to calculateFilledSpots, but given a card (needs width and height >= 1)
+      let fakeCard = { row: 1, col: 5, width: 1, height: 1 }
+      expect(instance.findCardOverlap(fakeCard)).toEqual(cardA)
+      // 2x2 should stick out and overlap cardA
+      fakeCard = { row: 0, col: 4, width: 2, height: 2 }
+      expect(instance.findCardOverlap(fakeCard)).toEqual(cardA)
     })
   })
 
@@ -141,8 +157,9 @@ describe('FoamcoreGrid', () => {
       expect(instance.dragGridSpot.size).toEqual(0)
       expect(instance.dragging).toEqual(false)
       expect(props.uiStore.multiMoveCardIds.length).toBe(0)
-      expect(props.uiStore.selectedCardIds.length).toBe(0)
       expect(instance.calculateCardsToRender).toHaveBeenCalled()
+      // card should remain selected
+      expect(props.uiStore.selectedCardIds.length).toBe(1)
     })
   })
 

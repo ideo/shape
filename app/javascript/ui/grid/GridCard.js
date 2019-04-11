@@ -335,6 +335,7 @@ class GridCard extends React.Component {
       lastPinnedCard,
       testCollectionCard,
       searchResult,
+      showHotEdge,
     } = this.props
 
     const firstCardInRow = card.position && card.position.x === 0
@@ -361,12 +362,21 @@ class GridCard extends React.Component {
       >
         {canEditCollection &&
           (!card.isPinnedAndLocked || lastPinnedCard) && (
-            <GridCardHotspot card={card} dragging={dragging} />
+            <GridCardHotspot
+              card={card}
+              dragging={dragging}
+              showHotEdge={showHotEdge}
+            />
           )}
         {canEditCollection &&
           firstCardInRow &&
           !card.isPinnedAndLocked && (
-            <GridCardHotspot card={card} dragging={dragging} position="left" />
+            <GridCardHotspot
+              card={card}
+              dragging={dragging}
+              position="left"
+              showHotEdge={showHotEdge}
+            />
           )}
         {record.isMedia && this.renderReplaceControl()}
         {!record.menuDisabled &&
@@ -452,6 +462,7 @@ GridCard.propTypes = {
   testCollectionCard: PropTypes.bool,
   searchResult: PropTypes.bool,
   draggingMultiple: PropTypes.bool,
+  showHotEdge: PropTypes.bool,
 }
 
 GridCard.defaultProps = {
@@ -466,6 +477,7 @@ GridCard.defaultProps = {
   testCollectionCard: false,
   draggingMultiple: false,
   searchResult: false,
+  showHotEdge: true,
 }
 
 export default GridCard
