@@ -789,6 +789,8 @@ class FoamcoreGrid extends React.Component {
         zoomLevel={this.zoomLevel}
         maxResizeCol={this.calcEdgeCol(card, card.id)}
         maxResizeRow={this.calcEdgeRow(card, card.id)}
+        scrollElement={this.gridRef}
+        horizontalScroll
         showHotEdge={false}
       />
     )

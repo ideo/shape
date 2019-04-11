@@ -49,9 +49,13 @@ class PageWithApiWrapper extends React.Component {
   get fetchId() {
     // will use a custom function (passed in prop)
     // or else default to match.params.id
+    // e.g. used on HomePage to fetch currentUserCollectionId
     const { fetchId, apiStore, match } = this.props
-    if (!fetchId) return match.params.id
-    return fetchId(apiStore, match.params.id)
+    // strip non-numeric characters from id
+    let paramsId = parseInt(match.params.id) || match.params.id
+    paramsId = paramsId ? paramsId.toString() : null
+    if (!fetchId) return paramsId
+    return fetchId(apiStore, paramsId)
   }
 
   requiresFetch = ({ location: prevLocation, match: prevMatch }) => {
