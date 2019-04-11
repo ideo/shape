@@ -713,6 +713,7 @@ class FoamcoreGrid extends React.Component {
         maxResizeRow={this.calcEdgeRow(card, card.id)}
         scrollElement={this.gridRef}
         horizontalScroll
+        showHotEdge={false}
       />
     )
   }
@@ -848,6 +849,7 @@ class FoamcoreGrid extends React.Component {
     const { gridW } = this.props
     return (
       <Grid
+        data-deselect-on-click
         onMouseMove={this.handleMouseMove}
         onScroll={this.handleScroll}
         innerRef={ref => {

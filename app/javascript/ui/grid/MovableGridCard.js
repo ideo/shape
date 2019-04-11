@@ -398,6 +398,7 @@ class MovableGridCard extends React.PureComponent {
         card={this.props.card}
         dragging={this.state.dragging}
         showHotspot={beginningOfRow}
+        showHotEdge={this.props.showHotEdge}
       />
     </PositionedGridCard>
   )
@@ -476,6 +477,7 @@ class MovableGridCard extends React.PureComponent {
       maxResizeRow,
       maxResizeCol,
       zoomLevel,
+      showHotEdge,
     } = this.props
 
     let {
@@ -547,6 +549,7 @@ class MovableGridCard extends React.PureComponent {
       isUserCollection,
       isSharedCollection,
       lastPinnedCard,
+      showHotEdge,
     }
 
     const draggingMultiple =
@@ -698,6 +701,7 @@ MovableGridCard.propTypes = {
   maxResizeCol: PropTypes.number,
   scrollElement: MobxPropTypes.objectOrObservableObject,
   horizontalScroll: PropTypes.bool,
+  showHotEdge: PropTypes.bool,
 }
 
 MovableGridCard.defaultProps = {
@@ -708,6 +712,7 @@ MovableGridCard.defaultProps = {
   maxResizeCol: 4,
   scrollElement: null,
   horizontalScroll: false,
+  showHotEdge: true,
 }
 
 export default MovableGridCard
