@@ -166,6 +166,13 @@ export default class UiStore {
   modalContentRef = null
   @observable
   dragCardMaster = null
+  mouseDownAt = { x: null, y: null }
+  @observable
+  selectedArea = { minX: null, maxX: null, minY: null, maxY: null }
+
+  constructor(props) {
+    this.throttledSetSelectedArea = _.throttle(this._setSelectedArea, 25)
+  }
 
   @action
   toggleEditingCardId(cardId) {
@@ -580,6 +587,43 @@ export default class UiStore {
     }
     return opts.open
   }
+
+  /* Selection area functions */
+
+  handleMouseDownSelection = e => {
+    this.mouseDownAt = { x: e.clientX, y: e.clientY }
+    console.log('mouseDown')
+  }
+
+  handleMouseMoveSelection = e => {
+    // Return if mouse is only scrolling, not click-dragging
+    if (!this.mouseDownAt.x) return
+
+    this.throttledSetSelectedArea({
+      minX: _.min([e.clientX, this.mouseDownAt.x]),
+      maxX: _.max([e.clientX, this.mouseDownAt.x]),
+      minY: _.min([e.clientY, this.mouseDownAt.y]),
+      maxY: _.max([e.clientY, this.mouseDownAt.y]),
+    })
+  }
+
+  handleMouseUpSelection = e => {
+    // Reset for next drag
+    this.mouseDownAt = { x: null, y: null }
+    this._setSelectedArea({
+      minX: null,
+      maxX: null,
+      minY: null,
+      maxY: null,
+    })
+  }
+
+  @action
+  _setSelectedArea = coords => {
+    this.selectedArea = coords
+  }
+
+  /* End Selection area functions */
 
   // takes a click event as a parameter
   captureKeyboardGridClick = (e, cardId) => {

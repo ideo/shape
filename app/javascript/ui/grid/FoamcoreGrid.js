@@ -36,6 +36,20 @@ const BlankCard = styled.div.attrs({
   z-index: 0;
 `
 
+const SelectedArea = styled.div.attrs({
+  style: ({ coords }) => ({
+    height: `${coords.maxY - coords.minY}px`,
+    left: `${coords.minX}px`,
+    top: `${coords.minY}px`,
+    width: `${coords.maxX - coords.minX}px`,
+  }),
+})`
+  backround-color: rgba(255, 255, 255, 0.3);
+  border: 1.5px solid ${v.colors.primaryLight};
+  position: fixed;
+  z-index: ${v.zIndex.clickWrapper};
+`
+
 const Grid = styled.div`
   min-height: 1300px;
   position: relative;
@@ -81,7 +95,6 @@ class FoamcoreGrid extends React.Component {
   loadedRows = { loading: false, max: 0 }
   loadedCols = { loading: false, max: 0 }
   draggingMap = []
-  mouseDownAt = { x: null, y: null }
 
   constructor(props) {
     super(props)
@@ -101,8 +114,9 @@ class FoamcoreGrid extends React.Component {
     window.addEventListener('scroll', this.handleScroll)
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
     this.filledSpots = this.calculateFilledSpots()
+    this.onSelectingArea()
   }
 
   componentWillUnmount() {
@@ -294,27 +308,46 @@ class FoamcoreGrid extends React.Component {
     return !!this.getDraggedOnSpot(coords)
   }
 
-  handleMouseDownDrag = e => {
-    this.mouseDownAt = { x: e.clientX, y: e.clientY }
+  // Return true if dragging area > 20px on either dimentions
+  get selectedAreaLargeEnough() {
+    const {
+      selectedArea: { minX, maxX, minY, maxY },
+    } = this.props
+    return maxX - minX > 20 || maxY - minY > 20
   }
 
-  handleMouseUpDrag = e => {
-    const minX = _.min([e.clientX, this.mouseDownAt.x])
-    const maxX = _.max([e.clientX, this.mouseDownAt.x])
-    const minY = _.min([e.clientY, this.mouseDownAt.y])
-    const maxY = _.max([e.clientY, this.mouseDownAt.y])
+  onSelectingArea = () => {
+    const { collection, uiStore } = this.props
+    let {
+      selectedArea: { minX, maxX, minY, maxY },
+    } = this.props
 
-    // Reset for next drag
-    this.mouseDownAt = { x: null, y: null }
+    if (!this.selectedAreaLargeEnough) return
 
-    // Return if not dragging
-    if (maxX - minX < 20 || maxY - minY < 20) return
+    const gridBounds = this.gridRef.getBoundingClientRect()
+
+    // Set all min-max x/y coordinates so they don't fall outside bounds of grid
+    if (minX < gridBounds.top) minX = gridBounds.top
+    if (minY < gridBounds.left) minY = gridBounds.left
+    if (maxX > gridBounds.right) maxX = gridBounds.right
+    if (maxY > gridBounds.bottom) maxY = gridBounds.bottom
 
     // Select all cards that this drag rectangle 'touches'
     const topLeftCoords = this.coordinatesForPosition({ x: minX, y: minY })
     const bottomRightCoords = this.coordinatesForPosition({ x: maxX, y: maxY })
-    const { collection } = this.props
-    collection.cardsBetween(topLeftCoords, bottomRightCoords)
+
+    // Return if it couldn't find cards in both positions
+    if (!topLeftCoords || !bottomRightCoords) return
+
+    const selectedCardIds = collection.cardIdsWithinRectangle(
+      topLeftCoords,
+      bottomRightCoords
+    )
+
+    // TODO: if shift is also selected, add to any existing selection
+    runInAction(() => {
+      uiStore.selectedCardIds = selectedCardIds
+    })
   }
 
   handleBlankCardClick = ({ row, col }) => e => {
@@ -867,17 +900,16 @@ class FoamcoreGrid extends React.Component {
   }
 
   render() {
-    const { gridW } = this.props
+    const { gridW, selectedArea } = this.props
     return (
       <Grid
         onMouseMove={this.handleMouseMove}
-        onMouseDown={this.handleMouseDownDrag}
-        onMouseUp={this.handleMouseUpDrag}
         onScroll={this.handleScroll}
         innerRef={ref => {
           this.gridRef = ref
         }}
       >
+        {this.selectedAreaLargeEnough && <SelectedArea coords={selectedArea} />}
         <div
           style={{
             position: 'absolute',
@@ -917,6 +949,7 @@ FoamcoreGrid.propTypes = {
   canEditCollection: PropTypes.bool.isRequired,
   movingCardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
   loadCollectionCards: PropTypes.func.isRequired,
+  selectedArea: MobxPropTypes.objectOrObservableObject.isRequired,
   sorting: PropTypes.bool,
 }
 FoamcoreGrid.wrappedComponent.propTypes = {
