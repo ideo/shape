@@ -358,8 +358,8 @@ class FoamcoreGrid extends React.Component {
     ev.persist()
     if (this.resizing) return
     const hoverPos = {
-      x: ev.pageX - pageMargins.left + this.gridRef.scrollLeft,
-      y: ev.pageY - pageMargins.top + this.gridRef.scrollTop,
+      x: ev.pageX - pageMargins.left + window.scrollX,
+      y: ev.pageY - pageMargins.top + window.scrollY,
     }
     this.throttledSetHoverSpot(hoverPos)
   }
@@ -789,7 +789,6 @@ class FoamcoreGrid extends React.Component {
         zoomLevel={this.zoomLevel}
         maxResizeCol={this.calcEdgeCol(card, card.id)}
         maxResizeRow={this.calcEdgeRow(card, card.id)}
-        scrollElement={this.gridRef}
         horizontalScroll
         showHotEdge={false}
       />
