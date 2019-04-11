@@ -92,7 +92,10 @@ class FilestackUpload {
   }
 
   static fileUrl({ handle = '' }) {
-    return this.client.transform(handle, {})
+    // NOTE: using this function is only necessary when Filestack security is enabled,
+    // otherwise transform with no params is broken (just returns the handle)
+    // return this.client.transform(handle, {})
+    return `https://cdn.filestackcontent.com/${handle}`
   }
 
   static imageUrl({ handle = '', mimetype = '', filestackOpts = {} } = {}) {
