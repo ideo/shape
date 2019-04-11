@@ -13,7 +13,7 @@ import ReportIcon from '~/ui/icons/ReportIcon'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import SubmissionBoxIcon from '~/ui/icons/SubmissionBoxIcon'
-import FoamBoardIcon from '~/ui/icons/FoamBoardIcon'
+import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import FilestackUpload, { MAX_SIZE } from '~/utils/FilestackUpload'
 import { StyledGridCard } from '~/ui/grid/shared'
@@ -390,7 +390,7 @@ class GridCardBlank extends React.Component {
       case 'testCollection':
       case 'template':
       case 'submissionBox':
-      case 'foamBoard':
+      case 'foamcoreBoard':
         inner = (
           <CollectionCreator
             type={creating}
@@ -480,14 +480,14 @@ class GridCardBlank extends React.Component {
         Icon={SubmissionBoxIcon}
       />
     )
-    const foamBoardBctBox = (
+    const foamcoreBoardBctBox = (
       <BctButtonBox
         tooltip="Create foamcore board"
-        type="foamBoard"
+        type="foamcoreBoard"
         creating={creating}
         size={size}
-        onClick={this.startCreating('foamBoard')}
-        Icon={FoamBoardIcon}
+        onClick={this.startCreating('foamcoreBoard')}
+        Icon={FoamcoreBoardIcon}
       />
     )
     const collectionBctBox = (
@@ -551,8 +551,8 @@ class GridCardBlank extends React.Component {
           {creating === 'collection' && (
             <BctButtonRotation>{collectionBctBox}</BctButtonRotation>
           )}
-          {creating === 'foamBoard' && (
-            <BctButtonRotation>{foamBoardBctBox}</BctButtonRotation>
+          {creating === 'foamcoreBoard' && (
+            <BctButtonRotation>{foamcoreBoardBctBox}</BctButtonRotation>
           )}
           {creating === 'submissionBox' && (
             <BctButtonRotation>{submissionBctBox}</BctButtonRotation>
@@ -589,8 +589,8 @@ class GridCardBlank extends React.Component {
               justify="space-between"
             >
               {collectionBctBox}
-              {foamBoardBctBox}
-              {submissionBctBox}
+              {foamcoreBoardBctBox}
+              {testBctBox}
               <PopoutMenu
                 buttonStyle="bct"
                 menuOpen={this.state.bctMenuOpen}
@@ -608,9 +608,9 @@ class GridCardBlank extends React.Component {
                     onClick: this.createDefaultReportCard,
                   },
                   {
-                    name: 'Get Feedback',
-                    iconLeft: <TestCollectionIcon />,
-                    onClick: this.startCreating('testCollection'),
+                    name: 'Create Submission Box',
+                    iconLeft: <SubmissionBoxIcon />,
+                    onClick: this.startCreating('submissionBox'),
                   },
                 ]}
               />
