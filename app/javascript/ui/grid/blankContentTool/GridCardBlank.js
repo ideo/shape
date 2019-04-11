@@ -592,25 +592,26 @@ class GridCardBlank extends React.Component {
               {foamcoreBoardBctBox}
               {testBctBox}
               <PopoutMenu
+                width={240}
                 buttonStyle="bct"
                 menuOpen={this.state.bctMenuOpen}
                 onClick={this.toggleBctMenu}
                 direction="right"
                 menuItems={[
                   {
+                    name: 'Create Submission Box',
+                    iconLeft: <SubmissionBoxIcon />,
+                    onClick: this.startCreating('submissionBox'),
+                  },
+                  {
                     name: 'Create Template',
-                    iconLeft: <TemplateIcon size="small" />,
+                    iconLeft: <TemplateIcon />,
                     onClick: this.startCreating('template'),
                   },
                   {
                     name: 'Create Report',
                     iconLeft: <ReportIcon />,
                     onClick: this.createDefaultReportCard,
-                  },
-                  {
-                    name: 'Create Submission Box',
-                    iconLeft: <SubmissionBoxIcon />,
-                    onClick: this.startCreating('submissionBox'),
                   },
                 ]}
               />
