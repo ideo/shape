@@ -330,6 +330,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :col,
       :width,
       :height,
+      :row,
+      :col,
       :reference,
       :parent_id,
       :collection_id,

@@ -2,9 +2,7 @@ import { observable, action, computed, runInAction } from 'mobx'
 import _ from 'lodash'
 import { ReferenceType } from 'datx'
 
-import { uiStore } from '~/stores'
 import { apiUrl } from '~/utils/url'
-
 import BaseRecord from './BaseRecord'
 import Comment from './Comment'
 import UsersThread from './UsersThread'
@@ -59,6 +57,7 @@ class CommentThread extends BaseRecord {
   }
 
   async API_create() {
+    const { uiStore } = this
     try {
       await this.create()
       // now that we have a real id, update what's expanded
@@ -115,7 +114,7 @@ class CommentThread extends BaseRecord {
     })
     this.importComments([comment], { created: true })
     // this will create the comment in the API
-    uiStore.trackEvent('create', this.record)
+    this.uiStore.trackEvent('create', this.record)
     return comment.save()
   }
 

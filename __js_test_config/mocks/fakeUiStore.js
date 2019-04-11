@@ -51,6 +51,7 @@ const fakeUiStore = {
   setViewingCollection: jest.fn(),
   setViewingItem: jest.fn(),
   viewingCollection: null,
+  viewingItem: null,
   movingFromCollectionId: null,
   movingCardIds: [],
   openMoveMenu: jest.fn(),
@@ -84,6 +85,8 @@ const fakeUiStore = {
   captureKeyboardGridClick: jest.fn(),
   popupAlert: jest.fn(),
   stopDragging: jest.fn(),
+  multiMoveCardIds: [],
+  setSnoozeChecked: jest.fn(),
 }
 
 export default fakeUiStore

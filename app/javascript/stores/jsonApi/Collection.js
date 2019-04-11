@@ -4,7 +4,8 @@ import { ReferenceType } from 'datx'
 import pluralize from 'pluralize'
 import queryString from 'query-string'
 
-import { apiStore, routingStore, uiStore } from '~/stores'
+// TODO: remove this apiStore import by refactoring static methods that depend on it
+import { apiStore } from '~/stores'
 import { apiUrl } from '~/utils/url'
 
 import BaseRecord from './BaseRecord'
@@ -41,7 +42,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   @computed
   get cardIds() {
-    return this.collection_cards.map(card => card.id)
+    const sortedCards = _.sortBy(this.collection_cards, card => card.order)
+    return sortedCards.map(card => card.id)
   }
 
   @computed
@@ -77,7 +79,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     } else {
       this.snoozedEditWarningsAt = Date.now()
     }
-    uiStore.setSnoozeChecked(!!this.snoozedEditWarningsAt)
+    this.uiStore.setSnoozeChecked(!!this.snoozedEditWarningsAt)
   }
 
   @action
@@ -89,7 +91,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (!this.isMasterTemplate || this.template_num_instances === 0)
       return false
     // if we already have the confirmation open, don't try to re-open
-    if (uiStore.dialogConfig.open === 'confirm') return false
+    if (this.uiStore.dialogConfig.open === 'confirm') return false
     const oneHourAgo = Date.now() - 1000 * 60 * 60
     if (!this.snoozedEditWarningsAt) return true
     if (this.snoozedEditWarningsAt < oneHourAgo) {
@@ -129,7 +131,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   // otherwise it will just call onConfirm()
   confirmEdit({ onCancel, onConfirm }) {
     if (!this.shouldShowEditWarning) return onConfirm()
-    uiStore.confirm({
+    this.uiStore.confirm({
       ...this.confirmEditOptions,
       onCancel: () => {
         if (onCancel) onCancel()
@@ -340,14 +342,20 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     this._reorderCards()
   }
 
-  toJsonApiWithCards() {
+  toJsonApiWithCards(onlyCardIds = []) {
     const data = this.toJsonApi()
     // attach nested attributes of cards
     if (this.collection_cards) {
-      data.attributes.collection_cards_attributes = _.map(
-        this.collection_cards,
-        card => _.pick(card, ['id', 'order', 'width', 'height'])
-      )
+      const cardAttributes = []
+      _.each(this.collection_cards, card => {
+        if (
+          onlyCardIds.length === 0 ||
+          (onlyCardIds && onlyCardIds.indexOf(card.id) !== -1)
+        ) {
+          cardAttributes.push(_.pick(card, card.batchUpdateAttributes))
+        }
+      })
+      data.attributes.collection_cards_attributes = cardAttributes
     }
     return data
   }
@@ -402,7 +410,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     })
   }
 
-  API_updateCards({ card, updates, undoMessage } = {}) {
+  API_updateCard({ card, updates, undoMessage } = {}) {
     // this works a little differently than the typical "undo" snapshot...
     // we snapshot the collection_cards.attributes so that they can be reverted
     const jsonData = this.toJsonApiWithCards()
@@ -422,25 +430,107 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.request(apiPath, 'PATCH', { data })
   }
 
-  API_batchUpdateCards({ cards, updates, undoMessage } = {}) {
-    const jsonData = this.toJsonApiWithCards()
-    this.pushUndo({
-      snapshot: jsonData.attributes,
-      message: undoMessage,
+  /*
+  Perform batch updates on multiple cards at once
+
+  updates (array)
+    An array of objects with a card reference and the updated attributes, e.g.
+    [
+      { card: card instance, order: 2  },
+      { card: card instance, order: 4  },
+    ]
+
+  updateAllCards (bool)
+    If true, it will send data to the API for all collection cards
+    (useful for regular collections where order needs to be updated on all cards).
+
+    If false, will only send data about updated cards.
+  */
+
+  API_batchUpdateCards({ updates, updateAllCards }) {
+    const updatesByCardId = {}
+    _.each(updates, update => {
+      updatesByCardId[update.card.id] = update
     })
 
-    // now actually make the change to the card(s)
-    const sortedCards = _.sortBy(cards, 'order')
-    _.each(sortedCards, (card, idx) => {
-      const sortedOrder = updates.order + (idx + 1) * 0.1
-      card.order = sortedOrder
+    // Apply all updates to in-memory cards
+    _.each(this.collection_cards, card => {
+      // Apply updates to each card
+      const cardUpdates = updatesByCardId[card.id]
+      if (cardUpdates) {
+        // Pick out allowed values and assign them
+        const allowedAttrs = _.pick(cardUpdates, card.batchUpdateAttributes)
+        _.forEach(allowedAttrs, (value, key) => {
+          card[key] = value
+        })
+      }
     })
 
-    this._reorderCards()
-    // TODO try and find way to update cards after pushing undo
-    const data = this.toJsonApiWithCards()
-    const apiPath = `collections/${this.id}`
-    return this.apiStore.request(apiPath, 'PATCH', { data })
+    const data = this.toJsonApiWithCards(
+      updateAllCards ? [] : _.keys(updatesByCardId)
+    )
+
+    // Persist updates to API
+    return this.apiStore.request(`collections/${this.id}`, 'PATCH', { data })
+  }
+
+  /*
+  Perform batch updates on multiple cards at once,
+  and captures current cards state to undo to
+
+  updates (array)
+    An array of objects with a card reference and the updated attributes, e.g.
+    [
+      { card: card instance, row: 4, col: 3  },
+      { card: card instance, row: 4, col: 4  },
+    ]
+
+  updateAllCards (bool)
+    If false, will only send data about updated cards.
+
+    If true, it will send data to the API for all collection cards
+    (useful for regular collections where order needs to be updated on all cards).
+
+  undoMessage (string) - a message to display if someone undoes the action
+  onConfirm (optional function) - a function to run once user confirms update
+  onCancel (optional function)  - a function to call if they cancel performing update
+
+  */
+  API_batchUpdateCardsWithUndo({
+    updates,
+    updateAllCards = false,
+    undoMessage,
+    onConfirm,
+    onCancel,
+  }) {
+    const cardIds = []
+    const updatesByCardId = {}
+    _.each(updates, update => {
+      cardIds.push(update.card.id)
+      updatesByCardId[update.card.id] = update
+    })
+
+    const performUpdate = () => {
+      // Store snapshot of existing cards so changes can be un-done
+      const cardsData = this.toJsonApiWithCards(updateAllCards ? [] : cardIds)
+
+      this.pushUndo({
+        snapshot: cardsData.attributes,
+        message: undoMessage,
+      })
+
+      return this.API_batchUpdateCards({ updates, updateAllCards }).then(
+        res => {
+          if (onConfirm) onConfirm()
+        }
+      )
+    }
+
+    // Show a dialog if in a template
+    return this.confirmEdit({
+      onCancel,
+      onConfirm: performUpdate,
+    })
   }
 
   @computed
@@ -478,7 +568,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         message =
           'You must close any other live tests before launching this one.'
       }
-      uiStore.alert(message)
+      this.uiStore.alert(message)
       return false
     }
     return true
@@ -492,7 +582,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       let prompt = 'Are you sure you want to stop all active tests?'
       const num = this.template_num_instances
       prompt += ` ${num} ${pluralize('submission', num)} will be affected.`
-      return uiStore.confirm({
+      return this.uiStore.confirm({
         iconName: 'Alert',
         prompt,
         confirmText: 'Stop feedback',
@@ -534,6 +624,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   API_performTestAction = async actionName => {
+    const { uiStore } = this
     // this will disable any test launch/close/reopen buttons until loading is complete
     uiStore.update('launchButtonLoading', true)
     try {
@@ -586,7 +677,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       .request(`collections/${this.id}/clear_collection_cover`, 'POST')
       .catch(err => {
         console.warn(err)
-        uiStore.alert(
+        this.uiStore.alert(
           'Unable to change the collection cover. This may be a special collection that you cannot edit.'
         )
       })
@@ -600,7 +691,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       `test_collections/${this.id}/next_available`
     )
     if (!res.data) return
-    const path = routingStore.pathTo('collections', res.data.id)
+    const path = this.routingStore.pathTo('collections', res.data.id)
 
     this.setNextAvailableTestPath(`${path}?open=tests`)
   }
@@ -626,13 +717,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   async API_sortCards() {
-    const order = uiStore.collectionCardSortOrder
+    const order = this.uiStore.collectionCardSortOrder
     this.setReloading(true)
     await this.API_fetchCards({ order })
     this.setReloading(false)
   }
 
   static async createSubmission(parent_id, submissionSettings) {
+    const { uiStore } = this
     const { type, template } = submissionSettings
     if (type === 'template' && template) {
       const templateData = {
@@ -643,7 +735,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       uiStore.update('isLoading', true)
       const res = await apiStore.createTemplateInstance(templateData)
       uiStore.update('isLoading', false)
-      routingStore.routeTo('collections', res.data.id)
+      this.routingStore.routeTo('collections', res.data.id)
     } else {
       uiStore.openBlankContentTool({
         order: 0,

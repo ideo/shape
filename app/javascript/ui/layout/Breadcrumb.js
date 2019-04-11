@@ -3,10 +3,12 @@ import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { floor, round, sumBy, compact } from 'lodash'
+import { Link } from 'react-router-dom'
 
-import { apiStore } from '~/stores'
+import { apiStore, routingStore } from '~/stores'
 import v from '~/utils/variables'
 import BreadcrumbItem from './BreadcrumbItem'
+import ArrowIcon from '../icons/ArrowIcon'
 
 const BreadcrumbPadding = styled.div`
   height: 1.7rem;
@@ -26,6 +28,15 @@ const StyledBreadcrumbWrapper = styled.div`
 `
 StyledBreadcrumbWrapper.displayName = 'StyledBreadcrumbWrapper'
 
+const IconContainer = styled.span`
+  color: ${v.colors.black};
+  display: inline-block;
+  height: 18px;
+  margin-right: 8px;
+  width: 12px;
+  vertical-align: middle;
+`
+
 @observer
 class Breadcrumb extends React.Component {
   constructor(props) {
@@ -41,14 +52,25 @@ class Breadcrumb extends React.Component {
   }
 
   calculateMaxChars = () => {
-    if (!this.breadcrumbWrapper.current) return 80
-    const width = this.breadcrumbWrapper.current.offsetWidth
+    let width = this.props.containerWidth
+    if (!width) {
+      if (!this.breadcrumbWrapper.current) return 80
+      width = this.breadcrumbWrapper.current.offsetWidth
+    }
     // roughly .075 characters per pixel
     return round(width * 0.075)
   }
 
-  items = () => {
-    const { record } = this.props
+  get previousItem() {
+    const items = this.items(false)
+    if (items.length > 1) {
+      return items[items.length - 2]
+    }
+    return null
+  }
+
+  items = (clamp = true) => {
+    const { maxDepth, record } = this.props
     const items = []
     if (record.inMyCollection) {
       items.push({
@@ -72,7 +94,8 @@ class Breadcrumb extends React.Component {
         identifier,
       })
     })
-    return compact(items)
+    const depth = clamp ? maxDepth * -1 || 0 : 0
+    return compact(items).slice(depth)
   }
 
   totalNameLength = items => {
@@ -99,12 +122,20 @@ class Breadcrumb extends React.Component {
 
     // First try truncating any long items to 25 chars
     items.forEach(item => {
-      if (item.name.length > 25) item.truncatedName = item.name.slice(0, 24)
+      if (item.name && item.name.length > 25) {
+        item.truncatedName = item.name.slice(0, 24)
+      }
     })
 
     charsLeftToTruncate = this.charsToTruncateForItems(items)
 
     if (charsLeftToTruncate <= 0) return items
+
+    if (items.length === 1) {
+      const [item] = items
+      item.truncatedName = item.name.slice(0, this.calculateMaxChars())
+      return items
+    }
 
     // Item names are still too long, show ... in place of their name
     // Start at the midpoint, floor-ing to favor adding ellipses farther up the breadcrumb
@@ -115,6 +146,7 @@ class Breadcrumb extends React.Component {
     let increment = items.length % 2 === 0
     let jumpBy = 1
     while (charsLeftToTruncate > 0) {
+      if (!items[index]) break
       if (items[index].name !== 'My Collection') {
         // Continue marking for truncation until we reduce it to be short enough
         items[index].ellipses = true
@@ -127,6 +159,25 @@ class Breadcrumb extends React.Component {
       increment = !increment
     }
     return items
+  }
+
+  renderBackButton() {
+    const { backButton } = this.props
+    const item = this.previousItem
+    if (!backButton || !item) return null
+    let path
+    if (item.id === 'homepage') {
+      path = routingStore.pathTo('homepage')
+    } else {
+      path = routingStore.pathTo(item.type, item.id)
+    }
+    return (
+      <Link to={path}>
+        <IconContainer>
+          <ArrowIcon />
+        </IconContainer>
+      </Link>
+    )
   }
 
   render() {
@@ -142,10 +193,11 @@ class Breadcrumb extends React.Component {
     // We need a ref to wrapper so we always render that
     // Tried using innerRef on styled component but it isn't available on mount
     return (
-      <div ref={this.breadcrumbWrapper} style={{ width: '80%' }}>
+      <div ref={this.breadcrumbWrapper}>
         {!renderItems && <BreadcrumbPadding />}
         {renderItems && (
           <StyledBreadcrumbWrapper>
+            {this.renderBackButton()}
             {this.truncatedItems.map((item, index) => (
               <span className="breadcrumb_item" key={item.name}>
                 <BreadcrumbItem
@@ -168,10 +220,16 @@ Breadcrumb.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   isHomepage: PropTypes.bool.isRequired,
   breadcrumbWrapper: PropTypes.oneOfType([PropTypes.element, PropTypes.object]),
+  containerWidth: PropTypes.number,
+  maxDepth: PropTypes.number,
+  backButton: PropTypes.bool,
 }
 
 Breadcrumb.defaultProps = {
   breadcrumbWrapper: React.createRef(),
+  containerWidth: null,
+  maxDepth: null,
+  backButton: false,
 }
 
 export default Breadcrumb
