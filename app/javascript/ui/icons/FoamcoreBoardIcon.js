@@ -1,6 +1,6 @@
 import Icon from './Icon'
 
-const FoamBoardIcon = () => (
+const FoamcoreBoardIcon = () => (
   <Icon fill>
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47 47">
       <g>
@@ -17,4 +17,4 @@ const FoamBoardIcon = () => (
   </Icon>
 )
 
-export default FoamBoardIcon
+export default FoamcoreBoardIcon
