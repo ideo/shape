@@ -135,6 +135,14 @@ class MovableGridCard extends React.PureComponent {
     const { horizontalScroll, card } = this.props
     const { gridW } = uiStore.gridSettings
 
+    // NOTE: these hide so that we can fully control the page scroll
+    // otherwise the browser will *also* try to scroll when you hit the edges;
+    // however, there is some UI helpfulness lost if you can't see the scrollbars :(
+    if (!horizontalScroll) {
+      document.body.style['overflow-x'] = 'hidden'
+      document.body.style['overflow-y'] = 'hidden'
+    }
+
     // Vertical Scroll
     if (e.clientY < TOP_SCROLL_TRIGGER) {
       // At top of viewport

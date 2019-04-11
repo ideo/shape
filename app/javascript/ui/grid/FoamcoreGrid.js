@@ -2,13 +2,8 @@ import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-// import _ from 'lodash'
 import styled from 'styled-components'
 
-// import CollectionSort from '~/ui/grid/CollectionSort'
-// import Loader from '~/ui/layout/Loader'
-// import MovableGridCard from '~/ui/grid/MovableGridCard'
-// import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import v from '~/utils/variables'
 
@@ -27,7 +22,7 @@ const BlankCard = styled.div.attrs({
     props.type === 'unrendered' ? `1px solid ${v.colors.primaryDark}` : 'none'};
   background-color: ${props => {
     if (props.blocked) {
-      return 'red'
+      return v.colors.alert
     }
     if (props.type === 'blank' || props.type === 'drag') {
       return v.colors.primaryLight
@@ -85,6 +80,8 @@ class FoamcoreGrid extends React.Component {
   loadedRows = { loading: false, max: 0 }
   loadedCols = { loading: false, max: 0 }
   draggingMap = []
+  // track whether drag movement is blocked because of overlapping cards
+  hasDragCollision = false
 
   constructor(props) {
     super(props)
@@ -473,7 +470,7 @@ class FoamcoreGrid extends React.Component {
 
     if (
       movePlaceholder.card ||
-      this.isBlocked ||
+      this.hasDragCollision ||
       // movePlaceholder won't have row/col keys if it's not being rendered)
       typeof masterRow === 'undefined'
     ) {
@@ -530,7 +527,6 @@ class FoamcoreGrid extends React.Component {
       this.dragging = false
       this.resizing = false
       uiStore.multiMoveCardIds = []
-      // uiStore.selectedCardIds = []
     })
     // Run immediately without throttling
     this.calculateCardsToRender()
@@ -551,17 +547,6 @@ class FoamcoreGrid extends React.Component {
     if (!overlapCoords) {
       return
     }
-
-    // TURNING THIS OFF -- so that there is a placeholder rendered where your existing drag card used to be
-
-    // const maybeCard = this.findCardForSpot(overlapCoords)
-    // if (maybeCard) {
-    //   this.setCardDragSpot(maybeCard, dragPosition)
-    //   if (uiStore.multiMoveCardIds.length > 1 && !recur) {
-    //     this.setMultiMoveDragSpots(overlapCoords, dragPosition)
-    //   }
-    //   return
-    // }
 
     runInAction(() => {
       this.dragGridSpot.set(getMapKey(overlapCoords), overlapCoords)
@@ -705,16 +690,15 @@ class FoamcoreGrid extends React.Component {
     if (!_.isNumber(col) || _.isNaN(col)) return null
     const { uiStore } = this.props
     const filledRow = this.filledSpots[row]
-    const found = filledRow ? filledRow[col] : null
-    if (found) {
-      const { card } = found
+    const foundCard = filledRow ? filledRow[col] : null
+    if (foundCard) {
       if (
-        card &&
-        (card.id === cardId || _.includes(uiStore.multiMoveCardIds, card.id))
+        foundCard.id === cardId ||
+        _.includes(uiStore.multiMoveCardIds, foundCard.id)
       ) {
         return false
       }
-      return found
+      return foundCard
     }
     return false
   }
@@ -807,7 +791,7 @@ class FoamcoreGrid extends React.Component {
         type={type}
         zoomLevel={zoomLevel}
         key={`blank-${type}-${col}:${row}`}
-        blocked={this.isBlocked && type === 'drag'}
+        blocked={this.hasDragCollision && type === 'drag'}
         data-blank-type={type}
         draggedOn
       />
@@ -901,7 +885,7 @@ class FoamcoreGrid extends React.Component {
         _.isNumber(card.row) &&
         _.isNumber(card.col)
     )
-    this.isBlocked = false
+    this.hasDragCollision = false
     cards = cards.map(cardOrBlank => {
       // If another real card is filling up the hover spot, don't render
       // the hover spot at all (which gets rendered after this loop)
@@ -913,7 +897,8 @@ class FoamcoreGrid extends React.Component {
         return this.positionCard(cardOrBlank)
       }
       // for the blank dragging spots determine if they are blocked for moving into
-      this.isBlocked = this.isBlocked || this.findCardOverlap(cardOrBlank)
+      this.hasDragCollision =
+        this.hasDragCollision || this.findCardOverlap(cardOrBlank)
       return this.positionBlank(cardOrBlank, 'drag')
     })
     cards.push(
