@@ -378,6 +378,32 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         expect(response.status).to eq(204)
       end
     end
+
+    context 'with row and col' do
+      let(:params) do
+        json_api_params(
+          'collections',
+          raw_params.merge(
+            collection_cards_attributes: {
+              id: collection_card.id,
+              width: 3,
+              row: 4,
+              col: 5,
+            }
+          ),
+        )
+      end
+
+      it 'updates card col and row' do
+        expect(collection_card.row).not_to eq(4)
+        expect(collection_card.col).not_to eq(5)
+        patch(path, params: params)
+        expect(response.status).to eq(200)
+        collection_card.reload
+        expect(collection_card.row).to eq(4)
+        expect(collection_card.col).to eq(5)
+      end
+    end
   end
 
   describe 'POST #clear_collection_cover' do

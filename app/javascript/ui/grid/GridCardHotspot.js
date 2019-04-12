@@ -28,13 +28,13 @@ const HotspotLine = styled.div`
   height: 100%;
   background: ${v.colors.primaryLight};
   position: relative;
-  left: 4px;
+  left: ${props => props.left}px;
   width: ${props => props.gutter}px;
 `
 
 const StyledPlusIcon = styled.div`
   position: relative;
-  left: -9px;
+  left: -${props => props.left}px;
   width: 12px;
   color: white;
   font-size: 1.5rem;
@@ -58,16 +58,28 @@ class GridCardHotspot extends React.Component {
     uiStore.openBlankContentTool({ order })
   }
 
+  get hotspotMargins() {
+    const { position } = this.props
+    if (position === 'left') {
+      return { line: 4, icon: 9 }
+    }
+    return { line: 8, icon: 5 }
+  }
+
   render() {
-    const { dragging, uiStore, position } = this.props
+    const { dragging, uiStore, position, showHotEdge } = this.props
+    const { icon, line } = this.hotspotMargins
+
     return (
       <StyledHotspot
         position={position}
         dragging={dragging}
         onClick={this.clickHotspot}
       >
-        <HotspotLine gutter={uiStore.gridSettings.gutter} />
-        <StyledPlusIcon>+</StyledPlusIcon>
+        {showHotEdge && (
+          <HotspotLine left={line} gutter={uiStore.gridSettings.gutter} />
+        )}
+        <StyledPlusIcon left={icon}>+</StyledPlusIcon>
       </StyledHotspot>
     )
   }
@@ -77,12 +89,14 @@ GridCardHotspot.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   dragging: PropTypes.bool.isRequired,
   position: PropTypes.string,
+  showHotEdge: PropTypes.bool,
 }
 GridCardHotspot.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 GridCardHotspot.defaultProps = {
   position: 'right',
+  showHotEdge: true,
 }
 
 GridCardHotspot.displayName = 'GridCardHotspot'
