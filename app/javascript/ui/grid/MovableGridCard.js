@@ -61,6 +61,29 @@ const cardCSSTransition = 'transform 0.4s, width 0.25s, height 0.25s'
 const cardHoverTransition = 'transform 0.2s'
 const TOP_SCROLL_TRIGGER = 210
 
+const scrollAmount = () => {
+  // When zooming browser in or out, it doesn't work to use `1` as the unit,
+  // There aren't any reliable ways to get the zoom level from all browsers.
+  // This library doesn't work: https://github.com/tombigel/detect-zoom.
+  // window.devicePixelRatio doesn't work on all browsers.
+  // Setting a div of a fixed width on the page and measuring it's width doesn't work.
+  //
+  // What we need is to return a value that is > 1 for zoomed in screens
+  // window.devicePixelRatio will be 1 for non-retina
+  // and retina is likely at 2, but if zoomed out to 50% is 1
+  //
+  let amount
+  if (window.devicePixelRatio >= 2) {
+    amount = window.devicePixelRatio
+  } else if (window.devicePixelRatio >= 1) {
+    amount = 2
+  } else {
+    // After testing out multiple values, this seemed to be the right balance
+    amount = 1.5 / window.devicePixelRatio
+  }
+  return amount
+}
+
 class MovableGridCard extends React.PureComponent {
   constructor(props) {
     super(props)
@@ -108,27 +131,56 @@ class MovableGridCard extends React.PureComponent {
     })
   }
 
-  scrollAmount = () => {
-    // When zooming browser in or out, it doesn't work to use `1` as the unit,
-    // There aren't any reliable ways to get the zoom level from all browsers.
-    // This library doesn't work: https://github.com/tombigel/detect-zoom.
-    // window.devicePixelRatio doesn't work on all browsers.
-    // Setting a div of a fixed width on the page and measuring it's width doesn't work.
-    //
-    // What we need is to return a value that is > 1 for zoomed in screens
-    // window.devicePixelRatio will be 1 for non-retina
-    // and retina is likely at 2, but if zoomed out to 50% is 1
-    //
-    let scrollAmount
-    if (window.devicePixelRatio >= 2) {
-      scrollAmount = window.devicePixelRatio
-    } else if (window.devicePixelRatio >= 1) {
-      scrollAmount = 2
-    } else {
-      // After testing out multiple values, this seemed to be the right balance
-      scrollAmount = 1.5 / window.devicePixelRatio
+  scrollIfNearPageBounds = e => {
+    const { horizontalScroll, card } = this.props
+    const { gridW } = uiStore.gridSettings
+
+    // NOTE: these hide so that we can fully control the page scroll
+    // otherwise the browser will *also* try to scroll when you hit the edges;
+    // however, there is some UI helpfulness lost if you can't see the scrollbars :(
+    if (!horizontalScroll) {
+      document.body.style['overflow-x'] = 'hidden'
+      document.body.style['overflow-y'] = 'hidden'
     }
-    return scrollAmount
+
+    // Vertical Scroll
+    if (e.clientY < TOP_SCROLL_TRIGGER) {
+      // At top of viewport
+      this.scrolling = true
+      this.scrollUp(null, e.clientY)
+      return
+    } else if (e.clientY > window.innerHeight - TOP_SCROLL_TRIGGER) {
+      // At bottom of viewport
+      this.scrolling = true
+      this.scrollDown()
+      return
+    }
+
+    // Horizontal Scroll
+    if (!horizontalScroll) {
+      this.scrolling = false
+      return
+    }
+    const cardWidth = (card.width * gridW) / 2
+    const leftMargin = v.containerPadding.horizontal * 16
+
+    // At right of viewport
+    if (e.clientX > window.innerWidth - cardWidth + leftMargin) {
+      this.scrolling = true
+      this.scrollRight()
+      // At left of viewport
+    } else if (e.clientX - cardWidth - leftMargin < 0) {
+      this.scrolling = true
+      this.scrollLeft()
+    } else {
+      this.scrolling = false
+    }
+  }
+
+  get scrollElement() {
+    const { scrollElement } = this.props
+    if (scrollElement) return scrollElement
+    return window
   }
 
   scrollUp = (timestamp, clientY) => {
@@ -138,7 +190,7 @@ class MovableGridCard extends React.PureComponent {
       return window.requestAnimationFrame(this.scrollUp)
     }
 
-    window.scrollBy(0, -this.scrollAmount())
+    this.scrollElement.scrollBy(0, -scrollAmount())
 
     return window.requestAnimationFrame(this.scrollUp)
   }
@@ -152,9 +204,23 @@ class MovableGridCard extends React.PureComponent {
       return window.requestAnimationFrame(this.scrollDown)
     }
 
-    window.scrollBy(0, this.scrollAmount())
+    this.scrollElement.scrollBy(0, scrollAmount())
 
     return window.requestAnimationFrame(this.scrollDown)
+  }
+
+  scrollLeft = timestamp => {
+    if (!this.scrolling) return null
+
+    this.scrollElement.scrollBy(-scrollAmount(), 0)
+    return window.requestAnimationFrame(this.scrollLeft)
+  }
+
+  scrollRight = timestamp => {
+    if (!this.scrolling) return null
+
+    this.scrollElement.scrollBy(scrollAmount(), 0)
+    return window.requestAnimationFrame(this.scrollRight)
   }
 
   handleDrag = (e, data, dX, dY) => {
@@ -174,19 +240,7 @@ class MovableGridCard extends React.PureComponent {
       return
     }
 
-    document.body.style['overflow-y'] = 'hidden'
-
-    if (e.clientY < TOP_SCROLL_TRIGGER) {
-      // At top of viewport
-      this.scrolling = true
-      this.scrollUp(null, e.clientY)
-    } else if (e.clientY > window.innerHeight - TOP_SCROLL_TRIGGER) {
-      // At bottom of viewport
-      this.scrolling = true
-      this.scrollDown()
-    } else {
-      this.scrolling = false
-    }
+    this.scrollIfNearPageBounds(e)
 
     // TODO make this switch for normal collections
     // const pageMargin = window.innerWidth - v.maxWidth
@@ -230,8 +284,10 @@ class MovableGridCard extends React.PureComponent {
   }
 
   handleStop = type => ev => {
+    const { horizontalScroll } = this.props
     this.scrolling = false
     document.body.style['overflow-y'] = 'auto'
+    if (horizontalScroll) document.body.style['overflow-x'] = 'auto'
     this.setState({ dragging: false, resizing: false }, () => {
       // Resizing has to be reset first, before the handler or the card dimensions
       // will jump back in forth as the grid resizes the actual card while this
@@ -645,6 +701,8 @@ MovableGridCard.propTypes = {
   zoomLevel: PropTypes.number,
   maxResizeRow: PropTypes.number,
   maxResizeCol: PropTypes.number,
+  scrollElement: MobxPropTypes.objectOrObservableObject,
+  horizontalScroll: PropTypes.bool,
   showHotEdge: PropTypes.bool,
 }
 
@@ -654,6 +712,8 @@ MovableGridCard.defaultProps = {
   zoomLevel: 1,
   maxResizeRow: 2,
   maxResizeCol: 4,
+  scrollElement: null,
+  horizontalScroll: false,
   showHotEdge: true,
 }
 

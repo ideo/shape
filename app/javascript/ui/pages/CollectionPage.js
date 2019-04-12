@@ -371,7 +371,7 @@ class CollectionPage extends React.Component {
   )
 
   render() {
-    const { collection, isHomepage, uiStore } = this.props
+    const { collection, uiStore } = this.props
     if (!collection) {
       return this.loader()
     }
@@ -398,7 +398,7 @@ class CollectionPage extends React.Component {
     if (collection.isBoard) {
       return (
         <Fragment>
-          <PageHeader record={collection} isHomepage={isHomepage} />
+          <PageHeader record={collection} />
           <PageContainer fullWidth={collection.isBoard}>
             <FoamcoreGrid
               // pull in cols, gridW, gridH, gutter
