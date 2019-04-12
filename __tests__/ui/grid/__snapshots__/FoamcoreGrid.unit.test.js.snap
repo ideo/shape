@@ -1,0 +1,127 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FoamcoreGrid renders snapshot 1`] = `
+<styled.div
+  data-deselect-on-click={true}
+  innerRef={[Function]}
+  onMouseMove={[Function]}
+  onScroll={[Function]}
+>
+  <styled.div>
+    <Tooltip
+      classes={
+        Object {
+          "tooltip": "Tooltip",
+        }
+      }
+      placement="top"
+      title="Zoom out"
+    >
+      <div
+        className="zoom-icon"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        role="button"
+        tabIndex={0}
+      >
+        <MinusCircleIcon />
+      </div>
+    </Tooltip>
+    <Tooltip
+      classes={
+        Object {
+          "tooltip": "Tooltip",
+        }
+      }
+      placement="top"
+      title="Zoom in"
+    >
+      <div
+        className="zoom-icon"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        role="button"
+        tabIndex={0}
+      >
+        <PlusCircleIcon />
+      </div>
+    </Tooltip>
+  </styled.div>
+  <div
+    style={
+      Object {
+        "height": "1px",
+        "width": "3200px",
+      }
+    }
+  />
+  <styled.div
+    blocked={false}
+    data-blank-type="unrendered"
+    draggedOn={true}
+    h={200}
+    height={200}
+    key="blank-unrendered-5:1"
+    onClick={[Function]}
+    type="unrendered"
+    w={200}
+    width={200}
+    x={1050}
+    xPos={1050}
+    y={210}
+    yPos={210}
+    zoomLevel={1}
+  />
+  <styled.div
+    blocked={false}
+    data-blank-type="unrendered"
+    draggedOn={true}
+    h={410}
+    height={410}
+    key="blank-unrendered-1:0"
+    onClick={[Function]}
+    type="unrendered"
+    w={410}
+    width={410}
+    x={210}
+    xPos={210}
+    y={0}
+    yPos={0}
+    zoomLevel={1}
+  />
+  <styled.div
+    blocked={false}
+    data-blank-type="unrendered"
+    draggedOn={true}
+    h={200}
+    height={200}
+    key="blank-unrendered-0:2"
+    onClick={[Function]}
+    type="unrendered"
+    w={410}
+    width={410}
+    x={0}
+    xPos={0}
+    y={420}
+    yPos={420}
+    zoomLevel={1}
+  />
+  <styled.div
+    blocked={false}
+    data-blank-type="generic"
+    draggedOn={true}
+    h={-10}
+    height={-10}
+    key="blank-generic-null:null"
+    onClick={[Function]}
+    type="generic"
+    w={-10}
+    width={-10}
+    x={0}
+    xPos={0}
+    y={0}
+    yPos={0}
+    zoomLevel={1}
+  />
+</styled.div>
+`;
