@@ -46,8 +46,8 @@ const SelectedArea = styled.div.attrs({
     width: `${coords.width}px`,
   }),
 })`
-  backround-color: rgba(255, 255, 255, 0.3);
-  border: 1.5px solid ${v.colors.primaryLight};
+  background-color: rgba(255, 255, 255, 0.3);
+  border: 1px solid ${v.colors.primaryLight};
   position: absolute;
   z-index: ${v.zIndex.clickWrapper};
 `
@@ -66,7 +66,7 @@ const pageMargins = {
   // v.containerPadding is in `em` units, so we multiply by 16
   left: v.containerPadding.horizontal * 16,
   // TODO: is this right? This is 60px but we also have collection title up top
-  top: v.headerHeight,
+  top: v.headerHeight + 90,
 }
 
 const MAX_CARD_W = 4
@@ -112,13 +112,14 @@ class FoamcoreGrid extends React.Component {
 
   componentDidMount() {
     this.filledSpots = this.calculateFilledSpots()
+    this.updateSelectedArea()
     this.throttledCalculateCardsToRender()
     window.addEventListener('scroll', this.handleScroll)
   }
 
   componentDidUpdate(prevProps) {
     this.filledSpots = this.calculateFilledSpots()
-    this.onSelectingArea()
+    this.updateSelectedArea()
   }
 
   componentWillUnmount() {
@@ -265,12 +266,6 @@ class FoamcoreGrid extends React.Component {
     const { gridW, gridH, gutter } = this.props
     const { zoomLevel } = this
 
-    const colAmountLeft = x % (gridW + gutter)
-    const rowAmountLeft = y % (gridH + gutter)
-
-    // If in the gutter, return null
-    if (colAmountLeft > gridW || rowAmountLeft > gridH) return null
-
     const col = Math.floor((x / (gridW + gutter)) * zoomLevel)
     const row = Math.floor((y / (gridH + gutter)) * zoomLevel)
 
@@ -339,27 +334,32 @@ class FoamcoreGrid extends React.Component {
     return !!this.getDraggedOnSpot(coords)
   }
 
-  // Return true if dragging area > 20px on either dimentions
-  get selectedAreaLargeEnough() {
+  // Adjusts global x,y coords to foamcore grid coords
+  get selectedAreaAdjustedForGrid() {
     const {
       selectedArea: { minX, maxX, minY, maxY },
     } = this.props
-    return maxX - minX > 20 || maxY - minY > 20
-  }
 
-  get selectedAreaCoords() {
-    let {
-      selectedArea: { minX, maxX, minY, maxY },
-    } = this.props
-
-    const bounds = this.gridRef.getBoundingClientRect()
+    // If no area is selected, return null values
+    if (!minX)
+      return {
+        minX,
+        maxX,
+        minY,
+        maxY,
+      }
 
     // Adjust coordinates by page margins
-    minX -= bounds.left
-    maxX -= bounds.left
-    minY -= bounds.top
-    maxY -= bounds.top
+    return {
+      minX: minX - pageMargins.left,
+      maxX: maxX - pageMargins.left,
+      minY: minY - pageMargins.top,
+      maxY: maxY - pageMargins.top,
+    }
+  }
 
+  get selectedAreaStyleProps() {
+    const { minX, maxX, minY, maxY } = this.selectedAreaAdjustedForGrid
     return {
       top: minY,
       left: minX,
@@ -368,36 +368,22 @@ class FoamcoreGrid extends React.Component {
     }
   }
 
-  onSelectingArea = () => {
+  updateSelectedArea = () => {
     const { collection, uiStore } = this.props
-    let {
-      selectedArea: { minX, maxX, minY, maxY },
-    } = this.props
+    const { minX, maxX, minY, maxY } = this.selectedAreaAdjustedForGrid
 
-    if (!this.selectedAreaLargeEnough) return
-
-    console.log([minX, minY], [maxX, maxY])
-
-    const gridBounds = this.gridRef.getBoundingClientRect()
-
-    // Set all min-max x/y coordinates so they don't fall outside bounds of grid
-    if (minX < gridBounds.top) minX = gridBounds.top
-    if (minY < gridBounds.left) minY = gridBounds.left
-    if (maxX > gridBounds.right) maxX = gridBounds.right
-    if (maxY > gridBounds.bottom) maxY = gridBounds.bottom
-
-    // console.log([minX, minY], [maxX, maxY])
+    // Check if there is a selected area
+    if (!minX) return
 
     // Select all cards that this drag rectangle 'touches'
-    const topLeftCoords = this.coordinatesForPosition({ x: minX, y: minY })
-    const bottomRightCoords = this.coordinatesForPosition({ x: maxX, y: maxY })
-
-    console.log(
-      'topLeftCoords',
-      topLeftCoords,
-      'bottomRightCoords',
-      bottomRightCoords
-    )
+    const topLeftCoords = this.coordinatesForPosition({
+      x: minX,
+      y: minY,
+    })
+    const bottomRightCoords = this.coordinatesForPosition({
+      x: maxX,
+      y: maxY,
+    })
 
     // Return if it couldn't find cards in both positions
     if (!topLeftCoords || !bottomRightCoords) return
@@ -414,6 +400,13 @@ class FoamcoreGrid extends React.Component {
   }
 
   handleBlankCardClick = ({ row, col }) => e => {
+    const {
+      selectedArea: { minX },
+    } = this.props
+
+    // If user is selecting an area, don't trigger blank card click
+    if (minX) return
+
     runInAction(() => {
       this.blankContentTool = {
         id: 'blank',
@@ -422,6 +415,7 @@ class FoamcoreGrid extends React.Component {
         col,
       }
     })
+
     this.throttledCalculateCardsToRender()
   }
 
@@ -1009,9 +1003,7 @@ class FoamcoreGrid extends React.Component {
           this.gridRef = ref
         }}
       >
-        {this.selectedAreaLargeEnough && (
-          <SelectedArea coords={this.selectedAreaCoords} />
-        )}
+        {<SelectedArea coords={this.selectedAreaStyleProps} />}
         <div
           style={{
             position: 'absolute',
