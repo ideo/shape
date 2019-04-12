@@ -11,6 +11,7 @@ import ChannelManager from '~/utils/ChannelManager'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import { QuillStyleWrapper } from '~/ui/global/styled/typography'
 import TextItemToolbar from '~/ui/items/TextItemToolbar'
+import { routingStore } from '~/stores'
 import v from '~/utils/variables'
 
 Quill.register('modules/cursors', QuillCursors)
@@ -80,6 +81,7 @@ class RealtimeTextItem extends React.Component {
   saveTimer = null
   version = null
   currentlySending = false
+  currentlySendingCheck = null
   combinedDelta = new Delta()
   bufferDelta = new Delta()
   contentSnapshot = new Delta()
@@ -94,6 +96,9 @@ class RealtimeTextItem extends React.Component {
 
   componentDidMount() {
     this.subscribeToItemEditingChannel()
+    setTimeout(() => {
+      this.subscribeToItemEditingChannel()
+    }, 1250)
 
     if (!this.reactQuillRef) return
     this.initQuillRefsAndData({ initSnapshot: true })
@@ -111,7 +116,13 @@ class RealtimeTextItem extends React.Component {
   componentWillUnmount() {
     this.sendCombinedDelta.flush()
     this.unmounted = true
-    ChannelManager.unsubscribeAllFromChannel(this.channelName)
+    const { routingTo } = routingStore
+    const { item } = this.props
+    const routingToSameItem =
+      routingTo.id === item.id && routingTo.type === 'items'
+    ChannelManager.unsubscribeAllFromChannel(this.channelName, {
+      keepOpen: routingToSameItem,
+    })
   }
 
   subscribeToItemEditingChannel() {
@@ -126,8 +137,6 @@ class RealtimeTextItem extends React.Component {
   initQuillRefsAndData = ({ initSnapshot } = {}) => {
     if (!this.reactQuillRef) return
     if (typeof this.reactQuillRef.getEditor !== 'function') return
-    // if (!this.quillEditor) {
-    // }
     this.quillEditor = this.reactQuillRef.getEditor()
 
     if (!initSnapshot) return
@@ -204,6 +213,8 @@ class RealtimeTextItem extends React.Component {
 
     if (current_editor.id === currentUserId) {
       // now we can successfully say that our delta was sent/received
+      clearTimeout(this.currentlySendingCheck)
+      this.currentlySendingCheck = null
       this.currentlySending = false
       if (data.error) {
         return
@@ -316,6 +327,13 @@ class RealtimeTextItem extends React.Component {
 
   _sendCombinedDelta = () => {
     if (!this.combinedDelta.length() || this.currentlySending) {
+      if (this.currentlySending && !this.currentlySendingCheck) {
+        this.currentlySendingCheck = setTimeout(() => {
+          // if we are stuck 10s in this `currentlySending` mode it means our socketSends are
+          // silently failing... we've probably been unsubscribed and it's throwing a backend error
+          if (this.currentlySending) this.channelDisconnected()
+        }, 10 * 1000)
+      }
       return false
     }
 

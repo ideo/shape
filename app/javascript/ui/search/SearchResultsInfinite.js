@@ -132,7 +132,7 @@ class SearchResultsInfinite extends React.Component {
             intervalDelay={300}
             onChange={this.handleVisibilityChange(i + 1)}
             offset={{
-              top: v.headerHeightCompact + gridSettings.gridH / 2,
+              top: v.headerHeight + gridSettings.gridH / 2,
             }}
           >
             <StyledCardWrapper>
