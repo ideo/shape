@@ -970,11 +970,7 @@ class FoamcoreGrid extends React.Component {
     return (
       <Grid
         data-empty-space-click
-        /*
-          // This was killing performance... why do we even need it?
-          // Can't we do it all hover effects with css?
-          onMouseMove={this.handleMouseMove}
-        */
+        onMouseMove={this.handleMouseMove}
         onScroll={this.handleScroll}
         innerRef={ref => {
           this.gridRef = ref
