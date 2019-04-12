@@ -405,6 +405,8 @@ class CollectionPage extends React.Component {
               // pull in cols, gridW, gridH, gutter
               {...gridSettings}
               selectedArea={selectedArea}
+              // Included so that component re-renders when area changes
+              selectedAreaMinX={selectedArea.minX}
               collection={collection}
               loadCollectionCards={this.loadCollectionCards}
               trackCollectionUpdated={this.trackCollectionUpdated}

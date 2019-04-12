@@ -166,13 +166,10 @@ export default class UiStore {
   modalContentRef = null
   @observable
   dragCardMaster = null
-  mouseDownAt = { x: null, y: null }
   @observable
   selectedArea = { minX: null, maxX: null, minY: null, maxY: null }
-
-  constructor(props) {
-    this.throttledSetSelectedArea = _.throttle(this._setSelectedArea, 25)
-  }
+  @observable
+  selectedAreaEnabled = false
 
   @action
   toggleEditingCardId(cardId) {
@@ -237,6 +234,11 @@ export default class UiStore {
         y < target.coordinates.top
       return !overlap
     })
+  }
+
+  @action
+  setSelectedArea(selectedArea) {
+    this.selectedArea = selectedArea
   }
 
   @action
@@ -587,44 +589,6 @@ export default class UiStore {
     }
     return opts.open
   }
-
-  /* Selection area functions */
-
-  handleMouseDownSelection = e => {
-    this.mouseDownAt = { x: e.pageX, y: e.pageY }
-  }
-
-  handleMouseMoveSelection = e => {
-    // Return if mouse is only scrolling, not click-dragging
-    if (!this.mouseDownAt.x) return
-
-    this.throttledSetSelectedArea({
-      minX: _.min([e.pageX, this.mouseDownAt.x]),
-      maxX: _.max([e.pageX, this.mouseDownAt.x]),
-      minY: _.min([e.pageY, this.mouseDownAt.y]),
-      maxY: _.max([e.pageY, this.mouseDownAt.y]),
-    })
-  }
-
-  handleMouseUpSelection = e => {
-    // Reset for next drag
-    this.mouseDownAt = { x: null, y: null }
-    // Cancel any currently throttled calls
-    this.throttledSetSelectedArea.cancel()
-    this._setSelectedArea({
-      minX: null,
-      maxX: null,
-      minY: null,
-      maxY: null,
-    })
-  }
-
-  @action
-  _setSelectedArea = coords => {
-    this.selectedArea = coords
-  }
-
-  /* End Selection area functions */
 
   // takes a click event as a parameter
   captureKeyboardGridClick = (e, cardId) => {

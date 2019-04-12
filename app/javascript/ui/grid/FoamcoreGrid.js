@@ -38,20 +38,6 @@ const BlankCard = styled.div.attrs({
   z-index: ${props => (props.type === 'drag' ? v.zIndex.cardHovering : 0)};
 `
 
-const SelectedArea = styled.div.attrs({
-  style: ({ coords }) => ({
-    left: `${coords.left}px`,
-    top: `${coords.top}px`,
-    height: `${coords.height}px`,
-    width: `${coords.width}px`,
-  }),
-})`
-  background-color: rgba(255, 255, 255, 0.3);
-  border: 1px solid ${v.colors.primaryLight};
-  position: absolute;
-  z-index: ${v.zIndex.clickWrapper};
-`
-
 const Grid = styled.div`
   min-height: 1300px;
   margin-top: ${v.pageContentMarginTop}px;
@@ -110,6 +96,10 @@ class FoamcoreGrid extends React.Component {
   }
 
   componentDidMount() {
+    const { uiStore } = this.props
+    runInAction(() => {
+      uiStore.selectedAreaEnabled = true
+    })
     this.throttledCalculateCardsToRender()
     window.addEventListener('scroll', this.handleScroll)
   }
@@ -119,6 +109,10 @@ class FoamcoreGrid extends React.Component {
   }
 
   componentWillUnmount() {
+    const { uiStore } = this.props
+    runInAction(() => {
+      uiStore.selectedAreaEnabled = false
+    })
     window.removeEventListener('scroll', this.handleScroll)
   }
 
@@ -332,35 +326,34 @@ class FoamcoreGrid extends React.Component {
 
   // Adjusts global x,y coords to foamcore grid coords
   get selectedAreaAdjustedForGrid() {
-    const selectedArea = this.props
-    const { minX, maxX, minY, maxY } = selectedArea
+    const { selectedArea } = this.props
+    let { minX, minY, maxX, maxY } = selectedArea
 
     // If no area is selected, return null values
     if (!minX) return selectedArea
 
     // Adjust coordinates by page margins
-    return {
-      minX: minX - pageMargins.left,
-      maxX: maxX - pageMargins.left,
-      minY: minY - pageMargins.top,
-      maxY: maxY - pageMargins.top,
-    }
-  }
+    // Make sure all values start at 0
+    minX -= pageMargins.left
+    if (minX < 0) minX = 0
+    minY -= pageMargins.top
+    if (minY < 0) minY = 0
+    maxX -= pageMargins.left
+    if (maxX < 0) maxX = 0
+    maxY -= pageMargins.top
+    if (maxY < 0) maxY = 0
 
-  // Props for the div that shows area selected
-  get selectedAreaStyleProps() {
-    const { minX, maxX, minY, maxY } = this.selectedAreaAdjustedForGrid
     return {
-      top: minY,
-      left: minX,
-      height: maxY - minY,
-      width: maxX - minX,
+      minX,
+      minY,
+      maxX,
+      maxY,
     }
   }
 
   updateSelectedArea = () => {
     const { collection, uiStore } = this.props
-    const { minX, maxX, minY, maxY } = this.selectedAreaAdjustedForGrid
+    const { minX, minY, maxX, maxY } = this.selectedAreaAdjustedForGrid
 
     // Check if there is a selected area
     if (!minX) return
@@ -977,13 +970,16 @@ class FoamcoreGrid extends React.Component {
     return (
       <Grid
         data-empty-space-click
-        onMouseMove={this.handleMouseMove}
+        /*
+          // This was killing performance... why do we even need it?
+          // Can't we do it all hover effects with css?
+          onMouseMove={this.handleMouseMove}
+        */
         onScroll={this.handleScroll}
         innerRef={ref => {
           this.gridRef = ref
         }}
       >
-        {<SelectedArea coords={this.selectedAreaStyleProps} />}
         <div
           style={{
             position: 'absolute',
@@ -1024,6 +1020,7 @@ FoamcoreGrid.propTypes = {
   movingCardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
   loadCollectionCards: PropTypes.func.isRequired,
   selectedArea: MobxPropTypes.objectOrObservableObject.isRequired,
+  selectedAreaMinX: PropTypes.number,
   sorting: PropTypes.bool,
 }
 FoamcoreGrid.wrappedComponent.propTypes = {
@@ -1033,6 +1030,7 @@ FoamcoreGrid.wrappedComponent.propTypes = {
 }
 FoamcoreGrid.defaultProps = {
   sorting: false,
+  selectedAreaMinX: null,
 }
 FoamcoreGrid.displayName = 'FoamcoreGrid'
 

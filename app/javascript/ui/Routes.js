@@ -3,6 +3,7 @@ import { Switch, Route, Redirect, withRouter } from 'react-router-dom'
 import { MuiThemeProvider } from '@material-ui/core/styles'
 import WindowSizeListener from 'react-window-size-listener'
 import styled from 'styled-components'
+import _ from 'lodash'
 
 import ActivityLogBox from '~/ui/activity_log/ActivityLogBox'
 import DialogWrapper from '~/ui/global/modals/DialogWrapper'
@@ -51,6 +52,19 @@ const FixedActivityLogWrapper = styled.div`
   z-index: ${v.zIndex.activityLog};
 `
 
+const SelectedArea = styled.div.attrs({
+  style: ({ coords }) => ({
+    left: `${coords.left}px`,
+    top: `${coords.top}px`,
+    height: `${coords.height}px`,
+    width: `${coords.width}px`,
+  }),
+})`
+  background-color: rgba(192, 219, 222, 0.4);
+  position: absolute;
+  z-index: ${v.zIndex.clickWrapper};
+`
+
 const emptySpaceClick = e => {
   const { target } = e
   return target.getAttribute && target.getAttribute('data-empty-space-click')
@@ -61,6 +75,12 @@ const emptySpaceClick = e => {
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class Routes extends React.Component {
+  constructor(props) {
+    super(props)
+    this.mouseDownAt = { x: null, y: null }
+    this.throttledSetSelectedArea = _.throttle(this._setSelectedArea, 25)
+  }
+
   componentDidMount() {
     const { apiStore } = this.props
     apiStore.loadCurrentUser().then(() => {
@@ -81,26 +101,55 @@ class Routes extends React.Component {
     uiStore.update('windowWidth', windowWidth)
   }
 
-  handleClick = e => {
-    const { uiStore } = this.props
-    if (!emptySpaceClick(e)) return
-    uiStore.deselectCards()
-  }
-
   handleMouseDownSelection = e => {
-    const { uiStore } = this.props
     if (!emptySpaceClick(e)) return
-    uiStore.handleMouseDownSelection(e)
+    const { uiStore } = this.props
+    uiStore.deselectCards()
+    this.mouseDownAt = { x: e.pageX, y: e.pageY }
   }
 
   handleMouseMoveSelection = e => {
-    const { uiStore } = this.props
-    uiStore.handleMouseMoveSelection(e)
+    // Return if mouse is only scrolling, not click-dragging
+    if (!this.mouseDownAt.x) return
+    this.throttledSetSelectedArea({
+      minX: _.min([e.pageX, this.mouseDownAt.x]),
+      maxX: _.max([e.pageX, this.mouseDownAt.x]),
+      minY: _.min([e.pageY, this.mouseDownAt.y]),
+      maxY: _.max([e.pageY, this.mouseDownAt.y]),
+    })
   }
 
   handleMouseUpSelection = e => {
-    const { uiStore } = this.props
-    uiStore.handleMouseUpSelection(e)
+    // Reset for next drag
+    this.mouseDownAt = { x: null, y: null }
+    // Cancel any currently throttled calls
+    this.throttledSetSelectedArea.cancel()
+    this._setSelectedArea({
+      minX: null,
+      maxX: null,
+      minY: null,
+      maxY: null,
+    })
+  }
+
+  _setSelectedArea = coords => {
+    const {
+      apiStore: { uiStore },
+    } = this.props
+    uiStore.setSelectedArea(coords)
+  }
+
+  // Props for the div that shows area selected
+  get selectedAreaStyleProps() {
+    const {
+      selectedArea: { minX, maxX, minY, maxY },
+    } = this.props.uiStore
+    return {
+      top: minY,
+      left: minX,
+      height: maxY - minY,
+      width: maxX - minX,
+    }
   }
 
   render() {
@@ -112,15 +161,21 @@ class Routes extends React.Component {
       !apiStore.currentUser.terms_accepted &&
       !routingStore.pathContains('/terms')
 
+    const {
+      uiStore: { selectedAreaEnabled },
+    } = apiStore
+
     return (
       <AppWrapper
-        onClick={this.handleClick}
         onMouseDown={this.handleMouseDownSelection}
         onMouseUp={this.handleMouseUpSelection}
         onMouseMove={this.handleMouseMoveSelection}
         blur={displayTermsPopup}
         id="AppWrapper"
       >
+        {selectedAreaEnabled && (
+          <SelectedArea coords={this.selectedAreaStyleProps} />
+        )}
         <ErrorBoundary>
           <MuiThemeProvider theme={MuiTheme}>
             {/* Global components are rendered here */}
