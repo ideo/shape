@@ -15,10 +15,18 @@ function createCard(data) {
 
 describe('FoamcoreGrid', () => {
   beforeEach(() => {
-    cardA = createCard({ col: 5, row: 1 })
-    cardB = createCard({ col: 1, row: 0, width: 2, height: 2 })
-    cardC = createCard({ col: 0, row: 2, width: 2 })
+    cardA = createCard({ row: 1, col: 5 })
+    cardB = createCard({ row: 0, col: 1, width: 2, height: 2 })
+    cardC = createCard({ row: 2, col: 0, width: 2 })
     const collection = fakeCollection
+
+    collection.cardMatrix = [[], [], []]
+    collection.cardMatrix[1][5] = cardA
+    collection.cardMatrix[0][1] = cardB
+    collection.cardMatrix[1][1] = cardB
+    collection.cardMatrix[2][0] = cardC
+    collection.cardMatrix[2][1] = cardC
+
     collection.collection_cards = [cardA, cardB, cardC]
     collection.confirmEdit = jest.fn()
 
@@ -48,24 +56,24 @@ describe('FoamcoreGrid', () => {
     instance.gridRef = { scrollLeft: 0, scrollTop: 0 }
   })
 
-  describe('calculateFilledSpots', () => {
-    it('maps out all the filled spots in the grid as a matrix', () => {
-      const { filledSpots } = instance
-      // 3 cards
-      expect(filledSpots.length).toEqual(3)
-
-      expect(filledSpots[1][5]).toEqual(cardA)
-      // height 2
-      expect(filledSpots[0][1]).toEqual(cardB)
-      expect(filledSpots[1][1]).toEqual(cardB)
-      // width 2
-      expect(filledSpots[2][0]).toEqual(cardC)
-      expect(filledSpots[2][1]).toEqual(cardC)
-      // empty spots
-      expect(filledSpots[0][0]).toBeUndefined()
-      expect(filledSpots[2][5]).toBeUndefined()
-    })
-  })
+  // describe('calculateFilledSpots', () => {
+  //   it('maps out all the filled spots in the grid as a matrix', () => {
+  //     const { filledSpots } = instance
+  //     // 3 cards
+  //     expect(filledSpots.length).toEqual(3)
+  //
+  //     expect(filledSpots[1][5]).toEqual(cardA)
+  //     // height 2
+  //     expect(filledSpots[0][1]).toEqual(cardB)
+  //     expect(filledSpots[1][1]).toEqual(cardB)
+  //     // width 2
+  //     expect(filledSpots[2][0]).toEqual(cardC)
+  //     expect(filledSpots[2][1]).toEqual(cardC)
+  //     // empty spots
+  //     expect(filledSpots[0][0]).toBeUndefined()
+  //     expect(filledSpots[2][5]).toBeUndefined()
+  //   })
+  // })
 
   describe('findCardOverlap', () => {
     it('finds filledSpot (or not) where a card is trying to be dragged', () => {
@@ -320,30 +328,42 @@ describe('FoamcoreGrid', () => {
 
   describe('calcEdgeCol/Row', () => {
     beforeEach(() => {
-      cardA = createCard({ col: 1, row: 1 })
-      cardB = createCard({ col: 8, row: 1 })
-      cardC = createCard({ col: 9, row: 9 })
+      cardA = createCard({ row: 1, col: 1 })
+      cardB = createCard({ row: 1, col: 8 })
+      cardC = createCard({ row: 1, col: 9 })
+      const { collection } = props
+      collection.cardMatrix = [[], [], [], []]
+      collection.cardMatrix[1][1] = cardA
+      collection.cardMatrix[1][8] = cardB
+      collection.cardMatrix[1][9] = cardC
+
       props.collection.collection_cards = [cardA, cardB, cardC]
+    })
+
+    afterEach(() => {
+      props.collection.cardMatrix = [[], [], [], []]
     })
 
     describe('with a card that has no cards around it', () => {
       it('should set the max column as the max card width', () => {
-        const edgeCol = instance.calcEdgeCol(cards[0], cards[0].id)
+        const edgeCol = instance.calcEdgeCol(cardA, cardA.id)
         expect(edgeCol).toEqual(4)
       })
 
       it('sets the max row as the max card height', () => {
-        const edgeRow = instance.calcEdgeRow(cards[0], cards[0].id)
+        const edgeRow = instance.calcEdgeRow(cardA, cardA.id)
         expect(edgeRow).toEqual(2)
       })
     })
 
-    describe('with a card that has horizontal contraints, 2 spaces apart', () => {
+    describe('with a card that has horizontal constraints, 2 spaces apart', () => {
       beforeEach(() => {
-        const otherCard = props.collection.collection_cards[1]
-        otherCard.row = 1
-        otherCard.col = 3
-        rerender()
+        cardB.row = 1
+        cardB.col = 3
+        const { collection } = props
+        collection.cardMatrix[1][1] = cardA
+        collection.cardMatrix[1][3] = cardB
+        collection.cardMatrix[1][9] = cardC
       })
 
       it('has a maxResizeCol of 2', () => {
@@ -352,12 +372,15 @@ describe('FoamcoreGrid', () => {
       })
     })
 
-    describe('with a card that has vertical contraints, 1 space apart', () => {
+    describe('with a card that has vertical constraints, 1 space apart', () => {
       beforeEach(() => {
-        const otherCard = props.collection.collection_cards[1]
-        otherCard.row = 2
-        otherCard.col = 1
-        rerender()
+        cardA.row = 2
+        cardB.row = 3
+        cardB.col = 1
+        const { collection } = props
+        collection.cardMatrix[2][1] = cardA
+        collection.cardMatrix[3][1] = cardB
+        collection.cardMatrix[1][9] = cardC
       })
 
       it('has maxResizeRow of 1', () => {

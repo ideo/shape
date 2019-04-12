@@ -603,31 +603,30 @@ export default class UiStore {
   @action
   selectCardsUpTo(cardId) {
     const selected = [...this.selectedCardIds]
-    const cardIds = [...this.collectionCardIds]
-    const lastSelected = _.last(selected)
-    // gather which cardIds are between this card and the last selected card
-    let between = []
-    if (lastSelected) {
-      if (lastSelected === cardId) return
-      const lastIdx = this.collectionCardIds.findIndex(
-        id => id === lastSelected
-      )
-      const thisIdx = this.collectionCardIds.findIndex(id => id === cardId)
-      if (lastIdx > thisIdx) {
-        between = cardIds.slice(thisIdx, lastIdx)
-      } else {
-        between = cardIds.slice(lastIdx, thisIdx)
-      }
-      // get unique cardIds selected, make sure the current card is put at the end w/ reverse
-      let newSelected = _.reverse(_.uniq(_.concat([cardId], selected, between)))
-      // if ALL those items were already selected, then toggle selection to OFF
-      if (_.isEmpty(_.difference(newSelected, selected))) {
-        newSelected = _.difference(selected, between)
-      }
-      this.selectedCardIds.replace(newSelected)
-    } else {
-      this.selectedCardIds.replace([cardId])
+    const lastSelectedCardId = _.last(selected)
+
+    if (!lastSelectedCardId) return this.selectedCardIds.replace([cardId])
+    if (lastSelectedCardId === cardId) return this.selectedCardIds
+
+    // Get cardIds that are between this card and the last selected card
+    const cardIdsBetween = this.viewingCollection.cardIdsBetween(
+      cardId,
+      lastSelectedCardId
+    )
+
+    // Get unique cardIds selected
+    // Make sure the current card is put at the end w/ reverse
+    let newSelected = _.reverse(
+      _.uniq(_.concat([cardId], selected, cardIdsBetween))
+    )
+
+    // If ALL those items were already selected,
+    // toggle selection to OFF
+    if (_.isEmpty(_.difference(newSelected, selected))) {
+      newSelected = _.difference(selected, cardIdsBetween)
     }
+
+    return this.selectedCardIds.replace(newSelected)
   }
 
   isSelected(cardId) {
