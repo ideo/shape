@@ -378,6 +378,8 @@ describe('FoamcoreGrid', () => {
       instance.loadedRows = { min: 0, max: 9 }
       instance.loadedCols = { min: 0, max: 9 }
       instance.loadCards = jest.fn()
+      // Stub this or else it causes mobx `Maximum call stack size exceeded`
+      instance.calculateCardsToRender = jest.fn()
     })
 
     describe('scrolling in loaded bounds', () => {
@@ -405,8 +407,6 @@ describe('FoamcoreGrid', () => {
         Object.defineProperty(instance, 'visibleCols', {
           get: jest.fn().mockReturnValue({ min: 0, max: 4, num: 5 }),
         })
-        // Stub this or else it causes mobx `Maximum call stack size exceeded`
-        instance.calculateCardsToRender = jest.fn()
       })
 
       it('calls loadMoreRows', () => {
