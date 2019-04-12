@@ -30,15 +30,18 @@ import BctButtonBox from './BctButtonBox'
 import BctButtonRotation from './BctButtonRotation'
 
 const StyledGridCardBlank = StyledGridCard.extend`
-  background: transparent;
+  background-color: ${v.colors.commonLight};
+  box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.1);
   cursor: auto;
   position: relative;
+  overflow: hidden;
   button {
     cursor: pointer;
     border: none;
-    transition: all 300ms;
+    transition: all 200ms;
   }
 `
+StyledGridCardBlank.displayName = 'WeeStyledGridCardBlank'
 
 // width of card is constrained by gridW
 // vertical position is adjusted by gridH / 2 if card is 2 rows tall
@@ -50,6 +53,7 @@ const StyledGridCardInner = styled.div`
 `
 const StyledBlankCreationTool = styled.div`
   padding: 2rem;
+  padding-top: 1rem;
   position: relative;
   .foreground {
     position: relative;
@@ -308,15 +312,15 @@ class GridCardBlank extends React.Component {
 
   createCard = (nested = {}, options = {}) => {
     const { replacingId } = this
-    let { order } = this.props
     const { afterCreate, parent, apiStore, uiStore } = this.props
-    if (order === null) ({ order } = uiStore.blankContentToolState)
-    const { width, height } = uiStore.blankContentToolState
+    const { order, row, col, width, height } = uiStore.blankContentToolState
     const isReplacing = !!replacingId
     const attrs = {
       order,
       width,
       height,
+      row,
+      col,
       // `parent` is the collection this card belongs to
       parent_id: parent.id,
       image_contain: this.props.defaultShowWholeImage,
@@ -634,7 +638,6 @@ GridCardBlank.propTypes = {
   afterCreate: PropTypes.func,
   preselected: PropTypes.string,
   replacingId: PropTypes.string,
-  order: PropTypes.number,
   testCollectionCard: PropTypes.bool,
   defaultShowWholeImage: PropTypes.bool,
 }
@@ -646,7 +649,6 @@ GridCardBlank.defaultProps = {
   afterCreate: null,
   preselected: null,
   replacingId: null,
-  order: null,
   testCollectionCard: false,
   defaultShowWholeImage: false,
 }

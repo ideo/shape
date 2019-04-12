@@ -123,6 +123,8 @@ class CollectionCard extends BaseRecord {
   beginReplacing() {
     this.uiStore.openBlankContentTool({
       order: this.order,
+      row: this.row,
+      col: this.col,
       width: this.width,
       height: this.height,
       replacingId: this.id,

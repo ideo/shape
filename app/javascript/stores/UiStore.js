@@ -11,6 +11,8 @@ export default class UiStore {
     order: null,
     width: null,
     height: null,
+    row: null,
+    col: null,
     replacingId: null,
     emptyCollection: false,
     collectionId: null,
