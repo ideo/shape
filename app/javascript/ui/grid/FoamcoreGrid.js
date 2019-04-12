@@ -4,6 +4,8 @@ import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import PlusCircleIcon from '~/ui/icons/PlusCircleIcon'
+import MinusCircleIcon from '~/ui/icons/MinusCircleIcon'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import v from '~/utils/variables'
 
@@ -42,6 +44,34 @@ const Grid = styled.div`
   min-height: 1300px;
   margin-top: ${v.pageContentMarginTop}px;
   position: relative;
+`
+
+const ZoomIconWrapper = styled.div`
+  position: fixed;
+  border-radius: 27px;
+  height: 27px;
+  top: 78px;
+  right: 62px;
+  background-color: rgba(242, 241, 238, 0.5);
+  z-index: ${v.zIndex.clickWrapper};
+  > div {
+    outline: none;
+    display: inline-block;
+    color: ${v.colors.commonDark};
+    cursor: pointer;
+    height: 23px;
+    width: 23px;
+    margin: 2px;
+    &:first-of-type {
+      margin-right: 10px;
+    }
+    &:hover {
+      color: ${v.colors.secondaryDarkest};
+    }
+    svg {
+      height: 100%;
+    }
+  }
 `
 
 function getMapKey({ col, row }) {
@@ -903,23 +933,24 @@ class FoamcoreGrid extends React.Component {
           this.gridRef = ref
         }}
       >
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            zIndex: 900,
-            background: 'white',
-          }}
-        >
-          <button onClick={this.handleZoomOut}>
-            <h3>-</h3>
-          </button>
-          <span style={{ display: 'inline-block', width: '10px' }} />
-          <button onClick={this.handleZoomIn}>
-            <h3>+</h3>
-          </button>
-        </div>
+        <ZoomIconWrapper>
+          <div
+            role="button"
+            onClick={this.handleZoomOut}
+            onKeyDown={this.handleZoomOut}
+            tabIndex={0}
+          >
+            <MinusCircleIcon />
+          </div>
+          <div
+            role="button"
+            onClick={this.handleZoomIn}
+            onKeyDown={this.handleZoomIn}
+            tabIndex={0}
+          >
+            <PlusCircleIcon />
+          </div>
+        </ZoomIconWrapper>
         <div style={{ width: `${gridW * 16}px`, height: '1px' }} />
         {this.cardsToRender}
       </Grid>
