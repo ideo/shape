@@ -151,7 +151,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
     const minMax = this.minMaxRowColForCards(cards)
     const rowRange = _.range(minMax.minRow, minMax.maxRow + 1)
-    const colRange = _.range(minMax.mincol, minMax.maxCol + 1)
+    const colRange = _.range(minMax.minCol, minMax.maxCol + 1)
 
     // Find all cards that are within the rectangle created
     // between the first and last selected cards
