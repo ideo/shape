@@ -504,7 +504,7 @@ class GridCardBlank extends React.Component {
     return (
       <StyledBlankCreationTool replacing={isReplacing && !creating}>
         <Flex className="foreground" justify="space-between">
-          {/* First Row of Options */}
+          {/* First row of options */}
           {!isReplacing &&
             !creating && (
               <BctButtonBox
@@ -512,7 +512,6 @@ class GridCardBlank extends React.Component {
                 type="text"
                 creating={creating}
                 size={size}
-                // onClick={this.startCreating('text')}
                 onClick={this.createTextItem}
                 Icon={AddTextIcon}
               />
@@ -547,7 +546,7 @@ class GridCardBlank extends React.Component {
               Icon={AddVideoIcon}
             />
           )}
-          {/* These are What to render on state change for second row */}
+          {/* These are what to render on state change for second row */}
           {creating === 'collection' && (
             <BctButtonRotation>{collectionBctBox}</BctButtonRotation>
           )}
