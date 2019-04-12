@@ -62,7 +62,6 @@ const MAX_CARD_H = 2
 @observer
 class FoamcoreGrid extends React.Component {
   gridRef = null
-  filledSpots = []
   @observable
   cardsToRender = []
   @observable
@@ -96,13 +95,8 @@ class FoamcoreGrid extends React.Component {
   }
 
   componentDidMount() {
-    this.filledSpots = this.calculateFilledSpots()
     this.throttledCalculateCardsToRender()
     window.addEventListener('scroll', this.handleScroll)
-  }
-
-  componentDidUpdate() {
-    this.filledSpots = this.calculateFilledSpots()
   }
 
   componentWillUnmount() {
@@ -293,7 +287,7 @@ class FoamcoreGrid extends React.Component {
   }
 
   findCardOverlap(card) {
-    const { uiStore } = this.props
+    const { collection, uiStore } = this.props
     let { width, height } = card
     const origWidth = width
     const { row, col } = card
@@ -302,7 +296,7 @@ class FoamcoreGrid extends React.Component {
       while (width > 0 && !found) {
         const filledRow = row + height - 1
         const filledCol = col + width - 1
-        const searchRow = this.filledSpots[filledRow]
+        const searchRow = collection.cardMatrix[filledRow]
         found = searchRow && searchRow[filledCol]
         // don't consider overlapping itself
         if (found && _.includes(uiStore.multiMoveCardIds, found.id))
@@ -659,37 +653,10 @@ class FoamcoreGrid extends React.Component {
     this.throttledCalculateCardsToRender()
   }
 
-  calculateFilledSpots() {
-    const {
-      collection: { collection_cards },
-    } = this.props
-
-    const filledSpots = []
-    collection_cards.forEach(card => {
-      let { width, height } = card
-      const origWidth = width
-      const { row, col } = card
-      while (height > 0) {
-        while (width > 0) {
-          const filledRow = row + height - 1
-          const filledCol = col + width - 1
-          //   row: row + height - 1, // 1 + 2 - 1 = 2 | 2
-          //   col: col + width - 1, // 0 + 2 - 1 = 1 | 0
-          filledSpots[filledRow] = filledSpots[filledRow] || []
-          filledSpots[filledRow][filledCol] = card
-          width -= 1
-        }
-        width = origWidth
-        height -= 1
-      }
-    })
-    return filledSpots
-  }
-
   findFilledSpot({ col, row }, cardId = null) {
     if (!_.isNumber(col) || _.isNaN(col)) return null
-    const { uiStore } = this.props
-    const filledRow = this.filledSpots[row]
+    const { collection, uiStore } = this.props
+    const filledRow = collection.cardMatrix[row]
     const foundCard = filledRow ? filledRow[col] : null
     if (foundCard) {
       if (
@@ -717,7 +684,7 @@ class FoamcoreGrid extends React.Component {
 
   calcEdgeRow({ col, row, height }, cardId) {
     let tempRow = row + height - 1
-    while (tempRow <= MAX_CARD_H) {
+    while (tempRow <= row + MAX_CARD_H) {
       const filled = this.findFilledSpot({ row: tempRow, col }, cardId)
       if (filled) {
         return tempRow - row
