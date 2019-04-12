@@ -591,8 +591,7 @@ export default class UiStore {
   /* Selection area functions */
 
   handleMouseDownSelection = e => {
-    this.mouseDownAt = { x: e.clientX, y: e.clientY }
-    console.log('mouseDown')
+    this.mouseDownAt = { x: e.pageX, y: e.pageY }
   }
 
   handleMouseMoveSelection = e => {
@@ -600,16 +599,18 @@ export default class UiStore {
     if (!this.mouseDownAt.x) return
 
     this.throttledSetSelectedArea({
-      minX: _.min([e.clientX, this.mouseDownAt.x]),
-      maxX: _.max([e.clientX, this.mouseDownAt.x]),
-      minY: _.min([e.clientY, this.mouseDownAt.y]),
-      maxY: _.max([e.clientY, this.mouseDownAt.y]),
+      minX: _.min([e.pageX, this.mouseDownAt.x]),
+      maxX: _.max([e.pageX, this.mouseDownAt.x]),
+      minY: _.min([e.pageY, this.mouseDownAt.y]),
+      maxY: _.max([e.pageY, this.mouseDownAt.y]),
     })
   }
 
   handleMouseUpSelection = e => {
     // Reset for next drag
     this.mouseDownAt = { x: null, y: null }
+    // Cancel any currently throttled calls
+    this.throttledSetSelectedArea.cancel()
     this._setSelectedArea({
       minX: null,
       maxX: null,

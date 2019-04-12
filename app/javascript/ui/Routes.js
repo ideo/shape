@@ -51,6 +51,11 @@ const FixedActivityLogWrapper = styled.div`
   z-index: ${v.zIndex.activityLog};
 `
 
+const emptySpaceClick = e => {
+  const { target } = e
+  return target.getAttribute && target.getAttribute('data-empty-space-click')
+}
+
 // withRouter allows it to respond automatically to routing changes in props
 @withRouter
 @inject('apiStore', 'uiStore', 'routingStore')
@@ -77,12 +82,25 @@ class Routes extends React.Component {
   }
 
   handleClick = e => {
-    const { target } = e
     const { uiStore } = this.props
+    if (!emptySpaceClick(e)) return
+    uiStore.deselectCards()
+  }
 
-    if (!target.getAttribute) return
+  handleMouseDownSelection = e => {
+    const { uiStore } = this.props
+    if (!emptySpaceClick(e)) return
+    uiStore.handleMouseDownSelection(e)
+  }
 
-    if (target.getAttribute('data-deselect-on-click')) uiStore.deselectCards()
+  handleMouseMoveSelection = e => {
+    const { uiStore } = this.props
+    uiStore.handleMouseMoveSelection(e)
+  }
+
+  handleMouseUpSelection = e => {
+    const { uiStore } = this.props
+    uiStore.handleMouseUpSelection(e)
   }
 
   render() {
@@ -97,6 +115,9 @@ class Routes extends React.Component {
     return (
       <AppWrapper
         onClick={this.handleClick}
+        onMouseDown={this.handleMouseDownSelection}
+        onMouseUp={this.handleMouseUpSelection}
+        onMouseMove={this.handleMouseMoveSelection}
         blur={displayTermsPopup}
         id="AppWrapper"
       >
@@ -108,7 +129,7 @@ class Routes extends React.Component {
             <ZendeskWidget />
 
             <Header />
-            <FixedBoundary className="fixed_boundary" data-deselect-on-click />
+            <FixedBoundary className="fixed_boundary" data-empty-space-click />
             <FixedActivityLogWrapper>
               <ActivityLogBox />
             </FixedActivityLogWrapper>

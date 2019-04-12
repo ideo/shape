@@ -245,7 +245,7 @@ class PageHeader extends React.Component {
           <RolesModal record={rolesRecord} open={!!uiStore.rolesMenuOpen} />
           <div>
             <StyledTitleAndRoles
-              data-deselect-on-click
+              data-empty-space-click
               className={record.isCurrentUserProfile ? 'user-profile' : ''}
               justify="space-between"
             >

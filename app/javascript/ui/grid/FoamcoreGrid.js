@@ -40,15 +40,15 @@ const BlankCard = styled.div.attrs({
 
 const SelectedArea = styled.div.attrs({
   style: ({ coords }) => ({
-    height: `${coords.maxY - coords.minY}px`,
-    left: `${coords.minX}px`,
-    top: `${coords.minY}px`,
-    width: `${coords.maxX - coords.minX}px`,
+    left: `${coords.left}px`,
+    top: `${coords.top}px`,
+    height: `${coords.height}px`,
+    width: `${coords.width}px`,
   }),
 })`
   backround-color: rgba(255, 255, 255, 0.3);
   border: 1.5px solid ${v.colors.primaryLight};
-  position: fixed;
+  position: absolute;
   z-index: ${v.zIndex.clickWrapper};
 `
 
@@ -65,6 +65,7 @@ function getMapKey({ col, row }) {
 const pageMargins = {
   // v.containerPadding is in `em` units, so we multiply by 16
   left: v.containerPadding.horizontal * 16,
+  // TODO: is this right? This is 60px but we also have collection title up top
   top: v.headerHeight,
 }
 
@@ -346,6 +347,27 @@ class FoamcoreGrid extends React.Component {
     return maxX - minX > 20 || maxY - minY > 20
   }
 
+  get selectedAreaCoords() {
+    let {
+      selectedArea: { minX, maxX, minY, maxY },
+    } = this.props
+
+    const bounds = this.gridRef.getBoundingClientRect()
+
+    // Adjust coordinates by page margins
+    minX -= bounds.left
+    maxX -= bounds.left
+    minY -= bounds.top
+    maxY -= bounds.top
+
+    return {
+      top: minY,
+      left: minX,
+      height: maxY - minY,
+      width: maxX - minX,
+    }
+  }
+
   onSelectingArea = () => {
     const { collection, uiStore } = this.props
     let {
@@ -353,6 +375,8 @@ class FoamcoreGrid extends React.Component {
     } = this.props
 
     if (!this.selectedAreaLargeEnough) return
+
+    console.log([minX, minY], [maxX, maxY])
 
     const gridBounds = this.gridRef.getBoundingClientRect()
 
@@ -362,9 +386,18 @@ class FoamcoreGrid extends React.Component {
     if (maxX > gridBounds.right) maxX = gridBounds.right
     if (maxY > gridBounds.bottom) maxY = gridBounds.bottom
 
+    // console.log([minX, minY], [maxX, maxY])
+
     // Select all cards that this drag rectangle 'touches'
     const topLeftCoords = this.coordinatesForPosition({ x: minX, y: minY })
     const bottomRightCoords = this.coordinatesForPosition({ x: maxX, y: maxY })
+
+    console.log(
+      'topLeftCoords',
+      topLeftCoords,
+      'bottomRightCoords',
+      bottomRightCoords
+    )
 
     // Return if it couldn't find cards in both positions
     if (!topLeftCoords || !bottomRightCoords) return
@@ -966,17 +999,19 @@ class FoamcoreGrid extends React.Component {
   }
 
   render() {
-    const { gridW, selectedArea } = this.props
+    const { gridW } = this.props
     return (
       <Grid
-        data-deselect-on-click
+        data-empty-space-click
         onMouseMove={this.handleMouseMove}
         onScroll={this.handleScroll}
         innerRef={ref => {
           this.gridRef = ref
         }}
       >
-        {this.selectedAreaLargeEnough && <SelectedArea coords={selectedArea} />}
+        {this.selectedAreaLargeEnough && (
+          <SelectedArea coords={this.selectedAreaCoords} />
+        )}
         <div
           style={{
             position: 'absolute',

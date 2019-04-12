@@ -4,7 +4,6 @@ import pluralize from 'pluralize'
 import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { animateScroll as scroll } from 'react-scroll'
-import styled from 'styled-components'
 
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 import ChannelManager from '~/utils/ChannelManager'
@@ -26,11 +25,6 @@ import OverdueBanner from '~/ui/layout/OverdueBanner'
 
 // more global way to do this?
 pluralize.addPluralRule(/canvas$/i, 'canvases')
-
-const SelectionHandler = styled.div`
-  width: 1000vw;
-  height: 1000vh;
-`
 
 @inject('apiStore', 'uiStore', 'routingStore', 'undoStore')
 @observer
@@ -376,21 +370,6 @@ class CollectionPage extends React.Component {
     </div>
   )
 
-  handleMouseDownSelection = e => {
-    const { uiStore } = this.props
-    uiStore.handleMouseDownSelection(e)
-  }
-
-  handleMouseMoveSelection = e => {
-    const { uiStore } = this.props
-    uiStore.handleMouseMoveSelection(e)
-  }
-
-  handleMouseUpSelection = e => {
-    const { uiStore } = this.props
-    uiStore.handleMouseUpSelection(e)
-  }
-
   render() {
     const { collection, uiStore } = this.props
     if (!collection) {
@@ -419,11 +398,7 @@ class CollectionPage extends React.Component {
     const { isSubmissionBox, requiresTestDesigner } = collection
     if (collection.isBoard) {
       return (
-        <SelectionHandler
-          onMouseDown={this.handleMouseDownSelection}
-          onMouseUp={this.handleMouseUpSelection}
-          onMouseMove={this.handleMouseMoveSelection}
-        >
+        <Fragment>
           <PageHeader record={collection} />
           <PageContainer fullWidth={collection.isBoard}>
             <FoamcoreGrid
@@ -449,7 +424,7 @@ class CollectionPage extends React.Component {
           </PageContainer>
           {isLoading && this.loader()}
           {!isLoading && isTransparentLoading && this.transparentLoader()}
-        </SelectionHandler>
+        </Fragment>
       )
     }
     return (
