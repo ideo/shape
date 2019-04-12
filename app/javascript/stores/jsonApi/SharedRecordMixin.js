@@ -39,7 +39,10 @@ const SharedRecordMixin = superclass =>
         snapshot.collection_cards_attributes.forEach(cardData => {
           const card = this.collection_cards.find(cc => cc.id === cardData.id)
           if (card) {
-            _.assign(card, _.pick(cardData, ['order', 'width', 'height']))
+            _.assign(
+              card,
+              _.pick(cardData, ['order', 'width', 'height', 'row', 'col'])
+            )
           }
         })
         this._reorderCards()

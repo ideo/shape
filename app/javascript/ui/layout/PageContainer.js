@@ -16,7 +16,9 @@ const StyledContainer = styled.main`
 `
 
 const PageContainer = ({ children, fullWidth }) => (
-  <StyledContainer fullWidth={fullWidth}>{children}</StyledContainer>
+  <StyledContainer data-deselect-on-click fullWidth={fullWidth}>
+    {children}
+  </StyledContainer>
 )
 
 PageContainer.propTypes = {

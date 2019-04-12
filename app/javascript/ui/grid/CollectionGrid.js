@@ -9,11 +9,12 @@ import CollectionSort from '~/ui/grid/CollectionSort'
 import Loader from '~/ui/layout/Loader'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
+import v from '~/utils/variables'
 
 const CARD_HOLD_TIME = 0.4 * 1000
 
 const StyledGrid = styled.div`
-  margin-top: 50px;
+  margin-top: ${v.pageContentMarginTop}px;
   min-height: ${props => props.minHeight}px;
   position: relative;
   width: 100%;
@@ -864,7 +865,7 @@ class CollectionGrid extends React.Component {
     const minHeight = rows * (gridSettings.gridH + gridSettings.gutter)
 
     return (
-      <StyledGrid minHeight={minHeight}>
+      <StyledGrid data-deselect-on-click minHeight={minHeight}>
         {sorting && (
           <SortContainer>
             <CollectionSort collection={collection} />

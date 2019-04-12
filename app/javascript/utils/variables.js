@@ -37,6 +37,8 @@ export const KEYS = {
 
 export default {
   headerHeight: 60,
+  // this is the margin to separate the page title from its content
+  pageContentMarginTop: 50,
   maxWidth: 1320,
   containerPadding: {
     horizontal: 2,
