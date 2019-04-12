@@ -670,24 +670,41 @@ class FoamcoreGrid extends React.Component {
     return false
   }
 
-  calcEdgeCol({ col, row, width }, cardId) {
-    let tempCol = col + width - 1
-    while (tempCol <= col + MAX_CARD_W) {
-      const filled = this.findFilledSpot({ col: tempCol, row }, cardId)
-      if (filled) {
-        return tempCol - col
+  calcEdgeCol({ col, row, width, height }, cardId) {
+    // start from outer column (e.g. width=1, col=0: start at col 1)
+    let tempCol = col + width
+    let tempRow = row
+    while (tempCol < col + MAX_CARD_W) {
+      tempRow = row
+      while (tempRow < row + height) {
+        const filled = this.findFilledSpot(
+          { col: tempCol, row: tempRow },
+          cardId
+        )
+        if (filled) {
+          return tempCol - col
+        }
+        tempRow += 1
       }
       tempCol += 1
     }
     return MAX_CARD_W
   }
 
-  calcEdgeRow({ col, row, height }, cardId) {
-    let tempRow = row + height - 1
-    while (tempRow <= row + MAX_CARD_H) {
-      const filled = this.findFilledSpot({ row: tempRow, col }, cardId)
-      if (filled) {
-        return tempRow - row
+  calcEdgeRow({ col, row, width, height }, cardId) {
+    let tempRow = row + height
+    let tempCol = col
+    while (tempRow < row + MAX_CARD_H) {
+      tempCol = col
+      while (tempCol < col + width) {
+        const filled = this.findFilledSpot(
+          { col: tempCol, row: tempRow },
+          cardId
+        )
+        if (filled) {
+          return tempRow - row
+        }
+        tempCol += 1
       }
       tempRow += 1
     }
