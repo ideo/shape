@@ -112,12 +112,11 @@ class FoamcoreGrid extends React.Component {
 
   componentDidMount() {
     this.filledSpots = this.calculateFilledSpots()
-    this.updateSelectedArea()
     this.throttledCalculateCardsToRender()
     window.addEventListener('scroll', this.handleScroll)
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate() {
     this.filledSpots = this.calculateFilledSpots()
     this.updateSelectedArea()
   }
@@ -336,18 +335,11 @@ class FoamcoreGrid extends React.Component {
 
   // Adjusts global x,y coords to foamcore grid coords
   get selectedAreaAdjustedForGrid() {
-    const {
-      selectedArea: { minX, maxX, minY, maxY },
-    } = this.props
+    const selectedArea = this.props
+    const { minX, maxX, minY, maxY } = selectedArea
 
     // If no area is selected, return null values
-    if (!minX)
-      return {
-        minX,
-        maxX,
-        minY,
-        maxY,
-      }
+    if (!minX) return selectedArea
 
     // Adjust coordinates by page margins
     return {
@@ -358,6 +350,7 @@ class FoamcoreGrid extends React.Component {
     }
   }
 
+  // Props for the div that shows area selected
   get selectedAreaStyleProps() {
     const { minX, maxX, minY, maxY } = this.selectedAreaAdjustedForGrid
     return {
