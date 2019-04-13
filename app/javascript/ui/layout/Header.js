@@ -309,12 +309,12 @@ class Header extends React.Component {
     return (
       <Fragment>
         <StyledFixedHeader
-          data-deselect-on-click
+          data-empty-space-click
           zIndex={v.zIndex.globalHeader}
         >
           <MaxWidthContainer>
             <Flex
-              data-deselect-on-click
+              data-empty-space-click
               align="center"
               style={{ minHeight: v.headerHeight }}
             >
@@ -327,7 +327,7 @@ class Header extends React.Component {
               <Box auto>
                 <div ref={ref => this.updateBreadcrumbsWidth(ref)}>
                   {record && (
-                    <Flex data-deselect-on-click align="center">
+                    <Flex data-empty-space-click align="center">
                       {/* TODO: why doesnt <Box auto={isMobile}> work like this? */}
                       <div style={{ flex: isMobile ? '1 1 auto' : '0 1 auto' }}>
                         <Breadcrumb

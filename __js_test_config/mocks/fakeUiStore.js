@@ -46,6 +46,8 @@ const fakeUiStore = {
   rolesMenuOpen: false,
   isLoading: false,
   dismissedMoveHelper: false,
+  selectedAreaEnabled: false,
+  setSelectedArea: jest.fn(),
   selectedCardIds: [],
   selectCardId: jest.fn(),
   setViewingCollection: jest.fn(),

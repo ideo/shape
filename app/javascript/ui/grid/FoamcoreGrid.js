@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { action, observable, runInAction } from 'mobx'
+import { action, observable, observe, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
@@ -55,6 +55,7 @@ function getMapKey({ col, row }) {
 const pageMargins = {
   // v.containerPadding is in `em` units, so we multiply by 16
   left: v.containerPadding.horizontal * 16,
+  // TODO: is this right? This is 60px but we also have collection title up top
   top: v.headerHeight + 90,
 }
 
@@ -75,15 +76,16 @@ class FoamcoreGrid extends React.Component {
   dragging = false
   @observable
   resizing = false
-  // TODO rename this now that it's also used for resize placeholder
-  @observable
-  placeholderSpot = {
+  placeholderDefaults = {
     row: null,
     col: null,
     width: null,
     height: null,
     type: null,
   }
+  // TODO rename this now that it's also used for resize placeholder
+  @observable
+  placeholderSpot = { ...this.placeholderDefaults }
   loadedRows = { loading: false, max: 0 }
   loadedCols = { loading: false, max: 0 }
   draggingMap = []
@@ -100,15 +102,41 @@ class FoamcoreGrid extends React.Component {
       this.calculateCardsToRender,
       25
     )
+    // NOTE: Not a fan of doing this, but this is a performance fix for now.
+    // could be nicer if it was a prop that we listened for in componentDidUpdate
+    this.disposer = observe(this.placeholderSpot, change => {
+      this.throttledCalculateCardsToRender()
+    })
   }
 
   componentDidMount() {
+    const { uiStore } = this.props
+    runInAction(() => {
+      uiStore.selectedAreaEnabled = true
+    })
+    // NOTE: yet another hack -- get the page to render on initial load
     this.throttledCalculateCardsToRender()
     window.addEventListener('scroll', this.handleScroll)
   }
 
+  componentDidUpdate(prevProps) {
+    this.updateSelectedArea()
+    if (
+      prevProps.cardProperties.length !== this.props.cardProperties.length ||
+      prevProps.blankContentToolState.order !==
+        this.props.blankContentToolState.order
+    ) {
+      this.throttledCalculateCardsToRender()
+    }
+  }
+
   componentWillUnmount() {
+    const { uiStore } = this.props
+    runInAction(() => {
+      uiStore.selectedAreaEnabled = false
+    })
     window.removeEventListener('scroll', this.handleScroll)
+    if (this.disposer) this.disposer()
   }
 
   loadCards({ rows, cols }) {
@@ -251,12 +279,6 @@ class FoamcoreGrid extends React.Component {
     const { gridW, gridH, gutter } = this.props
     const { zoomLevel } = this
 
-    const colAmountLeft = x % (gridW + gutter)
-    const rowAmountLeft = y % (gridH + gutter)
-
-    // If in the gutter, return null
-    if (colAmountLeft > gridW || rowAmountLeft > gridH) return null
-
     const col = Math.floor((x / (gridW + gutter)) * zoomLevel)
     const row = Math.floor((y / (gridH + gutter)) * zoomLevel)
 
@@ -320,12 +342,83 @@ class FoamcoreGrid extends React.Component {
     return !!this.getDraggedOnSpot(coords)
   }
 
+  get isSelectingArea() {
+    // Check if there is a selected area
+    return !!this.selectedAreaAdjustedForGrid.minX
+  }
+
+  // Adjusts global x,y coords to foamcore grid coords
+  get selectedAreaAdjustedForGrid() {
+    const { selectedArea } = this.props
+    let { minX, minY, maxX, maxY } = selectedArea
+
+    // If no area is selected, return null values
+    if (!minX) return selectedArea
+
+    // Adjust coordinates by page margins
+    // Make sure all values start at 0
+    minX -= pageMargins.left
+    if (minX < 0) minX = 0
+    minY -= pageMargins.top
+    if (minY < 0) minY = 0
+    maxX -= pageMargins.left
+    if (maxX < 0) maxX = 0
+    maxY -= pageMargins.top
+    if (maxY < 0) maxY = 0
+
+    return {
+      minX,
+      minY,
+      maxX,
+      maxY,
+    }
+  }
+
+  updateSelectedArea = () => {
+    const { collection, uiStore } = this.props
+    const { minX, minY, maxX, maxY } = this.selectedAreaAdjustedForGrid
+
+    // Check if there is a selected area
+    if (!minX) return
+
+    // Select all cards that this drag rectangle 'touches'
+    const topLeftCoords = this.coordinatesForPosition({
+      x: minX,
+      y: minY,
+    })
+    const bottomRightCoords = this.coordinatesForPosition({
+      x: maxX,
+      y: maxY,
+    })
+
+    // Return if it couldn't find cards in both positions
+    if (!topLeftCoords || !bottomRightCoords) return
+
+    const selectedCardIds = collection.cardIdsWithinRectangle(
+      topLeftCoords,
+      bottomRightCoords
+    )
+
+    // TODO: if shift is also selected, add to any existing selection
+    runInAction(() => {
+      uiStore.selectedCardIds = selectedCardIds
+    })
+  }
+
   handleBlankCardClick = ({ row, col }) => e => {
+    const {
+      selectedArea: { minX },
+    } = this.props
+
+    // If user is selecting an area, don't trigger blank card click
+    if (minX) return
+
     const { uiStore } = this.props
     uiStore.openBlankContentTool({
       row,
       col,
     })
+
     this.throttledCalculateCardsToRender()
   }
 
@@ -617,20 +710,25 @@ class FoamcoreGrid extends React.Component {
   }
 
   setHoverSpot(hoverPos) {
-    if (this.resizing) return
+    if (this.dragging || this.isSelectingArea) return
+    if (this.resizing) {
+      // TODO: again, this is just to get this to work for now...
+      // this is for calculating the correct resizing edge boundaries
+      this.throttledCalculateCardsToRender()
+      return
+    }
     const coordinates = this.coordinatesForPosition(hoverPos)
     if (coordinates) {
       // Don't place a hover card when there's already a card there.
       const found = this.findFilledSpot(coordinates)
       if (found && this.placeholderSpot) {
-        this.setPlaceholderSpot({})
+        this.setPlaceholderSpot(false)
       } else {
         this.setPlaceholderSpot({ ...coordinates, type: 'hover' })
       }
     } else {
-      this.setPlaceholderSpot({})
+      this.setPlaceholderSpot(false)
     }
-    this.throttledCalculateCardsToRender()
   }
 
   setResizeSpot({ row, col, width, height }) {
@@ -815,7 +913,16 @@ class FoamcoreGrid extends React.Component {
 
   @action
   setPlaceholderSpot = placeholderSpot => {
-    this.placeholderSpot = placeholderSpot
+    let vals = { ...this.placeholderDefaults }
+    if (placeholderSpot) {
+      vals = { ...placeholderSpot }
+    }
+    const { row, col, width, height, type } = vals
+    this.placeholderSpot.row = row
+    this.placeholderSpot.col = col
+    this.placeholderSpot.width = width
+    this.placeholderSpot.height = height
+    this.placeholderSpot.type = type
   }
 
   @action
@@ -887,7 +994,7 @@ class FoamcoreGrid extends React.Component {
 
     return (
       <Grid
-        data-deselect-on-click
+        data-empty-space-click
         onMouseMove={this.handleMouseMove}
         onScroll={this.handleScroll}
         innerRef={ref => {
@@ -932,7 +1039,10 @@ FoamcoreGrid.propTypes = {
   trackCollectionUpdated: PropTypes.func.isRequired,
   canEditCollection: PropTypes.bool.isRequired,
   movingCardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
+  blankContentToolState: MobxPropTypes.objectOrObservableObject,
   loadCollectionCards: PropTypes.func.isRequired,
+  selectedArea: MobxPropTypes.objectOrObservableObject.isRequired,
+  selectedAreaMinX: PropTypes.number,
   sorting: PropTypes.bool,
 }
 FoamcoreGrid.wrappedComponent.propTypes = {
@@ -941,7 +1051,9 @@ FoamcoreGrid.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 FoamcoreGrid.defaultProps = {
+  blankContentToolState: {},
   sorting: false,
+  selectedAreaMinX: null,
 }
 FoamcoreGrid.displayName = 'FoamcoreGrid'
 

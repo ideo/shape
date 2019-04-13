@@ -361,22 +361,15 @@ class GridCard extends React.Component {
         selected={this.isSelected || this.props.hoveringOver}
       >
         {canEditCollection &&
+          showHotEdge &&
           (!card.isPinnedAndLocked || lastPinnedCard) && (
-            <GridCardHotspot
-              card={card}
-              dragging={dragging}
-              showHotEdge={showHotEdge}
-            />
+            <GridCardHotspot card={card} dragging={dragging} />
           )}
         {canEditCollection &&
+          showHotEdge &&
           firstCardInRow &&
           !card.isPinnedAndLocked && (
-            <GridCardHotspot
-              card={card}
-              dragging={dragging}
-              position="left"
-              showHotEdge={showHotEdge}
-            />
+            <GridCardHotspot card={card} dragging={dragging} position="left" />
           )}
         {record.isMedia && this.renderReplaceControl()}
         {!record.menuDisabled &&
