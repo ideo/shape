@@ -415,6 +415,8 @@ class CollectionPage extends React.Component {
               cardProperties={collection.cardProperties}
               // to trigger a re-render
               movingCardIds={uiStore.movingCardIds}
+              // Pass in BCT state so grid will re-render when open/closed
+              blankContentToolState={blankContentToolState}
             />
             <MoveModal />
             {(uiStore.dragging || uiStore.cardMenuOpenAndPositioned) && (

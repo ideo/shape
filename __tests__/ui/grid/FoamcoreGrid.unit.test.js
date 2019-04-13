@@ -5,6 +5,7 @@ import fakeUiStore from '#/mocks/fakeUiStore'
 import { fakeCollectionCard, fakeCollection } from '#/mocks/data'
 
 let props, wrapper, instance, rerender, cards, cardA, cardB, cardC
+const fakeEv = { persist: jest.fn(), pageX: 120, pageY: 50 }
 let idCounter = 0
 
 function createCard(data) {
@@ -42,6 +43,7 @@ describe('FoamcoreGrid', () => {
       loadCollectionCards: jest.fn(() => Promise.resolve()),
       updateCollection: jest.fn(),
       cardProperties: [],
+      blankContentToolState: {},
       apiStore: fakeApiStore(),
       uiStore: fakeUiStore,
       routingStore: {
@@ -70,8 +72,6 @@ describe('FoamcoreGrid', () => {
   })
 
   describe('handleMouseMove', () => {
-    const fakeEv = { persist: jest.fn(), pageX: 120, pageY: 50 }
-
     beforeEach(() => {
       instance.throttledSetHoverSpot = jest.fn().mockReturnValue('')
       instance.handleMouseMove(fakeEv)
@@ -89,12 +89,12 @@ describe('FoamcoreGrid', () => {
   describe('handleMouseMove', () => {
     beforeEach(() => {
       instance.placeholderSpot = { row: 1, col: 1 }
-      instance.handleMouseOut()
+      instance.handleMouseMove(fakeEv)
     })
 
     it('should reset the placeholder spot', () => {
-      expect(instance.placeholderSpot.row).toBeUndefined()
-      expect(instance.placeholderSpot.col).toBeUndefined()
+      expect(instance.placeholderSpot.row).toBeNull()
+      expect(instance.placeholderSpot.col).toBeNull()
     })
   })
 
@@ -471,7 +471,7 @@ describe('FoamcoreGrid', () => {
         // instead of having to mock the return value:
         props.collection.cardIdsWithinRectangle = jest.fn().mockReturnValue([])
         rerender()
-        instance.componentDidUpdate()
+        instance.componentDidUpdate(props)
       })
 
       it('does not set uiStore.selectedCardIds', () => {
@@ -488,7 +488,7 @@ describe('FoamcoreGrid', () => {
           .fn()
           .mockReturnValue([cardA.id, cardB.id])
         rerender()
-        instance.componentDidUpdate()
+        instance.componentDidUpdate(props)
       })
 
       it('sets uiStore.selectedCardIds', () => {
