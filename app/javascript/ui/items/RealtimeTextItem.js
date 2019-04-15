@@ -101,6 +101,8 @@ class RealtimeTextItem extends React.Component {
     }, 1250)
 
     if (!this.reactQuillRef) return
+    const { editor } = this.reactQuillRef
+    this.overrideHeadersFromClipboard(editor)
     this.initQuillRefsAndData({ initSnapshot: true })
     setTimeout(() => {
       this.quillEditor.focus()
@@ -295,28 +297,60 @@ class RealtimeTextItem extends React.Component {
     return null
   }
 
-  adjustHeaderSizeIfNewline = delta => {
-    // Check if user added newline
-    // And if so, set their default text size if provided
+  newlineIndicesForDelta = delta => {
     const newlineOpIndices = []
     _.each(delta.ops, (op, index) => {
       if (op.insert && op.insert.includes('\n')) newlineOpIndices.push(index)
     })
-    if (newlineOpIndices.length === 0) return
+    return newlineOpIndices
+  }
+
+  headerFromLastNewline = delta => {
+    // Check if user added newline
+    // And if so, set their default text size if provided
+    const newlineOpIndices = this.newlineIndicesForDelta(delta)
 
     // Return if there wasn't a specified header size in previous newline operation
     const prevHeaderSizeOp = delta.ops[_.last(newlineOpIndices)]
-    if (!prevHeaderSizeOp.attributes || !prevHeaderSizeOp.attributes.header)
-      return
+    if (!prevHeaderSizeOp.attributes || !prevHeaderSizeOp.attributes.header) {
+      return null
+    }
+    return prevHeaderSizeOp.attributes.header
+  }
 
-    // Apply previosu line's header size to last operation
+  adjustHeaderSizeIfNewline = delta => {
+    // Check if user added newline
+    // And if so, set their default text size if provided
+    if (this.newlineIndicesForDelta(delta).length === 0) return
+
+    const prevHeader = this.headerFromLastNewline(delta)
+    if (!prevHeader) return
+
+    // Apply previous line's header size to last operation
     const lastOp = _.last(delta.ops)
     if (!lastOp.attributes) {
-      lastOp.attributes = { header: prevHeaderSizeOp.attributes.header }
+      lastOp.attributes = { header: prevHeader }
     } else {
-      lastOp.attributes.header = prevHeaderSizeOp.attributes.header
+      lastOp.attributes.header = prevHeader
     }
     this.quillEditor.updateContents(delta)
+  }
+
+  remapHeaderToH1 = (node, delta) => {
+    delta.map(op => {
+      if (!op.attributes) op.attributes = { header: 1 }
+      op.attributes.header = 1
+      return op
+    })
+    return delta
+  }
+
+  overrideHeadersFromClipboard = editor => {
+    // change all header attributes to H1, e.g. when copy/pasting
+    const headers = ['H1', 'H2', 'H3', 'H4', 'H5', 'H6']
+    headers.forEach(header => {
+      editor.clipboard.addMatcher(header, this.remapHeaderToH1)
+    })
   }
 
   handleTextChange = (content, delta, source, editor) => {
