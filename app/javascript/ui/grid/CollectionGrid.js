@@ -51,6 +51,9 @@ const groupByConsecutive = (array, value) => {
   return groups
 }
 
+// simple way to detect if prop changes warrant re-initializing
+const objectsEqual = (a, b) => JSON.stringify(a) === JSON.stringify(b)
+
 // needs to be an observer to observe changes to the collection + items
 @inject('apiStore', 'routingStore', 'uiStore')
 @observer
@@ -72,10 +75,20 @@ class CollectionGrid extends React.Component {
     loadCollectionCards({})
   }
 
-  componentWillReceiveProps(nextProps) {
-    // TODO: refactor this into componentDidUpdate
-    // and only re-initialize under the right conditions (of props changing)
-    this.initialize(nextProps)
+  componentDidUpdate(prevProps) {
+    const fields = [
+      'cols',
+      'gridH',
+      'gridW',
+      'blankContentToolState',
+      'cardProperties',
+      'movingCardIds',
+    ]
+    const prevPlucked = _.pick(prevProps, fields)
+    const plucked = _.pick(this.props, fields)
+    if (!objectsEqual(prevPlucked, plucked)) {
+      this.initialize(this.props)
+    }
   }
 
   componentWillUnmount() {
@@ -441,10 +454,6 @@ class CollectionGrid extends React.Component {
     return placeholder
   }
 
-  removePlaceholderCard = cards => {
-    _.reject(cards, { cardType: 'placeholder' })
-  }
-
   findOverlap = (cardId, dragPosition) => {
     const { dragX, dragY } = dragPosition
     const { gutter, gridW, gridH } = this.props
@@ -595,6 +604,7 @@ class CollectionGrid extends React.Component {
     // even though hidden cards are not loaded by default in the API, we still filter here because
     // it's possible that some hidden cards were loaded in memory via the CoverImageSelector
     const cards = [...collectionCards].filter(c => !c.hidden)
+
     // props might get passed in e.g. nextProps for componentWillReceiveProps
     if (!opts.props) opts.props = this.props
     const { collection, gridW, gridH, gutter, cols, addEmptyCard } = opts.props
