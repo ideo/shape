@@ -48,14 +48,14 @@ class CollectionCard extends BaseRecord {
   // For cards that are positioned using row/col,
   // this is the row that they extend to
   get maxRow() {
-    if (!this.row || !this.height) return 0
+    if (this.row === undefined || this.height === undefined) return 0
     return this.row + this.height - 1
   }
 
   // For cards that are positioned using row/col,
   // this is the col that they extend to
   get maxCol() {
-    if (!this.col || !this.width) return 0
+    if (this.col === undefined || this.width === undefined) return 0
     return this.col + this.width - 1
   }
 

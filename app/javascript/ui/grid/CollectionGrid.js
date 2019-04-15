@@ -9,6 +9,7 @@ import CollectionSort from '~/ui/grid/CollectionSort'
 import Loader from '~/ui/layout/Loader'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
+import { objectsEqual } from '~/utils/objectUtils'
 import v from '~/utils/variables'
 
 const CARD_HOLD_TIME = 0.4 * 1000
@@ -50,9 +51,6 @@ const groupByConsecutive = (array, value) => {
   if (buffer.length > 0) groups.push(buffer)
   return groups
 }
-
-// simple way to detect if prop changes warrant re-initializing
-const objectsEqual = (a, b) => JSON.stringify(a) === JSON.stringify(b)
 
 // needs to be an observer to observe changes to the collection + items
 @inject('apiStore', 'routingStore', 'uiStore')
