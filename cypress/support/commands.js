@@ -45,6 +45,9 @@ Cypress.Commands.add(
     let type = 'collection'
     // these types correspond to the BctButtonBox types in GridCardBlank
     switch (collectionType) {
+      case 'foamcoreBoard':
+        type = 'foamcoreBoard'
+        break
       case 'test':
         type = 'testCollection'
         break

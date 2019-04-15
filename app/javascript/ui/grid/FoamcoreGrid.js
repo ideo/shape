@@ -1025,6 +1025,7 @@ class FoamcoreGrid extends React.Component {
         }}
       >
         <div
+          data-cy="zoom-control"
           style={{
             position: 'absolute',
             top: 0,
