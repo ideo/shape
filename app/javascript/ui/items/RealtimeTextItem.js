@@ -296,24 +296,33 @@ class RealtimeTextItem extends React.Component {
   }
 
   adjustHeaderSizeIfNewline = delta => {
-    if (this.headerSize) {
-      // Check if user added newline
-      // And if so, set their default text size if provided
-      const hasNewline = _.some(delta.ops, op => op.insert === '\n')
-      const hasNullHeader = _.some(
-        delta.ops,
-        op => op.attributes && op.attributes.header === null
-      )
-      if (hasNewline && hasNullHeader) {
-        const lastOp = _.last(delta.ops)
-        lastOp.attributes.header = this.headerSize
-        this.quillEditor.updateContents(delta)
-      }
+    // Check if user added newline
+    // And if so, set their default text size if provided
+    const newlineOpIndices = []
+    _.each(delta.ops, (op, index) => {
+      if (op.insert && op.insert.includes('\n')) newlineOpIndices.push(index)
+    })
+    if (newlineOpIndices.length === 0) return
+
+    // Return if there wasn't a specified header size in previous newline operation
+    const prevHeaderSizeOp = delta.ops[_.last(newlineOpIndices)]
+    if (!prevHeaderSizeOp.attributes || !prevHeaderSizeOp.attributes.header)
+      return
+
+    // Apply previosu line's header size to last operation
+    const lastOp = _.last(delta.ops)
+    if (!lastOp.attributes) {
+      lastOp.attributes = { header: prevHeaderSizeOp.attributes.header }
+    } else {
+      lastOp.attributes.header = prevHeaderSizeOp.attributes.header
     }
+    this.quillEditor.updateContents(delta)
   }
 
   handleTextChange = (content, delta, source, editor) => {
     if (source === 'user') {
+      // This adjustment is made so that the currently-selected
+      // header size is preserved on new lines
       this.adjustHeaderSizeIfNewline(delta)
       const cursors = this.quillEditor.getModule('cursors')
       cursors.clearCursors()
