@@ -4,6 +4,7 @@ import { action, observable, observe, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import PlusIcon from '~/ui/icons/PlusIcon'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import v from '~/utils/variables'
 
@@ -16,6 +17,7 @@ const BlankCard = styled.div.attrs({
     top: `${y}px`,
     transform: `scale(${1 / zoomLevel})`,
     width: `${w}px`,
+    cursor: 'pointer',
   }),
 })`
   border: ${props =>
@@ -46,6 +48,16 @@ const Grid = styled.div`
   min-height: 1300px;
   margin-top: ${v.pageContentMarginTop}px;
   position: relative;
+`
+
+const StyledPlusIcon = styled.div`
+  position: relative;
+  /* TODO: better styling than this? */
+  width: 20%;
+  height: 20%;
+  top: 38%;
+  left: 38%;
+  color: ${v.colors.secondaryMedium};
 `
 
 function getMapKey({ col, row }) {
@@ -864,6 +876,15 @@ class FoamcoreGrid extends React.Component {
     const position = this.positionForCoordinates({ col, row, width, height })
 
     const { zoomLevel } = this
+    let inner = ''
+    if (type === 'hover') {
+      inner = (
+        // TODO: better styling than this for centering PlusIcon
+        <StyledPlusIcon>
+          <PlusIcon />
+        </StyledPlusIcon>
+      )
+    }
 
     return (
       <BlankCard
@@ -875,7 +896,9 @@ class FoamcoreGrid extends React.Component {
         blocked={this.hasDragCollision && type === 'drag'}
         data-blank-type={type}
         draggedOn
-      />
+      >
+        {inner}
+      </BlankCard>
     )
   }
 
