@@ -254,16 +254,15 @@ class RealtimeTextItem extends React.Component {
   }
 
   get dataContent() {
-    const { item, initialFontTag } = this.props
+    const { item } = this.props
     const dataContent = toJS(item.data_content)
     // Set initial font size - if text item is blank,
     // and user has chosen a h* tag (e.g. h1)
     // (p tag does not require any ops changes)
-    if (dataContent.ops.length === 0 && initialFontTag.includes('h')) {
-      const size = _.replace(initialFontTag, 'h', '')
+    if (dataContent.ops.length === 0 && this.headerSize) {
       dataContent.ops.push({
         insert: '\n',
-        attributes: { header: size },
+        attributes: { header: this.headerSize },
       })
     }
     return dataContent
@@ -288,8 +287,34 @@ class RealtimeTextItem extends React.Component {
     return item
   }
 
+  get headerSize() {
+    const { initialFontTag } = this.props
+    if (initialFontTag.includes('h')) {
+      return _.replace(initialFontTag, 'h', '')
+    }
+    return null
+  }
+
+  adjustHeaderSizeIfNewline = delta => {
+    if (this.headerSize) {
+      // Check if user added newline
+      // And if so, set their default text size if provided
+      const hasNewline = _.some(delta.ops, op => op.insert === '\n')
+      const hasNullHeader = _.some(
+        delta.ops,
+        op => op.attributes && op.attributes.header === null
+      )
+      if (hasNewline && hasNullHeader) {
+        const lastOp = _.last(delta.ops)
+        lastOp.attributes.header = this.headerSize
+        this.quillEditor.updateContents(delta)
+      }
+    }
+  }
+
   handleTextChange = (content, delta, source, editor) => {
     if (source === 'user') {
+      this.adjustHeaderSizeIfNewline(delta)
       const cursors = this.quillEditor.getModule('cursors')
       cursors.clearCursors()
 
