@@ -254,8 +254,19 @@ class RealtimeTextItem extends React.Component {
   }
 
   get dataContent() {
-    const { item } = this.props
-    return toJS(item.data_content)
+    const { item, initialFontTag } = this.props
+    const dataContent = toJS(item.data_content)
+    // Set initial font size - if text item is blank,
+    // and user has chosen a h* tag (e.g. h1)
+    // (p tag does not require any ops changes)
+    if (dataContent.ops.length === 0 && initialFontTag.includes('h')) {
+      const size = _.replace(initialFontTag, 'h', '')
+      dataContent.ops.push({
+        insert: '\n',
+        attributes: { header: size },
+      })
+    }
+    return dataContent
   }
 
   cancel = ev => {
@@ -417,10 +428,12 @@ RealtimeTextItem.propTypes = {
   fullyLoaded: PropTypes.bool.isRequired,
   onExpand: PropTypes.func,
   fullPageView: PropTypes.bool,
+  initialFontTag: PropTypes.oneOf(['h1', 'h3', 'p']),
 }
 RealtimeTextItem.defaultProps = {
   onExpand: null,
   fullPageView: false,
+  initialFontTag: 'p',
 }
 
 export default RealtimeTextItem

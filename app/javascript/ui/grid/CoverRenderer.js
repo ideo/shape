@@ -32,6 +32,7 @@ class CoverRenderer extends React.Component {
       height,
       handleClick,
       searchResult,
+      isBoardCollection,
     } = this.props
     if (this.isItem) {
       switch (record.type) {
@@ -44,6 +45,7 @@ class CoverRenderer extends React.Component {
               cardId={card.id}
               handleClick={handleClick}
               searchResult={searchResult}
+              initialFontTag={isBoardCollection ? 'h1' : 'p'}
             />
           )
         case ITEM_TYPES.EXTERNAL_IMAGE:
@@ -135,6 +137,7 @@ CoverRenderer.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   cardType: PropTypes.string.isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
+  isBoardCollection: PropTypes.bool,
   coverItem: PropTypes.bool,
   height: PropTypes.number,
   dragging: PropTypes.bool,
@@ -147,6 +150,7 @@ CoverRenderer.defaultProps = {
   dragging: false,
   searchResult: false,
   coverItem: false,
+  isBoardCollection: false,
   handleClick: () => null,
 }
 
