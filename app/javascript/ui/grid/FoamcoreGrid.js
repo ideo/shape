@@ -95,7 +95,6 @@ class FoamcoreGrid extends React.Component {
   constructor(props) {
     super(props)
     this.debouncedSetDraggedOnSpots = _.debounce(this.setDraggedOnSpots, 15)
-    this.throttledSetHoverSpot = _.throttle(this.setHoverSpot, 50)
     this.throttledSetResizeSpot = _.throttle(this.setResizeSpot, 25)
     this.throttledLoadAfterScroll = _.debounce(this.loadAfterScroll, 250)
     this.throttledCalculateCardsToRender = _.throttle(
@@ -154,7 +153,6 @@ class FoamcoreGrid extends React.Component {
 
   loadAfterScroll = ev => {
     // Run position cards to re-render cards that were previously out of view
-
     this.throttledCalculateCardsToRender()
 
     const visRows = this.visibleRows
@@ -438,17 +436,6 @@ class FoamcoreGrid extends React.Component {
     this.throttledCalculateCardsToRender()
   }
 
-  handleMouseMove = ev => {
-    // Something about react synthetic events and throttling
-    ev.persist()
-    if (this.resizing) return
-    const hoverPos = {
-      x: ev.pageX - pageMargins.left,
-      y: ev.pageY - pageMargins.top,
-    }
-    this.throttledSetHoverSpot(hoverPos)
-  }
-
   handleScroll = ev => {
     this.throttledLoadAfterScroll(ev)
   }
@@ -709,28 +696,6 @@ class FoamcoreGrid extends React.Component {
     })
   }
 
-  setHoverSpot(hoverPos) {
-    if (this.dragging || this.isSelectingArea) return
-    if (this.resizing) {
-      // TODO: again, this is just to get this to work for now...
-      // this is for calculating the correct resizing edge boundaries
-      this.throttledCalculateCardsToRender()
-      return
-    }
-    const coordinates = this.coordinatesForPosition(hoverPos)
-    if (coordinates) {
-      // Don't place a hover card when there's already a card there.
-      const found = this.findFilledSpot(coordinates)
-      if (found && this.placeholderSpot) {
-        this.setPlaceholderSpot(false)
-      } else {
-        this.setPlaceholderSpot({ ...coordinates, type: 'hover' })
-      }
-    } else {
-      this.setPlaceholderSpot(false)
-    }
-  }
-
   setResizeSpot({ row, col, width, height }) {
     this.setPlaceholderSpot({
       row,
@@ -925,6 +890,27 @@ class FoamcoreGrid extends React.Component {
     this.placeholderSpot.type = type
   }
 
+  get blankCardsForEmptySpacesWithinVisibleArea() {
+    const { collection } = this.props
+    const matrix = collection.cardMatrix
+    const blankCards = []
+    // Add blank cards to all empty spaces,
+    // and 2x screen heights at the bottom
+    _.each(
+      _.range(0, collection.max_row_index + this.visibleRows.num * 2),
+      row => {
+        _.each(_.range(0, 15), col => {
+          // If there's no row, or nothing in this column, add a blank card for this spot
+          if (!matrix[row] || !matrix[row][col])
+            blankCards.push(
+              this.positionBlank({ row, col, width: 1, height: 1 })
+            )
+        })
+      }
+    )
+    return blankCards
+  }
+
   @action
   calculateCardsToRender = () => {
     const { collection, uiStore } = this.props
@@ -981,9 +967,9 @@ class FoamcoreGrid extends React.Component {
         this.hasDragCollision || this.findCardOverlap(cardOrBlank)
       return this.positionBlank(cardOrBlank, 'drag')
     })
-    cards.push(
-      this.positionBlank(this.placeholderSpot, this.placeholderSpot.type)
-    )
+
+    // Add blank cards for all empty spaces - for hover and click -> BCT actions
+    cards = _.concat(cards, this.blankCardsForEmptySpacesWithinVisibleArea)
 
     this.cardsToRender = cards
     return this.cardsToRender
@@ -995,7 +981,6 @@ class FoamcoreGrid extends React.Component {
     return (
       <Grid
         data-empty-space-click
-        onMouseMove={this.handleMouseMove}
         onScroll={this.handleScroll}
         innerRef={ref => {
           this.gridRef = ref
