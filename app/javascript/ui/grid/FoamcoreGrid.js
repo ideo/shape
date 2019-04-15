@@ -26,22 +26,24 @@ const BlankCard = styled.div.attrs({
     if (props.blocked) {
       return v.colors.alert
     }
-    if (
-      props.type === 'blank' ||
-      props.type === 'drag' ||
-      props.type === 'hover'
-    ) {
+    if (props.type === 'blank' || props.type === 'drag') {
       return v.colors.primaryLight
     }
     return 'none'
   }};
   position: absolute;
   transform-origin: left top;
-  &:hover {
-    background-color: ${v.colors.primaryLight} !important;
-  }
   opacity: ${props => (props.type === 'drag' ? 0.5 : 1)};
   z-index: ${props => (props.type === 'drag' ? v.zIndex.cardHovering : 0)};
+  &:hover {
+    background-color: ${v.colors.primaryLight} !important;
+    .plus-icon {
+      display: block;
+    }
+  }
+  .plus-icon {
+    display: none;
+  }
 `
 
 const Grid = styled.div`
@@ -845,7 +847,7 @@ class FoamcoreGrid extends React.Component {
     if (type === 'hover') {
       inner = (
         // TODO: better styling than this for centering PlusIcon
-        <StyledPlusIcon>
+        <StyledPlusIcon className="plus-icon">
           <PlusIcon />
         </StyledPlusIcon>
       )
@@ -926,7 +928,7 @@ class FoamcoreGrid extends React.Component {
           // If there's no row, or nothing in this column, add a blank card for this spot
           if (!matrix[row] || !matrix[row][col])
             blankCards.push(
-              this.positionBlank({ row, col, width: 1, height: 1 })
+              this.positionBlank({ row, col, width: 1, height: 1 }, 'hover')
             )
         })
       }
