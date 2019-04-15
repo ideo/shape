@@ -12,7 +12,7 @@ const fakeEv = { preventDefault: jest.fn() }
 let wrapper, component
 describe('ContainImage', () => {
   beforeEach(() => {
-    props.card.image_contain = false
+    props.image_contain = false
     wrapper = shallow(<ContainImage {...props} />)
     component = wrapper.instance()
   })
@@ -20,7 +20,7 @@ describe('ContainImage', () => {
   describe('render()', () => {
     describe('when image is already contained', () => {
       beforeEach(() => {
-        props.card.image_contain = true
+        props.image_contain = true
         wrapper.setProps(props)
       })
 
