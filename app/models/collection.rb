@@ -704,6 +704,17 @@ class Collection < ApplicationRecord
     result
   end
 
+  # TODO: Replace ad hoc implementation of this method in rest of code
+  def last_non_blank_row
+    collection_cards.map(&:row).compact.max.to_i
+  end
+
+  # TODO: Do we want to keep this?
+  # It does give single source of for where we want move/linked/duplicated cards to appear
+  def empty_row_for_moving_cards
+    last_non_blank_row + 2
+  end
+
   # =================================
   # Various boolean queries/checks
   # - many are related to test collections and submission_boxes

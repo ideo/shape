@@ -156,6 +156,7 @@ export default class UiStore {
   actionAfterRoute = null
   @observable
   movingIntoCollection = null
+  // this isn't set on clicking into collection while snackbar is open
   @observable
   dragTargets = []
   @observable
@@ -335,6 +336,7 @@ export default class UiStore {
   openMoveMenu({ from: fromCollectionId, cardAction }) {
     this.dismissedMoveHelper = false
     this.pageMenuOpen = false
+
     this.closeCardMenu()
     // On move, copy over selected cards to moving cards
     this.movingFromCollectionId = fromCollectionId

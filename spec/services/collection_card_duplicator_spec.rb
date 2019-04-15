@@ -34,6 +34,20 @@ RSpec.describe CollectionCardDuplicator, type: :service do
       expect(to_collection.collection_cards.count).to eq 5
     end
 
+    context 'when to_collection is a foamcore board' do
+      let!(:to_collection) { create(:board_collection, num_cards: 3, add_editors: [user]) }
+      let(:new_cards) { service.call }
+      let(:target_empty_row) { to_collection_cards.map(&:row).max + 2 }
+
+      it 'sets row of duplicated cards 2 rows after the last non-blank row' do
+        new_cards.each_with_index do |card, index|
+          expect(card.parent_id).to eq to_collection.id
+          expect(card.row).to eq target_empty_row
+          expect(card.col).to eq index
+        end
+      end
+    end
+
     context 'with data items that have legends' do
       let!(:data_item) do
         create(

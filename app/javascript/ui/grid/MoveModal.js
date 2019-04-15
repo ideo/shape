@@ -67,6 +67,7 @@ class MoveModal extends React.Component {
       uiStore.alert("You can't move an item here")
       return
     }
+
     const collectionId = viewingCollection.id
     const movingFromCollection = apiStore.find(
       'collections',
@@ -77,6 +78,7 @@ class MoveModal extends React.Component {
       movingFromCollection,
       cardAction,
     })
+
     if (error) {
       if (!viewingCollection.can_edit_content) {
         uiStore.confirm({
@@ -94,12 +96,14 @@ class MoveModal extends React.Component {
       }
       return
     }
+
     let data = {
       to_id: collectionId,
       from_id: uiStore.movingFromCollectionId,
       collection_card_ids: uiStore.movingCardIds,
       placement,
     }
+
     try {
       runInAction(() => {
         this.isLoading = true
@@ -229,6 +233,67 @@ class MoveModal extends React.Component {
     )
   }
 
+  get upArrowIconHolder() {
+    const { uiStore } = this.props
+    const { viewingCollection } = uiStore
+
+    if (viewingCollection && viewingCollection.isBoard) return null
+
+    return (
+      <IconHolder key="moveup">
+        <Tooltip
+          classes={{ tooltip: 'Tooltip' }}
+          title="Place at top"
+          placement="top"
+        >
+          <button onClick={this.handleMoveToBeginning}>
+            <MoveArrowIcon direction="up" />
+          </button>
+        </Tooltip>
+      </IconHolder>
+    )
+  }
+
+  get downArrowIconHolder() {
+    return (
+      <IconHolder key="movedown">
+        <Tooltip
+          classes={{ tooltip: 'Tooltip' }}
+          title="Place at bottom"
+          placement="top"
+        >
+          <button onClick={this.handleMoveToEnd}>
+            <MoveArrowIcon direction="down" />
+          </button>
+        </Tooltip>
+      </IconHolder>
+    )
+  }
+
+  get closeIconHolder() {
+    return (
+      <CloseIconHolder key="close">
+        <Tooltip
+          classes={{ tooltip: 'Tooltip' }}
+          title="Cancel"
+          placement="top"
+        >
+          <button onClick={this.handleClose}>
+            <CloseIcon />
+          </button>
+        </Tooltip>
+      </CloseIconHolder>
+    )
+  }
+
+  get snackbarActions() {
+    return [
+      this.upArrowIconHolder,
+      this.downArrowIconHolder,
+      this.closeIconHolder,
+    ].filter(el => !null)
+  }
+
   render() {
     const { uiStore } = this.props
 
@@ -249,41 +314,7 @@ class MoveModal extends React.Component {
                       {this.moveMessage}
                     </StyledSnackbarText>
                   }
-                  action={[
-                    <IconHolder key="moveup">
-                      <Tooltip
-                        classes={{ tooltip: 'Tooltip' }}
-                        title="Place at top"
-                        placement="top"
-                      >
-                        <button onClick={this.handleMoveToBeginning}>
-                          <MoveArrowIcon direction="up" />
-                        </button>
-                      </Tooltip>
-                    </IconHolder>,
-                    <IconHolder key="movedown">
-                      <Tooltip
-                        classes={{ tooltip: 'Tooltip' }}
-                        title="Place at bottom"
-                        placement="top"
-                      >
-                        <button onClick={this.handleMoveToEnd}>
-                          <MoveArrowIcon direction="down" />
-                        </button>
-                      </Tooltip>
-                    </IconHolder>,
-                    <CloseIconHolder key="close">
-                      <Tooltip
-                        classes={{ tooltip: 'Tooltip' }}
-                        title="Cancel"
-                        placement="top"
-                      >
-                        <button onClick={this.handleClose}>
-                          <CloseIcon />
-                        </button>
-                      </Tooltip>
-                    </CloseIconHolder>,
-                  ]}
+                  action={this.snackbarActions}
                 />
               )}
             </StyledSnackbar>

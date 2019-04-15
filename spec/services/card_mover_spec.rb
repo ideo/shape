@@ -71,6 +71,25 @@ RSpec.describe CardMover, type: :service do
         expect(from_collection.reload.collection_cards).to match_array []
         expect(to_collection.reload.collection_cards.last(3)).to match_array moving_cards
       end
+
+      context 'when to_collection is a foamcore board' do
+        let!(:to_collection) do
+          create(:board_collection,
+            num_cards: 3,
+            add_editors: [user],
+            organization: organization
+          )
+        end
+
+        it 'sets row of moved cards 2 rows after the last non-blank row' do
+          card_mover.call
+
+          cards_.reload.each_with_index do |card, index|
+            expect(card.parent_id).to eq to_collection.id
+            expect(card.row).to eq target_empty_row
+            expect(card.col).to eq index
+          end
+      end
     end
 
     context 'with card_action "link"' do
@@ -90,6 +109,25 @@ RSpec.describe CardMover, type: :service do
       it 'should not assign any permissions' do
         expect(Roles::MergeToChild).not_to receive(:new)
         card_mover.call
+      end
+
+
+      context 'when to_collection is a foamcore board' do
+        let!(:to_collection) do
+          create(:board_collection,
+            num_cards: 3,
+            add_editors: [user],
+            organization: organization
+          )
+        end
+
+        it 'sets row of linked cards 2 rows after the last non-blank row' do
+          card_mover.call
+          # expect ^this to change row and column for linked cards?
+          linking_cards.each_with_index do |card, index|
+            expect(card.row).to eq target_empty_row
+            expect(card.col).to eq index
+          end
       end
     end
 

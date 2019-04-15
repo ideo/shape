@@ -21,7 +21,7 @@ class CollectionCardDuplicator < SimpleService
   def duplicate_cards
     # reverse cards for 'beginning' since they get duplicated one by one to the front
     @cards = @cards.reverse if @placement == 'beginning'
-    @cards.each do |card|
+    @cards.each_with_index do |card, i|
       # Skip if legend item - they will be moved over in `duplicate_legend_items`
       next if card.item&.is_a?(Item::LegendItem)
 
@@ -32,6 +32,13 @@ class CollectionCardDuplicator < SimpleService
         duplicate_linked_records: true,
         system_collection: @system_collection,
       )
+      # we want the empty row to be the same for each card in array being moved
+      # Should this be a method in collection.rb?
+      target_empty_row = @to_collection.collection_cards.map(&:row).compact.max.to_i + 2
+      dup.update(
+        row: target_empty_row,
+        col: i
+      ) if @to_collection.is_a? Collection::Board
       @should_update_cover ||= dup.should_update_parent_collection_cover?
       @new_cards << dup
     end
