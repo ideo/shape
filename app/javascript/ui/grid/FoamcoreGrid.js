@@ -333,11 +333,11 @@ class FoamcoreGrid extends React.Component {
         const searchRow = cardMatrix[filledRow]
         found = searchRow && searchRow[filledCol]
         // don't consider overlapping itself
-        if (found && _.includes(uiStore.multiMoveCardIds, found.id)) {
-          found = false
-        } else if (found) {
-          return true
+        if (found && !_.includes(uiStore.multiMoveCardIds, found.id)) {
+          return found
         }
+        found = false
+
         width -= 1
       }
       width = origWidth
