@@ -6,6 +6,7 @@ import styled from 'styled-components'
 
 import PlusIcon from '~/ui/icons/PlusIcon'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
+import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
 import v from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
 
@@ -1030,24 +1031,10 @@ class FoamcoreGrid extends React.Component {
           this.gridRef = ref
         }}
       >
-        <div
-          data-cy="zoom-control"
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            zIndex: 900,
-            background: 'white',
-          }}
-        >
-          <button onClick={this.handleZoomOut}>
-            <h3>-</h3>
-          </button>
-          <span style={{ display: 'inline-block', width: '10px' }} />
-          <button onClick={this.handleZoomIn}>
-            <h3>+</h3>
-          </button>
-        </div>
+        <FoamcoreZoomControls
+          onZoomIn={this.handleZoomIn}
+          onZoomOut={this.handleZoomOut}
+        />
         <div style={{ width: `${gridW * 16}px`, height: '1px' }} />
         {this.cardsToRender}
       </Grid>

@@ -58,6 +58,8 @@ export default {
 
   transitionWithDelay: 'all 0.3s 0.2s',
 
+  navOpacity: 0.9,
+
   colors: {
     black: '#120f0e',
     white: '#ffffff',
