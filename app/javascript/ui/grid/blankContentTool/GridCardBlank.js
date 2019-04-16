@@ -32,8 +32,9 @@ import BctButtonRotation from './BctButtonRotation'
 
 const StyledGridCardBlank = StyledGridCard.extend`
   background-color: ${v.colors.commonLight};
-  box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.1);
-  cursor: auto;
+  ${props =>
+    props.boxShadow &&
+    'box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.1);'} cursor: auto;
   position: relative;
   overflow: hidden;
   button {
@@ -627,11 +628,14 @@ class GridCardBlank extends React.Component {
   }
 
   render() {
-    const { testCollectionCard, uiStore } = this.props
+    const { testCollectionCard, uiStore, parent } = this.props
     const { gridSettings, blankContentToolState } = uiStore
     const { creating } = this.state
     return (
-      <StyledGridCardBlank blueBg={testCollectionCard}>
+      <StyledGridCardBlank
+        blueBg={testCollectionCard}
+        boxShadow={parent.isBoard}
+      >
         <StyledGridCardInner
           height={blankContentToolState.height}
           gridW={gridSettings.gridW}
