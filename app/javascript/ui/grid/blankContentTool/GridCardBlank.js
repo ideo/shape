@@ -24,7 +24,6 @@ import PopoutMenu from '~/ui/global/PopoutMenu'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 
 import CollectionCreator from './CollectionCreator'
-import TextItemCreator from './TextItemCreator'
 import LinkCreator from './LinkCreator'
 import DataItemCreator from './DataItemCreator'
 import BctButtonBox from './BctButtonBox'
@@ -433,17 +432,6 @@ class GridCardBlank extends React.Component {
           />
         )
         break
-      case 'text':
-        // TextItemCreator is the only one that `returns`
-        // since it doesn't use the BctBackground
-        return (
-          <TextItemCreator
-            loading={loading}
-            height={this.props.height}
-            createCard={this.createCard}
-            closeBlankContentTool={this.closeBlankContentTool}
-          />
-        )
       default:
         inner = (
           <BctDropzone droppingFile={droppingFile} id="dropzone">
@@ -629,7 +617,6 @@ class GridCardBlank extends React.Component {
   render() {
     const { testCollectionCard, uiStore } = this.props
     const { gridSettings, blankContentToolState } = uiStore
-    const { creating } = this.state
     return (
       <StyledGridCardBlank blueBg={testCollectionCard}>
         <StyledGridCardInner
@@ -641,8 +628,7 @@ class GridCardBlank extends React.Component {
         </StyledGridCardInner>
         {this.state.loading && <InlineLoader />}
         {!this.emptyState &&
-          !testCollectionCard &&
-          creating !== 'text' && (
+          !testCollectionCard && (
             <CloseButton onClick={this.closeBlankContentTool} />
           )}
       </StyledGridCardBlank>
@@ -653,7 +639,6 @@ class GridCardBlank extends React.Component {
 GridCardBlank.propTypes = {
   // parent is the parent collection
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
-  height: PropTypes.number.isRequired,
   afterCreate: PropTypes.func,
   preselected: PropTypes.string,
   replacingId: PropTypes.string,
