@@ -402,7 +402,12 @@ class GridCard extends React.Component {
                   <EditButton onClick={this.editCard} />
                 )}
               {record.isImage &&
-                this.canContentEditCard && <ContainImage card={card} />}
+                this.canContentEditCard && (
+                  <ContainImage
+                    card={card}
+                    image_contain={card.image_contain}
+                  />
+                )}
               {(record.isImage || record.isText) && (
                 <CardActionHolder
                   className="show-on-hover"

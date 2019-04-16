@@ -108,6 +108,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get cardMatrix() {
+    if (this.collection_cards.length === 0) return [[]]
+
     // Get maximum dimensions of our card matrix
     const maxCol = _.max(this.collection_cards.map(card => card.maxCol))
     const maxRow = _.max(this.collection_cards.map(card => card.maxRow))
@@ -820,7 +822,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   static async createSubmission(parent_id, submissionSettings) {
-    const { uiStore } = this
+    const { routingStore, uiStore } = apiStore
     const { type, template } = submissionSettings
     if (type === 'template' && template) {
       const templateData = {
@@ -831,7 +833,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       uiStore.update('isLoading', true)
       const res = await apiStore.createTemplateInstance(templateData)
       uiStore.update('isLoading', false)
-      this.routingStore.routeTo('collections', res.data.id)
+      routingStore.routeTo('collections', res.data.id)
     } else {
       uiStore.openBlankContentTool({
         order: 0,

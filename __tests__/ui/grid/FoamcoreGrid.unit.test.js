@@ -1,11 +1,10 @@
 import FoamcoreGrid from '~/ui/grid/FoamcoreGrid'
-
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import { fakeCollectionCard, fakeCollection } from '#/mocks/data'
 
 let props, wrapper, instance, rerender, cards, cardA, cardB, cardC
-const fakeEv = { persist: jest.fn(), pageX: 120, pageY: 50 }
 let idCounter = 0
 
 function createCard(data) {
@@ -60,6 +59,10 @@ describe('FoamcoreGrid', () => {
     instance.gridRef = { scrollLeft: 0, scrollTop: 0 }
   })
 
+  it('renders snapshot', () => {
+    expectTreeToMatchSnapshot(wrapper)
+  })
+
   describe('findCardOverlap', () => {
     it('finds filledSpot (or not) where a card is trying to be dragged', () => {
       // similar to calculateFilledSpots, but given a card (needs width and height >= 1)
@@ -68,33 +71,6 @@ describe('FoamcoreGrid', () => {
       // 2x2 should stick out and overlap cardA
       fakeCard = { row: 0, col: 4, width: 2, height: 2 }
       expect(instance.findCardOverlap(fakeCard)).toEqual(cardA)
-    })
-  })
-
-  describe('handleMouseMove', () => {
-    beforeEach(() => {
-      instance.throttledSetHoverSpot = jest.fn().mockReturnValue('')
-      instance.handleMouseMove(fakeEv)
-    })
-
-    it('should call persist on the event', () => {
-      expect(fakeEv.persist).toHaveBeenCalled()
-    })
-
-    it('should set the hover spot throttled', () => {
-      expect(instance.throttledSetHoverSpot).toHaveBeenCalled()
-    })
-  })
-
-  describe('handleMouseMove', () => {
-    beforeEach(() => {
-      instance.placeholderSpot = { row: 1, col: 1 }
-      instance.handleMouseMove(fakeEv)
-    })
-
-    it('should reset the placeholder spot', () => {
-      expect(instance.placeholderSpot.row).toBeNull()
-      expect(instance.placeholderSpot.col).toBeNull()
     })
   })
 

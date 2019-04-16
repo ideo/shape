@@ -36,7 +36,7 @@ const StyledPlusIcon = styled.div`
   position: relative;
   left: ${props => props.left}px;
   width: 12px;
-  color: white;
+  color: ${v.colors.secondaryMedium};
   font-size: 1.5rem;
   cursor: pointer;
 `
