@@ -9,6 +9,7 @@ import CollectionSort from '~/ui/grid/CollectionSort'
 import Loader from '~/ui/layout/Loader'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
+import { objectsEqual } from '~/utils/objectUtils'
 import v from '~/utils/variables'
 
 const CARD_HOLD_TIME = 0.4 * 1000
@@ -72,10 +73,20 @@ class CollectionGrid extends React.Component {
     loadCollectionCards({})
   }
 
-  componentWillReceiveProps(nextProps) {
-    // TODO: refactor this into componentDidUpdate
-    // and only re-initialize under the right conditions (of props changing)
-    this.initialize(nextProps)
+  componentDidUpdate(prevProps) {
+    const fields = [
+      'cols',
+      'gridH',
+      'gridW',
+      'blankContentToolState',
+      'cardProperties',
+      'movingCardIds',
+    ]
+    const prevPlucked = _.pick(prevProps, fields)
+    const plucked = _.pick(this.props, fields)
+    if (!objectsEqual(prevPlucked, plucked)) {
+      this.initialize(this.props)
+    }
   }
 
   componentWillUnmount() {
@@ -441,10 +452,6 @@ class CollectionGrid extends React.Component {
     return placeholder
   }
 
-  removePlaceholderCard = cards => {
-    _.reject(cards, { cardType: 'placeholder' })
-  }
-
   findOverlap = (cardId, dragPosition) => {
     const { dragX, dragY } = dragPosition
     const { gutter, gridW, gridH } = this.props
@@ -595,6 +602,7 @@ class CollectionGrid extends React.Component {
     // even though hidden cards are not loaded by default in the API, we still filter here because
     // it's possible that some hidden cards were loaded in memory via the CoverImageSelector
     const cards = [...collectionCards].filter(c => !c.hidden)
+
     // props might get passed in e.g. nextProps for componentWillReceiveProps
     if (!opts.props) opts.props = this.props
     const { collection, gridW, gridH, gutter, cols, addEmptyCard } = opts.props
@@ -865,7 +873,7 @@ class CollectionGrid extends React.Component {
     const minHeight = rows * (gridSettings.gridH + gridSettings.gutter)
 
     return (
-      <StyledGrid data-deselect-on-click minHeight={minHeight}>
+      <StyledGrid data-empty-space-click minHeight={minHeight}>
         {sorting && (
           <SortContainer>
             <CollectionSort collection={collection} />

@@ -240,12 +240,12 @@ class PageHeader extends React.Component {
     const rolesRecord = uiStore.rolesMenuOpen ? uiStore.rolesMenuOpen : record
 
     return (
-      <StyledHeader>
+      <StyledHeader data-empty-space-click>
         <MaxWidthContainer>
           <RolesModal record={rolesRecord} open={!!uiStore.rolesMenuOpen} />
           <div>
             <StyledTitleAndRoles
-              data-deselect-on-click
+              data-empty-space-click
               className={record.isCurrentUserProfile ? 'user-profile' : ''}
               justify="space-between"
             >

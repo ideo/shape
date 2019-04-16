@@ -40,7 +40,7 @@ class FoamcoreZoomControls extends React.Component {
     const { onZoomIn, onZoomOut } = this.props
 
     return (
-      <ZoomIconWrapper>
+      <ZoomIconWrapper data-cy="zoom-control">
         <Tooltip
           classes={{ tooltip: 'Tooltip' }}
           title="Zoom out"

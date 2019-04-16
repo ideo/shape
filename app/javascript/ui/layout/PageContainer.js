@@ -16,7 +16,7 @@ const StyledContainer = styled.main`
 `
 
 const PageContainer = ({ children, fullWidth }) => (
-  <StyledContainer data-deselect-on-click fullWidth={fullWidth}>
+  <StyledContainer data-empty-space-click fullWidth={fullWidth}>
     {children}
   </StyledContainer>
 )

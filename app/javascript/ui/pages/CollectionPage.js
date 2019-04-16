@@ -391,6 +391,7 @@ class CollectionPage extends React.Component {
       blankContentToolState,
       submissionBoxSettingsOpen,
       gridSettings,
+      selectedArea,
     } = uiStore
 
     // submissions_collection will only exist for submission boxes
@@ -403,6 +404,9 @@ class CollectionPage extends React.Component {
             <FoamcoreGrid
               // pull in cols, gridW, gridH, gutter
               {...gridSettings}
+              selectedArea={selectedArea}
+              // Included so that component re-renders when area changes
+              selectedAreaMinX={selectedArea.minX}
               collection={collection}
               loadCollectionCards={this.loadCollectionCards}
               trackCollectionUpdated={this.trackCollectionUpdated}
@@ -411,6 +415,8 @@ class CollectionPage extends React.Component {
               cardProperties={collection.cardProperties}
               // to trigger a re-render
               movingCardIds={uiStore.movingCardIds}
+              // Pass in BCT state so grid will re-render when open/closed
+              blankContentToolState={blankContentToolState}
             />
             <MoveModal />
             {(uiStore.dragging || uiStore.cardMenuOpenAndPositioned) && (

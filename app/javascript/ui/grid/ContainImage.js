@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 
 import CardActionHolder from '~/ui/icons/CardActionHolder'
@@ -12,8 +13,7 @@ class ContainImage extends React.Component {
   }
 
   render() {
-    const { card } = this.props
-    const { image_contain } = card
+    const { image_contain } = this.props
 
     return (
       <CardActionHolder
@@ -32,6 +32,7 @@ class ContainImage extends React.Component {
 
 ContainImage.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
+  image_contain: PropTypes.bool.isRequired,
 }
 
 // to override the long 'injected-xxx' name

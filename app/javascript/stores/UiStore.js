@@ -11,6 +11,8 @@ export default class UiStore {
     order: null,
     width: null,
     height: null,
+    row: null,
+    col: null,
     replacingId: null,
     emptyCollection: false,
     collectionId: null,
@@ -166,6 +168,10 @@ export default class UiStore {
   modalContentRef = null
   @observable
   dragCardMaster = null
+  @observable
+  selectedArea = { minX: null, maxX: null, minY: null, maxY: null }
+  @observable
+  selectedAreaEnabled = false
 
   @action
   toggleEditingCardId(cardId) {
@@ -230,6 +236,11 @@ export default class UiStore {
         y < target.coordinates.top
       return !overlap
     })
+  }
+
+  @action
+  setSelectedArea(selectedArea) {
+    this.selectedArea = selectedArea
   }
 
   @action

@@ -37,9 +37,12 @@ describe('FoamcoreGrid', () => {
       gridH: 200,
       gutter: 10,
       sortBy: 'order',
+      selectedArea: { minX: null, minY: null, maxX: null, maxY: null },
+      minX: null,
       loadCollectionCards: jest.fn(() => Promise.resolve()),
       updateCollection: jest.fn(),
       cardProperties: [],
+      blankContentToolState: {},
       apiStore: fakeApiStore(),
       uiStore: fakeUiStore,
       routingStore: {
@@ -68,35 +71,6 @@ describe('FoamcoreGrid', () => {
       // 2x2 should stick out and overlap cardA
       fakeCard = { row: 0, col: 4, width: 2, height: 2 }
       expect(instance.findCardOverlap(fakeCard)).toEqual(cardA)
-    })
-  })
-
-  describe('handleMouseMove', () => {
-    const fakeEv = { persist: jest.fn(), pageX: 120, pageY: 50 }
-
-    beforeEach(() => {
-      instance.throttledSetHoverSpot = jest.fn().mockReturnValue('')
-      instance.handleMouseMove(fakeEv)
-    })
-
-    it('should call persist on the event', () => {
-      expect(fakeEv.persist).toHaveBeenCalled()
-    })
-
-    it('should set the hover spot throttled', () => {
-      expect(instance.throttledSetHoverSpot).toHaveBeenCalled()
-    })
-  })
-
-  describe('handleMouseMove', () => {
-    beforeEach(() => {
-      instance.placeholderSpot = { row: 1, col: 1 }
-      instance.handleMouseOut()
-    })
-
-    it('should reset the placeholder spot', () => {
-      expect(instance.placeholderSpot.row).toBeUndefined()
-      expect(instance.placeholderSpot.col).toBeUndefined()
     })
   })
 
@@ -380,6 +354,8 @@ describe('FoamcoreGrid', () => {
       instance.loadedRows = { min: 0, max: 9 }
       instance.loadedCols = { min: 0, max: 9 }
       instance.loadCards = jest.fn()
+      // Stub this or else it causes mobx `Maximum call stack size exceeded`
+      instance.calculateCardsToRender = jest.fn()
     })
 
     describe('scrolling in loaded bounds', () => {
@@ -453,6 +429,47 @@ describe('FoamcoreGrid', () => {
       }
       instance.loadCards(rowsCols)
       expect(props.loadCollectionCards).toHaveBeenCalledWith(rowsCols)
+    })
+  })
+
+  describe('updateSelectedArea', () => {
+    beforeEach(() => {
+      cardA = createCard({ row: 0, col: 1 })
+      cardB = createCard({ row: 1, col: 2 })
+      cardC = createCard({ row: 3, col: 3 })
+      props.collection.collection_cards = [cardA, cardB, cardC]
+    })
+
+    describe('selected area not matching any cards', () => {
+      beforeEach(() => {
+        props.selectedArea = { minX: 500, minY: 10, maxX: 550, maxY: 20 }
+        // It would be nice if we could use the real Collection class
+        // instead of having to mock the return value:
+        props.collection.cardIdsWithinRectangle = jest.fn().mockReturnValue([])
+        rerender()
+        instance.componentDidUpdate(props)
+      })
+
+      it('does not set uiStore.selectedCardIds', () => {
+        expect(props.uiStore.selectedCardIds).toEqual([])
+      })
+    })
+
+    describe('selected area matching two cards', () => {
+      beforeEach(() => {
+        props.selectedArea = { minX: 40, minY: 150, maxX: 550, maxY: 450 }
+        // It would be nice if we could use the real Collection class
+        // instead of having to mock the return value:
+        props.collection.cardIdsWithinRectangle = jest
+          .fn()
+          .mockReturnValue([cardA.id, cardB.id])
+        rerender()
+        instance.componentDidUpdate(props)
+      })
+
+      it('sets uiStore.selectedCardIds', () => {
+        expect(props.uiStore.selectedCardIds).toEqual([cardA.id, cardB.id])
+      })
     })
   })
 

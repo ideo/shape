@@ -2,9 +2,8 @@
 
 exports[`FoamcoreGrid renders snapshot 1`] = `
 <styled.div
-  data-deselect-on-click={true}
+  data-empty-space-click={true}
   innerRef={[Function]}
-  onMouseMove={[Function]}
   onScroll={[Function]}
 >
   <FoamcoreZoomControls
@@ -25,7 +24,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
     draggedOn={true}
     h={200}
     height={200}
-    key="blank-unrendered-5:1"
+    key="blank-unrendered-1:5"
     onClick={[Function]}
     type="unrendered"
     w={200}
@@ -42,7 +41,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
     draggedOn={true}
     h={410}
     height={410}
-    key="blank-unrendered-1:0"
+    key="blank-unrendered-0:1"
     onClick={[Function]}
     type="unrendered"
     w={410}
@@ -59,7 +58,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
     draggedOn={true}
     h={200}
     height={200}
-    key="blank-unrendered-0:2"
+    key="blank-unrendered-2:0"
     onClick={[Function]}
     type="unrendered"
     w={410}
@@ -68,23 +67,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
     xPos={0}
     y={420}
     yPos={420}
-    zoomLevel={1}
-  />
-  <styled.div
-    blocked={false}
-    data-blank-type="generic"
-    draggedOn={true}
-    h={-10}
-    height={-10}
-    key="blank-generic-null:null"
-    onClick={[Function]}
-    type="generic"
-    w={-10}
-    width={-10}
-    x={0}
-    xPos={0}
-    y={0}
-    yPos={0}
     zoomLevel={1}
   />
 </styled.div>
