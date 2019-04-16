@@ -30,18 +30,22 @@ import BctButtonBox from './BctButtonBox'
 import BctButtonRotation from './BctButtonRotation'
 
 const StyledGridCardBlank = StyledGridCard.extend`
-  background-color: ${v.colors.commonLight};
-  ${props =>
-    props.boxShadow &&
-    'box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.1);'} cursor: auto;
+  background-color: transparent;
+  cursor: auto;
   position: relative;
   button {
     cursor: pointer;
     border: none;
     transition: all 200ms;
   }
+  ${props =>
+    props.boxShadow &&
+    `
+    box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.1);
+    background-color: ${v.colors.commonLight};
+  `};
 `
-StyledGridCardBlank.displayName = 'WeeStyledGridCardBlank'
+StyledGridCardBlank.displayName = 'StyledGridCardBlank'
 
 // width of card is constrained by gridW
 // vertical position is adjusted by gridH / 2 if card is 2 rows tall
