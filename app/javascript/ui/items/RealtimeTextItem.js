@@ -291,8 +291,8 @@ class RealtimeTextItem extends React.Component {
 
   get headerSize() {
     const { initialFontTag } = this.props
-    if (initialFontTag.includes('h')) {
-      return _.replace(initialFontTag, 'h', '')
+    if (initialFontTag.includes('H')) {
+      return _.replace(initialFontTag, 'H', '')
     }
     return null
   }
@@ -496,12 +496,12 @@ RealtimeTextItem.propTypes = {
   fullyLoaded: PropTypes.bool.isRequired,
   onExpand: PropTypes.func,
   fullPageView: PropTypes.bool,
-  initialFontTag: PropTypes.oneOf(['h1', 'h3', 'p']),
+  initialFontTag: PropTypes.oneOf(['H1', 'H3', 'P']),
 }
 RealtimeTextItem.defaultProps = {
   onExpand: null,
   fullPageView: false,
-  initialFontTag: 'p',
+  initialFontTag: 'P',
 }
 
 export default RealtimeTextItem

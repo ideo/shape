@@ -45,7 +45,7 @@ class CoverRenderer extends React.Component {
               cardId={card.id}
               handleClick={handleClick}
               searchResult={searchResult}
-              initialFontTag={isBoardCollection ? 'h1' : 'p'}
+              initialFontTag={isBoardCollection ? 'H1' : 'P'}
             />
           )
         case ITEM_TYPES.EXTERNAL_IMAGE:
