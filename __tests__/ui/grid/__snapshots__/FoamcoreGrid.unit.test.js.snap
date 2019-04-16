@@ -3,20 +3,14 @@
 exports[`FoamcoreGrid renders snapshot 1`] = `
 <styled.div
   data-empty-space-click={true}
+  height={NaN}
   innerRef={[Function]}
   onScroll={[Function]}
+  width={3360}
 >
   <FoamcoreZoomControls
     onZoomIn={[Function]}
     onZoomOut={[Function]}
-  />
-  <div
-    style={
-      Object {
-        "height": "1px",
-        "width": "3200px",
-      }
-    }
   />
   <styled.div
     blocked={false}

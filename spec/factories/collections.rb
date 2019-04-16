@@ -99,6 +99,8 @@ FactoryBot.define do
             order: (i - 1),
             width: 1,
             height: 1,
+            col: 0,
+            row: i,
             pinned: evaluator.pin_cards,
           )
           # e.g. primary_collection_cards or link_collection_cards
