@@ -837,6 +837,7 @@ class CollectionGrid extends React.Component {
           canEditCollection={canEditCollection}
           isUserCollection={collection.isUserCollection}
           isSharedCollection={collection.isSharedCollection}
+          isBoardCollection={false}
           position={card.position}
           record={record}
           onDrag={this.onDrag}

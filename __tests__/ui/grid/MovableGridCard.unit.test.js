@@ -23,6 +23,7 @@ const props = {
   isSharedCollection: false,
   hoveringOverLeft: false,
   hoveringOverRight: false,
+  isBoardCollection: false,
   holdingOver: false,
 }
 

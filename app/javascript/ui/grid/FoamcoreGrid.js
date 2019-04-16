@@ -829,6 +829,7 @@ class FoamcoreGrid extends React.Component {
         canEditCollection={canEditCollection}
         isUserCollection={collection.isUserCollection}
         isSharedCollection={collection.isSharedCollection}
+        isBoardCollection
         position={position}
         record={card.record || {}}
         onDrag={this.onDrag}
