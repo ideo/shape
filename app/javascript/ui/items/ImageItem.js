@@ -5,8 +5,14 @@ import styled from 'styled-components'
 import { CloseButton } from '~/ui/global/styled/buttons'
 
 const StyledImage = styled.img`
-  /* basic way to make it "responsive" */
+  /* Made it "responsive" and centered*/
+  display: block;
   max-width: 100vw;
+  max-height: 42vw;
+  margin-right: auto;
+  margin-left: auto;
+  padding-top: 3%;
+
 `
 StyledImage.displayName = 'StyledImage'
 
