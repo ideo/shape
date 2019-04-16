@@ -60,25 +60,6 @@ describe('FoamcoreGrid', () => {
     expectTreeToMatchSnapshot(wrapper)
   })
 
-  // describe('calculateFilledSpots', () => {
-  //   it('maps out all the filled spots in the grid as a matrix', () => {
-  //     const { filledSpots } = instance
-  //     // 3 cards
-  //     expect(filledSpots.length).toEqual(3)
-  //
-  //     expect(filledSpots[1][5]).toEqual(cardA)
-  //     // height 2
-  //     expect(filledSpots[0][1]).toEqual(cardB)
-  //     expect(filledSpots[1][1]).toEqual(cardB)
-  //     // width 2
-  //     expect(filledSpots[2][0]).toEqual(cardC)
-  //     expect(filledSpots[2][1]).toEqual(cardC)
-  //     // empty spots
-  //     expect(filledSpots[0][0]).toBeUndefined()
-  //     expect(filledSpots[2][5]).toBeUndefined()
-  //   })
-  // })
-
   describe('findCardOverlap', () => {
     it('finds filledSpot (or not) where a card is trying to be dragged', () => {
       // similar to calculateFilledSpots, but given a card (needs width and height >= 1)

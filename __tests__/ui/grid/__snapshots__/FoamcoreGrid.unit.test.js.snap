@@ -7,46 +7,10 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
   onMouseMove={[Function]}
   onScroll={[Function]}
 >
-  <styled.div>
-    <Tooltip
-      classes={
-        Object {
-          "tooltip": "Tooltip",
-        }
-      }
-      placement="top"
-      title="Zoom out"
-    >
-      <div
-        className="zoom-icon"
-        onClick={[Function]}
-        onKeyDown={[Function]}
-        role="button"
-        tabIndex={0}
-      >
-        <MinusCircleIcon />
-      </div>
-    </Tooltip>
-    <Tooltip
-      classes={
-        Object {
-          "tooltip": "Tooltip",
-        }
-      }
-      placement="top"
-      title="Zoom in"
-    >
-      <div
-        className="zoom-icon"
-        onClick={[Function]}
-        onKeyDown={[Function]}
-        role="button"
-        tabIndex={0}
-      >
-        <PlusCircleIcon />
-      </div>
-    </Tooltip>
-  </styled.div>
+  <FoamcoreZoomControls
+    onZoomIn={[Function]}
+    onZoomOut={[Function]}
+  />
   <div
     style={
       Object {

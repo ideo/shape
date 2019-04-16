@@ -4,10 +4,8 @@ import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
-import PlusCircleIcon from '~/ui/icons/PlusCircleIcon'
-import MinusCircleIcon from '~/ui/icons/MinusCircleIcon'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
-import Tooltip from '~/ui/global/Tooltip'
+import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
 import v from '~/utils/variables'
 
 // When you have attributes that will change a lot,
@@ -45,34 +43,6 @@ const Grid = styled.div`
   min-height: 1300px;
   margin-top: ${v.pageContentMarginTop}px;
   position: relative;
-`
-
-const ZoomIconWrapper = styled.div`
-  position: fixed;
-  border-radius: 27px;
-  height: 27px;
-  top: 78px;
-  right: 62px;
-  background-color: rgba(242, 241, 238, 0.5);
-  z-index: ${v.zIndex.clickWrapper};
-  .zoom-icon {
-    outline: none;
-    display: inline-block;
-    color: ${v.colors.commonDark};
-    cursor: pointer;
-    height: 23px;
-    width: 23px;
-    margin: 2px;
-    &:first-of-type {
-      margin-right: 10px;
-    }
-    &:hover {
-      color: ${v.colors.secondaryDarkest};
-    }
-    svg {
-      height: 100%;
-    }
-  }
 `
 
 function getMapKey({ col, row }) {
@@ -923,37 +893,6 @@ class FoamcoreGrid extends React.Component {
     return this.cardsToRender
   }
 
-  renderZoomControls = () => (
-    <ZoomIconWrapper>
-      <Tooltip
-        classes={{ tooltip: 'Tooltip' }}
-        title="Zoom out"
-        placement="top"
-      >
-        <div
-          className="zoom-icon"
-          role="button"
-          onClick={this.handleZoomOut}
-          onKeyDown={this.handleZoomOut}
-          tabIndex={0}
-        >
-          <MinusCircleIcon />
-        </div>
-      </Tooltip>
-      <Tooltip classes={{ tooltip: 'Tooltip' }} title="Zoom in" placement="top">
-        <div
-          className="zoom-icon"
-          role="button"
-          onClick={this.handleZoomIn}
-          onKeyDown={this.handleZoomIn}
-          tabIndex={0}
-        >
-          <PlusCircleIcon />
-        </div>
-      </Tooltip>
-    </ZoomIconWrapper>
-  )
-
   render() {
     const { gridW } = this.props
     return (
@@ -965,7 +904,10 @@ class FoamcoreGrid extends React.Component {
           this.gridRef = ref
         }}
       >
-        {this.renderZoomControls()}
+        <FoamcoreZoomControls
+          onZoomIn={this.handleZoomIn}
+          onZoomOut={this.handleZoomOut}
+        />
         <div style={{ width: `${gridW * 16}px`, height: '1px' }} />
         {this.cardsToRender}
       </Grid>
