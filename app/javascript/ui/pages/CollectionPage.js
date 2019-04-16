@@ -392,6 +392,7 @@ class CollectionPage extends React.Component {
       submissionBoxSettingsOpen,
       gridSettings,
       selectedArea,
+      cardMenuOpen,
     } = uiStore
 
     // submissions_collection will only exist for submission boxes
@@ -411,6 +412,8 @@ class CollectionPage extends React.Component {
               loadCollectionCards={this.loadCollectionCards}
               trackCollectionUpdated={this.trackCollectionUpdated}
               canEditCollection={collection.can_edit_content}
+              // Trigger re-render if card menu is opened
+              cardIdMenuOpen={cardMenuOpen.id}
               // Pass in cardProperties so grid will re-render when they change
               cardProperties={collection.cardProperties}
               // to trigger a re-render

@@ -132,11 +132,7 @@ class FoamcoreGrid extends React.Component {
 
   componentDidUpdate(prevProps) {
     this.updateSelectedArea()
-    if (
-      prevProps.cardProperties.length !== this.props.cardProperties.length ||
-      prevProps.blankContentToolState.order !==
-        this.props.blankContentToolState.order
-    ) {
+    if (this.rerenderGivenPrevProps(prevProps)) {
       this.throttledCalculateCardsToRender()
     }
   }
@@ -158,6 +154,18 @@ class FoamcoreGrid extends React.Component {
       rows,
       cols,
     })
+  }
+
+  rerenderGivenPrevProps(prevProps) {
+    if (prevProps.cardProperties.length !== this.props.cardProperties.length)
+      return true
+    if (
+      prevProps.blankContentToolState.order !==
+      this.props.blankContentToolState.order
+    )
+      return true
+    if (prevProps.cardIdMenuOpen !== this.props.cardIdMenuOpen) return true
+    return false
   }
 
   // Load more cards if we are approaching a boundary of what we have loaded
@@ -1062,6 +1070,7 @@ FoamcoreGrid.propTypes = {
   selectedArea: MobxPropTypes.objectOrObservableObject.isRequired,
   selectedAreaMinX: PropTypes.number,
   sorting: PropTypes.bool,
+  cardIdMenuOpen: PropTypes.string,
 }
 FoamcoreGrid.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -1072,6 +1081,7 @@ FoamcoreGrid.defaultProps = {
   blankContentToolState: {},
   sorting: false,
   selectedAreaMinX: null,
+  cardIdMenuOpen: null,
 }
 FoamcoreGrid.displayName = 'FoamcoreGrid'
 
