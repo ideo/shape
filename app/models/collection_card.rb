@@ -29,6 +29,9 @@ class CollectionCard < ApplicationRecord
   validates :col,
             inclusion: { in: Collection::Board.allowed_col_range.to_a },
             if: :parent_board_collection?
+  validates :row,
+            numericality: { greater_than_or_equal_to: 0 },
+            if: :parent_board_collection?
 
   delegate :board_collection?,
            to: :parent,
@@ -42,6 +45,7 @@ class CollectionCard < ApplicationRecord
            allow_nil: true
 
   scope :ordered, -> { order(order: :asc) }
+  scope :ordered_row_col, -> { reorder(row: :asc, col: :asc) }
   scope :pinned, -> { where(pinned: true) }
   scope :unpinned, -> { where(pinned: false) }
   scope :visible, -> { where(hidden: false) }
