@@ -25,12 +25,21 @@ class CollectionCard < ApplicationRecord
 
   validates :parent, :order, presence: true
   validate :single_item_or_collection_is_present
-
   validate :parent_is_not_readonly, on: :create
+  validates :col,
+            inclusion: { in: Collection::Board.allowed_col_range.to_a },
+            if: :parent_board_collection?
 
-  delegate :can_edit?, to: :record, allow_nil: true
-  delegate :can_edit_content?, to: :record, allow_nil: true
-  delegate :can_view?, to: :record, allow_nil: true
+  delegate :board_collection?,
+           to: :parent,
+           prefix: true,
+           allow_nil: true
+
+  delegate :can_edit?,
+           :can_edit_content?,
+           :can_view?,
+           to: :record,
+           allow_nil: true
 
   scope :ordered, -> { order(order: :asc) }
   scope :pinned, -> { where(pinned: true) }
