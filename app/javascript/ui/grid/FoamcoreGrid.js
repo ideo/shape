@@ -132,11 +132,7 @@ class FoamcoreGrid extends React.Component {
 
   componentDidUpdate(prevProps) {
     this.updateSelectedArea()
-    if (
-      prevProps.cardProperties.length !== this.props.cardProperties.length ||
-      prevProps.blankContentToolState.order !==
-        this.props.blankContentToolState.order
-    ) {
+    if (this.propsHaveChangedFrom(prevProps)) {
       this.throttledCalculateCardsToRender()
     }
   }
@@ -158,6 +154,16 @@ class FoamcoreGrid extends React.Component {
       rows,
       cols,
     })
+  }
+
+  propsHaveChangedFrom(prevProps) {
+    const fields = [
+      'cardProperties',
+      'blankContentToolState',
+      'cardIdMenuOpen',
+      'movingCardIds',
+    ]
+    return !objectsEqual(_.pick(prevProps, fields), _.pick(this.props, fields))
   }
 
   // Load more cards if we are approaching a boundary of what we have loaded
@@ -953,8 +959,12 @@ class FoamcoreGrid extends React.Component {
 
   @action
   calculateCardsToRender = () => {
-    const { collection, uiStore } = this.props
-    const collectionCards = [...collection.collection_cards]
+    const { collection, movingCardIds, uiStore } = this.props
+    // any cards that are being moved don't appear at all
+    const collectionCards = _.reject(collection.collection_cards, c =>
+      _.includes(movingCardIds, c.id)
+    )
+
     let cards = []
     this.hasDragCollision = false
 
@@ -1062,6 +1072,7 @@ FoamcoreGrid.propTypes = {
   selectedArea: MobxPropTypes.objectOrObservableObject.isRequired,
   selectedAreaMinX: PropTypes.number,
   sorting: PropTypes.bool,
+  cardIdMenuOpen: PropTypes.string,
 }
 FoamcoreGrid.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -1072,6 +1083,7 @@ FoamcoreGrid.defaultProps = {
   blankContentToolState: {},
   sorting: false,
   selectedAreaMinX: null,
+  cardIdMenuOpen: null,
 }
 FoamcoreGrid.displayName = 'FoamcoreGrid'
 
