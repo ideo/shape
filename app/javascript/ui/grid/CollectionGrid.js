@@ -303,8 +303,6 @@ class CollectionGrid extends React.Component {
     }
   }
 
-  // why is this only done on drag/resize stop?
-  // How did the move menu work before?
   async moveCardsIntoCollection(cardIds, hoveringRecord) {
     const { collection, uiStore, apiStore } = this.props
     const can_edit = hoveringRecord.can_edit_content || hoveringRecord.can_edit
