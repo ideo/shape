@@ -10,7 +10,7 @@ const StyledEditorPill = styled.div`
   top: ${v.headerHeight - 25}px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: ${v.zIndex.pageHeader};
+  z-index: ${v.zIndex.activityLog};
 
   min-width: 400px;
   min-height: 40px;

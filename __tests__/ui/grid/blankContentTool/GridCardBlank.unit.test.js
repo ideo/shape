@@ -5,12 +5,17 @@ import fakeUiStore from '#/mocks/fakeUiStore'
 import FilestackUpload from '~/utils/FilestackUpload'
 import { fakeCollectionCard } from '#/mocks/data'
 
+const mockCardMethods = {
+  API_create: jest.fn().mockResolvedValue({ record: { id: 1 } }),
+  API_replace: jest.fn().mockResolvedValue({ record: { id: 1 } }),
+}
+
 // replace FilestackUpload with a mock, no need to hit actual filestack API
 jest.mock('../../../../app/javascript/utils/FilestackUpload')
 // in order to mock our way past `new CollectionCard(attrs, apiStore)`
-jest.mock('../../../../app/javascript/stores/jsonApi/CollectionCard')
-// solving a mysterious `property 'type' of undefined` error that traces to Item.js -> routingStore
-jest.mock('../../../../app/javascript/stores/index')
+jest.mock('../../../../app/javascript/stores/jsonApi/CollectionCard', () =>
+  jest.fn().mockImplementation(() => mockCardMethods)
+)
 
 let props, wrapper, replacingCard, component
 beforeEach(() => {
@@ -19,7 +24,6 @@ beforeEach(() => {
   props = {
     uiStore: fakeUiStore,
     apiStore: fakeApiStore({ findResult: replacingCard }),
-    height: 100,
     parent: { id: 1 },
   }
   wrapper = shallow(<GridCardBlank.wrappedComponent {...props} />)
@@ -60,11 +64,9 @@ describe('GridCardBlank', () => {
       expect(wrapper.find('LinkCreator').props().type).toEqual('video')
     })
 
-    it('opens TextItemCreator with onClick handler', () => {
-      component.startCreating('text')()
-      wrapper.update()
-      expect(wrapper.state().creating).toEqual('text')
-      expect(wrapper.find('TextItemCreator').exists()).toBe(true)
+    it('calls API_create with TextItem onClick handler', async () => {
+      await wrapper.instance().createTextItem()
+      expect(mockCardMethods.API_create).toHaveBeenCalled()
     })
 
     it('opens LinkCreator (link) with onClick handler', () => {
@@ -77,24 +79,17 @@ describe('GridCardBlank', () => {
     it('calls API_create when creating', async () => {
       await wrapper.instance().createCard()
       expect(wrapper.state().loading).toBeTruthy()
-      const newCard = CollectionCard.mock.instances[0]
-      expect(newCard.API_create).toHaveBeenCalled()
+      expect(mockCardMethods.API_create).toHaveBeenCalled()
     })
 
-    fit('adds the card record to the uiStore as a new card', async () => {
-      const card = {
-        record: {
-          id: 1,
-        },
-      }
-      CollectionCard.mockImplementation(() => ({
-        API_create: jest.fn().mockResolvedValue(card),
-      }))
+    // TODO: was having all sorts of problems getting this test to work without breaking others
+    it('adds the card record to the uiStore as a new card', async () => {
       await wrapper.instance().createCard()
       return new Promise(resolve => {
         setTimeout(() => {
           expect(fakeUiStore.addNewCard).toHaveBeenCalled()
-          expect(fakeUiStore.addNewCard).toHaveBeenCalledWith(card.record.id)
+          // id: 1 comes from mockCardMethods defined at top
+          expect(fakeUiStore.addNewCard).toHaveBeenCalledWith(1)
           resolve()
         })
       })
@@ -137,8 +132,7 @@ describe('GridCardBlank', () => {
     it('calls API_replace with replacingId', async () => {
       await wrapper.instance().createCard()
       expect(wrapper.state().loading).toBeTruthy()
-      const newCard = CollectionCard.mock.instances[0]
-      expect(newCard.API_replace).toHaveBeenCalledWith({ replacingId })
+      expect(mockCardMethods.API_replace).toHaveBeenCalledWith({ replacingId })
     })
   })
 })

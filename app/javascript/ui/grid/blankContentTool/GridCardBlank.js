@@ -24,25 +24,28 @@ import PopoutMenu from '~/ui/global/PopoutMenu'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 
 import CollectionCreator from './CollectionCreator'
-import TextItemCreator from './TextItemCreator'
 import LinkCreator from './LinkCreator'
 import DataItemCreator from './DataItemCreator'
 import BctButtonBox from './BctButtonBox'
 import BctButtonRotation from './BctButtonRotation'
 
 const StyledGridCardBlank = StyledGridCard.extend`
-  background-color: ${v.colors.commonLight};
-  box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.1);
+  background-color: transparent;
   cursor: auto;
   position: relative;
-  overflow: hidden;
   button {
     cursor: pointer;
     border: none;
     transition: all 200ms;
   }
+  ${props =>
+    props.boxShadow &&
+    `
+    box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.1);
+    background-color: ${v.colors.commonLight};
+  `};
 `
-StyledGridCardBlank.displayName = 'WeeStyledGridCardBlank'
+StyledGridCardBlank.displayName = 'StyledGridCardBlank'
 
 // width of card is constrained by gridW
 // vertical position is adjusted by gridH / 2 if card is 2 rows tall
@@ -433,17 +436,6 @@ class GridCardBlank extends React.Component {
           />
         )
         break
-      case 'text':
-        // TextItemCreator is the only one that `returns`
-        // since it doesn't use the BctBackground
-        return (
-          <TextItemCreator
-            loading={loading}
-            height={this.props.height}
-            createCard={this.createCard}
-            closeBlankContentTool={this.closeBlankContentTool}
-          />
-        )
       default:
         inner = (
           <BctDropzone droppingFile={droppingFile} id="dropzone">
@@ -627,11 +619,13 @@ class GridCardBlank extends React.Component {
   }
 
   render() {
-    const { testCollectionCard, uiStore } = this.props
+    const { testCollectionCard, uiStore, parent } = this.props
     const { gridSettings, blankContentToolState } = uiStore
-    const { creating } = this.state
     return (
-      <StyledGridCardBlank blueBg={testCollectionCard}>
+      <StyledGridCardBlank
+        blueBg={testCollectionCard}
+        boxShadow={parent.isBoard}
+      >
         <StyledGridCardInner
           height={blankContentToolState.height}
           gridW={gridSettings.gridW}
@@ -641,8 +635,7 @@ class GridCardBlank extends React.Component {
         </StyledGridCardInner>
         {this.state.loading && <InlineLoader />}
         {!this.emptyState &&
-          !testCollectionCard &&
-          creating !== 'text' && (
+          !testCollectionCard && (
             <CloseButton onClick={this.closeBlankContentTool} />
           )}
       </StyledGridCardBlank>
@@ -653,7 +646,6 @@ class GridCardBlank extends React.Component {
 GridCardBlank.propTypes = {
   // parent is the parent collection
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
-  height: PropTypes.number.isRequired,
   afterCreate: PropTypes.func,
   preselected: PropTypes.string,
   replacingId: PropTypes.string,
