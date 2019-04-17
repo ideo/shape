@@ -1,6 +1,6 @@
 # Serve up static pages
 class HomeController < ApplicationController
-  before_action :authenticate_user!, except: %i[login sign_up login_as marketing]
+  before_action :authenticate_user!, only: %i[index]
   before_action :set_omniauth_state
 
   def index
@@ -24,11 +24,23 @@ class HomeController < ApplicationController
     @email = params[:email]
   end
 
+  def sign_out_and_redirect
+    sign_out(current_user) if user_signed_in?
+    url = NetworkApi::Authentication.provider_auth_url(
+      provider: params[:provider],
+      redirect_url: user_ideo_omniauth_callback_url(
+        host: ENV['BASE_HOST'],
+      ),
+      cookies: cookies,
+    )
+    redirect_to url
+  end
+
   before_action :require_dev_env, only: [:login_as]
   def login_as
-    if (u = User.find(params[:id]))
-      sign_in(:user, u)
-    end
+    u = User.find(params[:id]) if params[:id]
+    u ||= User.find_by(email: params[:email]) if params[:email]
+    sign_in(:user, u) if u
     respond_to do |format|
       format.html { redirect_to root_url }
       format.json { render jsonapi: u }

@@ -2,7 +2,7 @@
   "type": "object",
   "properties": {
     "name": { "type": "string" },
-    "type": { "type": "string" },
+    "class_type": { "type": "string" },
     "master_template": { "type": ["boolean"] },
     "template_id": { "type": ["integer", "null"] },
     "submission_box_type": { "type": ["string", "null"] },
@@ -38,5 +38,5 @@
     "launchable": { "type": ["boolean"] },
     "test_collection_id": { "type": ["string"] }
   },
-  "required": ["name", "type", "created_at", "cover"]
+  "required": ["name", "class_type", "created_at", "cover"]
 }

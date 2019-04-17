@@ -113,6 +113,50 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
     end
   end
 
+  describe 'GET #index' do
+    let!(:organizations) { create_list(:organization, 2, member: user) }
+    let(:other_org) { create(:organization) }
+    let(:path) { '/api/v1/organizations' }
+
+    it 'returns a 200' do
+      get(path)
+      expect(response.status).to eq(200)
+    end
+
+    it 'returns organizations linked to user' do
+      get(path)
+      expect(json['data'].count).to eq 2
+      expect(json['data'].map { |i| i['id'].to_i }).to match_array(organizations.pluck(:id))
+    end
+
+    context 'with external_id filter', api_token: true do
+      let(:organization) { organizations.first }
+      # Necessary, as this is how an org is linked to a bot user
+      let!(:application_organization) do
+        create(
+          :application_organization,
+          organization: organization,
+          application: @api_token.application,
+        )
+      end
+      let!(:external_record) do
+        create(
+          :external_record,
+          externalizable: organization,
+          external_id: 99,
+          application_id: @api_token.application.id,
+        )
+      end
+      let(:path) { '/api/v1/organizations?filter[external_id]=99' }
+
+      it 'returns organization(s) matching external_id' do
+        get(path)
+        expect(json['data'].count).to eq 1
+        expect(json['data'].first['id'].to_i).to eq organization.id
+      end
+    end
+  end
+
   describe 'GET #current' do
     let!(:organization) { create(:organization) }
     let(:path) { '/api/v1/organizations/current' }
@@ -181,9 +225,9 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
         )
       end
 
-      it 'returns a 400 with organization errors' do
+      it 'returns a 422 with organization errors' do
         post(path, params: params)
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
         expect(json['errors'].first['title']).to eq 'Invalid name'
       end
     end

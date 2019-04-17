@@ -1,14 +1,20 @@
 import axios from 'axios'
 import filestack from 'filestack-js'
 
-import { apiStore } from '~/stores'
-
 const API_KEY = process.env.FILESTACK_API_KEY
 
-export const MAX_SIZE = 25 * 1024 * 1024
+export const MAX_SIZE = 75 * 1024 * 1024
 
 const imageUploadConfig = {
-  accept: ['.pdf', 'image/*', 'application/*', 'text/*', '.docx', '.ppt'],
+  accept: [
+    '.pdf',
+    'image/*',
+    'application/*',
+    'text/*',
+    '.docx',
+    '.ppt',
+    'video/*',
+  ],
   maxFiles: 1,
   imageMax: [7500, 7500],
   maxSize: MAX_SIZE,
@@ -32,7 +38,7 @@ const dropPaneDefaults = {
 
 class FilestackUpload {
   static get client() {
-    return filestack.init(API_KEY, apiStore.filestackToken)
+    return filestack.init(API_KEY)
   }
 
   static async processFiles(filesUploaded) {
@@ -85,17 +91,31 @@ class FilestackUpload {
     })
   }
 
+  static fileUrl({ handle = '' }) {
+    // NOTE: using this function is only necessary when Filestack security is enabled,
+    // otherwise transform with no params is broken (just returns the handle)
+    // return this.client.transform(handle, {})
+    return `https://cdn.filestackcontent.com/${handle}`
+  }
+
   static imageUrl({ handle = '', mimetype = '', filestackOpts = {} } = {}) {
     const params = {
       rotate: { deg: 'exif' },
       ...filestackOpts,
     }
-    if (mimetype.indexOf('svg') > -1) {
+    if (mimetype.match(/gif|svg/)) {
       // svg doesn't allow these transforms
+      // and it would be good to know "animated gif" vs not, but we eliminate gif transform params for this reason
       delete params.rotate
       delete params.resize
     }
-    return this.client.transform(handle, params)
+    let url = this.client.transform(handle, params)
+    if (url.indexOf('http') === -1) {
+      // the transform API seems to just return back the handle if no params are provided
+      // so we need to change it into a CDN link
+      url = `https://cdn.filestackcontent.com/${handle}`
+    }
+    return url
   }
 
   static preview(handle, id) {

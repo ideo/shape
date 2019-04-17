@@ -1,5 +1,5 @@
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
-import { uiStore } from '~/stores'
+import { apiStore, uiStore } from '~/stores'
 
 import { fakeTextItem } from '#/mocks/data'
 
@@ -25,8 +25,8 @@ describe('TextItemCover', () => {
     component = wrapper.instance()
   })
 
-  it('renders Quill with item.text_data', () => {
-    expect(wrapper.find('Quill').props().value).toBe(item.text_data)
+  it('renders Quill with item.data_content', () => {
+    expect(wrapper.find('Quill').props().value).toBe(item.data_content)
   })
 
   it('renders Read More if text height exceeds the viewable area', () => {
@@ -53,37 +53,51 @@ describe('TextItemCover', () => {
   })
 
   describe('handleClick', () => {
-    it('returns false if you are dragging', () => {
+    it('returns false if you are dragging', async () => {
       wrapper.setProps({ dragging: true })
-      expect(component.handleClick(e)).toBe(false)
+      const result = await component.handleClick(e)
+      expect(result).toBe(false)
     })
 
-    it("returns false if you can't edit content", () => {
+    it("returns false if you can't edit content", async () => {
       wrapper.setProps({
         dragging: false,
         item: { ...item, can_edit_content: false },
       })
-      expect(component.handleClick(e)).toBe(false)
+      const result = await component.handleClick(e)
+      expect(result).toBe(false)
     })
 
-    it('returns false if searchResult is true', () => {
+    it('returns false if searchResult is true', async () => {
       wrapper.setProps({
         dragging: false,
         item: { ...item, searchResult: true },
       })
-      expect(component.handleClick(e)).toBe(false)
+      const result = await component.handleClick(e)
+      expect(result).toBe(false)
     })
 
-    it('calls uiStore.update textEditingItem if can_edit_content', () => {
+    it('calls uiStore.update textEditingItem if can_edit_content', async () => {
       wrapper.setProps({
         dragging: false,
         item: { ...item, can_edit_content: true },
       })
-      expect(component.handleClick(e)).toBe(null)
+      const result = await component.handleClick(e)
+      expect(result).toBe(null)
       expect(uiStore.update).toHaveBeenCalledWith(
         'textEditingItem',
         expect.any(Object)
       )
+    })
+
+    it('calls apiStore.fetch item if can_edit_content', async () => {
+      wrapper.setProps({
+        dragging: false,
+        item: { ...item, can_edit_content: true },
+      })
+      const result = await component.handleClick(e)
+      expect(result).toBe(null)
+      expect(apiStore.fetch).toHaveBeenCalledWith('items', item.id, true)
     })
   })
 })

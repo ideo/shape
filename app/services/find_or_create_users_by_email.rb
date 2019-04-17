@@ -1,4 +1,4 @@
-class CreatePendingUsers
+class FindOrCreateUsersByEmail
   attr_reader :failed_emails, :users
 
   def initialize(emails:)

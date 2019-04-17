@@ -5,17 +5,27 @@ class Api::V1::GroupsController < Api::V1::BaseController
 
   # All the current user's groups in this org
   # /organizations/:id/groups
+  before_action :load_user_groups, only: %i[index]
+  before_action :load_and_filter_index, only: %i[index]
   def index
-    render jsonapi: current_user.groups.where(organization_id: @organization.id).order(name: :asc)
+    render jsonapi: @groups
   end
 
   def show
     render jsonapi: @group, include: [roles: %i[users groups]]
   end
 
+  before_action :check_group_organization_param, only: %i[create]
   before_action :authorize_current_organization, only: %i[create]
   def create
+    external_id = params[:group].delete(:external_id)
     @group.organization = current_organization
+    if external_id.present? && current_user.application
+      @group.external_records.build(
+        external_id: external_id,
+        application: current_user.application,
+      )
+    end
     if @group.save
       current_user.add_role(Role::ADMIN, @group)
       render jsonapi: @group.reload, include: [roles: [:users]]
@@ -49,8 +59,29 @@ class Api::V1::GroupsController < Api::V1::BaseController
 
   private
 
+  def check_group_organization_param
+    organization_id = params[:group].delete(:organization_id)
+    return unless organization_id.present?
+    @current_organization = Organization.find(organization_id)
+  end
+
   def authorize_current_organization
     authorize! :read, current_organization
+  end
+
+  def load_user_groups
+    if current_organization.blank?
+      @groups = []
+    elsif current_api_token.present?
+      # Allow them access to any group in the org,
+      # the user doesn't have to be an admin on it
+      @groups = Group.where(organization_id: current_organization.id)
+                     .order(name: :asc)
+    else
+      @groups = current_user.groups
+                            .where(organization_id: current_organization.id)
+                            .order(name: :asc)
+    end
   end
 
   def group_params

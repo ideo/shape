@@ -3,8 +3,13 @@ class Api::V1::ItemsController < Api::V1::BaseController
   load_and_authorize_resource :collection_card, only: :create
   load_and_authorize_resource except: %i[update in_my_collection]
 
+  before_action :load_and_filter_index, only: %i[index]
+  def index
+    render jsonapi: @items, include: params[:include]
+  end
+
   def show
-    log_item_activity(:viewed)
+    log_item_activity(:viewed) if log_activity?
     render jsonapi: @item,
            include: [:filestack_file, :parent, :parent_collection_card, roles: %i[users groups resource]],
            expose: { current_record: @item }
@@ -22,13 +27,15 @@ class Api::V1::ItemsController < Api::V1::BaseController
   def update
     @item.attributes = item_params
     if @item.save
-      log_item_activity(:edited)
-      CollectionUpdateBroadcaster.call(@item.parent, current_user)
+      log_item_activity(:edited) if log_activity?
+      broadcaster = CollectionUpdateBroadcaster.new(@item.parent, current_user)
+      if @item.is_a? Item::TextItem
+        broadcaster.text_item_updated(@item)
+      else
+        broadcaster.call
+      end
       # cancel_sync means we don't want to render the item JSON
       return if @cancel_sync
-      if @item.is_a?(Item::TextItem)
-        @item.stopped_editing(current_user)
-      end
       render jsonapi: @item, expose: { current_record: @item }
     else
       render_api_errors @item.errors
@@ -80,11 +87,13 @@ class Api::V1::ItemsController < Api::V1::BaseController
     params.require(:item).permit(
       :type,
       :name,
+      :external_id,
       :content,
-      { text_data: {} },
+      { data_content: {} },
       { data_settings: [
         :d_measure,
         :d_timeframe,
+        selected_measures: [],
         d_filters: %i[type target],
       ] },
       :url,
@@ -92,6 +101,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
       :archived,
       :tag_list,
       :thumbnail_url,
+      :legend_item_id,
       filestack_file_attributes: Item.filestack_file_attributes_whitelist,
     )
   end

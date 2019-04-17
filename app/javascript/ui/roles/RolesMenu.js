@@ -23,18 +23,24 @@ function sortUserOrGroup(a, b) {
 
 const ScrollArea = styled.div`
   flex: 1 1 auto;
-  min-height: 100px;
+  min-height: 220px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+`
+
+const FooterBreak = styled.div`
+  border-top: 1px solid ${v.colors.commonMedium};
+  width: 100%;
 `
 
 const FooterArea = styled.div`
   flex: 0 0 auto;
   padding-top: 24px;
-  padding-bottom: ${props => (props.menuOpen ? 100 : 30)}px;
+  padding-bottom: 30px;
 `
 
 const StyledHeaderRow = styled(Row)`
+  flex: 0 0 auto;
   flex-wrap: wrap;
   justify-content: space-between;
   margin-left: 0;
@@ -43,10 +49,29 @@ const StyledHeaderRow = styled(Row)`
     width: 100%;
   }
 `
-const StyledRow = styled(Row)`
+const GroupHeader = styled.div`
+  background-color: ${v.colors.white};
   cursor: pointer;
-  margin-left: 0;
+  margin-bottom: 15px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  ${props =>
+    props.open &&
+    `&:after {
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 4%, rgba(0, 0, 0, 0));
+      content: "";
+      display: block;
+      position: absolute;
+      height: 5px;
+      width: 100%;
+    }`};
 `
+const StyledRow = styled(Row)`
+  margin-left: 0;
+  margin-bottom: 0;
+`
+
 const StyledCollapseToggle = styled.button`
   .icon {
     width: 24px;
@@ -134,9 +159,12 @@ class RolesMenu extends React.Component {
 
     const groups = this.setupEntityGroups(sortedRoleEntities, counts)
 
+    const pendingPanelOpen =
+      (counts.active === 0 && counts.pending > 0) || status === 'pending'
+
     this.setState(prevState => ({
       groups,
-      pendingPanelOpen: counts.active === 0 && counts.pending > 0,
+      pendingPanelOpen,
       page: {
         pending:
           status === 'pending' || status === 'both'
@@ -282,41 +310,42 @@ class RolesMenu extends React.Component {
 
     return (
       <Fragment>
+        <StyledHeaderRow align="flex-end">
+          <Heading3>{title}</Heading3>
+          <SearchButton
+            value={this.state.searchText}
+            onChange={this.handleSearchChange}
+            onClear={this.clearSearch}
+          />
+        </StyledHeaderRow>
         <ScrollArea>
-          <StyledHeaderRow align="flex-end">
-            <Heading3>{title}</Heading3>
-            <SearchButton
-              value={this.state.searchText}
-              onChange={this.handleSearchChange}
-              onClear={this.clearSearch}
-            />
-          </StyledHeaderRow>
-
           {groups.map(group => {
             const { panelTitle, entities, count, status } = group
             if (entities.length === 0) return null
 
             return (
               <div key={panelTitle}>
-                <StyledRow
-                  align="center"
+                <GroupHeader
                   onClick={() => this.togglePanel(group)}
+                  open={this.isOpenPanel(group)}
                 >
-                  <DisplayText>
-                    {panelTitle} ({count})
-                  </DisplayText>
-                  <RowItemLeft style={{ marginLeft: '0px' }}>
-                    {this.isOpenPanel(group) ? (
-                      <StyledCollapseToggle aria-label="Collapse">
-                        <DropdownIcon />
-                      </StyledCollapseToggle>
-                    ) : (
-                      <StyledExpandToggle aria-label="Expand">
-                        <DropdownIcon />
-                      </StyledExpandToggle>
-                    )}
-                  </RowItemLeft>
-                </StyledRow>
+                  <StyledRow align="center">
+                    <DisplayText>
+                      {panelTitle} ({count})
+                    </DisplayText>
+                    <RowItemLeft style={{ marginLeft: '0px' }}>
+                      {this.isOpenPanel(group) ? (
+                        <StyledCollapseToggle aria-label="Collapse">
+                          <DropdownIcon />
+                        </StyledCollapseToggle>
+                      ) : (
+                        <StyledExpandToggle aria-label="Expand">
+                          <DropdownIcon />
+                        </StyledExpandToggle>
+                      )}
+                    </RowItemLeft>
+                  </StyledRow>
+                </GroupHeader>
                 <Collapse
                   in={this.isOpenPanel(group)}
                   timeout="auto"
@@ -360,16 +389,21 @@ class RolesMenu extends React.Component {
           })}
         </ScrollArea>
         {canEdit && (
-          <FooterArea menuOpen={uiStore.autocompleteValues > 0}>
-            <Heading3>{addCallout}</Heading3>
-            <RolesAdd
-              roleTypes={addRoleTypes}
-              roleLabels={submissionBox ? { viewer: 'participant' } : {}}
-              onCreateRoles={this.createRoles}
-              onCreateUsers={this.onCreateUsers}
-              ownerType={ownerType}
-            />
-          </FooterArea>
+          <Fragment>
+            <Row>
+              <FooterBreak />
+            </Row>
+            <FooterArea>
+              <RolesAdd
+                title={addCallout}
+                roleTypes={addRoleTypes}
+                roleLabels={submissionBox ? { viewer: 'participant' } : {}}
+                onCreateRoles={this.createRoles}
+                onCreateUsers={this.onCreateUsers}
+                ownerType={ownerType}
+              />
+            </FooterArea>
+          </Fragment>
         )}
       </Fragment>
     )

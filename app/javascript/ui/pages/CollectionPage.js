@@ -34,6 +34,7 @@ class CollectionPage extends React.Component {
   @observable
   cardsFetched = false
 
+  updatePoller = null
   editorTimeout = null
   channelName = 'CollectionViewingChannel'
 
@@ -95,6 +96,9 @@ class CollectionPage extends React.Component {
       if (uiStore.actionAfterRoute) {
         uiStore.performActionAfterRoute()
       }
+      if (collection.awaiting_updates) {
+        this.pollForUpdates()
+      }
     })
 
     // setViewingCollection has to happen first bc we use it in openBlankContentTool
@@ -121,6 +125,27 @@ class CollectionPage extends React.Component {
       uiStore.popupSnackbar({ message })
     }
     uiStore.update('dragTargets', [])
+  }
+
+  pollForUpdates() {
+    const { collection, apiStore, uiStore } = this.props
+    this.updatePoller = setInterval(async () => {
+      if (collection.awaiting_updates) {
+        const res = await apiStore.fetch('collections', collection.id, true)
+        if (!res.data.awaiting_updates) {
+          collection.API_fetchCards()
+        } else if (uiStore.dialogConfig.open !== 'loading') {
+          uiStore.loadingDialog({
+            prompt:
+              'Please wait while we build your account. This should take from 15 to 30 seconds.',
+            iconName: 'Celebrate',
+          })
+        }
+      } else {
+        clearInterval(this.updatePoller)
+        uiStore.closeDialog()
+      }
+    }, 2000)
   }
 
   async checkSubmissionBox() {
@@ -169,7 +194,6 @@ class CollectionPage extends React.Component {
     const submissionsId = submissions ? submissions.id : ''
 
     if (_.compact([currentId, submissionsId]).indexOf(data.record_id) > -1) {
-      this.setEditor(data.current_editor)
       if (
         !_.isEmpty(data.current_editor) &&
         data.current_editor.id === apiStore.currentUserId
@@ -177,13 +201,41 @@ class CollectionPage extends React.Component {
         // don't reload your own updates
         return
       }
+      if (data.data && data.data.item) {
+        const { item } = data.data
+        if (item && item.data_content) {
+          this.handleTextItemUpdate(item, data.current_editor)
+          return
+        }
+      }
+      this.setEditor(data.current_editor)
       this.reloadData()
     }
   }
 
+  handleTextItemUpdate = (item, current_editor) => {
+    const { apiStore, uiStore } = this.props
+    const localItem = apiStore.find('items', item.id)
+    if (localItem) {
+      // update with incoming content UNLESS we are editing that item
+      if (
+        uiStore.textEditingItem &&
+        uiStore.textEditingItem.id === localItem.id
+      ) {
+        return
+      }
+      localItem.data_content = item.data_content
+    } else {
+      // we don't have the item, it must be a new card that we need to fetch
+      this.reloadData()
+    }
+    this.setEditor(current_editor)
+  }
+
   async _reloadData() {
     const { collection } = this.props
-    collection.API_fetchCards({ per_page: collection.collection_cards.length })
+    const per_page = collection.collection_cards.length || 50
+    collection.API_fetchCards({ per_page })
     if (this.collection.submissions_collection) {
       this.setLoadedSubmissions(false)
       await this.collection.submissions_collection.API_fetchCards()
@@ -286,7 +338,6 @@ class CollectionPage extends React.Component {
             template: collection.submission_template,
           }}
           movingCardIds={[]}
-          movingCards={false}
           sorting
         />
         <FloatingActionButton
@@ -308,11 +359,25 @@ class CollectionPage extends React.Component {
     </div>
   )
 
+  transparentLoader = () => (
+    <div
+      style={{
+        marginTop: v.headerHeight,
+        position: 'fixed',
+        top: 0,
+        left: 'calc(50% - 50px)',
+      }}
+    >
+      <Loader />
+    </div>
+  )
+
   render() {
     const { collection, isHomepage, uiStore } = this.props
     if (!collection) {
       return this.loader()
     }
+
     // NOTE: if we have first loaded the slimmer SerializableSimpleCollection via the CommentThread
     // then some fields like `can_edit` will be undefined.
     // So we check if the full Collection has loaded via the `can_edit` attr
@@ -320,7 +385,9 @@ class CollectionPage extends React.Component {
     const isLoading =
       collection.meta.snapshot.can_edit === undefined ||
       (!this.cardsFetched && collection.collection_cards.length === 0) ||
+      collection.awaiting_updates ||
       uiStore.isLoading
+    const isTransparentLoading = !!uiStore.movingIntoCollection
 
     const {
       blankContentToolState,
@@ -330,13 +397,6 @@ class CollectionPage extends React.Component {
 
     // submissions_collection will only exist for submission boxes
     const { isSubmissionBox, requiresTestDesigner } = collection
-    const { movingCardIds, cardAction } = uiStore
-    // only tell the Grid to hide "movingCards" if we're moving and not linking
-    const uiMovingCardIds =
-      ['move', 'moveWithinCollection'].indexOf(cardAction) > -1
-        ? movingCardIds
-        : []
-
     return (
       <Fragment>
         <PageHeader record={collection} isHomepage={isHomepage} />
@@ -357,9 +417,10 @@ class CollectionPage extends React.Component {
                 cardProperties={collection.cardProperties}
                 // Pass in BCT state so grid will re-render when open/closed
                 blankContentToolState={blankContentToolState}
-                movingCardIds={uiMovingCardIds}
-                // passing length prop seems to properly trigger a re-render
-                movingCards={uiStore.movingCardIds.length}
+                // to trigger a re-render
+                movingCardIds={
+                  uiStore.isMovingCards ? [...uiStore.movingCardIds] : []
+                }
                 // don't add the extra row for submission box
                 addEmptyCard={!isSubmissionBox}
               />
@@ -381,6 +442,7 @@ class CollectionPage extends React.Component {
           </PageContainer>
         )}
         {isLoading && this.loader()}
+        {!isLoading && isTransparentLoading && this.transparentLoader()}
       </Fragment>
     )
   }

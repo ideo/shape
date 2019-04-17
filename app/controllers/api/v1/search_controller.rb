@@ -50,7 +50,6 @@ class Api::V1::SearchController < Api::V1::BaseController
 
   def capture_query_params
     @query = params[:query] || ''
-    @page = params[:page].present? ? params[:page].to_i : 1
   end
 
   def search_records

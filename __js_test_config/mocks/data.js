@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { observable } from "mobx"
 
 const fakeJsonApiAttrs = {
   assign: jest.fn(),
@@ -31,7 +32,7 @@ export const fakeTextItemAttrs = {
   type: 'Item::TextItem',
   internalType: 'items',
   name: 'My Cool Item',
-  text_data:
+  data_content:
     'This is the content for the item and it contains multiple sentences. Like this one.',
   breadcrumb: [['collections', 1, 'Some collection'], ['items', 1, 'my item']],
   parentPath: '/',
@@ -40,6 +41,118 @@ export const fakeTextItemAttrs = {
   internalType: 'items',
   parent_collection_card: fakeCollectionCard,
 }
+
+export const fakeDataset = {
+  measure: 'participants',
+  description: 'A description',
+  timeframe: 'month',
+  chart_type: 'area',
+  order: 0,
+  data: [
+    { date: '2018-07-10', value: 10 },
+    { date: '2018-08-10', value: 25 },
+    { date: '2018-09-10', value: 30 },
+  ],
+}
+
+export const fakeDataItemCollectionsItemsAttrs = {
+  ...fakeTextItemAttrs,
+  type: 'Item::DataItem',
+  data_content: null,
+  report_type: 'report_type_collections_and_items',
+  isReportTypeCollectionsItems: true,
+  isReportTypeNetworkAppMetric: false,
+  isReportTypeRecord: false,
+  data_settings: {
+    d_measure: 'participants',
+    d_timeframe: 'month'
+  },
+  measure: {
+    name: 'Participants'
+  },
+  primaryDataset: fakeDataset,
+  datasets: [
+    fakeDataset
+  ],
+}
+
+export const fakeLegendItemAttrs = {
+  ...fakeTextItemAttrs,
+  type: 'Item::LegendItem',
+  primary_measure: {
+    measure: 'Business Unit',
+    order: 0,
+    style: { fill: '#9874AB' }
+  },
+  comparison_measures: [
+    {
+      measure: '95th Percentile',
+      order: 1
+    },
+    {
+      measure: '75th Percentile',
+      order: 2
+    },
+  ],
+  data_settings: {
+    selected_measures: observable([
+      '95th Percentile'
+    ])
+  }
+}
+
+export const fakeLegendItem = {
+  ...fakeLegendItemAttrs,
+  rawAttributes: jest.fn().mockReturnValue(fakeLegendItemAttrs),
+  getRecordType: jest.fn().mockReturnValue('items'),
+  save: jest.fn().mockReturnValue(Promise.resolve({})),
+}
+
+export const fakeLegendItemCard = {
+  ...fakeItemCard,
+  record: fakeLegendItem
+}
+
+export const creativeDifferenceQualityDataset = {
+  measure: 'Purpose',
+  description:
+    'The degree to which there is alignment about a meaningful change that leadership and employees want to make in the world.',
+  timeframe: 'month',
+  chart_type: 'area',
+  single_value: 0,
+  order: 0,
+  style: {
+    fill: '#EFEFEF',
+    dashWidth: 2,
+  },
+  data: [
+    { date: '2018-07-10', value: 10 },
+    { date: '2018-08-10', value: 25 },
+    { date: '2018-09-10', value: 30 },
+  ],
+}
+
+export const fakeDataItemRecordAttrs = {
+  ...fakeTextItemAttrs,
+  type: 'Item::DataItem',
+  data_content: null,
+  name: 'Data Item',
+  report_type: 'report_type_record',
+  isReportTypeCollectionsItems: false,
+  isReportTypeNetworkAppMetric: false,
+  isReportTypeRecord: true,
+  primaryDataset: creativeDifferenceQualityDataset,
+  datasets: [
+    creativeDifferenceQualityDataset,
+    {
+      ...creativeDifferenceQualityDataset,
+      measure: '95th Percentile',
+      order: 1,
+      chart_type: 'line'
+    }
+  ],
+}
+
 export const fakeTextItem = {
   ...fakeTextItemAttrs,
   rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),

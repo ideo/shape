@@ -7,6 +7,8 @@ import queryString from 'query-string'
 
 import { apiUrl } from '~/utils/url'
 import trackError from '~/utils/trackError'
+import googleTagManager from '~/vendor/googleTagManager'
+
 import Activity from './jsonApi/Activity'
 import Collection from './jsonApi/Collection'
 import CollectionCard from './jsonApi/CollectionCard'
@@ -22,7 +24,6 @@ import CommentThread from './jsonApi/CommentThread'
 import UsersThread from './jsonApi/UsersThread'
 import SurveyResponse from './jsonApi/SurveyResponse'
 import QuestionAnswer from './jsonApi/QuestionAnswer'
-import { undoStore } from './index'
 
 class ApiStore extends jsonapi(datxCollection) {
   @observable
@@ -55,6 +56,13 @@ class ApiStore extends jsonapi(datxCollection) {
   // doesn't have any need to be observable...
   filestackToken = {}
   filestackTokenInterval = null
+
+  constructor({ routingStore, uiStore, undoStore } = {}) {
+    super()
+    this.routingStore = routingStore
+    this.uiStore = uiStore
+    this.undoStore = undoStore
+  }
 
   fetch(type, id, skipCache = false) {
     return super.fetch(type, id, { skipCache })
@@ -142,7 +150,6 @@ class ApiStore extends jsonapi(datxCollection) {
       const currentUser = res.data
       this.setCurrentUserInfo({
         id: currentUser.id,
-        filestackToken: currentUser.filestack_token,
         organizationId:
           currentUser.current_organization &&
           currentUser.current_organization.id,
@@ -384,7 +391,7 @@ class ApiStore extends jsonapi(datxCollection) {
     )
     if (undoable) {
       const snapshot = collection.toJsonApiWithCards()
-      undoStore.pushUndoAction({
+      this.undoStore.pushUndoAction({
         message: 'Archive undone',
         apiCall: () => this.unarchiveCards({ cardIds, snapshot }),
         redirectPath: { type: 'collections', id: collection.id },
@@ -423,7 +430,7 @@ class ApiStore extends jsonapi(datxCollection) {
   async duplicateCards(data) {
     const res = await this.request('collection_cards/duplicate', 'POST', data)
     const collection = this.find('collections', data.to_id)
-    undoStore.pushUndoAction({
+    this.undoStore.pushUndoAction({
       message: 'Duplicate undone',
       apiCall: () =>
         this.archiveCards({
@@ -485,29 +492,20 @@ class ApiStore extends jsonapi(datxCollection) {
     }
   }
 
-  checkCurrentOrganizationPayments() {
-    return this.request(
+  async checkCurrentOrganizationPayments() {
+    const { has_payment_method } = this.currentUserOrganization
+    const res = await this.request(
       `organizations/${this.currentUserOrganizationId}/check_payments`
     )
-  }
-
-  beginTokenRefreshPoller() {
-    if (this.filestackTokenInterval) {
-      clearInterval(this.filestackTokenInterval)
+    const org = res.data
+    if (!has_payment_method && org.has_payment_method) {
+      // payment method was successfully added
+      googleTagManager.push({
+        event: 'formSubmission',
+        formType: 'Added Payment Method',
+      })
     }
-    // token expires in an hour, attempt refresh every 20m just to be safe
-    this.filestackTokenInterval = setInterval(() => {
-      this.refreshFilestackToken()
-    }, 1000 * 60 * 20)
-  }
-
-  async refreshFilestackToken() {
-    try {
-      this.filestackToken = await this.requestJson('filestack/token')
-    } catch (e) {
-      trackError(e, { source: 'refreshFilestackToken', name: 'fetchToken' })
-    }
-    return this.filestackToken
+    return org
   }
 
   // default action for updating any basic apiStore value

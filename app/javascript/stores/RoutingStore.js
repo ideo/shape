@@ -7,6 +7,7 @@ import { apiStore, uiStore } from '~/stores'
 // mobx-react-router with a couple of helper methods
 class RoutingStore extends RouterStore {
   previousPageBeforeSearch = null
+  routingTo = { type: null, id: null }
 
   slug = () => apiStore.currentOrgSlug
 
@@ -33,6 +34,8 @@ class RoutingStore extends RouterStore {
   }
 
   routeTo = (type, id = null) => {
+    this.routingTo = { type, id }
+
     // close the org/roles menus if either are open when we route to a new page
     uiStore.update('organizationMenuPage', null)
     uiStore.update('rolesMenuOpen', null)

@@ -55,36 +55,42 @@ class FilestackFile < ApplicationRecord
     @api_client ||= FilestackClient.new(ENV['FILESTACK_API_KEY'], security: filestack_security)
   end
 
-  def self.filestack_security
+  def self.filestack_security(read_only: true)
     raise 'FilestackSecurity needs FILESTACK_API_SECRET to be set' if ENV['FILESTACK_API_SECRET'].blank?
+    permissions = %w[read convert stat exif]
+    permissions += %w[store pick] unless read_only
     FilestackSecurity.new(
       ENV['FILESTACK_API_SECRET'],
       options: {
         expiry: TOKEN_EXPIRATION.to_i,
-        call: %w[read store pick convert stat exif],
+        call: permissions,
       },
     )
   end
 
-  def self.security_token
-    security = filestack_security
+  def self.security_token(read_only: true)
+    security = filestack_security(read_only: read_only)
     {
       policy: security.policy,
       signature: security.signature,
     }
   end
 
-  def self.signed_url(handle)
+  def self.signed_url(handle, type:)
     token = security_token
     %(https://process.filestackapi.com/#{ENV['FILESTACK_API_KEY']}
       /security=policy:#{token[:policy]},signature:#{token[:signature]}
-      /rotate=deg:exif
+      /#{type == :video ? 'video_convert=preset:h264' : 'rotate=deg:exif'}
       /#{handle}
     ).gsub(/\s+/, '')
   end
 
   def signed_url
-    FilestackFile.signed_url(handle)
+    FilestackFile.signed_url(handle, type: :image)
+  end
+
+  def video_conversion_url
+    FilestackFile.signed_url(handle, type: :video)
   end
 
   def filestack_filelink

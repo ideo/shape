@@ -11,8 +11,7 @@ describe Api::V1::QuestionAnswersController, type: :request, json: true do
     let(:params) {
       json_api_params(
         'question_answers',
-        'answer_text': 'I do not like green eggs and ham.',
-        'answer_number': nil,
+        'answer_number': 2,
         'question_id': question.id,
       )
     }
@@ -34,9 +33,24 @@ describe Api::V1::QuestionAnswersController, type: :request, json: true do
     context 'with invalid test collection' do
       let(:test_collection) { create(:test_collection, test_status: :closed) }
 
-      it 'returns a 400' do
+      it 'returns a 422' do
         post(path, params: params)
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
+      end
+    end
+
+    context 'with no answer number' do
+      let(:params_without_answer) do
+        json_api_params(
+          'question_answers',
+          'answer_number': nil,
+          'question_id': question.id,
+        )
+      end
+
+      it 'returns a 422' do
+        post(path, params: params_without_answer)
+        expect(response.status).to eq(422)
       end
     end
   end
@@ -82,9 +96,9 @@ describe Api::V1::QuestionAnswersController, type: :request, json: true do
     context 'with invalid test collection' do
       let(:test_collection) { create(:test_collection, test_status: :closed) }
 
-      it 'returns a 400' do
+      it 'returns a 422' do
         patch(path, params: params)
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
     end
   end

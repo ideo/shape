@@ -21,6 +21,9 @@ const props = {
   canEditCollection: false,
   isUserCollection: false,
   isSharedCollection: false,
+  hoveringOverLeft: false,
+  hoveringOverRight: false,
+  holdingOver: false,
 }
 
 let wrapper
@@ -91,6 +94,17 @@ describe('MovableGridCard', () => {
         wrapper.find('Rnd').props().enableResizing.bottomRight
       ).toBeTruthy()
       expect(wrapper.find('Rnd').props().disableDragging).toBeFalsy()
+    })
+  })
+
+  describe('when hoveringOverRight', () => {
+    beforeEach(() => {
+      props.hoveringOverRight = true
+      wrapper = shallow(<MovableGridCard {...props} />)
+    })
+
+    it('passes hoveringOver to GridCard', () => {
+      expect(wrapper.find('GridCard').props().hoveringOver).toBe(true)
     })
   })
 })

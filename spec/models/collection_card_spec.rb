@@ -166,8 +166,9 @@ RSpec.describe CollectionCard, type: :model do
         expect { duplicate_without_user }.to change(Item, :count).by(1)
       end
 
-      context 'in a master template' do
+      context 'in a master template with 1 or more instances' do
         let(:collection) { collection_card.parent }
+        let!(:instance) { create(:collection, template: collection) }
 
         before do
           collection.update(master_template: true)
@@ -177,6 +178,17 @@ RSpec.describe CollectionCard, type: :model do
           expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(collection.id)
           duplicate
         end
+      end
+    end
+
+    context 'with specified order placement' do
+      let!(:collection) { create(:collection, num_cards: 3, record_type: :collection) }
+      let(:collection_card) { collection.collection_cards.first }
+      let(:placement) { 1 }
+
+      it 'should place the duplicate in the middle of the collection' do
+        expect(duplicate.order).to eq 1
+        expect(collection.collection_cards.second).to eq duplicate
       end
     end
 
@@ -507,8 +519,9 @@ RSpec.describe CollectionCard, type: :model do
         collection_cards.archive_all!(user_id: user.id)
       end
 
-      context 'with a master template collection' do
+      context 'with a master template collection with 1 or more instances' do
         let(:collection) { create(:collection, master_template: true, num_cards: 2) }
+        let!(:instance) { create(:collection, template: collection) }
 
         it 'should call the UpdateTemplateInstancesWorker' do
           expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(collection.id)

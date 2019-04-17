@@ -16,6 +16,24 @@ import OverdueClockIcon from '~/ui/icons/OverdueClockIcon'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import TestGraphIcon from '~/ui/icons/TestGraphIcon'
 
+export const iconNames = [
+  'Alert',
+  'Archive',
+  'Back',
+  'Celebrate',
+  'Close',
+  'CloseSubtractGroup',
+  'Clock',
+  'Hidden',
+  'Leave',
+  'Link',
+  'Mail',
+  'Ok',
+  'OverdueClock',
+  'Template',
+  'TestGraph',
+]
+
 export default {
   AlertIcon,
   ArchiveIcon,

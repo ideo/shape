@@ -60,11 +60,11 @@ StyledCollectionCover.displayName = 'StyledCollectionCover'
 const pad = 16
 const calcSectionWidth = props => {
   if (props.width === 4) {
-    return `${props.gridW * 2 - props.gutter * 1}px`
+    return `${props.gridW * 2 - props.gutter * 2}px`
   } else if (props.width > 1) {
-    return `${props.gridW - props.gutter * 2}px`
+    return `${props.gridW - props.gutter * 3}px`
   }
-  return `calc(100% - ${props.gutter * 2}px)`
+  return `calc(100% - ${props.gutter * 3}px)`
 }
 
 const calcSectionHeight = props => {
@@ -77,6 +77,11 @@ const calcSectionHeight = props => {
 const StyledCardContent = styled.div`
   .top,
   .bottom {
+    font-family: ${v.fonts.sans};
+    font-size: 1rem;
+    letter-spacing: 0;
+    line-height: 1.375rem;
+
     position: absolute;
     right: 1.5rem;
     width: ${props => calcSectionWidth(props)};
@@ -86,7 +91,7 @@ const StyledCardContent = styled.div`
     top: ${props => props.gutter / 2 + pad}px;
   }
   .bottom {
-    bottom: ${props => (props.height === 1 ? 6 : pad)}px;
+    bottom: ${props => (props.height === 1 ? 4 : pad)}px;
   }
   ${props =>
     props.width > 1 &&

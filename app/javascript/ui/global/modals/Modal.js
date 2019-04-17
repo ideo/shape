@@ -3,7 +3,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import Dialog from '@material-ui/core/Dialog'
-import DialogContent from '@material-ui/core/DialogContent'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import Fade from '@material-ui/core/Fade'
 
@@ -11,6 +10,7 @@ import { Heading2 } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 import ArrowIcon from '~/ui/icons/ArrowIcon'
 import CloseIcon from '~/ui/icons/CloseIcon'
+import { uiStore } from '~/stores'
 
 const StyledDialog = styled(Dialog)`
   .modal__paper {
@@ -24,14 +24,18 @@ const StyledDialog = styled(Dialog)`
       max-height: 100%;
     }
   }
-  .modal__padding {
-    padding-left: 45px;
+`
+
+const StyledDialogContent = styled.div`
+  flex: 1 1 auto;
+  &.modal__padding {
+    padding: 0 24px 24px 45px;
     @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
       padding-left: 16px;
       padding-right: 16px;
     }
   }
-  .modal__no-scroll {
+  &.modal__no-scroll {
     padding-top: 0px;
     padding-bottom: 0px;
     overflow-y: auto;
@@ -121,6 +125,16 @@ Dialog.defaultProps = {
 }
 
 class Modal extends React.Component {
+  constructor(props) {
+    super(props)
+    this.contentArea = React.createRef()
+  }
+
+  componentDidUpdate() {
+    // have to update the ref while we navigate / change the modal
+    uiStore.update('modalContentRef', this.contentArea)
+  }
+
   handleClose = ev => {
     ev.preventDefault()
     const { onClose } = this.props
@@ -175,13 +189,14 @@ class Modal extends React.Component {
             <CloseIcon />
           </ModalCloseButton>
         )}
-        <DialogContent
-          classes={{
-            root: ['modal__padding', noScroll && 'modal__no-scroll'].join(' '),
-          }}
+        <StyledDialogContent
+          innerRef={this.contentArea}
+          className={['modal__padding', noScroll && 'modal__no-scroll'].join(
+            ' '
+          )}
         >
           {children}
-        </DialogContent>
+        </StyledDialogContent>
       </StyledDialog>
     )
   }

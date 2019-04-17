@@ -174,6 +174,13 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
   describe 'POST #create' do
     let(:path) { '/api/v1/collection_cards' }
+    let(:item_attributes) do
+      {
+        content: 'This is my item content',
+        data_content: { ops: [{ insert: 'This is my item content.' }] },
+        type: 'Item::TextItem',
+      }
+    end
     let(:raw_params) do
       {
         order: 1,
@@ -182,11 +189,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         # parent_id is required to retrieve the parent collection without a nested route
         parent_id: collection.id,
         # create with a nested item
-        item_attributes: {
-          content: 'This is my item content',
-          text_data: { ops: [{ insert: 'This is my item content.' }] },
-          type: 'Item::TextItem',
-        },
+        item_attributes: item_attributes,
       }
     end
     let(:params) { json_api_params('collection_cards', raw_params) }
@@ -242,19 +245,47 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         post(path, params: params)
       end
 
-      it 'broadcasts collection updates' do
-        expect(CollectionUpdateBroadcaster).to receive(:call).with(
-          collection,
-          user,
-        )
-        post(path, params: params)
+      context 'broadcasting updates' do
+        context 'with a text item' do
+          let(:item_attributes) do
+            {
+              content: '',
+              data_content: {},
+              type: 'Item::TextItem',
+            }
+          end
+
+          it 'does not broadcast collection updates' do
+            # text items get created empty so we don't broadcast yet
+            expect(CollectionUpdateBroadcaster).not_to receive(:call)
+            post(path, params: params)
+          end
+        end
+
+        context 'with a link item' do
+          let(:item_attributes) do
+            {
+              content: 'This is my item content',
+              url: Faker::Internet.url('example.com'),
+              type: 'Item::LinkItem',
+            }
+          end
+
+          it 'broadcasts collection updates' do
+            expect(CollectionUpdateBroadcaster).to receive(:call).with(
+              collection,
+              user,
+            )
+            post(path, params: params)
+          end
+        end
       end
     end
 
     context 'with errors' do
-      it 'returns a 400 bad request' do
+      it 'returns a 422 bad request' do
         post(path, params: bad_params)
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
     end
 
@@ -458,6 +489,27 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
+    context 'trying to move inside itself' do
+      let!(:from_collection) do
+        create(:collection, organization: to_collection.organization, add_editors: [user])
+      end
+      let!(:subcollection_card) { create(:collection_card, parent: from_collection) }
+      let!(:to_collection) { create(:collection, add_editors: [user]) }
+      let(:moving_cards) { [subcollection_card] }
+
+      before do
+        to_collection.update(
+          parent_collection_card: subcollection_card,
+        )
+        user.add_role(Role::EDITOR, to_collection)
+      end
+
+      it 'returns a 422 unprocessable_entity' do
+        patch(path, params: params)
+        expect(response.status).to eq(422)
+      end
+    end
+
     context 'with content editor access for to_collection' do
       let(:editor) { create(:user) }
       let(:viewer) { create(:user) }
@@ -486,7 +538,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         patch(path, params: params)
         combined_cards = to_collection.reload.collection_cards
         # expect to find moved cards at the front
-        expect(combined_cards.first(2)).to match_array moving_cards
+        expect(combined_cards.first(2)).to eq moving_cards
         expect(combined_cards.count).to eq 5
       end
 
@@ -514,6 +566,19 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       it 'creates an activity' do
         expect(ActivityAndNotificationBuilder).to receive(:call).twice
         patch(path, params: params)
+      end
+
+      context 'with specific order' do
+        before do
+          moving_cards.first.update(order: 1)
+          moving_cards.last.update(order: 0)
+        end
+
+        it 'moves new cards to the front of the collection and preserves order' do
+          patch(path, params: params)
+          combined_cards = to_collection.reload.collection_cards
+          expect(combined_cards.first).to eq moving_cards.last
+        end
       end
     end
   end
@@ -646,9 +711,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         to_collection.recalculate_breadcrumb!
       end
 
-      it 'returns a 400' do
+      it 'returns a 422' do
         post(path, params: params)
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
     end
 

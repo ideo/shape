@@ -62,6 +62,7 @@ export const Label = styled.label`
 `
 Label.displayName = 'StyledLabel'
 
+/* eslint-disable no-nested-ternary */
 /** @component */
 export const FormButton = styled.button`
   width: ${props => (props.width ? props.width : 183)}px;
@@ -90,18 +91,20 @@ export const FormButton = styled.button`
   &:hover,
   &:focus {
     background-color: ${props =>
-      props.color === v.colors.primaryDark
-        ? v.colors.primaryDarkest
-        : v.colors.commonDark};
+      props.disabledHover
+        ? props.color
+        : props.color === v.colors.primaryDark
+          ? v.colors.primaryDarkest
+          : v.colors.commonDark};
   }
   ${props =>
     props.disabled &&
-    `background-color: white;
-      border: 1px solid ${v.colors.commonMedium};
-      color:  ${v.colors.commonMedium};
+    `background-color: transparent;
+      border: 1px solid ${props.overrideOutlineColor || v.colors.commonMedium};
+      color:  ${props.overrideOutlineColor || v.colors.commonMedium};
       cursor: initial;
       &:hover, &:focus {
-        background-color: white;
+        background-color: transparent;
       }
     `};
 `
@@ -288,6 +291,9 @@ Select.displayName = 'StyledSelect'
 export const Checkbox = styled(MuiCheckbox)`
   &.checkbox--error {
     color: ${v.colors.alert};
+  }
+  &.checkbox--black {
+    color: ${v.colors.black} !important;
   }
   &.checkbox--white,
   &.checkbox--checked-white {

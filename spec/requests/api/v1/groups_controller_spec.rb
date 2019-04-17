@@ -3,6 +3,58 @@ require 'rails_helper'
 describe Api::V1::GroupsController, type: :request, json: true, auth: true do
   let(:user) { @user }
 
+  describe 'GET #index' do
+    context 'with logged in user', create_org: true do
+      let(:organization) { user.current_organization }
+      let(:path) { "/api/v1/organizations/#{organization.id}/groups" }
+      let!(:groups) do
+        create_list(:group, 2, organization: organization, add_members: [user])
+      end
+      let!(:other_org) { create(:organization, member: user) }
+      let!(:other_group) { create(:group, organization: other_org) }
+
+      it 'returns the current org groups for the current user' do
+        get(path)
+        expect(response.status).to eq 200
+        # the 2 groups we created + org members + org admins
+        expect(json['data'].count).to eq 4
+        found_ids = json['data'].map { |i| i['id'] }
+        expect(found_ids).to include(groups.first.id.to_s)
+        expect(found_ids).not_to include(other_group.id.to_s)
+      end
+    end
+
+    context 'with api token and external_id', auth: false, api_token: true do
+      let!(:application_org) do
+        create(
+          :application_organization,
+          application: @api_token.application,
+        )
+      end
+      let!(:group) { create(:group, organization: application_org.organization) }
+      let!(:external_record) do
+        create(
+          :external_record,
+          external_id: '99',
+          externalizable: group,
+          application: @api_token.application,
+        )
+      end
+      let(:path) { '/api/v1/groups' }
+
+      it 'returns the group with external_id' do
+        get(
+          path,
+          params: { filter: { external_id: '99' } },
+          headers: { Authorization: "Bearer #{@api_token.token}" },
+        )
+        expect(response.status).to eq(200)
+        expect(json['data'].count).to eq 1
+        expect(json['data'].first['attributes']['external_id']).to eq '99'
+      end
+    end
+  end
+
   describe 'GET #show' do
     let!(:organization) { create(:organization) }
     let!(:group) { create(:group, add_admins: [user]) }
@@ -46,17 +98,14 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
   end
 
   describe 'POST #create', create_org: true do
-    let!(:organization) { create(:organization) }
     let!(:group) { create(:group, add_admins: [user]) }
     let(:current_user) { user }
     let(:path) { '/api/v1/groups' }
     let(:params) do
       json_api_params(
         'groups',
-        {
-          name: 'Creative Collaborators',
-          tag: 'collaborators',
-        }
+        name: 'Creative Collaborators',
+        tag: 'collaborators',
       )
     end
 
@@ -100,6 +149,63 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
         post(path, params: params)
         group = Group.find(json['data']['id'])
         expect(group.organization).to eq(user.current_organization)
+      end
+
+      context 'with external_id', api_token: true do
+        let(:params) do
+          json_api_params(
+            'groups',
+            name: 'Creative Collaborators',
+            external_id: '100',
+          )
+        end
+
+        context 'without application access to the org' do
+          it 'returns 401' do
+            post(
+              path,
+              params: params,
+              headers: { Authorization: "Bearer #{@api_token.token}" },
+            )
+            expect(response.status).to eq 401
+          end
+        end
+
+        context 'with application access to the org' do
+          let!(:application_org) do
+            create(
+              :application_organization,
+              application: @api_token.application,
+              organization: user.current_organization,
+            )
+          end
+
+          it 'adds external_id to group' do
+            post(
+              path,
+              params: params,
+              headers: { Authorization: "Bearer #{@api_token.token}" },
+            )
+            expect(response.status).to eq 200
+            expect(json['data']['attributes']['external_id']).to eq '100'
+          end
+        end
+      end
+
+      context 'with organization_id passed in' do
+        let!(:organization) { create(:organization, member: user) }
+        let(:params) do
+          json_api_params(
+            'groups',
+            name: 'Creative Collaborators',
+            organization_id: organization.id,
+          )
+        end
+
+        it 'creates the group in the passed in organization' do
+          post(path, params: params)
+          expect(Group.find(json['data']['id']).organization_id).to eq organization.id
+        end
       end
     end
   end

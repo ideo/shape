@@ -6,5 +6,7 @@ class UrlsController < ApplicationController
     url = params.require(:url)
     html = HTTParty.get(URI.encode(url))
     render html: html.response.body.html_safe
+  rescue StandardError
+    head :bad_request
   end
 end

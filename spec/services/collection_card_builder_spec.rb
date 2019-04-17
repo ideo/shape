@@ -97,6 +97,28 @@ RSpec.describe CollectionCardBuilder, type: :service do
           expect(builder.collection_card.pinned?).to be true
         end
       end
+
+      context 'with external_id', api_token: true do
+        let(:builder) do
+          CollectionCardBuilder.new(
+            params: params.merge(
+              collection_attributes: {
+                name: 'Cool Collection',
+                external_id: '99',
+              },
+            ),
+            parent_collection: parent,
+            user: @api_token.application.user,
+          )
+        end
+
+        it 'should create the external_record' do
+          expect {
+            builder.create
+          }.to change(ExternalRecord, :count).by(1)
+          expect(builder.collection_card.record.external_records.last.external_id).to eq '99'
+        end
+      end
     end
 
     context 'success creating card with item' do
@@ -106,7 +128,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
             item_attributes: {
               name: 'My item name',
               content: 'My Text Content goes here',
-              text_data: { ops: [] },
+              data_content: { ops: [] },
               type: 'Item::TextItem',
             },
           ),
@@ -208,7 +230,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
             item_attributes: {
               content: 'Test Content',
               type: 'Item::TextItem',
-              text_data: 'xyz',
+              data_content: 'xyz',
             },
           ),
           parent_collection: parent,

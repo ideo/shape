@@ -138,7 +138,7 @@ class EditableName extends React.Component {
       return (
         <StyledEditableName fontSize={fontSize}>
           <AutosizeInput
-            maxLength={40}
+            maxLength={v.maxTitleLength}
             className="input__name"
             style={{ fontSize }}
             value={this.name}

@@ -6,6 +6,7 @@ class Organization < ApplicationRecord
   SUPER_ADMIN_EMAIL = ENV['SUPER_ADMIN_EMAIL'] || 'admin@shape.space'.freeze
 
   include Resourceable
+  include Externalizable
   extend FriendlyId
   friendly_id :slug_candidates, use: %i[slugged finders history]
 
@@ -13,6 +14,7 @@ class Organization < ApplicationRecord
   has_many :items, through: :collections, dependent: :destroy
   has_many :groups, dependent: :destroy
   has_many :api_tokens, dependent: :destroy
+  has_many :application_organizations, dependent: :destroy
   belongs_to :primary_group,
              class_name: 'Group',
              dependent: :destroy,
@@ -84,8 +86,9 @@ class Organization < ApplicationRecord
   def setup_user_membership_and_collections(user, synchronous: false)
     # make sure they're on the org
     Collection::UserCollection.find_or_create_for_user(user, self)
-    find_or_create_user_getting_started_collection(user, synchronous: synchronous)
     setup_user_membership(user)
+    find_or_create_user_getting_started_content(user, synchronous: synchronous)
+    add_shared_with_org_collections(user) if primary_group.can_view? user
   end
 
   # This gets called from Roles::MassRemove after leaving a primary/guest group
@@ -117,8 +120,18 @@ class Organization < ApplicationRecord
     user.switch_to_organization(self) if user.current_organization_id.blank?
   end
 
+  def add_shared_with_org_collections(user)
+    collections_to_share = collections.where(shared_with_organization: true)
+    return unless collections_to_share.any?
+    LinkToSharedCollectionsWorker.perform_async(
+      [user.id],
+      [],
+      collections_to_share.map(&:id),
+      [],
+    )
+  end
+
   def setup_bot_user_membership(user)
-    Collection::UserCollection.find_or_create_for_user(user, self)
     user.add_role(Role::APPLICATION_USER, self)
     user.switch_to_organization(self) if user.current_organization_id.blank?
   end
@@ -266,6 +279,28 @@ class Organization < ApplicationRecord
     )
   end
 
+  def find_or_create_user_getting_started_content(user, synchronous: false)
+    return if getting_started_collection.blank?
+
+    user_collection = user.current_user_collection(id)
+
+    # NOTE: can remove this once all orgs are migrated
+    if getting_started_collection.name == 'Getting Started with Shape'
+      return find_or_create_user_getting_started_collection(user, synchronous: synchronous)
+    end
+
+    # this will copy them to the beginning
+    getting_started_collection.copy_all_cards_into!(
+      user_collection,
+      synchronous: synchronous,
+      # allows copies to continue even if the user can't view the original content
+      system_collection: true,
+    )
+    user_collection.save if user_collection.cached_attributes.delete 'awaiting_first_user_content'
+    user_collection
+  end
+
+  # NOTE: can remove this legacy method once all orgs are migrated
   def find_or_create_user_getting_started_collection(user, synchronous: false)
     return if getting_started_collection.blank?
 
@@ -291,8 +326,7 @@ class Organization < ApplicationRecord
 
     CollectionCardBuilder.new(
       params: {
-        # put it after SharedWithMe
-        order: 1,
+        order: 0,
         collection_id: user_getting_started.id,
       },
       parent_collection: user_collection,
@@ -320,7 +354,7 @@ class Organization < ApplicationRecord
       type: 'Item::TextItem',
       name: "#{name} Terms",
       content: 'Terms',
-      text_data: { a: {} },
+      data_content: { a: {} },
     )
     admin_group.add_role(Role::EDITOR, item)
     self.terms_text_item = item

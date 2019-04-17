@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190201202932) do
+ActiveRecord::Schema.define(version: 20190326201728) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -93,13 +93,23 @@ ActiveRecord::Schema.define(version: 20190201202932) do
     t.boolean "image_contain", default: false
     t.boolean "is_cover", default: false
     t.datetime "unarchived_at"
-    t.boolean "hidden", default: false
     t.integer "filter", default: 1
+    t.boolean "hidden", default: false
+    t.boolean "show_replace", default: true
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
     t.index ["templated_from_id"], name: "index_collection_cards_on_templated_from_id"
     t.index ["type"], name: "index_collection_cards_on_type"
+  end
+
+  create_table "collection_cover_items", force: :cascade do |t|
+    t.bigint "collection_id"
+    t.bigint "item_id"
+    t.integer "order"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["collection_id", "item_id"], name: "index_collection_cover_items_on_collection_id_and_item_id", unique: true
   end
 
   create_table "collections", force: :cascade do |t|
@@ -121,14 +131,16 @@ ActiveRecord::Schema.define(version: 20190201202932) do
     t.integer "submission_box_type"
     t.bigint "submission_box_id"
     t.integer "test_status"
-    t.integer "processing_status"
     t.integer "question_item_id"
     t.bigint "test_collection_id"
+    t.integer "processing_status"
     t.bigint "collection_to_test_id"
     t.datetime "unarchived_at"
     t.jsonb "cached_test_scores"
-    t.bigint "roles_anchor_collection_id"
     t.boolean "hide_submissions", default: false
+    t.bigint "roles_anchor_collection_id"
+    t.boolean "shared_with_organization", default: false
+    t.integer "cover_type", default: 0
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
@@ -160,6 +172,18 @@ ActiveRecord::Schema.define(version: 20190201202932) do
     t.datetime "updated_at", null: false
     t.jsonb "draftjs_data"
     t.index ["comment_thread_id"], name: "index_comments_on_comment_thread_id"
+  end
+
+  create_table "external_records", force: :cascade do |t|
+    t.string "external_id"
+    t.bigint "application_id"
+    t.string "externalizable_type"
+    t.bigint "externalizable_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["application_id"], name: "index_external_records_on_application_id"
+    t.index ["external_id", "application_id", "externalizable_type", "externalizable_id"], name: "index_external_records_common_fields"
+    t.index ["externalizable_type", "externalizable_id"], name: "index_on_externalizable"
   end
 
   create_table "filestack_files", force: :cascade do |t|
@@ -228,7 +252,7 @@ ActiveRecord::Schema.define(version: 20190201202932) do
     t.jsonb "breadcrumb"
     t.integer "filestack_file_id"
     t.string "url"
-    t.jsonb "text_data"
+    t.jsonb "data_content"
     t.string "thumbnail_url"
     t.jsonb "cached_attributes", default: {}
     t.datetime "archived_at"
@@ -240,6 +264,8 @@ ActiveRecord::Schema.define(version: 20190201202932) do
     t.datetime "unarchived_at"
     t.jsonb "data_settings"
     t.bigint "roles_anchor_collection_id"
+    t.integer "report_type"
+    t.integer "legend_item_id"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
     t.index ["created_at"], name: "index_items_on_created_at"

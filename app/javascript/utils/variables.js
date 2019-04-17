@@ -6,11 +6,18 @@ export const ITEM_TYPES = {
   QUESTION: 'Item::QuestionItem',
   CHART: 'Item::ChartItem',
   DATA: 'Item::DataItem',
+  EXTERNAL_IMAGE: 'Item::ExternalImageItem',
+  LEGEND: 'Item::LegendItem',
 }
 
 export const COLLECTION_TYPES = {
   TEST: 'Collection::TestCollection',
   TEST_DESIGN: 'Collection::TestDesign',
+}
+
+export const DATASET_CHART_TYPES = {
+  AREA: 'area',
+  LINE: 'line',
 }
 
 export const DATA_MEASURES = [
@@ -36,6 +43,7 @@ export default {
   containerPadding: {
     horizontal: 2,
   },
+  maxTitleLength: 144,
 
   // Keep in sync with assets/stylesheets/core/base.scss
   responsive: {

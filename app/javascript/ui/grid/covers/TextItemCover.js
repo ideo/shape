@@ -8,10 +8,11 @@ import { apiStore, routingStore, uiStore } from '~/stores'
 import v from '~/utils/variables'
 import { ShowMoreButton } from '~/ui/global/styled/forms'
 import { QuillStyleWrapper } from '~/ui/global/styled/typography'
-import ActionCableConsumer from '~/utils/ActionCableConsumer'
 import InlineLoader from '~/ui/layout/InlineLoader'
-import TextItem from '~/ui/items/TextItem'
+import RealtimeTextItem from '~/ui/items/RealtimeTextItem'
 import PaddedCardCover from './PaddedCardCover'
+
+const stripTags = str => str.replace(/(<([^>]+)>)/gi, '')
 
 const StyledReadMore = ShowMoreButton.extend`
   z-index: ${v.zIndex.gridCard};
@@ -61,7 +62,7 @@ class TextItemCover extends React.Component {
     return uiStore.textEditingItem === item
   }
 
-  handleClick = e => {
+  handleClick = async e => {
     e.stopPropagation()
     const { item, dragging, cardId, searchResult } = this.props
     if (dragging || uiStore.dragging || this.isEditing) return false
@@ -74,6 +75,7 @@ class TextItemCover extends React.Component {
       // likewise on search results, never pop open the inline editor
       return false
     }
+    await apiStore.fetch('items', item.id, true)
     uiStore.update('textEditingItem', this.state.item)
     return null
   }
@@ -83,12 +85,6 @@ class TextItemCover extends React.Component {
     routingStore.routeTo('items', item.id)
   }
 
-  textChange = itemTextData => {
-    const { item } = this.state
-    item.text_data = itemTextData
-    this.setState({ item })
-  }
-
   clearTextEditingItem = () => {
     const { item } = this.state
     if (uiStore.textEditingItem && uiStore.textEditingItem.id === item.id) {
@@ -96,12 +92,22 @@ class TextItemCover extends React.Component {
     }
   }
 
-  blur = (item, ev) => {
+  blur = async (item, ev) => {
     if (this.unmounted) {
       return
     }
-    if (ev) ev.stopPropagation()
+    if (ev && ev.stopPropagation) ev.stopPropagation()
     this.clearTextEditingItem()
+    const hasContent = stripTags(item.content).length
+    if (!hasContent) {
+      // archive empty text item when you hit "X"
+      const card = apiStore.find('collection_cards', this.props.cardId)
+      card.API_archiveSelf({ undoable: false })
+      return
+    }
+    // save final updates and broadcast to collection
+    item.API_updateWithoutSync()
+
     // TODO figure out why ref wasn't working
     // eslint-disable-next-line react/no-find-dom-node
     const node = ReactDOM.findDOMNode(this)
@@ -137,21 +143,20 @@ class TextItemCover extends React.Component {
     const { item } = this.state
     if (!item) return ''
     return (
-      <TextItem
+      <RealtimeTextItem
         item={item}
-        actionCableConsumer={ActionCableConsumer}
         currentUserId={apiStore.currentUser.id}
-        onUpdatedData={this.textChange}
-        onSave={this.save}
         onExpand={item.id ? this.expand : null}
         onCancel={this.blur}
+        // if we are rendering editing then the item has been fetched
+        fullyLoaded
       />
     )
   }
 
   renderDefault() {
     const { item } = this.props
-    const textData = item.toJSON().text_data
+    const textData = item.toJSON().data_content
     const quillProps = {
       // ref is used to get the height of the div in checkTextAreaHeight
       ref: c => {

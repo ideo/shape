@@ -5,16 +5,19 @@
     "order": { "type": "integer" },
     "width": { "type": "integer" },
     "height": { "type": "integer" },
-    "type": { "type": "string" },
+    "class_type": { "type": "string" },
     "card_question_type": { "type": ["string", "null"] },
     "link": { "type": "boolean" },
     "can_move": { "type": "boolean" },
     "pinned": { "type": "boolean" },
+    "is_master_template_card": { "type": "boolean" },
+    "show_replace": { "type": "boolean" },
     "pinned_and_locked": { "type": "boolean" },
     "image_contain": { "type": "boolean" },
     "is_cover": { "type": "boolean" },
     "filter": { "type": "string" },
-    "hidden": { "type": "boolean" }
+    "hidden": { "type": "boolean" },
+    "updated_at": { "type": "date" }
   },
-  "required": ["order", "width", "height", "type", "link"]
+  "required": ["order", "width", "height", "class_type", "link", "updated_at"]
 }

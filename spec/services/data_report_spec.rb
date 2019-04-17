@@ -1,11 +1,16 @@
 require 'rails_helper'
 
-RSpec.describe DataReport::Internal, type: :service do
+RSpec.describe DataReport::CollectionsAndItems, type: :service do
   let(:organization) { create(:organization_without_groups) }
   # parent needed for calculations that lookup org id
   let(:parent_collection) { create(:collection, organization: organization) }
-  let(:data_item) { create(:data_item, parent_collection: parent_collection) }
-  let(:report) { DataReport::Internal.new(data_item) }
+  let(:data_item) do
+    create(:data_item,
+           :report_type_collections_and_items,
+           parent_collection: parent_collection)
+  end
+  let(:report) { DataReport::CollectionsAndItems.new(data_item) }
+  let(:dataset) { report.call.first }
 
   describe '#call' do
     context 'filtering by organization' do
@@ -19,19 +24,29 @@ RSpec.describe DataReport::Internal, type: :service do
           data_item.update(
             data_settings: {
               d_measure: 'participants',
+              d_timeframe: data_item.d_timeframe,
             },
           )
         end
 
         it 'should calculate the number of participants in the organization' do
-          expect(report.call[:value]).to eq 3
+          expect(dataset[:single_value]).to eq 3
         end
 
         context 'with return_records: true' do
-          let(:report) { DataReport::Internal.new(data_item, return_records: true) }
+          let!(:report) do
+            DataReport::CollectionsAndItems.new(
+              data_item,
+              return_records: true,
+            )
+          end
 
           it 'should return the actor_ids instead of the count' do
-            expect(report.call[:value].pluck(:actor_id)).to match_array(activities.pluck(:actor_id))
+            expect(
+              dataset[:single_value].pluck(:actor_id),
+            ).to match_array(
+              activities.pluck(:actor_id),
+            )
           end
         end
       end
@@ -43,12 +58,13 @@ RSpec.describe DataReport::Internal, type: :service do
           data_item.update(
             data_settings: {
               d_measure: 'viewers',
+              d_timeframe: data_item.d_timeframe,
             },
           )
         end
 
         it 'should calculate the number of viewers in the organization' do
-          expect(report.call[:value]).to eq 2
+          expect(dataset[:single_value]).to eq 2
         end
       end
 
@@ -62,13 +78,14 @@ RSpec.describe DataReport::Internal, type: :service do
           data_item.update(
             data_settings: {
               d_measure: 'activity',
+              d_timeframe: data_item.d_timeframe,
             },
           )
         end
 
         it 'should calculate the number of activities in the organization' do
           # 3 comments should count, even if they are the same actor
-          expect(report.call[:value]).to eq 3
+          expect(dataset[:single_value]).to eq 3
         end
       end
 
@@ -79,14 +96,15 @@ RSpec.describe DataReport::Internal, type: :service do
           data_item.update(
             data_settings: {
               d_measure: 'collections',
+              d_timeframe: data_item.d_timeframe,
             },
           )
         end
 
         it 'should calculate the number of collections total in the org' do
           # NOTE: an extra collection is created in the initial setup
-          expect(report.call[:value]).to eq 4
-          expect(report.call[:value]).to eq Collection.count
+          expect(dataset[:single_value]).to eq 4
+          expect(dataset[:single_value]).to eq Collection.count
         end
       end
 
@@ -98,25 +116,27 @@ RSpec.describe DataReport::Internal, type: :service do
           data_item.update(
             data_settings: {
               d_measure: 'items',
+              d_timeframe: data_item.d_timeframe,
             },
           )
         end
 
         it 'should calculate the number of items total in the org' do
           # NOTE: an extra item to account for the actual data item
-          expect(report.call[:value]).to eq 6
-          expect(report.call[:value]).to eq Item.count
+          expect(dataset[:single_value]).to eq 6
+          expect(dataset[:single_value]).to eq Item.count
         end
       end
 
       context 'with a content, items and collections measure' do
-        let(:collection) { create(:collection, organization: organization) }
+        let!(:collection) { create(:collection, organization: organization) }
         let!(:items) { create_list(:text_item, 5, parent_collection: collection) }
 
         before do
           data_item.update(
             data_settings: {
               d_measure: 'records',
+              d_timeframe: data_item.d_timeframe,
             },
           )
         end
@@ -124,8 +144,8 @@ RSpec.describe DataReport::Internal, type: :service do
         it 'should calculate the number of items & collections total in the org' do
           # NOTE: an extra item to account for the actual data item
           # 6 items total, plus two collections
-          expect(report.call[:value]).to eq 8
-          expect(report.call[:value]).to eq(Item.count + Collection.count)
+          expect(dataset[:single_value]).to eq 8
+          expect(dataset[:single_value]).to eq(Item.count + Collection.count)
         end
       end
     end
@@ -162,9 +182,10 @@ RSpec.describe DataReport::Internal, type: :service do
             data_settings: {
               d_measure: 'participants',
               d_filters: [{ type: 'Collection', target: parent_collection.id }],
+              d_timeframe: data_item.d_timeframe,
             },
           )
-          expect(report.call[:value]).to eq 9
+          expect(dataset[:single_value]).to eq 9
         end
 
         it 'calculates the number of participants in a child collection, and the items in that collection' do
@@ -172,9 +193,10 @@ RSpec.describe DataReport::Internal, type: :service do
             data_settings: {
               d_measure: 'participants',
               d_filters: [{ type: 'Collection', target: child_collection.id }],
+              d_timeframe: data_item.d_timeframe,
             },
           )
-          expect(report.call[:value]).to eq 8
+          expect(dataset[:single_value]).to eq 8
         end
 
         it 'calculates the number of participants in a child child collection, and the items in that collection' do
@@ -182,9 +204,10 @@ RSpec.describe DataReport::Internal, type: :service do
             data_settings: {
               d_measure: 'participants',
               d_filters: [{ type: 'Collection', target: child_child_collection.id }],
+              d_timeframe: data_item.d_timeframe,
             },
           )
-          expect(report.call[:value]).to eq 7
+          expect(dataset[:single_value]).to eq 7
         end
       end
 
@@ -194,9 +217,10 @@ RSpec.describe DataReport::Internal, type: :service do
             data_settings: {
               d_measure: 'viewers',
               d_filters: [{ type: 'Collection', target: parent_collection.id }],
+              d_timeframe: data_item.d_timeframe,
             },
           )
-          expect(report.call[:value]).to eq 14
+          expect(dataset[:single_value]).to eq 14
         end
 
         it 'calculates the number of viewers in a child collection, and the items in that collection' do
@@ -204,9 +228,10 @@ RSpec.describe DataReport::Internal, type: :service do
             data_settings: {
               d_measure: 'viewers',
               d_filters: [{ type: 'Collection', target: child_collection.id }],
+              d_timeframe: data_item.d_timeframe,
             },
           )
-          expect(report.call[:value]).to eq 9
+          expect(dataset[:single_value]).to eq 9
         end
 
         it 'calculates the number of viewers in a child child collection, and the items in that collection' do
@@ -214,9 +239,10 @@ RSpec.describe DataReport::Internal, type: :service do
             data_settings: {
               d_measure: 'viewers',
               d_filters: [{ type: 'Collection', target: child_child_collection.id }],
+              d_timeframe: data_item.d_timeframe,
             },
           )
-          expect(report.call[:value]).to eq 5
+          expect(dataset[:single_value]).to eq 5
         end
       end
 
@@ -228,12 +254,13 @@ RSpec.describe DataReport::Internal, type: :service do
             data_settings: {
               d_measure: 'collections',
               d_filters: [{ type: 'Collection', target: parent_collection.id }],
+              d_timeframe: data_item.d_timeframe,
             },
           )
         end
 
         it 'should calculate the number of collections in the collection' do
-          expect(report.call[:value]).to eq 4
+          expect(dataset[:single_value]).to eq 4
         end
       end
 
@@ -247,13 +274,14 @@ RSpec.describe DataReport::Internal, type: :service do
             data_settings: {
               d_measure: 'items',
               d_filters: [{ type: 'Collection', target: parent_collection.id }],
+              d_timeframe: data_item.d_timeframe,
             },
           )
         end
 
         it 'should calculate the number of items in the collection' do
           # NOTE: plus 1 question item + actual data item
-          expect(report.call[:value]).to eq 12
+          expect(dataset[:single_value]).to eq 12
         end
       end
 
@@ -268,13 +296,14 @@ RSpec.describe DataReport::Internal, type: :service do
             data_settings: {
               d_measure: 'records',
               d_filters: [{ type: 'Collection', target: parent_collection.id }],
+              d_timeframe: data_item.d_timeframe,
             },
           )
         end
 
         it 'should calculate the number of collections & items in the collection' do
           # 4 colls + 12 items (see tests above)
-          expect(report.call[:value]).to eq 16
+          expect(dataset[:single_value]).to eq 16
         end
       end
 
@@ -287,11 +316,11 @@ RSpec.describe DataReport::Internal, type: :service do
               d_filters: [{ type: 'Collection', target: parent_collection.id }],
             },
           )
-          values = report.call[:values]
+          values = dataset[:data]
           # we created one activity in the first month
-          expect(values.first[:amount]).to eq 1
+          expect(values.first[:value]).to eq 1
           # the rest are more recent
-          expect(values.last[:amount]).to eq 8
+          expect(values.last[:value]).to eq 8
         end
       end
 
@@ -304,11 +333,11 @@ RSpec.describe DataReport::Internal, type: :service do
               d_filters: [{ type: 'Collection', target: parent_collection.id }],
             },
           )
-          values = report.call[:values]
+          values = dataset[:data]
           # we created one activity in the first month
-          expect(values.first[:amount]).to eq 5
+          expect(values.first[:value]).to eq 5
           # the rest are more recent
-          expect(values.last[:amount]).to eq 9
+          expect(values.last[:value]).to eq 9
         end
       end
 
@@ -328,10 +357,10 @@ RSpec.describe DataReport::Internal, type: :service do
         end
 
         it 'should calculate collection counts on a timeline' do
-          values = report.call[:values]
-          expect(values.first[:amount]).to eq 1
+          values = dataset[:data]
+          expect(values.first[:value]).to eq 1
           # the rest are more recent
-          expect(values.last[:amount]).to eq 3
+          expect(values.last[:value]).to eq 3
         end
       end
 
@@ -359,9 +388,9 @@ RSpec.describe DataReport::Internal, type: :service do
           # Recent collections: 3, Parent, Child, ChildChild (parent context)
           # Recent Items: 1 (data item, top context) + 1 (parent context) + 3 new items
           # RECENT = 8 total
-          values = report.call[:values]
-          expect(values.first[:amount]).to eq 6
-          expect(values.last[:amount]).to eq 8
+          values = dataset[:data]
+          expect(values.first[:value]).to eq 6
+          expect(values.last[:value]).to eq 8
         end
       end
     end

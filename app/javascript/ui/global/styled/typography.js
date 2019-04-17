@@ -50,6 +50,7 @@ export const Heading3 = styled.h3`
   font-size: 0.9375rem;
   font-weight: ${v.weights.medium};
   letter-spacing: 0.0625rem;
+  color: ${props => props.color || v.colors.black};
 `
 Heading3.displayName = 'StyledHeading3'
 
@@ -204,7 +205,10 @@ export const HugeNumber = Heading1.extend`
 `
 
 export const QuillStyleWrapper = styled.div`
+  height: 100%;
   .quill {
+    height: 100%;
+
     h1 {
       ${TextItemHeading1Css};
       color: ${v.colors.black};
@@ -215,12 +219,45 @@ export const QuillStyleWrapper = styled.div`
       margin-bottom: 0.75rem;
     }
 
+    h3 {
+      font-size: 0.8125rem;
+      letter-spacing: 1px;
+      margin-bottom: 0.8125rem;
+      text-transform: uppercase;
+    }
+
     p {
+      font-family: ${v.fonts.sans};
+      font-size: 1rem;
+      letter-spacing: 0;
+      line-height: 1.5rem;
       margin-bottom: 0.625rem;
     }
 
     p + h3 {
       margin-top: 0.85rem;
+    }
+
+    @keyframes blink-animation {
+      to {
+        visibility: hidden;
+      }
+    }
+
+    .ql-container {
+      overflow: visible !important;
+    }
+
+    .ql-cursor {
+      cursor: text;
+      .ql-cursor-caret {
+        animation: blink-animation 1s steps(5, start) infinite;
+        width: 3px;
+      }
+    }
+
+    .ql-editor {
+      overflow-x: hidden;
     }
   }
 `

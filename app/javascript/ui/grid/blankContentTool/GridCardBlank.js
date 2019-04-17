@@ -284,6 +284,7 @@ class GridCardBlank extends React.Component {
       item_attributes: {
         type: ITEM_TYPES.DATA,
         name: 'Report',
+        report_type: 'report_type_collections_and_items',
         data_settings: {
           d_measure: 'participants',
           d_timeframe: 'ever',
@@ -339,6 +340,24 @@ class GridCardBlank extends React.Component {
       // NOTE: closeBlankContentTool() will automatically get called
       // in CollectionCard after the async actions are complete
     })
+  }
+
+  createTextItem = item => {
+    this.createCard(
+      {
+        item_attributes: {
+          name: 'Text',
+          content: '',
+          data_content: { ops: [] },
+          type: ITEM_TYPES.TEXT,
+        },
+      },
+      {
+        afterCreate: card => {
+          this.props.uiStore.update('textEditingItem', card.record)
+        },
+      }
+    )
   }
 
   closeBlankContentTool = () => {
@@ -491,7 +510,8 @@ class GridCardBlank extends React.Component {
                 type="text"
                 creating={creating}
                 size={size}
-                onClick={this.startCreating('text')}
+                // onClick={this.startCreating('text')}
+                onClick={this.createTextItem}
                 Icon={AddTextIcon}
               />
             )}

@@ -19,17 +19,17 @@ const DotFlyout = props => (
   </g>
 )
 
-class ChartTooltip extends React.Component {
+class ChartTooltip extends React.PureComponent {
   static defaultEvents = VictoryTooltip.defaultEvents
 
-  get maxAmount() {
+  get maxValue() {
     const { data } = this.props
-    return Math.max(...data.map(d => d.amount))
+    return Math.max(...data.map(d => d.value))
   }
 
-  get minAmount() {
+  get minValue() {
     const { data } = this.props
-    return Math.min(...data.map(d => d.amount))
+    return Math.min(...data.map(d => d.value))
   }
 
   get isLastDataPoint() {
@@ -39,18 +39,19 @@ class ChartTooltip extends React.Component {
 
   isFirstPointOfType(typeAmount) {
     const { data, index } = this.props
-    const all = data.filter(d => d.amount === typeAmount)
+    const all = data.filter(d => d.value === typeAmount)
+
     if (!all.length) return false
     const firstIdx = all[0]._x - 1
     return parseInt(index) === firstIdx
   }
 
   get isFirstMaxPoint() {
-    return this.isFirstPointOfType(this.maxAmount)
+    return this.isFirstPointOfType(this.maxValue)
   }
 
   get isFirstMinPoint() {
-    return this.isFirstPointOfType(this.minAmount)
+    return this.isFirstPointOfType(this.minValue)
   }
 
   get xOffset() {
@@ -67,16 +68,37 @@ class ChartTooltip extends React.Component {
     return 0
   }
 
-  renderAmountMark(datum, totalData) {
-    if (this.isFirstMaxPoint) return true
-    if (this.isFirstMinPoint) return true
+  get fontSizes() {
+    const { cardArea } = this.props
+    if (cardArea === 1) {
+      return {
+        tooltip: '20px',
+        label: '20px',
+      }
+    }
+    return {
+      tooltip: '12px',
+      label: '10px',
+    }
+  }
+
+  get isTwoDuplicatePoints() {
+    const { data } = this.props
+    if (data.length !== 2) return false
+
+    return data[0].value === data[1].value
+  }
+
+  renderValueMark(datum, totalData) {
+    if (this.isFirstMaxPoint && !this.isTwoDuplicatePoints) return true
+    if (this.isFirstMinPoint && !this.isTwoDuplicatePoints) return true
     if (this.isLastDataPoint) return true
     return false
   }
 
   render() {
     const { data, datum, textRenderer, x, y } = this.props
-    const showAlways = this.renderAmountMark(datum, data.length - 1)
+    const showAlways = this.renderValueMark(datum, data.length - 1)
     const dx = this.xOffset
     const text = textRenderer(datum, this.isLastDataPoint)
     return (
@@ -87,13 +109,13 @@ class ChartTooltip extends React.Component {
           cornerRadius={2}
           flyoutComponent={<DotFlyout />}
           height={40}
-          width={140}
+          width={180}
           dx={dx * 5}
           dy={0}
           style={{
             fill: 'white',
             fontFamily: v.fonts.sans,
-            fontSize: '12px',
+            fontSize: this.fontSizes.tooltip,
             fontWeight: 'normal',
           }}
           text={text}
@@ -113,8 +135,8 @@ class ChartTooltip extends React.Component {
               {...this.props}
               dx={dx}
               dy={-5}
-              style={{ fontSize: '10px', fontWeight: 'normal' }}
-              text={`${datum.amount}`}
+              style={{ fontSize: this.fontSizes.label, fontWeight: 'normal' }}
+              text={`${datum.value}`}
               orientation="top"
               pointerLength={0}
               flyoutStyle={{ stroke: 'transparent', fill: 'transparent' }}
@@ -136,12 +158,14 @@ class ChartTooltip extends React.Component {
 }
 ChartTooltip.propTypes = {
   textRenderer: PropTypes.func.isRequired,
-  maxAmount: PropTypes.number,
-  minAmount: PropTypes.number,
+  maxValue: PropTypes.number,
+  minValue: PropTypes.number,
+  cardArea: PropTypes.number,
 }
 ChartTooltip.defaultProps = {
-  maxAmount: 0,
-  minAmount: 0,
+  maxValue: 0,
+  minValue: 0,
+  cardArea: 1,
 }
 
 export default ChartTooltip

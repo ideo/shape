@@ -55,6 +55,33 @@ describe Collection, type: :model do
       end
     end
 
+    describe '#collection_cover_cards' do
+      let!(:collection) { create(:collection, num_cards: 3) }
+      let(:collection_cards) { collection.collection_cards }
+
+      it 'should return [] if no cards are covers' do
+        expect(collection_cards.all? { |card| !card.is_cover? }).to be true
+        expect(collection.collection_cover_cards).to be_empty
+      end
+
+      it 'returns no collection_cover_items' do
+        expect(collection.collection_cover_items).to be_empty
+      end
+
+      context 'with one card marked as cover' do
+        let(:cover_card) { collection_cards.first }
+        before { cover_card.update(is_cover: true) }
+
+        it 'is returned' do
+          expect(collection.collection_cover_cards).to eq([cover_card])
+        end
+
+        it 'collection_cover_items returns card item' do
+          expect(collection.collection_cover_items).to eq([cover_card.item])
+        end
+      end
+    end
+
     describe '#destroy' do
       let(:user) { create(:user) }
       let!(:collection) { create(:collection, num_cards: 3, add_editors: [user]) }
@@ -140,7 +167,7 @@ describe Collection, type: :model do
     end
   end
 
-  describe '#duplicate' do
+  describe '#duplicate!' do
     let!(:user) { create(:user) }
     let!(:parent_collection_user) { create(:user) }
     let!(:collection_user) { create(:user) }
@@ -295,30 +322,86 @@ describe Collection, type: :model do
       end
     end
 
-    context 'with a collection inside the system-generated getting started collection' do
-      let(:getting_started_collection) { create(:global_collection, organization: organization) }
+    context 'with a subcollection inside the system-generated getting started collection' do
+      let(:parent_collection) { create(:global_collection) }
+      let!(:subcollection) { create(:collection, num_cards: 2, parent_collection: collection, organization: organization) }
       let(:duplicate) do
         collection.duplicate!(
           for_user: user,
           copy_parent_card: copy_parent_card,
           parent: parent,
           system_collection: true,
+          synchronous: true,
         )
       end
+      let(:shell_collection) { duplicate.collections.first }
 
       before do
-        parent_collection.update(cloned_from: getting_started_collection)
-        organization.update(getting_started_collection: getting_started_collection)
+        organization.update(getting_started_collection: parent_collection)
+        duplicate
       end
 
-      it 'should mark the duplicate as a getting_started_shell' do
-        expect(duplicate.getting_started_shell).to be true
+      it 'should mark the duplicate child collection as a getting_started_shell' do
+        expect(shell_collection.getting_started_shell).to be true
       end
 
-      it 'should not create any collection cards' do
-        expect(CollectionCardDuplicationWorker).not_to receive(:new)
-        expect(duplicate.collection_cards.count).to eq 0
+      it 'should not create any collection cards in the child collection' do
+        expect(shell_collection.cloned_from).to eq subcollection
+        expect(shell_collection.cloned_from.collection_cards.count).to eq 2
+        expect(shell_collection.collection_cards.count).to eq 0
       end
+    end
+
+    context 'with external records' do
+      let!(:external_records) do
+        [
+          create(:external_record, externalizable: collection, external_id: '100'),
+          create(:external_record, externalizable: collection, external_id: '101'),
+        ]
+      end
+
+      it 'duplicates external records' do
+        expect(collection.external_records.reload.size).to eq(2)
+        expect {
+          duplicate
+        }.to change(ExternalRecord, :count).by(2)
+
+        expect(duplicate.external_records.pluck(:external_id)).to match_array(
+          %w[100 101],
+        )
+      end
+    end
+
+    context 'with submission_attrs' do
+      let!(:collection) { create(:collection, :submission) }
+
+      it 'clears out submission_attrs' do
+        expect(collection.submission?).to be true
+        expect(duplicate.submission?).to be false
+      end
+    end
+  end
+
+  describe '#copy_all_cards_into!' do
+    let(:source_collection) { create(:collection, num_cards: 3) }
+    let(:target_collection) { create(:collection, num_cards: 2) }
+
+    it 'copies all cards from source to target, to the beginning' do
+      source_collection.copy_all_cards_into!(target_collection, synchronous: true)
+      target_collection.reload
+      expect(target_collection.collection_cards.count).to eq 5
+      first_record = source_collection.collection_cards.first.record
+      expect(target_collection.collection_cards.first.record.cloned_from).to eq first_record
+    end
+
+    it 'copies all cards from source to target, to the specified order' do
+      source_collection.copy_all_cards_into!(target_collection, synchronous: true, placement: 1)
+      target_collection.reload
+      # first record should still be the original target_collection card
+      expect(target_collection.collection_cards.first.record.cloned_from).to be nil
+      first_record = source_collection.collection_cards.first.record
+      # check the second record
+      expect(target_collection.collection_cards.second.record.cloned_from).to eq first_record
     end
   end
 
@@ -501,9 +584,20 @@ describe Collection, type: :model do
     context 'with a master_template' do
       let(:collection) { create(:collection, master_template: true, num_cards: 3) }
 
-      it 'should call the UpdateTemplateInstancesWorker' do
-        expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(collection.id)
-        collection.unarchive_cards!(cards, snapshot)
+      context 'with a template instance' do
+        let!(:instance) { create(:collection, template: collection) }
+
+        it 'should call the UpdateTemplateInstancesWorker' do
+          expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(collection.id)
+          collection.unarchive_cards!(cards, snapshot)
+        end
+      end
+
+      context 'without a template instance' do
+        it 'should not call the UpdateTemplateInstancesWorker' do
+          expect(UpdateTemplateInstancesWorker).not_to receive(:perform_async)
+          collection.unarchive_cards!(cards, snapshot)
+        end
       end
     end
   end
@@ -641,7 +735,7 @@ describe Collection, type: :model do
       end
 
       it 'updates cached cover text to match item updates' do
-        item.text_data = { ops: [{ insert: 'Howdy doody.' }] }
+        item.data_content = { ops: [{ insert: 'Howdy doody.' }] }
         collection.update_cover_text!(item)
         expect(collection.cached_cover['text']).to eq 'Howdy doody.'
       end

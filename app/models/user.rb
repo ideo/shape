@@ -51,6 +51,7 @@ class User < ApplicationRecord
            class_name: 'Collection::UserProfile',
            inverse_of: :created_by,
            foreign_key: :created_by_id
+  has_one :application
 
   belongs_to :current_organization,
              class_name: 'Organization',
@@ -95,6 +96,18 @@ class User < ApplicationRecord
       status: status,
       organization_ids: organization_ids,
     }
+  end
+
+  alias organizations_through_groups organizations
+  def organizations
+    if application_bot?
+      return application.organizations
+    end
+    organizations_through_groups
+  end
+
+  def application_bot?
+    application.present?
   end
 
   def email_search_tokens
@@ -218,7 +231,7 @@ class User < ApplicationRecord
       self.current_organization = self.current_user_collection = nil
     else
       self.current_organization = organization
-      self.current_user_collection = collections.user.find_by_organization_id(organization.id)
+      self.current_user_collection = current_user_collection(organization.id)
     end
     # make sure user picks up new roles / relationships
     save && reload
@@ -227,13 +240,8 @@ class User < ApplicationRecord
   # overrides retrieval of belongs_to relation
   def current_user_collection(org_id = current_organization_id)
     return nil unless org_id
-    if current_user_collection_id && org_id == current_organization_id
-      # if within same org, we already have the current_user_collection id
-      return Collection.find(current_user_collection_id)
-    end
-
-    # TODO: rename "user" to user_collection
-    collections.user.find_by_organization_id(org_id)
+    type = bot_user? ? 'Application' : 'User'
+    collections.find_by(organization_id: org_id, type: "Collection::#{type}Collection")
   end
 
   def current_shared_collection(org_id = current_organization_id)
@@ -319,6 +327,10 @@ class User < ApplicationRecord
     archived!
     # NOTE: this is disabled, was creating way too many Zendesk tickets
     # DeprovisionUserWorker.perform_async(id)
+  end
+
+  def bot_user?
+    application.present?
   end
 
   private

@@ -297,23 +297,31 @@ describe Organization, type: :model do
 
   describe '#setup_user_membership_and_collections' do
     let(:user) { create(:user, email: 'jill@ideo.com') }
-    let(:getting_started) { create(:global_collection) }
-    let!(:subcollection_cards) { create_list(:collection_card_collection, 2, parent: getting_started) }
-    let!(:item_cards) { create_list(:collection_card_text, 2, parent: getting_started) }
     let!(:organization) do
-      # adding `member: user` will call user.setup_user_membership_and_collections
-      create(:organization, domain_whitelist: ['ideo.com'], getting_started_collection: getting_started, member: user)
+      create(:organization, domain_whitelist: ['ideo.com'])
+    end
+    let(:getting_started) { create(:global_collection, name: 'Getting Started', organization: organization) }
+    let!(:subcollection_card) { create(:collection_card_collection, parent: getting_started) }
+    let(:subcollection) { subcollection_card.collection }
+    let!(:sub_subcollection_cards) { create_list(:collection_card_collection, 2, parent: subcollection) }
+    let!(:item_cards) { create_list(:collection_card_text, 2, parent: getting_started) }
+
+    before do
+      # need this to match up for `getting_started?` to work
+      organization.update(getting_started_collection: getting_started)
+      organization.setup_user_membership_and_collections(user, synchronous: true)
     end
 
-    it 'should create a UserCollection, SharedWithMeCollection and Getting Started collection for the user' do
-      expect(user.collections.size).to eq(3)
-      # SharedWithMe and Getting Started live within the user collection
-      expect(user.current_user_collection.collections.size).to eq(2)
+    it 'should copy all cards from getting started into the UserCollection' do
+      # should copy all getting_started content (1 collection, 2 items) plus SharedWithMe
+      expect(user.current_user_collection.collection_cards.count).to eq(4)
+      # SharedWithMe card is hidden for now
+      expect(user.current_user_collection.collection_cards.visible.count).to eq(3)
     end
 
     it 'should set the Getting Started copy collections to getting_started_shell' do
-      gs_copy = user.current_user_collection.collections.last
-      expect(gs_copy.cloned_from).to eq getting_started
+      gs_copy = user.current_user_collection.collections.where(type: nil).last
+      expect(gs_copy.cloned_from.parent).to eq getting_started
       # all collections in the copy should be marked with the getting_started_shell attr
       expect(gs_copy.collections.map(&:getting_started_shell).all?).to eq true
     end
@@ -325,6 +333,24 @@ describe Organization, type: :model do
     it 'should set the user to be on the current organization' do
       expect(user.current_organization).to eq(organization)
       expect(user.current_user_collection_id).not_to be nil
+    end
+  end
+
+  describe '#setup_bot_user_membership' do
+    let(:application) { create(:application) }
+    let(:user) { application.user }
+    let(:organization) { create(:organization) }
+
+    it 'should add bot user to the organization' do
+      expect(user.has_role?(Role::APPLICATION_USER, organization)).to be false
+      organization.setup_bot_user_membership(user)
+      expect(user.reload.has_role?(Role::APPLICATION_USER, organization)).to be true
+    end
+
+    it 'should set current_organization if none assigned' do
+      expect(user.current_organization).to be_nil
+      organization.setup_bot_user_membership(user)
+      expect(user.current_organization).to eq(organization)
     end
   end
 
@@ -752,6 +778,22 @@ describe Organization, type: :model do
       expect(organization.can_view?(user)).to be false
       user.add_role(Role::APPLICATION_USER, organization)
       expect(organization.can_view?(user)).to be true
+    end
+  end
+
+  describe '#add_shared_with_org_collections' do
+    let(:organization) { create(:organization) }
+    let(:user) { create(:user) }
+    let(:collection) { create(:collection, organization: organization, shared_with_organization: true) }
+
+    it 'links the collection to the user\'s My Collection' do
+      expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
+        [user.id],
+        [],
+        [collection.id],
+        [],
+      )
+      organization.add_shared_with_org_collections(user)
     end
   end
 end

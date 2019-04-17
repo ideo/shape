@@ -3,6 +3,52 @@ require 'rails_helper'
 describe Api::V1::CollectionsController, type: :request, json: true, auth: true do
   let(:user) { @user }
 
+  context 'with API user' do
+    let!(:api_user) { create(:user, :application_bot) }
+    before do
+      login_as(api_user)
+    end
+
+    describe 'GET #index', create_org: true do
+      let!(:collection) do
+        create(:collection, num_cards: 1, add_viewers: [api_user])
+      end
+      let!(:external_record) do
+        create(
+          :external_record,
+          application: api_user.application,
+          externalizable: collection,
+          external_id: '123',
+        )
+      end
+      let(:path) do
+        api_v1_collections_path(filter: { external_id: '123' })
+      end
+
+      it 'returns a 200' do
+        get(path)
+        expect(response.status).to eq(200)
+      end
+
+      it 'matches JSON schema' do
+        get(path)
+        expect(json['data'].size).to eq(1)
+        expect(json['data'].first['attributes']).to match_json_schema('collection', strict: false)
+      end
+
+      context 'if collection is archived' do
+        before do
+          collection.archive!
+        end
+
+        it 'is not included in API response' do
+          get(path)
+          expect(json['data']).to be_empty
+        end
+      end
+    end
+  end
+
   describe 'GET #show', create_org: true do
     let!(:collection) do
       create(:collection, num_cards: 5, add_viewers: [user])
@@ -204,9 +250,9 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
 
     context 'trying to create inside a template' do
       let(:to_collection) { create(:collection, master_template: true, organization: organization) }
-      it 'returns a 400' do
+      it 'returns a 422' do
         post(path, params: params)
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
     end
   end

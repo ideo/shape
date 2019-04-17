@@ -68,15 +68,17 @@ export const BctButton = styled.button`
 BctButton.displayName = 'BctButton'
 
 export const StyledGridCard = styled.div`
-  background: white;
+  background: ${props => props.background || 'white'};
   box-shadow: ${props =>
     props.dragging ? '1px 1px 5px 2px rgba(0, 0, 0, 0.25)' : ''};
   cursor: ${props => {
     if (props.dragging) return 'grabbing'
-    else if (props.testCollectionCard) return 'auto'
+    else if (props.unclickable) return 'auto'
     return 'pointer'
   }};
   height: 100%;
+  // Attempt at an IE11 fix
+  min-height: 100%;
   opacity: ${props => (props.dragging ? '0.75' : '1')};
   padding: 0;
   position: relative;
@@ -182,6 +184,7 @@ StyledGridCardInner.displayName = 'StyledGridCardInner'
 
 const TopActions = css`
   align-items: center;
+  cursor: pointer;
   display: flex;
   position: absolute;
   top: 0.35rem;

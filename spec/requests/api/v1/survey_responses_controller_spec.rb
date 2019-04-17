@@ -36,9 +36,9 @@ describe Api::V1::SurveyResponsesController, type: :request, json: true do
     end
 
     context 'with invalid test status (draft)' do
-      it 'returns a 400' do
+      it 'returns a 422' do
         post(path, params: params)
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(422)
       end
     end
 

@@ -2,11 +2,10 @@ import { observable, action, computed, runInAction } from 'mobx'
 import _ from 'lodash'
 import { ReferenceType } from 'datx'
 
-import { uiStore } from '~/stores'
 import { apiUrl } from '~/utils/url'
-
 import BaseRecord from './BaseRecord'
 import Comment from './Comment'
+import UsersThread from './UsersThread'
 import User from './User'
 
 // should always be the same as paginates_per in comment.rb
@@ -58,8 +57,9 @@ class CommentThread extends BaseRecord {
   }
 
   async API_create() {
+    const { uiStore } = this
     try {
-      await this.save()
+      await this.create()
       // now that we have a real id, update what's expanded
       uiStore.expandThread(this.key, { reset: false })
       uiStore.trackEvent('create', this.record)
@@ -94,6 +94,9 @@ class CommentThread extends BaseRecord {
         // error if that still didn't work...
         return false
       }
+      // you would only ever be creating a new thread on the current page
+      // so update the currentPageThreadKey to match the new persisted key
+      this.apiStore.setCurrentPageThreadKey(this.key)
     }
     // can just call this without awaiting the result
     this.API_markViewed()
@@ -111,7 +114,7 @@ class CommentThread extends BaseRecord {
     })
     this.importComments([comment], { created: true })
     // this will create the comment in the API
-    uiStore.trackEvent('create', this.record)
+    this.uiStore.trackEvent('create', this.record)
     return comment.save()
   }
 
@@ -154,6 +157,14 @@ class CommentThread extends BaseRecord {
     newComments = _.sortBy(newComments, ['updated_at'])
     this.comments.replace(newComments)
   }
+}
+
+CommentThread.refDefaults = {
+  users_thread: {
+    model: UsersThread,
+    type: ReferenceType.TO_ONE,
+    defaultValue: null,
+  },
 }
 
 export default CommentThread

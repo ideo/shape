@@ -1,4 +1,5 @@
 class SerializableCollection < BaseJsonSerializer
+  include SerializedExternalId
   type 'collections'
 
   attributes :created_at, :updated_at, :name, :organization_id,
@@ -9,6 +10,12 @@ class SerializableCollection < BaseJsonSerializer
   has_many :roles do
     data do
       @object.anchored_roles
+    end
+  end
+  has_many :collection_cover_items do
+    data do
+      # Only include cover items if this collection has indicated to use them
+      @object.cover_type_items? ? @object.collection_cover_items : []
     end
   end
   has_one :parent_collection_card
@@ -36,10 +43,6 @@ class SerializableCollection < BaseJsonSerializer
 
   attribute :test_scores do
     @object.cached_test_scores || {}
-  end
-
-  attribute :type do
-    @object.type || @object.class.name
   end
 
   attribute :breadcrumb, if: -> { @current_record.nil? || @object == @current_record } do
@@ -140,5 +143,9 @@ class SerializableCollection < BaseJsonSerializer
 
   attribute :test_collection_id, if: -> { @object.is_a?(Collection::TestDesign) } do
     @object.test_collection.id.to_s
+  end
+
+  attribute :awaiting_updates do
+    @object.getting_started_shell || @object.awaiting_first_user_content
   end
 end

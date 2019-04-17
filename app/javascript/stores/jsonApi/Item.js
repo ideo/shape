@@ -23,7 +23,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
     'type',
     'name',
     'content',
-    'text_data',
+    'data_content',
     'url',
     'image',
     'archived',
@@ -31,6 +31,8 @@ class Item extends SharedRecordMixin(BaseRecord) {
     'thumbnail_url',
     'filestack_file_attributes',
     'data_settings',
+    'report_type',
+    'selected_measures',
   ]
 
   get justText() {
@@ -51,9 +53,31 @@ class Item extends SharedRecordMixin(BaseRecord) {
   get canReplace() {
     if (!this.can_edit_content) return false
     return _.includes(
-      [ITEM_TYPES.IMAGE, ITEM_TYPES.FILE, ITEM_TYPES.VIDEO, ITEM_TYPES.LINK],
+      [
+        ITEM_TYPES.IMAGE,
+        ITEM_TYPES.FILE,
+        ITEM_TYPES.VIDEO,
+        ITEM_TYPES.LINK,
+        ITEM_TYPES.EXTERNAL_IMAGE,
+      ],
       this.type
     )
+  }
+
+  get isMedia() {
+    return this.isImage || this.isVideo
+  }
+
+  get isReportTypeCollectionsItems() {
+    return this.report_type === 'report_type_collections_and_items'
+  }
+
+  get isReportTypeNetworkAppMetric() {
+    return this.report_type === 'report_type_network_app_metric'
+  }
+
+  get isReportTypeRecord() {
+    return this.report_type === 'report_type_record'
   }
 
   get pdfCoverUrl() {
@@ -74,12 +98,19 @@ class Item extends SharedRecordMixin(BaseRecord) {
     )
   }
 
+  get isLegend() {
+    return this.type === ITEM_TYPES.LEGEND
+  }
+
   get isDownloadable() {
     return this.isGenericFile || this.isPdfFile
   }
 
   get isImage() {
-    return this.filestack_file && this.mimeBaseType === 'image'
+    return (
+      this.type === ITEM_TYPES.EXTERNAL_IMAGE ||
+      (this.filestack_file && this.mimeBaseType === 'image')
+    )
   }
 
   get isText() {
@@ -95,7 +126,10 @@ class Item extends SharedRecordMixin(BaseRecord) {
   }
 
   get isVideo() {
-    return this.type === ITEM_TYPES.VIDEO
+    return (
+      this.type === ITEM_TYPES.VIDEO ||
+      (this.filestack_file && this.mimeBaseType === 'video')
+    )
   }
 
   get isLink() {
@@ -110,7 +144,18 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return this.isVideo || this.isLink
   }
 
+  fileUrl() {
+    const { filestack_handle } = this
+    if (!filestack_handle) return ''
+    return FilestackUpload.fileUrl({
+      handle: filestack_handle,
+    })
+  }
+
   imageUrl(filestackOpts = {}) {
+    if (this.type === ITEM_TYPES.EXTERNAL_IMAGE) {
+      return this.url
+    }
     const { filestack_file, filestack_handle } = this
     if (!filestack_handle) return ''
     let mimetype = ''
@@ -124,28 +169,34 @@ class Item extends SharedRecordMixin(BaseRecord) {
     })
   }
 
+  get primaryDataset() {
+    const { datasets } = this
+    if (!datasets) return null
+    if (datasets.length <= 1) return datasets[0]
+    return datasets.find(dataset => dataset.order === 0)
+  }
+
   get measure() {
-    const { data_settings } = this
-    if (!data_settings || !data_settings.d_measure) return {}
-    const measure = _.find(DATA_MEASURES, { value: data_settings.d_measure })
-    if (!measure) {
-      const measureName = _.capitalize(data_settings.d_measure)
+    const { name } = this
+    const { measure } = this.primaryDataset
+    if (!measure)
       return {
-        name: measureName,
+        name,
       }
+    const shapeMeasure = _.find(DATA_MEASURES, { value: measure })
+    if (shapeMeasure) return shapeMeasure
+    return {
+      name: _.capitalize(measure),
     }
-    return measure
   }
 
   get timeframe() {
-    const { data_settings } = this
-    if (!data_settings || !data_settings.d_timeframe) return ''
-    return data_settings.d_timeframe
+    const { timeframe } = this.primaryDataset
+    return timeframe || ''
   }
 
   get measureTooltip() {
-    const { measure } = this
-    return measure.tooltip || measure.name.toLowerCase()
+    return this.measure.tooltip || this.measure.name.toLowerCase()
   }
 
   get collectionFilter() {
@@ -169,15 +220,22 @@ class Item extends SharedRecordMixin(BaseRecord) {
         trackError(err, { name: 'item:update' })
       })
   }
+
+  API_pingCollection() {
+    return this.apiStore.request(`items/${this.id}/ping_collection`)
+  }
 }
 
 Item.defaults = {
-  text_data: '',
+  data_content: '',
   can_edit: false,
-  data: {
-    values: [],
-    count: 0,
-  },
+  datasets: [
+    {
+      order: 0,
+      data: [],
+      count: 0,
+    },
+  ],
   data_settings: {
     d_measure: null,
   },

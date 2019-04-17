@@ -53,10 +53,11 @@ class OverdueBanner extends React.Component {
   hide = () => this.props.uiStore.hideOverdueBanner()
 
   render() {
-    const currentOrganization = this.props.apiStore.currentUser
-      .current_organization
+    const { apiStore } = this.props
+    const currentOrganization = apiStore.currentUser.current_organization
 
     if (
+      !currentOrganization ||
       !this.props.uiStore.overdueBannerVisible ||
       currentOrganization.deactivated ||
       !currentOrganization.overdue ||

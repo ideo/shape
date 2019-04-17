@@ -13,6 +13,17 @@ describe User, type: :model do
     it { should have_many :comments }
     it { should have_many :activities_as_actor }
     it { should have_many :notifications }
+
+    context 'as application bot user' do
+      let(:organizations) { create_list(:organization, 2) }
+      let!(:application) { create(:application, add_orgs: organizations) }
+      let(:user) { application.user }
+
+      it 'should find organizations via the application' do
+        expect(user.organizations).to match_array organizations
+        expect(user.organizations).to match_array application.organizations
+      end
+    end
   end
 
   context 'validations' do
@@ -381,6 +392,25 @@ describe User, type: :model do
       expect(user.current_user_collection).to be_nil
       expect(user.switch_to_organization(organization)).to be_truthy
       expect(user.current_user_collection).to eq(org_user_collection)
+    end
+
+    context 'with two orgs' do
+      let!(:organization2) { create(:organization) }
+      let!(:org2_user_collection) do
+        # Create user collection manually
+        # To make sure being in an org isn't coupled with being a group member/admin
+        Collection::UserCollection.find_or_create_for_user(user, organization2)
+      end
+
+      it 'sets user settings to the switched org' do
+        expect(user.switch_to_organization(organization)).to be_truthy
+        expect(user.current_organization).to eq(organization)
+        expect(user.current_user_collection).to eq(org_user_collection)
+        # second org
+        expect(user.switch_to_organization(organization2)).to be_truthy
+        expect(user.current_organization).to eq(organization2)
+        expect(user.current_user_collection).to eq(org2_user_collection)
+      end
     end
 
     context 'if setting to nil' do

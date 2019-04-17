@@ -46,6 +46,17 @@ describe('Header', () => {
     expect(wrapper.find('PopoutMenu').exists()).toBe(false)
   })
 
+  describe('with no current_organization', () => {
+    beforeEach(() => {
+      props.apiStore.currentUser.current_organization = null
+      wrapper = shallow(<Header.wrappedComponent {...props} />)
+    })
+
+    it('renders the BasicHeader', () => {
+      expect(wrapper.find('BasicHeader').exists()).toBe(true)
+    })
+  })
+
   describe('when clicking on user', () => {
     let settings, logout
 

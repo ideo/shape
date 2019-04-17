@@ -18,17 +18,38 @@ class BaseRecord extends jsonapi(Model) {
     }
   }
 
+  get apiStore() {
+    // this datx collection is the apiStore
+    return this.meta.collection
+  }
+
+  get uiStore() {
+    // uiStore gets supplied via apiStore
+    return this.apiStore.uiStore
+  }
+
+  get routingStore() {
+    // routingStore gets supplied via apiStore
+    return this.apiStore.routingStore
+  }
+
   @computed
   get id() {
     return this.meta.id
   }
 
-  get persisted() {
-    return !!this.id && this.id > 0
+  // We call `type` (the STI attribute) `class_type` in the API so that it doesn't confuse json-api-client
+  // however the frontend still refers to it as `type`
+  get type() {
+    return this.class_type
   }
 
-  get apiStore() {
-    return this.meta.collection
+  set type(t) {
+    this.class_type = t
+  }
+
+  get persisted() {
+    return !!this.id && this.id > 0
   }
 
   get internalType() {

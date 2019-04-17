@@ -36,6 +36,7 @@ const CardActionHolder = ({
       fill={active ? v.colors.black : v.colors.commonMedium}
       size={size}
       onClick={onClick}
+      data-cy={`CardAction-${tooltipText}`}
     >
       {children}
     </StyledIcon>

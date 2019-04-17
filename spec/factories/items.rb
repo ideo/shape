@@ -10,7 +10,7 @@ FactoryBot.define do
 
     factory :text_item, class: 'Item::TextItem' do
       content { Faker::BackToTheFuture.quote }
-      text_data { { ops: [{ insert: 'Hola, world.' }] } }
+      data_content { { ops: [{ insert: 'Hola, world.' }] } }
     end
 
     factory :link_item, class: 'Item::LinkItem' do
@@ -39,12 +39,49 @@ FactoryBot.define do
     end
 
     factory :chart_item, class: 'Item::ChartItem' do
-      data_source factory: :question_item
+      trait :with_question_item do
+        data_source factory: :question_item
+      end
+      trait :with_remote_url do
+        url 'https://creativedifference.ideo.com/api/v4/quality_scores'
+      end
     end
 
     factory :data_item, class: 'Item::DataItem' do
-      data_settings { { d_measure: 'participants', d_timeframe: 'ever' } }
+      trait :report_type_collections_and_items do
+        report_type :report_type_collections_and_items
+        data_settings { { d_measure: 'participants', d_timeframe: 'ever' } }
+      end
+
+      trait :report_type_network_app_metric do
+        report_type :report_type_network_app_metric
+        url 'https://profile.ideo.com/api/v1/app_metrics'
+      end
+
+      trait :report_type_record do
+        data_content(
+          datasets: [
+            {
+              measure: 'IDEO',
+              chart_type: 'area',
+              single_value: 0,
+              order: 0,
+              data: [{ date: '2018-10-03', value: 80 }],
+            },
+            {
+              measure: 'All Organizations',
+              chart_type: 'line',
+              single_value: 0,
+              order: 1,
+              data: [{ date: '2018-11-13', value: 24 }],
+            },
+          ],
+        )
+        report_type :report_type_record
+      end
     end
+
+    factory :legend_item, class: 'Item::LegendItem'
 
     after(:build) do |item, evaluator|
       if evaluator.parent_collection

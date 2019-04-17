@@ -7,9 +7,7 @@ namespace :cypress do
 
     email = 'cypress-test@ideo.com'
     user = User.find_by(email: email)
-    unless user.present?
-      user = FactoryBot.create(:user, email: email, id: 4).becomes(User)
-    end
+    user ||= FactoryBot.create(:user, email: email).becomes(User)
     organization = Organization.find_by(name: 'CypressTest')
     unless organization.present?
       builder = OrganizationBuilder.new(
@@ -24,6 +22,7 @@ namespace :cypress do
     # via dependent: :destroy this will also remove everything in the test area
     my_collection.collections.where(name: 'Cypress Test Area').destroy_all
     create_cards(my_collection, user)
+    create_events(organization)
   end
 
   def create_cards(collection, user)
@@ -40,6 +39,7 @@ namespace :cypress do
     builder.create
 
     card = builder.collection_card
+
     builder = CollectionCardBuilder.new(
       params: {
         order: 0,
@@ -51,5 +51,19 @@ namespace :cypress do
       user: user,
     )
     builder.create
+  end
+
+  def create_events(organization)
+    15.times do |_i|
+      user = FactoryBot.create(:user)
+      FactoryBot.create(:activity,
+                        # with cache_classes = false, it gets angry if you try to pass in the
+                        # actual model and not id (ActiveRecord::AssociationTypeMismatch)
+                        organization_id: organization.id,
+                        actor_id: user.id,
+                        action: :viewed,
+                        target: Collection.last,
+                        created_at: Date.today - rand(100))
+    end
   end
 end

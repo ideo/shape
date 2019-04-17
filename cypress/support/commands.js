@@ -3,8 +3,8 @@ import _ from 'lodash'
 // commands please read more here:
 // https://on.cypress.io/custom-commands
 
-Cypress.Commands.add('login', ({ userId } = {}) => {
-  cy.request('GET', `/login_as.json?id=${userId}`)
+Cypress.Commands.add('login', ({ email } = {}) => {
+  cy.request('GET', `/login_as?email=${email}`)
   cy.wait(100)
 })
 
@@ -77,6 +77,12 @@ Cypress.Commands.add('createTextItem', () => {
   cy.wait(50)
 })
 
+Cypress.Commands.add('createDataItem', () => {
+  cy.selectBctType({ type: 'report' })
+  cy.wait('@apiCreateCollectionCard')
+  cy.wait(50)
+})
+
 Cypress.Commands.add('resizeCard', (pos, size) => {
   // size e.g. "2x1" so we split on 'x'
   const sizes = size.split('x')
@@ -123,6 +129,16 @@ Cypress.Commands.add('selectBctType', ({ type, empty = false }) => {
     cy.locateDataOrClass('.StyledHotspot')
       .last()
       .click({ force: true })
+  }
+  if (type === 'report') {
+    cy.locate('BctButton-more')
+      .last()
+      .click({ force: true })
+    cy.wait(100)
+    cy.locate('PopoutMenu_createReport')
+      .first()
+      .click({ force: true })
+    return
   }
   cy.locate(`BctButton-${type}`)
     .first()

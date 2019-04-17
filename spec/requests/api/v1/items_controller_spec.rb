@@ -3,6 +3,39 @@ require 'rails_helper'
 describe Api::V1::ItemsController, type: :request, json: true, auth: true do
   let(:user) { @user }
 
+  describe 'GET #index', api_token: true do
+    let(:path) { '/api/v1/items' }
+
+    # these index actions are essentially testing Collection::FilteredIndexLoader
+    it 'returns a 422 unless filter param is present' do
+      get(path)
+      expect(response.status).to eq(422)
+    end
+
+    it 'returns a 200 if filter param and api_token are present' do
+      get(path, params: { filter: { external_id: '99' } })
+      expect(response.status).to eq(200)
+    end
+
+    context 'with api token and external_id', auth: false do
+      let(:item) { create(:text_item) }
+      let!(:external_record) do
+        create(:external_record, external_id: '99', externalizable: item, application: @api_token.application)
+      end
+
+      it 'returns the item with external_id' do
+        get(
+          path,
+          params: { filter: { external_id: '99' } },
+          headers: { Authorization: "Bearer #{@api_token.token}" },
+        )
+        expect(response.status).to eq(200)
+        expect(json['data'].count).to eq 1
+        expect(json['data'].first['attributes']['external_id']).to eq '99'
+      end
+    end
+  end
+
   describe 'GET #show' do
     let!(:item) { create(:text_item, add_viewers: [user]) }
     let(:path) { "/api/v1/items/#{item.id}" }
@@ -104,6 +137,13 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
         },
       )
     end
+    let(:broadcaster) { double('broadcaster') }
+
+    before do
+      allow(CollectionUpdateBroadcaster).to receive(:new).and_return(broadcaster)
+      allow(broadcaster).to receive(:text_item_updated).and_return(true)
+      allow(broadcaster).to receive(:call).and_return(true)
+    end
 
     it 'returns a 200' do
       patch(path, params: params)
@@ -151,12 +191,24 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
       patch(path, params: params)
     end
 
-    it 'broadcasts collection updates' do
-      expect(CollectionUpdateBroadcaster).to receive(:call).with(
-        parent,
-        user,
-      )
-      patch(path, params: params)
+    context 'with a text item' do
+      let!(:item) { create(:text_item, add_editors: [user]) }
+
+      it 'broadcasts individual text updates' do
+        expect(broadcaster).to receive(:text_item_updated).with(
+          item,
+        )
+        patch(path, params: params)
+      end
+    end
+
+    context 'with a link item' do
+      let!(:item) { create(:link_item, add_editors: [user]) }
+
+      it 'broadcasts collection updates' do
+        expect(broadcaster).to receive(:call)
+        patch(path, params: params)
+      end
     end
 
     context 'with cancel_sync == true' do

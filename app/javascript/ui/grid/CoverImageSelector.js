@@ -7,7 +7,6 @@ import styled from 'styled-components'
 import FlipMove from 'react-flip-move'
 
 import CardActionHolder from '~/ui/icons/CardActionHolder'
-import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import CoverImageToggleIcon from '~/ui/icons/CoverImageToggleIcon'
 import FilestackUpload from '~/utils/FilestackUpload'
 import QuickOptionSelector from '~/ui/global/QuickOptionSelector'
@@ -16,6 +15,9 @@ import UploadIcon from '~/ui/icons/UploadIcon'
 import XIcon from '~/ui/icons/XIcon'
 import { SmallBreak } from '~/ui/global/styled/layout'
 import v, { ITEM_TYPES } from '~/utils/variables'
+// This must be imported last, or else it leads to a cryptic
+// circular dependency issue
+import CollectionCard from '~/stores/jsonApi/CollectionCard'
 
 const removeOption = {
   type: 'remove',

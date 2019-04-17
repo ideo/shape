@@ -10,6 +10,8 @@ class QuestionAnswer < ApplicationRecord
 
   delegate :completed?, to: :survey_response, prefix: true
 
+  validates :answer_number, presence: true, if: :answer_number_required?
+
   after_commit :update_survey_response, on: %i[create destroy], if: :survey_response_present?
   after_commit :update_collection_test_scores, if: :survey_response_present?
   before_save :update_open_response_item, if: :update_open_response_item?
@@ -36,7 +38,8 @@ class QuestionAnswer < ApplicationRecord
     item = open_response_item
     return create_open_response_item if item.blank?
     return destroy_open_response_item_and_card if answer_text.blank?
-    item.set_ops_from_plain_text(answer_text)
+    item.content = answer_text
+    item.import_plaintext_content(answer_text)
     item.save
   end
 
@@ -46,9 +49,7 @@ class QuestionAnswer < ApplicationRecord
       item_attributes: {
         type: 'Item::TextItem',
         content: answer_text,
-        text_data: {
-          ops: TextToQuillOps.call(answer_text),
-        },
+        data_content: QuillContentConverter.new(answer_text).text_to_quill_ops,
       },
     }
     builder = CollectionCardBuilder.new(
@@ -78,5 +79,9 @@ class QuestionAnswer < ApplicationRecord
     return if survey_response.destroyed?
     return unless survey_response.completed?
     survey_response.cache_test_scores!
+  end
+
+  def answer_number_required?
+    question&.scale_question?
   end
 end

@@ -29,6 +29,7 @@ class PageWithApiWrapper extends React.Component {
     if (fetchType && fetchId) {
       const data = apiStore.find(fetchType, fetchId)
       if (data) {
+        data.fullyLoaded = false
         this.setState({ data })
       }
     }
@@ -48,9 +49,13 @@ class PageWithApiWrapper extends React.Component {
   get fetchId() {
     // will use a custom function (passed in prop)
     // or else default to match.params.id
+    // e.g. used on HomePage to fetch currentUserCollectionId
     const { fetchId, apiStore, match } = this.props
-    if (!fetchId) return match.params.id
-    return fetchId(apiStore, match.params.id)
+    // strip non-numeric characters from id
+    let paramsId = parseInt(match.params.id) || match.params.id
+    paramsId = paramsId ? paramsId.toString() : null
+    if (!fetchId) return paramsId
+    return fetchId(apiStore, paramsId)
   }
 
   requiresFetch = ({ location: prevLocation, match: prevMatch }) => {
@@ -83,6 +88,7 @@ class PageWithApiWrapper extends React.Component {
       .then(res => {
         if (this.unmounted) return
         const { data } = res
+        data.fullyLoaded = true
         this.setState({ data })
       })
       .catch(err => {
@@ -143,6 +149,6 @@ export const ItemApiWrapper = routerProps => (
   <PageWithApiWrapper
     {...routerProps}
     fetchType="items"
-    render={item => <ItemPage item={item} />}
+    render={item => <ItemPage item={item} fullyLoaded={item.fullyLoaded} />}
   />
 )

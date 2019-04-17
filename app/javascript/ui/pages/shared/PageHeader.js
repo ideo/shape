@@ -42,6 +42,7 @@ const IconHolder = styled.span`
     props.align === 'left'
       ? 'margin-right: 12px;'
       : 'margin-left: 6px;'} margin-top: 12px;
+  overflow: hidden;
   width: 32px;
 
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
@@ -52,7 +53,6 @@ const IconHolder = styled.span`
 `
 
 const HeaderFormButton = FormButton.extend`
-  margin-left: 30px;
   margin-top: 10px;
   font-size: 0.825rem;
 `
@@ -358,6 +358,7 @@ class PageHeader extends React.Component {
               justify="space-between"
             >
               <Flex
+                wrap
                 align="center"
                 className="title"
                 onClick={this.handleTitleClick}
@@ -431,7 +432,6 @@ class PageHeader extends React.Component {
                       <HeaderFormButton
                         width="170"
                         color={v.colors.transparent}
-                        style={{ marginLeft: 10 }}
                         onClick={record.closeTest}
                         disabled={uiStore.launchButtonLoading}
                       >

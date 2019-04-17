@@ -18,6 +18,13 @@ module RealtimeEditorsViewers
     )
   end
 
+  def received_changes(data, user = nil)
+    publish_to_channel(
+      current_editor: user ? user.as_json : {},
+      data: data,
+    )
+  end
+
   # Track viewers by user_id
   # Using an increment counter was prone to dupe issues (e.g. same user with two browser windows open)
   def started_viewing(user, dont_notify: false)
@@ -36,6 +43,10 @@ module RealtimeEditorsViewers
 
   def stream_name
     editing_cache_key
+  end
+
+  def publish_error
+    ActionCable.server.broadcast stream_name, {}, code: :unprocessable_entity
   end
 
   private
@@ -58,9 +69,6 @@ module RealtimeEditorsViewers
       record_type: jsonapi_type_name,
     }
     data = defaults.merge!(merge_data)
-    if is_a?(Item::TextItem)
-      data[:item_text_data] = text_data.as_json
-    end
     ActionCable.server.broadcast stream_name, data
   end
 

@@ -16,6 +16,7 @@ FactoryBot.define do
     organization factory: :organization_without_groups
 
     factory :user_collection, class: Collection::UserCollection
+    factory :application_collection, class: Collection::ApplicationCollection
     factory :shared_with_me_collection, class: Collection::SharedWithMeCollection
     factory :global_collection, class: Collection::Global
     factory :getting_started_template_collection, class: Collection::Global do

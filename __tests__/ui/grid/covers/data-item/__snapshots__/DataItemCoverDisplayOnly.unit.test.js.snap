@@ -1,0 +1,98 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
+<StyledDataItemCover>
+  <styled.div>
+    <StyledHeading3
+      color="#EFEFEF"
+    >
+      Data Item
+      <Tooltip
+        classes={
+          Object {
+            "tooltip": "Tooltip",
+          }
+        }
+        placement="bottom"
+        title="The degree to which there is alignment about a meaningful change that leadership and employees want to make in the world."
+      >
+        <styled.div
+          color="#EFEFEF"
+        >
+          <InfoIcon
+            height={11}
+            style={
+              Object {
+                "fill": undefined,
+              }
+            }
+            width={11}
+          />
+        </styled.div>
+      </Tooltip>
+    </StyledHeading3>
+    <br />
+  </styled.div>
+  <ChartGroup
+    datasets={
+      Array [
+        Object {
+          "chart_type": "area",
+          "data": Array [
+            Object {
+              "date": "2018-07-10",
+              "value": 10,
+            },
+            Object {
+              "date": "2018-08-10",
+              "value": 25,
+            },
+            Object {
+              "date": "2018-09-10",
+              "value": 30,
+            },
+          ],
+          "description": "The degree to which there is alignment about a meaningful change that leadership and employees want to make in the world.",
+          "measure": "Purpose",
+          "order": 0,
+          "single_value": 0,
+          "style": Object {
+            "dashWidth": 2,
+            "fill": "#EFEFEF",
+          },
+          "timeframe": "month",
+        },
+        Object {
+          "chart_type": "line",
+          "data": Array [
+            Object {
+              "date": "2018-07-10",
+              "value": 10,
+            },
+            Object {
+              "date": "2018-08-10",
+              "value": 25,
+            },
+            Object {
+              "date": "2018-09-10",
+              "value": 30,
+            },
+          ],
+          "description": "The degree to which there is alignment about a meaningful change that leadership and employees want to make in the world.",
+          "measure": "95th Percentile",
+          "order": 1,
+          "single_value": 0,
+          "style": Object {
+            "dashWidth": 2,
+            "fill": "#EFEFEF",
+          },
+          "timeframe": "month",
+        },
+      ]
+    }
+    height={1}
+    simpleDateTooltip={true}
+    width={1}
+  />
+</StyledDataItemCover>
+`;

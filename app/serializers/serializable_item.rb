@@ -1,9 +1,10 @@
 class SerializableItem < BaseJsonSerializer
+  include SerializedExternalId
   type 'items'
-  attributes :type, :name, :content, :text_data,
+  attributes :name, :content, :data_content,
              :url, :thumbnail_url, :icon_url, :question_type,
              :data_source_type, :data_source_id, :data_settings,
-             :previous_thumbnail_urls
+             :previous_thumbnail_urls, :legend_item_id
 
   has_many :roles do
     data do
@@ -40,6 +41,10 @@ class SerializableItem < BaseJsonSerializer
     @object.filestack_file_handle
   end
 
+  attribute :has_replaced_media do
+    @object.replaced_media?
+  end
+
   belongs_to :filestack_file
 
   attribute :breadcrumb, if: -> { @object == @current_record || @force_breadcrumbs } do
@@ -60,5 +65,9 @@ class SerializableItem < BaseJsonSerializer
   attribute :pinned_and_locked do
     # might be nil, particularly in tests
     @object.pinned_and_locked? || false
+  end
+
+  attribute :pending_transcoding do
+    @object.pending_transcoding_uuid.present?
   end
 end

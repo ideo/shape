@@ -61,6 +61,7 @@ class CollectionGrid extends React.Component {
       rows: 1,
       hoveringOver: null,
       dragTimeoutId: null,
+      matrix: [],
     }
   }
 
@@ -292,6 +293,7 @@ class CollectionGrid extends React.Component {
   async moveCardsIntoCollection(cardIds, hoveringRecord) {
     const { collection, uiStore, apiStore } = this.props
     const can_edit = hoveringRecord.can_edit_content || hoveringRecord.can_edit
+    uiStore.update('movingIntoCollection', hoveringRecord)
     if (!can_edit) {
       uiStore.confirm({
         prompt:
@@ -352,6 +354,13 @@ class CollectionGrid extends React.Component {
     const hoveringOver = this.findOverlap(cardId, dragPosition)
     if (hoveringOver && hoveringOver.card.isPinnedAndLocked) return
     if (hoveringOver) {
+      if (hoveringOver.card.cardType === 'placeholder') {
+        if (!placeholder) {
+          // the case where we created a new placeholder in findOverlap
+          placeholder = hoveringOver.card
+          stateCards.push(placeholder)
+        }
+      }
       const previousHoveringOver = this.state.hoveringOver
       const previousHoverOrder = previousHoveringOver
         ? previousHoveringOver.order
@@ -413,7 +422,8 @@ class CollectionGrid extends React.Component {
       cardType: 'placeholder',
       record: original.record,
     }
-    const placeholder = new CollectionCard(data)
+    // NOTE: important to always initialize models supplying apiStore as the collection
+    const placeholder = new CollectionCard(data, this.props.apiStore)
     updateModelId(placeholder, placeholderKey)
     return placeholder
   }
@@ -423,44 +433,90 @@ class CollectionGrid extends React.Component {
   }
 
   findOverlap = (cardId, dragPosition) => {
-    let hoveringOver = null
     const { dragX, dragY } = dragPosition
-    const { gutter, gridW } = this.props
-    _.each(this.state.cards, card => {
-      if (card.isBeingMultiMoved) return null
-      const placeholder =
-        card.cardType === 'placeholder' || card.cardType === 'blank'
-      if (card.id === cardId || placeholder) return null
-      // only run this check if we're within the reasonable row bounds
-      const { position } = card
-      const sameRow =
-        dragY >= position.yPos - gutter * 0.5 &&
-        dragY <= position.yPos + position.height
+    const { gutter, gridW, gridH } = this.props
+    const { cards, matrix } = this.state
+    let placeholder = _.find(cards, { cardType: 'placeholder' })
+    if (placeholder) {
+      // always reset this setting, unless we manually position below
+      placeholder.skipPositioning = false
+    }
 
-      const withinCard =
-        dragX >= position.xPos - gutter * 2 &&
-        dragX <= position.xPos + position.width - gutter
-      if (sameRow && withinCard) {
-        const { order, record } = card
-        // approx 70px at full width
-        const leftAreaSize = gridW * 0.23
-        let direction = 'left'
-        if (card.record && card.record.internalType === 'collections') {
-          // only collections have a "hover right" area
-          direction = dragX >= position.xPos + leftAreaSize ? 'right' : 'left'
-        }
-        hoveringOver = {
-          order,
-          direction,
-          card,
-          record,
-        }
-        // exit early
-        return false
+    // calculate row/col that we are dragging over (with some padding to account for our desired logic)
+    const row = Math.floor((dragY + gutter * 0.5) / (gridH + gutter))
+    const col = Math.floor((dragX + gutter * 2) / (gridW + gutter))
+
+    let overlapCardId = null
+    if (matrix[row] && matrix[row][col]) {
+      // first case: we're directly overlapping an existing card
+      overlapCardId = matrix[row][col]
+      const overlapped = _.find(cards, { id: overlapCardId })
+      const { record, position } = overlapped
+      if (overlapped.isBeingMultiMoved) return null
+      const isPlaceholder =
+        overlapped.cardType === 'placeholder' || overlapped.cardType === 'blank'
+      if (overlapped.id === cardId || isPlaceholder) return null
+
+      const leftAreaSize = gridW * 0.23
+      let direction = 'left'
+      if (record && record.internalType === 'collections') {
+        // only collections have a "hover right" area
+        direction = dragX >= position.xPos + leftAreaSize ? 'right' : 'left'
       }
-      return null
-    })
-    return hoveringOver
+      return {
+        order: overlapped.order,
+        direction,
+        card: overlapped,
+        record,
+      }
+    } else if (row >= 0 && row <= matrix.length && col >= 0 && col <= 3) {
+      // if we're within the grid, but not over an existing card...
+      // we need to actually find the closest card to determine "order"
+      const currentRow = matrix[row]
+      // [ 1  1  2  2 ]
+      // [ 3  4  x  x ]  <--- card 4 is "nearest" our gap
+      const rowPortion = _.compact(_.take(currentRow, col + 1))
+      const cardsInRow = _.filter(
+        cards,
+        c => _.includes(rowPortion, c.id) && c.position.y === row
+      )
+      let near = _.last(cardsInRow)
+      if (!near && row > 0) {
+        // there is the case where the "nearest" card is sticking down from the previous row
+        // [ 1  1  2  3 ]
+        // [ 1  1  x  x ]  <--- card 1 is not actually "nearest", should find card 3
+        near = _.find(cards, { id: _.last(_.compact(matrix[row - 1])) })
+      }
+      if (near) {
+        if (!placeholder) {
+          const positionedCard = _.find(cards, { id: cardId })
+          placeholder = this.createPlaceholderCard(positionedCard)
+        }
+        // update the placeholder attrs to move it to our desired spot.
+        placeholder.order = near.order + 0.5
+        placeholder.width = 1
+        placeholder.height = 1
+        // we want to skip positioning in positionCards because we are manually setting x/yPos
+        placeholder.skipPositioning = true
+        placeholder.position = {
+          x: row,
+          y: col,
+          xPos: col * (gridW + gutter),
+          yPos: row * (gridH + gutter),
+          width: gridW,
+          height: gridH,
+        }
+
+        return {
+          order: placeholder.order,
+          direction: 'left',
+          card: placeholder,
+          record: null,
+        }
+      }
+    }
+
+    return null
   }
 
   setHoveringOverProperties = (card, hoveringOver) => {
@@ -551,11 +607,7 @@ class CollectionGrid extends React.Component {
         return
       }
 
-      if (card.isBeingMoved) {
-        return
-      }
-
-      if (card.tempHidden) {
+      if (card.isBeingMoved || card.tempHidden || card.skipPositioning) {
         return
       }
 
@@ -704,11 +756,19 @@ class CollectionGrid extends React.Component {
         }
       }
     })
+
+    let rows = matrix.length
+    if (!addEmptyCard && _.isEmpty(_.compact(_.last(matrix)))) {
+      // don't add space for an empty row if we don't want it to appear
+      rows -= 1
+    }
+
     // update cards in state
     this.setState(
       {
         cards,
-        rows: matrix.length,
+        rows,
+        matrix,
       },
       () => {
         if (_.isFunction(opts.onMoveComplete)) opts.onMoveComplete()
@@ -754,10 +814,10 @@ class CollectionGrid extends React.Component {
           record={record}
           onDrag={this.onDrag}
           hoveringOverLeft={
-            card.hoveringOver && card.hoveringOver.direction === 'left'
+            !!card.hoveringOver && card.hoveringOver.direction === 'left'
           }
           hoveringOverRight={
-            card.hoveringOver && card.hoveringOver.direction === 'right'
+            !!card.hoveringOver && card.hoveringOver.direction === 'right'
           }
           holdingOver={!!card.holdingOver}
           onDragOrResizeStop={this.onDragOrResizeStop}

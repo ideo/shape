@@ -7,7 +7,6 @@ import Input from '@material-ui/core/Input'
 import Chip from '@material-ui/core/Chip'
 import AsyncCreatable from 'react-select/lib/AsyncCreatable'
 import Select from 'react-select'
-import { pick } from 'lodash'
 
 import Loader from '~/ui/layout/Loader'
 import Option from '~/ui/global/AutocompleteOption'
@@ -72,7 +71,6 @@ const selectStyles = theme => ({
   clearIndicator: () => ({}),
   container: () => ({}),
   control: () => ({
-    width: '370px',
     paddingLeft: '24px',
     display: 'flex',
     alignItems: 'center',
@@ -92,11 +90,13 @@ const selectStyles = theme => ({
     ...base,
   }),
   loadingIndicator: () => ({}),
-  loadingMessage: () => ({}),
+  loadingMessage: () => ({
+    padding: theme.spacing.unit * 2,
+  }),
   menu: base => ({
-    ...pick(base, ['position', 'width', 'zIndex']),
+    ...base,
+    borderRadius: '0px',
     backgroundColor: 'white',
-    top: `calc(100% + ${theme.spacing.unit}px)`,
     width: '370px',
     zIndex: 2,
   }),
@@ -125,13 +125,22 @@ const selectStyles = theme => ({
 })
 
 const SelectWrapped = props => {
-  const { classes, theme, creatable, options, optionSearch, ...other } = props
+  const {
+    classes,
+    theme,
+    creatable,
+    options,
+    optionSearch,
+    menuPlacement,
+    ...other
+  } = props
   if (optionSearch && !creatable) {
     // Option search will do an async search for options.
     return (
       <AsyncSelect
         loadOptions={optionSearch}
         defaultOptions
+        menuPlacement={menuPlacement}
         styles={selectStyles(theme)}
         components={{
           valueComponent: valueComponent(classes),
@@ -149,6 +158,7 @@ const SelectWrapped = props => {
       defaultOptions
       styles={selectStyles(theme)}
       formatCreateLabel={inputValue => `Invite email ${inputValue}`}
+      menuPlacement={menuPlacement}
       components={{
         valueComponent: valueComponent(classes),
         LoadingIndicator,
@@ -166,6 +176,7 @@ const SelectWrapped = props => {
   ) : (
     <Select
       styles={selectStyles(theme)}
+      menuPlacement={menuPlacement}
       components={{
         valueComponent: valueComponent(classes),
         DropdownIndicator,
@@ -228,12 +239,14 @@ class AutoComplete extends React.Component {
       options,
       optionSearch,
       placeholder,
+      menuPlacement,
       creatable,
     } = this.props
     const { option } = this.state
     return (
       <div className={classes.root}>
         <Input
+          fullWidth
           inputComponent={SelectWrappedWithStyles}
           inputProps={{
             classes,
@@ -244,6 +257,7 @@ class AutoComplete extends React.Component {
             onChange: this.handleChange,
             placeholder,
             creatable,
+            menuPlacement,
             instanceId: 'react-select-chip',
             id: 'react-select-chip',
             name: 'react-select-chip',
@@ -274,6 +288,7 @@ AutoComplete.propTypes = {
   placeholder: PropTypes.string,
   creatable: PropTypes.bool,
   value: PropTypes.number,
+  menuPlacement: PropTypes.string,
 }
 
 AutoComplete.defaultProps = {
@@ -283,6 +298,7 @@ AutoComplete.defaultProps = {
   placeholder: '',
   value: undefined,
   optionSearch: null,
+  menuPlacement: 'bottom',
 }
 
 export default withStyles(styles)(AutoComplete)
