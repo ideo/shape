@@ -5,6 +5,12 @@ const fakeUiStore = {
     gridW: 312,
     gridH: 250,
   },
+  defaultGridSettings: {
+    cols: 4,
+    gutter: 20,
+    gridW: 312,
+    gridH: 250,
+  },
   blankContentToolState: {
     order: null,
     width: null,

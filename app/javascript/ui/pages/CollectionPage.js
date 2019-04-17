@@ -392,73 +392,60 @@ class CollectionPage extends React.Component {
       submissionBoxSettingsOpen,
       gridSettings,
       selectedArea,
+      cardMenuOpen,
     } = uiStore
+
+    // props shared by Foamcore + Normal
+    const genericCollectionProps = {
+      collection,
+      loadCollectionCards: this.loadCollectionCards,
+      trackCollectionUpdated: this.trackCollectionUpdated,
+      canEditCollection: collection.can_edit_content,
+      // Pass in cardProperties so grid will re-render when they change
+      cardProperties: collection.cardProperties,
+      // Pass in BCT state so grid will re-render when open/closed
+      blankContentToolState,
+      // to trigger a re-render
+      movingCardIds: uiStore.isMovingCards ? [...uiStore.movingCardIds] : [],
+    }
 
     // submissions_collection will only exist for submission boxes
     const { isSubmissionBox, requiresTestDesigner } = collection
+
+    let inner
     if (collection.isBoard) {
-      return (
-        <Fragment>
-          <PageHeader record={collection} />
-          <PageContainer fullWidth={collection.isBoard}>
-            <FoamcoreGrid
-              // pull in cols, gridW, gridH, gutter
-              {...gridSettings}
-              selectedArea={selectedArea}
-              // Included so that component re-renders when area changes
-              selectedAreaMinX={selectedArea.minX}
-              collection={collection}
-              loadCollectionCards={this.loadCollectionCards}
-              trackCollectionUpdated={this.trackCollectionUpdated}
-              canEditCollection={collection.can_edit_content}
-              // Pass in cardProperties so grid will re-render when they change
-              cardProperties={collection.cardProperties}
-              // to trigger a re-render
-              movingCardIds={uiStore.movingCardIds}
-              // Pass in BCT state so grid will re-render when open/closed
-              blankContentToolState={blankContentToolState}
-            />
-            <MoveModal />
-            {(uiStore.dragging || uiStore.cardMenuOpenAndPositioned) && (
-              <ClickWrapper
-                clickHandlers={[this.handleAllClick]}
-                onContextMenu={this.handleAllClick}
-              />
-            )}
-          </PageContainer>
-          {isLoading && this.loader()}
-          {!isLoading && isTransparentLoading && this.transparentLoader()}
-        </Fragment>
+      inner = (
+        <FoamcoreGrid
+          {...genericCollectionProps}
+          selectedArea={selectedArea}
+          // Included so that component re-renders when area changes
+          selectedAreaMinX={selectedArea.minX}
+          // Trigger re-render if card menu is opened
+          cardIdMenuOpen={cardMenuOpen.id}
+        />
+      )
+    } else if (requiresTestDesigner) {
+      inner = this.renderTestDesigner()
+    } else {
+      inner = (
+        <CollectionGrid
+          {...genericCollectionProps}
+          // pull in cols, gridW, gridH, gutter
+          {...gridSettings}
+          // don't add the extra row for submission box
+          addEmptyCard={!isSubmissionBox}
+        />
       )
     }
+
     return (
       <Fragment>
         <PageHeader record={collection} />
         {!isLoading && (
-          <PageContainer>
+          <PageContainer fullWidth={collection.isBoard}>
             <OverdueBanner />
             {this.renderEditorPill}
-            {requiresTestDesigner && this.renderTestDesigner()}
-            {!requiresTestDesigner && (
-              <CollectionGrid
-                // pull in cols, gridW, gridH, gutter
-                {...gridSettings}
-                loadCollectionCards={this.loadCollectionCards}
-                trackCollectionUpdated={this.trackCollectionUpdated}
-                collection={collection}
-                canEditCollection={collection.can_edit_content}
-                // Pass in cardProperties so grid will re-render when they change
-                cardProperties={collection.cardProperties}
-                // Pass in BCT state so grid will re-render when open/closed
-                blankContentToolState={blankContentToolState}
-                // to trigger a re-render
-                movingCardIds={
-                  uiStore.isMovingCards ? [...uiStore.movingCardIds] : []
-                }
-                // don't add the extra row for submission box
-                addEmptyCard={!isSubmissionBox}
-              />
-            )}
+            {inner}
             {(collection.requiresSubmissionBoxSettings ||
               submissionBoxSettingsOpen) && (
               <SubmissionBoxSettingsModal collection={collection} />

@@ -420,9 +420,7 @@ class MovableGridCard extends React.PureComponent {
     const { height, width, xPos, yPos } = styleProps
     const { blankType } = card
 
-    let cardElement = (
-      <GridCardBlank height={height} parent={parent} preselected={blankType} />
-    )
+    let cardElement = <GridCardBlank parent={parent} preselected={blankType} />
     if (cardType === 'submission') {
       cardElement = (
         <AddSubmission

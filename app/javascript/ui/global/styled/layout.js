@@ -77,8 +77,13 @@ export const FixedHeader = styled(StyledHeader)`
   z-index: ${props => props.zIndex};
   position: fixed;
   top: 0;
-  background: ${hexToRgba(v.colors.commonLight, 0.8)};
-  backdrop-filter: blur(8px);
+  background: ${hexToRgba(v.colors.commonLight, 0.96)};
+  @supports (
+    (-webkit-backdrop-filter: blur(4px)) or (backdrop-filter: blur(4px))
+  ) {
+    background: ${hexToRgba(v.colors.commonLight, 0.9)};
+    backdrop-filter: blur(4px);
+  }
 `
 FixedHeader.displayName = 'FixedHeader'
 
