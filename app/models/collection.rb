@@ -713,6 +713,10 @@ class Collection < ApplicationRecord
     is_a?(Collection::TestCollection) || is_a?(Collection::TestDesign)
   end
 
+  def board_collection?
+    type == 'Collection::Board'
+  end
+
   def global_collection?
     type == 'Collection::Global'
   end

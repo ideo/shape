@@ -49,9 +49,10 @@ const BlankCard = styled.div.attrs({
 `
 
 const Grid = styled.div`
-  min-height: 1300px;
   margin-top: ${v.pageContentMarginTop}px;
   position: relative;
+  width: ${props => `${props.width}px`};
+  min-height: ${props => `${props.height}px`};
 `
 
 const StyledPlusIcon = styled.div`
@@ -77,6 +78,7 @@ const pageMargins = {
 
 const MAX_CARD_W = 4
 const MAX_CARD_H = 2
+const MAX_COLS = 16
 
 // needs to be an observer to observe changes to the collection + items
 @inject('apiStore', 'routingStore', 'uiStore')
@@ -240,13 +242,36 @@ class FoamcoreGrid extends React.Component {
     if (col > this.loadedCols.max) this.loadedCols.max = col
   }
 
+  get gridSettings() {
+    // Foamcore doesn't change gridSettings based on browser size,
+    // instead always refer to the defaults
+    return this.props.uiStore.defaultGridSettings
+  }
+
+  get totalGridSize() {
+    const { gridW, gridH, gutter } = this.gridSettings
+    const { collection } = this.props
+    // Max rows is the max row of any current cards (max_row_index)
+    // + 1, since it is zero-indexed,
+    // + 2x the visible number of rows
+    // for padding to allow scrolling beyond the current cards
+    const visRows = this.visibleRows.num || 1
+    const maxRows = collection.max_row_index + 1 + visRows * 2
+    const height = ((gridH + gutter) * maxRows) / this.zoomLevel
+    const width = ((gridW + gutter) * MAX_COLS) / this.zoomLevel
+    return {
+      width,
+      height,
+    }
+  }
+
   get cardAndGutterWidth() {
-    const { gridW, gutter } = this.props
+    const { gridW, gutter } = this.gridSettings
     return (gridW + gutter) / this.zoomLevel
   }
 
   get cardAndGutterHeight() {
-    const { gridH, gutter } = this.props
+    const { gridH, gutter } = this.gridSettings
     return (gridH + gutter) / this.zoomLevel
   }
 
@@ -291,7 +316,7 @@ class FoamcoreGrid extends React.Component {
   // Finds row and column from an x,y coordinate
   coordinatesForPosition(position) {
     const { x, y } = position
-    const { gridW, gridH, gutter } = this.props
+    const { gridW, gridH, gutter } = this.gridSettings
     const { zoomLevel } = this
 
     const col = Math.floor((x / (gridW + gutter)) * zoomLevel)
@@ -303,7 +328,7 @@ class FoamcoreGrid extends React.Component {
   }
 
   positionForCoordinates({ col, row, width = 1, height = 1 }) {
-    const { gridW, gridH, gutter } = this.props
+    const { gridW, gridH, gutter } = this.gridSettings
     const { zoomLevel } = this
     const pos = {
       x: (col * (gridW + gutter)) / zoomLevel,
@@ -944,7 +969,7 @@ class FoamcoreGrid extends React.Component {
     _.each(
       _.range(0, collection.max_row_index + this.visibleRows.num * 2),
       row => {
-        _.each(_.range(0, 15), col => {
+        _.each(_.range(0, MAX_COLS), col => {
           // If there's no row, or nothing in this column, add a blank card for this spot
           const blankCard = { row, col, width: 1, height: 1 }
           if (!matrix[row] || !matrix[row][col]) {
@@ -1032,8 +1057,7 @@ class FoamcoreGrid extends React.Component {
   }
 
   render() {
-    const { gridW } = this.props
-
+    const gridSize = this.totalGridSize
     return (
       <Grid
         data-empty-space-click
@@ -1041,27 +1065,23 @@ class FoamcoreGrid extends React.Component {
         innerRef={ref => {
           this.gridRef = ref
         }}
+        width={gridSize.width}
+        height={gridSize.height}
       >
         <FoamcoreZoomControls
           onZoomIn={this.handleZoomIn}
           onZoomOut={this.handleZoomOut}
         />
-        <div style={{ width: `${gridW * 16}px`, height: '1px' }} />
         {this.cardsToRender}
       </Grid>
     )
   }
 }
 
-const gridConfigProps = {
-  cols: PropTypes.number.isRequired,
-  gridH: PropTypes.number.isRequired,
-  gridW: PropTypes.number.isRequired,
-  gutter: PropTypes.number.isRequired,
-}
-
 FoamcoreGrid.propTypes = {
-  ...gridConfigProps,
+  // gridH: PropTypes.number.isRequired,
+  // gridW: PropTypes.number.isRequired,
+  // gutter: PropTypes.number.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   cardProperties: MobxPropTypes.arrayOrObservableArray.isRequired,
   trackCollectionUpdated: PropTypes.func.isRequired,
