@@ -84,11 +84,12 @@ RSpec.describe CardMover, type: :service do
         it 'sets row of moved cards 2 rows after the last non-blank row' do
           card_mover.call
 
-          cards_.reload.each_with_index do |card, index|
+          cards.reload.each_with_index do |card, index|
             expect(card.parent_id).to eq to_collection.id
             expect(card.row).to eq target_empty_row
             expect(card.col).to eq index
           end
+        end
       end
     end
 
@@ -124,10 +125,11 @@ RSpec.describe CardMover, type: :service do
         it 'sets row of linked cards 2 rows after the last non-blank row' do
           card_mover.call
           # expect ^this to change row and column for linked cards?
-          linking_cards.each_with_index do |card, index|
+          linking_cards.reload.each_with_index do |card, index|
             expect(card.row).to eq target_empty_row
             expect(card.col).to eq index
           end
+        end
       end
     end
 
