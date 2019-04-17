@@ -59,7 +59,6 @@ const InnerCardWrapper = styled.div.attrs({
 
 const cardCSSTransition = 'transform 0.4s, width 0.25s, height 0.25s'
 const cardHoverTransition = 'transform 0.2s'
-const TOP_SCROLL_TRIGGER = 210
 
 const scrollAmount = () => {
   // When zooming browser in or out, it doesn't work to use `1` as the unit,
@@ -144,12 +143,12 @@ class MovableGridCard extends React.PureComponent {
     }
 
     // Vertical Scroll
-    if (e.clientY < TOP_SCROLL_TRIGGER) {
+    if (e.clientY < v.topScrollTrigger) {
       // At top of viewport
       this.scrolling = true
       this.scrollUp(null, e.clientY)
       return
-    } else if (e.clientY > window.innerHeight - TOP_SCROLL_TRIGGER) {
+    } else if (e.clientY > window.innerHeight - v.topScrollTrigger) {
       // At bottom of viewport
       this.scrolling = true
       this.scrollDown()
@@ -224,7 +223,7 @@ class MovableGridCard extends React.PureComponent {
   }
 
   handleDrag = (e, data, dX, dY) => {
-    const { position } = this.props
+    const { position, dragOffset } = this.props
     // Global dragging should use screen coordinates
     // TODO this could also be a HOC that publishes to the UI store
     const { pageX, pageY } = e
@@ -242,16 +241,12 @@ class MovableGridCard extends React.PureComponent {
 
     this.scrollIfNearPageBounds(e)
 
-    // TODO make this switch for normal collections
-    // const pageMargin = window.innerWidth - v.maxWidth
-    const pageMargin = v.containerPadding.horizontal / 2
-    let cardX = e.pageX
-    if (window.innerWidth >= v.maxWidth) {
-      cardX -= pageMargin / 2
-    } else {
-      cardX -= 35
-    }
-    const cardY = e.pageY - TOP_SCROLL_TRIGGER
+    console.log('dragOffset x', dragOffset.x, 'dragOffset y', dragOffset.y)
+
+    const cardX = e.pageX - dragOffset.x
+    const cardY = e.pageY - dragOffset.y
+
+    // Set x and y to be in the middle of the card
     this.setState({
       x: cardX - position.width / 2,
       y: cardY - position.height / 2,
@@ -532,13 +527,13 @@ class MovableGridCard extends React.PureComponent {
     if (dragging) {
       // experiment -- shrink wide and tall cards for easier movement
       if (width > 500) {
-        if (this.state.initialOffsetX > TOP_SCROLL_TRIGGER) {
+        if (this.state.initialOffsetX > v.topScrollTrigger) {
           xAdjust = this.state.initialOffsetX * 0.25
         }
         width *= 0.8
       }
       if (height > 500) {
-        if (this.state.initialOffsetY > TOP_SCROLL_TRIGGER) {
+        if (this.state.initialOffsetY > v.topScrollTrigger) {
           yAdjust = this.state.initialOffsetY * 0.25
         }
         height *= 0.8
@@ -700,6 +695,7 @@ MovableGridCard.propTypes = {
   hoveringOverRight: PropTypes.bool.isRequired,
   holdingOver: PropTypes.bool.isRequired,
   position: PropTypes.shape(propShapes.position).isRequired,
+  dragOffset: PropTypes.shape(propShapes.xy).isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
   onDrag: PropTypes.func.isRequired,

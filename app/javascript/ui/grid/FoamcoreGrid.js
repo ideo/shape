@@ -838,6 +838,11 @@ class FoamcoreGrid extends React.Component {
       position.yPos = position.y - this.zoomLevel * 38
     }
 
+    const dragOffset = {
+      x: pageMargins.left / this.zoomLevel,
+      y: pageMargins.top / this.zoomLevel,
+    }
+
     return (
       <MovableGridCard
         key={key}
@@ -848,6 +853,7 @@ class FoamcoreGrid extends React.Component {
         isSharedCollection={collection.isSharedCollection}
         isBoardCollection
         position={position}
+        dragOffset={dragOffset}
         record={card.record || {}}
         onDrag={this.onDrag}
         onDragStart={this.onDragStart}
