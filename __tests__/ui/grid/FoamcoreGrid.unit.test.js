@@ -63,6 +63,25 @@ describe('FoamcoreGrid', () => {
     expectTreeToMatchSnapshot(wrapper)
   })
 
+  describe('componentDidUpdate', () => {
+    beforeEach(() => {
+      instance.throttledCalculateCardsToRender = jest.fn()
+    })
+    it('re-renders when cardProperties have changed', () => {
+      wrapper.setProps({
+        collection: { ...fakeCollection },
+      })
+      // no changes because we did not change cardProperties
+      expect(instance.throttledCalculateCardsToRender).not.toHaveBeenCalled()
+      wrapper.setProps({
+        collection: { ...fakeCollection },
+        cardProperties: [{ id: 'new' }],
+      })
+      // it does re-render with a change to cardProperties
+      expect(instance.throttledCalculateCardsToRender).toHaveBeenCalled()
+    })
+  })
+
   describe('findCardOverlap', () => {
     it('finds filledSpot (or not) where a card is trying to be dragged', () => {
       // similar to calculateFilledSpots, but given a card (needs width and height >= 1)
