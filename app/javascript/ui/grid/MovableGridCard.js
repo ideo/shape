@@ -422,12 +422,10 @@ class MovableGridCard extends React.PureComponent {
   renderBlank = cardType => {
     const { card, parent } = this.props
     const styleProps = this.styleProps()
-    const { height, xPos, yPos } = styleProps
+    const { height, width, xPos, yPos } = styleProps
     const { blankType } = card
 
-    let cardElement = (
-      <GridCardBlank height={height} parent={parent} preselected={blankType} />
-    )
+    let cardElement = <GridCardBlank parent={parent} preselected={blankType} />
     if (cardType === 'submission') {
       cardElement = (
         <AddSubmission
@@ -435,6 +433,11 @@ class MovableGridCard extends React.PureComponent {
           submissionSettings={card.submissionSettings}
         />
       )
+    }
+
+    let transformOrigin = `${xPos}px ${yPos}px`
+    if (card.id === 'blank') {
+      transformOrigin = `${xPos + width / 2}px ${yPos + height / 2}px`
     }
 
     return (
@@ -445,11 +448,11 @@ class MovableGridCard extends React.PureComponent {
         appearAnimation={{
           from: {
             transform: `scaleX(0) scaleY(0)`,
-            transformOrigin: `${xPos}px ${yPos}px`,
+            transformOrigin,
           },
           to: {
             transform: `scaleX(1) scaleY(1)`,
-            transformOrigin: `${xPos}px ${yPos}px`,
+            transformOrigin,
           },
         }}
       >
@@ -471,6 +474,7 @@ class MovableGridCard extends React.PureComponent {
       canEditCollection,
       isUserCollection,
       isSharedCollection,
+      isBoardCollection,
       lastPinnedCard,
       hidden,
       hoveringOverLeft,
@@ -552,6 +556,7 @@ class MovableGridCard extends React.PureComponent {
       menuOpen,
       canEditCollection,
       isUserCollection,
+      isBoardCollection,
       isSharedCollection,
       lastPinnedCard,
       showHotEdge,
@@ -688,6 +693,7 @@ MovableGridCard.propTypes = {
   canEditCollection: PropTypes.bool.isRequired,
   isUserCollection: PropTypes.bool.isRequired,
   isSharedCollection: PropTypes.bool.isRequired,
+  isBoardCollection: PropTypes.bool.isRequired,
   hoveringOverLeft: PropTypes.bool.isRequired,
   hoveringOverRight: PropTypes.bool.isRequired,
   holdingOver: PropTypes.bool.isRequired,

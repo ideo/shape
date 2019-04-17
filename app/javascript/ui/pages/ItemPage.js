@@ -143,11 +143,7 @@ class ItemPage extends React.Component {
           <PageContainer>
             {item.parent_collection_card &&
             replacingId === item.parent_collection_card.id ? (
-              <GridCardBlank
-                height={1}
-                parent={item.parent}
-                afterCreate={this.reroute}
-              />
+              <GridCardBlank parent={item.parent} afterCreate={this.reroute} />
             ) : (
               <div>
                 {this.content}

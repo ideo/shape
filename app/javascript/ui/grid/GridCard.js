@@ -293,7 +293,14 @@ class GridCard extends React.Component {
   }
 
   get renderCover() {
-    const { card, height, dragging, searchResult, handleClick } = this.props
+    const {
+      card,
+      height,
+      dragging,
+      searchResult,
+      handleClick,
+      isBoardCollection,
+    } = this.props
     let { record, cardType } = this.props
     if (this.coverItem) {
       // Instead use the item for the cover rather than the collection
@@ -310,6 +317,7 @@ class GridCard extends React.Component {
         dragging={dragging}
         searchResult={searchResult}
         handleClick={handleClick}
+        isBoardCollection={isBoardCollection}
       />
     )
   }
@@ -361,22 +369,15 @@ class GridCard extends React.Component {
         selected={this.isSelected || this.props.hoveringOver}
       >
         {canEditCollection &&
+          showHotEdge &&
           (!card.isPinnedAndLocked || lastPinnedCard) && (
-            <GridCardHotspot
-              card={card}
-              dragging={dragging}
-              showHotEdge={showHotEdge}
-            />
+            <GridCardHotspot card={card} dragging={dragging} />
           )}
         {canEditCollection &&
+          showHotEdge &&
           firstCardInRow &&
           !card.isPinnedAndLocked && (
-            <GridCardHotspot
-              card={card}
-              dragging={dragging}
-              position="left"
-              showHotEdge={showHotEdge}
-            />
+            <GridCardHotspot card={card} dragging={dragging} position="left" />
           )}
         {record.isMedia && this.renderReplaceControl()}
         {!record.menuDisabled &&
@@ -401,7 +402,12 @@ class GridCard extends React.Component {
                   <EditButton onClick={this.editCard} />
                 )}
               {record.isImage &&
-                this.canContentEditCard && <ContainImage card={card} />}
+                this.canContentEditCard && (
+                  <ContainImage
+                    card={card}
+                    image_contain={card.image_contain}
+                  />
+                )}
               {(record.isImage || record.isText) && (
                 <CardActionHolder
                   className="show-on-hover"
@@ -454,6 +460,7 @@ GridCard.propTypes = {
   height: PropTypes.number,
   canEditCollection: PropTypes.bool,
   isSharedCollection: PropTypes.bool,
+  isBoardCollection: PropTypes.bool,
   handleClick: PropTypes.func,
   dragging: PropTypes.bool,
   hoveringOver: PropTypes.bool,
@@ -469,6 +476,7 @@ GridCard.defaultProps = {
   height: 1,
   canEditCollection: false,
   isSharedCollection: false,
+  isBoardCollection: false,
   handleClick: () => null,
   dragging: false,
   hoveringOver: false,

@@ -4,8 +4,11 @@ import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import PlusIcon from '~/ui/icons/PlusIcon'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
+import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
 import v from '~/utils/variables'
+import { objectsEqual } from '~/utils/objectUtils'
 
 // When you have attributes that will change a lot,
 // it's a performance gain to use `styled.div.attrs`
@@ -16,6 +19,7 @@ const BlankCard = styled.div.attrs({
     top: `${y}px`,
     transform: `scale(${1 / zoomLevel})`,
     width: `${w}px`,
+    cursor: 'pointer',
   }),
 })`
   border: ${props =>
@@ -31,17 +35,33 @@ const BlankCard = styled.div.attrs({
   }};
   position: absolute;
   transform-origin: left top;
-  &:hover {
-    background-color: ${v.colors.primaryLight} !important;
-  }
   opacity: ${props => (props.type === 'drag' ? 0.5 : 1)};
   z-index: ${props => (props.type === 'drag' ? v.zIndex.cardHovering : 0)};
+  &:hover {
+    background-color: ${v.colors.primaryLight} !important;
+    .plus-icon {
+      display: block;
+    }
+  }
+  .plus-icon {
+    display: none;
+  }
 `
 
 const Grid = styled.div`
   min-height: 1300px;
   margin-top: ${v.pageContentMarginTop}px;
   position: relative;
+`
+
+const StyledPlusIcon = styled.div`
+  position: relative;
+  /* TODO: better styling than this? */
+  width: 20%;
+  height: 20%;
+  top: 38%;
+  left: 38%;
+  color: ${v.colors.secondaryMedium};
 `
 
 function getMapKey({ col, row }) {
@@ -51,7 +71,8 @@ function getMapKey({ col, row }) {
 const pageMargins = {
   // v.containerPadding is in `em` units, so we multiply by 16
   left: v.containerPadding.horizontal * 16,
-  top: v.headerHeight,
+  // TODO: is this right? This is 60px but we also have collection title up top
+  top: v.headerHeight + 90,
 }
 
 const MAX_CARD_W = 4
@@ -65,17 +86,23 @@ class FoamcoreGrid extends React.Component {
   @observable
   cardsToRender = []
   @observable
-  blankContentTool = null
-  @observable
   zoomLevel = 1
   dragGridSpot = observable.map({})
   @observable
   dragging = false
   @observable
   resizing = false
+  placeholderDefaults = {
+    row: null,
+    col: null,
+    width: null,
+    height: null,
+    type: null,
+  }
+  draggingCardMasterPosition = {}
   // TODO rename this now that it's also used for resize placeholder
   @observable
-  placeholderSpot = { row: null, col: null, width: null, height: null }
+  placeholderSpot = { ...this.placeholderDefaults }
   loadedRows = { loading: false, max: 0 }
   loadedCols = { loading: false, max: 0 }
   draggingMap = []
@@ -85,7 +112,6 @@ class FoamcoreGrid extends React.Component {
   constructor(props) {
     super(props)
     this.debouncedSetDraggedOnSpots = _.debounce(this.setDraggedOnSpots, 15)
-    this.throttledSetHoverSpot = _.throttle(this.setHoverSpot, 50)
     this.throttledSetResizeSpot = _.throttle(this.setResizeSpot, 25)
     this.throttledLoadAfterScroll = _.debounce(this.loadAfterScroll, 250)
     this.throttledCalculateCardsToRender = _.throttle(
@@ -95,11 +121,27 @@ class FoamcoreGrid extends React.Component {
   }
 
   componentDidMount() {
+    const { uiStore } = this.props
+    runInAction(() => {
+      uiStore.selectedAreaEnabled = true
+    })
+    // NOTE: yet another hack -- get the page to render on initial load
     this.throttledCalculateCardsToRender()
     window.addEventListener('scroll', this.handleScroll)
   }
 
+  componentDidUpdate(prevProps) {
+    this.updateSelectedArea()
+    if (this.propsHaveChangedFrom(prevProps)) {
+      this.throttledCalculateCardsToRender()
+    }
+  }
+
   componentWillUnmount() {
+    const { uiStore } = this.props
+    runInAction(() => {
+      uiStore.selectedAreaEnabled = false
+    })
     window.removeEventListener('scroll', this.handleScroll)
   }
 
@@ -114,11 +156,20 @@ class FoamcoreGrid extends React.Component {
     })
   }
 
+  propsHaveChangedFrom(prevProps) {
+    const fields = [
+      'cardProperties',
+      'blankContentToolState',
+      'cardIdMenuOpen',
+      'movingCardIds',
+    ]
+    return !objectsEqual(_.pick(prevProps, fields), _.pick(this.props, fields))
+  }
+
   // Load more cards if we are approaching a boundary of what we have loaded
 
   loadAfterScroll = ev => {
     // Run position cards to re-render cards that were previously out of view
-
     this.throttledCalculateCardsToRender()
 
     const visRows = this.visibleRows
@@ -243,16 +294,11 @@ class FoamcoreGrid extends React.Component {
     const { gridW, gridH, gutter } = this.props
     const { zoomLevel } = this
 
-    const colAmountLeft = x % (gridW + gutter)
-    const rowAmountLeft = y % (gridH + gutter)
-
-    // If in the gutter, return null
-    if (colAmountLeft > gridW || rowAmountLeft > gridH) return null
-
     const col = Math.floor((x / (gridW + gutter)) * zoomLevel)
     const row = Math.floor((y / (gridH + gutter)) * zoomLevel)
 
     if (row === -1 || col === -1) return null
+
     return { col, row }
   }
 
@@ -280,27 +326,25 @@ class FoamcoreGrid extends React.Component {
     }
   }
 
-  // NOTE: currently not used given the disabling of a couple other things
-  findCardForSpot({ col, row }) {
-    const filledSpot = this.findFilledSpot({ col, row })
-    return filledSpot ? filledSpot.card : null
-  }
-
   findCardOverlap(card) {
     const { collection, uiStore } = this.props
     let { width, height } = card
     const origWidth = width
     const { row, col } = card
     let found = false
+    const { cardMatrix } = collection
     while (height > 0 && !found) {
       while (width > 0 && !found) {
         const filledRow = row + height - 1
         const filledCol = col + width - 1
-        const searchRow = collection.cardMatrix[filledRow]
+        const searchRow = cardMatrix[filledRow]
         found = searchRow && searchRow[filledCol]
         // don't consider overlapping itself
-        if (found && _.includes(uiStore.multiMoveCardIds, found.id))
-          found = false
+        if (found && !_.includes(uiStore.multiMoveCardIds, found.id)) {
+          return found
+        }
+        found = false
+
         width -= 1
       }
       width = origWidth
@@ -317,15 +361,83 @@ class FoamcoreGrid extends React.Component {
     return !!this.getDraggedOnSpot(coords)
   }
 
-  handleBlankCardClick = ({ row, col }) => e => {
-    runInAction(() => {
-      this.blankContentTool = {
-        id: 'blank',
-        type: 'bct',
-        row,
-        col,
-      }
+  get isSelectingArea() {
+    // Check if there is a selected area
+    return !!this.selectedAreaAdjustedForGrid.minX
+  }
+
+  // Adjusts global x,y coords to foamcore grid coords
+  get selectedAreaAdjustedForGrid() {
+    const { selectedArea } = this.props
+    let { minX, minY, maxX, maxY } = selectedArea
+
+    // If no area is selected, return null values
+    if (!minX) return selectedArea
+
+    // Adjust coordinates by page margins
+    // Make sure all values start at 0
+    minX -= pageMargins.left
+    if (minX < 0) minX = 0
+    minY -= pageMargins.top
+    if (minY < 0) minY = 0
+    maxX -= pageMargins.left
+    if (maxX < 0) maxX = 0
+    maxY -= pageMargins.top
+    if (maxY < 0) maxY = 0
+
+    return {
+      minX,
+      minY,
+      maxX,
+      maxY,
+    }
+  }
+
+  updateSelectedArea = () => {
+    const { collection, uiStore } = this.props
+    const { minX, minY, maxX, maxY } = this.selectedAreaAdjustedForGrid
+
+    // Check if there is a selected area
+    if (!minX) return
+
+    // Select all cards that this drag rectangle 'touches'
+    const topLeftCoords = this.coordinatesForPosition({
+      x: minX,
+      y: minY,
     })
+    const bottomRightCoords = this.coordinatesForPosition({
+      x: maxX,
+      y: maxY,
+    })
+
+    // Return if it couldn't find cards in both positions
+    if (!topLeftCoords || !bottomRightCoords) return
+
+    const selectedCardIds = collection.cardIdsWithinRectangle(
+      topLeftCoords,
+      bottomRightCoords
+    )
+
+    // TODO: if shift is also selected, add to any existing selection
+    runInAction(() => {
+      uiStore.selectedCardIds = selectedCardIds
+    })
+  }
+
+  handleBlankCardClick = ({ row, col }) => e => {
+    const {
+      selectedArea: { minX },
+    } = this.props
+
+    // If user is selecting an area, don't trigger blank card click
+    if (minX) return
+
+    const { uiStore } = this.props
+    uiStore.openBlankContentTool({
+      row,
+      col,
+    })
+
     this.throttledCalculateCardsToRender()
   }
 
@@ -342,22 +454,6 @@ class FoamcoreGrid extends React.Component {
     runInAction(() => {
       this.zoomLevel = this.zoomLevel - 1
     })
-    this.throttledCalculateCardsToRender()
-  }
-
-  handleMouseMove = ev => {
-    // Something about react synthetic events and throttling
-    ev.persist()
-    if (this.resizing) return
-    const hoverPos = {
-      x: ev.pageX - pageMargins.left + window.scrollX,
-      y: ev.pageY - pageMargins.top + window.scrollY,
-    }
-    this.throttledSetHoverSpot(hoverPos)
-  }
-
-  handleMouseOut = ev => {
-    this.setPlaceholderSpot({})
     this.throttledCalculateCardsToRender()
   }
 
@@ -390,6 +486,7 @@ class FoamcoreGrid extends React.Component {
 
   onDragStart = cardId => {
     this.draggingMap = this.determineDragMap(cardId)
+    this.throttledCalculateCardsToRender()
   }
 
   onDragOrResizeStop = (cardId, dragType) => {
@@ -521,6 +618,7 @@ class FoamcoreGrid extends React.Component {
       this.dragging = false
       this.resizing = false
       uiStore.multiMoveCardIds = []
+      this.draggingCardMasterPosition = {}
     })
     // Run immediately without throttling
     this.calculateCardsToRender()
@@ -530,25 +628,33 @@ class FoamcoreGrid extends React.Component {
    * Sets the current spots that are being dragged on, whether it's a card
    * or a blank spot that then has to be rendered
    */
-  setDraggedOnSpots(overlapCoords, dragPosition, recur) {
-    if (!this.dragging) return
-    if (!recur) {
-      runInAction(() => {
-        this.dragGridSpot.clear()
+  @action
+  setDraggedOnSpots(masterPosition, dragPosition, recur) {
+    if (!this.dragging || !masterPosition) return
+    const { uiStore } = this.props
+
+    // If master dragging position hasn't changed, don't need to do anything
+    if (objectsEqual(masterPosition, this.draggingCardMasterPosition)) return
+
+    this.dragGridSpot.clear()
+
+    // Add master dragging card
+    this.dragGridSpot.set(getMapKey(masterPosition), masterPosition)
+
+    // Loop through any additional cards and add drag spots for them
+    if (uiStore.multiMoveCardIds.length > 1) {
+      this.draggingMap.forEach(mapped => {
+        const relativePosition = {
+          col: mapped.col + masterPosition.col,
+          row: mapped.row + masterPosition.row,
+          width: mapped.card.width,
+          height: mapped.card.height,
+        }
+        this.dragGridSpot.set(getMapKey(relativePosition), relativePosition)
       })
     }
-    const { uiStore } = this.props
-    if (!overlapCoords) {
-      return
-    }
 
-    runInAction(() => {
-      this.dragGridSpot.set(getMapKey(overlapCoords), overlapCoords)
-    })
-    if (uiStore.multiMoveCardIds.length > 1 && !recur) {
-      this.setMultiMoveDragSpots(overlapCoords, dragPosition)
-    }
-    this.calculateCardsToRender()
+    this.throttledCalculateCardsToRender()
   }
 
   /*
@@ -565,6 +671,8 @@ class FoamcoreGrid extends React.Component {
     // The master card is the card currently being dragged
     const masterCard = collection.collection_cards.find(c => c.id === cardId)
     const movingCardIds = uiStore.multiMoveCardIds.filter(c => c.id !== cardId)
+
+    // Loop through non-master cards to calculate drag map
     const dragMap = movingCardIds.map(movingCardId => {
       const card = collection.collection_cards.find(c => c.id === movingCardId)
       const { col, row } = card
@@ -619,27 +727,6 @@ class FoamcoreGrid extends React.Component {
       }
       this.setDraggedOnSpots(relativePosition, dragPosition, true)
     })
-  }
-
-  setHoverSpot(hoverPos) {
-    if (this.resizing) return
-    const coordinates = this.coordinatesForPosition(hoverPos)
-    if (coordinates) {
-      // Don't place a hover card when there's already a card there.
-
-      // NOTE: this is just getting overridden later anyway??
-
-      // const found = this.findCardForSpot(coordinates)
-      // if (found) {
-      //   this.setPlaceholderSpot({})
-      // }
-      if (!this.placeholderSpot.row) {
-        this.setPlaceholderSpot({ ...coordinates, type: 'hover' })
-      }
-    } else {
-      this.setPlaceholderSpot({})
-    }
-    this.throttledCalculateCardsToRender()
   }
 
   setResizeSpot({ row, col, width, height }) {
@@ -733,6 +820,13 @@ class FoamcoreGrid extends React.Component {
     const { cardMenuOpen } = uiStore
     const cardType = card.record ? card.record.internalType : card.cardType
     const position = this.positionForCoordinates(card)
+
+    // TODO reorganize
+    if (card.id === 'blank' && this.zoomLevel !== 1) {
+      position.xPos = position.x - this.zoomLevel * 38
+      position.yPos = position.y - this.zoomLevel * 38
+    }
+
     return (
       <MovableGridCard
         key={key}
@@ -741,8 +835,9 @@ class FoamcoreGrid extends React.Component {
         canEditCollection={canEditCollection}
         isUserCollection={collection.isUserCollection}
         isSharedCollection={collection.isSharedCollection}
+        isBoardCollection
         position={position}
-        record={card.record}
+        record={card.record || {}}
         onDrag={this.onDrag}
         onDragStart={this.onDragStart}
         // no need to trigger displacing the card (hoveringOverLeft) since we don't do that in foamcore
@@ -766,7 +861,17 @@ class FoamcoreGrid extends React.Component {
 
   positionBlank({ row, col, width, height }, type = 'generic') {
     const position = this.positionForCoordinates({ col, row, width, height })
+
     const { zoomLevel } = this
+    let inner = ''
+    if (type === 'hover') {
+      inner = (
+        // TODO: better styling than this for centering PlusIcon
+        <StyledPlusIcon className="plus-icon">
+          <PlusIcon />
+        </StyledPlusIcon>
+      )
+    }
 
     return (
       <BlankCard
@@ -774,11 +879,13 @@ class FoamcoreGrid extends React.Component {
         {...position}
         type={type}
         zoomLevel={zoomLevel}
-        key={`blank-${type}-${col}:${row}`}
+        key={`blank-${type}-${row}:${col}`}
         blocked={this.hasDragCollision && type === 'drag'}
         data-blank-type={type}
         draggedOn
-      />
+      >
+        {inner}
+      </BlankCard>
     )
   }
 
@@ -797,15 +904,11 @@ class FoamcoreGrid extends React.Component {
     return this.renderMovableCard(blankContentTool, `bct-${col}:${row}`, {})
   }
 
-  cardWithinViewPlusPage = ({
-    card,
-    visibleRows = null,
-    visibleCols = null,
-  }) => {
+  cardWithinViewPlusPage = card => {
     // Select all cards that are within view,
     // plus half a screen on any side
-    const rows = visibleRows || this.visibleRows
-    const cols = visibleCols || this.visibleCols
+    const rows = this.visibleRows
+    const cols = this.visibleCols
 
     const numRows = Math.ceil(rows.num)
     const numCols = Math.ceil(cols.num)
@@ -820,28 +923,53 @@ class FoamcoreGrid extends React.Component {
 
   @action
   setPlaceholderSpot = placeholderSpot => {
-    this.placeholderSpot = placeholderSpot
+    let vals = { ...this.placeholderDefaults }
+    if (placeholderSpot) {
+      vals = { ...placeholderSpot }
+    }
+    const { row, col, width, height, type } = vals
+    this.placeholderSpot.row = row
+    this.placeholderSpot.col = col
+    this.placeholderSpot.width = width
+    this.placeholderSpot.height = height
+    this.placeholderSpot.type = type
+  }
+
+  get blankCardsForEmptySpacesWithinVisibleArea() {
+    const { collection } = this.props
+    const matrix = collection.cardMatrix
+    const blankCards = []
+    // Add blank cards to all empty spaces,
+    // and 2x screen heights at the bottom
+    _.each(
+      _.range(0, collection.max_row_index + this.visibleRows.num * 2),
+      row => {
+        _.each(_.range(0, 15), col => {
+          // If there's no row, or nothing in this column, add a blank card for this spot
+          const blankCard = { row, col, width: 1, height: 1 }
+          if (!matrix[row] || !matrix[row][col]) {
+            if (this.cardWithinViewPlusPage(blankCard))
+              blankCards.push(this.positionBlank(blankCard, 'hover'))
+          }
+        })
+      }
+    )
+    return blankCards
   }
 
   @action
   calculateCardsToRender = () => {
-    const { collection } = this.props
-    const collectionCards = [...collection.collection_cards]
-    let cards = []
+    const { collection, movingCardIds, uiStore } = this.props
+    // any cards that are being moved don't appear at all
+    const collectionCards = _.reject(collection.collection_cards, c =>
+      _.includes(movingCardIds, c.id)
+    )
 
-    // Memoize so it doesn't call it every time `cardWithinViewPlusPage` is called
-    const rows = this.visibleRows
-    const cols = this.visibleCols
+    let cards = []
+    this.hasDragCollision = false
 
     collectionCards.forEach(card => {
-      if (
-        this.cardWithinViewPlusPage({
-          card,
-          visibleRows: rows,
-          visibleCols: cols,
-        }) ||
-        card.isDragCardMaster
-      ) {
+      if (this.cardWithinViewPlusPage(card) || card.isDragCardMaster) {
         // On first load we need to mark the max row and col loaded
         this.updateMaxLoaded({ row: card.row, col: card.col })
         // Render cards in view, or within one screen on any dimension
@@ -858,9 +986,23 @@ class FoamcoreGrid extends React.Component {
       }
     })
 
-    if (this.blankContentTool) cards.push(this.blankContentTool)
-    if (this.dragGridSpot.size)
-      cards = [...cards, ...this.dragGridSpot.values()]
+    if (uiStore.blankContentToolState)
+      cards.push({
+        id: 'blank',
+        blankType: 'bct',
+        ...uiStore.blankContentToolState,
+      })
+
+    if (this.dragGridSpot.size) {
+      // Figure out if we have a collision
+      const draggingPlaceholders = [...this.dragGridSpot.values()]
+      draggingPlaceholders.forEach(placeholder => {
+        this.hasDragCollision =
+          this.hasDragCollision || this.findCardOverlap(placeholder)
+      })
+
+      cards = [...cards, ...draggingPlaceholders]
+    }
 
     // Don't render cards that are being dragged along
     cards = cards.filter(
@@ -869,7 +1011,6 @@ class FoamcoreGrid extends React.Component {
         _.isNumber(card.row) &&
         _.isNumber(card.col)
     )
-    this.hasDragCollision = false
     cards = cards.map(cardOrBlank => {
       // If another real card is filling up the hover spot, don't render
       // the hover spot at all (which gets rendered after this loop)
@@ -880,46 +1021,31 @@ class FoamcoreGrid extends React.Component {
       } else if (cardOrBlank.id) {
         return this.positionCard(cardOrBlank)
       }
-      // for the blank dragging spots determine if they are blocked for moving into
-      this.hasDragCollision =
-        this.hasDragCollision || this.findCardOverlap(cardOrBlank)
       return this.positionBlank(cardOrBlank, 'drag')
     })
-    cards.push(
-      this.positionBlank(this.placeholderSpot, this.placeholderSpot.type)
-    )
+
+    // Add blank cards for all empty spaces - for hover and click -> BCT actions
+    cards = [...cards, ...this.blankCardsForEmptySpacesWithinVisibleArea]
+
     this.cardsToRender = cards
     return this.cardsToRender
   }
 
   render() {
     const { gridW } = this.props
+
     return (
       <Grid
-        data-deselect-on-click
-        onMouseMove={this.handleMouseMove}
+        data-empty-space-click
         onScroll={this.handleScroll}
         innerRef={ref => {
           this.gridRef = ref
         }}
       >
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            zIndex: 900,
-            background: 'white',
-          }}
-        >
-          <button onClick={this.handleZoomOut}>
-            <h3>-</h3>
-          </button>
-          <span style={{ display: 'inline-block', width: '10px' }} />
-          <button onClick={this.handleZoomIn}>
-            <h3>+</h3>
-          </button>
-        </div>
+        <FoamcoreZoomControls
+          onZoomIn={this.handleZoomIn}
+          onZoomOut={this.handleZoomOut}
+        />
         <div style={{ width: `${gridW * 16}px`, height: '1px' }} />
         {this.cardsToRender}
       </Grid>
@@ -941,8 +1067,12 @@ FoamcoreGrid.propTypes = {
   trackCollectionUpdated: PropTypes.func.isRequired,
   canEditCollection: PropTypes.bool.isRequired,
   movingCardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
+  blankContentToolState: MobxPropTypes.objectOrObservableObject,
   loadCollectionCards: PropTypes.func.isRequired,
+  selectedArea: MobxPropTypes.objectOrObservableObject.isRequired,
+  selectedAreaMinX: PropTypes.number,
   sorting: PropTypes.bool,
+  cardIdMenuOpen: PropTypes.string,
 }
 FoamcoreGrid.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -950,7 +1080,10 @@ FoamcoreGrid.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 FoamcoreGrid.defaultProps = {
+  blankContentToolState: {},
   sorting: false,
+  selectedAreaMinX: null,
+  cardIdMenuOpen: null,
 }
 FoamcoreGrid.displayName = 'FoamcoreGrid'
 

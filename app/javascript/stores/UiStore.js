@@ -11,17 +11,25 @@ export default class UiStore {
     order: null,
     width: null,
     height: null,
+    row: null,
+    col: null,
     replacingId: null,
     emptyCollection: false,
     collectionId: null,
     blankType: null,
+  }
+  defaultCardMenuState = {
+    id: null,
+    x: 0,
+    y: 0,
+    direction: 'left',
   }
   @observable
   pageError = null
   @observable
   blankContentToolState = { ...this.defaultBCTState }
   @observable
-  cardMenuOpen = { id: false, x: 0, y: 0, direction: 'left' }
+  cardMenuOpen = { ...this.defaultCardMenuState }
   @computed
   get cardMenuOpenAndPositioned() {
     const { cardMenuOpen } = this
@@ -166,6 +174,10 @@ export default class UiStore {
   modalContentRef = null
   @observable
   dragCardMaster = null
+  @observable
+  selectedArea = { minX: null, maxX: null, minY: null, maxY: null }
+  @observable
+  selectedAreaEnabled = false
 
   @action
   toggleEditingCardId(cardId) {
@@ -233,6 +245,11 @@ export default class UiStore {
   }
 
   @action
+  setSelectedArea(selectedArea) {
+    this.selectedArea = selectedArea
+  }
+
+  @action
   popupAlert(props = {}) {
     _.assign(this.dialogConfig, {
       ...this.defaultDialogProps,
@@ -295,7 +312,7 @@ export default class UiStore {
   }
 
   closeCardMenu() {
-    this.update('cardMenuOpen', { id: false, x: 0, y: 0, direction: 'left' })
+    this.update('cardMenuOpen', { ...this.defaultCardMenuState })
   }
 
   async popupSnackbar(props = {}) {

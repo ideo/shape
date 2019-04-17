@@ -108,6 +108,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get cardMatrix() {
+    if (this.collection_cards.length === 0) return [[]]
+
     // Get maximum dimensions of our card matrix
     const maxCol = _.max(this.collection_cards.map(card => card.maxCol))
     const maxRow = _.max(this.collection_cards.map(card => card.maxRow))
@@ -155,6 +157,22 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
     // Find all cards that are within the rectangle created
     // between the first and last selected cards
+    const matrix = this.cardMatrix
+    const cardIds = []
+    _.each(rowRange, row => {
+      _.each(colRange, col => {
+        const card = matrix[row][col]
+        if (card && !_.includes(cardIds, card.id)) cardIds.push(card.id)
+      })
+    })
+
+    return cardIds
+  }
+
+  cardIdsWithinRectangle(minCoords, maxCoords) {
+    const rowRange = _.range(minCoords.row, maxCoords.row + 1)
+    const colRange = _.range(minCoords.col, maxCoords.col + 1)
+
     const matrix = this.cardMatrix
     const cardIds = []
     _.each(rowRange, row => {
@@ -804,7 +822,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   static async createSubmission(parent_id, submissionSettings) {
-    const { uiStore } = this
+    const { routingStore, uiStore } = apiStore
     const { type, template } = submissionSettings
     if (type === 'template' && template) {
       const templateData = {
@@ -815,7 +833,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       uiStore.update('isLoading', true)
       const res = await apiStore.createTemplateInstance(templateData)
       uiStore.update('isLoading', false)
-      this.routingStore.routeTo('collections', res.data.id)
+      routingStore.routeTo('collections', res.data.id)
     } else {
       uiStore.openBlankContentTool({
         order: 0,

@@ -1,3 +1,6 @@
+// NOTE: NO LONGER USED. Just here for reference in case we still need to copy
+// anything to RealtimeTextItem. Otherwise it can be deleted.
+
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'

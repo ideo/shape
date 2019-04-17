@@ -1,0 +1,73 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FoamcoreGrid renders snapshot 1`] = `
+<styled.div
+  data-empty-space-click={true}
+  innerRef={[Function]}
+  onScroll={[Function]}
+>
+  <FoamcoreZoomControls
+    onZoomIn={[Function]}
+    onZoomOut={[Function]}
+  />
+  <div
+    style={
+      Object {
+        "height": "1px",
+        "width": "3200px",
+      }
+    }
+  />
+  <styled.div
+    blocked={false}
+    data-blank-type="unrendered"
+    draggedOn={true}
+    h={200}
+    height={200}
+    key="blank-unrendered-1:5"
+    onClick={[Function]}
+    type="unrendered"
+    w={200}
+    width={200}
+    x={1050}
+    xPos={1050}
+    y={210}
+    yPos={210}
+    zoomLevel={1}
+  />
+  <styled.div
+    blocked={false}
+    data-blank-type="unrendered"
+    draggedOn={true}
+    h={410}
+    height={410}
+    key="blank-unrendered-0:1"
+    onClick={[Function]}
+    type="unrendered"
+    w={410}
+    width={410}
+    x={210}
+    xPos={210}
+    y={0}
+    yPos={0}
+    zoomLevel={1}
+  />
+  <styled.div
+    blocked={false}
+    data-blank-type="unrendered"
+    draggedOn={true}
+    h={200}
+    height={200}
+    key="blank-unrendered-2:0"
+    onClick={[Function]}
+    type="unrendered"
+    w={410}
+    width={410}
+    x={0}
+    xPos={0}
+    y={420}
+    yPos={420}
+    zoomLevel={1}
+  />
+</styled.div>
+`;

@@ -141,6 +141,7 @@ class TextItemCover extends React.Component {
 
   renderEditing() {
     const { item } = this.state
+    const { initialFontTag } = this.props
     if (!item) return ''
     return (
       <RealtimeTextItem
@@ -148,6 +149,7 @@ class TextItemCover extends React.Component {
         currentUserId={apiStore.currentUser.id}
         onExpand={item.id ? this.expand : null}
         onCancel={this.blur}
+        initialFontTag={initialFontTag}
         // if we are rendering editing then the item has been fetched
         fullyLoaded
       />
@@ -203,6 +205,7 @@ TextItemCover.propTypes = {
   dragging: PropTypes.bool.isRequired,
   cardId: PropTypes.string.isRequired,
   handleClick: PropTypes.func.isRequired,
+  initialFontTag: PropTypes.string.isRequired,
   height: PropTypes.number,
   searchResult: PropTypes.bool,
 }

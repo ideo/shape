@@ -212,6 +212,7 @@ describe('Collection', () => {
     describe('cardMatrix', () => {
       it('returns array of arrays', () => {
         const matrix = collection.cardMatrix
+
         expect(matrix[0][0].id).toEqual(cardIds[0])
         expect(matrix[0][1].id).toEqual(cardIds[0])
         expect(matrix[0][2]).toEqual(undefined)
