@@ -278,6 +278,14 @@ class Header extends React.Component {
   }
 
   @computed
+  get isLargeBreakpoint() {
+    const { uiStore } = this.props
+    return (
+      uiStore.windowWidth && uiStore.windowWidth >= v.responsive.largeBreakpoint
+    )
+  }
+
+  @computed
   get isMobile() {
     const { uiStore } = this.props
     return (
@@ -294,6 +302,7 @@ class Header extends React.Component {
   render() {
     const {
       isMobile,
+      isLargeBreakpoint,
       breadcrumbsWidth,
       record,
       userDropdownOpen,
@@ -321,11 +330,10 @@ class Header extends React.Component {
                 <div ref={ref => this.updateBreadcrumbsWidth(ref)}>
                   {record && (
                     <Flex align="center">
-                      {/* TODO: why doesnt <Box auto={isMobile}> work like this? */}
                       <div style={{ flex: isMobile ? '1 1 auto' : '0 1 auto' }}>
                         <Breadcrumb
-                          maxDepth={isMobile ? 1 : null}
-                          backButton={isMobile}
+                          maxDepth={isLargeBreakpoint ? null : 1}
+                          backButton={!isLargeBreakpoint}
                           record={record}
                           isHomepage={routingStore.isHomepage}
                           // re-mount every time the record / breadcrumb changes
