@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DataItemCreator renders snapshot 1`] = `
+<styled.div>
+  <form
+    className="form"
+  >
+    <MeasureSelect
+      dataSettingsName="measure"
+      item={null}
+      onSelect={[Function]}
+    />
+  </form>
+</styled.div>
+`;

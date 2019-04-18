@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GenericLinkCreator renders snapshot 1`] = `
+<styled.div>
+  <form
+    className="form"
+    onSubmit={[MockFunction]}
+  >
+    <BctTextField
+      autoFocus={true}
+      data-cy="BctTextField"
+      onChange={[MockFunction]}
+      onKeyDown={[Function]}
+      placeholder="Create link"
+      value=""
+    />
+    <StyledFormButton
+      color="#120f0e"
+      data-cy="LinkCreatorFormButton"
+      disabled={false}
+    >
+      Add
+    </StyledFormButton>
+  </form>
+</styled.div>
+`;

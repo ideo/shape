@@ -1,4 +1,5 @@
 import DataItemCreator from '~/ui/grid/blankContentTool/DataItemCreator'
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import { ITEM_TYPES } from '~/utils/variables'
 
 let wrapper, props, component
@@ -12,6 +13,10 @@ describe('DataItemCreator', () => {
     props.createCard.mockClear()
     wrapper = shallow(<DataItemCreator {...props} />)
     component = wrapper.instance()
+  })
+
+  it('renders snapshot', () => {
+    expectTreeToMatchSnapshot(wrapper)
   })
 
   it('calls createCard with DataItem type and report name', () => {

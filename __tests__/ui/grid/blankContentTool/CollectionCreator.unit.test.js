@@ -1,4 +1,5 @@
 import CollectionCreator from '~/ui/grid/blankContentTool/CollectionCreator'
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 const e = { preventDefault: jest.fn() }
 let wrapper, props, component
@@ -13,6 +14,10 @@ describe('MovableGridCard', () => {
     props.createCard.mockClear()
     wrapper = shallow(<CollectionCreator {...props} />)
     component = wrapper.instance()
+  })
+
+  it('renders snapshot', () => {
+    expectTreeToMatchSnapshot(wrapper)
   })
 
   it('renders a BctTextField', () => {

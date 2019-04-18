@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GridCardBlank renders snapshot 1`] = `
+<StyledAddSubmission>
+  <StyledGridCardInner
+    gridH={250}
+    gridW={312}
+    height={null}
+  >
+    <StyledBlankCreationTool>
+      <h3>
+        Add a new 
+        text
+      </h3>
+      <SubmissionButton
+        onClick={[Function]}
+      >
+        +
+      </SubmissionButton>
+    </StyledBlankCreationTool>
+  </StyledGridCardInner>
+</StyledAddSubmission>
+`;

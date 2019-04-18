@@ -1,5 +1,6 @@
 import ChartItemCover from '~/ui/grid/covers/ChartItemCover'
 import { apiStore } from '~/stores'
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 import { fakeChartItem, fakeCollection } from '#/mocks/data'
 
@@ -18,6 +19,10 @@ describe('ChartItemCover', () => {
       component = wrapper.instance()
     }
     rerender()
+  })
+
+  it('renders snapshot', () => {
+    expectTreeToMatchSnapshot(wrapper)
   })
 
   describe('render()', () => {

@@ -1,5 +1,6 @@
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
 import { apiStore, uiStore } from '~/stores'
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 import { fakeTextItem } from '#/mocks/data'
 
@@ -23,6 +24,10 @@ describe('TextItemCover', () => {
     props.editable = false
     wrapper = shallow(<TextItemCover {...props} />)
     component = wrapper.instance()
+  })
+
+  it('renders snapshot', () => {
+    expectTreeToMatchSnapshot(wrapper)
   })
 
   it('renders Quill with item.data_content', () => {

@@ -1,0 +1,59 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CollectionCover renders snapshot 1`] = `
+<StyledCollectionCover
+  data-cy="CollectionCover"
+  url="http://fake.url.net"
+>
+  <StyledCardContent
+    gridW={312}
+    gutter={20}
+    height={1}
+    width={2}
+  >
+    <div
+      className="overlay"
+    />
+    <div
+      className="top"
+    >
+      <styled.h1>
+        <Dotdotdot
+          clamp={3}
+          tagName="div"
+          truncationChar="…"
+          useNativeClamp={true}
+        >
+          <PlainLink
+            className="no-select cancelGridClick"
+            onClick={[Function]}
+            to="//collections/1"
+          >
+            <span
+              style={
+                Object {
+                  "hyphens": "initial",
+                }
+              }
+            >
+              My Workspace X
+            </span>
+          </PlainLink>
+        </Dotdotdot>
+      </styled.h1>
+    </div>
+    <div
+      className="bottom"
+    >
+      <Dotdotdot
+        clamp={3}
+        tagName="div"
+        truncationChar="…"
+        useNativeClamp={true}
+      >
+        Lorem ipsum blockchain boogie
+      </Dotdotdot>
+    </div>
+  </StyledCardContent>
+</StyledCollectionCover>
+`;
