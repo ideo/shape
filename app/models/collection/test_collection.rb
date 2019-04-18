@@ -282,13 +282,6 @@ class Collection
       )
     end
 
-    def create_open_response_collection_cards(open_question_items: nil, initiated_by: nil)
-      build_open_response_collection_cards(
-        open_question_items: open_question_items,
-        initiated_by: initiated_by,
-      ).all?(&:create)
-    end
-
     def touch_test_design
       test_design.try(:touch)
     end
@@ -313,8 +306,8 @@ class Collection
           .each_with_index do |card, i|
             card.update(parent_id: test_design.id, order: i)
           end
-        create_open_response_collection_cards
-        setup_response_graphs(initiated_by: initiated_by).each(&:create)
+        create_open_response_collections(initiated_by: initiated_by)
+        create_response_graphs(initiated_by: initiated_by)
         test_design.cache_cover!
       end
       reorder_cards!
@@ -340,20 +333,23 @@ class Collection
       )
     end
 
-    def build_open_response_collection_cards(open_question_items: nil, initiated_by: nil)
+    def create_open_response_collections(open_question_items: nil, initiated_by: nil)
       open_question_items ||= question_items.question_open
       open_question_items.map do |open_question|
-        CollectionCardBuilder.new(
-          params: {
-            order: open_question.parent_collection_card.order,
-            collection_attributes: {
-              name: "#{open_question.content} Responses",
-              type: 'Collection::TestOpenResponses',
-              question_item_id: open_question.id,
-            },
-          },
+        open_question.create_open_response_collection(
           parent_collection: self,
-          user: initiated_by,
+          initiated_by: initiated_by,
+        )
+      end
+    end
+
+    def create_response_graphs(initiated_by:)
+      question_items
+        .select(&:scale_question?)
+        .map do |question|
+        question.create_response_graph(
+          parent_collection: self,
+          initiated_by: initiated_by,
         )
       end
     end
@@ -370,25 +366,6 @@ class Collection
           },
         )
       end
-    end
-
-    def setup_response_graphs(initiated_by:)
-      question_items.map do |question|
-        next unless question.scale_question?
-        CollectionCardBuilder.new(
-          params: {
-            order: question.parent_collection_card.order,
-            height: 2,
-            width: 2,
-            item_attributes: {
-              type: 'Item::ChartItem',
-              data_source: question,
-            },
-          },
-          parent_collection: self,
-          user: initiated_by,
-        )
-      end.compact
     end
 
     def add_test_tag

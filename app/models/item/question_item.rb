@@ -19,7 +19,8 @@ class Item
              as: :data_source,
              class_name: 'Item::ChartItem'
 
-    after_update :update_test_open_responses_collection, if: :update_test_open_responses_collection?
+    after_update :update_test_open_responses_collection,
+                 if: :update_test_open_responses_collection?
 
     scope :not_answerable, -> {
       where(
@@ -88,6 +89,43 @@ class Item
       # don't want to divide by 0
       return 0 if total.zero?
       (points * 100.0 / total).round
+    end
+
+    def create_response_graph(parent_collection:, initiated_by:)
+      return unless scale_question?
+      builder = CollectionCardBuilder.new(
+        params: {
+          order: parent_collection_card.order,
+          height: 2,
+          width: 2,
+          item_attributes: {
+            type: 'Item::ChartItem',
+            data_source: self,
+          },
+        },
+        parent_collection: parent_collection,
+        user: initiated_by,
+      )
+      builder.create
+      builder.collection_card
+    end
+
+    def create_open_response_collection(parent_collection:, initiated_by:)
+      return unless question_open?
+      builder = CollectionCardBuilder.new(
+        params: {
+          order: parent_collection_card.order,
+          collection_attributes: {
+            name: "#{content} Responses",
+            type: 'Collection::TestOpenResponses',
+            question_item_id: id,
+          },
+        },
+        parent_collection: parent_collection,
+        user: initiated_by,
+      )
+      builder.create
+      builder.collection_card
     end
 
     private

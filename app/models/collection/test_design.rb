@@ -32,7 +32,7 @@ class Collection
     def question_item_created(question_item)
       return unless question_item.question_open?
       # Create open response collection for this new question item
-      test_collection.create_open_response_collection_cards(
+      test_collection.create_open_response_collections(
         open_question_items: [question_item],
       )
     end
