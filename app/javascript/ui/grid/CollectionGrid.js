@@ -13,7 +13,6 @@ import CollectionCard from '~/stores/jsonApi/CollectionCard'
 const CARD_HOLD_TIME = 0.4 * 1000
 
 const StyledGrid = styled.div`
-  margin-top: 50px;
   min-height: ${props => props.minHeight}px;
   position: relative;
   width: 100%;
