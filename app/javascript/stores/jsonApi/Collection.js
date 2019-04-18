@@ -31,6 +31,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   @observable
   totalPages = 1
   recordsPerPage = 50
+  @observable
+  scrollBottom = 0
 
   attributesForAPI = [
     'name',
@@ -408,6 +410,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.isSharedCollection
   }
 
+  @computed
   get cardProperties() {
     return this.collection_cards.map(c => _.pick(c, ['id', 'updated_at']))
   }
@@ -800,6 +803,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   @action
   setNextAvailableTestPath(path) {
     this.nextAvailableTestPath = path
+  }
+  @action
+  updateScrollBottom(y) {
+    this.scrollBottom = y
   }
 
   reassignCover(newCover) {

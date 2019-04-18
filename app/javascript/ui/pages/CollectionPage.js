@@ -95,6 +95,9 @@ class CollectionPage extends React.Component {
     } = this.props
     this.subscribeToChannel(collection.id)
 
+    // setViewingCollection has to happen first bc we use it in openBlankContentTool
+    uiStore.setViewingCollection(collection)
+
     if (collection.collection_cards.length === 0) {
       uiStore.openBlankContentTool()
     }
@@ -107,9 +110,6 @@ class CollectionPage extends React.Component {
     if (collection.awaiting_updates) {
       this.pollForUpdates()
     }
-
-    // setViewingCollection has to happen first bc we use it in openBlankContentTool
-    uiStore.setViewingCollection(collection)
     if (collection.isSubmissionsCollection) {
       // NOTE: SubmissionsCollections are not meant to be viewable, so we route
       // back to the SubmissionBox instead
@@ -434,6 +434,7 @@ class CollectionPage extends React.Component {
           {...gridSettings}
           // don't add the extra row for submission box
           addEmptyCard={!isSubmissionBox}
+          cardsFetched={this.cardsFetched}
         />
       )
     }

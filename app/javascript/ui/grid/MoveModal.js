@@ -97,10 +97,11 @@ class MoveModal extends React.Component {
       return
     }
 
+    const cardIds = [...uiStore.movingCardIds]
     let data = {
       to_id: collectionId,
       from_id: uiStore.movingFromCollectionId,
-      collection_card_ids: uiStore.movingCardIds,
+      collection_card_ids: cardIds,
       placement,
     }
 
@@ -149,6 +150,10 @@ class MoveModal extends React.Component {
         uiStore.scrollToTop()
       } else {
         uiStore.scrollToBottom()
+      }
+      if (cardAction === 'move') {
+        // we actually want to reselect the cards at this point
+        uiStore.reselectCardIds(cardIds)
       }
     } catch (e) {
       runInAction(() => {

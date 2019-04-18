@@ -82,9 +82,7 @@ class CollectionGrid extends React.Component {
   }
 
   componentDidMount() {
-    const { loadCollectionCards } = this.props
     this.initialize(this.props)
-    loadCollectionCards({})
   }
 
   componentDidUpdate(prevProps) {
@@ -95,6 +93,7 @@ class CollectionGrid extends React.Component {
       'blankContentToolState',
       'cardProperties',
       'movingCardIds',
+      'cardsFetched',
     ]
     const prevPlucked = _.pick(prevProps, fields)
     const plucked = _.pick(this.props, fields)

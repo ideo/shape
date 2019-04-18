@@ -530,6 +530,13 @@ export default class UiStore {
 
   @action
   setViewingCollection(collection = null) {
+    // escape if we're already viewing this collection
+    if (
+      this.viewingCollection &&
+      collection &&
+      this.viewingCollection.id === collection.id
+    )
+      return
     this.previousViewingCollection = this.viewingCollection
     this.viewingCollection = collection
     this.viewingItem = null
@@ -538,6 +545,8 @@ export default class UiStore {
 
   @action
   setViewingItem(item = null) {
+    // escape if we're already viewing this item
+    if (this.viewingItem && item && this.viewingItem.id === item.id) return
     this.previousViewingCollection = this.viewingCollection
     this.viewingCollection = null
     this.viewingItem = item
@@ -725,5 +734,19 @@ export default class UiStore {
     if (!this.modalContentRef) return
     const node = this.modalContentRef.current
     node.scrollTop = node.scrollHeight
+  }
+
+  scrollToTop() {
+    this.scroll.scrollToTop()
+  }
+
+  scrollToBottom() {
+    if (this.viewingCollection && this.viewingCollection.isBoard) {
+      this.scroll.scrollTo(
+        this.viewingCollection.scrollBottom - window.innerHeight / 3
+      )
+      return
+    }
+    this.scroll.scrollToBottom()
   }
 }

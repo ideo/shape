@@ -126,10 +126,10 @@ class FoamcoreGrid extends React.Component {
     const { uiStore } = this.props
     runInAction(() => {
       uiStore.selectedAreaEnabled = true
-      // this.zoomLevel = this.defaultZoomLevel
     })
     // now that component is mounted, calculate visible area and calculateCardsToRender
     this.loadAfterScroll()
+    this.updateCollectionScrollBottom()
     window.addEventListener('scroll', this.handleScroll)
   }
 
@@ -247,7 +247,8 @@ class FoamcoreGrid extends React.Component {
   get relativeZoomLevel() {
     if (this.zoomLevel !== 3) return this.zoomLevel
     const { gridW, gutter } = this.gridSettings
-    const gridWidth = (gridW + gutter) * MAX_COLS + pageMargins.left * 2
+    const gridWidth =
+      (gridW + gutter) * MAX_COLS + pageMargins.left * 2 * this.zoomLevel
     return gridWidth / window.innerWidth
   }
 
@@ -480,6 +481,7 @@ class FoamcoreGrid extends React.Component {
     runInAction(() => {
       this.zoomLevel = this.zoomLevel + 1
     })
+    this.updateCollectionScrollBottom()
     this.throttledCalculateCardsToRender()
   }
 
@@ -488,7 +490,16 @@ class FoamcoreGrid extends React.Component {
     runInAction(() => {
       this.zoomLevel = this.zoomLevel - 1
     })
+    this.updateCollectionScrollBottom()
     this.throttledCalculateCardsToRender()
+  }
+
+  updateCollectionScrollBottom() {
+    const { collection } = this.props
+    const { gridH, gutter } = this.gridSettings
+    const y =
+      (collection.max_row_index * (gridH + gutter)) / this.relativeZoomLevel
+    collection.updateScrollBottom(y)
   }
 
   handleScroll = ev => {
