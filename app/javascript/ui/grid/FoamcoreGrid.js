@@ -4,6 +4,7 @@ import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import InlineLoader from '~/ui/layout/InlineLoader'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
@@ -22,11 +23,12 @@ const BlankCard = styled.div.attrs({
     cursor: 'pointer',
   }),
 })`
-  border: ${props =>
-    props.type === 'unrendered' ? `1px solid ${v.colors.primaryDark}` : 'none'};
   background-color: ${props => {
     if (props.blocked) {
       return v.colors.alert
+    }
+    if (props.type === 'unrendered') {
+      return v.colors.commonLightest
     }
     if (props.type === 'blank' || props.type === 'drag') {
       return v.colors.primaryLight
@@ -35,7 +37,11 @@ const BlankCard = styled.div.attrs({
   }};
   position: absolute;
   transform-origin: left top;
-  opacity: ${props => (props.type === 'drag' ? 0.5 : 1)};
+  opacity: ${props => {
+    if (props.type === 'unrendered') return 0.75
+    if (props.type === 'drag') return 0.5
+    return 1
+  }}
   z-index: ${props => (props.type === 'drag' ? v.zIndex.cardHovering : 0)};
   &:hover {
     background-color: ${v.colors.primaryLight} !important;
@@ -922,6 +928,8 @@ class FoamcoreGrid extends React.Component {
           <PlusIcon />
         </StyledPlusIcon>
       )
+    } else if (type === 'unrendered') {
+      inner = <InlineLoader background={v.colors.commonLightest} />
     }
 
     return (
