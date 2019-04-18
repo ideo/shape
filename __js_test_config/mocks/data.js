@@ -22,6 +22,7 @@ export const fakeCollectionCard = {
   record: {},
   item: {},
   reference: false,
+  image_contain: false,
   beginReplacing: jest.fn(),
   API_create: jest.fn(),
   API_archive: jest.fn(),
@@ -41,6 +42,7 @@ export const fakeTextItemAttrs = {
   can_edit: false,
   inherited_tag_list: [],
   internalType: 'items',
+  fullyLoaded: true,
   parent_collection_card: fakeCollectionCard,
 }
 
@@ -307,6 +309,7 @@ export const fakeItemCard = {
   maxWidth: 1,
   record: fakeTextItem,
   item: fakeTextItem,
+  image_contain: false,
   API_create: jest.fn(),
   API_archive: jest.fn(),
   API_linkToMyCollection: jest.fn(),

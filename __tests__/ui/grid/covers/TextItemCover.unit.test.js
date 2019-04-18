@@ -13,6 +13,7 @@ const props = {
   height: 200,
   cardId: '1',
   handleClick: jest.fn(),
+  initialFontTag: 'P',
 }
 const e = {
   stopPropagation: jest.fn(),
