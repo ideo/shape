@@ -360,10 +360,15 @@ class CollectionGrid extends React.Component {
       }
       await apiStore.moveCards(data)
       const afterMove = () => {
+        const { movingIntoCollection } = uiStore
         uiStore.setMovingCards([])
         uiStore.update('multiMoveCardIds', [])
         uiStore.reselectCardIds(cardIds)
         uiStore.update('movingIntoCollection', null)
+        // add a little delay because the board has to load first
+        if (movingIntoCollection.isBoard) {
+          setTimeout(() => uiStore.scrollToBottom(), 500)
+        }
       }
       if (data.to_id === data.from_id) {
         afterMove()
