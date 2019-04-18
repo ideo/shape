@@ -12,7 +12,7 @@ const MAX_USERS_TO_SHOW = 4
 const StyledRolesSummary = styled.div`
   position: relative;
   top: 5px;
-  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+  @media only screen and (max-width: ${v.responsive.medBreakpoint - 1}px) {
     min-height: 50px;
     .roles-summary--inner {
       display: none;

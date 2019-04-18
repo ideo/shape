@@ -65,7 +65,7 @@ InlineRow.displayName = 'StyledInlineRow'
 export const StyledHeader = styled.header`
   box-sizing: border-box;
   width: 100%;
-  padding: 0 ${v.containerPadding.horizontal}rem;
+  padding: 0 ${v.containerPadding.horizontal}rem 1rem;
   position: relative; /* necessary to get above the FixedBoundary */
   @media print {
     display: none;
@@ -74,6 +74,7 @@ export const StyledHeader = styled.header`
 StyledHeader.displayName = 'StyledHeader'
 
 export const FixedHeader = styled(StyledHeader)`
+  padding: 0 ${v.containerPadding.horizontal}rem;
   z-index: ${props => props.zIndex};
   position: fixed;
   top: 0;
