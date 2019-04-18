@@ -128,8 +128,8 @@ class FoamcoreGrid extends React.Component {
       uiStore.selectedAreaEnabled = true
       this.zoomLevel = this.defaultZoomLevel
     })
-    // NOTE: yet another hack -- get the page to render on initial load
-    this.throttledCalculateCardsToRender()
+    // now that component is mounted, calculate visible area and calculateCardsToRender
+    this.loadAfterScroll()
     window.addEventListener('scroll', this.handleScroll)
   }
 
