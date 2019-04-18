@@ -564,6 +564,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       }
     })
 
+    this._reorderCards()
+
     const data = this.toJsonApiWithCards(
       updateAllCards ? [] : _.keys(updatesByCardId)
     )
