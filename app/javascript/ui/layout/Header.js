@@ -281,7 +281,7 @@ class Header extends React.Component {
   get isMobile() {
     const { uiStore } = this.props
     return (
-      uiStore.windowWidth && uiStore.windowWidth <= v.responsive.smallBreakpoint
+      uiStore.windowWidth && uiStore.windowWidth < v.responsive.medBreakpoint
     )
   }
 
