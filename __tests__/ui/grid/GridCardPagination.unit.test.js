@@ -1,5 +1,6 @@
 import GridCardPagination from '~/ui/grid/GridCardPagination'
 import { fakeCollection } from '#/mocks/data'
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 let wrapper, component, props
 describe('GridCardPagination', () => {
@@ -23,6 +24,10 @@ describe('GridCardPagination', () => {
     expect(props.loadCollectionCards).toHaveBeenCalledWith({
       page: props.nextPage,
     })
+  })
+
+  it('renders snapshot', () => {
+    expectTreeToMatchSnapshot(wrapper)
   })
 
   describe('when collection.totalPages < nextPage', () => {

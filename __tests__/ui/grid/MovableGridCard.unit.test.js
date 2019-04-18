@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 import {
   fakeItemCard,
@@ -25,10 +26,15 @@ const props = {
   hoveringOverRight: false,
   isBoardCollection: false,
   holdingOver: false,
+  dragOffset: { x: 0, y: 0 },
 }
 
 let wrapper, instance
 describe('MovableGridCard', () => {
+  it('renders snapshot', () => {
+    expectTreeToMatchSnapshot(wrapper)
+  })
+
   it('renders a placeholder card if cardType is "placeholder"', () => {
     props.cardType = 'placeholder'
     wrapper = shallow(<MovableGridCard {...props} />)

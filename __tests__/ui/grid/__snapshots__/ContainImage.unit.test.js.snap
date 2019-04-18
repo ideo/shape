@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ContainImage renders snapshot 1`] = `
+<CardActionHolder
+  active={false}
+  className="show-on-hover"
+  disableHover={false}
+  onClick={[Function]}
+  size={32}
+  tooltipText="show whole image"
+>
+  <ContainImageIcon />
+</CardActionHolder>
+`;

@@ -458,13 +458,14 @@ describe('FoamcoreGrid', () => {
 
       describe('selected area not matching any cards', () => {
         beforeEach(() => {
-          props.selectedArea = { minX: 500, minY: 10, maxX: 550, maxY: 20 }
-          // It would be nice if we could use the real Collection class
-          // instead of having to mock the return value:
           props.collection.cardIdsWithinRectangle = jest
             .fn()
             .mockReturnValue([])
           rerender()
+          props.uiStore.selectedCardIds = []
+          props.selectedArea = { minX: 500, minY: 10, maxX: 550, maxY: 20 }
+          // It would be nice if we could use the real Collection class
+          // instead of having to mock the return value:
           instance.componentDidUpdate(props)
         })
 

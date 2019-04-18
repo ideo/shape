@@ -1,5 +1,6 @@
 import VideoItemCover from '~/ui/grid/covers/VideoItemCover'
 import { fakeVideoItem } from '#/mocks/data'
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 // because of Activity.trackActivity('viewed', item)
 jest.mock('../../../../app/javascript/stores/jsonApi/Activity')
@@ -13,6 +14,10 @@ let wrapper
 describe('VideoItemCover', () => {
   beforeEach(() => {
     wrapper = shallow(<VideoItemCover {...props} />)
+  })
+
+  it('renders snapshot', () => {
+    expectTreeToMatchSnapshot(wrapper)
   })
 
   it('renders the StyledVideoCover', () => {

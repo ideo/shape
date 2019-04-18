@@ -3,6 +3,7 @@ import CardActionHolder from '~/ui/icons/CardActionHolder'
 import FilestackUpload from '~/utils/FilestackUpload'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 import { fakeCollection, fakeCollectionCard } from '#/mocks/data'
 
@@ -50,6 +51,10 @@ describe('CoverImageSelector', () => {
       innerWrapper = shallow(component.renderInner())
     }
     rerender()
+  })
+
+  it('renders snapshot', () => {
+    expectTreeToMatchSnapshot(wrapper)
   })
 
   describe('render()', () => {

@@ -1,5 +1,6 @@
 import GridCard from '~/ui/grid/GridCard'
 import { uiStore } from '~/stores'
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 import {
   fakeItemCard,
@@ -39,6 +40,10 @@ describe('GridCard', () => {
         rerender()
       })
 
+      it('renders snapshot', () => {
+        expectTreeToMatchSnapshot(wrapper)
+      })
+
       it('renders a StyledGridCard with passed in dragging prop', () => {
         expect(wrapper.find('StyledGridCard').props().dragging).toBe(
           props.dragging
@@ -76,6 +81,10 @@ describe('GridCard', () => {
         props.canEditCollection = true
         wrapper.setProps(props)
         rerender()
+      })
+
+      it('renders snapshot', () => {
+        expectTreeToMatchSnapshot(wrapper)
       })
 
       it('passes canEdit to menu', () => {
@@ -174,6 +183,10 @@ describe('GridCard', () => {
         rerender()
       })
 
+      it('renders snapshot', () => {
+        expectTreeToMatchSnapshot(wrapper)
+      })
+
       it('renders the collection icon', () => {
         expect(
           wrapper
@@ -200,6 +213,10 @@ describe('GridCard', () => {
         rerender()
       })
 
+      it('renders snapshot', () => {
+        expectTreeToMatchSnapshot(wrapper)
+      })
+
       it('passes canEdit to menu', () => {
         expect(wrapper.find('ActionMenu').props().canEdit).toBe(true)
       })
@@ -217,6 +234,10 @@ describe('GridCard', () => {
         rerender()
       })
 
+      it('renders snapshot', () => {
+        expectTreeToMatchSnapshot(wrapper)
+      })
+
       it('renders selection circle and card menu, but no hotspot', () => {
         expect(wrapper.find('SelectionCircle').exists()).toBe(true)
         expect(wrapper.find('ActionMenu').exists()).toBe(true)
@@ -230,6 +251,10 @@ describe('GridCard', () => {
         props.canEditCollection = true
         props.record.menuDisabled = true
         rerender()
+      })
+
+      it('renders snapshot', () => {
+        expectTreeToMatchSnapshot(wrapper)
       })
 
       it('does not render ActionMenu', () => {
@@ -260,6 +285,10 @@ describe('GridCard', () => {
       rerender()
     })
 
+    it('renders snapshot', () => {
+      expectTreeToMatchSnapshot(wrapper)
+    })
+
     it('renders the colored to indicate selection', () => {
       expect(wrapper.find('StyledGridCard').props().selected).toBe(true)
     })
@@ -270,6 +299,10 @@ describe('GridCard', () => {
       props.hoveringOver = false
       uiStore.toggleSelectedCardId(props.card.id)
       rerender()
+    })
+
+    it('renders snapshot', () => {
+      expectTreeToMatchSnapshot(wrapper)
     })
 
     it('renders the colored to indicate selection', () => {
@@ -283,6 +316,10 @@ describe('GridCard', () => {
       props.record.can_edit = true
       props.record.menuDisabled = false
       rerender()
+    })
+
+    it('renders snapshot', () => {
+      expectTreeToMatchSnapshot(wrapper)
     })
 
     it('disables canEdit functionality', () => {
