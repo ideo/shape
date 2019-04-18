@@ -88,7 +88,7 @@ class FoamcoreGrid extends React.Component {
   @observable
   cardsToRender = []
   @observable
-  zoomLevel = 1
+  zoomLevel = 3
   dragGridSpot = observable.map({})
   @observable
   dragging = false
@@ -126,7 +126,7 @@ class FoamcoreGrid extends React.Component {
     const { uiStore } = this.props
     runInAction(() => {
       uiStore.selectedAreaEnabled = true
-      this.zoomLevel = this.defaultZoomLevel
+      // this.zoomLevel = this.defaultZoomLevel
     })
     // now that component is mounted, calculate visible area and calculateCardsToRender
     this.loadAfterScroll()
@@ -244,7 +244,8 @@ class FoamcoreGrid extends React.Component {
   }
 
   // Default zoom level is that which fits all columns in the browser viewport
-  get defaultZoomLevel() {
+  get relativeZoomLevel() {
+    if (this.zoomLevel !== 3) return this.zoomLevel
     const { gridW, gutter } = this.gridSettings
     const gridWidth = (gridW + gutter) * MAX_COLS + pageMargins.left * 2
     return gridWidth / window.innerWidth
@@ -265,8 +266,8 @@ class FoamcoreGrid extends React.Component {
     // for padding to allow scrolling beyond the current cards
     const visRows = this.visibleRows.num || 1
     const maxRows = collection.max_row_index + 1 + visRows * 2
-    const height = ((gridH + gutter) * maxRows) / this.zoomLevel
-    const width = ((gridW + gutter) * MAX_COLS) / this.zoomLevel
+    const height = ((gridH + gutter) * maxRows) / this.relativeZoomLevel
+    const width = ((gridW + gutter) * MAX_COLS) / this.relativeZoomLevel
     return {
       width,
       height,
@@ -275,12 +276,12 @@ class FoamcoreGrid extends React.Component {
 
   get cardAndGutterWidth() {
     const { gridW, gutter } = this.gridSettings
-    return (gridW + gutter) / this.zoomLevel
+    return (gridW + gutter) / this.relativeZoomLevel
   }
 
   get cardAndGutterHeight() {
     const { gridH, gutter } = this.gridSettings
-    return (gridH + gutter) / this.zoomLevel
+    return (gridH + gutter) / this.relativeZoomLevel
   }
 
   get visibleRows() {
@@ -325,10 +326,10 @@ class FoamcoreGrid extends React.Component {
   coordinatesForPosition(position) {
     const { x, y } = position
     const { gridW, gridH, gutter } = this.gridSettings
-    const { zoomLevel } = this
+    const { relativeZoomLevel } = this
 
-    const col = Math.floor((x / (gridW + gutter)) * zoomLevel)
-    const row = Math.floor((y / (gridH + gutter)) * zoomLevel)
+    const col = Math.floor((x / (gridW + gutter)) * relativeZoomLevel)
+    const row = Math.floor((y / (gridH + gutter)) * relativeZoomLevel)
 
     if (row === -1 || col === -1) return null
 
@@ -337,10 +338,10 @@ class FoamcoreGrid extends React.Component {
 
   positionForCoordinates({ col, row, width = 1, height = 1 }) {
     const { gridW, gridH, gutter } = this.gridSettings
-    const { zoomLevel } = this
+    const { relativeZoomLevel } = this
     const pos = {
-      x: (col * (gridW + gutter)) / zoomLevel,
-      y: (row * (gridH + gutter)) / zoomLevel,
+      x: (col * (gridW + gutter)) / relativeZoomLevel,
+      y: (row * (gridH + gutter)) / relativeZoomLevel,
       w: width * (gridW + gutter) - gutter,
       h: height * (gridH + gutter) - gutter,
     }
@@ -857,7 +858,7 @@ class FoamcoreGrid extends React.Component {
     // TODO reorganize
     if (card.id === 'blank' && this.zoomLevel !== 1) {
       position.xPos = position.x - this.zoomLevel * 38
-      position.yPos = position.y - this.zoomLevel * 38
+      position.yPos = position.y - this.zoomLevel * 30
     }
 
     const dragOffset = {
@@ -889,7 +890,7 @@ class FoamcoreGrid extends React.Component {
         routeTo={routingStore.routeTo}
         parent={collection}
         menuOpen={cardMenuOpen.id === card.id}
-        zoomLevel={this.zoomLevel}
+        zoomLevel={this.relativeZoomLevel}
         maxResizeCol={this.calcEdgeCol(card, card.id)}
         maxResizeRow={this.calcEdgeRow(card, card.id)}
         horizontalScroll
@@ -901,7 +902,7 @@ class FoamcoreGrid extends React.Component {
   positionBlank({ row, col, width, height }, type = 'generic') {
     const position = this.positionForCoordinates({ col, row, width, height })
 
-    const { zoomLevel } = this
+    const { relativeZoomLevel } = this
     let inner = ''
     if (type === 'hover') {
       inner = (
@@ -917,7 +918,7 @@ class FoamcoreGrid extends React.Component {
         onClick={this.handleBlankCardClick({ col, row })}
         {...position}
         type={type}
-        zoomLevel={zoomLevel}
+        zoomLevel={relativeZoomLevel}
         key={`blank-${type}-${row}:${col}`}
         blocked={this.hasDragCollision && type === 'drag'}
         data-blank-type={type}
