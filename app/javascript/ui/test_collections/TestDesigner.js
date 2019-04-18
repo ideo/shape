@@ -100,6 +100,23 @@ class TestDesigner extends React.Component {
     }
   }
 
+  get isLiveTest() {
+    const { collection } = this.props
+    return collection.isLiveTest
+  }
+
+  // This shows a dialog immediately
+  confirmWithDialog = ({ prompt, onConfirm }) => {
+    const { uiStore } = apiStore
+    uiStore.confirm({
+      prompt,
+      confirmText: 'Continue',
+      iconName: 'Template',
+      onConfirm: () => onConfirm(),
+    })
+  }
+
+  // This shows a dialog only if the collection is a template
   confirmEdit = action => {
     const { collection } = this.props
     collection.confirmEdit({
@@ -107,23 +124,46 @@ class TestDesigner extends React.Component {
     })
   }
 
-  handleSelectChange = replacingCard => ev =>
-    this.confirmEdit(() => {
-      this.createNewQuestionCard({
-        replacingCard,
-        questionType: ev.target.value,
+  handleSelectChange = replacingCard => ev => {
+    const replaceCard = () => {
+      this.confirmEdit(() => {
+        this.createNewQuestionCard({
+          replacingCard,
+          questionType: ev.target.value,
+        })
       })
-    })
+    }
+    if (this.isLiveTest) {
+      this.confirmWithDialog({
+        prompt:
+          'This test has been launched. Are you sure you want to change the question type?',
+        onConfirm: replaceCard,
+      })
+    } else {
+      replaceCard()
+    }
+  }
 
-  handleTrash = card => {
-    this.confirmEdit(() => card.API_archiveSelf())
+  handleTrash = async card => {
+    this.confirmEdit(() => card.API_archiveSelf({}))
   }
 
   handleNew = (card, addBefore) => () => {
-    this.confirmEdit(() => {
-      const order = addBefore ? card.order - 0.5 : card.order + 1
-      this.createNewQuestionCard({ order })
-    })
+    const addNewCard = () => {
+      this.confirmEdit(() => {
+        const order = addBefore ? card.order - 0.5 : card.order + 1
+        this.createNewQuestionCard({ order })
+      })
+    }
+    if (this.isLiveTest) {
+      this.confirmWithDialog({
+        prompt:
+          'This test has been launched. Are you sure you want to add a new question?',
+        onConfirm: addNewCard,
+      })
+    } else {
+      addNewCard()
+    }
   }
 
   archiveMediaCardsIfDefaultState() {
@@ -209,7 +249,9 @@ class TestDesigner extends React.Component {
     const card = new CollectionCard(attrs, apiStore)
     card.parent = collection
     if (replacingCard) {
-      return card.API_replace({ replacingId: replacingCard.id })
+      // Set new card in same place as that you are replacing
+      card.order = replacingCard.order
+      await replacingCard.API_archiveSelf({})
     }
     return card.API_create()
   }
