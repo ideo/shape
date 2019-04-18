@@ -397,18 +397,18 @@ class FoamcoreGrid extends React.Component {
     let { minX, minY, maxX, maxY } = selectedArea
 
     // If no area is selected, return null values
-    if (!minX) return selectedArea
+    if (minX === null) return selectedArea
 
     // Adjust coordinates by page margins
-    // Make sure all values start at 0
     minX -= pageMargins.left
-    if (minX < 0) minX = 0
     minY -= pageMargins.top
-    if (minY < 0) minY = 0
     maxX -= pageMargins.left
-    if (maxX < 0) maxX = 0
     maxY -= pageMargins.top
-    if (maxY < 0) maxY = 0
+
+    // If the user is selecting outside of the grid,
+    // set to 0 if the bottom of selected area is over the grid
+    if (minX < 0 && maxX > 0) minX = 0
+    if (minY < 0 && maxY > 0) minY = 0
 
     return {
       minX,
@@ -423,7 +423,7 @@ class FoamcoreGrid extends React.Component {
     const { minX, minY, maxX, maxY } = this.selectedAreaAdjustedForGrid
 
     // Check if there is a selected area
-    if (!minX) return
+    if (minX === null) return
 
     // Select all cards that this drag rectangle 'touches'
     const topLeftCoords = this.coordinatesForPosition({
@@ -913,6 +913,7 @@ class FoamcoreGrid extends React.Component {
         key={`blank-${type}-${row}:${col}`}
         blocked={this.hasDragCollision && type === 'drag'}
         data-blank-type={type}
+        data-empty-space-click
         draggedOn
       >
         {inner}
