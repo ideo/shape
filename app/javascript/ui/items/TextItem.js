@@ -15,6 +15,7 @@ import ChannelManager from '~/utils/ChannelManager'
 // Only used if there are other viewers
 const UNLOCK_IN_MILLISECONDS = 5000
 
+const FULL_PAGE_TOP_PADDING = '2rem'
 const DockedToolbar = styled.div`
   background: white;
   box-sizing: border-box;
@@ -22,25 +23,25 @@ const DockedToolbar = styled.div`
   left: 0;
   margin-bottom: 20px;
   padding: 5px 10px 0;
-  ${props => props.fullPageView && `padding-left: 36px`};
   position: fixed;
-  ${props => `top: ${props.fullPageView ? v.headerHeight : 0}px`};
   width: 100%;
   z-index: 100;
   ${props =>
-    // Hack because headerHeight doesn't close the gap to-the-pixel
     props.fullPageView &&
     `
-    margin-top: -4px;
-    @media only screen and (max-width: ${v.responsive.muiSmBreakpoint}px) {
-      margin-top: -7px;
-    }
-  `};
+      margin-top: -${FULL_PAGE_TOP_PADDING};
+      padding-left: 36px;
+    `};
+  ${props =>
+    !props.fullPageView &&
+    `
+      top: 0;
+    `};
 `
 
 const StyledContainer = styled.div`
   padding-top: 25px;
-  ${props => props.fullPageView && `padding: 2rem 0.5rem;`};
+  ${props => props.fullPageView && `padding: ${FULL_PAGE_TOP_PADDING} 0.5rem;`};
   .editor-pill {
     ${props =>
       !props.fullPageView &&
