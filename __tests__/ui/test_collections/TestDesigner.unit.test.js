@@ -1,9 +1,10 @@
 import TestDesigner from '~/ui/test_collections/TestDesigner'
 import { fakeCollection } from '#/mocks/data'
 import fakeApiStore from '#/mocks/fakeApiStore'
+
 import v from '~/utils/variables'
 
-let wrapper, props, component
+let wrapper, props, instance, component
 describe('TestDesigner', () => {
   beforeEach(() => {
     props = {
@@ -57,6 +58,53 @@ describe('TestDesigner', () => {
       expect(wrapper.find('RadioControl').props().selectedValue).toEqual(
         'media'
       )
+    })
+  })
+
+  describe('with live test_collection', () => {
+    beforeEach(() => {
+      props.collection.can_edit_content = true
+      props.collection.test_status = 'live'
+      props.collection.isLiveTest = true
+      wrapper = shallow(<TestDesigner {...props} />)
+    })
+
+    it('prompts user when adding a new question', () => {
+      wrapper
+        .find('QuestionHotEdge')
+        .first()
+        .props()
+        .onAdd()
+      expect(props.collection.apiStore.uiStore.confirm).toHaveBeenCalledWith({
+        confirmText: 'Continue',
+        iconName: 'Alert',
+        onConfirm: expect.any(Function),
+        prompt:
+          'This test has been launched. Are you sure you want to add a new question?',
+      })
+    })
+
+    describe('handleSelectChange', () => {
+      beforeEach(() => {
+        instance = wrapper.instance()
+        const fakeEv = {
+          preventDefault: jest.fn(),
+          target: { value: 'question_excitement' },
+        }
+        instance.handleSelectChange(props.collection.collection_cards[0])(
+          fakeEv
+        )
+      })
+
+      it('prompts user when changing a question type', () => {
+        expect(props.collection.apiStore.uiStore.confirm).toHaveBeenCalledWith({
+          confirmText: 'Continue',
+          iconName: 'Alert',
+          onConfirm: expect.any(Function),
+          prompt:
+            'This test has been launched. Are you sure you want to change the question type?',
+        })
+      })
     })
   })
 
