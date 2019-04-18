@@ -289,7 +289,7 @@ describe('GridCard', () => {
       expectTreeToMatchSnapshot(wrapper)
     })
 
-    it('renders the colored to indicate selection', () => {
+    it('renders the colored circle to indicate selection', () => {
       expect(wrapper.find('StyledGridCard').props().selected).toBe(true)
     })
   })
@@ -297,7 +297,7 @@ describe('GridCard', () => {
   describe('when selected', () => {
     beforeEach(() => {
       props.hoveringOver = false
-      uiStore.toggleSelectedCardId(props.card.id)
+      uiStore.selectCardId(props.card.id)
       rerender()
     })
 
@@ -305,8 +305,12 @@ describe('GridCard', () => {
       expectTreeToMatchSnapshot(wrapper)
     })
 
-    it('renders the colored to indicate selection', () => {
+    it('renders the colored circle to indicate selection', () => {
       expect(wrapper.find('StyledGridCard').props().selected).toBe(true)
+    })
+
+    afterEach(() => {
+      uiStore.deselectCards()
     })
   })
 

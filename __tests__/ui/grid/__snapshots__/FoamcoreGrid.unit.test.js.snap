@@ -6,7 +6,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
   height={NaN}
   innerRef={[Function]}
   onScroll={[Function]}
-  width={5312}
+  width={1011.8095238095239}
 >
   <FoamcoreZoomControls
     onZoomIn={[Function]}
@@ -24,11 +24,11 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
     type="unrendered"
     w={312}
     width={312}
-    x={1660}
-    xPos={1660}
-    y={270}
-    yPos={270}
-    zoomLevel={1}
+    x={316.1904761904762}
+    xPos={316.1904761904762}
+    y={51.42857142857143}
+    yPos={51.42857142857143}
+    zoomLevel={5.25}
   />
   <styled.div
     blocked={false}
@@ -42,11 +42,11 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
     type="unrendered"
     w={644}
     width={644}
-    x={332}
-    xPos={332}
+    x={63.23809523809524}
+    xPos={63.23809523809524}
     y={0}
     yPos={0}
-    zoomLevel={1}
+    zoomLevel={5.25}
   />
   <styled.div
     blocked={false}
@@ -62,9 +62,9 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
     width={644}
     x={0}
     xPos={0}
-    y={540}
-    yPos={540}
-    zoomLevel={1}
+    y={102.85714285714286}
+    yPos={102.85714285714286}
+    zoomLevel={5.25}
   />
 </styled.div>
 `;

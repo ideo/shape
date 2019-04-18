@@ -10,6 +10,7 @@ let defaultOpts
 describe('RolesAdd', () => {
   beforeEach(() => {
     props = {
+      title: 'Add groups',
       searchableItems: [],
       roleTypes: ['viewer', 'editor'],
       onCreate: jest.fn(),
