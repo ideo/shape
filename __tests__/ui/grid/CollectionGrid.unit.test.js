@@ -1,4 +1,5 @@
 import CollectionGrid from '~/ui/grid/CollectionGrid'
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
@@ -29,6 +30,10 @@ beforeEach(() => {
 })
 
 describe('CollectionGrid', () => {
+  it('renders snapshot', () => {
+    expectTreeToMatchSnapshot(wrapper)
+  })
+
   it('renders the Grid with draggable collection cards', () => {
     expect(wrapper.find('StyledGrid').exists()).toBe(true)
     expect(

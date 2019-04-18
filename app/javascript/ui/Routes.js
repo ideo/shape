@@ -111,6 +111,11 @@ class Routes extends React.Component {
   handleMouseMoveSelection = e => {
     // Return if mouse is only scrolling, not click-dragging
     if (!this.mouseDownAt.x) return
+
+    // Stop propagation if dragging so it doesn't trigger other events
+    e.stopPropagation()
+    e.preventDefault()
+
     this.throttledSetSelectedArea({
       minX: _.min([e.pageX, this.mouseDownAt.x]),
       maxX: _.max([e.pageX, this.mouseDownAt.x]),
@@ -120,16 +125,28 @@ class Routes extends React.Component {
   }
 
   handleMouseUpSelection = e => {
+    if (!this.mouseDownAt.x) return
+
+    // Stop propagation if dragging so it doesn't trigger other events
+    e.stopPropagation()
+    e.preventDefault()
+
     // Reset for next drag
     this.mouseDownAt = { x: null, y: null }
+
     // Cancel any currently throttled calls
     this.throttledSetSelectedArea.cancel()
-    this._setSelectedArea({
-      minX: null,
-      maxX: null,
-      minY: null,
-      maxY: null,
-    })
+
+    // Wait to clear mouse down area,
+    // So that BCT does not immediately trigger
+    setTimeout(() => {
+      this._setSelectedArea({
+        minX: null,
+        maxX: null,
+        minY: null,
+        maxY: null,
+      })
+    }, 500)
   }
 
   _setSelectedArea = coords => {

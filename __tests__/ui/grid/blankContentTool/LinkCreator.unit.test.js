@@ -1,4 +1,5 @@
 import LinkCreator from '~/ui/grid/blankContentTool/LinkCreator'
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import { ITEM_TYPES } from '~/utils/variables'
 
 const e = { preventDefault: jest.fn() }
@@ -14,6 +15,10 @@ describe('LinkCreator', () => {
     props.createCard.mockClear()
     wrapper = shallow(<LinkCreator {...props} />)
     component = wrapper.instance()
+  })
+
+  it('renders snapshot', () => {
+    expectTreeToMatchSnapshot(wrapper)
   })
 
   it('renders a GenericLinkCreator', () => {

@@ -177,7 +177,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const cardIds = []
     _.each(rowRange, row => {
       _.each(colRange, col => {
-        const card = matrix[row][col]
+        const card = matrix[row] && matrix[row][col]
         if (card && !_.includes(cardIds, card.id)) cardIds.push(card.id)
       })
     })
@@ -563,6 +563,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         })
       }
     })
+
+    this._reorderCards()
 
     const data = this.toJsonApiWithCards(
       updateAllCards ? [] : _.keys(updatesByCardId)

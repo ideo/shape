@@ -52,6 +52,20 @@ const groupByConsecutive = (array, value) => {
   return groups
 }
 
+const pageMargins = () => {
+  let xMargin
+  if (window.innerWidth >= v.maxWidth) {
+    xMargin = (window.innerWidth - v.maxWidth) / 2
+  } else {
+    // Otherwise use container padding, multiplied to transform to px
+    xMargin = v.containerPadding.horizontal * 16
+  }
+  return {
+    x: xMargin,
+    y: v.topScrollTrigger,
+  }
+}
+
 // needs to be an observer to observe changes to the collection + items
 @inject('apiStore', 'routingStore', 'uiStore')
 @observer
@@ -839,6 +853,7 @@ class CollectionGrid extends React.Component {
           isSharedCollection={collection.isSharedCollection}
           isBoardCollection={false}
           position={card.position}
+          dragOffset={pageMargins()}
           record={record}
           onDrag={this.onDrag}
           hoveringOverLeft={

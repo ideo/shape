@@ -3,51 +3,47 @@
 exports[`FoamcoreGrid renders snapshot 1`] = `
 <styled.div
   data-empty-space-click={true}
+  height={NaN}
   innerRef={[Function]}
   onScroll={[Function]}
+  width={5312}
 >
   <FoamcoreZoomControls
     onZoomIn={[Function]}
     onZoomOut={[Function]}
   />
-  <div
-    style={
-      Object {
-        "height": "1px",
-        "width": "3200px",
-      }
-    }
-  />
   <styled.div
     blocked={false}
     data-blank-type="unrendered"
+    data-empty-space-click={true}
     draggedOn={true}
-    h={200}
-    height={200}
+    h={250}
+    height={250}
     key="blank-unrendered-1:5"
     onClick={[Function]}
     type="unrendered"
-    w={200}
-    width={200}
-    x={1050}
-    xPos={1050}
-    y={210}
-    yPos={210}
+    w={312}
+    width={312}
+    x={1660}
+    xPos={1660}
+    y={270}
+    yPos={270}
     zoomLevel={1}
   />
   <styled.div
     blocked={false}
     data-blank-type="unrendered"
+    data-empty-space-click={true}
     draggedOn={true}
-    h={410}
-    height={410}
+    h={520}
+    height={520}
     key="blank-unrendered-0:1"
     onClick={[Function]}
     type="unrendered"
-    w={410}
-    width={410}
-    x={210}
-    xPos={210}
+    w={644}
+    width={644}
+    x={332}
+    xPos={332}
     y={0}
     yPos={0}
     zoomLevel={1}
@@ -55,18 +51,19 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
   <styled.div
     blocked={false}
     data-blank-type="unrendered"
+    data-empty-space-click={true}
     draggedOn={true}
-    h={200}
-    height={200}
+    h={250}
+    height={250}
     key="blank-unrendered-2:0"
     onClick={[Function]}
     type="unrendered"
-    w={410}
-    width={410}
+    w={644}
+    width={644}
     x={0}
     xPos={0}
-    y={420}
-    yPos={420}
+    y={540}
+    yPos={540}
     zoomLevel={1}
   />
 </styled.div>

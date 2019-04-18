@@ -49,9 +49,10 @@ const BlankCard = styled.div.attrs({
 `
 
 const Grid = styled.div`
-  min-height: 1300px;
   margin-top: ${v.pageContentMarginTop}px;
   position: relative;
+  width: ${props => `${props.width}px`};
+  min-height: ${props => `${props.height}px`};
 `
 
 const StyledPlusIcon = styled.div`
@@ -77,6 +78,7 @@ const pageMargins = {
 
 const MAX_CARD_W = 4
 const MAX_CARD_H = 2
+const MAX_COLS = 16
 
 // needs to be an observer to observe changes to the collection + items
 @inject('apiStore', 'routingStore', 'uiStore')
@@ -124,6 +126,7 @@ class FoamcoreGrid extends React.Component {
     const { uiStore } = this.props
     runInAction(() => {
       uiStore.selectedAreaEnabled = true
+      this.zoomLevel = this.defaultZoomLevel
     })
     // NOTE: yet another hack -- get the page to render on initial load
     this.throttledCalculateCardsToRender()
@@ -240,13 +243,43 @@ class FoamcoreGrid extends React.Component {
     if (col > this.loadedCols.max) this.loadedCols.max = col
   }
 
+  // Default zoom level is that which fits all columns in the browser viewport
+  get defaultZoomLevel() {
+    const { gridW, gutter } = this.gridSettings
+    const gridWidth = (gridW + gutter) * MAX_COLS + pageMargins.left * 2
+    return gridWidth / window.innerWidth
+  }
+
+  get gridSettings() {
+    // Foamcore doesn't change gridSettings based on browser size,
+    // instead always refer to the defaults
+    return this.props.uiStore.defaultGridSettings
+  }
+
+  get totalGridSize() {
+    const { gridW, gridH, gutter } = this.gridSettings
+    const { collection } = this.props
+    // Max rows is the max row of any current cards (max_row_index)
+    // + 1, since it is zero-indexed,
+    // + 2x the visible number of rows
+    // for padding to allow scrolling beyond the current cards
+    const visRows = this.visibleRows.num || 1
+    const maxRows = collection.max_row_index + 1 + visRows * 2
+    const height = ((gridH + gutter) * maxRows) / this.zoomLevel
+    const width = ((gridW + gutter) * MAX_COLS) / this.zoomLevel
+    return {
+      width,
+      height,
+    }
+  }
+
   get cardAndGutterWidth() {
-    const { gridW, gutter } = this.props
+    const { gridW, gutter } = this.gridSettings
     return (gridW + gutter) / this.zoomLevel
   }
 
   get cardAndGutterHeight() {
-    const { gridH, gutter } = this.props
+    const { gridH, gutter } = this.gridSettings
     return (gridH + gutter) / this.zoomLevel
   }
 
@@ -291,7 +324,7 @@ class FoamcoreGrid extends React.Component {
   // Finds row and column from an x,y coordinate
   coordinatesForPosition(position) {
     const { x, y } = position
-    const { gridW, gridH, gutter } = this.props
+    const { gridW, gridH, gutter } = this.gridSettings
     const { zoomLevel } = this
 
     const col = Math.floor((x / (gridW + gutter)) * zoomLevel)
@@ -303,7 +336,7 @@ class FoamcoreGrid extends React.Component {
   }
 
   positionForCoordinates({ col, row, width = 1, height = 1 }) {
-    const { gridW, gridH, gutter } = this.props
+    const { gridW, gridH, gutter } = this.gridSettings
     const { zoomLevel } = this
     const pos = {
       x: (col * (gridW + gutter)) / zoomLevel,
@@ -372,18 +405,18 @@ class FoamcoreGrid extends React.Component {
     let { minX, minY, maxX, maxY } = selectedArea
 
     // If no area is selected, return null values
-    if (!minX) return selectedArea
+    if (minX === null) return selectedArea
 
     // Adjust coordinates by page margins
-    // Make sure all values start at 0
     minX -= pageMargins.left
-    if (minX < 0) minX = 0
     minY -= pageMargins.top
-    if (minY < 0) minY = 0
     maxX -= pageMargins.left
-    if (maxX < 0) maxX = 0
     maxY -= pageMargins.top
-    if (maxY < 0) maxY = 0
+
+    // If the user is selecting outside of the grid,
+    // set to 0 if the bottom of selected area is over the grid
+    if (minX < 0 && maxX > 0) minX = 0
+    if (minY < 0 && maxY > 0) minY = 0
 
     return {
       minX,
@@ -398,7 +431,7 @@ class FoamcoreGrid extends React.Component {
     const { minX, minY, maxX, maxY } = this.selectedAreaAdjustedForGrid
 
     // Check if there is a selected area
-    if (!minX) return
+    if (minX === null) return
 
     // Select all cards that this drag rectangle 'touches'
     const topLeftCoords = this.coordinatesForPosition({
@@ -827,6 +860,11 @@ class FoamcoreGrid extends React.Component {
       position.yPos = position.y - this.zoomLevel * 38
     }
 
+    const dragOffset = {
+      x: pageMargins.left,
+      y: pageMargins.top,
+    }
+
     return (
       <MovableGridCard
         key={key}
@@ -837,6 +875,7 @@ class FoamcoreGrid extends React.Component {
         isSharedCollection={collection.isSharedCollection}
         isBoardCollection
         position={position}
+        dragOffset={dragOffset}
         record={card.record || {}}
         onDrag={this.onDrag}
         onDragStart={this.onDragStart}
@@ -882,6 +921,7 @@ class FoamcoreGrid extends React.Component {
         key={`blank-${type}-${row}:${col}`}
         blocked={this.hasDragCollision && type === 'drag'}
         data-blank-type={type}
+        data-empty-space-click
         draggedOn
       >
         {inner}
@@ -944,7 +984,7 @@ class FoamcoreGrid extends React.Component {
     _.each(
       _.range(0, collection.max_row_index + this.visibleRows.num * 2),
       row => {
-        _.each(_.range(0, 15), col => {
+        _.each(_.range(0, MAX_COLS), col => {
           // If there's no row, or nothing in this column, add a blank card for this spot
           const blankCard = { row, col, width: 1, height: 1 }
           if (!matrix[row] || !matrix[row][col]) {
@@ -1032,8 +1072,7 @@ class FoamcoreGrid extends React.Component {
   }
 
   render() {
-    const { gridW } = this.props
-
+    const gridSize = this.totalGridSize
     return (
       <Grid
         data-empty-space-click
@@ -1041,27 +1080,23 @@ class FoamcoreGrid extends React.Component {
         innerRef={ref => {
           this.gridRef = ref
         }}
+        width={gridSize.width}
+        height={gridSize.height}
       >
         <FoamcoreZoomControls
           onZoomIn={this.handleZoomIn}
           onZoomOut={this.handleZoomOut}
         />
-        <div style={{ width: `${gridW * 16}px`, height: '1px' }} />
         {this.cardsToRender}
       </Grid>
     )
   }
 }
 
-const gridConfigProps = {
-  cols: PropTypes.number.isRequired,
-  gridH: PropTypes.number.isRequired,
-  gridW: PropTypes.number.isRequired,
-  gutter: PropTypes.number.isRequired,
-}
-
 FoamcoreGrid.propTypes = {
-  ...gridConfigProps,
+  // gridH: PropTypes.number.isRequired,
+  // gridW: PropTypes.number.isRequired,
+  // gutter: PropTypes.number.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   cardProperties: MobxPropTypes.arrayOrObservableArray.isRequired,
   trackCollectionUpdated: PropTypes.func.isRequired,

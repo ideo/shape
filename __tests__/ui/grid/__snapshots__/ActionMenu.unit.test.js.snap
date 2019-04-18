@@ -1,0 +1,65 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ActionMenu as editor renders snapshot 1`] = `
+<PopoutMenu
+  buttonStyle=""
+  className=""
+  direction="left"
+  disabled={false}
+  groupExtraComponent={Object {}}
+  groupedMenuItems={Object {}}
+  hideDotMenu={false}
+  menuItems={
+    Array [
+      Object {
+        "iconRight": <DuplicateIcon />,
+        "name": "Duplicate",
+        "onClick": [Function],
+      },
+      Object {
+        "iconRight": <MoveIcon />,
+        "name": "Move",
+        "onClick": [Function],
+      },
+      Object {
+        "iconRight": <LinkIcon
+          viewBox="0 0 18 18"
+        />,
+        "name": "Link",
+        "onClick": [Function],
+      },
+      Object {
+        "iconRight": <AddIntoIcon />,
+        "name": "Add to My Collection",
+        "onClick": [Function],
+      },
+      Object {
+        "iconRight": <TagIcon />,
+        "name": "Tags",
+        "onClick": [Function],
+      },
+      Object {
+        "iconRight": <PermissionsIcon />,
+        "name": "Permissions",
+        "onClick": [Function],
+      },
+      Object {
+        "iconRight": <ArchiveIcon />,
+        "name": "Archive",
+        "onClick": [Function],
+      },
+    ]
+  }
+  menuOpen={false}
+  onClick={[Function]}
+  onMouseLeave={[Function]}
+  position={
+    Object {
+      "x": 0,
+      "y": 0,
+    }
+  }
+  width={250}
+  wrapperClassName="card-menu"
+/>
+`;

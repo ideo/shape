@@ -56,6 +56,70 @@ RSpec.describe CollectionCard, type: :model do
         end
       end
     end
+
+    describe '#col' do
+      let(:card) { build(:collection_card_text, row: 5) }
+
+      it 'does not apply to regular collection' do
+        card.col = 500
+        expect(card.valid?).to be true
+      end
+
+      context 'parent is Collection::Board' do
+        before do
+          card.parent.update(type: 'Collection::Board')
+        end
+
+        it 'validates column is in 0..Collection::Board::COLS' do
+          expect(Collection::Board::COLS).to eq(16)
+
+          card.col = 0
+          expect(card.valid?).to be true
+
+          card.col = 15
+          expect(card.valid?).to be true
+
+          card.col = 16
+          expect(card.valid?).to be false
+          expect(card.errors[:col]).not_to be_empty
+
+          card.col = 500
+          expect(card.valid?).to be false
+          expect(card.errors[:col]).not_to be_empty
+        end
+      end
+    end
+
+    describe '#row' do
+      let(:card) { build(:collection_card_text, col: 5) }
+
+      it 'does not apply to regular collection' do
+        card.row = -20
+        expect(card.valid?).to be true
+      end
+
+      context 'parent is Collection::Board' do
+        before do
+          card.parent.update(type: 'Collection::Board')
+        end
+
+        it 'validates row >= 0' do
+          card.row = 0
+          expect(card.valid?).to be true
+
+          card.row = 1500
+          expect(card.valid?).to be true
+
+          card.row = -10
+          expect(card.valid?).to be false
+          expect(card.errors[:row]).not_to be_empty
+
+          card.row = 'this'
+          expect(card.valid?).to be false
+          expect(card.errors[:row]).not_to be_empty
+        end
+      end
+    end
   end
 
   describe 'callbacks' do

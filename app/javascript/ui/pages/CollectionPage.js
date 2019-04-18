@@ -398,8 +398,6 @@ class CollectionPage extends React.Component {
     // props shared by Foamcore + Normal
     const genericCollectionProps = {
       collection,
-      // pull in cols, gridW, gridH, gutter
-      ...gridSettings,
       loadCollectionCards: this.loadCollectionCards,
       trackCollectionUpdated: this.trackCollectionUpdated,
       canEditCollection: collection.can_edit_content,
@@ -432,6 +430,8 @@ class CollectionPage extends React.Component {
       inner = (
         <CollectionGrid
           {...genericCollectionProps}
+          // pull in cols, gridW, gridH, gutter
+          {...gridSettings}
           // don't add the extra row for submission box
           addEmptyCard={!isSubmissionBox}
         />
