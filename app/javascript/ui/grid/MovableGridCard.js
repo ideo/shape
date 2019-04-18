@@ -223,7 +223,7 @@ class MovableGridCard extends React.PureComponent {
   }
 
   handleDrag = (e, data, dX, dY) => {
-    const { position, dragOffset } = this.props
+    const { position, dragOffset, zoomLevel } = this.props
     // Global dragging should use screen coordinates
     // TODO this could also be a HOC that publishes to the UI store
     const { pageX, pageY } = e
@@ -241,15 +241,15 @@ class MovableGridCard extends React.PureComponent {
 
     this.scrollIfNearPageBounds(e)
 
-    console.log('dragOffset x', dragOffset.x, 'dragOffset y', dragOffset.y)
-
     const cardX = e.pageX - dragOffset.x
     const cardY = e.pageY - dragOffset.y
 
     // Set x and y to be in the middle of the card
+    // Zoom levels multiply coordinates,
+    // so we must also multiply card dimensions by the zoom level
     this.setState({
-      x: cardX - position.width / 2,
-      y: cardY - position.height / 2,
+      x: cardX - position.width / zoomLevel / 2,
+      y: cardY - position.height / zoomLevel / 2,
     })
 
     if (!this.state.dragging) {

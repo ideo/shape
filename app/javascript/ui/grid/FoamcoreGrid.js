@@ -853,8 +853,8 @@ class FoamcoreGrid extends React.Component {
     }
 
     const dragOffset = {
-      x: pageMargins.left / this.zoomLevel,
-      y: pageMargins.top / this.zoomLevel,
+      x: pageMargins.left,
+      y: pageMargins.top,
     }
 
     return (
