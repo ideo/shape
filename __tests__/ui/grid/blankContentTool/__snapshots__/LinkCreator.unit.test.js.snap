@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LinkCreator renders snapshot 1`] = `
+<GenericLinkCreator
+  loading={false}
+  onChange={[Function]}
+  onClose={[MockFunction]}
+  onPasswordChange={[Function]}
+  onSubmit={[Function]}
+  password=""
+  passwordField={false}
+  placeholder="Link URL"
+  url=""
+  urlValid={false}
+/>
+`;

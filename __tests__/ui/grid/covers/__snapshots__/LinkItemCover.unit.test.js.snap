@@ -1,0 +1,48 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LinkItemCover renders snapshot 1`] = `
+<StyledLinkCover>
+  <StyledImageCover
+    bgColor="#120f0e"
+    url="http://thumb.jpg"
+  >
+    <Flex
+      align="center"
+      className="inner"
+      justify="center"
+    >
+      <Reflex
+        style={
+          Object {
+            "width": "100%",
+          }
+        }
+      >
+        <CardHeading
+          className="name"
+        >
+          Independent.uk
+        </CardHeading>
+        <p
+          className="content"
+        >
+          The best news under the sun
+        </p>
+        <GridCardIconWithName
+          icon={
+            <img
+              alt="link icon"
+              onError={[Function]}
+              src="http://icon.jpg"
+            />
+          }
+          text="http://independente.co.uk"
+        />
+      </Reflex>
+    </Flex>
+    <div
+      className="overlay"
+    />
+  </StyledImageCover>
+</StyledLinkCover>
+`;

@@ -126,6 +126,7 @@ class FoamcoreGrid extends React.Component {
     const { uiStore } = this.props
     runInAction(() => {
       uiStore.selectedAreaEnabled = true
+      this.zoomLevel = this.defaultZoomLevel
     })
     // NOTE: yet another hack -- get the page to render on initial load
     this.throttledCalculateCardsToRender()
@@ -240,6 +241,13 @@ class FoamcoreGrid extends React.Component {
   updateMaxLoaded = ({ row, col }) => {
     if (row > this.loadedRows.max) this.loadedRows.max = row
     if (col > this.loadedCols.max) this.loadedCols.max = col
+  }
+
+  // Default zoom level is that which fits all columns in the browser viewport
+  get defaultZoomLevel() {
+    const { gridW, gutter } = this.gridSettings
+    const gridWidth = (gridW + gutter) * MAX_COLS + pageMargins.left * 2
+    return gridWidth / window.innerWidth
   }
 
   get gridSettings() {

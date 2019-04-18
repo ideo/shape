@@ -1,0 +1,60 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`VideoItemCover renders snapshot 1`] = `
+<StyledVideoCover
+  playing={false}
+>
+  <StyledImageCover
+    bgColor="#a89f9b"
+    className="not-playing"
+    url="https://img.youtube.com/vi/4r7wHMg5Yjg/hqdefault.jpg"
+  >
+    <Flex
+      align="center"
+      className="inner"
+      justify="center"
+    >
+      <Reflex>
+        <button
+          className="cancelGridClick"
+          onClick={[Function]}
+        >
+          ►
+        </button>
+      </Reflex>
+    </Flex>
+    <div
+      className="overlay"
+    />
+  </StyledImageCover>
+  <div
+    className="playing"
+  >
+    <styled.div>
+      <styled.div
+        className="show-on-hover"
+      >
+        <CardActionHolder
+          active={false}
+          className="show-on-hover"
+          disableHover={true}
+          onClick={[Function]}
+          size={32}
+          tooltipText=""
+        >
+          <DragIcon />
+        </CardActionHolder>
+      </styled.div>
+      <styled.div>
+        <VideoPlayer
+          controls={true}
+          height="100%"
+          playing={false}
+          url="https://www.youtube.com/watch?v=4r7wHMg5Yjg"
+          width="100%"
+        />
+      </styled.div>
+    </styled.div>
+  </div>
+</StyledVideoCover>
+`;
