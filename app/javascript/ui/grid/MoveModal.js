@@ -146,9 +146,9 @@ class MoveModal extends React.Component {
       uiStore.resetSelectionAndBCT()
       uiStore.closeMoveMenu()
       if (placement === 'beginning') {
-        uiStore.scroll.scrollToTop()
+        uiStore.scrollToTop()
       } else {
-        uiStore.scroll.scrollToBottom()
+        uiStore.scrollToBottom()
       }
     } catch (e) {
       runInAction(() => {

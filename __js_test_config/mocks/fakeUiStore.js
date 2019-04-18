@@ -35,10 +35,6 @@ const fakeUiStore = {
     w: 1,
   },
   activityLogMoving: false,
-  scroll: {
-    scrollToTop: jest.fn(),
-    scrollToBottom: jest.fn(),
-  },
   cardMenuOpen: {
     id: false,
     x: 0,
@@ -95,6 +91,8 @@ const fakeUiStore = {
   stopDragging: jest.fn(),
   multiMoveCardIds: [],
   setSnoozeChecked: jest.fn(),
+  scrollToTop: jest.fn(),
+  scrollToBottom: jest.fn(),
 }
 
 export default fakeUiStore

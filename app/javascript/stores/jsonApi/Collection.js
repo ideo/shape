@@ -474,6 +474,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       per_page,
     }
     if (!params.per_page) {
+      // NOTE: If this is a Board, per_page will be ignored in favor of default 16x16 rows/cols
       params.per_page = this.recordsPerPage
     }
     if (this.currentOrder !== 'order') {
@@ -502,8 +503,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         this.collection_cards.replace(data)
       } else {
         // For foam core collections we sometimes retrieve
-        // the same card twice so we must de-dupe
-        this.collection_cards = _.unionBy(this.collection_cards, data, 'id')
+        // the same card twice so we must de-dupe (using new `data` as the tiebreaker)
+        this.collection_cards = _.unionBy(data, this.collection_cards, 'id')
       }
     })
   }
