@@ -130,7 +130,6 @@ ActiveRecord::Schema.define(version: 20190227194651) do
     t.jsonb "cached_test_scores"
     t.bigint "roles_anchor_collection_id"
     t.boolean "hide_submissions", default: false
-    t.boolean "shared_with_organization", default: false
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
