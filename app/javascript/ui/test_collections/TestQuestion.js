@@ -104,7 +104,6 @@ class TestQuestion extends React.Component {
           inner = (
             <GridCardBlank
               parent={parent}
-              height={1}
               order={card.order}
               replacingId={card.id}
               testCollectionCard

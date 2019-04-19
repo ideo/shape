@@ -1,5 +1,6 @@
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
 import { apiStore, uiStore } from '~/stores'
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 import { fakeTextItem } from '#/mocks/data'
 
@@ -12,6 +13,7 @@ const props = {
   height: 200,
   cardId: '1',
   handleClick: jest.fn(),
+  initialFontTag: 'P',
 }
 const e = {
   stopPropagation: jest.fn(),
@@ -23,6 +25,10 @@ describe('TextItemCover', () => {
     props.editable = false
     wrapper = shallow(<TextItemCover {...props} />)
     component = wrapper.instance()
+  })
+
+  it('renders snapshot', () => {
+    expectTreeToMatchSnapshot(wrapper)
   })
 
   it('renders Quill with item.data_content', () => {

@@ -9,6 +9,7 @@ Feature: Creating an Organization
 
     When I click the "FormButton_submitGroup"
     And I wait for "@apiCreateOrganization" to finish
+    And I wait for "@apiGetCollection" to finish
     Then I should see "Please wait while we build your account" in a "DialogPrompt"
     # note it might be "our-test-org-1" etc, this will match as RegExp
     Then I should see "our-test-org" in the URL

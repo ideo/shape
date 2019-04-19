@@ -5,6 +5,12 @@ const fakeUiStore = {
     gridW: 312,
     gridH: 250,
   },
+  defaultGridSettings: {
+    cols: 4,
+    gutter: 20,
+    gridW: 312,
+    gridH: 250,
+  },
   blankContentToolState: {
     order: null,
     width: null,
@@ -29,10 +35,6 @@ const fakeUiStore = {
     w: 1,
   },
   activityLogMoving: false,
-  scroll: {
-    scrollToTop: jest.fn(),
-    scrollToBottom: jest.fn(),
-  },
   cardMenuOpen: {
     id: false,
     x: 0,
@@ -46,11 +48,14 @@ const fakeUiStore = {
   rolesMenuOpen: false,
   isLoading: false,
   dismissedMoveHelper: false,
+  selectedAreaEnabled: false,
+  setSelectedArea: jest.fn(),
   selectedCardIds: [],
   selectCardId: jest.fn(),
   setViewingCollection: jest.fn(),
   setViewingItem: jest.fn(),
   viewingCollection: null,
+  viewingItem: null,
   movingFromCollectionId: null,
   movingCardIds: [],
   openMoveMenu: jest.fn(),
@@ -83,7 +88,11 @@ const fakeUiStore = {
   autocompleteMenuClosed: jest.fn(),
   captureKeyboardGridClick: jest.fn(),
   popupAlert: jest.fn(),
+  stopDragging: jest.fn(),
+  multiMoveCardIds: [],
   setSnoozeChecked: jest.fn(),
+  scrollToTop: jest.fn(),
+  scrollToBottom: jest.fn(),
 }
 
 export default fakeUiStore

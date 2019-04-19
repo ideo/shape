@@ -1,0 +1,70 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FoamcoreGrid renders snapshot 1`] = `
+<styled.div
+  data-empty-space-click={true}
+  height={NaN}
+  innerRef={[Function]}
+  onScroll={[Function]}
+  width={988.2790697674419}
+>
+  <FoamcoreZoomControls
+    onZoomIn={[Function]}
+    onZoomOut={[Function]}
+  />
+  <styled.div
+    blocked={false}
+    data-blank-type="unrendered"
+    data-empty-space-click={true}
+    draggedOn={true}
+    h={250}
+    height={250}
+    key="blank-unrendered-1:5"
+    onClick={[Function]}
+    type="unrendered"
+    w={312}
+    width={312}
+    x={308.83720930232556}
+    xPos={308.83720930232556}
+    y={50.23255813953488}
+    yPos={50.23255813953488}
+    zoomLevel={5.375}
+  />
+  <styled.div
+    blocked={false}
+    data-blank-type="unrendered"
+    data-empty-space-click={true}
+    draggedOn={true}
+    h={520}
+    height={520}
+    key="blank-unrendered-0:1"
+    onClick={[Function]}
+    type="unrendered"
+    w={644}
+    width={644}
+    x={61.76744186046512}
+    xPos={61.76744186046512}
+    y={0}
+    yPos={0}
+    zoomLevel={5.375}
+  />
+  <styled.div
+    blocked={false}
+    data-blank-type="unrendered"
+    data-empty-space-click={true}
+    draggedOn={true}
+    h={250}
+    height={250}
+    key="blank-unrendered-2:0"
+    onClick={[Function]}
+    type="unrendered"
+    w={644}
+    width={644}
+    x={0}
+    xPos={0}
+    y={100.46511627906976}
+    yPos={100.46511627906976}
+    zoomLevel={5.375}
+  />
+</styled.div>
+`;

@@ -27,8 +27,8 @@ class BillingPage extends React.Component {
 
   render() {
     return (
-      <Box mb={v.headerHeightCompact}>
-        <PageContainer marginTop={v.headerHeightCompact}>
+      <Box mb={v.headerHeight}>
+        <PageContainer>
           <Heading1>
             <Grid container justify="space-between">
               <Grid item>Billing</Grid>

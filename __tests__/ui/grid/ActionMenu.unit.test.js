@@ -2,6 +2,7 @@ import _ from 'lodash'
 import ActionMenu from '~/ui/grid/ActionMenu'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import { fakeCollection, fakeCollectionCard } from '#/mocks/data'
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 const card = fakeCollectionCard
 card.can_move = true
@@ -34,6 +35,10 @@ describe('ActionMenu', () => {
       component = wrapper.instance()
       props.uiStore.selectCardId.mockClear()
       props.uiStore.openMoveMenu.mockClear()
+    })
+
+    it('renders snapshot', () => {
+      expectTreeToMatchSnapshot(wrapper)
     })
 
     it('creates a PopoutMenu with all editable actions', () => {

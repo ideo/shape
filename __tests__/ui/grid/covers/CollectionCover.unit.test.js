@@ -1,6 +1,7 @@
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import { fakeCollection } from '#/mocks/data'
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 const props = {
   collection: fakeCollection,
@@ -18,6 +19,10 @@ describe('CollectionCover', () => {
       is_inside_a_submission: false,
     }
     wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
+  })
+
+  it('renders snapshot', () => {
+    expectTreeToMatchSnapshot(wrapper)
   })
 
   it('renders the cover image_url', () => {

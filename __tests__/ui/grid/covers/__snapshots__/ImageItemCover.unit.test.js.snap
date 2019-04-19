@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ImageItemCover renders snapshot 1`] = `
+<StyledImageCover
+  contain={false}
+  url="http://fake.url/img"
+/>
+`;

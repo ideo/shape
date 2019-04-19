@@ -16,6 +16,7 @@ import v from '~/utils/variables'
 
 Quill.register('modules/cursors', QuillCursors)
 
+const FULL_PAGE_TOP_PADDING = '2rem'
 const DockedToolbar = styled.div`
   background: white;
   box-sizing: border-box;
@@ -23,26 +24,26 @@ const DockedToolbar = styled.div`
   left: 0;
   margin-bottom: 20px;
   padding: 5px 10px 0;
-  ${props => props.fullPageView && `padding-left: 36px`};
   position: fixed;
-  ${props => `top: ${props.fullPageView ? v.headerHeight : 0}px`};
   width: 100%;
   z-index: 100;
   ${props =>
-    // Hack because headerHeight doesn't close the gap to-the-pixel
     props.fullPageView &&
     `
-    margin-top: -4px;
-    @media only screen and (max-width: ${v.responsive.muiSmBreakpoint}px) {
-      margin-top: -7px;
-    }
-  `};
+      margin-top: -${FULL_PAGE_TOP_PADDING};
+      padding-left: 36px;
+    `};
+  ${props =>
+    !props.fullPageView &&
+    `
+      top: 0;
+    `};
 `
 
 const StyledContainer = styled.div`
   padding-top: 25px;
 
-  ${props => props.fullPageView && `padding: 2rem 0.5rem;`};
+  ${props => props.fullPageView && `padding: ${FULL_PAGE_TOP_PADDING} 0.5rem;`};
   ${props =>
     props.loading &&
     `
@@ -101,6 +102,8 @@ class RealtimeTextItem extends React.Component {
     }, 1250)
 
     if (!this.reactQuillRef) return
+    const { editor } = this.reactQuillRef
+    this.overrideHeadersFromClipboard(editor)
     this.initQuillRefsAndData({ initSnapshot: true })
     setTimeout(() => {
       this.quillEditor.focus()
@@ -255,7 +258,17 @@ class RealtimeTextItem extends React.Component {
 
   get dataContent() {
     const { item } = this.props
-    return toJS(item.data_content)
+    const dataContent = toJS(item.data_content)
+    // Set initial font size - if text item is blank,
+    // and user has chosen a h* tag (e.g. h1)
+    // (p tag does not require any ops changes)
+    if (dataContent.ops.length === 0 && this.headerSize) {
+      dataContent.ops.push({
+        insert: '\n',
+        attributes: { header: this.headerSize },
+      })
+    }
+    return dataContent
   }
 
   cancel = ev => {
@@ -277,8 +290,75 @@ class RealtimeTextItem extends React.Component {
     return item
   }
 
+  get headerSize() {
+    const { initialFontTag } = this.props
+    if (initialFontTag.includes('H')) {
+      return _.replace(initialFontTag, 'H', '')
+    }
+    return null
+  }
+
+  newlineIndicesForDelta = delta => {
+    const newlineOpIndices = []
+    _.each(delta.ops, (op, index) => {
+      if (op.insert && op.insert.includes('\n')) newlineOpIndices.push(index)
+    })
+    return newlineOpIndices
+  }
+
+  headerFromLastNewline = delta => {
+    // Check if user added newline
+    // And if so, set their default text size if provided
+    const newlineOpIndices = this.newlineIndicesForDelta(delta)
+
+    // Return if there wasn't a specified header size in previous newline operation
+    const prevHeaderSizeOp = delta.ops[_.last(newlineOpIndices)]
+    if (!prevHeaderSizeOp.attributes || !prevHeaderSizeOp.attributes.header) {
+      return null
+    }
+    return prevHeaderSizeOp.attributes.header
+  }
+
+  adjustHeaderSizeIfNewline = delta => {
+    // Check if user added newline
+    // And if so, set their default text size if provided
+    if (this.newlineIndicesForDelta(delta).length === 0) return
+
+    const prevHeader = this.headerFromLastNewline(delta)
+    if (!prevHeader) return
+
+    // Apply previous line's header size to last operation
+    const lastOp = _.last(delta.ops)
+    if (!lastOp.attributes) {
+      lastOp.attributes = { header: prevHeader }
+    } else {
+      lastOp.attributes.header = prevHeader
+    }
+    this.quillEditor.updateContents(delta)
+  }
+
+  remapHeaderToH1 = (node, delta) => {
+    delta.map(op => {
+      if (!op.attributes) op.attributes = { header: 1 }
+      op.attributes.header = 1
+      return op
+    })
+    return delta
+  }
+
+  overrideHeadersFromClipboard = editor => {
+    // change all header attributes to H1, e.g. when copy/pasting
+    const headers = ['H1', 'H2', 'H3', 'H4', 'H5', 'H6']
+    headers.forEach(header => {
+      editor.clipboard.addMatcher(header, this.remapHeaderToH1)
+    })
+  }
+
   handleTextChange = (content, delta, source, editor) => {
     if (source === 'user') {
+      // This adjustment is made so that the currently-selected
+      // header size is preserved on new lines
+      this.adjustHeaderSizeIfNewline(delta)
       const cursors = this.quillEditor.getModule('cursors')
       cursors.clearCursors()
 
@@ -417,10 +497,12 @@ RealtimeTextItem.propTypes = {
   fullyLoaded: PropTypes.bool.isRequired,
   onExpand: PropTypes.func,
   fullPageView: PropTypes.bool,
+  initialFontTag: PropTypes.oneOf(['H1', 'H3', 'P']),
 }
 RealtimeTextItem.defaultProps = {
   onExpand: null,
   fullPageView: false,
+  initialFontTag: 'P',
 }
 
 export default RealtimeTextItem
