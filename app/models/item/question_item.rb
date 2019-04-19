@@ -63,7 +63,7 @@ class Item
     end
 
     def scale_question?
-      self.class.scale_question_types.include? question_type.to_sym
+      self.class.scale_question_types.include? question_type&.to_sym
     end
 
     def requires_roles?

@@ -3,6 +3,7 @@ class Collection
     belongs_to :test_collection, class_name: 'Collection::TestCollection'
     delegate :can_reopen?,
              :launchable?,
+             :live_or_was_launched?,
              :test_status,
              :collection_to_test,
              to: :test_collection

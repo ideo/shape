@@ -57,8 +57,8 @@ class CollectionCardBuilder
           end
 
           # If this is a live test collection...
-          if @parent_collection.is_a?(Collection::TestCollection) &&
-             @parent_collection.live? &&
+          if @parent_collection.test_collection? &&
+             @parent_collection.live_or_was_launched? &&
              record.is_a?(Item::QuestionItem)
 
             # If this is a new scale question, create response graphs

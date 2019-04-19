@@ -154,8 +154,9 @@ RSpec.describe CollectionCardBuilder, type: :service do
         expect(builder.create).to be true
       end
 
-      context 'with test collection' do
+      context 'with test design collection' do
         let(:test_collection) { create(:test_collection, :completed) }
+        let(:parent_collection) { test_collection }
         before do
           user.add_role(Role::EDITOR, test_collection)
           test_collection.children.each do |record|
@@ -172,7 +173,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
                   question_type: :question_clarity,
                 }
               ),
-              parent_collection: test_collection,
+              parent_collection: parent_collection,
               user: user,
             )
           end
@@ -190,6 +191,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
             before do
               test_collection.launch!(initiated_by: user)
             end
+            let!(:parent_collection) { test_collection.test_design }
 
             it 'creates chart item' do
               expect(test_collection.live?).to be true
@@ -228,6 +230,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
             before do
               test_collection.launch!(initiated_by: user)
             end
+            let!(:parent_collection) { test_collection.test_design }
 
             it 'creates open response collection' do
               expect(test_collection.live?).to be true

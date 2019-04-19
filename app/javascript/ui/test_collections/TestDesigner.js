@@ -251,7 +251,6 @@ class TestDesigner extends React.Component {
     if (replacingCard) {
       // Set new card in same place as that you are replacing
       card.order = replacingCard.order
-      console.log('API_archiveSelf on', replacingCard.id)
       await replacingCard.API_archiveSelf({})
     }
     return card.API_create()

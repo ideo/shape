@@ -79,6 +79,7 @@ class Collection
       update_cached_submission_status(parent_submission) if inside_a_submission?
       # TODO: Perhaps need to do *some* of this setup when reopening?
       create_test_design_and_move_cards!(initiated_by: initiated_by) unless reopening
+      update(test_launched_at: Time.current)
     end
 
     def after_close_test
@@ -196,6 +197,10 @@ class Collection
 
     def completed_and_launchable?
       test_completed? && launchable?
+    end
+
+    def live_or_was_launched?
+      live? || test_launched_at.present?
     end
 
     def can_reopen?
