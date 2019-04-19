@@ -13,7 +13,9 @@ exports[`TextItemCover renders snapshot 1`] = `
     }
   }
 >
-  <styled.div>
+  <styled.div
+    notEditing={true}
+  >
     <Quill
       modules={Object {}}
       readOnly={true}
