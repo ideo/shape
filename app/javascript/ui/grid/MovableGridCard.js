@@ -281,6 +281,7 @@ class MovableGridCard extends React.PureComponent {
   }
 
   handleStop = type => ev => {
+    console.log('in handleStop, event: ', { event })
     const { horizontalScroll } = this.props
     this.scrolling = false
     document.body.style['overflow-y'] = 'auto'

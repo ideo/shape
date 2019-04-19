@@ -25,6 +25,7 @@ const BlankCard = styled.div.attrs({
 })`
   background-color: ${props => {
     if (props.blocked) {
+      console.log('blocked, props are:', props)
       return v.colors.alert
     }
     if (props.type === 'unrendered') {
@@ -129,6 +130,10 @@ class FoamcoreGrid extends React.Component {
       this.calculateCardsToRender,
       25
     )
+
+    this.state = {
+      hoveringOver: null,
+    }
   }
 
   componentDidMount() {
@@ -606,20 +611,41 @@ class FoamcoreGrid extends React.Component {
 
   moveCards = masterCard => {
     if (this.dragGridSpot.size < 1) return
-    const { collection } = this.props
+    const { uiStore, collection } = this.props
     const undoMessage = 'Card move undone'
 
     const movePlaceholder = [...this.dragGridSpot.values()][0]
     const masterRow = movePlaceholder.row
     const masterCol = movePlaceholder.col
 
+    console.log('masterRow: ', masterRow)
+    console.log('masterCard', masterCard)
+    console.log('movePlaceholder', { movePlaceholder })
+    console.log('movePlaceholder.card', movePlaceholder.card)
+    console.log('this.hasDragCollision', this.hasDragCollision)
+    console.log('uiStore.activeDragTarget is: ', uiStore.activeDragTarget)
+    if (uiStore.activeDragTarget) {
+      const { apiStore } = this.props
+      const targetRecord = uiStore.activeDragTarget.item
+      console.log('targetRecord is: ', targetRecord)
+      if (uiStore.activeDragTarget.item.id === 'homepage') {
+        targetRecord.id = apiStore.currentUserCollectionId
+      }
+      uiStore.setMovingCards(uiStore.multiMoveCardIds, {
+        cardAction: 'moveWithinCollection',
+      })
+      this.moveCardsIntoCollection(uiStore.multiMoveCardIds, targetRecord)
+    }
+
     if (
       movePlaceholder.card ||
-      this.hasDragCollision ||
+      // Drag collision is required to drop cards into a collection
+      // this.hasDragCollision ||
       // movePlaceholder won't have row/col keys if it's not being rendered)
       typeof masterRow === 'undefined'
     ) {
       // this means you tried to drop it over an existing card (or there was no placeholder i.e. you dragged offscreen)
+      console.log('resetting card positions')
       this.resetCardPositions()
       return
     }
@@ -648,6 +674,7 @@ class FoamcoreGrid extends React.Component {
     })
 
     if (negativeZone) {
+      console.log('in negativeZone: ', negativeZone, 'returning now')
       this.resetCardPositions()
       return
     }
@@ -661,6 +688,60 @@ class FoamcoreGrid extends React.Component {
       undoMessage,
       onConfirm: onConfirmOrCancel,
       onCancel: onConfirmOrCancel,
+    })
+  }
+
+  async moveCardsIntoCollection(cardIds, hoveringRecord) {
+    const { collection, uiStore, apiStore } = this.props
+    const can_edit = hoveringRecord.can_edit_content || hoveringRecord.can_edit
+    uiStore.update('movingIntoCollection', hoveringRecord)
+    console.log('hoveringRecord', hoveringRecord)
+    if (!can_edit) {
+      uiStore.confirm({
+        prompt:
+          'You only have view access to this collection. Would you like to keep moving the cards?',
+        confirmText: 'Continue',
+        iconName: 'Alert',
+        onConfirm: () => {
+          this.cancelDrag()
+          uiStore.reselectCardIds(cardIds)
+          uiStore.openMoveMenu({
+            from: collection.id,
+            cardAction: 'move',
+          })
+        },
+        onCancel: () => {
+          this.cancelDrag()
+        },
+      })
+      return
+    }
+    this.setState({ hoveringOver: null }, async () => {
+      const data = {
+        to_id: hoveringRecord.id.toString(),
+        from_id: collection.id.toString(),
+        collection_card_ids: cardIds,
+        placement: 'beginning',
+      }
+      await apiStore.moveCards(data)
+      const afterMove = () => {
+        const { movingIntoCollection } = uiStore
+        uiStore.setMovingCards([])
+        uiStore.update('multiMoveCardIds', [])
+        uiStore.reselectCardIds(cardIds)
+        uiStore.update('movingIntoCollection', null)
+        // add a little delay because the board has to load first
+        if (movingIntoCollection.isBoard) {
+          setTimeout(() => uiStore.scrollToBottom(), 500)
+        }
+      }
+      if (data.to_id === data.from_id) {
+        afterMove()
+      } else {
+        uiStore.update('movingIntoCollection', hoveringRecord)
+        uiStore.update('actionAfterRoute', afterMove)
+        this.props.routingStore.routeTo('collections', hoveringRecord.id)
+      }
     })
   }
 
@@ -708,6 +789,8 @@ class FoamcoreGrid extends React.Component {
       })
     }
 
+    // const hoveringOver = this.findOverlap(cardId, dragPosition)
+    // this.setState({ hoveringOver })
     this.throttledCalculateCardsToRender()
   }
 
@@ -942,6 +1025,8 @@ class FoamcoreGrid extends React.Component {
         type={type}
         zoomLevel={relativeZoomLevel}
         key={`blank-${type}-${row}:${col}`}
+        /* Why is this rendering on top of a collection? */
+
         blocked={this.hasDragCollision && type === 'drag'}
         data-blank-type={type}
         data-empty-space-click
