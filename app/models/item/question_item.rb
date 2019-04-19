@@ -2,6 +2,7 @@ class Item
   class QuestionItem < Item
     has_many :question_answers, inverse_of: :question, foreign_key: :question_id, dependent: :destroy
     has_one :test_open_responses_collection, class_name: 'Collection::TestOpenResponses'
+    has_one :test_chart_item, class_name: 'Item::ChartItem', as: :data_source
 
     after_commit :notify_test_design_of_creation,
                  on: :create,
@@ -92,7 +93,8 @@ class Item
     end
 
     def create_response_graph(parent_collection:, initiated_by:)
-      return unless scale_question?
+      return if !scale_question? || test_chart_item.present?
+
       builder = CollectionCardBuilder.new(
         params: {
           order: parent_collection_card.order,
@@ -111,7 +113,8 @@ class Item
     end
 
     def create_open_response_collection(parent_collection:, initiated_by:)
-      return unless question_open?
+      return if !question_open? || test_open_responses_collection.present?
+
       builder = CollectionCardBuilder.new(
         params: {
           order: parent_collection_card.order,
@@ -139,12 +142,12 @@ class Item
     end
 
     def update_test_open_responses_collection?
-      saved_change_to_name? && test_open_responses_collection.present?
+      saved_change_to_content? && test_open_responses_collection.present?
     end
 
     def update_test_open_responses_collection
       test_open_responses_collection.update(
-        name: name,
+        name: "#{content} Responses",
       )
     end
   end

@@ -60,6 +60,11 @@ class Collection
       ]
     end
 
+    # Used so that we can interchangably call this on TestCollection and TestDesign
+    def test_collection
+      self
+    end
+
     def launch_test!(initiated_by: nil, reopening: false)
       # remove the "blanks"
       remove_incomplete_question_items

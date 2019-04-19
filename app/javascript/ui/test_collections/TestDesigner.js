@@ -3,6 +3,7 @@ import { Flex } from 'reflexbox'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled, { ThemeProvider } from 'styled-components'
 import FlipMove from 'react-flip-move'
+import pluralize from 'pluralize'
 
 import { DisplayText, NumberListText } from '~/ui/global/styled/typography'
 import { Select, SelectOption } from '~/ui/global/styled/forms'
@@ -100,9 +101,9 @@ class TestDesigner extends React.Component {
     }
   }
 
-  get isLiveTest() {
+  get numResponses() {
     const { collection } = this.props
-    return collection.isLiveTest
+    return collection.num_survey_responses
   }
 
   // This shows a dialog immediately
@@ -133,10 +134,15 @@ class TestDesigner extends React.Component {
         })
       })
     }
-    if (this.isLiveTest) {
+    // If test is already launched, and this isn't a blank card,
+    // confirm they want to change the type
+    if (this.numResponses > 0 && replacingCard.question_type) {
       this.confirmWithDialog({
-        prompt:
-          'This test has been launched. Are you sure you want to change the question type?',
+        prompt: `This test has ${pluralize(
+          'response',
+          this.numResponses,
+          true
+        )}. Are you sure you want to change the question type?`,
         onConfirm: replaceCard,
       })
     } else {
@@ -155,10 +161,13 @@ class TestDesigner extends React.Component {
         this.createNewQuestionCard({ order })
       })
     }
-    if (this.isLiveTest) {
+    if (this.numResponses > 0) {
       this.confirmWithDialog({
-        prompt:
-          'This test has been launched. Are you sure you want to add a new question?',
+        prompt: `This test has ${pluralize(
+          'response',
+          this.numResponses,
+          true
+        )}. Are you sure you want to add a new question?`,
         onConfirm: addNewCard,
       })
     } else {

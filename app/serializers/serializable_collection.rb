@@ -148,4 +148,9 @@ class SerializableCollection < BaseJsonSerializer
   attribute :awaiting_updates do
     @object.getting_started_shell || @object.awaiting_first_user_content
   end
+
+
+  attribute :num_survey_responses do
+    @object.test_collection? ? @object.survey_responses.size : 0
+  end
 end

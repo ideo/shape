@@ -333,6 +333,7 @@ export const fakeCollection = {
   isSharedCollection: false,
   isUserCollection: false,
   isNormalCollection: true,
+  num_survey_responses: 0,
   cover: {
     image_url: 'http://fake.url.net',
     text: 'Lorem ipsum blockchain boogie',

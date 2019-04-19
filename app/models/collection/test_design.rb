@@ -16,6 +16,8 @@ class Collection
              class_name: 'Item::QuestionItem',
              through: :primary_collection_cards
 
+    has_many :survey_responses, through: :test_collection
+
     def duplicate!(**args)
       duplicate = super(args)
       return duplicate unless duplicate.persisted?

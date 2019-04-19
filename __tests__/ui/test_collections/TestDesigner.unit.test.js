@@ -61,48 +61,56 @@ describe('TestDesigner', () => {
     })
   })
 
-  describe('with live test_collection', () => {
+  describe('with responses', () => {
     beforeEach(() => {
       props.collection.can_edit_content = true
-      props.collection.test_status = 'live'
-      props.collection.isLiveTest = true
+      props.collection.num_survey_responses = 5
       wrapper = shallow(<TestDesigner {...props} />)
     })
 
-    it('prompts user when adding a new question', () => {
-      wrapper
-        .find('QuestionHotEdge')
-        .first()
-        .props()
-        .onAdd()
-      expect(props.collection.apiStore.uiStore.confirm).toHaveBeenCalledWith({
-        confirmText: 'Continue',
-        iconName: 'Alert',
-        onConfirm: expect.any(Function),
-        prompt:
-          'This test has been launched. Are you sure you want to add a new question?',
-      })
-    })
-
     describe('handleSelectChange', () => {
+      let card, fakeEv
       beforeEach(() => {
-        instance = wrapper.instance()
-        const fakeEv = {
+        fakeEv = {
           preventDefault: jest.fn(),
           target: { value: 'question_excitement' },
         }
-        instance.handleSelectChange(props.collection.collection_cards[0])(
-          fakeEv
-        )
+        card = props.collection.collection_cards[0]
+        instance = wrapper.instance()
+      })
+
+      it('does not prompt if adding a new question without a type', () => {
+        card.question_type = null
+        instance.handleSelectChange(card)(fakeEv)
+        expect(props.collection.apiStore.uiStore.confirm).not.toHaveBeenCalled()
       })
 
       it('prompts user when changing a question type', () => {
+        card.question_type = 'question_clarity'
+        instance.handleSelectChange(card)(fakeEv)
         expect(props.collection.apiStore.uiStore.confirm).toHaveBeenCalledWith({
           confirmText: 'Continue',
           iconName: 'Alert',
           onConfirm: expect.any(Function),
           prompt:
-            'This test has been launched. Are you sure you want to change the question type?',
+            'This test has 5 responses. Are you sure you want to change the question type?',
+        })
+      })
+    })
+
+    describe('onAdd', () => {
+      it('prompts user when adding a new question', () => {
+        wrapper
+          .find('QuestionHotEdge')
+          .first()
+          .props()
+          .onAdd()
+        expect(props.collection.apiStore.uiStore.confirm).toHaveBeenCalledWith({
+          confirmText: 'Continue',
+          iconName: 'Alert',
+          onConfirm: expect.any(Function),
+          prompt:
+            'This test has 5 responses. Are you sure you want to add a new question?',
         })
       })
     })
