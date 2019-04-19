@@ -35,17 +35,17 @@ module IdeoSsoHelper
   end
 
   def ideo_sso_token_auth_url(token)
-    ideo_sso_oauth_url + "&auth_token=#{token}"
+    ideo_sso_oauth_url(
+      auth_token: token,
+    )
   end
 
-  def ideo_sso_oauth_url
-    cookies['IdeoSSO-State'] ||= SecureRandom.uuid
-    ENV['IDEO_SSO_HOST'] +
-      '/oauth/authorize' \
-      "?client_id=#{ideo_sso_client_id}" \
-      "&redirect_uri=#{CGI.escape(ideo_sso_redirect_url.to_s)}" \
-      '&response_type=code' \
-      "&state=#{cookies['IdeoSSO-State']}"
+  def ideo_sso_oauth_url(addtl_params = {})
+    NetworkApi::Authentication.uri_with_oauth_params(
+      redirect_url: ideo_sso_redirect_url.to_s,
+      cookies: cookies,
+      addtl_params: addtl_params,
+    )
   end
 
   def stripe_js_sdk_url
