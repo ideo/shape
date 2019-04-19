@@ -45,6 +45,9 @@ Cypress.Commands.add(
     let type = 'collection'
     // these types correspond to the BctButtonBox types in GridCardBlank
     switch (collectionType) {
+      case 'foamcoreBoard':
+        type = 'foamcoreBoard'
+        break
       case 'test':
         type = 'testCollection'
         break
@@ -91,7 +94,7 @@ Cypress.Commands.add('resizeCard', (pos, size) => {
     const collection = win.uiStore.viewingCollection
     const f = pos === 'last' ? _.last : _.first
     const card = f(collection.sortedCards)
-    collection.API_updateCards({
+    collection.API_updateCard({
       card,
       updates: { width, height },
       undoMessage: 'Card resize undone',
@@ -106,7 +109,7 @@ Cypress.Commands.add('reorderFirstTwoCards', () => {
     const collection = win.uiStore.viewingCollection
     collection._reorderCards()
     const card = _.first(collection.sortedCards)
-    collection.API_updateCards({
+    collection.API_updateCard({
       card,
       updates: { order: 1.5 },
       undoMessage: 'Card move undone',

@@ -13,7 +13,7 @@ Feature: Creating a Test Collection
     Then I should see "End of Survey" in a ".DisplayText"
 
     # Scenario: Setting up the questions and launching the test
-    When I add a video
+    When I add a link URL
     And I add a test description
     And I add an open response question
     When I click the "HeaderFormButton" containing "Get Feedback"

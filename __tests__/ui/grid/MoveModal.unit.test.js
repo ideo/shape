@@ -1,5 +1,6 @@
 import MoveModal from '~/ui/grid/MoveModal'
 import { fakeCollection, fakeUser } from '#/mocks/data'
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
@@ -20,9 +21,13 @@ describe('MoveModal', () => {
     }
     props.apiStore.request = jest.fn()
     props.uiStore.alert.mockClear()
-    props.uiStore.scroll.scrollToTop.mockClear()
+    props.uiStore.scrollToTop.mockClear()
     wrapper = shallow(<MoveModal.wrappedComponent {...props} />)
     component = wrapper.instance()
+  })
+
+  it('renders snapshot', () => {
+    expectTreeToMatchSnapshot(wrapper)
   })
 
   describe('handleClose', () => {
@@ -177,7 +182,7 @@ describe('MoveModal', () => {
       it('should deselect the cards and scroll to top', async () => {
         await component.moveCards('beginning')
         expect(props.uiStore.resetSelectionAndBCT).toHaveBeenCalled()
-        expect(props.uiStore.scroll.scrollToTop).toHaveBeenCalled()
+        expect(props.uiStore.scrollToTop).toHaveBeenCalled()
       })
     })
 

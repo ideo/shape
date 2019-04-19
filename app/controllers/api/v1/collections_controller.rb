@@ -190,7 +190,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :submission_box_type,
       :collection_to_test_id,
       :hide_submissions,
-      collection_cards_attributes: %i[id order width height],
+      collection_cards_attributes: %i[id order width height row col],
     )
   end
 

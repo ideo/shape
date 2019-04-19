@@ -11,17 +11,25 @@ export default class UiStore {
     order: null,
     width: null,
     height: null,
+    row: null,
+    col: null,
     replacingId: null,
     emptyCollection: false,
     collectionId: null,
     blankType: null,
+  }
+  defaultCardMenuState = {
+    id: null,
+    x: 0,
+    y: 0,
+    direction: 'left',
   }
   @observable
   pageError = null
   @observable
   blankContentToolState = { ...this.defaultBCTState }
   @observable
-  cardMenuOpen = { id: false, x: 0, y: 0, direction: 'left' }
+  cardMenuOpen = { ...this.defaultCardMenuState }
   @computed
   get cardMenuOpenAndPositioned() {
     const { cardMenuOpen } = this
@@ -164,6 +172,12 @@ export default class UiStore {
   multiMoveCardIds = []
   @observable
   modalContentRef = null
+  @observable
+  dragCardMaster = null
+  @observable
+  selectedArea = { minX: null, maxX: null, minY: null, maxY: null }
+  @observable
+  selectedAreaEnabled = false
 
   @action
   toggleEditingCardId(cardId) {
@@ -185,12 +199,14 @@ export default class UiStore {
     } else {
       this.multiMoveCardIds = [cardId]
     }
+    this.dragCardMaster = cardId
   }
 
   @action
   stopDragging() {
     this.dragging = false
     this.activeDragTarget = null
+    this.dragCardMaster = null
   }
 
   @action
@@ -226,6 +242,11 @@ export default class UiStore {
         y < target.coordinates.top
       return !overlap
     })
+  }
+
+  @action
+  setSelectedArea(selectedArea) {
+    this.selectedArea = selectedArea
   }
 
   @action
@@ -291,7 +312,7 @@ export default class UiStore {
   }
 
   closeCardMenu() {
-    this.update('cardMenuOpen', { id: false, x: 0, y: 0, direction: 'left' })
+    this.update('cardMenuOpen', { ...this.defaultCardMenuState })
   }
 
   async popupSnackbar(props = {}) {
@@ -509,6 +530,13 @@ export default class UiStore {
 
   @action
   setViewingCollection(collection = null) {
+    // escape if we're already viewing this collection
+    if (
+      this.viewingCollection &&
+      collection &&
+      this.viewingCollection.id === collection.id
+    )
+      return
     this.previousViewingCollection = this.viewingCollection
     this.viewingCollection = collection
     this.viewingItem = null
@@ -517,6 +545,8 @@ export default class UiStore {
 
   @action
   setViewingItem(item = null) {
+    // escape if we're already viewing this item
+    if (this.viewingItem && item && this.viewingItem.id === item.id) return
     this.previousViewingCollection = this.viewingCollection
     this.viewingCollection = null
     this.viewingItem = item
@@ -598,31 +628,30 @@ export default class UiStore {
   @action
   selectCardsUpTo(cardId) {
     const selected = [...this.selectedCardIds]
-    const cardIds = [...this.collectionCardIds]
-    const lastSelected = _.last(selected)
-    // gather which cardIds are between this card and the last selected card
-    let between = []
-    if (lastSelected) {
-      if (lastSelected === cardId) return
-      const lastIdx = this.collectionCardIds.findIndex(
-        id => id === lastSelected
-      )
-      const thisIdx = this.collectionCardIds.findIndex(id => id === cardId)
-      if (lastIdx > thisIdx) {
-        between = cardIds.slice(thisIdx, lastIdx)
-      } else {
-        between = cardIds.slice(lastIdx, thisIdx)
-      }
-      // get unique cardIds selected, make sure the current card is put at the end w/ reverse
-      let newSelected = _.reverse(_.uniq(_.concat([cardId], selected, between)))
-      // if ALL those items were already selected, then toggle selection to OFF
-      if (_.isEmpty(_.difference(newSelected, selected))) {
-        newSelected = _.difference(selected, between)
-      }
-      this.selectedCardIds.replace(newSelected)
-    } else {
-      this.selectedCardIds.replace([cardId])
+    const lastSelectedCardId = _.last(selected)
+
+    if (!lastSelectedCardId) return this.selectedCardIds.replace([cardId])
+    if (lastSelectedCardId === cardId) return this.selectedCardIds
+
+    // Get cardIds that are between this card and the last selected card
+    const cardIdsBetween = this.viewingCollection.cardIdsBetween(
+      cardId,
+      lastSelectedCardId
+    )
+
+    // Get unique cardIds selected
+    // Make sure the current card is put at the end w/ reverse
+    let newSelected = _.reverse(
+      _.uniq(_.concat([cardId], selected, cardIdsBetween))
+    )
+
+    // If ALL those items were already selected,
+    // toggle selection to OFF
+    if (_.isEmpty(_.difference(newSelected, selected))) {
+      newSelected = _.difference(selected, cardIdsBetween)
     }
+
+    return this.selectedCardIds.replace(newSelected)
   }
 
   isSelected(cardId) {
@@ -705,5 +734,19 @@ export default class UiStore {
     if (!this.modalContentRef) return
     const node = this.modalContentRef.current
     node.scrollTop = node.scrollHeight
+  }
+
+  scrollToTop() {
+    this.scroll.scrollToTop()
+  }
+
+  scrollToBottom() {
+    if (this.viewingCollection && this.viewingCollection.isBoard) {
+      this.scroll.scrollTo(
+        this.viewingCollection.scrollBottom - window.innerHeight / 3
+      )
+      return
+    }
+    this.scroll.scrollToBottom()
   }
 }

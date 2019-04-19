@@ -48,6 +48,7 @@ exports[`DataItemCover renders snapshot 1`] = `
             "timeframe": "month",
           },
         ],
+        "fullyLoaded": true,
         "id": "1",
         "inherited_tag_list": Array [],
         "internalType": "items",
@@ -66,20 +67,24 @@ exports[`DataItemCover renders snapshot 1`] = `
           "assign": [MockFunction],
           "assignRef": [MockFunction],
           "beginReplacing": [MockFunction],
+          "col": 1,
           "create": [MockFunction],
           "disableMenu": [MockFunction],
           "height": 1,
           "id": "11",
+          "image_contain": false,
           "item": Object {},
           "maxHeight": 1,
           "maxWidth": 1,
           "order": 1,
           "parentCollection": Object {
             "API_archive": [MockFunction],
+            "API_batchUpdateCards": [MockFunction],
+            "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_fetchCards": [MockFunction],
             "API_getNextAvailableTest": [MockFunction],
-            "API_updateCards": [MockFunction],
+            "API_updateCard": [MockFunction],
             "API_updateName": [MockFunction],
             "assign": [MockFunction],
             "assignRef": [MockFunction],
@@ -91,6 +96,7 @@ exports[`DataItemCover renders snapshot 1`] = `
               "10",
               "10",
             ],
+            "cardIdsWithinRectangle": [MockFunction],
             "cardProperties": Array [],
             "card_order": "order",
             "checkCurrentOrg": [MockFunction],
@@ -105,6 +111,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                 "disableMenu": [MockFunction],
                 "height": 1,
                 "id": "10",
+                "image_contain": false,
                 "item": Object {
                   "breadcrumb": Array [
                     Array [
@@ -120,6 +127,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                  "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
                   "internalType": "items",
@@ -146,6 +154,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                  "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
                   "internalType": "items",
@@ -168,6 +177,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                 "disableMenu": [MockFunction],
                 "height": 1,
                 "id": "10",
+                "image_contain": false,
                 "item": Object {
                   "breadcrumb": Array [
                     Array [
@@ -183,6 +193,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                  "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
                   "internalType": "items",
@@ -209,6 +220,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                  "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
                   "internalType": "items",
@@ -231,6 +243,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                 "disableMenu": [MockFunction],
                 "height": 1,
                 "id": "10",
+                "image_contain": false,
                 "item": Object {
                   "breadcrumb": Array [
                     Array [
@@ -246,6 +259,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                  "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
                   "internalType": "items",
@@ -272,6 +286,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                  "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
                   "internalType": "items",
@@ -321,6 +336,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                 "disableMenu": [MockFunction],
                 "height": 1,
                 "id": "10",
+                "image_contain": false,
                 "item": Object {
                   "breadcrumb": Array [
                     Array [
@@ -336,6 +352,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                  "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
                   "internalType": "items",
@@ -362,6 +379,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                  "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
                   "internalType": "items",
@@ -384,6 +402,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                 "disableMenu": [MockFunction],
                 "height": 1,
                 "id": "10",
+                "image_contain": false,
                 "item": Object {
                   "breadcrumb": Array [
                     Array [
@@ -399,6 +418,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                  "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
                   "internalType": "items",
@@ -425,6 +445,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                  "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
                   "internalType": "items",
@@ -447,6 +468,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                 "disableMenu": [MockFunction],
                 "height": 1,
                 "id": "10",
+                "image_contain": false,
                 "item": Object {
                   "breadcrumb": Array [
                     Array [
@@ -462,6 +484,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                  "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
                   "internalType": "items",
@@ -488,6 +511,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                  "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
                   "internalType": "items",
@@ -507,10 +531,12 @@ exports[`DataItemCover renders snapshot 1`] = `
             ],
             "type": "Collection",
             "update": [MockFunction],
+            "updateScrollBottom": [MockFunction],
           },
           "patch": [MockFunction],
           "record": Object {},
           "reference": false,
+          "row": 0,
           "save": [MockFunction],
           "update": [MockFunction],
           "width": 1,
@@ -585,6 +611,7 @@ exports[`DataItemCover renders snapshot 1`] = `
           "timeframe": "month",
         },
       ],
+      "fullyLoaded": true,
       "id": "1",
       "inherited_tag_list": Array [],
       "internalType": "items",
@@ -603,20 +630,24 @@ exports[`DataItemCover renders snapshot 1`] = `
         "assign": [MockFunction],
         "assignRef": [MockFunction],
         "beginReplacing": [MockFunction],
+        "col": 1,
         "create": [MockFunction],
         "disableMenu": [MockFunction],
         "height": 1,
         "id": "11",
+        "image_contain": false,
         "item": Object {},
         "maxHeight": 1,
         "maxWidth": 1,
         "order": 1,
         "parentCollection": Object {
           "API_archive": [MockFunction],
+          "API_batchUpdateCards": [MockFunction],
+          "API_batchUpdateCardsWithUndo": [MockFunction],
           "API_clearCollectionCover": [MockFunction],
           "API_fetchCards": [MockFunction],
           "API_getNextAvailableTest": [MockFunction],
-          "API_updateCards": [MockFunction],
+          "API_updateCard": [MockFunction],
           "API_updateName": [MockFunction],
           "assign": [MockFunction],
           "assignRef": [MockFunction],
@@ -628,6 +659,7 @@ exports[`DataItemCover renders snapshot 1`] = `
             "10",
             "10",
           ],
+          "cardIdsWithinRectangle": [MockFunction],
           "cardProperties": Array [],
           "card_order": "order",
           "checkCurrentOrg": [MockFunction],
@@ -642,6 +674,7 @@ exports[`DataItemCover renders snapshot 1`] = `
               "disableMenu": [MockFunction],
               "height": 1,
               "id": "10",
+              "image_contain": false,
               "item": Object {
                 "breadcrumb": Array [
                   Array [
@@ -657,6 +690,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                 ],
                 "can_edit": false,
                 "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                "fullyLoaded": true,
                 "id": "1",
                 "inherited_tag_list": Array [],
                 "internalType": "items",
@@ -683,6 +717,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                 ],
                 "can_edit": false,
                 "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                "fullyLoaded": true,
                 "id": "1",
                 "inherited_tag_list": Array [],
                 "internalType": "items",
@@ -705,6 +740,7 @@ exports[`DataItemCover renders snapshot 1`] = `
               "disableMenu": [MockFunction],
               "height": 1,
               "id": "10",
+              "image_contain": false,
               "item": Object {
                 "breadcrumb": Array [
                   Array [
@@ -720,6 +756,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                 ],
                 "can_edit": false,
                 "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                "fullyLoaded": true,
                 "id": "1",
                 "inherited_tag_list": Array [],
                 "internalType": "items",
@@ -746,6 +783,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                 ],
                 "can_edit": false,
                 "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                "fullyLoaded": true,
                 "id": "1",
                 "inherited_tag_list": Array [],
                 "internalType": "items",
@@ -768,6 +806,7 @@ exports[`DataItemCover renders snapshot 1`] = `
               "disableMenu": [MockFunction],
               "height": 1,
               "id": "10",
+              "image_contain": false,
               "item": Object {
                 "breadcrumb": Array [
                   Array [
@@ -783,6 +822,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                 ],
                 "can_edit": false,
                 "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                "fullyLoaded": true,
                 "id": "1",
                 "inherited_tag_list": Array [],
                 "internalType": "items",
@@ -809,6 +849,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                 ],
                 "can_edit": false,
                 "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                "fullyLoaded": true,
                 "id": "1",
                 "inherited_tag_list": Array [],
                 "internalType": "items",
@@ -858,6 +899,7 @@ exports[`DataItemCover renders snapshot 1`] = `
               "disableMenu": [MockFunction],
               "height": 1,
               "id": "10",
+              "image_contain": false,
               "item": Object {
                 "breadcrumb": Array [
                   Array [
@@ -873,6 +915,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                 ],
                 "can_edit": false,
                 "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                "fullyLoaded": true,
                 "id": "1",
                 "inherited_tag_list": Array [],
                 "internalType": "items",
@@ -899,6 +942,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                 ],
                 "can_edit": false,
                 "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                "fullyLoaded": true,
                 "id": "1",
                 "inherited_tag_list": Array [],
                 "internalType": "items",
@@ -921,6 +965,7 @@ exports[`DataItemCover renders snapshot 1`] = `
               "disableMenu": [MockFunction],
               "height": 1,
               "id": "10",
+              "image_contain": false,
               "item": Object {
                 "breadcrumb": Array [
                   Array [
@@ -936,6 +981,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                 ],
                 "can_edit": false,
                 "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                "fullyLoaded": true,
                 "id": "1",
                 "inherited_tag_list": Array [],
                 "internalType": "items",
@@ -962,6 +1008,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                 ],
                 "can_edit": false,
                 "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                "fullyLoaded": true,
                 "id": "1",
                 "inherited_tag_list": Array [],
                 "internalType": "items",
@@ -984,6 +1031,7 @@ exports[`DataItemCover renders snapshot 1`] = `
               "disableMenu": [MockFunction],
               "height": 1,
               "id": "10",
+              "image_contain": false,
               "item": Object {
                 "breadcrumb": Array [
                   Array [
@@ -999,6 +1047,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                 ],
                 "can_edit": false,
                 "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                "fullyLoaded": true,
                 "id": "1",
                 "inherited_tag_list": Array [],
                 "internalType": "items",
@@ -1025,6 +1074,7 @@ exports[`DataItemCover renders snapshot 1`] = `
                 ],
                 "can_edit": false,
                 "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                "fullyLoaded": true,
                 "id": "1",
                 "inherited_tag_list": Array [],
                 "internalType": "items",
@@ -1044,10 +1094,12 @@ exports[`DataItemCover renders snapshot 1`] = `
           ],
           "type": "Collection",
           "update": [MockFunction],
+          "updateScrollBottom": [MockFunction],
         },
         "patch": [MockFunction],
         "record": Object {},
         "reference": false,
+        "row": 0,
         "save": [MockFunction],
         "update": [MockFunction],
         "width": 1,

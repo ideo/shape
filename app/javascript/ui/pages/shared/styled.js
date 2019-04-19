@@ -24,6 +24,14 @@ export const StyledTitleAndRoles = styled(Flex)`
     @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
       padding-top: 10px;
     }
+
+    > * {
+      margin-right: 20px;
+      &:first-child,
+      &:last-child {
+        margin-right: 0px;
+      }
+    }
   }
 `
 

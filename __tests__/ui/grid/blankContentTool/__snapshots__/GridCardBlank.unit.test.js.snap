@@ -1,0 +1,163 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GridCardBlank renders snapshot 1`] = `
+<StyledGridCardBlank>
+  <styled.div
+    gridH={250}
+    gridW={312}
+    height={null}
+  >
+    <styled.div
+      replacing={false}
+    >
+      <Flex
+        className="foreground"
+        justify="space-between"
+      >
+        <BctButtonBox
+          Icon={[Function]}
+          creating={null}
+          onClick={[Function]}
+          size={47}
+          tooltip="Add text box"
+          type="text"
+        />
+        <BctButtonBox
+          Icon={[Function]}
+          creating={null}
+          onClick={[Function]}
+          size={47}
+          tooltip="Add file"
+          type="file"
+        />
+        <BctButtonBox
+          Icon={[Function]}
+          creating={null}
+          onClick={[Function]}
+          size={47}
+          tooltip="Add URL"
+          type="link"
+        />
+        <BctButtonBox
+          Icon={[Function]}
+          creating={null}
+          onClick={[Function]}
+          size={47}
+          tooltip="Link video"
+          type="video"
+        />
+      </Flex>
+      <Flex
+        className="foreground foreground-bottom"
+        justify="space-between"
+      >
+        <BctButtonBox
+          Icon={[Function]}
+          creating={null}
+          onClick={[Function]}
+          size={47}
+          tooltip="Create collection"
+          type="collection"
+        />
+        <BctButtonBox
+          Icon={[Function]}
+          creating={null}
+          onClick={[Function]}
+          size={47}
+          tooltip="Create foamcore board"
+          type="foamcoreBoard"
+        />
+        <BctButtonBox
+          Icon={[Function]}
+          creating={null}
+          onClick={[Function]}
+          size={47}
+          tooltip="Get feedback"
+          type="testCollection"
+        />
+        <PopoutMenu
+          buttonStyle="bct"
+          className=""
+          direction="right"
+          disabled={false}
+          groupExtraComponent={Object {}}
+          groupedMenuItems={Object {}}
+          hideDotMenu={false}
+          menuItems={
+            Array [
+              Object {
+                "iconLeft": <SubmissionBoxIcon />,
+                "name": "Create Submission Box",
+                "onClick": [Function],
+              },
+              Object {
+                "iconLeft": <TemplateIcon
+                  circled={false}
+                  filled={false}
+                  size="normal"
+                  viewBox="0 0 50 50"
+                />,
+                "name": "Create Template",
+                "onClick": [Function],
+              },
+              Object {
+                "iconLeft": <ReportIcon
+                  size="small"
+                />,
+                "name": "Create Report",
+                "onClick": [Function],
+              },
+            ]
+          }
+          menuOpen={false}
+          onClick={[Function]}
+          onMouseLeave={[Function]}
+          position={null}
+          width={240}
+          wrapperClassName="card-menu"
+        />
+      </Flex>
+      <styled.div
+        droppingFile={false}
+        id="dropzone"
+      >
+        <div
+          className="text"
+        >
+          <img
+            alt="dropzone icons"
+            src={null}
+            style={
+              Object {
+                "width": "80px",
+              }
+            }
+          />
+          <div
+            className="top"
+          >
+            Drag & Drop
+          </div>
+          <div
+            className="or"
+          >
+            or
+          </div>
+          <div
+            className="bottom"
+          >
+            Browse
+          </div>
+        </div>
+      </styled.div>
+      <BctBackground />
+    </styled.div>
+  </styled.div>
+  <CloseButton
+    color="#a89f9b"
+    onClick={[Function]}
+    position="absolute"
+    size="sm"
+  />
+</StyledGridCardBlank>
+`;
