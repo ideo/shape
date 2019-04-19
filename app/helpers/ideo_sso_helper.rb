@@ -45,7 +45,7 @@ module IdeoSsoHelper
       redirect_url: ideo_sso_redirect_url.to_s,
       cookies: cookies,
       addtl_params: addtl_params,
-    )
+    ).to_s
   end
 
   def stripe_js_sdk_url
