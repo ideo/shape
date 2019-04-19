@@ -316,7 +316,7 @@ class FoamcoreGrid extends React.Component {
   get visibleCols() {
     if (!this.gridRef) return { min: null, max: null }
 
-    const left = window.scrollX
+    const left = window.scrollX || window.pageXOffset
     const gridWidth = window.innerWidth - pageMargins.left
 
     const min = parseFloat((left / this.cardAndGutterWidth).toFixed(1))

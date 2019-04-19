@@ -190,7 +190,7 @@ class TextItemCover extends React.Component {
         class="cancelGridClick"
         onClick={this.handleClick}
       >
-        <QuillStyleWrapper>
+        <QuillStyleWrapper notEditing={!isEditing}>
           {this.state.loading && <InlineLoader />}
           {content}
           {this.state.readMore &&
