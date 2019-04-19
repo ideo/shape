@@ -135,7 +135,7 @@ class TextItemCover extends React.Component {
     const qlEditor = this.quillEditor.editingArea.getElementsByClassName(
       'ql-editor'
     )[0]
-    const textAreaHeight = qlEditor.scrollHeight
+    const textAreaHeight = qlEditor ? qlEditor.scrollHeight : 0
     // render the Read More link if the text height exceeds viewable area
     if (height && textAreaHeight > height) {
       this.setState({ readMore: true })
