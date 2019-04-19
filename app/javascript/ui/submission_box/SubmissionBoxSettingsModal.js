@@ -22,6 +22,7 @@ import AddLinkIcon from '~/ui/icons/AddLinkIcon'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import Modal from '~/ui/global/modals/Modal'
+import RecordSearch from '~/ui/global/RecordSearch'
 import v from '~/utils/variables'
 
 const SubmissionBoxRow = Row.extend`
@@ -49,15 +50,8 @@ const StyledTitleContent = styled.div`
 class SubmissionBoxSettingsModal extends React.Component {
   @observable
   loading = false
-
-  componentDidMount() {
-    const { apiStore } = this.props
-    apiStore.fetchUsableTemplates()
-  }
-
-  get templates() {
-    return this.props.apiStore.usableTemplates
-  }
+  @observable
+  templates = []
 
   get locked() {
     const { uiStore } = this.props
@@ -118,6 +112,13 @@ class SubmissionBoxSettingsModal extends React.Component {
     }
     // otherwise just go straight to the callback if no submissions
     callback()
+  }
+
+  onSearch = templates => {
+    if (!templates) return
+    runInAction(() => {
+      this.templates = templates
+    })
   }
 
   // you can either set it to be a template, or a type like "text"
@@ -296,8 +297,12 @@ class SubmissionBoxSettingsModal extends React.Component {
     )
   }
 
-  render() {
+  searchFilter = c => {
     const { submission_template_id } = this.props.collection
+    return submission_template_id !== c.id
+  }
+
+  render() {
     return (
       <Modal
         title={this.titleContent()}
@@ -306,11 +311,17 @@ class SubmissionBoxSettingsModal extends React.Component {
         open
       >
         <div>
+          <RecordSearch
+            onSelect={() => {}}
+            onSearch={this.onSearch}
+            initialLoadAmount={25}
+            searchFilter={this.searchFilter}
+            searchTags={['template']}
+          />
+          <br />
           {this.itemRows}
-          {this.templates.map(
-            template =>
-              submission_template_id !== template.id &&
-              this.submissionBoxRowForTemplate(template)
+          {this.templates.map(template =>
+            this.submissionBoxRowForTemplate(template)
           )}
         </div>
       </Modal>

@@ -1,8 +1,17 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { inject, observer } from 'mobx-react'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import AutoComplete from '~/ui/global/AutoComplete'
+import trackError from '~/utils/trackError'
+
+function formatCollections(collections) {
+  return collections.map(collection => ({
+    value: collection.id,
+    label: collection.name,
+    data: collection,
+  }))
+}
 
 @inject('apiStore')
 @observer
@@ -14,14 +23,19 @@ class RecordSearch extends React.Component {
         callback()
         return
       }
-
-      this.props.apiStore
+      const tags = props.searchTags.map(tag => `#${tag}`).join(' ')
+      props.apiStore
         .searchCollections({
-          query: term,
+          query: `${tags} ${term}`,
           per_page: 30,
-          filter: props.searchFilter,
         })
-        .then(res => callback(formatCollections(res.data)))
+        .then(res => res.data.filter(props.searchFilter))
+        .then(
+          records =>
+            props.onSearch
+              ? props.onSearch(records)
+              : callback(formatCollections(records))
+        )
         .catch(e => {
           trackError(e)
         })
@@ -44,16 +58,19 @@ class RecordSearch extends React.Component {
         optionSearch={this.onSearch}
         onOptionSelect={option => this.props.onSelect(option)}
         placeholder="Collection name"
-        keepSelectedOptions
         style={{ display: 'inline-block' }}
+        keepMenuClosed={!!this.props.onSearch}
       />
     )
   }
 }
 
 RecordSearch.propTypes = {
+  onSelect: PropTypes.func.isRequired,
+  onSearch: PropTypes.func,
   initialLoadAmount: PropTypes.number,
   searchFilter: PropTypes.func,
+  searchTags: PropTypes.arrayOf(PropTypes.string),
 }
 
 RecordSearch.wrappedComponent.propTypes = {
@@ -61,6 +78,10 @@ RecordSearch.wrappedComponent.propTypes = {
 }
 
 RecordSearch.defaultProps = {
+  onSearch: null,
   initialLoadAmount: 0,
   searchFilter: r => r,
+  searchTags: [],
 }
+
+export default RecordSearch
