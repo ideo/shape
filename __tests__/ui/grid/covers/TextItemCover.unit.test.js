@@ -32,7 +32,11 @@ describe('TextItemCover', () => {
   it('renders Read More if text height exceeds the viewable area', () => {
     const inst = wrapper.instance()
     inst.quillEditor = {
-      getEditingArea: () => ({ offsetHeight: 900 }),
+      editingArea: {
+        getElementsByClassName: jest
+          .fn()
+          .mockReturnValue([{ scrollHeight: 500 }]),
+      },
     }
     inst.componentDidMount()
     // force re-render to pick up state update
@@ -44,7 +48,11 @@ describe('TextItemCover', () => {
   it('does not render Read More if text height fits within the viewable area', () => {
     const inst = wrapper.instance()
     inst.quillEditor = {
-      getEditingArea: () => ({ offsetHeight: 50 }),
+      editingArea: {
+        getElementsByClassName: jest
+          .fn()
+          .mockReturnValue([{ scrollHeight: 100 }]),
+      },
     }
     inst.componentDidMount()
     wrapper.update()
