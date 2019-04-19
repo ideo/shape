@@ -123,6 +123,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
               ],
               "type": "Collection",
               "update": [MockFunction],
+              "updateScrollBottom": [MockFunction],
             },
             "patch": [MockFunction],
             "record": Object {},
@@ -247,6 +248,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
               ],
               "type": "Collection",
               "update": [MockFunction],
+              "updateScrollBottom": [MockFunction],
             },
             "patch": [MockFunction],
             "record": Object {},
@@ -280,15 +282,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
     isUserCollection={false}
     key="10"
     lastPinnedCard={false}
-    loadCollectionCards={
-      [MockFunction] {
-        "calls": Array [
-          Array [
-            Object {},
-          ],
-        ],
-      }
-    }
+    loadCollectionCards={[MockFunction]}
     maxResizeCol={4}
     maxResizeRow={2}
     menuOpen={false}
@@ -427,6 +421,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -543,6 +538,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -665,6 +661,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -781,6 +778,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -903,6 +901,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -1019,6 +1018,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -1587,6 +1587,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
             ],
             "type": "Collection",
             "update": [MockFunction],
+            "updateScrollBottom": [MockFunction],
           },
           "patch": [MockFunction],
           "record": Object {},
@@ -1707,6 +1708,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -1823,6 +1825,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -1945,6 +1948,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -2061,6 +2065,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -2183,6 +2188,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -2299,6 +2305,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -2321,6 +2328,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
         ],
         "type": "Collection",
         "update": [MockFunction],
+        "updateScrollBottom": [MockFunction],
       }
     }
     position={
@@ -2610,6 +2618,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
             ],
             "type": "Collection",
             "update": [MockFunction],
+            "updateScrollBottom": [MockFunction],
           },
           "patch": [MockFunction],
           "record": Object {},
@@ -2745,6 +2754,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
               ],
               "type": "Collection",
               "update": [MockFunction],
+              "updateScrollBottom": [MockFunction],
             },
             "patch": [MockFunction],
             "record": Object {},
@@ -2869,6 +2879,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
               ],
               "type": "Collection",
               "update": [MockFunction],
+              "updateScrollBottom": [MockFunction],
             },
             "patch": [MockFunction],
             "record": Object {},
@@ -2902,15 +2913,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
     isUserCollection={false}
     key="10"
     lastPinnedCard={false}
-    loadCollectionCards={
-      [MockFunction] {
-        "calls": Array [
-          Array [
-            Object {},
-          ],
-        ],
-      }
-    }
+    loadCollectionCards={[MockFunction]}
     maxResizeCol={4}
     maxResizeRow={2}
     menuOpen={false}
@@ -3049,6 +3052,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -3165,6 +3169,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -3287,6 +3292,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -3403,6 +3409,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -3525,6 +3532,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -3641,6 +3649,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -4209,6 +4218,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
             ],
             "type": "Collection",
             "update": [MockFunction],
+            "updateScrollBottom": [MockFunction],
           },
           "patch": [MockFunction],
           "record": Object {},
@@ -4329,6 +4339,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -4445,6 +4456,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -4567,6 +4579,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -4683,6 +4696,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -4805,6 +4819,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -4921,6 +4936,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -4943,6 +4959,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
         ],
         "type": "Collection",
         "update": [MockFunction],
+        "updateScrollBottom": [MockFunction],
       }
     }
     position={
@@ -5232,6 +5249,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
             ],
             "type": "Collection",
             "update": [MockFunction],
+            "updateScrollBottom": [MockFunction],
           },
           "patch": [MockFunction],
           "record": Object {},
@@ -5367,6 +5385,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
               ],
               "type": "Collection",
               "update": [MockFunction],
+              "updateScrollBottom": [MockFunction],
             },
             "patch": [MockFunction],
             "record": Object {},
@@ -5491,6 +5510,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
               ],
               "type": "Collection",
               "update": [MockFunction],
+              "updateScrollBottom": [MockFunction],
             },
             "patch": [MockFunction],
             "record": Object {},
@@ -5524,15 +5544,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
     isUserCollection={false}
     key="10"
     lastPinnedCard={false}
-    loadCollectionCards={
-      [MockFunction] {
-        "calls": Array [
-          Array [
-            Object {},
-          ],
-        ],
-      }
-    }
+    loadCollectionCards={[MockFunction]}
     maxResizeCol={4}
     maxResizeRow={2}
     menuOpen={false}
@@ -5671,6 +5683,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -5787,6 +5800,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -5909,6 +5923,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -6025,6 +6040,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -6147,6 +6163,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -6263,6 +6280,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -6831,6 +6849,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
             ],
             "type": "Collection",
             "update": [MockFunction],
+            "updateScrollBottom": [MockFunction],
           },
           "patch": [MockFunction],
           "record": Object {},
@@ -6951,6 +6970,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -7067,6 +7087,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -7189,6 +7210,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -7305,6 +7327,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -7427,6 +7450,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -7543,6 +7567,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
                   ],
                   "type": "Collection",
                   "update": [MockFunction],
+                  "updateScrollBottom": [MockFunction],
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -7565,6 +7590,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
         ],
         "type": "Collection",
         "update": [MockFunction],
+        "updateScrollBottom": [MockFunction],
       }
     }
     position={
@@ -7854,6 +7880,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
             ],
             "type": "Collection",
             "update": [MockFunction],
+            "updateScrollBottom": [MockFunction],
           },
           "patch": [MockFunction],
           "record": Object {},

@@ -360,6 +360,7 @@ export const fakeCollection = {
   API_batchUpdateCardsWithUndo: jest.fn().mockReturnValue(Promise.resolve({})),
   checkCurrentOrg: jest.fn(),
   confirmEdit: jest.fn(),
+  updateScrollBottom: jest.fn(),
   cardProperties: [],
   internalType: 'collections',
   meta: {

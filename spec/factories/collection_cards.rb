@@ -3,8 +3,7 @@ FactoryBot.define do
     parent factory: :collection
     order 0
     sequence(:row)
-    sequence(:column)
-
+    sequence(:col)
 
     factory :collection_card_image do
       item factory: :file_item, strategy: :build
