@@ -83,15 +83,10 @@ class CardMover
     @to_collection_cards.uniq!
   end
 
-  def last_non_blank_row_in_to_collection
-    @existing_cards.map(&:row).compact.max.to_i
-  end
-
   def move_cards_to_board
     return if !@to_collection.is_a? Collection::Board
-    # we want the empty row to be the same for each card in array being moved
-    # TODO: should this be a method in collection.rb?
-    target_empty_row = last_non_blank_row_in_to_collection + 2
+
+    target_empty_row = @to_collection.empty_row_for_moving_cards
     @moving_cards.each_with_index do |card, i|
       card.update(
         parent_id: @to_collection.id,
@@ -102,7 +97,7 @@ class CardMover
   end
 
   def move_cards_to_collection
-    return [] if @to_collection.is_a? Collection::Board # Do we need to do this all over now?
+    return [] if @to_collection.is_a? Collection::Board
     # Reorder all cards based on order of joined_cards
     @to_collection_cards.map.with_index do |card, i|
       # parent_id will already be set for existing_cards but no harm to indicate
