@@ -185,7 +185,8 @@ class MovableGridCard extends React.PureComponent {
   scrollUp = (timestamp, clientY) => {
     if (clientY) this.clientY = clientY
     if (!this.scrolling) return null
-    if (window.scrollY < 10) {
+    const scrollY = window.scrollY || window.pageYOffset
+    if (scrollY < 10) {
       return window.requestAnimationFrame(this.scrollUp)
     }
 
@@ -196,8 +197,9 @@ class MovableGridCard extends React.PureComponent {
 
   scrollDown = timestamp => {
     if (!this.scrolling) return null
+    const scrollY = window.scrollY || window.pageYOffset
     if (
-      window.innerHeight + window.scrollY >=
+      window.innerHeight + scrollY >=
       document.body.offsetHeight + uiStore.gridSettings.gridH * 2
     ) {
       return window.requestAnimationFrame(this.scrollDown)

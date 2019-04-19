@@ -41,15 +41,18 @@ const BlankCard = styled.div.attrs({
     if (props.type === 'unrendered') return 0.75
     if (props.type === 'drag') return 0.5
     return 1
-  }}
+  }};
   z-index: ${props => (props.type === 'drag' ? v.zIndex.cardHovering : 0)};
-  &:hover {
+  ${props =>
+    props.type === 'unrendered'
+      ? ''
+      : `&:hover {
     background-color: ${v.colors.primaryLight} !important;
     .plus-icon {
       display: block;
     }
   }
-  .plus-icon {
+  `} .plus-icon {
     display: none;
   }
 `
@@ -294,7 +297,7 @@ class FoamcoreGrid extends React.Component {
   get visibleRows() {
     if (!this.gridRef) return { min: null, max: null }
 
-    const top = window.scrollY
+    const top = window.scrollY || window.pageYOffset
     const gridHeight = window.innerHeight - pageMargins.top
 
     const min = parseFloat((top / this.cardAndGutterHeight).toFixed(1))
