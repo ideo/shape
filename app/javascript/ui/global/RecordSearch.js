@@ -19,13 +19,20 @@ class RecordSearch extends React.Component {
         .searchCollections({
           query: term,
           per_page: 30,
-          filter: props.filter,
+          filter: props.searchFilter,
         })
         .then(res => callback(formatCollections(res.data)))
         .catch(e => {
           trackError(e)
         })
     }, 350)
+  }
+
+  componentDidMount() {
+    const { initialLoadAmount } = this.props
+    if (initialLoadAmount > 0) {
+      this.debouncedSearch(' ')
+    }
   }
 
   onSearch = (value, callback) => this.debouncedSearch(value, callback)
@@ -45,15 +52,15 @@ class RecordSearch extends React.Component {
 }
 
 RecordSearch.propTypes = {
-  initalLoadAmount: PropTypes.number,
-  filter: PropTypes.func,
+  initialLoadAmount: PropTypes.number,
+  searchFilter: PropTypes.func,
 }
 
 RecordSearch.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-  filter: r => r,
 }
 
 RecordSearch.defaultProps = {
-  initalLoadAmount: 0,
+  initialLoadAmount: 0,
+  searchFilter: r => r,
 }
