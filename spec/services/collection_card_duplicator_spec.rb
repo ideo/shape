@@ -24,8 +24,8 @@ RSpec.describe CollectionCardDuplicator, type: :service do
       expect(moving_cards.map(&:parent_id).uniq).to match_array [from_collection.id]
       new_cards = service.call
 
+      first_cards = to_collection.reload.collection_cards.first(2)
       # newly created cards should be duplicates
-      first_cards = to_collection.collection_cards.first(2)
       expect(first_cards).to match_array new_cards
       expect(first_cards.map(&:item)).not_to match_array moving_cards.map(&:item)
       # names should match, in same order
@@ -37,7 +37,7 @@ RSpec.describe CollectionCardDuplicator, type: :service do
     context 'when to_collection is a foamcore board' do
       let!(:to_collection) { create(:board_collection, num_cards: 3, add_editors: [user]) }
       let(:new_cards) { service.call }
-      let(:target_empty_row) { to_collection_cards.map(&:row).max + 2 }
+      let(:target_empty_row) { to_collection.empty_row_for_moving_cards }
 
       it 'sets row of duplicated cards 2 rows after the last non-blank row' do
         new_cards.each_with_index do |card, index|
@@ -70,6 +70,8 @@ RSpec.describe CollectionCardDuplicator, type: :service do
 
       it 'links legend to duplicated data item' do
         service.call
+        to_collection.reload.collection_cards
+
         expect(duplicated_data_items.size).to eq(1)
         expect(duplicated_data_items.first.cloned_from).to eq(data_item)
       end
