@@ -140,8 +140,8 @@ ActiveRecord::Schema.define(version: 20190402225253) do
     t.bigint "collection_to_test_id"
     t.datetime "unarchived_at"
     t.jsonb "cached_test_scores"
-    t.boolean "hide_submissions", default: false
     t.bigint "roles_anchor_collection_id"
+    t.boolean "hide_submissions", default: false
     t.boolean "shared_with_organization", default: false
     t.integer "cover_type", default: 0
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
@@ -383,7 +383,7 @@ ActiveRecord::Schema.define(version: 20190402225253) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "email", default: "", null: false
+    t.string "email", default: ""
     t.string "encrypted_password", default: "", null: false
     t.string "first_name"
     t.string "last_name"
@@ -412,6 +412,7 @@ ActiveRecord::Schema.define(version: 20190402225253) do
     t.boolean "show_template_helper", default: true
     t.boolean "mailing_list", default: false
     t.datetime "last_active_at"
+    t.string "phone"
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"
