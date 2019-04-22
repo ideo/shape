@@ -76,13 +76,9 @@ describe('CollectionPage', () => {
     })
   })
 
-  describe('updateCollection', () => {
+  describe('trackCollectionUpdated', () => {
     beforeEach(() => {
-      wrapper.instance().updateCollection()
-    })
-
-    it('should update the collection cards through api', () => {
-      expect(collection.API_updateCards).toHaveBeenCalled()
+      wrapper.instance().trackCollectionUpdated()
     })
 
     it('should track an event for updating the collection', () => {

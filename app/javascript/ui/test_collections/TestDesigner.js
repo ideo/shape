@@ -150,7 +150,7 @@ class TestDesigner extends React.Component {
     }
   }
 
-  handleTrash = async card => {
+  handleTrash = card => {
     this.confirmEdit(() => card.API_archiveSelf({}))
   }
 

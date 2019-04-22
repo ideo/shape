@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GridCardPagination renders snapshot 1`] = `
+<VisibilitySensor
+  active={true}
+  containment={null}
+  delayedCall={false}
+  intervalCheck={true}
+  intervalDelay={300}
+  minTopValue={0}
+  offset={Object {}}
+  onChange={[Function]}
+  partialVisibility={true}
+  resizeCheck={false}
+  resizeDelay={250}
+  resizeThrottle={-1}
+  scrollCheck={true}
+  scrollDelay={250}
+  scrollThrottle={-1}
+>
+  <Loader
+    containerHeight="100%"
+    size={60}
+  />
+</VisibilitySensor>
+`;

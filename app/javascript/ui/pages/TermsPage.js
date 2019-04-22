@@ -10,7 +10,7 @@ import {
   QuillStyleWrapper,
 } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
-import Header, { BasicHeader } from '~/ui/layout/Header'
+import { BasicHeader } from '~/ui/layout/Header'
 import PageContainer from '~/ui/layout/PageContainer'
 import termsMarkdown from '~/markdown/TermsOfUse'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
@@ -66,8 +66,8 @@ class TermsPage extends React.PureComponent {
     const loggedIn = !!apiStore.currentUser
     return (
       <div>
-        {loggedIn ? <Header /> : <BasicHeader />}
-        <PageContainer marginTop={v.headerHeightCompact}>
+        {!loggedIn && <BasicHeader />}
+        <PageContainer>
           <Heading1>Legal</Heading1>
           {loggedIn && <OverdueBanner />}
           {inner}

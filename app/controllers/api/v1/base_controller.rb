@@ -23,6 +23,7 @@ class Api::V1::BaseController < ApplicationController
       'Item::LegendItem': SerializableLegendItem,
       'Collection::UserCollection': SerializableCollection,
       'Collection::ApplicationCollection': SerializableCollection,
+      'Collection::Board': SerializableCollection,
       'Collection::SharedWithMeCollection': SerializableCollection,
       'Collection::Global': SerializableCollection,
       'Collection::TestCollection': SerializableCollection,

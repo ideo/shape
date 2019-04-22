@@ -13,6 +13,7 @@ import ReportIcon from '~/ui/icons/ReportIcon'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import SubmissionBoxIcon from '~/ui/icons/SubmissionBoxIcon'
+import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import FilestackUpload, { MAX_SIZE } from '~/utils/FilestackUpload'
 import { StyledGridCard } from '~/ui/grid/shared'
@@ -23,22 +24,28 @@ import PopoutMenu from '~/ui/global/PopoutMenu'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 
 import CollectionCreator from './CollectionCreator'
-import TextItemCreator from './TextItemCreator'
 import LinkCreator from './LinkCreator'
 import DataItemCreator from './DataItemCreator'
 import BctButtonBox from './BctButtonBox'
 import BctButtonRotation from './BctButtonRotation'
 
 const StyledGridCardBlank = StyledGridCard.extend`
-  background: transparent;
+  background-color: transparent;
   cursor: auto;
   position: relative;
   button {
     cursor: pointer;
     border: none;
-    transition: all 300ms;
+    transition: all 200ms;
   }
+  ${props =>
+    props.boxShadow &&
+    `
+    box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.1);
+    background-color: ${v.colors.commonLight};
+  `};
 `
+StyledGridCardBlank.displayName = 'StyledGridCardBlank'
 
 // width of card is constrained by gridW
 // vertical position is adjusted by gridH / 2 if card is 2 rows tall
@@ -50,6 +57,7 @@ const StyledGridCardInner = styled.div`
 `
 const StyledBlankCreationTool = styled.div`
   padding: 2rem;
+  padding-top: 1rem;
   position: relative;
   .foreground {
     position: relative;
@@ -308,15 +316,15 @@ class GridCardBlank extends React.Component {
 
   createCard = (nested = {}, options = {}) => {
     const { replacingId } = this
-    let { order } = this.props
     const { afterCreate, parent, apiStore, uiStore } = this.props
-    if (order === null) ({ order } = uiStore.blankContentToolState)
-    const { width, height } = uiStore.blankContentToolState
+    const { order, row, col, width, height } = uiStore.blankContentToolState
     const isReplacing = !!replacingId
     const attrs = {
       order,
       width,
       height,
+      row,
+      col,
       // `parent` is the collection this card belongs to
       parent_id: parent.id,
       image_contain: this.props.defaultShowWholeImage,
@@ -389,6 +397,7 @@ class GridCardBlank extends React.Component {
       case 'testCollection':
       case 'template':
       case 'submissionBox':
+      case 'foamcoreBoard':
         inner = (
           <CollectionCreator
             type={creating}
@@ -427,17 +436,6 @@ class GridCardBlank extends React.Component {
           />
         )
         break
-      case 'text':
-        // TextItemCreator is the only one that `returns`
-        // since it doesn't use the BctBackground
-        return (
-          <TextItemCreator
-            loading={loading}
-            height={this.props.height}
-            createCard={this.createCard}
-            closeBlankContentTool={this.closeBlankContentTool}
-          />
-        )
       default:
         inner = (
           <BctDropzone droppingFile={droppingFile} id="dropzone">
@@ -458,16 +456,6 @@ class GridCardBlank extends React.Component {
         )
     }
 
-    const videoBctBox = (
-      <BctButtonBox
-        tooltip="Link video"
-        type="video"
-        creating={creating}
-        size={size}
-        onClick={this.startCreating('video')}
-        Icon={AddVideoIcon}
-      />
-    )
     const testBctBox = (
       <BctButtonBox
         tooltip="Get feedback"
@@ -488,21 +476,31 @@ class GridCardBlank extends React.Component {
         Icon={SubmissionBoxIcon}
       />
     )
+    const foamcoreBoardBctBox = (
+      <BctButtonBox
+        tooltip="Create foamcore board"
+        type="foamcoreBoard"
+        creating={creating}
+        size={size}
+        onClick={this.startCreating('foamcoreBoard')}
+        Icon={FoamcoreBoardIcon}
+      />
+    )
+    const collectionBctBox = (
+      <BctButtonBox
+        tooltip="Create collection"
+        type="collection"
+        creating={creating}
+        size={size}
+        onClick={this.startCreating('collection')}
+        Icon={AddCollectionIcon}
+      />
+    )
 
     return (
       <StyledBlankCreationTool replacing={isReplacing && !creating}>
         <Flex className="foreground" justify="space-between">
-          {!isReplacing &&
-            (!creating || creating === 'collection') && (
-              <BctButtonBox
-                tooltip="Create collection"
-                type="collection"
-                creating={creating}
-                size={size}
-                onClick={this.startCreating('collection')}
-                Icon={AddCollectionIcon}
-              />
-            )}
+          {/* First row of options */}
           {!isReplacing &&
             !creating && (
               <BctButtonBox
@@ -510,7 +508,6 @@ class GridCardBlank extends React.Component {
                 type="text"
                 creating={creating}
                 size={size}
-                // onClick={this.startCreating('text')}
                 onClick={this.createTextItem}
                 Icon={AddTextIcon}
               />
@@ -535,16 +532,28 @@ class GridCardBlank extends React.Component {
               Icon={AddLinkIcon}
             />
           )}
-          {((isReplacing && creating !== 'link') || creating === 'video') && (
-            <BctButtonRotation disabled={isReplacing}>
-              {videoBctBox}
-            </BctButtonRotation>
+          {(!creating || creating === 'video') && (
+            <BctButtonBox
+              tooltip="Link video"
+              type="video"
+              creating={creating}
+              size={size}
+              onClick={this.startCreating('video')}
+              Icon={AddVideoIcon}
+            />
           )}
-          {creating === 'testCollection' && (
-            <BctButtonRotation>{testBctBox}</BctButtonRotation>
+          {/* These are what to render on state change for second row */}
+          {creating === 'collection' && (
+            <BctButtonRotation>{collectionBctBox}</BctButtonRotation>
+          )}
+          {creating === 'foamcoreBoard' && (
+            <BctButtonRotation>{foamcoreBoardBctBox}</BctButtonRotation>
           )}
           {creating === 'submissionBox' && (
             <BctButtonRotation>{submissionBctBox}</BctButtonRotation>
+          )}
+          {creating === 'testCollection' && (
+            <BctButtonRotation>{testBctBox}</BctButtonRotation>
           )}
           {creating === 'data' && (
             <BctButtonRotation>
@@ -567,25 +576,31 @@ class GridCardBlank extends React.Component {
             </BctButtonRotation>
           )}
         </Flex>
-
+        {/* Second row display on initial load */}
         {!isReplacing &&
           !creating && (
             <Flex
               className="foreground foreground-bottom"
               justify="space-between"
             >
-              {videoBctBox}
-              {submissionBctBox}
+              {collectionBctBox}
+              {foamcoreBoardBctBox}
               {testBctBox}
               <PopoutMenu
+                width={240}
                 buttonStyle="bct"
                 menuOpen={this.state.bctMenuOpen}
                 onClick={this.toggleBctMenu}
                 direction="right"
                 menuItems={[
                   {
+                    name: 'Create Submission Box',
+                    iconLeft: <SubmissionBoxIcon />,
+                    onClick: this.startCreating('submissionBox'),
+                  },
+                  {
                     name: 'Create Template',
-                    iconLeft: <TemplateIcon size="small" />,
+                    iconLeft: <TemplateIcon />,
                     onClick: this.startCreating('template'),
                   },
                   {
@@ -604,11 +619,13 @@ class GridCardBlank extends React.Component {
   }
 
   render() {
-    const { testCollectionCard, uiStore } = this.props
+    const { testCollectionCard, uiStore, parent } = this.props
     const { gridSettings, blankContentToolState } = uiStore
-    const { creating } = this.state
     return (
-      <StyledGridCardBlank blueBg={testCollectionCard}>
+      <StyledGridCardBlank
+        blueBg={testCollectionCard}
+        boxShadow={parent.isBoard}
+      >
         <StyledGridCardInner
           height={blankContentToolState.height}
           gridW={gridSettings.gridW}
@@ -618,8 +635,7 @@ class GridCardBlank extends React.Component {
         </StyledGridCardInner>
         {this.state.loading && <InlineLoader />}
         {!this.emptyState &&
-          !testCollectionCard &&
-          creating !== 'text' && (
+          !testCollectionCard && (
             <CloseButton onClick={this.closeBlankContentTool} />
           )}
       </StyledGridCardBlank>
@@ -630,11 +646,9 @@ class GridCardBlank extends React.Component {
 GridCardBlank.propTypes = {
   // parent is the parent collection
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
-  height: PropTypes.number.isRequired,
   afterCreate: PropTypes.func,
   preselected: PropTypes.string,
   replacingId: PropTypes.string,
-  order: PropTypes.number,
   testCollectionCard: PropTypes.bool,
   defaultShowWholeImage: PropTypes.bool,
 }
@@ -646,7 +660,6 @@ GridCardBlank.defaultProps = {
   afterCreate: null,
   preselected: null,
   replacingId: null,
-  order: null,
   testCollectionCard: false,
   defaultShowWholeImage: false,
 }

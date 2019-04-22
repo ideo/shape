@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import _ from 'lodash'
 import { Fragment } from 'react'
 import pluralize from 'pluralize'
@@ -9,6 +8,7 @@ import { animateScroll as scroll } from 'react-scroll'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 import ChannelManager from '~/utils/ChannelManager'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
+import FoamcoreGrid from '~/ui/grid/FoamcoreGrid'
 import FloatingActionButton from '~/ui/global/FloatingActionButton'
 import Loader from '~/ui/layout/Loader'
 import MoveModal from '~/ui/grid/MoveModal'
@@ -44,7 +44,7 @@ class CollectionPage extends React.Component {
   }
 
   componentDidMount() {
-    this.onAPILoad()
+    this.loadCollectionCards({})
   }
 
   componentDidUpdate(prevProps) {
@@ -59,7 +59,7 @@ class CollectionPage extends React.Component {
       ChannelManager.unsubscribeAllFromChannel(this.channelName)
       // when navigating between collections, close BCT
       this.props.uiStore.closeBlankContentTool()
-      this.onAPILoad()
+      this.loadCollectionCards({})
     }
   }
 
@@ -73,6 +73,18 @@ class CollectionPage extends React.Component {
     return this.props.collection
   }
 
+  loadCollectionCards = async ({ page, per_page, rows, cols }) => {
+    const { collection } = this.props
+    return collection
+      .API_fetchCards({ page, per_page, rows, cols })
+      .then(() => {
+        runInAction(() => {
+          this.cardsFetched = true
+          this.onAPILoad()
+        })
+      })
+  }
+
   async onAPILoad() {
     const {
       collection,
@@ -82,27 +94,22 @@ class CollectionPage extends React.Component {
       undoStore,
     } = this.props
     this.subscribeToChannel(collection.id)
-    // do this here, asynchronously -- don't need to await to perform other actions
-    collection.API_fetchCards().then(() => {
-      runInAction(() => {
-        this.cardsFetched = true
-      })
-      if (collection.collection_cards.length === 0) {
-        uiStore.openBlankContentTool()
-      }
-      if (undoStore.undoAfterRoute) {
-        undoStore.performUndoAfterRoute()
-      }
-      if (uiStore.actionAfterRoute) {
-        uiStore.performActionAfterRoute()
-      }
-      if (collection.awaiting_updates) {
-        this.pollForUpdates()
-      }
-    })
 
     // setViewingCollection has to happen first bc we use it in openBlankContentTool
     uiStore.setViewingCollection(collection)
+
+    if (collection.collection_cards.length === 0) {
+      uiStore.openBlankContentTool()
+    }
+    if (undoStore.undoAfterRoute) {
+      undoStore.performUndoAfterRoute()
+    }
+    if (uiStore.actionAfterRoute) {
+      uiStore.performActionAfterRoute()
+    }
+    if (collection.awaiting_updates) {
+      this.pollForUpdates()
+    }
     if (collection.isSubmissionsCollection) {
       // NOTE: SubmissionsCollections are not meant to be viewable, so we route
       // back to the SubmissionBox instead
@@ -124,6 +131,7 @@ class CollectionPage extends React.Component {
       const message = `${collection.processing_status}...`
       uiStore.popupSnackbar({ message })
     }
+
     uiStore.update('dragTargets', [])
   }
 
@@ -133,7 +141,7 @@ class CollectionPage extends React.Component {
       if (collection.awaiting_updates) {
         const res = await apiStore.fetch('collections', collection.id, true)
         if (!res.data.awaiting_updates) {
-          collection.API_fetchCards()
+          this.loadCollectionCards({})
         } else if (uiStore.dialogConfig.open !== 'loading') {
           uiStore.loadingDialog({
             prompt:
@@ -234,8 +242,9 @@ class CollectionPage extends React.Component {
 
   async _reloadData() {
     const { collection } = this.props
-    const per_page = collection.collection_cards.length || 50
-    collection.API_fetchCards({ per_page })
+    const per_page =
+      collection.collection_cards.length || collection.recordsPerPage
+    this.loadCollectionCards({ per_page })
     if (this.collection.submissions_collection) {
       this.setLoadedSubmissions(false)
       await this.collection.submissions_collection.API_fetchCards()
@@ -246,6 +255,7 @@ class CollectionPage extends React.Component {
   @action
   setLoadedSubmissions = val => {
     const { uiStore } = this.props
+
     if (!this.collection) return
     const { submissions_collection } = this.collection
     if (submissions_collection && submissions_collection.cardIds.length) {
@@ -266,18 +276,7 @@ class CollectionPage extends React.Component {
     Collection.createSubmission(id, submissionSettings)
   }
 
-  updateCollection = ({ card, updates, undoMessage } = {}) => {
-    const { collection } = this.props
-    // this will assign the update attrs to the card and push an undo action
-    collection.API_updateCards({ card, updates, undoMessage })
-    const { uiStore } = this.props
-    uiStore.trackEvent('update', this.collection)
-  }
-
-  batchUpdateCollection = ({ cards, updates, undoMessage } = {}) => {
-    const { collection } = this.props
-    // this will assign the update attrs to the card and push an undo action
-    collection.API_batchUpdateCards({ cards, updates, undoMessage })
+  trackCollectionUpdated = () => {
     const { uiStore } = this.props
     uiStore.trackEvent('update', this.collection)
   }
@@ -325,8 +324,7 @@ class CollectionPage extends React.Component {
         {this.submissionsPageSeparator}
         <CollectionGrid
           {...gridSettings}
-          updateCollection={this.updateCollection}
-          batchUpdateCollection={this.batchUpdateCollection}
+          trackCollectionUpdated={this.trackCollectionUpdated}
           collection={submissions_collection}
           canEditCollection={false}
           // Pass in cardProperties so grid will re-render when they change
@@ -373,7 +371,7 @@ class CollectionPage extends React.Component {
   )
 
   render() {
-    const { collection, isHomepage, uiStore } = this.props
+    const { collection, uiStore } = this.props
     if (!collection) {
       return this.loader()
     }
@@ -393,38 +391,62 @@ class CollectionPage extends React.Component {
       blankContentToolState,
       submissionBoxSettingsOpen,
       gridSettings,
+      selectedArea,
+      cardMenuOpen,
     } = uiStore
+
+    // props shared by Foamcore + Normal
+    const genericCollectionProps = {
+      collection,
+      loadCollectionCards: this.loadCollectionCards,
+      trackCollectionUpdated: this.trackCollectionUpdated,
+      canEditCollection: collection.can_edit_content,
+      // Pass in cardProperties so grid will re-render when they change
+      cardProperties: collection.cardProperties,
+      // Pass in BCT state so grid will re-render when open/closed
+      blankContentToolState,
+      // to trigger a re-render
+      movingCardIds: uiStore.isMovingCards ? [...uiStore.movingCardIds] : [],
+    }
 
     // submissions_collection will only exist for submission boxes
     const { isSubmissionBox, requiresTestDesigner } = collection
+
+    let inner
+    if (collection.isBoard) {
+      inner = (
+        <FoamcoreGrid
+          {...genericCollectionProps}
+          selectedArea={selectedArea}
+          // Included so that component re-renders when area changes
+          selectedAreaMinX={selectedArea.minX}
+          // Trigger re-render if card menu is opened
+          cardIdMenuOpen={cardMenuOpen.id}
+        />
+      )
+    } else if (requiresTestDesigner) {
+      inner = this.renderTestDesigner()
+    } else {
+      inner = (
+        <CollectionGrid
+          {...genericCollectionProps}
+          // pull in cols, gridW, gridH, gutter
+          {...gridSettings}
+          // don't add the extra row for submission box
+          addEmptyCard={!isSubmissionBox}
+          cardsFetched={this.cardsFetched}
+        />
+      )
+    }
+
     return (
       <Fragment>
-        <PageHeader record={collection} isHomepage={isHomepage} />
+        <PageHeader record={collection} />
         {!isLoading && (
-          <PageContainer>
+          <PageContainer fullWidth={collection.isBoard}>
             <OverdueBanner />
             {this.renderEditorPill}
-            {requiresTestDesigner && this.renderTestDesigner()}
-            {!requiresTestDesigner && (
-              <CollectionGrid
-                // pull in cols, gridW, gridH, gutter
-                {...gridSettings}
-                updateCollection={this.updateCollection}
-                batchUpdateCollection={this.batchUpdateCollection}
-                collection={collection}
-                canEditCollection={collection.can_edit_content}
-                // Pass in cardProperties so grid will re-render when they change
-                cardProperties={collection.cardProperties}
-                // Pass in BCT state so grid will re-render when open/closed
-                blankContentToolState={blankContentToolState}
-                // to trigger a re-render
-                movingCardIds={
-                  uiStore.isMovingCards ? [...uiStore.movingCardIds] : []
-                }
-                // don't add the extra row for submission box
-                addEmptyCard={!isSubmissionBox}
-              />
-            )}
+            {inner}
             {(collection.requiresSubmissionBoxSettings ||
               submissionBoxSettingsOpen) && (
               <SubmissionBoxSettingsModal collection={collection} />
@@ -450,16 +472,12 @@ class CollectionPage extends React.Component {
 
 CollectionPage.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
-  isHomepage: PropTypes.bool,
 }
 CollectionPage.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
   undoStore: MobxPropTypes.objectOrObservableObject.isRequired,
-}
-CollectionPage.defaultProps = {
-  isHomepage: false,
 }
 
 export default CollectionPage

@@ -51,13 +51,13 @@ When('I close the snackbar', () => {
 // ----------------------
 // Test Collection setup
 // ----------------------
-When('I add a video', () => {
+When('I add a link URL', () => {
   // assumes BCT is already open
-  cy.locate(`BctButton-video`)
+  cy.locate(`BctButton-link`)
     .first()
     .click()
   cy.locate('BctTextField').type(
-    'https://www.youtube.com/watch?v=Zha0xYuF8dw',
+    'https://www.ideo.com/blog/why-coding-needs-to-be-a-conversation-not-a-list-of-commands',
     {
       force: true,
     }

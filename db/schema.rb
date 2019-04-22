@@ -93,11 +93,14 @@ ActiveRecord::Schema.define(version: 20190418233316) do
     t.boolean "image_contain", default: false
     t.boolean "is_cover", default: false
     t.datetime "unarchived_at"
-    t.integer "filter", default: 1
     t.boolean "hidden", default: false
+    t.integer "filter", default: 1
     t.boolean "show_replace", default: true
+    t.integer "row"
+    t.integer "col"
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
+    t.index ["order", "row", "col"], name: "index_collection_cards_on_order_and_row_and_col"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
     t.index ["templated_from_id"], name: "index_collection_cards_on_templated_from_id"
     t.index ["type"], name: "index_collection_cards_on_type"
@@ -131,9 +134,9 @@ ActiveRecord::Schema.define(version: 20190418233316) do
     t.integer "submission_box_type"
     t.bigint "submission_box_id"
     t.integer "test_status"
+    t.integer "processing_status"
     t.integer "question_item_id"
     t.bigint "test_collection_id"
-    t.integer "processing_status"
     t.bigint "collection_to_test_id"
     t.datetime "unarchived_at"
     t.jsonb "cached_test_scores"

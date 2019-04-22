@@ -2,7 +2,6 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import PrintableInvoice from '~shared/components/compounds/PrintableInvoice'
 import trackError from '~/utils/trackError'
-import v from '~/utils/variables'
 import Box from '~shared/components/atoms/Box'
 
 @inject('networkStore')
@@ -27,7 +26,7 @@ class BillingStatement extends React.Component {
     const { networkStore, match } = this.props
     const invoice = networkStore.find('invoices', match.params.id)
     return invoice ? (
-      <Box mt={v.headerHeightCompact}>
+      <Box>
         <PrintableInvoice
           invoice={invoice}
           organization={invoice.organization}

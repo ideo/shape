@@ -4,9 +4,7 @@ import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import queryString from 'query-string'
 
-import v from '~/utils/variables'
 import Loader from '~/ui/layout/Loader'
-import Header from '~/ui/layout/Header'
 import Deactivated from '~/ui/layout/Deactivated'
 import MoveModal from '~/ui/grid/MoveModal'
 import PageContainer from '~/ui/layout/PageContainer'
@@ -156,8 +154,7 @@ class SearchPage extends React.Component {
 
     return (
       <Fragment>
-        <Header />
-        <PageContainer marginTop={v.headerHeightCompact}>
+        <PageContainer>
           {this.renderSearchResults()}
           <MoveModal />
         </PageContainer>

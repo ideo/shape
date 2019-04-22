@@ -245,7 +245,7 @@ export const QuillStyleWrapper = styled.div`
     }
 
     .ql-container {
-      overflow: visible !important;
+      ${props => (props.notEditing ? '' : 'overflow: visible !important;')};
     }
 
     .ql-cursor {
@@ -258,6 +258,7 @@ export const QuillStyleWrapper = styled.div`
 
     .ql-editor {
       overflow-x: hidden;
+      ${props => (props.notEditing ? 'overflow-y: hidden;' : '')};
     }
   }
 `

@@ -130,7 +130,12 @@ class TextItemCover extends React.Component {
 
   checkTextAreaHeight = height => {
     if (!this.quillEditor) return
-    const textAreaHeight = this.quillEditor.getEditingArea().offsetHeight
+    // The height of the editor is constrained to the container,
+    // we must get the .ql-editor div to calculate text height
+    const qlEditor = this.quillEditor.editingArea.getElementsByClassName(
+      'ql-editor'
+    )[0]
+    const textAreaHeight = qlEditor ? qlEditor.scrollHeight : 0
     // render the Read More link if the text height exceeds viewable area
     if (height && textAreaHeight > height) {
       this.setState({ readMore: true })
@@ -141,6 +146,7 @@ class TextItemCover extends React.Component {
 
   renderEditing() {
     const { item } = this.state
+    const { initialFontTag } = this.props
     if (!item) return ''
     return (
       <RealtimeTextItem
@@ -148,6 +154,7 @@ class TextItemCover extends React.Component {
         currentUserId={apiStore.currentUser.id}
         onExpand={item.id ? this.expand : null}
         onCancel={this.blur}
+        initialFontTag={initialFontTag}
         // if we are rendering editing then the item has been fetched
         fullyLoaded
       />
@@ -183,7 +190,7 @@ class TextItemCover extends React.Component {
         class="cancelGridClick"
         onClick={this.handleClick}
       >
-        <QuillStyleWrapper>
+        <QuillStyleWrapper notEditing={!isEditing}>
           {this.state.loading && <InlineLoader />}
           {content}
           {this.state.readMore &&
@@ -203,6 +210,7 @@ TextItemCover.propTypes = {
   dragging: PropTypes.bool.isRequired,
   cardId: PropTypes.string.isRequired,
   handleClick: PropTypes.func.isRequired,
+  initialFontTag: PropTypes.string.isRequired,
   height: PropTypes.number,
   searchResult: PropTypes.bool,
 }

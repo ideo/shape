@@ -4705,6 +4705,11 @@ elegant-spinner@^1.0.1:
   resolved "https://registry.yarnpkg.com/elegant-spinner/-/elegant-spinner-1.0.1.tgz#db043521c95d7e303fd8f345bedc3349cfb0729e"
   integrity sha1-2wQ1IcldfjA/2PNFvtwzSc+wcp4=
 
+element-matches-polyfill@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/element-matches-polyfill/-/element-matches-polyfill-1.0.0.tgz#3d97b361c9f8101ed1ce8bb450cef874dadda283"
+  integrity sha512-6xnaB9NpWYmSgWP1/njuCanX1nopjVZRvSivd9cX7cfURGdldeT46g+3ph1pfNNiiPvHLjfhUk/8HXQkbcu7ng==
+
 elliptic@^6.0.0:
   version "6.4.1"
   resolved "https://registry.yarnpkg.com/elliptic/-/elliptic-6.4.1.tgz#c2d0b7776911b86722c632c3c06c60f2f819939a"

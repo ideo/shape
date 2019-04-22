@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MovableGridCard renders snapshot 1`] = `
+<styled.div>
+  <form
+    className="form"
+    onSubmit={[Function]}
+  >
+    <BctTextField
+      autoFocus={true}
+      data-cy="CollectionCreatorTextField"
+      onChange={[Function]}
+      onKeyDown={[Function]}
+      placeholder="Collection name"
+      value=""
+    />
+    <StyledFormButton
+      color="#120f0e"
+      data-cy="CollectionCreatorFormButton"
+      disabled={false}
+      width={125}
+    >
+      Add
+    </StyledFormButton>
+  </form>
+</styled.div>
+`;
