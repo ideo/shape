@@ -310,13 +310,19 @@ class MovableGridCard extends React.PureComponent {
   }
 
   handleResize = (e, dir, ref, delta, position) => {
+    const { isBoardCollection, zoomLevel } = this.props
     if (!this.state.resizing) {
       this.setState({ resizing: true, moveComplete: false })
       uiStore.resetSelectionAndBCT()
       // close the MoveMenu to prevent weird behaviors
       uiStore.closeMoveMenu()
     }
-    const { gridW, gridH, cols } = uiStore.gridSettings
+    const gridSettings = isBoardCollection
+      ? uiStore.defaultGridSettings
+      : uiStore.gridSettings
+    const { cols } = gridSettings
+    const gridW = gridSettings.gridW / zoomLevel
+    const gridH = gridSettings.gridH / zoomLevel
     const { card } = this.props
     const pad = 0.75
     const newSize = {
@@ -508,18 +514,20 @@ class MovableGridCard extends React.PureComponent {
       return this.renderPagination()
     }
 
-    const { gridW, gridH, cols, gutter } = uiStore.gridSettings
+    const gridSettings = isBoardCollection
+      ? uiStore.defaultGridSettings
+      : uiStore.gridSettings
+    const { gridW, gridH, cols, gutter } = gridSettings
     // TODO: esp. for foamcore, change this min/max pixel based resize logic...
     // resize placeholder should determine if it's overlapping an empty spot or not
     const minWidth = (gridW * 0.8) / zoomLevel
     const minHeight = (gridH * 0.8) / zoomLevel
-    // need to always set Rnd maxWidth to 4 columns instead of `cols`
+    // need to always set Rnd maxWidth to full amount (e.g. don't divide by zoomLevel)
     // because of this issue: https://github.com/bokuweb/react-rnd/issues/221
-    const maxWidth = (maxResizeCol * (gridW + gutter)) / zoomLevel
-    const maxHeight =
-      uiStore.gridHeightFor(maxResizeRow, {
-        useDefault: true,
-      }) / zoomLevel
+    const maxWidth = maxResizeCol * (gridW + gutter)
+    const maxHeight = uiStore.gridHeightFor(maxResizeRow, {
+      useDefault: true,
+    })
 
     let xAdjust = 0
     let yAdjust = 0
