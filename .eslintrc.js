@@ -47,9 +47,6 @@ module.exports = {
       "Object.assign",
       "Object.values",
       "fetch",
-      "window.scrollX",
-      "window.scrollY",
-      "navigator.maxTouchPoints",
       "Array.prototype.push"
     ],
   },
