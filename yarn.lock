@@ -372,6 +372,13 @@
   resolved "https://registry.yarnpkg.com/@nodelib/fs.stat/-/fs.stat-1.1.1.tgz#53f349bb986ab273d601175aa1b25a655ab90ee3"
   integrity sha512-KU/VDjC5RwtDUZiz3d+DHXJF2lp5hB9dn552TXIyptj8SH1vXmR40mG0JgGq03IlYsOgGfcv8xrLpSQ0YUMQdA==
 
+"@prettier/plugin-ruby@^0.12.1":
+  version "0.12.1"
+  resolved "https://registry.yarnpkg.com/@prettier/plugin-ruby/-/plugin-ruby-0.12.1.tgz#0af18c2334b3d2d9fc0b8c5b9b04ecea0d7aaf95"
+  integrity sha512-bdZL3se3dDLHfOb71cjio2kHY/9ln23nKBElnjJciSi5qN6qLNAiKksQgs3Dt6rHhfUhh2ofYrmwqTADEJgd/A==
+  dependencies:
+    prettier "^1.16.4"
+
 "@rails/webpacker@4.0.0-pre.2":
   version "4.0.0-pre.2"
   resolved "https://registry.yarnpkg.com/@rails/webpacker/-/webpacker-4.0.0-pre.2.tgz#66be9b5eac9e5f54030de4dde93820a626e70657"
@@ -10860,6 +10867,11 @@ prettier@^1.12.1, prettier@^1.14.2:
   version "1.14.2"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.14.2.tgz#0ac1c6e1a90baa22a62925f41963c841983282f9"
   integrity sha512-McHPg0n1pIke+A/4VcaS2en+pTNjy4xF+Uuq86u/5dyDO59/TtFZtQ708QIRkEZ3qwKz3GVkVa6mpxK/CpB8Rg==
+
+prettier@^1.16.4:
+  version "1.17.0"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.17.0.tgz#53b303676eed22cc14a9f0cec09b477b3026c008"
+  integrity sha512-sXe5lSt2WQlCbydGETgfm1YBShgOX4HxQkFPvbxkcwgDvGDeqVau8h+12+lmSVlP3rHPz0oavfddSZg/q+Szjw==
 
 pretty-bytes@^4.0.2:
   version "4.0.2"
