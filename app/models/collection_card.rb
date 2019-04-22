@@ -15,6 +15,7 @@ class CollectionCard < ApplicationRecord
   attr_accessor :external_id
 
   before_validation :assign_order, if: :assign_order?
+  before_validation :ensure_width_and_height
 
   before_create :assign_default_height_and_width
   after_update :update_collection_cover, if: :saved_change_to_is_cover?
@@ -346,6 +347,11 @@ class CollectionCard < ApplicationRecord
 
   def assign_order
     self.order = parent.collection_cards.maximum(:order) || 0
+  end
+
+  def ensure_width_and_height
+    self.width = 1 if width.nil?
+    self.height = 1 if height.nil?
   end
 
   def resourceable_class
