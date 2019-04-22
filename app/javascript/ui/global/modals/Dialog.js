@@ -147,7 +147,7 @@ Dialog.defaultProps = {
   overrideWithLoader: false,
 }
 // all propTypes except required `children` node, to be used by Information/ConfirmationModal
-const { children, ...childPropTypes } = Dialog.propTypes
+const { ...childPropTypes } = Dialog.propTypes
 Dialog.childPropTypes = childPropTypes
 
 export default Dialog

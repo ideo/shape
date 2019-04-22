@@ -2,9 +2,14 @@
   "name": "Shape",
   "private": true,
   "engines": {
-    "node": "~8.9.1",
+    "node": "~8.15.0",
     "yarn": "^1.10.0"
   },
+  "browserslist": [
+    "ie 11",
+    "last 1 version",
+    "> 1%"
+  ],
   "scripts": {
     "styleguide": "yarn styleguidist server",
     "test": "jest --watch",
@@ -78,6 +83,7 @@
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-react": "^6.24.1",
+    "browserslist": "^4.5.5",
     "caniuse-lite": "^1.0.30000830",
     "date-fns": "2.0.0-alpha.27",
     "datx": "^0.11.4",
@@ -167,10 +173,8 @@
     "enzyme-adapter-react-16": "^1.1.1",
     "enzyme-to-json": "^3.3.3",
     "eslint": "^4.16.0",
-    "eslint-config-airbnb": "~16.1.0",
-    "eslint-config-standard": "10.2.1",
-    "eslint-config-standard-react": "5.0.0",
     "eslint-import-resolver-babel-module": "^4.0.0",
+    "eslint-plugin-compat": "^3.1.1",
     "eslint-plugin-cypress": "^2.0.1",
     "eslint-plugin-import": "~2.8.0",
     "eslint-plugin-jest": "^21.7.0",
@@ -193,6 +197,7 @@
     "webpack-bundle-analyzer": "^2.11.1",
     "webpack-dev-server": "^3.1.3"
   },
+
   "resolutions": {
     "react-draggable": "git+https://git@github.com/ideo/react-draggable.git#3.0.5-beta.1",
     "@cypress/browserify-preprocessor": "1.0.3"
