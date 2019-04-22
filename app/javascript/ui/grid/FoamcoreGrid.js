@@ -952,7 +952,7 @@ class FoamcoreGrid extends React.Component {
     )
   }
 
-  positionBct({ col, row }) {
+  positionBct({ col, row, width, height }) {
     // TODO this has to be documented
     const blankContentTool = {
       id: 'blank',
@@ -961,8 +961,8 @@ class FoamcoreGrid extends React.Component {
       blankType: null,
       col,
       row,
-      width: 1,
-      height: 1,
+      width,
+      height,
     }
     return this.renderMovableCard(blankContentTool, `bct-${col}:${row}`, {})
   }
