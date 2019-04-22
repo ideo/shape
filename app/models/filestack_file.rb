@@ -76,17 +76,21 @@ class FilestackFile < ApplicationRecord
     }
   end
 
-  def self.signed_url(handle)
+  def self.signed_url(handle, type:)
     token = security_token
     %(https://process.filestackapi.com/#{ENV['FILESTACK_API_KEY']}
       /security=policy:#{token[:policy]},signature:#{token[:signature]}
-      /rotate=deg:exif
+      /#{type == :video ? 'video_convert=preset:h264' : 'rotate=deg:exif'}
       /#{handle}
     ).gsub(/\s+/, '')
   end
 
   def signed_url
-    FilestackFile.signed_url(handle)
+    FilestackFile.signed_url(handle, type: :image)
+  end
+
+  def video_conversion_url
+    FilestackFile.signed_url(handle, type: :video)
   end
 
   def filestack_filelink

@@ -1,6 +1,8 @@
 import AddSubmission from '~/ui/grid/blankContentTool/AddSubmission'
 import Collection from '~/stores/jsonApi/Collection'
 import fakeUiStore from '#/mocks/fakeUiStore'
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
+
 import { fakeCollection, fakeCollectionCard } from '#/mocks/data'
 
 jest.mock('../../../../app/javascript/stores/index')
@@ -22,6 +24,10 @@ describe('GridCardBlank', () => {
       },
     }
     wrapper = shallow(<AddSubmission.wrappedComponent {...props} />)
+  })
+
+  it('renders snapshot', () => {
+    expectTreeToMatchSnapshot(wrapper)
   })
 
   describe('render()', () => {

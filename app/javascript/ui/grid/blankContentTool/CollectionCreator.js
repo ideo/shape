@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import { BctTextField, FormButton } from '~/ui/global/styled/forms'
 import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
-import { KEYS } from '~/utils/variables'
+import v, { KEYS } from '~/utils/variables'
 import { routingStore } from '~/stores'
 
 class CollectionCreator extends React.Component {
@@ -12,6 +12,7 @@ class CollectionCreator extends React.Component {
   }
 
   onInputChange = e => {
+    if (e.target.value.length > v.maxTitleLength) return
     this.setState({
       inputText: e.target.value,
     })
@@ -30,6 +31,7 @@ class CollectionCreator extends React.Component {
     let dbType = null
     if (type === 'submissionBox') dbType = 'Collection::SubmissionBox'
     else if (type === 'testCollection') dbType = 'Collection::TestCollection'
+    else if (type === 'foamcoreBoard') dbType = 'Collection::Board'
     createCard(
       {
         // `collection` is the collection being created within the card
@@ -87,6 +89,7 @@ CollectionCreator.propTypes = {
     'template',
     'testCollection',
     'submissionBox',
+    'foamcoreBoard',
   ]),
   createCard: PropTypes.func.isRequired,
   closeBlankContentTool: PropTypes.func.isRequired,

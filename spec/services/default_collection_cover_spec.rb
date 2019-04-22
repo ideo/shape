@@ -1,8 +1,8 @@
 require 'rails_helper'
 
-RSpec.describe CollectionCover, type: :service do
-  describe '#generate' do
-    let(:collection_cover) { CollectionCover.call(collection) }
+RSpec.describe DefaultCollectionCover, type: :service do
+  describe '#call' do
+    let(:collection_cover) { DefaultCollectionCover.call(collection) }
 
     context 'with normal settings, text and image' do
       let!(:collection) { create(:collection) }
@@ -38,6 +38,14 @@ RSpec.describe CollectionCover, type: :service do
           image_item.archive!
           expect(video_item.reload.is_cover?).to be true
           expect(collection.cached_cover['image_url']).to eq video_item.item.image_url
+        end
+      end
+
+      context 'with cover_type_items' do
+        before { collection.update(cover_type: :cover_type_items) }
+
+        it 'returns empty {}' do
+          expect(collection_cover).to be_empty
         end
       end
     end

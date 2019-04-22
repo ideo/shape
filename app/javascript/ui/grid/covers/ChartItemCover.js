@@ -22,6 +22,7 @@ import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
 
 const CoverContainer = styled.div`
+  height: 87%;
   padding: 16px;
 `
 

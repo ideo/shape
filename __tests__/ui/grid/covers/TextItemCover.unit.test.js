@@ -1,5 +1,6 @@
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
-import { uiStore } from '~/stores'
+import { apiStore, uiStore } from '~/stores'
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 import { fakeTextItem } from '#/mocks/data'
 
@@ -12,6 +13,7 @@ const props = {
   height: 200,
   cardId: '1',
   handleClick: jest.fn(),
+  initialFontTag: 'P',
 }
 const e = {
   stopPropagation: jest.fn(),
@@ -25,6 +27,10 @@ describe('TextItemCover', () => {
     component = wrapper.instance()
   })
 
+  it('renders snapshot', () => {
+    expectTreeToMatchSnapshot(wrapper)
+  })
+
   it('renders Quill with item.data_content', () => {
     expect(wrapper.find('Quill').props().value).toBe(item.data_content)
   })
@@ -32,7 +38,11 @@ describe('TextItemCover', () => {
   it('renders Read More if text height exceeds the viewable area', () => {
     const inst = wrapper.instance()
     inst.quillEditor = {
-      getEditingArea: () => ({ offsetHeight: 900 }),
+      editingArea: {
+        getElementsByClassName: jest
+          .fn()
+          .mockReturnValue([{ scrollHeight: 500 }]),
+      },
     }
     inst.componentDidMount()
     // force re-render to pick up state update
@@ -44,7 +54,11 @@ describe('TextItemCover', () => {
   it('does not render Read More if text height fits within the viewable area', () => {
     const inst = wrapper.instance()
     inst.quillEditor = {
-      getEditingArea: () => ({ offsetHeight: 50 }),
+      editingArea: {
+        getElementsByClassName: jest
+          .fn()
+          .mockReturnValue([{ scrollHeight: 100 }]),
+      },
     }
     inst.componentDidMount()
     wrapper.update()
@@ -53,37 +67,51 @@ describe('TextItemCover', () => {
   })
 
   describe('handleClick', () => {
-    it('returns false if you are dragging', () => {
+    it('returns false if you are dragging', async () => {
       wrapper.setProps({ dragging: true })
-      expect(component.handleClick(e)).toBe(false)
+      const result = await component.handleClick(e)
+      expect(result).toBe(false)
     })
 
-    it("returns false if you can't edit content", () => {
+    it("returns false if you can't edit content", async () => {
       wrapper.setProps({
         dragging: false,
         item: { ...item, can_edit_content: false },
       })
-      expect(component.handleClick(e)).toBe(false)
+      const result = await component.handleClick(e)
+      expect(result).toBe(false)
     })
 
-    it('returns false if searchResult is true', () => {
+    it('returns false if searchResult is true', async () => {
       wrapper.setProps({
         dragging: false,
         item: { ...item, searchResult: true },
       })
-      expect(component.handleClick(e)).toBe(false)
+      const result = await component.handleClick(e)
+      expect(result).toBe(false)
     })
 
-    it('calls uiStore.update textEditingItem if can_edit_content', () => {
+    it('calls uiStore.update textEditingItem if can_edit_content', async () => {
       wrapper.setProps({
         dragging: false,
         item: { ...item, can_edit_content: true },
       })
-      expect(component.handleClick(e)).toBe(null)
+      const result = await component.handleClick(e)
+      expect(result).toBe(null)
       expect(uiStore.update).toHaveBeenCalledWith(
         'textEditingItem',
         expect.any(Object)
       )
+    })
+
+    it('calls apiStore.fetch item if can_edit_content', async () => {
+      wrapper.setProps({
+        dragging: false,
+        item: { ...item, can_edit_content: true },
+      })
+      const result = await component.handleClick(e)
+      expect(result).toBe(null)
+      expect(apiStore.fetch).toHaveBeenCalledWith('items', item.id, true)
     })
   })
 })

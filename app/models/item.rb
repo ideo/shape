@@ -23,7 +23,8 @@ class Item < ApplicationRecord
                  :cached_filestack_file_url,
                  :cached_filestack_file_info,
                  :previous_thumbnail_urls,
-                 :cached_inheritance
+                 :cached_inheritance,
+                 :pending_transcoding_uuid
 
   # The card that 'holds' this item and determines its breadcrumb
   has_one :parent_collection_card,
@@ -44,6 +45,8 @@ class Item < ApplicationRecord
   has_one :question_item, class_name: 'Item::QuestionItem'
 
   scope :questions, -> { where(type: 'Item::QuestionItem') }
+  scope :data_items, -> { where(type: 'Item::DataItem') }
+  scope :legend_items, -> { where(type: 'Item::LegendItem') }
 
   before_validation :format_url, if: :saved_change_to_url?
   before_create :generate_name, unless: :name_present?
@@ -142,6 +145,9 @@ class Item < ApplicationRecord
       )
       i.parent_collection_card.item = i
     end
+
+    # Method from Externalizable
+    duplicate_external_records(i)
 
     # Method from HasFilestackFile
     filestack_file_duplicate!(i)

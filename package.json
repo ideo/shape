@@ -26,7 +26,8 @@
       "__js_test_config"
     ],
     "moduleNameMapper": {
-      ".+\\.(css|styl|less|sass|scss|png|jpg|svg|ttf|woff|woff2|otf)$": "identity-obj-proxy"
+      ".+\\.(css|styl|less|sass|scss|png|jpg|svg|ttf|woff|woff2|otf)$": "identity-obj-proxy",
+      "ideo-sso": "<rootDir>/__mocks__/ideo-sso.js"
     },
     "testPathIgnorePatterns": [
       "/config/webpack/"
@@ -78,12 +79,14 @@
     "babel-polyfill": "^6.26.0",
     "babel-preset-react": "^6.24.1",
     "caniuse-lite": "^1.0.30000830",
+    "date-fns": "2.0.0-alpha.27",
     "datx": "^0.11.4",
     "datx-jsonapi": "^0.11.4",
     "draft-js": "^0.10.5",
     "draft-js-linkify-plugin": "^2.0.1",
     "draft-js-mention-plugin": "^3.0.4",
     "draft-js-plugins-editor": "^2.0.8",
+    "element-matches-polyfill": "^1.0.0",
     "eslint-config-prettier": "^3.0.1",
     "eslint-plugin-prettier": "^2.6.2",
     "filestack-js": "^0.11.2",
@@ -110,6 +113,8 @@
     "prettier": "^1.14.2",
     "prop-types": "^15.6.2",
     "query-string": "5.1.0",
+    "quill-cursors": "^2.1.0",
+    "quill-delta": "^4.2.0",
     "react": "^16.4.2",
     "react-autosize-textarea": "^3.0.3",
     "react-copy-to-clipboard": "^5.0.1",

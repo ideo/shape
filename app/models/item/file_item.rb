@@ -25,8 +25,30 @@ class Item
       filestack_file && filestack_file.mimetype.split('/').first
     end
 
+    def mime_ext_type
+      filestack_file && filestack_file.mimetype.split('/').last
+    end
+
     def image?
       filestack_file && mime_base_type == 'image'
+    end
+
+    def video?
+      filestack_file && mime_base_type == 'video'
+    end
+
+    def transcode!
+      return if filestack_file.blank?
+      return if mime_ext_type == 'mp4'
+      response = HTTParty.get(filestack_file.video_conversion_url)
+      conversion_result = JSON.parse(response.body)
+      update(
+        pending_transcoding_uuid: conversion_result['uuid'],
+      )
+    end
+
+    def self.find_by_transcoding_uuid(uuid)
+      where("cached_attributes->>'pending_transcoding_uuid' = '#{uuid}'").first
     end
 
     private

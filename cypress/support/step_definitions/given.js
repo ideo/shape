@@ -7,14 +7,14 @@ Given('I visit the Marketing Page', () => {
 
 Given('I login and visit My Collection', () => {
   // user 4 is our test user
-  cy.login({ userId: 4 })
+  cy.login({ email: 'cypress-test@ideo.com' })
   // go to My Collection
   cy.visit('/')
   cy.wait('@apiGetCurrentUser')
 })
 
 Given('I login and visit the Test Area', () => {
-  cy.login({ userId: 4 })
+  cy.login({ email: 'cypress-test@ideo.com' })
   // go to My Collection
   cy.visit('/')
   cy.wait('@apiGetCurrentUser')

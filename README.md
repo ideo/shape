@@ -3,6 +3,7 @@
 Here are the commands you can use to get started:
 
 Install all the libraries first:
+
 ```
 brew install nvm
 nvm install 8.9.4
@@ -10,10 +11,16 @@ brew install yarn
 curl -L https://get.rvm.io | bash -s stable --auto-dotfiles --autolibs=enable --rails
 brew install postgresql
 brew install redis
+brew install elasticsearch
 brew install heroku/brew/heroku
+
+# use homebrew services to start elasticsearch and redis in the background
+brew services start redis
+brew services start elasticsearch
 ```
 
 Clone the app and install the gems:
+
 ```
 git clone <clone URL>
 cd shape/
@@ -30,6 +37,7 @@ git submodule update
 ```
 
 Setup the `.env` file with valid credentials:
+
 ```
 cp .env.example .env
 # modify credentials
@@ -38,7 +46,7 @@ cp .env.example .env
 Create the database and migrate:
 
 ```
-rails db:setup 
+rails db:setup
 
 # get access to Shell commands in Terminal
 source ./shell-commands
@@ -49,45 +57,77 @@ shapecopydb local
 
 Run tests:
 
+Rails Unit & Controller Tests
+
 ```
 # run rails tests once:
 bin/rspec
 # watch files and re-run tests:
 bundle exec guard
+```
 
+Jest Unit Tests
+
+```
 # run JS tests once:
 yarn run jest
 # watch files and re-run JS tests:
 yarn test
 ```
 
+Cypress Integration Tests
+
+Note: Make sure to select **Electron** as your browser in the cypress dropdown when running it locally.
+
+```
+# Run cypress integration tests:
+yarn cypress-ci
+
+# Or control the tests:
+yarn cypress
+```
+
 ## Running your dev environment
 
 1. Run your webpack server:
+
 ```
-bin/webpack-dev-server
-```
-2. Run your sidekiq worker:
-```
-bundle exec sidekiq -e ${RACK_ENV:-development} -C config/sidekiq.yml
-```
-3. Run your rails server:
-```
-bin/rails s
+heroku local webpack -f Procfile.development
 ```
 
-### Use ttab for quick dev environment setup
+2. Run your sidekiq worker:
+
+```
+heroku local worker -f Procfile.development
+```
+
+3. Run your rails server:
+
+```
+rails s
+```
+
+### (Optional) Use ttab for quick dev environment setup
+
 Install ttab and [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli#download-and-install):
+
 ```
 npm install -g ttab
 ```
 
 Run dev script:
+
 ```
 ./dev.sh
 ```
+
 This will open separate tabs to:
-  1. Run the webpack dev server and sidekiq worker
-  1. Run the rails server
-  1. Open [Atom](https://atom.io/) in the project directory
-And will open your browser (may need to refresh page after initial webpack)
+
+1. Run the webpack dev server and sidekiq worker
+1. Run the rails server
+1. Open [Atom](https://atom.io/) in the project directory
+   And will open your browser (may need to refresh page after initial webpack)
+
+```
+
+```

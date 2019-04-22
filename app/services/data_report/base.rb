@@ -9,11 +9,8 @@ module DataReport
       @filters = override_measures[:d_filters] || data_item.d_filters
       @timeframe = override_measures[:d_timeframe] || data_item.d_timeframe
       @return_records = return_records
-      @data = {
-        # e.g. if there was a chart of values...
-        values: [],
-        value: 0,
-      }
+      @data = []
+      @single_value = nil
     end
 
     def call

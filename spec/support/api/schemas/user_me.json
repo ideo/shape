@@ -19,8 +19,7 @@
     "user_profile_collection_id": { "type": ["string", "null"] },
     "notify_through_email": { "type": "boolean" },
     "mailing_list": { "type": "boolean" },
-    "google_auth_token": { "type": "string" },
-    "filestack_token": { "type": ["object"] }
+    "google_auth_token": { "type": "string" }
   },
   "required": ["email", "first_name", "last_name", "status"]
 }

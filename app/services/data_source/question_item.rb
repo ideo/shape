@@ -51,7 +51,15 @@ module DataSource
       counts = survey_answers.group(QuestionAnswer.arel_table[:answer_number]).count
       counts.each do |answer_number, count|
         answer_data = data.find { |d| d[:answer] == answer_number }
-        answer_data[:num_responses] = count
+        begin
+          answer_data[:num_responses] = count
+        rescue => e
+          Appsignal.set_error(e,
+                              answer_number: answer_number.to_s,
+                              question_item: survey_answers.first.question_id.to_s,
+                              counts: counts.map { |p| '%s="%s"' % p }.join(', '))
+          next
+        end
       end
       data
     end

@@ -1,0 +1,53 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LegendItemCover renders snapshot 1`] = `
+<styled.div>
+  <Styled(StyledHeading3)>
+    My Cool Item
+  </Styled(StyledHeading3)>
+  <Measure
+    key="measure-Business Unit"
+  >
+    <styled.span>
+      <styled.span
+        color="#9874AB"
+      />
+    </styled.span>
+    <StyledDisplayText>
+      Business Unit
+    </StyledDisplayText>
+  </Measure>
+  <Measure
+    key="measure-95th Percentile"
+  >
+    <styled.span>
+      <LineChartMeasure
+        color="#000000"
+        order={1}
+      />
+    </styled.span>
+    <StyledDisplayText>
+      95th Percentile
+    </StyledDisplayText>
+    <UnselectMeasure
+      onClick={[Function]}
+      role="button"
+    >
+      <XIcon />
+    </UnselectMeasure>
+  </Measure>
+  <br />
+  <styled.div>
+    <StyledHeading3
+      className="add-comparison-button"
+      onClick={[Function]}
+      role="button"
+    >
+      <PlusIcon
+        viewBox="0 0 5 18"
+      />
+      Add Comparison
+    </StyledHeading3>
+  </styled.div>
+</styled.div>
+`;

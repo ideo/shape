@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { observable } from "mobx"
 
 const fakeJsonApiAttrs = {
   assign: jest.fn(),
@@ -14,11 +15,14 @@ export const fakeCollectionCard = {
   order: 1,
   height: 1,
   width: 1,
+  row: 0,
+  col: 1,
   maxWidth: 1,
   maxHeight: 1,
   record: {},
   item: {},
   reference: false,
+  image_contain: false,
   beginReplacing: jest.fn(),
   API_create: jest.fn(),
   API_archive: jest.fn(),
@@ -38,8 +42,121 @@ export const fakeTextItemAttrs = {
   can_edit: false,
   inherited_tag_list: [],
   internalType: 'items',
+  fullyLoaded: true,
   parent_collection_card: fakeCollectionCard,
 }
+
+export const fakeDataset = {
+  measure: 'participants',
+  description: 'A description',
+  timeframe: 'month',
+  chart_type: 'area',
+  order: 0,
+  data: [
+    { date: '2018-07-10', value: 10 },
+    { date: '2018-08-10', value: 25 },
+    { date: '2018-09-10', value: 30 },
+  ],
+}
+
+export const fakeDataItemCollectionsItemsAttrs = {
+  ...fakeTextItemAttrs,
+  type: 'Item::DataItem',
+  data_content: null,
+  report_type: 'report_type_collections_and_items',
+  isReportTypeCollectionsItems: true,
+  isReportTypeNetworkAppMetric: false,
+  isReportTypeRecord: false,
+  data_settings: {
+    d_measure: 'participants',
+    d_timeframe: 'month'
+  },
+  measure: {
+    name: 'Participants'
+  },
+  primaryDataset: fakeDataset,
+  datasets: [
+    fakeDataset
+  ],
+}
+
+export const fakeLegendItemAttrs = {
+  ...fakeTextItemAttrs,
+  type: 'Item::LegendItem',
+  primary_measure: {
+    measure: 'Business Unit',
+    order: 0,
+    style: { fill: '#9874AB' }
+  },
+  comparison_measures: [
+    {
+      measure: '95th Percentile',
+      order: 1
+    },
+    {
+      measure: '75th Percentile',
+      order: 2
+    },
+  ],
+  data_settings: {
+    selected_measures: observable([
+      '95th Percentile'
+    ])
+  }
+}
+
+export const fakeLegendItem = {
+  ...fakeLegendItemAttrs,
+  rawAttributes: jest.fn().mockReturnValue(fakeLegendItemAttrs),
+  getRecordType: jest.fn().mockReturnValue('items'),
+  save: jest.fn().mockReturnValue(Promise.resolve({})),
+}
+
+export const fakeLegendItemCard = {
+  ...fakeItemCard,
+  record: fakeLegendItem
+}
+
+export const creativeDifferenceQualityDataset = {
+  measure: 'Purpose',
+  description:
+    'The degree to which there is alignment about a meaningful change that leadership and employees want to make in the world.',
+  timeframe: 'month',
+  chart_type: 'area',
+  single_value: 0,
+  order: 0,
+  style: {
+    fill: '#EFEFEF',
+    dashWidth: 2,
+  },
+  data: [
+    { date: '2018-07-10', value: 10 },
+    { date: '2018-08-10', value: 25 },
+    { date: '2018-09-10', value: 30 },
+  ],
+}
+
+export const fakeDataItemRecordAttrs = {
+  ...fakeTextItemAttrs,
+  type: 'Item::DataItem',
+  data_content: null,
+  name: 'Data Item',
+  report_type: 'report_type_record',
+  isReportTypeCollectionsItems: false,
+  isReportTypeNetworkAppMetric: false,
+  isReportTypeRecord: true,
+  primaryDataset: creativeDifferenceQualityDataset,
+  datasets: [
+    creativeDifferenceQualityDataset,
+    {
+      ...creativeDifferenceQualityDataset,
+      measure: '95th Percentile',
+      order: 1,
+      chart_type: 'line'
+    }
+  ],
+}
+
 export const fakeTextItem = {
   ...fakeTextItemAttrs,
   rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
@@ -192,6 +309,7 @@ export const fakeItemCard = {
   maxWidth: 1,
   record: fakeTextItem,
   item: fakeTextItem,
+  image_contain: false,
   API_create: jest.fn(),
   API_archive: jest.fn(),
   API_linkToMyCollection: jest.fn(),
@@ -231,14 +349,18 @@ export const fakeCollection = {
   parent_collection_card: fakeCollectionCard,
   // This is a computed property on the collection store
   cardIds: _.map(fakeCards, c => c.id),
+  cardIdsWithinRectangle: jest.fn().mockReturnValue([]),
   API_archive: jest.fn(),
-  API_updateCards: jest.fn(),
+  API_updateCard: jest.fn(),
   API_updateName: jest.fn(),
   API_getNextAvailableTest: jest.fn(),
   API_clearCollectionCover: jest.fn(),
   API_fetchCards: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_batchUpdateCards: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_batchUpdateCardsWithUndo: jest.fn().mockReturnValue(Promise.resolve({})),
   checkCurrentOrg: jest.fn(),
   confirmEdit: jest.fn(),
+  updateScrollBottom: jest.fn(),
   cardProperties: [],
   internalType: 'collections',
   meta: {

@@ -1,5 +1,6 @@
 import GridCard from '~/ui/grid/GridCard'
 import { uiStore } from '~/stores'
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 import {
   fakeItemCard,
@@ -39,6 +40,10 @@ describe('GridCard', () => {
         rerender()
       })
 
+      it('renders snapshot', () => {
+        expectTreeToMatchSnapshot(wrapper)
+      })
+
       it('renders a StyledGridCard with passed in dragging prop', () => {
         expect(wrapper.find('StyledGridCard').props().dragging).toBe(
           props.dragging
@@ -76,6 +81,10 @@ describe('GridCard', () => {
         props.canEditCollection = true
         wrapper.setProps(props)
         rerender()
+      })
+
+      it('renders snapshot', () => {
+        expectTreeToMatchSnapshot(wrapper)
       })
 
       it('passes canEdit to menu', () => {
@@ -147,34 +156,6 @@ describe('GridCard', () => {
       })
     })
 
-    describe('with a pdf file', () => {
-      beforeEach(() => {
-        props.card.record = { ...fakeFileItem }
-        props.record = props.card.record
-        props.record.isPdfFile = true
-        props.cardType = 'items'
-        rerender()
-      })
-
-      it('renders a generic file cover', () => {
-        expect(wrapper.find('PdfFileItemCover').exists()).toBeTruthy()
-      })
-    })
-
-    describe('with a generic file', () => {
-      beforeEach(() => {
-        props.card.record = { ...fakeFileItem }
-        props.record = props.card.record
-        props.record.isGenericFile = true
-        props.cardType = 'items'
-        rerender()
-      })
-
-      it('renders a generic file cover', () => {
-        expect(wrapper.find('GenericFileItemCover').exists()).toBeTruthy()
-      })
-    })
-
     describe('with a private item', () => {
       beforeEach(() => {
         props.card.record = { ...fakeTextItem, is_private: true }
@@ -202,10 +183,8 @@ describe('GridCard', () => {
         rerender()
       })
 
-      it('renders the collection cover', () => {
-        expect(wrapper.find('CollectionCover').props().collection).toEqual(
-          fakeCollection
-        )
+      it('renders snapshot', () => {
+        expectTreeToMatchSnapshot(wrapper)
       })
 
       it('renders the collection icon', () => {
@@ -234,6 +213,10 @@ describe('GridCard', () => {
         rerender()
       })
 
+      it('renders snapshot', () => {
+        expectTreeToMatchSnapshot(wrapper)
+      })
+
       it('passes canEdit to menu', () => {
         expect(wrapper.find('ActionMenu').props().canEdit).toBe(true)
       })
@@ -251,6 +234,10 @@ describe('GridCard', () => {
         rerender()
       })
 
+      it('renders snapshot', () => {
+        expectTreeToMatchSnapshot(wrapper)
+      })
+
       it('renders selection circle and card menu, but no hotspot', () => {
         expect(wrapper.find('SelectionCircle').exists()).toBe(true)
         expect(wrapper.find('ActionMenu').exists()).toBe(true)
@@ -264,6 +251,10 @@ describe('GridCard', () => {
         props.canEditCollection = true
         props.record.menuDisabled = true
         rerender()
+      })
+
+      it('renders snapshot', () => {
+        expectTreeToMatchSnapshot(wrapper)
       })
 
       it('does not render ActionMenu', () => {
@@ -294,7 +285,11 @@ describe('GridCard', () => {
       rerender()
     })
 
-    it('renders the colored to indicate selection', () => {
+    it('renders snapshot', () => {
+      expectTreeToMatchSnapshot(wrapper)
+    })
+
+    it('renders the colored circle to indicate selection', () => {
       expect(wrapper.find('StyledGridCard').props().selected).toBe(true)
     })
   })
@@ -302,12 +297,20 @@ describe('GridCard', () => {
   describe('when selected', () => {
     beforeEach(() => {
       props.hoveringOver = false
-      uiStore.toggleSelectedCardId(props.card.id)
+      uiStore.selectCardId(props.card.id)
       rerender()
     })
 
-    it('renders the colored to indicate selection', () => {
+    it('renders snapshot', () => {
+      expectTreeToMatchSnapshot(wrapper)
+    })
+
+    it('renders the colored circle to indicate selection', () => {
       expect(wrapper.find('StyledGridCard').props().selected).toBe(true)
+    })
+
+    afterEach(() => {
+      uiStore.deselectCards()
     })
   })
 
@@ -317,6 +320,10 @@ describe('GridCard', () => {
       props.record.can_edit = true
       props.record.menuDisabled = false
       rerender()
+    })
+
+    it('renders snapshot', () => {
+      expectTreeToMatchSnapshot(wrapper)
     })
 
     it('disables canEdit functionality', () => {

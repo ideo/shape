@@ -25,6 +25,7 @@ module Roles
     end
 
     def group_ids
+      # The primary group has special behavior: it does not gather + share content
       groups = @groups.reject(&:primary?)
       groups.map(&:id)
     end

@@ -6,7 +6,10 @@ class Collection
 
       # Create the user's workspace collection for this org
       # if they don't already have one
-      collection = create(organization: organization)
+      collection = create(
+        organization: organization,
+        awaiting_first_user_content: organization.users.count == 1,
+      )
 
       return collection if collection.new_record?
 

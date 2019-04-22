@@ -15,11 +15,25 @@ module Externalizable
   end
 
   def add_external_id(external_id, application_id)
-    return true if external_records.create(
+    record = external_records.create(
       external_id: external_id,
       application_id: application_id,
     )
-    errors.add(:external_id, 'must be unique')
+    return true if record.persisted?
+
+    errors.add(
+      :external_id,
+      record.errors.full_messages.join('. '),
+    )
     raise ActiveRecord::Rollback
+  end
+
+  def duplicate_external_records(externalizable)
+    external_records.map do |external_record|
+      dupe = external_record.amoeba_dup
+      dupe.externalizable = externalizable
+      dupe.save!
+      dupe
+    end
   end
 end

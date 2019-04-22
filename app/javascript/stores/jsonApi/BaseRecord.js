@@ -18,6 +18,21 @@ class BaseRecord extends jsonapi(Model) {
     }
   }
 
+  get apiStore() {
+    // this datx collection is the apiStore
+    return this.meta.collection
+  }
+
+  get uiStore() {
+    // uiStore gets supplied via apiStore
+    return this.apiStore.uiStore
+  }
+
+  get routingStore() {
+    // routingStore gets supplied via apiStore
+    return this.apiStore.routingStore
+  }
+
   @computed
   get id() {
     return this.meta.id
@@ -35,10 +50,6 @@ class BaseRecord extends jsonapi(Model) {
 
   get persisted() {
     return !!this.id && this.id > 0
-  }
-
-  get apiStore() {
-    return this.meta.collection
   }
 
   get internalType() {

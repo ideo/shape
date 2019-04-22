@@ -1,7 +1,9 @@
+import fakeUiStore from './fakeUiStore'
+
 const fakeApiStore = ({
   findResult = '',
   findAllResult = [],
-  requestResult = '',
+  requestResult = { data: {} },
 } = {}) => {
   return {
     add: jest.fn().mockName('add'),
@@ -101,6 +103,10 @@ const fakeApiStore = ({
     ],
     collections: [],
     items: [],
+
+    uiStore: fakeUiStore,
+    undoStore: {},
+    routingStore: {},
   }
 }
 

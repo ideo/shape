@@ -4,7 +4,8 @@ import { ReferenceType } from 'datx'
 import pluralize from 'pluralize'
 import queryString from 'query-string'
 
-import { apiStore, routingStore, uiStore } from '~/stores'
+// TODO: remove this apiStore import by refactoring static methods that depend on it
+import { apiStore } from '~/stores'
 import { apiUrl } from '~/utils/url'
 
 import BaseRecord from './BaseRecord'
@@ -29,6 +30,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   currentOrder = 'order'
   @observable
   totalPages = 1
+  recordsPerPage = 50
+  @observable
+  scrollBottom = 0
 
   attributesForAPI = [
     'name',
@@ -40,7 +44,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   @computed
   get cardIds() {
-    return this.collection_cards.map(card => card.id)
+    return this.sortedCards.map(card => card.id)
   }
 
   @computed
@@ -76,7 +80,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     } else {
       this.snoozedEditWarningsAt = Date.now()
     }
-    uiStore.setSnoozeChecked(!!this.snoozedEditWarningsAt)
+    this.uiStore.setSnoozeChecked(!!this.snoozedEditWarningsAt)
   }
 
   @action
@@ -84,11 +88,110 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     this.reloading = value
   }
 
+  cardIdsBetween(firstCardId, lastCardId) {
+    if (this.isBoard) {
+      return this.cardIdsBetweenByColRow(firstCardId, lastCardId)
+    }
+    // For all other collection types, find cards by order
+    return this.cardIdsBetweenByOrder(firstCardId, lastCardId)
+  }
+
+  // Find all cards that are between these two card ids,
+  // using the card order
+  cardIdsBetweenByOrder(firstCardId, lastCardId) {
+    const firstIdx = this.cardIds.findIndex(id => id === firstCardId)
+    const lastIdx = this.cardIds.findIndex(id => id === lastCardId)
+    const cardIdsBetween = [...this.cardIds]
+    // Cards are in sorted order, so slice out the right card Ids
+    if (lastIdx > firstIdx) {
+      return cardIdsBetween.slice(firstIdx, lastIdx)
+    }
+    return cardIdsBetween.slice(lastIdx, firstIdx)
+  }
+
+  get cardMatrix() {
+    if (this.collection_cards.length === 0) return [[]]
+
+    // Get maximum dimensions of our card matrix
+    const maxCol = _.max(this.collection_cards.map(card => card.maxCol))
+    const maxRow = _.max(this.collection_cards.map(card => card.maxRow))
+
+    // Create matrix of arrays, each row having an array with the 'columns'
+    // Since row and col are zero-indexed, add 1
+    const matrix = _.map(new Array(maxRow + 1), row => new Array(maxCol + 1))
+
+    // Iterate through each card to populate the matrix
+    _.each(this.collection_cards, card => {
+      // Create a range with the min and max row and column that this card occupies
+      // range does not include last value, so increment max by 1
+      const rows = _.range(card.row, card.maxRow + 1)
+      const cols = _.range(card.col, card.maxCol + 1)
+
+      // Iterate over each to populate the matrix
+      _.each(rows, row => {
+        _.each(cols, col => {
+          matrix[row][col] = card
+        })
+      })
+    })
+    return matrix
+  }
+
+  minMaxRowColForCards = cards =>
+    // Find the min/max rows of what they have selected,
+    // keeping in mind a card's area needs to contribute to width/height
+    ({
+      minRow: _.min(cards.map(card => card.row)),
+      maxRow: _.max(cards.map(card => card.maxRow)),
+      minCol: _.min(cards.map(card => card.col)),
+      maxCol: _.max(cards.map(card => card.maxCol)),
+    })
+
+  // Find all cards that are between these two card ids,
+  // using the card row & col
+  cardIdsBetweenByColRow(firstCardId, lastCardId) {
+    const cards = this.collection_cards.filter(
+      card => card.id === firstCardId || card.id === lastCardId
+    )
+    const minMax = this.minMaxRowColForCards(cards)
+    const rowRange = _.range(minMax.minRow, minMax.maxRow + 1)
+    const colRange = _.range(minMax.minCol, minMax.maxCol + 1)
+
+    // Find all cards that are within the rectangle created
+    // between the first and last selected cards
+    const matrix = this.cardMatrix
+    const cardIds = []
+    _.each(rowRange, row => {
+      _.each(colRange, col => {
+        const card = matrix[row][col]
+        if (card && !_.includes(cardIds, card.id)) cardIds.push(card.id)
+      })
+    })
+
+    return cardIds
+  }
+
+  cardIdsWithinRectangle(minCoords, maxCoords) {
+    const rowRange = _.range(minCoords.row, maxCoords.row + 1)
+    const colRange = _.range(minCoords.col, maxCoords.col + 1)
+
+    const matrix = this.cardMatrix
+    const cardIds = []
+    _.each(rowRange, row => {
+      _.each(colRange, col => {
+        const card = matrix[row] && matrix[row][col]
+        if (card && !_.includes(cardIds, card.id)) cardIds.push(card.id)
+      })
+    })
+
+    return cardIds
+  }
+
   get shouldShowEditWarning() {
     if (!this.isMasterTemplate || this.template_num_instances === 0)
       return false
     // if we already have the confirmation open, don't try to re-open
-    if (uiStore.dialogConfig.open === 'confirm') return false
+    if (this.uiStore.dialogConfig.open === 'confirm') return false
     const oneHourAgo = Date.now() - 1000 * 60 * 60
     if (!this.snoozedEditWarningsAt) return true
     if (this.snoozedEditWarningsAt < oneHourAgo) {
@@ -128,7 +231,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   // otherwise it will just call onConfirm()
   confirmEdit({ onCancel, onConfirm }) {
     if (!this.shouldShowEditWarning) return onConfirm()
-    uiStore.confirm({
+    this.uiStore.confirm({
       ...this.confirmEditOptions,
       onCancel: () => {
         if (onCancel) onCancel()
@@ -188,6 +291,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get isTestCollectionOrTestDesign() {
     return this.isTestCollection || this.isTestDesign
+  }
+
+  get isBoard() {
+    return this.type === 'Collection::Board'
   }
 
   get requiresSubmissionBoxSettings() {
@@ -303,10 +410,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.isSharedCollection
   }
 
+  @computed
   get cardProperties() {
-    return this.collection_cards.map(c =>
-      _.pick(c, ['id', 'order', 'width', 'height'])
-    )
+    return this.collection_cards.map(c => _.pick(c, ['id', 'updated_at']))
   }
 
   // this marks it with the "offset" special color
@@ -337,23 +443,31 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     this._reorderCards()
   }
 
-  toJsonApiWithCards() {
+  toJsonApiWithCards(onlyCardIds = []) {
     const data = this.toJsonApi()
     // attach nested attributes of cards
     if (this.collection_cards) {
-      data.attributes.collection_cards_attributes = _.map(
-        this.collection_cards,
-        card => _.pick(card, ['id', 'order', 'width', 'height'])
-      )
+      const cardAttributes = []
+      _.each(this.collection_cards, card => {
+        if (
+          onlyCardIds.length === 0 ||
+          (onlyCardIds && onlyCardIds.indexOf(card.id) !== -1)
+        ) {
+          cardAttributes.push(_.pick(card, card.batchUpdateAttributes))
+        }
+      })
+      data.attributes.collection_cards_attributes = cardAttributes
     }
     return data
   }
 
   async API_fetchCards({
     page = 1,
-    per_page = 50,
+    per_page = null,
     order,
     hidden = false,
+    rows,
+    cols,
   } = {}) {
     runInAction(() => {
       if (order) this.currentOrder = order
@@ -362,31 +476,43 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       page,
       per_page,
     }
+    if (!params.per_page) {
+      // NOTE: If this is a Board, per_page will be ignored in favor of default 16x16 rows/cols
+      params.per_page = this.recordsPerPage
+    }
     if (this.currentOrder !== 'order') {
       params.card_order = this.currentOrder
     }
     if (hidden) {
       params.hidden = true
     }
+    if (rows && cols) {
+      params.rows = rows
+      params.cols = cols
+    }
     const apiPath = `collections/${
       this.id
-    }/collection_cards?${queryString.stringify(params)}`
+    }/collection_cards?${queryString.stringify(params, {
+      arrayFormat: 'bracket',
+    })}`
     const res = await this.apiStore.request(apiPath)
     const { data, links } = res
     runInAction(() => {
       this.totalPages = links.last
       this.currentPage = page
-      if (page === 1) {
+      if (!this.isBoard && page === 1) {
         // NOTE: If we ever want to "remember" collections where you've previously loaded 50+
         // we could think about handling this differently.
         this.collection_cards.replace(data)
       } else {
-        this.collection_cards = this.collection_cards.concat(data)
+        // For foam core collections we sometimes retrieve
+        // the same card twice so we must de-dupe (using new `data` as the tiebreaker)
+        this.collection_cards = _.unionBy(data, this.collection_cards, 'id')
       }
     })
   }
 
-  API_updateCards({ card, updates, undoMessage } = {}) {
+  API_updateCard({ card, updates, undoMessage } = {}) {
     // this works a little differently than the typical "undo" snapshot...
     // we snapshot the collection_cards.attributes so that they can be reverted
     const jsonData = this.toJsonApiWithCards()
@@ -406,25 +532,109 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.request(apiPath, 'PATCH', { data })
   }
 
-  API_batchUpdateCards({ cards, updates, undoMessage } = {}) {
-    const jsonData = this.toJsonApiWithCards()
-    this.pushUndo({
-      snapshot: jsonData.attributes,
-      message: undoMessage,
+  /*
+  Perform batch updates on multiple cards at once
+
+  updates (array)
+    An array of objects with a card reference and the updated attributes, e.g.
+    [
+      { card: card instance, order: 2  },
+      { card: card instance, order: 4  },
+    ]
+
+  updateAllCards (bool)
+    If true, it will send data to the API for all collection cards
+    (useful for regular collections where order needs to be updated on all cards).
+
+    If false, will only send data about updated cards.
+  */
+
+  API_batchUpdateCards({ updates, updateAllCards }) {
+    const updatesByCardId = {}
+    _.each(updates, update => {
+      updatesByCardId[update.card.id] = update
     })
 
-    // now actually make the change to the card(s)
-    const sortedCards = _.sortBy(cards, 'order')
-    _.each(sortedCards, (card, idx) => {
-      const sortedOrder = updates.order + (idx + 1) * 0.1
-      card.order = sortedOrder
+    // Apply all updates to in-memory cards
+    _.each(this.collection_cards, card => {
+      // Apply updates to each card
+      const cardUpdates = updatesByCardId[card.id]
+      if (cardUpdates) {
+        // Pick out allowed values and assign them
+        const allowedAttrs = _.pick(cardUpdates, card.batchUpdateAttributes)
+        _.forEach(allowedAttrs, (value, key) => {
+          card[key] = value
+        })
+      }
     })
 
     this._reorderCards()
-    // TODO try and find way to update cards after pushing undo
-    const data = this.toJsonApiWithCards()
-    const apiPath = `collections/${this.id}`
-    return this.apiStore.request(apiPath, 'PATCH', { data })
+
+    const data = this.toJsonApiWithCards(
+      updateAllCards ? [] : _.keys(updatesByCardId)
+    )
+
+    // Persist updates to API
+    return this.apiStore.request(`collections/${this.id}`, 'PATCH', { data })
+  }
+
+  /*
+  Perform batch updates on multiple cards at once,
+  and captures current cards state to undo to
+
+  updates (array)
+    An array of objects with a card reference and the updated attributes, e.g.
+    [
+      { card: card instance, row: 4, col: 3  },
+      { card: card instance, row: 4, col: 4  },
+    ]
+
+  updateAllCards (bool)
+    If false, will only send data about updated cards.
+
+    If true, it will send data to the API for all collection cards
+    (useful for regular collections where order needs to be updated on all cards).
+
+  undoMessage (string) - a message to display if someone undoes the action
+  onConfirm (optional function) - a function to run once user confirms update
+  onCancel (optional function)  - a function to call if they cancel performing update
+
+  */
+  API_batchUpdateCardsWithUndo({
+    updates,
+    updateAllCards = false,
+    undoMessage,
+    onConfirm,
+    onCancel,
+  }) {
+    const cardIds = []
+    const updatesByCardId = {}
+    _.each(updates, update => {
+      cardIds.push(update.card.id)
+      updatesByCardId[update.card.id] = update
+    })
+
+    const performUpdate = () => {
+      // Store snapshot of existing cards so changes can be un-done
+      const cardsData = this.toJsonApiWithCards(updateAllCards ? [] : cardIds)
+
+      this.pushUndo({
+        snapshot: cardsData.attributes,
+        message: undoMessage,
+      })
+
+      return this.API_batchUpdateCards({ updates, updateAllCards }).then(
+        res => {
+          if (onConfirm) onConfirm()
+        }
+      )
+    }
+
+    // Show a dialog if in a template
+    return this.confirmEdit({
+      onCancel,
+      onConfirm: performUpdate,
+    })
   }
 
   @computed
@@ -462,7 +672,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         message =
           'You must close any other live tests before launching this one.'
       }
-      uiStore.alert(message)
+      this.uiStore.alert(message)
       return false
     }
     return true
@@ -476,7 +686,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       let prompt = 'Are you sure you want to stop all active tests?'
       const num = this.template_num_instances
       prompt += ` ${num} ${pluralize('submission', num)} will be affected.`
-      return uiStore.confirm({
+      return this.uiStore.confirm({
         iconName: 'Alert',
         prompt,
         confirmText: 'Stop feedback',
@@ -518,6 +728,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   API_performTestAction = async actionName => {
+    const { uiStore } = this
     // this will disable any test launch/close/reopen buttons until loading is complete
     uiStore.update('launchButtonLoading', true)
     try {
@@ -570,7 +781,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       .request(`collections/${this.id}/clear_collection_cover`, 'POST')
       .catch(err => {
         console.warn(err)
-        uiStore.alert(
+        this.uiStore.alert(
           'Unable to change the collection cover. This may be a special collection that you cannot edit.'
         )
       })
@@ -584,7 +795,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       `test_collections/${this.id}/next_available`
     )
     if (!res.data) return
-    const path = routingStore.pathTo('collections', res.data.id)
+    const path = this.routingStore.pathTo('collections', res.data.id)
 
     this.setNextAvailableTestPath(`${path}?open=tests`)
   }
@@ -592,6 +803,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   @action
   setNextAvailableTestPath(path) {
     this.nextAvailableTestPath = path
+  }
+  @action
+  updateScrollBottom(y) {
+    this.scrollBottom = y
   }
 
   reassignCover(newCover) {
@@ -610,13 +825,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   async API_sortCards() {
-    const order = uiStore.collectionCardSortOrder
+    const order = this.uiStore.collectionCardSortOrder
     this.setReloading(true)
     await this.API_fetchCards({ order })
     this.setReloading(false)
   }
 
   static async createSubmission(parent_id, submissionSettings) {
+    const { routingStore, uiStore } = apiStore
     const { type, template } = submissionSettings
     if (type === 'template' && template) {
       const templateData = {

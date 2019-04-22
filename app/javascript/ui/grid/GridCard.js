@@ -2,19 +2,11 @@ import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
-import ChartItemCover from '~/ui/grid/covers/ChartItemCover'
 import ContainImage from '~/ui/grid/ContainImage'
 import CoverImageToggle from '~/ui/grid/CoverImageToggle'
 import CoverImageSelector from '~/ui/grid/CoverImageSelector'
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
-import LinkItemCover from '~/ui/grid/covers/LinkItemCover'
-import TextItemCover from '~/ui/grid/covers/TextItemCover'
-import PdfFileItemCover from '~/ui/grid/covers/PdfFileItemCover'
-import ImageItemCover from '~/ui/grid/covers/ImageItemCover'
-import VideoItemCover from '~/ui/grid/covers/VideoItemCover'
-import GenericFileItemCover from '~/ui/grid/covers/GenericFileItemCover'
-import CollectionCover from '~/ui/grid/covers/CollectionCover'
-import DataItemCover from '~/ui/grid/covers/DataItemCover'
+import CoverRenderer from '~/ui/grid/CoverRenderer'
 
 import Activity from '~/stores/jsonApi/Activity'
 import ActionMenu from '~/ui/grid/ActionMenu'
@@ -75,71 +67,6 @@ class GridCard extends React.Component {
   get isSelected() {
     const { card } = this.props
     return uiStore.isSelected(card.id)
-  }
-
-  get renderInner() {
-    const { card, record, height, handleClick, searchResult } = this.props
-    if (this.isItem) {
-      switch (record.type) {
-        case ITEM_TYPES.TEXT:
-          return (
-            <TextItemCover
-              item={record}
-              height={height}
-              dragging={this.props.dragging}
-              cardId={card.id}
-              handleClick={handleClick}
-              searchResult={searchResult}
-            />
-          )
-        case ITEM_TYPES.EXTERNAL_IMAGE:
-          return <ImageItemCover item={record} contain={card.image_contain} />
-        case ITEM_TYPES.FILE: {
-          if (record.isPdfFile) {
-            return <PdfFileItemCover item={record} />
-          }
-          if (record.isImage) {
-            return <ImageItemCover item={record} contain={card.image_contain} />
-          }
-          if (record.filestack_file) {
-            return <GenericFileItemCover item={record} />
-          }
-          return <div style={{ padding: '20px' }}>File not found.</div>
-        }
-        case ITEM_TYPES.VIDEO:
-          return <VideoItemCover item={record} dragging={this.props.dragging} />
-        case ITEM_TYPES.LINK:
-          return (
-            <LinkItemCover
-              item={record}
-              cardHeight={card.height}
-              dragging={this.props.dragging}
-            />
-          )
-        case ITEM_TYPES.CHART:
-          return <ChartItemCover item={record} testCollection={card.parent} />
-
-        case ITEM_TYPES.DATA:
-          return <DataItemCover height={height} item={record} card={card} />
-
-        default:
-          return <div>{record.content}</div>
-      }
-    } else if (this.isCollection) {
-      return (
-        <CollectionCover
-          width={card.maxWidth}
-          height={card.maxHeight}
-          collection={record}
-          dragging={this.props.dragging}
-          inSubmissionsCollection={
-            card.parentCollection &&
-            card.parentCollection.isSubmissionsCollection
-          }
-        />
-      )
-    }
-    return <div />
   }
 
   get actionsColor() {
@@ -345,17 +272,64 @@ class GridCard extends React.Component {
       // TODO: could replace with preview
       Activity.trackActivity('downloaded', record)
       return
-    } else if (record.type === ITEM_TYPES.VIDEO || record.isImage) {
+    } else if (record.isVideo || record.isImage || record.isLegend) {
       return
     } else if (record.mimeBaseType === 'image') {
       this.props.handleClick(e)
       return
     } else if (record.isGenericFile) {
       // TODO: could replace with preview
-      this.linkOffsite(record.filestack_file.url)
+      this.linkOffsite(record.fileUrl())
       return
     }
     this.props.handleClick(e)
+  }
+
+  get coverItem() {
+    const { collection_cover_items } = this.props.record
+    if (!collection_cover_items || collection_cover_items.length === 0)
+      return null
+    return collection_cover_items[0]
+  }
+
+  get renderCover() {
+    const {
+      card,
+      height,
+      dragging,
+      searchResult,
+      handleClick,
+      isBoardCollection,
+    } = this.props
+    let { record, cardType } = this.props
+    if (this.coverItem) {
+      // Instead use the item for the cover rather than the collection
+      record = this.coverItem
+      cardType = 'items'
+    }
+    return (
+      <CoverRenderer
+        card={card}
+        cardType={cardType}
+        coverItem={this.coverItem}
+        record={record}
+        height={height}
+        dragging={dragging}
+        searchResult={searchResult}
+        handleClick={handleClick}
+        isBoardCollection={isBoardCollection}
+      />
+    )
+  }
+
+  get transparentBackground() {
+    const { cardType, record } = this.props
+    // If this is a legend or data item, it's transparent
+    if (cardType === 'items' && (record.isLegend || record.isData)) return true
+    // If a data item and is a collection cover, it's transparent
+    if (this.coverItem && this.coverItem.isData) return true
+
+    return false
   }
 
   render() {
@@ -367,9 +341,9 @@ class GridCard extends React.Component {
       draggingMultiple,
       menuOpen,
       lastPinnedCard,
-
       testCollectionCard,
       searchResult,
+      showHotEdge,
     } = this.props
 
     const firstCardInRow = card.position && card.position.x === 0
@@ -377,11 +351,13 @@ class GridCard extends React.Component {
 
     return (
       <StyledGridCard
+        background={this.transparentBackground ? 'transparent' : 'white'}
         className="gridCard"
         id={`gridCard-${card.id}`}
         dragging={dragging}
         draggingMultiple={draggingMultiple}
         testCollectionCard={testCollectionCard}
+        unclickable={testCollectionCard || record.isImage}
         // mostly for E2E checking purposes
         data-width={card.width}
         data-height={card.height}
@@ -393,10 +369,12 @@ class GridCard extends React.Component {
         selected={this.isSelected || this.props.hoveringOver}
       >
         {canEditCollection &&
+          showHotEdge &&
           (!card.isPinnedAndLocked || lastPinnedCard) && (
             <GridCardHotspot card={card} dragging={dragging} />
           )}
         {canEditCollection &&
+          showHotEdge &&
           firstCardInRow &&
           !card.isPinnedAndLocked && (
             <GridCardHotspot card={card} dragging={dragging} position="left" />
@@ -419,9 +397,17 @@ class GridCard extends React.Component {
                     onReassign={this.onCollectionCoverChange}
                   />
                 )}
-              {record.isData && <EditButton onClick={this.editCard} />}
+              {record.isData &&
+                record.isReportTypeCollectionsItems && (
+                  <EditButton onClick={this.editCard} />
+                )}
               {record.isImage &&
-                this.canContentEditCard && <ContainImage card={card} />}
+                this.canContentEditCard && (
+                  <ContainImage
+                    card={card}
+                    image_contain={card.image_contain}
+                  />
+                )}
               {(record.isImage || record.isText) && (
                 <CardActionHolder
                   className="show-on-hover"
@@ -455,7 +441,7 @@ class GridCard extends React.Component {
           filter={card.filter}
           forceFilter={!this.hasCover}
         >
-          {this.renderInner}
+          {this.renderCover}
         </StyledGridCardInner>
         <TagEditorModal
           canEdit={this.canEditCard}
@@ -474,6 +460,7 @@ GridCard.propTypes = {
   height: PropTypes.number,
   canEditCollection: PropTypes.bool,
   isSharedCollection: PropTypes.bool,
+  isBoardCollection: PropTypes.bool,
   handleClick: PropTypes.func,
   dragging: PropTypes.bool,
   hoveringOver: PropTypes.bool,
@@ -482,12 +469,14 @@ GridCard.propTypes = {
   testCollectionCard: PropTypes.bool,
   searchResult: PropTypes.bool,
   draggingMultiple: PropTypes.bool,
+  showHotEdge: PropTypes.bool,
 }
 
 GridCard.defaultProps = {
   height: 1,
   canEditCollection: false,
   isSharedCollection: false,
+  isBoardCollection: false,
   handleClick: () => null,
   dragging: false,
   hoveringOver: false,
@@ -496,6 +485,7 @@ GridCard.defaultProps = {
   testCollectionCard: false,
   draggingMultiple: false,
   searchResult: false,
+  showHotEdge: true,
 }
 
 export default GridCard

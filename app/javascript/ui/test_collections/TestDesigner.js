@@ -116,7 +116,7 @@ class TestDesigner extends React.Component {
     })
 
   handleTrash = card => {
-    this.confirmEdit(() => card.API_archiveSelf())
+    this.confirmEdit(() => card.API_archiveSelf({}))
   }
 
   handleNew = (card, addBefore) => () => {

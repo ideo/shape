@@ -26,6 +26,10 @@ class OrganizationBuilder
         return true if @user.email == 'cypress-test@ideo.com'
         create_network_organization
         create_network_subscription
+      else
+        @user.current_user_collection(@organization.id).update(
+          awaiting_first_user_content: false,
+        )
       end
       true
     end

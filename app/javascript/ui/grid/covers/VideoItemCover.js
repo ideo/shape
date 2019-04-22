@@ -6,7 +6,9 @@ import { Flex, Box } from 'reflexbox'
 import { StyledTopLeftActions } from '~/ui/grid/shared'
 import { FullAbsolute, FullAbsoluteParent } from '~/ui/global/styled/layout'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
+import { DisplayText } from '~/ui/global/styled/typography'
 import DragIcon from '~/ui/icons/DragIcon'
+import AddVideoIcon from '~/ui/icons/AddVideoIcon'
 import v from '~/utils/variables'
 import hexToRgba from '~/utils/hexToRgba'
 import VideoPlayer from '~/ui/items/VideoPlayer'
@@ -45,8 +47,25 @@ const StyledVideoCover = styled.div`
     display: ${props => (props.playing ? 'block' : 'none')};
     z-index: ${v.zIndex.gridCardBg};
   }
+  ${props =>
+    props.pending &&
+    `
+    background: ${v.colors.commonDark};
+    height: calc(100% - 40px);
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-top: 40px;
+    text-align: center;
+    width: calc(100% - 60px);
+  `};
 `
 StyledVideoCover.displayName = 'StyledVideoCover'
+
+const InfoIconHolder = styled.span`
+  display: inline-block;
+  height: 60px;
+  width: 60px;
+`
 
 @observer
 class VideoItemCover extends React.Component {
@@ -54,7 +73,13 @@ class VideoItemCover extends React.Component {
     playing: false,
   }
 
-  componentDidMount() {}
+  get videoUrl() {
+    const { item } = this.props
+    if (item.filestack_file) {
+      return item.fileUrl()
+    }
+    return item.url
+  }
 
   playVideo = () => {
     const { item, dragging } = this.props
@@ -69,6 +94,24 @@ class VideoItemCover extends React.Component {
     const { item } = this.props
     const thumbnail = item.thumbnail_url
     const showPlayer = !thumbnail
+
+    if (item.pending_transcoding) {
+      return (
+        <StyledVideoCover pending={item.pending_transcoding}>
+          <DisplayText color={v.colors.white}>
+            <InfoIconHolder>
+              <AddVideoIcon />
+            </InfoIconHolder>
+            <div>
+              Your video upload is currently processing.
+              <br />
+              Please check back later.
+            </div>
+          </DisplayText>
+        </StyledVideoCover>
+      )
+    }
+
     return (
       <StyledVideoCover playing={this.state.playing || showPlayer}>
         {thumbnail && (
@@ -96,7 +139,7 @@ class VideoItemCover extends React.Component {
             </StyledTopLeftActions>
             <FullAbsolute>
               <VideoPlayer
-                url={item.url}
+                url={this.videoUrl}
                 controls
                 playing={this.state.playing}
                 width="100%"

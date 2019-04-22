@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import { action, observable } from 'mobx'
 
-import { uiStore } from '~/stores'
 import { ITEM_TYPES, COLLECTION_TYPES } from '~/utils/variables'
 import { apiUrl } from '~/utils/url'
 import BaseRecord from './BaseRecord'
@@ -15,6 +14,8 @@ class CollectionCard extends BaseRecord {
     'order',
     'width',
     'height',
+    'row',
+    'col',
     'reference',
     'parent_id',
     'collection_id',
@@ -26,6 +27,8 @@ class CollectionCard extends BaseRecord {
     'hidden',
     'filter',
   ]
+
+  batchUpdateAttributes = ['id', 'order', 'width', 'height', 'row', 'col']
 
   @observable
   maxWidth = this.width
@@ -40,6 +43,20 @@ class CollectionCard extends BaseRecord {
   @action
   setMaxHeight(h) {
     this.maxHeight = h
+  }
+
+  // For cards that are positioned using row/col,
+  // this is the row that they extend to
+  get maxRow() {
+    if (this.row === undefined || this.height === undefined) return 0
+    return this.row + this.height - 1
+  }
+
+  // For cards that are positioned using row/col,
+  // this is the col that they extend to
+  get maxCol() {
+    if (this.col === undefined || this.width === undefined) return 0
+    return this.col + this.width - 1
   }
 
   get isTestDesignCollection() {
@@ -106,8 +123,10 @@ class CollectionCard extends BaseRecord {
   }
 
   beginReplacing() {
-    uiStore.openBlankContentTool({
+    this.uiStore.openBlankContentTool({
       order: this.order,
+      row: this.row,
+      col: this.col,
       width: this.width,
       height: this.height,
       replacingId: this.id,
@@ -115,6 +134,7 @@ class CollectionCard extends BaseRecord {
   }
 
   async API_create() {
+    const { uiStore } = this
     try {
       const res = await this.apiStore.request('collection_cards', 'POST', {
         data: this.toJsonApi(),
@@ -131,6 +151,7 @@ class CollectionCard extends BaseRecord {
   }
 
   async API_replace({ replacingId }) {
+    const { uiStore } = this
     try {
       // NOTE: in this context, `this` is a new CollectionCard model
       // that has the data we want to send for replacing the card
@@ -156,6 +177,7 @@ class CollectionCard extends BaseRecord {
   }
 
   async API_destroy() {
+    const { uiStore } = this
     try {
       this.destroy()
       this.parentCollection.removeCard(this)
@@ -166,6 +188,7 @@ class CollectionCard extends BaseRecord {
   }
 
   async API_linkToMyCollection() {
+    const { uiStore } = this
     const viewingCollectionId = uiStore.viewingCollection
       ? uiStore.viewingCollection.id
       : this.parent_id
@@ -187,6 +210,7 @@ class CollectionCard extends BaseRecord {
   }
 
   reselectOnlyEditableCards(cardIds) {
+    const { uiStore } = this
     const filteredCardIds = this.apiStore
       .findAll('collection_cards')
       .filter(
@@ -217,46 +241,58 @@ class CollectionCard extends BaseRecord {
   }
 
   get selectedCards() {
-    const { selectedCardIds } = uiStore
+    const { selectedCardIds } = this.uiStore
     return this.apiStore
       .findAll('collection_cards')
       .filter(card => selectedCardIds.indexOf(card.id) > -1)
   }
 
   get isSelected() {
-    return uiStore.selectedCardIds.indexOf(this.id) > -1
+    return this.uiStore.selectedCardIds.indexOf(this.id) > -1
   }
 
   get isBeingMoved() {
-    const { movingCardIds, cardAction } = uiStore
+    const { movingCardIds, cardAction } = this.uiStore
     // only count "being moved" for the move actions (not link, duplicate, etc)
     if (!_.includes(['move', 'moveWithinCollection'], cardAction)) return false
     return movingCardIds.indexOf(this.id) > -1
   }
 
   get isBeingMultiMoved() {
+    const { uiStore } = this
     return uiStore.multiMoveCardIds.indexOf(this.id) > -1
   }
 
-  async API_archiveSelf() {
+  get isBeingMultiDragged() {
+    return !this.isDragCardMaster && this.isBeingMultiMoved
+  }
+
+  get isDragCardMaster() {
+    const { uiStore } = this
+    return uiStore.dragCardMaster === this.id
+  }
+
+  async API_archiveSelf({ undoable = true } = {}) {
     try {
       await this.apiStore.archiveCards({
         cardIds: [this.id],
         collection: this.parentCollection,
+        undoable,
       })
       return
     } catch (e) {
-      uiStore.defaultAlertError()
+      this.uiStore.defaultAlertError()
     }
   }
 
   async API_archiveCards(cardIds = []) {
-    uiStore.reselectCardIds(cardIds)
+    this.uiStore.reselectCardIds(cardIds)
     return this.API_archive()
   }
 
   // this could really be a static method now that it archives all selected cards
   async API_archive({ isReplacing = false, onCancel = null } = {}) {
+    const { uiStore } = this
     const { selectedCardIds } = uiStore
     const collection = this.parentCollection
 
@@ -294,7 +330,7 @@ class CollectionCard extends BaseRecord {
           prompt = 'Are you sure you want to archive this test design?'
           prompt += ' It will close your feedback.'
         }
-        uiStore.confirm({
+        this.uiStore.confirm({
           prompt,
           confirmText,
           iconName,

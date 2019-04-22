@@ -1,22 +1,63 @@
 require 'rails_helper'
 
 RSpec.describe QuestionAnswer, type: :model do
+  let(:user) { create(:user) }
+  let(:test_collection) { create(:test_collection) }
+  let!(:survey_response) { create(:survey_response, test_collection: test_collection) }
+  let(:question) { survey_response.question_items.first }
+
   context 'associations' do
     it { should belong_to(:survey_response) }
     it { should belong_to(:question) }
   end
 
+  describe 'validations' do
+    describe 'answer_number presence' do
+      let(:question_answer) do
+        build(:question_answer,
+              :unanswered,
+              survey_response: survey_response,
+              question: question)
+      end
+
+      context 'scale question' do
+        before do
+          question.update(question_type: :question_clarity)
+        end
+
+        it 'is valid with answer_number' do
+          expect(question_answer.answer_number).to be_nil
+          expect(question_answer.valid?).to be false
+          expect(question_answer.errors[:answer_number]).not_to be_empty
+        end
+
+        it 'is invalid without answer_number' do
+          question_answer.answer_number = 2
+          expect(question_answer.valid?).to be true
+          expect(question_answer.errors[:answer_number]).to be_empty
+        end
+      end
+
+      context 'open response question' do
+        before do
+          question.update(question_type: :question_open)
+        end
+
+        it 'is valid without answer_number' do
+          expect(question_answer.answer_number).to be_nil
+          expect(question_answer.valid?).to be true
+          expect(question_answer.errors[:answer_number]).to be_empty
+        end
+      end
+    end
+  end
+
   describe 'callbacks' do
-    let(:user) { create(:user) }
-    let(:test_collection) { create(:test_collection) }
-    let!(:survey_response) { create(:survey_response, test_collection: test_collection) }
-    let(:question) { survey_response.question_items.first }
     let(:question_answer) do
       build(:question_answer,
             survey_response: survey_response,
             question: question)
     end
-
     before do
       test_collection.question_items.each do |question|
         question.update(

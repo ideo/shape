@@ -132,8 +132,12 @@ const SelectWrapped = props => {
     options,
     optionSearch,
     menuPlacement,
+    keepMenuClosed,
     ...other
   } = props
+  if (keepMenuClosed) {
+    other.menuIsOpen = false
+  }
   if (optionSearch && !creatable) {
     // Option search will do an async search for options.
     return (
@@ -240,6 +244,7 @@ class AutoComplete extends React.Component {
       optionSearch,
       placeholder,
       menuPlacement,
+      keepMenuClosed,
       creatable,
     } = this.props
     const { option } = this.state
@@ -258,6 +263,7 @@ class AutoComplete extends React.Component {
             placeholder,
             creatable,
             menuPlacement,
+            keepMenuClosed,
             instanceId: 'react-select-chip',
             id: 'react-select-chip',
             name: 'react-select-chip',
@@ -289,6 +295,7 @@ AutoComplete.propTypes = {
   creatable: PropTypes.bool,
   value: PropTypes.number,
   menuPlacement: PropTypes.string,
+  keepMenuClosed: PropTypes.bool,
 }
 
 AutoComplete.defaultProps = {
@@ -299,6 +306,7 @@ AutoComplete.defaultProps = {
   value: undefined,
   optionSearch: null,
   menuPlacement: 'bottom',
+  keepMenuClosed: false,
 }
 
 export default withStyles(styles)(AutoComplete)

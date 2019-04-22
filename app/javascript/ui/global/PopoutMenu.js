@@ -167,6 +167,30 @@ class PopoutMenu extends React.Component {
     return rendered
   }
 
+  buttonStyleIcon = buttonStyle => {
+    switch (buttonStyle) {
+      case 'bct':
+        return <MenuIcon viewBox="-11 -11 26 40" />
+      case 'card':
+        return (
+          <CardActionHolder>
+            <CardMenuIcon />
+          </CardActionHolder>
+        )
+      default:
+        return <MenuIcon viewBox="0 0 5 18" />
+    }
+  }
+
+  buttonStyleMenuToggle = buttonStyle => {
+    switch (buttonStyle) {
+      case 'bct':
+        return BctButton
+      default:
+        return StyledMenuToggle
+    }
+  }
+
   render() {
     const {
       className,
@@ -184,15 +208,9 @@ class PopoutMenu extends React.Component {
 
     const isBct = buttonStyle === 'bct'
     const isCard = buttonStyle === 'card'
-    const MenuToggle = isBct ? BctButton : StyledMenuToggle
-    let icon = <MenuIcon viewBox="0 0 5 18" />
-    if (isBct) icon = <MenuIcon viewBox="-11 -11 26 40" />
-    if (isCard)
-      icon = (
-        <CardActionHolder>
-          <CardMenuIcon />
-        </CardActionHolder>
-      )
+
+    const MenuToggle = this.buttonStyleMenuToggle(buttonStyle)
+    const icon = this.buttonStyleIcon(buttonStyle)
     return (
       <StyledMenuButtonWrapper
         className={`${wrapperClassName} ${menuOpen && ' open'}`}

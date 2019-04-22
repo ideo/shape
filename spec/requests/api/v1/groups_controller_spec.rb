@@ -25,11 +25,22 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
     end
 
     context 'with api token and external_id', auth: false, api_token: true do
-      let(:path) { '/api/v1/groups' }
-      let(:group) { create(:group) }
-      let!(:external_record) do
-        create(:external_record, external_id: '99', externalizable: group, application: @api_token.application)
+      let!(:application_org) do
+        create(
+          :application_organization,
+          application: @api_token.application,
+        )
       end
+      let!(:group) { create(:group, organization: application_org.organization) }
+      let!(:external_record) do
+        create(
+          :external_record,
+          external_id: '99',
+          externalizable: group,
+          application: @api_token.application,
+        )
+      end
+      let(:path) { '/api/v1/groups' }
 
       it 'returns the group with external_id' do
         get(
@@ -162,8 +173,13 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
 
         context 'with application access to the org' do
           let!(:application_org) do
-            create(:application_organization, application: @api_token.application, organization: user.current_organization)
+            create(
+              :application_organization,
+              application: @api_token.application,
+              organization: user.current_organization,
+            )
           end
+
           it 'adds external_id to group' do
             post(
               path,

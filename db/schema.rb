@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190227194651) do
+ActiveRecord::Schema.define(version: 20190402225253) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -96,11 +96,23 @@ ActiveRecord::Schema.define(version: 20190227194651) do
     t.boolean "hidden", default: false
     t.integer "filter", default: 1
     t.boolean "show_replace", default: true
+    t.integer "row"
+    t.integer "col"
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
+    t.index ["order", "row", "col"], name: "index_collection_cards_on_order_and_row_and_col"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
     t.index ["templated_from_id"], name: "index_collection_cards_on_templated_from_id"
     t.index ["type"], name: "index_collection_cards_on_type"
+  end
+
+  create_table "collection_cover_items", force: :cascade do |t|
+    t.bigint "collection_id"
+    t.bigint "item_id"
+    t.integer "order"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["collection_id", "item_id"], name: "index_collection_cover_items_on_collection_id_and_item_id", unique: true
   end
 
   create_table "collections", force: :cascade do |t|
@@ -131,6 +143,7 @@ ActiveRecord::Schema.define(version: 20190227194651) do
     t.bigint "roles_anchor_collection_id"
     t.boolean "hide_submissions", default: false
     t.boolean "shared_with_organization", default: false
+    t.integer "cover_type", default: 0
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
@@ -172,7 +185,7 @@ ActiveRecord::Schema.define(version: 20190227194651) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["application_id"], name: "index_external_records_on_application_id"
-    t.index ["external_id", "application_id", "externalizable_type"], name: "index_uniq_external_id", unique: true
+    t.index ["external_id", "application_id", "externalizable_type", "externalizable_id"], name: "index_external_records_common_fields"
     t.index ["externalizable_type", "externalizable_id"], name: "index_on_externalizable"
   end
 
@@ -255,6 +268,7 @@ ActiveRecord::Schema.define(version: 20190227194651) do
     t.jsonb "data_settings"
     t.bigint "roles_anchor_collection_id"
     t.integer "report_type"
+    t.integer "legend_item_id"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
     t.index ["created_at"], name: "index_items_on_created_at"

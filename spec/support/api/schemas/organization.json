@@ -9,6 +9,7 @@
     "in_app_billing": { "type": "boolean" },
     "inaccessible_at": { "type": "date" },
     "is_within_trial_period": { "type": "boolean" },
+    "has_payment_method": { "type": "boolean" },
     "name": { "type": "string" },
     "overdue": { "type": "boolean" },
     "price_per_user": { "type": "number" },

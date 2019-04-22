@@ -26,7 +26,7 @@ const StyledBreadcrumbItem = styled.div`
     background: ${v.colors.primaryLight};
   `};
   a {
-    color: ${v.colors.commonDark};
+    color: ${props => (props.isLast ? v.colors.black : v.colors.commonDark)};
     text-decoration: none;
     display: inline-block;
   }
@@ -36,7 +36,7 @@ const StyledBreadcrumbItem = styled.div`
 class BreadcrumbItem extends React.Component {
   render() {
     const { item, index, numItems } = this.props
-    const showCaret = index < numItems - 1
+    const isLast = index === numItems - 1
     let path
     if (item.id === 'homepage') {
       path = routingStore.pathTo('homepage')
@@ -53,6 +53,7 @@ class BreadcrumbItem extends React.Component {
           data-cy="Breadcrumb"
           innerRef={this.props.forwardedRef}
           currentlyDraggedOn={!!showDrag}
+          isLast={isLast}
         >
           {item.ellipses || item.truncatedName ? (
             <Tooltip
@@ -66,7 +67,7 @@ class BreadcrumbItem extends React.Component {
             <Link to={path}>{item.name}</Link>
           )}
         </StyledBreadcrumbItem>
-        {showCaret && <StyledBreadcrumbCaret>&#62;</StyledBreadcrumbCaret>}
+        {!isLast && <StyledBreadcrumbCaret>&#62;</StyledBreadcrumbCaret>}
       </Fragment>
     )
   }

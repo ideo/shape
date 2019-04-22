@@ -1,0 +1,46 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FoamcoreZoomControls renders snapshot 1`] = `
+<styled.div
+  data-cy="zoom-control"
+>
+  <Tooltip
+    classes={
+      Object {
+        "tooltip": "Tooltip",
+      }
+    }
+    placement="top"
+    title="Zoom out"
+  >
+    <div
+      className="zoom-icon"
+      onClick={[MockFunction]}
+      onKeyDown={[MockFunction]}
+      role="button"
+      tabIndex={0}
+    >
+      <MinusCircleIcon />
+    </div>
+  </Tooltip>
+  <Tooltip
+    classes={
+      Object {
+        "tooltip": "Tooltip",
+      }
+    }
+    placement="top"
+    title="Zoom in"
+  >
+    <div
+      className="zoom-icon"
+      onClick={[MockFunction]}
+      onKeyDown={[MockFunction]}
+      role="button"
+      tabIndex={0}
+    >
+      <PlusCircleIcon />
+    </div>
+  </Tooltip>
+</styled.div>
+`;

@@ -131,7 +131,15 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
 
     context 'with external_id filter', api_token: true do
       let(:organization) { organizations.first }
-      let(:external_record) do
+      # Necessary, as this is how an org is linked to a bot user
+      let!(:application_organization) do
+        create(
+          :application_organization,
+          organization: organization,
+          application: @api_token.application,
+        )
+      end
+      let!(:external_record) do
         create(
           :external_record,
           externalizable: organization,
@@ -139,7 +147,7 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
           application_id: @api_token.application.id,
         )
       end
-      let(:path) { "/api/v1/organizations?filter[external_id]=#{external_record.external_id}" }
+      let(:path) { '/api/v1/organizations?filter[external_id]=99' }
 
       it 'returns organization(s) matching external_id' do
         get(path)

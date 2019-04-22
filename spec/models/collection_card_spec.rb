@@ -56,6 +56,70 @@ RSpec.describe CollectionCard, type: :model do
         end
       end
     end
+
+    describe '#col' do
+      let(:card) { build(:collection_card_text, row: 5) }
+
+      it 'does not apply to regular collection' do
+        card.col = 500
+        expect(card.valid?).to be true
+      end
+
+      context 'parent is Collection::Board' do
+        before do
+          card.parent.update(type: 'Collection::Board')
+        end
+
+        it 'validates column is in 0..Collection::Board::COLS' do
+          expect(Collection::Board::COLS).to eq(16)
+
+          card.col = 0
+          expect(card.valid?).to be true
+
+          card.col = 15
+          expect(card.valid?).to be true
+
+          card.col = 16
+          expect(card.valid?).to be false
+          expect(card.errors[:col]).not_to be_empty
+
+          card.col = 500
+          expect(card.valid?).to be false
+          expect(card.errors[:col]).not_to be_empty
+        end
+      end
+    end
+
+    describe '#row' do
+      let(:card) { build(:collection_card_text, col: 5) }
+
+      it 'does not apply to regular collection' do
+        card.row = -20
+        expect(card.valid?).to be true
+      end
+
+      context 'parent is Collection::Board' do
+        before do
+          card.parent.update(type: 'Collection::Board')
+        end
+
+        it 'validates row >= 0' do
+          card.row = 0
+          expect(card.valid?).to be true
+
+          card.row = 1500
+          expect(card.valid?).to be true
+
+          card.row = -10
+          expect(card.valid?).to be false
+          expect(card.errors[:row]).not_to be_empty
+
+          card.row = 'this'
+          expect(card.valid?).to be false
+          expect(card.errors[:row]).not_to be_empty
+        end
+      end
+    end
   end
 
   describe 'callbacks' do
@@ -166,8 +230,9 @@ RSpec.describe CollectionCard, type: :model do
         expect { duplicate_without_user }.to change(Item, :count).by(1)
       end
 
-      context 'in a master template' do
+      context 'in a master template with 1 or more instances' do
         let(:collection) { collection_card.parent }
+        let!(:instance) { create(:collection, template: collection) }
 
         before do
           collection.update(master_template: true)
@@ -177,6 +242,17 @@ RSpec.describe CollectionCard, type: :model do
           expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(collection.id)
           duplicate
         end
+      end
+    end
+
+    context 'with specified order placement' do
+      let!(:collection) { create(:collection, num_cards: 3, record_type: :collection) }
+      let(:collection_card) { collection.collection_cards.first }
+      let(:placement) { 1 }
+
+      it 'should place the duplicate in the middle of the collection' do
+        expect(duplicate.order).to eq 1
+        expect(collection.collection_cards.second).to eq duplicate
       end
     end
 
@@ -507,8 +583,9 @@ RSpec.describe CollectionCard, type: :model do
         collection_cards.archive_all!(user_id: user.id)
       end
 
-      context 'with a master template collection' do
+      context 'with a master template collection with 1 or more instances' do
         let(:collection) { create(:collection, master_template: true, num_cards: 2) }
+        let!(:instance) { create(:collection, template: collection) }
 
         it 'should call the UpdateTemplateInstancesWorker' do
           expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(collection.id)

@@ -1,22 +1,37 @@
 module DataReport
   class NetworkAppMetric < Base
     def call
-      calculate
-      @data
+      datasets
     end
 
     private
+
+    def datasets
+      [
+        {
+          measure: @measure,
+          chart_type: 'area',
+          timeframe: 'month',
+          order: 0,
+          data: data,
+        },
+      ]
+    end
+
+    def data
+      @data ||= base_query.map do |metric|
+        {
+          date: Date.parse(metric['measured_at']).to_s,
+          value: metric['number'],
+        }
+      end
+    end
 
     def base_query
       NetworkApi::AppMetric
         .where(json_api_query_params)
         .order(measured_at: :asc)
         .per(records_per_page)
-    end
-
-    # Include up to 100 records
-    def records_per_page
-      100
     end
 
     def json_api_query_params
@@ -28,15 +43,9 @@ module DataReport
       }.merge(params)
     end
 
-    def calculate
-      values = base_query.map do |metric|
-        {
-          date: Date.parse(metric['measured_at']).to_s,
-          amount: metric['number'],
-        }
-      end
-
-      @data[:values] = values
+    # Include up to 100 records
+    def records_per_page
+      100
     end
   end
 end

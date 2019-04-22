@@ -86,7 +86,7 @@ class MarketingPage extends React.Component {
 
             <Center>
               <ResponsiveInlineBlock>
-                <a className="get-early-access-header" href="/login">
+                <a className="get-early-access-header" href="/sign_up">
                   <MarketingCallToAction>
                     {this.state.pageTexts.buttonTopLeft}
                   </MarketingCallToAction>
@@ -96,7 +96,7 @@ class MarketingPage extends React.Component {
             {/*  -- VIDEO BUTTON DISABLED -- not ready yet
             <Center>
               <ResponsiveInlineBlock>
-                <a href="/login">
+                <a href="/sign_up">
                   <MarketingVideoLink>{this.state.pageTexts.buttonTopRight}</MarketingVideoLink>
                 </a>
               </ResponsiveInlineBlock>
@@ -125,8 +125,8 @@ class MarketingPage extends React.Component {
               </InvertMarketingH1>
             </Box>
             <Box w={1} pt={[46, 65]} pb={[46, 74]} mb={[10, 0]}>
-              <a className="get-early-access-footer" href="/login">
-                <MarketingCallToAction href="/login">
+              <a className="get-early-access-footer" href="/sign_up">
+                <MarketingCallToAction>
                   {this.state.pageTexts.buttonFooter}
                 </MarketingCallToAction>
               </a>

@@ -97,7 +97,7 @@ class CommentThreadHeader extends React.Component {
         if (!users_thread) return
         if (users_thread.currentSubscribed) {
           users_thread.unsubscribedFromEmail = true
-          this.toggleSubscribe({ preventDefault: () => {} })
+          this.toggleSubscribe()
         }
       }
     }
@@ -129,8 +129,10 @@ class CommentThreadHeader extends React.Component {
   }
 
   toggleSubscribe = ev => {
-    ev.preventDefault()
-    ev.stopPropagation()
+    if (ev) {
+      ev.preventDefault()
+      ev.stopPropagation()
+    }
     const { thread } = this.props
     const { users_thread } = thread
     if (users_thread) users_thread.unsubscribedFromEmail = false

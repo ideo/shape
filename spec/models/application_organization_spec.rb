@@ -27,6 +27,22 @@ RSpec.describe ApplicationOrganization, type: :model do
           application_user.has_role?(Role::APPLICATION_USER, organization),
         ).to be true
       end
+
+      context 'if bot user already has a current collection' do
+        let(:app_org_two) do
+          create(:application_organization,
+                 application: application_organization.application)
+        end
+
+        it 'creates new collection' do
+          expect {
+            app_org_two
+          }.to change(Collection::ApplicationCollection, :count).by(1)
+          expect(
+            app_org_two.root_collection_id,
+          ).not_to eq(application_organization.root_collection_id)
+        end
+      end
     end
 
     describe '#remove_user_from_organization' do

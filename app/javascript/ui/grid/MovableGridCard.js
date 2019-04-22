@@ -39,20 +39,49 @@ const bounceAnim = keyframes`
   }
 `
 
-const InnerCardWrapper = styled.div`
-  width: 100%;
-  height: 100%;
-  width: 100%;
+const InnerCardWrapper = styled.div.attrs({
+  style: ({ width, height, transition, transform }) => ({
+    transition,
+    transform,
+    height: `${height}px`,
+    width: `${width}px`,
+  }),
+})`
+  transform-origin: left top;
+  backface-visibility: hidden;
+  font-smoothing: subpixel-antialiased;
   ${props =>
     props.animatedBounce &&
     `
     animation: ${bounceAnim} 0.25s ease-out;
-  `};
+    `};
 `
 
 const cardCSSTransition = 'transform 0.4s, width 0.25s, height 0.25s'
 const cardHoverTransition = 'transform 0.2s'
-const TOP_SCROLL_TRIGGER = 210
+
+const scrollAmount = () => {
+  // When zooming browser in or out, it doesn't work to use `1` as the unit,
+  // There aren't any reliable ways to get the zoom level from all browsers.
+  // This library doesn't work: https://github.com/tombigel/detect-zoom.
+  // window.devicePixelRatio doesn't work on all browsers.
+  // Setting a div of a fixed width on the page and measuring it's width doesn't work.
+  //
+  // What we need is to return a value that is > 1 for zoomed in screens
+  // window.devicePixelRatio will be 1 for non-retina
+  // and retina is likely at 2, but if zoomed out to 50% is 1
+  //
+  let amount
+  if (window.devicePixelRatio >= 2) {
+    amount = window.devicePixelRatio
+  } else if (window.devicePixelRatio >= 1) {
+    amount = 2
+  } else {
+    // After testing out multiple values, this seemed to be the right balance
+    amount = 1.5 / window.devicePixelRatio
+  }
+  return amount
+}
 
 class MovableGridCard extends React.PureComponent {
   constructor(props) {
@@ -68,6 +97,8 @@ class MovableGridCard extends React.PureComponent {
       initialOffsetY: 0,
       x: props.position.xPos,
       y: props.position.yPos,
+      resizeWidth: 0,
+      resizeHeight: 0,
     }
   }
 
@@ -99,39 +130,107 @@ class MovableGridCard extends React.PureComponent {
     })
   }
 
+  scrollIfNearPageBounds = e => {
+    const { horizontalScroll, card } = this.props
+    const { gridW } = uiStore.gridSettings
+
+    // NOTE: these hide so that we can fully control the page scroll
+    // otherwise the browser will *also* try to scroll when you hit the edges;
+    // however, there is some UI helpfulness lost if you can't see the scrollbars :(
+    if (!horizontalScroll) {
+      document.body.style['overflow-x'] = 'hidden'
+      document.body.style['overflow-y'] = 'hidden'
+    }
+
+    // Vertical Scroll
+    if (e.clientY < v.topScrollTrigger) {
+      // At top of viewport
+      this.scrolling = true
+      this.scrollUp(null, e.clientY)
+      return
+    } else if (e.clientY > window.innerHeight - v.topScrollTrigger) {
+      // At bottom of viewport
+      this.scrolling = true
+      this.scrollDown()
+      return
+    }
+
+    // Horizontal Scroll
+    if (!horizontalScroll) {
+      this.scrolling = false
+      return
+    }
+    const cardWidth = (card.width * gridW) / 2
+    const leftMargin = v.containerPadding.horizontal * 16
+
+    // At right of viewport
+    if (e.clientX > window.innerWidth - cardWidth + leftMargin) {
+      this.scrolling = true
+      this.scrollRight()
+      // At left of viewport
+    } else if (e.clientX - cardWidth - leftMargin < 0) {
+      this.scrolling = true
+      this.scrollLeft()
+    } else {
+      this.scrolling = false
+    }
+  }
+
+  get scrollElement() {
+    const { scrollElement } = this.props
+    if (scrollElement) return scrollElement
+    return window
+  }
+
   scrollUp = (timestamp, clientY) => {
     if (clientY) this.clientY = clientY
     if (!this.scrolling) return null
-    if (window.scrollY < 10) {
+    const scrollY = window.scrollY || window.pageYOffset
+    if (scrollY < 10) {
       return window.requestAnimationFrame(this.scrollUp)
     }
-    const scrollAmount = 1
 
-    window.scrollBy(0, -scrollAmount)
+    this.scrollElement.scrollBy(0, -scrollAmount())
 
     return window.requestAnimationFrame(this.scrollUp)
   }
 
   scrollDown = timestamp => {
     if (!this.scrolling) return null
+    const scrollY = window.scrollY || window.pageYOffset
     if (
-      window.innerHeight + window.scrollY >=
+      window.innerHeight + scrollY >=
       document.body.offsetHeight + uiStore.gridSettings.gridH * 2
     ) {
       return window.requestAnimationFrame(this.scrollDown)
     }
-    const scrollAmount = 1
 
-    window.scrollBy(0, scrollAmount)
+    this.scrollElement.scrollBy(0, scrollAmount())
 
     return window.requestAnimationFrame(this.scrollDown)
   }
 
+  scrollLeft = timestamp => {
+    if (!this.scrolling) return null
+
+    this.scrollElement.scrollBy(-scrollAmount(), 0)
+    return window.requestAnimationFrame(this.scrollLeft)
+  }
+
+  scrollRight = timestamp => {
+    if (!this.scrolling) return null
+
+    this.scrollElement.scrollBy(scrollAmount(), 0)
+    return window.requestAnimationFrame(this.scrollRight)
+  }
+
   handleDrag = (e, data, dX, dY) => {
-    const { position } = this.props
+    const { position, dragOffset, zoomLevel } = this.props
     // Global dragging should use screen coordinates
     // TODO this could also be a HOC that publishes to the UI store
     const { pageX, pageY } = e
+    // When zooming browser in or out, it multiplies pageX and pageY by that zoom
+    // e.g. 50% zoom multiplies all coordinate values by 2
     uiStore.drag({ x: pageX, y: pageY })
 
     // x, y represent the current drag position
@@ -142,31 +241,17 @@ class MovableGridCard extends React.PureComponent {
       return
     }
 
-    document.body.style['overflow-y'] = 'hidden'
+    this.scrollIfNearPageBounds(e)
 
-    if (e.clientY < TOP_SCROLL_TRIGGER) {
-      // At top of viewport
-      this.scrolling = true
-      this.scrollUp(null, e.clientY)
-    } else if (e.clientY > window.innerHeight - TOP_SCROLL_TRIGGER) {
-      // At bottom of viewport
-      this.scrolling = true
-      this.scrollDown()
-    } else {
-      this.scrolling = false
-    }
+    const cardX = e.pageX - dragOffset.x
+    const cardY = e.pageY - dragOffset.y
 
-    const pageMargin = window.innerWidth - v.maxWidth
-    let cardX = e.pageX
-    if (window.innerWidth >= v.maxWidth) {
-      cardX -= pageMargin / 2
-    } else {
-      cardX -= 35
-    }
-    const cardY = e.pageY - TOP_SCROLL_TRIGGER
+    // Set x and y to be in the middle of the card
+    // Zoom levels multiply coordinates,
+    // so we must also multiply card dimensions by the zoom level
     this.setState({
-      x: cardX - position.width / 2,
-      y: cardY - position.height / 2,
+      x: cardX - position.width / zoomLevel / 2,
+      y: cardY - position.height / zoomLevel / 2,
     })
 
     if (!this.state.dragging) {
@@ -174,10 +259,15 @@ class MovableGridCard extends React.PureComponent {
       // close the MoveMenu to prevent weird behaviors
       uiStore.closeMoveMenu({ deselect: false })
       uiStore.startDragging(this.props.card.id)
-      this.setState({
-        dragging: true,
-        moveComplete: false,
-      })
+      this.setState(
+        {
+          dragging: true,
+          moveComplete: false,
+        },
+        () => {
+          this.props.onDragStart && this.props.onDragStart(this.props.card.id)
+        }
+      )
     }
     const dragPosition = {
       dragX: cardX,
@@ -186,14 +276,24 @@ class MovableGridCard extends React.PureComponent {
     }
 
     this.dragPosition = dragPosition
+    this.props.card.dragPosition = dragPosition
     this.props.onDrag(this.props.card.id, dragPosition)
   }
 
   handleStop = type => ev => {
+    const { horizontalScroll } = this.props
     this.scrolling = false
     document.body.style['overflow-y'] = 'auto'
+    if (horizontalScroll) document.body.style['overflow-x'] = 'auto'
     this.setState({ dragging: false, resizing: false }, () => {
-      this.props.onDragOrResizeStop(this.props.card.id, type)
+      // Resizing has to be reset first, before the handler or the card dimensions
+      // will jump back in forth as the grid resizes the actual card while this
+      // resize state is still set.
+      this.setState({
+        resizeWidth: 0,
+        resizeHeight: 0,
+      })
+      this.props.onDragOrResizeStop(this.props.card.id, type, ev)
       const timeoutId = setTimeout(() => {
         // have this item remain "on top" while it animates back
         this.setState({
@@ -230,6 +330,7 @@ class MovableGridCard extends React.PureComponent {
     newSize.height = Math.max(Math.min(newSize.height, 2), 1)
     this.props.onResize(this.props.card.id, newSize)
     this.scrolling = false
+    this.setState({ resizeWidth: delta.width, resizeHeight: delta.height })
   }
 
   // this function gets passed down to the card, so it can place the onClick handler
@@ -296,16 +397,19 @@ class MovableGridCard extends React.PureComponent {
         card={this.props.card}
         dragging={this.state.dragging}
         showHotspot={beginningOfRow}
+        showHotEdge={this.props.showHotEdge}
       />
     </PositionedGridCard>
   )
 
   renderPagination = () => {
+    const { loadCollectionCards } = this.props
     const collection = this.props.parent
     return (
       <PositionedGridCard {...this.styleProps()}>
         <GridCardPagination
           collection={collection}
+          loadCollectionCards={loadCollectionCards}
           nextPage={collection.nextPage}
         />
       </PositionedGridCard>
@@ -315,12 +419,10 @@ class MovableGridCard extends React.PureComponent {
   renderBlank = cardType => {
     const { card, parent } = this.props
     const styleProps = this.styleProps()
-    const { height, xPos, yPos } = styleProps
+    const { height, width, xPos, yPos } = styleProps
     const { blankType } = card
 
-    let cardElement = (
-      <GridCardBlank height={height} parent={parent} preselected={blankType} />
-    )
+    let cardElement = <GridCardBlank parent={parent} preselected={blankType} />
     if (cardType === 'submission') {
       cardElement = (
         <AddSubmission
@@ -328,6 +430,11 @@ class MovableGridCard extends React.PureComponent {
           submissionSettings={card.submissionSettings}
         />
       )
+    }
+
+    let transformOrigin = `${xPos}px ${yPos}px`
+    if (card.id === 'blank') {
+      transformOrigin = `${xPos + width / 2}px ${yPos + height / 2}px`
     }
 
     return (
@@ -338,11 +445,11 @@ class MovableGridCard extends React.PureComponent {
         appearAnimation={{
           from: {
             transform: `scaleX(0) scaleY(0)`,
-            transformOrigin: `${xPos}px ${yPos}px`,
+            transformOrigin,
           },
           to: {
             transform: `scaleX(1) scaleY(1)`,
-            transformOrigin: `${xPos}px ${yPos}px`,
+            transformOrigin,
           },
         }}
       >
@@ -364,11 +471,16 @@ class MovableGridCard extends React.PureComponent {
       canEditCollection,
       isUserCollection,
       isSharedCollection,
+      isBoardCollection,
       lastPinnedCard,
       hidden,
       hoveringOverLeft,
       hoveringOverRight,
       holdingOver,
+      maxResizeRow,
+      maxResizeCol,
+      zoomLevel,
+      showHotEdge,
     } = this.props
 
     let {
@@ -376,7 +488,15 @@ class MovableGridCard extends React.PureComponent {
       position: { width },
     } = this.props
 
-    const { dragging, resizing, moveComplete, x, y } = this.state
+    const {
+      dragging,
+      resizing,
+      moveComplete,
+      resizeWidth,
+      resizeHeight,
+      x,
+      y,
+    } = this.state
 
     if (cardType === 'placeholder') {
       return this.renderPlaceholder()
@@ -388,13 +508,18 @@ class MovableGridCard extends React.PureComponent {
       return this.renderPagination()
     }
 
-    const { gridW, gridH, cols } = uiStore.gridSettings
-    const minWidth = gridW * 0.8
-    const minHeight = gridH * 0.8
+    const { gridW, gridH, cols, gutter } = uiStore.gridSettings
+    // TODO: esp. for foamcore, change this min/max pixel based resize logic...
+    // resize placeholder should determine if it's overlapping an empty spot or not
+    const minWidth = (gridW * 0.8) / zoomLevel
+    const minHeight = (gridH * 0.8) / zoomLevel
     // need to always set Rnd maxWidth to 4 columns instead of `cols`
     // because of this issue: https://github.com/bokuweb/react-rnd/issues/221
-    const maxWidth = uiStore.gridWidthFor(4)
-    const maxHeight = uiStore.gridHeightFor(2, { useDefault: true })
+    const maxWidth = (maxResizeCol * (gridW + gutter)) / zoomLevel
+    const maxHeight =
+      uiStore.gridHeightFor(maxResizeRow, {
+        useDefault: true,
+      }) / zoomLevel
 
     let xAdjust = 0
     let yAdjust = 0
@@ -402,13 +527,13 @@ class MovableGridCard extends React.PureComponent {
     if (dragging) {
       // experiment -- shrink wide and tall cards for easier movement
       if (width > 500) {
-        if (this.state.initialOffsetX > TOP_SCROLL_TRIGGER) {
+        if (this.state.initialOffsetX > v.topScrollTrigger) {
           xAdjust = this.state.initialOffsetX * 0.25
         }
         width *= 0.8
       }
       if (height > 500) {
-        if (this.state.initialOffsetY > TOP_SCROLL_TRIGGER) {
+        if (this.state.initialOffsetY > v.topScrollTrigger) {
           yAdjust = this.state.initialOffsetY * 0.25
         }
         height *= 0.8
@@ -428,35 +553,41 @@ class MovableGridCard extends React.PureComponent {
       menuOpen,
       canEditCollection,
       isUserCollection,
+      isBoardCollection,
       isSharedCollection,
       lastPinnedCard,
+      showHotEdge,
     }
 
     const draggingMultiple =
       cardProps.dragging && uiStore.multiMoveCardIds.length > 1
 
-    let zIndex = 0
+    let zIndex = 1
     if (!moveComplete) zIndex = v.zIndex.cardDragging
     if (uiStore.cardMenuOpen.id === card.id) {
       zIndex = v.zIndex.aboveClickWrapper
     }
-    let transform = null
+    let transform = `translateZ(0) scale(${1 / zoomLevel})`
+    const adjustedWidth = (width + resizeWidth) / zoomLevel
+    const adjustedHeight = (height + resizeHeight) / zoomLevel
+    // const outerTransform = `scale(${1 / zoomLevel})`
     let transition = dragging || resizing ? 'none' : cardCSSTransition
     // TODO this should actually check it's a breadcrumb
     const draggedOverBreadcrumb = !!uiStore.activeDragTarget
     if (dragging) {
-      transform = `translate(${xAdjust}px, ${yAdjust}px) rotate(3deg)`
+      transform += ` translate(${xAdjust}px, ${yAdjust}px) rotate(3deg)`
       if (draggedOverBreadcrumb) {
-        transform = 'scaleX(0.75) scaleY(0.75) translate(0px, 180px)'
+        transform += ' scaleX(0.75) scaleY(0.75) translate(0px, 180px)'
         transition = cardHoverTransition
       }
     } else if (hoveringOverLeft) {
       zIndex = v.zIndex.cardHovering
-      transform = 'translate(32px, -32px)'
+      const amount = 32 / zoomLevel
+      transform += ` translate(${amount}px, -${amount}px)`
       transition = cardHoverTransition
     } else if (hoveringOverRight) {
       zIndex = v.zIndex.cardHovering
-      transform = 'scaleX(1.075) scaleY(1.075)'
+      transform += ' scaleX(1.075) scaleY(1.075)'
       transition = cardHoverTransition
     }
 
@@ -488,9 +619,17 @@ class MovableGridCard extends React.PureComponent {
           maxHeight={maxHeight}
           dragAxis="none"
           cancel=".no-drag"
-          size={{ width, height }}
+          size={{
+            width: adjustedWidth,
+            height: adjustedHeight,
+          }}
           position={{ x, y }}
-          default={{ width, height, x: xPos, y: yPos }}
+          default={{
+            width: adjustedWidth,
+            height: adjustedHeight,
+            x: xPos,
+            y: yPos,
+          }}
           disableDragging={
             !canEditCollection ||
             // NOTE: disabling dragging for touchscreens because of conflict with touch scrolling
@@ -528,10 +667,10 @@ class MovableGridCard extends React.PureComponent {
         >
           <InnerCardWrapper
             animatedBounce={holdingOver}
-            style={{
-              transform,
-              transition,
-            }}
+            width={width + resizeWidth}
+            height={height + resizeHeight}
+            transition={transition}
+            transform={transform}
           >
             <GridCard
               {...cardProps}
@@ -551,10 +690,12 @@ MovableGridCard.propTypes = {
   canEditCollection: PropTypes.bool.isRequired,
   isUserCollection: PropTypes.bool.isRequired,
   isSharedCollection: PropTypes.bool.isRequired,
+  isBoardCollection: PropTypes.bool.isRequired,
   hoveringOverLeft: PropTypes.bool.isRequired,
   hoveringOverRight: PropTypes.bool.isRequired,
   holdingOver: PropTypes.bool.isRequired,
   position: PropTypes.shape(propShapes.position).isRequired,
+  dragOffset: PropTypes.shape(propShapes.xy).isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
   onDrag: PropTypes.func.isRequired,
@@ -564,11 +705,23 @@ MovableGridCard.propTypes = {
   menuOpen: PropTypes.bool.isRequired,
   lastPinnedCard: PropTypes.bool,
   hidden: PropTypes.bool,
+  zoomLevel: PropTypes.number,
+  maxResizeRow: PropTypes.number,
+  maxResizeCol: PropTypes.number,
+  scrollElement: MobxPropTypes.objectOrObservableObject,
+  horizontalScroll: PropTypes.bool,
+  showHotEdge: PropTypes.bool,
 }
 
 MovableGridCard.defaultProps = {
   lastPinnedCard: false,
   hidden: false,
+  zoomLevel: 1,
+  maxResizeRow: 2,
+  maxResizeCol: 4,
+  scrollElement: null,
+  horizontalScroll: false,
+  showHotEdge: true,
 }
 
 export default MovableGridCard

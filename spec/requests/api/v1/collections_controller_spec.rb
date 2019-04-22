@@ -3,6 +3,52 @@ require 'rails_helper'
 describe Api::V1::CollectionsController, type: :request, json: true, auth: true do
   let(:user) { @user }
 
+  context 'with API user' do
+    let!(:api_user) { create(:user, :application_bot) }
+    before do
+      login_as(api_user)
+    end
+
+    describe 'GET #index', create_org: true do
+      let!(:collection) do
+        create(:collection, num_cards: 1, add_viewers: [api_user])
+      end
+      let!(:external_record) do
+        create(
+          :external_record,
+          application: api_user.application,
+          externalizable: collection,
+          external_id: '123',
+        )
+      end
+      let(:path) do
+        api_v1_collections_path(filter: { external_id: '123' })
+      end
+
+      it 'returns a 200' do
+        get(path)
+        expect(response.status).to eq(200)
+      end
+
+      it 'matches JSON schema' do
+        get(path)
+        expect(json['data'].size).to eq(1)
+        expect(json['data'].first['attributes']).to match_json_schema('collection', strict: false)
+      end
+
+      context 'if collection is archived' do
+        before do
+          collection.archive!
+        end
+
+        it 'is not included in API response' do
+          get(path)
+          expect(json['data']).to be_empty
+        end
+      end
+    end
+  end
+
   describe 'GET #show', create_org: true do
     let!(:collection) do
       create(:collection, num_cards: 5, add_viewers: [user])
@@ -330,6 +376,32 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       it 'returns a 204 no content' do
         patch(path, params: params)
         expect(response.status).to eq(204)
+      end
+    end
+
+    context 'with row and col' do
+      let(:params) do
+        json_api_params(
+          'collections',
+          raw_params.merge(
+            collection_cards_attributes: {
+              id: collection_card.id,
+              width: 3,
+              row: 4,
+              col: 5,
+            }
+          ),
+        )
+      end
+
+      it 'updates card col and row' do
+        expect(collection_card.row).not_to eq(4)
+        expect(collection_card.col).not_to eq(5)
+        patch(path, params: params)
+        expect(response.status).to eq(200)
+        collection_card.reload
+        expect(collection_card.row).to eq(4)
+        expect(collection_card.col).to eq(5)
       end
     end
   end

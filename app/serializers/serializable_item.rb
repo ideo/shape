@@ -4,7 +4,7 @@ class SerializableItem < BaseJsonSerializer
   attributes :name, :content, :data_content,
              :url, :thumbnail_url, :icon_url, :question_type,
              :data_source_type, :data_source_id, :data_settings,
-             :previous_thumbnail_urls
+             :previous_thumbnail_urls, :legend_item_id
 
   has_many :roles do
     data do
@@ -65,5 +65,9 @@ class SerializableItem < BaseJsonSerializer
   attribute :pinned_and_locked do
     # might be nil, particularly in tests
     @object.pinned_and_locked? || false
+  end
+
+  attribute :pending_transcoding do
+    @object.pending_transcoding_uuid.present?
   end
 end

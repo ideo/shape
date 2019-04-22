@@ -1,6 +1,7 @@
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import CoverImageToggle from '~/ui/grid/CoverImageToggle'
 import { fakeCollectionCard } from '#/mocks/data'
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 const card = fakeCollectionCard
 let props = {}
@@ -19,6 +20,10 @@ describe('CoverImageToggle', () => {
     }
     rerender()
     component = wrapper.instance()
+  })
+
+  it('renders snapshot', () => {
+    expectTreeToMatchSnapshot(wrapper)
   })
 
   describe('render()', () => {

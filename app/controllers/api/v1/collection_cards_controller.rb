@@ -9,10 +9,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :load_collection_cards, only: %i[index]
   def index
     params[:card_order] ||= @collection.default_card_order
+
     render jsonapi: @collection_cards,
            include: [
              :parent,
-             record: [:filestack_file],
+             record: %i[filestack_file collection_cover_items],
            ],
            expose: {
              card_order: params[:card_order],
@@ -40,7 +41,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       current_user.reload.reset_cached_roles!
       card.reload
       create_notification(card, :created)
-      broadcast_collection_create_updates
+      # because TextItems get created empty, we don't broadcast their creation
+      broadcast_collection_create_updates unless card.record.is_a?(Item::TextItem)
       render jsonapi: card,
              include: [:parent, record: [:filestack_file]],
              expose: { current_record: card.record }
@@ -169,15 +171,28 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def load_collection_cards
-    # ensure per_page is between 50 and 200
-    per_page = [params[:per_page].to_i, CollectionCard::DEFAULT_PER_PAGE].max
-    per_page = [per_page, 200].min
+    if @collection.is_a?(Collection::Board)
+      # Defaults to 16x16 since we default to a fully zoomed-out view
+      rows = params[:rows].is_a?(Array) ? params[:rows] : [0, 16]
+      cols = params[:cols].is_a?(Array) ? params[:cols] : [0, 16]
+      scope = @collection.collection_cards_by_row_and_col(
+        rows: rows,
+        cols: cols,
+      )
+    else
+      # ensure per_page is between 50 and 200
+      per_page = [params[:per_page].to_i, CollectionCard::DEFAULT_PER_PAGE].max
+      per_page = [per_page, 200].min
+      scope = @collection.collection_cards_by_page(
+        page: @page,
+        per_page: per_page,
+      )
+    end
 
     @collection_cards = @collection.collection_cards_viewable_by(
       current_user,
+      scope: scope,
       card_order: params[:card_order],
-      page: @page,
-      per_page: per_page,
       hidden: params[:hidden].present?,
     )
   end
@@ -199,7 +214,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def load_and_authorize_moving_collections
     @from_collection = Collection.find(json_api_params[:from_id])
-    @cards = CollectionCard.where(id: json_api_params[:collection_card_ids])
+    @cards = ordered_cards
     @to_collection = Collection.find(json_api_params[:to_id])
     authorize! :edit_content, @from_collection
     authorize! :edit_content, @to_collection
@@ -208,7 +223,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   # almost the same as above but needs to authorize read access for each card's record
   def load_and_authorize_linking_collections
     @from_collection = Collection.find(json_api_params[:from_id])
-    @cards = CollectionCard.where(id: json_api_params[:collection_card_ids])
+    @cards = ordered_cards
     @cards.each do |card|
       authorize! :read, card.record
     end
@@ -285,6 +300,10 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     CollectionUpdateBroadcaster.call(@collection_cards.first.parent, current_user)
   end
 
+  def ordered_cards
+    CollectionCard.ordered.where(id: json_api_params[:collection_card_ids])
+  end
+
   def collection_card_update_params
     params.require(:collection_card).permit(
       :width,
@@ -293,6 +312,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :is_cover,
       :filter,
       :show_replace,
+      :order,
     )
   end
 
@@ -305,8 +325,12 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def collection_card_params
     params.require(:collection_card).permit(
       :order,
+      :row,
+      :col,
       :width,
       :height,
+      :row,
+      :col,
       :reference,
       :parent_id,
       :collection_id,
@@ -324,6 +348,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         template_id
         master_template
         external_id
+        cover_type
       ],
       item_attributes: [
         :id,
@@ -338,6 +363,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         :report_type,
         :external_id,
         :content,
+        :legend_item_id,
         data_content: {},
         filestack_file_attributes: [
           :url,

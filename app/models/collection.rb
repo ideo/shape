@@ -22,10 +22,10 @@ class Collection < ApplicationRecord
                  :cached_cover,
                  :cached_tag_list,
                  :cached_owned_tag_list,
-                 :cached_org_properties,
                  :cached_card_count,
                  :submission_attrs,
                  :getting_started_shell,
+                 :awaiting_first_user_content,
                  :cached_inheritance
 
   # callbacks
@@ -77,6 +77,12 @@ class Collection < ApplicationRecord
           inverse_of: :collection,
           dependent: :destroy
 
+  has_many :collection_cover_cards,
+           -> { active.is_cover.ordered },
+           class_name: 'CollectionCard::Primary',
+           foreign_key: :parent_id,
+           inverse_of: :parent
+
   has_many :items, through: :primary_collection_cards
   has_many :collections, through: :primary_collection_cards
   has_many :items_and_linked_items,
@@ -85,6 +91,9 @@ class Collection < ApplicationRecord
   has_many :collections_and_linked_collections,
            through: :collection_cards,
            source: :collection
+  has_many :collection_cover_items,
+           through: :collection_cover_cards,
+           source: :item
 
   has_one :comment_thread, as: :record, dependent: :destroy
 
@@ -113,6 +122,11 @@ class Collection < ApplicationRecord
   enum processing_status: {
     processing_breadcrumb: 1,
     duplicating: 2,
+  }
+
+  enum cover_type: {
+    cover_type_default: 0,
+    cover_type_items: 1,
   }
 
   # Searchkick Config
@@ -202,6 +216,7 @@ class Collection < ApplicationRecord
       :submission_template,
       :collection_to_test,
       :live_test_collection,
+      :collection_cover_items,
       roles: %i[pending_users users groups resource],
     ]
   end
@@ -253,6 +268,8 @@ class Collection < ApplicationRecord
     end
     # Clones collection and all embedded items/collections
     c = amoeba_dup
+    # clear out cached submission_attrs
+    c.cached_attributes.delete 'submission_attrs'
     c.cloned_from = self
     c.created_by = for_user
     c.tag_list = tag_list
@@ -263,7 +280,7 @@ class Collection < ApplicationRecord
     # NOTE: parent is only nil in Colab import -- perhaps we should clean up any Colab import specific code?
     c.organization_id = parent.try(:organization_id) || organization_id
 
-    if system_collection && parent.try(:cloned_from).try(:getting_started?)
+    if system_collection && self.parent.try(:parent).try(:getting_started?)
       c.getting_started_shell = true
     end
 
@@ -280,6 +297,9 @@ class Collection < ApplicationRecord
       )
       c.parent_collection_card.collection = c
     end
+
+    # Method from Externalizable
+    duplicate_external_records(c)
 
     c.enable_org_view_access_if_allowed(parent)
 
@@ -300,6 +320,30 @@ class Collection < ApplicationRecord
 
     # pick up newly created relationships
     c.reload
+  end
+
+  def copy_all_cards_into!(
+    target_collection,
+    placement: 'beginning',
+    synchronous: false,
+    system_collection: false
+  )
+    cards = placement != 'end' ? collection_cards.reverse : collection_cards
+    duplicates = []
+    cards.each do |card|
+      # ensures single copy, if existing copies already exist it will skip those
+      existing_records = target_collection.collection_cards.map(&:record)
+      next if existing_records.select { |r| r.cloned_from == card.record }.present?
+      duplicates << card.duplicate!(
+        parent: target_collection,
+        placement: placement,
+        synchronous: synchronous,
+        # can allow copies to continue even if the user can't view the original content
+        system_collection: system_collection,
+      )
+    end
+    # return the set of created duplicates
+    CollectionCard.where(id: duplicates.pluck(:id))
   end
 
   # NOTE: this refers to the first level of children
@@ -363,9 +407,33 @@ class Collection < ApplicationRecord
     end
   end
 
+  def collection_cards_by_page(page: 1, per_page: CollectionCard::DEFAULT_PER_PAGE)
+    all_collection_cards.page(page).per(per_page)
+  end
+
+  # If a board, it handles pagination differently
+  # rows and cols params are arrays of [min, max]
+  def collection_cards_by_row_and_col(rows:, cols:)
+    table = CollectionCard.arel_table
+    all_collection_cards.where(
+      table[:row].gteq(rows[0])
+      .and(
+        table[:row].lteq(rows[1]),
+      )
+      .and(
+        table[:col].gteq(cols[0]),
+      )
+      .and(
+        table[:col].lteq(cols[1]),
+      ),
+    )
+  end
+
   def collection_cards_viewable_by(
     user,
-    card_order: nil, page: 1, per_page: CollectionCard::DEFAULT_PER_PAGE, hidden: false
+    scope: all_collection_cards,
+    card_order: nil,
+    hidden: false
   )
     order = { order: :asc }
     collection_order = nil
@@ -379,7 +447,11 @@ class Collection < ApplicationRecord
       end
     end
 
-    cards = all_collection_cards.active
+    cards = scope
+            .active
+            .includes(collection: [:collection_cover_items], item: [:filestack_file])
+            .order(order)
+
     # `hidden` means include both hidden and unhidden cards
     cards = cards.visible unless hidden
 
@@ -427,16 +499,10 @@ class Collection < ApplicationRecord
               .distinct
     end
 
-    cards = cards
-            .includes(:collection, item: [:filestack_file])
-            .order(order)
-            .page(page)
-            .per(per_page)
-
     # precache roles because these will be referred to in the serializers (e.g. can_edit?)
     user.precache_roles_for(
       [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],
-      cards.map(&:record),
+      cards.map(&:record).compact,
     )
 
     cards
@@ -509,7 +575,7 @@ class Collection < ApplicationRecord
   end
 
   def cache_cover
-    self.cached_cover = CollectionCover.call(self)
+    self.cached_cover = DefaultCollectionCover.call(self)
   end
 
   def cache_cover!
@@ -527,7 +593,7 @@ class Collection < ApplicationRecord
   end
 
   def update_cover_text!(text_item)
-    cached_cover['text'] = CollectionCover.cover_text(self, text_item)
+    cached_cover['text'] = DefaultCollectionCover.cover_text(self, text_item)
     save
   end
 
@@ -638,6 +704,14 @@ class Collection < ApplicationRecord
     result
   end
 
+  def last_non_blank_row
+    collection_cards.map(&:row).compact.max.to_i
+  end
+
+  def empty_row_for_moving_cards
+    last_non_blank_row + 2
+  end
+
   # =================================
   # Various boolean queries/checks
   # - many are related to test collections and submission_boxes
@@ -645,6 +719,10 @@ class Collection < ApplicationRecord
   # =================================
   def test_collection?
     is_a?(Collection::TestCollection) || is_a?(Collection::TestDesign)
+  end
+
+  def board_collection?
+    type == 'Collection::Board'
   end
 
   def global_collection?

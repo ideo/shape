@@ -20,8 +20,10 @@ class Api::V1::BaseController < ApplicationController
       'Item::QuestionItem': SerializableItem,
       'Item::ChartItem': SerializableItem,
       'Item::DataItem': SerializableDataItem,
+      'Item::LegendItem': SerializableLegendItem,
       'Collection::UserCollection': SerializableCollection,
       'Collection::ApplicationCollection': SerializableCollection,
+      'Collection::Board': SerializableCollection,
       'Collection::SharedWithMeCollection': SerializableCollection,
       'Collection::Global': SerializableCollection,
       'Collection::TestCollection': SerializableCollection,
@@ -156,5 +158,9 @@ class Api::V1::BaseController < ApplicationController
     @page = params[:page].try(:to_i) ||
             params[:page].try(:[], :number) ||
             1
+  end
+
+  def log_activity?
+    current_api_token.blank?
   end
 end

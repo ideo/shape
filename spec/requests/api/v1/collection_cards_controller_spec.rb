@@ -170,10 +170,53 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         end
       end
     end
+
+    context 'with Board collection' do
+      let!(:board_collection) do
+        create(:board_collection, num_cards: 4, add_editors: [user])
+      end
+      let(:board_collection_cards) { board_collection.collection_cards }
+      let(:path) do
+        "/api/v1/collections/#{board_collection.id}/collection_cards?rows[]=2&rows[]=4&cols[]=0&cols[]=2"
+      end
+      let!(:cards_included) do
+        board_collection_cards[0].update(row: 2, col: 0)
+        board_collection_cards[1].update(row: 4, col: 2)
+        [
+          board_collection_cards[0],
+          board_collection_cards[1],
+        ]
+      end
+      let!(:cards_excluded) do
+        board_collection_cards[2].update(row: 0, col: 0)
+        board_collection_cards[3].update(row: 2, col: 3)
+        [
+          board_collection_cards[2],
+          board_collection_cards[3],
+        ]
+      end
+      before do
+        board_collection.items.each { |i| user.add_role(Role::VIEWER, i) }
+      end
+
+      it 'includes cards with requested rows and columns' do
+        get(path)
+        expect(
+          json['data'].map { |card| card['id'].to_i },
+        ).to match_array(cards_included.map(&:id))
+      end
+    end
   end
 
   describe 'POST #create' do
     let(:path) { '/api/v1/collection_cards' }
+    let(:item_attributes) do
+      {
+        content: 'This is my item content',
+        data_content: { ops: [{ insert: 'This is my item content.' }] },
+        type: 'Item::TextItem',
+      }
+    end
     let(:raw_params) do
       {
         order: 1,
@@ -182,11 +225,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         # parent_id is required to retrieve the parent collection without a nested route
         parent_id: collection.id,
         # create with a nested item
-        item_attributes: {
-          content: 'This is my item content',
-          data_content: { ops: [{ insert: 'This is my item content.' }] },
-          type: 'Item::TextItem',
-        },
+        item_attributes: item_attributes,
       }
     end
     let(:params) { json_api_params('collection_cards', raw_params) }
@@ -242,12 +281,40 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         post(path, params: params)
       end
 
-      it 'broadcasts collection updates' do
-        expect(CollectionUpdateBroadcaster).to receive(:call).with(
-          collection,
-          user,
-        )
-        post(path, params: params)
+      context 'broadcasting updates' do
+        context 'with a text item' do
+          let(:item_attributes) do
+            {
+              content: '',
+              data_content: {},
+              type: 'Item::TextItem',
+            }
+          end
+
+          it 'does not broadcast collection updates' do
+            # text items get created empty so we don't broadcast yet
+            expect(CollectionUpdateBroadcaster).not_to receive(:call)
+            post(path, params: params)
+          end
+        end
+
+        context 'with a link item' do
+          let(:item_attributes) do
+            {
+              content: 'This is my item content',
+              url: Faker::Internet.url('example.com'),
+              type: 'Item::LinkItem',
+            }
+          end
+
+          it 'broadcasts collection updates' do
+            expect(CollectionUpdateBroadcaster).to receive(:call).with(
+              collection,
+              user,
+            )
+            post(path, params: params)
+          end
+        end
       end
     end
 
@@ -507,7 +574,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         patch(path, params: params)
         combined_cards = to_collection.reload.collection_cards
         # expect to find moved cards at the front
-        expect(combined_cards.first(2)).to match_array moving_cards
+        expect(combined_cards.first(2)).to eq moving_cards
         expect(combined_cards.count).to eq 5
       end
 
@@ -535,6 +602,19 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       it 'creates an activity' do
         expect(ActivityAndNotificationBuilder).to receive(:call).twice
         patch(path, params: params)
+      end
+
+      context 'with specific order' do
+        before do
+          moving_cards.first.update(order: 1)
+          moving_cards.last.update(order: 0)
+        end
+
+        it 'moves new cards to the front of the collection and preserves order' do
+          patch(path, params: params)
+          combined_cards = to_collection.reload.collection_cards
+          expect(combined_cards.first).to eq moving_cards.last
+        end
       end
     end
   end

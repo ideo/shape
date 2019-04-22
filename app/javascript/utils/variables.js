@@ -7,11 +7,17 @@ export const ITEM_TYPES = {
   CHART: 'Item::ChartItem',
   DATA: 'Item::DataItem',
   EXTERNAL_IMAGE: 'Item::ExternalImageItem',
+  LEGEND: 'Item::LegendItem',
 }
 
 export const COLLECTION_TYPES = {
   TEST: 'Collection::TestCollection',
   TEST_DESIGN: 'Collection::TestDesign',
+}
+
+export const DATASET_CHART_TYPES = {
+  AREA: 'area',
+  LINE: 'line',
 }
 
 export const DATA_MEASURES = [
@@ -30,13 +36,15 @@ export const KEYS = {
 }
 
 export default {
-  globalHeaderHeight: 82,
-  headerHeight: 192,
-  headerHeightCompact: 100,
+  headerHeight: 60,
+  // this is the margin to separate the page title from its content
+  pageContentMarginTop: 50,
   maxWidth: 1320,
   containerPadding: {
     horizontal: 2,
   },
+  topScrollTrigger: 210,
+  maxTitleLength: 144,
 
   // Keep in sync with assets/stylesheets/core/base.scss
   responsive: {
@@ -50,6 +58,8 @@ export default {
   },
 
   transitionWithDelay: 'all 0.3s 0.2s',
+
+  navOpacity: 0.9,
 
   colors: {
     black: '#120f0e',
