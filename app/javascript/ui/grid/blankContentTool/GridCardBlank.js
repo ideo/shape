@@ -70,15 +70,42 @@ const StyledBlankCreationTool = styled.div`
     }
   }
   transition: ${v.transitionWithDelay};
-  /* handle "small 4-col" layout i.e. layoutSize == 3 */
-  @media only screen and (min-width: ${v.responsive
-      .medBreakpoint}px) and (max-width: ${v.responsive.largeBreakpoint}px) {
-    padding: 1.5rem 1.33rem;
 
-    .foreground.foreground-bottom {
-      top: 80px;
+  /* handle "small 4-col" layout i.e. layoutSize == 3, except on Foamcore */
+  ${props =>
+    !props.board &&
+    `
+      @media only screen and (min-width: ${
+        v.responsive.medBreakpoint
+      }px) and (max-width: ${v.responsive.largeBreakpoint}px) {
+        padding: 1.5rem 1.33rem;
+
+        .foreground.foreground-bottom {
+          top: 80px;
+        }
+
+        .bct-background {
+          width: 135px;
+          height: 135px;
+          left: 50px;
+        }
+        .bct-dropzone {
+          width: 135px;
+          left: 50px;
+          .text {
+            top: 35px;
+            left: 28px;
+            font-size: 0.8rem;
+          }
+          .fsp-drop-pane__container {
+            width: 120px;
+            height: 120px;
+          }
+        }
+      }
     }
-  }
+
+  `};
 `
 
 const BctBackground = styled.div`
@@ -92,14 +119,6 @@ const BctBackground = styled.div`
   border: 8px solid ${v.colors.primaryLight};
   background: ${v.colors.primaryLightest};
   transition: ${v.transitionWithDelay};
-
-  /* handle "small 4-col" layout i.e. layoutSize == 3 */
-  @media only screen and (min-width: ${v.responsive
-      .medBreakpoint}px) and (max-width: ${v.responsive.largeBreakpoint}px) {
-    width: 135px;
-    height: 135px;
-    left: 50px;
-  }
 `
 BctBackground.displayName = 'BctBackground'
 
@@ -159,22 +178,6 @@ const BctDropzone = styled.div`
         font-size: 4rem;
       }
     `};
-  }
-
-  /* handle "small 4-col" layout i.e. layoutSize == 3 */
-  @media only screen and (min-width: ${v.responsive
-      .medBreakpoint}px) and (max-width: ${v.responsive.largeBreakpoint}px) {
-    width: 135px;
-    left: 50px;
-    .text {
-      top: 35px;
-      left: 28px;
-      font-size: 0.8rem;
-    }
-    .fsp-drop-pane__container {
-      width: 120px;
-      height: 120px;
-    }
   }
 `
 
@@ -389,6 +392,7 @@ class GridCardBlank extends React.Component {
   renderInner = () => {
     let inner
     const { creating, loading, droppingFile } = this.state
+    const { isBoard } = this.props.parent
     const isReplacing = !!this.replacingId
     const size = v.iconSizes.bct
 
@@ -438,7 +442,11 @@ class GridCardBlank extends React.Component {
         break
       default:
         inner = (
-          <BctDropzone droppingFile={droppingFile} id="dropzone">
+          <BctDropzone
+            className="bct-dropzone"
+            droppingFile={droppingFile}
+            id="dropzone"
+          >
             {!loading &&
               !droppingFile && (
                 <div className="text">
@@ -498,7 +506,10 @@ class GridCardBlank extends React.Component {
     )
 
     return (
-      <StyledBlankCreationTool replacing={isReplacing && !creating}>
+      <StyledBlankCreationTool
+        board={isBoard}
+        replacing={isReplacing && !creating}
+      >
         <Flex className="foreground" justify="space-between">
           {/* First row of options */}
           {!isReplacing &&
@@ -613,7 +624,7 @@ class GridCardBlank extends React.Component {
             </Flex>
           )}
         {inner}
-        <BctBackground />
+        <BctBackground className="bct-background" />
       </StyledBlankCreationTool>
     )
   }
@@ -621,15 +632,17 @@ class GridCardBlank extends React.Component {
   render() {
     const { testCollectionCard, uiStore, parent } = this.props
     const { gridSettings, blankContentToolState } = uiStore
+    const { isBoard } = parent
+    let { gridW, gridH } = gridSettings
+    if (isBoard) {
+      ;({ gridW, gridH } = uiStore.defaultGridSettings)
+    }
     return (
-      <StyledGridCardBlank
-        blueBg={testCollectionCard}
-        boxShadow={parent.isBoard}
-      >
+      <StyledGridCardBlank boxShadow={isBoard}>
         <StyledGridCardInner
           height={blankContentToolState.height}
-          gridW={gridSettings.gridW}
-          gridH={gridSettings.gridH}
+          gridW={gridW}
+          gridH={gridH}
         >
           {this.renderInner()}
         </StyledGridCardInner>
