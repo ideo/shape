@@ -366,6 +366,8 @@ class FoamcoreGrid extends React.Component {
     }
   }
 
+  // I think we need to revise this since we aren't getting the red areas anymore
+  // Or maybe it is some other attribute? Can't recall
   findCardOverlap(card) {
     const { collection, uiStore } = this.props
     const { row, col, height, width } = card
