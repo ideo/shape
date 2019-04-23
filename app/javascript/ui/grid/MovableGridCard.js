@@ -428,6 +428,7 @@ class MovableGridCard extends React.PureComponent {
         <AddSubmission
           parent_id={card.parent_id}
           submissionSettings={card.submissionSettings}
+          enabled={parent.submissions_enabled}
         />
       )
     }

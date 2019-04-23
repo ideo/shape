@@ -94,6 +94,7 @@ class CollectionGrid extends React.Component {
       'cardProperties',
       'movingCardIds',
       'cardsFetched',
+      'submissionSettings',
     ]
     const prevPlucked = _.pick(prevProps, fields)
     const plucked = _.pick(this.props, fields)
@@ -927,6 +928,7 @@ CollectionGrid.propTypes = {
   submissionSettings: PropTypes.shape({
     type: PropTypes.string,
     template: MobxPropTypes.objectOrObservableObject,
+    enabled: PropTypes.bool,
   }),
   sorting: PropTypes.bool,
 }
