@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190402225253) do
+ActiveRecord::Schema.define(version: 20190418233316) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -144,6 +144,7 @@ ActiveRecord::Schema.define(version: 20190402225253) do
     t.boolean "hide_submissions", default: false
     t.boolean "shared_with_organization", default: false
     t.integer "cover_type", default: 0
+    t.datetime "test_launched_at"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"

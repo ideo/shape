@@ -118,6 +118,7 @@ exports[`GridCardBlank renders snapshot 1`] = `
         />
       </Flex>
       <styled.div
+        className="bct-dropzone"
         droppingFile={false}
         id="dropzone"
       >
@@ -150,7 +151,9 @@ exports[`GridCardBlank renders snapshot 1`] = `
           </div>
         </div>
       </styled.div>
-      <BctBackground />
+      <BctBackground
+        className="bct-background"
+      />
     </styled.div>
   </styled.div>
   <CloseButton

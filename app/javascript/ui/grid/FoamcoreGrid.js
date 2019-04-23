@@ -30,7 +30,10 @@ const BlankCard = styled.div.attrs({
     if (props.blocked) {
       return v.colors.alert
     }
-    if (props.type === 'blank' || props.type === 'drag') {
+    if (props.type === 'unrendered') {
+      return v.colors.commonLightest
+    }
+    if (_.includes(['blank', 'drag', 'resize'], props.type)) {
       return v.colors.primaryLight
     }
     return 'none'
@@ -591,8 +594,10 @@ class FoamcoreGrid extends React.Component {
     const { collection, trackCollectionUpdated } = this.props
     let { height, width } = this.placeholderSpot
     // Some double-checking validations
-    if (height > MAX_CARD_H) height = MAX_CARD_H
-    if (width > MAX_CARD_W) width = MAX_CARD_W
+    const maxHeight = this.calcEdgeRow(card)
+    const maxWidth = this.calcEdgeCol(card)
+    if (height > maxHeight) height = maxHeight
+    if (width > maxWidth) width = maxWidth
     // set up action to undo
     if (card.height !== height || card.width !== width) {
       undoMessage = 'Card resize undone'
@@ -779,6 +784,7 @@ class FoamcoreGrid extends React.Component {
       this.resizing = false
       uiStore.multiMoveCardIds = []
       this.draggingCardMasterPosition = {}
+      this.setPlaceholderSpot(this.placeholderDefaults)
     })
     // Run immediately without throttling
     this.calculateCardsToRender()
@@ -912,7 +918,6 @@ class FoamcoreGrid extends React.Component {
       height,
       type: 'resize',
     })
-    this.throttledCalculateCardsToRender()
   }
 
   findFilledSpot({ col, row }, cardId = null) {
@@ -932,17 +937,14 @@ class FoamcoreGrid extends React.Component {
     return false
   }
 
-  calcEdgeCol({ col, row, width, height }, cardId) {
+  calcEdgeCol({ id, col, row, width, height }) {
     // start from outer column (e.g. width=1, col=0: start at col 1)
     let tempCol = col + width
     let tempRow = row
     while (tempCol < col + MAX_CARD_W) {
       tempRow = row
       while (tempRow < row + height) {
-        const filled = this.findFilledSpot(
-          { col: tempCol, row: tempRow },
-          cardId
-        )
+        const filled = this.findFilledSpot({ col: tempCol, row: tempRow }, id)
         if (filled) {
           return tempCol - col
         }
@@ -953,16 +955,13 @@ class FoamcoreGrid extends React.Component {
     return MAX_CARD_W
   }
 
-  calcEdgeRow({ col, row, width, height }, cardId) {
+  calcEdgeRow({ id, col, row, width, height }) {
     let tempRow = row + height
     let tempCol = col
     while (tempRow < row + MAX_CARD_H) {
       tempCol = col
       while (tempCol < col + width) {
-        const filled = this.findFilledSpot(
-          { col: tempCol, row: tempRow },
-          cardId
-        )
+        const filled = this.findFilledSpot({ col: tempCol, row: tempRow }, id)
         if (filled) {
           return tempRow - row
         }
@@ -1032,20 +1031,19 @@ class FoamcoreGrid extends React.Component {
         holdingOver={isHoveringOverCollection && this.hoveringOver.holdingOver}
         onDragOrResizeStop={this.onDragOrResizeStop}
         onResize={this.onResize}
-        onResizeStop={this.onResizeStop}
         routeTo={routingStore.routeTo}
         parent={collection}
         menuOpen={cardMenuOpen.id === card.id}
         zoomLevel={this.relativeZoomLevel}
-        maxResizeCol={this.calcEdgeCol(card, card.id)}
-        maxResizeRow={this.calcEdgeRow(card, card.id)}
+        // maxResizeCol={this.calcEdgeCol(card)}
+        // maxResizeRow={this.calcEdgeRow(card)}
         horizontalScroll
         showHotEdge={false}
       />
     )
   }
 
-  positionBlank({ row, col, width, height }, type = 'generic') {
+  positionBlank({ row, col, width, height }, type = 'drag') {
     const position = this.positionForCoordinates({ col, row, width, height })
 
     const { relativeZoomLevel } = this
@@ -1078,7 +1076,7 @@ class FoamcoreGrid extends React.Component {
     )
   }
 
-  positionBct({ col, row }) {
+  positionBct({ col, row, width, height }) {
     // TODO this has to be documented
     const blankContentTool = {
       id: 'blank',
@@ -1087,8 +1085,8 @@ class FoamcoreGrid extends React.Component {
       blankType: null,
       col,
       row,
-      width: 1,
-      height: 1,
+      width,
+      height,
     }
     return this.renderMovableCard(blankContentTool, `bct-${col}:${row}`, {})
   }
@@ -1111,17 +1109,16 @@ class FoamcoreGrid extends React.Component {
   }
 
   @action
-  setPlaceholderSpot = placeholderSpot => {
-    let vals = { ...this.placeholderDefaults }
-    if (placeholderSpot) {
-      vals = { ...placeholderSpot }
+  setPlaceholderSpot = (placeholderSpot = this.placeholderDefaults) => {
+    if (!objectsEqual(this.placeholderSpot, placeholderSpot)) {
+      const { row, col, width, height, type } = placeholderSpot
+      this.placeholderSpot.row = row
+      this.placeholderSpot.col = col
+      this.placeholderSpot.width = width
+      this.placeholderSpot.height = height
+      this.placeholderSpot.type = type
+      this.calculateCardsToRender()
     }
-    const { row, col, width, height, type } = vals
-    this.placeholderSpot.row = row
-    this.placeholderSpot.col = col
-    this.placeholderSpot.width = width
-    this.placeholderSpot.height = height
-    this.placeholderSpot.type = type
   }
 
   get blankCardsForEmptySpacesWithinVisibleArea() {
@@ -1164,7 +1161,7 @@ class FoamcoreGrid extends React.Component {
     let cards = []
     this.hasDragCollision = false
 
-    collectionCards.forEach(card => {
+    _.each(collectionCards, card => {
       if (this.cardWithinViewPlusPage(card) || card.isDragCardMaster) {
         // On first load we need to mark the max row and col loaded
         this.updateMaxLoaded({ row: card.row, col: card.col })
@@ -1182,18 +1179,26 @@ class FoamcoreGrid extends React.Component {
       }
     })
 
-    if (uiStore.blankContentToolState)
+    if (uiStore.blankContentToolState) {
       cards.push({
         id: 'blank',
         blankType: 'bct',
         ...uiStore.blankContentToolState,
       })
+    }
+
+    if (this.placeholderSpot) {
+      cards.push({
+        id: 'resize',
+        ...this.placeholderSpot,
+      })
+    }
 
     // draw our dragging grid, but only if we're not hovering over a collection
     if (this.dragGridSpot.size && !this.hoveringOverCollection) {
       // Figure out if we have a collision
       const draggingPlaceholders = [...this.dragGridSpot.values()]
-      draggingPlaceholders.forEach(placeholder => {
+      _.each(draggingPlaceholders, placeholder => {
         this.hasDragCollision =
           this.hasDragCollision || this.findCardOverlap(placeholder)
       })
@@ -1208,17 +1213,19 @@ class FoamcoreGrid extends React.Component {
         _.isNumber(card.row) &&
         _.isNumber(card.col)
     )
-    cards = cards.map(cardOrBlank => {
+    cards = _.map(cards, cardOrBlank => {
       // If another real card is filling up the hover spot, don't render
       // the hover spot at all (which gets rendered after this loop)
       if (cardOrBlank.id === 'blank') {
         return this.positionBct(cardOrBlank)
       } else if (cardOrBlank.id === 'unrendered') {
         return this.positionBlank(cardOrBlank, 'unrendered')
+      } else if (cardOrBlank.id === 'resize' || !cardOrBlank.id) {
+        return this.positionBlank(cardOrBlank, cardOrBlank.id || 'drag')
       } else if (cardOrBlank.id) {
         return this.positionCard(cardOrBlank)
       }
-      return this.positionBlank(cardOrBlank, 'drag')
+      return null
     })
 
     // Add blank cards for all empty spaces - for hover and click -> BCT actions

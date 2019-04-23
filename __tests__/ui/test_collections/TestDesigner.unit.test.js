@@ -1,9 +1,10 @@
 import TestDesigner from '~/ui/test_collections/TestDesigner'
 import { fakeCollection } from '#/mocks/data'
 import fakeApiStore from '#/mocks/fakeApiStore'
+
 import v from '~/utils/variables'
 
-let wrapper, props, component
+let wrapper, props, instance, component
 describe('TestDesigner', () => {
   beforeEach(() => {
     props = {
@@ -57,6 +58,80 @@ describe('TestDesigner', () => {
       expect(wrapper.find('RadioControl').props().selectedValue).toEqual(
         'media'
       )
+    })
+  })
+
+  describe('with responses', () => {
+    beforeEach(() => {
+      props.collection.can_edit_content = true
+      props.collection.num_survey_responses = 5
+      wrapper = shallow(<TestDesigner {...props} />)
+    })
+
+    describe('handleSelectChange', () => {
+      let card, fakeEv
+      beforeEach(() => {
+        fakeEv = {
+          preventDefault: jest.fn(),
+          target: { value: 'question_excitement' },
+        }
+        card = props.collection.collection_cards[0]
+        instance = wrapper.instance()
+      })
+
+      it('does not prompt if adding a new question without a type', () => {
+        card.card_question_type = null
+        instance.handleSelectChange(card)(fakeEv)
+        expect(props.collection.apiStore.uiStore.confirm).not.toHaveBeenCalled()
+      })
+
+      it('prompts user when changing a question type', () => {
+        card.card_question_type = 'question_clarity'
+        instance.handleSelectChange(card)(fakeEv)
+        expect(props.collection.apiStore.uiStore.confirm).toHaveBeenCalledWith({
+          confirmText: 'Continue',
+          iconName: 'Alert',
+          onConfirm: expect.any(Function),
+          prompt:
+            'This test has 5 responses. Are you sure you want to change the question type?',
+        })
+      })
+    })
+
+    describe('handleTrash', () => {
+      let card
+      beforeEach(() => {
+        card = props.collection.collection_cards[0]
+        instance = wrapper.instance()
+      })
+
+      it('prompts user when removing a question', () => {
+        instance.handleTrash(card)
+        expect(props.collection.apiStore.uiStore.confirm).toHaveBeenCalledWith({
+          confirmText: 'Continue',
+          iconName: 'Alert',
+          onConfirm: expect.any(Function),
+          prompt:
+            'This test has 5 responses. Are you sure you want to remove this question?',
+        })
+      })
+    })
+
+    describe('onAdd', () => {
+      it('prompts user when adding a new question', () => {
+        wrapper
+          .find('QuestionHotEdge')
+          .first()
+          .props()
+          .onAdd()
+        expect(props.collection.apiStore.uiStore.confirm).toHaveBeenCalledWith({
+          confirmText: 'Continue',
+          iconName: 'Alert',
+          onConfirm: expect.any(Function),
+          prompt:
+            'This test has 5 responses. Are you sure you want to add a new question?',
+        })
+      })
     })
   })
 

@@ -2,6 +2,7 @@ class Item
   class QuestionItem < Item
     has_many :question_answers, inverse_of: :question, foreign_key: :question_id, dependent: :destroy
     has_one :test_open_responses_collection, class_name: 'Collection::TestOpenResponses'
+    has_one :test_chart_item, class_name: 'Item::ChartItem', as: :data_source
 
     after_commit :notify_test_design_of_creation,
                  on: :create,
@@ -19,7 +20,8 @@ class Item
              as: :data_source,
              class_name: 'Item::ChartItem'
 
-    after_update :update_test_open_responses_collection, if: :update_test_open_responses_collection?
+    after_update :update_test_open_responses_collection,
+                 if: :update_test_open_responses_collection?
 
     scope :not_answerable, -> {
       where(
@@ -62,7 +64,7 @@ class Item
     end
 
     def scale_question?
-      self.class.scale_question_types.include? question_type.to_sym
+      self.class.scale_question_types.include? question_type&.to_sym
     end
 
     def requires_roles?
@@ -90,6 +92,45 @@ class Item
       (points * 100.0 / total).round
     end
 
+    def create_response_graph(parent_collection:, initiated_by:)
+      return if !scale_question? || test_chart_item.present?
+
+      builder = CollectionCardBuilder.new(
+        params: {
+          order: parent_collection_card.order,
+          height: 2,
+          width: 2,
+          item_attributes: {
+            type: 'Item::ChartItem',
+            data_source: self,
+          },
+        },
+        parent_collection: parent_collection,
+        user: initiated_by,
+      )
+      builder.create
+      builder.collection_card
+    end
+
+    def create_open_response_collection(parent_collection:, initiated_by:)
+      return if !question_open? || test_open_responses_collection.present?
+
+      builder = CollectionCardBuilder.new(
+        params: {
+          order: parent_collection_card.order,
+          collection_attributes: {
+            name: "#{content} Responses",
+            type: 'Collection::TestOpenResponses',
+            question_item_id: id,
+          },
+        },
+        parent_collection: parent_collection,
+        user: initiated_by,
+      )
+      builder.create
+      builder.collection_card
+    end
+
     private
 
     def notify_test_design_collection_of_creation?
@@ -101,12 +142,12 @@ class Item
     end
 
     def update_test_open_responses_collection?
-      saved_change_to_name? && test_open_responses_collection.present?
+      saved_change_to_content? && test_open_responses_collection.present?
     end
 
     def update_test_open_responses_collection
       test_open_responses_collection.update(
-        name: name,
+        name: "#{content} Responses",
       )
     end
   end
