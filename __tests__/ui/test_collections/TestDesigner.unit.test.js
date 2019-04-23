@@ -80,13 +80,13 @@ describe('TestDesigner', () => {
       })
 
       it('does not prompt if adding a new question without a type', () => {
-        card.question_type = null
+        card.card_question_type = null
         instance.handleSelectChange(card)(fakeEv)
         expect(props.collection.apiStore.uiStore.confirm).not.toHaveBeenCalled()
       })
 
       it('prompts user when changing a question type', () => {
-        card.question_type = 'question_clarity'
+        card.card_question_type = 'question_clarity'
         instance.handleSelectChange(card)(fakeEv)
         expect(props.collection.apiStore.uiStore.confirm).toHaveBeenCalledWith({
           confirmText: 'Continue',
@@ -94,6 +94,25 @@ describe('TestDesigner', () => {
           onConfirm: expect.any(Function),
           prompt:
             'This test has 5 responses. Are you sure you want to change the question type?',
+        })
+      })
+    })
+
+    describe('handleTrash', () => {
+      let card
+      beforeEach(() => {
+        card = props.collection.collection_cards[0]
+        instance = wrapper.instance()
+      })
+
+      it('prompts user when removing a question', () => {
+        instance.handleTrash(card)
+        expect(props.collection.apiStore.uiStore.confirm).toHaveBeenCalledWith({
+          confirmText: 'Continue',
+          iconName: 'Alert',
+          onConfirm: expect.any(Function),
+          prompt:
+            'This test has 5 responses. Are you sure you want to remove this question?',
         })
       })
     })

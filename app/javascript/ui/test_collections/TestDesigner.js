@@ -125,54 +125,52 @@ class TestDesigner extends React.Component {
     })
   }
 
+  confirmActionIfResponsesExist = ({ action, message, conditions = true }) => {
+    const confirmableAction = () => this.confirmEdit(action)
+    if (this.numResponses > 0 && conditions) {
+      this.confirmWithDialog({
+        prompt: `This test has ${pluralize(
+          'response',
+          this.numResponses,
+          true
+        )}. ${message}`,
+        onConfirm: confirmableAction,
+      })
+    } else {
+      confirmableAction()
+    }
+  }
+
   handleSelectChange = replacingCard => ev => {
-    const replaceCard = () => {
-      this.confirmEdit(() => {
+    // If test is already launched, and this isn't a blank card,
+    // confirm they want to change the type
+    this.confirmActionIfResponsesExist({
+      action: () => {
         this.createNewQuestionCard({
           replacingCard,
           questionType: ev.target.value,
         })
-      })
-    }
-    // If test is already launched, and this isn't a blank card,
-    // confirm they want to change the type
-    if (this.numResponses > 0 && replacingCard.question_type) {
-      this.confirmWithDialog({
-        prompt: `This test has ${pluralize(
-          'response',
-          this.numResponses,
-          true
-        )}. Are you sure you want to change the question type?`,
-        onConfirm: replaceCard,
-      })
-    } else {
-      replaceCard()
-    }
+      },
+      message: 'Are you sure you want to change the question type?',
+      conditions: replacingCard.card_question_type,
+    })
   }
 
   handleTrash = card => {
-    this.confirmEdit(() => card.API_archiveSelf({}))
+    this.confirmActionIfResponsesExist({
+      action: () => card.API_archiveSelf({}),
+      message: 'Are you sure you want to remove this question?',
+    })
   }
 
   handleNew = (card, addBefore) => () => {
-    const addNewCard = () => {
-      this.confirmEdit(() => {
+    this.confirmActionIfResponsesExist({
+      action: () => {
         const order = addBefore ? card.order - 0.5 : card.order + 1
         this.createNewQuestionCard({ order })
-      })
-    }
-    if (this.numResponses > 0) {
-      this.confirmWithDialog({
-        prompt: `This test has ${pluralize(
-          'response',
-          this.numResponses,
-          true
-        )}. Are you sure you want to add a new question?`,
-        onConfirm: addNewCard,
-      })
-    } else {
-      addNewCard()
-    }
+      },
+      message: 'Are you sure you want to add a new question?',
+    })
   }
 
   archiveMediaCardsIfDefaultState() {
