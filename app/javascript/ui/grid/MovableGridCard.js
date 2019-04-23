@@ -336,7 +336,10 @@ class MovableGridCard extends React.PureComponent {
     newSize.height = Math.max(Math.min(newSize.height, 2), 1)
     this.props.onResize(this.props.card.id, newSize)
     this.scrolling = false
-    this.setState({ resizeWidth: delta.width, resizeHeight: delta.height })
+    this.setState({
+      resizeWidth: delta.width * zoomLevel,
+      resizeHeight: delta.height * zoomLevel,
+    })
   }
 
   // this function gets passed down to the card, so it can place the onClick handler
