@@ -145,6 +145,7 @@ ActiveRecord::Schema.define(version: 20190422230949) do
     t.boolean "shared_with_organization", default: false
     t.integer "cover_type", default: 0
     t.boolean "submissions_enabled", default: true
+    t.datetime "test_launched_at"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"

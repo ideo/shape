@@ -3,6 +3,7 @@ import { Flex } from 'reflexbox'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled, { ThemeProvider } from 'styled-components'
 import FlipMove from 'react-flip-move'
+import pluralize from 'pluralize'
 
 import { DisplayText, NumberListText } from '~/ui/global/styled/typography'
 import { Select, SelectOption } from '~/ui/global/styled/forms'
@@ -100,6 +101,23 @@ class TestDesigner extends React.Component {
     }
   }
 
+  get numResponses() {
+    const { collection } = this.props
+    return collection.num_survey_responses
+  }
+
+  // This shows a dialog immediately
+  confirmWithDialog = ({ prompt, onConfirm }) => {
+    const { collection } = this.props
+    collection.apiStore.uiStore.confirm({
+      prompt,
+      confirmText: 'Continue',
+      iconName: 'Alert',
+      onConfirm: () => onConfirm(),
+    })
+  }
+
+  // This shows a dialog only if the collection is a template
   confirmEdit = action => {
     const { collection } = this.props
     collection.confirmEdit({
@@ -107,22 +125,51 @@ class TestDesigner extends React.Component {
     })
   }
 
-  handleSelectChange = replacingCard => ev =>
-    this.confirmEdit(() => {
-      this.createNewQuestionCard({
-        replacingCard,
-        questionType: ev.target.value,
+  confirmActionIfResponsesExist = ({ action, message, conditions = true }) => {
+    const confirmableAction = () => this.confirmEdit(action)
+    if (this.numResponses > 0 && conditions) {
+      this.confirmWithDialog({
+        prompt: `This test has ${pluralize(
+          'response',
+          this.numResponses,
+          true
+        )}. ${message}`,
+        onConfirm: confirmableAction,
       })
+    } else {
+      confirmableAction()
+    }
+  }
+
+  handleSelectChange = replacingCard => ev => {
+    // If test is already launched, and this isn't a blank card,
+    // confirm they want to change the type
+    this.confirmActionIfResponsesExist({
+      action: () => {
+        this.createNewQuestionCard({
+          replacingCard,
+          questionType: ev.target.value,
+        })
+      },
+      message: 'Are you sure you want to change the question type?',
+      conditions: replacingCard.card_question_type,
     })
+  }
 
   handleTrash = card => {
-    this.confirmEdit(() => card.API_archiveSelf({}))
+    this.confirmActionIfResponsesExist({
+      action: () => card.API_archiveSelf({}),
+      message: 'Are you sure you want to remove this question?',
+    })
   }
 
   handleNew = (card, addBefore) => () => {
-    this.confirmEdit(() => {
-      const order = addBefore ? card.order - 0.5 : card.order + 1
-      this.createNewQuestionCard({ order })
+    this.confirmActionIfResponsesExist({
+      action: () => {
+        const order = addBefore ? card.order - 0.5 : card.order + 1
+        this.createNewQuestionCard({ order })
+      },
+      message: 'Are you sure you want to add a new question?',
     })
   }
 
@@ -209,7 +256,9 @@ class TestDesigner extends React.Component {
     const card = new CollectionCard(attrs, apiStore)
     card.parent = collection
     if (replacingCard) {
-      return card.API_replace({ replacingId: replacingCard.id })
+      // Set new card in same place as that you are replacing
+      card.order = replacingCard.order
+      await replacingCard.API_archiveSelf({})
     }
     return card.API_create()
   }

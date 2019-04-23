@@ -493,7 +493,10 @@ export default class UiStore {
       order: 0,
       width: 1,
       height: 1,
-      emptyCollection: viewingCollection && viewingCollection.isEmpty,
+      emptyCollection:
+        viewingCollection &&
+        viewingCollection.isEmpty &&
+        !viewingCollection.isBoard,
       collectionId: viewingCollection && viewingCollection.id,
       ...options,
     }

@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# We support all major Ruby versions. Please see our docs for a full list
+# https://codeship.com/documentation/languages/ruby/
+
+# DEBUG + include rvm
+source ~/.bash_profile
+
+# Setup database
+bundle exec rails db:schema:load
+bundle exec rails db:migrate
+# Start Java 8 for Elasticsearch 6
+source $HOME/bin/jdk/jdk_switcher
+jdk_switcher home oraclejdk8
+jdk_switcher use oraclejdk8
+# Start up ElasticSearch Version 6.2.0 on port 9333 (so it doesn't conflict with default)
+export ELASTICSEARCH_VERSION=6.2.0
+export ELASTICSEARCH_PORT=9333
+\curl -sSL https://raw.githubusercontent.com/codeship/scripts/master/packages/elasticsearch.sh | bash -s
+# Setup nvm
+nvm install 8.9.4
+nvm use 8.9.4
+nvm alias default 8.9.4
+#
+# Setup Yarn
+curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.15.2
+source /home/rof/.bashrc
+yarn install --frozen-lockfile
+#
+# Setup Ruby and gems
+rvm use 2.4.3
+bundle config build.nokogiri --use-system-libraries
+bundle install
+# Get db ready
+# Use postgres 9.6 -- docs: https://documentation.codeship.com/basic/databases/postgresql/
+sed -i "s|5432|5436|" "config/database.yml"
+bundle exec rake db:schema:load
+bundle exec rake db:migrate

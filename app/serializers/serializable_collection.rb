@@ -149,6 +149,10 @@ class SerializableCollection < BaseJsonSerializer
     @object.getting_started_shell || @object.awaiting_first_user_content
   end
 
+  attribute :num_survey_responses do
+    @object.test_collection? ? @object.survey_responses.size : 0
+  end
+
   attribute :max_row_index do
     @object.is_a?(Collection::Board) ? @object.max_row_index : nil
   end
