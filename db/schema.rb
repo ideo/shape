@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190402225253) do
+ActiveRecord::Schema.define(version: 20190418233316) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -140,10 +140,11 @@ ActiveRecord::Schema.define(version: 20190402225253) do
     t.bigint "collection_to_test_id"
     t.datetime "unarchived_at"
     t.jsonb "cached_test_scores"
-    t.boolean "hide_submissions", default: false
     t.bigint "roles_anchor_collection_id"
+    t.boolean "hide_submissions", default: false
     t.boolean "shared_with_organization", default: false
     t.integer "cover_type", default: 0
+    t.datetime "test_launched_at"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
@@ -383,7 +384,7 @@ ActiveRecord::Schema.define(version: 20190402225253) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "email", default: "", null: false
+    t.string "email", default: ""
     t.string "encrypted_password", default: "", null: false
     t.string "first_name"
     t.string "last_name"
@@ -412,6 +413,7 @@ ActiveRecord::Schema.define(version: 20190402225253) do
     t.boolean "show_template_helper", default: true
     t.boolean "mailing_list", default: false
     t.datetime "last_active_at"
+    t.string "phone"
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"

@@ -3,6 +3,7 @@ class Collection
     belongs_to :test_collection, class_name: 'Collection::TestCollection'
     delegate :can_reopen?,
              :launchable?,
+             :live_or_was_launched?,
              :test_status,
              :collection_to_test,
              to: :test_collection
@@ -14,6 +15,8 @@ class Collection
              source: :item,
              class_name: 'Item::QuestionItem',
              through: :primary_collection_cards
+
+    has_many :survey_responses, through: :test_collection
 
     def duplicate!(**args)
       duplicate = super(args)
@@ -32,7 +35,7 @@ class Collection
     def question_item_created(question_item)
       return unless question_item.question_open?
       # Create open response collection for this new question item
-      test_collection.create_open_response_collection_cards(
+      test_collection.create_open_response_collections(
         open_question_items: [question_item],
       )
     end
