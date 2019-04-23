@@ -201,6 +201,9 @@ export const StyledTopRightActions = styled.div`
   border-radius: 4px;
   height: 34px;
   right: 0.25rem;
+  top: ${props => 0.25 * props.zoomLevel}rem;
+  transform: scale(${props => props.zoomLevel});
+  transform-origin: top right;
 
   .selected {
     border-color: ${props => props.color};

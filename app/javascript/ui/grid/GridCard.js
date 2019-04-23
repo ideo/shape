@@ -344,6 +344,7 @@ class GridCard extends React.Component {
       testCollectionCard,
       searchResult,
       showHotEdge,
+      zoomLevel,
     } = this.props
 
     const firstCardInRow = card.position && card.position.x === 0
@@ -385,6 +386,7 @@ class GridCard extends React.Component {
             <StyledTopRightActions
               color={this.actionsColor}
               className="show-on-hover"
+              zoomLevel={zoomLevel}
             >
               {record.isDownloadable && <Download record={record} />}
               {record.canSetACover && (
@@ -470,6 +472,7 @@ GridCard.propTypes = {
   searchResult: PropTypes.bool,
   draggingMultiple: PropTypes.bool,
   showHotEdge: PropTypes.bool,
+  zoomLevel: PropTypes.number,
 }
 
 GridCard.defaultProps = {
@@ -486,6 +489,7 @@ GridCard.defaultProps = {
   draggingMultiple: false,
   searchResult: false,
   showHotEdge: true,
+  zoomLevel: 1,
 }
 
 export default GridCard
