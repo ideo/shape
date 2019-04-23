@@ -27,7 +27,7 @@ source /home/rof/.bashrc
 yarn install --frozen-lockfile
 #
 # Setup Ruby and gems
-rvm use 2.4.3
+rvm use 2.5.5
 bundle config build.nokogiri --use-system-libraries
 bundle install
 # Get db ready
