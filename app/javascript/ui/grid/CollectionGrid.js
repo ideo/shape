@@ -420,7 +420,6 @@ class CollectionGrid extends React.Component {
       ) {
         const dragTimeoutId = setTimeout(() => {
           hoveringOver.holdingOver = true
-          this.setHoveringOverProperties(hoveringOver.card, hoveringOver)
           this.setState({ hoveringOver })
         }, CARD_HOLD_TIME)
         this.setState({ dragTimeoutId })
@@ -555,19 +554,6 @@ class CollectionGrid extends React.Component {
     }
 
     return null
-  }
-
-  setHoveringOverProperties = (card, hoveringOver) => {
-    card.hoveringOver = false
-    card.holdingOver = false
-    if (hoveringOver) {
-      // check if the card is being currently hovered over
-      if (card.id === hoveringOver.card.id) card.hoveringOver = hoveringOver
-      card.holdingOver =
-        card.id === hoveringOver.card.id &&
-        hoveringOver.direction === 'right' &&
-        hoveringOver.holdingOver
-    }
   }
 
   clearDragTimeout = () => {
@@ -767,8 +753,6 @@ class CollectionGrid extends React.Component {
 
           // add position attrs to card
           card.position = position
-          this.setHoveringOverProperties(card, this.state.hoveringOver)
-
           // when we're moving/hovering, placeholders should not take up any space
           const hoverPlaceholder =
             opts.dragType === 'hover' && card.cardType === 'placeholder'
@@ -828,6 +812,7 @@ class CollectionGrid extends React.Component {
       uiStore,
       loadCollectionCards,
     } = this.props
+    const { hoveringOver } = this.state
     let i = 0
     // unnecessary? we seem to need to preserve the array order
     // in order to not re-draw divs (make transform animation work)
@@ -844,6 +829,9 @@ class CollectionGrid extends React.Component {
           cardType = card.record.internalType
         }
       }
+      const isHoveringOver =
+        hoveringOver && hoveringOver.card && hoveringOver.card.id === card.id
+      const isHoldingOver = isHoveringOver && hoveringOver.holdingOver
       const { cardMenuOpen } = uiStore
       if (_.isEmpty(card.position)) return
       const shouldHide = card.isBeingMultiMoved || card.isBeingMoved
@@ -860,13 +848,11 @@ class CollectionGrid extends React.Component {
           dragOffset={pageMargins()}
           record={record}
           onDrag={this.onDrag}
-          hoveringOverLeft={
-            !!card.hoveringOver && card.hoveringOver.direction === 'left'
-          }
+          hoveringOverLeft={isHoveringOver && hoveringOver.direction === 'left'}
           hoveringOverRight={
-            !!card.hoveringOver && card.hoveringOver.direction === 'right'
+            isHoveringOver && hoveringOver.direction === 'right'
           }
-          holdingOver={!!card.holdingOver}
+          holdingOver={isHoldingOver}
           onDragOrResizeStop={this.onDragOrResizeStop}
           onResize={this.onResize}
           onResizeStop={this.onResizeStop}
