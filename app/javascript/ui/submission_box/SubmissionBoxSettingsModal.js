@@ -240,54 +240,90 @@ class SubmissionBoxSettingsModal extends React.Component {
     return collection.save()
   }
 
-  titleContent = () => (
-    <StyledTitleContent>
-      <Heading2>Submission Box Settings</Heading2>
-      {this.loading && <InlineLoader />}
-      <Row>
-        <span
-          style={{
-            display: 'inline-block',
-            height: '25px',
-            width: '25px',
-            color: v.colors.commonMedium,
-          }}
-        >
-          <AlertIcon />
-        </span>
-        <RowItemLeft>
-          <SmallHelperText>
-            Anyone invited to this collection box will be able to instantly
-            create their own instance of the template that you choose. Use one
-            of our templates or create your own.
-          </SmallHelperText>
-          <FormControlLabel
-            style={{ marginLeft: '-42px' }}
-            classes={{ label: 'form-control' }}
-            control={
-              <Checkbox
-                checked={this.props.collection.hide_submissions}
-                onChange={this.updateHidden}
-                value="yes"
-              />
-            }
-            label={
-              <div style={{ marginLeft: '-4px' }}>
-                <DisplayText>Hide new submissions</DisplayText>
-                <br />
-                <SmallHelperText>
-                  When this box is checked, submissions will not show up until
-                  the participant chooses to submit it.
-                </SmallHelperText>
-              </div>
-            }
-          />
-        </RowItemLeft>
-      </Row>
-      <Heading3>Submission Format</Heading3>
-      {this.selectedOption()}
-    </StyledTitleContent>
-  )
+  updateEnabled = ev => {
+    ev.preventDefault()
+    const { collection } = this.props
+    collection.submissions_enabled = !collection.submissions_enabled
+    return collection.save()
+  }
+
+  titleContent = () => {
+    const { collection } = this.props
+    const { submissions_enabled, hide_submissions } = collection
+
+    return (
+      <StyledTitleContent>
+        <Heading2>Submission Box Settings</Heading2>
+        {this.loading && <InlineLoader />}
+        <Row>
+          <span
+            style={{
+              display: 'inline-block',
+              height: '25px',
+              width: '25px',
+              color: v.colors.commonMedium,
+            }}
+          >
+            <AlertIcon />
+          </span>
+          <RowItemLeft>
+            <SmallHelperText>
+              Anyone invited to this collection box will be able to instantly
+              create their own instance of the template that you choose. Use one
+              of our templates or create your own.
+            </SmallHelperText>
+            <FormControlLabel
+              style={{ marginLeft: '-42px' }}
+              classes={{ label: 'form-control' }}
+              control={
+                <Checkbox
+                  checked={submissions_enabled}
+                  onChange={this.updateEnabled}
+                  value="yes"
+                />
+              }
+              label={
+                <div style={{ marginLeft: '-4px' }}>
+                  <DisplayText>
+                    Accept new submissions ({submissions_enabled ? 'ON' : 'OFF'}
+                    )
+                  </DisplayText>
+                  <br />
+                  <SmallHelperText>
+                    When this box is checked, participants are able to create
+                    new submissions and submit them.
+                  </SmallHelperText>
+                </div>
+              }
+            />
+            <FormControlLabel
+              style={{ marginLeft: '-42px' }}
+              classes={{ label: 'form-control' }}
+              control={
+                <Checkbox
+                  checked={hide_submissions}
+                  onChange={this.updateHidden}
+                  value="yes"
+                />
+              }
+              label={
+                <div style={{ marginLeft: '-4px' }}>
+                  <DisplayText>Hide new submissions</DisplayText>
+                  <br />
+                  <SmallHelperText>
+                    When this box is checked, submissions will not show up until
+                    the participant chooses to submit it.
+                  </SmallHelperText>
+                </div>
+              }
+            />
+          </RowItemLeft>
+        </Row>
+        <Heading3>Submission Format</Heading3>
+        {this.selectedOption()}
+      </StyledTitleContent>
+    )
+  }
 
   get itemRows() {
     const { submission_box_type } = this.props.collection
