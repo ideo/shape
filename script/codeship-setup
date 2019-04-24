@@ -5,9 +5,6 @@
 # DEBUG + include rvm
 source ~/.bash_profile
 
-# Setup database
-bundle exec rails db:schema:load
-bundle exec rails db:migrate
 # Start Java 8 for Elasticsearch 6
 source $HOME/bin/jdk/jdk_switcher
 jdk_switcher home oraclejdk8
