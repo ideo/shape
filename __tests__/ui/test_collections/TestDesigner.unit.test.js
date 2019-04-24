@@ -1,6 +1,7 @@
 import TestDesigner from '~/ui/test_collections/TestDesigner'
 import { fakeCollection } from '#/mocks/data'
 import fakeApiStore from '#/mocks/fakeApiStore'
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 import v from '~/utils/variables'
 
@@ -18,6 +19,10 @@ describe('TestDesigner', () => {
     wrapper = shallow(<TestDesigner {...props} />)
   })
 
+  it('renders snapshot', () => {
+    expectTreeToMatchSnapshot(wrapper)
+  })
+
   it('renders TestQuestions for each card', () => {
     expect(wrapper.find('TestQuestion').length).toEqual(
       fakeCollection.collection_cards.length
@@ -32,8 +37,8 @@ describe('TestDesigner', () => {
 
   it('renders the question options alphabetically', () => {
     const select = wrapper.find('StyledSelect StyledSelectOption')
-    expect(select.get(0).props.value).toEqual('question_category_satisfaction')
-    expect(select.get(1).props.value).toEqual('question_clarity')
+    expect(select.get(2).props.value).toEqual('question_description')
+    expect(select.get(3).props.value).toEqual('question_media')
   })
 
   it('passes position props for beginning and end', () => {
