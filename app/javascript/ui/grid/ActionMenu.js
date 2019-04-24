@@ -114,7 +114,7 @@ class ActionMenu extends React.Component {
 
   toggleOpen = e => {
     e.stopPropagation()
-    this.props.onOpen()
+    this.props.onOpen(e)
   }
 
   openSubmissionBoxSettings = () => {
