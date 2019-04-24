@@ -172,7 +172,7 @@ class RealtimeTextItem extends React.Component {
     this.setState({ disconnected: true })
   }
 
-  channelReceivedData = ({ current_editor, data, num_viewers }) => {
+  channelReceivedData = ({ current_editor, data }) => {
     if (this.unmounted) return
     if (data && data.version) {
       this.handleReceivedDelta({ current_editor, data })
@@ -354,7 +354,7 @@ class RealtimeTextItem extends React.Component {
     })
   }
 
-  handleTextChange = (content, delta, source, editor) => {
+  handleTextChange = (content, delta, source, _editor) => {
     if (source === 'user') {
       // This adjustment is made so that the currently-selected
       // header size is preserved on new lines
