@@ -64,7 +64,6 @@ class CollectionPage extends React.Component {
   }
 
   componentWillUnmount() {
-    // super.componentWillUnmount()
     ChannelManager.unsubscribeAllFromChannel(this.channelName)
   }
 
@@ -360,7 +359,8 @@ class CollectionPage extends React.Component {
   transparentLoader = () => (
     <div
       style={{
-        marginTop: v.headerHeight,
+        zIndex: v.zIndex.clickWrapper,
+        marginTop: v.headerHeight + v.pageContentMarginTop + 10,
         position: 'fixed',
         top: 0,
         left: 'calc(50% - 50px)',
