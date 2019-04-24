@@ -31,7 +31,7 @@ class Item
 
     scope :scale_questions, -> {
       where(
-        question_type: scale_question_types,
+        question_type: question_type_categories[:scaled_rating],
       )
     }
 
@@ -48,15 +48,26 @@ class Item
       question_category_satisfaction: 10,
     }
 
-    def self.scale_question_types
-      %i[
-        question_context
-        question_useful
-        question_excitement
-        question_different
-        question_clarity
-        question_category_satisfaction
-      ]
+    def self.question_type_categories
+      {
+        idea_content: %i[
+          question_description
+          question_media
+        ],
+        scaled_rating: %i[
+          question_context
+          question_useful
+          question_excitement
+          question_different
+          question_clarity
+          question_category_satisfaction
+        ],
+        customizable: %i[
+          question_category_satisfaction
+          question_context
+          question_open
+        ],
+      }
     end
 
     def self.unanswerable_question_types
@@ -64,7 +75,7 @@ class Item
     end
 
     def scale_question?
-      self.class.scale_question_types.include? question_type&.to_sym
+      self.class.question_type_categories[:scaled_rating].include?(question_type&.to_sym)
     end
 
     def requires_roles?

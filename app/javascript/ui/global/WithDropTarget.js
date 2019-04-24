@@ -58,7 +58,7 @@ function WithDropTarget(Wrapped) {
     }
 
     render() {
-      const { forwardedRef, ...rest } = this.props
+      const { ...rest } = this.props
       return (
         <Wrapped
           {...rest}
