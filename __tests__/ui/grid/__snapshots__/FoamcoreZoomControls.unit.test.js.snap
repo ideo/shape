@@ -13,15 +13,13 @@ exports[`FoamcoreZoomControls renders snapshot 1`] = `
     placement="top"
     title="Zoom out"
   >
-    <div
+    <button
       className="zoom-icon"
       onClick={[MockFunction]}
-      onKeyDown={[MockFunction]}
-      role="button"
       tabIndex={0}
     >
       <MinusCircleIcon />
-    </div>
+    </button>
   </Tooltip>
   <Tooltip
     classes={
@@ -32,15 +30,13 @@ exports[`FoamcoreZoomControls renders snapshot 1`] = `
     placement="top"
     title="Zoom in"
   >
-    <div
+    <button
       className="zoom-icon"
       onClick={[MockFunction]}
-      onKeyDown={[MockFunction]}
-      role="button"
       tabIndex={0}
     >
       <PlusCircleIcon />
-    </div>
+    </button>
   </Tooltip>
 </styled.div>
 `;

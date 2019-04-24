@@ -91,10 +91,12 @@ describe('FoamcoreGrid', () => {
       it('finds filledSpot (or not) where a card is trying to be dragged', () => {
         // similar to calculateFilledSpots, but given a card (needs width and height >= 1)
         let fakeCard = { row: 1, col: 5, width: 1, height: 1 }
-        expect(instance.findCardOverlap(fakeCard)).toEqual(cardA)
+        let overlap = instance.findCardOverlap(fakeCard)
+        expect(overlap.card).toEqual(cardA)
         // 2x2 should stick out and overlap cardA
         fakeCard = { row: 0, col: 4, width: 2, height: 2 }
-        expect(instance.findCardOverlap(fakeCard)).toEqual(cardA)
+        overlap = instance.findCardOverlap(fakeCard)
+        expect(overlap.card).toEqual(cardA)
       })
     })
 

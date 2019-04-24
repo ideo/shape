@@ -4,7 +4,6 @@ import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
-import InlineLoader from '~/ui/layout/InlineLoader'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
@@ -23,6 +22,8 @@ const BlankCard = styled.div.attrs({
     cursor: 'pointer',
   }),
 })`
+  border: ${props =>
+    props.type === 'unrendered' ? `1px solid ${v.colors.primaryDark}` : 'none'};
   background-color: ${props => {
     if (props.blocked) {
       return v.colors.alert
@@ -37,22 +38,15 @@ const BlankCard = styled.div.attrs({
   }};
   position: absolute;
   transform-origin: left top;
-  opacity: ${props => {
-    if (props.type === 'unrendered') return 0.75
-    if (props.type === 'drag') return 0.5
-    return 1
-  }};
+  opacity: ${props => (props.type === 'drag' ? 0.5 : 1)};
   z-index: ${props => (props.type === 'drag' ? v.zIndex.cardHovering : 0)};
-  ${props =>
-    props.type === 'unrendered'
-      ? ''
-      : `&:hover {
+  &:hover {
     background-color: ${v.colors.primaryLight} !important;
     .plus-icon {
       display: block;
     }
   }
-  `} .plus-icon {
+  .plus-icon {
     display: none;
   }
 `
@@ -119,6 +113,8 @@ class FoamcoreGrid extends React.Component {
   draggingMap = []
   // track whether drag movement is blocked because of overlapping cards
   hasDragCollision = false
+  hoveringOver = false
+  dragTimeoutId = null
 
   constructor(props) {
     super(props)
@@ -150,6 +146,7 @@ class FoamcoreGrid extends React.Component {
   }
 
   componentWillUnmount() {
+    this.clearDragTimeout()
     const { uiStore } = this.props
     runInAction(() => {
       uiStore.selectedAreaEnabled = false
@@ -297,7 +294,7 @@ class FoamcoreGrid extends React.Component {
   get visibleRows() {
     if (!this.gridRef) return { min: null, max: null }
 
-    const top = window.scrollY || window.pageYOffset
+    const top = window.scrollY
     const gridHeight = window.innerHeight - pageMargins.top
 
     const min = parseFloat((top / this.cardAndGutterHeight).toFixed(1))
@@ -316,7 +313,7 @@ class FoamcoreGrid extends React.Component {
   get visibleCols() {
     if (!this.gridRef) return { min: null, max: null }
 
-    const left = window.scrollX || window.pageXOffset
+    const left = window.scrollX
     const gridWidth = window.innerWidth - pageMargins.left
 
     const min = parseFloat((left / this.cardAndGutterWidth).toFixed(1))
@@ -370,29 +367,35 @@ class FoamcoreGrid extends React.Component {
     }
   }
 
+  // I think we need to revise this since we aren't getting the red areas anymore
+  // Or maybe it is some other attribute? Can't recall
   findCardOverlap(card) {
     const { collection, uiStore } = this.props
-    let { width, height } = card
-    const origWidth = width
-    const { row, col } = card
+    const { row, col, height, width } = card
     let found = false
+    let h = 1
+    let w = 1
     const { cardMatrix } = collection
-    while (height > 0 && !found) {
-      while (width > 0 && !found) {
-        const filledRow = row + height - 1
-        const filledCol = col + width - 1
+    while (h <= height && !found) {
+      while (w <= width && !found) {
+        const filledRow = row + h - 1
+        const filledCol = col + w - 1
         const searchRow = cardMatrix[filledRow]
         found = searchRow && searchRow[filledCol]
         // don't consider overlapping itself
         if (found && !_.includes(uiStore.multiMoveCardIds, found.id)) {
-          return found
+          return {
+            card: found,
+            record: found.record,
+            holdingOver: false,
+          }
         }
         found = false
 
-        width -= 1
+        w += 1
       }
-      width = origWidth
-      height -= 1
+      w = 1
+      h += 1
     }
     return found
   }
@@ -546,9 +549,7 @@ class FoamcoreGrid extends React.Component {
   onDragOrResizeStop = (cardId, dragType) => {
     const {
       collection: { collection_cards },
-      uiStore,
     } = this.props
-    uiStore.stopDragging()
     const card = _.find(collection_cards, ['id', cardId])
     if (dragType === 'resize') {
       this.resizeCard(card)
@@ -608,14 +609,33 @@ class FoamcoreGrid extends React.Component {
 
   moveCards = masterCard => {
     if (this.dragGridSpot.size < 1) return
-    const { collection } = this.props
+    const { uiStore, collection } = this.props
     const undoMessage = 'Card move undone'
 
     const movePlaceholder = [...this.dragGridSpot.values()][0]
     const masterRow = movePlaceholder.row
     const masterCol = movePlaceholder.col
+    // This is for dragging onto the breadcrumb
+    if (uiStore.activeDragTarget) {
+      const { apiStore } = this.props
+      const targetRecord = uiStore.activeDragTarget.item
+      if (uiStore.activeDragTarget.item.id === 'homepage') {
+        targetRecord.id = apiStore.currentUserCollectionId
+      }
+      uiStore.setMovingCards(uiStore.multiMoveCardIds, {
+        cardAction: 'moveWithinCollection',
+      })
+      this.moveCardsIntoCollection(uiStore.multiMoveCardIds, targetRecord)
+      return
+    }
 
-    if (
+    if (this.hoveringOverCollection) {
+      this.moveCardsIntoCollection(
+        uiStore.multiMoveCardIds,
+        this.hoveringOverCollection
+      )
+      return
+    } else if (
       movePlaceholder.card ||
       this.hasDragCollision ||
       // movePlaceholder won't have row/col keys if it's not being rendered)
@@ -628,10 +648,6 @@ class FoamcoreGrid extends React.Component {
 
     const updates = []
     // draggingMap has the relative row and column of all cards being moved
-    //
-    // TODO: currently it can set negative rows and columns
-    // if you move to the left-hand side of the board,
-    // so we need to address that in collision detection
     let negativeZone = false
     _.each(this.draggingMap, map => {
       const update = {
@@ -663,6 +679,18 @@ class FoamcoreGrid extends React.Component {
       undoMessage,
       onConfirm: onConfirmOrCancel,
       onCancel: onConfirmOrCancel,
+    })
+  }
+
+  async moveCardsIntoCollection(cardIds, hoveringRecord) {
+    this.props.collection.API_moveCardsIntoCollection({
+      toCollection: hoveringRecord,
+      cardIds,
+      onCancel: () => {
+        this.hoveringOver = false
+        this.resetCardPositions()
+      },
+      onSuccess: () => (this.hoveringOver = false),
     })
   }
 
@@ -711,7 +739,35 @@ class FoamcoreGrid extends React.Component {
       })
     }
 
+    const previousHoveringOver = { ...this.hoveringOver }
+    // store whatever card (or not) that we're hovering over
+    this.hoveringOver = this.findCardOverlap(masterPosition)
+    if (
+      this.hoveringOver &&
+      (!previousHoveringOver.card ||
+        this.hoveringOver.card !== previousHoveringOver.card)
+    ) {
+      // if we've changed cards we're hovering over... start a new dragTimeout
+      this.clearDragTimeout()
+      const dragTimeoutId = setTimeout(() => {
+        if (!this.hoveringOver) return
+        this.hoveringOver.holdingOver = true
+        // kind of silly but we need to call this just to get the holdingOver "jiggle" effect
+        this.calculateCardsToRender()
+      }, v.cardHoldTime)
+      this.dragTimeoutId = dragTimeoutId
+    }
     this.throttledCalculateCardsToRender()
+  }
+
+  get hoveringOverCollection() {
+    if (
+      this.hoveringOver &&
+      this.hoveringOver.record.internalType === 'collections'
+    ) {
+      return this.hoveringOver.record
+    }
+    return null
   }
 
   /*
@@ -882,6 +938,11 @@ class FoamcoreGrid extends React.Component {
       y: pageMargins.top,
     }
 
+    const isHoveringOverCollection =
+      this.hoveringOver &&
+      this.hoveringOver.card.id === card.id &&
+      this.hoveringOver.record.internalType === 'collections'
+
     return (
       <MovableGridCard
         key={key}
@@ -898,16 +959,14 @@ class FoamcoreGrid extends React.Component {
         onDragStart={this.onDragStart}
         // no need to trigger displacing the card (hoveringOverLeft) since we don't do that in foamcore
         hoveringOverLeft={false}
-        hoveringOverRight={!!opts.hoverOverRight}
-        holdingOver={!!card.holdingOver}
+        hoveringOverRight={isHoveringOverCollection}
+        holdingOver={isHoveringOverCollection && this.hoveringOver.holdingOver}
         onDragOrResizeStop={this.onDragOrResizeStop}
         onResize={this.onResize}
         routeTo={routingStore.routeTo}
         parent={collection}
         menuOpen={cardMenuOpen.id === card.id}
         zoomLevel={this.relativeZoomLevel}
-        // maxResizeCol={this.calcEdgeCol(card)}
-        // maxResizeRow={this.calcEdgeRow(card)}
         horizontalScroll
         showHotEdge={false}
       />
@@ -926,8 +985,6 @@ class FoamcoreGrid extends React.Component {
           <PlusIcon />
         </StyledPlusIcon>
       )
-    } else if (type === 'unrendered') {
-      inner = <InlineLoader background={v.colors.commonLightest} />
     }
 
     return (
@@ -937,6 +994,8 @@ class FoamcoreGrid extends React.Component {
         type={type}
         zoomLevel={relativeZoomLevel}
         key={`blank-${type}-${row}:${col}`}
+        /* Why is this rendering on top of a collection? */
+
         blocked={this.hasDragCollision && type === 'drag'}
         data-blank-type={type}
         data-empty-space-click
@@ -1014,8 +1073,15 @@ class FoamcoreGrid extends React.Component {
     return blankCards
   }
 
+  clearDragTimeout() {
+    if (this.dragTimeoutId) {
+      clearTimeout(this.dragTimeoutId)
+      this.dragTimeoutId = null
+    }
+  }
+
   @action
-  calculateCardsToRender = () => {
+  calculateCardsToRender() {
     const { collection, movingCardIds, uiStore } = this.props
     // any cards that are being moved don't appear at all
     const collectionCards = _.reject(collection.collection_cards, c =>
@@ -1058,7 +1124,8 @@ class FoamcoreGrid extends React.Component {
       })
     }
 
-    if (this.dragGridSpot.size) {
+    // draw our dragging grid, but only if we're not hovering over a collection
+    if (this.dragGridSpot.size && !this.hoveringOverCollection) {
       // Figure out if we have a collision
       const draggingPlaceholders = [...this.dragGridSpot.values()]
       _.each(draggingPlaceholders, placeholder => {
@@ -1121,9 +1188,6 @@ class FoamcoreGrid extends React.Component {
 }
 
 FoamcoreGrid.propTypes = {
-  // gridH: PropTypes.number.isRequired,
-  // gridW: PropTypes.number.isRequired,
-  // gutter: PropTypes.number.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   cardProperties: MobxPropTypes.arrayOrObservableArray.isRequired,
   trackCollectionUpdated: PropTypes.func.isRequired,
