@@ -189,11 +189,20 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       )
     end
 
-    @collection_cards = @collection.collection_cards_viewable_by(
-      current_user,
-      scope: scope,
-      card_order: params[:card_order],
-      hidden: params[:hidden].present?,
+    @collection_cards = CollectionCardFilter
+                        .new(
+                          collection_or_scope: scope
+                        )
+                        .viewable_by(
+                          current_user,
+                          card_order: params[:card_order],
+                          hidden: params[:hidden].present?,
+                        )
+
+    # precache roles because these will be referred to in the serializers (e.g. can_edit?)
+    current_user.precache_roles_for(
+      [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],
+      @collection_cards.map(&:record).compact,
     )
   end
 
