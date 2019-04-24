@@ -30,7 +30,7 @@ const StyledAvatarGroup = styled.div`
     display: inline-block;
     margin-left: 0px;
     margin-right: -12px;
-    border: 1px solid ${v.colors.commonLightest};
+    border: 1px solid ${v.colors.commonLight};
     /* for any transparent avatars */
     background-color: white;
     &:last-child {
