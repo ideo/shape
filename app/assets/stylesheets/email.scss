@@ -108,7 +108,7 @@ $sentinel-lt-font: 'Sentinel-Light', 'Sentinel', Palatino, Georgia, serif;
     a {
       font-family: $gotham-font;
       text-align: center;
-      text-transform: uppercase;
+      text-transform: none;
       color: $color-white;
       font-size: 16px;
       letter-spacing: 1.5px;
@@ -167,7 +167,7 @@ $sentinel-lt-font: 'Sentinel-Light', 'Sentinel', Palatino, Georgia, serif;
   line-height: 26px;
   margin-bottom: 15px;
   margin-top: 30px;
-  text-transform: uppercase;
+  text-transform: none;
   width: 390px;
 }
 button {
@@ -316,7 +316,7 @@ button {
   font-weight: 500;
   letter-spacing: 2.25px;
   line-height: 13px;
-  text-transform: uppercase;
+  text-transform: none;
   padding-top: 8px;
   padding-left: 5px;
   padding-right: 10px;
