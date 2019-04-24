@@ -10,8 +10,6 @@ import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
 import v from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
 
-const CARD_HOLD_TIME = 0.4 * 1000
-
 // When you have attributes that will change a lot,
 // it's a performance gain to use `styled.div.attrs`
 const BlankCard = styled.div.attrs({
@@ -135,7 +133,6 @@ class FoamcoreGrid extends React.Component {
       uiStore.selectedAreaEnabled = true
     })
     // now that component is mounted, calculate visible area and calculateCardsToRender
-    this.clearDragTimeout()
     this.loadAfterScroll()
     this.updateCollectionScrollBottom()
     window.addEventListener('scroll', this.handleScroll)
@@ -149,6 +146,7 @@ class FoamcoreGrid extends React.Component {
   }
 
   componentWillUnmount() {
+    this.clearDragTimeout()
     const { uiStore } = this.props
     runInAction(() => {
       uiStore.selectedAreaEnabled = false
@@ -389,6 +387,7 @@ class FoamcoreGrid extends React.Component {
           return {
             card: found,
             record: found.record,
+            holdingOver: false,
           }
         }
         found = false
@@ -544,31 +543,17 @@ class FoamcoreGrid extends React.Component {
 
   onDragStart = cardId => {
     this.draggingMap = this.determineDragMap(cardId)
-    if (this.hoveringOver) {
-      const dragTimeoutId = setTimeout(() => {
-        this.hoveringOver.holdingOver = true
-        // this.setState({ hoveringOver })
-        // I think we don't need ^this since we are 'this' instead of state
-      }, CARD_HOLD_TIME)
-      this.dragTimeoutId = dragTimeoutId
-    }
     this.throttledCalculateCardsToRender()
   }
 
   onDragOrResizeStop = (cardId, dragType) => {
     const {
       collection: { collection_cards },
-      uiStore,
     } = this.props
-    console.log('onDragOrResizeStop', this.hoveringOver)
-    // uiStore.stopDragging()
-    console.log('cardId: ', cardId)
     const card = _.find(collection_cards, ['id', cardId])
-    console.log('card: ', card)
     if (dragType === 'resize') {
       this.resizeCard(card)
     } else {
-      console.log('in onDragOrResizeStop, going to movecards')
       this.moveCards(card)
     }
   }
@@ -630,19 +615,10 @@ class FoamcoreGrid extends React.Component {
     const movePlaceholder = [...this.dragGridSpot.values()][0]
     const masterRow = movePlaceholder.row
     const masterCol = movePlaceholder.col
-
-    // console.log('masterRow: ', masterRow)
-    // console.log('masterCard', masterCard) // thing being dragged
-    // console.log('movePlaceholder', { movePlaceholder })
-    // console.log('movePlaceholder.card', movePlaceholder.card)
-    // console.log('this.hasDragCollision', this.hasDragCollision)
-    // console.log('uiStore.activeDragTarget is: ', uiStore.activeDragTarget)
-    // Why is there no active drag target?
-    // Presumably uiStore.stopDragging is getting fired somewhere
+    // This is for dragging onto the breadcrumb
     if (uiStore.activeDragTarget) {
       const { apiStore } = this.props
       const targetRecord = uiStore.activeDragTarget.item
-      console.log('targetRecord is: ', targetRecord)
       if (uiStore.activeDragTarget.item.id === 'homepage') {
         targetRecord.id = apiStore.currentUserCollectionId
       }
@@ -650,6 +626,7 @@ class FoamcoreGrid extends React.Component {
         cardAction: 'moveWithinCollection',
       })
       this.moveCardsIntoCollection(uiStore.multiMoveCardIds, targetRecord)
+      return
     }
 
     if (this.hoveringOverCollection) {
@@ -665,17 +642,12 @@ class FoamcoreGrid extends React.Component {
       typeof masterRow === 'undefined'
     ) {
       // this means you tried to drop it over an existing card (or there was no placeholder i.e. you dragged offscreen)
-      console.log('resetting card positions')
       this.resetCardPositions()
       return
     }
 
     const updates = []
     // draggingMap has the relative row and column of all cards being moved
-    //
-    // TODO: currently it can set negative rows and columns
-    // if you move to the left-hand side of the board,
-    // so we need to address that in collision detection
     let negativeZone = false
     _.each(this.draggingMap, map => {
       const update = {
@@ -694,7 +666,6 @@ class FoamcoreGrid extends React.Component {
     })
 
     if (negativeZone) {
-      console.log('in negativeZone: ', negativeZone, 'returning now')
       this.resetCardPositions()
       return
     }
@@ -715,15 +686,13 @@ class FoamcoreGrid extends React.Component {
     const { uiStore } = this.props
     uiStore.setMovingCards([])
     uiStore.stopDragging()
-    this.positionCardsFromProps()
   }
 
+  // TODO: this is totally copied from CollectionGrid -- DRY
   async moveCardsIntoCollection(cardIds, hoveringRecord) {
     const { collection, uiStore, apiStore } = this.props
     const can_edit = hoveringRecord.can_edit_content || hoveringRecord.can_edit
     uiStore.update('movingIntoCollection', hoveringRecord)
-    console.log('hoveringRecord', hoveringRecord)
-    console.log('cardIds: ', cardIds)
     if (!can_edit) {
       uiStore.confirm({
         prompt:
@@ -744,35 +713,33 @@ class FoamcoreGrid extends React.Component {
       })
       return
     }
-    this.setState({ hoveringOver: null }, async () => {
-      const data = {
-        to_id: hoveringRecord.id.toString(),
-        from_id: collection.id.toString(),
-        collection_card_ids: cardIds,
-        placement: 'beginning',
+
+    this.hoveringOver = null
+    const data = {
+      to_id: hoveringRecord.id.toString(),
+      from_id: collection.id.toString(),
+      collection_card_ids: cardIds,
+      placement: 'beginning',
+    }
+    await apiStore.moveCards(data)
+    const afterMove = () => {
+      const { movingIntoCollection } = uiStore
+      uiStore.setMovingCards([])
+      uiStore.update('multiMoveCardIds', [])
+      uiStore.reselectCardIds(cardIds)
+      uiStore.update('movingIntoCollection', null)
+      // add a little delay because the board has to load first
+      if (movingIntoCollection.isBoard) {
+        setTimeout(() => uiStore.scrollToBottom(), 500)
       }
-      console.log(data)
-      await apiStore.moveCards(data)
-      const afterMove = () => {
-        const { movingIntoCollection } = uiStore
-        uiStore.setMovingCards([])
-        uiStore.update('multiMoveCardIds', [])
-        uiStore.reselectCardIds(cardIds)
-        uiStore.update('movingIntoCollection', null)
-        // add a little delay because the board has to load first
-        if (movingIntoCollection.isBoard) {
-          setTimeout(() => uiStore.scrollToBottom(), 500)
-        }
-      }
-      if (data.to_id === data.from_id) {
-        afterMove()
-      } else {
-        console.log('moving into collection: ', hoveringRecord)
-        uiStore.update('movingIntoCollection', hoveringRecord)
-        uiStore.update('actionAfterRoute', afterMove)
-        this.props.routingStore.routeTo('collections', hoveringRecord.id)
-      }
-    })
+    }
+    if (data.to_id === data.from_id) {
+      afterMove()
+    } else {
+      uiStore.update('movingIntoCollection', hoveringRecord)
+      uiStore.update('actionAfterRoute', afterMove)
+      this.props.routingStore.routeTo('collections', hoveringRecord.id)
+    }
   }
 
   // reset the grid back to its original state
@@ -802,8 +769,6 @@ class FoamcoreGrid extends React.Component {
     // If master dragging position hasn't changed, don't need to do anything
     if (objectsEqual(masterPosition, this.draggingCardMasterPosition)) return
 
-    // Set this dragTimeoutId in here or in onDrag?
-    this.clearDragTimeout()
     this.dragGridSpot.clear()
 
     // Add master dragging card
@@ -822,9 +787,24 @@ class FoamcoreGrid extends React.Component {
       })
     }
 
+    const previousHoveringOver = { ...this.hoveringOver }
     // store whatever card (or not) that we're hovering over
     this.hoveringOver = this.findCardOverlap(masterPosition)
-    // this.setState({ hoveringOver })
+    if (
+      this.hoveringOver &&
+      (!previousHoveringOver.card ||
+        this.hoveringOver.card !== previousHoveringOver.card)
+    ) {
+      // if we've changed cards we're hovering over... start a new dragTimeout
+      this.clearDragTimeout()
+      const dragTimeoutId = setTimeout(() => {
+        if (!this.hoveringOver) return
+        this.hoveringOver.holdingOver = true
+        // kind of silly but we need to call this just to get the holdingOver "jiggle" effect
+        this.calculateCardsToRender()
+      }, v.cardHoldTime)
+      this.dragTimeoutId = dragTimeoutId
+    }
     this.throttledCalculateCardsToRender()
   }
 
@@ -1035,8 +1015,6 @@ class FoamcoreGrid extends React.Component {
         parent={collection}
         menuOpen={cardMenuOpen.id === card.id}
         zoomLevel={this.relativeZoomLevel}
-        // maxResizeCol={this.calcEdgeCol(card)}
-        // maxResizeRow={this.calcEdgeRow(card)}
         horizontalScroll
         showHotEdge={false}
       />
@@ -1143,7 +1121,7 @@ class FoamcoreGrid extends React.Component {
     return blankCards
   }
 
-  clearDragTimeout = () => {
+  clearDragTimeout() {
     if (this.dragTimeoutId) {
       clearTimeout(this.dragTimeoutId)
       this.dragTimeoutId = null
@@ -1151,7 +1129,7 @@ class FoamcoreGrid extends React.Component {
   }
 
   @action
-  calculateCardsToRender = () => {
+  calculateCardsToRender() {
     const { collection, movingCardIds, uiStore } = this.props
     // any cards that are being moved don't appear at all
     const collectionCards = _.reject(collection.collection_cards, c =>
@@ -1258,9 +1236,6 @@ class FoamcoreGrid extends React.Component {
 }
 
 FoamcoreGrid.propTypes = {
-  // gridH: PropTypes.number.isRequired,
-  // gridW: PropTypes.number.isRequired,
-  // gutter: PropTypes.number.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   cardProperties: MobxPropTypes.arrayOrObservableArray.isRequired,
   trackCollectionUpdated: PropTypes.func.isRequired,

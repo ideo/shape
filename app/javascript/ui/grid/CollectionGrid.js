@@ -12,8 +12,6 @@ import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import { objectsEqual } from '~/utils/objectUtils'
 import v from '~/utils/variables'
 
-const CARD_HOLD_TIME = 0.4 * 1000
-
 const StyledGrid = styled.div`
   margin-top: ${v.pageContentMarginTop}px;
   min-height: ${props => props.minHeight}px;
@@ -75,7 +73,7 @@ class CollectionGrid extends React.Component {
     this.state = {
       cards: [],
       rows: 1,
-      hoveringOver: null,
+      hoveringOver: false,
       dragTimeoutId: null,
       matrix: [],
     }
@@ -222,7 +220,7 @@ class CollectionGrid extends React.Component {
   positionCardsFromProps = () => {
     const { uiStore } = this.props
     uiStore.update('multiMoveCardIds', [])
-    this.setState({ hoveringOver: null }, () => {
+    this.setState({ hoveringOver: false }, () => {
       this.positionCards(this.props.collection.collection_cards)
     })
   }
@@ -306,7 +304,7 @@ class CollectionGrid extends React.Component {
         cardAction: 'moveWithinCollection',
       })
       if (hoveringRecord.internalType === 'collections') {
-        this.setState({ hoveringOver: null }, () => {
+        this.setState({ hoveringOver: false }, () => {
           this.moveCardsIntoCollection(uiStore.multiMoveCardIds, hoveringRecord)
         })
       }
@@ -351,7 +349,7 @@ class CollectionGrid extends React.Component {
       })
       return
     }
-    this.setState({ hoveringOver: null }, async () => {
+    this.setState({ hoveringOver: false }, async () => {
       const data = {
         to_id: hoveringRecord.id.toString(),
         from_id: collection.id.toString(),
@@ -421,7 +419,7 @@ class CollectionGrid extends React.Component {
         const dragTimeoutId = setTimeout(() => {
           hoveringOver.holdingOver = true
           this.setState({ hoveringOver })
-        }, CARD_HOLD_TIME)
+        }, v.cardHoldTime)
         this.setState({ dragTimeoutId })
       }
 
