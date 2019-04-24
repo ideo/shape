@@ -55,23 +55,60 @@ const TrashButton = styled.button`
   margin-left: 12px;
 `
 
-const selectOptions = [
-  { value: '', label: 'select question type' },
-  { value: 'question_context', label: 'Context Setting' },
-  { value: 'question_media', label: 'Photo or Video of Idea' },
-  { value: 'question_description', label: 'Idea Description' },
-  { value: 'question_useful', label: 'Useful' },
-  { value: 'question_open', label: 'Open Response' },
-  { value: 'question_excitement', label: 'Excitement' },
-  { value: 'question_clarity', label: 'Clarity' },
-  { value: 'question_different', label: 'Different' },
-  { value: 'question_category_satisfaction', label: 'Category Satisfaction' },
+const selectOptionGroups = [
+  {
+    category: 'Idea Content',
+    values: [
+      { value: 'question_description', label: 'Description' },
+      { value: 'question_media', label: 'Photo/Video' },
+    ],
+  },
+  {
+    category: 'Scaled Rating',
+    values: [
+      { value: 'question_clarity', label: 'Clear' },
+      { value: 'question_different', label: 'Different' },
+      { value: 'question_excitement', label: 'Exciting' },
+      { value: 'question_useful', label: 'Useful' },
+    ],
+  },
+  {
+    category: 'Customizable',
+    values: [
+      {
+        value: 'question_category_satisfaction',
+        label: 'Category Satisfaction',
+      },
+      { value: 'question_context', label: 'Context Setting' },
+      { value: 'question_open', label: 'Open Response' },
+    ],
+  },
 ]
 
-function optionSort(a, b) {
-  if (b.value === '') return 1
-  return a.label.localeCompare(b.label)
+const renderSelectOption = opt => {
+  const { value, label, category } = opt
+
+  let rootClass
+  if (category) rootClass = 'category'
+  else if (!value) rootClass = 'grayedOut'
+  else rootClass = 'selectOption'
+
+  return (
+    <SelectOption
+      key={label}
+      classes={{
+        root: rootClass,
+        selected: 'selected',
+      }}
+      disabled={!value}
+      value={value}
+    >
+      <span data-cy="QuestionSelectOption">{label}</span>
+    </SelectOption>
+  )
 }
+
+const optionSort = (a, b) => a.label.localeCompare(b.label)
 
 @observer
 class TestDesigner extends React.Component {
@@ -287,19 +324,18 @@ class TestDesigner extends React.Component {
             value={card.card_question_type || ''}
             onChange={this.handleSelectChange(card)}
           >
-            {selectOptions.sort(optionSort).map(opt => (
-              <SelectOption
-                key={opt.value}
-                classes={{
-                  root: !opt.value ? 'grayedOut' : 'selectOption',
-                  selected: 'selected',
-                }}
-                disabled={!opt.value}
-                value={opt.value}
-              >
-                <span data-cy="QuestionSelectOption">{opt.label}</span>
-              </SelectOption>
-            ))}
+            {renderSelectOption({ value: '', label: 'select question type' })}
+            {selectOptionGroups.map(optGroup => {
+              const options = [
+                {
+                  value: '',
+                  label: optGroup.category,
+                  category: true,
+                },
+              ]
+              optGroup.values.sort(optionSort).forEach(opt => options.push(opt))
+              return options.map(opt => renderSelectOption(opt))
+            })}
           </Select>
         )}
         {this.canEdit &&
