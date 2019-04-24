@@ -326,55 +326,11 @@ class CollectionGrid extends React.Component {
   }
 
   async moveCardsIntoCollection(cardIds, hoveringRecord) {
-    const { collection, uiStore, apiStore } = this.props
-    const can_edit = hoveringRecord.can_edit_content || hoveringRecord.can_edit
-    uiStore.update('movingIntoCollection', hoveringRecord)
-    if (!can_edit) {
-      uiStore.confirm({
-        prompt:
-          'You only have view access to this collection. Would you like to keep moving the cards?',
-        confirmText: 'Continue',
-        iconName: 'Alert',
-        onConfirm: () => {
-          this.cancelDrag()
-          uiStore.reselectCardIds(cardIds)
-          uiStore.openMoveMenu({
-            from: collection.id,
-            cardAction: 'move',
-          })
-        },
-        onCancel: () => {
-          this.cancelDrag()
-        },
-      })
-      return
-    }
-    this.setState({ hoveringOver: false }, async () => {
-      const data = {
-        to_id: hoveringRecord.id.toString(),
-        from_id: collection.id.toString(),
-        collection_card_ids: cardIds,
-        placement: 'beginning',
-      }
-      await apiStore.moveCards(data)
-      const afterMove = () => {
-        const { movingIntoCollection } = uiStore
-        uiStore.setMovingCards([])
-        uiStore.update('multiMoveCardIds', [])
-        uiStore.reselectCardIds(cardIds)
-        uiStore.update('movingIntoCollection', null)
-        // add a little delay because the board has to load first
-        if (movingIntoCollection.isBoard) {
-          setTimeout(() => uiStore.scrollToBottom(), 500)
-        }
-      }
-      if (data.to_id === data.from_id) {
-        afterMove()
-      } else {
-        uiStore.update('movingIntoCollection', hoveringRecord)
-        uiStore.update('actionAfterRoute', afterMove)
-        this.props.routingStore.routeTo('collections', hoveringRecord.id)
-      }
+    this.props.collection.API_moveCardsIntoCollection({
+      toCollection: hoveringRecord,
+      cardIds,
+      onCancel: () => this.positionCardsFromProps(),
+      onSuccess: () => this.setState({ hoveringOver: false }),
     })
   }
 

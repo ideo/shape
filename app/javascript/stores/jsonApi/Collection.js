@@ -831,6 +831,71 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     this.setReloading(false)
   }
 
+  async API_moveCardsIntoCollection({
+    toCollection,
+    cardIds,
+    onCancel,
+    onSuccess,
+  } = {}) {
+    const { uiStore, routingStore } = this
+    const can_edit = toCollection.can_edit_content || toCollection.can_edit
+    const cancel = () => {
+      uiStore.setMovingCards([])
+      uiStore.update('multiMoveCardIds', [])
+      uiStore.stopDragging()
+      if (_.isFunction(onCancel)) onCancel()
+    }
+    if (!can_edit) {
+      uiStore.confirm({
+        prompt:
+          'You only have view access to this collection. Would you like to keep moving the cards?',
+        confirmText: 'Continue',
+        iconName: 'Alert',
+        onConfirm: () => {
+          cancel()
+          uiStore.reselectCardIds(cardIds)
+          uiStore.openMoveMenu({
+            from: this.id,
+            cardAction: 'move',
+          })
+        },
+        onCancel: () => {
+          cancel()
+        },
+      })
+      return
+    }
+
+    // onSuccess is really "successfully able to edit this collection"
+    if (_.isFunction(onSuccess)) onSuccess()
+    uiStore.update('movingIntoCollection', toCollection)
+
+    const data = {
+      to_id: toCollection.id.toString(),
+      from_id: this.id.toString(),
+      collection_card_ids: cardIds,
+      placement: 'beginning',
+    }
+    await apiStore.moveCards(data)
+    const afterMove = () => {
+      const { movingIntoCollection } = uiStore
+      uiStore.setMovingCards([])
+      uiStore.update('multiMoveCardIds', [])
+      uiStore.reselectCardIds(cardIds)
+      uiStore.update('movingIntoCollection', null)
+      // add a little delay because the board has to load first
+      if (movingIntoCollection.isBoard) {
+        setTimeout(() => uiStore.scrollToBottom(), 500)
+      }
+    }
+    if (data.to_id === data.from_id) {
+      afterMove()
+    } else {
+      uiStore.update('actionAfterRoute', afterMove)
+      routingStore.routeTo('collections', toCollection.id)
+    }
+  }
+
   static async createSubmission(parent_id, submissionSettings) {
     const { routingStore, uiStore } = apiStore
     const { type, template } = submissionSettings
