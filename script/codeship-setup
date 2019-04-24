@@ -14,9 +14,9 @@ export ELASTICSEARCH_VERSION=6.2.0
 export ELASTICSEARCH_PORT=9333
 \curl -sSL https://raw.githubusercontent.com/codeship/scripts/master/packages/elasticsearch.sh | bash -s
 # Setup nvm
-nvm install 8.9.4
-nvm use 8.9.4
-nvm alias default 8.9.4
+nvm install $(cat .nvmrc)
+nvm use $(cat .nvmrc)
+nvm alias default $(cat .nvmrc)
 #
 # Setup Yarn
 curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.15.1
@@ -25,7 +25,7 @@ source /home/rof/.bashrc
 yarn install --frozen-lockfile
 #
 # Setup Ruby and gems
-rvm use 2.5.5
+rvm use $(cat .ruby-version)
 bundle config build.nokogiri --use-system-libraries
 bundle install
 # Get db ready
