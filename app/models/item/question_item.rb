@@ -31,7 +31,7 @@ class Item
 
     scope :scale_questions, -> {
       where(
-        question_type: question_types[:scaled_rating],
+        question_type: question_type_categories[:scaled_rating],
       )
     }
 
@@ -48,7 +48,7 @@ class Item
       question_category_satisfaction: 10,
     }
 
-    def self.question_types
+    def self.question_type_categories
       {
         idea_content: %i[
           question_description
@@ -75,7 +75,7 @@ class Item
     end
 
     def scale_question?
-      self.class.question_types[:scaled_rating].include? question_type&.to_sym
+      self.class.question_type_categories[:scaled_rating].include?(question_type&.to_sym)
     end
 
     def requires_roles?

@@ -334,10 +334,6 @@ export const SelectOption = styled(MenuItem)`
     }
   }
 
-  &.selectOption:first-of-type {
-    border-top: none;
-  }
-
   &.selected {
     background-color: inherit !important;
     border-left-color: ${v.colors.black};
