@@ -1,16 +1,13 @@
 module.exports = {
-  plugins: ['react', 'jest', 'cypress', 'prettier'],
+  plugins: ['jsx-a11y', 'react', 'jest', 'cypress', 'prettier', 'compat'],
   env: {
     'jest/globals': true,
     'cypress/globals': true,
   },
   extends: [
-    'airbnb',
-    'standard',
-    'standard-react',
+    'prettier',
     'plugin:prettier/recommended',
     'prettier/react',
-    'prettier/standard',
   ],
   parser: 'babel-eslint',
   parserOptions: {
@@ -43,9 +40,28 @@ module.exports = {
       node: {},
     },
     'module-resolver': {},
-    'import/core-modules': ['styled-jsx/css'],
+    'polyfills': [
+      // Example of marking entire API and all methods and properties as polyfilled
+      "Array.from",
+      "Promise",
+      "Object.assign",
+      "Object.values",
+      "fetch",
+      "Array.prototype.push"
+    ],
   },
   rules: {
+    'no-unused-vars': [
+      'error',
+      {
+        argsIgnorePattern: '^_',
+        args: 'none',
+      },
+    ],
+    'no-var': 'error',
+    'prefer-const': 'error',
+    'import/prefer-default-export': 'off',
+    'compat/compat': 'warn',
     'arrow-parens': [0, 'as-needed'],
     // because of all of our rails API snake_case variables
     camelcase: 0,
@@ -90,6 +106,7 @@ module.exports = {
     'react/jsx-curly-brace-presence': 0,
     'react/jsx-closing-tag-location': 0,
     'react/no-did-mount-set-state': 0,
+    'react/jsx-uses-vars': 1,
     'react/sort-comp': [
       1,
       {
