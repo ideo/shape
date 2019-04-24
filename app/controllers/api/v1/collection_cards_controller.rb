@@ -349,6 +349,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         master_template
         external_id
         cover_type
+        submissions_enabled
       ],
       item_attributes: [
         :id,
