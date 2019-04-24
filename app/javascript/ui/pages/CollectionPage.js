@@ -312,7 +312,13 @@ class CollectionPage extends React.Component {
   renderSubmissionsCollection() {
     const { collection, uiStore } = this.props
     const { blankContentToolState, gridSettings, loadedSubmissions } = uiStore
-    const { submissionTypeName, submissions_collection } = collection
+    const {
+      submissionTypeName,
+      submissions_collection,
+      submission_box_type,
+      submission_template,
+      submissions_enabled,
+    } = collection
 
     if (!submissions_collection || !loadedSubmissions) {
       return this.loader()
@@ -331,17 +337,20 @@ class CollectionPage extends React.Component {
           // Pass in BCT state so grid will re-render when open/closed
           blankContentToolState={blankContentToolState}
           submissionSettings={{
-            type: collection.submission_box_type,
-            template: collection.submission_template,
+            type: submission_box_type,
+            template: submission_template,
+            enabled: submissions_enabled,
           }}
           movingCardIds={[]}
           sorting
         />
-        <FloatingActionButton
-          toolTip={`Add ${submissionTypeName}`}
-          onClick={this.onAddSubmission}
-          icon={<PlusIcon />}
-        />
+        {submissions_enabled && (
+          <FloatingActionButton
+            toolTip={`Add ${submissionTypeName}`}
+            onClick={this.onAddSubmission}
+            icon={<PlusIcon />}
+          />
+        )}
       </div>
     )
   }

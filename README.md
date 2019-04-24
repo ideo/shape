@@ -2,7 +2,7 @@
 
 Here are the commands you can use to get started:
 
-Install all the libraries first:
+**Install all the libraries first:**
 
 ```
 brew install nvm
@@ -19,7 +19,7 @@ brew services start redis
 brew services start elasticsearch
 ```
 
-Clone the app and install the gems:
+**Clone the app and install the gems:**
 
 ```
 git clone <clone URL>
@@ -36,14 +36,14 @@ git submodule init
 git submodule update
 ```
 
-Setup the `.env` file with valid credentials:
+**Setup the `.env` file with valid credentials:**
 
 ```
 cp .env.example .env
 # modify credentials
 ```
 
-Create the database and migrate:
+**Create the database and migrate:**
 
 ```
 rails db:setup
@@ -55,7 +55,12 @@ source ./shell-commands
 shapecopydb local
 ```
 
-Run tests:
+**Setup your text editor and linter:**
+
+Ensure your text editor has [eslint](https://eslint.org/) and [rubocop](https://rubocop.readthedocs.io/en/latest/) installed (e.g. for Atom you would install [linter-eslint](https://github.com/AtomLinter/linter-eslint) and [linter-rubocop](https://atom.io/packages/linter-rubocop)). For JS code we are using [prettier](https://prettier.io/), so if you have your linter running, it will automatically format properly on save.
+
+
+**Run tests:**
 
 Rails Unit & Controller Tests
 

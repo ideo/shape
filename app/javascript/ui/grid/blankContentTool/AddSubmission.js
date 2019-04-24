@@ -60,9 +60,22 @@ class AddSubmission extends React.Component {
   }
 
   renderInner = () => {
-    const { uiStore } = this.props
+    const {
+      uiStore,
+      submissionSettings: { enabled },
+    } = this.props
     const { viewingCollection } = uiStore
     if (!viewingCollection) return ''
+
+    if (!enabled) {
+      return (
+        <StyledBlankCreationTool>
+          <h3>Not accepting new ideas</h3>
+          This submission box is now closed. It&apos;s no longer possible to
+          submit new ideas.
+        </StyledBlankCreationTool>
+      )
+    }
 
     return (
       <StyledBlankCreationTool>
@@ -101,6 +114,7 @@ AddSubmission.propTypes = {
   submissionSettings: PropTypes.shape({
     type: PropTypes.string,
     template: MobxPropTypes.objectOrObservableObject,
+    enabled: PropTypes.bool,
   }).isRequired,
 }
 AddSubmission.wrappedComponent.propTypes = {
