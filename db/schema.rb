@@ -414,7 +414,7 @@ ActiveRecord::Schema.define(version: 20190424210415) do
     t.boolean "mailing_list", default: false
     t.datetime "last_active_at"
     t.string "phone"
-    t.boolean "should_recontact", default: false
+    t.integer "feedback_contact_preference", default: 0
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"

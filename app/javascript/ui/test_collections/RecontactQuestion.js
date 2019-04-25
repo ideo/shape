@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import Emoji from '~/ui/icons/Emoji'
@@ -7,15 +8,19 @@ import { QuestionText } from './shared'
 @observer
 class RecontactQuestion extends React.Component {
   handleClickYes = ev => {
-    const { user } = this.props
-    user.should_recontact = true
-    user.save()
+    const { onAnswer, user } = this.props
+    user.API_updateCurrentUser({
+      feedback_contact_preference: 1,
+    })
+    onAnswer()
   }
 
   handleClickNo = ev => {
-    const { user } = this.props
-    user.should_recontact = false
-    user.save()
+    const { onAnswer, user } = this.props
+    user.API_updateCurrentUser({
+      feedback_contact_preference: 2,
+    })
+    onAnswer()
   }
 
   render() {
@@ -27,13 +32,16 @@ class RecontactQuestion extends React.Component {
         </QuestionText>
         <EmojiHolder>
           <EmojiButton
-            selected={user.should_recontact}
+            selected={user.feedback_contact_preference === 2}
+            onClick={this.handleClickNo}
+          >
+            <Emoji name="Finished" symbol="👎" />
+          </EmojiButton>
+          <EmojiButton
+            selected={user.feedback_contact_preference === 1}
             onClick={this.handleClickYes}
           >
             <Emoji name="Yes" symbol="👍" />
-          </EmojiButton>
-          <EmojiButton selected={false} onClick={this.handleClickNo}>
-            <Emoji name="Finished" symbol="👎" />
           </EmojiButton>
         </EmojiHolder>
       </div>
@@ -43,6 +51,7 @@ class RecontactQuestion extends React.Component {
 
 RecontactQuestion.propTypes = {
   user: MobxPropTypes.objectOrObservableObject.isRequired,
+  onAnswer: PropTypes.func.isRequired,
 }
 
 export default RecontactQuestion

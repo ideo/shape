@@ -38,7 +38,7 @@ const QuestionCardInner = styled.div`
 
 @observer
 class TestQuestion extends React.Component {
-  handleQuestionAnswer = async ({ text, number }) => {
+  handleQuestionAnswer = async ({ text, number } = {}) => {
     const {
       card,
       item,
@@ -49,6 +49,10 @@ class TestQuestion extends React.Component {
     let { surveyResponse, questionAnswer } = this.props
     // components should never trigger this when editing, but double-check here
     if (editing) return
+    if (card.card_question_type === 'question_recontact') {
+      afterQuestionAnswered(card)
+      return
+    }
 
     if (!questionAnswer) {
       if (!surveyResponse) {
@@ -80,7 +84,6 @@ class TestQuestion extends React.Component {
   renderQuestion() {
     const { parent, card, item, editing, questionAnswer, canEdit } = this.props
     let inner
-    console.log('renderq', card.id, card.card_question_type, item)
     switch (card.card_question_type) {
       case 'question_useful':
       case 'question_clarity':
@@ -88,7 +91,6 @@ class TestQuestion extends React.Component {
       case 'question_context':
       case 'question_different':
       case 'question_category_satisfaction':
-        console.log('renderscale', card.id, card.card_question_type, item)
         return (
           <ScaleQuestion
             question={item}
@@ -165,8 +167,12 @@ class TestQuestion extends React.Component {
           />
         )
       case 'question_recontact':
-        console.log('render contact')
-        return <RecontactQuestion user={apiStore.currentUser} />
+        return (
+          <RecontactQuestion
+            user={apiStore.currentUser}
+            onAnswer={this.handleQuestionAnswer}
+          />
+        )
       default:
         return <NewQuestionGraphic />
     }
