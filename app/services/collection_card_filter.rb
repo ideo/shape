@@ -13,7 +13,7 @@ class CollectionCardFilter
   end
 
   def viewable_by_anyone
-    @cards = @cards.visible
+    apply_hidden(false)
     @cards
   end
 
@@ -23,18 +23,17 @@ class CollectionCardFilter
     hidden: false
   )
     apply_order(card_order)
-
-    # `hidden` means include both hidden and unhidden cards
-    @cards = @cards.visible unless hidden
-
-    filter_for_user(user) unless user.has_cached_role?(Role::SUPER_ADMIN)
-
+    apply_hidden(hidden)
+    filter_for_user(user)
     @cards
   end
 
   private
 
   def filter_for_user(user)
+    # Do no filtering if user is super admin
+    return if user.has_cached_role?(Role::SUPER_ADMIN)
+
     group_ids = user.current_org_group_ids
     resource_identifier_sql = %(
       CASE WHEN COALESCE(
@@ -92,5 +91,10 @@ class CollectionCardFilter
     end
 
     @cards = @cards.order(order)
+  end
+
+  def apply_hidden(hidden = false)
+    # `hidden` means include both hidden and unhidden cards
+    @cards = @cards.visible unless hidden
   end
 end
