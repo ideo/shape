@@ -30,7 +30,6 @@ const StyledHeader = styled.div`
   .name {
     font-size: 1.25rem;
     line-height: 1.5rem;
-    text-transform: none;
   }
   .unread {
     color: ${v.colors.alert};
