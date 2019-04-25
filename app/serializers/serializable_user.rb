@@ -2,7 +2,7 @@ class SerializableUser < BaseJsonSerializer
   type 'users'
   attributes :first_name, :last_name, :email,
              :created_at, :status,
-             :handle
+             :handle, :should_recontact
 
   attribute :pic_url_square do
     @object.picture || 'https://s3-us-west-2.amazonaws.com/assets.shape.space/user-avatar.png'

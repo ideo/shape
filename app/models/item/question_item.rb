@@ -46,6 +46,7 @@ class Item
       question_excitement: 8,
       question_different: 9,
       question_category_satisfaction: 10,
+      question_recontact: 11,
     }
 
     def self.question_type_categories

@@ -6,6 +6,7 @@ import FlipMove from 'react-flip-move'
 import { Element as ScrollElement, scroller } from 'react-scroll'
 import { ThemeProvider } from 'styled-components'
 
+import { apiStore } from '~/stores'
 import {
   TestQuestionHolder,
   styledTestTheme,
@@ -33,8 +34,9 @@ class TestSurveyResponder extends React.Component {
 
   viewableCards = () => {
     const { collection } = this.props
+    const { currentUser } = apiStore
     let reachedLastVisibleCard = false
-    return collection.question_cards.filter(card => {
+    const questions = collection.question_cards.filter(card => {
       // turn off the card's actionmenu (dot-dot-dot)
       card.record.disableMenu()
       if (reachedLastVisibleCard) {
@@ -49,6 +51,15 @@ class TestSurveyResponder extends React.Component {
       reachedLastVisibleCard = true
       return true
     })
+    if (currentUser) {
+      questions.splice(questions.length - 1, 0, {
+        id: 'recontact?',
+        card_question_type: 'question_recontact',
+        record: { id: 'facsda', content: '' },
+      })
+    }
+    console.log('questions', questions)
+    return questions
   }
 
   afterQuestionAnswered = card => {

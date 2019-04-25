@@ -6,6 +6,7 @@ import GridCard from '~/ui/grid/GridCard'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import DescriptionQuestion from '~/ui/test_collections/DescriptionQuestion'
 import FinishQuestion from '~/ui/test_collections/FinishQuestion'
+import RecontactQuestion from '~/ui/test_collections/RecontactQuestion'
 import NextTestQuestion from '~/ui/test_collections/NextTestQuestion'
 import NewQuestionGraphic from '~/ui/icons/NewQuestionGraphic'
 import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
@@ -79,6 +80,7 @@ class TestQuestion extends React.Component {
   renderQuestion() {
     const { parent, card, item, editing, questionAnswer, canEdit } = this.props
     let inner
+    console.log('renderq', card.id, card.card_question_type, item)
     switch (card.card_question_type) {
       case 'question_useful':
       case 'question_clarity':
@@ -86,6 +88,7 @@ class TestQuestion extends React.Component {
       case 'question_context':
       case 'question_different':
       case 'question_category_satisfaction':
+        console.log('renderscale', card.id, card.card_question_type, item)
         return (
           <ScaleQuestion
             question={item}
@@ -161,6 +164,9 @@ class TestQuestion extends React.Component {
             }
           />
         )
+      case 'question_recontact':
+        console.log('render contact')
+        return <RecontactQuestion user={apiStore.currentUser} />
       default:
         return <NewQuestionGraphic />
     }
