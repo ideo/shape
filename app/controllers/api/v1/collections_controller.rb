@@ -2,6 +2,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   deserializable_resource :collection, class: DeserializableCollection, only: %i[update]
   load_and_authorize_resource :collection_card, only: [:create]
   load_and_authorize_resource except: %i[update destroy in_my_collection]
+  skip_before_action :check_api_authentication!, only: %i[show]
   # NOTE: these have to be in the following order
   before_action :load_and_authorize_collection_update, only: %i[update]
   before_action :load_collection_with_roles, only: %i[show update]
@@ -116,7 +117,9 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def log_viewing_activities
+    return unless user_signed_in?
     log_organization_view_activity
+    # TODO: we may want to log collection view for anonymous user
     log_collection_activity(:viewed)
   end
 
@@ -176,6 +179,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
                   .where(id: params[:id])
                   .includes(Collection.default_relationships_for_query)
                   .first
+    return unless user_signed_in?
     current_user.precache_roles_for(
       [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],
       ([@collection] + Collection.where(id: @collection.breadcrumb)),

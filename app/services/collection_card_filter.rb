@@ -1,5 +1,6 @@
 class CollectionCardFilter
   def initialize(collection_or_scope:)
+    @collection_order = nil
     if collection_or_scope.is_a?(Collection)
       @cards = collection_or_scope.collection_cards
     else
@@ -12,19 +13,16 @@ class CollectionCardFilter
                    )
   end
 
-  def viewable_by_anyone
-    apply_hidden(false)
-    @cards
-  end
-
   def viewable_by(
-    user,
+    user: nil,
     card_order: nil,
     hidden: false
   )
     apply_order(card_order)
     apply_hidden(hidden)
-    filter_for_user(user)
+    if user
+      filter_for_user(user)
+    end
     @cards
   end
 
@@ -68,7 +66,7 @@ class CollectionCardFilter
     )
 
     fields = ['collection_cards.*']
-    fields << collection_order if collection_order.present?
+    fields << @collection_order if @collection_order.present?
 
     @cards = @cards
              .joins(join_sql)
@@ -79,11 +77,10 @@ class CollectionCardFilter
 
   def apply_order(card_order)
     order = { order: :asc }
-    collection_order = nil
     if card_order
       if card_order == 'total' || card_order.include?('question_')
-        collection_order = "collections.cached_test_scores->'#{card_order}'"
-        order = "#{collection_order} DESC NULLS LAST"
+        @collection_order = "collections.cached_test_scores->'#{card_order}'"
+        order = "#{@collection_order} DESC NULLS LAST"
       else
         # e.g. updated_at
         order = { card_order => :desc }

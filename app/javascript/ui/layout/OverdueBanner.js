@@ -54,6 +54,7 @@ class OverdueBanner extends React.Component {
 
   render() {
     const { apiStore } = this.props
+    if (!apiStore.currentUser) return null
     const currentOrganization = apiStore.currentUser.current_organization
 
     if (

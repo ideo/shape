@@ -28,6 +28,8 @@ import QuestionAnswer from './jsonApi/QuestionAnswer'
 class ApiStore extends jsonapi(datxCollection) {
   @observable
   currentUserId = null
+  @observable
+  sessionLoaded = false
 
   @observable
   currentUserOrganizationId = null
@@ -128,6 +130,7 @@ class ApiStore extends jsonapi(datxCollection) {
 
   @computed
   get currentOrgIsDeactivated() {
+    if (!this.currentUser) return false
     const org =
       this.currentUserOrganization || this.currentUser.current_organization
     if (!org) return false
@@ -144,16 +147,20 @@ class ApiStore extends jsonapi(datxCollection) {
     return _.first(this.currentUser.organizations.filter(org => org.id === id))
   }
 
-  async loadCurrentUser() {
+  async loadCurrentUser({ onSuccess } = {}) {
     try {
       const res = await this.request('users/me')
       const currentUser = res.data
-      this.setCurrentUserInfo({
-        id: currentUser.id,
-        organizationId:
-          currentUser.current_organization &&
-          currentUser.current_organization.id,
-      })
+      if (currentUser.id) {
+        this.setCurrentUserInfo({
+          id: currentUser.id,
+          organizationId:
+            currentUser.current_organization &&
+            currentUser.current_organization.id,
+        })
+        if (_.isFunction(onSuccess)) onSuccess(currentUser)
+      }
+      this.update('sessionLoaded', true)
     } catch (e) {
       trackError(e, { source: 'loadCurrentUser', name: 'fetchUser' })
     }

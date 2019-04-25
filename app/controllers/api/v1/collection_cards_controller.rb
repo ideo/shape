@@ -1,6 +1,7 @@
 class Api::V1::CollectionCardsController < Api::V1::BaseController
   deserializable_resource :collection_card, class: DeserializableCollectionCard, only: %i[create update replace]
   load_and_authorize_resource except: %i[move replace]
+  skip_before_action :check_api_authentication!, only: %i[index]
   before_action :load_and_authorize_parent_collection, only: %i[create replace]
   before_action :load_and_authorize_parent_collection_for_update, only: %i[update]
 
@@ -191,14 +192,15 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
     @collection_cards = CollectionCardFilter
                         .new(
-                          collection_or_scope: scope
+                          collection_or_scope: scope,
                         )
                         .viewable_by(
-                          current_user,
+                          user: current_user,
                           card_order: params[:card_order],
                           hidden: params[:hidden].present?,
                         )
 
+    return unless user_signed_in?
     # precache roles because these will be referred to in the serializers (e.g. can_edit?)
     current_user.precache_roles_for(
       [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],

@@ -85,6 +85,14 @@ class Ability
         comment_thread.can_edit?(user)
       end
     end
+    # for logged-out users
+
+    can :read, Collection do |collection|
+      collection.can_view?(user)
+    end
+    can :read, CollectionCard do |collection_card|
+      collection_card.can_view?(user)
+    end
 
     # don't allow any of the editing actions unless you've accepted terms
     # (i.e. user becomes view-only)

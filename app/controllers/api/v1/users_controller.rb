@@ -1,4 +1,5 @@
 class Api::V1::UsersController < Api::V1::BaseController
+  skip_before_action :check_api_authentication!, only: %i[me]
   load_and_authorize_resource only: %i[show]
   def show
     render jsonapi: @user, include: [
@@ -9,17 +10,21 @@ class Api::V1::UsersController < Api::V1::BaseController
   end
 
   def me
-    current_user.update_attributes(last_active_at: Time.current)
-    render jsonapi: current_user, include: [
-      :groups,
-      organizations: %i[primary_group],
-      current_organization: %i[primary_group guest_group admin_group terms_text_item],
-    ], class: {
-      User: SerializableCurrentUser,
-      Group: SerializableGroup,
-      Organization: SerializableOrganization,
-      'Item::TextItem': SerializableItem,
-    }
+    if user_signed_in?
+      current_user.update_attributes(last_active_at: Time.current)
+      render jsonapi: current_user, include: [
+        :groups,
+        organizations: %i[primary_group],
+        current_organization: %i[primary_group guest_group admin_group terms_text_item],
+      ], class: {
+        User: SerializableCurrentUser,
+        Group: SerializableGroup,
+        Organization: SerializableOrganization,
+        'Item::TextItem': SerializableItem,
+      }
+    else
+      render jsonapi: User.new
+    end
   end
 
   # Create new pending users from email addresses

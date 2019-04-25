@@ -41,7 +41,7 @@ class Api::V1::BaseController < ApplicationController
   # as @instance_vars in serializable resources
   def jsonapi_expose
     {
-      current_user: current_user,
+      current_user: current_user || User.new,
       current_ability: current_ability,
       current_api_token: current_api_token,
     }

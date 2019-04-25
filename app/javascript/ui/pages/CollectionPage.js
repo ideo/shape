@@ -97,30 +97,32 @@ class CollectionPage extends React.Component {
     // setViewingCollection has to happen first bc we use it in openBlankContentTool
     uiStore.setViewingCollection(collection)
 
-    if (collection.collection_cards.length === 0) {
-      uiStore.openBlankContentTool()
-    }
-    if (undoStore.undoAfterRoute) {
-      undoStore.performUndoAfterRoute()
-    }
-    if (uiStore.actionAfterRoute) {
-      uiStore.performActionAfterRoute()
-    }
-    if (collection.awaiting_updates) {
-      this.pollForUpdates()
-    }
     if (collection.isSubmissionsCollection) {
       // NOTE: SubmissionsCollections are not meant to be viewable, so we route
       // back to the SubmissionBox instead
       routingStore.routeTo('collections', collection.submission_box_id)
       return
     }
+    if (collection.awaiting_updates) {
+      this.pollForUpdates()
+    }
+    if (uiStore.actionAfterRoute) {
+      uiStore.performActionAfterRoute()
+    }
+    if (collection.collection_cards.length === 0) {
+      uiStore.openBlankContentTool()
+    }
+    if (undoStore.undoAfterRoute) {
+      undoStore.performUndoAfterRoute()
+    }
     collection.checkCurrentOrg()
     if (collection.isNormalCollection) {
-      const thread = await apiStore.findOrBuildCommentThread(collection)
-      uiStore.expandThread(thread.key)
-      if (routingStore.query) {
-        uiStore.openOptionalMenus(routingStore.query)
+      if (apiStore.currentUser) {
+        const thread = await apiStore.findOrBuildCommentThread(collection)
+        uiStore.expandThread(thread.key)
+        if (routingStore.query) {
+          uiStore.openOptionalMenus(routingStore.query)
+        }
       }
       this.checkSubmissionBox()
     } else {

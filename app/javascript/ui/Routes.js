@@ -83,8 +83,10 @@ class Routes extends React.Component {
 
   componentDidMount() {
     const { apiStore } = this.props
-    apiStore.loadCurrentUser().then(() => {
-      firebaseClient.authenticate(apiStore.currentUser.google_auth_token)
+    apiStore.loadCurrentUser({
+      onSuccess: currentUser => {
+        firebaseClient.authenticate(currentUser.google_auth_token)
+      },
     })
     document.addEventListener('keydown', captureGlobalKeypress)
   }
@@ -171,11 +173,13 @@ class Routes extends React.Component {
 
   render() {
     const { apiStore, routingStore } = this.props
-    if (!apiStore.currentUser) {
+    const { sessionLoaded, currentUser } = apiStore
+    if (!sessionLoaded) {
       return <Loader />
     }
     const displayTermsPopup =
-      !apiStore.currentUser.terms_accepted &&
+      currentUser &&
+      !currentUser.terms_accepted &&
       !routingStore.pathContains('/terms')
 
     const {
@@ -200,14 +204,13 @@ class Routes extends React.Component {
             <DialogWrapper />
             <ZendeskWidget />
 
-            <Header />
+            {currentUser && <Header />}
+
             <FixedBoundary className="fixed_boundary" data-empty-space-click />
             <FixedActivityLogWrapper>
               <ActivityLogBox />
             </FixedActivityLogWrapper>
-            {displayTermsPopup && (
-              <TermsOfUseModal currentUser={apiStore.currentUser} />
-            )}
+            {displayTermsPopup && <TermsOfUseModal currentUser={currentUser} />}
             {/* Switch will stop when it finds the first matching path */}
             <Switch>
               <Route
