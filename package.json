@@ -95,7 +95,6 @@
     "element-matches-polyfill": "^1.0.0",
     "eslint-config-prettier": "^3.0.1",
     "eslint-plugin-prettier": "^2.6.2",
-    "eslint_d": "^7.3.0",
     "filestack-js": "^0.11.2",
     "firebase": "^5.0.4",
     "formik": "0.11.11",
