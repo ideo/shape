@@ -2,7 +2,7 @@
   "name": "Shape",
   "private": true,
   "engines": {
-    "node": "~8.15.0",
+    "node": "^8.15.0",
     "yarn": "^1.10.0"
   },
   "browserslist": [

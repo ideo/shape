@@ -33,9 +33,9 @@ const StyledResizeIcon = styled.div`
   }
 `
 
-const bounceAnim = keyframes`
+const bounceAnim = zoomLevel => keyframes`
   50% {
-    transform: scaleX(1.125) scaleY(1.125);
+    transform: scaleX(${1.125 / zoomLevel}) scaleY(${1.125 / zoomLevel});
   }
 `
 
@@ -53,7 +53,7 @@ const InnerCardWrapper = styled.div.attrs({
   ${props =>
     props.animatedBounce &&
     `
-    animation: ${bounceAnim} 0.25s ease-out;
+    animation: ${bounceAnim(props.zoomLevel)} 0.25s ease-out;
     `};
 `
 
@@ -683,6 +683,7 @@ class MovableGridCard extends React.PureComponent {
             height={height + resizeHeight}
             transition={transition}
             transform={transform}
+            zoomLevel={zoomLevel}
           >
             <GridCard
               {...cardProps}
@@ -703,9 +704,9 @@ MovableGridCard.propTypes = {
   isUserCollection: PropTypes.bool.isRequired,
   isSharedCollection: PropTypes.bool.isRequired,
   isBoardCollection: PropTypes.bool.isRequired,
-  hoveringOverLeft: PropTypes.bool.isRequired,
-  hoveringOverRight: PropTypes.bool.isRequired,
-  holdingOver: PropTypes.bool.isRequired,
+  hoveringOverLeft: PropTypes.bool,
+  hoveringOverRight: PropTypes.bool,
+  holdingOver: PropTypes.bool,
   position: PropTypes.shape(propShapes.position).isRequired,
   dragOffset: PropTypes.shape(propShapes.xy).isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -734,6 +735,9 @@ MovableGridCard.defaultProps = {
   scrollElement: null,
   horizontalScroll: false,
   showHotEdge: true,
+  hoveringOverLeft: false,
+  hoveringOverRight: false,
+  holdingOver: false,
 }
 
 export default MovableGridCard

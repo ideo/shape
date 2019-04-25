@@ -6,8 +6,9 @@ Here are the commands you can use to get started:
 
 ```
 brew install nvm
-nvm install 8.9.4
-brew install yarn
+nvm install 8.16.0
+# use nvm + npm to install yarn; `brew install yarn` would try to reinstall node
+npm install -g yarn
 curl -L https://get.rvm.io | bash -s stable --auto-dotfiles --autolibs=enable --rails
 brew install postgresql
 brew install redis
@@ -24,7 +25,7 @@ brew services start elasticsearch
 ```
 git clone <clone URL>
 cd shape/
-rvm install ruby 2.4.3
+rvm install ruby 2.5.5
 cd ..
 cd shape/
 gem install bundler
