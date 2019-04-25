@@ -15,23 +15,24 @@ import QuestionHotEdge from '~/ui/test_collections/QuestionHotEdge'
 import TestQuestion from '~/ui/test_collections/TestQuestion'
 import RadioControl from '~/ui/global/RadioControl'
 import { apiStore } from '~/stores'
+import AudienceSettings from '~/ui/test_collections/AudienceSettings'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 
-const TopBorder = styled.div`
-  background-color: ${props => props.theme.borderColorEditing};
-  border-radius: 7px 7px 0 0;
-  height: 16px;
-  margin-left: 320px;
-  width: 374px;
-
-  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
-    display: none;
-  }
-`
-const BottomBorder = TopBorder.extend`
-  border-radius: 0 0 7px 7px;
-`
+// const TopBorder = styled.div`
+//   background-color: ${props => props.theme.borderColorEditing};
+//   border-radius: 7px 7px 0 0;
+//   height: 16px;
+//   margin-left: 320px;
+//   width: 374px;
+//
+//   @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+//     display: none;
+//   }
+// `
+// const BottomBorder = TopBorder.extend`
+//   border-radius: 0 0 7px 7px;
+// `
 
 <<<<<<< HEAD
 const QuestionSelectHolder = styled.div`
@@ -419,52 +420,67 @@ class TestDesigner extends React.Component {
       ].includes(item.question_type)
       return (
         <FlipMove appearAnimation="fade" key={card.id}>
-          <div>
-            <Flex
-              style={{
-                width: '694px',
-                flexWrap: 'wrap',
-              }}
-            >
-              {i === 0 && this.canEdit && this.renderHotEdge(card, true)}
-              <QuestionSelectHolder
+          <Flex
+            className={`card ${card.id}`}
+            style={{
+              width: '694px',
+              flexWrap: 'wrap',
+              // flexFlow: 'column', // only when mobile
+            }}
+          >
+            {i === 0 && this.canEdit && this.renderHotEdge(card, true)}
+            <QuestionSelectHolder
+              card={card}
+              canEdit={this.canEdit}
+              handleSelectChange={this.handleSelectChange}
+              handleTrash={this.handleTrash}
+            />
+            <TestQuestionHolder editing userEditable={userEditable}>
+              <TestQuestion
+                editing
+                parent={collection}
                 card={card}
-                canEdit={this.canEdit}
-                handleSelectChange={this.handleSelectChange}
-                handleTrash={this.handleTrash}
+                item={item}
+                position={position}
+                order={card.order}
+                canEdit={this.canEditQuestions}
               />
-              <TestQuestionHolder editing userEditable={userEditable}>
-                <TestQuestion
-                  editing
-                  parent={collection}
-                  card={card}
-                  item={item}
-                  position={position}
-                  order={card.order}
-                  canEdit={this.canEditQuestions}
-                />
-              </TestQuestionHolder>
-              {this.canEdit &&
-                card.card_question_type !== 'question_finish' &&
-                this.renderHotEdge(card)}
-            </Flex>
-          </div>
+            </TestQuestionHolder>
+            {this.canEdit &&
+              card.card_question_type !== 'question_finish' &&
+              this.renderHotEdge(card)}
+          </Flex>
         </FlipMove>
       )
     })
 
     return (
       <ThemeProvider theme={this.styledTheme}>
-        <div>
-          {this.renderTestTypeForm()}
-          <TopBorder />
-          {inner}
-          <BottomBorder />
-        </div>
+        <OuterContainer>
+          <div className={'col-start'}>
+            <h3>Feedback Design</h3>
+            {inner}
+          </div>
+          <div className={'col-start'}>
+            <h3>Feedback Settings</h3>
+            {this.renderTestTypeForm()}
+            <AudienceSettings />
+          </div>
+        </OuterContainer>
       </ThemeProvider>
     )
   }
 }
+
+const OuterContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 800px [col-start]);
+  grid-gap: 1rem;
+
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    grid-template-columns: repeat(1, 200px [col-start]);
+  }
+`
 
 TestDesigner.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,

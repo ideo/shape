@@ -1,4 +1,3 @@
-import React from 'react'
 import { PropTypes } from 'prop-types'
 import v, { TEST_COLLECTION_SELECT_OPTIONS } from '~/utils/variables'
 import { Select, SelectOption } from '~/ui/global/styled/forms'
