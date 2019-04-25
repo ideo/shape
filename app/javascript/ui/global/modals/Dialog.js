@@ -131,7 +131,7 @@ class Dialog extends React.PureComponent {
 Dialog.propTypes = {
   iconName: PropTypes.oneOf(iconNames),
   iconImageOverride: PropTypes.string,
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node,
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func,
   maxWidth: PropTypes.string,
@@ -140,6 +140,7 @@ Dialog.propTypes = {
 }
 Dialog.defaultProps = {
   iconName: 'Alert',
+  children: null,
   maxWidth: 'xs', // 'xs' == 360px
   iconImageOverride: null,
   backgroundColor: v.colors.commonDark,
