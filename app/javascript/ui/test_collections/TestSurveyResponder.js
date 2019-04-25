@@ -22,9 +22,9 @@ const UNANSWERABLE_QUESTION_TYPES = [
 @observer
 class TestSurveyResponder extends React.Component {
   allCards = []
-
-  componentDidMount() {
-    const { collection } = this.props
+  constructor(props) {
+    super(props)
+    const { collection } = props
     const { currentUser } = apiStore
     const questions = [...collection.question_cards]
     if (currentUser) {
@@ -42,10 +42,7 @@ class TestSurveyResponder extends React.Component {
     if (!surveyResponse) return undefined
     if (card.card_question_type === 'question_recontact') {
       const { currentUser } = apiStore
-      return (
-        currentUser.feedback_contract_preference !==
-        'feedback_contact_unanswered'
-      )
+      return currentUser.feedback_contact_preference !== 0
     }
     return _.find(surveyResponse.question_answers, {
       question_id: card.record.id,
