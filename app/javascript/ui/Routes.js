@@ -171,6 +171,15 @@ class Routes extends React.Component {
     }
   }
 
+  goToRoot = () => {
+    const { apiStore } = this.props
+    if (apiStore.currentOrgSlug) {
+      return <Redirect to={`/${apiStore.currentOrgSlug}`} />
+    } else {
+      return <HomePage />
+    }
+  }
+
   render() {
     const { apiStore, routingStore } = this.props
     const { sessionLoaded, currentUser } = apiStore
@@ -204,7 +213,7 @@ class Routes extends React.Component {
             <DialogWrapper />
             <ZendeskWidget />
 
-            {currentUser && <Header />}
+            <Header />
 
             <FixedBoundary className="fixed_boundary" data-empty-space-click />
             <FixedActivityLogWrapper>
@@ -213,17 +222,7 @@ class Routes extends React.Component {
             {displayTermsPopup && <TermsOfUseModal currentUser={currentUser} />}
             {/* Switch will stop when it finds the first matching path */}
             <Switch>
-              <Route
-                exact
-                path="/"
-                render={() =>
-                  apiStore.currentOrgSlug ? (
-                    <Redirect to={`/${apiStore.currentOrgSlug}`} />
-                  ) : (
-                    <HomePage />
-                  )
-                }
-              />
+              <Route exact path="/" render={this.goToRoot} />
               {/* These routes are doubled up so that the non-org route
                 will route you to the org one */}
               <Route path="/collections/:id" component={CollectionApiWrapper} />
