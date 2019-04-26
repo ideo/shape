@@ -97,6 +97,7 @@ class ConfirmationDialog extends React.PureComponent {
   }
 
   render() {
+    // these props get passed in from uiStore.dialogConfig in DialogWrapper
     const {
       cancelImage,
       cancelPrompt,
@@ -109,8 +110,6 @@ class ConfirmationDialog extends React.PureComponent {
       snoozeChecked,
       image,
     } = this.props
-
-    // TODO: as far as I can tell, no remaining instance of this dialogue uses the a `props.image`
 
     const twoColumn = !!(confirmPrompt || cancelPrompt)
     const bigModal = !!(image || twoColumn)

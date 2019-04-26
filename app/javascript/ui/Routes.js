@@ -10,7 +10,7 @@ import DialogWrapper from '~/ui/global/modals/DialogWrapper'
 import ErrorBoundary from '~/ui/global/ErrorBoundary'
 import ZendeskWidget from '~/ui/global/ZendeskWidget'
 import Header from '~/ui/layout/Header'
-import HomePage from '~/ui/pages/HomePage'
+import CreateOrgPage from '~/ui/pages/CreateOrgPage'
 import {
   CollectionApiWrapper,
   MyCollectionApiWrapper,
@@ -176,7 +176,7 @@ class Routes extends React.Component {
     if (apiStore.currentOrgSlug) {
       return <Redirect to={`/${apiStore.currentOrgSlug}`} />
     } else {
-      return <HomePage />
+      return <CreateOrgPage />
     }
   }
 

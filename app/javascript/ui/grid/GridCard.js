@@ -181,32 +181,23 @@ class GridCard extends React.Component {
     )
   }
 
-  openMenu = () => {
+  openMenu = (ev, { x = 0, y = 0 } = {}) => {
     const { card } = this.props
+    const direction = ev.screenX < v.actionMenuWidth ? 'right' : 'left'
     if (this.props.menuOpen) {
       uiStore.closeCardMenu()
     } else {
-      uiStore.openCardMenu(card.id)
+      uiStore.openCardMenu(card.id, { direction, x, y })
     }
   }
 
   openContextMenu = ev => {
-    const { card } = this.props
+    ev.preventDefault()
     const rect = this.gridCardRef.getBoundingClientRect()
     const x = ev.clientX - rect.left - rect.width * 0.95
     const y = ev.clientY - rect.top - 15
 
-    const direction = ev.screenX < 250 ? 'right' : 'left'
-    if (this.props.menuOpen) {
-      uiStore.closeCardMenu()
-    } else {
-      uiStore.openCardMenu(card.id, {
-        x,
-        y,
-        direction,
-      })
-    }
-    ev.preventDefault()
+    this.openMenu(ev, { x, y })
     return false
   }
 
@@ -344,6 +335,7 @@ class GridCard extends React.Component {
       testCollectionCard,
       searchResult,
       showHotEdge,
+      zoomLevel,
     } = this.props
 
     const firstCardInRow = card.position && card.position.x === 0
@@ -385,6 +377,7 @@ class GridCard extends React.Component {
             <StyledTopRightActions
               color={this.actionsColor}
               className="show-on-hover"
+              zoomLevel={zoomLevel}
             >
               {record.isDownloadable && <Download record={record} />}
               {record.canSetACover && (
@@ -425,6 +418,7 @@ class GridCard extends React.Component {
                 card={card}
                 canEdit={this.canEditCard}
                 canReplace={record.canReplace && !card.link && !searchResult}
+                direction={uiStore.cardMenuOpen.direction}
                 menuOpen={menuOpen}
                 onOpen={this.openMenu}
                 onLeave={this.closeMenu}
@@ -470,6 +464,7 @@ GridCard.propTypes = {
   searchResult: PropTypes.bool,
   draggingMultiple: PropTypes.bool,
   showHotEdge: PropTypes.bool,
+  zoomLevel: PropTypes.number,
 }
 
 GridCard.defaultProps = {
@@ -486,6 +481,7 @@ GridCard.defaultProps = {
   draggingMultiple: false,
   searchResult: false,
   showHotEdge: true,
+  zoomLevel: 1,
 }
 
 export default GridCard
