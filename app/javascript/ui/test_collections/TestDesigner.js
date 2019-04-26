@@ -19,98 +19,6 @@ import AudienceSettings from '~/ui/test_collections/AudienceSettings'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 
-// const TopBorder = styled.div`
-//   background-color: ${props => props.theme.borderColorEditing};
-//   border-radius: 7px 7px 0 0;
-//   height: 16px;
-//   margin-left: 320px;
-//   width: 374px;
-//
-//   @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
-//     display: none;
-//   }
-// `
-// const BottomBorder = TopBorder.extend`
-//   border-radius: 0 0 7px 7px;
-// `
-
-<<<<<<< HEAD
-const QuestionSelectHolder = styled.div`
-  margin-top: 10px;
-  margin-right: 20px;
-  width: 300px;
-
-  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
-    margin-bottom: 20px;
-    width: auto;
-    max-width: 400px;
-  }
-`
-
-const TrashButton = styled.button`
-  position: relative;
-  top: 6px;
-  width: 26px;
-  margin-left: 12px;
-`
-
-const selectOptionGroups = [
-  {
-    category: 'Idea Content',
-    values: [
-      { value: 'question_description', label: 'Description' },
-      { value: 'question_media', label: 'Photo/Video' },
-    ],
-  },
-  {
-    category: 'Scaled Rating',
-    values: [
-      { value: 'question_clarity', label: 'Clear' },
-      { value: 'question_different', label: 'Different' },
-      { value: 'question_excitement', label: 'Exciting' },
-      { value: 'question_useful', label: 'Useful' },
-    ],
-  },
-  {
-    category: 'Customizable',
-    values: [
-      {
-        value: 'question_category_satisfaction',
-        label: 'Category Satisfaction',
-      },
-      { value: 'question_context', label: 'Context Setting' },
-      { value: 'question_open', label: 'Open Response' },
-    ],
-  },
-]
-
-const renderSelectOption = opt => {
-  const { value, label, category } = opt
-
-  let rootClass
-  if (category) rootClass = 'category'
-  else if (!value) rootClass = 'grayedOut'
-  else rootClass = 'selectOption'
-
-  return (
-    <SelectOption
-      key={label}
-      classes={{
-        root: rootClass,
-        selected: 'selected',
-      }}
-      disabled={!value}
-      value={value}
-    >
-      <span data-cy="QuestionSelectOption">{label}</span>
-    </SelectOption>
-  )
-}
-
-const optionSort = (a, b) => a.label.localeCompare(b.label)
-
-=======
->>>>>>> WIP; extract QuestionSelectHolder to component
 @observer
 class TestDesigner extends React.Component {
   constructor(props) {
@@ -305,57 +213,6 @@ class TestDesigner extends React.Component {
     return <QuestionHotEdge onAdd={this.handleNew(card, addBefore)} />
   }
 
-<<<<<<< HEAD
-  renderQuestionSelectForm(card) {
-    const blank = !card.card_question_type
-    return (
-      <QuestionSelectHolder>
-        <NumberListText>{card.order + 1}.</NumberListText>
-        {card.card_question_type === 'question_finish' ? (
-          <DisplayText>End of Survey</DisplayText>
-        ) : (
-          <Select
-            classes={{
-              root: 'select fixedWidth',
-              select: blank ? 'grayedOut' : '',
-              selectMenu: 'selectMenu',
-            }}
-            displayEmpty
-            disabled={!this.canEdit}
-            name="role"
-            value={card.card_question_type || ''}
-            onChange={this.handleSelectChange(card)}
-          >
-            {renderSelectOption({ value: '', label: 'select question type' })}
-            {selectOptionGroups.map(optGroup => {
-              const options = [
-                {
-                  value: '',
-                  label: optGroup.category,
-                  category: true,
-                },
-              ]
-              optGroup.values.sort(optionSort).forEach(opt => options.push(opt))
-              return options.map(opt => renderSelectOption(opt))
-            })}
-          </Select>
-        )}
-        {this.canEdit &&
-          card.card_question_type !== 'question_finish' && (
-            <TrashButton onClick={() => this.handleTrash(card)}>
-              <TrashIcon />
-            </TrashButton>
-          )}
-        <div style={{ color: v.colors.commonMedium }}>
-          {card.isPinnedAndLocked && <PinnedIcon locked />}
-          {card.isPinnedInTemplate && <PinnedIcon />}
-        </div>
-      </QuestionSelectHolder>
-    )
-  }
-
-=======
->>>>>>> WIP; extract QuestionSelectHolder to component
   renderTestTypeForm() {
     const { collection } = this.props
     const canEdit = collection.can_edit
@@ -452,7 +309,9 @@ class TestDesigner extends React.Component {
         <OuterContainer>
           <div className={'col-start'}>
             <h3>Feedback Design</h3>
+            <TopBorder />
             {inner}
+            <BottomBorder />
           </div>
           <div className={'col-end'}>
             <h3>Feedback Settings</h3>
@@ -465,12 +324,32 @@ class TestDesigner extends React.Component {
   }
 }
 
+// Todo: have first and last TestQuestionFlexWrapper replace BottomBorder/TopBorder
+const TopBorder = styled.div`
+  background-color: ${props => props.theme.borderColorEditing};
+  border-radius: 7px 7px 0 0;
+  height: 16px;
+  margin-left: 314px;
+  width: 374px;
+
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    display: none;
+  }
+`
+const BottomBorder = TopBorder.extend`
+  border-radius: 0 0 7px 7px;
+`
+
 const TestQuestionFlexWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
   width: 694px;
 
   @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    width: 600px;
+  }
+
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
     width: auto;
   }
 `
@@ -490,6 +369,10 @@ const OuterContainer = styled.div`
   @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
     flex-direction: column-reverse;
     flex-wrap: wrap;
+
+    .col-start {
+      justify-content: center;
+    }
 
     .col-end {
       margin-left: 0px;
