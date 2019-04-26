@@ -29,7 +29,12 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
     y={50.23255813953488}
     yPos={50.23255813953488}
     zoomLevel={5.375}
-  />
+  >
+    <InlineLoader
+      background="#f5f4f3"
+      fixed={false}
+    />
+  </styled.div>
   <styled.div
     blocked={false}
     data-blank-type="unrendered"
@@ -47,7 +52,12 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
     y={0}
     yPos={0}
     zoomLevel={5.375}
-  />
+  >
+    <InlineLoader
+      background="#f5f4f3"
+      fixed={false}
+    />
+  </styled.div>
   <styled.div
     blocked={false}
     data-blank-type="unrendered"
@@ -65,6 +75,11 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
     y={100.46511627906976}
     yPos={100.46511627906976}
     zoomLevel={5.375}
-  />
+  >
+    <InlineLoader
+      background="#f5f4f3"
+      fixed={false}
+    />
+  </styled.div>
 </styled.div>
 `;

@@ -4,6 +4,7 @@ import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import InlineLoader from '~/ui/layout/InlineLoader'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
@@ -22,8 +23,6 @@ const BlankCard = styled.div.attrs({
     cursor: 'pointer',
   }),
 })`
-  border: ${props =>
-    props.type === 'unrendered' ? `1px solid ${v.colors.primaryDark}` : 'none'};
   background-color: ${props => {
     if (props.blocked) {
       return v.colors.alert
@@ -38,15 +37,22 @@ const BlankCard = styled.div.attrs({
   }};
   position: absolute;
   transform-origin: left top;
-  opacity: ${props => (props.type === 'drag' ? 0.5 : 1)};
+  opacity: ${props => {
+    if (props.type === 'unrendered') return 0.75
+    if (props.type === 'drag') return 0.5
+    return 1
+  }};
   z-index: ${props => (props.type === 'drag' ? v.zIndex.cardHovering : 0)};
-  &:hover {
+  ${props =>
+    props.type === 'unrendered'
+      ? ''
+      : `&:hover {
     background-color: ${v.colors.primaryLight} !important;
     .plus-icon {
       display: block;
     }
   }
-  .plus-icon {
+  `} .plus-icon {
     display: none;
   }
 `
@@ -294,7 +300,7 @@ class FoamcoreGrid extends React.Component {
   get visibleRows() {
     if (!this.gridRef) return { min: null, max: null }
 
-    const top = window.scrollY
+    const top = window.scrollY || window.pageYOffset
     const gridHeight = window.innerHeight - pageMargins.top
 
     const min = parseFloat((top / this.cardAndGutterHeight).toFixed(1))
@@ -313,7 +319,7 @@ class FoamcoreGrid extends React.Component {
   get visibleCols() {
     if (!this.gridRef) return { min: null, max: null }
 
-    const left = window.scrollX
+    const left = window.scrollX || window.pageXOffset
     const gridWidth = window.innerWidth - pageMargins.left
 
     const min = parseFloat((left / this.cardAndGutterWidth).toFixed(1))
@@ -985,6 +991,8 @@ class FoamcoreGrid extends React.Component {
           <PlusIcon />
         </StyledPlusIcon>
       )
+    } else if (type === 'unrendered') {
+      inner = <InlineLoader background={v.colors.commonLightest} />
     }
 
     return (
