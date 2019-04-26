@@ -307,13 +307,13 @@ class TestDesigner extends React.Component {
     return (
       <ThemeProvider theme={this.styledTheme}>
         <OuterContainer>
-          <div className={'col-start'}>
+          <div className={'design-column'}>
             <h3>Feedback Design</h3>
             <TopBorder />
             {inner}
             <BottomBorder />
           </div>
-          <div className={'col-end'}>
+          <div className={'settings-column'}>
             <h3>Feedback Settings</h3>
             {this.renderTestTypeForm()}
             <AudienceSettings />
@@ -357,11 +357,11 @@ const TestQuestionFlexWrapper = styled.div`
 const OuterContainer = styled.div`
   display: flex;
 
-  .col-start {
+  .design-column {
     flex: 1;
   }
 
-  .col-end {
+  .settings-column {
     flex: 1;
     margin-left: 30px;
   }
@@ -370,11 +370,11 @@ const OuterContainer = styled.div`
     flex-direction: column-reverse;
     flex-wrap: wrap;
 
-    .col-start {
+    .design-column {
       justify-content: center;
     }
 
-    .col-end {
+    .settings-column {
       margin-left: 0px;
     }
   }
