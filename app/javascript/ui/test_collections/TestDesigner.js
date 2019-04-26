@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import { Flex } from 'reflexbox'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled, { ThemeProvider } from 'styled-components'
 import FlipMove from 'react-flip-move'
@@ -14,6 +13,7 @@ import {
 import QuestionHotEdge from '~/ui/test_collections/QuestionHotEdge'
 import TestQuestion from '~/ui/test_collections/TestQuestion'
 import RadioControl from '~/ui/global/RadioControl'
+import trackError from '~/utils/trackError'
 import { apiStore } from '~/stores'
 import AudienceSettings from '~/ui/test_collections/AudienceSettings'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
@@ -43,7 +43,11 @@ class TestDesigner extends React.Component {
         collectionToTest: res.data,
       })
     } catch (e) {
-      console.warn(e, 'unable to load parent collection')
+      trackError(e, {
+        message: `Unable to load parent collection for Collection ${
+          collection.id
+        }`,
+      })
     }
   }
 
