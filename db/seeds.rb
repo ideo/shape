@@ -6,7 +6,10 @@
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
 
-org = Organization.find_or_create_by(id: 1)
+org = Organization.find_or_initialize_by(id: 1)
+if org.new_record?
+  org = FactoryBot.create(:organization_without_groups)
+end
 if ENV['GETTING_STARTED_TEMPLATE_ID']
   c = Collection.find_or_initialize_by(
     id: ENV['GETTING_STARTED_TEMPLATE_ID'],
