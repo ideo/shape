@@ -5,10 +5,8 @@ import styled, { ThemeProvider } from 'styled-components'
 import FlipMove from 'react-flip-move'
 import pluralize from 'pluralize'
 
-import { DisplayText, NumberListText } from '~/ui/global/styled/typography'
-import { Select, SelectOption } from '~/ui/global/styled/forms'
 import v, { ITEM_TYPES } from '~/utils/variables'
-import TrashIcon from '~/ui/icons/TrashIcon'
+import QuestionSelectHolder from '~/ui/test_collections/QuestionSelectHolder'
 import {
   TestQuestionHolder,
   styledTestTheme,
@@ -16,7 +14,6 @@ import {
 import QuestionHotEdge from '~/ui/test_collections/QuestionHotEdge'
 import TestQuestion from '~/ui/test_collections/TestQuestion'
 import RadioControl from '~/ui/global/RadioControl'
-import PinnedIcon from '~/ui/icons/PinnedIcon'
 import { apiStore } from '~/stores'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
@@ -36,6 +33,7 @@ const BottomBorder = TopBorder.extend`
   border-radius: 0 0 7px 7px;
 `
 
+<<<<<<< HEAD
 const QuestionSelectHolder = styled.div`
   margin-top: 10px;
   margin-right: 20px;
@@ -110,6 +108,8 @@ const renderSelectOption = opt => {
 
 const optionSort = (a, b) => a.label.localeCompare(b.label)
 
+=======
+>>>>>>> WIP; extract QuestionSelectHolder to component
 @observer
 class TestDesigner extends React.Component {
   constructor(props) {
@@ -304,6 +304,7 @@ class TestDesigner extends React.Component {
     return <QuestionHotEdge onAdd={this.handleNew(card, addBefore)} />
   }
 
+<<<<<<< HEAD
   renderQuestionSelectForm(card) {
     const blank = !card.card_question_type
     return (
@@ -352,6 +353,8 @@ class TestDesigner extends React.Component {
     )
   }
 
+=======
+>>>>>>> WIP; extract QuestionSelectHolder to component
   renderTestTypeForm() {
     const { collection } = this.props
     const canEdit = collection.can_edit
@@ -424,7 +427,12 @@ class TestDesigner extends React.Component {
               }}
             >
               {i === 0 && this.canEdit && this.renderHotEdge(card, true)}
-              {this.renderQuestionSelectForm(card)}
+              <QuestionSelectHolder
+                card={card}
+                canEdit={this.canEdit}
+                handleSelectChange={this.handleSelectChange}
+                handleTrash={this.handleTrash}
+              />
               <TestQuestionHolder editing userEditable={userEditable}>
                 <TestQuestion
                   editing
