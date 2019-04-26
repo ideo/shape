@@ -8,7 +8,8 @@
     "last_name": { "type": "string" },
     "pic_url_square": { "type": "string" },
     "status": { "type": "string" },
-    "user_profile_collection_id": { "type": ["string", "null"] }
+    "user_profile_collection_id": { "type": ["string", "null"] },
+    "feedback_contact_preference": { "type": "string" }
   },
   "required": ["email", "first_name", "last_name", "status"]
 }
