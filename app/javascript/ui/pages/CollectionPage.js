@@ -369,7 +369,7 @@ class CollectionPage extends React.Component {
     <div
       style={{
         zIndex: v.zIndex.clickWrapper,
-        marginTop: v.headerHeight + v.pageContentMarginTop + 10,
+        marginTop: v.headerHeight + 40,
         position: 'fixed',
         top: 0,
         left: 'calc(50% - 50px)',
