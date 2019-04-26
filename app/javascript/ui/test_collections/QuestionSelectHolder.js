@@ -74,12 +74,11 @@ function optionSort(a, b) {
 
 const SelectHolderContainer = styled.div`
   margin-top: 10px;
-  margin-right: 20px;
+  margin-right: 14px;
   width: 300px;
 
   @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
     margin-bottom: 20px;
-    width: auto;
     max-width: 400px;
   }
 `

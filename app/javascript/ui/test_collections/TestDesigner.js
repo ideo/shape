@@ -420,14 +420,7 @@ class TestDesigner extends React.Component {
       ].includes(item.question_type)
       return (
         <FlipMove appearAnimation="fade" key={card.id}>
-          <Flex
-            className={`card ${card.id}`}
-            style={{
-              width: '694px',
-              flexWrap: 'wrap',
-              // flexFlow: 'column', // only when mobile
-            }}
-          >
+          <TestQuestionFlexWrapper className={`card ${card.id}`}>
             {i === 0 && this.canEdit && this.renderHotEdge(card, true)}
             <QuestionSelectHolder
               card={card}
@@ -449,7 +442,7 @@ class TestDesigner extends React.Component {
             {this.canEdit &&
               card.card_question_type !== 'question_finish' &&
               this.renderHotEdge(card)}
-          </Flex>
+          </TestQuestionFlexWrapper>
         </FlipMove>
       )
     })
@@ -461,7 +454,7 @@ class TestDesigner extends React.Component {
             <h3>Feedback Design</h3>
             {inner}
           </div>
-          <div className={'col-start'}>
+          <div className={'col-end'}>
             <h3>Feedback Settings</h3>
             {this.renderTestTypeForm()}
             <AudienceSettings />
@@ -472,13 +465,35 @@ class TestDesigner extends React.Component {
   }
 }
 
-const OuterContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 800px [col-start]);
-  grid-gap: 1rem;
+const TestQuestionFlexWrapper = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  width: 694px;
 
   @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
-    grid-template-columns: repeat(1, 200px [col-start]);
+    width: auto;
+  }
+`
+
+const OuterContainer = styled.div`
+  display: flex;
+
+  .col-start {
+    flex: 1;
+  }
+
+  .col-end {
+    flex: 1;
+    margin-left: 30px;
+  }
+
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    flex-direction: column-reverse;
+    flex-wrap: wrap;
+
+    .col-end {
+      margin-left: 0px;
+    }
   }
 `
 
