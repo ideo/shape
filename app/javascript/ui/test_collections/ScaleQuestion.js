@@ -42,14 +42,14 @@ const Scale = styled.div`
   }
 `
 
-const EmojiHolder = styled.div`
+export const EmojiHolder = styled.div`
   align-items: center;
   display: flex;
   justify-content: space-around;
   margin-top: 10px;
 `
 
-const EmojiButton = styled.button`
+export const EmojiButton = styled.button`
   opacity: ${props => (props.selected ? 1 : 0.2)};
   transition: opacity 0.3s;
   &:hover {
