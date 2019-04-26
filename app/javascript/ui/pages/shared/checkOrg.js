@@ -2,7 +2,7 @@ import { apiStore, routingStore } from '~/stores'
 
 const checkOrg = match => {
   // if we're already mid-switch don't start another one
-  if (apiStore.switchingOrgs) return true
+  if (apiStore.switchingOrgs || !apiStore.currentUser) return true
 
   const { org } = match.params
   let path = `${routingStore.location.pathname}${routingStore.location.search}`

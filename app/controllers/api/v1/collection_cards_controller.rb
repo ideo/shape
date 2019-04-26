@@ -1,6 +1,6 @@
 class Api::V1::CollectionCardsController < Api::V1::BaseController
   deserializable_resource :collection_card, class: DeserializableCollectionCard, only: %i[create update replace]
-  load_and_authorize_resource except: %i[move replace]
+  load_and_authorize_resource except: %i[index move replace]
   skip_before_action :check_api_authentication!, only: %i[index]
   before_action :load_and_authorize_parent_collection, only: %i[create replace]
   before_action :load_and_authorize_parent_collection_for_update, only: %i[update]
@@ -172,32 +172,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def load_collection_cards
-    if @collection.is_a?(Collection::Board)
-      # Defaults to 16x16 since we default to a fully zoomed-out view
-      rows = params[:rows].is_a?(Array) ? params[:rows] : [0, 16]
-      cols = params[:cols].is_a?(Array) ? params[:cols] : [0, 16]
-      scope = @collection.collection_cards_by_row_and_col(
-        rows: rows,
-        cols: cols,
-      )
-    else
-      # ensure per_page is between 50 and 200
-      per_page = [params[:per_page].to_i, CollectionCard::DEFAULT_PER_PAGE].max
-      per_page = [per_page, 200].min
-      scope = @collection.collection_cards_by_page(
-        page: @page,
-        per_page: per_page,
-      )
-    end
-
     @collection_cards = CollectionCardFilter
-                        .new(
-                          collection_or_scope: scope,
-                        )
-                        .viewable_by(
+                        .call(
+                          collection: @collection,
                           user: current_user,
-                          card_order: params[:card_order],
-                          hidden: params[:hidden].present?,
+                          filters: params.merge(page: @page),
                         )
 
     return unless user_signed_in?

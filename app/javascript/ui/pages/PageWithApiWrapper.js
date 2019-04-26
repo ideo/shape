@@ -62,6 +62,7 @@ class PageWithApiWrapper extends React.Component {
     const { match, location } = this.props
     const { fetchId } = this
     const { data } = this.state
+    if (!data) return false
     if (data && data.id && fetchId && data.id !== fetchId) {
       // e.g. for My Collection, but switching orgs
       return true
@@ -92,8 +93,10 @@ class PageWithApiWrapper extends React.Component {
         this.setState({ data })
       })
       .catch(err => {
-        uiStore.update('pageError', err)
-        trackError(err, { name: 'PageApiFetch' })
+        this.setState({ data: null }, () => {
+          uiStore.update('pageError', err)
+          trackError(err, { name: 'PageApiFetch' })
+        })
       })
   }
 

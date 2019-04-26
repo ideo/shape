@@ -1,38 +1,57 @@
-class CollectionCardFilter
-  def initialize(collection_or_scope:)
+class CollectionCardFilter < SimpleService
+  def initialize(collection:, user:, filters:)
     @collection_order = nil
-    if collection_or_scope.is_a?(Collection)
-      @cards = collection_or_scope.collection_cards
-    else
-      @cards = collection_or_scope
-    end
-    @cards = @cards.active
-                   .includes(
-                     collection: [:collection_cover_items],
-                     item: [:filestack_file]
-                   )
+    @collection = collection
+    @user = user
+    @filters = filters
+    @cards = []
   end
 
-  def viewable_by(
-    user: nil,
-    card_order: nil,
-    hidden: false
-  )
-    apply_order(card_order)
-    apply_hidden(hidden)
-    if user
-      filter_for_user(user)
+  def call
+    initialize_cards
+    apply_order
+    apply_hidden
+    if @user && @collection.can_view?(@user)
+      filter_for_user
+    else
+      filter_for_public
     end
     @cards
   end
 
   private
 
-  def filter_for_user(user)
-    # Do no filtering if user is super admin
-    return if user.has_cached_role?(Role::SUPER_ADMIN)
+  def initialize_cards
+    if @collection.is_a?(Collection::Board)
+      # Defaults to 16x16 since we default to a fully zoomed-out view
+      rows = @filters[:rows].is_a?(Array) ? @filters[:rows] : [0, 16]
+      cols = @filters[:cols].is_a?(Array) ? @filters[:cols] : [0, 16]
+      @cards = @collection.collection_cards_by_row_and_col(
+        rows: rows,
+        cols: cols,
+      )
+    else
+      # ensure per_page is between 50 and 200
+      per_page = [@filters[:per_page].to_i, CollectionCard::DEFAULT_PER_PAGE].max
+      per_page = [per_page, 200].min
+      @cards = @collection.collection_cards_by_page(
+        page: @filters[:page],
+        per_page: per_page,
+      )
+    end
+    @cards = @cards
+             .active
+             .includes(
+               collection: [:collection_cover_items],
+               item: [:filestack_file],
+             )
+  end
 
-    group_ids = user.current_org_group_ids
+  def filter_for_user
+    # Do no filtering if user is super admin
+    return if @user.has_cached_role?(Role::SUPER_ADMIN)
+
+    group_ids = @user.current_org_group_ids
     resource_identifier_sql = %(
       CASE WHEN COALESCE(
         items.roles_anchor_collection_id,
@@ -59,7 +78,7 @@ class CollectionCardFilter
       )
       LEFT JOIN users_roles ON
       users_roles.role_id = roles.id and
-      users_roles.user_id = #{user.id}
+      users_roles.user_id = #{@user.id}
       LEFT JOIN groups_roles ON
       groups_roles.role_id = roles.id and
       groups_roles.group_id IN (#{group_ids.present? ? group_ids.join(',') : 'NULL'})
@@ -75,7 +94,21 @@ class CollectionCardFilter
              .distinct
   end
 
-  def apply_order(card_order)
+  def filter_for_public
+    fields = ['collection_cards.*']
+    fields << @collection_order if @collection_order.present?
+    @cards = @cards
+             .left_joins(:item, :collection)
+             .select(*fields)
+             .where(
+               "(item_id IS NOT NULL AND items.cached_attributes->'cached_inheritance'->>'private'='false') OR " \
+               "(collection_id IS NOT NULL AND collections.cached_attributes->'cached_inheritance'->>'private'='false')",
+             )
+             .distinct
+  end
+
+  def apply_order
+    card_order = @filters[:card_order]
     order = { order: :asc }
     if card_order
       if card_order == 'total' || card_order.include?('question_')
@@ -90,8 +123,8 @@ class CollectionCardFilter
     @cards = @cards.order(order)
   end
 
-  def apply_hidden(hidden = false)
+  def apply_hidden
     # `hidden` means include both hidden and unhidden cards
-    @cards = @cards.visible unless hidden
+    @cards = @cards.visible unless @filters[:hidden].present?
   end
 end

@@ -127,6 +127,7 @@ class PageHeader extends React.Component {
 
   get hiddenIcon() {
     const { record } = this.props
+    if (!record.can_view) return null
     if (record.is_private || this.isCurrentlyHiddenSubmission) {
       return (
         <HiddenIconButton

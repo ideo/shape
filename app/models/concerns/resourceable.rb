@@ -124,7 +124,6 @@ module Resourceable
   end
 
   def can_view?(user_or_group)
-    return true if try(:viewable_by_anyone?)
     return true if can_edit?(user_or_group)
     return true if can_edit_content?(user_or_group)
     raise_role_name_not_set(:view_role) if self.class.view_role.blank?

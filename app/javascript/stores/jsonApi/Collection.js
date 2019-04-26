@@ -405,11 +405,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.is_org_template_collection
   }
 
-  // disable cardMenu actions for certain collections
-  get menuDisabled() {
-    return this.isSharedCollection
-  }
-
   @computed
   get cardProperties() {
     return this.collection_cards.map(c => _.pick(c, ['id', 'updated_at']))

@@ -200,6 +200,7 @@ class Header extends React.Component {
             location="PageMenu"
             className="card-menu"
             card={record.parent_collection_card}
+            canView={record.can_view}
             canEdit={record.can_edit}
             canReplace={record.canReplace}
             direction={uiStore.pageMenuOpen || 'left'}

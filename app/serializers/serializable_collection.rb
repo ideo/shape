@@ -67,6 +67,11 @@ class SerializableCollection < BaseJsonSerializer
     @card_order || 'order'
   end
 
+  attribute :can_view do
+    # intentionally not using ability so `viewable_by_anyone?` does not return true
+    @current_user ? @object.can_view?(@current_user) : false
+  end
+
   attribute :can_edit do
     @current_ability.can?(:edit, @object)
   end
