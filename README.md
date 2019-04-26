@@ -30,20 +30,22 @@ gem install bundler
 - https://github.com/ideo/network-react-components
 - https://github.com/ideo/network-api-ruby
 
-**Clone the app and install the gems:**
+**Clone the app and run the setup script:**
+
+Note: `./dev.sh -s` will run `rails db:setup` which will also seed your database with two required collections, marked by the following `ENV` ids:
+
+- `ENV['GETTING_STARTED_TEMPLATE_ID']`
+- `ENV['ORG_MASTER_TEMPLATES_ID']`
+
+If these two collections don't exist then you won't be able to create a new organization and setup your first account.
 
 ```
 git clone https://github.com/ideo/shape
 cd shape
+# Setup the `.env` file with valid credentials: (get these from the IDEO team)
+cp .env.example .env
 # run our setup script (install gems, packages, setup database)
 ./dev.sh -s
-```
-
-**Setup the `.env` file with valid credentials:**
-
-```
-cp .env.example .env
-# modify credentials
 ```
 
 **Setup your text editor and linter:**

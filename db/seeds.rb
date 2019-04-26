@@ -5,3 +5,32 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+
+org = Organization.find_or_create_by(id: 1)
+if ENV['GETTING_STARTED_TEMPLATE_ID']
+  c = Collection.find_or_initialize_by(
+    id: ENV['GETTING_STARTED_TEMPLATE_ID'],
+  )
+  if c.new_record?
+    c.name = 'Seeded Content for My Collection'
+    c.organization = org
+    c.save
+
+    # just to give it one item
+    FactoryBot.create(:collection_card_text, parent: c)
+  end
+end
+
+if ENV['ORG_MASTER_TEMPLATES_ID']
+  c = Collection.find_or_initialize_by(
+    id: ENV['ORG_MASTER_TEMPLATES_ID'],
+  )
+  if c.new_record?
+    c.name = 'Master Templates'
+    c.organization = org
+    c.save
+
+    # just to give it one template
+    FactoryBot.create(:collection, master_template: true, num_cards: 1, parent_collection: c)
+  end
+end

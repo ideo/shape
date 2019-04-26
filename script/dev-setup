@@ -21,8 +21,6 @@ if [ ! -f "$DIR/.env" ]; then
 fi
 
 yarn install
-
 bundle install
-
+# setup runs db:create, db:schema:load and db:seed
 bin/rails db:setup
-bin/rails db:migrate
