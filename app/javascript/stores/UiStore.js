@@ -99,6 +99,7 @@ export default class UiStore {
     iconName: null,
     confirmText: 'OK',
     cancelText: 'Cancel',
+    closeable: true,
     fadeOutTime: undefined,
     snoozeChecked: false,
     onToggleSnoozeDialog: null,
