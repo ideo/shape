@@ -58,6 +58,7 @@ export default {
     muiSmBreakpoint: 960,
   },
 
+  transition: 'all 0.2s',
   transitionWithDelay: 'all 0.3s 0.2s',
 
   navOpacity: 0.9,
