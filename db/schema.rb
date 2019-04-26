@@ -14,7 +14,6 @@ ActiveRecord::Schema.define(version: 20190424210415) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
-  enable_extension "pg_stat_statements"
 
   create_table "activities", force: :cascade do |t|
     t.bigint "actor_id"
@@ -58,14 +57,6 @@ ActiveRecord::Schema.define(version: 20190424210415) do
     t.index ["token"], name: "index_api_tokens_on_token"
   end
 
-  create_table "app_metrics", force: :cascade do |t|
-    t.string "metric"
-    t.float "value"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["metric", "created_at"], name: "index_app_metrics_on_metric_and_created_at"
-  end
-
   create_table "application_organizations", force: :cascade do |t|
     t.bigint "application_id"
     t.bigint "organization_id"
@@ -101,7 +92,7 @@ ActiveRecord::Schema.define(version: 20190424210415) do
     t.boolean "image_contain", default: false
     t.boolean "is_cover", default: false
     t.datetime "unarchived_at"
-    t.integer "filter", default: 0
+    t.integer "filter", default: 1
     t.boolean "hidden", default: false
     t.boolean "show_replace", default: true
     t.integer "row"
@@ -302,11 +293,11 @@ ActiveRecord::Schema.define(version: 20190424210415) do
     t.integer "profile_template_id"
     t.integer "profile_collection_id"
     t.string "slug"
-    t.integer "getting_started_collection_id"
     t.string "network_subscription_id"
     t.integer "active_users_count", default: 0, null: false
     t.datetime "trial_ends_at"
     t.integer "trial_users_count", default: 0, null: false
+    t.integer "getting_started_collection_id"
     t.boolean "in_app_billing", default: true, null: false
     t.boolean "trial_users_count_exceeded_email_sent", default: false, null: false
     t.boolean "trial_expired_email_sent", default: false, null: false
@@ -421,7 +412,7 @@ ActiveRecord::Schema.define(version: 20190424210415) do
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
   end
 
-  create_table "users_roles", id: :serial, force: :cascade do |t|
+  create_table "users_roles", force: :cascade do |t|
     t.bigint "user_id"
     t.bigint "role_id"
     t.index ["role_id"], name: "index_users_roles_on_role_id"
