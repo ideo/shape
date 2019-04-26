@@ -4,8 +4,9 @@ import styled from 'styled-components'
 import _ from 'lodash'
 import pluralize from 'pluralize'
 
-import v from '~/utils/variables'
+import Tooltip from '~/ui/global/Tooltip'
 import Avatar from '~/ui/global/Avatar'
+import v from '~/utils/variables'
 
 const MAX_USERS_TO_SHOW = 4
 
@@ -197,7 +198,9 @@ class RolesSummary extends React.Component {
     const { canEdit } = this.props
     if (!canEdit) return ''
     return (
-      <StyledAddUserBtn onClick={this.props.handleClick}>+</StyledAddUserBtn>
+      <Tooltip title="Share">
+        <StyledAddUserBtn onClick={this.props.handleClick}>+</StyledAddUserBtn>
+      </Tooltip>
     )
   }
 
