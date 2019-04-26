@@ -45,6 +45,7 @@ export default {
   },
   topScrollTrigger: 210,
   maxTitleLength: 144,
+  actionMenuWidth: 250,
 
   // Keep in sync with assets/stylesheets/core/base.scss
   responsive: {

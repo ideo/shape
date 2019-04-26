@@ -45,6 +45,7 @@ export default class UiStore {
   isTouchDevice =
     // https://hacks.mozilla.org/2013/04/detecting-touch-its-the-why-not-the-how/
     'ontouchstart' in window ||
+    // eslint-disable-next-line
     navigator.maxTouchPoints > 0 ||
     navigator.msMaxTouchPoints > 0
   @observable
