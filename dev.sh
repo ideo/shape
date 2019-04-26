@@ -28,11 +28,11 @@ if ! [ -x "$(command -v ttab)" ]; then
   echo 'using `heroku local -f Procfile.development`'
   heroku local -f Procfile.development
 else
+  # echo 'Running rails server...'
+  ttab bin/rails server
   # echo 'Starting heroku local to run webpack-dev-server...'
   ttab heroku local webpack -f Procfile.development
   ttab heroku local worker -f Procfile.development
-  # echo 'Running rails server...'
-  ttab bin/rails server
-  # echo 'Opening code editor...'
+  # echo 'Opening code editor and browser...'
   ttab "$EDITOR . && open http://localhost:3000"
 fi
