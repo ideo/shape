@@ -46,30 +46,18 @@ class FoamcoreZoomControls extends React.Component {
           title="Zoom out"
           placement="top"
         >
-          <div
-            className="zoom-icon"
-            role="button"
-            onClick={onZoomOut}
-            onKeyDown={onZoomOut}
-            tabIndex={0}
-          >
+          <button className="zoom-icon" onClick={onZoomOut} tabIndex={0}>
             <MinusCircleIcon />
-          </div>
+          </button>
         </Tooltip>
         <Tooltip
           classes={{ tooltip: 'Tooltip' }}
           title="Zoom in"
           placement="top"
         >
-          <div
-            className="zoom-icon"
-            role="button"
-            onClick={onZoomIn}
-            onKeyDown={onZoomIn}
-            tabIndex={0}
-          >
+          <button className="zoom-icon" onClick={onZoomIn} tabIndex={0}>
             <PlusCircleIcon />
-          </div>
+          </button>
         </Tooltip>
       </ZoomIconWrapper>
     )

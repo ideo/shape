@@ -12,8 +12,6 @@ import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import { objectsEqual } from '~/utils/objectUtils'
 import v from '~/utils/variables'
 
-const CARD_HOLD_TIME = 0.4 * 1000
-
 const StyledGrid = styled.div`
   margin-top: ${v.pageContentMarginTop}px;
   min-height: ${props => props.minHeight}px;
@@ -75,7 +73,7 @@ class CollectionGrid extends React.Component {
     this.state = {
       cards: [],
       rows: 1,
-      hoveringOver: null,
+      hoveringOver: false,
       dragTimeoutId: null,
       matrix: [],
     }
@@ -94,6 +92,7 @@ class CollectionGrid extends React.Component {
       'cardProperties',
       'movingCardIds',
       'cardsFetched',
+      'submissionSettings',
     ]
     const prevPlucked = _.pick(prevProps, fields)
     const plucked = _.pick(this.props, fields)
@@ -222,7 +221,7 @@ class CollectionGrid extends React.Component {
   positionCardsFromProps = () => {
     const { uiStore } = this.props
     uiStore.update('multiMoveCardIds', [])
-    this.setState({ hoveringOver: null }, () => {
+    this.setState({ hoveringOver: false }, () => {
       this.positionCards(this.props.collection.collection_cards)
     })
   }
@@ -306,7 +305,7 @@ class CollectionGrid extends React.Component {
         cardAction: 'moveWithinCollection',
       })
       if (hoveringRecord.internalType === 'collections') {
-        this.setState({ hoveringOver: null }, () => {
+        this.setState({ hoveringOver: false }, () => {
           this.moveCardsIntoCollection(uiStore.multiMoveCardIds, hoveringRecord)
         })
       }
@@ -328,55 +327,11 @@ class CollectionGrid extends React.Component {
   }
 
   async moveCardsIntoCollection(cardIds, hoveringRecord) {
-    const { collection, uiStore, apiStore } = this.props
-    const can_edit = hoveringRecord.can_edit_content || hoveringRecord.can_edit
-    uiStore.update('movingIntoCollection', hoveringRecord)
-    if (!can_edit) {
-      uiStore.confirm({
-        prompt:
-          'You only have view access to this collection. Would you like to keep moving the cards?',
-        confirmText: 'Continue',
-        iconName: 'Alert',
-        onConfirm: () => {
-          this.cancelDrag()
-          uiStore.reselectCardIds(cardIds)
-          uiStore.openMoveMenu({
-            from: collection.id,
-            cardAction: 'move',
-          })
-        },
-        onCancel: () => {
-          this.cancelDrag()
-        },
-      })
-      return
-    }
-    this.setState({ hoveringOver: null }, async () => {
-      const data = {
-        to_id: hoveringRecord.id.toString(),
-        from_id: collection.id.toString(),
-        collection_card_ids: cardIds,
-        placement: 'beginning',
-      }
-      await apiStore.moveCards(data)
-      const afterMove = () => {
-        const { movingIntoCollection } = uiStore
-        uiStore.setMovingCards([])
-        uiStore.update('multiMoveCardIds', [])
-        uiStore.reselectCardIds(cardIds)
-        uiStore.update('movingIntoCollection', null)
-        // add a little delay because the board has to load first
-        if (movingIntoCollection.isBoard) {
-          setTimeout(() => uiStore.scrollToBottom(), 500)
-        }
-      }
-      if (data.to_id === data.from_id) {
-        afterMove()
-      } else {
-        uiStore.update('movingIntoCollection', hoveringRecord)
-        uiStore.update('actionAfterRoute', afterMove)
-        this.props.routingStore.routeTo('collections', hoveringRecord.id)
-      }
+    this.props.collection.API_moveCardsIntoCollection({
+      toCollection: hoveringRecord,
+      cardIds,
+      onCancel: () => this.positionCardsFromProps(),
+      onSuccess: () => this.setState({ hoveringOver: false }),
     })
   }
 
@@ -420,9 +375,8 @@ class CollectionGrid extends React.Component {
       ) {
         const dragTimeoutId = setTimeout(() => {
           hoveringOver.holdingOver = true
-          this.setHoveringOverProperties(hoveringOver.card, hoveringOver)
           this.setState({ hoveringOver })
-        }, CARD_HOLD_TIME)
+        }, v.cardHoldTime)
         this.setState({ dragTimeoutId })
       }
 
@@ -555,19 +509,6 @@ class CollectionGrid extends React.Component {
     }
 
     return null
-  }
-
-  setHoveringOverProperties = (card, hoveringOver) => {
-    card.hoveringOver = false
-    card.holdingOver = false
-    if (hoveringOver) {
-      // check if the card is being currently hovered over
-      if (card.id === hoveringOver.card.id) card.hoveringOver = hoveringOver
-      card.holdingOver =
-        card.id === hoveringOver.card.id &&
-        hoveringOver.direction === 'right' &&
-        hoveringOver.holdingOver
-    }
   }
 
   clearDragTimeout = () => {
@@ -767,8 +708,6 @@ class CollectionGrid extends React.Component {
 
           // add position attrs to card
           card.position = position
-          this.setHoveringOverProperties(card, this.state.hoveringOver)
-
           // when we're moving/hovering, placeholders should not take up any space
           const hoverPlaceholder =
             opts.dragType === 'hover' && card.cardType === 'placeholder'
@@ -828,6 +767,7 @@ class CollectionGrid extends React.Component {
       uiStore,
       loadCollectionCards,
     } = this.props
+    const { hoveringOver } = this.state
     let i = 0
     // unnecessary? we seem to need to preserve the array order
     // in order to not re-draw divs (make transform animation work)
@@ -844,6 +784,9 @@ class CollectionGrid extends React.Component {
           cardType = card.record.internalType
         }
       }
+      const isHoveringOver =
+        hoveringOver && hoveringOver.card && hoveringOver.card.id === card.id
+      const isHoldingOver = isHoveringOver && hoveringOver.holdingOver
       const { cardMenuOpen } = uiStore
       if (_.isEmpty(card.position)) return
       const shouldHide = card.isBeingMultiMoved || card.isBeingMoved
@@ -860,13 +803,11 @@ class CollectionGrid extends React.Component {
           dragOffset={pageMargins()}
           record={record}
           onDrag={this.onDrag}
-          hoveringOverLeft={
-            !!card.hoveringOver && card.hoveringOver.direction === 'left'
-          }
+          hoveringOverLeft={isHoveringOver && hoveringOver.direction === 'left'}
           hoveringOverRight={
-            !!card.hoveringOver && card.hoveringOver.direction === 'right'
+            isHoveringOver && hoveringOver.direction === 'right'
           }
-          holdingOver={!!card.holdingOver}
+          holdingOver={isHoldingOver}
           onDragOrResizeStop={this.onDragOrResizeStop}
           onResize={this.onResize}
           onResizeStop={this.onResizeStop}
@@ -927,6 +868,7 @@ CollectionGrid.propTypes = {
   submissionSettings: PropTypes.shape({
     type: PropTypes.string,
     template: MobxPropTypes.objectOrObservableObject,
+    enabled: PropTypes.bool,
   }),
   sorting: PropTypes.bool,
 }

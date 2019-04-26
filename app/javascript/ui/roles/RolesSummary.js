@@ -29,10 +29,21 @@ const StyledAvatarGroup = styled.div`
   .viewer {
     display: inline-block;
     margin-left: 0px;
-    margin-right: -10px;
+    margin-right: -12px;
+    border: 1px solid ${v.colors.commonLight};
+    /* for any transparent avatars */
+    background-color: white;
     &:last-child {
       margin-right: 0;
     }
+    ${props =>
+      _.map(
+        _.range(1, 6),
+        i =>
+          `:nth-child(${i}) {
+            z-index: ${10 - i};
+          }`
+      )};
   }
   .placeholder {
     background-color: ${v.colors.commonMedium};
@@ -153,8 +164,8 @@ class RolesSummary extends React.Component {
 
     return (
       <StyledAvatarGroup align="right">
-        {editorCount > MAX_USERS_TO_SHOW && MORE_EDITORS}
         {editorAvatars}
+        {editorCount > MAX_USERS_TO_SHOW && MORE_EDITORS}
       </StyledAvatarGroup>
     )
   }
@@ -176,8 +187,8 @@ class RolesSummary extends React.Component {
     ))
     return (
       <StyledAvatarGroup>
-        {viewerCount > MAX_USERS_TO_SHOW && MORE_VIEWERS}
         {viewerAvatars}
+        {viewerCount > MAX_USERS_TO_SHOW && MORE_VIEWERS}
       </StyledAvatarGroup>
     )
   }
