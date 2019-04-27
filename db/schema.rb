@@ -14,6 +14,7 @@ ActiveRecord::Schema.define(version: 20190424210415) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+  enable_extension "pg_stat_statements"
 
   create_table "activities", force: :cascade do |t|
     t.bigint "actor_id"
@@ -293,11 +294,11 @@ ActiveRecord::Schema.define(version: 20190424210415) do
     t.integer "profile_template_id"
     t.integer "profile_collection_id"
     t.string "slug"
+    t.integer "getting_started_collection_id"
     t.string "network_subscription_id"
     t.integer "active_users_count", default: 0, null: false
     t.datetime "trial_ends_at"
     t.integer "trial_users_count", default: 0, null: false
-    t.integer "getting_started_collection_id"
     t.boolean "in_app_billing", default: true, null: false
     t.boolean "trial_users_count_exceeded_email_sent", default: false, null: false
     t.boolean "trial_expired_email_sent", default: false, null: false
@@ -412,7 +413,7 @@ ActiveRecord::Schema.define(version: 20190424210415) do
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
   end
 
-  create_table "users_roles", force: :cascade do |t|
+  create_table "users_roles", id: :serial, force: :cascade do |t|
     t.bigint "user_id"
     t.bigint "role_id"
     t.index ["role_id"], name: "index_users_roles_on_role_id"
