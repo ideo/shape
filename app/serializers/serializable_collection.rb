@@ -5,7 +5,8 @@ class SerializableCollection < BaseJsonSerializer
   attributes :created_at, :updated_at, :name, :organization_id,
              :master_template, :template_id,
              :submission_box_type, :submission_box_id, :submission_template_id,
-             :test_status, :collection_to_test_id, :hide_submissions, :submissions_enabled
+             :test_status, :collection_to_test_id, :hide_submissions, :submissions_enabled,
+             :viewable_by_anyone
 
   has_many :roles do
     data do
@@ -164,5 +165,9 @@ class SerializableCollection < BaseJsonSerializer
 
   attribute :max_col_index do
     @object.is_a?(Collection::Board) ? @object.max_col_index : nil
+  end
+
+  link :self do
+    @frontend_url_for.call(@object)
   end
 end

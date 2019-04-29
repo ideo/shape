@@ -245,6 +245,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.find('organizations', this.organization_id)
   }
 
+  get isCollection() {
+    return true
+  }
+
   get isUserCollection() {
     return this.type === 'Collection::UserCollection'
   }

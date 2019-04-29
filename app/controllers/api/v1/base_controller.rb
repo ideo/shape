@@ -1,4 +1,5 @@
 class Api::V1::BaseController < ApplicationController
+  include ApplicationHelper
   before_action :check_api_authentication!
   before_action :check_cancel_sync
   before_action :check_page_param
@@ -44,6 +45,7 @@ class Api::V1::BaseController < ApplicationController
       current_user: current_user || User.new,
       current_ability: current_ability,
       current_api_token: current_api_token,
+      frontend_url_for: lambda { |obj| frontend_url_for(obj) },
     }
   end
 

@@ -3,15 +3,20 @@ import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { observable, runInAction } from 'mobx'
+import { getModelLinks } from 'datx-jsonapi'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Collapse } from '@material-ui/core'
+import { Flex } from 'reflexbox'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
 import v from '~/utils/variables'
+import CopyToClipboard from 'react-copy-to-clipboard'
 
-import { ShowMoreButton } from '~/ui/global/styled/forms'
+import { ShowMoreButton, Checkbox } from '~/ui/global/styled/forms'
 import { Heading3, DisplayText } from '~/ui/global/styled/typography'
 import { Row, RowItemLeft } from '~/ui/global/styled/layout'
 import SearchButton from '~/ui/global/SearchButton'
 import DropdownIcon from '~/ui/icons/DropdownIcon'
+import LinkIcon from '~/ui/icons/LinkIcon'
 import RolesAdd from '~/ui/roles/RolesAdd'
 import RoleSelect from '~/ui/roles/RoleSelect'
 import { uiStore } from '~/stores'
@@ -20,6 +25,10 @@ import { uiStore } from '~/stores'
 function sortUserOrGroup(a, b) {
   return a.entity.name.localeCompare(b.entity.name)
 }
+
+const StyledFormControlLabel = styled(FormControlLabel)`
+  margin-top: -10px;
+`
 
 const ScrollArea = styled.div`
   flex: 1 1 auto;
@@ -85,6 +94,20 @@ const StyledExpandToggle = styled.button`
   }
 `
 
+const GetLink = styled.div`
+  cursor: pointer;
+  display: inline-block;
+  margin-top: 2px;
+  .icon {
+    width: 16px;
+    transform: translateY(3px);
+  }
+  .text {
+    display: inline-block;
+    margin-left: 7px;
+  }
+`
+
 @inject('apiStore', 'routingStore')
 @observer
 class RolesMenu extends React.Component {
@@ -93,6 +116,7 @@ class RolesMenu extends React.Component {
     groups: [],
     pendingPanelOpen: false,
     activePanelOpen: true,
+    viewableByAnyone: false,
     page: {
       pending: 1,
       active: 1,
@@ -109,6 +133,10 @@ class RolesMenu extends React.Component {
 
   componentDidMount() {
     this.initializeRolesAndGroups({ reset: true, page: 1 })
+    const {
+      record: { viewable_by_anyone },
+    } = this.props
+    this.setState({ viewableByAnyone: viewable_by_anyone })
   }
 
   async initializeRolesAndGroups({
@@ -288,6 +316,71 @@ class RolesMenu extends React.Component {
     return currentUser.id !== entity.id
   }
 
+  toggleViewableByAnyone = () => {
+    const { record } = this.props
+    const { viewableByAnyone } = this.state
+    record.viewable_by_anyone = !viewableByAnyone
+    record.save()
+    this.setState({
+      viewableByAnyone: !viewableByAnyone,
+    })
+  }
+
+  handleViewableByAnyoneToggle = () => {
+    const { viewableByAnyone } = this.state
+    if (!viewableByAnyone) {
+      // Show dialog if they are toggling on
+      uiStore.confirm({
+        prompt:
+          'This content will be available to anyone with this link. Are you sure you want to share this content?',
+        confirmText: 'Continue',
+        iconName: 'Alert',
+        onConfirm: this.toggleViewableByAnyone,
+      })
+    } else {
+      // Otherwise immediately toggle off
+      this.toggleViewableByAnyone()
+    }
+  }
+
+  get renderViewableByAnyone() {
+    const { canEdit, record } = this.props
+
+    if (!record || !record.isCollection || !canEdit) return <div />
+
+    const { viewableByAnyone } = this.state
+    const url = getModelLinks(record).self
+
+    return (
+      <Flex align="center" style={{ marginBottom: 5 }}>
+        <StyledFormControlLabel
+          classes={{ label: 'form-control' }}
+          control={
+            <Checkbox
+              checked={viewableByAnyone}
+              onChange={this.handleViewableByAnyoneToggle}
+              value="yes"
+            />
+          }
+          label={`Allow anyone with this link to view (${
+            viewableByAnyone ? 'ON' : 'OFF'
+          })`}
+        />
+        {viewableByAnyone && (
+          <CopyToClipboard text={url}>
+            <GetLink
+              aria-label="Get link"
+              onClick={() => uiStore.popupSnackbar({ message: 'Link Copied' })}
+            >
+              <LinkIcon className="icon" />
+              <Heading3 className="text">Get Link</Heading3>
+            </GetLink>
+          </CopyToClipboard>
+        )}
+      </Flex>
+    )
+  }
+
   render() {
     const {
       record,
@@ -310,6 +403,7 @@ class RolesMenu extends React.Component {
 
     return (
       <Fragment>
+        {this.renderViewableByAnyone}
         <StyledHeaderRow align="flex-end">
           <Heading3>{title}</Heading3>
           <SearchButton
