@@ -39,6 +39,7 @@ class CollectionCardFilter < SimpleService
         per_page: per_page,
       )
     end
+
     @cards = @cards
              .active
              .includes(
