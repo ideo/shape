@@ -54,6 +54,12 @@ Then('I should see an svg on the report item', () => {
     .should('exist')
 })
 
+Then('I should see the {string} modal', modalTitle => {
+  cy.get(`[role="dialog"][aria-labelledby="${modalTitle}"]`)
+    .first()
+    .should('exist')
+})
+
 Then('I should see the {word} of {int} cards as {word}', (pos, count, size) => {
   // size e.g. "2x1" so we split on 'x'
   const sizes = size.split('x')
