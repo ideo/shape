@@ -10,7 +10,7 @@ class Api::V1::UsersController < Api::V1::BaseController
   end
 
   def me
-    if user_signed_in?
+    if user_signed_in? || current_api_token.present?
       current_user.update_attributes(last_active_at: Time.current)
       render jsonapi: current_user, include: [
         :groups,
