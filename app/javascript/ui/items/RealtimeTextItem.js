@@ -211,7 +211,6 @@ class RealtimeTextItem extends React.Component {
           })
         }
       }
-      // this.version = data.version
     }
 
     if (current_editor.id === currentUserId) {
@@ -234,6 +233,8 @@ class RealtimeTextItem extends React.Component {
   }
 
   applyIncomingDelta(remoteDelta) {
+    // mostly just for unit tests
+    if (!this.quillEditor) return
     // apply the incoming other person's delta, accounting for our own changes,
     // but prioritizing theirs
     const remoteDeltaWithLocalChanges = this.combinedDelta.transform(
@@ -400,6 +401,7 @@ class RealtimeTextItem extends React.Component {
   }
 
   _sendCursor = () => {
+    if (!this.quillEditor) return
     this.socketSend('cursor', {
       range: this.quillEditor.getSelection(),
     })

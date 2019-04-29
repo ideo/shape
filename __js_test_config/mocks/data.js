@@ -35,8 +35,12 @@ export const fakeTextItemAttrs = {
   type: 'Item::TextItem',
   internalType: 'items',
   name: 'My Cool Item',
-  data_content:
-    'This is the content for the item and it contains multiple sentences. Like this one.',
+  data_content: {
+    ops: [
+      {insert: 'This is the content for the item and it contains multiple sentences. Like this one.'}
+    ],
+    version: 1,
+  },
   breadcrumb: [['collections', 1, 'Some collection'], ['items', 1, 'my item']],
   parentPath: '/',
   can_edit: false,
