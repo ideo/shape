@@ -201,6 +201,18 @@ When('I fill out the organization name with {string}', orgName => {
 })
 
 // ----------------------
+// Action Menu
+// ----------------------
+
+When('I click ... in the nav and select {string}', option => {
+  cy.locate('PopoutMenu')
+    .first()
+    .click()
+
+  cy.locate(`PopoutMenu_${option}`).click()
+})
+
+// ----------------------
 // Items
 // ----------------------
 
