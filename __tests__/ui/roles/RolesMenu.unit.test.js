@@ -1,5 +1,6 @@
 import { observable } from 'mobx'
 import RolesMenu from '~/ui/roles/RolesMenu'
+import fakeUiStore from '#/mocks/fakeUiStore'
 
 import { fakeUser, fakeRole, fakeCollection } from '#/mocks/data'
 
@@ -12,6 +13,7 @@ const apiStore = observable({
   add: jest.fn(),
   currentUser: fakeUser,
   currentUserOrganizationId: 1,
+  uiStore: fakeUiStore,
 })
 
 let props
@@ -37,6 +39,7 @@ describe('RolesMenu', () => {
       ownerType: 'collections',
       apiStore,
       routingStore,
+      canEdit: false,
     }
     apiStore.searchRoles.mockClear()
     wrapper = shallow(<RolesMenu.wrappedComponent {...props} />)
@@ -138,6 +141,74 @@ describe('RolesMenu', () => {
         apiStore.currentUser.id = 4
         const user = { id: 3 }
         expect(component.notCurrentUser(user)).toBeTruthy()
+      })
+    })
+  })
+
+  it('if not editor, does not show viewable by anyone toggle', () => {
+    expect(props.canEdit).toEqual(false)
+    expect(
+      wrapper.find('[data-cy="viewable-by-anyone-checkbox"]').exists()
+    ).toEqual(false)
+  })
+
+  describe('handleViewableByAnyoneToggle when viewable_by_anyone is false', () => {
+    beforeEach(() => {
+      props.record.viewable_by_anyone = false
+      props.apiStore.uiStore.confirm.mockClear()
+      props.canEdit = true
+      wrapper = shallow(<RolesMenu.wrappedComponent {...props} />)
+    })
+
+    it('defaults to show no one can view', () => {
+      expect(
+        wrapper
+          .find('[data-cy="viewable-by-anyone-checkbox"]')
+          .first()
+          .props().control.props.checked
+      ).toEqual(false)
+    })
+
+    it('toggles viewable_by_anyone', () => {
+      wrapper.instance().handleViewableByAnyoneToggle()
+
+      expect(props.apiStore.uiStore.confirm).toHaveBeenCalledWith({
+        prompt:
+          'This content will be available to anyone with this link. Are you sure you want to share this content?',
+        iconName: 'Alert',
+        confirmText: 'Continue',
+        onConfirm: expect.any(Function),
+      })
+    })
+  })
+
+  describe('handleViewableByAnyoneToggle when viewable_by_anyone is true', () => {
+    beforeEach(() => {
+      props.record.viewable_by_anyone = true
+      props.apiStore.uiStore.confirm.mockClear()
+      props.canEdit = true
+      wrapper = shallow(<RolesMenu.wrappedComponent {...props} />)
+    })
+
+    it('has checked checkbox', () => {
+      expect(
+        wrapper
+          .find('[data-cy="viewable-by-anyone-checkbox"]')
+          .first()
+          .props().control.props.checked
+      ).toEqual(true)
+    })
+
+    it('toggles viewable_by_anyone without confirmation', () => {
+      wrapper.instance().handleViewableByAnyoneToggle()
+      expect(props.apiStore.uiStore.confirm).not.toHaveBeenCalled()
+      expect(props.record.save).toHaveBeenCalled()
+    })
+
+    it('enables clicking to copy link', () => {
+      wrapper.find('ViewableByAnyoneLink').simulate('click')
+      expect(props.apiStore.uiStore.popupSnackbar).toHaveBeenCalledWith({
+        message: 'Link Copied',
       })
     })
   })

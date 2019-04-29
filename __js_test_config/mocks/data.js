@@ -335,14 +335,19 @@ export const fakeCollection = {
   can_edit: false,
   can_edit_content: false,
   master_template: false,
+  isCollection: true,
   isSharedCollection: false,
   isUserCollection: false,
   isNormalCollection: true,
   num_survey_responses: 0,
+  viewable_by_anyone: false,
   cover: {
     image_url: 'http://fake.url.net',
     text: 'Lorem ipsum blockchain boogie',
     name: 'Proto-typo',
+  },
+  links: {
+    self: 'https://www.shape.space/ideo/collections/1'
   },
   card_order: 'order',
   collection_cards: fakeCards,

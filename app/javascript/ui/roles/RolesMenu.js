@@ -3,7 +3,6 @@ import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { observable, runInAction } from 'mobx'
-import { getModelLinks } from 'datx-jsonapi'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Collapse } from '@material-ui/core'
 import { Flex } from 'reflexbox'
@@ -19,7 +18,6 @@ import DropdownIcon from '~/ui/icons/DropdownIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import RolesAdd from '~/ui/roles/RolesAdd'
 import RoleSelect from '~/ui/roles/RoleSelect'
-import { uiStore } from '~/stores'
 
 // TODO rewrite this
 function sortUserOrGroup(a, b) {
@@ -94,7 +92,7 @@ const StyledExpandToggle = styled.button`
   }
 `
 
-const GetLink = styled.div`
+const ViewableByAnyoneLink = styled.div`
   cursor: pointer;
   display: inline-block;
   margin-top: 2px;
@@ -107,6 +105,7 @@ const GetLink = styled.div`
     margin-left: 7px;
   }
 `
+ViewableByAnyoneLink.displayName = 'ViewableByAnyoneLink'
 
 @inject('apiStore', 'routingStore')
 @observer
@@ -267,7 +266,12 @@ class RolesMenu extends React.Component {
   }
 
   createRoles = (entities, roleName, opts = {}) => {
-    const { apiStore, ownerId, ownerType } = this.props
+    const {
+      apiStore,
+      apiStore: { uiStore },
+      ownerId,
+      ownerType,
+    } = this.props
     const userIds = entities
       .filter(entity => entity.internalType === 'users')
       .map(user => user.id)
@@ -300,7 +304,10 @@ class RolesMenu extends React.Component {
   }
 
   onCreateUsers = emails => {
-    const { apiStore } = this.props
+    const {
+      apiStore,
+      apiStore: { uiStore },
+    } = this.props
     return apiStore
       .request(`users/create_from_emails`, 'POST', { emails })
       .catch(err => {
@@ -328,6 +335,9 @@ class RolesMenu extends React.Component {
 
   handleViewableByAnyoneToggle = () => {
     const { viewableByAnyone } = this.state
+    const {
+      apiStore: { uiStore },
+    } = this.props
     if (!viewableByAnyone) {
       // Show dialog if they are toggling on
       uiStore.confirm({
@@ -344,12 +354,16 @@ class RolesMenu extends React.Component {
   }
 
   get renderViewableByAnyone() {
-    const { canEdit, record } = this.props
+    const {
+      canEdit,
+      record,
+      apiStore: { uiStore },
+    } = this.props
 
-    if (!record || !record.isCollection || !canEdit) return <div />
+    if (!record.isCollection || !canEdit) return <div />
 
     const { viewableByAnyone } = this.state
-    const url = getModelLinks(record).self
+    const url = record.links.self
 
     return (
       <Flex align="center" style={{ marginBottom: 5 }}>
@@ -362,19 +376,21 @@ class RolesMenu extends React.Component {
               value="yes"
             />
           }
+          data-cy="viewable-by-anyone-checkbox"
           label={`Allow anyone with this link to view (${
             viewableByAnyone ? 'ON' : 'OFF'
           })`}
         />
         {viewableByAnyone && (
           <CopyToClipboard text={url}>
-            <GetLink
+            <ViewableByAnyoneLink
               aria-label="Get link"
               onClick={() => uiStore.popupSnackbar({ message: 'Link Copied' })}
+              data-cy="viewable-by-anyone-link"
             >
               <LinkIcon className="icon" />
               <Heading3 className="text">Get Link</Heading3>
-            </GetLink>
+            </ViewableByAnyoneLink>
           </CopyToClipboard>
         )}
       </Flex>
