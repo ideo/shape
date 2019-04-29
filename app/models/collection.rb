@@ -429,6 +429,14 @@ class Collection < ApplicationRecord
     )
   end
 
+  def collection_cards_viewable_by(user:, filters: {})
+    CollectionCardFilter.call(
+      collection: self,
+      user: user,
+      filters: filters,
+    )
+  end
+
   # convenience method if card order ever gets out of sync
   def reorder_cards!
     all_collection_cards.active.visible.order(pinned: :desc, order: :asc).each_with_index do |card, i|

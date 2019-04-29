@@ -441,7 +441,7 @@ describe Collection, type: :model do
     end
 
     it 'should show all cards without limiting' do
-      expect(collection.collection_cards_viewable_by(user)).to match_array(cards)
+      expect(collection.collection_cards_viewable_by(user: user)).to match_array(cards)
     end
 
     context 'if one item is private' do
@@ -453,8 +453,8 @@ describe Collection, type: :model do
       end
 
       it 'should not include card' do
-        expect(collection.collection_cards_viewable_by(user)).not_to include(private_card)
-        expect(collection.collection_cards_viewable_by(user)).to match_array(cards - [private_card])
+        expect(collection.collection_cards_viewable_by(user: user)).not_to include(private_card)
+        expect(collection.collection_cards_viewable_by(user: user)).to match_array(cards - [private_card])
       end
     end
 
@@ -467,14 +467,14 @@ describe Collection, type: :model do
       end
 
       it 'should not include card' do
-        expect(collection.collection_cards_viewable_by(user)).not_to include(private_card)
-        expect(collection.collection_cards_viewable_by(user)).to match_array(cards - [private_card])
+        expect(collection.collection_cards_viewable_by(user: user)).not_to include(private_card)
+        expect(collection.collection_cards_viewable_by(user: user)).to match_array(cards - [private_card])
       end
     end
 
     context 'with card_order param' do
       it 'should return results according to the updated_at param' do
-        viewable = collection.collection_cards_viewable_by(user, card_order: 'updated_at')
+        viewable = collection.collection_cards_viewable_by(user: user, filters: { card_order: 'updated_at' })
         sorted = cards.sort_by(&:updated_at).reverse
         expect(viewable.first).to eq(sorted.first)
         expect(viewable.last).to eq(sorted.last)
@@ -486,7 +486,7 @@ describe Collection, type: :model do
         scored2 = collection.collections.last
         scored2.update(cached_test_scores: { 'question_useful' => 20 })
 
-        viewable = collection.collection_cards_viewable_by(user, card_order: 'question_useful')
+        viewable = collection.collection_cards_viewable_by(user: user, filters: { card_order: 'question_useful' })
         expect(viewable.first).to eq(scored1.parent_collection_card)
         expect(viewable.second).to eq(scored2.parent_collection_card)
       end
@@ -494,12 +494,9 @@ describe Collection, type: :model do
 
     context 'with pagination' do
       it 'should only show the appropriate page' do
-        # just make a simple 1 per-page request
-        scope = collection.collection_cards_by_page(
-          per_page: 1,
-        )
-        first_page = collection.collection_cards_viewable_by(user, scope: scope)
-        expect(first_page).to match_array([cards.first])
+        # defaults to 50 records per page, so page 2 will be empty
+        first_page = collection.collection_cards_viewable_by(user: user, filters: { page: 2 })
+        expect(first_page).to be_empty
       end
     end
 
@@ -509,7 +506,7 @@ describe Collection, type: :model do
       end
 
       it 'should only show the un-hidden cards' do
-        expect(collection.collection_cards_viewable_by(user)).to match_array(cards.where(hidden: false))
+        expect(collection.collection_cards_viewable_by(user: user)).to match_array(cards.where(hidden: false))
       end
     end
   end
