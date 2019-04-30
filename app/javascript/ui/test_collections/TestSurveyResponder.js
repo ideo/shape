@@ -27,12 +27,13 @@ class TestSurveyResponder extends React.Component {
     const { collection } = props
     const { currentUser } = apiStore
     const questions = [...collection.question_cards]
-    if (currentUser) {
-      questions.splice(questions.length - 1, 0, {
-        id: 'recontact',
-        card_question_type: 'question_recontact',
-        record: { id: 'facsda', content: '' },
-      })
+    if (!collection.live_test_collection) {
+      console.log('currentUser', currentUser)
+      // questions.splice(questions.length - 1, 0, {
+      //   id: 'recontact',
+      //   card_question_type: 'question_recontact',
+      //   record: { id: 'facsda', content: '' },
+      // })
     }
     this.allCards = questions
   }
