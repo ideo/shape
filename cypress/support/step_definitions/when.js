@@ -130,6 +130,12 @@ When('I click the {string}', el => {
     .click({ force: true })
 })
 
+When('I click {string}', el => {
+  cy.locateDataOrClass(el)
+    .first()
+    .click({ force: true })
+})
+
 When('I wait for {string} to finish', apiCall => {
   cy.wait(apiCall)
 })

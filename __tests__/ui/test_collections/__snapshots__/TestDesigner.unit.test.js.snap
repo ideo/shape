@@ -409,9 +409,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "id": "1",
                         "inherited_tag_list": Array [],
                         "internalType": "collections",
+                        "isCollection": true,
                         "isNormalCollection": true,
                         "isSharedCollection": false,
                         "isUserCollection": false,
+                        "links": Object {
+                          "self": "https://www.shape.space/ideo/collections/1",
+                        },
                         "master_template": false,
                         "meta": Object {
                           "snapshot": Object {
@@ -436,6 +440,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "type": "Collection",
                         "update": [MockFunction],
                         "updateScrollBottom": [MockFunction],
+                        "viewable_by_anyone": false,
                       },
                       "patch": [MockFunction],
                       "record": Object {},
@@ -527,9 +532,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "id": "1",
                         "inherited_tag_list": Array [],
                         "internalType": "collections",
+                        "isCollection": true,
                         "isNormalCollection": true,
                         "isSharedCollection": false,
                         "isUserCollection": false,
+                        "links": Object {
+                          "self": "https://www.shape.space/ideo/collections/1",
+                        },
                         "master_template": false,
                         "meta": Object {
                           "snapshot": Object {
@@ -554,6 +563,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "type": "Collection",
                         "update": [MockFunction],
                         "updateScrollBottom": [MockFunction],
+                        "viewable_by_anyone": false,
                       },
                       "patch": [MockFunction],
                       "record": Object {},
@@ -710,9 +720,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "id": "1",
                       "inherited_tag_list": Array [],
                       "internalType": "collections",
+                      "isCollection": true,
                       "isNormalCollection": true,
                       "isSharedCollection": false,
                       "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
                       "master_template": false,
                       "meta": Object {
                         "snapshot": Object {
@@ -797,6 +811,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "type": "Collection",
                       "update": [MockFunction],
                       "updateScrollBottom": [MockFunction],
+                      "viewable_by_anyone": false,
                     },
                     "patch": [MockFunction],
                     "record": Object {},
@@ -989,6 +1004,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "organizationMenuPage": "organizationMenuPage",
                       "pageMenuOpen": false,
                       "popupAlert": [MockFunction],
+                      "popupSnackbar": [MockFunction],
                       "removeNewCard": [MockFunction],
                       "resetSelectionAndBCT": [MockFunction],
                       "rolesMenuOpen": false,
@@ -1115,9 +1131,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -1138,6 +1158,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -1225,9 +1246,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -1248,6 +1273,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -1348,9 +1374,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -1371,6 +1401,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -1458,9 +1489,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -1481,6 +1516,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -1581,9 +1617,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -1604,6 +1644,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -1691,9 +1732,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -1714,6 +1759,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -1741,9 +1787,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                   "id": "1",
                   "inherited_tag_list": Array [],
                   "internalType": "collections",
+                  "isCollection": true,
                   "isNormalCollection": true,
                   "isSharedCollection": false,
                   "isUserCollection": false,
+                  "links": Object {
+                    "self": "https://www.shape.space/ideo/collections/1",
+                  },
                   "master_template": false,
                   "meta": Object {
                     "snapshot": Object {
@@ -2006,9 +2056,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "id": "1",
                       "inherited_tag_list": Array [],
                       "internalType": "collections",
+                      "isCollection": true,
                       "isNormalCollection": true,
                       "isSharedCollection": false,
                       "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
                       "master_template": false,
                       "meta": Object {
                         "snapshot": Object {
@@ -2231,6 +2285,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "type": "Collection",
                       "update": [MockFunction],
                       "updateScrollBottom": [MockFunction],
+                      "viewable_by_anyone": false,
                     },
                     "patch": [MockFunction],
                     "record": Object {},
@@ -2329,9 +2384,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -2352,6 +2411,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -2439,9 +2499,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -2462,6 +2526,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -2562,9 +2627,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -2585,6 +2654,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -2672,9 +2742,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -2695,6 +2769,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -2795,9 +2870,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -2818,6 +2897,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -2905,9 +2985,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -2928,6 +3012,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -2951,6 +3036,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                   "type": "Collection",
                   "update": [MockFunction],
                   "updateScrollBottom": [MockFunction],
+                  "viewable_by_anyone": false,
                 }
               }
               position="question_beginning"
@@ -3332,9 +3418,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "id": "1",
                         "inherited_tag_list": Array [],
                         "internalType": "collections",
+                        "isCollection": true,
                         "isNormalCollection": true,
                         "isSharedCollection": false,
                         "isUserCollection": false,
+                        "links": Object {
+                          "self": "https://www.shape.space/ideo/collections/1",
+                        },
                         "master_template": false,
                         "meta": Object {
                           "snapshot": Object {
@@ -3359,6 +3449,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "type": "Collection",
                         "update": [MockFunction],
                         "updateScrollBottom": [MockFunction],
+                        "viewable_by_anyone": false,
                       },
                       "patch": [MockFunction],
                       "record": Object {},
@@ -3450,9 +3541,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "id": "1",
                         "inherited_tag_list": Array [],
                         "internalType": "collections",
+                        "isCollection": true,
                         "isNormalCollection": true,
                         "isSharedCollection": false,
                         "isUserCollection": false,
+                        "links": Object {
+                          "self": "https://www.shape.space/ideo/collections/1",
+                        },
                         "master_template": false,
                         "meta": Object {
                           "snapshot": Object {
@@ -3477,6 +3572,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "type": "Collection",
                         "update": [MockFunction],
                         "updateScrollBottom": [MockFunction],
+                        "viewable_by_anyone": false,
                       },
                       "patch": [MockFunction],
                       "record": Object {},
@@ -3633,9 +3729,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "id": "1",
                       "inherited_tag_list": Array [],
                       "internalType": "collections",
+                      "isCollection": true,
                       "isNormalCollection": true,
                       "isSharedCollection": false,
                       "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
                       "master_template": false,
                       "meta": Object {
                         "snapshot": Object {
@@ -3720,6 +3820,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "type": "Collection",
                       "update": [MockFunction],
                       "updateScrollBottom": [MockFunction],
+                      "viewable_by_anyone": false,
                     },
                     "patch": [MockFunction],
                     "record": Object {},
@@ -3912,6 +4013,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "organizationMenuPage": "organizationMenuPage",
                       "pageMenuOpen": false,
                       "popupAlert": [MockFunction],
+                      "popupSnackbar": [MockFunction],
                       "removeNewCard": [MockFunction],
                       "resetSelectionAndBCT": [MockFunction],
                       "rolesMenuOpen": false,
@@ -4038,9 +4140,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -4061,6 +4167,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -4148,9 +4255,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -4171,6 +4282,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -4271,9 +4383,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -4294,6 +4410,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -4381,9 +4498,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -4404,6 +4525,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -4504,9 +4626,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -4527,6 +4653,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -4614,9 +4741,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -4637,6 +4768,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -4664,9 +4796,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                   "id": "1",
                   "inherited_tag_list": Array [],
                   "internalType": "collections",
+                  "isCollection": true,
                   "isNormalCollection": true,
                   "isSharedCollection": false,
                   "isUserCollection": false,
+                  "links": Object {
+                    "self": "https://www.shape.space/ideo/collections/1",
+                  },
                   "master_template": false,
                   "meta": Object {
                     "snapshot": Object {
@@ -4929,9 +5065,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "id": "1",
                       "inherited_tag_list": Array [],
                       "internalType": "collections",
+                      "isCollection": true,
                       "isNormalCollection": true,
                       "isSharedCollection": false,
                       "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
                       "master_template": false,
                       "meta": Object {
                         "snapshot": Object {
@@ -5154,6 +5294,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "type": "Collection",
                       "update": [MockFunction],
                       "updateScrollBottom": [MockFunction],
+                      "viewable_by_anyone": false,
                     },
                     "patch": [MockFunction],
                     "record": Object {},
@@ -5252,9 +5393,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -5275,6 +5420,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -5362,9 +5508,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -5385,6 +5535,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -5485,9 +5636,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -5508,6 +5663,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -5595,9 +5751,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -5618,6 +5778,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -5718,9 +5879,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -5741,6 +5906,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -5828,9 +5994,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -5851,6 +6021,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -5874,6 +6045,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                   "type": "Collection",
                   "update": [MockFunction],
                   "updateScrollBottom": [MockFunction],
+                  "viewable_by_anyone": false,
                 }
               }
               questionAnswer={null}
@@ -6254,9 +6426,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "id": "1",
                         "inherited_tag_list": Array [],
                         "internalType": "collections",
+                        "isCollection": true,
                         "isNormalCollection": true,
                         "isSharedCollection": false,
                         "isUserCollection": false,
+                        "links": Object {
+                          "self": "https://www.shape.space/ideo/collections/1",
+                        },
                         "master_template": false,
                         "meta": Object {
                           "snapshot": Object {
@@ -6281,6 +6457,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "type": "Collection",
                         "update": [MockFunction],
                         "updateScrollBottom": [MockFunction],
+                        "viewable_by_anyone": false,
                       },
                       "patch": [MockFunction],
                       "record": Object {},
@@ -6372,9 +6549,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "id": "1",
                         "inherited_tag_list": Array [],
                         "internalType": "collections",
+                        "isCollection": true,
                         "isNormalCollection": true,
                         "isSharedCollection": false,
                         "isUserCollection": false,
+                        "links": Object {
+                          "self": "https://www.shape.space/ideo/collections/1",
+                        },
                         "master_template": false,
                         "meta": Object {
                           "snapshot": Object {
@@ -6399,6 +6580,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "type": "Collection",
                         "update": [MockFunction],
                         "updateScrollBottom": [MockFunction],
+                        "viewable_by_anyone": false,
                       },
                       "patch": [MockFunction],
                       "record": Object {},
@@ -6555,9 +6737,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "id": "1",
                       "inherited_tag_list": Array [],
                       "internalType": "collections",
+                      "isCollection": true,
                       "isNormalCollection": true,
                       "isSharedCollection": false,
                       "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
                       "master_template": false,
                       "meta": Object {
                         "snapshot": Object {
@@ -6642,6 +6828,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "type": "Collection",
                       "update": [MockFunction],
                       "updateScrollBottom": [MockFunction],
+                      "viewable_by_anyone": false,
                     },
                     "patch": [MockFunction],
                     "record": Object {},
@@ -6834,6 +7021,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "organizationMenuPage": "organizationMenuPage",
                       "pageMenuOpen": false,
                       "popupAlert": [MockFunction],
+                      "popupSnackbar": [MockFunction],
                       "removeNewCard": [MockFunction],
                       "resetSelectionAndBCT": [MockFunction],
                       "rolesMenuOpen": false,
@@ -6960,9 +7148,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -6983,6 +7175,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -7070,9 +7263,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -7093,6 +7290,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -7193,9 +7391,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -7216,6 +7418,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -7303,9 +7506,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -7326,6 +7533,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -7426,9 +7634,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -7449,6 +7661,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -7536,9 +7749,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -7559,6 +7776,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -7586,9 +7804,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                   "id": "1",
                   "inherited_tag_list": Array [],
                   "internalType": "collections",
+                  "isCollection": true,
                   "isNormalCollection": true,
                   "isSharedCollection": false,
                   "isUserCollection": false,
+                  "links": Object {
+                    "self": "https://www.shape.space/ideo/collections/1",
+                  },
                   "master_template": false,
                   "meta": Object {
                     "snapshot": Object {
@@ -7851,9 +8073,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "id": "1",
                       "inherited_tag_list": Array [],
                       "internalType": "collections",
+                      "isCollection": true,
                       "isNormalCollection": true,
                       "isSharedCollection": false,
                       "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
                       "master_template": false,
                       "meta": Object {
                         "snapshot": Object {
@@ -8076,6 +8302,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "type": "Collection",
                       "update": [MockFunction],
                       "updateScrollBottom": [MockFunction],
+                      "viewable_by_anyone": false,
                     },
                     "patch": [MockFunction],
                     "record": Object {},
@@ -8174,9 +8401,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -8197,6 +8428,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -8284,9 +8516,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -8307,6 +8543,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -8407,9 +8644,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -8430,6 +8671,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -8517,9 +8759,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -8540,6 +8786,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -8640,9 +8887,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -8663,6 +8914,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -8750,9 +9002,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "id": "1",
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
+                            "isCollection": true,
                             "isNormalCollection": true,
                             "isSharedCollection": false,
                             "isUserCollection": false,
+                            "links": Object {
+                              "self": "https://www.shape.space/ideo/collections/1",
+                            },
                             "master_template": false,
                             "meta": Object {
                               "snapshot": Object {
@@ -8773,6 +9029,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "viewable_by_anyone": false,
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -8796,6 +9053,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                   "type": "Collection",
                   "update": [MockFunction],
                   "updateScrollBottom": [MockFunction],
+                  "viewable_by_anyone": false,
                 }
               }
               position="question_end"

@@ -311,9 +311,13 @@ exports[`DataItemCover renders snapshot 1`] = `
             "id": "1",
             "inherited_tag_list": Array [],
             "internalType": "collections",
+            "isCollection": true,
             "isNormalCollection": true,
             "isSharedCollection": false,
             "isUserCollection": false,
+            "links": Object {
+              "self": "https://www.shape.space/ideo/collections/1",
+            },
             "master_template": false,
             "meta": Object {
               "snapshot": Object {
@@ -533,6 +537,7 @@ exports[`DataItemCover renders snapshot 1`] = `
             "type": "Collection",
             "update": [MockFunction],
             "updateScrollBottom": [MockFunction],
+            "viewable_by_anyone": false,
           },
           "patch": [MockFunction],
           "record": Object {},
@@ -875,9 +880,13 @@ exports[`DataItemCover renders snapshot 1`] = `
           "id": "1",
           "inherited_tag_list": Array [],
           "internalType": "collections",
+          "isCollection": true,
           "isNormalCollection": true,
           "isSharedCollection": false,
           "isUserCollection": false,
+          "links": Object {
+            "self": "https://www.shape.space/ideo/collections/1",
+          },
           "master_template": false,
           "meta": Object {
             "snapshot": Object {
@@ -1097,6 +1106,7 @@ exports[`DataItemCover renders snapshot 1`] = `
           "type": "Collection",
           "update": [MockFunction],
           "updateScrollBottom": [MockFunction],
+          "viewable_by_anyone": false,
         },
         "patch": [MockFunction],
         "record": Object {},

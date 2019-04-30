@@ -7,11 +7,8 @@ import { observe } from 'mobx'
 import { apiStore } from '~/stores'
 import trackError from '~/utils/trackError'
 
-// disable firestore in cypress automated tests -- doesn't really work
-const cypress = navigator && navigator.userAgent === 'cypress'
-
 let db = {}
-if (process.env.GOOGLE_CLOUD_BROWSER_KEY && !cypress) {
+if (process.env.GOOGLE_CLOUD_BROWSER_KEY) {
   firebase.initializeApp({
     apiKey: process.env.GOOGLE_CLOUD_BROWSER_KEY,
     projectId: process.env.GOOGLE_CLOUD_PROJECT,

@@ -38,6 +38,16 @@ Then('I should see {int} {string}', (num, el) => {
     .should('eq', num)
 })
 
+Then('I should see the snackbar with {string}', text => {
+  const snackbarText = cy
+    .get('.SnackbarContent > div')
+    .first()
+    .find('span')
+    .invoke('text') // Need to call the .text method, normal chaining with .should does not work
+
+  cy.wrap(snackbarText).should('contain', text)
+})
+
 Then('I should see {int} for the single data value', num => {
   const dataValue = cy.get('[data-cy="DataReport-count"]')
   dataValue.should('contain', num)
