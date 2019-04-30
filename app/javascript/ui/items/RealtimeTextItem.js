@@ -26,12 +26,18 @@ const DockedToolbar = styled.div`
   padding: 5px 10px 0;
   position: fixed;
   width: 100%;
-  z-index: 100;
+  z-index: ${v.zIndex.gridCardTop};
+  opacity: 0.95;
   ${props =>
     props.fullPageView &&
     `
       margin-top: -${FULL_PAGE_TOP_PADDING};
-      padding-left: 36px;
+      position: relative; /* IE fallback */
+      padding-left: 0;
+      @supports (position: sticky) {
+        top: ${v.headerHeight}px;
+        position: sticky;
+      }
     `};
   ${props =>
     !props.fullPageView &&

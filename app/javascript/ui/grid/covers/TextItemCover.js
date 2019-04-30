@@ -184,8 +184,6 @@ class TextItemCover extends React.Component {
         data-cy="TextItemCover"
         style={{
           height: 'calc(100% - 30px)',
-          overflowX: 'hidden',
-          overflowY: isEditing ? 'auto' : 'hidden',
         }}
         class="cancelGridClick"
         onClick={this.handleClick}
