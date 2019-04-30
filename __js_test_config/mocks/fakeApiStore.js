@@ -6,6 +6,7 @@ const fakeApiStore = ({
   requestResult = { data: {} },
 } = {}) => {
   return {
+    sessionLoaded: true,
     add: jest.fn().mockName('add'),
     removeAll: jest.fn().mockName('removeAll'),
     find: jest.fn().mockReturnValue(findResult),
