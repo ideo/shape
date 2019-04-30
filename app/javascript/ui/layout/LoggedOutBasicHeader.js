@@ -22,6 +22,7 @@ const StyledLoginLink = styled(Heading3)`
     line-height: 1.5rem;
   }
 `
+StyledLoginLink.displayName = 'StyledLoginLink'
 
 class LoggedOutBasicHeader extends React.PureComponent {
   render() {
