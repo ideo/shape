@@ -87,6 +87,7 @@ class Ability
     end
     # for logged-out users and fallback for all users
     can :read, Collection, anyone_can_view: true
+    can :read, Collection, anyone_can_join: true
 
     # don't allow any of the editing actions unless you've accepted terms
     # (i.e. user becomes view-only)

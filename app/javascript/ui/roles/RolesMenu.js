@@ -5,28 +5,21 @@ import styled from 'styled-components'
 import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Collapse } from '@material-ui/core'
-import { Flex } from 'reflexbox'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
-import v from '~/utils/variables'
-import CopyToClipboard from 'react-copy-to-clipboard'
 
-import { ShowMoreButton, Checkbox } from '~/ui/global/styled/forms'
+import v from '~/utils/variables'
+import { ShowMoreButton } from '~/ui/global/styled/forms'
 import { Heading3, DisplayText } from '~/ui/global/styled/typography'
 import { Row, RowItemLeft } from '~/ui/global/styled/layout'
 import SearchButton from '~/ui/global/SearchButton'
 import DropdownIcon from '~/ui/icons/DropdownIcon'
-import LinkIcon from '~/ui/icons/LinkIcon'
 import RolesAdd from '~/ui/roles/RolesAdd'
 import RoleSelect from '~/ui/roles/RoleSelect'
+import PublicSharingOptions from '~/ui/global/PublicSharingOptions'
 
 // TODO rewrite this
 function sortUserOrGroup(a, b) {
   return a.entity.name.localeCompare(b.entity.name)
 }
-
-const StyledFormControlLabel = styled(FormControlLabel)`
-  margin-top: -10px;
-`
 
 const ScrollArea = styled.div`
   flex: 1 1 auto;
@@ -92,21 +85,6 @@ const StyledExpandToggle = styled.button`
   }
 `
 
-const PublicViewLink = styled.div`
-  cursor: pointer;
-  display: inline-block;
-  margin-top: 2px;
-  .icon {
-    width: 16px;
-    transform: translateY(3px);
-  }
-  .text {
-    display: inline-block;
-    margin-left: 7px;
-  }
-`
-PublicViewLink.displayName = 'PublicViewLink'
-
 @inject('apiStore', 'routingStore')
 @observer
 class RolesMenu extends React.Component {
@@ -114,8 +92,6 @@ class RolesMenu extends React.Component {
     searchText: '',
     groups: [],
     pendingPanelOpen: false,
-    activePanelOpen: true,
-    anyoneCanView: false,
     page: {
       pending: 1,
       active: 1,
@@ -323,123 +299,6 @@ class RolesMenu extends React.Component {
     return currentUser.id !== entity.id
   }
 
-  toggleAnyoneCanView = () => {
-    const { record } = this.props
-    const { anyoneCanView } = this.state
-    record.anyone_can_view = !anyoneCanView
-    record.save()
-    this.setState({
-      anyoneCanView: !anyoneCanView,
-    })
-  }
-
-  handleAnyoneCanJoinToggle = () => {
-    const { anyoneCanJoin } = this.state
-    const { record } = this.props
-    record.anyone_can_join = !anyoneCanJoin
-    record.save()
-    this.setState({
-      anyoneCanJoin: !anyoneCanJoin,
-    })
-  }
-
-  handleAnyoneCanViewToggle = () => {
-    const { anyoneCanView } = this.state
-    const {
-      apiStore: { uiStore },
-    } = this.props
-    if (!anyoneCanView) {
-      // Show dialog if they are toggling on
-      uiStore.confirm({
-        prompt:
-          'This content will be available to anyone with this link. Are you sure you want to share this content?',
-        confirmText: 'Continue',
-        iconName: 'Alert',
-        onConfirm: this.toggleAnyoneCanView,
-      })
-    } else {
-      // Otherwise immediately toggle off
-      this.toggleAnyoneCanView()
-    }
-  }
-
-  get renderAnyoneCanView() {
-    const {
-      record,
-      apiStore: { uiStore },
-    } = this.props
-
-    const { anyoneCanView } = this.state
-    const { frontend_url } = record
-
-    return (
-      <Flex align="center" style={{ marginBottom: 5 }}>
-        <StyledFormControlLabel
-          classes={{ label: 'form-control' }}
-          control={
-            <Checkbox
-              checked={anyoneCanView}
-              onChange={this.handleanyoneCanViewToggle}
-              value="yes"
-            />
-          }
-          data-cy="viewable-by-anyone-checkbox"
-          label={`Allow anyone with this link to view (${
-            anyoneCanView ? 'ON' : 'OFF'
-          })`}
-        />
-        {anyoneCanView && (
-          <CopyToClipboard text={frontend_url}>
-            <PublicViewLink
-              aria-label="Get link"
-              onClick={() => uiStore.popupSnackbar({ message: 'Link Copied' })}
-              data-cy="anyone-can-view-link"
-            >
-              <LinkIcon className="icon" />
-              <Heading3 className="text">Get Link</Heading3>
-            </PublicViewLink>
-          </CopyToClipboard>
-        )}
-      </Flex>
-    )
-  }
-
-  get renderAnyoneCanJoin() {
-    const { anyoneCanJoin } = this.state
-    return (
-      <Flex align="center" style={{ marginBottom: 5 }}>
-        <StyledFormControlLabel
-          classes={{ label: 'form-control' }}
-          control={
-            <Checkbox
-              checked={anyoneCanJoin}
-              onChange={this.handleAnyoneCanJoinToggle}
-              value="yes"
-            />
-          }
-          data-cy="anyone-can-join-checkbox"
-          label={`Public can join this collection (${
-            anyoneCanJoin ? 'ON' : 'OFF'
-          })`}
-        />
-      </Flex>
-    )
-  }
-
-  get renderPublicSharingOptions() {
-    const { record, canEdit } = this.props
-
-    if (!record.isCollection || !canEdit) return <div />
-
-    return (
-      <div>
-        Public Sharing Options
-        {this.renderAnyoneCanView}
-        {this.renderAnyoneCanJoin}
-      </div>
-    )
-  }
-
   render() {
     const {
       record,
@@ -462,7 +321,7 @@ class RolesMenu extends React.Component {
 
     return (
       <Fragment>
-        {this.renderPublicSharingOptions}
+        <PublicSharingOptions record={record} canEdit={canEdit} />
         <StyledHeaderRow align="flex-end">
           <Heading3>{title}</Heading3>
           <SearchButton

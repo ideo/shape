@@ -6,6 +6,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   # NOTE: these have to be in the following order
   before_action :load_and_authorize_collection_update, only: %i[update]
   before_action :load_collection_with_roles, only: %i[show update]
+  before_action :join_collection_group, only: :show, if: :join_collection_group?
 
   before_action :load_and_filter_index, only: %i[index]
   def index
@@ -227,5 +228,15 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def broadcast_parent_collection_updates
     CollectionUpdateBroadcaster.call(@parent_collection, current_user)
+  end
+
+  def join_collection_group?
+    user_signed_in? &&
+      @collection.anyone_can_join? &&
+      !@collection.can_view?(current_user)
+  end
+
+  def join_collection_group
+    # TODO...
   end
 end
