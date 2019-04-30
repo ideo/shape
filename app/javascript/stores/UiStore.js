@@ -317,6 +317,14 @@ export default class UiStore {
     this.update('cardMenuOpen', { ...this.defaultCardMenuState })
   }
 
+  showPermissionsDialog() {
+    this.confirm({
+      prompt: 'You need permission to access this content.',
+      iconName: 'Key',
+      onConfirm: () => this.closeDialog(),
+    })
+  }
+
   async popupSnackbar(props = {}) {
     if (this.snackbarConfig.open) {
       this.closeSnackbar()

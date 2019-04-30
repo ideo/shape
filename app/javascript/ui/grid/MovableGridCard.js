@@ -367,7 +367,11 @@ class MovableGridCard extends React.PureComponent {
 
     // timeout is just a stupid thing so that Draggable doesn't complain about unmounting
     setTimeout(() => {
-      this.props.routeTo(cardType, record.id)
+      if (record.can_view) {
+        this.props.routeTo(cardType, record.id)
+      } else {
+        uiStore.showPermissionsDialog()
+      }
     })
   }
 
