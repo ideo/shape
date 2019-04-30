@@ -77,6 +77,11 @@ class Comment extends React.Component {
     )
   }
 
+  handleDeleteClick = () => {
+    const { comment } = this.props
+    comment.API_destroy()
+  }
+
   render() {
     const { comment } = this.props
     const { author } = comment
@@ -96,6 +101,10 @@ class Comment extends React.Component {
           <span className="timestamp">
             <Moment date={comment.updated_at} />
           </span>
+
+          {comment.persisted && (
+            <button onClick={this.handleDeleteClick}>X</button>
+          )}
         </InlineRow>
         <div className="message">{this.renderMessage()}</div>
       </StyledComment>
