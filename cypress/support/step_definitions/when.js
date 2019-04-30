@@ -3,6 +3,10 @@ import _ from 'lodash'
 
 const FLIPMOVE_DELAY = 600
 
+When('I clear all cookies', () => {
+  cy.clearCookies()
+})
+
 // ----------------------
 // Creating content (BCT)
 // ----------------------
@@ -146,6 +150,12 @@ When('I wait for {int} second(s)', num => {
 
 When('I capture the current URL', () => {
   cy.url().as('url')
+})
+
+When('I visit the captured URL', () => {
+  cy.get('@url').then(url => {
+    cy.visit(url)
+  })
 })
 
 When('I type some random things', () => {

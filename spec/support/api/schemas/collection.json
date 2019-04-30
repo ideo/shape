@@ -37,7 +37,8 @@
     "is_inside_a_submission": { "type": ["boolean"] },
     "submission_attrs": { "type": ["object"] },
     "launchable": { "type": ["boolean"] },
-    "test_collection_id": { "type": ["string"] }
+    "test_collection_id": { "type": ["string"] },
+    "frontend_url": { "type": ["string"] }
   },
   "required": ["name", "class_type", "created_at", "cover"]
 }

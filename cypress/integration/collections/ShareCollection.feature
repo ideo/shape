@@ -1,4 +1,4 @@
-Feature: Creating a Public Collection
+Feature: Sharing a Collection
 
   Scenario: Making a collection viewable by anyone
     Given I login and visit the Test Area
@@ -16,4 +16,9 @@ Feature: Creating a Public Collection
     Then I should see "Allow anyone with this link to view (ON)" in a "viewable-by-anyone-checkbox"
 
     When I click "viewable-by-anyone-link"
-    Then I should see the snackbar with "Link Copied!"
+    Then I should have an element named ".StyledSnackbarText"
+
+    When I capture the current URL
+    And I clear all cookies
+    And I visit the captured URL
+    Then I should see "Anyone Can See" in a "EditableNameHeading"

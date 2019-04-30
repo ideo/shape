@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import { observable, computed, action, runInAction } from 'mobx'
 import { ReferenceType } from 'datx'
-import { getModelLinks } from 'datx-jsonapi'
 import pluralize from 'pluralize'
 import queryString from 'query-string'
 
@@ -408,10 +407,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get isOrgTemplateCollection() {
     return this.is_org_template_collection
-  }
-
-  get links() {
-    return getModelLinks(this)
   }
 
   @computed

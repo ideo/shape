@@ -167,7 +167,7 @@ class SerializableCollection < BaseJsonSerializer
     @object.is_a?(Collection::Board) ? @object.max_col_index : nil
   end
 
-  link :self do
+  attribute :frontend_url do
     @frontend_url_for.call(@object)
   end
 end

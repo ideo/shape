@@ -363,7 +363,7 @@ class RolesMenu extends React.Component {
     if (!record.isCollection || !canEdit) return <div />
 
     const { viewableByAnyone } = this.state
-    const url = record.links.self
+    const { frontend_url } = record
 
     return (
       <Flex align="center" style={{ marginBottom: 5 }}>
@@ -382,7 +382,7 @@ class RolesMenu extends React.Component {
           })`}
         />
         {viewableByAnyone && (
-          <CopyToClipboard text={url}>
+          <CopyToClipboard text={frontend_url}>
             <ViewableByAnyoneLink
               aria-label="Get link"
               onClick={() => uiStore.popupSnackbar({ message: 'Link Copied' })}
