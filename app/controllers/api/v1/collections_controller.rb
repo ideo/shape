@@ -196,6 +196,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :hide_submissions,
       :submissions_enabled,
       :anyone_can_view,
+      :anyone_can_join,
       collection_cards_attributes: %i[id order width height row col],
     )
   end

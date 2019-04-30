@@ -15,7 +15,7 @@ Feature: Sharing a Collection
     When I click "ConfirmButton"
     Then I should see "Allow anyone with this link to view (ON)" in a "viewable-by-anyone-checkbox"
 
-    When I click "viewable-by-anyone-link"
+    When I click "anyone-can-view-link"
     Then I should have an element named ".StyledSnackbarText"
 
     When I capture the current URL

@@ -14,6 +14,8 @@
     "created_at": { "type": "date" },
     "updated_at": { "type": "date" },
     "breadcrumb": { "type": ["array", "null"] },
+    "anyone_can_view": { "type": ["boolean"] },
+    "anyone_can_join": { "type": ["boolean"] },
     "can_edit": { "type": ["boolean"] },
     "can_view": { "type": ["boolean"] },
     "can_edit_content": { "type": ["boolean"] },

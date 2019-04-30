@@ -92,7 +92,7 @@ const StyledExpandToggle = styled.button`
   }
 `
 
-const ViewableByAnyoneLink = styled.div`
+const PublicViewLink = styled.div`
   cursor: pointer;
   display: inline-block;
   margin-top: 2px;
@@ -105,7 +105,7 @@ const ViewableByAnyoneLink = styled.div`
     margin-left: 7px;
   }
 `
-ViewableByAnyoneLink.displayName = 'ViewableByAnyoneLink'
+PublicViewLink.displayName = 'PublicViewLink'
 
 @inject('apiStore', 'routingStore')
 @observer
@@ -115,7 +115,7 @@ class RolesMenu extends React.Component {
     groups: [],
     pendingPanelOpen: false,
     activePanelOpen: true,
-    viewableByAnyone: false,
+    anyoneCanView: false,
     page: {
       pending: 1,
       active: 1,
@@ -135,7 +135,7 @@ class RolesMenu extends React.Component {
     const {
       record: { anyone_can_view },
     } = this.props
-    this.setState({ viewableByAnyone: anyone_can_view })
+    this.setState({ anyoneCanView: anyone_can_view })
   }
 
   async initializeRolesAndGroups({
@@ -323,46 +323,53 @@ class RolesMenu extends React.Component {
     return currentUser.id !== entity.id
   }
 
-  toggleViewableByAnyone = () => {
+  toggleAnyoneCanView = () => {
     const { record } = this.props
-    const { viewableByAnyone } = this.state
-    record.anyone_can_view = !viewableByAnyone
+    const { anyoneCanView } = this.state
+    record.anyone_can_view = !anyoneCanView
     record.save()
     this.setState({
-      viewableByAnyone: !viewableByAnyone,
+      anyoneCanView: !anyoneCanView,
     })
   }
 
-  handleViewableByAnyoneToggle = () => {
-    const { viewableByAnyone } = this.state
+  handleAnyoneCanJoinToggle = () => {
+    const { anyoneCanJoin } = this.state
+    const { record } = this.props
+    record.anyone_can_join = !anyoneCanJoin
+    record.save()
+    this.setState({
+      anyoneCanJoin: !anyoneCanJoin,
+    })
+  }
+
+  handleAnyoneCanViewToggle = () => {
+    const { anyoneCanView } = this.state
     const {
       apiStore: { uiStore },
     } = this.props
-    if (!viewableByAnyone) {
+    if (!anyoneCanView) {
       // Show dialog if they are toggling on
       uiStore.confirm({
         prompt:
           'This content will be available to anyone with this link. Are you sure you want to share this content?',
         confirmText: 'Continue',
         iconName: 'Alert',
-        onConfirm: this.toggleViewableByAnyone,
+        onConfirm: this.toggleAnyoneCanView,
       })
     } else {
       // Otherwise immediately toggle off
-      this.toggleViewableByAnyone()
+      this.toggleAnyoneCanView()
     }
   }
 
-  get renderViewableByAnyone() {
+  get renderAnyoneCanView() {
     const {
-      canEdit,
       record,
       apiStore: { uiStore },
     } = this.props
 
-    if (!record.isCollection || !canEdit) return <div />
-
-    const { viewableByAnyone } = this.state
+    const { anyoneCanView } = this.state
     const { frontend_url } = record
 
     return (
@@ -371,29 +378,65 @@ class RolesMenu extends React.Component {
           classes={{ label: 'form-control' }}
           control={
             <Checkbox
-              checked={viewableByAnyone}
-              onChange={this.handleViewableByAnyoneToggle}
+              checked={anyoneCanView}
+              onChange={this.handleanyoneCanViewToggle}
               value="yes"
             />
           }
           data-cy="viewable-by-anyone-checkbox"
           label={`Allow anyone with this link to view (${
-            viewableByAnyone ? 'ON' : 'OFF'
+            anyoneCanView ? 'ON' : 'OFF'
           })`}
         />
-        {viewableByAnyone && (
+        {anyoneCanView && (
           <CopyToClipboard text={frontend_url}>
-            <ViewableByAnyoneLink
+            <PublicViewLink
               aria-label="Get link"
               onClick={() => uiStore.popupSnackbar({ message: 'Link Copied' })}
-              data-cy="viewable-by-anyone-link"
+              data-cy="anyone-can-view-link"
             >
               <LinkIcon className="icon" />
               <Heading3 className="text">Get Link</Heading3>
-            </ViewableByAnyoneLink>
+            </PublicViewLink>
           </CopyToClipboard>
         )}
       </Flex>
+    )
+  }
+
+  get renderAnyoneCanJoin() {
+    const { anyoneCanJoin } = this.state
+    return (
+      <Flex align="center" style={{ marginBottom: 5 }}>
+        <StyledFormControlLabel
+          classes={{ label: 'form-control' }}
+          control={
+            <Checkbox
+              checked={anyoneCanJoin}
+              onChange={this.handleAnyoneCanJoinToggle}
+              value="yes"
+            />
+          }
+          data-cy="anyone-can-join-checkbox"
+          label={`Public can join this collection (${
+            anyoneCanJoin ? 'ON' : 'OFF'
+          })`}
+        />
+      </Flex>
+    )
+  }
+
+  get renderPublicSharingOptions() {
+    const { record, canEdit } = this.props
+
+    if (!record.isCollection || !canEdit) return <div />
+
+    return (
+      <div>
+        Public Sharing Options
+        {this.renderAnyoneCanView}
+        {this.renderAnyoneCanJoin}
+      </div>
     )
   }
 
@@ -419,7 +462,7 @@ class RolesMenu extends React.Component {
 
     return (
       <Fragment>
-        {this.renderViewableByAnyone}
+        {this.renderPublicSharingOptions}
         <StyledHeaderRow align="flex-end">
           <Heading3>{title}</Heading3>
           <SearchButton
