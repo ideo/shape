@@ -9,47 +9,35 @@ const options = [
   {
     value: 'link',
     label: 'Share via link (on)',
-    disabled: false,
-    // Should this be a function?
+    disabled: true,
+    selected: true,
+    handleToggle: () => console.log('clicked'),
   },
   {
     value: 'filter',
     label: 'All People (No Filters)',
     disabled: false,
-    // Should this be a function?
+    selected: false,
+    handleToggle: () => console.log('clicked'),
   },
 ]
 
-const AudienceSettings = () => {
-  return (
-    <div>
-      <h3>Audience</h3>
-      <StyledAudienceGrid>
-        <StyledForm>
-          <FormControl component="fieldset" required>
-            {options.map(option => (
-              <AudienceSettingsRow
-                key={option.value}
-                handleToggle={() =>
-                  console.log(`clicked button ${option.label}`)
-                }
-                checked={false}
-                value={option.value}
-                label={option.label}
-              />
-            ))}
-          </FormControl>
-        </StyledForm>
-      </StyledAudienceGrid>
-    </div>
-  )
-}
+const AudienceSettings = () => (
+  <AudienceSettingsWrapper>
+    <h3>Audience</h3>
+    {options.map(option => (
+      <AudienceSettingsRow
+        handleToggle={() => console.log(`clicked button ${option.label}`)}
+        checked={option.selected}
+        value={option.value}
+        label={option.label}
+      />
+    ))}
+  </AudienceSettingsWrapper>
+)
 
-const StyledAudienceGrid = styled.div`
-  display: grid;
-`
-// maxWidth mainly to force the radio buttons from spanning the page
-const StyledForm = styled.form`
+const AudienceSettingsWrapper = styled.div`
+  /* display: grid; */
   max-width: 750px;
 `
 

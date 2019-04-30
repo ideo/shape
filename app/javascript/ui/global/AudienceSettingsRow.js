@@ -1,15 +1,22 @@
+import React from 'react'
 import { PropTypes } from 'prop-types'
 import { Checkbox, LabelContainer } from '~/ui/global/styled/forms'
 import styled from 'styled-components'
 import v from '~/utils/variables'
-// Should this just take an option instead of a label AND value?
-const AudienceSettingsRow = ({ checked, label, value, handleToggle }) => {
-  return (
+
+const AudienceSettingsRow = ({ checked, label, value, handleToggle }) => (
+  <StyledRowFlexParent>
     <LabelContainer
       classes={{ label: 'form-control' }}
       labelPlacement={'end'}
       control={
-        <Checkbox checked={checked} onChange={handleToggle} value={value} />
+        <Checkbox
+          checked={checked}
+          onChange={handleToggle}
+          value={value}
+          color={'default'}
+          iconStyle={{ fill: 'black' }}
+        />
       }
       label={
         <div style={{ maxWidth: '582px' }}>
@@ -17,8 +24,24 @@ const AudienceSettingsRow = ({ checked, label, value, handleToggle }) => {
         </div>
       }
     />
-  )
-}
+    <StyledRowFlexItem>–</StyledRowFlexItem>
+    <StyledRowFlexItem>–</StyledRowFlexItem>
+    <StyledRowFlexItem>–</StyledRowFlexItem>
+  </StyledRowFlexParent>
+)
+
+const StyledRowFlexParent = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+`
+
+// flex-grow, flex-shrink and flex-basis combined
+const StyledRowFlexItem = styled.div`
+  flex: 0 1 auto;
+  margin-top: 15px;
+`
 
 const StyledLabel = styled.label`
   margin-bottom: 0;
