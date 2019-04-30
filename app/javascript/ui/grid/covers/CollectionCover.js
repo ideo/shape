@@ -260,7 +260,7 @@ class CollectionCover extends React.Component {
     // User does not have permission to see collection
     e.preventDefault()
     e.stopPropagation()
-    uiStore.showPermissionsDialog()
+    uiStore.showPermissionsAlert()
     return false
   }
 
@@ -291,6 +291,7 @@ class CollectionCover extends React.Component {
                   className="no-select cancelGridClick"
                   onClick={this.handleClick}
                   to={routingStore.pathTo('collections', collection.id)}
+                  data-cy="collection-cover-link"
                 >
                   {this.name}
                 </PlainLink>

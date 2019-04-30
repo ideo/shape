@@ -11,6 +11,12 @@ const props = {
 }
 const { cover } = fakeCollection
 
+const fakeEvent = {
+  preventDefault: jest.fn(),
+  stopPropagation: jest.fn(),
+  metaKey: null,
+}
+
 let wrapper
 describe('CollectionCover', () => {
   beforeEach(() => {
@@ -52,6 +58,13 @@ describe('CollectionCover', () => {
     expect(wrapper.find('LaunchButton').exists()).toBeFalsy()
   })
 
+  it('does not show permission alert', () => {
+    wrapper
+      .find('[data-cy="collection-cover-link"]')
+      .simulate('click', fakeEvent)
+    expect(props.uiStore.showPermissionsAlert).not.toHaveBeenCalled()
+  })
+
   describe('with a launchable submission test', () => {
     beforeEach(() => {
       props.collection = {
@@ -66,6 +79,20 @@ describe('CollectionCover', () => {
 
     it('renders the launch test button', () => {
       expect(wrapper.find('LaunchButton').exists()).toBeTruthy()
+    })
+  })
+
+  describe('with collection user cannot view', () => {
+    beforeEach(() => {
+      props.collection.can_view = false
+      wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
+    })
+
+    it('shows permission alert', () => {
+      wrapper
+        .find('[data-cy="collection-cover-link"]')
+        .simulate('click', fakeEvent)
+      expect(props.uiStore.showPermissionsAlert).toHaveBeenCalled()
     })
   })
 })

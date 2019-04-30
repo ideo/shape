@@ -72,7 +72,7 @@ class TextItemCover extends React.Component {
     }
 
     if (!item.can_view) {
-      uiStore.showPermissionsDialog()
+      uiStore.showPermissionsAlert()
       return false
     } else if (!item.can_edit_content || searchResult) {
       // if a viewer, there's nothing to do on the generic click action

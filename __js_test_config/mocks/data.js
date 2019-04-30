@@ -35,6 +35,7 @@ export const fakeTextItemAttrs = {
   type: 'Item::TextItem',
   internalType: 'items',
   name: 'My Cool Item',
+  can_view: true,
   data_content:
     'This is the content for the item and it contains multiple sentences. Like this one.',
   breadcrumb: [['collections', 1, 'Some collection'], ['items', 1, 'my item']],
@@ -333,6 +334,7 @@ export const fakeCollection = {
   tag_list: ['prototype', 'blockchain'],
   inherited_tag_list: [],
   can_edit: false,
+  can_view: true,
   can_edit_content: false,
   master_template: false,
   isCollection: true,

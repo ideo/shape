@@ -94,6 +94,8 @@ const fakeUiStore = {
   scrollToTop: jest.fn(),
   scrollToBottom: jest.fn(),
   popupSnackbar: jest.fn(),
+  showPermissionsAlert: jest.fn(),
+  gridHeightFor: jest.fn().mockReturnValue(250),
 }
 
 export default fakeUiStore
