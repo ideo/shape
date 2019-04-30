@@ -6,7 +6,7 @@ class SerializableCollection < BaseJsonSerializer
              :master_template, :template_id,
              :submission_box_type, :submission_box_id, :submission_template_id,
              :test_status, :collection_to_test_id, :hide_submissions, :submissions_enabled,
-             :viewable_by_anyone
+             :anyone_can_view
 
   has_many :roles do
     data do
@@ -69,7 +69,7 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   attribute :can_view do
-    # intentionally not using ability so `viewable_by_anyone?` does not return true
+    # intentionally not using ability so `anyone_can_view?` does not return true
     @current_user ? @object.can_view?(@current_user) : false
   end
 

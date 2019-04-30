@@ -195,7 +195,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :collection_to_test_id,
       :hide_submissions,
       :submissions_enabled,
-      :viewable_by_anyone,
+      :anyone_can_view,
       collection_cards_attributes: %i[id order width height row col],
     )
   end

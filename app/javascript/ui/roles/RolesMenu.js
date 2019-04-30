@@ -133,9 +133,9 @@ class RolesMenu extends React.Component {
   componentDidMount() {
     this.initializeRolesAndGroups({ reset: true, page: 1 })
     const {
-      record: { viewable_by_anyone },
+      record: { anyone_can_view },
     } = this.props
-    this.setState({ viewableByAnyone: viewable_by_anyone })
+    this.setState({ viewableByAnyone: anyone_can_view })
   }
 
   async initializeRolesAndGroups({
@@ -326,7 +326,7 @@ class RolesMenu extends React.Component {
   toggleViewableByAnyone = () => {
     const { record } = this.props
     const { viewableByAnyone } = this.state
-    record.viewable_by_anyone = !viewableByAnyone
+    record.anyone_can_view = !viewableByAnyone
     record.save()
     this.setState({
       viewableByAnyone: !viewableByAnyone,

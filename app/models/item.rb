@@ -79,7 +79,7 @@ class Item < ApplicationRecord
     )
   end
 
-  def viewable_by_anyone?
+  def anyone_can_view?
     false
   end
 

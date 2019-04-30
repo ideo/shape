@@ -152,9 +152,9 @@ describe('RolesMenu', () => {
     ).toEqual(false)
   })
 
-  describe('handleViewableByAnyoneToggle when viewable_by_anyone is false', () => {
+  describe('handleViewableByAnyoneToggle when anyone_can_view is false', () => {
     beforeEach(() => {
-      props.record.viewable_by_anyone = false
+      props.record.anyone_can_view = false
       props.apiStore.uiStore.confirm.mockClear()
       props.canEdit = true
       wrapper = shallow(<RolesMenu.wrappedComponent {...props} />)
@@ -169,7 +169,7 @@ describe('RolesMenu', () => {
       ).toEqual(false)
     })
 
-    it('toggles viewable_by_anyone', () => {
+    it('toggles anyone_can_view', () => {
       wrapper.instance().handleViewableByAnyoneToggle()
 
       expect(props.apiStore.uiStore.confirm).toHaveBeenCalledWith({
@@ -182,9 +182,9 @@ describe('RolesMenu', () => {
     })
   })
 
-  describe('handleViewableByAnyoneToggle when viewable_by_anyone is true', () => {
+  describe('handleViewableByAnyoneToggle when anyone_can_view is true', () => {
     beforeEach(() => {
-      props.record.viewable_by_anyone = true
+      props.record.anyone_can_view = true
       props.apiStore.uiStore.confirm.mockClear()
       props.canEdit = true
       wrapper = shallow(<RolesMenu.wrappedComponent {...props} />)
@@ -199,7 +199,7 @@ describe('RolesMenu', () => {
       ).toEqual(true)
     })
 
-    it('toggles viewable_by_anyone without confirmation', () => {
+    it('toggles anyone_can_view without confirmation', () => {
       wrapper.instance().handleViewableByAnyoneToggle()
       expect(props.apiStore.uiStore.confirm).not.toHaveBeenCalled()
       expect(props.record.save).toHaveBeenCalled()

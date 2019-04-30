@@ -346,7 +346,7 @@ export const fakeCollection = {
   isUserCollection: false,
   isNormalCollection: true,
   num_survey_responses: 0,
-  viewable_by_anyone: false,
+  anyone_can_view: false,
   cover: {
     image_url: 'http://fake.url.net',
     text: 'Lorem ipsum blockchain boogie',
