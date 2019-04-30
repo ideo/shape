@@ -1,14 +1,13 @@
 # Serve up static pages
 class HomeController < ApplicationController
-  # before_action :authenticate_user!, only: %i[index]
   before_action :set_omniauth_state
 
   def index
     # limited users aren't allowed to access the full Shape app
-    # if current_user.limited?
-    #   sign_out :user
-    #   redirect_to root_url
-    # end
+    if user_signed_in? && current_user.limited?
+      sign_out :user
+      redirect_to root_url
+    end
     # for someone without admin access who tries to go to /sidekiq
     return redirect_to root_url if params[:path] == 'sidekiq'
   end

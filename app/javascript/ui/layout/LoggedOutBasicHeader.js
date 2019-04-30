@@ -45,12 +45,14 @@ class LoggedOutBasicHeader extends React.PureComponent {
 
               <Box>
                 <Flex align="center">
-                  <Avatar
-                    title={organization.name}
-                    url={organization.filestack_file_url}
-                    className="organization-avatar"
-                    responsive={false}
-                  />
+                  {organization && (
+                    <Avatar
+                      title={organization.name}
+                      url={organization.filestack_file_url}
+                      className="organization-avatar"
+                      responsive={false}
+                    />
+                  )}
                   <StyledLoginLink>
                     <a href="/login">Log in</a>
                   </StyledLoginLink>
@@ -66,7 +68,11 @@ class LoggedOutBasicHeader extends React.PureComponent {
 }
 
 LoggedOutBasicHeader.propTypes = {
-  organization: MobxPropTypes.objectOrObservableObject.isRequired,
+  organization: MobxPropTypes.objectOrObservableObject,
+}
+
+LoggedOutBasicHeader.defaultProps = {
+  organization: null,
 }
 
 export default LoggedOutBasicHeader

@@ -276,10 +276,13 @@ class Header extends React.Component {
     const { apiStore, routingStore, uiStore } = this.props
     const { currentUser } = apiStore
     if (!currentUser) {
-      // user is not logged in
+      // user is not logged in, or:
       // user needs to set up their Org, will see the Org popup before proceeding
-      if (!record) return null
-      return <LoggedOutBasicHeader organization={record.organization} />
+      return (
+        <LoggedOutBasicHeader
+          organization={record ? record.organization : null}
+        />
+      )
     } else if (!currentUser.current_organization) {
       return <BasicHeader orgMenu={uiStore.organizationMenuOpen} />
     }
