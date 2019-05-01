@@ -58,6 +58,23 @@ class AudienceSettings extends React.Component {
     this.setState({ options: newOptions })
   }
 
+  stopEditingIfContent = () => {
+    console.log('foo')
+    // AJAX call to set size for audience in database
+  }
+  handleKeyPress = () => {
+    console.log('foo')
+  }
+  handleInputChange = e => {
+    console.log(e.target)
+    const { id, value } = e.target
+    const { options } = this.state
+    const option = options[id]
+    const updatedOption = Object.assign({}, option, { size: value })
+    const newOptions = Object.assign({}, options, updatedOption)
+    this.setState({ options: newOptions })
+  }
+
   render() {
     return (
       <AudienceSettingsWrapper>
@@ -86,7 +103,19 @@ class AudienceSettings extends React.Component {
               />
               <StyledRowFlexItem>–</StyledRowFlexItem>
               <StyledRowFlexItem>
-                {hasInput ? <StyledInput /> : '–'}
+                {hasInput ? (
+                  <EditableInput
+                    id={option.id}
+                    type="text"
+                    placeholder="–"
+                    value={option.size}
+                    onChange={this.handleInputChange}
+                    onKeyPress={this.handleKeyPress}
+                    onBlur={this.stopEditingIfContent}
+                  />
+                ) : (
+                  '–'
+                )}
               </StyledRowFlexItem>
               <StyledRowFlexItem>–</StyledRowFlexItem>
             </StyledRowFlexParent>
@@ -123,9 +152,27 @@ const StyledLabel = styled.label`
   display: block;
 `
 
-const StyledInput = styled.input`
-  background: ${v.colors.primaryLightest};
+const EditableInput = styled(AutosizeInput)`
+  input {
+    width: 40px;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid ${v.colors.black};
+    padding: 2px 3px;
+    margin: -1px 2px -1px 5px;
+    font-size: 16px;
+    font-family: ${v.fonts.sans};
+    font-size: 1rem;
+    color: ${v.colors.black};
+    &:focus {
+      outline: 0;
+    }
+    &::placeholder {
+      color: ${v.colors.commonDark};
+    }
+  }
 `
+EditableInput.displayName = 'EditableInput'
 
 AudienceSettings.propTypes = {}
 
