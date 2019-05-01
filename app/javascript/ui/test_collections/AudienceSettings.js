@@ -2,7 +2,6 @@ import React from 'react'
 // import { PropTypes } from 'prop-types'
 import styled from 'styled-components'
 import AutosizeInput from 'react-input-autosize'
-// import AudienceSettingsRow from '~/ui/global/AudienceSettingsRow'
 import { Checkbox, LabelContainer } from '~/ui/global/styled/forms'
 import { SmallHelperText, DisplayText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
@@ -77,45 +76,47 @@ class AudienceSettings extends React.Component {
   render() {
     return (
       <AudienceSettingsWrapper>
-        <h3>Audience</h3>
+        <h3 style={{ marginBottom: '0px' }}>Audience</h3>
         <StyledRowFlexParent>
           <StyledRowFlexItem />
-          <StyledRowFlexItem>
+          <StyledRowFlexHeader>
             <SmallHelperText>$/Response</SmallHelperText>
-          </StyledRowFlexItem>
-          <StyledRowFlexItem>
+          </StyledRowFlexHeader>
+          <StyledRowFlexHeader>
             <SmallHelperText>Size</SmallHelperText>
-          </StyledRowFlexItem>
-          <StyledRowFlexItem>
+          </StyledRowFlexHeader>
+          <StyledRowFlexHeader>
             <SmallHelperText>Price</SmallHelperText>
-          </StyledRowFlexItem>
+          </StyledRowFlexHeader>
         </StyledRowFlexParent>
         {this.state.options.map(option => {
           const { label, id, selected, hasInput } = option
           return (
             <StyledRowFlexParent>
-              <LabelContainer
-                classes={{ label: 'form-control' }}
-                labelPlacement={'end'}
-                control={
-                  <Checkbox
-                    checked={selected}
-                    onChange={this.toggleCheckbox}
-                    value={id}
-                    color={'default'}
-                    iconStyle={{ fill: 'black' }}
-                  />
-                }
-                label={
-                  <div style={{ maxWidth: '582px' }}>
-                    <StyledLabel>{label}</StyledLabel>
-                  </div>
-                }
-              />
               <StyledRowFlexItem>
-                <DisplayText color={v.colors.commonMedium}>–</DisplayText>
+                <LabelContainer
+                  classes={{ label: 'form-control' }}
+                  labelPlacement={'end'}
+                  control={
+                    <Checkbox
+                      checked={selected}
+                      onChange={this.toggleCheckbox}
+                      value={id}
+                      color={'default'}
+                      iconStyle={{ fill: 'black' }}
+                    />
+                  }
+                  label={
+                    <div style={{ maxWidth: '582px', paddingTop: '15px' }}>
+                      <StyledLabel>{label}</StyledLabel>
+                    </div>
+                  }
+                />
               </StyledRowFlexItem>
-              <StyledRowFlexItem>
+              <StyledRowFlexCell>
+                <DisplayText color={v.colors.commonMedium}>–</DisplayText>
+              </StyledRowFlexCell>
+              <StyledRowFlexCell>
                 {hasInput ? (
                   <EditableInput
                     id={option.id}
@@ -129,10 +130,10 @@ class AudienceSettings extends React.Component {
                 ) : (
                   <DisplayText color={v.colors.commonMedium}>–</DisplayText>
                 )}
-              </StyledRowFlexItem>
-              <StyledRowFlexItem>
+              </StyledRowFlexCell>
+              <StyledRowFlexCell>
                 <DisplayText color={v.colors.commonMedium}>–</DisplayText>
-              </StyledRowFlexItem>
+              </StyledRowFlexCell>
             </StyledRowFlexParent>
           )
         })}
@@ -142,7 +143,8 @@ class AudienceSettings extends React.Component {
 }
 
 const AudienceSettingsWrapper = styled.div`
-  max-width: 750px;
+  width: 100%;
+  max-width: 500px;
 `
 
 const StyledRowFlexParent = styled.div`
@@ -154,8 +156,17 @@ const StyledRowFlexParent = styled.div`
 
 // flex-grow, flex-shrink and flex-basis combined
 const StyledRowFlexItem = styled.div`
-  flex: 0 1 auto;
-  margin-top: 15px;
+  width: 250px;
+`
+
+const StyledRowFlexCell = styled(StyledRowFlexItem)`
+  width: 70px;
+  padding-top: 10px;
+  text-align: center;
+`
+
+const StyledRowFlexHeader = styled(StyledRowFlexCell)`
+  padding-top: 0px;
 `
 
 const StyledLabel = styled.label`
@@ -164,7 +175,8 @@ const StyledLabel = styled.label`
   font-family: ${v.fonts.sans};
   font-size: 1rem;
   letter-spacing: 0.05rem;
-  display: block;
+  display: inline;
+  vertical-align: middle;
 `
 
 const EditableInput = styled(AutosizeInput)`
