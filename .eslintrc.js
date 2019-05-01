@@ -32,6 +32,7 @@ module.exports = {
     fetch: true,
     webpack: true,
     React: true,
+    Map: true,
     // for enzyme tests
     shallow: true,
     render: true,
@@ -77,6 +78,7 @@ module.exports = {
     'func-names': 0,
     'import/no-absolute-path': 0,
     'import/extensions': 0,
+    'no-undef': 2,
     'no-param-reassign': ['error', { props: false }],
     'no-underscore-dangle': 0,
     'prettier/prettier': 'error',
