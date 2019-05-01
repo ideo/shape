@@ -104,9 +104,11 @@ class Collection < ApplicationRecord
   belongs_to :cloned_from, class_name: 'Collection', optional: true
   belongs_to :created_by, class_name: 'User', optional: true
   belongs_to :question_item, class_name: 'Item::QuestionItem', optional: true
+  belongs_to :joinable_group, class_name: 'Group', optional: true
 
   validates :name, presence: true
   before_validation :inherit_parent_organization_id, on: :create
+  before_validation :add_joinable_guest_group, on: :update, if: :will_save_change_to_anyone_can_join?
 
   scope :root, -> { where('jsonb_array_length(breadcrumb) = 1') }
   scope :not_custom_type, -> { where(type: nil) }
@@ -768,5 +770,12 @@ class Collection < ApplicationRecord
 
   def now_master_template?
     saved_change_to_master_template? && master_template?
+  end
+
+  # TODO: just defaults to guest group and sets that here
+  def add_joinable_guest_group
+    return unless anyone_can_join?
+    organization.guest_group.add_role(Role::VIEWER, self)
+    self.joinable_group_id = organization.guest_group_id
   end
 end

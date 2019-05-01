@@ -4,9 +4,9 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   load_and_authorize_resource except: %i[update destroy in_my_collection]
   skip_before_action :check_api_authentication!, only: %i[show]
   # NOTE: these have to be in the following order
+  before_action :join_collection_group, only: :show, if: :join_collection_group?
   before_action :load_and_authorize_collection_update, only: %i[update]
   before_action :load_collection_with_roles, only: %i[show update]
-  before_action :join_collection_group, only: :show, if: :join_collection_group?
 
   before_action :load_and_filter_index, only: %i[index]
   def index
@@ -233,10 +233,13 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def join_collection_group?
     user_signed_in? &&
       @collection.anyone_can_join? &&
-      !@collection.can_view?(current_user)
+      # the setup requires you to have been added to the org before this point
+      @collection.organization.can_view?(current_user) &&
+      @collection.joinable_group.present?
   end
 
   def join_collection_group
-    # TODO...
+    group = @collection.joinable_group
+    current_user.add_role(Role::MEMBER, group) unless group.guest?
   end
 end
