@@ -1,9 +1,10 @@
 import React from 'react'
 // import { PropTypes } from 'prop-types'
 import styled from 'styled-components'
+import AutosizeInput from 'react-input-autosize'
 // import AudienceSettingsRow from '~/ui/global/AudienceSettingsRow'
 import { Checkbox, LabelContainer } from '~/ui/global/styled/forms'
-import v, { colors } from '~/utils/variables'
+import v from '~/utils/variables'
 
 class AudienceSettings extends React.Component {
   constructor(props) {
@@ -31,6 +32,7 @@ class AudienceSettings extends React.Component {
       {
         id: 1,
         label: 'Share via link (on)',
+        size: null,
         disabled: true,
         selected: true,
         hasInput: false,
@@ -38,6 +40,7 @@ class AudienceSettings extends React.Component {
       {
         id: 2,
         label: 'All People (No Filters)',
+        size: null,
         disabled: false,
         selected: false,
         hasInput: true,
@@ -62,23 +65,24 @@ class AudienceSettings extends React.Component {
     console.log('foo')
     // AJAX call to set size for audience in database
   }
-  handleKeyPress = () => {
-    console.log('foo')
+  handleKeyPress = event => {
+    if (event.key === 'Enter') this.stopEditingIfContent()
   }
   handleInputChange = e => {
     console.log(e.target)
-    const { id, value } = e.target
-    const { options } = this.state
-    const option = options[id]
-    const updatedOption = Object.assign({}, option, { size: value })
-    const newOptions = Object.assign({}, options, updatedOption)
-    this.setState({ options: newOptions })
+    // let input component handle its own state and pass data back up?
   }
 
   render() {
     return (
       <AudienceSettingsWrapper>
         <h3>Audience</h3>
+        <StyledRowFlexParent>
+          <StyledRowFlexItem />
+          <StyledRowFlexItem>$/Response</StyledRowFlexItem>
+          <StyledRowFlexItem>Size</StyledRowFlexItem>
+          <StyledRowFlexItem>Price</StyledRowFlexItem>
+        </StyledRowFlexParent>
         {this.state.options.map(option => {
           const { label, id, selected, hasInput } = option
           return (
@@ -153,13 +157,15 @@ const StyledLabel = styled.label`
 `
 
 const EditableInput = styled(AutosizeInput)`
+  width: 2rem;
+  border-bottom: 1px solid ${v.colors.black};
+
   input {
-    width: 40px;
+    width: 2rem;
     background: transparent;
     border: 0;
-    border-bottom: 1px solid ${v.colors.black};
     padding: 2px 3px;
-    margin: -1px 2px -1px 5px;
+    margin: -1px 0px -1px 0px;
     font-size: 16px;
     font-family: ${v.fonts.sans};
     font-size: 1rem;
