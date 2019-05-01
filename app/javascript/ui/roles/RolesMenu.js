@@ -92,6 +92,7 @@ class RolesMenu extends React.Component {
     searchText: '',
     groups: [],
     pendingPanelOpen: false,
+    activePanelOpen: true,
     page: {
       pending: 1,
       active: 1,
