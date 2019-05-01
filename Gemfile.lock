@@ -314,6 +314,7 @@ GEM
     parser (2.5.0.5)
       ast (~> 2.4.0)
     pg (1.1.3)
+    phony (2.18.1)
     powerpack (0.1.1)
     progress_bar (1.2.0)
       highline (~> 1.6)
@@ -552,6 +553,7 @@ DEPENDENCIES
   oj
   omniauth-ideo!
   pg (~> 1.1)
+  phony
   pry-rails
   puma (~> 3.12)
   rack-cors (~> 1.0.1)
