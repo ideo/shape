@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import { Flex } from 'reflexbox'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled, { ThemeProvider } from 'styled-components'
 import FlipMove from 'react-flip-move'
@@ -14,6 +13,7 @@ import {
 import QuestionHotEdge from '~/ui/test_collections/QuestionHotEdge'
 import TestQuestion from '~/ui/test_collections/TestQuestion'
 import RadioControl from '~/ui/global/RadioControl'
+import trackError from '~/utils/trackError'
 import { apiStore } from '~/stores'
 import AudienceSettings from '~/ui/test_collections/AudienceSettings'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
@@ -43,7 +43,11 @@ class TestDesigner extends React.Component {
         collectionToTest: res.data,
       })
     } catch (e) {
-      console.warn(e, 'unable to load parent collection')
+      trackError(e, {
+        message: `Unable to load parent collection for Collection ${
+          collection.id
+        }`,
+      })
     }
   }
 
@@ -307,13 +311,13 @@ class TestDesigner extends React.Component {
     return (
       <ThemeProvider theme={this.styledTheme}>
         <OuterContainer>
-          <div className={'col-start'}>
+          <div className={'design-column'}>
             <h3>Feedback Design</h3>
             <TopBorder />
             {inner}
             <BottomBorder />
           </div>
-          <div className={'col-end'}>
+          <div className={'settings-column'}>
             <h3>Feedback Settings</h3>
             {this.renderTestTypeForm()}
             <AudienceSettings />
@@ -357,11 +361,11 @@ const TestQuestionFlexWrapper = styled.div`
 const OuterContainer = styled.div`
   display: flex;
 
-  .col-start {
+  .design-column {
     flex: 1;
   }
 
-  .col-end {
+  .settings-column {
     flex: 1;
     margin-left: 30px;
   }
@@ -370,11 +374,11 @@ const OuterContainer = styled.div`
     flex-direction: column-reverse;
     flex-wrap: wrap;
 
-    .col-start {
+    .design-column {
       justify-content: center;
     }
 
-    .col-end {
+    .settings-column {
       margin-left: 0px;
     }
   }

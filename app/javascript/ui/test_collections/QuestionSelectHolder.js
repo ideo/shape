@@ -1,4 +1,4 @@
-import { PropTypes } from 'prop-types'
+import PropTypes from 'prop-types'
 import v, { TEST_COLLECTION_SELECT_OPTIONS } from '~/utils/variables'
 import { Select, SelectOption } from '~/ui/global/styled/forms'
 import { DisplayText, NumberListText } from '~/ui/global/styled/typography'
@@ -61,7 +61,12 @@ const QuestionSelectHolder = ({
 }
 
 QuestionSelectHolder.propTypes = {
-  card: PropTypes.shape.isRequired, // specify or use MobxPropTypes?
+  card: PropTypes.shape({
+    isPinnedInTemplate: PropTypes.bool,
+    isPinnedAndLocked: PropTypes.bool,
+    order: PropTypes.number.isRequired,
+    card_question_type: PropTypes.string.isRequired,
+  }).isRequired, // specify or use MobxPropTypes?
   canEdit: PropTypes.bool.isRequired,
   handleSelectChange: PropTypes.func.isRequired,
   handleTrash: PropTypes.func.isRequired,

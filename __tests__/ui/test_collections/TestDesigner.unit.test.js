@@ -29,18 +29,6 @@ describe('TestDesigner', () => {
     )
   })
 
-  it('renders Select form with card_question_type selected', () => {
-    expect(wrapper.find('StyledSelect').get(0).props.value).toEqual(
-      'question_useful'
-    )
-  })
-
-  it('renders the question options alphabetically', () => {
-    const select = wrapper.find('StyledSelect StyledSelectOption')
-    expect(select.get(2).props.value).toEqual('question_description')
-    expect(select.get(3).props.value).toEqual('question_media')
-  })
-
   it('passes position props for beginning and end', () => {
     expect(wrapper.find('TestQuestion').get(0).props.position).toEqual(
       'question_beginning'
