@@ -2,7 +2,7 @@ class SerializableCollection < BaseJsonSerializer
   include SerializedExternalId
   type 'collections'
 
-  attributes :created_at, :updated_at, :name, :organization_id,
+  attributes :created_at, :updated_at, :name,
              :master_template, :template_id,
              :submission_box_type, :submission_box_id, :submission_template_id,
              :test_status, :collection_to_test_id, :hide_submissions, :submissions_enabled,
@@ -25,6 +25,10 @@ class SerializableCollection < BaseJsonSerializer
   belongs_to :submissions_collection
   belongs_to :submission_template
   belongs_to :collection_to_test
+
+  attribute :organization_id do
+    @object.organization_id.to_s
+  end
 
   attribute :system_required do
     @object.system_required?

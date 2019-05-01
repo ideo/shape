@@ -24,7 +24,7 @@
     "inherited_tag_list": { "type": ["array", "null"] },
     "cover": { "type": ["object"] },
     "test_scores": { "type": ["object"] },
-    "organization_id": { "type": "integer" },
+    "organization_id": { "type": "string" },
     "is_org_template_collection": { "type": ["boolean"] },
     "is_profile_template": { "type": ["boolean"] },
     "is_profile_collection": { "type": ["boolean"] },
