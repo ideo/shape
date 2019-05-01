@@ -13,7 +13,6 @@ module.exports = {
     'cypress/globals': true,
   },
   extends: [
-    'eslint:recommended',
     'prettier',
     'plugin:prettier/recommended',
     'prettier/react',
