@@ -93,7 +93,11 @@ Rails.application.routes.draw do
           patch 'add_terms_text'
           patch 'remove_terms_text'
           get 'check_payments'
+          get 'my_collection'
         end
+
+        get 'search', to: 'search#search'
+
         resources :collections, only: %i[create]
         resources :groups, only: %i[index]
         resources :users, only: %i[index]
@@ -128,7 +132,6 @@ Rails.application.routes.draw do
         get 'token', to: 'filestack#token', as: :filestack_token
       end
       scope :search do
-        get '/', to: 'search#search', as: :search
         get 'users_and_groups', to: 'search#users_and_groups', as: :search_users_and_groups
         get 'organizations', to: 'search#organizations', as: :search_organizations
       end
