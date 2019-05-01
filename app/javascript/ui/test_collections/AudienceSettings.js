@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import AutosizeInput from 'react-input-autosize'
 // import AudienceSettingsRow from '~/ui/global/AudienceSettingsRow'
 import { Checkbox, LabelContainer } from '~/ui/global/styled/forms'
+import { SmallHelperText, DisplayText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 
 class AudienceSettings extends React.Component {
@@ -79,9 +80,15 @@ class AudienceSettings extends React.Component {
         <h3>Audience</h3>
         <StyledRowFlexParent>
           <StyledRowFlexItem />
-          <StyledRowFlexItem>$/Response</StyledRowFlexItem>
-          <StyledRowFlexItem>Size</StyledRowFlexItem>
-          <StyledRowFlexItem>Price</StyledRowFlexItem>
+          <StyledRowFlexItem>
+            <SmallHelperText>$/Response</SmallHelperText>
+          </StyledRowFlexItem>
+          <StyledRowFlexItem>
+            <SmallHelperText>Size</SmallHelperText>
+          </StyledRowFlexItem>
+          <StyledRowFlexItem>
+            <SmallHelperText>Price</SmallHelperText>
+          </StyledRowFlexItem>
         </StyledRowFlexParent>
         {this.state.options.map(option => {
           const { label, id, selected, hasInput } = option
@@ -105,7 +112,9 @@ class AudienceSettings extends React.Component {
                   </div>
                 }
               />
-              <StyledRowFlexItem>–</StyledRowFlexItem>
+              <StyledRowFlexItem>
+                <DisplayText color={v.colors.commonMedium}>–</DisplayText>
+              </StyledRowFlexItem>
               <StyledRowFlexItem>
                 {hasInput ? (
                   <EditableInput
@@ -118,10 +127,12 @@ class AudienceSettings extends React.Component {
                     onBlur={this.stopEditingIfContent}
                   />
                 ) : (
-                  '–'
+                  <DisplayText color={v.colors.commonMedium}>–</DisplayText>
                 )}
               </StyledRowFlexItem>
-              <StyledRowFlexItem>–</StyledRowFlexItem>
+              <StyledRowFlexItem>
+                <DisplayText color={v.colors.commonMedium}>–</DisplayText>
+              </StyledRowFlexItem>
             </StyledRowFlexParent>
           )
         })}
