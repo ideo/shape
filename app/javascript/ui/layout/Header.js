@@ -311,7 +311,7 @@ class Header extends React.Component {
                           maxDepth={isLargeBreakpoint ? null : 1}
                           backButton={!isLargeBreakpoint}
                           record={record}
-                          isHomepage={routingStore.isHomepage}
+                          isHomepage={uiStore.isViewingHomepage}
                           // re-mount every time the record / breadcrumb changes
                           key={`${record.identifier}_${record.breadcrumbSize}`}
                           // force props update if windowWidth changes

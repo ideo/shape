@@ -561,6 +561,13 @@ export default class UiStore {
     this.viewingItem = item
   }
 
+  get isViewingHomepage() {
+    return (
+      this.viewingCollection &&
+      this.viewingCollection.class_type === 'Collection::UserCollection'
+    )
+  }
+
   get viewingRecord() {
     // only one should be present at a time depending on what page you're on
     return this.viewingCollection || this.viewingItem

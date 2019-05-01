@@ -35,9 +35,6 @@ class ApiStore extends jsonapi(datxCollection) {
   currentUserOrganizationId = null
 
   @observable
-  switchingOrgs = false
-
-  @observable
   currentCommentThreadIds = []
 
   @observable
@@ -163,6 +160,15 @@ class ApiStore extends jsonapi(datxCollection) {
       this.update('sessionLoaded', true)
     } catch (e) {
       trackError(e, { source: 'loadCurrentUser', name: 'fetchUser' })
+    }
+  }
+
+  checkCurrentOrg({ id = '', slug = '' } = {}) {
+    const doesNotMatch =
+      (id && this.currentUserOrganizationId !== id) ||
+      (slug && this.currentOrgSlug !== slug)
+    if (doesNotMatch) {
+      this.loadCurrentUser()
     }
   }
 

@@ -13,7 +13,6 @@ import Header from '~/ui/layout/Header'
 import CreateOrgPage from '~/ui/pages/CreateOrgPage'
 import {
   CollectionApiWrapper,
-  MyCollectionApiWrapper,
   ItemApiWrapper,
 } from '~/ui/pages/PageWithApiWrapper'
 import Loader from '~/ui/layout/Loader'
@@ -282,7 +281,7 @@ class Routes extends React.Component {
               <Route
                 exact
                 path="/:org"
-                render={props => <MyCollectionApiWrapper {...props} />}
+                render={props => <CollectionApiWrapper {...props} />}
               />
             </Switch>
           </MuiThemeProvider>

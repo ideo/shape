@@ -653,16 +653,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     }
   }
 
-  checkCurrentOrg() {
-    const { currentUser } = this.apiStore
-    if (!currentUser) return
-    if (
-      this.organization_id.toString() !== currentUser.current_organization.id
-    ) {
-      currentUser.switchOrganization(this.organization_id)
-    }
-  }
-
   checkLaunchability() {
     if (!this.can_edit_content || !this.launchable) {
       // TODO: More specific messaging around why e.g. if this is a submission template...

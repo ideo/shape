@@ -93,17 +93,15 @@ class CollectionPage extends React.Component {
       undoStore,
     } = this.props
 
-    if (
-      !apiStore.currentUser &&
-      collection.anyone_can_join &&
-      !collection.anyone_can_view
-    ) {
+    if (!apiStore.currentUser && !collection.anyone_can_view) {
       // in this case, if you're not logged in, we require you to login
       // NOTE: the user will see a brief flash of the content before redirect
       window.location.href = `/login?redirect=${encodeURI(
         collection.frontend_url
       )}`
     }
+
+    apiStore.checkCurrentOrg({ id: collection.organization_id })
 
     this.subscribeToChannel(collection.id)
 
@@ -128,7 +126,6 @@ class CollectionPage extends React.Component {
     if (undoStore.undoAfterRoute) {
       undoStore.performUndoAfterRoute()
     }
-    collection.checkCurrentOrg()
     if (collection.isNormalCollection) {
       if (apiStore.currentUser) {
         const thread = await apiStore.findOrBuildCommentThread(collection)
