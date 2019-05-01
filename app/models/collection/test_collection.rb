@@ -10,6 +10,7 @@ class Collection
              source: :item,
              class_name: 'Item::QuestionItem',
              through: :primary_collection_cards
+    has_many :test_audiences, dependent: :destroy
     belongs_to :collection_to_test, class_name: 'Collection', optional: true
 
     before_create :setup_default_status_and_questions, unless: :cloned_from_present?
