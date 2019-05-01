@@ -92,6 +92,19 @@ class CollectionPage extends React.Component {
       routingStore,
       undoStore,
     } = this.props
+
+    if (
+      !apiStore.currentUser &&
+      collection.anyone_can_join &&
+      !collection.anyone_can_view
+    ) {
+      // in this case, if you're not logged in, we require you to login
+      // NOTE: the user will see a brief flash of the content before redirect
+      window.location.href = `/login?redirect=${encodeURI(
+        collection.frontend_url
+      )}`
+    }
+
     this.subscribeToChannel(collection.id)
 
     // setViewingCollection has to happen first bc we use it in openBlankContentTool
