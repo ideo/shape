@@ -2,7 +2,7 @@ import React from 'react'
 // import { PropTypes } from 'prop-types'
 import styled from 'styled-components'
 import AutosizeInput from 'react-input-autosize'
-import { Checkbox, LabelContainer } from '~/ui/global/styled/forms'
+import { Checkbox, LabelContainer, FormButton } from '~/ui/global/styled/forms'
 import { SmallHelperText, DisplayText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 
@@ -137,6 +137,17 @@ class AudienceSettings extends React.Component {
             </StyledRowFlexParent>
           )
         })}
+        <StyledRowFlexParent>
+          <StyledRowFlexItem />
+          <StyledRowFlexCell />
+          <StyledRowFlexCell>Total</StyledRowFlexCell>
+          <StyledRowFlexCell>$value</StyledRowFlexCell>
+        </StyledRowFlexParent>
+        <StyledRowFlexParent style={{ marginTop: '30px' }}>
+          <StyledRowFlexItem />
+          <StyledRowFlexCell />
+          <FormButton>Get Feedback</FormButton>
+        </StyledRowFlexParent>
       </AudienceSettingsWrapper>
     )
   }
@@ -189,7 +200,6 @@ const EditableInput = styled(AutosizeInput)`
     border: 0;
     padding: 2px 3px;
     margin: -1px 0px -1px 0px;
-    font-size: 16px;
     font-family: ${v.fonts.sans};
     font-size: 1rem;
     color: ${v.colors.black};
