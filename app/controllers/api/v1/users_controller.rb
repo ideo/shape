@@ -68,7 +68,7 @@ class Api::V1::UsersController < Api::V1::BaseController
     if creator.call
       render jsonapi: creator.limited_user
     else
-      render_api_errors creator.errors
+      render json: { errors: creator.errors }, status: :unprocessable_entity
     end
   end
 

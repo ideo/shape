@@ -34,9 +34,11 @@ class RecontactQuestion extends React.Component {
     let user
     try {
       const res = await apiStore.createLimitedUser(contactInfo)
+      if (!res) throw { errors: ['Contact information invalid'] }
       user = res.data
     } catch (err) {
-      uiStore.alert(err.error[0])
+      uiStore.alert(err.errors[0])
+      return
     }
     apiStore.setCurrentUserInfo({
       id: user.id,
@@ -62,6 +64,7 @@ class RecontactQuestion extends React.Component {
     const { onAnswer } = this.props
     ev.preventDefault()
     const user = await this.createAndSetCurrentUser(this.state.contactInfo)
+    if (!user) return
     user.API_updateCurrentUser({
       feedback_contact_preference: FEEDBACK_CONTACT_YES,
     })
@@ -78,13 +81,13 @@ class RecontactQuestion extends React.Component {
         </QuestionText>
         <EmojiHolder>
           <EmojiButton
-            selected={showContactInfo}
+            selected={false}
             onClick={this.handleClick(FEEDBACK_CONTACT_NO)}
           >
             <Emoji name="Finished" symbol="👎" />
           </EmojiButton>
           <EmojiButton
-            selected={!showContactInfo}
+            selected={showContactInfo}
             onClick={this.handleClick(FEEDBACK_CONTACT_YES)}
           >
             <Emoji name="Yes" symbol="👍" />
