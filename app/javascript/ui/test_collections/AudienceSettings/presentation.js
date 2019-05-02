@@ -15,105 +15,146 @@ const AudienceSettings = ({
 }) => (
   <AudienceSettingsWrapper>
     <h3 style={{ marginBottom: '0px' }}>Audience</h3>
-    <StyledRowFlexParent>
-      <StyledRowFlexItem />
-      <StyledRowFlexHeader>
-        <SmallHelperText>$/Response</SmallHelperText>
-      </StyledRowFlexHeader>
-      <StyledRowFlexHeader>
-        <SmallHelperText>Size</SmallHelperText>
-      </StyledRowFlexHeader>
-      <StyledRowFlexHeader>
-        <SmallHelperText>Price</SmallHelperText>
-      </StyledRowFlexHeader>
-    </StyledRowFlexParent>
-    {options.map(option => {
-      const { label, id, selected, hasInput, pricePerResponse, size } = option
-      return (
-        <StyledRowFlexParent>
-          <StyledRowFlexItem>
-            <LabelContainer
-              classes={{ label: 'form-control' }}
-              labelPlacement={'end'}
-              control={
-                <Checkbox
-                  checked={selected}
-                  onChange={toggleCheckbox}
-                  value={id}
-                  color={'default'}
-                  iconStyle={{ fill: 'black' }}
-                />
-              }
-              label={
-                <div style={{ maxWidth: '582px', paddingTop: '15px' }}>
-                  <StyledLabel>{label}</StyledLabel>
-                </div>
-              }
-            />
-          </StyledRowFlexItem>
-          <StyledRowFlexCell>
-            <DisplayText color={v.colors.commonMedium}>
-              {pricePerResponse ? pricePerResponse : '–'}
-            </DisplayText>
-          </StyledRowFlexCell>
-          <StyledRowFlexCell>
-            {hasInput ? (
-              <EditableInput
-                id={option.id}
-                type="text"
-                placeholder="–"
-                value={option.size}
-                onChange={handleInputChange}
-                onKeyPress={handleKeyPress}
-                onBlur={stopEditingIfContent}
-              />
-            ) : (
-              <DisplayText color={v.colors.commonMedium}>–</DisplayText>
-            )}
-          </StyledRowFlexCell>
-          <StyledRowFlexCell>
-            <DisplayText color={v.colors.commonMedium}>
-              {size > 0 ? _.round(pricePerResponse * size, 2) : '–'}
-            </DisplayText>
-          </StyledRowFlexCell>
-        </StyledRowFlexParent>
-      )
-    })}
-    <StyledRowFlexParent>
-      <StyledRowFlexItem />
-      <StyledRowFlexCell />
-      <StyledRowFlexCell>Total</StyledRowFlexCell>
-      <StyledRowFlexCell>{totalPrice}</StyledRowFlexCell>
-    </StyledRowFlexParent>
-    <StyledRowFlexParent style={{ marginTop: '30px' }}>
-      <StyledRowFlexItem />
-      <StyledRowFlexCell />
-      <FormButton>Get Feedback</FormButton>
-    </StyledRowFlexParent>
+    <div style={{ display: 'flex', flowDirection: 'column' }}>
+      <div
+        style={{
+          display: 'flex',
+          flowDirection: 'column',
+          justifyContent: 'flex-start',
+          flexWrap: 'wrap',
+        }}
+      >
+        {options.map(option => {
+          const {
+            label,
+            id,
+            selected,
+            hasInput,
+            pricePerResponse,
+            size,
+          } = option
+          return (
+            <StyledColumnFlexParent>
+              <StyledRowFlexParent>
+                <StyledRowFlexItem>
+                  <LabelContainer
+                    classes={{ label: 'form-control' }}
+                    labelPlacement={'end'}
+                    control={
+                      <Checkbox
+                        checked={selected}
+                        onChange={toggleCheckbox}
+                        value={id}
+                        color={'default'}
+                        iconStyle={{ fill: 'black' }}
+                      />
+                    }
+                    label={
+                      <div style={{ maxWidth: '582px', paddingTop: '15px' }}>
+                        <StyledLabel>{label}</StyledLabel>
+                      </div>
+                    }
+                  />
+                </StyledRowFlexItem>
+              </StyledRowFlexParent>
+
+              <StyledRowFlexParent>
+                <StyledRowFlexHeader>
+                  <SmallHelperText>$/Response</SmallHelperText>
+                </StyledRowFlexHeader>
+                <StyledRowFlexHeader>
+                  <SmallHelperText>Size</SmallHelperText>
+                </StyledRowFlexHeader>
+                <StyledRowFlexHeader>
+                  <SmallHelperText>Price</SmallHelperText>
+                </StyledRowFlexHeader>
+              </StyledRowFlexParent>
+
+              <StyledRowFlexParent>
+                <StyledRowFlexCell>
+                  <DisplayText color={v.colors.commonMedium}>
+                    {pricePerResponse ? pricePerResponse : '–'}
+                  </DisplayText>
+                </StyledRowFlexCell>
+                <StyledRowFlexCell>
+                  {hasInput ? (
+                    <EditableInput
+                      id={option.id}
+                      type="text"
+                      placeholder="–"
+                      value={option.size}
+                      onChange={handleInputChange}
+                      onKeyPress={handleKeyPress}
+                      onBlur={stopEditingIfContent}
+                    />
+                  ) : (
+                    <DisplayText color={v.colors.commonMedium}>–</DisplayText>
+                  )}
+                </StyledRowFlexCell>
+                <StyledRowFlexCell>
+                  <DisplayText color={v.colors.commonMedium}>
+                    {size > 0 ? _.round(pricePerResponse * size, 2) : '–'}
+                  </DisplayText>
+                </StyledRowFlexCell>
+              </StyledRowFlexParent>
+            </StyledColumnFlexParent>
+          )
+        })}
+
+        <StyledColumnFlexParent>
+          <StyledRowFlexParent style={{ marginTop: '15px' }}>
+            <StyledRowFlexCell />
+            <StyledRowFlexCell>Total</StyledRowFlexCell>
+            <StyledRowFlexCell>{totalPrice}</StyledRowFlexCell>
+          </StyledRowFlexParent>
+          <StyledRowFlexParent
+            style={{ marginTop: '30px', marginBottom: '30px' }}
+          >
+            <FormButton>Get Feedback</FormButton>
+          </StyledRowFlexParent>
+        </StyledColumnFlexParent>
+      </div>
+    </div>
   </AudienceSettingsWrapper>
 )
 
 const AudienceSettingsWrapper = styled.div`
   width: 100%;
   max-width: 500px;
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    max-width: 350px;
+  }
+`
+
+const StyledColumnFlexParent = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex-wrap: wrap;
 `
 
 const StyledRowFlexParent = styled.div`
   display: flex;
   flex-direction: row;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   justify-content: space-between;
 `
 
 // flex-grow, flex-shrink and flex-basis combined
 const StyledRowFlexItem = styled.div`
   width: 250px;
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    /* width: 100px; */
+  }
 `
 
 const StyledRowFlexCell = styled(StyledRowFlexItem)`
   width: 70px;
   padding-top: 10px;
   text-align: center;
+  only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    width: 30px;
+  }
 `
 
 const StyledRowFlexHeader = styled(StyledRowFlexCell)`
