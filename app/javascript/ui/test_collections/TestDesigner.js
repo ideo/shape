@@ -15,7 +15,7 @@ import TestQuestion from '~/ui/test_collections/TestQuestion'
 import RadioControl from '~/ui/global/RadioControl'
 import trackError from '~/utils/trackError'
 import { apiStore } from '~/stores'
-import AudienceSettings from '~/ui/test_collections/AudienceSettings'
+import AudienceSettings from '~/ui/test_collections/AudienceSettings/index.js'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 
