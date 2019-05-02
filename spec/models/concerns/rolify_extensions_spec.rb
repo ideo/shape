@@ -1,14 +1,10 @@
 require 'rails_helper'
 
 describe RolifyExtensions, type: :concern do
-  let(:organization) { create(:organization) }
+  let!(:organization) { create(:organization, member: user) }
   let(:collection) { create(:collection, organization: organization) }
   let(:user) { create(:user) }
   let(:group) { create(:group, organization: organization) }
-
-  before do
-    organization.setup_user_membership(user)
-  end
 
   it 'should have concern included' do
     expect(User.ancestors).to include(RolifyExtensions)
@@ -35,7 +31,7 @@ describe RolifyExtensions, type: :concern do
     end
   end
 
-  describe '#has_role_by_identifier?' do
+  describe '#has_role_by_identifier?', only: true do
     let(:has_editor_role) do
       user.has_role_by_identifier?(Role::EDITOR, collection.roles_anchor_resource_identifier)
     end
@@ -43,13 +39,15 @@ describe RolifyExtensions, type: :concern do
       user.has_role_by_identifier?(Role::VIEWER, collection.roles_anchor_resource_identifier)
     end
 
-    it 'returns true if user has role' do
-      user.add_role(Role::EDITOR, collection)
-      expect(has_editor_role).to be true
-    end
+    context 'with user roles' do
+      it 'returns true if user has role' do
+        user.add_role(Role::EDITOR, collection)
+        expect(has_editor_role).to be true
+      end
 
-    it 'returns false if user does not have role' do
-      expect(has_editor_role).to be false
+      it 'returns false if user does not have role' do
+        expect(has_editor_role).to be false
+      end
     end
 
     context 'with group' do

@@ -465,6 +465,7 @@ describe User, type: :model do
       let!(:other_org) { create(:organization_without_groups) }
 
       it 'returns nil' do
+        # can't switch to the org
         expect(user.switch_to_organization(other_org)).to be_nil
       end
     end

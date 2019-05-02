@@ -340,6 +340,10 @@ describe Organization, type: :model do
     let(:application) { create(:application) }
     let(:user) { application.user }
     let(:organization) { create(:organization) }
+    let!(:application_collection) do
+      # must have an ApplicationCollection to successfully switch to the org
+      Collection::ApplicationCollection.find_or_create_for_bot_user(user, organization)
+    end
 
     it 'should add bot user to the organization' do
       expect(user.has_role?(Role::APPLICATION_USER, organization)).to be false
@@ -356,12 +360,10 @@ describe Organization, type: :model do
 
   describe '#remove_user_membership' do
     let(:organization) { create(:organization) }
-    let(:other_org) { create(:organization) }
+    let!(:other_org) { create(:organization, member: user) }
     let(:user) { create(:user) }
 
     before do
-      user.add_role(Role::MEMBER, other_org.primary_group)
-      other_org.setup_user_membership(user)
       # NOTE: because this call is mocked, we are not *actually* removing them from the org
       allow(Roles::RemoveUserRolesFromOrganization).to receive(:call).and_return(true)
     end
