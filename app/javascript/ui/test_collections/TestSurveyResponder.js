@@ -6,6 +6,7 @@ import FlipMove from 'react-flip-move'
 import { Element as ScrollElement, scroller } from 'react-scroll'
 import { ThemeProvider } from 'styled-components'
 
+import { apiStore } from '~/stores'
 import {
   TestQuestionHolder,
   styledTestTheme,
@@ -20,9 +21,30 @@ const UNANSWERABLE_QUESTION_TYPES = [
 
 @observer
 class TestSurveyResponder extends React.Component {
+  allCards = []
+  constructor(props) {
+    super(props)
+    const { collection } = props
+    const questions = [...collection.question_cards]
+    // TODO: re-enable, but only for standalone tests
+    // const { currentUser } = apiStore
+    // if (currentUser) {
+    //   questions.splice(questions.length - 1, 0, {
+    //     id: 'recontact',
+    //     card_question_type: 'question_recontact',
+    //     record: { id: 'facsda', content: '' },
+    //   })
+    // }
+    this.allCards = questions
+  }
+
   questionAnswerForCard = card => {
     const { surveyResponse } = this.props
     if (!surveyResponse) return undefined
+    if (card.card_question_type === 'question_recontact') {
+      const { currentUser } = apiStore
+      return currentUser.feedback_contact_preference !== 0
+    }
     return _.find(surveyResponse.question_answers, {
       question_id: card.record.id,
     })
@@ -32,11 +54,10 @@ class TestSurveyResponder extends React.Component {
     UNANSWERABLE_QUESTION_TYPES.indexOf(card.card_question_type) === -1
 
   viewableCards = () => {
-    const { collection } = this.props
     let reachedLastVisibleCard = false
-    return collection.question_cards.filter(card => {
+    const questions = this.allCards.filter(card => {
       // turn off the card's actionmenu (dot-dot-dot)
-      card.record.disableMenu()
+      card.id !== 'recontact' && card.record.disableMenu()
       if (reachedLastVisibleCard) {
         return false
       } else if (
@@ -49,6 +70,7 @@ class TestSurveyResponder extends React.Component {
       reachedLastVisibleCard = true
       return true
     })
+    return questions
   }
 
   afterQuestionAnswered = card => {
@@ -56,9 +78,9 @@ class TestSurveyResponder extends React.Component {
   }
 
   scrollToTopOfNextCard = card => {
-    const { collection, containerId } = this.props
-    const index = collection.question_cards.indexOf(card)
-    const nextCard = collection.question_cards[index + 1]
+    const { containerId } = this.props
+    const index = this.allCards.indexOf(card)
+    const nextCard = this.allCards[index + 1]
     if (!nextCard) return
     scroller.scrollTo(`card-${nextCard.id}`, {
       duration: 400,

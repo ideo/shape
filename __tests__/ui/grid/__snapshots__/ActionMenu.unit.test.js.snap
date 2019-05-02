@@ -39,8 +39,8 @@ exports[`ActionMenu as editor renders snapshot 1`] = `
         "onClick": [Function],
       },
       Object {
-        "iconRight": <PermissionsIcon />,
-        "name": "Permissions",
+        "iconRight": <SharingIcon />,
+        "name": "Sharing",
         "onClick": [Function],
       },
       Object {

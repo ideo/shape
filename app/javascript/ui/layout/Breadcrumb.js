@@ -7,8 +7,9 @@ import { Link } from 'react-router-dom'
 
 import { apiStore, routingStore } from '~/stores'
 import v from '~/utils/variables'
-import BreadcrumbItem from './BreadcrumbItem'
-import ArrowIcon from '../icons/ArrowIcon'
+import Tooltip from '~/ui/global/Tooltip'
+import ArrowIcon from '~/ui/icons/ArrowIcon'
+import BreadcrumbItem from '~/ui/layout/BreadcrumbItem'
 
 const BreadcrumbPadding = styled.div`
   height: 1.7rem;
@@ -28,8 +29,12 @@ const StyledBreadcrumbWrapper = styled.div`
 `
 StyledBreadcrumbWrapper.displayName = 'StyledBreadcrumbWrapper'
 
-const IconContainer = styled.span`
+const BackIconContainer = styled.span`
   color: ${v.colors.black};
+  transition: ${v.transition};
+  &:hover {
+    color: ${v.colors.primaryDarkest};
+  }
   display: inline-block;
   height: 18px;
   margin-right: 8px;
@@ -173,9 +178,11 @@ class Breadcrumb extends React.Component {
     }
     return (
       <Link to={path}>
-        <IconContainer>
-          <ArrowIcon />
-        </IconContainer>
+        <Tooltip title={item.name}>
+          <BackIconContainer>
+            <ArrowIcon />
+          </BackIconContainer>
+        </Tooltip>
       </Link>
     )
   }

@@ -50,8 +50,6 @@ export const KEYS = {
 
 export default {
   headerHeight: 60,
-  // this is the margin to separate the page title from its content
-  pageContentMarginTop: 50,
   maxWidth: 1320,
   containerPadding: {
     horizontal: 2,
@@ -71,6 +69,7 @@ export default {
     muiSmBreakpoint: 960,
   },
 
+  transition: 'all 0.2s',
   transitionWithDelay: 'all 0.3s 0.2s',
 
   navOpacity: 0.9,

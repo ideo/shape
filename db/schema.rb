@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190422230949) do
+ActiveRecord::Schema.define(version: 20190424210415) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -104,15 +104,6 @@ ActiveRecord::Schema.define(version: 20190422230949) do
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
     t.index ["templated_from_id"], name: "index_collection_cards_on_templated_from_id"
     t.index ["type"], name: "index_collection_cards_on_type"
-  end
-
-  create_table "collection_cover_items", force: :cascade do |t|
-    t.bigint "collection_id"
-    t.bigint "item_id"
-    t.integer "order"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["collection_id", "item_id"], name: "index_collection_cover_items_on_collection_id_and_item_id", unique: true
   end
 
   create_table "collections", force: :cascade do |t|
@@ -415,6 +406,7 @@ ActiveRecord::Schema.define(version: 20190422230949) do
     t.boolean "mailing_list", default: false
     t.datetime "last_active_at"
     t.string "phone"
+    t.integer "feedback_contact_preference", default: 0
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"
