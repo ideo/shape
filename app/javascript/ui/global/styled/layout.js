@@ -65,7 +65,7 @@ InlineRow.displayName = 'StyledInlineRow'
 export const StyledHeader = styled.header`
   box-sizing: border-box;
   width: 100%;
-  padding: 0 ${v.containerPadding.horizontal}rem 1rem;
+  padding: 0 ${v.containerPadding.horizontal}rem 1.875rem;
   position: relative; /* necessary to get above the FixedBoundary */
   @media print {
     display: none;
@@ -78,6 +78,7 @@ export const FixedHeader = styled(StyledHeader)`
   z-index: ${v.zIndex.globalHeader};
   position: fixed;
   top: 0;
+  margin-top: 4px;
   background: ${hexToRgba(v.colors.commonLight, 0.96)};
   @supports (
     (-webkit-backdrop-filter: blur(4px)) or (backdrop-filter: blur(4px))
