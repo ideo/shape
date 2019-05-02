@@ -7,9 +7,9 @@ GIT
 
 GIT
   remote: https://github.com/ideo/network-api-ruby.git
-  revision: fa2ca070e29c595fea4463287889f7a6d128ed5b
+  revision: 5f0363bd4e45dae47493156c85351911aa357b57
   specs:
-    network-api-ruby (0.0.11)
+    network-api-ruby (0.0.13)
       json_api_client (~> 1.5, >= 1.5.3)
 
 GIT
@@ -103,7 +103,7 @@ GEM
     childprocess (0.9.0)
       ffi (~> 1.0, >= 1.0.11)
     coderay (1.1.2)
-    concurrent-ruby (1.1.4)
+    concurrent-ruby (1.1.5)
     connection_pool (2.2.1)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
@@ -225,7 +225,7 @@ GEM
     highline (1.7.10)
     httparty (0.16.1)
       multi_xml (>= 0.5.2)
-    i18n (1.5.3)
+    i18n (1.6.0)
       concurrent-ruby (~> 1.0)
     jbuilder (2.7.0)
       activesupport (>= 4.2.0)
@@ -583,7 +583,7 @@ DEPENDENCIES
   webpacker (>= 4.0.x)
 
 RUBY VERSION
-   ruby 2.4.3p205
+   ruby 2.5.5p157
 
 BUNDLED WITH
-   1.16.5
+   1.16.6

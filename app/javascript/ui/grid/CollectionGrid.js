@@ -9,11 +9,10 @@ import CollectionSort from '~/ui/grid/CollectionSort'
 import Loader from '~/ui/layout/Loader'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
-
-const CARD_HOLD_TIME = 0.4 * 1000
+import { objectsEqual } from '~/utils/objectUtils'
+import v from '~/utils/variables'
 
 const StyledGrid = styled.div`
-  margin-top: 50px;
   min-height: ${props => props.minHeight}px;
   position: relative;
   width: 100%;
@@ -50,6 +49,20 @@ const groupByConsecutive = (array, value) => {
   return groups
 }
 
+const pageMargins = () => {
+  let xMargin
+  if (window.innerWidth >= v.maxWidth) {
+    xMargin = (window.innerWidth - v.maxWidth) / 2
+  } else {
+    // Otherwise use container padding, multiplied to transform to px
+    xMargin = v.containerPadding.horizontal * 16
+  }
+  return {
+    x: xMargin,
+    y: v.topScrollTrigger,
+  }
+}
+
 // needs to be an observer to observe changes to the collection + items
 @inject('apiStore', 'routingStore', 'uiStore')
 @observer
@@ -59,7 +72,7 @@ class CollectionGrid extends React.Component {
     this.state = {
       cards: [],
       rows: 1,
-      hoveringOver: null,
+      hoveringOver: false,
       dragTimeoutId: null,
       matrix: [],
     }
@@ -69,10 +82,22 @@ class CollectionGrid extends React.Component {
     this.initialize(this.props)
   }
 
-  componentWillReceiveProps(nextProps) {
-    // TODO: refactor this into componentDidUpdate
-    // and only re-initialize under the right conditions (of props changing)
-    this.initialize(nextProps)
+  componentDidUpdate(prevProps) {
+    const fields = [
+      'cols',
+      'gridH',
+      'gridW',
+      'blankContentToolState',
+      'cardProperties',
+      'movingCardIds',
+      'cardsFetched',
+      'submissionSettings',
+    ]
+    const prevPlucked = _.pick(prevProps, fields)
+    const plucked = _.pick(this.props, fields)
+    if (!objectsEqual(prevPlucked, plucked)) {
+      this.initialize(this.props)
+    }
   }
 
   componentWillUnmount() {
@@ -195,7 +220,7 @@ class CollectionGrid extends React.Component {
   positionCardsFromProps = () => {
     const { uiStore } = this.props
     uiStore.update('multiMoveCardIds', [])
-    this.setState({ hoveringOver: null }, () => {
+    this.setState({ hoveringOver: false }, () => {
       this.positionCards(this.props.collection.collection_cards)
     })
   }
@@ -222,10 +247,10 @@ class CollectionGrid extends React.Component {
       // we want to update this card to match the placeholder
       const { order } = placeholder
       let { width, height } = placeholder
-      const updates = { order }
       let undoMessage = 'Card move undone'
-      let updateCollectionCard
-      const onCancel = () => this.positionCardsFromProps()
+      const updates = []
+      const { trackCollectionUpdated } = this.props
+
       // don't resize the card for a drag, only for an actual resize
       if (dragType === 'resize') {
         // just some double-checking validations
@@ -235,33 +260,43 @@ class CollectionGrid extends React.Component {
         if (original.height !== height || original.width !== width) {
           undoMessage = 'Card resize undone'
         }
-        updates.width = width
-        updates.height = height
-
-        // If a template, warn that any instances will be updated
-        updateCollectionCard = () => {
-          // this will assign the update attributes to the card
-          this.props.updateCollection({
-            card: original,
-            updates,
-            undoMessage,
-          })
-          this.positionCardsFromProps()
-        }
+        updates.push({
+          card: original,
+          order,
+          width,
+          height,
+        })
       }
-      // TODO add same template confirmation for multi-item moving
       if (uiStore.multiMoveCardIds.length > 0) {
-        updateCollectionCard = () => {
-          this.props.batchUpdateCollection({
-            cards: multiMoveCards,
-            updates,
-            undoMessage,
+        // Set order for moved cards so they are between whole integers,
+        // and the backend will then take care of setting
+        // it properly amongst the entire collection
+        const sortedCards = _.sortBy(multiMoveCards, 'order')
+        _.each(sortedCards, (card, idx) => {
+          const sortedOrder = order + (idx + 1) * 0.1
+          updates.push({
+            card,
+            order: sortedOrder,
           })
-          this.positionCardsFromProps()
-        }
+        })
       }
 
-      collection.confirmEdit({ onCancel, onConfirm: updateCollectionCard })
+      const onConfirm = () => {
+        trackCollectionUpdated()
+      }
+      const onCancel = () => this.positionCardsFromProps()
+
+      // Perform batch update on all cards,
+      // and show confirmation if this is a template
+      collection.API_batchUpdateCardsWithUndo({
+        updates,
+        updateAllCards: true,
+        undoMessage,
+        onConfirm,
+        onCancel,
+      })
+      // this should happen right away, not waiting for the API call (since locally we have the updated cards' positions)
+      this.positionCardsFromProps()
     } else if (hoveringOver && hoveringOver.direction === 'right') {
       // the case where we hovered in the drop zone of a collection and now want to move cards + reroute
       const hoveringRecord = hoveringOver.card.record
@@ -269,7 +304,7 @@ class CollectionGrid extends React.Component {
         cardAction: 'moveWithinCollection',
       })
       if (hoveringRecord.internalType === 'collections') {
-        this.setState({ hoveringOver: null }, () => {
+        this.setState({ hoveringOver: false }, () => {
           this.moveCardsIntoCollection(uiStore.multiMoveCardIds, hoveringRecord)
         })
       }
@@ -291,50 +326,11 @@ class CollectionGrid extends React.Component {
   }
 
   async moveCardsIntoCollection(cardIds, hoveringRecord) {
-    const { collection, uiStore, apiStore } = this.props
-    const can_edit = hoveringRecord.can_edit_content || hoveringRecord.can_edit
-    uiStore.update('movingIntoCollection', hoveringRecord)
-    if (!can_edit) {
-      uiStore.confirm({
-        prompt:
-          'You only have view access to this collection. Would you like to keep moving the cards?',
-        confirmText: 'Continue',
-        iconName: 'Alert',
-        onConfirm: () => {
-          this.cancelDrag()
-          uiStore.reselectCardIds(cardIds)
-          uiStore.openMoveMenu({
-            from: collection.id,
-            cardAction: 'move',
-          })
-        },
-        onCancel: () => {
-          this.cancelDrag()
-        },
-      })
-      return
-    }
-    this.setState({ hoveringOver: null }, async () => {
-      const data = {
-        to_id: hoveringRecord.id.toString(),
-        from_id: collection.id.toString(),
-        collection_card_ids: cardIds,
-        placement: 'beginning',
-      }
-      await apiStore.moveCards(data)
-      const afterMove = () => {
-        uiStore.setMovingCards([])
-        uiStore.update('multiMoveCardIds', [])
-        uiStore.reselectCardIds(cardIds)
-        uiStore.update('movingIntoCollection', null)
-      }
-      if (data.to_id === data.from_id) {
-        afterMove()
-      } else {
-        uiStore.update('movingIntoCollection', hoveringRecord)
-        uiStore.update('actionAfterRoute', afterMove)
-        this.props.routingStore.routeTo('collections', hoveringRecord.id)
-      }
+    this.props.collection.API_moveCardsIntoCollection({
+      toCollection: hoveringRecord,
+      cardIds,
+      onCancel: () => this.positionCardsFromProps(),
+      onSuccess: () => this.setState({ hoveringOver: false }),
     })
   }
 
@@ -378,9 +374,8 @@ class CollectionGrid extends React.Component {
       ) {
         const dragTimeoutId = setTimeout(() => {
           hoveringOver.holdingOver = true
-          this.setHoveringOverProperties(hoveringOver.card, hoveringOver)
           this.setState({ hoveringOver })
-        }, CARD_HOLD_TIME)
+        }, v.cardHoldTime)
         this.setState({ dragTimeoutId })
       }
 
@@ -426,10 +421,6 @@ class CollectionGrid extends React.Component {
     const placeholder = new CollectionCard(data, this.props.apiStore)
     updateModelId(placeholder, placeholderKey)
     return placeholder
-  }
-
-  removePlaceholderCard = cards => {
-    _.reject(cards, { cardType: 'placeholder' })
   }
 
   findOverlap = (cardId, dragPosition) => {
@@ -519,19 +510,6 @@ class CollectionGrid extends React.Component {
     return null
   }
 
-  setHoveringOverProperties = (card, hoveringOver) => {
-    card.hoveringOver = false
-    card.holdingOver = false
-    if (hoveringOver) {
-      // check if the card is being currently hovered over
-      if (card.id === hoveringOver.card.id) card.hoveringOver = hoveringOver
-      card.holdingOver =
-        card.id === hoveringOver.card.id &&
-        hoveringOver.direction === 'right' &&
-        hoveringOver.holdingOver
-    }
-  }
-
   clearDragTimeout = () => {
     if (this.state.dragTimeoutId) {
       clearTimeout(this.state.dragTimeoutId)
@@ -582,6 +560,7 @@ class CollectionGrid extends React.Component {
     // even though hidden cards are not loaded by default in the API, we still filter here because
     // it's possible that some hidden cards were loaded in memory via the CoverImageSelector
     const cards = [...collectionCards].filter(c => !c.hidden)
+
     // props might get passed in e.g. nextProps for componentWillReceiveProps
     if (!opts.props) opts.props = this.props
     const { collection, gridW, gridH, gutter, cols, addEmptyCard } = opts.props
@@ -728,8 +707,6 @@ class CollectionGrid extends React.Component {
 
           // add position attrs to card
           card.position = position
-          this.setHoveringOverProperties(card, this.state.hoveringOver)
-
           // when we're moving/hovering, placeholders should not take up any space
           const hoverPlaceholder =
             opts.dragType === 'hover' && card.cardType === 'placeholder'
@@ -782,7 +759,14 @@ class CollectionGrid extends React.Component {
 
   renderPositionedCards = () => {
     const grid = []
-    const { collection, canEditCollection, routingStore, uiStore } = this.props
+    const {
+      collection,
+      canEditCollection,
+      routingStore,
+      uiStore,
+      loadCollectionCards,
+    } = this.props
+    const { hoveringOver } = this.state
     let i = 0
     // unnecessary? we seem to need to preserve the array order
     // in order to not re-draw divs (make transform animation work)
@@ -799,6 +783,9 @@ class CollectionGrid extends React.Component {
           cardType = card.record.internalType
         }
       }
+      const isHoveringOver =
+        hoveringOver && hoveringOver.card && hoveringOver.card.id === card.id
+      const isHoldingOver = isHoveringOver && hoveringOver.holdingOver
       const { cardMenuOpen } = uiStore
       if (_.isEmpty(card.position)) return
       const shouldHide = card.isBeingMultiMoved || card.isBeingMoved
@@ -810,16 +797,16 @@ class CollectionGrid extends React.Component {
           canEditCollection={canEditCollection}
           isUserCollection={collection.isUserCollection}
           isSharedCollection={collection.isSharedCollection}
+          isBoardCollection={false}
           position={card.position}
+          dragOffset={pageMargins()}
           record={record}
           onDrag={this.onDrag}
-          hoveringOverLeft={
-            !!card.hoveringOver && card.hoveringOver.direction === 'left'
-          }
+          hoveringOverLeft={isHoveringOver && hoveringOver.direction === 'left'}
           hoveringOverRight={
-            !!card.hoveringOver && card.hoveringOver.direction === 'right'
+            isHoveringOver && hoveringOver.direction === 'right'
           }
-          holdingOver={!!card.holdingOver}
+          holdingOver={isHoldingOver}
           onDragOrResizeStop={this.onDragOrResizeStop}
           onResize={this.onResize}
           onResizeStop={this.onResizeStop}
@@ -829,6 +816,7 @@ class CollectionGrid extends React.Component {
           lastPinnedCard={
             card.isPinnedAndLocked && i === this.state.cards.length - 1
           }
+          loadCollectionCards={loadCollectionCards}
           hidden={shouldHide}
         />
       )
@@ -845,7 +833,7 @@ class CollectionGrid extends React.Component {
     const minHeight = rows * (gridSettings.gridH + gridSettings.gutter)
 
     return (
-      <StyledGrid minHeight={minHeight}>
+      <StyledGrid data-empty-space-click minHeight={minHeight}>
         {sorting && (
           <SortContainer>
             <CollectionSort collection={collection} />
@@ -868,17 +856,18 @@ const gridConfigProps = {
 
 CollectionGrid.propTypes = {
   ...gridConfigProps,
-  updateCollection: PropTypes.func.isRequired,
-  batchUpdateCollection: PropTypes.func.isRequired,
+  trackCollectionUpdated: PropTypes.func.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   blankContentToolState: MobxPropTypes.objectOrObservableObject,
   cardProperties: MobxPropTypes.arrayOrObservableArray.isRequired,
   canEditCollection: PropTypes.bool.isRequired,
   movingCardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
+  loadCollectionCards: PropTypes.func.isRequired,
   addEmptyCard: PropTypes.bool,
   submissionSettings: PropTypes.shape({
     type: PropTypes.string,
     template: MobxPropTypes.objectOrObservableObject,
+    enabled: PropTypes.bool,
   }),
   sorting: PropTypes.bool,
 }

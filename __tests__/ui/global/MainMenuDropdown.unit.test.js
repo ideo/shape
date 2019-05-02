@@ -1,9 +1,9 @@
-import OrganizationDropdown from '~/ui/organizations/OrganizationDropdown'
+import MainMenuDropdown from '~/ui/global/MainMenuDropdown'
 import { fakeOrganization } from '#/mocks/data'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 
-describe('OrganizationDropdown', () => {
+describe('MainMenuDropdown', () => {
   let component, wrapper, props, otherFakeOrg, itemNames
 
   beforeEach(() => {
@@ -31,33 +31,13 @@ describe('OrganizationDropdown', () => {
       'Billing',
       'Legal',
     ]
-    wrapper = shallow(<OrganizationDropdown.wrappedComponent {...props} />)
-    component = wrapper.instance()
     props.uiStore.alert.mockClear()
     props.uiStore.confirm.mockClear()
-  })
-
-  describe('closeOrgMenu', () => {
-    beforeEach(() => {
-      component.closeOrgMenu()
-    })
-
-    it('sets organization page to null', () => {
-      expect(component.organizationPage).toBeFalsy()
-    })
-  })
-
-  describe('openOrgMenu', () => {
-    beforeEach(() => {
-      component.openOrgMenu('organizationPeople')
-    })
-
-    it('sets organization page to passed in page name', () => {
-      expect(props.uiStore.update).toHaveBeenCalledWith(
-        'organizationMenuPage',
-        'organizationPeople'
-      )
-    })
+    render = () => {
+      wrapper = shallow(<MainMenuDropdown.wrappedComponent {...props} />)
+      component = wrapper.instance()
+    }
+    render()
   })
 
   describe('menuItems', () => {
@@ -98,6 +78,91 @@ describe('OrganizationDropdown', () => {
         ).toBeFalsy()
       })
     })
+
+    describe('if displaying the user menu', () => {
+      beforeEach(() => {
+        props.context = 'user'
+        render()
+      })
+
+      it('has a main group', () => {
+        expect(component.menuItems.main).toBeDefined()
+      })
+
+      it('does not have a top group', () => {
+        expect(component.menuItems.top).toBeUndefined()
+      })
+
+      it('has user settings option', () => {
+        const link = component.menuItems.main.find(
+          item => item.name === 'Account Settings'
+        )
+        expect(link).toBeDefined()
+        expect(link.onClick).toBeInstanceOf(Function)
+      })
+
+      it('has notifications option', () => {
+        const link = component.menuItems.main.find(
+          item => item.name === 'Notification Settings'
+        )
+        expect(link).toBeDefined()
+        expect(link.onClick).toBeInstanceOf(Function)
+      })
+
+      it('has logout option', () => {
+        const link = component.menuItems.main.find(
+          item => item.name === 'Logout'
+        )
+        expect(link).toBeDefined()
+        expect(link.onClick).toBeInstanceOf(Function)
+      })
+    })
+
+    describe('if displaying the org menu', () => {
+      beforeEach(() => {
+        props.context = 'org'
+        render()
+      })
+
+      it('has the correct groups', () => {
+        expect(component.menuItems.top).toBeDefined()
+        expect(component.menuItems.organizations).toBeDefined()
+        expect(component.menuItems.bottom).toBeDefined()
+      })
+
+      it('does not have a main group', () => {
+        expect(component.menuItems.main).toBeUndefined()
+      })
+
+      it('has a People & Groups option', () => {
+        const link = component.menuItems.top.find(
+          item => item.name === 'People & Groups'
+        )
+        expect(link).toBeDefined()
+        expect(link.onClick).toBeInstanceOf(Function)
+      })
+
+      it('has a New Organization option', () => {
+        const link = component.menuItems.bottom.find(
+          item => item.name === 'New Organization'
+        )
+        expect(link).toBeDefined()
+        expect(link.onClick).toBeInstanceOf(Function)
+      })
+    })
+  })
+
+  describe('openOrgMenu', () => {
+    beforeEach(() => {
+      component.handleOrgPeople()
+    })
+
+    it('sets organization page to passed in page name', () => {
+      expect(props.uiStore.update).toHaveBeenCalledWith(
+        'organizationMenuPage',
+        'organizationPeople'
+      )
+    })
   })
 
   describe('handleSwitchOrg', () => {
@@ -128,10 +193,6 @@ describe('OrganizationDropdown', () => {
       component.handleZendesk()
     })
 
-    it('should call the on item click handler', () => {
-      expect(props.onItemClick).toHaveBeenCalled()
-    })
-
     it('should activate the Zendesk widget', () => {
       expect(global.zE.activate).toHaveBeenCalledWith({ hideOnClose: true })
     })
@@ -146,10 +207,6 @@ describe('OrganizationDropdown', () => {
       component.handleBilling()
     })
 
-    it('should call the on item click handler', () => {
-      expect(props.onItemClick).toHaveBeenCalled()
-    })
-
     it('should route to the billing page', () => {
       expect(props.routingStore.routeTo).toHaveBeenCalledWith('/billing')
     })
@@ -158,10 +215,6 @@ describe('OrganizationDropdown', () => {
   describe('handleLegal', () => {
     beforeEach(() => {
       component.handleLegal()
-    })
-
-    it('should call the on item click handler', () => {
-      expect(props.onItemClick).toHaveBeenCalled()
     })
 
     it('should route to the terms page', () => {

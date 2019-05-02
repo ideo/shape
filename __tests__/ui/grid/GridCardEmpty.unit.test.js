@@ -1,4 +1,5 @@
 import GridCardEmpty from '~/ui/grid/GridCardEmpty'
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 
@@ -26,6 +27,10 @@ describe('GridCardEmpty', () => {
       wrapper = shallow(<GridCardEmpty.wrappedComponent {...withProps} />)
       component = wrapper.instance()
     }
+  })
+
+  it('renders snapshot', () => {
+    expectTreeToMatchSnapshot(wrapper)
   })
 
   it('renders a hotspot if showHotspot is true', () => {

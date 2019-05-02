@@ -1,6 +1,8 @@
 import AddSubmission from '~/ui/grid/blankContentTool/AddSubmission'
 import Collection from '~/stores/jsonApi/Collection'
 import fakeUiStore from '#/mocks/fakeUiStore'
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
+
 import { fakeCollection, fakeCollectionCard } from '#/mocks/data'
 
 jest.mock('../../../../app/javascript/stores/index')
@@ -19,9 +21,14 @@ describe('GridCardBlank', () => {
       submissionSettings: {
         type: 'text',
         template: fakeCollection,
+        enabled: true,
       },
     }
     wrapper = shallow(<AddSubmission.wrappedComponent {...props} />)
+  })
+
+  it('renders snapshot', () => {
+    expectTreeToMatchSnapshot(wrapper)
   })
 
   describe('render()', () => {
@@ -47,6 +54,23 @@ describe('GridCardBlank', () => {
         props.parent_id,
         props.submissionSettings
       )
+    })
+  })
+
+  describe('when disabled', () => {
+    beforeEach(() => {
+      props.submissionSettings.enabled = false
+      wrapper = shallow(<AddSubmission.wrappedComponent {...props} />)
+    })
+
+    it('says "Not accepting new ideas"', () => {
+      expect(wrapper.find('StyledBlankCreationTool h3').text()).toEqual(
+        'Not accepting new ideas'
+      )
+    })
+
+    it('does not render a submission button', () => {
+      expect(wrapper.find('SubmissionButton').exists()).toBe(false)
     })
   })
 })

@@ -15,6 +15,7 @@ FactoryBot.define do
     # don't automatically call the `create_groups` callback when building a fake org for this collection
     organization factory: :organization_without_groups
 
+    factory :board_collection, class: Collection::Board
     factory :user_collection, class: Collection::UserCollection
     factory :application_collection, class: Collection::ApplicationCollection
     factory :shared_with_me_collection, class: Collection::SharedWithMeCollection
@@ -98,6 +99,8 @@ FactoryBot.define do
             order: (i - 1),
             width: 1,
             height: 1,
+            col: 0,
+            row: i,
             pinned: evaluator.pin_cards,
           )
           # e.g. primary_collection_cards or link_collection_cards

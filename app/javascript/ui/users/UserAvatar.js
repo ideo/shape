@@ -25,7 +25,7 @@ UserAvatar.propTypes = {
 }
 
 UserAvatar.defaultProps = {
-  size: 34,
+  size: 32,
   className: '',
 }
 

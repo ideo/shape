@@ -191,6 +191,36 @@ describe User, type: :model do
         expect(from_omniauth.new_record?).to be true
       end
     end
+
+    context 'with a limited user' do
+      let(:phone) { '123123' }
+      let(:auth) do
+        Hashie::Mash.new(
+          provider: 'ideo',
+          uid: '123',
+          info: {
+            email: Faker::Internet.unique.email,
+          },
+          extra: {
+            raw_info: {
+              phone: phone,
+              type: 'User::Limited',
+              picture: 'http://pic.url.net',
+              picture_medium: 'http://pic.url.net/med',
+              picture_large: 'http://pic.url.net/lg',
+            },
+          },
+        )
+      end
+
+      it 'saves the phone number' do
+        expect(from_omniauth.phone).to eq phone
+      end
+
+      it 'marks the user as limited' do
+        expect(from_omniauth.limited?).to be true
+      end
+    end
   end
 
   describe '#organizations' do

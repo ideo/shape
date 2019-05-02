@@ -3,7 +3,7 @@ const reactDocgenTypescript = require('react-docgen-typescript')
 const reactDocgen = require('react-docgen')
 
 /* eslint-disable-next-line no-unused-vars */
-const { devServer, ...webpackConfig } = require('./config/webpack/development')
+const { ...webpackConfig } = require('./config/webpack/development')
 
 const componentsGlob = p => path.join(p, '**/*{.js,jsx,ts,tsx}')
 

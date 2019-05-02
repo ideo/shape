@@ -1,0 +1,34 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TextItemCover renders snapshot 1`] = `
+<styled.div
+  class="cancelGridClick"
+  data-cy="TextItemCover"
+  onClick={[Function]}
+  style={
+    Object {
+      "height": "calc(100% - 30px)",
+    }
+  }
+>
+  <styled.div
+    notEditing={true}
+  >
+    <Quill
+      modules={Object {}}
+      readOnly={true}
+      theme={null}
+      value={
+        Object {
+          "ops": Array [
+            Object {
+              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+            },
+          ],
+          "version": 1,
+        }
+      }
+    />
+  </styled.div>
+</styled.div>
+`;

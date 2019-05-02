@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CoverImageSelector renders snapshot 1`] = `
+<React.Fragment>
+  <CardActionHolder
+    active={false}
+    className="show-on-hover"
+    disableHover={false}
+    onClick={[Function]}
+    role="button"
+    size={32}
+    tooltipText="select cover image"
+  >
+    <CoverImageToggleIcon />
+  </CardActionHolder>
+</React.Fragment>
+`;

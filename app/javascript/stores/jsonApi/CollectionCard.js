@@ -14,6 +14,8 @@ class CollectionCard extends BaseRecord {
     'order',
     'width',
     'height',
+    'row',
+    'col',
     'reference',
     'parent_id',
     'collection_id',
@@ -25,6 +27,8 @@ class CollectionCard extends BaseRecord {
     'hidden',
     'filter',
   ]
+
+  batchUpdateAttributes = ['id', 'order', 'width', 'height', 'row', 'col']
 
   @observable
   maxWidth = this.width
@@ -39,6 +43,20 @@ class CollectionCard extends BaseRecord {
   @action
   setMaxHeight(h) {
     this.maxHeight = h
+  }
+
+  // For cards that are positioned using row/col,
+  // this is the row that they extend to
+  get maxRow() {
+    if (this.row === undefined || this.height === undefined) return 0
+    return this.row + this.height - 1
+  }
+
+  // For cards that are positioned using row/col,
+  // this is the col that they extend to
+  get maxCol() {
+    if (this.col === undefined || this.width === undefined) return 0
+    return this.col + this.width - 1
   }
 
   get isTestDesignCollection() {
@@ -107,6 +125,8 @@ class CollectionCard extends BaseRecord {
   beginReplacing() {
     this.uiStore.openBlankContentTool({
       order: this.order,
+      row: this.row,
+      col: this.col,
       width: this.width,
       height: this.height,
       replacingId: this.id,
@@ -239,10 +259,20 @@ class CollectionCard extends BaseRecord {
   }
 
   get isBeingMultiMoved() {
-    return this.uiStore.multiMoveCardIds.indexOf(this.id) > -1
+    const { uiStore } = this
+    return uiStore.multiMoveCardIds.indexOf(this.id) > -1
   }
 
-  async API_archiveSelf({ undoable = true }) {
+  get isBeingMultiDragged() {
+    return !this.isDragCardMaster && this.isBeingMultiMoved
+  }
+
+  get isDragCardMaster() {
+    const { uiStore } = this
+    return uiStore.dragCardMaster === this.id
+  }
+
+  async API_archiveSelf({ undoable = true } = {}) {
     try {
       await this.apiStore.archiveCards({
         cardIds: [this.id],

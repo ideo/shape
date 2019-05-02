@@ -2,6 +2,7 @@ import _ from 'lodash'
 import ActionMenu from '~/ui/grid/ActionMenu'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import { fakeCollection, fakeCollectionCard } from '#/mocks/data'
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 const card = fakeCollectionCard
 card.can_move = true
@@ -24,7 +25,7 @@ describe('ActionMenu', () => {
         'Link',
         'Add to My Collection',
         'Tags',
-        'Permissions',
+        'Sharing',
         'Archive',
         'Replace',
       ]
@@ -34,6 +35,10 @@ describe('ActionMenu', () => {
       component = wrapper.instance()
       props.uiStore.selectCardId.mockClear()
       props.uiStore.openMoveMenu.mockClear()
+    })
+
+    it('renders snapshot', () => {
+      expectTreeToMatchSnapshot(wrapper)
     })
 
     it('creates a PopoutMenu with all editable actions', () => {
@@ -115,7 +120,7 @@ describe('ActionMenu', () => {
         'Link',
         'Add to My Collection',
         'Tags',
-        'Permissions',
+        'Sharing',
         'Replace',
       ]
       props.card.isPinnedAndLocked = true
@@ -133,13 +138,7 @@ describe('ActionMenu', () => {
 
   describe('as viewer', () => {
     beforeEach(() => {
-      actions = [
-        'Duplicate',
-        'Link',
-        'Add to My Collection',
-        'Tags',
-        'Permissions',
-      ]
+      actions = ['Duplicate', 'Link', 'Add to My Collection', 'Tags', 'Sharing']
       wrapper = shallow(
         <ActionMenu.wrappedComponent
           {...props}
@@ -158,7 +157,7 @@ describe('ActionMenu', () => {
 
   describe('as editor of a system required record', () => {
     beforeEach(() => {
-      actions = ['Move', 'Link', 'Add to My Collection', 'Permissions']
+      actions = ['Move', 'Link', 'Add to My Collection', 'Sharing']
       props.card.record.system_required = true
       props.card.isPinnedAndLocked = false
       wrapper = shallow(
@@ -183,7 +182,7 @@ describe('ActionMenu', () => {
         'Link',
         'Add to My Collection',
         'Tags',
-        'Permissions',
+        'Sharing',
         'Archive',
       ]
       props.card.can_move = false

@@ -36,14 +36,14 @@ export const KEYS = {
 }
 
 export default {
-  globalHeaderHeight: 82,
-  headerHeight: 192,
-  headerHeightCompact: 100,
+  headerHeight: 50,
   maxWidth: 1320,
   containerPadding: {
     horizontal: 2,
   },
+  topScrollTrigger: 210,
   maxTitleLength: 144,
+  actionMenuWidth: 250,
 
   // Keep in sync with assets/stylesheets/core/base.scss
   responsive: {
@@ -56,7 +56,12 @@ export default {
     muiSmBreakpoint: 960,
   },
 
+  transition: 'all 0.2s',
   transitionWithDelay: 'all 0.3s 0.2s',
+
+  navOpacity: 0.9,
+
+  cardHoldTime: 0.4 * 1000,
 
   colors: {
     black: '#120f0e',

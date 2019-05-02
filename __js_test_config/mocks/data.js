@@ -15,11 +15,14 @@ export const fakeCollectionCard = {
   order: 1,
   height: 1,
   width: 1,
+  row: 0,
+  col: 1,
   maxWidth: 1,
   maxHeight: 1,
   record: {},
   item: {},
   reference: false,
+  image_contain: false,
   beginReplacing: jest.fn(),
   API_create: jest.fn(),
   API_archive: jest.fn(),
@@ -32,13 +35,18 @@ export const fakeTextItemAttrs = {
   type: 'Item::TextItem',
   internalType: 'items',
   name: 'My Cool Item',
-  data_content:
-    'This is the content for the item and it contains multiple sentences. Like this one.',
+  data_content: {
+    ops: [
+      {insert: 'This is the content for the item and it contains multiple sentences. Like this one.'}
+    ],
+    version: 1,
+  },
   breadcrumb: [['collections', 1, 'Some collection'], ['items', 1, 'my item']],
   parentPath: '/',
   can_edit: false,
   inherited_tag_list: [],
   internalType: 'items',
+  fullyLoaded: true,
   parent_collection_card: fakeCollectionCard,
 }
 
@@ -305,6 +313,7 @@ export const fakeItemCard = {
   maxWidth: 1,
   record: fakeTextItem,
   item: fakeTextItem,
+  image_contain: false,
   API_create: jest.fn(),
   API_archive: jest.fn(),
   API_linkToMyCollection: jest.fn(),
@@ -333,6 +342,7 @@ export const fakeCollection = {
   isSharedCollection: false,
   isUserCollection: false,
   isNormalCollection: true,
+  num_survey_responses: 0,
   cover: {
     image_url: 'http://fake.url.net',
     text: 'Lorem ipsum blockchain boogie',
@@ -344,14 +354,18 @@ export const fakeCollection = {
   parent_collection_card: fakeCollectionCard,
   // This is a computed property on the collection store
   cardIds: _.map(fakeCards, c => c.id),
+  cardIdsWithinRectangle: jest.fn().mockReturnValue([]),
   API_archive: jest.fn(),
-  API_updateCards: jest.fn(),
+  API_updateCard: jest.fn(),
   API_updateName: jest.fn(),
   API_getNextAvailableTest: jest.fn(),
   API_clearCollectionCover: jest.fn(),
   API_fetchCards: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_batchUpdateCards: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_batchUpdateCardsWithUndo: jest.fn().mockReturnValue(Promise.resolve({})),
   checkCurrentOrg: jest.fn(),
   confirmEdit: jest.fn(),
+  updateScrollBottom: jest.fn(),
   cardProperties: [],
   internalType: 'collections',
   meta: {

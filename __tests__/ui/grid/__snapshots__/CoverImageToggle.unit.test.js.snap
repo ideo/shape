@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CoverImageToggle renders snapshot 1`] = `
+<CardActionHolder
+  active={false}
+  className="show-on-hover"
+  disableHover={false}
+  onClick={[Function]}
+  role="button"
+  size={32}
+  tooltipText="make cover image"
+>
+  <CoverImageToggleIcon />
+</CardActionHolder>
+`;
