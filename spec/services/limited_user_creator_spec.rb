@@ -2,7 +2,18 @@ require 'rails_helper'
 
 RSpec.describe LimitedUserCreator, type: :service do
   let(:contact_info) { 'ms@m.com' }
-  let(:fake_user) { create(:user) }
+  let(:fake_user) do
+    Hashie::Mash.new(
+      uid: SecureRandom.hex(15),
+      type: 'User::Limited',
+      email:  Faker::Internet.unique.email,
+      phone: Faker::PhoneNumber.cell_phone,
+      first_name: Faker::Name.first_name,
+      last_name: Faker::Name.last_name,
+      username: Faker::Internet.unique.slug,
+      extra: {},
+    )
+  end
   let(:limited_user_creator) do
     LimitedUserCreator.new(
       contact_info: contact_info,
@@ -11,11 +22,10 @@ RSpec.describe LimitedUserCreator, type: :service do
 
   before do
     allow(NetworkApi::User).to receive(:create).and_return(fake_user)
+    allow(NetworkApi::User).to receive(:where).and_return([])
   end
 
   describe '#call' do
-    let!(:finished_call) { limited_user_creator.call }
-
     it 'should create a new user' do
       expect do
         limited_user_creator.call
@@ -23,14 +33,15 @@ RSpec.describe LimitedUserCreator, type: :service do
     end
 
     it 'should set the user status to limited' do
-      expect(User.last.status).to eq 'limited'
+      limited_user_creator.call
+      expect(limited_user_creator.limited_user.status).to eq 'limited'
     end
 
     context 'with an email' do
       let(:contact_info) { 'mary@make.com' }
 
       it 'should return true' do
-        expect(finished_call).to be true
+        expect(limited_user_creator.call).to be true
       end
 
       it 'should create create a user on the network api with email' do
@@ -45,7 +56,7 @@ RSpec.describe LimitedUserCreator, type: :service do
         let(:contact_info) { 'marmake.com' }
 
         it 'should return false with errors' do
-          expect(finished_call).to be false
+          expect(limited_user_creator.call).to be false
         end
       end
     end

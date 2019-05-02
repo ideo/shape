@@ -4,7 +4,7 @@ class LimitedUserCreator < SimpleService
   def initialize(contact_info:)
     @contact_info = contact_info
     @email = nil
-    @phone_number = nil
+    @phone = nil
     @limited_user = nil
 
     @errors = []
@@ -12,8 +12,11 @@ class LimitedUserCreator < SimpleService
 
   def call
     return false unless validate_contact_info
-    network_user = create_network_user
-    create_user(network_user)
+    network_user = find_or_create_network_user
+    return false unless network_user.present?
+    saved = create_user(network_user)
+    @errors = @limited_user.errors
+    saved
   end
 
   private
@@ -22,7 +25,7 @@ class LimitedUserCreator < SimpleService
     if contact_info_email?
       @email = @contact_info
     else
-      @phone_number = normalize_phone_number
+      @phone = normalize_phone_number
     end
   end
 
@@ -37,18 +40,18 @@ class LimitedUserCreator < SimpleService
     false
   end
 
-  def create_network_user
-    if @email
-      NetworkApi::User.create(
-        email: @email,
-        limited_user: true,
-      )
-    else
-      NetworkApi::User.create(
-        phone: @phone_number,
-        limited_user: true,
-      )
-    end
+  def find_or_create_network_user
+    params = {}
+    params[:email] = @email if @email
+    params[:phone] = @phone if @phone
+
+    return false if params.empty?
+
+    existing = NetworkApi::User.where(params).first
+    return existing if existing.present?
+
+    params[:limited_user] = true
+    NetworkApi::User.create(params)
   end
 
   def create_user(network_user)
