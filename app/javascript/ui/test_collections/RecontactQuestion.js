@@ -5,15 +5,30 @@ import { apiStore, uiStore } from '~/stores'
 import Emoji from '~/ui/icons/Emoji'
 import { EmojiButton, EmojiHolder } from '~/ui/test_collections/ScaleQuestion'
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
+import OkIcon from '~/ui/icons/OkIcon'
 import { QuestionText } from './shared'
 import { TextInput, TextResponseHolder, TextEnterButton } from './shared'
+import styled from 'styled-components'
 
 const FEEDBACK_CONTACT_YES = 1
 const FEEDBACK_CONTACT_NO = 2
 
+const IconHolder = styled.div`
+  bottom: 14px;
+  color: ${props => props.theme.questionText};
+  height: 32px;
+  position: absolute;
+  right: 18px;
+  width: 32px;
+`
+
 @observer
 class RecontactQuestion extends React.Component {
-  state = { showContactInfo: false, contactInfo: '' }
+  state = {
+    showContactInfo: false,
+    contactInfo: '',
+    submittedContactInfo: false,
+  }
 
   async createAndSetCurrentUser(contactInfo) {
     let user
@@ -27,6 +42,7 @@ class RecontactQuestion extends React.Component {
       id: user.id,
       organizationId: apiStore.currentUserOrganizationId,
     })
+    return user
   }
 
   handleChange = ev => {
@@ -43,18 +59,20 @@ class RecontactQuestion extends React.Component {
   }
 
   handleContactInfoSubmit = async ev => {
+    const { onAnswer } = this.props
     ev.preventDefault()
-    await this.createAndSetCurrentUser(this.state.contactInfo)
+    const user = await this.createAndSetCurrentUser(this.state.contactInfo)
     user.API_updateCurrentUser({
       feedback_contact_preference: FEEDBACK_CONTACT_YES,
     })
     onAnswer()
+    this.setState({ submittedContactInfo: true })
   }
 
   render() {
-    const { contactInfo, showContactInfo } = this.state
+    const { contactInfo, showContactInfo, submittedContactInfo } = this.state
     return (
-      <div>
+      <div style={{ width: '100%' }}>
         <QuestionText>
           Would you like to be contacted about future surveys?
         </QuestionText>
@@ -75,6 +93,7 @@ class RecontactQuestion extends React.Component {
 
         {showContactInfo && (
           <form ref="form" onSubmit={this.handleContactInfoSubmit}>
+            <br />
             <TextResponseHolder>
               <TextInput
                 onChange={this.handleChange}
@@ -82,9 +101,15 @@ class RecontactQuestion extends React.Component {
                 type="questionText"
                 placeholder="email or phone number"
               />
-              <TextEnterButton onClick={this.handleContactInfoSubmit}>
-                <ReturnArrowIcon />
-              </TextEnterButton>
+              {submittedContactInfo ? (
+                <IconHolder>
+                  <OkIcon />
+                </IconHolder>
+              ) : (
+                <TextEnterButton focused onClick={this.handleContactInfoSubmit}>
+                  <ReturnArrowIcon />
+                </TextEnterButton>
+              )}
             </TextResponseHolder>
           </form>
         )}
