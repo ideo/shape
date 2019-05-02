@@ -460,6 +460,7 @@ export const fakeComment = {
   message:
     'This is my message to the world. Go to the source: https://www.ideo.com',
   updated_at: new Date(),
+  API_destroy: jest.fn().mockReturnValue(Promise.resolve({})),
 }
 export const fakeThread = {
   id: '1',

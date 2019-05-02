@@ -1,11 +1,17 @@
 import Comment from '~/ui/threads/Comment'
-import { fakeComment } from '#/mocks/data'
+import { fakeComment, fakeUser } from '#/mocks/data'
+import { apiStore } from '~/stores'
+
+jest.mock('../../../app/javascript/stores')
 
 let wrapper, props
 describe('Comment', () => {
   beforeEach(() => {
     props = {
-      comment: fakeComment,
+      comment: {
+        ...fakeComment,
+        persisted: true,
+      },
     }
     wrapper = shallow(<Comment {...props} />)
   })
@@ -30,5 +36,34 @@ describe('Comment', () => {
     expect(wrapper.find('Moment').props().date).toEqual(
       props.comment.updated_at
     )
+  })
+
+  describe('when user is comment author', () => {
+    beforeEach(() => {
+      apiStore.currentUserId = '1'
+    })
+
+    it('renders a delete button', () => {
+      expect(wrapper.find('.test-delete-comment').exists()).toBe(true)
+    })
+
+    describe('on click delete', () => {
+      it('deletes the comment', () => {
+        const deleteButton = wrapper.find('.test-delete-comment').first()
+        deleteButton.simulate('click')
+        expect(props.comment.API_destroy).toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe('when user is not the comment author', () => {
+    beforeEach(() => {
+      apiStore.currentUserId = '1'
+      props.comment.author = { ...fakeUser, id: '9' }
+      wrapper.setProps(props)
+    })
+    it('does not render a delete button', () => {
+      expect(wrapper.find('.test-delete-comment').exists()).toBe(false)
+    })
   })
 })

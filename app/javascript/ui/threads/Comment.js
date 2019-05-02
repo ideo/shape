@@ -12,6 +12,7 @@ import { InlineRow } from '~/ui/global/styled/layout'
 import Moment from '~/ui/global/Moment'
 import Avatar from '~/ui/global/Avatar'
 import { StyledCommentInput } from './CustomCommentMentions'
+import { apiStore } from '~/stores'
 
 const StyledComment = StyledCommentInput.extend`
   padding: 10px;
@@ -102,9 +103,15 @@ class Comment extends React.Component {
             <Moment date={comment.updated_at} />
           </span>
 
-          {comment.persisted && (
-            <button onClick={this.handleDeleteClick}>X</button>
-          )}
+          {comment.persisted &&
+            apiStore.currentUserId === comment.author.id && (
+              <button
+                onClick={this.handleDeleteClick}
+                className="test-delete-comment"
+              >
+                X
+              </button>
+            )}
         </InlineRow>
         <div className="message">{this.renderMessage()}</div>
       </StyledComment>
