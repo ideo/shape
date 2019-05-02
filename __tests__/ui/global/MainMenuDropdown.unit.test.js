@@ -165,7 +165,7 @@ describe('MainMenuDropdown', () => {
   describe('handleSwitchOrg', () => {
     const fakeEv = { preventDefault: () => null }
 
-    it('should call switchOrganization on currentUser', () => {
+    it('should route you to the organization', () => {
       component.handleSwitchOrg(fakeOrganization)(fakeEv)
       expect(fakeRoutingStore.routeTo).toHaveBeenCalledWith(
         `/${fakeOrganization.slug}`

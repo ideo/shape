@@ -68,7 +68,6 @@ const fakeApiStore = ({
       pic_url_square: 'https://s3.amazonaws.com/pic.png',
       groups: [],
       terms_accepted: true,
-      switchOrganization: jest.fn(),
       API_hideHelper: jest.fn(),
     },
     // NOTE: important that this matches currentUserOrganization.slug
