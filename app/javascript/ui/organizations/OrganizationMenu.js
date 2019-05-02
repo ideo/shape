@@ -301,5 +301,6 @@ OrganizationMenu.defaultProps = {
   open: false,
   locked: false,
 }
+OrganizationMenu.displayName = 'OrganizationMenu'
 
 export default OrganizationMenu

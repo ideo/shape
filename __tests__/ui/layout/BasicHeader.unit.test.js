@@ -29,9 +29,7 @@ describe('BasicHeader', () => {
     })
 
     it('shows org menu', () => {
-      expect(
-        wrapper.find('inject-OrganizationMenu-with-apiStore-uiStore').exists()
-      ).toEqual(true)
+      expect(wrapper.find('OrganizationMenu').exists()).toEqual(true)
     })
   })
 })
