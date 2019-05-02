@@ -11,12 +11,16 @@ const StyledContainer = styled.main`
     `
     max-width: ${v.maxWidth}px;
   `}
-  padding: 0 ${v.containerPadding.horizontal}rem;
+  padding: 0 ${props => props.padding}rem;
   position: relative;
 `
 
-const PageContainer = ({ children, fullWidth }) => (
-  <StyledContainer data-empty-space-click fullWidth={fullWidth}>
+const PageContainer = ({ children, fullWidth, padding }) => (
+  <StyledContainer
+    data-empty-space-click
+    fullWidth={fullWidth}
+    padding={padding}
+  >
     {children}
   </StyledContainer>
 )
@@ -24,10 +28,12 @@ const PageContainer = ({ children, fullWidth }) => (
 PageContainer.propTypes = {
   children: PropTypes.node.isRequired,
   fullWidth: PropTypes.bool,
+  padding: PropTypes.string,
 }
 
 PageContainer.defaultProps = {
   fullWidth: false,
+  padding: v.containerPadding.horizontal,
 }
 
 export default PageContainer

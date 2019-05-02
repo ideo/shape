@@ -136,11 +136,21 @@ class ItemPage extends React.Component {
 
     const { replacingId } = uiStore.blankContentToolState
 
+    let containerProps = {}
+    if (
+      item.type === ITEM_TYPES.EXTERNAL_IMAGE ||
+      item.type === ITEM_TYPES.FILE
+    ) {
+      containerProps = {
+        fullWidth: true,
+        padding: '0',
+      }
+    }
     return (
       <Fragment>
         <PageHeader record={item} />
         <ItemPageContainer>
-          <PageContainer>
+          <PageContainer {...containerProps}>
             {item.parent_collection_card &&
             replacingId === item.parent_collection_card.id ? (
               <GridCardBlank parent={item.parent} afterCreate={this.reroute} />
