@@ -31,7 +31,7 @@ class Comment extends BaseRecord {
         remove(thread.comments, comment => comment.id === this.id)
       })
     } catch (e) {
-      console.log(e)
+      console.error(e)
       uiStore.defaultAlertError()
     }
   }
