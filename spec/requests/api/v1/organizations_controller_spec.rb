@@ -197,7 +197,7 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
   end
 
   describe 'GET #my_collection' do
-    let!(:organization) { create(:organization, slug: Faker::Internet.unique.slug) }
+    let!(:organization) { create(:organization, slug: Faker::Internet.slug(nil, '-')) }
     let!(:user_collection) do
       create(:user_collection, organization: organization, add_editors: [user])
     end

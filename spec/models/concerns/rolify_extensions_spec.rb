@@ -1,9 +1,9 @@
 require 'rails_helper'
 
 describe RolifyExtensions, type: :concern do
+  let!(:user) { create(:user) }
   let!(:organization) { create(:organization, member: user) }
   let(:collection) { create(:collection, organization: organization) }
-  let(:user) { create(:user) }
   let(:group) { create(:group, organization: organization) }
 
   it 'should have concern included' do
@@ -78,7 +78,6 @@ describe RolifyExtensions, type: :concern do
 
   describe '#precache_roles_for' do
     let(:collection_cards) { create_list(:collection_card_text, 3, parent: collection) }
-    let(:user) { create(:user, add_to_org: organization) }
     let(:group) { create(:group, add_members: [user], organization: organization) }
 
     before do
