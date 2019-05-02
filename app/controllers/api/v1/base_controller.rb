@@ -165,4 +165,11 @@ class Api::V1::BaseController < ApplicationController
   def log_activity?
     current_api_token.blank?
   end
+
+  def load_and_authorize_organization_from_slug
+    slug = params[:organization_id]
+    slug = params[:id] if !slug && controller_name == 'organizations'
+    @organization = Organization.friendly.find(slug)
+    authorize! :read, @organization
+  end
 end

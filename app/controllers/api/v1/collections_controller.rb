@@ -5,6 +5,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   skip_before_action :check_api_authentication!, only: %i[show]
   # NOTE: these have to be in the following order
   before_action :join_collection_group, only: :show, if: :join_collection_group?
+  before_action :switch_to_organization, only: %i[show]
   before_action :load_and_authorize_collection_update, only: %i[update]
   before_action :load_collection_with_roles, only: %i[show update]
 
@@ -233,13 +234,18 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def join_collection_group?
     user_signed_in? &&
       @collection.anyone_can_join? &&
-      # the setup requires you to have been added to the org before this point
-      @collection.organization.can_view?(current_user) &&
       @collection.joinable_group.present?
   end
 
   def join_collection_group
     group = @collection.joinable_group
+    # TODO: first join the org if you need to...
+    # ..... join + switch
+    # only add_role if it's not the guest group
     current_user.add_role(Role::MEMBER, group) unless group.guest?
+  end
+
+  def switch_to_organization
+    current_user.switch_to_organization(@collection.organization)
   end
 end

@@ -240,11 +240,14 @@ class User < ApplicationRecord
   end
 
   def switch_to_organization(organization = nil)
+    return if current_organization_id == organization&.id
     if organization.blank?
       self.current_organization = self.current_user_collection = nil
     else
+      org_user_collection = current_user_collection(organization.id)
+      return unless org_user_collection.present?
+      self.current_user_collection = org_user_collection
       self.current_organization = organization
-      self.current_user_collection = current_user_collection(organization.id)
     end
     # make sure user picks up new roles / relationships
     save && reload

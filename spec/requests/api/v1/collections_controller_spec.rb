@@ -191,6 +191,19 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         expect(response.status).to eq(404)
       end
     end
+
+    context 'on different org' do
+      let!(:other_org) { create(:organization, member: user) }
+      let!(:collection) do
+        create(:collection, organization: other_org, add_viewers: [user])
+      end
+
+      it 'should switch the user to the org' do
+        get(path)
+        expect(response.status).to eq(200)
+        expect(user.current_organization).to eq other_org
+      end
+    end
   end
 
   describe 'POST #create_template' do
