@@ -8,7 +8,6 @@ import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
 import { QuestionText } from './shared'
 import { TextInput, TextResponseHolder, TextEnterButton } from './shared'
 
-console.log('fuck', TextInput, TextEnterButton)
 const FEEDBACK_CONTACT_YES = 1
 const FEEDBACK_CONTACT_NO = 2
 
