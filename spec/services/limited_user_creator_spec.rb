@@ -30,7 +30,6 @@ RSpec.describe LimitedUserCreator, type: :service do
       it 'should create create a user on the network api with email' do
         expect(NetworkApi::User).to receive(:create).with(
           email: contact_info,
-          phone: nil,
           limited_user: true,
         )
         limited_user_creator.call
@@ -50,7 +49,6 @@ RSpec.describe LimitedUserCreator, type: :service do
 
       it 'should create a user with normalized phone number' do
         expect(NetworkApi::User).to receive(:create).with(
-          email: nil,
           phone: '4154239843',
           limited_user: true,
         )

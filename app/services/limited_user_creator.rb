@@ -39,11 +39,17 @@ class LimitedUserCreator < SimpleService
   end
 
   def create_network_user
-    NetworkApi::User.create(
-      email: @email,
-      phone: @phone_number,
-      limited_user: true,
-    )
+    if @email
+      NetworkApi::User.create(
+        email: @email,
+        limited_user: true,
+      )
+    else
+      NetworkApi::User.create(
+        phone: @phone_number,
+        limited_user: true,
+      )
+    end
   end
 
   def create_user(network_user)

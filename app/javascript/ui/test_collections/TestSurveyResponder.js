@@ -27,13 +27,15 @@ class TestSurveyResponder extends React.Component {
     const { collection } = props
     const { currentUser } = apiStore
     const questions = [...collection.question_cards]
-    if (!collection.live_test_collection) {
-      console.log('currentUser', currentUser)
-      // questions.splice(questions.length - 1, 0, {
-      //   id: 'recontact',
-      //   card_question_type: 'question_recontact',
-      //   record: { id: 'facsda', content: '' },
-      // })
+    if (
+      !collection.live_test_collection ||
+      (currentUser && currentUser.feedback_contact_preference)
+    ) {
+      questions.splice(questions.length - 1, 0, {
+        id: 'recontact',
+        card_question_type: 'question_recontact',
+        record: { id: 'facsda', content: '' },
+      })
     }
     this.allCards = questions
   }
@@ -43,6 +45,7 @@ class TestSurveyResponder extends React.Component {
     if (!surveyResponse) return undefined
     if (card.card_question_type === 'question_recontact') {
       const { currentUser } = apiStore
+      if (!currentUser) return false
       return currentUser.feedback_contact_preference !== 0
     }
     return _.find(surveyResponse.question_answers, {
