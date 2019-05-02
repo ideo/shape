@@ -1,5 +1,5 @@
 class LimitedUserCreator < SimpleService
-  attr_accessor :limited_user
+  attr_accessor :limited_user, :errors
 
   def initialize(contact_info:)
     @contact_info = contact_info
@@ -13,8 +13,7 @@ class LimitedUserCreator < SimpleService
   def call
     return false unless validate_contact_info
     network_user = create_network_user
-    user = create_user(network_user)
-    user
+    create_user(network_user)
   end
 
   private
@@ -53,7 +52,7 @@ class LimitedUserCreator < SimpleService
   end
 
   def create_user(network_user)
-    network_user.status = :limited
-    network_user.save
+    @limited_user = User.find_or_initialize_from_network(network_user)
+    @limited_user.save
   end
 end

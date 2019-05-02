@@ -16,6 +16,12 @@ RSpec.describe LimitedUserCreator, type: :service do
   describe '#call' do
     let!(:finished_call) { limited_user_creator.call }
 
+    it 'should create a new user' do
+      expect do
+        limited_user_creator.call
+      end.to change(User, :count).by(1)
+    end
+
     it 'should set the user status to limited' do
       expect(User.last.status).to eq 'limited'
     end

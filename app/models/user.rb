@@ -141,46 +141,64 @@ class User < ApplicationRecord
     users
   end
 
-  def self.from_omniauth(auth)
-    user = where(provider: auth.provider, uid: auth.uid).first
+  def self.find_or_initialize_from_external(attrs, provider)
+    user = where(provider: provider, uid: attrs.uid).first
 
     unless user
       # if not found by provider, look up by email
-      if auth.extra.raw_info.type == 'User::Limited'
-        if auth.info.email.present?
-          user = User.find_or_initialize_by(email: auth.info.email)
+      if attrs.type == 'User::Limited'
+        if attrs.email.present?
+          user = User.find_or_initialize_by(email: attrs.email)
         else
-          user = User.find_or_initialize_by(phone: auth.extra.raw_info.phone)
+          user = User.find_or_initialize_by(phone: attrs.phone)
         end
         user.status = User.statuses[:limited]
       else
-        user = User.find_or_initialize_by(email: auth.info.email)
+        user = User.find_or_initialize_by(email: attrs.email)
         user.status = User.statuses[:active]
       end
       user.invitation_token = nil
       user.password = Devise.friendly_token(40)
       user.password_confirmation = user.password
-      user.provider = auth.provider
-      user.uid = auth.uid
+      user.provider = provider
+      user.uid = attrs.uid
     end
 
     # Update user on every auth
-    user.email = auth.info.email
-    user.phone = auth.extra.raw_info.phone
+    user.email = attrs.email
+    user.phone = attrs.phone
     unless user.limited?
-      if auth.info.username.present?
-        user.handle = auth.info.username
+      if attrs.present?
+        user.handle = attrs.username
       elsif user.handle.blank?
         user.generate_handle
       end
     end
-    user.first_name = auth.info.first_name
-    user.last_name = auth.info.last_name
+    user.first_name = attrs.first_name
+    user.last_name = attrs.last_name
     %w[picture picture_medium picture_large].each do |field|
-      user.network_data[field] = auth.extra.raw_info.try(field)
+      user.network_data[field] = attrs.try(:extra).try(field)
     end
 
     user
+  end
+
+  def self.from_omniauth(auth)
+    user = Hashie::Mash.new(
+      uid: auth.uid,
+      type: auth.extra.raw_info.type,
+      email:  auth.info.email,
+      phone: auth.extra.raw_info.phone,
+      first_name: auth.info.first_name,
+      last_name: auth.info.last_name,
+      username: auth.info.username,
+      extra: auth.extra.raw_info,
+    )
+    find_or_initialize_from_external(user, auth.provider)
+  end
+
+  def self.find_or_initialize_from_network(network_user)
+    find_or_initialize_from_external(network_user, 'ideo')
   end
 
   def self.create_pending_user(email:)
