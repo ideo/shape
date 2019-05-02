@@ -32,6 +32,7 @@ const fakeApiStore = ({
       .fn()
       .mockReturnValue(Promise.resolve({ data: [] })),
     searchCollections: jest.fn().mockReturnValue(Promise.resolve({ data: [] })),
+    checkCurrentOrg: jest.fn(),
     loadCurrentUserGroups: jest.fn(),
     searchRoles: jest.fn().mockReturnValue(Promise.resolve({ data: [] })),
     setCurrentUserId: jest.fn(),

@@ -1,15 +1,16 @@
 import PageWithApiWrapper from '~/ui/pages/PageWithApiWrapper'
 import Deactivated from '~/ui/layout/Deactivated'
-import { apiStore, uiStore, routingStore } from '~/stores'
+import { apiStore, uiStore } from '~/stores'
 
 jest.mock('../../../app/javascript/stores')
 
-let wrapper, location, match, props
+let wrapper, location, match, props, instance, rerender
 
 beforeEach(() => {
   location = {}
   match = {
     path: '/collections/:id',
+    url: '/collections',
     params: {
       id: 1,
       org: 'ideo',
@@ -25,37 +26,39 @@ beforeEach(() => {
     render: () => null,
   }
 
-  wrapper = shallow(<PageWithApiWrapper.wrappedComponent {...props} />)
+  rerender = () => {
+    wrapper = shallow(<PageWithApiWrapper.wrappedComponent {...props} />)
+    instance = wrapper.instance()
+  }
+  rerender()
 })
 
 describe('PageWithApiWrapper', () => {
   describe('componentDidUpdate', () => {
-    describe('checkOrg', () => {
-      describe('when the route match.params.org does not match apiStore.currentOrgSlug', () => {
+    describe('requiresFetch', () => {
+      beforeEach(() => {
+        instance.fetchData = jest.fn()
+      })
+
+      describe('when the route match.url has changed', () => {
         beforeEach(() => {
-          props.match.params.org = 'different-slug'
-          wrapper = shallow(<PageWithApiWrapper.wrappedComponent {...props} />)
-          wrapper.instance().componentDidUpdate({ location, match })
+          instance.componentDidUpdate({
+            location,
+            match: { ...match, url: 'different-slug' },
+          })
         })
 
-        it('calls routingStore to make sure /:org namespace is in the path', () => {
-          expect(apiStore.currentUser.switchOrganization).toHaveBeenCalledWith(
-            'different-slug',
-            { redirectPath: routingStore.location.pathname }
-          )
+        it('calls fetchData', () => {
+          expect(instance.fetchData).toHaveBeenCalled()
         })
       })
-      describe('when the route does not have match.params.org', () => {
+      describe('when the route match.url has not changed', () => {
         beforeEach(() => {
-          props.match.params.org = null
-          wrapper = shallow(<PageWithApiWrapper.wrappedComponent {...props} />)
-          wrapper.instance().componentDidUpdate({ location, match })
+          instance.componentDidUpdate(props)
         })
 
-        it('calls routingStore to make sure /:org namespace is in the path', () => {
-          expect(routingStore.routeTo).toHaveBeenCalledWith(
-            `/${apiStore.currentOrgSlug}${routingStore.location.pathname}`
-          )
+        it('calls fetchData', () => {
+          expect(instance.fetchData).not.toHaveBeenCalled()
         })
       })
     })
@@ -63,7 +66,7 @@ describe('PageWithApiWrapper', () => {
 
   describe('fetchData', () => {
     beforeEach(() => {
-      wrapper.instance().fetchData()
+      instance.fetchData()
     })
 
     it('calls apiStore request', () => {
