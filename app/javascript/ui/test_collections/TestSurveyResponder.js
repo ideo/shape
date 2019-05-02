@@ -25,7 +25,6 @@ class TestSurveyResponder extends React.Component {
   constructor(props) {
     super(props)
     const { collection } = props
-    const { currentUser } = apiStore
     const questions = [...collection.question_cards]
     if (
       !collection.live_test_collection ||

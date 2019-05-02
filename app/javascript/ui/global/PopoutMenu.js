@@ -276,7 +276,7 @@ PopoutMenu.propTypes = {
   groupExtraComponent: PropTypes.shape({
     component: PropTypes.node,
   }),
-  direction: PropTypes.string,
+  direction: PropTypes.oneOf(['left', 'right']),
 }
 
 PopoutMenu.defaultProps = {

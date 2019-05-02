@@ -2,13 +2,13 @@
 
 Here are the commands you can use to get started:
 
-**Install all the libraries first:**
+**Install all the dependencies first:**
 
 ```
 brew install nvm
-nvm install 8.9.4
-brew install yarn
-curl -L https://get.rvm.io | bash -s stable --auto-dotfiles --autolibs=enable --rails
+nvm install 8.16.0
+# use nvm + npm to install yarn; `brew install yarn` would try to reinstall node
+npm install -g yarn
 brew install postgresql
 brew install redis
 brew install elasticsearch
@@ -17,42 +17,35 @@ brew install heroku/brew/heroku
 # use homebrew services to start elasticsearch and redis in the background
 brew services start redis
 brew services start elasticsearch
-```
 
-**Clone the app and install the gems:**
-
-```
-git clone <clone URL>
-cd shape/
-rvm install ruby 2.4.3
-cd ..
-cd shape/
+# setup rvm and install ruby, bundler
+curl -L https://get.rvm.io | bash -s stable --auto-dotfiles --autolibs=enable --rails
+rvm install ruby 2.5.5
+rvm use 2.5.5
 gem install bundler
-bundle install
-yarn install
-
-# Initialize and update the git submodule for Network React Components
-git submodule init
-git submodule update
 ```
 
-**Setup the `.env` file with valid credentials:**
+**You will also need to be granted access to:**
+
+- https://github.com/ideo/network-react-components
+- https://github.com/ideo/network-api-ruby
+
+**Clone the app and run the setup script:**
+
+Note: `./dev.sh -s` will run `rails db:setup` which will also seed your database with two required collections, marked by the following `ENV` ids:
+
+- `ENV['GETTING_STARTED_TEMPLATE_ID']`
+- `ENV['ORG_MASTER_TEMPLATES_ID']`
+
+If these two collections don't exist then you won't be able to create a new organization and setup your first account.
 
 ```
+git clone https://github.com/ideo/shape
+cd shape
+# Setup the `.env` file with valid credentials: (get these from the IDEO team)
 cp .env.example .env
-# modify credentials
-```
-
-**Create the database and migrate:**
-
-```
-rails db:setup
-
-# get access to Shell commands in Terminal
-source ./shell-commands
-
-# copy production data to your local database
-shapecopydb local
+# run our setup script (install gems, packages, setup database)
+./dev.sh -s
 ```
 
 **Setup your text editor and linter:**
@@ -118,6 +111,7 @@ Install ttab and [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli#d
 
 ```
 npm install -g ttab
+brew tap heroku/brew && brew install heroku
 ```
 
 Run dev script:
@@ -134,5 +128,6 @@ This will open separate tabs to:
    And will open your browser (may need to refresh page after initial webpack)
 
 ```
-
+# run the script with a different text editor
+./dev.sh -e [your favorite editor]
 ```

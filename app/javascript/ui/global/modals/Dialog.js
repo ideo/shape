@@ -65,7 +65,8 @@ const PromptText = styled.span`
 class Dialog extends React.PureComponent {
   handleClose = ev => {
     ev.preventDefault()
-    const { onClose } = this.props
+    const { closeable, onClose } = this.props
+    if (!closeable) return
     onClose && onClose()
   }
 
@@ -92,7 +93,14 @@ class Dialog extends React.PureComponent {
   }
 
   render() {
-    const { children, backgroundColor, onClose, open, maxWidth } = this.props
+    const {
+      children,
+      closeable,
+      backgroundColor,
+      onClose,
+      open,
+      maxWidth,
+    } = this.props
     return (
       <StyledDialog
         open={open}
@@ -109,11 +117,12 @@ class Dialog extends React.PureComponent {
         // using suggestion here: https://git.io/fpUnP
         variant={{ backgroundColor }}
       >
-        {onClose && (
-          <ModalCloseButton onClick={this.handleClose}>
-            <CloseIcon />
-          </ModalCloseButton>
-        )}
+        {closeable &&
+          onClose && (
+            <ModalCloseButton onClick={this.handleClose}>
+              <CloseIcon />
+            </ModalCloseButton>
+          )}
         <CenteredPaddedContent paddingSides={maxWidth === 'md' ? 50 : 20}>
           {this.icon}
           <PromptText
@@ -131,8 +140,9 @@ class Dialog extends React.PureComponent {
 Dialog.propTypes = {
   iconName: PropTypes.oneOf(iconNames),
   iconImageOverride: PropTypes.string,
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node,
   open: PropTypes.bool.isRequired,
+  closeable: PropTypes.bool,
   onClose: PropTypes.func,
   maxWidth: PropTypes.string,
   backgroundColor: PropTypes.oneOf(Object.values(v.colors)),
@@ -140,9 +150,11 @@ Dialog.propTypes = {
 }
 Dialog.defaultProps = {
   iconName: 'Alert',
+  children: null,
   maxWidth: 'xs', // 'xs' == 360px
   iconImageOverride: null,
   backgroundColor: v.colors.commonDark,
+  closeable: true,
   onClose: null,
   overrideWithLoader: false,
 }

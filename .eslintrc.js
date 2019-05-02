@@ -1,5 +1,13 @@
 module.exports = {
-  plugins: ['jsx-a11y', 'react', 'jest', 'cypress', 'prettier', 'compat'],
+  plugins: [
+    'jsx-a11y',
+    'react',
+    'jest',
+    'cypress',
+    'prettier',
+    'import',
+    'compat'
+  ],
   env: {
     'jest/globals': true,
     'cypress/globals': true,
@@ -60,6 +68,7 @@ module.exports = {
     ],
     'no-var': 'error',
     'prefer-const': 'error',
+    'import/no-unresolved': 2,
     'import/prefer-default-export': 'off',
     'compat/compat': 'warn',
     'arrow-parens': [0, 'as-needed'],
