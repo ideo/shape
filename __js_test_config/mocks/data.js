@@ -283,6 +283,7 @@ export const fakeFileItemAttrs = {
   },
   inherited_tag_list: [],
   can_edit: false,
+  can_view: true,
   parent_collection_card: fakeCollectionCard,
 }
 export const fakeFileItem = {

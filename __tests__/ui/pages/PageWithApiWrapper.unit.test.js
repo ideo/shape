@@ -96,11 +96,16 @@ describe('PageWithApiWrapper', () => {
       )
     })
 
-    describe('organization is deactivated', () => {
+    describe('organization is deactivated and you get a 404 as a result', () => {
       beforeEach(() => {
         wrapper.setProps({
           apiStore: {
+            ...apiStore,
             currentOrgIsDeactivated: true,
+          },
+          uiStore: {
+            ...uiStore,
+            pageError: { status: 404 },
           },
         })
       })
