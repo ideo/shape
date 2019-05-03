@@ -49,7 +49,7 @@ export const KEYS = {
 }
 
 export default {
-  headerHeight: 60,
+  headerHeight: 50,
   maxWidth: 1320,
   containerPadding: {
     horizontal: 2,

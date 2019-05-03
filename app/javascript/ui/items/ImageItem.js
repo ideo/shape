@@ -5,9 +5,13 @@ import styled from 'styled-components'
 import { CloseButton } from '~/ui/global/styled/buttons'
 
 const StyledImage = styled.img`
-  /* basic way to make it "responsive" */
+  display: block;
+  /* basic way to make it "responsive" and centered */
   max-width: 100vw;
+  margin-right: auto;
+  margin-left: auto;
 `
+
 StyledImage.displayName = 'StyledImage'
 
 class ImageItem extends React.PureComponent {

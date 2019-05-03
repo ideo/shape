@@ -23,6 +23,7 @@ import MainMenuDropdown from '~/ui/global/MainMenuDropdown'
 /* global IdeoSSO */
 
 const StyledFixedHeader = styled(FixedHeader)`
+  padding-top: 4px;
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
     padding-left: 5px;
     padding-right: 5px;
@@ -280,6 +281,12 @@ class Header extends React.Component {
   }
 
   @computed
+  get maxBreadcrumbContainerWidth() {
+    const outer = this.breadcrumbsWidth - this.actionsWidth
+    return Math.min(outer, 700)
+  }
+
+  @computed
   get isLargeBreakpoint() {
     const { uiStore } = this.props
     return (
@@ -305,7 +312,6 @@ class Header extends React.Component {
     const {
       isMobile,
       isLargeBreakpoint,
-      breadcrumbsWidth,
       record,
       userDropdownOpen,
       orgDropdownOpen,
@@ -341,7 +347,7 @@ class Header extends React.Component {
                     <Flex data-empty-space-click align="center">
                       <div style={{ flex: isMobile ? '1 1 auto' : '0 1 auto' }}>
                         <Breadcrumb
-                          maxDepth={isLargeBreakpoint ? null : 1}
+                          maxDepth={isLargeBreakpoint ? 6 : 1}
                           backButton={!isLargeBreakpoint}
                           record={record}
                           isHomepage={routingStore.isHomepage}
@@ -349,7 +355,7 @@ class Header extends React.Component {
                           key={`${record.identifier}_${record.breadcrumbSize}`}
                           // force props update if windowWidth changes
                           windowWidth={uiStore.windowWidth}
-                          containerWidth={breadcrumbsWidth - this.actionsWidth}
+                          containerWidth={this.maxBreadcrumbContainerWidth}
                         />
                       </div>
                       <Box>
