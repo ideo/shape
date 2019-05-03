@@ -2,6 +2,7 @@ import styled, { ThemeProvider } from 'styled-components'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 
 import v from '~/utils/variables'
+import DialogWrapper from '~/ui/global/modals/DialogWrapper'
 import Emoji from '~/ui/icons/Emoji'
 import Logo from '~/ui/layout/Logo'
 import TestSurveyResponder from '~/ui/test_collections/TestSurveyResponder'
@@ -102,6 +103,7 @@ class TestSurveyPage extends React.Component {
     return (
       <ThemeProvider theme={styledTestTheme('primary')}>
         <StyledSurvey>
+          <DialogWrapper />
           <SurveyClosed>
             <EmojiMessageContainer>
               <Emoji scale={2} name="Raising hands" symbol="🙌" />
@@ -120,6 +122,7 @@ class TestSurveyPage extends React.Component {
         <LogoWrapper>
           <Logo withText width={83} />
         </LogoWrapper>
+        <DialogWrapper />
         {this.renderSurvey}
       </StyledBg>
     )

@@ -74,11 +74,10 @@ export const StyledHeader = styled.header`
 StyledHeader.displayName = 'StyledHeader'
 
 export const FixedHeader = styled(StyledHeader)`
-  padding: 0 ${v.containerPadding.horizontal}rem;
-  z-index: ${v.zIndex.globalHeader};
   position: fixed;
   top: 0;
-  margin-top: 4px;
+  padding: 4px ${v.containerPadding.horizontal}rem 0;
+  z-index: ${v.zIndex.globalHeader};
   background: ${hexToRgba(v.colors.commonLight, 0.96)};
   @supports (
     (-webkit-backdrop-filter: blur(4px)) or (backdrop-filter: blur(4px))

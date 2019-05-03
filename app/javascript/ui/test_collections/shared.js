@@ -289,3 +289,45 @@ export const styledTestTheme = (themeName = 'primary') => {
     descriptionText: v.colors.commonLightest,
   }
 }
+
+export const TextEnterButton = styled.button`
+  bottom: 14px;
+  color: white;
+  right: 18px;
+  position: absolute;
+  transition: opacity 0.3s;
+  vertical-align: super;
+
+  background-color: ${props => props.theme.questionText};
+  border-radius: 50%;
+  height: 32px;
+  width: 32px;
+
+  span {
+    height: 50%;
+    margin-top: 4px;
+    width: 50%;
+  }
+
+  svg {
+    transform: scale(1, -1);
+  }
+
+  &:hover {
+    filter: brightness(90%);
+  }
+
+  ${props =>
+    !props.focused &&
+    `
+    background: transparent;
+    border: 2px solid ${v.colors.commonMedium};
+    color: ${v.colors.commonMedium};
+
+    &:hover {
+      background: transparent;
+      border: 2px solid ${v.colors.commonMedium};
+      color: ${v.colors.commonMedium};
+    }
+  `};
+`

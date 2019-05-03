@@ -31,6 +31,7 @@ const StyledBreadcrumbItem = styled.div`
     display: inline-block;
     transition: ${v.transition};
     &:hover {
+      cursor: pointer;
       color: ${v.colors.primaryDarkest};
     }
   }

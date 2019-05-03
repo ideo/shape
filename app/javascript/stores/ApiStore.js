@@ -163,6 +163,17 @@ class ApiStore extends jsonapi(datxCollection) {
     }
   }
 
+  async createLimitedUser(contactInfo) {
+    try {
+      const res = await this.request('users/create_limited_user', 'POST', {
+        contact_info: contactInfo,
+      })
+      return res
+    } catch (e) {
+      trackError(e, { source: 'createLimitedUser' })
+    }
+  }
+
   checkCurrentOrg({ id = '', slug = '' } = {}) {
     const doesNotMatch =
       (id && this.currentUserOrganizationId !== id) ||

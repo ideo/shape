@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { Flex } from 'reflexbox'
 import PropTypes from 'prop-types'
+import { observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import FlipMove from 'react-flip-move'
 import { Element as ScrollElement, scroller } from 'react-scroll'
@@ -21,20 +22,22 @@ const UNANSWERABLE_QUESTION_TYPES = [
 
 @observer
 class TestSurveyResponder extends React.Component {
+  @observable
+  recontactAnswered = false
+
   allCards = []
   constructor(props) {
     super(props)
     const { collection } = props
+    const { currentUser } = apiStore
     const questions = [...collection.question_cards]
-    // TODO: re-enable, but only for standalone tests
-    // const { currentUser } = apiStore
-    // if (currentUser) {
-    //   questions.splice(questions.length - 1, 0, {
-    //     id: 'recontact',
-    //     card_question_type: 'question_recontact',
-    //     record: { id: 'facsda', content: '' },
-    //   })
-    // }
+    if (!collection.live_test_collection || currentUser) {
+      questions.splice(questions.length - 1, 0, {
+        id: 'recontact',
+        card_question_type: 'question_recontact',
+        record: { id: 'facsda', content: '' },
+      })
+    }
     this.allCards = questions
   }
 
@@ -42,8 +45,7 @@ class TestSurveyResponder extends React.Component {
     const { surveyResponse } = this.props
     if (!surveyResponse) return undefined
     if (card.card_question_type === 'question_recontact') {
-      const { currentUser } = apiStore
-      return currentUser.feedback_contact_preference !== 0
+      return this.recontactAnswered
     }
     return _.find(surveyResponse.question_answers, {
       question_id: card.record.id,
@@ -74,6 +76,11 @@ class TestSurveyResponder extends React.Component {
   }
 
   afterQuestionAnswered = card => {
+    if (card.id === 'recontact') {
+      runInAction(() => {
+        this.recontactAnswered = true
+      })
+    }
     this.scrollToTopOfNextCard(card)
   }
 

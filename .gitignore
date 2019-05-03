@@ -37,3 +37,6 @@ styleguide
 
 cypress/screenshots
 cypress/videos
+
+# generated ctags
+.tags
