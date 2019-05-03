@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190426223319) do
+ActiveRecord::Schema.define(version: 20190503205644) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -58,14 +58,6 @@ ActiveRecord::Schema.define(version: 20190426223319) do
     t.index ["token"], name: "index_api_tokens_on_token"
   end
 
-  create_table "app_metrics", force: :cascade do |t|
-    t.string "metric"
-    t.float "value"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["metric", "created_at"], name: "index_app_metrics_on_metric_and_created_at"
-  end
-
   create_table "application_organizations", force: :cascade do |t|
     t.bigint "application_id"
     t.bigint "organization_id"
@@ -81,6 +73,16 @@ ActiveRecord::Schema.define(version: 20190426223319) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_applications_on_user_id"
+  end
+
+  create_table "audiences", force: :cascade do |t|
+    t.string "name"
+    t.float "price_per_response"
+    t.string "criteria"
+    t.bigint "organization_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["organization_id"], name: "index_audiences_on_organization_id"
   end
 
   create_table "collection_cards", force: :cascade do |t|
@@ -101,7 +103,7 @@ ActiveRecord::Schema.define(version: 20190426223319) do
     t.boolean "image_contain", default: false
     t.boolean "is_cover", default: false
     t.datetime "unarchived_at"
-    t.integer "filter", default: 0
+    t.integer "filter", default: 1
     t.boolean "hidden", default: false
     t.boolean "show_replace", default: true
     t.integer "row"
@@ -145,7 +147,6 @@ ActiveRecord::Schema.define(version: 20190426223319) do
     t.integer "cover_type", default: 0
     t.datetime "test_launched_at"
     t.boolean "submissions_enabled", default: true
-    t.integer "test_sample_size", default: 0
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
@@ -384,6 +385,16 @@ ActiveRecord::Schema.define(version: 20190426223319) do
     t.index ["name"], name: "index_tags_on_name", unique: true
   end
 
+  create_table "test_audiences", force: :cascade do |t|
+    t.integer "sample_size"
+    t.bigint "audience_id"
+    t.bigint "test_collection_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["audience_id"], name: "index_test_audiences_on_audience_id"
+    t.index ["test_collection_id"], name: "index_test_audiences_on_test_collection_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: ""
     t.string "encrypted_password", default: "", null: false
@@ -440,4 +451,5 @@ ActiveRecord::Schema.define(version: 20190426223319) do
   end
 
   add_foreign_key "collections", "organizations"
+  add_foreign_key "test_audiences", "audiences"
 end

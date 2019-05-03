@@ -97,6 +97,7 @@ Rails.application.routes.draw do
         resources :collections, only: %i[create]
         resources :groups, only: %i[index]
         resources :users, only: %i[index]
+        resources :audiences, only: %i[index]
       end
       delete 'sessions' => 'sessions#destroy'
       resources :users, except: :index do
@@ -137,6 +138,7 @@ Rails.application.routes.draw do
         # not shallow because we always want to look up survey_response by session_uid
         resources :question_answers, only: %i[create update]
       end
+      resources :audiences, only: %i[index show]
     end
   end
 

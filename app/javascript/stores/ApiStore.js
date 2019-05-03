@@ -10,20 +10,21 @@ import trackError from '~/utils/trackError'
 import googleTagManager from '~/vendor/googleTagManager'
 
 import Activity from './jsonApi/Activity'
+import Audience from './jsonApi/Audience'
 import Collection from './jsonApi/Collection'
 import CollectionCard from './jsonApi/CollectionCard'
-import Role from './jsonApi/Role'
+import Comment from './jsonApi/Comment'
+import CommentThread from './jsonApi/CommentThread'
 import FilestackFile from './jsonApi/FilestackFile'
 import Group from './jsonApi/Group'
 import Item from './jsonApi/Item'
 import Notification from './jsonApi/Notification'
 import Organization from './jsonApi/Organization'
-import User from './jsonApi/User'
-import Comment from './jsonApi/Comment'
-import CommentThread from './jsonApi/CommentThread'
-import UsersThread from './jsonApi/UsersThread'
-import SurveyResponse from './jsonApi/SurveyResponse'
 import QuestionAnswer from './jsonApi/QuestionAnswer'
+import Role from './jsonApi/Role'
+import SurveyResponse from './jsonApi/SurveyResponse'
+import User from './jsonApi/User'
+import UsersThread from './jsonApi/UsersThread'
 
 class ApiStore extends jsonapi(datxCollection) {
   @observable
@@ -356,6 +357,16 @@ class ApiStore extends jsonapi(datxCollection) {
     return res.data
   }
 
+  async fetchOrganizationAudiences(orgId) {
+    // const res = await this.request(
+    //   `audiences/organization_audiences/${orgId}`,
+    //   'GET'
+    // )
+    const res = await this.request(`/organizations/${orgId}/audiences/`, 'GET')
+    const audiences = res.data
+    return audiences
+  }
+
   async createTemplateInstance(data) {
     return this.request('collections/create_template', 'POST', data)
   }
@@ -547,20 +558,21 @@ class ApiStore extends jsonapi(datxCollection) {
 }
 ApiStore.types = [
   Activity,
+  Audience,
   Collection,
   CollectionCard,
+  Comment,
+  CommentThread,
   FilestackFile,
   Group,
   Item,
-  Role,
-  Organization,
-  User,
-  Comment,
-  CommentThread,
   Notification,
-  UsersThread,
-  SurveyResponse,
+  Organization,
   QuestionAnswer,
+  SurveyResponse,
+  Role,
+  User,
+  UsersThread,
 ]
 
 export default ApiStore

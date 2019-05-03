@@ -1,58 +1,33 @@
 import React from 'react'
 // import { PropTypes } from 'prop-types'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observable, runInAction } from 'mobx'
 import AudienceSettingsWidget from './presentation'
 
+@inject('apiStore')
+@observer
 class AudienceSettings extends React.Component {
-  state = {
-    options: [],
-  }
+  @observable
+  audiences = []
 
   componentDidMount() {
-    this.setState({
-      options: this.options,
+    this.fetchAvailableAudiences()
+  }
+
+  fetchAvailableAudiences = async () => {
+    const { apiStore } = this.props
+    const audiences = await apiStore.fetchOrganizationAudiences(
+      apiStore.currentUserOrganizationId
+    )
+    console.log('here', audiences)
+    runInAction(() => {
+      this.audences = audiences
     })
   }
 
-  fetchOptions = () => {
-    console.log('TODO: implement fetchOptions')
-  }
-
-  get options() {
-    this.fetchOptions()
-    // eventually this will be an API call to fetch audiences
-    return [
-      {
-        id: '1',
-        label: 'Share via link (on)',
-        size: null,
-        disabled: true,
-        selected: true,
-        hasInput: false,
-      },
-      {
-        id: '2',
-        label: 'All People (No Filters)',
-        size: 12,
-        disabled: false,
-        selected: false,
-        hasInput: true,
-        pricePerResponse: 5.12,
-      },
-      {
-        id: '3',
-        label: 'My new option',
-        size: 12,
-        disabled: false,
-        selected: false,
-        hasInput: true,
-        pricePerResponse: 3.77,
-      },
-    ]
-  }
-
   get totalPrice() {
-    const { options } = this.state
-    return options
+    const { audiences } = this
+    return audiences
       .map(option => {
         if (option.size < 1) {
           return 0
@@ -63,17 +38,18 @@ class AudienceSettings extends React.Component {
   }
 
   toggleCheckbox = e => {
-    const { options } = this.state
+    const { audiences } = this
     const id = e.target.value
-    const foundOption = options.find(option => option.id === id)
+    const foundOption = audiences.find(option => option.id === id)
     const updatedOption = Object.assign({}, foundOption, {
       selected: !foundOption.selected,
     })
-    console.log('updating option: ', updatedOption)
-    const newOptions = this.state.options.map(
+    const newaudiences = this.audiences.map(
       option => (option.id === id ? updatedOption : option)
     )
-    this.setState({ options: newOptions })
+    runInAction(() => {
+      this.audences = newaudiences
+    })
   }
 
   stopEditingIfContent = () => {
@@ -96,12 +72,15 @@ class AudienceSettings extends React.Component {
         handleKeyPress={this.handleKeyPress}
         handleInputChange={this.handleInputChange}
         totalPrice={this.totalPrice}
-        options={this.state.options}
+        options={this.audiences}
       />
     )
   }
 }
 
 AudienceSettings.propTypes = {}
+AudienceSettings.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
 
 export default AudienceSettings

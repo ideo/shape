@@ -4,6 +4,7 @@ class CreateAudiences < ActiveRecord::Migration[5.1]
       t.string :name
       t.float :price_per_response
       t.string :criteria
+      t.references :organization
 
       t.timestamps
     end
