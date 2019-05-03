@@ -70,10 +70,10 @@ class AudienceSettings extends React.Component {
     const { options } = this.state
     const parsedValue = parseInt(e.target.value)
     const foundOption = options.find(option => option.id === parsedValue)
-    console.log('updating option: ', foundOption)
     const updatedOption = Object.assign({}, foundOption, {
       selected: !foundOption.selected,
     })
+    console.log('updating option: ', updatedOption)
     const newOptions = this.state.options.map(
       option => (option.id === parsedValue ? updatedOption : option)
     )
