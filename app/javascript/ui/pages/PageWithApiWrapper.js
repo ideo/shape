@@ -8,6 +8,7 @@ import Deactivated from '~/ui/layout/Deactivated'
 import CollectionPage from '~/ui/pages/CollectionPage'
 import ItemPage from '~/ui/pages/ItemPage'
 import trackError from '~/utils/trackError'
+import routeToLogin from '~/utils/routeToLogin'
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -100,7 +101,7 @@ class PageWithApiWrapper extends React.Component {
   }
 
   fetchData = async () => {
-    const { apiStore, uiStore } = this.props
+    const { apiStore, uiStore, match } = this.props
     uiStore.update('pageError', null)
 
     return apiStore
@@ -113,6 +114,10 @@ class PageWithApiWrapper extends React.Component {
       })
       .catch(err => {
         this.setState({ data: null }, () => {
+          if (!apiStore.currentUser && err.status === 401) {
+            // always redirect logged-out users to login
+            routeToLogin({ redirect: match.url })
+          }
           uiStore.update('pageError', err)
           trackError(err, { name: 'PageApiFetch' })
         })

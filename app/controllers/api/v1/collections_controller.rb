@@ -5,7 +5,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   skip_before_action :check_api_authentication!, only: %i[show]
   # NOTE: these have to be in the following order
   before_action :join_collection_group, only: :show, if: :join_collection_group?
-  before_action :switch_to_organization, only: %i[show]
+  before_action :switch_to_organization, only: :show, if: :user_signed_in?
   before_action :load_and_authorize_collection_update, only: %i[update]
   before_action :load_collection_with_roles, only: %i[show update]
 

@@ -22,6 +22,7 @@ import TestDesigner from '~/ui/test_collections/TestDesigner'
 import v from '~/utils/variables'
 import Collection from '~/stores/jsonApi/Collection'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
+import routeToLogin from '~/utils/routeToLogin'
 
 // more global way to do this?
 pluralize.addPluralRule(/canvas$/i, 'canvases')
@@ -44,6 +45,13 @@ class CollectionPage extends React.Component {
   }
 
   componentDidMount() {
+    const { collection, apiStore } = this.props
+    if (!apiStore.currentUser && !collection.anyone_can_view) {
+      // in this case, if you're not logged in but you had access (joinable but not public)
+      // we do require you to login
+      // NOTE: the user will see a brief flash of the collection name before redirect
+      routeToLogin({ redirect: collection.frontend_url })
+    }
     this.loadCollectionCards({})
   }
 
@@ -92,14 +100,6 @@ class CollectionPage extends React.Component {
       routingStore,
       undoStore,
     } = this.props
-
-    if (!apiStore.currentUser && !collection.anyone_can_view) {
-      // in this case, if you're not logged in, we require you to login
-      // NOTE: the user will see a brief flash of the content before redirect
-      window.location.href = `/login?redirect=${encodeURI(
-        collection.frontend_url
-      )}`
-    }
 
     apiStore.checkCurrentOrg({ id: collection.organization_id })
 
