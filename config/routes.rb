@@ -103,6 +103,7 @@ Rails.application.routes.draw do
         collection do
           get 'me'
           post 'create_from_emails'
+          post 'create_limited_user'
           patch 'update_current_user'
           post 'switch_org'
         end

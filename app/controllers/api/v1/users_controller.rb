@@ -62,6 +62,16 @@ class Api::V1::UsersController < Api::V1::BaseController
     end
   end
 
+  def create_limited_user
+    contact_info = params['_jsonapi']['contact_info']
+    creator = LimitedUserCreator.new(contact_info: contact_info)
+    if creator.call
+      render jsonapi: creator.limited_user
+    else
+      render json: { errors: creator.errors }, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def load_and_authorize_organization
