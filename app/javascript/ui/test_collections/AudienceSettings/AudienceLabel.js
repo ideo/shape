@@ -13,7 +13,6 @@ const AudienceLabel = ({ option, toggleCheckbox }) => (
             onChange={toggleCheckbox}
             value={option.id}
             color={'default'}
-            iconStyle={{ fill: 'black' }}
           />
         }
         label={

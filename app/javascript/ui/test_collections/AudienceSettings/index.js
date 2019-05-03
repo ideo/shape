@@ -3,12 +3,8 @@ import React from 'react'
 import AudienceSettingsWidget from './presentation'
 
 class AudienceSettings extends React.Component {
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      options: [],
-    }
+  state = {
+    options: [],
   }
 
   componentDidMount() {
@@ -26,7 +22,7 @@ class AudienceSettings extends React.Component {
     // eventually this will be an API call to fetch audiences
     return [
       {
-        id: 1,
+        id: '1',
         label: 'Share via link (on)',
         size: null,
         disabled: true,
@@ -34,7 +30,7 @@ class AudienceSettings extends React.Component {
         hasInput: false,
       },
       {
-        id: 2,
+        id: '2',
         label: 'All People (No Filters)',
         size: 12,
         disabled: false,
@@ -43,7 +39,7 @@ class AudienceSettings extends React.Component {
         pricePerResponse: 5.12,
       },
       {
-        id: 3,
+        id: '3',
         label: 'My new option',
         size: 12,
         disabled: false,
@@ -68,14 +64,14 @@ class AudienceSettings extends React.Component {
 
   toggleCheckbox = e => {
     const { options } = this.state
-    const parsedValue = parseInt(e.target.value)
-    const foundOption = options.find(option => option.id === parsedValue)
+    const id = e.target.value
+    const foundOption = options.find(option => option.id === id)
     const updatedOption = Object.assign({}, foundOption, {
       selected: !foundOption.selected,
     })
     console.log('updating option: ', updatedOption)
     const newOptions = this.state.options.map(
-      option => (option.id === parsedValue ? updatedOption : option)
+      option => (option.id === id ? updatedOption : option)
     )
     this.setState({ options: newOptions })
   }

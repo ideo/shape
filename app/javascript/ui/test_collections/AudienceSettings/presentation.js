@@ -28,7 +28,7 @@ const AudienceSettings = ({
         <StyledColumnFlexParent>
           {options.map(option => {
             return (
-              <StyledColumnFlexParent>
+              <StyledColumnFlexParent key={option.id}>
                 <AudienceLabel
                   option={option}
                   toggleCheckbox={toggleCheckbox}
@@ -69,7 +69,7 @@ const AudienceSettings = ({
           </StyledRowFlexParent>
           {options.map(option => {
             return (
-              <StyledRowFlexParent>
+              <StyledRowFlexParent key={option.id}>
                 <AudienceLabel
                   option={option}
                   toggleCheckbox={toggleCheckbox}
