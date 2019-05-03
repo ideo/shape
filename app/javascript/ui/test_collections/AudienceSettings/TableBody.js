@@ -13,11 +13,13 @@ const TableBody = ({
   <StyledRowFlexParent>
     <StyledRowFlexCell>
       <DisplayText color={v.colors.commonMedium}>
-        {option.pricePerResponse ? `$${option.pricePerResponse}` : '–'}
+        {option.pricePerResponse && option.selected
+          ? `$${option.pricePerResponse}`
+          : '–'}
       </DisplayText>
     </StyledRowFlexCell>
     <StyledRowFlexCell>
-      {option.hasInput ? (
+      {option.hasInput && option.selected ? (
         <EditableInput
           id={option.id}
           type="text"
@@ -33,7 +35,7 @@ const TableBody = ({
     </StyledRowFlexCell>
     <StyledRowFlexCell>
       <DisplayText color={v.colors.commonMedium}>
-        {option.size > 0
+        {option.size > 0 && option.selected
           ? `$${_.round(option.pricePerResponse * option.size, 2)}`
           : '–'}
       </DisplayText>
