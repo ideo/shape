@@ -6,20 +6,15 @@ Given('I visit the Marketing Page', () => {
 })
 
 Given('I login and visit My Collection', () => {
-  // user 4 is our test user
-  cy.login({ email: 'cypress-test@ideo.com' })
-  // go to My Collection
-  cy.visit('/')
-  cy.wait('@apiGetCurrentUser')
+  cy.loginAndVisitMyCollection()
 })
 
 Given('I login and visit the Test Area', () => {
-  cy.login({ email: 'cypress-test@ideo.com' })
-  // go to My Collection
-  cy.visit('/')
-  cy.wait('@apiGetCurrentUser')
+  cy.loginAndVisitMyCollection()
   // navigate into collection
   cy.locateWith('CollectionCover', 'Cypress Test Area')
     .last()
     .click()
+  cy.wait('@apiGetCollection')
+  cy.wait('@apiGetCollectionCards')
 })
