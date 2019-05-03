@@ -3,6 +3,28 @@ require 'rails_helper'
 describe Api::V1::CollectionsController, type: :request, json: true, auth: true do
   let(:user) { @user }
 
+  context 'with anonymous (logged-out) user', auth: false do
+    describe 'GET #show' do
+      let(:path) { "/api/v1/collections/#{collection.id}" }
+
+      context 'with a normal collection' do
+        let(:collection) { create(:collection) }
+        it 'returns a 401' do
+          get(path)
+          expect(response.status).to eq(401)
+        end
+      end
+
+      context 'with an anyone_can_view collection' do
+        let(:collection) { create(:collection, anyone_can_view: true) }
+        it 'returns a 200' do
+          get(path)
+          expect(response.status).to eq(200)
+        end
+      end
+    end
+  end
+
   context 'with API user' do
     let!(:api_user) { create(:user, :application_bot) }
     before do
