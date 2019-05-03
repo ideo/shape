@@ -21,6 +21,7 @@ namespace :cypress do
     my_collection = user.current_user_collection
     # via dependent: :destroy this will also remove everything in the test area
     my_collection.collections.where(name: 'Cypress Test Area').destroy_all
+    User.where('handle LIKE ?', 'cy-test-%').destroy_all
     create_cards(my_collection, user)
     create_events(organization)
   end
@@ -55,7 +56,7 @@ namespace :cypress do
 
   def create_events(organization)
     15.times do |_i|
-      user = FactoryBot.create(:user)
+      user = FactoryBot.create(:user, handle: "cy-test-#{Faker::Internet.unique.slug}")
       FactoryBot.create(:activity,
                         # with cache_classes = false, it gets angry if you try to pass in the
                         # actual model and not id (ActiveRecord::AssociationTypeMismatch)

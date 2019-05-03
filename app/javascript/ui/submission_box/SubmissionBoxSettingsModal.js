@@ -22,6 +22,7 @@ import AddLinkIcon from '~/ui/icons/AddLinkIcon'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import Modal from '~/ui/global/modals/Modal'
+import RecordSearch from '~/ui/global/RecordSearch'
 import v from '~/utils/variables'
 
 const SubmissionBoxRow = Row.extend`
@@ -49,15 +50,8 @@ const StyledTitleContent = styled.div`
 class SubmissionBoxSettingsModal extends React.Component {
   @observable
   loading = false
-
-  componentDidMount() {
-    const { apiStore } = this.props
-    apiStore.fetchUsableTemplates()
-  }
-
-  get templates() {
-    return this.props.apiStore.usableTemplates
-  }
+  @observable
+  templates = []
 
   get locked() {
     const { uiStore } = this.props
@@ -118,6 +112,13 @@ class SubmissionBoxSettingsModal extends React.Component {
     }
     // otherwise just go straight to the callback if no submissions
     callback()
+  }
+
+  onSearch = templates => {
+    if (!templates) return
+    runInAction(() => {
+      this.templates = templates
+    })
   }
 
   // you can either set it to be a template, or a type like "text"
@@ -239,54 +240,90 @@ class SubmissionBoxSettingsModal extends React.Component {
     return collection.save()
   }
 
-  titleContent = () => (
-    <StyledTitleContent>
-      <Heading2>Submission Box Settings</Heading2>
-      {this.loading && <InlineLoader />}
-      <Row>
-        <span
-          style={{
-            display: 'inline-block',
-            height: '25px',
-            width: '25px',
-            color: v.colors.commonMedium,
-          }}
-        >
-          <AlertIcon />
-        </span>
-        <RowItemLeft>
-          <SmallHelperText>
-            Anyone invited to this collection box will be able to instantly
-            create their own instance of the template that you choose. Use one
-            of our templates or create your own.
-          </SmallHelperText>
-          <FormControlLabel
-            style={{ marginLeft: '-42px' }}
-            classes={{ label: 'form-control' }}
-            control={
-              <Checkbox
-                checked={this.props.collection.hide_submissions}
-                onChange={this.updateHidden}
-                value="yes"
-              />
-            }
-            label={
-              <div style={{ marginLeft: '-4px' }}>
-                <DisplayText>Hide new submissions</DisplayText>
-                <br />
-                <SmallHelperText>
-                  When this box is checked, submissions will not show up until
-                  the participant chooses to submit it.
-                </SmallHelperText>
-              </div>
-            }
-          />
-        </RowItemLeft>
-      </Row>
-      <Heading3>Submission Format</Heading3>
-      {this.selectedOption()}
-    </StyledTitleContent>
-  )
+  updateEnabled = ev => {
+    ev.preventDefault()
+    const { collection } = this.props
+    collection.submissions_enabled = !collection.submissions_enabled
+    return collection.save()
+  }
+
+  titleContent = () => {
+    const { collection } = this.props
+    const { submissions_enabled, hide_submissions } = collection
+
+    return (
+      <StyledTitleContent>
+        <Heading2>Submission Box Settings</Heading2>
+        {this.loading && <InlineLoader />}
+        <Row>
+          <span
+            style={{
+              display: 'inline-block',
+              height: '25px',
+              width: '25px',
+              color: v.colors.commonMedium,
+            }}
+          >
+            <AlertIcon />
+          </span>
+          <RowItemLeft>
+            <SmallHelperText>
+              Anyone invited to this collection box will be able to instantly
+              create their own instance of the template that you choose. Use one
+              of our templates or create your own.
+            </SmallHelperText>
+            <FormControlLabel
+              style={{ marginLeft: '-42px' }}
+              classes={{ label: 'form-control' }}
+              control={
+                <Checkbox
+                  checked={submissions_enabled}
+                  onChange={this.updateEnabled}
+                  value="yes"
+                />
+              }
+              label={
+                <div style={{ marginLeft: '-4px' }}>
+                  <DisplayText>
+                    Accept new submissions ({submissions_enabled ? 'ON' : 'OFF'}
+                    )
+                  </DisplayText>
+                  <br />
+                  <SmallHelperText>
+                    When this box is checked, participants are able to create
+                    new submissions and submit them.
+                  </SmallHelperText>
+                </div>
+              }
+            />
+            <FormControlLabel
+              style={{ marginLeft: '-42px' }}
+              classes={{ label: 'form-control' }}
+              control={
+                <Checkbox
+                  checked={hide_submissions}
+                  onChange={this.updateHidden}
+                  value="yes"
+                />
+              }
+              label={
+                <div style={{ marginLeft: '-4px' }}>
+                  <DisplayText>Hide new submissions</DisplayText>
+                  <br />
+                  <SmallHelperText>
+                    When this box is checked, submissions will not show up until
+                    the participant chooses to submit it.
+                  </SmallHelperText>
+                </div>
+              }
+            />
+          </RowItemLeft>
+        </Row>
+        <Heading3>Submission Format</Heading3>
+        {this.selectedOption()}
+      </StyledTitleContent>
+    )
+  }
 
   get itemRows() {
     const { submission_box_type } = this.props.collection
@@ -296,8 +333,12 @@ class SubmissionBoxSettingsModal extends React.Component {
     )
   }
 
-  render() {
+  searchFilter = c => {
     const { submission_template_id } = this.props.collection
+    return submission_template_id !== c.id
+  }
+
+  render() {
     return (
       <Modal
         title={this.titleContent()}
@@ -306,11 +347,17 @@ class SubmissionBoxSettingsModal extends React.Component {
         open
       >
         <div>
+          <RecordSearch
+            onSelect={() => {}}
+            onSearch={this.onSearch}
+            initialLoadAmount={25}
+            searchFilter={this.searchFilter}
+            searchTags={['template']}
+          />
+          <br />
           {this.itemRows}
-          {this.templates.map(
-            template =>
-              submission_template_id !== template.id &&
-              this.submissionBoxRowForTemplate(template)
+          {this.templates.map(template =>
+            this.submissionBoxRowForTemplate(template)
           )}
         </div>
       </Modal>

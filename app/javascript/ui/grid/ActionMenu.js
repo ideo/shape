@@ -11,7 +11,7 @@ import DuplicateIcon from '~/ui/icons/DuplicateIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import MoveIcon from '~/ui/icons/MoveIcon'
 import ReplaceIcon from '~/ui/icons/ReplaceIcon'
-import PermissionsIcon from '~/ui/icons/PermissionsIcon'
+import SharingIcon from '~/ui/icons/SharingIcon'
 import SubmissionBoxIconSm from '~/ui/icons/SubmissionBoxIconSm'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import TagIcon from '~/ui/icons/TagIcon'
@@ -114,7 +114,7 @@ class ActionMenu extends React.Component {
 
   toggleOpen = e => {
     e.stopPropagation()
-    this.props.onOpen()
+    this.props.onOpen(e)
   }
 
   openSubmissionBoxSettings = () => {
@@ -163,8 +163,8 @@ class ActionMenu extends React.Component {
       },
       { name: 'Tags', iconRight: <TagIcon />, onClick: this.showTags },
       {
-        name: 'Permissions',
-        iconRight: <PermissionsIcon />,
+        name: 'Sharing',
+        iconRight: <SharingIcon />,
         onClick: this.showRolesMenu,
       },
       {
@@ -216,7 +216,7 @@ class ActionMenu extends React.Component {
       ]
       if (location !== 'Search') {
         viewActions.push('Tags')
-        viewActions.push('Permissions')
+        viewActions.push('Sharing')
       }
       items = _.filter(items, a => _.includes(viewActions, a.name))
     }
@@ -260,7 +260,13 @@ class ActionMenu extends React.Component {
   }
 
   render() {
-    const { className, menuOpen, wrapperClassName, uiStore } = this.props
+    const {
+      className,
+      menuOpen,
+      wrapperClassName,
+      direction,
+      uiStore,
+    } = this.props
     return (
       <PopoutMenu
         className={className}
@@ -271,7 +277,7 @@ class ActionMenu extends React.Component {
         menuOpen={menuOpen}
         buttonStyle={this.buttonStyle}
         position={{ x: uiStore.cardMenuOpen.x, y: uiStore.cardMenuOpen.y }}
-        direction={uiStore.cardMenuOpen.direction}
+        direction={direction}
         width={250}
       />
     )
@@ -281,6 +287,7 @@ class ActionMenu extends React.Component {
 ActionMenu.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   className: PropTypes.string,
+  direction: PopoutMenu.propTypes.direction,
   wrapperClassName: PropTypes.string,
   location: PropTypes.string.isRequired,
   menuOpen: PropTypes.bool.isRequired,
@@ -300,6 +307,7 @@ ActionMenu.displayName = 'ActionMenu'
 
 ActionMenu.defaultProps = {
   className: '',
+  direction: null,
   wrapperClassName: 'card-menu',
   onMoveMenu: null,
   afterArchive: null,

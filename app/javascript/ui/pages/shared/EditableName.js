@@ -101,15 +101,14 @@ class EditableName extends React.Component {
   }
 
   truncateName() {
-    const { extraWidth, actionsWidth, uiStore } = this.props
+    const { extraWidth, uiStore } = this.props
     if (!this.name) return ''
     // 64 == account for 32px padding x2
     const screenWidth = Math.min(uiStore.windowWidth - 64, v.maxWidth)
     // Estimation of width based on current font size
     const fontSizeMultiplier =
       screenWidth > v.responsive.smallBreakpoint ? 25 : 10
-    let marginRightPadding = actionsWidth + 30
-    if (extraWidth) marginRightPadding += extraWidth
+    const marginRightPadding = 30 + (extraWidth || 0)
     let width = this.name.length * fontSizeMultiplier
     // NOTE: this isn't really doing anything yet, but could be used to
     // calculate the "true width" of the H1
@@ -171,7 +170,6 @@ EditableName.propTypes = {
   canEdit: PropTypes.bool,
   fontSize: PropTypes.number,
   extraWidth: PropTypes.number,
-  actionsWidth: PropTypes.number,
 }
 
 EditableName.wrappedComponent.propTypes = {
@@ -182,7 +180,6 @@ EditableName.defaultProps = {
   canEdit: false,
   fontSize: 2.25,
   extraWidth: 0,
-  actionsWidth: 0,
 }
 
 EditableName.displayName = 'EditableName'

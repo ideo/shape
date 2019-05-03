@@ -1,5 +1,6 @@
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
 import { apiStore, uiStore } from '~/stores'
+import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 import { fakeTextItem } from '#/mocks/data'
 
@@ -12,6 +13,7 @@ const props = {
   height: 200,
   cardId: '1',
   handleClick: jest.fn(),
+  initialFontTag: 'P',
 }
 const e = {
   stopPropagation: jest.fn(),
@@ -25,6 +27,10 @@ describe('TextItemCover', () => {
     component = wrapper.instance()
   })
 
+  it('renders snapshot', () => {
+    expectTreeToMatchSnapshot(wrapper)
+  })
+
   it('renders Quill with item.data_content', () => {
     expect(wrapper.find('Quill').props().value).toBe(item.data_content)
   })
@@ -32,7 +38,11 @@ describe('TextItemCover', () => {
   it('renders Read More if text height exceeds the viewable area', () => {
     const inst = wrapper.instance()
     inst.quillEditor = {
-      getEditingArea: () => ({ offsetHeight: 900 }),
+      editingArea: {
+        getElementsByClassName: jest
+          .fn()
+          .mockReturnValue([{ scrollHeight: 500 }]),
+      },
     }
     inst.componentDidMount()
     // force re-render to pick up state update
@@ -44,7 +54,11 @@ describe('TextItemCover', () => {
   it('does not render Read More if text height fits within the viewable area', () => {
     const inst = wrapper.instance()
     inst.quillEditor = {
-      getEditingArea: () => ({ offsetHeight: 50 }),
+      editingArea: {
+        getElementsByClassName: jest
+          .fn()
+          .mockReturnValue([{ scrollHeight: 100 }]),
+      },
     }
     inst.componentDidMount()
     wrapper.update()

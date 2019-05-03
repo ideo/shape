@@ -33,6 +33,7 @@ const createNamedRoutes = () => {
   cy.route('POST', '/api/v1/organizations').as('apiCreateOrganization')
   // external routes
   cy.route('GET', '**/youtube/v3/videos*', 'fx:youtube-api').as('youtubeApi')
+  cy.route('GET', /passthru/, 'fx:blog').as('externalUrl')
 }
 
 before(() => {

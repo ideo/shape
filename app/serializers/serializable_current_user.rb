@@ -3,7 +3,7 @@ class SerializableCurrentUser < SerializableUser
   # adds some fields that only the current user should see for themself
   attributes :terms_accepted, :notify_through_email,
              :show_helper, :show_move_helper, :show_template_helper,
-             :mailing_list
+             :mailing_list, :feedback_contact_preference
 
   attribute :google_auth_token do
     # generate user login token for firebase

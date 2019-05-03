@@ -140,5 +140,39 @@ describe Users::OmniauthCallbacksController, type: :request do
         expect(group.can_view?(user)).to be true
       end
     end
+
+    context 'with a limited user' do
+      let(:uid) { '1231xyz232' }
+
+      before do
+        OmniAuth.config.test_mode = true
+        OmniAuth.config.mock_auth[:ideo] = OmniAuth::AuthHash.new(
+          provider: 'ideo',
+          uid: uid,
+          info: {},
+          extra: {
+            raw_info: {
+              type: 'User::Limited',
+              phone: '123123',
+              picture: picture,
+              picture_medium: "#{picture}_md",
+              picture_large: "#{picture}_lg",
+            },
+          },
+        )
+      end
+
+      it 'does not call OrganizationAutojoiner' do
+        expect(OrganizationAutojoiner).not_to receive(:new)
+        post(path)
+      end
+
+      it 'creates a limited user' do
+        post(path)
+        user = User.find_by_uid(uid)
+        expect(user).not_to be_nil
+        expect(user.limited?).to be true
+      end
+    end
   end
 end

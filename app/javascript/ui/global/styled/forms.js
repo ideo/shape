@@ -309,6 +309,7 @@ export const SelectOption = styled(MenuItem)`
     height: auto;
     padding: 12px 10px 12px 20px;
     position: relative;
+    border-top: 1px solid ${v.colors.commonMedium};
 
     &::before {
       background-color: transparent;
@@ -325,17 +326,6 @@ export const SelectOption = styled(MenuItem)`
       }
     }
 
-    &::after {
-      background-color: ${v.colors.commonMedium};
-      bottom: 0;
-      content: '';
-      display: block;
-      height: 1px;
-      left: 0;
-      position: absolute;
-      width: 100%;
-    }
-
     &:hover {
       background-color: inherit !important;
       &::before {
@@ -347,6 +337,16 @@ export const SelectOption = styled(MenuItem)`
   &.selected {
     background-color: inherit !important;
     border-left-color: ${v.colors.black};
+  }
+
+  &.category {
+    text-transform: uppercase;
+    font-size: 0.8125rem;
+    font-weight: ${v.weights.medium};
+    letter-spacing: 0.0625rem;
+    color: ${v.colors.black};
+    border-top: 1px solid ${v.colors.black};
+    opacity: 1;
   }
 
   &.grayedOut {

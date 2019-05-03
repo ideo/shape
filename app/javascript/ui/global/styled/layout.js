@@ -62,15 +62,28 @@ export const InlineRow = styled(Flex)`
 `
 InlineRow.displayName = 'StyledInlineRow'
 
-export const FixedHeader = styled.header`
+export const StyledHeader = styled.header`
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0 ${v.containerPadding.horizontal}rem 1.875rem;
+  position: relative; /* necessary to get above the FixedBoundary */
+  @media print {
+    display: none;
+  }
+`
+StyledHeader.displayName = 'StyledHeader'
+
+export const FixedHeader = styled(StyledHeader)`
+  padding: 0 ${v.containerPadding.horizontal}rem;
   z-index: ${props => props.zIndex};
   position: fixed;
   top: 0;
-  width: calc(100% - ${v.containerPadding.horizontal}rem * 2);
-  background: ${v.colors.commonLight};
-  padding: 1rem ${v.containerPadding.horizontal}rem;
-  @media print {
-    display: none;
+  background: ${hexToRgba(v.colors.commonLight, 0.96)};
+  @supports (
+    (-webkit-backdrop-filter: blur(4px)) or (backdrop-filter: blur(4px))
+  ) {
+    background: ${hexToRgba(v.colors.commonLight, 0.9)};
+    backdrop-filter: blur(4px);
   }
 `
 FixedHeader.displayName = 'FixedHeader'

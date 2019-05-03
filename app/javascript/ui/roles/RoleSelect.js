@@ -162,7 +162,6 @@ class RoleSelect extends React.Component {
           <Avatar
             key={entity.id}
             url={url}
-            size={38}
             // user_profile_collection_id will be null if its a group
             linkToCollectionId={entity.user_profile_collection_id}
           />

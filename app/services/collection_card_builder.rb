@@ -56,6 +56,27 @@ class CollectionCardBuilder
             record.transcode!
           end
 
+          # If this is a live test collection...
+          if @parent_collection.test_collection? &&
+             @parent_collection.live_or_was_launched? &&
+             record.is_a?(Item::QuestionItem)
+
+            test_collection = @parent_collection.test_collection
+
+            # If this is a new scale question, create response graphs
+            if record.scale_question?
+              record.create_response_graph(
+                parent_collection: test_collection,
+                initiated_by: @user,
+              )
+            elsif record.question_open?
+              record.create_open_response_collection(
+                parent_collection: test_collection,
+                initiated_by: @user,
+              )
+            end
+          end
+
           if @parent_collection.is_a? Collection::SubmissionsCollection
             @parent_collection.follow_submission_box(@user)
           end
