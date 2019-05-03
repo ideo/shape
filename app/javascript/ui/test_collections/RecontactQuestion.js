@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import { apiStore, uiStore } from '~/stores'
+import { DisplayText } from '~/ui/global/styled/typography'
 import Emoji from '~/ui/icons/Emoji'
 import { EmojiButton, EmojiHolder } from '~/ui/test_collections/ScaleQuestion'
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
@@ -9,6 +10,7 @@ import OkIcon from '~/ui/icons/OkIcon'
 import { QuestionText } from './shared'
 import { TextInput, TextResponseHolder, TextEnterButton } from './shared'
 import styled from 'styled-components'
+import v from '~/utils/variables'
 
 const FEEDBACK_CONTACT_YES = 1
 const FEEDBACK_CONTACT_NO = 2
@@ -96,7 +98,18 @@ class RecontactQuestion extends React.Component {
 
         {showContactInfo && (
           <form ref="form" onSubmit={this.handleContactInfoSubmit}>
-            <br />
+            <div style={{ padding: '16px 20px' }}>
+              <DisplayText color={v.colors.white}>
+                Please enter an email or mobile number to be recontacted.
+              </DisplayText>
+              <br />
+              <br />
+              <DisplayText color={v.colors.white}>
+                Surveys are time sensitive so enter a mobile number to allow us
+                to reach you more quickly.
+              </DisplayText>
+              <br />
+            </div>
             <TextResponseHolder>
               <TextInput
                 onChange={this.handleChange}
