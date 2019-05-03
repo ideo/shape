@@ -105,8 +105,8 @@ class RecontactQuestion extends React.Component {
               <br />
               <br />
               <DisplayText color={v.colors.white}>
-                Surveys are time sensitive so enter a mobile number to allow us
-                to reach you more quickly.
+                Surveys are time sensitive, so entering a mobile number will
+                allow us to reach you more quickly.
               </DisplayText>
               <br />
             </div>
