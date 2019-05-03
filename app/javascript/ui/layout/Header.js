@@ -23,7 +23,7 @@ import MainMenuDropdown from '~/ui/global/MainMenuDropdown'
 /* global IdeoSSO */
 
 const StyledFixedHeader = styled(FixedHeader)`
-  margin-top: 4px;
+  padding-top: 4px;
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
     padding-left: 5px;
     padding-right: 5px;
