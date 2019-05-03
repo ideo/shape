@@ -20,6 +20,7 @@ describe Collection, type: :model do
     it { should belong_to :cloned_from }
     it { should belong_to :organization }
     it { should belong_to :template }
+    it { should belong_to :joinable_group }
     # these come from Testable concern
     it { should have_many :test_collections }
     it { should have_one :live_test_collection }
@@ -108,6 +109,22 @@ describe Collection, type: :model do
         expect(collection.primary_collection_cards.any?(&:pinned?)).to be false
         collection.update(master_template: true)
         expect(collection.reload.primary_collection_cards.all?(&:pinned?)).to be true
+      end
+    end
+
+    describe '#add_joinable_guest_group' do
+      let(:organization) { create(:organization) }
+      let!(:collection) { create(:collection, organization: organization) }
+      let(:guest_group) { collection.organization.guest_group }
+
+      it 'sets the org guest group as the joinable_group when anyone_can_join is set to true' do
+        expect(collection.can_view?(guest_group)).to be false
+        collection.update(anyone_can_join: true)
+        guest_group.reset_cached_roles!
+        # adds group as viewer
+        expect(collection.can_view?(guest_group)).to be true
+        # sets the joinable group
+        expect(collection.joinable_group_id).to eq guest_group.id
       end
     end
   end

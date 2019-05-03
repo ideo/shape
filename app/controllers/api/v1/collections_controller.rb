@@ -239,8 +239,11 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def join_collection_group
     group = @collection.joinable_group
-    # TODO: first join the org if you need to...
-    # ..... join + switch
+    # first join the org if you need to...
+    unless @collection.organization.can_view? current_user
+      # even with this pushing some functions to the background, it's still a little slow
+      @collection.organization.setup_user_membership_and_collections(current_user)
+    end
     # only add_role if it's not the guest group
     current_user.add_role(Role::MEMBER, group) unless group.guest?
   end

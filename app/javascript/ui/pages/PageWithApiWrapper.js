@@ -126,12 +126,17 @@ class PageWithApiWrapper extends React.Component {
 
   render() {
     const { apiStore, uiStore } = this.props
+    const { pageError } = uiStore
     const { data } = this.state
-    if (apiStore.currentOrgIsDeactivated) {
+    if (
+      apiStore.currentOrgIsDeactivated &&
+      pageError &&
+      pageError.status === 404
+    ) {
       return <Deactivated />
     }
-    if (uiStore.pageError) {
-      return <PageError error={uiStore.pageError} />
+    if (pageError) {
+      return <PageError error={pageError} />
     }
     if (!data) return ''
 
