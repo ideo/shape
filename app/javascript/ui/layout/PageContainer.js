@@ -28,7 +28,7 @@ const PageContainer = ({ children, fullWidth, padding }) => (
 PageContainer.propTypes = {
   children: PropTypes.node.isRequired,
   fullWidth: PropTypes.bool,
-  padding: PropTypes.string,
+  padding: PropTypes.number,
 }
 
 PageContainer.defaultProps = {

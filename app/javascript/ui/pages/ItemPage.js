@@ -143,7 +143,7 @@ class ItemPage extends React.Component {
     ) {
       containerProps = {
         fullWidth: true,
-        padding: '0',
+        padding: 0,
       }
     }
     return (
