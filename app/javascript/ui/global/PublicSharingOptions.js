@@ -66,11 +66,13 @@ class PublicSharingOptions extends React.Component {
     })
   }
 
-  handleAnyoneCanJoinToggle = () => {
+  handleAnyoneCanJoinToggle = async () => {
     const { anyoneCanJoin } = this.state
-    const { record } = this.props
+    const { record, reloadGroups } = this.props
     record.anyone_can_join = !anyoneCanJoin
-    record.save()
+    if (!record.anyone_can_join) record.joinable_group_id = null
+    await record.save()
+    reloadGroups()
     this.setState({
       anyoneCanJoin: !anyoneCanJoin,
     })
@@ -179,15 +181,12 @@ class PublicSharingOptions extends React.Component {
 
 PublicSharingOptions.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
-  canEdit: PropTypes.bool,
+  canEdit: PropTypes.bool.isRequired,
+  reloadGroups: PropTypes.func.isRequired,
 }
 
 PublicSharingOptions.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-}
-
-PublicSharingOptions.defaultProps = {
-  canEdit: false,
 }
 
 export default PublicSharingOptions

@@ -199,6 +199,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :submissions_enabled,
       :anyone_can_view,
       :anyone_can_join,
+      :joinable_group_id,
       collection_cards_attributes: %i[id order width height row col],
     )
   end

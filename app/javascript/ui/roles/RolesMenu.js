@@ -322,7 +322,11 @@ class RolesMenu extends React.Component {
 
     return (
       <Fragment>
-        <PublicSharingOptions record={record} canEdit={canEdit} />
+        <PublicSharingOptions
+          record={record}
+          canEdit={canEdit}
+          reloadGroups={() => this.initializeRolesAndGroups()}
+        />
         <StyledHeaderRow align="flex-end">
           <Heading3>{title}</Heading3>
           <SearchButton

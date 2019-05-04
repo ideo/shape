@@ -42,6 +42,13 @@ class RoleSelect extends React.Component {
     return false
   }
 
+  get isJoinableGroup() {
+    const { entity, record } = this.props
+    return (
+      entity.internalType === 'groups' && record.joinable_group_id === entity.id
+    )
+  }
+
   get resourceType() {
     const { record } = this.props
     if (record.internalType === 'groups') {
@@ -152,7 +159,7 @@ class RoleSelect extends React.Component {
     // TODO remove duplication with RolesAdd role select menu
     const url = entity.pic_url_square || entity.filestack_file_url
     const showLeaveIcon =
-      enabled ||
+      (enabled && !this.isJoinableGroup) ||
       (entity.isCurrentUser &&
         !record.system_required &&
         !record.pinned_and_locked)
@@ -170,7 +177,10 @@ class RoleSelect extends React.Component {
           <Grid item xs={12} sm>
             {entity.name && entity.name.trim().length > 0 ? (
               <Grid container direction="column">
-                <DisplayText>{this.renderName()}</DisplayText>
+                <DisplayText>
+                  {this.renderName()}
+                  {this.isJoinableGroup && ' <JOINABLE>'}
+                </DisplayText>
                 <SubText>{entity.email}</SubText>
               </Grid>
             ) : (

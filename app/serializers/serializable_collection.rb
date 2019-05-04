@@ -30,6 +30,10 @@ class SerializableCollection < BaseJsonSerializer
     @object.organization_id.to_s
   end
 
+  attribute :joinable_group_id do
+    @object.joinable_group_id.to_s
+  end
+
   attribute :system_required do
     @object.system_required?
   end
