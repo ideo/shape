@@ -154,40 +154,46 @@ export class FirebaseClient {
     apiStore.update('loadingThreads', true)
     this.subscribedThreadIds.push(threadId)
     const threadUid = threadId.toString()
-    this.commentThreadsListener = db
-      .collection('comment_threads')
-      .doc(threadUid)
-      .onSnapshot(
-        threadDoc => {
-          const thread = apiStore.syncFromFirestore(threadDoc.data())
-          this.commentsListener = this.commentsForThread(threadUid)
-            .limit(3)
-            .get()
-            .then(snapshots => {
-              const comments = []
-              snapshots.docs.forEach(commentDoc => {
-                const comment = apiStore.syncFromFirestore(commentDoc.data())
-                comments.push(comment)
+    const firestoreThread = db.collection('comment_threads').doc(threadUid)
+    firestoreThread
+      // get() to ensure document exists before listening, otherwise firestore throws errors
+      .get()
+      .then(doc => {
+        this.commentThreadsListener = firestoreThread.onSnapshot(
+          threadDoc => {
+            const thread = apiStore.syncFromFirestore(threadDoc.data())
+            this.commentsListener = this.commentsForThread(threadUid)
+              .limit(3)
+              .get()
+              .then(snapshots => {
+                const comments = []
+                snapshots.docs.forEach(commentDoc => {
+                  const comment = apiStore.syncFromFirestore(commentDoc.data())
+                  comments.push(comment)
+                })
+                apiStore.importUsersThread({
+                  usersThread,
+                  thread,
+                  comments,
+                })
+                this.loadedThreadIds.push(threadId)
+                this.checkIfFinishedLoading()
               })
-              apiStore.importUsersThread({
-                usersThread,
-                thread,
-                comments,
-              })
-              this.loadedThreadIds.push(threadId)
-              this.checkIfFinishedLoading()
+          },
+          error => {
+            this.escapeLoader()
+            trackError(error, {
+              name: 'Firestore:CommentThreads',
+              message: `thread ${threadUid}; ${error && error.message}`,
             })
-        },
-        error => {
-          this.escapeLoader()
-          trackError(error, {
-            name: 'Firestore:CommentThreads',
-            message: `thread ${threadUid}; ${error && error.message}`,
-          })
-        }
-      )
-    this.listeners.push(this.commentThreadsListener)
-    this.listeners.push(this.commentsListener)
+          }
+        )
+        this.listeners.push(this.commentThreadsListener)
+        this.listeners.push(this.commentsListener)
+      })
+      .catch(e => {
+        // comment_thread document does not exist
+      })
   }
 
   escapeLoader = () => {
