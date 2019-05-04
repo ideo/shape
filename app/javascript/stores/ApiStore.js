@@ -200,7 +200,9 @@ class ApiStore extends jsonapi(datxCollection) {
   searchCollections(params) {
     const defaultParams = { query: '' }
     return this.request(
-      `search?${queryString.stringify(_.merge(defaultParams, params))}`
+      `organizations/${this.currentOrgSlug}/search?${queryString.stringify(
+        _.merge(defaultParams, params)
+      )}`
     )
   }
 
@@ -399,7 +401,9 @@ class ApiStore extends jsonapi(datxCollection) {
       .replace(/\s/g, '+')
       .replace(/#/g, '%23')
     // TODO: pagination?
-    const templates = await this.fetchAllPages(`search?query=${q}&per_page=50`)
+    const templates = await this.fetchAllPages(
+      `organizations/${this.currentOrgSlug}/search?query=${q}&per_page=50`
+    )
     runInAction(() => {
       this.usableTemplates = templates.filter(c => c.isUsableTemplate)
     })
