@@ -301,6 +301,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.type === 'Collection::Board'
   }
 
+  get isPublicJoinable() {
+    return this.anyone_can_join && !this.apiStore.currentUser
+  }
+
   get requiresSubmissionBoxSettings() {
     if (!this.isSubmissionBox) return false
     // if type is null then it requires setup

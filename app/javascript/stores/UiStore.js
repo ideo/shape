@@ -1,6 +1,8 @@
 import _ from 'lodash'
 import { animateScroll } from 'react-scroll'
 import { observable, action, runInAction, computed } from 'mobx'
+
+import routeToLogin from '~/utils/routeToLogin'
 import sleep from '~/utils/sleep'
 import v from '~/utils/variables'
 
@@ -317,7 +319,13 @@ export default class UiStore {
     this.update('cardMenuOpen', { ...this.defaultCardMenuState })
   }
 
+  // TODO: rename this function to be clear it is show or reroute??
   showPermissionsAlert() {
+    const { viewingCollection } = this
+    if (viewingCollection && viewingCollection.isPublicJoinable) {
+      routeToLogin({ redirect: viewingCollection.frontend_url })
+      return
+    }
     this.alert('You need permission to access this content.', 'Key')
   }
 

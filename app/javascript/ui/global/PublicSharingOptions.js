@@ -7,29 +7,37 @@ import CopyToClipboard from 'react-copy-to-clipboard'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 
 import { Checkbox } from '~/ui/global/styled/forms'
-import { Heading3, SubText } from '~/ui/global/styled/typography'
+import { Heading3, SmallHelperText } from '~/ui/global/styled/typography'
 import LinkIcon from '~/ui/icons/LinkIcon'
-import ProfileIcon from '~/ui/icons/ProfileIcon'
+import PublicSharingIcon from '~/ui/icons/PublicSharingIcon'
+import v from '~/utils/variables'
 
 const StyledFormControlLabel = styled(FormControlLabel)`
-  margin-top: -10px;
+  margin-top: -18px;
 `
 
 const StyledTitle = styled.div`
-  margin-bottom: 10px;
+  cursor: pointer;
+  color: ${v.colors.commonDark};
+  margin-bottom: 6px;
   .icon {
-    width: 24px;
-    margin-right: 10px;
+    width: 28px;
+    margin-right: 6px;
+  }
+  span {
+    display: inline-block;
   }
 `
 
 const PublicViewLink = styled.div`
   cursor: pointer;
   display: inline-block;
-  margin-top: 2px;
+  position: relative;
+  top: -3px;
   .icon {
     width: 16px;
-    transform: translateY(3px);
+    position: relative;
+    top: 3px;
   }
   .text {
     display: inline-block;
@@ -44,6 +52,7 @@ class PublicSharingOptions extends React.Component {
   state = {
     anyoneCanView: false,
     anyoneCanJoin: false,
+    sharingOptionsOpen: false,
   }
 
   componentDidMount() {
@@ -64,6 +73,13 @@ class PublicSharingOptions extends React.Component {
     this.setState({
       anyoneCanView: !anyoneCanView,
     })
+  }
+
+  toggleSharingMenuOpen = () => {
+    this.setState(prevState => ({
+      ...prevState,
+      sharingOptionsOpen: !prevState.sharingOptionsOpen,
+    }))
   }
 
   handleAnyoneCanJoinToggle = async () => {
@@ -104,8 +120,9 @@ class PublicSharingOptions extends React.Component {
       apiStore: { uiStore },
     } = this.props
 
-    const { anyoneCanView } = this.state
+    const { anyoneCanView, sharingOptionsOpen } = this.state
     const { frontend_url } = record
+    if (!anyoneCanView && !sharingOptionsOpen) return
 
     return (
       <Flex align="center" style={{ marginBottom: 5 }}>
@@ -140,7 +157,9 @@ class PublicSharingOptions extends React.Component {
   }
 
   get renderAnyoneCanJoin() {
-    const { anyoneCanJoin } = this.state
+    const { anyoneCanJoin, sharingOptionsOpen } = this.state
+    if (!anyoneCanJoin && !sharingOptionsOpen) return
+
     return (
       <Flex align="center" style={{ marginBottom: 5 }}>
         <StyledFormControlLabel
@@ -168,9 +187,14 @@ class PublicSharingOptions extends React.Component {
 
     return (
       <Fragment>
-        <StyledTitle>
-          <ProfileIcon />
-          <SubText>Public Sharing Options</SubText>
+        <StyledTitle onClick={this.toggleSharingMenuOpen}>
+          <PublicSharingIcon />
+          <SmallHelperText
+            style={{ position: 'relative', top: '-10px' }}
+            color={v.colors.commonDark}
+          >
+            Public Sharing Options
+          </SmallHelperText>
         </StyledTitle>
         {this.renderAnyoneCanView}
         {this.renderAnyoneCanJoin}

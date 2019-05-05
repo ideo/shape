@@ -44,6 +44,7 @@ const StyledHeaderRow = styled(Row)`
   flex-wrap: wrap;
   justify-content: space-between;
   margin-left: 0;
+  margin-bottom: 0;
 
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
     width: 100%;
