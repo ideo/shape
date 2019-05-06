@@ -18,7 +18,10 @@ const StyledFormControlLabel = styled(FormControlLabel)`
 
 const StyledTitle = styled.div`
   cursor: pointer;
-  color: ${v.colors.commonDark};
+  color: ${props => props.color};
+  &:hover {
+    color: ${v.colors.commonDarkest};
+  }
   margin-bottom: 6px;
   .icon {
     width: 28px;
@@ -182,16 +185,20 @@ class PublicSharingOptions extends React.Component {
 
   render() {
     const { record, canEdit } = this.props
+    const { sharingOptionsOpen } = this.state
 
     if (!record.isCollection || !canEdit) return <div />
+    const color = sharingOptionsOpen
+      ? v.colors.commonDarkest
+      : v.colors.commonDark
 
     return (
       <Fragment>
-        <StyledTitle onClick={this.toggleSharingMenuOpen}>
+        <StyledTitle onClick={this.toggleSharingMenuOpen} color={color}>
           <PublicSharingIcon />
           <SmallHelperText
             style={{ position: 'relative', top: '-10px' }}
-            color={v.colors.commonDark}
+            color={color}
           >
             Public Sharing Options
           </SmallHelperText>

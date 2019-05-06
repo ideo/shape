@@ -36,6 +36,8 @@ describe('PublicSharingOptions', () => {
       props.apiStore.uiStore.confirm.mockClear()
       props.canEdit = true
       wrapper = shallow(<PublicSharingOptions.wrappedComponent {...props} />)
+      // first open the menu
+      wrapper.setState({ sharingOptionsOpen: true })
     })
 
     it('defaults to show no one can view', () => {
