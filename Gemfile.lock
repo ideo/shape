@@ -1,16 +1,16 @@
 GIT
+  remote: git@github.com:ideo/network-api-ruby.git
+  revision: 5f0363bd4e45dae47493156c85351911aa357b57
+  specs:
+    network-api-ruby (0.0.13)
+      json_api_client (~> 1.5, >= 1.5.3)
+
+GIT
   remote: https://github.com/ideo/heroku-deflater.git
   revision: 04e492f84812b988f5c97df7d14c1b5d8730e81c
   specs:
     heroku-deflater (0.6.3)
       rack (>= 1.4.5)
-
-GIT
-  remote: https://github.com/ideo/network-api-ruby.git
-  revision: 5f0363bd4e45dae47493156c85351911aa357b57
-  specs:
-    network-api-ruby (0.0.13)
-      json_api_client (~> 1.5, >= 1.5.3)
 
 GIT
   remote: https://github.com/ideo/omniauth-ideo.git
