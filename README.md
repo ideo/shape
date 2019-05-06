@@ -131,3 +131,22 @@ This will open separate tabs to:
 # run the script with a different text editor
 ./dev.sh -e [your favorite editor]
 ```
+
+### (Optional) Create your own Firebase instance
+
+1. Sign in to the [Firebase Console](https://console.firebase.google.com)
+1. Create a new Firebase project
+1. Click on the gear icon next to "Project Overview" in the sidebar and go to the "Project settings"
+1. Copy the "Web API Key" value and update the `GOOGLE_CLOUD_BROWSER_KEY` value in the `.env` file
+1. Copy the "Project ID" value and update the `GOOGLE_CLOUD_PROJECT` value in the `.env` file
+1. Go to the "Service accounts" tab
+1. Click the "Generate new private key" button
+1. Copy the contents of the private key JSON file and update the `GOOGLE_CLOUD_KEYFILE` value in `.env` file
+1. Click on "Authentication" in sidebar
+1. Click on the "Set up sign-in method" button
+1. Click on "Database" in sidebar
+1. Click on the "Create database" button
+1. Select the “Start in test mode” option
+1. Restart your development server
+1. In the browser, open the JavaScript console
+1. If there are Firebase errors about missing indices, click on the link in the error message to create the index
