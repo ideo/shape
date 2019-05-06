@@ -292,15 +292,6 @@ class CommentThreadContainer extends React.Component {
     })
   }
 
-  jumpToBottom = () => {
-    scroller.scrollTo(`thread-${this.threads.length}`, {
-      ...this.scrollOpts,
-      delay: 0,
-      duration: 0,
-      smooth: null,
-    })
-  }
-
   afterSubmit = thread => () => {
     this.scrollToTopOfNextThread(thread)
   }
@@ -341,7 +332,9 @@ class CommentThreadContainer extends React.Component {
             expanded={this.isExpanded(thread.key)}
             onClick={this.expandThread(thread)}
             afterSubmit={this.afterSubmit(thread)}
-            onEditorHeightChange={this.jumpToBottom}
+            onEditorHeightChange={() =>
+              this.scrollToTopOfNextThread(thread, { duration: 0 })
+            }
           />
         </VisibilitySensor>
       </ScrollElement>
