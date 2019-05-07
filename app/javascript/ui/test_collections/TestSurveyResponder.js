@@ -181,5 +181,6 @@ TestSurveyResponder.defaultProps = {
   theme: 'primary',
   containerId: '',
 }
+TestSurveyResponder.displayName = 'TestSurveyResponder'
 
 export default TestSurveyResponder

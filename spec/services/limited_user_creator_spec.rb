@@ -37,6 +37,12 @@ RSpec.describe LimitedUserCreator, type: :service do
       expect(limited_user_creator.limited_user.status).to eq 'limited'
     end
 
+    it 'should set the user feedback_contact_preference to yes' do
+      limited_user_creator.call
+      user = limited_user_creator.limited_user
+      expect(user.feedback_contact_yes?).to be true
+    end
+
     context 'with an email' do
       let(:contact_info) { 'mary@make.com' }
 
