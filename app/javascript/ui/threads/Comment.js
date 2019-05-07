@@ -5,6 +5,7 @@ import { EditorState, convertFromRaw } from 'draft-js'
 import Editor from 'draft-js-plugins-editor'
 import createMentionPlugin from 'draft-js-mention-plugin'
 import createLinkifyPlugin from 'draft-js-linkify-plugin'
+import styled from 'styled-components'
 
 import v from '~/utils/variables'
 import { DisplayText } from '~/ui/global/styled/typography'
@@ -13,8 +14,12 @@ import Moment from '~/ui/global/Moment'
 import Avatar from '~/ui/global/Avatar'
 import { StyledCommentInput } from './CustomCommentMentions'
 import { apiStore } from '~/stores'
+import TrashIcon from '~/ui/icons/TrashIcon'
+import { showOnHoverCss, hideOnHoverCss } from '~/ui/grid/shared'
 
 const StyledComment = StyledCommentInput.extend`
+  ${showOnHoverCss};
+  ${hideOnHoverCss};
   padding: 10px;
   margin-bottom: 5px;
   background: ${props =>
@@ -36,6 +41,37 @@ const StyledComment = StyledCommentInput.extend`
       color: ${v.colors.ctaPrimary};
     }
   }
+`
+
+export const StyledCommentActions = styled.div`
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  height: 34px;
+  top: 0.25rem;
+
+  svg {
+    color: ${v.colors.commonDark};
+    &:hover {
+      color: ${v.colors.commonLight};
+    }
+  }
+`
+
+const FlexPushRight = styled.div`
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  position: relative;
+`
+
+const DeleteButton = styled.button`
+  width: 42px;
+`
+
+const Timestamp = styled.span`
+  position: absolute;
+  right: 0;
 `
 
 class Comment extends React.Component {
@@ -99,20 +135,24 @@ class Comment extends React.Component {
           <DisplayText className="author" color={v.colors.white}>
             {comment.author.name}
           </DisplayText>
-          <span className="timestamp">
-            <Moment date={comment.updated_at} />
-          </span>
-
-          {comment.persisted &&
-            apiStore.currentUserId === comment.author.id && (
-              <button
-                onClick={this.handleDeleteClick}
-                className="test-delete-comment"
-              >
-                X
-              </button>
-            )}
+          <FlexPushRight>
+            <Timestamp className="timestamp hide-on-hover">
+              <Moment date={comment.updated_at} />
+            </Timestamp>
+            <StyledCommentActions className="show-on-hover">
+              {comment.persisted &&
+                apiStore.currentUserId === comment.author.id && (
+                  <DeleteButton
+                    onClick={this.handleDeleteClick}
+                    className="test-delete-comment"
+                  >
+                    <TrashIcon />
+                  </DeleteButton>
+                )}
+            </StyledCommentActions>
+          </FlexPushRight>
         </InlineRow>
+
         <div className="message">{this.renderMessage()}</div>
       </StyledComment>
     )

@@ -108,15 +108,10 @@ export const StyledGridCard = styled.div`
 `
 StyledGridCard.displayName = 'StyledGridCard'
 
-export const StyledCardWrapper = styled.div`
-  z-index: ${props => props.zIndex};
-  /* this is for both the ResizeIcon (in this component) and CardMenu (in GridCard) */
+export const showOnHoverCss = css`
   .show-on-hover {
     opacity: 0;
     transition: opacity 0.25s;
-  }
-  &:hover {
-    z-index: ${props => props.zIndex};
   }
   &:hover,
   &.touch-device {
@@ -124,6 +119,28 @@ export const StyledCardWrapper = styled.div`
       /* don't show hover items while dragging */
       opacity: ${props => (props.dragging ? 0 : 1)};
     }
+  }
+`
+
+export const hideOnHoverCss = css`
+  .hide-on-hover {
+    opacity: 1;
+    transition: opacity 0.25s;
+  }
+  &:hover,
+  &.touch-device {
+    .hide-on-hover {
+      /* don't show hover items while dragging */
+      opacity: ${props => (props.dragging ? 1 : 0)};
+    }
+  }
+`
+
+export const StyledCardWrapper = styled.div`
+  ${showOnHoverCss};
+  z-index: ${props => props.zIndex};
+  &:hover {
+    z-index: ${props => props.zIndex};
   }
 `
 StyledCardWrapper.defaultProps = {
