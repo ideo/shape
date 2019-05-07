@@ -1,47 +1,66 @@
+import { observer } from 'mobx-react'
+import AutosizeInput from 'react-input-autosize'
+
 import v from '~/utils/variables'
 import styled from 'styled-components'
 import { StyledRowFlexParent, StyledRowFlexCell } from './styled'
 import { DisplayText } from '~/ui/global/styled/typography'
-import AutosizeInput from 'react-input-autosize'
 
-const TableBody = ({
-  option,
-  stopEditingIfContent,
-  handleKeyPress,
-  handleInputChange,
-}) => (
-  <StyledRowFlexParent>
-    <StyledRowFlexCell>
-      <DisplayText color={v.colors.commonMedium}>
-        {option.pricePerResponse && option.selected
-          ? `$${option.pricePerResponse}`
-          : '–'}
-      </DisplayText>
-    </StyledRowFlexCell>
-    <StyledRowFlexCell>
-      {option.hasInput && option.selected ? (
-        <EditableInput
-          id={option.id}
-          type="text"
-          placeholder="–"
-          value={option.size}
-          onChange={handleInputChange}
-          onKeyPress={handleKeyPress}
-          onBlur={stopEditingIfContent}
-        />
-      ) : (
-        <DisplayText color={v.colors.commonMedium}>–</DisplayText>
-      )}
-    </StyledRowFlexCell>
-    <StyledRowFlexCell>
-      <DisplayText color={v.colors.commonMedium}>
-        {option.size > 0 && option.selected
-          ? `$${_.round(option.pricePerResponse * option.size, 2)}`
-          : '–'}
-      </DisplayText>
-    </StyledRowFlexCell>
-  </StyledRowFlexParent>
-)
+@observer
+class TableBody extends React.Component {
+  handleInputChange = ev => {
+    const { option, onInputChange } = this.props
+    onInputChange(option.id, ev.target.value)
+  }
+
+  render() {
+    const { option, stopEditingIfContent, handleKeyPress } = this.props
+    return (
+      <StyledRowFlexParent>
+        <StyledRowFlexCell>
+          <DisplayText
+            color={
+              option.currentlySelected ? v.colors.black : v.colors.commonMedium
+            }
+          >
+            {option.price_per_response && option.currentlySelected
+              ? `$${option.price_per_response}`
+              : '–'}
+          </DisplayText>
+        </StyledRowFlexCell>
+        <StyledRowFlexCell>
+          {option.currentlySelected ? (
+            <EditableInput
+              id={option.id}
+              type="text"
+              placeholder="–"
+              value={option.currentSampleSize}
+              onChange={this.handleInputChange}
+              onKeyPress={handleKeyPress}
+              onBlur={stopEditingIfContent}
+            />
+          ) : (
+            <DisplayText color={v.colors.commonMedium}>–</DisplayText>
+          )}
+        </StyledRowFlexCell>
+        <StyledRowFlexCell>
+          <DisplayText
+            color={
+              option.currentlySelected ? v.colors.black : v.colors.commonMedium
+            }
+          >
+            {option.currentSampleSize > 0 && option.currentlySelected
+              ? `$${_.round(
+                  option.price_per_response * option.currentSampleSize,
+                  2
+                ).toFixed(2)}`
+              : '–'}
+          </DisplayText>
+        </StyledRowFlexCell>
+      </StyledRowFlexParent>
+    )
+  }
+}
 
 const EditableInput = styled(AutosizeInput)`
   width: 2rem;

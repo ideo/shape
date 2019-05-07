@@ -320,7 +320,7 @@ class TestDesigner extends React.Component {
           <div className={'settings-column'}>
             <h3>Feedback Settings</h3>
             {this.renderTestTypeForm()}
-            <AudienceSettings />
+            <AudienceSettings testCollection={collection} />
           </div>
         </OuterContainer>
       </ThemeProvider>

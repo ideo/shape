@@ -23,6 +23,7 @@ import Organization from './jsonApi/Organization'
 import QuestionAnswer from './jsonApi/QuestionAnswer'
 import Role from './jsonApi/Role'
 import SurveyResponse from './jsonApi/SurveyResponse'
+import TestAudience from './jsonApi/TestAudience'
 import User from './jsonApi/User'
 import UsersThread from './jsonApi/UsersThread'
 
@@ -569,8 +570,9 @@ ApiStore.types = [
   Notification,
   Organization,
   QuestionAnswer,
-  SurveyResponse,
   Role,
+  SurveyResponse,
+  TestAudience,
   User,
   UsersThread,
 ]

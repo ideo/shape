@@ -1,7 +1,12 @@
 import { StyledRowFlexParent, StyledRowFlexItem, StyledLabel } from './styled'
 import { Checkbox, LabelContainer } from '~/ui/global/styled/forms'
 
-const AudienceLabel = ({ option, toggleCheckbox }) => (
+const AudienceLabel = ({
+  selected,
+  audienceId,
+  audienceName,
+  onToggleCheckbox,
+}) => (
   <StyledRowFlexParent>
     <StyledRowFlexItem>
       <LabelContainer
@@ -9,15 +14,15 @@ const AudienceLabel = ({ option, toggleCheckbox }) => (
         labelPlacement={'end'}
         control={
           <Checkbox
-            checked={option.selected}
-            onChange={toggleCheckbox}
-            value={option.id}
+            checked={selected}
+            onChange={onToggleCheckbox}
+            value={audienceId}
             color={'default'}
           />
         }
         label={
           <div style={{ maxWidth: '582px', paddingTop: '15px' }}>
-            <StyledLabel>{option.label}</StyledLabel>
+            <StyledLabel>{audienceName}</StyledLabel>
           </div>
         }
       />
