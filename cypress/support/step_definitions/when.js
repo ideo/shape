@@ -205,6 +205,10 @@ When('I visit the current Test URL', () => {
   })
 })
 
+When('I type {string} in {string}', (text, element) => {
+  cy.get(element).type(text, { force: true })
+})
+
 // ----------------------
 // Organization Menu
 // ----------------------

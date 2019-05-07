@@ -261,7 +261,10 @@ class PublicSharingOptions extends React.Component {
     const { joinableGroup, showJoinableGroupSearch } = this.state
     return (
       <Box style={{ marginLeft: 20, marginBottom: 30, width: '40%' }}>
-        <StyledJoinableGroup onClick={this.toggleShowJoinableGroupSearch}>
+        <StyledJoinableGroup
+          onClick={this.toggleShowJoinableGroupSearch}
+          data-cy="public-joinable-group-toggle"
+        >
           {joinableGroup && <EntityAvatarAndName entity={joinableGroup} />}
           <StyledGroupDropdown menuOpen={showJoinableGroupSearch}>
             <DropdownIcon />
@@ -321,7 +324,11 @@ class PublicSharingOptions extends React.Component {
 
     return (
       <Fragment>
-        <StyledTitle onClick={this.toggleSharingMenuOpen} color={color}>
+        <StyledTitle
+          onClick={this.toggleSharingMenuOpen}
+          color={color}
+          data-cy="public-sharing-options-title"
+        >
           <PublicSharingIcon />
           <SmallHelperText
             style={{ position: 'relative', top: '-10px' }}

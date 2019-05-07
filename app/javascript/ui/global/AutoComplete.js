@@ -269,6 +269,7 @@ class AutoComplete extends React.Component {
             instanceId: 'react-select-chip',
             id: 'react-select-chip',
             name: 'react-select-chip',
+            className: 'react-select-chip',
             promptTextCreator: label => `Invite email ${label}`,
             simpleValue: true,
           }}
