@@ -354,7 +354,7 @@ const TestQuestionFlexWrapper = styled.div`
   }
 
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
-    width: auto;
+    width: 100%;
   }
 `
 
