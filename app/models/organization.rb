@@ -85,9 +85,12 @@ class Organization < ApplicationRecord
   # NOTE: this method can be called many times for the same org
   def setup_user_membership_and_collections(user, synchronous: false)
     # make sure they're on the org
-    Collection::UserCollection.find_or_create_for_user(user, self)
+    user_collection = Collection::UserCollection.find_or_create_for_user(user, self)
     setup_user_membership(user)
-    find_or_create_user_getting_started_content(user, synchronous: synchronous)
+    # only create the getting started content for new users
+    if user_collection.newly_created
+      create_user_getting_started_content(user, synchronous: synchronous)
+    end
     add_shared_with_org_collections(user) if primary_group.can_view? user
   end
 
@@ -279,15 +282,10 @@ class Organization < ApplicationRecord
     )
   end
 
-  def find_or_create_user_getting_started_content(user, synchronous: false)
+  def create_user_getting_started_content(user, synchronous: false)
     return if getting_started_collection.blank?
 
     user_collection = user.current_user_collection(id)
-
-    # NOTE: can remove this once all orgs are migrated
-    if getting_started_collection.name == 'Getting Started with Shape'
-      return find_or_create_user_getting_started_collection(user, synchronous: synchronous)
-    end
 
     # this will copy them to the beginning
     getting_started_collection.copy_all_cards_into!(
