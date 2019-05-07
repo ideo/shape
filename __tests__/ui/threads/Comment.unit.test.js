@@ -1,6 +1,6 @@
 import Comment from '~/ui/threads/Comment'
 import { fakeComment, fakeUser } from '#/mocks/data'
-import { apiStore } from '~/stores'
+import { apiStore, uiStore } from '~/stores'
 
 jest.mock('../../../app/javascript/stores')
 
@@ -51,7 +51,7 @@ describe('Comment', () => {
       it('deletes the comment', () => {
         const deleteButton = wrapper.find('.test-delete-comment').first()
         deleteButton.simulate('click')
-        expect(props.comment.API_destroy).toHaveBeenCalled()
+        expect(uiStore.confirm).toHaveBeenCalled()
       })
     })
   })

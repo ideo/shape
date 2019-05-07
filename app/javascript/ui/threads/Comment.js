@@ -13,7 +13,7 @@ import { InlineRow } from '~/ui/global/styled/layout'
 import Moment from '~/ui/global/Moment'
 import Avatar from '~/ui/global/Avatar'
 import { StyledCommentInput } from './CustomCommentMentions'
-import { apiStore } from '~/stores'
+import { apiStore, uiStore } from '~/stores'
 import TrashIcon from '~/ui/icons/TrashIcon'
 import { showOnHoverCss, hideOnHoverCss } from '~/ui/grid/shared'
 
@@ -116,7 +116,15 @@ class Comment extends React.Component {
 
   handleDeleteClick = () => {
     const { comment } = this.props
-    comment.API_destroy()
+    uiStore.confirm({
+      iconName: 'Alert',
+      prompt:
+        'Are you sure you want to delete this comment? You will not be able to undo this action',
+      confirmText: 'Delete',
+      onConfirm: () => {
+        comment.API_destroy()
+      },
+    })
   }
 
   render() {
