@@ -30,6 +30,8 @@ gem install bundler
 - https://github.com/ideo/network-react-components
 - https://github.com/ideo/network-api-ruby
 
+Note: You will need to [create a GitHub personal access token](https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line) in order to install the `network-api-ruby` gem. You can  enter the token as your password when prompted for your GitHub credentials. Or, you can set an environment variable for Bundler to use: `export BUNDLE_GITHUB__COM=x-access-token:<token>`
+
 **Clone the app and run the setup script:**
 
 Note: `./dev.sh -s` will run `rails db:setup` which will also seed your database with two required collections, marked by the following `ENV` ids:
@@ -131,6 +133,14 @@ This will open separate tabs to:
 # run the script with a different text editor
 ./dev.sh -e [your favorite editor]
 ```
+
+### Keeping database in sync
+
+Sometimes your local database environment will drift away from production. You can pull the current production database to your local machine using a shell command from `.shell-commands` (NOTE: this is only possible if you have been granted access to the Heroku instance). First, run `source .shell-commands`, then run:
+```
+shapecopydb local
+```
+It shouldn't take too long, although `Searchkick` will take longer to reindex records. 
 
 ### (Optional) Create your own Firebase instance
 
