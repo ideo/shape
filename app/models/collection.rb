@@ -28,10 +28,15 @@ class Collection < ApplicationRecord
                  :awaiting_first_user_content,
                  :cached_inheritance
 
+  # validations
+  validates :name, presence: true
+
   # callbacks
+  before_validation :inherit_parent_organization_id, on: :create
+  before_validation :set_joinable_guest_group, on: :update, if: :will_save_change_to_anyone_can_join?
+  before_save :add_viewer_to_joinable_group, if: :will_save_change_to_joinable_group_id?
   after_touch :touch_related_cards, unless: :destroyed?
   after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
-
   after_commit :reindex_sync, on: :create
   after_commit :update_comment_thread_in_firestore, unless: :destroyed?
   after_save :pin_all_primary_cards, if: :now_master_template?
@@ -105,11 +110,6 @@ class Collection < ApplicationRecord
   belongs_to :created_by, class_name: 'User', optional: true
   belongs_to :question_item, class_name: 'Item::QuestionItem', optional: true
   belongs_to :joinable_group, class_name: 'Group', optional: true
-
-  validates :name, presence: true
-  before_validation :inherit_parent_organization_id, on: :create
-  before_validation :add_joinable_guest_group, on: :update, if: :will_save_change_to_anyone_can_join?
-  before_save :add_viewer_to_joinable_group, if: :will_save_change_to_joinable_group_id?
 
   scope :root, -> { where('jsonb_array_length(breadcrumb) = 1') }
   scope :not_custom_type, -> { where(type: nil) }
@@ -773,10 +773,10 @@ class Collection < ApplicationRecord
     saved_change_to_master_template? && master_template?
   end
 
-  # TODO: just defaults to guest group and sets that here
-  def add_joinable_guest_group
-    return unless anyone_can_join?
-    self.joinable_group_id = organization.guest_group_id
+  def set_joinable_guest_group
+    # If anyone can join, default to guest group
+    # Otherwise, clear out joinable group
+    self.joinable_group_id = anyone_can_join? ? organization.guest_group_id : nil
   end
 
   def add_viewer_to_joinable_group

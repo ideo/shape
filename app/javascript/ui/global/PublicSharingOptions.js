@@ -275,7 +275,7 @@ class PublicSharingOptions extends React.Component {
               onOptionSelect={this.onGroupSelected}
               placeholder="search groups"
               menuPlacement="bottom"
-              menuStyles={{ width: '250px', zIndex: 10, border: 'none' }}
+              menuStyles={{ width: '250px', zIndex: 10 }}
             />
           </Box>
         )}
