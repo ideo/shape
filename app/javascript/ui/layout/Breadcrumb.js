@@ -1,14 +1,14 @@
-import React from 'react'
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import { floor, round, sumBy, compact } from 'lodash'
 import { Link } from 'react-router-dom'
 
 import { apiStore, routingStore } from '~/stores'
 import v from '~/utils/variables'
-import BreadcrumbItem from './BreadcrumbItem'
-import ArrowIcon from '../icons/ArrowIcon'
+import Tooltip from '~/ui/global/Tooltip'
+import ArrowIcon from '~/ui/icons/ArrowIcon'
+import BreadcrumbItem from '~/ui/layout/BreadcrumbItem'
 
 const BreadcrumbPadding = styled.div`
   height: 1.7rem;
@@ -28,8 +28,13 @@ const StyledBreadcrumbWrapper = styled.div`
 `
 StyledBreadcrumbWrapper.displayName = 'StyledBreadcrumbWrapper'
 
-const IconContainer = styled.span`
+const BackIconContainer = styled.span`
   color: ${v.colors.black};
+  transition: ${v.transition};
+  &:hover {
+    cursor: pointer;
+    color: ${v.colors.primaryDarkest};
+  }
   display: inline-block;
   height: 18px;
   margin-right: 8px;
@@ -58,7 +63,7 @@ class Breadcrumb extends React.Component {
       width = this.breadcrumbWrapper.current.offsetWidth
     }
     // roughly .075 characters per pixel
-    return round(width * 0.075)
+    return _.round(width * 0.08)
   }
 
   get previousItem() {
@@ -72,6 +77,7 @@ class Breadcrumb extends React.Component {
   items = (clamp = true) => {
     const { maxDepth, record } = this.props
     const items = []
+    let middleName = ''
     if (record.inMyCollection) {
       items.push({
         type: 'collections',
@@ -84,9 +90,27 @@ class Breadcrumb extends React.Component {
       })
     }
     if (!record.breadcrumb) return items
-    record.breadcrumb.map(item => {
+    const len = record.breadcrumb.length
+    const longBreadcrumb = maxDepth && len >= maxDepth
+
+    _.each(record.breadcrumb, (item, idx) => {
       const { type, id } = item
       const identifier = `${type}_${id}`
+
+      if (longBreadcrumb && idx >= 2 && idx <= len - 3) {
+        // if we have a really long breadcrumb we compress some options in the middle
+        if (middleName) middleName += ' > '
+        middleName += item.name
+        if (idx == len - 3) {
+          return items.push({
+            ...item,
+            name: middleName,
+            ellipses: true,
+            identifier,
+          })
+        }
+        return
+      }
       return items.push({
         ...item,
         truncatedName: null,
@@ -94,22 +118,27 @@ class Breadcrumb extends React.Component {
         identifier,
       })
     })
-    const depth = clamp ? maxDepth * -1 || 0 : 0
-    return compact(items).slice(depth)
+
+    const depth = clamp && maxDepth ? maxDepth * -1 : 0
+    return _.compact(items).slice(depth)
   }
 
+  // totalNameLength keeps getting called, with items potentially truncated
   totalNameLength = items => {
     if (!items) return 0
-    return sumBy(items, item => {
+    return _.sumBy(items, item => {
       let len = 0
+      if (item.ellipses) return
       if (item.truncatedName) len = item.truncatedName.length
       else if (item.name) len = item.name.length
+
       return len
     })
   }
 
-  charsToTruncateForItems = items =>
-    this.totalNameLength(items) - this.calculateMaxChars()
+  charsToTruncateForItems = items => {
+    return this.totalNameLength(items) - this.calculateMaxChars()
+  }
 
   get truncatedItems() {
     return this.truncateItems(this.items())
@@ -121,8 +150,8 @@ class Breadcrumb extends React.Component {
     if (charsLeftToTruncate <= 0) return items
 
     // First try truncating any long items to 25 chars
-    items.forEach(item => {
-      if (item.name && item.name.length > 25) {
+    _.each(items, item => {
+      if (!item.ellipses && item.name && item.name.length > 25) {
         item.truncatedName = item.name.slice(0, 24)
       }
     })
@@ -139,26 +168,44 @@ class Breadcrumb extends React.Component {
 
     // Item names are still too long, show ... in place of their name
     // Start at the midpoint, floor-ing to favor adding ellipses farther up the breadcrumb
-    let index = floor((items.length - 1) / 2)
+    let index = _.floor((items.length - 1) / 2)
 
     // If event number of items, increment index first,
     // otherwise if odd, decrement first
     let increment = items.length % 2 === 0
     let jumpBy = 1
+
     while (charsLeftToTruncate > 0) {
-      if (!items[index]) break
-      if (items[index].name !== 'My Collection') {
+      const item = items[index]
+      if (!item) break
+      if (item.name !== 'My Collection' && !item.ellipses) {
+        // Subtract this item from chars to truncate
+        charsLeftToTruncate -= item.truncatedName
+          ? item.truncatedName.length
+          : item.name.length
         // Continue marking for truncation until we reduce it to be short enough
-        items[index].ellipses = true
-        // Subtract this item from chars to truncate (adding in 2 for ... chars)
-        charsLeftToTruncate -= items[index].name.length + 2
+        item.ellipses = true
+        // clear out truncatedName so that just the ellipses is printed out
+        item.truncatedName = null
       }
       // Traverse on either side of midpoint
       index = increment ? index + jumpBy : index - jumpBy
       jumpBy += 1
       increment = !increment
     }
-    return items
+
+    // last step! combine multiple consecutive ellipses
+    if (items.length > 4) {
+      _.each(items, (item, idx) => {
+        const next = items[idx + 1]
+        if (item.ellipses && next && next.ellipses) {
+          next.name = `${item.name} > ${next.name}`
+          item.remove = true
+        }
+      })
+    }
+
+    return _.reject(items, { remove: true })
   }
 
   renderBackButton() {
@@ -173,9 +220,11 @@ class Breadcrumb extends React.Component {
     }
     return (
       <Link to={path}>
-        <IconContainer>
-          <ArrowIcon />
-        </IconContainer>
+        <Tooltip title={item.name}>
+          <BackIconContainer>
+            <ArrowIcon />
+          </BackIconContainer>
+        </Tooltip>
       </Link>
     )
   }
@@ -189,7 +238,7 @@ class Breadcrumb extends React.Component {
       inMyCollection !== null &&
       breadcrumb &&
       breadcrumb.length > 0
-    const numItems = this.items().length
+    const items = this.truncatedItems
     // We need a ref to wrapper so we always render that
     // Tried using innerRef on styled component but it isn't available on mount
     return (
@@ -198,13 +247,13 @@ class Breadcrumb extends React.Component {
         {renderItems && (
           <StyledBreadcrumbWrapper>
             {this.renderBackButton()}
-            {this.truncatedItems.map((item, index) => (
+            {items.map((item, index) => (
               <span className="breadcrumb_item" key={item.name}>
                 <BreadcrumbItem
                   identifier={item.identifier}
                   item={item}
                   index={index}
-                  numItems={numItems}
+                  numItems={items.length}
                 />
               </span>
             ))}
@@ -228,7 +277,7 @@ Breadcrumb.propTypes = {
 Breadcrumb.defaultProps = {
   breadcrumbWrapper: React.createRef(),
   containerWidth: null,
-  maxDepth: null,
+  maxDepth: 6,
   backButton: false,
 }
 

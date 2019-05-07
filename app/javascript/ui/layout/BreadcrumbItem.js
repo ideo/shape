@@ -29,6 +29,11 @@ const StyledBreadcrumbItem = styled.div`
     color: ${props => (props.isLast ? v.colors.black : v.colors.commonDark)};
     text-decoration: none;
     display: inline-block;
+    transition: ${v.transition};
+    &:hover {
+      cursor: pointer;
+      color: ${v.colors.primaryDarkest};
+    }
   }
 `
 

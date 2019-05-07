@@ -7,7 +7,10 @@ describe('TestSurveyPage', () => {
   describe('Live Survey', () => {
     beforeEach(() => {
       props = {
-        collection: Object.assign({}, fakeCollection, { test_status: 'live' }),
+        collection: {
+          ...fakeCollection,
+          test_status: 'live',
+        },
       }
       wrapper = shallow(<TestSurveyPage {...props} />)
     })
@@ -20,9 +23,10 @@ describe('TestSurveyPage', () => {
   describe('Closed Survey', () => {
     beforeEach(() => {
       props = {
-        collection: Object.assign({}, fakeCollection, {
+        collection: {
+          ...fakeCollection,
           test_status: 'closed',
-        }),
+        },
       }
       wrapper = shallow(<TestSurveyPage {...props} />)
     })

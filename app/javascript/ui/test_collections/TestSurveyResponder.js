@@ -1,7 +1,8 @@
 import _ from 'lodash'
 import { Flex } from 'reflexbox'
 import PropTypes from 'prop-types'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observable, runInAction } from 'mobx'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import FlipMove from 'react-flip-move'
 import { Element as ScrollElement, scroller } from 'react-scroll'
 import { ThemeProvider } from 'styled-components'
@@ -18,11 +19,47 @@ const UNANSWERABLE_QUESTION_TYPES = [
   'question_finish',
 ]
 
+@inject('apiStore')
 @observer
 class TestSurveyResponder extends React.Component {
+  @observable
+  recontactAnswered = false
+  state = {
+    questionCards: [],
+  }
+
+  componentDidMount() {
+    this.initializeCards()
+  }
+
+  async initializeCards() {
+    const { collection, apiStore } = this.props
+
+    await apiStore.loadCurrentUser()
+    const { currentUser } = apiStore
+    const questionCards = [...collection.question_cards]
+
+    if (
+      !collection.live_test_collection &&
+      (!currentUser ||
+        currentUser.feedback_contact_preference ===
+          'feedback_contact_unanswered')
+    ) {
+      questionCards.splice(questionCards.length - 1, 0, {
+        id: 'recontact',
+        card_question_type: 'question_recontact',
+        record: { id: 'facsda', content: '' },
+      })
+    }
+    this.setState({ questionCards })
+  }
+
   questionAnswerForCard = card => {
     const { surveyResponse } = this.props
     if (!surveyResponse) return undefined
+    if (card.card_question_type === 'question_recontact') {
+      return this.recontactAnswered
+    }
     return _.find(surveyResponse.question_answers, {
       question_id: card.record.id,
     })
@@ -31,12 +68,13 @@ class TestSurveyResponder extends React.Component {
   answerableCard = card =>
     UNANSWERABLE_QUESTION_TYPES.indexOf(card.card_question_type) === -1
 
-  viewableCards = () => {
-    const { collection } = this.props
+  get viewableCards() {
+    const { questionCards } = this.state
+
     let reachedLastVisibleCard = false
-    return collection.question_cards.filter(card => {
+    const questions = questionCards.filter(card => {
       // turn off the card's actionmenu (dot-dot-dot)
-      card.record.disableMenu()
+      if (card.id !== 'recontact') card.record.disableMenu()
       if (reachedLastVisibleCard) {
         return false
       } else if (
@@ -49,16 +87,25 @@ class TestSurveyResponder extends React.Component {
       reachedLastVisibleCard = true
       return true
     })
+    return questions
   }
 
   afterQuestionAnswered = card => {
-    this.scrollToTopOfNextCard(card)
+    if (card.id === 'recontact') {
+      runInAction(() => {
+        this.recontactAnswered = true
+      })
+    }
+    setTimeout(() => {
+      this.scrollToTopOfNextCard(card)
+    }, 100)
   }
 
   scrollToTopOfNextCard = card => {
-    const { collection, containerId } = this.props
-    const index = collection.question_cards.indexOf(card)
-    const nextCard = collection.question_cards[index + 1]
+    const { questionCards } = this.state
+    const { containerId } = this.props
+    const index = questionCards.indexOf(card)
+    const nextCard = questionCards[index + 1]
     if (!nextCard) return
     scroller.scrollTo(`card-${nextCard.id}`, {
       duration: 400,
@@ -77,10 +124,11 @@ class TestSurveyResponder extends React.Component {
       createSurveyResponse,
       theme,
     } = this.props
+
     return (
       <ThemeProvider theme={styledTestTheme(theme)}>
         <div id="surveyContainer">
-          {this.viewableCards().map(card => (
+          {this.viewableCards.map(card => (
             // ScrollElement only gets the right offsetTop if outside the FlipMove
             <ScrollElement name={`card-${card.id}`} key={card.id}>
               <FlipMove appearAnimation="fade">
@@ -124,10 +172,15 @@ TestSurveyResponder.propTypes = {
   containerId: PropTypes.string,
 }
 
+TestSurveyResponder.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+
 TestSurveyResponder.defaultProps = {
   surveyResponse: undefined,
   theme: 'primary',
   containerId: '',
 }
+TestSurveyResponder.displayName = 'TestSurveyResponder'
 
 export default TestSurveyResponder

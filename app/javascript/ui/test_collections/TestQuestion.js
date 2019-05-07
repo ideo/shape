@@ -6,6 +6,7 @@ import GridCard from '~/ui/grid/GridCard'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import DescriptionQuestion from '~/ui/test_collections/DescriptionQuestion'
 import FinishQuestion from '~/ui/test_collections/FinishQuestion'
+import RecontactQuestion from '~/ui/test_collections/RecontactQuestion'
 import NextTestQuestion from '~/ui/test_collections/NextTestQuestion'
 import NewQuestionGraphic from '~/ui/icons/NewQuestionGraphic'
 import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
@@ -37,7 +38,7 @@ const QuestionCardInner = styled.div`
 
 @observer
 class TestQuestion extends React.Component {
-  handleQuestionAnswer = async ({ text, number }) => {
+  handleQuestionAnswer = async ({ text, number } = {}) => {
     const {
       card,
       item,
@@ -48,6 +49,10 @@ class TestQuestion extends React.Component {
     let { surveyResponse, questionAnswer } = this.props
     // components should never trigger this when editing, but double-check here
     if (editing) return
+    if (card.card_question_type === 'question_recontact') {
+      afterQuestionAnswered(card)
+      return
+    }
 
     if (!questionAnswer) {
       if (!surveyResponse) {
@@ -77,7 +82,15 @@ class TestQuestion extends React.Component {
   }
 
   renderQuestion() {
-    const { parent, card, item, editing, questionAnswer, canEdit } = this.props
+    const {
+      parent,
+      card,
+      item,
+      editing,
+      questionAnswer,
+      canEdit,
+      surveyResponse,
+    } = this.props
     let inner
     switch (card.card_question_type) {
       case 'question_useful':
@@ -159,6 +172,14 @@ class TestQuestion extends React.Component {
               parent.is_submission_box_template_test ||
               parent.is_submission_test
             }
+          />
+        )
+      case 'question_recontact':
+        return (
+          <RecontactQuestion
+            user={apiStore.currentUser}
+            onAnswer={this.handleQuestionAnswer}
+            sessionUid={surveyResponse.session_uid}
           />
         )
       default:

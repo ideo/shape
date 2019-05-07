@@ -1,5 +1,7 @@
 class Collection
   class UserCollection < Collection
+    attr_accessor :newly_created
+
     def self.find_or_create_for_user(user, organization)
       existing = user.current_user_collection(organization.id)
       return existing if existing.present?
@@ -10,6 +12,8 @@ class Collection
         organization: organization,
         awaiting_first_user_content: organization.users.count == 1,
       )
+      # we want to keep track of this for later org setup
+      collection.newly_created = true
 
       return collection if collection.new_record?
 

@@ -70,7 +70,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                   ],
                   "can_edit": false,
-                  "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -188,7 +195,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                   ],
                   "can_edit": false,
-                  "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -331,7 +345,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                       ],
                     ],
                     "can_edit": false,
-                    "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                    "data_content": Object {
+                      "ops": Array [
+                        Object {
+                          "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        },
+                      ],
+                      "version": 1,
+                    },
                     "fullyLoaded": true,
                     "id": "1",
                     "inherited_tag_list": Array [],
@@ -449,7 +470,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                       ],
                     ],
                     "can_edit": false,
-                    "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                    "data_content": Object {
+                      "ops": Array [
+                        Object {
+                          "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        },
+                      ],
+                      "version": 1,
+                    },
                     "fullyLoaded": true,
                     "id": "1",
                     "inherited_tag_list": Array [],
@@ -572,7 +600,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                   ],
                   "can_edit": false,
-                  "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -1041,7 +1076,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -1151,7 +1193,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -1274,7 +1323,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -1384,7 +1440,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -1507,7 +1570,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -1617,7 +1687,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -1804,7 +1881,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -1831,7 +1915,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -1871,7 +1962,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -1898,7 +1996,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -1938,7 +2043,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -1965,7 +2077,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -2033,7 +2152,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -2060,7 +2186,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -2100,7 +2233,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -2127,7 +2267,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -2167,7 +2314,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -2194,7 +2348,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -2255,7 +2416,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -2365,7 +2533,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -2488,7 +2663,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -2598,7 +2780,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -2721,7 +2910,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -2831,7 +3027,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -2993,7 +3196,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                   ],
                   "can_edit": false,
-                  "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -3111,7 +3321,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                   ],
                   "can_edit": false,
-                  "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -3254,7 +3471,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                       ],
                     ],
                     "can_edit": false,
-                    "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                    "data_content": Object {
+                      "ops": Array [
+                        Object {
+                          "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        },
+                      ],
+                      "version": 1,
+                    },
                     "fullyLoaded": true,
                     "id": "1",
                     "inherited_tag_list": Array [],
@@ -3372,7 +3596,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                       ],
                     ],
                     "can_edit": false,
-                    "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                    "data_content": Object {
+                      "ops": Array [
+                        Object {
+                          "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        },
+                      ],
+                      "version": 1,
+                    },
                     "fullyLoaded": true,
                     "id": "1",
                     "inherited_tag_list": Array [],
@@ -3495,7 +3726,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                   ],
                   "can_edit": false,
-                  "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -3964,7 +4202,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -4074,7 +4319,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -4197,7 +4449,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -4307,7 +4566,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -4430,7 +4696,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -4540,7 +4813,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -4727,7 +5007,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -4754,7 +5041,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -4794,7 +5088,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -4821,7 +5122,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -4861,7 +5169,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -4888,7 +5203,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -4956,7 +5278,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -4983,7 +5312,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -5023,7 +5359,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -5050,7 +5393,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -5090,7 +5440,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -5117,7 +5474,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -5178,7 +5542,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -5288,7 +5659,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -5411,7 +5789,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -5521,7 +5906,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -5644,7 +6036,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -5754,7 +6153,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -5915,7 +6321,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                   ],
                   "can_edit": false,
-                  "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -6033,7 +6446,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                   ],
                   "can_edit": false,
-                  "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -6176,7 +6596,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                       ],
                     ],
                     "can_edit": false,
-                    "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                    "data_content": Object {
+                      "ops": Array [
+                        Object {
+                          "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        },
+                      ],
+                      "version": 1,
+                    },
                     "fullyLoaded": true,
                     "id": "1",
                     "inherited_tag_list": Array [],
@@ -6294,7 +6721,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                       ],
                     ],
                     "can_edit": false,
-                    "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                    "data_content": Object {
+                      "ops": Array [
+                        Object {
+                          "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        },
+                      ],
+                      "version": 1,
+                    },
                     "fullyLoaded": true,
                     "id": "1",
                     "inherited_tag_list": Array [],
@@ -6417,7 +6851,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                   ],
                   "can_edit": false,
-                  "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -6886,7 +7327,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -6996,7 +7444,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -7119,7 +7574,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -7229,7 +7691,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -7352,7 +7821,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -7462,7 +7938,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -7649,7 +8132,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -7676,7 +8166,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -7716,7 +8213,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -7743,7 +8247,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -7783,7 +8294,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -7810,7 +8328,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -7878,7 +8403,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -7905,7 +8437,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -7945,7 +8484,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -7972,7 +8518,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -8012,7 +8565,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -8039,7 +8599,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               ],
                             ],
                             "can_edit": false,
-                            "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            "data_content": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                                },
+                              ],
+                              "version": 1,
+                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -8100,7 +8667,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -8210,7 +8784,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -8333,7 +8914,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -8443,7 +9031,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -8566,7 +9161,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -8676,7 +9278,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           ],
                         ],
                         "can_edit": false,
-                        "data_content": "This is the content for the item and it contains multiple sentences. Like this one.",
+                        "data_content": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                            },
+                          ],
+                          "version": 1,
+                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],

@@ -332,6 +332,9 @@ class CommentThreadContainer extends React.Component {
             expanded={this.isExpanded(thread.key)}
             onClick={this.expandThread(thread)}
             afterSubmit={this.afterSubmit(thread)}
+            onEditorHeightChange={() =>
+              this.scrollToTopOfNextThread(thread, { duration: 0 })
+            }
           />
         </VisibilitySensor>
       </ScrollElement>

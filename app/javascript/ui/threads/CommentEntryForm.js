@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import { toJS, observable, action, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { EditorState, ContentState, convertToRaw } from 'draft-js'
+import { get } from 'lodash'
 
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
 import { CommentForm } from '~/ui/global/styled/forms'
@@ -18,7 +19,7 @@ class CommentEntryForm extends React.Component {
   suggestionsOpen = false
   @observable
   updating = false
-  // @observable editorState = EditorState.createEmpty()
+  editorHeight = null
   state = {
     editorState: EditorState.createEmpty(),
   }
@@ -53,10 +54,25 @@ class CommentEntryForm extends React.Component {
     const message = content.getPlainText()
     this.commentData.message = message
     this.commentData.draftjs_data = convertToRaw(content)
-    // this.editorState = editorState
+    this.handleHeightChange()
     this.setState({
       editorState,
     })
+  }
+
+  handleHeightChange = () => {
+    const newEditorHeight = get(
+      this.editor,
+      'editor.editorContainer.scrollHeight'
+    )
+
+    if (!newEditorHeight) return
+
+    if (this.editorHeight !== newEditorHeight) {
+      this.props.onHeightChange()
+    }
+
+    this.editorHeight = newEditorHeight
   }
 
   setEditor = (editor, { unset = false } = {}) => {
@@ -70,7 +86,6 @@ class CommentEntryForm extends React.Component {
   }
 
   resetEditorState() {
-    // this.editorState = EditorState.push(this.state.editorState, ContentState.createFromText(''))
     this.setState({
       editorState: EditorState.push(
         this.state.editorState,

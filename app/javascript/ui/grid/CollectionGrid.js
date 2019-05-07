@@ -13,7 +13,6 @@ import { objectsEqual } from '~/utils/objectUtils'
 import v from '~/utils/variables'
 
 const StyledGrid = styled.div`
-  margin-top: ${v.pageContentMarginTop}px;
   min-height: ${props => props.minHeight}px;
   position: relative;
   width: 100%;

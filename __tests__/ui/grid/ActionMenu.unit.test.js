@@ -25,7 +25,7 @@ describe('ActionMenu', () => {
         'Link',
         'Add to My Collection',
         'Tags',
-        'Permissions',
+        'Sharing',
         'Archive',
         'Replace',
       ]
@@ -120,7 +120,7 @@ describe('ActionMenu', () => {
         'Link',
         'Add to My Collection',
         'Tags',
-        'Permissions',
+        'Sharing',
         'Replace',
       ]
       props.card.isPinnedAndLocked = true
@@ -138,13 +138,7 @@ describe('ActionMenu', () => {
 
   describe('as viewer', () => {
     beforeEach(() => {
-      actions = [
-        'Duplicate',
-        'Link',
-        'Add to My Collection',
-        'Tags',
-        'Permissions',
-      ]
+      actions = ['Duplicate', 'Link', 'Add to My Collection', 'Tags', 'Sharing']
       wrapper = shallow(
         <ActionMenu.wrappedComponent
           {...props}
@@ -163,7 +157,7 @@ describe('ActionMenu', () => {
 
   describe('as editor of a system required record', () => {
     beforeEach(() => {
-      actions = ['Move', 'Link', 'Add to My Collection', 'Permissions']
+      actions = ['Move', 'Link', 'Add to My Collection', 'Sharing']
       props.card.record.system_required = true
       props.card.isPinnedAndLocked = false
       wrapper = shallow(
@@ -188,7 +182,7 @@ describe('ActionMenu', () => {
         'Link',
         'Add to My Collection',
         'Tags',
-        'Permissions',
+        'Sharing',
         'Archive',
       ]
       props.card.can_move = false
