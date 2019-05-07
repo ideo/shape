@@ -10,11 +10,11 @@ Feature: Sharing a Collection
     Then I should see the "Sharing: Anyone Can See" modal
 
     When I click "public-sharing-options-title"
-    And I click "viewable-by-anyone-checkbox"
+    And I click "anyone-can-view-checkbox"
     Then I should see the "Confirmation" modal
 
     When I click "ConfirmButton"
-    Then I should see "Allow anyone with this link to view (ON)" in a "viewable-by-anyone-checkbox"
+    Then I should see "Allow anyone with this link to view (ON)" in a "anyone-can-view-checkbox"
 
     When I click "anyone-can-view-link"
     Then I should have an element named ".StyledSnackbarText"

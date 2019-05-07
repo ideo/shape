@@ -25,6 +25,7 @@ const StyledJoinableGroup = styled.div`
   display: flex;
   cursor: pointer;
 `
+StyledJoinableGroup.displayName = 'StyledJoinableGroup'
 
 const StyledGroupDropdown = styled.span`
   .icon {
@@ -76,7 +77,7 @@ class PublicSharingOptions extends React.Component {
   state = {
     anyoneCanView: false,
     anyoneCanJoin: false,
-    sharingOptionsOpen: false,
+    sharingOptionsVisible: false,
     showJoinableGroupSearch: false,
     joinableGroup: null,
   }
@@ -131,16 +132,15 @@ class PublicSharingOptions extends React.Component {
       }
     })
 
-  loadJoinableGroup = () => {
+  loadJoinableGroup = async () => {
     const { joinableGroup } = this.state
     const { joinable_group_id } = this.props.record
     if (!joinable_group_id) return
     if (joinableGroup && joinableGroup.id === joinable_group_id) return
     const { apiStore } = this.props
-    apiStore.fetch('groups', joinable_group_id).then(data => {
-      this.setState({
-        joinableGroup: data.data,
-      })
+    const groupData = await apiStore.fetch('groups', joinable_group_id)
+    this.setState({
+      joinableGroup: groupData.data,
     })
   }
 
@@ -154,23 +154,11 @@ class PublicSharingOptions extends React.Component {
     })
   }
 
-  toggleSharingMenuOpen = () => {
+  toggleSharingOptionsVisible = () => {
     this.setState(prevState => ({
       ...prevState,
-      sharingOptionsOpen: !prevState.sharingOptionsOpen,
+      sharingOptionsVisible: !prevState.sharingOptionsVisible,
     }))
-  }
-
-  handleAnyoneCanJoinToggle = async () => {
-    const { anyoneCanJoin } = this.state
-    const { record, reloadGroups } = this.props
-    record.anyone_can_join = !anyoneCanJoin
-    if (!record.anyone_can_join) record.joinable_group_id = null
-    await record.save()
-    reloadGroups()
-    this.setState({
-      anyoneCanJoin: !anyoneCanJoin,
-    })
   }
 
   handleAnyoneCanViewToggle = () => {
@@ -191,6 +179,18 @@ class PublicSharingOptions extends React.Component {
       // Otherwise immediately toggle off
       this.toggleAnyoneCanView()
     }
+  }
+
+  handleAnyoneCanJoinToggle = async () => {
+    const { anyoneCanJoin } = this.state
+    const { record, reloadGroups } = this.props
+    record.anyone_can_join = !anyoneCanJoin
+    if (!record.anyone_can_join) record.joinable_group_id = null
+    await record.save()
+    reloadGroups()
+    this.setState({
+      anyoneCanJoin: !anyoneCanJoin,
+    })
   }
 
   onGroupSelected = async group => {
@@ -215,49 +215,7 @@ class PublicSharingOptions extends React.Component {
     })
   }
 
-  get renderAnyoneCanView() {
-    const {
-      record,
-      apiStore: { uiStore },
-    } = this.props
-
-    const { anyoneCanView, sharingOptionsOpen } = this.state
-    const { frontend_url } = record
-    if (!anyoneCanView && !sharingOptionsOpen) return
-
-    return (
-      <Flex align="center" style={{ marginBottom: 5 }}>
-        <StyledFormControlLabel
-          classes={{ label: 'form-control' }}
-          control={
-            <Checkbox
-              checked={anyoneCanView}
-              onChange={this.handleAnyoneCanViewToggle}
-              value="yes"
-            />
-          }
-          data-cy="viewable-by-anyone-checkbox"
-          label={`Allow anyone with this link to view (${
-            anyoneCanView ? 'ON' : 'OFF'
-          })`}
-        />
-        {anyoneCanView && (
-          <CopyToClipboard text={frontend_url}>
-            <PublicViewLink
-              aria-label="Get link"
-              onClick={() => uiStore.popupSnackbar({ message: 'Link Copied' })}
-              data-cy="anyone-can-view-link"
-            >
-              <LinkIcon className="icon" />
-              <Heading3 className="text">Get Link</Heading3>
-            </PublicViewLink>
-          </CopyToClipboard>
-        )}
-      </Flex>
-    )
-  }
-
-  get renderGroupSelection() {
+  get renderJoinGroupSelection() {
     const { joinableGroup, showJoinableGroupSearch } = this.state
     return (
       <Box style={{ marginLeft: 20, marginBottom: 30, width: '40%' }}>
@@ -287,8 +245,8 @@ class PublicSharingOptions extends React.Component {
   }
 
   get renderAnyoneCanJoin() {
-    const { anyoneCanJoin, sharingOptionsOpen } = this.state
-    if (!anyoneCanJoin && !sharingOptionsOpen) return
+    const { anyoneCanJoin, sharingOptionsVisible } = this.state
+    if (!anyoneCanJoin && !sharingOptionsVisible) return
 
     return (
       <Fragment>
@@ -308,24 +266,66 @@ class PublicSharingOptions extends React.Component {
             })`}
           />
         </Flex>
-        {anyoneCanJoin && this.renderGroupSelection}
+        {anyoneCanJoin && this.renderJoinGroupSelection}
       </Fragment>
+    )
+  }
+
+  get renderAnyoneCanView() {
+    const {
+      record,
+      apiStore: { uiStore },
+    } = this.props
+
+    const { anyoneCanView, sharingOptionsVisible } = this.state
+    const { frontend_url } = record
+    if (!anyoneCanView && !sharingOptionsVisible) return
+
+    return (
+      <Flex align="center" style={{ marginBottom: 5 }}>
+        <StyledFormControlLabel
+          classes={{ label: 'form-control' }}
+          control={
+            <Checkbox
+              checked={anyoneCanView}
+              onChange={this.handleAnyoneCanViewToggle}
+              value="yes"
+            />
+          }
+          data-cy="anyone-can-view-checkbox"
+          label={`Allow anyone with this link to view (${
+            anyoneCanView ? 'ON' : 'OFF'
+          })`}
+        />
+        {anyoneCanView && (
+          <CopyToClipboard text={frontend_url}>
+            <PublicViewLink
+              aria-label="Get link"
+              onClick={() => uiStore.popupSnackbar({ message: 'Link Copied' })}
+              data-cy="anyone-can-view-link"
+            >
+              <LinkIcon className="icon" />
+              <Heading3 className="text">Get Link</Heading3>
+            </PublicViewLink>
+          </CopyToClipboard>
+        )}
+      </Flex>
     )
   }
 
   render() {
     const { record, canEdit } = this.props
-    const { sharingOptionsOpen } = this.state
+    const { sharingOptionsVisible } = this.state
 
     if (!record.isCollection || !canEdit) return <div />
-    const color = sharingOptionsOpen
+    const color = sharingOptionsVisible
       ? v.colors.commonDarkest
       : v.colors.commonDark
 
     return (
       <Fragment>
         <StyledTitle
-          onClick={this.toggleSharingMenuOpen}
+          onClick={this.toggleSharingOptionsVisible}
           color={color}
           data-cy="public-sharing-options-title"
         >

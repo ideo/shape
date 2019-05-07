@@ -2,13 +2,14 @@ import { observable } from 'mobx'
 import PublicSharingOptions from '~/ui/global/PublicSharingOptions'
 import fakeUiStore from '#/mocks/fakeUiStore'
 
-import { fakeCollection } from '#/mocks/data'
+import { fakeCollection, fakeGroup } from '#/mocks/data'
 
 const apiStore = observable({
+  fetch: jest.fn().mockReturnValue(Promise.resolve({ data: fakeGroup })),
   uiStore: fakeUiStore,
 })
 
-let props, wrapper
+let props, wrapper, rerender, rerenderAndShowSharingOptions
 
 describe('PublicSharingOptions', () => {
   beforeEach(() => {
@@ -18,32 +19,52 @@ describe('PublicSharingOptions', () => {
     props = {
       record,
       apiStore,
-      canEdit: false,
+      reloadGroups: jest.fn(),
+      canEdit: true,
     }
-    wrapper = shallow(<PublicSharingOptions.wrappedComponent {...props} />)
+    rerender = () => {
+      wrapper = shallow(<PublicSharingOptions.wrappedComponent {...props} />)
+    }
+    rerenderAndShowSharingOptions = () => {
+      rerender()
+      wrapper.instance().setState({ sharingOptionsVisible: true })
+      // Update so async op completes
+      wrapper.update()
+    }
+    rerender()
   })
 
-  it('if not editor, does not show viewable by anyone toggle', () => {
-    expect(props.canEdit).toEqual(false)
+  it('it shows public sharing options', () => {
     expect(
-      wrapper.find('[data-cy="viewable-by-anyone-checkbox"]').exists()
-    ).toEqual(false)
+      wrapper.find('[data-cy="public-sharing-options-title"]').exists()
+    ).toEqual(true)
   })
 
-  describe('handleViewableByAnyoneToggle when anyone_can_view is false', () => {
+  describe('not an editor', () => {
+    beforeEach(() => {
+      props.canEdit = false
+      rerender()
+    })
+
+    it('if not editor, does not show public sharing options', () => {
+      expect(props.canEdit).toEqual(false)
+      expect(
+        wrapper.find('[data-cy="public-sharing-options-title"]').exists()
+      ).toEqual(false)
+    })
+  })
+
+  describe('handleAnyoneCanViewToggle when anyone_can_view is false', () => {
     beforeEach(() => {
       props.record.anyone_can_view = false
       props.apiStore.uiStore.confirm.mockClear()
-      props.canEdit = true
-      wrapper = shallow(<PublicSharingOptions.wrappedComponent {...props} />)
-      // first open the menu
-      wrapper.setState({ sharingOptionsOpen: true })
+      rerenderAndShowSharingOptions()
     })
 
     it('defaults to show no one can view', () => {
       expect(
         wrapper
-          .find('[data-cy="viewable-by-anyone-checkbox"]')
+          .find('[data-cy="anyone-can-view-checkbox"]')
           .first()
           .props().control.props.checked
       ).toEqual(false)
@@ -62,18 +83,17 @@ describe('PublicSharingOptions', () => {
     })
   })
 
-  describe('handleViewableByAnyoneToggle when anyone_can_view is true', () => {
+  describe('handleAnyoneCanViewToggle when anyone_can_view is true', () => {
     beforeEach(() => {
       props.record.anyone_can_view = true
       props.apiStore.uiStore.confirm.mockClear()
-      props.canEdit = true
-      wrapper = shallow(<PublicSharingOptions.wrappedComponent {...props} />)
+      rerenderAndShowSharingOptions()
     })
 
     it('has checked checkbox', () => {
       expect(
         wrapper
-          .find('[data-cy="viewable-by-anyone-checkbox"]')
+          .find('[data-cy="anyone-can-view-checkbox"]')
           .first()
           .props().control.props.checked
       ).toEqual(true)
@@ -90,6 +110,60 @@ describe('PublicSharingOptions', () => {
       expect(props.apiStore.uiStore.popupSnackbar).toHaveBeenCalledWith({
         message: 'Link Copied',
       })
+    })
+  })
+
+  describe('handleAnyoneCanJoinToggle when anyone_can_join is false', () => {
+    beforeEach(() => {
+      props.record.anyone_can_join = false
+      rerenderAndShowSharingOptions()
+    })
+
+    it('has unchecked checkbox', () => {
+      expect(
+        wrapper
+          .find('[data-cy="anyone-can-join-checkbox"]')
+          .first()
+          .props().control.props.checked
+      ).toEqual(false)
+    })
+
+    it('updates collection if toggled', () => {
+      wrapper.instance().handleAnyoneCanJoinToggle()
+      expect(props.record.save).toHaveBeenCalled()
+    })
+  })
+
+  describe('handleAnyoneCanJoinToggle when anyone_can_join is true', () => {
+    beforeEach(() => {
+      props.record.anyone_can_join = true
+      props.record.joinable_group_id = '1'
+      rerenderAndShowSharingOptions()
+    })
+
+    it('has checked checkbox', () => {
+      expect(
+        wrapper
+          .find('[data-cy="anyone-can-join-checkbox"]')
+          .first()
+          .props().control.props.checked
+      ).toEqual(true)
+    })
+
+    it('shows joinable group loaded from API', () => {
+      expect(apiStore.fetch).toHaveBeenCalledWith(
+        'groups',
+        props.record.joinable_group_id
+      )
+      // Update so async op completes
+      wrapper.update()
+      expect(
+        wrapper
+          .find('StyledJoinableGroup')
+          .find('EntityAvatarAndName')
+          .first()
+          .props().entity
+      ).toEqual(fakeGroup)
     })
   })
 })

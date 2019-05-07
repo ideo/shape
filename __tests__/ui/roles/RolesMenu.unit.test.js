@@ -144,7 +144,7 @@ describe('RolesMenu', () => {
   it('if not editor, does not show viewable by anyone toggle', () => {
     expect(props.canEdit).toEqual(false)
     expect(
-      wrapper.find('[data-cy="viewable-by-anyone-checkbox"]').exists()
+      wrapper.find('[data-cy="anyone-can-view-checkbox"]').exists()
     ).toEqual(false)
   })
 })

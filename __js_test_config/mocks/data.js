@@ -4,10 +4,10 @@ import { observable } from "mobx"
 const fakeJsonApiAttrs = {
   assign: jest.fn(),
   assignRef: jest.fn(),
-  save: jest.fn().mockReturnValue({}),
-  create: jest.fn().mockReturnValue({}),
-  patch: jest.fn().mockReturnValue({}),
-  update: jest.fn().mockReturnValue({}),
+  save: jest.fn().mockReturnValue(Promise.resolve({})),
+  create: jest.fn().mockReturnValue(Promise.resolve({})),
+  patch: jest.fn().mockReturnValue(Promise.resolve({})),
+  update: jest.fn().mockReturnValue(Promise.resolve({})),
   disableMenu: jest.fn(),
 }
 export const fakeCollectionCard = {
