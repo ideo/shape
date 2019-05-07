@@ -195,6 +195,26 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
     end
   end
 
+  describe 'POST #create_limited_user', auth: false, create_org: false do
+    let(:path) { '/api/v1/users/create_limited_user' }
+    let(:raw_params) do
+      { contact_info: 'something@somewhere.com' }
+    end
+    let(:params) { raw_params.to_json }
+    let(:service_double) { double('service') }
+
+    before do
+      allow(service_double).to receive(:call).and_return(true)
+      allow(service_double).to receive(:limited_user).and_return(User.new)
+    end
+
+    it 'returns a 200 and calls LimitedUserCreator' do
+      expect(LimitedUserCreator).to receive(:new).with(raw_params).and_return(service_double)
+      post(path, params: params)
+      expect(response.status).to eq 200
+    end
+  end
+
   describe 'POST #switch_org' do
     let!(:switch_organization) { create(:organization) }
     let!(:organization) { user.current_organization }

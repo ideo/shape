@@ -20,7 +20,7 @@
     "notify_through_email": { "type": "boolean" },
     "mailing_list": { "type": "boolean" },
     "google_auth_token": { "type": "string" },
-    "feedback_contact_preference": { "type": "integer" }
+    "feedback_contact_preference": { "type": "string" }
   },
   "required": ["email", "first_name", "last_name", "status"]
 }

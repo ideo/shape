@@ -82,7 +82,15 @@ class TestQuestion extends React.Component {
   }
 
   renderQuestion() {
-    const { parent, card, item, editing, questionAnswer, canEdit } = this.props
+    const {
+      parent,
+      card,
+      item,
+      editing,
+      questionAnswer,
+      canEdit,
+      surveyResponse,
+    } = this.props
     let inner
     switch (card.card_question_type) {
       case 'question_useful':
@@ -171,6 +179,7 @@ class TestQuestion extends React.Component {
           <RecontactQuestion
             user={apiStore.currentUser}
             onAnswer={this.handleQuestionAnswer}
+            sessionUid={surveyResponse.session_uid}
           />
         )
       default:

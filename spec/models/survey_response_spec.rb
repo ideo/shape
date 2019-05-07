@@ -32,12 +32,27 @@ RSpec.describe SurveyResponse, type: :model do
         ).to be true
       end
     end
+
+    describe '#ping_collection' do
+      let!(:test_collection) { create(:test_collection) }
+      let!(:survey_response) { create(:survey_response, test_collection: test_collection) }
+
+      it 'should call CollectionUpdateBroadcaster with the test_collection if status changes' do
+        expect(CollectionUpdateBroadcaster).to receive(:call).with(test_collection)
+        survey_response.update(status: :completed)
+      end
+    end
   end
 
   describe '#all_questions_answered?' do
     # Turn the 4 default cards into 4 answerable cards
     let(:test_collection) { create(:test_collection, :answerable_questions) }
     let(:survey_response) { create(:survey_response, test_collection: test_collection) }
+
+    before do
+      # this will move the questions into the TestDesign and allow the delegation to work
+      test_collection.launch!
+    end
 
     context 'no questions answered' do
       it 'returns false' do
@@ -49,7 +64,7 @@ RSpec.describe SurveyResponse, type: :model do
       let!(:question_answer) do
         create(:question_answer,
                survey_response: survey_response,
-               question: survey_response.question_items.answerable.first)
+               question: survey_response.answerable_complete_question_items.first)
       end
 
       it 'returns false' do
@@ -59,7 +74,7 @@ RSpec.describe SurveyResponse, type: :model do
 
     context 'all questions answered' do
       let!(:question_answers) do
-        survey_response.question_items.answerable.map do |question|
+        survey_response.answerable_complete_question_items.map do |question|
           create(:question_answer,
                  survey_response: survey_response,
                  question: question)
@@ -73,7 +88,13 @@ RSpec.describe SurveyResponse, type: :model do
   end
 
   describe '#question_answer_created_or_destroyed' do
-    let(:survey_response) { create(:survey_response) }
+    let(:test_collection) { create(:test_collection, :answerable_questions) }
+    let(:survey_response) { create(:survey_response, test_collection: test_collection) }
+
+    before do
+      # this will move the questions into the TestDesign and allow the delegation to work
+      test_collection.launch!
+    end
 
     it 'changes updated_at' do
       expect {
@@ -87,7 +108,7 @@ RSpec.describe SurveyResponse, type: :model do
 
     context 'with all questions answered' do
       let!(:question_answers) do
-        survey_response.question_items.answerable.map do |question|
+        survey_response.answerable_complete_question_items.map do |question|
           create(:question_answer,
                  survey_response: survey_response,
                  question: question)
