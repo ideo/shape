@@ -47,8 +47,7 @@ export const StyledCommentActions = styled.div`
   align-items: center;
   cursor: pointer;
   display: flex;
-  height: 34px;
-  top: 0.25rem;
+  height: 32px;
 
   svg {
     color: ${v.colors.commonDark};
@@ -66,7 +65,8 @@ const FlexPushRight = styled.div`
 `
 
 const DeleteButton = styled.button`
-  width: 42px;
+  width: 32px;
+  height: 32px;
 `
 
 const Timestamp = styled.span`
