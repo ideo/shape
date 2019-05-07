@@ -109,6 +109,7 @@ class Collection < ApplicationRecord
   validates :name, presence: true
   before_validation :inherit_parent_organization_id, on: :create
   before_validation :add_joinable_guest_group, on: :update, if: :will_save_change_to_anyone_can_join?
+  before_save :add_viewer_to_joinable_group, if: :will_save_change_to_joinable_group_id?
 
   scope :root, -> { where('jsonb_array_length(breadcrumb) = 1') }
   scope :not_custom_type, -> { where(type: nil) }
@@ -775,7 +776,11 @@ class Collection < ApplicationRecord
   # TODO: just defaults to guest group and sets that here
   def add_joinable_guest_group
     return unless anyone_can_join?
-    organization.guest_group.add_role(Role::VIEWER, self)
     self.joinable_group_id = organization.guest_group_id
+  end
+
+  def add_viewer_to_joinable_group
+    return if joinable_group.blank?
+    joinable_group.add_role(Role::VIEWER, self)
   end
 end

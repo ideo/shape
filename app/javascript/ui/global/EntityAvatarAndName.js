@@ -1,10 +1,27 @@
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
+import styled from 'styled-components'
 
 import { routingStore } from '~/stores'
-import { DisplayText, SubText } from '~/ui/global/styled/typography'
+import {
+  DisplayText,
+  SubText,
+  SmallHelperText,
+} from '~/ui/global/styled/typography'
 import Avatar from '~/ui/global/Avatar'
+import PublicSharingIcon from '~/ui/icons/PublicSharingIcon'
+import v from '~/utils/variables'
+
+const StyledJoinableGroupLabel = styled.div`
+  color: ${v.colors.commonDark};
+  margin-left: 15px;
+  margin-top: 5px;
+  .icon {
+    width: 28px;
+    margin-right: 6px;
+  }
+`
 
 class EntityAvatarAndName extends React.Component {
   get avatarUrl() {
@@ -32,8 +49,19 @@ class EntityAvatarAndName extends React.Component {
           entity.name.trim().length > 0 && (
             <Flex ml={10} column>
               <DisplayText>
-                {this.renderName}
-                {isJoinableGroup && ' <JOINABLE>'}
+                <Flex align="center">
+                  {this.renderName}
+                  {isJoinableGroup && (
+                    <StyledJoinableGroupLabel>
+                      <PublicSharingIcon />
+                      <SmallHelperText
+                        style={{ position: 'relative', top: '-10px' }}
+                      >
+                        Public Group
+                      </SmallHelperText>
+                    </StyledJoinableGroupLabel>
+                  )}
+                </Flex>
               </DisplayText>
               <SubText>{entity.email}</SubText>
             </Flex>

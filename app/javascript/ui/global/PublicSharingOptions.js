@@ -193,11 +193,12 @@ class PublicSharingOptions extends React.Component {
     }
   }
 
-  onGroupSelected = group => {
+  onGroupSelected = async group => {
     if (!group) return
-    const { record } = this.props
+    const { record, reloadGroups } = this.props
     record.joinable_group_id = group.id
-    record.save()
+    await record.save()
+    reloadGroups()
     this.setState({
       joinableGroup: group,
       showJoinableGroupSearch: false,
@@ -274,7 +275,7 @@ class PublicSharingOptions extends React.Component {
               onOptionSelect={this.onGroupSelected}
               placeholder="search groups"
               menuPlacement="bottom"
-              menuStyles={{ width: '250px', zIndex: 10 }}
+              menuStyles={{ width: '250px', zIndex: 10, border: 'none' }}
             />
           </Box>
         )}
