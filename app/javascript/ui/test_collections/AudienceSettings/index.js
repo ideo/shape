@@ -1,5 +1,6 @@
 import React from 'react'
 // import { PropTypes } from 'prop-types'
+import { computed } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { runInAction, observable, toJS } from 'mobx'
 
@@ -18,6 +19,7 @@ class AudienceSettings extends React.Component {
 
   fetchAvailableAudiences = async () => {
     const { apiStore } = this.props
+
     const audiences = await apiStore.fetchOrganizationAudiences(
       apiStore.currentUserOrganizationId
     )
@@ -26,6 +28,7 @@ class AudienceSettings extends React.Component {
     })
   }
 
+  @computed
   get totalPrice() {
     const { audiences } = this
     return _.round(

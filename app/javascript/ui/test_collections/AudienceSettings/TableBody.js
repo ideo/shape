@@ -10,6 +10,7 @@ import { DisplayText } from '~/ui/global/styled/typography'
 class TableBody extends React.Component {
   handleInputChange = ev => {
     const { option, onInputChange } = this.props
+
     onInputChange(option.id, ev.target.value)
   }
 
@@ -24,7 +25,7 @@ class TableBody extends React.Component {
             }
           >
             {option.price_per_response && option.currentlySelected
-              ? `$${option.price_per_response}`
+              ? `$${option.price_per_response.toFixed(2)}`
               : '–'}
           </DisplayText>
         </StyledRowFlexCell>
