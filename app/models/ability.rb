@@ -84,6 +84,9 @@ class Ability
         # equivalent to comment_thread.record.can_view?
         comment_thread.can_edit?(user)
       end
+      can %i[read manage], Comment do |comment|
+        comment.can_edit?(user)
+      end
     end
 
     # don't allow any of the editing actions unless you've accepted terms
