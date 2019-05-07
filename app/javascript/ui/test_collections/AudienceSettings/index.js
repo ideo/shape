@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import React from 'react'
 // import { PropTypes } from 'prop-types'
 import { computed } from 'mobx'
@@ -12,6 +13,11 @@ import TestAudience from '~/stores//jsonApi/TestAudience'
 class AudienceSettings extends React.Component {
   @observable
   audiences = []
+
+  constructor(props) {
+    super(props)
+    this.throttledSaveTestAudience = _.throttle(this.saveTestAudience, 25)
+  }
 
   componentDidMount() {
     this.fetchAvailableAudiences()
@@ -54,6 +60,10 @@ class AudienceSettings extends React.Component {
     return new TestAudience(toJS(testAudienceData), apiStore)
   }
 
+  saveTestAudience(audience) {
+    audience.testAudience.save()
+  }
+
   onToggleCheckbox = e => {
     const { apiStore } = this.props
     const id = e.target.value
@@ -71,12 +81,10 @@ class AudienceSettings extends React.Component {
     })
   }
 
-  stopEditingIfContent = () => {
-    // AJAX call to set size for audience in database
-  }
-
   handleKeyPress = event => {
-    if (event.key === 'Enter') this.stopEditingIfContent()
+    if (event.key === 'Enter') {
+      this.throttledSaveTestAudience.flush()
+    }
   }
 
   onInputChange = (audienceId, value) => {
@@ -85,6 +93,7 @@ class AudienceSettings extends React.Component {
     runInAction(() => {
       audience.testAudience.sample_size = value
     })
+    this.throttledSaveTestAudience(audience)
   }
 
   render() {
