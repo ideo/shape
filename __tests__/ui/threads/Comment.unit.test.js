@@ -43,6 +43,10 @@ describe('Comment', () => {
       apiStore.currentUserId = '1'
     })
 
+    it('renders an edit button', () => {
+      expect(wrapper.find('.test-edit-comment').exists()).toBe(true)
+    })
+
     it('renders a delete button', () => {
       expect(wrapper.find('.test-delete-comment').exists()).toBe(true)
     })
@@ -61,6 +65,9 @@ describe('Comment', () => {
       apiStore.currentUserId = '1'
       props.comment.author = { ...fakeUser, id: '9' }
       wrapper.setProps(props)
+    })
+    it('does not render an edit button', () => {
+      expect(wrapper.find('.test-edit-comment').exists()).toBe(false)
     })
     it('does not render a delete button', () => {
       expect(wrapper.find('.test-delete-comment').exists()).toBe(false)

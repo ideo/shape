@@ -15,6 +15,7 @@ import Avatar from '~/ui/global/Avatar'
 import { StyledCommentInput } from './CustomCommentMentions'
 import { apiStore, uiStore } from '~/stores'
 import TrashLgIcon from '~/ui/icons/TrashLgIcon'
+import EditPencilIcon from '~/ui/icons/EditPencilIcon'
 import { showOnHoverCss, hideOnHoverCss } from '~/ui/grid/shared'
 
 const StyledComment = StyledCommentInput.extend`
@@ -64,7 +65,7 @@ const FlexPushRight = styled.div`
   position: relative;
 `
 
-const DeleteButton = styled.button`
+const ActionButton = styled.button`
   width: 32px;
   height: 32px;
 `
@@ -150,12 +151,17 @@ class Comment extends React.Component {
             <StyledCommentActions className="show-on-hover">
               {comment.persisted &&
                 apiStore.currentUserId === comment.author.id && (
-                  <DeleteButton
-                    onClick={this.handleDeleteClick}
-                    className="test-delete-comment"
-                  >
-                    <TrashLgIcon />
-                  </DeleteButton>
+                  <React.Fragment>
+                    <ActionButton className="test-edit-comment">
+                      <EditPencilIcon />
+                    </ActionButton>
+                    <ActionButton
+                      onClick={this.handleDeleteClick}
+                      className="test-delete-comment"
+                    >
+                      <TrashLgIcon />
+                    </ActionButton>
+                  </React.Fragment>
                 )}
             </StyledCommentActions>
           </FlexPushRight>
