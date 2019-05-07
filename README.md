@@ -133,3 +133,11 @@ This will open separate tabs to:
 # run the script with a different text editor
 ./dev.sh -e [your favorite editor]
 ```
+
+### Keeping database in sync
+
+Sometimes your local database environment will drift away from production. You can pull the current production database to your local machine using a shell command from `.shell-commands` (NOTE: this is only possible if you have been granted access to the Heroku instance). First, run `source .shell-commands`, then run:
+```
+shapecopydb local
+```
+It shouldn't take too long, although `Searchkick` will take longer to reindex records. 
