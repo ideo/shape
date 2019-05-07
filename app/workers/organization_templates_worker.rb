@@ -127,7 +127,7 @@ class OrganizationTemplatesWorker
   end
 
   def create_user_getting_started_collection
-    @organization.find_or_create_user_getting_started_content(
+    @organization.create_user_getting_started_content(
       @user,
       synchronous: true,
     )

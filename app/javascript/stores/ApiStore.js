@@ -161,6 +161,18 @@ class ApiStore extends jsonapi(datxCollection) {
     }
   }
 
+  async createLimitedUser({ contactInfo, sessionUid }) {
+    try {
+      const res = await this.request('users/create_limited_user', 'POST', {
+        contact_info: contactInfo,
+        session_uid: sessionUid,
+      })
+      return res
+    } catch (e) {
+      trackError(e, { source: 'createLimitedUser' })
+    }
+  }
+
   searchUsersAndGroups(query) {
     return this.request(`search/users_and_groups?query=${query}`)
   }

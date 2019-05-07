@@ -30,6 +30,8 @@ gem install bundler
 - https://github.com/ideo/network-react-components
 - https://github.com/ideo/network-api-ruby
 
+Note: You will need to [create a GitHub personal access token](https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line) in order to install the `network-api-ruby` gem. You can  enter the token as your password when prompted for your GitHub credentials. Or, you can set an environment variable for Bundler to use: `export BUNDLE_GITHUB__COM=x-access-token:<token>`
+
 **Clone the app and run the setup script:**
 
 Note: `./dev.sh -s` will run `rails db:setup` which will also seed your database with two required collections, marked by the following `ENV` ids:
@@ -131,3 +133,30 @@ This will open separate tabs to:
 # run the script with a different text editor
 ./dev.sh -e [your favorite editor]
 ```
+
+### Keeping database in sync
+
+Sometimes your local database environment will drift away from production. You can pull the current production database to your local machine using a shell command from `.shell-commands` (NOTE: this is only possible if you have been granted access to the Heroku instance). First, run `source .shell-commands`, then run:
+```
+shapecopydb local
+```
+It shouldn't take too long, although `Searchkick` will take longer to reindex records. 
+
+### (Optional) Create your own Firebase instance
+
+1. Sign in to the [Firebase Console](https://console.firebase.google.com)
+1. Create a new Firebase project
+1. Click on the gear icon next to "Project Overview" in the sidebar and go to the "Project settings"
+1. Copy the "Web API Key" value and update the `GOOGLE_CLOUD_BROWSER_KEY` value in the `.env` file
+1. Copy the "Project ID" value and update the `GOOGLE_CLOUD_PROJECT` value in the `.env` file
+1. Go to the "Service accounts" tab
+1. Click the "Generate new private key" button
+1. Copy the contents of the private key JSON file and update the `GOOGLE_CLOUD_KEYFILE` value in `.env` file
+1. Click on "Authentication" in sidebar
+1. Click on the "Set up sign-in method" button
+1. Click on "Database" in sidebar
+1. Click on the "Create database" button
+1. Select the “Start in test mode” option
+1. Restart your development server
+1. In the browser, open the JavaScript console
+1. If there are Firebase errors about missing indices, click on the link in the error message to create the index

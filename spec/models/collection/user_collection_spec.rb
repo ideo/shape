@@ -14,6 +14,7 @@ describe Collection::UserCollection, type: :model do
     it 'should create a Collection::UserCollection in the organization' do
       expect(user_collection.persisted?).to be true
       expect(user_collection.organization).to eq organization
+      expect(user_collection.newly_created).to be true
     end
 
     it 'the user should be an editor' do
@@ -37,6 +38,10 @@ describe Collection::UserCollection, type: :model do
       it 'should return the existing Collection::UserCollection' do
         expect(user_collection.id).to eq existing.id
         expect(user_collection.organization).to eq organization
+      end
+
+      it 'should not be marked as newly_created' do
+        expect(user_collection.newly_created).to be nil
       end
     end
   end

@@ -192,12 +192,12 @@ class Collection < ApplicationRecord
     # TODO: indexing private sub-content differently?
     # Current functionality for getting a collection's searchable "text content":
     # - go through all items in the collection
-    # - for TextItems, grab the first 200 characters of their content
+    # - for TextItems, grab all their content
     # - for other items (e.g. media), grab the name
     # - join it all together into one blob of text, remove non-normal characters
     items.map do |item|
       if item.is_a? Item::TextItem
-        item.plain_content.truncate(200, separator: /\s/, omission: '')
+        item.plain_content
       else
         item.name
       end

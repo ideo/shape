@@ -62,6 +62,7 @@ RSpec.describe QuestionAnswer, type: :model do
       test_collection.question_items.each do |question|
         question.update(
           question_type: Item::QuestionItem.question_types[:question_open],
+          content: 'some question?',
         )
       end
       test_collection
