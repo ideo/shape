@@ -14,7 +14,7 @@ import Moment from '~/ui/global/Moment'
 import Avatar from '~/ui/global/Avatar'
 import { StyledCommentInput } from './CustomCommentMentions'
 import { apiStore, uiStore } from '~/stores'
-import TrashIcon from '~/ui/icons/TrashIcon'
+import TrashLgIcon from '~/ui/icons/TrashLgIcon'
 import { showOnHoverCss, hideOnHoverCss } from '~/ui/grid/shared'
 
 const StyledComment = StyledCommentInput.extend`
@@ -154,7 +154,7 @@ class Comment extends React.Component {
                     onClick={this.handleDeleteClick}
                     className="test-delete-comment"
                   >
-                    <TrashIcon />
+                    <TrashLgIcon />
                   </DeleteButton>
                 )}
             </StyledCommentActions>
