@@ -134,7 +134,7 @@ This will open separate tabs to:
 
 ### Keeping database in sync
 
-Sometimes your local database environment will drift away from production. You can pull the current production database to you r local machine using a shell command from `.shell-commands`. First, run `source .shell-commands`, then run:
+Sometimes your local database environment will drift away from production. You can pull the current production database to your local machine using a shell command from `.shell-commands` (NOTE: this is only possible if you have been granted access to the Heroku instance). First, run `source .shell-commands`, then run:
 ```
 shapecopydb local
 ```
