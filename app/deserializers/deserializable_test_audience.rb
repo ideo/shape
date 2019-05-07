@@ -1,0 +1,2 @@
+class DeserializableTestAudience < BaseJsonDeserializer
+end

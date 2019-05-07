@@ -16,7 +16,7 @@ class AudienceSettings extends React.Component {
 
   constructor(props) {
     super(props)
-    this.throttledSaveTestAudience = _.throttle(this.saveTestAudience, 25)
+    this.throttledSaveTestAudience = _.throttle(this.saveTestAudience, 2000)
   }
 
   componentDidMount() {
@@ -60,8 +60,14 @@ class AudienceSettings extends React.Component {
     return new TestAudience(toJS(testAudienceData), apiStore)
   }
 
-  saveTestAudience(audience) {
-    audience.testAudience.save()
+  async saveTestAudience(audience) {
+    await audience.currentTestAudience.save()
+  }
+
+  saveAllTestAudiences() {
+    this.audiences.forEach(audience => {
+      this.saveTestAudience(audience)
+    })
   }
 
   onToggleCheckbox = e => {
@@ -72,18 +78,15 @@ class AudienceSettings extends React.Component {
       // If not yet selected, we have to create the test audience for this test
       // and temporarily attach it to the audience
       const testAudience = this.createTestAudience(audience)
-      runInAction(() => {
-        audience.testAudience = testAudience
-      })
+      apiStore.add(testAudience)
+    } else {
+      apiStore.remove(audience.currentTestAudience)
     }
-    runInAction(() => {
-      audience.currentlySelected = !audience.currentlySelected
-    })
   }
 
   handleKeyPress = event => {
     if (event.key === 'Enter') {
-      this.throttledSaveTestAudience.flush()
+      // this.throttledSaveTestAudience.flush()
     }
   }
 
@@ -91,9 +94,9 @@ class AudienceSettings extends React.Component {
     const { apiStore } = this.props
     const audience = apiStore.find('audiences', audienceId)
     runInAction(() => {
-      audience.testAudience.sample_size = value
+      audience.currentTestAudience.sample_size = value
     })
-    this.throttledSaveTestAudience(audience)
+    // this.throttledSaveTestAudience(audience)
   }
 
   render() {
@@ -104,7 +107,7 @@ class AudienceSettings extends React.Component {
         handleKeyPress={this.handleKeyPress}
         onInputChange={this.onInputChange}
         totalPrice={this.totalPrice}
-        options={this.audiences}
+        audiences={this.audiences}
       />
     )
   }

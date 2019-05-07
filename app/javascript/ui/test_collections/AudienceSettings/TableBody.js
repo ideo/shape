@@ -9,33 +9,35 @@ import { DisplayText } from '~/ui/global/styled/typography'
 @observer
 class TableBody extends React.Component {
   handleInputChange = ev => {
-    const { option, onInputChange } = this.props
+    const { audience, onInputChange } = this.props
 
-    onInputChange(option.id, ev.target.value)
+    onInputChange(audience.id, ev.target.value)
   }
 
   render() {
-    const { option, stopEditingIfContent, handleKeyPress } = this.props
+    const { audience, stopEditingIfContent, handleKeyPress } = this.props
     return (
       <StyledRowFlexParent>
         <StyledRowFlexCell>
           <DisplayText
             color={
-              option.currentlySelected ? v.colors.black : v.colors.commonMedium
+              audience.currentlySelected
+                ? v.colors.black
+                : v.colors.commonMedium
             }
           >
-            {option.price_per_response && option.currentlySelected
-              ? `$${option.price_per_response.toFixed(2)}`
+            {audience.price_per_response && audience.currentlySelected
+              ? `$${audience.price_per_response.toFixed(2)}`
               : '–'}
           </DisplayText>
         </StyledRowFlexCell>
         <StyledRowFlexCell>
-          {option.currentlySelected ? (
+          {audience.currentlySelected ? (
             <EditableInput
-              id={option.id}
+              id={audience.id}
               type="text"
               placeholder="–"
-              value={option.currentSampleSize}
+              value={audience.currentSampleSize}
               onChange={this.handleInputChange}
               onKeyPress={handleKeyPress}
               onBlur={stopEditingIfContent}
@@ -47,12 +49,14 @@ class TableBody extends React.Component {
         <StyledRowFlexCell>
           <DisplayText
             color={
-              option.currentlySelected ? v.colors.black : v.colors.commonMedium
+              audience.currentlySelected
+                ? v.colors.black
+                : v.colors.commonMedium
             }
           >
-            {option.currentSampleSize > 0 && option.currentlySelected
+            {audience.currentSampleSize > 0 && audience.currentlySelected
               ? `$${_.round(
-                  option.price_per_response * option.currentSampleSize,
+                  audience.price_per_response * audience.currentSampleSize,
                   2
                 ).toFixed(2)}`
               : '–'}

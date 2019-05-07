@@ -217,6 +217,7 @@ class Collection < ApplicationRecord
       :collection_to_test,
       :live_test_collection,
       :collection_cover_items,
+      :test_audiences,
       roles: %i[pending_users users groups resource],
     ]
   end
@@ -382,6 +383,10 @@ class Collection < ApplicationRecord
 
   def collection_to_test
     nil
+  end
+
+  def test_audiences
+    []
   end
 
   def resourceable_class

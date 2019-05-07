@@ -1,6 +1,8 @@
 class SerializableTestCollection < SerializableSimpleCollection
   type 'collections'
 
+  has_many :test_audiences
+
   attributes :test_status
 
   has_many :question_cards do

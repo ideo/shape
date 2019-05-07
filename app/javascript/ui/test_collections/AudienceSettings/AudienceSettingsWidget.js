@@ -1,4 +1,4 @@
-// import { PropTypes } from 'prop-types'
+import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
@@ -17,11 +17,11 @@ import v from '~/utils/variables'
 
 @observer
 class AudienceSettings extends React.Component {
-  renderTableBody(option) {
+  renderTableBody(audience) {
     const { stopEditingIfContent, handleKeyPress, onInputChange } = this.props
     return (
       <TableBody
-        option={option}
+        audience={audience}
         stopEditingIfContent={stopEditingIfContent}
         handleKeyPress={handleKeyPress}
         onInputChange={onInputChange}
@@ -29,32 +29,32 @@ class AudienceSettings extends React.Component {
     )
   }
 
-  renderLabel(option) {
+  renderLabel(audience) {
     const { onToggleCheckbox } = this.props
     return (
       <AudienceLabel
-        audienceId={option.id}
-        audienceName={option.name}
-        selected={option.currentlySelected}
+        audienceId={audience.id}
+        audienceName={audience.name}
+        selected={audience.currentlySelected}
         onToggleCheckbox={onToggleCheckbox}
       />
     )
   }
 
   render() {
-    const { options, totalPrice } = this.props
+    const { audiences, onSubmitSettings, totalPrice } = this.props
     return (
       <AudienceSettingsWrapper>
         <h3 style={{ marginBottom: '0px' }}>Audience</h3>
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <MobileWrapper>
             <StyledColumnFlexParent>
-              {options.map(option => {
+              {audiences.map(audience => {
                 return (
-                  <StyledColumnFlexParent key={option.id}>
-                    {this.renderLabel(option)}
+                  <StyledColumnFlexParent key={audience.id}>
+                    {this.renderLabel(audience)}
                     <TableHeader />
-                    {this.renderTableBody(option)}
+                    {this.renderTableBody(audience)}
                   </StyledColumnFlexParent>
                 )
               })}
@@ -81,11 +81,11 @@ class AudienceSettings extends React.Component {
                 <StyledRowFlexItem />
                 <TableHeader />
               </StyledRowFlexParent>
-              {options.map(option => {
+              {audiences.map(audience => {
                 return (
-                  <StyledRowFlexParent key={option.id}>
-                    {this.renderLabel(option)}
-                    {this.renderTableBody(option)}
+                  <StyledRowFlexParent key={audience.id}>
+                    {this.renderLabel(audience)}
+                    {this.renderTableBody(audience)}
                   </StyledRowFlexParent>
                 )
               })}
@@ -102,7 +102,10 @@ class AudienceSettings extends React.Component {
                 }}
               >
                 <StyledRowFlexItem />
-                <FormButton style={{ marginLeft: '40px' }}>
+                <FormButton
+                  style={{ marginLeft: '40px' }}
+                  onClick={onSubmitSettings}
+                >
                   Get Feedback
                 </FormButton>
               </StyledRowFlexParent>
@@ -116,7 +119,12 @@ class AudienceSettings extends React.Component {
   }
 }
 AudienceSettings.propTypes = {
-  options: MobxPropTypes.objectOrObservableObject.isRequired,
+  audiences: MobxPropTypes.objectOrObservableObject.isRequired,
+  onSubmitSettings: PropTypes.func.isRequired,
+  handleKeyPress: PropTypes.func.isRequired,
+  onInputChange: PropTypes.func.isRequired,
+  onToggleCheckbox: PropTypes.func.isRequired,
+  totalPrice: PropTypes.number.isRequired,
 }
 
 const AudienceSettingsWrapper = styled.div`

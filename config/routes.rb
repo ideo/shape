@@ -125,6 +125,7 @@ Rails.application.routes.draw do
           get 'user_notifications'
         end
       end
+      resources :test_audiences, only: %i[create update]
       scope :filestack do
         get 'token', to: 'filestack#token', as: :filestack_token
       end

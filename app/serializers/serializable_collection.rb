@@ -24,6 +24,7 @@ class SerializableCollection < BaseJsonSerializer
   belongs_to :submissions_collection
   belongs_to :submission_template
   belongs_to :collection_to_test
+  has_many :test_audiences
 
   attribute :system_required do
     @object.system_required?
