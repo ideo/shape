@@ -16,7 +16,7 @@ describe Api::V1::FilestackController, type: :request, json: true, auth: true do
         .and_return(security_token)
       get(path)
       expect(response.status).to be 200
-      expect(response.body).to eq(2)
+      expect(response.body).to eq(security_token.to_json)
     end
   end
 end
