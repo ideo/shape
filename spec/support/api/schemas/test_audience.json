@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "properties": {
+    "sample_size": { "type": ["number", "null"] },
+    "audience_id": { "type": "number" },
+    "test_collection_id": { "type": "number" }
+  }
+}
