@@ -16,6 +16,8 @@ class Collection
     after_create :add_test_tag, :add_child_roles
     after_update :touch_test_design, if: :saved_change_to_test_status?
 
+    delegate :answerable_complete_question_items, to: :test_design, allow_nil: true
+
     enum test_status: {
       draft: 0,
       live: 1,

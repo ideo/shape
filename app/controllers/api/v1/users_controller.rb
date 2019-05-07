@@ -1,4 +1,5 @@
 class Api::V1::UsersController < Api::V1::BaseController
+  skip_before_action :check_api_authentication!, only: :create_limited_user
   load_and_authorize_resource only: %i[show]
   def show
     render jsonapi: @user, include: [
@@ -63,9 +64,14 @@ class Api::V1::UsersController < Api::V1::BaseController
   end
 
   def create_limited_user
-    contact_info = params['_jsonapi']['contact_info']
+    contact_info = json_api_params[:contact_info]
+    session_uid = json_api_params[:session_uid]
     creator = LimitedUserCreator.new(contact_info: contact_info)
     if creator.call
+      if session_uid
+        survey_response = SurveyResponse.find_by_session_uid(session_uid)
+        survey_response.update(user_id: creator.limited_user.id)
+      end
       render jsonapi: creator.limited_user
     else
       render json: { errors: creator.errors }, status: :unprocessable_entity
