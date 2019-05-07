@@ -4,12 +4,12 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import Grid from '@material-ui/core/Grid'
 import MenuItem from '@material-ui/core/MenuItem'
 import styled from 'styled-components'
-import { DisplayText, SubText } from '~/ui/global/styled/typography'
+import { DisplayText } from '~/ui/global/styled/typography'
 import { Row } from '~/ui/global/styled/layout'
+import EntityAvatarAndName from '~/ui/global/EntityAvatarAndName'
 import { Select } from '~/ui/global/styled/forms'
 import LeaveIcon from '~/ui/icons/LeaveIcon'
 import Tooltip from '~/ui/global/Tooltip'
-import Avatar from '~/ui/global/Avatar'
 import { uiStore } from '~/stores'
 
 const minRowStyle = {
@@ -157,7 +157,6 @@ class RoleSelect extends React.Component {
     }
 
     // TODO remove duplication with RolesAdd role select menu
-    const url = entity.pic_url_square || entity.filestack_file_url
     const showLeaveIcon =
       (enabled && !this.isJoinableGroup) ||
       (entity.isCurrentUser &&
@@ -165,28 +164,11 @@ class RoleSelect extends React.Component {
         !record.pinned_and_locked)
     return (
       <Row>
-        <span>
-          <Avatar
-            key={entity.id}
-            url={url}
-            // user_profile_collection_id will be null if its a group
-            linkToCollectionId={entity.user_profile_collection_id}
-          />
-        </span>
         <RowItemGrid container justify="space-between">
-          <Grid item xs={12} sm>
-            {entity.name && entity.name.trim().length > 0 ? (
-              <Grid container direction="column">
-                <DisplayText>
-                  {this.renderName()}
-                  {this.isJoinableGroup && ' <JOINABLE>'}
-                </DisplayText>
-                <SubText>{entity.email}</SubText>
-              </Grid>
-            ) : (
-              <DisplayText>{this.renderName()}</DisplayText>
-            )}
-          </Grid>
+          <EntityAvatarAndName
+            entity={entity}
+            isJoinableGroup={this.isJoinableGroup}
+          />
           <Grid item style={minRowStyle}>
             {select}
           </Grid>

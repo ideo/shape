@@ -67,7 +67,7 @@ const valueComponent = classes => valueProps => {
 
 const ITEM_HEIGHT = 48
 
-const selectStyles = theme => ({
+const selectStyles = (theme, menuStyles = {}) => ({
   clearIndicator: () => ({}),
   container: () => ({}),
   control: () => ({
@@ -97,8 +97,7 @@ const selectStyles = theme => ({
     ...base,
     borderRadius: '0px',
     backgroundColor: 'white',
-    width: '370px',
-    zIndex: 2,
+    ...menuStyles,
   }),
   menuList: base => ({
     ...base,
@@ -133,6 +132,7 @@ const SelectWrapped = props => {
     optionSearch,
     menuPlacement,
     keepMenuClosed,
+    menuStyles,
     ...other
   } = props
   if (keepMenuClosed) {
@@ -145,7 +145,7 @@ const SelectWrapped = props => {
         loadOptions={optionSearch}
         defaultOptions
         menuPlacement={menuPlacement}
-        styles={selectStyles(theme)}
+        styles={selectStyles(theme, menuStyles)}
         components={{
           valueComponent: valueComponent(classes),
           LoadingIndicator,
@@ -160,7 +160,7 @@ const SelectWrapped = props => {
     <AsyncCreatable
       loadOptions={optionSearch}
       defaultOptions
-      styles={selectStyles(theme)}
+      styles={selectStyles(theme, menuStyles)}
       formatCreateLabel={inputValue => `Invite email ${inputValue}`}
       menuPlacement={menuPlacement}
       components={{
@@ -179,7 +179,7 @@ const SelectWrapped = props => {
     />
   ) : (
     <Select
-      styles={selectStyles(theme)}
+      styles={selectStyles(theme, menuStyles)}
       menuPlacement={menuPlacement}
       components={{
         valueComponent: valueComponent(classes),
@@ -246,6 +246,7 @@ class AutoComplete extends React.Component {
       menuPlacement,
       keepMenuClosed,
       creatable,
+      menuStyles,
     } = this.props
     const { option } = this.state
     return (
@@ -255,6 +256,7 @@ class AutoComplete extends React.Component {
           inputComponent={SelectWrappedWithStyles}
           inputProps={{
             classes,
+            menuStyles,
             multi: true,
             value: keepSelectedOptions ? option : null,
             options,
@@ -296,6 +298,10 @@ AutoComplete.propTypes = {
   value: PropTypes.number,
   menuPlacement: PropTypes.string,
   keepMenuClosed: PropTypes.bool,
+  menuStyles: PropTypes.shape({
+    width: PropTypes.string,
+    zIndex: PropTypes.number,
+  }),
 }
 
 AutoComplete.defaultProps = {
@@ -307,6 +313,10 @@ AutoComplete.defaultProps = {
   optionSearch: null,
   menuPlacement: 'bottom',
   keepMenuClosed: false,
+  menuStyles: {
+    width: '370px',
+    zIndex: 2,
+  },
 }
 
 export default withStyles(styles)(AutoComplete)

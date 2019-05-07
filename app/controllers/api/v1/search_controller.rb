@@ -24,7 +24,8 @@ class Api::V1::SearchController < Api::V1::BaseController
 
   before_action :authorize_resource, only: :users_and_groups
   def users_and_groups
-    @indexes = [User]
+    @indexes = []
+    @indexes << User unless params[:groups_only]
     @indexes << Group unless params[:users_only]
     return search_users_and_groups_for_resource if @resource
     results = search_users_and_groups
