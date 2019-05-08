@@ -4,7 +4,7 @@ import { apiStore, uiStore } from '~/stores'
 
 jest.mock('../../../app/javascript/stores')
 
-let wrapper, props, component
+let wrapper, props, component, rerender
 describe('Comment', () => {
   beforeEach(() => {
     props = {
@@ -13,8 +13,11 @@ describe('Comment', () => {
         persisted: true,
       },
     }
-    wrapper = shallow(<Comment {...props} />)
-    component = wrapper.instance()
+    rerender = props => {
+      wrapper = shallow(<Comment {...props} />)
+      component = wrapper.instance()
+    }
+    rerender(props)
   })
 
   it('renders the author name and avatar', () => {
@@ -90,11 +93,11 @@ describe('Comment', () => {
   })
 
   // TODO: Figure out why these tests are no longer passing...
-  xdescribe('when user is not the comment author', () => {
+  describe('when user is not the comment author', () => {
     beforeEach(() => {
       apiStore.currentUserId = '1'
       props.comment.author = { ...fakeUser, id: '9' }
-      wrapper.setProps(props)
+      rerender(props)
     })
     it('does not render an edit button', () => {
       expect(wrapper.find('.test-edit-comment').exists()).toBe(false)
