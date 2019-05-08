@@ -142,6 +142,14 @@ class Item
       builder.collection_card
     end
 
+    def question_title
+      question_title_and_description[:title]
+    end
+
+    def question_description
+      question_title_and_description[:description]
+    end
+
     private
 
     def notify_test_design_collection_of_creation?
@@ -160,6 +168,44 @@ class Item
       test_open_responses_collection.update(
         name: "#{content} Responses",
       )
+    end
+
+    def question_title_and_description
+      case question_type.to_sym
+      when :question_useful
+        {
+          title: 'Usefulness',
+          description: 'How useful is this idea for you?',
+        }
+      when :question_clarity
+        {
+          title: 'Clarity',
+          description: 'How clear is this idea for you?',
+        }
+      when :question_excitement
+        {
+          title: 'Excitement',
+          description: 'How exciting is this idea for you?',
+        }
+      when :question_different
+        {
+          title: 'Different',
+          description: "How different is this idea from what you've seen before?",
+        }
+      when :question_category_satisfaction
+        # the category text gets added later within ScaleQuestion
+        {
+          title: 'Category Satisfaction',
+          description: 'How satisfied are you with your current',
+        }
+      when :question_context
+        {}
+      else
+        {
+          title: 'Context',
+          description: 'How satisfied are you with your current solution?',
+        }
+      end
     end
   end
 end

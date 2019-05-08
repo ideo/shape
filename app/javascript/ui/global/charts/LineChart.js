@@ -62,7 +62,7 @@ const LineChart = ({ dataset, simpleDateTooltip, cardArea }) => {
       style={chartStyle(dataset)}
       data={values}
       domain={domain}
-      key={`dataset-${dataset.measure}`}
+      key={`dataset-${dataset.order}`}
     />
   )
 }

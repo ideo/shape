@@ -5,7 +5,7 @@ class Item
     def chart_data
       if data_source.is_a?(Item::QuestionItem)
         DataSource::QuestionItem.call(
-          chart_item: self,
+          data_item: self,
           question_item: data_source,
         )
       else

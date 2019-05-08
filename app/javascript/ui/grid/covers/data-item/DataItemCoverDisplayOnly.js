@@ -1,7 +1,7 @@
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
-import { Heading3 } from '~/ui/global/styled/typography'
+import { Heading1, Heading3 } from '~/ui/global/styled/typography'
 import InfoIcon from '~/ui/icons/InfoIcon'
 import ChartGroup from '~/ui/global/charts/ChartGroup'
 import {
@@ -10,7 +10,10 @@ import {
 } from '~/ui/global/charts/ChartUtils'
 import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
-import StyledDataItemCover from './StyledDataItemCover'
+import {
+  StyledDataItemCover,
+  StyledDataItemQuestionCover,
+} from './StyledDataItemCover'
 
 const StyledInfoIcon = styled.div`
   display: inline-block;
@@ -20,10 +23,30 @@ const StyledInfoIcon = styled.div`
   margin-left: 7px;
 `
 
+const StyledTitleAndDescription = styled.div`
+  margin-bottom: 20px;
+`
+
+const StyledCover = props => {
+  const { isReportTypeQuestionItem } = props.item
+  if (isReportTypeQuestionItem) {
+    return (
+      <StyledDataItemQuestionCover>
+        {props.children}
+      </StyledDataItemQuestionCover>
+    )
+  }
+  return <StyledDataItemCover>{props.children}</StyledDataItemCover>
+}
+
 class DataItemCoverDisplayOnly extends React.Component {
   get title() {
     const { item } = this.props
-    return item.name
+    if (item.isReportTypeQuestionItem) {
+      return this.questionItemTitleAndDescription
+    } else {
+      return <Heading3 color={this.fillColor}>{item.name}</Heading3>
+    }
   }
 
   get fillColor() {
@@ -36,13 +59,23 @@ class DataItemCoverDisplayOnly extends React.Component {
     return primaryDataset && primaryDataset.description
   }
 
+  get questionItemTitleAndDescription() {
+    const { question_title, question_description } = this.props.item
+    return (
+      <div>
+        {question_title && <Heading1>{question_title}</Heading1>}
+        {question_description && <Heading3>{question_description}</Heading3>}
+      </div>
+    )
+  }
+
   render() {
     const { card, item } = this.props
     const tooltip = this.primaryDatasetDescription
     return (
-      <StyledDataItemCover>
+      <StyledCover item={item}>
         <AboveChartContainer>
-          <Heading3 color={this.fillColor}>
+          <StyledTitleAndDescription>
             {this.title}
             {tooltip && (
               <Tooltip
@@ -59,8 +92,7 @@ class DataItemCoverDisplayOnly extends React.Component {
                 </StyledInfoIcon>
               </Tooltip>
             )}
-          </Heading3>
-          <br />
+          </StyledTitleAndDescription>
         </AboveChartContainer>
         <ChartGroup
           datasets={item.datasets}
@@ -68,7 +100,7 @@ class DataItemCoverDisplayOnly extends React.Component {
           height={card.height}
           simpleDateTooltip
         />
-      </StyledDataItemCover>
+      </StyledCover>
     )
   }
 }

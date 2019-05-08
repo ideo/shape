@@ -13,11 +13,8 @@ import styled from 'styled-components'
 
 import { apiStore } from '~/stores'
 import { Heading1, Heading3 } from '~/ui/global/styled/typography'
-import {
-  questionInformation,
-  theme,
-  themeLabelStyles,
-} from '~/ui/test_collections/shared'
+import { questionInformation } from '~/ui/test_collections/shared'
+import { victoryTheme, themeLabelStyles } from '~/ui/global/charts/ChartUtils'
 import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
 
@@ -119,7 +116,7 @@ class ChartItemCover extends React.Component {
         <VictoryChart
           domainPadding={{ y: 10 }}
           domain={{ y: [0, 95] }}
-          theme={theme}
+          theme={victoryTheme}
         >
           <VictoryAxis
             style={{

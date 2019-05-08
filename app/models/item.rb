@@ -228,6 +228,10 @@ class Item < ApplicationRecord
     {}
   end
 
+  def question_title; end
+
+  def question_description; end
+
   def jsonapi_type_name
     'items'
   end

@@ -1,18 +1,20 @@
-module DataSource
+module DataReport
   class QuestionItem < Base
+
+    delegate :question_type, to: :question_item, allow_nil: true
+
+    def call
+      datasets
+    end
 
     private
 
     def test_collection
-      chart_item.parent
-    end
-
-    def chart_item
-      context[:chart_item]
+      @data_item.parent
     end
 
     def question_item
-      context[:question_item]
+      @data_item.data_source
     end
 
     def title
@@ -43,16 +45,19 @@ module DataSource
     end
 
     def base_data
-      (1..4).map { |n| { num_responses: 0, answer: n } }
+      (1..4).map { |n| { value: 0, column: n } }
     end
 
     def grouped_response_data(survey_answers)
       data = base_data
+      num_answers = survey_answers.count
       counts = survey_answers.group(QuestionAnswer.arel_table[:answer_number]).count
       counts.each do |answer_number, count|
-        answer_data = data.find { |d| d[:answer] == answer_number }
+        answer_data = data.find { |d| d[:column] == answer_number }
         begin
-          answer_data[:num_responses] = count
+          answer_data[:type] = question_type
+          answer_data[:value] = count
+          answer_data[:total] = num_answers
         rescue => e
           Appsignal.set_error(e,
                               answer_number: answer_number.to_s,
@@ -61,16 +66,30 @@ module DataSource
           next
         end
       end
-      data
+      add_percentage_to_data(data, num_answers)
+    end
+
+    def add_percentage_to_data(data, num_answers)
+      data.map do |d|
+        d[:percentage] = 0
+        next if num_answers.zero?
+        d[:percentage] = (d[:value].to_f / num_answers * 100).round
+        d
+      end
     end
 
     def question_data
       # NOTE: the only currently supported data_source is a question_item
       survey_answers = question_item.completed_survey_answers
       {
+        order: 0,
+        chart_type: 'bar',
+        measure: 'answer_counts',
         label: test_collection.name,
-        type: 'question_items',
+        question_type: question_type,
         total: survey_answers.count,
+        timeframe: 'month',
+        max_domain: 95,
         data: grouped_response_data(survey_answers),
       }
     end
@@ -96,9 +115,14 @@ module DataSource
 
     def org_data
       {
+        order: 1,
+        chart_type: 'bar',
+        measure: 'org_answer_counts',
         label: test_collection.organization.name,
-        type: 'org_wide',
+        question_type: question_type,
         total: org_survey_answers.count,
+        timeframe: 'month',
+        max_domain: 95,
         data: grouped_response_data(org_survey_answers),
       }
     end

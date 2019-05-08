@@ -4,10 +4,9 @@ import v from '~/utils/variables'
 const StyledDataItemCover = styled.div`
   background-color: ${v.colors.commonLight};
   border-top: 2px solid ${v.colors.black};
-  height: calc(100% - 15px);
+  height: calc(92% - 15px);
   padding: 15px 0 0;
   text-align: left;
-
   .editableMetric {
     ${props =>
       props.editable &&
@@ -24,4 +23,11 @@ const StyledDataItemCover = styled.div`
 `
 StyledDataItemCover.displayName = 'StyledDataItemCover'
 
-export default StyledDataItemCover
+const StyledDataItemQuestionCover = styled.div`
+  height: calc(100% - 32px);
+  padding: 16px;
+  background-color: ${v.colors.white};
+  text-align: left;
+`
+
+export { StyledDataItemCover, StyledDataItemQuestionCover }

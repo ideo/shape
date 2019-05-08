@@ -5,18 +5,25 @@ import {
   LineSegment,
   VictoryAxis,
   VictoryChart,
+  VictoryGroup,
   VictoryLabel,
   VictoryVoronoiContainer,
 } from 'victory'
 
 import { DisplayText } from '~/ui/global/styled/typography'
 import OrganicGrid from '~/ui/icons/OrganicGrid'
-import { theme } from '~/ui/test_collections/shared'
 import monthEdge from '~/utils/monthEdge'
 import v, { DATASET_CHART_TYPES } from '~/utils/variables'
 import AreaChart from '~/ui/global/charts/AreaChart'
+import BarChart from '~/ui/global/charts/BarChart'
 import LineChart from '~/ui/global/charts/LineChart'
-import { datasetPropType, utcMoment } from '~/ui/global/charts/ChartUtils'
+import Tick from '~/ui/global/charts/Tick'
+import {
+  datasetPropType,
+  utcMoment,
+  victoryTheme,
+  emojiSeriesMap,
+} from '~/ui/global/charts/ChartUtils'
 
 const calculateTickLabelEdges = labelText => {
   if (!labelText) return 0
@@ -47,7 +54,15 @@ const ChartContainer = styled.div`
   bottom: 0px;
   height: 92%;
   position: absolute;
+  /*
+  bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
   width: 100%;
+  position: absolute;
+  */
 `
 
 class ChartGroup extends React.PureComponent {
@@ -66,6 +81,13 @@ class ChartGroup extends React.PureComponent {
     const { datasets } = this.props
     return datasets.filter(
       dataset => dataset.order !== 0 && dataset.data.length > 0
+    )
+  }
+
+  get primaryDatasetBarChart() {
+    return (
+      this.primaryDataset &&
+      this.primaryDataset.chart_type === DATASET_CHART_TYPES.BAR
     )
   }
 
@@ -106,6 +128,11 @@ class ChartGroup extends React.PureComponent {
 
   fullDate = (date, index) => `${utcMoment(date).format('MM/DD/YY')}`
 
+  get emojiScale() {
+    if (!this.primaryDataset.question_type) return []
+    return emojiSeriesMap[this.primaryDataset.question_type]
+  }
+
   get chartAxisStyle() {
     if (this.isSmallChartStyle) {
       return {
@@ -143,6 +170,39 @@ class ChartGroup extends React.PureComponent {
         fontSize: '10px',
         dy: 5,
       }
+    }
+
+    if (this.primaryDatasetBarChart) {
+      return (
+        <VictoryAxis
+          style={{
+            axis: { stroke: 'transparent' },
+          }}
+          tickValues={[1, 2, 3, 4]}
+          tickFormat={this.emojiScale.map(e => e.symbol)}
+          tickLabelComponent={<Tick emojiScale={this.emojiScale} />}
+          events={[
+            {
+              eventHandlers: {
+                onMouseOver: () => [
+                  {
+                    target: 'tickLabels',
+                    mutation: props => ({
+                      isHovered: true,
+                    }),
+                  },
+                ],
+                onMouseOut: () => [
+                  {
+                    target: 'labels',
+                    mutation: props => null,
+                  },
+                ],
+              },
+            },
+          ]}
+        />
+      )
     }
 
     // NOTE: The transform property is for IE11 which doesn't recognize CSS
@@ -202,6 +262,11 @@ class ChartGroup extends React.PureComponent {
           cardArea: width * height,
           dashWidth,
         })
+      case DATASET_CHART_TYPES.BAR:
+        return BarChart({
+          dataset,
+          cardArea: width * height,
+        })
       default:
         return AreaChart({
           dataset,
@@ -211,24 +276,59 @@ class ChartGroup extends React.PureComponent {
     }
   }
 
-  get renderCharts() {
+  get renderedDatasets() {
     let datasetIndex = 0
+    const datasets = [this.renderDataset(this.primaryDataset, datasetIndex)]
+    if (!this.secondaryDatasetsWithData) return datasets
+    this.secondaryDatasetsWithData.forEach(dataset =>
+      datasets.push(this.renderDataset(dataset, (datasetIndex += 1)))
+    )
+    return datasets
+  }
+
+  get chartProps() {
+    const props = {
+      theme: victoryTheme,
+      domain: { y: [0, this.primaryDataset.max_domain] },
+    }
+    if (this.primaryDatasetBarChart) {
+      return {
+        domainPadding: 10,
+        ...props,
+      }
+    } else {
+      return {
+        domainPadding: 80,
+        containerComponent: <VictoryVoronoiContainer />,
+        ...props,
+      }
+    }
+  }
+
+  get renderVictoryChart() {
+    if (this.primaryDatasetBarChart) {
+      return (
+        <VictoryChart {...this.chartProps}>
+          <VictoryGroup offset={30}>
+            {this.renderedDatasets.map(dataset => dataset)}
+          </VictoryGroup>
+          {this.chartAxis}
+        </VictoryChart>
+      )
+    }
+    return (
+      <VictoryChart {...this.chartProps}>
+        {this.renderedDatasets.map(dataset => dataset)}
+        {this.chartAxis}
+      </VictoryChart>
+    )
+  }
+
+  get renderCharts() {
     return (
       <ChartContainer data-cy="ChartContainer">
         <OrganicGrid />
-        <VictoryChart
-          theme={theme}
-          domainPadding={{ y: 80 }}
-          padding={{ top: 0, left: 0, right: 0, bottom: 0 }}
-          containerComponent={<VictoryVoronoiContainer />}
-        >
-          {this.renderDataset(this.primaryDataset, datasetIndex)}
-          {this.secondaryDatasetsWithData &&
-            this.secondaryDatasetsWithData.map(dataset =>
-              this.renderDataset(dataset, (datasetIndex += 1))
-            )}
-          {this.chartAxis}
-        </VictoryChart>
+        {this.renderVictoryChart}
       </ChartContainer>
     )
   }

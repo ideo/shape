@@ -18,7 +18,7 @@ import DataTargetSelect from '~/ui/reporting/DataTargetSelect'
 import v from '~/utils/variables'
 import trackError from '~/utils/trackError'
 import OrganicGridPng from '~/assets/organic_grid_black.png'
-import StyledDataItemCover from './StyledDataItemCover'
+import { StyledDataItemCover } from './StyledDataItemCover'
 
 const GraphKey = styled.span`
   background: url(${OrganicGridPng});

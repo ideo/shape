@@ -66,6 +66,7 @@ const AreaChart = ({ dataset, simpleDateTooltip, cardArea = 1 }) => {
       domain={domain}
       y="value"
       x="month"
+      key={`dataset-${dataset.order}`}
     />
   )
 }

@@ -80,7 +80,12 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return this.report_type === 'report_type_record'
   }
 
+  get isReportTypeQuestionItem() {
+    return this.report_type === 'report_type_question_item'
+  }
+
   get pdfCoverUrl() {
+    if (!this.filestack_file) return ''
     return FilestackUpload.pdfCoverUrl(this.filestack_file.handle)
   }
 
