@@ -16,8 +16,6 @@ class CommentEntryForm extends React.Component {
     draftjs_data: {},
   }
   @observable
-  suggestionsOpen = false
-  @observable
   updating = false
   editorHeight = null
   state = {
@@ -94,25 +92,6 @@ class CommentEntryForm extends React.Component {
     })
   }
 
-  @action
-  handleOpenSuggestions = () => {
-    this.suggestionsOpen = true
-  }
-
-  @action
-  handleCloseSuggestions = () => {
-    this.suggestionsOpen = false
-  }
-
-  handleReturn = e => {
-    if (!e.shiftKey && !this.suggestionsOpen) {
-      // submit message
-      this.handleSubmit(e)
-      return 'handled'
-    }
-    return 'not-handled'
-  }
-
   handleSubmit = e => {
     e.preventDefault()
     const rawData = toJS(this.commentData)
@@ -141,9 +120,7 @@ class CommentEntryForm extends React.Component {
           <CommentInput
             editorState={this.state.editorState}
             onChange={this.handleInputChange}
-            onOpenSuggestions={this.handleOpenSuggestions}
-            onCloseSuggestions={this.handleCloseSuggestions}
-            handleReturn={this.handleReturn}
+            handleSubmit={this.handleSubmit}
             setEditor={this.setEditor}
             readOnly={false}
           />

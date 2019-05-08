@@ -103,8 +103,6 @@ class Comment extends React.Component {
     draftjs_data: {},
   }
   @observable
-  suggestionsOpen = false
-  @observable
   updating = false
   editorHeight = null
 
@@ -146,9 +144,7 @@ class Comment extends React.Component {
         <CommentInput
           editorState={this.state.editorState}
           onChange={this.handleInputChange}
-          onOpenSuggestions={this.handleOpenSuggestions}
-          onCloseSuggestions={this.handleCloseSuggestions}
-          handleReturn={this.handleReturn}
+          handleSubmit={this.handleSubmit}
           setEditor={this.setEditor}
           readOnly={!this.state.editing}
         />
@@ -207,25 +203,6 @@ class Comment extends React.Component {
       if (!this.editor) return
       this.editor.focus()
     })
-  }
-
-  @action
-  handleOpenSuggestions = () => {
-    this.suggestionsOpen = true
-  }
-
-  @action
-  handleCloseSuggestions = () => {
-    this.suggestionsOpen = false
-  }
-
-  handleReturn = e => {
-    if (!e.shiftKey && !this.suggestionsOpen) {
-      // submit message
-      this.handleSubmit(e)
-      return 'handled'
-    }
-    return 'not-handled'
   }
 
   handleSubmit = e => {
