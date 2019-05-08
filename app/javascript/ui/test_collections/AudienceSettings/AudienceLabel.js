@@ -14,6 +14,7 @@ const AudienceLabel = ({
         labelPlacement={'end'}
         control={
           <Checkbox
+            id={`audienceCheckbox-${audienceId}`}
             checked={selected}
             onChange={onToggleCheckbox}
             value={audienceId}
@@ -22,7 +23,9 @@ const AudienceLabel = ({
         }
         label={
           <div style={{ maxWidth: '582px', paddingTop: '15px' }}>
-            <StyledLabel>{audienceName}</StyledLabel>
+            <StyledLabel htmlFor={`audienceCheckbox-${audienceId}`}>
+              {audienceName}
+            </StyledLabel>
           </div>
         }
       />
