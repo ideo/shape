@@ -1,8 +1,7 @@
 import _ from 'lodash'
-import { toJS } from 'mobx'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
-import { EditorState, convertFromRaw } from 'draft-js'
-import Editor from 'draft-js-plugins-editor'
+import { toJS, observable, action } from 'mobx'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { EditorState, convertFromRaw, convertToRaw } from 'draft-js'
 import createMentionPlugin from 'draft-js-mention-plugin'
 import createLinkifyPlugin from 'draft-js-linkify-plugin'
 import styled from 'styled-components'
@@ -17,6 +16,9 @@ import { apiStore, uiStore } from '~/stores'
 import TrashLgIcon from '~/ui/icons/TrashLgIcon'
 import EditPencilIcon from '~/ui/icons/EditPencilIcon'
 import { showOnHoverCss, hideOnHoverCss } from '~/ui/grid/shared'
+import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
+import { CommentForm } from '~/ui/global/styled/forms'
+import CommentInput from './CommentInput'
 
 const StyledComment = StyledCommentInput.extend`
   ${showOnHoverCss};
@@ -75,13 +77,26 @@ const Timestamp = styled.span`
   right: 0;
 `
 
+@observer
 class Comment extends React.Component {
+  @observable
+  commentData = {
+    message: '',
+    draftjs_data: {},
+  }
+  @observable
+  suggestionsOpen = false
+  @observable
+  updating = false
+  editorHeight = null
+
   constructor(props) {
     super(props)
     this.mentionPlugin = createMentionPlugin()
     this.linkifyPlugin = createLinkifyPlugin({ target: '_blank' })
     this.state = {
       editorState: EditorState.createEmpty(),
+      editing: false,
     }
   }
 
@@ -95,24 +110,42 @@ class Comment extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    this.editor = null
+  }
+
   renderMessage() {
     const { comment } = this.props
+    // TODO Editor for non-draft-js comments
     if (_.isEmpty(toJS(comment.draftjs_data))) {
       // fallback only necessary for supporting older comments before we added draftjs
       // otherwise this use case will go away
       return comment.message
     }
-    const plugins = [this.mentionPlugin, this.linkifyPlugin]
     return (
-      <Editor
-        readOnly
-        editorState={this.state.editorState}
-        // NOTE: this onChange is necessary for draft-js-plugins to decorate properly!
-        // see https://github.com/draft-js-plugins/draft-js-plugins/issues/530#issuecomment-258736772
-        onChange={editorState => this.setState({ editorState })}
-        plugins={plugins}
-      />
+      <CommentForm onSubmit={this.handleSubmit}>
+        <div className="textarea-input">
+          <CommentInput
+            editorState={this.state.editorState}
+            onChange={this.handleInputChange}
+            onOpenSuggestions={this.handleOpenSuggestions}
+            onCloseSuggestions={this.handleCloseSuggestions}
+            handleReturn={this.handleReturn}
+            setEditor={this.setEditor}
+          />
+        </div>
+        {this.state.editing && (
+          <button>
+            <ReturnArrowIcon />
+          </button>
+        )}
+      </CommentForm>
     )
+  }
+
+  handleEditClick = () => {
+    this.setState({ editing: true })
+    this.focusTextArea()
   }
 
   handleDeleteClick = () => {
@@ -126,6 +159,60 @@ class Comment extends React.Component {
         comment.API_destroy()
       },
     })
+  }
+
+  @action
+  handleInputChange = editorState => {
+    if (this.updating) return
+    const content = editorState.getCurrentContent()
+    const message = content.getPlainText()
+    this.commentData.message = message
+    this.commentData.draftjs_data = convertToRaw(content)
+    this.setState({
+      editorState,
+    })
+  }
+
+  setEditor = (editor, { unset = false } = {}) => {
+    if (unset) {
+      this.editor = null
+      return
+    }
+    if (this.editor) return
+    this.editor = editor
+  }
+
+  focusTextArea = () => {
+    // NOTE: draft-js-plugins need timeout, even with 0 delay, see:
+    // https://github.com/draft-js-plugins/draft-js-plugins/issues/800#issuecomment-315950836
+    setTimeout(() => {
+      if (!this.editor) return
+      this.editor.focus()
+    })
+  }
+
+  @action
+  handleOpenSuggestions = () => {
+    this.suggestionsOpen = true
+  }
+
+  @action
+  handleCloseSuggestions = () => {
+    this.suggestionsOpen = false
+  }
+
+  handleReturn = e => {
+    if (!e.shiftKey && !this.suggestionsOpen) {
+      // submit message
+      this.handleSubmit(e)
+      return 'handled'
+    }
+    return 'not-handled'
+  }
+
+  handleSubmit = e => {
+    e.preventDefault()
+    console.log('handle submit')
   }
 
   render() {
@@ -152,7 +239,10 @@ class Comment extends React.Component {
               {comment.persisted &&
                 apiStore.currentUserId === comment.author.id && (
                   <React.Fragment>
-                    <ActionButton className="test-edit-comment">
+                    <ActionButton
+                      onClick={this.handleEditClick}
+                      className="test-edit-comment"
+                    >
                       <EditPencilIcon />
                     </ActionButton>
                     <ActionButton
