@@ -17,7 +17,6 @@ import TrashLgIcon from '~/ui/icons/TrashLgIcon'
 import EditPencilIcon from '~/ui/icons/EditPencilIcon'
 import { showOnHoverCss, hideOnHoverCss } from '~/ui/grid/shared'
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
-import { CommentForm } from '~/ui/global/styled/forms'
 import CommentInput from './CommentInput'
 
 const StyledComment = StyledCommentInput.extend`
@@ -77,6 +76,21 @@ const Timestamp = styled.span`
   right: 0;
 `
 
+const StyledForm = styled.form`
+  position: relative;
+`
+
+const EnterButton = styled.button`
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 30px;
+  height: 30px;
+  background-color: ${v.colors.secondaryDark};
+  border-radius: 15px;
+  padding: 6px;
+`
+
 @observer
 class Comment extends React.Component {
   @observable
@@ -123,24 +137,22 @@ class Comment extends React.Component {
       return comment.message
     }
     return (
-      <CommentForm onSubmit={this.handleSubmit}>
-        <div className="textarea-input">
-          <CommentInput
-            editorState={this.state.editorState}
-            onChange={this.handleInputChange}
-            onOpenSuggestions={this.handleOpenSuggestions}
-            onCloseSuggestions={this.handleCloseSuggestions}
-            handleReturn={this.handleReturn}
-            setEditor={this.setEditor}
-            readOnly={!this.state.editing}
-          />
-        </div>
+      <StyledForm onSubmit={this.handleSubmit}>
+        <CommentInput
+          editorState={this.state.editorState}
+          onChange={this.handleInputChange}
+          onOpenSuggestions={this.handleOpenSuggestions}
+          onCloseSuggestions={this.handleCloseSuggestions}
+          handleReturn={this.handleReturn}
+          setEditor={this.setEditor}
+          readOnly={!this.state.editing}
+        />
         {this.state.editing && (
-          <button>
+          <EnterButton>
             <ReturnArrowIcon />
-          </button>
+          </EnterButton>
         )}
-      </CommentForm>
+      </StyledForm>
     )
   }
 
