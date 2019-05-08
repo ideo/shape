@@ -159,7 +159,6 @@ describe('PublicSharingOptions', () => {
       wrapper.update()
       expect(
         wrapper
-          .find('StyledJoinableGroup')
           .find('EntityAvatarAndName')
           .first()
           .props().entity

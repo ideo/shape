@@ -164,7 +164,7 @@ class RoleSelect extends React.Component {
         !record.pinned_and_locked)
     return (
       <Row>
-        <RowItemGrid container justify="space-between">
+        <RowItemGrid container alignItems="center" justify="space-between">
           <EntityAvatarAndName
             entity={entity}
             isJoinableGroup={this.isJoinableGroup}

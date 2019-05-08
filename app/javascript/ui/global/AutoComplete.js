@@ -65,9 +65,9 @@ const valueComponent = classes => valueProps => {
   return <div className="Select-value">{children}</div>
 }
 
-const ITEM_HEIGHT = 48
+const ITEM_HEIGHT = 64
 
-const selectStyles = (theme, menuStyles = {}) => ({
+const selectStyles = (theme, menuStyles = {}, numOptionsToShow = 3.5) => ({
   clearIndicator: () => ({}),
   container: () => ({}),
   control: () => ({
@@ -101,7 +101,7 @@ const selectStyles = (theme, menuStyles = {}) => ({
   }),
   menuList: base => ({
     ...base,
-    maxHeight: `${ITEM_HEIGHT * 3.5}px`,
+    maxHeight: `${ITEM_HEIGHT * numOptionsToShow}px`,
   }),
   multiValue: () => ({}),
   multiValueLabel: () => ({}),
@@ -133,6 +133,7 @@ const SelectWrapped = props => {
     menuPlacement,
     keepMenuClosed,
     menuStyles,
+    numOptionsToShow,
     ...other
   } = props
   if (keepMenuClosed) {
@@ -145,7 +146,7 @@ const SelectWrapped = props => {
         loadOptions={optionSearch}
         defaultOptions
         menuPlacement={menuPlacement}
-        styles={selectStyles(theme, menuStyles)}
+        styles={selectStyles(theme, menuStyles, numOptionsToShow)}
         components={{
           valueComponent: valueComponent(classes),
           LoadingIndicator,
@@ -160,7 +161,7 @@ const SelectWrapped = props => {
     <AsyncCreatable
       loadOptions={optionSearch}
       defaultOptions
-      styles={selectStyles(theme, menuStyles)}
+      styles={selectStyles(theme, menuStyles, numOptionsToShow)}
       formatCreateLabel={inputValue => `Invite email ${inputValue}`}
       menuPlacement={menuPlacement}
       components={{
@@ -179,7 +180,7 @@ const SelectWrapped = props => {
     />
   ) : (
     <Select
-      styles={selectStyles(theme, menuStyles)}
+      styles={selectStyles(theme, menuStyles, numOptionsToShow)}
       menuPlacement={menuPlacement}
       components={{
         valueComponent: valueComponent(classes),
@@ -247,6 +248,7 @@ class AutoComplete extends React.Component {
       keepMenuClosed,
       creatable,
       menuStyles,
+      numOptionsToShow,
     } = this.props
     const { option } = this.state
     return (
@@ -257,6 +259,7 @@ class AutoComplete extends React.Component {
           inputProps={{
             classes,
             menuStyles,
+            numOptionsToShow,
             multi: true,
             value: keepSelectedOptions ? option : null,
             options,
@@ -299,6 +302,7 @@ AutoComplete.propTypes = {
   value: PropTypes.number,
   menuPlacement: PropTypes.string,
   keepMenuClosed: PropTypes.bool,
+  numOptionsToShow: PropTypes.number,
   menuStyles: PropTypes.shape({
     width: PropTypes.string,
     zIndex: PropTypes.number,
@@ -314,6 +318,7 @@ AutoComplete.defaultProps = {
   optionSearch: null,
   menuPlacement: 'bottom',
   keepMenuClosed: false,
+  numOptionsToShow: 3.5,
   menuStyles: {
     width: '370px',
     zIndex: 2,

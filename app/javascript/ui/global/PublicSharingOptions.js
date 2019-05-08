@@ -13,7 +13,6 @@ import EntityAvatarAndName from '~/ui/global/EntityAvatarAndName'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import PublicSharingIcon from '~/ui/icons/PublicSharingIcon'
 import AutoComplete from '~/ui/global/AutoComplete'
-import DropdownIcon from '~/ui/icons/DropdownIcon'
 import v from '~/utils/variables'
 import trackError from '~/utils/trackError'
 
@@ -21,13 +20,13 @@ const StyledFormControlLabel = styled(FormControlLabel)`
   margin-top: -18px;
 `
 
-const StyledJoinableGroup = styled.div`
-  display: flex;
+const StyledGroupShowSelect = styled(SmallHelperText)`
+  margin-left: 10px;
+  color: ${v.colors.commonDarkest};
   cursor: pointer;
-`
-StyledJoinableGroup.displayName = 'StyledJoinableGroup'
-
-const StyledGroupDropdown = styled.span`
+  &:hover {
+    color: ${v.colors.secondaryDarkest};
+  }
   .icon {
     width: 24px;
     margin-left: 5px;
@@ -219,15 +218,16 @@ class PublicSharingOptions extends React.Component {
     const { joinableGroup, showJoinableGroupSearch } = this.state
     return (
       <Box style={{ marginLeft: 20, marginBottom: 30, width: '40%' }}>
-        <StyledJoinableGroup
-          onClick={this.toggleShowJoinableGroupSearch}
-          data-cy="public-joinable-group-toggle"
-        >
+        <Flex align="center">
           {joinableGroup && <EntityAvatarAndName entity={joinableGroup} />}
-          <StyledGroupDropdown menuOpen={showJoinableGroupSearch}>
-            <DropdownIcon />
-          </StyledGroupDropdown>
-        </StyledJoinableGroup>
+          <StyledGroupShowSelect
+            menuOpen={showJoinableGroupSearch}
+            onClick={this.toggleShowJoinableGroupSearch}
+            data-cy="public-joinable-group-toggle"
+          >
+            Change
+          </StyledGroupShowSelect>
+        </Flex>
         {showJoinableGroupSearch && (
           <Box style={{ marginTop: 10, width: 250 }}>
             <AutoComplete
@@ -237,6 +237,7 @@ class PublicSharingOptions extends React.Component {
               placeholder="search groups"
               menuPlacement="bottom"
               menuStyles={{ width: '250px', zIndex: 10 }}
+              numOptionsToShow={5.5}
             />
           </Box>
         )}
