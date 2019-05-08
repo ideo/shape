@@ -18,6 +18,7 @@ import EditPencilIcon from '~/ui/icons/EditPencilIcon'
 import { showOnHoverCss, hideOnHoverCss } from '~/ui/grid/shared'
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
 import CommentInput from './CommentInput'
+import XIcon from '~/ui/icons/XIcon'
 
 const StyledComment = StyledCommentInput.extend`
   ${showOnHoverCss};
@@ -89,6 +90,11 @@ const EnterButton = styled.button`
   background-color: ${v.colors.secondaryDark};
   border-radius: 15px;
   padding: 6px;
+`
+
+const CancelEditButton = styled.button`
+  width: 22px;
+  height: 22px;
 `
 
 @observer
@@ -228,6 +234,10 @@ class Comment extends React.Component {
     console.log('handle submit')
   }
 
+  handleCancelEditClick = () => {
+    this.setState({ editing: false })
+  }
+
   render() {
     const { comment } = this.props
     const { author } = comment
@@ -245,28 +255,40 @@ class Comment extends React.Component {
             {comment.author.name}
           </DisplayText>
           <FlexPushRight>
-            <Timestamp className="timestamp hide-on-hover">
-              <Moment date={comment.updated_at} />
-            </Timestamp>
-            <StyledCommentActions className="show-on-hover">
-              {comment.persisted &&
-                apiStore.currentUserId === comment.author.id && (
-                  <React.Fragment>
-                    <ActionButton
-                      onClick={this.handleEditClick}
-                      className="test-edit-comment"
-                    >
-                      <EditPencilIcon />
-                    </ActionButton>
-                    <ActionButton
-                      onClick={this.handleDeleteClick}
-                      className="test-delete-comment"
-                    >
-                      <TrashLgIcon />
-                    </ActionButton>
-                  </React.Fragment>
-                )}
-            </StyledCommentActions>
+            {!this.state.editing && (
+              <React.Fragment>
+                <Timestamp className="timestamp hide-on-hover">
+                  <Moment date={comment.updated_at} />
+                </Timestamp>
+                <StyledCommentActions className="show-on-hover">
+                  {comment.persisted &&
+                    apiStore.currentUserId === comment.author.id && (
+                      <React.Fragment>
+                        <ActionButton
+                          onClick={this.handleEditClick}
+                          className="test-edit-comment"
+                        >
+                          <EditPencilIcon />
+                        </ActionButton>
+                        <ActionButton
+                          onClick={this.handleDeleteClick}
+                          className="test-delete-comment"
+                        >
+                          <TrashLgIcon />
+                        </ActionButton>
+                      </React.Fragment>
+                    )}
+                </StyledCommentActions>
+              </React.Fragment>
+            )}
+            {this.state.editing && (
+              <CancelEditButton
+                onClick={this.handleCancelEditClick}
+                className="test-cancel-edit-comment"
+              >
+                <XIcon />
+              </CancelEditButton>
+            )}
           </FlexPushRight>
         </InlineRow>
 
