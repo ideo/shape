@@ -145,6 +145,7 @@ class CommentEntryForm extends React.Component {
             onCloseSuggestions={this.handleCloseSuggestions}
             handleReturn={this.handleReturn}
             setEditor={this.setEditor}
+            readOnly={false}
           />
         </div>
         <button>

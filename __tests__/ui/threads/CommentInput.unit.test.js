@@ -15,6 +15,7 @@ describe('CommentInput', () => {
       setEditor: jest.fn(),
       editorState: EditorState.createEmpty(),
       apiStore,
+      readOnly: false,
     }
     wrapper = shallow(<CommentInput.wrappedComponent {...props} />)
     component = wrapper.instance()

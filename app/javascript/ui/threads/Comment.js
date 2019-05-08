@@ -132,6 +132,7 @@ class Comment extends React.Component {
             onCloseSuggestions={this.handleCloseSuggestions}
             handleReturn={this.handleReturn}
             setEditor={this.setEditor}
+            readOnly={!this.state.editing}
           />
         </div>
         {this.state.editing && (
