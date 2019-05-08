@@ -4,7 +4,7 @@ import { apiStore, uiStore } from '~/stores'
 
 jest.mock('../../../app/javascript/stores')
 
-let wrapper, props, component, rerender
+let wrapper, props, rerender
 describe('Comment', () => {
   beforeEach(() => {
     props = {
@@ -15,7 +15,6 @@ describe('Comment', () => {
     }
     rerender = props => {
       wrapper = shallow(<Comment {...props} />)
-      component = wrapper.instance()
     }
     rerender(props)
   })
@@ -68,15 +67,6 @@ describe('Comment', () => {
           expect(wrapper.find('.test-cancel-edit-comment').exists()).toBe(false)
         })
       })
-
-      it('calls thread.API_updateWithoutSync on submit', () => {
-        component.commentData = {
-          message: 'hello',
-          draftjs_data: { blocks: [] },
-        }
-        component.handleSubmit({ preventDefault: jest.fn() })
-        expect(fakeComment.API_updateWithoutSync).toHaveBeenCalled()
-      })
     })
 
     it('renders a delete button', () => {
@@ -92,7 +82,6 @@ describe('Comment', () => {
     })
   })
 
-  // TODO: Figure out why these tests are no longer passing...
   describe('when user is not the comment author', () => {
     beforeEach(() => {
       apiStore.currentUserId = '1'
