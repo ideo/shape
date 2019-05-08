@@ -1,9 +1,7 @@
 import _ from 'lodash'
-import { toJS, observable, action } from 'mobx'
+import { toJS, observable, action, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { EditorState, convertFromRaw, convertToRaw } from 'draft-js'
-import createMentionPlugin from 'draft-js-mention-plugin'
-import createLinkifyPlugin from 'draft-js-linkify-plugin'
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
@@ -127,12 +125,12 @@ class Comment extends React.Component {
       const editorState = EditorState.createWithContent(contentState)
       this.setState({ editorState })
     }
-    document.addEventListener("keydown", this.handleEscape, false)
+    document.addEventListener('keydown', this.handleEscape, false)
   }
 
   componentWillUnmount() {
     this.editor = null
-    document.removeEventListener("keydown", this.handleEscape, false)
+    document.removeEventListener('keydown', this.handleEscape, false)
   }
 
   renderMessage() {
@@ -155,7 +153,7 @@ class Comment extends React.Component {
           readOnly={!this.state.editing}
         />
         {this.state.editing && (
-          <EnterButton>
+          <EnterButton className="test-update-comment">
             <ReturnArrowIcon />
           </EnterButton>
         )}
@@ -233,6 +231,17 @@ class Comment extends React.Component {
   handleSubmit = e => {
     e.preventDefault()
     console.log('handle submit')
+    const rawData = toJS(this.commentData)
+    // don't allow submit of empty comment
+    if (!rawData.message) return
+    const { comment } = this.props
+    comment.API_updateWithoutSync(rawData).then(() => {
+      this.setState({ editing: false })
+      this.updating = false
+    })
+    runInAction(() => {
+      this.updating = true
+    })
   }
 
   handleEscape = e => {

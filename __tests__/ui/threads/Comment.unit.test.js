@@ -4,7 +4,7 @@ import { apiStore, uiStore } from '~/stores'
 
 jest.mock('../../../app/javascript/stores')
 
-let wrapper, props
+let wrapper, props, component
 describe('Comment', () => {
   beforeEach(() => {
     props = {
@@ -14,6 +14,7 @@ describe('Comment', () => {
       },
     }
     wrapper = shallow(<Comment {...props} />)
+    component = wrapper.instance()
   })
 
   it('renders the author name and avatar', () => {
@@ -63,6 +64,15 @@ describe('Comment', () => {
           editButton.simulate('click')
           expect(wrapper.find('.test-cancel-edit-comment').exists()).toBe(false)
         })
+      })
+
+      it('calls thread.API_updateWithoutSync on submit', () => {
+        component.commentData = {
+          message: 'hello',
+          draftjs_data: { blocks: [] },
+        }
+        component.handleSubmit({ preventDefault: jest.fn() })
+        expect(fakeComment.API_updateWithoutSync).toHaveBeenCalled()
       })
     })
 
