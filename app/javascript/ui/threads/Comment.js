@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { toJS, observable, action, runInAction } from 'mobx'
+import { toJS, observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { EditorState, convertFromRaw, convertToRaw } from 'draft-js'
 import styled from 'styled-components'
@@ -98,11 +98,6 @@ const CancelEditButton = styled.button`
 @observer
 class Comment extends React.Component {
   @observable
-  commentData = {
-    message: '',
-    draftjs_data: {},
-  }
-  @observable
   updating = false
   editorHeight = null
 
@@ -175,13 +170,8 @@ class Comment extends React.Component {
     })
   }
 
-  @action
   handleInputChange = editorState => {
     if (this.updating) return
-    const content = editorState.getCurrentContent()
-    const message = content.getPlainText()
-    this.commentData.message = message
-    this.commentData.draftjs_data = convertToRaw(content)
     this.setState({
       editorState,
     })
@@ -207,10 +197,17 @@ class Comment extends React.Component {
 
   handleSubmit = e => {
     e.preventDefault()
-    console.log('handle submit')
-    const rawData = toJS(this.commentData)
+
+    const content = this.state.editorState.getCurrentContent()
+    const message = content.getPlainText()
     // don't allow submit of empty comment
-    if (!rawData.message) return
+    if (!message) return
+
+    const rawData = {
+      message,
+      draftjs_data: convertToRaw(content),
+    }
+
     const { comment } = this.props
     comment.API_updateWithoutSync(rawData).then(() => {
       this.setState({ editing: false })

@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { toJS, observable, action, runInAction } from 'mobx'
+import { observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { EditorState, ContentState, convertToRaw } from 'draft-js'
 import { get } from 'lodash'
@@ -10,11 +10,6 @@ import CommentInput from './CommentInput'
 
 @observer
 class CommentEntryForm extends React.Component {
-  @observable
-  commentData = {
-    message: '',
-    draftjs_data: {},
-  }
   @observable
   updating = false
   editorHeight = null
@@ -45,13 +40,8 @@ class CommentEntryForm extends React.Component {
     })
   }
 
-  @action
   handleInputChange = editorState => {
     if (this.updating) return
-    const content = editorState.getCurrentContent()
-    const message = content.getPlainText()
-    this.commentData.message = message
-    this.commentData.draftjs_data = convertToRaw(content)
     this.handleHeightChange()
     this.setState({
       editorState,
@@ -94,17 +84,23 @@ class CommentEntryForm extends React.Component {
 
   handleSubmit = e => {
     e.preventDefault()
-    const rawData = toJS(this.commentData)
+
+    const content = this.state.editorState.getCurrentContent()
+    const message = content.getPlainText()
     // don't allow submit of empty comment
-    if (!rawData.message) return
+    if (!message) return
+
+    const rawData = {
+      message,
+      draftjs_data: convertToRaw(content),
+    }
+
     const { thread } = this.props
     thread.API_saveComment(rawData).then(() => {
       this.props.afterSubmit()
       this.updating = false
     })
     runInAction(() => {
-      this.commentData.message = ''
-      this.commentData.draftjs_data = {}
       this.updating = true
     })
     this.resetEditorState()
