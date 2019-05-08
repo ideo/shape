@@ -112,8 +112,7 @@ class Comment extends React.Component {
 
   constructor(props) {
     super(props)
-    this.mentionPlugin = createMentionPlugin()
-    this.linkifyPlugin = createLinkifyPlugin({ target: '_blank' })
+    this.handleEscape = this.handleEscape.bind(this)
     this.state = {
       editorState: EditorState.createEmpty(),
       editing: false,
@@ -128,10 +127,12 @@ class Comment extends React.Component {
       const editorState = EditorState.createWithContent(contentState)
       this.setState({ editorState })
     }
+    document.addEventListener("keydown", this.handleEscape, false)
   }
 
   componentWillUnmount() {
     this.editor = null
+    document.removeEventListener("keydown", this.handleEscape, false)
   }
 
   renderMessage() {
@@ -232,6 +233,12 @@ class Comment extends React.Component {
   handleSubmit = e => {
     e.preventDefault()
     console.log('handle submit')
+  }
+
+  handleEscape = e => {
+    if (e.keyCode === 27 && this.state.editing) {
+      this.handleCancelEditClick()
+    }
   }
 
   handleCancelEditClick = () => {
