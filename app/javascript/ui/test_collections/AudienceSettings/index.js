@@ -1,12 +1,11 @@
 import _ from 'lodash'
 import React from 'react'
-// import { PropTypes } from 'prop-types'
 import { computed } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { runInAction, observable, toJS } from 'mobx'
 
 import AudienceSettingsWidget from './AudienceSettingsWidget'
-import TestAudience from '~/stores//jsonApi/TestAudience'
+import TestAudience from '~/stores/jsonApi/TestAudience'
 
 @inject('apiStore')
 @observer
