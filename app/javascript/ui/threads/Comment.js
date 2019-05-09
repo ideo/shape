@@ -248,7 +248,7 @@ class Comment extends React.Component {
             {!this.state.editing && (
               <React.Fragment>
                 <Timestamp className="timestamp hide-on-hover">
-                  <Moment date={comment.updated_at} />
+                  <Moment date={comment.created_at} />
                 </Timestamp>
                 <StyledCommentActions className="show-on-hover">
                   {comment.persisted &&
