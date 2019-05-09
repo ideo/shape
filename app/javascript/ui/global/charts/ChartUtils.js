@@ -174,7 +174,7 @@ export const victoryTheme = objectAssignDeep({}, VictoryTheme.grayscale, {
   },
 })
 
-export const emojiSeriesMap = {
+export const emojiSeries = {
   question_useful: [
     { number: 1, name: 'Very useless', symbol: '👎' },
     { number: 2, name: 'Somewhat useless', scale: 0.6, symbol: '👎' },
@@ -205,4 +205,10 @@ export const emojiSeriesMap = {
     { number: 3, name: 'Different', scale: 0.6, symbol: '😲' },
     { number: 4, name: 'Very different', symbol: '🤯' },
   ],
+}
+
+export const emojiSeriesForQuestionType = questionType => {
+  const series = emojiSeries[questionType]
+  if (series) return series
+  return emojiSeries.question_category_satisfaction
 }

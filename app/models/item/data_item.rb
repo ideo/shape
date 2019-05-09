@@ -68,6 +68,8 @@ class Item
       builder = CollectionCardBuilder.new(
         params: {
           order: parent_collection_card.order + 1,
+          width: 1,
+          height: 2,
           item_attributes: {
             type: 'Item::LegendItem',
           },
@@ -127,8 +129,11 @@ class Item
     end
 
     def create_legend_item?
-      return false if dont_create_legend_item
-      report_type_record? && legend_item.blank? && parent_collection_card.present?
+      return false if dont_create_legend_item ||
+                      report_type_network_app_metric? ||
+                      report_type_collections_and_items?
+
+      legend_item.blank? && parent_collection_card.present?
     end
   end
 end

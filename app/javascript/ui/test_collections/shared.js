@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import PropTypes from 'prop-types'
 import styled, { css } from 'styled-components'
 import TextareaAutosize from 'react-autosize-textarea'
@@ -119,14 +118,6 @@ export const TestQuestionHolder = styled.div`
     margin-bottom: 0;
   }
 `
-
-export const questionTitle = question_type => {
-  if (question_type !== 'total') {
-    const info = questionInformation({ question_type })
-    return info.questionTitle
-  }
-  return _.startCase(question_type)
-}
 
 export const styledTestTheme = (themeName = 'primary') => {
   // primary theme used for TestType == Media (non-collection test w/ image/video)

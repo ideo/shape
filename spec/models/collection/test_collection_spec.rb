@@ -280,7 +280,7 @@ describe Collection::TestCollection, type: :model do
               .map { |card| card.record.class },
             ).to eq(
               [
-                Item::ChartItem,
+                Item::DataItem,
                 Collection::TestDesign,
               ],
             )
@@ -295,7 +295,7 @@ describe Collection::TestCollection, type: :model do
             expect do
               test_collection.launch!(initiated_by: user)
             end.to change(
-              Item::ChartItem, :count
+              Item::DataItem, :count
             ).by(test_collection.question_items.select { |q| q.question_context? || q.question_useful? }.size)
           end
 

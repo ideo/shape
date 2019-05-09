@@ -356,13 +356,16 @@ class Collection
     end
 
     def create_response_graphs(initiated_by:)
+      legend_item = nil
       question_items
         .select(&:scale_question?)
-        .map do |question|
-        question.create_response_graph(
+        .map.with_index do |question, i|
+        data_item_card = question.create_response_graph(
           parent_collection: self,
           initiated_by: initiated_by,
+          legend_item: legend_item,
         )
+        legend_item = data_item_card.item.legend_item if i.zero?
       end
     end
 

@@ -10,7 +10,6 @@ import VideoItemCover from '~/ui/grid/covers/VideoItemCover'
 import GenericFileItemCover from '~/ui/grid/covers/GenericFileItemCover'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 import DataItemCover from '~/ui/grid/covers/DataItemCover'
-import ChartItemCover from '~/ui/grid/covers/ChartItemCover'
 import LegendItemCover from '~/ui/grid/covers/LegendItemCover'
 
 import { ITEM_TYPES } from '~/utils/variables'
@@ -72,9 +71,6 @@ class CoverRenderer extends React.Component {
               dragging={dragging}
             />
           )
-        case ITEM_TYPES.CHART:
-          return <ChartItemCover item={record} testCollection={card.parent} />
-
         case ITEM_TYPES.DATA:
           // We must pass in dataset length to trigger
           // re-render when new datasets are added

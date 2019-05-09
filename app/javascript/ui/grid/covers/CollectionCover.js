@@ -15,7 +15,6 @@ import { FormButton, RoundPill } from '~/ui/global/styled/forms'
 import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
-import { questionTitle } from '~/ui/test_collections/shared'
 import { routingStore } from '~/stores'
 
 const IconHolder = styled.span`
@@ -191,8 +190,8 @@ class CollectionCover extends React.Component {
     // don't display score for ordering like 'updated_at'
     if (!this.hasCollectionScore) return ''
 
-    const orderName = questionTitle(order)
-    const score = collection.test_scores[order]
+    const orderName = order.question_title
+    const score = collection.test_scores[order.question_type]
     return (
       <RoundPill>
         Result: {orderName}: <strong>{score}%</strong>

@@ -72,8 +72,9 @@ module DataReport
     def add_percentage_to_data(data, num_answers)
       data.map do |d|
         d[:percentage] = 0
-        next if num_answers.zero?
-        d[:percentage] = (d[:value].to_f / num_answers * 100).round
+        if num_answers.positive?
+          d[:percentage] = (d[:value].to_f / num_answers * 100).round
+        end
         d
       end
     end

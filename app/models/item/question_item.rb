@@ -74,6 +74,56 @@ class Item
       %i[question_media question_description question_finish]
     end
 
+    def self.question_title_and_description(question_type = nil)
+      case question_type&.to_sym
+      when :question_useful
+        {
+          title: 'Usefulness',
+          description: 'How useful is this idea for you?',
+        }
+      when :question_clarity
+        {
+          title: 'Clarity',
+          description: 'How clear is this idea for you?',
+        }
+      when :question_excitement
+        {
+          title: 'Excitement',
+          description: 'How exciting is this idea for you?',
+        }
+      when :question_different
+        {
+          title: 'Different',
+          description: "How different is this idea from what you've seen before?",
+        }
+      when :question_category_satisfaction
+        # the category text gets added later within ScaleQuestion
+        {
+          title: 'Category Satisfaction',
+          description: 'How satisfied are you with your current',
+        }
+      when :question_context
+        {
+          title: 'Context',
+          description: 'How satisfied are you with your current solution?',
+        }
+      else
+        {}
+      end
+    end
+
+    def question_title_and_description
+      self.class.question_title_and_description(question_type)
+    end
+
+    def question_title
+      question_title_and_description[:title]
+    end
+
+    def question_description
+      question_title_and_description[:description]
+    end
+
     def scale_question?
       self.class.question_type_categories[:scaled_rating].include?(question_type&.to_sym)
     end
@@ -103,7 +153,7 @@ class Item
       (points * 100.0 / total).round
     end
 
-    def create_response_graph(parent_collection:, initiated_by:)
+    def create_response_graph(parent_collection:, initiated_by:, legend_item: nil)
       return if !scale_question? || test_chart_item.present?
 
       builder = CollectionCardBuilder.new(
@@ -112,8 +162,10 @@ class Item
           height: 2,
           width: 2,
           item_attributes: {
-            type: 'Item::ChartItem',
+            type: 'Item::DataItem',
             data_source: self,
+            report_type: :report_type_question_item,
+            legend_item_id: legend_item&.id,
           },
         },
         parent_collection: parent_collection,
@@ -142,14 +194,6 @@ class Item
       builder.collection_card
     end
 
-    def question_title
-      question_title_and_description[:title]
-    end
-
-    def question_description
-      question_title_and_description[:description]
-    end
-
     private
 
     def notify_test_design_collection_of_creation?
@@ -170,42 +214,6 @@ class Item
       )
     end
 
-    def question_title_and_description
-      case question_type.to_sym
-      when :question_useful
-        {
-          title: 'Usefulness',
-          description: 'How useful is this idea for you?',
-        }
-      when :question_clarity
-        {
-          title: 'Clarity',
-          description: 'How clear is this idea for you?',
-        }
-      when :question_excitement
-        {
-          title: 'Excitement',
-          description: 'How exciting is this idea for you?',
-        }
-      when :question_different
-        {
-          title: 'Different',
-          description: "How different is this idea from what you've seen before?",
-        }
-      when :question_category_satisfaction
-        # the category text gets added later within ScaleQuestion
-        {
-          title: 'Category Satisfaction',
-          description: 'How satisfied are you with your current',
-        }
-      when :question_context
-        {}
-      else
-        {
-          title: 'Context',
-          description: 'How satisfied are you with your current solution?',
-        }
-      end
-    end
+
   end
 end

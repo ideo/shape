@@ -179,11 +179,11 @@ RSpec.describe CollectionCardBuilder, type: :service do
           end
 
           context 'and test is not live' do
-            it 'does not create chart item' do
+            it 'does not create data item' do
               expect(test_collection.live?).to be false
               expect {
                 builder.create
-              }.not_to change(Item::ChartItem, :count)
+              }.not_to change(Item::DataItem, :count)
             end
           end
 
@@ -193,11 +193,11 @@ RSpec.describe CollectionCardBuilder, type: :service do
             end
             let!(:parent_collection) { test_collection.test_design }
 
-            it 'creates chart item' do
+            it 'creates data item' do
               expect(test_collection.live?).to be true
               expect {
                 builder.create
-              }.to change(Item::ChartItem, :count).by(1)
+              }.to change(Item::DataItem, :count).by(1)
             end
           end
         end

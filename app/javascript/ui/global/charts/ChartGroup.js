@@ -22,7 +22,7 @@ import {
   datasetPropType,
   utcMoment,
   victoryTheme,
-  emojiSeriesMap,
+  emojiSeriesForQuestionType,
 } from '~/ui/global/charts/ChartUtils'
 
 const calculateTickLabelEdges = labelText => {
@@ -124,7 +124,7 @@ class ChartGroup extends React.PureComponent {
   get emojiScale() {
     const { question_type } = this.primaryDataset
     if (!question_type) return []
-    return emojiSeriesMap[question_type]
+    return emojiSeriesForQuestionType(question_type)
   }
 
   get chartAxisStyle() {

@@ -62,12 +62,14 @@ class CollectionCardBuilder
              record.is_a?(Item::QuestionItem)
 
             test_collection = @parent_collection.test_collection
+            legend_item = @parent_collection.items.legend_items.first
 
             # If this is a new scale question, create response graphs
             if record.scale_question?
               record.create_response_graph(
                 parent_collection: test_collection,
                 initiated_by: @user,
+                legend_item: legend_item,
               )
             elsif record.question_open?
               record.create_open_response_collection(

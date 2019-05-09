@@ -20,6 +20,13 @@ class Collection
         .select('jsonb_object_keys(cached_test_scores) as types')
         .group('types')
         .map(&:types)
+        .map do |question_type|
+        data = Item::QuestionItem.question_title_and_description(question_type)
+        {
+          question_type: question_type,
+          question_title: data[:title],
+         }
+      end
     end
   end
 
