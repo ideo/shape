@@ -126,6 +126,9 @@ class CollectionPage extends React.Component {
     if (undoStore.undoAfterRoute) {
       undoStore.performUndoAfterRoute()
     }
+    if (collection.joinable_group_id) {
+      apiStore.checkJoinableGroup(collection.joinable_group_id)
+    }
     if (collection.isNormalCollection) {
       if (apiStore.currentUser) {
         const thread = await apiStore.findOrBuildCommentThread(collection)

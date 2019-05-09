@@ -183,6 +183,14 @@ class ApiStore extends jsonapi(datxCollection) {
     }
   }
 
+  checkJoinableGroup(id) {
+    if (!this.currentUser) return
+    const { groups } = this.currentUser
+    if (!_.includes(_.map(groups, 'id'), id)) {
+      this.loadCurrentUser()
+    }
+  }
+
   searchUsersAndGroups(query) {
     return this.request(`search/users_and_groups?query=${query}`)
   }

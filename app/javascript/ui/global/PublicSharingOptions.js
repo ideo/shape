@@ -217,13 +217,15 @@ class PublicSharingOptions extends React.Component {
   get renderJoinGroupSelection() {
     const { joinableGroup, showJoinableGroupSearch } = this.state
     return (
-      <Box style={{ marginLeft: 20, marginBottom: 30, width: '40%' }}>
+      <Box
+        style={{ marginLeft: 20, marginBottom: 30, width: '40%' }}
+        data-cy="public-joinable-group-toggle"
+      >
         <Flex align="center">
           {joinableGroup && <EntityAvatarAndName entity={joinableGroup} />}
           <StyledGroupShowSelect
             menuOpen={showJoinableGroupSearch}
             onClick={this.toggleShowJoinableGroupSearch}
-            data-cy="public-joinable-group-toggle"
           >
             Change
           </StyledGroupShowSelect>

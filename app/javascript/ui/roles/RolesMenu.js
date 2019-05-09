@@ -230,6 +230,7 @@ class RolesMenu extends React.Component {
 
   deleteRoles = async (role, entity, opts = {}) => {
     const { ownerId, ownerType } = this.props
+    const { apiStore } = this.props
     return role.API_delete(entity, ownerId, ownerType, opts).then(res => {
       // We should do a page reload to get the correct user's new org
       if (opts.organizationChange) {
@@ -238,6 +239,10 @@ class RolesMenu extends React.Component {
       }
       if (!opts.isSwitching) {
         this.initializeRolesAndGroups()
+      }
+      if (entity.isCurrentUser && ownerType === 'groups') {
+        // if you've left a group, reload your groups from the API
+        apiStore.loadCurrentUser()
       }
       return {}
     })
