@@ -5,6 +5,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 // import { EditorState, convertToRaw } from 'draft-js'
 import Editor from 'draft-js-plugins-editor'
 import createMentionPlugin from 'draft-js-mention-plugin'
+import createLinkifyPlugin from 'draft-js-linkify-plugin'
 
 import { uiStore } from '~/stores'
 import {
@@ -43,6 +44,7 @@ class CommentInput extends React.Component {
   constructor(props) {
     super(props)
     this.initMentionPlugin()
+    this.initLinkifyPlugin()
     this.searchUsersAndGroups = _.debounce(this._searchUsersAndGroups, 300)
   }
 
@@ -56,6 +58,10 @@ class CommentInput extends React.Component {
       // treat the entire "@xyz" as an all-or-nothing token
       entityMutability: 'IMMUTABLE',
     })
+  }
+
+  initLinkifyPlugin() {
+    this.linkifyPlugin = createLinkifyPlugin({ target: '_blank' })
   }
 
   @action
@@ -114,7 +120,7 @@ class CommentInput extends React.Component {
     const { onChange, editorState, readOnly } = this.props
     const { MentionSuggestions } = this.mentionPlugin
     MentionSuggestions.displayName = 'MentionSuggestions'
-    const plugins = [this.mentionPlugin]
+    const plugins = [this.mentionPlugin, this.linkifyPlugin]
 
     return (
       <StyledCommentInput editing onClick={this.focus}>
