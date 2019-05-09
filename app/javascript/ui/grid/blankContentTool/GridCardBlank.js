@@ -270,6 +270,7 @@ class GridCardBlank extends React.Component {
   }
 
   startCreating = type => () => {
+    console.log('creating ', type)
     this.setState({ creating: type, bctMenuOpen: false })
   }
 

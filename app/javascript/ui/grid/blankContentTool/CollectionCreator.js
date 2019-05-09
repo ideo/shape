@@ -28,6 +28,7 @@ class CollectionCreator extends React.Component {
     e.preventDefault()
     if (!this.state.inputText) return
     const { createCard, type } = this.props
+    console.log('creating collection: ', type)
     let dbType = null
     if (type === 'submissionBox') dbType = 'Collection::SubmissionBox'
     else if (type === 'testCollection') dbType = 'Collection::TestCollection'

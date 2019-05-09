@@ -266,12 +266,14 @@ class CollectionPage extends React.Component {
   }
 
   onAddSubmission = ev => {
+    console.log('CollectionPage#onAddSubmission, event: ', ev)
     ev.preventDefault()
     const { id } = this.collection.submissions_collection
     const submissionSettings = {
       type: this.collection.submission_box_type,
       template: this.collection.submission_template,
     }
+    console.log(id, submissionSettings)
     Collection.createSubmission(id, submissionSettings)
   }
 
@@ -319,6 +321,11 @@ class CollectionPage extends React.Component {
       submission_template,
       submissions_enabled,
     } = collection
+
+    console.log(
+      'CollectionPage#renderSubmissionCollection, submission_template: ',
+      submission_template
+    )
 
     if (!submissions_collection || !loadedSubmissions) {
       return this.loader()

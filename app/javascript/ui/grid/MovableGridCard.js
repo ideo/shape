@@ -427,12 +427,16 @@ class MovableGridCard extends React.PureComponent {
 
   renderBlank = cardType => {
     const { card, parent } = this.props
+    console.log('MovableGridCard#renderBlank, card = ', card)
     const styleProps = this.styleProps()
     const { height, width, xPos, yPos } = styleProps
     const { blankType } = card
 
     let cardElement = <GridCardBlank parent={parent} preselected={blankType} />
     if (cardType === 'submission') {
+      console.log('making a card: ', cardType)
+      console.log('MovableGridCard#renderBlank')
+      console.log('card.submissionSettings = ', card.submissionSettings)
       cardElement = (
         <AddSubmission
           parent_id={card.parent_id}
@@ -511,6 +515,7 @@ class MovableGridCard extends React.PureComponent {
     if (cardType === 'placeholder') {
       return this.renderPlaceholder()
     } else if (cardType === 'blank' || cardType === 'submission') {
+      console.log('in render, renderBlank for cardType: ', cardType)
       return this.renderBlank(cardType)
     } else if (cardType === 'empty') {
       return this.renderEmpty({ beginningOfRow: card.position.x === 0 })

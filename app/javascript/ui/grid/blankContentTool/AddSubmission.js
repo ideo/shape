@@ -53,18 +53,22 @@ class AddSubmission extends React.Component {
   }
 
   handleSubmission = ev => {
+    console.log('AddSubmission#handleSubmission, event: ', ev)
     ev.preventDefault()
     const { parent_id, submissionSettings } = this.props
+    console.log(parent_id, submissionSettings)
     //  TODO figure out how to put loading state even when calling this
     Collection.createSubmission(parent_id, submissionSettings)
   }
 
   renderInner = () => {
+    console.log('render inner from AddSubmission')
     const {
       uiStore,
       submissionSettings: { enabled },
     } = this.props
     const { viewingCollection } = uiStore
+    console.log(viewingCollection, enabled)
     if (!viewingCollection) return ''
 
     if (!enabled) {

@@ -899,17 +899,20 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   static async createSubmission(parent_id, submissionSettings) {
     const { routingStore, uiStore } = apiStore
     const { type, template } = submissionSettings
+    console.log('submissionSettings: ', submissionSettings)
     if (type === 'template' && template) {
       const templateData = {
         template_id: template.id,
         parent_id,
         placement: 'beginning',
       }
+      console.log('templateData is: ', template)
       uiStore.update('isLoading', true)
       const res = await apiStore.createTemplateInstance(templateData)
       uiStore.update('isLoading', false)
       routingStore.routeTo('collections', res.data.id)
     } else {
+      console.log('missing type or template; opening blank content tool')
       uiStore.openBlankContentTool({
         order: 0,
         collectionId: parent_id,
