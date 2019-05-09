@@ -24,9 +24,10 @@ const StyledDataItemCover = styled.div`
 StyledDataItemCover.displayName = 'StyledDataItemCover'
 
 const StyledDataItemQuestionCover = styled.div`
+  background-color: ${v.colors.commonLight};
+  border-top: 2px solid ${v.colors.black};
   height: calc(100% - 32px);
   padding: 16px;
-  background-color: ${v.colors.white};
   text-align: left;
 `
 

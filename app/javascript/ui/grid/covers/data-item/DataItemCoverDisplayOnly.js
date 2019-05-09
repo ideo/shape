@@ -1,5 +1,6 @@
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import { Fragment } from 'react'
 
 import { Heading1, Heading3 } from '~/ui/global/styled/typography'
 import InfoIcon from '~/ui/icons/InfoIcon'
@@ -25,6 +26,10 @@ const StyledInfoIcon = styled.div`
 
 const StyledTitleAndDescription = styled.div`
   margin-bottom: 20px;
+`
+
+const StyledTitleDescInline = styled.div`
+  display: inline-block;
 `
 
 const StyledCover = props => {
@@ -62,10 +67,10 @@ class DataItemCoverDisplayOnly extends React.Component {
   get questionItemTitleAndDescription() {
     const { question_title, question_description } = this.props.item
     return (
-      <div>
+      <Fragment>
         {question_title && <Heading1>{question_title}</Heading1>}
         {question_description && <Heading3>{question_description}</Heading3>}
-      </div>
+      </Fragment>
     )
   }
 
@@ -76,7 +81,7 @@ class DataItemCoverDisplayOnly extends React.Component {
       <StyledCover item={item}>
         <AboveChartContainer>
           <StyledTitleAndDescription>
-            {this.title}
+            <StyledTitleDescInline>{this.title}</StyledTitleDescInline>
             {tooltip && (
               <Tooltip
                 classes={{ tooltip: 'Tooltip' }}

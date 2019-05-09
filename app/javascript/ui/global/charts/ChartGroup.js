@@ -51,8 +51,11 @@ const NotEnoughDataContainer = styled.div`
 `
 
 const ChartContainer = styled.div`
-  width: 100%;
+  position: absolute;
   height: ${props => props.height};
+  bottom: 0;
+  left: 0;
+  right: 0;
 `
 
 class ChartGroup extends React.PureComponent {
@@ -278,13 +281,13 @@ class ChartGroup extends React.PureComponent {
   }
 
   get renderVictoryChart() {
-    const props = {
-      theme: victoryTheme,
-      domain: { y: [0, this.primaryDataset.max_domain] },
-    }
     if (this.primaryDatasetBarChart) {
       return (
-        <VictoryChart domainPadding={10} {...props}>
+        <VictoryChart
+          theme={victoryTheme}
+          domainPadding={{ y: 10 }}
+          padding={{ top: 0, left: 40, right: 40, bottom: 15 }}
+        >
           <VictoryGroup offset={30}>
             {this.renderedDatasets.map(dataset => dataset)}
           </VictoryGroup>
@@ -294,9 +297,10 @@ class ChartGroup extends React.PureComponent {
     }
     return (
       <VictoryChart
-        domainPadding={80}
+        theme={victoryTheme}
+        domainPadding={{ y: 80 }}
+        padding={{ top: 0, left: 0, right: 0, bottom: 0 }}
         containerComponent={<VictoryVoronoiContainer />}
-        {...props}
       >
         {this.renderedDatasets.map(dataset => dataset)}
         {this.chartAxis}
