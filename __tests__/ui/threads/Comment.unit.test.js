@@ -37,7 +37,7 @@ describe('Comment', () => {
 
   it('renders the timestamp', () => {
     expect(wrapper.find('Moment').props().date).toEqual(
-      props.comment.updated_at
+      props.comment.created_at
     )
   })
 
