@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { toJS, runInAction } from 'mobx'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { EditorState, convertFromRaw, convertToRaw } from 'draft-js'
 import styled from 'styled-components'
 
@@ -96,7 +96,6 @@ const CancelEditButton = styled.button`
   height: 22px;
 `
 
-@observer
 class Comment extends React.Component {
   constructor(props) {
     super(props)

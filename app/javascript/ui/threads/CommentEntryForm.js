@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import { runInAction } from 'mobx'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { EditorState, ContentState, convertToRaw } from 'draft-js'
 import { get } from 'lodash'
 
@@ -8,7 +8,6 @@ import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
 import { CommentForm } from '~/ui/global/styled/forms'
 import CommentInput from './CommentInput'
 
-@observer
 class CommentEntryForm extends React.Component {
   editorHeight = null
   state = {
