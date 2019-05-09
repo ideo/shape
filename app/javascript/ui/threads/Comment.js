@@ -108,13 +108,12 @@ class Comment extends React.Component {
   }
 
   componentWillMount() {
-    if (this.isDraftJSComment()) {
-      const { comment } = this.props
-      const draftjsData = toJS(comment.draftjs_data)
-      const contentState = convertFromRaw(draftjsData)
-      const editorState = EditorState.createWithContent(contentState)
-      this.setState({ editorState })
-    }
+    const { comment } = this.props
+    const draftjsData = toJS(comment.draftjs_data)
+    const contentState = convertFromRaw(draftjsData)
+    const editorState = EditorState.createWithContent(contentState)
+    this.setState({ editorState })
+
     document.addEventListener('keydown', this.handleEscape, false)
   }
 
@@ -128,29 +127,22 @@ class Comment extends React.Component {
   }
 
   renderMessage() {
-    const { comment } = this.props
-    if (this.isDraftJSComment()) {
-      return (
-        <StyledForm onSubmit={this.handleSubmit}>
-          <CommentInput
-            editorState={this.state.editorState}
-            onChange={this.handleInputChange}
-            handleSubmit={this.handleSubmit}
-            setEditor={this.setEditor}
-            readOnly={!this.state.editing}
-          />
-          {this.state.editing && (
-            <EnterButton className="test-update-comment">
-              <ReturnArrowIcon />
-            </EnterButton>
-          )}
-        </StyledForm>
-      )
-    }
-
-    // fallback only necessary for supporting older comments before we added draftjs
-    // otherwise this use case will go away
-    return comment.message
+    return (
+      <StyledForm onSubmit={this.handleSubmit}>
+        <CommentInput
+          editorState={this.state.editorState}
+          onChange={this.handleInputChange}
+          handleSubmit={this.handleSubmit}
+          setEditor={this.setEditor}
+          readOnly={!this.state.editing}
+        />
+        {this.state.editing && (
+          <EnterButton className="test-update-comment">
+            <ReturnArrowIcon />
+          </EnterButton>
+        )}
+      </StyledForm>
+    )
   }
 
   handleEditClick = () => {
@@ -254,16 +246,14 @@ class Comment extends React.Component {
                   {comment.persisted &&
                     apiStore.currentUserId === comment.author.id && (
                       <React.Fragment>
-                        {this.isDraftJSComment() && (
-                          <Tooltip placement="top" title="edit comment">
-                            <ActionButton
-                              onClick={this.handleEditClick}
-                              className="test-edit-comment"
-                            >
-                              <EditPencilIcon />
-                            </ActionButton>
-                          </Tooltip>
-                        )}
+                        <Tooltip placement="top" title="edit comment">
+                          <ActionButton
+                            onClick={this.handleEditClick}
+                            className="test-edit-comment"
+                          >
+                            <EditPencilIcon />
+                          </ActionButton>
+                        </Tooltip>
                         <Tooltip placement="top" title="delete comment">
                           <ActionButton
                             onClick={this.handleDeleteClick}
