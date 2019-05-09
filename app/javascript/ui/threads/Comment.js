@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { isEmpty } from 'lodash'
 import { toJS, runInAction } from 'mobx'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { EditorState, convertFromRaw, convertToRaw } from 'draft-js'
@@ -108,9 +108,9 @@ class Comment extends React.Component {
   }
 
   componentWillMount() {
-    const { comment } = this.props
-    const draftjsData = toJS(comment.draftjs_data)
-    if (!_.isEmpty(draftjsData)) {
+    if (this.isDraftJSComment()) {
+      const { comment } = this.props
+      const draftjsData = toJS(comment.draftjs_data)
       const contentState = convertFromRaw(draftjsData)
       const editorState = EditorState.createWithContent(contentState)
       this.setState({ editorState })
@@ -123,30 +123,34 @@ class Comment extends React.Component {
     document.removeEventListener('keydown', this.handleEscape, false)
   }
 
+  isDraftJSComment() {
+    return !isEmpty(toJS(this.props.comment.draftjs_data))
+  }
+
   renderMessage() {
     const { comment } = this.props
-    // TODO Editor for non-draft-js comments
-    if (_.isEmpty(toJS(comment.draftjs_data))) {
-      // fallback only necessary for supporting older comments before we added draftjs
-      // otherwise this use case will go away
-      return comment.message
+    if (this.isDraftJSComment()) {
+      return (
+        <StyledForm onSubmit={this.handleSubmit}>
+          <CommentInput
+            editorState={this.state.editorState}
+            onChange={this.handleInputChange}
+            handleSubmit={this.handleSubmit}
+            setEditor={this.setEditor}
+            readOnly={!this.state.editing}
+          />
+          {this.state.editing && (
+            <EnterButton className="test-update-comment">
+              <ReturnArrowIcon />
+            </EnterButton>
+          )}
+        </StyledForm>
+      )
     }
-    return (
-      <StyledForm onSubmit={this.handleSubmit}>
-        <CommentInput
-          editorState={this.state.editorState}
-          onChange={this.handleInputChange}
-          handleSubmit={this.handleSubmit}
-          setEditor={this.setEditor}
-          readOnly={!this.state.editing}
-        />
-        {this.state.editing && (
-          <EnterButton className="test-update-comment">
-            <ReturnArrowIcon />
-          </EnterButton>
-        )}
-      </StyledForm>
-    )
+
+    // fallback only necessary for supporting older comments before we added draftjs
+    // otherwise this use case will go away
+    return comment.message
   }
 
   handleEditClick = () => {
@@ -250,14 +254,16 @@ class Comment extends React.Component {
                   {comment.persisted &&
                     apiStore.currentUserId === comment.author.id && (
                       <React.Fragment>
-                        <Tooltip placement="top" title="edit comment">
-                          <ActionButton
-                            onClick={this.handleEditClick}
-                            className="test-edit-comment"
-                          >
-                            <EditPencilIcon />
-                          </ActionButton>
-                        </Tooltip>
+                        {this.isDraftJSComment() && (
+                          <Tooltip placement="top" title="edit comment">
+                            <ActionButton
+                              onClick={this.handleEditClick}
+                              className="test-edit-comment"
+                            >
+                              <EditPencilIcon />
+                            </ActionButton>
+                          </Tooltip>
+                        )}
                         <Tooltip placement="top" title="delete comment">
                           <ActionButton
                             onClick={this.handleDeleteClick}

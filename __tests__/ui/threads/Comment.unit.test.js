@@ -31,8 +31,8 @@ describe('Comment', () => {
     )
   })
 
-  it('renders the message', () => {
-    expect(wrapper.find('.message').text()).toEqual(props.comment.message)
+  it('renders a read only form', () => {
+    expect(wrapper.find('.message').text()).toEqual('<styled.form />')
   })
 
   it('renders the timestamp', () => {
@@ -93,6 +93,27 @@ describe('Comment', () => {
     })
     it('does not render a delete button', () => {
       expect(wrapper.find('.test-delete-comment').exists()).toBe(false)
+    })
+  })
+
+  describe('when the comment does not have any draftJS data', () => {
+    beforeEach(() => {
+      props.comment.draftjs_data = null
+      rerender(props)
+    })
+
+    it('renders the message', () => {
+      expect(wrapper.find('.message').text()).toEqual(props.comment.message)
+    })
+
+    describe('when user is comment author', () => {
+      beforeEach(() => {
+        apiStore.currentUserId = '1'
+      })
+
+      it('does not render the edit button', () => {
+        expect(wrapper.find('.test-edit-comment').exists()).toBe(false)
+      })
     })
   })
 })
