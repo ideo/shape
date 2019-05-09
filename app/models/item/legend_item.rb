@@ -11,7 +11,7 @@ class Item
     after_save :touch_related_collection_cards
 
     def name
-      'Compare To'
+      'Legend'
     end
 
     def primary_measure

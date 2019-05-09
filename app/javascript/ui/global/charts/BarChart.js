@@ -1,10 +1,8 @@
 import PropTypes from 'prop-types'
 import { VictoryBar } from 'victory'
 
-import ChartTooltip from '~/ui/global/charts/ChartTooltip'
 import {
   datasetPropType,
-  emojiTooltipText,
   chartDomainForDatasetValues,
   themeLabelStyles,
 } from '~/ui/global/charts/ChartUtils'
@@ -24,13 +22,9 @@ const BarChart = ({ dataset, simpleDateTooltip, cardArea }) => {
     values,
     maxDomain: dataset.max_domain,
   })
-  const tooltipFn = datum => emojiTooltipText(datum)
   return (
     <VictoryBar
-      labels={d => `${d.percentage}%`}
-      labelComponent={
-        <ChartTooltip textRenderer={tooltipFn} cardArea={cardArea} />
-      }
+      labels={(datum, active) => `${datum.percentage}%`}
       padding={10}
       barWidth={30}
       data={values}

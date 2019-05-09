@@ -84,8 +84,7 @@ module DataReport
       {
         order: 0,
         chart_type: 'bar',
-        measure: 'answer_counts',
-        label: test_collection.name,
+        measure: test_collection.name,
         question_type: question_type,
         total: survey_answers.count,
         timeframe: 'month',
@@ -117,8 +116,7 @@ module DataReport
       {
         order: 1,
         chart_type: 'bar',
-        measure: 'org_answer_counts',
-        label: test_collection.organization.name,
+        measure: "#{test_collection.organization.name} Organization",
         question_type: question_type,
         total: org_survey_answers.count,
         timeframe: 'month',

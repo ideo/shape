@@ -51,18 +51,8 @@ const NotEnoughDataContainer = styled.div`
 `
 
 const ChartContainer = styled.div`
-  bottom: 0px;
-  height: 92%;
-  position: absolute;
-  /*
-  bottom: 0;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 100%;
   width: 100%;
-  position: absolute;
-  */
+  height: ${props => props.height};
 `
 
 class ChartGroup extends React.PureComponent {
@@ -129,8 +119,9 @@ class ChartGroup extends React.PureComponent {
   fullDate = (date, index) => `${utcMoment(date).format('MM/DD/YY')}`
 
   get emojiScale() {
-    if (!this.primaryDataset.question_type) return []
-    return emojiSeriesMap[this.primaryDataset.question_type]
+    const { question_type } = this.primaryDataset
+    if (!question_type) return []
+    return emojiSeriesMap[question_type]
   }
 
   get chartAxisStyle() {
@@ -286,29 +277,14 @@ class ChartGroup extends React.PureComponent {
     return datasets
   }
 
-  get chartProps() {
+  get renderVictoryChart() {
     const props = {
       theme: victoryTheme,
       domain: { y: [0, this.primaryDataset.max_domain] },
     }
     if (this.primaryDatasetBarChart) {
-      return {
-        domainPadding: 10,
-        ...props,
-      }
-    } else {
-      return {
-        domainPadding: 80,
-        containerComponent: <VictoryVoronoiContainer />,
-        ...props,
-      }
-    }
-  }
-
-  get renderVictoryChart() {
-    if (this.primaryDatasetBarChart) {
       return (
-        <VictoryChart {...this.chartProps}>
+        <VictoryChart domainPadding={10} {...props}>
           <VictoryGroup offset={30}>
             {this.renderedDatasets.map(dataset => dataset)}
           </VictoryGroup>
@@ -317,19 +293,14 @@ class ChartGroup extends React.PureComponent {
       )
     }
     return (
-      <VictoryChart {...this.chartProps}>
+      <VictoryChart
+        domainPadding={80}
+        containerComponent={<VictoryVoronoiContainer />}
+        {...props}
+      >
         {this.renderedDatasets.map(dataset => dataset)}
         {this.chartAxis}
       </VictoryChart>
-    )
-  }
-
-  get renderCharts() {
-    return (
-      <ChartContainer data-cy="ChartContainer">
-        <OrganicGrid />
-        {this.renderVictoryChart}
-      </ChartContainer>
     )
   }
 
@@ -337,7 +308,15 @@ class ChartGroup extends React.PureComponent {
     if (this.primaryDatasetValues.length === 0) {
       return this.renderNotEnoughData()
     }
-    return this.renderCharts
+    return (
+      <ChartContainer
+        height={this.primaryDatasetBarChart ? '100%' : '92%'}
+        data-cy="ChartContainer"
+      >
+        <OrganicGrid />
+        {this.renderVictoryChart}
+      </ChartContainer>
+    )
   }
 }
 
