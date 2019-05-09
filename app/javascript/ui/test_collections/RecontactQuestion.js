@@ -12,9 +12,6 @@ import { TextInput, TextResponseHolder, TextEnterButton } from './shared'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 
-const FEEDBACK_CONTACT_YES = 1
-const FEEDBACK_CONTACT_NO = 2
-
 const IconHolder = styled.div`
   bottom: 14px;
   color: ${props => props.theme.questionText};
@@ -32,20 +29,18 @@ class RecontactQuestion extends React.Component {
     submittedContactInfo: false,
   }
 
-  async createAndSetCurrentUser(contactInfo) {
+  async createLimitedUser(contactInfo) {
     let user
+    const { sessionUid } = this.props
     try {
-      const res = await apiStore.createLimitedUser(contactInfo)
+      const res = await apiStore.createLimitedUser({ contactInfo, sessionUid })
       if (!res) throw { errors: ['Contact information invalid'] }
       user = res.data
     } catch (err) {
       uiStore.alert(err.errors[0])
       return
     }
-    apiStore.setCurrentUserInfo({
-      id: user.id,
-      organizationId: apiStore.currentUserOrganizationId,
-    })
+
     return user
   }
 
@@ -54,27 +49,32 @@ class RecontactQuestion extends React.Component {
   }
 
   handleClick = choice => ev => {
-    if (choice === FEEDBACK_CONTACT_YES) {
+    const { onAnswer, user } = this.props
+    if (choice === 'feedback_contact_yes' && !user) {
       this.setState({ showContactInfo: true })
       return
     }
-    const { onAnswer } = this.props
+    if (user) {
+      user.API_updateCurrentUser({
+        feedback_contact_preference: choice,
+      })
+    }
+    // there was a user, or anon user answered "no", move on
     onAnswer()
   }
 
   handleContactInfoSubmit = async ev => {
     const { onAnswer } = this.props
+    const { contactInfo } = this.state
     ev.preventDefault()
-    const user = await this.createAndSetCurrentUser(this.state.contactInfo)
-    if (!user) return
-    user.API_updateCurrentUser({
-      feedback_contact_preference: FEEDBACK_CONTACT_YES,
-    })
+    const created = this.createLimitedUser(contactInfo)
+    if (!created) return
     onAnswer()
     this.setState({ submittedContactInfo: true })
   }
 
   render() {
+    const { user } = this.props
     const { contactInfo, showContactInfo, submittedContactInfo } = this.state
     return (
       <div style={{ width: '100%' }}>
@@ -83,14 +83,20 @@ class RecontactQuestion extends React.Component {
         </QuestionText>
         <EmojiHolder>
           <EmojiButton
-            selected={false}
-            onClick={this.handleClick(FEEDBACK_CONTACT_NO)}
+            selected={
+              user && user.feedback_contact_preference === 'feedback_contact_no'
+            }
+            onClick={this.handleClick('feedback_contact_no')}
           >
             <Emoji name="Finished" symbol="👎" />
           </EmojiButton>
           <EmojiButton
-            selected={showContactInfo}
-            onClick={this.handleClick(FEEDBACK_CONTACT_YES)}
+            selected={
+              showContactInfo ||
+              (user &&
+                user.feedback_contact_preference === 'feedback_contact_yes')
+            }
+            onClick={this.handleClick('feedback_contact_yes')}
           >
             <Emoji name="Yes" symbol="👍" />
           </EmojiButton>
@@ -137,6 +143,7 @@ class RecontactQuestion extends React.Component {
 RecontactQuestion.propTypes = {
   user: MobxPropTypes.objectOrObservableObject,
   onAnswer: PropTypes.func.isRequired,
+  sessionUid: PropTypes.string.isRequired,
 }
 RecontactQuestion.defaultProps = {
   user: null,

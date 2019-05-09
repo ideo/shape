@@ -193,6 +193,7 @@ export class FirebaseClient {
       })
       .catch(e => {
         // comment_thread document does not exist
+        this.escapeLoader()
       })
   }
 

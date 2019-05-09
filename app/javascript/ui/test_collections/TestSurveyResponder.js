@@ -2,12 +2,11 @@ import _ from 'lodash'
 import { Flex } from 'reflexbox'
 import PropTypes from 'prop-types'
 import { observable, runInAction } from 'mobx'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import FlipMove from 'react-flip-move'
 import { Element as ScrollElement, scroller } from 'react-scroll'
 import { ThemeProvider } from 'styled-components'
 
-import { apiStore } from '~/stores'
 import {
   TestQuestionHolder,
   styledTestTheme,
@@ -20,25 +19,39 @@ const UNANSWERABLE_QUESTION_TYPES = [
   'question_finish',
 ]
 
+@inject('apiStore')
 @observer
 class TestSurveyResponder extends React.Component {
   @observable
   recontactAnswered = false
+  state = {
+    questionCards: [],
+  }
 
-  allCards = []
-  constructor(props) {
-    super(props)
-    const { collection } = props
+  componentDidMount() {
+    this.initializeCards()
+  }
+
+  async initializeCards() {
+    const { collection, apiStore } = this.props
+
+    await apiStore.loadCurrentUser()
     const { currentUser } = apiStore
-    const questions = [...collection.question_cards]
-    if (!collection.live_test_collection || currentUser) {
-      questions.splice(questions.length - 1, 0, {
+    const questionCards = [...collection.question_cards]
+
+    if (
+      !collection.live_test_collection &&
+      (!currentUser ||
+        currentUser.feedback_contact_preference ===
+          'feedback_contact_unanswered')
+    ) {
+      questionCards.splice(questionCards.length - 1, 0, {
         id: 'recontact',
         card_question_type: 'question_recontact',
         record: { id: 'facsda', content: '' },
       })
     }
-    this.allCards = questions
+    this.setState({ questionCards })
   }
 
   questionAnswerForCard = card => {
@@ -55,11 +68,13 @@ class TestSurveyResponder extends React.Component {
   answerableCard = card =>
     UNANSWERABLE_QUESTION_TYPES.indexOf(card.card_question_type) === -1
 
-  viewableCards = () => {
+  get viewableCards() {
+    const { questionCards } = this.state
+
     let reachedLastVisibleCard = false
-    const questions = this.allCards.filter(card => {
+    const questions = questionCards.filter(card => {
       // turn off the card's actionmenu (dot-dot-dot)
-      card.id !== 'recontact' && card.record.disableMenu()
+      if (card.id !== 'recontact') card.record.disableMenu()
       if (reachedLastVisibleCard) {
         return false
       } else if (
@@ -81,13 +96,16 @@ class TestSurveyResponder extends React.Component {
         this.recontactAnswered = true
       })
     }
-    this.scrollToTopOfNextCard(card)
+    setTimeout(() => {
+      this.scrollToTopOfNextCard(card)
+    }, 100)
   }
 
   scrollToTopOfNextCard = card => {
+    const { questionCards } = this.state
     const { containerId } = this.props
-    const index = this.allCards.indexOf(card)
-    const nextCard = this.allCards[index + 1]
+    const index = questionCards.indexOf(card)
+    const nextCard = questionCards[index + 1]
     if (!nextCard) return
     scroller.scrollTo(`card-${nextCard.id}`, {
       duration: 400,
@@ -106,10 +124,11 @@ class TestSurveyResponder extends React.Component {
       createSurveyResponse,
       theme,
     } = this.props
+
     return (
       <ThemeProvider theme={styledTestTheme(theme)}>
         <div id="surveyContainer">
-          {this.viewableCards().map(card => (
+          {this.viewableCards.map(card => (
             // ScrollElement only gets the right offsetTop if outside the FlipMove
             <ScrollElement name={`card-${card.id}`} key={card.id}>
               <FlipMove appearAnimation="fade">
@@ -153,10 +172,15 @@ TestSurveyResponder.propTypes = {
   containerId: PropTypes.string,
 }
 
+TestSurveyResponder.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+
 TestSurveyResponder.defaultProps = {
   surveyResponse: undefined,
   theme: 'primary',
   containerId: '',
 }
+TestSurveyResponder.displayName = 'TestSurveyResponder'
 
 export default TestSurveyResponder

@@ -207,7 +207,7 @@ module Resourceable
     inherit_roles_from_parent!(roles_anchor)
     unanchor!
     # special case for QuestionItems because they don't really retain any roles
-    return unless is_a? Collection::TestCollection
+    return unless respond_to? :question_items
     question_items.each(&:reanchor!)
   end
 

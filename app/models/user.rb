@@ -78,6 +78,12 @@ class User < ApplicationRecord
     limited: 3,
   }
 
+  enum feedback_contact_preference: {
+    feedback_contact_unanswered: 0,
+    feedback_contact_yes: 1,
+    feedback_contact_no: 2,
+  }
+
   # to turn off devise validatable for uniqueness of email
   def will_save_change_to_email?
     false

@@ -61,76 +61,6 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
     end
   end
 
-  # describe 'GET #search', search: true do
-  #   let!(:organization) { user.current_organization }
-  #   let!(:users) { create_list(:user, 3) }
-  #   let(:path) { '/api/v1/users/search' }
-  #   let(:find_user) { users.first }
-  #
-  #   before do
-  #     users.each do |member|
-  #       member.add_role(:member, organization.primary_group)
-  #     end
-  #     User.reindex
-  #   end
-  #
-  #   it 'returns a 200' do
-  #     get(path, params: { query: '' })
-  #     expect(response.status).to eq(200)
-  #   end
-  #
-  #   it 'returns user that matches name search' do
-  #     get(path, params: { query: find_user.name })
-  #     expect(json['data'].size).to eq(1)
-  #     expect(json['data'].first['id'].to_i).to eq(find_user.id)
-  #   end
-  #
-  #   it 'returns user that matches fuzzy search' do
-  #     name_without_first_char = find_user.name.slice(1, find_user.name.length)
-  #     get(path, params: { query: name_without_first_char })
-  #     expect(json['data'].size).to eq(1)
-  #     expect(json['data'].first['id'].to_i).to eq(find_user.id)
-  #   end
-  #
-  #   it 'returns user that matches email search' do
-  #     get(path, params: { query: find_user.email })
-  #     expect(json['data'].size).to eq(1)
-  #     expect(json['data'].first['id'].to_i).to eq(find_user.id)
-  #   end
-  #
-  #   it 'does not return fuzzy email match' do
-  #     email_without_first_char = find_user.email.slice(1, find_user.email.length)
-  #     get(path, params: { query: email_without_first_char })
-  #     expect(json['data'].size).to eq(0)
-  #   end
-  #
-  #   it 'returns empty array if no match' do
-  #     get(path, params: { query: 'bananas' })
-  #     expect(json['data']).to be_empty
-  #   end
-  #
-  #   context 'with another org' do
-  #     let!(:org2) { create(:organization) }
-  #     let!(:org2_user) do
-  #       create(:user,
-  #              first_name: find_user.first_name,
-  #              last_name: find_user.last_name)
-  #     end
-  #
-  #     before do
-  #       org2_user.add_role(:member, org2.primary_group)
-  #       expect(org2_user.name).to eq(find_user.name)
-  #       User.reindex
-  #     end
-  #
-  #     it 'does not return user that has same name in another org' do
-  #       get(path, params: { query: find_user.name })
-  #       expect(json['data'].size).to eq(1)
-  #       expect(json['data'].first['id'].to_i).to eq(find_user.id)
-  #     end
-  #   end
-  # end
-
   describe 'POST #create_from_emails' do
     let(:emails) { Array.new(3).map { Faker::Internet.email } }
     let(:users_json) { json_included_objects_of_type('users') }
@@ -192,6 +122,61 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
       expect(user.show_helper).to be false
       expect(user.show_move_helper).to be false
       expect(user.show_template_helper).to be false
+    end
+  end
+
+  describe 'POST #create_limited_user', auth: false, create_org: false do
+    let(:path) { '/api/v1/users/create_limited_user' }
+    let(:raw_params) do
+      { contact_info: 'something@somewhere.com' }
+    end
+    let(:params) { raw_params.to_json }
+    let(:service_double) { double('service') }
+
+    before do
+      allow(service_double).to receive(:call).and_return(true)
+      allow(service_double).to receive(:limited_user).and_return(User.new)
+    end
+
+    it 'returns a 200 and calls LimitedUserCreator' do
+      expect(LimitedUserCreator).to receive(:new).with(raw_params).and_return(service_double)
+      post(path, params: params)
+      expect(response.status).to eq 200
+    end
+  end
+
+  describe 'POST #switch_org' do
+    let!(:switch_organization) { create(:organization) }
+    let!(:organization) { user.current_organization }
+    let(:path) { '/api/v1/users/switch_org' }
+    let(:params) { { organization_id: switch_organization.id.to_s }.to_json }
+    let(:slug_params) { { organization_id: switch_organization.slug.to_s }.to_json }
+    # catch a use case where we had an error using Organization.friendly.find
+    let!(:bad_org) { create(:organization, slug: switch_organization.id) }
+
+    before do
+      organization.update(slug: 'sluggity-slug')
+      switch_organization.update(slug: 'glug-2')
+      user.add_role(Role::MEMBER, switch_organization.primary_group)
+    end
+
+    it 'returns a 200' do
+      post(path, params: params)
+      expect(response.status).to eq(200)
+    end
+
+    it 'it switches the users current org' do
+      expect(user).to receive(:switch_to_organization).with(
+        switch_organization,
+      )
+      post(path, params: params)
+    end
+
+    it 'it switches the users current org when using the slug' do
+      expect(user).to receive(:switch_to_organization).with(
+        switch_organization,
+      )
+      post(path, params: slug_params)
     end
   end
 end

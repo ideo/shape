@@ -123,6 +123,7 @@ class CommentThread extends React.Component {
           expanded={expanded}
           thread={thread}
           afterSubmit={this.props.afterSubmit}
+          onHeightChange={this.props.onEditorHeightChange}
         />
       </StyledCommentThread>
     )

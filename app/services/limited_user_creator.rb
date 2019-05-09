@@ -56,6 +56,7 @@ class LimitedUserCreator < SimpleService
 
   def create_user(network_user)
     @limited_user = User.find_or_initialize_from_network(network_user)
+    @limited_user.feedback_contact_preference = :feedback_contact_yes
     @limited_user.save
   end
 end

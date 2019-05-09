@@ -295,7 +295,7 @@ describe Organization, type: :model do
     end
   end
 
-  describe '#setup_user_membership_and_collections' do
+  describe '#setup_user_membership_and_collections', only: true do
     let(:user) { create(:user, email: 'jill@ideo.com') }
     let!(:organization) do
       create(:organization, domain_whitelist: ['ideo.com'])
@@ -305,6 +305,7 @@ describe Organization, type: :model do
     let(:subcollection) { subcollection_card.collection }
     let!(:sub_subcollection_cards) { create_list(:collection_card_collection, 2, parent: subcollection) }
     let!(:item_cards) { create_list(:collection_card_text, 2, parent: getting_started) }
+    let(:user_collection) { user.current_user_collection }
 
     before do
       # need this to match up for `getting_started?` to work
@@ -314,13 +315,13 @@ describe Organization, type: :model do
 
     it 'should copy all cards from getting started into the UserCollection' do
       # should copy all getting_started content (1 collection, 2 items) plus SharedWithMe
-      expect(user.current_user_collection.collection_cards.count).to eq(4)
+      expect(user_collection.collection_cards.count).to eq(4)
       # SharedWithMe card is hidden for now
-      expect(user.current_user_collection.collection_cards.visible.count).to eq(3)
+      expect(user_collection.collection_cards.visible.count).to eq(3)
     end
 
     it 'should set the Getting Started copy collections to getting_started_shell' do
-      gs_copy = user.current_user_collection.collections.where(type: nil).last
+      gs_copy = user_collection.collections.where(type: nil).last
       expect(gs_copy.cloned_from.parent).to eq getting_started
       # all collections in the copy should be marked with the getting_started_shell attr
       expect(gs_copy.collections.map(&:getting_started_shell).all?).to eq true
@@ -333,6 +334,17 @@ describe Organization, type: :model do
     it 'should set the user to be on the current organization' do
       expect(user.current_organization).to eq(organization)
       expect(user.current_user_collection_id).not_to be nil
+    end
+
+    context 'with existing user' do
+      it 'should not re-copy all the getting started content' do
+        # assume the user has archived their initial content
+        user_collection.collection_cards.visible.each(&:archive!)
+        expect(user_collection.collection_cards.visible.count).to eq(0)
+        # call this again, which will happen e.g. in MassAssign
+        organization.setup_user_membership_and_collections(user, synchronous: true)
+        expect(user.current_user_collection.collection_cards.visible.count).to eq(0)
+      end
     end
   end
 

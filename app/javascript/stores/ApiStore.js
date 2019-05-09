@@ -163,10 +163,11 @@ class ApiStore extends jsonapi(datxCollection) {
     }
   }
 
-  async createLimitedUser(contactInfo) {
+  async createLimitedUser({ contactInfo, sessionUid }) {
     try {
       const res = await this.request('users/create_limited_user', 'POST', {
         contact_info: contactInfo,
+        session_uid: sessionUid,
       })
       return res
     } catch (e) {
