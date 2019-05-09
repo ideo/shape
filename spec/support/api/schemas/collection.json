@@ -34,8 +34,9 @@
     "is_submission_box_template": { "type": ["boolean"] },
     "is_submission_box_template_test": { "type": ["boolean"] },
     "is_inside_a_submission": { "type": ["boolean"] },
-    "submission_attrs": { "type": ["object"] },
-    "launchable": { "type": ["boolean"] },
+    "submission_attrs": { "type": ["object", "null"] },
+    "launchable": { "type": ["boolean", "null"] },
+    "gives_incentive": { "type": ["boolean", "null"] },
     "test_collection_id": { "type": ["string"] }
   },
   "required": ["name", "class_type", "created_at", "cover"]

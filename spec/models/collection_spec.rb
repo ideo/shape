@@ -546,7 +546,7 @@ describe Collection, type: :model do
           rows: [3, 10],
           cols: [4, 6],
         )
-      ).to eq(matching_cards)
+      ).to match_array(matching_cards)
     end
   end
 
