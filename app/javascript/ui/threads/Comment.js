@@ -17,6 +17,7 @@ import { showOnHoverCss, hideOnHoverCss } from '~/ui/grid/shared'
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
 import CommentInput from './CommentInput'
 import XIcon from '~/ui/icons/XIcon'
+import Tooltip from '~/ui/global/Tooltip'
 
 const StyledComment = StyledCommentInput.extend`
   ${showOnHoverCss};
@@ -254,18 +255,22 @@ class Comment extends React.Component {
                   {comment.persisted &&
                     apiStore.currentUserId === comment.author.id && (
                       <React.Fragment>
-                        <ActionButton
-                          onClick={this.handleEditClick}
-                          className="test-edit-comment"
-                        >
-                          <EditPencilIcon />
-                        </ActionButton>
-                        <ActionButton
-                          onClick={this.handleDeleteClick}
-                          className="test-delete-comment"
-                        >
-                          <TrashLgIcon />
-                        </ActionButton>
+                        <Tooltip placement="top" title="edit comment">
+                          <ActionButton
+                            onClick={this.handleEditClick}
+                            className="test-edit-comment"
+                          >
+                            <EditPencilIcon />
+                          </ActionButton>
+                        </Tooltip>
+                        <Tooltip placement="top" title="delete comment">
+                          <ActionButton
+                            onClick={this.handleDeleteClick}
+                            className="test-delete-comment"
+                          >
+                            <TrashLgIcon />
+                          </ActionButton>
+                        </Tooltip>
                       </React.Fragment>
                     )}
                 </StyledCommentActions>
