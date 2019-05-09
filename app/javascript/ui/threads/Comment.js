@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { toJS, observable, runInAction } from 'mobx'
+import { toJS, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { EditorState, convertFromRaw, convertToRaw } from 'draft-js'
 import styled from 'styled-components'
@@ -98,16 +98,13 @@ const CancelEditButton = styled.button`
 
 @observer
 class Comment extends React.Component {
-  @observable
-  updating = false
-  editorHeight = null
-
   constructor(props) {
     super(props)
     this.handleEscape = this.handleEscape.bind(this)
     this.state = {
       editorState: EditorState.createEmpty(),
       editing: false,
+      updating: false,
     }
   }
 
@@ -172,7 +169,7 @@ class Comment extends React.Component {
   }
 
   handleInputChange = editorState => {
-    if (this.updating) return
+    if (this.state.updating) return
     this.setState({
       editorState,
     })
@@ -211,11 +208,10 @@ class Comment extends React.Component {
 
     const { comment } = this.props
     comment.API_updateWithoutSync(rawData).then(() => {
-      this.setState({ editing: false })
-      this.updating = false
+      this.setState({ editing: false, updating: false })
     })
     runInAction(() => {
-      this.updating = true
+      this.setState({ updating: true })
     })
   }
 

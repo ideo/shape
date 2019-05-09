@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { observable, runInAction } from 'mobx'
+import { runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { EditorState, ContentState, convertToRaw } from 'draft-js'
 import { get } from 'lodash'
@@ -10,11 +10,10 @@ import CommentInput from './CommentInput'
 
 @observer
 class CommentEntryForm extends React.Component {
-  @observable
-  updating = false
   editorHeight = null
   state = {
     editorState: EditorState.createEmpty(),
+    updating: false,
   }
 
   componentDidMount() {
@@ -41,7 +40,7 @@ class CommentEntryForm extends React.Component {
   }
 
   handleInputChange = editorState => {
-    if (this.updating) return
+    if (this.state.updating) return
     this.handleHeightChange()
     this.setState({
       editorState,
@@ -98,10 +97,10 @@ class CommentEntryForm extends React.Component {
     const { thread } = this.props
     thread.API_saveComment(rawData).then(() => {
       this.props.afterSubmit()
-      this.updating = false
+      this.setState({ updating: false })
     })
     runInAction(() => {
-      this.updating = true
+      this.setState({ updating: true })
     })
     this.resetEditorState()
   }
