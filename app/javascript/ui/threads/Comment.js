@@ -87,8 +87,16 @@ const EnterButton = styled.button`
   width: 30px;
   height: 30px;
   background-color: ${v.colors.secondaryDark};
-  border-radius: 15px;
+  border-radius: 50%;
   padding: 6px;
+
+  svg {
+    transform: scale(1, -1);
+  }
+
+  &:hover {
+    filter: brightness(90%);
+  }
 `
 
 const CancelEditButton = styled.button`
