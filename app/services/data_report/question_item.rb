@@ -45,7 +45,7 @@ module DataReport
     end
 
     def base_data
-      (1..4).map { |n| { value: 0, column: n } }
+      (1..4).map { |n| { value: 0, total: 0, column: n, percentage: 0, type: question_type } }
     end
 
     def grouped_response_data(survey_answers)
@@ -55,7 +55,6 @@ module DataReport
       counts.each do |answer_number, count|
         answer_data = data.find { |d| d[:column] == answer_number }
         begin
-          answer_data[:type] = question_type
           answer_data[:value] = count
           answer_data[:total] = num_answers
         rescue => e
