@@ -6,12 +6,18 @@ import { runInAction, observable, toJS } from 'mobx'
 
 import AudienceSettingsWidget from './AudienceSettingsWidget'
 import TestAudience from '~/stores/jsonApi/TestAudience'
+import FeedbackTermsModal from '../FeedbackTermsModal'
+// Need to replace with actual asset => how to add to AWS?
+import PaperAirplane from '../PaperAirplane'
+import { FormButton } from '~/ui/global/styled/forms'
+import { Heading1, DisplayText } from '~/ui/global/styled/typography'
 
 @inject('apiStore')
 @observer
 class AudienceSettings extends React.Component {
   @observable
   audiences = []
+  showModal = false
 
   constructor(props) {
     super(props)
@@ -100,14 +106,34 @@ class AudienceSettings extends React.Component {
 
   render() {
     return (
-      <AudienceSettingsWidget
-        onToggleCheckbox={this.onToggleCheckbox}
-        stopEditingIfContent={this.stopEditingIfContent}
-        handleKeyPress={this.handleKeyPress}
-        onInputChange={this.onInputChange}
-        totalPrice={this.totalPrice}
-        audiences={this.audiences}
-      />
+      <React.Fragment>
+        <FeedbackTermsModal>
+          <PaperAirplane />
+          <Heading1>
+            Before you launch your first test, please review and agree to the
+            terms below.
+          </Heading1>
+          <DisplayText>
+            Shape is a creative platform which allows its users to test its
+            ideas, including capturing digital research by distributing surveys
+            to people of interest. Shape is not responsible for and does not
+            have any insight into the contents of the surveys created by its
+            users, but those users are required to comply with Shape’s Terms of
+            Use. If you believe one of our users is breaching our Terms of Use,
+            please <a href="mailto:help@shape.space">contact us</a>.
+          </DisplayText>
+          <div />
+          <FormButton width={300}>I agree to these terms</FormButton>
+        </FeedbackTermsModal>
+        <AudienceSettingsWidget
+          onToggleCheckbox={this.onToggleCheckbox}
+          stopEditingIfContent={this.stopEditingIfContent}
+          handleKeyPress={this.handleKeyPress}
+          onInputChange={this.onInputChange}
+          totalPrice={this.totalPrice}
+          audiences={this.audiences}
+        />
+      </React.Fragment>
     )
   }
 }

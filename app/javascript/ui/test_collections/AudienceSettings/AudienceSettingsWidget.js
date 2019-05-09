@@ -12,7 +12,6 @@ import {
 import TableHeader from './TableHeader'
 import TableBody from './TableBody'
 import AudienceLabel from './AudienceLabel'
-
 import v from '~/utils/variables'
 
 @observer
@@ -70,7 +69,7 @@ class AudienceSettings extends React.Component {
                   justifyContent: 'center',
                 }}
               >
-                <FormButton>Get Feedback</FormButton>
+                <FormButton onClick={onSubmitSettings}>Get Feedback</FormButton>
               </StyledRowFlexParent>
             </StyledColumnFlexParent>
           </MobileWrapper>
@@ -96,10 +95,7 @@ class AudienceSettings extends React.Component {
                 <StyledRowFlexCell>{totalPrice}</StyledRowFlexCell>
               </StyledRowFlexParent>
               <StyledRowFlexParent
-                style={{
-                  marginTop: '24px',
-                  marginBottom: '32px',
-                }}
+                style={{ marginTop: '24px', marginBottom: '32px' }}
               >
                 <StyledRowFlexItem />
                 <FormButton
