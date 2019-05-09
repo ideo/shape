@@ -27,9 +27,11 @@ export const StyledTitleAndRoles = styled(Flex)`
 
     > * {
       margin-right: 20px;
-      &:first-child,
+      &:first-child {
+        margin-right: 10px;
+      }
       &:last-child {
-        margin-right: 0px;
+        margin-right: 0;
       }
     }
   }
