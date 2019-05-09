@@ -288,7 +288,12 @@ class Comment extends React.Component {
           </FlexPushRight>
         </InlineRow>
 
-        <div className="message">{this.renderMessage()}</div>
+        <div className="message">
+          {this.renderMessage()}
+          {comment.updated_at > comment.created_at && (
+            <span className="test-edited-indicator">(edited)</span>
+          )}
+        </div>
       </StyledComment>
     )
   }

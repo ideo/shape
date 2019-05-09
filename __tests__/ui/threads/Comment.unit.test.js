@@ -41,6 +41,22 @@ describe('Comment', () => {
     )
   })
 
+  it('does not show an edited indicator', () => {
+    expect(wrapper.find('.test-edited-indicator').exists()).toBe(false)
+  })
+
+  describe('when the comment has been edited', () => {
+    beforeEach(() => {
+      props.comment.created_at = new Date('2019-05-09T03:18:00')
+      props.comment.updated_at = new Date('2019-05-09T03:18:01')
+      rerender(props)
+    })
+
+    it('shows an edited indicator', () => {
+      expect(wrapper.find('.test-edited-indicator').exists()).toBe(true)
+    })
+  })
+
   describe('when user is comment author', () => {
     beforeEach(() => {
       apiStore.currentUserId = '1'
