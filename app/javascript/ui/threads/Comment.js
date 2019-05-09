@@ -276,12 +276,14 @@ class Comment extends React.Component {
               </React.Fragment>
             )}
             {this.state.editing && (
-              <CancelEditButton
-                onClick={this.handleCancelEditClick}
-                className="test-cancel-edit-comment"
-              >
-                <XIcon />
-              </CancelEditButton>
+              <StyledCommentActions>
+                <CancelEditButton
+                  onClick={this.handleCancelEditClick}
+                  className="test-cancel-edit-comment"
+                >
+                  <XIcon />
+                </CancelEditButton>
+              </StyledCommentActions>
             )}
           </FlexPushRight>
         </InlineRow>
