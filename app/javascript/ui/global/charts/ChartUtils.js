@@ -115,7 +115,23 @@ export const AboveChartContainer = styled.div`
   z-index: ${v.zIndex.aboveVictoryChart};
 `
 
-const colorScale = [v.colors.tertiaryMedium, v.colors.primaryLight]
+export const colorScale = [
+  v.colors.tertiaryMedium,
+  v.colors.primaryLight,
+  '#738091',
+  '#A1A6B4',
+  '#88B6C6',
+  '#5473A6',
+  '#929E9E',
+  '#84AF99',
+  '#C2BBB9',
+  '#8B83A2',
+  '#AE8CA3',
+  '#D6C3C9',
+  '#DEA895',
+  '#A85751',
+  '#454545',
+]
 
 export const themeLabelStyles = {
   fontFamily: v.fonts.sans,

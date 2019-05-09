@@ -6,6 +6,7 @@ import { Select, SelectOption } from '~/ui/global/styled/forms'
 import XIcon from '~/ui/icons/XIcon'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import v from '~/utils/variables'
+import { colorScale } from '~/ui/global/charts/ChartUtils'
 import { DisplayText, Heading3 } from '~/ui/global/styled/typography'
 import LineChartMeasure from '~/ui/icons/LineChartMeasure'
 
@@ -112,17 +113,18 @@ class LegendItemCover extends React.Component {
   }
 
   renderSelectedMeasure = ({ measureData, primary }) => {
-    const { measure, style } = measureData
+    const { measure, style, chart_type, order } = measureData
     let icon
-    if (primary) {
-      icon = <AreaChartMeasure color={(style && style.fill) || '#000000'} />
-    } else {
+    if (chart_type === 'line') {
       icon = (
         <LineChartMeasure
           color={(style && style.fill) || '#000000'}
           order={measureData.order}
         />
       )
+    } else {
+      const color = style && style.fill ? style.fill : colorScale[order]
+      icon = <AreaChartMeasure color={color} />
     }
     return (
       <Measure key={`measure-${measure}`}>

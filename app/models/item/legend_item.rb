@@ -36,6 +36,7 @@ class Item
         measure: dataset[:measure],
         style: dataset[:style],
         order: dataset[:order],
+        chart_type: dataset[:chart_type] || 'line', # Line as a fallback for C∆ charts
       }
     end
 
