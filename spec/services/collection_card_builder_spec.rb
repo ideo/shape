@@ -193,11 +193,13 @@ RSpec.describe CollectionCardBuilder, type: :service do
             end
             let!(:parent_collection) { test_collection.test_design }
 
-            it 'creates data item' do
+            it 'creates data item and legend' do
+              expect(test_collection.legend_item).to be_nil
               expect(test_collection.live?).to be true
               expect {
                 builder.create
               }.to change(Item::DataItem, :count).by(1)
+              expect(test_collection.legend_item).not_to be_nil
             end
           end
         end

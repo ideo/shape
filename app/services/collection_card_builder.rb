@@ -61,6 +61,8 @@ class CollectionCardBuilder
              @parent_collection.live_or_was_launched? &&
              record.is_a?(Item::QuestionItem)
 
+            test_collection = @parent_collection.test_collection
+
             # If this is a new scale question, create response graphs
             if record.scale_question?
               record.create_response_graph(

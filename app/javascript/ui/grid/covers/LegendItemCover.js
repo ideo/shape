@@ -201,7 +201,7 @@ class LegendItemCover extends React.Component {
     const { primary_measure } = item
     const { comparisonMenuOpen } = this.state
     return (
-      <StyledLegendItem>
+      <StyledLegendItem data-cy="LegendItemCover">
         <StyledLegendTitle>{item.name}</StyledLegendTitle>
         {this.renderSelectedMeasure({
           measureData: primary_measure,

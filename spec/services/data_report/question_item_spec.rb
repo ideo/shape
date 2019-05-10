@@ -39,7 +39,7 @@ RSpec.describe DataReport::QuestionItem, type: :service do
       expect(subject[1].except(:data)).to eq(
         order: 1,
         chart_type: 'bar',
-        measure: "#{organization.name} Organization",
+        measure: DataReport::QuestionItem::ORG_MEASURE_NAME,
         question_type: question_item.question_type,
         total: 0,
         timeframe: 'month',
@@ -90,7 +90,7 @@ RSpec.describe DataReport::QuestionItem, type: :service do
         expect(subject[1].except(:data)).to eq(
           order: 1,
           chart_type: 'bar',
-          measure: "#{test_collection.organization.name} Organization",
+          measure: DataReport::QuestionItem::ORG_MEASURE_NAME,
           question_type: question_item.question_type,
           total: 6,
           timeframe: 'month',

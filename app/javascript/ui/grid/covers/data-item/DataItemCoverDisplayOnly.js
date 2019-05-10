@@ -36,12 +36,16 @@ const StyledCover = props => {
   const { isReportTypeQuestionItem } = props.item
   if (isReportTypeQuestionItem) {
     return (
-      <StyledDataItemQuestionCover>
+      <StyledDataItemQuestionCover data-cy="DataItemCover">
         {props.children}
       </StyledDataItemQuestionCover>
     )
   }
-  return <StyledDataItemCover>{props.children}</StyledDataItemCover>
+  return (
+    <StyledDataItemCover data-cy="DataItemCover">
+      {props.children}
+    </StyledDataItemCover>
+  )
 }
 
 class DataItemCoverDisplayOnly extends React.Component {
@@ -82,7 +86,7 @@ class DataItemCoverDisplayOnly extends React.Component {
     const { card, item } = this.props
     const tooltip = this.primaryDatasetDescription
     return (
-      <StyledCover item={item} data-cy="DataItemCover">
+      <StyledCover item={item}>
         <AboveChartContainer>
           <StyledTitleAndDescription>
             <StyledTitleDescInline>{this.title}</StyledTitleDescInline>
