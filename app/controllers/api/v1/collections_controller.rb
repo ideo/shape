@@ -114,7 +114,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     end
     fresh_when(
       last_modified: last_modified,
-      etag: @collection.cache_key(params[:card_order]),
+      etag: @collection.cache_key(params[:card_order], current_user.try(:id)),
     )
   end
 

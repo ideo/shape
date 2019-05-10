@@ -95,12 +95,15 @@ class Breadcrumb extends React.Component {
 
     _.each(record.breadcrumb, (item, idx) => {
       const { type, id } = item
+      // use apiStore to observe record changes e.g. when editing current collection name
+      const itemRecord = apiStore.find(type, id)
+      const name = itemRecord ? itemRecord.name : item.name
       const identifier = `${type}_${id}`
 
       if (longBreadcrumb && idx >= 2 && idx <= len - 3) {
         // if we have a really long breadcrumb we compress some options in the middle
         if (middleName) middleName += ' > '
-        middleName += item.name
+        middleName += name
         if (idx == len - 3) {
           return items.push({
             ...item,
@@ -113,6 +116,7 @@ class Breadcrumb extends React.Component {
       }
       return items.push({
         ...item,
+        name,
         truncatedName: null,
         ellipses: false,
         identifier,
