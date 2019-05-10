@@ -8,6 +8,7 @@ describe('LoggedOutBasicHeader', () => {
   beforeEach(() => {
     props = {
       organization: null,
+      redirectPath: '/some/path',
     }
     rerender = () => {
       wrapper = shallow(<LoggedOutBasicHeader {...props} />)
@@ -19,10 +20,12 @@ describe('LoggedOutBasicHeader', () => {
     expect(wrapper.find('Logo').exists()).toEqual(true)
   })
 
-  it('shows login', () => {
+  it('shows login link with redirect', () => {
     const loginLink = wrapper.find('StyledLoginLink a')
     expect(loginLink.exists()).toEqual(true)
-    expect(loginLink.props().href).toEqual('/login')
+    expect(loginLink.props().href).toEqual(
+      `/login?redirect=${props.redirectPath}`
+    )
   })
 
   it('does not show org avatar if no organization', () => {

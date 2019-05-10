@@ -551,7 +551,7 @@ class Collection < ApplicationRecord
     false
   end
 
-  def cache_key(card_order = 'order')
+  def cache_key(card_order = 'order', user_id = nil)
     test_details = ''
     if test_collection?
       # make sure these details factor into caching
@@ -566,6 +566,7 @@ class Collection < ApplicationRecord
       "/#{test_details}" \
       "/#{getting_started_shell}" \
       "/#{organization.updated_at}" \
+      "/user_id_#{user_id}" \
       "/roles_#{anchored_roles.maximum(:updated_at).to_i}"
   end
 

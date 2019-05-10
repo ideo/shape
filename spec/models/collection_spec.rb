@@ -754,6 +754,12 @@ describe Collection, type: :model do
           first_card.update(updated_at: 10.seconds.from_now)
         end.to change(collection, :cache_key)
       end
+
+      it 'updates based on user_id' do
+        logged_out_key = collection.cache_key('order', nil)
+        logged_in_key = collection.cache_key('order', user.id)
+        expect(logged_out_key).not_to eq logged_in_key
+      end
     end
 
     describe '#cache_tag_list' do
