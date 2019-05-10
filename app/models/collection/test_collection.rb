@@ -248,6 +248,11 @@ class Collection
       prelaunch_question_items
     end
 
+    def legend_item
+      question_item = question_items.includes(test_data_item: :legend_item).first
+      question_item&.test_data_item&.legend_item
+    end
+
     def test_open_response_collections
       collections.where(type: 'Collection::TestOpenResponses')
     end
@@ -356,17 +361,32 @@ class Collection
     end
 
     def create_response_graphs(initiated_by:)
-      legend_item = nil
+      legend = nil
+      graphs = []
       question_items
         .select(&:scale_question?)
-        .map.with_index do |question, i|
+        .each_with_index do |question, i|
         data_item_card = question.create_response_graph(
           parent_collection: self,
           initiated_by: initiated_by,
-          legend_item: legend_item,
+          legend_item: legend,
         )
-        legend_item = data_item_card.item.legend_item if i.zero?
+        legend = data_item_card.item.legend_item if i.zero?
+        graphs << data_item_card
       end
+
+      # Update legend to have org measure selected
+      add_org_measure_to_legend(legend) if legend.present?
+
+      graphs
+    end
+
+    def add_org_measure_to_legend(legend = nil)
+      org_measure_name = DataReport::QuestionItem::ORG_MEASURE_NAME
+      legend ||= legend_item
+      return if legend.blank? || legend.selected_measures.include?(org_measure_name)
+      legend.selected_measures += [org_measure_name]
+      legend.save
     end
 
     def setup_default_status_and_questions

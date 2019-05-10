@@ -123,7 +123,8 @@ export const fakeLegendItemAttrs = {
     selected_measures: observable([
       '95th Percentile'
     ])
-  }
+  },
+  dynamic_measure_names: {}
 }
 
 export const fakeLegendItem = {

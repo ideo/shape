@@ -129,7 +129,7 @@ class LegendItemCover extends React.Component {
     return (
       <Measure key={`measure-${measure}`}>
         {icon && <MeasureIconWrapper>{icon}</MeasureIconWrapper>}
-        <DisplayText>{measure}</DisplayText>
+        <DisplayText>{this.measureDisplayName(measure)}</DisplayText>
         {!primary && (
           <UnselectMeasure
             role="button"
@@ -147,6 +147,15 @@ class LegendItemCover extends React.Component {
     this.setState({
       comparisonMenuOpen: !comparisonMenuOpen,
     })
+  }
+
+  measureDisplayName = measure => {
+    const { dynamic_measure_names } = this.props.item
+    const dynamicName = dynamic_measure_names
+      ? dynamic_measure_names[measure]
+      : undefined
+    if (dynamicName) return dynamicName
+    return measure
   }
 
   get comparisonMenuOptions() {
@@ -180,7 +189,7 @@ class LegendItemCover extends React.Component {
             key={option}
             value={option}
           >
-            {option}
+            {this.measureDisplayName(option)}
           </SelectOption>
         ))}
       </Select>

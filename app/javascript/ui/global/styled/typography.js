@@ -23,7 +23,8 @@ const Heading1Css = css`
     props.wrapLine ? 'normal' : 'nowrap'}; /* better this way for responsive? */
 
   @media only screen and (max-width: ${v.responsive.largeBreakpoint}px) {
-    padding: 1rem 0;
+    /* Allow us not to have responsive behavior */
+    ${props => (props.notResponsive ? '' : 'padding: 1rem 0;')};
   }
 `
 /** @component */

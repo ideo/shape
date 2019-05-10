@@ -68,7 +68,11 @@ class DataItemCoverDisplayOnly extends React.Component {
     const { question_title, question_description } = this.props.item
     return (
       <Fragment>
-        {question_title && <Heading1>{question_title}</Heading1>}
+        {question_title && (
+          <Heading1 style={{ marginTop: 0 }} notResponsive>
+            {question_title}
+          </Heading1>
+        )}
         {question_description && <Heading3>{question_description}</Heading3>}
       </Fragment>
     )

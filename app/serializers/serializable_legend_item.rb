@@ -8,4 +8,8 @@ class SerializableLegendItem < SerializableItem
     settings[:selected_measures] ||= []
     settings
   end
+
+  attribute :dynamic_measure_names do
+    @object.dynamic_measure_names || {}
+  end
 end

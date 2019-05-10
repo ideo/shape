@@ -18,7 +18,10 @@ const props = {
 let wrapper
 describe('LegendItemCover', () => {
   beforeEach(() => {
-    wrapper = shallow(<LegendItemCover {...props} />)
+    render = () => {
+      wrapper = shallow(<LegendItemCover {...props} />)
+    }
+    render()
   })
 
   it('renders snapshot', () => {
@@ -64,5 +67,26 @@ describe('LegendItemCover', () => {
     firstOption.simulate('click')
     expect(props.item.save).toHaveBeenCalled()
     expect(props.card.parent.API_fetchCards).toHaveBeenCalled()
+  })
+
+  describe('with dynamic measure name', () => {
+    beforeEach(() => {
+      props.item.primary_measure.measure = 'org-wide-feedback'
+      props.item.dynamic_measure_names = {
+        'org-wide-feedback': 'IDEO Organization',
+      }
+      render()
+    })
+
+    it('replaces measure with dynamic name', () => {
+      expect(
+        wrapper
+          .find('Measure')
+          .at(0)
+          .find('StyledDisplayText')
+          .children()
+          .text()
+      ).toContain('IDEO Organization')
+    })
   })
 })

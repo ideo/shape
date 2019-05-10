@@ -2,7 +2,7 @@ class Item
   class QuestionItem < Item
     has_many :question_answers, inverse_of: :question, foreign_key: :question_id, dependent: :destroy
     has_one :test_open_responses_collection, class_name: 'Collection::TestOpenResponses'
-    has_one :test_chart_item, class_name: 'Item::ChartItem', as: :data_source
+    has_one :test_data_item, class_name: 'Item::DataItem', as: :data_source
 
     after_commit :notify_test_design_of_creation,
                  on: :create,
@@ -16,9 +16,9 @@ class Item
         question_type: unanswerable_question_types,
       )
     }
-    has_many :chart_items,
+    has_many :data_items,
              as: :data_source,
-             class_name: 'Item::ChartItem'
+             class_name: 'Item::DataItem'
 
     after_update :update_test_open_responses_collection,
                  if: :update_test_open_responses_collection?
@@ -154,7 +154,9 @@ class Item
     end
 
     def create_response_graph(parent_collection:, initiated_by:, legend_item: nil)
-      return if !scale_question? || test_chart_item.present?
+      return if !scale_question? || test_data_item.present?
+
+      legend_item ||= parent_collection.legend_item
 
       builder = CollectionCardBuilder.new(
         params: {

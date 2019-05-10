@@ -29,6 +29,12 @@ class Item
         end.values
     end
 
+    def dynamic_measure_names
+      {
+        DataReport::QuestionItem::ORG_MEASURE_NAME => "#{organization.name} Organization",
+      }
+    end
+
     private
 
     def dataset_measure_hash(dataset)

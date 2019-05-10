@@ -3,6 +3,8 @@ module DataReport
 
     delegate :question_type, to: :question_item, allow_nil: true
 
+    ORG_MEASURE_NAME = 'org-wide-feedback'.freeze
+
     def call
       datasets
     end
@@ -115,7 +117,7 @@ module DataReport
       {
         order: 1,
         chart_type: 'bar',
-        measure: "#{test_collection.organization.name} Organization",
+        measure: ORG_MEASURE_NAME,
         question_type: question_type,
         total: org_survey_answers.count,
         timeframe: 'month',
