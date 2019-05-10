@@ -148,7 +148,7 @@ export class FirebaseClient {
     (this.commentsListener = db
       .collection('comments')
       .where('data.attributes.comment_thread_id', '==', parseInt(threadId))
-      .orderBy('data.attributes.updated_at', 'desc'))
+      .orderBy('data.attributes.created_at', 'desc'))
 
   subscribeToThread = usersThread => {
     const threadId = usersThread.comment_thread_id
