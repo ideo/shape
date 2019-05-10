@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import SearchBar from '~/ui/layout/SearchBar'
+import SearchButton from '~/ui/global/SearchButton'
 
 @inject('routingStore', 'uiStore') // needed for routeTo method
 @observer
@@ -36,7 +37,8 @@ class GlobalSearchBar extends React.Component {
   render() {
     const { routingStore } = this.props
     return (
-      <SearchBar
+      <SearchButton
+        background="white"
         focused={routingStore.pathContains('/search')}
         value={this.searchText}
         onChange={this.handleTextChange}
