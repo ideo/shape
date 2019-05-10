@@ -120,7 +120,7 @@ class TestSurveyPage extends React.Component {
     return (
       <StyledBg>
         <LogoWrapper>
-          <Logo />
+          <Logo withText width={83} />
         </LogoWrapper>
         <DialogWrapper />
         {this.renderSurvey}

@@ -6,7 +6,7 @@ import { apiStore } from '~/stores'
 import Collection from '~/stores/jsonApi/Collection'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 
-import { fakeRole, fakeUser } from '#/mocks/data'
+import { fakeRole } from '#/mocks/data'
 
 describe('Collection', () => {
   let collection
@@ -50,44 +50,6 @@ describe('Collection', () => {
 
       it('should return true', () => {
         expect(collection.isNormalCollection).toBeTruthy()
-      })
-    })
-  })
-
-  describe('checkCurrentOrg', () => {
-    let user
-    describe('when the org id is different from the current users org', () => {
-      beforeEach(() => {
-        user = fakeUser
-        user.current_organization = { id: '3' }
-        Object.defineProperty(apiStore, 'currentUser', {
-          get: jest.fn().mockReturnValue(user),
-        })
-      })
-
-      it('should call switchOrganization on the collection', () => {
-        collection.checkCurrentOrg()
-        expect(user.switchOrganization).toHaveBeenCalledWith(
-          collection.organization_id
-        )
-      })
-    })
-
-    describe('when the org id is the same as the current users org', () => {
-      beforeEach(() => {
-        user = fakeUser
-        user.current_organization = { id: '4' }
-        Object.defineProperty(apiStore, 'currentUser', {
-          get: jest.fn().mockReturnValue(user),
-        })
-      })
-
-      it('should call switchOrganization on the collection', () => {
-        user.switchOrganization.mockClear()
-        collection.checkCurrentOrg()
-        expect(user.switchOrganization).not.toHaveBeenCalledWith(
-          collection.organization_id
-        )
       })
     })
   })

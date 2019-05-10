@@ -7,7 +7,7 @@ RSpec.describe ItemRealtimeChannel, type: :channel do
   let(:stream_name) { item.stream_name }
 
   before do
-    stub_connection current_user: user
+    stub_connection current_user: user, current_ability: Ability.new(user)
   end
 
   describe '#subscribed' do

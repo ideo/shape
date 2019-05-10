@@ -1,6 +1,6 @@
 class Api::V1::OrganizationsController < Api::V1::BaseController
   deserializable_resource :organization, only: %i[create update]
-  load_and_authorize_resource except: %i[create]
+  load_and_authorize_resource except: %i[create my_collection]
 
   before_action :load_user_organizations, only: %i[index]
   before_action :load_and_filter_index, only: %i[index]
@@ -33,6 +33,11 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
     else
       render_api_errors builder.errors
     end
+  end
+
+  before_action :load_and_authorize_organization_from_slug, only: %i[my_collection]
+  def my_collection
+    redirect_to api_v1_collection_path(current_user.current_user_collection(@organization.id))
   end
 
   def add_terms_text

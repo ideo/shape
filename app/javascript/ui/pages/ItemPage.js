@@ -38,7 +38,8 @@ class ItemPage extends React.Component {
     this.setState({ item }, async () => {
       uiStore.update('dragTargets', [])
       uiStore.setViewingItem(item)
-      if (item.parent) item.parent.checkCurrentOrg()
+      if (item.parent)
+        apiStore.checkCurrentOrg({ id: item.parent.organization_id })
       const thread = await apiStore.findOrBuildCommentThread(item)
       uiStore.expandThread(thread.key)
       if (routingStore.query) {

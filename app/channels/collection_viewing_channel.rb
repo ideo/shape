@@ -2,7 +2,7 @@ class CollectionViewingChannel < ApplicationCable::Channel
   # All public methods are exposed to consumers
 
   def subscribed
-    return reject if collection.nil?
+    return reject if collection.nil? || current_ability.cannot?(:read, collection)
     collection.started_viewing(current_user)
     stream_from collection.stream_name
   end

@@ -24,6 +24,10 @@ Then('I should see the element {string}', el => {
   cy.locate(el).should('be.visible')
 })
 
+Then('I should have an element named {string}', el => {
+  cy.locateDataOrClass(el).should('exist')
+})
+
 Then('I should see a {string}', selector => {
   cy.locateDataOrClass(selector).should('be.visible')
 })
@@ -50,6 +54,12 @@ Then('I should see the single data value', () => {
 
 Then('I should see an svg on the report item', () => {
   cy.get('[data-cy="ChartContainer"] svg')
+    .first()
+    .should('exist')
+})
+
+Then('I should see the {string} modal', modalTitle => {
+  cy.get(`[role="dialog"][aria-labelledby="${modalTitle}"]`)
     .first()
     .should('exist')
 })

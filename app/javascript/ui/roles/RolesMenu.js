@@ -5,8 +5,8 @@ import styled from 'styled-components'
 import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Collapse } from '@material-ui/core'
-import v from '~/utils/variables'
 
+import v from '~/utils/variables'
 import { ShowMoreButton } from '~/ui/global/styled/forms'
 import { Heading3, DisplayText } from '~/ui/global/styled/typography'
 import { Row, RowItemLeft } from '~/ui/global/styled/layout'
@@ -14,7 +14,7 @@ import SearchButton from '~/ui/global/SearchButton'
 import DropdownIcon from '~/ui/icons/DropdownIcon'
 import RolesAdd from '~/ui/roles/RolesAdd'
 import RoleSelect from '~/ui/roles/RoleSelect'
-import { uiStore } from '~/stores'
+import PublicSharingOptions from '~/ui/global/PublicSharingOptions'
 
 // TODO rewrite this
 function sortUserOrGroup(a, b) {
@@ -44,6 +44,7 @@ const StyledHeaderRow = styled(Row)`
   flex-wrap: wrap;
   justify-content: space-between;
   margin-left: 0;
+  margin-bottom: 0;
 
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
     width: 100%;
@@ -109,6 +110,10 @@ class RolesMenu extends React.Component {
 
   componentDidMount() {
     this.initializeRolesAndGroups({ reset: true, page: 1 })
+    const {
+      record: { anyone_can_view },
+    } = this.props
+    this.setState({ anyoneCanView: anyone_can_view })
   }
 
   async initializeRolesAndGroups({
@@ -225,6 +230,7 @@ class RolesMenu extends React.Component {
 
   deleteRoles = async (role, entity, opts = {}) => {
     const { ownerId, ownerType } = this.props
+    const { apiStore } = this.props
     return role.API_delete(entity, ownerId, ownerType, opts).then(res => {
       // We should do a page reload to get the correct user's new org
       if (opts.organizationChange) {
@@ -234,12 +240,21 @@ class RolesMenu extends React.Component {
       if (!opts.isSwitching) {
         this.initializeRolesAndGroups()
       }
+      if (entity.isCurrentUser && ownerType === 'groups') {
+        // if you've left a group, reload your groups from the API
+        apiStore.loadCurrentUser()
+      }
       return {}
     })
   }
 
   createRoles = (entities, roleName, opts = {}) => {
-    const { apiStore, ownerId, ownerType } = this.props
+    const {
+      apiStore,
+      apiStore: { uiStore },
+      ownerId,
+      ownerType,
+    } = this.props
     const userIds = entities
       .filter(entity => entity.internalType === 'users')
       .map(user => user.id)
@@ -272,7 +287,10 @@ class RolesMenu extends React.Component {
   }
 
   onCreateUsers = emails => {
-    const { apiStore } = this.props
+    const {
+      apiStore,
+      apiStore: { uiStore },
+    } = this.props
     return apiStore
       .request(`users/create_from_emails`, 'POST', { emails })
       .catch(err => {
@@ -310,6 +328,11 @@ class RolesMenu extends React.Component {
 
     return (
       <Fragment>
+        <PublicSharingOptions
+          record={record}
+          canEdit={canEdit}
+          reloadGroups={() => this.initializeRolesAndGroups()}
+        />
         <StyledHeaderRow align="flex-end">
           <Heading3>{title}</Heading3>
           <SearchButton

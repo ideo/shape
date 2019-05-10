@@ -5,17 +5,19 @@ describe InvitationsController, type: :request do
     let(:pending_user) { create(:user, :pending) }
     let(:redirect) { 'http://localhost:3000/my/redirect' }
     let(:path) do
-      "/invitations/#{pending_user.invitation_token}?redirect=#{redirect}"
+      "/invitations/#{invitation_token}?redirect=#{redirect}"
     end
 
     context 'with a pending user' do
+      let(:invitation_token) { pending_user.invitation_token }
+
       it 'redirects to signup with the user email' do
         expect(get(path)).to redirect_to(sign_up_url(email: pending_user.email))
       end
     end
 
-    context 'without a pending user' do
-      let(:pending_user) { create(:user, invitation_token: nil) }
+    context 'with an invalid token' do
+      let(:invitation_token) { SecureRandom.hex }
 
       it 'redirects to login' do
         expect(get(path)).to redirect_to(login_url)

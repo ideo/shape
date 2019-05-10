@@ -6,6 +6,7 @@ const fakeApiStore = ({
   requestResult = { data: {} },
 } = {}) => {
   return {
+    sessionLoaded: true,
     add: jest.fn().mockName('add'),
     removeAll: jest.fn().mockName('removeAll'),
     find: jest.fn().mockReturnValue(findResult),
@@ -31,6 +32,7 @@ const fakeApiStore = ({
       .fn()
       .mockReturnValue(Promise.resolve({ data: [] })),
     searchCollections: jest.fn().mockReturnValue(Promise.resolve({ data: [] })),
+    checkCurrentOrg: jest.fn(),
     loadCurrentUserGroups: jest.fn(),
     searchRoles: jest.fn().mockReturnValue(Promise.resolve({ data: [] })),
     setCurrentUserId: jest.fn(),
@@ -66,7 +68,6 @@ const fakeApiStore = ({
       pic_url_square: 'https://s3.amazonaws.com/pic.png',
       groups: [],
       terms_accepted: true,
-      switchOrganization: jest.fn(),
       API_hideHelper: jest.fn(),
     },
     // NOTE: important that this matches currentUserOrganization.slug

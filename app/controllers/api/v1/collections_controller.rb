@@ -2,7 +2,10 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   deserializable_resource :collection, class: DeserializableCollection, only: %i[update]
   load_and_authorize_resource :collection_card, only: [:create]
   load_and_authorize_resource except: %i[update destroy in_my_collection]
+  skip_before_action :check_api_authentication!, only: %i[show]
   # NOTE: these have to be in the following order
+  before_action :join_collection_group, only: :show, if: :join_collection_group?
+  before_action :switch_to_organization, only: :show, if: :user_signed_in?
   before_action :load_and_authorize_collection_update, only: %i[update]
   before_action :load_collection_with_roles, only: %i[show update]
 
@@ -111,12 +114,14 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     end
     fresh_when(
       last_modified: last_modified,
-      etag: @collection.cache_key(params[:card_order]),
+      etag: @collection.cache_key(params[:card_order], current_user.try(:id)),
     )
   end
 
   def log_viewing_activities
+    return unless user_signed_in?
     log_organization_view_activity
+    # TODO: we may want to log collection view for anonymous user
     log_collection_activity(:viewed)
   end
 
@@ -176,6 +181,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
                   .where(id: params[:id])
                   .includes(Collection.default_relationships_for_query)
                   .first
+    return unless user_signed_in?
     current_user.precache_roles_for(
       [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],
       ([@collection] + Collection.where(id: @collection.breadcrumb)),
@@ -191,6 +197,9 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :collection_to_test_id,
       :hide_submissions,
       :submissions_enabled,
+      :anyone_can_view,
+      :anyone_can_join,
+      :joinable_group_id,
       collection_cards_attributes: %i[id order width height row col],
     )
   end
@@ -221,5 +230,26 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def broadcast_parent_collection_updates
     CollectionUpdateBroadcaster.call(@parent_collection, current_user)
+  end
+
+  def join_collection_group?
+    user_signed_in? &&
+      @collection.anyone_can_join? &&
+      @collection.joinable_group.present?
+  end
+
+  def join_collection_group
+    group = @collection.joinable_group
+    # first join the org if you need to...
+    unless @collection.organization.can_view? current_user
+      # even with this pushing some functions to the background, it's still a little slow
+      @collection.organization.setup_user_membership_and_collections(current_user)
+    end
+    # only add_role if it's not the guest group
+    current_user.add_role(Role::MEMBER, group) unless group.guest?
+  end
+
+  def switch_to_organization
+    current_user.switch_to_organization(@collection.organization)
   end
 end
