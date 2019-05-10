@@ -1,5 +1,6 @@
 class Api::V1::CommentsController < Api::V1::BaseController
   load_and_authorize_resource :comment_thread, only: %i[index create]
+  load_and_authorize_resource :comment, only: %i[destroy]
   def index
     # mark comments as read
     @comment_thread.viewed_by!(current_user)
@@ -21,6 +22,14 @@ class Api::V1::CommentsController < Api::V1::BaseController
       head :no_content
     else
       render jsonapi: @comment.errors
+    end
+  end
+
+  def destroy
+    if @comment.destroy
+      head :no_content
+    else
+      render_api_errors @comment.errors
     end
   end
 

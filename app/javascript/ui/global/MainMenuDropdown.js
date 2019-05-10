@@ -86,17 +86,15 @@ class MainMenuDropdown extends React.Component {
     }
   }
 
-  handleSwitchOrg = orgId => ev => {
+  handleSwitchOrg = organization => ev => {
     ev.preventDefault()
-    const { apiStore, uiStore } = this.props
+    const { apiStore, uiStore, routingStore } = this.props
     const switchOrg = () => {
-      apiStore.currentUser.switchOrganization(orgId, {
-        redirectPath: 'homepage',
-      })
+      routingStore.routeTo(`/${organization.slug}`)
     }
     if (uiStore.isMovingCards) {
       const currentOrgName = apiStore.currentUserOrganization.name
-      const otherOrgName = apiStore.findOrganizationById(orgId).name
+      const otherOrgName = apiStore.findOrganizationById(organization.id).name
 
       uiStore.confirm({
         iconName: 'Alert',
@@ -241,7 +239,7 @@ class MainMenuDropdown extends React.Component {
           id: org.id,
           name: org.primary_group.name,
           iconLeft: avatar,
-          onClick: this.handleSwitchOrg(org.id),
+          onClick: this.handleSwitchOrg(org),
           noBorder: true,
         }
       })

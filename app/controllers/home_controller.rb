@@ -1,11 +1,10 @@
 # Serve up static pages
 class HomeController < ApplicationController
-  before_action :authenticate_user!, only: %i[index]
   before_action :set_omniauth_state
 
   def index
     # limited users aren't allowed to access the full Shape app
-    if current_user.limited?
+    if user_signed_in? && current_user.limited?
       sign_out :user
       redirect_to root_url
     end
@@ -17,6 +16,7 @@ class HomeController < ApplicationController
   end
 
   def login
+    store_location_for :user, params[:redirect] if params[:redirect].present?
   end
 
   def sign_up

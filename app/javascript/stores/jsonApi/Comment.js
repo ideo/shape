@@ -1,8 +1,10 @@
-import { observable, action } from 'mobx'
+import { observable, action, runInAction } from 'mobx'
+import { remove } from 'lodash'
 
 import { apiUrl } from '~/utils/url'
 
 import BaseRecord from './BaseRecord'
+import { apiStore, uiStore } from '~/stores'
 
 class Comment extends BaseRecord {
   static type = 'comments'
@@ -19,6 +21,19 @@ class Comment extends BaseRecord {
   @action
   markAsRead() {
     this.unread = false
+  }
+
+  API_destroy = async () => {
+    try {
+      await this.destroy()
+      const thread = apiStore.find('comment_threads', this.comment_thread_id)
+      runInAction(() => {
+        remove(thread.comments, comment => comment.id === this.id)
+      })
+    } catch (e) {
+      console.error(e)
+      uiStore.defaultAlertError()
+    }
   }
 }
 

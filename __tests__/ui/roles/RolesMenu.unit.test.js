@@ -1,5 +1,6 @@
 import { observable } from 'mobx'
 import RolesMenu from '~/ui/roles/RolesMenu'
+import fakeUiStore from '#/mocks/fakeUiStore'
 
 import { fakeUser, fakeRole, fakeCollection } from '#/mocks/data'
 
@@ -12,16 +13,13 @@ const apiStore = observable({
   add: jest.fn(),
   currentUser: fakeUser,
   currentUserOrganizationId: 1,
+  uiStore: fakeUiStore,
 })
 
-let props
-
 jest.mock('../../../app/javascript/stores/jsonApi/Role')
-let wrapper
+let props, wrapper, component
 
 describe('RolesMenu', () => {
-  let component
-
   beforeEach(() => {
     const routingStore = {
       pathTo: jest.fn(),
@@ -37,6 +35,7 @@ describe('RolesMenu', () => {
       ownerType: 'collections',
       apiStore,
       routingStore,
+      canEdit: false,
     }
     apiStore.searchRoles.mockClear()
     wrapper = shallow(<RolesMenu.wrappedComponent {...props} />)
@@ -140,5 +139,12 @@ describe('RolesMenu', () => {
         expect(component.notCurrentUser(user)).toBeTruthy()
       })
     })
+  })
+
+  it('if not editor, does not show viewable by anyone toggle', () => {
+    expect(props.canEdit).toEqual(false)
+    expect(
+      wrapper.find('[data-cy="anyone-can-view-checkbox"]').exists()
+    ).toEqual(false)
   })
 })

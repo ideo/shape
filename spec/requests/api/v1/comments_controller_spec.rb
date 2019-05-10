@@ -67,4 +67,22 @@ describe Api::V1::CommentsController, type: :request, json: true, auth: true do
       post(path, params: params)
     end
   end
+
+  describe 'DELETE destroy' do
+    let!(:comment_thread) { create(:item_comment_thread) }
+    let!(:comment) { create(:comment, comment_thread: comment_thread, author: user) }
+    let(:path) { "/api/v1/comments/#{comment.id}" }
+
+    before do
+      user.add_role(Role::EDITOR, comment_thread.record)
+    end
+
+    it 'deletes the comment' do
+      expect {
+        delete(path)
+      }.to change(Comment, :count).from(1).to(0)
+      expect(response.status).to eq(204)
+    end
+
+  end
 end

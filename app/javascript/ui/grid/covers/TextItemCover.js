@@ -70,7 +70,11 @@ class TextItemCover extends React.Component {
     if (uiStore.captureKeyboardGridClick(e, cardId)) {
       return false
     }
-    if (!item.can_edit_content || searchResult) {
+
+    if (!item.can_view) {
+      uiStore.showPermissionsAlert()
+      return false
+    } else if (!item.can_edit_content || searchResult) {
       // if a viewer, there's nothing to do on the generic click action
       // likewise on search results, never pop open the inline editor
       return false

@@ -3,6 +3,10 @@ import _ from 'lodash'
 
 const FLIPMOVE_DELAY = 600
 
+When('I clear all cookies', () => {
+  cy.clearCookies()
+})
+
 // ----------------------
 // Creating content (BCT)
 // ----------------------
@@ -130,6 +134,12 @@ When('I click the {string}', el => {
     .click({ force: true })
 })
 
+When('I click {string}', el => {
+  cy.locateDataOrClass(el)
+    .first()
+    .click({ force: true })
+})
+
 When('I wait for {string} to finish', apiCall => {
   cy.wait(apiCall)
 })
@@ -140,6 +150,12 @@ When('I wait for {int} second(s)', num => {
 
 When('I capture the current URL', () => {
   cy.url().as('url')
+})
+
+When('I visit the captured URL', () => {
+  cy.get('@url').then(url => {
+    cy.visit(url)
+  })
 })
 
 When('I type some random things', () => {
@@ -189,6 +205,10 @@ When('I visit the current Test URL', () => {
   })
 })
 
+When('I type {string} in {string}', (text, element) => {
+  cy.get(element).type(text, { force: true })
+})
+
 // ----------------------
 // Organization Menu
 // ----------------------
@@ -198,6 +218,18 @@ When('I fill out the organization name with {string}', orgName => {
     .first()
     .click()
     .type(orgName)
+})
+
+// ----------------------
+// Action Menu
+// ----------------------
+
+When('I click ... in the nav and select {string}', option => {
+  cy.locate('PopoutMenu')
+    .first()
+    .click()
+
+  cy.locate(`PopoutMenu_${option}`).click()
 })
 
 // ----------------------

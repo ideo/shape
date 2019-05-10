@@ -1,4 +1,5 @@
 class Api::V1::BaseController < ApplicationController
+  include ApplicationHelper
   before_action :check_api_authentication!
   before_action :check_cancel_sync
   before_action :check_page_param
@@ -41,9 +42,10 @@ class Api::V1::BaseController < ApplicationController
   # as @instance_vars in serializable resources
   def jsonapi_expose
     {
-      current_user: current_user,
+      current_user: current_user || User.new,
       current_ability: current_ability,
       current_api_token: current_api_token,
+      frontend_url_for: lambda { |obj| frontend_url_for(obj) },
     }
   end
 
@@ -162,5 +164,12 @@ class Api::V1::BaseController < ApplicationController
 
   def log_activity?
     current_api_token.blank?
+  end
+
+  def load_and_authorize_organization_from_slug
+    slug = params[:organization_id]
+    slug = params[:id] if !slug && controller_name == 'organizations'
+    @organization = Organization.friendly.find(slug)
+    authorize! :read, @organization
   end
 end
