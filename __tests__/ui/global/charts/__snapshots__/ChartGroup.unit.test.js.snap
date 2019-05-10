@@ -3,6 +3,7 @@
 exports[`ChartGroup renders snapshot 1`] = `
 <styled.div
   data-cy="ChartContainer"
+  height="92%"
 >
   <OrganicGrid />
   <VictoryChart
@@ -2304,19 +2305,27 @@ exports[`ChartGroup renders snapshot 1`] = `
         },
         "bar": Object {
           "colorScale": Array [
-            "#252525",
-            "#525252",
-            "#737373",
-            "#969696",
-            "#bdbdbd",
-            "#d9d9d9",
-            "#f0f0f0",
+            "#de8f74",
+            "#c0dbde",
+            "#738091",
+            "#A1A6B4",
+            "#88B6C6",
+            "#5473A6",
+            "#929E9E",
+            "#84AF99",
+            "#C2BBB9",
+            "#8B83A2",
+            "#AE8CA3",
+            "#D6C3C9",
+            "#DEA895",
+            "#A85751",
+            "#454545",
           ],
           "height": 300,
           "padding": 50,
           "style": Object {
             "data": Object {
-              "fill": "#252525",
+              "fill": "#de8f74",
               "padding": 8,
               "strokeWidth": 0,
             },
@@ -2494,6 +2503,19 @@ exports[`ChartGroup renders snapshot 1`] = `
           "colorScale": Array [
             "#de8f74",
             "#c0dbde",
+            "#738091",
+            "#A1A6B4",
+            "#88B6C6",
+            "#5473A6",
+            "#929E9E",
+            "#84AF99",
+            "#C2BBB9",
+            "#8B83A2",
+            "#AE8CA3",
+            "#D6C3C9",
+            "#DEA895",
+            "#A85751",
+            "#454545",
           ],
           "height": 300,
           "padding": 50,
@@ -2503,6 +2525,19 @@ exports[`ChartGroup renders snapshot 1`] = `
           "colorScale": Array [
             "#de8f74",
             "#c0dbde",
+            "#738091",
+            "#A1A6B4",
+            "#88B6C6",
+            "#5473A6",
+            "#929E9E",
+            "#84AF99",
+            "#C2BBB9",
+            "#8B83A2",
+            "#AE8CA3",
+            "#D6C3C9",
+            "#DEA895",
+            "#A85751",
+            "#454545",
           ],
           "fontSize": 14,
           "gutter": 10,
@@ -2711,17 +2746,14 @@ exports[`ChartGroup renders snapshot 1`] = `
         Array [
           Object {
             "date": "2018-07-10",
-            "month": "2018-07-10",
             "value": 10,
           },
           Object {
             "date": "2018-08-10",
-            "month": "2018-08-10",
             "value": 25,
           },
           Object {
             "date": "2018-09-10",
-            "month": "2018-09-10",
             "value": 30,
           },
         ]
@@ -2752,6 +2784,7 @@ exports[`ChartGroup renders snapshot 1`] = `
           rectComponent={<Rect />}
         />
       }
+      key="dataset-0"
       labelComponent={
         <ChartTooltip
           cardArea={1}
@@ -3254,7 +3287,7 @@ exports[`ChartGroup renders snapshot 1`] = `
           },
         }
       }
-      x="month"
+      x="date"
       y="value"
     />
     <VictoryLine
@@ -3313,7 +3346,7 @@ exports[`ChartGroup renders snapshot 1`] = `
           rectComponent={<Rect />}
         />
       }
-      key="dataset-participants"
+      key="dataset-1"
       labelComponent={
         <ChartTooltip
           cardArea={1}

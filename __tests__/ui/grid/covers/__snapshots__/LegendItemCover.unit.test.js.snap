@@ -21,9 +21,8 @@ exports[`LegendItemCover renders snapshot 1`] = `
     key="measure-95th Percentile"
   >
     <styled.span>
-      <LineChartMeasure
-        color="#000000"
-        order={1}
+      <styled.span
+        color="#c0dbde"
       />
     </styled.span>
     <StyledDisplayText>
