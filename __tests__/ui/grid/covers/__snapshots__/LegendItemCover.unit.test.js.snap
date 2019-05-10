@@ -1,7 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`LegendItemCover renders snapshot 1`] = `
-<styled.div>
+<styled.div
+  data-cy="LegendItemCover"
+>
   <Styled(StyledHeading3)>
     My Cool Item
   </Styled(StyledHeading3)>
