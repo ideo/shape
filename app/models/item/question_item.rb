@@ -3,6 +3,7 @@ class Item
     has_many :question_answers, inverse_of: :question, foreign_key: :question_id, dependent: :destroy
     has_one :test_open_responses_collection, class_name: 'Collection::TestOpenResponses'
     has_one :test_chart_item, class_name: 'Item::ChartItem', as: :data_source
+    has_one :test_media_item_card, class_name: 'CollectionCard'
 
     after_commit :notify_test_design_of_creation,
                  on: :create,
@@ -121,6 +122,18 @@ class Item
       )
       builder.create
       builder.collection_card
+    end
+
+    def create_media_item(parent_collection:, initiated_by:)
+      return if test_media_item_card.present?
+      media_link_card = CollectionCard::Link.create(
+        parent: parent_collection,
+        item_id: id,
+        width: 1,
+        height: 2,
+        order: -1,
+      )
+      media_link_card
     end
 
     def create_open_response_collection(parent_collection:, initiated_by:)

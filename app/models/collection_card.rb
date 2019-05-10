@@ -8,6 +8,7 @@ class CollectionCard < ApplicationRecord
   belongs_to :collection, optional: true
   belongs_to :item, optional: true
   belongs_to :templated_from, class_name: 'CollectionCard', optional: true
+  belongs_to :question_item, class_name: 'Item::QuestionItem', optional: true
 
   # this really is only appropriate for CollectionCard::Primary but defined globally here
   accepts_nested_attributes_for :collection, :item
