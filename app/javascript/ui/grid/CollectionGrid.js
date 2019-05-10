@@ -124,9 +124,6 @@ class CollectionGrid extends React.Component {
       // remove any cards we're moving to make them appear "picked up"
       _.each(movingCardIds, id => _.remove(cards, { id }))
     }
-    if (submissionSettings) {
-      this.addSubmissionCard(cards)
-    }
     const bctOpen =
       blankContentToolState &&
       blankContentToolState.order !== null &&
@@ -167,6 +164,9 @@ class CollectionGrid extends React.Component {
         // Add the BCT to the array of cards to be positioned, if they can edit
         cards.unshift(blankCard)
       }
+    }
+    if (submissionSettings) {
+      this.addSubmissionCard(cards)
     }
     return cards
   }
