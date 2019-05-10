@@ -1,3 +1,5 @@
+# modified from https://gist.github.com/brysgo/9980344
+
 CHECKING_OUT_BRANCH=$3
 OLD_BRANCH=$1
 NEW_BRANCH=$2
