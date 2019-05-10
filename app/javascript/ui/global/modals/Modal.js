@@ -12,6 +12,8 @@ import ArrowIcon from '~/ui/icons/ArrowIcon'
 import CloseIcon from '~/ui/icons/CloseIcon'
 import { uiStore } from '~/stores'
 
+// Make border a prop to allow it be removed?
+// https://ideo.invisionapp.com/d/main#/console/14424671/360618724/inspect
 const StyledDialog = styled(Dialog)`
   .modal__paper {
     border-left: 17px solid ${v.colors.black};
