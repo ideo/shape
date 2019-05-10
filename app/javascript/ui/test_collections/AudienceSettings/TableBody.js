@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 import v from '~/utils/variables'
 import styled from 'styled-components'
 import { StyledRowFlexParent, StyledRowFlexCell } from './styled'
