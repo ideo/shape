@@ -1,8 +1,7 @@
 import _ from 'lodash'
 import React from 'react'
-import { computed } from 'mobx'
+import { runInAction, observable, toJS, action, computed } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { runInAction, observable, toJS } from 'mobx'
 
 import AudienceSettingsWidget from './AudienceSettingsWidget'
 import TestAudience from '~/stores/jsonApi/TestAudience'
@@ -13,7 +12,8 @@ import FeedbackTermsModal from '../FeedbackTermsModal'
 class AudienceSettings extends React.Component {
   @observable
   audiences = []
-  showModal = false
+  @observable
+  termsModalOpen = false
 
   constructor(props) {
     super(props)
@@ -100,10 +100,29 @@ class AudienceSettings extends React.Component {
     // this.throttledSaveTestAudience(audience)
   }
 
+  openTermsModal = () => runInAction(() => (this.termsModalOpen = true))
+
+  closeTermsModal = () => runInAction(() => (this.termsModalOpen = false))
+
+  submitSettings = () => {
+    this.openTermsModal()
+    console.log('submitting settings')
+    // Also need to update size for test audiences
+  }
+
+  confirmFeedbackTerms = () => {
+    console.log('Agreeing to feedback terms')
+    // AJAX call to update things
+  }
+
   render() {
     return (
       <React.Fragment>
-        <FeedbackTermsModal />
+        <FeedbackTermsModal
+          open={!!this.termsModalOpen}
+          onSubmit={this.confirmFeedbackTerms}
+          close={this.closeTermsModal}
+        />
         <AudienceSettingsWidget
           onToggleCheckbox={this.onToggleCheckbox}
           stopEditingIfContent={this.stopEditingIfContent}
@@ -111,6 +130,7 @@ class AudienceSettings extends React.Component {
           onInputChange={this.onInputChange}
           totalPrice={this.totalPrice}
           audiences={this.audiences}
+          onSubmitSettings={this.submitSettings}
         />
       </React.Fragment>
     )

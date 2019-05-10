@@ -114,6 +114,7 @@ class AudienceSettings extends React.Component {
     )
   }
 }
+
 AudienceSettings.propTypes = {
   audiences: MobxPropTypes.objectOrObservableObject.isRequired,
   onSubmitSettings: PropTypes.func.isRequired,
@@ -142,7 +143,5 @@ const MobileWrapper = styled.div`
     display: none;
   }
 `
-
-AudienceSettings.propTypes = {}
 
 export default AudienceSettings

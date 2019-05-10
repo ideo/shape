@@ -10,8 +10,8 @@ import { List, ListItem } from '~/ui/global/styled/lists'
 import Link from '~/ui/global/Link'
 import { colors } from '~shared/styles/index'
 
-const FeedbackTermsModal = ({ children, close }) => (
-  <Modal title="Feedback Terms and Conditions" open onClose={close}>
+const FeedbackTermsModal = ({ onSubmit, open, close }) => (
+  <Modal title="Feedback Terms and Conditions" open={open} onClose={close}>
     <PaperAirplane />
     <Heading1 wrapLine>
       Before you launch your first test, please review and agree to the terms
@@ -67,7 +67,9 @@ const FeedbackTermsModal = ({ children, close }) => (
       </DisplayText>
     </StyledDiv>
     <StyledDiv style={{ textAlign: 'center' }}>
-      <FormButton width={300}>I agree to these terms</FormButton>
+      <FormButton onClick={onsubmit} width={300}>
+        I agree to these terms
+      </FormButton>
     </StyledDiv>
   </Modal>
 )
