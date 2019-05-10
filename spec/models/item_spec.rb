@@ -18,9 +18,9 @@ RSpec.describe Item, type: :model do
 
       it 'should save the previous thumbnail_url in the cached array' do
         prev_url = item.thumbnail_url
-        expect {
+        expect do
           item.update(thumbnail_url: 'http://new.image.com/x.jpg')
-        }.to change(item, :previous_thumbnail_urls)
+        end.to change(item, :previous_thumbnail_urls)
         expect(item.reload.previous_thumbnail_urls).to match_array([prev_url])
       end
 
@@ -120,9 +120,9 @@ RSpec.describe Item, type: :model do
       it 'duplicates external records' do
         expect(item.external_records.size).to eq(2)
 
-        expect {
+        expect do
           duplicate
-        }.to change(ExternalRecord, :count).by(2)
+        end.to change(ExternalRecord, :count).by(2)
 
         expect(duplicate.external_records.pluck(:external_id)).to match_array(
           %w[100 101],
@@ -222,8 +222,8 @@ RSpec.describe Item, type: :model do
         question_item = create(:question_item, parent_collection_card: parent_collection_card)
         expect(question_item.search_data[:content]).to eq('')
 
-        chart_item = create(:chart_item, :with_question_item, parent_collection_card: parent_collection_card)
-        expect(chart_item.search_data[:content]).to eq('')
+        data_item = create(:data_item, :report_type_question_item, parent_collection_card: parent_collection_card)
+        expect(data_item.search_data[:content]).to eq('')
       end
     end
   end
