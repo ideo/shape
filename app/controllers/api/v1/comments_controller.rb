@@ -34,11 +34,13 @@ class Api::V1::CommentsController < Api::V1::BaseController
   end
 
   def update
-    @comment.message = json_api_params[:data][:attributes][:message]
-    @comment.draftjs_data = json_api_params[:data][:attributes][:draftjs_data]
+    success = CommentUpdater.call(
+      comment: @comment,
+      message: json_api_params[:data][:attributes][:message],
+      draftjs_data: json_api_params[:data][:attributes][:draftjs_data]
+    )
 
-    if @comment.save
-      @comment.store_in_firestore
+    if success
       render jsonapi: @comment
     else
       render_api_errors @comment.errors
