@@ -200,10 +200,10 @@ export class FirebaseClient {
       })
   }
 
-  escapeLoader = () => {
+  escapeLoader = (timeout = 2500) => {
     setTimeout(() => {
       apiStore.update('loadingThreads', false)
-    }, 2500)
+    }, timeout)
   }
 
   checkIfFinishedLoading = () => {
@@ -211,6 +211,8 @@ export class FirebaseClient {
     if (this.loadedThreadIds.length === this.subscribedThreadIds.length) {
       apiStore.update('loadingThreads', false)
     }
+    // just in case there was an issue loading all the threads, escape the loader after 5s
+    this.escapeLoader(5000)
   }
 }
 

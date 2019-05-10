@@ -183,7 +183,7 @@ class Comment extends React.Component {
     uiStore.confirm({
       iconName: 'Alert',
       prompt:
-        'Are you sure you want to delete this comment? You will not be able to undo this action',
+        'Are you sure you want to delete this comment? You will not be able to undo this action.',
       confirmText: 'Delete',
       onConfirm: () => {
         comment.API_destroy()
