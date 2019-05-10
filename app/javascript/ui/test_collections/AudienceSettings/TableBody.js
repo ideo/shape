@@ -55,9 +55,8 @@ class TableBody extends React.Component {
             }
           >
             {audience.currentSampleSize > 0 && audience.currentlySelected
-              ? `$${_.round(
-                  audience.price_per_response * audience.currentSampleSize,
-                  2
+              ? `$${(
+                  audience.price_per_response * audience.currentSampleSize
                 ).toFixed(2)}`
               : '–'}
           </DisplayText>
