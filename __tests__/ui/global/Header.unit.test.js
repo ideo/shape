@@ -76,7 +76,7 @@ describe('Header', () => {
 
     describe('on the homepage', () => {
       beforeEach(() => {
-        props.routingStore.isHomepage = true
+        props.uiStore.isViewingHomepage = true
         render()
       })
 

@@ -113,5 +113,13 @@ describe('TextItemCover', () => {
       expect(result).toBe(null)
       expect(apiStore.fetch).toHaveBeenCalledWith('items', item.id, true)
     })
+
+    it('calls uiStore.showPermissionsAlert if cannot view', () => {
+      wrapper.setProps({
+        item: { ...item, can_view: false },
+      })
+      component.handleClick(e)
+      expect(uiStore.showPermissionsAlert).toHaveBeenCalled()
+    })
   })
 })

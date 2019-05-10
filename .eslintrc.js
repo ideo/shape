@@ -9,6 +9,8 @@ module.exports = {
     'compat'
   ],
   env: {
+    es6: true,
+    node: true,
     'jest/globals': true,
     'cypress/globals': true,
   },
@@ -79,6 +81,7 @@ module.exports = {
     'import/extensions': 0,
     'no-param-reassign': ['error', { props: false }],
     'no-underscore-dangle': 0,
+    'no-undef': 2,
     'prettier/prettier': 'error',
     'prefer-destructuring': [
       'error',

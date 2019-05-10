@@ -46,4 +46,8 @@ class Comment < ApplicationRecord
       ut.store_in_batch(batch)
     end
   end
+
+  def can_edit?(user)
+    author.id == user.id
+  end
 end

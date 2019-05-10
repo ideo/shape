@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { Fragment } from 'react'
 import { observable, action, computed, runInAction } from 'mobx'
@@ -16,23 +15,17 @@ import ActivityLogButton from '~/ui/notifications/ActivityLogButton'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
-import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
+import {
+  FixedHeader,
+  MaxWidthContainer,
+  HeaderSpacer,
+} from '~/ui/global/styled/layout'
 import v from '~/utils/variables'
+import BasicHeader from '~/ui/layout/BasicHeader'
+import LoggedOutBasicHeader from '~/ui/layout/LoggedOutBasicHeader'
 import MainMenuDropdown from '~/ui/global/MainMenuDropdown'
 
 /* global IdeoSSO */
-
-const StyledFixedHeader = styled(FixedHeader)`
-  padding-top: 4px;
-  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
-    padding-left: 5px;
-    padding-right: 5px;
-  }
-`
-
-const HeaderSpacer = styled.div`
-  height: ${v.headerHeight}px;
-`
 
 const StyledAvatarAndDropdown = styled.div`
   display: inline-block;
@@ -88,38 +81,6 @@ const StyledActivityLogBtn = styled(StyledRoundBtn)`
     background: ${v.colors.secondaryDark};
   }
 `
-
-export const BasicHeader = ({ orgMenu }) => (
-  <Fragment>
-    <StyledFixedHeader zIndex={v.zIndex.globalHeader}>
-      <MaxWidthContainer>
-        <Flex align="center" justify="space-between">
-          <Box>
-            <PlainLink to="/">
-              <Logo />
-            </PlainLink>
-          </Box>
-        </Flex>
-        {orgMenu && (
-          <OrganizationMenu
-            organization={{}}
-            userGroups={[]}
-            onClose={() => null}
-            open={orgMenu}
-            locked
-          />
-        )}
-      </MaxWidthContainer>
-    </StyledFixedHeader>
-    <HeaderSpacer />
-  </Fragment>
-)
-BasicHeader.propTypes = {
-  orgMenu: PropTypes.bool,
-}
-BasicHeader.defaultProps = {
-  orgMenu: false,
-}
 
 @inject('apiStore', 'routingStore', 'uiStore')
 @observer
@@ -239,6 +200,7 @@ class Header extends React.Component {
             location="PageMenu"
             className="card-menu"
             card={record.parent_collection_card}
+            canView={record.can_view}
             canEdit={record.can_edit}
             canReplace={record.canReplace}
             direction={uiStore.pageMenuOpen || 'left'}
@@ -318,17 +280,21 @@ class Header extends React.Component {
     } = this
     const { apiStore, routingStore, uiStore } = this.props
     const { currentUser } = apiStore
-    if (!currentUser.current_organization) {
+    if (!currentUser) {
+      // user is not logged in, or:
       // user needs to set up their Org, will see the Org popup before proceeding
+      return (
+        <LoggedOutBasicHeader
+          organization={record ? record.organization : null}
+        />
+      )
+    } else if (!currentUser.current_organization) {
       return <BasicHeader orgMenu={uiStore.organizationMenuOpen} />
     }
     const primaryGroup = currentUser.current_organization.primary_group
     return (
       <Fragment>
-        <StyledFixedHeader
-          data-empty-space-click
-          zIndex={v.zIndex.globalHeader}
-        >
+        <FixedHeader data-empty-space-click>
           <MaxWidthContainer>
             <Flex
               data-empty-space-click
@@ -337,7 +303,7 @@ class Header extends React.Component {
             >
               <Box style={{ paddingRight: '12px' }}>
                 <PlainLink to={routingStore.pathTo('homepage')}>
-                  <Logo noText width={46} />
+                  <Logo />
                 </PlainLink>
               </Box>
 
@@ -350,7 +316,7 @@ class Header extends React.Component {
                           maxDepth={isLargeBreakpoint ? 6 : 1}
                           backButton={!isLargeBreakpoint}
                           record={record}
-                          isHomepage={routingStore.isHomepage}
+                          isHomepage={uiStore.isViewingHomepage}
                           // re-mount every time the record / breadcrumb changes
                           key={`${record.identifier}_${record.breadcrumbSize}`}
                           // force props update if windowWidth changes
@@ -439,7 +405,7 @@ class Header extends React.Component {
               </Box>
             </Flex>
           </MaxWidthContainer>
-        </StyledFixedHeader>
+        </FixedHeader>
         <HeaderSpacer />
       </Fragment>
     )

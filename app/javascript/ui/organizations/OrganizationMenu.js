@@ -12,7 +12,7 @@ import OrganizationPeople from '~/ui/organizations/OrganizationPeople'
 import GroupTitle from '~/ui/groups/GroupTitle'
 import googleTagManager from '~/vendor/googleTagManager'
 
-@inject('apiStore', 'uiStore')
+@inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class OrganizationMenu extends React.Component {
   @observable
@@ -77,7 +77,7 @@ class OrganizationMenu extends React.Component {
   }
 
   createOrganization = async organizationData => {
-    const { apiStore, uiStore, onClose } = this.props
+    const { apiStore, uiStore, routingStore, onClose } = this.props
     const newOrg = new Organization(organizationData, apiStore)
     try {
       runInAction(() => {
@@ -85,14 +85,12 @@ class OrganizationMenu extends React.Component {
       })
       const hasOrg = !!apiStore.currentUserOrganization
       await newOrg.create()
-      await apiStore.currentUser.switchOrganization(newOrg.id, {
-        redirectPath: 'homepage',
-      })
       uiStore.update('orgCreated', true)
       googleTagManager.push({
         event: 'formSubmission',
         formType: hasOrg ? 'Additional Org' : 'New Org',
       })
+      routingStore.routeTo(`/${newOrg.slug}`)
       onClose()
     } catch (err) {
       uiStore.alert(err.error ? err.error[0] : 'There was an error.')
@@ -297,10 +295,12 @@ OrganizationMenu.propTypes = {
 OrganizationMenu.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 OrganizationMenu.defaultProps = {
   open: false,
   locked: false,
 }
+OrganizationMenu.displayName = 'OrganizationMenu'
 
 export default OrganizationMenu

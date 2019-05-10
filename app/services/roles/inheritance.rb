@@ -27,7 +27,7 @@ module Roles
       return false if @parent.nil?
       cached = child.cached_inheritance
       if child.same_roles_anchor? @parent
-        if cached.present? && cached['private']
+        if cached.nil? || cached['private']
           child.cached_inheritance = { private: false, updated_at: Time.current }
           child.save
         end

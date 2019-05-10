@@ -10,6 +10,7 @@ const uiStore = { ...fakeUiStore, viewingCollection: fakeCollection }
 const props = {
   card,
   uiStore,
+  canView: true,
   canEdit: false,
   canReplace: false,
   menuOpen: false,
@@ -152,6 +153,26 @@ describe('ActionMenu', () => {
       const popout = wrapper.find('PopoutMenu').at(0)
       expect(popout.props().menuItems.length).toEqual(actions.length)
       expect(_.map(popout.props().menuItems, i => i.name)).toEqual(actions)
+    })
+
+    describe('if cannot view', () => {
+      beforeEach(() => {
+        props.canView = false
+        wrapper = shallow(<ActionMenu.wrappedComponent {...props} />)
+      })
+
+      it('does not include Duplicate', () => {
+        const actionsWithoutDuplicate = actions.filter(
+          val => val !== 'Duplicate'
+        )
+        const popout = wrapper.find('PopoutMenu').at(0)
+        expect(popout.props().menuItems.length).toEqual(
+          actionsWithoutDuplicate.length
+        )
+        expect(_.map(popout.props().menuItems, i => i.name)).toEqual(
+          actionsWithoutDuplicate
+        )
+      })
     })
   })
 

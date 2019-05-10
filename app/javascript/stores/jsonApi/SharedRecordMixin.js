@@ -16,7 +16,7 @@ const SharedRecordMixin = superclass =>
     }
 
     get menuDisabled() {
-      return super.menuDisabled || this.forceMenuDisabled
+      return this.isSharedCollection || this.forceMenuDisabled || !this.can_view
     }
 
     API_updateName(name) {

@@ -1,7 +1,7 @@
 {
   "baseUrl": "http://localhost:3000",
   "viewportWidth": 1320,
-  "viewportHeight": 720,
+  "viewportHeight": 800,
   "userAgent": "cypress",
   "supportFile": "cypress/support/setup.js",
   "pluginsFile": "cypress/support/plugins.js",
