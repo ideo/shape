@@ -2,7 +2,7 @@ class ItemRealtimeChannel < ApplicationCable::Channel
   # All public methods are exposed to consumers
 
   def subscribed
-    return reject if item.nil? || !item.can_edit_content?(current_user)
+    return reject if item.nil? || current_ability.cannot?(:edit_content, item)
     item.started_viewing(current_user)
     stream_from item.stream_name
   end

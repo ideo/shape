@@ -317,6 +317,8 @@ class CollectionPage extends React.Component {
     const { currentEditor } = this
     const { currentUserId } = this.props.apiStore
     let hidden = ''
+    // don't let logged-out users see who's editing, but they can still receive realtime updates
+    if (!currentUserId) return
     if (_.isEmpty(currentEditor) || currentEditor.id === currentUserId)
       hidden = 'hidden'
     return (

@@ -27,13 +27,13 @@ module RealtimeEditorsViewers
 
   # Track viewers by user_id
   # Using an increment counter was prone to dupe issues (e.g. same user with two browser windows open)
-  def started_viewing(user, dont_notify: false)
-    Cache.set_add(viewing_cache_key, user.id)
+  def started_viewing(user = nil, dont_notify: false)
+    Cache.set_add(viewing_cache_key, user.id) if user
     publish_to_channel unless dont_notify
   end
 
-  def stopped_viewing(user, dont_notify: false)
-    Cache.set_remove(viewing_cache_key, user.id)
+  def stopped_viewing(user = nil, dont_notify: false)
+    Cache.set_remove(viewing_cache_key, user.id) if user
     publish_to_channel unless dont_notify
   end
 
