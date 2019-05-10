@@ -160,7 +160,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def check_cache
     fresh_when(
       last_modified: @collection.updated_at.utc,
-      etag: "#{@collection.cache_key(params[:card_order])}/cards/#{@page}",
+      etag: "#{@collection.cache_key(params[:card_order], current_user.try(:id))}/cards/#{@page}",
     )
   end
 

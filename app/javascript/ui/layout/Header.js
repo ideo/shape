@@ -286,6 +286,7 @@ class Header extends React.Component {
       return (
         <LoggedOutBasicHeader
           organization={record ? record.organization : null}
+          redirectPath={record ? record.frontendPath : null}
         />
       )
     } else if (!currentUser.current_organization) {

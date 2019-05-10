@@ -102,9 +102,9 @@ class RealtimeTextItem extends React.Component {
   }
 
   componentDidMount() {
-    this.subscribeToItemEditingChannel()
+    this.subscribeToItemRealtimeChannel()
     setTimeout(() => {
-      this.subscribeToItemEditingChannel()
+      this.subscribeToItemRealtimeChannel()
     }, 1250)
 
     if (!this.reactQuillRef) return
@@ -134,7 +134,7 @@ class RealtimeTextItem extends React.Component {
     })
   }
 
-  subscribeToItemEditingChannel() {
+  subscribeToItemRealtimeChannel() {
     const { item } = this.props
     this.channel = ChannelManager.subscribe(this.channelName, item.id, {
       channelConnected: this.channelConnected,

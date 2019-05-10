@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { Fragment } from 'react'
 import { Flex, Box } from 'reflexbox'
@@ -12,6 +13,7 @@ import { Heading3 } from '~/ui/global/styled/typography'
 import Avatar from '~/ui/global/Avatar'
 import Logo from '~/ui/layout/Logo'
 import v from '~/utils/variables'
+import { loginRedirectPath } from '~/utils/routeToLogin'
 
 const StyledLoginLink = styled(Heading3)`
   margin-left: 15px;
@@ -26,7 +28,7 @@ StyledLoginLink.displayName = 'StyledLoginLink'
 
 class LoggedOutBasicHeader extends React.PureComponent {
   render() {
-    const { organization } = this.props
+    const { organization, redirectPath } = this.props
 
     return (
       <Fragment>
@@ -55,7 +57,7 @@ class LoggedOutBasicHeader extends React.PureComponent {
                     />
                   )}
                   <StyledLoginLink>
-                    <a href="/login">Log in</a>
+                    <a href={loginRedirectPath(redirectPath)}>Log in</a>
                   </StyledLoginLink>
                 </Flex>
               </Box>
@@ -70,10 +72,12 @@ class LoggedOutBasicHeader extends React.PureComponent {
 
 LoggedOutBasicHeader.propTypes = {
   organization: MobxPropTypes.objectOrObservableObject,
+  redirectPath: PropTypes.string,
 }
 
 LoggedOutBasicHeader.defaultProps = {
   organization: null,
+  redirectPath: null,
 }
 
 export default LoggedOutBasicHeader
