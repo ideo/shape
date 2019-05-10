@@ -1,15 +1,14 @@
-import LineChart from '~/ui/global/charts/LineChart'
+import BarChart from '~/ui/global/charts/BarChart'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import { fakeAreaChartDataset } from '#/mocks/data'
 
 const props = {}
 let wrapper, render
 
-describe('LineChart', () => {
+describe('BarChart', () => {
   beforeEach(() => {
     props.dataset = fakeAreaChartDataset
-    props.simpleDateTooltip = true
-    render = () => (wrapper = shallow(<LineChart {...props} />))
+    render = () => (wrapper = shallow(<BarChart {...props} />))
     render()
   })
 
@@ -17,7 +16,7 @@ describe('LineChart', () => {
     expectTreeToMatchSnapshot(wrapper)
   })
 
-  it('renders VictoryLine', () => {
-    expect(wrapper.find('VictoryLine').exists()).toBe(true)
+  it('renders VictoryBar', () => {
+    expect(wrapper.find('VictoryBar').exists()).toBe(true)
   })
 })

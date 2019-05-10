@@ -45,7 +45,7 @@ module DataReport
     end
 
     def base_data
-      (1..4).map { |n| { value: 0, total: 0, column: n, percentage: 0, type: question_type } }
+      (1..4).map { |n| { value: 0, column: n, percentage: 0 } }
     end
 
     def grouped_response_data(survey_answers)
@@ -56,7 +56,6 @@ module DataReport
         answer_data = data.find { |d| d[:column] == answer_number }
         begin
           answer_data[:value] = count
-          answer_data[:total] = num_answers
         rescue => e
           Appsignal.set_error(e,
                               answer_number: answer_number.to_s,

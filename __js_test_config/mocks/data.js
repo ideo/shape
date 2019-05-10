@@ -50,7 +50,7 @@ export const fakeTextItemAttrs = {
   parent_collection_card: fakeCollectionCard,
 }
 
-export const fakeDataset = {
+export const fakeAreaChartDataset = {
   measure: 'participants',
   description: 'A description',
   timeframe: 'month',
@@ -60,6 +60,23 @@ export const fakeDataset = {
     { date: '2018-07-10', value: 10 },
     { date: '2018-08-10', value: 25 },
     { date: '2018-09-10', value: 30 },
+  ],
+}
+
+export const fakeBarChartDataset = {
+  measure: 'participants',
+  description: 'A description',
+  question_type: 'question_context',
+  timeframe: 'month',
+  chart_type: 'bar',
+  order: 0,
+  total: 10,
+  max_domain: 95,
+  data: [
+    { column: 1, value: 5, percentage: 50, type: 'question_context' },
+    { column: 2, value: 0, percentage: 0, type: 'question_context' },
+    { column: 3, value: 5, percentage: 50, type: 'question_context' },
+    { column: 4, value: 0, percentage: 0, type: 'question_context' },
   ],
 }
 
@@ -78,9 +95,9 @@ export const fakeDataItemCollectionsItemsAttrs = {
   measure: {
     name: 'Participants'
   },
-  primaryDataset: fakeDataset,
+  primaryDataset: fakeAreaChartDataset,
   datasets: [
-    fakeDataset
+    fakeAreaChartDataset
   ],
 }
 
@@ -220,53 +237,6 @@ export const fakeLinkItemAttrs = {
 export const fakeLinkItem = {
   ...fakeLinkItemAttrs,
   rawAttributes: jest.fn().mockReturnValue(fakeLinkItemAttrs),
-  getRecordType: jest.fn().mockReturnValue('items'),
-}
-export const fakeChartItemAttrs = {
-  id: '5',
-  type: 'Item::ChartItem',
-  name: '',
-  content: '',
-  chart_data: {
-    0: 3,
-    1: 6,
-    2: 1,
-    3: 8,
-  },
-  chart_data: {
-    datasets: [
-      {
-        label: 'Super test',
-        type: 'question_items',
-        total: 7,
-        data: [
-          { num_responses: 2, answer: 1 },
-          { num_responses: 2, answer: 2 },
-          { num_responses: 0, answer: 3 },
-          { num_responses: 3, answer: 4 },
-        ],
-      },
-      {
-        label: 'Super Org',
-        type: 'org_wide',
-        total: 50,
-        data: [
-          { num_responses: 5, answer: 1 },
-          { num_responses: 10, answer: 2 },
-          { num_responses: 20, answer: 3 },
-          { num_responses: 15, answer: 4 },
-        ],
-      },
-    ],
-  },
-  data_source_id: 3,
-  inherited_tag_list: [],
-  can_edit: false,
-  parent_collection_card: fakeCollectionCard,
-}
-export const fakeChartItem = {
-  ...fakeChartItemAttrs,
-  rawAttributes: jest.fn().mockReturnValue(fakeChartItemAttrs),
   getRecordType: jest.fn().mockReturnValue('items'),
 }
 export const fakeFileItemAttrs = {

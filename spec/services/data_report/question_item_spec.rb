@@ -12,18 +12,10 @@ RSpec.describe DataReport::QuestionItem, type: :service do
   end
   let(:empty_dataset) do
     [
-      {
-        column: 1, value: 0, total: 0, percentage: 0, type: question_item.question_type
-      },
-      {
-        column: 2, value: 0, total: 0, percentage: 0, type: question_item.question_type
-      },
-      {
-        column: 3, value: 0, total: 0, percentage: 0, type: question_item.question_type
-      },
-      {
-        column: 4, value: 0, total: 0, percentage: 0, type: question_item.question_type
-      },
+      { column: 1, value: 0, percentage: 0 },
+      { column: 2, value: 0, percentage: 0 },
+      { column: 3, value: 0, percentage: 0 },
+      { column: 4, value: 0, percentage: 0 },
     ]
   end
 
@@ -88,10 +80,10 @@ RSpec.describe DataReport::QuestionItem, type: :service do
         )
         expect(subject[0][:data]).to match_array(
           [
-            { column: 1, value: 1, total: 1, percentage: 100, type: question_item.question_type },
-            { column: 2, value: 0, total: 0, percentage: 0, type: question_item.question_type },
-            { column: 3, value: 0, total: 0, percentage: 0, type: question_item.question_type },
-            { column: 4, value: 0, total: 0, percentage: 0, type: question_item.question_type },
+            { column: 1, value: 1, percentage: 100 },
+            { column: 2, value: 0, percentage: 0 },
+            { column: 3, value: 0, percentage: 0 },
+            { column: 4, value: 0, percentage: 0 },
           ]
         )
 
@@ -106,10 +98,10 @@ RSpec.describe DataReport::QuestionItem, type: :service do
         )
         expect(subject[1][:data]).to match_array(
           [
-            { column: 1, value: 6, total: 6, percentage: 100, type: question_item.question_type },
-            { column: 2, value: 0, total: 0, percentage: 0, type: question_item.question_type },
-            { column: 3, value: 0, total: 0, percentage: 0, type: question_item.question_type },
-            { column: 4, value: 0, total: 0, percentage: 0, type: question_item.question_type },
+            { column: 1, value: 6, percentage: 100 },
+            { column: 2, value: 0, percentage: 0 },
+            { column: 3, value: 0, percentage: 0 },
+            { column: 4, value: 0, percentage: 0 },
           ]
         )
       end

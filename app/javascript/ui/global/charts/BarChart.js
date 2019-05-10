@@ -18,9 +18,10 @@ const formatValues = (values, datasetOrder) => {
 
 const BarChart = ({ dataset, simpleDateTooltip, cardArea }) => {
   const values = formatValues(dataset.data, dataset.order)
+  const { total, max_domain } = dataset
   const domain = chartDomainForDatasetValues({
     values,
-    maxDomain: dataset.max_domain,
+    maxDomain: max_domain,
   })
   return (
     <VictoryBar
@@ -40,7 +41,7 @@ const BarChart = ({ dataset, simpleDateTooltip, cardArea }) => {
                 mutation: props => {
                   const { datum } = props
                   return {
-                    text: `${datum.value}/${datum.total} \ntotal`,
+                    text: `${datum.value}/${total} \ntotal`,
                     style: Object.assign({}, themeLabelStyles, {
                       fill: v.colors.tertiaryMedium,
                       fontSize: 9,
