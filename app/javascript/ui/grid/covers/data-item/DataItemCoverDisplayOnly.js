@@ -82,7 +82,7 @@ class DataItemCoverDisplayOnly extends React.Component {
     const { card, item } = this.props
     const tooltip = this.primaryDatasetDescription
     return (
-      <StyledCover item={item}>
+      <StyledCover item={item} data-cy="DataItemCover">
         <AboveChartContainer>
           <StyledTitleAndDescription>
             <StyledTitleDescInline>{this.title}</StyledTitleDescInline>

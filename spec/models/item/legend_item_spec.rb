@@ -20,7 +20,8 @@ RSpec.describe Item::LegendItem, type: :model do
       expect(legend_item.primary_measure).to eq(
         measure: primary_dataset[:measure],
         style: primary_dataset[:style],
-        order: 0
+        order: 0,
+        chart_type: 'area',
       )
     end
   end
@@ -35,6 +36,7 @@ RSpec.describe Item::LegendItem, type: :model do
             measure: dataset[:measure],
             style: dataset[:style],
             order: i + 1,
+            chart_type: 'line',
           }
         end,
       )

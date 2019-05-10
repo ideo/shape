@@ -281,6 +281,7 @@ describe Collection::TestCollection, type: :model do
             ).to eq(
               [
                 Item::DataItem,
+                Item::LegendItem,
                 Collection::TestDesign,
               ],
             )
