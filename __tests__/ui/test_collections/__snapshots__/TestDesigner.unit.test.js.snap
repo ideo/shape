@@ -9944,8 +9944,11 @@ exports[`TestDesigner renders snapshot 1`] = `
             "API_getNextAvailableTest": [MockFunction],
             "API_updateCard": [MockFunction],
             "API_updateName": [MockFunction],
+            "anyone_can_join": false,
+            "anyone_can_view": false,
             "apiStore": Object {
               "add": [MockFunction add],
+              "checkCurrentOrg": [MockFunction],
               "checkInMyCollection": [MockFunction],
               "collections": Array [],
               "createTemplateInstance": [MockFunction],
@@ -9991,7 +9994,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                   },
                 ],
                 "pic_url_square": "https://s3.amazonaws.com/pic.png",
-                "switchOrganization": [MockFunction],
                 "terms_accepted": true,
               },
               "currentUserId": "1",
@@ -10036,6 +10038,7 @@ exports[`TestDesigner renders snapshot 1`] = `
               "searchRoles": [MockFunction],
               "searchUsers": [MockFunction],
               "searchUsersAndGroups": [MockFunction],
+              "sessionLoaded": true,
               "setCurrentUserId": [MockFunction],
               "sync": [MockFunction sync],
               "uiStore": Object {
@@ -10094,6 +10097,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                 "editingName": false,
                 "expandThread": [MockFunction],
                 "expandedThreadKey": null,
+                "gridHeightFor": [MockFunction],
                 "gridSettings": Object {
                   "cols": 4,
                   "gridH": 250,
@@ -10102,6 +10106,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                 },
                 "isLoading": false,
                 "isNewCard": [MockFunction],
+                "isViewingHomepage": false,
                 "movingCardIds": Array [],
                 "movingFromCollectionId": null,
                 "multiMoveCardIds": Array [],
@@ -10110,9 +10115,11 @@ exports[`TestDesigner renders snapshot 1`] = `
                 "openMoveMenu": [MockFunction],
                 "openOptionalMenus": [MockFunction],
                 "organizationMenuGroupId": null,
+                "organizationMenuOpen": false,
                 "organizationMenuPage": "organizationMenuPage",
                 "pageMenuOpen": false,
                 "popupAlert": [MockFunction],
+                "popupSnackbar": [MockFunction],
                 "removeNewCard": [MockFunction],
                 "resetSelectionAndBCT": [MockFunction],
                 "rolesMenuOpen": false,
@@ -10126,6 +10133,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                 "setSnoozeChecked": [MockFunction],
                 "setViewingCollection": [MockFunction],
                 "setViewingItem": [MockFunction],
+                "showPermissionsAlert": [MockFunction],
                 "stopDragging": [MockFunction],
                 "toggleEditingCardId": [MockFunction],
                 "trackEvent": [MockFunction],
@@ -10144,6 +10152,7 @@ exports[`TestDesigner renders snapshot 1`] = `
             "breadcrumb": Array [],
             "can_edit": false,
             "can_edit_content": false,
+            "can_view": true,
             "cardIds": Array [
               "10",
               "10",
@@ -10180,6 +10189,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                   ],
                   "can_edit": false,
+                  "can_view": true,
                   "data_content": Object {
                     "ops": Array [
                       Object {
@@ -10220,11 +10230,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "API_getNextAvailableTest": [MockFunction],
                       "API_updateCard": [MockFunction],
                       "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
                       "assign": [MockFunction],
                       "assignRef": [MockFunction],
                       "breadcrumb": Array [],
                       "can_edit": false,
                       "can_edit_content": false,
+                      "can_view": true,
                       "cardIds": Array [
                         "10",
                         "10",
@@ -10246,9 +10259,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "id": "1",
                       "inherited_tag_list": Array [],
                       "internalType": "collections",
+                      "isCollection": true,
                       "isNormalCollection": true,
                       "isSharedCollection": false,
                       "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
                       "master_template": false,
                       "meta": Object {
                         "snapshot": Object {
@@ -10297,6 +10314,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                   ],
                   "can_edit": false,
+                  "can_view": true,
                   "data_content": Object {
                     "ops": Array [
                       Object {
@@ -10337,11 +10355,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "API_getNextAvailableTest": [MockFunction],
                       "API_updateCard": [MockFunction],
                       "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
                       "assign": [MockFunction],
                       "assignRef": [MockFunction],
                       "breadcrumb": Array [],
                       "can_edit": false,
                       "can_edit_content": false,
+                      "can_view": true,
                       "cardIds": Array [
                         "10",
                         "10",
@@ -10363,9 +10384,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "id": "1",
                       "inherited_tag_list": Array [],
                       "internalType": "collections",
+                      "isCollection": true,
                       "isNormalCollection": true,
                       "isSharedCollection": false,
                       "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
                       "master_template": false,
                       "meta": Object {
                         "snapshot": Object {
@@ -10427,6 +10452,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                   ],
                   "can_edit": false,
+                  "can_view": true,
                   "data_content": Object {
                     "ops": Array [
                       Object {
@@ -10467,11 +10493,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "API_getNextAvailableTest": [MockFunction],
                       "API_updateCard": [MockFunction],
                       "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
                       "assign": [MockFunction],
                       "assignRef": [MockFunction],
                       "breadcrumb": Array [],
                       "can_edit": false,
                       "can_edit_content": false,
+                      "can_view": true,
                       "cardIds": Array [
                         "10",
                         "10",
@@ -10493,9 +10522,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "id": "1",
                       "inherited_tag_list": Array [],
                       "internalType": "collections",
+                      "isCollection": true,
                       "isNormalCollection": true,
                       "isSharedCollection": false,
                       "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
                       "master_template": false,
                       "meta": Object {
                         "snapshot": Object {
@@ -10544,6 +10577,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                   ],
                   "can_edit": false,
+                  "can_view": true,
                   "data_content": Object {
                     "ops": Array [
                       Object {
@@ -10584,11 +10618,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "API_getNextAvailableTest": [MockFunction],
                       "API_updateCard": [MockFunction],
                       "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
                       "assign": [MockFunction],
                       "assignRef": [MockFunction],
                       "breadcrumb": Array [],
                       "can_edit": false,
                       "can_edit_content": false,
+                      "can_view": true,
                       "cardIds": Array [
                         "10",
                         "10",
@@ -10610,9 +10647,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "id": "1",
                       "inherited_tag_list": Array [],
                       "internalType": "collections",
+                      "isCollection": true,
                       "isNormalCollection": true,
                       "isSharedCollection": false,
                       "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
                       "master_template": false,
                       "meta": Object {
                         "snapshot": Object {
@@ -10674,6 +10715,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                   ],
                   "can_edit": false,
+                  "can_view": true,
                   "data_content": Object {
                     "ops": Array [
                       Object {
@@ -10714,11 +10756,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "API_getNextAvailableTest": [MockFunction],
                       "API_updateCard": [MockFunction],
                       "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
                       "assign": [MockFunction],
                       "assignRef": [MockFunction],
                       "breadcrumb": Array [],
                       "can_edit": false,
                       "can_edit_content": false,
+                      "can_view": true,
                       "cardIds": Array [
                         "10",
                         "10",
@@ -10740,9 +10785,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "id": "1",
                       "inherited_tag_list": Array [],
                       "internalType": "collections",
+                      "isCollection": true,
                       "isNormalCollection": true,
                       "isSharedCollection": false,
                       "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
                       "master_template": false,
                       "meta": Object {
                         "snapshot": Object {
@@ -10791,6 +10840,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                   ],
                   "can_edit": false,
+                  "can_view": true,
                   "data_content": Object {
                     "ops": Array [
                       Object {
@@ -10831,11 +10881,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "API_getNextAvailableTest": [MockFunction],
                       "API_updateCard": [MockFunction],
                       "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
                       "assign": [MockFunction],
                       "assignRef": [MockFunction],
                       "breadcrumb": Array [],
                       "can_edit": false,
                       "can_edit_content": false,
+                      "can_view": true,
                       "cardIds": Array [
                         "10",
                         "10",
@@ -10857,9 +10910,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "id": "1",
                       "inherited_tag_list": Array [],
                       "internalType": "collections",
+                      "isCollection": true,
                       "isNormalCollection": true,
                       "isSharedCollection": false,
                       "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
                       "master_template": false,
                       "meta": Object {
                         "snapshot": Object {
@@ -10907,9 +10964,13 @@ exports[`TestDesigner renders snapshot 1`] = `
             "id": "1",
             "inherited_tag_list": Array [],
             "internalType": "collections",
+            "isCollection": true,
             "isNormalCollection": true,
             "isSharedCollection": false,
             "isUserCollection": false,
+            "links": Object {
+              "self": "https://www.shape.space/ideo/collections/1",
+            },
             "master_template": false,
             "meta": Object {
               "snapshot": Object {
@@ -10944,11 +11005,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                 "API_getNextAvailableTest": [MockFunction],
                 "API_updateCard": [MockFunction],
                 "API_updateName": [MockFunction],
+                "anyone_can_join": false,
+                "anyone_can_view": false,
                 "assign": [MockFunction],
                 "assignRef": [MockFunction],
                 "breadcrumb": Array [],
                 "can_edit": false,
                 "can_edit_content": false,
+                "can_view": true,
                 "cardIds": Array [
                   "10",
                   "10",
@@ -10985,6 +11049,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                       ],
                       "can_edit": false,
+                      "can_view": true,
                       "data_content": Object {
                         "ops": Array [
                           Object {
@@ -11019,6 +11084,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                       ],
                       "can_edit": false,
+                      "can_view": true,
                       "data_content": Object {
                         "ops": Array [
                           Object {
@@ -11066,6 +11132,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                       ],
                       "can_edit": false,
+                      "can_view": true,
                       "data_content": Object {
                         "ops": Array [
                           Object {
@@ -11100,6 +11167,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                       ],
                       "can_edit": false,
+                      "can_view": true,
                       "data_content": Object {
                         "ops": Array [
                           Object {
@@ -11147,6 +11215,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                       ],
                       "can_edit": false,
+                      "can_view": true,
                       "data_content": Object {
                         "ops": Array [
                           Object {
@@ -11181,6 +11250,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                       ],
                       "can_edit": false,
+                      "can_view": true,
                       "data_content": Object {
                         "ops": Array [
                           Object {
@@ -11214,9 +11284,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                 "id": "1",
                 "inherited_tag_list": Array [],
                 "internalType": "collections",
+                "isCollection": true,
                 "isNormalCollection": true,
                 "isSharedCollection": false,
                 "isUserCollection": false,
+                "links": Object {
+                  "self": "https://www.shape.space/ideo/collections/1",
+                },
                 "master_template": false,
                 "meta": Object {
                   "snapshot": Object {
@@ -11256,6 +11330,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                       ],
                       "can_edit": false,
+                      "can_view": true,
                       "data_content": Object {
                         "ops": Array [
                           Object {
@@ -11290,6 +11365,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                       ],
                       "can_edit": false,
+                      "can_view": true,
                       "data_content": Object {
                         "ops": Array [
                           Object {
@@ -11337,6 +11413,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                       ],
                       "can_edit": false,
+                      "can_view": true,
                       "data_content": Object {
                         "ops": Array [
                           Object {
@@ -11371,6 +11448,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                       ],
                       "can_edit": false,
+                      "can_view": true,
                       "data_content": Object {
                         "ops": Array [
                           Object {
@@ -11418,6 +11496,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                       ],
                       "can_edit": false,
+                      "can_view": true,
                       "data_content": Object {
                         "ops": Array [
                           Object {
@@ -11452,6 +11531,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                       ],
                       "can_edit": false,
+                      "can_view": true,
                       "data_content": Object {
                         "ops": Array [
                           Object {
@@ -11520,6 +11600,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                   ],
                   "can_edit": false,
+                  "can_view": true,
                   "data_content": Object {
                     "ops": Array [
                       Object {
@@ -11560,11 +11641,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "API_getNextAvailableTest": [MockFunction],
                       "API_updateCard": [MockFunction],
                       "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
                       "assign": [MockFunction],
                       "assignRef": [MockFunction],
                       "breadcrumb": Array [],
                       "can_edit": false,
                       "can_edit_content": false,
+                      "can_view": true,
                       "cardIds": Array [
                         "10",
                         "10",
@@ -11586,9 +11670,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "id": "1",
                       "inherited_tag_list": Array [],
                       "internalType": "collections",
+                      "isCollection": true,
                       "isNormalCollection": true,
                       "isSharedCollection": false,
                       "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
                       "master_template": false,
                       "meta": Object {
                         "snapshot": Object {
@@ -11637,6 +11725,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                   ],
                   "can_edit": false,
+                  "can_view": true,
                   "data_content": Object {
                     "ops": Array [
                       Object {
@@ -11677,11 +11766,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "API_getNextAvailableTest": [MockFunction],
                       "API_updateCard": [MockFunction],
                       "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
                       "assign": [MockFunction],
                       "assignRef": [MockFunction],
                       "breadcrumb": Array [],
                       "can_edit": false,
                       "can_edit_content": false,
+                      "can_view": true,
                       "cardIds": Array [
                         "10",
                         "10",
@@ -11703,9 +11795,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "id": "1",
                       "inherited_tag_list": Array [],
                       "internalType": "collections",
+                      "isCollection": true,
                       "isNormalCollection": true,
                       "isSharedCollection": false,
                       "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
                       "master_template": false,
                       "meta": Object {
                         "snapshot": Object {
@@ -11767,6 +11863,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                   ],
                   "can_edit": false,
+                  "can_view": true,
                   "data_content": Object {
                     "ops": Array [
                       Object {
@@ -11807,11 +11904,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "API_getNextAvailableTest": [MockFunction],
                       "API_updateCard": [MockFunction],
                       "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
                       "assign": [MockFunction],
                       "assignRef": [MockFunction],
                       "breadcrumb": Array [],
                       "can_edit": false,
                       "can_edit_content": false,
+                      "can_view": true,
                       "cardIds": Array [
                         "10",
                         "10",
@@ -11833,9 +11933,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "id": "1",
                       "inherited_tag_list": Array [],
                       "internalType": "collections",
+                      "isCollection": true,
                       "isNormalCollection": true,
                       "isSharedCollection": false,
                       "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
                       "master_template": false,
                       "meta": Object {
                         "snapshot": Object {
@@ -11884,6 +11988,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                   ],
                   "can_edit": false,
+                  "can_view": true,
                   "data_content": Object {
                     "ops": Array [
                       Object {
@@ -11924,11 +12029,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "API_getNextAvailableTest": [MockFunction],
                       "API_updateCard": [MockFunction],
                       "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
                       "assign": [MockFunction],
                       "assignRef": [MockFunction],
                       "breadcrumb": Array [],
                       "can_edit": false,
                       "can_edit_content": false,
+                      "can_view": true,
                       "cardIds": Array [
                         "10",
                         "10",
@@ -11950,9 +12058,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "id": "1",
                       "inherited_tag_list": Array [],
                       "internalType": "collections",
+                      "isCollection": true,
                       "isNormalCollection": true,
                       "isSharedCollection": false,
                       "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
                       "master_template": false,
                       "meta": Object {
                         "snapshot": Object {
@@ -12014,6 +12126,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                   ],
                   "can_edit": false,
+                  "can_view": true,
                   "data_content": Object {
                     "ops": Array [
                       Object {
@@ -12054,11 +12167,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "API_getNextAvailableTest": [MockFunction],
                       "API_updateCard": [MockFunction],
                       "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
                       "assign": [MockFunction],
                       "assignRef": [MockFunction],
                       "breadcrumb": Array [],
                       "can_edit": false,
                       "can_edit_content": false,
+                      "can_view": true,
                       "cardIds": Array [
                         "10",
                         "10",
@@ -12080,9 +12196,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "id": "1",
                       "inherited_tag_list": Array [],
                       "internalType": "collections",
+                      "isCollection": true,
                       "isNormalCollection": true,
                       "isSharedCollection": false,
                       "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
                       "master_template": false,
                       "meta": Object {
                         "snapshot": Object {
@@ -12131,6 +12251,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                   ],
                   "can_edit": false,
+                  "can_view": true,
                   "data_content": Object {
                     "ops": Array [
                       Object {
@@ -12171,11 +12292,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "API_getNextAvailableTest": [MockFunction],
                       "API_updateCard": [MockFunction],
                       "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
                       "assign": [MockFunction],
                       "assignRef": [MockFunction],
                       "breadcrumb": Array [],
                       "can_edit": false,
                       "can_edit_content": false,
+                      "can_view": true,
                       "cardIds": Array [
                         "10",
                         "10",
@@ -12197,9 +12321,13 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "id": "1",
                       "inherited_tag_list": Array [],
                       "internalType": "collections",
+                      "isCollection": true,
                       "isNormalCollection": true,
                       "isSharedCollection": false,
                       "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
                       "master_template": false,
                       "meta": Object {
                         "snapshot": Object {
