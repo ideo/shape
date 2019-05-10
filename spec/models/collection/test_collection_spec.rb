@@ -280,6 +280,7 @@ describe Collection::TestCollection, type: :model do
               .map { |card| card.record.class },
             ).to eq(
               [
+                Item::VideoItem,
                 Item::ChartItem,
                 Collection::TestDesign,
               ],
@@ -315,6 +316,19 @@ describe Collection::TestCollection, type: :model do
                   .question_items
                   .all?(&:test_open_responses_collection),
               ).to be true
+            end
+          end
+
+          context 'with media questions' do
+            let!(:test_collection) { create(:test_collection) }
+
+            it 'creates a media item link for each media item' do
+              test_collection.launch!(initiated_by: user)
+              expect(
+                test_collection
+                  .items
+                  .count,
+              ).to equal 4
             end
           end
 
