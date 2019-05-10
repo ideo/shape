@@ -161,8 +161,7 @@ RSpec.describe Roles::Inheritance, type: :service do
     end
   end
 
-  # private_child? is generally just doing !inherit_from_parent so we don't need to
-  # duplicate everything above
+  # private_child? is ultimately doing !inherit_from_parent, along with caching the value
   describe '#private_child?' do
     before do
       add_roles(Role::EDITOR, editors, collection)
@@ -207,6 +206,18 @@ RSpec.describe Roles::Inheritance, type: :service do
         add_roles(Role::EDITOR, editors, item)
         # the caching only checks for updated_at to the second, have to fudge that
         collection.roles.first.update(updated_at: 1.minute.from_now)
+        expect(inheritance.private_child?(item)).to be false
+        expect(item.cached_inheritance['private']).to be false
+        expect(item.cached_inheritance['updated_at']).not_to be nil
+      end
+    end
+
+    context 'with private = false' do
+      before do
+        add_roles(Role::EDITOR, editors, item)
+      end
+
+      it 'will cache the settings on the item' do
         expect(inheritance.private_child?(item)).to be false
         expect(item.cached_inheritance['private']).to be false
         expect(item.cached_inheritance['updated_at']).not_to be nil

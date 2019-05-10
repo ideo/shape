@@ -31,6 +31,9 @@ module Breadcrumb
 
     # Transforms collection ids into breadcrumb with collection names
     def viewable_to_api
+      unless @user.persisted?
+        return [breadcrumb_item_for_api(@object)]
+      end
       (viewable_collections + [@object]).map do |object|
         breadcrumb_item_for_api(object)
       end

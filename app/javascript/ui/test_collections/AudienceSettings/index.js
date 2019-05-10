@@ -6,7 +6,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { runInAction, observable, toJS } from 'mobx'
 
 import AudienceSettingsWidget from './AudienceSettingsWidget'
-import TestAudience from '~/stores//jsonApi/TestAudience'
+import TestAudience from '~/stores/jsonApi/TestAudience'
 
 @inject('apiStore')
 @observer
@@ -70,6 +70,10 @@ class AudienceSettings extends React.Component {
     })
   }
 
+  onSubmitSettings = () => {
+    this.saveAllTestAudiences()
+  }
+
   onToggleCheckbox = e => {
     const { apiStore } = this.props
     const id = e.target.value
@@ -84,28 +88,28 @@ class AudienceSettings extends React.Component {
     }
   }
 
-  handleKeyPress = event => {
-    if (event.key === 'Enter') {
-      // this.throttledSaveTestAudience.flush()
-    }
-  }
-
   onInputChange = (audienceId, value) => {
     const { apiStore } = this.props
     const audience = apiStore.find('audiences', audienceId)
     runInAction(() => {
       audience.currentTestAudience.sample_size = value
     })
-    // this.throttledSaveTestAudience(audience)
+    this.throttledSaveTestAudience(audience)
+  }
+
+  handleKeyPress = event => {
+    if (event.key === 'Enter') {
+      this.throttledSaveTestAudience.flush()
+    }
   }
 
   render() {
     return (
       <AudienceSettingsWidget
         onToggleCheckbox={this.onToggleCheckbox}
-        stopEditingIfContent={this.stopEditingIfContent}
         handleKeyPress={this.handleKeyPress}
         onInputChange={this.onInputChange}
+        onSubmitSettings={this.onSubmitSettings}
         totalPrice={this.totalPrice}
         audiences={this.audiences}
       />

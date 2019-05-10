@@ -247,14 +247,21 @@ class CollectionCover extends React.Component {
   }
 
   handleClick = e => {
-    const { dragging, uiStore } = this.props
+    const { dragging, uiStore, collection } = this.props
     const makingSelection =
       (e.metaKey || e.ctrlKey || e.shiftKey) && uiStore.selectedCardIds.length
     if (dragging || makingSelection) {
       e.preventDefault()
       return false
     }
-    return true
+
+    if (collection.can_view) return true
+
+    // User does not have permission to see collection
+    e.preventDefault()
+    e.stopPropagation()
+    uiStore.showPermissionsAlert()
+    return false
   }
 
   render() {
@@ -284,6 +291,7 @@ class CollectionCover extends React.Component {
                   className="no-select cancelGridClick"
                   onClick={this.handleClick}
                   to={routingStore.pathTo('collections', collection.id)}
+                  data-cy="collection-cover-link"
                 >
                   {this.name}
                 </PlainLink>

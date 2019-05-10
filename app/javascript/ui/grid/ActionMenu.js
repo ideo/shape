@@ -134,6 +134,7 @@ class ActionMenu extends React.Component {
 
   get menuItems() {
     const {
+      canView,
       canEdit,
       card,
       canReplace,
@@ -208,12 +209,10 @@ class ActionMenu extends React.Component {
         items = _.reject(items, { name: 'Move' })
       }
     } else {
-      const viewActions = [
-        'Duplicate',
-        'Link',
-        'Add to My Collection',
-        'Download',
-      ]
+      const viewActions = ['Link', 'Add to My Collection', 'Download']
+      if (canView) {
+        viewActions.unshift('Duplicate')
+      }
       if (location !== 'Search') {
         viewActions.push('Tags')
         viewActions.push('Sharing')
@@ -291,6 +290,7 @@ ActionMenu.propTypes = {
   wrapperClassName: PropTypes.string,
   location: PropTypes.string.isRequired,
   menuOpen: PropTypes.bool.isRequired,
+  canView: PropTypes.bool.isRequired,
   canEdit: PropTypes.bool.isRequired,
   canReplace: PropTypes.bool,
   submissionBox: PropTypes.bool,

@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
+import { uiStore } from '~/stores'
 
 import {
   fakeItemCard,
@@ -8,6 +9,8 @@ import {
   fakePosition,
   fakeCollection,
 } from '#/mocks/data'
+
+jest.mock('../../../app/javascript/stores/index')
 
 const props = {
   card: fakeItemCard,
@@ -27,6 +30,11 @@ const props = {
   isBoardCollection: false,
   holdingOver: false,
   dragOffset: { x: 0, y: 0 },
+}
+
+const fakeEvent = {
+  preventDefault: jest.fn(),
+  target: { className: '', closest: jest.fn() },
 }
 
 let wrapper, instance
@@ -134,6 +142,26 @@ describe('MovableGridCard', () => {
       it('calls scrollBy on scrollElement', () => {
         instance.scrollLeft()
         expect(props.scrollElement.scrollBy).toHaveBeenCalledWith(-2, 0)
+      })
+    })
+  })
+
+  describe('handleClick', () => {
+    it('does not call showPermissionsAlert', () => {
+      expect(props.record.can_view).toEqual(true)
+      wrapper.instance().handleClick(fakeEvent)
+      expect(uiStore.showPermissionsAlert).not.toHaveBeenCalled()
+    })
+
+    describe('if user cannot view', () => {
+      beforeEach(() => {
+        props.record.can_view = false
+        wrapper = shallow(<MovableGridCard {...props} />)
+      })
+
+      it('calls showPermissionsAlert', () => {
+        wrapper.instance().handleClick(fakeEvent)
+        expect(uiStore.showPermissionsAlert).toHaveBeenCalled()
       })
     })
   })

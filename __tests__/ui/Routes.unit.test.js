@@ -63,4 +63,16 @@ describe('Routes', () => {
       expect(wrapper.find('TermsOfUseModal').exists()).toBeTruthy()
     })
   })
+
+  describe('if session has not loaded', () => {
+    beforeEach(() => {
+      props.apiStore.sessionLoaded = false
+      wrapper = shallow(<Routes.wrappedComponent {...props} />)
+    })
+
+    it('returns loader without app wrapper', () => {
+      expect(wrapper.find('AppWrapper').exists()).toEqual(false)
+      expect(wrapper.find('Loader').exists()).toEqual(true)
+    })
+  })
 })

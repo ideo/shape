@@ -65,9 +65,9 @@ const valueComponent = classes => valueProps => {
   return <div className="Select-value">{children}</div>
 }
 
-const ITEM_HEIGHT = 48
+const ITEM_HEIGHT = 64
 
-const selectStyles = theme => ({
+const selectStyles = (theme, menuStyles = {}, numOptionsToShow = 3.5) => ({
   clearIndicator: () => ({}),
   container: () => ({}),
   control: () => ({
@@ -97,12 +97,11 @@ const selectStyles = theme => ({
     ...base,
     borderRadius: '0px',
     backgroundColor: 'white',
-    width: '370px',
-    zIndex: 2,
+    ...menuStyles,
   }),
   menuList: base => ({
     ...base,
-    maxHeight: `${ITEM_HEIGHT * 3.5}px`,
+    maxHeight: `${ITEM_HEIGHT * numOptionsToShow}px`,
   }),
   multiValue: () => ({}),
   multiValueLabel: () => ({}),
@@ -133,6 +132,8 @@ const SelectWrapped = props => {
     optionSearch,
     menuPlacement,
     keepMenuClosed,
+    menuStyles,
+    numOptionsToShow,
     ...other
   } = props
   if (keepMenuClosed) {
@@ -145,7 +146,7 @@ const SelectWrapped = props => {
         loadOptions={optionSearch}
         defaultOptions
         menuPlacement={menuPlacement}
-        styles={selectStyles(theme)}
+        styles={selectStyles(theme, menuStyles, numOptionsToShow)}
         components={{
           valueComponent: valueComponent(classes),
           LoadingIndicator,
@@ -160,7 +161,7 @@ const SelectWrapped = props => {
     <AsyncCreatable
       loadOptions={optionSearch}
       defaultOptions
-      styles={selectStyles(theme)}
+      styles={selectStyles(theme, menuStyles, numOptionsToShow)}
       formatCreateLabel={inputValue => `Invite email ${inputValue}`}
       menuPlacement={menuPlacement}
       components={{
@@ -179,7 +180,7 @@ const SelectWrapped = props => {
     />
   ) : (
     <Select
-      styles={selectStyles(theme)}
+      styles={selectStyles(theme, menuStyles, numOptionsToShow)}
       menuPlacement={menuPlacement}
       components={{
         valueComponent: valueComponent(classes),
@@ -246,6 +247,8 @@ class AutoComplete extends React.Component {
       menuPlacement,
       keepMenuClosed,
       creatable,
+      menuStyles,
+      numOptionsToShow,
     } = this.props
     const { option } = this.state
     return (
@@ -255,6 +258,8 @@ class AutoComplete extends React.Component {
           inputComponent={SelectWrappedWithStyles}
           inputProps={{
             classes,
+            menuStyles,
+            numOptionsToShow,
             multi: true,
             value: keepSelectedOptions ? option : null,
             options,
@@ -267,6 +272,7 @@ class AutoComplete extends React.Component {
             instanceId: 'react-select-chip',
             id: 'react-select-chip',
             name: 'react-select-chip',
+            className: 'react-select-chip',
             promptTextCreator: label => `Invite email ${label}`,
             simpleValue: true,
           }}
@@ -296,6 +302,11 @@ AutoComplete.propTypes = {
   value: PropTypes.number,
   menuPlacement: PropTypes.string,
   keepMenuClosed: PropTypes.bool,
+  numOptionsToShow: PropTypes.number,
+  menuStyles: PropTypes.shape({
+    width: PropTypes.string,
+    zIndex: PropTypes.number,
+  }),
 }
 
 AutoComplete.defaultProps = {
@@ -307,6 +318,11 @@ AutoComplete.defaultProps = {
   optionSearch: null,
   menuPlacement: 'bottom',
   keepMenuClosed: false,
+  numOptionsToShow: 3.5,
+  menuStyles: {
+    width: '370px',
+    zIndex: 2,
+  },
 }
 
 export default withStyles(styles)(AutoComplete)

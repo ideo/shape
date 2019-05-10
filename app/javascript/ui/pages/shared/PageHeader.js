@@ -21,6 +21,7 @@ import { SubduedHeading1 } from '~/ui/global/styled/typography'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import { FormButton } from '~/ui/global/styled/forms'
 import v from '~/utils/variables'
+import routeToLogin from '~/utils/routeToLogin'
 /* global IdeoSSO */
 
 const IconHolder = styled.span`
@@ -127,6 +128,7 @@ class PageHeader extends React.Component {
 
   get hiddenIcon() {
     const { record } = this.props
+    if (!record.can_view) return null
     if (record.is_private || this.isCurrentlyHiddenSubmission) {
       return (
         <HiddenIconButton
@@ -231,6 +233,20 @@ class PageHeader extends React.Component {
     return null
   }
 
+  get joinCollectionButton() {
+    const { record } = this.props
+    if (!record.isPublicJoinable) return null
+    return (
+      <HeaderFormButton
+        style={{ marginLeft: '1rem' }}
+        color={v.colors.primaryDarkest}
+        onClick={() => routeToLogin({ redirect: record.frontend_url })}
+      >
+        Join
+      </HeaderFormButton>
+    )
+  }
+
   render() {
     const { record, uiStore } = this.props
     const tagEditorOpen =
@@ -286,6 +302,7 @@ class PageHeader extends React.Component {
                   </HeaderFormButton>
                 )}
                 {this.launchTestButton}
+                {this.joinCollectionButton}
                 {record.isLiveTest && (
                   <Fragment>
                     <CopyToClipboard

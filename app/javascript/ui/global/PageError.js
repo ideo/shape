@@ -16,7 +16,7 @@ class PageError extends React.PureComponent {
     return (
       <div>
         <PageContainer>
-          <div style={{ textAlign: 'center' }}>
+          <div style={{ marginTop: '4rem', textAlign: 'center' }}>
             <Heading1>Oh no!</Heading1>
             <DisplayText>{content}</DisplayText>
           </div>

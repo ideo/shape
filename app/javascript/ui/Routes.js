@@ -13,7 +13,6 @@ import Header from '~/ui/layout/Header'
 import CreateOrgPage from '~/ui/pages/CreateOrgPage'
 import {
   CollectionApiWrapper,
-  MyCollectionApiWrapper,
   ItemApiWrapper,
 } from '~/ui/pages/PageWithApiWrapper'
 import Loader from '~/ui/layout/Loader'
@@ -83,8 +82,10 @@ class Routes extends React.Component {
 
   componentDidMount() {
     const { apiStore } = this.props
-    apiStore.loadCurrentUser().then(() => {
-      firebaseClient.authenticate(apiStore.currentUser.google_auth_token)
+    apiStore.loadCurrentUser({
+      onSuccess: currentUser => {
+        firebaseClient.authenticate(currentUser.google_auth_token)
+      },
     })
     document.addEventListener('keydown', captureGlobalKeypress)
   }
@@ -169,13 +170,24 @@ class Routes extends React.Component {
     }
   }
 
+  goToRoot = () => {
+    const { apiStore } = this.props
+    if (apiStore.currentOrgSlug) {
+      return <Redirect to={`/${apiStore.currentOrgSlug}`} />
+    } else {
+      return <CreateOrgPage />
+    }
+  }
+
   render() {
     const { apiStore, routingStore } = this.props
-    if (!apiStore.currentUser) {
+    const { sessionLoaded, currentUser } = apiStore
+    if (!sessionLoaded) {
       return <Loader />
     }
     const displayTermsPopup =
-      !apiStore.currentUser.terms_accepted &&
+      currentUser &&
+      !currentUser.terms_accepted &&
       !routingStore.pathContains('/terms')
 
     const {
@@ -201,26 +213,15 @@ class Routes extends React.Component {
             <ZendeskWidget />
 
             <Header />
+
             <FixedBoundary className="fixed_boundary" data-empty-space-click />
             <FixedActivityLogWrapper>
               <ActivityLogBox />
             </FixedActivityLogWrapper>
-            {displayTermsPopup && (
-              <TermsOfUseModal currentUser={apiStore.currentUser} />
-            )}
+            {displayTermsPopup && <TermsOfUseModal currentUser={currentUser} />}
             {/* Switch will stop when it finds the first matching path */}
             <Switch>
-              <Route
-                exact
-                path="/"
-                render={() =>
-                  apiStore.currentOrgSlug ? (
-                    <Redirect to={`/${apiStore.currentOrgSlug}`} />
-                  ) : (
-                    <CreateOrgPage />
-                  )
-                }
-              />
+              <Route exact path="/" render={this.goToRoot} />
               {/* These routes are doubled up so that the non-org route
                 will route you to the org one */}
               <Route path="/collections/:id" component={CollectionApiWrapper} />
@@ -280,7 +281,7 @@ class Routes extends React.Component {
               <Route
                 exact
                 path="/:org"
-                render={props => <MyCollectionApiWrapper {...props} />}
+                render={props => <CollectionApiWrapper {...props} />}
               />
             </Switch>
           </MuiThemeProvider>

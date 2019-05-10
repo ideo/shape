@@ -3,6 +3,7 @@ import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
 import Organization from '~/stores/jsonApi/Organization'
 import { fakeGroup } from '#/mocks/data'
 import fakeApiStore from '#/mocks/fakeApiStore'
+import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 
 jest.mock('../../../app/javascript/stores/jsonApi/Organization')
@@ -19,6 +20,7 @@ describe('OrganizationMenu', () => {
     props = {
       apiStore,
       uiStore: fakeUiStore,
+      routingStore: fakeRoutingStore,
       open: true,
       onClose: jest.fn(),
       organization: {
@@ -139,6 +141,7 @@ describe('OrganizationMenu', () => {
       createFn = jest.fn().mockReturnValue(Promise.resolve({}))
       Organization.mockImplementation(() => ({
         id: 3,
+        slug: 'sluggity',
         create: createFn,
         assign: jest.fn(),
       }))
@@ -146,9 +149,7 @@ describe('OrganizationMenu', () => {
     })
 
     it('should switch to the new organization', () => {
-      expect(
-        props.apiStore.currentUser.switchOrganization
-      ).toHaveBeenCalledWith(3, { redirectPath: 'homepage' })
+      expect(props.routingStore.routeTo).toHaveBeenCalledWith('/sluggity')
     })
 
     it('should set the uiStore state', () => {
