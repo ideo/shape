@@ -1,3 +1,5 @@
+# modified from https://gist.github.com/brysgo/9980344
+
 CHECKING_OUT_BRANCH=$3
 OLD_BRANCH=$1
 NEW_BRANCH=$2
@@ -16,9 +18,9 @@ if [ $CHECKING_OUT_BRANCH -eq 1 ]
     fi
 
     # check if we need to do a yarn install
-    PACKAGE_CHANGED=`echo "$FILES_CHANGED" | egrep 'M\tpackage.json'`
+    PACKAGE_CHANGED=`echo "$FILES_CHANGED" | egrep 'M\tyarn.lock'`
     if [ ! -z "$PACKAGE_CHANGED" ]; then
-      echo "Your package.json has changed, running yarn"
+      echo "Your yarn.lock has changed, running yarn"
       yarn
     fi
 
