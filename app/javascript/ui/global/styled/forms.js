@@ -414,7 +414,7 @@ export const CommentForm = styled.form`
   .textarea-input {
     background: ${v.colors.secondaryMedium};
     font-family: ${v.fonts.sans};
-    width: 100%;
+    padding: 10px;
   }
 `
 CommentForm.displayName = 'CommentForm'

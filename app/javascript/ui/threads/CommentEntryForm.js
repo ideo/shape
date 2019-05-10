@@ -154,7 +154,6 @@ class CommentEntryForm extends React.Component {
             onChange={this.handleInputChange}
             handleSubmit={this.handleSubmit}
             setEditor={this.setEditor}
-            readOnly={false}
           />
         </div>
         <EnterButton focused={this.state.focused}>
