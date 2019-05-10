@@ -3,6 +3,7 @@ class CommentUpdater < SimpleService
     @comment = comment
     @message = message
     @draftjs_data = draftjs_data
+    @previous_mentions = comment.mentions
   end
 
   def call
@@ -11,6 +12,7 @@ class CommentUpdater < SimpleService
     if @comment.save
       @comment.store_in_firestore
       create_edited_activity
+      create_mention_notifications
       return true
     end
 
@@ -25,11 +27,28 @@ class CommentUpdater < SimpleService
   end
 
   def create_edited_activity
+    ActivityAndNotificationBuilder.call(
+      actor: @comment.author,
+      target: @comment.comment_thread.record,
+      action: :edited_comment,
+      content: @comment.message,
+    )
+  end
+
+  def create_mention_notifications
+    mentions = @comment.mentions
+    newly_mentioned_user_ids = mentions[:user_ids] - @previous_mentions[:user_ids]
+    newly_mentioned_group_ids = mentions[:group_ids] - @previous_mentions[:group_ids]
+    if newly_mentioned_user_ids.present? || newly_mentioned_group_ids.present?
       ActivityAndNotificationBuilder.call(
         actor: @comment.author,
         target: @comment.comment_thread.record,
-        action: :edited_comment,
+        action: :mentioned,
+        subject_user_ids: newly_mentioned_user_ids,
+        subject_group_ids: newly_mentioned_group_ids,
+        combine: true,
         content: @comment.message,
       )
+    end
   end
 end
