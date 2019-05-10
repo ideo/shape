@@ -56,7 +56,7 @@ const StyledDialog = styled(Dialog)`
   }
 `
 const StyledLogo = styled(Logo)`
-  margin: 16px auto 100px;
+  margin: 16px auto 50px;
 `
 
 @observer
@@ -120,7 +120,7 @@ class TermsOfUseModal extends React.Component {
       >
         <DialogContent>
           <form onSubmit={this.handleSubmit}>
-            <StyledLogo width={128} />
+            <StyledLogo withText width={128} />
             <Heading1 wrapLine>Hello {currentUser.first_name}!</Heading1>
             <p>
               {showBillingInformation
