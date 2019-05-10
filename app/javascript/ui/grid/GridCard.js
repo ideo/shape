@@ -416,6 +416,7 @@ class GridCard extends React.Component {
                 className="show-on-hover"
                 wrapperClassName="card-menu"
                 card={card}
+                canView={record.can_view}
                 canEdit={this.canEditCard}
                 canReplace={record.canReplace && !card.link && !searchResult}
                 direction={uiStore.cardMenuOpen.direction}

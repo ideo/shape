@@ -245,6 +245,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.find('organizations', this.organization_id)
   }
 
+  get isCollection() {
+    return true
+  }
+
   get isUserCollection() {
     return this.type === 'Collection::UserCollection'
   }
@@ -295,6 +299,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get isBoard() {
     return this.type === 'Collection::Board'
+  }
+
+  get isPublicJoinable() {
+    return this.anyone_can_join && !this.apiStore.currentUser
   }
 
   get requiresSubmissionBoxSettings() {
@@ -403,11 +411,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get isOrgTemplateCollection() {
     return this.is_org_template_collection
-  }
-
-  // disable cardMenu actions for certain collections
-  get menuDisabled() {
-    return this.isSharedCollection
   }
 
   @computed
@@ -651,16 +654,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       _.each(this.sortedCards, (card, i) => {
         card.order = i
       })
-    }
-  }
-
-  checkCurrentOrg() {
-    const { currentUser } = this.apiStore
-    if (!currentUser) return
-    if (
-      this.organization_id.toString() !== currentUser.current_organization.id
-    ) {
-      currentUser.switchOrganization(this.organization_id)
     }
   }
 

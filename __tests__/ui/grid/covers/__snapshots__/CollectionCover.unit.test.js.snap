@@ -26,6 +26,7 @@ exports[`CollectionCover renders snapshot 1`] = `
         >
           <PlainLink
             className="no-select cancelGridClick"
+            data-cy="collection-cover-link"
             onClick={[Function]}
             to="//collections/1"
           >

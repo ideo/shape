@@ -3,6 +3,28 @@ require 'rails_helper'
 describe Api::V1::CollectionsController, type: :request, json: true, auth: true do
   let(:user) { @user }
 
+  context 'with anonymous (logged-out) user', auth: false do
+    describe 'GET #show' do
+      let(:path) { "/api/v1/collections/#{collection.id}" }
+
+      context 'with a normal collection' do
+        let(:collection) { create(:collection) }
+        it 'returns a 401' do
+          get(path)
+          expect(response.status).to eq(401)
+        end
+      end
+
+      context 'with an anyone_can_view collection' do
+        let(:collection) { create(:collection, anyone_can_view: true) }
+        it 'returns a 200' do
+          get(path)
+          expect(response.status).to eq(200)
+        end
+      end
+    end
+  end
+
   context 'with API user' do
     let!(:api_user) { create(:user, :application_bot) }
     before do
@@ -189,6 +211,19 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       it 'should return a 404' do
         get(path)
         expect(response.status).to eq(404)
+      end
+    end
+
+    context 'on different org' do
+      let!(:other_org) { create(:organization, member: user) }
+      let!(:collection) do
+        create(:collection, organization: other_org, add_viewers: [user])
+      end
+
+      it 'should switch the user to the org' do
+        get(path)
+        expect(response.status).to eq(200)
+        expect(user.current_organization).to eq other_org
       end
     end
   end

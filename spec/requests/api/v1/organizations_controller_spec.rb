@@ -196,6 +196,22 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
     end
   end
 
+  describe 'GET #my_collection' do
+    let!(:organization) { create(:organization, slug: Faker::Internet.slug(nil, '-')) }
+    let!(:user_collection) do
+      create(:user_collection, organization: organization, add_editors: [user])
+    end
+    let(:path) { "/api/v1/organizations/#{organization.slug}/my_collection" }
+
+    before do
+      user.add_role(Role::MEMBER, organization.primary_group)
+    end
+
+    it 'redirects to show the user collection' do
+      expect(get(path)).to redirect_to(api_v1_collection_path(user_collection))
+    end
+  end
+
   describe 'POST #create', vcr: { match_requests_on: %i[host path] } do
     let(:path) { '/api/v1/organizations/' }
     let!(:current_user) { create(:user) }
