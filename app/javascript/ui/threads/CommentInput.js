@@ -117,7 +117,7 @@ class CommentInput extends React.Component {
   }
 
   render() {
-    const { onChange, editorState, readOnly } = this.props
+    const { onChange, editorState } = this.props
     const { MentionSuggestions } = this.mentionPlugin
     MentionSuggestions.displayName = 'MentionSuggestions'
     const plugins = [this.mentionPlugin, this.linkifyPlugin]
@@ -125,7 +125,6 @@ class CommentInput extends React.Component {
     return (
       <StyledCommentInput editing onClick={this.focus}>
         <Editor
-          readOnly={readOnly}
           editorState={editorState}
           onChange={onChange}
           handleReturn={this.handleReturn}
@@ -153,7 +152,6 @@ CommentInput.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   setEditor: PropTypes.func.isRequired,
   editorState: MobxPropTypes.objectOrObservableObject.isRequired,
-  readOnly: PropTypes.bool.isRequired,
 }
 CommentInput.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,

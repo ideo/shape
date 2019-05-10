@@ -31,8 +31,8 @@ describe('Comment', () => {
     )
   })
 
-  it('renders a read only form', () => {
-    expect(wrapper.find('.message').text()).toEqual('<styled.form />')
+  it('renders the message', () => {
+    expect(wrapper.find('.message').text()).toEqual(props.comment.message)
   })
 
   it('renders the timestamp', () => {

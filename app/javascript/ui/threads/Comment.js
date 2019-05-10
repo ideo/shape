@@ -78,6 +78,7 @@ const Timestamp = styled.span`
 
 const StyledForm = styled.form`
   position: relative;
+  min-height: 50px;
 `
 
 const EnterButton = styled.button`
@@ -102,6 +103,12 @@ const EnterButton = styled.button`
 const CancelEditButton = styled.button`
   width: 22px;
   height: 22px;
+`
+
+const EditedIndicator = styled.span`
+  color: ${v.colors.secondaryDarkest};
+  font-size: 0.75rem;
+  padding-left: 10px;
 `
 
 class Comment extends React.Component {
@@ -135,21 +142,34 @@ class Comment extends React.Component {
   }
 
   renderMessage() {
+    const { comment } = this.props
+
     return (
-      <StyledForm onSubmit={this.handleSubmit}>
-        <CommentInput
-          editorState={this.state.editorState}
-          onChange={this.handleInputChange}
-          handleSubmit={this.handleSubmit}
-          setEditor={this.setEditor}
-          readOnly={!this.state.editing}
-        />
-        {this.state.editing && (
-          <EnterButton className="test-update-comment">
-            <ReturnArrowIcon />
-          </EnterButton>
+      <React.Fragment>
+        {!this.state.editing && (
+          <div>
+            {comment.message}
+            {comment.updated_at > comment.created_at && (
+              <EditedIndicator className="test-edited-indicator">
+                (edited)
+              </EditedIndicator>
+            )}
+          </div>
         )}
-      </StyledForm>
+        {this.state.editing && (
+          <StyledForm onSubmit={this.handleSubmit}>
+            <CommentInput
+              editorState={this.state.editorState}
+              onChange={this.handleInputChange}
+              handleSubmit={this.handleSubmit}
+              setEditor={this.setEditor}
+            />
+            <EnterButton className="test-update-comment">
+              <ReturnArrowIcon />
+            </EnterButton>
+          </StyledForm>
+        )}
+      </React.Fragment>
     )
   }
 
@@ -288,12 +308,7 @@ class Comment extends React.Component {
           </FlexPushRight>
         </InlineRow>
 
-        <div className="message">
-          {this.renderMessage()}
-          {comment.updated_at > comment.created_at && (
-            <span className="test-edited-indicator">(edited)</span>
-          )}
-        </div>
+        <div className="message">{this.renderMessage()}</div>
       </StyledComment>
     )
   }
