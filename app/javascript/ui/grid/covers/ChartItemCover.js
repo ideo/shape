@@ -26,6 +26,17 @@ const CoverContainer = styled.div`
   padding: 16px;
 `
 
+const UnPaddedHeading1 = styled(Heading1)`
+  margin-top: 0;
+  margin-bottom: 5px;
+  @media only screen and (max-width: ${v.responsive.largeBreakpoint}px) {
+    padding: 0;
+  }
+`
+const UnPaddedHeading3 = styled(Heading3)`
+  margin-bottom: 0;
+`
+
 const Tick = props => {
   const emoji = props.emojiScale[props.index]
   if (!emoji) return <div />
@@ -112,8 +123,12 @@ class ChartItemCover extends React.Component {
       <CoverContainer data-cy="ChartItemCover">
         {this.question && (
           <div>
-            <Heading1>{this.mapQuestionType.questionTitle}</Heading1>
-            <Heading3>{this.mapQuestionType.questionText}</Heading3>
+            <UnPaddedHeading1>
+              {this.mapQuestionType.questionTitle}
+            </UnPaddedHeading1>
+            <UnPaddedHeading3>
+              {this.mapQuestionType.questionText}
+            </UnPaddedHeading3>
           </div>
         )}
         <VictoryChart
