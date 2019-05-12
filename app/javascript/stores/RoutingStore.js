@@ -66,6 +66,7 @@ class RoutingStore extends RouterStore {
   }
 
   leaveSearch = () => {
+    if (!this.isSearch) return
     if (this.previousPageBeforeSearch) {
       this.routeTo(this.previousPageBeforeSearch)
     } else {
