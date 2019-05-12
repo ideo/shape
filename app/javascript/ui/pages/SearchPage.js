@@ -22,7 +22,7 @@ class SearchPage extends React.Component {
   total = 0
 
   componentDidMount() {
-    const { uiStore, routingStore, location } = this.props
+    const { uiStore, location } = this.props
     const query = this.searchQuery(location)
     // initialize SearchBar to the queryString, e.g. when directly loading a search URL
     uiStore.update('searchText', query)
@@ -32,7 +32,6 @@ class SearchPage extends React.Component {
 
   @action
   componentDidUpdate(prevProps) {
-    const { routingStore, location } = this.props
     if (this.requiresFetch(prevProps)) {
       // NOTE: important to do this here to "reset" infinite scroll!
       this.searchResults.replace([])
