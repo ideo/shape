@@ -23,6 +23,7 @@ class Role < ApplicationRecord
   CONTENT_EDITOR = :content_editor
   MEMBER = :member
   ADMIN = :admin
+  SHAPE_ADMIN = :shape_admin
   SUPER_ADMIN = :super_admin
   APPLICATION_USER = :application_user
 
