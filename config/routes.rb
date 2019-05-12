@@ -157,6 +157,10 @@ Rails.application.routes.draw do
     end
   end
 
+  namespace :admin do
+    root to: 'dashboard#index'
+  end
+
   authenticate :user, ->(u) { Rails.env.development? || u.has_cached_role?(Role::SUPER_ADMIN) } do
     require 'sidekiq/web'
     require 'sidekiq-scheduler/web'
