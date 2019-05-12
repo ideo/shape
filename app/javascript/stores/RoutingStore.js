@@ -12,6 +12,11 @@ class RoutingStore extends RouterStore {
   slug = () => apiStore.currentOrgSlug
 
   @computed
+  get isSearch() {
+    return this.location.pathname === this.pathTo('search')
+  }
+
+  @computed
   get query() {
     return queryString.parse(this.location.search)
   }
@@ -24,9 +29,9 @@ class RoutingStore extends RouterStore {
         return `/${this.slug()}/items/${id}`
       case 'search':
         // `id` means query in this case
-        // if no query, then go back to homepage (e.g. clearing out your search)
-        if (!id) return this.pathTo('homepage')
-        return `/${this.slug()}/search?q=${id.replace(/\s/g, '+')}`
+        const path = `/${this.slug()}/search`
+        const qs = id ? `?q=${encodeURIComponent(id)}` : ''
+        return `${path}${qs}`
       case 'homepage':
       default:
         return `/${this.slug()}`
@@ -41,7 +46,7 @@ class RoutingStore extends RouterStore {
     uiStore.update('rolesMenuOpen', null)
     uiStore.setViewingCollection(null)
     uiStore.closeDialog()
-    if (!id && type !== 'homepage') {
+    if (!id && type !== 'homepage' && type !== 'search') {
       // in this case, type is a path like '/' or '/terms'
       this.push(type)
       return
