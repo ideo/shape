@@ -18,4 +18,8 @@ class SerializableTestCollection < SerializableSimpleCollection
   attribute :is_submission_test do
     @object.submission_test?
   end
+
+  attribute :gives_incentive do
+    @object.try(:gives_incentive?)
+  end
 end

@@ -168,6 +168,7 @@ class TestQuestion extends React.Component {
         }
         return (
           <FinishQuestion
+            givesIncentive={parent.gives_incentive}
             submissionBox={
               parent.is_submission_box_template_test ||
               parent.is_submission_test

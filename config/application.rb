@@ -34,5 +34,6 @@ module Shape
     config.middleware.use Rack::Deflater
 
     ::IDEO_PRODUCTS_GROUP_ID = 27
+    ::FEEDBACK_INCENTIVE_AMOUNT = BigDecimal('2.00')
   end
 end

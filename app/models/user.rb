@@ -46,6 +46,7 @@ class User < ApplicationRecord
   has_many :activities_as_subject, through: :activity_subjects, class_name: 'Activity'
   has_many :activity_subjects, as: :subject
   has_many :notifications
+  has_many :feedback_incentive_records
 
   has_many :user_profiles,
            class_name: 'Collection::UserProfile',
@@ -371,6 +372,11 @@ class User < ApplicationRecord
 
   def bot_user?
     application.present?
+  end
+
+  def current_incentive_balance
+    last_record = feedback_incentive_records.order(created_at: :desc).first
+    last_record ? last_record.current_balance : 0
   end
 
   private
