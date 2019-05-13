@@ -34,7 +34,10 @@ beforeEach(() => {
 
 describe('SearchPage', () => {
   it('makes an API call to fetch the search results', () => {
-    expect(apiStore.request).toBeCalledWith(`search?query=${query}&page=1`)
+    const { slug } = apiStore.currentUserOrganization
+    expect(apiStore.request).toBeCalledWith(
+      `organizations/${slug}/search?query=${query}&page=1`
+    )
   })
 
   it('displays the "no results" message by default', () => {

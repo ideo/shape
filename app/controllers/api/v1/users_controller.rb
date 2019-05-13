@@ -1,5 +1,5 @@
 class Api::V1::UsersController < Api::V1::BaseController
-  skip_before_action :check_api_authentication!, only: :create_limited_user
+  skip_before_action :check_api_authentication!, only: %i[me create_limited_user]
   load_and_authorize_resource only: %i[show]
   def show
     render jsonapi: @user, include: [
@@ -10,17 +10,21 @@ class Api::V1::UsersController < Api::V1::BaseController
   end
 
   def me
-    current_user.update_attributes(last_active_at: Time.current)
-    render jsonapi: current_user, include: [
-      :groups,
-      organizations: %i[primary_group],
-      current_organization: %i[primary_group guest_group admin_group terms_text_item],
-    ], class: {
-      User: SerializableCurrentUser,
-      Group: SerializableGroup,
-      Organization: SerializableOrganization,
-      'Item::TextItem': SerializableItem,
-    }
+    if user_signed_in? || current_api_token.present?
+      current_user.update_attributes(last_active_at: Time.current)
+      render jsonapi: current_user, include: [
+        :groups,
+        organizations: %i[primary_group],
+        current_organization: %i[primary_group guest_group admin_group terms_text_item],
+      ], class: {
+        User: SerializableCurrentUser,
+        Group: SerializableGroup,
+        Organization: SerializableOrganization,
+        'Item::TextItem': SerializableItem,
+      }
+    else
+      render jsonapi: User.new
+    end
   end
 
   # Create new pending users from email addresses
@@ -41,23 +45,6 @@ class Api::V1::UsersController < Api::V1::BaseController
       render jsonapi: current_user, class: {
         User: SerializableCurrentUser,
       }
-    else
-      render_api_errors current_user.errors
-    end
-  end
-
-  before_action :load_and_authorize_organization, only: %i[switch_org]
-  def switch_org
-    if current_user.switch_to_organization(@organization)
-      render jsonapi: current_user,
-             include: [
-               :groups, organizations: [:primary_group], current_organization: %i[primary_group guest_group]
-             ],
-             class: {
-               User: SerializableCurrentUser,
-               Group: SerializableGroup,
-               Organization: SerializableOrganization,
-             }
     else
       render_api_errors current_user.errors
     end

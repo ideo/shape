@@ -1,19 +1,28 @@
-import _ from 'lodash'
-import { toJS } from 'mobx'
+import { isEmpty } from 'lodash'
+import { toJS, runInAction } from 'mobx'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
-import { EditorState, convertFromRaw } from 'draft-js'
-import Editor from 'draft-js-plugins-editor'
-import createMentionPlugin from 'draft-js-mention-plugin'
-import createLinkifyPlugin from 'draft-js-linkify-plugin'
+import { EditorState, convertFromRaw, convertToRaw } from 'draft-js'
+import styled from 'styled-components'
 
 import v from '~/utils/variables'
 import { DisplayText } from '~/ui/global/styled/typography'
 import { InlineRow } from '~/ui/global/styled/layout'
+import { CommentEnterButton } from '~/ui/global/styled/forms'
 import Moment from '~/ui/global/Moment'
 import Avatar from '~/ui/global/Avatar'
 import { StyledCommentInput } from './CustomCommentMentions'
+import { apiStore, uiStore } from '~/stores'
+import TrashLgIcon from '~/ui/icons/TrashLgIcon'
+import EditPencilIcon from '~/ui/icons/EditPencilIcon'
+import { showOnHoverCss, hideOnHoverCss } from '~/ui/grid/shared'
+import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
+import XIcon from '~/ui/icons/XIcon'
+import Tooltip from '~/ui/global/Tooltip'
+import CommentInput from './CommentInput'
 
 const StyledComment = StyledCommentInput.extend`
+  ${showOnHoverCss};
+  ${hideOnHoverCss};
   padding: 10px;
   margin-bottom: 5px;
   background: ${props =>
@@ -37,49 +46,204 @@ const StyledComment = StyledCommentInput.extend`
   }
 `
 
+export const StyledCommentActions = styled.div`
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  height: 32px;
+
+  svg {
+    color: ${v.colors.commonDark};
+    &:hover {
+      color: ${v.colors.commonLight};
+    }
+  }
+`
+
+const FlexPushRight = styled.div`
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  position: relative;
+`
+
+const ActionButton = styled.button`
+  width: 32px;
+  height: 32px;
+`
+
+const Timestamp = styled.span`
+  position: absolute;
+  right: 0;
+`
+
+const StyledForm = styled.form`
+  position: relative;
+  min-height: 50px;
+`
+
+const EditEnterButton = styled(CommentEnterButton)`
+  position: absolute;
+  right: 0;
+  bottom: 0;
+`
+
+const CancelEditButton = styled.button`
+  width: 22px;
+  height: 22px;
+`
+CancelEditButton.displayName = 'CancelEditButton'
+
+const EditedIndicator = styled.span`
+  color: ${v.colors.secondaryDarkest};
+  font-size: 0.75rem;
+  padding-left: 10px;
+`
+EditedIndicator.displayName = 'EditedIndicator'
+
 class Comment extends React.Component {
   constructor(props) {
     super(props)
-    this.mentionPlugin = createMentionPlugin()
-    this.linkifyPlugin = createLinkifyPlugin({ target: '_blank' })
+    this.handleEscape = this.handleEscape.bind(this)
     this.state = {
       editorState: EditorState.createEmpty(),
+      editing: false,
+      updating: false,
     }
   }
 
-  componentWillMount() {
+  componentDidMount() {
+    this.initializeEditorState()
+    document.addEventListener('keydown', this.handleEscape, false)
+  }
+
+  componentWillUnmount() {
+    this.editor = null
+    document.removeEventListener('keydown', this.handleEscape, false)
+  }
+
+  initializeEditorState() {
     const { comment } = this.props
     const draftjsData = toJS(comment.draftjs_data)
-    if (!_.isEmpty(draftjsData)) {
-      const contentState = convertFromRaw(draftjsData)
-      const editorState = EditorState.createWithContent(contentState)
-      this.setState({ editorState })
+    const contentState = convertFromRaw(draftjsData)
+    const editorState = EditorState.createWithContent(contentState)
+    this.setState({ editorState, editing: false })
+  }
+
+  isDraftJSComment() {
+    return !isEmpty(toJS(this.props.comment.draftjs_data))
+  }
+
+  handleEditClick = () => {
+    this.setState({ editing: true })
+    this.focusTextArea()
+  }
+
+  handleDeleteClick = () => {
+    const { comment } = this.props
+    uiStore.confirm({
+      iconName: 'Alert',
+      prompt:
+        'Are you sure you want to delete this comment? You will not be able to undo this action.',
+      confirmText: 'Delete',
+      onConfirm: () => {
+        comment.API_destroy()
+      },
+    })
+  }
+
+  handleInputChange = editorState => {
+    if (this.state.updating) return
+    this.setState({
+      editorState,
+    })
+  }
+
+  setEditor = (editor, { unset = false } = {}) => {
+    if (unset) {
+      this.editor = null
+      return
     }
+    if (this.editor) return
+    this.editor = editor
+  }
+
+  focusTextArea = () => {
+    // NOTE: draft-js-plugins need timeout, even with 0 delay, see:
+    // https://github.com/draft-js-plugins/draft-js-plugins/issues/800#issuecomment-315950836
+    setTimeout(() => {
+      if (!this.editor) return
+      this.editor.focus()
+    })
+  }
+
+  handleSubmit = e => {
+    e.preventDefault()
+
+    const content = this.state.editorState.getCurrentContent()
+    const message = content.getPlainText()
+    // don't allow submit of empty comment
+    if (!message) return
+
+    const rawData = {
+      message,
+      draftjs_data: convertToRaw(content),
+    }
+
+    const { comment } = this.props
+    comment.API_updateWithoutSync(rawData).then(() => {
+      this.setState({ editing: false, updating: false })
+    })
+    runInAction(() => {
+      this.setState({ updating: true })
+    })
+  }
+
+  handleEscape = e => {
+    if (e.keyCode === 27 && this.state.editing) {
+      this.handleCancelEditClick()
+    }
+  }
+
+  handleCancelEditClick = () => {
+    // cancel any unsaved edits and re-initialize
+    this.initializeEditorState()
   }
 
   renderMessage() {
     const { comment } = this.props
-    if (_.isEmpty(toJS(comment.draftjs_data))) {
-      // fallback only necessary for supporting older comments before we added draftjs
-      // otherwise this use case will go away
-      return comment.message
-    }
-    const plugins = [this.mentionPlugin, this.linkifyPlugin]
+
     return (
-      <Editor
-        readOnly
-        editorState={this.state.editorState}
-        // NOTE: this onChange is necessary for draft-js-plugins to decorate properly!
-        // see https://github.com/draft-js-plugins/draft-js-plugins/issues/530#issuecomment-258736772
-        onChange={editorState => this.setState({ editorState })}
-        plugins={plugins}
-      />
+      <React.Fragment>
+        {!this.state.editing && (
+          <div>
+            {comment.message}
+            {comment.wasEdited && (
+              <EditedIndicator>{'(edited)'}</EditedIndicator>
+            )}
+          </div>
+        )}
+        {this.state.editing && (
+          <StyledForm onSubmit={this.handleSubmit}>
+            <CommentInput
+              editorState={this.state.editorState}
+              onChange={this.handleInputChange}
+              handleSubmit={this.handleSubmit}
+              setEditor={this.setEditor}
+            />
+            <EditEnterButton focused>
+              <ReturnArrowIcon />
+            </EditEnterButton>
+          </StyledForm>
+        )}
+      </React.Fragment>
     )
   }
 
   render() {
     const { comment } = this.props
     const { author } = comment
+    const isCurrentUserComment = apiStore.currentUserId === comment.author.id
 
     return (
       <StyledComment unread={comment.unread}>
@@ -93,10 +257,51 @@ class Comment extends React.Component {
           <DisplayText className="author" color={v.colors.white}>
             {comment.author.name}
           </DisplayText>
-          <span className="timestamp">
-            <Moment date={comment.updated_at} />
-          </span>
+          <FlexPushRight>
+            {!this.state.editing && (
+              <React.Fragment>
+                <Timestamp
+                  className={`timestamp ${
+                    isCurrentUserComment ? 'hide-on-hover' : ''
+                  }`}
+                >
+                  <Moment date={comment.created_at} />
+                </Timestamp>
+                <StyledCommentActions className="show-on-hover">
+                  {comment.persisted &&
+                    isCurrentUserComment && (
+                      <React.Fragment>
+                        <Tooltip placement="top" title="edit comment">
+                          <ActionButton
+                            onClick={this.handleEditClick}
+                            className="test-edit-comment"
+                          >
+                            <EditPencilIcon />
+                          </ActionButton>
+                        </Tooltip>
+                        <Tooltip placement="top" title="delete comment">
+                          <ActionButton
+                            onClick={this.handleDeleteClick}
+                            className="test-delete-comment"
+                          >
+                            <TrashLgIcon />
+                          </ActionButton>
+                        </Tooltip>
+                      </React.Fragment>
+                    )}
+                </StyledCommentActions>
+              </React.Fragment>
+            )}
+            {this.state.editing && (
+              <StyledCommentActions>
+                <CancelEditButton onClick={this.handleCancelEditClick}>
+                  <XIcon />
+                </CancelEditButton>
+              </StyledCommentActions>
+            )}
+          </FlexPushRight>
         </InlineRow>
+
         <div className="message">{this.renderMessage()}</div>
       </StyledComment>
     )

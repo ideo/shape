@@ -9,7 +9,6 @@ import Deactivated from '~/ui/layout/Deactivated'
 import MoveModal from '~/ui/grid/MoveModal'
 import PageContainer from '~/ui/layout/PageContainer'
 import SearchResultsInfinite from '~/ui/search/SearchResultsInfinite'
-import checkOrg from '~/ui/pages/shared/checkOrg'
 
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
@@ -38,7 +37,7 @@ class SearchPage extends React.Component {
   @action
   componentDidUpdate(prevProps) {
     const { routingStore, location } = this.props
-    if (checkOrg(this.props.match) && this.requiresFetch(prevProps)) {
+    if (this.requiresFetch(prevProps)) {
       // NOTE: important to do this here to "reset" infinite scroll!
       this.searchResults.replace([])
       this.fetchData()
@@ -52,6 +51,11 @@ class SearchPage extends React.Component {
     const { uiStore } = this.props
     uiStore.update('searchText', '')
     this.unmounted = true
+  }
+
+  get urlSlug() {
+    const { match } = this.props
+    return match.params && match.params.org
   }
 
   requiresFetch = prevProps => {
@@ -85,6 +89,9 @@ class SearchPage extends React.Component {
 
   @action
   onAPILoad = ({ data: results, meta }) => {
+    const { apiStore } = this.props
+    // this needs to await the fetchData request so that your (potential) org switch is complete
+    apiStore.checkCurrentOrg({ slug: this.urlSlug })
     if (meta.page === 1) {
       // reset if we are performing a new search starting at page 1
       this.searchResults.replace([])
@@ -109,7 +116,7 @@ class SearchPage extends React.Component {
 
   requestPath = (page = 1) => {
     const q = this.searchQuery(this.props.location, { url: true })
-    return `search?query=${q}&page=${page}`
+    return `organizations/${this.urlSlug}/search?query=${q}&page=${page}`
   }
 
   handleInfiniteLoad = page => {

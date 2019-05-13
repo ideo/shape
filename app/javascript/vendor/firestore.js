@@ -7,11 +7,8 @@ import { observe } from 'mobx'
 import { apiStore } from '~/stores'
 import trackError from '~/utils/trackError'
 
-// disable firestore in cypress automated tests -- doesn't really work
-const cypress = navigator && navigator.userAgent === 'cypress'
-
 let db = {}
-if (process.env.GOOGLE_CLOUD_BROWSER_KEY && !cypress) {
+if (process.env.GOOGLE_CLOUD_BROWSER_KEY) {
   firebase.initializeApp({
     apiKey: process.env.GOOGLE_CLOUD_BROWSER_KEY,
     projectId: process.env.GOOGLE_CLOUD_PROJECT,
@@ -148,7 +145,7 @@ export class FirebaseClient {
     (this.commentsListener = db
       .collection('comments')
       .where('data.attributes.comment_thread_id', '==', parseInt(threadId))
-      .orderBy('data.attributes.updated_at', 'desc'))
+      .orderBy('data.attributes.created_at', 'desc'))
 
   subscribeToThread = usersThread => {
     const threadId = usersThread.comment_thread_id
@@ -200,10 +197,10 @@ export class FirebaseClient {
       })
   }
 
-  escapeLoader = () => {
+  escapeLoader = (timeout = 2500) => {
     setTimeout(() => {
       apiStore.update('loadingThreads', false)
-    }, 2500)
+    }, timeout)
   }
 
   checkIfFinishedLoading = () => {
@@ -211,6 +208,8 @@ export class FirebaseClient {
     if (this.loadedThreadIds.length === this.subscribedThreadIds.length) {
       apiStore.update('loadingThreads', false)
     }
+    // just in case there was an issue loading all the threads, escape the loader after 5s
+    this.escapeLoader(5000)
   }
 }
 

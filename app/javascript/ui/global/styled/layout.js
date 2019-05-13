@@ -74,16 +74,20 @@ export const StyledHeader = styled.header`
 StyledHeader.displayName = 'StyledHeader'
 
 export const FixedHeader = styled(StyledHeader)`
-  padding: 0 ${v.containerPadding.horizontal}rem;
-  z-index: ${props => props.zIndex};
   position: fixed;
   top: 0;
+  padding: 4px ${v.containerPadding.horizontal}rem 0;
+  z-index: ${v.zIndex.globalHeader};
   background: ${hexToRgba(v.colors.commonLight, 0.96)};
   @supports (
     (-webkit-backdrop-filter: blur(4px)) or (backdrop-filter: blur(4px))
   ) {
     background: ${hexToRgba(v.colors.commonLight, 0.9)};
     backdrop-filter: blur(4px);
+  }
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    padding-left: 5px;
+    padding-right: 5px;
   }
 `
 FixedHeader.displayName = 'FixedHeader'
@@ -140,4 +144,8 @@ export const FullAbsolute = styled.div`
 export const SmallBreak = styled.div`
   display: block;
   height: 5px;
+`
+
+export const HeaderSpacer = styled.div`
+  height: ${v.headerHeight}px;
 `

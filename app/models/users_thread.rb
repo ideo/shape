@@ -20,8 +20,8 @@ class UsersThread < ApplicationRecord
   def unread_count
     comment_thread
       .comments
-      .order(updated_at: :desc)
-      .where('updated_at > ?', last_viewed_at)
+      .order(created_at: :desc)
+      .where('created_at > ?', last_viewed_at)
       .count
   end
 

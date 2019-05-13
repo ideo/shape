@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
-import { EditorState } from 'draft-js'
-import { observable, computed } from 'mobx'
+import { computed } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled, { css } from 'styled-components'
 
@@ -77,14 +76,6 @@ StyledCommentsWrapper.displayName = 'StyledCommentsWrapper'
 
 @observer
 class CommentThread extends React.Component {
-  @observable
-  commentData = {
-    message: '',
-    draftjs_data: {},
-  }
-  @observable
-  editorState = EditorState.createEmpty()
-
   @computed
   get comments() {
     const { expanded, thread } = this.props

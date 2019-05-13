@@ -55,6 +55,7 @@ const fakeUiStore = {
   setViewingCollection: jest.fn(),
   setViewingItem: jest.fn(),
   viewingCollection: null,
+  isViewingHomepage: false,
   viewingItem: null,
   movingFromCollectionId: null,
   movingCardIds: [],
@@ -69,6 +70,7 @@ const fakeUiStore = {
   blurContent: false,
   organizationMenuPage: 'organizationMenuPage',
   organizationMenuGroupId: null,
+  organizationMenuOpen: false,
   expandedThreadKey: null,
   expandThread: jest.fn(),
   openGroup: jest.fn(),
@@ -93,6 +95,9 @@ const fakeUiStore = {
   setSnoozeChecked: jest.fn(),
   scrollToTop: jest.fn(),
   scrollToBottom: jest.fn(),
+  popupSnackbar: jest.fn(),
+  showPermissionsAlert: jest.fn(),
+  gridHeightFor: jest.fn().mockReturnValue(250),
 }
 
 export default fakeUiStore

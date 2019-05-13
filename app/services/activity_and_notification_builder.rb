@@ -71,9 +71,17 @@ class ActivityAndNotificationBuilder < SimpleService
       .where(id: all_user_ids)
       .where.not(status: :archived)
       .find_each do |user|
-      next if user.id == @actor.id
-      next if @omit_user_ids.include? user.id
-      next unless should_receive_notifications?(user) && @action != :mentioned
+
+      skippable = (
+        # don't notify for user's own activities
+        user.id == @actor.id ||
+        # if we've explicitly omitted them
+        @omit_user_ids.include?(user.id) ||
+        # or if they're unsubscribed
+        !should_receive_notifications?(user)
+      )
+      next if skippable
+
       if @combine
         if (notif = combine_existing_notifications(user.id))
           @created_notifications << notif

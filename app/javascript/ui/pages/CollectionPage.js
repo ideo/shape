@@ -22,6 +22,7 @@ import TestDesigner from '~/ui/test_collections/TestDesigner'
 import v from '~/utils/variables'
 import Collection from '~/stores/jsonApi/Collection'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
+import routeToLogin from '~/utils/routeToLogin'
 
 // more global way to do this?
 pluralize.addPluralRule(/canvas$/i, 'canvases')
@@ -44,6 +45,13 @@ class CollectionPage extends React.Component {
   }
 
   componentDidMount() {
+    const { collection, apiStore } = this.props
+    if (!apiStore.currentUser && !collection.anyone_can_view) {
+      // in this case, if you're not logged in but you had access (joinable but not public)
+      // we do require you to login
+      // NOTE: the user will see a brief flash of the collection name before redirect
+      routeToLogin({ redirect: collection.frontend_url })
+    }
     this.loadCollectionCards({})
   }
 
@@ -92,35 +100,42 @@ class CollectionPage extends React.Component {
       routingStore,
       undoStore,
     } = this.props
+
+    apiStore.checkCurrentOrg({ id: collection.organization_id })
+
     this.subscribeToChannel(collection.id)
 
     // setViewingCollection has to happen first bc we use it in openBlankContentTool
     uiStore.setViewingCollection(collection)
 
-    if (collection.collection_cards.length === 0) {
-      uiStore.openBlankContentTool()
-    }
-    if (undoStore.undoAfterRoute) {
-      undoStore.performUndoAfterRoute()
-    }
-    if (uiStore.actionAfterRoute) {
-      uiStore.performActionAfterRoute()
-    }
-    if (collection.awaiting_updates) {
-      this.pollForUpdates()
-    }
     if (collection.isSubmissionsCollection) {
       // NOTE: SubmissionsCollections are not meant to be viewable, so we route
       // back to the SubmissionBox instead
       routingStore.routeTo('collections', collection.submission_box_id)
       return
     }
-    collection.checkCurrentOrg()
+    if (collection.awaiting_updates) {
+      this.pollForUpdates()
+    }
+    if (uiStore.actionAfterRoute) {
+      uiStore.performActionAfterRoute()
+    }
+    if (collection.collection_cards.length === 0) {
+      uiStore.openBlankContentTool()
+    }
+    if (undoStore.undoAfterRoute) {
+      undoStore.performUndoAfterRoute()
+    }
+    if (collection.joinable_group_id) {
+      apiStore.checkJoinableGroup(collection.joinable_group_id)
+    }
     if (collection.isNormalCollection) {
-      const thread = await apiStore.findOrBuildCommentThread(collection)
-      uiStore.expandThread(thread.key)
-      if (routingStore.query) {
-        uiStore.openOptionalMenus(routingStore.query)
+      if (apiStore.currentUser) {
+        const thread = await apiStore.findOrBuildCommentThread(collection)
+        uiStore.expandThread(thread.key)
+        if (routingStore.query) {
+          uiStore.openOptionalMenus(routingStore.query)
+        }
       }
       this.checkSubmissionBox()
     } else {
@@ -302,6 +317,8 @@ class CollectionPage extends React.Component {
     const { currentEditor } = this
     const { currentUserId } = this.props.apiStore
     let hidden = ''
+    // don't let logged-out users see who's editing, but they can still receive realtime updates
+    if (!currentUserId) return
     if (_.isEmpty(currentEditor) || currentEditor.id === currentUserId)
       hidden = 'hidden'
     return (
@@ -329,6 +346,7 @@ class CollectionPage extends React.Component {
         {this.submissionsPageSeparator}
         <CollectionGrid
           {...gridSettings}
+          loadCollectionCards={this.loadCollectionCards}
           trackCollectionUpdated={this.trackCollectionUpdated}
           collection={submissions_collection}
           canEditCollection={false}
@@ -380,7 +398,7 @@ class CollectionPage extends React.Component {
   )
 
   render() {
-    const { collection, uiStore } = this.props
+    const { collection, uiStore, apiStore } = this.props
     if (!collection) {
       return this.loader()
     }
@@ -462,6 +480,7 @@ class CollectionPage extends React.Component {
             )}
             <MoveModal />
             {isSubmissionBox &&
+              apiStore.currentUser &&
               collection.submission_box_type &&
               this.renderSubmissionsCollection()}
             {(uiStore.dragging || uiStore.cardMenuOpenAndPositioned) && (

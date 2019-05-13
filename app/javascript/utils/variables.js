@@ -48,6 +48,9 @@ export const KEYS = {
   ESC: 27,
 }
 
+// global vars from Rails application (or undefined, e.g. in a unit test)
+export const FEEDBACK_INCENTIVE_AMOUNT = window.FEEDBACK_INCENTIVE_AMOUNT || 2
+
 export default {
   headerHeight: 50,
   maxWidth: 1320,

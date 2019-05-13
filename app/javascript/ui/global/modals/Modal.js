@@ -47,6 +47,9 @@ const StyledDialogContent = styled.div`
 `
 
 const StyledDialogTitle = styled(DialogTitle)`
+  &.modal__padding {
+    padding: 24px 24px 10px;
+  }
   align-items: center;
   display: flex;
   min-height: 50px;
@@ -175,7 +178,6 @@ class Modal extends React.Component {
         <StyledDialogTitle
           classes={{ root: 'modal__padding' }}
           disableTypography
-          id="sharing"
         >
           {/* onBack is an optional button */}
           {_.isFunction(onBack) && (

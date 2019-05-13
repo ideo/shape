@@ -75,6 +75,10 @@ class AudienceSettings extends React.Component {
     })
   }
 
+  onSubmitSettings = () => {
+    this.saveAllTestAudiences()
+  }
+
   onToggleCheckbox = e => {
     const { apiStore } = this.props
     const id = e.target.value
@@ -89,19 +93,19 @@ class AudienceSettings extends React.Component {
     }
   }
 
-  handleKeyPress = event => {
-    if (event.key === 'Enter') {
-      // this.throttledSaveTestAudience.flush()
-    }
-  }
-
   onInputChange = (audienceId, value) => {
     const { apiStore } = this.props
     const audience = apiStore.find('audiences', audienceId)
     runInAction(() => {
       audience.currentTestAudience.sample_size = value
     })
-    // this.throttledSaveTestAudience(audience)
+    this.throttledSaveTestAudience(audience)
+  }
+
+  handleKeyPress = event => {
+    if (event.key === 'Enter') {
+      this.throttledSaveTestAudience.flush()
+    }
   }
 
   openTermsModal = () => runInAction(() => (this.termsModalOpen = true))

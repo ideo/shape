@@ -13,6 +13,7 @@ describe User, type: :model do
     it { should have_many :comments }
     it { should have_many :activities_as_actor }
     it { should have_many :notifications }
+    it { should have_many :feedback_incentive_records }
 
     context 'as application bot user' do
       let(:organizations) { create_list(:organization, 2) }
@@ -460,6 +461,15 @@ describe User, type: :model do
         expect(user.current_user_collection).to be_nil
       end
     end
+
+    context 'with no user collection in that org' do
+      let!(:other_org) { create(:organization_without_groups) }
+
+      it 'returns nil' do
+        # can't switch to the org
+        expect(user.switch_to_organization(other_org)).to be_nil
+      end
+    end
   end
 
   context 'abilities for viewing and editing' do
@@ -563,6 +573,16 @@ describe User, type: :model do
       # expect(DeprovisionUserWorker).to receive(:perform_async).with(user.id)
       expect(user).to receive(:archived!)
       user.archive!
+    end
+  end
+
+  describe '#current_incentive_balance' do
+    let!(:feedback_incentive_record1) { create(:feedback_incentive_record, amount: 2, current_balance: 2, user: user) }
+    let!(:feedback_incentive_record2) { create(:feedback_incentive_record, amount: 4, current_balance: 6, user: user) }
+
+    it 'gets the balance from the most recent record' do
+      expect(user.feedback_incentive_records.count).to eq 2
+      expect(user.current_incentive_balance).to eq feedback_incentive_record2.current_balance
     end
   end
 end

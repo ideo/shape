@@ -1,4 +1,4 @@
-import { routingStore, uiStore } from '~/stores'
+import { uiStore } from '~/stores'
 import { apiUrl } from '~/utils/url'
 
 import BaseRecord from './BaseRecord'
@@ -77,27 +77,6 @@ class User extends BaseRecord {
 
   API_hideMoveHelper() {
     return this.API_updateCurrentUser({ show_move_helper: false })
-  }
-
-  async switchOrganization(
-    organizationId,
-    { redirectPath = null, redirectId = null } = {}
-  ) {
-    try {
-      this.apiStore.update('switchingOrgs', true)
-      await this.apiStore.request('users/switch_org', 'POST', {
-        organization_id: organizationId,
-      })
-      await this.apiStore.loadCurrentUser()
-      this.apiStore.update('switchingOrgs', false)
-      if (redirectPath) {
-        routingStore.routeTo(redirectPath, redirectId)
-      }
-    } catch (e) {
-      if (e.status === 404 || e.status === 401) {
-        routingStore.routeTo('homepage')
-      }
-    }
   }
 }
 
