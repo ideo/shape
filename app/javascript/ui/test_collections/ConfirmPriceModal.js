@@ -35,32 +35,38 @@ const FeedbackTermsModal = ({
     <StyledModalCloseButton onClick={close}>
       <CloseIcon />
     </StyledModalCloseButton>
-    <DialogContent>
+    <StyledDialogContent classes={{ root: 'root__dialog-content' }}>
       <form onSubmit={onSubmit}>
         <PaperAirplane />
         <SpecialDisplayHeading wrapLine>
           Your test "{testName}" is about to be launched. Your payment method
-          will be charged {price} for this feedback.
+          will be charged <span style={{ fontWeight: 700 }}>{price}</span> for
+          this feedback.
         </SpecialDisplayHeading>
-        <StyledDiv>
+        <StyledDiv
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingBottom: '2rem',
+          }}
+        >
+          <CardBrandIcon brand={paymentMethod.brand} width={32} height={30} />{' '}
           <DisplayText>
-            <CardBrandIcon brand={paymentMethod.brand} width={32} height={30} />{' '}
             {paymentMethod.brand} ending in {paymentMethod.last4} will be
             charged.
           </DisplayText>
         </StyledDiv>
-        <StyledDiv style={{ textAlign: 'center', marginTop: '1rem' }}>
+        <StyledDiv style={{ textAlign: 'center' }}>
           <FormButton width={200}>Get Feedback</FormButton>
         </StyledDiv>
       </form>
-    </DialogContent>
+    </StyledDialogContent>
   </StyledDialog>
 )
 
 const SpecialDisplayHeading = styled.p`
-  margin: 0;
-  margin-top: 10px;
-  margin-bottom: 20px;
+  padding: 30px 0;
   line-height: 1.625rem;
   font-family: ${v.fonts.sans};
   font-size: 1.25rem;
@@ -71,7 +77,7 @@ const SpecialDisplayHeading = styled.p`
 const StyledDialog = styled(Dialog)`
   .modal__paper {
     text-align: center;
-    padding: 20px;
+    padding: 20px 35px;
     padding-top: 35px;
     max-width: 560px;
     max-height: 480px;
@@ -86,6 +92,10 @@ const StyledDialog = styled(Dialog)`
 StyledDialog.displayName = 'StyledDialog'
 
 const StyledDialogContent = styled(DialogContent)`
+  &.root__dialog-content {
+    padding: 20px 35px;
+  }
+
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
     padding-bottom: 120px !important;
   }
@@ -96,7 +106,7 @@ const StyledModalCloseButton = styled(ModalCloseButton)`
 `
 
 const StyledDiv = styled.div`
-  margin: 1.5rem 0;
+  padding: 1rem 0;
 `
 
 FeedbackTermsModal.propTypes = {
