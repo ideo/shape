@@ -57,6 +57,7 @@ class AdminRoutes extends React.Component {
           <Switch>
             <Route path="/admin" component={AdminPage} />
             <Route path="/search" component={SearchPage} />
+            <Route path="/:org/search" component={SearchPage} />
             <Route
               path="/user_settings"
               render={() => (
