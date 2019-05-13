@@ -2,10 +2,11 @@ class SerializableCollection < BaseJsonSerializer
   include SerializedExternalId
   type 'collections'
 
-  attributes :created_at, :updated_at, :name, :organization_id,
+  attributes :created_at, :updated_at, :name,
              :master_template, :template_id,
              :submission_box_type, :submission_box_id, :submission_template_id,
-             :test_status, :collection_to_test_id, :hide_submissions, :submissions_enabled
+             :test_status, :collection_to_test_id, :hide_submissions, :submissions_enabled,
+             :anyone_can_view, :anyone_can_join
 
   has_many :roles do
     data do
@@ -24,6 +25,14 @@ class SerializableCollection < BaseJsonSerializer
   belongs_to :submissions_collection
   belongs_to :submission_template
   belongs_to :collection_to_test
+
+  attribute :organization_id do
+    @object.organization_id.to_s
+  end
+
+  attribute :joinable_group_id do
+    @object.joinable_group_id.to_s
+  end
 
   attribute :system_required do
     @object.system_required?
@@ -65,6 +74,11 @@ class SerializableCollection < BaseJsonSerializer
 
   attribute :card_order, if: -> { @object == @current_record } do
     @card_order || 'order'
+  end
+
+  attribute :can_view do
+    # intentionally not using ability so `anyone_can_view?` does not return true
+    @current_user ? @object.can_view?(@current_user) : false
   end
 
   attribute :can_edit do
@@ -159,5 +173,9 @@ class SerializableCollection < BaseJsonSerializer
 
   attribute :max_col_index do
     @object.is_a?(Collection::Board) ? @object.max_col_index : nil
+  end
+
+  attribute :frontend_url do
+    @frontend_url_for.call(@object)
   end
 end

@@ -1,8 +1,10 @@
-import { observable, action } from 'mobx'
+import { observable, action, runInAction } from 'mobx'
+import { remove } from 'lodash'
 
 import { apiUrl } from '~/utils/url'
 
 import BaseRecord from './BaseRecord'
+import { apiStore, uiStore } from '~/stores'
 
 class Comment extends BaseRecord {
   static type = 'comments'
@@ -19,6 +21,39 @@ class Comment extends BaseRecord {
   @action
   markAsRead() {
     this.unread = false
+  }
+
+  get wasEdited() {
+    return this.updated_at > this.created_at
+  }
+
+  API_destroy = async () => {
+    try {
+      await this.destroy()
+      const thread = apiStore.find('comment_threads', this.comment_thread_id)
+      runInAction(() => {
+        remove(thread.comments, comment => comment.id === this.id)
+      })
+    } catch (e) {
+      console.error(e)
+      uiStore.defaultAlertError()
+    }
+  }
+
+  API_updateWithoutSync = rawData => {
+    this.message = rawData.message
+    this.draftjs_data = rawData.draftjs_data
+
+    const data = this.toJsonApi()
+    // Turn off syncing when saving the comment to not reload the page
+    data.cancel_sync = true
+    return apiStore
+      .request(`comments/${this.id}`, 'PATCH', {
+        data,
+      })
+      .catch(err => {
+        trackError(err, { name: 'comment:update' })
+      })
   }
 }
 

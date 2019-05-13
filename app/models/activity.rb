@@ -42,6 +42,7 @@ class Activity < ApplicationRecord
     duplicated: 13,
     archived_from_template: 14,
     viewed: 15,
+    edited_comment: 16,
   }
 
   def self.participant_actions

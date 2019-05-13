@@ -59,9 +59,8 @@ class Organization < ApplicationRecord
   after_update :update_subscription, if: :saved_change_to_in_app_billing?
   after_update :update_deactivated, if: :saved_change_to_deactivated?
 
-  delegate :admins, to: :primary_group
-  delegate :members, to: :primary_group
-  delegate :handle, to: :primary_group, allow_nil: true
+  delegate :admins, :members, :filestack_file_url, :handle,
+           to: :primary_group, allow_nil: true
 
   validates :name, presence: true
 

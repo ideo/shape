@@ -460,6 +460,15 @@ describe User, type: :model do
         expect(user.current_user_collection).to be_nil
       end
     end
+
+    context 'with no user collection in that org' do
+      let!(:other_org) { create(:organization_without_groups) }
+
+      it 'returns nil' do
+        # can't switch to the org
+        expect(user.switch_to_organization(other_org)).to be_nil
+      end
+    end
   end
 
   context 'abilities for viewing and editing' do

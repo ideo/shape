@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 
-import { routingStore } from '~/stores'
+import { routingStore, uiStore } from '~/stores'
+import PlainLink from '~/ui/global/PlainLink'
 import LinkItemCover from '~/ui/grid/covers/LinkItemCover'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
 import PdfFileItemCover from '~/ui/grid/covers/PdfFileItemCover'
@@ -106,23 +107,29 @@ class CoverRenderer extends React.Component {
     return <div />
   }
 
-  handleClickToCollection = () => {
-    const { card } = this.props
-    routingStore.routeTo('collections', card.record.id)
+  handleClickToCollection = e => {
+    const { record } = this.props
+    if (record.can_view) return true
+
+    e.stopPropagation()
+    e.preventDefault()
+    uiStore.showPermissionsAlert()
+    return false
   }
 
   render() {
-    const { coverItem } = this.props
+    const { coverItem, card } = this.props
     if (coverItem) {
       return (
-        <div
+        <PlainLink
           onClick={this.handleClickToCollection}
           onKeyDown={this.handleClickToCollection}
+          to={routingStore.routeTo('collections', card.record.id)}
           role="link"
           tabIndex="0"
         >
           {this.renderCover}
-        </div>
+        </PlainLink>
       )
     }
     return this.renderCover

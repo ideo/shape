@@ -55,6 +55,10 @@ class SerializableItem < BaseJsonSerializer
     ).viewable_to_api
   end
 
+  attribute :can_view do
+    @current_user ? @object.can_view?(@current_user) : false
+  end
+
   attribute :can_edit do
     @current_ability.can?(:edit, @object)
   end

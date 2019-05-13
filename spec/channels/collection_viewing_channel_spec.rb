@@ -1,12 +1,21 @@
 require 'rails_helper'
 
 RSpec.describe CollectionViewingChannel, type: :channel do
-  let(:collection) { create(:collection) }
   let(:user) { create(:user) }
+  let(:collection) { create(:collection, add_viewers: [user]) }
   let(:stream_name) { collection.stream_name }
 
   before do
-    stub_connection current_user: user
+    stub_connection current_user: user, current_ability: Ability.new(user)
+  end
+
+  context 'without read access' do
+    let(:collection) { create(:collection) }
+    let!(:subscription) { subscribe(id: collection.id) }
+
+    it 'rejects the subscription' do
+      expect(subscription).to be_rejected
+    end
   end
 
   describe '#edited' do

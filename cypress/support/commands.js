@@ -8,6 +8,14 @@ Cypress.Commands.add('login', ({ email } = {}) => {
   cy.wait(100)
 })
 
+Cypress.Commands.add('loginAndVisitMyCollection', () => {
+  cy.login({ email: 'cypress-test@ideo.com' })
+  // go to My Collection, wait for loading to complete
+  cy.visit('/')
+  cy.wait('@apiGetCurrentUser')
+  cy.wait('@apiGetCollectionCards')
+})
+
 Cypress.Commands.add('logout', () => {
   cy.request('DELETE', '/api/v1/sessions')
 })

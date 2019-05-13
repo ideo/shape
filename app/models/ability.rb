@@ -84,7 +84,13 @@ class Ability
         # equivalent to comment_thread.record.can_view?
         comment_thread.can_edit?(user)
       end
+      can %i[read manage], Comment do |comment|
+        comment.can_edit?(user)
+      end
     end
+    # for logged-out users and fallback for all users
+    can :read, Collection, anyone_can_view: true
+    can :read, Collection, anyone_can_join: true
 
     # don't allow any of the editing actions unless you've accepted terms
     # (i.e. user becomes view-only)

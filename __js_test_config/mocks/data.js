@@ -4,10 +4,10 @@ import { observable } from "mobx"
 const fakeJsonApiAttrs = {
   assign: jest.fn(),
   assignRef: jest.fn(),
-  save: jest.fn().mockReturnValue({}),
-  create: jest.fn().mockReturnValue({}),
-  patch: jest.fn().mockReturnValue({}),
-  update: jest.fn().mockReturnValue({}),
+  save: jest.fn().mockReturnValue(Promise.resolve({})),
+  create: jest.fn().mockReturnValue(Promise.resolve({})),
+  patch: jest.fn().mockReturnValue(Promise.resolve({})),
+  update: jest.fn().mockReturnValue(Promise.resolve({})),
   disableMenu: jest.fn(),
 }
 export const fakeCollectionCard = {
@@ -35,6 +35,7 @@ export const fakeTextItemAttrs = {
   type: 'Item::TextItem',
   internalType: 'items',
   name: 'My Cool Item',
+  can_view: true,
   data_content: {
     ops: [
       {insert: 'This is the content for the item and it contains multiple sentences. Like this one.'}
@@ -253,6 +254,7 @@ export const fakeFileItemAttrs = {
   },
   inherited_tag_list: [],
   can_edit: false,
+  can_view: true,
   parent_collection_card: fakeCollectionCard,
 }
 export const fakeFileItem = {
@@ -308,16 +310,23 @@ export const fakeCollection = {
   tag_list: ['prototype', 'blockchain'],
   inherited_tag_list: [],
   can_edit: false,
+  can_view: true,
   can_edit_content: false,
   master_template: false,
+  isCollection: true,
   isSharedCollection: false,
   isUserCollection: false,
   isNormalCollection: true,
   num_survey_responses: 0,
+  anyone_can_view: false,
+  anyone_can_join: false,
   cover: {
     image_url: 'http://fake.url.net',
     text: 'Lorem ipsum blockchain boogie',
     name: 'Proto-typo',
+  },
+  links: {
+    self: 'https://www.shape.space/ideo/collections/1'
   },
   card_order: 'order',
   collection_cards: fakeCards,
@@ -389,7 +398,6 @@ export const fakeUserAttrs = {
   type: 'users',
   terms_accepted: true,
   isCurrentUser: jest.fn(),
-  switchOrganization: jest.fn(),
   API_updateCurrentUser: jest.fn(),
   API_hideHelper: jest.fn().mockReturnValue(Promise.resolve({})),
   notify_through_email: true,
@@ -430,7 +438,9 @@ export const fakeComment = {
   author: fakeUser,
   message:
     'This is my message to the world. Go to the source: https://www.ideo.com',
-  updated_at: new Date(),
+  draftjs_data: {"blocks":[{"key":"74h6f","data":{},"text":"This is my message to the world. Go to the source: https://www.ideo.com","type":"unstyled","depth":0,"entityRanges":[],"inlineStyleRanges":[]}],"entityMap":{}},
+  created_at: new Date('2019-05-09T03:18:00'),
+  updated_at: new Date('2019-05-09T03:18:00'),
 }
 export const fakeThread = {
   id: '1',

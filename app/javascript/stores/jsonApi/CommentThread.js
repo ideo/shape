@@ -154,7 +154,7 @@ class CommentThread extends BaseRecord {
         comment.markAsUnread()
       }
     })
-    newComments = _.sortBy(newComments, ['updated_at'])
+    newComments = _.sortBy(newComments, ['created_at'])
     this.comments.replace(newComments)
   }
 }
