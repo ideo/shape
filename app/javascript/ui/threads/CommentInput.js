@@ -5,6 +5,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 // import { EditorState, convertToRaw } from 'draft-js'
 import Editor from 'draft-js-plugins-editor'
 import createMentionPlugin from 'draft-js-mention-plugin'
+import createLinkifyPlugin from 'draft-js-linkify-plugin'
 
 import { uiStore } from '~/stores'
 import {
@@ -43,6 +44,7 @@ class CommentInput extends React.Component {
   constructor(props) {
     super(props)
     this.initMentionPlugin()
+    this.initLinkifyPlugin()
     this.searchUsersAndGroups = _.debounce(this._searchUsersAndGroups, 300)
   }
 
@@ -58,9 +60,32 @@ class CommentInput extends React.Component {
     })
   }
 
+  initLinkifyPlugin() {
+    this.linkifyPlugin = createLinkifyPlugin({ target: '_blank' })
+  }
+
+  @action
+  handleOpenSuggestions = () => {
+    this.suggestionsOpen = true
+  }
+
+  @action
+  handleCloseSuggestions = () => {
+    this.suggestionsOpen = false
+  }
+
+  handleReturn = e => {
+    if (!e.shiftKey && !this.suggestionsOpen) {
+      // submit message
+      this.props.handleSubmit(e)
+      return 'handled'
+    }
+    return 'not-handled'
+  }
+
   @action
   handleClose = () => {
-    this.props.onCloseSuggestions()
+    this.handleCloseSuggestions()
     this.suggestions = []
   }
 
@@ -92,22 +117,17 @@ class CommentInput extends React.Component {
   }
 
   render() {
-    const {
-      onChange,
-      onOpenSuggestions,
-      handleReturn,
-      editorState,
-    } = this.props
+    const { onChange, editorState } = this.props
     const { MentionSuggestions } = this.mentionPlugin
     MentionSuggestions.displayName = 'MentionSuggestions'
-    const plugins = [this.mentionPlugin]
+    const plugins = [this.mentionPlugin, this.linkifyPlugin]
 
     return (
       <StyledCommentInput editing onClick={this.focus}>
         <Editor
           editorState={editorState}
           onChange={onChange}
-          handleReturn={handleReturn}
+          handleReturn={this.handleReturn}
           plugins={plugins}
           placeholder="Add comment"
           ref={element => {
@@ -117,7 +137,7 @@ class CommentInput extends React.Component {
         />
         <MentionSuggestions
           onSearchChange={this.onSearchChange}
-          onOpen={onOpenSuggestions}
+          onOpen={this.handleOpenSuggestions}
           onClose={this.handleClose}
           suggestions={this.suggestions.toJS()}
           entryComponent={CustomMentionSuggestion}
@@ -129,9 +149,7 @@ class CommentInput extends React.Component {
 
 CommentInput.propTypes = {
   onChange: PropTypes.func.isRequired,
-  onOpenSuggestions: PropTypes.func.isRequired,
-  onCloseSuggestions: PropTypes.func.isRequired,
-  handleReturn: PropTypes.func.isRequired,
+  handleSubmit: PropTypes.func.isRequired,
   setEditor: PropTypes.func.isRequired,
   editorState: MobxPropTypes.objectOrObservableObject.isRequired,
 }

@@ -4,7 +4,7 @@ import { apiStore, uiStore } from '~/stores'
 
 jest.mock('../../../app/javascript/stores')
 
-let wrapper, props
+let wrapper, props, rerender
 describe('Comment', () => {
   beforeEach(() => {
     props = {
@@ -13,7 +13,10 @@ describe('Comment', () => {
         persisted: true,
       },
     }
-    wrapper = shallow(<Comment {...props} />)
+    rerender = props => {
+      wrapper = shallow(<Comment {...props} />)
+    }
+    rerender(props)
   })
 
   it('renders the author name and avatar', () => {
@@ -34,13 +37,51 @@ describe('Comment', () => {
 
   it('renders the timestamp', () => {
     expect(wrapper.find('Moment').props().date).toEqual(
-      props.comment.updated_at
+      props.comment.created_at
     )
+  })
+
+  it('does not show an edited indicator', () => {
+    expect(wrapper.find('EditedIndicator').exists()).toBe(false)
+  })
+
+  describe('when the comment has been edited', () => {
+    beforeEach(() => {
+      props.comment.wasEdited = true
+      rerender(props)
+    })
+
+    it('shows an edited indicator', () => {
+      expect(wrapper.find('EditedIndicator').exists()).toBe(true)
+    })
   })
 
   describe('when user is comment author', () => {
     beforeEach(() => {
       apiStore.currentUserId = '1'
+    })
+
+    it('renders an edit button', () => {
+      expect(wrapper.find('.test-edit-comment').exists()).toBe(true)
+    })
+
+    describe('on click edit', () => {
+      beforeEach(() => {
+        const editButton = wrapper.find('.test-edit-comment').first()
+        editButton.simulate('click')
+      })
+
+      it('shows a button to cancel editing', () => {
+        expect(wrapper.find('CancelEditButton').exists()).toBe(true)
+      })
+
+      describe('on click cancel edit button', () => {
+        it('closes out of editing mode', () => {
+          const editButton = wrapper.find('CancelEditButton').first()
+          editButton.simulate('click')
+          expect(wrapper.find('CancelEditButton').exists()).toBe(false)
+        })
+      })
     })
 
     it('renders a delete button', () => {
@@ -60,7 +101,10 @@ describe('Comment', () => {
     beforeEach(() => {
       apiStore.currentUserId = '1'
       props.comment.author = { ...fakeUser, id: '9' }
-      wrapper.setProps(props)
+      rerender(props)
+    })
+    it('does not render an edit button', () => {
+      expect(wrapper.find('.test-edit-comment').exists()).toBe(false)
     })
     it('does not render a delete button', () => {
       expect(wrapper.find('.test-delete-comment').exists()).toBe(false)
