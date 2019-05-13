@@ -164,12 +164,13 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
           show_helper: false,
           show_move_helper: false,
           show_template_helper: false,
+          feedback_terms_accepted: true,
         },
       }.to_json
     end
 
     before do
-      user.update_attributes(terms_accepted: false, show_helper: true)
+      user.update_attributes(terms_accepted: false, show_helper: true, feedback_terms_accepted: false)
     end
 
     it 'returns a 200' do
@@ -181,6 +182,12 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
       expect(user.terms_accepted).to be false
       patch(path, params: params)
       expect(user.reload.terms_accepted).to be true
+    end
+
+    it 'updates feedback_terms_accepted for current_user' do
+      expect(user.feedback_terms_accepted).to be false
+      patch(path, params: params)
+      expect(user.reload.feedback_terms_accepted).to be true
     end
 
     it 'updates show_helpers for current_user' do

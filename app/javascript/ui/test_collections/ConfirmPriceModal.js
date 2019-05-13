@@ -30,62 +30,17 @@ const FeedbackTermsModal = ({ onSubmit, open, close }) => (
     <DialogContent>
       <form onSubmit={onSubmit}>
         <PaperAirplane />
-        <SpecialDisplayHeading wrapLine>
-          Before you launch your first test, please review and agree to the
-          terms below.
-        </SpecialDisplayHeading>
+        <SpecialDisplayHeading wrapLine>Agree to terms</SpecialDisplayHeading>
         <StyledDiv>
-          <StyledDisplayText>
-            You understand that as a human-centered business, Shape expects you
-            to behave ethically to other users and people who respond to your
-            surveys anonymously, and in accordance with the Terms of Use and
-            applicable law. You also understand that IDEO does not have any
-            control over the contents of your surveys which are intended to be
-            anonymous, but requires the following house rules:
-          </StyledDisplayText>
-        </StyledDiv>
-        <StyledDiv>
-          <List>
-            <ListItem>
-              <StyledDisplayText>
-                1. You agree not to ask for personally identifiable or sensitive
-                information from users including their name or image.{' '}
-              </StyledDisplayText>
-            </ListItem>
-            <ListItem>
-              <StyledDisplayText>
-                2. You agree that Shape is not responsible for the contents of
-                the survey, and that these are your/your organization’s
-                responsibility.
-              </StyledDisplayText>
-            </ListItem>
-            <ListItem>
-              <StyledDisplayText>
-                3. You agree not to include offensive or discriminatory language
-                or intent in the surveys or include content or style likely to
-                affect Shape’s reputation as an ethical business.
-              </StyledDisplayText>
-            </ListItem>
-            <ListItem>
-              <StyledDisplayText>
-                4. You agree that Shape may remove, modify, terminate your
-                access to surveys or the Platform if you breach the above rules,
-                in addition to its rights under the Terms of Use.
-              </StyledDisplayText>
-            </ListItem>
-          </List>
+          <StyledDisplayText>Do it now</StyledDisplayText>
         </StyledDiv>
         <StyledDiv>
           <StyledDisplayText>
-            You can find the full terms of use for Shape at{' '}
-            <Link to="/terms" target="_blank">
-              shape.space/terms
-            </Link>
-            .
+            Something about last 4 card digits
           </StyledDisplayText>
         </StyledDiv>
         <StyledDiv style={{ textAlign: 'center' }}>
-          <FormButton width={300}>I agree to these terms</FormButton>
+          <FormButton width={300}>Get Feedback</FormButton>
         </StyledDiv>
       </form>
     </DialogContent>

@@ -6,6 +6,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import AudienceSettingsWidget from './AudienceSettingsWidget'
 import TestAudience from '~/stores/jsonApi/TestAudience'
 import FeedbackTermsModal from '../FeedbackTermsModal'
+import ConfirmPriceModal from '../ConfirmPriceModal'
 
 @inject('apiStore')
 @observer
@@ -14,6 +15,8 @@ class AudienceSettings extends React.Component {
   audiences = []
   @observable
   termsModalOpen = false
+  @observable
+  confirmPriceModalOpen = false
 
   constructor(props) {
     super(props)
@@ -104,15 +107,43 @@ class AudienceSettings extends React.Component {
 
   closeTermsModal = () => runInAction(() => (this.termsModalOpen = false))
 
-  submitSettings = () => {
-    this.openTermsModal()
-    console.log('submitting settings')
-    // Also need to update size for test audiences
+  openConfirmPriceModal = () =>
+    runInAction(() => (this.confirmPriceModalOpen = true))
+
+  closeConfirmPriceModal = () =>
+    runInAction(() => (this.confirmPriceModalOpen = false))
+
+  submitSettings = e => {
+    e.preventDefault()
+    const { apiStore } = this.props
+    const currentUser = apiStore.currentUser
+    // TODO: update size for test audiences
+    // this.saveAllTestAudiences()
+    if (currentUser.feedback_terms_accepted) {
+      console.log('submitting settings')
+      this.openConfirmPriceModal()
+    } else {
+      this.openTermsModal()
+    }
   }
 
-  confirmFeedbackTerms = () => {
+  acceptFeedbackTerms = e => {
+    e.preventDefault()
     console.log('Agreeing to feedback terms')
-    // AJAX call to update things
+    const { apiStore } = this.props
+    const currentUser = apiStore.currentUser
+    currentUser.API_acceptFeedbackTerms().finally(() => {
+      runInAction(() => {
+        this.termsModalOpen = false
+        this.confirmPriceModal = true
+      })
+    })
+  }
+
+  confirmPrice = e => {
+    e.preventDefault()
+    console.log('buying feedback')
+    // TODO: Charge card for purchasing feedback audiences
   }
 
   render() {
@@ -120,8 +151,13 @@ class AudienceSettings extends React.Component {
       <React.Fragment>
         <FeedbackTermsModal
           open={!!this.termsModalOpen}
-          onSubmit={this.confirmFeedbackTerms}
-          handleClose={this.closeTermsModal}
+          onSubmit={this.acceptFeedbackTerms}
+          close={this.closeTermsModal}
+        />
+        <ConfirmPriceModal
+          open={!!this.confirmPriceModalOpen}
+          onSubmit={this.confirmPrice}
+          close={this.closePriceConfirmModal}
         />
         <AudienceSettingsWidget
           onToggleCheckbox={this.onToggleCheckbox}
