@@ -14,7 +14,7 @@ import v from '~/utils/variables'
 
 class BasicHeader extends React.PureComponent {
   render() {
-    const { orgMenu } = this.props
+    const { orgMenu, children } = this.props
 
     return (
       <Fragment>
@@ -30,16 +30,21 @@ class BasicHeader extends React.PureComponent {
                   <Logo />
                 </PlainLink>
               </Box>
+
+              {children}
+
+              <Box flex align="center">
+                {orgMenu && (
+                  <OrganizationMenu
+                    organization={{}}
+                    userGroups={[]}
+                    onClose={() => null}
+                    open={orgMenu}
+                    locked
+                  />
+                )}
+              </Box>
             </Flex>
-            {orgMenu && (
-              <OrganizationMenu
-                organization={{}}
-                userGroups={[]}
-                onClose={() => null}
-                open={orgMenu}
-                locked
-              />
-            )}
           </MaxWidthContainer>
         </FixedHeader>
         <HeaderSpacer />
@@ -50,6 +55,11 @@ class BasicHeader extends React.PureComponent {
 
 BasicHeader.propTypes = {
   orgMenu: PropTypes.bool.isRequired,
+  children: PropTypes.node,
+}
+
+BasicHeader.defaultProps = {
+  children: null,
 }
 
 export default BasicHeader
