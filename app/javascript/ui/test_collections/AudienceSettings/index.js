@@ -121,7 +121,7 @@ class AudienceSettings extends React.Component {
         <FeedbackTermsModal
           open={!!this.termsModalOpen}
           onSubmit={this.confirmFeedbackTerms}
-          close={this.closeTermsModal}
+          handleClose={this.closeTermsModal}
         />
         <AudienceSettingsWidget
           onToggleCheckbox={this.onToggleCheckbox}
