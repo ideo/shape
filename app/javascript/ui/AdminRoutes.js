@@ -1,3 +1,4 @@
+import WindowSizeListener from 'react-window-size-listener'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Switch, Route, Redirect, withRouter } from 'react-router-dom'
 import { MuiThemeProvider } from '@material-ui/core/styles'
@@ -17,7 +18,7 @@ import { CollectionApiWrapper } from '~/ui/pages/PageWithApiWrapper'
 
 // withRouter allows it to respond automatically to routing changes in props
 @withRouter
-@inject('apiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class AdminRoutes extends React.Component {
   componentDidMount() {
@@ -29,6 +30,14 @@ class AdminRoutes extends React.Component {
     })
   }
 
+  handleWindowResize = ({ windowWidth }) => {
+    // NOTE: Routes should only interact with uiStore for global re-rendering changes like this
+    const { uiStore } = this.props
+    uiStore.updateColumnsToFit(windowWidth)
+    uiStore.updateActivityLogWidth(windowWidth)
+    uiStore.update('windowWidth', windowWidth)
+  }
+
   render() {
     const { apiStore } = this.props
     const { sessionLoaded } = apiStore
@@ -38,6 +47,7 @@ class AdminRoutes extends React.Component {
     return (
       <ErrorBoundary>
         <MuiThemeProvider theme={MuiTheme}>
+          <WindowSizeListener onResize={this.handleWindowResize} />
           <DialogWrapper />
           <ZendeskWidget />
 
@@ -77,6 +87,7 @@ class AdminRoutes extends React.Component {
 
 AdminRoutes.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default AdminRoutes
