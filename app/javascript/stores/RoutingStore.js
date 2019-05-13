@@ -27,6 +27,8 @@ class RoutingStore extends RouterStore {
         // if no query, then go back to homepage (e.g. clearing out your search)
         if (!id) return this.pathTo('homepage')
         return `/${this.slug()}/search?q=${id.replace(/\s/g, '+')}`
+      case 'admin':
+        return '/admin'
       case 'homepage':
       default:
         return `/${this.slug()}`
