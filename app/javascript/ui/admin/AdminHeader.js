@@ -1,3 +1,4 @@
+import Hidden from '@material-ui/core/Hidden'
 import styled from 'styled-components'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Fragment } from 'react'
@@ -8,6 +9,7 @@ import {
   MaxWidthContainer,
   HeaderSpacer,
 } from '~/ui/global/styled/layout'
+import GlobalSearch from '~/ui/layout/GlobalSearch'
 import Logo from '~/ui/layout/Logo'
 import PlainLink from '~/ui/global/PlainLink'
 import v from '~/utils/variables'
@@ -46,6 +48,12 @@ class AdminHeader extends React.Component {
 
               <Box auto>
                 <StyledHeadingWrapper>Shape Admin</StyledHeadingWrapper>
+              </Box>
+
+              <Box flex align="center">
+                <Hidden smDown>
+                  <GlobalSearch className="search-bar" />
+                </Hidden>
               </Box>
             </Flex>
           </MaxWidthContainer>
