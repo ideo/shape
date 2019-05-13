@@ -1,27 +1,19 @@
 import PropTypes from 'prop-types'
-import { toJS, observable, action, runInAction } from 'mobx'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { runInAction } from 'mobx'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { EditorState, ContentState, convertToRaw } from 'draft-js'
 import { get } from 'lodash'
 
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
-import { CommentForm } from '~/ui/global/styled/forms'
+import { CommentForm, CommentEnterButton } from '~/ui/global/styled/forms'
 import CommentInput from './CommentInput'
 
-@observer
 class CommentEntryForm extends React.Component {
-  @observable
-  commentData = {
-    message: '',
-    draftjs_data: {},
-  }
-  @observable
-  suggestionsOpen = false
-  @observable
-  updating = false
   editorHeight = null
   state = {
     editorState: EditorState.createEmpty(),
+    updating: false,
+    focused: false,
   }
 
   componentDidMount() {
@@ -47,16 +39,13 @@ class CommentEntryForm extends React.Component {
     })
   }
 
-  @action
   handleInputChange = editorState => {
-    if (this.updating) return
-    const content = editorState.getCurrentContent()
-    const message = content.getPlainText()
-    this.commentData.message = message
-    this.commentData.draftjs_data = convertToRaw(content)
+    if (this.state.updating) return
     this.handleHeightChange()
+    const focused = editorState.getSelection().getHasFocus()
     this.setState({
       editorState,
+      focused,
     })
   }
 
@@ -94,39 +83,26 @@ class CommentEntryForm extends React.Component {
     })
   }
 
-  @action
-  handleOpenSuggestions = () => {
-    this.suggestionsOpen = true
-  }
-
-  @action
-  handleCloseSuggestions = () => {
-    this.suggestionsOpen = false
-  }
-
-  handleReturn = e => {
-    if (!e.shiftKey && !this.suggestionsOpen) {
-      // submit message
-      this.handleSubmit(e)
-      return 'handled'
-    }
-    return 'not-handled'
-  }
-
   handleSubmit = e => {
     e.preventDefault()
-    const rawData = toJS(this.commentData)
+
+    const content = this.state.editorState.getCurrentContent()
+    const message = content.getPlainText()
     // don't allow submit of empty comment
-    if (!rawData.message) return
+    if (!message) return
+
+    const rawData = {
+      message,
+      draftjs_data: convertToRaw(content),
+    }
+
     const { thread } = this.props
     thread.API_saveComment(rawData).then(() => {
       this.props.afterSubmit()
-      this.updating = false
+      this.setState({ updating: false })
     })
     runInAction(() => {
-      this.commentData.message = ''
-      this.commentData.draftjs_data = {}
-      this.updating = true
+      this.setState({ updating: true })
     })
     this.resetEditorState()
   }
@@ -141,15 +117,13 @@ class CommentEntryForm extends React.Component {
           <CommentInput
             editorState={this.state.editorState}
             onChange={this.handleInputChange}
-            onOpenSuggestions={this.handleOpenSuggestions}
-            onCloseSuggestions={this.handleCloseSuggestions}
-            handleReturn={this.handleReturn}
+            handleSubmit={this.handleSubmit}
             setEditor={this.setEditor}
           />
         </div>
-        <button>
+        <CommentEnterButton focused={this.state.focused}>
           <ReturnArrowIcon />
-        </button>
+        </CommentEnterButton>
       </CommentForm>
     )
   }
