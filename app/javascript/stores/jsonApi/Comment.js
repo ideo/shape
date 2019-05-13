@@ -23,6 +23,10 @@ class Comment extends BaseRecord {
     this.unread = false
   }
 
+  get wasEdited() {
+    return this.updated_at > this.created_at
+  }
+
   API_destroy = async () => {
     try {
       await this.destroy()

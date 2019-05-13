@@ -7,6 +7,7 @@ import styled from 'styled-components'
 import v from '~/utils/variables'
 import { DisplayText } from '~/ui/global/styled/typography'
 import { InlineRow } from '~/ui/global/styled/layout'
+import { CommentEnterButton } from '~/ui/global/styled/forms'
 import Moment from '~/ui/global/Moment'
 import Avatar from '~/ui/global/Avatar'
 import { StyledCommentInput } from './CustomCommentMentions'
@@ -15,9 +16,9 @@ import TrashLgIcon from '~/ui/icons/TrashLgIcon'
 import EditPencilIcon from '~/ui/icons/EditPencilIcon'
 import { showOnHoverCss, hideOnHoverCss } from '~/ui/grid/shared'
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
-import CommentInput from './CommentInput'
 import XIcon from '~/ui/icons/XIcon'
 import Tooltip from '~/ui/global/Tooltip'
+import CommentInput from './CommentInput'
 
 const StyledComment = StyledCommentInput.extend`
   ${showOnHoverCss};
@@ -81,35 +82,24 @@ const StyledForm = styled.form`
   min-height: 50px;
 `
 
-const EnterButton = styled.button`
+const EditEnterButton = styled(CommentEnterButton)`
   position: absolute;
   right: 0;
   bottom: 0;
-  width: 30px;
-  height: 30px;
-  background-color: ${v.colors.secondaryDark};
-  border-radius: 50%;
-  padding: 6px;
-
-  svg {
-    transform: scale(1, -1);
-  }
-
-  &:hover {
-    filter: brightness(90%);
-  }
 `
 
 const CancelEditButton = styled.button`
   width: 22px;
   height: 22px;
 `
+CancelEditButton.displayName = 'CancelEditButton'
 
 const EditedIndicator = styled.span`
   color: ${v.colors.secondaryDarkest};
   font-size: 0.75rem;
   padding-left: 10px;
 `
+EditedIndicator.displayName = 'EditedIndicator'
 
 class Comment extends React.Component {
   constructor(props) {
@@ -122,13 +112,8 @@ class Comment extends React.Component {
     }
   }
 
-  componentWillMount() {
-    const { comment } = this.props
-    const draftjsData = toJS(comment.draftjs_data)
-    const contentState = convertFromRaw(draftjsData)
-    const editorState = EditorState.createWithContent(contentState)
-    this.setState({ editorState })
-
+  componentDidMount() {
+    this.initializeEditorState()
     document.addEventListener('keydown', this.handleEscape, false)
   }
 
@@ -137,40 +122,16 @@ class Comment extends React.Component {
     document.removeEventListener('keydown', this.handleEscape, false)
   }
 
-  isDraftJSComment() {
-    return !isEmpty(toJS(this.props.comment.draftjs_data))
+  initializeEditorState() {
+    const { comment } = this.props
+    const draftjsData = toJS(comment.draftjs_data)
+    const contentState = convertFromRaw(draftjsData)
+    const editorState = EditorState.createWithContent(contentState)
+    this.setState({ editorState, editing: false })
   }
 
-  renderMessage() {
-    const { comment } = this.props
-
-    return (
-      <React.Fragment>
-        {!this.state.editing && (
-          <div>
-            {comment.message}
-            {comment.updated_at > comment.created_at && (
-              <EditedIndicator className="test-edited-indicator">
-                (edited)
-              </EditedIndicator>
-            )}
-          </div>
-        )}
-        {this.state.editing && (
-          <StyledForm onSubmit={this.handleSubmit}>
-            <CommentInput
-              editorState={this.state.editorState}
-              onChange={this.handleInputChange}
-              handleSubmit={this.handleSubmit}
-              setEditor={this.setEditor}
-            />
-            <EnterButton className="test-update-comment">
-              <ReturnArrowIcon />
-            </EnterButton>
-          </StyledForm>
-        )}
-      </React.Fragment>
-    )
+  isDraftJSComment() {
+    return !isEmpty(toJS(this.props.comment.draftjs_data))
   }
 
   handleEditClick = () => {
@@ -245,12 +206,44 @@ class Comment extends React.Component {
   }
 
   handleCancelEditClick = () => {
-    this.setState({ editing: false })
+    // cancel any unsaved edits and re-initialize
+    this.initializeEditorState()
+  }
+
+  renderMessage() {
+    const { comment } = this.props
+
+    return (
+      <React.Fragment>
+        {!this.state.editing && (
+          <div>
+            {comment.message}
+            {comment.wasEdited && (
+              <EditedIndicator>{'(edited)'}</EditedIndicator>
+            )}
+          </div>
+        )}
+        {this.state.editing && (
+          <StyledForm onSubmit={this.handleSubmit}>
+            <CommentInput
+              editorState={this.state.editorState}
+              onChange={this.handleInputChange}
+              handleSubmit={this.handleSubmit}
+              setEditor={this.setEditor}
+            />
+            <EditEnterButton focused>
+              <ReturnArrowIcon />
+            </EditEnterButton>
+          </StyledForm>
+        )}
+      </React.Fragment>
+    )
   }
 
   render() {
     const { comment } = this.props
     const { author } = comment
+    const isCurrentUserComment = apiStore.currentUserId === comment.author.id
 
     return (
       <StyledComment unread={comment.unread}>
@@ -267,12 +260,16 @@ class Comment extends React.Component {
           <FlexPushRight>
             {!this.state.editing && (
               <React.Fragment>
-                <Timestamp className="timestamp hide-on-hover">
+                <Timestamp
+                  className={`timestamp ${
+                    isCurrentUserComment ? 'hide-on-hover' : ''
+                  }`}
+                >
                   <Moment date={comment.created_at} />
                 </Timestamp>
                 <StyledCommentActions className="show-on-hover">
                   {comment.persisted &&
-                    apiStore.currentUserId === comment.author.id && (
+                    isCurrentUserComment && (
                       <React.Fragment>
                         <Tooltip placement="top" title="edit comment">
                           <ActionButton
@@ -297,10 +294,7 @@ class Comment extends React.Component {
             )}
             {this.state.editing && (
               <StyledCommentActions>
-                <CancelEditButton
-                  onClick={this.handleCancelEditClick}
-                  className="test-cancel-edit-comment"
-                >
+                <CancelEditButton onClick={this.handleCancelEditClick}>
                   <XIcon />
                 </CancelEditButton>
               </StyledCommentActions>

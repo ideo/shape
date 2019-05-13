@@ -1,47 +1,12 @@
 import PropTypes from 'prop-types'
-import styled from 'styled-components'
 import { runInAction } from 'mobx'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { EditorState, ContentState, convertToRaw } from 'draft-js'
 import { get } from 'lodash'
 
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
-import { CommentForm } from '~/ui/global/styled/forms'
+import { CommentForm, CommentEnterButton } from '~/ui/global/styled/forms'
 import CommentInput from './CommentInput'
-import v from '~/utils/variables'
-
-const EnterButton = styled.button`
-  position: absolute;
-  right: 10px;
-  top: 7px;
-  width: 30px;
-  height: 30px;
-  background-color: ${v.colors.secondaryDark};
-  border-radius: 50%;
-  padding: 6px;
-
-  svg {
-    transform: scale(1, -1);
-  }
-
-  &:hover {
-    filter: brightness(90%);
-  }
-
-  ${props =>
-    !props.focused &&
-    `
-    background: transparent;
-    border: 1px solid ${v.colors.commonMedium};
-    color: ${v.colors.commonMedium};
-
-    &:hover {
-      background: transparent;
-      border: 1px solid ${v.colors.commonMedium};
-      color: ${v.colors.commonMedium};
-    }
-  `};
-`
 
 class CommentEntryForm extends React.Component {
   editorHeight = null
@@ -156,9 +121,9 @@ class CommentEntryForm extends React.Component {
             setEditor={this.setEditor}
           />
         </div>
-        <EnterButton focused={this.state.focused}>
+        <CommentEnterButton focused={this.state.focused}>
           <ReturnArrowIcon />
-        </EnterButton>
+        </CommentEnterButton>
       </CommentForm>
     )
   }

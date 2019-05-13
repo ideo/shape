@@ -42,18 +42,17 @@ describe('Comment', () => {
   })
 
   it('does not show an edited indicator', () => {
-    expect(wrapper.find('.test-edited-indicator').exists()).toBe(false)
+    expect(wrapper.find('EditedIndicator').exists()).toBe(false)
   })
 
   describe('when the comment has been edited', () => {
     beforeEach(() => {
-      props.comment.created_at = new Date('2019-05-09T03:18:00')
-      props.comment.updated_at = new Date('2019-05-09T03:18:01')
+      props.comment.wasEdited = true
       rerender(props)
     })
 
     it('shows an edited indicator', () => {
-      expect(wrapper.find('.test-edited-indicator').exists()).toBe(true)
+      expect(wrapper.find('EditedIndicator').exists()).toBe(true)
     })
   })
 
@@ -73,14 +72,14 @@ describe('Comment', () => {
       })
 
       it('shows a button to cancel editing', () => {
-        expect(wrapper.find('.test-cancel-edit-comment').exists()).toBe(true)
+        expect(wrapper.find('CancelEditButton').exists()).toBe(true)
       })
 
       describe('on click cancel edit button', () => {
         it('closes out of editing mode', () => {
-          const editButton = wrapper.find('.test-cancel-edit-comment').first()
+          const editButton = wrapper.find('CancelEditButton').first()
           editButton.simulate('click')
-          expect(wrapper.find('.test-cancel-edit-comment').exists()).toBe(false)
+          expect(wrapper.find('CancelEditButton').exists()).toBe(false)
         })
       })
     })

@@ -19,7 +19,7 @@ class Api::V1::CommentsController < Api::V1::BaseController
       author: current_user,
     )
     if @comment
-      head :no_content
+      render jsonapi: @comment
     else
       render jsonapi: @comment.errors
     end
@@ -37,7 +37,7 @@ class Api::V1::CommentsController < Api::V1::BaseController
     success = CommentUpdater.call(
       comment: @comment,
       message: json_api_params[:data][:attributes][:message],
-      draftjs_data: json_api_params[:data][:attributes][:draftjs_data]
+      draftjs_data: json_api_params[:data][:attributes][:draftjs_data],
     )
 
     if success
