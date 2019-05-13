@@ -13,10 +13,18 @@ import Link from '~/ui/global/Link'
 import { colors, flexbox } from '~shared/styles/index'
 import v from '~/utils/variables'
 import CloseIcon from '../icons/CloseIcon'
+import CardBrandIcon from '~shared/components/atoms/CardBrandIcon'
 
 // Extract children from here
 // Reuse for both Agree to Terms and Confirm Payment?
-const FeedbackTermsModal = ({ onSubmit, open, close }) => (
+const FeedbackTermsModal = ({
+  onSubmit,
+  open,
+  close,
+  paymentMethod,
+  price,
+  testName,
+}) => (
   <StyledDialog
     classes={{ root: 'root__dialog', paper: 'modal__paper' }}
     open={open}
@@ -30,17 +38,19 @@ const FeedbackTermsModal = ({ onSubmit, open, close }) => (
     <DialogContent>
       <form onSubmit={onSubmit}>
         <PaperAirplane />
-        <SpecialDisplayHeading wrapLine>Agree to terms</SpecialDisplayHeading>
+        <SpecialDisplayHeading wrapLine>
+          Your test "{testName}" is about to be launched. Your payment method
+          will be charged {price} for this feedback.
+        </SpecialDisplayHeading>
         <StyledDiv>
-          <StyledDisplayText>Do it now</StyledDisplayText>
+          <DisplayText>
+            <CardBrandIcon brand={paymentMethod.brand} width={32} height={30} />{' '}
+            {paymentMethod.brand} ending in {paymentMethod.last4} will be
+            charged.
+          </DisplayText>
         </StyledDiv>
-        <StyledDiv>
-          <StyledDisplayText>
-            Something about last 4 card digits
-          </StyledDisplayText>
-        </StyledDiv>
-        <StyledDiv style={{ textAlign: 'center' }}>
-          <FormButton width={300}>Get Feedback</FormButton>
+        <StyledDiv style={{ textAlign: 'center', marginTop: '1rem' }}>
+          <FormButton width={200}>Get Feedback</FormButton>
         </StyledDiv>
       </form>
     </DialogContent>
@@ -60,11 +70,11 @@ const SpecialDisplayHeading = styled.p`
 
 const StyledDialog = styled(Dialog)`
   .modal__paper {
+    text-align: center;
     padding: 20px;
     padding-top: 35px;
-    max-width: 680px;
-    max-height: 692px;
-    width: 100%;
+    max-width: 560px;
+    max-height: 480px;
 
     @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
       margin: 0;
@@ -79,10 +89,6 @@ const StyledDialogContent = styled(DialogContent)`
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
     padding-bottom: 120px !important;
   }
-`
-
-const StyledDisplayText = styled(DisplayText)`
-  font-size: 0.75rem;
 `
 
 const StyledModalCloseButton = styled(ModalCloseButton)`

@@ -7,6 +7,7 @@ import AudienceSettingsWidget from './AudienceSettingsWidget'
 import TestAudience from '~/stores/jsonApi/TestAudience'
 import FeedbackTermsModal from '../FeedbackTermsModal'
 import ConfirmPriceModal from '../ConfirmPriceModal'
+import { PaymentMethod } from '~shared/api.network.v1'
 
 @inject('apiStore')
 @observer
@@ -107,11 +108,14 @@ class AudienceSettings extends React.Component {
 
   closeTermsModal = () => runInAction(() => (this.termsModalOpen = false))
 
-  openConfirmPriceModal = () =>
-    runInAction(() => (this.confirmPriceModalOpen = true))
+  @action
+  openConfirmPriceModal = () => (this.confirmPriceModalOpen = true)
 
-  closeConfirmPriceModal = () =>
-    runInAction(() => (this.confirmPriceModalOpen = false))
+  @action
+  closeConfirmPriceModal = () => {
+    console.log('close confirm price')
+    this.confirmPriceModalOpen = false
+  }
 
   submitSettings = e => {
     e.preventDefault()
@@ -135,7 +139,7 @@ class AudienceSettings extends React.Component {
     currentUser.API_acceptFeedbackTerms().finally(() => {
       runInAction(() => {
         this.termsModalOpen = false
-        this.confirmPriceModal = true
+        this.confirmPriceModalOpen = true
       })
     })
   }
@@ -143,6 +147,7 @@ class AudienceSettings extends React.Component {
   confirmPrice = e => {
     e.preventDefault()
     console.log('buying feedback')
+    this.closeConfirmPriceModal()
     // TODO: Charge card for purchasing feedback audiences
   }
 
@@ -157,7 +162,10 @@ class AudienceSettings extends React.Component {
         <ConfirmPriceModal
           open={!!this.confirmPriceModalOpen}
           onSubmit={this.confirmPrice}
-          close={this.closePriceConfirmModal}
+          close={this.closeConfirmPriceModal}
+          paymentMethod={{ last4: 1234, brand: 'Visa' }}
+          price={'$100'}
+          testName={'Your Cool Test'}
         />
         <AudienceSettingsWidget
           onToggleCheckbox={this.onToggleCheckbox}
