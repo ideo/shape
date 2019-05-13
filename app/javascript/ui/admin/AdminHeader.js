@@ -1,3 +1,4 @@
+import Hidden from '@material-ui/core/Hidden'
 import styled from 'styled-components'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Fragment } from 'react'
@@ -10,6 +11,7 @@ import {
 } from '~/ui/global/styled/layout'
 import Logo from '~/ui/layout/Logo'
 import PlainLink from '~/ui/global/PlainLink'
+import AdminUsersSummary from '~/ui/admin/AdminUsersSummary'
 import v from '~/utils/variables'
 
 const StyledHeadingWrapper = styled.div`
@@ -45,7 +47,12 @@ class AdminHeader extends React.Component {
               </Box>
 
               <Box auto>
-                <StyledHeadingWrapper>Shape Admin</StyledHeadingWrapper>
+                <Flex align="center">
+                  <StyledHeadingWrapper>Shape Admin</StyledHeadingWrapper>
+                  <Hidden smDown>
+                    <AdminUsersSummary />
+                  </Hidden>
+                </Flex>
               </Box>
             </Flex>
           </MaxWidthContainer>
