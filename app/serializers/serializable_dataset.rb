@@ -5,7 +5,7 @@ class SerializableDataset < BaseJsonSerializer
              :total, :data
 
   attribute :measure do
-    if @object.is_a?(DataItem::OrgWideQuestion)
+    if @object.is_a?(Dataset::OrgWideQuestion)
       @object.measure(organization: @collection&.organization)
     else
       @object.measure

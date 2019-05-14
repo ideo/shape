@@ -10,6 +10,7 @@ class Item
              dependent: :destroy,
              class_name: 'DataItemsDatasets',
              foreign_key: 'data_item_id'
+    has_many :datasets, through: :data_items_datasets
 
     store_accessor :data_settings,
                    :d_measure,

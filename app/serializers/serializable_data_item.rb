@@ -6,5 +6,5 @@ class SerializableDataItem < SerializableItem
     nil
   end
 
-  has_many :data_item_datasets
+  has_many :data_items_datasets
 end

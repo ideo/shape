@@ -218,18 +218,19 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
       it 'includes data_items_datasets' do
         get(path)
-        debugger
         data_items_datasets = json_included_objects_of_type('data_items_datasets')
+        expect(data_items_datasets.size).to eq(1)
         expect(
-          data_items_datasets.map(&:id),
+          data_items_datasets.map{ |d| d['id'].to_i },
         ).to eq(data_item.data_items_datasets.map(&:id))
       end
 
       it 'includes datasets' do
         get(path)
         datasets = json_included_objects_of_type('datasets')
+        expect(datasets.size).to eq(1)
         expect(
-          datasets.map(&:id),
+          datasets.map{ |d| d['id'].to_i },
         ).to eq(data_item.datasets.map(&:id))
       end
     end

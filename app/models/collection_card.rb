@@ -71,8 +71,8 @@ class CollectionCard < ApplicationRecord
     [
       :parent,
       record: [
-        :filestack_file,
         :collection_cover_items,
+        :filestack_file,
         data_items_datasets: [:dataset],
       ],
     ]
