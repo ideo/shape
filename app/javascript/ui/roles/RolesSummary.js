@@ -6,6 +6,7 @@ import pluralize from 'pluralize'
 
 import Tooltip from '~/ui/global/Tooltip'
 import Avatar from '~/ui/global/Avatar'
+import AvatarGroup from '~/ui/global/AvatarGroup'
 import v from '~/utils/variables'
 
 const MAX_USERS_TO_SHOW = 4
@@ -21,36 +22,6 @@ const StyledRolesSummary = styled.div`
   }
 `
 StyledRolesSummary.displayName = 'StyledRolesSummary'
-
-const StyledAvatarGroup = styled.div`
-  display: inline-block;
-  margin: 0 8px;
-  .placeholder,
-  .editor,
-  .viewer {
-    display: inline-block;
-    margin-left: 0px;
-    margin-right: -12px;
-    border: 1px solid ${v.colors.commonLight};
-    /* for any transparent avatars */
-    background-color: white;
-    &:last-child {
-      margin-right: 0;
-    }
-    ${props =>
-      _.map(
-        _.range(1, 6),
-        i =>
-          `:nth-child(${i}) {
-            z-index: ${10 - i};
-          }`
-      )};
-  }
-  .placeholder {
-    background-color: ${v.colors.commonMedium};
-  }
-`
-StyledAvatarGroup.displayName = 'StyledAvatarGroup'
 
 const StyledSeparator = styled.div`
   width: 1px;
@@ -164,10 +135,10 @@ class RolesSummary extends React.Component {
     ))
 
     return (
-      <StyledAvatarGroup align="right">
+      <AvatarGroup align="right">
         {editorAvatars}
         {editorCount > MAX_USERS_TO_SHOW && MORE_EDITORS}
-      </StyledAvatarGroup>
+      </AvatarGroup>
     )
   }
 
@@ -187,10 +158,10 @@ class RolesSummary extends React.Component {
       />
     ))
     return (
-      <StyledAvatarGroup>
+      <AvatarGroup>
         {viewerAvatars}
         {viewerCount > MAX_USERS_TO_SHOW && MORE_VIEWERS}
-      </StyledAvatarGroup>
+      </AvatarGroup>
     )
   }
 
