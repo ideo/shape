@@ -4,7 +4,8 @@ class Item
              class_name: 'Item::DataItem',
              inverse_of: :legend_item
 
-    has_many :datasets, through: :data_items
+    has_many :data_items_datasets, through: :data_items
+    has_many :datasets, through: :data_items_datasets
 
     # TODO: deprecate after migrating --
     # selected measures moved to the DataItemsDatasets join table
