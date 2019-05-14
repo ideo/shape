@@ -33,6 +33,7 @@ const UnPaddedHeading1 = styled(Heading1)`
     padding: 0;
   }
 `
+
 const UnPaddedHeading3 = styled(Heading3)`
   margin-bottom: 0;
 `
@@ -123,10 +124,10 @@ class ChartItemCover extends React.Component {
       <CoverContainer data-cy="ChartItemCover">
         {this.question && (
           <div>
-            <UnPaddedHeading1>
+            <UnPaddedHeading1 className="testHeading1">
               {this.mapQuestionType.questionTitle}
             </UnPaddedHeading1>
-            <UnPaddedHeading3>
+            <UnPaddedHeading3 className="testHeading2">
               {this.mapQuestionType.questionText}
             </UnPaddedHeading3>
           </div>
