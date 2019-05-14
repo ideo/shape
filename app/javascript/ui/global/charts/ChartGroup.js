@@ -69,8 +69,8 @@ class ChartGroup extends React.PureComponent {
   }
 
   get secondaryDatasetsWithData() {
-    const { secondaryDatasets } = this.props
-    return secondaryDatasets.filter(
+    const { secondaryDatasets } = this.props.dataItem
+    return secondaryDatasets().filter(
       dataset => dataset.order !== 0 && dataset.data.length > 0
     )
   }

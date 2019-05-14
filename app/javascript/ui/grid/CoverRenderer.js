@@ -77,7 +77,7 @@ class CoverRenderer extends React.Component {
           // re-render when new datasets are added
           return (
             <DataItemCover
-              datasetLength={record.data_items_datasets.length}
+              datasetLength={record.datasets.length}
               height={height}
               item={record}
               card={card}

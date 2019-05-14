@@ -209,20 +209,12 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
     context 'with data items and datasets' do
       let!(:data_item) { create(:data_item, :report_type_question_item) }
+      let(:data_items_datasets) { data_item.data_items_datasets.first }
       before do
         user.add_role(Role::VIEWER, data_item)
         collection.collection_cards.first.update(
           item: data_item,
         )
-      end
-
-      it 'includes data_items_datasets' do
-        get(path)
-        data_items_datasets = json_included_objects_of_type('data_items_datasets')
-        expect(data_items_datasets.size).to eq(1)
-        expect(
-          data_items_datasets.map{ |d| d['id'].to_i },
-        ).to eq(data_item.data_items_datasets.map(&:id))
       end
 
       it 'includes datasets' do
@@ -232,6 +224,15 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         expect(
           datasets.map{ |d| d['id'].to_i },
         ).to eq(data_item.datasets.map(&:id))
+      end
+
+      it 'includes data_items_datasets_id' do
+        get(path)
+        dataset = json_included_objects_of_type('datasets').first
+        attrs = dataset['attributes']
+        expect(attrs['data_items_datasets_id'].to_i).to eq(data_items_datasets.id)
+        expect(attrs['order']).to eq(data_items_datasets.order)
+        expect(attrs['selected']).to eq(data_items_datasets.selected)
       end
     end
   end

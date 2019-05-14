@@ -73,7 +73,7 @@ class CollectionCard < ApplicationRecord
       record: [
         :collection_cover_items,
         :filestack_file,
-        data_items_datasets: [:dataset],
+        :datasets,
       ],
     ]
   end

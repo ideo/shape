@@ -9,7 +9,13 @@ class Dataset < ApplicationRecord
   belongs_to :data_source, polymorphic: true, optional: true
 
   validates :timeframe, :chart_type, presence: true
-  validates :cached_data, presence: true, if: :root_dataset_class?
+  validates :cached_data, :measure, presence: true, if: :root_dataset_class?
+
+  attr_accessor :cached_data_items_datasets
+
+  delegate :order, :selected,
+           to: :cached_data_items_datasets,
+           allow_nil: true
 
   enum timeframe: {
     ever: 0,
@@ -29,13 +35,15 @@ class Dataset < ApplicationRecord
 
   # Can override in each class
   def data
-    return cached_data['data'] if cached_data.present?
+    return cached_data if cached_data.present?
     []
   end
 
   # Implement in each sub-class
-  def total
-    cached_data['total'] if cached_data.present?
+  def total; end
+
+  def data_items_datasets_id
+    cached_data_items_datasets&.id
   end
 
   private

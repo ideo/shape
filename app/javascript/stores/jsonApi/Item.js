@@ -175,28 +175,19 @@ class Item extends SharedRecordMixin(BaseRecord) {
   }
 
   get primaryDataset() {
-    const { data_items_datasets } = this
-    if (!data_items_datasets) return null
-    if (data_items_datasets.length <= 1) return data_items_datasets[0].dataset
-    const primary = data_items_datasets.find(
-      data_items_datasets => data_items_datasets.order === 0
-    )
-    return primary.dataset
+    const { datasets } = this
+    if (!datasets) return null
+    if (datasets.length <= 1) return datasets[0]
+    const primary = datasets.find(dataset => dataset.order === 0)
+    return primary
   }
 
-  get secondaryDataItemDatasets() {
-    const { data_items_datasets } = this
-    if (!data_items_datasets) return []
-    return data_items_datasets.filter(
-      data_item_dataset => data_item_dataset.order !== 0
+  secondaryDatasets = ({ selected } = { selected: true }) => {
+    const { datasets } = this
+    if (!datasets) return []
+    return this.datasets.filter(
+      dataset => dataset.order !== 0 && dataset.selected === selected
     )
-  }
-
-  secondaryDatasets = ({ selected = true }) => {
-    const dataItemDatasets = this.secondaryDataItemDatasets.filter(
-      data_item_dataset => selected === data_item_dataset.selected
-    )
-    return dataItemDatasets.map(data_item_dataset => data_item_dataset.dataset)
   }
 
   get measure() {

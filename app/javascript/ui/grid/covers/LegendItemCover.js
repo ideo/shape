@@ -148,7 +148,7 @@ class LegendItemCover extends React.Component {
 
   comparisonDatasets = ({ selected }) => {
     const { item } = this.props
-    return item.secondaryDatasets(selected)
+    return item.secondaryDatasets({ selected })
   }
 
   get comparisonMenuOptions() {
