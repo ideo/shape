@@ -34,6 +34,10 @@ class Api::V1::BaseController < ApplicationController
       'Collection::UserProfile': SerializableCollection,
       'CollectionCard::Primary': SerializableCollectionCard,
       'CollectionCard::Link': SerializableCollectionCard,
+      'Dataset::CollectionsAndItems': SerializableDataset,
+      'Dataset::External': SerializableDataset,
+      'Dataset::OrgWideQuestion': SerializableDataset,
+      'Dataset::QuestionItem': SerializableDataset,
     )
   end
 

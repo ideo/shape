@@ -4,6 +4,8 @@ class Item
              class_name: 'Item::DataItem',
              inverse_of: :legend_item
 
+    has_many :datasets, through: :data_items
+
     store_accessor :data_settings,
                    :selected_measures
 
@@ -15,18 +17,17 @@ class Item
     end
 
     def primary_measure
-      return if primary_datasets.blank?
-      sample_dataset = primary_datasets.first
-      dataset_measure_hash(sample_dataset)
+      datasets_by_measure[measures.first].first
     end
 
     # Comparisons are non-primary measures from all linked datasets
     def comparison_measures
-      non_primary_datasets
-        .each_with_object({}) do |dataset, h|
-          next if h[dataset[:measure]].present?
-          h[dataset[:measure]] = dataset_measure_hash(dataset)
-        end.values
+      measures = []
+      datasets_by_measure.each_with_index do |(_measure, datasets), i|
+        next if i.zero?
+        measures << datasets.first
+      end
+      measures
     end
 
     def dynamic_measure_names
@@ -35,27 +36,40 @@ class Item
       }
     end
 
-    private
+    # private
 
-    def dataset_measure_hash(dataset)
+    def dataset_measure_hash(dataset, order = 0)
       {
-        measure: dataset[:measure],
-        style: dataset[:style],
-        order: dataset[:order],
-        chart_type: dataset[:chart_type] || 'line', # Line as a fallback for C∆ charts
+        measure: dataset.measure,
+        style: dataset.try(:style),
+        order: order,
+        chart_type: dataset.chart_type || 'line', # Line as a fallback for C∆ charts
       }
     end
 
-    def primary_datasets
-      datasets_with_data.select { |dataset| dataset[:order].zero? }
+    def use_datasets?
+      datasets.present?
     end
 
-    def non_primary_datasets
-      datasets_with_data.reject { |dataset| dataset[:order].zero? }
+    def measures
+      datasets_by_measure.keys
     end
 
-    def datasets_with_data
-      @datasets_with_data ||= data_items.map(&:all_datasets).flatten.select do |dataset|
+    def datasets_by_measure
+      last_measure = nil
+      i = 0
+      @datasets_by_measure ||= all_datasets.each_with_object({}) do |dataset, h|
+        h[dataset.measure] ||= []
+        h[dataset.measure] << dataset_measure_hash(dataset, i)
+        i += 1 if last_measure != dataset.measure
+        last_measure = dataset.measure
+      end
+    end
+
+    def all_datasets
+      return datasets if datasets.present?
+
+      @all_datasets ||= data_items.map(&:all_datasets).flatten.select do |dataset|
         dataset[:data].present? || dataset[:single_value].present?
       end
     end

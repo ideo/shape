@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190424210415) do
+ActiveRecord::Schema.define(version: 20190513203005) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -137,6 +137,9 @@ ActiveRecord::Schema.define(version: 20190424210415) do
     t.integer "cover_type", default: 0
     t.datetime "test_launched_at"
     t.boolean "submissions_enabled", default: true
+    t.boolean "anyone_can_view", default: false
+    t.boolean "anyone_can_join", default: false
+    t.bigint "joinable_group_id"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
@@ -168,6 +171,32 @@ ActiveRecord::Schema.define(version: 20190424210415) do
     t.datetime "updated_at", null: false
     t.jsonb "draftjs_data"
     t.index ["comment_thread_id"], name: "index_comments_on_comment_thread_id"
+  end
+
+  create_table "data_items_datasets", force: :cascade do |t|
+    t.bigint "data_item_id"
+    t.bigint "dataset_id"
+    t.integer "order", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["data_item_id", "dataset_id", "order"], name: "data_items_datasets_aggregate_index"
+  end
+
+  create_table "datasets", force: :cascade do |t|
+    t.string "type"
+    t.string "measure"
+    t.integer "chart_type"
+    t.integer "max_domain"
+    t.integer "timeframe"
+    t.jsonb "cached_data"
+    t.string "question_type"
+    t.bigint "organization_id"
+    t.string "data_source_type"
+    t.bigint "data_source_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["data_source_type", "data_source_id"], name: "index_datasets_on_data_source_type_and_data_source_id"
+    t.index ["organization_id"], name: "index_datasets_on_organization_id"
   end
 
   create_table "external_records", force: :cascade do |t|

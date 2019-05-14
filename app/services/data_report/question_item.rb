@@ -1,53 +1,51 @@
 module DataReport
-  class QuestionItem < Base
-
-    delegate :question_type, to: :question_item, allow_nil: true
+  class QuestionItem < SimpleService
 
     ORG_MEASURE_NAME = 'org-wide-feedback'.freeze
 
+    def initialize(dataset:)
+      @dataset = dataset
+    end
+
     def call
-      datasets
+      return grouped_response_data(survey_answers) if question_item?
+
+      grouped_response_data(org_survey_answers)
+    end
+
+    def total
+      return survey_answers.count if question_item?
+
+      org_survey_answers.count
     end
 
     private
 
+    def question_item?
+      @dataset.is_a?(Dataset::QuestionItem)
+    end
+
+    def org_wide?
+      @dataset.is_a?(Dataset::OrgWideQuestion)
+    end
+
     def test_collection
-      @data_item.parent
+      @dataset.parent
     end
 
     def question_item
-      @data_item.data_source
+      @dataset.data_source
     end
 
-    def title
-      ''
-    end
-
-    def subtitle
-      ''
-    end
-
-    def datasets
-      [
-        question_data,
-        org_data,
-      ]
-    end
-
-    def columns
-      1.upto(4).map do |i|
-        {
-          title: i,
-        }
-      end
-    end
-
-    def filters
-      []
+    def question_type
+      return question_item.question_type if question_item.present?
+      @dataset.question_type
     end
 
     def base_data
-      (1..4).map { |n| { value: 0, column: n, percentage: 0 } }
+      (1..4).map do |n|
+        { value: 0, column: n, percentage: 0 }
+      end
     end
 
     def grouped_response_data(survey_answers)
@@ -79,19 +77,8 @@ module DataReport
       end
     end
 
-    def question_data
-      # NOTE: the only currently supported data_source is a question_item
-      survey_answers = question_item.completed_survey_answers
-      {
-        order: 0,
-        chart_type: 'bar',
-        measure: test_collection.name,
-        question_type: question_type,
-        total: survey_answers.count,
-        timeframe: 'month',
-        max_domain: 95,
-        data: grouped_response_data(survey_answers),
-      }
+    def survey_answers
+      question_item.completed_survey_answers
     end
 
     def org_survey_answers
@@ -111,19 +98,6 @@ module DataReport
             test_collection.organization_id,
           ),
         )
-    end
-
-    def org_data
-      {
-        order: 1,
-        chart_type: 'bar',
-        measure: ORG_MEASURE_NAME,
-        question_type: question_type,
-        total: org_survey_answers.count,
-        timeframe: 'month',
-        max_domain: 95,
-        data: grouped_response_data(org_survey_answers),
-      }
     end
   end
 end

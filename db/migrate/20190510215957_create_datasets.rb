@@ -1,10 +1,12 @@
 class CreateDatasets < ActiveRecord::Migration[5.1]
   def change
     create_table :datasets do |t|
-      t.jsonb :data
+      t.string :type, :measure
+      t.integer :chart_type, :max_domain, :timeframe
+      t.jsonb :cached_data
+      t.string :question_type
       t.references :organization
       t.references :data_source, polymorphic: true
-      t.boolean :global, default: false
       t.timestamps
     end
   end

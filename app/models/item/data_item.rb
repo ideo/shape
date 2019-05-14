@@ -1,15 +1,23 @@
 class Item
   class DataItem < Item
     belongs_to :legend_item, class_name: 'Item::LegendItem', optional: true
+    # TODO: deprecate this relationship after migrating
+    # all existing DataItems to have datasets
     belongs_to :data_source, polymorphic: true, optional: true
+
+    has_many :data_items_datasets,
+             -> { ordered },
+             dependent: :destroy,
+             class_name: 'DataItemsDatasets'
+    has_many :datasets, through: :data_items_datasets
 
     store_accessor :data_settings,
                    :d_measure,
-                   :d_filters,
+                   :d_filters, # This is an optional data source (Collection or Item)
                    :d_timeframe
 
     validates :report_type, presence: true
-    validate :collections_and_items_validations, if: :report_type_collections_and_items?
+    # validate :collections_and_items_validations, if: :report_type_collections_and_items?
     validate :network_app_metric_validations, if: :report_type_network_app_metric?
     validate :record_validations, if: :report_type_record?
     after_create :create_legend_item, if: :create_legend_item?
@@ -53,12 +61,12 @@ class Item
     end
 
     # Datasets that may be filtered by legend
-    def datasets
+    def visible_datasets
       all_datasets.select do |dataset|
-        dataset[:order].zero? ||
+        dataset.order.zero? ||
           (
             selected_measures.present? &&
-            selected_measures.include?(dataset[:measure].to_s)
+            selected_measures.include?(dataset.measure.to_s)
           )
       end
     end
@@ -98,13 +106,13 @@ class Item
     def load_datasets
       if report_type_record?
         return [] if data_content['datasets'].blank?
-        data_content['datasets'].map(&:deep_symbolize_keys)
+        data_content['datasets'].map do |data|
+          Hashie::Mash.new(data)
+        end.order_by(&:order)
       elsif report_type_network_app_metric?
-        DataReport::NetworkAppMetric.call(self)
-      elsif report_type_collections_and_items?
-        DataReport::CollectionsAndItems.call(self)
-      elsif report_type_question_item?
-        DataReport::QuestionItem.call(self)
+        DataReport::NetworkAppMetric.call(self).map do |data|
+          Hashie::Mash.new(data)
+        end.order_by(&:order)
       else
         []
       end

@@ -84,6 +84,7 @@ class DataItemCoverDisplayOnly extends React.Component {
 
   render() {
     const { card, item } = this.props
+    console.log(item)
     const tooltip = this.primaryDatasetDescription
     return (
       <StyledCover item={item}>
@@ -108,7 +109,7 @@ class DataItemCoverDisplayOnly extends React.Component {
           </StyledTitleAndDescription>
         </AboveChartContainer>
         <ChartGroup
-          datasets={item.datasets}
+          datasets={item.visibleDatasets}
           width={card.width}
           height={card.height}
           simpleDateTooltip

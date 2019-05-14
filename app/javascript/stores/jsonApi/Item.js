@@ -174,11 +174,16 @@ class Item extends SharedRecordMixin(BaseRecord) {
     })
   }
 
+  get visibleDatasets() {
+    if (this.datasets.length > 0) return this.datasets
+    return this.visible_datasets
+  }
+
   get primaryDataset() {
-    const { datasets } = this
-    if (!datasets) return null
-    if (datasets.length <= 1) return datasets[0]
-    return datasets.find(dataset => dataset.order === 0)
+    const { visibleDatasets } = this
+    if (!visibleDatasets) return null
+    if (visibleDatasets.length <= 1) return visibleDatasets[0]
+    return datasets.find(visibleDatasets => visibleDatasets.order === 0)
   }
 
   get measure() {

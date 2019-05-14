@@ -1,5 +1,9 @@
 module DataReport
-  class CollectionsAndItems < Base
+  class CollectionsAndItems < SimpleService
+
+    def initialize(dataset:)
+      @dataset = dataset
+    end
 
     def call
       if @measure == 'records'

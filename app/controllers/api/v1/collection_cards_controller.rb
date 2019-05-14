@@ -13,7 +13,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     render jsonapi: @collection_cards,
            include: [
              :parent,
-             record: %i[filestack_file collection_cover_items],
+             record: %i[filestack_file collection_cover_items datasets],
            ],
            expose: {
              card_order: params[:card_order],

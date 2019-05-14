@@ -12,6 +12,7 @@ import googleTagManager from '~/vendor/googleTagManager'
 import Activity from './jsonApi/Activity'
 import Collection from './jsonApi/Collection'
 import CollectionCard from './jsonApi/CollectionCard'
+import Dataset from './jsonApi/Dataset'
 import Role from './jsonApi/Role'
 import FilestackFile from './jsonApi/FilestackFile'
 import Group from './jsonApi/Group'
@@ -561,6 +562,7 @@ ApiStore.types = [
   Activity,
   Collection,
   CollectionCard,
+  Dataset,
   FilestackFile,
   Group,
   Item,

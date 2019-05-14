@@ -2,7 +2,12 @@ class Item
   class QuestionItem < Item
     has_many :question_answers, inverse_of: :question, foreign_key: :question_id, dependent: :destroy
     has_one :test_open_responses_collection, class_name: 'Collection::TestOpenResponses'
+    has_one :dataset, as: :data_source, dependent: :destroy
+
+    # TODO: Deprecate once migrating to datasets
     has_one :test_data_item, class_name: 'Item::DataItem', as: :data_source
+
+    after_create :create_dataset
 
     after_commit :notify_test_design_of_creation,
                  on: :create,
@@ -165,7 +170,6 @@ class Item
           width: 2,
           item_attributes: {
             type: 'Item::DataItem',
-            data_source: self,
             report_type: :report_type_question_item,
             legend_item_id: legend_item&.id,
           },
@@ -174,6 +178,12 @@ class Item
         user: initiated_by,
       )
       builder.create
+      if builder.collection_card.persisted?
+        dataset.data_items_datasets.create(
+          data_item: builder.collection_card.record,
+        )
+      end
+
       builder.collection_card
     end
 
@@ -198,6 +208,14 @@ class Item
 
     private
 
+    def create_dataset
+      self.dataset = Dataset::QuestionItem.create(
+        data_source: self,
+        timeframe: :month,
+        chart_type: :bar,
+      )
+    end
+
     def notify_test_design_collection_of_creation?
       parent.is_a?(Collection::TestDesign)
     end
@@ -215,7 +233,5 @@ class Item
         name: "#{content} Responses",
       )
     end
-
-
   end
 end

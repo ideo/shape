@@ -1,5 +1,12 @@
 module DataReport
-  class NetworkAppMetric < Base
+  class NetworkAppMetric < SimpleService
+    def initialize(data_item:)
+      @data_item = data_item
+      @measure = data_item.d_measure
+      @filters = data_item.d_filters
+      @timeframe = data_item.d_timeframe
+    end
+
     def call
       datasets
     end
