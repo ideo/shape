@@ -8,7 +8,7 @@ import { runInAction, observable, toJS } from 'mobx'
 import AudienceSettingsWidget from './AudienceSettingsWidget'
 import TestAudience from '~/stores/jsonApi/TestAudience'
 
-@inject('apiStore')
+@inject('apiStore', 'networkStore', 'routingStore', 'uiStore')
 @observer
 class AudienceSettings extends React.Component {
   @observable
@@ -70,8 +70,48 @@ class AudienceSettings extends React.Component {
     })
   }
 
-  onSubmitSettings = () => {
+  async hasPaymentMethod() {
+    const { apiStore, networkStore } = this.props
+    const organization = apiStore.currentUserOrganization
+    await networkStore.loadPaymentMethods(organization.id)
+  }
+
+  addPaymentMethodModal() {
+    const { apiStore, networkStore, routingStore, uiStore } = this.props
+    // Will they always have a default payment method if they have at least one
+    // payment method?
+    const { defaultPaymentMethod } = networkStore
+    if (!defaultPaymentMethod) {
+      // The org admins should receive a different message than non-admins
+      if (apiStore.currentUserOrganization.primary_group.can_edit) {
+        const message =
+          'Uh-oh! It looks like you don’t have an active payment method.'
+        uiStore.confirm({
+          prompt: message,
+          confirmText: 'Add payment method',
+          cancelText: '',
+          onConfirm: () => routingStore.routeTo('billing'),
+        })
+      } else {
+        const message =
+          'Oops! your organization has not added a payment method yet. Ask your administrator to add a payment method to proceed.'
+        uiStore.alert({
+          prompt: message,
+          confirmText: 'cancel',
+          onConfirm: () => uiStore.closeDialog,
+        })
+      }
+    }
+  }
+
+  onSubmitSettings = async () => {
     this.saveAllTestAudiences()
+    const hasPaymentMethod = await this.hasPaymentMethod()
+    if (!hasPaymentMethod) {
+      this.addPaymentMethodModal()
+    } else {
+      // launch test
+    }
   }
 
   onToggleCheckbox = e => {
