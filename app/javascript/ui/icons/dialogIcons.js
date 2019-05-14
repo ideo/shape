@@ -8,6 +8,7 @@ import CloseIcon from '~/ui/icons/CloseIcon'
 import CloseSubtractGroupIcon from '~/ui/icons/CloseSubtractGroupIcon'
 import HiddenIcon from '~/ui/icons/HiddenIcon'
 import InfoIcon from '~/ui/icons/InfoIcon'
+import KeyIcon from '~/ui/icons/KeyIcon'
 import LeaveIcon from '~/ui/icons/LeaveIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import MailIcon from '~/ui/icons/MailIcon'
@@ -25,6 +26,7 @@ export const iconNames = [
   'CloseSubtractGroup',
   'Clock',
   'Hidden',
+  'Key',
   'Leave',
   'Link',
   'Mail',
@@ -44,6 +46,7 @@ export default {
   CloseSubtractGroupIcon,
   HiddenIcon,
   InfoIcon,
+  KeyIcon,
   LeaveIcon,
   LinkIcon,
   MailIcon,

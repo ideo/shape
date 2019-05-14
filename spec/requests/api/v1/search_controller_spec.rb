@@ -36,7 +36,7 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
         add_viewers: [current_user],
       )
     end
-    let(:path) { '/api/v1/search' }
+    let(:path) { "/api/v1/organizations/#{organization.slug}/search" }
     let(:find_collection) { collections.first }
 
     before do

@@ -14,14 +14,14 @@ import TextIcon from '~/ui/icons/TextIcon'
 import Tooltip from '~/ui/global/Tooltip'
 import v, { ITEM_TYPES } from '~/utils/variables'
 
+const StyledLink = styled(Link)`
+  margin-right: 8px;
+`
+
 const StyledHeader = styled.div`
-  align-items: flex-start;
+  align-items: center;
   display: flex;
   height: ${props => (props.lines === 1 ? 50 : 70)}px;
-
-  *:first-child {
-    margin-right: 8px;
-  }
 
   .timestamp {
     margin-left: auto;
@@ -36,8 +36,8 @@ const StyledHeader = styled.div`
     display: flex;
     flex-basis: content;
     height: 12px;
-    width: 20px;
-    margin-left: 4px;
+    width: ${props => (props.lines === 1 ? 20 : 25)}px;
+    margin-left: 8px;
     margin-top: 5px;
     svg {
       margin-left: 4px;
@@ -75,8 +75,8 @@ export const FollowHolder = styled.span`
   color: ${props =>
     props.isFollowed ? v.colors.commonLight : v.colors.secondaryLight};
   height: 15px;
-  margin-left: 7px;
-  margin-right: 8px;
+  margin-left: 10px;
+  margin-right: 10px;
   margin-top: 3px;
   width: 15px;
 `
@@ -155,22 +155,31 @@ class CommentThreadHeader extends React.Component {
   renderThumbnail() {
     const { record } = this
     let content
+    const iconPadding = this.titleLines === 1 ? 12 : 0
     if (record.internalType === 'items') {
       if (record.type === ITEM_TYPES.TEXT) {
-        content = <TextIcon viewBox="0 0 70 70" />
+        content = (
+          <div style={{ paddingTop: `${iconPadding}px` }}>
+            <TextIcon viewBox="0 0 70 70" />
+          </div>
+        )
       } else {
         content = <img src={record.filestack_file_url} alt="Text" />
       }
     } else {
-      content = <CollectionIcon viewBox="50 50 170 170" />
+      content = (
+        <div style={{ paddingTop: `${iconPadding}px` }}>
+          <CollectionIcon viewBox="50 50 170 170" />
+        </div>
+      )
       if (record.cover.image_url) {
         content = <img src={record.cover.image_url} alt={record.name} />
       }
     }
     return (
-      <Link to={this.objectLink()}>
+      <StyledLink to={this.objectLink()}>
         <ThumbnailHolder>{content}</ThumbnailHolder>
-      </Link>
+      </StyledLink>
     )
   }
 

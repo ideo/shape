@@ -1,4 +1,4 @@
-import { computed } from 'mobx'
+import { computed, runInAction } from 'mobx'
 import { Model, initModelRef, setModelMetaKey } from 'datx'
 import { jsonapi, modelToJsonApi } from 'datx-jsonapi'
 import _ from 'lodash'
@@ -106,6 +106,14 @@ class BaseRecord extends jsonapi(Model) {
   patch() {
     this.apiStore.request(`${this.internalType}/${this.id}`, 'PATCH', {
       data: this.toJsonApi(),
+    })
+  }
+
+  async destroy() {
+    await this.apiStore.request(`${this.internalType}/${this.id}`, 'DELETE')
+    this.apiStore.remove(this.internalType, this.id)
+    runInAction(() => {
+      setModelMetaKey(this, DATX_PERSISTED_KEY, false)
     })
   }
 }

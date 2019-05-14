@@ -2,16 +2,13 @@ import MainMenuDropdown from '~/ui/global/MainMenuDropdown'
 import { fakeOrganization } from '#/mocks/data'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
+import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 
 describe('MainMenuDropdown', () => {
   let component, wrapper, props, otherFakeOrg, itemNames
 
   beforeEach(() => {
     const apiStore = fakeApiStore()
-    const routingStore = {
-      pathTo: jest.fn(),
-      routeTo: jest.fn(),
-    }
     otherFakeOrg = Object.assign({}, fakeOrganization, { id: 999, name: 'new' })
     apiStore.currentUser.current_organization = fakeOrganization
     fakeOrganization.primary_group.can_edit = true
@@ -20,7 +17,7 @@ describe('MainMenuDropdown', () => {
       open: true,
       onItemClick: jest.fn(),
       apiStore,
-      routingStore,
+      routingStore: fakeRoutingStore,
       uiStore: fakeUiStore,
     }
     itemNames = [
@@ -166,22 +163,23 @@ describe('MainMenuDropdown', () => {
   })
 
   describe('handleSwitchOrg', () => {
-    const orgId = 1
     const fakeEv = { preventDefault: () => null }
 
-    it('should call switchOrganization on currentUser', () => {
-      component.handleSwitchOrg(orgId)(fakeEv)
-      expect(
-        props.apiStore.currentUser.switchOrganization
-      ).toHaveBeenCalledWith(orgId, { redirectPath: 'homepage' })
+    it('should route you to the organization', () => {
+      component.handleSwitchOrg(fakeOrganization)(fakeEv)
+      expect(fakeRoutingStore.routeTo).toHaveBeenCalledWith(
+        `/${fakeOrganization.slug}`
+      )
     })
 
     it('should call uiStore.confirm if trying to move cards between orgs', () => {
       props.uiStore.isMovingCards = true
       wrapper.setProps(props)
-      component.handleSwitchOrg(orgId)(fakeEv)
+      component.handleSwitchOrg(fakeOrganization)(fakeEv)
       // findOrganizationById to lookup the name for the confirm dialog
-      expect(props.apiStore.findOrganizationById).toHaveBeenCalledWith(orgId)
+      expect(props.apiStore.findOrganizationById).toHaveBeenCalledWith(
+        fakeOrganization.id
+      )
       expect(props.uiStore.confirm).toHaveBeenCalled()
     })
   })

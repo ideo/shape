@@ -59,6 +59,8 @@ describe('ChartGroup', () => {
     beforeEach(() => {
       props.datasets = [fakeAreaChartDataset]
       props.datasets[0].data = [{ value: 24, date: '2018-09-10' }]
+      // NOTE: this test passes, but warns:
+      // Failed prop type: Invalid prop `domain` supplied to `VictoryBar`
       render()
     })
 

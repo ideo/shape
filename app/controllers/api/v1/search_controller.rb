@@ -1,6 +1,8 @@
 class Api::V1::SearchController < Api::V1::BaseController
   before_action :capture_query_params
 
+  before_action :load_and_authorize_organization_from_slug, only: %i[search]
+  before_action :switch_to_organization, only: %i[search]
   def search
     results = search_records
     render(
@@ -22,7 +24,8 @@ class Api::V1::SearchController < Api::V1::BaseController
 
   before_action :authorize_resource, only: :users_and_groups
   def users_and_groups
-    @indexes = [User]
+    @indexes = []
+    @indexes << User unless params[:groups_only]
     @indexes << Group unless params[:users_only]
     return search_users_and_groups_for_resource if @resource
     results = search_users_and_groups
@@ -170,5 +173,10 @@ class Api::V1::SearchController < Api::V1::BaseController
     return unless params[:resource_id] && params[:resource_type]
     @resource = params[:resource_type].constantize.find params[:resource_id]
     authorize! :read, @resource
+  end
+
+  def switch_to_organization
+    return unless @organization.present?
+    current_user.switch_to_organization(@organization)
   end
 end

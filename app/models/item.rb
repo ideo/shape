@@ -79,6 +79,10 @@ class Item < ApplicationRecord
     )
   end
 
+  def anyone_can_view?
+    false
+  end
+
   def search_content
     text = []
     case self

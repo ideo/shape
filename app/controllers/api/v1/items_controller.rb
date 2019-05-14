@@ -8,6 +8,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
     render jsonapi: @items, include: params[:include]
   end
 
+  before_action :switch_to_organization, only: :show, if: :user_signed_in?
   def show
     log_item_activity(:viewed) if log_activity?
     render jsonapi: @item,
@@ -119,5 +120,9 @@ class Api::V1::ItemsController < Api::V1::BaseController
       action: activity,
       content: @item.content,
     )
+  end
+
+  def switch_to_organization
+    current_user.switch_to_organization(@item.organization)
   end
 end

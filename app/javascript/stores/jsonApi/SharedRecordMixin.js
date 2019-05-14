@@ -16,7 +16,11 @@ const SharedRecordMixin = superclass =>
     }
 
     get menuDisabled() {
-      return super.menuDisabled || this.forceMenuDisabled
+      return this.isSharedCollection || this.forceMenuDisabled || !this.can_view
+    }
+
+    get frontendPath() {
+      return `/${this.internalType}/${this.id}`
     }
 
     API_updateName(name) {

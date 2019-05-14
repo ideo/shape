@@ -1,4 +1,4 @@
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Fragment } from 'react'
 
@@ -48,6 +48,7 @@ const StyledCover = props => {
   )
 }
 
+@observer
 class DataItemCoverDisplayOnly extends React.Component {
   get title() {
     const { item } = this.props

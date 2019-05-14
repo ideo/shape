@@ -28,10 +28,15 @@ class Collection < ApplicationRecord
                  :awaiting_first_user_content,
                  :cached_inheritance
 
+  # validations
+  validates :name, presence: true
+
   # callbacks
+  before_validation :inherit_parent_organization_id, on: :create
+  before_validation :set_joinable_guest_group, on: :update, if: :will_save_change_to_anyone_can_join?
+  before_save :add_viewer_to_joinable_group, if: :will_save_change_to_joinable_group_id?
   after_touch :touch_related_cards, unless: :destroyed?
   after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
-
   after_commit :reindex_sync, on: :create
   after_commit :update_comment_thread_in_firestore, unless: :destroyed?
   after_save :pin_all_primary_cards, if: :now_master_template?
@@ -104,9 +109,7 @@ class Collection < ApplicationRecord
   belongs_to :cloned_from, class_name: 'Collection', optional: true
   belongs_to :created_by, class_name: 'User', optional: true
   belongs_to :question_item, class_name: 'Item::QuestionItem', optional: true
-
-  validates :name, presence: true
-  before_validation :inherit_parent_organization_id, on: :create
+  belongs_to :joinable_group, class_name: 'Group', optional: true
 
   scope :root, -> { where('jsonb_array_length(breadcrumb) = 1') }
   scope :not_custom_type, -> { where(type: nil) }
@@ -432,83 +435,12 @@ class Collection < ApplicationRecord
     )
   end
 
-  def collection_cards_viewable_by(
-    user,
-    scope: all_collection_cards,
-    card_order: nil,
-    hidden: false
-  )
-    order = { order: :asc }
-    collection_order = nil
-    if card_order
-      if card_order == 'total' || card_order.include?('question_')
-        collection_order = "collections.cached_test_scores->'#{card_order}'"
-        order = "#{collection_order} DESC NULLS LAST"
-      else
-        # e.g. updated_at
-        order = { card_order => :desc }
-      end
-    end
-
-    cards = scope
-            .active
-            .includes(collection: [:collection_cover_items], item: [:filestack_file])
-            .order(order)
-
-    # `hidden` means include both hidden and unhidden cards
-    cards = cards.visible unless hidden
-
-    unless user.has_cached_role?(Role::SUPER_ADMIN)
-      group_ids = user.current_org_group_ids
-      resource_identifier_sql = %(
-        CASE WHEN COALESCE(
-          items.roles_anchor_collection_id,
-          collections.roles_anchor_collection_id
-        ) IS NOT NULL
-        THEN
-          CONCAT('Collection_', COALESCE(
-            items.roles_anchor_collection_id,
-            collections.roles_anchor_collection_id
-          ))
-        ELSE
-          CONCAT(
-            (CASE WHEN collection_cards.item_id IS NOT NULL THEN 'Item' ELSE 'Collection' END),
-            '_',
-            COALESCE(collection_cards.item_id, collection_cards.collection_id)
-          )
-        END
-      )
-      join_sql = %(
-        LEFT JOIN items ON items.id = collection_cards.item_id
-        LEFT JOIN collections ON collections.id = collection_cards.collection_id
-        JOIN roles ON (
-          roles.resource_identifier = #{resource_identifier_sql}
-        )
-        LEFT JOIN users_roles ON
-        users_roles.role_id = roles.id and
-        users_roles.user_id = #{user.id}
-        LEFT JOIN groups_roles ON
-        groups_roles.role_id = roles.id and
-        groups_roles.group_id IN (#{group_ids.present? ? group_ids.join(',') : 'NULL'})
-      )
-
-      fields = ['collection_cards.*']
-      fields << collection_order if collection_order.present?
-
-      cards = cards
-              .joins(join_sql)
-              .select(*fields)
-              .where('coalesce(users_roles.id, groups_roles.id) IS NOT NULL')
-              .distinct
-    end
-
-    # precache roles because these will be referred to in the serializers (e.g. can_edit?)
-    user.precache_roles_for(
-      [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],
-      cards.map(&:record).compact,
+  def collection_cards_viewable_by(user:, filters: {})
+    CollectionCardFilter.call(
+      collection: self,
+      user: user,
+      filters: filters,
     )
-
-    cards
   end
 
   # convenience method if card order ever gets out of sync
@@ -617,7 +549,7 @@ class Collection < ApplicationRecord
     false
   end
 
-  def cache_key(card_order = 'order')
+  def cache_key(card_order = 'order', user_id = nil)
     test_details = ''
     if test_collection?
       # make sure these details factor into caching
@@ -632,6 +564,7 @@ class Collection < ApplicationRecord
       "/#{test_details}" \
       "/#{getting_started_shell}" \
       "/#{organization.updated_at}" \
+      "/user_id_#{user_id}" \
       "/roles_#{anchored_roles.maximum(:updated_at).to_i}"
   end
 
@@ -842,5 +775,16 @@ class Collection < ApplicationRecord
 
   def now_master_template?
     saved_change_to_master_template? && master_template?
+  end
+
+  def set_joinable_guest_group
+    # If anyone can join, default to guest group
+    # Otherwise, clear out joinable group
+    self.joinable_group_id = anyone_can_join? ? organization.guest_group_id : nil
+  end
+
+  def add_viewer_to_joinable_group
+    return if joinable_group.blank?
+    joinable_group.add_role(Role::VIEWER, self)
   end
 end

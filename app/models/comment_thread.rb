@@ -9,7 +9,7 @@ class CommentThread < ApplicationRecord
   before_validation :inherit_record_organization_id, on: :create
 
   has_many :comments,
-           -> { order(updated_at: :desc) },
+           -> { order(created_at: :asc) },
            dependent: :destroy
   has_many :users_threads, dependent: :destroy
   has_many :groups_threads, dependent: :destroy
