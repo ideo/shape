@@ -37,3 +37,9 @@ if ENV['ORG_MASTER_TEMPLATES_ID']
     FactoryBot.create(:collection, master_template: true, num_cards: 1, parent_collection: c)
   end
 end
+
+# Add universally available auidences for development work
+if Audience.count.zero? && Rails.env.development?
+  Audience.create(name: 'Share via Link', price_per_response: 0)
+  Audience.create(name: 'All People (No Filters)', price_per_response: 5)
+end
