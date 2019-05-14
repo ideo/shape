@@ -4,7 +4,6 @@ import { sortBy } from 'lodash'
 import Avatar from '~/ui/global/Avatar'
 import AvatarGroup from '~/ui/global/AvatarGroup'
 import Tooltip from '~/ui/global/Tooltip'
-import trackError from '~/utils/trackError'
 import { AddButton } from '~/ui/global/styled/buttons'
 
 const MAX_ADMINS_TO_SHOW = 4
@@ -25,20 +24,14 @@ class AdminUsersSummary extends React.Component {
     adminUsers: [],
   }
 
-  componentDidMount() {
-    this.fetchUsers()
+  async componentDidMount() {
+    const res = await this.fetchUsers()
+    this.setState({ adminUsers: res.data })
   }
 
   fetchUsers() {
     const { apiStore } = this.props
-    apiStore
-      .fetchShapeAdminUsers()
-      .then(res => {
-        this.setState({ adminUsers: res.data })
-      })
-      .catch(e => {
-        trackError(e)
-      })
+    return apiStore.request('users/shape_admins')
   }
 
   renderUsers() {
