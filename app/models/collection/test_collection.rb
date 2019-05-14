@@ -375,18 +375,7 @@ class Collection
         graphs << data_item_card
       end
 
-      # Update legend to have org measure selected
-      add_org_measure_to_legend(legend) if legend.present?
-
       graphs
-    end
-
-    def add_org_measure_to_legend(legend = nil)
-      org_measure_name = DataReport::QuestionItem::ORG_MEASURE_NAME
-      legend ||= legend_item
-      return if legend.blank? || legend.selected_measures.include?(org_measure_name)
-      legend.selected_measures += [org_measure_name]
-      legend.save
     end
 
     def setup_default_status_and_questions
