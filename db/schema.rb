@@ -75,16 +75,6 @@ ActiveRecord::Schema.define(version: 20190510183438) do
     t.index ["user_id"], name: "index_applications_on_user_id"
   end
 
-  create_table "audiences", force: :cascade do |t|
-    t.string "name"
-    t.float "price_per_response"
-    t.string "criteria"
-    t.bigint "organization_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["organization_id"], name: "index_audiences_on_organization_id"
-  end
-
   create_table "collection_cards", force: :cascade do |t|
     t.integer "order", null: false
     t.integer "width"
@@ -389,16 +379,6 @@ ActiveRecord::Schema.define(version: 20190510183438) do
     t.index ["name"], name: "index_tags_on_name", unique: true
   end
 
-  create_table "test_audiences", force: :cascade do |t|
-    t.integer "sample_size"
-    t.bigint "audience_id"
-    t.bigint "test_collection_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["audience_id"], name: "index_test_audiences_on_audience_id"
-    t.index ["test_collection_id"], name: "index_test_audiences_on_test_collection_id"
-  end
-
   create_table "users", force: :cascade do |t|
     t.string "email", default: ""
     t.string "encrypted_password", default: "", null: false
@@ -455,5 +435,4 @@ ActiveRecord::Schema.define(version: 20190510183438) do
   end
 
   add_foreign_key "collections", "organizations"
-  add_foreign_key "test_audiences", "audiences"
 end
