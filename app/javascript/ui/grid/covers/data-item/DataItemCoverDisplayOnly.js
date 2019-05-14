@@ -109,7 +109,7 @@ class DataItemCoverDisplayOnly extends React.Component {
           </StyledTitleAndDescription>
         </AboveChartContainer>
         <ChartGroup
-          datasets={item.visibleDatasets}
+          dataItem={item}
           width={card.width}
           height={card.height}
           simpleDateTooltip

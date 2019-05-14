@@ -19,7 +19,6 @@ import BarChart from '~/ui/global/charts/BarChart'
 import LineChart from '~/ui/global/charts/LineChart'
 import Tick from '~/ui/global/charts/Tick'
 import {
-  datasetPropType,
   utcMoment,
   victoryTheme,
   emojiSeriesForQuestionType,
@@ -60,9 +59,8 @@ const ChartContainer = styled.div`
 
 class ChartGroup extends React.PureComponent {
   get primaryDataset() {
-    const { datasets } = this.props
-    if (datasets.length <= 1) return datasets[0]
-    return datasets.find(dataset => dataset.order === 0)
+    const { primaryDataset } = this.props.dataItem
+    return primaryDataset
   }
 
   get primaryDatasetValues() {
@@ -71,8 +69,8 @@ class ChartGroup extends React.PureComponent {
   }
 
   get secondaryDatasetsWithData() {
-    const { datasets } = this.props
-    return datasets.filter(
+    const { secondaryDatasets } = this.props
+    return secondaryDatasets.filter(
       dataset => dataset.order !== 0 && dataset.data.length > 0
     )
   }
@@ -325,7 +323,7 @@ class ChartGroup extends React.PureComponent {
 }
 
 ChartGroup.propTypes = {
-  datasets: MobxPropTypes.arrayOrObservableArrayOf(datasetPropType).isRequired,
+  dataItem: MobxPropTypes.objectOrObservableObject.isRequired,
   simpleDateTooltip: PropTypes.bool,
   width: PropTypes.number,
   height: PropTypes.number,

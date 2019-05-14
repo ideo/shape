@@ -44,7 +44,10 @@ class CollectionCardFilter < SimpleService
              .active
              .includes(
                collection: [:collection_cover_items],
-               item: [:filestack_file],
+               item: [
+                 :filestack_file,
+                 data_items_datasets: [:dataset]
+               ],
              )
   end
 

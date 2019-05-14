@@ -11,8 +11,9 @@ class Dataset
       data_report.total
     end
 
-    def measure
-      ORG_MEASURE_NAME
+    def measure(organization = nil)
+      organization ||= data_items.first&.organization
+      "#{organization&.name} Organization"
     end
 
     def max_domain

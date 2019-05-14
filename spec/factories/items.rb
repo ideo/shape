@@ -39,6 +39,10 @@ FactoryBot.define do
     end
 
     factory :data_item, class: 'Item::DataItem' do
+      transient do
+        dataset_type :cached_data
+      end
+
       trait :report_type_collections_and_items do
         report_type :report_type_collections_and_items
         data_settings { { d_measure: 'participants', d_timeframe: 'ever' } }
@@ -46,38 +50,23 @@ FactoryBot.define do
 
       trait :report_type_network_app_metric do
         report_type :report_type_network_app_metric
-        url 'https://profile.ideo.com/api/v1/app_metrics'
+        dataset_type :network_app_metric
       end
 
       trait :report_type_record do
-        data_content(
-          datasets: [
-            {
-              measure: 'IDEO',
-              chart_type: 'area',
-              single_value: 0,
-              order: 0,
-              data: [{ date: '2018-10-03', value: 80 }],
-            },
-            {
-              measure: 'All Organizations',
-              chart_type: 'line',
-              single_value: 0,
-              order: 1,
-              data: [{ date: '2018-11-13', value: 24 }],
-            },
-          ],
-        )
         report_type :report_type_record
+        dataset_type :cached_data
       end
 
       trait :report_type_question_item do
         report_type :report_type_question_item
-        data_source factory: :question_item
+        dataset_type :question_item
       end
 
-      trait :with_remote_url do
-        url 'https://creativedifference.ideo.com/api/v4/quality_scores'
+      after(:build) do |data_item, evaluator|
+        data_item.data_items_datasets << build_list(
+          :data_items_datasets, 1, evaluator.dataset_type, data_item: data_item
+        )
       end
     end
 

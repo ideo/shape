@@ -206,6 +206,33 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         ).to match_array(cards_included.map(&:id))
       end
     end
+
+    context 'with data items and datasets' do
+      let!(:data_item) { create(:data_item, :report_type_question_item) }
+      before do
+        user.add_role(Role::VIEWER, data_item)
+        collection.collection_cards.first.update(
+          item: data_item,
+        )
+      end
+
+      it 'includes data_items_datasets' do
+        get(path)
+        debugger
+        data_items_datasets = json_included_objects_of_type('data_items_datasets')
+        expect(
+          data_items_datasets.map(&:id),
+        ).to eq(data_item.data_items_datasets.map(&:id))
+      end
+
+      it 'includes datasets' do
+        get(path)
+        datasets = json_included_objects_of_type('datasets')
+        expect(
+          datasets.map(&:id),
+        ).to eq(data_item.datasets.map(&:id))
+      end
+    end
   end
 
   describe 'POST #create' do

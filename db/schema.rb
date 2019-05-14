@@ -177,19 +177,21 @@ ActiveRecord::Schema.define(version: 20190513203005) do
     t.bigint "data_item_id"
     t.bigint "dataset_id"
     t.integer "order", null: false
+    t.boolean "selected", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["data_item_id", "dataset_id", "order"], name: "data_items_datasets_aggregate_index"
+    t.index ["data_item_id", "dataset_id", "order", "selected"], name: "data_items_datasets_aggregate_index"
   end
 
   create_table "datasets", force: :cascade do |t|
     t.string "type"
     t.string "measure"
+    t.string "question_type"
+    t.string "url"
     t.integer "chart_type"
     t.integer "max_domain"
     t.integer "timeframe"
     t.jsonb "cached_data"
-    t.string "question_type"
     t.bigint "organization_id"
     t.string "data_source_type"
     t.bigint "data_source_id"

@@ -174,16 +174,29 @@ class Item extends SharedRecordMixin(BaseRecord) {
     })
   }
 
-  get visibleDatasets() {
-    if (this.datasets.length > 0) return this.datasets
-    return this.visible_datasets
+  get primaryDataset() {
+    const { data_items_datasets } = this
+    if (!data_items_datasets) return null
+    if (data_items_datasets.length <= 1) return data_items_datasets[0].dataset
+    const primary = data_items_datasets.find(
+      data_items_datasets => data_items_datasets.order === 0
+    )
+    return primary.dataset
   }
 
-  get primaryDataset() {
-    const { visibleDatasets } = this
-    if (!visibleDatasets) return null
-    if (visibleDatasets.length <= 1) return visibleDatasets[0]
-    return datasets.find(visibleDatasets => visibleDatasets.order === 0)
+  get secondaryDataItemDatasets() {
+    const { data_items_datasets } = this
+    if (!data_items_datasets) return []
+    return data_items_datasets.filter(
+      data_item_dataset => data_item_dataset.order !== 0
+    )
+  }
+
+  secondaryDatasets = ({ selected = true }) => {
+    const dataItemDatasets = this.secondaryDataItemDatasets.filter(
+      data_item_dataset => selected === data_item_dataset.selected
+    )
+    return dataItemDatasets.map(data_item_dataset => data_item_dataset.dataset)
   }
 
   get measure() {
@@ -239,13 +252,6 @@ class Item extends SharedRecordMixin(BaseRecord) {
 Item.defaults = {
   data_content: '',
   can_edit: false,
-  datasets: [
-    {
-      order: 0,
-      data: [],
-      count: 0,
-    },
-  ],
   data_settings: {
     d_measure: null,
   },

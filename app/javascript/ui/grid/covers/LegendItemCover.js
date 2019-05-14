@@ -100,26 +100,14 @@ class LegendItemCover extends React.Component {
     card.parent.API_fetchCards()
   }
 
-  comparisonMeasures = ({ selected }) => {
-    const { selected_measures } = this.props.item.data_settings
-
-    if (selected && selected_measures.length === 0) return []
-
-    const { comparison_measures } = this.props.item
-    return comparison_measures.filter(
-      measureData =>
-        selected === selected_measures.includes(measureData.measure)
-    )
-  }
-
-  renderSelectedMeasure = ({ measureData, primary }) => {
-    const { measure, style, chart_type, order } = measureData
+  renderSelectedDataset = ({ dataset, order, primary }) => {
+    const { measure, style, chart_type } = dataset
     let icon
     if (chart_type === 'line') {
       icon = (
         <LineChartMeasure
           color={(style && style.fill) || '#000000'}
-          order={measureData.order}
+          order={order}
         />
       )
     } else {
@@ -158,9 +146,15 @@ class LegendItemCover extends React.Component {
     return measure
   }
 
+  comparisonDatasets = ({ selected }) => {
+    const { item } = this.props
+    return item.secondaryDatasets(selected)
+  }
+
   get comparisonMenuOptions() {
-    return this.comparisonMeasures({ selected: false }).map(measureData => {
-      const { measure } = measureData
+    const { item } = this.props
+    return item.secondaryDatasets({ selected: false }).map(dataset => {
+      const { measure } = dataset
       return measure
     })
   }
@@ -198,18 +192,21 @@ class LegendItemCover extends React.Component {
 
   render() {
     const { item } = this.props
-    const { primary_measure } = item
+    const { primaryDataset } = item
     const { comparisonMenuOpen } = this.state
+    let order = 0
     return (
       <StyledLegendItem data-cy="LegendItemCover">
         <StyledLegendTitle>{item.name}</StyledLegendTitle>
-        {this.renderSelectedMeasure({
-          measureData: primary_measure,
+        {this.renderSelectedDataset({
+          dataset: primaryDataset,
+          order: order,
           primary: true,
         })}
-        {this.comparisonMeasures({ selected: true }).map(measureData =>
-          this.renderSelectedMeasure({
-            measureData,
+        {item.secondaryDatasets({ selected: true }).map(dataset =>
+          this.renderSelectedDataset({
+            dataset,
+            order: (order += 1),
             primary: false,
           })
         )}

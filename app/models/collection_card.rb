@@ -67,6 +67,17 @@ class CollectionCard < ApplicationRecord
     recognize []
   end
 
+  def self.default_relationships_for_api
+    [
+      :parent,
+      record: [
+        :filestack_file,
+        :collection_cover_items,
+        data_items_datasets: [:dataset],
+      ],
+    ]
+  end
+
   def duplicate!(
     for_user: nil,
     parent: self.parent,
