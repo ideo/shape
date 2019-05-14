@@ -11,6 +11,7 @@ import PlainLink from '~/ui/global/PlainLink'
 import GlobalSearch from '~/ui/layout/GlobalSearch'
 import Avatar from '~/ui/global/Avatar'
 import ActionMenu from '~/ui/grid/ActionMenu'
+import ArrowIcon from '~/ui/icons/ArrowIcon'
 import ActivityLogButton from '~/ui/notifications/ActivityLogButton'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
@@ -26,6 +27,15 @@ import LoggedOutBasicHeader from '~/ui/layout/LoggedOutBasicHeader'
 import MainMenuDropdown from '~/ui/global/MainMenuDropdown'
 
 /* global IdeoSSO */
+
+const BackIconContainer = styled.span`
+  color: ${v.colors.black};
+  display: inline-block;
+  height: 18px;
+  margin-right: 8px;
+  width: 12px;
+  vertical-align: middle;
+`
 
 const StyledAvatarAndDropdown = styled.div`
   display: inline-block;
@@ -265,9 +275,41 @@ class Header extends React.Component {
   }
 
   @computed
+  get isMobileXs() {
+    const { uiStore } = this.props
+    return (
+      uiStore.windowWidth && uiStore.windowWidth < v.responsive.smallBreakpoint
+    )
+  }
+
+  @computed
   get record() {
     const { uiStore } = this.props
     return uiStore.viewingCollection || uiStore.viewingItem
+  }
+
+  renderMobileSearch() {
+    const { routingStore } = this.props
+    return (
+      <Fragment>
+        <FixedHeader data-empty-space-click>
+          <MaxWidthContainer>
+            <Flex align="center" style={{ minHeight: v.headerHeight }}>
+              <button onClick={routingStore.leaveSearch}>
+                <BackIconContainer>
+                  <ArrowIcon />
+                </BackIconContainer>
+              </button>
+
+              <Box>
+                <GlobalSearch open className="search-bar" />
+              </Box>
+            </Flex>
+          </MaxWidthContainer>
+        </FixedHeader>
+        <HeaderSpacer />
+      </Fragment>
+    )
   }
 
   render() {
@@ -291,6 +333,9 @@ class Header extends React.Component {
       )
     } else if (!currentUser.current_organization) {
       return <BasicHeader orgMenu={uiStore.organizationMenuOpen} />
+    }
+    if (routingStore.isSearch && this.isMobileXs) {
+      return this.renderMobileSearch()
     }
     const primaryGroup = currentUser.current_organization.primary_group
     return (
@@ -352,8 +397,8 @@ class Header extends React.Component {
                 </div>
               </Box>
 
-              <Box flex align="center">
-                <Hidden smDown>
+              <Box flex align="center" style={{ marginLeft: '8px' }}>
+                <Hidden xsDown>
                   <GlobalSearch className="search-bar" />
                 </Hidden>
                 {record && (
