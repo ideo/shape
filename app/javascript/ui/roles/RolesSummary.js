@@ -8,6 +8,7 @@ import Tooltip from '~/ui/global/Tooltip'
 import Avatar from '~/ui/global/Avatar'
 import AvatarGroup from '~/ui/global/AvatarGroup'
 import v from '~/utils/variables'
+import { AddButton } from '~/ui/global/styled/buttons'
 
 const MAX_USERS_TO_SHOW = 4
 
@@ -29,22 +30,6 @@ const StyledSeparator = styled.div`
   background-color: ${v.colors.commonMedium};
   display: inline-block;
 `
-
-const StyledAddUserBtn = styled.div`
-  display: inline-block;
-  vertical-align: top;
-  margin-right: 0;
-  width: 32px;
-  height: 32px;
-  border-radius: 32px;
-  background-color: white;
-  color: ${v.colors.black};
-  line-height: 32px;
-  font-size: 1.5rem;
-  text-align: center;
-  cursor: pointer;
-`
-StyledAddUserBtn.displayName = 'StyledAddUserBtn'
 
 const MORE_EDITORS = (
   <Avatar
@@ -170,7 +155,7 @@ class RolesSummary extends React.Component {
     if (!canEdit) return ''
     return (
       <Tooltip title="Share">
-        <StyledAddUserBtn onClick={this.props.handleClick}>+</StyledAddUserBtn>
+        <AddButton onClick={this.props.handleClick}>+</AddButton>
       </Tooltip>
     )
   }

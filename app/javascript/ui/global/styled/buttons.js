@@ -81,3 +81,19 @@ export const NotificationButton = styled.button`
   width: 12px;
 `
 NotificationButton.displayName = 'NotificationButton'
+
+export const AddButton = styled.div`
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 32px;
+  background-color: white;
+  color: ${v.colors.black};
+  line-height: 32px;
+  font-size: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+`
+AddButton.displayName = 'AddButton'

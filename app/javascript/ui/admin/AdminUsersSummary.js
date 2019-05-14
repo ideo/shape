@@ -3,7 +3,9 @@ import { sortBy } from 'lodash'
 
 import Avatar from '~/ui/global/Avatar'
 import AvatarGroup from '~/ui/global/AvatarGroup'
+import Tooltip from '~/ui/global/Tooltip'
 import trackError from '~/utils/trackError'
+import { AddButton } from '~/ui/global/styled/buttons'
 
 const MAX_ADMINS_TO_SHOW = 4
 
@@ -60,10 +62,15 @@ class AdminUsersSummary extends React.Component {
     const adminCount = this.state.adminUsers.length
 
     return (
-      <AvatarGroup>
-        {this.renderUsers()}
-        {adminCount > MAX_ADMINS_TO_SHOW && MORE_ADMINS}
-      </AvatarGroup>
+      <React.Fragment>
+        <AvatarGroup>
+          {this.renderUsers()}
+          {adminCount > MAX_ADMINS_TO_SHOW && MORE_ADMINS}
+        </AvatarGroup>
+        <Tooltip title="Invite Shape Admin">
+          <AddButton>+</AddButton>
+        </Tooltip>
+      </React.Fragment>
     )
   }
 }

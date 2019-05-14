@@ -38,8 +38,8 @@ describe('RolesSummary', () => {
       expect(wrapper.find('[className="viewer"]').length).toEqual(2)
     })
 
-    it('does not render StyledAddUserBtn by default', () => {
-      expect(wrapper.find('StyledAddUserBtn').exists()).toBe(false)
+    it('does not render AddButton by default', () => {
+      expect(wrapper.find('AddButton').exists()).toBe(false)
     })
   })
 
@@ -135,8 +135,8 @@ describe('RolesSummary', () => {
     })
 
     it('renders manage roles button with onClick', () => {
-      expect(wrapper.find('StyledAddUserBtn').exists()).toBe(true)
-      expect(wrapper.find('StyledAddUserBtn').props().onClick).toEqual(
+      expect(wrapper.find('AddButton').exists()).toBe(true)
+      expect(wrapper.find('AddButton').props().onClick).toEqual(
         canEditProps.handleClick
       )
     })
