@@ -221,6 +221,10 @@ class ApiStore extends jsonapi(datxCollection) {
     )
   }
 
+  fetchShapeAdminUsers() {
+    return this.request('users/shape_admins', 'GET')
+  }
+
   async fetchRoles(resource) {
     const res = await this.request(
       `${resource.internalType}/${resource.id}/roles`,
