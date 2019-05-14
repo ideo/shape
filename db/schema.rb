@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190508180048) do
+ActiveRecord::Schema.define(version: 20190514224531) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -77,11 +77,11 @@ ActiveRecord::Schema.define(version: 20190508180048) do
 
   create_table "audiences", force: :cascade do |t|
     t.string "name"
-    t.float "price_per_response"
     t.string "criteria"
     t.bigint "organization_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.float "price_per_response"
     t.index ["organization_id"], name: "index_audiences_on_organization_id"
   end
 
@@ -150,6 +150,7 @@ ActiveRecord::Schema.define(version: 20190508180048) do
     t.boolean "anyone_can_view", default: false
     t.boolean "anyone_can_join", default: false
     t.bigint "joinable_group_id"
+    t.datetime "test_closed_at"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
