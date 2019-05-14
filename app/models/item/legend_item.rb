@@ -36,7 +36,7 @@ class Item
       }
     end
 
-    # private
+    private
 
     def dataset_measure_hash(dataset, order = 0)
       {

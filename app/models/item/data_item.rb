@@ -26,11 +26,6 @@ class Item
              to: :legend_item,
              allow_nil: true
 
-    delegate :question_title,
-             :question_description,
-             to: :data_source,
-             allow_nil: true
-
     VALID_MEASURES = %w[
       participants
       viewers
@@ -99,6 +94,14 @@ class Item
       return duplicate if duplicate.new_record? || duplicate.errors.present?
 
       duplicate
+    end
+
+    def title
+      datasets.first&.title
+    end
+
+    def description
+      datasets.first&.description
     end
 
     private

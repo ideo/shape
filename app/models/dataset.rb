@@ -22,6 +22,10 @@ class Dataset < ApplicationRecord
     line: 2,
   }
 
+  def title; end
+
+  def description; end
+
   def data
     # Implement in your class
   end

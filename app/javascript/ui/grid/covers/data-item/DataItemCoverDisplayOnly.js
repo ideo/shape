@@ -70,22 +70,21 @@ class DataItemCoverDisplayOnly extends React.Component {
   }
 
   get questionItemTitleAndDescription() {
-    const { question_title, question_description } = this.props.item
+    const { title, description } = this.props.item
     return (
       <Fragment>
-        {question_title && (
+        {title && (
           <Heading1 style={{ marginTop: 0 }} notResponsive>
-            {question_title}
+            {title}
           </Heading1>
         )}
-        {question_description && <Heading3>{question_description}</Heading3>}
+        {description && <Heading3>{description}</Heading3>}
       </Fragment>
     )
   }
 
   render() {
     const { card, item } = this.props
-    console.log(item)
     const tooltip = this.primaryDatasetDescription
     return (
       <StyledCover item={item}>

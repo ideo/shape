@@ -22,6 +22,14 @@ class Dataset
       95
     end
 
+    def title
+      question_item.question_title
+    end
+
+    def description
+      question_item.question_description
+    end
+
     private
 
     def data_report
