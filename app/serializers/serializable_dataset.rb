@@ -2,8 +2,9 @@ class SerializableDataset < BaseJsonSerializer
   type 'datasets'
   attributes :chart_type, :timeframe,
              :max_domain, :question_type,
-             :total, :data, :order, :selected,
-             :data_items_datasets_id, :style
+             :total, :data, :single_value,
+             :order, :selected, :style,
+             :data_items_datasets_id
 
   attribute :measure do
     if @object.is_a?(Dataset::OrgWideQuestion)

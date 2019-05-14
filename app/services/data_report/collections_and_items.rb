@@ -1,64 +1,73 @@
 module DataReport
   class CollectionsAndItems < SimpleService
 
-    def initialize(dataset:)
-      @dataset = dataset
+    delegate :organization_id, to: :@record
+
+    def initialize(record:, measure:, timeframe:)
+      @record = record
+      @measure = measure
+      @timeframe = timeframe
+      @data = nil
+      @single_value = nil
+      @is_single_value = false
+      @query = nil
     end
 
     def call
+      initialize_data
+      calculate_timeframe_values
+      @data
+    end
+
+    def single_value
+      @is_single_value = true
+      initialize_data
+      calculate_single_value
+      @single_value
+    end
+
+    private
+
+    def single_value?
+      @is_single_value
+    end
+
+    def initialize_data
       if @measure == 'records'
         collections_and_items_report_dataset
       else
         @query = generate_base_query
         return [] unless @query
         @query = filtered_query
-        if @timeframe == 'ever'
-          calculate_single_value
-        else
-          calculate_timeframe_values
-        end
       end
-      datasets
-    end
-
-    private
-
-    def collections_and_items_report_dataset
-
-    end
-
-    def datasets
-      [
-        {
-          measure: @measure,
-          chart_type: 'area',
-          timeframe: @timeframe,
-          order: 0,
-          single_value: @single_value,
-          data: @data,
-        },
-      ]
     end
 
     def collections_and_items_report_dataset
-      # create temp DataItems to create item and collection reports
-      d_items = @data_item.amoeba_dup
-      d_items.organization_id = @data_item.organization_id
-      d_items.d_measure = 'items'
-      d_collections = @data_item.amoeba_dup
-      d_collections.organization_id = @data_item.organization_id
-      d_collections.d_measure = 'collections'
-      item_dataset = d_items.datasets.first
-      collection_dataset = d_collections.datasets.first
-      # Combine the two reports
-      # Call .to_i on single_value because it may be nil (only present if timeframe is `ever`)
-      @single_value = item_dataset[:single_value].to_i + collection_dataset[:single_value].to_i
-      all_values = (item_dataset[:data] + collection_dataset[:data]).group_by { |x| x[:date] }
-      @data = all_values.map do |date, values|
-        {
-          date: date,
-          value: values.map { |x| x[:value] }.sum,
-        }
+      item_data = DataReport::CollectionsAndItems.new(
+        record: @record,
+        measure: 'items',
+        timeframe: @timeframe,
+      )
+
+      collection_data = DataReport::CollectionsAndItems.new(
+        record: @record,
+        measure: 'collections',
+        timeframe: @timeframe,
+      )
+
+      if single_value?
+        # Combine the two reports
+        # Call .to_i on single_value because it may be nil (only present if timeframe is `ever`)
+        @single_value = item_data.single_value.to_i + collection_data.single_value.to_i
+      else
+        concatenated = (item_data.call + collection_data.call)
+        all_values = concatenated.group_by { |x| x[:date] }
+        @data = all_values.map do |date, values|
+          {
+            date: date,
+            value: values.map { |x| x[:value] }.sum,
+          }
+        end
       end
     end
 
@@ -80,9 +89,8 @@ module DataReport
     end
 
     def filtered_query
-      collection_filter = @filters&.find { |x| x['type'] == 'Collection' }
-      if collection_filter && collection_filter['target']
-        collection_opts = { collection_id: collection_filter['target'] }
+      if @record.is_a?(Collection)
+        collection_opts = { collection_id: @record.id }
         if measure_queries_activities?
           @query.where(target_type: %w[Collection Item])
                 .joins(%(left join collections on
@@ -107,10 +115,10 @@ module DataReport
         if @measure == 'items'
           @query
             .joins(parent_collection_card: :parent)
-            .where('collections.organization_id = ?', @data_item.organization_id)
+            .where('collections.organization_id = ?', organization_id)
         else
           @query
-            .where(organization_id: @data_item.organization_id)
+            .where(organization_id: organization_id)
         end
       end
     end
@@ -188,7 +196,7 @@ module DataReport
       else
         return
       end
-      return @single_value = value if @return_records
+
       @single_value = value.count
     end
   end

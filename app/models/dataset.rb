@@ -29,18 +29,22 @@ class Dataset < ApplicationRecord
     line: 2,
   }
 
+  # Implement in each sub-class
+
   def title; end
 
   def description; end
 
-  # Can override in each class
+  def total; end
+
+  def single_value; end
+
   def data
     return cached_data if cached_data.present?
     []
   end
 
-  # Implement in each sub-class
-  def total; end
+  # End of methods to (potentially) implement in each sub-class
 
   def data_items_datasets_id
     cached_data_items_datasets&.id

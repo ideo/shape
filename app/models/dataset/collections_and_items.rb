@@ -1,7 +1,5 @@
 class Dataset
   class CollectionsAndItems < Dataset
-    # Data source is a collection or item
-
     VALID_MEASURES = %w[
       participants
       viewers
@@ -13,10 +11,27 @@ class Dataset
     ].freeze
 
     validates :measure, inclusion: { in: VALID_MEASURES }
+    # Data source is a collection or item
+    validates :data_source, presence: true
 
     def data
-      # TODO
-      {}
+      return if ever?
+
+      DataReport::CollectionsAndItems.call(
+        record: data_source,
+        measure: measure,
+        timeframe: timeframe,
+      )
+    end
+
+    def single_value
+      return unless ever?
+
+      DataReport::CollectionsAndItems.new(
+        record: data_source,
+        measure: measure,
+        timeframe: timeframe,
+      ).single_value
     end
   end
 end
