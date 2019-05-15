@@ -23,7 +23,10 @@ import {
 import v from '~/utils/variables'
 import BasicHeader from '~/ui/layout/BasicHeader'
 import LoggedOutBasicHeader from '~/ui/layout/LoggedOutBasicHeader'
-import MainMenuDropdown from '~/ui/global/MainMenuDropdown'
+import MainMenuDropdown, {
+  CONTEXT_USER,
+  CONTEXT_COMBO,
+} from '~/ui/global/MainMenuDropdown'
 
 /* global IdeoSSO */
 
@@ -232,7 +235,7 @@ class Header extends React.Component {
   get renderUserDropdown() {
     const { userDropdownOpen, isMobile } = this
     if (!userDropdownOpen) return ''
-    const menuContext = isMobile ? 'combo' : 'user'
+    const menuContext = isMobile ? CONTEXT_COMBO : CONTEXT_USER
     return (
       <MainMenuDropdown
         context={menuContext}

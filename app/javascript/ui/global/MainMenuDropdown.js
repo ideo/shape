@@ -11,9 +11,9 @@ import ProfileIcon from '~/ui/icons/ProfileIcon'
 import SettingsIcon from '~/ui/icons/SettingsIcon'
 import SearchBar from '~/ui/layout/SearchBar'
 
-const CONTEXT_USER = 'user'
-const CONTEXT_ORG = 'org'
-const CONTEXT_COMBO = 'combo'
+export const CONTEXT_USER = 'user'
+export const CONTEXT_ORG = 'org'
+export const CONTEXT_COMBO = 'combo'
 const MAX_ORGS_IN_LIST = 10
 
 const IconHolder = styled.span`
