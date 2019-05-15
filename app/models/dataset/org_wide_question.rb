@@ -1,5 +1,6 @@
 class Dataset
   class OrgWideQuestion < Dataset
+    before_validation :set_default_timeframe
 
     ORG_MEASURE_NAME = 'org-wide-feedback'.freeze
 
@@ -24,6 +25,10 @@ class Dataset
 
     def data_report
       @data_report ||= DataReport::QuestionItem.new(dataset: self)
+    end
+
+    def set_default_timeframe
+      self.timeframe = :ever
     end
   end
 end

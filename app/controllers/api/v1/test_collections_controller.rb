@@ -47,6 +47,14 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
     end
   end
 
+  def add_comparison
+    # TestComparison.add(@origin_collection, comparison_collection)
+  end
+
+  def remove_comparison
+    # TestComparison.remove(@origin_collection, comparison_collection)
+  end
+
   private
 
   def load_test_collection

@@ -1,14 +1,43 @@
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { observable, action } from 'mobx'
 
-import { Select, SelectOption } from '~/ui/global/styled/forms'
+import AutoComplete from '~/ui/global/AutoComplete'
 import XIcon from '~/ui/icons/XIcon'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import v from '~/utils/variables'
 import { colorScale } from '~/ui/global/charts/ChartUtils'
 import { DisplayText, Heading3 } from '~/ui/global/styled/typography'
 import LineChartMeasure from '~/ui/icons/LineChartMeasure'
+import trackError from '~/utils/trackError'
+
+function formatCollections(collections) {
+  return collections.map(collection => ({
+    value: collection.id,
+    label: collection.name,
+    data: collection,
+  }))
+}
+
+const PlusIconContainer = styled.span`
+  &:hover,
+  &:active {
+    .icon {
+      background-color: ${v.colors.commonDarkest};
+    }
+    color: ${v.colors.commonDarkest};
+  }
+  .icon {
+    background-color: ${v.colors.commonMedium};
+    border-radius: 50%;
+    padding: 7px;
+    height: 15px;
+    width: 15px;
+    margin: -3px 8px 0 0;
+    display: inline-block;
+    vertical-align: middle;
+  }
+`
 
 const StyledLegendItem = styled.div`
   border-top: 2px solid #000;
@@ -61,27 +90,20 @@ const StyledAddComparison = styled.div`
   }
   &:hover,
   &:active {
-    .icon {
-      background-color: ${v.colors.commonDarkest};
-    }
     color: ${v.colors.commonDarkest};
-  }
-  .icon {
-    background-color: ${v.colors.commonMedium};
-    border-radius: 50%;
-    padding: 7px;
-    height: 15px;
-    width: 15px;
-    margin: -3px 8px 0 0;
-    display: inline-block;
-    vertical-align: middle;
   }
 `
 
+@inject('apiStore', 'uiStore')
 @observer
 class LegendItemCover extends React.Component {
   state = {
     comparisonMenuOpen: false,
+  }
+
+  componentWillUnMount() {
+    const { uiStore } = this.props
+    uiStore.removeEmptySpaceClickHandler(this.onSearchClose)
   }
 
   @observable
@@ -130,8 +152,14 @@ class LegendItemCover extends React.Component {
     )
   }
 
-  toggleComparisonMenu = () => {
+  toggleComparisonSearch = () => {
+    const { uiStore } = this.props
     const { comparisonMenuOpen } = this.state
+    if (comparisonMenuOpen) {
+      uiStore.removeEmptySpaceClickHandler(this.onSearchClose)
+    } else {
+      uiStore.addEmptySpaceClickHandler(this.onSearchClose)
+    }
     this.setState({
       comparisonMenuOpen: !comparisonMenuOpen,
     })
@@ -146,47 +174,43 @@ class LegendItemCover extends React.Component {
     return measure
   }
 
-  comparisonDatasets = ({ selected }) => {
-    const { item } = this.props
-    return item.secondaryDatasets({ selected })
-  }
-
-  get comparisonMenuOptions() {
-    const { item } = this.props
-    return item.secondaryDatasets({ selected: false }).map(dataset => {
-      const { measure } = dataset
-      return measure
+  onSearchClose = ev => {
+    this.setState({
+      comparisonMenuOpen: false,
     })
   }
 
-  handleComparisonMenuSelection = event => {
-    event.preventDefault()
-    const { value } = event.target
-    this.toggleMeasure({ measure: value, show: true })
+  onSelectComparison = testCollection => {
+    console.log('woah', testCollection)
+  }
+
+  searchTestCollections = (term, callback) => {
+    const { item } = this.props
+    return this.props.apiStore
+      .searchCollections({
+        query: `${term}`,
+        type: 'Collection::TestCollection',
+        order_by: 'updated_at',
+        order_direction: 'desc',
+        per_page: 30,
+      })
+      .then(res => res.data)
+      .then(records => records.filter(record => record.id === item.parent_id))
+      .then(records => callback(formatCollections(records)))
+      .catch(e => {
+        trackError(e)
+      })
   }
 
   get renderComparisonMenu() {
     return (
-      <Select
-        classes={{ root: 'select', selectMenu: 'selectMenu' }}
-        displayEmpty
-        disableUnderline
-        name="role"
-        onChange={this.handleComparisonMenuSelection}
-        onClose={() => this.setState({ comparisonMenuOpen: false })}
-        open
-        inline
-      >
-        {this.comparisonMenuOptions.map(option => (
-          <SelectOption
-            classes={{ root: 'selectOption', selected: 'selected' }}
-            key={option}
-            value={option}
-          >
-            {this.measureDisplayName(option)}
-          </SelectOption>
-        ))}
-      </Select>
+      <AutoComplete
+        options={[]}
+        optionSearch={this.searchTestCollections}
+        onOptionSelect={option => this.onSelectComparison(option)}
+        placeholder="search comparisons"
+        onMenuClose={this.onSearchClose}
+      />
     )
   }
 
@@ -213,14 +237,18 @@ class LegendItemCover extends React.Component {
         <br />
         <StyledAddComparison>
           {comparisonMenuOpen && this.renderComparisonMenu}
-          <Heading3
-            onClick={this.toggleComparisonMenu}
-            role="button"
-            className="add-comparison-button"
-          >
-            <PlusIcon viewBox="0 0 5 18" />
-            Add Comparison
-          </Heading3>
+          {!comparisonMenuOpen && (
+            <Heading3
+              onClick={this.toggleComparisonSearch}
+              role="button"
+              className="add-comparison-button"
+            >
+              <PlusIconContainer>
+                <PlusIcon viewBox="0 0 5 18" />
+              </PlusIconContainer>
+              Add Comparison
+            </Heading3>
+          )}
         </StyledAddComparison>
       </StyledLegendItem>
     )
@@ -230,6 +258,10 @@ class LegendItemCover extends React.Component {
 LegendItemCover.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   card: MobxPropTypes.objectOrObservableObject,
+}
+
+LegendItemCover.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 LegendItemCover.defaultProps = {

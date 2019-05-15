@@ -99,6 +99,11 @@ class Collection < ApplicationRecord
   has_many :collection_cover_items,
            through: :collection_cover_cards,
            source: :item
+  has_many :data_items,
+           -> { data_items },
+           source: :item,
+           class_name: 'Item::DataItem',
+           through: :primary_collection_cards
 
   has_one :comment_thread, as: :record, dependent: :destroy
 

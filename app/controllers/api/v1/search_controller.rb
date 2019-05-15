@@ -63,8 +63,8 @@ class Api::V1::SearchController < Api::V1::BaseController
 
     order_opts = { _score: :desc }
 
-    if params[:collection_type].present?
-      where_clause[:type] = params[:collection_type]
+    if params[:type].present?
+      where_clause[:type] = params[:type]
     end
 
     if params[:order_by].present? && params[:order_direction].present?

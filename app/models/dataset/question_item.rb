@@ -1,5 +1,6 @@
 class Dataset
   class QuestionItem < Dataset
+    before_validation :set_default_timeframe
 
     def data
       data_report.call
@@ -34,6 +35,10 @@ class Dataset
 
     def data_report
       @data_report ||= DataReport::QuestionItem.new(dataset: self)
+    end
+
+    def set_default_timeframe
+      self.timeframe = :ever
     end
   end
 end

@@ -137,6 +137,8 @@ export default class UiStore {
   activityLogMoving = false
   @observable
   windowWidth = 0
+  @observable
+  emptySpaceClickHandlers = new Set()
 
   // Comments + Threads
   @observable
@@ -390,6 +392,28 @@ export default class UiStore {
     this.movingCardIds.replace([])
     this.movingFromCollectionId = null
     if (deselect) this.deselectCards()
+  }
+
+  @action
+  addEmptySpaceClickHandler(handler) {
+    this.emptySpaceClickHandlers.add(handler)
+  }
+
+  @action
+  removeEmptySpaceClickHandler(handler) {
+    this.emptySpaceClickHandlers.delete(handler)
+  }
+
+  @action
+  clearEmptySpaceClickHandlers() {
+    this.emptySpaceClickHandlers.clear()
+  }
+
+  @action
+  onEmptySpaceClick(ev) {
+    const { emptySpaceClickHandlers } = this
+    if (emptySpaceClickHandlers.size === 0) return
+    emptySpaceClickHandlers.forEach(handler => handler(ev))
   }
 
   @action

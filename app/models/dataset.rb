@@ -11,6 +11,8 @@ class Dataset < ApplicationRecord
   validates :timeframe, :chart_type, presence: true
   validates :cached_data, :measure, presence: true, if: :root_dataset_class?
 
+  scope :question_items, -> { where(type: 'Dataset::QuestionItem') }
+
   attr_accessor :cached_data_items_datasets
 
   delegate :order, :selected,

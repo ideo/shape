@@ -12,6 +12,9 @@ class Collection
              through: :primary_collection_cards
     belongs_to :collection_to_test, class_name: 'Collection', optional: true
 
+    has_many :datasets,
+             through: :data_items
+
     before_create :setup_default_status_and_questions, unless: :cloned_from_present?
     after_create :add_test_tag, :add_child_roles
     after_update :touch_test_design, if: :saved_change_to_test_status?
