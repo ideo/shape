@@ -83,13 +83,11 @@ LeaveIconHolder.displayName = 'StyledLeaveIconHolder'
 @observer
 class AdminUsersModal extends React.Component {
   state = {
-    adminUsers: [],
     activePanelOpen: true,
   }
 
-  async componentDidMount() {
-    const res = await this.props.apiStore.fetchShapeAdminUsers()
-    this.setState({ adminUsers: res.data })
+  componentDidMount() {
+    this.props.apiStore.fetchShapeAdminUsers()
   }
 
   handleClose = async ev => {
@@ -109,16 +107,16 @@ class AdminUsersModal extends React.Component {
 
   isOpenPanel = panel => this.state[`${panel}PanelOpen`]
 
-  async removeUser(user) {
+  removeUser(user) {
     this.props.apiStore.removeShapeAdminUser(user)
   }
 
   render() {
-    const { open } = this.props
+    const { open, apiStore } = this.props
     const title = 'Invite Shape Admin Users'
 
     const panel = 'active'
-    const { adminUsers } = this.state
+    const adminUsers = apiStore.shapeAdminUsers
     const activeCount = adminUsers.length
 
     return (

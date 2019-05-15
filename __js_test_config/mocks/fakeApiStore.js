@@ -108,6 +108,7 @@ const fakeApiStore = ({
     ],
     collections: [],
     items: [],
+    shapeAdminUsers: [],
 
     uiStore: fakeUiStore,
     undoStore: {},

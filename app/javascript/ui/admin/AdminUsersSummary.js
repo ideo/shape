@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { sortBy } from 'lodash'
 
 import Avatar from '~/ui/global/Avatar'
 import AvatarGroup, { MAX_AVATARS_TO_SHOW } from '~/ui/global/AvatarGroup'
@@ -10,18 +9,13 @@ import { AddButton } from '~/ui/global/styled/buttons'
 @inject('apiStore')
 @observer
 class AdminUsersSummary extends React.Component {
-  state = {
-    adminUsers: [],
-  }
-
-  async componentDidMount() {
-    const res = await this.props.apiStore.fetchShapeAdminUsers()
-    this.setState({ adminUsers: res.data })
+  componentDidMount() {
+    this.props.apiStore.fetchShapeAdminUsers()
   }
 
   renderUsers() {
-    let users = sortBy(this.state.adminUsers, ['first_name'])
-    users = users.slice(0, MAX_AVATARS_TO_SHOW)
+    const { apiStore } = this.props
+    const users = apiStore.shapeAdminUsers.slice(0, MAX_AVATARS_TO_SHOW)
 
     return users.map(user => {
       return (
@@ -37,7 +31,8 @@ class AdminUsersSummary extends React.Component {
   }
 
   render() {
-    const adminCount = this.state.adminUsers.length
+    const { apiStore } = this.props
+    const adminCount = apiStore.shapeAdminUsers.length
 
     return (
       <React.Fragment>

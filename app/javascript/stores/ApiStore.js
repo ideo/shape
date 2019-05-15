@@ -52,6 +52,9 @@ class ApiStore extends jsonapi(datxCollection) {
   @observable
   usableTemplates = []
 
+  @observable
+  shapeAdminUsers = []
+
   // doesn't have any need to be observable...
   filestackToken = {}
   filestackTokenInterval = null
@@ -232,12 +235,22 @@ class ApiStore extends jsonapi(datxCollection) {
     return roles
   }
 
+  @action
   async fetchShapeAdminUsers() {
-    return this.request('admin/users')
+    const res = await this.request('admin/users')
+    const adminUsers = _.sortBy(res.data, ['first_name'])
+    runInAction(() => {
+      this.shapeAdminUsers = adminUsers
+    })
+    return adminUsers
   }
 
+  @action
   async removeShapeAdminUser(user) {
-    return this.request(`admin/users/${user.id}`, 'DELETE')
+    await this.request(`admin/users/${user.id}`, 'DELETE')
+    runInAction(() => {
+      _.remove(this.shapeAdminUsers, (u) => u.id === user.id)
+    })
   }
 
   @action

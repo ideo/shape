@@ -4,25 +4,18 @@ import fakeApiStore from '#/mocks/fakeApiStore'
 import AdminUsersSummary from '~/ui/admin/AdminUsersSummary'
 import { fakeUser } from '#/mocks/data'
 
-const waitForAsync = () => new Promise(resolve => setImmediate(resolve))
-
-const defaultProps = {
+const apiStore = fakeApiStore()
+const props = {
   handleClick: jest.fn(),
+  apiStore,
 }
 
-let wrapper, props
+let wrapper
 describe('AdminUsersSummary', () => {
   describe('with one Shape admin user', () => {
     beforeEach(async () => {
-      props = {
-        ...defaultProps,
-        apiStore: fakeApiStore({
-          requestResult: { data: [fakeUser] },
-        }),
-      }
+      apiStore.shapeAdminUsers = [fakeUser]
       wrapper = shallow(<AdminUsersSummary.wrappedComponent {...props} />)
-      await waitForAsync()
-      wrapper.update()
     })
 
     it('renders an avatar for the Shape admin user', () => {
@@ -63,18 +56,14 @@ describe('AdminUsersSummary', () => {
       fakeUser5.first_name = 'Chance'
       fakeUser5.last_name = 'Schollar'
       fakeUser5.name = 'Chance Schollar'
-
-      props = {
-        ...defaultProps,
-        apiStore: fakeApiStore({
-          requestResult: {
-            data: [fakeUser, fakeUser2, fakeUser3, fakeUser4, fakeUser5],
-          },
-        }),
-      }
+      apiStore.shapeAdminUsers = [
+        fakeUser,
+        fakeUser2,
+        fakeUser3,
+        fakeUser4,
+        fakeUser5,
+      ]
       wrapper = shallow(<AdminUsersSummary.wrappedComponent {...props} />)
-      await waitForAsync()
-      wrapper.update()
     })
 
     it('renders avatars for four of the Shape admin users', () => {
