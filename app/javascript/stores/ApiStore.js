@@ -249,8 +249,12 @@ class ApiStore extends jsonapi(datxCollection) {
   async removeShapeAdminUser(user) {
     await this.request(`admin/users/${user.id}`, 'DELETE')
     runInAction(() => {
-      _.remove(this.shapeAdminUsers, (u) => u.id === user.id)
+      _.remove(this.shapeAdminUsers, u => u.id === user.id)
     })
+
+    if (user.id === this.currentUserId) {
+      window.location.href = '/'
+    }
   }
 
   @action
