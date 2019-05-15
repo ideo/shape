@@ -14,6 +14,7 @@ import ActionMenu from '~/ui/grid/ActionMenu'
 import ActivityLogButton from '~/ui/notifications/ActivityLogButton'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
+import UserDropdown from '~/ui/layout/UserDropdown'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 import {
   FixedHeader,
@@ -23,14 +24,11 @@ import {
 import v from '~/utils/variables'
 import BasicHeader from '~/ui/layout/BasicHeader'
 import LoggedOutBasicHeader from '~/ui/layout/LoggedOutBasicHeader'
-import MainMenuDropdown, {
-  CONTEXT_USER,
-  CONTEXT_COMBO,
-} from '~/ui/global/MainMenuDropdown'
+import MainMenuDropdown from '~/ui/global/MainMenuDropdown'
 
 /* global IdeoSSO */
 
-const StyledAvatarAndDropdown = styled.div`
+export const StyledAvatarAndDropdown = styled.div`
   display: inline-block;
   margin-left: 8px;
   .user-avatar,
@@ -89,9 +87,6 @@ const StyledActivityLogBtn = styled(StyledRoundBtn)`
 @observer
 class Header extends React.Component {
   @observable
-  userDropdownOpen = false
-
-  @observable
   orgDropdownOpen = false
 
   @observable
@@ -115,11 +110,6 @@ class Header extends React.Component {
   handleOrgClick = open => () =>
     runInAction(() => {
       this.orgDropdownOpen = open
-    })
-
-  handleUserClick = open => () =>
-    runInAction(() => {
-      this.userDropdownOpen = open
     })
 
   showObjectRoleDialog = () => {
@@ -163,7 +153,7 @@ class Header extends React.Component {
   }
 
   get clickHandlers() {
-    return [this.handleUserClick(false), this.handleOrgClick(false)]
+    return [this.handleOrgClick(false)]
   }
 
   get hasActions() {
@@ -232,19 +222,6 @@ class Header extends React.Component {
     )
   }
 
-  get renderUserDropdown() {
-    const { userDropdownOpen, isMobile } = this
-    if (!userDropdownOpen) return ''
-    const menuContext = isMobile ? CONTEXT_COMBO : CONTEXT_USER
-    return (
-      <MainMenuDropdown
-        context={menuContext}
-        open={userDropdownOpen}
-        onItemClick={this.handleUserClick(false)}
-      />
-    )
-  }
-
   @computed
   get maxBreadcrumbContainerWidth() {
     const outer = this.breadcrumbsWidth - this.actionsWidth
@@ -258,7 +235,7 @@ class Header extends React.Component {
   }
 
   render() {
-    const { record, userDropdownOpen, orgDropdownOpen } = this
+    const { record, orgDropdownOpen } = this
     const { apiStore, routingStore, uiStore } = this.props
     const { currentUser } = apiStore
     if (!currentUser) {
@@ -370,22 +347,8 @@ class Header extends React.Component {
                     </button>
                   </StyledAvatarAndDropdown>
                 </Hidden>
-                <StyledAvatarAndDropdown className="userDropdown">
-                  {this.renderUserDropdown}
-                  <button
-                    style={{ display: 'block' }}
-                    className="userBtn"
-                    onClick={this.handleUserClick(true)}
-                  >
-                    <Avatar
-                      title={currentUser.name}
-                      url={currentUser.pic_url_square}
-                      className="user-avatar"
-                      responsive={false}
-                    />
-                  </button>
-                </StyledAvatarAndDropdown>
-                {(userDropdownOpen || orgDropdownOpen) && (
+                <UserDropdown />
+                {orgDropdownOpen && (
                   <ClickWrapper clickHandlers={this.clickHandlers} />
                 )}
               </Box>
