@@ -232,6 +232,10 @@ class ApiStore extends jsonapi(datxCollection) {
     return roles
   }
 
+  async fetchShapeAdminUsers() {
+    return this.request('users/shape_admins')
+  }
+
   @action
   importUsersThread({ usersThread, thread, comments } = {}) {
     thread.addReference('users_thread', usersThread, {

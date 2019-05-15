@@ -15,13 +15,8 @@ class AdminUsersSummary extends React.Component {
   }
 
   async componentDidMount() {
-    const res = await this.fetchUsers()
+    const res = await this.props.apiStore.fetchShapeAdminUsers()
     this.setState({ adminUsers: res.data })
-  }
-
-  fetchUsers() {
-    const { apiStore } = this.props
-    return apiStore.request('users/shape_admins')
   }
 
   renderUsers() {
