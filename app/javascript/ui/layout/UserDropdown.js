@@ -1,10 +1,10 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import { CONTEXT_COMBO, CONTEXT_USER } from '../global/MainMenuDropdown'
-import { StyledAvatarAndDropdown } from '~/ui/layout/Header'
 import Avatar from '~/ui/global/Avatar'
-import MainMenuDropdown from '~/ui/global/MainMenuDropdown'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
+import MainMenuDropdown from '~/ui/global/MainMenuDropdown'
+import StyledAvatarAndDropdown from '~/ui/layout/StyledAvatarAndDropdown'
 
 @inject('apiStore', 'uiStore')
 @observer

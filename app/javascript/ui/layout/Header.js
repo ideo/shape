@@ -25,29 +25,9 @@ import v from '~/utils/variables'
 import BasicHeader from '~/ui/layout/BasicHeader'
 import LoggedOutBasicHeader from '~/ui/layout/LoggedOutBasicHeader'
 import MainMenuDropdown from '~/ui/global/MainMenuDropdown'
+import StyledAvatarAndDropdown from '~/ui/layout/StyledAvatarAndDropdown'
 
 /* global IdeoSSO */
-
-export const StyledAvatarAndDropdown = styled.div`
-  display: inline-block;
-  margin-left: 8px;
-  .user-avatar,
-  .organization-avatar {
-    cursor: pointer;
-    margin-left: 0;
-    margin-right: 0;
-  }
-  .user-menu,
-  .org-menu {
-    top: 15px;
-    right: 20px;
-    z-index: ${v.zIndex.aboveClickWrapper};
-    .menu-toggle {
-      display: none;
-    }
-  }
-`
-StyledAvatarAndDropdown.displayName = 'StyledAvatarAndDropdown'
 
 const StyledSeparator = styled.div`
   width: 1px;
