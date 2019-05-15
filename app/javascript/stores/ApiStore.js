@@ -458,7 +458,7 @@ class ApiStore extends jsonapi(datxCollection) {
     const fromCollection = this.find('collections', data.from_id)
     if (data.to_id !== data.from_id) {
       runInAction(() => {
-        fromCollection.collection_cards.replace([])
+        fromCollection.removeCardIds(data.collection_card_ids)
       })
     } else {
       await fromCollection.API_fetchCards()
