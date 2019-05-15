@@ -14,6 +14,7 @@ import ActionMenu from '~/ui/grid/ActionMenu'
 import ActivityLogButton from '~/ui/notifications/ActivityLogButton'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
+import UserDropdown from '~/ui/layout/UserDropdown'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 import {
   FixedHeader,
@@ -24,29 +25,9 @@ import v from '~/utils/variables'
 import BasicHeader from '~/ui/layout/BasicHeader'
 import LoggedOutBasicHeader from '~/ui/layout/LoggedOutBasicHeader'
 import MainMenuDropdown from '~/ui/global/MainMenuDropdown'
+import StyledAvatarAndDropdown from '~/ui/layout/StyledAvatarAndDropdown'
 
 /* global IdeoSSO */
-
-const StyledAvatarAndDropdown = styled.div`
-  display: inline-block;
-  margin-left: 8px;
-  .user-avatar,
-  .organization-avatar {
-    cursor: pointer;
-    margin-left: 0;
-    margin-right: 0;
-  }
-  .user-menu,
-  .org-menu {
-    top: 15px;
-    right: 20px;
-    z-index: ${v.zIndex.aboveClickWrapper};
-    .menu-toggle {
-      display: none;
-    }
-  }
-`
-StyledAvatarAndDropdown.displayName = 'StyledAvatarAndDropdown'
 
 const StyledSeparator = styled.div`
   width: 1px;
@@ -86,9 +67,6 @@ const StyledActivityLogBtn = styled(StyledRoundBtn)`
 @observer
 class Header extends React.Component {
   @observable
-  userDropdownOpen = false
-
-  @observable
   orgDropdownOpen = false
 
   @observable
@@ -112,11 +90,6 @@ class Header extends React.Component {
   handleOrgClick = open => () =>
     runInAction(() => {
       this.orgDropdownOpen = open
-    })
-
-  handleUserClick = open => () =>
-    runInAction(() => {
-      this.userDropdownOpen = open
     })
 
   showObjectRoleDialog = () => {
@@ -160,7 +133,7 @@ class Header extends React.Component {
   }
 
   get clickHandlers() {
-    return [this.handleUserClick(false), this.handleOrgClick(false)]
+    return [this.handleOrgClick(false)]
   }
 
   get hasActions() {
@@ -229,39 +202,10 @@ class Header extends React.Component {
     )
   }
 
-  get renderUserDropdown() {
-    const { userDropdownOpen, isMobile } = this
-    if (!userDropdownOpen) return ''
-    const menuContext = isMobile ? 'combo' : 'user'
-    return (
-      <MainMenuDropdown
-        context={menuContext}
-        open={userDropdownOpen}
-        onItemClick={this.handleUserClick(false)}
-      />
-    )
-  }
-
   @computed
   get maxBreadcrumbContainerWidth() {
     const outer = this.breadcrumbsWidth - this.actionsWidth
     return Math.min(outer, 700)
-  }
-
-  @computed
-  get isLargeBreakpoint() {
-    const { uiStore } = this.props
-    return (
-      uiStore.windowWidth && uiStore.windowWidth >= v.responsive.largeBreakpoint
-    )
-  }
-
-  @computed
-  get isMobile() {
-    const { uiStore } = this.props
-    return (
-      uiStore.windowWidth && uiStore.windowWidth < v.responsive.medBreakpoint
-    )
   }
 
   @computed
@@ -271,13 +215,7 @@ class Header extends React.Component {
   }
 
   render() {
-    const {
-      isMobile,
-      isLargeBreakpoint,
-      record,
-      userDropdownOpen,
-      orgDropdownOpen,
-    } = this
+    const { record, orgDropdownOpen } = this
     const { apiStore, routingStore, uiStore } = this.props
     const { currentUser } = apiStore
     if (!currentUser) {
@@ -312,10 +250,14 @@ class Header extends React.Component {
                 <div ref={ref => this.updateBreadcrumbsWidth(ref)}>
                   {record && (
                     <Flex data-empty-space-click align="center">
-                      <div style={{ flex: isMobile ? '1 1 auto' : '0 1 auto' }}>
+                      <div
+                        style={{
+                          flex: uiStore.isMobile ? '1 1 auto' : '0 1 auto',
+                        }}
+                      >
                         <Breadcrumb
-                          maxDepth={isLargeBreakpoint ? 6 : 1}
-                          backButton={!isLargeBreakpoint}
+                          maxDepth={uiStore.isLargeBreakpoint ? 6 : 1}
+                          backButton={!uiStore.isLargeBreakpoint}
                           record={record}
                           isHomepage={uiStore.isViewingHomepage}
                           // re-mount every time the record / breadcrumb changes
@@ -385,22 +327,8 @@ class Header extends React.Component {
                     </button>
                   </StyledAvatarAndDropdown>
                 </Hidden>
-                <StyledAvatarAndDropdown className="userDropdown">
-                  {this.renderUserDropdown}
-                  <button
-                    style={{ display: 'block' }}
-                    className="userBtn"
-                    onClick={this.handleUserClick(true)}
-                  >
-                    <Avatar
-                      title={currentUser.name}
-                      url={currentUser.pic_url_square}
-                      className="user-avatar"
-                      responsive={false}
-                    />
-                  </button>
-                </StyledAvatarAndDropdown>
-                {(userDropdownOpen || orgDropdownOpen) && (
+                <UserDropdown />
+                {orgDropdownOpen && (
                   <ClickWrapper clickHandlers={this.clickHandlers} />
                 )}
               </Box>
