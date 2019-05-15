@@ -4,15 +4,16 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Fragment } from 'react'
 import { Flex, Box } from 'reflexbox'
 
+import AdminUsersModal from '~/ui/admin/AdminUsersModal'
+import AdminUsersSummary from '~/ui/admin/AdminUsersSummary'
+import Logo from '~/ui/layout/Logo'
+import PlainLink from '~/ui/global/PlainLink'
+import v from '~/utils/variables'
 import {
   FixedHeader,
   MaxWidthContainer,
   HeaderSpacer,
 } from '~/ui/global/styled/layout'
-import Logo from '~/ui/layout/Logo'
-import PlainLink from '~/ui/global/PlainLink'
-import AdminUsersSummary from '~/ui/admin/AdminUsersSummary'
-import v from '~/utils/variables'
 
 const StyledHeadingWrapper = styled.div`
   margin-left: 0.5rem;
@@ -25,11 +26,16 @@ const StyledHeadingWrapper = styled.div`
   color: ${v.colors.black};
 `
 
-@inject('routingStore')
+@inject('routingStore', 'uiStore')
 @observer
 class AdminHeader extends React.Component {
+  showAdminUsersDialog = () => {
+    const { uiStore } = this.props
+    uiStore.update('adminUsersMenuOpen', true)
+  }
+
   render() {
-    const { routingStore } = this.props
+    const { routingStore, uiStore } = this.props
 
     return (
       <Fragment>
@@ -50,11 +56,14 @@ class AdminHeader extends React.Component {
                 <Flex align="center">
                   <StyledHeadingWrapper>Shape Admin</StyledHeadingWrapper>
                   <Hidden smDown>
-                    <AdminUsersSummary />
+                    <AdminUsersSummary
+                      handleClick={this.showAdminUsersDialog}
+                    />
                   </Hidden>
                 </Flex>
               </Box>
             </Flex>
+            <AdminUsersModal open={!!uiStore.adminUsersMenuOpen} />
           </MaxWidthContainer>
         </FixedHeader>
         <HeaderSpacer />
@@ -65,6 +74,7 @@ class AdminHeader extends React.Component {
 
 AdminHeader.wrappedComponent.propTypes = {
   routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default AdminHeader

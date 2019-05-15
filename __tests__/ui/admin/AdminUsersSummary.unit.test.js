@@ -6,11 +6,16 @@ import { fakeUser } from '#/mocks/data'
 
 const waitForAsync = () => new Promise(resolve => setImmediate(resolve))
 
+const defaultProps = {
+  handleClick: jest.fn(),
+}
+
 let wrapper, props
 describe('AdminUsersSummary', () => {
   describe('with one Shape admin user', () => {
     beforeEach(async () => {
       props = {
+        ...defaultProps,
         apiStore: fakeApiStore({
           requestResult: { data: [fakeUser] },
         }),
@@ -60,6 +65,7 @@ describe('AdminUsersSummary', () => {
       fakeUser5.name = 'Chance Schollar'
 
       props = {
+        ...defaultProps,
         apiStore: fakeApiStore({
           requestResult: {
             data: [fakeUser, fakeUser2, fakeUser3, fakeUser4, fakeUser5],

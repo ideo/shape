@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { sortBy } from 'lodash'
 
@@ -51,12 +52,16 @@ class AdminUsersSummary extends React.Component {
         >
           {this.renderUsers()}
         </AvatarGroup>
-        <Tooltip title="Invite Shape Admin">
-          <AddButton>+</AddButton>
+        <Tooltip title="Invite Shape Admin Users">
+          <AddButton onClick={this.props.handleClick}>+</AddButton>
         </Tooltip>
       </React.Fragment>
     )
   }
+}
+
+AdminUsersSummary.propTypes = {
+  handleClick: PropTypes.func.isRequired,
 }
 
 AdminUsersSummary.wrappedComponent.propTypes = {
