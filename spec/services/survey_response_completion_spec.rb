@@ -5,11 +5,29 @@ describe SurveyResponseCompletion, type: :service do
   let(:survey_response) { create(:survey_response, test_collection: test_collection) }
   let(:service) { SurveyResponseCompletion.new(survey_response) }
 
-  it 'marks the survey_response as complete' do
-    expect {
-      service.call
-    }.to change(survey_response, :status)
-    expect(survey_response.status).to eq 'completed'
+  context "completed after test closed but within allowable window" do
+    let(:test_collection) do
+      collection = create(:test_collection, :with_test_audience)
+      collection.close!
+      collection
+    end
+    it 'marks the survey_response as completed_late' do
+      expect {
+        service.call
+      }.to change(survey_response, :status)
+      # unsure why test_collection#close! is failing here
+      expect(survey_response.status).to eq 'completed_late'
+    end
+  end
+
+  context "completed before test was closed" do
+    it 'marks the survey_response as completed' do
+      expect {
+        service.call
+      }.to change(survey_response, :status)
+
+      expect(survey_response.status).to eq 'completed'
+    end
   end
 
   it 'should call CollectionUpdateBroadcaster with the test_collection if status changes' do

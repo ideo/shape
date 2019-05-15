@@ -90,7 +90,18 @@ class Collection
       update(test_launched_at: Time.current)
     end
 
+    def closed_within_completion_window?
+      return false if test_closed_at.blank?
+      closed? && Time.zone.now.between?(test_closed_at, completion_window)
+    end
+
+    def completion_window
+      test_closed_at - 10.minutes
+    end
+
     def after_close_test
+      update(test_closed_at: Time.current)
+
       if inside_a_submission?
         update_cached_submission_status(parent_submission)
       elsif submission_box_template_test?

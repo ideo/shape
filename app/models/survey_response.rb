@@ -12,6 +12,7 @@ class SurveyResponse < ApplicationRecord
   enum status: {
     in_progress: 0,
     completed: 1,
+    completed_late: 2,
   }
 
   def all_questions_answered?
