@@ -1,6 +1,6 @@
+import { action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import { observable, action } from 'mobx'
 
 import AutoComplete from '~/ui/global/AutoComplete'
 import XIcon from '~/ui/icons/XIcon'
@@ -106,7 +106,6 @@ class LegendItemCover extends React.Component {
     uiStore.removeEmptySpaceClickHandler(this.onSearchClose)
   }
 
-  @observable
   @action
   toggleMeasure = async ({ measure, show }) => {
     const { item, card } = this.props
@@ -180,10 +179,12 @@ class LegendItemCover extends React.Component {
     })
   }
 
-  onSelectComparison = testCollection => {
+  @action
+  onSelectComparison = async testCollection => {
     const { card } = this.props
     console.log('woah', card)
-    card.parent.API_addComparison(testCollection)
+    await card.parent.API_addComparison(testCollection)
+    card.parent.API_fetchCards()
   }
 
   searchTestCollections = (term, callback) => {

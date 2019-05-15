@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer } from 'mobx-react'
 import styled from 'styled-components'
 import {
   LineSegment,
@@ -57,7 +58,8 @@ const ChartContainer = styled.div`
   right: 0;
 `
 
-class ChartGroup extends React.PureComponent {
+@observer
+class ChartGroup extends React.Component {
   get primaryDataset() {
     const { primaryDataset } = this.props.dataItem
     return primaryDataset
