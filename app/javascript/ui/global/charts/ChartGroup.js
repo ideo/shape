@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
@@ -19,6 +20,7 @@ import BarChart from '~/ui/global/charts/BarChart'
 import LineChart from '~/ui/global/charts/LineChart'
 import Tick from '~/ui/global/charts/Tick'
 import {
+  colorScale,
   utcMoment,
   victoryTheme,
   emojiSeriesForQuestionType,
@@ -85,6 +87,27 @@ class ChartGroup extends React.PureComponent {
   get isSmallChartStyle() {
     const { width, height } = this.props
     return width <= 1 && height <= 1
+  }
+
+  get colorScaleFromData() {
+    const { dataItem } = this.props
+    const { datasets } = dataItem
+    const measures = datasets.map(dataset => dataset.measure)
+    const colors = []
+    if (!dataItem.legendItem) return colorScale
+    let previousMeasure
+    let idx = 0
+    dataItem.legendItem.datasets.forEach(legendDataset => {
+      if (legendDataset.measure !== previousMeasure) {
+        if (_.includes(measures, legendDataset.measure)) {
+          colors.push(colorScale[idx])
+        }
+        idx += 1
+      }
+      previousMeasure = legendDataset.measure
+    })
+    console.log('colrs', colors)
+    return colors
   }
 
   monthlyXAxisText = (date, index) => {
@@ -286,7 +309,7 @@ class ChartGroup extends React.PureComponent {
           domainPadding={{ y: 10 }}
           padding={{ top: 0, left: 40, right: 40, bottom: 15 }}
         >
-          <VictoryGroup offset={30}>
+          <VictoryGroup offset={30} colorScale={this.colorScaleFromData}>
             {this.renderedDatasets.map(dataset => dataset)}
           </VictoryGroup>
           {this.chartAxis}

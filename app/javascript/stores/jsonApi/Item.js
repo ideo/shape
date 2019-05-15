@@ -204,6 +204,12 @@ class Item extends SharedRecordMixin(BaseRecord) {
     }
   }
 
+  get legendItem() {
+    const { legend_item_id } = this
+    if (!legend_item_id) return null
+    return this.apiStore.find('items', legend_item_id.toString())
+  }
+
   get timeframe() {
     const { timeframe } = this.primaryDataset
     return timeframe || ''

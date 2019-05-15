@@ -824,6 +824,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     this.setReloading(false)
   }
 
+  async API_addComparison(comparisonTest) {
+    const apiPath = `test_collections/${this.id}/add_comparison`
+    const data = { comparison_collection_id: comparisonTest.id }
+    return this.apiStore.request(apiPath, 'POST', { data })
+  }
+
   async API_moveCardsIntoCollection({
     toCollection,
     cardIds,

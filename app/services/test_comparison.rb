@@ -14,29 +14,21 @@ class TestComparison < SimpleService
 
   def add
     return if same_collection?
-    @collection.data_items.report_type_question_items.includes(datasets: [:data_source]).each do |data_item|
+    # @collection.data_items.report_type_question_item.includes(datasets: [:data_source]).each do |data_item|
+    @collection.data_items.report_type_question_item.each do |data_item|
       # TODO: assign question_type on question items datasets?
       question_item_type = data_item.datasets.first.data_source.question_type
       maximum_order = data_item.data_items_datasets.maximum(:order)
-      comparison_datasets_by_question_type[question_item_type].each do |comparison_dataset|
+      comparable = comparison_datasets_by_question_type[question_item_type]
+      next if comparable.nil?
+      comparable.each do |comparison_dataset|
         data_item.data_items_datasets.create(
           dataset: comparison_dataset,
           order: maximum_order += 1,
+          selected: true,
         )
       end
     end
-
-    # @collection.data_items.report_type_question_items.each |data_item| do
-    #   matching_data_set = datasets_by_question_type[data_item.
-    # end
-
-    # @comparison_collection.question_items.scale_questions.each
-    #   question_items = question_items_by_question_type[question.question_type]
-    #   question_items.each do |question_item|
-    #     create_data_items_datasets(question_item.dataset)
-    #   end
-    #   #   create_data_items_datasets(question_items)
-    # end
   end
 
   def remove
@@ -53,7 +45,8 @@ class TestComparison < SimpleService
   end
 
   def comparison_datasets_by_question_type
-    @comparison_datasets_by_question_type ||= @comparison_collection.includes(:dataset).question_items.scale_questions.each_with_object({}) do |question_item, h|
+    # @comparison_datasets_by_question_type ||= @comparison_collection.includes(:dataset).question_items.scale_questions.each_with_object({}) do |question_item, h|
+    @comparison_datasets_by_question_type ||= @comparison_collection.question_items.scale_questions.each_with_object({}) do |question_item, h|
       h[question_item.question_type] ||= []
       h[question_item.question_type].push(question_item.dataset)
     end

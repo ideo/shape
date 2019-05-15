@@ -58,6 +58,8 @@ Rails.application.routes.draw do
           patch 'close'
           patch 'reopen'
           get 'next_available'
+          post 'add_comparison'
+          post 'remove_comparison'
         end
       end
       resources :items, only: %i[create]

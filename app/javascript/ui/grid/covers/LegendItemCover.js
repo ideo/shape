@@ -181,12 +181,14 @@ class LegendItemCover extends React.Component {
   }
 
   onSelectComparison = testCollection => {
-    console.log('woah', testCollection)
+    const { card } = this.props
+    console.log('woah', card)
+    card.parent.API_addComparison(testCollection)
   }
 
   searchTestCollections = (term, callback) => {
-    const { item } = this.props
-    return this.props.apiStore
+    const { item, apiStore } = this.props
+    return apiStore
       .searchCollections({
         query: `${term}`,
         type: 'Collection::TestCollection',
@@ -195,7 +197,7 @@ class LegendItemCover extends React.Component {
         per_page: 30,
       })
       .then(res => res.data)
-      .then(records => records.filter(record => record.id === item.parent_id))
+      .then(records => records.filter(record => record.id !== item.parent_id))
       .then(records => callback(formatCollections(records)))
       .catch(e => {
         trackError(e)
