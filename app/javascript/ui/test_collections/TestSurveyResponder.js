@@ -57,6 +57,8 @@ class TestSurveyResponder extends React.Component {
   questionAnswerForCard = card => {
     const { surveyResponse } = this.props
     if (!surveyResponse) return undefined
+    // This method is supposed to return a questionAnswer, not a boolean
+    // https://www.dropbox.com/s/72mafwlzukz13ir/Screenshot%202019-05-15%2012.17.10.png?dl=0
     if (card.card_question_type === 'question_recontact') {
       return this.recontactAnswered
     }

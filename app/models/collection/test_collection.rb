@@ -90,13 +90,9 @@ class Collection
       update(test_launched_at: Time.current)
     end
 
-    def closed_within_completion_window?
-      return false if test_closed_at.blank?
-      closed? && Time.zone.now.between?(test_closed_at, completion_window)
-    end
-
-    def completion_window
-      test_closed_at - 10.minutes
+    def still_accepting_answers?
+      return true if live?
+      closed? && test_closed_at < 10.minutes.ago
     end
 
     def after_close_test

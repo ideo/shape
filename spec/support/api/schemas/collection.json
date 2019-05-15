@@ -42,7 +42,8 @@
     "gives_incentive": { "type": ["boolean", "null"] },
     "joinable_group_id": { "type": ["string"] },
     "test_collection_id": { "type": ["string"] },
-    "frontend_url": { "type": ["string"] }
+    "frontend_url": { "type": ["string"] },
+    "test_closed_at": { "type": ["string"] }
   },
   "required": ["name", "class_type", "created_at", "cover"]
 }

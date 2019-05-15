@@ -14,7 +14,7 @@ class SurveyResponseCompletion < SimpleService
 
   def update_survey_status
     test_collection = @survey_response.test_collection
-    if test_collection.closed_within_completion_window?
+    if test_collection.still_accepting_answers?
       @survey_response.completed_late!
     else
       @survey_response.completed!

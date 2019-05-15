@@ -1,5 +1,5 @@
 import styled, { ThemeProvider } from 'styled-components'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { PropTypes as MobxPropTypes, observer } from 'mobx-react'
 
 import v from '~/utils/variables'
 import DialogWrapper from '~/ui/global/modals/DialogWrapper'
@@ -50,6 +50,7 @@ const LearnMoreLink = LoudDisplayLink.extend`
 `
 LearnMoreLink.displayName = 'LearnMoreLink'
 
+@observer
 class TestSurveyPage extends React.Component {
   state = {
     surveyResponse: null,
@@ -84,6 +85,11 @@ class TestSurveyPage extends React.Component {
     const { collection, createSurveyResponse } = this
     const { surveyResponse } = this.state
     if (!collection) return null
+
+    // this is being set in /stores/jsonApi/QuestionAnswer.js
+    if (collection.test_status === 'closed') {
+      return <div>hurry</div>
+    }
     if (collection.test_status === 'live') {
       return (
         <StyledSurvey data-cy="StandaloneTestSurvey">
