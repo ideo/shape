@@ -1,7 +1,6 @@
 import { apiUrl } from '~/utils/url'
 import { runInAction } from 'mobx'
 import BaseRecord from './BaseRecord'
-import { apiStore } from '~/stores'
 
 class QuestionAnswer extends BaseRecord {
   static type = 'question_answers'
@@ -19,7 +18,7 @@ class QuestionAnswer extends BaseRecord {
       )
       return res.data
     } catch (e) {
-      let test_collection = apiStore.find(
+      const test_collection = this.apiStore.find(
         'collections',
         this.survey_response.test_collection_id
       )
