@@ -100,10 +100,6 @@ describe('RolesSummary', () => {
       expect(wrapper.find('[className="editor"]').length).toEqual(4)
     })
 
-    it('renders an additonal placeholder to indicate more', () => {
-      expect(wrapper.find('[className="placeholder"]').length).toEqual(1)
-    })
-
     it('does not render any viewers or viewer label', () => {
       expect(wrapper.find('[className="viewer"]').exists()).toBe(false)
       expect(wrapper.render().text()).not.toMatch(/viewer/i)

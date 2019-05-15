@@ -71,12 +71,8 @@ describe('AdminUsersSummary', () => {
       wrapper.update()
     })
 
-    it('renders avatars for the Shape admin users', () => {
+    it('renders avatars for four of the Shape admin users', () => {
       expect(wrapper.find('.admin').length).toEqual(4)
-    })
-
-    it('renders a placeholder for the Shape admin users not shown', () => {
-      expect(wrapper.find('.placeholder').length).toEqual(1)
     })
   })
 })

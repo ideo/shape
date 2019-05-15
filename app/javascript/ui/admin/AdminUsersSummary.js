@@ -2,20 +2,9 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { sortBy } from 'lodash'
 
 import Avatar from '~/ui/global/Avatar'
-import AvatarGroup from '~/ui/global/AvatarGroup'
+import AvatarGroup, { MAX_AVATARS_TO_SHOW } from '~/ui/global/AvatarGroup'
 import Tooltip from '~/ui/global/Tooltip'
 import { AddButton } from '~/ui/global/styled/buttons'
-
-const MAX_ADMINS_TO_SHOW = 4
-
-const MORE_ADMINS = (
-  <Avatar
-    title="...and more admins"
-    url=""
-    className="placeholder"
-    displayName
-  />
-)
 
 @inject('apiStore')
 @observer
@@ -36,7 +25,7 @@ class AdminUsersSummary extends React.Component {
 
   renderUsers() {
     let users = sortBy(this.state.adminUsers, ['first_name'])
-    users = users.slice(0, MAX_ADMINS_TO_SHOW)
+    users = users.slice(0, MAX_AVATARS_TO_SHOW)
 
     return users.map(user => {
       return (
@@ -56,9 +45,11 @@ class AdminUsersSummary extends React.Component {
 
     return (
       <React.Fragment>
-        <AvatarGroup>
+        <AvatarGroup
+          avatarCount={adminCount}
+          placeholderTitle="...and more admins"
+        >
           {this.renderUsers()}
-          {adminCount > MAX_ADMINS_TO_SHOW && MORE_ADMINS}
         </AvatarGroup>
         <Tooltip title="Invite Shape Admin">
           <AddButton>+</AddButton>

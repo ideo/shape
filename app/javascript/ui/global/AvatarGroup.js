@@ -1,9 +1,13 @@
+import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { map, range } from 'lodash'
 
+import Avatar from '~/ui/global/Avatar'
 import v from '~/utils/variables'
 
-const AvatarGroup = styled.div`
+export const MAX_AVATARS_TO_SHOW = 4
+
+const StyledAvatarGroup = styled.div`
   display: inline-block;
   margin: 0 8px;
   .placeholder,
@@ -32,6 +36,32 @@ const AvatarGroup = styled.div`
     background-color: ${v.colors.commonMedium};
   }
 `
-AvatarGroup.displayName = 'AvatarGroup'
+StyledAvatarGroup.displayName = 'StyledAvatarGroup'
+
+class AvatarGroup extends React.PureComponent {
+  render() {
+    const { avatarCount, children, placeholderTitle } = this.props
+
+    return (
+      <StyledAvatarGroup>
+        {children}
+        {avatarCount > MAX_AVATARS_TO_SHOW && (
+          <Avatar
+            title={placeholderTitle}
+            url=""
+            className="placeholder"
+            displayName
+          />
+        )}
+      </StyledAvatarGroup>
+    )
+  }
+}
+
+AvatarGroup.propTypes = {
+  children: PropTypes.node,
+  avatarCount: PropTypes.number.isRequired,
+  placeholderTitle: PropTypes.string.isRequired,
+}
 
 export default AvatarGroup

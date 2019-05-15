@@ -6,11 +6,9 @@ import pluralize from 'pluralize'
 
 import Tooltip from '~/ui/global/Tooltip'
 import Avatar from '~/ui/global/Avatar'
-import AvatarGroup from '~/ui/global/AvatarGroup'
+import AvatarGroup, { MAX_AVATARS_TO_SHOW } from '~/ui/global/AvatarGroup'
 import v from '~/utils/variables'
 import { AddButton } from '~/ui/global/styled/buttons'
-
-const MAX_USERS_TO_SHOW = 4
 
 const StyledRolesSummary = styled.div`
   position: relative;
@@ -30,23 +28,6 @@ const StyledSeparator = styled.div`
   background-color: ${v.colors.commonMedium};
   display: inline-block;
 `
-
-const MORE_EDITORS = (
-  <Avatar
-    title="...and more editors"
-    url=""
-    className="placeholder"
-    displayName
-  />
-)
-const MORE_VIEWERS = (
-  <Avatar
-    title="...and more viewers"
-    url=""
-    className="placeholder"
-    displayName
-  />
-)
 
 // NOTE: intentionally not an observer so that searching roles within the menu doesn't affect this list on the fly
 // however it will automatically update after you close the RolesModal
@@ -72,17 +53,17 @@ class RolesSummary extends React.Component {
     return [...viewerRole.users, ...viewerRole.groups]
   }
 
-  // Return at most MAX_USERS_TO_SHOW users,
+  // Return at most MAX_AVATARS_TO_SHOW users,
   // prioritizing editors over viewers
   get viewersAndEditorsLimited() {
     let editors = _.sortBy(this.editors, ['first_name'])
     let viewers = _.sortBy(this.viewers, ['first_name'])
     const editorCount = editors.length
     const viewerCount = viewers.length
-    editors = editors.slice(0, MAX_USERS_TO_SHOW)
+    editors = editors.slice(0, MAX_AVATARS_TO_SHOW)
 
-    if (editors.length < MAX_USERS_TO_SHOW) {
-      const numViewers = MAX_USERS_TO_SHOW - editors.length
+    if (editors.length < MAX_AVATARS_TO_SHOW) {
+      const numViewers = MAX_AVATARS_TO_SHOW - editors.length
       viewers = viewers.slice(0, numViewers)
     } else {
       viewers = []
@@ -120,9 +101,12 @@ class RolesSummary extends React.Component {
     ))
 
     return (
-      <AvatarGroup align="right">
+      <AvatarGroup
+        align="right"
+        avatarCount={editorCount}
+        placeholderTitle="...and more editors"
+      >
         {editorAvatars}
-        {editorCount > MAX_USERS_TO_SHOW && MORE_EDITORS}
       </AvatarGroup>
     )
   }
@@ -143,9 +127,11 @@ class RolesSummary extends React.Component {
       />
     ))
     return (
-      <AvatarGroup>
+      <AvatarGroup
+        avatarCount={viewerCount}
+        placeholderTitle="...and more viewers"
+      >
         {viewerAvatars}
-        {viewerCount > MAX_USERS_TO_SHOW && MORE_VIEWERS}
       </AvatarGroup>
     )
   }
