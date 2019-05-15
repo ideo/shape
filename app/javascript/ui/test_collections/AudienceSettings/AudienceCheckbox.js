@@ -1,7 +1,12 @@
-import { StyledRowFlexParent, StyledRowFlexItem, StyledLabel } from './styled'
+import PropTypes from 'prop-types'
+import {
+  StyledRowFlexParent,
+  StyledRowFlexItem,
+  StyledLabelText,
+} from './styled'
 import { Checkbox, LabelContainer } from '~/ui/global/styled/forms'
 
-const AudienceLabel = ({
+const AudienceCheckbox = ({
   selected,
   audienceId,
   audienceName,
@@ -23,9 +28,7 @@ const AudienceLabel = ({
         }
         label={
           <div style={{ maxWidth: '582px', paddingTop: '15px' }}>
-            <StyledLabel htmlFor={`audienceCheckbox-${audienceId}`}>
-              {audienceName}
-            </StyledLabel>
+            <StyledLabelText>{audienceName}</StyledLabelText>
           </div>
         }
       />
@@ -33,4 +36,11 @@ const AudienceLabel = ({
   </StyledRowFlexParent>
 )
 
-export default AudienceLabel
+AudienceCheckbox.propTypes = {
+  selected: PropTypes.bool.isRequired,
+  audienceId: PropTypes.string.isRequired,
+  audienceName: PropTypes.string.isRequired,
+  onToggleCheckbox: PropTypes.func.isRequired,
+}
+
+export default AudienceCheckbox

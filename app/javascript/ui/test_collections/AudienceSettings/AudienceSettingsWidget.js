@@ -3,6 +3,8 @@ import styled from 'styled-components'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import { FormButton } from '~/ui/global/styled/forms'
+import { DisplayTextCss } from '~/ui/global/styled/typography'
+import v from '~/utils/variables'
 import {
   StyledRowFlexItem,
   StyledRowFlexCell,
@@ -11,30 +13,63 @@ import {
 } from './styled'
 import TableHeader from './TableHeader'
 import TableBody from './TableBody'
-import AudienceLabel from './AudienceLabel'
-import v from '~/utils/variables'
+import AudienceCheckbox from './AudienceCheckbox'
+
+const AudienceSettingsWrapper = styled.div`
+  width: 100%;
+  max-width: 500px;
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    max-width: 350px;
+  }
+  ${DisplayTextCss};
+`
+
+const DesktopWrapper = styled.div`
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    display: none;
+  }
+`
+
+const MobileWrapper = styled.div`
+  @media only screen and (min-width: ${v.responsive.medBreakpoint}px) {
+    display: none;
+  }
+`
 
 @observer
-class AudienceSettings extends React.Component {
+class AudienceSettingsWidget extends React.Component {
+  audienceSelected(audience) {
+    const { audienceSettings } = this.props
+    const option = audienceSettings[audience.id]
+    return option ? option.selected : false
+  }
+
+  sampleSize(audience) {
+    const { audienceSettings } = this.props
+    const option = audienceSettings[audience.id]
+    return option ? option.sample_size : ''
+  }
+
   renderTableBody(audience) {
-    const { stopEditingIfContent, handleKeyPress, onInputChange } = this.props
+    const { handleKeyPress, onInputChange } = this.props
     return (
       <TableBody
         audience={audience}
-        stopEditingIfContent={stopEditingIfContent}
         handleKeyPress={handleKeyPress}
         onInputChange={onInputChange}
+        selected={this.audienceSelected(audience)}
+        sampleSize={this.sampleSize(audience)}
       />
     )
   }
 
-  renderLabel(audience) {
+  renderCheckbox(audience) {
     const { onToggleCheckbox } = this.props
     return (
-      <AudienceLabel
+      <AudienceCheckbox
         audienceId={audience.id}
         audienceName={audience.name}
-        selected={audience.currentlySelected}
+        selected={this.audienceSelected(audience)}
         onToggleCheckbox={onToggleCheckbox}
       />
     )
@@ -42,6 +77,15 @@ class AudienceSettings extends React.Component {
 
   render() {
     const { audiences, onSubmitSettings, totalPrice } = this.props
+
+    const totalPriceDisplay = (
+      <React.Fragment>
+        <StyledRowFlexCell>Total</StyledRowFlexCell>
+        <StyledRowFlexCell>
+          <strong>${totalPrice}</strong>
+        </StyledRowFlexCell>
+      </React.Fragment>
+    )
     return (
       <AudienceSettingsWrapper>
         <h3 style={{ marginBottom: '0px' }}>Audience</h3>
@@ -51,7 +95,7 @@ class AudienceSettings extends React.Component {
               {audiences.map(audience => {
                 return (
                   <StyledColumnFlexParent key={audience.id}>
-                    {this.renderLabel(audience)}
+                    {this.renderCheckbox(audience)}
                     <TableHeader />
                     {this.renderTableBody(audience)}
                   </StyledColumnFlexParent>
@@ -59,8 +103,7 @@ class AudienceSettings extends React.Component {
               })}
               <StyledRowFlexParent style={{ marginTop: '15px' }}>
                 <StyledRowFlexCell />
-                <StyledRowFlexCell>Total</StyledRowFlexCell>
-                <StyledRowFlexCell>{totalPrice}</StyledRowFlexCell>
+                {totalPriceDisplay}
               </StyledRowFlexParent>
               <StyledRowFlexParent
                 style={{
@@ -83,7 +126,7 @@ class AudienceSettings extends React.Component {
               {audiences.map(audience => {
                 return (
                   <StyledRowFlexParent key={audience.id}>
-                    {this.renderLabel(audience)}
+                    {this.renderCheckbox(audience)}
                     {this.renderTableBody(audience)}
                   </StyledRowFlexParent>
                 )
@@ -91,8 +134,7 @@ class AudienceSettings extends React.Component {
               <StyledRowFlexParent>
                 <StyledRowFlexItem />
                 <StyledRowFlexCell />
-                <StyledRowFlexCell>Total</StyledRowFlexCell>
-                <StyledRowFlexCell>{totalPrice}</StyledRowFlexCell>
+                {totalPriceDisplay}
               </StyledRowFlexParent>
               <StyledRowFlexParent
                 style={{ marginTop: '24px', marginBottom: '32px' }}
@@ -115,33 +157,14 @@ class AudienceSettings extends React.Component {
   }
 }
 
-AudienceSettings.propTypes = {
-  audiences: MobxPropTypes.objectOrObservableObject.isRequired,
+AudienceSettingsWidget.propTypes = {
+  audiences: MobxPropTypes.arrayOrObservableArray.isRequired,
+  audienceSettings: MobxPropTypes.objectOrObservableObject.isRequired,
   onSubmitSettings: PropTypes.func.isRequired,
   handleKeyPress: PropTypes.func.isRequired,
   onInputChange: PropTypes.func.isRequired,
   onToggleCheckbox: PropTypes.func.isRequired,
-  totalPrice: PropTypes.number.isRequired,
+  totalPrice: PropTypes.string.isRequired,
 }
 
-const AudienceSettingsWrapper = styled.div`
-  width: 100%;
-  max-width: 500px;
-  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
-    max-width: 350px;
-  }
-`
-
-const DesktopWrapper = styled.div`
-  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
-    display: none;
-  }
-`
-
-const MobileWrapper = styled.div`
-  @media only screen and (min-width: ${v.responsive.medBreakpoint}px) {
-    display: none;
-  }
-`
-
-export default AudienceSettings
+export default AudienceSettingsWidget

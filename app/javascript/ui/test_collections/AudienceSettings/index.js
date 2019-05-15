@@ -5,24 +5,18 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import AudienceSettingsWidget from './AudienceSettingsWidget'
 import TestAudience from '~/stores/jsonApi/TestAudience'
-import FeedbackTermsModal from '../FeedbackTermsModal'
-import ConfirmPriceModal from '../ConfirmPriceModal'
-import { PaymentMethod } from '~shared/api.network.v1'
+import FeedbackTermsModal from '~/ui/test_collections/FeedbackTermsModal'
+import ConfirmPriceModal from '~/ui/test_collections/ConfirmPriceModal'
 
 @inject('apiStore')
 @observer
 class AudienceSettings extends React.Component {
   @observable
-  audiences = []
-  @observable
   termsModalOpen = false
   @observable
   confirmPriceModalOpen = false
-
-  constructor(props) {
-    super(props)
-    this.throttledSaveTestAudience = _.throttle(this.saveTestAudience, 2000)
-  }
+  @observable
+  audienceSettings = new Map()
 
   componentDidMount() {
     this.fetchAvailableAudiences()
@@ -34,21 +28,34 @@ class AudienceSettings extends React.Component {
     const audiences = await apiStore.fetchOrganizationAudiences(
       apiStore.currentUserOrganizationId
     )
-    runInAction(() => {
-      this.audiences = audiences
+    const audienceSettings = {}
+    _.each(audiences, audience => {
+      audienceSettings[audience.id] = {
+        selected: false,
+        sample_size: '',
+      }
     })
+    this.updateAudienceSettings(audienceSettings)
+  }
+
+  @computed
+  get audiences() {
+    const { apiStore } = this.props
+    return apiStore.findAll('audiences')
   }
 
   @computed
   get totalPrice() {
-    const { audiences } = this
+    const { audiences, audienceSettings } = this
     return _.round(
       audiences
         .map(audience => {
-          if (audience.currentSampleSize < 1) {
-            return 0
-          }
-          return audience.currentSampleSize * audience.price_per_response
+          const setting = audienceSettings[audience.id]
+          if (!setting || !setting.selected) return 0
+          const sampleSize = setting.sample_size
+            ? parseInt(setting.sample_size)
+            : 0
+          return sampleSize * audience.price_per_response
         })
         .reduce((acc, price) => price + acc, 0),
       2
@@ -80,51 +87,57 @@ class AudienceSettings extends React.Component {
   }
 
   onToggleCheckbox = e => {
-    const { apiStore } = this.props
+    // const { apiStore } = this.props
     const id = e.target.value
-    const audience = apiStore.find('audiences', id)
-    if (!audience.currentlySelected) {
-      // If not yet selected, we have to create the test audience for this test
-      // and temporarily attach it to the audience
-      const testAudience = this.createTestAudience(audience)
-      apiStore.add(testAudience)
-    } else {
-      apiStore.remove(audience.currentTestAudience)
-    }
+    // const audience = apiStore.find('audiences', id)
+    // if (!audience.currentlySelected) {
+    //   // If not yet selected, we have to create the test audience for this test
+    //   // and temporarily attach it to the audience
+    //   const testAudience = this.createTestAudience(audience)
+    //   apiStore.add(testAudience)
+    // } else {
+    //   apiStore.remove(audience.currentTestAudience)
+    // }
+    runInAction(() => {
+      const { audienceSettings } = this
+      audienceSettings[id].selected = !audienceSettings[id].selected
+    })
   }
 
   onInputChange = (audienceId, value) => {
-    const { apiStore } = this.props
-    const audience = apiStore.find('audiences', audienceId)
+    // const { apiStore } = this.props
+    // const audience = apiStore.find('audiences', audienceId)
+    const { audienceSettings } = this
     runInAction(() => {
-      audience.currentTestAudience.sample_size = value
+      audienceSettings[audienceId].sample_size = value
     })
-    this.throttledSaveTestAudience(audience)
+    // this.throttledSaveTestAudience(audience)
   }
 
   handleKeyPress = event => {
-    if (event.key === 'Enter') {
-      this.throttledSaveTestAudience.flush()
-    }
+    // if (event.key === 'Enter') {
+    //   this.throttledSaveTestAudience.flush()
+    // }
   }
 
-  openTermsModal = () => runInAction(() => (this.termsModalOpen = true))
+  @action
+  openTermsModal = () => (this.termsModalOpen = true)
 
-  closeTermsModal = () => runInAction(() => (this.termsModalOpen = false))
+  @action
+  closeTermsModal = () => (this.termsModalOpen = false)
 
   @action
   openConfirmPriceModal = () => (this.confirmPriceModalOpen = true)
 
   @action
-  closeConfirmPriceModal = () => {
-    console.log('close confirm price')
-    this.confirmPriceModalOpen = false
-  }
+  closeConfirmPriceModal = () => (this.confirmPriceModalOpen = false)
+
+  @action
+  updateAudienceSettings = settings => (this.audienceSettings = settings)
 
   submitSettings = e => {
     e.preventDefault()
-    const { apiStore } = this.props
-    const currentUser = apiStore.currentUser
+    const { currentUser } = this.props.apiStore
     // TODO: update size for test audiences
     // this.saveAllTestAudiences()
     if (currentUser.feedback_terms_accepted) {
@@ -138,13 +151,10 @@ class AudienceSettings extends React.Component {
   acceptFeedbackTerms = e => {
     e.preventDefault()
     console.log('Agreeing to feedback terms')
-    const { apiStore } = this.props
-    const currentUser = apiStore.currentUser
+    const { currentUser } = this.props.apiStore
     currentUser.API_acceptFeedbackTerms().finally(() => {
-      runInAction(() => {
-        this.termsModalOpen = false
-        this.confirmPriceModalOpen = true
-      })
+      this.closeTermsModal()
+      this.openConfirmPriceModal()
     })
   }
 
@@ -168,7 +178,7 @@ class AudienceSettings extends React.Component {
           onSubmit={this.confirmPrice}
           close={this.closeConfirmPriceModal}
           paymentMethod={{ last4: 1234, brand: 'Visa' }}
-          price={'$100'}
+          totalPrice={this.totalPrice}
           testName={'Your Cool Test'}
         />
         <AudienceSettingsWidget
@@ -178,6 +188,7 @@ class AudienceSettings extends React.Component {
           onInputChange={this.onInputChange}
           totalPrice={this.totalPrice}
           audiences={this.audiences}
+          audienceSettings={this.audienceSettings}
           onSubmitSettings={this.submitSettings}
         />
       </React.Fragment>
@@ -185,7 +196,6 @@ class AudienceSettings extends React.Component {
   }
 }
 
-AudienceSettings.propTypes = {}
 AudienceSettings.propTypes = {
   testCollection: MobxPropTypes.objectOrObservableObject.isRequired,
 }
