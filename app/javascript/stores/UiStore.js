@@ -413,6 +413,16 @@ export default class UiStore {
     )
   }
 
+  @computed
+  get isMobile() {
+    return this.windowWidth && this.windowWidth < v.responsive.medBreakpoint
+  }
+
+  @computed
+  get isLargeBreakpoint() {
+    return this.windowWidth && this.windowWidth >= v.responsive.largeBreakpoint
+  }
+
   // NOTE: because we aren't tracking a difference between "closed" and null,
   // OrgMenu will always default back to "People & Groups" while in the process of closing/fading
   @computed

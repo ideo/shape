@@ -249,35 +249,13 @@ class Header extends React.Component {
   }
 
   @computed
-  get isLargeBreakpoint() {
-    const { uiStore } = this.props
-    return (
-      uiStore.windowWidth && uiStore.windowWidth >= v.responsive.largeBreakpoint
-    )
-  }
-
-  @computed
-  get isMobile() {
-    const { uiStore } = this.props
-    return (
-      uiStore.windowWidth && uiStore.windowWidth < v.responsive.medBreakpoint
-    )
-  }
-
-  @computed
   get record() {
     const { uiStore } = this.props
     return uiStore.viewingCollection || uiStore.viewingItem
   }
 
   render() {
-    const {
-      isMobile,
-      isLargeBreakpoint,
-      record,
-      userDropdownOpen,
-      orgDropdownOpen,
-    } = this
+    const { record, userDropdownOpen, orgDropdownOpen } = this
     const { apiStore, routingStore, uiStore } = this.props
     const { currentUser } = apiStore
     if (!currentUser) {
@@ -312,10 +290,14 @@ class Header extends React.Component {
                 <div ref={ref => this.updateBreadcrumbsWidth(ref)}>
                   {record && (
                     <Flex data-empty-space-click align="center">
-                      <div style={{ flex: isMobile ? '1 1 auto' : '0 1 auto' }}>
+                      <div
+                        style={{
+                          flex: uiStore.isMobile ? '1 1 auto' : '0 1 auto',
+                        }}
+                      >
                         <Breadcrumb
-                          maxDepth={isLargeBreakpoint ? 6 : 1}
-                          backButton={!isLargeBreakpoint}
+                          maxDepth={uiStore.isLargeBreakpoint ? 6 : 1}
+                          backButton={!uiStore.isLargeBreakpoint}
                           record={record}
                           isHomepage={uiStore.isViewingHomepage}
                           // re-mount every time the record / breadcrumb changes
