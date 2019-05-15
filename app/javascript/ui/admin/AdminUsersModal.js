@@ -109,6 +109,10 @@ class AdminUsersModal extends React.Component {
 
   isOpenPanel = panel => this.state[`${panel}PanelOpen`]
 
+  async removeUser(user) {
+    this.props.apiStore.removeShapeAdminUser(user)
+  }
+
   render() {
     const { open } = this.props
     const title = 'Invite Shape Admin Users'
@@ -166,7 +170,7 @@ class AdminUsersModal extends React.Component {
                       title={user.isCurrentUser ? 'Leave' : 'Remove'}
                       placement="bottom"
                     >
-                      <LeaveIconHolder>
+                      <LeaveIconHolder onClick={() => this.removeUser(user)}>
                         <LeaveIcon />
                       </LeaveIconHolder>
                     </Tooltip>

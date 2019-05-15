@@ -144,25 +144,4 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
       expect(response.status).to eq 200
     end
   end
-
-  describe 'GET #shape_admins' do
-    let!(:non_admin_user) { create(:user) }
-    let(:admin_user) { create(:user) }
-    let(:path) { "/api/v1/users/shape_admins" }
-
-    before do
-      admin_user.add_role(Role::SHAPE_ADMIN)
-    end
-
-    it 'returns a 200' do
-      get(path)
-      expect(response.status).to eq(200)
-    end
-
-    it 'returns users with shape_admin role' do
-      get(path)
-      expect(json['data'].size).to eq(1)
-      expect(json['data'][0]['id'].to_i).to eq(admin_user.id)
-    end
-  end
 end

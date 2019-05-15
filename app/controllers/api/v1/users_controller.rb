@@ -65,10 +65,6 @@ class Api::V1::UsersController < Api::V1::BaseController
     end
   end
 
-  def shape_admins
-    render jsonapi: User.with_role(Role::SHAPE_ADMIN)
-  end
-
   private
 
   def load_and_authorize_organization

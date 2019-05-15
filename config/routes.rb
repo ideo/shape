@@ -109,7 +109,6 @@ Rails.application.routes.draw do
           post 'create_from_emails'
           post 'create_limited_user'
           patch 'update_current_user'
-          get 'shape_admins'
         end
         resources :roles, only: %i[destroy]
       end
@@ -145,6 +144,10 @@ Rails.application.routes.draw do
       resources :survey_responses, only: %i[show create] do
         # not shallow because we always want to look up survey_response by session_uid
         resources :question_answers, only: %i[create update]
+      end
+
+      namespace :admin do
+        resources :users, only: %i[index destroy]
       end
     end
   end

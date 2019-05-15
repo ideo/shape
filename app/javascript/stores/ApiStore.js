@@ -233,7 +233,11 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   async fetchShapeAdminUsers() {
-    return this.request('users/shape_admins')
+    return this.request('admin/users')
+  }
+
+  async removeShapeAdminUser(user) {
+    return this.request(`admin/users/${user.id}`, 'DELETE')
   }
 
   @action
