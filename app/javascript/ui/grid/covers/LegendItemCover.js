@@ -221,6 +221,10 @@ class LegendItemCover extends React.Component {
     const { primaryDataset } = item
     const { comparisonMenuOpen } = this.state
     let order = 0
+    console.log(
+      '2nd',
+      item.secondaryDatasets({ selected: true }).map(d => d.id)
+    )
     return (
       <StyledLegendItem data-cy="LegendItemCover">
         <StyledLegendTitle>{item.name}</StyledLegendTitle>

@@ -1,6 +1,5 @@
 module DataReport
   class QuestionItem < SimpleService
-
     ORG_MEASURE_NAME = 'org-wide-feedback'.freeze
 
     def initialize(dataset:)
@@ -17,6 +16,12 @@ module DataReport
       return survey_answers.count if question_item?
 
       org_survey_answers.count
+    end
+
+    def self.base_data
+      (1..4).map do |n|
+        { value: 0, column: n, percentage: 0 }
+      end
     end
 
     private
@@ -42,25 +47,19 @@ module DataReport
       @dataset.question_type
     end
 
-    def base_data
-      (1..4).map do |n|
-        { value: 0, column: n, percentage: 0 }
-      end
-    end
-
     def grouped_response_data(survey_answers)
-      data = base_data
+      data = self.class.base_data
       num_answers = survey_answers.count
       counts = survey_answers.group(QuestionAnswer.arel_table[:answer_number]).count
       counts.each do |answer_number, count|
         answer_data = data.find { |d| d[:column] == answer_number }
         begin
           answer_data[:value] = count
-        rescue => e
+        rescue StandardError => e
           Appsignal.set_error(e,
                               answer_number: answer_number.to_s,
                               question_item: survey_answers.first.question_id.to_s,
-                              counts: counts.map { |p| '%s="%s"' % p }.join(', '))
+                              counts: counts.map { |p| format('%s="%s"', p) }.join(', '))
           next
         end
       end

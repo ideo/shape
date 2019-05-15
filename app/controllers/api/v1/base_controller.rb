@@ -36,6 +36,7 @@ class Api::V1::BaseController < ApplicationController
       'CollectionCard::Primary': SerializableCollectionCard,
       'CollectionCard::Link': SerializableCollectionCard,
       'Dataset::CollectionsAndItems': SerializableDataset,
+      'Dataset::Empty': SerializableDataset,
       'Dataset::External': SerializableDataset,
       'Dataset::NetworkAppMetric': SerializableDataset,
       'Dataset::OrgWideQuestion': SerializableDataset,

@@ -17,16 +17,24 @@ class TestComparison < SimpleService
     # @collection.data_items.report_type_question_item.includes(datasets: [:data_source]).each do |data_item|
     @collection.data_items.report_type_question_item.each do |data_item|
       # TODO: assign question_type on question items datasets?
-      question_item_type = data_item.datasets.first.data_source.question_type
+      question_item = data_item.datasets.first.data_source
+      question_item_type = question_item.question_type
       maximum_order = data_item.data_items_datasets.maximum(:order)
       comparable = comparison_datasets_by_question_type[question_item_type]
-      next if comparable.nil?
-      comparable.each do |comparison_dataset|
+      if comparable.blank?
         data_item.data_items_datasets.create(
-          dataset: comparison_dataset,
+          dataset: empty_dataset_for_comparison,
           order: maximum_order += 1,
           selected: true,
         )
+      else
+        comparable.each do |comparison_dataset|
+          data_item.data_items_datasets.create(
+            dataset: comparison_dataset,
+            order: maximum_order += 1,
+            selected: true,
+          )
+        end
       end
     end
   end
@@ -36,6 +44,18 @@ class TestComparison < SimpleService
   end
 
   private
+
+  def empty_dataset_for_comparison
+    existing = Dataset::Empty.find_by(
+      data_source_type: @comparison_collection.class.base_class.name,
+      data_source_id: @comparison_collection.id,
+    )
+    return existing if existing.present?
+    Dataset::Empty.create_for_collection(
+      collection: @comparison_collection,
+      chart_type: :bar,
+    )
+  end
 
   def question_items_by_question_type
     @question_items_by_question_type ||= @collection.question_items.scale_questions.each_with_object({}) do |question_item, h|
