@@ -14,6 +14,7 @@ import {
   MaxWidthContainer,
   HeaderSpacer,
 } from '~/ui/global/styled/layout'
+import UserDropdown from '~/ui/layout/UserDropdown'
 
 const StyledHeadingWrapper = styled.div`
   margin-left: 0.5rem;
@@ -61,6 +62,10 @@ class AdminHeader extends React.Component {
                     />
                   </Hidden>
                 </Flex>
+              </Box>
+
+              <Box flex align="center">
+                <UserDropdown />
               </Box>
             </Flex>
             <AdminUsersModal open={!!uiStore.adminUsersMenuOpen} />
