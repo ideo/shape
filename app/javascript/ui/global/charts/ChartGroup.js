@@ -142,6 +142,10 @@ class ChartGroup extends React.Component {
 
   fullDate = (date, index) => `${utcMoment(date).format('MM/DD/YY')}`
 
+  get totalBarsPerGroup() {
+    return this.secondaryDatasetsWithData.length + 1
+  }
+
   get emojiScale() {
     const { question_type } = this.primaryDataset
     if (!question_type) return []
@@ -260,7 +264,7 @@ class ChartGroup extends React.Component {
     </NotEnoughDataContainer>
   )
 
-  renderDataset = (dataset, index) => {
+  renderDataset = (dataset, index, total) => {
     const { simpleDateTooltip, width, height } = this.props
     const dashWidth = index * 2
     switch (dataset.chart_type) {
@@ -281,6 +285,7 @@ class ChartGroup extends React.Component {
         return BarChart({
           dataset,
           cardArea: width * height,
+          barsInGroup: total,
         })
       default:
         return AreaChart({
@@ -293,10 +298,18 @@ class ChartGroup extends React.Component {
 
   get renderedDatasets() {
     let datasetIndex = 0
-    const datasets = [this.renderDataset(this.primaryDataset, datasetIndex)]
+    const datasets = [
+      this.renderDataset(
+        this.primaryDataset,
+        datasetIndex,
+        this.totalBarsPerGroup
+      ),
+    ]
     if (!this.secondaryDatasetsWithData) return datasets
     this.secondaryDatasetsWithData.forEach(dataset =>
-      datasets.push(this.renderDataset(dataset, (datasetIndex += 1)))
+      datasets.push(
+        this.renderDataset(dataset, (datasetIndex += 1), this.totalBarsPerGroup)
+      )
     )
     return datasets
   }
@@ -309,7 +322,7 @@ class ChartGroup extends React.Component {
           domainPadding={{ y: 10 }}
           padding={{ top: 0, left: 40, right: 40, bottom: 15 }}
         >
-          <VictoryGroup offset={30}>
+          <VictoryGroup offset={30 / (this.totalBarsPerGroup / 3)}>
             {this.renderedDatasets.map(dataset => dataset)}
           </VictoryGroup>
           {this.chartAxis}

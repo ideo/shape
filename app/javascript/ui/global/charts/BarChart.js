@@ -16,18 +16,20 @@ const formatValues = (values, datasetOrder) => {
   }))
 }
 
-const BarChart = ({ dataset, simpleDateTooltip, cardArea }) => {
+const BarChart = ({ dataset, simpleDateTooltip, cardArea, barsInGroup }) => {
   const values = formatValues(dataset.data, dataset.order)
   const { total, max_domain } = dataset
   const domain = chartDomainForDatasetValues({
     values,
     maxDomain: max_domain,
   })
+  const barWidth = barsInGroup > 3 ? 30 / (barsInGroup / 2) : 30
+  console.log('poop', dataset)
   return (
     <VictoryBar
       labels={(datum, active) => `${datum.percentage}%`}
-      padding={10}
-      barWidth={30}
+      padding={10 / barsInGroup}
+      barWidth={barWidth}
       data={values}
       domain={domain}
       key={`dataset-${dataset.order}`}
@@ -41,11 +43,13 @@ const BarChart = ({ dataset, simpleDateTooltip, cardArea }) => {
                 mutation: props => {
                   const { datum } = props
                   return {
-                    text: `${datum.value}/${total} \ntotal`,
+                    text: `${dataset.measure} | ${datum.percentage}% | ${
+                      datum.value
+                    }/${total} \ntotal`,
                     style: Object.assign({}, themeLabelStyles, {
-                      fill: v.colors.tertiaryMedium,
-                      fontSize: 9,
-                      maxWidth: 20,
+                      fill: v.colors.black,
+                      fontSize: 7,
+                      maxWidth: 10,
                     }),
                   }
                 },
@@ -67,10 +71,12 @@ const BarChart = ({ dataset, simpleDateTooltip, cardArea }) => {
 BarChart.propTypes = {
   dataset: datasetPropType.isRequired,
   cardArea: PropTypes.number,
+  barsInGroup: PropTypes.number,
 }
 
 BarChart.defaultProps = {
   cardArea: 1,
+  barsInGroup: 1,
 }
 
 export default BarChart
