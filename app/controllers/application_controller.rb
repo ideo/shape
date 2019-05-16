@@ -9,4 +9,8 @@ class ApplicationController < ActionController::Base
     authenticate_user!
     head(:unauthorized) unless current_user.has_cached_role?(Role::SUPER_ADMIN)
   end
+
+  def authorize_shape_admin!
+    raise CanCan::AccessDenied unless current_user.has_cached_role?(Role::SHAPE_ADMIN) || current_user.has_cached_role?(Role::SUPER_ADMIN)
+  end
 end

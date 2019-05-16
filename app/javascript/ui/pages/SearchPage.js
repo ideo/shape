@@ -22,12 +22,8 @@ class SearchPage extends React.Component {
   total = 0
 
   componentDidMount() {
-    const { uiStore, routingStore, location } = this.props
+    const { uiStore, location } = this.props
     const query = this.searchQuery(location)
-    if (!query) {
-      routingStore.leaveSearch()
-      return
-    }
     // initialize SearchBar to the queryString, e.g. when directly loading a search URL
     uiStore.update('searchText', query)
 
@@ -36,14 +32,10 @@ class SearchPage extends React.Component {
 
   @action
   componentDidUpdate(prevProps) {
-    const { routingStore, location } = this.props
     if (this.requiresFetch(prevProps)) {
       // NOTE: important to do this here to "reset" infinite scroll!
       this.searchResults.replace([])
       this.fetchData()
-    }
-    if (!this.searchQuery(location)) {
-      routingStore.leaveSearch()
     }
   }
 
@@ -65,7 +57,10 @@ class SearchPage extends React.Component {
       return true
     }
     // i.e. you are on SearchPage and perform a new search
-    return this.searchQuery(prevProps.location) !== this.searchQuery(location)
+    return (
+      this.searchQuery(prevProps.location) !== this.searchQuery(location) &&
+      this.searchQuery(location)
+    )
   }
 
   fetchData = (page = 1) => {
@@ -127,6 +122,10 @@ class SearchPage extends React.Component {
 
   renderSearchResults = () => {
     const { uiStore, routingStore, location } = this.props
+    const query = this.searchQuery(location)
+    if (!query) {
+      return null
+    }
     if (this.searchResults.length === 0) {
       if (uiStore.isLoading) {
         return <Loader />
@@ -134,7 +133,7 @@ class SearchPage extends React.Component {
       return (
         <div>
           No results found for &quot;
-          {this.searchQuery(location)}
+          {query}
           &quot;.
         </div>
       )

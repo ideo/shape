@@ -258,6 +258,18 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   @action
+  async addShapeAdminUsers(users) {
+    const userIds = users.map(user => user.id)
+    const data = { user_ids: userIds }
+    await this.request('admin/users', 'POST', data)
+    runInAction(() => {
+      this.shapeAdminUsers = _.sortBy(this.shapeAdminUsers.concat(users), [
+        'first_name',
+      ])
+    })
+  }
+
+  @action
   importUsersThread({ usersThread, thread, comments } = {}) {
     thread.addReference('users_thread', usersThread, {
       model: UsersThread,

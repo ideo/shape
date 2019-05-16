@@ -8,6 +8,7 @@ import EntityAvatarAndName from '~/ui/global/EntityAvatarAndName'
 import Grid from '@material-ui/core/Grid'
 import LeaveIcon from '~/ui/icons/LeaveIcon'
 import Modal from '~/ui/global/modals/Modal'
+import RolesAdd from '~/ui/roles/RolesAdd'
 import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
 import { Heading3, DisplayText } from '~/ui/global/styled/typography'
@@ -79,6 +80,17 @@ const LeaveIconHolder = styled.button`
 `
 LeaveIconHolder.displayName = 'StyledLeaveIconHolder'
 
+const FooterBreak = styled.div`
+  border-top: 1px solid ${v.colors.commonMedium};
+  width: 100%;
+`
+
+const FooterArea = styled.div`
+  flex: 0 0 auto;
+  padding-top: 24px;
+  padding-bottom: 30px;
+`
+
 @inject('apiStore', 'uiStore')
 @observer
 class AdminUsersModal extends React.Component {
@@ -109,6 +121,15 @@ class AdminUsersModal extends React.Component {
 
   removeUser(user) {
     this.props.apiStore.removeShapeAdminUser(user)
+  }
+
+  createRoles = users => {
+    this.props.apiStore.addShapeAdminUsers(users)
+  }
+
+  createUsers = emails => {
+    console.log('create users', emails)
+    return { data: [] }
   }
 
   render() {
@@ -178,6 +199,20 @@ class AdminUsersModal extends React.Component {
               </Collapse>
             </div>
           </ScrollArea>
+          <React.Fragment>
+            <Row>
+              <FooterBreak />
+            </Row>
+            <FooterArea>
+              <RolesAdd
+                title={'Add People:'}
+                roleTypes={['shapeAdmin']}
+                onCreateRoles={this.createRoles}
+                onCreateUsers={this.createUsers}
+                ownerType={'shapeAdmins'}
+              />
+            </FooterArea>
+          </React.Fragment>
         </React.Fragment>
       </Modal>
     )

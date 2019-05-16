@@ -8,12 +8,12 @@ import CloseIcon from '~/ui/icons/CloseIcon'
 
 const StyledSearchButton = styled.div`
   border-radius: 20px;
-  background: ${v.colors.commonLightest};
+  background: ${props => props.background};
   position: relative;
-  min-width: 40px;
-  max-width: ${props => (props.open ? '250px' : '40px')};
+  min-width: 32px;
+  max-width: ${props => (props.open ? '250px' : '32px')};
   width: 100%;
-  height: 40px;
+  height: 32px;
   text-align: center;
   display: flex;
   align-items: center;
@@ -46,7 +46,7 @@ const StyledSearchButton = styled.div`
   .search {
     color: ${v.colors.black};
     flex: 0 0 auto;
-    padding: 0px 8px;
+    padding: 0px 4px;
     svg {
       display: inline-block;
       height: 22px;
@@ -60,7 +60,7 @@ const StyledSearchButton = styled.div`
   .close {
     position: absolute;
     right: 10px;
-    bottom: 7px;
+    bottom: 4px;
     color: ${v.colors.commonDark};
     visibility: ${props => (props.open ? 'visible' : 'hidden')};
     opacity: ${props => (props.open ? '1' : '0')};
@@ -107,10 +107,10 @@ class SearchButton extends React.Component {
   }
 
   render() {
-    const { value } = this.props
+    const { value, background } = this.props
     const open = this.props.open || this.open
     return (
-      <StyledSearchButton open={open}>
+      <StyledSearchButton open={open} background={background}>
         <button className="search" onClick={this.handleOpen(true)}>
           <SearchIcon />
         </button>
@@ -136,10 +136,12 @@ SearchButton.propTypes = {
   onChange: PropTypes.func.isRequired,
   onClear: PropTypes.func.isRequired,
   open: PropTypes.bool,
+  background: PropTypes.string,
 }
 
 SearchButton.defaultProps = {
   open: false,
+  background: v.colors.commonLightest,
 }
 
 export default SearchButton
