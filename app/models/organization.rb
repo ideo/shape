@@ -54,7 +54,6 @@ class Organization < ApplicationRecord
                view_role: Role::APPLICATION_USER
 
   after_create :create_groups
-  after_create :create_org_wide_datasets
   before_update :parse_domain_whitelist
   after_update :update_network_name, :update_group_names, if: :saved_change_to_name?
   after_update :check_guests_for_domain_match, if: :saved_change_to_domain_whitelist?
@@ -436,9 +435,5 @@ class Organization < ApplicationRecord
     else
       create_network_subscription
     end
-  end
-
-  def create_org_wide_datasets
-    CreateOrgWideDatasets.perform_in(1.minute, id)
   end
 end

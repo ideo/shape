@@ -3,6 +3,9 @@ class Item
     has_many :question_answers, inverse_of: :question, foreign_key: :question_id, dependent: :destroy
     has_one :test_open_responses_collection, class_name: 'Collection::TestOpenResponses'
     has_one :dataset, as: :data_source, class_name: 'Dataset::QuestionItem', dependent: :destroy
+    has_many :data_items,
+             as: :data_source,
+             class_name: 'Item::DataItem'
 
     # TODO: Deprecate once migrating to datasets
     has_one :test_data_item, class_name: 'Item::DataItem', as: :data_source
@@ -16,24 +19,19 @@ class Item
     after_update :update_test_open_responses_collection,
                  if: :update_test_open_responses_collection?
 
+    after_update :update_test_open_responses_collection,
+                 if: :update_test_open_responses_collection?
+
     scope :answerable, -> {
       where.not(
         question_type: unanswerable_question_types,
       )
     }
-    has_many :data_items,
-             as: :data_source,
-             class_name: 'Item::DataItem'
-
-    after_update :update_test_open_responses_collection,
-                 if: :update_test_open_responses_collection?
-
     scope :not_answerable, -> {
       where(
         question_type: unanswerable_question_types,
       )
     }
-
     scope :scale_questions, -> {
       where(
         question_type: question_type_categories[:scaled_rating],
@@ -182,8 +180,12 @@ class Item
       )
       builder.create
       if builder.collection_card.persisted?
+        data_item = builder.collection_card.record
         dataset.data_items_datasets.create(
-          data_item: builder.collection_card.record,
+          data_item: data_item,
+        )
+        data_item.data_items_datasets.create(
+          dataset: org_wide_question_dataset,
         )
       end
 
@@ -207,6 +209,14 @@ class Item
       )
       builder.create
       builder.collection_card
+    end
+
+    def org_wide_question_dataset
+      Dataset::OrgWideQuestion.find_or_create_by(
+        organization_id: organization.id,
+        question_type: question_type,
+        chart_type: :bar,
+      )
     end
 
     private

@@ -81,4 +81,49 @@ RSpec.describe Item::QuestionItem, type: :model do
       end
     end
   end
+
+  describe '#create_response_graph' do
+    let(:user) { create(:user) }
+    let(:organization) { create(:organization) }
+    let!(:test_collection) do
+      create(:test_collection, :completed, organization: organization, add_editors: [user])
+    end
+    before do
+      test_collection.launch!(initiated_by: user)
+      test_collection.reload
+    end
+    let(:scale_questions) do
+      test_collection
+        .question_items
+        .where(
+          question_type: Item::QuestionItem.question_type_categories[:scaled_rating],
+        )
+    end
+    let(:question_item) { scale_questions.first }
+    let(:data_item) do
+      question_item.create_response_graph(
+        parent_collection: test_collection,
+        initiated_by: user,
+      ).record
+    end
+    let(:org_wide_question_dataset) do
+      Dataset::OrgWideQuestion.find_by(
+        organization: organization,
+        question_type: question_item.question_type,
+      )
+    end
+
+    it 'creates DataItem on test collection for the question' do
+      expect { data_item }.to change(Item::DataItem, :count).by(1)
+    end
+
+    it 'adds dataset' do
+      expect(data_item.datasets).to include(question_item.dataset)
+    end
+
+    it 'adds org-wide dataset' do
+      expect(org_wide_question_dataset.persisted?).to be true
+      expect(data_item.datasets).to include(org_wide_question_dataset)
+    end
+  end
 end
