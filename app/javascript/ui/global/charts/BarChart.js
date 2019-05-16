@@ -1,12 +1,11 @@
 import PropTypes from 'prop-types'
 import { VictoryBar } from 'victory'
 
+import ChartTooltip from '~/ui/global/charts/ChartTooltip'
 import {
   datasetPropType,
   chartDomainForDatasetValues,
-  themeLabelStyles,
 } from '~/ui/global/charts/ChartUtils'
-import v from '~/utils/variables'
 
 const formatValues = (values, datasetOrder) => {
   return values.map((datum, i) => ({
@@ -24,10 +23,29 @@ const BarChart = ({ dataset, simpleDateTooltip, cardArea, barsInGroup }) => {
     maxDomain: max_domain,
   })
   const barWidth = barsInGroup > 3 ? 30 / (barsInGroup / 2) : 30
-  console.log('poop', dataset)
+  // Only show labels if theres room for them
+  const labelRenderer = datum =>
+    barsInGroup > 4 ? () => {} : `${datum.percentage}%`
+  const tooltipRenderer = datum => {
+    let text = `${dataset.measure}
+    ${datum.percentage}%
+    ${datum.value}/${total} total`
+    if (total === 0) {
+      text = 'No comparable chart from this feedback'
+    }
+    return text
+  }
   return (
     <VictoryBar
-      labels={(datum, active) => `${datum.percentage}%`}
+      labels={d => d.percentage}
+      labelComponent={
+        <ChartTooltip
+          tooltipTextRenderer={tooltipRenderer}
+          labelTextRenderer={labelRenderer}
+          cardArea={cardArea}
+          displayTicks={false}
+        />
+      }
       padding={10 / barsInGroup}
       barWidth={barWidth}
       data={values}
@@ -41,17 +59,7 @@ const BarChart = ({ dataset, simpleDateTooltip, cardArea, barsInGroup }) => {
               {
                 target: 'labels',
                 mutation: props => {
-                  const { datum } = props
-                  return {
-                    text: `${dataset.measure} | ${datum.percentage}% | ${
-                      datum.value
-                    }/${total} \ntotal`,
-                    style: Object.assign({}, themeLabelStyles, {
-                      fill: v.colors.black,
-                      fontSize: 7,
-                      maxWidth: 10,
-                    }),
-                  }
+                  return { active: true }
                 },
               },
             ],
