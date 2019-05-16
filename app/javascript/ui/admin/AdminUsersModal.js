@@ -128,8 +128,12 @@ class AdminUsersModal extends React.Component {
   }
 
   createUsers = emails => {
-    console.log('create users', emails)
-    return { data: [] }
+    const { apiStore, uiStore } = this.props
+    return apiStore
+      .request(`users/create_from_emails`, 'POST', { emails })
+      .catch(err => {
+        uiStore.alert(err.error[0])
+      })
   }
 
   render() {
