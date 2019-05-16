@@ -93,6 +93,7 @@ class RecontactQuestion extends React.Component {
         <EmojiHolder>
           <EmojiButton
             selected={
+              // default to true for no user and then set for limited user
               user && user.feedback_contact_preference === 'feedback_contact_no'
             }
             onClick={this.handleClick('feedback_contact_no')}
