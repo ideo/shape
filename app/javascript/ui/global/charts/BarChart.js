@@ -44,6 +44,7 @@ const BarChart = ({ dataset, simpleDateTooltip, cardArea, barsInGroup }) => {
           labelTextRenderer={labelRenderer}
           cardArea={cardArea}
           displayTicks={false}
+          alwaysShowLabels={true}
         />
       }
       padding={10 / barsInGroup}

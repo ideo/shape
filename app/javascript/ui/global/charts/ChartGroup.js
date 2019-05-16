@@ -319,8 +319,8 @@ class ChartGroup extends React.Component {
       return (
         <VictoryChart
           theme={victoryTheme}
-          domainPadding={{ y: 10 }}
-          padding={{ top: 0, left: 40, right: 40, bottom: 15 }}
+          domainPadding={{ y: 70 }}
+          padding={{ top: 0, left: 60, right: 60, bottom: 15 }}
         >
           <VictoryGroup offset={30 / (this.totalBarsPerGroup / 3)}>
             {this.renderedDatasets.map(dataset => dataset)}

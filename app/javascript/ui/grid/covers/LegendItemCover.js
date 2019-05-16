@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
@@ -114,14 +113,6 @@ class LegendItemCover extends React.Component {
     comparisonMenuOpen: false,
   }
 
-  constructor(props) {
-    super(props)
-    this.debouncedSearchTestCollections = _.debounce(
-      this.searchTestCollections,
-      500
-    )
-  }
-
   componentDidMount() {
     this.searchTestCollections(' ')
   }
@@ -129,53 +120,6 @@ class LegendItemCover extends React.Component {
   componentWillUnMount() {
     const { uiStore } = this.props
     uiStore.removeEmptySpaceClickHandler(this.onSearchClose)
-  }
-
-  @action
-  toggleMeasure = async ({ measure, show }) => {
-    const { item, card } = this.props
-    const { selected_measures } = item.data_settings
-    if (show) {
-      // Add measure
-      selected_measures.push(measure)
-    } else {
-      // Remove measure
-      selected_measures.remove(measure)
-    }
-    await item.save()
-    card.parent.API_fetchCards()
-  }
-
-  renderSelectedDataset = ({ dataset, order, primary }) => {
-    const { measure, style, chart_type } = dataset
-    let icon
-    if (chart_type === 'line') {
-      icon = (
-        <LineChartMeasure
-          color={(style && style.fill) || '#000000'}
-          order={order}
-        />
-      )
-    } else {
-      const color = style && style.fill ? style.fill : colorScale[order]
-      icon = <AreaChartMeasure color={color} />
-    }
-    return (
-      <Measure key={`measure-${measure}`}>
-        {icon && <MeasureIconWrapper>{icon}</MeasureIconWrapper>}
-        <MeasureText color={v.colors.black}>
-          {this.measureDisplayName(measure)}
-        </MeasureText>
-        {!primary && (
-          <UnselectMeasure
-            role="button"
-            onClick={() => this.toggleMeasure({ measure, show: false })}
-          >
-            <XIcon />
-          </UnselectMeasure>
-        )}
-      </Measure>
-    )
   }
 
   toggleComparisonSearch = () => {
@@ -206,10 +150,15 @@ class LegendItemCover extends React.Component {
     })
   }
 
+  onDeselectComparison = async dataset => {
+    const { card } = this.props
+    await card.parent.API_removeComparison({ id: dataset.test_collection_id })
+    card.parent.API_fetchCards()
+  }
+
   @action
   onSelectComparison = async testCollection => {
     const { card } = this.props
-    console.log('woah', card)
     await card.parent.API_addComparison(testCollection)
     card.parent.API_fetchCards()
   }
@@ -224,19 +173,20 @@ class LegendItemCover extends React.Component {
 
   searchTestCollections = (term, callback) => {
     const { item, apiStore } = this.props
+    if (!term) {
+      callback()
+      return
+    }
     return apiStore
       .searchCollections({
         query: `${term}`,
         type: 'Collection::TestCollection',
         order_by: 'updated_at',
         order_direction: 'desc',
-        per_page: 5,
+        per_page: 30,
       })
       .then(res => res.data)
       .then(records => records.filter(record => record.id !== item.parent_id))
-      .then(records =>
-        records.filter(record => !this.findDatasetByTest(record.id))
-      )
       .then(records => callback && callback(formatCollections(records)))
       .catch(e => {
         trackError(e)
@@ -247,11 +197,43 @@ class LegendItemCover extends React.Component {
     return (
       <AutoComplete
         options={[]}
-        optionSearch={this.debouncedSearchTestCollections}
+        optionSearch={this.searchTestCollections}
         onOptionSelect={option => this.onSelectComparison(option)}
         placeholder="search comparisons"
         onMenuClose={this.onSearchClose}
       />
+    )
+  }
+
+  renderSelectedDataset = ({ dataset, order, primary }) => {
+    const { measure, style, chart_type } = dataset
+    let icon
+    if (chart_type === 'line') {
+      icon = (
+        <LineChartMeasure
+          color={(style && style.fill) || '#000000'}
+          order={order}
+        />
+      )
+    } else {
+      const color = style && style.fill ? style.fill : colorScale[order]
+      icon = <AreaChartMeasure color={color} />
+    }
+    return (
+      <Measure key={`measure-${measure}`}>
+        {icon && <MeasureIconWrapper>{icon}</MeasureIconWrapper>}
+        <MeasureText color={v.colors.black}>
+          {this.measureDisplayName(measure)}
+        </MeasureText>
+        {!primary && (
+          <UnselectMeasure
+            role="button"
+            onClick={() => this.onDeselectComparison(dataset)}
+          >
+            <XIcon />
+          </UnselectMeasure>
+        )}
+      </Measure>
     )
   }
 
