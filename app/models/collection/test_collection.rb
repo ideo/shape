@@ -340,7 +340,7 @@ class Collection
         # push it to the end, will get resorted after creation is complete
         order: 999,
         collection_attributes: {
-          name: "#{name} Feedback Design",
+          name: Collection::TestDesign.generate_name(name),
           type: 'Collection::TestDesign',
           test_collection_id: id,
           template_id: template_id,

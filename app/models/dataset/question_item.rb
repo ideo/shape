@@ -20,7 +20,8 @@ class Dataset
 
     def measure
       # The collection name
-      question_item.parent&.name
+      return if test_collection.blank?
+      test_collection.name.sub(Collection::TestDesign::COLLECTION_SUFFIX, '')
     end
 
     def max_domain
@@ -36,7 +37,11 @@ class Dataset
     end
 
     def test_collection_id
-      question_item.parent&.id
+      test_collection_id&.id
+    end
+
+    def test_collection
+      question_item&.parent
     end
 
     private
