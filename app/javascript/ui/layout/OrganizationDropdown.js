@@ -1,14 +1,13 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
-import { CONTEXT_COMBO, CONTEXT_USER } from '~/ui/global/MainMenuDropdown'
 import Avatar from '~/ui/global/Avatar'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
-import MainMenuDropdown from '~/ui/global/MainMenuDropdown'
+import MainMenuDropdown, { CONTEXT_ORG } from '~/ui/global/MainMenuDropdown'
 import StyledAvatarAndDropdown from '~/ui/layout/StyledAvatarAndDropdown'
 
-@inject('apiStore', 'uiStore')
+@inject('apiStore')
 @observer
-class UserDropdown extends React.Component {
+class OrganizationDropdown extends React.Component {
   state = {
     dropdownOpen: false,
   }
@@ -17,15 +16,16 @@ class UserDropdown extends React.Component {
 
   render() {
     const { dropdownOpen } = this.state
-    const { apiStore, uiStore } = this.props
-    const { currentUser } = apiStore
-    const menuContext = uiStore.isMobile ? CONTEXT_COMBO : CONTEXT_USER
+    const {
+      apiStore: { currentUser },
+    } = this.props
+    const primaryGroup = currentUser.current_organization.primary_group
 
     return (
-      <StyledAvatarAndDropdown className="userDropdown">
+      <StyledAvatarAndDropdown className="orgDropdown">
         {dropdownOpen && (
           <MainMenuDropdown
-            context={menuContext}
+            context={CONTEXT_ORG}
             open={dropdownOpen}
             onItemClick={this.createClickHandler({ open: false })}
           />
@@ -33,13 +33,14 @@ class UserDropdown extends React.Component {
 
         <button
           style={{ display: 'block' }}
-          className="userBtn"
+          className="orgBtn"
+          data-cy="OrgMenuBtn"
           onClick={this.createClickHandler({ open: true })}
         >
           <Avatar
-            title={currentUser.name}
-            url={currentUser.pic_url_square}
-            className="user-avatar"
+            title={primaryGroup.name}
+            url={primaryGroup.filestack_file_url}
+            className="organization-avatar"
             responsive={false}
           />
         </button>
@@ -54,9 +55,8 @@ class UserDropdown extends React.Component {
   }
 }
 
-UserDropdown.wrappedComponent.propTypes = {
+OrganizationDropdown.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
-export default UserDropdown
+export default OrganizationDropdown
