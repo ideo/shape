@@ -49,26 +49,26 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
   end
 
   def add_comparison
-    test_comparison = TestComparison.add(
+    test_comparison = TestComparison.new(
       collection: @test_collection,
       comparison_collection: @comparison_collection,
     )
-    if test_comparison
+    if test_comparison.add
       render_collection
     else
-      render_api_errors test_comparison.errors
+      render json: { errors: test_comparison.errors }, status: :unprocessable_entity
     end
   end
 
   def remove_comparison
-    test_comparison = TestComparison.remove(
+    test_comparison = TestComparison.new(
       collection: @test_collection,
       comparison_collection: @comparison_collection,
     )
-    if test_comparison
+    if test_comparison.remove
       render_collection
     else
-      render_api_errors test_comparison.errors
+      render json: { errors: test_comparison.errors }, status: :unprocessable_entity
     end
   end
 
@@ -86,7 +86,7 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
   def load_comparison_collection
     # TODO: get the comparison collection id param the correct way
     @comparison_collection = Collection::TestCollection.find_by(
-      id: params[:_jsonapi][:data][:comparison_collection_id],
+      id: json_api_params[:data][:comparison_collection_id],
     )
     if @comparison_collection.blank?
       head(404)

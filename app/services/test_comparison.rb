@@ -7,14 +7,6 @@ class TestComparison < SimpleService
     @errors = []
   end
 
-  def self.add(*args)
-    new(*args).add
-  end
-
-  def self.remove(*args)
-    new(*args).remove
-  end
-
   def add
     return false if same_collection?
     collection_question_data_items.includes(primary_dataset: :question_item).each do |data_item|
