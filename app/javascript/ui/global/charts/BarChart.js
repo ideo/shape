@@ -1,12 +1,11 @@
 import PropTypes from 'prop-types'
 import { VictoryBar } from 'victory'
 
+import ChartTooltip from '~/ui/global/charts/ChartTooltip'
 import {
   datasetPropType,
   chartDomainForDatasetValues,
-  themeLabelStyles,
 } from '~/ui/global/charts/ChartUtils'
-import v from '~/utils/variables'
 
 const formatValues = (values, datasetOrder) => {
   return values.map((datum, i) => ({
@@ -16,18 +15,39 @@ const formatValues = (values, datasetOrder) => {
   }))
 }
 
-const BarChart = ({ dataset, simpleDateTooltip, cardArea }) => {
+const BarChart = ({ dataset, simpleDateTooltip, cardArea, barsInGroup }) => {
   const values = formatValues(dataset.data, dataset.order)
   const { total, max_domain } = dataset
   const domain = chartDomainForDatasetValues({
     values,
     maxDomain: max_domain,
   })
+  const barWidth = barsInGroup > 3 ? 30 / (barsInGroup / 2) : 30
+  // Only show labels if theres room for them
+  const labelRenderer = datum =>
+    barsInGroup > 4 ? () => {} : `${datum.percentage}%`
+  const tooltipRenderer = datum => {
+    let text = `${dataset.measure}
+    ${datum.percentage}%
+    ${datum.value}/${total} total`
+    if (total === 0) {
+      text = 'No comparable chart from this feedback'
+    }
+    return text
+  }
   return (
     <VictoryBar
-      labels={(datum, active) => `${datum.percentage}%`}
-      padding={10}
-      barWidth={30}
+      labels={d => d.percentage}
+      labelComponent={
+        <ChartTooltip
+          tooltipTextRenderer={tooltipRenderer}
+          labelTextRenderer={labelRenderer}
+          cardArea={cardArea}
+          displayTicks={false}
+        />
+      }
+      padding={10 / barsInGroup}
+      barWidth={barWidth}
       data={values}
       domain={domain}
       key={`dataset-${dataset.order}`}
@@ -39,15 +59,7 @@ const BarChart = ({ dataset, simpleDateTooltip, cardArea }) => {
               {
                 target: 'labels',
                 mutation: props => {
-                  const { datum } = props
-                  return {
-                    text: `${datum.value}/${total} \ntotal`,
-                    style: Object.assign({}, themeLabelStyles, {
-                      fill: v.colors.tertiaryMedium,
-                      fontSize: 9,
-                      maxWidth: 20,
-                    }),
-                  }
+                  return { active: true }
                 },
               },
             ],
@@ -67,10 +79,12 @@ const BarChart = ({ dataset, simpleDateTooltip, cardArea }) => {
 BarChart.propTypes = {
   dataset: datasetPropType.isRequired,
   cardArea: PropTypes.number,
+  barsInGroup: PropTypes.number,
 }
 
 BarChart.defaultProps = {
   cardArea: 1,
+  barsInGroup: 1,
 }
 
 export default BarChart

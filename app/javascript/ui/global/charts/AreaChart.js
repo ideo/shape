@@ -57,7 +57,11 @@ const AreaChart = ({ dataset, simpleDateTooltip, cardArea = 1 }) => {
       style={chartStyle(dataset.style || {})}
       labels={d => d.value}
       labelComponent={
-        <ChartTooltip textRenderer={tooltipFn} cardArea={cardArea} />
+        <ChartTooltip
+          tooltipTextRenderer={tooltipFn}
+          labelTextRenderer={datum => `${datum.value}`}
+          cardArea={cardArea}
+        />
       }
       domain={domain}
       data={values}

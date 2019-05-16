@@ -7,7 +7,11 @@ import XIcon from '~/ui/icons/XIcon'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import v from '~/utils/variables'
 import { colorScale } from '~/ui/global/charts/ChartUtils'
-import { DisplayText, Heading3 } from '~/ui/global/styled/typography'
+import {
+  DisplayText,
+  Heading3,
+  SmallHelperText,
+} from '~/ui/global/styled/typography'
 import LineChartMeasure from '~/ui/icons/LineChartMeasure'
 import trackError from '~/utils/trackError'
 
@@ -101,6 +105,10 @@ class LegendItemCover extends React.Component {
     comparisonMenuOpen: false,
   }
 
+  componentDidMount() {
+    this.searchTestCollections(' ')
+  }
+
   componentWillUnMount() {
     const { uiStore } = this.props
     uiStore.removeEmptySpaceClickHandler(this.onSearchClose)
@@ -138,7 +146,9 @@ class LegendItemCover extends React.Component {
     return (
       <Measure key={`measure-${measure}`}>
         {icon && <MeasureIconWrapper>{icon}</MeasureIconWrapper>}
-        <DisplayText>{this.measureDisplayName(measure)}</DisplayText>
+        <SmallHelperText color={v.colors.black}>
+          {this.measureDisplayName(measure)}
+        </SmallHelperText>
         {!primary && (
           <UnselectMeasure
             role="button"
@@ -195,11 +205,11 @@ class LegendItemCover extends React.Component {
         type: 'Collection::TestCollection',
         order_by: 'updated_at',
         order_direction: 'desc',
-        per_page: 30,
+        per_page: 5,
       })
       .then(res => res.data)
       .then(records => records.filter(record => record.id !== item.parent_id))
-      .then(records => callback(formatCollections(records)))
+      .then(records => callback && callback(formatCollections(records)))
       .catch(e => {
         trackError(e)
       })
@@ -222,10 +232,6 @@ class LegendItemCover extends React.Component {
     const { primaryDataset } = item
     const { comparisonMenuOpen } = this.state
     let order = 0
-    console.log(
-      '2nd',
-      item.secondaryDatasets({ selected: true }).map(d => d.id)
-    )
     return (
       <StyledLegendItem data-cy="LegendItemCover">
         <StyledLegendTitle>{item.name}</StyledLegendTitle>

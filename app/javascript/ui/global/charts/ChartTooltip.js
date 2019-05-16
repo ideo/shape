@@ -72,12 +72,12 @@ class ChartTooltip extends React.PureComponent {
     const { cardArea } = this.props
     if (cardArea === 1) {
       return {
-        tooltip: '20px',
+        tooltip: '14px',
         label: '20px',
       }
     }
     return {
-      tooltip: '12px',
+      tooltip: '10px',
       label: '10px',
     }
   }
@@ -97,19 +97,26 @@ class ChartTooltip extends React.PureComponent {
   }
 
   render() {
-    const { data, datum, textRenderer, x, y } = this.props
+    const {
+      data,
+      datum,
+      displayTicks,
+      labelTextRenderer,
+      tooltipTextRenderer,
+      x,
+      y,
+    } = this.props
     const showAlways = this.renderValueMark(datum, data.length - 1)
     const dx = this.xOffset
-    const text = textRenderer(datum, this.isLastDataPoint)
+    const labelText = labelTextRenderer(datum, this.isLastDataPoint)
+    const tooltipText = tooltipTextRenderer(datum, this.isLastDataPoint)
     return (
       <g>
         <VictoryTooltip
           {...this.props}
           theme={theme}
           cornerRadius={2}
-          flyoutComponent={<DotFlyout />}
-          height={40}
-          width={180}
+          flyoutComponent={displayTicks ? <DotFlyout /> : <Flyout />}
           dx={dx * 5}
           dy={0}
           style={{
@@ -118,11 +125,10 @@ class ChartTooltip extends React.PureComponent {
             fontSize: this.fontSizes.tooltip,
             fontWeight: 'normal',
           }}
-          text={text}
+          text={tooltipText}
           orientation="top"
           pointerLength={0}
           flyoutStyle={{
-            transform: 'translateY(-5px)',
             stroke: 'transparent',
             fill: v.colors.black,
             opacity: 0.8,
@@ -134,22 +140,24 @@ class ChartTooltip extends React.PureComponent {
               active={showAlways}
               {...this.props}
               dx={dx}
-              dy={-5}
+              dy={-10}
               style={{ fontSize: this.fontSizes.label, fontWeight: 'normal' }}
-              text={`${datum.value}`}
+              text={labelText}
               orientation="top"
               pointerLength={0}
               flyoutStyle={{ stroke: 'transparent', fill: 'transparent' }}
             />
-            <line
-              x1={x}
-              x2={x + 8}
-              y1={y + 9}
-              y2={y + 9}
-              dx={dx}
-              stroke="black"
-              strokeWidth={0.75}
-            />
+            {displayTicks && (
+              <line
+                x1={x}
+                x2={x + 8}
+                y1={y + 9}
+                y2={y + 9}
+                dx={dx}
+                stroke="black"
+                strokeWidth={0.75}
+              />
+            )}
           </Fragment>
         )}
       </g>
@@ -157,15 +165,18 @@ class ChartTooltip extends React.PureComponent {
   }
 }
 ChartTooltip.propTypes = {
-  textRenderer: PropTypes.func.isRequired,
+  tooltipTextRenderer: PropTypes.func.isRequired,
+  labelTextRenderer: PropTypes.func.isRequired,
   maxValue: PropTypes.number,
   minValue: PropTypes.number,
   cardArea: PropTypes.number,
+  displayTicks: PropTypes.bool,
 }
 ChartTooltip.defaultProps = {
   maxValue: 0,
   minValue: 0,
   cardArea: 1,
+  displayTicks: true,
 }
 
 export default ChartTooltip

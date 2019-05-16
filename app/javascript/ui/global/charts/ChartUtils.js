@@ -149,8 +149,8 @@ export const victoryTheme = objectAssignDeep({}, VictoryTheme.grayscale, {
         fill: colorScale[0],
       },
       labels: Object.assign({}, themeLabelStyles, {
-        fill: v.colors.tertiaryMedium,
-        fontSize: 14,
+        fill: v.colors.black,
+        fontSize: 8,
       }),
     },
     colorScale,
