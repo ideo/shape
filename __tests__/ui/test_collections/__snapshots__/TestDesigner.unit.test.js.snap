@@ -962,6 +962,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "searchUsersAndGroups": [MockFunction],
                     "sessionLoaded": true,
                     "setCurrentUserId": [MockFunction],
+                    "shapeAdminUsers": Array [],
                     "sync": [MockFunction sync],
                     "uiStore": Object {
                       "activityLogMoving": false,
@@ -4227,6 +4228,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "searchUsersAndGroups": [MockFunction],
                     "sessionLoaded": true,
                     "setCurrentUserId": [MockFunction],
+                    "shapeAdminUsers": Array [],
                     "sync": [MockFunction sync],
                     "uiStore": Object {
                       "activityLogMoving": false,
@@ -7491,6 +7493,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "searchUsersAndGroups": [MockFunction],
                     "sessionLoaded": true,
                     "setCurrentUserId": [MockFunction],
+                    "shapeAdminUsers": Array [],
                     "sync": [MockFunction sync],
                     "uiStore": Object {
                       "activityLogMoving": false,
