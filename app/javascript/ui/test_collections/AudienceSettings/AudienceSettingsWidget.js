@@ -2,7 +2,6 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
-import { FormButton } from '~/ui/global/styled/forms'
 import { DisplayTextCss } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 import {
@@ -51,11 +50,10 @@ class AudienceSettingsWidget extends React.Component {
   }
 
   renderTableBody(audience) {
-    const { handleKeyPress, onInputChange } = this.props
+    const { onInputChange } = this.props
     return (
       <TableBody
         audience={audience}
-        handleKeyPress={handleKeyPress}
         onInputChange={onInputChange}
         selected={this.audienceSelected(audience)}
         sampleSize={this.sampleSize(audience)}
@@ -76,13 +74,13 @@ class AudienceSettingsWidget extends React.Component {
   }
 
   render() {
-    const { audiences, onSubmitSettings, totalPrice } = this.props
+    const { audiences, totalPrice } = this.props
 
     const totalPriceDisplay = (
       <React.Fragment>
         <StyledRowFlexCell>Total</StyledRowFlexCell>
         <StyledRowFlexCell>
-          <strong>${totalPrice}</strong>
+          <strong>{totalPrice}</strong>
         </StyledRowFlexCell>
       </React.Fragment>
     )
@@ -104,15 +102,6 @@ class AudienceSettingsWidget extends React.Component {
               <StyledRowFlexParent style={{ marginTop: '15px' }}>
                 <StyledRowFlexCell />
                 {totalPriceDisplay}
-              </StyledRowFlexParent>
-              <StyledRowFlexParent
-                style={{
-                  marginTop: '30px',
-                  marginBottom: '30px',
-                  justifyContent: 'center',
-                }}
-              >
-                <FormButton onClick={onSubmitSettings}>Get Feedback</FormButton>
               </StyledRowFlexParent>
             </StyledColumnFlexParent>
           </MobileWrapper>
@@ -136,17 +125,6 @@ class AudienceSettingsWidget extends React.Component {
                 <StyledRowFlexCell />
                 {totalPriceDisplay}
               </StyledRowFlexParent>
-              <StyledRowFlexParent
-                style={{ marginTop: '24px', marginBottom: '32px' }}
-              >
-                <StyledRowFlexItem />
-                <FormButton
-                  style={{ marginLeft: '40px' }}
-                  onClick={onSubmitSettings}
-                >
-                  Get Feedback
-                </FormButton>
-              </StyledRowFlexParent>
             </StyledRowFlexParent>
           </DesktopWrapper>
 
@@ -160,8 +138,6 @@ class AudienceSettingsWidget extends React.Component {
 AudienceSettingsWidget.propTypes = {
   audiences: MobxPropTypes.arrayOrObservableArray.isRequired,
   audienceSettings: MobxPropTypes.objectOrObservableObject.isRequired,
-  onSubmitSettings: PropTypes.func.isRequired,
-  handleKeyPress: PropTypes.func.isRequired,
   onInputChange: PropTypes.func.isRequired,
   onToggleCheckbox: PropTypes.func.isRequired,
   totalPrice: PropTypes.string.isRequired,

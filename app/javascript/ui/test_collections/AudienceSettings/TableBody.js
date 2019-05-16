@@ -40,7 +40,7 @@ class TableBody extends React.Component {
   }
 
   render() {
-    const { audience, sampleSize, selected, handleKeyPress } = this.props
+    const { audience, sampleSize, selected } = this.props
     const textColor = selected ? v.colors.black : v.colors.commonMedium
     const selectedWithPrice = audience.price_per_response && selected
 
@@ -63,7 +63,6 @@ class TableBody extends React.Component {
               placeholder="–"
               value={sampleSize}
               onChange={this.handleInputChange}
-              onKeyPress={handleKeyPress}
             />
           ) : (
             <DisplayText color={v.colors.commonMedium}>–</DisplayText>
@@ -87,7 +86,6 @@ TableBody.propTypes = {
   audience: MobxPropTypes.objectOrObservableObject.isRequired,
   sampleSize: PropTypes.string.isRequired,
   selected: PropTypes.bool.isRequired,
-  handleKeyPress: PropTypes.func.isRequired,
   onInputChange: PropTypes.func.isRequired,
 }
 

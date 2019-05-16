@@ -446,9 +446,8 @@ class Collection
     end
 
     def gives_incentive?
-      # TODO: a different check whether a test_collection is "incentivizable"?
-      # for example we don't want in-collection tests...
-      test_audiences.present?
+      # right now the check is basically any paid tests == gives_incentive
+      test_audiences.where('price_per_response > 0').present?
     end
   end
 end

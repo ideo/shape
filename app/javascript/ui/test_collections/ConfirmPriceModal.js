@@ -36,7 +36,7 @@ const ConfirmPriceModal = ({
         <PaperAirplane />
         <SpecialDisplayHeading wrapLine>
           Your test "{testName}" is about to be launched. Your payment method
-          will be charged <strong>${totalPrice}</strong> for this feedback.
+          will be charged <strong>{totalPrice}</strong> for this feedback.
         </SpecialDisplayHeading>
         <StyledDiv
           style={{

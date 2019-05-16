@@ -1,12 +1,25 @@
 import _ from 'lodash'
 import React from 'react'
-import { runInAction, observable, toJS, action, computed } from 'mobx'
+import styled from 'styled-components'
+import { runInAction, observable, action, computed } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
+import { FormButton } from '~/ui/global/styled/forms'
 import AudienceSettingsWidget from './AudienceSettingsWidget'
-import TestAudience from '~/stores/jsonApi/TestAudience'
+// import TestAudience from '~/stores/jsonApi/TestAudience'
 import FeedbackTermsModal from '~/ui/test_collections/FeedbackTermsModal'
 import ConfirmPriceModal from '~/ui/test_collections/ConfirmPriceModal'
+import v from '~/utils/variables'
+
+const FormButtonWrapper = styled.div`
+  margin: 2rem;
+  display: flex;
+  @media only screen and (min-width: ${v.responsive.medBreakpoint}px) {
+    button {
+      margin-left: auto;
+    }
+  }
+`
 
 @inject('apiStore')
 @observer
@@ -59,32 +72,36 @@ class AudienceSettings extends React.Component {
         })
         .reduce((acc, price) => price + acc, 0),
       2
-    ).toFixed(2)
+    )
   }
 
-  createTestAudience(audience) {
-    const { apiStore, testCollection } = this.props
-    const testAudienceData = {
-      audience_id: audience.id,
-      test_collection_id: testCollection.id,
-      sample_size: 0,
-    }
-    return new TestAudience(toJS(testAudienceData), apiStore)
+  get totalPriceDollars() {
+    return `$${this.totalPrice.toFixed(2)}`
   }
 
-  async saveTestAudience(audience) {
-    await audience.currentTestAudience.save()
-  }
-
-  saveAllTestAudiences() {
-    this.audiences.forEach(audience => {
-      this.saveTestAudience(audience)
-    })
-  }
-
-  onSubmitSettings = () => {
-    this.saveAllTestAudiences()
-  }
+  // createTestAudience(audience) {
+  //   const { apiStore, testCollection } = this.props
+  //   const testAudienceData = {
+  //     audience_id: audience.id,
+  //     test_collection_id: testCollection.id,
+  //     sample_size: 0,
+  //   }
+  //   return new TestAudience(toJS(testAudienceData), apiStore)
+  // }
+  //
+  // async saveTestAudience(audience) {
+  //   await audience.currentTestAudience.save()
+  // }
+  //
+  // saveAllTestAudiences() {
+  //   this.audiences.forEach(audience => {
+  //     this.saveTestAudience(audience)
+  //   })
+  // }
+  //
+  // onSubmitSettings = () => {
+  //   this.saveAllTestAudiences()
+  // }
 
   onToggleCheckbox = e => {
     // const { apiStore } = this.props
@@ -114,11 +131,11 @@ class AudienceSettings extends React.Component {
     // this.throttledSaveTestAudience(audience)
   }
 
-  handleKeyPress = event => {
-    // if (event.key === 'Enter') {
-    //   this.throttledSaveTestAudience.flush()
-    // }
-  }
+  // handleKeyPress = event => {
+  //   if (event.key === 'Enter') {
+  //     this.throttledSaveTestAudience.flush()
+  //   }
+  // }
 
   @action
   openTermsModal = () => (this.termsModalOpen = true)
@@ -137,12 +154,17 @@ class AudienceSettings extends React.Component {
 
   submitSettings = e => {
     e.preventDefault()
-    const { currentUser } = this.props.apiStore
+    const { testCollection, apiStore } = this.props
+    const { currentUser } = apiStore
     // TODO: update size for test audiences
     // this.saveAllTestAudiences()
     if (currentUser.feedback_terms_accepted) {
       console.log('submitting settings')
-      this.openConfirmPriceModal()
+      if (this.totalPrice === 0) {
+        testCollection.launchTest()
+      } else {
+        this.openConfirmPriceModal()
+      }
     } else {
       this.openTermsModal()
     }
@@ -160,12 +182,20 @@ class AudienceSettings extends React.Component {
 
   confirmPrice = e => {
     e.preventDefault()
+    // const { audienceSettings } = this
+    // const { testCollection } = this.props
     console.log('buying feedback')
     this.closeConfirmPriceModal()
     // TODO: Charge card for purchasing feedback audiences
+
+    // TODO: launch with audienceSettings passed along??
+    // testCollection.launchTest({ audienceSettings })
   }
 
   render() {
+    const { testCollection } = this.props
+    const showAudienceSettings = !testCollection.collection_to_test_id
+
     return (
       <React.Fragment>
         <FeedbackTermsModal
@@ -178,19 +208,22 @@ class AudienceSettings extends React.Component {
           onSubmit={this.confirmPrice}
           close={this.closeConfirmPriceModal}
           paymentMethod={{ last4: 1234, brand: 'Visa' }}
-          totalPrice={this.totalPrice}
-          testName={'Your Cool Test'}
+          totalPrice={this.totalPriceDollars}
+          testName={testCollection.name}
         />
-        <AudienceSettingsWidget
-          onToggleCheckbox={this.onToggleCheckbox}
-          stopEditingIfContent={this.stopEditingIfContent}
-          handleKeyPress={this.handleKeyPress}
-          onInputChange={this.onInputChange}
-          totalPrice={this.totalPrice}
-          audiences={this.audiences}
-          audienceSettings={this.audienceSettings}
-          onSubmitSettings={this.submitSettings}
-        />
+        {showAudienceSettings && (
+          <AudienceSettingsWidget
+            onToggleCheckbox={this.onToggleCheckbox}
+            stopEditingIfContent={this.stopEditingIfContent}
+            onInputChange={this.onInputChange}
+            totalPrice={this.totalPriceDollars}
+            audiences={this.audiences}
+            audienceSettings={this.audienceSettings}
+          />
+        )}
+        <FormButtonWrapper>
+          <FormButton onClick={this.submitSettings}>Get Feedback</FormButton>
+        </FormButtonWrapper>
       </React.Fragment>
     )
   }
