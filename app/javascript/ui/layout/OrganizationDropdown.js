@@ -1,56 +1,43 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import Avatar from '~/ui/global/Avatar'
-import ClickWrapper from '~/ui/layout/ClickWrapper'
+import AvatarDropdown from '~/ui/layout/AvatarDropdown'
 import MainMenuDropdown, { CONTEXT_ORG } from '~/ui/global/MainMenuDropdown'
-import StyledAvatarAndDropdown from '~/ui/layout/StyledAvatarAndDropdown'
 
 @inject('apiStore')
 @observer
 class OrganizationDropdown extends React.Component {
-  state = {
-    dropdownOpen: false,
-  }
-
-  createClickHandler = ({ open }) => () => this.setState({ dropdownOpen: open })
-
   render() {
-    const { dropdownOpen } = this.state
-    const {
-      apiStore: { currentUser },
-    } = this.props
+    const { apiStore } = this.props
+    const { currentUser } = apiStore
     const primaryGroup = currentUser.current_organization.primary_group
 
     return (
-      <StyledAvatarAndDropdown className="orgDropdown">
-        {dropdownOpen && (
+      <AvatarDropdown
+        className="orgDropdown"
+        renderDropdown={({ isDropdownOpen, closeDropdown }) => (
           <MainMenuDropdown
             context={CONTEXT_ORG}
-            open={dropdownOpen}
-            onItemClick={this.createClickHandler({ open: false })}
+            open={isDropdownOpen}
+            onItemClick={closeDropdown}
           />
         )}
-
-        <button
-          style={{ display: 'block' }}
-          className="orgBtn"
-          data-cy="OrgMenuBtn"
-          onClick={this.createClickHandler({ open: true })}
-        >
-          <Avatar
-            title={primaryGroup.name}
-            url={primaryGroup.filestack_file_url}
-            className="organization-avatar"
-            responsive={false}
-          />
-        </button>
-
-        {dropdownOpen && (
-          <ClickWrapper
-            clickHandlers={[this.createClickHandler({ open: false })]}
-          />
+        renderAvatar={({ openDropdown }) => (
+          <button
+            style={{ display: 'block' }}
+            className="orgBtn"
+            data-cy="OrgMenuBtn"
+            onClick={openDropdown}
+          >
+            <Avatar
+              title={primaryGroup.name}
+              url={primaryGroup.filestack_file_url}
+              className="organization-avatar"
+              responsive={false}
+            />
+          </button>
         )}
-      </StyledAvatarAndDropdown>
+      />
     )
   }
 }
