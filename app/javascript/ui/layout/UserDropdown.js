@@ -1,3 +1,4 @@
+import { computed } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import { CONTEXT_COMBO, CONTEXT_USER } from '~/ui/global/MainMenuDropdown'
@@ -5,20 +6,28 @@ import Avatar from '~/ui/global/Avatar'
 import AvatarDropdown from '~/ui/layout/AvatarDropdown'
 import MainMenuDropdown from '~/ui/global/MainMenuDropdown'
 
-@inject('apiStore', 'uiStore')
+@inject('apiStore', 'routingStore', 'uiStore')
 @observer
 class UserDropdown extends React.Component {
+  @computed
+  get menuContext() {
+    const { routingStore, uiStore } = this.props
+    // The organization menu is not needed in the admin area.
+    if (routingStore.isAdmin) return CONTEXT_USER
+    // Combine the organization and user menu on mobile.
+    return uiStore.isMobile ? CONTEXT_COMBO : CONTEXT_USER
+  }
+
   render() {
-    const { apiStore, uiStore } = this.props
+    const { apiStore } = this.props
     const { currentUser } = apiStore
-    const menuContext = uiStore.isMobile ? CONTEXT_COMBO : CONTEXT_USER
 
     return (
       <AvatarDropdown
         className="userDropdown"
         renderDropdown={({ isDropdownOpen, closeDropdown }) => (
           <MainMenuDropdown
-            context={menuContext}
+            context={this.menuContext}
             open={isDropdownOpen}
             onItemClick={closeDropdown}
           />
