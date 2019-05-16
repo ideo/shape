@@ -4,7 +4,8 @@ class SerializableDataset < BaseJsonSerializer
              :max_domain, :question_type,
              :total, :data, :single_value,
              :order, :selected, :style,
-             :data_items_datasets_id
+             :data_items_datasets_id,
+             :test_collection_id
 
   attribute :measure do
     if @object.is_a?(Dataset::OrgWideQuestion)

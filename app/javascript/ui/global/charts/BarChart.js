@@ -31,7 +31,7 @@ const BarChart = ({ dataset, simpleDateTooltip, cardArea, barsInGroup }) => {
     ${datum.percentage}%
     ${datum.value}/${total} total`
     if (total === 0) {
-      text = 'No comparable chart from this feedback'
+      text = 'No comparable chart\n from this feedback'
     }
     return text
   }

@@ -40,6 +40,8 @@ class Dataset < ApplicationRecord
 
   def single_value; end
 
+  def test_collection_id; end
+
   def data
     return cached_data if cached_data.present?
     []

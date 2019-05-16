@@ -35,6 +35,10 @@ class Dataset
       question_item.question_description
     end
 
+    def test_collection_id
+      question_item.parent&.id
+    end
+
     private
 
     def data_report
