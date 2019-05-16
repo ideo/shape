@@ -185,9 +185,10 @@ class Item extends SharedRecordMixin(BaseRecord) {
   secondaryDatasets = ({ selected } = { selected: true }) => {
     const { datasets } = this
     if (!datasets) return []
-    return this.datasets.filter(
+    const allDatasets = this.datasets.filter(
       dataset => dataset.order !== 0 && dataset.selected === selected
     )
+    return _.uniqBy(allDatasets, 'test_collection_id')
   }
 
   get measure() {

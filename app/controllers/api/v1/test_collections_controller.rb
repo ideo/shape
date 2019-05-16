@@ -1,6 +1,6 @@
 class Api::V1::TestCollectionsController < Api::V1::BaseController
   before_action :load_and_authorize_test_collection, only: %i[launch close reopen add_comparison]
-  before_action :load_test_collection, only: %i[show next_available]
+  before_action :load_test_collection, only: %i[show next_available add_comparison remove_comparison]
   before_action :load_submission_box_test_collection, only: %i[next_available]
   before_action :load_comparison_collection, only: %i[add_comparison remove_comparison]
 
@@ -85,7 +85,7 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
 
   def load_comparison_collection
     # TODO: get the comparison collection id param the correct way
-    @comparison_collection = Collection::TestCollection.find_by(
+    @comparison_collection = Collection.find_by(
       id: json_api_params[:data][:comparison_collection_id],
     )
     if @comparison_collection.blank?

@@ -98,6 +98,7 @@ class ChartTooltip extends React.PureComponent {
 
   render() {
     const {
+      alwaysShowLabels,
       data,
       datum,
       displayTicks,
@@ -106,7 +107,8 @@ class ChartTooltip extends React.PureComponent {
       x,
       y,
     } = this.props
-    const showAlways = this.renderValueMark(datum, data.length - 1)
+    const showAlways =
+      alwaysShowLabels || this.renderValueMark(datum, data.length - 1)
     const dx = this.xOffset
     const labelText = labelTextRenderer(datum, this.isLastDataPoint)
     const tooltipText = tooltipTextRenderer(datum, this.isLastDataPoint)
@@ -139,7 +141,7 @@ class ChartTooltip extends React.PureComponent {
             <VictoryTooltip
               active={showAlways}
               {...this.props}
-              dx={dx}
+              dx={labelText.length > 8 ? dx : 0}
               dy={-10}
               style={{ fontSize: this.fontSizes.label, fontWeight: 'normal' }}
               text={labelText}
@@ -171,12 +173,14 @@ ChartTooltip.propTypes = {
   minValue: PropTypes.number,
   cardArea: PropTypes.number,
   displayTicks: PropTypes.bool,
+  alwaysShowLabels: PropTypes.bool,
 }
 ChartTooltip.defaultProps = {
   maxValue: 0,
   minValue: 0,
   cardArea: 1,
   displayTicks: true,
+  alwaysShowLabels: false,
 }
 
 export default ChartTooltip
