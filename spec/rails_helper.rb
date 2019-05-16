@@ -73,7 +73,14 @@ RSpec.configure do |config|
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
     # NOTE: need to reindex every searchable model before test suite is run
-    Searchkick.models.each(&:reindex)
+    Searchkick.models.each do |model|
+      begin
+        model.search_index.delete
+      rescue
+      end
+
+      model.reindex
+    end
     Searchkick.disable_callbacks
   end
 

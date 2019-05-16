@@ -1,4 +1,6 @@
 class Api::V1::Admin::UsersController < Api::V1::BaseController
+  before_action :authorize_shape_admin!
+
   def index
     render jsonapi: User.with_role(Role::SHAPE_ADMIN)
   end
