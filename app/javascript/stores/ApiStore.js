@@ -258,9 +258,9 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   @action
-  async addShapeAdminUsers(users) {
+  async addShapeAdminUsers(users, opts) {
     const userIds = users.map(user => user.id)
-    const data = { user_ids: userIds }
+    const data = { user_ids: userIds, sendInvites: opts.sendInvites }
     await this.request('admin/users', 'POST', data)
     runInAction(() => {
       this.shapeAdminUsers = _.sortBy(this.shapeAdminUsers.concat(users), [

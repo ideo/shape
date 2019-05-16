@@ -16,7 +16,13 @@ class Api::V1::Admin::UsersController < Api::V1::BaseController
 
   def create
     users = User.where(id: json_api_params[:user_ids])
-    if ::Admin::AddRoleToUsers.call(users: users)
+    success = ::Admin::AddRoleToUsers.call(
+      invited_by: current_user,
+      users: users,
+      send_invites: json_api_params[:send_invites]
+    )
+
+    if success
       head :no_content
     else
       render_api_errors []

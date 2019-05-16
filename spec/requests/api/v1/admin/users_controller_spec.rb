@@ -45,6 +45,7 @@ describe Api::V1::Admin::UsersController, type: :request, json: true, auth: true
     let(:params) {
       {
         'user_ids': user_ids,
+        'send_invites': true,
       }.to_json
     }
 
@@ -57,7 +58,9 @@ describe Api::V1::Admin::UsersController, type: :request, json: true, auth: true
       allow(Admin::AddRoleToUsers).to receive(:call)
       post(path, params: params)
       expect(Admin::AddRoleToUsers).to have_received(:call).with(
-        users: users
+        invited_by: admin_user,
+        users: users,
+        send_invites: true,
       )
     end
   end

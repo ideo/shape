@@ -123,8 +123,8 @@ class AdminUsersModal extends React.Component {
     this.props.apiStore.removeShapeAdminUser(user)
   }
 
-  createRoles = users => {
-    this.props.apiStore.addShapeAdminUsers(users)
+  createRoles = (users, _, opts = {}) => {
+    this.props.apiStore.addShapeAdminUsers(users, opts)
   }
 
   createUsers = emails => {
