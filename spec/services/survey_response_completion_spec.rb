@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe SurveyResponseCompletion, type: :service do
-  let(:test_collection) { create(:test_collection, :with_test_audience) }
+  let(:test_collection) { create(:test_collection, :with_test_audience, test_status: :live) }
   let(:survey_response) { create(:survey_response, test_collection: test_collection) }
   let(:service) { SurveyResponseCompletion.new(survey_response) }
 
@@ -15,7 +15,7 @@ describe SurveyResponseCompletion, type: :service do
       expect {
         service.call
       }.to change(survey_response, :status)
-      # unsure why test_collection#close! is failing here
+
       expect(survey_response.status).to eq 'completed_late'
     end
   end

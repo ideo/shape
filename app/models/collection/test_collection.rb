@@ -92,6 +92,7 @@ class Collection
 
     def still_accepting_answers?
       return true if live?
+      return false if test_closed_at.nil?
       closed? && 10.minutes.ago < test_closed_at
     end
 
