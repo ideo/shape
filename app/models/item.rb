@@ -41,7 +41,6 @@ class Item < ApplicationRecord
   has_many :data_items_datasets,
            -> { none },
            dependent: :destroy,
-           class_name: 'DataItemsDatasets',
            foreign_key: 'data_item_id'
 
   delegate :parent, :pinned, :pinned?, :pinned_and_locked?,

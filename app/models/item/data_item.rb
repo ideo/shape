@@ -1,22 +1,32 @@
 class Item
   class DataItem < Item
     belongs_to :legend_item, class_name: 'Item::LegendItem', optional: true
-    # TODO: deprecate this relationship after migrating
-    # all existing DataItems to have datasets
-    belongs_to :data_source, polymorphic: true, optional: true
 
     has_many :data_items_datasets,
              -> { ordered },
              dependent: :destroy,
-             class_name: 'DataItemsDatasets',
              foreign_key: 'data_item_id'
+
+    has_one :primary_data_items_datasets,
+            -> { where(order: 0) },
+            foreign_key: 'data_item_id',
+            class_name: 'DataItemsDataset'
+
     has_many :datasets, through: :data_items_datasets
 
-    # TODO: Deprecate after migrating to datasets
+    has_one :primary_dataset,
+            through: :primary_data_items_datasets,
+            class_name: 'Dataset',
+            source: :dataset
+
+    # TODO: deprecate this relationship after migrating
+    # all existing DataItems to have datasets
+    belongs_to :data_source, polymorphic: true, optional: true
     store_accessor :data_settings,
                    :d_measure,
                    :d_filters, # This is an optional data source (Collection or Item)
                    :d_timeframe
+    # END deprecating methods
 
     validates :report_type, presence: true
     after_create :create_legend_item, if: :create_legend_item?

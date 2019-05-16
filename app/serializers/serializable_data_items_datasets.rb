@@ -1,4 +1,4 @@
-class SerializableDataItemsDatasets < BaseJsonSerializer
+class SerializableDataItemsDataset < BaseJsonSerializer
   type 'data_items_datasets'
 
   belongs_to :dataset

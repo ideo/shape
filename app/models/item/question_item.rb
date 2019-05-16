@@ -2,7 +2,7 @@ class Item
   class QuestionItem < Item
     has_many :question_answers, inverse_of: :question, foreign_key: :question_id, dependent: :destroy
     has_one :test_open_responses_collection, class_name: 'Collection::TestOpenResponses'
-    has_one :dataset, as: :data_source, dependent: :destroy
+    has_one :dataset, as: :data_source, class_name: 'Dataset::QuestionItem', dependent: :destroy
 
     # TODO: Deprecate once migrating to datasets
     has_one :test_data_item, class_name: 'Item::DataItem', as: :data_source

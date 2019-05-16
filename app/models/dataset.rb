@@ -1,6 +1,5 @@
 class Dataset < ApplicationRecord
-  has_many :data_items_datasets,
-           class_name: 'DataItemsDatasets', dependent: :destroy
+  has_many :data_items_datasets, dependent: :destroy
 
   has_many :data_items,
            through: :data_items_datasets,

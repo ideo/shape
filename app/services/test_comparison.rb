@@ -1,7 +1,10 @@
 class TestComparison < SimpleService
+  attr_reader :errors
+
   def initialize(collection:, comparison_collection:)
     @collection = collection
     @comparison_collection = comparison_collection
+    @errors = []
   end
 
   def self.add(*args)
@@ -13,34 +16,49 @@ class TestComparison < SimpleService
   end
 
   def add
-    return if same_collection?
-    # @collection.data_items.report_type_question_item.includes(datasets: [:data_source]).each do |data_item|
-    @collection.data_items.report_type_question_item.each do |data_item|
-      # TODO: assign question_type on question items datasets?
-      question_item = data_item.datasets.first.data_source
-      question_item_type = question_item.question_type
+    return false if same_collection?
+    collection_question_data_items.includes(primary_dataset: :question_item).each do |data_item|
+      question_item = data_item.primary_dataset.question_item
       maximum_order = data_item.data_items_datasets.maximum(:order)
-      comparable = comparison_datasets_by_question_type[question_item_type]
-      if comparable.blank?
-        data_item.data_items_datasets.create(
+      comparable_datasets = comparison_question_datasets_by_question_type[question_item.question_type]
+      if comparable_datasets.blank?
+        data_items_dataset = data_item.data_items_datasets.create(
           dataset: empty_dataset_for_comparison,
           order: maximum_order += 1,
           selected: true,
         )
+        if data_items_dataset.errors.present?
+          errors.push(data_items_dataset.errors.full_messages)
+        end
       else
-        comparable.each do |comparison_dataset|
-          data_item.data_items_datasets.create(
+        comparable_datasets.each do |comparison_dataset|
+          data_items_dataset = data_item.data_items_datasets.create(
             dataset: comparison_dataset,
             order: maximum_order += 1,
             selected: true,
           )
+          if data_items_dataset.errors.present?
+            errors.push(data_items_dataset.errors.full_messages)
+          end
         end
       end
     end
+    errors.blank?
   end
 
   def remove
-    return if same_collection?
+    return false if same_collection?
+    collection_question_data_items.includes(data_items_datasets: :dataset).each do |data_item|
+      data_item.data_items_datasets.each do |data_items_dataset|
+        dataset = data_items_dataset.dataset
+        next unless comparison_collection_datasets.include?(dataset)
+        # If this question dataset comes from the comparison, remove it
+        unless data_items_dataset.destroy
+          errors.push('Could not remove a dataset')
+        end
+      end
+    end
+    errors.blank?
   end
 
   private
@@ -57,26 +75,28 @@ class TestComparison < SimpleService
     )
   end
 
-  def question_items_by_question_type
-    @question_items_by_question_type ||= @collection.question_items.scale_questions.each_with_object({}) do |question_item, h|
-      h[question_item.question_type] ||= []
-      h[question_item.question_type].push(question_item)
-    end
+  def collection_question_data_items
+    @collection
+      .data_items
+      .report_type_question_item
+      .includes(primary_dataset: :question_item)
   end
 
-  def comparison_datasets_by_question_type
-    # @comparison_datasets_by_question_type ||= @comparison_collection.includes(:dataset).question_items.scale_questions.each_with_object({}) do |question_item, h|
-    @comparison_datasets_by_question_type ||= @comparison_collection.question_items.scale_questions.each_with_object({}) do |question_item, h|
+  def comparison_question_datasets_by_question_type
+    @comparison_question_datasets_by_question_type ||= @comparison_collection
+    .question_items
+    .scale_questions
+    .each_with_object({}) do |question_item, h|
       h[question_item.question_type] ||= []
       h[question_item.question_type].push(question_item.dataset)
     end
   end
 
-  def same_collection?
-    @collection == @comparison_collection
+  def comparison_collection_datasets
+    comparison_question_datasets_by_question_type.values.flatten
   end
 
-  def find_by_question_type(question_type)
-    @collection.question_items.scale_questions.where(question_type: question_type)
+  def same_collection?
+    @collection == @comparison_collection
   end
 end

@@ -1,6 +1,14 @@
 class Dataset
   class QuestionItem < Dataset
     before_validation :set_default_timeframe
+    belongs_to :question_item,
+               foreign_key: 'data_source_id',
+               class_name: 'Item::QuestionItem',
+               optional: true
+
+    delegate :question_type,
+             to: :question_item,
+             allow_nil: true
 
     def data
       data_report.call
@@ -13,10 +21,6 @@ class Dataset
     def measure
       # The collection name
       question_item.parent&.name
-    end
-
-    def question_item
-      data_source
     end
 
     def max_domain

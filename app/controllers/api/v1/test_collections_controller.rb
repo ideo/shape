@@ -54,9 +54,9 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
       comparison_collection: @comparison_collection,
     )
     if test_comparison
-      render jsonapi: @test_collection
+      render_collection
     else
-      render json: test_comparison.errors
+      render_api_errors test_comparison.errors
     end
   end
 
@@ -66,9 +66,9 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
       comparison_collection: @comparison_collection,
     )
     if test_comparison
-      render jsonapi: @test_collection
+      render_collection
     else
-      render json: test_comparison.errors
+      render_api_errors test_comparison.errors
     end
   end
 
