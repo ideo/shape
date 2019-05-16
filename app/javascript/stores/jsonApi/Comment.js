@@ -1,6 +1,7 @@
 import { observable, action, runInAction } from 'mobx'
 import { remove } from 'lodash'
 
+import trackError from '~/utils/trackError'
 import { apiUrl } from '~/utils/url'
 
 import BaseRecord from './BaseRecord'
@@ -23,6 +24,10 @@ class Comment extends BaseRecord {
     this.unread = false
   }
 
+  get wasEdited() {
+    return this.updated_at > this.created_at
+  }
+
   API_destroy = async () => {
     try {
       await this.destroy()
@@ -34,6 +39,22 @@ class Comment extends BaseRecord {
       console.error(e)
       uiStore.defaultAlertError()
     }
+  }
+
+  API_updateWithoutSync = rawData => {
+    this.message = rawData.message
+    this.draftjs_data = rawData.draftjs_data
+
+    const data = this.toJsonApi()
+    // Turn off syncing when saving the comment to not reload the page
+    data.cancel_sync = true
+    return apiStore
+      .request(`comments/${this.id}`, 'PATCH', {
+        data,
+      })
+      .catch(err => {
+        trackError(err, { name: 'comment:update' })
+      })
   }
 }
 

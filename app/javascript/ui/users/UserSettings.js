@@ -50,6 +50,7 @@ class OrganizationSettings extends React.Component {
   }
 
   get notifyValue() {
+    if (!this.user) return 'off'
     return this.user.notify_through_email ? 'on' : 'off'
   }
 
