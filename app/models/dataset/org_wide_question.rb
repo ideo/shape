@@ -2,7 +2,26 @@ class Dataset
   class OrgWideQuestion < Dataset
     before_validation :set_default_timeframe
 
-    ORG_MEASURE_NAME = 'org-wide-feedback'.freeze
+    def self.setup_new_question_type(question_type)
+      Organization.find_each do |organization|
+        where(
+          organization: organization,
+          question_type: question_type,
+        ).find_or_create
+      end
+    end
+
+    def self.find_or_create_for_organization(organization)
+      Item::QuestionItem
+        .question_type_categories[:scaled_rating]
+        .each do |question_type|
+
+        where(
+          organization: organization,
+          question_type: question_type,
+        ).find_or_create
+      end
+    end
 
     def data
       data_report.call
@@ -12,8 +31,7 @@ class Dataset
       data_report.total
     end
 
-    def measure(organization = nil)
-      organization ||= data_items.first&.organization
+    def measure
       "#{organization&.name} Organization"
     end
 

@@ -1,6 +1,5 @@
 module DataReport
   class QuestionItem < SimpleService
-    ORG_MEASURE_NAME = 'org-wide-feedback'.freeze
 
     def initialize(dataset:)
       @dataset = dataset

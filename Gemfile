@@ -155,6 +155,7 @@ group :test do
   gem 'json-schema'
   gem 'vcr'
   gem 'webmock'
+  gem 'rspec-sidekiq'
 end
 
 group :production do

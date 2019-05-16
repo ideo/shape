@@ -1,11 +1,12 @@
 class Dataset < ApplicationRecord
+  belongs_to :organization, optional: true
+  belongs_to :data_source, polymorphic: true, optional: true
+
   has_many :data_items_datasets, dependent: :destroy
 
   has_many :data_items,
            through: :data_items_datasets,
            class_name: 'Item::DataItem'
-
-  belongs_to :data_source, polymorphic: true, optional: true
 
   validates :timeframe, :chart_type, presence: true
   validates :cached_data, :measure, presence: true, if: :root_dataset_class?
