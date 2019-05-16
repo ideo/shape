@@ -147,7 +147,7 @@ Rails.application.routes.draw do
       end
 
       namespace :admin do
-        resources :users, only: %i[index destroy]
+        resources :users, only: %i[index destroy create]
       end
     end
   end

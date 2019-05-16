@@ -123,8 +123,8 @@ class AdminUsersModal extends React.Component {
     this.props.apiStore.removeShapeAdminUser(user)
   }
 
-  createRoles = (entities, roleName, opts = {}) => {
-    console.log('create roles', entities, roleName, opts)
+  createRoles = users => {
+    this.props.apiStore.addShapeAdminUsers(users)
   }
 
   createUsers = emails => {
@@ -209,7 +209,7 @@ class AdminUsersModal extends React.Component {
                 roleTypes={['shapeAdmin']}
                 onCreateRoles={this.createRoles}
                 onCreateUsers={this.createUsers}
-                ownerType={'users'}
+                ownerType={'shapeAdmins'}
               />
             </FooterArea>
           </React.Fragment>

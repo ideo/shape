@@ -13,4 +13,13 @@ class Api::V1::Admin::UsersController < Api::V1::BaseController
       render_api_errors user.errors
     end
   end
+
+  def create
+    users = User.where(id: json_api_params[:user_ids])
+    if ::Admin::AddRoleToUsers.call(users: users)
+      head :no_content
+    else
+      render_api_errors []
+    end
+  end
 end

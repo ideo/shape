@@ -36,4 +36,29 @@ describe Api::V1::Admin::UsersController, type: :request, json: true, auth: true
       expect(admin_user.has_role?(Role::SHAPE_ADMIN)).to be(false)
     end
   end
+
+  describe 'POST #create' do
+    let(:path) { "/api/v1/admin/users" }
+    let(:users) { create_list(:user, 3) }
+    let(:user_ids) { users.map(&:id) }
+    let(:users_json) { json_included_objects_of_type('users') }
+    let(:params) {
+      {
+        'user_ids': user_ids,
+      }.to_json
+    }
+
+    it 'returns a 204 no content' do
+      post(path, params: params)
+      expect(response.status).to eq(204)
+    end
+
+    it 'adds the Shape admin role to the users' do
+      allow(Admin::AddRoleToUsers).to receive(:call)
+      post(path, params: params)
+      expect(Admin::AddRoleToUsers).to have_received(:call).with(
+        users: users
+      )
+    end
+  end
 end
