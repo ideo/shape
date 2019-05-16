@@ -32,6 +32,14 @@ class TestSurveyResponder extends React.Component {
     this.initializeCards()
   }
 
+  componentDidUpdate(prevProps) {
+    if (
+      this.props.includeRecontactQuestion != prevProps.includeRecontactQuestion
+    ) {
+      this.initializeCards()
+    }
+  }
+
   async initializeCards() {
     const { collection, includeRecontactQuestion } = this.props
 

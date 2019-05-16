@@ -31,6 +31,7 @@ class RecontactQuestion extends React.Component {
     showContactInfo: false,
     contactInfo: '',
     submittedContactInfo: false,
+    answer: '',
   }
 
   async createLimitedUser(contactInfo) {
@@ -54,6 +55,8 @@ class RecontactQuestion extends React.Component {
 
   handleClick = choice => ev => {
     const { onAnswer, user } = this.props
+    this.setState({ answer: choice })
+
     if (choice === 'feedback_contact_yes' && !user) {
       this.setState({ showContactInfo: true })
       return
@@ -84,7 +87,12 @@ class RecontactQuestion extends React.Component {
 
   render() {
     const { user } = this.props
-    const { contactInfo, showContactInfo, submittedContactInfo } = this.state
+    const {
+      contactInfo,
+      showContactInfo,
+      submittedContactInfo,
+      answer,
+    } = this.state
     return (
       <div style={{ width: '100%', backgroundColor: this.backgroundColor }}>
         <QuestionText>
@@ -93,8 +101,10 @@ class RecontactQuestion extends React.Component {
         <EmojiHolder>
           <EmojiButton
             selected={
-              // default to true for no user and then set for limited user
-              user && user.feedback_contact_preference === 'feedback_contact_no'
+              (user &&
+                user.feedback_contact_preference === 'feedback_contact_no') ||
+              answer === 'feedback_contact_no' ||
+              !answer
             }
             onClick={this.handleClick('feedback_contact_no')}
           >
@@ -102,9 +112,11 @@ class RecontactQuestion extends React.Component {
           </EmojiButton>
           <EmojiButton
             selected={
-              showContactInfo ||
+              !answer ||
               (user &&
-                user.feedback_contact_preference === 'feedback_contact_yes')
+                user.feedback_contact_preference === 'feedback_contact_yes') ||
+              answer === 'feedback_contact_yes' ||
+              !answer
             }
             onClick={this.handleClick('feedback_contact_yes')}
           >
