@@ -98,6 +98,14 @@ const StyledAddComparison = styled.div`
   }
 `
 
+const MeasureText = styled(SmallHelperText)`
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 240px;
+  white-space: nowrap;
+`
+
 @inject('apiStore', 'uiStore')
 @observer
 class LegendItemCover extends React.Component {
@@ -146,9 +154,9 @@ class LegendItemCover extends React.Component {
     return (
       <Measure key={`measure-${measure}`}>
         {icon && <MeasureIconWrapper>{icon}</MeasureIconWrapper>}
-        <SmallHelperText color={v.colors.black}>
+        <MeasureText color={v.colors.black}>
           {this.measureDisplayName(measure)}
-        </SmallHelperText>
+        </MeasureText>
         {!primary && (
           <UnselectMeasure
             role="button"
