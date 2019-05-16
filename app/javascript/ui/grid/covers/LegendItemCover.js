@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
@@ -113,6 +114,14 @@ class LegendItemCover extends React.Component {
     comparisonMenuOpen: false,
   }
 
+  constructor(props) {
+    super(props)
+    this.debouncedSearchTestCollections = _.debounce(
+      this.searchTestCollections,
+      500
+    )
+  }
+
   componentDidMount() {
     this.searchTestCollections(' ')
   }
@@ -205,6 +214,14 @@ class LegendItemCover extends React.Component {
     card.parent.API_fetchCards()
   }
 
+  findDatasetByTest(testId) {
+    const { item } = this.props
+    const dataSet = item.datasets.find(
+      d => d.test_collection_id === parseInt(testId)
+    )
+    return dataSet
+  }
+
   searchTestCollections = (term, callback) => {
     const { item, apiStore } = this.props
     return apiStore
@@ -217,6 +234,9 @@ class LegendItemCover extends React.Component {
       })
       .then(res => res.data)
       .then(records => records.filter(record => record.id !== item.parent_id))
+      .then(records =>
+        records.filter(record => !this.findDatasetByTest(record.id))
+      )
       .then(records => callback && callback(formatCollections(records)))
       .catch(e => {
         trackError(e)
@@ -227,7 +247,7 @@ class LegendItemCover extends React.Component {
     return (
       <AutoComplete
         options={[]}
-        optionSearch={this.searchTestCollections}
+        optionSearch={this.debouncedSearchTestCollections}
         onOptionSelect={option => this.onSelectComparison(option)}
         placeholder="search comparisons"
         onMenuClose={this.onSearchClose}
