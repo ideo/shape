@@ -7,8 +7,12 @@ import Emoji from '~/ui/icons/Emoji'
 import { EmojiButton, EmojiHolder } from '~/ui/test_collections/ScaleQuestion'
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
 import OkIcon from '~/ui/icons/OkIcon'
-import { QuestionText } from './shared'
-import { TextInput, TextResponseHolder, TextEnterButton } from './shared'
+import {
+  QuestionText,
+  TextInput,
+  TextResponseHolder,
+  TextEnterButton,
+} from '~/ui/test_collections/shared'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 
@@ -73,11 +77,16 @@ class RecontactQuestion extends React.Component {
     this.setState({ submittedContactInfo: true })
   }
 
+  get backgroundColor() {
+    const { backgroundColor } = this.props
+    return backgroundColor ? backgroundColor : v.colors.primaryDark
+  }
+
   render() {
     const { user } = this.props
     const { contactInfo, showContactInfo, submittedContactInfo } = this.state
     return (
-      <div style={{ width: '100%' }}>
+      <div style={{ width: '100%', backgroundColor: this.backgroundColor }}>
         <QuestionText>
           Would you like to be contacted about future surveys?
         </QuestionText>
@@ -144,9 +153,11 @@ RecontactQuestion.propTypes = {
   user: MobxPropTypes.objectOrObservableObject,
   onAnswer: PropTypes.func.isRequired,
   sessionUid: PropTypes.string.isRequired,
+  backgroundColor: PropTypes.string,
 }
 RecontactQuestion.defaultProps = {
   user: null,
+  backgroundColor: null,
 }
 
 export default RecontactQuestion

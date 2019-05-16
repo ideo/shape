@@ -59,6 +59,7 @@ class ClosedSurvey extends React.Component {
             <StyledClosedText>{this.message}</StyledClosedText>
             {includeRecontactQuestion && !this.answer ? (
               <RecontactQuestion
+                backgroundColor={v.colors.primaryDarkest}
                 onAnswer={this.onAnswer}
                 sessionUid={sessionUid}
               />
