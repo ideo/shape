@@ -33,18 +33,13 @@ class TestSurveyResponder extends React.Component {
   }
 
   async initializeCards() {
-    const { collection, apiStore } = this.props
+    const { collection, includeRecontactQuestion } = this.props
 
-    await apiStore.loadCurrentUser()
-    const { currentUser } = apiStore
     const questionCards = [...collection.question_cards]
+    console.log('included recontract? ', includeRecontactQuestion)
 
-    if (
-      !collection.live_test_collection &&
-      (!currentUser ||
-        currentUser.feedback_contact_preference ===
-          'feedback_contact_unanswered')
-    ) {
+    if (includeRecontactQuestion) {
+      console.log('splicing cards')
       questionCards.splice(questionCards.length - 1, 0, {
         id: 'recontact',
         card_question_type: 'question_recontact',

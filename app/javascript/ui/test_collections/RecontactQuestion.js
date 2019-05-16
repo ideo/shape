@@ -60,7 +60,7 @@ class RecontactQuestion extends React.Component {
       })
     }
     // there was a user, or anon user answered "no", move on
-    onAnswer()
+    onAnswer(choice)
   }
 
   handleContactInfoSubmit = async ev => {
@@ -69,7 +69,7 @@ class RecontactQuestion extends React.Component {
     ev.preventDefault()
     const created = this.createLimitedUser(contactInfo)
     if (!created) return
-    onAnswer()
+    onAnswer('feedback_contact_yes')
     this.setState({ submittedContactInfo: true })
   }
 
