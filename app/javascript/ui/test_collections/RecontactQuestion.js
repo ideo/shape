@@ -88,7 +88,7 @@ class RecontactQuestion extends React.Component {
     return (
       <div style={{ width: '100%', backgroundColor: this.backgroundColor }}>
         <QuestionText>
-          Would you like to be contacted about future surveys?
+          Would you like to be contacted about future feedback opportunities?
         </QuestionText>
         <EmojiHolder>
           <EmojiButton
@@ -97,7 +97,7 @@ class RecontactQuestion extends React.Component {
             }
             onClick={this.handleClick('feedback_contact_no')}
           >
-            <Emoji name="Finished" symbol="👎" />
+            <Emoji scale={1.375} name="Finished" symbol="👎" />
           </EmojiButton>
           <EmojiButton
             selected={
@@ -107,7 +107,7 @@ class RecontactQuestion extends React.Component {
             }
             onClick={this.handleClick('feedback_contact_yes')}
           >
-            <Emoji name="Yes" symbol="👍" />
+            <Emoji scale={1.375} name="Yes" symbol="👍" />
           </EmojiButton>
         </EmojiHolder>
 

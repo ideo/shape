@@ -76,6 +76,11 @@ class ClosedSurvey extends React.Component {
 // TODO move blue background, rounded-corner box to shared component
 const StyledClosedText = styled.div`
   margin: 10px 0 40px 0;
+  font-size: 1.25rem;
+  line-height: 20px;
+  text-align: center;
+  padding-left: 44px;
+  padding-right: 44px;
 `
 
 const StyledSurvey = styled.div`
@@ -92,6 +97,7 @@ const LearnMoreLink = LoudDisplayLink.extend`
   font-size: 0.75rem;
   letter-spacing: 2px;
   color: ${v.colors.white};
+  text-align: center;
 `
 LearnMoreLink.displayName = 'LearnMoreLink'
 
