@@ -12,7 +12,8 @@ describe('ChartTooltip', () => {
     props = {
       minValue: 10,
       maxValue: 90,
-      textRenderer: jest.fn(),
+      labelTextRenderer: jest.fn().mockReturnValue(''),
+      tooltipTextRenderer: jest.fn(),
       data,
       datum: data[0],
       index: '0',
@@ -32,7 +33,7 @@ describe('ChartTooltip', () => {
     })
 
     it('should render with the text renderer', () => {
-      expect(props.textRenderer).toHaveBeenCalledWith(props.datum, false)
+      expect(props.tooltipTextRenderer).toHaveBeenCalledWith(props.datum, false)
     })
 
     it('should render a tooltip', () => {

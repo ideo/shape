@@ -2330,9 +2330,9 @@ exports[`ChartGroup renders snapshot 1`] = `
               "strokeWidth": 0,
             },
             "labels": Object {
-              "fill": "#de8f74",
+              "fill": "#120f0e",
               "fontFamily": "'Gotham', sans-serif",
-              "fontSize": 14,
+              "fontSize": 8,
               "letterSpacing": "normal",
               "padding": 10,
               "stroke": "transparent",
@@ -2787,10 +2787,13 @@ exports[`ChartGroup renders snapshot 1`] = `
       key="dataset-0"
       labelComponent={
         <ChartTooltip
+          alwaysShowLabels={false}
           cardArea={1}
+          displayTicks={true}
+          labelTextRenderer={[Function]}
           maxValue={0}
           minValue={0}
-          textRenderer={[Function]}
+          tooltipTextRenderer={[Function]}
         />
       }
       labels={[Function]}
@@ -3349,7 +3352,9 @@ exports[`ChartGroup renders snapshot 1`] = `
       key="dataset-1"
       labelComponent={
         <ChartTooltip
+          alwaysShowLabels={false}
           cardArea={1}
+          displayTicks={true}
           maxValue={0}
           minValue={0}
           textRenderer={[Function]}
@@ -3917,16 +3922,18 @@ exports[`ChartGroup renders snapshot 1`] = `
       }
       key="dataset-2"
       labelComponent={
-        <VictoryLabel
-          capHeight={0.71}
-          direction="inherit"
-          lineHeight={1}
-          textComponent={<Text />}
-          tspanComponent={<TSpan />}
+        <ChartTooltip
+          alwaysShowLabels={true}
+          cardArea={1}
+          displayTicks={false}
+          labelTextRenderer={[Function]}
+          maxValue={0}
+          minValue={0}
+          tooltipTextRenderer={[Function]}
         />
       }
       labels={[Function]}
-      padding={10}
+      padding={3.3333333333333335}
       samples={50}
       scale="linear"
       sortOrder="ascending"

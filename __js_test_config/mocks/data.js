@@ -159,10 +159,32 @@ export const creativeDifferenceQualityDataset = {
   ],
 }
 
+export const fakeDatasetAttrs = {
+  chart_type: 'bar',
+  data: [],
+  data_items_datasets_id: 100,
+  measure: 'Data measure',
+  order: 0,
+  question_type: null,
+  selected: true,
+  test_collection_id: null,
+  timeframe: 'ever',
+  total: 1,
+}
+
+export const fakeDataset = {
+  ...fakeDatasetAttrs,
+  rawAttributes: jest.fn().mockReturnValue(fakeDatasetAttrs),
+  getRecordType: jest.fn().mockReturnValue('datasets'),
+  toJSON: jest.fn().mockReturnValue(fakeDatasetAttrs),
+  ...fakeJsonApiAttrs,
+}
+
 export const fakeDataItemRecordAttrs = {
   ...fakeTextItemAttrs,
   type: 'Item::DataItem',
   data_content: null,
+  datasets: [fakeDataset],
   name: 'Data Item',
   report_type: 'report_type_record',
   isReportTypeCollectionsItems: false,
@@ -178,6 +200,16 @@ export const fakeDataItemRecordAttrs = {
       chart_type: 'line'
     }
   ],
+  primaryDataset: jest.fn().mockReturnValue(fakeDataset),
+  secondaryDatasets: jest.fn().mockReturnValue([fakeDataset]),
+}
+
+export const fakeDataItem = {
+  ...fakeDataItemRecordAttrs,
+  rawAttributes: jest.fn().mockReturnValue(fakeDataItemRecordAttrs),
+  getRecordType: jest.fn().mockReturnValue('items'),
+  toJSON: jest.fn().mockReturnValue(fakeDataItemRecordAttrs),
+  ...fakeJsonApiAttrs,
 }
 
 export const fakeTextItem = {

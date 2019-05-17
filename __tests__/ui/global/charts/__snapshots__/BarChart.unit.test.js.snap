@@ -69,12 +69,14 @@ exports[`BarChart renders snapshot 1`] = `
   }
   key="dataset-0"
   labelComponent={
-    <VictoryLabel
-      capHeight={0.71}
-      direction="inherit"
-      lineHeight={1}
-      textComponent={<Text />}
-      tspanComponent={<TSpan />}
+    <ChartTooltip
+      alwaysShowLabels={true}
+      cardArea={1}
+      displayTicks={false}
+      labelTextRenderer={[Function]}
+      maxValue={0}
+      minValue={0}
+      tooltipTextRenderer={[Function]}
     />
   }
   labels={[Function]}
