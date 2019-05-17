@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :data_items_datasets do
+  factory :data_items_dataset do
     trait :cached_data do
       dataset factory: [:dataset, :with_cached_data]
     end

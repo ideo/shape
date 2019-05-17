@@ -4,6 +4,7 @@ FactoryBot.define do
     chart_type 'area'
 
     trait :with_cached_data do
+      measure 'Widgets'
       cached_data {
         {
           total: 24,

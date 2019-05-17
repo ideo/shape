@@ -31,6 +31,26 @@ class Dataset < ApplicationRecord
     line: 2,
   }
 
+  searchkick callbacks: :queue
+
+  scope :search_import, -> do
+    includes(
+      data_source: { parent_collection_card: :parent },
+    )
+  end
+
+  def search_data
+    {
+      type: type,
+      measure: measure,
+      organization_id: organization_id || data_source&.organization_id,
+      question_type: question_type,
+      chart_type: chart_type,
+      data_source_parent_id: data_source ? data_source.parent.id : nil,
+      data_source_parent_type: data_source ? data_source.parent.class.base_class.name : nil,
+    }
+  end
+
   # Implement in each sub-class
 
   def title; end

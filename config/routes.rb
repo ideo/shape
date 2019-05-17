@@ -37,6 +37,11 @@ Rails.application.routes.draw do
             get 'will_become_private'
           end
         end
+        resources :datasets, only: %i[show] do
+          member do
+            post 'toggle_selected'
+          end
+        end
       end
       resources :items do
         member do

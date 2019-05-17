@@ -1,4 +1,6 @@
 class SerializableLegendItem < SerializableItem
+  attribute :legend_search_source
+
   has_many :datasets do
     data do
       @object.data_items_datasets.map do |data_items_datasets|

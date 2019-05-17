@@ -65,7 +65,7 @@ FactoryBot.define do
 
       after(:build) do |data_item, evaluator|
         data_item.data_items_datasets << build_list(
-          :data_items_datasets, 1, evaluator.dataset_type, data_item: data_item
+          :data_items_dataset, 1, evaluator.dataset_type, data_item: data_item
         )
       end
     end

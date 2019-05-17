@@ -15,13 +15,23 @@ class Item
     store_accessor :data_settings,
                    :selected_measures
 
+    before_create :set_default_search_source, unless: :legend_search_source
     after_save :touch_related_collection_cards
+
+    enum legend_search_source: {
+      search_test_collections: 0,
+      select_from_datasets: 1,
+    }
 
     def name
       'Legend'
     end
 
     private
+
+    def set_default_search_source
+      self.legend_search_source = :search_test_collections
+    end
 
     def touch_related_collection_cards
       CollectionCard::Primary

@@ -1,7 +1,8 @@
-import { action } from 'mobx'
+import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import { Select, SelectOption } from '~/ui/global/styled/forms'
 import AutoComplete from '~/ui/global/AutoComplete'
 import XIcon from '~/ui/icons/XIcon'
 import PlusIcon from '~/ui/icons/PlusIcon'
@@ -122,6 +123,14 @@ class LegendItemCover extends React.Component {
     uiStore.removeEmptySpaceClickHandler(this.onSearchClose)
   }
 
+  @observable
+  @action
+  toggleDatasetSelected = async ({ dataset }) => {
+    const { parent } = this.props.card
+    await dataset.API_toggleSelected({ collectionId: parent.id })
+    parent.API_fetchCards()
+  }
+
   toggleComparisonSearch = () => {
     const { uiStore } = this.props
     const { comparisonMenuOpen } = this.state
@@ -152,8 +161,13 @@ class LegendItemCover extends React.Component {
 
   onDeselectComparison = async dataset => {
     const { card } = this.props
-    await card.parent.API_removeComparison({ id: dataset.test_collection_id })
-    card.parent.API_fetchCards()
+    const { legend_search_source } = this.props.item
+    if (legend_search_source === 'select_from_datasets') {
+      this.toggleDatasetSelected({ dataset })
+    } else if (legend_search_source === 'search_test_collections') {
+      await card.parent.API_removeComparison({ id: dataset.test_collection_id })
+      card.parent.API_fetchCards()
+    }
   }
 
   @action
@@ -193,7 +207,41 @@ class LegendItemCover extends React.Component {
       })
   }
 
-  get renderComparisonMenu() {
+  handleDatasetMenuSelection = event => {
+    event.preventDefault()
+    const { value } = event.target
+    const { datasets } = this.props.item
+    const dataset = datasets.find(dataset => dataset.id === value)
+    this.toggleDatasetSelected({ dataset })
+  }
+
+  get renderDatasetsMenu() {
+    const { secondaryDatasets } = this.props.item
+    return (
+      <Select
+        classes={{ root: 'select', selectMenu: 'selectMenu' }}
+        displayEmpty
+        disableUnderline
+        name="role"
+        onChange={this.handleDatasetMenuSelection}
+        onClose={() => this.setState({ comparisonMenuOpen: false })}
+        open
+        inline
+      >
+        {secondaryDatasets({ selected: false }).map(dataset => (
+          <SelectOption
+            classes={{ root: 'selectOption', selected: 'selected' }}
+            key={dataset.id}
+            value={dataset.id}
+          >
+            {dataset.measure}
+          </SelectOption>
+        ))}
+      </Select>
+    )
+  }
+
+  get renderTestCollectionsSearch() {
     return (
       <AutoComplete
         options={[]}
@@ -203,6 +251,15 @@ class LegendItemCover extends React.Component {
         onMenuClose={this.onSearchClose}
       />
     )
+  }
+
+  get renderComparisonMenu() {
+    const { legend_search_source } = this.props.item
+    if (legend_search_source === 'select_from_datasets') {
+      return this.renderDatasetsMenu
+    } else if (legend_search_source === 'search_test_collections') {
+      return this.renderTestCollectionsSearch
+    }
   }
 
   renderSelectedDataset = ({ dataset, order, primary }) => {
