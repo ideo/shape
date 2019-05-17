@@ -22,10 +22,6 @@ describe('AdminUsersSummary', () => {
       expect(wrapper.find('Avatar').length).toEqual(1)
     })
 
-    it('does not render a placeholder for additional users for only one admin user', () => {
-      expect(wrapper.find('.placeholder').exists()).toBe(false)
-    })
-
     it('renders an AddButton', () => {
       expect(wrapper.find('AddButton').exists()).toBe(true)
     })
