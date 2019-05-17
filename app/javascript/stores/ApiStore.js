@@ -559,6 +559,10 @@ class ApiStore extends jsonapi(datxCollection) {
     return org
   }
 
+  get currentOrganization() {
+    return this.currentUser.current_organization
+  }
+
   // default action for updating any basic apiStore value
   @action
   update(name, value) {

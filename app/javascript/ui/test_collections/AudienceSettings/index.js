@@ -5,7 +5,7 @@ import { runInAction, observable, action, computed } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import { FormButton } from '~/ui/global/styled/forms'
-import AudienceSettingsWidget from './AudienceSettingsWidget'
+import AudienceSettingsWidget from '~/ui/test_collections/AudienceSettings/AudienceSettingsWidget'
 // import TestAudience from '~/stores/jsonApi/TestAudience'
 import FeedbackTermsModal from '~/ui/test_collections/FeedbackTermsModal'
 import ConfirmPriceModal from '~/ui/test_collections/ConfirmPriceModal'
@@ -203,6 +203,9 @@ class AudienceSettings extends React.Component {
 
   render() {
     const { uiStore, testCollection } = this.props
+    const { apiStore } = this.props
+    const { currentUser } = apiStore
+    const currentUserOrganization = currentUser.current_organization
 
     return (
       <React.Fragment>
@@ -216,6 +219,7 @@ class AudienceSettings extends React.Component {
           onSubmit={this.confirmPrice}
           close={this.closeConfirmPriceModal}
           paymentMethod={{ last4: 1234, brand: 'Visa' }}
+          organization={currentUserOrganization}
           totalPrice={this.totalPriceDollars}
           testName={testCollection.name}
         />

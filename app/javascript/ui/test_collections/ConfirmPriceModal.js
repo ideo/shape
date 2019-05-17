@@ -1,39 +1,45 @@
 import PropTypes from 'prop-types'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
-
 import PaperAirplane from '~/ui/test_collections/PaperAirplane'
 import { ModalCloseButton } from '~/ui/global/modals/Modal'
-import { FormButton } from '~/ui/global/styled/forms'
+import { TextButton, FormButton } from '~/ui/global/styled/forms'
 import { DisplayText } from '~/ui/global/styled/typography'
+import PlainLink from '~/ui/global/PlainLink'
 import v from '~/utils/variables'
 import CloseIcon from '~/ui/icons/CloseIcon'
 import CardBrandIcon from '~shared/components/atoms/CardBrandIcon'
 
 // Extract children from here
-// Reuse for both Agree to Terms and Confirm Payment?
-const ConfirmPriceModal = ({
-  onSubmit,
-  open,
-  close,
-  paymentMethod,
-  totalPrice,
-  testName,
-}) => (
-  <StyledDialog
-    classes={{ root: 'root__dialog', paper: 'modal__paper' }}
-    open={open}
-    BackdropProps={{
-      invisible: true,
-    }}
-  >
-    <StyledModalCloseButton onClick={close}>
-      <CloseIcon />
-    </StyledModalCloseButton>
-    <StyledDialogContent classes={{ root: 'root__dialog-content' }}>
+class ConfirmPriceModal extends React.Component {
+  renderMissingPaymentContent() {
+    const { close } = this.props
+    return (
+      <React.Fragment>
+        <SpecialDisplayHeading wrapLine>
+          Oh no! It looks like you don't have a valid payment method for this
+          feedback request. Please ask an administrator to add a payment method.
+        </SpecialDisplayHeading>
+        <StyledDiv style={{ textAlign: 'center' }}>
+          <TextButton onClick={close} width={200}>
+            Close
+          </TextButton>
+        </StyledDiv>
+      </React.Fragment>
+    )
+  }
+
+  renderPaymentMethodContent() {
+    const { onSubmit, testName, totalPrice } = this.props
+    const buttonProps = {
+      disabled: !this.hasPaymentMethod,
+      width: 200,
+    }
+
+    return (
       <form onSubmit={onSubmit}>
-        <PaperAirplane />
         <SpecialDisplayHeading wrapLine>
           Your test "{testName}" is about to be launched. Your payment method
           will be charged <strong>{totalPrice}</strong> for this feedback.
@@ -46,19 +52,76 @@ const ConfirmPriceModal = ({
             paddingBottom: '2rem',
           }}
         >
-          <CardBrandIcon brand={paymentMethod.brand} width={32} height={30} />{' '}
-          <DisplayText>
-            {paymentMethod.brand} ending in {paymentMethod.last4} will be
-            charged.
-          </DisplayText>
+          {this.renderPaymentMethodToCharge()}
         </StyledDiv>
         <StyledDiv style={{ textAlign: 'center' }}>
-          <FormButton width={200}>Get Feedback</FormButton>
+          <FormButton {...buttonProps}>Get Feedback</FormButton>
         </StyledDiv>
       </form>
-    </StyledDialogContent>
-  </StyledDialog>
-)
+    )
+  }
+
+  renderPaymentMethodToCharge() {
+    const { paymentMethod, organization } = this.props
+
+    const message = this.isOrgAdmin
+      ? `${paymentMethod.brand} ending in ${paymentMethod.last4} will be
+            charged.`
+      : `${organization.name}'s default payment method will be charged.`
+    const paymentBrand = paymentMethod ? paymentMethod.brand : null
+
+    // Is this logic working right?
+    return this.isOrgAdmin ? (
+      <React.Fragment>
+        <CardBrandIcon brand={paymentBrand} width={32} height={30} />{' '}
+        <DisplayText>{message}</DisplayText>
+      </React.Fragment>
+    ) : (
+      <React.Fragment>
+        <CardBrandIcon brand={null} width={32} height={30} />
+        <DisplayText>
+          <PlainLink to={'/billing'}>
+            Please add a payment method to continue
+          </PlainLink>
+        </DisplayText>
+      </React.Fragment>
+    )
+  }
+
+  get isOrgAdmin() {
+    const { organization } = this.props
+    return organization.primary_group
+      ? organization.primary_group.can_edit
+      : false
+  }
+
+  get hasPaymentMethod() {
+    const { organization } = this.props
+    return organization.has_payment_method
+  }
+
+  render() {
+    const { open, close } = this.props
+
+    return (
+      <StyledDialog
+        classes={{ root: 'root__dialog', paper: 'modal__paper' }}
+        open={open}
+        BackdropProps={{ invisible: true }}
+      >
+        <StyledModalCloseButton onClick={close}>
+          <CloseIcon />
+        </StyledModalCloseButton>
+        <StyledDialogContent classes={{ root: 'root__dialog-content' }}>
+          <PaperAirplane />
+          {this.hasPaymentMethod
+            ? this.renderPaymentMethodContent()
+            : this.renderMissingPaymentContent()}
+        </StyledDialogContent>
+      </StyledDialog>
+    )
+  }
+}
 
 const SpecialDisplayHeading = styled.p`
   padding: 30px 0;
@@ -67,6 +130,8 @@ const SpecialDisplayHeading = styled.p`
   font-size: 1.25rem;
   font-weight: ${v.weights.book};
   color: ${v.colors.black};
+  width: 422px;
+  margin-bottom: 0;
 `
 
 const StyledDialog = styled(Dialog)`
@@ -108,12 +173,18 @@ ConfirmPriceModal.propTypes = {
   open: PropTypes.bool.isRequired,
   close: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  organization: MobxPropTypes.objectOrObservableObject,
   paymentMethod: PropTypes.shape({
     last4: PropTypes.number,
     brand: PropTypes.string,
-  }).isRequired,
+  }),
   testName: PropTypes.string.isRequired,
   totalPrice: PropTypes.string.isRequired,
+}
+
+ConfirmPriceModal.defaultProps = {
+  organization: null,
+  paymentMethod: null,
 }
 
 export default ConfirmPriceModal

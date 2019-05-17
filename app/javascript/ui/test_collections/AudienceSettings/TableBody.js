@@ -65,7 +65,7 @@ class TableBody extends React.Component {
               onChange={this.handleInputChange}
             />
           ) : (
-            <DisplayText color={v.colors.commonMedium}>–</DisplayText>
+            <DisplayText color={textColor}>–</DisplayText>
           )}
         </StyledRowFlexCell>
         <StyledRowFlexCell>
