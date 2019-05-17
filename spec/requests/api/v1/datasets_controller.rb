@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Api::V1::ItemsController, type: :request, json: true, auth: true do
+describe Api::V1::DatasetsController, type: :request, json: true, auth: true do
   let(:user) { @user }
 
   describe 'POST #toggle_selected' do
