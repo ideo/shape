@@ -41,12 +41,10 @@ class CollectionCardArchiveWorker
   end
 
   def get_target_participants(record)
-    measures = {
-      d_measure: 'participants',
-      d_timeframe: 'ever',
-      d_filters: [{ 'type' => 'Collection', 'target' => record.id }],
-    }
-    datasets = DataReport::CollectionsAndItems.new(record, override_measures: measures, return_records: true).call
-    datasets.first[:single_value]
+    DataReport::CollectionsAndItems.new(
+      record: record,
+      timeframe: 'ever',
+      measure: 'records',
+    ).actor_ids
   end
 end

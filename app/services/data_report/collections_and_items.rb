@@ -26,6 +26,11 @@ module DataReport
       @single_value
     end
 
+    def actor_ids
+      initialize_data
+      query_actor_ids
+    end
+
     private
 
     def single_value?
@@ -183,6 +188,13 @@ module DataReport
                           .uniq { |i| i[:date] } # this will filter out dupe when final series.date == now()
 
       @data = values
+    end
+
+    def query_actor_ids
+      @query
+        .select(:actor_id)
+        .distinct
+        .pluck(:actor_id)
     end
 
     def calculate_single_value
