@@ -1,14 +1,21 @@
 import ChartGroup from '~/ui/global/charts/ChartGroup'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import { emojiSeriesForQuestionType } from '~/ui/global/charts/ChartUtils'
-import { fakeAreaChartDataset, fakeBarChartDataset } from '#/mocks/data'
+import {
+  fakeDataItem,
+  fakeAreaChartDataset,
+  fakeBarChartDataset,
+} from '#/mocks/data'
 
 const props = {}
-let wrapper, render
+let wrapper, render, dataItem
 
 describe('ChartGroup', () => {
   beforeEach(() => {
-    props.datasets = [
+    dataItem = {
+      ...fakeDataItem,
+    }
+    dataItem.datasets = [
       fakeAreaChartDataset,
       {
         ...fakeAreaChartDataset,
@@ -21,6 +28,12 @@ describe('ChartGroup', () => {
         chart_type: 'bar',
       },
     ]
+    dataItem.primaryDataset = fakeAreaChartDataset
+    dataItem.secondaryDatasets.mockReturnValue([
+      dataItem.datasets[1],
+      dataItem.datasets[2],
+    ])
+    props.dataItem = dataItem
     props.simpleDateTooltip = true
     render = () => (wrapper = shallow(<ChartGroup {...props} />))
     render()
@@ -58,7 +71,7 @@ describe('ChartGroup', () => {
   describe('with a single data point in values', () => {
     beforeEach(() => {
       props.datasets = [fakeAreaChartDataset]
-      props.datasets[0].data = [{ value: 24, date: '2018-09-10' }]
+      props.dataItem.primaryDataset.data = [{ value: 24, date: '2018-09-10' }]
       // NOTE: this test passes, but warns:
       // Failed prop type: Invalid prop `domain` supplied to `VictoryBar`
       render()
@@ -71,8 +84,7 @@ describe('ChartGroup', () => {
 
   describe('with not enough data', () => {
     beforeEach(() => {
-      props.datasets = [fakeAreaChartDataset]
-      props.datasets[0].data = []
+      props.dataItem.primaryDataset.data = []
       render()
     })
 
@@ -88,7 +100,8 @@ describe('ChartGroup', () => {
 
   describe('with bar column data', () => {
     beforeEach(() => {
-      props.datasets = [fakeBarChartDataset]
+      props.dataItem.datasets = [fakeBarChartDataset]
+      props.dataItem.primaryDataset = fakeBarChartDataset
       render()
     })
 

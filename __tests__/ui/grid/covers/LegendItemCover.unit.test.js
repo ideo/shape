@@ -1,6 +1,8 @@
 import LegendItemCover from '~/ui/grid/covers/LegendItemCover'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
+import fakeApiStore from '#/mocks/fakeApiStore'
+import fakeUiStore from '#/mocks/fakeUiStore'
 import {
   fakeLegendItem,
   fakeLegendItemCard,
@@ -13,6 +15,8 @@ const props = {
     ...fakeLegendItemCard,
     parent: fakeCollection,
   },
+  apiStore: fakeApiStore(),
+  uiStore: fakeUiStore,
 }
 
 let wrapper

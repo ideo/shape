@@ -60,7 +60,9 @@ exports[`LineChart renders snapshot 1`] = `
   key="dataset-0"
   labelComponent={
     <ChartTooltip
+      alwaysShowLabels={false}
       cardArea={1}
+      displayTicks={true}
       maxValue={0}
       minValue={0}
       textRenderer={[Function]}
