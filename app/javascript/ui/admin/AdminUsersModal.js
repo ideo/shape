@@ -114,7 +114,6 @@ class AdminUsersModal extends React.Component {
                 <LeaveIcon />
               </LeaveIconHolder>
             </Tooltip>
-            <LeaveIconHolder enabled={false} />
           </Row>
         ))}
       </Panel>
@@ -129,8 +128,8 @@ class AdminUsersModal extends React.Component {
       prompt = 'Are you sure you want to leave Shape Admin?'
       confirmText = 'Leave'
     } else {
-      prompt = `Are you sure you want to remove
-        ${user.nameWithHints || user.name} from Shape Admin?`
+      prompt = `Are you sure you want to remove ${user.nameWithHints ||
+        user.name} from Shape Admin?`
       confirmText = 'Remove'
     }
 

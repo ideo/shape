@@ -869,6 +869,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                   "anyone_can_view": false,
                   "apiStore": Object {
                     "add": [MockFunction add],
+                    "addShapeAdminUsers": [MockFunction],
                     "checkCurrentOrg": [MockFunction],
                     "checkInMyCollection": [MockFunction],
                     "collections": Array [],
@@ -954,6 +955,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "moveCards": [MockFunction],
                     "recentNotifications": Map {},
                     "removeAll": [MockFunction removeAll],
+                    "removeShapeAdminUser": [MockFunction],
                     "request": [MockFunction request],
                     "routingStore": Object {},
                     "searchCollections": [MockFunction],
@@ -4135,6 +4137,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                   "anyone_can_view": false,
                   "apiStore": Object {
                     "add": [MockFunction add],
+                    "addShapeAdminUsers": [MockFunction],
                     "checkCurrentOrg": [MockFunction],
                     "checkInMyCollection": [MockFunction],
                     "collections": Array [],
@@ -4220,6 +4223,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "moveCards": [MockFunction],
                     "recentNotifications": Map {},
                     "removeAll": [MockFunction removeAll],
+                    "removeShapeAdminUser": [MockFunction],
                     "request": [MockFunction request],
                     "routingStore": Object {},
                     "searchCollections": [MockFunction],
@@ -7400,6 +7404,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                   "anyone_can_view": false,
                   "apiStore": Object {
                     "add": [MockFunction add],
+                    "addShapeAdminUsers": [MockFunction],
                     "checkCurrentOrg": [MockFunction],
                     "checkInMyCollection": [MockFunction],
                     "collections": Array [],
@@ -7485,6 +7490,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "moveCards": [MockFunction],
                     "recentNotifications": Map {},
                     "removeAll": [MockFunction removeAll],
+                    "removeShapeAdminUser": [MockFunction],
                     "request": [MockFunction request],
                     "routingStore": Object {},
                     "searchCollections": [MockFunction],

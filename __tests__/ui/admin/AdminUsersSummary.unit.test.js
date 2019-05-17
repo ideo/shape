@@ -13,7 +13,7 @@ const props = {
 let wrapper
 describe('AdminUsersSummary', () => {
   describe('with one Shape admin user', () => {
-    beforeEach(async () => {
+    beforeEach(() => {
       apiStore.shapeAdminUsers = [fakeUser]
       wrapper = shallow(<AdminUsersSummary.wrappedComponent {...props} />)
     })
