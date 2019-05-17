@@ -47,6 +47,11 @@ class LimitedUserCreator < SimpleService
 
     return false if params.empty?
 
+    unless Rails.env.production?
+      # always look up the same user so we don't keep creating real ones
+      params[:email] = 'test.shape.space@ideo.com'
+      params.delete :phone
+    end
     existing = NetworkApi::User.where(params).first
     return existing if existing.present?
 

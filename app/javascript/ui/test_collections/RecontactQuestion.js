@@ -81,7 +81,7 @@ class RecontactQuestion extends React.Component {
         <QuestionText>
           Would you like to be contacted about future surveys?
         </QuestionText>
-        <EmojiHolder>
+        <EmojiHolder data-cy="RecontactEmojiHolder">
           <EmojiButton
             selected={
               user && user.feedback_contact_preference === 'feedback_contact_no'
@@ -97,6 +97,7 @@ class RecontactQuestion extends React.Component {
                 user.feedback_contact_preference === 'feedback_contact_yes')
             }
             onClick={this.handleClick('feedback_contact_yes')}
+            data-cy="RecontactEmojiBtnThumbUp"
           >
             <Emoji name="Yes" symbol="👍" />
           </EmojiButton>
@@ -122,13 +123,18 @@ class RecontactQuestion extends React.Component {
                 value={contactInfo}
                 type="questionText"
                 placeholder="email or phone number"
+                data-cy="RecontactTextInput"
               />
               {submittedContactInfo ? (
                 <IconHolder>
                   <OkIcon />
                 </IconHolder>
               ) : (
-                <TextEnterButton focused onClick={this.handleContactInfoSubmit}>
+                <TextEnterButton
+                  focused
+                  onClick={this.handleContactInfoSubmit}
+                  data-cy="RecontactTextResponseButton"
+                >
                   <ReturnArrowIcon />
                 </TextEnterButton>
               )}

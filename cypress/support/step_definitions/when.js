@@ -69,11 +69,18 @@ When('I add a link URL', () => {
   cy.locate('LinkCreatorFormButton').click()
 })
 
-When('I add a test description', () => {
-  cy.locate('DescriptionQuestionText')
+When('I add a test description for {string}', string => {
+  cy.locateDataOrClass(string)
     .first()
     .click()
     .type('Let me introduce my lovely prototype.')
+})
+
+When('I add a test email for {string}', string => {
+  cy.locateDataOrClass(string)
+    .first()
+    .click()
+    .type('name@example.com')
 })
 
 When('I add an open response question', () => {
@@ -134,6 +141,12 @@ When('I click the {string}', el => {
     .click({ force: true })
 })
 
+When('I click the last {string}', el => {
+  cy.locateDataOrClass(el)
+    .last()
+    .click({ force: true })
+})
+
 When('I click {string}', el => {
   cy.locateDataOrClass(el)
     .first()
@@ -156,6 +169,11 @@ When('I visit the captured URL', () => {
   cy.get('@url').then(url => {
     cy.visit(url)
   })
+})
+
+// used for shortcutting a test
+When('I visit URL {string}', url => {
+  cy.visit(url)
 })
 
 When('I type some random things', () => {
