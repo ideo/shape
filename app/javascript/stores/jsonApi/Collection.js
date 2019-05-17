@@ -640,6 +640,22 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     })
   }
 
+  API_selectDatasetsMeasure({ measure }) {
+    return this.apiStore.request(
+      `collections/${this.id}/datasets/select_measure`,
+      'POST',
+      { measure }
+    )
+  }
+
+  API_unselectDatasetsMeasure({ measure }) {
+    return this.apiStore.request(
+      `collections/${this.id}/datasets/unselect_measure`,
+      'POST',
+      { measure }
+    )
+  }
+
   @computed
   get sortedCards() {
     return _.sortBy(this.collection_cards, 'order')

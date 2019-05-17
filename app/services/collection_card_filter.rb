@@ -46,7 +46,7 @@ class CollectionCardFilter < SimpleService
                collection: [:collection_cover_items],
                item: [
                  :filestack_file,
-                 data_items_datasets: [:dataset]
+                 data_items_datasets: [:dataset],
                ],
              )
   end

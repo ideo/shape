@@ -5,6 +5,7 @@ class DataItemsDataset < ApplicationRecord
   before_create :set_order, unless: :order?
 
   scope :ordered, -> { order(order: :asc) }
+  scope :selected, -> { where(selected: true) }
 
   private
 

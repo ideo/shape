@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
@@ -125,9 +126,13 @@ class LegendItemCover extends React.Component {
 
   @observable
   @action
-  toggleDatasetSelected = async ({ dataset }) => {
+  toggleMeasureSelected = async ({ measure, selected }) => {
     const { parent } = this.props.card
-    await dataset.API_toggleSelected({ collectionId: parent.id })
+    if (selected) {
+      await parent.API_selectDatasetsMeasure({ measure })
+    } else {
+      await parent.API_unselectDatasetsMeasure({ measure })
+    }
     parent.API_fetchCards()
   }
 
@@ -163,7 +168,7 @@ class LegendItemCover extends React.Component {
     const { card } = this.props
     const { legend_search_source } = this.props.item
     if (legend_search_source === 'select_from_datasets') {
-      this.toggleDatasetSelected({ dataset })
+      this.toggleMeasureSelected({ measure: dataset.measure, selected: false })
     } else if (legend_search_source === 'search_test_collections') {
       await card.parent.API_removeComparison({ id: dataset.test_collection_id })
       card.parent.API_fetchCards()
@@ -207,32 +212,45 @@ class LegendItemCover extends React.Component {
       })
   }
 
-  handleDatasetMenuSelection = event => {
+  handleDatasetMeasureSelection = event => {
     event.preventDefault()
     const { value } = event.target
+    this.toggleMeasureSelected({ measure: value, selected: true })
+  }
+
+  datasets = ({ selected }) => {
     const { datasets } = this.props.item
-    const dataset = datasets.find(dataset => dataset.id === value)
-    this.toggleDatasetSelected({ dataset })
+    const measures = []
+    return datasets.filter(dataset => {
+      if (
+        dataset.selected === selected &&
+        !_.includes(measures, dataset.measure)
+      ) {
+        measures.push(dataset.measure)
+        return true
+      } else {
+        return false
+      }
+    })
   }
 
   get renderDatasetsMenu() {
-    const { secondaryDatasets } = this.props.item
     return (
       <Select
         classes={{ root: 'select', selectMenu: 'selectMenu' }}
         displayEmpty
         disableUnderline
         name="role"
-        onChange={this.handleDatasetMenuSelection}
+        onChange={this.handleDatasetMeasureSelection}
         onClose={() => this.setState({ comparisonMenuOpen: false })}
         open
         inline
       >
-        {secondaryDatasets({ selected: false }).map(dataset => (
+        {this.datasets({ selected: false }).map(dataset => (
           <SelectOption
             classes={{ root: 'selectOption', selected: 'selected' }}
-            key={dataset.id}
-            value={dataset.id}
+            key={dataset.measure}
+            value={dataset.measure}
           >
             {dataset.measure}
           </SelectOption>
@@ -263,6 +281,7 @@ class LegendItemCover extends React.Component {
   }
 
   renderSelectedDataset = ({ dataset, order, primary }) => {
+    if (!dataset) return ''
     const { measure, style, chart_type } = dataset
     let icon
     if (chart_type === 'line') {
@@ -296,22 +315,16 @@ class LegendItemCover extends React.Component {
 
   render() {
     const { item } = this.props
-    const { primaryDataset } = item
     const { comparisonMenuOpen } = this.state
     let order = 0
     return (
       <StyledLegendItem data-cy="LegendItemCover">
         <StyledLegendTitle>{item.name}</StyledLegendTitle>
-        {this.renderSelectedDataset({
-          dataset: primaryDataset,
-          order: order,
-          primary: true,
-        })}
-        {item.secondaryDatasets({ selected: true }).map(dataset =>
+        {this.datasets({ selected: true }).map(dataset =>
           this.renderSelectedDataset({
             dataset,
             order: (order += 1),
-            primary: false,
+            primary: order === 0,
           })
         )}
         <br />

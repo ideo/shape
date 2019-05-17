@@ -38,8 +38,9 @@ Rails.application.routes.draw do
           end
         end
         resources :datasets, only: %i[show] do
-          member do
-            post 'toggle_selected'
+          collection do
+            post 'select_measure'
+            post 'unselect_measure'
           end
         end
       end
