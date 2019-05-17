@@ -33,13 +33,6 @@ describe('Header', () => {
     expect(wrapper.find('.search-bar').exists()).toBe(true)
   })
 
-  it('renders the org avatar', () => {
-    const orgAvatar = wrapper.find('.organization-avatar')
-    expect(orgAvatar.exists()).toBe(true)
-    expect(orgAvatar.props().title).toEqual(group.name)
-    expect(orgAvatar.props().url).toEqual(group.filestack_file_url)
-  })
-
   describe('closeOrgMenu', () => {
     beforeEach(() => {
       component.closeOrgMenu()

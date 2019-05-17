@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import PropTypes from 'prop-types'
 
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 import v from '~/utils/variables'
@@ -29,8 +30,12 @@ class AvatarDropdown extends React.Component {
     dropdownOpen: false,
   }
 
-  openDropdown = () => this.setState({ dropdownOpen: true })
-  closeDropdown = () => this.setState({ dropdownOpen: false })
+  openDropdown = () => {
+    this.setState({ dropdownOpen: true })
+  }
+  closeDropdown = () => {
+    this.setState({ dropdownOpen: false })
+  }
 
   render() {
     const { openDropdown, closeDropdown } = this
@@ -51,6 +56,12 @@ class AvatarDropdown extends React.Component {
       </StyledAvatarAndDropdown>
     )
   }
+}
+
+AvatarDropdown.propTypes = {
+  className: PropTypes.string,
+  renderAvatar: PropTypes.func.isRequired,
+  renderDropdown: PropTypes.func.isRequired,
 }
 
 export default AvatarDropdown
