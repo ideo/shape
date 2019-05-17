@@ -17,6 +17,11 @@ class RoutingStore extends RouterStore {
   }
 
   @computed
+  get isAdmin() {
+    return this.location.pathname === this.pathTo('admin')
+  }
+
+  @computed
   get query() {
     return queryString.parse(this.location.search)
   }

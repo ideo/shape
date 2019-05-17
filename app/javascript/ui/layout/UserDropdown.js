@@ -1,62 +1,59 @@
+import { computed } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
-import { CONTEXT_COMBO, CONTEXT_USER } from '../global/MainMenuDropdown'
+import { CONTEXT_COMBO, CONTEXT_USER } from '~/ui/global/MainMenuDropdown'
 import Avatar from '~/ui/global/Avatar'
-import ClickWrapper from '~/ui/layout/ClickWrapper'
+import AvatarDropdown from '~/ui/layout/AvatarDropdown'
 import MainMenuDropdown from '~/ui/global/MainMenuDropdown'
-import StyledAvatarAndDropdown from '~/ui/layout/StyledAvatarAndDropdown'
 
-@inject('apiStore', 'uiStore')
+@inject('apiStore', 'routingStore', 'uiStore')
 @observer
 class UserDropdown extends React.Component {
-  state = {
-    userDropdownOpen: false,
+  @computed
+  get menuContext() {
+    const { routingStore, uiStore } = this.props
+    // The organization menu is not needed in the admin area.
+    if (routingStore.isAdmin) return CONTEXT_USER
+    // Combine the organization and user menu on mobile.
+    return uiStore.isMobile ? CONTEXT_COMBO : CONTEXT_USER
   }
 
-  createClickHandler = ({ open }) => () =>
-    this.setState({ userDropdownOpen: open })
-
   render() {
-    const { userDropdownOpen } = this.state
-    const { apiStore, uiStore } = this.props
+    const { apiStore } = this.props
     const { currentUser } = apiStore
-    const menuContext = uiStore.isMobile ? CONTEXT_COMBO : CONTEXT_USER
 
     return (
-      <StyledAvatarAndDropdown className="userDropdown">
-        {userDropdownOpen && (
+      <AvatarDropdown
+        className="userDropdown"
+        renderDropdown={({ isDropdownOpen, closeDropdown }) => (
           <MainMenuDropdown
-            context={menuContext}
-            open={userDropdownOpen}
-            onItemClick={this.createClickHandler({ open: false })}
+            context={this.menuContext}
+            open={isDropdownOpen}
+            onItemClick={closeDropdown}
           />
         )}
-
-        <button
-          style={{ display: 'block' }}
-          className="userBtn"
-          onClick={this.createClickHandler({ open: true })}
-        >
-          <Avatar
-            title={currentUser.name}
-            url={currentUser.pic_url_square}
-            className="user-avatar"
-            responsive={false}
-          />
-        </button>
-
-        {userDropdownOpen && (
-          <ClickWrapper
-            clickHandlers={[this.createClickHandler({ open: false })]}
-          />
+        renderAvatar={({ openDropdown }) => (
+          <button
+            style={{ display: 'block' }}
+            className="userBtn"
+            onClick={openDropdown}
+          >
+            <Avatar
+              title={currentUser.name}
+              url={currentUser.pic_url_square}
+              className="user-avatar"
+              responsive={false}
+            />
+          </button>
         )}
-      </StyledAvatarAndDropdown>
+      />
     )
   }
 }
 
 UserDropdown.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 

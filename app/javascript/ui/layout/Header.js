@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { Fragment } from 'react'
-import { observable, action, computed, runInAction } from 'mobx'
+import { observable, action, computed } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
 import Hidden from '@material-ui/core/Hidden'
@@ -9,14 +9,13 @@ import Breadcrumb from '~/ui/layout/Breadcrumb'
 import Logo from '~/ui/layout/Logo'
 import PlainLink from '~/ui/global/PlainLink'
 import GlobalSearch from '~/ui/layout/GlobalSearch'
-import Avatar from '~/ui/global/Avatar'
 import ActionMenu from '~/ui/grid/ActionMenu'
 import ArrowIcon from '~/ui/icons/ArrowIcon'
 import ActivityLogButton from '~/ui/notifications/ActivityLogButton'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
 import UserDropdown from '~/ui/layout/UserDropdown'
-import ClickWrapper from '~/ui/layout/ClickWrapper'
+import OrganizationDropdown from '~/ui/layout/OrganizationDropdown'
 import {
   FixedHeader,
   MaxWidthContainer,
@@ -25,8 +24,6 @@ import {
 import v from '~/utils/variables'
 import BasicHeader from '~/ui/layout/BasicHeader'
 import LoggedOutBasicHeader from '~/ui/layout/LoggedOutBasicHeader'
-import MainMenuDropdown from '~/ui/global/MainMenuDropdown'
-import StyledAvatarAndDropdown from '~/ui/layout/StyledAvatarAndDropdown'
 
 /* global IdeoSSO */
 
@@ -77,9 +74,6 @@ const StyledActivityLogBtn = styled(StyledRoundBtn)`
 @observer
 class Header extends React.Component {
   @observable
-  orgDropdownOpen = false
-
-  @observable
   actionsWidth = 0
 
   @observable
@@ -96,11 +90,6 @@ class Header extends React.Component {
     if (!ref) return
     this.breadcrumbsWidth = ref.offsetWidth
   }
-
-  handleOrgClick = open => () =>
-    runInAction(() => {
-      this.orgDropdownOpen = open
-    })
 
   showObjectRoleDialog = () => {
     const { record } = this
@@ -140,10 +129,6 @@ class Header extends React.Component {
         routingStore.routeTo('homepage')
       }
     }
-  }
-
-  get clickHandlers() {
-    return [this.handleOrgClick(false)]
   }
 
   get hasActions() {
@@ -200,18 +185,6 @@ class Header extends React.Component {
     return null
   }
 
-  get renderOrgDropdown() {
-    const { orgDropdownOpen } = this
-    if (!orgDropdownOpen) return ''
-    return (
-      <MainMenuDropdown
-        context="org"
-        open={orgDropdownOpen}
-        onItemClick={this.handleOrgClick(false)}
-      />
-    )
-  }
-
   @computed
   get maxBreadcrumbContainerWidth() {
     const outer = this.breadcrumbsWidth - this.actionsWidth
@@ -258,9 +231,10 @@ class Header extends React.Component {
   }
 
   render() {
-    const { record, orgDropdownOpen } = this
+    const { record } = this
     const { apiStore, routingStore, uiStore } = this.props
     const { currentUser } = apiStore
+
     if (!currentUser) {
       // user is not logged in, or:
       // user needs to set up their Org, will see the Org popup before proceeding
@@ -276,7 +250,7 @@ class Header extends React.Component {
     if (routingStore.isSearch && this.isMobileXs) {
       return this.renderMobileSearch()
     }
-    const primaryGroup = currentUser.current_organization.primary_group
+
     return (
       <Fragment>
         <FixedHeader data-empty-space-click>
@@ -356,27 +330,9 @@ class Header extends React.Component {
                   open={uiStore.organizationMenuOpen}
                 />
                 <Hidden smDown>
-                  <StyledAvatarAndDropdown className="orgDropdown">
-                    {this.renderOrgDropdown}
-                    <button
-                      style={{ display: 'block' }}
-                      className="orgBtn"
-                      data-cy="OrgMenuBtn"
-                      onClick={this.handleOrgClick(true)}
-                    >
-                      <Avatar
-                        title={primaryGroup.name}
-                        url={primaryGroup.filestack_file_url}
-                        className="organization-avatar"
-                        responsive={false}
-                      />
-                    </button>
-                  </StyledAvatarAndDropdown>
+                  <OrganizationDropdown />
                 </Hidden>
                 <UserDropdown />
-                {orgDropdownOpen && (
-                  <ClickWrapper clickHandlers={this.clickHandlers} />
-                )}
               </Box>
             </Flex>
           </MaxWidthContainer>

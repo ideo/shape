@@ -1,6 +1,8 @@
 import UserDropdown from '~/ui/layout/UserDropdown'
 import fakeApiStore from '#/mocks/fakeApiStore'
+import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
+import { CONTEXT_USER, CONTEXT_COMBO } from '~/ui/global/MainMenuDropdown'
 
 describe('UserDropdown', () => {
   let apiStore, props, wrapper
@@ -14,34 +16,46 @@ describe('UserDropdown', () => {
     apiStore = fakeApiStore()
     props = {
       apiStore,
+      routingStore: fakeRoutingStore,
       uiStore: { ...fakeUiStore },
     }
   })
 
-  it(`renders the current user's avatar`, () => {
-    render()
+  describe('menuContext', () => {
+    it(`is "${CONTEXT_USER}" for non-mobile viewports`, () => {
+      props.routingStore.isAdmin = false
+      props.uiStore.isMobile = false
 
-    const { currentUser } = apiStore
-    const userAvatar = wrapper.find('.user-avatar').first()
-    expect(userAvatar.exists()).toBe(true)
-    expect(userAvatar.props().title).toEqual(currentUser.name)
-    expect(userAvatar.props().url).toEqual(currentUser.pic_url_square)
-  })
+      render()
 
-  it('does not show the menu before it is clicked', () => {
-    render()
-    expect(wrapper.find('MainMenuDropdown').exists()).toBe(false)
-  })
+      expect(wrapper.instance().menuContext).toEqual(CONTEXT_USER)
+    })
 
-  it('shows the user menu when clicked', () => {
-    render()
-    wrapper
-      .find('.userBtn')
-      .first()
-      .simulate('click')
+    it(`is "${CONTEXT_COMBO}" for mobile viewport`, () => {
+      props.routingStore.isAdmin = false
+      props.uiStore.isMobile = true
 
-    const MainMenuDropdown = wrapper.find('MainMenuDropdown')
-    expect(MainMenuDropdown.props().open).toBe(true)
-    expect(MainMenuDropdown.exists()).toBe(true)
+      render()
+
+      expect(wrapper.instance().menuContext).toEqual(CONTEXT_COMBO)
+    })
+
+    it(`is "${CONTEXT_USER}" in the admin for non-mobie viewports`, () => {
+      props.routingStore.isAdmin = true
+      props.uiStore.isMobile = false
+
+      render()
+
+      expect(wrapper.instance().menuContext).toEqual(CONTEXT_USER)
+    })
+
+    it(`is "${CONTEXT_USER}" in the admin for mobie viewports`, () => {
+      props.routingStore.isAdmin = true
+      props.uiStore.isMobile = true
+
+      render()
+
+      expect(wrapper.instance().menuContext).toEqual(CONTEXT_USER)
+    })
   })
 })
