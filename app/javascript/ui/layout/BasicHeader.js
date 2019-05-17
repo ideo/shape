@@ -30,17 +30,16 @@ class BasicHeader extends React.PureComponent {
                   <Logo />
                 </PlainLink>
               </Box>
-
-              {orgMenu && (
-                <OrganizationMenu
-                  organization={{}}
-                  userGroups={[]}
-                  onClose={() => null}
-                  open={orgMenu}
-                  locked
-                />
-              )}
             </Flex>
+            {orgMenu && (
+              <OrganizationMenu
+                organization={{}}
+                userGroups={[]}
+                onClose={() => null}
+                open={orgMenu}
+                locked
+              />
+            )}
           </MaxWidthContainer>
         </FixedHeader>
         <HeaderSpacer />
