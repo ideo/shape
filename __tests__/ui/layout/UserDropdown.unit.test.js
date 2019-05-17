@@ -2,7 +2,11 @@ import UserDropdown from '~/ui/layout/UserDropdown'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
-import { CONTEXT_USER, CONTEXT_COMBO } from '~/ui/global/MainMenuDropdown'
+import {
+  CONTEXT_USER,
+  CONTEXT_COMBO,
+  CONTEXT_ADMIN,
+} from '~/ui/global/MainMenuDropdown'
 
 describe('UserDropdown', () => {
   let apiStore, props, wrapper
@@ -40,7 +44,7 @@ describe('UserDropdown', () => {
       expect(wrapper.instance().menuContext).toEqual(CONTEXT_COMBO)
     })
 
-    it(`is "${CONTEXT_USER}" in the admin for non-mobie viewports`, () => {
+    it(`is "${CONTEXT_USER}" in the admin for non-mobile viewports`, () => {
       props.routingStore.isAdmin = true
       props.uiStore.isMobile = false
 
@@ -49,13 +53,13 @@ describe('UserDropdown', () => {
       expect(wrapper.instance().menuContext).toEqual(CONTEXT_USER)
     })
 
-    it(`is "${CONTEXT_USER}" in the admin for mobie viewports`, () => {
+    it(`is "${CONTEXT_ADMIN}" in the admin for mobile viewports`, () => {
       props.routingStore.isAdmin = true
       props.uiStore.isMobile = true
 
       render()
 
-      expect(wrapper.instance().menuContext).toEqual(CONTEXT_USER)
+      expect(wrapper.instance().menuContext).toEqual(CONTEXT_ADMIN)
     })
   })
 })

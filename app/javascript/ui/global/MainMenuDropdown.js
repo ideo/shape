@@ -15,6 +15,7 @@ import v from '~/utils/variables'
 export const CONTEXT_USER = 'user'
 export const CONTEXT_ORG = 'org'
 export const CONTEXT_COMBO = 'combo'
+export const CONTEXT_ADMIN = 'admin'
 const MAX_ORGS_IN_LIST = 10
 
 const IconHolder = styled.span`
@@ -280,6 +281,21 @@ class MainMenuDropdown extends React.Component {
     return extras
   }
 
+  get adminMenuGroups() {
+    const { uiStore } = this.props
+    return {
+      admin: [
+        {
+          name: 'Invite Shape Admins',
+          icon: '+',
+          onClick: () => {
+            uiStore.update('adminUsersMenuOpen', true)
+          },
+        },
+      ],
+    }
+  }
+
   get menuItems() {
     const { context, onItemClick } = this.props
     const onItemClickWrapper = cb => e => {
@@ -293,6 +309,9 @@ class MainMenuDropdown extends React.Component {
       Object.assign(menuItems, this.userMenuGroups)
     } else if (context === CONTEXT_ORG) {
       Object.assign(menuItems, this.orgMenuGroups)
+    } else if (context === CONTEXT_ADMIN) {
+      Object.assign(menuItems, this.adminMenuGroups)
+      Object.assign(menuItems, this.userMenuGroups)
     } else {
       Object.assign(menuItems, this.orgMenuGroups)
       Object.assign(menuItems, this.userMenuGroups)
