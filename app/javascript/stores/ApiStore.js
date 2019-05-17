@@ -252,7 +252,7 @@ class ApiStore extends jsonapi(datxCollection) {
       _.remove(this.shapeAdminUsers, u => u.id === user.id)
     })
 
-    if (user.id === this.currentUserId) {
+    if (user.isCurrentUser) {
       window.location.href = '/'
     }
   }

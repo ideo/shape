@@ -110,7 +110,7 @@ class AdminUsersModal extends React.Component {
               title={user.isCurrentUser ? 'Leave' : 'Remove'}
               placement="bottom"
             >
-              <LeaveIconHolder onClick={() => this.removeUser(user)}>
+              <LeaveIconHolder onClick={() => this.handleRemoveUserClick(user)}>
                 <LeaveIcon />
               </LeaveIconHolder>
             </Tooltip>
@@ -119,6 +119,27 @@ class AdminUsersModal extends React.Component {
         ))}
       </Panel>
     )
+  }
+
+  handleRemoveUserClick(user) {
+    let prompt
+    let confirmText
+
+    if (user.isCurrentUser) {
+      prompt = 'Are you sure you want to leave Shape Admin?'
+      confirmText = 'Leave'
+    } else {
+      prompt = `Are you sure you want to remove
+        ${user.nameWithHints || user.name} from Shape Admin?`
+      confirmText = 'Remove'
+    }
+
+    this.props.uiStore.confirm({
+      prompt,
+      confirmText,
+      iconName: 'Leave',
+      onConfirm: () => this.removeUser(user),
+    })
   }
 
   removeUser(user) {
