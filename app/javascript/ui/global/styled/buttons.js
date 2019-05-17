@@ -97,3 +97,9 @@ export const AddButton = styled.div`
   cursor: pointer;
 `
 AddButton.displayName = 'AddButton'
+
+export const LeaveButton = styled.button`
+  margin-top: 8px;
+  width: 16px;
+`
+LeaveButton.displayName = 'StyledLeaveIconHolder'

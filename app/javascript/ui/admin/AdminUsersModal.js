@@ -1,58 +1,22 @@
 import PropTypes from 'prop-types'
-import styled from 'styled-components'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import EntityAvatarAndName from '~/ui/global/EntityAvatarAndName'
-import Grid from '@material-ui/core/Grid'
 import LeaveIcon from '~/ui/icons/LeaveIcon'
 import Modal from '~/ui/global/modals/Modal'
 import Panel from '~/ui/global/Panel'
 import RolesAdd from '~/ui/roles/RolesAdd'
 import Tooltip from '~/ui/global/Tooltip'
-import v from '~/utils/variables'
 import { Heading3 } from '~/ui/global/styled/typography'
-import { Row } from '~/ui/global/styled/layout'
-
-const StyledHeaderRow = styled(Row)`
-  flex: 0 0 auto;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  margin-left: 0;
-  margin-bottom: 0;
-
-  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
-    width: 100%;
-  }
-`
-
-const ScrollArea = styled.div`
-  flex: 1 1 auto;
-  min-height: 220px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-`
-
-const RowItemGrid = styled(Grid)`
-  align-self: center;
-  margin-left: 14px;
-`
-
-const LeaveIconHolder = styled.button`
-  margin-top: 8px;
-  width: 16px;
-`
-LeaveIconHolder.displayName = 'StyledLeaveIconHolder'
-
-const FooterBreak = styled.div`
-  border-top: 1px solid ${v.colors.commonMedium};
-  width: 100%;
-`
-
-const FooterArea = styled.div`
-  flex: 0 0 auto;
-  padding-top: 24px;
-  padding-bottom: 30px;
-`
+import {
+  FooterBreak,
+  FooterArea,
+  Row,
+  RowItemGrid,
+  ScrollArea,
+  StyledHeaderRow,
+} from '~/ui/global/styled/layout'
+import { LeaveButton } from '~/ui/global/styled/buttons'
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -110,9 +74,9 @@ class AdminUsersModal extends React.Component {
               title={user.isCurrentUser ? 'Leave' : 'Remove'}
               placement="bottom"
             >
-              <LeaveIconHolder onClick={() => this.handleRemoveUserClick(user)}>
+              <LeaveButton onClick={() => this.handleRemoveUserClick(user)}>
                 <LeaveIcon />
-              </LeaveIconHolder>
+              </LeaveButton>
             </Tooltip>
           </Row>
         ))}

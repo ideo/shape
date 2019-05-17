@@ -1,14 +1,18 @@
 import _ from 'lodash'
 import { Fragment } from 'react'
 import PropTypes from 'prop-types'
-import styled from 'styled-components'
 import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
-import v from '~/utils/variables'
 import { ShowMoreButton } from '~/ui/global/styled/forms'
 import { Heading3 } from '~/ui/global/styled/typography'
-import { Row } from '~/ui/global/styled/layout'
+import {
+  Row,
+  ScrollArea,
+  StyledHeaderRow,
+  FooterBreak,
+  FooterArea,
+} from '~/ui/global/styled/layout'
 import SearchButton from '~/ui/global/SearchButton'
 import Panel from '~/ui/global/Panel'
 import RolesAdd from '~/ui/roles/RolesAdd'
@@ -19,36 +23,6 @@ import PublicSharingOptions from '~/ui/global/PublicSharingOptions'
 function sortUserOrGroup(a, b) {
   return a.entity.name.localeCompare(b.entity.name)
 }
-
-const ScrollArea = styled.div`
-  flex: 1 1 auto;
-  min-height: 220px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-`
-
-const FooterBreak = styled.div`
-  border-top: 1px solid ${v.colors.commonMedium};
-  width: 100%;
-`
-
-const FooterArea = styled.div`
-  flex: 0 0 auto;
-  padding-top: 24px;
-  padding-bottom: 30px;
-`
-
-const StyledHeaderRow = styled(Row)`
-  flex: 0 0 auto;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  margin-left: 0;
-  margin-bottom: 0;
-
-  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
-    width: 100%;
-  }
-`
 
 @inject('apiStore', 'routingStore')
 @observer
