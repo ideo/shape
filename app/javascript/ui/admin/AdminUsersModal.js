@@ -1,18 +1,17 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { Collapse } from '@material-ui/core'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
-import DropdownIcon from '~/ui/icons/DropdownIcon'
 import EntityAvatarAndName from '~/ui/global/EntityAvatarAndName'
 import Grid from '@material-ui/core/Grid'
 import LeaveIcon from '~/ui/icons/LeaveIcon'
 import Modal from '~/ui/global/modals/Modal'
+import Panel from '~/ui/global/Panel'
 import RolesAdd from '~/ui/roles/RolesAdd'
 import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
-import { Heading3, DisplayText } from '~/ui/global/styled/typography'
-import { Row, RowItemLeft } from '~/ui/global/styled/layout'
+import { Heading3 } from '~/ui/global/styled/typography'
+import { Row } from '~/ui/global/styled/layout'
 
 const StyledHeaderRow = styled(Row)`
   flex: 0 0 auto;
@@ -31,42 +30,6 @@ const ScrollArea = styled.div`
   min-height: 220px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-`
-
-const GroupHeader = styled.div`
-  background-color: ${v.colors.white};
-  cursor: pointer;
-  margin-bottom: 15px;
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  ${props =>
-    props.open &&
-    `&:after {
-      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 4%, rgba(0, 0, 0, 0));
-      content: "";
-      display: block;
-      position: absolute;
-      height: 5px;
-      width: 100%;
-    }`};
-`
-const StyledRow = styled(Row)`
-  margin-left: 0;
-  margin-bottom: 0;
-`
-
-const StyledCollapseToggle = styled.button`
-  .icon {
-    width: 24px;
-    transform: translateY(4px);
-  }
-`
-const StyledExpandToggle = styled.button`
-  .icon {
-    width: 24px;
-    transform: translateY(2px) rotate(-90deg);
-  }
 `
 
 const RowItemGrid = styled(Grid)`
@@ -94,10 +57,6 @@ const FooterArea = styled.div`
 @inject('apiStore', 'uiStore')
 @observer
 class AdminUsersModal extends React.Component {
-  state = {
-    activePanelOpen: true,
-  }
-
   componentDidMount() {
     this.props.apiStore.fetchShapeAdminUsers()
   }
@@ -109,15 +68,58 @@ class AdminUsersModal extends React.Component {
     }
   }
 
-  togglePanel = panel => {
-    this.updatePanel(panel, !this.isOpenPanel(panel))
+  renderInvitedUsers() {
+    const activeUsers = []
+    const pendingUsers = []
+
+    this.props.apiStore.shapeAdminUsers.forEach(user => {
+      user.status === 'pending'
+        ? pendingUsers.push(user)
+        : activeUsers.push(user)
+    })
+
+    const pendingUserCount = pendingUsers.length
+
+    return (
+      <ScrollArea>
+        {pendingUserCount > 0 &&
+          this.renderUsersPanel(
+            pendingUsers,
+            `Previously Invited (${pendingUserCount})`,
+            false
+          )}
+        {this.renderUsersPanel(
+          activeUsers,
+          `Active Users (${activeUsers.length})`,
+          true
+        )}
+      </ScrollArea>
+    )
   }
 
-  updatePanel = (panel, isOpen) => {
-    this.setState({ [`${panel}PanelOpen`]: isOpen })
+  renderUsersPanel(users, title, open) {
+    return (
+      <Panel title={title} open={open}>
+        {users.map(user => (
+          <Row key={`${user.internalType}_${user.id}`}>
+            <RowItemGrid container alignItems="center" justify="space-between">
+              <EntityAvatarAndName entity={user} isJoinableGroup={false} />
+            </RowItemGrid>
+            <Tooltip
+              classes={{ tooltip: 'Tooltip' }}
+              title={user.isCurrentUser ? 'Leave' : 'Remove'}
+              placement="bottom"
+            >
+              <LeaveIconHolder onClick={() => this.removeUser(user)}>
+                <LeaveIcon />
+              </LeaveIconHolder>
+            </Tooltip>
+            <LeaveIconHolder enabled={false} />
+          </Row>
+        ))}
+      </Panel>
+    )
   }
-
-  isOpenPanel = panel => this.state[`${panel}PanelOpen`]
 
   removeUser(user) {
     this.props.apiStore.removeShapeAdminUser(user)
@@ -137,12 +139,8 @@ class AdminUsersModal extends React.Component {
   }
 
   render() {
-    const { open, apiStore } = this.props
+    const { open } = this.props
     const title = 'Invite Shape Admin Users'
-
-    const panel = 'active'
-    const adminUsers = apiStore.shapeAdminUsers
-    const activeCount = adminUsers.length
 
     return (
       <Modal title={title} onClose={this.handleClose} open={open} noScroll>
@@ -150,59 +148,7 @@ class AdminUsersModal extends React.Component {
           <StyledHeaderRow align="flex-end">
             <Heading3>Previously Invited</Heading3>
           </StyledHeaderRow>
-          <ScrollArea>
-            <div>
-              <GroupHeader
-                onClick={() => this.togglePanel(panel)}
-                open={this.isOpenPanel(panel)}
-              >
-                <StyledRow align="center">
-                  <DisplayText>Active Users ({activeCount})</DisplayText>
-                  <RowItemLeft style={{ marginLeft: '0px' }}>
-                    {this.isOpenPanel(panel) ? (
-                      <StyledCollapseToggle aria-label="Collapse">
-                        <DropdownIcon />
-                      </StyledCollapseToggle>
-                    ) : (
-                      <StyledExpandToggle aria-label="Expand">
-                        <DropdownIcon />
-                      </StyledExpandToggle>
-                    )}
-                  </RowItemLeft>
-                </StyledRow>
-              </GroupHeader>
-              <Collapse
-                in={this.isOpenPanel(panel)}
-                timeout="auto"
-                unmountOnExit
-              >
-                {adminUsers.map(user => (
-                  <Row key={`${user.internalType}_${user.id}`}>
-                    <RowItemGrid
-                      container
-                      alignItems="center"
-                      justify="space-between"
-                    >
-                      <EntityAvatarAndName
-                        entity={user}
-                        isJoinableGroup={false}
-                      />
-                    </RowItemGrid>
-                    <Tooltip
-                      classes={{ tooltip: 'Tooltip' }}
-                      title={user.isCurrentUser ? 'Leave' : 'Remove'}
-                      placement="bottom"
-                    >
-                      <LeaveIconHolder onClick={() => this.removeUser(user)}>
-                        <LeaveIcon />
-                      </LeaveIconHolder>
-                    </Tooltip>
-                    <LeaveIconHolder enabled={false} />
-                  </Row>
-                ))}
-              </Collapse>
-            </div>
-          </ScrollArea>
+          {this.renderInvitedUsers()}
           <React.Fragment>
             <Row>
               <FooterBreak />
