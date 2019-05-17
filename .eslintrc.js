@@ -119,6 +119,8 @@ module.exports = {
     'react/jsx-closing-tag-location': 0,
     'react/no-did-mount-set-state': 0,
     'react/jsx-uses-vars': 1,
+    'react/prop-types': 2,
+    'react/require-default-props': 1,
     'react/sort-comp': [
       1,
       {

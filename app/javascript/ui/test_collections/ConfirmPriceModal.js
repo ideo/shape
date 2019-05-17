@@ -1,28 +1,24 @@
 import PropTypes from 'prop-types'
-import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
-import { ModalCloseButton } from '~/ui/global/modals/Modal'
-// Need to replace with actual asset => how to add to AWS?
+
 import PaperAirplane from '~/ui/test_collections/PaperAirplane'
+import { ModalCloseButton } from '~/ui/global/modals/Modal'
 import { FormButton } from '~/ui/global/styled/forms'
-import { Heading1, DisplayText } from '~/ui/global/styled/typography'
-import { List, ListItem } from '~/ui/global/styled/lists'
-import Link from '~/ui/global/Link'
-import { colors, flexbox } from '~shared/styles/index'
+import { DisplayText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
-import CloseIcon from '../icons/CloseIcon'
+import CloseIcon from '~/ui/icons/CloseIcon'
 import CardBrandIcon from '~shared/components/atoms/CardBrandIcon'
 
 // Extract children from here
 // Reuse for both Agree to Terms and Confirm Payment?
-const FeedbackTermsModal = ({
+const ConfirmPriceModal = ({
   onSubmit,
   open,
   close,
   paymentMethod,
-  price,
+  totalPrice,
   testName,
 }) => (
   <StyledDialog
@@ -40,8 +36,7 @@ const FeedbackTermsModal = ({
         <PaperAirplane />
         <SpecialDisplayHeading wrapLine>
           Your test "{testName}" is about to be launched. Your payment method
-          will be charged <span style={{ fontWeight: 700 }}>{price}</span> for
-          this feedback.
+          will be charged <strong>{totalPrice}</strong> for this feedback.
         </SpecialDisplayHeading>
         <StyledDiv
           style={{
@@ -109,9 +104,16 @@ const StyledDiv = styled.div`
   padding: 1rem 0;
 `
 
-FeedbackTermsModal.propTypes = {
+ConfirmPriceModal.propTypes = {
+  open: PropTypes.bool.isRequired,
   close: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  paymentMethod: PropTypes.shape({
+    last4: PropTypes.number,
+    brand: PropTypes.string,
+  }).isRequired,
+  testName: PropTypes.string.isRequired,
+  totalPrice: PropTypes.string.isRequired,
 }
 
-export default FeedbackTermsModal
+export default ConfirmPriceModal

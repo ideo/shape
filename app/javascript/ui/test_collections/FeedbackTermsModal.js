@@ -1,16 +1,14 @@
 import PropTypes from 'prop-types'
-import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
+
 import { ModalCloseButton } from '~/ui/global/modals/Modal'
-// Need to replace with actual asset => how to add to AWS?
 import PaperAirplane from '~/ui/test_collections/PaperAirplane'
 import { FormButton } from '~/ui/global/styled/forms'
-import { Heading1, DisplayText } from '~/ui/global/styled/typography'
+import { DisplayText } from '~/ui/global/styled/typography'
 import { List, ListItem } from '~/ui/global/styled/lists'
 import Link from '~/ui/global/Link'
-import { colors, flexbox } from '~shared/styles/index'
 import v from '~/utils/variables'
 import CloseIcon from '../icons/CloseIcon'
 
@@ -120,12 +118,6 @@ const StyledDialog = styled(Dialog)`
 `
 StyledDialog.displayName = 'StyledDialog'
 
-const StyledDialogContent = styled(DialogContent)`
-  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
-    padding-bottom: 120px !important;
-  }
-`
-
 const StyledDisplayText = styled(DisplayText)`
   font-size: 0.75rem;
 `
@@ -139,6 +131,7 @@ const StyledDiv = styled.div`
 `
 
 FeedbackTermsModal.propTypes = {
+  open: PropTypes.bool.isRequired,
   close: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
 }

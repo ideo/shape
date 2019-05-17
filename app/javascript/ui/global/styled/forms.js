@@ -272,6 +272,9 @@ export const Select = styled(MuiSelect)`
     padding-bottom: 0;
     padding-top: 0;
     vertical-align: baseline;
+    &.bottomPadded {
+      padding-bottom: 7px;
+    }
     &:focus {
       background-color: transparent;
     }
