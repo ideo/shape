@@ -58,7 +58,7 @@ describe('AdminUsersModal', () => {
       const pendingPanel = panels.first()
       const panelProps = pendingPanel.props()
       expect(panelProps.open).toBe(false)
-      expect(panelProps.title).toEqual('Previously Invited (1)')
+      expect(panelProps.title).toEqual('Pending Invitations (1)')
     })
   })
 

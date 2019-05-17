@@ -49,7 +49,7 @@ class AdminUsersModal extends React.Component {
         {pendingUserCount > 0 &&
           this.renderUsersPanel(
             pendingUsers,
-            `Previously Invited (${pendingUserCount})`,
+            `Pending Invitations (${pendingUserCount})`,
             false
           )}
         {this.renderUsersPanel(
