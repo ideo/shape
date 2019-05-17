@@ -33,9 +33,18 @@ class Collection
       error_on_all_events :aasm_event_failed
 
       event :launch,
-            guard: :completed_and_launchable?,
+            guards: [
+              :completed_and_launchable?,
+              proc { |**args|
+                attempt_to_purchase_test_audiences!(
+                  test_audience_params: args[:test_audience_params],
+                )
+              },
+            ],
             after_commit: proc { |**args|
-                            launch_test!(initiated_by: args[:initiated_by])
+                            post_launch_setup!(
+                              initiated_by: args[:initiated_by],
+                            )
                           } do
         transitions from: :draft, to: :live
       end
@@ -48,7 +57,7 @@ class Collection
       event :reopen,
             guard: :can_reopen?,
             after_commit: proc { |**args|
-                            launch_test!(initiated_by: args[:initiated_by], reopening: true)
+                            post_launch_setup!(initiated_by: args[:initiated_by], reopening: true)
                           } do
         transitions from: :closed, to: :live
       end
@@ -68,7 +77,14 @@ class Collection
       self
     end
 
-    def launch_test!(initiated_by: nil, reopening: false)
+    def attempt_to_purchase_test_audiences!(test_audience_params: nil)
+      return true unless test_audience_params.present?
+      TestAudiencePurchaser.call(self, test_audience_params)
+      return false if errors.present?
+      true
+    end
+
+    def post_launch_setup!(initiated_by: nil, reopening: false)
       # remove the "blanks"
       remove_incomplete_question_items
       if submission_box_template_test?
@@ -85,7 +101,6 @@ class Collection
         return true
       end
       update_cached_submission_status(parent_submission) if inside_a_submission?
-      # TODO: Perhaps need to do *some* of this setup when reopening?
       create_test_design_and_move_cards!(initiated_by: initiated_by) unless reopening
       update(test_launched_at: Time.current)
     end

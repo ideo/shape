@@ -21,7 +21,7 @@ const FormButtonWrapper = styled.div`
   }
 `
 
-@inject('apiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class AudienceSettings extends React.Component {
   @observable
@@ -45,7 +45,7 @@ class AudienceSettings extends React.Component {
     _.each(audiences, audience => {
       audienceSettings[audience.id] = {
         selected: false,
-        sample_size: '',
+        sample_size: '0',
       }
     })
     this.updateAudienceSettings(audienceSettings)
@@ -60,6 +60,7 @@ class AudienceSettings extends React.Component {
   @computed
   get totalPrice() {
     const { audiences, audienceSettings } = this
+    if (!this.showAudienceSettings) return 0
     return _.round(
       audiences
         .map(audience => {
@@ -154,14 +155,12 @@ class AudienceSettings extends React.Component {
 
   submitSettings = e => {
     e.preventDefault()
-    const { testCollection, apiStore } = this.props
+    const { apiStore } = this.props
     const { currentUser } = apiStore
-    // TODO: update size for test audiences
-    // this.saveAllTestAudiences()
     if (currentUser.feedback_terms_accepted) {
       console.log('submitting settings')
       if (this.totalPrice === 0) {
-        testCollection.launchTest()
+        this.launchTestWithAudienceSettings()
       } else {
         this.openConfirmPriceModal()
       }
@@ -182,19 +181,28 @@ class AudienceSettings extends React.Component {
 
   confirmPrice = e => {
     e.preventDefault()
-    // const { audienceSettings } = this
-    // const { testCollection } = this.props
     console.log('buying feedback')
     this.closeConfirmPriceModal()
-    // TODO: Charge card for purchasing feedback audiences
+    this.launchTestWithAudienceSettings()
+  }
 
-    // TODO: launch with audienceSettings passed along??
-    // testCollection.launchTest({ audienceSettings })
+  launchTestWithAudienceSettings() {
+    const { testCollection } = this.props
+    testCollection.launchTest(
+      this.showAudienceSettings ? this.audienceSettings : null
+    )
+  }
+
+  get showAudienceSettings() {
+    const { testCollection } = this.props
+    return (
+      !testCollection.collection_to_test_id &&
+      !testCollection.is_submission_box_template_test
+    )
   }
 
   render() {
-    const { testCollection } = this.props
-    const showAudienceSettings = !testCollection.collection_to_test_id
+    const { uiStore, testCollection } = this.props
 
     return (
       <React.Fragment>
@@ -211,10 +219,9 @@ class AudienceSettings extends React.Component {
           totalPrice={this.totalPriceDollars}
           testName={testCollection.name}
         />
-        {showAudienceSettings && (
+        {this.showAudienceSettings && (
           <AudienceSettingsWidget
             onToggleCheckbox={this.onToggleCheckbox}
-            stopEditingIfContent={this.stopEditingIfContent}
             onInputChange={this.onInputChange}
             totalPrice={this.totalPriceDollars}
             audiences={this.audiences}
@@ -222,7 +229,12 @@ class AudienceSettings extends React.Component {
           />
         )}
         <FormButtonWrapper>
-          <FormButton onClick={this.submitSettings}>Get Feedback</FormButton>
+          <FormButton
+            disabled={uiStore.launchButtonLoading}
+            onClick={this.submitSettings}
+          >
+            Get Feedback
+          </FormButton>
         </FormButtonWrapper>
       </React.Fragment>
     )
@@ -234,6 +246,7 @@ AudienceSettings.propTypes = {
 }
 AudienceSettings.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default AudienceSettings
