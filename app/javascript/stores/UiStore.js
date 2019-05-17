@@ -413,6 +413,10 @@ export default class UiStore {
     )
   }
 
+  get isMobileXs() {
+    return this.windowWidth && this.windowWidth < v.responsive.smallBreakpoint
+  }
+
   @computed
   get isMobile() {
     return this.windowWidth && this.windowWidth < v.responsive.medBreakpoint
