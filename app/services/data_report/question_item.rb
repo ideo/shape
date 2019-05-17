@@ -1,6 +1,8 @@
 module DataReport
   class QuestionItem < SimpleService
 
+    delegate :test_collection, to: :@dataset
+
     def initialize(dataset:)
       @dataset = dataset
     end
@@ -25,16 +27,17 @@ module DataReport
 
     private
 
+    def organization_id
+      return test_collection.organization_id if question_item?
+      return @dataset.organization_id if org_wide?
+    end
+
     def question_item?
       @dataset.is_a?(Dataset::QuestionItem)
     end
 
     def org_wide?
       @dataset.is_a?(Dataset::OrgWideQuestion)
-    end
-
-    def test_collection
-      @dataset.parent
     end
 
     def question_item
@@ -84,7 +87,7 @@ module DataReport
         .joins(:question)
         .where(
           Item::QuestionItem.arel_table[:question_type].eq(
-            question_item.question_type,
+            @dataset.question_type,
           ),
         )
         .joins(survey_response: :test_collection)
@@ -93,7 +96,7 @@ module DataReport
         )
         .where(
           Collection::TestCollection.arel_table[:organization_id].eq(
-            test_collection.organization_id,
+            organization_id,
           ),
         )
     end

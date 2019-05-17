@@ -37,7 +37,7 @@ class Dataset
     end
 
     def test_collection_id
-      test_collection_id&.id
+      test_collection&.id
     end
 
     def test_collection
