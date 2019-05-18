@@ -9933,7 +9933,7 @@ exports[`TestDesigner renders snapshot 1`] = `
           selectedValue="media"
         />
       </form>
-      <inject-AudienceSettings-with-apiStore
+      <inject-AudienceSettings-with-apiStore-uiStore
         testCollection={
           Object {
             "API_archive": [MockFunction],
