@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 import PlusIcon from '~/ui/icons/PlusIcon'
 import v from '~/utils/variables'
+import { uiStore } from '~/stores'
 
 const HotEdge = styled.div`
   height: 0;
@@ -61,6 +62,12 @@ const HotAreaButton = styled.button`
 
 class QuestionHotEdge extends React.Component {
   state = { showing: false }
+
+  componentDidMount() {
+    if (uiStore.isTouchDevice) {
+      this.setState({ showing: true })
+    }
+  }
 
   handleAdd = ev => {
     ev.preventDefault()

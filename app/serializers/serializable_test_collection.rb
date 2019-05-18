@@ -1,6 +1,8 @@
 class SerializableTestCollection < SerializableSimpleCollection
   type 'collections'
 
+  has_many :test_audiences
+
   attributes :test_status
 
   has_many :question_cards do
@@ -15,5 +17,9 @@ class SerializableTestCollection < SerializableSimpleCollection
 
   attribute :is_submission_test do
     @object.submission_test?
+  end
+
+  attribute :gives_incentive do
+    @object.try(:gives_incentive?)
   end
 end

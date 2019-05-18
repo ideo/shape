@@ -14,304 +14,319 @@ exports[`TestDesigner renders snapshot 1`] = `
     }
   }
 >
-  <div>
-    <form
-      style={
-        Object {
-          "maxWidth": "750px",
-        }
-      }
+  <styled.div>
+    <div
+      className="design-column"
     >
-      <RadioControl
-        name="test_type"
-        onChange={[Function]}
-        options={
-          Array [
-            Object {
-              "disabled": true,
-              "label": "Get feedback on an image, video or idea description",
-              "value": "media",
-            },
-          ]
-        }
-        selectedValue="media"
-      />
-    </form>
-    <styled.div />
-    <FlipMovePropConverter
-      appearAnimation="fade"
-      delay={0}
-      disableAllAnimations={false}
-      duration={350}
-      easing="ease-in-out"
-      enterAnimation="elevator"
-      getPosition={[Function]}
-      key="10"
-      leaveAnimation="elevator"
-      maintainContainerHeight={false}
-      staggerDelayBy={0}
-      staggerDurationBy={0}
-      typeName="div"
-      verticalAlignment="top"
-    >
-      <div>
-        <Flex
-          style={
-            Object {
-              "flexWrap": "wrap",
-              "width": "694px",
-            }
-          }
+      <h3>
+        Feedback Design
+      </h3>
+      <styled.div />
+      <FlipMovePropConverter
+        appearAnimation="fade"
+        delay={0}
+        disableAllAnimations={false}
+        duration={350}
+        easing="ease-in-out"
+        enterAnimation="elevator"
+        getPosition={[Function]}
+        key="10"
+        leaveAnimation="elevator"
+        maintainContainerHeight={false}
+        staggerDelayBy={0}
+        staggerDurationBy={0}
+        typeName="div"
+        verticalAlignment="top"
+      >
+        <styled.div
+          className="card 10"
         >
-          <styled.div>
-            <NumberListText>
-              1
-              .
-            </NumberListText>
-            <StyledSelect
-              classes={
-                Object {
-                  "root": "select fixedWidth",
-                  "select": "",
-                  "selectMenu": "selectMenu",
-                }
+          <QuestionSelectHolder
+            canEdit={false}
+            card={
+              Object {
+                "API_archive": [MockFunction],
+                "API_create": [MockFunction],
+                "API_linkToMyCollection": [MockFunction],
+                "assign": [MockFunction],
+                "assignRef": [MockFunction],
+                "card_question_type": "question_useful",
+                "create": [MockFunction],
+                "disableMenu": [MockFunction],
+                "height": 1,
+                "id": "10",
+                "image_contain": false,
+                "item": Object {
+                  "breadcrumb": Array [
+                    Array [
+                      "collections",
+                      1,
+                      "Some collection",
+                    ],
+                    Array [
+                      "items",
+                      1,
+                      "my item",
+                    ],
+                  ],
+                  "can_edit": false,
+                  "can_view": true,
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
+                  "fullyLoaded": true,
+                  "id": "1",
+                  "inherited_tag_list": Array [],
+                  "internalType": "items",
+                  "name": "My Cool Item",
+                  "parentPath": "/",
+                  "parent_collection_card": Object {
+                    "API_archive": [MockFunction],
+                    "API_create": [MockFunction],
+                    "API_linkToMyCollection": [MockFunction],
+                    "assign": [MockFunction],
+                    "assignRef": [MockFunction],
+                    "beginReplacing": [MockFunction],
+                    "col": 1,
+                    "create": [MockFunction],
+                    "disableMenu": [MockFunction],
+                    "height": 1,
+                    "id": "11",
+                    "image_contain": false,
+                    "item": Object {},
+                    "maxHeight": 1,
+                    "maxWidth": 1,
+                    "order": 1,
+                    "parentCollection": Object {
+                      "API_archive": [MockFunction],
+                      "API_batchUpdateCards": [MockFunction],
+                      "API_batchUpdateCardsWithUndo": [MockFunction],
+                      "API_clearCollectionCover": [MockFunction],
+                      "API_fetchCards": [MockFunction],
+                      "API_getNextAvailableTest": [MockFunction],
+                      "API_updateCard": [MockFunction],
+                      "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
+                      "assign": [MockFunction],
+                      "assignRef": [MockFunction],
+                      "breadcrumb": Array [],
+                      "can_edit": false,
+                      "can_edit_content": false,
+                      "can_view": true,
+                      "cardIds": Array [
+                        "10",
+                        "10",
+                        "10",
+                      ],
+                      "cardIdsWithinRectangle": [MockFunction],
+                      "cardProperties": Array [],
+                      "card_order": "order",
+                      "checkCurrentOrg": [MockFunction],
+                      "collection_cards": Array [
+                        [Circular],
+                        [Circular],
+                        [Circular],
+                      ],
+                      "confirmEdit": [MockFunction],
+                      "cover": Object {
+                        "image_url": "http://fake.url.net",
+                        "name": "Proto-typo",
+                        "text": "Lorem ipsum blockchain boogie",
+                      },
+                      "create": [MockFunction],
+                      "disableMenu": [MockFunction],
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "collections",
+                      "isCollection": true,
+                      "isNormalCollection": true,
+                      "isSharedCollection": false,
+                      "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
+                      "master_template": false,
+                      "meta": Object {
+                        "snapshot": Object {
+                          "can_edit": false,
+                        },
+                      },
+                      "name": "My Workspace X",
+                      "num_survey_responses": 0,
+                      "parent_collection_card": [Circular],
+                      "patch": [MockFunction],
+                      "roles": Array [],
+                      "save": [MockFunction],
+                      "sortedCards": Array [
+                        [Circular],
+                        [Circular],
+                        [Circular],
+                      ],
+                      "tag_list": Array [
+                        "prototype",
+                        "blockchain",
+                      ],
+                      "type": "Collection",
+                      "update": [MockFunction],
+                      "updateScrollBottom": [MockFunction],
+                    },
+                    "patch": [MockFunction],
+                    "record": Object {},
+                    "reference": false,
+                    "row": 0,
+                    "save": [MockFunction],
+                    "update": [MockFunction],
+                    "width": 1,
+                  },
+                  "type": "Item::TextItem",
+                },
+                "maxWidth": 1,
+                "order": 0,
+                "patch": [MockFunction],
+                "record": Object {
+                  "breadcrumb": Array [
+                    Array [
+                      "collections",
+                      1,
+                      "Some collection",
+                    ],
+                    Array [
+                      "items",
+                      1,
+                      "my item",
+                    ],
+                  ],
+                  "can_edit": false,
+                  "can_view": true,
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
+                  "fullyLoaded": true,
+                  "id": "1",
+                  "inherited_tag_list": Array [],
+                  "internalType": "items",
+                  "name": "My Cool Item",
+                  "parentPath": "/",
+                  "parent_collection_card": Object {
+                    "API_archive": [MockFunction],
+                    "API_create": [MockFunction],
+                    "API_linkToMyCollection": [MockFunction],
+                    "assign": [MockFunction],
+                    "assignRef": [MockFunction],
+                    "beginReplacing": [MockFunction],
+                    "col": 1,
+                    "create": [MockFunction],
+                    "disableMenu": [MockFunction],
+                    "height": 1,
+                    "id": "11",
+                    "image_contain": false,
+                    "item": Object {},
+                    "maxHeight": 1,
+                    "maxWidth": 1,
+                    "order": 1,
+                    "parentCollection": Object {
+                      "API_archive": [MockFunction],
+                      "API_batchUpdateCards": [MockFunction],
+                      "API_batchUpdateCardsWithUndo": [MockFunction],
+                      "API_clearCollectionCover": [MockFunction],
+                      "API_fetchCards": [MockFunction],
+                      "API_getNextAvailableTest": [MockFunction],
+                      "API_updateCard": [MockFunction],
+                      "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
+                      "assign": [MockFunction],
+                      "assignRef": [MockFunction],
+                      "breadcrumb": Array [],
+                      "can_edit": false,
+                      "can_edit_content": false,
+                      "can_view": true,
+                      "cardIds": Array [
+                        "10",
+                        "10",
+                        "10",
+                      ],
+                      "cardIdsWithinRectangle": [MockFunction],
+                      "cardProperties": Array [],
+                      "card_order": "order",
+                      "checkCurrentOrg": [MockFunction],
+                      "collection_cards": Array [
+                        [Circular],
+                        [Circular],
+                        [Circular],
+                      ],
+                      "confirmEdit": [MockFunction],
+                      "cover": Object {
+                        "image_url": "http://fake.url.net",
+                        "name": "Proto-typo",
+                        "text": "Lorem ipsum blockchain boogie",
+                      },
+                      "create": [MockFunction],
+                      "disableMenu": [MockFunction],
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "collections",
+                      "isCollection": true,
+                      "isNormalCollection": true,
+                      "isSharedCollection": false,
+                      "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
+                      "master_template": false,
+                      "meta": Object {
+                        "snapshot": Object {
+                          "can_edit": false,
+                        },
+                      },
+                      "name": "My Workspace X",
+                      "num_survey_responses": 0,
+                      "parent_collection_card": [Circular],
+                      "patch": [MockFunction],
+                      "roles": Array [],
+                      "save": [MockFunction],
+                      "sortedCards": Array [
+                        [Circular],
+                        [Circular],
+                        [Circular],
+                      ],
+                      "tag_list": Array [
+                        "prototype",
+                        "blockchain",
+                      ],
+                      "type": "Collection",
+                      "update": [MockFunction],
+                      "updateScrollBottom": [MockFunction],
+                    },
+                    "patch": [MockFunction],
+                    "record": Object {},
+                    "reference": false,
+                    "row": 0,
+                    "save": [MockFunction],
+                    "update": [MockFunction],
+                    "width": 1,
+                  },
+                  "type": "Item::TextItem",
+                },
+                "save": [MockFunction],
+                "update": [MockFunction],
+                "width": 1,
               }
-              disabled={true}
-              displayEmpty={true}
-              name="role"
-              onChange={[Function]}
-              value="question_useful"
-            >
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "grayedOut",
-                    "selected": "selected",
-                  }
-                }
-                disabled={true}
-                key="select question type"
-                value=""
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  select question type
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "category",
-                    "selected": "selected",
-                  }
-                }
-                disabled={true}
-                key="Idea Content"
-                value=""
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Idea Content
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Description"
-                value="question_description"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Description
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Photo/Video"
-                value="question_media"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Photo/Video
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "category",
-                    "selected": "selected",
-                  }
-                }
-                disabled={true}
-                key="Scaled Rating"
-                value=""
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Scaled Rating
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Clear"
-                value="question_clarity"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Clear
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Different"
-                value="question_different"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Different
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Exciting"
-                value="question_excitement"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Exciting
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Useful"
-                value="question_useful"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Useful
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "category",
-                    "selected": "selected",
-                  }
-                }
-                disabled={true}
-                key="Customizable"
-                value=""
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Customizable
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Category Satisfaction"
-                value="question_category_satisfaction"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Category Satisfaction
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Context Setting"
-                value="question_context"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Context Setting
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Open Response"
-                value="question_open"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Open Response
-                </span>
-              </StyledSelectOption>
-            </StyledSelect>
-            <div
-              style={
-                Object {
-                  "color": "#c6c1bf",
-                }
-              }
-            />
-          </styled.div>
+            }
+            handleSelectChange={[Function]}
+            handleTrash={[Function]}
+          />
           <styled.div
             editing={true}
             userEditable={false}
@@ -3303,283 +3318,313 @@ exports[`TestDesigner renders snapshot 1`] = `
               surveyResponse={null}
             />
           </styled.div>
-        </Flex>
-      </div>
-    </FlipMovePropConverter>
-    <FlipMovePropConverter
-      appearAnimation="fade"
-      delay={0}
-      disableAllAnimations={false}
-      duration={350}
-      easing="ease-in-out"
-      enterAnimation="elevator"
-      getPosition={[Function]}
-      key="10"
-      leaveAnimation="elevator"
-      maintainContainerHeight={false}
-      staggerDelayBy={0}
-      staggerDurationBy={0}
-      typeName="div"
-      verticalAlignment="top"
-    >
-      <div>
-        <Flex
-          style={
-            Object {
-              "flexWrap": "wrap",
-              "width": "694px",
-            }
-          }
+        </styled.div>
+      </FlipMovePropConverter>
+      <FlipMovePropConverter
+        appearAnimation="fade"
+        delay={0}
+        disableAllAnimations={false}
+        duration={350}
+        easing="ease-in-out"
+        enterAnimation="elevator"
+        getPosition={[Function]}
+        key="10"
+        leaveAnimation="elevator"
+        maintainContainerHeight={false}
+        staggerDelayBy={0}
+        staggerDurationBy={0}
+        typeName="div"
+        verticalAlignment="top"
+      >
+        <styled.div
+          className="card 10"
         >
-          <styled.div>
-            <NumberListText>
-              1
-              .
-            </NumberListText>
-            <StyledSelect
-              classes={
-                Object {
-                  "root": "select fixedWidth",
-                  "select": "",
-                  "selectMenu": "selectMenu",
-                }
+          <QuestionSelectHolder
+            canEdit={false}
+            card={
+              Object {
+                "API_archive": [MockFunction],
+                "API_create": [MockFunction],
+                "API_linkToMyCollection": [MockFunction],
+                "assign": [MockFunction],
+                "assignRef": [MockFunction],
+                "card_question_type": "question_useful",
+                "create": [MockFunction],
+                "disableMenu": [MockFunction],
+                "height": 1,
+                "id": "10",
+                "image_contain": false,
+                "item": Object {
+                  "breadcrumb": Array [
+                    Array [
+                      "collections",
+                      1,
+                      "Some collection",
+                    ],
+                    Array [
+                      "items",
+                      1,
+                      "my item",
+                    ],
+                  ],
+                  "can_edit": false,
+                  "can_view": true,
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
+                  "fullyLoaded": true,
+                  "id": "1",
+                  "inherited_tag_list": Array [],
+                  "internalType": "items",
+                  "name": "My Cool Item",
+                  "parentPath": "/",
+                  "parent_collection_card": Object {
+                    "API_archive": [MockFunction],
+                    "API_create": [MockFunction],
+                    "API_linkToMyCollection": [MockFunction],
+                    "assign": [MockFunction],
+                    "assignRef": [MockFunction],
+                    "beginReplacing": [MockFunction],
+                    "col": 1,
+                    "create": [MockFunction],
+                    "disableMenu": [MockFunction],
+                    "height": 1,
+                    "id": "11",
+                    "image_contain": false,
+                    "item": Object {},
+                    "maxHeight": 1,
+                    "maxWidth": 1,
+                    "order": 1,
+                    "parentCollection": Object {
+                      "API_archive": [MockFunction],
+                      "API_batchUpdateCards": [MockFunction],
+                      "API_batchUpdateCardsWithUndo": [MockFunction],
+                      "API_clearCollectionCover": [MockFunction],
+                      "API_fetchCards": [MockFunction],
+                      "API_getNextAvailableTest": [MockFunction],
+                      "API_updateCard": [MockFunction],
+                      "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
+                      "assign": [MockFunction],
+                      "assignRef": [MockFunction],
+                      "breadcrumb": Array [],
+                      "can_edit": false,
+                      "can_edit_content": false,
+                      "can_view": true,
+                      "cardIds": Array [
+                        "10",
+                        "10",
+                        "10",
+                      ],
+                      "cardIdsWithinRectangle": [MockFunction],
+                      "cardProperties": Array [],
+                      "card_order": "order",
+                      "checkCurrentOrg": [MockFunction],
+                      "collection_cards": Array [
+                        [Circular],
+                        [Circular],
+                        [Circular],
+                      ],
+                      "confirmEdit": [MockFunction],
+                      "cover": Object {
+                        "image_url": "http://fake.url.net",
+                        "name": "Proto-typo",
+                        "text": "Lorem ipsum blockchain boogie",
+                      },
+                      "create": [MockFunction],
+                      "disableMenu": [MockFunction],
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "collections",
+                      "isCollection": true,
+                      "isNormalCollection": true,
+                      "isSharedCollection": false,
+                      "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
+                      "master_template": false,
+                      "meta": Object {
+                        "snapshot": Object {
+                          "can_edit": false,
+                        },
+                      },
+                      "name": "My Workspace X",
+                      "num_survey_responses": 0,
+                      "parent_collection_card": [Circular],
+                      "patch": [MockFunction],
+                      "roles": Array [],
+                      "save": [MockFunction],
+                      "sortedCards": Array [
+                        [Circular],
+                        [Circular],
+                        [Circular],
+                      ],
+                      "tag_list": Array [
+                        "prototype",
+                        "blockchain",
+                      ],
+                      "type": "Collection",
+                      "update": [MockFunction],
+                      "updateScrollBottom": [MockFunction],
+                    },
+                    "patch": [MockFunction],
+                    "record": Object {},
+                    "reference": false,
+                    "row": 0,
+                    "save": [MockFunction],
+                    "update": [MockFunction],
+                    "width": 1,
+                  },
+                  "type": "Item::TextItem",
+                },
+                "maxWidth": 1,
+                "order": 0,
+                "patch": [MockFunction],
+                "record": Object {
+                  "breadcrumb": Array [
+                    Array [
+                      "collections",
+                      1,
+                      "Some collection",
+                    ],
+                    Array [
+                      "items",
+                      1,
+                      "my item",
+                    ],
+                  ],
+                  "can_edit": false,
+                  "can_view": true,
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
+                  "fullyLoaded": true,
+                  "id": "1",
+                  "inherited_tag_list": Array [],
+                  "internalType": "items",
+                  "name": "My Cool Item",
+                  "parentPath": "/",
+                  "parent_collection_card": Object {
+                    "API_archive": [MockFunction],
+                    "API_create": [MockFunction],
+                    "API_linkToMyCollection": [MockFunction],
+                    "assign": [MockFunction],
+                    "assignRef": [MockFunction],
+                    "beginReplacing": [MockFunction],
+                    "col": 1,
+                    "create": [MockFunction],
+                    "disableMenu": [MockFunction],
+                    "height": 1,
+                    "id": "11",
+                    "image_contain": false,
+                    "item": Object {},
+                    "maxHeight": 1,
+                    "maxWidth": 1,
+                    "order": 1,
+                    "parentCollection": Object {
+                      "API_archive": [MockFunction],
+                      "API_batchUpdateCards": [MockFunction],
+                      "API_batchUpdateCardsWithUndo": [MockFunction],
+                      "API_clearCollectionCover": [MockFunction],
+                      "API_fetchCards": [MockFunction],
+                      "API_getNextAvailableTest": [MockFunction],
+                      "API_updateCard": [MockFunction],
+                      "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
+                      "assign": [MockFunction],
+                      "assignRef": [MockFunction],
+                      "breadcrumb": Array [],
+                      "can_edit": false,
+                      "can_edit_content": false,
+                      "can_view": true,
+                      "cardIds": Array [
+                        "10",
+                        "10",
+                        "10",
+                      ],
+                      "cardIdsWithinRectangle": [MockFunction],
+                      "cardProperties": Array [],
+                      "card_order": "order",
+                      "checkCurrentOrg": [MockFunction],
+                      "collection_cards": Array [
+                        [Circular],
+                        [Circular],
+                        [Circular],
+                      ],
+                      "confirmEdit": [MockFunction],
+                      "cover": Object {
+                        "image_url": "http://fake.url.net",
+                        "name": "Proto-typo",
+                        "text": "Lorem ipsum blockchain boogie",
+                      },
+                      "create": [MockFunction],
+                      "disableMenu": [MockFunction],
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "collections",
+                      "isCollection": true,
+                      "isNormalCollection": true,
+                      "isSharedCollection": false,
+                      "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
+                      "master_template": false,
+                      "meta": Object {
+                        "snapshot": Object {
+                          "can_edit": false,
+                        },
+                      },
+                      "name": "My Workspace X",
+                      "num_survey_responses": 0,
+                      "parent_collection_card": [Circular],
+                      "patch": [MockFunction],
+                      "roles": Array [],
+                      "save": [MockFunction],
+                      "sortedCards": Array [
+                        [Circular],
+                        [Circular],
+                        [Circular],
+                      ],
+                      "tag_list": Array [
+                        "prototype",
+                        "blockchain",
+                      ],
+                      "type": "Collection",
+                      "update": [MockFunction],
+                      "updateScrollBottom": [MockFunction],
+                    },
+                    "patch": [MockFunction],
+                    "record": Object {},
+                    "reference": false,
+                    "row": 0,
+                    "save": [MockFunction],
+                    "update": [MockFunction],
+                    "width": 1,
+                  },
+                  "type": "Item::TextItem",
+                },
+                "save": [MockFunction],
+                "update": [MockFunction],
+                "width": 1,
               }
-              disabled={true}
-              displayEmpty={true}
-              name="role"
-              onChange={[Function]}
-              value="question_useful"
-            >
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "grayedOut",
-                    "selected": "selected",
-                  }
-                }
-                disabled={true}
-                key="select question type"
-                value=""
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  select question type
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "category",
-                    "selected": "selected",
-                  }
-                }
-                disabled={true}
-                key="Idea Content"
-                value=""
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Idea Content
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Description"
-                value="question_description"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Description
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Photo/Video"
-                value="question_media"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Photo/Video
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "category",
-                    "selected": "selected",
-                  }
-                }
-                disabled={true}
-                key="Scaled Rating"
-                value=""
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Scaled Rating
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Clear"
-                value="question_clarity"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Clear
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Different"
-                value="question_different"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Different
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Exciting"
-                value="question_excitement"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Exciting
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Useful"
-                value="question_useful"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Useful
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "category",
-                    "selected": "selected",
-                  }
-                }
-                disabled={true}
-                key="Customizable"
-                value=""
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Customizable
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Category Satisfaction"
-                value="question_category_satisfaction"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Category Satisfaction
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Context Setting"
-                value="question_context"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Context Setting
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Open Response"
-                value="question_open"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Open Response
-                </span>
-              </StyledSelectOption>
-            </StyledSelect>
-            <div
-              style={
-                Object {
-                  "color": "#c6c1bf",
-                }
-              }
-            />
-          </styled.div>
+            }
+            handleSelectChange={[Function]}
+            handleTrash={[Function]}
+          />
           <styled.div
             editing={true}
             userEditable={false}
@@ -6570,283 +6615,313 @@ exports[`TestDesigner renders snapshot 1`] = `
               surveyResponse={null}
             />
           </styled.div>
-        </Flex>
-      </div>
-    </FlipMovePropConverter>
-    <FlipMovePropConverter
-      appearAnimation="fade"
-      delay={0}
-      disableAllAnimations={false}
-      duration={350}
-      easing="ease-in-out"
-      enterAnimation="elevator"
-      getPosition={[Function]}
-      key="10"
-      leaveAnimation="elevator"
-      maintainContainerHeight={false}
-      staggerDelayBy={0}
-      staggerDurationBy={0}
-      typeName="div"
-      verticalAlignment="top"
-    >
-      <div>
-        <Flex
-          style={
-            Object {
-              "flexWrap": "wrap",
-              "width": "694px",
-            }
-          }
+        </styled.div>
+      </FlipMovePropConverter>
+      <FlipMovePropConverter
+        appearAnimation="fade"
+        delay={0}
+        disableAllAnimations={false}
+        duration={350}
+        easing="ease-in-out"
+        enterAnimation="elevator"
+        getPosition={[Function]}
+        key="10"
+        leaveAnimation="elevator"
+        maintainContainerHeight={false}
+        staggerDelayBy={0}
+        staggerDurationBy={0}
+        typeName="div"
+        verticalAlignment="top"
+      >
+        <styled.div
+          className="card 10"
         >
-          <styled.div>
-            <NumberListText>
-              1
-              .
-            </NumberListText>
-            <StyledSelect
-              classes={
-                Object {
-                  "root": "select fixedWidth",
-                  "select": "",
-                  "selectMenu": "selectMenu",
-                }
+          <QuestionSelectHolder
+            canEdit={false}
+            card={
+              Object {
+                "API_archive": [MockFunction],
+                "API_create": [MockFunction],
+                "API_linkToMyCollection": [MockFunction],
+                "assign": [MockFunction],
+                "assignRef": [MockFunction],
+                "card_question_type": "question_useful",
+                "create": [MockFunction],
+                "disableMenu": [MockFunction],
+                "height": 1,
+                "id": "10",
+                "image_contain": false,
+                "item": Object {
+                  "breadcrumb": Array [
+                    Array [
+                      "collections",
+                      1,
+                      "Some collection",
+                    ],
+                    Array [
+                      "items",
+                      1,
+                      "my item",
+                    ],
+                  ],
+                  "can_edit": false,
+                  "can_view": true,
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
+                  "fullyLoaded": true,
+                  "id": "1",
+                  "inherited_tag_list": Array [],
+                  "internalType": "items",
+                  "name": "My Cool Item",
+                  "parentPath": "/",
+                  "parent_collection_card": Object {
+                    "API_archive": [MockFunction],
+                    "API_create": [MockFunction],
+                    "API_linkToMyCollection": [MockFunction],
+                    "assign": [MockFunction],
+                    "assignRef": [MockFunction],
+                    "beginReplacing": [MockFunction],
+                    "col": 1,
+                    "create": [MockFunction],
+                    "disableMenu": [MockFunction],
+                    "height": 1,
+                    "id": "11",
+                    "image_contain": false,
+                    "item": Object {},
+                    "maxHeight": 1,
+                    "maxWidth": 1,
+                    "order": 1,
+                    "parentCollection": Object {
+                      "API_archive": [MockFunction],
+                      "API_batchUpdateCards": [MockFunction],
+                      "API_batchUpdateCardsWithUndo": [MockFunction],
+                      "API_clearCollectionCover": [MockFunction],
+                      "API_fetchCards": [MockFunction],
+                      "API_getNextAvailableTest": [MockFunction],
+                      "API_updateCard": [MockFunction],
+                      "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
+                      "assign": [MockFunction],
+                      "assignRef": [MockFunction],
+                      "breadcrumb": Array [],
+                      "can_edit": false,
+                      "can_edit_content": false,
+                      "can_view": true,
+                      "cardIds": Array [
+                        "10",
+                        "10",
+                        "10",
+                      ],
+                      "cardIdsWithinRectangle": [MockFunction],
+                      "cardProperties": Array [],
+                      "card_order": "order",
+                      "checkCurrentOrg": [MockFunction],
+                      "collection_cards": Array [
+                        [Circular],
+                        [Circular],
+                        [Circular],
+                      ],
+                      "confirmEdit": [MockFunction],
+                      "cover": Object {
+                        "image_url": "http://fake.url.net",
+                        "name": "Proto-typo",
+                        "text": "Lorem ipsum blockchain boogie",
+                      },
+                      "create": [MockFunction],
+                      "disableMenu": [MockFunction],
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "collections",
+                      "isCollection": true,
+                      "isNormalCollection": true,
+                      "isSharedCollection": false,
+                      "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
+                      "master_template": false,
+                      "meta": Object {
+                        "snapshot": Object {
+                          "can_edit": false,
+                        },
+                      },
+                      "name": "My Workspace X",
+                      "num_survey_responses": 0,
+                      "parent_collection_card": [Circular],
+                      "patch": [MockFunction],
+                      "roles": Array [],
+                      "save": [MockFunction],
+                      "sortedCards": Array [
+                        [Circular],
+                        [Circular],
+                        [Circular],
+                      ],
+                      "tag_list": Array [
+                        "prototype",
+                        "blockchain",
+                      ],
+                      "type": "Collection",
+                      "update": [MockFunction],
+                      "updateScrollBottom": [MockFunction],
+                    },
+                    "patch": [MockFunction],
+                    "record": Object {},
+                    "reference": false,
+                    "row": 0,
+                    "save": [MockFunction],
+                    "update": [MockFunction],
+                    "width": 1,
+                  },
+                  "type": "Item::TextItem",
+                },
+                "maxWidth": 1,
+                "order": 0,
+                "patch": [MockFunction],
+                "record": Object {
+                  "breadcrumb": Array [
+                    Array [
+                      "collections",
+                      1,
+                      "Some collection",
+                    ],
+                    Array [
+                      "items",
+                      1,
+                      "my item",
+                    ],
+                  ],
+                  "can_edit": false,
+                  "can_view": true,
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
+                  "fullyLoaded": true,
+                  "id": "1",
+                  "inherited_tag_list": Array [],
+                  "internalType": "items",
+                  "name": "My Cool Item",
+                  "parentPath": "/",
+                  "parent_collection_card": Object {
+                    "API_archive": [MockFunction],
+                    "API_create": [MockFunction],
+                    "API_linkToMyCollection": [MockFunction],
+                    "assign": [MockFunction],
+                    "assignRef": [MockFunction],
+                    "beginReplacing": [MockFunction],
+                    "col": 1,
+                    "create": [MockFunction],
+                    "disableMenu": [MockFunction],
+                    "height": 1,
+                    "id": "11",
+                    "image_contain": false,
+                    "item": Object {},
+                    "maxHeight": 1,
+                    "maxWidth": 1,
+                    "order": 1,
+                    "parentCollection": Object {
+                      "API_archive": [MockFunction],
+                      "API_batchUpdateCards": [MockFunction],
+                      "API_batchUpdateCardsWithUndo": [MockFunction],
+                      "API_clearCollectionCover": [MockFunction],
+                      "API_fetchCards": [MockFunction],
+                      "API_getNextAvailableTest": [MockFunction],
+                      "API_updateCard": [MockFunction],
+                      "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
+                      "assign": [MockFunction],
+                      "assignRef": [MockFunction],
+                      "breadcrumb": Array [],
+                      "can_edit": false,
+                      "can_edit_content": false,
+                      "can_view": true,
+                      "cardIds": Array [
+                        "10",
+                        "10",
+                        "10",
+                      ],
+                      "cardIdsWithinRectangle": [MockFunction],
+                      "cardProperties": Array [],
+                      "card_order": "order",
+                      "checkCurrentOrg": [MockFunction],
+                      "collection_cards": Array [
+                        [Circular],
+                        [Circular],
+                        [Circular],
+                      ],
+                      "confirmEdit": [MockFunction],
+                      "cover": Object {
+                        "image_url": "http://fake.url.net",
+                        "name": "Proto-typo",
+                        "text": "Lorem ipsum blockchain boogie",
+                      },
+                      "create": [MockFunction],
+                      "disableMenu": [MockFunction],
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "collections",
+                      "isCollection": true,
+                      "isNormalCollection": true,
+                      "isSharedCollection": false,
+                      "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
+                      "master_template": false,
+                      "meta": Object {
+                        "snapshot": Object {
+                          "can_edit": false,
+                        },
+                      },
+                      "name": "My Workspace X",
+                      "num_survey_responses": 0,
+                      "parent_collection_card": [Circular],
+                      "patch": [MockFunction],
+                      "roles": Array [],
+                      "save": [MockFunction],
+                      "sortedCards": Array [
+                        [Circular],
+                        [Circular],
+                        [Circular],
+                      ],
+                      "tag_list": Array [
+                        "prototype",
+                        "blockchain",
+                      ],
+                      "type": "Collection",
+                      "update": [MockFunction],
+                      "updateScrollBottom": [MockFunction],
+                    },
+                    "patch": [MockFunction],
+                    "record": Object {},
+                    "reference": false,
+                    "row": 0,
+                    "save": [MockFunction],
+                    "update": [MockFunction],
+                    "width": 1,
+                  },
+                  "type": "Item::TextItem",
+                },
+                "save": [MockFunction],
+                "update": [MockFunction],
+                "width": 1,
               }
-              disabled={true}
-              displayEmpty={true}
-              name="role"
-              onChange={[Function]}
-              value="question_useful"
-            >
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "grayedOut",
-                    "selected": "selected",
-                  }
-                }
-                disabled={true}
-                key="select question type"
-                value=""
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  select question type
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "category",
-                    "selected": "selected",
-                  }
-                }
-                disabled={true}
-                key="Idea Content"
-                value=""
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Idea Content
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Description"
-                value="question_description"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Description
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Photo/Video"
-                value="question_media"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Photo/Video
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "category",
-                    "selected": "selected",
-                  }
-                }
-                disabled={true}
-                key="Scaled Rating"
-                value=""
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Scaled Rating
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Clear"
-                value="question_clarity"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Clear
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Different"
-                value="question_different"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Different
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Exciting"
-                value="question_excitement"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Exciting
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Useful"
-                value="question_useful"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Useful
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "category",
-                    "selected": "selected",
-                  }
-                }
-                disabled={true}
-                key="Customizable"
-                value=""
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Customizable
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Category Satisfaction"
-                value="question_category_satisfaction"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Category Satisfaction
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Context Setting"
-                value="question_context"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Context Setting
-                </span>
-              </StyledSelectOption>
-              <StyledSelectOption
-                classes={
-                  Object {
-                    "root": "selectOption",
-                    "selected": "selected",
-                  }
-                }
-                disabled={false}
-                key="Open Response"
-                value="question_open"
-              >
-                <span
-                  data-cy="QuestionSelectOption"
-                >
-                  Open Response
-                </span>
-              </StyledSelectOption>
-            </StyledSelect>
-            <div
-              style={
-                Object {
-                  "color": "#c6c1bf",
-                }
-              }
-            />
-          </styled.div>
+            }
+            handleSelectChange={[Function]}
+            handleTrash={[Function]}
+          />
           <styled.div
             editing={true}
             userEditable={false}
@@ -9838,10 +9913,2484 @@ exports[`TestDesigner renders snapshot 1`] = `
               surveyResponse={null}
             />
           </styled.div>
-        </Flex>
-      </div>
-    </FlipMovePropConverter>
-    <styled.div />
-  </div>
+        </styled.div>
+      </FlipMovePropConverter>
+      <styled.div />
+    </div>
+    <div
+      className="settings-column"
+    >
+      <h3>
+        Feedback Settings
+      </h3>
+      <form
+        style={
+          Object {
+            "maxWidth": "750px",
+          }
+        }
+      >
+        <RadioControl
+          name="test_type"
+          onChange={[Function]}
+          options={
+            Array [
+              Object {
+                "disabled": true,
+                "label": "Get feedback on an image, video or idea description",
+                "value": "media",
+              },
+            ]
+          }
+          selectedValue="media"
+        />
+      </form>
+      <inject-AudienceSettings-with-apiStore
+        testCollection={
+          Object {
+            "API_archive": [MockFunction],
+            "API_batchUpdateCards": [MockFunction],
+            "API_batchUpdateCardsWithUndo": [MockFunction],
+            "API_clearCollectionCover": [MockFunction],
+            "API_fetchCards": [MockFunction],
+            "API_getNextAvailableTest": [MockFunction],
+            "API_updateCard": [MockFunction],
+            "API_updateName": [MockFunction],
+            "anyone_can_join": false,
+            "anyone_can_view": false,
+            "apiStore": Object {
+              "add": [MockFunction add],
+              "addShapeAdminUsers": [MockFunction],
+              "checkCurrentOrg": [MockFunction],
+              "checkInMyCollection": [MockFunction],
+              "collections": Array [],
+              "createTemplateInstance": [MockFunction],
+              "currentOrgSlug": "org-slug",
+              "currentThreads": Array [
+                Object {
+                  "comments": Array [],
+                  "id": "1",
+                  "key": "abc-1",
+                  "record": Object {
+                    "name": "abc",
+                  },
+                  "users_thread": Object {
+                    "subscribed": true,
+                  },
+                },
+                Object {
+                  "comments": Array [],
+                  "id": "2",
+                  "key": "abc-2",
+                  "record": Object {
+                    "name": "xyz",
+                  },
+                  "users_thread": Object {
+                    "subscribed": true,
+                  },
+                },
+              ],
+              "currentUser": Object {
+                "API_hideHelper": [MockFunction],
+                "current_organization": Object {
+                  "deactivated": false,
+                  "name": "Acme Inc",
+                },
+                "current_user_collection_id": 99,
+                "groups": Array [],
+                "id": "1",
+                "name": "Johnny Appleseed",
+                "organizations": Array [
+                  Object {
+                    "filestack_file_url": "test.jpg",
+                    "name": "Acme Inc 1",
+                  },
+                ],
+                "pic_url_square": "https://s3.amazonaws.com/pic.png",
+                "terms_accepted": true,
+              },
+              "currentUserId": "1",
+              "currentUserOrganization": Object {
+                "id": "1",
+                "name": "Acme Inc",
+                "primary_group": Object {
+                  "name": "Acme Inc",
+                },
+                "slug": "org-slug",
+              },
+              "duplicateCards": [MockFunction],
+              "fetch": [MockFunction fetch] {
+                "calls": Array [
+                  Array [
+                    "collections",
+                    undefined,
+                  ],
+                ],
+              },
+              "fetchNotifications": [MockFunction],
+              "fetchRoles": [MockFunction fetchRoles],
+              "fetchShapeAdminUsers": [MockFunction fetchShapeAdminUsers],
+              "fetchThreads": [MockFunction],
+              "find": [MockFunction],
+              "findAll": [MockFunction],
+              "findOrBuildCommentThread": [MockFunction],
+              "findOrganizationById": [MockFunction],
+              "findThreadForRecord": [MockFunction],
+              "hasOlderThreads": false,
+              "items": Array [],
+              "linkCards": [MockFunction],
+              "loadCurrentUser": [MockFunction],
+              "loadCurrentUserGroups": [MockFunction],
+              "loadNextThreadPage": [MockFunction],
+              "loadingThreads": false,
+              "moveCards": [MockFunction],
+              "recentNotifications": Map {},
+              "removeAll": [MockFunction removeAll],
+              "removeShapeAdminUser": [MockFunction],
+              "request": [MockFunction request],
+              "routingStore": Object {},
+              "searchCollections": [MockFunction],
+              "searchRoles": [MockFunction],
+              "searchUsers": [MockFunction],
+              "searchUsersAndGroups": [MockFunction],
+              "sessionLoaded": true,
+              "setCurrentUserId": [MockFunction],
+              "shapeAdminUsers": Array [],
+              "sync": [MockFunction sync],
+              "uiStore": Object {
+                "activityLogMoving": false,
+                "activityLogOpen": false,
+                "activityLogPage": "comments",
+                "activityLogPosition": Object {
+                  "h": 1,
+                  "w": 1,
+                  "x": 0,
+                  "y": 0,
+                },
+                "addNewCard": [MockFunction],
+                "alert": [MockFunction],
+                "alertOk": [MockFunction],
+                "autocompleteMenuClosed": [MockFunction],
+                "blankContentToolState": Object {
+                  "height": null,
+                  "order": null,
+                  "replacingId": null,
+                  "width": null,
+                },
+                "blurContent": false,
+                "captureKeyboardGridClick": [MockFunction],
+                "cardAction": "move",
+                "cardMenuOpen": Object {
+                  "id": false,
+                  "x": 0,
+                  "y": 0,
+                },
+                "closeBlankContentTool": [MockFunction],
+                "closeCardMenu": [MockFunction],
+                "closeDialog": [MockFunction],
+                "closeMoveMenu": [MockFunction],
+                "collectionCardSortOrder": "",
+                "confirm": [MockFunction],
+                "defaultAlertError": [MockFunction],
+                "defaultGridSettings": Object {
+                  "cols": 4,
+                  "gridH": 250,
+                  "gridW": 312,
+                  "gutter": 20,
+                },
+                "dialogConfig": Object {
+                  "cancelText": "Cancel",
+                  "confirmText": "OK",
+                  "iconName": null,
+                  "onCancel": null,
+                  "onClose": [MockFunction],
+                  "onConfirm": null,
+                  "open": null,
+                  "prompt": null,
+                },
+                "dismissedMoveHelper": false,
+                "editingCardId": 0,
+                "editingName": false,
+                "expandThread": [MockFunction],
+                "expandedThreadKey": null,
+                "gridHeightFor": [MockFunction],
+                "gridSettings": Object {
+                  "cols": 4,
+                  "gridH": 250,
+                  "gridW": 312,
+                  "gutter": 20,
+                },
+                "isLoading": false,
+                "isNewCard": [MockFunction],
+                "isViewingHomepage": false,
+                "movingCardIds": Array [],
+                "movingFromCollectionId": null,
+                "multiMoveCardIds": Array [],
+                "openCardMenu": [MockFunction],
+                "openGroup": [MockFunction],
+                "openMoveMenu": [MockFunction],
+                "openOptionalMenus": [MockFunction],
+                "organizationMenuGroupId": null,
+                "organizationMenuOpen": false,
+                "organizationMenuPage": "organizationMenuPage",
+                "pageMenuOpen": false,
+                "popupAlert": [MockFunction],
+                "popupSnackbar": [MockFunction],
+                "removeNewCard": [MockFunction],
+                "resetSelectionAndBCT": [MockFunction],
+                "rolesMenuOpen": false,
+                "scrollToBottom": [MockFunction],
+                "scrollToTop": [MockFunction],
+                "searchText": "",
+                "selectCardId": [MockFunction],
+                "selectedAreaEnabled": false,
+                "selectedCardIds": Array [],
+                "setSelectedArea": [MockFunction],
+                "setSnoozeChecked": [MockFunction],
+                "setViewingCollection": [MockFunction],
+                "setViewingItem": [MockFunction],
+                "showPermissionsAlert": [MockFunction],
+                "stopDragging": [MockFunction],
+                "toggleEditingCardId": [MockFunction],
+                "trackEvent": [MockFunction],
+                "trackedRecords": Object {},
+                "update": [MockFunction],
+                "viewingCollection": null,
+                "viewingItem": null,
+              },
+              "undoStore": Object {},
+              "unreadActivityCount": 0,
+              "unreadNotifications": Array [],
+              "usersThreadPagesToLoad": 1,
+            },
+            "assign": [MockFunction],
+            "assignRef": [MockFunction],
+            "breadcrumb": Array [],
+            "can_edit": false,
+            "can_edit_content": false,
+            "can_view": true,
+            "cardIds": Array [
+              "10",
+              "10",
+              "10",
+            ],
+            "cardIdsWithinRectangle": [MockFunction],
+            "cardProperties": Array [],
+            "card_order": "order",
+            "checkCurrentOrg": [MockFunction],
+            "collection_cards": Array [
+              Object {
+                "API_archive": [MockFunction],
+                "API_create": [MockFunction],
+                "API_linkToMyCollection": [MockFunction],
+                "assign": [MockFunction],
+                "assignRef": [MockFunction],
+                "card_question_type": "question_useful",
+                "create": [MockFunction],
+                "disableMenu": [MockFunction],
+                "height": 1,
+                "id": "10",
+                "image_contain": false,
+                "item": Object {
+                  "breadcrumb": Array [
+                    Array [
+                      "collections",
+                      1,
+                      "Some collection",
+                    ],
+                    Array [
+                      "items",
+                      1,
+                      "my item",
+                    ],
+                  ],
+                  "can_edit": false,
+                  "can_view": true,
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
+                  "fullyLoaded": true,
+                  "id": "1",
+                  "inherited_tag_list": Array [],
+                  "internalType": "items",
+                  "name": "My Cool Item",
+                  "parentPath": "/",
+                  "parent_collection_card": Object {
+                    "API_archive": [MockFunction],
+                    "API_create": [MockFunction],
+                    "API_linkToMyCollection": [MockFunction],
+                    "assign": [MockFunction],
+                    "assignRef": [MockFunction],
+                    "beginReplacing": [MockFunction],
+                    "col": 1,
+                    "create": [MockFunction],
+                    "disableMenu": [MockFunction],
+                    "height": 1,
+                    "id": "11",
+                    "image_contain": false,
+                    "item": Object {},
+                    "maxHeight": 1,
+                    "maxWidth": 1,
+                    "order": 1,
+                    "parentCollection": Object {
+                      "API_archive": [MockFunction],
+                      "API_batchUpdateCards": [MockFunction],
+                      "API_batchUpdateCardsWithUndo": [MockFunction],
+                      "API_clearCollectionCover": [MockFunction],
+                      "API_fetchCards": [MockFunction],
+                      "API_getNextAvailableTest": [MockFunction],
+                      "API_updateCard": [MockFunction],
+                      "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
+                      "assign": [MockFunction],
+                      "assignRef": [MockFunction],
+                      "breadcrumb": Array [],
+                      "can_edit": false,
+                      "can_edit_content": false,
+                      "can_view": true,
+                      "cardIds": Array [
+                        "10",
+                        "10",
+                        "10",
+                      ],
+                      "cardIdsWithinRectangle": [MockFunction],
+                      "cardProperties": Array [],
+                      "card_order": "order",
+                      "checkCurrentOrg": [MockFunction],
+                      "collection_cards": [Circular],
+                      "confirmEdit": [MockFunction],
+                      "cover": Object {
+                        "image_url": "http://fake.url.net",
+                        "name": "Proto-typo",
+                        "text": "Lorem ipsum blockchain boogie",
+                      },
+                      "create": [MockFunction],
+                      "disableMenu": [MockFunction],
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "collections",
+                      "isCollection": true,
+                      "isNormalCollection": true,
+                      "isSharedCollection": false,
+                      "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
+                      "master_template": false,
+                      "meta": Object {
+                        "snapshot": Object {
+                          "can_edit": false,
+                        },
+                      },
+                      "name": "My Workspace X",
+                      "num_survey_responses": 0,
+                      "parent_collection_card": [Circular],
+                      "patch": [MockFunction],
+                      "roles": Array [],
+                      "save": [MockFunction],
+                      "sortedCards": [Circular],
+                      "tag_list": Array [
+                        "prototype",
+                        "blockchain",
+                      ],
+                      "type": "Collection",
+                      "update": [MockFunction],
+                      "updateScrollBottom": [MockFunction],
+                    },
+                    "patch": [MockFunction],
+                    "record": Object {},
+                    "reference": false,
+                    "row": 0,
+                    "save": [MockFunction],
+                    "update": [MockFunction],
+                    "width": 1,
+                  },
+                  "type": "Item::TextItem",
+                },
+                "maxWidth": 1,
+                "order": 0,
+                "patch": [MockFunction],
+                "record": Object {
+                  "breadcrumb": Array [
+                    Array [
+                      "collections",
+                      1,
+                      "Some collection",
+                    ],
+                    Array [
+                      "items",
+                      1,
+                      "my item",
+                    ],
+                  ],
+                  "can_edit": false,
+                  "can_view": true,
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
+                  "fullyLoaded": true,
+                  "id": "1",
+                  "inherited_tag_list": Array [],
+                  "internalType": "items",
+                  "name": "My Cool Item",
+                  "parentPath": "/",
+                  "parent_collection_card": Object {
+                    "API_archive": [MockFunction],
+                    "API_create": [MockFunction],
+                    "API_linkToMyCollection": [MockFunction],
+                    "assign": [MockFunction],
+                    "assignRef": [MockFunction],
+                    "beginReplacing": [MockFunction],
+                    "col": 1,
+                    "create": [MockFunction],
+                    "disableMenu": [MockFunction],
+                    "height": 1,
+                    "id": "11",
+                    "image_contain": false,
+                    "item": Object {},
+                    "maxHeight": 1,
+                    "maxWidth": 1,
+                    "order": 1,
+                    "parentCollection": Object {
+                      "API_archive": [MockFunction],
+                      "API_batchUpdateCards": [MockFunction],
+                      "API_batchUpdateCardsWithUndo": [MockFunction],
+                      "API_clearCollectionCover": [MockFunction],
+                      "API_fetchCards": [MockFunction],
+                      "API_getNextAvailableTest": [MockFunction],
+                      "API_updateCard": [MockFunction],
+                      "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
+                      "assign": [MockFunction],
+                      "assignRef": [MockFunction],
+                      "breadcrumb": Array [],
+                      "can_edit": false,
+                      "can_edit_content": false,
+                      "can_view": true,
+                      "cardIds": Array [
+                        "10",
+                        "10",
+                        "10",
+                      ],
+                      "cardIdsWithinRectangle": [MockFunction],
+                      "cardProperties": Array [],
+                      "card_order": "order",
+                      "checkCurrentOrg": [MockFunction],
+                      "collection_cards": [Circular],
+                      "confirmEdit": [MockFunction],
+                      "cover": Object {
+                        "image_url": "http://fake.url.net",
+                        "name": "Proto-typo",
+                        "text": "Lorem ipsum blockchain boogie",
+                      },
+                      "create": [MockFunction],
+                      "disableMenu": [MockFunction],
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "collections",
+                      "isCollection": true,
+                      "isNormalCollection": true,
+                      "isSharedCollection": false,
+                      "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
+                      "master_template": false,
+                      "meta": Object {
+                        "snapshot": Object {
+                          "can_edit": false,
+                        },
+                      },
+                      "name": "My Workspace X",
+                      "num_survey_responses": 0,
+                      "parent_collection_card": [Circular],
+                      "patch": [MockFunction],
+                      "roles": Array [],
+                      "save": [MockFunction],
+                      "sortedCards": [Circular],
+                      "tag_list": Array [
+                        "prototype",
+                        "blockchain",
+                      ],
+                      "type": "Collection",
+                      "update": [MockFunction],
+                      "updateScrollBottom": [MockFunction],
+                    },
+                    "patch": [MockFunction],
+                    "record": Object {},
+                    "reference": false,
+                    "row": 0,
+                    "save": [MockFunction],
+                    "update": [MockFunction],
+                    "width": 1,
+                  },
+                  "type": "Item::TextItem",
+                },
+                "save": [MockFunction],
+                "update": [MockFunction],
+                "width": 1,
+              },
+              Object {
+                "API_archive": [MockFunction],
+                "API_create": [MockFunction],
+                "API_linkToMyCollection": [MockFunction],
+                "assign": [MockFunction],
+                "assignRef": [MockFunction],
+                "card_question_type": "question_useful",
+                "create": [MockFunction],
+                "disableMenu": [MockFunction],
+                "height": 1,
+                "id": "10",
+                "image_contain": false,
+                "item": Object {
+                  "breadcrumb": Array [
+                    Array [
+                      "collections",
+                      1,
+                      "Some collection",
+                    ],
+                    Array [
+                      "items",
+                      1,
+                      "my item",
+                    ],
+                  ],
+                  "can_edit": false,
+                  "can_view": true,
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
+                  "fullyLoaded": true,
+                  "id": "1",
+                  "inherited_tag_list": Array [],
+                  "internalType": "items",
+                  "name": "My Cool Item",
+                  "parentPath": "/",
+                  "parent_collection_card": Object {
+                    "API_archive": [MockFunction],
+                    "API_create": [MockFunction],
+                    "API_linkToMyCollection": [MockFunction],
+                    "assign": [MockFunction],
+                    "assignRef": [MockFunction],
+                    "beginReplacing": [MockFunction],
+                    "col": 1,
+                    "create": [MockFunction],
+                    "disableMenu": [MockFunction],
+                    "height": 1,
+                    "id": "11",
+                    "image_contain": false,
+                    "item": Object {},
+                    "maxHeight": 1,
+                    "maxWidth": 1,
+                    "order": 1,
+                    "parentCollection": Object {
+                      "API_archive": [MockFunction],
+                      "API_batchUpdateCards": [MockFunction],
+                      "API_batchUpdateCardsWithUndo": [MockFunction],
+                      "API_clearCollectionCover": [MockFunction],
+                      "API_fetchCards": [MockFunction],
+                      "API_getNextAvailableTest": [MockFunction],
+                      "API_updateCard": [MockFunction],
+                      "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
+                      "assign": [MockFunction],
+                      "assignRef": [MockFunction],
+                      "breadcrumb": Array [],
+                      "can_edit": false,
+                      "can_edit_content": false,
+                      "can_view": true,
+                      "cardIds": Array [
+                        "10",
+                        "10",
+                        "10",
+                      ],
+                      "cardIdsWithinRectangle": [MockFunction],
+                      "cardProperties": Array [],
+                      "card_order": "order",
+                      "checkCurrentOrg": [MockFunction],
+                      "collection_cards": [Circular],
+                      "confirmEdit": [MockFunction],
+                      "cover": Object {
+                        "image_url": "http://fake.url.net",
+                        "name": "Proto-typo",
+                        "text": "Lorem ipsum blockchain boogie",
+                      },
+                      "create": [MockFunction],
+                      "disableMenu": [MockFunction],
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "collections",
+                      "isCollection": true,
+                      "isNormalCollection": true,
+                      "isSharedCollection": false,
+                      "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
+                      "master_template": false,
+                      "meta": Object {
+                        "snapshot": Object {
+                          "can_edit": false,
+                        },
+                      },
+                      "name": "My Workspace X",
+                      "num_survey_responses": 0,
+                      "parent_collection_card": [Circular],
+                      "patch": [MockFunction],
+                      "roles": Array [],
+                      "save": [MockFunction],
+                      "sortedCards": [Circular],
+                      "tag_list": Array [
+                        "prototype",
+                        "blockchain",
+                      ],
+                      "type": "Collection",
+                      "update": [MockFunction],
+                      "updateScrollBottom": [MockFunction],
+                    },
+                    "patch": [MockFunction],
+                    "record": Object {},
+                    "reference": false,
+                    "row": 0,
+                    "save": [MockFunction],
+                    "update": [MockFunction],
+                    "width": 1,
+                  },
+                  "type": "Item::TextItem",
+                },
+                "maxWidth": 1,
+                "order": 0,
+                "patch": [MockFunction],
+                "record": Object {
+                  "breadcrumb": Array [
+                    Array [
+                      "collections",
+                      1,
+                      "Some collection",
+                    ],
+                    Array [
+                      "items",
+                      1,
+                      "my item",
+                    ],
+                  ],
+                  "can_edit": false,
+                  "can_view": true,
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
+                  "fullyLoaded": true,
+                  "id": "1",
+                  "inherited_tag_list": Array [],
+                  "internalType": "items",
+                  "name": "My Cool Item",
+                  "parentPath": "/",
+                  "parent_collection_card": Object {
+                    "API_archive": [MockFunction],
+                    "API_create": [MockFunction],
+                    "API_linkToMyCollection": [MockFunction],
+                    "assign": [MockFunction],
+                    "assignRef": [MockFunction],
+                    "beginReplacing": [MockFunction],
+                    "col": 1,
+                    "create": [MockFunction],
+                    "disableMenu": [MockFunction],
+                    "height": 1,
+                    "id": "11",
+                    "image_contain": false,
+                    "item": Object {},
+                    "maxHeight": 1,
+                    "maxWidth": 1,
+                    "order": 1,
+                    "parentCollection": Object {
+                      "API_archive": [MockFunction],
+                      "API_batchUpdateCards": [MockFunction],
+                      "API_batchUpdateCardsWithUndo": [MockFunction],
+                      "API_clearCollectionCover": [MockFunction],
+                      "API_fetchCards": [MockFunction],
+                      "API_getNextAvailableTest": [MockFunction],
+                      "API_updateCard": [MockFunction],
+                      "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
+                      "assign": [MockFunction],
+                      "assignRef": [MockFunction],
+                      "breadcrumb": Array [],
+                      "can_edit": false,
+                      "can_edit_content": false,
+                      "can_view": true,
+                      "cardIds": Array [
+                        "10",
+                        "10",
+                        "10",
+                      ],
+                      "cardIdsWithinRectangle": [MockFunction],
+                      "cardProperties": Array [],
+                      "card_order": "order",
+                      "checkCurrentOrg": [MockFunction],
+                      "collection_cards": [Circular],
+                      "confirmEdit": [MockFunction],
+                      "cover": Object {
+                        "image_url": "http://fake.url.net",
+                        "name": "Proto-typo",
+                        "text": "Lorem ipsum blockchain boogie",
+                      },
+                      "create": [MockFunction],
+                      "disableMenu": [MockFunction],
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "collections",
+                      "isCollection": true,
+                      "isNormalCollection": true,
+                      "isSharedCollection": false,
+                      "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
+                      "master_template": false,
+                      "meta": Object {
+                        "snapshot": Object {
+                          "can_edit": false,
+                        },
+                      },
+                      "name": "My Workspace X",
+                      "num_survey_responses": 0,
+                      "parent_collection_card": [Circular],
+                      "patch": [MockFunction],
+                      "roles": Array [],
+                      "save": [MockFunction],
+                      "sortedCards": [Circular],
+                      "tag_list": Array [
+                        "prototype",
+                        "blockchain",
+                      ],
+                      "type": "Collection",
+                      "update": [MockFunction],
+                      "updateScrollBottom": [MockFunction],
+                    },
+                    "patch": [MockFunction],
+                    "record": Object {},
+                    "reference": false,
+                    "row": 0,
+                    "save": [MockFunction],
+                    "update": [MockFunction],
+                    "width": 1,
+                  },
+                  "type": "Item::TextItem",
+                },
+                "save": [MockFunction],
+                "update": [MockFunction],
+                "width": 1,
+              },
+              Object {
+                "API_archive": [MockFunction],
+                "API_create": [MockFunction],
+                "API_linkToMyCollection": [MockFunction],
+                "assign": [MockFunction],
+                "assignRef": [MockFunction],
+                "card_question_type": "question_useful",
+                "create": [MockFunction],
+                "disableMenu": [MockFunction],
+                "height": 1,
+                "id": "10",
+                "image_contain": false,
+                "item": Object {
+                  "breadcrumb": Array [
+                    Array [
+                      "collections",
+                      1,
+                      "Some collection",
+                    ],
+                    Array [
+                      "items",
+                      1,
+                      "my item",
+                    ],
+                  ],
+                  "can_edit": false,
+                  "can_view": true,
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
+                  "fullyLoaded": true,
+                  "id": "1",
+                  "inherited_tag_list": Array [],
+                  "internalType": "items",
+                  "name": "My Cool Item",
+                  "parentPath": "/",
+                  "parent_collection_card": Object {
+                    "API_archive": [MockFunction],
+                    "API_create": [MockFunction],
+                    "API_linkToMyCollection": [MockFunction],
+                    "assign": [MockFunction],
+                    "assignRef": [MockFunction],
+                    "beginReplacing": [MockFunction],
+                    "col": 1,
+                    "create": [MockFunction],
+                    "disableMenu": [MockFunction],
+                    "height": 1,
+                    "id": "11",
+                    "image_contain": false,
+                    "item": Object {},
+                    "maxHeight": 1,
+                    "maxWidth": 1,
+                    "order": 1,
+                    "parentCollection": Object {
+                      "API_archive": [MockFunction],
+                      "API_batchUpdateCards": [MockFunction],
+                      "API_batchUpdateCardsWithUndo": [MockFunction],
+                      "API_clearCollectionCover": [MockFunction],
+                      "API_fetchCards": [MockFunction],
+                      "API_getNextAvailableTest": [MockFunction],
+                      "API_updateCard": [MockFunction],
+                      "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
+                      "assign": [MockFunction],
+                      "assignRef": [MockFunction],
+                      "breadcrumb": Array [],
+                      "can_edit": false,
+                      "can_edit_content": false,
+                      "can_view": true,
+                      "cardIds": Array [
+                        "10",
+                        "10",
+                        "10",
+                      ],
+                      "cardIdsWithinRectangle": [MockFunction],
+                      "cardProperties": Array [],
+                      "card_order": "order",
+                      "checkCurrentOrg": [MockFunction],
+                      "collection_cards": [Circular],
+                      "confirmEdit": [MockFunction],
+                      "cover": Object {
+                        "image_url": "http://fake.url.net",
+                        "name": "Proto-typo",
+                        "text": "Lorem ipsum blockchain boogie",
+                      },
+                      "create": [MockFunction],
+                      "disableMenu": [MockFunction],
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "collections",
+                      "isCollection": true,
+                      "isNormalCollection": true,
+                      "isSharedCollection": false,
+                      "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
+                      "master_template": false,
+                      "meta": Object {
+                        "snapshot": Object {
+                          "can_edit": false,
+                        },
+                      },
+                      "name": "My Workspace X",
+                      "num_survey_responses": 0,
+                      "parent_collection_card": [Circular],
+                      "patch": [MockFunction],
+                      "roles": Array [],
+                      "save": [MockFunction],
+                      "sortedCards": [Circular],
+                      "tag_list": Array [
+                        "prototype",
+                        "blockchain",
+                      ],
+                      "type": "Collection",
+                      "update": [MockFunction],
+                      "updateScrollBottom": [MockFunction],
+                    },
+                    "patch": [MockFunction],
+                    "record": Object {},
+                    "reference": false,
+                    "row": 0,
+                    "save": [MockFunction],
+                    "update": [MockFunction],
+                    "width": 1,
+                  },
+                  "type": "Item::TextItem",
+                },
+                "maxWidth": 1,
+                "order": 0,
+                "patch": [MockFunction],
+                "record": Object {
+                  "breadcrumb": Array [
+                    Array [
+                      "collections",
+                      1,
+                      "Some collection",
+                    ],
+                    Array [
+                      "items",
+                      1,
+                      "my item",
+                    ],
+                  ],
+                  "can_edit": false,
+                  "can_view": true,
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
+                  "fullyLoaded": true,
+                  "id": "1",
+                  "inherited_tag_list": Array [],
+                  "internalType": "items",
+                  "name": "My Cool Item",
+                  "parentPath": "/",
+                  "parent_collection_card": Object {
+                    "API_archive": [MockFunction],
+                    "API_create": [MockFunction],
+                    "API_linkToMyCollection": [MockFunction],
+                    "assign": [MockFunction],
+                    "assignRef": [MockFunction],
+                    "beginReplacing": [MockFunction],
+                    "col": 1,
+                    "create": [MockFunction],
+                    "disableMenu": [MockFunction],
+                    "height": 1,
+                    "id": "11",
+                    "image_contain": false,
+                    "item": Object {},
+                    "maxHeight": 1,
+                    "maxWidth": 1,
+                    "order": 1,
+                    "parentCollection": Object {
+                      "API_archive": [MockFunction],
+                      "API_batchUpdateCards": [MockFunction],
+                      "API_batchUpdateCardsWithUndo": [MockFunction],
+                      "API_clearCollectionCover": [MockFunction],
+                      "API_fetchCards": [MockFunction],
+                      "API_getNextAvailableTest": [MockFunction],
+                      "API_updateCard": [MockFunction],
+                      "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
+                      "assign": [MockFunction],
+                      "assignRef": [MockFunction],
+                      "breadcrumb": Array [],
+                      "can_edit": false,
+                      "can_edit_content": false,
+                      "can_view": true,
+                      "cardIds": Array [
+                        "10",
+                        "10",
+                        "10",
+                      ],
+                      "cardIdsWithinRectangle": [MockFunction],
+                      "cardProperties": Array [],
+                      "card_order": "order",
+                      "checkCurrentOrg": [MockFunction],
+                      "collection_cards": [Circular],
+                      "confirmEdit": [MockFunction],
+                      "cover": Object {
+                        "image_url": "http://fake.url.net",
+                        "name": "Proto-typo",
+                        "text": "Lorem ipsum blockchain boogie",
+                      },
+                      "create": [MockFunction],
+                      "disableMenu": [MockFunction],
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "collections",
+                      "isCollection": true,
+                      "isNormalCollection": true,
+                      "isSharedCollection": false,
+                      "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
+                      "master_template": false,
+                      "meta": Object {
+                        "snapshot": Object {
+                          "can_edit": false,
+                        },
+                      },
+                      "name": "My Workspace X",
+                      "num_survey_responses": 0,
+                      "parent_collection_card": [Circular],
+                      "patch": [MockFunction],
+                      "roles": Array [],
+                      "save": [MockFunction],
+                      "sortedCards": [Circular],
+                      "tag_list": Array [
+                        "prototype",
+                        "blockchain",
+                      ],
+                      "type": "Collection",
+                      "update": [MockFunction],
+                      "updateScrollBottom": [MockFunction],
+                    },
+                    "patch": [MockFunction],
+                    "record": Object {},
+                    "reference": false,
+                    "row": 0,
+                    "save": [MockFunction],
+                    "update": [MockFunction],
+                    "width": 1,
+                  },
+                  "type": "Item::TextItem",
+                },
+                "save": [MockFunction],
+                "update": [MockFunction],
+                "width": 1,
+              },
+            ],
+            "confirmEdit": [MockFunction],
+            "cover": Object {
+              "image_url": "http://fake.url.net",
+              "name": "Proto-typo",
+              "text": "Lorem ipsum blockchain boogie",
+            },
+            "create": [MockFunction],
+            "disableMenu": [MockFunction],
+            "id": "1",
+            "inherited_tag_list": Array [],
+            "internalType": "collections",
+            "isCollection": true,
+            "isNormalCollection": true,
+            "isSharedCollection": false,
+            "isUserCollection": false,
+            "links": Object {
+              "self": "https://www.shape.space/ideo/collections/1",
+            },
+            "master_template": false,
+            "meta": Object {
+              "snapshot": Object {
+                "can_edit": false,
+              },
+            },
+            "name": "My Workspace X",
+            "num_survey_responses": 0,
+            "parent_collection_card": Object {
+              "API_archive": [MockFunction],
+              "API_create": [MockFunction],
+              "API_linkToMyCollection": [MockFunction],
+              "assign": [MockFunction],
+              "assignRef": [MockFunction],
+              "beginReplacing": [MockFunction],
+              "col": 1,
+              "create": [MockFunction],
+              "disableMenu": [MockFunction],
+              "height": 1,
+              "id": "11",
+              "image_contain": false,
+              "item": Object {},
+              "maxHeight": 1,
+              "maxWidth": 1,
+              "order": 1,
+              "parentCollection": Object {
+                "API_archive": [MockFunction],
+                "API_batchUpdateCards": [MockFunction],
+                "API_batchUpdateCardsWithUndo": [MockFunction],
+                "API_clearCollectionCover": [MockFunction],
+                "API_fetchCards": [MockFunction],
+                "API_getNextAvailableTest": [MockFunction],
+                "API_updateCard": [MockFunction],
+                "API_updateName": [MockFunction],
+                "anyone_can_join": false,
+                "anyone_can_view": false,
+                "assign": [MockFunction],
+                "assignRef": [MockFunction],
+                "breadcrumb": Array [],
+                "can_edit": false,
+                "can_edit_content": false,
+                "can_view": true,
+                "cardIds": Array [
+                  "10",
+                  "10",
+                  "10",
+                ],
+                "cardIdsWithinRectangle": [MockFunction],
+                "cardProperties": Array [],
+                "card_order": "order",
+                "checkCurrentOrg": [MockFunction],
+                "collection_cards": Array [
+                  Object {
+                    "API_archive": [MockFunction],
+                    "API_create": [MockFunction],
+                    "API_linkToMyCollection": [MockFunction],
+                    "assign": [MockFunction],
+                    "assignRef": [MockFunction],
+                    "card_question_type": "question_useful",
+                    "create": [MockFunction],
+                    "disableMenu": [MockFunction],
+                    "height": 1,
+                    "id": "10",
+                    "image_contain": false,
+                    "item": Object {
+                      "breadcrumb": Array [
+                        Array [
+                          "collections",
+                          1,
+                          "Some collection",
+                        ],
+                        Array [
+                          "items",
+                          1,
+                          "my item",
+                        ],
+                      ],
+                      "can_edit": false,
+                      "can_view": true,
+                      "data_content": Object {
+                        "ops": Array [
+                          Object {
+                            "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                          },
+                        ],
+                        "version": 1,
+                      },
+                      "fullyLoaded": true,
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "items",
+                      "name": "My Cool Item",
+                      "parentPath": "/",
+                      "parent_collection_card": [Circular],
+                      "type": "Item::TextItem",
+                    },
+                    "maxWidth": 1,
+                    "order": 0,
+                    "patch": [MockFunction],
+                    "record": Object {
+                      "breadcrumb": Array [
+                        Array [
+                          "collections",
+                          1,
+                          "Some collection",
+                        ],
+                        Array [
+                          "items",
+                          1,
+                          "my item",
+                        ],
+                      ],
+                      "can_edit": false,
+                      "can_view": true,
+                      "data_content": Object {
+                        "ops": Array [
+                          Object {
+                            "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                          },
+                        ],
+                        "version": 1,
+                      },
+                      "fullyLoaded": true,
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "items",
+                      "name": "My Cool Item",
+                      "parentPath": "/",
+                      "parent_collection_card": [Circular],
+                      "type": "Item::TextItem",
+                    },
+                    "save": [MockFunction],
+                    "update": [MockFunction],
+                    "width": 1,
+                  },
+                  Object {
+                    "API_archive": [MockFunction],
+                    "API_create": [MockFunction],
+                    "API_linkToMyCollection": [MockFunction],
+                    "assign": [MockFunction],
+                    "assignRef": [MockFunction],
+                    "card_question_type": "question_useful",
+                    "create": [MockFunction],
+                    "disableMenu": [MockFunction],
+                    "height": 1,
+                    "id": "10",
+                    "image_contain": false,
+                    "item": Object {
+                      "breadcrumb": Array [
+                        Array [
+                          "collections",
+                          1,
+                          "Some collection",
+                        ],
+                        Array [
+                          "items",
+                          1,
+                          "my item",
+                        ],
+                      ],
+                      "can_edit": false,
+                      "can_view": true,
+                      "data_content": Object {
+                        "ops": Array [
+                          Object {
+                            "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                          },
+                        ],
+                        "version": 1,
+                      },
+                      "fullyLoaded": true,
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "items",
+                      "name": "My Cool Item",
+                      "parentPath": "/",
+                      "parent_collection_card": [Circular],
+                      "type": "Item::TextItem",
+                    },
+                    "maxWidth": 1,
+                    "order": 0,
+                    "patch": [MockFunction],
+                    "record": Object {
+                      "breadcrumb": Array [
+                        Array [
+                          "collections",
+                          1,
+                          "Some collection",
+                        ],
+                        Array [
+                          "items",
+                          1,
+                          "my item",
+                        ],
+                      ],
+                      "can_edit": false,
+                      "can_view": true,
+                      "data_content": Object {
+                        "ops": Array [
+                          Object {
+                            "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                          },
+                        ],
+                        "version": 1,
+                      },
+                      "fullyLoaded": true,
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "items",
+                      "name": "My Cool Item",
+                      "parentPath": "/",
+                      "parent_collection_card": [Circular],
+                      "type": "Item::TextItem",
+                    },
+                    "save": [MockFunction],
+                    "update": [MockFunction],
+                    "width": 1,
+                  },
+                  Object {
+                    "API_archive": [MockFunction],
+                    "API_create": [MockFunction],
+                    "API_linkToMyCollection": [MockFunction],
+                    "assign": [MockFunction],
+                    "assignRef": [MockFunction],
+                    "card_question_type": "question_useful",
+                    "create": [MockFunction],
+                    "disableMenu": [MockFunction],
+                    "height": 1,
+                    "id": "10",
+                    "image_contain": false,
+                    "item": Object {
+                      "breadcrumb": Array [
+                        Array [
+                          "collections",
+                          1,
+                          "Some collection",
+                        ],
+                        Array [
+                          "items",
+                          1,
+                          "my item",
+                        ],
+                      ],
+                      "can_edit": false,
+                      "can_view": true,
+                      "data_content": Object {
+                        "ops": Array [
+                          Object {
+                            "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                          },
+                        ],
+                        "version": 1,
+                      },
+                      "fullyLoaded": true,
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "items",
+                      "name": "My Cool Item",
+                      "parentPath": "/",
+                      "parent_collection_card": [Circular],
+                      "type": "Item::TextItem",
+                    },
+                    "maxWidth": 1,
+                    "order": 0,
+                    "patch": [MockFunction],
+                    "record": Object {
+                      "breadcrumb": Array [
+                        Array [
+                          "collections",
+                          1,
+                          "Some collection",
+                        ],
+                        Array [
+                          "items",
+                          1,
+                          "my item",
+                        ],
+                      ],
+                      "can_edit": false,
+                      "can_view": true,
+                      "data_content": Object {
+                        "ops": Array [
+                          Object {
+                            "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                          },
+                        ],
+                        "version": 1,
+                      },
+                      "fullyLoaded": true,
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "items",
+                      "name": "My Cool Item",
+                      "parentPath": "/",
+                      "parent_collection_card": [Circular],
+                      "type": "Item::TextItem",
+                    },
+                    "save": [MockFunction],
+                    "update": [MockFunction],
+                    "width": 1,
+                  },
+                ],
+                "confirmEdit": [MockFunction],
+                "cover": Object {
+                  "image_url": "http://fake.url.net",
+                  "name": "Proto-typo",
+                  "text": "Lorem ipsum blockchain boogie",
+                },
+                "create": [MockFunction],
+                "disableMenu": [MockFunction],
+                "id": "1",
+                "inherited_tag_list": Array [],
+                "internalType": "collections",
+                "isCollection": true,
+                "isNormalCollection": true,
+                "isSharedCollection": false,
+                "isUserCollection": false,
+                "links": Object {
+                  "self": "https://www.shape.space/ideo/collections/1",
+                },
+                "master_template": false,
+                "meta": Object {
+                  "snapshot": Object {
+                    "can_edit": false,
+                  },
+                },
+                "name": "My Workspace X",
+                "num_survey_responses": 0,
+                "parent_collection_card": [Circular],
+                "patch": [MockFunction],
+                "roles": Array [],
+                "save": [MockFunction],
+                "sortedCards": Array [
+                  Object {
+                    "API_archive": [MockFunction],
+                    "API_create": [MockFunction],
+                    "API_linkToMyCollection": [MockFunction],
+                    "assign": [MockFunction],
+                    "assignRef": [MockFunction],
+                    "card_question_type": "question_useful",
+                    "create": [MockFunction],
+                    "disableMenu": [MockFunction],
+                    "height": 1,
+                    "id": "10",
+                    "image_contain": false,
+                    "item": Object {
+                      "breadcrumb": Array [
+                        Array [
+                          "collections",
+                          1,
+                          "Some collection",
+                        ],
+                        Array [
+                          "items",
+                          1,
+                          "my item",
+                        ],
+                      ],
+                      "can_edit": false,
+                      "can_view": true,
+                      "data_content": Object {
+                        "ops": Array [
+                          Object {
+                            "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                          },
+                        ],
+                        "version": 1,
+                      },
+                      "fullyLoaded": true,
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "items",
+                      "name": "My Cool Item",
+                      "parentPath": "/",
+                      "parent_collection_card": [Circular],
+                      "type": "Item::TextItem",
+                    },
+                    "maxWidth": 1,
+                    "order": 0,
+                    "patch": [MockFunction],
+                    "record": Object {
+                      "breadcrumb": Array [
+                        Array [
+                          "collections",
+                          1,
+                          "Some collection",
+                        ],
+                        Array [
+                          "items",
+                          1,
+                          "my item",
+                        ],
+                      ],
+                      "can_edit": false,
+                      "can_view": true,
+                      "data_content": Object {
+                        "ops": Array [
+                          Object {
+                            "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                          },
+                        ],
+                        "version": 1,
+                      },
+                      "fullyLoaded": true,
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "items",
+                      "name": "My Cool Item",
+                      "parentPath": "/",
+                      "parent_collection_card": [Circular],
+                      "type": "Item::TextItem",
+                    },
+                    "save": [MockFunction],
+                    "update": [MockFunction],
+                    "width": 1,
+                  },
+                  Object {
+                    "API_archive": [MockFunction],
+                    "API_create": [MockFunction],
+                    "API_linkToMyCollection": [MockFunction],
+                    "assign": [MockFunction],
+                    "assignRef": [MockFunction],
+                    "card_question_type": "question_useful",
+                    "create": [MockFunction],
+                    "disableMenu": [MockFunction],
+                    "height": 1,
+                    "id": "10",
+                    "image_contain": false,
+                    "item": Object {
+                      "breadcrumb": Array [
+                        Array [
+                          "collections",
+                          1,
+                          "Some collection",
+                        ],
+                        Array [
+                          "items",
+                          1,
+                          "my item",
+                        ],
+                      ],
+                      "can_edit": false,
+                      "can_view": true,
+                      "data_content": Object {
+                        "ops": Array [
+                          Object {
+                            "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                          },
+                        ],
+                        "version": 1,
+                      },
+                      "fullyLoaded": true,
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "items",
+                      "name": "My Cool Item",
+                      "parentPath": "/",
+                      "parent_collection_card": [Circular],
+                      "type": "Item::TextItem",
+                    },
+                    "maxWidth": 1,
+                    "order": 0,
+                    "patch": [MockFunction],
+                    "record": Object {
+                      "breadcrumb": Array [
+                        Array [
+                          "collections",
+                          1,
+                          "Some collection",
+                        ],
+                        Array [
+                          "items",
+                          1,
+                          "my item",
+                        ],
+                      ],
+                      "can_edit": false,
+                      "can_view": true,
+                      "data_content": Object {
+                        "ops": Array [
+                          Object {
+                            "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                          },
+                        ],
+                        "version": 1,
+                      },
+                      "fullyLoaded": true,
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "items",
+                      "name": "My Cool Item",
+                      "parentPath": "/",
+                      "parent_collection_card": [Circular],
+                      "type": "Item::TextItem",
+                    },
+                    "save": [MockFunction],
+                    "update": [MockFunction],
+                    "width": 1,
+                  },
+                  Object {
+                    "API_archive": [MockFunction],
+                    "API_create": [MockFunction],
+                    "API_linkToMyCollection": [MockFunction],
+                    "assign": [MockFunction],
+                    "assignRef": [MockFunction],
+                    "card_question_type": "question_useful",
+                    "create": [MockFunction],
+                    "disableMenu": [MockFunction],
+                    "height": 1,
+                    "id": "10",
+                    "image_contain": false,
+                    "item": Object {
+                      "breadcrumb": Array [
+                        Array [
+                          "collections",
+                          1,
+                          "Some collection",
+                        ],
+                        Array [
+                          "items",
+                          1,
+                          "my item",
+                        ],
+                      ],
+                      "can_edit": false,
+                      "can_view": true,
+                      "data_content": Object {
+                        "ops": Array [
+                          Object {
+                            "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                          },
+                        ],
+                        "version": 1,
+                      },
+                      "fullyLoaded": true,
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "items",
+                      "name": "My Cool Item",
+                      "parentPath": "/",
+                      "parent_collection_card": [Circular],
+                      "type": "Item::TextItem",
+                    },
+                    "maxWidth": 1,
+                    "order": 0,
+                    "patch": [MockFunction],
+                    "record": Object {
+                      "breadcrumb": Array [
+                        Array [
+                          "collections",
+                          1,
+                          "Some collection",
+                        ],
+                        Array [
+                          "items",
+                          1,
+                          "my item",
+                        ],
+                      ],
+                      "can_edit": false,
+                      "can_view": true,
+                      "data_content": Object {
+                        "ops": Array [
+                          Object {
+                            "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                          },
+                        ],
+                        "version": 1,
+                      },
+                      "fullyLoaded": true,
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "items",
+                      "name": "My Cool Item",
+                      "parentPath": "/",
+                      "parent_collection_card": [Circular],
+                      "type": "Item::TextItem",
+                    },
+                    "save": [MockFunction],
+                    "update": [MockFunction],
+                    "width": 1,
+                  },
+                ],
+                "tag_list": Array [
+                  "prototype",
+                  "blockchain",
+                ],
+                "type": "Collection",
+                "update": [MockFunction],
+                "updateScrollBottom": [MockFunction],
+              },
+              "patch": [MockFunction],
+              "record": Object {},
+              "reference": false,
+              "row": 0,
+              "save": [MockFunction],
+              "update": [MockFunction],
+              "width": 1,
+            },
+            "patch": [MockFunction],
+            "roles": Array [],
+            "save": [MockFunction],
+            "sortedCards": Array [
+              Object {
+                "API_archive": [MockFunction],
+                "API_create": [MockFunction],
+                "API_linkToMyCollection": [MockFunction],
+                "assign": [MockFunction],
+                "assignRef": [MockFunction],
+                "card_question_type": "question_useful",
+                "create": [MockFunction],
+                "disableMenu": [MockFunction],
+                "height": 1,
+                "id": "10",
+                "image_contain": false,
+                "item": Object {
+                  "breadcrumb": Array [
+                    Array [
+                      "collections",
+                      1,
+                      "Some collection",
+                    ],
+                    Array [
+                      "items",
+                      1,
+                      "my item",
+                    ],
+                  ],
+                  "can_edit": false,
+                  "can_view": true,
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
+                  "fullyLoaded": true,
+                  "id": "1",
+                  "inherited_tag_list": Array [],
+                  "internalType": "items",
+                  "name": "My Cool Item",
+                  "parentPath": "/",
+                  "parent_collection_card": Object {
+                    "API_archive": [MockFunction],
+                    "API_create": [MockFunction],
+                    "API_linkToMyCollection": [MockFunction],
+                    "assign": [MockFunction],
+                    "assignRef": [MockFunction],
+                    "beginReplacing": [MockFunction],
+                    "col": 1,
+                    "create": [MockFunction],
+                    "disableMenu": [MockFunction],
+                    "height": 1,
+                    "id": "11",
+                    "image_contain": false,
+                    "item": Object {},
+                    "maxHeight": 1,
+                    "maxWidth": 1,
+                    "order": 1,
+                    "parentCollection": Object {
+                      "API_archive": [MockFunction],
+                      "API_batchUpdateCards": [MockFunction],
+                      "API_batchUpdateCardsWithUndo": [MockFunction],
+                      "API_clearCollectionCover": [MockFunction],
+                      "API_fetchCards": [MockFunction],
+                      "API_getNextAvailableTest": [MockFunction],
+                      "API_updateCard": [MockFunction],
+                      "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
+                      "assign": [MockFunction],
+                      "assignRef": [MockFunction],
+                      "breadcrumb": Array [],
+                      "can_edit": false,
+                      "can_edit_content": false,
+                      "can_view": true,
+                      "cardIds": Array [
+                        "10",
+                        "10",
+                        "10",
+                      ],
+                      "cardIdsWithinRectangle": [MockFunction],
+                      "cardProperties": Array [],
+                      "card_order": "order",
+                      "checkCurrentOrg": [MockFunction],
+                      "collection_cards": [Circular],
+                      "confirmEdit": [MockFunction],
+                      "cover": Object {
+                        "image_url": "http://fake.url.net",
+                        "name": "Proto-typo",
+                        "text": "Lorem ipsum blockchain boogie",
+                      },
+                      "create": [MockFunction],
+                      "disableMenu": [MockFunction],
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "collections",
+                      "isCollection": true,
+                      "isNormalCollection": true,
+                      "isSharedCollection": false,
+                      "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
+                      "master_template": false,
+                      "meta": Object {
+                        "snapshot": Object {
+                          "can_edit": false,
+                        },
+                      },
+                      "name": "My Workspace X",
+                      "num_survey_responses": 0,
+                      "parent_collection_card": [Circular],
+                      "patch": [MockFunction],
+                      "roles": Array [],
+                      "save": [MockFunction],
+                      "sortedCards": [Circular],
+                      "tag_list": Array [
+                        "prototype",
+                        "blockchain",
+                      ],
+                      "type": "Collection",
+                      "update": [MockFunction],
+                      "updateScrollBottom": [MockFunction],
+                    },
+                    "patch": [MockFunction],
+                    "record": Object {},
+                    "reference": false,
+                    "row": 0,
+                    "save": [MockFunction],
+                    "update": [MockFunction],
+                    "width": 1,
+                  },
+                  "type": "Item::TextItem",
+                },
+                "maxWidth": 1,
+                "order": 0,
+                "patch": [MockFunction],
+                "record": Object {
+                  "breadcrumb": Array [
+                    Array [
+                      "collections",
+                      1,
+                      "Some collection",
+                    ],
+                    Array [
+                      "items",
+                      1,
+                      "my item",
+                    ],
+                  ],
+                  "can_edit": false,
+                  "can_view": true,
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
+                  "fullyLoaded": true,
+                  "id": "1",
+                  "inherited_tag_list": Array [],
+                  "internalType": "items",
+                  "name": "My Cool Item",
+                  "parentPath": "/",
+                  "parent_collection_card": Object {
+                    "API_archive": [MockFunction],
+                    "API_create": [MockFunction],
+                    "API_linkToMyCollection": [MockFunction],
+                    "assign": [MockFunction],
+                    "assignRef": [MockFunction],
+                    "beginReplacing": [MockFunction],
+                    "col": 1,
+                    "create": [MockFunction],
+                    "disableMenu": [MockFunction],
+                    "height": 1,
+                    "id": "11",
+                    "image_contain": false,
+                    "item": Object {},
+                    "maxHeight": 1,
+                    "maxWidth": 1,
+                    "order": 1,
+                    "parentCollection": Object {
+                      "API_archive": [MockFunction],
+                      "API_batchUpdateCards": [MockFunction],
+                      "API_batchUpdateCardsWithUndo": [MockFunction],
+                      "API_clearCollectionCover": [MockFunction],
+                      "API_fetchCards": [MockFunction],
+                      "API_getNextAvailableTest": [MockFunction],
+                      "API_updateCard": [MockFunction],
+                      "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
+                      "assign": [MockFunction],
+                      "assignRef": [MockFunction],
+                      "breadcrumb": Array [],
+                      "can_edit": false,
+                      "can_edit_content": false,
+                      "can_view": true,
+                      "cardIds": Array [
+                        "10",
+                        "10",
+                        "10",
+                      ],
+                      "cardIdsWithinRectangle": [MockFunction],
+                      "cardProperties": Array [],
+                      "card_order": "order",
+                      "checkCurrentOrg": [MockFunction],
+                      "collection_cards": [Circular],
+                      "confirmEdit": [MockFunction],
+                      "cover": Object {
+                        "image_url": "http://fake.url.net",
+                        "name": "Proto-typo",
+                        "text": "Lorem ipsum blockchain boogie",
+                      },
+                      "create": [MockFunction],
+                      "disableMenu": [MockFunction],
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "collections",
+                      "isCollection": true,
+                      "isNormalCollection": true,
+                      "isSharedCollection": false,
+                      "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
+                      "master_template": false,
+                      "meta": Object {
+                        "snapshot": Object {
+                          "can_edit": false,
+                        },
+                      },
+                      "name": "My Workspace X",
+                      "num_survey_responses": 0,
+                      "parent_collection_card": [Circular],
+                      "patch": [MockFunction],
+                      "roles": Array [],
+                      "save": [MockFunction],
+                      "sortedCards": [Circular],
+                      "tag_list": Array [
+                        "prototype",
+                        "blockchain",
+                      ],
+                      "type": "Collection",
+                      "update": [MockFunction],
+                      "updateScrollBottom": [MockFunction],
+                    },
+                    "patch": [MockFunction],
+                    "record": Object {},
+                    "reference": false,
+                    "row": 0,
+                    "save": [MockFunction],
+                    "update": [MockFunction],
+                    "width": 1,
+                  },
+                  "type": "Item::TextItem",
+                },
+                "save": [MockFunction],
+                "update": [MockFunction],
+                "width": 1,
+              },
+              Object {
+                "API_archive": [MockFunction],
+                "API_create": [MockFunction],
+                "API_linkToMyCollection": [MockFunction],
+                "assign": [MockFunction],
+                "assignRef": [MockFunction],
+                "card_question_type": "question_useful",
+                "create": [MockFunction],
+                "disableMenu": [MockFunction],
+                "height": 1,
+                "id": "10",
+                "image_contain": false,
+                "item": Object {
+                  "breadcrumb": Array [
+                    Array [
+                      "collections",
+                      1,
+                      "Some collection",
+                    ],
+                    Array [
+                      "items",
+                      1,
+                      "my item",
+                    ],
+                  ],
+                  "can_edit": false,
+                  "can_view": true,
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
+                  "fullyLoaded": true,
+                  "id": "1",
+                  "inherited_tag_list": Array [],
+                  "internalType": "items",
+                  "name": "My Cool Item",
+                  "parentPath": "/",
+                  "parent_collection_card": Object {
+                    "API_archive": [MockFunction],
+                    "API_create": [MockFunction],
+                    "API_linkToMyCollection": [MockFunction],
+                    "assign": [MockFunction],
+                    "assignRef": [MockFunction],
+                    "beginReplacing": [MockFunction],
+                    "col": 1,
+                    "create": [MockFunction],
+                    "disableMenu": [MockFunction],
+                    "height": 1,
+                    "id": "11",
+                    "image_contain": false,
+                    "item": Object {},
+                    "maxHeight": 1,
+                    "maxWidth": 1,
+                    "order": 1,
+                    "parentCollection": Object {
+                      "API_archive": [MockFunction],
+                      "API_batchUpdateCards": [MockFunction],
+                      "API_batchUpdateCardsWithUndo": [MockFunction],
+                      "API_clearCollectionCover": [MockFunction],
+                      "API_fetchCards": [MockFunction],
+                      "API_getNextAvailableTest": [MockFunction],
+                      "API_updateCard": [MockFunction],
+                      "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
+                      "assign": [MockFunction],
+                      "assignRef": [MockFunction],
+                      "breadcrumb": Array [],
+                      "can_edit": false,
+                      "can_edit_content": false,
+                      "can_view": true,
+                      "cardIds": Array [
+                        "10",
+                        "10",
+                        "10",
+                      ],
+                      "cardIdsWithinRectangle": [MockFunction],
+                      "cardProperties": Array [],
+                      "card_order": "order",
+                      "checkCurrentOrg": [MockFunction],
+                      "collection_cards": [Circular],
+                      "confirmEdit": [MockFunction],
+                      "cover": Object {
+                        "image_url": "http://fake.url.net",
+                        "name": "Proto-typo",
+                        "text": "Lorem ipsum blockchain boogie",
+                      },
+                      "create": [MockFunction],
+                      "disableMenu": [MockFunction],
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "collections",
+                      "isCollection": true,
+                      "isNormalCollection": true,
+                      "isSharedCollection": false,
+                      "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
+                      "master_template": false,
+                      "meta": Object {
+                        "snapshot": Object {
+                          "can_edit": false,
+                        },
+                      },
+                      "name": "My Workspace X",
+                      "num_survey_responses": 0,
+                      "parent_collection_card": [Circular],
+                      "patch": [MockFunction],
+                      "roles": Array [],
+                      "save": [MockFunction],
+                      "sortedCards": [Circular],
+                      "tag_list": Array [
+                        "prototype",
+                        "blockchain",
+                      ],
+                      "type": "Collection",
+                      "update": [MockFunction],
+                      "updateScrollBottom": [MockFunction],
+                    },
+                    "patch": [MockFunction],
+                    "record": Object {},
+                    "reference": false,
+                    "row": 0,
+                    "save": [MockFunction],
+                    "update": [MockFunction],
+                    "width": 1,
+                  },
+                  "type": "Item::TextItem",
+                },
+                "maxWidth": 1,
+                "order": 0,
+                "patch": [MockFunction],
+                "record": Object {
+                  "breadcrumb": Array [
+                    Array [
+                      "collections",
+                      1,
+                      "Some collection",
+                    ],
+                    Array [
+                      "items",
+                      1,
+                      "my item",
+                    ],
+                  ],
+                  "can_edit": false,
+                  "can_view": true,
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
+                  "fullyLoaded": true,
+                  "id": "1",
+                  "inherited_tag_list": Array [],
+                  "internalType": "items",
+                  "name": "My Cool Item",
+                  "parentPath": "/",
+                  "parent_collection_card": Object {
+                    "API_archive": [MockFunction],
+                    "API_create": [MockFunction],
+                    "API_linkToMyCollection": [MockFunction],
+                    "assign": [MockFunction],
+                    "assignRef": [MockFunction],
+                    "beginReplacing": [MockFunction],
+                    "col": 1,
+                    "create": [MockFunction],
+                    "disableMenu": [MockFunction],
+                    "height": 1,
+                    "id": "11",
+                    "image_contain": false,
+                    "item": Object {},
+                    "maxHeight": 1,
+                    "maxWidth": 1,
+                    "order": 1,
+                    "parentCollection": Object {
+                      "API_archive": [MockFunction],
+                      "API_batchUpdateCards": [MockFunction],
+                      "API_batchUpdateCardsWithUndo": [MockFunction],
+                      "API_clearCollectionCover": [MockFunction],
+                      "API_fetchCards": [MockFunction],
+                      "API_getNextAvailableTest": [MockFunction],
+                      "API_updateCard": [MockFunction],
+                      "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
+                      "assign": [MockFunction],
+                      "assignRef": [MockFunction],
+                      "breadcrumb": Array [],
+                      "can_edit": false,
+                      "can_edit_content": false,
+                      "can_view": true,
+                      "cardIds": Array [
+                        "10",
+                        "10",
+                        "10",
+                      ],
+                      "cardIdsWithinRectangle": [MockFunction],
+                      "cardProperties": Array [],
+                      "card_order": "order",
+                      "checkCurrentOrg": [MockFunction],
+                      "collection_cards": [Circular],
+                      "confirmEdit": [MockFunction],
+                      "cover": Object {
+                        "image_url": "http://fake.url.net",
+                        "name": "Proto-typo",
+                        "text": "Lorem ipsum blockchain boogie",
+                      },
+                      "create": [MockFunction],
+                      "disableMenu": [MockFunction],
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "collections",
+                      "isCollection": true,
+                      "isNormalCollection": true,
+                      "isSharedCollection": false,
+                      "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
+                      "master_template": false,
+                      "meta": Object {
+                        "snapshot": Object {
+                          "can_edit": false,
+                        },
+                      },
+                      "name": "My Workspace X",
+                      "num_survey_responses": 0,
+                      "parent_collection_card": [Circular],
+                      "patch": [MockFunction],
+                      "roles": Array [],
+                      "save": [MockFunction],
+                      "sortedCards": [Circular],
+                      "tag_list": Array [
+                        "prototype",
+                        "blockchain",
+                      ],
+                      "type": "Collection",
+                      "update": [MockFunction],
+                      "updateScrollBottom": [MockFunction],
+                    },
+                    "patch": [MockFunction],
+                    "record": Object {},
+                    "reference": false,
+                    "row": 0,
+                    "save": [MockFunction],
+                    "update": [MockFunction],
+                    "width": 1,
+                  },
+                  "type": "Item::TextItem",
+                },
+                "save": [MockFunction],
+                "update": [MockFunction],
+                "width": 1,
+              },
+              Object {
+                "API_archive": [MockFunction],
+                "API_create": [MockFunction],
+                "API_linkToMyCollection": [MockFunction],
+                "assign": [MockFunction],
+                "assignRef": [MockFunction],
+                "card_question_type": "question_useful",
+                "create": [MockFunction],
+                "disableMenu": [MockFunction],
+                "height": 1,
+                "id": "10",
+                "image_contain": false,
+                "item": Object {
+                  "breadcrumb": Array [
+                    Array [
+                      "collections",
+                      1,
+                      "Some collection",
+                    ],
+                    Array [
+                      "items",
+                      1,
+                      "my item",
+                    ],
+                  ],
+                  "can_edit": false,
+                  "can_view": true,
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
+                  "fullyLoaded": true,
+                  "id": "1",
+                  "inherited_tag_list": Array [],
+                  "internalType": "items",
+                  "name": "My Cool Item",
+                  "parentPath": "/",
+                  "parent_collection_card": Object {
+                    "API_archive": [MockFunction],
+                    "API_create": [MockFunction],
+                    "API_linkToMyCollection": [MockFunction],
+                    "assign": [MockFunction],
+                    "assignRef": [MockFunction],
+                    "beginReplacing": [MockFunction],
+                    "col": 1,
+                    "create": [MockFunction],
+                    "disableMenu": [MockFunction],
+                    "height": 1,
+                    "id": "11",
+                    "image_contain": false,
+                    "item": Object {},
+                    "maxHeight": 1,
+                    "maxWidth": 1,
+                    "order": 1,
+                    "parentCollection": Object {
+                      "API_archive": [MockFunction],
+                      "API_batchUpdateCards": [MockFunction],
+                      "API_batchUpdateCardsWithUndo": [MockFunction],
+                      "API_clearCollectionCover": [MockFunction],
+                      "API_fetchCards": [MockFunction],
+                      "API_getNextAvailableTest": [MockFunction],
+                      "API_updateCard": [MockFunction],
+                      "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
+                      "assign": [MockFunction],
+                      "assignRef": [MockFunction],
+                      "breadcrumb": Array [],
+                      "can_edit": false,
+                      "can_edit_content": false,
+                      "can_view": true,
+                      "cardIds": Array [
+                        "10",
+                        "10",
+                        "10",
+                      ],
+                      "cardIdsWithinRectangle": [MockFunction],
+                      "cardProperties": Array [],
+                      "card_order": "order",
+                      "checkCurrentOrg": [MockFunction],
+                      "collection_cards": [Circular],
+                      "confirmEdit": [MockFunction],
+                      "cover": Object {
+                        "image_url": "http://fake.url.net",
+                        "name": "Proto-typo",
+                        "text": "Lorem ipsum blockchain boogie",
+                      },
+                      "create": [MockFunction],
+                      "disableMenu": [MockFunction],
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "collections",
+                      "isCollection": true,
+                      "isNormalCollection": true,
+                      "isSharedCollection": false,
+                      "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
+                      "master_template": false,
+                      "meta": Object {
+                        "snapshot": Object {
+                          "can_edit": false,
+                        },
+                      },
+                      "name": "My Workspace X",
+                      "num_survey_responses": 0,
+                      "parent_collection_card": [Circular],
+                      "patch": [MockFunction],
+                      "roles": Array [],
+                      "save": [MockFunction],
+                      "sortedCards": [Circular],
+                      "tag_list": Array [
+                        "prototype",
+                        "blockchain",
+                      ],
+                      "type": "Collection",
+                      "update": [MockFunction],
+                      "updateScrollBottom": [MockFunction],
+                    },
+                    "patch": [MockFunction],
+                    "record": Object {},
+                    "reference": false,
+                    "row": 0,
+                    "save": [MockFunction],
+                    "update": [MockFunction],
+                    "width": 1,
+                  },
+                  "type": "Item::TextItem",
+                },
+                "maxWidth": 1,
+                "order": 0,
+                "patch": [MockFunction],
+                "record": Object {
+                  "breadcrumb": Array [
+                    Array [
+                      "collections",
+                      1,
+                      "Some collection",
+                    ],
+                    Array [
+                      "items",
+                      1,
+                      "my item",
+                    ],
+                  ],
+                  "can_edit": false,
+                  "can_view": true,
+                  "data_content": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
+                      },
+                    ],
+                    "version": 1,
+                  },
+                  "fullyLoaded": true,
+                  "id": "1",
+                  "inherited_tag_list": Array [],
+                  "internalType": "items",
+                  "name": "My Cool Item",
+                  "parentPath": "/",
+                  "parent_collection_card": Object {
+                    "API_archive": [MockFunction],
+                    "API_create": [MockFunction],
+                    "API_linkToMyCollection": [MockFunction],
+                    "assign": [MockFunction],
+                    "assignRef": [MockFunction],
+                    "beginReplacing": [MockFunction],
+                    "col": 1,
+                    "create": [MockFunction],
+                    "disableMenu": [MockFunction],
+                    "height": 1,
+                    "id": "11",
+                    "image_contain": false,
+                    "item": Object {},
+                    "maxHeight": 1,
+                    "maxWidth": 1,
+                    "order": 1,
+                    "parentCollection": Object {
+                      "API_archive": [MockFunction],
+                      "API_batchUpdateCards": [MockFunction],
+                      "API_batchUpdateCardsWithUndo": [MockFunction],
+                      "API_clearCollectionCover": [MockFunction],
+                      "API_fetchCards": [MockFunction],
+                      "API_getNextAvailableTest": [MockFunction],
+                      "API_updateCard": [MockFunction],
+                      "API_updateName": [MockFunction],
+                      "anyone_can_join": false,
+                      "anyone_can_view": false,
+                      "assign": [MockFunction],
+                      "assignRef": [MockFunction],
+                      "breadcrumb": Array [],
+                      "can_edit": false,
+                      "can_edit_content": false,
+                      "can_view": true,
+                      "cardIds": Array [
+                        "10",
+                        "10",
+                        "10",
+                      ],
+                      "cardIdsWithinRectangle": [MockFunction],
+                      "cardProperties": Array [],
+                      "card_order": "order",
+                      "checkCurrentOrg": [MockFunction],
+                      "collection_cards": [Circular],
+                      "confirmEdit": [MockFunction],
+                      "cover": Object {
+                        "image_url": "http://fake.url.net",
+                        "name": "Proto-typo",
+                        "text": "Lorem ipsum blockchain boogie",
+                      },
+                      "create": [MockFunction],
+                      "disableMenu": [MockFunction],
+                      "id": "1",
+                      "inherited_tag_list": Array [],
+                      "internalType": "collections",
+                      "isCollection": true,
+                      "isNormalCollection": true,
+                      "isSharedCollection": false,
+                      "isUserCollection": false,
+                      "links": Object {
+                        "self": "https://www.shape.space/ideo/collections/1",
+                      },
+                      "master_template": false,
+                      "meta": Object {
+                        "snapshot": Object {
+                          "can_edit": false,
+                        },
+                      },
+                      "name": "My Workspace X",
+                      "num_survey_responses": 0,
+                      "parent_collection_card": [Circular],
+                      "patch": [MockFunction],
+                      "roles": Array [],
+                      "save": [MockFunction],
+                      "sortedCards": [Circular],
+                      "tag_list": Array [
+                        "prototype",
+                        "blockchain",
+                      ],
+                      "type": "Collection",
+                      "update": [MockFunction],
+                      "updateScrollBottom": [MockFunction],
+                    },
+                    "patch": [MockFunction],
+                    "record": Object {},
+                    "reference": false,
+                    "row": 0,
+                    "save": [MockFunction],
+                    "update": [MockFunction],
+                    "width": 1,
+                  },
+                  "type": "Item::TextItem",
+                },
+                "save": [MockFunction],
+                "update": [MockFunction],
+                "width": 1,
+              },
+            ],
+            "tag_list": Array [
+              "prototype",
+              "blockchain",
+            ],
+            "type": "Collection",
+            "update": [MockFunction],
+            "updateScrollBottom": [MockFunction],
+          }
+        }
+      />
+    </div>
+  </styled.div>
 </ThemeProvider>
 `;

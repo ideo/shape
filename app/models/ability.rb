@@ -84,6 +84,14 @@ class Ability
         # equivalent to comment_thread.record.can_view?
         comment_thread.can_edit?(user)
       end
+
+      can :read, Audience do |audience|
+        audience.can_view?(user)
+      end
+      can :manage, Audience do |audience|
+        audience.can_edit?(user)
+      end
+
       can %i[read manage], Comment do |comment|
         comment.can_edit?(user)
       end

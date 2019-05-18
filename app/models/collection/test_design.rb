@@ -4,6 +4,7 @@ class Collection
     delegate :can_reopen?,
              :launchable?,
              :live_or_was_launched?,
+             :gives_incentive?,
              :test_status,
              :collection_to_test,
              to: :test_collection
