@@ -218,7 +218,8 @@ class AudienceSettings extends React.Component {
           open={!!this.confirmPriceModalOpen}
           onSubmit={this.confirmPrice}
           close={this.closeConfirmPriceModal}
-          paymentMethod={{ last4: 1234, brand: 'Visa' }}
+          // TODO: pull in the real payment method from the network (brand / last4)
+          paymentMethod={null}
           organization={currentUserOrganization}
           totalPrice={this.totalPriceDollars}
           testName={testCollection.name}
@@ -234,10 +235,13 @@ class AudienceSettings extends React.Component {
         )}
         <FormButtonWrapper>
           <FormButton
+            data-cy="LaunchFormButton"
             disabled={uiStore.launchButtonLoading}
             onClick={this.submitSettings}
           >
-            Get Feedback
+            {testCollection.is_submission_box_template_test
+              ? 'Launch Tests'
+              : 'Get Feedback'}
           </FormButton>
         </FormButtonWrapper>
       </React.Fragment>

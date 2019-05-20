@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import {
   StyledRowFlexParent,
@@ -19,6 +20,7 @@ const AudienceCheckbox = ({
         labelPlacement={'end'}
         control={
           <Checkbox
+            data-cy={`audienceCheckbox-${_.kebabCase(audienceName)}`}
             id={`audienceCheckbox-${audienceId}`}
             checked={selected}
             onChange={onToggleCheckbox}

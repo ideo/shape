@@ -64,7 +64,7 @@ class ConfirmPriceModal extends React.Component {
   renderPaymentMethodToCharge() {
     const { paymentMethod, organization } = this.props
 
-    const message = this.isOrgAdmin
+    const message = paymentMethod
       ? `${paymentMethod.brand} ending in ${paymentMethod.last4} will be
             charged.`
       : `${organization.name}'s default payment method will be charged.`

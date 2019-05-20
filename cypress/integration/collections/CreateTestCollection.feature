@@ -16,7 +16,8 @@ Feature: Creating a Test Collection
     When I add a link URL
     And I add a test description
     And I add an open response question
-    When I click the "HeaderFormButton" containing "Get Feedback"
+    And I click the "audienceCheckbox-share-via-link"
+    When I click the "LaunchFormButton" containing "Get Feedback"
     And I wait for "@apiLaunchTest" to finish
     And I wait for 1 second
 
