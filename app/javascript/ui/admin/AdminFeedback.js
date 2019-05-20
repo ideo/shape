@@ -70,7 +70,7 @@ class AdminFeedback extends React.Component {
             {testCollection.test_audiences.map(testAudience => (
               <React.Fragment key={testAudience.id}>
                 <AudienceRowItem item xs={4}>
-                  Anybody
+                  {testAudience.audience.name}
                 </AudienceRowItem>
                 <AudienceRowItem item xs={4}>
                   <Flex justify="flex-end">12</Flex>

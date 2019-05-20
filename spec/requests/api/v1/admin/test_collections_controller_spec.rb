@@ -39,6 +39,10 @@ describe Api::V1::Admin::TestCollectionsController, type: :request, json: true, 
       actual_test_audience = json['included'][0]
       expect(actual_test_audience['id'].to_i).to eq(test_audience.id)
       expect(actual_test_audience['attributes']['sample_size']).to eq(test_audience.sample_size)
+
+      actual_audience = json['included'][1]
+      expect(actual_audience['id'].to_i).to eq(audience.id)
+      expect(actual_audience['attributes']['name']).to eq(audience.name)
     end
   end
 end
