@@ -3,7 +3,7 @@ class SerializableTestCollection < SerializableSimpleCollection
 
   has_many :test_audiences
 
-  attributes :test_status
+  attributes :test_status, :test_closed_at
 
   has_many :question_cards do
     data do

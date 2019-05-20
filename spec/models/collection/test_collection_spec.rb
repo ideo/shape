@@ -319,6 +319,14 @@ describe Collection::TestCollection, type: :model do
             end
           end
 
+          context 'with test_audience_params' do
+            it 'should call TestAudiencePurchaser' do
+              params = { some: 'params' }
+              expect(TestAudiencePurchaser).to receive(:call).with(test_collection, params)
+              test_collection.launch!(initiated_by: user, test_audience_params: params)
+            end
+          end
+
           describe '#serialized_for_test_survey' do
             before do
               test_collection.launch!(initiated_by: user)
@@ -350,9 +358,10 @@ describe Collection::TestCollection, type: :model do
           test_collection.launch!(initiated_by: user)
         end
 
-        it 'should set status as closed' do
+        it 'should set status as closed and set closed_at datetime' do
           expect(test_collection.close!).to be true
           expect(test_collection.closed?).to be true
+          expect(test_collection.test_closed_at).to be_within(1.second).of Time.current
         end
       end
 
@@ -367,8 +376,8 @@ describe Collection::TestCollection, type: :model do
           expect(test_collection.live?).to be true
         end
 
-        it 'should call the launch_test! method on itself with `reopening` param' do
-          expect(test_collection).to receive(:launch_test!).with(initiated_by: user, reopening: true)
+        it 'should call the post_launch_setup! method on itself with `reopening` param' do
+          expect(test_collection).to receive(:post_launch_setup!).with(initiated_by: user, reopening: true)
           test_collection.reopen!(initiated_by: user)
         end
       end
@@ -464,9 +473,14 @@ describe Collection::TestCollection, type: :model do
       it 'should find all submissions and close their tests' do
         expect(submission_test.test_status).to eq 'live'
         expect(submission.reload.submission_attrs['test_status']).to eq 'live'
+
         test_collection.close!
+
+        expect(test_collection.test_closed_at).to be_within(1.second).of Time.current
+
         submission.reload
         submission_test.reload
+
         expect(submission.submission_attrs['test_status']).to eq 'closed'
         expect(submission_test.test_status).to eq 'closed'
       end

@@ -11,7 +11,11 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
   end
 
   def launch
-    if @test_collection.launch!(initiated_by: current_user)
+    success = @test_collection.launch!(
+      initiated_by: current_user,
+      test_audience_params: json_api_params[:audiences],
+    )
+    if success
       render_collection
     else
       render_api_errors @test_collection.errors

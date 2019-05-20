@@ -58,6 +58,8 @@ class TestQuestion extends React.Component {
       if (!surveyResponse) {
         surveyResponse = await createSurveyResponse()
       }
+      // if creation fails due to test being closed, exit early
+      if (!surveyResponse) return
       // create new answer if we didn't have one
       questionAnswer = new QuestionAnswer(
         {

@@ -54,13 +54,17 @@ export const Heading3 = styled.h3`
 `
 Heading3.displayName = 'StyledHeading3'
 
-/** @component */
-export const DisplayText = styled.span`
+export const DisplayTextCss = css`
   color: ${props => props.color || v.colors.black};
   font-weight: ${v.weights.book};
   font-family: ${v.fonts.sans};
   font-size: 1rem;
   text-transform: none;
+`
+
+/** @component */
+export const DisplayText = styled.span`
+  ${DisplayTextCss};
 `
 DisplayText.displayName = 'StyledDisplayText'
 

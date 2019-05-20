@@ -191,33 +191,17 @@ class PageHeader extends React.Component {
 
   get launchTestButton() {
     const { record, uiStore } = this.props
-    if (
-      record.can_edit_content &&
-      (record.isDraftTest || record.isClosedTest)
-    ) {
-      if (record.isDraftTest) {
-        return (
-          <HeaderFormButton
-            onClick={record.launchTest}
-            disabled={uiStore.launchButtonLoading}
-          >
-            {record.is_submission_box_template_test
-              ? 'Launch Tests'
-              : 'Get Feedback'}
-          </HeaderFormButton>
-        )
-      } else if (record.isClosedTest) {
-        return (
-          <HeaderFormButton
-            onClick={record.reopenTest}
-            color={v.colors.transparent}
-            width="200"
-            disabled={uiStore.launchButtonLoading}
-          >
-            Re-open Feedback
-          </HeaderFormButton>
-        )
-      }
+    if (record.can_edit_content && record.isClosedTest) {
+      return (
+        <HeaderFormButton
+          onClick={record.reopenTest}
+          color={v.colors.transparent}
+          width="200"
+          disabled={uiStore.launchButtonLoading}
+        >
+          Re-open Feedback
+        </HeaderFormButton>
+      )
     }
     if (this.isCurrentlyHiddenSubmission) {
       return (

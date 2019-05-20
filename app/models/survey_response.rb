@@ -1,6 +1,7 @@
 class SurveyResponse < ApplicationRecord
   belongs_to :test_collection, class_name: 'Collection::TestCollection', touch: true
   belongs_to :user, optional: true
+  belongs_to :test_audience, optional: true
   has_many :question_answers, dependent: :destroy
   has_one :feedback_incentive_record
 
@@ -12,6 +13,7 @@ class SurveyResponse < ApplicationRecord
   enum status: {
     in_progress: 0,
     completed: 1,
+    completed_late: 2,
   }
 
   def all_questions_answered?

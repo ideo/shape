@@ -36,7 +36,7 @@ const StyledRowFlexHeader = styled(StyledRowFlexCell)`
   padding-top: 0px;
 `
 
-const StyledLabel = styled.label`
+const StyledLabelText = styled.span`
   margin-bottom: 0;
   margin-top: 15px;
   font-family: ${v.fonts.sans};
@@ -52,5 +52,5 @@ export {
   StyledRowFlexHeader,
   StyledRowFlexParent,
   StyledColumnFlexParent,
-  StyledLabel,
+  StyledLabelText,
 }

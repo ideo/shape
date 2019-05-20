@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190508180048) do
+ActiveRecord::Schema.define(version: 20190514224531) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -77,11 +77,11 @@ ActiveRecord::Schema.define(version: 20190508180048) do
 
   create_table "audiences", force: :cascade do |t|
     t.string "name"
-    t.float "price_per_response"
     t.string "criteria"
     t.bigint "organization_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "price_per_response", precision: 10, scale: 2
     t.index ["organization_id"], name: "index_audiences_on_organization_id"
   end
 
@@ -150,6 +150,7 @@ ActiveRecord::Schema.define(version: 20190508180048) do
     t.boolean "anyone_can_view", default: false
     t.boolean "anyone_can_join", default: false
     t.bigint "joinable_group_id"
+    t.datetime "test_closed_at"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
@@ -369,7 +370,9 @@ ActiveRecord::Schema.define(version: 20190508180048) do
     t.text "session_uid"
     t.integer "status", default: 0
     t.bigint "user_id"
+    t.bigint "test_audience_id"
     t.index ["session_uid"], name: "index_survey_responses_on_session_uid", unique: true
+    t.index ["test_audience_id"], name: "index_survey_responses_on_test_audience_id"
     t.index ["test_collection_id"], name: "index_survey_responses_on_test_collection_id"
     t.index ["user_id"], name: "index_survey_responses_on_user_id"
   end
@@ -405,6 +408,7 @@ ActiveRecord::Schema.define(version: 20190508180048) do
     t.bigint "test_collection_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "price_per_response", precision: 10, scale: 2
     t.index ["audience_id"], name: "index_test_audiences_on_audience_id"
     t.index ["test_collection_id"], name: "index_test_audiences_on_test_collection_id"
   end
@@ -441,6 +445,7 @@ ActiveRecord::Schema.define(version: 20190508180048) do
     t.datetime "last_active_at"
     t.string "phone"
     t.integer "feedback_contact_preference", default: 0
+    t.boolean "feedback_terms_accepted", default: false
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"

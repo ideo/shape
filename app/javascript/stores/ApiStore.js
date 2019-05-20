@@ -437,7 +437,7 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   async fetchOrganizationAudiences(orgId) {
-    const res = await this.request(`/organizations/${orgId}/audiences/`, 'GET')
+    const res = await this.request(`organizations/${orgId}/audiences/`, 'GET')
     const audiences = res.data
     return audiences
   }
@@ -594,6 +594,10 @@ class ApiStore extends jsonapi(datxCollection) {
       })
     }
     return org
+  }
+
+  get currentOrganization() {
+    return this.currentUser.current_organization
   }
 
   // default action for updating any basic apiStore value

@@ -4,4 +4,8 @@ class SerializableTestAudience < BaseJsonSerializer
 
   belongs_to :audience
   belongs_to :test_collection
+
+  attribute :price_per_response do
+    @object.price_per_response.to_f
+  end
 end
