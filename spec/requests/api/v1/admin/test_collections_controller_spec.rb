@@ -11,6 +11,7 @@ describe Api::V1::Admin::TestCollectionsController, type: :request, json: true, 
     let!(:collection) { create(:test_collection, test_status: :live, test_launched_at: Time.now) }
     let!(:audience) { create(:audience) }
     let!(:test_audience) { create(:test_audience, audience: audience, test_collection: collection) }
+    let!(:survey_response) { create(:survey_response, status: :completed, test_collection: collection, user: admin_user) }
     let!(:draft_collection) { create(:test_collection, test_status: :draft) }
     let!(:collection_without_test_audience) { create(:test_collection, test_status: :live) }
     let(:path) { "/api/v1/admin/test_collections?page=1" }
@@ -32,7 +33,7 @@ describe Api::V1::Admin::TestCollectionsController, type: :request, json: true, 
       expect(actual_test_collection['id'].to_i).to eq(collection.id)
       expect(actual_test_collection['attributes']['name']).to eq(collection.name)
       expect(actual_test_collection['attributes']['test_launched_at']).not_to be_nil
-
+      expect(actual_test_collection['attributes']['num_survey_responses']).to eq(1)
     end
 
     it 'returns test audiences' do

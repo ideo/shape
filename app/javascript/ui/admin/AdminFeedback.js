@@ -126,7 +126,9 @@ class AdminFeedback extends React.Component {
                   {testAudience.audience.name}
                 </AudienceRowItem>
                 <AudienceRowItem item xs={4}>
-                  <Flex justify="flex-end">12</Flex>
+                  <Flex justify="flex-end">
+                    {testCollection.num_survey_responses}
+                  </Flex>
                 </AudienceRowItem>
                 <AudienceRowItem item xs={4}>
                   <Flex justify="flex-end">{testAudience.sample_size}</Flex>
