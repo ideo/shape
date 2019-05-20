@@ -186,6 +186,7 @@ ActiveRecord::Schema.define(version: 20190517171959) do
 
   create_table "datasets", force: :cascade do |t|
     t.string "type"
+    t.string "name"
     t.string "measure"
     t.string "question_type"
     t.string "url"
