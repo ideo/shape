@@ -26,6 +26,7 @@ import Tooltip from '~/ui/global/Tooltip'
 import { routingStore, uiStore } from '~/stores'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import ReplaceCardButton from '~/ui/grid/ReplaceCardButton'
+import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
 import {
   StyledGridCard,
   StyledBottomLeftIcon,
@@ -97,6 +98,8 @@ class GridCard extends React.Component {
             </div>
           </Tooltip>
         )
+      } else if (record.isBoard) {
+        icon = <FoamcoreBoardIcon />
       } else {
         icon = <CollectionIcon />
       }

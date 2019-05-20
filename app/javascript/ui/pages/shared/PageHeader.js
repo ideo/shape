@@ -20,6 +20,7 @@ import { StyledHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import { SubduedHeading1 } from '~/ui/global/styled/typography'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import { FormButton } from '~/ui/global/styled/forms'
+import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
 import v from '~/utils/variables'
 import routeToLogin from '~/utils/routeToLogin'
 /* global IdeoSSO */
@@ -177,6 +178,8 @@ class PageHeader extends React.Component {
       icon = <SubmissionBoxIconLg />
     } else if (record.launchableTestId) {
       icon = <TestCollectionIcon />
+    } else if (record.isBoard) {
+      icon = <FoamcoreBoardIcon />
     }
     if (icon) {
       return <IconHolder align="right">{icon}</IconHolder>
