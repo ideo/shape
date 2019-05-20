@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { Flex } from 'reflexbox'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
+import Box from '~shared/components/atoms/Box'
 import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import LeftButtonIcon from '~/ui/icons/LeftButtonIcon'
 import Section from '~shared/components/molecules/Section'
@@ -152,7 +153,9 @@ class AdminFeedback extends React.Component {
       <Wrapper>
         <Heading1>Feedback</Heading1>
         <Section>
-          <Heading2>All Shape Feedback</Heading2>
+          <Box mb={40}>
+            <Heading2>All Shape Feedback</Heading2>
+          </Box>
           <Grid container>
             <Grid container>
               <Grid item xs={2}>
