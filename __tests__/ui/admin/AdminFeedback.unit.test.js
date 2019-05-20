@@ -37,6 +37,11 @@ describe('AdminFeedback', () => {
       const audienceName = audienceRowItems.at(0)
       expect(audienceName.html()).toContain(fakeAudience.name)
 
+      const audienceResponseCount = audienceRowItems.at(1)
+      expect(audienceResponseCount.html()).toContain(
+        fakeTestAudience.num_survey_responses
+      )
+
       const audienceSampleSize = audienceRowItems.at(2)
       expect(audienceSampleSize.html()).toContain(fakeTestAudience.sample_size)
     })

@@ -528,6 +528,7 @@ export const fakeTestAudience = {
   id: '1',
   audience: fakeAudience,
   sample_size: 12,
+  num_survey_responses: 6,
 }
 export const fakeTestCollection = {
   id: '1',
