@@ -1,0 +1,15 @@
+Organization: <%= @collection.organization.name %>
+Test name: <%= @collection.name %>
+Test URL: <%= @test_url %>
+Test ID: <%= @collection.id %>
+Test launched: <%= @launched_at %>
+<%- if @feedback_collection_url %>
+Feedback collection URL: <%= @feedback_collection_url %>
+<%- end %>
+Feedback design collection URL: <%= @feedback_design_collection_url %>
+
+Audiences:
+
+<%- @collection.test_audiences.each do |test_audience| %>
+<%= test_audience.audience.name %>: <%= test_audience.sample_size %>
+<%- end %>
