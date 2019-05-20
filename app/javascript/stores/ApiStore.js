@@ -271,9 +271,12 @@ class ApiStore extends jsonapi(datxCollection) {
     })
   }
 
-  async fetchTestCollections() {
-    const res = await this.request('admin/test_collections')
-    return res.data
+  async fetchTestCollections(page = 1) {
+    const res = await this.request(`admin/test_collections?page=${page}`)
+    return {
+      data: res.data,
+      totalPages: parseInt(res.headers.get('X-Total-Pages')),
+    }
   }
 
   @action

@@ -5,6 +5,10 @@ class Api::V1::Admin::TestCollectionsController < Api::V1::BaseController
     collections = Collection::TestCollection.includes(test_audiences: [:audience])
       .where(test_status: :live)
       .where.not(test_audiences: { id: nil })
+      .page(@page)
+      .per(25)
+
+    headers['X-Total-Pages'] = collections.total_pages
 
     render jsonapi: collections,
       include: [test_audiences: [:audience]],

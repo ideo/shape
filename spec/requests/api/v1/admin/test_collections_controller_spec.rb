@@ -13,7 +13,7 @@ describe Api::V1::Admin::TestCollectionsController, type: :request, json: true, 
     let!(:test_audience) { create(:test_audience, audience: audience, test_collection: collection) }
     let!(:draft_collection) { create(:test_collection, test_status: :draft) }
     let!(:collection_without_test_audience) { create(:test_collection, test_status: :live) }
-    let(:path) { "/api/v1/admin/test_collections" }
+    let(:path) { "/api/v1/admin/test_collections?page=1" }
 
     it 'returns a 200' do
       get(path)
@@ -45,6 +45,12 @@ describe Api::V1::Admin::TestCollectionsController, type: :request, json: true, 
       actual_audience = json['included'][1]
       expect(actual_audience['id'].to_i).to eq(audience.id)
       expect(actual_audience['attributes']['name']).to eq(audience.name)
+    end
+
+    it 'paginates' do
+      get(path)
+
+      expect(response.header['X-Total-Pages']).to eq(1)
     end
   end
 end

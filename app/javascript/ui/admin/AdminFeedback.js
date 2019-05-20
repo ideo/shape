@@ -5,6 +5,7 @@ import { Flex } from 'reflexbox'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
+import LeftButtonIcon from '~/ui/icons/LeftButtonIcon'
 import Section from '~shared/components/molecules/Section'
 import v from '~/utils/variables'
 import { Heading1, Heading2, Heading3 } from '~/ui/global/styled/typography'
@@ -39,16 +40,62 @@ const AudienceRowItem = styled(Grid)`
   padding-bottom: 0.5rem;
 `
 
+const PaginationWrapper = styled.div`
+  background-color: ${v.colors.commonDark};
+  border-radius: 1px;
+  color: ${v.colors.white};
+  height: 60px;
+  letter-spacing: 1.6px;
+  line-height: 60px;
+  margin: 0 1rem;
+  width: 60px;
+  text-align: center;
+`
+
+const PaginationButton = styled.button`
+  color: ${v.colors.commonDark};
+  height: 35px;
+  width: 35px;
+
+  &:disabled {
+    color: ${v.colors.commonLight};
+  }
+`
+
+const NextPageButton = styled(PaginationButton)`
+  svg {
+    transform: scale(-1, 1);
+  }
+`
+
 @inject('apiStore')
 @observer
 class AdminFeedback extends React.Component {
   state = {
     testCollections: [],
+    currentPage: 1,
+    totalPages: 1,
   }
 
-  async componentDidMount() {
-    const testCollections = await this.props.apiStore.fetchTestCollections()
-    this.setState({ testCollections })
+  componentDidMount() {
+    this.loadTestCollections(this.state.currentPage)
+  }
+
+  async loadTestCollections(page) {
+    const testCollections = await this.props.apiStore.fetchTestCollections(page)
+    this.setState({
+      testCollections: testCollections.data,
+      currentPage: page,
+      totalPages: testCollections.totalPages,
+    })
+  }
+
+  loadPreviousPage() {
+    this.loadTestCollections(this.state.currentPage - 1)
+  }
+
+  loadNextPage() {
+    this.loadTestCollections(this.state.currentPage + 1)
   }
 
   renderTestCollections() {
@@ -92,6 +139,10 @@ class AdminFeedback extends React.Component {
   }
 
   render() {
+    const { currentPage, totalPages } = this.state
+    const previousPageDisabled = currentPage === 1
+    const nextPageDisabled = currentPage === totalPages
+
     return (
       <Wrapper>
         <Heading1>Feedback</Heading1>
@@ -132,6 +183,29 @@ class AdminFeedback extends React.Component {
             </Grid>
             {this.renderTestCollections()}
           </Grid>
+          {totalPages > 1 && (
+            <Grid container>
+              <Grid item xs={12}>
+                <Flex align="center" justify="center" mt={3}>
+                  <PaginationButton
+                    disabled={previousPageDisabled}
+                    onClick={() => this.loadPreviousPage()}
+                  >
+                    <LeftButtonIcon disabled={previousPageDisabled} />
+                  </PaginationButton>
+                  <PaginationWrapper>
+                    {currentPage}/{totalPages}
+                  </PaginationWrapper>
+                  <NextPageButton
+                    disabled={nextPageDisabled}
+                    onClick={() => this.loadNextPage()}
+                  >
+                    <LeftButtonIcon disabled={nextPageDisabled} />
+                  </NextPageButton>
+                </Flex>
+              </Grid>
+            </Grid>
+          )}
         </Section>
       </Wrapper>
     )
