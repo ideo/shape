@@ -103,6 +103,7 @@ class Collection
       update_cached_submission_status(parent_submission) if inside_a_submission?
       create_test_design_and_move_cards!(initiated_by: initiated_by) unless reopening
       update(test_launched_at: Time.current, test_closed_at: nil)
+      TestCollectionMailer.notify_launch(self.id).deliver_later unless test_audiences.empty?
     end
 
     def still_accepting_answers?
