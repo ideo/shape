@@ -13,9 +13,13 @@ class SurveyResponseCompletion < SimpleService
   private
 
   def update_survey_status
-    @survey_response.update(
-      status: :completed,
-    )
+    test_collection = @survey_response.test_collection
+    if test_collection.live?
+      @survey_response.completed!
+    else
+      @survey_response.completed_late!
+    end
+
     @survey_response.cache_test_scores!
   end
 

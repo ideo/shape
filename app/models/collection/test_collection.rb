@@ -102,10 +102,18 @@ class Collection
       end
       update_cached_submission_status(parent_submission) if inside_a_submission?
       create_test_design_and_move_cards!(initiated_by: initiated_by) unless reopening
-      update(test_launched_at: Time.current)
+      update(test_launched_at: Time.current, test_closed_at: nil)
+    end
+
+    def still_accepting_answers?
+      return true if live?
+      return false if test_closed_at.nil?
+      closed? && 10.minutes.ago < test_closed_at
     end
 
     def after_close_test
+      update(test_closed_at: Time.current)
+
       if inside_a_submission?
         update_cached_submission_status(parent_submission)
       elsif submission_box_template_test?

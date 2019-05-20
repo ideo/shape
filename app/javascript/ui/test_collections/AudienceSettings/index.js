@@ -80,42 +80,8 @@ class AudienceSettings extends React.Component {
     return `$${this.totalPrice.toFixed(2)}`
   }
 
-  // createTestAudience(audience) {
-  //   const { apiStore, testCollection } = this.props
-  //   const testAudienceData = {
-  //     audience_id: audience.id,
-  //     test_collection_id: testCollection.id,
-  //     sample_size: 0,
-  //   }
-  //   return new TestAudience(toJS(testAudienceData), apiStore)
-  // }
-  //
-  // async saveTestAudience(audience) {
-  //   await audience.currentTestAudience.save()
-  // }
-  //
-  // saveAllTestAudiences() {
-  //   this.audiences.forEach(audience => {
-  //     this.saveTestAudience(audience)
-  //   })
-  // }
-  //
-  // onSubmitSettings = () => {
-  //   this.saveAllTestAudiences()
-  // }
-
   onToggleCheckbox = e => {
-    // const { apiStore } = this.props
     const id = e.target.value
-    // const audience = apiStore.find('audiences', id)
-    // if (!audience.currentlySelected) {
-    //   // If not yet selected, we have to create the test audience for this test
-    //   // and temporarily attach it to the audience
-    //   const testAudience = this.createTestAudience(audience)
-    //   apiStore.add(testAudience)
-    // } else {
-    //   apiStore.remove(audience.currentTestAudience)
-    // }
     runInAction(() => {
       const { audienceSettings } = this
       audienceSettings[id].selected = !audienceSettings[id].selected
@@ -123,20 +89,11 @@ class AudienceSettings extends React.Component {
   }
 
   onInputChange = (audienceId, value) => {
-    // const { apiStore } = this.props
-    // const audience = apiStore.find('audiences', audienceId)
     const { audienceSettings } = this
     runInAction(() => {
       audienceSettings[audienceId].sample_size = value
     })
-    // this.throttledSaveTestAudience(audience)
   }
-
-  // handleKeyPress = event => {
-  //   if (event.key === 'Enter') {
-  //     this.throttledSaveTestAudience.flush()
-  //   }
-  // }
 
   @action
   openTermsModal = () => (this.termsModalOpen = true)
