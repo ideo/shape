@@ -70,7 +70,8 @@ RSpec.describe DataReport::QuestionItem, type: :service do
     context 'org-wide dataset' do
       let!(:dataset) do
         create(:org_wide_question_dataset,
-               question_type: question_item.question_type)
+               question_type: question_item.question_type,
+               organization: organization)
       end
 
       describe '#call' do
