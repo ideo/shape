@@ -11,6 +11,8 @@ describe Api::V1::Admin::TestCollectionsController, type: :request, json: true, 
     let!(:collection) { create(:test_collection, test_status: :live, test_launched_at: Time.now) }
     let!(:audience) { create(:audience) }
     let!(:test_audience) { create(:test_audience, audience: audience, test_collection: collection) }
+    let!(:draft_collection) { create(:test_collection, test_status: :draft) }
+    let!(:collection_without_test_audience) { create(:test_collection, test_status: :live) }
     let(:path) { "/api/v1/admin/test_collections" }
 
     it 'returns a 200' do
@@ -18,7 +20,7 @@ describe Api::V1::Admin::TestCollectionsController, type: :request, json: true, 
       expect(response.status).to eq(200)
     end
 
-    it 'returns test collections' do
+    it 'returns launched test collections' do
       get(path)
       expect(json['data'].size).to eq(1)
     end
