@@ -1,18 +1,23 @@
 import Grid from '@material-ui/core/Grid'
 import styled from 'styled-components'
 import { Flex } from 'reflexbox'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import Section from '~shared/components/molecules/Section'
 import v from '~/utils/variables'
 import { Heading1, Heading2, Heading3 } from '~/ui/global/styled/typography'
+import * as colors from '~shared/styles/constants/colors'
 
 const Wrapper = styled.div`
   font-family: ${v.fonts.sans};
 `
 
 const SubHeadingWrapper = styled(Flex)`
+  align-items: flex-end;
+  flex-direction: column;
   height: 100%;
+  justify-content: flex-end;
 `
 
 const SubHeading = styled.div`
@@ -21,7 +26,60 @@ const SubHeading = styled.div`
   line-height: 1rem;
 `
 
+const FeedbackRow = styled(Grid)`
+  padding: 1rem 0;
+`
+
+const LaunchState = styled.span`
+  color: ${colors.confirmation};
+`
+
+@inject('apiStore')
+@observer
 class AdminFeedback extends React.Component {
+  state = {
+    testCollections: [],
+  }
+
+  async componentDidMount() {
+    const testCollections = await this.props.apiStore.fetchTestCollections()
+    this.setState({ testCollections })
+  }
+
+  renderTestCollections() {
+    return this.state.testCollections.map(testCollection => (
+      <React.Fragment key={testCollection.id}>
+        <FeedbackRow container>
+          <Grid item xs={2}>
+            {testCollection.name}
+          </Grid>
+          <Grid item xs={2}>
+            <LaunchState>Launched</LaunchState>
+          </Grid>
+          <Grid item xs={2}>
+            0days 0hrs 5mins
+          </Grid>
+          <Grid item xs={2}>
+            Anybody
+          </Grid>
+          <Grid item xs={2}>
+            <Flex justify="flex-end">
+              {testCollection.num_survey_responses}
+            </Flex>
+          </Grid>
+          <Grid item xs={2}>
+            <Flex justify="flex-end">12</Flex>
+          </Grid>
+        </FeedbackRow>
+        <Grid container>
+          <Grid item xs={12}>
+            <HorizontalDivider />
+          </Grid>
+        </Grid>
+      </React.Fragment>
+    ))
+  }
+
   render() {
     return (
       <Wrapper>
@@ -46,12 +104,12 @@ class AdminFeedback extends React.Component {
                 </Flex>
               </Grid>
               <Grid item xs={2}>
-                <SubHeadingWrapper column justify="flex-end">
+                <SubHeadingWrapper>
                   <SubHeading>Complete Responses</SubHeading>
                 </SubHeadingWrapper>
               </Grid>
               <Grid item xs={2}>
-                <SubHeadingWrapper column justify="flex-end">
+                <SubHeadingWrapper>
                   <SubHeading>Total Requested</SubHeading>
                 </SubHeadingWrapper>
               </Grid>
@@ -61,31 +119,16 @@ class AdminFeedback extends React.Component {
                 <HorizontalDivider />
               </Grid>
             </Grid>
-            <Grid container>
-              <Grid item xs={2}>
-                CoinBase
-              </Grid>
-              <Grid item xs={2}>
-                Launched
-              </Grid>
-              <Grid item xs={2}>
-                0days 0hrs 5mins
-              </Grid>
-              <Grid item xs={2}>
-                Anybody
-              </Grid>
-              <Grid item xs={2}>
-                12
-              </Grid>
-              <Grid item xs={2}>
-                12
-              </Grid>
-            </Grid>
+            {this.renderTestCollections()}
           </Grid>
         </Section>
       </Wrapper>
     )
   }
+}
+
+AdminFeedback.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default AdminFeedback

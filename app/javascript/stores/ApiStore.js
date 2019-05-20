@@ -271,6 +271,11 @@ class ApiStore extends jsonapi(datxCollection) {
     })
   }
 
+  async fetchTestCollections() {
+    const res = await this.request('admin/test_collections')
+    return res.data
+  }
+
   @action
   importUsersThread({ usersThread, thread, comments } = {}) {
     thread.addReference('users_thread', usersThread, {
