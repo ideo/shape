@@ -2,6 +2,7 @@ FactoryBot.define do
   factory :dataset do
     timeframe 'month'
     chart_type 'area'
+    name 'report'
 
     trait :with_cached_data do
       measure 'Widgets'
