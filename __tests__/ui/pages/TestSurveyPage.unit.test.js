@@ -1,6 +1,8 @@
 import TestSurveyPage from '~/ui/pages/TestSurveyPage'
 import { fakeCollection } from '#/mocks/data'
 
+jest.mock('../../../app/javascript/stores/index')
+
 let wrapper, props
 
 describe('TestSurveyPage', () => {
@@ -31,14 +33,8 @@ describe('TestSurveyPage', () => {
       wrapper = shallow(<TestSurveyPage {...props} />)
     })
 
-    it('renders SurveyClosed', () => {
-      expect(wrapper.find('SurveyClosed').exists()).toEqual(true)
-      expect(
-        wrapper
-          .find('SurveyClosed')
-          .find('LearnMoreLink')
-          .exists()
-      ).toEqual(true)
+    it('renders ClosedSurvey', () => {
+      expect(wrapper.find('ClosedSurvey').exists()).toEqual(true)
     })
 
     it('does not render TestSurveyResponder', () => {
