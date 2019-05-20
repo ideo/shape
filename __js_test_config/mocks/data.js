@@ -125,7 +125,6 @@ export const fakeLegendItemAttrs = {
       '95th Percentile'
     ])
   },
-  dynamic_measure_names: {}
 }
 
 export const fakeLegendItem = {

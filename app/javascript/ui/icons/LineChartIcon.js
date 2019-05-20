@@ -3,7 +3,7 @@ import { lineChartDashWithForOrder } from '~/ui/global/charts/ChartUtils'
 
 import Icon from './Icon'
 
-const LineChartMeasure = ({ color, order }) => (
+const LineChartIcon = ({ color, order }) => (
   <Icon fill>
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
       <line
@@ -19,14 +19,14 @@ const LineChartMeasure = ({ color, order }) => (
   </Icon>
 )
 
-LineChartMeasure.propTypes = {
+LineChartIcon.propTypes = {
   color: PropTypes.string,
   order: PropTypes.number,
 }
 
-LineChartMeasure.defaultProps = {
+LineChartIcon.defaultProps = {
   color: '#000000',
   order: 0,
 }
 
-export default LineChartMeasure
+export default LineChartIcon

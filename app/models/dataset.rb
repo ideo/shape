@@ -9,7 +9,7 @@ class Dataset < ApplicationRecord
            class_name: 'Item::DataItem'
 
   validates :timeframe, :chart_type, presence: true
-  validates :cached_data, :measure, presence: true, if: :root_dataset_class?
+  validates :cached_data, :name, presence: true, if: :root_dataset_class?
 
   scope :question_items, -> { where(type: 'Dataset::QuestionItem') }
 
@@ -42,7 +42,7 @@ class Dataset < ApplicationRecord
   def search_data
     {
       type: type,
-      measure: measure,
+      name: name,
       organization_id: organization_id || data_source&.organization_id,
       question_type: question_type,
       chart_type: chart_type,
@@ -53,11 +53,18 @@ class Dataset < ApplicationRecord
 
   # Implement in each sub-class
 
+  def display_name
+    name
+  end
+
   def title; end
 
   def description; end
 
   def total; end
+
+  # Measure is the 'thing' being quantified, e.g. particiapnts, viewers, activity, content
+  def measure; end
 
   def single_value; end
 

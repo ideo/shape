@@ -640,19 +640,19 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     })
   }
 
-  API_selectDatasetsMeasure({ measure }) {
+  API_selectDatasetsWithName({ name }) {
     return this.apiStore.request(
-      `collections/${this.id}/datasets/select_measure`,
+      `collections/${this.id}/datasets/select`,
       'POST',
-      { measure }
+      { name }
     )
   }
 
-  API_unselectDatasetsMeasure({ measure }) {
+  API_unselectDatasetsWithName({ name }) {
     return this.apiStore.request(
-      `collections/${this.id}/datasets/unselect_measure`,
+      `collections/${this.id}/datasets/unselect`,
       'POST',
-      { measure }
+      { name }
     )
   }
 

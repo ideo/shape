@@ -18,7 +18,7 @@ class Dataset
       data_report.total
     end
 
-    def measure
+    def name
       # The collection name
       return if test_collection.blank?
       test_collection.name.sub(Collection::TestDesign::COLLECTION_SUFFIX, '')
@@ -42,6 +42,10 @@ class Dataset
 
     def test_collection
       question_item&.parent
+    end
+
+    def measure
+      :answer_count
     end
 
     private

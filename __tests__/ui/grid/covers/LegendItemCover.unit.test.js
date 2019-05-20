@@ -43,18 +43,18 @@ describe('LegendItemCover', () => {
     ).toContain('Business Unit')
   })
 
-  it('shows selected measure', () => {
-    const selectedMeasure = wrapper.find('Measure').at(1)
+  it('shows selected dataset', () => {
+    const selectedMeasure = wrapper.find('Dataset').at(1)
     expect(selectedMeasure.exists()).toBe(true)
-    expect(selectedMeasure.find('UnselectMeasure').exists()).toBe(true)
+    expect(selectedMeasure.find('UnselectDataset').exists()).toBe(true)
   })
 
-  it('removes selected measure when x is clicked', () => {
-    const unselectMeasure = wrapper
-      .find('Measure')
+  it('removes selected dataset when x is clicked', () => {
+    const unselectDataset = wrapper
+      .find('Dataset')
       .at(1)
-      .find('UnselectMeasure')
-    unselectMeasure.simulate('click')
+      .find('UnselectDataset')
+    unselectDataset.simulate('click')
     expect(props.item.save).toHaveBeenCalled()
     // Not sure why this fails
     // I can log that it is being called in the component, and it passes in the test below
@@ -71,26 +71,5 @@ describe('LegendItemCover', () => {
     firstOption.simulate('click')
     expect(props.item.save).toHaveBeenCalled()
     expect(props.card.parent.API_fetchCards).toHaveBeenCalled()
-  })
-
-  describe('with dynamic measure name', () => {
-    beforeEach(() => {
-      props.item.primary_measure.measure = 'org-wide-feedback'
-      props.item.dynamic_measure_names = {
-        'org-wide-feedback': 'IDEO Organization',
-      }
-      render()
-    })
-
-    it('replaces measure with dynamic name', () => {
-      expect(
-        wrapper
-          .find('Measure')
-          .at(0)
-          .find('StyledDisplayText')
-          .children()
-          .text()
-      ).toContain('IDEO Organization')
-    })
   })
 })

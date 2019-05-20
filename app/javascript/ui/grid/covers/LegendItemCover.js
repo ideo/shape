@@ -14,7 +14,7 @@ import {
   Heading3,
   SmallHelperText,
 } from '~/ui/global/styled/typography'
-import LineChartMeasure from '~/ui/icons/LineChartMeasure'
+import LineChartIcon from '~/ui/icons/LineChartIcon'
 import trackError from '~/utils/trackError'
 
 function formatCollections(collections) {
@@ -55,14 +55,14 @@ const StyledLegendTitle = styled(Heading3)`
   margin-bottom: 20px;
 `
 
-const Measure = styled.div`
+const Dataset = styled.div`
   font-size: 1.1rem;
   margin: 15px 0;
   position: relative;
 `
-Measure.displayName = 'Measure'
+Dataset.displayName = 'Dataset'
 
-const UnselectMeasure = styled(DisplayText)`
+const UnselectDataset = styled(DisplayText)`
   position: absolute;
   right: 0;
   width: 16px;
@@ -73,16 +73,16 @@ const UnselectMeasure = styled(DisplayText)`
     color: black;
   }
 `
-UnselectMeasure.displayName = 'UnselectMeasure'
+UnselectDataset.displayName = 'UnselectDataset'
 
-const AreaChartMeasure = styled.span`
+const AreaChartIcon = styled.span`
   display: inline-block;
   width: 100%;
   height: 100%;
   background-color: ${props => props.color};
 `
 
-const MeasureIconWrapper = styled.span`
+const DatasetIconWrapper = styled.span`
   display: inline-block;
   width: 15px;
   height: 15px;
@@ -100,7 +100,7 @@ const StyledAddComparison = styled.div`
   }
 `
 
-const MeasureText = styled(SmallHelperText)`
+const DatasetText = styled(SmallHelperText)`
   display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -126,12 +126,12 @@ class LegendItemCover extends React.Component {
 
   @observable
   @action
-  toggleMeasureSelected = async ({ measure, selected }) => {
+  toggleDatasetsWithName = async ({ name, selected }) => {
     const { parent } = this.props.card
     if (selected) {
-      await parent.API_selectDatasetsMeasure({ measure })
+      await parent.API_selectDatasetsWithName({ name })
     } else {
-      await parent.API_unselectDatasetsMeasure({ measure })
+      await parent.API_unselectDatasetsWithName({ name })
     }
     parent.API_fetchCards()
   }
@@ -149,30 +149,14 @@ class LegendItemCover extends React.Component {
     })
   }
 
-  measureDisplayName = measure => {
-    const { dynamic_measure_names } = this.props.item
-    const dynamicName = dynamic_measure_names
-      ? dynamic_measure_names[measure]
-      : undefined
-    if (dynamicName) return dynamicName
-    return measure
-  }
-
   onSearchClose = ev => {
     this.setState({
       comparisonMenuOpen: false,
     })
   }
 
-  onDeselectComparison = async dataset => {
-    const { card } = this.props
-    const { legend_search_source } = this.props.item
-    if (legend_search_source === 'select_from_datasets') {
-      this.toggleMeasureSelected({ measure: dataset.measure, selected: false })
-    } else if (legend_search_source === 'search_test_collections') {
-      await card.parent.API_removeComparison({ id: dataset.test_collection_id })
-      card.parent.API_fetchCards()
-    }
+  onDeselectComparison = async name => {
+    this.toggleDatasetsWithName({ name: name, selected: false })
   }
 
   @action
@@ -212,21 +196,18 @@ class LegendItemCover extends React.Component {
       })
   }
 
-  handleDatasetMeasureSelection = event => {
+  handleDatasetSelection = event => {
     event.preventDefault()
     const { value } = event.target
-    this.toggleMeasureSelected({ measure: value, selected: true })
+    this.toggleDatasetsWithName({ name: value, selected: true })
   }
 
   datasets = ({ selected }) => {
     const { datasets } = this.props.item
-    const measures = []
+    const names = []
     return datasets.filter(dataset => {
-      if (
-        dataset.selected === selected &&
-        !_.includes(measures, dataset.measure)
-      ) {
-        measures.push(dataset.measure)
+      if (dataset.selected === selected && !_.includes(names, dataset.name)) {
+        names.push(dataset.name)
         return true
       } else {
         return false
@@ -241,7 +222,7 @@ class LegendItemCover extends React.Component {
         displayEmpty
         disableUnderline
         name="role"
-        onChange={this.handleDatasetMeasureSelection}
+        onChange={this.handleDatasetSelection}
         onClose={() => this.setState({ comparisonMenuOpen: false })}
         open
         inline
@@ -249,10 +230,10 @@ class LegendItemCover extends React.Component {
         {this.datasets({ selected: false }).map(dataset => (
           <SelectOption
             classes={{ root: 'selectOption', selected: 'selected' }}
-            key={dataset.measure}
-            value={dataset.measure}
+            key={dataset.name}
+            value={dataset.name}
           >
-            {dataset.measure}
+            {dataset.display_name}
           </SelectOption>
         ))}
       </Select>
@@ -282,34 +263,32 @@ class LegendItemCover extends React.Component {
 
   renderSelectedDataset = ({ dataset, order, primary }) => {
     if (!dataset) return ''
-    const { measure, style, chart_type } = dataset
+    const { name, style, chart_type, display_name } = dataset
     let icon
     if (chart_type === 'line') {
       icon = (
-        <LineChartMeasure
+        <LineChartIcon
           color={(style && style.fill) || '#000000'}
           order={order}
         />
       )
     } else {
       const color = style && style.fill ? style.fill : colorScale[order]
-      icon = <AreaChartMeasure color={color} />
+      icon = <AreaChartIcon color={color} />
     }
     return (
-      <Measure key={`measure-${measure}`}>
-        {icon && <MeasureIconWrapper>{icon}</MeasureIconWrapper>}
-        <MeasureText color={v.colors.black}>
-          {this.measureDisplayName(measure)}
-        </MeasureText>
+      <Dataset key={`dataset-${name}`}>
+        {icon && <DatasetIconWrapper>{icon}</DatasetIconWrapper>}
+        <DatasetText color={v.colors.black}>{display_name}</DatasetText>
         {!primary && (
-          <UnselectMeasure
+          <UnselectDataset
             role="button"
-            onClick={() => this.onDeselectComparison(dataset)}
+            onClick={() => this.onDeselectComparison(name)}
           >
             <XIcon />
-          </UnselectMeasure>
+          </UnselectDataset>
         )}
-      </Measure>
+      </Dataset>
     )
   }
 
