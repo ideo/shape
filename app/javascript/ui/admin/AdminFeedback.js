@@ -31,6 +31,7 @@ const SubHeading = styled.div`
 const FeedbackRow = styled(Grid)`
   padding: 1rem 0;
 `
+FeedbackRow.displayName = 'FeedbackRow'
 
 const LaunchState = styled.span`
   color: ${colors.confirmation};
@@ -39,6 +40,7 @@ const LaunchState = styled.span`
 const AudienceRowItem = styled(Grid)`
   padding-bottom: 0.5rem;
 `
+AudienceRowItem.displayName = 'AudienceRowItem'
 
 const PaginationWrapper = styled.div`
   background-color: ${v.colors.commonDark};
@@ -51,6 +53,7 @@ const PaginationWrapper = styled.div`
   width: 60px;
   text-align: center;
 `
+PaginationWrapper.displayName = 'PaginationWrapper'
 
 const PaginationButton = styled.button`
   color: ${v.colors.commonDark};
@@ -61,12 +64,14 @@ const PaginationButton = styled.button`
     color: ${v.colors.commonLight};
   }
 `
+PaginationButton.displayName = 'PaginationButton'
 
 const NextPageButton = styled(PaginationButton)`
   svg {
     transform: scale(-1, 1);
   }
 `
+NextPageButton.displayName = 'NextPageButton'
 
 @inject('apiStore')
 @observer
