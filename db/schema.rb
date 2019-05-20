@@ -81,7 +81,7 @@ ActiveRecord::Schema.define(version: 20190514224531) do
     t.bigint "organization_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.float "price_per_response"
+    t.decimal "price_per_response", precision: 10, scale: 2
     t.index ["organization_id"], name: "index_audiences_on_organization_id"
   end
 
@@ -370,7 +370,9 @@ ActiveRecord::Schema.define(version: 20190514224531) do
     t.text "session_uid"
     t.integer "status", default: 0
     t.bigint "user_id"
+    t.bigint "test_audience_id"
     t.index ["session_uid"], name: "index_survey_responses_on_session_uid", unique: true
+    t.index ["test_audience_id"], name: "index_survey_responses_on_test_audience_id"
     t.index ["test_collection_id"], name: "index_survey_responses_on_test_collection_id"
     t.index ["user_id"], name: "index_survey_responses_on_user_id"
   end
@@ -406,6 +408,7 @@ ActiveRecord::Schema.define(version: 20190514224531) do
     t.bigint "test_collection_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "price_per_response", precision: 10, scale: 2
     t.index ["audience_id"], name: "index_test_audiences_on_audience_id"
     t.index ["test_collection_id"], name: "index_test_audiences_on_test_collection_id"
   end
@@ -442,6 +445,7 @@ ActiveRecord::Schema.define(version: 20190514224531) do
     t.datetime "last_active_at"
     t.string "phone"
     t.integer "feedback_contact_preference", default: 0
+    t.boolean "feedback_terms_accepted", default: false
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"

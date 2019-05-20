@@ -132,6 +132,7 @@ class CommentEntryForm extends React.Component {
 CommentEntryForm.propTypes = {
   expanded: PropTypes.bool.isRequired,
   afterSubmit: PropTypes.func.isRequired,
+  onHeightChange: PropTypes.func.isRequired,
   thread: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 

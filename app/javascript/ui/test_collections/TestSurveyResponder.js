@@ -172,6 +172,7 @@ class TestSurveyResponder extends React.Component {
 TestSurveyResponder.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   createSurveyResponse: PropTypes.func.isRequired,
+  includeRecontactQuestion: PropTypes.bool,
   surveyResponse: MobxPropTypes.objectOrObservableObject,
   theme: PropTypes.string,
   containerId: PropTypes.string,
@@ -185,6 +186,7 @@ TestSurveyResponder.defaultProps = {
   surveyResponse: undefined,
   theme: 'primary',
   containerId: '',
+  includeRecontactQuestion: false,
 }
 TestSurveyResponder.displayName = 'TestSurveyResponder'
 

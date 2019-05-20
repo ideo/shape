@@ -319,6 +319,14 @@ describe Collection::TestCollection, type: :model do
             end
           end
 
+          context 'with test_audience_params' do
+            it 'should call TestAudiencePurchaser' do
+              params = { some: 'params' }
+              expect(TestAudiencePurchaser).to receive(:call).with(test_collection, params)
+              test_collection.launch!(initiated_by: user, test_audience_params: params)
+            end
+          end
+
           describe '#serialized_for_test_survey' do
             before do
               test_collection.launch!(initiated_by: user)
@@ -368,8 +376,8 @@ describe Collection::TestCollection, type: :model do
           expect(test_collection.live?).to be true
         end
 
-        it 'should call the launch_test! method on itself with `reopening` param' do
-          expect(test_collection).to receive(:launch_test!).with(initiated_by: user, reopening: true)
+        it 'should call the post_launch_setup! method on itself with `reopening` param' do
+          expect(test_collection).to receive(:post_launch_setup!).with(initiated_by: user, reopening: true)
           test_collection.reopen!(initiated_by: user)
         end
       end

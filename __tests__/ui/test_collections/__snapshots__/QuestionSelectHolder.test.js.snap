@@ -11,7 +11,7 @@ exports[`TestDesigner renders snapshot 1`] = `
       Object {
         "root": "select fixedWidth",
         "select": "",
-        "selectMenu": "selectMenu",
+        "selectMenu": "selectMenu bottomPadded",
       }
     }
     disabled={false}

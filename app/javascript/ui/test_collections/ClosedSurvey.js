@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled, { ThemeProvider } from 'styled-components'
 import Emoji from '~/ui/icons/Emoji'
 import {
@@ -48,7 +50,7 @@ class ClosedSurvey extends React.Component {
   }
 
   render() {
-    const { includeRecontactQuestion, sessionUid } = this.props
+    const { currentUser, includeRecontactQuestion, sessionUid } = this.props
 
     return (
       <ThemeProvider theme={styledTestTheme('primary')}>
@@ -60,6 +62,7 @@ class ClosedSurvey extends React.Component {
             {includeRecontactQuestion && !this.answer ? (
               <RecontactQuestion
                 backgroundColor={v.colors.primaryDarkest}
+                user={currentUser}
                 onAnswer={this.onAnswer}
                 sessionUid={sessionUid}
               />
@@ -100,5 +103,16 @@ const LearnMoreLink = LoudDisplayLink.extend`
   text-align: center;
 `
 LearnMoreLink.displayName = 'LearnMoreLink'
+
+ClosedSurvey.propTypes = {
+  currentUser: MobxPropTypes.objectOrObservableObject,
+  includeRecontactQuestion: PropTypes.bool,
+  sessionUid: PropTypes.string,
+}
+ClosedSurvey.defaultProps = {
+  currentUser: null,
+  includeRecontactQuestion: false,
+  sessionUid: null,
+}
 
 export default ClosedSurvey

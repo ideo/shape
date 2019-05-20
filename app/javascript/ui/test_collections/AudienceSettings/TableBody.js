@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { observer } from 'mobx-react'
 import AutosizeInput from 'react-input-autosize'
 
@@ -5,66 +7,6 @@ import v from '~/utils/variables'
 import styled from 'styled-components'
 import { StyledRowFlexParent, StyledRowFlexCell } from './styled'
 import { DisplayText } from '~/ui/global/styled/typography'
-
-@observer
-class TableBody extends React.Component {
-  handleInputChange = ev => {
-    const { audience, onInputChange } = this.props
-
-    onInputChange(audience.id, ev.target.value)
-  }
-
-  render() {
-    const { audience, stopEditingIfContent, handleKeyPress } = this.props
-    return (
-      <StyledRowFlexParent>
-        <StyledRowFlexCell>
-          <DisplayText
-            color={
-              audience.currentlySelected
-                ? v.colors.black
-                : v.colors.commonMedium
-            }
-          >
-            {audience.price_per_response && audience.currentlySelected
-              ? `$${audience.price_per_response.toFixed(2)}`
-              : '–'}
-          </DisplayText>
-        </StyledRowFlexCell>
-        <StyledRowFlexCell>
-          {audience.currentlySelected ? (
-            <EditableInput
-              id={audience.id}
-              type="text"
-              placeholder="–"
-              value={audience.currentSampleSize}
-              onChange={this.handleInputChange}
-              onKeyPress={handleKeyPress}
-              onBlur={stopEditingIfContent}
-            />
-          ) : (
-            <DisplayText color={v.colors.commonMedium}>–</DisplayText>
-          )}
-        </StyledRowFlexCell>
-        <StyledRowFlexCell>
-          <DisplayText
-            color={
-              audience.currentlySelected
-                ? v.colors.black
-                : v.colors.commonMedium
-            }
-          >
-            {audience.currentSampleSize > 0 && audience.currentlySelected
-              ? `$${(
-                  audience.price_per_response * audience.currentSampleSize
-                ).toFixed(2)}`
-              : '–'}
-          </DisplayText>
-        </StyledRowFlexCell>
-      </StyledRowFlexParent>
-    )
-  }
-}
 
 const EditableInput = styled(AutosizeInput)`
   width: 2rem;
@@ -88,5 +30,63 @@ const EditableInput = styled(AutosizeInput)`
   }
 `
 EditableInput.displayName = 'EditableInput'
+
+@observer
+class TableBody extends React.Component {
+  handleInputChange = ev => {
+    const { audience, onInputChange } = this.props
+
+    onInputChange(audience.id, ev.target.value)
+  }
+
+  render() {
+    const { audience, sampleSize, selected } = this.props
+    const textColor = selected ? v.colors.black : v.colors.commonMedium
+    const selectedWithPrice = audience.price_per_response && selected
+
+    return (
+      <StyledRowFlexParent>
+        <StyledRowFlexCell>
+          <DisplayText color={textColor}>
+            <strong>
+              {selectedWithPrice
+                ? `$${audience.price_per_response.toFixed(2)}`
+                : '–'}
+            </strong>
+          </DisplayText>
+        </StyledRowFlexCell>
+        <StyledRowFlexCell>
+          {selectedWithPrice ? (
+            <EditableInput
+              id={audience.id}
+              type="text"
+              placeholder="–"
+              value={sampleSize}
+              onChange={this.handleInputChange}
+            />
+          ) : (
+            <DisplayText color={textColor}>–</DisplayText>
+          )}
+        </StyledRowFlexCell>
+        <StyledRowFlexCell>
+          <DisplayText color={textColor}>
+            <strong>
+              {sampleSize > 0 && selected
+                ? `$${(audience.price_per_response * sampleSize).toFixed(2)}`
+                : '–'}
+            </strong>
+          </DisplayText>
+        </StyledRowFlexCell>
+      </StyledRowFlexParent>
+    )
+  }
+}
+
+TableBody.propTypes = {
+  audience: MobxPropTypes.objectOrObservableObject.isRequired,
+  sampleSize: PropTypes.string.isRequired,
+  selected: PropTypes.bool.isRequired,
+  onInputChange: PropTypes.func.isRequired,
+}
 
 export default TableBody

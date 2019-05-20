@@ -125,6 +125,7 @@ CommentThread.propTypes = {
   expanded: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,
   afterSubmit: PropTypes.func.isRequired,
+  onEditorHeightChange: PropTypes.func.isRequired,
   thread: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 

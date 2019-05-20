@@ -23,7 +23,7 @@ const QuestionSelectHolder = ({
           classes={{
             root: 'select fixedWidth',
             select: blank ? 'grayedOut' : '',
-            selectMenu: 'selectMenu',
+            selectMenu: 'selectMenu bottomPadded',
           }}
           displayEmpty
           disabled={!canEdit}
