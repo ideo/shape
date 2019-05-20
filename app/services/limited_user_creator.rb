@@ -47,7 +47,7 @@ class LimitedUserCreator < SimpleService
 
     return false if params.empty?
 
-    unless Rails.env.production?
+    if Rails.env.development?
       # always look up the same user so we don't keep creating real ones
       params[:email] = 'test.shape.space@ideo.com'
       params.delete :phone
