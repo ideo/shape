@@ -1,4 +1,5 @@
 import Grid from '@material-ui/core/Grid'
+import moment from 'moment-mini'
 import styled from 'styled-components'
 import { Flex } from 'reflexbox'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -57,15 +58,15 @@ class AdminFeedback extends React.Component {
             <LaunchState>Launched</LaunchState>
           </Grid>
           <Grid item xs={2}>
-            0days 0hrs 5mins
+            {testCollection.test_launched_at
+              ? moment(testCollection.test_launched_at).fromNow(true)
+              : null}
           </Grid>
           <Grid item xs={2}>
             Anybody
           </Grid>
           <Grid item xs={2}>
-            <Flex justify="flex-end">
-              {testCollection.num_survey_responses}
-            </Flex>
+            <Flex justify="flex-end">12</Flex>
           </Grid>
           <Grid item xs={2}>
             <Flex justify="flex-end">12</Flex>
