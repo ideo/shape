@@ -9,6 +9,8 @@ describe Api::V1::Admin::TestCollectionsController, type: :request, json: true, 
 
   describe 'GET #index' do
     let!(:collection) { create(:test_collection, test_status: :live, test_launched_at: Time.now) }
+    let!(:audience) { create(:audience) }
+    let!(:test_audience) { create(:test_audience, audience: audience, test_collection: collection) }
     let(:path) { "/api/v1/admin/test_collections" }
 
     it 'returns a 200' do
@@ -28,6 +30,15 @@ describe Api::V1::Admin::TestCollectionsController, type: :request, json: true, 
       expect(actual_test_collection['id'].to_i).to eq(collection.id)
       expect(actual_test_collection['attributes']['name']).to eq(collection.name)
       expect(actual_test_collection['attributes']['test_launched_at']).not_to be_nil
+
+    end
+
+    it 'returns test audiences' do
+      get(path)
+
+      actual_test_audience = json['included'][0]
+      expect(actual_test_audience['id'].to_i).to eq(test_audience.id)
+      expect(actual_test_audience['attributes']['sample_size']).to eq(test_audience.sample_size)
     end
   end
 end

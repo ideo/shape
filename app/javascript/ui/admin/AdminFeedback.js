@@ -35,6 +35,10 @@ const LaunchState = styled.span`
   color: ${colors.confirmation};
 `
 
+const AudienceRowItem = styled(Grid)`
+  padding-bottom: 0.5rem;
+`
+
 @inject('apiStore')
 @observer
 class AdminFeedback extends React.Component {
@@ -62,14 +66,20 @@ class AdminFeedback extends React.Component {
               ? moment(testCollection.test_launched_at).fromNow(true)
               : null}
           </Grid>
-          <Grid item xs={2}>
-            Anybody
-          </Grid>
-          <Grid item xs={2}>
-            <Flex justify="flex-end">12</Flex>
-          </Grid>
-          <Grid item xs={2}>
-            <Flex justify="flex-end">12</Flex>
+          <Grid container item xs={6}>
+            {testCollection.test_audiences.map(testAudience => (
+              <React.Fragment key={testAudience.id}>
+                <AudienceRowItem item xs={4}>
+                  Anybody
+                </AudienceRowItem>
+                <AudienceRowItem item xs={4}>
+                  <Flex justify="flex-end">12</Flex>
+                </AudienceRowItem>
+                <AudienceRowItem item xs={4}>
+                  <Flex justify="flex-end">{testAudience.sample_size}</Flex>
+                </AudienceRowItem>
+              </React.Fragment>
+            ))}
           </Grid>
         </FeedbackRow>
         <Grid container>

@@ -3,6 +3,10 @@ class Api::V1::Admin::TestCollectionsController < Api::V1::BaseController
 
   def index
     render jsonapi: Collection::TestCollection.all,
-      class: { 'Collection::TestCollection': SerializableAdminTestCollection }
+      include: [:test_audiences],
+      class: {
+        'Collection::TestCollection': SerializableAdminTestCollection,
+        TestAudience: SerializableTestAudience,
+      }
   end
 end
