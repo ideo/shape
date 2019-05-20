@@ -110,17 +110,20 @@ class AudienceSettings extends React.Component {
   @action
   updateAudienceSettings = settings => (this.audienceSettings = settings)
 
+  confirmOrLaunchTest() {
+    if (this.totalPrice === 0) {
+      this.launchTestWithAudienceSettings()
+    } else {
+      this.openConfirmPriceModal()
+    }
+  }
+
   submitSettings = e => {
     e.preventDefault()
     const { apiStore } = this.props
     const { currentUser } = apiStore
     if (currentUser.feedback_terms_accepted) {
-      console.log('submitting settings')
-      if (this.totalPrice === 0) {
-        this.launchTestWithAudienceSettings()
-      } else {
-        this.openConfirmPriceModal()
-      }
+      this.confirmOrLaunchTest()
     } else {
       this.openTermsModal()
     }
@@ -128,17 +131,15 @@ class AudienceSettings extends React.Component {
 
   acceptFeedbackTerms = e => {
     e.preventDefault()
-    console.log('Agreeing to feedback terms')
     const { currentUser } = this.props.apiStore
     currentUser.API_acceptFeedbackTerms().finally(() => {
       this.closeTermsModal()
-      this.openConfirmPriceModal()
+      this.confirmOrLaunchTest()
     })
   }
 
   confirmPrice = e => {
     e.preventDefault()
-    console.log('buying feedback')
     this.closeConfirmPriceModal()
     this.launchTestWithAudienceSettings()
   }
