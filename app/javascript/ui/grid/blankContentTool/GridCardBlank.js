@@ -300,9 +300,10 @@ class GridCardBlank extends React.Component {
         type: ITEM_TYPES.DATA,
         name: 'Report',
         report_type: 'report_type_collections_and_items',
-        data_settings: {
-          d_measure: 'participants',
-          d_timeframe: 'ever',
+        dataset_attributes: {
+          chart_type: 'area',
+          measure: 'participants',
+          timeframe: 'ever',
         },
       },
     })

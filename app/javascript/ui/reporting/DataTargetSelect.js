@@ -46,12 +46,12 @@ class DataTargetSelect extends React.Component {
   componentDidMount() {
     const {
       item: {
-        data_settings: { d_filters },
+        primaryDataset: { data_source_type },
       },
     } = this.props
-    if (!d_filters || d_filters.length === 0) return
+    if (!data_source_type) return
     runInAction(() => {
-      this.type = d_filters[0].type
+      this.type = data_source_type
     })
   }
 

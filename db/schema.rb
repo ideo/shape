@@ -75,6 +75,16 @@ ActiveRecord::Schema.define(version: 20190517171959) do
     t.index ["user_id"], name: "index_applications_on_user_id"
   end
 
+  create_table "audiences", force: :cascade do |t|
+    t.string "name"
+    t.float "price_per_response"
+    t.string "criteria"
+    t.bigint "organization_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["organization_id"], name: "index_audiences_on_organization_id"
+  end
+
   create_table "collection_cards", force: :cascade do |t|
     t.integer "order", null: false
     t.integer "width"
@@ -98,6 +108,7 @@ ActiveRecord::Schema.define(version: 20190517171959) do
     t.boolean "show_replace", default: true
     t.integer "row"
     t.integer "col"
+    t.integer "question_item_id"
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["order", "row", "col"], name: "index_collection_cards_on_order_and_row_and_col"
@@ -186,7 +197,6 @@ ActiveRecord::Schema.define(version: 20190517171959) do
 
   create_table "datasets", force: :cascade do |t|
     t.string "type"
-    t.string "name"
     t.string "measure"
     t.string "question_type"
     t.string "url"
@@ -201,6 +211,7 @@ ActiveRecord::Schema.define(version: 20190517171959) do
     t.bigint "data_source_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "name"
     t.index ["data_source_type", "data_source_id"], name: "index_datasets_on_data_source_type_and_data_source_id"
     t.index ["organization_id"], name: "index_datasets_on_organization_id"
   end
@@ -411,6 +422,16 @@ ActiveRecord::Schema.define(version: 20190517171959) do
     t.index ["name"], name: "index_tags_on_name", unique: true
   end
 
+  create_table "test_audiences", force: :cascade do |t|
+    t.integer "sample_size"
+    t.bigint "audience_id"
+    t.bigint "test_collection_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["audience_id"], name: "index_test_audiences_on_audience_id"
+    t.index ["test_collection_id"], name: "index_test_audiences_on_test_collection_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: ""
     t.string "encrypted_password", default: "", null: false
@@ -467,4 +488,5 @@ ActiveRecord::Schema.define(version: 20190517171959) do
   end
 
   add_foreign_key "collections", "organizations"
+  add_foreign_key "test_audiences", "audiences"
 end

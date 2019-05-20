@@ -9,143 +9,110 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
            :report_type_collections_and_items,
            parent_collection: parent_collection)
   end
-  let(:report) { DataReport::CollectionsAndItems.new(data_item) }
-  let(:dataset) { report.call.first }
+  let(:dataset_measure) { 'participants' }
+  let(:dataset_timeframe) { 'ever' }
+  let(:dataset_data_source) { nil }
+  let(:default_dataset_params) do
+    {
+      measure: 'participants',
+      timeframe: 'ever',
+      data_source: nil,
+    }
+  end
+  let(:dataset_params) { {} }
+  let(:dataset) do
+    d = data_item.datasets.first
+    d.update(default_dataset_params.merge(dataset_params))
+    if d.type
+      d.becomes(d.type.safe_constantize)
+    else
+      d
+    end
+  end
+
+  let(:report) { DataReport::CollectionsAndItems.new(dataset: dataset) }
 
   describe '#call' do
     context 'filtering by organization' do
+      before do
+        dataset.update(
+          organization: organization,
+        )
+      end
+
       context 'with a participant measure' do
         let!(:activities) do
           # this will generate a new actor for each activity
           create_list(:activity, 3, organization: organization, action: :created)
         end
 
-        before do
-          data_item.update(
-            data_settings: {
-              d_measure: 'participants',
-              d_timeframe: data_item.d_timeframe,
-            },
-          )
-        end
-
         it 'should calculate the number of participants in the organization' do
-          expect(dataset[:single_value]).to eq 3
-        end
-
-        context 'with return_records: true' do
-          let!(:report) do
-            DataReport::CollectionsAndItems.new(
-              data_item,
-              return_records: true,
-            )
-          end
-
-          it 'should return the actor_ids instead of the count' do
-            expect(
-              dataset[:single_value].pluck(:actor_id),
-            ).to match_array(
-              activities.pluck(:actor_id),
-            )
-          end
+          expect(report.single_value).to eq 3
         end
       end
 
       context 'with a viewer measure' do
+        let(:dataset_params) { { measure: 'viewers' } }
+
         before do
           # this will generate a new actor for each activity
           create_list(:activity, 2, organization: organization, action: :viewed)
-          data_item.update(
-            data_settings: {
-              d_measure: 'viewers',
-              d_timeframe: data_item.d_timeframe,
-            },
-          )
         end
 
         it 'should calculate the number of viewers in the organization' do
-          expect(dataset[:single_value]).to eq 2
+          expect(report.single_value).to eq 2
         end
       end
 
       context 'with an activity measure' do
         let(:actor) { create(:user) }
+        let(:dataset_params) { { measure: 'activity' } }
+
         before do
           # viewed does not count towards activity
           create_list(:activity, 2, actor: actor, organization: organization, action: :viewed)
           # commented does
           create_list(:activity, 3, actor: actor, organization: organization, action: :commented)
-          data_item.update(
-            data_settings: {
-              d_measure: 'activity',
-              d_timeframe: data_item.d_timeframe,
-            },
-          )
         end
 
         it 'should calculate the number of activities in the organization' do
           # 3 comments should count, even if they are the same actor
-          expect(dataset[:single_value]).to eq 3
+          expect(report.single_value).to eq 3
         end
       end
 
       context 'with a content, collections measure' do
         let!(:collections) { create_list(:collection, 3, organization: organization) }
-
-        before do
-          data_item.update(
-            data_settings: {
-              d_measure: 'collections',
-              d_timeframe: data_item.d_timeframe,
-            },
-          )
-        end
+        let(:dataset_params) { { measure: 'collections' } }
 
         it 'should calculate the number of collections total in the org' do
           # NOTE: an extra collection is created in the initial setup
-          expect(dataset[:single_value]).to eq 4
-          expect(dataset[:single_value]).to eq Collection.count
+          expect(report.single_value).to eq 4
+          expect(report.single_value).to eq Collection.where(organization_id: organization.id).count
         end
       end
 
       context 'with a content, items measure' do
         let(:collection) { create(:collection, organization: organization) }
         let!(:items) { create_list(:text_item, 5, parent_collection: collection) }
-
-        before do
-          data_item.update(
-            data_settings: {
-              d_measure: 'items',
-              d_timeframe: data_item.d_timeframe,
-            },
-          )
-        end
+        let(:dataset_params) { { measure: 'items' } }
 
         it 'should calculate the number of items total in the org' do
           # NOTE: an extra item to account for the actual data item
-          expect(dataset[:single_value]).to eq 6
-          expect(dataset[:single_value]).to eq Item.count
+          expect(report.single_value).to eq 6
+          expect(report.single_value).to eq Item.count
         end
       end
 
       context 'with a content, items and collections measure' do
         let!(:collection) { create(:collection, organization: organization) }
         let!(:items) { create_list(:text_item, 5, parent_collection: collection) }
-
-        before do
-          data_item.update(
-            data_settings: {
-              d_measure: 'records',
-              d_timeframe: data_item.d_timeframe,
-            },
-          )
-        end
+        let(:dataset_params) { { measure: 'records' } }
 
         it 'should calculate the number of items & collections total in the org' do
           # NOTE: an extra item to account for the actual data item
           # 6 items total, plus two collections
-          expect(dataset[:single_value]).to eq 8
-          expect(dataset[:single_value]).to eq(Item.count + Collection.count)
+          expect(report.single_value).to eq 8
         end
       end
     end
@@ -177,90 +144,79 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
       end
 
       context 'with a participant measure' do
+        let(:dataset_params) { { data_source: parent_collection } }
+
         it 'calculates the number of participants in the collection, child collections, and items in those collections' do
-          data_item.update(
-            data_settings: {
-              d_measure: 'participants',
-              d_filters: [{ type: 'Collection', target: parent_collection.id }],
-              d_timeframe: data_item.d_timeframe,
-            },
-          )
-          expect(dataset[:single_value]).to eq 9
+          expect(report.single_value).to eq 9
         end
 
-        it 'calculates the number of participants in a child collection, and the items in that collection' do
-          data_item.update(
-            data_settings: {
-              d_measure: 'participants',
-              d_filters: [{ type: 'Collection', target: child_collection.id }],
-              d_timeframe: data_item.d_timeframe,
-            },
-          )
-          expect(dataset[:single_value]).to eq 8
+        context 'with a child collection data source' do
+          let(:dataset_params) { { data_source: child_collection } }
+
+          it 'calculates the number of participants in a child collection, and the items in that collection' do
+            expect(report.single_value).to eq 8
+          end
         end
 
-        it 'calculates the number of participants in a child child collection, and the items in that collection' do
-          data_item.update(
-            data_settings: {
-              d_measure: 'participants',
-              d_filters: [{ type: 'Collection', target: child_child_collection.id }],
-              d_timeframe: data_item.d_timeframe,
-            },
-          )
-          expect(dataset[:single_value]).to eq 7
+        context 'with a child child collection data source' do
+          let(:dataset_params) { { data_source: child_child_collection } }
+
+          it 'calculates the number of participants in a child child collection, and the items in that collection' do
+            expect(report.single_value).to eq 7
+          end
         end
       end
 
       context 'with a viewers measure' do
+        let(:dataset_params) do
+          {
+            data_source: parent_collection,
+            measure: 'viewers',
+          }
+        end
+
         it 'calculates the number of viewers in the collection, child collections, and items in those collections' do
-          data_item.update(
-            data_settings: {
-              d_measure: 'viewers',
-              d_filters: [{ type: 'Collection', target: parent_collection.id }],
-              d_timeframe: data_item.d_timeframe,
-            },
-          )
-          expect(dataset[:single_value]).to eq 14
+          expect(report.single_value).to eq 14
         end
 
-        it 'calculates the number of viewers in a child collection, and the items in that collection' do
-          data_item.update(
-            data_settings: {
-              d_measure: 'viewers',
-              d_filters: [{ type: 'Collection', target: child_collection.id }],
-              d_timeframe: data_item.d_timeframe,
-            },
-          )
-          expect(dataset[:single_value]).to eq 9
+        context 'with child data source' do
+          let(:dataset_params) do
+            {
+              data_source: child_collection,
+              measure: 'viewers',
+            }
+          end
+
+          it 'calculates the number of viewers in a child collection, and the items in that collection' do
+            expect(report.single_value).to eq 9
+          end
         end
 
-        it 'calculates the number of viewers in a child child collection, and the items in that collection' do
-          data_item.update(
-            data_settings: {
-              d_measure: 'viewers',
-              d_filters: [{ type: 'Collection', target: child_child_collection.id }],
-              d_timeframe: data_item.d_timeframe,
-            },
-          )
-          expect(dataset[:single_value]).to eq 5
+        context 'with child child data source' do
+          let(:dataset_params) do
+            {
+              data_source: child_child_collection,
+              measure: 'viewers',
+            }
+          end
+
+          it 'calculates the number of viewers in a child child collection, and the items in that collection' do
+            expect(report.single_value).to eq 5
+          end
         end
       end
 
       context 'with a collections measure' do
         let!(:other_child_collection) { create(:collection, organization: organization, parent_collection: parent_collection) }
-
-        before do
-          data_item.update(
-            data_settings: {
-              d_measure: 'collections',
-              d_filters: [{ type: 'Collection', target: parent_collection.id }],
-              d_timeframe: data_item.d_timeframe,
-            },
-          )
+        let(:dataset_params) do
+          {
+            data_source: parent_collection,
+            measure: 'collections',
+          }
         end
 
         it 'should calculate the number of collections in the collection' do
-          expect(dataset[:single_value]).to eq 4
+          expect(report.single_value).to eq 4
         end
       end
 
@@ -268,20 +224,16 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
         let!(:parent_items) { create_list(:text_item, 5, parent_collection: parent_collection) }
         let!(:child_items) { create_list(:text_item, 3, parent_collection: child_collection) }
         let!(:child_child_items) { create_list(:text_item, 2, parent_collection: child_child_collection) }
-
-        before do
-          data_item.update(
-            data_settings: {
-              d_measure: 'items',
-              d_filters: [{ type: 'Collection', target: parent_collection.id }],
-              d_timeframe: data_item.d_timeframe,
-            },
-          )
+        let(:dataset_params) do
+          {
+            data_source: parent_collection,
+            measure: 'items',
+          }
         end
 
         it 'should calculate the number of items in the collection' do
           # NOTE: plus 1 question item + actual data item
-          expect(dataset[:single_value]).to eq 12
+          expect(report.single_value).to eq 12
         end
       end
 
@@ -290,33 +242,29 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
         let!(:parent_items) { create_list(:text_item, 5, parent_collection: parent_collection) }
         let!(:child_items) { create_list(:text_item, 3, parent_collection: other_child_collection) }
         let!(:child_child_items) { create_list(:text_item, 2, parent_collection: child_child_collection) }
-
-        before do
-          data_item.update(
-            data_settings: {
-              d_measure: 'records',
-              d_filters: [{ type: 'Collection', target: parent_collection.id }],
-              d_timeframe: data_item.d_timeframe,
-            },
-          )
+        let(:dataset_params) do
+          {
+            data_source: parent_collection,
+            measure: 'records',
+          }
         end
 
         it 'should calculate the number of collections & items in the collection' do
           # 4 colls + 12 items (see tests above)
-          expect(dataset[:single_value]).to eq 16
+          expect(report.single_value).to eq 16
         end
       end
 
       context 'with a participant measure and a timeframe' do
+        let(:dataset_params) do
+          {
+            data_source: parent_collection,
+            timeframe: 'month',
+          }
+        end
+
         it 'calculates the number of participants in the collection, child collections, and items in those collections' do
-          data_item.update(
-            data_settings: {
-              d_measure: 'participants',
-              d_timeframe: 'month',
-              d_filters: [{ type: 'Collection', target: parent_collection.id }],
-            },
-          )
-          values = dataset[:data]
+          values = report.call
           # we created one activity in the first month
           expect(values.first[:value]).to eq 1
           # the rest are more recent
@@ -325,15 +273,16 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
       end
 
       context 'with a viewer measure and a timeframe' do
+        let(:dataset_params) do
+          {
+            data_source: parent_collection,
+            timeframe: 'month',
+            measure: 'viewers',
+          }
+        end
+
         it 'calculates the number of viewers in the collection, child collections, and items in those collections' do
-          data_item.update(
-            data_settings: {
-              d_measure: 'viewers',
-              d_timeframe: 'month',
-              d_filters: [{ type: 'Collection', target: parent_collection.id }],
-            },
-          )
-          values = dataset[:data]
+          values = report.call
           # we created one activity in the first month
           expect(values.first[:value]).to eq 5
           # the rest are more recent
@@ -345,19 +294,16 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
         let!(:other_child_collection) do
           create(:collection, organization: organization, parent_collection: parent_collection, created_at: 2.months.ago)
         end
-
-        before do
-          data_item.update(
-            data_settings: {
-              d_measure: 'collections',
-              d_timeframe: 'month',
-              d_filters: [{ type: 'Collection', target: parent_collection.id }],
-            },
-          )
+        let(:dataset_params) do
+          {
+            data_source: parent_collection,
+            timeframe: 'month',
+            measure: 'collections',
+          }
         end
 
         it 'should calculate collection counts on a timeline' do
-          values = dataset[:data]
+          values = report.call
           expect(values.first[:value]).to eq 1
           # the rest are more recent
           expect(values.last[:value]).to eq 3
@@ -370,15 +316,12 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
         end
         let!(:new_items) { create_list(:text_item, 3, parent_collection: old_child_collection) }
         let!(:old_items) { create_list(:text_item, 5, parent_collection: old_child_collection, created_at: 2.months.ago) }
-
-        before do
-          data_item.update(
-            data_settings: {
-              d_measure: 'records',
-              d_timeframe: 'month',
-              d_filters: [{ type: 'Collection', target: parent_collection.id }],
-            },
-          )
+        let(:dataset_params) do
+          {
+            data_source: parent_collection,
+            timeframe: 'month',
+            measure: 'records',
+          }
         end
 
         it 'should calculate collection & item counts on a timeline' do
@@ -388,7 +331,7 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
           # Recent collections: 3, Parent, Child, ChildChild (parent context)
           # Recent Items: 1 (data item, top context) + 1 (parent context) + 3 new items
           # RECENT = 8 total
-          values = dataset[:data]
+          values = report.call
           expect(values.first[:value]).to eq 6
           expect(values.last[:value]).to eq 8
         end

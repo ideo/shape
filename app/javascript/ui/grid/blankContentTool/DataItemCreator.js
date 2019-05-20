@@ -18,9 +18,10 @@ class DataItemCreator extends React.Component {
         type: ITEM_TYPES.DATA,
         name: 'Report',
         report_type: 'report_type_collections_and_items',
-        data_settings: {
-          d_measure: value,
-          d_timeframe: 'ever',
+        dataset_attributes: {
+          chart_type: 'area',
+          measure: value,
+          timeframe: 'ever',
         },
       },
     })

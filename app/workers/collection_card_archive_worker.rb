@@ -42,9 +42,11 @@ class CollectionCardArchiveWorker
 
   def get_target_participants(record)
     DataReport::CollectionsAndItems.new(
-      record: record,
-      timeframe: 'ever',
-      measure: 'records',
+      Dataset.build(
+        data_source: record,
+        timeframe: 'ever',
+        measure: 'records',
+      ),
     ).actor_ids
   end
 end

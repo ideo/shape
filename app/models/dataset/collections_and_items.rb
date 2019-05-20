@@ -10,17 +10,13 @@ class Dataset
       records
     ].freeze
 
-    validates :measure, inclusion: { in: VALID_MEASURES }
-    # Data source is a collection or item
-    validates :data_source, presence: true
+    validates :measure, inclusion: { in: Dataset::CollectionsAndItems::VALID_MEASURES }
 
     def data
       return if ever?
 
       DataReport::CollectionsAndItems.call(
-        record: data_source,
-        measure: measure,
-        timeframe: timeframe,
+        dataset: datasets.first,
       )
     end
 
@@ -28,9 +24,7 @@ class Dataset
       return unless ever?
 
       DataReport::CollectionsAndItems.new(
-        record: data_source,
-        measure: measure,
-        timeframe: timeframe,
+        dataset: datasets.first,
       ).single_value
     end
   end

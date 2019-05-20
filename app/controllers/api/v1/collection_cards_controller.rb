@@ -362,9 +362,12 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
           :mimetype,
           docinfo: {},
         ],
-        data_settings: %i[
-          d_measure
-          d_timeframe
+        dataset_attributes: %i[
+          measure
+          timeframe
+          chart_type
+          data_source_type
+          data_source_id
         ],
       ],
     )

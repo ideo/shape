@@ -45,7 +45,7 @@ FactoryBot.define do
 
       trait :report_type_collections_and_items do
         report_type :report_type_collections_and_items
-        data_settings { { d_measure: 'participants', d_timeframe: 'ever' } }
+        dataset_type :collections_and_items
       end
 
       trait :report_type_network_app_metric do

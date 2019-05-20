@@ -26,6 +26,8 @@ class Item < ApplicationRecord
                  :cached_inheritance,
                  :pending_transcoding_uuid
 
+  attr_accessor :dataset_attributes
+
   # The card that 'holds' this item and determines its breadcrumb
   has_one :parent_collection_card,
           class_name: 'CollectionCard::Primary',

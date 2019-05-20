@@ -10,6 +10,8 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
     create(:activity, action: Activity.actions[:created], actor: users[0], target: collection, organization: organization)
     create(:activity, action: Activity.actions[:commented], actor: users[1], target: items[0], organization: organization)
   end
+  let(:data_source) { collection }
+  let(:dataset) { create(:collections_and_items_dataset, data_source: data_source) }
   before do
     collection.recalculate_breadcrumb!
     collection.items.first.recalculate_breadcrumb!
@@ -17,11 +19,7 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
 
   describe '#call' do
     let(:call) do
-      DataReport::CollectionsAndItems.call(
-        record: collection,
-        measure: 'participants',
-        timeframe: 'month',
-      )
+      DataReport::CollectionsAndItems.call(dataset: dataset)
     end
 
     it 'returns time series' do
@@ -38,11 +36,7 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
 
   describe '#single_value' do
     let(:single_value) do
-      DataReport::CollectionsAndItems.new(
-        record: collection,
-        measure: 'participants',
-        timeframe: 'ever',
-      ).single_value
+      DataReport::CollectionsAndItems.new(dataset: dataset).single_value
     end
 
     it 'returns time series' do
@@ -52,11 +46,7 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
 
   describe '#actor_ids' do
     let(:actor_ids) do
-      DataReport::CollectionsAndItems.new(
-        record: collection,
-        measure: 'participants',
-        timeframe: 'ever',
-      ).actor_ids
+      DataReport::CollectionsAndItems.new(dataset: dataset).actor_ids
     end
 
     it 'returns actor_ids for all collections and items' do

@@ -1,12 +1,10 @@
 module DataReport
   class CollectionsAndItems < SimpleService
+    delegate :measure, :timeframe, to: :@dataset
 
-    delegate :organization_id, to: :@record
-
-    def initialize(record:, measure:, timeframe:)
-      @record = record
-      @measure = measure
-      @timeframe = timeframe
+    def initialize(dataset:)
+      @dataset = dataset
+      @record = dataset.data_source
       @data = nil
       @single_value = nil
       @is_single_value = false
@@ -14,15 +12,23 @@ module DataReport
     end
 
     def call
-      initialize_data
-      calculate_timeframe_values
+      if measure == 'records'
+        collections_and_items_report_dataset
+      else
+        initialize_data
+        calculate_timeframe_values
+      end
       @data
     end
 
     def single_value
       @is_single_value = true
-      initialize_data
-      calculate_single_value
+      if measure == 'records'
+        collections_and_items_report_dataset
+      else
+        initialize_data
+        calculate_single_value
+      end
       @single_value
     end
 
@@ -37,28 +43,32 @@ module DataReport
       @is_single_value
     end
 
+    def organization_id
+      @dataset.organization_id || @record&.organization_id
+    end
+
     def initialize_data
-      if @measure == 'records'
-        collections_and_items_report_dataset
-      else
-        @query = generate_base_query
-        return [] unless @query
-        @query = filtered_query
-      end
+      @query = generate_base_query
+      return [] unless @query
+      @query = filtered_query
     end
 
     def collections_and_items_report_dataset
-      item_data = DataReport::CollectionsAndItems.new(
-        record: @record,
-        measure: 'items',
-        timeframe: @timeframe,
-      )
+      item_data = DataReport::CollectionsAndItems.new(dataset:
+        Dataset.new(
+          data_source: @record,
+          measure: 'items',
+          timeframe: timeframe,
+          organization_id: organization_id,
+        ))
 
-      collection_data = DataReport::CollectionsAndItems.new(
-        record: @record,
-        measure: 'collections',
-        timeframe: @timeframe,
-      )
+      collection_data = DataReport::CollectionsAndItems.new(dataset:
+        Dataset.new(
+          data_source: @record,
+          measure: 'collections',
+          timeframe: timeframe,
+          organization_id: organization_id,
+        ))
 
       if single_value?
         # Combine the two reports
@@ -77,7 +87,7 @@ module DataReport
     end
 
     def generate_base_query
-      case @measure
+      case measure
       when 'participants'
         Activity.where_participated
       when 'viewers'
@@ -107,17 +117,17 @@ module DataReport
                 .where(%(coalesce(collections.breadcrumb, items.breadcrumb) @> ':collection_id' or
                            collections.id = :collection_id),
                        collection_opts)
-        elsif @measure == 'collections'
+        elsif measure == 'collections'
           @query.where(%(breadcrumb @> ':collection_id' or
                          id = :collection_id),
                        collection_opts)
-        elsif @measure == 'items'
+        elsif measure == 'items'
           @query.where(%(breadcrumb @> ':collection_id'),
                        collection_opts)
         end
       else
         # default, within entire org
-        if @measure == 'items'
+        if measure == 'items'
           @query
             .joins(parent_collection_card: :parent)
             .where('collections.organization_id = ?', organization_id)
@@ -129,12 +139,12 @@ module DataReport
     end
 
     def measure_queries_activities?
-      !%w[collections items records].include?(@measure)
+      !%w[collections items records].include?(measure)
     end
 
     def query_table
       return Activity if measure_queries_activities?
-      case @measure
+      case measure
       when 'collections'
         Collection
       when 'items'
@@ -150,7 +160,7 @@ module DataReport
       return unless earliest.present?
 
       min = [earliest, 6.months.ago].max
-      case @measure
+      case measure
       when 'participants', 'viewers'
         selection = 'count(distinct(actor_id))'
       when 'activity', 'content', 'collections', 'items'
@@ -171,15 +181,15 @@ module DataReport
               FROM (#{@query.select(*columns).to_sql}) inner_query
               WHERE
                 created_at BETWEEN
-                  LEAST(series.date, now()::DATE) - INTERVAL '1 #{@timeframe}'
+                  LEAST(series.date, now()::DATE) - INTERVAL '1 #{timeframe}'
                   AND
-                  LEAST(series.date, now()::DATE) + INTERVAL '1 #{@timeframe}'
+                  LEAST(series.date, now()::DATE) + INTERVAL '1 #{timeframe}'
           )
         FROM
           GENERATE_SERIES(
-            ('#{min.send("beginning_of_#{@timeframe}")}'::DATE + INTERVAL '1 #{@timeframe}'),
-            now()::DATE + INTERVAL '1 #{@timeframe}',
-            INTERVAL '1 #{@timeframe}'
+            ('#{min.send("beginning_of_#{timeframe}")}'::DATE + INTERVAL '1 #{timeframe}'),
+            now()::DATE + INTERVAL '1 #{timeframe}',
+            INTERVAL '1 #{timeframe}'
           ) AS series
         ORDER BY series.date;
       }
@@ -198,7 +208,7 @@ module DataReport
     end
 
     def calculate_single_value
-      case @measure
+      case measure
       when 'participants', 'viewers'
         value = @query
                 .select(:actor_id)

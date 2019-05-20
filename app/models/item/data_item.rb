@@ -78,7 +78,27 @@ class Item
       datasets.first&.description
     end
 
+    def create_dataset(params)
+      datasets.create(
+        {
+          type: dataset_type,
+          organization_id: organization_id,
+        }.merge(params),
+      )
+    end
+
     private
+
+    def dataset_type
+      case report_type.to_s
+      when
+        'report_type_collections_and_items' then 'Dataset::CollectionsAndItems'
+      when
+        'report_type_question_item' then 'Dataset::QuestionItem'
+      when
+        'report_type_network_app_metric' then 'Dataset::NetworkAppMetric'
+      end
+    end
 
     def create_legend_item?
       return false if dont_create_legend_item ||

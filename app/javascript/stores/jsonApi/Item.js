@@ -30,7 +30,6 @@ class Item extends SharedRecordMixin(BaseRecord) {
     'tag_list',
     'thumbnail_url',
     'filestack_file_attributes',
-    'data_settings',
     'report_type',
     'selected_measures',
   ]
@@ -221,11 +220,8 @@ class Item extends SharedRecordMixin(BaseRecord) {
   }
 
   get collectionFilter() {
-    if (!this.data_settings) return null
-    return (
-      this.data_settings.d_filters &&
-      _.find(this.data_settings.d_filters, { type: 'Collection' })
-    )
+    if (!this.primaryDataset) return null
+    return _.find(this.primaryDataset.data_source_id, { type: 'Collection' })
   }
 
   API_updateWithoutSync({ cancel_sync } = {}) {
@@ -250,9 +246,6 @@ class Item extends SharedRecordMixin(BaseRecord) {
 Item.defaults = {
   data_content: '',
   can_edit: false,
-  data_settings: {
-    d_measure: null,
-  },
   thumbnail_url: '',
 }
 Item.refDefaults = {

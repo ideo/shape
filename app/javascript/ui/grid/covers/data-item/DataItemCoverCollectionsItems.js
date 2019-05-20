@@ -114,7 +114,7 @@ class DataItemCoverCollectionsItems extends React.Component {
   async saveSettings(settings) {
     const { card, item, uiStore } = this.props
     runInAction(() => {
-      item.data_settings = Object.assign({}, item.data_settings, settings)
+      item.primaryDatset = Object.assign({}, item.primaryDatset, settings)
     })
     const res = await item.save()
     // If the timeframe changed we have to resize the card
@@ -239,9 +239,9 @@ class DataItemCoverCollectionsItems extends React.Component {
 
   get titleAndControls() {
     const { item } = this.props
-    const { name, data_settings } = item
+    const { name, primaryDataset } = item
     if (item.isReportTypeNetworkAppMetric) {
-      return startCase(data_settings.d_measure)
+      return startCase(primaryDataset.measure)
     } else if (item.isReportTypeCollectionsItems) {
       return this.collectionsAndItemsControls
     }

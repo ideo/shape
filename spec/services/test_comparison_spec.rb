@@ -31,19 +31,19 @@ RSpec.describe TestComparison do
 
   describe '#add' do
     let(:add) do
-      TestComparison.add(
+      TestComparison.new(
         collection: test_collection,
         comparison_collection: comparison_collection,
-      )
+      ).add
     end
 
     it 'adds datasets from comparison to test collection data items' do
-      expect(test_data_item.datasets.size).to eq(1)
+      expect(test_data_item.datasets.size).to eq(2)
       expect(test_data_item.datasets).not_to include(comparison_data_item.datasets.first)
       expect { add }.to change(DataItemsDataset, :count).by(1)
       test_data_item.datasets.reload
       expect(test_data_item.datasets).to include(comparison_data_item.datasets.first)
-      expect(test_data_item.datasets.size).to eq(2)
+      expect(test_data_item.datasets.size).to eq(3)
     end
 
     context 'if collection has different question type' do
@@ -67,22 +67,22 @@ RSpec.describe TestComparison do
       end
 
       it 'adds empty dataset' do
-        expect(not_matching_question_data_item.datasets.size).to eq(1)
+        expect(not_matching_question_data_item.datasets.size).to eq(2)
         expect(not_matching_question_data_item.datasets.pluck(:type)).not_to include('Dataset::Empty')
         expect { add }.to change(Dataset::Empty, :count).by(1)
         empty_dataset = Dataset::Empty.last
         not_matching_question_data_item.datasets.reload
-        expect(not_matching_question_data_item.datasets.size).to eq(2)
+        expect(not_matching_question_data_item.datasets.size).to eq(3)
         expect(not_matching_question_data_item.datasets).to include(empty_dataset)
       end
     end
 
     context 'if collections are the same' do
       let!(:add) do
-        TestComparison.add(
+        TestComparison.new(
           collection: test_collection,
           comparison_collection: test_collection,
-        )
+        ).add
       end
 
       it 'does not add' do
@@ -97,25 +97,25 @@ RSpec.describe TestComparison do
 
   describe '#remove' do
     before do
-      TestComparison.add(
+      TestComparison.new(
         collection: test_collection,
         comparison_collection: comparison_collection,
-      )
+      ).add
     end
     let(:remove) do
-      TestComparison.remove(
+      TestComparison.new(
         collection: test_collection,
         comparison_collection: comparison_collection,
-      )
+      ).remove
     end
 
     it 'removes datasets from test collection data items' do
-      expect(test_data_item.datasets.size).to eq(2)
+      expect(test_data_item.datasets.size).to eq(3)
       expect(test_data_item.datasets).to include(comparison_data_item.datasets.first)
       expect { remove }.to change(DataItemsDataset, :count).by(-1)
       test_data_item.datasets.reload
       expect(test_data_item.datasets).not_to include(comparison_data_item.datasets.first)
-      expect(test_data_item.datasets.size).to eq(1)
+      expect(test_data_item.datasets.size).to eq(2)
     end
   end
 end

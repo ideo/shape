@@ -91,24 +91,12 @@ class Api::V1::ItemsController < Api::V1::BaseController
       :external_id,
       :content,
       { data_content: {} },
-      { data_settings: [
-        :d_measure,
-        :d_timeframe,
-        selected_measures: [],
-        d_filters: %i[type target],
-      ] },
       :url,
       :image,
       :archived,
       :tag_list,
       :thumbnail_url,
       :legend_item_id,
-      datasets_attributes: %i[
-        id
-        measure
-        timeframe
-        chart_type
-      ],
       filestack_file_attributes: Item.filestack_file_attributes_whitelist,
     )
   end

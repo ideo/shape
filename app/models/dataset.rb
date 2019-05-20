@@ -63,9 +63,6 @@ class Dataset < ApplicationRecord
 
   def total; end
 
-  # Measure is the 'thing' being quantified, e.g. particiapnts, viewers, activity, content
-  def measure; end
-
   def single_value; end
 
   def test_collection_id; end
