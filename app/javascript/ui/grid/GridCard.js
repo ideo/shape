@@ -413,7 +413,11 @@ class GridCard extends React.Component {
                   <FullScreenIcon />
                 </CardActionHolder>
               )}
-              {!testCollectionCard && <SelectionCircle cardId={card.id} />}
+              {!testCollectionCard && (
+                <CardActionHolder tooltipText="select">
+                  <SelectionCircle cardId={card.id} />
+                </CardActionHolder>
+              )}
               <ActionMenu
                 location={searchResult ? 'Search' : 'GridCard'}
                 className="show-on-hover"
