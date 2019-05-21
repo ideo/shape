@@ -17,4 +17,13 @@ class SerializableCurrentUser < SerializableUser
   attribute :is_super_admin do
     @current_user ? @current_user.has_role?(Role::SUPER_ADMIN) : false
   end
+
+  attribute :current_incentive_balance do
+    @object.current_incentive_balance.to_s
+    # Because JSON wants strings for numbers? See current_user_collection_id
+  end
+
+  attribute :incentive_due_date do
+    @object.incentive_due_date&.strftime('%m/%d/%Y')
+  end
 end
