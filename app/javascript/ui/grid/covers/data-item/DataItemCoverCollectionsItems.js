@@ -38,8 +38,8 @@ class DataItemCoverCollectionsItems extends React.Component {
   targetCollection = null
 
   componentDidMount() {
-    const { datasets } = this.props.item
-    const dataSourceId = datasets[0].data_source_id
+    const { primaryDataset } = this.props.item
+    const dataSourceId = primaryDataset.data_source_id
     if (dataSourceId) {
       this.loadTargetCollection(dataSourceId)
     }

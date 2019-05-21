@@ -313,7 +313,7 @@ class LegendItemCover extends React.Component {
             <Heading3
               onClick={this.toggleComparisonSearch}
               role="button"
-              className="add-comparison-button"
+              className="test-add-comparison-button"
             >
               <PlusIconContainer>
                 <PlusIcon viewBox="0 0 5 18" />

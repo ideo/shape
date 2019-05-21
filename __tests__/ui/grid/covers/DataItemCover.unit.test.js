@@ -1,6 +1,7 @@
 import DataItemCover from '~/ui/grid/covers/DataItemCover'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import {
+  fakeDataset,
   fakeDataItemCollectionsItemsAttrs,
   fakeDataItemRecordAttrs,
 } from '#/mocks/data'
@@ -13,6 +14,7 @@ describe('DataItemCover', () => {
   beforeEach(() => {
     props.apiStore = apiStore
     props.item = fakeDataItemCollectionsItemsAttrs
+    props.item.primaryDataset = fakeDataset
     props.card = { id: 1, record: props.item, width: 1, height: 1 }
     render = () =>
       (wrapper = shallow(<DataItemCover.wrappedComponent {...props} />))
@@ -26,6 +28,7 @@ describe('DataItemCover', () => {
   describe('item with "report_type_collections_and_items"', () => {
     beforeEach(() => {
       props.item = fakeDataItemCollectionsItemsAttrs
+      props.item.primaryDataset = fakeDataset
       props.card.record = props.item
       wrapper.setProps(props)
       render()
@@ -40,6 +43,7 @@ describe('DataItemCover', () => {
   describe('item with "report_type_record"', () => {
     beforeEach(() => {
       props.item = fakeDataItemRecordAttrs
+      props.item.primaryDataset = fakeDataset
       props.card.record = props.item
       wrapper.setProps(props)
       render()
