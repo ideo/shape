@@ -165,12 +165,13 @@ class RecontactQuestion extends React.Component {
 RecontactQuestion.propTypes = {
   user: MobxPropTypes.objectOrObservableObject,
   onAnswer: PropTypes.func.isRequired,
-  sessionUid: PropTypes.string.isRequired,
+  sessionUid: PropTypes.string,
   backgroundColor: PropTypes.string,
 }
 RecontactQuestion.defaultProps = {
   user: null,
   backgroundColor: null,
+  sessionUid: null,
 }
 
 export default RecontactQuestion

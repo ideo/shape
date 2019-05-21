@@ -2,6 +2,7 @@ class TestsController < ApplicationController
   include ApplicationHelper
   include IdeoSsoHelper
   before_action :load_test_collection, only: %i[show token_auth]
+  before_action :load_test_audience_into_session, only: %i[show]
   before_action :redirect_to_test, only: %i[show]
 
   def show
@@ -28,7 +29,21 @@ class TestsController < ApplicationController
   def load_test_collection
     @collection = Collection::TestCollection.find(params[:id])
   rescue ActiveRecord::RecordNotFound
-    redirect_to root_url
+    @collection = Collection::TestCollection.new
+    @invalid = true
+  end
+
+  def load_test_audience_into_session
+    unless params[:ta].present?
+      # clear out any previous values from the session
+      session.delete :test_audience_id
+      return
+    end
+    test_audience = @collection.test_audiences.find_by(id: params[:ta])
+    unless test_audience.present? || @collection.link_sharing_enabled?
+      @invalid = true
+    end
+    session[:test_audience_id] = test_audience&.id
   end
 
   def redirect_to_test

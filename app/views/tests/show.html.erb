@@ -5,6 +5,7 @@
   window.nextAvailableId = <%= @next_submission_test ? @next_submission_test.id : 'null' %>;
   window.noneAvailable = <%= params[:action] == 'completed' %>;
   window.filestackToken = <%= FilestackFile.filestack_security(read_only: true).to_json.html_safe %>;
+  window.invalid = <%= !!@invalid %>;
 </script>
 
 <%= javascript_pack_tag 'test-survey-app' %>

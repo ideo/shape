@@ -63,11 +63,19 @@ describe Collection::TestCollection, type: :model do
   end
 
   describe '#create_uniq_survey_response' do
+    let!(:test_audience) { create(:test_audience, test_collection: test_collection) }
+
     it 'should create a survey response with a unique session_uid' do
       expect do
         test_collection.create_uniq_survey_response
       end.to change(test_collection.survey_responses, :count).by(1)
       expect(test_collection.survey_responses.last.session_uid).not_to be nil
+    end
+
+    it 'should accept the passed in test_audience_id' do
+      expect {
+        test_collection.create_uniq_survey_response(test_audience_id: test_audience.id)
+      }.to change(test_audience.survey_responses, :count).by(1)
     end
   end
 
