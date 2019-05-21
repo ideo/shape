@@ -78,5 +78,27 @@ RSpec.describe LimitedUserCreator, type: :service do
         limited_user_creator.call
       end
     end
+
+    context 'with additional fields' do
+      let(:contact_info) { 'mary@make.com' }
+      let(:user_info) {
+        {
+          phone: '4154239843',
+          first_name: 'Limited',
+          last_name: 'User'
+        }
+      }
+
+      it 'should create a user with the additional fields' do
+        expect(NetworkApi::User).to receive(:create).with(
+          email: contact_info,
+          phone: user_info[:phone],
+          first_name: user_info[:first_name],
+          last_name: user_info[:last_name],
+          limited_user: true,
+        )
+        LimitedUserCreator.call(contact_info: contact_info, user_info: user_info)
+      end
+    end
   end
 end

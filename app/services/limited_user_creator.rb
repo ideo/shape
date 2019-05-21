@@ -1,8 +1,9 @@
 class LimitedUserCreator < SimpleService
   attr_accessor :limited_user, :errors
 
-  def initialize(contact_info:)
+  def initialize(contact_info:, user_info: {})
     @contact_info = contact_info
+    @user_info = user_info
     @email = nil
     @phone = nil
     @limited_user = nil
@@ -61,6 +62,8 @@ class LimitedUserCreator < SimpleService
     return if @network_user.present?
 
     params[:limited_user] = true
+    params.merge!(@user_info)
+
     @network_user = NetworkApi::User.create(params)
   end
 
