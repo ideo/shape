@@ -1,52 +1,68 @@
 # NOTE: if audiences are free, will not really "purchase" but just create
-class TestAudiencePurchaser < SimpleService
-  attr_reader :total_price
+class TestAudiencePurchaser
+  include Interactor
 
-  def initialize(test_collection, test_audience_params)
-    @test_collection = test_collection
-    @test_audience_params = test_audience_params
-    @total_price = 0
+  delegate :test_collection, :test_audience_params, :total_price,
+           to: :context
+
+  delegate :organization, to: :test_collection
+
+  before do
+    context.total_price = 0
   end
 
   def call
-    if build_test_audiences
-      charge_payment_and_create_test_audiences
-    end
-    @test_collection
+    build_test_audiences
+    charge_payment
+    test_collection.save
   end
 
   private
 
   def build_test_audiences
-    @test_audience_params.each do |id, settings|
+    test_audience_params.each do |id, settings|
       next unless settings[:selected]
       audience = Audience.find(id)
       sample_size = settings[:sample_size].to_i
       # skip any TestAudience for audiences that cost money, where no sample_size was indicated
       next if audience.price_per_response.positive? && sample_size.zero?
-      @test_collection.test_audiences.build(
+      test_collection.test_audiences.build(
         sample_size: sample_size,
         price_per_response: audience.price_per_response,
         audience_id: audience.id,
       )
-      @total_price += sample_size * audience.price_per_response
+      context.total_price += sample_size * audience.price_per_response
+
     rescue ActiveRecord::RecordNotFound
-      @test_collection.errors.add(:test_audiences, 'audience not found')
+      test_collection.errors.add(:test_audiences, 'not found')
+      context.fail!
     end
-    @test_collection.errors.empty?
+
+    return if test_collection.test_audiences.present?
+
+    test_collection.errors.add(:test_audiences, 'required')
+    context.fail!
   end
 
-  def charge_payment_and_create_test_audiences
-    # error case, requires at least one audience e.g. link sharing
-    if @test_collection.test_audiences.empty?
-      @test_collection.errors.add(:test_audiences, 'required')
-      return
+  def charge_payment
+    return true unless total_price.positive?
+    # Purchase test
+    payment_method = organization.network_default_payment_method
+
+    if payment_method.blank?
+      context.fail!(
+        message: 'No valid payment method has been added',
+      )
     end
-    if @total_price.positive?
-      # TODO: Hook up payment with org credit card
-      # and add errors if it didn't work
-    end
-    # save will create the test_audiences built earlier
-    @test_collection.save
+
+    payment = NetworkApi::Payment.create(
+      payment_method_id: payment_method.id,
+      amount: total_price,
+    )
+    return true if payment.status == 'succeeded'
+
+    context.fail!(
+      message: "Payment failed: #{payment.errors.full_messages.join('. ')}",
+    )
   end
 end

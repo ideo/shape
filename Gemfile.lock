@@ -7,9 +7,9 @@ GIT
 
 GIT
   remote: https://github.com/ideo/network-api-ruby.git
-  revision: 5f0363bd4e45dae47493156c85351911aa357b57
+  revision: e7fe637bcee89101ea3ad62bd302c52eb9989022
   specs:
-    network-api-ruby (0.0.13)
+    network-api-ruby (0.0.15)
       json_api_client (~> 1.5, >= 1.5.3)
 
 GIT
@@ -227,6 +227,7 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (1.6.0)
       concurrent-ruby (~> 1.0)
+    interactor (3.1.1)
     jbuilder (2.7.0)
       activesupport (>= 4.2.0)
       multi_json (>= 1.2)
@@ -288,7 +289,7 @@ GEM
     msgpack (1.2.4)
     multi_json (1.13.1)
     multi_xml (0.6.0)
-    multipart-post (2.0.0)
+    multipart-post (2.1.1)
     nenv (0.3.0)
     nio4r (2.3.1)
     nokogiri (1.8.5)
@@ -542,6 +543,7 @@ DEPENDENCIES
   guard-rspec
   heroku-deflater!
   httparty
+  interactor
   jbuilder (~> 2.5)
   json-schema
   jsonapi-rails

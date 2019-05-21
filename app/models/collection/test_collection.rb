@@ -78,10 +78,16 @@ class Collection
     end
 
     def attempt_to_purchase_test_audiences!(test_audience_params: nil)
-      return true unless test_audience_params.present?
-      TestAudiencePurchaser.call(self, test_audience_params)
-      return false if errors.present?
-      true
+      return true if test_audience_params.blank?
+
+      purchaser = TestAudiencePurchaser.call(
+        test_collection: self,
+        test_audience_params: test_audience_params,
+      )
+      purchaser.success?
+    rescue Interactor::Failure
+      errors.add(:base, purchaser.message) if purchaser.message.present?
+      false
     end
 
     def post_launch_setup!(initiated_by: nil, reopening: false)

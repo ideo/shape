@@ -204,18 +204,22 @@ class Organization < ApplicationRecord
 
   def create_network_subscription
     plan = NetworkApi::Plan.first
-    payment_method = NetworkApi::PaymentMethod.find(
-      organization_id: network_organization.id,
-      default: true,
-    ).first
     subscription_params = {
       organization_id: network_organization.id,
       plan_id: plan.id,
     }
+    payment_method = network_default_payment_method
     if payment_method
       subscription_params[:payment_method_id] = payment_method.id
     end
     NetworkApi::Subscription.create(subscription_params)
+  end
+
+  def network_default_payment_method
+    NetworkApi::PaymentMethod.find(
+      organization_id: network_organization.id,
+      default: true,
+    ).first
   end
 
   def calculate_active_users_count!
@@ -271,10 +275,7 @@ class Organization < ApplicationRecord
   end
 
   def update_payment_status
-    payment_method = NetworkApi::PaymentMethod.find(
-      organization_id: network_organization.id,
-      default: true,
-    ).first
+    payment_method = network_default_payment_method
     update_attributes!(
       has_payment_method: payment_method ? true : false,
       overdue_at: payment_method ? nil : overdue_at,
