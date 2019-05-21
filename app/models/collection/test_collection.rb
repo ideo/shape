@@ -103,7 +103,7 @@ class Collection
       update_cached_submission_status(parent_submission) if inside_a_submission?
       create_test_design_and_move_cards!(initiated_by: initiated_by) unless reopening
       update(test_launched_at: Time.current, test_closed_at: nil)
-      TestCollectionMailer.notify_launch(self.id).deliver_later unless test_audiences.empty?
+      TestCollectionMailer.notify_launch(id).deliver_later if gives_incentive? && ENV['ENABLE_ZENDESK_FOR_TEST_LAUNCH']
     end
 
     def still_accepting_answers?
