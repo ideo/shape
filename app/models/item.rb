@@ -42,7 +42,6 @@ class Item < ApplicationRecord
   # Intentionally scoping so all non-data-items return no DataItemsDatasets
   has_many :data_items_datasets,
            -> { none },
-           dependent: :destroy,
            foreign_key: 'data_item_id'
 
   delegate :parent, :pinned, :pinned?, :pinned_and_locked?,
