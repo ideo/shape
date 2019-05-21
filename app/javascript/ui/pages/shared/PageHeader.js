@@ -179,7 +179,7 @@ class PageHeader extends React.Component {
     } else if (record.launchableTestId) {
       icon = <TestCollectionIcon />
     } else if (record.isBoard) {
-      icon = <FoamcoreBoardIcon />
+      icon = <FoamcoreBoardIcon large />
     }
     if (icon) {
       return <IconHolder align="right">{icon}</IconHolder>
