@@ -58,6 +58,7 @@ Rails.application.routes.draw do
           end
         end
       end
+      resources :datasets, only: %i[update]
       resources :test_collections, only: %i[show] do
         member do
           patch 'launch'

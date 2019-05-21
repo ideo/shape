@@ -16,7 +16,7 @@ class Dataset
       return if ever?
 
       DataReport::CollectionsAndItems.call(
-        dataset: datasets.first,
+        dataset: self,
       )
     end
 
@@ -24,7 +24,7 @@ class Dataset
       return unless ever?
 
       DataReport::CollectionsAndItems.new(
-        dataset: datasets.first,
+        dataset: self,
       ).single_value
     end
   end

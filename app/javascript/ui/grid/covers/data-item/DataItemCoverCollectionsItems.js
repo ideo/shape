@@ -38,16 +38,17 @@ class DataItemCoverCollectionsItems extends React.Component {
   targetCollection = null
 
   componentDidMount() {
-    const { collectionFilter } = this.props.item
-    if (collectionFilter && collectionFilter.target) {
-      this.loadTargetCollection(collectionFilter.target)
+    const { datasets } = this.props.item
+    const dataSourceId = datasets[0].data_source_id
+    if (dataSourceId) {
+      this.loadTargetCollection(dataSourceId)
     }
   }
 
-  async loadTargetCollection(target) {
+  async loadTargetCollection(source) {
     const { apiStore } = this.props
     try {
-      const res = await apiStore.fetch('collections', target)
+      const res = await apiStore.fetch('collections', source)
       runInAction(() => {
         this.targetCollection = res.data
       })
@@ -69,7 +70,7 @@ class DataItemCoverCollectionsItems extends React.Component {
 
   onSelectTimeframe = value => {
     this.saveSettings({
-      d_timeframe: value,
+      timeframe: value,
     })
   }
 
@@ -82,9 +83,8 @@ class DataItemCoverCollectionsItems extends React.Component {
     }
 
     this.saveSettings({
-      d_filters: value
-        ? [{ type: 'Collection', target: Number(collectionId) }]
-        : [],
+      data_source_id: collectionId,
+      data_source_type: 'collections',
     })
     if (collectionId) {
       this.loadTargetCollection(collectionId)
@@ -100,7 +100,7 @@ class DataItemCoverCollectionsItems extends React.Component {
     // don't allow setting null measure
     if (!value) return
     this.saveSettings({
-      d_measure: value,
+      measure: value,
     })
   }
 
@@ -114,11 +114,11 @@ class DataItemCoverCollectionsItems extends React.Component {
   async saveSettings(settings) {
     const { card, item, uiStore } = this.props
     runInAction(() => {
-      item.primaryDatset = Object.assign({}, item.primaryDatset, settings)
+      Object.assign(item.primaryDataset, settings)
     })
-    const res = await item.save()
+    await item.primaryDataset.save()
     // If the timeframe changed we have to resize the card
-    if (settings.d_timeframe) {
+    if (settings.timeframe) {
       const { height, width } = this.correctGridSize
       card.height = height
       card.width = width
@@ -126,7 +126,6 @@ class DataItemCoverCollectionsItems extends React.Component {
     }
     // TODO: investigate why data isn't being updated with just `save()`
     runInAction(() => {
-      item.update(res.data)
       this.toggleEditing()
       uiStore.toggleEditingCardId(card.id)
     })
@@ -164,7 +163,8 @@ class DataItemCoverCollectionsItems extends React.Component {
 
   get measureControl() {
     const { item } = this.props
-    const { measure } = item
+    const { primaryDataset } = item
+    const { measure } = primaryDataset
     const editable = item.can_edit_content
     if (this.editing) {
       return (
@@ -180,11 +180,11 @@ class DataItemCoverCollectionsItems extends React.Component {
     } else if (editable) {
       return (
         <EditableButton editable={editable} onClick={this.handleEditClick}>
-          <span className="editableMetric">{measure.name}</span>
+          <span className="editableMetric">{measure}</span>
         </EditableButton>
       )
     }
-    return <span>{measure.name}</span>
+    return <span>{measure}</span>
   }
 
   get targetControl() {
@@ -219,7 +219,7 @@ class DataItemCoverCollectionsItems extends React.Component {
     if (timeframe === 'ever') {
       return (
         <span className="titleAndControls">
-          within {!item.collectionFilter ? 'the ' : ''}
+          within {!item.datasets[0].data_source ? 'the ' : ''}
           {this.targetControl} {this.timeframeControl}
         </span>
       )
