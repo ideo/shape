@@ -267,7 +267,7 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
       end
     end
 
-    context 'with collection_type' do
+    context 'with type' do
       let!(:test_collection) do
         create(
           :test_collection,
