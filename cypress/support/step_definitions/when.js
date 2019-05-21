@@ -69,7 +69,7 @@ When('I add a link URL', () => {
   cy.locate('LinkCreatorFormButton').click()
 })
 
-When('I add a test description for {string}', string => {
+When('I fill {string} with some text', string => {
   cy.locateDataOrClass(string)
     .first()
     .click()

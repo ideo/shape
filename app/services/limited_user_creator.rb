@@ -6,15 +6,20 @@ class LimitedUserCreator < SimpleService
     @email = nil
     @phone = nil
     @limited_user = nil
+    @network_user = nil
 
     @errors = []
   end
 
   def call
     return false unless validate_contact_info
-    network_user = find_or_create_network_user
-    return false unless network_user.present?
-    saved = create_user(network_user)
+    find_or_create_network_user
+    return false unless @network_user.present?
+    if @network_user.errors.present?
+      @errors = @network_user.errors
+      return false
+    end
+    saved = create_user(@network_user)
     @errors = @limited_user.errors
     saved
   end
@@ -49,14 +54,14 @@ class LimitedUserCreator < SimpleService
 
     if Rails.env.development?
       # always look up the same user so we don't keep creating real ones
-      params[:email] = 'test.shape.space@ideo.com'
+      params[:email] = 'test.user@shape.space'
       params.delete :phone
     end
-    existing = NetworkApi::User.where(params).first
-    return existing if existing.present?
+    @network_user = NetworkApi::User.where(params).first
+    return if @network_user.present?
 
     params[:limited_user] = true
-    NetworkApi::User.create(params)
+    @network_user = NetworkApi::User.create(params)
   end
 
   def create_user(network_user)
