@@ -41,6 +41,10 @@ class RoutingStore extends RouterStore {
   routeTo = (type, id = null) => {
     this.routingTo = { type, id }
 
+    // prevent accidental route changes while you are dragging/moving into collection
+    if (uiStore.movingIntoCollection) {
+      return
+    }
     // close the org/roles menus if either are open when we route to a new page
     uiStore.update('organizationMenuPage', null)
     uiStore.update('rolesMenuOpen', null)
