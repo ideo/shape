@@ -1,3 +1,22 @@
+# == Schema Information
+#
+# Table name: question_answers
+#
+#  id                    :bigint(8)        not null, primary key
+#  answer_number         :integer
+#  answer_text           :text
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#  open_response_item_id :integer
+#  question_id           :bigint(8)
+#  survey_response_id    :bigint(8)
+#
+# Indexes
+#
+#  index_question_answers_on_question_id         (question_id)
+#  index_question_answers_on_survey_response_id  (survey_response_id)
+#
+
 class QuestionAnswer < ApplicationRecord
   # NOTE: survey_response then touches its test_collection,
   # so that answering one question can bust the collection caching for viewing charts

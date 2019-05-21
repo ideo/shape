@@ -1,3 +1,27 @@
+# == Schema Information
+#
+# Table name: groups
+#
+#  id                           :bigint(8)        not null, primary key
+#  archive_batch                :string
+#  archived                     :boolean          default(FALSE)
+#  archived_at                  :datetime
+#  autojoin_emails              :jsonb
+#  handle                       :string
+#  name                         :string
+#  created_at                   :datetime         not null
+#  updated_at                   :datetime         not null
+#  current_shared_collection_id :integer
+#  filestack_file_id            :integer
+#  organization_id              :bigint(8)
+#
+# Indexes
+#
+#  index_groups_on_autojoin_emails  (autojoin_emails) USING gin
+#  index_groups_on_handle           (handle)
+#  index_groups_on_organization_id  (organization_id)
+#
+
 class Group < ApplicationRecord
   include Resourceable
   include HasFilestackFile
