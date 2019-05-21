@@ -46,12 +46,12 @@ class DataTargetSelect extends React.Component {
   componentDidMount() {
     const {
       item: {
-        primaryDataset: { data_source_type },
+        primaryDataset: { data_source_id },
       },
     } = this.props
-    if (!data_source_type) return
+    if (!data_source_id) return
     runInAction(() => {
-      this.type = data_source_type
+      this.type = 'Collection'
     })
   }
 
@@ -62,7 +62,7 @@ class DataTargetSelect extends React.Component {
     if (targetCollection && !this.editing) {
       return targetCollection.name
     }
-    return item.collectionFilter ? 'Collection' : this.type
+    return item.data_source_id ? 'Collection' : this.type
   }
 
   handleChange = e => {
@@ -112,7 +112,7 @@ class DataTargetSelect extends React.Component {
             </SelectOption>
           ))}
         </Select>
-        {this.type === 'collections' &&
+        {this.type === 'Collection' &&
           this.editing && (
             <div
               style={{

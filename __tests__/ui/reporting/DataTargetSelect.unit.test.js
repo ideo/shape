@@ -35,14 +35,13 @@ describe('DataTargetSelect', () => {
     describe('collection filter is present', () => {
       beforeEach(() => {
         props.item.primaryDataset.data_source_id = 1
-        props.item.primaryDataset.data_source_type = 'collections'
         props.item.primaryDataset.data_source = { type: 'collections', id: '1' }
         render()
         wrapper.instance().componentDidMount()
       })
 
       it('sets the type to Collection', () => {
-        expect(wrapper.instance().type).toEqual('collections')
+        expect(wrapper.instance().type).toEqual('Collection')
       })
     })
 
@@ -129,10 +128,9 @@ describe('DataTargetSelect', () => {
       describe('collectionFilter present', () => {
         it('sets the current value to Collection', () => {
           props.item.data_source_id = 1
-          props.item.data_source_type = 'collections'
           props.item.data_source = { type: 'collections', id: '1' }
           render()
-          expect(wrapper.find(Select).props().value).toEqual('Organization')
+          expect(wrapper.find(Select).props().value).toEqual('Collection')
         })
       })
 
@@ -150,6 +148,7 @@ describe('DataTargetSelect', () => {
     describe('select options', () => {
       it('has select options for Organization and Collection', () => {
         render()
+
         const options = ['Organization', 'Collection']
         options.forEach((name, i) => {
           const o = wrapper.find(Select).childAt(i)
@@ -164,7 +163,6 @@ describe('DataTargetSelect', () => {
         it('renders the AutoComplete while editing', () => {
           props.item.primaryDataset = {
             ...fakeDataset,
-            data_source_type: 'collections',
             data_source_id: 1,
           }
           render()
@@ -177,7 +175,6 @@ describe('DataTargetSelect', () => {
 
         it('does not render the AutoComplete unless editing', () => {
           props.item.data_source_id = 1
-          props.item.data_source_type = 'collections'
           props.item.data_source = { type: 'collections', id: '1' }
           render()
           expect(wrapper.find(AutoComplete).length).toEqual(0)
