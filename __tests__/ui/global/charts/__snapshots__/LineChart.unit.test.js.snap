@@ -63,9 +63,10 @@ exports[`LineChart renders snapshot 1`] = `
       alwaysShowLabels={false}
       cardArea={1}
       displayTicks={true}
+      labelTextRenderer={[Function]}
       maxValue={0}
       minValue={0}
-      textRenderer={[Function]}
+      tooltipTextRenderer={[Function]}
     />
   }
   labels={[Function]}

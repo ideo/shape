@@ -12,7 +12,7 @@ exports[`DataItemCover renders snapshot 1`] = `
         <React.Fragment>
           <StyledHeading3>
             <span>
-              Participants
+              participants
             </span>
              per 
             <span>
