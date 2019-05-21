@@ -2,6 +2,7 @@ import DataTargetSelect from '~/ui/reporting/DataTargetSelect'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import { Select } from '~/ui/global/styled/forms'
 import AutoComplete from '~/ui/global/AutoComplete'
+import { fakeDataset } from '#/mocks/data'
 
 let wrapper
 
@@ -15,7 +16,8 @@ describe('DataTargetSelect', () => {
   beforeEach(() => {
     props.apiStore = fakeApiStore()
     props.item = {
-      data_settings: {},
+      datasets: [fakeDataset],
+      primaryDataset: fakeDataset,
     }
     props.onSelect = jest.fn()
   })
@@ -32,7 +34,9 @@ describe('DataTargetSelect', () => {
 
     describe('collection filter is present', () => {
       beforeEach(() => {
-        props.item.data_settings.d_filters = [{ type: 'Collection', target: 1 }]
+        props.item.primaryDataset.data_source_id = 1
+        props.item.primaryDataset.data_source_type = 'collections'
+        props.item.primaryDataset.data_source = { type: 'collections', id: '1' }
         render()
         wrapper.instance().componentDidMount()
       })
@@ -44,7 +48,9 @@ describe('DataTargetSelect', () => {
 
     describe('collection filter is not present', () => {
       beforeEach(() => {
-        props.item.data_settings = {}
+        props.item.primaryDataset.data_source_id = null
+        props.item.primaryDataset.data_source_type = null
+        props.item.primaryDataset.data_source = null
         render()
         wrapper.instance().componentDidMount()
       })
