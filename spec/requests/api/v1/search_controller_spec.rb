@@ -281,8 +281,8 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
       end
 
       it 'only returns collections of that type' do
-        get(path, params: { collection_type: 'Collection::TestCollection' })
-        expect(json['data'].size).to be(1)
+        get(path, params: { type: 'Collection::TestCollection' })
+        expect(json['data'].size).to equal(1)
         expect(json['data'].first['id'].to_i).to eq(test_collection.id)
       end
     end

@@ -272,15 +272,6 @@ describe Organization, type: :model do
         )
       end
     end
-
-    describe '#create_org_wide_datasets' do
-      it 'queues worker' do
-        organization
-        expect(
-          CreateOrgWideDatasets,
-        ).to have_enqueued_sidekiq_job(organization.id).in(1.minute)
-      end
-    end
   end
 
   describe '#setup_user_membership' do
