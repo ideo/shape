@@ -72,13 +72,9 @@ module RolifyExtensions
 
   def has_cached_role?(role_name)
     @has_cached_role ||= Hash.new do |h, key|
-      h[key] = has_role?(role_name)
+      h[key] = has_role?(key)
     end
-
-    key = role_name.to_s
-    @has_cached_role[key] = has_role?(role_name) unless @has_cached_role.key?(key)
-
-    @has_cached_role[key]
+    @has_cached_role[role_name.to_s]
   end
 
   # Override Rolify method for optimizations + customizations

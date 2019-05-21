@@ -19,7 +19,7 @@ class Api::V1::Admin::UsersController < Api::V1::BaseController
     success = ::Admin::AddRoleToUsers.call(
       invited_by: current_user,
       users: users,
-      send_invites: json_api_params[:send_invites]
+      send_invites: json_api_params[:send_invites],
     )
 
     if success
