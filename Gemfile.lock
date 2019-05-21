@@ -228,6 +228,8 @@ GEM
     i18n (1.6.0)
       concurrent-ruby (~> 1.0)
     interactor (3.1.1)
+    interactor-schema (0.2.2)
+      interactor (~> 3.1)
     jbuilder (2.7.0)
       activesupport (>= 4.2.0)
       multi_json (>= 1.2)
@@ -544,6 +546,7 @@ DEPENDENCIES
   heroku-deflater!
   httparty
   interactor
+  interactor-schema
   jbuilder (~> 2.5)
   json-schema
   jsonapi-rails
