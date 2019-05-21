@@ -29,24 +29,23 @@ class CollectionCardArchiveWorker
   end
 
   def create_notification(card)
-    participants = get_target_participants(card.record)
-    return if participants.empty?
+    participant_ids = get_target_participant_ids(card.record)
+    return if participant_ids.empty?
     ActivityAndNotificationBuilder.call(
       actor: @actor,
       target: card.record,
       action: :archived,
-      subject_user_ids: participants.pluck(:actor_id),
+      subject_user_ids: participant_ids,
       subject_group_ids: [],
     )
   end
 
-  def get_target_participants(record)
-    DataReport::CollectionsAndItems.new(
-      Dataset.build(
+  def get_target_participant_ids(record)
+    DataReport::CollectionsAndItems.new(dataset:
+      Dataset.new(
         data_source: record,
         timeframe: 'ever',
-        measure: 'records',
-      ),
-    ).actor_ids
+        measure: 'participants',
+      )).actor_ids
   end
 end
