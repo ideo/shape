@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observable, runInAction } from 'mobx'
 import styled from 'styled-components'
@@ -40,6 +41,14 @@ const CloseIconHolder = styled.span`
 class MoveModal extends React.Component {
   @observable
   isLoading = false
+
+  componentDidUpdate() {
+    const { uiStore, pastingCards } = this.props
+    if (pastingCards) {
+      this.handleMoveToEnd()
+      uiStore.update('pastingCards', false)
+    }
+  }
 
   handleClose = ev => {
     ev.preventDefault()
@@ -331,11 +340,15 @@ class MoveModal extends React.Component {
   }
 }
 
-MoveModal.propTypes = {}
+MoveModal.propTypes = {
+  pastingCards: PropTypes.bool.isRequired,
+}
 MoveModal.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
-MoveModal.defaultProps = {}
+MoveModal.defaultProps = {
+  pastingCards: false,
+}
 
 export default MoveModal
