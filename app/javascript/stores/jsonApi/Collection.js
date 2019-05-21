@@ -870,15 +870,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       placement: 'beginning',
     }
     await apiStore.moveCards(data)
-    const { movingIntoCollection } = uiStore
     uiStore.setMovingCards([])
     uiStore.update('multiMoveCardIds', [])
-    uiStore.reselectCardIds(cardIds)
     uiStore.update('movingIntoCollection', null)
-    // add a little delay because the board has to load first
-    if (movingIntoCollection.isBoard) {
-      setTimeout(() => uiStore.scrollToBottom(), 500)
-    }
   }
 
   static async createSubmission(parent_id, submissionSettings) {
