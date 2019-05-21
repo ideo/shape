@@ -42,7 +42,7 @@ describe('DataTargetSelect', () => {
       })
 
       it('sets the type to Collection', () => {
-        expect(wrapper.instance().type).toEqual('Collection')
+        expect(wrapper.instance().type).toEqual('collections')
       })
     })
 
@@ -92,11 +92,15 @@ describe('DataTargetSelect', () => {
       describe('collectionFilter present', () => {
         it('calls onSelect with the collectionFilter target', () => {
           props.onSelect.mockReset()
-          props.item.collectionFilter = { type: 'Collection', target: 1 }
+          props.item.data_source_id = 1
+          props.item.data_source_type = 'collections'
+          props.item.data_source = { type: 'collections', id: '1' }
           render()
-          event.target.value = 'foo'
+          event.target.value = 'asdf'
           wrapper.instance().handleChange(event)
-          expect(props.onSelect).toHaveBeenCalledWith({ custom: 1 })
+          expect(props.onSelect).toHaveBeenCalledWith({
+            custom: props.item.data_source,
+          })
         })
       })
 
@@ -124,9 +128,11 @@ describe('DataTargetSelect', () => {
     describe('Select value', () => {
       describe('collectionFilter present', () => {
         it('sets the current value to Collection', () => {
-          props.item.collectionFilter = { type: 'Collection', target: 1 }
+          props.item.data_source_id = 1
+          props.item.data_source_type = 'collections'
+          props.item.data_source = { type: 'collections', id: '1' }
           render()
-          expect(wrapper.find(Select).props().value).toEqual('Collection')
+          expect(wrapper.find(Select).props().value).toEqual('Organization')
         })
       })
 
@@ -156,9 +162,11 @@ describe('DataTargetSelect', () => {
     describe('Collection name autocomplete', () => {
       describe('when type is Collection', () => {
         it('renders the AutoComplete while editing', () => {
-          props.item.data_settings.d_filters = [
-            { type: 'Collection', target: 1 },
-          ]
+          props.item.primaryDataset = {
+            ...fakeDataset,
+            data_source_type: 'collections',
+            data_source_id: 1,
+          }
           render()
           wrapper.instance().editing = true
           wrapper.update()
@@ -166,18 +174,11 @@ describe('DataTargetSelect', () => {
           expect(p.placeholder).toEqual('Collection name')
           expect(p.keepSelectedOptions).toEqual(true)
         })
-        it('does not render the AutoComplete unless editing', () => {
-          props.item.data_settings.d_filters = [
-            { type: 'Collection', target: 1 },
-          ]
-          render()
-          expect(wrapper.find(AutoComplete).length).toEqual(0)
-        })
-      })
 
-      describe('when type is not Collection', () => {
-        it('does not render the Autocomplete', () => {
-          props.item.collectionFilter = null
+        it('does not render the AutoComplete unless editing', () => {
+          props.item.data_source_id = 1
+          props.item.data_source_type = 'collections'
+          props.item.data_source = { type: 'collections', id: '1' }
           render()
           expect(wrapper.find(AutoComplete).length).toEqual(0)
         })

@@ -68,7 +68,7 @@ class DataTargetSelect extends React.Component {
   handleChange = e => {
     e.preventDefault()
     const { item, onSelect } = this.props
-    const { collectionFilter } = item
+    const { data_source } = item
     const { value } = e.target
     runInAction(() => (this.type = value))
 
@@ -76,8 +76,8 @@ class DataTargetSelect extends React.Component {
       onSelect()
     } else if (value === 'Collection') {
       runInAction(() => (this.editing = true))
-    } else if (collectionFilter && collectionFilter.target) {
-      onSelect({ custom: collectionFilter.target })
+    } else if (data_source) {
+      onSelect({ custom: data_source })
     }
   }
 
@@ -112,7 +112,7 @@ class DataTargetSelect extends React.Component {
             </SelectOption>
           ))}
         </Select>
-        {this.type === 'Collection' &&
+        {this.type === 'collections' &&
           this.editing && (
             <div
               style={{
