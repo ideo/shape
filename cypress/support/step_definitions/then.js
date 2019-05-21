@@ -88,3 +88,18 @@ Then('I should see {string} in the URL', slug => {
     .as('url')
     .should('match', new RegExp(slug))
 })
+
+Then('I should see {string} deselected', selector => {
+  cy.locateDataOrClass(selector)
+    .first()
+    .should('have.css', 'opacity', '0.2')
+})
+
+Then(
+  'I should see a question with {string} and {int} emojis',
+  (selector, count) => {
+    cy.locateDataOrClass(selector)
+      .children()
+      .should('have.length', count)
+  }
+)
