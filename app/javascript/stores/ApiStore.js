@@ -54,6 +54,9 @@ class ApiStore extends jsonapi(datxCollection) {
   @observable
   usableTemplates = []
 
+  @observable
+  shapeAdminUsers = []
+
   // doesn't have any need to be observable...
   filestackToken = {}
   filestackTokenInterval = null
@@ -232,6 +235,40 @@ class ApiStore extends jsonapi(datxCollection) {
     resource.roles = roles
     this.add(roles, 'roles')
     return roles
+  }
+
+  @action
+  async fetchShapeAdminUsers() {
+    const res = await this.request('admin/users')
+    const adminUsers = _.sortBy(res.data, ['first_name'])
+    runInAction(() => {
+      this.shapeAdminUsers = adminUsers
+    })
+    return adminUsers
+  }
+
+  @action
+  async removeShapeAdminUser(user) {
+    await this.request(`admin/users/${user.id}`, 'DELETE')
+    runInAction(() => {
+      _.remove(this.shapeAdminUsers, u => u.id === user.id)
+    })
+
+    if (user.isCurrentUser) {
+      window.location.href = '/'
+    }
+  }
+
+  @action
+  async addShapeAdminUsers(users, opts) {
+    const userIds = users.map(user => user.id)
+    const data = { user_ids: userIds, sendInvites: opts.sendInvites }
+    await this.request('admin/users', 'POST', data)
+    runInAction(() => {
+      this.shapeAdminUsers = _.sortBy(this.shapeAdminUsers.concat(users), [
+        'first_name',
+      ])
+    })
   }
 
   @action

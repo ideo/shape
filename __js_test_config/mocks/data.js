@@ -426,7 +426,7 @@ export const fakeUserAttrs = {
   current_organization: fakeOrganization,
   type: 'users',
   terms_accepted: true,
-  isCurrentUser: jest.fn(),
+  isCurrentUser: true,
   API_updateCurrentUser: jest.fn(),
   API_hideHelper: jest.fn().mockReturnValue(Promise.resolve({})),
   notify_through_email: true,

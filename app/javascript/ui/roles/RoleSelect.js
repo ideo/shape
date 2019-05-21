@@ -3,29 +3,18 @@ import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import Grid from '@material-ui/core/Grid'
 import MenuItem from '@material-ui/core/MenuItem'
-import styled from 'styled-components'
 import { DisplayText } from '~/ui/global/styled/typography'
-import { Row } from '~/ui/global/styled/layout'
+import { Row, RowItemGrid } from '~/ui/global/styled/layout'
 import EntityAvatarAndName from '~/ui/global/EntityAvatarAndName'
 import { Select } from '~/ui/global/styled/forms'
 import LeaveIcon from '~/ui/icons/LeaveIcon'
 import Tooltip from '~/ui/global/Tooltip'
 import { uiStore } from '~/stores'
+import { LeaveButton } from '~/ui/global/styled/buttons'
 
 const minRowStyle = {
   minWidth: '110px',
 }
-
-const RowItemGrid = styled(Grid)`
-  align-self: center;
-  margin-left: 14px;
-`
-
-const LeaveIconHolder = styled.button`
-  margin-top: 8px;
-  width: 16px;
-`
-LeaveIconHolder.displayName = 'StyledLeaveIconHolder'
 
 const DisplayTextPadded = DisplayText.extend`
   /* match the padding of MuiSelect */
@@ -179,9 +168,9 @@ class RoleSelect extends React.Component {
             title={entity.isCurrentUser ? 'Leave' : 'Remove'}
             placement="bottom"
           >
-            <LeaveIconHolder onClick={this.onRoleRemove}>
+            <LeaveButton onClick={this.onRoleRemove}>
               <LeaveIcon />
-            </LeaveIconHolder>
+            </LeaveButton>
           </Tooltip>
         )}
         {!showLeaveIcon && <LeaveIconHolder enabled={false} />}

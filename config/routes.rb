@@ -143,7 +143,12 @@ Rails.application.routes.draw do
         # not shallow because we always want to look up survey_response by session_uid
         resources :question_answers, only: %i[create update]
       end
+
       resources :audiences, only: %i[index show]
+
+      namespace :admin do
+        resources :users, only: %i[index destroy create]
+      end
     end
   end
 
@@ -154,6 +159,10 @@ Rails.application.routes.draw do
     collection do
       get 'completed'
     end
+  end
+
+  namespace :admin do
+    root to: 'dashboard#index'
   end
 
   authenticate :user, ->(u) { Rails.env.development? || u.has_cached_role?(Role::SUPER_ADMIN) } do

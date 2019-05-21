@@ -72,7 +72,7 @@ module RolifyExtensions
 
   def has_cached_role?(role_name)
     @has_cached_role ||= Hash.new do |h, key|
-      h[key] = has_role?(role_name)
+      h[key] = has_role?(key)
     end
     @has_cached_role[role_name.to_s]
   end
@@ -121,7 +121,7 @@ module RolifyExtensions
 
   def remove_role(role_name, resource = nil)
     # anchored items/collections aren't allowed to have their own roles, you need to unanchor them first
-    return false if resource.roles_anchor_collection_id.present?
+    return false if resource && resource.roles_anchor_collection_id.present?
 
     if resource.blank?
       role = Role.where(name: role_name, resource: nil).first
