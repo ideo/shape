@@ -10,19 +10,35 @@ describe Api::V1::Admin::TestCollectionsController, type: :request, json: true, 
   describe 'GET #index' do
     let!(:collection) { create(:test_collection, test_status: :live, test_launched_at: Time.now) }
     let!(:audience) { create(:audience) }
-    let!(:test_audience) { create(:test_audience, audience: audience, test_collection: collection) }
+    let!(:test_audience) do
+      create(
+        :test_audience,
+        audience: audience,
+        test_collection: collection,
+        price_per_response: 1,
+      )
+    end
     let!(:survey_response) do
       create(
         :survey_response,
         status: :completed,
         test_collection: collection,
         test_audience: test_audience,
-        user: admin_user
+        user: admin_user,
       )
     end
     let!(:draft_collection) { create(:test_collection, test_status: :draft) }
     let!(:collection_without_test_audience) { create(:test_collection, test_status: :live) }
-    let(:path) { "/api/v1/admin/test_collections?page=1" }
+    let!(:collection_with_link_share_test_audience) { create(:test_collection, test_status: :live) }
+    let!(:link_share_test_audience) do
+      create(
+        :test_audience,
+        audience: audience,
+        test_collection: collection_with_link_share_test_audience,
+        price_per_response: 0,
+      )
+    end
+    let(:path) { '/api/v1/admin/test_collections?page=1' }
 
     it 'returns a 200' do
       get(path)
