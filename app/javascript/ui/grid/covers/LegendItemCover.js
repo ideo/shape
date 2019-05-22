@@ -169,7 +169,7 @@ class LegendItemCover extends React.Component {
   findDatasetByTest(testId) {
     const { item } = this.props
     const dataSet = item.datasets.find(
-      d => d.test_collection_id === parseInt(testId)
+      d => d.data_source_id === parseInt(testId)
     )
     return dataSet
   }
@@ -190,6 +190,9 @@ class LegendItemCover extends React.Component {
       })
       .then(res => res.data)
       .then(records => records.filter(record => record.id !== item.parent_id))
+      .then(records =>
+        records.filter(record => !this.findDatasetByTest(record.id))
+      )
       .then(records => callback && callback(formatCollections(records)))
       .catch(e => {
         trackError(e)
