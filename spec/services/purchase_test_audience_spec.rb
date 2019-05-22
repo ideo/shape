@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe TestAudiencePurchaser, type: :service do
+describe PurchaseTestAudience, type: :service do
   let(:payment_errors) { [] }
   let(:payment_method_double) { double(id: SecureRandom.hex(10)) }
   before do
@@ -34,7 +34,7 @@ describe TestAudiencePurchaser, type: :service do
     end
   end
   let!(:result) do
-    TestAudiencePurchaser.call(
+    PurchaseTestAudience.call(
       test_collection: test_collection,
       test_audience_params: test_audience_params,
       user: user,

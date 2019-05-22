@@ -1,5 +1,5 @@
 # NOTE: if audiences are free, will not really "purchase" but just create
-class TestAudiencePurchaser
+class PurchaseTestAudience
   include Interactor
   include Interactor::Schema
   delegate :number_to_currency, to: 'ActionController::Base.helpers'

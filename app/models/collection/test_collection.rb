@@ -81,13 +81,12 @@ class Collection
     def attempt_to_purchase_test_audiences!(user:, test_audience_params: nil)
       return true if test_audience_params.blank?
 
-      purchaser = TestAudiencePurchaser.call(
+      purchaser = PurchaseTestAudience.call(
         test_collection: self,
         test_audience_params: test_audience_params,
         user: user,
       )
-      purchaser.success?
-    rescue Interactor::Failure
+      return true if purchaser.success?
       errors.add(:base, purchaser.message) if purchaser.message.present?
       false
     end
