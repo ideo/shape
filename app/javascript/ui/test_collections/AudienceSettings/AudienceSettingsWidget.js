@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { Flex } from 'reflexbox'
 
 import { DisplayTextCss } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
@@ -13,6 +14,8 @@ import {
 import TableHeader from './TableHeader'
 import TableBody from './TableBody'
 import AudienceCheckbox from './AudienceCheckbox'
+import Button from '~shared/components/atoms/Button'
+import PlusIcon from '~shared/images/icon-plus.svg'
 
 const AudienceSettingsWrapper = styled.div`
   width: 100%;
@@ -76,6 +79,17 @@ class AudienceSettingsWidget extends React.Component {
   render() {
     const { audiences, totalPrice } = this.props
 
+    const newAudienceButton = (
+      <Flex align="center">
+        <StyledRowFlexItem style={{ marginTop: '5px' }}>
+          <Button href="#">
+            <PlusIcon width={15} style={{ fill: v.colors.black }} />
+            New Audience
+          </Button>
+        </StyledRowFlexItem>
+      </Flex>
+    )
+
     const totalPriceDisplay = (
       <React.Fragment>
         <StyledRowFlexCell>Total</StyledRowFlexCell>
@@ -100,6 +114,7 @@ class AudienceSettingsWidget extends React.Component {
                 )
               })}
               <StyledRowFlexParent style={{ marginTop: '15px' }}>
+                {newAudienceButton}
                 <StyledRowFlexCell />
                 {totalPriceDisplay}
               </StyledRowFlexParent>
@@ -121,7 +136,7 @@ class AudienceSettingsWidget extends React.Component {
                 )
               })}
               <StyledRowFlexParent>
-                <StyledRowFlexItem />
+                {newAudienceButton}
                 <StyledRowFlexCell />
                 {totalPriceDisplay}
               </StyledRowFlexParent>
