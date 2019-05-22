@@ -113,7 +113,7 @@ class TestSurveyPage extends React.Component {
   render() {
     return (
       <React.Fragment>
-        <RespondentBanner user={this.currentUser} />
+        {this.currentUser ? <RespondentBanner user={this.currentUser} /> : null}
         <StyledBg>
           <LogoWrapper>
             <Logo withText width={83} />

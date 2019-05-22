@@ -1,38 +1,39 @@
 import { PropTypes as MobxPropTypes } from 'mobx-react'
-import styled from 'styled-components'
 import v from '~/utils/variables'
-import { DisplayText } from '~/ui/global/styled/typography'
+import Banner from '~/ui/layout/Banner'
 
 class RespondentBanner extends React.Component {
-  render() {
-    const { user } = this.props
+  renderLeftComponent() {
+    return `You have earned $${this.user.current_incentive_balance}.`
+  }
 
-    if (!user || user.current_incentive_balance < 1) return ''
+  renderRightComponent() {
+    return `You will receive your payment before ${
+      this.user.incentive_due_date
+    }.`
+  }
+
+  get user() {
+    const { user } = this.props
+    return user ? user : null
+  }
+
+  get hideBanner() {
+    return !this.user || this.user.current_incentive_balance < 1
+  }
+
+  render() {
+    if (this.hideBanner) return ''
 
     return (
-      <StyledBanner>
-        <div>
-          <DisplayText color={'white'}>
-            You have earned ${user.current_incentive_balance}.
-          </DisplayText>
-        </div>
-        <div>
-          <DisplayText color={'white'}>
-            You will receive your payment before {user.incentive_due_date}.
-          </DisplayText>
-        </div>
-      </StyledBanner>
+      <Banner
+        backgroundColor={v.colors.secondaryDark}
+        leftComponent={this.renderLeftComponent()}
+        rightComponent={this.renderRightComponent()}
+      />
     )
   }
 }
-
-const StyledBanner = styled.div`
-  background: ${v.colors.secondaryDark};
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  padding: 1rem;
-`
 
 RespondentBanner.propTypes = {
   user: MobxPropTypes.objectOrObservableObject,

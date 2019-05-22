@@ -24,6 +24,6 @@ class SerializableCurrentUser < SerializableUser
   end
 
   attribute :incentive_due_date do
-    @object.incentive_due_date&.strftime('%m/%d/%Y')
+    @object.incentive_due_date&.strftime('%m/%d/%y')
   end
 end

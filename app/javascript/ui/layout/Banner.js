@@ -21,7 +21,7 @@ class Banner extends React.Component {
               {this.props.leftComponent}
             </Grid>
             <Grid item xs={12} md={3}>
-              {this.props.rightComponent}
+              <StyledAction>{this.props.rightComponent}</StyledAction>
             </Grid>
           </Grid>
         </MaxWidthContainer>
@@ -47,23 +47,16 @@ const StyledBanner = styled.div`
   color: white;
   font-family: ${v.fonts.sans};
   font-size: 1.33rem;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  margin-left: calc(-100vw / 2 + ${v.maxWidth - 2 * v.fonts.baseSize}px / 2);
-  margin-right: calc(-100vw / 2 + ${v.maxWidth - 2 * v.fonts.baseSize}px / 2);
-
-  @media only screen and (max-width: ${v.maxWidth +
-      v.containerPadding.horizontal * v.fonts.baseSize}px) {
-    margin-left: -${v.containerPadding.horizontal}rem;
-    margin-right: -${v.containerPadding.horizontal}rem;
-    padding: 20px ${v.containerPadding.horizontal}rem;
-  }
-
   padding: 20px;
 
   a {
     color: white;
   }
+`
+
+const StyledAction = styled.div`
+  font-size: 1rem;
+  text-align: right;
 `
 
 export default Banner

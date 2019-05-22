@@ -33,23 +33,19 @@ class OverdueBanner extends React.Component {
   renderRightComponent() {
     const userCanEdit = this.currentOrganization.primary_group.can_edit
 
-    return (
-      <StyledAction>
-        {userCanEdit ? (
-          <div>
-            Add payment method <Link to="/billing">here.</Link>
-          </div>
-        ) : (
-          <Grid container spacing={16} alignItems="flex-end">
-            <Grid item>Contact your admin for assistance.</Grid>
-            <Grid item>
-              <StyledClickableIconWrapper onClick={this.hide}>
-                <CloseIcon />
-              </StyledClickableIconWrapper>
-            </Grid>
-          </Grid>
-        )}
-      </StyledAction>
+    return userCanEdit ? (
+      <div>
+        Add payment method <Link to="/billing">here.</Link>
+      </div>
+    ) : (
+      <Grid container spacing={16} alignItems="flex-end">
+        <Grid item>Contact your admin for assistance.</Grid>
+        <Grid item>
+          <StyledClickableIconWrapper onClick={this.hide}>
+            <CloseIcon />
+          </StyledClickableIconWrapper>
+        </Grid>
+      </Grid>
     )
   }
 
@@ -79,7 +75,7 @@ class OverdueBanner extends React.Component {
     if (this.hideOverdueBanner) return null
 
     return (
-      <Banner
+      <StyledBanner
         backgroundColor={v.colors.alert}
         leftComponent={this.renderLeftComponent()}
         rightComponent={this.renderRightComponent()}
@@ -87,6 +83,20 @@ class OverdueBanner extends React.Component {
     )
   }
 }
+
+const StyledBanner = styled(Banner)`
+  margin-left: calc(-100vw / 2 + ${v.maxWidth - 2 * v.fonts.baseSize}px / 2);
+  margin-right: calc(-100vw / 2 + ${v.maxWidth - 2 * v.fonts.baseSize}px / 2);
+  margin-top: 20px;
+  margin-bottom: 20px;
+
+  @media only screen and (max-width: ${v.maxWidth +
+      v.containerPadding.horizontal * v.fonts.baseSize}px) {
+    margin-left: -${v.containerPadding.horizontal}rem;
+    margin-right: -${v.containerPadding.horizontal}rem;
+    padding: 20px ${v.containerPadding.horizontal}rem;
+  }
+`
 
 OverdueBanner.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -102,11 +112,6 @@ const StyledClickableIconWrapper = styled(StyledIconWrapper)`
   width: 20px;
   height: 20px;
   cursor: pointer;
-`
-
-const StyledAction = styled.div`
-  font-size: 1rem;
-  text-align: right;
 `
 
 export default OverdueBanner
