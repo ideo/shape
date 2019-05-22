@@ -21,9 +21,9 @@ class ProductDescriptions extends React.PureComponent {
     marketingFirestoreClient
       .getObjectFromCollection('productDescriptions')
       .then(productDescriptions => {
-        const descriptionsToArray = Object.keys(productDescriptions).map(key =>
-          Object.assign({ id: key }, productDescriptions[key])
-        )
+        const descriptionsToArray = Object.keys(productDescriptions)
+          .map(key => Object.assign({ id: key }, productDescriptions[key]))
+          .sort((a, b) => a.order - b.order)
         this.setState({ products: descriptionsToArray }) // convert firestore collection object to iterable array
       })
   }

@@ -49,17 +49,7 @@ export default class FirestoreClient {
       const o = {}
       snapshot.forEach(s => {
         const { id } = s
-        switch (collection) {
-          case 'pageText':
-            const { value } = s.data()
-            o[id] = value
-            break
-          case 'productDescriptions':
-            o[id] = s.data()
-            break
-          default:
-            break // undefined will be assigned for collection keys whose collections don't exist
-        }
+        o[id] = s.data()
       })
       return o
     }
