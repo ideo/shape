@@ -3,7 +3,6 @@ class Item
     has_many :question_answers, inverse_of: :question, foreign_key: :question_id, dependent: :destroy
     has_one :test_open_responses_collection, class_name: 'Collection::TestOpenResponses'
     has_one :test_chart_item, class_name: 'Item::ChartItem', as: :data_source
-    has_one :test_media_item_card, class_name: 'CollectionCard'
 
     after_commit :notify_test_design_of_creation,
                  on: :create,
@@ -125,7 +124,7 @@ class Item
     end
 
     def create_media_item(parent_collection:)
-      return if test_media_item_card.present?
+      return unless cards_linked_to_this_item.empty?
       media_link_card = CollectionCard::Link.create(
         parent: parent_collection,
         item_id: id,
