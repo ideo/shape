@@ -124,7 +124,7 @@ class Item
       builder.collection_card
     end
 
-    def create_media_item(parent_collection:, initiated_by:)
+    def create_media_item(parent_collection:)
       return if test_media_item_card.present?
       media_link_card = CollectionCard::Link.create(
         parent: parent_collection,
