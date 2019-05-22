@@ -328,6 +328,7 @@ class Collection
           end
         create_open_response_collections(initiated_by: initiated_by)
         create_response_graphs(initiated_by: initiated_by)
+        create_media_item_link
         test_design.cache_cover!
       end
       reorder_cards!
@@ -379,6 +380,17 @@ class Collection
       end
 
       graphs
+    end
+
+    def create_media_item_link(media_question_items: nil)
+      media_question_items ||= test_design.items.reject { |i| i.type == 'Item::QuestionItem' }
+      media_question_items.map do |media_item|
+        media_question = media_item.becomes!(Item::QuestionItem)
+        media_question.question_type == :question_media
+        media_question.create_media_item(
+          parent_collection: self,
+        )
+      end
     end
 
     def setup_default_status_and_questions
