@@ -25,7 +25,7 @@ import TermsOfUseModal from '~/ui/users/TermsOfUseModal'
 import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
 import UserSettings from '~/ui/users/UserSettings'
 import v from '~/utils/variables'
-import firebaseClient from '~/vendor/firestore'
+import firebaseClient from '~/vendor/firebase/firebaseClient'
 import MuiTheme, { BillingMuiTheme } from '~/ui/theme'
 import captureGlobalKeypress from '~/utils/captureGlobalKeypress'
 

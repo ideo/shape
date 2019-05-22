@@ -2,7 +2,6 @@ import { Fragment } from 'react'
 import { Box } from 'reflexbox'
 import { Element as ScrollElement } from 'react-scroll'
 import ReactRouterPropTypes from 'react-router-prop-types'
-import queryString from 'query-string'
 
 import {
   MarketingBack,
@@ -31,7 +30,8 @@ import MarketingMenu from '~/ui/marketing/MarketingMenu'
 import SubscribeEmail from '~/ui/marketing/SubscribeEmail'
 import ProductDescriptions from '~/ui/marketing/ProductDescriptions'
 import BetaSticker from '~/ui/marketing/BetaSticker'
-import db from '~/vendor/firebaseMarketing'
+import marketingFirestoreClient from '~/vendor/firebase/sites/marketing'
+import queryString from 'query-string'
 
 class MarketingPage extends React.Component {
   constructor(props) {
@@ -44,28 +44,15 @@ class MarketingPage extends React.Component {
   }
 
   componentDidMount() {
-    const textValues = {}
-    if (db && db.collection) {
-      db.collection('pageText')
-        .get()
-        .then(snapshot => {
-          snapshot.forEach(pageText => {
-            const key = pageText.id
-            const { value } = pageText.data()
-            textValues[key] = value
-          })
-          if (this.props.location.search) {
-            const params = queryString.parse(this.props.location.search)
-            if (params && params.campaign === 'alphapt7') {
-              textValues.footerHeader = textValues.footerHeader.replace(
-                '$5',
-                '$7'
-              )
-            }
-          }
-          this.setState({ pageTexts: textValues })
-        })
-    }
+    marketingFirestoreClient.getObjectFromCollection('pageText').then(texts => {
+      if (this.props.location.search) {
+        const params = queryString.parse(this.props.location.search)
+        if (params && params.campaign === 'alphapt7') {
+          texts.footerHeader = texts.footerHeader.replace('$5', '$7')
+        }
+      }
+      this.setState({ pageTexts: texts })
+    })
   }
 
   render() {
