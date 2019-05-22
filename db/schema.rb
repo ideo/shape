@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190510183438) do
+ActiveRecord::Schema.define(version: 20190430234650) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -98,7 +98,6 @@ ActiveRecord::Schema.define(version: 20190510183438) do
     t.boolean "show_replace", default: true
     t.integer "row"
     t.integer "col"
-    t.integer "question_item_id"
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["order", "row", "col"], name: "index_collection_cards_on_order_and_row_and_col"
