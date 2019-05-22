@@ -7,7 +7,7 @@ class TestAudience < ApplicationRecord
 
   validates :price_per_response, presence: true
 
-  before_validation :set_price_per_response_from_audience, if: :audience
+  before_validation :set_price_per_response_from_audience, on: :create
   before_create :purchase, if: :requires_payment?
 
   delegate :name, :price_per_response,
@@ -23,7 +23,7 @@ class TestAudience < ApplicationRecord
   def description
     "#{launched_by.name} launched #{test_collection.name} test with " \
       "#{sample_size} total #{audience_name} audience respondents at " +
-      number_to_currency(price_per_response)
+      number_to_currency(price_per_response || 0)
   end
 
   def payment_method
@@ -43,12 +43,14 @@ class TestAudience < ApplicationRecord
   private
 
   def purchase
+    return unless valid?
+
     payment = NetworkApi::Payment.create(
       payment_method_id: payment_method.id,
       description: description,
-      amount: total_price,
+      amount: total_price.to_f,
       quantity: sample_size,
-      unit_amount: price_per_response,
+      unit_amount: price_per_response.to_f,
     )
     self.network_payment_id = payment.id
     return payment if payment.status == 'succeeded'
@@ -62,6 +64,6 @@ class TestAudience < ApplicationRecord
   end
 
   def set_price_per_response_from_audience
-    self.price_per_response = audience.price_per_response
+    self.price_per_response ||= audience&.price_per_response
   end
 end
