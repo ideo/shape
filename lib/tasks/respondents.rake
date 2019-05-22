@@ -1,11 +1,19 @@
+require 'open-uri'
+
 namespace :respondents do
   desc 'Import current respondents into INA'
-  task :import, [:filepath] => [:environment] do |_, args|
+  task :import, [:url] => [:environment] do |_, args|
+    file = Tempfile.new(['respondents', '.csv'], "#{Rails.root}/tmp/")
+    # rubocop:disable Security/Open
+    file.write(open(args[:url]).read)
+    # rubocop:enable Security/Open
+    file.rewind
+
     imported = 0
     skipped = 0
     errors = 0
 
-    CSV.foreach(args[:filepath], headers: true, header_converters: :symbol) do |row|
+    CSV.foreach(file, headers: true, header_converters: :symbol) do |row|
       puts "Importing #{row[:email]}"
 
       if row[:can_we_contact_again] != 'YES' || row[:valid_response_or_gibberish].present?
