@@ -261,9 +261,10 @@ class LegendItemCover extends React.Component {
     }
   }
 
-  renderSelectedDataset = ({ dataset, order, primary }) => {
+  renderSelectedDataset = ({ dataset }) => {
     if (!dataset) return ''
-    const { name, style, chart_type, display_name } = dataset
+    const { name, style, chart_type, display_name, order } = dataset
+    const primary = order === 0
     let icon
     if (chart_type === 'line') {
       icon = (
@@ -280,14 +281,15 @@ class LegendItemCover extends React.Component {
       <Dataset key={`dataset-${name}`}>
         {icon && <DatasetIconWrapper>{icon}</DatasetIconWrapper>}
         <DatasetText color={v.colors.black}>{display_name}</DatasetText>
-        {!primary && (
-          <UnselectDataset
-            role="button"
-            onClick={() => this.onDeselectComparison(name)}
-          >
-            <XIcon />
-          </UnselectDataset>
-        )}
+        {!primary &&
+          dataset.class_type !== 'Dataset::OrgWideQuestion' && (
+            <UnselectDataset
+              role="button"
+              onClick={() => this.onDeselectComparison(name)}
+            >
+              <XIcon />
+            </UnselectDataset>
+          )}
       </Dataset>
     )
   }
@@ -295,15 +297,12 @@ class LegendItemCover extends React.Component {
   render() {
     const { item } = this.props
     const { comparisonMenuOpen } = this.state
-    let order = 0
     return (
       <StyledLegendItem data-cy="LegendItemCover">
         <StyledLegendTitle>{item.name}</StyledLegendTitle>
         {this.datasets({ selected: true }).map(dataset =>
           this.renderSelectedDataset({
             dataset,
-            order: (order += 1),
-            primary: order === 0,
           })
         )}
         <br />

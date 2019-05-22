@@ -89,27 +89,6 @@ class ChartGroup extends React.Component {
     return width <= 1 && height <= 1
   }
 
-  // get colorScaleFromData() {
-  //   const { dataItem } = this.props
-  //   const { datasets } = dataItem
-  //   const measures = datasets.map(dataset => dataset.measure)
-  //   const colors = []
-  //   if (!dataItem.legendItem) return colorScale
-  //   let previousMeasure
-  //   let idx = 0
-  //   dataItem.legendItem.datasets.forEach(legendDataset => {
-  //     if (legendDataset.measure !== previousMeasure) {
-  //       if (_.includes(measures, legendDataset.measure)) {
-  //         colors.push(colorScale[idx])
-  //       }
-  //       idx += 1
-  //     }
-  //     previousMeasure = legendDataset.measure
-  //   })
-  //   console.log('colrs', colors)
-  //   return colors
-  // }
-
   monthlyXAxisText = (date, index) => {
     const { timeframe } = this.primaryDataset
     const dateOperand = utcMoment(date)

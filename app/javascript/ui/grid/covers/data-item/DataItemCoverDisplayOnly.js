@@ -32,6 +32,10 @@ const StyledTitleDescInline = styled.div`
   display: inline-block;
 `
 
+const UnPaddedHeading3 = styled(Heading3)`
+  margin-bottom: 0;
+`
+
 const StyledCover = props => {
   const { isReportTypeQuestionItem } = props.item
   if (isReportTypeQuestionItem) {
@@ -78,7 +82,7 @@ class DataItemCoverDisplayOnly extends React.Component {
             {title}
           </Heading1>
         )}
-        {description && <Heading3>{description}</Heading3>}
+        {description && <UnPaddedHeading3>{description}</UnPaddedHeading3>}
       </Fragment>
     )
   }

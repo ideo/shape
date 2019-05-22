@@ -1,6 +1,5 @@
 module DataReport
   class QuestionItem < SimpleService
-
     delegate :test_collection, to: :@dataset
 
     def initialize(dataset:)
@@ -55,6 +54,7 @@ module DataReport
       counts = survey_answers.group(QuestionAnswer.arel_table[:answer_number]).count
       counts.each do |answer_number, count|
         answer_data = data.find { |d| d[:column] == answer_number }
+        next if answer_data.nil?
         begin
           answer_data[:value] = count
         rescue StandardError => e
