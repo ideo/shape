@@ -19,6 +19,7 @@
 #  shared_with_organization   :boolean          default(FALSE)
 #  submission_box_type        :integer
 #  submissions_enabled        :boolean          default(TRUE)
+#  test_closed_at             :datetime
 #  test_launched_at           :datetime
 #  test_status                :integer
 #  type                       :string
