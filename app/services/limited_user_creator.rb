@@ -1,9 +1,10 @@
 class LimitedUserCreator < SimpleService
   attr_accessor :limited_user, :errors
 
-  def initialize(contact_info:, user_info: {})
+  def initialize(contact_info:, user_info: {}, date_of_participation: nil)
     @contact_info = contact_info
     @user_info = user_info
+    @date_of_participation = date_of_participation
     @email = nil
     @phone = nil
     @limited_user = nil
@@ -70,6 +71,7 @@ class LimitedUserCreator < SimpleService
   def create_user(network_user)
     @limited_user = User.find_or_initialize_from_network(network_user)
     @limited_user.feedback_contact_preference = :feedback_contact_yes
+    @limited_user.created_at = @date_of_participation if @date_of_participation.present?
     @limited_user.save
   end
 end

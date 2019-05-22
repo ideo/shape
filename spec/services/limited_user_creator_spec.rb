@@ -85,7 +85,7 @@ RSpec.describe LimitedUserCreator, type: :service do
         {
           phone: '4154239843',
           first_name: 'Limited',
-          last_name: 'User'
+          last_name: 'User',
         }
       }
 

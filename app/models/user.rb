@@ -211,6 +211,9 @@ class User < ApplicationRecord
         user = User.find_or_initialize_by(email: attrs.email)
         user.status = User.statuses[:active]
       end
+      user.first_name = attrs[:first_name]
+      user.last_name = attrs[:last_name]
+      user.phone = attrs[:phone]
       user.invitation_token = nil
       user.password = Devise.friendly_token(40)
       user.password_confirmation = user.password
