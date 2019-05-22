@@ -1,3 +1,18 @@
+# == Schema Information
+#
+# Table name: applications
+#
+#  id         :bigint(8)        not null, primary key
+#  name       :string
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  user_id    :bigint(8)
+#
+# Indexes
+#
+#  index_applications_on_user_id  (user_id)
+#
+
 class Application < ApplicationRecord
   # 'Bot' user that acts on behalf of this application
   belongs_to :user

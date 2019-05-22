@@ -1,3 +1,48 @@
+# == Schema Information
+#
+# Table name: users
+#
+#  id                          :bigint(8)        not null, primary key
+#  cached_attributes           :jsonb
+#  current_sign_in_at          :datetime
+#  current_sign_in_ip          :inet
+#  email                       :string           default("")
+#  encrypted_password          :string           default(""), not null
+#  feedback_contact_preference :integer          default("feedback_contact_unanswered")
+#  first_name                  :string
+#  handle                      :string
+#  invitation_token            :string
+#  last_active_at              :datetime
+#  last_name                   :string
+#  last_notification_mail_sent :datetime
+#  last_sign_in_at             :datetime
+#  last_sign_in_ip             :inet
+#  mailing_list                :boolean          default(FALSE)
+#  network_data                :jsonb
+#  notify_through_email        :boolean          default(TRUE)
+#  phone                       :string
+#  provider                    :string
+#  remember_created_at         :datetime
+#  show_helper                 :boolean          default(TRUE)
+#  show_move_helper            :boolean          default(TRUE)
+#  show_template_helper        :boolean          default(TRUE)
+#  sign_in_count               :integer          default(0), not null
+#  status                      :integer          default("active")
+#  terms_accepted              :boolean          default(FALSE)
+#  uid                         :string
+#  created_at                  :datetime         not null
+#  updated_at                  :datetime         not null
+#  current_organization_id     :integer
+#  current_user_collection_id  :integer
+#
+# Indexes
+#
+#  index_users_on_email             (email)
+#  index_users_on_handle            (handle) UNIQUE
+#  index_users_on_invitation_token  (invitation_token)
+#  index_users_on_provider_and_uid  (provider,uid) UNIQUE
+#
+
 class User < ApplicationRecord
   prepend RolifyExtensions # Prepend so it can call rolify methods using super
 

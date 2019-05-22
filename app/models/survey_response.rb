@@ -1,3 +1,22 @@
+# == Schema Information
+#
+# Table name: survey_responses
+#
+#  id                 :bigint(8)        not null, primary key
+#  session_uid        :text
+#  status             :integer          default("in_progress")
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  test_collection_id :bigint(8)
+#  user_id            :bigint(8)
+#
+# Indexes
+#
+#  index_survey_responses_on_session_uid         (session_uid) UNIQUE
+#  index_survey_responses_on_test_collection_id  (test_collection_id)
+#  index_survey_responses_on_user_id             (user_id)
+#
+
 class SurveyResponse < ApplicationRecord
   belongs_to :test_collection, class_name: 'Collection::TestCollection', touch: true
   belongs_to :user, optional: true
