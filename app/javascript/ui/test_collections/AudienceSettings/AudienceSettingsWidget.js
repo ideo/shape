@@ -14,6 +14,7 @@ import {
 import TableHeader from './TableHeader'
 import TableBody from './TableBody'
 import AudienceCheckbox from './AudienceCheckbox'
+import AddAudienceModal from './AddAudienceModal'
 import Button from '~shared/components/atoms/Button'
 import PlusIcon from '~shared/images/icon-plus.svg'
 
@@ -40,6 +41,18 @@ const MobileWrapper = styled.div`
 
 @observer
 class AudienceSettingsWidget extends React.Component {
+  state = {
+    addAudienceModalOpen: false,
+  }
+
+  openAddAudienceModal = () => {
+    this.setState({ addAudienceModalOpen: true })
+  }
+
+  closeAddAudienceModal = () => {
+    this.setState({ addAudienceModalOpen: false })
+  }
+
   audienceSelected(audience) {
     const { audienceSettings } = this.props
     const option = audienceSettings[audience.id]
@@ -82,7 +95,7 @@ class AudienceSettingsWidget extends React.Component {
     const newAudienceButton = (
       <Flex align="center">
         <StyledRowFlexItem style={{ marginTop: '5px' }}>
-          <Button href="#">
+          <Button href="#" onClick={this.openAddAudienceModal}>
             <PlusIcon width={15} style={{ fill: v.colors.black }} />
             New Audience
           </Button>
@@ -145,6 +158,10 @@ class AudienceSettingsWidget extends React.Component {
 
           <StyledColumnFlexParent />
         </div>
+        <AddAudienceModal
+          open={this.state.addAudienceModalOpen}
+          close={this.closeAddAudienceModal}
+        />
       </AudienceSettingsWrapper>
     )
   }
