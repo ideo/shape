@@ -280,9 +280,9 @@ describe Collection::TestCollection, type: :model do
               .map { |card| card.record.class },
             ).to eq(
               [
+                Item::VideoItem,
                 Item::DataItem,
                 Item::LegendItem,
-                Item::VideoItem,
                 Collection::TestDesign,
               ],
             )
