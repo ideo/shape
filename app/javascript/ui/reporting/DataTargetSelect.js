@@ -93,44 +93,45 @@ class DataTargetSelect extends React.Component {
   render() {
     return (
       <form className="form" style={{ display: 'inline-block' }}>
-        <Select
-          classes={{ root: 'select', selectMenu: 'selectMenu' }}
-          displayEmpty
-          disableUnderline
-          name="role"
-          onChange={this.handleChange}
-          value={this.currentValue}
-          inline
-        >
-          {this.selectOptions.map(opt => (
-            <SelectOption
-              classes={{ root: 'selectOption', selected: 'selected' }}
-              key={opt}
-              value={opt}
-            >
-              {opt}
-            </SelectOption>
-          ))}
-        </Select>
-        {this.type === 'Collection' &&
-          this.editing && (
-            <div
-              style={{
-                display: 'inline-block',
-                marginBottom: '10px',
-                backgroundColor: v.colors.commonLight,
-              }}
-            >
-              <AutoComplete
-                options={[]}
-                optionSearch={this.onSearch}
-                onOptionSelect={option => this.props.onSelect(option)}
-                placeholder="Collection name"
-                keepSelectedOptions
-                style={{ display: 'inline-block' }}
-              />
-            </div>
-          )}
+        {this.type === 'Collection' && this.editing ? (
+          <div
+            style={{
+              display: 'block',
+              marginBottom: '10px',
+              backgroundColor: v.colors.commonLight,
+              width: '190px',
+            }}
+          >
+            <AutoComplete
+              options={[]}
+              optionSearch={this.onSearch}
+              onOptionSelect={option => this.props.onSelect(option)}
+              placeholder="Collection name"
+              keepSelectedOptions
+              style={{ display: 'inline-block' }}
+            />
+          </div>
+        ) : (
+          <Select
+            classes={{ root: 'select', selectMenu: 'selectMenu' }}
+            displayEmpty
+            disableUnderline
+            name="role"
+            onChange={this.handleChange}
+            value={this.currentValue}
+            inline
+          >
+            {this.selectOptions.map(opt => (
+              <SelectOption
+                classes={{ root: 'selectOption', selected: 'selected' }}
+                key={opt}
+                value={opt}
+              >
+                {opt}
+              </SelectOption>
+            ))}
+          </Select>
+        )}
       </form>
     )
   }

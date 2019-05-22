@@ -87,7 +87,7 @@ class DataItemCoverCollectionsItems extends React.Component {
 
     this.saveSettings({
       data_source_id: collectionId,
-      data_source_type: 'collections',
+      data_source_type: 'Collection',
     })
     if (collectionId) {
       this.loadTargetCollection(collectionId)
