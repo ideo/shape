@@ -40,19 +40,12 @@ describe PurchaseTestAudience, type: :service do
       user: user,
     )
   end
-  let(:total_price) do
-    result.total_price
-  end
 
   context 'with a paid audience' do
     let(:audiences) { create_list(:audience, 2, price_per_response: 5) }
 
     it 'is successful' do
       expect(result.success?).to be true
-    end
-
-    it 'calculates total_price' do
-      expect(total_price).to eq 5 * sample_size * 2
     end
 
     it 'creates test audiences matching the audience' do
@@ -62,15 +55,15 @@ describe PurchaseTestAudience, type: :service do
     end
 
     it 'calls NetworkApi::Payment.create' do
-      test_audiences = test_collection.test_audiences
-      description =  "#{user.name} launched #{test_collection.name} test with " \
-                    "#{test_audiences[0].sample_size} total #{audiences[0].name} audience respondents at $#{sprintf('%.2f', audiences[0].price_per_response)} " \
-                    "and #{test_audiences[1].sample_size} total #{audiences[1].name} audience respondents at $#{sprintf('%.2f', audiences[1].price_per_response)}."
-      expect(NetworkApi::Payment).to have_received(:create).with(
-        payment_method_id: payment_method_double.id,
-        amount: total_price,
-        description: description,
-      )
+      test_collection.test_audiences.each do |test_audience|
+        expect(NetworkApi::Payment).to have_received(:create).with(
+          payment_method_id: payment_method_double.id,
+          amount: test_audience.total_price,
+          description: test_audience.description,
+          quantity: test_audience.sample_size,
+          unit_amount: test_audience.price_per_response,
+        )
+      end
     end
 
     context 'without payment method' do
@@ -93,7 +86,10 @@ describe PurchaseTestAudience, type: :service do
       end
 
       it 'returns error' do
-        expect(result.message).to eq('Payment failed: Bank declined the card')
+        expect(result.message).to eq(
+          "Could not purchase #{audiences[0].name} audience. " \
+          'Payment failed: Bank declined the card',
+        )
       end
     end
   end
@@ -103,10 +99,6 @@ describe PurchaseTestAudience, type: :service do
 
     it 'is successful' do
       expect(result.success?).to be true
-    end
-
-    it 'calculates total_price' do
-      expect(total_price).to eq 0
     end
 
     it 'creates test audiences matching the audience' do
