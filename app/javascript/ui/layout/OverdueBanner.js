@@ -76,7 +76,6 @@ class OverdueBanner extends React.Component {
 
     return (
       <StyledBanner
-        backgroundColor={v.colors.alert}
         leftComponent={this.renderLeftComponent()}
         rightComponent={this.renderRightComponent()}
       />

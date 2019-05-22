@@ -33,17 +33,15 @@ class Banner extends React.Component {
 Banner.propTypes = {
   leftComponent: PropTypes.object.isRequired,
   rightComponent: PropTypes.object.isRequired,
-  backgroundColor: PropTypes.string.isRequired,
 }
 
 Banner.defaultProps = {
   leftComponent: () => null,
   rightComponent: () => null,
-  backgroundColor: v.colors.alert,
 }
 
 const StyledBanner = styled.div`
-  background-color: ${props => props.backgroundColor};
+  background-color: ${v.colors.alert};
   color: white;
   font-family: ${v.fonts.sans};
   font-size: 1.33rem;

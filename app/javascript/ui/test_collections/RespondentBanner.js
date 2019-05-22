@@ -27,7 +27,6 @@ class RespondentBanner extends React.Component {
 
     return (
       <Banner
-        backgroundColor={v.colors.secondaryDark}
         leftComponent={this.renderLeftComponent()}
         rightComponent={this.renderRightComponent()}
       />
