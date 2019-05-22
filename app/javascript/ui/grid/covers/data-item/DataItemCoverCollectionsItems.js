@@ -10,6 +10,7 @@ import {
   HugeNumber,
 } from '~/ui/global/styled/typography'
 import ChartGroup from '~/ui/global/charts/ChartGroup'
+import InlineLoader from '~/ui/layout/InlineLoader'
 import { AboveChartContainer } from '~/ui/global/charts/ChartUtils'
 import EditableButton from '~/ui/reporting/EditableButton'
 import MeasureSelect from '~/ui/reporting/MeasureSelect'
@@ -36,6 +37,8 @@ const GraphKey = styled.span`
 class DataItemCoverCollectionsItems extends React.Component {
   @observable
   targetCollection = null
+  @observable
+  loading = false
 
   componentDidMount() {
     const { primaryDataset } = this.props.item
@@ -115,6 +118,7 @@ class DataItemCoverCollectionsItems extends React.Component {
     const { card, item, uiStore } = this.props
     runInAction(() => {
       Object.assign(item.primaryDataset, settings)
+      this.loading = true
     })
     await item.primaryDataset.save()
     // If the timeframe changed we have to resize the card
@@ -128,6 +132,7 @@ class DataItemCoverCollectionsItems extends React.Component {
     runInAction(() => {
       this.toggleEditing()
       uiStore.toggleEditingCardId(card.id)
+      this.loading = false
     })
   }
 
@@ -300,6 +305,7 @@ class DataItemCoverCollectionsItems extends React.Component {
         editing={this.editing}
         data-cy="DataItemCover"
       >
+        {this.loading && <InlineLoader />}
         {item.isReportTypeCollectionsItems && timeframe === 'ever'
           ? this.renderSingleValue()
           : this.renderTimeframeValues()}
