@@ -23,6 +23,7 @@ Feature: Creating a Test Collection
     Then I should see "Usefulness" in a "DataItemCover"
     # assuming the collection cover is not truncated...
     Then I should see a collection card named "Test Prototype Feedback Design"
+    Then I should see a "LegendItemCover"
     Then I should see "Get Link" in a "HeaderFormButton"
     Then I should see "Stop Feedback" in a "HeaderFormButton"
 
