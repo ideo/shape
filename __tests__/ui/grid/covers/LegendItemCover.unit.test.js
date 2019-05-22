@@ -35,7 +35,6 @@ describe('LegendItemCover', () => {
   it('shows selected dataset', () => {
     const selectedMeasure = wrapper.find('Dataset').at(0)
     expect(selectedMeasure.exists()).toBe(true)
-    expect(selectedMeasure.find('UnselectDataset').exists()).toBe(true)
   })
 
   it('removes selected dataset when x is clicked', () => {

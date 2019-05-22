@@ -12,25 +12,19 @@ exports[`LegendItemCover renders snapshot 1`] = `
   >
     <styled.span>
       <styled.span
-        color="#c0dbde"
+        color="#de8f74"
       />
     </styled.span>
     <Styled(SmallHelperText)
       color="#120f0e"
     />
-    <UnselectDataset
-      onClick={[Function]}
-      role="button"
-    >
-      <XIcon />
-    </UnselectDataset>
   </Dataset>
   <Dataset
     key="dataset-85th"
   >
     <styled.span>
       <styled.span
-        color="#738091"
+        color="#c0dbde"
       />
     </styled.span>
     <Styled(SmallHelperText)
@@ -48,7 +42,7 @@ exports[`LegendItemCover renders snapshot 1`] = `
   >
     <styled.span>
       <styled.span
-        color="#A1A6B4"
+        color="#738091"
       />
     </styled.span>
     <Styled(SmallHelperText)
