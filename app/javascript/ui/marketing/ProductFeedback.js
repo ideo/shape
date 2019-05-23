@@ -8,7 +8,7 @@ import {
 } from '~/ui/global/styled/marketing.js'
 import v from '~/utils/variables'
 
-const StyledProductDescription = styled(MarketingContent)`
+const StyledProductFeedback = styled(MarketingContent)`
   margin-left: 24px;
   margin-right: 24px;
   padding-top: 0px;
@@ -33,25 +33,25 @@ const Title = styled(MarketingH1Bold)`
     line-height: 40px;
   }
 `
-const Description = styled(MarketingContent)`
-  text-align: left;
-  word-wrap: break-word;
-  line-height: 25px;
-  font-size: 18px;
-
-  @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
-    line-height: 1.4em;
-    font-size: 1.1em;
-  }
-`
-
-// const StyledInnerHTML = styled.div`
+// const Description = styled(MarketingContent)`
 //   text-align: left;
 //   word-wrap: break-word;
 //   line-height: 25px;
 //   font-size: 18px;
+//
+//   @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
+//     line-height: 1.4em;
+//     font-size: 1.1em;
+//   }
 // `
-// StyledInnerHTML.displayName = 'StyledInnerHTML'
+
+const StyledInnerHTML = styled.div`
+  text-align: left;
+  word-wrap: break-word;
+  line-height: 25px;
+  font-size: 18px;
+`
+StyledInnerHTML.displayName = 'StyledInnerHTML'
 
 // const StyledMarkdown = styled(ReactMarkdown)`
 //   text-align: left;
@@ -69,10 +69,10 @@ const ImageDisplay = styled.img`
   box-shadow: 0px 2px 16px ${v.colors.commonMedium};
 `
 
-class ProductDescription extends React.PureComponent {
+class ProductFeedback extends React.PureComponent {
   render() {
     return (
-      <StyledProductDescription id={this.props.id} order={this.props.order}>
+      <StyledProductFeedback id={this.props.id} order={this.props.order}>
         <MarketingFlex
           w={1}
           mt={4}
@@ -88,15 +88,9 @@ class ProductDescription extends React.PureComponent {
 
           <Box w={[1, 0.21]} order={[4, this.props.order % 2 === 1 ? 2 : 4]}>
             <Title>{this.props.title}</Title>
-            <Description>{this.props.description}</Description>
-            {/* uncomment if descriptionHTML is used to render description
-              <StyledInnerHTML
-                dangerouslySetInnerHTML={{ __html: this.props.descriptionHTML }}
-              />
-            */}
-            {/* uncomment if descriptionMarkdown is used to render description
-              <ReactMarkdown source={this.props.descriptionMarkdown} />
-            */}
+            <StyledInnerHTML
+              dangerouslySetInnerHTML={{ __html: this.props.descriptionHTML }}
+            />
           </Box>
 
           <Box w={[null, 0.09]} order={3} />
@@ -107,12 +101,12 @@ class ProductDescription extends React.PureComponent {
 
           <Box w={[null, 0.08]} order={4} />
         </MarketingFlex>
-      </StyledProductDescription>
+      </StyledProductFeedback>
     )
   }
 }
 
-ProductDescription.propTypes = {
+ProductFeedback.propTypes = {
   id: PropTypes.string.isRequired,
   order: PropTypes.number.isRequired,
   title: PropTypes.string.isRequired,
@@ -122,10 +116,10 @@ ProductDescription.propTypes = {
   imageUrl: PropTypes.string.isRequired,
 }
 
-ProductDescription.defaultProps = {
+ProductFeedback.defaultProps = {
   description: '',
   descriptionMarkdown: '',
   descriptionHTML: '',
 }
 
-export default ProductDescription
+export default ProductFeedback
