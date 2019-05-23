@@ -12,21 +12,27 @@ import v from '~/utils/variables'
 class OverdueBanner extends React.Component {
   hide = () => this.props.uiStore.hideOverdueBanner()
 
-  renderLeftComponent() {
-    const currentOrganization = this
+  get overdueMessage() {
+    const { currentOrganization } = this
+    return `${
+      currentOrganization.name
+    } account is overdue. Your content will become inaccessible on ${
+      currentOrganization.inaccessible_at
+    }.`
+  }
 
+  renderLeftComponent() {
     return (
-      <React.Fragment>
+      <div>
         <Grid item xs={1}>
           <StyledIconWrapper>
             <OverdueClockIcon />
           </StyledIconWrapper>
         </Grid>
         <Grid item xs={11}>
-          {currentOrganization.name} account is overdue. Your content will
-          become inaccessible on {currentOrganization.inaccessible_at}.
+          {this.overdueMessage}
         </Grid>
-      </React.Fragment>
+      </div>
     )
   }
 
@@ -52,15 +58,13 @@ class OverdueBanner extends React.Component {
   get currentOrganization() {
     const { apiStore } = this.props
 
-    apiStore.currentUser ? apiStore.currentUser.current_organization : null
-
-    if (!apiStore.currentUser) return null
-
-    return apiStore.currentUser.current_organization
+    return apiStore.currentUser
+      ? apiStore.currentUser.current_organization
+      : null
   }
 
   get hideOverdueBanner() {
-    const currentOrganization = this
+    const { currentOrganization } = this
 
     return (
       !currentOrganization ||
@@ -96,6 +100,7 @@ const StyledBanner = styled(Banner)`
     padding: 20px ${v.containerPadding.horizontal}rem;
   }
 `
+StyledBanner.displayName = 'StyledBanner'
 
 OverdueBanner.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,

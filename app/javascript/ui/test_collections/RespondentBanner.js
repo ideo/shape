@@ -1,5 +1,4 @@
 import { PropTypes as MobxPropTypes } from 'mobx-react'
-import v from '~/utils/variables'
 import Banner from '~/ui/layout/Banner'
 
 class RespondentBanner extends React.Component {

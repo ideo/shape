@@ -7,7 +7,7 @@ import v from '~/utils/variables'
 class Banner extends React.Component {
   render() {
     return (
-      <StyledBanner {...this.props}>
+      <StyledBanner>
         <MaxWidthContainer>
           <Grid container justify="space-between" alignItems="center">
             <Grid
@@ -51,6 +51,7 @@ const StyledBanner = styled.div`
     color: white;
   }
 `
+StyledBanner.displayName = 'StyledBanner'
 
 const StyledAction = styled.div`
   font-size: 1rem;
