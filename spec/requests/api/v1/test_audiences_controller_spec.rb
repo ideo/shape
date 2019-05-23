@@ -44,7 +44,8 @@ describe Api::V1::TestAudiencesController, type: :request, json: true, auth: tru
       create(:test_audience,
              audience: audience,
              test_collection: test_collection,
-             sample_size: 10)
+             sample_size: 10,
+             launched_by: current_user)
     end
     let(:params) do
       json_api_params(
