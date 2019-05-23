@@ -369,11 +369,15 @@ class Collection
 
     def create_media_item_link(media_question_items: nil)
       media_question_items ||= test_design.items.reject { |i| i.type == 'Item::QuestionItem' }
-      media_question_items.map do |media_item|
-        media_question = media_item.becomes!(Item::QuestionItem)
-        media_question.question_type == :question_media
-        media_question.create_media_item(
-          parent_collection: self,
+      # since we're placing things at the front one by one, we reverse the order
+      media_question_items.reverse.map do |media_item|
+        next unless media_item.cards_linked_to_this_item.empty?
+        CollectionCard::Link.create(
+          parent: self,
+          item_id: media_item.id,
+          width: 1,
+          height: 2,
+          order: -1,
         )
       end
     end

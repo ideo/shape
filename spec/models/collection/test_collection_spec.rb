@@ -320,15 +320,14 @@ describe Collection::TestCollection, type: :model do
           end
 
           context 'with media questions' do
-            let!(:test_collection) { create(:test_collection) }
+            # "completed" will have one video item
+            let!(:test_collection) { create(:test_collection, :completed) }
+            let(:first_card) { test_collection.collection_cards.first }
 
-            it 'creates a media item link for each media item' do
+            it 'creates a media item link for the media item' do
               test_collection.launch!(initiated_by: user)
-              expect(
-                test_collection
-                  .items
-                  .count,
-              ).to equal 4
+              expect(first_card.is_a?(CollectionCard::Link)).to be true
+              expect(first_card.item).to eq test_collection.test_design.items.first
             end
           end
 
