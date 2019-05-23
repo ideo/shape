@@ -18,3 +18,7 @@ Given('I login and visit the Test Area', () => {
   cy.wait('@apiGetCollection')
   cy.wait('@apiGetCollectionCards')
 })
+
+Given('I logout', () => {
+  cy.logout()
+})

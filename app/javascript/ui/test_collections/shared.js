@@ -35,6 +35,7 @@ export const QuestionText = styled.p`
 export const TextInputHolder = StyledCommentTextarea.extend`
   color: white;
   padding: 6px;
+  width: 100%;
   background-color: ${props =>
     props.hasFocus
       ? props.theme.backgroundColorEditable

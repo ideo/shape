@@ -582,9 +582,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         create(:collection, num_cards: 3, add_editors: [user, editor], add_viewers: [viewer])
       end
 
-      it 'returns a 200' do
+      it 'returns a 204' do
         patch(path, params: params)
-        expect(response.status).to eq(200)
+        expect(response.status).to eq(204)
       end
 
       it 'moves cards from one collection to the other' do
@@ -702,9 +702,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         end
       end
 
-      it 'returns a 200' do
+      it 'returns a 204' do
         post(path, params: params)
-        expect(response.status).to eq(200)
+        expect(response.status).to eq(204)
       end
 
       it 'links cards from one collection to the other' do

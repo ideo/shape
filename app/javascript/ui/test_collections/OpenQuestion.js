@@ -95,8 +95,12 @@ class OpenQuestion extends React.Component {
               type="questionText"
               placeholder="write response here"
               disabled={editing}
+              data-cy="OpenQuestionTextInput"
             />
-            <TextEnterButton focused={this.state.focused}>
+            <TextEnterButton
+              focused={this.state.focused}
+              data-cy="OpenQuestionTextButton"
+            >
               <ReturnArrowIcon />
             </TextEnterButton>
           </TextResponseHolder>

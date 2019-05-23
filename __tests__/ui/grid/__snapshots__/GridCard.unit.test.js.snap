@@ -12457,9 +12457,17 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
     color="#c6c1bf"
     zoomLevel={1}
   >
-    <SelectionCircle
-      cardId="11"
-    />
+    <CardActionHolder
+      active={false}
+      disableHover={false}
+      onClick={[Function]}
+      size={32}
+      tooltipText="select"
+    >
+      <SelectionCircle
+        cardId="11"
+      />
+    </CardActionHolder>
     <ActionMenu
       afterArchive={null}
       canEdit={true}
@@ -18359,9 +18367,17 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
     color="#c6c1bf"
     zoomLevel={1}
   >
-    <SelectionCircle
-      cardId="11"
-    />
+    <CardActionHolder
+      active={false}
+      disableHover={false}
+      onClick={[Function]}
+      size={32}
+      tooltipText="select"
+    >
+      <SelectionCircle
+        cardId="11"
+      />
+    </CardActionHolder>
     <ActionMenu
       afterArchive={null}
       canEdit={false}
@@ -30144,9 +30160,17 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
     color="#c6c1bf"
     zoomLevel={1}
   >
-    <SelectionCircle
-      cardId="11"
-    />
+    <CardActionHolder
+      active={false}
+      disableHover={false}
+      onClick={[Function]}
+      size={32}
+      tooltipText="select"
+    >
+      <SelectionCircle
+        cardId="11"
+      />
+    </CardActionHolder>
     <ActionMenu
       afterArchive={null}
       canEdit={false}
@@ -36334,9 +36358,17 @@ exports[`GridCard with item as editor renders snapshot 1`] = `
     color="#c6c1bf"
     zoomLevel={1}
   >
-    <SelectionCircle
-      cardId="10"
-    />
+    <CardActionHolder
+      active={false}
+      disableHover={false}
+      onClick={[Function]}
+      size={32}
+      tooltipText="select"
+    >
+      <SelectionCircle
+        cardId="10"
+      />
+    </CardActionHolder>
     <ActionMenu
       afterArchive={null}
       canEdit={true}
@@ -37461,9 +37493,17 @@ exports[`GridCard with item as viewer renders snapshot 1`] = `
     color="#c6c1bf"
     zoomLevel={1}
   >
-    <SelectionCircle
-      cardId="10"
-    />
+    <CardActionHolder
+      active={false}
+      disableHover={false}
+      onClick={[Function]}
+      size={32}
+      tooltipText="select"
+    >
+      <SelectionCircle
+        cardId="10"
+      />
+    </CardActionHolder>
     <ActionMenu
       afterArchive={null}
       canEdit={false}
@@ -39206,9 +39246,17 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
     color="#c6c1bf"
     zoomLevel={1}
   >
-    <SelectionCircle
-      cardId="11"
-    />
+    <CardActionHolder
+      active={false}
+      disableHover={false}
+      onClick={[Function]}
+      size={32}
+      tooltipText="select"
+    >
+      <SelectionCircle
+        cardId="11"
+      />
+    </CardActionHolder>
     <ActionMenu
       afterArchive={null}
       canEdit={false}
