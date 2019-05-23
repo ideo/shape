@@ -221,7 +221,7 @@ class CollectionGrid extends React.Component {
     const { uiStore } = this.props
     uiStore.update('multiMoveCardIds', [])
     this.setState({ hoveringOver: false }, () => {
-      this.positionCards(this.props.collection.collection_cards)
+      this.initialize(this.props)
     })
   }
 

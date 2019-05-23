@@ -458,8 +458,8 @@ class MovableGridCard extends React.PureComponent {
       styleProps.xPos = xPos + offsetXAmt
     }
 
-    if (xPos + width > window.pageXOffset + window.innerWidth) {
-      const padding = 10
+    const padding = 40
+    if (xPos + width + padding > window.pageXOffset + window.innerWidth) {
       offsetXAmt = xPos - (window.pageXOffset + window.innerWidth)
       styleProps.xPos = xPos - width - offsetXAmt - padding
     }
