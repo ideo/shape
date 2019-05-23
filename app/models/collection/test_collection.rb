@@ -1,3 +1,62 @@
+# == Schema Information
+#
+# Table name: collections
+#
+#  id                         :bigint(8)        not null, primary key
+#  anyone_can_join            :boolean          default(FALSE)
+#  anyone_can_view            :boolean          default(FALSE)
+#  archive_batch              :string
+#  archived                   :boolean          default(FALSE)
+#  archived_at                :datetime
+#  breadcrumb                 :jsonb
+#  cached_attributes          :jsonb
+#  cached_test_scores         :jsonb
+#  cover_type                 :integer          default("cover_type_default")
+#  hide_submissions           :boolean          default(FALSE)
+#  master_template            :boolean          default(FALSE)
+#  name                       :string
+#  processing_status          :integer
+#  shared_with_organization   :boolean          default(FALSE)
+#  submission_box_type        :integer
+#  submissions_enabled        :boolean          default(TRUE)
+#  test_closed_at             :datetime
+#  test_launched_at           :datetime
+#  test_status                :integer
+#  type                       :string
+#  unarchived_at              :datetime
+#  created_at                 :datetime         not null
+#  updated_at                 :datetime         not null
+#  cloned_from_id             :bigint(8)
+#  collection_to_test_id      :bigint(8)
+#  created_by_id              :integer
+#  joinable_group_id          :bigint(8)
+#  organization_id            :bigint(8)
+#  question_item_id           :integer
+#  roles_anchor_collection_id :bigint(8)
+#  submission_box_id          :bigint(8)
+#  submission_template_id     :integer
+#  template_id                :integer
+#  test_collection_id         :bigint(8)
+#
+# Indexes
+#
+#  index_collections_on_breadcrumb                  (breadcrumb) USING gin
+#  index_collections_on_cached_test_scores          (cached_test_scores) USING gin
+#  index_collections_on_cloned_from_id              (cloned_from_id)
+#  index_collections_on_created_at                  (created_at)
+#  index_collections_on_organization_id             (organization_id)
+#  index_collections_on_roles_anchor_collection_id  (roles_anchor_collection_id)
+#  index_collections_on_submission_box_id           (submission_box_id)
+#  index_collections_on_submission_template_id      (submission_template_id)
+#  index_collections_on_template_id                 (template_id)
+#  index_collections_on_test_status                 (test_status)
+#  index_collections_on_type                        (type)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (organization_id => organizations.id)
+#
+
 class Collection
   class TestCollection < Collection
     include AASM
@@ -110,6 +169,7 @@ class Collection
       update_cached_submission_status(parent_submission) if inside_a_submission?
       create_test_design_and_move_cards!(initiated_by: initiated_by) unless reopening
       update(test_launched_at: Time.current, test_closed_at: nil)
+      TestCollectionMailer.notify_launch(id).deliver_later if gives_incentive? && ENV['ENABLE_ZENDESK_FOR_TEST_LAUNCH']
     end
 
     def still_accepting_answers?
@@ -283,10 +343,12 @@ class Collection
       collections.where(type: 'Collection::TestOpenResponses')
     end
 
-    def create_uniq_survey_response(user_id: nil)
+    def create_uniq_survey_response(user_id: nil, test_audience_id: nil)
       survey_responses.create(
         session_uid: SecureRandom.uuid,
         user_id: user_id,
+        # only include passed in test_audience_id if it is a valid relation
+        test_audience_id: test_audience_ids.include?(test_audience_id) ? test_audience_id : nil,
       )
     end
 
@@ -351,6 +413,7 @@ class Collection
           end
         create_open_response_collections(initiated_by: initiated_by)
         create_response_graphs(initiated_by: initiated_by)
+        create_media_item_link
         test_design.cache_cover!
       end
       reorder_cards!
@@ -393,6 +456,21 @@ class Collection
         question.create_response_graph(
           parent_collection: self,
           initiated_by: initiated_by,
+        )
+      end
+    end
+
+    def create_media_item_link(media_question_items: nil)
+      media_question_items ||= test_design.items.reject { |i| i.type == 'Item::QuestionItem' }
+      # since we're placing things at the front one by one, we reverse the order
+      media_question_items.reverse.map do |media_item|
+        next unless media_item.cards_linked_to_this_item.empty?
+        CollectionCard::Link.create(
+          parent: self,
+          item_id: media_item.id,
+          width: 1,
+          height: 2,
+          order: -1,
         )
       end
     end
@@ -478,6 +556,14 @@ class Collection
     def gives_incentive?
       # right now the check is basically any paid tests == gives_incentive
       test_audiences.where('price_per_response > 0').present?
+    end
+
+    def link_sharing_audience
+      test_audiences.where(price_per_response: 0).first
+    end
+
+    def link_sharing_enabled?
+      link_sharing_audience.present?
     end
   end
 end

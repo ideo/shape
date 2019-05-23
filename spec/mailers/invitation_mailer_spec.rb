@@ -76,5 +76,25 @@ RSpec.describe InvitationMailer, type: :mailer do
         )
       end
     end
+
+    context 'with Shape admin' do
+      let(:invited_to_type) { Role::SHAPE_ADMIN.to_s.titleize }
+      let(:mail) do
+        InvitationMailer.invite(
+          user_id: user.id,
+          invited_by_id: invited_by.id,
+          invited_to_type: invited_to_type,
+        )
+      end
+
+      it 'renders the headers' do
+        expect(mail.subject).to eq("Your invitation to \"#{invited_to_type}\" on Shape")
+        expect(mail.to).to eq([user.email])
+      end
+
+      it 'renders the body' do
+        expect(mail.body.encoded).to match("#{invited_by.name} has invited you to join \"#{invited_to_type}\"")
+      end
+    end
   end
 end

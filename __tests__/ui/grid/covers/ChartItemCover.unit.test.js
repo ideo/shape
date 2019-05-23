@@ -27,8 +27,8 @@ describe('ChartItemCover', () => {
 
   describe('render()', () => {
     it('does not render headings when the question is not there', () => {
-      expect(wrapper.find('Heading1').exists()).toBe(false)
-      expect(wrapper.find('Heading3').exists()).toBe(false)
+      expect(wrapper.find('.testHeading1').exists()).toBe(false)
+      expect(wrapper.find('.testHeading2').exists()).toBe(false)
     })
 
     describe('when question is fetched', () => {
@@ -40,13 +40,13 @@ describe('ChartItemCover', () => {
       it('does render the headings when the question is there', async () => {
         expect(
           wrapper
-            .find('Heading1')
+            .find('.testHeading1')
             .children()
             .text()
         ).toEqual('Usefulness')
         expect(
           wrapper
-            .find('StyledHeading3')
+            .find('.testHeading2')
             .children()
             .text()
         ).toEqual('How useful is this idea for you?')
@@ -65,7 +65,7 @@ describe('ChartItemCover', () => {
         it('should render the category satisfaction filled-in field', () => {
           expect(
             wrapper
-              .find('StyledHeading3')
+              .find('.testHeading2')
               .children()
               .text()
           ).toEqual('How satisfied are you with your current donut')

@@ -17,6 +17,11 @@ class RoutingStore extends RouterStore {
   }
 
   @computed
+  get isAdmin() {
+    return this.location.pathname === this.pathTo('admin')
+  }
+
+  @computed
   get query() {
     return queryString.parse(this.location.search)
   }
@@ -32,6 +37,8 @@ class RoutingStore extends RouterStore {
         const path = `/${this.slug()}/search`
         const qs = id ? `?q=${encodeURIComponent(id)}` : ''
         return `${path}${qs}`
+      case 'admin':
+        return '/admin'
       case 'homepage':
       default:
         return `/${this.slug()}`
@@ -41,6 +48,10 @@ class RoutingStore extends RouterStore {
   routeTo = (type, id = null) => {
     this.routingTo = { type, id }
 
+    // prevent accidental route changes while you are dragging/moving into collection
+    if (uiStore.movingIntoCollection) {
+      return
+    }
     // close the org/roles menus if either are open when we route to a new page
     uiStore.update('organizationMenuPage', null)
     uiStore.update('rolesMenuOpen', null)

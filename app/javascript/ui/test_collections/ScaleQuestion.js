@@ -183,7 +183,7 @@ class ScaleQuestion extends React.Component {
         </Question>
         <Scale>
           <SmallHelperText>select your response below</SmallHelperText>
-          <EmojiHolder>
+          <EmojiHolder data-cy="ScaleEmojiHolder">
             {emojis.map(emoji => (
               <Tooltip
                 classes={{ tooltip: 'Tooltip' }}
@@ -202,6 +202,7 @@ class ScaleQuestion extends React.Component {
                     onClick={this.vote(emoji.number)}
                     // "vote" button is disabled while editing
                     disabled={editing}
+                    data-cy="ScaleEmojiBtn"
                   >
                     <Emoji
                       name={emoji.name}

@@ -1,3 +1,20 @@
+# == Schema Information
+#
+# Table name: audiences
+#
+#  id                 :bigint(8)        not null, primary key
+#  criteria           :string
+#  name               :string
+#  price_per_response :decimal(10, 2)   default(0.0)
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  organization_id    :bigint(8)
+#
+# Indexes
+#
+#  index_audiences_on_organization_id  (organization_id)
+#
+
 class Audience < ApplicationRecord
   belongs_to :organization, optional: true
 

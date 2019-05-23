@@ -1,3 +1,27 @@
+# == Schema Information
+#
+# Table name: test_audiences
+#
+#  id                 :bigint(8)        not null, primary key
+#  price_per_response :decimal(10, 2)
+#  sample_size        :integer
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  audience_id        :bigint(8)
+#  launched_by_id     :integer
+#  network_payment_id :string
+#  test_collection_id :bigint(8)
+#
+# Indexes
+#
+#  index_test_audiences_on_audience_id         (audience_id)
+#  index_test_audiences_on_test_collection_id  (test_collection_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (audience_id => audiences.id)
+#
+
 class TestAudience < ApplicationRecord
   belongs_to :audience
   belongs_to :test_collection,
@@ -20,6 +44,10 @@ class TestAudience < ApplicationRecord
 
   # this will only get set in PurchaseTestAudience
   attr_writer :payment_method
+
+  def closed?
+    survey_responses.completed.size >= sample_size
+  end
 
   def description
     "#{launched_by.name} launched #{test_collection.name} test with " \

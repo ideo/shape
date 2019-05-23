@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideo/network-api-ruby.git
-  revision: 1adad1f4602611bcacff7b1c2d94a048334ed0cc
+  revision: 652625087411194c5b03ff0a825643da343884ca
   specs:
     network-api-ruby (0.0.16)
       json_api_client (~> 1.5, >= 1.5.3)
@@ -70,6 +70,9 @@ GEM
     addressable (2.3.8)
     amoeba (3.1.0)
       activerecord (>= 3.2.6)
+    annotate (2.7.5)
+      activerecord (>= 3.2, < 7.0)
+      rake (>= 10.4, < 13.0)
     appsignal (2.5.1)
       rack
     arel (8.0.0)
@@ -520,6 +523,7 @@ DEPENDENCIES
   active_record_query_trace
   acts-as-taggable-on
   amoeba
+  annotate
   appsignal
   autoprefixer-rails
   barnes
