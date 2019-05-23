@@ -92,11 +92,16 @@ class Collection
     end
 
     def question_item_created(question_item)
-      return unless question_item.question_open?
-      # Create open response collection for this new question item
-      test_collection.create_open_response_collections(
-        open_question_items: [question_item],
-      )
+      if question_item.question_open?
+        # Create open response collection for this new question item
+        test_collection.create_open_response_collections(
+          open_question_items: [question_item],
+        )
+      elsif question_item.question_media?
+        test_collection.create_media_item_link(
+          media_question_items: [question_item],
+        )
+      end
     end
 
     def answerable_complete_question_items

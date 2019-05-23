@@ -289,6 +289,7 @@ describe Collection::TestCollection, type: :model do
               .map { |card| card.record.class },
             ).to eq(
               [
+                Item::VideoItem,
                 Item::ChartItem,
                 Collection::TestDesign,
               ],
@@ -355,6 +356,18 @@ describe Collection::TestCollection, type: :model do
 
               expect(TestCollectionMailer).to receive(:notify_launch).with(test_collection.id)
               test_collection.launch!(initiated_by: user)
+            end
+          end
+
+          context 'with media questions' do
+            # "completed" will have one video item
+            let!(:test_collection) { create(:test_collection, :completed) }
+            let(:first_card) { test_collection.collection_cards.first }
+
+            it 'creates a media item link for the media item' do
+              test_collection.launch!(initiated_by: user)
+              expect(first_card.is_a?(CollectionCard::Link)).to be true
+              expect(first_card.item).to eq test_collection.test_design.items.first
             end
           end
 
