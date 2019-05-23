@@ -1,11 +1,12 @@
 require 'rails_helper'
 
 describe Api::V1::TestAudiencesController, type: :request, json: true, auth: true do
+  let!(:current_user) { @user }
+  let(:organization) { create(:organization, admin: current_user) }
+  let(:audience) { create(:audience, organizations: [organization]) }
+  let(:test_collection) { create(:test_collection, add_editors: [current_user]) }
+
   describe 'POST #create' do
-    let!(:current_user) { @user }
-    let(:organization) { create(:organization, admin: current_user) }
-    let(:audience) { create(:audience, organization: organization) }
-    let(:test_collection) { create(:test_collection, add_editors: [current_user]) }
     let(:params) do
       json_api_params(
         'test_audiences',
@@ -36,10 +37,6 @@ describe Api::V1::TestAudiencesController, type: :request, json: true, auth: tru
   end
 
   describe 'PATCH #update' do
-    let!(:current_user) { @user }
-    let(:organization) { create(:organization, admin: current_user) }
-    let(:audience) { create(:audience, organization: organization) }
-    let(:test_collection) { create(:test_collection, add_editors: [current_user]) }
     let(:test_audience) do
       create(:test_audience,
              audience: audience,
