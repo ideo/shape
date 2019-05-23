@@ -353,6 +353,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         :external_id,
         :content,
         :legend_item_id,
+        :legend_search_source,
         data_content: {},
         filestack_file_attributes: [
           :url,
@@ -362,12 +363,25 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
           :mimetype,
           docinfo: {},
         ],
-        dataset_attributes: %i[
-          measure
-          timeframe
-          chart_type
-          data_source_type
-          data_source_id
+        datasets_attributes: [
+          :name,
+          :description,
+          :order,
+          :selected,
+          :max_domain,
+          :cached_data,
+          :measure,
+          :timeframe,
+          :chart_type,
+          :data_source_type,
+          :data_source_id,
+          style: {},
+          cached_data: [
+            :value,
+            :date,
+            :percentage,
+            :column,
+          ],
         ],
       ],
     )
