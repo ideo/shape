@@ -16,7 +16,7 @@ class Api::V1::AudiencesController < Api::V1::BaseController
   def create
     @audience = Audience.new(audience_params)
     @audience.price_per_response = Audience::TARGETED_PRICE_PER_RESPONSE
-    @audience.organization = current_organization
+    @audience.organizations << current_organization
     if @audience.save
       render jsonapi: @audience.reload
     else
@@ -28,8 +28,9 @@ class Api::V1::AudiencesController < Api::V1::BaseController
 
   def load_user_audiences
     @audiences = Audience
-                 .where(organization_id: nil)
-                 .or(Audience.where(organization_id: @organization.id))
+                 .includes(:organizations)
+                 .where(organizations: { id: nil })
+                 .or(Audience.includes(:organizations).where(organizations: { id: @organization.id }))
   end
 
   def authorize_current_organization

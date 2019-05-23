@@ -16,7 +16,8 @@
 #
 
 class Audience < ApplicationRecord
-  belongs_to :organization, optional: true
+  has_many :audience_organizations, dependent: :destroy
+  has_many :organizations, through: :audience_organizations
 
   delegate :can_edit?,
            :can_view?,
