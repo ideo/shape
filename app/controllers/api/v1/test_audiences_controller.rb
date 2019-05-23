@@ -4,6 +4,7 @@ class Api::V1::TestAudiencesController < Api::V1::BaseController
 
   def create
     @test_audience = TestAudience.new(test_audience_params)
+    @test_audience.launched_by = current_user
     if @test_audience.save
       render jsonapi: @test_audience,
              include: %i[test_collection audience],

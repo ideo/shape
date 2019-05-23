@@ -1,7 +1,20 @@
 require 'rails_helper'
 
 describe Api::V1::TestAudiencesController, type: :request, json: true, auth: true do
-  describe 'POST #create' do
+  let(:payment_method_double) { double(id: SecureRandom.hex(10)) }
+  let(:network_payment_double) { double(id: 5, status: 'succeeded') }
+
+  before do
+    @user = current_user
+    allow(NetworkApi::Payment).to receive(:create).and_return(
+      network_payment_double,
+    )
+    allow(NetworkApi::PaymentMethod).to receive(:find).and_return(
+      [payment_method_double],
+    )
+  end
+
+  describe 'POST #create', :vcr do
     let!(:current_user) { @user }
     let(:organization) { create(:organization, admin: current_user) }
     let(:audience) { create(:audience, organization: organization) }
@@ -35,12 +48,12 @@ describe Api::V1::TestAudiencesController, type: :request, json: true, auth: tru
     end
   end
 
-  describe 'PATCH #update' do
+  describe 'PATCH #update', :vcr do
     let!(:current_user) { @user }
     let(:organization) { create(:organization, admin: current_user) }
     let(:audience) { create(:audience, organization: organization) }
     let(:test_collection) { create(:test_collection, add_editors: [current_user]) }
-    let(:payment_method_double) { double(id: SecureRandom.hex(10)) }
+    let(:network_organization_double) { double(id: SecureRandom.hex(10)) }
     let(:test_audience) do
       create(:test_audience,
              audience: audience,
@@ -60,8 +73,8 @@ describe Api::V1::TestAudiencesController, type: :request, json: true, auth: tru
 
     before do
       @user = current_user
-      allow(NetworkApi::PaymentMethod).to receive(:find).and_return(
-        [payment_method_double],
+      allow(NetworkApi::Organization).to receive(:find_by_external_id).and_return(
+        network_organization_double,
       )
     end
 

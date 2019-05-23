@@ -1,0 +1,119 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://profile.ideo.com/api/v1/payments
+    body:
+      encoding: UTF-8
+      string: '{"data":{"type":"payments","attributes":{"payment_method_id":"30c3b40d718ee738115e","description":"Van
+        Bruen launched interactive test with 10 total Vision - Telescopic audience
+        respondents at $17.00","amount":170.0,"quantity":10,"unit_amount":17.0}}}'
+    headers:
+      User-Agent:
+      - Faraday v0.12.2
+      Content-Type:
+      - application/vnd.api+json
+      Accept:
+      - application/vnd.api+json
+      Authorization:
+      - Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJ0eXBlIjoiYXBwbGljYXRpb24iLCJjbGllbnRfaWQiOiI0NTZjOTI1NjliYWZhOGQwMzUxNjJlNmE0YThhN2M5OWVlN2RlNGVlOGMxODczODNjMzEwNDIyMDgxYmIwMmU0IiwidWlkIjoiMDB1Y3kzdW53aE9wbHhzZHowaDciLCJleHBpcmVzIjoxNTU1OTc0NTAyfQ.ZXa-_6zQe5jyC4-g5gonWjgAsVcgFmEBS2FTsEImuj7vaN2inLxhFjdJ85SDHJaBkczOIIzjLOM5gLsfs5DWvV3DTR8Ox5NJeH_OwY7317z_cVVUTB2Oyu54B8zduLDiqyQ3DCYMHEXn6CwjliP_Z32CTCxdI--ED_nu1wCMAtxhjHShvyWS-QLXvN0MbcxTU0dTYzdEsSzCW4qWuYSxLzlh32CW6GUwystqvXe69wMi6Dlz4IC5OEpksK8DBsDCe6eNFqcUtJyTr42tzcHi2hI7JyHpXFRPpacybIrnZwjYMIb4hDdBKKyko0JhQ95-2lFuoLCGElTIkCeuLavViA
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 404
+      message: Not Found
+    headers:
+      Server:
+      - Cowboy
+      Date:
+      - Thu, 23 May 2019 17:50:39 GMT
+      Connection:
+      - keep-alive
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Request-Id:
+      - 19210835-10df-4bfc-a3fd-158113ba9436
+      X-Runtime:
+      - '0.004516'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Vary:
+      - Origin
+      Content-Length:
+      - '1722'
+      Via:
+      - 1.1 vegur
+    body:
+      encoding: UTF-8
+      string: |
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>The page you were looking for doesn't exist (404)</title>
+          <meta name="viewport" content="width=device-width,initial-scale=1">
+          <style>
+          .rails-default-error-page {
+            background-color: #EFEFEF;
+            color: #2E2F30;
+            text-align: center;
+            font-family: arial, sans-serif;
+            margin: 0;
+          }
+
+          .rails-default-error-page div.dialog {
+            width: 95%;
+            max-width: 33em;
+            margin: 4em auto 0;
+          }
+
+          .rails-default-error-page div.dialog > div {
+            border: 1px solid #CCC;
+            border-right-color: #999;
+            border-left-color: #999;
+            border-bottom-color: #BBB;
+            border-top: #B00100 solid 4px;
+            border-top-left-radius: 9px;
+            border-top-right-radius: 9px;
+            background-color: white;
+            padding: 7px 12% 0;
+            box-shadow: 0 3px 8px rgba(50, 50, 50, 0.17);
+          }
+
+          .rails-default-error-page h1 {
+            font-size: 100%;
+            color: #730E15;
+            line-height: 1.5em;
+          }
+
+          .rails-default-error-page div.dialog > p {
+            margin: 0 0 1em;
+            padding: 1em;
+            background-color: #F7F7F7;
+            border: 1px solid #CCC;
+            border-right-color: #999;
+            border-left-color: #999;
+            border-bottom-color: #999;
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+            border-top-color: #DADADA;
+            color: #666;
+            box-shadow: 0 3px 8px rgba(50, 50, 50, 0.17);
+          }
+          </style>
+        </head>
+
+        <body class="rails-default-error-page">
+          <!-- This file lives in public/404.html -->
+          <div class="dialog">
+            <div>
+              <h1>The page you were looking for doesn't exist.</h1>
+              <p>You may have mistyped the address or the page may have moved.</p>
+            </div>
+            <p>If you are the application owner check the logs for more information.</p>
+          </div>
+        </body>
+        </html>
+    http_version: 
+  recorded_at: Thu, 23 May 2019 17:50:39 GMT
+recorded_with: VCR 4.0.0
