@@ -162,10 +162,10 @@ export const MarketingTagLine = styled(MarketingH2)`
   font-size: 24px;
   max-width: 600px;
   margin: auto;
-  margin-bottom: 68px;
+  margin-bottom: ${props => (props.videoPlaying ? '12px' : '68px')};
 
   @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
-    font-size: 32px;
+    font-size: ${props => (props.videoPlaying ? '22px' : '32px')};
   }
 
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
@@ -198,16 +198,24 @@ export const MarketingContentLink = styled.button`
 MarketingContentLink.displayName = 'StyledMarketingContentLink'
 
 /** @component */
+export const MarketingHeroButtonContainer = styled.div`
+  width: 100%;
+`
+MarketingHeroButtonContainer.displayName = 'StyledMarketingButtonContainer'
+
+/** @component */
 export const MarketingCallToAction = styled(MarketingContentLink)`
   background-color: ${v.colors.caution};
   border-radius: 4px;
   border: 2px solid ${v.colors.caution};
   padding: 12px 16px;
   margin: 0;
+  margin-right: 16px;
   letter-spacing: 0.5px;
   text-transform: uppercase;
   font-size: 14px;
   font-weight: ${v.weights.medium};
+  width: 180px;
 `
 MarketingCallToAction.displayName = 'StyledMarketingCallToAction'
 
@@ -215,9 +223,29 @@ MarketingCallToAction.displayName = 'StyledMarketingCallToAction'
 export const MarketingVideoLink = styled(MarketingCallToAction)`
   background-color: white;
   border: 2px solid black;
-  padding: 16px 18px;
+  padding: 12px 16px;
+  width: 180px;
 `
 MarketingVideoLink.displayName = 'StyledMarketingVideoLink'
+
+export const VideoDimensions = {
+  width: '780px',
+  height: '439px',
+}
+
+/** @component */
+export const MarketingVideoWrapper = styled.div`
+  margin-bottom: ${props => (props.videoPlaying ? '35px' : '0')};
+  z-index: ${props => (props.videoPlaying ? '1' : '-1')};
+  height: ${props => (props.videoPlaying ? VideoDimensions.height : '0')};
+  width: ${props => (props.videoPlaying ? VideoDimensions.width : '0')};
+  opacity: ${props => (props.videoPlaying ? '1' : '0')};
+  background-color: rgba(0, 0, 0, 0.3);
+  margin-left: auto;
+  margin-right: auto;
+`
+
+MarketingVideoWrapper.displayName = 'StyledMarketingVideoWrapper'
 
 /** @component */
 export const MarketingHeavyCTA = styled(MarketingCallToAction)`
@@ -319,12 +347,14 @@ export const MarketingShapeLogo = styled.img.attrs({
   max-width: 256px;
   margin-top: 75px;
   padding-bottom: 16px;
+  height: ${props => (props.videoPlaying ? '90px' : 'auto')};
 
   @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
     max-width: 410px;
   }
   @media only screen and (min-width: ${v.responsive.medBreakpoint}px) {
-    margin-top: 126px;
+    margin-top: ${props => (props.videoPlaying ? '64px' : '126px')};
+    height: ${props => (props.videoPlaying ? '124px' : '248px')};
   }
 `
 MarketingShapeLogo.displayName = 'StyledMarketingShapeLogo'
