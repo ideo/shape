@@ -269,10 +269,17 @@ RSpec.describe CollectionCardBuilder, type: :service do
               item_attributes: {
                 type: 'Item::DataItem',
                 report_type: 'report_type_collections_and_items',
-                dataset_attributes: {
-                  chart_type: 'area',
-                  measure: 'participants',
-                  timeframe: 'ever',
+                datasets_attributes: {
+                  0 => {
+                    chart_type: 'area',
+                    measure: 'participants',
+                    timeframe: 'ever',
+                  },
+                  1 => {
+                    chart_type: 'line',
+                    measure: 'viewers',
+                    timeframe: 'ever',
+                  },
                 },
               },
             ),
@@ -287,8 +294,9 @@ RSpec.describe CollectionCardBuilder, type: :service do
 
         it 'should create a linked dataset' do
           item = builder.collection_card.item
-          expect(item.datasets.count).to eq 1
+          expect(item.datasets.count).to eq 2
           expect(item.datasets.first.measure).to eq 'participants'
+          expect(item.datasets.last.measure).to eq 'viewers'
         end
       end
     end

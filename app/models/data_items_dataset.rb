@@ -1,6 +1,6 @@
 class DataItemsDataset < ApplicationRecord
-  belongs_to :data_item, class_name: 'Item::DataItem'
-  belongs_to :dataset
+  belongs_to :data_item, class_name: 'Item::DataItem', required: true
+  belongs_to :dataset, required: true
 
   before_create :set_order, unless: :order?
 

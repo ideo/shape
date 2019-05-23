@@ -45,4 +45,34 @@ RSpec.describe Item::DataItem, type: :model do
       end
     end
   end
+
+  describe '#create_dataset' do
+    let!(:data_item) { create(:data_item, :report_type_record, dataset_type: nil) }
+    let(:params) do
+      {
+        order: 2,
+        selected: false,
+        chart_type: :bar,
+        measure: 'something',
+        timeframe: 'ever',
+        name: 'Something That is Great',
+        cached_data: [
+          { date: '2019-04-01', value: 987654321 },
+        ]
+      }
+    end
+
+    it 'creates dataset' do
+      expect {
+        data_item.create_dataset(params)
+      }.to change(Dataset, :count).by(1)
+    end
+
+    it 'slices params out to data_items_dataset' do
+      dataset = data_item.create_dataset(params)
+      data_items_dataset = dataset.data_items_datasets.first
+      expect(data_items_dataset.order).to eq(2)
+      expect(data_items_dataset.selected).to be false
+    end
+  end
 end

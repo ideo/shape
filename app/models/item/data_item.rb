@@ -79,12 +79,20 @@ class Item
     end
 
     def create_dataset(params)
-      datasets.create(
-        {
-          type: dataset_type,
-          organization_id: organization_id,
-        }.merge(params),
-      )
+      # Slice out params used for DataItemsDataset
+      order = params.delete(:order)
+      selected = params.delete(:selected) || true
+
+      dataset_params = {
+        type: dataset_type,
+        organization_id: organization_id,
+      }.merge(params)
+
+      data_items_datasets.create(
+        order: order,
+        selected: selected,
+        dataset: Dataset.new(dataset_params),
+      ).dataset
     end
 
     private
