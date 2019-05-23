@@ -12,18 +12,20 @@ import {
   InvertMarketingH1Bold,
   InvertMarketingLinkMail,
   MarketingFlex,
-  ResponsiveInlineBlock,
+  MarketingHeroButtonContainer,
   ResponsivePadInlineBlock,
   DesktopSpacer,
   Center,
   MarketingTagLine,
-  // MarketingVideoLink,
+  MarketingVideoLink,
   MarketingShapeLogo,
+  MarketingVideoWrapper,
   // MarketingBetaSticker,
   MarketingCallToAction,
   MarketingGradientTop,
   InvertedCentered,
   InvertedFixedWidth,
+  VideoDimensions,
 } from '~/ui/global/styled/marketing.js'
 import poweredByIdeo from '~/assets/Powered-by-IDEO-Inverted.png'
 import MarketingMenu from '~/ui/marketing/MarketingMenu'
@@ -32,6 +34,7 @@ import ProductDescriptions from '~/ui/marketing/ProductDescriptions'
 import BetaSticker from '~/ui/marketing/BetaSticker'
 import marketingFirestoreClient from '~/vendor/firebase/sites/marketing'
 import queryString from 'query-string'
+import ReactPlayer from 'react-player'
 
 class MarketingPage extends React.Component {
   constructor(props) {
@@ -40,7 +43,10 @@ class MarketingPage extends React.Component {
 
     this.state = {
       pageTexts: pageTexts,
+      videoPlaying: false,
     }
+
+    this.toggleVideoPlaying = this.toggleVideoPlaying.bind(this)
   }
 
   componentDidMount() {
@@ -55,7 +61,17 @@ class MarketingPage extends React.Component {
     })
   }
 
+  toggleVideoPlaying = () => {
+    this.setState({
+      videoPlaying: !this.state.videoPlaying,
+    })
+  }
+
   render() {
+    const { videoPlaying, pageTexts } = this.state
+    const videoPlayingButtonText = !videoPlaying
+      ? pageTexts.hero && pageTexts.hero.buttons[1]
+      : pageTexts.hero && pageTexts.hero.buttons[2]
     return (
       <Fragment>
         <MarketingBack>
@@ -65,30 +81,34 @@ class MarketingPage extends React.Component {
             <BetaSticker />
 
             <Center>
-              <MarketingShapeLogo />
-              <MarketingTagLine>
-                {this.state.pageTexts.hero && this.state.pageTexts.hero.tagLine}
+              <MarketingShapeLogo videoPlaying={videoPlaying} />
+              <MarketingTagLine videoPlaying={videoPlaying}>
+                {pageTexts.hero && pageTexts.hero.tagLine}
               </MarketingTagLine>
+            </Center>
+            <Center>
+              <MarketingVideoWrapper videoPlaying={videoPlaying}>
+                <ReactPlayer
+                  url={pageTexts.hero && pageTexts.hero.videoUrl}
+                  height={videoPlaying ? VideoDimensions.height : '0px'}
+                  width={videoPlaying ? VideoDimensions.width : '0px'}
+                  playing={videoPlaying}
+                />
+              </MarketingVideoWrapper>
             </Center>
 
             <Center>
-              <ResponsiveInlineBlock>
+              <MarketingHeroButtonContainer>
                 <a className="get-early-access-header" href="/sign_up">
                   <MarketingCallToAction>
-                    {this.state.pageTexts.hero &&
-                      this.state.pageTexts.hero.ctaButtons[0]}
+                    {pageTexts.hero && pageTexts.hero.buttons[0]}
                   </MarketingCallToAction>
                 </a>
-              </ResponsiveInlineBlock>
+                <MarketingVideoLink onClick={this.toggleVideoPlaying}>
+                  {videoPlayingButtonText}
+                </MarketingVideoLink>
+              </MarketingHeroButtonContainer>
             </Center>
-            {/*  -- VIDEO BUTTON DISABLED -- not ready yet
-            <Center>
-              <ResponsiveInlineBlock>
-                <a href="/sign_up">
-                  <MarketingVideoLink>{this.state.pageTexts.buttonTopRight}</MarketingVideoLink>
-                </a>
-              </ResponsiveInlineBlock>
-            </Center> */}
           </MarketingGradientTop>
 
           <MarketingFlex align="center" justify="center" wrap w={1}>
@@ -104,35 +124,30 @@ class MarketingPage extends React.Component {
           <MarketingFlex align="center" justify="center" wrap w={1}>
             <Box w={1} mb={[10, '4px']}>
               <InvertMarketingH1Bold>
-                {this.state.pageTexts.footer &&
-                  this.state.pageTexts.footer.header}
+                {pageTexts.footer && pageTexts.footer.header}
               </InvertMarketingH1Bold>
             </Box>
             <Box w={1}>
               <InvertMarketingH1>
-                {this.state.pageTexts.footer &&
-                  this.state.pageTexts.footer.subHeader}
+                {pageTexts.footer && pageTexts.footer.subHeader}
               </InvertMarketingH1>
             </Box>
             <Box w={1} pt={[46, 65]} pb={[46, 74]} mb={[10, 0]}>
               <a className="get-early-access-footer" href="/sign_up">
                 <MarketingCallToAction>
-                  {this.state.pageTexts.footer &&
-                    this.state.pageTexts.footer.ctaButtons[0]}
+                  {pageTexts.footer && pageTexts.footer.buttons[0]}
                 </MarketingCallToAction>
               </a>
             </Box>
 
             <ResponsivePadInlineBlock>
               <InvertedCentered>
-                {this.state.pageTexts.contact &&
-                  this.state.pageTexts.contact.header}
+                {pageTexts.contact && pageTexts.contact.header}
               </InvertedCentered>
             </ResponsivePadInlineBlock>
             <ResponsivePadInlineBlock>
               <InvertedCentered>
-                {this.state.pageTexts.contact &&
-                  this.state.pageTexts.contact.header2}
+                {pageTexts.contact && pageTexts.contact.header2}
               </InvertedCentered>
             </ResponsivePadInlineBlock>
 
@@ -144,8 +159,7 @@ class MarketingPage extends React.Component {
 
             <Box w={1} mt={(0, 5)} wrap>
               <InvertedFixedWidth>
-                {this.state.pageTexts.subscription &&
-                  this.state.pageTexts.subscription.header}
+                {pageTexts.subscription && pageTexts.subscription.header}
               </InvertedFixedWidth>
             </Box>
 
