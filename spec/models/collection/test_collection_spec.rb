@@ -327,6 +327,29 @@ describe Collection::TestCollection, type: :model do
             end
           end
 
+          context 'without targeted audience' do
+            it 'should not send a notification email' do
+              expect(TestCollectionMailer).not_to receive(:notify_launch)
+              test_collection.launch!(initiated_by: user)
+            end
+          end
+
+          context 'with targeted audience' do
+            it 'should send a notification email' do
+              audience = create(:audience)
+              create(:test_audience, audience: audience, test_collection: test_collection, price_per_response: 1)
+
+              deliver_double = double('TestCollectionMailer')
+              allow(TestCollectionMailer).to receive(:notify_launch).and_return(deliver_double)
+              allow(deliver_double).to receive(:deliver_later).and_return(true)
+
+              ENV['ENABLE_ZENDESK_FOR_TEST_LAUNCH'] = '1'
+
+              expect(TestCollectionMailer).to receive(:notify_launch).with(test_collection.id)
+              test_collection.launch!(initiated_by: user)
+            end
+          end
+
           describe '#serialized_for_test_survey' do
             before do
               test_collection.launch!(initiated_by: user)
