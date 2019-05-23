@@ -18,16 +18,13 @@ class TestAudience < ApplicationRecord
 
   delegate :number_to_currency, to: 'ActionController::Base.helpers'
 
+  # this will only get set in PurchaseTestAudience
   attr_writer :payment_method
 
   def description
     "#{launched_by.name} launched #{test_collection.name} test with " \
       "#{sample_size} total #{audience_name} audience respondents at " +
       number_to_currency(price_per_response || 0)
-  end
-
-  def payment_method
-    @payment_method ||= organization.network_default_payment_method
   end
 
   def total_price
@@ -42,11 +39,12 @@ class TestAudience < ApplicationRecord
 
   private
 
+  # This callback only gets called when using PurchaseTestAudience and setting payment_method
   def purchase
     return unless valid?
 
     payment = NetworkApi::Payment.create(
-      payment_method_id: payment_method.id,
+      payment_method_id: @payment_method.id,
       description: description,
       amount: total_price.to_f,
       quantity: sample_size,
@@ -60,7 +58,7 @@ class TestAudience < ApplicationRecord
   end
 
   def requires_payment?
-    total_price.positive?
+    @payment_method.present? && total_price.positive?
   end
 
   def set_price_per_response_from_audience

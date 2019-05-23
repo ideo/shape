@@ -23,7 +23,7 @@ RSpec.describe TestAudience, type: :model do
           ':[]': payment_errors,
           full_messages: payment_errors,
         ),
-      )
+      ),
     )
   end
   let(:test_collection) { create(:test_collection) }
@@ -49,12 +49,17 @@ RSpec.describe TestAudience, type: :model do
           quantity: test_audience.sample_size,
           unit_amount: audience.price_per_response.to_f,
         )
+        # set the payment method
+        test_audience.payment_method = payment_method_double
         test_audience.save
       end
 
       context 'if payment fails' do
         let!(:payment_errors) { ['Bank declined the card'] }
-        before { test_audience.save }
+        before do
+          test_audience.payment_method = payment_method_double
+          test_audience.save
+        end
 
         it 'is not successful' do
           expect(test_audience.persisted?).to be false

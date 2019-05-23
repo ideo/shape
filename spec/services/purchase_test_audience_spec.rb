@@ -105,6 +105,14 @@ describe PurchaseTestAudience, type: :service do
       expect(test_collection.test_audiences.count).to eq 1
       expect(test_collection.test_audiences.first.price_per_response).to eq 0
     end
+
+    context 'without payment method' do
+      let!(:payment_method_double) { nil }
+
+      it 'is still successful' do
+        expect(result.success?).to be true
+      end
+    end
   end
 
   context 'with no audiences' do

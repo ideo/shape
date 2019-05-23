@@ -15,11 +15,11 @@ class PurchaseTestAudience
   delegate :test_audiences, to: :test_collection
 
   before do
+    # this could eventually use "in app purchase" payment method
     context.payment_method = organization.network_default_payment_method
   end
 
   def call
-    ensure_valid_payment_method
     create_test_audiences
     validate_test_audiences
     test_collection.save
@@ -62,6 +62,8 @@ class PurchaseTestAudience
       # skip any TestAudience for audiences that cost money,
       # where no sample_size was indicated
       next if audience.price_per_response.positive? && sample_size.zero?
+
+      ensure_valid_payment_method if audience.price_per_response.positive?
 
       test_collection.test_audiences.create(
         sample_size: sample_size,

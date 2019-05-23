@@ -17,7 +17,7 @@ describe SurveyResponseCompletion, type: :service do
   end
 
   describe '#call', :vcr do
-    context 'completed after test closed but within allowable window', :vrc do
+    context 'completed after test closed but within allowable window' do
       let(:test_collection) do
         collection = create(:test_collection, :with_test_audience)
         collection.close!
