@@ -33,7 +33,7 @@ class Api::V1::AudiencesController < Api::V1::BaseController
   end
 
   def authorize_current_organization
-    authorize! :read, current_organization
+    authorize! :manage, current_organization
   end
 
   def audience_params
