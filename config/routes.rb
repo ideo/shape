@@ -110,6 +110,7 @@ Rails.application.routes.draw do
         resources :collections, only: %i[create]
         resources :groups, only: %i[index]
         resources :users, only: %i[index]
+        resources :audiences, only: %i[index]
       end
       delete 'sessions' => 'sessions#destroy'
       resources :users, except: :index do
@@ -138,6 +139,7 @@ Rails.application.routes.draw do
           get 'user_notifications'
         end
       end
+      resources :test_audiences, only: %i[create update]
       scope :filestack do
         get 'token', to: 'filestack#token', as: :filestack_token
       end
@@ -150,6 +152,12 @@ Rails.application.routes.draw do
         # not shallow because we always want to look up survey_response by session_uid
         resources :question_answers, only: %i[create update]
       end
+
+      resources :audiences, only: %i[index show]
+
+      namespace :admin do
+        resources :users, only: %i[index destroy create]
+      end
     end
   end
 
@@ -160,6 +168,10 @@ Rails.application.routes.draw do
     collection do
       get 'completed'
     end
+  end
+
+  namespace :admin do
+    root to: 'dashboard#index'
   end
 
   authenticate :user, ->(u) { Rails.env.development? || u.has_cached_role?(Role::SUPER_ADMIN) } do

@@ -1,3 +1,61 @@
+# == Schema Information
+#
+# Table name: collections
+#
+#  id                         :bigint(8)        not null, primary key
+#  anyone_can_join            :boolean          default(FALSE)
+#  anyone_can_view            :boolean          default(FALSE)
+#  archive_batch              :string
+#  archived                   :boolean          default(FALSE)
+#  archived_at                :datetime
+#  breadcrumb                 :jsonb
+#  cached_attributes          :jsonb
+#  cached_test_scores         :jsonb
+#  cover_type                 :integer          default("cover_type_default")
+#  hide_submissions           :boolean          default(FALSE)
+#  master_template            :boolean          default(FALSE)
+#  name                       :string
+#  processing_status          :integer
+#  shared_with_organization   :boolean          default(FALSE)
+#  submission_box_type        :integer
+#  submissions_enabled        :boolean          default(TRUE)
+#  test_launched_at           :datetime
+#  test_status                :integer
+#  type                       :string
+#  unarchived_at              :datetime
+#  created_at                 :datetime         not null
+#  updated_at                 :datetime         not null
+#  cloned_from_id             :bigint(8)
+#  collection_to_test_id      :bigint(8)
+#  created_by_id              :integer
+#  joinable_group_id          :bigint(8)
+#  organization_id            :bigint(8)
+#  question_item_id           :integer
+#  roles_anchor_collection_id :bigint(8)
+#  submission_box_id          :bigint(8)
+#  submission_template_id     :integer
+#  template_id                :integer
+#  test_collection_id         :bigint(8)
+#
+# Indexes
+#
+#  index_collections_on_breadcrumb                  (breadcrumb) USING gin
+#  index_collections_on_cached_test_scores          (cached_test_scores) USING gin
+#  index_collections_on_cloned_from_id              (cloned_from_id)
+#  index_collections_on_created_at                  (created_at)
+#  index_collections_on_organization_id             (organization_id)
+#  index_collections_on_roles_anchor_collection_id  (roles_anchor_collection_id)
+#  index_collections_on_submission_box_id           (submission_box_id)
+#  index_collections_on_submission_template_id      (submission_template_id)
+#  index_collections_on_template_id                 (template_id)
+#  index_collections_on_test_status                 (test_status)
+#  index_collections_on_type                        (type)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (organization_id => organizations.id)
+#
+
 class Collection
   class TestCollection < Collection
     include AASM
@@ -10,6 +68,7 @@ class Collection
              source: :item,
              class_name: 'Item::QuestionItem',
              through: :primary_collection_cards
+    has_many :test_audiences, dependent: :destroy
     belongs_to :collection_to_test, class_name: 'Collection', optional: true
 
     has_many :datasets,
@@ -35,9 +94,18 @@ class Collection
       error_on_all_events :aasm_event_failed
 
       event :launch,
-            guard: :completed_and_launchable?,
+            guards: [
+              :completed_and_launchable?,
+              proc { |**args|
+                attempt_to_purchase_test_audiences!(
+                  test_audience_params: args[:test_audience_params],
+                )
+              },
+            ],
             after_commit: proc { |**args|
-                            launch_test!(initiated_by: args[:initiated_by])
+                            post_launch_setup!(
+                              initiated_by: args[:initiated_by],
+                            )
                           } do
         transitions from: :draft, to: :live
       end
@@ -50,7 +118,7 @@ class Collection
       event :reopen,
             guard: :can_reopen?,
             after_commit: proc { |**args|
-                            launch_test!(initiated_by: args[:initiated_by], reopening: true)
+                            post_launch_setup!(initiated_by: args[:initiated_by], reopening: true)
                           } do
         transitions from: :closed, to: :live
       end
@@ -70,7 +138,14 @@ class Collection
       self
     end
 
-    def launch_test!(initiated_by: nil, reopening: false)
+    def attempt_to_purchase_test_audiences!(test_audience_params: nil)
+      return true unless test_audience_params.present?
+      TestAudiencePurchaser.call(self, test_audience_params)
+      return false if errors.present?
+      true
+    end
+
+    def post_launch_setup!(initiated_by: nil, reopening: false)
       # remove the "blanks"
       remove_incomplete_question_items
       if submission_box_template_test?
@@ -87,12 +162,20 @@ class Collection
         return true
       end
       update_cached_submission_status(parent_submission) if inside_a_submission?
-      # TODO: Perhaps need to do *some* of this setup when reopening?
       create_test_design_and_move_cards!(initiated_by: initiated_by) unless reopening
-      update(test_launched_at: Time.current)
+      update(test_launched_at: Time.current, test_closed_at: nil)
+      TestCollectionMailer.notify_launch(id).deliver_later if gives_incentive? && ENV['ENABLE_ZENDESK_FOR_TEST_LAUNCH']
+    end
+
+    def still_accepting_answers?
+      return true if live?
+      return false if test_closed_at.nil?
+      closed? && 10.minutes.ago < test_closed_at
     end
 
     def after_close_test
+      update(test_closed_at: Time.current)
+
       if inside_a_submission?
         update_cached_submission_status(parent_submission)
       elsif submission_box_template_test?
@@ -469,6 +552,11 @@ class Collection
 
     def cloned_from_present?
       cloned_from.present?
+    end
+
+    def gives_incentive?
+      # right now the check is basically any paid tests == gives_incentive
+      test_audiences.where('price_per_response > 0').present?
     end
   end
 end

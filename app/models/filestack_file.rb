@@ -1,3 +1,18 @@
+# == Schema Information
+#
+# Table name: filestack_files
+#
+#  id         :bigint(8)        not null, primary key
+#  docinfo    :jsonb
+#  filename   :string
+#  handle     :string
+#  mimetype   :string
+#  size       :integer
+#  url        :string
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+
 class FilestackFile < ApplicationRecord
   has_one :item
   has_one :group

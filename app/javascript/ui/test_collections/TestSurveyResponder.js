@@ -32,19 +32,22 @@ class TestSurveyResponder extends React.Component {
     this.initializeCards()
   }
 
-  async initializeCards() {
-    const { collection, apiStore } = this.props
-
-    await apiStore.loadCurrentUser()
-    const { currentUser } = apiStore
-    const questionCards = [...collection.question_cards]
-
+  componentDidUpdate(prevProps) {
     if (
-      !collection.live_test_collection &&
-      (!currentUser ||
-        currentUser.feedback_contact_preference ===
-          'feedback_contact_unanswered')
+      this.props.includeRecontactQuestion != prevProps.includeRecontactQuestion
     ) {
+      this.initializeCards()
+    }
+  }
+
+  async initializeCards() {
+    const { collection, includeRecontactQuestion } = this.props
+
+    const questionCards = [...collection.question_cards]
+    console.log('included recontract? ', includeRecontactQuestion)
+
+    if (includeRecontactQuestion) {
+      console.log('splicing cards')
       questionCards.splice(questionCards.length - 1, 0, {
         id: 'recontact',
         card_question_type: 'question_recontact',
@@ -57,6 +60,8 @@ class TestSurveyResponder extends React.Component {
   questionAnswerForCard = card => {
     const { surveyResponse } = this.props
     if (!surveyResponse) return undefined
+    // This method is supposed to return a questionAnswer, not a boolean
+    // https://www.dropbox.com/s/72mafwlzukz13ir/Screenshot%202019-05-15%2012.17.10.png?dl=0
     if (card.card_question_type === 'question_recontact') {
       return this.recontactAnswered
     }
@@ -167,6 +172,7 @@ class TestSurveyResponder extends React.Component {
 TestSurveyResponder.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   createSurveyResponse: PropTypes.func.isRequired,
+  includeRecontactQuestion: PropTypes.bool,
   surveyResponse: MobxPropTypes.objectOrObservableObject,
   theme: PropTypes.string,
   containerId: PropTypes.string,
@@ -180,6 +186,7 @@ TestSurveyResponder.defaultProps = {
   surveyResponse: undefined,
   theme: 'primary',
   containerId: '',
+  includeRecontactQuestion: false,
 }
 TestSurveyResponder.displayName = 'TestSurveyResponder'
 

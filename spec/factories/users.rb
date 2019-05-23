@@ -18,6 +18,7 @@ FactoryBot.define do
       }
     end
     terms_accepted true
+    feedback_terms_accepted true
     status User.statuses[:active]
 
     after(:build) do |user|

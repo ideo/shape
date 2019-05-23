@@ -14,7 +14,7 @@ Feature: Creating an "in-collection" Test Collection
     Then I should see "End of Survey" in a ".DisplayText"
 
     # Launch the test
-    When I click the "HeaderFormButton" containing "Get Feedback"
+    When I click the "LaunchFormButton" containing "Get Feedback"
     And I wait for "@apiLaunchTest" to finish
     Then I should see "Usefulness" in a "DataItemCover"
     Then I should see "Cypress Test" in a "LegendItemCover"

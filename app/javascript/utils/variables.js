@@ -31,10 +31,26 @@ export const DATA_MEASURES = [
   { name: 'Collections & Items', value: 'records' },
 ]
 
+export const TEST_COLLECTION_SELECT_OPTIONS = [
+  { value: '', label: 'select question type' },
+  { value: 'question_context', label: 'Context Setting' },
+  { value: 'question_media', label: 'Photo or Video of Idea' },
+  { value: 'question_description', label: 'Idea Description' },
+  { value: 'question_useful', label: 'Useful' },
+  { value: 'question_open', label: 'Open Response' },
+  { value: 'question_excitement', label: 'Excitement' },
+  { value: 'question_clarity', label: 'Clarity' },
+  { value: 'question_different', label: 'Different' },
+  { value: 'question_category_satisfaction', label: 'Category Satisfaction' },
+]
+
 export const KEYS = {
   ENTER: 13,
   ESC: 27,
 }
+
+// global vars from Rails application (or undefined, e.g. in a unit test)
+export const FEEDBACK_INCENTIVE_AMOUNT = window.FEEDBACK_INCENTIVE_AMOUNT || 2
 
 export default {
   headerHeight: 50,

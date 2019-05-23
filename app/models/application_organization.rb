@@ -1,3 +1,19 @@
+# == Schema Information
+#
+# Table name: application_organizations
+#
+#  id                 :bigint(8)        not null, primary key
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  application_id     :bigint(8)
+#  organization_id    :bigint(8)
+#  root_collection_id :bigint(8)
+#
+# Indexes
+#
+#  index_app_org_on_app_id_org_id  (application_id,organization_id) UNIQUE
+#
+
 class ApplicationOrganization < ApplicationRecord
   belongs_to :organization, required: true
   belongs_to :application, required: true

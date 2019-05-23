@@ -25,6 +25,7 @@ class SerializableCollection < BaseJsonSerializer
   belongs_to :submissions_collection
   belongs_to :submission_template
   belongs_to :collection_to_test
+  has_many :test_audiences
 
   attribute :organization_id do
     @object.organization_id.to_s
@@ -153,6 +154,10 @@ class SerializableCollection < BaseJsonSerializer
 
   attribute :launchable, if: -> { @object.test_collection? } do
     @object.launchable?
+  end
+
+  attribute :gives_incentive, if: -> { @object.test_collection? } do
+    @object.gives_incentive?
   end
 
   attribute :test_collection_id, if: -> { @object.is_a?(Collection::TestDesign) } do

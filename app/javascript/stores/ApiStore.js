@@ -10,22 +10,24 @@ import trackError from '~/utils/trackError'
 import googleTagManager from '~/vendor/googleTagManager'
 
 import Activity from './jsonApi/Activity'
+import Audience from './jsonApi/Audience'
 import Collection from './jsonApi/Collection'
 import CollectionCard from './jsonApi/CollectionCard'
 import DataItemsDataset from './jsonApi/DataItemsDataset'
 import Dataset from './jsonApi/Dataset'
-import Role from './jsonApi/Role'
+import Comment from './jsonApi/Comment'
+import CommentThread from './jsonApi/CommentThread'
 import FilestackFile from './jsonApi/FilestackFile'
 import Group from './jsonApi/Group'
 import Item from './jsonApi/Item'
 import Notification from './jsonApi/Notification'
 import Organization from './jsonApi/Organization'
-import User from './jsonApi/User'
-import Comment from './jsonApi/Comment'
-import CommentThread from './jsonApi/CommentThread'
-import UsersThread from './jsonApi/UsersThread'
-import SurveyResponse from './jsonApi/SurveyResponse'
 import QuestionAnswer from './jsonApi/QuestionAnswer'
+import Role from './jsonApi/Role'
+import SurveyResponse from './jsonApi/SurveyResponse'
+import TestAudience from './jsonApi/TestAudience'
+import User from './jsonApi/User'
+import UsersThread from './jsonApi/UsersThread'
 
 class ApiStore extends jsonapi(datxCollection) {
   @observable
@@ -53,6 +55,9 @@ class ApiStore extends jsonapi(datxCollection) {
 
   @observable
   usableTemplates = []
+
+  @observable
+  shapeAdminUsers = []
 
   // doesn't have any need to be observable...
   filestackToken = {}
@@ -236,6 +241,40 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   @action
+  async fetchShapeAdminUsers() {
+    const res = await this.request('admin/users')
+    const adminUsers = _.sortBy(res.data, ['first_name'])
+    runInAction(() => {
+      this.shapeAdminUsers = adminUsers
+    })
+    return adminUsers
+  }
+
+  @action
+  async removeShapeAdminUser(user) {
+    await this.request(`admin/users/${user.id}`, 'DELETE')
+    runInAction(() => {
+      _.remove(this.shapeAdminUsers, u => u.id === user.id)
+    })
+
+    if (user.isCurrentUser) {
+      window.location.href = '/'
+    }
+  }
+
+  @action
+  async addShapeAdminUsers(users, opts) {
+    const userIds = users.map(user => user.id)
+    const data = { user_ids: userIds, sendInvites: opts.sendInvites }
+    await this.request('admin/users', 'POST', data)
+    runInAction(() => {
+      this.shapeAdminUsers = _.sortBy(this.shapeAdminUsers.concat(users), [
+        'first_name',
+      ])
+    })
+  }
+
+  @action
   importUsersThread({ usersThread, thread, comments } = {}) {
     thread.addReference('users_thread', usersThread, {
       model: UsersThread,
@@ -400,6 +439,12 @@ class ApiStore extends jsonapi(datxCollection) {
     return res.data
   }
 
+  async fetchOrganizationAudiences(orgId) {
+    const res = await this.request(`organizations/${orgId}/audiences/`, 'GET')
+    const audiences = res.data
+    return audiences
+  }
+
   async createTemplateInstance(data) {
     return this.request('collections/create_template', 'POST', data)
   }
@@ -548,6 +593,10 @@ class ApiStore extends jsonapi(datxCollection) {
     return org
   }
 
+  get currentOrganization() {
+    return this.currentUser.current_organization
+  }
+
   // default action for updating any basic apiStore value
   @action
   update(name, value) {
@@ -587,22 +636,24 @@ class ApiStore extends jsonapi(datxCollection) {
 }
 ApiStore.types = [
   Activity,
+  Audience,
   Collection,
   CollectionCard,
-  DataItemsDataset,
+  Comment,
+  CommentThread,
   Dataset,
+  DataItemsDataset,
   FilestackFile,
   Group,
   Item,
-  Role,
-  Organization,
-  User,
-  Comment,
-  CommentThread,
   Notification,
-  UsersThread,
-  SurveyResponse,
+  Organization,
   QuestionAnswer,
+  Role,
+  SurveyResponse,
+  TestAudience,
+  User,
+  UsersThread,
 ]
 
 export default ApiStore

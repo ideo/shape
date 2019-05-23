@@ -1,3 +1,43 @@
+# == Schema Information
+#
+# Table name: organizations
+#
+#  id                                    :bigint(8)        not null, primary key
+#  active_users_count                    :integer          default(0), not null
+#  autojoin_domains                      :jsonb
+#  deactivated                           :boolean          default(FALSE), not null
+#  domain_whitelist                      :jsonb
+#  has_payment_method                    :boolean          default(FALSE), not null
+#  in_app_billing                        :boolean          default(TRUE), not null
+#  name                                  :string
+#  overdue_at                            :datetime
+#  sent_high_charges_high_email          :boolean          default(FALSE), not null
+#  sent_high_charges_low_email           :boolean          default(FALSE), not null
+#  sent_high_charges_middle_email        :boolean          default(FALSE), not null
+#  slug                                  :string
+#  trial_ends_at                         :datetime
+#  trial_expired_email_sent              :boolean          default(FALSE), not null
+#  trial_users_count                     :integer          default(0), not null
+#  trial_users_count_exceeded_email_sent :boolean          default(FALSE), not null
+#  created_at                            :datetime         not null
+#  updated_at                            :datetime         not null
+#  admin_group_id                        :integer
+#  filestack_file_id                     :integer
+#  getting_started_collection_id         :integer
+#  guest_group_id                        :integer
+#  network_subscription_id               :string
+#  primary_group_id                      :integer
+#  profile_collection_id                 :integer
+#  profile_template_id                   :integer
+#  template_collection_id                :integer
+#  terms_text_item_id                    :bigint(8)
+#
+# Indexes
+#
+#  index_organizations_on_autojoin_domains  (autojoin_domains) USING gin
+#  index_organizations_on_slug              (slug) UNIQUE
+#
+
 class Organization < ApplicationRecord
   RECENTLY_ACTIVE_RANGE = 90.days
   DEFAULT_TRIAL_ENDS_AT = 30.days

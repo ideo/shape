@@ -89,6 +89,7 @@ class Api::V1::UsersController < Api::V1::BaseController
       :notify_through_email,
       :mailing_list,
       :feedback_contact_preference,
+      :feedback_terms_accepted,
     )
   end
 end

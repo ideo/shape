@@ -51,6 +51,10 @@ export const EmojiButton = styled.button`
   &:hover {
     opacity: 1;
   }
+  @media only screen and (max-width: ${v.responsive.muiSmBreakpoint}px) {
+    opacity: ${props => (props.selected ? 1 : 0.2)};
+    transition: opacity 0.3s;
+  }
 `
 EmojiButton.displayName = 'EmojiButton'
 
