@@ -182,6 +182,8 @@ Rails.application.routes.draw do
   # custom URL for GCI
   get '/earlychildhood', to: redirect('/collections/4764')
 
+  # catch all marketing route request
+  get '/product/*path', to: 'home#marketing', constraints: ->(req) { req.format == :html || req.format == '*/*' }
   # catch all HTML route requests, send to frontend
   get '*path', to: 'home#index', constraints: ->(req) { req.format == :html || req.format == '*/*' }
 end

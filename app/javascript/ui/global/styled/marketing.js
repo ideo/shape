@@ -233,6 +233,13 @@ export const VideoDimensions = {
   height: '439px',
 }
 
+export const MarketingVideoContainer = styled.div`
+  display: flex;
+  justify-content: center;
+`
+
+MarketingVideoContainer.displayName = 'MarketingVideoContainer'
+
 /** @component */
 export const MarketingVideoWrapper = styled.div`
   margin-bottom: ${props => (props.videoPlaying ? '35px' : '0')};
@@ -241,8 +248,6 @@ export const MarketingVideoWrapper = styled.div`
   width: ${props => (props.videoPlaying ? VideoDimensions.width : '0')};
   opacity: ${props => (props.videoPlaying ? '1' : '0')};
   background-color: rgba(0, 0, 0, 0.3);
-  margin-left: auto;
-  margin-right: auto;
 `
 
 MarketingVideoWrapper.displayName = 'StyledMarketingVideoWrapper'

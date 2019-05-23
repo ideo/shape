@@ -19,6 +19,7 @@ import {
   MarketingTagLine,
   MarketingVideoLink,
   MarketingShapeLogo,
+  MarketingVideoContainer,
   MarketingVideoWrapper,
   // MarketingBetaSticker,
   MarketingCallToAction,
@@ -89,14 +90,16 @@ class MarketingPage extends React.Component {
               </MarketingTagLine>
             </Center>
             <Center>
-              <MarketingVideoWrapper videoPlaying={videoPlaying}>
-                <ReactPlayer
-                  url={pageTexts.hero && pageTexts.hero.videoUrl}
-                  height={videoPlaying ? VideoDimensions.height : '0px'}
-                  width={videoPlaying ? VideoDimensions.width : '0px'}
-                  playing={videoPlaying}
-                />
-              </MarketingVideoWrapper>
+              <MarketingVideoContainer>
+                <MarketingVideoWrapper videoPlaying={videoPlaying}>
+                  <ReactPlayer
+                    url={pageTexts.hero && pageTexts.hero.videoUrl}
+                    height={videoPlaying ? VideoDimensions.height : '0px'}
+                    width={videoPlaying ? VideoDimensions.width : '0px'}
+                    playing={videoPlaying}
+                  />
+                </MarketingVideoWrapper>
+              </MarketingVideoContainer>
             </Center>
 
             <Center>
