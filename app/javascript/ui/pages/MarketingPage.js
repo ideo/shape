@@ -33,6 +33,7 @@ import SubscribeEmail from '~/ui/marketing/SubscribeEmail'
 import ProductDescriptions from '~/ui/marketing/ProductDescriptions'
 import BetaSticker from '~/ui/marketing/BetaSticker'
 import marketingFirestoreClient from '~/vendor/firebase/sites/marketing'
+import ReactPlayer from 'react-player'
 // import queryString from 'query-string'
 
 class MarketingPage extends React.Component {
