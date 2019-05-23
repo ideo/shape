@@ -1,12 +1,13 @@
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { Grid } from '@material-ui/core'
 
 import Modal from '~/ui/global/modals/Modal'
 import {
   FormButton,
   FieldContainer,
-  FormActionsContainer,
   Label,
+  TextButton,
   TextField,
 } from '~/ui/global/styled/forms'
 import Audience from '~/stores/jsonApi/Audience'
@@ -25,12 +26,16 @@ class AddAudienceModal extends React.Component {
   }
 
   handleSave = async () => {
-    const { apiStore, close } = this.props
+    const { apiStore } = this.props
 
     const audience = new Audience({ name: this.state.name }, apiStore)
     await audience.API_create()
 
-    close()
+    this.reset()
+  }
+
+  reset = () => {
+    this.props.close()
     this.setState({ name: '', valid: false })
   }
 
@@ -51,19 +56,30 @@ class AddAudienceModal extends React.Component {
             type="text"
             value={this.state.name}
             onChange={this.handleNameChange}
-            placeholder={'enter audience name'}
+            placeholder={'Enter Audience Name…'}
           />
         </FieldContainer>
-        <FormActionsContainer style={{ paddingBottom: '32px' }}>
-          <FormButton
-            onClick={this.handleSave}
-            width={190}
-            type="submit"
-            disabled={!this.state.valid}
-          >
-            Submit
-          </FormButton>
-        </FormActionsContainer>
+        <Grid container alignItems="center" style={{ paddingBottom: '32px' }}>
+          <Grid item xs={6}>
+            <Grid container justify="center">
+              <TextButton onClick={this.reset} width={190}>
+                Cancel
+              </TextButton>
+            </Grid>
+          </Grid>
+          <Grid item xs={6}>
+            <Grid container justify="center">
+              <FormButton
+                onClick={this.handleSave}
+                width={190}
+                type="submit"
+                disabled={!this.state.valid}
+              >
+                Save
+              </FormButton>
+            </Grid>
+          </Grid>
+        </Grid>
       </Modal>
     )
   }
