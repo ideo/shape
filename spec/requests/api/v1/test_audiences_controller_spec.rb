@@ -40,6 +40,7 @@ describe Api::V1::TestAudiencesController, type: :request, json: true, auth: tru
     let(:organization) { create(:organization, admin: current_user) }
     let(:audience) { create(:audience, organization: organization) }
     let(:test_collection) { create(:test_collection, add_editors: [current_user]) }
+    let(:payment_method_double) { double(id: SecureRandom.hex(10)) }
     let(:test_audience) do
       create(:test_audience,
              audience: audience,
@@ -59,6 +60,7 @@ describe Api::V1::TestAudiencesController, type: :request, json: true, auth: tru
 
     before do
       @user = current_user
+      test_audience.payment_method = payment_method_double
     end
 
     it 'returns a 200' do
