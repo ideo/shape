@@ -40,11 +40,13 @@ class ProductDescriptions extends React.PureComponent {
               order={p.order}
               title={p.title}
               description={p.description}
+              descriptionMarkdown={p.descriptionMarkdown}
+              descriptionHTML={p.descriptionHTML}
               imageUrl={p.imageUrl}
             />
           ))
         ) : (
-          <span>-</span>
+          <div />
         )}
       </Content>
     )
