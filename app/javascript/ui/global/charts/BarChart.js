@@ -15,7 +15,7 @@ const formatValues = (values, datasetOrder) => {
   }))
 }
 
-const BarChart = ({ dataset, simpleDateTooltip, cardArea, barsInGroup }) => {
+const BarChart = ({ dataset, cardArea, barsInGroup }) => {
   const values = formatValues(dataset.data, dataset.order)
   const { total, max_domain } = dataset
   const domain = chartDomainForDatasetValues({

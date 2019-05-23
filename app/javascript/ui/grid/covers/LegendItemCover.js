@@ -336,6 +336,7 @@ LegendItemCover.propTypes = {
 
 LegendItemCover.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 LegendItemCover.defaultProps = {

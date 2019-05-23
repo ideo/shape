@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Fragment } from 'react'
@@ -50,6 +51,13 @@ const StyledCover = props => {
       {props.children}
     </StyledDataItemCover>
   )
+}
+StyledCover.propTypes = {
+  item: MobxPropTypes.objectOrObservableObject.isRequired,
+  children: PropTypes.node,
+}
+StyledCover.defaultProps = {
+  children: null,
 }
 
 @observer
