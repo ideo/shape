@@ -6,6 +6,29 @@ import TrashIcon from '~/ui/icons/TrashIcon'
 import PinnedIcon from '~/ui/icons/PinnedIcon'
 import styled from 'styled-components'
 
+const SelectHolderContainer = styled.div`
+  margin-top: 10px;
+  margin-right: 14px;
+  width: 300px;
+
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    margin-bottom: 20px;
+    max-width: 400px;
+  }
+`
+
+const TrashButton = styled.button`
+  position: relative;
+  top: 6px;
+  width: 26px;
+  margin-left: 12px;
+`
+
+function optionSort(a, b) {
+  if (b.value === '') return 1
+  return a.label.localeCompare(b.label)
+}
+
 const QuestionSelectHolder = ({
   card,
   canEdit,
@@ -71,28 +94,5 @@ QuestionSelectHolder.propTypes = {
   handleSelectChange: PropTypes.func.isRequired,
   handleTrash: PropTypes.func.isRequired,
 }
-
-function optionSort(a, b) {
-  if (b.value === '') return 1
-  return a.label.localeCompare(b.label)
-}
-
-const SelectHolderContainer = styled.div`
-  margin-top: 10px;
-  margin-right: 14px;
-  width: 300px;
-
-  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
-    margin-bottom: 20px;
-    max-width: 400px;
-  }
-`
-
-const TrashButton = styled.button`
-  position: relative;
-  top: 6px;
-  width: 26px;
-  margin-left: 12px;
-`
 
 export default QuestionSelectHolder

@@ -46,6 +46,9 @@ class TestSurveyPage extends React.Component {
       )
     }
     apiStore.filestackToken = window.filestackToken
+    if (window.invalid) {
+      this.collection.test_status = 'closed'
+    }
   }
 
   async componentDidMount() {
@@ -66,7 +69,6 @@ class TestSurveyPage extends React.Component {
       }
       return surveyResponse
     } catch (e) {
-      console.log('failed to create survey response b/c test is closed')
       this.collection.test_status = 'closed'
     }
   }

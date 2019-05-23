@@ -31,7 +31,7 @@ describe RolifyExtensions, type: :concern do
     end
   end
 
-  describe '#has_role_by_identifier?', only: true do
+  describe '#has_role_by_identifier?' do
     let(:has_editor_role) do
       user.has_role_by_identifier?(Role::EDITOR, collection.roles_anchor_resource_identifier)
     end

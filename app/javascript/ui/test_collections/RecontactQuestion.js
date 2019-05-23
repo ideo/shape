@@ -98,7 +98,7 @@ class RecontactQuestion extends React.Component {
         <QuestionText>
           Would you like to be contacted about future feedback opportunities?
         </QuestionText>
-        <EmojiHolder>
+        <EmojiHolder data-cy="RecontactEmojiHolder">
           <EmojiButton
             selected={
               (user &&
@@ -119,6 +119,7 @@ class RecontactQuestion extends React.Component {
               !answer
             }
             onClick={this.handleClick('feedback_contact_yes')}
+            data-cy="RecontactEmojiBtnThumbUp"
           >
             <Emoji scale={1.375} name="Yes" symbol="👍" />
           </EmojiButton>
@@ -144,13 +145,18 @@ class RecontactQuestion extends React.Component {
                 value={contactInfo}
                 type="questionText"
                 placeholder="email or phone number"
+                data-cy="RecontactTextInput"
               />
               {submittedContactInfo ? (
                 <IconHolder>
                   <OkIcon />
                 </IconHolder>
               ) : (
-                <TextEnterButton focused onClick={this.handleContactInfoSubmit}>
+                <TextEnterButton
+                  focused
+                  onClick={this.handleContactInfoSubmit}
+                  data-cy="RecontactTextResponseButton"
+                >
                   <ReturnArrowIcon />
                 </TextEnterButton>
               )}
@@ -165,12 +171,13 @@ class RecontactQuestion extends React.Component {
 RecontactQuestion.propTypes = {
   user: MobxPropTypes.objectOrObservableObject,
   onAnswer: PropTypes.func.isRequired,
-  sessionUid: PropTypes.string.isRequired,
+  sessionUid: PropTypes.string,
   backgroundColor: PropTypes.string,
 }
 RecontactQuestion.defaultProps = {
   user: null,
   backgroundColor: null,
+  sessionUid: null,
 }
 
 export default RecontactQuestion
