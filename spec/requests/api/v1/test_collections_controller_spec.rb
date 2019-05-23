@@ -92,7 +92,7 @@ describe Api::V1::TestCollectionsController, type: :request, json: true, auth: t
     end
   end
 
-  describe 'GET #token_auth' do
+  describe 'GET #token_auth', :vcr do
     let!(:collection) { create(:test_collection, test_status: :live) }
     let(:path) { token_auth_test_path(collection) }
 
@@ -108,7 +108,7 @@ describe Api::V1::TestCollectionsController, type: :request, json: true, auth: t
 
       it 'redirects to Network token auth' do
         get(path)
-        expect(response.location).to include(ideo_sso_api_base_url.to_s)
+        expect(response.location).to include('https://profile.ideo.com/oauth/')
       end
     end
   end

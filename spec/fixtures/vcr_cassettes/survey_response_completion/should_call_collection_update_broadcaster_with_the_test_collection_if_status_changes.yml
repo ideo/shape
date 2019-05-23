@@ -1,0 +1,72 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://profile.ideo.com/api/v1/organizations?filter%5Bclient_id%5D=456c92569bafa8d035162e6a4a8a7c99ee7de4ee8c187383c310422081bb02e4&filter%5Bexternal_id%5D=1&page%5Bnumber%5D=1&page%5Bsize%5D=1
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.12.2
+      Content-Type:
+      - application/vnd.api+json
+      Accept:
+      - application/vnd.api+json
+      Authorization:
+      - Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJ0eXBlIjoiYXBwbGljYXRpb24iLCJjbGllbnRfaWQiOiI0NTZjOTI1NjliYWZhOGQwMzUxNjJlNmE0YThhN2M5OWVlN2RlNGVlOGMxODczODNjMzEwNDIyMDgxYmIwMmU0IiwidWlkIjoiMDB1Y3kzdW53aE9wbHhzZHowaDciLCJleHBpcmVzIjoxNTU1OTc0NTAyfQ.ZXa-_6zQe5jyC4-g5gonWjgAsVcgFmEBS2FTsEImuj7vaN2inLxhFjdJ85SDHJaBkczOIIzjLOM5gLsfs5DWvV3DTR8Ox5NJeH_OwY7317z_cVVUTB2Oyu54B8zduLDiqyQ3DCYMHEXn6CwjliP_Z32CTCxdI--ED_nu1wCMAtxhjHShvyWS-QLXvN0MbcxTU0dTYzdEsSzCW4qWuYSxLzlh32CW6GUwystqvXe69wMi6Dlz4IC5OEpksK8DBsDCe6eNFqcUtJyTr42tzcHi2hI7JyHpXFRPpacybIrnZwjYMIb4hDdBKKyko0JhQ95-2lFuoLCGElTIkCeuLavViA
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - Cowboy
+      Date:
+      - Thu, 23 May 2019 18:14:43 GMT
+      Connection:
+      - keep-alive
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/vnd.api+json; charset=utf-8
+      Set-Cookie:
+      - _sso_profile_session=WnpZTi9JZFFqTW5lUnVuNXo0Z1lybDVBaU53WVN6enJPcnQ4UHRtRzkxVHFxUVQ4VWZnemx4bFl3Zys0K3B2Q1o4SDNHcFdpMTJGbjRWMEdtSGdLR1pZcW5IenZyZVFvRWtnVGYrczNwYmJHS29HT05mbEtwc2JuSSt3ZCtNa3ktLU5Cb1dpR2xrd3ZxRjduZVJoTVpyVHc9PQ%3D%3D--0a88152c955f82ea215c119733d1f441a90cac1d;
+        path=/; expires=Thu, 23 May 2019 22:14:44 -0000; HttpOnly; secure
+      - rack.session=BAh7BkkiD3Nlc3Npb25faWQGOgZFVEkiRTE5ODU5MTczNTRkMTIwZDBmMWRj%0AZjcxNTJkNmRmNGZjYWQ0ZjMyMzNhMjliOTcxNzNlMjA0NTk1ODE3ZWI5NmMG%0AOwBG%0A--f3775ede5b2ebb3473f22fd511e317710d069255;
+        path=/; expires=Thu, 23 May 2019 22:14:44 -0000; HttpOnly; secure
+      Etag:
+      - W/"b54cd5ec102995ed1b1eb05714ea1c35"
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      X-Request-Id:
+      - 113ba26e-4dec-4704-8445-5572a7034d09
+      X-Runtime:
+      - '0.039016'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Vary:
+      - Origin
+      Transfer-Encoding:
+      - chunked
+      Via:
+      - 1.1 vegur
+    body:
+      encoding: UTF-8
+      string: '{"data":[{"id":"111","type":"organizations","attributes":{"id":111,"name":"IDEO"},"relationships":{"applications":{"data":[{"type":"applications","id":"5"}]},"application_organizations":{"meta":{"included":false}}}}],"included":[{"id":"5","type":"applications","attributes":{"name":"Shape
+        - Staging","client_id":"456c92569bafa8d035162e6a4a8a7c99ee7de4ee8c187383c310422081bb02e4"}}],"meta":{},"jsonapi":{"version":"1.0"}}'
+    http_version: 
+  recorded_at: Thu, 23 May 2019 18:14:44 GMT
+recorded_with: VCR 4.0.0
