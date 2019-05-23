@@ -117,12 +117,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         create_notification(card,
                             Activity.map_move_action(@card_action))
       end
-      # NOTE: even though this action is in CollectionCardsController, it returns the to_collection
-      # so that it can be easily re-rendered on the page
-      render jsonapi: @to_collection.reload,
-             include: Collection.default_relationships_for_api,
-             meta: { moving_cards: mover.moving_cards.pluck(:id).map(&:to_s) },
-             expose: { current_record: @to_collection }
+      head :no_content
     else
       render json: { errors: mover.errors }, status: :unprocessable_entity
     end

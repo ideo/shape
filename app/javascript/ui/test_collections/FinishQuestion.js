@@ -16,7 +16,7 @@ const FinishQuestion = ({ submissionBox }) => (
         ? 'Thank you! You have given feedback on all of the current ideas. Please come back later to review more.'
         : 'You’re done! Thank you for taking the time to provide your opinion.'}
     </QuestionText>
-    <FinishedEmojiHolder>
+    <FinishedEmojiHolder data-cy="FinishedEmojiHolder">
       <Emoji name="Finished" symbol="🎉" />
     </FinishedEmojiHolder>
   </div>

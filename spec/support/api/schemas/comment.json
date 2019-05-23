@@ -2,6 +2,10 @@
   "type": "object",
   "properties": {
     "message": { "type": "string" },
+    "comment_thread_id": { "type": "integer" },
+    "author_id": { "type": "integer" },
+    "draftjs_data": { "type": ["object", "null"] },
+    "created_at": { "type": "date" },
     "updated_at": { "type": "date" }
   },
   "required": ["message", "updated_at"]

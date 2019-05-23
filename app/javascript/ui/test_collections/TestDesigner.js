@@ -43,7 +43,6 @@ const QuestionSelectHolder = styled.div`
 
   @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
     margin-bottom: 20px;
-    width: auto;
     max-width: 400px;
   }
 `

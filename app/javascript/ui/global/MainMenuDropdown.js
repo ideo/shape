@@ -2,7 +2,7 @@ import _ from 'lodash'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { runInAction, observable } from 'mobx'
+import { computed, runInAction, observable } from 'mobx'
 
 import Avatar from '~/ui/global/Avatar'
 import LeaveIcon from '~/ui/icons/LeaveIcon'
@@ -10,6 +10,7 @@ import PopoutMenu from '~/ui/global/PopoutMenu'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import SettingsIcon from '~/ui/icons/SettingsIcon'
 import SearchBar from '~/ui/layout/SearchBar'
+import v from '~/utils/variables'
 
 const CONTEXT_USER = 'user'
 const CONTEXT_ORG = 'org'
@@ -59,6 +60,14 @@ class MainMenuDropdown extends React.Component {
     this.searchOrganizations = _.debounce(this._searchOrganizations, 300)
   }
 
+  @computed
+  get isMobileXs() {
+    const { uiStore } = this.props
+    return (
+      uiStore.windowWidth && uiStore.windowWidth < v.responsive.smallBreakpoint
+    )
+  }
+
   handleOrgPeople = ev => {
     this.props.uiStore.update('organizationMenuPage', 'organizationPeople')
   }
@@ -69,6 +78,10 @@ class MainMenuDropdown extends React.Component {
 
   handleOrgSettings = ev => {
     this.props.routingStore.routeTo('/settings')
+  }
+
+  handleSearch = ev => {
+    this.props.routingStore.routeTo('search')
   }
 
   handleBilling = ev => {
@@ -283,6 +296,13 @@ class MainMenuDropdown extends React.Component {
     } else {
       Object.assign(menuItems, this.orgMenuGroups)
       Object.assign(menuItems, this.userMenuGroups)
+    }
+    if (this.isMobileXs) {
+      menuItems.top = menuItems.top || []
+      menuItems.top.splice(0, 0, {
+        name: 'Search',
+        onClick: this.handleSearch,
+      })
     }
 
     // Call the onItemClick event for any item that has a click handler
