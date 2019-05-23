@@ -57,22 +57,22 @@ RSpec.describe Item::DataItem, type: :model do
         timeframe: 'ever',
         name: 'Something That is Great',
         cached_data: [
-          { date: '2019-04-01', value: 987654321 },
-        ]
+          { date: '2019-04-01', value: 987_654_321 },
+        ],
       }
     end
 
     it 'creates dataset' do
-      expect {
+      expect do
         data_item.create_dataset(params)
-      }.to change(Dataset, :count).by(1)
+      end.to change(Dataset, :count).by(1)
     end
 
     it 'slices params out to data_items_dataset' do
       dataset = data_item.create_dataset(params)
       data_items_dataset = dataset.data_items_datasets.first
       expect(data_items_dataset.order).to eq(2)
-      expect(data_items_dataset.selected).to be false
+      expect(data_items_dataset.selected).to be true
     end
   end
 end
