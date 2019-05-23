@@ -152,7 +152,7 @@ class MoveModal extends React.Component {
       runInAction(() => {
         this.isLoading = false
       })
-      uiStore.alertOk(successMessage)
+      uiStore.popupSnackbar({ message: successMessage })
       uiStore.resetSelectionAndBCT()
       uiStore.closeMoveMenu()
       if (placement === 'beginning') {
