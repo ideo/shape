@@ -23,12 +23,13 @@ FactoryBot.define do
       timeframe 'month'
     end
 
-    factory :question_item_dataset, class: 'Dataset::QuestionItem' do
+    factory :question_dataset, class: 'Dataset::Question' do
       chart_type 'bar'
       data_source factory: :question_item
+      groupings { [] }
     end
 
-    factory :org_wide_question_dataset, class: 'Dataset::OrgWideQuestion' do
+    factory :org_wide_question_dataset, class: 'Dataset::Question' do
       question_type :question_clarity
     end
 

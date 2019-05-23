@@ -14,7 +14,7 @@ RSpec.describe DataReport::QuestionItem, type: :service do
       ]
     end
     let(:question_item) { create(:question_item) }
-    let(:dataset) { create(:question_item_dataset, data_source: question_item) }
+    let(:dataset) { create(:question_dataset, data_source: question_item) }
 
     describe '#call' do
       it 'returns datasets for question item' do
@@ -42,7 +42,7 @@ RSpec.describe DataReport::QuestionItem, type: :service do
 
     context 'question dataset' do
       let!(:dataset) do
-        create(:question_item_dataset, data_source: question_item)
+        create(:question_dataset, data_source: question_item)
       end
 
       describe '#call' do
@@ -53,7 +53,7 @@ RSpec.describe DataReport::QuestionItem, type: :service do
               { column: 2, value: 0, percentage: 0 },
               { column: 3, value: 0, percentage: 0 },
               { column: 4, value: 0, percentage: 0 },
-            ]
+            ],
           )
         end
       end
@@ -61,7 +61,7 @@ RSpec.describe DataReport::QuestionItem, type: :service do
       describe '#total' do
         it 'returns 1' do
           expect(
-            DataReport::QuestionItem.new(dataset: dataset).total
+            DataReport::QuestionItem.new(dataset: dataset).total,
           ).to eq(1)
         end
       end
@@ -71,6 +71,7 @@ RSpec.describe DataReport::QuestionItem, type: :service do
       let!(:dataset) do
         create(:org_wide_question_dataset,
                question_type: question_item.question_type,
+               groupings: [{ type: 'Organization', id: organization.id }],
                organization: organization)
       end
 
@@ -82,7 +83,7 @@ RSpec.describe DataReport::QuestionItem, type: :service do
               { column: 2, value: 0, percentage: 0 },
               { column: 3, value: 0, percentage: 0 },
               { column: 4, value: 0, percentage: 0 },
-            ]
+            ],
           )
         end
       end
@@ -90,7 +91,7 @@ RSpec.describe DataReport::QuestionItem, type: :service do
       describe '#total' do
         it 'returns 6' do
           expect(
-            DataReport::QuestionItem.new(dataset: dataset).total
+            DataReport::QuestionItem.new(dataset: dataset).total,
           ).to eq(6)
         end
       end

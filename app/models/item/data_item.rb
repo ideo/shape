@@ -143,7 +143,7 @@ class Item
       when
         'report_type_collections_and_items' then 'Dataset::CollectionsAndItems'
       when
-        'report_type_question_item' then 'Dataset::QuestionItem'
+        'report_type_question_item' then 'Dataset::Question'
       when
         'report_type_network_app_metric' then 'Dataset::NetworkAppMetric'
       end

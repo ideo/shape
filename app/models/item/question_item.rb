@@ -43,7 +43,7 @@ class Item
   class QuestionItem < Item
     has_many :question_answers, inverse_of: :question, foreign_key: :question_id, dependent: :destroy
     has_one :test_open_responses_collection, class_name: 'Collection::TestOpenResponses'
-    has_one :dataset, as: :data_source, class_name: 'Dataset::QuestionItem', dependent: :destroy
+    has_one :dataset, as: :data_source, class_name: 'Dataset::Question', dependent: :destroy
     has_many :data_items,
              as: :data_source,
              class_name: 'Item::DataItem'
@@ -265,8 +265,8 @@ class Item
     end
 
     def org_wide_question_dataset
-      Dataset::OrgWideQuestion.find_or_create_by(
-        organization_id: organization.id,
+      Dataset::Question.find_or_create_by(
+        groupings: [{ type: 'Organization', id: organization.id }],
         question_type: question_type,
         chart_type: :bar,
       )
@@ -275,7 +275,7 @@ class Item
     private
 
     def create_dataset
-      self.dataset = Dataset::QuestionItem.create(
+      self.dataset = Dataset::Question.create(
         data_source: self,
         timeframe: :month,
         chart_type: :bar,

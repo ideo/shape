@@ -1,34 +1,27 @@
 # == Schema Information
 #
-# Table name: datasets
+# Table name: test_audiences
 #
-#  id               :bigint(8)        not null, primary key
-#  cached_data      :jsonb
-#  chart_type       :integer
-#  data_source_type :string
-#  description      :text
-#  max_domain       :integer
-#  measure          :string
-#  name             :string
-#  question_type    :string
-#  style            :jsonb
-#  timeframe        :integer
-#  total            :integer
-#  type             :string
-#  url              :string
-#  created_at       :datetime         not null
-#  updated_at       :datetime         not null
-#  data_source_id   :bigint(8)
-#  organization_id  :bigint(8)
+#  id                 :bigint(8)        not null, primary key
+#  price_per_response :decimal(10, 2)
+#  sample_size        :integer
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  audience_id        :bigint(8)
+#  test_collection_id :bigint(8)
 #
 # Indexes
 #
-#  index_datasets_on_data_source_type_and_data_source_id  (data_source_type,data_source_id)
-#  index_datasets_on_organization_id                      (organization_id)
+#  index_test_audiences_on_audience_id         (audience_id)
+#  index_test_audiences_on_test_collection_id  (test_collection_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (audience_id => audiences.id)
 #
 
 class Dataset
-  class QuestionItem < Dataset
+  class Question < Dataset
     before_validation :set_default_timeframe
     belongs_to :question_item,
                foreign_key: 'data_source_id',
@@ -80,7 +73,7 @@ class Dataset
     private
 
     def data_report
-      @data_report ||= DataReport::QuestionItem.new(dataset: self)
+      @data_report ||= DataReport::Question.new(dataset: self)
     end
 
     def set_default_timeframe

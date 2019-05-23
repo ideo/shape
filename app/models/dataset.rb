@@ -7,6 +7,7 @@
 #  chart_type       :integer
 #  data_source_type :string
 #  description      :text
+#  groupings        :jsonb
 #  max_domain       :integer
 #  measure          :string
 #  name             :string
@@ -40,7 +41,7 @@ class Dataset < ApplicationRecord
   validates :timeframe, :chart_type, presence: true
   validates :cached_data, :name, presence: true, if: :root_dataset_class?
 
-  scope :question_items, -> { where(type: 'Dataset::QuestionItem') }
+  scope :question_items, -> { where(type: 'Dataset::Question') }
 
   attr_accessor :cached_data_items_datasets
 

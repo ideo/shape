@@ -7,15 +7,11 @@ module DataReport
     end
 
     def call
-      return grouped_response_data(survey_answers) if question_item?
-
-      grouped_response_data(org_survey_answers)
+      grouped_response_data(survey_answers)
     end
 
     def total
-      return survey_answers.count if question_item?
-
-      org_survey_answers.count
+      survey_answers.count
     end
 
     def self.base_data
@@ -25,19 +21,6 @@ module DataReport
     end
 
     private
-
-    def organization_id
-      return test_collection.organization_id if question_item?
-      return @dataset.organization_id if org_wide?
-    end
-
-    def question_item?
-      @dataset.is_a?(Dataset::QuestionItem)
-    end
-
-    def org_wide?
-      @dataset.is_a?(Dataset::OrgWideQuestion)
-    end
 
     def question_item
       @dataset.data_source
@@ -79,15 +62,21 @@ module DataReport
     end
 
     def survey_answers
-      question_item.completed_survey_answers
+      if @dataset.groupings.present? &&
+         @dataset.groupings.first['type'] == 'Organization'
+        org_survey_answers
+      else
+        question_item.completed_survey_answers
+      end
     end
 
     def org_survey_answers
+      organization_id = @dataset.groupings.first['id']
       QuestionAnswer
         .joins(:question)
         .where(
           Item::QuestionItem.arel_table[:question_type].eq(
-            @dataset.question_type,
+            question_type,
           ),
         )
         .joins(survey_response: :test_collection)

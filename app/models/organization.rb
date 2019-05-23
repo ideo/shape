@@ -55,7 +55,9 @@ class Organization < ApplicationRecord
   has_many :groups, dependent: :destroy
   has_many :api_tokens, dependent: :destroy
   has_many :application_organizations, dependent: :destroy
-  has_many :org_wide_question_datasets, class_name: 'Dataset::OrgWideQuestion'
+  ## TODO scope this relation to just organization grouped datasets?
+  ## TODO is this used?
+  has_many :org_wide_question_datasets, class_name: 'Dataset::Question'
   belongs_to :primary_group,
              class_name: 'Group',
              dependent: :destroy,

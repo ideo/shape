@@ -7,6 +7,7 @@
 #  chart_type       :integer
 #  data_source_type :string
 #  description      :text
+#  groupings        :jsonb
 #  max_domain       :integer
 #  measure          :string
 #  name             :string

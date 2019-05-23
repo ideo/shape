@@ -362,7 +362,6 @@ describe Collection::TestCollection, type: :model do
 
               expect(TestCollectionMailer).to receive(:notify_launch).with(test_collection.id)
               test_collection.launch!(initiated_by: user)
->>>>>>> origin/feedback-2.0
             end
           end
 
