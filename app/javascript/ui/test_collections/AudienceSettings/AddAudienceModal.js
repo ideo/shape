@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import Modal from '~/ui/global/modals/Modal'
 import {
@@ -8,7 +9,10 @@ import {
   Label,
   TextField,
 } from '~/ui/global/styled/forms'
+import Audience from '~/stores/jsonApi/Audience'
 
+@inject('apiStore')
+@observer
 class AddAudienceModal extends React.Component {
   state = {
     name: '',
@@ -20,8 +24,14 @@ class AddAudienceModal extends React.Component {
     this.validateForm()
   }
 
-  handleSave = () => {
-    console.log('save audience')
+  handleSave = async () => {
+    const { apiStore, close } = this.props
+
+    const audience = new Audience({ name: this.state.name }, apiStore)
+    await audience.API_create()
+
+    close()
+    this.setState({ name: '', valid: false })
   }
 
   validateForm() {
@@ -62,6 +72,9 @@ class AddAudienceModal extends React.Component {
 AddAudienceModal.propTypes = {
   open: PropTypes.bool.isRequired,
   close: PropTypes.func.isRequired,
+}
+AddAudienceModal.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default AddAudienceModal

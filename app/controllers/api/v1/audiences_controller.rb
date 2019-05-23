@@ -12,7 +12,6 @@ class Api::V1::AudiencesController < Api::V1::BaseController
     render jsonapi: @audience
   end
 
-  before_action :check_audience_organization_param, only: %i[create]
   before_action :authorize_current_organization, only: %i[create]
   def create
     @audience = Audience.new(audience_params)
@@ -31,12 +30,6 @@ class Api::V1::AudiencesController < Api::V1::BaseController
     @audiences = Audience
                  .where(organization_id: nil)
                  .or(Audience.where(organization_id: @organization.id))
-  end
-
-  def check_audience_organization_param
-    organization_id = params[:audience].delete(:organization_id)
-    return unless organization_id.present?
-    @current_organization = Organization.find(organization_id)
   end
 
   def authorize_current_organization

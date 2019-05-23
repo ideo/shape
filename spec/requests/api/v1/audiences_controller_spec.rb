@@ -25,7 +25,6 @@ describe Api::V1::AudiencesController, type: :request, json: true do
       json_api_params(
         'audiences',
         name: 'Anyone',
-        organization_id: user.current_organization.id,
       )
     end
 
