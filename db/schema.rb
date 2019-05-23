@@ -405,6 +405,8 @@ ActiveRecord::Schema.define(version: 20190520233054) do
   create_table "test_audience_invitations", force: :cascade do |t|
     t.bigint "test_audience_id"
     t.bigint "user_id"
+    t.string "invitation_token"
+    t.datetime "completed_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["test_audience_id"], name: "index_test_audience_invitations_on_test_audience_id"

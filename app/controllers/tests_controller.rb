@@ -14,14 +14,9 @@ class TestsController < ApplicationController
     render 'show'
   end
 
+  before_action :look_up_test_audience_invitation, only: :token_auth
   def token_auth
-    url = test_url(@collection)
-    if user_signed_in?
-      redirect_to url
-    else
-      store_location_for :user, url
-      redirect_to ideo_sso_token_auth_url(params[:token])
-    end
+    redirect_to ideo_sso_token_auth_url(@user_token)
   end
 
   private
@@ -33,17 +28,31 @@ class TestsController < ApplicationController
     @invalid = true
   end
 
+  # stored so that the saved survey_response is tied to the correct test_audience
   def load_test_audience_into_session
-    unless params[:ta].present?
-      # clear out any previous values from the session
-      session.delete :test_audience_id
-      return
-    end
-    test_audience = @collection.test_audiences.find_by(id: params[:ta])
-    unless test_audience.present? || @collection.link_sharing_enabled?
+    @test_audience = nil
+    if params[:ta].present? || params[:token].present?
+      look_up_test_audience
+      # if you're invited to a test audience it'll set to `invalid` if that audience is closed
+      @invalid = @test_audience.nil? || @test_audience.closed?
+    elsif !@collection.link_sharing_enabled?
+      # if no test audience param, then you can only view the test if link_sharing_enabled
       @invalid = true
     end
-    session[:test_audience_id] = test_audience&.id
+    # will reset to nil if no test_audience
+    session[:test_audience_id] = @test_audience&.id
+  end
+
+  def look_up_test_audience
+    test_audiences = @collection.test_audiences
+    if params[:ta].present?
+      @test_audience = test_audiences.find_by(id: params[:ta])
+    elsif params[:token].present?
+      invitation = TestAudienceInvitation.valid.find_by_invitation_token(params[:token])
+      if user_signed_in? && current_user.id == invitation.user_id && test_audiences.include?(invitation.test_audience)
+        @test_audience = invitation.test_audience
+      end
+    end
   end
 
   def redirect_to_test
@@ -84,5 +93,23 @@ class TestsController < ApplicationController
     end
     # standalone page
     redirect_to '/tests/completed'
+  end
+
+  def look_up_test_audience_invitation
+    @user_token = nil
+    invitation = TestAudienceInvitation.find_by_invitation_token(params[:token])
+    if invitation.nil?
+      redirect_to root_url
+      return
+    end
+    store_location_for :user, test_url(invitation.test_collection, token: params[:token])
+
+    user = invitation.user
+    # NOTE: if you still have a valid INA session for the wrong user then you'll still be logged in
+    # when it does the SSO redirect via ideo_sso_token_auth_url
+    sign_out(:user) if user_signed_in? && current_user.id != user.id
+
+    # fetch network token
+    @user_token = user.generate_network_auth_token if user.limited?
   end
 end

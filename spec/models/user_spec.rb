@@ -585,4 +585,13 @@ describe User, type: :model do
       expect(user.current_incentive_balance).to eq feedback_incentive_record2.current_balance
     end
   end
+
+  describe '#network_user' do
+    let(:user) { create(:user) }
+
+    it 'should look up the user from the Network' do
+      expect(NetworkApi::User).to receive(:find).with(user.uid).and_return([])
+      user.network_user
+    end
+  end
 end
