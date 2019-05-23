@@ -9,6 +9,7 @@
 #  email                       :string           default("")
 #  encrypted_password          :string           default(""), not null
 #  feedback_contact_preference :integer          default("feedback_contact_unanswered")
+#  feedback_terms_accepted     :boolean          default(FALSE)
 #  first_name                  :string
 #  handle                      :string
 #  invitation_token            :string
