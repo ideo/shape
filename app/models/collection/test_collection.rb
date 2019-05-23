@@ -335,10 +335,12 @@ class Collection
       collections.where(type: 'Collection::TestOpenResponses')
     end
 
-    def create_uniq_survey_response(user_id: nil)
+    def create_uniq_survey_response(user_id: nil, test_audience_id: nil)
       survey_responses.create(
         session_uid: SecureRandom.uuid,
         user_id: user_id,
+        # only include passed in test_audience_id if it is a valid relation
+        test_audience_id: test_audience_ids.include?(test_audience_id) ? test_audience_id : nil,
       )
     end
 
@@ -530,6 +532,14 @@ class Collection
     def gives_incentive?
       # right now the check is basically any paid tests == gives_incentive
       test_audiences.where('price_per_response > 0').present?
+    end
+
+    def link_sharing_audience
+      test_audiences.where(price_per_response: 0).first
+    end
+
+    def link_sharing_enabled?
+      link_sharing_audience.present?
     end
   end
 end

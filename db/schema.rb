@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190514224531) do
+ActiveRecord::Schema.define(version: 20190520233054) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -81,7 +81,7 @@ ActiveRecord::Schema.define(version: 20190514224531) do
     t.bigint "organization_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.decimal "price_per_response", precision: 10, scale: 2
+    t.decimal "price_per_response", precision: 10, scale: 2, default: "0.0"
     t.index ["organization_id"], name: "index_audiences_on_organization_id"
   end
 
@@ -402,6 +402,17 @@ ActiveRecord::Schema.define(version: 20190514224531) do
     t.index ["name"], name: "index_tags_on_name", unique: true
   end
 
+  create_table "test_audience_invitations", force: :cascade do |t|
+    t.bigint "test_audience_id"
+    t.bigint "user_id"
+    t.string "invitation_token"
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["test_audience_id"], name: "index_test_audience_invitations_on_test_audience_id"
+    t.index ["user_id"], name: "index_test_audience_invitations_on_user_id"
+  end
+
   create_table "test_audiences", force: :cascade do |t|
     t.integer "sample_size"
     t.bigint "audience_id"
@@ -472,5 +483,7 @@ ActiveRecord::Schema.define(version: 20190514224531) do
   add_foreign_key "collections", "organizations"
   add_foreign_key "feedback_incentive_records", "survey_responses"
   add_foreign_key "feedback_incentive_records", "users"
+  add_foreign_key "test_audience_invitations", "test_audiences"
+  add_foreign_key "test_audience_invitations", "users"
   add_foreign_key "test_audiences", "audiences"
 end
