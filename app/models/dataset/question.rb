@@ -47,9 +47,9 @@ class Dataset
     end
 
     def name
-      if org_grouping
+      if org_grouping.present?
         DEFAULT_ORG_NAME
-      elsif
+      elsif test_audience_grouping.present?
         # TODO: needs actual audience combo name?
         'test-audience'
       else
