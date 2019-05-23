@@ -60,7 +60,9 @@ describe Api::V1::TestAudiencesController, type: :request, json: true, auth: tru
 
     before do
       @user = current_user
-      test_audience.payment_method = payment_method_double
+      allow(NetworkApi::PaymentMethod).to receive(:find).and_return(
+        [payment_method_double],
+      )
     end
 
     it 'returns a 200' do
