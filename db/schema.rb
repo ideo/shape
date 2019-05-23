@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190523194711) do
+ActiveRecord::Schema.define(version: 20190523220518) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -87,11 +87,9 @@ ActiveRecord::Schema.define(version: 20190523194711) do
   create_table "audiences", force: :cascade do |t|
     t.string "name"
     t.string "criteria"
-    t.bigint "organization_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.decimal "price_per_response", precision: 10, scale: 2
-    t.index ["organization_id"], name: "index_audiences_on_organization_id"
   end
 
   create_table "collection_cards", force: :cascade do |t|

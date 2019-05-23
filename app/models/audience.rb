@@ -8,11 +8,6 @@
 #  price_per_response :float
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
-#  organization_id    :bigint(8)
-#
-# Indexes
-#
-#  index_audiences_on_organization_id  (organization_id)
 #
 
 class Audience < ApplicationRecord
