@@ -185,7 +185,7 @@ class LegendItemCover extends React.Component {
       const { name, selected } = entity
       this.toggleDatasetsWithName({ name, selected })
     } else {
-      await card.parent.API_addComparison({ id: entity.test_collection_id })
+      await card.parent.API_addComparison(entity)
     }
     card.parent.API_fetchCards()
   }
@@ -286,9 +286,9 @@ class LegendItemCover extends React.Component {
     }
   }
 
-  renderSelectedDataset = ({ dataset }) => {
+  renderSelectedDataset = ({ dataset, order }) => {
     if (!dataset) return ''
-    const { name, style, chart_type, display_name, order } = dataset
+    const { name, style, chart_type, display_name } = dataset
     const primary = order === 0
     let icon
     if (chart_type === 'line') {
@@ -323,12 +323,14 @@ class LegendItemCover extends React.Component {
   render() {
     const { item } = this.props
     const { comparisonMenuOpen } = this.state
+    let order = -1
     return (
       <StyledLegendItem data-cy="LegendItemCover">
         <StyledLegendTitle>{item.name}</StyledLegendTitle>
         {this.datasets({ selected: true }).map(dataset =>
           this.renderSelectedDataset({
             dataset,
+            order: (order += 1),
           })
         )}
         <br />
