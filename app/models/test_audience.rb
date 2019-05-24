@@ -25,4 +25,11 @@ class TestAudience < ApplicationRecord
   belongs_to :test_collection,
              class_name: 'Collection::TestCollection'
   has_many :survey_responses
+
+  delegate :name,
+           to: :audience
+
+  def self.display_name
+    'Audience'
+  end
 end

@@ -269,6 +269,7 @@ class LegendItemCover extends React.Component {
     const { name, style, chart_type, display_name, order } = dataset
     const primary = order === 0
     let icon
+    console.log(dataset)
     if (chart_type === 'line') {
       icon = (
         <LineChartIcon

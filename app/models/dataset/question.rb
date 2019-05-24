@@ -59,10 +59,11 @@ class Dataset
     end
 
     def display_name
-      return if groupings.empty?
+      return name if groupings.empty?
       # Just name off the first grouping for now, change in future
       klass = groupings.first['type'].constantize
-      "#{klass.name} #{groupings.first['type']}"
+      object = klass.find(groupings.first['id'].to_i)
+      "#{object.name} #{klass.display_name}"
     end
 
     def max_domain

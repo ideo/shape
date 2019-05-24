@@ -115,6 +115,10 @@ class Organization < ApplicationRecord
       .where(arel_table[:active_users_count].gt(0))
   end
 
+  def self.display_name
+    'Organization'
+  end
+
   def can_view?(user)
     return true if user.has_role?(Role::APPLICATION_USER, self)
     primary_group.can_view?(user) || admin_group.can_view?(user) || guest_group.can_view?(user)
