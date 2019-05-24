@@ -5,6 +5,7 @@ import { Collapse } from '@material-ui/core'
 import { Grid } from '@material-ui/core'
 
 import Audience from '~/stores/jsonApi/Audience'
+import AudienceCriteria from './AudienceCriteria'
 import Button from '~shared/components/atoms/Button'
 import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import Modal from '~/ui/global/modals/Modal'
@@ -22,12 +23,14 @@ import {
 // TODO Position menu on all viewport sizes
 const AddCriteriaMenu = styled.ul`
   background: ${v.colors.white};
-  box-shadow: 0 0 8px 0 rgba(18,15,14,0.2);
+  box-shadow: 0 0 8px 0 rgba(18, 15, 14, 0.2);
   left: calc(50% - 300px);
+  max-height: 264px;
+  overflow-y: scroll;
   position: fixed;
   top: calc(50% + 73px);
   width: 250px;
-  z-index: 1500;gg
+  z-index: 1500;
 `
 
 const CriteriaGroup = styled.li`
@@ -86,6 +89,25 @@ class AddAudienceModal extends React.Component {
     this.setState({ valid })
   }
 
+  renderCriteriaMenu() {
+    const groups = Object.keys(AudienceCriteria).map(group => {
+      const options = AudienceCriteria[group].map(option => (
+        <SelectOption classes={{ root: 'selectOption' }}>
+          {option.name}
+        </SelectOption>
+      ))
+
+      return (
+        <React.Fragment>
+          <CriteriaGroup>{group}</CriteriaGroup>
+          {options}
+        </React.Fragment>
+      )
+    })
+
+    return <AddCriteriaMenu>{groups}</AddCriteriaMenu>
+  }
+
   render() {
     return (
       <React.Fragment>
@@ -139,16 +161,7 @@ class AddAudienceModal extends React.Component {
           </Grid>
         </Modal>
         <Collapse in={this.state.criteriaMenuOpen} timeout="auto" unmountOnExit>
-          <AddCriteriaMenu>
-            <CriteriaGroup>Demographics</CriteriaGroup>
-            <SelectOption classes={{ root: 'selectOption' }}>Age</SelectOption>
-            <SelectOption classes={{ root: 'selectOption' }}>
-              Children
-            </SelectOption>
-            <SelectOption classes={{ root: 'selectOption' }}>
-              Country
-            </SelectOption>
-          </AddCriteriaMenu>
+          {this.renderCriteriaMenu()}
         </Collapse>
       </React.Fragment>
     )
