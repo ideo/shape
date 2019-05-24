@@ -312,7 +312,6 @@ describe Collection::TestCollection, type: :model do
               end.to change(
                 Dataset::Question, :count
               ).by(2)
-              debugger
               expect(Dataset::Question.first.question_type).to eq(
                 test_collection.question_items.first.question_type,
               )
