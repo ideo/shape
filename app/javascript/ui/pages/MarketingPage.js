@@ -32,9 +32,9 @@ import MarketingMenu from '~/ui/marketing/MarketingMenu'
 import SubscribeEmail from '~/ui/marketing/SubscribeEmail'
 import ProductDescriptions from '~/ui/marketing/ProductDescriptions'
 import BetaSticker from '~/ui/marketing/BetaSticker'
-import marketingFirestoreClient from '~/vendor/firebase/sites/marketing'
+import marketingFirebaseClient from '~/vendor/firebase/clients/marketingFirebaseClient'
 import ReactPlayer from 'react-player'
-// import queryString from 'query-string'
+//import queryString from 'query-string'
 
 class MarketingPage extends React.Component {
   constructor(props) {
@@ -50,15 +50,12 @@ class MarketingPage extends React.Component {
   }
 
   componentDidMount() {
-    marketingFirestoreClient.getObjectFromCollection('home').then(texts => {
-      /* What is the purpose of this block?
-        if (this.props.location.search) {
-          const params = queryString.parse(this.props.location.search)
-          if (params && params.campaign === 'alphapt7') {
-            texts.footerHeader = texts.footerHeader.replace('$5', '$7')
-          }
+    marketingFirebaseClient.getObjectFromCollection('home').then(texts => {
+      if (this.props.location.search) {
+        const params = queryString.parse(this.props.location.search)
+        if (params && params.campaign === 'alphapt7') {
+          texts.footerHeader = texts.footerHeader.replace('$5', '$7')
         }
-      */
       this.setState({ pageTexts: texts })
     })
   }
