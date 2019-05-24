@@ -1,16 +1,20 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { includes, remove } from 'lodash'
 import { Collapse } from '@material-ui/core'
 import { Grid } from '@material-ui/core'
 
 import Audience from '~/stores/jsonApi/Audience'
 import AudienceCriteria from './AudienceCriteria'
 import Button from '~shared/components/atoms/Button'
+import EditPencilIcon from '~/ui/icons/EditPencilIcon'
 import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import Modal from '~/ui/global/modals/Modal'
 import PlusIcon from '~shared/images/icon-plus.svg'
+import TrashLgIcon from '~/ui/icons/TrashLgIcon'
 import v from '~/utils/variables'
+import { FloatRight } from '~/ui/global/styled/layout'
 import {
   FormButton,
   FieldContainer,
@@ -19,6 +23,7 @@ import {
   TextButton,
   TextField,
 } from '~/ui/global/styled/forms'
+import TrashIcon from '~/ui/icons/TrashIcon';
 
 // TODO Position menu on all viewport sizes
 const AddCriteriaMenu = styled.ul`
@@ -43,6 +48,16 @@ const CriteriaGroup = styled.li`
   text-transform: uppercase;
 `
 
+const EditButton = styled.button`
+  height: 22px;
+  width: 22px;
+`
+
+const DeleteButton = styled.button`
+  height: 22px;
+  width: 27px;
+`
+
 @inject('apiStore')
 @observer
 class AddAudienceModal extends React.Component {
@@ -50,6 +65,7 @@ class AddAudienceModal extends React.Component {
     name: '',
     valid: false,
     criteriaMenuOpen: false,
+    selectedCriteria: [],
   }
 
   closeModal = () => {
@@ -84,18 +100,41 @@ class AddAudienceModal extends React.Component {
     this.setState({ name: '', valid: false })
   }
 
+  addCriteria(criteria) {
+    const { selectedCriteria } = this.state
+    selectedCriteria.push(criteria)
+    this.setState({ selectedCriteria })
+    this.closeCriteriaMenu()
+  }
+
+  removeCriteria(criteria) {
+    const { selectedCriteria } = this.state
+    remove(selectedCriteria, c => c === criteria)
+    this.setState({ selectedCriteria })
+  }
+
   validateForm() {
     const valid = this.state.name.length > 0
     this.setState({ valid })
   }
 
   renderCriteriaMenu() {
+    const { selectedCriteria } = this.state
+
     const groups = Object.keys(AudienceCriteria).map(group => {
-      const options = AudienceCriteria[group].map(option => (
-        <SelectOption classes={{ root: 'selectOption' }}>
-          {option.name}
+      const options = AudienceCriteria[group].map(option => {
+        const { name } = option
+
+        return (
+        <SelectOption
+          classes={{ root: 'selectOption' }}
+          disabled={includes(selectedCriteria, name)}
+          onClick={() => this.addCriteria(name)}
+        >
+          {name}
         </SelectOption>
-      ))
+        )
+      })
 
       return (
         <React.Fragment>
@@ -106,6 +145,26 @@ class AddAudienceModal extends React.Component {
     })
 
     return <AddCriteriaMenu>{groups}</AddCriteriaMenu>
+  }
+
+  renderSelectedCriteria() {
+    return this.state.selectedCriteria.map(criteria => (
+      <FieldContainer>
+        <FloatRight>
+          <EditButton>
+            <EditPencilIcon />
+          </EditButton>
+          <DeleteButton onClick={() => this.removeCriteria(criteria)}>
+            <TrashIcon />
+          </DeleteButton>
+        </FloatRight>
+        <Label>{criteria}</Label>
+        <HorizontalDivider
+          color={v.colors.commonMedium}
+          style={{ borderWidth: '0 0 1px 0' }}
+        />
+      </FieldContainer>
+    ))
   }
 
   render() {
@@ -127,6 +186,7 @@ class AddAudienceModal extends React.Component {
               placeholder={'Enter Audience Name…'}
             />
           </FieldContainer>
+          {this.renderSelectedCriteria()}
           <FieldContainer>
             <Label>Targeting Criteria</Label>
             <Button href="#" onClick={this.toggleCriteriaMenu}>
