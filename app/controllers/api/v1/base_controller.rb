@@ -40,7 +40,6 @@ class Api::V1::BaseController < ApplicationController
       'Dataset::External': SerializableDataset,
       'Dataset::NetworkAppMetric': SerializableDataset,
       'Dataset::Question': SerializableDataset,
-      'Dataset::OrgWideQuestion': SerializableDataset,
     )
   end
 

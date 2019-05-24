@@ -79,9 +79,6 @@ class Item
       )
     }
 
-    # You must run Dataset::OrgWideQuestion.setup_new_question_type
-    # for all orgs after adding a new question type,
-    # so all orgs have the dataset
     enum question_type: {
       question_context: 0,
       question_useful: 1,

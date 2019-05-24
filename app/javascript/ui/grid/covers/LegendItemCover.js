@@ -332,7 +332,6 @@ class LegendItemCover extends React.Component {
         {icon && <DatasetIconWrapper>{icon}</DatasetIconWrapper>}
         <DatasetText color={v.colors.black}>{display_name}</DatasetText>
         {!primary &&
-          dataset.class_type !== 'Dataset::OrgWideQuestion' &&
           dataset.selected && (
             <UnselectDataset
               role="button"
