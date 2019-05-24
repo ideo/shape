@@ -284,7 +284,7 @@ describe Collection::TestCollection, type: :model do
                 Item::VideoItem,
                 Item::DataItem,
                 Item::LegendItem,
-                Collection::TestDesign,
+                Collection::TestDesign
               ],
             )
           end
@@ -300,6 +300,23 @@ describe Collection::TestCollection, type: :model do
             end.to change(
               Item::DataItem, :count
             ).by(test_collection.question_items.select { |q| q.question_context? || q.question_useful? }.size)
+          end
+
+          context 'with test audiences' do
+            let(:audience) { create(:audience) }
+            let!(:test_audience) { create(:test_audience, audience: audience, test_collection: test_collection) }
+
+            it 'should create test audience datasets for each question' do
+              expect do
+                test_collection.launch!(initiated_by: user)
+              end.to change(
+                Dataset::Question, :count
+              ).by(2)
+              debugger
+              expect(Dataset::Question.first.question_type).to eq(
+                test_collection.question_items.first.question_type,
+              )
+            end
           end
 
           context 'with open response questions' do
@@ -592,7 +609,7 @@ describe Collection::TestCollection, type: :model do
       expect(test_collection.launch!(initiated_by: user)).to be false
       expect(test_collection.errors).to match_array([
         'Please add an image or video for your idea to question 1',
-        'Please add your idea description to question 2',
+        'Please add your idea description to question 2'
       ])
     end
   end

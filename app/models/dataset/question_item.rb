@@ -29,7 +29,7 @@
 #
 
 class Dataset
-  class Question < Dataset
+  class QuestionItem < Dataset
     before_validation :set_default_timeframe
     belongs_to :question_item,
                foreign_key: 'data_source_id',

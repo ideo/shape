@@ -40,6 +40,7 @@ class Api::V1::BaseController < ApplicationController
       'Dataset::External': SerializableDataset,
       'Dataset::NetworkAppMetric': SerializableDataset,
       'Dataset::Question': SerializableDataset,
+      'Dataset::OrgWideQuestion': SerializableDataset,
     )
   end
 
@@ -50,7 +51,7 @@ class Api::V1::BaseController < ApplicationController
       current_user: current_user || User.new,
       current_ability: current_ability,
       current_api_token: current_api_token,
-      frontend_url_for: lambda { |obj| frontend_url_for(obj) },
+      frontend_url_for: lambda { |obj| frontend_url_for(obj) }
     }
   end
 
@@ -67,7 +68,7 @@ class Api::V1::BaseController < ApplicationController
       first: 1,
       last: collection.total_pages,
       prev: collection.first_page? ? nil : current_page - 1,
-      next: collection.last_page? ? nil : current_page + 1,
+      next: collection.last_page? ? nil : current_page + 1
     }
   end
 
@@ -102,7 +103,7 @@ class Api::V1::BaseController < ApplicationController
     render jsonapi: @collection,
            include: include,
            expose: {
-             current_record: @collection,
+             current_record: @collection
            }
   end
 
