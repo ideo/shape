@@ -90,7 +90,7 @@ export const QuestionText = styled.p`
 export const TextInputHolder = StyledCommentTextarea.extend`
   color: white;
   padding: 6px;
-  width: 100%;
+  width: calc(100% - 12px);
   background-color: ${props =>
     props.hasFocus
       ? props.theme.backgroundColorEditable
