@@ -2,7 +2,6 @@ import { Fragment } from 'react'
 import { Box } from 'reflexbox'
 import { Element as ScrollElement } from 'react-scroll'
 import ReactRouterPropTypes from 'react-router-prop-types'
-import queryString from 'query-string'
 
 import {
   MarketingBack,
@@ -31,41 +30,29 @@ import MarketingMenu from '~/ui/marketing/MarketingMenu'
 import SubscribeEmail from '~/ui/marketing/SubscribeEmail'
 import ProductDescriptions from '~/ui/marketing/ProductDescriptions'
 import BetaSticker from '~/ui/marketing/BetaSticker'
-import db from '~/vendor/firebaseMarketing'
+import marketingFirebaseClient from '~/vendor/firebase/clients/marketingFirebaseClient'
+import queryString from 'query-string'
 
 class MarketingPage extends React.Component {
   constructor(props) {
     super(props)
-    const pageText = {}
+    const pageTexts = {}
 
     this.state = {
-      pageTexts: pageText,
+      pageTexts: pageTexts,
     }
   }
 
   componentDidMount() {
-    const textValues = {}
-    if (db && db.collection) {
-      db.collection('pageText')
-        .get()
-        .then(snapshot => {
-          snapshot.forEach(pageText => {
-            const key = pageText.id
-            const { value } = pageText.data()
-            textValues[key] = value
-          })
-          if (this.props.location.search) {
-            const params = queryString.parse(this.props.location.search)
-            if (params && params.campaign === 'alphapt7') {
-              textValues.footerHeader = textValues.footerHeader.replace(
-                '$5',
-                '$7'
-              )
-            }
-          }
-          this.setState({ pageTexts: textValues })
-        })
-    }
+    marketingFirebaseClient.getObjectFromCollection('home').then(texts => {
+      if (this.props.location.search) {
+        const params = queryString.parse(this.props.location.search)
+        if (params && params.campaign === 'alphapt7') {
+          texts.footerHeader = texts.footerHeader.replace('$5', '$7')
+        }
+      }
+      this.setState({ pageTexts: texts })
+    })
   }
 
   render() {
@@ -80,7 +67,7 @@ class MarketingPage extends React.Component {
             <Center>
               <MarketingShapeLogo />
               <MarketingTagLine>
-                {this.state.pageTexts.tagLine}
+                {this.state.pageTexts.hero && this.state.pageTexts.hero.tagLine}
               </MarketingTagLine>
             </Center>
 
@@ -88,7 +75,8 @@ class MarketingPage extends React.Component {
               <ResponsiveInlineBlock>
                 <a className="get-early-access-header" href="/sign_up">
                   <MarketingCallToAction>
-                    {this.state.pageTexts.buttonTopLeft}
+                    {this.state.pageTexts.hero &&
+                      this.state.pageTexts.hero.buttons[0]}
                   </MarketingCallToAction>
                 </a>
               </ResponsiveInlineBlock>
@@ -116,30 +104,35 @@ class MarketingPage extends React.Component {
           <MarketingFlex align="center" justify="center" wrap w={1}>
             <Box w={1} mb={[10, '4px']}>
               <InvertMarketingH1Bold>
-                {this.state.pageTexts.footerHeader}
+                {this.state.pageTexts.footer &&
+                  this.state.pageTexts.footer.header}
               </InvertMarketingH1Bold>
             </Box>
             <Box w={1}>
               <InvertMarketingH1>
-                {this.state.pageTexts.footerSubHeader}
+                {this.state.pageTexts.footer &&
+                  this.state.pageTexts.footer.subHeader}
               </InvertMarketingH1>
             </Box>
             <Box w={1} pt={[46, 65]} pb={[46, 74]} mb={[10, 0]}>
               <a className="get-early-access-footer" href="/sign_up">
                 <MarketingCallToAction>
-                  {this.state.pageTexts.buttonFooter}
+                  {this.state.pageTexts.footer &&
+                    this.state.pageTexts.footer.buttons[0]}
                 </MarketingCallToAction>
               </a>
             </Box>
 
             <ResponsivePadInlineBlock>
               <InvertedCentered>
-                {this.state.pageTexts.contactHeader}
+                {this.state.pageTexts.contact &&
+                  this.state.pageTexts.contact.header}
               </InvertedCentered>
             </ResponsivePadInlineBlock>
             <ResponsivePadInlineBlock>
               <InvertedCentered>
-                {this.state.pageTexts.contactHeader2}
+                {this.state.pageTexts.contact &&
+                  this.state.pageTexts.contact.header2}
               </InvertedCentered>
             </ResponsivePadInlineBlock>
 
@@ -151,7 +144,8 @@ class MarketingPage extends React.Component {
 
             <Box w={1} mt={(0, 5)} wrap>
               <InvertedFixedWidth>
-                {this.state.pageTexts.subscriptionHeader}
+                {this.state.pageTexts.subscription &&
+                  this.state.pageTexts.subscription.header}
               </InvertedFixedWidth>
             </Box>
 
