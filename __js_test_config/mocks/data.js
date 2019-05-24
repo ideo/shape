@@ -370,6 +370,8 @@ export const fakeCollection = {
   API_batchUpdateCardsWithUndo: jest.fn().mockReturnValue(Promise.resolve({})),
   API_selectDatasetsWithName: jest.fn().mockReturnValue(Promise.resolve({})),
   API_unselectDatasetsWithName: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_removeComparison: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_addComparison: jest.fn().mockReturnValue(Promise.resolve({})),
   checkCurrentOrg: jest.fn(),
   confirmEdit: jest.fn(),
   updateScrollBottom: jest.fn(),
