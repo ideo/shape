@@ -124,6 +124,9 @@ class LegendItemCover extends React.Component {
     uiStore.removeEmptySpaceClickHandler(this.onSearchClose)
   }
 
+  /*
+   * Unique dataset and whether selected or not
+   */
   datasets = ({ selected }) => {
     const { datasets } = this.props.item
     const names = []
@@ -137,6 +140,10 @@ class LegendItemCover extends React.Component {
     })
   }
 
+  /*
+   * Toggle's a dataset that already exists on the legend items and charts
+   * to have it's data_items_dataset.selected property toggled
+   */
   @observable
   @action
   toggleDatasetsWithName = async ({ name, selected } = {}) => {
@@ -168,6 +175,15 @@ class LegendItemCover extends React.Component {
     })
   }
 
+  /*
+   * When de-selecting a comparison with the Unselect button. Will always
+   * pass in a dataset and will either toggle the dataset's selected property
+   * if it's a grouped dataset (for now) or remove the whole data_items_dataset
+   *
+   * Datasets with groupings should always remain on the legend item and
+   * chart items so they appear by default in the add comparisons search menu.
+   * This behavior may change in the future
+   */
   onDeselectComparison = async dataset => {
     const { parent } = this.props.card
     if (dataset.groupings.length) {
@@ -179,6 +195,15 @@ class LegendItemCover extends React.Component {
     parent.API_fetchCards()
   }
 
+  /*
+   * When selecting a comparison with the autocomplete search. Will pass in
+   * either a dataset, in the case of org-wide and test audiences, or a
+   * TestCollection, in the case of the collection search.
+   *
+   * Datasets with groupings should always remain on the legend item and
+   * chart items so they appear by default in the add comparisons search menu.
+   * This behavior may change in the future
+   */
   onSelectComparison = async entity => {
     const { card } = this.props
     if (entity.internalType === 'datasets') {
