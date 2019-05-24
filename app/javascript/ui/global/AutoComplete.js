@@ -308,6 +308,12 @@ AutoComplete.propTypes = {
       value: PropTypes.string,
     })
   ).isRequired,
+  defaultOptions: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string,
+      value: PropTypes.string,
+    })
+  ),
   onOptionSelect: PropTypes.func.isRequired,
   optionSearch: PropTypes.func,
   keepSelectedOptions: PropTypes.bool,
@@ -331,6 +337,7 @@ AutoComplete.defaultProps = {
   placeholder: '',
   value: undefined,
   options: [],
+  defaultOptions: [],
   optionSearch: null,
   menuPlacement: 'bottom',
   keepMenuClosed: false,

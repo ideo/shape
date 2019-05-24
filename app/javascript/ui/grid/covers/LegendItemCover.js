@@ -172,9 +172,9 @@ class LegendItemCover extends React.Component {
     const { parent } = this.props.card
     if (dataset.groupings.length) {
       const { name, selected } = dataset
-      this.toggleDatasetsWithName({ name, selected})
+      this.toggleDatasetsWithName({ name, selected })
     } else {
-      await parent.API_removeComparison(testCollection)
+      await parent.API_removeComparison({ id: dataset.test_collection_id })
     }
     parent.API_fetchCards()
   }
@@ -183,9 +183,9 @@ class LegendItemCover extends React.Component {
     const { card } = this.props
     if (entity.internalType === 'datasets') {
       const { name, selected } = entity
-      this.toggleDatasetsWithName({ name, selected})
+      this.toggleDatasetsWithName({ name, selected })
     } else {
-      await card.parent.API_addComparison(testCollection)
+      await card.parent.API_addComparison({ id: entity.test_collection_id })
     }
     card.parent.API_fetchCards()
   }
@@ -255,13 +255,14 @@ class LegendItemCover extends React.Component {
   }
 
   get renderTestCollectionsSearch() {
-    const { item } = this.props
     // Transform the audience so name is set to display name for the option
     // formatting
-    const selectedDatasetNames = this.datasets({ selected: true }).map(d => d.name)
+    const selectedDatasetNames = this.datasets({ selected: true }).map(
+      d => d.name
+    )
     const unselectedDatasets = this.datasets({ selected: false })
     const formattedOptions = formatForAutocomplete(
-      _.reject(unselectedDatasets, (unselected) =>
+      _.reject(unselectedDatasets, unselected =>
         _.includes(selectedDatasetNames, unselected.name)
       )
     )
