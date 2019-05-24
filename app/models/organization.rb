@@ -210,7 +210,7 @@ class Organization < ApplicationRecord
       %i[handle id],
       :name,
       [:name, 1],
-      [:name, 2],
+      [:name, 2]
     ]
   end
 
@@ -257,7 +257,7 @@ class Organization < ApplicationRecord
     ).first
     subscription_params = {
       organization_id: network_organization.id,
-      plan_id: plan.id,
+      plan_id: plan.id
     }
     if payment_method
       subscription_params[:payment_method_id] = payment_method.id
@@ -371,7 +371,7 @@ class Organization < ApplicationRecord
     CollectionCardBuilder.new(
       params: {
         order: 0,
-        collection_id: user_getting_started.id,
+        collection_id: user_getting_started.id
       },
       parent_collection: user_collection,
       user: user,

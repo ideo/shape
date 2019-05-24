@@ -50,8 +50,7 @@ class Dataset
       if org_grouping.present?
         DEFAULT_ORG_NAME
       elsif test_audience_grouping.present?
-        # TODO: needs actual audience combo name?
-        'test-audience'
+        "test-audience-#{test_audience_grouping['id']}"
       else
         return if test_collection.blank?
         test_collection.name.sub(Collection::TestDesign::COLLECTION_SUFFIX, '')
@@ -101,11 +100,11 @@ class Dataset
     end
 
     def org_grouping
-      groupings.find { |grouping| grouping['type'] > 'Organization' }
+      groupings.find { |grouping| grouping['type'] == 'Organization' }
     end
 
     def test_audience_grouping
-      groupings.find { |grouping| grouping['type'] > 'TestAudience' }
+      groupings.find { |grouping| grouping['type'] == 'TestAudience' }
     end
   end
 end

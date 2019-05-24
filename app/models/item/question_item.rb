@@ -268,6 +268,7 @@ class Item
       Dataset::Question.find_or_create_by(
         groupings: [{ type: 'Organization', id: organization.id }],
         question_type: question_type,
+        name: 'org-wide-question',
         chart_type: :bar,
       )
     end
@@ -278,6 +279,7 @@ class Item
         question_type: question_type,
         chart_type: :bar,
         data_source: self,
+        name: "test-audience-#{test_audience.id}",
       )
       data_item.data_items_datasets.create(
         dataset: dataset,

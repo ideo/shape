@@ -130,6 +130,7 @@ const SelectWrapped = props => {
     classes,
     theme,
     creatable,
+    defaultOptions,
     options,
     optionSearch,
     menuPlacement,
@@ -147,7 +148,7 @@ const SelectWrapped = props => {
     return (
       <AsyncSelect
         loadOptions={optionSearch}
-        defaultOptions
+        defaultOptions={defaultOptions}
         menuPlacement={menuPlacement}
         styles={selectStyles(theme, menuStyles, numOptionsToShow)}
         onMenuClose={onMenuClose}
@@ -250,6 +251,7 @@ class AutoComplete extends React.Component {
     const {
       classes,
       keepSelectedOptions,
+      defaultOptions,
       options,
       optionSearch,
       placeholder,
@@ -272,6 +274,7 @@ class AutoComplete extends React.Component {
             numOptionsToShow,
             multi: true,
             value: keepSelectedOptions ? option : null,
+            defaultOptions,
             options,
             optionSearch,
             onChange: this.handleChange,
@@ -327,6 +330,7 @@ AutoComplete.defaultProps = {
   creatable: false,
   placeholder: '',
   value: undefined,
+  options: [],
   optionSearch: null,
   menuPlacement: 'bottom',
   keepMenuClosed: false,

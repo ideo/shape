@@ -54,7 +54,8 @@ class AutocompleteOption extends React.Component {
     let content = children
     const entity = data.data
     if (entity) {
-      const name = _.trim(entity.name) ? entity.name : entity.email
+      let name =  _.trim(entity.name) ? entity.name : entity.email
+      if (entity.display_name) name = entity.display_name
       content = (
         <Row align="center" noSpacing style={{ height: '38px' }}>
           <span>
