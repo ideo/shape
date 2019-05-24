@@ -1,5 +1,5 @@
 import ProductDescription from '~/ui/marketing/ProductDescription'
-import marketingFirestoreClient from '~/vendor/firebase/sites/marketing'
+import marketingFirebaseClient from '~/vendor/firebase/clients/marketingFirebaseClient'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 
@@ -18,13 +18,10 @@ class ProductDescriptions extends React.PureComponent {
   }
 
   componentDidMount() {
-    marketingFirestoreClient
+    marketingFirebaseClient
       .getObjectFromCollection('productDescriptions')
       .then(productDescriptions => {
-        const descriptionsToArray = Object.keys(productDescriptions)
-          .map(key => Object.assign({ id: key }, productDescriptions[key]))
-          .sort((a, b) => a.order - b.order)
-        this.setState({ products: descriptionsToArray }) // convert firestore collection object to iterable array
+        this.setState({ products: productDescriptions })
       })
   }
 
@@ -44,7 +41,7 @@ class ProductDescriptions extends React.PureComponent {
             />
           ))
         ) : (
-          <span>-</span>
+          <div />
         )}
       </Content>
     )

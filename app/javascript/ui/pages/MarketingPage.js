@@ -30,7 +30,7 @@ import MarketingMenu from '~/ui/marketing/MarketingMenu'
 import SubscribeEmail from '~/ui/marketing/SubscribeEmail'
 import ProductDescriptions from '~/ui/marketing/ProductDescriptions'
 import BetaSticker from '~/ui/marketing/BetaSticker'
-import marketingFirestoreClient from '~/vendor/firebase/sites/marketing'
+import marketingFirebaseClient from '~/vendor/firebase/clients/marketingFirebaseClient'
 import queryString from 'query-string'
 
 class MarketingPage extends React.Component {
@@ -44,7 +44,7 @@ class MarketingPage extends React.Component {
   }
 
   componentDidMount() {
-    marketingFirestoreClient.getObjectFromCollection('home').then(texts => {
+    marketingFirebaseClient.getObjectFromCollection('home').then(texts => {
       if (this.props.location.search) {
         const params = queryString.parse(this.props.location.search)
         if (params && params.campaign === 'alphapt7') {
@@ -76,7 +76,7 @@ class MarketingPage extends React.Component {
                 <a className="get-early-access-header" href="/sign_up">
                   <MarketingCallToAction>
                     {this.state.pageTexts.hero &&
-                      this.state.pageTexts.hero.ctaButtons[0]}
+                      this.state.pageTexts.hero.buttons[0]}
                   </MarketingCallToAction>
                 </a>
               </ResponsiveInlineBlock>
@@ -118,7 +118,7 @@ class MarketingPage extends React.Component {
               <a className="get-early-access-footer" href="/sign_up">
                 <MarketingCallToAction>
                   {this.state.pageTexts.footer &&
-                    this.state.pageTexts.footer.ctaButtons[0]}
+                    this.state.pageTexts.footer.buttons[0]}
                 </MarketingCallToAction>
               </a>
             </Box>
