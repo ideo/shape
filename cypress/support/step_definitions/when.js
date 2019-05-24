@@ -67,6 +67,7 @@ When('I add a link URL', () => {
     }
   )
   cy.locate('LinkCreatorFormButton').click()
+  cy.wait('@apiReplaceCollectionCard')
 })
 
 When('I fill {string} with some text', string => {
@@ -89,7 +90,7 @@ When('I add an open response question', () => {
     .click()
   cy.wait('@apiCreateCollectionCard')
   // have to wait for the flipmove fade-in
-  cy.wait(FLIPMOVE_DELAY + 3000)
+  cy.wait(FLIPMOVE_DELAY + 500)
   cy.locateDataOrClass('.SelectHolderContainer')
     .eq(3)
     .find('.select')
@@ -98,7 +99,8 @@ When('I add an open response question', () => {
     .first()
     .click()
   cy.wait(FLIPMOVE_DELAY)
-  cy.wait('@apiReplaceCollectionCard')
+  cy.wait('@apiArchiveCollectionCards')
+  cy.wait('@apiCreateCollectionCard')
   // have to wait for the flipmove fade-in
   cy.wait(FLIPMOVE_DELAY)
 
@@ -106,6 +108,7 @@ When('I add an open response question', () => {
     .last()
     .click()
     .type('What do you think about pizza?')
+  cy.wait('@apiUpdateItem')
 })
 
 // ----------------------
@@ -118,6 +121,7 @@ When(
       .last()
       .click({ force: true })
     cy.wait('@apiGetCollection')
+    cy.wait('@apiGetCollectionCards')
   }
 )
 

@@ -96,6 +96,7 @@ class Collection
               :completed_and_launchable?,
               proc { |**args|
                 attempt_to_purchase_test_audiences!(
+                  user: args[:initiated_by],
                   test_audience_params: args[:test_audience_params],
                 )
               },
@@ -136,11 +137,17 @@ class Collection
       self
     end
 
-    def attempt_to_purchase_test_audiences!(test_audience_params: nil)
-      return true unless test_audience_params.present?
-      TestAudiencePurchaser.call(self, test_audience_params)
-      return false if errors.present?
-      true
+    def attempt_to_purchase_test_audiences!(user:, test_audience_params: nil)
+      return true if test_audience_params.blank?
+
+      purchaser = PurchaseTestAudience.call(
+        test_collection: self,
+        test_audience_params: test_audience_params,
+        user: user,
+      )
+      return true if purchaser.success?
+      errors.add(:base, purchaser.message) if purchaser.message.present?
+      false
     end
 
     def post_launch_setup!(initiated_by: nil, reopening: false)
