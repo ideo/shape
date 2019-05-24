@@ -25,17 +25,11 @@ import {
 } from '~/ui/global/styled/forms'
 import TrashIcon from '~/ui/icons/TrashIcon';
 
-// TODO Position menu on all viewport sizes
 const AddCriteriaMenu = styled.ul`
   background: ${v.colors.white};
-  box-shadow: 0 0 8px 0 rgba(18, 15, 14, 0.2);
-  left: calc(50% - 300px);
   max-height: 264px;
   overflow-y: scroll;
-  position: fixed;
-  top: calc(50% + 73px);
   width: 250px;
-  z-index: 1500;
 `
 
 const CriteriaGroup = styled.li`
@@ -68,6 +62,9 @@ class AddAudienceModal extends React.Component {
     selectedCriteria: [],
   }
 
+  addCriteraButton = null
+  criteriaMenu = null
+
   closeModal = () => {
     this.closeCriteriaMenu()
     this.props.close()
@@ -78,7 +75,19 @@ class AddAudienceModal extends React.Component {
   }
 
   toggleCriteriaMenu = () => {
+    this.updateCriteriaMenuPosition()
     this.setState({ criteriaMenuOpen: !this.state.criteriaMenuOpen })
+  }
+
+  updateCriteriaMenuPosition = () => {
+    if (!this.addCriteraButton || !this.criteriaMenu) return
+
+    const buttonPosition = this.addCriteraButton.getBoundingClientRect()
+    const top = buttonPosition.top + buttonPosition.height + 8
+    const left = buttonPosition.left + 22
+
+    const baseStyle = 'position: fixed; z-index: 1400; box-shadow: 0 0 8px 0 rgba(18,15,14,0.2);'
+    this.criteriaMenu.style = `${baseStyle} top: ${top}px; left: ${left}px;`
   }
 
   handleNameChange = ev => {
@@ -189,10 +198,12 @@ class AddAudienceModal extends React.Component {
           {this.renderSelectedCriteria()}
           <FieldContainer>
             <Label>Targeting Criteria</Label>
-            <Button href="#" onClick={this.toggleCriteriaMenu}>
-              <PlusIcon width={15} style={{ fill: v.colors.black }} />
-              Add Audience Criteria
-            </Button>
+            <div ref={ref => this.addCriteraButton = ref}>
+              <Button href="#" onClick={this.toggleCriteriaMenu}>
+                <PlusIcon width={15} style={{ fill: v.colors.black }} />
+                Add Audience Criteria
+              </Button>
+            </div>
             <HorizontalDivider
               color={v.colors.commonMedium}
               style={{ borderWidth: '0 0 1px 0' }}
@@ -220,9 +231,11 @@ class AddAudienceModal extends React.Component {
             </Grid>
           </Grid>
         </Modal>
-        <Collapse in={this.state.criteriaMenuOpen} timeout="auto" unmountOnExit>
-          {this.renderCriteriaMenu()}
-        </Collapse>
+        <div ref={ref => this.criteriaMenu = ref}>
+          <Collapse in={this.state.criteriaMenuOpen} timeout="auto" unmountOnExit>
+            {this.renderCriteriaMenu()}
+          </Collapse>
+        </div>
       </React.Fragment>
     )
   }
