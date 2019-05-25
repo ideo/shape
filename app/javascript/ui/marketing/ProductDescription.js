@@ -45,22 +45,6 @@ const Description = styled(MarketingContent)`
   }
 `
 
-// const StyledInnerHTML = styled.div`
-//   text-align: left;
-//   word-wrap: break-word;
-//   line-height: 25px;
-//   font-size: 18px;
-// `
-// StyledInnerHTML.displayName = 'StyledInnerHTML'
-
-// const StyledMarkdown = styled(ReactMarkdown)`
-//   text-align: left;
-//   word-wrap: break-word;
-//   line-height: 25px;
-//   font-size: 18px;
-// `
-// StyledMarkdown.displayName = 'StyledMarkdown'
-
 const ImageDisplay = styled.img`
   object-fit: scale-down;
   max-width: 100%;
@@ -89,14 +73,6 @@ class ProductDescription extends React.PureComponent {
           <Box w={[1, 0.21]} order={[4, this.props.order % 2 === 1 ? 2 : 4]}>
             <Title>{this.props.title}</Title>
             <Description>{this.props.description}</Description>
-            {/* uncomment if descriptionHTML is used to render description
-              <StyledInnerHTML
-                dangerouslySetInnerHTML={{ __html: this.props.descriptionHTML }}
-              />
-            */}
-            {/* uncomment if descriptionMarkdown is used to render description
-              <ReactMarkdown source={this.props.descriptionMarkdown} />
-            */}
           </Box>
 
           <Box w={[null, 0.09]} order={3} />

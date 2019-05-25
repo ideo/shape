@@ -5,6 +5,7 @@ import {
   MarketingContent,
   MarketingH1Bold,
   MarketingFlex,
+  MarketingCallToAction,
 } from '~/ui/global/styled/marketing.js'
 import v from '~/utils/variables'
 
@@ -33,33 +34,17 @@ const Title = styled(MarketingH1Bold)`
     line-height: 40px;
   }
 `
-// const Description = styled(MarketingContent)`
-//   text-align: left;
-//   word-wrap: break-word;
-//   line-height: 25px;
-//   font-size: 18px;
-//
-//   @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
-//     line-height: 1.4em;
-//     font-size: 1.1em;
-//   }
-// `
 
 const StyledInnerHTML = styled.div`
   text-align: left;
   word-wrap: break-word;
   line-height: 25px;
   font-size: 18px;
+  ul {
+    list-style-type: disc;
+  }
 `
 StyledInnerHTML.displayName = 'StyledInnerHTML'
-
-// const StyledMarkdown = styled(ReactMarkdown)`
-//   text-align: left;
-//   word-wrap: break-word;
-//   line-height: 25px;
-//   font-size: 18px;
-// `
-// StyledMarkdown.displayName = 'StyledMarkdown'
 
 const ImageDisplay = styled.img`
   object-fit: scale-down;
@@ -69,8 +54,27 @@ const ImageDisplay = styled.img`
   box-shadow: 0px 2px 16px ${v.colors.commonMedium};
 `
 
+const ProductTemplateCTA = MarketingCallToAction.extend`
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 2.2em;
+  width: 100%;
+`
+
 class ProductTemplate extends React.PureComponent {
+  constructor(props) {
+    super(props)
+    this.renderSampleTemplateInstance = this.renderSampleTemplateInstance.bind(
+      this
+    )
+  }
+
+  renderSampleTemplateInstance = () => {
+    // stubbed out method to instantiate new template for demo
+  }
+
   render() {
+    const descriptionHTML = `${this.props.descriptionHTML}` // needed due to https://reactjs.org/docs/jsx-in-depth.html#string-literals
     return (
       <StyledProductTemplate id={this.props.id} order={this.props.order}>
         <MarketingFlex
@@ -88,9 +92,14 @@ class ProductTemplate extends React.PureComponent {
 
           <Box w={[1, 0.21]} order={[4, this.props.order % 2 === 1 ? 2 : 4]}>
             <Title>{this.props.title}</Title>
-            <StyledInnerHTML
-              dangerouslySetInnerHTML={{ __html: this.props.descriptionHTML }}
-            />
+            {
+              <StyledInnerHTML
+                dangerouslySetInnerHTML={{ __html: descriptionHTML }}
+              />
+            }
+            <ProductTemplateCTA onClick={this.renderSampleTemplateInstance}>
+              {this.props && this.props.buttons[0]}
+            </ProductTemplateCTA>
           </Box>
 
           <Box w={[null, 0.09]} order={3} />
@@ -114,6 +123,7 @@ ProductTemplate.propTypes = {
   descriptionMarkdown: PropTypes.string,
   descriptionHTML: PropTypes.string,
   imageUrl: PropTypes.string.isRequired,
+  buttons: PropTypes.array.isRequired,
 }
 
 ProductTemplate.defaultProps = {

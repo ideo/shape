@@ -19,7 +19,6 @@ import {
   MarketingTagLine,
   MarketingVideoLink,
   MarketingShapeLogo,
-  MarketingVideoContainer,
   MarketingVideoWrapper,
   // MarketingBetaSticker,
   MarketingCallToAction,
@@ -35,7 +34,7 @@ import ProductDescriptions from '~/ui/marketing/ProductDescriptions'
 import BetaSticker from '~/ui/marketing/BetaSticker'
 import marketingFirebaseClient from '~/vendor/firebase/clients/marketingFirebaseClient'
 import ReactPlayer from 'react-player'
-//import queryString from 'query-string'
+import queryString from 'query-string'
 
 class MarketingPage extends React.Component {
   constructor(props) {
@@ -57,6 +56,7 @@ class MarketingPage extends React.Component {
         if (params && params.campaign === 'alphapt7') {
           texts.footerHeader = texts.footerHeader.replace('$5', '$7')
         }
+      }
       this.setState({ pageTexts: texts })
     })
   }
@@ -86,18 +86,17 @@ class MarketingPage extends React.Component {
                 {pageTexts.hero && pageTexts.hero.tagLine}
               </MarketingTagLine>
             </Center>
-            <Center>
-              <MarketingVideoContainer>
-                <MarketingVideoWrapper videoPlaying={videoPlaying}>
-                  <ReactPlayer
-                    url={pageTexts.hero && pageTexts.hero.videoUrl}
-                    height={videoPlaying ? VideoDimensions.height : '0px'}
-                    width={videoPlaying ? VideoDimensions.width : '0px'}
-                    playing={videoPlaying}
-                  />
-                </MarketingVideoWrapper>
-              </MarketingVideoContainer>
-            </Center>
+
+            <MarketingFlex align="center" justify="center" wrap w={1}>
+              <MarketingVideoWrapper videoPlaying={videoPlaying}>
+                <ReactPlayer
+                  url={pageTexts.hero && pageTexts.hero.videoUrl}
+                  height={videoPlaying ? VideoDimensions.height : '0px'}
+                  width={videoPlaying ? VideoDimensions.width : '0px'}
+                  playing={videoPlaying}
+                />
+              </MarketingVideoWrapper>
+            </MarketingFlex>
 
             <Center>
               <MarketingHeroButtonContainer>

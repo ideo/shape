@@ -7,22 +7,26 @@ import {
   InvertMarketingLink,
   InvertMarketingH1,
   InvertMarketingH1Bold,
+  MarketingProductPageHeroTitle,
+  MarketingProductPageHeroSubtitle,
+  MarketingProductPageHeroVideoCaption,
   InvertMarketingLinkMail,
   MarketingFlex,
-  ResponsiveInlineBlock,
+  MarketingStandaloneVideoWrapper,
+  MarketingCallToAction,
   ResponsivePadInlineBlock,
   DesktopSpacer,
   Center,
-  MarketingCallToAction,
-  MarketingGradientTop,
   InvertedCentered,
   InvertedFixedWidth,
+  VideoDimensions,
 } from '~/ui/global/styled/marketing.js'
 import poweredByIdeo from '~/assets/Powered-by-IDEO-Inverted.png'
 import MarketingMenu from '~/ui/marketing/MarketingMenu'
 import SubscribeEmail from '~/ui/marketing/SubscribeEmail'
 import ProductTemplates from '~/ui/marketing/ProductTemplates'
-import marketingFirestoreClient from '~/vendor/firebase/sites/marketing'
+import marketingFirebaseClient from '~/vendor/firebase/clients/marketingFirebaseClient'
+import ReactPlayer from 'react-player'
 
 class ProductTemplatesPage extends React.Component {
   constructor(props) {
@@ -33,36 +37,60 @@ class ProductTemplatesPage extends React.Component {
   }
 
   componentDidMount() {
-    marketingFirestoreClient
-      .getObjectFromCollection('/product/pages/feedback')
+    marketingFirebaseClient
+      .getObjectFromCollection('/product/pages/templates') // query subcollection
       .then(texts => {
         this.setState({ pageTexts: texts })
       })
   }
 
   render() {
+    const { pageTexts } = this.state
     return (
       <Fragment>
         <MarketingBack>
-          <MarketingGradientTop>
-            <ScrollElement name="TopAnchor" />
-            <MarketingMenu />
-            <Center>
-              <ResponsiveInlineBlock>
-                <a className="get-early-access-header" href="/sign_up">
-                  <MarketingCallToAction />
-                </a>
-              </ResponsiveInlineBlock>
-            </Center>
-            {/*  -- VIDEO BUTTON DISABLED -- not ready yet
-            <Center>
-              <ResponsiveInlineBlock>
-                <a href="/sign_up">
-                  <MarketingVideoLink>{this.state.pageTexts.buttonTopRight}</MarketingVideoLink>
-                </a>
-              </ResponsiveInlineBlock>
-            </Center> */}
-          </MarketingGradientTop>
+          <MarketingMenu />
+          <MarketingFlex align="center" justify="center" wrap w={1}>
+            <Box w={1} mt={[12, 28, 34]} pr={[3, 0, 0]} pl={[3, 0, 0]}>
+              <MarketingProductPageHeroTitle>
+                {pageTexts.hero && pageTexts.hero.title}
+              </MarketingProductPageHeroTitle>
+            </Box>
+            <Box
+              w={[1, 0.6, 0.32]}
+              mt={[12, 28, 34]}
+              pr={[3, 0, 0]}
+              pl={[3, 0, 0]}
+            >
+              <MarketingProductPageHeroSubtitle>
+                {pageTexts.hero && pageTexts.hero.subTitle}
+              </MarketingProductPageHeroSubtitle>
+            </Box>
+          </MarketingFlex>
+          <MarketingFlex align="center" justify="center" wrap w={1}>
+            <Box mt={[12, 28, 34]}>
+              <MarketingStandaloneVideoWrapper>
+                <ReactPlayer
+                  url={pageTexts.hero && pageTexts.hero.videoUrl}
+                  height={VideoDimensions.height}
+                  width={VideoDimensions.width}
+                  playing={false}
+                />
+              </MarketingStandaloneVideoWrapper>
+            </Box>
+          </MarketingFlex>
+          <MarketingFlex align="center" justify="center" wrap w={1}>
+            <Box
+              w={[1, 0.6, 0.32]}
+              mt={[8, 28, 34]}
+              pr={[3, 0, 0]}
+              pl={[3, 0, 0]}
+            >
+              <MarketingProductPageHeroVideoCaption>
+                {pageTexts.hero && pageTexts.hero.videoCaption}
+              </MarketingProductPageHeroVideoCaption>
+            </Box>
+          </MarketingFlex>
 
           <MarketingFlex align="center" justify="center" wrap w={1}>
             <Box w={1} justify="center">
@@ -76,22 +104,32 @@ class ProductTemplatesPage extends React.Component {
           <ScrollElement name="FooterAnchor" />
           <MarketingFlex align="center" justify="center" wrap w={1}>
             <Box w={1} mb={[10, '4px']}>
-              <InvertMarketingH1Bold />
+              <InvertMarketingH1Bold>
+                {pageTexts.footer && pageTexts.footer.header}
+              </InvertMarketingH1Bold>
             </Box>
             <Box w={1}>
-              <InvertMarketingH1 />
+              <InvertMarketingH1>
+                {pageTexts.footer && pageTexts.footer.subHeader}
+              </InvertMarketingH1>
             </Box>
             <Box w={1} pt={[46, 65]} pb={[46, 74]} mb={[10, 0]}>
               <a className="get-early-access-footer" href="/sign_up">
-                <MarketingCallToAction />
+                <MarketingCallToAction>
+                  {pageTexts.footer && pageTexts.footer.buttons[0]}
+                </MarketingCallToAction>
               </a>
             </Box>
 
             <ResponsivePadInlineBlock>
-              <InvertedCentered />
+              <InvertedCentered>
+                {pageTexts.contact && pageTexts.contact.header}
+              </InvertedCentered>
             </ResponsivePadInlineBlock>
             <ResponsivePadInlineBlock>
-              <InvertedCentered />
+              <InvertedCentered>
+                {pageTexts.contact && pageTexts.contact.header2}
+              </InvertedCentered>
             </ResponsivePadInlineBlock>
 
             <Box w={1}>
@@ -101,7 +139,9 @@ class ProductTemplatesPage extends React.Component {
             </Box>
 
             <Box w={1} mt={(0, 5)} wrap>
-              <InvertedFixedWidth />
+              <InvertedFixedWidth>
+                {pageTexts.subscription && pageTexts.subscription.header}
+              </InvertedFixedWidth>
             </Box>
 
             <Box w={1} mt={[8, 0]}>

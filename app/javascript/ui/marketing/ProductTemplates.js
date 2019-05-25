@@ -1,5 +1,5 @@
 import ProductTemplate from '~/ui/marketing/ProductTemplate'
-import marketingFirestoreClient from '~/vendor/firebase/sites/marketing'
+import marketingFirebaseClient from '~/vendor/firebase/clients/marketingFirebaseClient'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 
@@ -18,7 +18,7 @@ export default class ProductTemplates extends React.PureComponent {
   }
 
   componentDidMount() {
-    marketingFirestoreClient
+    marketingFirebaseClient
       .getObjectFromCollection('productTemplates')
       .then(productTemplates => {
         const templatesToArray = Object.keys(productTemplates)
@@ -43,6 +43,7 @@ export default class ProductTemplates extends React.PureComponent {
               descriptionMarkdown={t.descriptionMarkdown}
               descriptionHTML={t.descriptionHTML}
               imageUrl={t.imageUrl}
+              buttons={t.buttons}
             />
           ))
         ) : (
