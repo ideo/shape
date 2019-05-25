@@ -358,6 +358,16 @@ export const SelectOption = styled(MenuItem)`
 `
 SelectOption.displayName = 'StyledSelectOption'
 
+export const CheckboxSelectOption = styled(MenuItem)`
+  &.selectOption {
+    display: block;
+    height: auto;
+    padding: 0 10px 0 0;
+    border-top: 1px solid ${v.colors.commonMedium};
+  }
+`
+CheckboxSelectOption.displayName = 'StyledCheckboxSelectOption'
+
 /** @component */
 export const StyledAutosizeInput = styled(AutosizeInput)`
   margin-bottom: 0.5rem;

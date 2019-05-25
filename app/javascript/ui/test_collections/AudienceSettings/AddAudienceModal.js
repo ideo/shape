@@ -17,6 +17,7 @@ import v from '~/utils/variables'
 import { FloatRight } from '~/ui/global/styled/layout'
 import {
   Checkbox,
+  CheckboxSelectOption,
   FormButton,
   FieldContainer,
   Label,
@@ -216,13 +217,13 @@ class AddAudienceModal extends React.Component {
 
     return selectedCriteria.map(criteria => {
       const options = criteriaOptions[criteria].options.map(option => (
-        <SelectOption
+        <CheckboxSelectOption
           key={option}
           classes={{ root: 'selectOption' }}
         >
           <Checkbox checked={false} />
           {option}
-        </SelectOption>
+        </CheckboxSelectOption>
       ))
 
       const menuOpen = openMenus[criteria]
@@ -234,6 +235,7 @@ class AddAudienceModal extends React.Component {
               open={menuOpen}
               onOpen={() => this.openMenu(criteria)}
               onClose={() => this.closeMenu(criteria)}
+              MenuProps={{ style: { maxHeight: '366px' }}}
               multiple
               value={[]}
               style={{ visibility: 'hidden'}}
