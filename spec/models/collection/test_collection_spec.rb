@@ -312,8 +312,8 @@ describe Collection::TestCollection, type: :model do
               end.to change(
                 Dataset::Question, :count
               ).by(2)
-              expect(Dataset::Question.first.question_type).to eq(
-                test_collection.question_items.first.question_type,
+              expect(Dataset::Question.last.groupings).to eq(
+                [{ 'id' => 1, 'type' => 'TestAudience' }],
               )
             end
           end

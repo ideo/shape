@@ -10,7 +10,7 @@ RSpec.describe DataReport::QuestionItem, type: :service do
         { column: 1, value: 0, percentage: 0 },
         { column: 2, value: 0, percentage: 0 },
         { column: 3, value: 0, percentage: 0 },
-        { column: 4, value: 0, percentage: 0 },
+        { column: 4, value: 0, percentage: 0 }
       ]
     end
     let(:question_item) { create(:question_item) }
@@ -52,7 +52,7 @@ RSpec.describe DataReport::QuestionItem, type: :service do
               { column: 1, value: 1, percentage: 100 },
               { column: 2, value: 0, percentage: 0 },
               { column: 3, value: 0, percentage: 0 },
-              { column: 4, value: 0, percentage: 0 },
+              { column: 4, value: 0, percentage: 0 }
             ],
           )
         end
@@ -81,7 +81,7 @@ RSpec.describe DataReport::QuestionItem, type: :service do
               { column: 1, value: 6, percentage: 100 },
               { column: 2, value: 0, percentage: 0 },
               { column: 3, value: 0, percentage: 0 },
-              { column: 4, value: 0, percentage: 0 },
+              { column: 4, value: 0, percentage: 0 }
             ],
           )
         end
@@ -114,13 +114,13 @@ RSpec.describe DataReport::QuestionItem, type: :service do
       end
 
       describe '#call' do
-        it 'returns org-wide data' do
+        it 'returns test audience data' do
           expect(DataReport::QuestionItem.call(dataset: dataset)).to match_array(
             [
               { column: 1, value: 6, percentage: 100 },
               { column: 2, value: 0, percentage: 0 },
               { column: 3, value: 0, percentage: 0 },
-              { column: 4, value: 0, percentage: 0 },
+              { column: 4, value: 0, percentage: 0 }
             ],
           )
         end
