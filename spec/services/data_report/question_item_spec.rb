@@ -97,8 +97,8 @@ RSpec.describe DataReport::QuestionItem, type: :service do
     end
 
     context 'filtering by test audience' do
-      let(:audience) { create(:audience, organization: organization) }
-      let(:test_audience) { create(:test_audience, audience: audience, test_collection: test_collection) }
+      let!(:audience) { create(:audience, organization: organization) }
+      let!(:test_audience) { create(:test_audience, audience: audience, test_collection: test_collection) }
 
       let!(:survey_response) { create(:survey_response, test_collection: test_collection, test_audience: test_audience) }
       let!(:question_item) { survey_response.question_items.select(&:question_useful?).first }
@@ -113,17 +113,20 @@ RSpec.describe DataReport::QuestionItem, type: :service do
                groupings: [{ type: 'TestAudience', id: test_audience.id }])
       end
 
-      describe '#call' do
-        it 'returns test audience data' do
-          expect(DataReport::QuestionItem.call(dataset: dataset)).to match_array(
-            [
-              { column: 1, value: 6, percentage: 100 },
-              { column: 2, value: 0, percentage: 0 },
-              { column: 3, value: 0, percentage: 0 },
-              { column: 4, value: 0, percentage: 0 }
-            ],
-          )
-        end
+      before do
+        survey_response.update_attribute(:status, :completed)
+      end
+
+      it 'returns test audience data' do
+        debugger
+        expect(DataReport::QuestionItem.call(dataset: dataset)).to match_array(
+          [
+            { column: 1, value: 1, percentage: 100 },
+            { column: 2, value: 0, percentage: 0 },
+            { column: 3, value: 0, percentage: 0 },
+            { column: 4, value: 0, percentage: 0 }
+          ],
+        )
       end
     end
   end

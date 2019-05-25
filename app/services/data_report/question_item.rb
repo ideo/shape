@@ -67,9 +67,12 @@ module DataReport
         org_survey_answers
       elsif @dataset.groupings.present? &&
             @dataset.groupings.first['type'] == 'TestAudience'
-        question_item.completed_survey_answers.where(
-          test_audience_id: @dataset.groupings.first['id'],
-        )
+        question_item.completed_survey_answers
+                     .where(
+                       SurveyResponse.arel_table[:test_audience_id].eq(
+                         @dataset.groupings.first['id'],
+                       ),
+                     )
       else
         question_item.completed_survey_answers
       end
