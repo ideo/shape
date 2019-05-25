@@ -217,6 +217,7 @@ class AddAudienceModal extends React.Component {
     return selectedCriteria.map(criteria => {
       const options = criteriaOptions[criteria].options.map(option => (
         <SelectOption
+          key={option}
           classes={{ root: 'selectOption' }}
         >
           <Checkbox checked={false} />
