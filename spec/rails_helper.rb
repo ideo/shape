@@ -127,6 +127,15 @@ RSpec.configure do |config|
     allow(FirestoreClient).to receive(:new).and_return(fake_client)
   end
 
+  config.before(:each) do
+    fake_twilio = double('twilio')
+    fake_methods = Hashie::Mash.new(
+      create: {},
+    )
+    allow(fake_twilio).to receive(:messages).and_return(fake_methods)
+    allow(Twilio::REST::Client).to receive(:new).and_return(fake_twilio)
+  end
+
   config.after(:each) do
     DatabaseCleaner.clean
     Warden.test_reset!

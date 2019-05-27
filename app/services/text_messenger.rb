@@ -1,7 +1,7 @@
 class TextMessenger < SimpleService
   attr_reader :errors
 
-  def initialize(message, phone_number)
+  def initialize(message:, phone_number:)
     @message = message
     @phone_number = phone_number
     @errors = []
@@ -22,7 +22,7 @@ class TextMessenger < SimpleService
     @client.messages.create(
       from: ENV['TWILIO_PHONE_NUMBER'],
       to: @phone_number,
-      body: message,
+      body: @message,
     )
   end
 end
