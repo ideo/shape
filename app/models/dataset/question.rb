@@ -100,10 +100,13 @@ class Dataset
     end
 
     def org_grouping
+      return false if groupings.nil?
       groupings.find { |grouping| grouping['type'] == 'Organization' }
     end
 
     def test_audience_grouping
+      return false if groupings.nil?
+      groupings.find { |grouping| grouping['type'] == 'Organization' }
       groupings.find { |grouping| grouping['type'] == 'TestAudience' }
     end
   end
