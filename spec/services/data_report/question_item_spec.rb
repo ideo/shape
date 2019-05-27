@@ -118,7 +118,6 @@ RSpec.describe DataReport::QuestionItem, type: :service do
       end
 
       it 'returns test audience data' do
-        debugger
         expect(DataReport::QuestionItem.call(dataset: dataset)).to match_array(
           [
             { column: 1, value: 1, percentage: 100 },
