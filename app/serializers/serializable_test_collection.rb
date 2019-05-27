@@ -3,7 +3,7 @@ class SerializableTestCollection < SerializableSimpleCollection
 
   has_many :test_audiences
 
-  attributes :test_status
+  attributes :test_status, :test_closed_at
 
   has_many :question_cards do
     data do
@@ -17,5 +17,9 @@ class SerializableTestCollection < SerializableSimpleCollection
 
   attribute :is_submission_test do
     @object.submission_test?
+  end
+
+  attribute :gives_incentive do
+    @object.try(:gives_incentive?)
   end
 end

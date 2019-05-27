@@ -272,6 +272,9 @@ export const Select = styled(MuiSelect)`
     padding-bottom: 0;
     padding-top: 0;
     vertical-align: baseline;
+    &.bottomPadded {
+      padding-bottom: 7px;
+    }
     &:focus {
       background-color: transparent;
     }
@@ -411,17 +414,10 @@ export const CommentForm = styled.form`
     ${v.colors.secondaryDark} 10%,
     ${v.colors.secondaryDark} 100%
   );
-  button {
-    position: absolute;
-    right: 18px;
-    top: 14px;
-    width: 18px;
-    height: 18px;
-  }
   .textarea-input {
     background: ${v.colors.secondaryMedium};
     font-family: ${v.fonts.sans};
-    width: 100%;
+    padding: 10px;
   }
 `
 CommentForm.displayName = 'CommentForm'
@@ -456,3 +452,36 @@ export const CommentTextarea = props => (
     <TextareaAutosize {...props} />
   </StyledCommentTextarea>
 )
+
+export const CommentEnterButton = styled.button`
+  position: absolute;
+  right: 10px;
+  top: 7px;
+  width: 30px;
+  height: 30px;
+  background-color: ${v.colors.secondaryDark};
+  border-radius: 50%;
+  padding: 6px;
+
+  svg {
+    transform: scale(1, -1);
+  }
+
+  &:hover {
+    filter: brightness(90%);
+  }
+
+  ${props =>
+    !props.focused &&
+    `
+    background: transparent;
+    border: 1px solid ${v.colors.commonMedium};
+    color: ${v.colors.commonMedium};
+
+    &:hover {
+      background: transparent;
+      border: 1px solid ${v.colors.commonMedium};
+      color: ${v.colors.commonMedium};
+    }
+  `};
+`

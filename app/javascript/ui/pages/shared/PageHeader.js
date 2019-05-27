@@ -20,6 +20,7 @@ import { StyledHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import { SubduedHeading1 } from '~/ui/global/styled/typography'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import { FormButton } from '~/ui/global/styled/forms'
+import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
 import v from '~/utils/variables'
 import routeToLogin from '~/utils/routeToLogin'
 /* global IdeoSSO */
@@ -177,6 +178,8 @@ class PageHeader extends React.Component {
       icon = <SubmissionBoxIconLg />
     } else if (record.launchableTestId) {
       icon = <TestCollectionIcon />
+    } else if (record.isBoard) {
+      icon = <FoamcoreBoardIcon large />
     }
     if (icon) {
       return <IconHolder align="right">{icon}</IconHolder>
@@ -191,33 +194,17 @@ class PageHeader extends React.Component {
 
   get launchTestButton() {
     const { record, uiStore } = this.props
-    if (
-      record.can_edit_content &&
-      (record.isDraftTest || record.isClosedTest)
-    ) {
-      if (record.isDraftTest) {
-        return (
-          <HeaderFormButton
-            onClick={record.launchTest}
-            disabled={uiStore.launchButtonLoading}
-          >
-            {record.is_submission_box_template_test
-              ? 'Launch Tests'
-              : 'Get Feedback'}
-          </HeaderFormButton>
-        )
-      } else if (record.isClosedTest) {
-        return (
-          <HeaderFormButton
-            onClick={record.reopenTest}
-            color={v.colors.transparent}
-            width="200"
-            disabled={uiStore.launchButtonLoading}
-          >
-            Re-open Feedback
-          </HeaderFormButton>
-        )
-      }
+    if (record.can_edit_content && record.isClosedTest) {
+      return (
+        <HeaderFormButton
+          onClick={record.reopenTest}
+          color={v.colors.transparent}
+          width="200"
+          disabled={uiStore.launchButtonLoading}
+        >
+          Re-open Feedback
+        </HeaderFormButton>
+      )
     }
     if (this.isCurrentlyHiddenSubmission) {
       return (

@@ -200,6 +200,10 @@ class GridCardBlank extends React.Component {
     // if the BCT mounts but then immediately gets closed via a uiStore action,
     // we check to not to make the drop pane to prevent it throwing an error
     setTimeout(this.createDropPane, 500)
+
+    if (this.props.preselected === 'text') {
+      this.createTextItem()
+    }
   }
 
   componentWillUnmount() {
@@ -381,7 +385,7 @@ class GridCardBlank extends React.Component {
       // have to re-create the DropPane
       this.createDropPane()
     } else {
-      this.props.uiStore.closeBlankContentTool()
+      uiStore.closeBlankContentTool()
     }
   }
 

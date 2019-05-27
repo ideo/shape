@@ -1,3 +1,31 @@
+# == Schema Information
+#
+# Table name: activities
+#
+#  id               :bigint(8)        not null, primary key
+#  action           :integer
+#  content          :text
+#  destination_type :string
+#  source_type      :string
+#  target_type      :string
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  actor_id         :bigint(8)
+#  destination_id   :bigint(8)
+#  organization_id  :bigint(8)
+#  source_id        :bigint(8)
+#  target_id        :bigint(8)
+#
+# Indexes
+#
+#  index_activities_on_actor_id                             (actor_id)
+#  index_activities_on_created_at                           (created_at)
+#  index_activities_on_destination_type_and_destination_id  (destination_type,destination_id)
+#  index_activities_on_organization_id                      (organization_id)
+#  index_activities_on_source_type_and_source_id            (source_type,source_id)
+#  index_activities_on_target_type_and_target_id            (target_type,target_id)
+#
+
 class Activity < ApplicationRecord
   belongs_to :actor, class_name: 'User'
   has_many :activity_subjects
@@ -42,6 +70,7 @@ class Activity < ApplicationRecord
     duplicated: 13,
     archived_from_template: 14,
     viewed: 15,
+    edited_comment: 16,
   }
 
   def self.participant_actions

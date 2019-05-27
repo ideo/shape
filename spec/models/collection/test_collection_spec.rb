@@ -63,11 +63,19 @@ describe Collection::TestCollection, type: :model do
   end
 
   describe '#create_uniq_survey_response' do
+    let!(:test_audience) { create(:test_audience, test_collection: test_collection) }
+
     it 'should create a survey response with a unique session_uid' do
       expect do
         test_collection.create_uniq_survey_response
       end.to change(test_collection.survey_responses, :count).by(1)
       expect(test_collection.survey_responses.last.session_uid).not_to be nil
+    end
+
+    it 'should accept the passed in test_audience_id' do
+      expect {
+        test_collection.create_uniq_survey_response(test_audience_id: test_audience.id)
+      }.to change(test_audience.survey_responses, :count).by(1)
     end
   end
 
@@ -281,6 +289,7 @@ describe Collection::TestCollection, type: :model do
               .map { |card| card.record.class },
             ).to eq(
               [
+                Item::VideoItem,
                 Item::ChartItem,
                 Collection::TestDesign,
               ],
@@ -319,6 +328,53 @@ describe Collection::TestCollection, type: :model do
             end
           end
 
+          context 'with test_audience_params' do
+            it 'should call PurchaseTestAudience' do
+              params = { some: 'params' }
+              expect(PurchaseTestAudience).to receive(:call).with(
+                test_collection: test_collection,
+                test_audience_params: params,
+                user: user,
+              )
+              test_collection.launch!(initiated_by: user, test_audience_params: params)
+            end
+          end
+
+          context 'without targeted audience' do
+            it 'should not send a notification email' do
+              expect(TestCollectionMailer).not_to receive(:notify_launch)
+              test_collection.launch!(initiated_by: user)
+            end
+          end
+
+          context 'with targeted audience' do
+            it 'should send a notification email' do
+              audience = create(:audience)
+              create(:test_audience, audience: audience, test_collection: test_collection, price_per_response: 1)
+
+              deliver_double = double('TestCollectionMailer')
+              allow(TestCollectionMailer).to receive(:notify_launch).and_return(deliver_double)
+              allow(deliver_double).to receive(:deliver_later).and_return(true)
+
+              ENV['ENABLE_ZENDESK_FOR_TEST_LAUNCH'] = '1'
+
+              expect(TestCollectionMailer).to receive(:notify_launch).with(test_collection.id)
+              test_collection.launch!(initiated_by: user)
+            end
+          end
+
+          context 'with media questions' do
+            # "completed" will have one video item
+            let!(:test_collection) { create(:test_collection, :completed) }
+            let(:first_card) { test_collection.collection_cards.first }
+
+            it 'creates a media item link for the media item' do
+              test_collection.launch!(initiated_by: user)
+              expect(first_card.is_a?(CollectionCard::Link)).to be true
+              expect(first_card.item).to eq test_collection.test_design.items.first
+            end
+          end
+
           describe '#serialized_for_test_survey' do
             before do
               test_collection.launch!(initiated_by: user)
@@ -350,9 +406,10 @@ describe Collection::TestCollection, type: :model do
           test_collection.launch!(initiated_by: user)
         end
 
-        it 'should set status as closed' do
+        it 'should set status as closed and set closed_at datetime' do
           expect(test_collection.close!).to be true
           expect(test_collection.closed?).to be true
+          expect(test_collection.test_closed_at).to be_within(1.second).of Time.current
         end
       end
 
@@ -367,8 +424,8 @@ describe Collection::TestCollection, type: :model do
           expect(test_collection.live?).to be true
         end
 
-        it 'should call the launch_test! method on itself with `reopening` param' do
-          expect(test_collection).to receive(:launch_test!).with(initiated_by: user, reopening: true)
+        it 'should call the post_launch_setup! method on itself with `reopening` param' do
+          expect(test_collection).to receive(:post_launch_setup!).with(initiated_by: user, reopening: true)
           test_collection.reopen!(initiated_by: user)
         end
       end
@@ -464,9 +521,14 @@ describe Collection::TestCollection, type: :model do
       it 'should find all submissions and close their tests' do
         expect(submission_test.test_status).to eq 'live'
         expect(submission.reload.submission_attrs['test_status']).to eq 'live'
+
         test_collection.close!
+
+        expect(test_collection.test_closed_at).to be_within(1.second).of Time.current
+
         submission.reload
         submission_test.reload
+
         expect(submission.submission_attrs['test_status']).to eq 'closed'
         expect(submission_test.test_status).to eq 'closed'
       end

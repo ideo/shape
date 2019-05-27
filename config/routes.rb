@@ -113,11 +113,7 @@ Rails.application.routes.draw do
         end
         resources :roles, only: %i[destroy]
       end
-      resources :comments do
-        member do
-          delete '', action: 'destroy'
-        end
-      end
+      resources :comments
       resources :comment_threads, only: %i[index show create subscribe unsubscribe] do
         resources :comments, only: %i[index create]
         member do
@@ -147,17 +143,24 @@ Rails.application.routes.draw do
         # not shallow because we always want to look up survey_response by session_uid
         resources :question_answers, only: %i[create update]
       end
+
       resources :audiences, only: %i[index show]
+
+      namespace :admin do
+        resources :users, only: %i[index destroy create]
+      end
     end
   end
 
   resources :tests, only: %i[show] do
-    member do
-      get 'token_auth'
-    end
     collection do
+      get 't/:token', to: 'tests#token_auth'
       get 'completed'
     end
+  end
+
+  namespace :admin do
+    root to: 'dashboard#index'
   end
 
   authenticate :user, ->(u) { Rails.env.development? || u.has_cached_role?(Role::SUPER_ADMIN) } do

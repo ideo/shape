@@ -41,9 +41,14 @@ describe Api::V1::CommentsController, type: :request, json: true, auth: true do
       user.add_role(Role::EDITOR, comment_thread.record)
     end
 
-    it 'returns a 204 no content' do
+    it 'returns a 200' do
       post(path, params: params)
-      expect(response.status).to eq(204)
+      expect(response.status).to eq(200)
+    end
+
+    it 'matches JSON schema for comment' do
+      post(path, params: params)
+      expect(json['data']['attributes']).to match_json_schema('comment')
     end
 
     it 'creates a message in the thread' do
@@ -68,7 +73,7 @@ describe Api::V1::CommentsController, type: :request, json: true, auth: true do
     end
   end
 
-  describe 'DELETE destroy' do
+  describe 'DELETE #destroy' do
     let!(:comment_thread) { create(:item_comment_thread) }
     let!(:comment) { create(:comment, comment_thread: comment_thread, author: user) }
     let(:path) { "/api/v1/comments/#{comment.id}" }
@@ -83,6 +88,32 @@ describe Api::V1::CommentsController, type: :request, json: true, auth: true do
       }.to change(Comment, :count).from(1).to(0)
       expect(response.status).to eq(204)
     end
+  end
 
+  describe 'PATCH #update' do
+    let!(:comment_thread) { create(:item_comment_thread) }
+    let!(:comment) { create(:comment, comment_thread: comment_thread, author: user) }
+    let(:path) { "/api/v1/comments/#{comment.id}" }
+    let(:params) {
+      json_api_params(
+        'comments',
+        message: 'edited comment',
+      )
+    }
+
+    before do
+      user.add_role(Role::EDITOR, comment_thread.record)
+    end
+
+    it 'returns a 200' do
+      patch(path, params: params)
+      expect(response.status).to eq(200)
+    end
+
+    it 'updates the content' do
+      expect(comment.message).not_to eq('edited comment')
+      patch(path, params: params)
+      expect(comment.reload.message).to eq('edited comment')
+    end
   end
 end

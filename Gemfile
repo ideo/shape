@@ -118,6 +118,10 @@ gem 'phony'
 # sending sms messages
 gem "twilio-ruby"
 
+# Nice patterns for service objects
+gem 'interactor'
+gem 'interactor-schema'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
@@ -136,6 +140,8 @@ group :development, :test do
 end
 
 group :development do
+  # annotate models with schema attributes
+  gem 'annotate' # https://github.com/ctran/annotate_models
   # Access an IRB console on exception pages or by using <%= console %> anywhere in the code.
   gem 'web-console', '>= 3.3.0'
   gem 'listen', '>= 3.0.5', '< 3.2'

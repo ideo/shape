@@ -1,3 +1,20 @@
+# == Schema Information
+#
+# Table name: comment_threads
+#
+#  id              :bigint(8)        not null, primary key
+#  record_type     :string
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  organization_id :bigint(8)
+#  record_id       :integer
+#
+# Indexes
+#
+#  index_comment_threads_on_organization_id  (organization_id)
+#  index_comment_threads_on_record_id        (record_id) UNIQUE
+#
+
 class CommentThread < ApplicationRecord
   include HasActivities
   include Firestoreable
@@ -9,7 +26,7 @@ class CommentThread < ApplicationRecord
   before_validation :inherit_record_organization_id, on: :create
 
   has_many :comments,
-           -> { order(updated_at: :desc) },
+           -> { order(created_at: :asc) },
            dependent: :destroy
   has_many :users_threads, dependent: :destroy
   has_many :groups_threads, dependent: :destroy

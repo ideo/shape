@@ -64,18 +64,17 @@ export const theme = objectAssignDeep({}, VictoryTheme.grayscale, {
 export const EmojiMessageContainer = styled.div`
   margin-top: 0px;
   font-size: 55px;
+  text-align: center;
 `
 
 export const SurveyClosed = styled.div`
   border-radius: 7px;
   margin: 0 auto;
   background-color: ${props => props.theme.backgroundColor};
-  width: 272px;
+  width: 312px;
   padding: 30px;
-  font-size: 1.25rem;
   font-family: ${v.fonts.sans};
   color: ${props => props.theme.descriptionText};
-  text-align: center;
 `
 SurveyClosed.displayName = 'SurveyClosed'
 
@@ -91,6 +90,7 @@ export const QuestionText = styled.p`
 export const TextInputHolder = StyledCommentTextarea.extend`
   color: white;
   padding: 6px;
+  width: calc(100% - 12px);
   background-color: ${props =>
     props.hasFocus
       ? props.theme.backgroundColorEditable

@@ -30,27 +30,38 @@ describe Api::V1::QuestionAnswersController, type: :request, json: true do
       expect { post(path, params: params) }.to change(QuestionAnswer, :count).by(1)
     end
 
-    context 'with invalid test collection' do
-      let(:test_collection) { create(:test_collection, test_status: :closed) }
+    context 'with closed test collection' do
+      context 'within 10 minutes of closing' do
+        let(:test_collection) { create(:test_collection, test_status: :closed, test_closed_at: 5.minutes.ago) }
 
-      it 'returns a 422' do
-        post(path, params: params)
-        expect(response.status).to eq(422)
-      end
-    end
-
-    context 'with no answer number' do
-      let(:params_without_answer) do
-        json_api_params(
-          'question_answers',
-          'answer_number': nil,
-          'question_id': question.id,
-        )
+        it 'returns a 200' do
+          post(path, params: params)
+          expect(response.status).to eq(200)
+        end
       end
 
-      it 'returns a 422' do
-        post(path, params: params_without_answer)
-        expect(response.status).to eq(422)
+      context "after 10 minutes of being closed" do
+        let(:test_collection) { create(:test_collection, test_status: :closed, test_closed_at: 11.minutes.ago) }
+
+        it 'returns a 422' do
+          post(path, params: params)
+          expect(response.status).to eq(422)
+        end
+      end
+
+      context 'with no answer number' do
+        let(:params_without_answer) do
+          json_api_params(
+            'question_answers',
+            'answer_number': nil,
+            'question_id': question.id,
+          )
+        end
+
+        it 'returns a 422' do
+          post(path, params: params_without_answer)
+          expect(response.status).to eq(422)
+        end
       end
     end
   end

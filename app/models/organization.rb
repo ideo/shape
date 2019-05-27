@@ -1,3 +1,43 @@
+# == Schema Information
+#
+# Table name: organizations
+#
+#  id                                    :bigint(8)        not null, primary key
+#  active_users_count                    :integer          default(0), not null
+#  autojoin_domains                      :jsonb
+#  deactivated                           :boolean          default(FALSE), not null
+#  domain_whitelist                      :jsonb
+#  has_payment_method                    :boolean          default(FALSE), not null
+#  in_app_billing                        :boolean          default(TRUE), not null
+#  name                                  :string
+#  overdue_at                            :datetime
+#  sent_high_charges_high_email          :boolean          default(FALSE), not null
+#  sent_high_charges_low_email           :boolean          default(FALSE), not null
+#  sent_high_charges_middle_email        :boolean          default(FALSE), not null
+#  slug                                  :string
+#  trial_ends_at                         :datetime
+#  trial_expired_email_sent              :boolean          default(FALSE), not null
+#  trial_users_count                     :integer          default(0), not null
+#  trial_users_count_exceeded_email_sent :boolean          default(FALSE), not null
+#  created_at                            :datetime         not null
+#  updated_at                            :datetime         not null
+#  admin_group_id                        :integer
+#  filestack_file_id                     :integer
+#  getting_started_collection_id         :integer
+#  guest_group_id                        :integer
+#  network_subscription_id               :string
+#  primary_group_id                      :integer
+#  profile_collection_id                 :integer
+#  profile_template_id                   :integer
+#  template_collection_id                :integer
+#  terms_text_item_id                    :bigint(8)
+#
+# Indexes
+#
+#  index_organizations_on_autojoin_domains  (autojoin_domains) USING gin
+#  index_organizations_on_slug              (slug) UNIQUE
+#
+
 class Organization < ApplicationRecord
   RECENTLY_ACTIVE_RANGE = 90.days
   DEFAULT_TRIAL_ENDS_AT = 30.days
@@ -204,18 +244,23 @@ class Organization < ApplicationRecord
 
   def create_network_subscription
     plan = NetworkApi::Plan.first
-    payment_method = NetworkApi::PaymentMethod.find(
-      organization_id: network_organization.id,
-      default: true,
-    ).first
     subscription_params = {
       organization_id: network_organization.id,
       plan_id: plan.id,
     }
+    payment_method = network_default_payment_method
     if payment_method
       subscription_params[:payment_method_id] = payment_method.id
     end
     NetworkApi::Subscription.create(subscription_params)
+  end
+
+  def network_default_payment_method
+    return unless network_organization.present?
+    NetworkApi::PaymentMethod.find(
+      organization_id: network_organization.id,
+      default: true,
+    ).first
   end
 
   def calculate_active_users_count!
@@ -271,10 +316,7 @@ class Organization < ApplicationRecord
   end
 
   def update_payment_status
-    payment_method = NetworkApi::PaymentMethod.find(
-      organization_id: network_organization.id,
-      default: true,
-    ).first
+    payment_method = network_default_payment_method
     update_attributes!(
       has_payment_method: payment_method ? true : false,
       overdue_at: payment_method ? nil : overdue_at,

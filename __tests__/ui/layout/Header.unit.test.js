@@ -33,25 +33,6 @@ describe('Header', () => {
     expect(wrapper.find('.search-bar').exists()).toBe(true)
   })
 
-  it('renders the org avatar', () => {
-    const orgAvatar = wrapper.find('.organization-avatar')
-    expect(orgAvatar.exists()).toBe(true)
-    expect(orgAvatar.props().title).toEqual(group.name)
-    expect(orgAvatar.props().url).toEqual(group.filestack_file_url)
-  })
-
-  it('renders the user avatar', () => {
-    const userAvatar = wrapper.find('.user-avatar')
-    const { currentUser } = props.apiStore
-    expect(userAvatar.exists()).toBe(true)
-    expect(userAvatar.props().title).toEqual(currentUser.name)
-    expect(userAvatar.props().url).toEqual(currentUser.pic_url_square)
-  })
-
-  it('does not show the user menu', () => {
-    expect(wrapper.find('PopoutMenu').exists()).toBe(false)
-  })
-
   describe('closeOrgMenu', () => {
     beforeEach(() => {
       component.closeOrgMenu()
@@ -139,23 +120,6 @@ describe('Header', () => {
 
     it('renders the BasicHeader', () => {
       expect(wrapper.find('BasicHeader').exists()).toBe(true)
-    })
-  })
-
-  describe('when clicking on user', () => {
-    beforeEach(() => {
-      wrapper
-        .find('.userBtn')
-        .first()
-        .simulate('click')
-    })
-
-    it('renders the user menu', () => {
-      const MainMenuDropdown = wrapper
-        .find('.userDropdown')
-        .find('MainMenuDropdown')
-      expect(MainMenuDropdown.props().open).toBe(true)
-      expect(MainMenuDropdown.exists()).toBe(true)
     })
   })
 })

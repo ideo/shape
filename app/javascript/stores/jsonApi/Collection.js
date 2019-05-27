@@ -672,7 +672,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return true
   }
 
-  launchTest = () => this._performTestAction('launch')
+  launchTest = (audiences = null) =>
+    this._performTestAction('launch', audiences)
 
   closeTest = () => {
     const onConfirm = () => this._performTestAction('close')
@@ -703,7 +704,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return res.data
   }
 
-  async _performTestAction(actionName) {
+  async _performTestAction(actionName, audiences = null) {
     // possible actions = 'launch', 'close', 'reopen'
     if (!_.includes(['launch', 'close', 'reopen'], actionName)) return false
     let collection = this
@@ -713,7 +714,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (_.includes(['launch', 'reopen'], actionName)) {
       if (collection.checkLaunchability()) {
         // called with 'this' so that we know if the submission is calling it
-        return this.API_performTestAction(actionName)
+        return this.API_performTestAction(actionName, audiences)
       }
       return false
     }
@@ -721,36 +722,39 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.API_performTestAction(actionName)
   }
 
-  API_performTestAction = async actionName => {
+  API_performTestAction = async (actionName, audiences = null) => {
     const { uiStore } = this
     // this will disable any test launch/close/reopen buttons until loading is complete
     uiStore.update('launchButtonLoading', true)
     try {
-      await this.apiStore
-        .request(
-          `test_collections/${this.launchableTestId}/${actionName}`,
-          'PATCH'
-        )
-        .catch(err => {
-          const errorMessages = err.error.map(e => ` ${e.detail}`)
-          let prompt = `You have questions that have not yet been finalized:\n
-             ${errorMessages}
-            `
-          // omit the extra wording for close and reopen
-          // for reopen: what if there are actually incomplete questions... ?
-          if (_.includes(['close', 'reopen'], actionName))
-            prompt = errorMessages
-          uiStore.popupAlert({
-            prompt,
-            fadeOutTime: 10 * 1000,
-          })
-        })
-      if (_.includes(['launch', 'reopen'], actionName)) {
-        // then refetch the cards -- particularly if you just launched
-        this.API_fetchCards()
-      }
+      await this.apiStore.request(
+        `test_collections/${this.launchableTestId}/${actionName}`,
+        'PATCH',
+        { audiences }
+      )
     } catch (e) {
+      const errorMessages = e.error.map(e => ` ${e.detail}`)
+      let prompt = `You have questions that have not yet been finalized:\n
+         ${errorMessages}
+        `
+      if (_.includes(prompt, 'Test audiences')) {
+        prompt = `Test unable to launch:\n
+           ${errorMessages}
+          `
+      }
+      // omit the extra wording for close and reopen
+      // for reopen: what if there are actually incomplete questions... ?
+      if (_.includes(['close', 'reopen'], actionName)) prompt = errorMessages
+      uiStore.popupAlert({
+        prompt,
+        fadeOutTime: 10 * 1000,
+      })
       uiStore.update('launchButtonLoading', false)
+      return false
+    }
+    if (_.includes(['launch', 'reopen'], actionName)) {
+      // then refetch the cards -- particularly if you just launched
+      this.API_fetchCards()
     }
     uiStore.update('launchButtonLoading', false)
     // refetch yourself
@@ -831,7 +835,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     onCancel,
     onSuccess,
   } = {}) {
-    const { uiStore, routingStore } = this
+    const { uiStore } = this
     const can_edit = toCollection.can_edit_content || toCollection.can_edit
     const cancel = () => {
       uiStore.setMovingCards([])
@@ -871,23 +875,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       placement: 'beginning',
     }
     await apiStore.moveCards(data)
-    const afterMove = () => {
-      const { movingIntoCollection } = uiStore
-      uiStore.setMovingCards([])
-      uiStore.update('multiMoveCardIds', [])
-      uiStore.reselectCardIds(cardIds)
-      uiStore.update('movingIntoCollection', null)
-      // add a little delay because the board has to load first
-      if (movingIntoCollection.isBoard) {
-        setTimeout(() => uiStore.scrollToBottom(), 500)
-      }
-    }
-    if (data.to_id === data.from_id) {
-      afterMove()
-    } else {
-      uiStore.update('actionAfterRoute', afterMove)
-      routingStore.routeTo('collections', toCollection.id)
-    }
+    uiStore.setMovingCards([])
+    uiStore.update('multiMoveCardIds', [])
+    uiStore.update('movingIntoCollection', null)
   }
 
   static async createSubmission(parent_id, submissionSettings) {

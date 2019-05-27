@@ -12,6 +12,16 @@ class RoutingStore extends RouterStore {
   slug = () => apiStore.currentOrgSlug
 
   @computed
+  get isSearch() {
+    return this.location.pathname === this.pathTo('search')
+  }
+
+  @computed
+  get isAdmin() {
+    return this.location.pathname === this.pathTo('admin')
+  }
+
+  @computed
   get query() {
     return queryString.parse(this.location.search)
   }
@@ -24,9 +34,11 @@ class RoutingStore extends RouterStore {
         return `/${this.slug()}/items/${id}`
       case 'search':
         // `id` means query in this case
-        // if no query, then go back to homepage (e.g. clearing out your search)
-        if (!id) return this.pathTo('homepage')
-        return `/${this.slug()}/search?q=${id.replace(/\s/g, '+')}`
+        const path = `/${this.slug()}/search`
+        const qs = id ? `?q=${encodeURIComponent(id)}` : ''
+        return `${path}${qs}`
+      case 'admin':
+        return '/admin'
       case 'homepage':
       default:
         return `/${this.slug()}`
@@ -36,17 +48,26 @@ class RoutingStore extends RouterStore {
   routeTo = (type, id = null) => {
     this.routingTo = { type, id }
 
+    // prevent accidental route changes while you are dragging/moving into collection
+    if (uiStore.movingIntoCollection) {
+      return
+    }
     // close the org/roles menus if either are open when we route to a new page
     uiStore.update('organizationMenuPage', null)
     uiStore.update('rolesMenuOpen', null)
     uiStore.setViewingCollection(null)
     uiStore.closeDialog()
-    if (!id && type !== 'homepage') {
+    if (!id && type !== 'homepage' && type !== 'search') {
       // in this case, type is a path like '/' or '/terms'
       this.push(type)
       return
     }
-    if (type === 'search') this.updatePreviousPageBeforeSearch(this.location)
+    if (type === 'search') {
+      this.updatePreviousPageBeforeSearch(this.location)
+      // don't route to search without a search query (passed in as `id`)
+      // e.g. when you clear out the search query
+      if (!id) return
+    }
     const path = this.pathTo(type, id)
     this.push(path)
   }
@@ -61,6 +82,7 @@ class RoutingStore extends RouterStore {
   }
 
   leaveSearch = () => {
+    if (!this.isSearch) return
     if (this.previousPageBeforeSearch) {
       this.routeTo(this.previousPageBeforeSearch)
     } else {

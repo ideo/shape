@@ -58,6 +58,8 @@ export default class UiStore {
   submissionBoxSettingsOpen = null
   @observable
   loadedSubmissions = false
+  @observable
+  adminUsersMenuOpen = null
   defaultGridSettings = {
     // layout will track we are at "size 3" i.e. "small 4 cols" even though cols === 4
     layoutSize: 4,
@@ -91,6 +93,8 @@ export default class UiStore {
   movingFromCollectionId = null
   @observable
   cardAction = 'move'
+  @observable
+  pastingCards = false
   @observable
   templateName = ''
   defaultDialogProps = {
@@ -409,6 +413,20 @@ export default class UiStore {
       this.movingCardIds.length > 0 &&
       this.cardAction !== 'moveWithinCollection'
     )
+  }
+
+  get isMobileXs() {
+    return this.windowWidth && this.windowWidth < v.responsive.smallBreakpoint
+  }
+
+  @computed
+  get isMobile() {
+    return this.windowWidth && this.windowWidth < v.responsive.medBreakpoint
+  }
+
+  @computed
+  get isLargeBreakpoint() {
+    return this.windowWidth && this.windowWidth >= v.responsive.largeBreakpoint
   }
 
   // NOTE: because we aren't tracking a difference between "closed" and null,
@@ -772,5 +790,10 @@ export default class UiStore {
       return
     }
     this.scroll.scrollToBottom()
+  }
+
+  @action
+  closeAdminUsersMenu() {
+    this.adminUsersMenuOpen = null
   }
 }

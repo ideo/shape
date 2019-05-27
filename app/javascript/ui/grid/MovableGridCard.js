@@ -451,6 +451,19 @@ class MovableGridCard extends React.PureComponent {
       transformOrigin = `${xPos + width / 2}px ${yPos + height / 2}px`
     }
 
+    let offsetXAmt = 0
+
+    if (xPos < window.pageXOffset) {
+      offsetXAmt = window.pageXOffset - xPos
+      styleProps.xPos = xPos + offsetXAmt
+    }
+
+    const padding = 40
+    if (xPos + width + padding > window.pageXOffset + window.innerWidth) {
+      offsetXAmt = xPos - (window.pageXOffset + window.innerWidth)
+      styleProps.xPos = xPos - width - offsetXAmt - padding
+    }
+
     return (
       <FlipMove
         // z-index is important because BCT has a popoutMenu

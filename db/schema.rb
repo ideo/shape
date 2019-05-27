@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190430234650) do
+ActiveRecord::Schema.define(version: 20190522210918) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -77,11 +77,11 @@ ActiveRecord::Schema.define(version: 20190430234650) do
 
   create_table "audiences", force: :cascade do |t|
     t.string "name"
-    t.float "price_per_response"
     t.string "criteria"
     t.bigint "organization_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "price_per_response", precision: 10, scale: 2, default: "0.0"
     t.index ["organization_id"], name: "index_audiences_on_organization_id"
   end
 
@@ -150,6 +150,7 @@ ActiveRecord::Schema.define(version: 20190430234650) do
     t.boolean "anyone_can_view", default: false
     t.boolean "anyone_can_join", default: false
     t.bigint "joinable_group_id"
+    t.datetime "test_closed_at"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
@@ -193,6 +194,17 @@ ActiveRecord::Schema.define(version: 20190430234650) do
     t.index ["application_id"], name: "index_external_records_on_application_id"
     t.index ["external_id", "application_id", "externalizable_type", "externalizable_id"], name: "index_external_records_common_fields"
     t.index ["externalizable_type", "externalizable_id"], name: "index_on_externalizable"
+  end
+
+  create_table "feedback_incentive_records", force: :cascade do |t|
+    t.bigint "user_id"
+    t.bigint "survey_response_id"
+    t.decimal "amount", precision: 10, scale: 2
+    t.decimal "current_balance", precision: 10, scale: 2
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["survey_response_id"], name: "index_feedback_incentive_records_on_survey_response_id"
+    t.index ["user_id"], name: "index_feedback_incentive_records_on_user_id"
   end
 
   create_table "filestack_files", force: :cascade do |t|
@@ -358,7 +370,9 @@ ActiveRecord::Schema.define(version: 20190430234650) do
     t.text "session_uid"
     t.integer "status", default: 0
     t.bigint "user_id"
+    t.bigint "test_audience_id"
     t.index ["session_uid"], name: "index_survey_responses_on_session_uid", unique: true
+    t.index ["test_audience_id"], name: "index_survey_responses_on_test_audience_id"
     t.index ["test_collection_id"], name: "index_survey_responses_on_test_collection_id"
     t.index ["user_id"], name: "index_survey_responses_on_user_id"
   end
@@ -388,12 +402,26 @@ ActiveRecord::Schema.define(version: 20190430234650) do
     t.index ["name"], name: "index_tags_on_name", unique: true
   end
 
+  create_table "test_audience_invitations", force: :cascade do |t|
+    t.bigint "test_audience_id"
+    t.bigint "user_id"
+    t.string "invitation_token"
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["test_audience_id"], name: "index_test_audience_invitations_on_test_audience_id"
+    t.index ["user_id"], name: "index_test_audience_invitations_on_user_id"
+  end
+
   create_table "test_audiences", force: :cascade do |t|
     t.integer "sample_size"
     t.bigint "audience_id"
     t.bigint "test_collection_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "price_per_response", precision: 10, scale: 2
+    t.string "network_payment_id"
+    t.integer "launched_by_id"
     t.index ["audience_id"], name: "index_test_audiences_on_audience_id"
     t.index ["test_collection_id"], name: "index_test_audiences_on_test_collection_id"
   end
@@ -430,6 +458,7 @@ ActiveRecord::Schema.define(version: 20190430234650) do
     t.datetime "last_active_at"
     t.string "phone"
     t.integer "feedback_contact_preference", default: 0
+    t.boolean "feedback_terms_accepted", default: false
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"
@@ -454,5 +483,9 @@ ActiveRecord::Schema.define(version: 20190430234650) do
   end
 
   add_foreign_key "collections", "organizations"
+  add_foreign_key "feedback_incentive_records", "survey_responses"
+  add_foreign_key "feedback_incentive_records", "users"
+  add_foreign_key "test_audience_invitations", "test_audiences"
+  add_foreign_key "test_audience_invitations", "users"
   add_foreign_key "test_audiences", "audiences"
 end

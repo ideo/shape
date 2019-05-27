@@ -346,6 +346,7 @@ class CollectionPage extends React.Component {
         {this.submissionsPageSeparator}
         <CollectionGrid
           {...gridSettings}
+          loadCollectionCards={this.loadCollectionCards}
           trackCollectionUpdated={this.trackCollectionUpdated}
           collection={submissions_collection}
           canEditCollection={false}
@@ -397,7 +398,7 @@ class CollectionPage extends React.Component {
   )
 
   render() {
-    const { collection, uiStore } = this.props
+    const { collection, uiStore, apiStore } = this.props
     if (!collection) {
       return this.loader()
     }
@@ -477,8 +478,10 @@ class CollectionPage extends React.Component {
               submissionBoxSettingsOpen) && (
               <SubmissionBoxSettingsModal collection={collection} />
             )}
-            <MoveModal />
+            {/* Listen to this pastingCards value which comes from pressing CTRL+V */}
+            <MoveModal pastingCards={uiStore.pastingCards} />
             {isSubmissionBox &&
+              apiStore.currentUser &&
               collection.submission_box_type &&
               this.renderSubmissionsCollection()}
             {(uiStore.dragging || uiStore.cardMenuOpenAndPositioned) && (

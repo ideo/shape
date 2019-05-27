@@ -1,23 +1,35 @@
 import _ from 'lodash'
 import React from 'react'
-// import { PropTypes } from 'prop-types'
-import { computed } from 'mobx'
+import styled from 'styled-components'
+import { runInAction, observable, action, computed } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { runInAction, observable, toJS } from 'mobx'
 
-import AudienceSettingsWidget from './AudienceSettingsWidget'
-import TestAudience from '~/stores/jsonApi/TestAudience'
+import { FormButton } from '~/ui/global/styled/forms'
+import AudienceSettingsWidget from '~/ui/test_collections/AudienceSettings/AudienceSettingsWidget'
+// import TestAudience from '~/stores/jsonApi/TestAudience'
+import FeedbackTermsModal from '~/ui/test_collections/FeedbackTermsModal'
+import ConfirmPriceModal from '~/ui/test_collections/ConfirmPriceModal'
+import v from '~/utils/variables'
 
-@inject('apiStore')
+const FormButtonWrapper = styled.div`
+  margin: 2rem;
+  display: flex;
+  @media only screen and (min-width: ${v.responsive.medBreakpoint}px) {
+    button {
+      margin-left: auto;
+    }
+  }
+`
+
+@inject('apiStore', 'uiStore')
 @observer
 class AudienceSettings extends React.Component {
   @observable
-  audiences = []
-
-  constructor(props) {
-    super(props)
-    this.throttledSaveTestAudience = _.throttle(this.saveTestAudience, 2000)
-  }
+  termsModalOpen = false
+  @observable
+  confirmPriceModalOpen = false
+  @observable
+  audienceSettings = new Map()
 
   componentDidMount() {
     this.fetchAvailableAudiences()
@@ -29,100 +41,178 @@ class AudienceSettings extends React.Component {
     const audiences = await apiStore.fetchOrganizationAudiences(
       apiStore.currentUserOrganizationId
     )
-    runInAction(() => {
-      this.audiences = audiences
+    const audienceSettings = {}
+    _.each(audiences, audience => {
+      audienceSettings[audience.id] = {
+        selected: false,
+        sample_size: '0',
+      }
     })
+    this.updateAudienceSettings(audienceSettings)
+  }
+
+  @computed
+  get audiences() {
+    const { apiStore } = this.props
+    return apiStore.findAll('audiences')
   }
 
   @computed
   get totalPrice() {
-    const { audiences } = this
+    const { audiences, audienceSettings } = this
+    if (!this.showAudienceSettings) return 0
     return _.round(
       audiences
         .map(audience => {
-          if (audience.currentSampleSize < 1) {
-            return 0
-          }
-          return audience.currentSampleSize * audience.price_per_response
+          const setting = audienceSettings[audience.id]
+          if (!setting || !setting.selected) return 0
+          const sampleSize = setting.sample_size
+            ? parseInt(setting.sample_size)
+            : 0
+          return sampleSize * audience.price_per_response
         })
         .reduce((acc, price) => price + acc, 0),
       2
-    ).toFixed(2)
+    )
   }
 
-  createTestAudience(audience) {
-    const { apiStore, testCollection } = this.props
-    const testAudienceData = {
-      audience_id: audience.id,
-      test_collection_id: testCollection.id,
-      sample_size: 0,
-    }
-    return new TestAudience(toJS(testAudienceData), apiStore)
-  }
-
-  async saveTestAudience(audience) {
-    await audience.currentTestAudience.save()
-  }
-
-  saveAllTestAudiences() {
-    this.audiences.forEach(audience => {
-      this.saveTestAudience(audience)
-    })
-  }
-
-  onSubmitSettings = () => {
-    this.saveAllTestAudiences()
+  get totalPriceDollars() {
+    return `$${this.totalPrice.toFixed(2)}`
   }
 
   onToggleCheckbox = e => {
-    const { apiStore } = this.props
     const id = e.target.value
-    const audience = apiStore.find('audiences', id)
-    if (!audience.currentlySelected) {
-      // If not yet selected, we have to create the test audience for this test
-      // and temporarily attach it to the audience
-      const testAudience = this.createTestAudience(audience)
-      apiStore.add(testAudience)
-    } else {
-      apiStore.remove(audience.currentTestAudience)
-    }
+    runInAction(() => {
+      const { audienceSettings } = this
+      audienceSettings[id].selected = !audienceSettings[id].selected
+    })
   }
 
   onInputChange = (audienceId, value) => {
-    const { apiStore } = this.props
-    const audience = apiStore.find('audiences', audienceId)
+    const { audienceSettings } = this
     runInAction(() => {
-      audience.currentTestAudience.sample_size = value
+      audienceSettings[audienceId].sample_size = value
     })
-    this.throttledSaveTestAudience(audience)
   }
 
-  handleKeyPress = event => {
-    if (event.key === 'Enter') {
-      this.throttledSaveTestAudience.flush()
+  @action
+  openTermsModal = () => (this.termsModalOpen = true)
+
+  @action
+  closeTermsModal = () => (this.termsModalOpen = false)
+
+  @action
+  openConfirmPriceModal = () => (this.confirmPriceModalOpen = true)
+
+  @action
+  closeConfirmPriceModal = () => (this.confirmPriceModalOpen = false)
+
+  @action
+  updateAudienceSettings = settings => (this.audienceSettings = settings)
+
+  confirmOrLaunchTest() {
+    if (this.totalPrice === 0) {
+      this.launchTestWithAudienceSettings()
+    } else {
+      this.openConfirmPriceModal()
     }
   }
 
-  render() {
+  submitSettings = e => {
+    e.preventDefault()
+    const { apiStore } = this.props
+    const { currentUser } = apiStore
+    if (currentUser.feedback_terms_accepted) {
+      this.confirmOrLaunchTest()
+    } else {
+      this.openTermsModal()
+    }
+  }
+
+  acceptFeedbackTerms = e => {
+    e.preventDefault()
+    const { currentUser } = this.props.apiStore
+    currentUser.API_acceptFeedbackTerms().finally(() => {
+      this.closeTermsModal()
+      this.confirmOrLaunchTest()
+    })
+  }
+
+  confirmPrice = e => {
+    e.preventDefault()
+    this.closeConfirmPriceModal()
+    this.launchTestWithAudienceSettings()
+  }
+
+  launchTestWithAudienceSettings() {
+    const { testCollection } = this.props
+    testCollection.launchTest(
+      this.showAudienceSettings ? this.audienceSettings : null
+    )
+  }
+
+  get showAudienceSettings() {
+    const { testCollection } = this.props
     return (
-      <AudienceSettingsWidget
-        onToggleCheckbox={this.onToggleCheckbox}
-        handleKeyPress={this.handleKeyPress}
-        onInputChange={this.onInputChange}
-        onSubmitSettings={this.onSubmitSettings}
-        totalPrice={this.totalPrice}
-        audiences={this.audiences}
-      />
+      !testCollection.collection_to_test_id &&
+      !testCollection.is_submission_box_template_test
+    )
+  }
+
+  render() {
+    const { uiStore, testCollection } = this.props
+    const { apiStore } = this.props
+    const { currentUser } = apiStore
+    const currentUserOrganization = currentUser.current_organization
+
+    return (
+      <React.Fragment>
+        <FeedbackTermsModal
+          open={!!this.termsModalOpen}
+          onSubmit={this.acceptFeedbackTerms}
+          close={this.closeTermsModal}
+        />
+        <ConfirmPriceModal
+          open={!!this.confirmPriceModalOpen}
+          onSubmit={this.confirmPrice}
+          close={this.closeConfirmPriceModal}
+          // TODO: pull in the real payment method from the network (brand / last4)
+          paymentMethod={null}
+          organization={currentUserOrganization}
+          totalPrice={this.totalPriceDollars}
+          testName={testCollection.name}
+        />
+        {this.showAudienceSettings && (
+          <AudienceSettingsWidget
+            onToggleCheckbox={this.onToggleCheckbox}
+            onInputChange={this.onInputChange}
+            totalPrice={this.totalPriceDollars}
+            audiences={this.audiences}
+            audienceSettings={this.audienceSettings}
+          />
+        )}
+        <FormButtonWrapper>
+          <FormButton
+            data-cy="LaunchFormButton"
+            disabled={uiStore.launchButtonLoading}
+            onClick={this.submitSettings}
+          >
+            {testCollection.is_submission_box_template_test
+              ? 'Launch Tests'
+              : 'Get Feedback'}
+          </FormButton>
+        </FormButtonWrapper>
+      </React.Fragment>
     )
   }
 }
 
-AudienceSettings.propTypes = {}
 AudienceSettings.propTypes = {
   testCollection: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 AudienceSettings.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default AudienceSettings

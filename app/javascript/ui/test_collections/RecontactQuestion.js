@@ -7,8 +7,12 @@ import Emoji from '~/ui/icons/Emoji'
 import { EmojiButton, EmojiHolder } from '~/ui/test_collections/ScaleQuestion'
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
 import OkIcon from '~/ui/icons/OkIcon'
-import { QuestionText } from './shared'
-import { TextInput, TextResponseHolder, TextEnterButton } from './shared'
+import {
+  QuestionText,
+  TextInput,
+  TextResponseHolder,
+  TextEnterButton,
+} from '~/ui/test_collections/shared'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 
@@ -27,6 +31,7 @@ class RecontactQuestion extends React.Component {
     showContactInfo: false,
     contactInfo: '',
     submittedContactInfo: false,
+    answer: '',
   }
 
   async createLimitedUser(contactInfo) {
@@ -50,6 +55,8 @@ class RecontactQuestion extends React.Component {
 
   handleClick = choice => ev => {
     const { onAnswer, user } = this.props
+    this.setState({ answer: choice })
+
     if (choice === 'feedback_contact_yes' && !user) {
       this.setState({ showContactInfo: true })
       return
@@ -60,7 +67,7 @@ class RecontactQuestion extends React.Component {
       })
     }
     // there was a user, or anon user answered "no", move on
-    onAnswer()
+    onAnswer(choice)
   }
 
   handleContactInfoSubmit = async ev => {
@@ -69,36 +76,52 @@ class RecontactQuestion extends React.Component {
     ev.preventDefault()
     const created = this.createLimitedUser(contactInfo)
     if (!created) return
-    onAnswer()
+    onAnswer('feedback_contact_yes')
     this.setState({ submittedContactInfo: true })
+  }
+
+  get backgroundColor() {
+    const { backgroundColor } = this.props
+    return backgroundColor ? backgroundColor : v.colors.primaryDark
   }
 
   render() {
     const { user } = this.props
-    const { contactInfo, showContactInfo, submittedContactInfo } = this.state
+    const {
+      contactInfo,
+      showContactInfo,
+      submittedContactInfo,
+      answer,
+    } = this.state
     return (
-      <div style={{ width: '100%' }}>
+      <div style={{ width: '100%', backgroundColor: this.backgroundColor }}>
         <QuestionText>
-          Would you like to be contacted about future surveys?
+          Would you like to be contacted about future feedback opportunities?
         </QuestionText>
-        <EmojiHolder>
+        <EmojiHolder data-cy="RecontactEmojiHolder">
           <EmojiButton
             selected={
-              user && user.feedback_contact_preference === 'feedback_contact_no'
+              (user &&
+                user.feedback_contact_preference === 'feedback_contact_no') ||
+              answer === 'feedback_contact_no' ||
+              !answer
             }
             onClick={this.handleClick('feedback_contact_no')}
           >
-            <Emoji name="Finished" symbol="👎" />
+            <Emoji scale={1.375} name="Finished" symbol="👎" />
           </EmojiButton>
           <EmojiButton
             selected={
-              showContactInfo ||
+              !answer ||
               (user &&
-                user.feedback_contact_preference === 'feedback_contact_yes')
+                user.feedback_contact_preference === 'feedback_contact_yes') ||
+              answer === 'feedback_contact_yes' ||
+              !answer
             }
             onClick={this.handleClick('feedback_contact_yes')}
+            data-cy="RecontactEmojiBtnThumbUp"
           >
-            <Emoji name="Yes" symbol="👍" />
+            <Emoji scale={1.375} name="Yes" symbol="👍" />
           </EmojiButton>
         </EmojiHolder>
 
@@ -122,13 +145,18 @@ class RecontactQuestion extends React.Component {
                 value={contactInfo}
                 type="questionText"
                 placeholder="email or phone number"
+                data-cy="RecontactTextInput"
               />
               {submittedContactInfo ? (
                 <IconHolder>
                   <OkIcon />
                 </IconHolder>
               ) : (
-                <TextEnterButton focused onClick={this.handleContactInfoSubmit}>
+                <TextEnterButton
+                  focused
+                  onClick={this.handleContactInfoSubmit}
+                  data-cy="RecontactTextResponseButton"
+                >
                   <ReturnArrowIcon />
                 </TextEnterButton>
               )}
@@ -143,10 +171,13 @@ class RecontactQuestion extends React.Component {
 RecontactQuestion.propTypes = {
   user: MobxPropTypes.objectOrObservableObject,
   onAnswer: PropTypes.func.isRequired,
-  sessionUid: PropTypes.string.isRequired,
+  sessionUid: PropTypes.string,
+  backgroundColor: PropTypes.string,
 }
 RecontactQuestion.defaultProps = {
   user: null,
+  backgroundColor: null,
+  sessionUid: null,
 }
 
 export default RecontactQuestion

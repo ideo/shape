@@ -252,9 +252,9 @@ describe('MoveModal', () => {
       })
 
       it('should show a success message', () => {
-        expect(uiStore.alertOk).toHaveBeenCalledWith(
-          'Your template instance has been created!'
-        )
+        expect(uiStore.popupSnackbar).toHaveBeenCalledWith({
+          message: 'Your template instance has been created!',
+        })
       })
 
       it('should close the move menu', async () => {

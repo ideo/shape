@@ -426,7 +426,7 @@ export const fakeUserAttrs = {
   current_organization: fakeOrganization,
   type: 'users',
   terms_accepted: true,
-  isCurrentUser: jest.fn(),
+  isCurrentUser: true,
   API_updateCurrentUser: jest.fn(),
   API_hideHelper: jest.fn().mockReturnValue(Promise.resolve({})),
   notify_through_email: true,
@@ -467,7 +467,9 @@ export const fakeComment = {
   author: fakeUser,
   message:
     'This is my message to the world. Go to the source: https://www.ideo.com',
-  updated_at: new Date(),
+  draftjs_data: {"blocks":[{"key":"74h6f","data":{},"text":"This is my message to the world. Go to the source: https://www.ideo.com","type":"unstyled","depth":0,"entityRanges":[],"inlineStyleRanges":[]}],"entityMap":{}},
+  created_at: new Date('2019-05-09T03:18:00'),
+  updated_at: new Date('2019-05-09T03:18:00'),
 }
 export const fakeThread = {
   id: '1',
