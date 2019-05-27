@@ -10,7 +10,7 @@ RSpec.describe DataReport::QuestionItem, type: :service do
         { column: 1, value: 0, percentage: 0 },
         { column: 2, value: 0, percentage: 0 },
         { column: 3, value: 0, percentage: 0 },
-        { column: 4, value: 0, percentage: 0 }
+        { column: 4, value: 0, percentage: 0 },
       ]
     end
     let(:question_item) { create(:question_item) }
@@ -52,7 +52,7 @@ RSpec.describe DataReport::QuestionItem, type: :service do
               { column: 1, value: 1, percentage: 100 },
               { column: 2, value: 0, percentage: 0 },
               { column: 3, value: 0, percentage: 0 },
-              { column: 4, value: 0, percentage: 0 }
+              { column: 4, value: 0, percentage: 0 },
             ],
           )
         end
@@ -81,7 +81,7 @@ RSpec.describe DataReport::QuestionItem, type: :service do
               { column: 1, value: 6, percentage: 100 },
               { column: 2, value: 0, percentage: 0 },
               { column: 3, value: 0, percentage: 0 },
-              { column: 4, value: 0, percentage: 0 }
+              { column: 4, value: 0, percentage: 0 },
             ],
           )
         end
@@ -102,13 +102,9 @@ RSpec.describe DataReport::QuestionItem, type: :service do
 
       let!(:survey_response) { create(:survey_response, test_collection: test_collection, test_audience: test_audience) }
       let!(:question_item) { survey_response.question_items.select(&:question_useful?).first }
-      let!(:question_answer) do
-        create(:question_answer,
-               survey_response: survey_response,
-               question: question_item)
-      end
       let!(:dataset) do
         create(:question_dataset,
+               data_source: question_item,
                question_type: question_item.question_type,
                groupings: [{ type: 'TestAudience', id: test_audience.id }])
       end
@@ -123,7 +119,7 @@ RSpec.describe DataReport::QuestionItem, type: :service do
             { column: 1, value: 1, percentage: 100 },
             { column: 2, value: 0, percentage: 0 },
             { column: 3, value: 0, percentage: 0 },
-            { column: 4, value: 0, percentage: 0 }
+            { column: 4, value: 0, percentage: 0 },
           ],
         )
       end
