@@ -4,6 +4,24 @@ import { Grid } from '@material-ui/core'
 import { MaxWidthContainer } from '~/ui/global/styled/layout'
 import v from '~/utils/variables'
 
+const StyledBanner = styled.div`
+  background-color: ${v.colors.alert};
+  color: white;
+  font-family: ${v.fonts.sans};
+  font-size: 1.33rem;
+  padding: 20px;
+
+  a {
+    color: white;
+  }
+`
+StyledBanner.displayName = 'StyledBanner'
+
+const StyledAction = styled.div`
+  font-size: 1rem;
+  text-align: right;
+`
+
 class Banner extends React.Component {
   render() {
     return (
@@ -39,23 +57,5 @@ Banner.defaultProps = {
   leftComponent: () => null,
   rightComponent: () => null,
 }
-
-const StyledBanner = styled.div`
-  background-color: ${v.colors.alert};
-  color: white;
-  font-family: ${v.fonts.sans};
-  font-size: 1.33rem;
-  padding: 20px;
-
-  a {
-    color: white;
-  }
-`
-StyledBanner.displayName = 'StyledBanner'
-
-const StyledAction = styled.div`
-  font-size: 1rem;
-  text-align: right;
-`
 
 export default Banner

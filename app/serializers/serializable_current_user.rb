@@ -19,8 +19,7 @@ class SerializableCurrentUser < SerializableUser
   end
 
   attribute :current_incentive_balance do
-    @object.current_incentive_balance.to_s
-    # Because JSON wants strings for numbers? See current_user_collection_id
+    @object.current_incentive_balance
   end
 
   attribute :incentive_due_date do

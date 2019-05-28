@@ -7,6 +7,32 @@ import CloseIcon from '~/ui/icons/CloseIcon'
 import Banner from '~/ui/layout/Banner'
 import v from '~/utils/variables'
 
+const StyledBanner = styled(Banner)`
+  margin-left: calc(-100vw / 2 + ${v.maxWidth - 2 * v.fonts.baseSize}px / 2);
+  margin-right: calc(-100vw / 2 + ${v.maxWidth - 2 * v.fonts.baseSize}px / 2);
+  margin-top: 20px;
+  margin-bottom: 20px;
+
+  @media only screen and (max-width: ${v.maxWidth +
+      v.containerPadding.horizontal * v.fonts.baseSize}px) {
+    margin-left: -${v.containerPadding.horizontal}rem;
+    margin-right: -${v.containerPadding.horizontal}rem;
+    padding: 20px ${v.containerPadding.horizontal}rem;
+  }
+`
+StyledBanner.displayName = 'StyledBanner'
+
+const StyledIconWrapper = styled.div`
+  width: ${props => props.width || props.height || '32'}px;
+  height: ${props => props.height || props.width || '32'}px;
+`
+
+const StyledClickableIconWrapper = styled(StyledIconWrapper)`
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+`
+
 @inject('apiStore', 'uiStore')
 @observer
 class OverdueBanner extends React.Component {
@@ -87,35 +113,9 @@ class OverdueBanner extends React.Component {
   }
 }
 
-const StyledBanner = styled(Banner)`
-  margin-left: calc(-100vw / 2 + ${v.maxWidth - 2 * v.fonts.baseSize}px / 2);
-  margin-right: calc(-100vw / 2 + ${v.maxWidth - 2 * v.fonts.baseSize}px / 2);
-  margin-top: 20px;
-  margin-bottom: 20px;
-
-  @media only screen and (max-width: ${v.maxWidth +
-      v.containerPadding.horizontal * v.fonts.baseSize}px) {
-    margin-left: -${v.containerPadding.horizontal}rem;
-    margin-right: -${v.containerPadding.horizontal}rem;
-    padding: 20px ${v.containerPadding.horizontal}rem;
-  }
-`
-StyledBanner.displayName = 'StyledBanner'
-
 OverdueBanner.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
-
-const StyledIconWrapper = styled.div`
-  width: ${props => props.width || props.height || '32'}px;
-  height: ${props => props.height || props.width || '32'}px;
-`
-
-const StyledClickableIconWrapper = styled(StyledIconWrapper)`
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-`
 
 export default OverdueBanner

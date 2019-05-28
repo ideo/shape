@@ -14,7 +14,7 @@ class RespondentBanner extends React.Component {
 
   get user() {
     const { user } = this.props
-    return user ? user : null
+    return user
   }
 
   get hideBanner() {
