@@ -180,7 +180,7 @@ class AddAudienceModal extends React.Component {
       })
 
       return (
-        <React.Fragment>
+        <React.Fragment key={group}>
           <CriteriaGroup>{group}</CriteriaGroup>
           {options}
         </React.Fragment>
@@ -193,7 +193,7 @@ class AddAudienceModal extends React.Component {
   renderSelectedCriteria() {
     return this.state.selectedCriteria.map(criteria => (
       <div ref={ref => this.criteriaTriggers[criteria] = ref}>
-        <FieldContainer>
+        <FieldContainer key={criteria}>
           <FloatRight>
             <EditButton onClick={() => this.openMenu(criteria)}>
               <EditPencilIcon />
@@ -229,7 +229,7 @@ class AddAudienceModal extends React.Component {
       const menuOpen = openMenus[criteria]
 
       return (
-        <div ref={ref => this.updateMenuPosition(criteria, ref)}>
+        <div key={criteria} ref={ref => this.updateMenuPosition(criteria, ref)}>
           <Collapse in={menuOpen} timeout="auto" unmountOnExit>
             <Select
               open={menuOpen}

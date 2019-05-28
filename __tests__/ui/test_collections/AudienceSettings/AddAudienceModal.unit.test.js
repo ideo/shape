@@ -23,7 +23,10 @@ describe('AddAudienceModal', () => {
 
     const name = 'Test'
     nameField.simulate('change', { target: { value: name } })
-    expect(wrapper.state()).toEqual({ name, valid: true })
+
+    const state = wrapper.state()
+    expect(state.name).toEqual(name)
+    expect(state.valid).toEqual(true)
 
     submitButton = wrapper.find('StyledFormButton')
     expect(submitButton.props()['disabled']).toBeFalsy()
