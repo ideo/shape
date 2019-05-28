@@ -47,6 +47,7 @@ class Api::V1::DatasetsController < Api::V1::BaseController
       :type,
       :measure,
       :timeframe,
+      :identifier,
       :data_source_id,
       :data_source_type,
       :data_source,
