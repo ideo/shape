@@ -1262,11 +1262,11 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
         }
       }
       cardType="collections"
-      coverItem={null}
       dragging={false}
       handleClick={[MockFunction]}
       height={100}
       isBoardCollection={false}
+      isCoverItem={false}
       record={
         Object {
           "API_archive": [MockFunction],
@@ -7171,11 +7171,11 @@ exports[`GridCard when selected renders snapshot 1`] = `
         }
       }
       cardType="collections"
-      coverItem={null}
       dragging={false}
       handleClick={[MockFunction]}
       height={100}
       isBoardCollection={false}
+      isCoverItem={false}
       record={
         Object {
           "API_archive": [MockFunction],
@@ -13718,11 +13718,11 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
         }
       }
       cardType="collections"
-      coverItem={null}
       dragging={false}
       handleClick={[MockFunction]}
       height={100}
       isBoardCollection={false}
+      isCoverItem={false}
       record={
         Object {
           "API_archive": [MockFunction],
@@ -19620,11 +19620,11 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
         }
       }
       cardType="collections"
-      coverItem={null}
       dragging={false}
       handleClick={[MockFunction]}
       height={100}
       isBoardCollection={false}
+      isCoverItem={false}
       record={
         Object {
           "API_archive": [MockFunction],
@@ -25501,11 +25501,11 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
         }
       }
       cardType="collections"
-      coverItem={null}
       dragging={false}
       handleClick={[MockFunction]}
       height={100}
       isBoardCollection={false}
+      isCoverItem={false}
       record={
         Object {
           "API_archive": [MockFunction],
@@ -31405,11 +31405,11 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
         }
       }
       cardType="collections"
-      coverItem={null}
       dragging={false}
       handleClick={[MockFunction]}
       height={100}
       isBoardCollection={false}
+      isCoverItem={false}
       record={
         Object {
           "API_archive": [MockFunction],
@@ -36928,11 +36928,11 @@ exports[`GridCard with item as editor renders snapshot 1`] = `
         }
       }
       cardType="items"
-      coverItem={null}
       dragging={false}
       handleClick={[MockFunction]}
       height={100}
       isBoardCollection={false}
+      isCoverItem={false}
       record={
         Object {
           "breadcrumb": Array [
@@ -38055,11 +38055,11 @@ exports[`GridCard with item as viewer renders snapshot 1`] = `
         }
       }
       cardType="items"
-      coverItem={null}
       dragging={false}
       handleClick={[MockFunction]}
       height={100}
       isBoardCollection={false}
+      isCoverItem={false}
       record={
         Object {
           "breadcrumb": Array [
@@ -40467,11 +40467,11 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
         }
       }
       cardType="collections"
-      coverItem={null}
       dragging={false}
       handleClick={[MockFunction]}
       height={100}
       isBoardCollection={false}
+      isCoverItem={false}
       record={
         Object {
           "API_archive": [MockFunction],
