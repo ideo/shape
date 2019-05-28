@@ -5,7 +5,7 @@
 #  id                 :bigint(8)        not null, primary key
 #  criteria           :string
 #  name               :string
-#  price_per_response :float
+#  price_per_response :decimal(10, 2)   default(0.0)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #

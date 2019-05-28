@@ -19,6 +19,7 @@
 #  shared_with_organization   :boolean          default(FALSE)
 #  submission_box_type        :integer
 #  submissions_enabled        :boolean          default(TRUE)
+#  test_closed_at             :datetime
 #  test_launched_at           :datetime
 #  test_status                :integer
 #  type                       :string
@@ -95,6 +96,7 @@ class Collection
               :completed_and_launchable?,
               proc { |**args|
                 attempt_to_purchase_test_audiences!(
+                  user: args[:initiated_by],
                   test_audience_params: args[:test_audience_params],
                 )
               },
@@ -135,11 +137,17 @@ class Collection
       self
     end
 
-    def attempt_to_purchase_test_audiences!(test_audience_params: nil)
-      return true unless test_audience_params.present?
-      TestAudiencePurchaser.call(self, test_audience_params)
-      return false if errors.present?
-      true
+    def attempt_to_purchase_test_audiences!(user:, test_audience_params: nil)
+      return true if test_audience_params.blank?
+
+      purchaser = PurchaseTestAudience.call(
+        test_collection: self,
+        test_audience_params: test_audience_params,
+        user: user,
+      )
+      return true if purchaser.success?
+      errors.add(:base, purchaser.message) if purchaser.message.present?
+      false
     end
 
     def post_launch_setup!(initiated_by: nil, reopening: false)
@@ -161,6 +169,7 @@ class Collection
       update_cached_submission_status(parent_submission) if inside_a_submission?
       create_test_design_and_move_cards!(initiated_by: initiated_by) unless reopening
       update(test_launched_at: Time.current, test_closed_at: nil)
+      TestCollectionMailer.notify_launch(id).deliver_later if gives_incentive? && ENV['ENABLE_ZENDESK_FOR_TEST_LAUNCH']
     end
 
     def still_accepting_answers?
@@ -334,10 +343,12 @@ class Collection
       collections.where(type: 'Collection::TestOpenResponses')
     end
 
-    def create_uniq_survey_response(user_id: nil)
+    def create_uniq_survey_response(user_id: nil, test_audience_id: nil)
       survey_responses.create(
         session_uid: SecureRandom.uuid,
         user_id: user_id,
+        # only include passed in test_audience_id if it is a valid relation
+        test_audience_id: test_audience_ids.include?(test_audience_id) ? test_audience_id : nil,
       )
     end
 
@@ -402,6 +413,7 @@ class Collection
           end
         create_open_response_collections(initiated_by: initiated_by)
         create_response_graphs(initiated_by: initiated_by)
+        create_media_item_link
         test_design.cache_cover!
       end
       reorder_cards!
@@ -444,6 +456,21 @@ class Collection
         question.create_response_graph(
           parent_collection: self,
           initiated_by: initiated_by,
+        )
+      end
+    end
+
+    def create_media_item_link(media_question_items: nil)
+      media_question_items ||= test_design.items.reject { |i| i.type == 'Item::QuestionItem' }
+      # since we're placing things at the front one by one, we reverse the order
+      media_question_items.reverse.map do |media_item|
+        next unless media_item.cards_linked_to_this_item.empty?
+        CollectionCard::Link.create(
+          parent: self,
+          item_id: media_item.id,
+          width: 1,
+          height: 2,
+          order: -1,
         )
       end
     end
@@ -529,6 +556,14 @@ class Collection
     def gives_incentive?
       # right now the check is basically any paid tests == gives_incentive
       test_audiences.where('price_per_response > 0').present?
+    end
+
+    def link_sharing_audience
+      test_audiences.where(price_per_response: 0).first
+    end
+
+    def link_sharing_enabled?
+      link_sharing_audience.present?
     end
   end
 end

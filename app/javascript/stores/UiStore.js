@@ -94,6 +94,8 @@ export default class UiStore {
   @observable
   cardAction = 'move'
   @observable
+  pastingCards = false
+  @observable
   templateName = ''
   defaultDialogProps = {
     open: null, // track whether "info" or "confirm" dialog are open, or none

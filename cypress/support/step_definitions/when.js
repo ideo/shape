@@ -67,13 +67,21 @@ When('I add a link URL', () => {
     }
   )
   cy.locate('LinkCreatorFormButton').click()
+  cy.wait('@apiReplaceCollectionCard')
 })
 
-When('I add a test description', () => {
-  cy.locate('DescriptionQuestionText')
+When('I fill {string} with some text', string => {
+  cy.locateDataOrClass(string)
     .first()
     .click()
     .type('Let me introduce my lovely prototype.')
+})
+
+When('I add a test email for {string}', string => {
+  cy.locateDataOrClass(string)
+    .first()
+    .click()
+    .type('name@example.com')
 })
 
 When('I add an open response question', () => {
@@ -82,7 +90,7 @@ When('I add an open response question', () => {
     .click()
   cy.wait('@apiCreateCollectionCard')
   // have to wait for the flipmove fade-in
-  cy.wait(FLIPMOVE_DELAY + 3000)
+  cy.wait(FLIPMOVE_DELAY + 500)
   cy.locateDataOrClass('.SelectHolderContainer')
     .eq(3)
     .find('.select')
@@ -91,7 +99,8 @@ When('I add an open response question', () => {
     .first()
     .click()
   cy.wait(FLIPMOVE_DELAY)
-  cy.wait('@apiReplaceCollectionCard')
+  cy.wait('@apiArchiveCollectionCards')
+  cy.wait('@apiCreateCollectionCard')
   // have to wait for the flipmove fade-in
   cy.wait(FLIPMOVE_DELAY)
 
@@ -99,6 +108,7 @@ When('I add an open response question', () => {
     .last()
     .click()
     .type('What do you think about pizza?')
+  cy.wait('@apiUpdateItem')
 })
 
 // ----------------------
@@ -111,6 +121,7 @@ When(
       .last()
       .click({ force: true })
     cy.wait('@apiGetCollection')
+    cy.wait('@apiGetCollectionCards')
   }
 )
 
@@ -131,6 +142,12 @@ When('I click the {string} containing {string}', (el, text) => {
 When('I click the {string}', el => {
   cy.locateDataOrClass(el)
     .first()
+    .click({ force: true })
+})
+
+When('I click the last {string}', el => {
+  cy.locateDataOrClass(el)
+    .last()
     .click({ force: true })
 })
 
@@ -156,6 +173,11 @@ When('I visit the captured URL', () => {
   cy.get('@url').then(url => {
     cy.visit(url)
   })
+})
+
+// used for shortcutting a test
+When('I visit URL {string}', url => {
+  cy.visit(url)
 })
 
 When('I type some random things', () => {

@@ -89,7 +89,7 @@ ActiveRecord::Schema.define(version: 20190523220518) do
     t.string "criteria"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.decimal "price_per_response", precision: 10, scale: 2
+    t.decimal "price_per_response", precision: 10, scale: 2, default: "0.0"
   end
 
   create_table "collection_cards", force: :cascade do |t|
@@ -121,6 +121,15 @@ ActiveRecord::Schema.define(version: 20190523220518) do
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
     t.index ["templated_from_id"], name: "index_collection_cards_on_templated_from_id"
     t.index ["type"], name: "index_collection_cards_on_type"
+  end
+
+  create_table "collection_cover_items", force: :cascade do |t|
+    t.bigint "collection_id"
+    t.bigint "item_id"
+    t.integer "order"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["collection_id", "item_id"], name: "index_collection_cover_items_on_collection_id_and_item_id", unique: true
   end
 
   create_table "collections", force: :cascade do |t|
@@ -409,6 +418,17 @@ ActiveRecord::Schema.define(version: 20190523220518) do
     t.index ["name"], name: "index_tags_on_name", unique: true
   end
 
+  create_table "test_audience_invitations", force: :cascade do |t|
+    t.bigint "test_audience_id"
+    t.bigint "user_id"
+    t.string "invitation_token"
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["test_audience_id"], name: "index_test_audience_invitations_on_test_audience_id"
+    t.index ["user_id"], name: "index_test_audience_invitations_on_user_id"
+  end
+
   create_table "test_audiences", force: :cascade do |t|
     t.integer "sample_size"
     t.bigint "audience_id"
@@ -416,6 +436,8 @@ ActiveRecord::Schema.define(version: 20190523220518) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.decimal "price_per_response", precision: 10, scale: 2
+    t.string "network_payment_id"
+    t.integer "launched_by_id"
     t.index ["audience_id"], name: "index_test_audiences_on_audience_id"
     t.index ["test_collection_id"], name: "index_test_audiences_on_test_collection_id"
   end
@@ -479,5 +501,7 @@ ActiveRecord::Schema.define(version: 20190523220518) do
   add_foreign_key "collections", "organizations"
   add_foreign_key "feedback_incentive_records", "survey_responses"
   add_foreign_key "feedback_incentive_records", "users"
+  add_foreign_key "test_audience_invitations", "test_audiences"
+  add_foreign_key "test_audience_invitations", "users"
   add_foreign_key "test_audiences", "audiences"
 end

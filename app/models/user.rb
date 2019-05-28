@@ -9,6 +9,7 @@
 #  email                       :string           default("")
 #  encrypted_password          :string           default(""), not null
 #  feedback_contact_preference :integer          default("feedback_contact_unanswered")
+#  feedback_terms_accepted     :boolean          default(FALSE)
 #  first_name                  :string
 #  handle                      :string
 #  invitation_token            :string
@@ -249,8 +250,8 @@ class User < ApplicationRecord
     find_or_initialize_from_external(user, auth.provider)
   end
 
-  def self.find_or_initialize_from_network(network_user)
-    find_or_initialize_from_external(network_user, 'ideo')
+  def self.find_or_initialize_from_network(network_user_auth)
+    find_or_initialize_from_external(network_user_auth, 'ideo')
   end
 
   def self.create_pending_user(email:)
@@ -422,6 +423,20 @@ class User < ApplicationRecord
   def current_incentive_balance
     last_record = feedback_incentive_records.order(created_at: :desc).first
     last_record ? last_record.current_balance : 0
+  end
+
+  def network_user
+    NetworkApi::User.find(uid).first
+  end
+
+  def generate_network_auth_token
+    return unless limited?
+    nu = network_user
+    return unless nu.present?
+    nu.generate_auth_token.first.try(:authentication_token)
+  rescue JsonApiClient::Errors::NotAuthorized
+    # shouldn't happen since we are already escaping `unless limited?`
+    nil
   end
 
   private

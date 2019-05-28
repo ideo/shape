@@ -295,7 +295,7 @@ describe Organization, type: :model do
     end
   end
 
-  describe '#setup_user_membership_and_collections', only: true do
+  describe '#setup_user_membership_and_collections' do
     let(:user) { create(:user, email: 'jill@ideo.com') }
     let!(:organization) do
       create(:organization, domain_whitelist: ['ideo.com'])
