@@ -103,3 +103,9 @@ Then(
       .should('have.length', count)
   }
 )
+
+Then('I should see the value {string} in the first text item', text => {
+  cy.get('.ql-editor')
+    .first()
+    .should('contain', text)
+})

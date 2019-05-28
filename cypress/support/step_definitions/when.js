@@ -25,6 +25,26 @@ When('I create a text item', num => {
   cy.createTextItem()
 })
 
+When('I click the first text item', () => {
+  cy.locate('TextItemCover')
+    .first()
+    .click({ force: true })
+    .wait(50)
+})
+
+When('I type {string} in the first quill editor', string => {
+  cy.get('.ql-editor')
+    .first()
+    .click()
+    .type(string)
+})
+
+When('I close the first open text item', () => {
+  cy.locate('TextItemClose')
+    .first()
+    .click({ force: true })
+})
+
 When('I create a data item', num => {
   cy.createDataItem()
 })

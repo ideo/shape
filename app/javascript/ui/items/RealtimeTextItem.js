@@ -151,7 +151,6 @@ class RealtimeTextItem extends React.Component {
     if (!initSnapshot) return
     const { item } = this.props
     this.version = item.data_content.version || 0
-    // what does getContents do?
     this.contentSnapshot = this.quillEditor.getContents()
   }
 
@@ -427,7 +426,6 @@ class RealtimeTextItem extends React.Component {
     }
 
     this.currentlySending = true
-    // what is contentSnapshot?
     const full_content = this.contentSnapshot.compose(this.combinedDelta)
     // NOTE: will get rejected if this.version < server saved version,
     // in which case the handleReceivedDelta error will try to resend
@@ -444,8 +442,6 @@ class RealtimeTextItem extends React.Component {
       ...full_content,
       version: this.version,
     }
-    // So we want to be storing this in the stack?
-    // Or do we just to do this with the previous data?
 
     this.bufferDelta = new Delta()
     return this.combinedDelta
