@@ -26,6 +26,7 @@ class SurveyResponse < ApplicationRecord
   has_many :question_answers, dependent: :destroy
   has_one :feedback_incentive_record
 
+  before_save :mark_as_completed, if: :all_questions_answered?
   after_save :create_open_response_items, if: :completed?
 
   delegate :question_items, to: :test_collection
@@ -58,6 +59,14 @@ class SurveyResponse < ApplicationRecord
   end
 
   private
+
+  def mark_as_completed
+    self.status = if test_collection.live?
+                    :completed
+                  else
+                    :completed_late
+                  end
+  end
 
   def create_open_response_items
     question_answers
