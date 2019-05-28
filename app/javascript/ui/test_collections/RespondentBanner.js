@@ -3,7 +3,8 @@ import Banner from '~/ui/layout/Banner'
 
 class RespondentBanner extends React.Component {
   renderLeftComponent() {
-    return `You have earned $${this.user.current_incentive_balance}.`
+    const earnings = parseFloat(this.user.current_incentive_balance).toFixed(2)
+    return `You have earned $${earnings}.`
   }
 
   renderRightComponent() {
