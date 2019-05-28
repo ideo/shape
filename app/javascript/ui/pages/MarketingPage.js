@@ -2,19 +2,11 @@ import { Fragment } from 'react'
 import { Box } from 'reflexbox'
 import { Element as ScrollElement } from 'react-scroll'
 import ReactRouterPropTypes from 'react-router-prop-types'
-
 import {
   MarketingBack,
-  MarketingFooter,
   // MarketingHeavyCTA,
-  InvertMarketingLink,
-  InvertMarketingH1,
-  InvertMarketingH1Bold,
-  InvertMarketingLinkMail,
   MarketingFlex,
   MarketingHeroButtonContainer,
-  ResponsivePadInlineBlock,
-  DesktopSpacer,
   Center,
   MarketingTagLine,
   MarketingVideoLink,
@@ -23,18 +15,15 @@ import {
   // MarketingBetaSticker,
   MarketingCallToAction,
   MarketingGradientTop,
-  InvertedCentered,
-  InvertedFixedWidth,
   VideoDimensions,
 } from '~/ui/global/styled/marketing.js'
-import poweredByIdeo from '~/assets/Powered-by-IDEO-Inverted.png'
 import MarketingMenu from '~/ui/marketing/MarketingMenu'
-import SubscribeEmail from '~/ui/marketing/SubscribeEmail'
 import ProductDescriptions from '~/ui/marketing/ProductDescriptions'
 import BetaSticker from '~/ui/marketing/BetaSticker'
 import marketingFirebaseClient from '~/vendor/firebase/clients/marketingFirebaseClient'
 import ReactPlayer from 'react-player'
-import queryString from 'query-string'
+import PageFooter from '~/ui/marketing/PageFooter.js'
+import { hasKeyValueParam } from '~/utils/paramUtils.js'
 
 class MarketingPage extends React.Component {
   constructor(props) {
@@ -51,11 +40,13 @@ class MarketingPage extends React.Component {
 
   componentDidMount() {
     marketingFirebaseClient.getObjectFromCollection('home').then(texts => {
-      if (this.props.location.search) {
-        const params = queryString.parse(this.props.location.search)
-        if (params && params.campaign === 'alphapt7') {
-          texts.footerHeader = texts.footerHeader.replace('$5', '$7')
-        }
+      const paramString = this.props.location.search
+      if (hasKeyValueParam(paramString, 'campaign', 'alphapt7')) {
+        texts.footer.header =
+          texts.footer.header && texts.footer.header.replace('$5', '$7')
+      }
+      if (hasKeyValueParam(paramString, 'videoPlaying', 'true')) {
+        this.setState({ videoPlaying: true })
       }
       this.setState({ pageTexts: texts })
     })
@@ -120,93 +111,16 @@ class MarketingPage extends React.Component {
           </MarketingFlex>
         </MarketingBack>
 
-        <MarketingFooter>
-          <ScrollElement name="FooterAnchor" />
-          <MarketingFlex align="center" justify="center" wrap w={1}>
-            <Box w={1} mb={[10, '4px']}>
-              <InvertMarketingH1Bold>
-                {pageTexts.footer && pageTexts.footer.header}
-              </InvertMarketingH1Bold>
-            </Box>
-            <Box w={1}>
-              <InvertMarketingH1>
-                {pageTexts.footer && pageTexts.footer.subHeader}
-              </InvertMarketingH1>
-            </Box>
-            <Box w={1} pt={[46, 65]} pb={[46, 74]} mb={[10, 0]}>
-              <a className="get-early-access-footer" href="/sign_up">
-                <MarketingCallToAction>
-                  {pageTexts.footer && pageTexts.footer.buttons[0]}
-                </MarketingCallToAction>
-              </a>
-            </Box>
-
-            <ResponsivePadInlineBlock>
-              <InvertedCentered>
-                {pageTexts.contact && pageTexts.contact.header}
-              </InvertedCentered>
-            </ResponsivePadInlineBlock>
-            <ResponsivePadInlineBlock>
-              <InvertedCentered>
-                {pageTexts.contact && pageTexts.contact.header2}
-              </InvertedCentered>
-            </ResponsivePadInlineBlock>
-
-            <Box w={1}>
-              <InvertMarketingLinkMail href="mailto:hello@shape.space">
-                hello@shape.space
-              </InvertMarketingLinkMail>
-            </Box>
-
-            <Box w={1} mt={(0, 5)} wrap>
-              <InvertedFixedWidth>
-                {pageTexts.subscription && pageTexts.subscription.header}
-              </InvertedFixedWidth>
-            </Box>
-
-            <Box w={1} mt={[8, 0]}>
-              <SubscribeEmail />
-            </Box>
-
-            <Box w={1}>
-              <InvertMarketingLink
-                href="https://www.ideo.com/"
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                <img
-                  src={poweredByIdeo}
-                  alt="Powered by IDEO"
-                  style={{
-                    width: '95px',
-                    paddingTop: '55px',
-                    paddingBottom: '30px',
-                  }}
-                />
-              </InvertMarketingLink>
-            </Box>
-          </MarketingFlex>
-
-          <Center>
-            <ResponsivePadInlineBlock>
-              <InvertMarketingLink href="https://www.ideo.com/privacy">
-                Privacy and Cookie Policy
-              </InvertMarketingLink>
-            </ResponsivePadInlineBlock>
-          </Center>
-          <Center>
-            <ResponsivePadInlineBlock>
-              <DesktopSpacer style={{ width: '80px' }} />
-              <InvertMarketingLink href="https://www.ideo.com/">
-                {/* Added span around &copy; in order to satisfy "jsx-a11y/accessible-emoji" */}
-                <span role="img" aria-label="Copyright Symbol">
-                  &copy;
-                </span>{' '}
-                2018
-              </InvertMarketingLink>
-            </ResponsivePadInlineBlock>
-          </Center>
-        </MarketingFooter>
+        <PageFooter
+          footerHeader={pageTexts.footer && pageTexts.footer.header}
+          footerSubheader={pageTexts.footer && pageTexts.footer.subHeader}
+          footerButtons={pageTexts.footer && pageTexts.footer.buttons}
+          contactHeader={pageTexts.contact && pageTexts.contact.header}
+          contactHeader2={pageTexts.contact && pageTexts.contact.header2}
+          subscriptionHeader={
+            pageTexts.subscription && pageTexts.subscription.header
+          }
+        />
       </Fragment>
     )
   }
