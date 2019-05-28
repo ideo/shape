@@ -21,10 +21,7 @@ export default class ProductTemplates extends React.PureComponent {
     marketingFirebaseClient
       .getObjectFromCollection('productTemplates')
       .then(productTemplates => {
-        const templatesToArray = Object.keys(productTemplates)
-          .map(key => Object.assign({ id: key }, productTemplates[key]))
-          .sort((a, b) => a.order - b.order)
-        this.setState({ templates: templatesToArray }) // convert firestore collection object to iterable array
+        this.setState({ templates: productTemplates }) // convert firestore collection object to iterable array
       })
   }
 
