@@ -23,10 +23,11 @@ const UNANSWERABLE_QUESTION_TYPES = [
 @observer
 class TestSurveyResponder extends React.Component {
   @observable
+  questionCards = []
+  @observable
   recontactAnswered = false
-  state = {
-    questionCards: [],
-  }
+  @observable
+  termsAnswered = false
 
   componentDidMount() {
     this.initializeCards()
@@ -34,6 +35,7 @@ class TestSurveyResponder extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (
+      this.props.includeTerms != prevProps.includeTerms ||
       this.props.includeRecontactQuestion != prevProps.includeRecontactQuestion
     ) {
       this.initializeCards()
@@ -41,20 +43,25 @@ class TestSurveyResponder extends React.Component {
   }
 
   async initializeCards() {
-    const { collection, includeRecontactQuestion } = this.props
+    const { collection, includeRecontactQuestion, includeTerms } = this.props
 
     const questionCards = [...collection.question_cards]
-    console.log('included recontract? ', includeRecontactQuestion)
 
     if (includeRecontactQuestion) {
-      console.log('splicing cards')
       questionCards.splice(questionCards.length - 1, 0, {
         id: 'recontact',
         card_question_type: 'question_recontact',
         record: { id: 'facsda', content: '' },
       })
     }
-    this.setState({ questionCards })
+    if (includeTerms) {
+      questionCards.unshift({
+        id: 'terms',
+        card_question_type: 'question_terms',
+        record: { id: 'terms', content: '' },
+      })
+    }
+    this.questionCards = questionCards
   }
 
   questionAnswerForCard = card => {
@@ -65,6 +72,9 @@ class TestSurveyResponder extends React.Component {
     if (card.card_question_type === 'question_recontact') {
       return this.recontactAnswered
     }
+    if (card.card_question_type === 'question_terms') {
+      return this.termsAnswered
+    }
     return _.find(surveyResponse.question_answers, {
       question_id: card.record.id,
     })
@@ -74,12 +84,13 @@ class TestSurveyResponder extends React.Component {
     UNANSWERABLE_QUESTION_TYPES.indexOf(card.card_question_type) === -1
 
   get viewableCards() {
-    const { questionCards } = this.state
+    const { questionCards } = this
 
     let reachedLastVisibleCard = false
     const questions = questionCards.filter(card => {
       // turn off the card's actionmenu (dot-dot-dot)
-      if (card.id !== 'recontact') card.record.disableMenu()
+      if (card.id !== 'recontact' && card.id !== 'terms')
+        card.record.disableMenu()
       if (reachedLastVisibleCard) {
         return false
       } else if (
@@ -95,10 +106,17 @@ class TestSurveyResponder extends React.Component {
     return questions
   }
 
-  afterQuestionAnswered = card => {
+  afterQuestionAnswered = (card, answer) => {
     if (card.id === 'recontact') {
       runInAction(() => {
         this.recontactAnswered = true
+      })
+    }
+    if (card.id === 'terms') {
+      // If they didn't agree to the terms, don't continue
+      if (!answer) return
+      runInAction(() => {
+        this.termsAnswered = true
       })
     }
     setTimeout(() => {
@@ -107,7 +125,7 @@ class TestSurveyResponder extends React.Component {
   }
 
   scrollToTopOfNextCard = card => {
-    const { questionCards } = this.state
+    const { questionCards } = this
     const { containerId } = this.props
     const index = questionCards.indexOf(card)
     const nextCard = questionCards[index + 1]
@@ -172,8 +190,10 @@ class TestSurveyResponder extends React.Component {
 TestSurveyResponder.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   createSurveyResponse: PropTypes.func.isRequired,
-  includeRecontactQuestion: PropTypes.bool,
+  user: MobxPropTypes.objectOrObservableObject,
   surveyResponse: MobxPropTypes.objectOrObservableObject,
+  includeRecontactQuestion: PropTypes.bool,
+  includeTerms: PropTypes.bool,
   theme: PropTypes.string,
   containerId: PropTypes.string,
 }
@@ -183,10 +203,12 @@ TestSurveyResponder.wrappedComponent.propTypes = {
 }
 
 TestSurveyResponder.defaultProps = {
+  user: null,
   surveyResponse: undefined,
   theme: 'primary',
   containerId: '',
   includeRecontactQuestion: false,
+  includeTerms: false,
 }
 TestSurveyResponder.displayName = 'TestSurveyResponder'
 
