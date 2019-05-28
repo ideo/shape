@@ -70,10 +70,10 @@ class CollectionCard < ApplicationRecord
   def self.default_relationships_for_api
     [
       :parent,
-      record: %i[
-        collection_cover_items
-        filestack_file
-        datasets
+      record: [
+        :filestack_file,
+        :datasets,
+        collection_cover_items: :datasets,
       ],
     ]
   end

@@ -9,14 +9,15 @@ class ApplicationOrganization < ApplicationRecord
   before_create :add_bot_user_to_organization
   before_destroy :remove_user_from_organization
 
-  private
-
   def create_root_collection
+    return if root_collection.present?
     return if application.blank? || organization.blank?
 
     self.root_collection = Collection::ApplicationCollection
                            .find_or_create_for_bot_user(application_user, organization)
   end
+
+  private
 
   def add_bot_user_to_organization
     organization.setup_bot_user_membership(application_user)

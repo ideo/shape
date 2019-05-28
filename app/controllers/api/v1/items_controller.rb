@@ -97,6 +97,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
       :tag_list,
       :thumbnail_url,
       :legend_item_id,
+      :legend_search_source,
       filestack_file_attributes: Item.filestack_file_attributes_whitelist,
     )
   end
