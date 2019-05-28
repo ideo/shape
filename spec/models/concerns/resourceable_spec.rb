@@ -117,6 +117,16 @@ describe Resourceable, type: :concern do
         expect(collection.can_view?(group)).to be true
       end
     end
+
+    context 'with common_viewable resource' do
+      before do
+        collection.update(common_viewable: true)
+      end
+
+      it 'should be viewable' do
+        expect(collection.can_view?(user)).to be true
+      end
+    end
   end
 
   context 'getting all editors and viewers' do

@@ -225,6 +225,18 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         expect(response.status).to eq(200)
         expect(user.current_organization).to eq other_org
       end
+
+      context 'with a common_viewable resource' do
+        before do
+          collection.update(common_viewable: true)
+        end
+
+        it 'should not switch the user to the org' do
+          get(path)
+          expect(response.status).to eq(200)
+          expect(user.current_organization).not_to eq other_org
+        end
+      end
     end
   end
 

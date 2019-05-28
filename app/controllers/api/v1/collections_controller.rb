@@ -250,6 +250,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def switch_to_organization
+    return if @collection.common_viewable?
     current_user.switch_to_organization(@collection.organization)
   end
 end

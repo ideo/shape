@@ -35,6 +35,7 @@ class Api::V1::BaseController < ApplicationController
       'Collection::UserProfile': SerializableCollection,
       'CollectionCard::Primary': SerializableCollectionCard,
       'CollectionCard::Link': SerializableCollectionCard,
+      'Group::Global': SerializableGroup,
     )
   end
 
