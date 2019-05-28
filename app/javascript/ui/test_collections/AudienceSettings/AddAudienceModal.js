@@ -284,20 +284,18 @@ class AddAudienceModal extends React.Component {
 
       return (
         <div key={criteria} ref={ref => this.updateMenuPosition(criteria, ref)}>
-          <Collapse in={menuOpen} timeout="auto" unmountOnExit>
-            <Select
-              open={menuOpen}
-              onOpen={() => this.openMenu(criteria)}
-              onClose={() => this.closeMenu(criteria)}
-              onChange={this.selectCriteraOption}
-              MenuProps={{ style: { maxHeight: '366px' } }}
-              multiple
-              value={[]}
-              style={{ visibility: 'hidden' }}
-            >
-              {options}
-            </Select>
-          </Collapse>
+          <Select
+            open={menuOpen}
+            onOpen={() => this.openMenu(criteria)}
+            onClose={() => this.closeMenu(criteria)}
+            onChange={this.selectCriteraOption}
+            MenuProps={{ style: { maxHeight: '366px' } }}
+            multiple
+            value={[]}
+            style={{ visibility: 'hidden', width: 0, height: 0 }}
+          >
+            {options}
+          </Select>
         </div>
       )
     })
