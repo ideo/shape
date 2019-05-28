@@ -8,9 +8,9 @@
 #  data_source_type :string
 #  description      :text
 #  groupings        :jsonb
+#  identifier       :string
 #  max_domain       :integer
 #  measure          :string
-#  name             :string
 #  question_type    :string
 #  style            :jsonb
 #  timeframe        :integer

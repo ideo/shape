@@ -57,8 +57,8 @@ describe('LegendItemCover', () => {
             ...fakeDataset,
             groupings: [{ type: 'Organization', id: 13 }],
             selected: true,
-            name: 'org-wide-question',
-            display_name: 'Organziation stuff',
+            identifier: 'org-wide-question',
+            name: 'Organization stuff',
           },
         ]
         render()
@@ -67,7 +67,7 @@ describe('LegendItemCover', () => {
 
       it('should unselect the dataset by name', () => {
         expect(
-          props.card.parent.API_unselectDatasetsWithName
+          props.card.parent.API_unselectDatasetsWithIdentifier
         ).toHaveBeenCalled()
       })
     })
@@ -137,8 +137,8 @@ describe('LegendItemCover', () => {
         ...fakeDataset,
         groupings: [{ type: 'Organization', id: 13 }],
         selected: false,
-        name: 'org-wide-question',
-        display_name: 'Organziation stuff',
+        identifier: 'org-wide-question',
+        name: 'Organization stuff',
         internalType: 'datasets',
       }
 
@@ -156,7 +156,9 @@ describe('LegendItemCover', () => {
     describe('with a dataset', () => {
       it('should toggle the dataset with name', () => {
         instance.onSelectComparison(groupedDataset)
-        expect(props.card.parent.API_selectDatasetsWithName).toHaveBeenCalled()
+        expect(
+          props.card.parent.API_selectDatasetsWithIdentifier
+        ).toHaveBeenCalled()
       })
     })
   })
