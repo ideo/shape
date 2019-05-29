@@ -186,4 +186,8 @@ class SerializableCollection < BaseJsonSerializer
   attribute :is_test_locked do
     @object.try(:purchased?)
   end
+
+  attribute :has_link_sharing do
+    @object.try(:link_sharing?)
+  end
 end

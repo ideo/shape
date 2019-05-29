@@ -126,6 +126,7 @@ class AudienceSettings extends React.Component {
         {
           test_collection_id: testDesign.test_collection_id,
           audience_id: audience.id,
+          price_per_response: 0,
         },
         apiStore
       )

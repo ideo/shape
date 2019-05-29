@@ -67,6 +67,7 @@ class Collection
              :test_status,
              :collection_to_test,
              :purchased?,
+             :link_sharing?,
              :test_audiences,
              to: :test_collection
 

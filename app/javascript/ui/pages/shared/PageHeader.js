@@ -290,52 +290,55 @@ class PageHeader extends React.Component {
                 )}
                 {this.launchTestButton}
                 {this.joinCollectionButton}
-                {record.isLiveTest && (
-                  <Fragment>
-                    <CopyToClipboard
-                      text={record.publicTestURL}
-                      onCopy={() => null}
-                    >
-                      <HeaderFormButton
-                        width="140"
-                        color={v.colors.transparent}
-                        onClick={() =>
-                          uiStore.popupSnackbar({ message: 'Test link copied' })
-                        }
+                {record.isLiveTest &&
+                  record.has_link_sharing && (
+                    <Fragment>
+                      <CopyToClipboard
+                        text={record.publicTestURL}
+                        onCopy={() => null}
                       >
-                        <span
-                          style={{
-                            display: 'inline-block',
-                            height: 24,
-                            width: 27,
-                            verticalAlign: 'middle',
-                          }}
-                        >
-                          <LinkIconSm />
-                        </span>
-                        <span
-                          style={{
-                            display: 'inline-block',
-                            verticalAlign: 'middle',
-                          }}
-                        >
-                          Get Link
-                        </span>
-                      </HeaderFormButton>
-                    </CopyToClipboard>
-                    {record.can_edit_content &&
-                      !record.is_test_locked && (
                         <HeaderFormButton
-                          width="170"
+                          width="140"
                           color={v.colors.transparent}
-                          onClick={record.closeTest}
-                          disabled={uiStore.launchButtonLoading}
+                          onClick={() =>
+                            uiStore.popupSnackbar({
+                              message: 'Test link copied',
+                            })
+                          }
                         >
-                          Stop Feedback
+                          <span
+                            style={{
+                              display: 'inline-block',
+                              height: 24,
+                              width: 27,
+                              verticalAlign: 'middle',
+                            }}
+                          >
+                            <LinkIconSm />
+                          </span>
+                          <span
+                            style={{
+                              display: 'inline-block',
+                              verticalAlign: 'middle',
+                            }}
+                          >
+                            Get Link
+                          </span>
                         </HeaderFormButton>
-                      )}
-                  </Fragment>
-                )}
+                      </CopyToClipboard>
+                      {record.can_edit_content &&
+                        !record.is_test_locked && (
+                          <HeaderFormButton
+                            width="170"
+                            color={v.colors.transparent}
+                            onClick={record.closeTest}
+                            disabled={uiStore.launchButtonLoading}
+                          >
+                            Stop Feedback
+                          </HeaderFormButton>
+                        )}
+                    </Fragment>
+                  )}
               </Flex>
             </StyledTitleAndRoles>
           </div>

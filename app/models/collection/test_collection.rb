@@ -567,5 +567,9 @@ class Collection
     def purchased?
       gives_incentive? && live?
     end
+
+    def link_sharing?
+      test_audiences.where(price_per_response: 0).present?
+    end
   end
 end
