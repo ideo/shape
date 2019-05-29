@@ -162,10 +162,8 @@ Rails.application.routes.draw do
   end
 
   resources :tests, only: %i[show] do
-    member do
-      get 'token_auth'
-    end
     collection do
+      get 't/:token', to: 'tests#token_auth'
       get 'completed'
     end
   end

@@ -123,7 +123,7 @@ describe Api::V1::TestCollectionsController, type: :request, json: true, auth: t
       {
         data: {
           comparison_collection_id: comparison_collection.id,
-        }
+        },
       }.to_json
     end
     before do

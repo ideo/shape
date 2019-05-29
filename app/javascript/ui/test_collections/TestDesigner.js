@@ -19,6 +19,62 @@ import AudienceSettings from '~/ui/test_collections/AudienceSettings'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 
+// TODO: have first and last TestQuestionFlexWrapper replace BottomBorder/TopBorder
+const TopBorder = styled.div`
+  background-color: ${props => props.theme.borderColorEditing};
+  border-radius: 7px 7px 0 0;
+  height: 16px;
+  margin-left: 314px;
+  width: 374px;
+
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    display: none;
+  }
+`
+const BottomBorder = TopBorder.extend`
+  border-radius: 0 0 7px 7px;
+`
+
+const TestQuestionFlexWrapper = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  width: 694px;
+
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    width: 600px;
+  }
+
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    width: 100%;
+  }
+`
+
+const OuterContainer = styled.div`
+  display: flex;
+
+  .design-column {
+    flex: 1;
+  }
+
+  .settings-column {
+    flex: 1;
+    margin-left: 30px;
+  }
+
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    flex-direction: column-reverse;
+    flex-wrap: wrap;
+
+    .design-column {
+      justify-content: center;
+    }
+
+    .settings-column {
+      margin-left: 0px;
+    }
+  }
+`
+
 @observer
 class TestDesigner extends React.Component {
   constructor(props) {
@@ -327,55 +383,6 @@ class TestDesigner extends React.Component {
     )
   }
 }
-
-const TopBorder = styled.div`
-  background-color: ${props => props.theme.borderColorEditing};
-  border-radius: 7px 7px 0 0;
-  height: 16px;
-  margin-left: 320px;
-  width: 374px;
-
-  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
-    display: none;
-  }
-`
-const BottomBorder = TopBorder.extend`
-  border-radius: 0 0 7px 7px;
-`
-
-const TestQuestionFlexWrapper = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  width: 694px;
-  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
-    width: 600px;
-  }
-  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
-    width: 100%;
-  }
-`
-
-const OuterContainer = styled.div`
-  display: flex;
-  .design-column {
-    flex: 1;
-  }
-  .settings-column {
-    flex: 1;
-    margin-left: 30px;
-  }
-  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
-    flex-direction: column-reverse;
-    flex-wrap: wrap;
-    .design-column {
-      justify-content: center;
-    }
-    .settings-column {
-      margin-left: 0px;
-    }
-  }
-`
-
 TestDesigner.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
 }

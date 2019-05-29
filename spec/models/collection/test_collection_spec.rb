@@ -63,11 +63,19 @@ describe Collection::TestCollection, type: :model do
   end
 
   describe '#create_uniq_survey_response' do
+    let!(:test_audience) { create(:test_audience, test_collection: test_collection) }
+
     it 'should create a survey response with a unique session_uid' do
       expect do
         test_collection.create_uniq_survey_response
       end.to change(test_collection.survey_responses, :count).by(1)
       expect(test_collection.survey_responses.last.session_uid).not_to be nil
+    end
+
+    it 'should accept the passed in test_audience_id' do
+      expect do
+        test_collection.create_uniq_survey_response(test_audience_id: test_audience.id)
+      end.to change(test_audience.survey_responses, :count).by(1)
     end
   end
 
@@ -351,9 +359,13 @@ describe Collection::TestCollection, type: :model do
           end
 
           context 'with test_audience_params' do
-            it 'should call TestAudiencePurchaser' do
+            it 'should call PurchaseTestAudience' do
               params = { some: 'params' }
-              expect(TestAudiencePurchaser).to receive(:call).with(test_collection, params)
+              expect(PurchaseTestAudience).to receive(:call).with(
+                test_collection: test_collection,
+                test_audience_params: params,
+                user: user,
+              )
               test_collection.launch!(initiated_by: user, test_audience_params: params)
             end
           end
@@ -378,6 +390,18 @@ describe Collection::TestCollection, type: :model do
 
               expect(TestCollectionMailer).to receive(:notify_launch).with(test_collection.id)
               test_collection.launch!(initiated_by: user)
+            end
+          end
+
+          context 'with media questions' do
+            # "completed" will have one video item
+            let!(:test_collection) { create(:test_collection, :completed) }
+            let(:first_card) { test_collection.collection_cards.first }
+
+            it 'creates a media item link for the media item' do
+              test_collection.launch!(initiated_by: user)
+              expect(first_card.is_a?(CollectionCard::Link)).to be true
+              expect(first_card.item).to eq test_collection.test_design.items.first
             end
           end
 
