@@ -197,6 +197,7 @@ ActiveRecord::Schema.define(version: 20190529222849) do
 
   create_table "datasets", force: :cascade do |t|
     t.string "type"
+    t.string "name"
     t.string "measure"
     t.string "question_type"
     t.string "url"
@@ -211,7 +212,6 @@ ActiveRecord::Schema.define(version: 20190529222849) do
     t.bigint "data_source_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "name"
     t.text "description"
     t.jsonb "groupings", default: []
     t.index ["data_source_type", "data_source_id"], name: "index_datasets_on_data_source_type_and_data_source_id"
