@@ -92,27 +92,6 @@ describe Api::V1::TestCollectionsController, type: :request, json: true, auth: t
     end
   end
 
-  describe 'GET #token_auth' do
-    let!(:collection) { create(:test_collection, test_status: :live) }
-    let(:path) { token_auth_test_path(collection) }
-
-    it 'redirects to collection' do
-      get(path)
-      expect(response).to redirect_to(test_url(collection))
-    end
-
-    context 'user not logged in' do
-      before do
-        logout(:user)
-      end
-
-      it 'redirects to Network token auth' do
-        get(path)
-        expect(response.location).to include(ideo_sso_api_base_url.to_s)
-      end
-    end
-  end
-
   describe 'POST #add_comparison' do
     let!(:collection) { create(:test_collection, test_status: :live, add_editors: [user]) }
     let!(:comparison_collection) { create(:test_collection, test_status: :live, add_editors: [user]) }
