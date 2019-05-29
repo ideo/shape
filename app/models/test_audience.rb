@@ -8,8 +8,6 @@
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  audience_id        :bigint(8)
-#  launched_by_id     :integer
-#  network_payment_id :string
 #  test_collection_id :bigint(8)
 #
 # Indexes

@@ -37,7 +37,9 @@ exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
             },
           ],
           "description": "The degree to which there is alignment about a meaningful change that leadership and employees want to make in the world.",
+          "identifier": "purpose",
           "measure": "Purpose",
+          "name": "purpose",
           "order": 0,
           "single_value": 0,
           "style": Object {
@@ -63,7 +65,9 @@ exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
             },
           ],
           "description": "The degree to which there is alignment about a meaningful change that leadership and employees want to make in the world.",
+          "identifier": "purpose",
           "measure": "95th Percentile",
+          "name": "purpose",
           "order": 1,
           "single_value": 0,
           "style": Object {
@@ -725,7 +729,9 @@ exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
               },
             ],
             "description": "The degree to which there is alignment about a meaningful change that leadership and employees want to make in the world.",
+            "identifier": "purpose",
             "measure": "Purpose",
+            "name": "purpose",
             "order": 0,
             "single_value": 0,
             "style": Object {
@@ -751,7 +757,9 @@ exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
               },
             ],
             "description": "The degree to which there is alignment about a meaningful change that leadership and employees want to make in the world.",
+            "identifier": "purpose",
             "measure": "95th Percentile",
+            "name": "purpose",
             "order": 1,
             "single_value": 0,
             "style": Object {

@@ -444,8 +444,6 @@ ActiveRecord::Schema.define(version: 20190528210255) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.decimal "price_per_response", precision: 10, scale: 2
-    t.string "network_payment_id"
-    t.integer "launched_by_id"
     t.index ["audience_id"], name: "index_test_audiences_on_audience_id"
     t.index ["test_collection_id"], name: "index_test_audiences_on_test_collection_id"
   end
