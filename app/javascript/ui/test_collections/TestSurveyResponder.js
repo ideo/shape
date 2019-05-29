@@ -61,7 +61,9 @@ class TestSurveyResponder extends React.Component {
         record: { id: 'terms', content: '' },
       })
     }
-    this.questionCards = questionCards
+    runInAction(() => {
+      this.questionCards = questionCards
+    })
   }
 
   questionAnswerForCard = card => {
@@ -88,11 +90,6 @@ class TestSurveyResponder extends React.Component {
 
     let reachedLastVisibleCard = false
     const questions = questionCards.filter(card => {
-      // console.log(
-      //   'top',
-      //   card.card_question_type,
-      //   this.questionAnswerForCard(card)
-      // )
       // turn off the card's actionmenu (dot-dot-dot)
       if (card.id !== 'recontact' && card.id !== 'terms')
         card.record.disableMenu()
