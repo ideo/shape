@@ -11,6 +11,8 @@
 #
 
 class Audience < ApplicationRecord
+  acts_as_taggable
+
   has_many :audience_organizations, dependent: :destroy
   has_many :organizations, through: :audience_organizations
 

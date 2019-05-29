@@ -38,6 +38,6 @@ class Api::V1::AudiencesController < Api::V1::BaseController
   end
 
   def audience_params
-    params.require(:audience).permit(:name)
+    params.require(:audience).permit(:name, :tag_list)
   end
 end
