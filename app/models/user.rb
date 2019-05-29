@@ -425,6 +425,12 @@ class User < ApplicationRecord
     last_record ? last_record.current_balance : 0
   end
 
+
+  def incentive_due_date
+    first_record = feedback_incentive_records.order(created_at: :asc).first
+    first_record ? first_record.created_at : nil
+  end
+
   def network_user
     NetworkApi::User.find(uid).first
   end

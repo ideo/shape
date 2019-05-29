@@ -11,7 +11,6 @@ import VideoItemCover from '~/ui/grid/covers/VideoItemCover'
 import GenericFileItemCover from '~/ui/grid/covers/GenericFileItemCover'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 import DataItemCover from '~/ui/grid/covers/DataItemCover'
-import ChartItemCover from '~/ui/grid/covers/ChartItemCover'
 import LegendItemCover from '~/ui/grid/covers/LegendItemCover'
 
 import { ITEM_TYPES } from '~/utils/variables'
@@ -73,15 +72,12 @@ class CoverRenderer extends React.Component {
               dragging={dragging}
             />
           )
-        case ITEM_TYPES.CHART:
-          return <ChartItemCover item={record} testCollection={card.parent} />
-
         case ITEM_TYPES.DATA:
           // We must pass in dataset length to trigger
           // re-render when new datasets are added
           return (
             <DataItemCover
-              datasetLength={record.datasets.length}
+              datasetLength={record.datasets ? record.datasets.length : 0}
               height={height}
               item={record}
               card={card}
@@ -122,13 +118,16 @@ class CoverRenderer extends React.Component {
   }
 
   render() {
-    const { coverItem, card } = this.props
-    if (coverItem) {
+    const {
+      isCoverItem,
+      card: { record },
+    } = this.props
+    if (isCoverItem) {
       return (
         <PlainLink
           onClick={this.handleClickToCollection}
           onKeyDown={this.handleClickToCollection}
-          to={routingStore.routeTo('collections', card.record.id)}
+          to={routingStore.pathTo('collections', record.id)}
           role="link"
           tabIndex="0"
         >
@@ -145,7 +144,7 @@ CoverRenderer.propTypes = {
   cardType: PropTypes.string.isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   isBoardCollection: PropTypes.bool,
-  coverItem: PropTypes.bool,
+  isCoverItem: PropTypes.bool,
   height: PropTypes.number,
   dragging: PropTypes.bool,
   searchResult: PropTypes.bool,
@@ -156,7 +155,7 @@ CoverRenderer.defaultProps = {
   height: 1,
   dragging: false,
   searchResult: false,
-  coverItem: false,
+  isCoverItem: false,
   isBoardCollection: false,
   handleClick: () => null,
 }

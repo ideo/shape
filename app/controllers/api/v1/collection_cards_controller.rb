@@ -12,10 +12,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     params[:card_order] ||= @collection.default_card_order
 
     render jsonapi: @collection_cards,
-           include: [
-             :parent,
-             record: %i[filestack_file collection_cover_items],
-           ],
+           include: CollectionCard.default_relationships_for_api,
            expose: {
              card_order: params[:card_order],
              current_record: @collection,
@@ -45,7 +42,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       # because TextItems get created empty, we don't broadcast their creation
       broadcast_collection_create_updates unless card.record.is_a?(Item::TextItem)
       render jsonapi: card,
-             include: [:parent, record: [:filestack_file]],
+             include: CollectionCard.default_relationships_for_api,
              expose: { current_record: card.record }
     else
       render_api_errors builder.errors
@@ -66,7 +63,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     if @collection_card.save
       create_notification(@collection_card, :edited)
       broadcast_collection_create_updates
-      render jsonapi: @collection_card.reload
+      render jsonapi: @collection_card.reload,
+             include: CollectionCard.default_relationships_for_api
     else
       render_api_errors @collection_card.errors
     end
@@ -94,7 +92,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       card = builder.replacing_card
       create_notification(card, :replaced)
       render jsonapi: card.reload,
-             include: [:parent, record: [:filestack_file]],
+             include: CollectionCard.default_relationships_for_api,
              expose: { current_record: card.record }
     else
       render_api_errors builder.errors
@@ -350,6 +348,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         :external_id,
         :content,
         :legend_item_id,
+        :legend_search_source,
         data_content: {},
         filestack_file_attributes: [
           :url,
@@ -359,9 +358,25 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
           :mimetype,
           docinfo: {},
         ],
-        data_settings: %i[
-          d_measure
-          d_timeframe
+        datasets_attributes: [
+          :identifier,
+          :description,
+          :order,
+          :selected,
+          :max_domain,
+          :cached_data,
+          :measure,
+          :timeframe,
+          :chart_type,
+          :data_source_type,
+          :data_source_id,
+          style: {},
+          cached_data: [
+            :value,
+            :date,
+            :percentage,
+            :column,
+          ],
         ],
       ],
     )

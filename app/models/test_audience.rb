@@ -31,6 +31,8 @@ class TestAudience < ApplicationRecord
   belongs_to :launched_by, class_name: 'User'
   has_many :survey_responses
 
+  delegate :name,
+           to: :audience
   validates :price_per_response, presence: true
 
   before_validation :set_price_per_response_from_audience, on: :create
@@ -55,6 +57,10 @@ class TestAudience < ApplicationRecord
     open: 0,
     closed: 1,
   }
+
+  def self.display_name
+    'Audience'
+  end
 
   def survey_response_completed!
     return unless reached_sample_size?

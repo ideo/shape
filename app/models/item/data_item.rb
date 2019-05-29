@@ -13,6 +13,7 @@
 #  data_settings              :jsonb
 #  data_source_type           :string
 #  icon_url                   :string
+#  legend_search_source       :integer
 #  name                       :string
 #  question_type              :integer
 #  report_type                :integer
@@ -42,63 +43,51 @@ class Item
   class DataItem < Item
     belongs_to :legend_item, class_name: 'Item::LegendItem', optional: true
 
+    has_many :data_items_datasets,
+             -> { ordered },
+             dependent: :destroy,
+             foreign_key: 'data_item_id'
+
+    has_one :primary_data_items_datasets,
+            -> { where(order: 0) },
+            foreign_key: 'data_item_id',
+            class_name: 'DataItemsDataset'
+
+    has_many :datasets, through: :data_items_datasets
+
+    has_one :primary_dataset,
+            through: :primary_data_items_datasets,
+            class_name: 'Dataset',
+            source: :dataset
+
+    # TODO: deprecate this relationship after migrating
+    # all existing DataItems to have datasets
+    belongs_to :data_source, polymorphic: true, optional: true
     store_accessor :data_settings,
                    :d_measure,
-                   :d_filters,
+                   :d_filters, # This is an optional data source (Collection or Item)
                    :d_timeframe
+    # END deprecating methods
 
     validates :report_type, presence: true
-    validate :collections_and_items_validations, if: :report_type_collections_and_items?
-    validate :network_app_metric_validations, if: :report_type_network_app_metric?
-    validate :record_validations, if: :report_type_record?
     after_create :create_legend_item, if: :create_legend_item?
-
-    delegate :selected_measures, to: :legend_item, allow_nil: true
-
-    VALID_MEASURES = %w[
-      participants
-      viewers
-      activity
-      content
-      collections
-      items
-      records
-    ].freeze
-    VALID_TIMEFRAMES = %w[
-      ever
-      month
-      week
-    ].freeze
 
     enum report_type: {
       report_type_collections_and_items: 0,
       report_type_network_app_metric: 1,
       report_type_record: 2,
+      report_type_question_item: 3,
     }
 
     attr_accessor :dont_create_legend_item
-
-    # All datasets available
-    def all_datasets
-      @all_datasets ||= load_datasets
-    end
-
-    # Datasets that may be filtered by legend
-    def datasets
-      all_datasets.select do |dataset|
-        dataset[:order].zero? ||
-          (
-            selected_measures.present? &&
-            selected_measures.include?(dataset[:measure].to_s)
-          )
-      end
-    end
 
     def create_legend_item(parent_collection = nil)
       parent_collection ||= parent
       builder = CollectionCardBuilder.new(
         params: {
           order: parent_collection_card.order + 1,
+          width: 1,
+          height: 2,
           item_attributes: {
             type: 'Item::LegendItem',
           },
@@ -122,40 +111,51 @@ class Item
       duplicate
     end
 
+    def title
+      datasets.first&.title
+    end
+
+    def description
+      datasets.first&.description
+    end
+
+    def create_dataset(params)
+      # Slice out params used for DataItemsDataset
+      order = params.delete(:order)
+      # Check if nil first so that selected can be set to false
+      selected = params[:selected].nil? ? true : params.delete(:selected)
+
+      dataset_params = {
+        type: dataset_type,
+        organization_id: organization_id,
+      }.merge(params)
+
+      data_items_datasets.create(
+        order: order,
+        selected: selected,
+        dataset: Dataset.new(dataset_params),
+      ).dataset
+    end
+
     private
 
-    def load_datasets
-      if report_type_record?
-        return [] if data_content['datasets'].blank?
-        data_content['datasets'].map(&:deep_symbolize_keys)
-      elsif report_type_network_app_metric?
-        DataReport::NetworkAppMetric.new(self).call
-      elsif report_type_collections_and_items?
-        DataReport::CollectionsAndItems.new(self).call
+    def dataset_type
+      case report_type.to_s
+      when
+        'report_type_collections_and_items' then 'Dataset::CollectionsAndItems'
+      when
+        'report_type_question_item' then 'Dataset::Question'
+      when
+        'report_type_network_app_metric' then 'Dataset::NetworkAppMetric'
       end
-    end
-
-    def record_validations
-      return if data_content.present?
-      errors.add(:data_content, 'must be present')
-    end
-
-    def network_app_metric_validations
-      return if url.present?
-      errors.add(:url, 'must be present')
-    end
-
-    def collections_and_items_validations
-      if !VALID_MEASURES.include?(d_measure.to_s)
-        errors.add(:data_settings, "measure must be one of #{VALID_MEASURES.join(', ')}")
-      end
-      return if VALID_TIMEFRAMES.include?(d_timeframe.to_s)
-      errors.add(:data_settings, "timeframe must be one of #{VALID_TIMEFRAMES.join(', ')}")
     end
 
     def create_legend_item?
-      return false if dont_create_legend_item
-      report_type_record? && legend_item.blank? && parent_collection_card.present?
+      return false if dont_create_legend_item ||
+                      report_type_network_app_metric? ||
+                      report_type_collections_and_items?
+
+      legend_item.blank? && parent_collection_card.present?
     end
   end
 end
