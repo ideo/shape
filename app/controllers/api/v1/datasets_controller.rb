@@ -13,32 +13,32 @@ class Api::V1::DatasetsController < Api::V1::BaseController
   end
 
   def select
-    update_measure(name: json_api_params[:name], selected: true)
+    update_measure(name: json_api_params[:identifier], selected: true)
     render json: { success: true }
   end
 
   def unselect
-    update_measure(name: json_api_params[:name], selected: false)
+    update_measure(name: json_api_params[:identifier], selected: false)
     render json: { success: true }
   end
 
   private
 
-  def update_measure(name: nil, selected: true)
-    return if name.blank?
-    collection_data_items_datasets(name: name).each do |data_items_dataset|
+  def update_measure(identifier: nil, selected: true)
+    return if identifier.blank?
+    collection_data_items_datasets(identifier: identifier).each do |data_items_dataset|
       data_items_dataset.update(
         selected: selected,
       )
     end
   end
 
-  def collection_data_items_datasets(name:)
+  def collection_data_items_datasets(identifier:)
     DataItemsDataset
       .joins(:dataset)
       .where(
         data_item_id: @collection.data_item_ids,
-        datasets: { name: name },
+        datasets: { identifier: identifier },
       )
   end
 
@@ -47,6 +47,7 @@ class Api::V1::DatasetsController < Api::V1::BaseController
       :type,
       :measure,
       :timeframe,
+      :identifier,
       :data_source_id,
       :data_source_type,
       :data_source,

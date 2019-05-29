@@ -17,11 +17,11 @@ import {
 import LineChartIcon from '~/ui/icons/LineChartIcon'
 import trackError from '~/utils/trackError'
 
-function formatForAutocomplete(things) {
-  return things.map(thing => ({
-    value: thing.id,
-    label: thing.display_name || thing.name,
-    data: thing,
+function formatForAutocomplete(objects) {
+  return objects.map(object => ({
+    value: object.id,
+    label: object.name,
+    data: object,
   }))
 }
 
@@ -129,10 +129,13 @@ class LegendItemCover extends React.Component {
    */
   datasets = ({ selected }) => {
     const { datasets } = this.props.item
-    const names = []
+    const identifiers = []
     return datasets.filter(dataset => {
-      if (dataset.selected === selected && !_.includes(names, dataset.name)) {
-        names.push(dataset.name)
+      if (
+        dataset.selected === selected &&
+        !_.includes(identifiers, dataset.identifier)
+      ) {
+        identifiers.push(dataset.identifier)
         return true
       } else {
         return false
@@ -146,12 +149,12 @@ class LegendItemCover extends React.Component {
    */
   @observable
   @action
-  toggleDatasetsWithName = async ({ name, selected } = {}) => {
+  toggleDatasetsWithIdentifier = async ({ identifier, selected }) => {
     const { parent } = this.props.card
     if (!selected) {
-      await parent.API_selectDatasetsWithName({ name })
+      await parent.API_selectDatasetsWithIdentifier({ identifier })
     } else {
-      await parent.API_unselectDatasetsWithName({ name })
+      await parent.API_unselectDatasetsWithIdentifier({ identifier })
     }
     parent.API_fetchCards()
   }
@@ -187,8 +190,8 @@ class LegendItemCover extends React.Component {
   onDeselectComparison = async dataset => {
     const { parent } = this.props.card
     if (dataset.groupings.length) {
-      const { name, selected } = dataset
-      this.toggleDatasetsWithName({ name, selected })
+      const { identifier, selected } = dataset
+      this.toggleDatasetsWithIdentifier({ identifier, selected })
     } else {
       await parent.API_removeComparison({ id: dataset.test_collection_id })
     }
@@ -207,8 +210,8 @@ class LegendItemCover extends React.Component {
   onSelectComparison = async entity => {
     const { card } = this.props
     if (entity.internalType === 'datasets') {
-      const { name, selected } = entity
-      this.toggleDatasetsWithName({ name, selected })
+      const { identifier, selected } = entity
+      this.toggleDatasetsWithIdentifier({ identifier, selected })
     } else {
       await card.parent.API_addComparison(entity)
     }
@@ -251,7 +254,7 @@ class LegendItemCover extends React.Component {
   handleDatasetSelection = event => {
     event.preventDefault()
     const { value } = event.target
-    this.toggleDatasetsWithName({ name: value, selected: true })
+    this.toggleDatasetsWithIdentifier({ identifier: value, selected: true })
   }
 
   get renderDatasetsMenu() {
@@ -269,10 +272,10 @@ class LegendItemCover extends React.Component {
         {this.datasets({ selected: false }).map(dataset => (
           <SelectOption
             classes={{ root: 'selectOption', selected: 'selected' }}
-            key={dataset.name}
-            value={dataset.name}
+            key={dataset.identifier}
+            value={dataset.identifier}
           >
-            {dataset.display_name}
+            {dataset.name}
           </SelectOption>
         ))}
       </Select>
@@ -282,13 +285,13 @@ class LegendItemCover extends React.Component {
   get renderTestCollectionsSearch() {
     // Transform the audience so name is set to display name for the option
     // formatting
-    const selectedDatasetNames = this.datasets({ selected: true }).map(
-      d => d.name
+    const selectedDatasetIdentifiers = this.datasets({ selected: true }).map(
+      d => d.identifier
     )
     const unselectedDatasets = this.datasets({ selected: false })
     const formattedOptions = formatForAutocomplete(
       _.reject(unselectedDatasets, unselected =>
-        _.includes(selectedDatasetNames, unselected.name)
+        _.includes(selectedDatasetIdentifiers, unselected.identifier)
       )
     )
     return (
@@ -313,7 +316,7 @@ class LegendItemCover extends React.Component {
 
   renderSelectedDataset = ({ dataset, order }) => {
     if (!dataset) return ''
-    const { name, style, chart_type, display_name } = dataset
+    const { identifier, name, style, chart_type } = dataset
     const primary = order === 0
     let icon
     if (chart_type === 'line') {
@@ -328,9 +331,9 @@ class LegendItemCover extends React.Component {
       icon = <AreaChartIcon color={color} />
     }
     return (
-      <Dataset key={`dataset-${name}`}>
+      <Dataset key={`dataset-${identifier}`}>
         {icon && <DatasetIconWrapper>{icon}</DatasetIconWrapper>}
-        <DatasetText color={v.colors.black}>{display_name}</DatasetText>
+        <DatasetText color={v.colors.black}>{name}</DatasetText>
         {!primary &&
           dataset.selected && (
             <UnselectDataset

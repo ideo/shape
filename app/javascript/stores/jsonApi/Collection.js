@@ -641,19 +641,19 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     })
   }
 
-  API_selectDatasetsWithName({ name }) {
+  API_selectDatasetsWithIdentifier({ identifier }) {
     return this.apiStore.request(
       `collections/${this.id}/datasets/select`,
       'POST',
-      { name }
+      { identifier }
     )
   }
 
-  API_unselectDatasetsWithName({ name }) {
+  API_unselectDatasetsWithIdentifier({ identifier }) {
     return this.apiStore.request(
       `collections/${this.id}/datasets/unselect`,
       'POST',
-      { name }
+      { identifier }
     )
   }
 

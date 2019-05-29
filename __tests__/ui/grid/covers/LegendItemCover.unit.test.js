@@ -57,17 +57,17 @@ describe('LegendItemCover', () => {
             ...fakeDataset,
             groupings: [{ type: 'Organization', id: 13 }],
             selected: true,
-            name: 'org-wide-question',
-            display_name: 'Organziation stuff',
+            identifier: 'org-wide-question',
+            name: 'Organization stuff',
           },
         ]
         render()
         getUnselect().simulate('click')
       })
 
-      it('should unselect the dataset by name', () => {
+      it('should unselect the dataset by identifier', () => {
         expect(
-          props.card.parent.API_unselectDatasetsWithName
+          props.card.parent.API_unselectDatasetsWithIdentifier
         ).toHaveBeenCalled()
       })
     })
@@ -76,13 +76,21 @@ describe('LegendItemCover', () => {
       beforeEach(() => {
         props.item.datasets = [
           fakeDataset,
-          { ...fakeDataset, groupings: [], selected: true, name: 'ads' },
+          {
+            ...fakeDataset,
+            // Set order to something other than 0, ore else it is primary and can't be unselected
+            order: 1,
+            groupings: [],
+            selected: true,
+            name: 'something-else',
+            identifier: 'Something Else',
+          },
         ]
         render()
         getUnselect().simulate('click')
       })
 
-      it('should remove the compairison', () => {
+      it('should remove the comparison', () => {
         expect(props.card.parent.API_removeComparison).toHaveBeenCalled()
       })
     })
@@ -90,10 +98,26 @@ describe('LegendItemCover', () => {
 
   describe('datasets()', () => {
     beforeEach(() => {
-      const datasetSelectedA = { ...fakeDataset, name: 'a', selected: true }
-      const datasetSelectedB = { ...fakeDataset, name: 'b', selected: true }
-      const datasetUnselectedC = { ...fakeDataset, name: 'c', selected: false }
-      const datasetDuplicatedA = { ...fakeDataset, name: 'a', selected: true }
+      const datasetSelectedA = {
+        ...fakeDataset,
+        identifier: 'a',
+        selected: true,
+      }
+      const datasetSelectedB = {
+        ...fakeDataset,
+        identifier: 'b',
+        selected: true,
+      }
+      const datasetUnselectedC = {
+        ...fakeDataset,
+        identifier: 'c',
+        selected: false,
+      }
+      const datasetDuplicatedA = {
+        ...fakeDataset,
+        identifier: 'a',
+        selected: true,
+      }
       props.item.datasets = [
         datasetSelectedA,
         datasetSelectedB,
@@ -108,7 +132,7 @@ describe('LegendItemCover', () => {
       expect(instance.datasets({ selected: false }).length).toEqual(1)
     })
 
-    it('should filter out duplicates by name', () => {
+    it('should filter out duplicates by identifier', () => {
       expect(instance.datasets({ selected: true }).length).toEqual(2)
     })
   })
@@ -137,8 +161,8 @@ describe('LegendItemCover', () => {
         ...fakeDataset,
         groupings: [{ type: 'Organization', id: 13 }],
         selected: false,
-        name: 'org-wide-question',
-        display_name: 'Organziation stuff',
+        identifier: 'org-wide-question',
+        name: 'Organization stuff',
         internalType: 'datasets',
       }
 
@@ -156,7 +180,9 @@ describe('LegendItemCover', () => {
     describe('with a dataset', () => {
       it('should toggle the dataset with name', () => {
         instance.onSelectComparison(groupedDataset)
-        expect(props.card.parent.API_selectDatasetsWithName).toHaveBeenCalled()
+        expect(
+          props.card.parent.API_selectDatasetsWithIdentifier
+        ).toHaveBeenCalled()
       })
     })
   })

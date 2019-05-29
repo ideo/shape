@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190529222849) do
+ActiveRecord::Schema.define(version: 20190528210255) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -197,7 +197,7 @@ ActiveRecord::Schema.define(version: 20190529222849) do
 
   create_table "datasets", force: :cascade do |t|
     t.string "type"
-    t.string "measure"
+    t.string "identifier"
     t.string "question_type"
     t.string "url"
     t.integer "chart_type"
@@ -211,7 +211,7 @@ ActiveRecord::Schema.define(version: 20190529222849) do
     t.bigint "data_source_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "name"
+    t.string "measure"
     t.text "description"
     t.jsonb "groupings", default: []
     t.index ["data_source_type", "data_source_id"], name: "index_datasets_on_data_source_type_and_data_source_id"
