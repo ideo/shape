@@ -138,8 +138,10 @@ class AddAudienceModal extends React.Component {
 
   handleSave = async () => {
     const { apiStore } = this.props
+    const { name, selectedCriteriaOptions } = this.state
+    const tag_list = selectedCriteriaOptions.join(', ')
 
-    const audience = new Audience({ name: this.state.name }, apiStore)
+    const audience = new Audience({ name, tag_list }, apiStore)
     await audience.API_create()
 
     this.reset()
@@ -189,6 +191,14 @@ class AddAudienceModal extends React.Component {
     this.setState({ valid })
   }
 
+  prefixCriteriaOption(criteria, option) {
+    return `${criteria} ${option}`
+  }
+
+  unPrefixCriteriaOption(criteria, prefixedOption) {
+    return prefixedOption.replace(`${criteria} `, '')
+  }
+
   renderCriteriaMenu() {
     const { selectedCriteria } = this.state
 
@@ -224,8 +234,11 @@ class AddAudienceModal extends React.Component {
 
     return this.state.selectedCriteria.map(criteria => {
       const { options } = criteriaOptions[criteria]
+      const prefixedOptions = options.map(o =>
+        this.prefixCriteriaOption(criteria, o)
+      )
       const selectedOptions = filter(selectedCriteriaOptions, o =>
-        includes(options, o)
+        includes(prefixedOptions, o)
       )
 
       return (
@@ -244,7 +257,7 @@ class AddAudienceModal extends React.Component {
           <Flex wrap>
             {selectedOptions.map(option => (
               <SelectedOption key={`selected_${option}`}>
-                {option}
+                {this.unPrefixCriteriaOption(criteria, option)}
               </SelectedOption>
             ))}
           </Flex>
@@ -262,23 +275,23 @@ class AddAudienceModal extends React.Component {
 
     return selectedCriteria.map(criteria => {
       const availableOptions = criteriaOptions[criteria].options
-      const selectedOptions = filter(selectedCriteriaOptions, o =>
-        includes(availableOptions, o)
-      )
 
-      const options = availableOptions.map(option => (
-        <CheckboxSelectOption
-          key={option}
-          classes={{ root: 'selectOption' }}
-          value={option}
-        >
-          <Checkbox
-            value={option}
-            checked={includes(selectedOptions, option)}
-          />
-          {option}
-        </CheckboxSelectOption>
-      ))
+      const options = availableOptions.map(option => {
+        const prefixedOption = this.prefixCriteriaOption(criteria, option)
+
+        return (
+          <CheckboxSelectOption
+            key={prefixedOption}
+            classes={{ root: 'selectOption' }}
+            value={prefixedOption}
+          >
+            <Checkbox
+              checked={includes(selectedCriteriaOptions, prefixedOption)}
+            />
+            {option}
+          </CheckboxSelectOption>
+        )
+      })
 
       const menuOpen = openMenus[criteria]
 
