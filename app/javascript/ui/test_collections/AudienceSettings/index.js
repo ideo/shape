@@ -9,6 +9,7 @@ import AudienceSettingsWidget from '~/ui/test_collections/AudienceSettings/Audie
 // import TestAudience from '~/stores/jsonApi/TestAudience'
 import FeedbackTermsModal from '~/ui/test_collections/FeedbackTermsModal'
 import ConfirmPriceModal from '~/ui/test_collections/ConfirmPriceModal'
+import TestAudience from '~/stores/jsonApi/TestAudience'
 import v from '~/utils/variables'
 
 const FormButtonWrapper = styled.div`
@@ -38,17 +39,36 @@ class AudienceSettings extends React.Component {
   fetchAvailableAudiences = async () => {
     const { apiStore } = this.props
 
-    const audiences = await apiStore.fetchOrganizationAudiences(
+    await apiStore.fetchOrganizationAudiences(
       apiStore.currentUserOrganizationId
     )
+    this.updateAudienceSettings()
+  }
+
+  updateAudienceSettings() {
+    const { testCollection } = this.props
     const audienceSettings = {}
+    const { audiences } = this
     _.each(audiences, audience => {
+      const testAudience = testCollection.test_audiences.find(
+        testAudience => testAudience.audience_id.toString() === audience.id
+      )
       audienceSettings[audience.id] = {
-        selected: false,
-        sample_size: '0',
+        selected: !!testAudience,
+        sample_size: testAudience ? testAudience.sample_size : '0',
+        audience: audience,
+        test_audience: testAudience,
       }
     })
-    this.updateAudienceSettings(audienceSettings)
+    runInAction(() => {
+      this.audienceSettings = audienceSettings
+    })
+  }
+
+  @computed
+  get locked() {
+    const { testCollection } = this.props
+    return testCollection.is_test_locked
   }
 
   @computed
@@ -80,12 +100,42 @@ class AudienceSettings extends React.Component {
     return `$${this.totalPrice.toFixed(2)}`
   }
 
-  onToggleCheckbox = e => {
+  onToggleCheckbox = async e => {
     const id = e.target.value
+    const { audienceSettings } = this
     runInAction(() => {
-      const { audienceSettings } = this
       audienceSettings[id].selected = !audienceSettings[id].selected
     })
+    const { audience, test_audience } = audienceSettings[id]
+    if (this.locked && audience.price_per_response === 0) {
+      this.toggleLinkSharing(audience, test_audience)
+    }
+  }
+
+  async toggleLinkSharing(audience, testAudience) {
+    const { apiStore, testCollection } = this.props
+    const testDesign = testCollection
+    if (testAudience) {
+      runInAction(() => {
+        _.remove(testDesign.test_audiences, tA => tA.id === testAudience.id)
+      })
+      await testAudience.destroy()
+      this.updateAudienceSettings()
+    } else {
+      const testAudience = new TestAudience(
+        {
+          test_collection_id: testDesign.test_collection_id,
+          audience_id: audience.id,
+        },
+        apiStore
+      )
+      await testAudience.save()
+      await testDesign.refetch()
+      runInAction(() => {
+        testDesign.test_audiences.push(testAudience)
+      })
+      this.updateAudienceSettings()
+    }
   }
 
   onInputChange = (audienceId, value) => {
@@ -106,9 +156,6 @@ class AudienceSettings extends React.Component {
 
   @action
   closeConfirmPriceModal = () => (this.confirmPriceModalOpen = false)
-
-  @action
-  updateAudienceSettings = settings => (this.audienceSettings = settings)
 
   confirmOrLaunchTest() {
     if (this.totalPrice === 0) {
@@ -189,12 +236,13 @@ class AudienceSettings extends React.Component {
             totalPrice={this.totalPriceDollars}
             audiences={this.audiences}
             audienceSettings={this.audienceSettings}
+            locked={this.locked}
           />
         )}
         <FormButtonWrapper>
           <FormButton
             data-cy="LaunchFormButton"
-            disabled={uiStore.launchButtonLoading}
+            disabled={uiStore.launchButtonLoading || this.locked}
             onClick={this.submitSettings}
           >
             {testCollection.is_submission_box_template_test

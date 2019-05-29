@@ -7,7 +7,6 @@ class SerializableCollection < BaseJsonSerializer
              :submission_box_type, :submission_box_id, :submission_template_id,
              :test_status, :collection_to_test_id, :hide_submissions, :submissions_enabled,
              :anyone_can_view, :anyone_can_join
-
   has_many :roles do
     data do
       @object.anchored_roles
@@ -182,5 +181,9 @@ class SerializableCollection < BaseJsonSerializer
 
   attribute :frontend_url do
     @frontend_url_for.call(@object)
+  end
+
+  attribute :is_test_locked do
+    @object.try(:purchased?)
   end
 end

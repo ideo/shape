@@ -165,6 +165,11 @@ class TestDesigner extends React.Component {
     return styledTestTheme('primary')
   }
 
+  get locked() {
+    const { collection } = this.props
+    return collection.is_test_locked
+  }
+
   get canEditQuestions() {
     const {
       isTemplated,
@@ -176,7 +181,7 @@ class TestDesigner extends React.Component {
     // but not necessarily add or change the questions themselves, once the editor "launches"
     if (isTemplated)
       return can_edit_content && (test_status !== 'draft' || launchable)
-    return can_edit_content
+    return can_edit_content && !this.locked
   }
 
   get canEdit() {
@@ -186,7 +191,7 @@ class TestDesigner extends React.Component {
     // NOTE: if we ever allow template instance editors to add their own questions at the end
     // (before the finish card?) then we may want to individually check canEdit on a per card basis
     if (isTemplated) return false
-    return can_edit_content
+    return can_edit_content && !this.locked
   }
 
   createNewQuestionCard = async ({

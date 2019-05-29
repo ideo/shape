@@ -66,6 +66,8 @@ class Collection
              :gives_incentive?,
              :test_status,
              :collection_to_test,
+             :purchased?,
+             :test_audiences,
              to: :test_collection
 
     after_commit :close_test, if: :archived_on_previous_save?
