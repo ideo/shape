@@ -290,8 +290,8 @@ class PageHeader extends React.Component {
                 )}
                 {this.launchTestButton}
                 {this.joinCollectionButton}
-                {record.isLiveTest &&
-                  record.has_link_sharing && (
+                {(record.isLiveTest && record.has_link_sharing) ||
+                  (record.collection_to_test_id && (
                     <Fragment>
                       <CopyToClipboard
                         text={record.publicTestURL}
@@ -338,7 +338,7 @@ class PageHeader extends React.Component {
                           </HeaderFormButton>
                         )}
                     </Fragment>
-                  )}
+                  ))}
               </Flex>
             </StyledTitleAndRoles>
           </div>
