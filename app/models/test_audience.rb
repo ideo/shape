@@ -3,6 +3,7 @@
 # Table name: test_audiences
 #
 #  id                 :bigint(8)        not null, primary key
+#  price_per_response :decimal(10, 2)
 #  sample_size        :integer
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
@@ -24,4 +25,11 @@ class TestAudience < ApplicationRecord
   belongs_to :test_collection,
              class_name: 'Collection::TestCollection'
   has_many :survey_responses
+
+  delegate :name,
+           to: :audience
+
+  def self.display_name
+    'Audience'
+  end
 end

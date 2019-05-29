@@ -55,7 +55,9 @@ class Organization < ApplicationRecord
   has_many :groups, dependent: :destroy
   has_many :api_tokens, dependent: :destroy
   has_many :application_organizations, dependent: :destroy
-  has_many :org_wide_question_datasets, class_name: 'Dataset::OrgWideQuestion'
+  ## TODO scope this relation to just organization grouped datasets?
+  ## TODO is this used?
+  has_many :org_wide_question_datasets, class_name: 'Dataset::Question'
   belongs_to :primary_group,
              class_name: 'Group',
              dependent: :destroy,
@@ -111,6 +113,10 @@ class Organization < ApplicationRecord
     billable
       .where.not(overdue_at: nil)
       .where(arel_table[:active_users_count].gt(0))
+  end
+
+  def self.display_name
+    'Organization'
   end
 
   def can_view?(user)
@@ -204,7 +210,7 @@ class Organization < ApplicationRecord
       %i[handle id],
       :name,
       [:name, 1],
-      [:name, 2],
+      [:name, 2]
     ]
   end
 
@@ -251,7 +257,7 @@ class Organization < ApplicationRecord
     ).first
     subscription_params = {
       organization_id: network_organization.id,
-      plan_id: plan.id,
+      plan_id: plan.id
     }
     if payment_method
       subscription_params[:payment_method_id] = payment_method.id
@@ -365,7 +371,7 @@ class Organization < ApplicationRecord
     CollectionCardBuilder.new(
       params: {
         order: 0,
-        collection_id: user_getting_started.id,
+        collection_id: user_getting_started.id
       },
       parent_collection: user_collection,
       user: user,

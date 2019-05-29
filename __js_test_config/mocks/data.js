@@ -52,6 +52,7 @@ export const fakeTextItemAttrs = {
 }
 
 export const fakeAreaChartDataset = {
+  identifier: 'question',
   measure: 'participants',
   description: 'A description',
   timeframe: 'month',
@@ -65,6 +66,7 @@ export const fakeAreaChartDataset = {
 }
 
 export const fakeBarChartDataset = {
+  identifier: 'question',
   measure: 'participants',
   description: 'A description',
   question_type: 'question_context',
@@ -103,6 +105,8 @@ export const fakeDataItemCollectionsItemsAttrs = {
 }
 
 export const creativeDifferenceQualityDataset = {
+  name: 'purpose',
+  identifier: 'purpose',
   measure: 'Purpose',
   description:
     'The degree to which there is alignment about a meaningful change that leadership and employees want to make in the world.',
@@ -126,6 +130,7 @@ export const fakeDatasetAttrs = {
   data: [],
   data_items_datasets_id: 100,
   measure: 'participants',
+  identifier: 'dataset',
   name: 'dataset',
   order: 0,
   question_type: null,
@@ -368,8 +373,10 @@ export const fakeCollection = {
   API_fetchCards: jest.fn().mockReturnValue(Promise.resolve({})),
   API_batchUpdateCards: jest.fn().mockReturnValue(Promise.resolve({})),
   API_batchUpdateCardsWithUndo: jest.fn().mockReturnValue(Promise.resolve({})),
-  API_selectDatasetsWithName: jest.fn().mockReturnValue(Promise.resolve({})),
-  API_unselectDatasetsWithName: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_selectDatasetsWithIdentifier: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_unselectDatasetsWithIdentifier: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_removeComparison: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_addComparison: jest.fn().mockReturnValue(Promise.resolve({})),
   checkCurrentOrg: jest.fn(),
   confirmEdit: jest.fn(),
   updateScrollBottom: jest.fn(),

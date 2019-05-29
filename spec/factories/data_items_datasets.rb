@@ -4,8 +4,8 @@ FactoryBot.define do
       dataset factory: %i[dataset with_cached_data]
     end
 
-    trait :question_item do
-      dataset factory: :question_item_dataset
+    trait :question do
+      dataset factory: :question_dataset
     end
 
     trait :network_app_metric do

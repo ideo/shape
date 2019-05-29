@@ -27,7 +27,7 @@ const BarChart = ({ dataset, cardArea, barsInGroup }) => {
   const labelRenderer = datum =>
     barsInGroup > 4 ? () => {} : `${datum.percentage}%`
   const tooltipRenderer = datum => {
-    let text = `${dataset.display_name}
+    let text = `${dataset.name}
     ${datum.percentage}%
     ${datum.value}/${total} total`
     if (total === 0) {

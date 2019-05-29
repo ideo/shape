@@ -1,10 +1,10 @@
 require 'rails_helper'
 
-RSpec.describe Dataset::QuestionItem, type: :model do
+RSpec.describe Dataset::Question, type: :model do
   describe '#name' do
     let!(:test_collection) { create(:test_collection) }
     let!(:question_item) { create(:question_item, parent_collection: test_collection) }
-    let(:dataset) { create(:question_item_dataset, data_source: question_item) }
+    let(:dataset) { create(:question_dataset, data_source: question_item) }
 
     it 'uses question item collection name' do
       expect(dataset.name).to eq(test_collection.name)

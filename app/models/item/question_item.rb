@@ -13,6 +13,7 @@
 #  data_settings              :jsonb
 #  data_source_type           :string
 #  icon_url                   :string
+#  legend_search_source       :integer
 #  name                       :string
 #  question_type              :integer
 #  report_type                :integer
@@ -42,7 +43,7 @@ class Item
   class QuestionItem < Item
     has_many :question_answers, inverse_of: :question, foreign_key: :question_id, dependent: :destroy
     has_one :test_open_responses_collection, class_name: 'Collection::TestOpenResponses'
-    has_one :dataset, as: :data_source, class_name: 'Dataset::QuestionItem', dependent: :destroy
+    has_one :dataset, as: :data_source, class_name: 'Dataset::Question', dependent: :destroy
     has_many :data_items,
              as: :data_source,
              class_name: 'Item::DataItem'
@@ -78,9 +79,6 @@ class Item
       )
     }
 
-    # You must run Dataset::OrgWideQuestion.setup_new_question_type
-    # for all orgs after adding a new question type,
-    # so all orgs have the dataset
     enum question_type: {
       question_context: 0,
       question_useful: 1,
@@ -91,7 +89,7 @@ class Item
       question_clarity: 7,
       question_excitement: 8,
       question_different: 9,
-      question_category_satisfaction: 10,
+      question_category_satisfaction: 10
     }
 
     def self.question_type_categories
@@ -112,7 +110,7 @@ class Item
           question_category_satisfaction
           question_context
           question_open
-        ],
+        ]
       }
     end
 
@@ -125,33 +123,33 @@ class Item
       when :question_useful
         {
           title: 'Usefulness',
-          description: 'How useful is this idea for you?',
+          description: 'How useful is this idea for you?'
         }
       when :question_clarity
         {
           title: 'Clarity',
-          description: 'How clear is this idea for you?',
+          description: 'How clear is this idea for you?'
         }
       when :question_excitement
         {
           title: 'Excitement',
-          description: 'How exciting is this idea for you?',
+          description: 'How exciting is this idea for you?'
         }
       when :question_different
         {
           title: 'Different',
-          description: "How different is this idea from what you've seen before?",
+          description: "How different is this idea from what you've seen before?"
         }
       when :question_category_satisfaction
         # the category text gets added later within ScaleQuestion
         {
           title: 'Category Satisfaction',
-          description: 'How satisfied are you with your current',
+          description: 'How satisfied are you with your current'
         }
       when :question_context
         {
           title: 'Context',
-          description: 'How satisfied are you with your current solution?',
+          description: 'How satisfied are you with your current solution?'
         }
       else
         {}
@@ -212,8 +210,8 @@ class Item
           item_attributes: {
             type: 'Item::DataItem',
             report_type: :report_type_question_item,
-            legend_item_id: legend_item&.id,
-          },
+            legend_item_id: legend_item&.id
+          }
         },
         parent_collection: parent_collection,
         user: initiated_by,
@@ -253,8 +251,8 @@ class Item
           collection_attributes: {
             name: "#{content} Responses",
             type: 'Collection::TestOpenResponses',
-            question_item_id: id,
-          },
+            question_item_id: id
+          }
         },
         parent_collection: parent_collection,
         user: initiated_by,
@@ -264,17 +262,32 @@ class Item
     end
 
     def org_wide_question_dataset
-      Dataset::OrgWideQuestion.find_or_create_by(
-        organization_id: organization.id,
+      Dataset::Question.find_or_create_by(
+        groupings: [{ type: 'Organization', id: organization.id }],
+        question_type: question_type,
+        identifier: Dataset::Question::DEFAULT_ORG_NAME,
+        chart_type: :bar,
+      )
+    end
+
+    def create_test_audience_dataset(test_audience, data_item)
+      dataset = Dataset::Question.create(
+        groupings: [{ type: 'TestAudience', id: test_audience.id }],
         question_type: question_type,
         chart_type: :bar,
+        data_source: self,
+        identifier: Dataset.identifier_for_object(test_audience),
+      )
+      data_item.data_items_datasets.create(
+        dataset: dataset,
+        selected: false,
       )
     end
 
     private
 
     def create_dataset
-      self.dataset = Dataset::QuestionItem.create(
+      self.dataset = Dataset::Question.create(
         data_source: self,
         timeframe: :month,
         chart_type: :bar,

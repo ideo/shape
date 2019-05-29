@@ -37,6 +37,7 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
       before do
         dataset.update(
           organization: organization,
+          groupings: [{ type: 'Organization', id: organization.id }],
         )
       end
 

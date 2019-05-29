@@ -1,3 +1,33 @@
+# == Schema Information
+#
+# Table name: datasets
+#
+#  id               :bigint(8)        not null, primary key
+#  cached_data      :jsonb
+#  chart_type       :integer
+#  data_source_type :string
+#  description      :text
+#  groupings        :jsonb
+#  identifier       :string
+#  max_domain       :integer
+#  measure          :string
+#  question_type    :string
+#  style            :jsonb
+#  timeframe        :integer
+#  total            :integer
+#  type             :string
+#  url              :string
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  data_source_id   :bigint(8)
+#  organization_id  :bigint(8)
+#
+# Indexes
+#
+#  index_datasets_on_data_source_type_and_data_source_id  (data_source_type,data_source_id)
+#  index_datasets_on_organization_id                      (organization_id)
+#
+
 class Dataset < ApplicationRecord
   belongs_to :organization, optional: true
   belongs_to :data_source, polymorphic: true, optional: true
@@ -11,7 +41,7 @@ class Dataset < ApplicationRecord
   validates :timeframe, :chart_type, presence: true
   validates :cached_data, :name, presence: true, if: :root_dataset_class?
 
-  scope :question_items, -> { where(type: 'Dataset::QuestionItem') }
+  scope :question_items, -> { where(type: 'Dataset::Question') }
 
   attr_accessor :cached_data_items_datasets
 
@@ -31,30 +61,19 @@ class Dataset < ApplicationRecord
     line: 2,
   }
 
-  searchkick callbacks: :queue
-
-  scope :search_import, -> do
-    includes(
-      data_source: { parent_collection_card: :parent },
-    )
+  def self.identifier_for_object(object)
+    "#{object.class.base_class.name}-#{object.id}"
   end
 
-  def search_data
-    {
-      type: type,
-      name: name,
-      organization_id: organization_id || data_source&.organization_id,
-      question_type: question_type,
-      chart_type: chart_type,
-      data_source_parent_id: data_source ? data_source.parent.id : nil,
-      data_source_parent_type: data_source ? data_source.parent.class.base_class.name : nil,
-    }
+  def grouping
+    # NOTE: support for multiple groupings is TBD
+    groupings.first
   end
 
   # Implement in each sub-class
 
-  def display_name
-    name
+  def name
+    identifier
   end
 
   def title; end

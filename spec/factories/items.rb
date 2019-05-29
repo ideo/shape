@@ -60,7 +60,7 @@ FactoryBot.define do
 
       trait :report_type_question_item do
         report_type :report_type_question_item
-        dataset_type :question_item
+        dataset_type :question
       end
 
       after(:build) do |data_item, evaluator|

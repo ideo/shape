@@ -19,6 +19,7 @@
 #  shared_with_organization   :boolean          default(FALSE)
 #  submission_box_type        :integer
 #  submissions_enabled        :boolean          default(TRUE)
+#  test_closed_at             :datetime
 #  test_launched_at           :datetime
 #  test_status                :integer
 #  type                       :string
@@ -83,7 +84,7 @@ class Collection
     enum test_status: {
       draft: 0,
       live: 1,
-      closed: 2,
+      closed: 2
     }
 
     aasm column: :test_status, enum: true do
@@ -100,7 +101,7 @@ class Collection
                 attempt_to_purchase_test_audiences!(
                   test_audience_params: args[:test_audience_params],
                 )
-              },
+              }
             ],
             after_commit: proc { |**args|
                             post_launch_setup!(
@@ -153,7 +154,7 @@ class Collection
           submission_attrs: {
             template: true,
             launchable_test_id: id,
-            test_status: test_status,
+            test_status: test_status
           },
         )
         # make sure all templates get the latest question setup
@@ -215,7 +216,7 @@ class Collection
           submission: true,
           template_test_id: id,
           launchable_test_id: launchable_test.id,
-          test_status: launchable_test.test_status,
+          test_status: launchable_test.test_status
         },
       )
       # e.g. if we switched which test is running, we want to switch to the latest one
@@ -369,8 +370,8 @@ class Collection
       {
         question_cards: [
           :parent,
-          record: [:filestack_file],
-        ],
+          record: [:filestack_file]
+        ]
       }
     end
 
@@ -427,8 +428,8 @@ class Collection
           name: Collection::TestDesign.generate_name(name),
           type: 'Collection::TestDesign',
           test_collection_id: id,
-          template_id: template_id,
-        },
+          template_id: template_id
+        }
       }
       CollectionCardBuilder.new(
         params: card_params,
@@ -460,6 +461,10 @@ class Collection
         )
         legend = data_item_card.item.legend_item if i.zero?
         graphs << data_item_card
+        test_audiences.each do |test_audience|
+          data_item = data_item_card.item
+          question.create_test_audience_dataset(test_audience, data_item)
+        end
       end
 
       graphs
@@ -484,7 +489,7 @@ class Collection
           order: i,
           item_attributes: {
             type: 'Item::QuestionItem',
-            question_type: question_type,
+            question_type: question_type
           },
         )
       end

@@ -13,6 +13,7 @@
 #  data_settings              :jsonb
 #  data_source_type           :string
 #  icon_url                   :string
+#  legend_search_source       :integer
 #  name                       :string
 #  question_type              :integer
 #  report_type                :integer
@@ -143,7 +144,7 @@ class Item
       when
         'report_type_collections_and_items' then 'Dataset::CollectionsAndItems'
       when
-        'report_type_question_item' then 'Dataset::QuestionItem'
+        'report_type_question_item' then 'Dataset::Question'
       when
         'report_type_network_app_metric' then 'Dataset::NetworkAppMetric'
       end
