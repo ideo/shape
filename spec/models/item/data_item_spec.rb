@@ -72,7 +72,7 @@ RSpec.describe Item::DataItem, type: :model do
       dataset = data_item.create_dataset(params)
       data_items_dataset = dataset.data_items_datasets.first
       expect(data_items_dataset.order).to eq(2)
-      expect(data_items_dataset.selected).to be true
+      expect(data_items_dataset.selected).to be false
     end
   end
 end

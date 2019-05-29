@@ -284,7 +284,7 @@ describe Collection::TestCollection, type: :model do
                 Item::VideoItem,
                 Item::DataItem,
                 Item::LegendItem,
-                Collection::TestDesign
+                Collection::TestDesign,
               ],
             )
           end
@@ -313,7 +313,7 @@ describe Collection::TestCollection, type: :model do
                 Dataset::Question, :count
               ).by(2)
               expect(Dataset::Question.last.groupings).to eq(
-                [{ 'id' => 1, 'type' => 'TestAudience' }],
+                [{ 'id' => test_audience.id, 'type' => 'TestAudience' }],
               )
             end
           end
@@ -608,7 +608,7 @@ describe Collection::TestCollection, type: :model do
       expect(test_collection.launch!(initiated_by: user)).to be false
       expect(test_collection.errors).to match_array([
         'Please add an image or video for your idea to question 1',
-        'Please add your idea description to question 2'
+        'Please add your idea description to question 2',
       ])
     end
   end
