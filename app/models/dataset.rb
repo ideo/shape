@@ -65,7 +65,7 @@ class Dataset < ApplicationRecord
     "#{object.class.base_class.name}-#{object.id}"
   end
 
-  def dataset_grouping
+  def grouping
     # NOTE: support for multiple groupings is TBD
     groupings.first
   end

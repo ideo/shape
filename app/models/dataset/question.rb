@@ -47,10 +47,10 @@ class Dataset
     end
 
     def name
-      if dataset_grouping.present?
+      if grouping.present?
         # Just name off the first grouping for now, change in future
-        klass = dataset_grouping['type'].constantize
-        object = klass.find(dataset_grouping['id'].to_i)
+        klass = grouping['type'].constantize
+        object = klass.find(grouping['id'].to_i)
         "#{object.name} #{klass.display_name}"
       elsif test_collection_id.present? && test_collection.present?
         test_collection.name.sub(Collection::TestDesign::COLLECTION_SUFFIX, '')

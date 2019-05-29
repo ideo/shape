@@ -62,15 +62,15 @@ module DataReport
     end
 
     def survey_answers
-      if @dataset.dataset_grouping.present? &&
-         @dataset.dataset_grouping['type'] == 'Organization'
+      if @dataset.grouping.present? &&
+         @dataset.grouping['type'] == 'Organization'
         org_survey_answers
-      elsif @dataset.dataset_grouping.present? &&
-            @dataset.dataset_grouping['type'] == 'TestAudience'
+      elsif @dataset.grouping.present? &&
+            @dataset.grouping['type'] == 'TestAudience'
         question_item.completed_survey_answers
                      .where(
                        SurveyResponse.arel_table[:test_audience_id].eq(
-                         @dataset.dataset_grouping['id'],
+                         @dataset.grouping['id'],
                        ),
                      )
       else
@@ -79,7 +79,7 @@ module DataReport
     end
 
     def org_survey_answers
-      organization_id = @dataset.dataset_grouping['id']
+      organization_id = @dataset.grouping['id']
       QuestionAnswer
         .joins(:question)
         .where(
