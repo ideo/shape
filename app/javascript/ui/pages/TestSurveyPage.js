@@ -7,6 +7,7 @@ import TestSurveyResponder from '~/ui/test_collections/TestSurveyResponder'
 import { apiStore } from '~/stores'
 import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
 import ClosedSurvey from '~/ui/test_collections/ClosedSurvey'
+import RespondentBanner from '~/ui/test_collections/RespondentBanner'
 
 const StyledBg = styled.div`
   background: #e3edee;
@@ -113,21 +114,24 @@ class TestSurveyPage extends React.Component {
 
   render() {
     return (
-      <StyledBg>
-        <LogoWrapper>
-          <Logo withText width={83} />
-        </LogoWrapper>
-        <DialogWrapper />
-        {this.collection.test_status === 'live' ? (
-          this.renderSurvey
-        ) : (
-          <ClosedSurvey
-            includeRecontactQuestion={this.includeRecontactQuestion}
-            currentUser={this.currentUser}
-            sessionUid={this.sessionUid}
-          />
-        )}
-      </StyledBg>
+      <React.Fragment>
+        {this.currentUser ? <RespondentBanner user={this.currentUser} /> : null}
+        <StyledBg>
+          <LogoWrapper>
+            <Logo withText width={83} />
+          </LogoWrapper>
+          <DialogWrapper />
+          {this.collection.test_status === 'live' ? (
+            this.renderSurvey
+          ) : (
+            <ClosedSurvey
+              includeRecontactQuestion={this.includeRecontactQuestion}
+              currentUser={this.currentUser}
+              sessionUid={this.sessionUid}
+            />
+          )}
+        </StyledBg>
+      </React.Fragment>
     )
   }
 }

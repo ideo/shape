@@ -329,9 +329,13 @@ describe Collection::TestCollection, type: :model do
           end
 
           context 'with test_audience_params' do
-            it 'should call TestAudiencePurchaser' do
+            it 'should call PurchaseTestAudience' do
               params = { some: 'params' }
-              expect(TestAudiencePurchaser).to receive(:call).with(test_collection, params)
+              expect(PurchaseTestAudience).to receive(:call).with(
+                test_collection: test_collection,
+                test_audience_params: params,
+                user: user,
+              )
               test_collection.launch!(initiated_by: user, test_audience_params: params)
             end
           end
