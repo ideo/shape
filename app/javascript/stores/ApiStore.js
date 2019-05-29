@@ -499,9 +499,35 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   async moveCards(data) {
-    const res = await this.request('collection_cards/move', 'PATCH', data)
+    console.log({ data })
+    // find origin collection
     const fromCollection = this.find('collections', data.from_id)
+    // make snapshot of fromCollection data with cards for potential undo
+    const oldSnapshot = fromCollection.toJsonApiWithCards(
+      data.collection_card_ids
+    )
+    // reverse to and from values for potential undo operation
+    const reversedData = Object.assign({}, data, {
+      to_id: data.from_id,
+      from_id: data.to_id,
+    })
+
+    // trigger card_mover in backend
+    const res = await this.request('collection_cards/move', 'PATCH', data)
+    // update UI for collection that cards were moved away from
     await fromCollection.API_fetchCards()
+
+    // add undo operation to stack so users can undo moving cards
+    this.undoStore.pushUndoAction({
+      message: 'Move undone',
+      apiCall: async () => {
+        await this.moveCards(reversedData)
+        fromCollection.API_batchUpdateCards(oldSnapshot)
+        await fromCollection.API_fetchCards()
+      },
+      redirectPath: { type: 'collections', id: fromCollection.id },
+    })
+
     return res
   }
 

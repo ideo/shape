@@ -688,6 +688,7 @@ class FoamcoreGrid extends React.Component {
   }
 
   async moveCardsIntoCollection(cardIds, hoveringRecord) {
+    // Add undo to stack here?
     this.props.collection.API_moveCardsIntoCollection({
       toCollection: hoveringRecord,
       cardIds,

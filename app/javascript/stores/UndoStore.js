@@ -16,6 +16,7 @@ export default class UndoStore {
   @action
   pushUndoAction({ apiCall, redirectPath = null, message = '' }) {
     this.stack.push({ apiCall, redirectPath, message })
+    console.log('undo stack is: ', this.stack)
     if (this.stack.length > MAX_UNDOSTACK_LENGTH) {
       // only keep 10 items at a time
       this.stack.shift()
