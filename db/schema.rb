@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190523213147) do
+ActiveRecord::Schema.define(version: 20190529222849) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -481,6 +481,7 @@ ActiveRecord::Schema.define(version: 20190523213147) do
     t.string "phone"
     t.integer "feedback_contact_preference", default: 0
     t.boolean "feedback_terms_accepted", default: false
+    t.boolean "respondent_terms_accepted", default: false
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"

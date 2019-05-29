@@ -86,7 +86,7 @@ class TestSurveyPage extends React.Component {
   }
 
   get includeTerms() {
-    return !this.currentUser || !this.currentUser.feedback_terms_accepted
+    return !this.currentUser || !this.currentUser.respondent_terms_accepted
   }
 
   get renderSurvey() {

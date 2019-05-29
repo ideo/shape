@@ -17,7 +17,7 @@ class TermsQuestion extends React.Component {
 
     if (user) {
       user.API_updateCurrentUser({
-        feedback_terms_accepted: choice,
+        respondent_terms_accepted: choice,
       })
     }
     // there was a user, or anon user answered "no", move on
@@ -71,14 +71,14 @@ class TermsQuestion extends React.Component {
         </QuestionText>
         <EmojiHolder data-cy="TermsEmojiHolder">
           <EmojiButton
-            selected={answered && user && !user.feedback_terms_accepted}
+            selected={answered && user && !user.respondent_terms_accepted}
             onClick={this.handleClick(false)}
           >
             <Emoji scale={1.375} name="Disagree" symbol="👎" />
           </EmojiButton>
           <EmojiButton
             data-cy="AcceptFeedbackTerms"
-            selected={answered && user && user.feedback_terms_accepted}
+            selected={answered && user && user.respondent_terms_accepted}
             onClick={this.handleClick(true)}
           >
             <Emoji scale={1.375} name="Yes" symbol="👍" />
