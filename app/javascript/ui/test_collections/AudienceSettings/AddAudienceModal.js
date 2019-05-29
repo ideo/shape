@@ -11,7 +11,7 @@ import Button from '~shared/components/atoms/Button'
 import EditPencilIcon from '~/ui/icons/EditPencilIcon'
 import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import Modal from '~/ui/global/modals/Modal'
-import PlusIcon from '~shared/images/icon-plus.svg'
+import PlusIcon from '~/ui/icons/PlusIcon'
 import TrashIcon from '~/ui/icons/TrashIcon'
 import v from '~/utils/variables'
 import { criteria, criteriaOptions } from './AudienceCriteria'
@@ -43,6 +43,12 @@ const CriteriaGroup = styled.li`
   letter-spacing: 1px;
   padding: 12px 10px 12px 20px;
   text-transform: uppercase;
+`
+
+const StyledPlusIcon = styled(PlusIcon)`
+  height: 15px;
+  margin-right: 8px;
+  width: 15px;
 `
 
 const EditButton = styled.button`
@@ -338,7 +344,7 @@ class AddAudienceModal extends React.Component {
             <Label>Targeting Criteria</Label>
             <div ref={ref => (this.addCriteraButton = ref)}>
               <Button href="#" onClick={this.toggleCriteriaMenu}>
-                <PlusIcon width={15} style={{ fill: v.colors.black }} />
+                <StyledPlusIcon />
                 Add Audience Criteria
               </Button>
             </div>
