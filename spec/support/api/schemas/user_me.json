@@ -19,7 +19,8 @@
     "mailing_list": { "type": "boolean" },
     "google_auth_token": { "type": "string" },
     "feedback_contact_preference": { "type": "string" },
-    "feedback_terms_accepted": { "type": "boolean" }
+    "feedback_terms_accepted": { "type": "boolean" },
+    "respondent_terms_accepted": { "type": "boolean" }
   },
   "required": ["email", "first_name", "last_name", "status"]
 }
