@@ -44,10 +44,8 @@ class TestSurveyResponder extends React.Component {
     const { collection, includeRecontactQuestion } = this.props
 
     const questionCards = [...collection.question_cards]
-    console.log('included recontract? ', includeRecontactQuestion)
 
     if (includeRecontactQuestion) {
-      console.log('splicing cards')
       questionCards.splice(questionCards.length - 1, 0, {
         id: 'recontact',
         card_question_type: 'question_recontact',
