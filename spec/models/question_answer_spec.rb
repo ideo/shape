@@ -92,6 +92,31 @@ RSpec.describe QuestionAnswer, type: :model do
       end
     end
 
+    context 'complete after test closed' do
+      before do
+        test_collection.close!
+      end
+      let!(:question_answers) do
+        survey_response.question_items.map do |question|
+          create(:question_answer,
+                 survey_response: survey_response,
+                 question: question)
+        end
+      end
+
+      describe 'within allowable window' do
+        it 'marks the survey_response as completed_late' do
+          expect(survey_response.reload.status).to eq 'completed_late'
+        end
+      end
+
+      describe 'after allowable window' do
+        pending 'marks the survey_response as completed_late' do
+          expect(survey_response.reload.status).to eq 'in_progress'
+        end
+      end
+    end
+
     context 'completed response' do
       let!(:question_answers) do
         survey_response.question_items.map do |question|

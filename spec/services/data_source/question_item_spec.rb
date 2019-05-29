@@ -70,21 +70,23 @@ RSpec.describe DataSource::QuestionItem, type: :service do
     end
 
     context 'with responses' do
-      let(:test_collection) { create(:test_collection, num_cards: 1, organization: organization) }
+      let(:test_collection) { create(:test_collection, :completed, num_cards: 1, organization: organization) }
+      before { test_collection.launch! }
       # Create another test collection so we have other responses in the org
       let(:other_test_collection) { create(:test_collection, :with_responses, organization: organization) }
       let!(:survey_response) { create(:survey_response, test_collection: test_collection) }
       let!(:question_item) { survey_response.question_items.select(&:question_useful?).first }
-      let!(:question_answer) do
-        create(:question_answer,
-               survey_response: survey_response,
-               question: question_item)
+      let!(:question_answers) do
+        survey_response.question_items.map do |question_item|
+          create(:question_answer,
+                 survey_response: survey_response,
+                 question: question_item)
+        end
       end
       let!(:chart_item) { create(:chart_item, data_source: question_item) }
       let(:card) { test_collection.collection_cards.first }
 
       before do
-        survey_response.update_attribute(:status, :completed)
         other_test_collection.reload
         card.update(item: chart_item)
       end

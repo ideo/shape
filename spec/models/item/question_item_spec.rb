@@ -35,7 +35,7 @@ RSpec.describe Item::QuestionItem, type: :model do
   context 'with a launched test collection' do
     let(:user) { create(:user) }
     let(:user2) { create(:user) }
-    let(:test_collection) { create(:test_collection) }
+    let(:test_collection) { create(:test_collection, :completed) }
     let(:test_design) do
       create(:test_design, test_collection: test_collection, add_editors: [user], add_viewers: [user2])
     end
@@ -56,6 +56,7 @@ RSpec.describe Item::QuestionItem, type: :model do
     let(:question_item) { question_card.item }
 
     describe '#score' do
+      before { test_collection.launch! }
       let!(:response) { create(:survey_response, test_collection: test_collection) }
       # cheating here because a survey_response should really only have one answer per question
       let!(:answer1) { create(:question_answer, survey_response: response, question: question_item, answer_number: 1) }
@@ -63,7 +64,6 @@ RSpec.describe Item::QuestionItem, type: :model do
       let!(:answer3) { create(:question_answer, survey_response: response, question: question_item, answer_number: 2) }
       let!(:answer4) { create(:question_answer, survey_response: response, question: question_item, answer_number: 4) }
       before do
-        response.update(status: :completed)
         question_item.update(question_type: :question_useful)
       end
 
