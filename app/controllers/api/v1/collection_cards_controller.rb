@@ -359,7 +359,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
           docinfo: {},
         ],
         datasets_attributes: [
-          :name,
+          :identifier,
           :description,
           :order,
           :selected,

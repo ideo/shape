@@ -8,9 +8,9 @@
 #  data_source_type :string
 #  description      :text
 #  groupings        :jsonb
+#  identifier       :string
 #  max_domain       :integer
 #  measure          :string
-#  name             :string
 #  question_type    :string
 #  style            :jsonb
 #  timeframe        :integer
@@ -47,22 +47,16 @@ class Dataset
     end
 
     def name
-      if org_grouping.present?
-        DEFAULT_ORG_NAME
-      elsif test_audience_grouping.present?
-        "test-audience-#{test_audience_grouping['id']}"
-      else
-        return if test_collection.blank?
+      if grouping.present?
+        # Just name off the first grouping for now, change in future
+        klass = grouping['type'].constantize
+        object = klass.find(grouping['id'].to_i)
+        "#{object.name} #{klass.display_name}"
+      elsif test_collection_id.present? && test_collection.present?
         test_collection.name.sub(Collection::TestDesign::COLLECTION_SUFFIX, '')
+      else
+        identifier
       end
-    end
-
-    def display_name
-      return name if groupings.empty?
-      # Just name off the first grouping for now, change in future
-      klass = groupings.first['type'].constantize
-      object = klass.find(groupings.first['id'].to_i)
-      "#{object.name} #{klass.display_name}"
     end
 
     def max_domain

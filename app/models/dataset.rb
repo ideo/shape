@@ -8,9 +8,9 @@
 #  data_source_type :string
 #  description      :text
 #  groupings        :jsonb
+#  identifier       :string
 #  max_domain       :integer
 #  measure          :string
-#  name             :string
 #  question_type    :string
 #  style            :jsonb
 #  timeframe        :integer
@@ -61,30 +61,19 @@ class Dataset < ApplicationRecord
     line: 2,
   }
 
-  searchkick callbacks: :queue
-
-  scope :search_import, -> do
-    includes(
-      data_source: { parent_collection_card: :parent },
-    )
+  def self.identifier_for_object(object)
+    "#{object.class.base_class.name}-#{object.id}"
   end
 
-  def search_data
-    {
-      type: type,
-      name: name,
-      organization_id: organization_id || data_source&.organization_id,
-      question_type: question_type,
-      chart_type: chart_type,
-      data_source_parent_id: data_source ? data_source.parent.id : nil,
-      data_source_parent_type: data_source ? data_source.parent.class.base_class.name : nil,
-    }
+  def grouping
+    # NOTE: support for multiple groupings is TBD
+    groupings.first
   end
 
   # Implement in each sub-class
 
-  def display_name
-    name
+  def name
+    identifier
   end
 
   def title; end

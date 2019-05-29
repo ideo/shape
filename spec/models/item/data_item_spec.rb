@@ -55,7 +55,7 @@ RSpec.describe Item::DataItem, type: :model do
         chart_type: :bar,
         measure: 'something',
         timeframe: 'ever',
-        name: 'Something That is Great',
+        identifier: 'Something That is Great',
         cached_data: [
           { date: '2019-04-01', value: 987_654_321 },
         ],
