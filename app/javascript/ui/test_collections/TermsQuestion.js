@@ -77,6 +77,7 @@ class TermsQuestion extends React.Component {
             <Emoji scale={1.375} name="Disagree" symbol="👎" />
           </EmojiButton>
           <EmojiButton
+            data-cy="AcceptFeedbackTerms"
             selected={answered && user && user.feedback_terms_accepted}
             onClick={this.handleClick(true)}
           >

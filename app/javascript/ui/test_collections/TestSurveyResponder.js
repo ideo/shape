@@ -38,7 +38,7 @@ class TestSurveyResponder extends React.Component {
       this.props.includeTerms != prevProps.includeTerms ||
       this.props.includeRecontactQuestion != prevProps.includeRecontactQuestion
     ) {
-      // this.initializeCards()
+      this.initializeCards()
     }
   }
 
@@ -66,14 +66,14 @@ class TestSurveyResponder extends React.Component {
 
   questionAnswerForCard = card => {
     const { surveyResponse } = this.props
+    if (card.card_question_type === 'question_terms') {
+      return this.termsAnswered
+    }
     if (!surveyResponse) return undefined
     // This method is supposed to return a questionAnswer, not a boolean
     // https://www.dropbox.com/s/72mafwlzukz13ir/Screenshot%202019-05-15%2012.17.10.png?dl=0
     if (card.card_question_type === 'question_recontact') {
       return this.recontactAnswered
-    }
-    if (card.card_question_type === 'question_terms') {
-      return this.termsAnswered
     }
     return _.find(surveyResponse.question_answers, {
       question_id: card.record.id,
@@ -88,10 +88,16 @@ class TestSurveyResponder extends React.Component {
 
     let reachedLastVisibleCard = false
     const questions = questionCards.filter(card => {
+      // console.log(
+      //   'top',
+      //   card.card_question_type,
+      //   this.questionAnswerForCard(card)
+      // )
       // turn off the card's actionmenu (dot-dot-dot)
       if (card.id !== 'recontact' && card.id !== 'terms')
         card.record.disableMenu()
       if (reachedLastVisibleCard) {
+        // console.log('reachedLastVisibleCard')
         return false
       } else if (
         !this.answerableCard(card) ||
@@ -100,6 +106,7 @@ class TestSurveyResponder extends React.Component {
         // If not answerable, or they already answered, show it
         return true
       }
+      console.log('end')
       reachedLastVisibleCard = true
       return true
     })
@@ -130,6 +137,7 @@ class TestSurveyResponder extends React.Component {
     const index = questionCards.indexOf(card)
     const nextCard = questionCards[index + 1]
     if (!nextCard) return
+    console.log(this.viewableCards, nextCard.id)
     scroller.scrollTo(`card-${nextCard.id}`, {
       duration: 400,
       smooth: true,
