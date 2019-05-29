@@ -6,7 +6,6 @@ import styled from 'styled-components'
 import { Select } from '~/ui/global/styled/forms'
 import { DisplayText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
-import { questionTitle } from '~/ui/test_collections/shared'
 
 const StyledGrid = styled.div``
 StyledGrid.displayName = 'StyledGrid'
@@ -26,8 +25,8 @@ class CollectionSort extends React.Component {
     ]
     _.each(collection.sort_options, opt => {
       opts.push({
-        name: `Result: ${questionTitle(opt)}`,
-        value: opt,
+        name: `Result: ${opt.question_title}`,
+        value: opt.question_type,
       })
     })
     return opts

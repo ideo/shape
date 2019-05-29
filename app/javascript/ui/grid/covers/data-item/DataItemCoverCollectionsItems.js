@@ -10,6 +10,7 @@ import {
   HugeNumber,
 } from '~/ui/global/styled/typography'
 import ChartGroup from '~/ui/global/charts/ChartGroup'
+import InlineLoader from '~/ui/layout/InlineLoader'
 import { AboveChartContainer } from '~/ui/global/charts/ChartUtils'
 import EditableButton from '~/ui/reporting/EditableButton'
 import MeasureSelect from '~/ui/reporting/MeasureSelect'
@@ -18,7 +19,7 @@ import DataTargetSelect from '~/ui/reporting/DataTargetSelect'
 import v from '~/utils/variables'
 import trackError from '~/utils/trackError'
 import OrganicGridPng from '~/assets/organic_grid_black.png'
-import StyledDataItemCover from './StyledDataItemCover'
+import { StyledDataItemCover } from './StyledDataItemCover'
 
 const GraphKey = styled.span`
   background: url(${OrganicGridPng});
@@ -36,18 +37,21 @@ const GraphKey = styled.span`
 class DataItemCoverCollectionsItems extends React.Component {
   @observable
   targetCollection = null
+  @observable
+  loading = false
 
   componentDidMount() {
-    const { collectionFilter } = this.props.item
-    if (collectionFilter && collectionFilter.target) {
-      this.loadTargetCollection(collectionFilter.target)
+    const { primaryDataset } = this.props.item
+    const dataSourceId = primaryDataset.data_source_id
+    if (dataSourceId) {
+      this.loadTargetCollection(dataSourceId)
     }
   }
 
-  async loadTargetCollection(target) {
+  async loadTargetCollection(source) {
     const { apiStore } = this.props
     try {
-      const res = await apiStore.fetch('collections', target)
+      const res = await apiStore.fetch('collections', source)
       runInAction(() => {
         this.targetCollection = res.data
       })
@@ -69,7 +73,7 @@ class DataItemCoverCollectionsItems extends React.Component {
 
   onSelectTimeframe = value => {
     this.saveSettings({
-      d_timeframe: value,
+      timeframe: value,
     })
   }
 
@@ -82,9 +86,8 @@ class DataItemCoverCollectionsItems extends React.Component {
     }
 
     this.saveSettings({
-      d_filters: value
-        ? [{ type: 'Collection', target: Number(collectionId) }]
-        : [],
+      data_source_id: collectionId,
+      data_source_type: 'Collection',
     })
     if (collectionId) {
       this.loadTargetCollection(collectionId)
@@ -100,7 +103,7 @@ class DataItemCoverCollectionsItems extends React.Component {
     // don't allow setting null measure
     if (!value) return
     this.saveSettings({
-      d_measure: value,
+      measure: value,
     })
   }
 
@@ -114,11 +117,12 @@ class DataItemCoverCollectionsItems extends React.Component {
   async saveSettings(settings) {
     const { card, item, uiStore } = this.props
     runInAction(() => {
-      item.data_settings = Object.assign({}, item.data_settings, settings)
+      Object.assign(item.primaryDataset, settings)
+      this.loading = true
     })
-    const res = await item.save()
+    await item.primaryDataset.save()
     // If the timeframe changed we have to resize the card
-    if (settings.d_timeframe) {
+    if (settings.timeframe) {
       const { height, width } = this.correctGridSize
       card.height = height
       card.width = width
@@ -126,9 +130,9 @@ class DataItemCoverCollectionsItems extends React.Component {
     }
     // TODO: investigate why data isn't being updated with just `save()`
     runInAction(() => {
-      item.update(res.data)
       this.toggleEditing()
       uiStore.toggleEditingCardId(card.id)
+      this.loading = false
     })
   }
 
@@ -164,7 +168,8 @@ class DataItemCoverCollectionsItems extends React.Component {
 
   get measureControl() {
     const { item } = this.props
-    const { measure } = item
+    const { primaryDataset } = item
+    const { measure } = primaryDataset
     const editable = item.can_edit_content
     if (this.editing) {
       return (
@@ -180,11 +185,11 @@ class DataItemCoverCollectionsItems extends React.Component {
     } else if (editable) {
       return (
         <EditableButton editable={editable} onClick={this.handleEditClick}>
-          <span className="editableMetric">{measure.name}</span>
+          <span className="editableMetric">{measure}</span>
         </EditableButton>
       )
     }
-    return <span>{measure.name}</span>
+    return <span>{measure}</span>
   }
 
   get targetControl() {
@@ -219,7 +224,7 @@ class DataItemCoverCollectionsItems extends React.Component {
     if (timeframe === 'ever') {
       return (
         <span className="titleAndControls">
-          within {!item.collectionFilter ? 'the ' : ''}
+          within {!item.datasets[0].data_source ? 'the ' : ''}
           {this.targetControl} {this.timeframeControl}
         </span>
       )
@@ -239,9 +244,9 @@ class DataItemCoverCollectionsItems extends React.Component {
 
   get titleAndControls() {
     const { item } = this.props
-    const { name, data_settings } = item
+    const { name, primaryDataset } = item
     if (item.isReportTypeNetworkAppMetric) {
-      return startCase(data_settings.d_measure)
+      return startCase(primaryDataset.measure)
     } else if (item.isReportTypeCollectionsItems) {
       return this.collectionsAndItemsControls
     }
@@ -275,7 +280,7 @@ class DataItemCoverCollectionsItems extends React.Component {
           <br />
         </AboveChartContainer>
         <ChartGroup
-          datasets={item.datasets}
+          dataItem={item}
           simpleDateTooltip={!item.isReportTypeCollectionsItems}
           width={card.width}
           height={card.height}
@@ -300,6 +305,7 @@ class DataItemCoverCollectionsItems extends React.Component {
         editing={this.editing}
         data-cy="DataItemCover"
       >
+        {this.loading && <InlineLoader />}
         {item.isReportTypeCollectionsItems && timeframe === 'ever'
           ? this.renderSingleValue()
           : this.renderTimeframeValues()}

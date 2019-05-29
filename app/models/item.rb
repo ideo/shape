@@ -13,6 +13,7 @@
 #  data_settings              :jsonb
 #  data_source_type           :string
 #  icon_url                   :string
+#  legend_search_source       :integer
 #  name                       :string
 #  question_type              :integer
 #  report_type                :integer
@@ -66,6 +67,8 @@ class Item < ApplicationRecord
                  :cached_inheritance,
                  :pending_transcoding_uuid
 
+  attr_accessor :datasets_attributes
+
   # The card that 'holds' this item and determines its breadcrumb
   has_one :parent_collection_card,
           class_name: 'CollectionCard::Primary',
@@ -76,6 +79,11 @@ class Item < ApplicationRecord
            class_name: 'CollectionCard::Link',
            inverse_of: :item,
            dependent: :destroy
+
+  # Intentionally scoping so all non-data-items return no DataItemsDatasets
+  has_many :data_items_datasets,
+           -> { none },
+           foreign_key: 'data_item_id'
 
   delegate :parent, :pinned, :pinned?, :pinned_and_locked?,
            to: :parent_collection_card, allow_nil: true
@@ -271,6 +279,10 @@ class Item < ApplicationRecord
   def data
     {}
   end
+
+  def question_title; end
+
+  def question_description; end
 
   def jsonapi_type_name
     'items'

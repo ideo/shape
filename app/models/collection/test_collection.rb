@@ -72,6 +72,9 @@ class Collection
     has_many :test_audiences, dependent: :destroy
     belongs_to :collection_to_test, class_name: 'Collection', optional: true
 
+    has_many :datasets,
+             through: :data_items
+
     before_create :setup_default_status_and_questions, unless: :cloned_from_present?
     after_create :add_test_tag, :add_child_roles
     after_update :touch_test_design, if: :saved_change_to_test_status?
@@ -81,7 +84,7 @@ class Collection
     enum test_status: {
       draft: 0,
       live: 1,
-      closed: 2,
+      closed: 2
     }
 
     aasm column: :test_status, enum: true do
@@ -99,7 +102,7 @@ class Collection
                   user: args[:initiated_by],
                   test_audience_params: args[:test_audience_params],
                 )
-              },
+              }
             ],
             after_commit: proc { |**args|
                             post_launch_setup!(
@@ -158,7 +161,7 @@ class Collection
           submission_attrs: {
             template: true,
             launchable_test_id: id,
-            test_status: test_status,
+            test_status: test_status
           },
         )
         # make sure all templates get the latest question setup
@@ -220,7 +223,7 @@ class Collection
           submission: true,
           template_test_id: id,
           launchable_test_id: launchable_test.id,
-          test_status: launchable_test.test_status,
+          test_status: launchable_test.test_status
         },
       )
       # e.g. if we switched which test is running, we want to switch to the latest one
@@ -339,6 +342,11 @@ class Collection
       prelaunch_question_items
     end
 
+    def legend_item
+      question_item = question_items.includes(test_data_item: :legend_item).first
+      question_item&.test_data_item&.legend_item
+    end
+
     def test_open_response_collections
       collections.where(type: 'Collection::TestOpenResponses')
     end
@@ -371,8 +379,8 @@ class Collection
       {
         question_cards: [
           :parent,
-          record: [:filestack_file],
-        ],
+          record: [:filestack_file]
+        ]
       }
     end
 
@@ -426,11 +434,11 @@ class Collection
         # push it to the end, will get resorted after creation is complete
         order: 999,
         collection_attributes: {
-          name: "#{name} Feedback Design",
+          name: Collection::TestDesign.generate_name(name),
           type: 'Collection::TestDesign',
           test_collection_id: id,
-          template_id: template_id,
-        },
+          template_id: template_id
+        }
       }
       CollectionCardBuilder.new(
         params: card_params,
@@ -450,14 +458,25 @@ class Collection
     end
 
     def create_response_graphs(initiated_by:)
+      legend = nil
+      graphs = []
       question_items
         .select(&:scale_question?)
-        .map do |question|
-        question.create_response_graph(
+        .each_with_index do |question, i|
+        data_item_card = question.create_response_graph(
           parent_collection: self,
           initiated_by: initiated_by,
+          legend_item: legend,
         )
+        legend = data_item_card.item.legend_item if i.zero?
+        graphs << data_item_card
+        test_audiences.each do |test_audience|
+          data_item = data_item_card.item
+          question.create_test_audience_dataset(test_audience, data_item)
+        end
       end
+
+      graphs
     end
 
     def create_media_item_link(media_question_items: nil)
@@ -483,7 +502,7 @@ class Collection
           order: i,
           item_attributes: {
             type: 'Item::QuestionItem',
-            question_type: question_type,
+            question_type: question_type
           },
         )
       end

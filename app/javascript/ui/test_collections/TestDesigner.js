@@ -383,7 +383,6 @@ class TestDesigner extends React.Component {
     )
   }
 }
-
 TestDesigner.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
 }

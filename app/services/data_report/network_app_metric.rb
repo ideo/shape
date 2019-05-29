@@ -1,5 +1,11 @@
 module DataReport
-  class NetworkAppMetric < Base
+  class NetworkAppMetric < SimpleService
+    def initialize(dataset:)
+      @dataset = dataset
+      @measure = dataset.measure
+      @timeframe = dataset.timeframe
+    end
+
     def call
       datasets
     end
@@ -35,12 +41,11 @@ module DataReport
     end
 
     def json_api_query_params
-      params = @filters&.first || {}
       {
         measure: @measure,
         start_date: 3.months.ago,
         # timeframe: @timeframe
-      }.merge(params)
+      }
     end
 
     # Include up to 100 records

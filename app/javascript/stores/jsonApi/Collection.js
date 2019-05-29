@@ -641,6 +641,22 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     })
   }
 
+  API_selectDatasetsWithIdentifier({ identifier }) {
+    return this.apiStore.request(
+      `collections/${this.id}/datasets/select`,
+      'POST',
+      { identifier }
+    )
+  }
+
+  API_unselectDatasetsWithIdentifier({ identifier }) {
+    return this.apiStore.request(
+      `collections/${this.id}/datasets/unselect`,
+      'POST',
+      { identifier }
+    )
+  }
+
   @computed
   get sortedCards() {
     return _.sortBy(this.collection_cards, 'order')
@@ -827,6 +843,18 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     this.setReloading(true)
     await this.API_fetchCards({ order })
     this.setReloading(false)
+  }
+
+  async API_addComparison(comparisonTest) {
+    const apiPath = `test_collections/${this.id}/add_comparison`
+    const data = { comparison_collection_id: comparisonTest.id }
+    return this.apiStore.request(apiPath, 'POST', { data })
+  }
+
+  async API_removeComparison(comparisonTest) {
+    const apiPath = `test_collections/${this.id}/remove_comparison`
+    const data = { comparison_collection_id: comparisonTest.id }
+    return this.apiStore.request(apiPath, 'POST', { data })
   }
 
   async API_moveCardsIntoCollection({

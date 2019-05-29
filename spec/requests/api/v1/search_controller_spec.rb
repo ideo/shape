@@ -266,6 +266,42 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
         expect(json['data'].first['id'].to_i).to eq(find_collection.id)
       end
     end
+
+    context 'with type' do
+      let!(:test_collection) do
+        create(
+          :test_collection,
+          organization: organization,
+          add_viewers: [current_user],
+        )
+      end
+
+      before do
+        batch_reindex(Collection)
+      end
+
+      it 'only returns collections of that type' do
+        get(path, params: { type: 'Collection::TestCollection' })
+        expect(json['data'].size).to equal(1)
+        expect(json['data'].first['id'].to_i).to eq(test_collection.id)
+      end
+    end
+
+    context 'with order_by and order_direction' do
+      let!(:find_collection) { collections.first }
+      before do
+        find_collection.update(created_at: 1.year.from_now)
+        batch_reindex(Collection)
+      end
+
+      it 'sorts according to given params' do
+        get(path, params: { order_by: :created_at, order_direction: :desc })
+        expect(json['data'].first['id'].to_i).to eq(find_collection.id)
+
+        get(path, params: { order_by: :created_at, order_direction: :asc })
+        expect(json['data'].first['id'].to_i).not_to eq(find_collection.id)
+      end
+    end
   end
 
   describe 'GET #search_users_and_groups' do

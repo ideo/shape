@@ -57,12 +57,16 @@ const LineChart = ({ dataset, simpleDateTooltip, cardArea }) => {
     <VictoryLine
       labels={d => d.value}
       labelComponent={
-        <ChartTooltip textRenderer={tooltipFn} cardArea={cardArea} />
+        <ChartTooltip
+          tooltipTextRenderer={tooltipFn}
+          labelTextRenderer={datum => `${datum.value}`}
+          cardArea={cardArea}
+        />
       }
       style={chartStyle(dataset)}
       data={values}
       domain={domain}
-      key={`dataset-${dataset.measure}`}
+      key={`dataset-${dataset.order}`}
     />
   )
 }
