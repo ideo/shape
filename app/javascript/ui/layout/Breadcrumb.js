@@ -271,7 +271,7 @@ class Breadcrumb extends React.Component {
 // TODO move wrapped props to certain place?
 Breadcrumb.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
-  isHomepage: PropTypes.bool.isRequired,
+  isHomepage: PropTypes.bool,
   breadcrumbWrapper: PropTypes.oneOfType([PropTypes.element, PropTypes.object]),
   containerWidth: PropTypes.number,
   maxDepth: PropTypes.number,
@@ -279,6 +279,7 @@ Breadcrumb.propTypes = {
 }
 
 Breadcrumb.defaultProps = {
+  isHomepage: false,
   breadcrumbWrapper: React.createRef(),
   containerWidth: null,
   maxDepth: 6,

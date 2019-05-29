@@ -183,8 +183,23 @@ class Header extends React.Component {
 
   get rolesSummary() {
     const { record } = this
-    const { uiStore } = this.props
+    const { uiStore, apiStore } = this.props
+    const { currentUserOrganization } = apiStore
     if (!this.hasActions) return null
+    if (record.isCommonViewable) {
+      if (!currentUserOrganization) return null
+      return (
+        // simple way to show org as a viewer of the common_viewable resource
+        <div style={{ marginLeft: '5px' }}>
+          <Avatar
+            url={currentUserOrganization.primary_group.filestack_file_url}
+            className="viewer"
+            title={`${currentUserOrganization.name} and Guests`}
+            displayName
+          />
+        </div>
+      )
+    }
     return (
       <RolesSummary
         key="roles"

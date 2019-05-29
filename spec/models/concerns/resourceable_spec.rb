@@ -200,6 +200,28 @@ describe Resourceable, type: :concern do
       expect(item.viewers).to eq collection.viewers
     end
 
+    context 'with common_viewable and viewing_organization_id' do
+      before do
+        collection.update(common_viewable: true)
+      end
+
+      it 'should return common_viewable? true if the roles_anchor is common_viewable' do
+        expect(item.common_viewable?).to be true
+      end
+
+      it 'should return anchored_roles if viewing_organization_id == organization_id' do
+        expect(
+          item.anchored_roles(viewing_organization_id: item.organization_id),
+        ).to eq collection.roles
+      end
+
+      it 'should return empty if viewing_organization_id != organization_id' do
+        expect(
+          item.anchored_roles(viewing_organization_id: 999),
+        ).to eq []
+      end
+    end
+
     describe '#inherit_roles_anchor_from_parent!' do
       let(:other_collection) { create(:collection, roles_anchor_collection: subcollection) }
       let(:item) { create(:text_item, parent_collection: subcollection, roles_anchor_collection: other_collection) }

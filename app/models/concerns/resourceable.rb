@@ -102,8 +102,9 @@ module Resourceable
     true
   end
 
-  def anchored_roles
+  def anchored_roles(viewing_organization_id: organization_id)
     return roles if is_a?(Group)
+    return [] if common_viewable? && viewing_organization_id != organization_id
     roles_anchor.roles
   end
 
