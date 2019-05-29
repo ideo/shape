@@ -35,7 +35,10 @@ EditableInput.displayName = 'EditableInput'
 class TableBody extends React.Component {
   handleInputChange = ev => {
     const { audience, onInputChange } = this.props
-
+    const { value } = ev.target
+    const numberRegex = /^[0-9\b]+$/
+    // Don't allow non-numbers
+    if (value !== '' && !numberRegex.test(value)) return
     onInputChange(audience.id, ev.target.value)
   }
 
