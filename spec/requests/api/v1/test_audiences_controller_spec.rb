@@ -35,6 +35,29 @@ describe Api::V1::TestAudiencesController, type: :request, json: true, auth: tru
     end
   end
 
+  describe 'DELETE #destroy' do
+    let!(:current_user) { @user }
+    let(:organization) { create(:organization, admin: current_user) }
+    let(:audience) { create(:audience, organization: organization) }
+    let(:test_collection) { create(:test_collection, add_editors: [current_user]) }
+    let(:test_audience) do
+      create(:test_audience,
+             audience: audience,
+             test_collection: test_collection,
+             sample_size: 10)
+    end
+    let(:path) { "/api/v1/test_audiences/#{test_audience.id}" }
+
+    before do
+      @user = current_user
+    end
+
+    it 'returns a 200' do
+      delete(path)
+      expect(response.status).to eq(200)
+    end
+  end
+
   describe 'PATCH #update' do
     let!(:current_user) { @user }
     let(:organization) { create(:organization, admin: current_user) }
