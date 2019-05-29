@@ -149,7 +149,7 @@ class LegendItemCover extends React.Component {
    */
   @observable
   @action
-  toggleDatasetsWithIdentifier = async ({ identifier, selected } = {}) => {
+  toggleDatasetsWithIdentifier = async ({ identifier, selected }) => {
     const { parent } = this.props.card
     if (!selected) {
       await parent.API_selectDatasetsWithIdentifier({ identifier })
