@@ -37,9 +37,29 @@ class Api::V1::DatasetsController < Api::V1::BaseController
     DataItemsDataset
       .joins(:dataset)
       .where(
-        data_item_id: @collection.data_item_ids,
+        data_item_id: collection_data_item_ids,
         datasets: { name: name },
       )
+  end
+
+  # All direct data items, plus any that are cover items for this collection
+  def collection_data_item_ids
+    arel_data_item_type = Item.arel_table[:type].eq('Item::DataItem')
+
+    visible_data_item_ids = @collection
+      .primary_collection_cards
+      .visible
+      .joins(:item)
+      .where(arel_data_item_type)
+      .pluck(Item.arel_table[:id])
+
+    collection_cover_data_item_ids = @collection
+      .collections
+      .joins(:collection_cover_items)
+      .where(arel_data_item_type)
+      .pluck(Item.arel_table[:id])
+
+    (visible_data_item_ids + collection_cover_data_item_ids).uniq
   end
 
   def dataset_params

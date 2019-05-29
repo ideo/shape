@@ -305,7 +305,7 @@ class GridCard extends React.Component {
       <CoverRenderer
         card={card}
         cardType={cardType}
-        coverItem={this.coverItem}
+        isCoverItem={this.coverItem ? true : false}
         record={record}
         height={height}
         dragging={dragging}
