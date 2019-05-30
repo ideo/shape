@@ -5,4 +5,8 @@ class SerializableAudience < BaseJsonSerializer
   attribute :price_per_response do
     @object.price_per_response.to_f
   end
+
+  attribute :global do
+    @object.organizations.empty?
+  end
 end
