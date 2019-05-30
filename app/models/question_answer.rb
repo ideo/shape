@@ -13,8 +13,7 @@
 #
 # Indexes
 #
-#  index_question_answers_on_question_id         (question_id)
-#  index_question_answers_on_survey_response_id  (survey_response_id)
+#  index_question_answers_on_survey_response_id_and_question_id  (survey_response_id,question_id) UNIQUE
 #
 
 class QuestionAnswer < ApplicationRecord
