@@ -25,6 +25,14 @@ module Breadcrumb
       ids = viewable
       Collection
         .where(id: ids)
+        .merge(
+          # only show collections in your org
+          Collection.where(organization_id: @user.current_organization_id)
+          .or(
+            # OR outside of your org where common_viewable == true
+            Collection.where("cached_attributes->'common_viewable' = 'true'"),
+          ),
+        )
         .order("position(id::text in '#{ids.join(',')}')")
         .select(:id, :name)
     end
@@ -39,22 +47,10 @@ module Breadcrumb
       end
     end
 
-    # # Checks if user can view this breadcrumb item,
-    # # by checking if they have view rights on anything within the breadcrumb chain
-    # def can_view_item?(breadcrumb_item)
-    #   viewable.include?(breadcrumb_item)
-    # end
-    #
-    # # Checks if user can edit this breadcrumb item,
-    # # by checking if they have edit rights on anything within the breadcrumb chain
-    # def can_edit_item?(breadcrumb_item)
-    #   editable.include?(breadcrumb_item)
-    # end
-
     private
 
-    # Iterates through breacrumb items and yields them to a block
-    # The first item to yield true then triggers returning all subsequent items
+    # Iterates backwards through breadcrumb items and yields them to a block
+    # The first item to yield false will block all subsequent items
     def select_breadcrumb_items_cascading
       can = true
 
@@ -74,7 +70,7 @@ module Breadcrumb
       type = object.class.base_class.name.downcase.pluralize
       {
         type: type,
-        id: object.id,
+        id: object.id.to_s,
         name: object.name,
         can_edit: object == @object ? object.can_edit?(@user) : editable.include?(object.id),
       }
