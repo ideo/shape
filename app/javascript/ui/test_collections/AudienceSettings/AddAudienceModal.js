@@ -47,6 +47,10 @@ const DeleteButton = styled.button`
 `
 DeleteButton.displayName = 'DeleteButton'
 
+const SelectedOptionsWrapper = styled(Flex)`
+  min-height: 40px;
+`
+
 const SelectedOption = styled.span`
   background: ${v.colors.commonLightest};
   font-family: ${v.fonts.sans};
@@ -253,13 +257,13 @@ class AddAudienceModal extends React.Component {
           <span ref={ref => (this.criteriaTriggers[criteria] = ref)}>
             <Label>{criteria}</Label>
           </span>
-          <Flex wrap>
+          <SelectedOptionsWrapper wrap>
             {selectedOptions.map(option => (
               <SelectedOption key={`selected_${option}`}>
                 {this.unPrefixCriteriaOption(criteria, option)}
               </SelectedOption>
             ))}
-          </Flex>
+          </SelectedOptionsWrapper>
           <HorizontalDivider
             color={v.colors.commonMedium}
             style={{ borderWidth: '0 0 1px 0', marginBlockStart: 0 }}
@@ -318,7 +322,7 @@ class AddAudienceModal extends React.Component {
 
     return (
       <React.Fragment>
-        <Modal title="Create New Audience" onClose={close} open={open} noScroll>
+        <Modal title="Create New Audience" onClose={close} open={open}>
           <FieldContainer>
             <Label htmlFor="audienceName">Audience Name</Label>
             <TextField
