@@ -4,6 +4,7 @@ class Api::V1::TestAudiencesController < Api::V1::BaseController
   load_resource
 
   def create
+    @test_audience.launched_by = current_user
     if @test_audience.save
       render_test_audience
     else
