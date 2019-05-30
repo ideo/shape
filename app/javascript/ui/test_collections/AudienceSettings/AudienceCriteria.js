@@ -24,7 +24,7 @@ export const criteria = [
   {
     name: 'Country',
     group: 'Demographics',
-    options: ['United Kingdom', 'United Stateds'],
+    options: ['United Kingdom', 'United States'],
   },
   {
     name: 'Education',
