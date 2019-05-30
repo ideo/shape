@@ -5,13 +5,12 @@ import { Element as ScrollElement } from 'react-scroll'
 import { Box } from 'reflexbox'
 import {
   MarketingBack,
-  MarketingProductPageHeroTitle,
-  MarketingProductPageHeroSubtitle,
-  MarketingProductPageHeroVideoCaption,
   MarketingFlex,
   MarketingStandaloneVideoWrapper,
   VideoDimensions,
+  MarketingH1Bold,
 } from '~/ui/global/styled/marketing.js'
+import { DisplayText } from '~/ui/global/styled/typography'
 import MarketingMenu from '~/ui/marketing/MarketingMenu'
 import ContentBlock from '~/ui/marketing/ContentBlock'
 import marketingFirebaseClient from '~/vendor/firebase/clients/marketingFirebaseClient'
@@ -43,7 +42,7 @@ class MarketingProductPage extends React.Component {
     return (
       <Fragment>
         <MarketingFlex align="center" justify="center" wrap w={1}>
-          <Box mt={[12, 28, 34]}>
+          <Box mt={44}>
             <MarketingStandaloneVideoWrapper>
               <ReactPlayer
                 url={hero.videoUrl}
@@ -55,15 +54,8 @@ class MarketingProductPage extends React.Component {
           </Box>
         </MarketingFlex>
         <MarketingFlex align="center" justify="center" wrap w={1}>
-          <Box
-            w={[1, 0.6, 0.32]}
-            mt={[8, 28, 34]}
-            pr={[3, 0, 0]}
-            pl={[3, 0, 0]}
-          >
-            <MarketingProductPageHeroVideoCaption>
-              {hero.videoCaption}
-            </MarketingProductPageHeroVideoCaption>
+          <Box w={[1, 0.6, 0.32]} mt={44} pr={[3, 0, 0]} pl={[3, 0, 0]}>
+            <DisplayText>{hero.videoCaption}</DisplayText>
           </Box>
         </MarketingFlex>
       </Fragment>
@@ -85,29 +77,20 @@ class MarketingProductPage extends React.Component {
         <MarketingBack>
           <MarketingMenu />
           <MarketingFlex align="center" justify="center" wrap w={1}>
-            <Box w={1} mt={[12, 28, 34]} pr={[3, 0, 0]} pl={[3, 0, 0]}>
-              <MarketingProductPageHeroTitle>
-                {hero && hero.title}
-              </MarketingProductPageHeroTitle>
+            <Box w={1} mt={34} pr={[3, 0, 0]} pl={[3, 0, 0]}>
+              <MarketingH1Bold>{hero && hero.title}</MarketingH1Bold>
             </Box>
-            <Box
-              w={[1, 0.6, 0.32]}
-              mt={[12, 28, 34]}
-              pr={[3, 0, 0]}
-              pl={[3, 0, 0]}
-            >
-              <MarketingProductPageHeroSubtitle>
-                {hero && hero.subTitle}
-              </MarketingProductPageHeroSubtitle>
+            <Box w={[1, 0.6, 0.32]} mt={44} pr={[3, 0, 0]} pl={[3, 0, 0]}>
+              <DisplayText>{hero && hero.subTitle}</DisplayText>
             </Box>
           </MarketingFlex>
           {this.renderVideoPlayer}
           <MarketingFlex align="center" justify="center" wrap w={1}>
             <Box w={1} justify="center">
               <ScrollElement name="ContentAnchor" />
-              {this.sortedBlocks.map(block => (
+              {this.sortedBlocks.map((block, i) => (
                 <ContentBlock
-                  order={block.order}
+                  order={i + 1}
                   title={block.title}
                   content={block.content}
                   imageUrl={block.imageUrl}

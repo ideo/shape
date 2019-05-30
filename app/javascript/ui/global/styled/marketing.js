@@ -1,11 +1,6 @@
 import styled from 'styled-components'
 import v from '~/utils/variables'
-import {
-  Heading1,
-  Heading2,
-  Anchor,
-  DisplayText,
-} from '~/ui/global/styled/typography'
+import { Heading1, Heading2, Anchor } from '~/ui/global/styled/typography'
 import { ReflexProvider, Flex } from 'reflexbox'
 import organicGridPillGray from '~/assets/organic_grid_pill_gray.png'
 
@@ -252,7 +247,6 @@ MarketingVideoWrapper.displayName = 'StyledMarketingVideoWrapper'
 
 /** @component */
 export const MarketingStandaloneVideoWrapper = styled.div`
-  margin-bottom: 35px;
   z-index: 1;
   height: ${VideoDimensions.height};
   width: ${VideoDimensions.width};
@@ -373,32 +367,6 @@ export const MarketingShapeLogo = styled.img.attrs({
   }
 `
 MarketingShapeLogo.displayName = 'StyledMarketingShapeLogo'
-
-/** @component */
-export const MarketingProductPageHeroTitle = styled(MarketingH1Bold)`
-  height: 46px;
-`
-
-MarketingProductPageHeroTitle.displayName =
-  'StyledMarketingProductPageHeroTitle'
-
-/** @component */
-export const MarketingProductPageHeroSubtitle = styled(DisplayText)`
-  height: 100px;
-`
-
-MarketingProductPageHeroSubtitle.displayName =
-  'StyledMarketingProductPageHeroSubtitle'
-MarketingProductPageHeroTitle.displayName =
-  'StyledMarketingProductPageHeroTitle'
-
-/** @component */
-export const MarketingProductPageHeroVideoCaption = styled(DisplayText)`
-  height: 50px;
-`
-
-MarketingProductPageHeroVideoCaption.displayName =
-  'StyledMarketingProductPageHeroVideoCaption'
 
 const space = [0, 8, 16, 32, 64]
 const breakpoints = [40, 52, 64]

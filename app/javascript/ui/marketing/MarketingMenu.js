@@ -89,7 +89,17 @@ const MenuBar = styled(AppBar)`
   }
 `
 
-function handleScrollToContent() {
+function redirectHomeIfNotHome() {
+  if (window.location.pathname !== '/' && window.location.pathname !== '') {
+    window.location.href = '/'
+    return true
+  } else {
+    return false
+  }
+}
+
+function handleScrollToContent(isHomePage) {
+  if (redirectHomeIfNotHome()) return
   scroller.scrollTo('ContentAnchor', {
     duration: 1500,
     delay: 100,
