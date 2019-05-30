@@ -97,7 +97,7 @@ RSpec.describe DataReport::QuestionItem, type: :service do
     end
 
     context 'filtering by test audience' do
-      let!(:audience) { create(:audience, organization: organization) }
+      let!(:audience) { create(:audience, organizations: [organization]) }
       let!(:test_audience) { create(:test_audience, audience: audience, test_collection: test_collection) }
 
       let!(:survey_response) { create(:survey_response, test_collection: test_collection, test_audience: test_audience) }
