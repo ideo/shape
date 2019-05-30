@@ -25,7 +25,7 @@ class PageFooter extends React.PureComponent {
       subHeader,
       buttonText,
       contactHeader,
-      subscriptionHeader,
+      mailingList,
     } = this.props.content
     return (
       <MarketingFooter>
@@ -54,7 +54,7 @@ class PageFooter extends React.PureComponent {
           </Box>
 
           <Box w={1} mt={(0, 5)} wrap>
-            <InvertedFixedWidth>{subscriptionHeader}</InvertedFixedWidth>
+            <InvertedFixedWidth>{mailingList}</InvertedFixedWidth>
           </Box>
 
           <Box w={1} mt={[8, 0]}>
