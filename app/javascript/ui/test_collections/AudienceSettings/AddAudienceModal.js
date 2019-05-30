@@ -314,14 +314,11 @@ class AddAudienceModal extends React.Component {
   }
 
   render() {
+    const { open, close } = this.props
+
     return (
       <React.Fragment>
-        <Modal
-          title="Create New Audience"
-          onClose={this.closeModal}
-          open={this.props.open}
-          noScroll
-        >
+        <Modal title="Create New Audience" onClose={close} open={open} noScroll>
           <FieldContainer>
             <Label htmlFor="audienceName">Audience Name</Label>
             <TextField
