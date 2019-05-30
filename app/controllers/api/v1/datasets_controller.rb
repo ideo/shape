@@ -13,12 +13,12 @@ class Api::V1::DatasetsController < Api::V1::BaseController
   end
 
   def select
-    update_measure(name: json_api_params[:identifier], selected: true)
+    update_measure(identifier: json_api_params[:identifier], selected: true)
     render json: { success: true }
   end
 
   def unselect
-    update_measure(name: json_api_params[:identifier], selected: false)
+    update_measure(identifier: json_api_params[:identifier], selected: false)
     render json: { success: true }
   end
 
@@ -47,17 +47,17 @@ class Api::V1::DatasetsController < Api::V1::BaseController
     arel_data_item_type = Item.arel_table[:type].eq('Item::DataItem')
 
     visible_data_item_ids = @collection
-      .primary_collection_cards
-      .visible
-      .joins(:item)
-      .where(arel_data_item_type)
-      .pluck(Item.arel_table[:id])
+                            .primary_collection_cards
+                            .visible
+                            .joins(:item)
+                            .where(arel_data_item_type)
+                            .pluck(Item.arel_table[:id])
 
     collection_cover_data_item_ids = @collection
-      .collections
-      .joins(:collection_cover_items)
-      .where(arel_data_item_type)
-      .pluck(Item.arel_table[:id])
+                                     .collections
+                                     .joins(:collection_cover_items)
+                                     .where(arel_data_item_type)
+                                     .pluck(Item.arel_table[:id])
 
     (visible_data_item_ids + collection_cover_data_item_ids).uniq
   end

@@ -7,27 +7,33 @@ describe Api::V1::DatasetsController, type: :request, json: true, auth: true do
   let(:data_items_dataset) { data_item.data_items_datasets.first }
   let(:dataset) { data_items_dataset.dataset }
 
-  describe 'POST #select_measure' do
-    let(:path) { "/api/v1/collections/#{collection.id}/datasets/select_measure" }
+  describe 'POST #select' do
+    let(:path) { "/api/v1/collections/#{collection.id}/datasets/select" }
 
     it 'unselects dataset with measure' do
-      expect {
-        post(path, params: { measure: dataset.measure }.to_json)
-      }.to change { data_items_dataset.reload.selected }.from(true).to(false)
+      dataset.update(identifier: 'uid')
+      expect do
+        post(path, params: {
+          identifier: dataset.identifier,
+        }.to_json)
+      end.to change { data_items_dataset.reload.selected }.from(true).to(false)
       expect(response.status).to eq(200)
     end
   end
 
-  describe 'POST #unselect_measure' do
-    let(:path) { "/api/v1/collections/#{collection.id}/datasets/unselect_measure" }
+  describe 'POST #unselect' do
+    let(:path) { "/api/v1/collections/#{collection.id}/datasets/unselect" }
     before do
       data_items_dataset.update(selected: false)
     end
 
     it 'selects dataset with measure' do
-      expect {
-        post(path, params: { measure: dataset.measure }.to_json)
-      }.to change { data_items_dataset.reload.selected }.from(false).to(true)
+      dataset.update(identifier: 'uid')
+      expect do
+        post(path, params: {
+          identifier: dataset.identifier,
+        }.to_json)
+      end.to change { data_items_dataset.reload.selected }.from(false).to(true)
       expect(response.status).to eq(200)
     end
   end
