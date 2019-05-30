@@ -5,11 +5,10 @@ import {
   MarketingContent,
   MarketingH1Bold,
   MarketingFlex,
-  MarketingCallToAction,
 } from '~/ui/global/styled/marketing.js'
 import v from '~/utils/variables'
 
-const StyledProductTemplate = styled(MarketingContent)`
+const StyledHtmlImage = styled(MarketingContent)`
   margin-left: 24px;
   margin-right: 24px;
   padding-top: 0px;
@@ -40,8 +39,38 @@ const StyledInnerHTML = styled.div`
   word-wrap: break-word;
   line-height: 25px;
   font-size: 18px;
+  h3 {
+    text-transform: uppercase;
+    margin-top: 17px;
+    margin-bottom: 13px;
+    font-size: 0.9375rem;
+    font-weight: ${v.weights.medium};
+    letter-spacing: 0.0625rem;
+    color: ${v.colors.black};
+  }
   ul {
     list-style-type: disc;
+    margin-left: 20px;
+    padding: 10px 0;
+    li {
+      margin-bottom: 5px;
+    }
+  }
+  a {
+    margin: 10px 0;
+    display: block;
+    background-color: ${v.colors.caution};
+    border-radius: 4px;
+    border: 2px solid ${v.colors.caution};
+    padding: 12px 16px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-size: 14px;
+    font-weight: ${v.weights.medium};
+    width: 180px;
+    text-decoration: none;
+    text-align: center;
+    color: ${v.colors.black};
   }
 `
 StyledInnerHTML.displayName = 'StyledInnerHTML'
@@ -54,29 +83,12 @@ const ImageDisplay = styled.img`
   box-shadow: 0px 2px 16px ${v.colors.commonMedium};
 `
 
-const ProductTemplateCTA = MarketingCallToAction.extend`
-  margin-top: 10px;
-  font-size: 14px;
-  line-height: 2.2em;
-  width: 100%;
-`
-
-class ProductTemplate extends React.PureComponent {
-  constructor(props) {
-    super(props)
-    this.renderSampleTemplateInstance = this.renderSampleTemplateInstance.bind(
-      this
-    )
-  }
-
-  renderSampleTemplateInstance = () => {
-    // stubbed out method to instantiate new template for demo
-  }
-
+class ContentBlock extends React.PureComponent {
   render() {
-    const descriptionHTML = `${this.props.descriptionHTML}` // needed due to https://reactjs.org/docs/jsx-in-depth.html#string-literals
+    const { order, title, content, imageUrl } = this.props
+    const html = `${content}` // needed due to https://reactjs.org/docs/jsx-in-depth.html#string-literals
     return (
-      <StyledProductTemplate id={this.props.id} order={this.props.order}>
+      <StyledHtmlImage key={title.toString()} order={order}>
         <MarketingFlex
           w={1}
           mt={4}
@@ -90,46 +102,29 @@ class ProductTemplate extends React.PureComponent {
         >
           <Box w={[null, 0.08]} order={1} />
 
-          <Box w={[1, 0.21]} order={[4, this.props.order % 2 === 1 ? 2 : 4]}>
-            <Title>{this.props.title}</Title>
-            {
-              <StyledInnerHTML
-                dangerouslySetInnerHTML={{ __html: descriptionHTML }}
-              />
-            }
-            <ProductTemplateCTA onClick={this.renderSampleTemplateInstance}>
-              {this.props && this.props.buttons[0]}
-            </ProductTemplateCTA>
+          <Box w={[1, 0.21]} order={[4, order % 2 === 1 ? 2 : 4]}>
+            <Title>{title}</Title>
+            {<StyledInnerHTML dangerouslySetInnerHTML={{ __html: html }} />}
           </Box>
 
           <Box w={[null, 0.09]} order={3} />
 
-          <Box w={[1, 0.54]} order={[2, this.props.order % 2 === 1 ? 4 : 2]}>
-            <ImageDisplay src={this.props.imageUrl} alt={this.props.title} />
+          <Box w={[1, 0.54]} order={[2, order % 2 === 1 ? 4 : 2]}>
+            <ImageDisplay src={imageUrl} alt={title} />
           </Box>
 
           <Box w={[null, 0.08]} order={4} />
         </MarketingFlex>
-      </StyledProductTemplate>
+      </StyledHtmlImage>
     )
   }
 }
 
-ProductTemplate.propTypes = {
-  id: PropTypes.string.isRequired,
+ContentBlock.propTypes = {
   order: PropTypes.number.isRequired,
   title: PropTypes.string.isRequired,
-  description: PropTypes.string,
-  descriptionMarkdown: PropTypes.string,
-  descriptionHTML: PropTypes.string,
+  content: PropTypes.string.isRequired,
   imageUrl: PropTypes.string.isRequired,
-  buttons: PropTypes.array.isRequired,
 }
 
-ProductTemplate.defaultProps = {
-  description: '',
-  descriptionMarkdown: '',
-  descriptionHTML: '',
-}
-
-export default ProductTemplate
+export default ContentBlock

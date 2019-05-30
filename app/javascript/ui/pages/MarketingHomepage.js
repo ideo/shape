@@ -1,10 +1,10 @@
+import _ from 'lodash'
 import { Fragment } from 'react'
 import { Box } from 'reflexbox'
 import { Element as ScrollElement } from 'react-scroll'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import {
   MarketingBack,
-  // MarketingHeavyCTA,
   MarketingFlex,
   MarketingHeroButtonContainer,
   Center,
@@ -12,13 +12,12 @@ import {
   MarketingVideoLink,
   MarketingShapeLogo,
   MarketingVideoWrapper,
-  // MarketingBetaSticker,
   MarketingCallToAction,
   MarketingGradientTop,
   VideoDimensions,
 } from '~/ui/global/styled/marketing.js'
 import MarketingMenu from '~/ui/marketing/MarketingMenu'
-import ProductDescriptions from '~/ui/marketing/ProductDescriptions'
+import ContentBlock from '~/ui/marketing/ContentBlock'
 import BetaSticker from '~/ui/marketing/BetaSticker'
 import marketingFirebaseClient from '~/vendor/firebase/clients/marketingFirebaseClient'
 import ReactPlayer from 'react-player'
@@ -28,28 +27,25 @@ import { hasKeyValueParam } from '~/utils/paramUtils.js'
 class MarketingPage extends React.Component {
   constructor(props) {
     super(props)
-    const pageTexts = {}
-
     this.state = {
-      pageTexts: pageTexts,
+      content: {},
       videoPlaying: false,
     }
-
     this.toggleVideoPlaying = this.toggleVideoPlaying.bind(this)
   }
 
-  componentDidMount() {
-    marketingFirebaseClient.getObjectFromCollection('home').then(texts => {
-      const paramString = this.props.location.search
-      if (hasKeyValueParam(paramString, 'campaign', 'alphapt7')) {
-        texts.footer.header =
-          texts.footer.header && texts.footer.header.replace('$5', '$7')
-      }
-      if (hasKeyValueParam(paramString, 'videoPlaying', 'true')) {
-        this.setState({ videoPlaying: true })
-      }
-      this.setState({ pageTexts: texts })
-    })
+  async componentDidMount() {
+    const content = await marketingFirebaseClient.getCollection('home')
+    this.setState({ content: content })
+
+    const paramString = this.props.location.search
+    if (hasKeyValueParam(paramString, 'campaign', 'alphapt7')) {
+      content.footer.header =
+        content.footer.header && content.footer.header.replace('$5', '$7')
+    }
+    if (hasKeyValueParam(paramString, 'videoPlaying', 'true')) {
+      this.setState({ videoPlaying: true })
+    }
   }
 
   toggleVideoPlaying = () => {
@@ -58,11 +54,19 @@ class MarketingPage extends React.Component {
     })
   }
 
+  get sortedBlocks() {
+    const {
+      content: { blocks },
+    } = this.state
+    return _.sortBy(blocks, block => block.order)
+  }
+
   render() {
-    const { videoPlaying, pageTexts } = this.state
+    const { videoPlaying, content } = this.state
+    const { hero } = content
     const videoPlayingButtonText = !videoPlaying
-      ? pageTexts.hero && pageTexts.hero.buttons[1]
-      : pageTexts.hero && pageTexts.hero.buttons[2]
+      ? hero && hero.buttons[1]
+      : hero && hero.buttons[2]
     return (
       <Fragment>
         <MarketingBack>
@@ -74,14 +78,14 @@ class MarketingPage extends React.Component {
             <Center>
               <MarketingShapeLogo videoPlaying={videoPlaying} />
               <MarketingTagLine videoPlaying={videoPlaying}>
-                {pageTexts.hero && pageTexts.hero.tagLine}
+                {hero && hero.tagLine}
               </MarketingTagLine>
             </Center>
 
             <MarketingFlex align="center" justify="center" wrap w={1}>
               <MarketingVideoWrapper videoPlaying={videoPlaying}>
                 <ReactPlayer
-                  url={pageTexts.hero && pageTexts.hero.videoUrl}
+                  url={hero && hero.videoUrl}
                   height={videoPlaying ? VideoDimensions.height : '0px'}
                   width={videoPlaying ? VideoDimensions.width : '0px'}
                   playing={videoPlaying}
@@ -93,7 +97,7 @@ class MarketingPage extends React.Component {
               <MarketingHeroButtonContainer>
                 <a className="get-early-access-header" href="/sign_up">
                   <MarketingCallToAction>
-                    {pageTexts.hero && pageTexts.hero.buttons[0]}
+                    {hero && hero.buttons[0]}
                   </MarketingCallToAction>
                 </a>
                 <MarketingVideoLink onClick={this.toggleVideoPlaying}>
@@ -106,19 +110,26 @@ class MarketingPage extends React.Component {
           <MarketingFlex align="center" justify="center" wrap w={1}>
             <Box w={1} justify="center">
               <ScrollElement name="ContentAnchor" />
-              <ProductDescriptions />
+              {this.sortedBlocks.map(block => (
+                <ContentBlock
+                  order={block.order}
+                  title={block.title}
+                  content={block.content}
+                  imageUrl={block.imageUrl}
+                />
+              ))}
             </Box>
           </MarketingFlex>
         </MarketingBack>
 
         <PageFooter
-          footerHeader={pageTexts.footer && pageTexts.footer.header}
-          footerSubheader={pageTexts.footer && pageTexts.footer.subHeader}
-          footerButtons={pageTexts.footer && pageTexts.footer.buttons}
-          contactHeader={pageTexts.contact && pageTexts.contact.header}
-          contactHeader2={pageTexts.contact && pageTexts.contact.header2}
+          footerHeader={content.footer && content.footer.header}
+          footerSubheader={content.footer && content.footer.subHeader}
+          footerButtons={content.footer && content.footer.buttons}
+          contactHeader={content.contact && content.contact.header}
+          contactHeader2={content.contact && content.contact.header2}
           subscriptionHeader={
-            pageTexts.subscription && pageTexts.subscription.header
+            content.subscription && content.subscription.header
           }
         />
       </Fragment>
