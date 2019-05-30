@@ -58,6 +58,10 @@ class TestAudience < ApplicationRecord
     closed: 1,
   }
 
+  def self.display_name
+    'Audience'
+  end
+
   def survey_response_completed!
     return unless reached_sample_size?
     self.status = :closed
@@ -68,10 +72,6 @@ class TestAudience < ApplicationRecord
 
   def reached_sample_size?
     survey_responses.completed.size >= sample_size
-  end
-
-  def self.display_name
-    'Audience'
   end
 
   def description
