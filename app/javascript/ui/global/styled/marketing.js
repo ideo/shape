@@ -215,7 +215,6 @@ export const MarketingCallToAction = styled(MarketingContentLink)`
   text-transform: uppercase;
   font-size: 14px;
   font-weight: ${v.weights.medium};
-  width: 180px;
 `
 MarketingCallToAction.displayName = 'StyledMarketingCallToAction'
 

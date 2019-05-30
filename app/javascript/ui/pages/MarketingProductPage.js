@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import { Fragment } from 'react'
+import ReactRouterPropTypes from 'react-router-prop-types'
 import PropTypes from 'prop-types'
 import { Element as ScrollElement } from 'react-scroll'
 import { Box } from 'reflexbox'
@@ -23,6 +24,7 @@ class MarketingProductPage extends React.Component {
     this.page = props.match.params.page
     this.state = {
       content: {},
+      footer: {},
     }
   }
 
@@ -32,6 +34,11 @@ class MarketingProductPage extends React.Component {
       this.page
     )
     this.setState({ content: content })
+    const footer = await marketingFirebaseClient.getCollectionField(
+      'home',
+      'footer'
+    )
+    this.setState({ footer: footer })
   }
 
   get renderVideoPlayer() {
@@ -70,12 +77,13 @@ class MarketingProductPage extends React.Component {
   }
 
   render() {
-    const { content } = this.state
-    const { hero, footer, contact, subscription } = content
+    const { location } = this.props
+    const { content, footer } = this.state
+    const { hero } = content
     return (
       <Fragment>
         <MarketingBack>
-          <MarketingMenu />
+          <MarketingMenu location={location} />
           <MarketingFlex align="center" justify="center" wrap w={1}>
             <Box w={1} mt={34} pr={[3, 0, 0]} pl={[3, 0, 0]}>
               <MarketingH1Bold>{hero && hero.title}</MarketingH1Bold>
@@ -99,14 +107,7 @@ class MarketingProductPage extends React.Component {
             </Box>
           </MarketingFlex>
         </MarketingBack>
-        <PageFooter
-          footerHeader={footer && footer.header}
-          footerSubheader={footer && footer.subHeader}
-          footerButtons={footer && footer.buttons}
-          contactHeader={contact && contact.header}
-          contactHeader2={contact && contact.header2}
-          subscriptionHeader={subscription && subscription.header}
-        />
+        <PageFooter content={footer} />
       </Fragment>
     )
   }
@@ -114,6 +115,7 @@ class MarketingProductPage extends React.Component {
 
 MarketingProductPage.propTypes = {
   match: PropTypes.object.isRequired,
+  location: ReactRouterPropTypes.location.isRequired,
 }
 
 export default MarketingProductPage

@@ -20,31 +20,31 @@ import poweredByIdeo from '~/assets/Powered-by-IDEO-Inverted.png'
 import SubscribeEmail from '~/ui/marketing/SubscribeEmail'
 class PageFooter extends React.PureComponent {
   render() {
+    const {
+      header,
+      subHeader,
+      buttonText,
+      contactHeader,
+      subscriptionHeader,
+    } = this.props.content
     return (
       <MarketingFooter>
         <ScrollElement name="FooterAnchor" />
         <MarketingFlex align="center" justify="center" wrap w={1}>
           <Box w={1} mb={[10, '4px']}>
-            <InvertMarketingH1Bold>
-              {this.props.footerHeader}
-            </InvertMarketingH1Bold>
+            <InvertMarketingH1Bold>{header}</InvertMarketingH1Bold>
           </Box>
           <Box w={1}>
-            <InvertMarketingH1>{this.props.footerSubheader}</InvertMarketingH1>
+            <InvertMarketingH1>{subHeader}</InvertMarketingH1>
           </Box>
           <Box w={1} pt={[46, 65]} pb={[46, 74]} mb={[10, 0]}>
             <a className="get-early-access-footer" href="/sign_up">
-              <MarketingCallToAction>
-                {this.props.footerButtons[0]}
-              </MarketingCallToAction>
+              <MarketingCallToAction>{buttonText}</MarketingCallToAction>
             </a>
           </Box>
 
           <ResponsivePadInlineBlock>
-            <InvertedCentered>{this.props.contactHeader}</InvertedCentered>
-          </ResponsivePadInlineBlock>
-          <ResponsivePadInlineBlock>
-            <InvertedCentered>{this.props.contactHeader2}</InvertedCentered>
+            <InvertedCentered>{contactHeader}</InvertedCentered>
           </ResponsivePadInlineBlock>
 
           <Box w={1}>
@@ -54,9 +54,7 @@ class PageFooter extends React.PureComponent {
           </Box>
 
           <Box w={1} mt={(0, 5)} wrap>
-            <InvertedFixedWidth>
-              {this.props.subscriptionHeader}
-            </InvertedFixedWidth>
+            <InvertedFixedWidth>{subscriptionHeader}</InvertedFixedWidth>
           </Box>
 
           <Box w={1} mt={[8, 0]}>
@@ -107,21 +105,11 @@ class PageFooter extends React.PureComponent {
 }
 
 PageFooter.propTypes = {
-  footerHeader: PropTypes.string,
-  footerSubheader: PropTypes.string,
-  footerButtons: PropTypes.array,
-  contactHeader: PropTypes.string,
-  contactHeader2: PropTypes.string,
-  subscriptionHeader: PropTypes.string,
+  content: PropTypes.object,
 }
 
 PageFooter.defaultProps = {
-  footerHeader: '',
-  footerSubheader: '',
-  footerButtons: [],
-  contactHeader: '',
-  contactHeader2: '',
-  subscriptionHeader: '',
+  content: {},
 }
 
 export default PageFooter

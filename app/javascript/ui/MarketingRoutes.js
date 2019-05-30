@@ -1,11 +1,14 @@
 import { Switch, Route } from 'react-router-dom'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
+import createBrowserHistory from 'history/createBrowserHistory'
 
 import ErrorBoundary from '~/ui/global/ErrorBoundary'
 import MarketingHomepage from '~/ui/pages/MarketingHomepage'
 import MarketingProductPage from '~/ui/pages/MarketingProductPage'
 import TermsPage from '~/ui/pages/TermsPage'
 import v from '~/utils/variables'
+
+export const browserHistory = createBrowserHistory()
 
 class MarketingRoutes extends React.Component {
   theme = createMuiTheme({

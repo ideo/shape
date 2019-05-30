@@ -62,17 +62,18 @@ class MarketingPage extends React.Component {
   }
 
   render() {
+    const { location } = this.props
     const { videoPlaying, content } = this.state
-    const { hero } = content
+    const { hero, footer } = content
     const videoPlayingButtonText = !videoPlaying
-      ? hero && hero.buttons[1]
-      : hero && hero.buttons[2]
+      ? hero && hero.watchVideoButton
+      : hero && hero.closeVideoButton
     return (
       <Fragment>
         <MarketingBack>
           <MarketingGradientTop>
             <ScrollElement name="TopAnchor" />
-            <MarketingMenu />
+            <MarketingMenu location={location} />
             <BetaSticker />
 
             <Center>
@@ -97,7 +98,7 @@ class MarketingPage extends React.Component {
               <MarketingHeroButtonContainer>
                 <a className="get-early-access-header" href="/sign_up">
                   <MarketingCallToAction>
-                    {hero && hero.buttons[0]}
+                    {hero && hero.getStartedButton}
                   </MarketingCallToAction>
                 </a>
                 <MarketingVideoLink onClick={this.toggleVideoPlaying}>
@@ -122,16 +123,7 @@ class MarketingPage extends React.Component {
           </MarketingFlex>
         </MarketingBack>
 
-        <PageFooter
-          footerHeader={content.footer && content.footer.header}
-          footerSubheader={content.footer && content.footer.subHeader}
-          footerButtons={content.footer && content.footer.buttons}
-          contactHeader={content.contact && content.contact.header}
-          contactHeader2={content.contact && content.contact.header2}
-          subscriptionHeader={
-            content.subscription && content.subscription.header
-          }
-        />
+        <PageFooter content={footer} />
       </Fragment>
     )
   }
