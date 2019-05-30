@@ -73,11 +73,6 @@ class AddAudienceModal extends React.Component {
 
   criteriaTriggers = {}
 
-  closeModal = () => {
-    this.closeCriteriaMenu()
-    this.props.close()
-  }
-
   openMenu = menu => {
     const { openMenus } = this.state
     openMenus[menu] = true
@@ -122,7 +117,13 @@ class AddAudienceModal extends React.Component {
 
   reset = () => {
     this.props.close()
-    this.setState({ name: '', valid: false })
+    this.setState({
+      name: '',
+      valid: false,
+      selectedCriteria: [],
+      openMenus: {},
+      selectedCriteriaOptions: [],
+    })
   }
 
   addCriteria = e => {
@@ -318,11 +319,13 @@ class AddAudienceModal extends React.Component {
   }
 
   render() {
-    const { open, close } = this.props
-
     return (
       <React.Fragment>
-        <Modal title="Create New Audience" onClose={close} open={open}>
+        <Modal
+          title="Create New Audience"
+          onClose={this.reset}
+          open={this.props.open}
+        >
           <FieldContainer>
             <Label htmlFor="audienceName">Audience Name</Label>
             <TextField
