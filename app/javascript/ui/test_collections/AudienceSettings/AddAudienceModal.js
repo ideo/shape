@@ -13,7 +13,7 @@ import Modal from '~/ui/global/modals/Modal'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import TrashIcon from '~/ui/icons/TrashIcon'
 import v from '~/utils/variables'
-import { criteria, criteriaOptions } from './AudienceCriteria'
+import { groupCriteriaByGroup, getCriterionByName } from './AudienceCriteria'
 import {
   Checkbox,
   CheckboxSelectOption,
@@ -143,7 +143,7 @@ class AddAudienceModal extends React.Component {
 
     remove(selectedCriteria, c => c === criteria)
 
-    const { options } = criteriaOptions[criteria]
+    const { options } = getCriterionByName(criteria)
     remove(selectedCriteriaOptions, o => includes(options, o))
 
     this.setState({ selectedCriteria, selectedCriteriaOptions })
@@ -185,22 +185,8 @@ class AddAudienceModal extends React.Component {
     const menuOpen = openMenus[ROOT_MENU]
     if (!menuOpen) return null
 
-    const groups = Object.keys(criteria).map(group => {
-      const options = criteria[group].map(option => {
-        const { name } = option
-
-        return (
-          <SelectOption
-            key={name}
-            classes={{ root: 'selectOption' }}
-            disabled={includes(selectedCriteria, name)}
-            value={name}
-          >
-            {name}
-          </SelectOption>
-        )
-      })
-
+    const criteria = groupCriteriaByGroup()
+    const groups = criteria.map(([group, groupCriteria]) => {
       const groupOption = (
         <SelectOption
           key={group}
@@ -211,8 +197,18 @@ class AddAudienceModal extends React.Component {
         </SelectOption>
       )
 
-      options.splice(0, 0, groupOption)
-      return options
+      const options = groupCriteria.map(({ name }) => (
+        <SelectOption
+          key={name}
+          classes={{ root: 'selectOption' }}
+          disabled={includes(selectedCriteria, name)}
+          value={name}
+        >
+          {name}
+        </SelectOption>
+      ))
+
+      return [groupOption, ...options]
     })
 
     return this.renderSelectMenu({
@@ -225,7 +221,7 @@ class AddAudienceModal extends React.Component {
 
   renderSelectMenu({ isOpen, menuId, onChange, selectOptions }) {
     return (
-      <div ref={ref => this.updateMenuPosition(menuId, ref)}>
+      <div key={menuId} ref={ref => this.updateMenuPosition(menuId, ref)}>
         <Select
           open={isOpen}
           onOpen={() => this.openMenu(menuId)}
@@ -246,7 +242,7 @@ class AddAudienceModal extends React.Component {
     const { selectedCriteriaOptions } = this.state
 
     return this.state.selectedCriteria.map(criteria => {
-      const { options } = criteriaOptions[criteria]
+      const { options } = getCriterionByName(criteria)
       const prefixedOptions = options.map(o =>
         this.prefixCriteriaOption(criteria, o)
       )
@@ -287,7 +283,7 @@ class AddAudienceModal extends React.Component {
     const { selectedCriteria, selectedCriteriaOptions, openMenus } = this.state
 
     return selectedCriteria.map(criteria => {
-      const availableOptions = criteriaOptions[criteria].options
+      const { options: availableOptions } = getCriterionByName(criteria)
 
       const options = availableOptions.map(option => {
         const prefixedOption = this.prefixCriteriaOption(criteria, option)
