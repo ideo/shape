@@ -1,65 +1,9 @@
-import _ from 'lodash'
 import PropTypes from 'prop-types'
 import styled, { css } from 'styled-components'
 import TextareaAutosize from 'react-autosize-textarea'
-import { VictoryTheme } from 'victory'
 
-import objectAssignDeep from '~/vendor/object-assign-deep'
 import { StyledCommentTextarea } from '~/ui/global/styled/forms'
 import v from '~/utils/variables'
-
-const colorScale = [v.colors.tertiaryMedium, v.colors.primaryLight]
-export const themeLabelStyles = {
-  fontFamily: v.fonts.sans,
-  fontSize: '10px',
-  padding: 10,
-  fill: v.colors.black,
-  stroke: 'transparent',
-  textTransform: 'uppercase',
-}
-export const theme = objectAssignDeep({}, VictoryTheme.grayscale, {
-  bar: {
-    style: {
-      labels: Object.assign({}, themeLabelStyles, {
-        fill: v.colors.tertiaryMedium,
-        fontSize: 14,
-      }),
-    },
-  },
-  area: {
-    style: {
-      labels: Object.assign({}, themeLabelStyles, {
-        fill: v.colors.tertiaryMedium,
-      }),
-    },
-  },
-  axis: {
-    style: {
-      tickLabels: themeLabelStyles,
-      axisLabel: themeLabelStyles,
-    },
-  },
-  group: {
-    colorScale,
-  },
-  legend: {
-    colorScale,
-    fontSize: 14,
-    gutter: 10,
-    style: {
-      data: {
-        type: 'square',
-      },
-      labels: Object.assign({}, themeLabelStyles, {
-        fontSize: 10.5,
-      }),
-      border: {
-        fill: 'rgba(255, 255, 255, 0.5)',
-      },
-      title: themeLabelStyles,
-    },
-  },
-})
 
 export const EmojiMessageContainer = styled.div`
   margin-top: 0px;
@@ -82,10 +26,18 @@ export const QuestionText = styled.p`
   box-sizing: border-box;
   color: white !important;
   font-family: ${v.fonts.sans} !important;
+  font-size: ${props => props.fontSizeEm}em;
   margin: 0;
   padding: 16px;
   width: 100%;
 `
+QuestionText.propTypes = {
+  fontSizeEm: PropTypes.number,
+}
+
+QuestionText.defaultProps = {
+  fontSizeEm: 1,
+}
 
 export const TextInputHolder = StyledCommentTextarea.extend`
   color: white;
@@ -174,96 +126,6 @@ export const TestQuestionHolder = styled.div`
     margin-bottom: 0;
   }
 `
-
-export const emojiSeriesMap = {
-  usefulness: [
-    { number: 1, name: 'Very useless', symbol: '👎' },
-    { number: 2, name: 'Somewhat useless', scale: 0.6, symbol: '👎' },
-    { number: 3, name: 'Somewhat useful', scale: 0.6, symbol: '👍' },
-    { number: 4, name: 'Very useful', symbol: '👍' },
-  ],
-  satisfaction: [
-    { number: 1, name: 'Very unsatisfied', symbol: '😡' },
-    { number: 2, name: 'Somewhat unsatisfied', scale: 0.6, symbol: '☹️' },
-    { number: 3, name: 'Mostly Satisfied', scale: 0.6, symbol: '😊' },
-    { number: 4, name: 'Very satisfied', symbol: '😍' },
-  ],
-  clarity: [
-    { number: 1, name: 'Totally unclear', symbol: '🤷‍♀️' },
-    { number: 2, name: 'Somewhat unclear', scale: 0.6, symbol: '🕶' },
-    { number: 3, name: 'Mostly clear', scale: 0.6, symbol: '👓' },
-    { number: 4, name: 'Totally clear', symbol: '🔬' },
-  ],
-  excitement: [
-    { number: 1, name: 'Totally unexciting', symbol: '😴' },
-    { number: 2, name: 'Unexciting', scale: 0.6, symbol: '😔' },
-    { number: 3, name: 'Exciting', scale: 0.6, symbol: '🙂' },
-    { number: 4, name: 'Totally exciting', symbol: '😍' },
-  ],
-  different: [
-    { number: 1, name: 'Not at all different', symbol: '😏' },
-    { number: 2, name: 'Not very different', scale: 0.6, symbol: '😐' },
-    { number: 3, name: 'Different', scale: 0.6, symbol: '😲' },
-    { number: 4, name: 'Very different', symbol: '🤯' },
-  ],
-}
-
-export const questionInformation = question => {
-  const questionType = question.question_type
-  let emojiSeriesName
-  let questionText
-  let questionTitle
-  switch (questionType) {
-    case 'question_useful':
-      emojiSeriesName = 'usefulness'
-      questionText = 'How useful is this idea for you?'
-      questionTitle = 'Usefulness'
-      break
-    case 'question_clarity':
-      emojiSeriesName = 'clarity'
-      questionText = 'How clear is this idea for you?'
-      questionTitle = 'Clarity'
-      break
-    case 'question_excitement':
-      emojiSeriesName = 'excitement'
-      questionText = 'How exciting is this idea for you?'
-      questionTitle = 'Excitement'
-      break
-    case 'question_different':
-      emojiSeriesName = 'different'
-      questionText = "How different is this idea from what you've seen before?"
-      questionTitle = 'Different'
-      break
-    case 'question_category_satisfaction':
-      emojiSeriesName = 'satisfaction'
-      // the category text gets added later within ScaleQuestion
-      questionText = 'How satisfied are you with your current'
-      questionTitle = 'Category Satisfaction'
-      break
-    case 'question_context':
-    default:
-      emojiSeriesName = 'satisfaction'
-      questionText = 'How satisfied are you with your current solution?'
-      questionTitle = 'Context'
-      break
-  }
-  const emojiSeries = emojiSeriesMap[emojiSeriesName]
-
-  return {
-    emojiSeries,
-    emojiSeriesName,
-    questionText,
-    questionTitle,
-  }
-}
-
-export const questionTitle = question_type => {
-  if (question_type !== 'total') {
-    const info = questionInformation({ question_type })
-    return info.questionTitle
-  }
-  return _.startCase(question_type)
-}
 
 export const styledTestTheme = (themeName = 'primary') => {
   // primary theme used for TestType == Media (non-collection test w/ image/video)

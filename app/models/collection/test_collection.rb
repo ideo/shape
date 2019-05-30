@@ -72,6 +72,9 @@ class Collection
     has_many :test_audiences, dependent: :destroy
     belongs_to :collection_to_test, class_name: 'Collection', optional: true
 
+    has_many :datasets,
+             through: :data_items
+
     before_create :setup_default_status_and_questions, unless: :cloned_from_present?
     after_create :add_test_tag, :add_child_roles
     after_update :touch_test_design, if: :saved_change_to_test_status?
@@ -339,6 +342,11 @@ class Collection
       prelaunch_question_items
     end
 
+    def legend_item
+      question_item = question_items.includes(test_data_item: :legend_item).first
+      question_item&.test_data_item&.legend_item
+    end
+
     def test_open_response_collections
       collections.where(type: 'Collection::TestOpenResponses')
     end
@@ -426,7 +434,7 @@ class Collection
         # push it to the end, will get resorted after creation is complete
         order: 999,
         collection_attributes: {
-          name: "#{name} Feedback Design",
+          name: Collection::TestDesign.generate_name(name),
           type: 'Collection::TestDesign',
           test_collection_id: id,
           template_id: template_id,
@@ -450,14 +458,25 @@ class Collection
     end
 
     def create_response_graphs(initiated_by:)
+      legend = nil
+      graphs = []
       question_items
         .select(&:scale_question?)
-        .map do |question|
-        question.create_response_graph(
+        .each_with_index do |question, i|
+        data_item_card = question.create_response_graph(
           parent_collection: self,
           initiated_by: initiated_by,
+          legend_item: legend,
         )
+        legend = data_item_card.item.legend_item if i.zero?
+        graphs << data_item_card
+        test_audiences.each do |test_audience|
+          data_item = data_item_card.item
+          question.create_test_audience_dataset(test_audience, data_item)
+        end
       end
+
+      graphs
     end
 
     def create_media_item_link(media_question_items: nil)
@@ -556,6 +575,14 @@ class Collection
     def gives_incentive?
       # right now the check is basically any paid tests == gives_incentive
       test_audiences.where('price_per_response > 0').present?
+    end
+
+    def purchased?
+      gives_incentive? && live?
+    end
+
+    def link_sharing?
+      test_audiences.where(price_per_response: 0).present?
     end
 
     def link_sharing_audience

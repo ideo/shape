@@ -4,7 +4,8 @@ class SerializableItem < BaseJsonSerializer
   attributes :name, :content, :data_content,
              :url, :thumbnail_url, :icon_url, :question_type,
              :data_source_type, :data_source_id, :data_settings,
-             :previous_thumbnail_urls, :legend_item_id
+             :previous_thumbnail_urls, :legend_item_id,
+             :question_title, :question_description
 
   has_many :roles do
     data do

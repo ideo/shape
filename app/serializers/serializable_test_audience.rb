@@ -8,4 +8,8 @@ class SerializableTestAudience < BaseJsonSerializer
   attribute :price_per_response do
     @object.price_per_response.to_f
   end
+
+  attribute :num_survey_responses do
+    @object.survey_responses.size
+  end
 end

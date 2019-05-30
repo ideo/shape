@@ -73,9 +73,9 @@ describe Collection::TestCollection, type: :model do
     end
 
     it 'should accept the passed in test_audience_id' do
-      expect {
+      expect do
         test_collection.create_uniq_survey_response(test_audience_id: test_audience.id)
-      }.to change(test_audience.survey_responses, :count).by(1)
+      end.to change(test_audience.survey_responses, :count).by(1)
     end
   end
 
@@ -290,7 +290,8 @@ describe Collection::TestCollection, type: :model do
             ).to eq(
               [
                 Item::VideoItem,
-                Item::ChartItem,
+                Item::DataItem,
+                Item::LegendItem,
                 Collection::TestDesign,
               ],
             )
@@ -305,8 +306,24 @@ describe Collection::TestCollection, type: :model do
             expect do
               test_collection.launch!(initiated_by: user)
             end.to change(
-              Item::ChartItem, :count
+              Item::DataItem, :count
             ).by(test_collection.question_items.select { |q| q.question_context? || q.question_useful? }.size)
+          end
+
+          context 'with test audiences' do
+            let(:audience) { create(:audience) }
+            let!(:test_audience) { create(:test_audience, audience: audience, test_collection: test_collection) }
+
+            it 'should create test audience datasets for each question' do
+              expect do
+                test_collection.launch!(initiated_by: user)
+              end.to change(
+                Dataset::Question, :count
+              ).by(2)
+              expect(Dataset::Question.last.groupings).to eq(
+                [{ 'id' => test_audience.id, 'type' => 'TestAudience' }],
+              )
+            end
           end
 
           context 'with open response questions' do
@@ -325,6 +342,19 @@ describe Collection::TestCollection, type: :model do
                   .question_items
                   .all?(&:test_open_responses_collection),
               ).to be true
+            end
+          end
+
+          context 'with media questions' do
+            let!(:test_collection) { create(:test_collection) }
+
+            it 'creates a media item link for each media item' do
+              test_collection.launch!(initiated_by: user)
+              expect(
+                test_collection
+                  .items
+                  .count,
+              ).to equal 4
             end
           end
 

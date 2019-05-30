@@ -16,7 +16,8 @@ Feature: Creating an "in-collection" Test Collection
     # Launch the test
     When I click the "LaunchFormButton" containing "Get Feedback"
     And I wait for "@apiLaunchTest" to finish
-    Then I should see "Usefulness" in a "ChartItemCover"
+    Then I should see "Usefulness" in a "DataItemCover"
+    Then I should see "Cypress Test" in a "LegendItemCover"
 
     # assuming the collection cover is not truncated...
     Then I should see a collection card named "Cypress Test Feedback Design"

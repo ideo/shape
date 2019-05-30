@@ -1,6 +1,6 @@
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import DataItemCoverCollectionsItems from '~/ui/grid/covers/data-item/DataItemCoverCollectionsItems'
-import { fakeDataItemCollectionsItemsAttrs } from '#/mocks/data'
+import { fakeDataset, fakeDataItemCollectionsItemsAttrs } from '#/mocks/data'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 
@@ -17,6 +17,7 @@ describe('DataItemCover', () => {
     props.uiStore = uiStore
     props.apiStore = apiStore
     props.item = fakeDataItemCollectionsItemsAttrs
+    props.item.primaryDataset = fakeDataset
     props.card = { id: 1, record: props.item, width: 1, height: 1 }
     props.uiStore.editingCardId = 0
     render = () =>
@@ -124,7 +125,7 @@ describe('DataItemCover', () => {
     it('should render a chart', () => {
       expect(wrapper.find('ChartGroup').exists()).toBe(true)
       expect(wrapper.find('ChartGroup').props()).toEqual({
-        datasets: props.item.datasets,
+        dataItem: props.item,
         simpleDateTooltip: false,
         width: 1,
         height: 1,
@@ -149,7 +150,7 @@ describe('DataItemCover', () => {
 
   describe('with a target collection', () => {
     beforeEach(() => {
-      props.item.collectionFilter = { target: 123 }
+      props.item.primaryDataset.data_source_id = 123
       render()
     })
 

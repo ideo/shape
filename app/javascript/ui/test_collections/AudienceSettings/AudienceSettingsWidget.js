@@ -65,6 +65,11 @@ class AudienceSettingsWidget extends React.Component {
     return option ? option.sample_size : ''
   }
 
+  isAudienceLocked(audience) {
+    const { locked } = this.props
+    return audience.price_per_response > 0 && locked
+  }
+
   renderTableBody(audience) {
     const { onInputChange } = this.props
     return (
@@ -73,6 +78,7 @@ class AudienceSettingsWidget extends React.Component {
         onInputChange={onInputChange}
         selected={this.audienceSelected(audience)}
         sampleSize={this.sampleSize(audience)}
+        locked={this.isAudienceLocked(audience)}
       />
     )
   }
@@ -85,6 +91,7 @@ class AudienceSettingsWidget extends React.Component {
         audienceName={audience.name}
         selected={this.audienceSelected(audience)}
         onToggleCheckbox={onToggleCheckbox}
+        disabled={this.isAudienceLocked(audience)}
       />
     )
   }
@@ -173,6 +180,11 @@ AudienceSettingsWidget.propTypes = {
   onInputChange: PropTypes.func.isRequired,
   onToggleCheckbox: PropTypes.func.isRequired,
   totalPrice: PropTypes.string.isRequired,
+  locked: PropTypes.bool,
+}
+
+AudienceSettingsWidget.defaultProps = {
+  locked: false,
 }
 
 export default AudienceSettingsWidget

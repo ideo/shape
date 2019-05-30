@@ -24,6 +24,7 @@
 #  phone                       :string
 #  provider                    :string
 #  remember_created_at         :datetime
+#  respondent_terms_accepted   :boolean          default(FALSE)
 #  show_helper                 :boolean          default(TRUE)
 #  show_move_helper            :boolean          default(TRUE)
 #  show_template_helper        :boolean          default(TRUE)
@@ -423,6 +424,13 @@ class User < ApplicationRecord
   def current_incentive_balance
     last_record = feedback_incentive_records.order(created_at: :desc).first
     last_record ? last_record.current_balance : 0
+  end
+
+
+  def incentive_due_date
+    first_record = feedback_incentive_records.order(created_at: :asc).first
+    return if first_record.blank?
+    first_record.created_at  + FeedbackIncentiveRecord::PAYMENT_WAITING_PERIOD
   end
 
   def network_user

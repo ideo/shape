@@ -111,6 +111,13 @@ When('I add an open response question', () => {
   cy.wait('@apiUpdateItem')
 })
 
+When('I accept the feedback survey terms', () => {
+  cy.locate('AcceptFeedbackTerms')
+    .last()
+    .click()
+  cy.wait(FLIPMOVE_DELAY)
+})
+
 // ----------------------
 // Navigation
 // ----------------------

@@ -3,6 +3,8 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import moment from 'moment-mini'
 import styled from 'styled-components'
 import pluralize from 'pluralize'
+import { VictoryTheme } from 'victory'
+import objectAssignDeep from '~/vendor/object-assign-deep'
 
 import v from '~/utils/variables'
 
@@ -52,6 +54,8 @@ export const chartDomainForDatasetValues = ({ values, maxDomain }) => {
     y: [0, domain],
   }
 }
+
+export const emojiTooltipText = datum => `${datum.value}`
 
 export const dateTooltipText = datum =>
   `${datum.value} on ${utcMoment(datum.date).format('l')}`
@@ -110,3 +114,117 @@ export const AboveChartContainer = styled.div`
   position: absolute;
   z-index: ${v.zIndex.aboveVictoryChart};
 `
+
+export const colorScale = [
+  v.colors.tertiaryMedium,
+  v.colors.primaryLight,
+  '#738091',
+  '#A1A6B4',
+  '#88B6C6',
+  '#5473A6',
+  '#929E9E',
+  '#84AF99',
+  '#C2BBB9',
+  '#8B83A2',
+  '#AE8CA3',
+  '#D6C3C9',
+  '#DEA895',
+  '#A85751',
+  '#454545',
+]
+
+export const themeLabelStyles = {
+  fontFamily: v.fonts.sans,
+  fontSize: '10px',
+  padding: 10,
+  fill: v.colors.black,
+  stroke: 'transparent',
+  textTransform: 'uppercase',
+}
+
+export const victoryTheme = objectAssignDeep({}, VictoryTheme.grayscale, {
+  bar: {
+    style: {
+      data: {
+        fill: colorScale[0],
+      },
+      labels: Object.assign({}, themeLabelStyles, {
+        fill: v.colors.black,
+        fontSize: 8,
+      }),
+    },
+    colorScale,
+  },
+  area: {
+    style: {
+      labels: Object.assign({}, themeLabelStyles, {
+        fill: v.colors.tertiaryMedium,
+      }),
+    },
+  },
+  axis: {
+    style: {
+      tickLabels: themeLabelStyles,
+      axisLabel: themeLabelStyles,
+    },
+  },
+  group: {
+    colorScale,
+  },
+  legend: {
+    colorScale,
+    fontSize: 14,
+    gutter: 10,
+    style: {
+      data: {
+        type: 'square',
+      },
+      labels: Object.assign({}, themeLabelStyles, {
+        fontSize: 10.5,
+      }),
+      border: {
+        fill: 'rgba(255, 255, 255, 0.5)',
+      },
+      title: themeLabelStyles,
+    },
+  },
+})
+
+export const emojiSeries = {
+  question_useful: [
+    { number: 1, name: 'Very useless', symbol: '👎' },
+    { number: 2, name: 'Somewhat useless', scale: 0.6, symbol: '👎' },
+    { number: 3, name: 'Somewhat useful', scale: 0.6, symbol: '👍' },
+    { number: 4, name: 'Very useful', symbol: '👍' },
+  ],
+  question_category_satisfaction: [
+    { number: 1, name: 'Very unsatisfied', symbol: '😡' },
+    { number: 2, name: 'Somewhat unsatisfied', scale: 0.6, symbol: '☹️' },
+    { number: 3, name: 'Mostly Satisfied', scale: 0.6, symbol: '😊' },
+    { number: 4, name: 'Very satisfied', symbol: '😍' },
+  ],
+  question_clarity: [
+    { number: 1, name: 'Totally unclear', symbol: '🤷‍♀️' },
+    { number: 2, name: 'Somewhat unclear', scale: 0.6, symbol: '🕶' },
+    { number: 3, name: 'Mostly clear', scale: 0.6, symbol: '👓' },
+    { number: 4, name: 'Totally clear', symbol: '🔬' },
+  ],
+  question_excitement: [
+    { number: 1, name: 'Totally unexciting', symbol: '😴' },
+    { number: 2, name: 'Unexciting', scale: 0.6, symbol: '😔' },
+    { number: 3, name: 'Exciting', scale: 0.6, symbol: '🙂' },
+    { number: 4, name: 'Totally exciting', symbol: '😍' },
+  ],
+  question_different: [
+    { number: 1, name: 'Not at all different', symbol: '😏' },
+    { number: 2, name: 'Not very different', scale: 0.6, symbol: '😐' },
+    { number: 3, name: 'Different', scale: 0.6, symbol: '😲' },
+    { number: 4, name: 'Very different', symbol: '🤯' },
+  ],
+}
+
+export const emojiSeriesForQuestionType = questionType => {
+  const series = emojiSeries[questionType]
+  if (series) return series
+  return emojiSeries.question_category_satisfaction
+}

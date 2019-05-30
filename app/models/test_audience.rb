@@ -29,6 +29,8 @@ class TestAudience < ApplicationRecord
   belongs_to :launched_by, class_name: 'User'
   has_many :survey_responses
 
+  delegate :name,
+           to: :audience
   validates :price_per_response, presence: true
 
   before_validation :set_price_per_response_from_audience, on: :create
@@ -44,6 +46,10 @@ class TestAudience < ApplicationRecord
 
   # this will only get set in PurchaseTestAudience
   attr_writer :payment_method
+
+  def self.display_name
+    'Audience'
+  end
 
   def closed?
     survey_responses.completed.size >= sample_size
