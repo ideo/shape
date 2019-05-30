@@ -45,7 +45,10 @@ const SharedRecordMixin = superclass =>
           if (card) {
             _.assign(
               card,
-              _.pick(cardData, ['order', 'width', 'height', 'row', 'col'])
+              _.pick(cardData, ['order', 'width', 'height', 'row', 'col']),
+              {
+                updated_at: new Date(),
+              }
             )
           }
         })
@@ -55,7 +58,7 @@ const SharedRecordMixin = superclass =>
         _.assign(this, snapshot)
         data = this.toJsonApi()
       }
-      data.cancel_sync = true
+      // data.cancel_sync = true
       return this.apiStore.request(this.baseApiPath, 'PATCH', { data })
     }
 

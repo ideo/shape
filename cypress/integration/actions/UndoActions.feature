@@ -40,6 +40,20 @@ Feature: Undo actions
     And I close the snackbar
     Then I should see the last of 3 cards as 1x1
 
+    # Undo moving cards to a collection
+    # select cards
+    # click action menu
+    # click move
+    # verify MDL snackbar pill exists
+    # click target collection
+    # verify MDL snackbar pill exists
+    # click down or up arrow
+    # verify cards are set down
+    # When I undo with CTRL+Z
+    # And I wait for "@apiGetCollection" to finish
+    # And I wait for "@apiGetInMyCollection" to finish
+    # verify cards are where they should be
+
     # empty stack
     When I undo with CTRL+Z
     Then I should not see a ".MuiSnackbarContent-message"
