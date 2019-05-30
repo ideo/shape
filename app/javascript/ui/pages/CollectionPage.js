@@ -479,7 +479,8 @@ class CollectionPage extends React.Component {
               submissionBoxSettingsOpen) && (
               <SubmissionBoxSettingsModal collection={collection} />
             )}
-            <MoveModal />
+            {/* Listen to this pastingCards value which comes from pressing CTRL+V */}
+            <MoveModal pastingCards={uiStore.pastingCards} />
             {isSubmissionBox &&
               apiStore.currentUser &&
               collection.submission_box_type &&

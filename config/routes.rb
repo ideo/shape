@@ -157,15 +157,14 @@ Rails.application.routes.draw do
 
       namespace :admin do
         resources :users, only: %i[index destroy create]
+        resources :test_collections, only: %i[index]
       end
     end
   end
 
   resources :tests, only: %i[show] do
-    member do
-      get 'token_auth'
-    end
     collection do
+      get 't/:token', to: 'tests#token_auth'
       get 'completed'
     end
   end

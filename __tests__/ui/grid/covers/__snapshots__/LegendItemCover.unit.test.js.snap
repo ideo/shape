@@ -49,9 +49,7 @@ exports[`LegendItemCover renders snapshot 1`] = `
       role="button"
     >
       <styled.span>
-        <PlusIcon
-          viewBox="0 0 5 18"
-        />
+        +
       </styled.span>
       Add Comparison
     </StyledHeading3>

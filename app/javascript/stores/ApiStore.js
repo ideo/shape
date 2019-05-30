@@ -274,6 +274,14 @@ class ApiStore extends jsonapi(datxCollection) {
     })
   }
 
+  async fetchTestCollections(page = 1) {
+    const res = await this.request(`admin/test_collections?page=${page}`)
+    return {
+      data: res.data,
+      totalPages: parseInt(res.headers.get('X-Total-Pages')),
+    }
+  }
+
   @action
   importUsersThread({ usersThread, thread, comments } = {}) {
     thread.addReference('users_thread', usersThread, {

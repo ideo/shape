@@ -104,9 +104,11 @@ class Routes extends React.Component {
 
   handleMouseDownSelection = e => {
     if (!emptySpaceClick(e)) return
+    // if we clicked an empty space...
     const { uiStore } = this.props
     uiStore.deselectCards()
     uiStore.onEmptySpaceClick(e)
+    uiStore.closeBlankContentTool()
     this.mouseDownAt = { x: e.pageX, y: e.pageY }
   }
 

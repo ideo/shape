@@ -39,7 +39,7 @@ class Dataset < ApplicationRecord
            class_name: 'Item::DataItem'
 
   validates :timeframe, :chart_type, presence: true
-  validates :cached_data, :name, presence: true, if: :root_dataset_class?
+  validates :cached_data, :identifier, presence: true, if: :root_dataset_class?
 
   scope :question_items, -> { where(type: 'Dataset::Question') }
 

@@ -6,7 +6,6 @@ import styled from 'styled-components'
 import { Select, SelectOption } from '~/ui/global/styled/forms'
 import AutoComplete from '~/ui/global/AutoComplete'
 import XIcon from '~/ui/icons/XIcon'
-import PlusIcon from '~/ui/icons/PlusIcon'
 import v from '~/utils/variables'
 import { colorScale } from '~/ui/global/charts/ChartUtils'
 import {
@@ -26,23 +25,11 @@ function formatForAutocomplete(objects) {
 }
 
 const PlusIconContainer = styled.span`
-  &:hover,
-  &:active {
-    .icon {
-      background-color: ${v.colors.commonDarkest};
-    }
-    color: ${v.colors.commonDarkest};
-  }
-  .icon {
-    background-color: ${v.colors.commonMedium};
-    border-radius: 50%;
-    padding: 7px;
-    height: 15px;
-    width: 15px;
-    margin: -3px 8px 0 0;
-    display: inline-block;
-    vertical-align: middle;
-  }
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 1.3em;
+  margin-right: 6px;
+  margin-top: -3px;
 `
 
 const StyledLegendItem = styled.div`
@@ -369,9 +356,7 @@ class LegendItemCover extends React.Component {
               role="button"
               className="test-add-comparison-button"
             >
-              <PlusIconContainer>
-                <PlusIcon viewBox="0 0 5 18" />
-              </PlusIconContainer>
+              <PlusIconContainer>+</PlusIconContainer>
               Add Comparison
             </Heading3>
           )}

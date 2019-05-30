@@ -230,18 +230,6 @@ class Item
       builder.collection_card
     end
 
-    def create_media_item(parent_collection:)
-      return unless cards_linked_to_this_item.empty?
-      media_link_card = CollectionCard::Link.create(
-        parent: parent_collection,
-        item_id: id,
-        width: 1,
-        height: 2,
-        order: -1,
-      )
-      media_link_card
-    end
-
     def create_open_response_collection(parent_collection:, initiated_by:)
       return if !question_open? || test_open_responses_collection.present?
 

@@ -118,13 +118,16 @@ class CoverRenderer extends React.Component {
   }
 
   render() {
-    const { coverItem, card } = this.props
-    if (coverItem) {
+    const {
+      isCoverItem,
+      card: { record },
+    } = this.props
+    if (isCoverItem) {
       return (
         <PlainLink
           onClick={this.handleClickToCollection}
           onKeyDown={this.handleClickToCollection}
-          to={routingStore.routeTo('collections', card.record.id)}
+          to={routingStore.pathTo('collections', record.id)}
           role="link"
           tabIndex="0"
         >
@@ -141,7 +144,7 @@ CoverRenderer.propTypes = {
   cardType: PropTypes.string.isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   isBoardCollection: PropTypes.bool,
-  coverItem: PropTypes.bool,
+  isCoverItem: PropTypes.bool,
   height: PropTypes.number,
   dragging: PropTypes.bool,
   searchResult: PropTypes.bool,
@@ -152,7 +155,7 @@ CoverRenderer.defaultProps = {
   height: 1,
   dragging: false,
   searchResult: false,
-  coverItem: false,
+  isCoverItem: false,
   isBoardCollection: false,
   handleClick: () => null,
 }

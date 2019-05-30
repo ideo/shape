@@ -122,7 +122,8 @@ class Item
     def create_dataset(params)
       # Slice out params used for DataItemsDataset
       order = params.delete(:order)
-      selected = params.delete(:selected) || true
+      # Check if nil first so that selected can be set to false
+      selected = params[:selected].nil? ? true : params.delete(:selected)
 
       dataset_params = {
         type: dataset_type,

@@ -388,7 +388,7 @@ class GridCardBlank extends React.Component {
       // have to re-create the DropPane
       this.createDropPane()
     } else {
-      this.props.uiStore.closeBlankContentTool()
+      uiStore.closeBlankContentTool()
     }
   }
 
