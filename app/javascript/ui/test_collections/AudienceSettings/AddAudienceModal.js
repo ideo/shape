@@ -39,11 +39,13 @@ const EditButton = styled.button`
   height: 22px;
   width: 22px;
 `
+EditButton.displayName = 'EditButton'
 
 const DeleteButton = styled.button`
   height: 22px;
   width: 27px;
 `
+DeleteButton.displayName = 'DeleteButton'
 
 const SelectedOption = styled.span`
   background: ${v.colors.commonLightest};
@@ -52,6 +54,7 @@ const SelectedOption = styled.span`
   margin-right: 8px;
   padding: 8px 12px;
 `
+SelectedOption.displayName = 'SelectedOption'
 
 @inject('apiStore')
 @observer
