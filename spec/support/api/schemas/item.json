@@ -27,7 +27,7 @@
     "has_replaced_media": { "type": ["boolean"] },
     "pending_transcoding": { "type": ["boolean"] },
     "legend_item_id": { "type": ["number", "null"] },
-    "common_viewable": { "type": ["boolean"] }
+    "common_viewable": { "type": ["boolean", "null"] }
   },
   "required": ["class_type"]
 }
