@@ -242,6 +242,11 @@ class PageHeader extends React.Component {
 
     const rolesRecord = uiStore.rolesMenuOpen ? uiStore.rolesMenuOpen : record
 
+    console.log(
+      'sdf',
+      (record.isLiveTest && record.has_link_sharing) ||
+        record.collection_to_test_id
+    )
     return (
       <StyledHeader data-empty-space-click>
         <MaxWidthContainer>
@@ -290,7 +295,8 @@ class PageHeader extends React.Component {
                 )}
                 {this.launchTestButton}
                 {this.joinCollectionButton}
-                {record.isLiveTest && (
+                {((record.isLiveTest && record.has_link_sharing) ||
+                  record.collection_to_test_id) && (
                   <Fragment>
                     <CopyToClipboard
                       text={record.publicTestURL}
@@ -300,7 +306,9 @@ class PageHeader extends React.Component {
                         width="140"
                         color={v.colors.transparent}
                         onClick={() =>
-                          uiStore.popupSnackbar({ message: 'Test link copied' })
+                          uiStore.popupSnackbar({
+                            message: 'Test link copied',
+                          })
                         }
                       >
                         <span
@@ -323,16 +331,17 @@ class PageHeader extends React.Component {
                         </span>
                       </HeaderFormButton>
                     </CopyToClipboard>
-                    {record.can_edit_content && (
-                      <HeaderFormButton
-                        width="170"
-                        color={v.colors.transparent}
-                        onClick={record.closeTest}
-                        disabled={uiStore.launchButtonLoading}
-                      >
-                        Stop Feedback
-                      </HeaderFormButton>
-                    )}
+                    {record.can_edit_content &&
+                      !record.is_test_locked && (
+                        <HeaderFormButton
+                          width="170"
+                          color={v.colors.transparent}
+                          onClick={record.closeTest}
+                          disabled={uiStore.launchButtonLoading}
+                        >
+                          Stop Feedback
+                        </HeaderFormButton>
+                      )}
                   </Fragment>
                 )}
               </Flex>

@@ -10,7 +10,8 @@ import { DisplayText } from '~/ui/global/styled/typography'
 
 const EditableInput = styled(AutosizeInput)`
   width: 2rem;
-  border-bottom: 1px solid ${v.colors.black};
+  border-bottom: 1px solid
+    ${props => (props.disabled ? v.colors.commonMedium : v.colors.black)};
 
   input {
     width: 2rem;
@@ -20,7 +21,8 @@ const EditableInput = styled(AutosizeInput)`
     margin: -1px 0px -1px 0px;
     font-family: ${v.fonts.sans};
     font-size: 1rem;
-    color: ${v.colors.black};
+    color: ${props =>
+      props.disabled ? v.colors.commonMedium : v.colors.black};
     &:focus {
       outline: 0;
     }
@@ -40,8 +42,9 @@ class TableBody extends React.Component {
   }
 
   render() {
-    const { audience, sampleSize, selected } = this.props
-    const textColor = selected ? v.colors.black : v.colors.commonMedium
+    const { audience, sampleSize, selected, locked } = this.props
+    const textColor =
+      selected && !locked ? v.colors.black : v.colors.commonMedium
     const selectedWithPrice = audience.price_per_response && selected
 
     return (
@@ -63,6 +66,7 @@ class TableBody extends React.Component {
               placeholder="–"
               value={sampleSize}
               onChange={this.handleInputChange}
+              disabled={locked}
             />
           ) : (
             <DisplayText color={textColor}>–</DisplayText>
@@ -87,6 +91,10 @@ TableBody.propTypes = {
   sampleSize: PropTypes.string.isRequired,
   selected: PropTypes.bool.isRequired,
   onInputChange: PropTypes.func.isRequired,
+  locked: PropTypes.bool,
+}
+TableBody.defaultProps = {
+  locked: false,
 }
 
 export default TableBody
