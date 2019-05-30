@@ -16,58 +16,19 @@ if (process.env.GOOGLE_FIRESTORE_SHAPE_MARKETING) {
 export class MarketingFirebaseClient {
   constructor() {}
 
-  async getObjectFromCollection(collection) {
-    let obj = {}
-    const hasCollection = db && db.collection
-    if (!hasCollection) {
-      return obj
-    }
-    const queryForObj = async collection => {
-      let snapshot = {}
-      switch (collection) {
-        case 'productDescriptions':
-        case 'productTemplates':
-          snapshot = await db
-            .collection(collection)
-            .orderBy('order')
-            .get()
-            .then(snapshot => {
-              return snapshot
-            })
-          break
-        default:
-          snapshot = await db
-            .collection(collection)
-            .get()
-            .then(snapshot => {
-              return snapshot
-            })
-          break
-      }
-      const o = {}
-      snapshot.forEach(s => {
-        const { id } = s
-        o[id] = s.data()
-      })
+  async getCollection(collection) {
+    const querySnapshot = await db.collection(collection).get()
+    const data = {}
+    querySnapshot.forEach(doc => {
+      data[doc.id] = doc.data()
+    })
+    return data
+  }
 
-      // convert non template objects, ie: 'productDescriptions' to array
-      // for easy component rendering in the front-end
-      const transformKeyValueToArray = hash => {
-        return Object.keys(hash).map(key =>
-          Object.assign({ id: key }, hash[key])
-        )
-      }
-
-      switch (collection) {
-        case 'productDescriptions':
-        case 'productTemplates':
-          return transformKeyValueToArray(o)
-        default:
-          return o
-      }
-    }
-    obj = await queryForObj(collection)
-    return obj
+  async getCollectionField(collection, field) {
+    const docRef = db.collection(collection).doc(field)
+    const snapshot = await docRef.get()
+    return snapshot.data()
   }
 }
 
