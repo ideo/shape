@@ -23,10 +23,11 @@ const UNANSWERABLE_QUESTION_TYPES = [
 @observer
 class TestSurveyResponder extends React.Component {
   @observable
+  questionCards = []
+  @observable
   recontactAnswered = false
-  state = {
-    questionCards: [],
-  }
+  @observable
+  termsAnswered = false
 
   componentDidMount() {
     this.initializeCards()
@@ -34,14 +35,15 @@ class TestSurveyResponder extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (
+      this.props.includeTerms != prevProps.includeTerms ||
       this.props.includeRecontactQuestion != prevProps.includeRecontactQuestion
     ) {
       this.initializeCards()
     }
   }
 
-  async initializeCards() {
-    const { collection, includeRecontactQuestion } = this.props
+  initializeCards() {
+    const { collection, includeRecontactQuestion, includeTerms } = this.props
 
     const questionCards = [...collection.question_cards]
 
@@ -52,11 +54,23 @@ class TestSurveyResponder extends React.Component {
         record: { id: 'facsda', content: '' },
       })
     }
-    this.setState({ questionCards })
+    if (includeTerms) {
+      questionCards.unshift({
+        id: 'terms',
+        card_question_type: 'question_terms',
+        record: { id: 'terms', content: '' },
+      })
+    }
+    runInAction(() => {
+      this.questionCards = questionCards
+    })
   }
 
   questionAnswerForCard = card => {
     const { surveyResponse } = this.props
+    if (card.card_question_type === 'question_terms') {
+      return this.termsAnswered
+    }
     if (!surveyResponse) return undefined
     // This method is supposed to return a questionAnswer, not a boolean
     // https://www.dropbox.com/s/72mafwlzukz13ir/Screenshot%202019-05-15%2012.17.10.png?dl=0
@@ -72,13 +86,15 @@ class TestSurveyResponder extends React.Component {
     UNANSWERABLE_QUESTION_TYPES.indexOf(card.card_question_type) === -1
 
   get viewableCards() {
-    const { questionCards } = this.state
+    const { questionCards } = this
 
     let reachedLastVisibleCard = false
     const questions = questionCards.filter(card => {
       // turn off the card's actionmenu (dot-dot-dot)
-      if (card.id !== 'recontact') card.record.disableMenu()
+      if (card.id !== 'recontact' && card.id !== 'terms')
+        card.record.disableMenu()
       if (reachedLastVisibleCard) {
+        // console.log('reachedLastVisibleCard')
         return false
       } else if (
         !this.answerableCard(card) ||
@@ -87,16 +103,24 @@ class TestSurveyResponder extends React.Component {
         // If not answerable, or they already answered, show it
         return true
       }
+      console.log('end')
       reachedLastVisibleCard = true
       return true
     })
     return questions
   }
 
-  afterQuestionAnswered = card => {
+  afterQuestionAnswered = (card, answer) => {
     if (card.id === 'recontact') {
       runInAction(() => {
         this.recontactAnswered = true
+      })
+    }
+    if (card.id === 'terms') {
+      // If they didn't agree to the terms, don't continue
+      if (!answer) return
+      runInAction(() => {
+        this.termsAnswered = true
       })
     }
     setTimeout(() => {
@@ -105,11 +129,12 @@ class TestSurveyResponder extends React.Component {
   }
 
   scrollToTopOfNextCard = card => {
-    const { questionCards } = this.state
+    const { questionCards } = this
     const { containerId } = this.props
     const index = questionCards.indexOf(card)
     const nextCard = questionCards[index + 1]
     if (!nextCard) return
+    console.log(this.viewableCards, nextCard.id)
     scroller.scrollTo(`card-${nextCard.id}`, {
       duration: 400,
       smooth: true,
@@ -170,8 +195,10 @@ class TestSurveyResponder extends React.Component {
 TestSurveyResponder.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   createSurveyResponse: PropTypes.func.isRequired,
-  includeRecontactQuestion: PropTypes.bool,
+  user: MobxPropTypes.objectOrObservableObject,
   surveyResponse: MobxPropTypes.objectOrObservableObject,
+  includeRecontactQuestion: PropTypes.bool,
+  includeTerms: PropTypes.bool,
   theme: PropTypes.string,
   containerId: PropTypes.string,
 }
@@ -181,10 +208,12 @@ TestSurveyResponder.wrappedComponent.propTypes = {
 }
 
 TestSurveyResponder.defaultProps = {
+  user: null,
   surveyResponse: undefined,
   theme: 'primary',
   containerId: '',
   includeRecontactQuestion: false,
+  includeTerms: false,
 }
 TestSurveyResponder.displayName = 'TestSurveyResponder'
 

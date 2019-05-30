@@ -26,10 +26,18 @@ export const QuestionText = styled.p`
   box-sizing: border-box;
   color: white !important;
   font-family: ${v.fonts.sans} !important;
+  font-size: ${props => props.fontSizeEm}em;
   margin: 0;
   padding: 16px;
   width: 100%;
 `
+QuestionText.propTypes = {
+  fontSizeEm: PropTypes.number,
+}
+
+QuestionText.defaultProps = {
+  fontSizeEm: 1,
+}
 
 export const TextInputHolder = StyledCommentTextarea.extend`
   color: white;
