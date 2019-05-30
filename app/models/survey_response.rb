@@ -27,7 +27,6 @@ class SurveyResponse < ApplicationRecord
   has_one :feedback_incentive_record
 
   before_save :mark_as_completed, if: :mark_as_completed?
-  after_save :create_open_response_items, if: :completed?
 
   delegate :question_items, to: :test_collection
   delegate :answerable_complete_question_items, to: :test_collection
@@ -40,7 +39,7 @@ class SurveyResponse < ApplicationRecord
 
   def all_questions_answered?
     # nil case should only happen in test env (test_design is not created)
-    return true if answerable_complete_question_items.nil?
+    return falses if answerable_complete_question_items.nil?
     # compare answerable question items to the ones we've answered
     (answerable_complete_question_items.pluck(:id) - question_answers.pluck(:question_id)).empty?
   end
