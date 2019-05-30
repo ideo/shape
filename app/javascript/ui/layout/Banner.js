@@ -31,14 +31,14 @@ class Banner extends React.Component {
             <Grid
               item
               xs={12}
-              md={9}
+              md={8}
               container
               spacing={16}
               alignItems="flex-end"
             >
               {this.props.leftComponent}
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={4}>
               <StyledAction>{this.props.rightComponent}</StyledAction>
             </Grid>
           </Grid>
