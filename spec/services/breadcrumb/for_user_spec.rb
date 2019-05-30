@@ -1,9 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe Breadcrumb::ForUser, type: :service do
-  let(:user) { create(:user) }
   let!(:collection) { create(:collection) }
-  let!(:subcollection) { create(:collection, num_cards: 1) }
+  let(:organization) { collection.organization }
+  let(:user) { create(:user, current_organization: organization) }
+  let!(:subcollection) { create(:collection, num_cards: 1, organization: organization) }
   let!(:item) { subcollection.items.first }
   let(:collection_breadcrumb) do
     # Use .last to only get last item in breadcrumb
@@ -89,6 +90,22 @@ RSpec.describe Breadcrumb::ForUser, type: :service do
 
       it 'should return breadcrumb with only item' do
         expect(Breadcrumb::ForUser.new(item, user).viewable).to be_empty
+      end
+    end
+
+    context 'with common_viewable collection in other orgs' do
+      let!(:other_collection) { create(:collection) }
+      let!(:common_viewable) { create(:collection, parent_collection: other_collection, common_viewable: true) }
+      let!(:common_viewable_item) { create(:text_item, parent_collection: common_viewable, roles_anchor_collection: common_viewable) }
+
+      before do
+        common_viewable.unanchor!
+      end
+
+      it 'should return just the common_viewable collections' do
+        expect(Breadcrumb::ForUser.new(common_viewable_item, user).viewable).to match_array([
+          common_viewable.id,
+        ])
       end
     end
   end

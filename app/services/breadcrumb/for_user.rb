@@ -6,7 +6,6 @@ module Breadcrumb
     def initialize(object, user)
       @object = object
       @user = user
-      @collections = Collection.where(id: @object.breadcrumb)
     end
 
     def viewable
@@ -76,10 +75,14 @@ module Breadcrumb
       }
     end
 
+    def breadcrumb_collections
+      @breadcrumb_collections ||= Collection.where(id: @object.breadcrumb)
+    end
+
     # we directly look up has_role_by_identifier for the breadcrumb, e.g. [5] becomes "Collection_5"
     def user_can?(action, breadcrumb_item)
       return true if @user.has_cached_role?(Role::SUPER_ADMIN)
-      collection = @collections.select { |c| c.id == breadcrumb_item }.first
+      collection = breadcrumb_collections.select { |c| c.id == breadcrumb_item }.first
       return false unless collection.present?
       collection.send("can_#{action}?", @user)
     end
