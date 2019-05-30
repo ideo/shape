@@ -89,7 +89,7 @@ class Item
       question_clarity: 7,
       question_excitement: 8,
       question_different: 9,
-      question_category_satisfaction: 10
+      question_category_satisfaction: 10,
     }
 
     def self.question_type_categories
@@ -110,7 +110,7 @@ class Item
           question_category_satisfaction
           question_context
           question_open
-        ]
+        ],
       }
     end
 
@@ -123,33 +123,33 @@ class Item
       when :question_useful
         {
           title: 'Usefulness',
-          description: 'How useful is this idea for you?'
+          description: 'How useful is this idea for you?',
         }
       when :question_clarity
         {
           title: 'Clarity',
-          description: 'How clear is this idea for you?'
+          description: 'How clear is this idea for you?',
         }
       when :question_excitement
         {
           title: 'Excitement',
-          description: 'How exciting is this idea for you?'
+          description: 'How exciting is this idea for you?',
         }
       when :question_different
         {
           title: 'Different',
-          description: "How different is this idea from what you've seen before?"
+          description: "How different is this idea from what you've seen before?",
         }
       when :question_category_satisfaction
         # the category text gets added later within ScaleQuestion
         {
           title: 'Category Satisfaction',
-          description: 'How satisfied are you with your current'
+          description: 'How satisfied are you with your current',
         }
       when :question_context
         {
           title: 'Context',
-          description: 'How satisfied are you with your current solution?'
+          description: 'How satisfied are you with your current solution?',
         }
       else
         {}
@@ -210,8 +210,8 @@ class Item
           item_attributes: {
             type: 'Item::DataItem',
             report_type: :report_type_question_item,
-            legend_item_id: legend_item&.id
-          }
+            legend_item_id: legend_item&.id,
+          },
         },
         parent_collection: parent_collection,
         user: initiated_by,
@@ -239,8 +239,8 @@ class Item
           collection_attributes: {
             name: "#{content} Responses",
             type: 'Collection::TestOpenResponses',
-            question_item_id: id
-          }
+            question_item_id: id,
+          },
         },
         parent_collection: parent_collection,
         user: initiated_by,

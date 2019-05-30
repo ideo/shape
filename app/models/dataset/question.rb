@@ -59,6 +59,14 @@ class Dataset
       end
     end
 
+    def identifier
+      if groupings.blank? && test_collection.present?
+        test_collection.name.sub(Collection::TestDesign::COLLECTION_SUFFIX, '')
+      else
+        self[:identifier]
+      end
+    end
+
     def max_domain
       95
     end
