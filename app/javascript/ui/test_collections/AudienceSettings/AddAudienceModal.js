@@ -215,19 +215,28 @@ class AddAudienceModal extends React.Component {
       return options
     })
 
+    return this.renderSelectMenu({
+      isOpen: menuOpen,
+      menuId: ROOT_MENU,
+      onChange: this.addCriteria,
+      selectOptions: flatten(groups),
+    })
+  }
+
+  renderSelectMenu({ isOpen, menuId, onChange, selectOptions }) {
     return (
-      <div ref={ref => this.updateMenuPosition(ROOT_MENU, ref)}>
+      <div ref={ref => this.updateMenuPosition(menuId, ref)}>
         <Select
-          open={menuOpen}
-          onOpen={() => this.openMenu(ROOT_MENU)}
-          onClose={() => this.closeMenu(ROOT_MENU)}
-          onChange={this.addCriteria}
+          open={isOpen}
+          onOpen={() => this.openMenu(menuId)}
+          onClose={() => this.closeMenu(menuId)}
+          onChange={onChange}
           MenuProps={{ style: { maxHeight: '366px' } }}
           multiple
           value={[]}
           style={{ visibility: 'hidden', width: 0, height: 0 }}
         >
-          {flatten(groups)}
+          {selectOptions}
         </Select>
       </div>
     )
@@ -299,22 +308,12 @@ class AddAudienceModal extends React.Component {
 
       const menuOpen = openMenus[criteria]
 
-      return (
-        <div key={criteria} ref={ref => this.updateMenuPosition(criteria, ref)}>
-          <Select
-            open={menuOpen}
-            onOpen={() => this.openMenu(criteria)}
-            onClose={() => this.closeMenu(criteria)}
-            onChange={this.selectCriteraOption}
-            MenuProps={{ style: { maxHeight: '366px' } }}
-            multiple
-            value={[]}
-            style={{ visibility: 'hidden', width: 0, height: 0 }}
-          >
-            {options}
-          </Select>
-        </div>
-      )
+      return this.renderSelectMenu({
+        isOpen: menuOpen,
+        menuId: criteria,
+        onChange: this.selectCriteraOption,
+        selectOptions: options,
+      })
     })
   }
 
