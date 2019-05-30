@@ -1,8 +1,7 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { filter, includes, remove } from 'lodash'
-import { Collapse } from '@material-ui/core'
+import { filter, flatten, includes, remove } from 'lodash'
 import { Flex } from 'reflexbox'
 import { Grid } from '@material-ui/core'
 
@@ -28,24 +27,9 @@ import {
 } from '~/ui/global/styled/forms'
 import { FloatRight } from '~/ui/global/styled/layout'
 
-const AddCriteriaMenu = styled.ul`
-  background: ${v.colors.white};
-  max-height: 264px;
-  overflow-y: scroll;
-  width: 250px;
-`
+const ROOT_MENU = 'root'
 
-const CriteriaGroup = styled.li`
-  border-top: 1px solid ${v.colors.black};
-  font-size: 0.8125rem;
-  font-family: ${v.fonts.sans};
-  font-weight: ${v.weights.medium};
-  letter-spacing: 1px;
-  padding: 12px 10px 12px 20px;
-  text-transform: uppercase;
-`
-
-const StyledPlusIcon = styled(PlusIcon)`
+const StyledPlusIcon = styled.span`
   height: 15px;
   margin-right: 8px;
   width: 15px;
@@ -75,40 +59,16 @@ class AddAudienceModal extends React.Component {
   state = {
     name: '',
     valid: false,
-    criteriaMenuOpen: false,
     selectedCriteria: [],
     openMenus: {},
     selectedCriteriaOptions: [],
   }
 
-  addCriteraButton = null
-  criteriaMenu = null
   criteriaTriggers = {}
 
   closeModal = () => {
     this.closeCriteriaMenu()
     this.props.close()
-  }
-
-  closeCriteriaMenu = () => {
-    this.setState({ criteriaMenuOpen: false })
-  }
-
-  toggleCriteriaMenu = () => {
-    this.updateCriteriaMenuPosition()
-    this.setState({ criteriaMenuOpen: !this.state.criteriaMenuOpen })
-  }
-
-  updateCriteriaMenuPosition = () => {
-    if (!this.addCriteraButton || !this.criteriaMenu) return
-
-    const buttonPosition = this.addCriteraButton.getBoundingClientRect()
-    const top = buttonPosition.top + buttonPosition.height + 8
-    const left = buttonPosition.left + 22
-
-    const baseStyle =
-      'position: fixed; z-index: 1400; box-shadow: 0 0 8px 0 rgba(18,15,14,0.2);'
-    this.criteriaMenu.style = `${baseStyle} top: ${top}px; left: ${left}px;`
   }
 
   openMenu = menu => {
@@ -120,7 +80,7 @@ class AddAudienceModal extends React.Component {
 
   updateMenuPosition = (menu, ref) => {
     const criteriaTrigger = this.criteriaTriggers[menu]
-    if (!criteriaTrigger) return
+    if (!criteriaTrigger || !ref) return
 
     const triggerPosition = criteriaTrigger.getBoundingClientRect()
     const { top, left, height } = triggerPosition
@@ -158,12 +118,15 @@ class AddAudienceModal extends React.Component {
     this.setState({ name: '', valid: false })
   }
 
-  addCriteria(criteria) {
+  addCriteria = e => {
+    const criteria = e.target.value[0]
+    if (!criteria) return
+
     const { selectedCriteria } = this.state
     selectedCriteria.push(criteria)
     this.setState({ selectedCriteria })
 
-    this.closeCriteriaMenu()
+    this.closeMenu(ROOT_MENU)
     this.openMenu(criteria)
   }
 
@@ -206,7 +169,13 @@ class AddAudienceModal extends React.Component {
   }
 
   renderCriteriaMenu() {
-    const { selectedCriteria } = this.state
+    const { openMenus, selectedCriteria } = this.state
+
+    // Since the menu is displayed in a MUI dialog, it must be
+    // rendered after the add audience modal is opened.
+    // Otherwise, it is replaced by the add audience modal
+    const menuOpen = openMenus[ROOT_MENU]
+    if (!menuOpen) return null
 
     const groups = Object.keys(criteria).map(group => {
       const options = criteria[group].map(option => {
@@ -217,22 +186,43 @@ class AddAudienceModal extends React.Component {
             key={name}
             classes={{ root: 'selectOption' }}
             disabled={includes(selectedCriteria, name)}
-            onClick={() => this.addCriteria(name)}
+            value={name}
           >
             {name}
           </SelectOption>
         )
       })
 
-      return (
-        <React.Fragment key={group}>
-          <CriteriaGroup>{group}</CriteriaGroup>
-          {options}
-        </React.Fragment>
+      const groupOption = (
+        <SelectOption
+          key={group}
+          classes={{ root: 'category' }}
+          disabled={true}
+        >
+          {group}
+        </SelectOption>
       )
+
+      options.splice(0, 0, groupOption)
+      return options
     })
 
-    return <AddCriteriaMenu>{groups}</AddCriteriaMenu>
+    return (
+      <div ref={ref => this.updateMenuPosition(ROOT_MENU, ref)}>
+        <Select
+          open={menuOpen}
+          onOpen={() => this.openMenu(ROOT_MENU)}
+          onClose={() => this.closeMenu(ROOT_MENU)}
+          onChange={this.addCriteria}
+          MenuProps={{ style: { maxHeight: '366px' } }}
+          multiple
+          value={[]}
+          style={{ visibility: 'hidden', width: 0, height: 0 }}
+        >
+          {flatten(groups)}
+        </Select>
+      </div>
+    )
   }
 
   renderSelectedCriteria() {
@@ -248,7 +238,7 @@ class AddAudienceModal extends React.Component {
       )
 
       return (
-        <FieldContainer key={criteria}>
+        <FieldContainer key={`menu_${criteria}`}>
           <FloatRight>
             <EditButton onClick={() => this.openMenu(criteria)}>
               <EditPencilIcon />
@@ -342,9 +332,11 @@ class AddAudienceModal extends React.Component {
           {this.renderSelectedCriteria()}
           <FieldContainer>
             <Label>Targeting Criteria</Label>
-            <div ref={ref => (this.addCriteraButton = ref)}>
-              <Button href="#" onClick={this.toggleCriteriaMenu}>
-                <StyledPlusIcon />
+            <div ref={ref => (this.criteriaTriggers[ROOT_MENU] = ref)}>
+              <Button href="#" onClick={() => this.openMenu(ROOT_MENU)}>
+                <StyledPlusIcon>
+                  <PlusIcon />
+                </StyledPlusIcon>
                 Add Audience Criteria
               </Button>
             </div>
@@ -375,15 +367,7 @@ class AddAudienceModal extends React.Component {
             </Grid>
           </Grid>
         </Modal>
-        <div ref={ref => (this.criteriaMenu = ref)}>
-          <Collapse
-            in={this.state.criteriaMenuOpen}
-            timeout="auto"
-            unmountOnExit
-          >
-            {this.renderCriteriaMenu()}
-          </Collapse>
-        </div>
+        {this.renderCriteriaMenu()}
         {this.renderSelectedCriteriaMenus()}
       </React.Fragment>
     )
