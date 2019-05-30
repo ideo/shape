@@ -39,7 +39,7 @@ class SurveyResponse < ApplicationRecord
 
   def all_questions_answered?
     # nil case should only happen in test env (test_design is not created)
-    return falses if answerable_complete_question_items.nil?
+    return false if answerable_complete_question_items.nil?
     # compare answerable question items to the ones we've answered
     (answerable_complete_question_items.pluck(:id) - question_answers.pluck(:question_id)).empty?
   end
