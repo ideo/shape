@@ -76,9 +76,9 @@ class TestComparison < SimpleService
 
   def comparison_question_datasets_by_question_type
     @comparison_question_datasets_by_question_type ||= @comparison_collection
-    .question_items
-    .scale_questions
-    .each_with_object({}) do |question_item, h|
+                                                       .question_items
+                                                       .scale_questions
+                                                       .each_with_object({}) do |question_item, h|
       h[question_item.question_type] ||= []
       h[question_item.question_type].push(question_item.dataset)
     end

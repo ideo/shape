@@ -259,7 +259,7 @@ class Item
     end
 
     def create_test_audience_dataset(test_audience, data_item)
-      dataset = Dataset::Question.create(
+      audience_dataset = Dataset::Question.create(
         groupings: [{ type: 'TestAudience', id: test_audience.id }],
         question_type: question_type,
         chart_type: :bar,
@@ -267,7 +267,7 @@ class Item
         identifier: Dataset.identifier_for_object(test_audience),
       )
       data_item.data_items_datasets.create(
-        dataset: dataset,
+        dataset: audience_dataset,
         selected: false,
       )
     end
