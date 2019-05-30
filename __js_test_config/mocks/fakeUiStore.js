@@ -98,6 +98,8 @@ const fakeUiStore = {
   popupSnackbar: jest.fn(),
   showPermissionsAlert: jest.fn(),
   gridHeightFor: jest.fn().mockReturnValue(250),
+  performActionAfterRoute: jest.fn(),
+  linkedBreadcrumbTrailForRecord: jest.fn().mockImplementation(x => x.breadcrumb),
 }
 
 export default fakeUiStore
