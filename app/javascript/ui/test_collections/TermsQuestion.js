@@ -6,6 +6,7 @@ import Emoji from '~/ui/icons/Emoji'
 import { EmojiButton, EmojiHolder } from '~/ui/test_collections/ScaleQuestion'
 import { QuestionText } from '~/ui/test_collections/shared'
 import v from '~/utils/variables'
+import { QuestionSpacingContainer } from './OpenQuestion'
 
 @observer
 class TermsQuestion extends React.Component {
@@ -44,31 +45,30 @@ class TermsQuestion extends React.Component {
         <div style={{ textAlign: 'center' }}>
           <Emoji name="Wave" symbol="👋" scale={2} />
         </div>
-        <QuestionText>
-          Thanks for taking the time to provide your feedback here on Shape, we
-          look forward to hearing your thoughts!
-          <br /> <br />
-          Before continuing, we ask that you read the following statement and
-          select the appropriate response.
-        </QuestionText>
-        <QuestionText fontSizeEm={0.75}>
-          Please note that the contents of the survey may ask you to provide
-          personal data about yourself including in some circumstances,
-          sensitive data such as race or health information depending on the
-          particular feedback we or our clients are looking for. It is your
-          choice whether to provide this information and it is entirely
-          optional.
-          <br /> <br />
-          If you choose to provide personal data in the survey, this will be
-          stored in the US and may be accessed by teams based in different
-          countries, which have different personal data laws and may be less
-          strict than the EU for example.
-          <br /> <br />
-          By participating, I understand that the content of this survey is
-          confidential and I agree not to disclose its contents to any third
-          parties.
-          <br />
-        </QuestionText>
+        <QuestionSpacingContainer editing={false}>
+          <QuestionText>
+            Thanks for taking the time to provide your feedback here on Shape,
+            we look forward to hearing your thoughts!
+            <br /> <br />
+            Before continuing, we ask that you read the following statement and
+            select the appropriate response.
+          </QuestionText>
+        </QuestionSpacingContainer>
+        <QuestionSpacingContainer editing={false}>
+          <QuestionText fontSizeEm={0.75}>
+            The contents of the survey may ask you to provide personal data
+            about yourself, including sensitive data such as race or health
+            information. It is your choice whether to provide this information
+            and it is entirely optional.
+            <br />
+            <br />
+            Any personal data you choose to provide will be stored in the US and
+            may be accessed by teams based in different countries, which have
+            different personal data laws and may be less strict than the EU for
+            example.
+            <br />
+          </QuestionText>
+        </QuestionSpacingContainer>
         <EmojiHolder data-cy="TermsEmojiHolder">
           <EmojiButton
             selected={answered && user && !user.respondent_terms_accepted}
