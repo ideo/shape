@@ -100,5 +100,26 @@ RSpec.describe LimitedUserCreator, type: :service do
         LimitedUserCreator.call(contact_info: contact_info, user_info: user_info)
       end
     end
+
+    context 'with date of participation' do
+      let(:contact_info) { 'mary@make.com' }
+      let(:date_of_participation) { Time.now - 1.day }
+
+      it 'should set created_at to the date of participation' do
+        LimitedUserCreator.call(contact_info: contact_info, date_of_participation: date_of_participation)
+
+        user = User.last
+        expect(user.created_at).to eq(date_of_participation)
+      end
+
+      it 'should create a TestAudienceInvitation' do
+        LimitedUserCreator.call(contact_info: contact_info, date_of_participation: date_of_participation)
+
+        user = User.last
+        invitation = TestAudienceInvitation.last
+        expect(invitation.user).to eq(user)
+        expect(invitation.created_at).to eq(date_of_participation)
+      end
+    end
   end
 end
