@@ -5,7 +5,6 @@ export const criteria = [
     name: 'Age',
     group: 'Demographics',
     options: [
-      'Silent Generation (born 1928-1945)',
       'Baby Boomer (born 1946-1964)',
       'Gen X (born 1965-1980)',
       'Millennial (born 1981-1996)',
@@ -30,45 +29,12 @@ export const criteria = [
   {
     name: 'Education',
     group: 'Demographics',
-    options: [
-      'High School',
-      'Vocational',
-      'College or Bachelor’s',
-      'Postgraduate or Master’s',
-      'Doctorate',
-    ],
-  },
-  {
-    name: 'Employment Status',
-    group: 'Demographics',
-    options: [
-      'Employed Full Time Job',
-      'Employed Part-time',
-      'Seeking Employment',
-      'Student',
-      'Retired',
-    ],
+    options: ['High School', 'College or Bachelor’s'],
   },
   {
     name: 'Gender',
     group: 'Demographics',
     options: ['Female', 'Male', 'Non-Binary', 'Transexual'],
-  },
-  {
-    name: 'Financial Standing',
-    group: 'Demographics',
-    options: [
-      'Paying the monthly bills is a struggle',
-      'Just breaking even',
-      'Getting by, but should save more',
-      'Living comfortably',
-      'Spending freely',
-    ],
-  },
-  {
-    name: 'Urban/Rural Dweller',
-    group: 'Demographics',
-    options: ['Metropolis', 'Urban', 'Suburban', 'Rural'],
   },
   {
     name: 'Early/Late Adopter',
