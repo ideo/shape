@@ -23,7 +23,20 @@ describe Collection::SubmissionsCollection, type: :model do
     end
 
     it 'should return all available test score options' do
-      expect(submissions_collection.sort_options).to match_array(%w[question_clarity question_useful])
+      expect(
+        submissions_collection.sort_options,
+      ).to match_array(
+        [
+          {
+            question_type: 'question_clarity',
+            question_title: 'Clarity',
+          },
+          {
+            question_type: 'question_useful',
+            question_title: 'Usefulness',
+          }
+        ]
+      )
     end
   end
 end

@@ -10,14 +10,6 @@ import {
   addDuplicateValueIfSingleValue,
 } from '~/ui/global/charts/ChartUtils'
 
-const formatValues = rawValues => {
-  const formatted = addDuplicateValueIfSingleValue(rawValues)
-  return formatted.map((value, i) => ({
-    ...value,
-    month: value.date,
-  }))
-}
-
 const chartStyle = style => {
   if (style.fill) {
     return {
@@ -33,6 +25,12 @@ const chartStyle = style => {
       fill: 'black',
     },
   }
+}
+
+const formatValues = values => {
+  const rawValues = addDuplicateValueIfSingleValue(values)
+  // Transform to regular arrays and objects for Victory
+  return rawValues.map(data => ({ ...data }))
 }
 
 const AreaChart = ({ dataset, simpleDateTooltip, cardArea = 1 }) => {
@@ -56,16 +54,20 @@ const AreaChart = ({ dataset, simpleDateTooltip, cardArea = 1 }) => {
   }
   return (
     <VictoryArea
+      style={chartStyle(dataset.style || {})}
       labels={d => d.value}
       labelComponent={
-        <ChartTooltip textRenderer={tooltipFn} cardArea={cardArea} />
+        <ChartTooltip
+          tooltipTextRenderer={tooltipFn}
+          labelTextRenderer={datum => `${datum.value}`}
+          cardArea={cardArea}
+        />
       }
-      style={chartStyle(dataset.style || {})}
-      data={values}
-      // This makes the chart shape based on the values
       domain={domain}
+      data={values}
       y="value"
-      x="month"
+      x="date"
+      key={`dataset-${dataset.order}`}
     />
   )
 }

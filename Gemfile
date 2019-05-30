@@ -115,6 +115,9 @@ gem 'oj'
 # phone number normalization
 gem 'phony'
 
+# sending sms messages
+gem "twilio-ruby"
+
 # Nice patterns for service objects
 gem 'interactor'
 gem 'interactor-schema'

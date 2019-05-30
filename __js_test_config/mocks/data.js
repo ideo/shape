@@ -51,7 +51,8 @@ export const fakeTextItemAttrs = {
   parent_collection_card: fakeCollectionCard,
 }
 
-export const fakeDataset = {
+export const fakeAreaChartDataset = {
+  identifier: 'question',
   measure: 'participants',
   description: 'A description',
   timeframe: 'month',
@@ -61,6 +62,24 @@ export const fakeDataset = {
     { date: '2018-07-10', value: 10 },
     { date: '2018-08-10', value: 25 },
     { date: '2018-09-10', value: 30 },
+  ],
+}
+
+export const fakeBarChartDataset = {
+  identifier: 'question',
+  measure: 'participants',
+  description: 'A description',
+  question_type: 'question_context',
+  timeframe: 'month',
+  chart_type: 'bar',
+  order: 0,
+  total: 10,
+  max_domain: 95,
+  data: [
+    { column: 1, value: 5, percentage: 50, type: 'question_context' },
+    { column: 2, value: 0, percentage: 0, type: 'question_context' },
+    { column: 3, value: 5, percentage: 50, type: 'question_context' },
+    { column: 4, value: 0, percentage: 0, type: 'question_context' },
   ],
 }
 
@@ -79,50 +98,15 @@ export const fakeDataItemCollectionsItemsAttrs = {
   measure: {
     name: 'Participants'
   },
-  primaryDataset: fakeDataset,
+  primaryDataset: fakeAreaChartDataset,
   datasets: [
-    fakeDataset
+    fakeAreaChartDataset
   ],
-}
-
-export const fakeLegendItemAttrs = {
-  ...fakeTextItemAttrs,
-  type: 'Item::LegendItem',
-  primary_measure: {
-    measure: 'Business Unit',
-    order: 0,
-    style: { fill: '#9874AB' }
-  },
-  comparison_measures: [
-    {
-      measure: '95th Percentile',
-      order: 1
-    },
-    {
-      measure: '75th Percentile',
-      order: 2
-    },
-  ],
-  data_settings: {
-    selected_measures: observable([
-      '95th Percentile'
-    ])
-  }
-}
-
-export const fakeLegendItem = {
-  ...fakeLegendItemAttrs,
-  rawAttributes: jest.fn().mockReturnValue(fakeLegendItemAttrs),
-  getRecordType: jest.fn().mockReturnValue('items'),
-  save: jest.fn().mockReturnValue(Promise.resolve({})),
-}
-
-export const fakeLegendItemCard = {
-  ...fakeItemCard,
-  record: fakeLegendItem
 }
 
 export const creativeDifferenceQualityDataset = {
+  name: 'purpose',
+  identifier: 'purpose',
   measure: 'Purpose',
   description:
     'The degree to which there is alignment about a meaningful change that leadership and employees want to make in the world.',
@@ -141,10 +125,34 @@ export const creativeDifferenceQualityDataset = {
   ],
 }
 
+export const fakeDatasetAttrs = {
+  chart_type: 'bar',
+  data: [],
+  data_items_datasets_id: 100,
+  measure: 'participants',
+  identifier: 'dataset',
+  name: 'dataset',
+  order: 0,
+  question_type: null,
+  selected: true,
+  test_collection_id: null,
+  timeframe: 'ever',
+  total: 1,
+}
+
+export const fakeDataset = {
+  ...fakeDatasetAttrs,
+  rawAttributes: jest.fn().mockReturnValue(fakeDatasetAttrs),
+  getRecordType: jest.fn().mockReturnValue('datasets'),
+  toJSON: jest.fn().mockReturnValue(fakeDatasetAttrs),
+  ...fakeJsonApiAttrs,
+}
+
 export const fakeDataItemRecordAttrs = {
   ...fakeTextItemAttrs,
   type: 'Item::DataItem',
   data_content: null,
+  datasets: [fakeDataset],
   name: 'Data Item',
   report_type: 'report_type_record',
   isReportTypeCollectionsItems: false,
@@ -160,7 +168,47 @@ export const fakeDataItemRecordAttrs = {
       chart_type: 'line'
     }
   ],
+  primaryDataset: jest.fn(),
+  secondaryDatasets: jest.fn(),
 }
+
+export const fakeDataItem = {
+  ...fakeDataItemRecordAttrs,
+  rawAttributes: jest.fn().mockReturnValue(fakeDataItemRecordAttrs),
+  getRecordType: jest.fn().mockReturnValue('items'),
+  toJSON: jest.fn().mockReturnValue(fakeDataItemRecordAttrs),
+  ...fakeJsonApiAttrs,
+}
+
+export const fakeLegendItemAttrs = {
+  ...fakeTextItemAttrs,
+  type: 'Item::LegendItem',
+  primary_measure: {
+    measure: 'Business Unit',
+    order: 0,
+    style: { fill: '#9874AB' }
+  },
+  primaryDataset: fakeDataset,
+  datasets: [
+    fakeDataset,
+    { order: 1, measure: '95th Percentile', name: '85th', fakeDataset, selected: true, },
+    { order: 2, measure: '75th Percentile', name: '75th', fakeDataset, selected: true },
+  ],
+}
+
+export const fakeLegendItem = {
+  ...fakeLegendItemAttrs,
+  rawAttributes: jest.fn().mockReturnValue(fakeLegendItemAttrs),
+  getRecordType: jest.fn().mockReturnValue('items'),
+  save: jest.fn().mockReturnValue(Promise.resolve({})),
+}
+
+export const fakeLegendItemCard = {
+  ...fakeItemCard,
+  record: fakeLegendItem,
+  parent: fakeCollection,
+}
+
 
 export const fakeTextItem = {
   ...fakeTextItemAttrs,
@@ -221,53 +269,6 @@ export const fakeLinkItemAttrs = {
 export const fakeLinkItem = {
   ...fakeLinkItemAttrs,
   rawAttributes: jest.fn().mockReturnValue(fakeLinkItemAttrs),
-  getRecordType: jest.fn().mockReturnValue('items'),
-}
-export const fakeChartItemAttrs = {
-  id: '5',
-  type: 'Item::ChartItem',
-  name: '',
-  content: '',
-  chart_data: {
-    0: 3,
-    1: 6,
-    2: 1,
-    3: 8,
-  },
-  chart_data: {
-    datasets: [
-      {
-        label: 'Super test',
-        type: 'question_items',
-        total: 7,
-        data: [
-          { num_responses: 2, answer: 1 },
-          { num_responses: 2, answer: 2 },
-          { num_responses: 0, answer: 3 },
-          { num_responses: 3, answer: 4 },
-        ],
-      },
-      {
-        label: 'Super Org',
-        type: 'org_wide',
-        total: 50,
-        data: [
-          { num_responses: 5, answer: 1 },
-          { num_responses: 10, answer: 2 },
-          { num_responses: 20, answer: 3 },
-          { num_responses: 15, answer: 4 },
-        ],
-      },
-    ],
-  },
-  data_source_id: 3,
-  inherited_tag_list: [],
-  can_edit: false,
-  parent_collection_card: fakeCollectionCard,
-}
-export const fakeChartItem = {
-  ...fakeChartItemAttrs,
-  rawAttributes: jest.fn().mockReturnValue(fakeChartItemAttrs),
   getRecordType: jest.fn().mockReturnValue('items'),
 }
 export const fakeFileItemAttrs = {
@@ -372,6 +373,10 @@ export const fakeCollection = {
   API_fetchCards: jest.fn().mockReturnValue(Promise.resolve({})),
   API_batchUpdateCards: jest.fn().mockReturnValue(Promise.resolve({})),
   API_batchUpdateCardsWithUndo: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_selectDatasetsWithIdentifier: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_unselectDatasetsWithIdentifier: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_removeComparison: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_addComparison: jest.fn().mockReturnValue(Promise.resolve({})),
   checkCurrentOrg: jest.fn(),
   confirmEdit: jest.fn(),
   updateScrollBottom: jest.fn(),

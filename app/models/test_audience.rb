@@ -31,6 +31,8 @@ class TestAudience < ApplicationRecord
   belongs_to :launched_by, class_name: 'User'
   has_many :survey_responses
 
+  delegate :name,
+           to: :audience
   validates :price_per_response, presence: true
 
   before_validation :set_price_per_response_from_audience, on: :create
@@ -66,6 +68,10 @@ class TestAudience < ApplicationRecord
 
   def reached_sample_size?
     survey_responses.completed.size >= sample_size
+  end
+
+  def self.display_name
+    'Audience'
   end
 
   def description

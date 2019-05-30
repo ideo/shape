@@ -37,6 +37,12 @@ Rails.application.routes.draw do
             get 'will_become_private'
           end
         end
+        resources :datasets, only: %i[show] do
+          collection do
+            post 'select'
+            post 'unselect'
+          end
+        end
       end
       resources :items do
         member do
@@ -52,12 +58,15 @@ Rails.application.routes.draw do
           end
         end
       end
+      resources :datasets, only: %i[update]
       resources :test_collections, only: %i[show] do
         member do
           patch 'launch'
           patch 'close'
           patch 'reopen'
           get 'next_available'
+          post 'add_comparison'
+          post 'remove_comparison'
         end
       end
       resources :items, only: %i[create]

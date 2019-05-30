@@ -18,6 +18,7 @@ export const COLLECTION_TYPES = {
 export const DATASET_CHART_TYPES = {
   AREA: 'area',
   LINE: 'line',
+  BAR: 'bar',
 }
 
 export const DATA_MEASURES = [

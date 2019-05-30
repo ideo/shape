@@ -1,51 +1,56 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`LegendItemCover renders snapshot 1`] = `
-<styled.div>
+<styled.div
+  data-cy="LegendItemCover"
+>
   <Styled(StyledHeading3)>
     My Cool Item
   </Styled(StyledHeading3)>
-  <Measure
-    key="measure-Business Unit"
+  <Dataset
+    key="dataset-dataset"
   >
     <styled.span>
       <styled.span
-        color="#9874AB"
+        color="#de8f74"
       />
     </styled.span>
-    <StyledDisplayText>
-      Business Unit
-    </StyledDisplayText>
-  </Measure>
-  <Measure
-    key="measure-95th Percentile"
+    <Styled(SmallHelperText)
+      color="#120f0e"
+    >
+      dataset
+    </Styled(SmallHelperText)>
+  </Dataset>
+  <Dataset
+    key="dataset-undefined"
   >
     <styled.span>
-      <LineChartMeasure
-        color="#000000"
-        order={1}
+      <styled.span
+        color="#c0dbde"
       />
     </styled.span>
-    <StyledDisplayText>
-      95th Percentile
-    </StyledDisplayText>
-    <UnselectMeasure
+    <Styled(SmallHelperText)
+      color="#120f0e"
+    >
+      85th
+    </Styled(SmallHelperText)>
+    <UnselectDataset
       onClick={[Function]}
       role="button"
     >
       <XIcon />
-    </UnselectMeasure>
-  </Measure>
+    </UnselectDataset>
+  </Dataset>
   <br />
   <styled.div>
     <StyledHeading3
-      className="add-comparison-button"
+      className="test-add-comparison-button"
       onClick={[Function]}
       role="button"
     >
-      <PlusIcon
-        viewBox="0 0 5 18"
-      />
+      <styled.span>
+        +
+      </styled.span>
       Add Comparison
     </StyledHeading3>
   </styled.div>

@@ -305,7 +305,7 @@ class GridCard extends React.Component {
       <CoverRenderer
         card={card}
         cardType={cardType}
-        coverItem={this.coverItem}
+        isCoverItem={this.coverItem ? true : false}
         record={record}
         height={height}
         dragging={dragging}
@@ -439,7 +439,7 @@ class GridCard extends React.Component {
         {/* onClick placed here so it's separate from hotspot click */}
         <StyledGridCardInner
           onClick={this.handleClick}
-          hasOverflow={record.isData}
+          hasOverflow={record.isData || record.isLegend}
           filter={card.filter}
           forceFilter={!this.hasCover}
         >

@@ -46,12 +46,12 @@ class DataTargetSelect extends React.Component {
   componentDidMount() {
     const {
       item: {
-        data_settings: { d_filters },
+        primaryDataset: { data_source_id },
       },
     } = this.props
-    if (!d_filters || d_filters.length === 0) return
+    if (!data_source_id) return
     runInAction(() => {
-      this.type = d_filters[0].type
+      this.type = 'Collection'
     })
   }
 
@@ -62,13 +62,13 @@ class DataTargetSelect extends React.Component {
     if (targetCollection && !this.editing) {
       return targetCollection.name
     }
-    return item.collectionFilter ? 'Collection' : this.type
+    return item.data_source_id ? 'Collection' : this.type
   }
 
   handleChange = e => {
     e.preventDefault()
     const { item, onSelect } = this.props
-    const { collectionFilter } = item
+    const { data_source } = item
     const { value } = e.target
     runInAction(() => (this.type = value))
 
@@ -76,8 +76,8 @@ class DataTargetSelect extends React.Component {
       onSelect()
     } else if (value === 'Collection') {
       runInAction(() => (this.editing = true))
-    } else if (collectionFilter && collectionFilter.target) {
-      onSelect({ custom: collectionFilter.target })
+    } else if (data_source) {
+      onSelect({ custom: data_source })
     }
   }
 
@@ -93,44 +93,45 @@ class DataTargetSelect extends React.Component {
   render() {
     return (
       <form className="form" style={{ display: 'inline-block' }}>
-        <Select
-          classes={{ root: 'select', selectMenu: 'selectMenu' }}
-          displayEmpty
-          disableUnderline
-          name="role"
-          onChange={this.handleChange}
-          value={this.currentValue}
-          inline
-        >
-          {this.selectOptions.map(opt => (
-            <SelectOption
-              classes={{ root: 'selectOption', selected: 'selected' }}
-              key={opt}
-              value={opt}
-            >
-              {opt}
-            </SelectOption>
-          ))}
-        </Select>
-        {this.type === 'Collection' &&
-          this.editing && (
-            <div
-              style={{
-                display: 'inline-block',
-                marginBottom: '10px',
-                backgroundColor: v.colors.commonLight,
-              }}
-            >
-              <AutoComplete
-                options={[]}
-                optionSearch={this.onSearch}
-                onOptionSelect={option => this.props.onSelect(option)}
-                placeholder="Collection name"
-                keepSelectedOptions
-                style={{ display: 'inline-block' }}
-              />
-            </div>
-          )}
+        {this.type === 'Collection' && this.editing ? (
+          <div
+            style={{
+              display: 'block',
+              marginBottom: '10px',
+              backgroundColor: v.colors.commonLight,
+              width: '190px',
+            }}
+          >
+            <AutoComplete
+              options={[]}
+              optionSearch={this.onSearch}
+              onOptionSelect={option => this.props.onSelect(option)}
+              placeholder="Collection name"
+              keepSelectedOptions
+              style={{ display: 'inline-block' }}
+            />
+          </div>
+        ) : (
+          <Select
+            classes={{ root: 'select', selectMenu: 'selectMenu' }}
+            displayEmpty
+            disableUnderline
+            name="role"
+            onChange={this.handleChange}
+            value={this.currentValue}
+            inline
+          >
+            {this.selectOptions.map(opt => (
+              <SelectOption
+                classes={{ root: 'selectOption', selected: 'selected' }}
+                key={opt}
+                value={opt}
+              >
+                {opt}
+              </SelectOption>
+            ))}
+          </Select>
+        )}
       </form>
     )
   }

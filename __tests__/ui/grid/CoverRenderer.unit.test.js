@@ -86,7 +86,7 @@ describe('CoverRenderer', () => {
 
   describe('with a cover item', () => {
     beforeEach(() => {
-      props.coverItem = true
+      props.isCoverItem = true
       rerender()
     })
 

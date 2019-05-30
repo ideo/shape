@@ -78,6 +78,12 @@ class Collection
 
     has_many :survey_responses, through: :test_collection
 
+    COLLECTION_SUFFIX = ' Feedback Design'.freeze
+
+    def self.generate_name(name)
+      "#{name}#{COLLECTION_SUFFIX}"
+    end
+
     def duplicate!(**args)
       duplicate = super(args)
       return duplicate unless duplicate.persisted?

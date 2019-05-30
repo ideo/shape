@@ -23,7 +23,13 @@ describe('DataItemCreator', () => {
     component.createItem('viewers')
     expect(props.createCard).toHaveBeenCalledWith({
       item_attributes: {
-        data_settings: { d_measure: 'viewers', d_timeframe: 'ever' },
+        datasets_attributes: {
+          0: {
+            chart_type: 'area',
+            measure: 'viewers',
+            timeframe: 'ever',
+          },
+        },
         type: ITEM_TYPES.DATA,
         report_type: 'report_type_collections_and_items',
         name: 'Report',

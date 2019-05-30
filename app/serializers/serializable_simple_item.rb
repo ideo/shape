@@ -1,7 +1,8 @@
 class SerializableSimpleItem < BaseJsonSerializer
   type 'items'
   attributes :name, :content,
-             :url, :thumbnail_url, :icon_url, :question_type
+             :url, :thumbnail_url, :icon_url,
+             :question_type, :question_description, :question_title
 
   belongs_to :filestack_file
 

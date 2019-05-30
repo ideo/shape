@@ -60,6 +60,17 @@ class Api::V1::SearchController < Api::V1::BaseController
     where_clause = {
       organization_id: current_organization.id,
     }
+
+    order_opts = { _score: :desc }
+
+    if params[:type].present?
+      where_clause[:type] = params[:type]
+    end
+
+    if params[:order_by].present? && params[:order_direction].present?
+      order_opts = { params[:order_by] => params[:order_direction] }
+    end
+
     # super_admin has access to everything regardless of user/group_ids
     unless current_user.has_cached_role?(Role::SUPER_ADMIN)
       where_clause[:_or] = [
@@ -74,6 +85,7 @@ class Api::V1::SearchController < Api::V1::BaseController
       where: where_clause,
       per_page: params[:per_page] || 10,
       page: @page,
+      order: order_opts,
     ).search(@query)
   end
 

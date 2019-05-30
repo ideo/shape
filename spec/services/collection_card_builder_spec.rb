@@ -113,9 +113,9 @@ RSpec.describe CollectionCardBuilder, type: :service do
         end
 
         it 'should create the external_record' do
-          expect {
+          expect do
             builder.create
-          }.to change(ExternalRecord, :count).by(1)
+          end.to change(ExternalRecord, :count).by(1)
           expect(builder.collection_card.record.external_records.last.external_id).to eq '99'
         end
       end
@@ -171,7 +171,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
                 item_attributes: {
                   type: 'Item::QuestionItem',
                   question_type: :question_clarity,
-                }
+                },
               ),
               parent_collection: parent_collection,
               user: user,
@@ -179,11 +179,11 @@ RSpec.describe CollectionCardBuilder, type: :service do
           end
 
           context 'and test is not live' do
-            it 'does not create chart item' do
+            it 'does not create data item' do
               expect(test_collection.live?).to be false
-              expect {
+              expect do
                 builder.create
-              }.not_to change(Item::ChartItem, :count)
+              end.not_to change(Item::DataItem, :count)
             end
           end
 
@@ -193,11 +193,12 @@ RSpec.describe CollectionCardBuilder, type: :service do
             end
             let!(:parent_collection) { test_collection.test_design }
 
-            it 'creates chart item' do
+            it 'creates data item and legend' do
+              expect(test_collection.legend_item).to be_nil
               expect(test_collection.live?).to be true
-              expect {
+              expect do
                 builder.create
-              }.to change(Item::ChartItem, :count).by(1)
+              end.to change(Item::DataItem, :count).by(1)
             end
           end
         end
@@ -210,7 +211,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
                   type: 'Item::QuestionItem',
                   question_type: :question_open,
                   content: 'What do you think?',
-                }
+                },
               ),
               parent_collection: test_collection,
               user: user,
@@ -220,9 +221,9 @@ RSpec.describe CollectionCardBuilder, type: :service do
           context 'and test is not live' do
             it 'does not create open response collection' do
               expect(test_collection.live?).to be false
-              expect {
+              expect do
                 builder.create
-              }.not_to change(Collection::TestOpenResponses, :count)
+              end.not_to change(Collection::TestOpenResponses, :count)
             end
           end
 
@@ -234,9 +235,9 @@ RSpec.describe CollectionCardBuilder, type: :service do
 
             it 'creates open response collection' do
               expect(test_collection.live?).to be true
-              expect {
+              expect do
                 builder.create
-              }.to change(Collection::TestOpenResponses, :count).by(1)
+              end.to change(Collection::TestOpenResponses, :count).by(1)
             end
           end
         end
@@ -258,6 +259,44 @@ RSpec.describe CollectionCardBuilder, type: :service do
         it 'should subscribe the submitter to the submission box' do
           users_thread = comment_thread.users_thread_for(user)
           expect(users_thread.subscribed).to be true
+        end
+      end
+
+      context 'when item is a data item' do
+        let(:builder) do
+          CollectionCardBuilder.new(
+            params: params.merge(
+              item_attributes: {
+                type: 'Item::DataItem',
+                report_type: 'report_type_collections_and_items',
+                datasets_attributes: {
+                  0 => {
+                    chart_type: 'area',
+                    measure: 'participants',
+                    timeframe: 'ever',
+                  },
+                  1 => {
+                    chart_type: 'line',
+                    measure: 'viewers',
+                    timeframe: 'ever',
+                  },
+                },
+              },
+            ),
+            parent_collection: parent,
+            user: user,
+          )
+        end
+
+        before do
+          builder.create
+        end
+
+        it 'should create a linked dataset' do
+          item = builder.collection_card.item
+          expect(item.datasets.count).to eq 2
+          expect(item.datasets.first.measure).to eq 'participants'
+          expect(item.datasets.last.measure).to eq 'viewers'
         end
       end
     end

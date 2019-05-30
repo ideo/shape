@@ -98,6 +98,8 @@ const fakeUiStore = {
   popupSnackbar: jest.fn(),
   showPermissionsAlert: jest.fn(),
   gridHeightFor: jest.fn().mockReturnValue(250),
+  addEmptySpaceClickHandler: jest.fn(),
+  removeEmptySpaceClickHandler: jest.fn(),
 }
 
 export default fakeUiStore
