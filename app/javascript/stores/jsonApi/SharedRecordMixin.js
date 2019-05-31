@@ -58,7 +58,7 @@ const SharedRecordMixin = superclass =>
         _.assign(this, snapshot)
         data = this.toJsonApi()
       }
-      // data.cancel_sync = true
+
       return this.apiStore.request(this.baseApiPath, 'PATCH', { data })
     }
 

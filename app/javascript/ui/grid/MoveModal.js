@@ -327,7 +327,7 @@ class MoveModal extends React.Component {
                 <StyledSnackbarContent
                   classes={{ root: 'SnackbarContent' }}
                   message={
-                    <StyledSnackbarText data-cy="MoveModalText" id="message-id">
+                    <StyledSnackbarText id="message-id">
                       {this.moveMessage}
                     </StyledSnackbarText>
                   }

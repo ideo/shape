@@ -143,7 +143,6 @@ class PopoutMenu extends React.Component {
           {groupExtraComponent[groupName]}
           {groupedMenuItems[groupName].map((item, i) => {
             const { id, name, iconLeft, iconRight, onClick, loading } = item
-            console.log(`PopoutMenu_${_.camelCase(name)}`)
             return (
               <StyledMenuItem
                 key={`${name}-${id || ''}`}
@@ -218,7 +217,6 @@ class PopoutMenu extends React.Component {
         role="presentation"
         onMouseLeave={onMouseLeave}
         hideDotMenu={hideDotMenu}
-        data-cy="MenuButtonWrapper"
       >
         {!hideDotMenu && (
           <MenuToggle

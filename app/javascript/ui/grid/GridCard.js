@@ -380,7 +380,6 @@ class GridCard extends React.Component {
               color={this.actionsColor}
               className="show-on-hover"
               zoomLevel={zoomLevel}
-              data-cy="CardActionMenu"
             >
               {record.isDownloadable && <Download record={record} />}
               {record.canSetACover && (
