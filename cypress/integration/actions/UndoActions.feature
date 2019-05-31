@@ -48,13 +48,13 @@ Feature: Undo actions
     And I close the move helper modal
     Then I should see "2 in transit" in a ".MuiSnackbarContent-message"
 
-    # test cards being moved
-    And I navigate to the collection named "Inner Collection" via the "CollectionCover"
+    When I navigate to the collection named "Inner Collection" via the "CollectionCover"
+    And I wait for 1 second
     Then I should see "2 in transit" in a ".MuiSnackbarContent-message"
-    And I click the down arrow on the MDL snackbar
-    And I wait for "@apiMoveCollectionCards" to finish
+
+    When I click the down arrow on the MDL snackbar
     And I wait for "@apiGetCollectionCards" to finish
-    And I wait for "@apiGetCollectionCards" to finish
+    # And I wait for "@apiMoveCollectionCards" to finish
     Then I should see a collection card named "Hello World"
     Then I should see a "TextItemCover" in the first card
     Then I should see the value "Testing" in the first text item
@@ -62,11 +62,14 @@ Feature: Undo actions
 
     # test undoing the move
     When I undo with CTRL+Z
+    And I wait for 1 second
 
-    And I wait for "@apiMoveCollectionCards" to finish
-    And I wait for "@apiGetCollectionCards" to finish
+    # And I wait for "@apiMoveCollectionCards" to finish
+    # And I wait for "@apiGetCollectionCards" to finish
     And I wait for "@apiGetCollection" to finish
     And I wait for "@apiGetInMyCollection" to finish
+    And I wait for "@apiUpdateCollection" to finish
+    And I wait for "@apiGetCollectionCards" to finish
 
     Then I should see a collection card named "Hello World"
     Then I should see a collection card named "Inner Collection"
