@@ -14,7 +14,7 @@ const StyledGridCardEmpty = styled.div`
   height: 100%;
   position: relative;
 
-   &:hover {
+  &:hover {
     background-color: ${v.colors.primaryLight} !important;
     .plus-icon {
       display: block;
