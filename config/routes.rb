@@ -37,6 +37,12 @@ Rails.application.routes.draw do
             get 'will_become_private'
           end
         end
+        resources :datasets, only: %i[show] do
+          collection do
+            post 'select'
+            post 'unselect'
+          end
+        end
       end
       resources :items do
         member do
@@ -52,12 +58,15 @@ Rails.application.routes.draw do
           end
         end
       end
+      resources :datasets, only: %i[update]
       resources :test_collections, only: %i[show] do
         member do
           patch 'launch'
           patch 'close'
           patch 'reopen'
           get 'next_available'
+          post 'add_comparison'
+          post 'remove_comparison'
         end
       end
       resources :items, only: %i[create]
@@ -130,7 +139,7 @@ Rails.application.routes.draw do
           get 'user_notifications'
         end
       end
-      resources :test_audiences, only: %i[create update]
+      resources :test_audiences, only: %i[create update destroy]
       scope :filestack do
         get 'token', to: 'filestack#token', as: :filestack_token
       end
@@ -144,10 +153,11 @@ Rails.application.routes.draw do
         resources :question_answers, only: %i[create update]
       end
 
-      resources :audiences, only: %i[index show]
+      resources :audiences, only: %i[index show create]
 
       namespace :admin do
         resources :users, only: %i[index destroy create]
+        resources :test_collections, only: %i[index]
       end
     end
   end

@@ -1,13 +1,36 @@
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import _ from 'lodash'
+import { action, observable } from 'mobx'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import { observable, action } from 'mobx'
 
 import { Select, SelectOption } from '~/ui/global/styled/forms'
+import AutoComplete from '~/ui/global/AutoComplete'
 import XIcon from '~/ui/icons/XIcon'
-import PlusIcon from '~/ui/icons/PlusIcon'
 import v from '~/utils/variables'
-import { DisplayText, Heading3 } from '~/ui/global/styled/typography'
-import LineChartMeasure from '~/ui/icons/LineChartMeasure'
+import { colorScale } from '~/ui/global/charts/ChartUtils'
+import {
+  DisplayText,
+  Heading3,
+  SmallHelperText,
+} from '~/ui/global/styled/typography'
+import LineChartIcon from '~/ui/icons/LineChartIcon'
+import trackError from '~/utils/trackError'
+
+function formatForAutocomplete(objects) {
+  return objects.map(object => ({
+    value: object.id,
+    label: object.name,
+    data: object,
+  }))
+}
+
+const PlusIconContainer = styled.span`
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 1.3em;
+  margin-right: 6px;
+  margin-top: -3px;
+`
 
 const StyledLegendItem = styled.div`
   border-top: 2px solid #000;
@@ -19,14 +42,14 @@ const StyledLegendTitle = styled(Heading3)`
   margin-bottom: 20px;
 `
 
-const Measure = styled.div`
+const Dataset = styled.div`
   font-size: 1.1rem;
   margin: 15px 0;
   position: relative;
 `
-Measure.displayName = 'Measure'
+Dataset.displayName = 'Dataset'
 
-const UnselectMeasure = styled(DisplayText)`
+const UnselectDataset = styled(DisplayText)`
   position: absolute;
   right: 0;
   width: 16px;
@@ -37,16 +60,16 @@ const UnselectMeasure = styled(DisplayText)`
     color: black;
   }
 `
-UnselectMeasure.displayName = 'UnselectMeasure'
+UnselectDataset.displayName = 'UnselectDataset'
 
-const AreaChartMeasure = styled.span`
+const AreaChartIcon = styled.span`
   display: inline-block;
   width: 100%;
   height: 100%;
   background-color: ${props => props.color};
 `
 
-const MeasureIconWrapper = styled.span`
+const DatasetIconWrapper = styled.span`
   display: inline-block;
   width: 15px;
   height: 15px;
@@ -60,159 +83,283 @@ const StyledAddComparison = styled.div`
   }
   &:hover,
   &:active {
-    .icon {
-      background-color: ${v.colors.commonDarkest};
-    }
     color: ${v.colors.commonDarkest};
-  }
-  .icon {
-    background-color: ${v.colors.commonMedium};
-    border-radius: 50%;
-    padding: 7px;
-    height: 15px;
-    width: 15px;
-    margin: -3px 8px 0 0;
-    display: inline-block;
-    vertical-align: middle;
   }
 `
 
+const DatasetText = styled(SmallHelperText)`
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 240px;
+  white-space: nowrap;
+`
+
+@inject('apiStore', 'uiStore')
 @observer
 class LegendItemCover extends React.Component {
   state = {
     comparisonMenuOpen: false,
   }
 
+  componentDidMount() {
+    this.searchTestCollections(' ')
+  }
+
+  componentWillUnMount() {
+    const { uiStore } = this.props
+    uiStore.removeEmptySpaceClickHandler(this.onSearchClose)
+  }
+
+  /*
+   * Unique dataset and whether selected or not
+   */
+  datasets = ({ selected }) => {
+    const { datasets } = this.props.item
+    const identifiers = []
+    return datasets.filter(dataset => {
+      if (
+        dataset.selected === selected &&
+        !_.includes(identifiers, dataset.identifier)
+      ) {
+        identifiers.push(dataset.identifier)
+        return true
+      } else {
+        return false
+      }
+    })
+  }
+
+  /*
+   * Toggle's a dataset that already exists on the legend items and charts
+   * to have it's data_items_dataset.selected property toggled
+   */
   @observable
   @action
-  toggleMeasure = async ({ measure, show }) => {
-    const { item, card } = this.props
-    const { selected_measures } = item.data_settings
-    if (show) {
-      // Add measure
-      selected_measures.push(measure)
+  toggleDatasetsWithIdentifier = async ({ identifier, selected }) => {
+    const { parent } = this.props.card
+    if (!selected) {
+      await parent.API_selectDatasetsWithIdentifier({ identifier })
     } else {
-      // Remove measure
-      selected_measures.remove(measure)
+      await parent.API_unselectDatasetsWithIdentifier({ identifier })
     }
-    await item.save()
-    card.parent.API_fetchCards()
+    parent.API_fetchCards()
   }
 
-  comparisonMeasures = ({ selected }) => {
-    const { selected_measures } = this.props.item.data_settings
-
-    if (selected && selected_measures.length === 0) return []
-
-    const { comparison_measures } = this.props.item
-    return comparison_measures.filter(
-      measureData =>
-        selected === selected_measures.includes(measureData.measure)
-    )
-  }
-
-  renderSelectedMeasure = ({ measureData, primary }) => {
-    const { measure, style } = measureData
-    let icon
-    if (primary) {
-      icon = <AreaChartMeasure color={(style && style.fill) || '#000000'} />
-    } else {
-      icon = (
-        <LineChartMeasure
-          color={(style && style.fill) || '#000000'}
-          order={measureData.order}
-        />
-      )
-    }
-    return (
-      <Measure key={`measure-${measure}`}>
-        {icon && <MeasureIconWrapper>{icon}</MeasureIconWrapper>}
-        <DisplayText>{measure}</DisplayText>
-        {!primary && (
-          <UnselectMeasure
-            role="button"
-            onClick={() => this.toggleMeasure({ measure, show: false })}
-          >
-            <XIcon />
-          </UnselectMeasure>
-        )}
-      </Measure>
-    )
-  }
-
-  toggleComparisonMenu = () => {
+  toggleComparisonSearch = () => {
+    const { uiStore } = this.props
     const { comparisonMenuOpen } = this.state
+    if (comparisonMenuOpen) {
+      uiStore.removeEmptySpaceClickHandler(this.onSearchClose)
+    } else {
+      uiStore.addEmptySpaceClickHandler(this.onSearchClose)
+    }
     this.setState({
       comparisonMenuOpen: !comparisonMenuOpen,
     })
   }
 
-  get comparisonMenuOptions() {
-    return this.comparisonMeasures({ selected: false }).map(measureData => {
-      const { measure } = measureData
-      return measure
+  onSearchClose = ev => {
+    this.setState({
+      comparisonMenuOpen: false,
     })
   }
 
-  handleComparisonMenuSelection = event => {
-    event.preventDefault()
-    const { value } = event.target
-    this.toggleMeasure({ measure: value, show: true })
+  /*
+   * When de-selecting a comparison with the Unselect button. Will always
+   * pass in a dataset and will either toggle the dataset's selected property
+   * if it's a grouped dataset (for now) or remove the whole data_items_dataset
+   *
+   * Datasets with groupings should always remain on the legend item and
+   * chart items so they appear by default in the add comparisons search menu.
+   * This behavior may change in the future
+   */
+  onDeselectComparison = async dataset => {
+    const { parent } = this.props.card
+    if (dataset.groupings.length) {
+      const { identifier, selected } = dataset
+      this.toggleDatasetsWithIdentifier({ identifier, selected })
+    } else {
+      await parent.API_removeComparison({ id: dataset.test_collection_id })
+    }
+    parent.API_fetchCards()
   }
 
-  get renderComparisonMenu() {
+  /*
+   * When selecting a comparison with the autocomplete search. Will pass in
+   * either a dataset, in the case of org-wide and test audiences, or a
+   * TestCollection, in the case of the collection search.
+   *
+   * Datasets with groupings should always remain on the legend item and
+   * chart items so they appear by default in the add comparisons search menu.
+   * This behavior may change in the future
+   */
+  onSelectComparison = async entity => {
+    const { card } = this.props
+    if (entity.internalType === 'datasets') {
+      const { identifier, selected } = entity
+      this.toggleDatasetsWithIdentifier({ identifier, selected })
+    } else {
+      await card.parent.API_addComparison(entity)
+    }
+    card.parent.API_fetchCards()
+  }
+
+  findDatasetByTest(testId) {
+    const { item } = this.props
+    const dataSet = item.datasets.find(
+      d => d.data_source_id === parseInt(testId)
+    )
+    return dataSet
+  }
+
+  searchTestCollections = (term, callback) => {
+    const { item, apiStore } = this.props
+    if (!term) {
+      callback()
+      return
+    }
+    return apiStore
+      .searchCollections({
+        query: `${term}`,
+        type: 'Collection::TestCollection',
+        order_by: 'updated_at',
+        order_direction: 'desc',
+        per_page: 30,
+      })
+      .then(res => res.data)
+      .then(records => records.filter(record => record.id !== item.parent_id))
+      .then(records =>
+        records.filter(record => !this.findDatasetByTest(record.id))
+      )
+      .then(records => callback && callback(formatForAutocomplete(records)))
+      .catch(e => {
+        trackError(e)
+      })
+  }
+
+  handleDatasetSelection = event => {
+    event.preventDefault()
+    const { value } = event.target
+    this.toggleDatasetsWithIdentifier({ identifier: value, selected: true })
+  }
+
+  get renderDatasetsMenu() {
     return (
       <Select
         classes={{ root: 'select', selectMenu: 'selectMenu' }}
         displayEmpty
         disableUnderline
         name="role"
-        onChange={this.handleComparisonMenuSelection}
+        onChange={this.handleDatasetSelection}
         onClose={() => this.setState({ comparisonMenuOpen: false })}
         open
         inline
       >
-        {this.comparisonMenuOptions.map(option => (
+        {this.datasets({ selected: false }).map(dataset => (
           <SelectOption
             classes={{ root: 'selectOption', selected: 'selected' }}
-            key={option}
-            value={option}
+            key={dataset.identifier}
+            value={dataset.identifier}
           >
-            {option}
+            {dataset.name}
           </SelectOption>
         ))}
       </Select>
     )
   }
 
+  get renderTestCollectionsSearch() {
+    // Transform the audience so name is set to display name for the option
+    // formatting
+    const selectedDatasetIdentifiers = this.datasets({ selected: true }).map(
+      d => d.identifier
+    )
+    const unselectedDatasets = this.datasets({ selected: false })
+    const formattedOptions = formatForAutocomplete(
+      _.reject(unselectedDatasets, unselected =>
+        _.includes(selectedDatasetIdentifiers, unselected.identifier)
+      )
+    )
+    return (
+      <AutoComplete
+        defaultOptions={formattedOptions}
+        optionSearch={this.searchTestCollections}
+        onOptionSelect={option => this.onSelectComparison(option)}
+        placeholder="search comparisons"
+        onMenuClose={this.onSearchClose}
+      />
+    )
+  }
+
+  get renderComparisonMenu() {
+    const { legend_search_source } = this.props.item
+    if (legend_search_source === 'select_from_datasets') {
+      return this.renderDatasetsMenu
+    } else if (legend_search_source === 'search_test_collections') {
+      return this.renderTestCollectionsSearch
+    }
+  }
+
+  renderSelectedDataset = ({ dataset, order }) => {
+    if (!dataset) return ''
+    const { identifier, name, style, chart_type } = dataset
+    const primary = order === 0
+    let icon
+    if (chart_type === 'line') {
+      icon = (
+        <LineChartIcon
+          color={(style && style.fill) || '#000000'}
+          order={order}
+        />
+      )
+    } else {
+      const color = style && style.fill ? style.fill : colorScale[order]
+      icon = <AreaChartIcon color={color} />
+    }
+    return (
+      <Dataset key={`dataset-${identifier}`}>
+        {icon && <DatasetIconWrapper>{icon}</DatasetIconWrapper>}
+        <DatasetText color={v.colors.black}>{name}</DatasetText>
+        {!primary &&
+          dataset.selected && (
+            <UnselectDataset
+              role="button"
+              onClick={() => this.onDeselectComparison(dataset)}
+            >
+              <XIcon />
+            </UnselectDataset>
+          )}
+      </Dataset>
+    )
+  }
+
   render() {
     const { item } = this.props
-    const { primary_measure } = item
     const { comparisonMenuOpen } = this.state
+    let order = -1
     return (
-      <StyledLegendItem>
+      <StyledLegendItem data-cy="LegendItemCover">
         <StyledLegendTitle>{item.name}</StyledLegendTitle>
-        {this.renderSelectedMeasure({
-          measureData: primary_measure,
-          primary: true,
-        })}
-        {this.comparisonMeasures({ selected: true }).map(measureData =>
-          this.renderSelectedMeasure({
-            measureData,
-            primary: false,
+        {this.datasets({ selected: true }).map(dataset =>
+          this.renderSelectedDataset({
+            dataset,
+            order: (order += 1),
           })
         )}
         <br />
         <StyledAddComparison>
           {comparisonMenuOpen && this.renderComparisonMenu}
-          <Heading3
-            onClick={this.toggleComparisonMenu}
-            role="button"
-            className="add-comparison-button"
-          >
-            <PlusIcon viewBox="0 0 5 18" />
-            Add Comparison
-          </Heading3>
+          {!comparisonMenuOpen && (
+            <Heading3
+              onClick={this.toggleComparisonSearch}
+              role="button"
+              className="test-add-comparison-button"
+            >
+              <PlusIconContainer>+</PlusIconContainer>
+              Add Comparison
+            </Heading3>
+          )}
         </StyledAddComparison>
       </StyledLegendItem>
     )
@@ -222,6 +369,11 @@ class LegendItemCover extends React.Component {
 LegendItemCover.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   card: MobxPropTypes.objectOrObservableObject,
+}
+
+LegendItemCover.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 LegendItemCover.defaultProps = {

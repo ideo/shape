@@ -89,7 +89,7 @@ Cypress.Commands.add('createTextItem', () => {
 })
 
 Cypress.Commands.add('createDataItem', () => {
-  cy.selectBctType({ type: 'report' })
+  cy.selectBctType({ type: 'report', order: 'first', empty: true })
   cy.wait('@apiCreateCollectionCard')
   cy.wait(50)
 })
@@ -135,26 +135,29 @@ Cypress.Commands.add('undo', () => {
   })
 })
 
-Cypress.Commands.add('selectBctType', ({ type, empty = false }) => {
-  if (!empty) {
-    cy.locateDataOrClass('.StyledHotspot')
-      .last()
-      .click({ force: true })
-  }
-  if (type === 'report') {
-    cy.locate('BctButton-more')
-      .last()
-      .click({ force: true })
-    cy.wait(100)
-    cy.locate('PopoutMenu_createReport')
+Cypress.Commands.add(
+  'selectBctType',
+  ({ type, empty = false, order = 'last' }) => {
+    if (!empty) {
+      cy.locateDataOrClass('.StyledHotspot')
+        [order]()
+        .click({ force: true })
+    }
+    if (type === 'report') {
+      cy.locate('BctButton-more')
+        .last()
+        .click({ force: true })
+      cy.wait(100)
+      cy.locate('PopoutMenu_createReport')
+        .first()
+        .click({ force: true })
+      return
+    }
+    cy.locate(`BctButton-${type}`)
       .first()
       .click({ force: true })
-    return
   }
-  cy.locate(`BctButton-${type}`)
-    .first()
-    .click({ force: true })
-})
+)
 
 // NOTE: https://stackoverflow.com/a/47537751/260495
 // this hack is what allows cypress + fetch to work together, otherwise it doesn't

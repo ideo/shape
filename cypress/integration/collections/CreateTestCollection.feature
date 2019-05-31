@@ -23,9 +23,11 @@ Feature: Creating a Test Collection
     And I wait for "@apiLaunchTest" to finish
     And I wait for 1 second
 
-    Then I should see "Usefulness" in a "ChartItemCover"
+    Then I should see "Usefulness" in a "DataItemCover"
     # assuming the collection cover is not truncated...
     Then I should see a collection card named "Test Prototype Feedback Design"
+    Then I should see "Test Prototype" in a "LegendItemCover"
+    Then I should see "CypressTest Organization" in a "LegendItemCover"
     Then I should see "Get Link" in a "HeaderFormButton"
     Then I should see "Stop Feedback" in a "HeaderFormButton"
 
@@ -35,6 +37,7 @@ Feature: Creating a Test Collection
     When I capture the current URL
     And I visit the current Test URL
     Then I should see a "StandaloneTestSurvey"
+    When I accept the feedback survey terms
     Then I should see "Why Coding Needs" in a "GridCard"
     Then I should see a question with "ScaleEmojiHolder" and 4 emojis
     When I click the last "ScaleEmojiBtn"

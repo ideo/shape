@@ -1,0 +1,2 @@
+class DeserializableDataItemsDataset < BaseJsonDeserializer
+end

@@ -4,6 +4,7 @@
     "sample_size": { "type": ["number", "null"] },
     "audience_id": { "type": "number" },
     "price_per_response": { "type": ["number", "null"] },
-    "test_collection_id": { "type": "number" }
+    "test_collection_id": { "type": "number" },
+    "num_survey_responses": { "type": "number" }
   }
 }

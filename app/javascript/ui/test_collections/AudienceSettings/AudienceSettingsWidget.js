@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { Flex } from 'reflexbox'
 
 import { DisplayTextCss } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
@@ -13,6 +14,9 @@ import {
 import TableHeader from './TableHeader'
 import TableBody from './TableBody'
 import AudienceCheckbox from './AudienceCheckbox'
+import AddAudienceModal from './AddAudienceModal'
+import Button from '~shared/components/atoms/Button'
+import PlusIcon from '~shared/images/icon-plus.svg'
 
 const AudienceSettingsWrapper = styled.div`
   width: 100%;
@@ -37,6 +41,18 @@ const MobileWrapper = styled.div`
 
 @observer
 class AudienceSettingsWidget extends React.Component {
+  state = {
+    addAudienceModalOpen: false,
+  }
+
+  openAddAudienceModal = () => {
+    this.setState({ addAudienceModalOpen: true })
+  }
+
+  closeAddAudienceModal = () => {
+    this.setState({ addAudienceModalOpen: false })
+  }
+
   audienceSelected(audience) {
     const { audienceSettings } = this.props
     const option = audienceSettings[audience.id]
@@ -49,6 +65,11 @@ class AudienceSettingsWidget extends React.Component {
     return option ? option.sample_size : ''
   }
 
+  isAudienceLocked(audience) {
+    const { locked } = this.props
+    return audience.price_per_response > 0 && locked
+  }
+
   renderTableBody(audience) {
     const { onInputChange } = this.props
     return (
@@ -57,6 +78,7 @@ class AudienceSettingsWidget extends React.Component {
         onInputChange={onInputChange}
         selected={this.audienceSelected(audience)}
         sampleSize={this.sampleSize(audience)}
+        locked={this.isAudienceLocked(audience)}
       />
     )
   }
@@ -69,12 +91,24 @@ class AudienceSettingsWidget extends React.Component {
         audienceName={audience.name}
         selected={this.audienceSelected(audience)}
         onToggleCheckbox={onToggleCheckbox}
+        disabled={this.isAudienceLocked(audience)}
       />
     )
   }
 
   render() {
     const { audiences, totalPrice } = this.props
+
+    const newAudienceButton = (
+      <Flex align="center">
+        <StyledRowFlexItem style={{ marginTop: '5px' }}>
+          <Button href="#" onClick={this.openAddAudienceModal}>
+            <PlusIcon width={15} style={{ fill: v.colors.black }} />
+            New Audience
+          </Button>
+        </StyledRowFlexItem>
+      </Flex>
+    )
 
     const totalPriceDisplay = (
       <React.Fragment>
@@ -100,6 +134,7 @@ class AudienceSettingsWidget extends React.Component {
                 )
               })}
               <StyledRowFlexParent style={{ marginTop: '15px' }}>
+                {newAudienceButton}
                 <StyledRowFlexCell />
                 {totalPriceDisplay}
               </StyledRowFlexParent>
@@ -121,7 +156,7 @@ class AudienceSettingsWidget extends React.Component {
                 )
               })}
               <StyledRowFlexParent>
-                <StyledRowFlexItem />
+                {newAudienceButton}
                 <StyledRowFlexCell />
                 {totalPriceDisplay}
               </StyledRowFlexParent>
@@ -130,6 +165,10 @@ class AudienceSettingsWidget extends React.Component {
 
           <StyledColumnFlexParent />
         </div>
+        <AddAudienceModal
+          open={this.state.addAudienceModalOpen}
+          close={this.closeAddAudienceModal}
+        />
       </AudienceSettingsWrapper>
     )
   }
@@ -141,6 +180,11 @@ AudienceSettingsWidget.propTypes = {
   onInputChange: PropTypes.func.isRequired,
   onToggleCheckbox: PropTypes.func.isRequired,
   totalPrice: PropTypes.string.isRequired,
+  locked: PropTypes.bool,
+}
+
+AudienceSettingsWidget.defaultProps = {
+  locked: false,
 }
 
 export default AudienceSettingsWidget

@@ -7,23 +7,48 @@ RSpec.describe TestAudience, type: :model do
     it { should have_many :survey_responses }
   end
 
-  describe '#closed?' do
-    let(:test_collection) { create(:test_collection) }
-    let(:test_audience) { create(:test_audience, test_collection: test_collection, sample_size: 5) }
-
-    context 'when it has received enough completed responses' do
-      let!(:survey_responses) { create_list(:survey_response, 5, status: :completed, test_audience: test_audience) }
-
-      it 'returns true' do
-        expect(test_audience.closed?).to be true
+  describe 'callbacks' do
+    describe '#closed?' do
+      let(:user) { create(:user) }
+      let(:test_collection) { create(:test_collection, :completed) }
+      before do
+        test_collection.launch!(initiated_by: user)
+        expect(test_collection.live?).to be true
+        expect(test_audience.closed_at).to be_nil
       end
-    end
+      let(:test_audience) { create(:test_audience, test_collection: test_collection, sample_size: 5) }
 
-    context 'when it has not received enough responses' do
-      let!(:survey_responses) { create_list(:survey_response, 2, status: :completed, test_audience: test_audience) }
+      context 'when it has received enough completed responses' do
+        let!(:survey_responses) do
+          create_list(
+            :survey_response,
+            5,
+            :fully_answered,
+            test_audience: test_audience,
+            test_collection: test_collection,
+          )
+        end
 
-      it 'returns false' do
-        expect(test_audience.closed?).to be false
+        it 'returns true' do
+          expect(test_audience.reload.closed?).to be true
+          expect(test_audience.closed_at).not_to be_nil
+        end
+
+        it 'closes the test' do
+          expect(test_collection.reload.closed?).to be true
+        end
+      end
+
+      context 'when it has not received enough responses' do
+        let!(:survey_responses) { create_list(:survey_response, 2, :fully_answered, test_audience: test_audience) }
+
+        it 'returns false' do
+          expect(test_audience.reload.closed?).to be false
+        end
+
+        it 'leaves the test open' do
+          expect(test_collection.reload.live?).to be true
+        end
       end
     end
   end

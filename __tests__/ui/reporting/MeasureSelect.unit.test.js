@@ -1,6 +1,6 @@
 import MeasureSelect from '~/ui/reporting/MeasureSelect'
 import { SelectOption } from '~/ui/global/styled/forms'
-import { fakeItem } from '#/mocks/data'
+import { fakeItem, fakeDataset } from '#/mocks/data'
 
 const props = {}
 let wrapper
@@ -8,9 +8,8 @@ describe('MeasureSelect', () => {
   beforeEach(() => {
     props.item = {
       ...fakeItem,
-      data_settings: {
-        d_measure: null,
-      },
+      datasets: [fakeDataset],
+      primaryDataset: fakeDataset,
     }
     props.onSelect = jest.fn()
     props.dataSettingsName = 'measure'

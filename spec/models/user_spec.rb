@@ -594,4 +594,22 @@ describe User, type: :model do
       user.network_user
     end
   end
+
+  describe '#incentive_due_date' do
+    let(:user) { create(:user) }
+
+    it 'is nil without an incentive record' do
+      expect(user.incentive_due_date).to be_nil
+    end
+
+    context 'with incentive record' do
+      let!(:incentive) { create(:feedback_incentive_record, user: user) }
+
+      it 'is first incentive created_at + waiting period' do
+        expect(user.incentive_due_date).to be_within(0.1).of(
+          incentive.created_at + FeedbackIncentiveRecord::PAYMENT_WAITING_PERIOD,
+        )
+      end
+    end
+  end
 end

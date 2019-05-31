@@ -12,6 +12,7 @@ const AudienceCheckbox = ({
   audienceId,
   audienceName,
   onToggleCheckbox,
+  disabled,
 }) => (
   <StyledRowFlexParent>
     <StyledRowFlexItem>
@@ -26,6 +27,7 @@ const AudienceCheckbox = ({
             onChange={onToggleCheckbox}
             value={audienceId}
             color={'default'}
+            disabled={disabled}
           />
         }
         label={
@@ -43,6 +45,11 @@ AudienceCheckbox.propTypes = {
   audienceId: PropTypes.string.isRequired,
   audienceName: PropTypes.string.isRequired,
   onToggleCheckbox: PropTypes.func.isRequired,
+  disabled: PropTypes.bool,
+}
+
+AudienceCheckbox.defaultProps = {
+  disabled: false,
 }
 
 export default AudienceCheckbox

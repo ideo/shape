@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190522210918) do
+ActiveRecord::Schema.define(version: 20190530193416) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -75,14 +75,21 @@ ActiveRecord::Schema.define(version: 20190522210918) do
     t.index ["user_id"], name: "index_applications_on_user_id"
   end
 
-  create_table "audiences", force: :cascade do |t|
-    t.string "name"
-    t.string "criteria"
+  create_table "audience_organizations", force: :cascade do |t|
+    t.bigint "audience_id"
     t.bigint "organization_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["audience_id"], name: "index_audience_organizations_on_audience_id"
+    t.index ["organization_id"], name: "index_audience_organizations_on_organization_id"
+  end
+
+  create_table "audiences", force: :cascade do |t|
+    t.string "name"
+    t.string "criteria"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.decimal "price_per_response", precision: 10, scale: 2, default: "0.0"
-    t.index ["organization_id"], name: "index_audiences_on_organization_id"
   end
 
   create_table "collection_cards", force: :cascade do |t|
@@ -114,6 +121,15 @@ ActiveRecord::Schema.define(version: 20190522210918) do
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
     t.index ["templated_from_id"], name: "index_collection_cards_on_templated_from_id"
     t.index ["type"], name: "index_collection_cards_on_type"
+  end
+
+  create_table "collection_cover_items", force: :cascade do |t|
+    t.bigint "collection_id"
+    t.bigint "item_id"
+    t.integer "order"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["collection_id", "item_id"], name: "index_collection_cover_items_on_collection_id_and_item_id", unique: true
   end
 
   create_table "collections", force: :cascade do |t|
@@ -182,6 +198,40 @@ ActiveRecord::Schema.define(version: 20190522210918) do
     t.datetime "updated_at", null: false
     t.jsonb "draftjs_data"
     t.index ["comment_thread_id"], name: "index_comments_on_comment_thread_id"
+  end
+
+  create_table "data_items_datasets", force: :cascade do |t|
+    t.bigint "data_item_id"
+    t.bigint "dataset_id"
+    t.integer "order", null: false
+    t.boolean "selected", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["data_item_id", "dataset_id", "order", "selected"], name: "data_items_datasets_aggregate_index"
+    t.index ["data_item_id", "dataset_id"], name: "index_data_items_datasets_on_data_item_id_and_dataset_id", unique: true
+  end
+
+  create_table "datasets", force: :cascade do |t|
+    t.string "type"
+    t.string "identifier"
+    t.string "measure"
+    t.string "question_type"
+    t.string "url"
+    t.integer "chart_type"
+    t.integer "max_domain"
+    t.integer "timeframe"
+    t.integer "total"
+    t.jsonb "cached_data"
+    t.jsonb "style"
+    t.bigint "organization_id"
+    t.string "data_source_type"
+    t.bigint "data_source_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "description"
+    t.jsonb "groupings", default: []
+    t.index ["data_source_type", "data_source_id"], name: "index_datasets_on_data_source_type_and_data_source_id"
+    t.index ["organization_id"], name: "index_datasets_on_organization_id"
   end
 
   create_table "external_records", force: :cascade do |t|
@@ -287,6 +337,7 @@ ActiveRecord::Schema.define(version: 20190522210918) do
     t.bigint "roles_anchor_collection_id"
     t.integer "report_type"
     t.integer "legend_item_id"
+    t.integer "legend_search_source"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
     t.index ["created_at"], name: "index_items_on_created_at"
@@ -347,8 +398,7 @@ ActiveRecord::Schema.define(version: 20190522210918) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "open_response_item_id"
-    t.index ["question_id"], name: "index_question_answers_on_question_id"
-    t.index ["survey_response_id"], name: "index_question_answers_on_survey_response_id"
+    t.index ["survey_response_id", "question_id"], name: "index_question_answers_on_survey_response_id_and_question_id", unique: true
   end
 
   create_table "roles", force: :cascade do |t|
@@ -422,6 +472,8 @@ ActiveRecord::Schema.define(version: 20190522210918) do
     t.decimal "price_per_response", precision: 10, scale: 2
     t.string "network_payment_id"
     t.integer "launched_by_id"
+    t.integer "status", default: 0
+    t.datetime "closed_at"
     t.index ["audience_id"], name: "index_test_audiences_on_audience_id"
     t.index ["test_collection_id"], name: "index_test_audiences_on_test_collection_id"
   end
@@ -459,6 +511,7 @@ ActiveRecord::Schema.define(version: 20190522210918) do
     t.string "phone"
     t.integer "feedback_contact_preference", default: 0
     t.boolean "feedback_terms_accepted", default: false
+    t.boolean "respondent_terms_accepted", default: false
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"

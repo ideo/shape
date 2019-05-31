@@ -66,6 +66,9 @@ class Collection
              :gives_incentive?,
              :test_status,
              :collection_to_test,
+             :purchased?,
+             :link_sharing?,
+             :test_audiences,
              to: :test_collection
 
     after_commit :close_test, if: :archived_on_previous_save?
@@ -77,6 +80,12 @@ class Collection
              through: :primary_collection_cards
 
     has_many :survey_responses, through: :test_collection
+
+    COLLECTION_SUFFIX = ' Feedback Design'.freeze
+
+    def self.generate_name(name)
+      "#{name}#{COLLECTION_SUFFIX}"
+    end
 
     def duplicate!(**args)
       duplicate = super(args)
