@@ -1,30 +1,30 @@
 class SurveyResponseCompletion < SimpleService
+
+  delegate :test_collection, to: :@survey_response
+  delegate :test_audience, to: :@survey_response, allow_nil: true
+
   def initialize(survey_response)
     @survey_response = survey_response
   end
 
   def call
-    update_survey_status
+    @survey_response.save
+    @survey_response.cache_test_scores!
+    update_test_audience_status
     find_or_create_incentive_record
     ping_collection
-    # TODO: (when we get to this story) calculate if test_audience has reached its max # of responses
   end
 
   private
 
-  def update_survey_status
-    test_collection = @survey_response.test_collection
-    if test_collection.live?
-      @survey_response.completed!
-    else
-      @survey_response.completed_late!
-    end
+  def update_test_audience_status
+    return if test_audience.blank?
 
-    @survey_response.cache_test_scores!
+    test_audience.survey_response_completed!
   end
 
   def find_or_create_incentive_record
-    return unless @survey_response.test_collection.gives_incentive?
+    return unless test_collection.gives_incentive?
 
     user = @survey_response.user
     return unless user.present?
@@ -41,6 +41,6 @@ class SurveyResponseCompletion < SimpleService
 
   def ping_collection
     # real-time update any graphs, etc.
-    CollectionUpdateBroadcaster.call(@survey_response.test_collection)
+    CollectionUpdateBroadcaster.call(test_collection)
   end
 end

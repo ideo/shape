@@ -1,0 +1,17 @@
+<div class="feedback-email">
+  <div class="subject">Your Feedback is complete!</div>
+  <div class="section">
+    <div class='p'>
+      Your recent request for <%= pluralize(@sample_size, 'response') %>
+      for <%= @test_collection.name %> has been completed.
+    </div>
+
+    <div class='p'>
+      To see how they responded, click below!
+    </div>
+  </div>
+
+  <div class='email-link email-link__capitalized'>
+    <%= link_to "Go To #{@test_collection.name} Feedback", @collection_url %>
+  </div>
+</div>

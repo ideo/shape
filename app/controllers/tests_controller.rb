@@ -45,8 +45,10 @@ class TestsController < ApplicationController
 
   def look_up_test_audience
     test_audiences = @collection.test_audiences
+    # ta is used when we are sourcing people for a test (a manual url param we use)
     if params[:ta].present?
       @test_audience = test_audiences.find_by(id: params[:ta])
+    # token is when we have explicitly invited an audience member to take a test
     elsif params[:token].present?
       invitation = TestAudienceInvitation.valid.find_by_invitation_token(params[:token])
       if user_signed_in? && current_user.id == invitation.user_id && test_audiences.include?(invitation.test_audience)

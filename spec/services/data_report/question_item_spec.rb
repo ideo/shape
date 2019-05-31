@@ -24,19 +24,26 @@ RSpec.describe DataReport::QuestionItem, type: :service do
   end
 
   context 'with responses' do
-    let(:test_collection) { create(:test_collection, num_cards: 1, organization: organization) }
+    let!(:test_collection) { create(:test_collection, :completed, num_cards: 1, organization: organization) }
+    before { test_collection.launch! }
     # Create another test collection so we have other responses in the org
-    let(:other_test_collection) { create(:test_collection, :with_responses, organization: organization) }
+    let(:other_test_collection) do
+      create(:test_collection,
+             :with_responses,
+             num_responses: 5,
+             organization: organization)
+    end
     let!(:survey_response) { create(:survey_response, test_collection: test_collection) }
     let!(:question_item) { survey_response.question_items.select(&:question_useful?).first }
-    let!(:question_answer) do
-      create(:question_answer,
-             survey_response: survey_response,
-             question: question_item)
+    let!(:question_answers) do
+      survey_response.question_items.map do |question_item|
+        create(:question_answer,
+               survey_response: survey_response,
+               question: question_item)
+      end
     end
 
     before do
-      survey_response.update_attribute(:status, :completed)
       other_test_collection.reload
     end
 
@@ -78,7 +85,7 @@ RSpec.describe DataReport::QuestionItem, type: :service do
         it 'returns org-wide data' do
           expect(DataReport::QuestionItem.call(dataset: dataset)).to match_array(
             [
-              { column: 1, value: 6, percentage: 100 },
+              { column: 1, value: 7, percentage: 100 },
               { column: 2, value: 0, percentage: 0 },
               { column: 3, value: 0, percentage: 0 },
               { column: 4, value: 0, percentage: 0 },
@@ -88,10 +95,10 @@ RSpec.describe DataReport::QuestionItem, type: :service do
       end
 
       describe '#total' do
-        it 'returns 6' do
+        it 'returns 7' do
           expect(
             DataReport::QuestionItem.new(dataset: dataset).total,
-          ).to eq(6)
+          ).to eq(7)
         end
       end
     end
@@ -99,7 +106,6 @@ RSpec.describe DataReport::QuestionItem, type: :service do
     context 'filtering by test audience' do
       let!(:audience) { create(:audience, organizations: [organization]) }
       let!(:test_audience) { create(:test_audience, audience: audience, test_collection: test_collection) }
-
       let!(:survey_response) { create(:survey_response, test_collection: test_collection, test_audience: test_audience) }
       let!(:question_item) { survey_response.question_items.select(&:question_useful?).first }
       let!(:dataset) do
@@ -108,9 +114,12 @@ RSpec.describe DataReport::QuestionItem, type: :service do
                question_type: question_item.question_type,
                groupings: [{ type: 'TestAudience', id: test_audience.id }])
       end
-
-      before do
-        survey_response.update_attribute(:status, :completed)
+      let!(:question_answers) do
+        survey_response.question_items.map do |question_item|
+          create(:question_answer,
+                 survey_response: survey_response,
+                 question: question_item)
+        end
       end
 
       it 'returns test audience data' do
