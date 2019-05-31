@@ -13,13 +13,13 @@ class TestCollectionMailer < ApplicationMailer
   end
 
   def notify_closed(collection_id:, user_id:)
-    @collection = Collection.find(collection_id)
+    @test_collection = Collection.find(collection_id)
     @user = User.find(user_id)
-    @closed_at = @collection.last_paid_audience_closed_at
-    @collection_url = frontend_url_for(@collection)
+    @sample_size = @test_collection.paid_audiences_sample_size
+    @collection_url = frontend_url_for(@test_collection)
     mail(
       to: @user.email,
-      subject: "Your #{@collection.name} feedback has been completed.",
+      subject: "Your #{@test_collection.name} feedback has been completed.",
     )
   end
 

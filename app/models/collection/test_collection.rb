@@ -600,8 +600,8 @@ class Collection
       link_sharing_audience.present?
     end
 
-    def last_paid_audience_closed_at
-      test_audiences.paid.closed.ordered_last_closed_at.first&.closed_at
+    def paid_audiences_sample_size
+      test_audiences.paid.sum(:sample_size)
     end
   end
 end

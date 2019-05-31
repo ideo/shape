@@ -1,3 +1,5 @@
-Timestamp: <%= @closed_at.to_s(:long_ordinal) %>
-Feedback: <%= @collection.name %>
-View: <%= @collection_url %>
+Your recent request for <%= pluralize(@sample_size, 'response') %> for <%= @test_collection.name %> has been completed.
+
+To see how they responded, click below:
+
+<%= @collection_url %>
