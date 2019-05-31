@@ -17,7 +17,7 @@ const DotContainer = styled.div`
 
 const Dot = styled.div`
   background-color: ${({ isCurrent }) =>
-    isCurrent ? v.colors.primaryDark : v.colors.commonMedium};
+    isCurrent ? v.colors.primaryDark : v.colors.commonDark};
   border-radius: 50%;
   display: block;
   height: ${({ scaleDown }) => 12 / (scaleDown + 1)}px;
