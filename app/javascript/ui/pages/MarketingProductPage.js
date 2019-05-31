@@ -8,7 +8,6 @@ import {
   MarketingBack,
   MarketingFlex,
   MarketingStandaloneVideoWrapper,
-  VideoDimensions,
   MarketingH1Bold,
 } from '~/ui/global/styled/marketing.js'
 import { DisplayText } from '~/ui/global/styled/typography'
@@ -53,8 +52,8 @@ class MarketingProductPage extends React.Component {
             <MarketingStandaloneVideoWrapper>
               <ReactPlayer
                 url={hero.videoUrl}
-                height={VideoDimensions.height}
-                width={VideoDimensions.width}
+                height="100%"
+                width="100%"
                 playing={false}
               />
             </MarketingStandaloneVideoWrapper>

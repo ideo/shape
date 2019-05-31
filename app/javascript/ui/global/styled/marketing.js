@@ -227,9 +227,12 @@ export const MarketingVideoLink = styled(MarketingCallToAction)`
 `
 MarketingVideoLink.displayName = 'StyledMarketingVideoLink'
 
+const videoRatio = 1.7777777778
+const videoWidth = 780
+
 export const VideoDimensions = {
-  width: '780px',
-  height: '439px',
+  width: `${videoWidth}px`,
+  height: `${Math.round(videoWidth / videoRatio)}px`,
 }
 
 /** @component */
@@ -238,8 +241,13 @@ export const MarketingVideoWrapper = styled.div`
   z-index: ${props => (props.videoPlaying ? '1' : '-1')};
   height: ${props => (props.videoPlaying ? VideoDimensions.height : '0')};
   width: ${props => (props.videoPlaying ? VideoDimensions.width : '0')};
+  max-width: 100vw;
   opacity: ${props => (props.videoPlaying ? '1' : '0')};
-  background-color: rgba(0, 0, 0, 0.3);
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    width: 100vw;
+    margin-left: auto;
+    margin-right: auto;
+  }
 `
 
 MarketingVideoWrapper.displayName = 'StyledMarketingVideoWrapper'
@@ -249,7 +257,12 @@ export const MarketingStandaloneVideoWrapper = styled.div`
   z-index: 1;
   height: ${VideoDimensions.height};
   width: ${VideoDimensions.width};
-  background-color: rgba(0, 0, 0, 0.3);
+  max-width: 100vw;
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    width: 100vw;
+    margin-left: auto;
+    margin-right: auto;
+  }
 `
 
 MarketingStandaloneVideoWrapper.displayName =
