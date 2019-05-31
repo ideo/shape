@@ -88,6 +88,10 @@ class TestSurveyPage extends React.Component {
     )
   }
 
+  get includeTerms() {
+    return !this.currentUser || !this.currentUser.respondent_terms_accepted
+  }
+
   get renderSurvey() {
     const { collection, createSurveyResponse } = this
     const { surveyResponse } = this.state
@@ -101,6 +105,7 @@ class TestSurveyPage extends React.Component {
           createSurveyResponse={createSurveyResponse}
           editing={false}
           includeRecontactQuestion={this.includeRecontactQuestion}
+          includeTerms={this.includeTerms}
         />
       </StyledSurvey>
     )

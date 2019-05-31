@@ -495,6 +495,7 @@ ActiveRecord::Schema.define(version: 20190530193416) do
     t.string "phone"
     t.integer "feedback_contact_preference", default: 0
     t.boolean "feedback_terms_accepted", default: false
+    t.boolean "respondent_terms_accepted", default: false
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"

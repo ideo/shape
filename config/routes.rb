@@ -139,7 +139,7 @@ Rails.application.routes.draw do
           get 'user_notifications'
         end
       end
-      resources :test_audiences, only: %i[create update]
+      resources :test_audiences, only: %i[create update destroy]
       scope :filestack do
         get 'token', to: 'filestack#token', as: :filestack_token
       end
@@ -157,6 +157,7 @@ Rails.application.routes.draw do
 
       namespace :admin do
         resources :users, only: %i[index destroy create]
+        resources :test_collections, only: %i[index]
       end
     end
   end

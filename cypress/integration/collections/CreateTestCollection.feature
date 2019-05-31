@@ -37,6 +37,7 @@ Feature: Creating a Test Collection
     When I capture the current URL
     And I visit the current Test URL
     Then I should see a "StandaloneTestSurvey"
+    When I accept the feedback survey terms
     Then I should see "Why Coding Needs" in a "GridCard"
     Then I should see a question with "ScaleEmojiHolder" and 4 emojis
     When I click the last "ScaleEmojiBtn"
