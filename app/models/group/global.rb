@@ -19,5 +19,9 @@ class Group
     def org_group?
       false
     end
+
+    def requires_org?
+      false
+    end
   end
 end

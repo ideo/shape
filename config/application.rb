@@ -20,7 +20,7 @@ module Shape
   SUPPORT_EMAIL = 'hello@shape.space'.freeze
   ZENDESK_EMAIL = 'help@shape.space'.freeze
   IDEO_PRODUCTS_GROUP_ID = 27
-  COMMON_RESOURCE_GROUP_ID = ENV['COMMON_RESOURCE_GROUP_ID'] || 1000
+  COMMON_RESOURCE_GROUP_ID = (ENV['COMMON_RESOURCE_GROUP_ID'] || 1000).to_i
 
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.

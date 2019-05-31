@@ -41,6 +41,7 @@ class Group < ApplicationRecord
   before_validation :set_handle_if_none, on: :create
 
   validates :name, presence: true
+  validates :organization_id, presence: true, if: :requires_org?
 
   validates :handle,
             uniqueness: { scope: :organization_id },
@@ -54,6 +55,8 @@ class Group < ApplicationRecord
   # Searchkick Config
   searchkick callbacks: :async, word_start: %i[name handle]
   scope :search_import, -> { where(archived: false) }
+  # includes global groups
+  scope :viewable_in_org, ->(id) { where(organization_id: [nil, id]) }
 
   def search_data
     {
@@ -128,6 +131,10 @@ class Group < ApplicationRecord
   # just to make Groups play nice with resourceable shared methods
   def roles_anchor_collection_id
     nil
+  end
+
+  def requires_org?
+    true
   end
 
   private
