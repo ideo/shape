@@ -606,7 +606,7 @@ describe User, type: :model do
       let!(:incentive) { create(:feedback_incentive_record, user: user) }
 
       it 'is first incentive created_at + waiting period' do
-        expect(user.incentive_due_date).to eq(
+        expect(user.incentive_due_date).to be_within(0.1).of(
           incentive.created_at + FeedbackIncentiveRecord::PAYMENT_WAITING_PERIOD,
         )
       end

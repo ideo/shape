@@ -242,11 +242,6 @@ class PageHeader extends React.Component {
 
     const rolesRecord = uiStore.rolesMenuOpen ? uiStore.rolesMenuOpen : record
 
-    console.log(
-      'sdf',
-      (record.isLiveTest && record.has_link_sharing) ||
-        record.collection_to_test_id
-    )
     return (
       <StyledHeader data-empty-space-click>
         <MaxWidthContainer>
