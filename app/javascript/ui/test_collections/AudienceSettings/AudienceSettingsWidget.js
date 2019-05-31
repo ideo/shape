@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { filter, sortBy } from 'lodash'
+import { filter, reject, sortBy } from 'lodash'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
 
@@ -97,6 +97,32 @@ class AudienceSettingsWidget extends React.Component {
     return sortBy(defaultAudiences, a => a.price_per_response)
   }
 
+  organizationAudiences() {
+    const { audiences } = this.props
+    const orgAudiences = reject(audiences, a => a.global)
+    return sortBy(orgAudiences, a => a.name)
+  }
+
+  addAudienceMenuItems() {
+    const orgAudiences = this.organizationAudiences()
+    const audienceItems = orgAudiences.map(audience => ({
+      name: audience.name,
+      onClick: () => this.addAudience(audience),
+    }))
+
+    audienceItems.push({
+      name: 'New Audience',
+      iconLeft: <PlusIcon />,
+      onClick: this.openAddAudienceModal,
+    })
+
+    return audienceItems
+  }
+
+  addAudience(audience) {
+    console.log('add audience', audience)
+  }
+
   audienceSelected(audience) {
     const { audienceSettings } = this.props
     const option = audienceSettings[audience.id]
@@ -144,14 +170,6 @@ class AudienceSettingsWidget extends React.Component {
     const { totalPrice } = this.props
     const defaultAudiences = this.defaultAudiences()
 
-    const addAudienceMenuItems = [
-      {
-        name: 'New Audience',
-        iconLeft: <PlusIcon />,
-        onClick: this.openAddAudienceModal,
-      },
-    ]
-
     const newAudienceButton = (
       <Flex align="center">
         <StyledRowFlexItem style={{ marginTop: '5px' }}>
@@ -165,7 +183,7 @@ class AudienceSettingsWidget extends React.Component {
             <PopoutMenu
               wrapperClassName="add-audience-menu"
               menuOpen={this.state.addAudienceMenuOpen}
-              menuItems={addAudienceMenuItems}
+              menuItems={this.addAudienceMenuItems()}
               hideDotMenu
             />
           </AddAudienceMenu>
