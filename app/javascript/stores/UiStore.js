@@ -101,8 +101,12 @@ export default class UiStore {
     onConfirm: null,
     onCancel: null,
     iconName: null,
+    confirmImage: null,
     confirmText: 'OK',
+    confirmPrompt: null,
+    cancelImage: null,
     cancelText: 'Cancel',
+    cancelPrompt: null,
     closeable: true,
     fadeOutTime: undefined,
     snoozeChecked: false,
@@ -123,8 +127,6 @@ export default class UiStore {
   snackbarConfig = { ...this.defaultSnackbarProps }
   @observable
   blurContent = false
-  @observable
-  orgCreated = false
   @observable
   searchText = ''
   @observable

@@ -20,8 +20,24 @@ class CreateOrgPage extends React.Component {
   }
 
   onConfirm = () => {
-    const { uiStore } = this.props
+    const { apiStore, uiStore, commonViewableResource } = this.props
     uiStore.openOrgCreateModal()
+    if (commonViewableResource) {
+      // this will actually happen after you've created your org
+      uiStore.update('actionAfterRoute', () => {
+        // viewing collection will be the user's My Collection at this point
+        const { viewingCollection } = uiStore
+        const data = {
+          to_id: viewingCollection.id,
+          from_id: viewingCollection.id,
+          collection_card_ids: [
+            commonViewableResource.parent_collection_card.id,
+          ],
+          placement: 'end',
+        }
+        apiStore.linkCards(data)
+      })
+    }
   }
 
   onCancel = () => {
@@ -53,9 +69,15 @@ class CreateOrgPage extends React.Component {
   }
 }
 
+CreateOrgPage.propTypes = {
+  commonViewableResource: MobxPropTypes.objectOrObservableObject,
+}
 CreateOrgPage.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+CreateOrgPage.defaultProps = {
+  commonViewableResource: null,
 }
 
 export default CreateOrgPage
