@@ -4,7 +4,7 @@ class UrlsController < ApplicationController
 
   def passthru
     url = params.require(:url)
-    html = HTTParty.get(URI.encode(url))
+    html = HTTParty.get(URI.encode(url), timeout: 10, retries: 1)
     render html: html.response.body.html_safe
   rescue StandardError
     head :bad_request
