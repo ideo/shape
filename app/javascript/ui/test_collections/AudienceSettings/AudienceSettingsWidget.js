@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import { filter, sortBy } from 'lodash'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
 
@@ -53,6 +54,12 @@ class AudienceSettingsWidget extends React.Component {
     this.setState({ addAudienceModalOpen: false })
   }
 
+  defaultAudiences() {
+    const { audiences } = this.props
+    const defaultAudiences = filter(audiences, a => a.global)
+    return sortBy(defaultAudiences, a => a.price_per_response)
+  }
+
   audienceSelected(audience) {
     const { audienceSettings } = this.props
     const option = audienceSettings[audience.id]
@@ -97,7 +104,8 @@ class AudienceSettingsWidget extends React.Component {
   }
 
   render() {
-    const { audiences, totalPrice } = this.props
+    const { totalPrice } = this.props
+    const defaultAudiences = this.defaultAudiences()
 
     const newAudienceButton = (
       <Flex align="center">
@@ -118,13 +126,14 @@ class AudienceSettingsWidget extends React.Component {
         </StyledRowFlexCell>
       </React.Fragment>
     )
+
     return (
       <AudienceSettingsWrapper>
         <h3 style={{ marginBottom: '0px' }}>Audience</h3>
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <MobileWrapper>
             <StyledColumnFlexParent>
-              {audiences.map(audience => {
+              {defaultAudiences.map(audience => {
                 return (
                   <StyledColumnFlexParent key={audience.id}>
                     {this.renderCheckbox(audience)}
@@ -147,7 +156,7 @@ class AudienceSettingsWidget extends React.Component {
                 <StyledRowFlexItem />
                 <TableHeader />
               </StyledRowFlexParent>
-              {audiences.map(audience => {
+              {defaultAudiences.map(audience => {
                 return (
                   <StyledRowFlexParent key={audience.id}>
                     {this.renderCheckbox(audience)}
