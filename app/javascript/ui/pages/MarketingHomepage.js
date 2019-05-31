@@ -14,7 +14,6 @@ import {
   MarketingVideoWrapper,
   MarketingCallToAction,
   MarketingGradientTop,
-  VideoDimensions,
 } from '~/ui/global/styled/marketing.js'
 import MarketingMenu from '~/ui/marketing/MarketingMenu'
 import ContentBlock from '~/ui/marketing/ContentBlock'
@@ -87,8 +86,8 @@ class MarketingPage extends React.Component {
               <MarketingVideoWrapper videoPlaying={videoPlaying}>
                 <ReactPlayer
                   url={hero && hero.videoUrl}
-                  height={videoPlaying ? VideoDimensions.height : '0px'}
-                  width={videoPlaying ? VideoDimensions.width : '0px'}
+                  height={videoPlaying ? '100%' : '0px'}
+                  width={videoPlaying ? '100%' : '0px'}
                   playing={videoPlaying}
                 />
               </MarketingVideoWrapper>
@@ -101,9 +100,12 @@ class MarketingPage extends React.Component {
                     {hero && hero.getStartedButton}
                   </MarketingCallToAction>
                 </a>
-                <MarketingVideoLink onClick={this.toggleVideoPlaying}>
-                  {videoPlayingButtonText}
-                </MarketingVideoLink>
+                {hero &&
+                  hero.videoUrl && (
+                    <MarketingVideoLink onClick={this.toggleVideoPlaying}>
+                      {videoPlayingButtonText}
+                    </MarketingVideoLink>
+                  )}
               </MarketingHeroButtonContainer>
             </Center>
           </MarketingGradientTop>
