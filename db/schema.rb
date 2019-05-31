@@ -75,14 +75,21 @@ ActiveRecord::Schema.define(version: 20190529222849) do
     t.index ["user_id"], name: "index_applications_on_user_id"
   end
 
-  create_table "audiences", force: :cascade do |t|
-    t.string "name"
-    t.string "criteria"
+  create_table "audience_organizations", force: :cascade do |t|
+    t.bigint "audience_id"
     t.bigint "organization_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["audience_id"], name: "index_audience_organizations_on_audience_id"
+    t.index ["organization_id"], name: "index_audience_organizations_on_organization_id"
+  end
+
+  create_table "audiences", force: :cascade do |t|
+    t.string "name"
+    t.string "criteria"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.decimal "price_per_response", precision: 10, scale: 2, default: "0.0"
-    t.index ["organization_id"], name: "index_audiences_on_organization_id"
   end
 
   create_table "collection_cards", force: :cascade do |t|
@@ -114,6 +121,15 @@ ActiveRecord::Schema.define(version: 20190529222849) do
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
     t.index ["templated_from_id"], name: "index_collection_cards_on_templated_from_id"
     t.index ["type"], name: "index_collection_cards_on_type"
+  end
+
+  create_table "collection_cover_items", force: :cascade do |t|
+    t.bigint "collection_id"
+    t.bigint "item_id"
+    t.integer "order"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["collection_id", "item_id"], name: "index_collection_cover_items_on_collection_id_and_item_id", unique: true
   end
 
   create_table "collections", force: :cascade do |t|
