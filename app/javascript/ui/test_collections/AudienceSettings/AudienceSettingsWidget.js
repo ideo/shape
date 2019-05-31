@@ -194,7 +194,9 @@ class AudienceSettingsWidget extends React.Component {
             />
           </AddAudienceMenu>
         </StyledRowFlexItem>
-        <ClickWrapper clickHandlers={[this.closeAddAudienceMenu]} />
+        {addAudienceMenuOpen && (
+          <ClickWrapper clickHandlers={[this.closeAddAudienceMenu]} />
+        )}
       </Flex>
     )
 
