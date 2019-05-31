@@ -19,7 +19,7 @@ const QuestionSpacing = css`
   border-bottom-width: 4px;
 `
 
-const QuestionSpacingContainer = styled.div`
+export const QuestionSpacingContainer = styled.div`
   ${QuestionSpacing};
 `
 

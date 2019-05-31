@@ -525,3 +525,20 @@ export const fakeSurveyResponse = {
   question_answers: [],
   ...fakeJsonApiAttrs,
 }
+export const fakeAudience = {
+  id: '1',
+  name: 'Anybody'
+}
+export const fakeTestAudience = {
+  id: '1',
+  audience: fakeAudience,
+  sample_size: 12,
+  num_survey_responses: 6,
+}
+export const fakeTestCollection = {
+  id: '1',
+  type: 'test_collections',
+  name: 'Test Collection',
+  test_launched_at: new Date('2019-05-09T03:18:00'),
+  test_audiences: [fakeTestAudience],
+}

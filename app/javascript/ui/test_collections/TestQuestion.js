@@ -9,8 +9,9 @@ import FinishQuestion from '~/ui/test_collections/FinishQuestion'
 import RecontactQuestion from '~/ui/test_collections/RecontactQuestion'
 import NextTestQuestion from '~/ui/test_collections/NextTestQuestion'
 import NewQuestionGraphic from '~/ui/icons/NewQuestionGraphic'
-import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
 import OpenQuestion from '~/ui/test_collections/OpenQuestion'
+import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
+import TermsQuestion from '~/ui/test_collections/TermsQuestion'
 import { QuestionText } from '~/ui/test_collections/shared'
 import { apiStore, uiStore } from '~/stores'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
@@ -38,7 +39,7 @@ const QuestionCardInner = styled.div`
 
 @observer
 class TestQuestion extends React.Component {
-  handleQuestionAnswer = async ({ text, number } = {}) => {
+  handleQuestionAnswer = async answer => {
     const {
       card,
       item,
@@ -46,11 +47,15 @@ class TestQuestion extends React.Component {
       createSurveyResponse,
       afterQuestionAnswered,
     } = this.props
+    const { text, number } = answer
     let { surveyResponse, questionAnswer } = this.props
     // components should never trigger this when editing, but double-check here
     if (editing) return
-    if (card.card_question_type === 'question_recontact') {
-      afterQuestionAnswered(card)
+    if (
+      card.card_question_type === 'question_recontact' ||
+      card.card_question_type === 'question_terms'
+    ) {
+      afterQuestionAnswered(card, answer)
       return
     }
 
@@ -185,6 +190,14 @@ class TestQuestion extends React.Component {
             sessionUid={surveyResponse.session_uid}
           />
         )
+      case 'question_terms':
+        return (
+          <TermsQuestion
+            user={apiStore.currentUser}
+            onAnswer={this.handleQuestionAnswer}
+          />
+        )
+
       default:
         return <NewQuestionGraphic />
     }
