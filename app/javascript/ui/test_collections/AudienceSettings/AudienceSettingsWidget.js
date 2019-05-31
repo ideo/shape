@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { filter, reject, sortBy } from 'lodash'
+import { concat, filter, reject, sortBy } from 'lodash'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
 
@@ -72,6 +72,7 @@ class AudienceSettingsWidget extends React.Component {
   state = {
     addAudienceMenuOpen: false,
     addAudienceModalOpen: false,
+    selectedOrgAudiences: [],
   }
 
   toggleAddAudienceMenu = () => {
@@ -120,7 +121,11 @@ class AudienceSettingsWidget extends React.Component {
   }
 
   addAudience(audience) {
-    console.log('add audience', audience)
+    this.closeAddAudienceMenu()
+
+    const { selectedOrgAudiences } = this.state
+    selectedOrgAudiences.push(audience)
+    this.setState({ selectedOrgAudiences })
   }
 
   audienceSelected(audience) {
@@ -168,7 +173,8 @@ class AudienceSettingsWidget extends React.Component {
 
   render() {
     const { totalPrice } = this.props
-    const defaultAudiences = this.defaultAudiences()
+    const { addAudienceMenuOpen, selectedOrgAudiences } = this.state
+    const audiences = concat(this.defaultAudiences(), selectedOrgAudiences)
 
     const newAudienceButton = (
       <Flex align="center">
@@ -182,7 +188,7 @@ class AudienceSettingsWidget extends React.Component {
           <AddAudienceMenu>
             <PopoutMenu
               wrapperClassName="add-audience-menu"
-              menuOpen={this.state.addAudienceMenuOpen}
+              menuOpen={addAudienceMenuOpen}
               menuItems={this.addAudienceMenuItems()}
               hideDotMenu
             />
@@ -207,7 +213,7 @@ class AudienceSettingsWidget extends React.Component {
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <MobileWrapper>
             <StyledColumnFlexParent>
-              {defaultAudiences.map(audience => {
+              {audiences.map(audience => {
                 return (
                   <StyledColumnFlexParent key={audience.id}>
                     {this.renderCheckbox(audience)}
@@ -230,7 +236,7 @@ class AudienceSettingsWidget extends React.Component {
                 <StyledRowFlexItem />
                 <TableHeader />
               </StyledRowFlexParent>
-              {defaultAudiences.map(audience => {
+              {audiences.map(audience => {
                 return (
                   <StyledRowFlexParent key={audience.id}>
                     {this.renderCheckbox(audience)}
