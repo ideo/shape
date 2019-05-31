@@ -352,8 +352,7 @@ class GridCard extends React.Component {
         dragging={dragging}
         draggingMultiple={draggingMultiple}
         testCollectionCard={testCollectionCard}
-        unclickable={testCollectionCard || record.isImage}
-        // mostly for E2E checking purposes
+        unclickable={testCollectionCard || record.isImage} // mostly for E2E checking purposes
         data-width={card.width}
         data-height={card.height}
         data-order={card.order}
@@ -381,6 +380,7 @@ class GridCard extends React.Component {
               color={this.actionsColor}
               className="show-on-hover"
               zoomLevel={zoomLevel}
+              data-cy="CardActionMenu"
             >
               {record.isDownloadable && <Download record={record} />}
               {record.canSetACover && (

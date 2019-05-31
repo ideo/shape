@@ -260,7 +260,10 @@ class MoveModal extends React.Component {
           title="Place at top"
           placement="top"
         >
-          <button onClick={this.handleMoveToBeginning}>
+          <button
+            onClick={this.handleMoveToBeginning}
+            data-cy="MoveModalArrow-up"
+          >
             <MoveArrowIcon direction="up" />
           </button>
         </Tooltip>
@@ -276,7 +279,7 @@ class MoveModal extends React.Component {
           title="Place at bottom"
           placement="top"
         >
-          <button onClick={this.handleMoveToEnd}>
+          <button onClick={this.handleMoveToEnd} data-cy="MoveModalArrow-down">
             <MoveArrowIcon direction="down" />
           </button>
         </Tooltip>
@@ -324,7 +327,7 @@ class MoveModal extends React.Component {
                 <StyledSnackbarContent
                   classes={{ root: 'SnackbarContent' }}
                   message={
-                    <StyledSnackbarText id="message-id">
+                    <StyledSnackbarText data-cy="MoveModalText" id="message-id">
                       {this.moveMessage}
                     </StyledSnackbarText>
                   }

@@ -41,18 +41,31 @@ Feature: Undo actions
     Then I should see the last of 3 cards as 1x1
 
     # Undo moving cards to a collection
-    # select cards
-    # click action menu
-    # click move
-    # verify MDL snackbar pill exists
-    # click target collection
-    # verify MDL snackbar pill exists
-    # click down or up arrow
+    When I select the index 0 text card
+    And I select the index 2 collection card
+    And I click the action menu for the index 0 card
+    And I click the move action for the index 0 card
+    And I close the move helper modal
+    Then I should see "2 in transit" in a ".MuiSnackbarContent-message"
+
+    And I navigate to the collection named "Inner Collection" via the "CollectionCover"
+    Then I should see "2 in transit" in a ".MuiSnackbarContent-message"
+    And I click the down arrow on the MDL snackbar
     # verify cards are set down
-    # When I undo with CTRL+Z
-    # And I wait for "@apiGetCollection" to finish
-    # And I wait for "@apiGetInMyCollection" to finish
-    # verify cards are where they should be
+    Then I should see a collection card named "Hello World"
+    Then I should see a "TextItemCover" in the first card
+    Then I should see the value "Testing" in the first text item
+    And I close the snackbar
+    When I undo with CTRL+Z
+    And I wait for "@apiGetCollection" to finish
+    And I wait for "@apiGetInMyCollection" to finish
+    # Do we need to wait for move API call too?
+
+    Then I should see a collection card named "Hello World"
+    Then I should see a collection card named "Inner Collection"
+    Then I should see a "TextItemCover" in the index 0 card
+    Then I should see a "CollectionCover" in the index 1 card
+    Then I should see a "CollectionCover" in the index 2 card
 
     # empty stack
     When I undo with CTRL+Z
