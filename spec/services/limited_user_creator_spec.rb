@@ -109,7 +109,7 @@ RSpec.describe LimitedUserCreator, type: :service do
         LimitedUserCreator.call(contact_info: contact_info, date_of_participation: date_of_participation)
 
         user = User.last
-        expect(user.created_at).to eq(date_of_participation)
+        expect(user.created_at.to_i).to eq(date_of_participation.to_i)
       end
 
       it 'should create a TestAudienceInvitation' do
@@ -118,7 +118,7 @@ RSpec.describe LimitedUserCreator, type: :service do
         user = User.last
         invitation = TestAudienceInvitation.last
         expect(invitation.user).to eq(user)
-        expect(invitation.created_at).to eq(date_of_participation)
+        expect(invitation.created_at.to_i).to eq(date_of_participation.to_i)
       end
     end
   end
