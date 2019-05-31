@@ -17,7 +17,9 @@ import TableBody from './TableBody'
 import AudienceCheckbox from './AudienceCheckbox'
 import AddAudienceModal from './AddAudienceModal'
 import Button from '~shared/components/atoms/Button'
-import PlusIcon from '~shared/images/icon-plus.svg'
+import PlusIcon from '~/ui/icons/PlusIcon'
+import PopoutMenu from '~/ui/global/PopoutMenu'
+import ClickWrapper from '~/ui/layout/ClickWrapper'
 
 const AudienceSettingsWrapper = styled.div`
   width: 100%;
@@ -40,13 +42,48 @@ const MobileWrapper = styled.div`
   }
 `
 
+const AddAudienceButton = styled(Button)`
+  z-index: ${v.zIndex.aboveClickWrapper};
+`
+
+const AddAudienceMenu = styled.span`
+  .menu-wrapper {
+    left: 0;
+    top: -35px;
+  }
+
+  .icon {
+    left: 0;
+    line-height: 2.4rem !important;
+    margin-right: 8px;
+    position: relative !important;
+    vertical-align: middle;
+  }
+`
+
+const StyledPlusIcon = styled.span`
+  height: 15px;
+  margin-right: 8px;
+  width: 15px;
+`
+
 @observer
 class AudienceSettingsWidget extends React.Component {
   state = {
+    addAudienceMenuOpen: false,
     addAudienceModalOpen: false,
   }
 
+  toggleAddAudienceMenu = () => {
+    this.setState({ addAudienceMenuOpen: !this.state.addAudienceMenuOpen })
+  }
+
+  closeAddAudienceMenu = () => {
+    this.setState({ addAudienceMenuOpen: false })
+  }
+
   openAddAudienceModal = () => {
+    this.closeAddAudienceMenu()
     this.setState({ addAudienceModalOpen: true })
   }
 
@@ -107,14 +144,33 @@ class AudienceSettingsWidget extends React.Component {
     const { totalPrice } = this.props
     const defaultAudiences = this.defaultAudiences()
 
+    const addAudienceMenuItems = [
+      {
+        name: 'New Audience',
+        iconLeft: <PlusIcon />,
+        onClick: this.openAddAudienceModal,
+      },
+    ]
+
     const newAudienceButton = (
       <Flex align="center">
         <StyledRowFlexItem style={{ marginTop: '5px' }}>
-          <Button href="#" onClick={this.openAddAudienceModal}>
-            <PlusIcon width={15} style={{ fill: v.colors.black }} />
-            New Audience
-          </Button>
+          <AddAudienceButton onClick={this.toggleAddAudienceMenu}>
+            <StyledPlusIcon>
+              <PlusIcon />
+            </StyledPlusIcon>
+            Audience
+          </AddAudienceButton>
+          <AddAudienceMenu>
+            <PopoutMenu
+              wrapperClassName="add-audience-menu"
+              menuOpen={this.state.addAudienceMenuOpen}
+              menuItems={addAudienceMenuItems}
+              hideDotMenu
+            />
+          </AddAudienceMenu>
         </StyledRowFlexItem>
+        <ClickWrapper clickHandlers={[this.closeAddAudienceMenu]} />
       </Flex>
     )
 
