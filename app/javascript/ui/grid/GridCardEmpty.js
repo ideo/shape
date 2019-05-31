@@ -6,10 +6,23 @@ import v from '~/utils/variables'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
 import HotspotHelperGraphic from '~/ui/icons/HotspotHelperGraphic'
+import PlusIcon from '~/ui/icons/PlusIcon'
+import { StyledPlusIcon } from '~/ui/grid/FoamcoreGrid'
 
 const StyledGridCardEmpty = styled.div`
   width: 100%;
   height: 100%;
+  position: relative;
+
+   &:hover {
+    background-color: ${v.colors.primaryLight} !important;
+    .plus-icon {
+      display: block;
+    }
+  }
+  .plus-icon {
+    display: none;
+  }
 `
 
 const StyledHotspotHelper = styled.div`
@@ -29,23 +42,24 @@ const StyledHotspotHelper = styled.div`
 @inject('apiStore', 'uiStore')
 @observer
 class GridCardEmpty extends React.Component {
-  get showHelper() {
-    const { uiStore, apiStore } = this.props
-    if (uiStore.blankContentToolIsOpen) {
-      return false
+  onClickHotspot = () => {
+    const { uiStore, card, position } = this.props
+    const order = card.order
+    const collection = card.parentCollection
+    // confirmEdit will check if we're in a template and need to confirm changes
+    if (collection) {
+      collection.confirmEdit({
+        onConfirm: () => uiStore.openBlankContentTool({ order }),
+      })
+      return
     }
-    return apiStore.currentUser.show_helper
-  }
-
-  hideHelper = () => {
-    const { apiStore } = this.props
-    apiStore.currentUser.API_hideHelper()
+    uiStore.openBlankContentTool({ order })
   }
 
   render() {
     const { card, dragging, showHotspot, showHotEdge } = this.props
     return (
-      <StyledGridCardEmpty>
+      <StyledGridCardEmpty onClick={this.onClickHotspot}>
         {showHotspot && (
           <GridCardHotspot
             card={card}
@@ -54,12 +68,9 @@ class GridCardEmpty extends React.Component {
             showHotEdge={showHotEdge}
           />
         )}
-        {this.showHelper && (
-          <StyledHotspotHelper>
-            <HotspotHelperGraphic />
-            <CloseButton onClick={this.hideHelper} />
-          </StyledHotspotHelper>
-        )}
+        <StyledPlusIcon className="plus-icon">
+          <PlusIcon />
+        </StyledPlusIcon>
       </StyledGridCardEmpty>
     )
   }
