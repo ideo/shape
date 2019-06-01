@@ -32,7 +32,7 @@ describe('AdminFeedback', () => {
 
     it('shows audience data for each test', () => {
       const audienceRowItems = wrapper.find('AudienceRowItem')
-      expect(audienceRowItems.length).toEqual(3)
+      expect(audienceRowItems.length).toEqual(4)
 
       const audienceName = audienceRowItems.at(0)
       expect(audienceName.html()).toContain(fakeAudience.name)

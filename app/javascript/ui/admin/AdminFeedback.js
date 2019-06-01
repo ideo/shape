@@ -7,8 +7,10 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import Box from '~shared/components/atoms/Box'
 import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import LeftButtonIcon from '~/ui/icons/LeftButtonIcon'
+import SearchIcon from '~/ui/icons/SearchIcon'
 import Section from '~shared/components/molecules/Section'
 import v from '~/utils/variables'
+import { AddButton } from '~/ui/global/styled/buttons'
 import { Heading1, Heading2, Heading3 } from '~/ui/global/styled/typography'
 import * as colors from '~shared/styles/constants/colors'
 
@@ -104,6 +106,10 @@ class AdminFeedback extends React.Component {
     this.loadTestCollections(this.state.currentPage + 1)
   }
 
+  searchForRespondents(testAudience) {
+    console.log('search for respondents', testAudience.audience.name)
+  }
+
   renderTestCollections() {
     return this.state.testCollections.map(testCollection => (
       <React.Fragment key={testCollection.id}>
@@ -122,16 +128,25 @@ class AdminFeedback extends React.Component {
           <Grid container item xs={6}>
             {testCollection.test_audiences.map(testAudience => (
               <React.Fragment key={testAudience.id}>
-                <AudienceRowItem item xs={4}>
+                <AudienceRowItem item xs={6}>
                   {testAudience.audience.name}
                 </AudienceRowItem>
-                <AudienceRowItem item xs={4}>
+                <AudienceRowItem item xs={2}>
                   <Flex justify="flex-end">
                     {testAudience.num_survey_responses}
                   </Flex>
                 </AudienceRowItem>
-                <AudienceRowItem item xs={4}>
+                <AudienceRowItem item xs={2}>
                   <Flex justify="flex-end">{testAudience.sample_size}</Flex>
+                </AudienceRowItem>
+                <AudienceRowItem item xs={2}>
+                  <Flex justify="flex-end">
+                    <AddButton
+                      onClick={() => this.searchForRespondents(testAudience)}
+                    >
+                      <SearchIcon />
+                    </AddButton>
+                  </Flex>
                 </AudienceRowItem>
               </React.Fragment>
             ))}
@@ -169,22 +184,27 @@ class AdminFeedback extends React.Component {
               <Grid item xs={2}>
                 <Heading3>Time Since Launch</Heading3>
               </Grid>
-              <Grid item xs={2}>
+              <Grid item xs={3}>
                 <Flex column>
                   <Heading3>Audience(s)</Heading3>
                   <SubHeading>Audience Name</SubHeading>
                 </Flex>
               </Grid>
-              <Grid item xs={2}>
+              <Grid item xs={1}>
                 <SubHeadingWrapper>
                   <SubHeading>Complete Responses</SubHeading>
                 </SubHeadingWrapper>
               </Grid>
-              <Grid item xs={2}>
+              <Grid item xs={1}>
                 <SubHeadingWrapper>
-                  <SubHeading>Total Requested</SubHeading>
+                  <SubHeading>
+                    Total
+                    <br />
+                    Requested
+                  </SubHeading>
                 </SubHeadingWrapper>
               </Grid>
+              <Grid item xs={1} />
             </Grid>
             <Grid container>
               <Grid item xs={12}>
