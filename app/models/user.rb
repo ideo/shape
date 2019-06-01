@@ -110,6 +110,8 @@ class User < ApplicationRecord
              class_name: 'Collection',
              optional: true
 
+  has_many :test_audience_invitations
+
   validates :email, presence: true, uniqueness: true, if: :email_required?
   validates :uid, :provider, presence: true, if: :active?
   validates :uid, uniqueness: { scope: :provider }, if: :active?

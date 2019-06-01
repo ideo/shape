@@ -31,6 +31,28 @@ class Api::V1::Admin::UsersController < Api::V1::BaseController
 
   def search
     audience = Audience.find(params[:audience_id])
-    render jsonapi: User.tagged_with(audience.tag_list)
+    users = User.tagged_with(audience.tag_list)
+                .left_outer_joins(:test_audience_invitations)
+                .select('users.*, MAX(test_audience_invitations.created_at) AS date_of_participation')
+                .group('users.id')
+                .order('date_of_participation ASC')
+                .uniq
+    render jsonapi: sort_users(users)
+  end
+
+  private
+
+  def sort_users(users)
+    users.sort do |u1, u2|
+      if u1.date_of_participation.nil? && u2.date_of_participation.nil?
+        0
+      elsif u1.date_of_participation.nil?
+        -1
+      elsif u2.date_of_participation.nil?
+        1
+      else
+        u1.date_of_participation <=> u2.date_of_participation
+      end
+    end
   end
 end

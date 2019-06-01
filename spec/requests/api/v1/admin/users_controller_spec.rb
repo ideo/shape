@@ -69,19 +69,63 @@ describe Api::V1::Admin::UsersController, type: :request, json: true, auth: true
     let(:tag_list) { %w[millenial usa]}
     let(:audience) { create(:audience, tag_list: tag_list) }
     let(:path) { "/api/v1/admin/users/search?audience_id=#{audience.id}" }
+    let(:test_collection1) { create(:test_collection) }
+    let(:test_collection2) { create(:test_collection) }
+    let(:test_audience1) do
+      create(:test_audience,
+             audience: audience,
+             test_collection: test_collection1,
+             sample_size: 10)
+    end
+    let(:test_audience2) do
+      create(:test_audience,
+             audience: audience,
+             test_collection: test_collection2,
+             sample_size: 10)
+    end
     let!(:millenial_user) { create(:user, tag_list: ['millennial']) }
     let!(:usa_user) { create(:user, tag_list: ['usa']) }
-    let!(:millenial_usa_user) { create(:user, tag_list: tag_list) }
+    let!(:millenial_usa_user1) { create(:user, tag_list: tag_list) }
+    let!(:millenial_invitation1) do
+      create(
+        :test_audience_invitation,
+        user: millenial_usa_user1,
+        test_audience: test_audience1,
+        created_at: Time.now - 2.days,
+      )
+    end
+    let!(:millenial_usa_user2) { create(:user, tag_list: tag_list) }
+    let!(:millenial_invitation2) do
+      create(
+        :test_audience_invitation,
+        user: millenial_usa_user2,
+        test_audience: test_audience1,
+        created_at: Time.now - 1.day,
+      )
+    end
+    let!(:millenial_invitation3) do
+      create(
+        :test_audience_invitation,
+        user: millenial_usa_user2,
+        test_audience: test_audience2,
+        created_at: Time.now,
+      )
+    end
     let!(:everything_user) { create(:user, tag_list: %w[millenial usa everything])}
 
     it 'returns users tagged with the given audience tags' do
       get path
 
-      expect(json['data'].size).to eq(2)
+      expect(json['data'].size).to eq(3)
 
-      user_ids = json['data'].pluck('id')
-      expect(user_ids).to include(millenial_usa_user.id.to_s)
-      expect(user_ids).to include(everything_user.id.to_s)
+      actual_user_ids = json['data'].pluck('id')
+      expected_user_ids = [
+        everything_user.id.to_s,
+        millenial_usa_user1.id.to_s,
+        millenial_usa_user2.id.to_s,
+      ]
+
+      expect(actual_user_ids).to eq(expected_user_ids)
     end
   end
 end
