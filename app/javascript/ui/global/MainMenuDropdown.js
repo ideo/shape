@@ -202,7 +202,7 @@ class MainMenuDropdown extends React.Component {
       bottom: [
         { name: 'New Organization', onClick: this.handleNewOrg },
         { name: 'Contact Support', onClick: this.handleZendesk },
-        { name: 'Legal', onClick: this.handleLegal },
+        { name: 'Terms and Privacy', onClick: this.handleLegal },
       ],
     }
     // splice these into the correct placement
