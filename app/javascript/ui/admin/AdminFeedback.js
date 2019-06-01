@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { Flex } from 'reflexbox'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
+import AdminRespondentsModal from './AdminRespondentsModal'
 import Box from '~shared/components/atoms/Box'
 import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import LeftButtonIcon from '~/ui/icons/LeftButtonIcon'
@@ -83,6 +84,8 @@ class AdminFeedback extends React.Component {
     testCollections: [],
     currentPage: 1,
     totalPages: 1,
+    respondentsModalOpen: false,
+    testAudience: null,
   }
 
   componentDidMount() {
@@ -108,6 +111,11 @@ class AdminFeedback extends React.Component {
 
   searchForRespondents(testAudience) {
     console.log('search for respondents', testAudience.audience.name)
+    this.setState({ respondentsModalOpen: true, testAudience })
+  }
+
+  closeRespondentsModal = () => {
+    this.setState({ respondentsModalOpen: false })
   }
 
   renderTestCollections() {
@@ -162,7 +170,12 @@ class AdminFeedback extends React.Component {
   }
 
   render() {
-    const { currentPage, totalPages } = this.state
+    const {
+      currentPage,
+      totalPages,
+      respondentsModalOpen,
+      testAudience,
+    } = this.state
     const previousPageDisabled = currentPage === 1
     const nextPageDisabled = currentPage === totalPages
 
@@ -237,6 +250,13 @@ class AdminFeedback extends React.Component {
             </Grid>
           )}
         </Section>
+        {respondentsModalOpen && (
+          <AdminRespondentsModal
+            open={respondentsModalOpen}
+            close={this.closeRespondentsModal}
+            testAudience={testAudience}
+          />
+        )}
       </Wrapper>
     )
   }
