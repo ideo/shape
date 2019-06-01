@@ -67,6 +67,8 @@ class User < ApplicationRecord
          :rememberable, :validatable, :omniauthable,
          omniauth_providers: [:ideo]
 
+  acts_as_taggable
+
   has_many :collections,
            through: :roles,
            source: :resource,
