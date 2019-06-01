@@ -156,7 +156,11 @@ Rails.application.routes.draw do
       resources :audiences, only: %i[index show create]
 
       namespace :admin do
-        resources :users, only: %i[index destroy create]
+        resources :users, only: %i[index destroy create] do
+          collection do
+            get :search
+          end
+        end
         resources :test_collections, only: %i[index]
       end
     end

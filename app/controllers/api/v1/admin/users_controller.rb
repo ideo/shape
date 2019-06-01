@@ -28,4 +28,9 @@ class Api::V1::Admin::UsersController < Api::V1::BaseController
       render_api_errors []
     end
   end
+
+  def search
+    audience = Audience.find(params[:audience_id])
+    render jsonapi: User.tagged_with(audience.tag_list)
+  end
 end

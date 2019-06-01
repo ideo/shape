@@ -9,7 +9,7 @@ describe Api::V1::Admin::UsersController, type: :request, json: true, auth: true
 
   describe 'GET #index' do
     let!(:non_admin_user) { create(:user) }
-    let(:path) { "/api/v1/admin/users" }
+    let(:path) { '/api/v1/admin/users' }
 
     it 'returns a 200' do
       get(path)
@@ -38,7 +38,7 @@ describe Api::V1::Admin::UsersController, type: :request, json: true, auth: true
   end
 
   describe 'POST #create' do
-    let(:path) { "/api/v1/admin/users" }
+    let(:path) { '/api/v1/admin/users' }
     let(:users) { create_list(:user, 3) }
     let(:user_ids) { users.map(&:id) }
     let(:users_json) { json_included_objects_of_type('users') }
@@ -62,6 +62,26 @@ describe Api::V1::Admin::UsersController, type: :request, json: true, auth: true
         users: users,
         send_invites: true,
       )
+    end
+  end
+
+  describe 'GET #search' do
+    let(:tag_list) { %w[millenial usa]}
+    let(:audience) { create(:audience, tag_list: tag_list) }
+    let(:path) { "/api/v1/admin/users/search?audience_id=#{audience.id}" }
+    let!(:millenial_user) { create(:user, tag_list: ['millennial']) }
+    let!(:usa_user) { create(:user, tag_list: ['usa']) }
+    let!(:millenial_usa_user) { create(:user, tag_list: tag_list) }
+    let!(:everything_user) { create(:user, tag_list: %w[millenial usa everything])}
+
+    it 'returns users tagged with the given audience tags' do
+      get path
+
+      expect(json['data'].size).to eq(2)
+
+      user_ids = json['data'].pluck('id')
+      expect(user_ids).to include(millenial_usa_user.id.to_s)
+      expect(user_ids).to include(everything_user.id.to_s)
     end
   end
 end
