@@ -542,6 +542,32 @@ class CollectionGrid extends React.Component {
     cards.push(emptyCard)
   }
 
+  createEmptyCard = order => {
+    const emptyCard = {
+      id: 'empty',
+      cardType: 'empty',
+      width: 1,
+      height: 1,
+      order,
+    }
+    return emptyCard
+  }
+
+  addEmptyCards = (cards, matrix) => {
+    matrix.forEach(row => {
+      row.forEach((cell, colIdx) => {
+        // cell is empty
+        if (cell === null) {
+          const previousCell = row[colIdx - 1]
+          const previousCard = cards.find(c => c.id === previousCell)
+          if (!previousCard) return
+          const emptyCard = this.createEmptyCard(previousCard.order + 0.5)
+          cards.push(emptyCard)
+        }
+      })
+    })
+  }
+
   addPaginationCard = cards => {
     if (_.find(cards, { id: 'pagination' })) return
     let order = cards.length
@@ -738,6 +764,9 @@ class CollectionGrid extends React.Component {
     })
 
     let rows = matrix.length
+    if (addEmptyCard) this.addEmptyCards(cards, matrix)
+    const emptys = cards.filter(c => c.id === 'empty')
+    console.log(emptys)
     if (!addEmptyCard && _.isEmpty(_.compact(_.last(matrix)))) {
       // don't add space for an empty row if we don't want it to appear
       rows -= 1
