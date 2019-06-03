@@ -117,6 +117,16 @@ describe Resourceable, type: :concern do
         expect(collection.can_view?(group)).to be true
       end
     end
+
+    context 'with common_viewable resource' do
+      before do
+        collection.update(common_viewable: true)
+      end
+
+      it 'should be viewable' do
+        expect(collection.can_view?(user)).to be true
+      end
+    end
   end
 
   context 'getting all editors and viewers' do
@@ -188,6 +198,28 @@ describe Resourceable, type: :concern do
 
     it 'should use the roles_anchor for its dynamic methods' do
       expect(item.viewers).to eq collection.viewers
+    end
+
+    context 'with common_viewable and viewing_organization_id' do
+      before do
+        collection.update(common_viewable: true)
+      end
+
+      it 'should return common_viewable? true if the roles_anchor is common_viewable' do
+        expect(item.common_viewable?).to be true
+      end
+
+      it 'should return anchored_roles if viewing_organization_id == organization_id' do
+        expect(
+          item.anchored_roles(viewing_organization_id: item.organization_id),
+        ).to eq collection.roles
+      end
+
+      it 'should return empty if viewing_organization_id != organization_id' do
+        expect(
+          item.anchored_roles(viewing_organization_id: 999),
+        ).to eq []
+      end
     end
 
     describe '#inherit_roles_anchor_from_parent!' do

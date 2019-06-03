@@ -42,8 +42,9 @@
     "gives_incentive": { "type": ["boolean", "null"] },
     "joinable_group_id": { "type": ["string"] },
     "test_collection_id": { "type": ["string"] },
+    "test_closed_at": { "type": ["string"] },
     "frontend_url": { "type": ["string"] },
-    "test_closed_at": { "type": ["string"] }
+    "common_viewable": { "type": ["boolean", "null"] }
   },
   "required": ["name", "class_type", "created_at", "cover"]
 }

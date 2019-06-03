@@ -8,20 +8,18 @@
 #  price_per_response :decimal(10, 2)   default(0.0)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
-#  organization_id    :bigint(8)
-#
-# Indexes
-#
-#  index_audiences_on_organization_id  (organization_id)
 #
 
 class Audience < ApplicationRecord
-  belongs_to :organization, optional: true
+  has_many :audience_organizations, dependent: :destroy
+  has_many :organizations, through: :audience_organizations
 
   delegate :can_edit?,
            :can_view?,
            to: :organization,
            allow_nil: true
+
+  TARGETED_PRICE_PER_RESPONSE = 4.75
 
   def link_sharing?
     # NOTE: for now this logic should suffice, however we could eventually change it

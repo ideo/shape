@@ -6,8 +6,21 @@ class TestCollectionMailer < ApplicationMailer
     @feedback_collection_url = get_feedback_collection_url(@collection)
     @feedback_design_collection_url = frontend_url_for(@collection)
 
-    mail to: Shape::ZENDESK_EMAIL,
+    mail(
+      to: Shape::ZENDESK_EMAIL,
       subject: "Shape Feedback: #{@collection.name} launched | ID: #{@collection.id}"
+    )
+  end
+
+  def notify_closed(collection_id:, user_id:)
+    @test_collection = Collection.find(collection_id)
+    @user = User.find(user_id)
+    @sample_size = @test_collection.paid_audiences_sample_size
+    @collection_url = frontend_url_for(@test_collection)
+    mail(
+      to: @user.email,
+      subject: "Your #{@test_collection.name} feedback has been completed.",
+    )
   end
 
   private

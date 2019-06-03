@@ -7,6 +7,7 @@ import FlipMove from 'react-flip-move'
 import { Element as ScrollElement, scroller } from 'react-scroll'
 import { ThemeProvider } from 'styled-components'
 
+import ProgressDots from '~/ui/global/ProgressDots'
 import {
   TestQuestionHolder,
   styledTestTheme,
@@ -28,6 +29,8 @@ class TestSurveyResponder extends React.Component {
   recontactAnswered = false
   @observable
   termsAnswered = false
+  @observable
+  currentCardIdx = 0
 
   componentDidMount() {
     this.initializeCards()
@@ -85,6 +88,10 @@ class TestSurveyResponder extends React.Component {
   answerableCard = card =>
     UNANSWERABLE_QUESTION_TYPES.indexOf(card.card_question_type) === -1
 
+  get answerableCards() {
+    return this.questionCards.filter(card => this.answerableCard(card))
+  }
+
   get viewableCards() {
     const { questionCards } = this
 
@@ -94,7 +101,6 @@ class TestSurveyResponder extends React.Component {
       if (card.id !== 'recontact' && card.id !== 'terms')
         card.record.disableMenu()
       if (reachedLastVisibleCard) {
-        // console.log('reachedLastVisibleCard')
         return false
       } else if (
         !this.answerableCard(card) ||
@@ -103,7 +109,6 @@ class TestSurveyResponder extends React.Component {
         // If not answerable, or they already answered, show it
         return true
       }
-      console.log('end')
       reachedLastVisibleCard = true
       return true
     })
@@ -132,9 +137,12 @@ class TestSurveyResponder extends React.Component {
     const { questionCards } = this
     const { containerId } = this.props
     const index = questionCards.indexOf(card)
+    const answerableIdx = this.answerableCards.indexOf(card)
+    runInAction(() => {
+      this.currentCardIdx = answerableIdx + 1
+    })
     const nextCard = questionCards[index + 1]
     if (!nextCard) return
-    console.log(this.viewableCards, nextCard.id)
     scroller.scrollTo(`card-${nextCard.id}`, {
       duration: 400,
       smooth: true,
@@ -156,6 +164,10 @@ class TestSurveyResponder extends React.Component {
     return (
       <ThemeProvider theme={styledTestTheme(theme)}>
         <div id="surveyContainer">
+          <ProgressDots
+            totalAmount={this.answerableCards.length + 1}
+            currentProgress={this.currentCardIdx}
+          />
           {this.viewableCards.map(card => (
             // ScrollElement only gets the right offsetTop if outside the FlipMove
             <ScrollElement name={`card-${card.id}`} key={card.id}>

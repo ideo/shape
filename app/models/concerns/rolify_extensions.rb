@@ -104,6 +104,7 @@ module RolifyExtensions
       existing &&
       existing.name.to_sym != resource.class.edit_role
     )
+
     # this will re-start the add_role process, after first removing user's viewer role
     return upgrade_to_edit_role(resource) if should_upgrade
     return existing if existing.present?
@@ -115,7 +116,7 @@ module RolifyExtensions
       raise "RolifyExtension: Unsupported model '#{self.class.name}' for add_role"
     end
     sync_groups_after_adding(role) if is_a?(User)
-    after_role_update(role)
+    after_role_update(role, :add)
     role
   end
 
@@ -139,7 +140,7 @@ module RolifyExtensions
     end
     return role if resource.blank?
     sync_groups_after_removing(role) if is_a?(User)
-    after_role_update(role)
+    after_role_update(role, :remove)
     role
   end
 

@@ -33,5 +33,15 @@ class Audience extends BaseRecord {
     if (!this.currentTestAudience) return 0
     return this.currentTestAudience.sample_size
   }
+
+  async API_create() {
+    const { uiStore } = this
+
+    try {
+      await this.create()
+    } catch (e) {
+      uiStore.defaultAlertError()
+    }
+  }
 }
 export default Audience

@@ -93,6 +93,18 @@ RSpec.describe TestComparison do
         expect(add).to be false
       end
     end
+
+    context 'if dataset is already linked' do
+      before do
+        test_data_item.data_items_datasets.create(
+          dataset: comparison_data_item.datasets.first,
+        )
+      end
+
+      it 'does not raise exception' do
+        expect { add }.not_to raise_error
+      end
+    end
   end
 
   describe '#remove' do
