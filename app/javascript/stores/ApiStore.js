@@ -277,6 +277,14 @@ class ApiStore extends jsonapi(datxCollection) {
     })
   }
 
+  async searchForRespondents(testAudience, numRespondents) {
+    const url = `admin/users/search?audience_id=${
+      testAudience.audience.id
+    }&num_respondents=${numRespondents}`
+    const res = await this.request(url)
+    return res.data
+  }
+
   async fetchTestCollections(page = 1) {
     const res = await this.request(`admin/test_collections?page=${page}`)
     return {
