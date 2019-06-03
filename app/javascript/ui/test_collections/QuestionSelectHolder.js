@@ -29,6 +29,29 @@ function optionSort(a, b) {
   return a.label.localeCompare(b.label)
 }
 
+const questionSelectOption = opt => {
+  const { value, label, category } = opt
+
+  let rootClass
+  if (category) rootClass = 'category'
+  else if (!value) rootClass = 'grayedOut'
+  else rootClass = 'selectOption'
+
+  return (
+    <SelectOption
+      key={value}
+      classes={{
+        root: rootClass,
+        selected: 'selected',
+      }}
+      disabled={!value}
+      value={value}
+    >
+      <span data-cy="QuestionSelectOption">{label}</span>
+    </SelectOption>
+  )
+}
+
 const QuestionSelectHolder = ({
   card,
   canEdit,
@@ -54,19 +77,18 @@ const QuestionSelectHolder = ({
           value={card.card_question_type || ''}
           onChange={handleSelectChange(card)}
         >
-          {TEST_COLLECTION_SELECT_OPTIONS.sort(optionSort).map(opt => (
-            <SelectOption
-              key={opt.value}
-              classes={{
-                root: !opt.value ? 'grayedOut' : 'selectOption',
-                selected: 'selected',
-              }}
-              disabled={!opt.value}
-              value={opt.value}
-            >
-              <span data-cy="QuestionSelectOption">{opt.label}</span>
-            </SelectOption>
-          ))}
+          {TEST_COLLECTION_SELECT_OPTIONS.map(optGroup => {
+            const options = []
+            if (optGroup.category) {
+              options.push({
+                value: '',
+                label: optGroup.category,
+                category: true,
+              })
+            }
+            optGroup.values.sort(optionSort).forEach(opt => options.push(opt))
+            return options.map(opt => questionSelectOption(opt))
+          })}
         </Select>
       )}
       {canEdit &&
