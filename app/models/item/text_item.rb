@@ -94,8 +94,9 @@ class Item
     end
 
     def sanitize_text(text)
-      regex = /&amp;/
-      text.gsub(regex, '&')
+      text.gsub!(/&amp;/, '&')
+      text.gsub!(/&lt;/, '<')
+      text.gsub!(/&gt;/, '>')
     end
   end
 end
