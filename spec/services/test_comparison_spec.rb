@@ -95,14 +95,17 @@ RSpec.describe TestComparison do
     end
 
     context 'if dataset is already linked' do
-      before do
+      let!(:data_items_dataset) do
         test_data_item.data_items_datasets.create(
           dataset: comparison_data_item.datasets.first,
+          selected: false,
         )
       end
 
-      it 'does not raise exception' do
-        expect { add }.not_to raise_error
+      it 'makes sure it is selected' do
+        expect(data_items_dataset.selected).to be false
+        expect(add).to be true
+        expect(data_items_dataset.reload.selected).to be true
       end
     end
   end
