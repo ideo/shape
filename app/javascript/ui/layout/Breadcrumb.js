@@ -1,10 +1,11 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
+import { observable, action } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
-import { apiStore, routingStore } from '~/stores'
+import { apiStore, uiStore, routingStore } from '~/stores'
 import v from '~/utils/variables'
 import Tooltip from '~/ui/global/Tooltip'
 import ArrowIcon from '~/ui/icons/ArrowIcon'
@@ -19,7 +20,6 @@ const StyledBreadcrumbWrapper = styled.div`
   margin-top: 0.5rem;
   height: 1.2rem;
   white-space: nowrap;
-  line-height: 1;
   font-size: 1rem;
   font-family: ${v.fonts.sans};
   font-weight: ${v.weights.book};
@@ -44,6 +44,9 @@ const BackIconContainer = styled.span`
 
 @observer
 class Breadcrumb extends React.Component {
+  @observable
+  breadcrumbWithLinks = []
+
   constructor(props) {
     super(props)
     this.breadcrumbWrapper = props.breadcrumbWrapper
@@ -52,6 +55,15 @@ class Breadcrumb extends React.Component {
   componentDidMount() {
     const { record, isHomepage } = this.props
     if (isHomepage) return
+    this.initBreadcrumb(record)
+  }
+
+  @action
+  initBreadcrumb(record) {
+    this.breadcrumbWithLinks.replace(
+      // this may also have the effect of marking uiStore.linkedInMyCollection
+      uiStore.linkedBreadcrumbTrailForRecord(record)
+    )
     // this will set record.inMyCollection = true/false
     apiStore.checkInMyCollection(record)
   }
@@ -78,7 +90,8 @@ class Breadcrumb extends React.Component {
     const { maxDepth, record } = this.props
     const items = []
     let middleName = ''
-    if (record.inMyCollection) {
+    const breadcrumb = this.breadcrumbWithLinks
+    if (record.inMyCollection || uiStore.linkedInMyCollection) {
       items.push({
         type: 'collections',
         id: 'homepage',
@@ -89,11 +102,12 @@ class Breadcrumb extends React.Component {
         ellipses: false,
       })
     }
-    if (!record.breadcrumb) return items
-    const len = record.breadcrumb.length
+    if (!breadcrumb) return items
+
+    const len = breadcrumb.length
     const longBreadcrumb = maxDepth && len >= maxDepth
 
-    _.each(record.breadcrumb, (item, idx) => {
+    _.each(breadcrumb, (item, idx) => {
       const { type, id } = item
       // use apiStore to observe record changes e.g. when editing current collection name
       const itemRecord = apiStore.find(type, id)
@@ -212,6 +226,12 @@ class Breadcrumb extends React.Component {
     return _.reject(items, { remove: true })
   }
 
+  restoreBreadcrumb = item => {
+    // this will clear out any links in the breadcrumb and revert it back to normal
+    uiStore.restoreBreadcrumb(item)
+    this.initBreadcrumb(this.props.record, true)
+  }
+
   renderBackButton() {
     const { backButton } = this.props
     const item = this.previousItem
@@ -258,6 +278,7 @@ class Breadcrumb extends React.Component {
                   item={item}
                   index={index}
                   numItems={items.length}
+                  restoreBreadcrumb={() => this.restoreBreadcrumb(item)}
                 />
               </span>
             ))}
@@ -268,7 +289,6 @@ class Breadcrumb extends React.Component {
   }
 }
 
-// TODO move wrapped props to certain place?
 Breadcrumb.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   isHomepage: PropTypes.bool,
