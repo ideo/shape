@@ -175,6 +175,15 @@ class Collection
       TestCollectionMailer.notify_launch(id).deliver_later if gives_incentive? && ENV['ENABLE_ZENDESK_FOR_TEST_LAUNCH']
     end
 
+    def test_audience_closed!
+      # Never close a test that still has link sharing enabled,
+      # or if there are any remaining paid audiences open
+      return if link_sharing_enabled? || any_paid_audiences_open?
+
+      # Otherwise close the test
+      close!
+    end
+
     def still_accepting_answers?
       return true if live?
       return false if test_closed_at.nil?
@@ -189,6 +198,8 @@ class Collection
       elsif submission_box_template_test?
         update_cached_submission_status(parent_submission_box_template)
         close_all_submissions_tests!
+      elsif gives_incentive?
+        NotifyFeedbackCompletedWorker.perform_async(id)
       end
     end
 
@@ -574,7 +585,7 @@ class Collection
 
     def gives_incentive?
       # right now the check is basically any paid tests == gives_incentive
-      test_audiences.where('price_per_response > 0').present?
+      test_audiences.paid.present?
     end
 
     def purchased?
@@ -586,11 +597,19 @@ class Collection
     end
 
     def link_sharing_audience
-      test_audiences.where(price_per_response: 0).first
+      test_audiences.link_sharing.first
+    end
+
+    def any_paid_audiences_open?
+      test_audiences.paid.open.count.positive?
     end
 
     def link_sharing_enabled?
       link_sharing_audience.present?
+    end
+
+    def paid_audiences_sample_size
+      test_audiences.paid.sum(:sample_size)
     end
   end
 end

@@ -8,7 +8,7 @@ import {
 } from '~/ui/global/styled/marketing.js'
 import v from '~/utils/variables'
 
-const StyledProductDescription = styled(MarketingContent)`
+const StyledHtmlImage = styled(MarketingContent)`
   margin-left: 24px;
   margin-right: 24px;
   padding-top: 0px;
@@ -33,17 +33,47 @@ const Title = styled(MarketingH1Bold)`
     line-height: 40px;
   }
 `
-const Description = styled(MarketingContent)`
+
+const StyledInnerHTML = styled.div`
   text-align: left;
   word-wrap: break-word;
   line-height: 25px;
   font-size: 18px;
-
-  @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
-    line-height: 1.4em;
-    font-size: 1.1em;
+  h3 {
+    text-transform: uppercase;
+    margin-top: 17px;
+    margin-bottom: 13px;
+    font-size: 0.9375rem;
+    font-weight: ${v.weights.medium};
+    letter-spacing: 0.0625rem;
+    color: ${v.colors.black};
+  }
+  ul {
+    list-style-type: disc;
+    margin-left: 20px;
+    padding: 10px 0;
+    li {
+      margin-bottom: 5px;
+    }
+  }
+  a {
+    margin: 10px 0;
+    display: block;
+    background-color: ${v.colors.caution};
+    border-radius: 4px;
+    border: 2px solid ${v.colors.caution};
+    padding: 12px 16px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-size: 14px;
+    font-weight: ${v.weights.medium};
+    width: 180px;
+    text-decoration: none;
+    text-align: center;
+    color: ${v.colors.black};
   }
 `
+StyledInnerHTML.displayName = 'StyledInnerHTML'
 
 const ImageDisplay = styled.img`
   object-fit: scale-down;
@@ -53,10 +83,12 @@ const ImageDisplay = styled.img`
   box-shadow: 0px 2px 16px ${v.colors.commonMedium};
 `
 
-class ProductDescription extends React.PureComponent {
+class ContentBlock extends React.PureComponent {
   render() {
+    const { order, title, content, imageUrl } = this.props
+    const html = `${content}` // needed due to https://reactjs.org/docs/jsx-in-depth.html#string-literals
     return (
-      <StyledProductDescription id={this.props.id} order={this.props.order}>
+      <StyledHtmlImage key={title.toString()} order={order}>
         <MarketingFlex
           w={1}
           mt={4}
@@ -70,30 +102,29 @@ class ProductDescription extends React.PureComponent {
         >
           <Box w={[null, 0.08]} order={1} />
 
-          <Box w={[1, 0.21]} order={[4, this.props.order % 2 === 1 ? 2 : 4]}>
-            <Title>{this.props.title}</Title>
-            <Description>{this.props.description}</Description>
+          <Box w={[1, 0.21]} order={[4, order % 2 === 1 ? 2 : 4]}>
+            <Title>{title}</Title>
+            {<StyledInnerHTML dangerouslySetInnerHTML={{ __html: html }} />}
           </Box>
 
           <Box w={[null, 0.09]} order={3} />
 
-          <Box w={[1, 0.54]} order={[2, this.props.order % 2 === 1 ? 4 : 2]}>
-            <ImageDisplay src={this.props.imageUrl} alt={this.props.title} />
+          <Box w={[1, 0.54]} order={[2, order % 2 === 1 ? 4 : 2]}>
+            <ImageDisplay src={imageUrl} alt={title} />
           </Box>
 
           <Box w={[null, 0.08]} order={4} />
         </MarketingFlex>
-      </StyledProductDescription>
+      </StyledHtmlImage>
     )
   }
 }
 
-ProductDescription.propTypes = {
-  id: PropTypes.string.isRequired,
+ContentBlock.propTypes = {
   order: PropTypes.number.isRequired,
   title: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
+  content: PropTypes.string.isRequired,
   imageUrl: PropTypes.string.isRequired,
 }
 
-export default ProductDescription
+export default ContentBlock

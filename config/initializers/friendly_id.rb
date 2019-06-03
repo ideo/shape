@@ -34,7 +34,7 @@ FriendlyId.defaults do |config|
     rails
     javascripts
     images
-
+    product
     passthru
     collections
     items

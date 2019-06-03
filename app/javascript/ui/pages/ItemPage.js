@@ -35,6 +35,9 @@ class ItemPage extends React.Component {
 
   onAPILoad = () => {
     const { item, apiStore, uiStore, routingStore } = this.props
+    if (uiStore.actionAfterRoute) {
+      uiStore.performActionAfterRoute()
+    }
     this.setState({ item }, async () => {
       uiStore.update('dragTargets', [])
       uiStore.setViewingItem(item)

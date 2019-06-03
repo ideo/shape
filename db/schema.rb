@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190529222849) do
+ActiveRecord::Schema.define(version: 20190530193416) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -121,15 +121,6 @@ ActiveRecord::Schema.define(version: 20190529222849) do
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
     t.index ["templated_from_id"], name: "index_collection_cards_on_templated_from_id"
     t.index ["type"], name: "index_collection_cards_on_type"
-  end
-
-  create_table "collection_cover_items", force: :cascade do |t|
-    t.bigint "collection_id"
-    t.bigint "item_id"
-    t.integer "order"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["collection_id", "item_id"], name: "index_collection_cover_items_on_collection_id_and_item_id", unique: true
   end
 
   create_table "collections", force: :cascade do |t|
@@ -292,9 +283,11 @@ ActiveRecord::Schema.define(version: 20190529222849) do
     t.datetime "archived_at"
     t.string "archive_batch"
     t.jsonb "autojoin_emails", default: []
+    t.string "type"
     t.index ["autojoin_emails"], name: "index_groups_on_autojoin_emails", using: :gin
     t.index ["handle"], name: "index_groups_on_handle"
     t.index ["organization_id"], name: "index_groups_on_organization_id"
+    t.index ["type"], name: "index_groups_on_type"
   end
 
   create_table "groups_roles", force: :cascade do |t|
@@ -398,8 +391,7 @@ ActiveRecord::Schema.define(version: 20190529222849) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "open_response_item_id"
-    t.index ["question_id"], name: "index_question_answers_on_question_id"
-    t.index ["survey_response_id"], name: "index_question_answers_on_survey_response_id"
+    t.index ["survey_response_id", "question_id"], name: "index_question_answers_on_survey_response_id_and_question_id", unique: true
   end
 
   create_table "roles", force: :cascade do |t|
@@ -473,6 +465,8 @@ ActiveRecord::Schema.define(version: 20190529222849) do
     t.decimal "price_per_response", precision: 10, scale: 2
     t.string "network_payment_id"
     t.integer "launched_by_id"
+    t.integer "status", default: 0
+    t.datetime "closed_at"
     t.index ["audience_id"], name: "index_test_audiences_on_audience_id"
     t.index ["test_collection_id"], name: "index_test_audiences_on_test_collection_id"
   end

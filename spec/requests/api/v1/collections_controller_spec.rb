@@ -94,7 +94,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       collection.recalculate_breadcrumb!
       get(path)
       expect(json['data']['attributes']['breadcrumb']).to match_array([
-        { 'type' => 'collections', 'id' => collection.id, 'name' => collection.name, 'can_edit' => false },
+        { type: 'collections', id: collection.id.to_s, name: collection.name, can_edit: false }.as_json,
       ])
     end
 
@@ -224,6 +224,18 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         get(path)
         expect(response.status).to eq(200)
         expect(user.current_organization).to eq other_org
+      end
+
+      context 'with a common_viewable resource' do
+        before do
+          collection.update(common_viewable: true)
+        end
+
+        it 'should not switch the user to the org' do
+          get(path)
+          expect(response.status).to eq(200)
+          expect(user.current_organization).not_to eq other_org
+        end
       end
     end
   end

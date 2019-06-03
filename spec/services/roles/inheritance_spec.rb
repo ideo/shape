@@ -223,6 +223,16 @@ RSpec.describe Roles::Inheritance, type: :service do
         expect(item.cached_inheritance['updated_at']).not_to be nil
       end
     end
+
+    context 'with common_viewable = true' do
+      before do
+        item.update(common_viewable: true)
+      end
+
+      it 'will mark private_child as false' do
+        expect(inheritance.private_child?(item)).to be false
+      end
+    end
   end
 
   def add_roles(role_name, user_or_users, object_or_objects)

@@ -51,6 +51,17 @@ RSpec.describe CardMover, type: :service do
         end
       end
 
+      context 'with link cards' do
+        let(:from_collection) do
+          create(:collection, organization: organization, num_cards: 3, record_type: :link_text, card_relation: :link)
+        end
+
+        it 'should not assign permissions' do
+          expect(Roles::MergeToChild).not_to receive(:call)
+          card_mover.call
+        end
+      end
+
       it 'should recalculate breadcrumbs' do
         card = moving_cards.first
         card.item.recalculate_breadcrumb!

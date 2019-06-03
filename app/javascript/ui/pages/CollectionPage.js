@@ -23,6 +23,7 @@ import v from '~/utils/variables'
 import Collection from '~/stores/jsonApi/Collection'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
 import routeToLogin from '~/utils/routeToLogin'
+import CreateOrgPage from '~/ui/pages/CreateOrgPage'
 
 // more global way to do this?
 pluralize.addPluralRule(/canvas$/i, 'canvases')
@@ -439,6 +440,8 @@ class CollectionPage extends React.Component {
 
     // submissions_collection will only exist for submission boxes
     const { isSubmissionBox, requiresTestDesigner } = collection
+    const userRequiresOrg =
+      !apiStore.currentUserOrganization && collection.common_viewable
 
     let inner
     if (collection.isBoard) {
@@ -470,6 +473,11 @@ class CollectionPage extends React.Component {
     return (
       <Fragment>
         <PageHeader record={collection} />
+        {userRequiresOrg && (
+          // for new user's trying to add a common resource, they'll see the Create Org modal
+          // pop up over the CollectionGrid
+          <CreateOrgPage commonViewableResource={collection} />
+        )}
         {!isLoading && (
           <PageContainer fullWidth={collection.isBoard}>
             <OverdueBanner />

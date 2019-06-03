@@ -13,8 +13,7 @@
 #
 # Indexes
 #
-#  index_question_answers_on_question_id         (question_id)
-#  index_question_answers_on_survey_response_id  (survey_response_id)
+#  index_question_answers_on_survey_response_id_and_question_id  (survey_response_id,question_id) UNIQUE
 #
 
 class QuestionAnswer < ApplicationRecord
@@ -33,7 +32,8 @@ class QuestionAnswer < ApplicationRecord
 
   after_commit :update_survey_response, on: %i[create destroy], if: :survey_response_present?
   after_commit :update_collection_test_scores, if: :survey_response_present?
-  before_save :update_open_response_item, if: :update_open_response_item?
+  before_create :create_open_response_item, if: :create_open_response_item?
+  after_update :update_open_response_item, if: :update_open_response_item?
   before_destroy :destroy_open_response_item_and_card, if: :open_response_item_present?
 
   private
@@ -50,16 +50,19 @@ class QuestionAnswer < ApplicationRecord
     survey_response_completed? &&
       question.question_open? &&
       question.test_open_responses_collection.present? &&
-      (answer_text_changed? || open_response_item.blank?)
+      (saved_change_to_answer_text? || open_response_item.blank?)
   end
 
   def update_open_response_item
     item = open_response_item
-    return create_open_response_item if item.blank?
     return destroy_open_response_item_and_card if answer_text.blank?
     item.content = answer_text
     item.import_plaintext_content(answer_text)
     item.save
+  end
+
+  def create_open_response_item?
+    question.test_open_responses_collection.present?
   end
 
   def create_open_response_item

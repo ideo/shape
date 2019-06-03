@@ -12,7 +12,11 @@ class OrganizationTemplates < SimpleService
 
   def copy_master_templates_into_org
     # NOTE: this also populates the first org admin's My Collection
-    return if @org.getting_started_collection.present? || getting_started_template.blank?
+    if @org.getting_started_collection.present? || getting_started_template.blank?
+      # kind of an escape hatch in case your env does not have a valid getting_started_template
+      @user&.current_user_collection&.update(awaiting_first_user_content: false)
+      return
+    end
 
     # create Getting Started collection for the org and the first admin user
     OrganizationTemplatesWorker.perform_in(

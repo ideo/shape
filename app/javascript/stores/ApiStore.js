@@ -123,6 +123,9 @@ class ApiStore extends jsonapi(datxCollection) {
 
   @computed
   get currentUserOrganization() {
+    if (!this.currentUserOrganizationId) {
+      return null
+    }
     return this.find('organizations', this.currentUserOrganizationId)
   }
 
