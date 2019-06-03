@@ -62,7 +62,7 @@ class AudienceSettingsWidget extends React.Component {
   sampleSize(audience) {
     const { audienceSettings } = this.props
     const option = audienceSettings[audience.id]
-    return option ? option.sample_size : ''
+    return option && option.sample_size ? option.sample_size.toString() : ''
   }
 
   isAudienceLocked(audience) {
@@ -97,9 +97,9 @@ class AudienceSettingsWidget extends React.Component {
   }
 
   render() {
-    const { audiences, totalPrice } = this.props
+    const { audiences, totalPrice, locked } = this.props
 
-    const newAudienceButton = (
+    let newAudienceButton = (
       <Flex align="center">
         <StyledRowFlexItem style={{ marginTop: '5px' }}>
           <Button href="#" onClick={this.openAddAudienceModal}>
@@ -109,6 +109,7 @@ class AudienceSettingsWidget extends React.Component {
         </StyledRowFlexItem>
       </Flex>
     )
+    if (locked) newAudienceButton = <div style={{ width: '250px' }} />
 
     const totalPriceDisplay = (
       <React.Fragment>
