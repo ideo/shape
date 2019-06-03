@@ -41,8 +41,10 @@ class ConfirmPriceModal extends React.Component {
     return (
       <form onSubmit={onSubmit}>
         <SpecialDisplayHeading wrapLine>
-          Your test "{testName}" is about to be launched. Your payment method
-          will be charged <strong>{totalPrice}</strong> for this feedback.
+          "{testName}" is about to be launched. You will receive an email
+          notification when your results are ready in 2-5 business days. Your
+          payment method will be charged <strong>{totalPrice}</strong> for this
+          feedback.
         </SpecialDisplayHeading>
         <StyledDiv
           style={{
