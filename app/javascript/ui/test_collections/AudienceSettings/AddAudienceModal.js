@@ -112,6 +112,8 @@ class AddAudienceModal extends React.Component {
     const audience = new Audience({ name, tag_list }, apiStore)
     await audience.API_create()
 
+    this.props.afterSave(audience)
+
     this.reset()
   }
 
@@ -379,6 +381,10 @@ class AddAudienceModal extends React.Component {
 AddAudienceModal.propTypes = {
   open: PropTypes.bool.isRequired,
   close: PropTypes.func.isRequired,
+  afterSave: PropTypes.func,
+}
+AddAudienceModal.defaultProps = {
+  afterSave: () => {},
 }
 AddAudienceModal.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,

@@ -108,7 +108,10 @@ class AudienceSettingsWidget extends React.Component {
     const orgAudiences = this.organizationAudiences()
     const audienceItems = orgAudiences.map(audience => ({
       name: audience.name,
-      onClick: () => this.addAudience(audience),
+      onClick: () => {
+        this.closeAddAudienceMenu()
+        this.addAudience(audience)
+      },
     }))
 
     audienceItems.push({
@@ -121,8 +124,6 @@ class AudienceSettingsWidget extends React.Component {
   }
 
   addAudience(audience) {
-    this.closeAddAudienceMenu()
-
     const { selectedOrgAudiences } = this.state
     selectedOrgAudiences.push(audience)
     this.setState({ selectedOrgAudiences })
@@ -259,6 +260,7 @@ class AudienceSettingsWidget extends React.Component {
         <AddAudienceModal
           open={this.state.addAudienceModalOpen}
           close={this.closeAddAudienceModal}
+          afterSave={audience => this.addAudience(audience)}
         />
       </AudienceSettingsWrapper>
     )
