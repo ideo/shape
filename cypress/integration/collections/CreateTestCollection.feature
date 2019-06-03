@@ -8,7 +8,7 @@ Feature: Creating a Test Collection
     And I wait for "@apiGetAudiences" to finish
     Then I should see "Test Prototype" in a "EditableNameHeading"
     # verify the existence of the default questions
-    Then I should see "Photo or Video of Idea" in a "QuestionSelectOption"
+    Then I should see "Photo/Video" in a "QuestionSelectOption"
     Then I should see "Description" in a "QuestionSelectOption"
     Then I should see "Useful" in a "QuestionSelectOption"
     Then I should see "End of Survey" in a ".DisplayText"
