@@ -1,15 +1,19 @@
 import Grid from '@material-ui/core/Grid'
 import moment from 'moment-mini'
 import styled from 'styled-components'
+import CopyToClipboard from 'react-copy-to-clipboard'
 import { Flex } from 'reflexbox'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import Box from '~shared/components/atoms/Box'
 import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import LeftButtonIcon from '~/ui/icons/LeftButtonIcon'
+import LinkIcon from '~/ui/icons/LinkIcon'
 import Section from '~shared/components/molecules/Section'
 import v from '~/utils/variables'
+import { CircledIcon } from '~/ui/global/styled/buttons'
 import { Heading1, Heading2, Heading3 } from '~/ui/global/styled/typography'
+import { showOnHoverCss } from '~/ui/grid/shared'
 import * as colors from '~shared/styles/constants/colors'
 
 const Wrapper = styled.div`
@@ -43,6 +47,14 @@ const AudienceRowItem = styled(Grid)`
 `
 AudienceRowItem.displayName = 'AudienceRowItem'
 
+const AudienceWrapper = styled(Flex)`
+  ${showOnHoverCss};
+`
+
+const AudienceActions = styled.div`
+  margin-left: 8px;
+`
+
 const PaginationWrapper = styled.div`
   background-color: ${v.colors.commonDark};
   border-radius: 1px;
@@ -74,7 +86,7 @@ const NextPageButton = styled(PaginationButton)`
 `
 NextPageButton.displayName = 'NextPageButton'
 
-@inject('apiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class AdminFeedback extends React.Component {
   state = {
@@ -123,7 +135,25 @@ class AdminFeedback extends React.Component {
             {testCollection.test_audiences.map(testAudience => (
               <React.Fragment key={testAudience.id}>
                 <AudienceRowItem item xs={4}>
-                  {testAudience.audience.name}
+                  <AudienceWrapper align="center">
+                    {testAudience.audience.name}
+                    <AudienceActions className="show-on-hover">
+                      <CopyToClipboard
+                        text={`${testCollection.publicTestURL}?ta=${
+                          testAudience.id
+                        }`}
+                        onCopy={() =>
+                          this.props.uiStore.popupSnackbar({
+                            message: 'Test link copied',
+                          })
+                        }
+                      >
+                        <CircledIcon>
+                          <LinkIcon />
+                        </CircledIcon>
+                      </CopyToClipboard>
+                    </AudienceActions>
+                  </AudienceWrapper>
                 </AudienceRowItem>
                 <AudienceRowItem item xs={4}>
                   <Flex justify="flex-end">
@@ -224,6 +254,7 @@ class AdminFeedback extends React.Component {
 
 AdminFeedback.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default AdminFeedback
