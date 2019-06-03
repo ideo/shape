@@ -53,12 +53,13 @@ const OuterContainer = styled.div`
   display: flex;
 
   .design-column {
-    flex: 1;
+    flex: 1 0 0;
   }
 
   .settings-column {
-    flex: 1;
+    flex: 1 0 0;
     margin-left: 30px;
+    width: auto;
   }
 
   @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {

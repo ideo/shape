@@ -142,7 +142,7 @@ class AudienceSettingsWidget extends React.Component {
           </MobileWrapper>
 
           <DesktopWrapper>
-            <StyledRowFlexParent>
+            <StyledRowFlexParent column>
               <StyledRowFlexParent>
                 <StyledRowFlexItem />
                 <TableHeader />
