@@ -27,7 +27,7 @@ class Item
         text += splitter if i.positive?
         text += t
       end
-      sanitize_text(text)
+      CGI.unescapeHTML(text)
     end
 
     def threadlocked_transform_realtime_delta(user, data)
@@ -91,12 +91,6 @@ class Item
     def rename_if_name_was_default
       return unless name == 'Text'
       generate_name
-    end
-
-    def sanitize_text(text)
-      text.gsub!(/&amp;/, '&')
-      text.gsub!(/&lt;/, '<')
-      text.gsub!(/&gt;/, '>')
     end
   end
 end
