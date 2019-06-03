@@ -1,6 +1,6 @@
-class MailchimpSubscription < SimpleService
+class MailingListSubscription < SimpleService
   # this is the IDEO Products mailchimp mailing list
-  LIST_ID = 'b141f584d3'.freeze
+  MAILCHIMP_LIST_ID = 'b141f584d3'.freeze
   # this is for marking the Shape mailchimp "interest" value
   SHAPE_ID = '9a0c2fe37c'.freeze
 
@@ -28,7 +28,7 @@ class MailchimpSubscription < SimpleService
 
   def network_mailing_list
     @network_mailing_list ||= NetworkApi::MailingList.where(
-      mailchimp_list_id: LIST_ID,
+      mailchimp_list_id: MAILCHIMP_LIST_ID,
     ).first
   end
 

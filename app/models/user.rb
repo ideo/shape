@@ -397,7 +397,7 @@ class User < ApplicationRecord
 
   # gets called via background worker
   def update_mailing_list_subscription
-    MailchimpSubscriptionWorker.perform_async(id, mailing_list)
+    MailingListSubscriptionWorker.perform_async(id, mailing_list)
   end
 
   def after_role_update(role, _method)
