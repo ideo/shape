@@ -88,7 +88,7 @@ class TestComparison < SimpleService
                                                        .scale_questions
                                                        .each_with_object({}) do |question_item, h|
       h[question_item.question_type] ||= []
-      h[question_item.question_type].push(question_item.dataset)
+      h[question_item.question_type].push(question_item.question_dataset)
     end
   end
 
