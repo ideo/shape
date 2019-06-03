@@ -241,7 +241,7 @@ class GridCard extends React.Component {
   onCollectionCoverChange = () => {
     const { card } = this.props
     // Reassign the previous cover when a new cover is assigned as the backend will have changed.
-    card.parent.reassignCover(card)
+    card.parentCollection.reassignCover(card)
   }
 
   get hasCover() {
@@ -276,7 +276,34 @@ class GridCard extends React.Component {
       this.linkOffsite(record.fileUrl())
       return
     }
+    // capture breadcrumb trail when navigating via Link cards, but not from My Collection
+    if (card.link) {
+      this.storeLinkedBreadcrumb(card)
+    }
+
     this.props.handleClick(e)
+  }
+
+  storeLinkedBreadcrumb = card => {
+    if (uiStore.isViewingHomepage) return
+    const { record } = card
+    // get a plain JS copy of breadcrumb
+    const breadcrumb = [...uiStore.viewingRecord.breadcrumb]
+    const { inMyCollection } = uiStore.viewingRecord
+    uiStore.update('actionAfterRoute', () => {
+      uiStore.updateLinkedBreadcrumbTrail({
+        breadcrumb,
+        inMyCollection,
+        record,
+      })
+    })
+  }
+
+  goToPage = card => {
+    if (card.link) {
+      this.storeLinkedBreadcrumb(card)
+    }
+    routingStore.routeTo('items', card.record.id)
   }
 
   get coverItem() {
@@ -407,7 +434,7 @@ class GridCard extends React.Component {
               {(record.isImage || record.isText) && (
                 <CardActionHolder
                   className="show-on-hover"
-                  onClick={() => routingStore.routeTo('items', card.record.id)}
+                  onClick={() => this.goToPage(card)}
                   tooltipText="go to page"
                 >
                   <FullScreenIcon />

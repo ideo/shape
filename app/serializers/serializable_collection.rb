@@ -10,21 +10,25 @@ class SerializableCollection < BaseJsonSerializer
 
   has_many :roles do
     data do
-      @object.anchored_roles
+      @object.anchored_roles(viewing_organization_id: @current_user.current_organization_id)
     end
   end
+
   has_many :collection_cover_items do
     data do
       # Only include cover items if this collection has indicated to use them
       @object.cover_type_items? ? @object.collection_cover_items : []
     end
   end
+
   has_one :parent_collection_card
   has_one :parent
   has_one :live_test_collection
   belongs_to :submissions_collection
   belongs_to :submission_template
   belongs_to :collection_to_test
+  belongs_to :organization
+  belongs_to :created_by
   has_many :test_audiences
 
   attribute :organization_id do
@@ -65,9 +69,6 @@ class SerializableCollection < BaseJsonSerializer
   attribute :processing_status do
     @object.processing_status.try(:titleize)
   end
-
-  belongs_to :organization
-  belongs_to :created_by
 
   attribute :collection_card_count do
     @object.cached_card_count || 0
@@ -182,5 +183,10 @@ class SerializableCollection < BaseJsonSerializer
 
   attribute :frontend_url do
     @frontend_url_for.call(@object)
+  end
+
+  attribute :common_viewable do
+    # only `true` if you're viewing the common resource outside of its home org
+    @object.common_viewable? && @object.organization_id != @current_user.current_organization_id
   end
 end

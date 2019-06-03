@@ -24,7 +24,7 @@ module Roles
 
     # if inherit is false for either role, then the child is "private"
     def private_child?(child)
-      return false if @parent.nil?
+      return false if @parent.nil? || child.common_viewable?
       cached = child.cached_inheritance
       if child.same_roles_anchor? @parent
         if cached.nil? || cached['private']

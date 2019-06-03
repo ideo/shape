@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190520233054) do
+ActiveRecord::Schema.define(version: 20190524214536) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -242,9 +242,11 @@ ActiveRecord::Schema.define(version: 20190520233054) do
     t.datetime "archived_at"
     t.string "archive_batch"
     t.jsonb "autojoin_emails", default: []
+    t.string "type"
     t.index ["autojoin_emails"], name: "index_groups_on_autojoin_emails", using: :gin
     t.index ["handle"], name: "index_groups_on_handle"
     t.index ["organization_id"], name: "index_groups_on_organization_id"
+    t.index ["type"], name: "index_groups_on_type"
   end
 
   create_table "groups_roles", force: :cascade do |t|

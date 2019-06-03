@@ -7,6 +7,7 @@ describe('CommentEntryForm', () => {
     props = {
       expanded: true,
       afterSubmit: jest.fn(),
+      onHeightChange: jest.fn(),
       thread: fakeThread,
     }
     wrapper = shallow(<CommentEntryForm {...props} />)

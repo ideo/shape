@@ -34,8 +34,8 @@ class SurveyResponseCompletion < SimpleService
     # return if SurveyResponse.find_by(user: user, test_collection: @survey_response.test_collection)
     @survey_response.create_feedback_incentive_record(
       user: user,
-      amount: ::FEEDBACK_INCENTIVE_AMOUNT,
-      current_balance: user.current_incentive_balance + ::FEEDBACK_INCENTIVE_AMOUNT,
+      amount: Shape::FEEDBACK_INCENTIVE_AMOUNT,
+      current_balance: user.current_incentive_balance + Shape::FEEDBACK_INCENTIVE_AMOUNT,
     )
   end
 

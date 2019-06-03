@@ -2,6 +2,7 @@
   "type": "object",
   "properties": {
     "name": { "type": "string" },
+    "class_type": { "type": "string" },
     "handle": { "type": ["string", "null"] },
     "is_primary": { "type": "boolean" },
     "is_guest": { "type": "boolean" },

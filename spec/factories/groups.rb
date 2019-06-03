@@ -21,5 +21,11 @@ FactoryBot.define do
         end
       end
     end
+
+    factory :global_group, class: Group::Global do
+      trait :common_resource do
+        id { Shape::COMMON_RESOURCE_GROUP_ID }
+      end
+    end
   end
 end

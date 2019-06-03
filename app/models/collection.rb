@@ -85,7 +85,8 @@ class Collection < ApplicationRecord
                  :submission_attrs,
                  :getting_started_shell,
                  :awaiting_first_user_content,
-                 :cached_inheritance
+                 :cached_inheritance,
+                 :common_viewable
 
   # validations
   validates :name, presence: true

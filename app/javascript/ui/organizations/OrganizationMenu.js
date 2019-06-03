@@ -20,17 +20,6 @@ class OrganizationMenu extends React.Component {
   @observable
   isLoading = false
 
-  componentDidMount() {
-    const { apiStore, uiStore } = this.props
-
-    if (uiStore.orgCreated) {
-      uiStore.update('orgCreated', false)
-      uiStore.alertOk('Your organization has been created')
-      // send you to add members to the newly created org
-      this.goToEditGroupRoles(apiStore.currentUserOrganization.primary_group)
-    }
-  }
-
   get currentPage() {
     return this.props.uiStore.organizationMenuPage
   }
@@ -85,7 +74,6 @@ class OrganizationMenu extends React.Component {
       })
       const hasOrg = !!apiStore.currentUserOrganization
       await newOrg.create()
-      uiStore.update('orgCreated', true)
       googleTagManager.push({
         event: 'formSubmission',
         formType: hasOrg ? 'Additional Org' : 'New Org',

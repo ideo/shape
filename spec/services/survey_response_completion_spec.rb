@@ -57,7 +57,7 @@ describe SurveyResponseCompletion, type: :service do
       it 'calculates the correct balance' do
         expect(user.current_incentive_balance).to eq 25.00
         service.call
-        expect(user.current_incentive_balance).to eq 25.00 + ::FEEDBACK_INCENTIVE_AMOUNT
+        expect(user.current_incentive_balance).to eq 25.00 + Shape::FEEDBACK_INCENTIVE_AMOUNT
       end
     end
   end

@@ -8,6 +8,7 @@ describe('CommentThread', () => {
       expanded: false,
       onClick: jest.fn(),
       afterSubmit: jest.fn(),
+      onEditorHeightChange: jest.fn(),
       thread: fakeThread,
     }
     wrapper = shallow(<CommentThread {...props} />)
