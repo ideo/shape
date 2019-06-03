@@ -100,6 +100,8 @@ const fakeUiStore = {
   gridHeightFor: jest.fn().mockReturnValue(250),
   performActionAfterRoute: jest.fn(),
   linkedBreadcrumbTrailForRecord: jest.fn().mockImplementation(x => x.breadcrumb),
+  addEmptySpaceClickHandler: jest.fn(),
+  removeEmptySpaceClickHandler: jest.fn(),
 }
 
 export default fakeUiStore

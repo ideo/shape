@@ -7,7 +7,6 @@ class SerializableCollection < BaseJsonSerializer
              :submission_box_type, :submission_box_id, :submission_template_id,
              :test_status, :collection_to_test_id, :hide_submissions, :submissions_enabled,
              :anyone_can_view, :anyone_can_join
-
   has_many :roles do
     data do
       @object.anchored_roles(viewing_organization_id: @current_user.current_organization_id)
@@ -188,5 +187,13 @@ class SerializableCollection < BaseJsonSerializer
   attribute :common_viewable do
     # only `true` if you're viewing the common resource outside of its home org
     @object.common_viewable? && @object.organization_id != @current_user.current_organization_id
+  end
+
+  attribute :is_test_locked do
+    @object.try(:purchased?)
+  end
+
+  attribute :has_link_sharing do
+    @object.try(:link_sharing?)
   end
 end

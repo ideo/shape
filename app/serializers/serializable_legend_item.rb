@@ -1,11 +1,14 @@
 class SerializableLegendItem < SerializableItem
-  attributes :primary_measure,
-             :comparison_measures
+  attribute :legend_search_source
 
-  attribute :data_settings do
-    settings = @object.data_settings&.symbolize_keys
-    settings ||= {}
-    settings[:selected_measures] ||= []
-    settings
+  has_many :datasets do
+    data do
+      @object.data_items_datasets.map do |data_items_datasets|
+        dataset = data_items_datasets.dataset
+        next if dataset.blank?
+        dataset.cached_data_items_datasets = data_items_datasets
+        dataset
+      end.compact.uniq
+    end
   end
 end

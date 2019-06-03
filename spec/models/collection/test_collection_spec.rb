@@ -73,9 +73,9 @@ describe Collection::TestCollection, type: :model do
     end
 
     it 'should accept the passed in test_audience_id' do
-      expect {
+      expect do
         test_collection.create_uniq_survey_response(test_audience_id: test_audience.id)
-      }.to change(test_audience.survey_responses, :count).by(1)
+      end.to change(test_audience.survey_responses, :count).by(1)
     end
   end
 
@@ -290,7 +290,8 @@ describe Collection::TestCollection, type: :model do
             ).to eq(
               [
                 Item::VideoItem,
-                Item::ChartItem,
+                Item::DataItem,
+                Item::LegendItem,
                 Collection::TestDesign,
               ],
             )
@@ -305,8 +306,24 @@ describe Collection::TestCollection, type: :model do
             expect do
               test_collection.launch!(initiated_by: user)
             end.to change(
-              Item::ChartItem, :count
+              Item::DataItem, :count
             ).by(test_collection.question_items.select { |q| q.question_context? || q.question_useful? }.size)
+          end
+
+          context 'with test audiences' do
+            let(:audience) { create(:audience) }
+            let!(:test_audience) { create(:test_audience, audience: audience, test_collection: test_collection) }
+
+            it 'should create test audience datasets for each question' do
+              expect do
+                test_collection.launch!(initiated_by: user)
+              end.to change(
+                Dataset::Question, :count
+              ).by(2)
+              expect(Dataset::Question.last.groupings).to eq(
+                [{ 'id' => test_audience.id, 'type' => 'TestAudience' }],
+              )
+            end
           end
 
           context 'with open response questions' do
@@ -328,10 +345,27 @@ describe Collection::TestCollection, type: :model do
             end
           end
 
+          context 'with media questions' do
+            let!(:test_collection) { create(:test_collection) }
+
+            it 'creates a media item link for each media item' do
+              test_collection.launch!(initiated_by: user)
+              expect(
+                test_collection
+                  .items
+                  .count,
+              ).to equal 4
+            end
+          end
+
           context 'with test_audience_params' do
-            it 'should call TestAudiencePurchaser' do
+            it 'should call PurchaseTestAudience' do
               params = { some: 'params' }
-              expect(TestAudiencePurchaser).to receive(:call).with(test_collection, params)
+              expect(PurchaseTestAudience).to receive(:call).with(
+                test_collection: test_collection,
+                test_audience_params: params,
+                user: user,
+              )
               test_collection.launch!(initiated_by: user, test_audience_params: params)
             end
           end
@@ -400,12 +434,38 @@ describe Collection::TestCollection, type: :model do
       describe '#close!' do
         before do
           test_collection.launch!(initiated_by: user)
+          allow(NotifyFeedbackCompletedWorker).to receive(:perform_async).and_call_original
         end
 
         it 'should set status as closed and set closed_at datetime' do
           expect(test_collection.close!).to be true
           expect(test_collection.closed?).to be true
           expect(test_collection.test_closed_at).to be_within(1.second).of Time.current
+        end
+
+        it 'does not call NotifyFeedbackCompletedWorker' do
+          expect(NotifyFeedbackCompletedWorker).not_to receive(:perform_async)
+          expect(test_collection.close!).to be true
+        end
+
+        context 'with link sharing audiences' do
+          let!(:test_audience) { create(:test_audience, :link_sharing, test_collection: test_collection) }
+
+          it 'does not call NotifyFeedbackCompletedWorker' do
+            expect(NotifyFeedbackCompletedWorker).not_to receive(:perform_async)
+            expect(test_collection.close!).to be true
+          end
+        end
+
+        context 'with paid audiences' do
+          let!(:test_audience) { create(:test_audience, test_collection: test_collection) }
+
+          it 'calls NotifyFeedbackCompletedWorker' do
+            expect(NotifyFeedbackCompletedWorker).to receive(:perform_async).with(
+              test_collection.id,
+            )
+            expect(test_collection.close!).to be true
+          end
         end
       end
 

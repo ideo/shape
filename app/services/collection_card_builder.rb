@@ -2,8 +2,9 @@ class CollectionCardBuilder
   attr_reader :collection_card, :errors
 
   def initialize(params:, parent_collection:, user: nil, type: 'primary')
+    @datasets_params = params.try(:[], :item_attributes).try(:[], :datasets_attributes)
     @params = params
-    @collection_card = parent_collection.send("#{type}_collection_cards").build(params)
+    @collection_card = parent_collection.send("#{type}_collection_cards").build(@params)
     @errors = @collection_card.errors
     @user = user
     @parent_collection = parent_collection
@@ -85,6 +86,10 @@ class CollectionCardBuilder
             # we just added a template card, so update the instances
             @parent_collection.queue_update_template_instances
           end
+
+          if @datasets_params.present?
+            create_and_link_datasets
+          end
         end
       end
     end
@@ -96,5 +101,11 @@ class CollectionCardBuilder
       @external_id,
       @user.application.id,
     )
+  end
+
+  def create_and_link_datasets
+    @datasets_params.to_h.values.each do |dataset_params|
+      @collection_card.item.create_dataset(dataset_params)
+    end
   end
 end

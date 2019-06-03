@@ -13,6 +13,8 @@ import Activity from './jsonApi/Activity'
 import Audience from './jsonApi/Audience'
 import Collection from './jsonApi/Collection'
 import CollectionCard from './jsonApi/CollectionCard'
+import DataItemsDataset from './jsonApi/DataItemsDataset'
+import Dataset from './jsonApi/Dataset'
 import Comment from './jsonApi/Comment'
 import CommentThread from './jsonApi/CommentThread'
 import FilestackFile from './jsonApi/FilestackFile'
@@ -220,6 +222,7 @@ class ApiStore extends jsonapi(datxCollection) {
     return this.request(`search/organizations?query=${query}`)
   }
 
+  // TODO rename searchRecords?
   searchCollections(params) {
     const defaultParams = { query: '' }
     return this.request(
@@ -272,6 +275,14 @@ class ApiStore extends jsonapi(datxCollection) {
         'first_name',
       ])
     })
+  }
+
+  async fetchTestCollections(page = 1) {
+    const res = await this.request(`admin/test_collections?page=${page}`)
+    return {
+      data: res.data,
+      totalPages: parseInt(res.headers.get('X-Total-Pages')),
+    }
   }
 
   @action
@@ -641,6 +652,8 @@ ApiStore.types = [
   CollectionCard,
   Comment,
   CommentThread,
+  Dataset,
+  DataItemsDataset,
   FilestackFile,
   Group,
   Item,

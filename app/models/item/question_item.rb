@@ -13,6 +13,7 @@
 #  data_settings              :jsonb
 #  data_source_type           :string
 #  icon_url                   :string
+#  legend_search_source       :integer
 #  name                       :string
 #  question_type              :integer
 #  report_type                :integer
@@ -42,11 +43,22 @@ class Item
   class QuestionItem < Item
     has_many :question_answers, inverse_of: :question, foreign_key: :question_id, dependent: :destroy
     has_one :test_open_responses_collection, class_name: 'Collection::TestOpenResponses'
-    has_one :test_chart_item, class_name: 'Item::ChartItem', as: :data_source
+    has_one :dataset, as: :data_source, class_name: 'Dataset::Question', dependent: :destroy
+    has_many :data_items,
+             as: :data_source,
+             class_name: 'Item::DataItem'
+
+    # TODO: Deprecate once migrating to datasets
+    has_one :test_data_item, class_name: 'Item::DataItem', as: :data_source
+
+    after_create :create_dataset
 
     after_commit :notify_test_design_of_creation,
                  on: :create,
                  if: :notify_test_design_collection_of_creation?
+
+    after_update :update_test_open_responses_collection,
+                 if: :update_test_open_responses_collection?
 
     after_update :update_test_open_responses_collection,
                  if: :update_test_open_responses_collection?
@@ -56,19 +68,11 @@ class Item
         question_type: unanswerable_question_types,
       )
     }
-    has_many :chart_items,
-             as: :data_source,
-             class_name: 'Item::ChartItem'
-
-    after_update :update_test_open_responses_collection,
-                 if: :update_test_open_responses_collection?
-
     scope :not_answerable, -> {
       where(
         question_type: unanswerable_question_types,
       )
     }
-
     scope :scale_questions, -> {
       where(
         question_type: question_type_categories[:scaled_rating],
@@ -114,6 +118,56 @@ class Item
       %i[question_media question_description question_finish]
     end
 
+    def self.question_title_and_description(question_type = nil)
+      case question_type&.to_sym
+      when :question_useful
+        {
+          title: 'Usefulness',
+          description: 'How useful is this idea for you?',
+        }
+      when :question_clarity
+        {
+          title: 'Clarity',
+          description: 'How clear is this idea for you?',
+        }
+      when :question_excitement
+        {
+          title: 'Excitement',
+          description: 'How exciting is this idea for you?',
+        }
+      when :question_different
+        {
+          title: 'Different',
+          description: "How different is this idea from what you've seen before?",
+        }
+      when :question_category_satisfaction
+        # the category text gets added later within ScaleQuestion
+        {
+          title: 'Category Satisfaction',
+          description: 'How satisfied are you with your current',
+        }
+      when :question_context
+        {
+          title: 'Context',
+          description: 'How satisfied are you with your current solution?',
+        }
+      else
+        {}
+      end
+    end
+
+    def question_title_and_description
+      self.class.question_title_and_description(question_type)
+    end
+
+    def question_title
+      question_title_and_description[:title]
+    end
+
+    def question_description
+      question_title_and_description[:description]
+    end
+
     def scale_question?
       self.class.question_type_categories[:scaled_rating].include?(question_type&.to_sym)
     end
@@ -143,8 +197,10 @@ class Item
       (points * 100.0 / total).round
     end
 
-    def create_response_graph(parent_collection:, initiated_by:)
-      return if !scale_question? || test_chart_item.present?
+    def create_response_graph(parent_collection:, initiated_by:, legend_item: nil)
+      return if !scale_question? || test_data_item.present?
+
+      legend_item ||= parent_collection.legend_item
 
       builder = CollectionCardBuilder.new(
         params: {
@@ -152,14 +208,25 @@ class Item
           height: 2,
           width: 2,
           item_attributes: {
-            type: 'Item::ChartItem',
-            data_source: self,
+            type: 'Item::DataItem',
+            report_type: :report_type_question_item,
+            legend_item_id: legend_item&.id,
           },
         },
         parent_collection: parent_collection,
         user: initiated_by,
       )
       builder.create
+      if builder.collection_card.persisted?
+        data_item = builder.collection_card.record
+        dataset.data_items_datasets.create(
+          data_item: data_item,
+        )
+        data_item.data_items_datasets.create(
+          dataset: org_wide_question_dataset,
+        )
+      end
+
       builder.collection_card
     end
 
@@ -182,7 +249,38 @@ class Item
       builder.collection_card
     end
 
+    def org_wide_question_dataset
+      Dataset::Question.find_or_create_by(
+        groupings: [{ type: 'Organization', id: organization.id }],
+        question_type: question_type,
+        identifier: Dataset::Question::DEFAULT_ORG_NAME,
+        chart_type: :bar,
+      )
+    end
+
+    def create_test_audience_dataset(test_audience, data_item)
+      audience_dataset = Dataset::Question.create(
+        groupings: [{ type: 'TestAudience', id: test_audience.id }],
+        question_type: question_type,
+        chart_type: :bar,
+        data_source: self,
+        identifier: Dataset.identifier_for_object(test_audience),
+      )
+      data_item.data_items_datasets.create(
+        dataset: audience_dataset,
+        selected: false,
+      )
+    end
+
     private
+
+    def create_dataset
+      self.dataset = Dataset::Question.create(
+        data_source: self,
+        timeframe: :month,
+        chart_type: :bar,
+      )
+    end
 
     def notify_test_design_collection_of_creation?
       parent.is_a?(Collection::TestDesign)

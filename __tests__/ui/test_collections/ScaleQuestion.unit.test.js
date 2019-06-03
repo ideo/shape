@@ -108,6 +108,8 @@ describe('ScaleQuestion', () => {
         beforeEach(() => {
           props.question.question_type = 'question_category_satisfaction'
           props.question.content = 'magic wand'
+          props.question.question_description =
+            'How satisfied are you with your current'
           props.editable = false
           wrapper = shallow(<ScaleQuestion {...props} />)
         })

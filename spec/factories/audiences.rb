@@ -1,7 +1,11 @@
 FactoryBot.define do
   factory :audience do
-    name "MyString"
-    price_per_response 1.5
-    criteria "MyString"
+    name { Faker::Superhero.power }
+    price_per_response { rand(1..20) }
+    criteria 'MyString'
+
+    trait :link_sharing do
+      price_per_response 0
+    end
   end
 end

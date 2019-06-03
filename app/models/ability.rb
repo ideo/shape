@@ -95,6 +95,11 @@ class Ability
       can %i[read manage], Comment do |comment|
         comment.can_edit?(user)
       end
+
+      can :create, DataItemsDataset
+      can :manage, DataItemsDataset do |data_items_dataset|
+        data_items_dataset.data_item.can_edit?(user)
+      end
     end
     # for logged-out users and fallback for all users
     can :read, Collection, anyone_can_view: true

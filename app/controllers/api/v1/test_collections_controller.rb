@@ -1,7 +1,8 @@
 class Api::V1::TestCollectionsController < Api::V1::BaseController
-  before_action :load_and_authorize_test_collection, only: %i[launch close reopen]
-  before_action :load_test_collection, only: %i[show next_available]
+  before_action :load_and_authorize_test_collection, only: %i[launch close reopen add_comparison]
+  before_action :load_test_collection, only: %i[show next_available add_comparison remove_comparison]
   before_action :load_submission_box_test_collection, only: %i[next_available]
+  before_action :load_comparison_collection, only: %i[add_comparison remove_comparison]
 
   def show
     render jsonapi: @test_collection,
@@ -51,11 +52,47 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
     end
   end
 
+  def add_comparison
+    test_comparison = TestComparison.new(
+      collection: @test_collection,
+      comparison_collection: @comparison_collection,
+    )
+    if test_comparison.add
+      render_collection
+    else
+      render json: { errors: test_comparison.errors }, status: :unprocessable_entity
+    end
+  end
+
+  def remove_comparison
+    test_comparison = TestComparison.new(
+      collection: @test_collection,
+      comparison_collection: @comparison_collection,
+    )
+    if test_comparison.remove
+      render_collection
+    else
+      render json: { errors: test_comparison.errors }, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def load_test_collection
     @collection = @test_collection = Collection::TestCollection.find_by(id: params[:id])
     if @test_collection.blank?
+      head(404)
+      return false
+    end
+    true
+  end
+
+  def load_comparison_collection
+    # TODO: get the comparison collection id param the correct way
+    @comparison_collection = Collection.find_by(
+      id: json_api_params[:data][:comparison_collection_id],
+    )
+    if @comparison_collection.blank?
       head(404)
       return false
     end

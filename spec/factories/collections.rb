@@ -46,6 +46,7 @@ FactoryBot.define do
     factory :test_collection, class: Collection::TestCollection do
       transient do
         record_type :question
+        num_responses 1
       end
 
       trait :answerable_questions do
@@ -65,8 +66,9 @@ FactoryBot.define do
       end
 
       trait :with_responses do
-        after(:create) do |collection|
-          survey_responses = create_list(:survey_response, 5, test_collection: collection)
+        after(:create) do |collection, evaluator|
+          num_responses = evaluator.num_responses
+          survey_responses = create_list(:survey_response, num_responses, test_collection: collection)
           survey_responses.map do |response|
             question = response.question_items.select(&:question_useful?).first
             create(:question_answer,
@@ -89,7 +91,7 @@ FactoryBot.define do
 
       trait :with_test_audience do
         after(:create) do |collection|
-          create(:test_audience, test_collection: collection, audience: create(:audience), price_per_response: 2)
+          create(:test_audience, test_collection: collection, audience: create(:audience), price_per_response: 2, launched_by: create(:user))
         end
       end
 

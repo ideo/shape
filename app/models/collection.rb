@@ -159,6 +159,11 @@ class Collection < ApplicationRecord
   has_many :collection_cover_items,
            through: :collection_cover_cards,
            source: :item
+  has_many :data_items,
+           -> { data_items },
+           source: :item,
+           class_name: 'Item::DataItem',
+           through: :primary_collection_cards
 
   has_one :comment_thread, as: :record, dependent: :destroy
 
@@ -234,6 +239,7 @@ class Collection < ApplicationRecord
       activity.updated_at.to_date
     end.uniq
     {
+      type: type,
       name: name,
       tags: all_tag_names,
       item_tags: items.map(&:tags).flatten.map(&:name),
@@ -243,6 +249,8 @@ class Collection < ApplicationRecord
       group_ids: search_group_ids,
       parent_ids: parent_ids,
       activity_dates: activity_dates.empty? ? nil : activity_dates,
+      created_at: created_at,
+      updated_at: updated_at,
     }
   end
 

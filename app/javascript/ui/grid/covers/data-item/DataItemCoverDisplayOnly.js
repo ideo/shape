@@ -1,7 +1,9 @@
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import PropTypes from 'prop-types'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import { Fragment } from 'react'
 
-import { Heading3 } from '~/ui/global/styled/typography'
+import { Heading1, Heading3 } from '~/ui/global/styled/typography'
 import InfoIcon from '~/ui/icons/InfoIcon'
 import ChartGroup from '~/ui/global/charts/ChartGroup'
 import {
@@ -10,7 +12,10 @@ import {
 } from '~/ui/global/charts/ChartUtils'
 import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
-import StyledDataItemCover from './StyledDataItemCover'
+import {
+  StyledDataItemCover,
+  StyledDataItemQuestionCover,
+} from './StyledDataItemCover'
 
 const StyledInfoIcon = styled.div`
   display: inline-block;
@@ -20,10 +25,50 @@ const StyledInfoIcon = styled.div`
   margin-left: 7px;
 `
 
+const StyledTitleAndDescription = styled.div`
+  margin-bottom: 20px;
+`
+
+const StyledTitleDescInline = styled.div`
+  display: inline-block;
+`
+
+const UnPaddedHeading3 = styled(Heading3)`
+  margin-bottom: 0;
+`
+
+const StyledCover = props => {
+  const { isReportTypeQuestionItem } = props.item
+  if (isReportTypeQuestionItem) {
+    return (
+      <StyledDataItemQuestionCover data-cy="DataItemCover">
+        {props.children}
+      </StyledDataItemQuestionCover>
+    )
+  }
+  return (
+    <StyledDataItemCover data-cy="DataItemCover">
+      {props.children}
+    </StyledDataItemCover>
+  )
+}
+StyledCover.propTypes = {
+  item: MobxPropTypes.objectOrObservableObject.isRequired,
+  children: PropTypes.node,
+}
+StyledCover.defaultProps = {
+  children: null,
+}
+
+@observer
 class DataItemCoverDisplayOnly extends React.Component {
   get title() {
     const { item } = this.props
-    return item.name
+    if (item.isReportTypeQuestionItem) {
+      return this.questionItemTitleAndDescription
+    } else {
+      return <Heading3 color={this.fillColor}>{item.name}</Heading3>
+    }
   }
 
   get fillColor() {
@@ -36,14 +81,28 @@ class DataItemCoverDisplayOnly extends React.Component {
     return primaryDataset && primaryDataset.description
   }
 
+  get questionItemTitleAndDescription() {
+    const { title, description } = this.props.item
+    return (
+      <Fragment>
+        {title && (
+          <Heading1 style={{ marginTop: 0 }} notResponsive>
+            {title}
+          </Heading1>
+        )}
+        {description && <UnPaddedHeading3>{description}</UnPaddedHeading3>}
+      </Fragment>
+    )
+  }
+
   render() {
     const { card, item } = this.props
     const tooltip = this.primaryDatasetDescription
     return (
-      <StyledDataItemCover>
+      <StyledCover item={item}>
         <AboveChartContainer>
-          <Heading3 color={this.fillColor}>
-            {this.title}
+          <StyledTitleAndDescription>
+            <StyledTitleDescInline>{this.title}</StyledTitleDescInline>
             {tooltip && (
               <Tooltip
                 classes={{ tooltip: 'Tooltip' }}
@@ -59,16 +118,15 @@ class DataItemCoverDisplayOnly extends React.Component {
                 </StyledInfoIcon>
               </Tooltip>
             )}
-          </Heading3>
-          <br />
+          </StyledTitleAndDescription>
         </AboveChartContainer>
         <ChartGroup
-          datasets={item.datasets}
+          dataItem={item}
           width={card.width}
           height={card.height}
           simpleDateTooltip
         />
-      </StyledDataItemCover>
+      </StyledCover>
     )
   }
 }

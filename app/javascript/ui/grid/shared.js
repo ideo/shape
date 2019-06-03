@@ -84,6 +84,7 @@ export const StyledGridCard = styled.div`
   position: relative;
   width: 100%;
   z-index: 1;
+
   ${props =>
     props.selected &&
     `
@@ -140,7 +141,7 @@ export const StyledCardWrapper = styled.div`
   ${showOnHoverCss};
   z-index: ${props => props.zIndex};
   &:hover {
-    z-index: ${props => props.zIndex};
+    z-index: ${props => props.zIndex + 1};
   }
 `
 StyledCardWrapper.defaultProps = {

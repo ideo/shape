@@ -19,7 +19,10 @@
     "mailing_list": { "type": "boolean" },
     "google_auth_token": { "type": "string" },
     "feedback_contact_preference": { "type": "string" },
-    "feedback_terms_accepted": { "type": "boolean" }
+    "feedback_terms_accepted": { "type": "boolean" },
+    "respondent_terms_accepted": { "type": "boolean" },
+    "current_incentive_balance": { "type": "number" },
+    "incentive_due_date": { "type": ["string", "null"] }
   },
   "required": ["email", "first_name", "last_name", "status"]
 }

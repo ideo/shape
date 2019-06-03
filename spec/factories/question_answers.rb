@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :question_answer do
-    survey_response nil
+    survey_response
     question nil
     answer_text "MyText"
     answer_number 1

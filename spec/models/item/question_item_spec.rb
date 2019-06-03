@@ -35,35 +35,24 @@ RSpec.describe Item::QuestionItem, type: :model do
   context 'with a launched test collection' do
     let(:user) { create(:user) }
     let(:user2) { create(:user) }
-    let(:test_collection) { create(:test_collection) }
-    let(:test_design) do
-      create(:test_design, test_collection: test_collection, add_editors: [user], add_viewers: [user2])
-    end
-    let(:question_card) do
-      # use builder so that it actually handles the right permissions
-      builder = CollectionCardBuilder.new(
-        params: {
-          item_attributes: {
-            type: 'Item::QuestionItem',
-            question_type: :question_useful,
-          },
-        },
-        parent_collection: test_design,
-      )
-      builder.create
-      builder.collection_card
-    end
-    let(:question_item) { question_card.item }
+    let(:test_collection) { create(:test_collection, :completed) }
 
     describe '#score' do
+      before { test_collection.launch! }
+      let(:question_item) { test_collection.question_items.select(&:question_useful?).first }
       let!(:response) { create(:survey_response, test_collection: test_collection) }
-      # cheating here because a survey_response should really only have one answer per question
-      let!(:answer1) { create(:question_answer, survey_response: response, question: question_item, answer_number: 1) }
-      let!(:answer2) { create(:question_answer, survey_response: response, question: question_item, answer_number: 2) }
-      let!(:answer3) { create(:question_answer, survey_response: response, question: question_item, answer_number: 2) }
-      let!(:answer4) { create(:question_answer, survey_response: response, question: question_item, answer_number: 4) }
+      let!(:responses) do
+        create_list(:survey_response,
+                    4,
+                    :fully_answered,
+                    test_collection: test_collection)
+      end
+      let!(:question_answers) { question_item.question_answers }
       before do
-        response.update(status: :completed)
+        question_answers[0].update(answer_number: 1)
+        question_answers[1].update(answer_number: 2)
+        question_answers[2].update(answer_number: 2)
+        question_answers[3].update(answer_number: 4)
         question_item.update(question_type: :question_useful)
       end
 
@@ -73,7 +62,26 @@ RSpec.describe Item::QuestionItem, type: :model do
       end
     end
 
-    context 'role access within a test collection' do
+    context 'and a useful question' do
+      let(:test_design) do
+        create(:test_design, test_collection: test_collection, add_editors: [user], add_viewers: [user2])
+      end
+      let(:question_card) do
+        # use builder so that it actually handles the right permissions
+        builder = CollectionCardBuilder.new(
+          params: {
+            item_attributes: {
+              type: 'Item::QuestionItem',
+              question_type: :question_useful,
+            },
+          },
+          parent_collection: test_design,
+        )
+        builder.create
+        builder.collection_card
+      end
+      let(:question_item) { question_card.item }
+
       it 'should defer to parent for resourceable capabilities' do
         expect(question_item.can_edit?(user)).to be true
         expect(question_item.can_edit?(user2)).to be false

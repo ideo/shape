@@ -29,6 +29,10 @@ const fakeApiStore = ({
       .mockName('fetchShapeAdminUsers'),
     removeShapeAdminUser: jest.fn(),
     addShapeAdminUsers: jest.fn(),
+    fetchTestCollections: jest
+      .fn()
+      .mockReturnValue(Promise.resolve(requestResult))
+      .mockName('fetchTestCollections'),
     sync: jest.fn().mockName('sync'),
     loadCurrentUser: jest.fn().mockReturnValue(Promise.resolve()),
     searchUsersAndGroups: jest
