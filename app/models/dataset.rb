@@ -42,6 +42,7 @@ class Dataset < ApplicationRecord
   validates :cached_data, :identifier, presence: true, if: :root_dataset_class?
 
   scope :question_items, -> { where(type: 'Dataset::Question') }
+  scope :without_groupings, -> { where("groupings = '[]'") }
 
   attr_accessor :cached_data_items_datasets
 
