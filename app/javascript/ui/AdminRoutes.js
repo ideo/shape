@@ -12,7 +12,6 @@ import MuiTheme from '~/ui/theme'
 import SettingsPage from '~/ui/pages/SettingsPage'
 import UserSettings from '~/ui/users/UserSettings'
 import ZendeskWidget from '~/ui/global/ZendeskWidget'
-import firebaseClient from '~/vendor/firestore'
 
 // withRouter allows it to respond automatically to routing changes in props
 @withRouter
@@ -21,11 +20,7 @@ import firebaseClient from '~/vendor/firestore'
 class AdminRoutes extends React.Component {
   componentDidMount() {
     const { apiStore } = this.props
-    apiStore.loadCurrentUser({
-      onSuccess: currentUser => {
-        firebaseClient.authenticate(currentUser.google_auth_token)
-      },
-    })
+    apiStore.loadCurrentUser()
   }
 
   handleWindowResize = ({ windowWidth }) => {
