@@ -207,15 +207,6 @@ class Header extends React.Component {
   }
 
   @computed
-  @computed
-  get isMobileXs() {
-    const { uiStore } = this.props
-    return (
-      uiStore.windowWidth && uiStore.windowWidth < v.responsive.smallBreakpoint
-    )
-  }
-
-  @computed
   get record() {
     const { uiStore } = this.props
     return uiStore.viewingCollection || uiStore.viewingItem
@@ -262,7 +253,7 @@ class Header extends React.Component {
     } else if (!currentUser.current_organization) {
       return <BasicHeader orgMenu={uiStore.organizationMenuOpen} />
     }
-    if (routingStore.isSearch && this.isMobileXs) {
+    if (routingStore.isSearch && uiStore.isMobileXs) {
       return this.renderMobileSearch()
     }
 
