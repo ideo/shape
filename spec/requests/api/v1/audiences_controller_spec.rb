@@ -66,7 +66,7 @@ describe Api::V1::AudiencesController, type: :request, json: true, create_org: t
         expect(audience.name).to eq('Anyone')
         expect(audience.tag_list.size).to eq(3)
         expect(audience.organizations).to include(user.current_organization)
-        expect(audience.price_per_response).to eq(Audience::TARGETED_PRICE_PER_RESPONSE)
+        expect(audience.price_per_response).to eq(Shape::TARGETED_AUDIENCE_PRICE_PER_RESPONSE)
       end
 
       it 'matches JSON schema' do
