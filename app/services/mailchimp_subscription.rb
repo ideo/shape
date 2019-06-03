@@ -4,46 +4,48 @@ class MailchimpSubscription < SimpleService
   # this is for marking the Shape mailchimp "interest" value
   SHAPE_ID = '9a0c2fe37c'.freeze
 
+  delegate :current_organization, to: :@user
+
   def initialize(user:, subscribe:)
     @user = user
     @subscribe = subscribe
   end
 
   def call
-    return unless ENV['MAILCHIMP_API_KEY'].present?
-    @subscribe ? subscribe : unsubscribe
+    return if network_mailing_list.blank? || current_network_organization.blank?
+    if @subscribe
+      subscribe
+    else
+      unsubscribe
+    end
   end
 
   private
 
-  def gibbon
-    # no need to memoize, these request objects are meant to be one-time use
-    Gibbon::Request.new(api_key: ENV['MAILCHIMP_API_KEY'])
+  def current_network_organization
+    current_organization&.network_organization
+  end
+
+  def network_mailing_list
+    @network_mailing_list ||= NetworkApi::MailingList.where(
+      mailchimp_list_id: LIST_ID,
+    ).first
   end
 
   def subscribe
-    first_name = @user.first_name || ''
-    last_name = @user.last_name || ''
-    gibbon
-      .lists(LIST_ID)
-      .members(lower_case_md5_hashed_email_address)
-      .upsert(body: {
-                email_address: @user.email,
-                status: 'subscribed',
-                merge_fields: { FNAME: first_name, LNAME: last_name },
-                interests: { SHAPE_ID => true },
-              })
-  end
-
-  def lower_case_md5_hashed_email_address
-    # mailchimp's method of identifying user by email
-    Digest::MD5.hexdigest(@user.email.downcase)
+    NetworkApi::MailingListMembership.create(
+      mailing_list_id: network_mailing_list.id,
+      organization_id: current_network_organization.id,
+      user_uid: @user.uid,
+    )
   end
 
   def unsubscribe
-    gibbon
-      .lists(LIST_ID)
-      .members(lower_case_md5_hashed_email_address)
-      .update(body: { status: 'unsubscribed' })
+    membership = NetworkApi::MailingListMembership.where(
+      mailing_list_id: network_mailing_list.id,
+      organization_id: current_network_organization.id,
+      user_uid: @user.uid,
+    )
+    membership.destroy if membership.present?
   end
 end
