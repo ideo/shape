@@ -101,8 +101,12 @@ export default class UiStore {
     onConfirm: null,
     onCancel: null,
     iconName: null,
+    confirmImage: null,
     confirmText: 'OK',
+    confirmPrompt: null,
+    cancelImage: null,
     cancelText: 'Cancel',
+    cancelPrompt: null,
     closeable: true,
     fadeOutTime: undefined,
     snoozeChecked: false,
@@ -123,8 +127,6 @@ export default class UiStore {
   snackbarConfig = { ...this.defaultSnackbarProps }
   @observable
   blurContent = false
-  @observable
-  orgCreated = false
   @observable
   searchText = ''
   @observable
@@ -184,6 +186,10 @@ export default class UiStore {
   selectedArea = { minX: null, maxX: null, minY: null, maxY: null }
   @observable
   selectedAreaEnabled = false
+  @observable
+  linkedBreadcrumbTrail = []
+  @observable
+  linkedInMyCollection = false
 
   @action
   toggleEditingCardId(cardId) {
@@ -774,5 +780,59 @@ export default class UiStore {
       return
     }
     this.scroll.scrollToBottom()
+  }
+
+  @action
+  updateLinkedBreadcrumbTrail = ({
+    breadcrumb,
+    inMyCollection,
+    record,
+  } = {}) => {
+    const { id, name, can_edit } = record
+    // append the record being linked to
+    const linkCrumb = {
+      id,
+      name,
+      can_edit,
+      inMyCollection,
+      type: record.internalType,
+      link: true,
+    }
+    this.linkedBreadcrumbTrail = this.linkedBreadcrumbTrail.concat(
+      breadcrumb.concat(linkCrumb)
+    )
+  }
+
+  @action
+  linkedBreadcrumbTrailForRecord(record) {
+    const { breadcrumb } = record
+    const { linkedBreadcrumbTrail } = this
+
+    if (!linkedBreadcrumbTrail.length || !breadcrumb) return breadcrumb
+    const linkCrumb = _.last(linkedBreadcrumbTrail)
+    const foundIdx = _.findIndex(breadcrumb, { id: linkCrumb.id })
+
+    if (foundIdx !== -1) {
+      if (linkCrumb.inMyCollection) {
+        this.linkedInMyCollection = true
+      }
+      return _.uniqBy(
+        linkedBreadcrumbTrail.concat(breadcrumb.slice(foundIdx + 1)),
+        'id'
+      )
+    } else {
+      // console.log(record.name, record.id, 'bummer.')
+      // does this reset belong here? i.e. linkedBreadcrumbTrail has no proper connection here
+      this.linkedBreadcrumbTrail.replace([])
+      return breadcrumb
+    }
+  }
+
+  @action
+  restoreBreadcrumb(item) {
+    // NOTE: this will restore the entire breadcrumb not just the spot you clicked
+    // (e.g. if there were two different links in the trail)
+    this.linkedBreadcrumbTrail.replace([])
+    this.linkedInMyCollection = false
   }
 }

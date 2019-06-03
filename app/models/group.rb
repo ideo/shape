@@ -28,7 +28,8 @@ class Group < ApplicationRecord
   # roles method gets overridden so we alias it here
   alias rolify_roles roles
 
-  belongs_to :organization
+  # so far the only "org optional" group is the "Common Resource" group
+  belongs_to :organization, optional: true
   belongs_to :current_shared_collection,
              class_name: 'Collection',
              optional: true
@@ -40,6 +41,7 @@ class Group < ApplicationRecord
   before_validation :set_handle_if_none, on: :create
 
   validates :name, presence: true
+  validates :organization_id, presence: true, if: :requires_org?
 
   validates :handle,
             uniqueness: { scope: :organization_id },
@@ -53,6 +55,8 @@ class Group < ApplicationRecord
   # Searchkick Config
   searchkick callbacks: :async, word_start: %i[name handle]
   scope :search_import, -> { where(archived: false) }
+  # includes global groups
+  scope :viewable_in_org, ->(id) { where(organization_id: [nil, id]) }
 
   def search_data
     {
@@ -106,6 +110,10 @@ class Group < ApplicationRecord
     [primary?, guest?, admin?].any?
   end
 
+  def common_resource?
+    false
+  end
+
   def can_view?(user)
     # NOTE: guest group access can be granted via primary_group membership
     return true if guest? && organization.primary_group.can_view?(user)
@@ -125,6 +133,10 @@ class Group < ApplicationRecord
     nil
   end
 
+  def requires_org?
+    true
+  end
+
   private
 
   def create_shared_collection
@@ -134,10 +146,17 @@ class Group < ApplicationRecord
     update(current_shared_collection: shared)
   end
 
-  def after_role_update(role)
+  # gets called from add/remove methods in rolify_extensions
+  def after_role_update(role, method = nil)
     resource = role.resource
     # Reindex record if it is a searchkick model
     resource.reindex if resource && Searchkick.callbacks? && resource.searchable?
+    return unless common_resource?
+    if method == :add
+      resource.update(common_viewable: true)
+    elsif method == :remove
+      resource.update(common_viewable: false)
+    end
   end
 
   def validate_handle?

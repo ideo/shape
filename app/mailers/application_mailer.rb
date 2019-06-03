@@ -7,7 +7,7 @@ class ApplicationMailer < ActionMailer::Base
 
   def mail(**args)
     if args[:users].present? && restrict_to_ideo_products?
-      products_group_user_ids = Group.find(::IDEO_PRODUCTS_GROUP_ID).user_ids
+      products_group_user_ids = Group.find(Shape::IDEO_PRODUCTS_GROUP_ID).user_ids
       args[:subject] = "[Shape #{ENV['SHAPE_APP']}] #{args[:subject]}"
       args[:to] = args[:users].select { |u| products_group_user_ids.include?(u.id) }.map(&:email)
     end
