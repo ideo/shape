@@ -143,6 +143,7 @@ class ActionMenu extends React.Component {
       testCollectionCard,
       uiStore,
     } = this.props
+    const { record } = card
 
     const actions = [
       {
@@ -204,7 +205,7 @@ class ActionMenu extends React.Component {
       if (!card.can_move) {
         items = _.reject(items, { name: 'Move' })
       }
-      if (card.record && card.record.is_submission_box_template) {
+      if (record && record.is_submission_box_template) {
         items = _.reject(items, { name: 'Archive' })
         items = _.reject(items, { name: 'Move' })
       }
@@ -213,7 +214,7 @@ class ActionMenu extends React.Component {
       if (canView) {
         viewActions.unshift('Duplicate')
       }
-      if (location !== 'Search') {
+      if (location !== 'Search' && !record.isCommonViewable) {
         viewActions.push('Tags')
         viewActions.push('Sharing')
       }
@@ -221,7 +222,7 @@ class ActionMenu extends React.Component {
     }
 
     // if record is system required, we always remove these actions
-    if (card.record && card.record.system_required) {
+    if (record && record.system_required) {
       items = _.reject(items, { name: 'Duplicate' })
       items = _.reject(items, { name: 'Tags' })
       if (!card.link) {
@@ -237,7 +238,7 @@ class ActionMenu extends React.Component {
       }
     }
 
-    if (!card.record || !card.record.isDownloadable) {
+    if (!record || !record.isDownloadable) {
       items = _.reject(items, { name: 'Download' })
     }
 

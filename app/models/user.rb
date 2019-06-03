@@ -400,7 +400,7 @@ class User < ApplicationRecord
     MailchimpSubscriptionWorker.perform_async(id, mailing_list)
   end
 
-  def after_role_update(role)
+  def after_role_update(role, _method)
     reset_cached_roles!
     resource = role.resource
     if resource.is_a?(Group) && role.resource.primary?

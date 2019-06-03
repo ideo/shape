@@ -320,6 +320,7 @@ class Collection
           end
         create_open_response_collections(initiated_by: initiated_by)
         create_response_graphs(initiated_by: initiated_by)
+        create_media_item_link
         test_design.cache_cover!
       end
       reorder_cards!
@@ -362,6 +363,21 @@ class Collection
         question.create_response_graph(
           parent_collection: self,
           initiated_by: initiated_by,
+        )
+      end
+    end
+
+    def create_media_item_link(media_question_items: nil)
+      media_question_items ||= test_design.items.reject { |i| i.type == 'Item::QuestionItem' }
+      # since we're placing things at the front one by one, we reverse the order
+      media_question_items.reverse.map do |media_item|
+        next unless media_item.cards_linked_to_this_item.empty?
+        CollectionCard::Link.create(
+          parent: self,
+          item_id: media_item.id,
+          width: 1,
+          height: 2,
+          order: -1,
         )
       end
     end

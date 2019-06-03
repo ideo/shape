@@ -28,7 +28,7 @@ RSpec.describe InvitationMailer, type: :mailer do
 
       context 'on staging env' do
         # this is testing logic within ApplicationMailer
-        let(:group) { create(:group, id: ::IDEO_PRODUCTS_GROUP_ID, organization: organization) }
+        let(:group) { create(:group, id: Shape::IDEO_PRODUCTS_GROUP_ID, organization: organization) }
         let!(:shape_app) { ENV['SHAPE_APP'] }
 
         before do

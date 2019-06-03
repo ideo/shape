@@ -830,7 +830,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     onCancel,
     onSuccess,
   } = {}) {
-    const { uiStore, routingStore } = this
+    const { uiStore } = this
     const can_edit = toCollection.can_edit_content || toCollection.can_edit
     const cancel = () => {
       uiStore.setMovingCards([])
@@ -870,23 +870,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       placement: 'beginning',
     }
     await apiStore.moveCards(data)
-    const afterMove = () => {
-      const { movingIntoCollection } = uiStore
-      uiStore.setMovingCards([])
-      uiStore.update('multiMoveCardIds', [])
-      uiStore.reselectCardIds(cardIds)
-      uiStore.update('movingIntoCollection', null)
-      // add a little delay because the board has to load first
-      if (movingIntoCollection.isBoard) {
-        setTimeout(() => uiStore.scrollToBottom(), 500)
-      }
-    }
-    if (data.to_id === data.from_id) {
-      afterMove()
-    } else {
-      uiStore.update('actionAfterRoute', afterMove)
-      routingStore.routeTo('collections', toCollection.id)
-    }
+    uiStore.setMovingCards([])
+    uiStore.update('multiMoveCardIds', [])
+    uiStore.update('movingIntoCollection', null)
   }
 
   static async createSubmission(parent_id, submissionSettings) {

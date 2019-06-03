@@ -25,7 +25,7 @@ import TermsOfUseModal from '~/ui/users/TermsOfUseModal'
 import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
 import UserSettings from '~/ui/users/UserSettings'
 import v from '~/utils/variables'
-import firebaseClient from '~/vendor/firestore'
+import firebaseClient from '~/vendor/firebase/clients/firebaseClient'
 import MuiTheme, { BillingMuiTheme } from '~/ui/theme'
 import captureGlobalKeypress from '~/utils/captureGlobalKeypress'
 
@@ -104,8 +104,10 @@ class Routes extends React.Component {
 
   handleMouseDownSelection = e => {
     if (!emptySpaceClick(e)) return
+    // if we clicked an empty space...
     const { uiStore } = this.props
     uiStore.deselectCards()
+    uiStore.closeBlankContentTool()
     this.mouseDownAt = { x: e.pageX, y: e.pageY }
   }
 

@@ -102,8 +102,9 @@ module Resourceable
     true
   end
 
-  def anchored_roles
+  def anchored_roles(viewing_organization_id: organization_id)
     return roles if is_a?(Group)
+    return [] if common_viewable? && viewing_organization_id != organization_id
     roles_anchor.roles
   end
 
@@ -124,6 +125,7 @@ module Resourceable
   end
 
   def can_view?(user_or_group)
+    return true if common_viewable?
     return true if can_edit?(user_or_group)
     return true if can_edit_content?(user_or_group)
     raise_role_name_not_set(:view_role) if self.class.view_role.blank?
@@ -247,6 +249,11 @@ module Resourceable
     return false if parent&.is_a?(Collection::UserCollection)
     # NOTE: this will return the cached value if found
     Roles::Inheritance.new(parent).private_child?(self)
+  end
+
+  def common_viewable?
+    # `common_viewable` comes from cached_attributes
+    roles_anchor.try(:common_viewable)
   end
 
   private

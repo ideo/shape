@@ -152,10 +152,6 @@ describe('OrganizationMenu', () => {
       expect(props.routingStore.routeTo).toHaveBeenCalledWith('/sluggity')
     })
 
-    it('should set the uiStore state', () => {
-      expect(props.uiStore.update).toHaveBeenCalledWith('orgCreated', true)
-    })
-
     it('should save the newly created organization', () => {
       expect(createFn).toHaveBeenCalled()
     })
@@ -165,27 +161,6 @@ describe('OrganizationMenu', () => {
         event: 'formSubmission',
         // because we have an existing org in apiStore in this case
         formType: 'Additional Org',
-      })
-    })
-
-    describe('with orgCreated state', () => {
-      beforeEach(() => {
-        props.uiStore.orgCreated = true
-        wrapper = shallow(<OrganizationMenu.wrappedComponent {...props} />)
-        component = wrapper.instance()
-      })
-
-      it('should open the org created alert', () => {
-        expect(props.uiStore.update).toHaveBeenCalledWith('orgCreated', false)
-        expect(props.uiStore.alertOk).toHaveBeenCalledWith(
-          'Your organization has been created'
-        )
-      })
-
-      it('should set the editGroup to be the org primary_group', () => {
-        expect(component.editGroup).toEqual(
-          props.apiStore.currentUserOrganization.primary_group
-        )
       })
     })
   })

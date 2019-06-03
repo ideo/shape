@@ -14,7 +14,7 @@ props.record.breadcrumb = [
 
 let wrapper, component, titles
 
-describe('StyledBreadcrumb', () => {
+describe('Breadcrumb', () => {
   beforeEach(() => {
     props.record.inMyCollection = false
     wrapper = shallow(<Breadcrumb {...props} />)

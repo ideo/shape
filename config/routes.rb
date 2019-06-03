@@ -112,11 +112,7 @@ Rails.application.routes.draw do
         end
         resources :roles, only: %i[destroy]
       end
-      resources :comments do
-        member do
-          delete '', action: 'destroy'
-        end
-      end
+      resources :comments
       resources :comment_threads, only: %i[index show create subscribe unsubscribe] do
         resources :comments, only: %i[index create]
         member do
@@ -186,6 +182,8 @@ Rails.application.routes.draw do
   # custom URL for GCI
   get '/earlychildhood', to: redirect('/collections/4764')
 
+  # catch all marketing route request
+  get '/product/*path', to: 'home#marketing', constraints: ->(req) { req.format == :html || req.format == '*/*' }
   # catch all HTML route requests, send to frontend
   get '*path', to: 'home#index', constraints: ->(req) { req.format == :html || req.format == '*/*' }
 end

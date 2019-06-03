@@ -41,7 +41,8 @@
     "launchable": { "type": ["boolean"] },
     "test_collection_id": { "type": ["string"] },
     "joinable_group_id": { "type": ["string"] },
-    "frontend_url": { "type": ["string"] }
+    "frontend_url": { "type": ["string"] },
+    "common_viewable": { "type": ["boolean", "null"] }
   },
   "required": ["name", "class_type", "created_at", "cover"]
 }

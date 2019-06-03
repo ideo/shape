@@ -43,22 +43,20 @@ class DescriptionQuestion extends React.Component {
   render() {
     const { item, maxLength, placeholder, canEdit } = this.props
     return (
-      <div>
-        <TextInputHolder hasFocus={this.state.focused || item.content === ''}>
-          <TextInput
-            data-cy="DescriptionQuestionText"
-            disabled={!canEdit}
-            onFocus={() => this.setState({ focused: true })}
-            onBlur={this.handleBlur}
-            onChange={this.handleChange}
-            type="descriptionText"
-            placeholder={placeholder}
-            value={item.content || ''}
-            maxLength={maxLength}
-          />
-          <StyledSmallText>{this.state.countLeft}</StyledSmallText>
-        </TextInputHolder>
-      </div>
+      <TextInputHolder hasFocus={this.state.focused || item.content === ''}>
+        <TextInput
+          data-cy="DescriptionQuestionText"
+          disabled={!canEdit}
+          onFocus={() => this.setState({ focused: true })}
+          onBlur={this.handleBlur}
+          onChange={this.handleChange}
+          type="descriptionText"
+          placeholder={placeholder}
+          value={item.content || ''}
+          maxLength={maxLength}
+        />
+        <StyledSmallText>{this.state.countLeft}</StyledSmallText>
+      </TextInputHolder>
     )
   }
 }

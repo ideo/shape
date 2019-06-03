@@ -23,6 +23,10 @@ const SharedRecordMixin = superclass =>
       return `/${this.internalType}/${this.id}`
     }
 
+    get isCommonViewable() {
+      return this.common_viewable
+    }
+
     API_updateName(name) {
       const previousName = this.name
       this.name = name
