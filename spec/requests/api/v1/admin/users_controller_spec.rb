@@ -68,7 +68,10 @@ describe Api::V1::Admin::UsersController, type: :request, json: true, auth: true
   describe 'GET #search' do
     let(:tag_list) { %w[millenial usa]}
     let(:audience) { create(:audience, tag_list: tag_list) }
-    let(:path) { "/api/v1/admin/users/search?audience_id=#{audience.id}" }
+    let(:num_respondents) { 5 }
+    let(:path) do
+      "/api/v1/admin/users/search?audience_id=#{audience.id}&num_respondents=#{num_respondents}"
+    end
     let(:test_collection1) { create(:test_collection) }
     let(:test_collection2) { create(:test_collection) }
     let(:test_audience1) do
@@ -126,6 +129,24 @@ describe Api::V1::Admin::UsersController, type: :request, json: true, auth: true
       ]
 
       expect(actual_user_ids).to eq(expected_user_ids)
+    end
+
+    context 'with more users that match query than the desired number' do
+      let(:num_respondents) { 2 }
+
+      it 'limits number of users returned to the desired number given' do
+        get path
+
+        expect(json['data'].size).to eq(2)
+
+        actual_user_ids = json['data'].pluck('id')
+        expected_user_ids = [
+          everything_user.id.to_s,
+          millenial_usa_user1.id.to_s,
+        ]
+
+        expect(actual_user_ids).to eq(expected_user_ids)
+      end
     end
   end
 end
