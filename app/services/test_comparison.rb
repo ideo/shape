@@ -14,23 +14,31 @@ class TestComparison < SimpleService
       maximum_order = data_item.data_items_datasets.maximum(:order)
       comparable_datasets = comparison_question_datasets_by_question_type[question_item.question_type]
       if comparable_datasets.blank?
-        data_items_dataset = data_item.data_items_datasets.create(
-          dataset: empty_dataset_for_comparison,
-          order: maximum_order += 1,
-          selected: true,
-        )
-        if data_items_dataset.errors.present?
-          errors.push(data_items_dataset.errors.full_messages)
-        end
-      else
-        comparable_datasets.each do |comparison_dataset|
+        begin
           data_items_dataset = data_item.data_items_datasets.create(
-            dataset: comparison_dataset,
+            dataset: empty_dataset_for_comparison,
             order: maximum_order += 1,
             selected: true,
           )
           if data_items_dataset.errors.present?
             errors.push(data_items_dataset.errors.full_messages)
+          end
+        rescue ActiveRecord::RecordNotUnique
+          # No-op, ignore if we already have linked the dataset
+        end
+      else
+        comparable_datasets.each do |comparison_dataset|
+          begin
+            data_items_dataset = data_item.data_items_datasets.create(
+              dataset: comparison_dataset,
+              order: maximum_order += 1,
+              selected: true,
+            )
+            if data_items_dataset.errors.present?
+              errors.push(data_items_dataset.errors.full_messages)
+            end
+          rescue ActiveRecord::RecordNotUnique
+            # No-op, ignore if we already have linked the dataset
           end
         end
       end
