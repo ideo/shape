@@ -113,6 +113,21 @@ describe PurchaseTestAudience, type: :service do
         expect(result.success?).to be true
       end
     end
+
+    context 'with the test audience already existing' do
+      let!(:test_audience) { create(:test_audience, audience: audiences.first, test_collection: test_collection) }
+
+      it 'should not create it a 2nd time' do
+        expect {
+          PurchaseTestAudience.call(
+            test_collection: test_collection,
+            test_audience_params: test_audience_params,
+            user: user,
+          )
+        }.not_to change(test_collection.test_audiences, :size)
+        expect(test_collection.test_audiences.size).to eq 1
+      end
+    end
   end
 
   context 'with no audiences' do
