@@ -22,18 +22,83 @@ exports[`TestDesigner renders snapshot 1`] = `
     <StyledSelectOption
       classes={
         Object {
+          "root": "grayedOut",
+          "selected": "selected",
+        }
+      }
+      disabled={true}
+      value=""
+    >
+      <span
+        data-cy="QuestionSelectOption"
+      >
+        select question type
+      </span>
+    </StyledSelectOption>
+    <StyledSelectOption
+      classes={
+        Object {
+          "root": "category",
+          "selected": "selected",
+        }
+      }
+      disabled={true}
+      value=""
+    >
+      <span
+        data-cy="QuestionSelectOption"
+      >
+        Idea Content
+      </span>
+    </StyledSelectOption>
+    <StyledSelectOption
+      classes={
+        Object {
           "root": "selectOption",
           "selected": "selected",
         }
       }
       disabled={false}
-      key="question_category_satisfaction"
-      value="question_category_satisfaction"
+      key="question_description"
+      value="question_description"
     >
       <span
         data-cy="QuestionSelectOption"
       >
-        Category Satisfaction
+        Description
+      </span>
+    </StyledSelectOption>
+    <StyledSelectOption
+      classes={
+        Object {
+          "root": "selectOption",
+          "selected": "selected",
+        }
+      }
+      disabled={false}
+      key="question_media"
+      value="question_media"
+    >
+      <span
+        data-cy="QuestionSelectOption"
+      >
+        Photo/Video
+      </span>
+    </StyledSelectOption>
+    <StyledSelectOption
+      classes={
+        Object {
+          "root": "category",
+          "selected": "selected",
+        }
+      }
+      disabled={true}
+      value=""
+    >
+      <span
+        data-cy="QuestionSelectOption"
+      >
+        Scaled Rating
       </span>
     </StyledSelectOption>
     <StyledSelectOption
@@ -50,24 +115,7 @@ exports[`TestDesigner renders snapshot 1`] = `
       <span
         data-cy="QuestionSelectOption"
       >
-        Clarity
-      </span>
-    </StyledSelectOption>
-    <StyledSelectOption
-      classes={
-        Object {
-          "root": "selectOption",
-          "selected": "selected",
-        }
-      }
-      disabled={false}
-      key="question_context"
-      value="question_context"
-    >
-      <span
-        data-cy="QuestionSelectOption"
-      >
-        Context Setting
+        Clear
       </span>
     </StyledSelectOption>
     <StyledSelectOption
@@ -101,74 +149,7 @@ exports[`TestDesigner renders snapshot 1`] = `
       <span
         data-cy="QuestionSelectOption"
       >
-        Excitement
-      </span>
-    </StyledSelectOption>
-    <StyledSelectOption
-      classes={
-        Object {
-          "root": "selectOption",
-          "selected": "selected",
-        }
-      }
-      disabled={false}
-      key="question_description"
-      value="question_description"
-    >
-      <span
-        data-cy="QuestionSelectOption"
-      >
-        Idea Description
-      </span>
-    </StyledSelectOption>
-    <StyledSelectOption
-      classes={
-        Object {
-          "root": "selectOption",
-          "selected": "selected",
-        }
-      }
-      disabled={false}
-      key="question_open"
-      value="question_open"
-    >
-      <span
-        data-cy="QuestionSelectOption"
-      >
-        Open Response
-      </span>
-    </StyledSelectOption>
-    <StyledSelectOption
-      classes={
-        Object {
-          "root": "selectOption",
-          "selected": "selected",
-        }
-      }
-      disabled={false}
-      key="question_media"
-      value="question_media"
-    >
-      <span
-        data-cy="QuestionSelectOption"
-      >
-        Photo or Video of Idea
-      </span>
-    </StyledSelectOption>
-    <StyledSelectOption
-      classes={
-        Object {
-          "root": "grayedOut",
-          "selected": "selected",
-        }
-      }
-      disabled={true}
-      value=""
-    >
-      <span
-        data-cy="QuestionSelectOption"
-      >
-        select question type
+        Exciting
       </span>
     </StyledSelectOption>
     <StyledSelectOption
@@ -186,6 +167,73 @@ exports[`TestDesigner renders snapshot 1`] = `
         data-cy="QuestionSelectOption"
       >
         Useful
+      </span>
+    </StyledSelectOption>
+    <StyledSelectOption
+      classes={
+        Object {
+          "root": "category",
+          "selected": "selected",
+        }
+      }
+      disabled={true}
+      value=""
+    >
+      <span
+        data-cy="QuestionSelectOption"
+      >
+        Customizable
+      </span>
+    </StyledSelectOption>
+    <StyledSelectOption
+      classes={
+        Object {
+          "root": "selectOption",
+          "selected": "selected",
+        }
+      }
+      disabled={false}
+      key="question_category_satisfaction"
+      value="question_category_satisfaction"
+    >
+      <span
+        data-cy="QuestionSelectOption"
+      >
+        Category Satisfaction
+      </span>
+    </StyledSelectOption>
+    <StyledSelectOption
+      classes={
+        Object {
+          "root": "selectOption",
+          "selected": "selected",
+        }
+      }
+      disabled={false}
+      key="question_context"
+      value="question_context"
+    >
+      <span
+        data-cy="QuestionSelectOption"
+      >
+        Context Setting
+      </span>
+    </StyledSelectOption>
+    <StyledSelectOption
+      classes={
+        Object {
+          "root": "selectOption",
+          "selected": "selected",
+        }
+      }
+      disabled={false}
+      key="question_open"
+      value="question_open"
+    >
+      <span
+        data-cy="QuestionSelectOption"
+      >
+        Open Response
       </span>
     </StyledSelectOption>
   </StyledSelect>
