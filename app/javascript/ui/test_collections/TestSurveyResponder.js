@@ -50,11 +50,19 @@ class TestSurveyResponder extends React.Component {
 
     const questionCards = [...collection.question_cards]
 
+    const questionFinishIndex = _.findIndex(
+      questionCards,
+      card => card.card_question_type === 'question_finish'
+    )
+
     if (includeRecontactQuestion) {
-      questionCards.splice(questionCards.length - 1, 0, {
+      // Put recontact question after the finish question
+      const recontactOrder = questionCards[questionFinishIndex].order + 1
+      questionCards.splice(questionFinishIndex + 1, 0, {
         id: 'recontact',
         card_question_type: 'question_recontact',
-        record: { id: 'facsda', content: '' },
+        order: recontactOrder,
+        record: { id: 'recontact_item', content: '' },
       })
     }
     if (includeTerms) {
