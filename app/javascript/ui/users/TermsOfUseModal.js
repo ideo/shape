@@ -163,7 +163,7 @@ class TermsOfUseModal extends React.Component {
                     value="yes"
                   />
                 }
-                label="Join the Shape Circle for early access to new Shape features and more!"
+                label="Join the Shape Circle for early access to new Shape features and more"
               />
             </FormControl>
 
