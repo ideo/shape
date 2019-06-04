@@ -620,9 +620,14 @@ class MovableGridCard extends React.PureComponent {
       transition = cardHoverTransition
     }
 
+    const touchDeviceClass =
+      (uiStore.isTouchDevice && cols === 1) || uiStore.isCypress
+        ? 'touch-device'
+        : ''
+
     return (
       <StyledCardWrapper
-        className={uiStore.isTouchDevice && cols === 1 ? 'touch-device' : ''}
+        className={touchDeviceClass}
         dragging={!moveComplete}
         zIndex={zIndex}
         onClick={this.handleWrapperClick}
