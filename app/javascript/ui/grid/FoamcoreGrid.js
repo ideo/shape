@@ -688,15 +688,17 @@ class FoamcoreGrid extends React.Component {
   }
 
   async moveCardsIntoCollection(cardIds, hoveringRecord) {
-    const onCancelOrSuccess = () => {
-      this.hoveringOver = false
-      this.calculateCardsToRender()
-    }
     this.props.collection.API_moveCardsIntoCollection({
       toCollection: hoveringRecord,
       cardIds,
-      onCancel: onCancelOrSuccess,
-      onSuccess: onCancelOrSuccess,
+      onCancel: () => {
+        this.hoveringOver = false
+        this.resetCardPositions()
+      },
+      onSuccess: () => {
+        this.hoveringOver = false
+        this.calculateCardsToRender()
+      },
     })
   }
 
