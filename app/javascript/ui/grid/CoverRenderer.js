@@ -33,6 +33,7 @@ class CoverRenderer extends React.Component {
       handleClick,
       searchResult,
       isBoardCollection,
+      isTestCollectionCard,
     } = this.props
     if (this.isItem) {
       switch (record.type) {
@@ -54,7 +55,13 @@ class CoverRenderer extends React.Component {
           if (record.isPdfFile) {
             return <PdfFileItemCover item={record} />
           } else if (record.isImage) {
-            return <ImageItemCover item={record} contain={card.image_contain} />
+            return (
+              <ImageItemCover
+                item={record}
+                contain={card.image_contain}
+                isTestCollectionCard={isTestCollectionCard}
+              />
+            )
           } else if (record.isVideo) {
             return <VideoItemCover item={record} dragging={dragging} />
           } else if (record.filestack_file) {
@@ -144,6 +151,7 @@ CoverRenderer.propTypes = {
   cardType: PropTypes.string.isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   isBoardCollection: PropTypes.bool,
+  isTestCollectionCard: PropTypes.bool,
   isCoverItem: PropTypes.bool,
   height: PropTypes.number,
   dragging: PropTypes.bool,
@@ -157,6 +165,7 @@ CoverRenderer.defaultProps = {
   searchResult: false,
   isCoverItem: false,
   isBoardCollection: false,
+  isTestCollectionCard: false,
   handleClick: () => null,
 }
 
