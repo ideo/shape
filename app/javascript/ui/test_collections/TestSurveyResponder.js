@@ -142,8 +142,10 @@ class TestSurveyResponder extends React.Component {
       })
     }
     if (card.id === 'terms') {
-      // If they didn't agree to the terms, don't continue
-      if (!answer) return
+      if (!answer) {
+        // If they didn't agree to the terms, send to marketing page
+        window.location.href = '/'
+      }
       runInAction(() => {
         this.termsAnswered = true
       })
