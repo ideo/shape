@@ -114,7 +114,7 @@ describe('Header', () => {
 
   describe('with no current_organization', () => {
     beforeEach(() => {
-      props.apiStore.currentUser.current_organization = null
+      props.apiStore.currentUserOrganization = null
       wrapper = shallow(<Header.wrappedComponent {...props} />)
     })
 

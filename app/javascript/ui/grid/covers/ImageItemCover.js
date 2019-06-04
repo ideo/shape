@@ -3,7 +3,8 @@ import { Fragment } from 'react'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import Viewer from 'react-viewer'
-import 'react-viewer/dist/index.css'
+// 'react-viewer/dist/index.css' is imported in application.scss
+// to get it to work on Heroku
 
 import SearchIcon from '~/ui/icons/SearchIcon'
 import v from '~/utils/variables'
