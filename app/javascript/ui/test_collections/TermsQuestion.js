@@ -34,35 +34,25 @@ class TermsQuestion extends React.Component {
     const { user } = this.props
     const { answered } = this
     return (
-      <div
-        style={{
-          width: '100%',
-          paddingTop: '20px',
-          paddingBottom: '20px',
-          backgroundColor: this.backgroundColor,
-        }}
-      >
-        <QuestionSpacingContainer editing={false}>
-          <QuestionText>
-            Before continuing, we ask that you read the following statement and
-            select the appropriate response.
-          </QuestionText>
-        </QuestionSpacingContainer>
-        <QuestionSpacingContainer editing={false}>
-          <QuestionText fontSizeEm={0.75}>
-            The contents of the survey may ask you to provide personal data
-            about yourself, including sensitive data such as race or health
-            information. It is your choice whether to provide this information
-            and it is entirely optional.
-            <br />
-            <br />
-            Any personal data you choose to provide will be stored in the US and
-            may be accessed by teams based in different countries, which have
-            different personal data laws and may be less strict than the EU for
-            example.
-            <br />
-          </QuestionText>
-        </QuestionSpacingContainer>
+      <QuestionSpacingContainer editing={false}>
+        <QuestionText>
+          Before continuing, we ask that you read the following statement and
+          select the appropriate response.
+        </QuestionText>
+
+        <QuestionText fontSizeEm={0.75}>
+          The contents of the survey may ask you to provide personal data about
+          yourself, including sensitive data such as race or health information.
+          It is your choice whether to provide this information and it is
+          entirely optional.
+          <br />
+          <br />
+          Any personal data you choose to provide will be stored in the US and
+          may be accessed by teams based in different countries, which have
+          different personal data laws and may be less strict than the EU for
+          example.
+          <br />
+        </QuestionText>
         <EmojiHolder data-cy="TermsEmojiHolder">
           <EmojiButton
             selected={answered && user && !user.respondent_terms_accepted}
@@ -78,7 +68,7 @@ class TermsQuestion extends React.Component {
             <Emoji scale={1.375} name="Yes" symbol="👍" />
           </EmojiButton>
         </EmojiHolder>
-      </div>
+      </QuestionSpacingContainer>
     )
   }
 }

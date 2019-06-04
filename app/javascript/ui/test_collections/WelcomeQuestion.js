@@ -28,7 +28,6 @@ class WelcomeQuestion extends React.Component {
           Thanks for taking the time to provide your feedback here on Shape. We
           look forward to hearing your thoughts!
         </QuestionText>
-        <br />
         <QuestionText>
           There are <strong>{numberOfQuestions} questions</strong> in this
           survey. Completing it should take around <strong>2 minutes</strong>,
