@@ -532,11 +532,14 @@ class CollectionGrid extends React.Component {
       height: 1,
       order,
       skipPositioning: true,
+      visible: false,
     }
     return emptyCard
   }
 
   addEmptyCards = (cards, matrix) => {
+    const { apiStore, uiStore, canEditCollection } = this.props
+    const { currentUser } = apiStore
     let previousCell = null
     const encountered = []
     matrix.forEach((row, rowIdx) => {
@@ -544,25 +547,40 @@ class CollectionGrid extends React.Component {
         if (cell !== null && !_.includes(encountered, cell)) {
           previousCell = cell
           encountered.push(cell)
-          return
+        } else if (cell === null) {
+          const previousCard = cards.find(c => c.id === previousCell)
+          if (!previousCard) return
+          const order = previousCard.order + 1
+          const id = `empty-${order}-${colIdx}-${rowIdx}`
+          const emptyCard = this.createEmptyCard(order, id)
+          emptyCard.position = this.calculateGridPosition({
+            card: emptyCard,
+            cardWidth: 1,
+            cardHeight: 1,
+            position: {
+              x: colIdx,
+              y: rowIdx,
+            },
+          })
+          cards.push(emptyCard)
         }
-        const previousCard = cards.find(c => c.id === previousCell)
-        if (!previousCard) return
-        const order = previousCard.order + 1
-        const id = `empty-${order}-${colIdx}-${rowIdx}`
-        const emptyCard = this.createEmptyCard(order, id)
-        emptyCard.position = this.calculateGridPosition({
-          card: emptyCard,
-          cardWidth: 1,
-          cardHeight: 1,
-          position: {
-            x: colIdx,
-            y: rowIdx,
-          },
-        })
-        cards.push(emptyCard)
       })
     })
+    // ---- new user case ---
+    // when `show_helper` is enabled
+    if (
+      !uiStore.blankContentToolIsOpen &&
+      currentUser &&
+      currentUser.show_helper &&
+      canEditCollection
+    ) {
+      // should find the first one with the highest order...
+      const maxOrderEmptyCard = _.maxBy(
+        _.filter(cards, { cardType: 'empty' }),
+        'order'
+      )
+      if (maxOrderEmptyCard) maxOrderEmptyCard.visible = true
+    }
   }
 
   addPaginationCard = cards => {

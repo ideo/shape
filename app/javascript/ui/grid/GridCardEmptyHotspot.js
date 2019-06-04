@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
@@ -10,6 +11,7 @@ const StyledGridCardEmpty = styled.div`
   height: 100%;
   position: relative;
 
+  &.visible,
   &:hover {
     background-color: ${v.colors.primaryLight} !important;
     .plus-icon {
@@ -40,8 +42,13 @@ class GridCardEmptyHotspot extends React.Component {
   }
 
   render() {
+    const { visible } = this.props
+
     return (
-      <StyledGridCardEmpty onClick={this.onClickHotspot}>
+      <StyledGridCardEmpty
+        className={visible ? 'visible' : ''}
+        onClick={this.onClickHotspot}
+      >
         <StyledPlusIcon className="plus-icon">
           <PlusIcon />
         </StyledPlusIcon>
@@ -51,6 +58,7 @@ class GridCardEmptyHotspot extends React.Component {
 }
 
 GridCardEmptyHotspot.propTypes = {
+  visible: PropTypes.bool.isRequired,
   card: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 GridCardEmptyHotspot.wrappedComponent.propTypes = {

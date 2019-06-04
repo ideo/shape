@@ -406,7 +406,10 @@ class MovableGridCard extends React.PureComponent {
 
   renderEmpty = () => (
     <PositionedGridCard {...this.styleProps()} transition={cardCSSTransition}>
-      <GridCardEmptyHotspot card={this.props.card} />
+      <GridCardEmptyHotspot
+        visible={this.props.card.visible}
+        card={this.props.card}
+      />
     </PositionedGridCard>
   )
 
