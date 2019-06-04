@@ -1,4 +1,5 @@
 import fakeApiStore from '#/mocks/fakeApiStore'
+import fakeUiStore from '#/mocks/fakeUiStore'
 import AdminFeedback from '~/ui/admin/AdminFeedback'
 import {
   fakeTestCollection,
@@ -19,6 +20,7 @@ describe('AdminFeedback', () => {
             totalPages: 2,
           },
         }),
+        uiStore: fakeUiStore,
       }
 
       wrapper = shallow(<AdminFeedback.wrappedComponent {...props} />)
@@ -90,6 +92,7 @@ describe('AdminFeedback', () => {
             totalPages: 1,
           },
         }),
+        uiStore: fakeUiStore,
       }
 
       wrapper = shallow(<AdminFeedback.wrappedComponent {...props} />)

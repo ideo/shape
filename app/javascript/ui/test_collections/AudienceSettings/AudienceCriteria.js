@@ -115,6 +115,10 @@ export const criteria = [
   },
 ]
 
+export const criteriaLimitByGroup = {
+  Psychographics: 2,
+}
+
 const getCriteriaBy = (key, value) =>
   criteria.filter(criterion => criterion[key] === value)
 
