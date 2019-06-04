@@ -16,6 +16,7 @@ import { Heading1, Heading2, Heading3 } from '~/ui/global/styled/typography'
 import { showOnHoverCss } from '~/ui/grid/shared'
 import Tooltip from '~/ui/global/Tooltip'
 import * as colors from '~shared/styles/constants/colors'
+import InfoNoCircleIcon from '~/ui/icons/InfoNoCircleIcon'
 
 const Wrapper = styled.div`
   font-family: ${v.fonts.sans};
@@ -49,7 +50,7 @@ const AudienceRowItem = styled(Grid)`
 AudienceRowItem.displayName = 'AudienceRowItem'
 
 const AudienceWrapper = styled(Flex)`
-  ${showOnHoverCss};
+  ${'' /* ${showOnHoverCss}; */};
 `
 
 const AudienceActions = styled.div`
@@ -158,6 +159,15 @@ class AdminFeedback extends React.Component {
                             <LinkIcon />
                           </CircledIcon>
                         </CopyToClipboard>
+                      </Tooltip>
+                      <Tooltip
+                        classes={{ tooltip: 'Tooltip' }}
+                        title={'view audience definition'}
+                        placement="top"
+                      >
+                        <CircledIcon>
+                          <InfoNoCircleIcon />
+                        </CircledIcon>
                       </Tooltip>
                     </AudienceActions>
                   </AudienceWrapper>
