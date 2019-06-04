@@ -5,8 +5,6 @@ class SerializableSurveyResponse < BaseJsonSerializer
 
 
   attribute :incentive do
-    # TODO: account for test_audience with price of 0.0 (link sharing)
-    # return nil if @object&.test_audience&.audience&.link_sharing?
-    @object.try(:test_audience).try(:price_per_response)
+    @object&.test_audience&.audience&.link_sharing? ? 0 : Shape::FEEDBACK_INCENTIVE_AMOUNT
   end
 end
