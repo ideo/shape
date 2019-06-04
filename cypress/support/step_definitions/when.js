@@ -67,7 +67,7 @@ When('I undo with CTRL+Z', () => {
 When('I close the snackbar', () => {
   cy.locateDataOrClass('.MuiSnackbarContent-action')
     .find('button')
-    .click()
+    .click({ force: true })
   // allow it to disappear
   cy.wait(1200)
 })
@@ -276,7 +276,7 @@ When('I fill out the organization name with {string}', orgName => {
 When('I click ... in the nav and select {string}', option => {
   cy.locate('PopoutMenu')
     .first()
-    .click()
+    .click({ force: true })
 
   cy.locate(`PopoutMenu_${option}`).click()
 })
