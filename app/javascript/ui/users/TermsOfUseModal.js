@@ -67,10 +67,17 @@ class TermsOfUseModal extends React.Component {
   isLoading = false
   @observable
   submitted = false
+  @observable
+  shapeCircleChecked = false
 
   @action
   handleMailingListCheck = event => {
     this.mailingListChecked = event.target.checked
+  }
+
+  @action
+  handleShapeCircleCheck = event => {
+    this.shapeCircleChecked = event.target.checked
   }
 
   @action
@@ -80,7 +87,10 @@ class TermsOfUseModal extends React.Component {
     const { currentUser } = this.props
     this.isLoading = true
     currentUser
-      .API_acceptTerms({ mailing_list: this.mailingListChecked })
+      .API_acceptTerms({
+        mailing_list: this.mailingListChecked,
+        shape_circle: this.shapeCircleChecked,
+      })
       .finally(() => {
         runInAction(() => {
           this.isLoading = false
@@ -114,9 +124,7 @@ class TermsOfUseModal extends React.Component {
       <StyledDialog
         classes={{ root: 'root__dialog', paper: 'modal__paper' }}
         open
-        BackdropProps={{
-          invisible: true,
-        }}
+        BackdropProps={{ invisible: true }}
       >
         <DialogContent>
           <form onSubmit={this.handleSubmit}>
@@ -143,6 +151,19 @@ class TermsOfUseModal extends React.Component {
                   />
                 }
                 label="Stay current on new features and case studies by signing up for our mailing list"
+              />
+            </FormControl>
+            <FormControl component="fieldset">
+              <FormControlLabel
+                classes={{ label: 'form-control' }}
+                control={
+                  <Checkbox
+                    checked={this.shapeCircleChecked}
+                    onChange={this.handleShapeCircleCheck}
+                    value="yes"
+                  />
+                }
+                label="Join the Shape Circle for early access to new Shape features and more!"
               />
             </FormControl>
 

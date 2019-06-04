@@ -91,6 +91,7 @@ class Api::V1::UsersController < Api::V1::BaseController
       :feedback_contact_preference,
       :feedback_terms_accepted,
       :respondent_terms_accepted,
+      :shape_circle,
     )
   end
 end

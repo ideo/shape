@@ -25,6 +25,7 @@
 #  provider                    :string
 #  remember_created_at         :datetime
 #  respondent_terms_accepted   :boolean          default(FALSE)
+#  shape_circle                :boolean          default(FALSE)
 #  show_helper                 :boolean          default(TRUE)
 #  show_move_helper            :boolean          default(TRUE)
 #  show_template_helper        :boolean          default(TRUE)

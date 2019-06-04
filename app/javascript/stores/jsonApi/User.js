@@ -51,10 +51,11 @@ class User extends BaseRecord {
     }
   }
 
-  API_acceptTerms({ mailing_list = false }) {
+  API_acceptTerms({ mailing_list = false, shape_circle = false }) {
     return this.API_updateCurrentUser({
       terms_accepted: true,
       mailing_list,
+      shape_circle,
     })
   }
 
