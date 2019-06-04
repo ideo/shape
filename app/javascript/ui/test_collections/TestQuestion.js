@@ -209,7 +209,6 @@ class TestQuestion extends React.Component {
           />
         )
       case 'question_welcome':
-        console.log({ surveyResponse })
         return (
           <WelcomeQuestion
             incentive={this.surveyIncentive(surveyResponse)}
@@ -245,7 +244,6 @@ TestQuestion.propTypes = {
   afterQuestionAnswered: PropTypes.func,
   canEdit: PropTypes.bool,
   numberOfQuestions: PropTypes.number.isRequired,
-  incentive: PropTypes.number,
 }
 
 TestQuestion.defaultProps = {
@@ -254,7 +252,6 @@ TestQuestion.defaultProps = {
   createSurveyResponse: null,
   afterQuestionAnswered: null,
   canEdit: false,
-  incentive: 2.5,
 }
 
 export default TestQuestion

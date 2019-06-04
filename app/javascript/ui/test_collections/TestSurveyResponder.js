@@ -108,7 +108,6 @@ class TestSurveyResponder extends React.Component {
     let reachedLastVisibleCard = false
     const questions = questionCards.filter(card => {
       // turn off the card's actionmenu (dot-dot-dot)
-      console.log('card id: ', card.id)
       if (
         ['recontact', 'terms', 'welcome'].every(
           questionId => card.id !== questionId

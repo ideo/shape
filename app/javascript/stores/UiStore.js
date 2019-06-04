@@ -862,7 +862,6 @@ export default class UiStore {
         'id'
       )
     } else {
-      // console.log(record.name, record.id, 'bummer.')
       // does this reset belong here? i.e. linkedBreadcrumbTrail has no proper connection here
       this.linkedBreadcrumbTrail.replace([])
       return breadcrumb
