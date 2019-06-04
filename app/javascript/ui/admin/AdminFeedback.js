@@ -17,6 +17,7 @@ import { showOnHoverCss } from '~/ui/grid/shared'
 import Tooltip from '~/ui/global/Tooltip'
 import * as colors from '~shared/styles/constants/colors'
 import InfoNoCircleIcon from '~/ui/icons/InfoNoCircleIcon'
+import AdminAudienceModal from '~/ui/admin/AdminAudienceModal'
 
 const Wrapper = styled.div`
   font-family: ${v.fonts.sans};
@@ -167,6 +168,11 @@ class AdminFeedback extends React.Component {
                       >
                         <CircledIcon>
                           <InfoNoCircleIcon />
+                          <AdminAudienceModal
+                            // may need to pass both test audience and regular audience?
+                            audience={testAudience.audience}
+                            open={open}
+                          />
                         </CircledIcon>
                       </Tooltip>
                     </AudienceActions>
@@ -191,6 +197,11 @@ class AdminFeedback extends React.Component {
         </Grid>
       </React.Fragment>
     ))
+  }
+
+  showAdminAudienceDialog = () => {
+    const { uiStore } = this.props
+    uiStore.update('adminAudienceMenuOpen', true)
   }
 
   render() {
