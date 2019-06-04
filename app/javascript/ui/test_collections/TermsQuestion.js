@@ -71,14 +71,14 @@ class TermsQuestion extends React.Component {
         </QuestionSpacingContainer>
         <EmojiHolder data-cy="TermsEmojiHolder">
           <EmojiButton
-            selected={answered && user && !user.respondent_terms_accepted}
+            selected={!answered || (user && !user.respondent_terms_accepted)}
             onClick={this.handleClick(false)}
           >
             <Emoji scale={1.375} name="Disagree" symbol="👎" />
           </EmojiButton>
           <EmojiButton
             data-cy="AcceptFeedbackTerms"
-            selected={answered && user && user.respondent_terms_accepted}
+            selected={!answered || (user && user.respondent_terms_accepted)}
             onClick={this.handleClick(true)}
           >
             <Emoji scale={1.375} name="Yes" symbol="👍" />
