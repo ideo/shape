@@ -12,13 +12,12 @@ import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import Modal from '~/ui/global/modals/Modal'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import TrashIcon from '~/ui/icons/TrashIcon'
-import v from '~/utils/variables'
+import v, { TARGETED_AUDIENCE_PRICE_PER_RESPONSE } from '~/utils/variables'
 import {
   groupCriteriaByGroup,
   getCriterionByName,
   criteriaLimitByGroup,
 } from './AudienceCriteria'
-import v, { TARGETED_AUDIENCE_PRICE_PER_RESPONSE } from '~/utils/variables'
 
 import {
   Checkbox,

@@ -397,7 +397,7 @@ class Collection
       }
     end
 
-    def serialized_for_test_survey
+    def serialized_for_test_survey(test_audience_id = nil)
       renderer = JSONAPI::Serializable::Renderer.new
       renderer.render(
         self,
@@ -405,6 +405,9 @@ class Collection
         # This uses a special serializer that defers collection cards to test design
         class: test_survey_render_class_mappings,
         include: test_survey_render_includes,
+        expose: {
+          test_audience_id: test_audience_id,
+        },
       )
     end
 
@@ -599,6 +602,10 @@ class Collection
     def gives_incentive?
       # right now the check is basically any paid tests == gives_incentive
       test_audiences.paid.present?
+    end
+
+    def gives_incentive_for?(test_audience_id)
+      test_audiences.paid.find_by(id: test_audience_id).present?
     end
 
     def purchased?

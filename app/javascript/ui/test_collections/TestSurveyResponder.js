@@ -147,6 +147,8 @@ class TestSurveyResponder extends React.Component {
       runInAction(() => {
         this.recontactAnswered = true
       })
+      // this is the last question, don't try to scroll
+      return
     }
     if (card.id === 'terms') {
       if (!answer) {

@@ -194,6 +194,7 @@ class TestQuestion extends React.Component {
             user={apiStore.currentUser}
             onAnswer={this.handleQuestionAnswer}
             sessionUid={surveyResponse.session_uid}
+            givesIncentive={parent.gives_incentive}
           />
         )
       case 'question_terms':
