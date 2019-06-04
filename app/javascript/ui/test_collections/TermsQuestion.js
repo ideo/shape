@@ -12,6 +12,8 @@ import { QuestionSpacingContainer } from './OpenQuestion'
 class TermsQuestion extends React.Component {
   @observable
   answered = false
+  @observable
+  choice = ''
 
   handleClick = choice => ev => {
     const { onAnswer, user } = this.props
@@ -22,6 +24,7 @@ class TermsQuestion extends React.Component {
       })
     }
     this.answered = true
+    this.choice = choice ? 'yes' : 'no'
     // there was a user, or anon user answered "no", move on
     onAnswer(choice)
   }
@@ -33,7 +36,7 @@ class TermsQuestion extends React.Component {
 
   render() {
     const { user } = this.props
-    const { answered } = this
+    const { answered, choice } = this
     return (
       <QuestionSpacingContainer editing={false}>
         <QuestionText>
@@ -57,7 +60,9 @@ class TermsQuestion extends React.Component {
         <EmojiHolder data-cy="TermsEmojiHolder">
           <EmojiButton
             selected={
-              !answered || (answered && user && !user.respondent_terms_accepted)
+              !answered ||
+              (answered && user && !user.respondent_terms_accepted) ||
+              choice == 'no'
             }
             onClick={this.handleClick(false)}
           >
@@ -66,7 +71,9 @@ class TermsQuestion extends React.Component {
           <EmojiButton
             data-cy="AcceptFeedbackTerms"
             selected={
-              !answered || (answered && user && user.respondent_terms_accepted)
+              !answered ||
+              (answered && user && user.respondent_terms_accepted) ||
+              choice == 'yes'
             }
             onClick={this.handleClick(true)}
           >
