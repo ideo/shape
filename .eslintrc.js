@@ -118,6 +118,7 @@ module.exports = {
     'react/prefer-stateless-function': 0,
     'react/jsx-curly-brace-presence': 0,
     'react/jsx-closing-tag-location': 0,
+    'react/jsx-no-undef': 2,
     'react/no-did-mount-set-state': 0,
     'react/no-unknown-property': 2,
     'react/jsx-uses-vars': 1,
