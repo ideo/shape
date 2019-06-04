@@ -138,7 +138,12 @@ class FoamcoreGrid extends React.Component {
       uiStore.selectedAreaEnabled = true
     })
     // now that component is mounted, calculate visible area and calculateCardsToRender
-    this.loadAfterScroll()
+    const visRows = this.visibleRows
+    const visCols = this.visibleCols
+    this.loadCards({
+      rows: [visRows.min, visRows.max],
+      cols: [visCols.min, visCols.max],
+    })
     this.updateCollectionScrollBottom()
     window.addEventListener('scroll', this.handleScroll)
   }
@@ -159,11 +164,19 @@ class FoamcoreGrid extends React.Component {
     window.removeEventListener('scroll', this.handleScroll)
   }
 
+  reloadLoadedCards() {
+    this.loadCards({
+      rows: [0, this.loadedRows.max],
+      cols: [0, this.loadedCols.max],
+    })
+  }
+
   loadCards({ rows, cols }) {
     const { loadCollectionCards } = this.props
     // Track what we've loaded
     // Set these immediately so further calls won't load the same rows
     this.updateMaxLoaded({ row: rows[1], col: cols[1] })
+    console.log('load cards', rows, cols)
     loadCollectionCards({
       rows,
       cols,
@@ -693,9 +706,14 @@ class FoamcoreGrid extends React.Component {
       cardIds,
       onCancel: () => {
         this.hoveringOver = false
-        this.resetCardPositions()
+        this.calculateCardsToRender()
       },
-      onSuccess: () => (this.hoveringOver = false),
+      onSuccess: () => {
+        this.hoveringOver = false
+        console.log('success')
+        this.reloadLoadedCards()
+        this.calculateCardsToRender()
+      },
     })
   }
 
@@ -1142,6 +1160,8 @@ class FoamcoreGrid extends React.Component {
 
       cards = [...cards, ...draggingPlaceholders]
     }
+
+    console.log('calculateCardsToRender', cards.length)
 
     // Don't render cards that are being dragged along
     cards = cards.filter(
