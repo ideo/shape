@@ -5,7 +5,6 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import Emoji from '~/ui/icons/Emoji'
 import { EmojiButton, EmojiHolder } from '~/ui/test_collections/ScaleQuestion'
 import { QuestionText } from '~/ui/test_collections/shared'
-import v from '~/utils/variables'
 import { QuestionSpacingContainer } from './OpenQuestion'
 
 @observer

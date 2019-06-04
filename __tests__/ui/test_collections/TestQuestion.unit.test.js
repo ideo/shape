@@ -9,6 +9,7 @@ describe('TestQuestion', () => {
       card: fakeItemCard,
       item: fakeQuestionItem,
       editing: true,
+      numberOfQuestions: 4,
     }
   })
 
