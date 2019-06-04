@@ -27,7 +27,6 @@ import {
 } from '~/ui/global/styled/forms'
 import { Heading3, DisplayText } from '~/ui/global/styled/typography'
 import { FloatRight } from '~/ui/global/styled/layout'
-import { DisplayText } from '~/ui/global/styled/typography'
 
 const ROOT_MENU = 'root'
 
@@ -377,18 +376,11 @@ class AddAudienceModal extends React.Component {
             </DisplayText>
           </Box>
           <Box mt={2} mb={35}>
-            <DisplayText color={v.colors.commonDark}>
-              Default price per respondent for a custom audience is $4.70
+            <DisplayText>
+              The default price per respondent for a custom audience is $
+              {TARGETED_AUDIENCE_PRICE_PER_RESPONSE.toFixed(2)}.
             </DisplayText>
           </Box>
-          <Grid container style={{ paddingBottom: '32px' }}>
-            <Grid item xs={12} style={{ textAlign: 'center' }}>
-              <DisplayText color="inherit">
-                Default price per respondent for a custom audience is $
-                {TARGETED_AUDIENCE_PRICE_PER_RESPONSE.toFixed(2)}
-              </DisplayText>
-            </Grid>
-          </Grid>
           <Grid container alignItems="center" style={{ paddingBottom: '32px' }}>
             <Grid item xs={6}>
               <Grid container justify="center">
