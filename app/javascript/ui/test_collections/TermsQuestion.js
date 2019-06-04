@@ -29,11 +29,6 @@ class TermsQuestion extends React.Component {
     onAnswer(choice)
   }
 
-  get backgroundColor() {
-    const { backgroundColor } = this.props
-    return backgroundColor ? backgroundColor : v.colors.primaryDark
-  }
-
   render() {
     const { user } = this.props
     const { answered, choice } = this
@@ -88,11 +83,9 @@ class TermsQuestion extends React.Component {
 TermsQuestion.propTypes = {
   user: MobxPropTypes.objectOrObservableObject,
   onAnswer: PropTypes.func.isRequired,
-  backgroundColor: PropTypes.string,
 }
 TermsQuestion.defaultProps = {
   user: null,
-  backgroundColor: null,
 }
 
 export default TermsQuestion

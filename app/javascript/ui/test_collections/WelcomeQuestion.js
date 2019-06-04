@@ -14,11 +14,6 @@ class WelcomeQuestion extends React.Component {
     onAnswer(choice)
   }
 
-  get backgroundColor() {
-    const { backgroundColor } = this.props
-    return backgroundColor ? backgroundColor : v.colors.primaryDark
-  }
-
   render() {
     const { numberOfQuestions, incentive } = this.props
 
@@ -46,12 +41,10 @@ class WelcomeQuestion extends React.Component {
 
 WelcomeQuestion.propTypes = {
   onAnswer: PropTypes.func.isRequired,
-  backgroundColor: PropTypes.string,
   numberOfQuestions: PropTypes.number.isRequired,
   incentive: PropTypes.number,
 }
 WelcomeQuestion.defaultProps = {
-  backgroundColor: null,
   incentive: FEEDBACK_INCENTIVE_AMOUNT,
 }
 
