@@ -92,7 +92,6 @@ const MenuBar = styled(AppBar)`
 `
 
 function handleScrollToContent(isHome) {
-  console.log('isHome', isHome)
   if (!isHome) {
     browserHistory.push('/')
     return
