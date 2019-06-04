@@ -1,14 +1,11 @@
 import _ from 'lodash'
-import { Flex } from 'reflexbox'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled, { ThemeProvider } from 'styled-components'
 import FlipMove from 'react-flip-move'
 import pluralize from 'pluralize'
 
-import { DisplayText, NumberListText } from '~/ui/global/styled/typography'
-import { Select, SelectOption } from '~/ui/global/styled/forms'
 import v, { ITEM_TYPES } from '~/utils/variables'
-import TrashIcon from '~/ui/icons/TrashIcon'
+import QuestionSelectHolder from '~/ui/test_collections/QuestionSelectHolder'
 import {
   TestQuestionHolder,
   styledTestTheme,
@@ -16,16 +13,18 @@ import {
 import QuestionHotEdge from '~/ui/test_collections/QuestionHotEdge'
 import TestQuestion from '~/ui/test_collections/TestQuestion'
 import RadioControl from '~/ui/global/RadioControl'
-import PinnedIcon from '~/ui/icons/PinnedIcon'
+import trackError from '~/utils/trackError'
 import { apiStore } from '~/stores'
+import AudienceSettings from '~/ui/test_collections/AudienceSettings'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 
+// TODO: have first and last TestQuestionFlexWrapper replace BottomBorder/TopBorder
 const TopBorder = styled.div`
   background-color: ${props => props.theme.borderColorEditing};
   border-radius: 7px 7px 0 0;
   height: 16px;
-  margin-left: 320px;
+  margin-left: 314px;
   width: 374px;
 
   @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
@@ -36,78 +35,46 @@ const BottomBorder = TopBorder.extend`
   border-radius: 0 0 7px 7px;
 `
 
-const QuestionSelectHolder = styled.div`
-  margin-top: 10px;
-  margin-right: 20px;
-  width: 300px;
+const TestQuestionFlexWrapper = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  width: 694px;
 
   @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
-    margin-bottom: 20px;
-    max-width: 400px;
+    width: 600px;
+  }
+
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    width: 100%;
   }
 `
 
-const TrashButton = styled.button`
-  position: relative;
-  top: 6px;
-  width: 26px;
-  margin-left: 12px;
+const OuterContainer = styled.div`
+  display: flex;
+
+  .design-column {
+    flex: 1 0 0;
+  }
+
+  .settings-column {
+    flex: 1 0 0;
+    margin-left: 30px;
+    width: auto;
+  }
+
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    flex-direction: column-reverse;
+    flex-wrap: wrap;
+
+    .design-column {
+      justify-content: center;
+    }
+
+    .settings-column {
+      margin-left: 0px;
+    }
+  }
 `
-
-const selectOptionGroups = [
-  {
-    category: 'Idea Content',
-    values: [
-      { value: 'question_description', label: 'Description' },
-      { value: 'question_media', label: 'Photo/Video' },
-    ],
-  },
-  {
-    category: 'Scaled Rating',
-    values: [
-      { value: 'question_clarity', label: 'Clear' },
-      { value: 'question_different', label: 'Different' },
-      { value: 'question_excitement', label: 'Exciting' },
-      { value: 'question_useful', label: 'Useful' },
-    ],
-  },
-  {
-    category: 'Customizable',
-    values: [
-      {
-        value: 'question_category_satisfaction',
-        label: 'Category Satisfaction',
-      },
-      { value: 'question_context', label: 'Context Setting' },
-      { value: 'question_open', label: 'Open Response' },
-    ],
-  },
-]
-
-const renderSelectOption = opt => {
-  const { value, label, category } = opt
-
-  let rootClass
-  if (category) rootClass = 'category'
-  else if (!value) rootClass = 'grayedOut'
-  else rootClass = 'selectOption'
-
-  return (
-    <SelectOption
-      key={label}
-      classes={{
-        root: rootClass,
-        selected: 'selected',
-      }}
-      disabled={!value}
-      value={value}
-    >
-      <span data-cy="QuestionSelectOption">{label}</span>
-    </SelectOption>
-  )
-}
-
-const optionSort = (a, b) => a.label.localeCompare(b.label)
 
 @observer
 class TestDesigner extends React.Component {
@@ -133,7 +100,11 @@ class TestDesigner extends React.Component {
         collectionToTest: res.data,
       })
     } catch (e) {
-      console.warn(e, 'unable to load parent collection')
+      trackError(e, {
+        message: `Unable to load parent collection for Collection ${
+          collection.id
+        }`,
+      })
     }
   }
 
@@ -251,6 +222,11 @@ class TestDesigner extends React.Component {
     return styledTestTheme('primary')
   }
 
+  get locked() {
+    const { collection } = this.props
+    return collection.is_test_locked
+  }
+
   get canEditQuestions() {
     const {
       isTemplated,
@@ -262,6 +238,7 @@ class TestDesigner extends React.Component {
     // but not necessarily add or change the questions themselves, once the editor "launches"
     if (isTemplated)
       return can_edit_content && (test_status !== 'draft' || launchable)
+    // this is where we do allow editing if it's locked/purchased
     return can_edit_content
   }
 
@@ -272,7 +249,7 @@ class TestDesigner extends React.Component {
     // NOTE: if we ever allow template instance editors to add their own questions at the end
     // (before the finish card?) then we may want to individually check canEdit on a per card basis
     if (isTemplated) return false
-    return can_edit_content
+    return can_edit_content && !this.locked
   }
 
   createNewQuestionCard = async ({
@@ -301,54 +278,6 @@ class TestDesigner extends React.Component {
 
   renderHotEdge(card, addBefore = false) {
     return <QuestionHotEdge onAdd={this.handleNew(card, addBefore)} />
-  }
-
-  renderQuestionSelectForm(card) {
-    const blank = !card.card_question_type
-    return (
-      <QuestionSelectHolder>
-        <NumberListText>{card.order + 1}.</NumberListText>
-        {card.card_question_type === 'question_finish' ? (
-          <DisplayText>End of Survey</DisplayText>
-        ) : (
-          <Select
-            classes={{
-              root: 'select fixedWidth',
-              select: blank ? 'grayedOut' : '',
-              selectMenu: 'selectMenu',
-            }}
-            displayEmpty
-            disabled={!this.canEdit}
-            name="role"
-            value={card.card_question_type || ''}
-            onChange={this.handleSelectChange(card)}
-          >
-            {renderSelectOption({ value: '', label: 'select question type' })}
-            {selectOptionGroups.map(optGroup => {
-              const options = [
-                {
-                  value: '',
-                  label: optGroup.category,
-                  category: true,
-                },
-              ]
-              optGroup.values.sort(optionSort).forEach(opt => options.push(opt))
-              return options.map(opt => renderSelectOption(opt))
-            })}
-          </Select>
-        )}
-        {this.canEdit &&
-          card.card_question_type !== 'question_finish' && (
-            <TrashButton onClick={() => this.handleTrash(card)}>
-              <TrashIcon />
-            </TrashButton>
-          )}
-        <div style={{ color: v.colors.commonMedium }}>
-          {card.isPinnedAndLocked && <PinnedIcon locked />}
-          {card.isPinnedInTemplate && <PinnedIcon />}
-        </div>
-      </QuestionSelectHolder>
-    )
   }
 
   renderTestTypeForm() {
@@ -415,48 +344,52 @@ class TestDesigner extends React.Component {
       ].includes(item.question_type)
       return (
         <FlipMove appearAnimation="fade" key={card.id}>
-          <div>
-            <Flex
-              style={{
-                width: '694px',
-                flexWrap: 'wrap',
-              }}
-            >
-              {i === 0 && this.canEdit && this.renderHotEdge(card, true)}
-              {this.renderQuestionSelectForm(card)}
-              <TestQuestionHolder editing userEditable={userEditable}>
-                <TestQuestion
-                  editing
-                  parent={collection}
-                  card={card}
-                  item={item}
-                  position={position}
-                  order={card.order}
-                  canEdit={this.canEditQuestions}
-                />
-              </TestQuestionHolder>
-              {this.canEdit &&
-                card.card_question_type !== 'question_finish' &&
-                this.renderHotEdge(card)}
-            </Flex>
-          </div>
+          <TestQuestionFlexWrapper className={`card ${card.id}`}>
+            {i === 0 && this.canEdit && this.renderHotEdge(card, true)}
+            <QuestionSelectHolder
+              card={card}
+              canEdit={this.canEdit}
+              handleSelectChange={this.handleSelectChange}
+              handleTrash={this.handleTrash}
+            />
+            <TestQuestionHolder editing userEditable={userEditable}>
+              <TestQuestion
+                editing
+                parent={collection}
+                card={card}
+                item={item}
+                position={position}
+                order={card.order}
+                canEdit={this.canEditQuestions}
+              />
+            </TestQuestionHolder>
+            {this.canEdit &&
+              card.card_question_type !== 'question_finish' &&
+              this.renderHotEdge(card)}
+          </TestQuestionFlexWrapper>
         </FlipMove>
       )
     })
 
     return (
       <ThemeProvider theme={this.styledTheme}>
-        <div>
-          {this.renderTestTypeForm()}
-          <TopBorder />
-          {inner}
-          <BottomBorder />
-        </div>
+        <OuterContainer>
+          <div className={'design-column'}>
+            <h3>Feedback Design</h3>
+            <TopBorder />
+            {inner}
+            <BottomBorder />
+          </div>
+          <div className={'settings-column'}>
+            <h3>Feedback Settings</h3>
+            {this.renderTestTypeForm()}
+            <AudienceSettings testCollection={collection} />
+          </div>
+        </OuterContainer>
       </ThemeProvider>
     )
   }
 }
-
 TestDesigner.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
 }

@@ -73,7 +73,14 @@ RSpec.configure do |config|
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
     # NOTE: need to reindex every searchable model before test suite is run
-    Searchkick.models.each(&:reindex)
+    Searchkick.models.each do |model|
+      begin
+        model.search_index.delete
+      rescue
+      end
+
+      model.reindex
+    end
     Searchkick.disable_callbacks
   end
 
@@ -125,6 +132,15 @@ RSpec.configure do |config|
     allow(fake_client).to receive(:read)
     allow(fake_client).to receive(:client).and_return(fake_methods)
     allow(FirestoreClient).to receive(:new).and_return(fake_client)
+  end
+
+  config.before(:each) do
+    fake_twilio = double('twilio')
+    fake_methods = Hashie::Mash.new(
+      create: {},
+    )
+    allow(fake_twilio).to receive(:messages).and_return(fake_methods)
+    allow(Twilio::REST::Client).to receive(:new).and_return(fake_twilio)
   end
 
   config.after(:each) do

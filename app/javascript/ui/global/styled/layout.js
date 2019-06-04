@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import Grid from '@material-ui/core/Grid'
 import { Flex } from 'reflexbox'
 import hexToRgba from '~/utils/hexToRgba'
 import styled from 'styled-components'
@@ -20,6 +21,18 @@ Row.propTypes = {
 Row.defaultProps = {
   align: 'flex-start',
 }
+
+export const StyledHeaderRow = styled(Row)`
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-left: 0;
+  margin-bottom: 0;
+
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    width: 100%;
+  }
+`
 
 /** @component */
 export const RowItemLeft = styled.span`
@@ -50,6 +63,11 @@ export const RowItem = styled.span`
   }
 `
 RowItem.displayName = 'StyledRowItem'
+
+export const RowItemGrid = styled(Grid)`
+  align-self: center;
+  margin-left: 14px;
+`
 
 export const InlineRow = styled(Flex)`
   & > * {
@@ -148,4 +166,21 @@ export const SmallBreak = styled.div`
 
 export const HeaderSpacer = styled.div`
   height: ${v.headerHeight}px;
+`
+
+export const ScrollArea = styled.div`
+  flex: 1 1 auto;
+  min-height: 220px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+`
+export const FooterBreak = styled.div`
+  border-top: 1px solid ${v.colors.commonMedium};
+  width: 100%;
+`
+
+export const FooterArea = styled.div`
+  flex: 0 0 auto;
+  padding-top: 24px;
+  padding-bottom: 30px;
 `

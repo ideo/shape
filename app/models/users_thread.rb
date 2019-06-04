@@ -1,3 +1,19 @@
+# == Schema Information
+#
+# Table name: users_threads
+#
+#  id                :bigint(8)        not null, primary key
+#  last_viewed_at    :datetime
+#  subscribed        :boolean          default(TRUE)
+#  created_at        :datetime         not null
+#  comment_thread_id :bigint(8)
+#  user_id           :bigint(8)
+#
+# Indexes
+#
+#  by_users_comment_thread  (user_id,comment_thread_id) UNIQUE
+#
+
 class UsersThread < ApplicationRecord
   include Firestoreable
 

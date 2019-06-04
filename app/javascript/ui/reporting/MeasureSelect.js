@@ -45,7 +45,7 @@ class MeasureSelect extends React.Component {
   get currentValue() {
     const { item, dataSettingsName } = this.props
     if (!item) return null
-    return item.data_settings[`d_${dataSettingsName}`]
+    return item.primaryDataset[dataSettingsName]
   }
 
   get contentSelected() {

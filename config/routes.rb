@@ -37,6 +37,12 @@ Rails.application.routes.draw do
             get 'will_become_private'
           end
         end
+        resources :datasets, only: %i[show] do
+          collection do
+            post 'select'
+            post 'unselect'
+          end
+        end
       end
       resources :items do
         member do
@@ -52,12 +58,15 @@ Rails.application.routes.draw do
           end
         end
       end
+      resources :datasets, only: %i[update]
       resources :test_collections, only: %i[show] do
         member do
           patch 'launch'
           patch 'close'
           patch 'reopen'
           get 'next_available'
+          post 'add_comparison'
+          post 'remove_comparison'
         end
       end
       resources :items, only: %i[create]
@@ -101,6 +110,7 @@ Rails.application.routes.draw do
         resources :collections, only: %i[create]
         resources :groups, only: %i[index]
         resources :users, only: %i[index]
+        resources :audiences, only: %i[index]
       end
       delete 'sessions' => 'sessions#destroy'
       resources :users, except: :index do
@@ -129,6 +139,7 @@ Rails.application.routes.draw do
           get 'user_notifications'
         end
       end
+      resources :test_audiences, only: %i[create update destroy]
       scope :filestack do
         get 'token', to: 'filestack#token', as: :filestack_token
       end
@@ -141,16 +152,25 @@ Rails.application.routes.draw do
         # not shallow because we always want to look up survey_response by session_uid
         resources :question_answers, only: %i[create update]
       end
+
+      resources :audiences, only: %i[index show create]
+
+      namespace :admin do
+        resources :users, only: %i[index destroy create]
+        resources :test_collections, only: %i[index]
+      end
     end
   end
 
   resources :tests, only: %i[show] do
-    member do
-      get 'token_auth'
-    end
     collection do
+      get 't/:token', to: 'tests#token_auth'
       get 'completed'
     end
+  end
+
+  namespace :admin do
+    root to: 'dashboard#index'
   end
 
   authenticate :user, ->(u) { Rails.env.development? || u.has_cached_role?(Role::SUPER_ADMIN) } do

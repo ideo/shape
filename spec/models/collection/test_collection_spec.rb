@@ -10,6 +10,7 @@ describe Collection::TestCollection, type: :model do
   context 'associations' do
     it { should have_many :survey_responses }
     it { should have_many :prelaunch_question_items }
+    it { should have_many :test_audiences }
     it { should have_one :test_design }
     it { should belong_to :collection_to_test }
   end
@@ -59,14 +60,37 @@ describe Collection::TestCollection, type: :model do
         expect(test_collection.cached_owned_tag_list).to match_array(['feedback'])
       end
     end
+
+    describe '#setup_link_sharing_test_audience' do
+      let!(:link_sharing_audience) { create(:audience, price_per_response: 0) }
+      let(:test_audience) { test_collection.test_audiences.first }
+
+      it 'should add the test_audience with status of "closed"' do
+        expect(test_collection.test_audiences.count).to be 1
+        expect(test_audience.status).to eq 'closed'
+        expect(test_audience.link_sharing?).to be true
+      end
+
+      it 'returns gives_incentive_for test_audience = false' do
+        expect(test_collection.gives_incentive_for?(test_audience.id)).to be false
+      end
+    end
   end
 
   describe '#create_uniq_survey_response' do
+    let!(:test_audience) { create(:test_audience, test_collection: test_collection) }
+
     it 'should create a survey response with a unique session_uid' do
       expect do
         test_collection.create_uniq_survey_response
       end.to change(test_collection.survey_responses, :count).by(1)
       expect(test_collection.survey_responses.last.session_uid).not_to be nil
+    end
+
+    it 'should accept the passed in test_audience_id' do
+      expect do
+        test_collection.create_uniq_survey_response(test_audience_id: test_audience.id)
+      end.to change(test_audience.survey_responses, :count).by(1)
     end
   end
 
@@ -281,7 +305,8 @@ describe Collection::TestCollection, type: :model do
             ).to eq(
               [
                 Item::VideoItem,
-                Item::ChartItem,
+                Item::DataItem,
+                Item::LegendItem,
                 Collection::TestDesign,
               ],
             )
@@ -296,8 +321,28 @@ describe Collection::TestCollection, type: :model do
             expect do
               test_collection.launch!(initiated_by: user)
             end.to change(
-              Item::ChartItem, :count
+              Item::DataItem, :count
             ).by(test_collection.question_items.select { |q| q.question_context? || q.question_useful? }.size)
+          end
+
+          context 'with test audiences' do
+            let(:audience) { create(:audience) }
+            let!(:test_audience) { create(:test_audience, audience: audience, test_collection: test_collection, price_per_response: 2) }
+
+            it 'should create test audience datasets for each question' do
+              expect do
+                test_collection.launch!(initiated_by: user)
+              end.to change(
+                Dataset::Question, :count
+              ).by(2)
+              expect(Dataset::Question.last.groupings).to eq(
+                [{ 'id' => test_audience.id, 'type' => 'TestAudience' }],
+              )
+            end
+
+            it 'returns gives_incentive_for test_audience = true' do
+              expect(test_collection.gives_incentive_for?(test_audience.id)).to be true
+            end
           end
 
           context 'with open response questions' do
@@ -316,6 +361,54 @@ describe Collection::TestCollection, type: :model do
                   .question_items
                   .all?(&:test_open_responses_collection),
               ).to be true
+            end
+          end
+
+          context 'with media questions' do
+            let!(:test_collection) { create(:test_collection) }
+
+            it 'creates a media item link for each media item' do
+              test_collection.launch!(initiated_by: user)
+              expect(
+                test_collection
+                  .items
+                  .count,
+              ).to equal 4
+            end
+          end
+
+          context 'with test_audience_params' do
+            it 'should call PurchaseTestAudience' do
+              params = { some: 'params' }
+              expect(PurchaseTestAudience).to receive(:call).with(
+                test_collection: test_collection,
+                test_audience_params: params,
+                user: user,
+              )
+              test_collection.launch!(initiated_by: user, test_audience_params: params)
+            end
+          end
+
+          context 'without targeted audience' do
+            it 'should not send a notification email' do
+              expect(TestCollectionMailer).not_to receive(:notify_launch)
+              test_collection.launch!(initiated_by: user)
+            end
+          end
+
+          context 'with targeted audience' do
+            it 'should send a notification email' do
+              audience = create(:audience)
+              create(:test_audience, audience: audience, test_collection: test_collection, price_per_response: 1)
+
+              deliver_double = double('TestCollectionMailer')
+              allow(TestCollectionMailer).to receive(:notify_launch).and_return(deliver_double)
+              allow(deliver_double).to receive(:deliver_later).and_return(true)
+
+              ENV['ENABLE_ZENDESK_FOR_TEST_LAUNCH'] = '1'
+
+              expect(TestCollectionMailer).to receive(:notify_launch).with(test_collection.id)
+              test_collection.launch!(initiated_by: user)
             end
           end
 
@@ -360,11 +453,38 @@ describe Collection::TestCollection, type: :model do
       describe '#close!' do
         before do
           test_collection.launch!(initiated_by: user)
+          allow(NotifyFeedbackCompletedWorker).to receive(:perform_async).and_call_original
         end
 
-        it 'should set status as closed' do
+        it 'should set status as closed and set closed_at datetime' do
           expect(test_collection.close!).to be true
           expect(test_collection.closed?).to be true
+          expect(test_collection.test_closed_at).to be_within(1.second).of Time.current
+        end
+
+        it 'does not call NotifyFeedbackCompletedWorker' do
+          expect(NotifyFeedbackCompletedWorker).not_to receive(:perform_async)
+          expect(test_collection.close!).to be true
+        end
+
+        context 'with link sharing audiences' do
+          let!(:test_audience) { create(:test_audience, :link_sharing, test_collection: test_collection) }
+
+          it 'does not call NotifyFeedbackCompletedWorker' do
+            expect(NotifyFeedbackCompletedWorker).not_to receive(:perform_async)
+            expect(test_collection.close!).to be true
+          end
+        end
+
+        context 'with paid audiences' do
+          let!(:test_audience) { create(:test_audience, test_collection: test_collection) }
+
+          it 'calls NotifyFeedbackCompletedWorker' do
+            expect(NotifyFeedbackCompletedWorker).to receive(:perform_async).with(
+              test_collection.id,
+            )
+            expect(test_collection.close!).to be true
+          end
         end
       end
 
@@ -379,8 +499,8 @@ describe Collection::TestCollection, type: :model do
           expect(test_collection.live?).to be true
         end
 
-        it 'should call the launch_test! method on itself with `reopening` param' do
-          expect(test_collection).to receive(:launch_test!).with(initiated_by: user, reopening: true)
+        it 'should call the post_launch_setup! method on itself with `reopening` param' do
+          expect(test_collection).to receive(:post_launch_setup!).with(initiated_by: user, reopening: true)
           test_collection.reopen!(initiated_by: user)
         end
       end
@@ -476,9 +596,14 @@ describe Collection::TestCollection, type: :model do
       it 'should find all submissions and close their tests' do
         expect(submission_test.test_status).to eq 'live'
         expect(submission.reload.submission_attrs['test_status']).to eq 'live'
+
         test_collection.close!
+
+        expect(test_collection.test_closed_at).to be_within(1.second).of Time.current
+
         submission.reload
         submission_test.reload
+
         expect(submission.submission_attrs['test_status']).to eq 'closed'
         expect(submission_test.test_status).to eq 'closed'
       end

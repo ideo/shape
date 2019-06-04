@@ -321,6 +321,7 @@ class GridCard extends React.Component {
       searchResult,
       handleClick,
       isBoardCollection,
+      testCollectionCard,
     } = this.props
     let { record, cardType } = this.props
     if (this.coverItem) {
@@ -332,13 +333,14 @@ class GridCard extends React.Component {
       <CoverRenderer
         card={card}
         cardType={cardType}
-        coverItem={this.coverItem}
+        isCoverItem={this.coverItem ? true : false}
         record={record}
         height={height}
         dragging={dragging}
         searchResult={searchResult}
         handleClick={handleClick}
         isBoardCollection={isBoardCollection}
+        isTestCollectionCard={testCollectionCard}
       />
     )
   }
@@ -379,8 +381,7 @@ class GridCard extends React.Component {
         dragging={dragging}
         draggingMultiple={draggingMultiple}
         testCollectionCard={testCollectionCard}
-        unclickable={testCollectionCard || record.isImage}
-        // mostly for E2E checking purposes
+        unclickable={testCollectionCard || record.isImage} // mostly for E2E checking purposes
         data-width={card.width}
         data-height={card.height}
         data-order={card.order}
@@ -466,7 +467,7 @@ class GridCard extends React.Component {
         {/* onClick placed here so it's separate from hotspot click */}
         <StyledGridCardInner
           onClick={this.handleClick}
-          hasOverflow={record.isData}
+          hasOverflow={record.isData || record.isLegend}
           filter={card.filter}
           forceFilter={!this.hasCover}
         >

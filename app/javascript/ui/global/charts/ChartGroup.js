@@ -1,22 +1,28 @@
 import PropTypes from 'prop-types'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import {
   LineSegment,
   VictoryAxis,
   VictoryChart,
+  VictoryGroup,
   VictoryLabel,
   VictoryVoronoiContainer,
 } from 'victory'
 
 import { DisplayText } from '~/ui/global/styled/typography'
 import OrganicGrid from '~/ui/icons/OrganicGrid'
-import { theme } from '~/ui/test_collections/shared'
 import monthEdge from '~/utils/monthEdge'
 import v, { DATASET_CHART_TYPES } from '~/utils/variables'
 import AreaChart from '~/ui/global/charts/AreaChart'
+import BarChart from '~/ui/global/charts/BarChart'
 import LineChart from '~/ui/global/charts/LineChart'
-import { datasetPropType, utcMoment } from '~/ui/global/charts/ChartUtils'
+import Tick from '~/ui/global/charts/Tick'
+import {
+  utcMoment,
+  victoryTheme,
+  emojiSeriesForQuestionType,
+} from '~/ui/global/charts/ChartUtils'
 
 const calculateTickLabelEdges = labelText => {
   if (!labelText) return 0
@@ -44,17 +50,18 @@ const NotEnoughDataContainer = styled.div`
 `
 
 const ChartContainer = styled.div`
-  bottom: 0px;
-  height: 92%;
   position: absolute;
-  width: 100%;
+  height: ${props => props.height};
+  bottom: 0;
+  left: 0;
+  right: 0;
 `
 
-class ChartGroup extends React.PureComponent {
+@observer
+class ChartGroup extends React.Component {
   get primaryDataset() {
-    const { datasets } = this.props
-    if (datasets.length <= 1) return datasets[0]
-    return datasets.find(dataset => dataset.order === 0)
+    const { primaryDataset } = this.props.dataItem
+    return primaryDataset
   }
 
   get primaryDatasetValues() {
@@ -63,9 +70,16 @@ class ChartGroup extends React.PureComponent {
   }
 
   get secondaryDatasetsWithData() {
-    const { datasets } = this.props
-    return datasets.filter(
+    const { secondaryDatasets } = this.props.dataItem
+    return secondaryDatasets().filter(
       dataset => dataset.order !== 0 && dataset.data.length > 0
+    )
+  }
+
+  get primaryDatasetBarChart() {
+    return (
+      this.primaryDataset &&
+      this.primaryDataset.chart_type === DATASET_CHART_TYPES.BAR
     )
   }
 
@@ -106,6 +120,16 @@ class ChartGroup extends React.PureComponent {
 
   fullDate = (date, index) => `${utcMoment(date).format('MM/DD/YY')}`
 
+  get totalBarsPerGroup() {
+    return this.secondaryDatasetsWithData.length + 1
+  }
+
+  get emojiScale() {
+    const { question_type } = this.primaryDataset
+    if (!question_type) return []
+    return emojiSeriesForQuestionType(question_type)
+  }
+
   get chartAxisStyle() {
     if (this.isSmallChartStyle) {
       return {
@@ -143,6 +167,39 @@ class ChartGroup extends React.PureComponent {
         fontSize: '10px',
         dy: 5,
       }
+    }
+
+    if (this.primaryDatasetBarChart) {
+      return (
+        <VictoryAxis
+          style={{
+            axis: { stroke: 'transparent' },
+          }}
+          tickValues={[1, 2, 3, 4]}
+          tickFormat={this.emojiScale.map(e => e.symbol)}
+          tickLabelComponent={<Tick emojiScale={this.emojiScale} />}
+          events={[
+            {
+              eventHandlers: {
+                onMouseOver: () => [
+                  {
+                    target: 'tickLabels',
+                    mutation: props => ({
+                      isHovered: true,
+                    }),
+                  },
+                ],
+                onMouseOut: () => [
+                  {
+                    target: 'labels',
+                    mutation: props => null,
+                  },
+                ],
+              },
+            },
+          ]}
+        />
+      )
     }
 
     // NOTE: The transform property is for IE11 which doesn't recognize CSS
@@ -185,7 +242,7 @@ class ChartGroup extends React.PureComponent {
     </NotEnoughDataContainer>
   )
 
-  renderDataset = (dataset, index) => {
+  renderDataset = (dataset, index, total) => {
     const { simpleDateTooltip, width, height } = this.props
     const dashWidth = index * 2
     switch (dataset.chart_type) {
@@ -202,6 +259,12 @@ class ChartGroup extends React.PureComponent {
           cardArea: width * height,
           dashWidth,
         })
+      case DATASET_CHART_TYPES.BAR:
+        return BarChart({
+          dataset,
+          cardArea: width * height,
+          barsInGroup: total,
+        })
       default:
         return AreaChart({
           dataset,
@@ -211,25 +274,49 @@ class ChartGroup extends React.PureComponent {
     }
   }
 
-  get renderCharts() {
+  get renderedDatasets() {
     let datasetIndex = 0
-    return (
-      <ChartContainer data-cy="ChartContainer">
-        <OrganicGrid />
+    const datasets = [
+      this.renderDataset(
+        this.primaryDataset,
+        datasetIndex,
+        this.totalBarsPerGroup
+      ),
+    ]
+    if (!this.secondaryDatasetsWithData) return datasets
+    this.secondaryDatasetsWithData.forEach(dataset =>
+      datasets.push(
+        this.renderDataset(dataset, (datasetIndex += 1), this.totalBarsPerGroup)
+      )
+    )
+    return datasets
+  }
+
+  get renderVictoryChart() {
+    if (this.primaryDatasetBarChart) {
+      return (
         <VictoryChart
-          theme={theme}
-          domainPadding={{ y: 80 }}
-          padding={{ top: 0, left: 0, right: 0, bottom: 0 }}
-          containerComponent={<VictoryVoronoiContainer />}
+          theme={victoryTheme}
+          domainPadding={{ y: 70 }}
+          padding={{ top: 0, left: 60, right: 60, bottom: 15 }}
         >
-          {this.renderDataset(this.primaryDataset, datasetIndex)}
-          {this.secondaryDatasetsWithData &&
-            this.secondaryDatasetsWithData.map(dataset =>
-              this.renderDataset(dataset, (datasetIndex += 1))
-            )}
+          <VictoryGroup offset={30 / (this.totalBarsPerGroup / 3)}>
+            {this.renderedDatasets.map(dataset => dataset)}
+          </VictoryGroup>
           {this.chartAxis}
         </VictoryChart>
-      </ChartContainer>
+      )
+    }
+    return (
+      <VictoryChart
+        theme={victoryTheme}
+        domainPadding={{ y: 80 }}
+        padding={{ top: 0, left: 0, right: 0, bottom: 0 }}
+        containerComponent={<VictoryVoronoiContainer />}
+      >
+        {this.renderedDatasets.map(dataset => dataset)}
+        {this.chartAxis}
+      </VictoryChart>
     )
   }
 
@@ -237,12 +324,20 @@ class ChartGroup extends React.PureComponent {
     if (this.primaryDatasetValues.length === 0) {
       return this.renderNotEnoughData()
     }
-    return this.renderCharts
+    return (
+      <ChartContainer
+        height={this.primaryDatasetBarChart ? '100%' : '92%'}
+        data-cy="ChartContainer"
+      >
+        <OrganicGrid />
+        {this.renderVictoryChart}
+      </ChartContainer>
+    )
   }
 }
 
 ChartGroup.propTypes = {
-  datasets: MobxPropTypes.arrayOrObservableArrayOf(datasetPropType).isRequired,
+  dataItem: MobxPropTypes.objectOrObservableObject.isRequired,
   simpleDateTooltip: PropTypes.bool,
   width: PropTypes.number,
   height: PropTypes.number,

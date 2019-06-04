@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types'
-import ifEmoji from 'if-emoji'
 import styled from 'styled-components'
 
 import EmojiDarkSunglasses from '~/assets/emoji/dark-sunglasses.png'
@@ -29,6 +28,11 @@ function emojiFallback(symbol) {
   }
   return fallback
 }
+function emojiSupported() {
+  const ctx = document.createElement('canvas').getContext('2d')
+  ctx.fillText('😗', -2, 4)
+  return ctx.getImageData(0, 0, 1, 1).data[3] > 0
+}
 
 const EmojiImage = styled.img`
   display: inline-block;
@@ -37,13 +41,16 @@ const EmojiImage = styled.img`
 
 const Emoji = props => {
   const { name, symbol, scale } = props
-  return ifEmoji(symbol) ? (
+  return emojiSupported(symbol) ? (
     <span
       className="emoji"
       role="img"
       aria-label={name || ''}
       aria-hidden={name ? 'false' : 'true'}
-      style={{ fontSize: `${parseInt(32 * scale)}px` }}
+      style={{
+        fontSize: `${parseInt(32 * scale)}px`,
+        fontFamily: 'Segoe UI Emoji',
+      }}
     >
       {symbol}
     </span>

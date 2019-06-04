@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "properties": {
+    "name": { "type": "string" },
+    "price_per_response": { "type": ["number", "null"] },
+    "criteria": { "type": ["number", "null"] },
+    "global": { "type": "boolean" }
+  }
+}

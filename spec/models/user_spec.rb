@@ -13,6 +13,7 @@ describe User, type: :model do
     it { should have_many :comments }
     it { should have_many :activities_as_actor }
     it { should have_many :notifications }
+    it { should have_many :feedback_incentive_records }
 
     context 'as application bot user' do
       let(:organizations) { create_list(:organization, 2) }
@@ -572,6 +573,43 @@ describe User, type: :model do
       # expect(DeprovisionUserWorker).to receive(:perform_async).with(user.id)
       expect(user).to receive(:archived!)
       user.archive!
+    end
+  end
+
+  describe '#current_incentive_balance' do
+    let!(:feedback_incentive_record1) { create(:feedback_incentive_record, amount: 2, current_balance: 2, user: user) }
+    let!(:feedback_incentive_record2) { create(:feedback_incentive_record, amount: 4, current_balance: 6, user: user) }
+
+    it 'gets the balance from the most recent record' do
+      expect(user.feedback_incentive_records.count).to eq 2
+      expect(user.current_incentive_balance).to eq feedback_incentive_record2.current_balance
+    end
+  end
+
+  describe '#network_user' do
+    let(:user) { create(:user) }
+
+    it 'should look up the user from the Network' do
+      expect(NetworkApi::User).to receive(:find).with(user.uid).and_return([])
+      user.network_user
+    end
+  end
+
+  describe '#incentive_due_date' do
+    let(:user) { create(:user) }
+
+    it 'is nil without an incentive record' do
+      expect(user.incentive_due_date).to be_nil
+    end
+
+    context 'with incentive record' do
+      let!(:incentive) { create(:feedback_incentive_record, user: user) }
+
+      it 'is first incentive created_at + waiting period' do
+        expect(user.incentive_due_date).to be_within(0.1).of(
+          incentive.created_at + FeedbackIncentiveRecord::PAYMENT_WAITING_PERIOD,
+        )
+      end
     end
   end
 end

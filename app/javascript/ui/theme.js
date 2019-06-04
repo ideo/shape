@@ -77,6 +77,14 @@ const theme = {
       main: v.colors.ctaPrimary,
     },
   },
+  zIndex: {
+    mobileStepper: 1000,
+    appBar: 1100,
+    drawer: 1200,
+    snackbar: 1300,
+    modal: 1400,
+    tooltip: 1500,
+  },
   breakpoints: {
     values: {
       xs: 0, // default

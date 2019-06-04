@@ -23,6 +23,16 @@ const fakeApiStore = ({
       .fn()
       .mockReturnValue(Promise.resolve())
       .mockName('fetchRoles'),
+    fetchShapeAdminUsers: jest
+      .fn()
+      .mockReturnValue(Promise.resolve(requestResult))
+      .mockName('fetchShapeAdminUsers'),
+    removeShapeAdminUser: jest.fn(),
+    addShapeAdminUsers: jest.fn(),
+    fetchTestCollections: jest
+      .fn()
+      .mockReturnValue(Promise.resolve(requestResult))
+      .mockName('fetchTestCollections'),
     sync: jest.fn().mockName('sync'),
     loadCurrentUser: jest.fn().mockReturnValue(Promise.resolve()),
     searchUsersAndGroups: jest
@@ -104,6 +114,7 @@ const fakeApiStore = ({
     ],
     collections: [],
     items: [],
+    shapeAdminUsers: [],
 
     uiStore: fakeUiStore,
     undoStore: {},

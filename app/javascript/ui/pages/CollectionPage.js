@@ -400,6 +400,7 @@ class CollectionPage extends React.Component {
 
   render() {
     const { collection, uiStore, apiStore } = this.props
+
     if (!collection) {
       return this.loader()
     }
