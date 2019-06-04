@@ -401,11 +401,11 @@ class AddAudienceModal extends React.Component {
               placeholder={'Enter Audience Name…'}
             />
           </FieldContainer>
-          <Box mb={3}>
+          <Box mb={2}>
             <Label>Targeting Criteria</Label>
           </Box>
           {this.renderSelectedCriteria()}
-          <Box mb={4}>
+          <Box mb={3}>
             <div ref={ref => (this.criteriaTriggers[ROOT_MENU] = ref)}>
               <Button href="#" onClick={() => this.openMenu(ROOT_MENU)}>
                 <StyledPlusIcon>
