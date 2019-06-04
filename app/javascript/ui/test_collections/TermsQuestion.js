@@ -21,6 +21,7 @@ class TermsQuestion extends React.Component {
         respondent_terms_accepted: choice,
       })
     }
+    this.answered = true
     // there was a user, or anon user answered "no", move on
     onAnswer(choice)
   }
@@ -55,14 +56,18 @@ class TermsQuestion extends React.Component {
         </QuestionText>
         <EmojiHolder data-cy="TermsEmojiHolder">
           <EmojiButton
-            selected={answered && user && !user.respondent_terms_accepted}
+            selected={
+              !answered || (answered && user && !user.respondent_terms_accepted)
+            }
             onClick={this.handleClick(false)}
           >
             <Emoji scale={1.375} name="Disagree" symbol="👎" />
           </EmojiButton>
           <EmojiButton
             data-cy="AcceptFeedbackTerms"
-            selected={answered && user && user.respondent_terms_accepted}
+            selected={
+              !answered || (answered && user && user.respondent_terms_accepted)
+            }
             onClick={this.handleClick(true)}
           >
             <Emoji scale={1.375} name="Yes" symbol="👍" />

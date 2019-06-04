@@ -115,8 +115,7 @@ class RecontactQuestion extends React.Component {
               !answer ||
               (user &&
                 user.feedback_contact_preference === 'feedback_contact_yes') ||
-              answer === 'feedback_contact_yes' ||
-              !answer
+              answer === 'feedback_contact_yes'
             }
             onClick={this.handleClick('feedback_contact_yes')}
             data-cy="RecontactEmojiBtnThumbUp"
