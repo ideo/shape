@@ -49,6 +49,13 @@ AudienceRowItem.displayName = 'AudienceRowItem'
 
 const AudienceWrapper = styled(Flex)`
   ${showOnHoverCss};
+  position: relative;
+  top: -0.5rem;
+  /*
+    adjust upward, so audience name is plum with the rest of the row's
+    contents. the AudienceAction buttons had the effect of pushing the
+    audience name down.
+  */
 `
 
 const AudienceAction = styled.div`
@@ -246,18 +253,18 @@ class AdminFeedback extends React.Component {
                   <Heading3>Audience(s)</Heading3>
                   <Grid container>
                     <Grid item xs={5}>
-                  <SubHeading>Audience Name</SubHeading>
-              </Grid>
-              <Grid item xs={2}>
+                      <SubHeading>Audience Name</SubHeading>
+                    </Grid>
+                    <Grid item xs={2}>
                       <SubHeadingRight>n Requested</SubHeadingRight>
-              </Grid>
+                    </Grid>
                     <Grid item xs={3}>
                       <SubHeadingRight>Sourced from INA</SubHeadingRight>
                     </Grid>
-              <Grid item xs={2}>
+                    <Grid item xs={2}>
                       <SubHeadingRight>Completed</SubHeadingRight>
-              </Grid>
-            </Grid>
+                    </Grid>
+                  </Grid>
                 </Flex>
               </Grid>
             </Grid>
