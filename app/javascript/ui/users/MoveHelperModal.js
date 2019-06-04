@@ -123,7 +123,12 @@ class MoveHelperModal extends React.Component {
             </FormControl>
 
             <div className="button--center">
-              <TextButton disabled={this.isLoading}>Close</TextButton>
+              <TextButton
+                data-cy="MoveHelperModal-button"
+                disabled={this.isLoading}
+              >
+                Close
+              </TextButton>
             </div>
           </form>
         </StyledDialogContent>

@@ -238,7 +238,8 @@ class TestDesigner extends React.Component {
     // but not necessarily add or change the questions themselves, once the editor "launches"
     if (isTemplated)
       return can_edit_content && (test_status !== 'draft' || launchable)
-    return can_edit_content && !this.locked
+    // this is where we do allow editing if it's locked/purchased
+    return can_edit_content
   }
 
   get canEdit() {

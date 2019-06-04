@@ -1,4 +1,5 @@
-# NOTE: if audiences are free, will not really "purchase" but just create
+# NOTE: This is no longer creating link sharing audiences (they will be skipped since they already exist)
+# could refactor this to more explicitly just focus on paid audiences
 class PurchaseTestAudience
   include Interactor
   include Interactor::Schema

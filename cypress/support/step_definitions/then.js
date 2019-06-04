@@ -20,6 +20,12 @@ Then('I should see a {string} in the first card', el => {
     .should('be.visible')
 })
 
+Then('I should see a {string} in the index {int} card', (el, pos) => {
+  cy.get(`[data-cy="GridCard"][data-order="${pos}"]`)
+    .locateDataOrClass(el)
+    .should('be.visible')
+})
+
 Then('I should see the element {string}', el => {
   cy.locate(el).should('be.visible')
 })
@@ -103,3 +109,9 @@ Then(
       .should('have.length', count)
   }
 )
+
+Then('I should see the value {string} in the first text item', text => {
+  cy.get('.ql-editor')
+    .first()
+    .should('contain', text)
+})

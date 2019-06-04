@@ -80,6 +80,14 @@ class TextItemCover extends React.Component {
       return false
     }
     await apiStore.fetch('items', item.id, true)
+    // store item content for later undo action
+    item.pushUndo({
+      snapshot: {
+        data_content: this.state.item.data_content,
+      },
+      message: 'Text undone!',
+      redirectTo: uiStore.viewingCollection,
+    })
     uiStore.update('textEditingItem', this.state.item)
     return null
   }

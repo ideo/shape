@@ -114,6 +114,20 @@ describe('TextItemCover', () => {
       expect(apiStore.fetch).toHaveBeenCalledWith('items', item.id, true)
     })
 
+    it('calls item.pushUndo if can_edit_content', async () => {
+      wrapper.setProps({
+        dragging: false,
+        item: { ...item, can_edit_content: true },
+      })
+      const result = await component.handleClick(e)
+      expect(result).toBe(null)
+      expect(item.pushUndo).toHaveBeenCalledWith({
+        message: 'Text undone!',
+        redirectTo: null,
+        snapshot: { data_content: item.data_content },
+      })
+    })
+
     it('calls uiStore.showPermissionsAlert if cannot view', () => {
       wrapper.setProps({
         item: { ...item, can_view: false },
