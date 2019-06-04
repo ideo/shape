@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { filter, flatten, includes, remove } from 'lodash'
-import { Flex } from 'reflexbox'
+import { Flex, Box } from 'reflexbox'
 import { Grid } from '@material-ui/core'
 
 import Audience from '~/stores/jsonApi/Audience'
@@ -25,6 +25,11 @@ import {
   TextButton,
   TextField,
 } from '~/ui/global/styled/forms'
+import {
+  Heading3,
+  DisplayText,
+  SmallHelperText,
+} from '~/ui/global/styled/typography'
 import { FloatRight } from '~/ui/global/styled/layout'
 import { DisplayText } from '~/ui/global/styled/typography'
 
@@ -60,6 +65,14 @@ const SelectedOption = styled.span`
   padding: 8px 12px;
 `
 SelectedOption.displayName = 'SelectedOption'
+
+const UnderlineLink = styled.div`
+  text-decoration: underline;
+  cursor: pointer;
+  display: inline;
+  margin-left: 4px;
+  margin-right: 4px;
+`
 
 @inject('apiStore')
 @observer
@@ -114,6 +127,12 @@ class AddAudienceModal extends React.Component {
     await audience.API_create()
 
     this.reset()
+  }
+
+  handleShowSupportWidget = () => {
+    const { zE } = window
+    zE('webWidget', 'show')
+    zE('webWidget', 'open')
   }
 
   reset = () => {
@@ -348,6 +367,22 @@ class AddAudienceModal extends React.Component {
               style={{ borderWidth: '0 0 1px 0' }}
             />
           </FieldContainer>
+          <Box mt={1} mb={25}>
+            <Heading3>Need help with your audience?</Heading3>
+            <DisplayText>
+              Want to include unavailable criteria or add more interests? We're
+              happy to help you create the audience you need.
+              <UnderlineLink onClick={this.handleShowSupportWidget}>
+                Submit a request
+              </UnderlineLink>
+              and we’ll get back to you in 24 hours.
+            </DisplayText>
+          </Box>
+          <Box mt={2} mb={35}>
+            <SmallHelperText>
+              Default price per respondent for a custom audience is $4.70
+            </SmallHelperText>
+          </Box>
           <Grid container style={{ paddingBottom: '32px' }}>
             <Grid item xs={12} style={{ textAlign: 'center' }}>
               <DisplayText color="inherit">

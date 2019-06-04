@@ -36,5 +36,9 @@ FactoryBot.define do
     factory :network_app_metric_dataset, class: 'Dataset::NetworkAppMetric' do
       url 'https://profile.ideo.com/api/v1/app_metrics'
     end
+
+    factory :empty_dataset, class: 'Dataset::Empty' do
+      data_source factory: :test_collection
+    end
   end
 end
