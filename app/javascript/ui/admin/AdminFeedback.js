@@ -23,18 +23,14 @@ const Wrapper = styled.div`
   font-family: ${v.fonts.sans};
 `
 
-const SubHeadingWrapper = styled(Flex)`
-  align-items: flex-end;
-  flex-direction: column;
-  height: 100%;
-  justify-content: flex-end;
-  text-align: right;
-`
-
 const SubHeading = styled.div`
   color: ${v.colors.commonDark};
   font-size: 0.75rem;
   line-height: 1rem;
+`
+
+const SubHeadingRight = styled(SubHeading)`
+  text-align: right;
 `
 
 const FeedbackRow = styled(Grid)`
@@ -149,7 +145,7 @@ class AdminFeedback extends React.Component {
           <Grid container item xs={6}>
             {testCollection.test_audiences.map(testAudience => (
               <React.Fragment key={testAudience.id}>
-                <AudienceRowItem item xs={4}>
+                <AudienceRowItem item xs={5}>
                   <AudienceWrapper align="center">
                     {testAudience.audience.name}
                     <Flex className="show-on-hover">
@@ -193,10 +189,13 @@ class AdminFeedback extends React.Component {
                     </Flex>
                   </AudienceWrapper>
                 </AudienceRowItem>
-                <AudienceRowItem item xs={4}>
+                <AudienceRowItem item xs={2}>
                   <Flex justify="flex-end">{testAudience.sample_size}</Flex>
                 </AudienceRowItem>
-                <AudienceRowItem item xs={4}>
+                <AudienceRowItem item xs={3}>
+                  <Flex justify="flex-end">0</Flex>
+                </AudienceRowItem>
+                <AudienceRowItem item xs={2}>
                   <Flex justify="flex-end">
                     {testAudience.num_survey_responses}
                   </Flex>
@@ -242,21 +241,24 @@ class AdminFeedback extends React.Component {
               <Grid item xs={2}>
                 <Heading3>Time Elapsed</Heading3>
               </Grid>
-              <Grid item xs={2}>
+              <Grid item xs={6}>
                 <Flex column>
                   <Heading3>Audience(s)</Heading3>
+                  <Grid container>
+                    <Grid item xs={5}>
                   <SubHeading>Audience Name</SubHeading>
+              </Grid>
+              <Grid item xs={2}>
+                      <SubHeadingRight>n Requested</SubHeadingRight>
+              </Grid>
+                    <Grid item xs={3}>
+                      <SubHeadingRight>Sourced from INA</SubHeadingRight>
+                    </Grid>
+              <Grid item xs={2}>
+                      <SubHeadingRight>Completed</SubHeadingRight>
+              </Grid>
+            </Grid>
                 </Flex>
-              </Grid>
-              <Grid item xs={2}>
-                <SubHeadingWrapper>
-                  <SubHeading>n Requested</SubHeading>
-                </SubHeadingWrapper>
-              </Grid>
-              <Grid item xs={2}>
-                <SubHeadingWrapper>
-                  <SubHeading>Completed</SubHeading>
-                </SubHeadingWrapper>
               </Grid>
             </Grid>
             <Grid container>

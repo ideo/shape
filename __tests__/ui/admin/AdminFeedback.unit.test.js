@@ -34,7 +34,7 @@ describe('AdminFeedback', () => {
 
     it('shows audience data for each test', () => {
       const audienceRowItems = wrapper.find('AudienceRowItem')
-      expect(audienceRowItems.length).toEqual(3)
+      expect(audienceRowItems.length).toEqual(4)
 
       const audienceName = audienceRowItems.at(0)
       expect(audienceName.html()).toContain(fakeAudience.name)
@@ -42,7 +42,11 @@ describe('AdminFeedback', () => {
       const audienceSampleSize = audienceRowItems.at(1)
       expect(audienceSampleSize.html()).toContain(fakeTestAudience.sample_size)
 
-      const audienceResponseCount = audienceRowItems.at(2)
+      // TODO: wire up "Sourced from INA" column to real data
+      const inaSourcedCount = audienceRowItems.at(2)
+      expect(inaSourcedCount.html()).toContain(0)
+
+      const audienceResponseCount = audienceRowItems.at(3)
       expect(audienceResponseCount.html()).toContain(
         fakeTestAudience.num_survey_responses
       )
