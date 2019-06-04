@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
-import { observable, action } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observable, action } from 'mobx'
 import styled, { ThemeProvider } from 'styled-components'
 
 import Emoji from '~/ui/icons/Emoji'
