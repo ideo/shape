@@ -1,9 +1,4 @@
-import countries from 'i18n-iso-countries'
-import en from 'i18n-iso-countries/langs/en.json'
-import { sortBy, uniq } from 'lodash'
-
-countries.registerLocale(en)
-const countryNames = sortBy(Object.values(countries.getNames('en')))
+import { uniq } from 'lodash'
 
 export const criteria = [
   {
@@ -29,7 +24,12 @@ export const criteria = [
   {
     name: 'Country',
     group: 'Demographics',
-    options: countryNames,
+    options: [
+      'Australia',
+      'Canada',
+      'United Kingdom',
+      'United States of America',
+    ],
   },
   {
     name: 'Education',

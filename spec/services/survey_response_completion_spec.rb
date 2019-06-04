@@ -58,5 +58,15 @@ describe SurveyResponseCompletion, type: :service do
         end.not_to change(FeedbackIncentiveRecord, :count)
       end
     end
+
+    context 'with link sharing' do
+      let(:test_collection) { create(:test_collection, :with_link_sharing) }
+
+      it 'does not create feedback_incentive_records' do
+        expect do
+          service.call
+        end.not_to change(FeedbackIncentiveRecord, :count)
+      end
+    end
   end
 end

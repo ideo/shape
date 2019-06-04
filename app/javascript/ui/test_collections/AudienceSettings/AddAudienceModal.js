@@ -25,11 +25,7 @@ import {
   TextButton,
   TextField,
 } from '~/ui/global/styled/forms'
-import {
-  Heading3,
-  DisplayText,
-  SmallHelperText,
-} from '~/ui/global/styled/typography'
+import { Heading3, DisplayText } from '~/ui/global/styled/typography'
 import { FloatRight } from '~/ui/global/styled/layout'
 import { DisplayText } from '~/ui/global/styled/typography'
 
@@ -381,9 +377,9 @@ class AddAudienceModal extends React.Component {
             </DisplayText>
           </Box>
           <Box mt={2} mb={35}>
-            <SmallHelperText>
+            <DisplayText color={v.colors.commonDark}>
               Default price per respondent for a custom audience is $4.70
-            </SmallHelperText>
+            </DisplayText>
           </Box>
           <Grid container style={{ paddingBottom: '32px' }}>
             <Grid item xs={12} style={{ textAlign: 'center' }}>
