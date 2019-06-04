@@ -92,6 +92,11 @@ class TestQuestion extends React.Component {
     afterQuestionAnswered(card)
   }
 
+  surveyIncentive(surveyResponse) {
+    if (!surveyResponse || !surveyResponse.incentive) return undefined
+    return parseFloat(surveyResponse.incentive)
+  }
+
   renderQuestion() {
     const {
       parent,
@@ -207,7 +212,7 @@ class TestQuestion extends React.Component {
         console.log({ surveyResponse })
         return (
           <WelcomeQuestion
-            incentive={surveyResponse ? surveyResponse.incentive : undefined}
+            incentive={this.surveyIncentive(surveyResponse)}
             numberOfQuestions={numberOfQuestions}
             onAnswer={this.handleQuestionAnswer}
           />
