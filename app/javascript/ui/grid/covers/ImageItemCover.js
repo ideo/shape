@@ -1,6 +1,12 @@
 import PropTypes from 'prop-types'
+import { Fragment } from 'react'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import Viewer from 'react-viewer'
+import 'react-viewer/dist/index.css'
+
+import SearchIcon from '~/ui/icons/SearchIcon'
+import v from '~/utils/variables'
 
 export const StyledImageCover = styled.div`
   ${props => props.url && `background-image: url(${props.url});`}
@@ -10,15 +16,74 @@ export const StyledImageCover = styled.div`
   background-repeat: no-repeat;
   width: 100%;
   height: 100%;
+  cursor: pointer;
 `
 StyledImageCover.displayName = 'StyledImageCover'
 
-class ImageItemCover extends React.PureComponent {
-  render() {
-    const { contain, item } = this.props
+const StyledMagnifyIcon = styled.div`
+  position: absolute;
+  top: 10px;
+  right: 5px;
+  color: ${v.colors.white};
+  cursor: pointer;
+  .icon {
+    width: 30px;
+    height: 30px;
+  }
+`
+
+class ImageItemCover extends React.Component {
+  state = {
+    fullscreen: false,
+  }
+
+  toggleFullscreen = () => {
+    const { fullscreen } = this.state
+    this.setState({ fullscreen: !fullscreen })
+  }
+
+  get imageUrl() {
+    const { item } = this.props
     const retina = window.devicePixelRatio && window.devicePixelRatio > 1
-    const imageUrl = item.imageUrl({ resize: { width: retina ? 2400 : 1200 } })
-    return <StyledImageCover url={imageUrl} contain={contain} />
+    return item.imageUrl({ resize: { width: retina ? 2400 : 1200 } })
+  }
+
+  get renderFullscreenImage() {
+    const { fullscreen } = this.state
+    return (
+      <Viewer
+        images={[{ src: this.imageUrl, alt: '' }]}
+        visible={fullscreen}
+        onClose={this.toggleFullscreen}
+        onMaskClick={this.toggleFullscreen}
+        rotatable={false}
+        scalable={false}
+        zIndex={1000}
+        drag={true}
+        changeable={false}
+        noImgDetails={true}
+        downloadable={false}
+        noNavbar={true}
+        zoomSpeed={0.25}
+      />
+    )
+  }
+
+  render() {
+    const { contain } = this.props
+    return (
+      <Fragment>
+        {this.renderFullscreenImage}
+        <StyledMagnifyIcon onClick={this.toggleFullscreen}>
+          <SearchIcon />
+        </StyledMagnifyIcon>
+        <StyledImageCover
+          url={this.imageUrl}
+          contain={contain}
+          onClick={this.toggleFullscreen}
+        />
+      </Fragment>
+    )
   }
 }
 
