@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { filter, flatten, includes, remove, forEach } from 'lodash'
+import { filter, flatten, includes, remove } from 'lodash'
 import { Flex, Box } from 'reflexbox'
 import { Grid } from '@material-ui/core'
 
@@ -204,22 +204,6 @@ class AddAudienceModal extends React.Component {
     this.setState({ selectedCriteriaOptions, numCriteriaPerGroup })
   }
 
-  get reachedCriteriaLimit() {
-    const { numCriteriaPerGroup } = this.state
-
-    if (!criteriaLimitByGroup) return false
-
-    let overLimit = false
-
-    forEach(criteriaLimitByGroup, (limit, group) => {
-      if (numCriteriaPerGroup[group] > limit) {
-        overLimit = true
-      }
-    })
-
-    return overLimit
-  }
-
   validateForm() {
     const valid = this.state.name.length > 0
     this.setState({ valid })
@@ -296,7 +280,7 @@ class AddAudienceModal extends React.Component {
   }
 
   renderSelectedCriteria() {
-    const { selectedCriteriaOptions } = this.state
+    const { selectedCriteriaOptions, numCriteriaPerGroup } = this.state
 
     return this.state.selectedCriteria.map(criteria => {
       const { options, group } = getCriterionByName(criteria)
@@ -307,6 +291,7 @@ class AddAudienceModal extends React.Component {
         includes(prefixedOptions, o)
       )
       const isLimited = criteriaLimitByGroup[group]
+      const atLimit = numCriteriaPerGroup[group] > criteriaLimitByGroup[group]
       return (
         <FieldContainer key={`menu_${criteria}`}>
           <FloatRight>
@@ -321,8 +306,12 @@ class AddAudienceModal extends React.Component {
             <Label>{criteria}</Label>
             {isLimited && (
               <Box mt={-14} mb={14}>
-                <SmallHelperText>
-                  Audiences are limited to a total of two interests or
+                <SmallHelperText
+                  style={{
+                    color: atLimit ? v.colors.alert : v.colors.commonMedium,
+                  }}
+                >
+                  Audiences are limited to a total of two (2) interests or
                   publications.
                 </SmallHelperText>
               </Box>
@@ -366,9 +355,7 @@ class AddAudienceModal extends React.Component {
           </CheckboxSelectOption>
         )
       })
-
       const menuOpen = openMenus[criteria]
-
       return this.renderSelectMenu({
         isOpen: menuOpen,
         menuId: criteria,
@@ -379,6 +366,8 @@ class AddAudienceModal extends React.Component {
   }
 
   render() {
+    const { selectedCriteriaOptions } = this.state
+    const numSelectedOptions = selectedCriteriaOptions.length
     return (
       <React.Fragment>
         <Modal
@@ -386,7 +375,6 @@ class AddAudienceModal extends React.Component {
           onClose={this.reset}
           open={this.props.open}
         >
-          {this.reachedCriteriaLimit && <div>BIG WARNING</div>}
           <FieldContainer>
             <Label htmlFor="audienceName">Audience Name</Label>
             <TextField
@@ -397,9 +385,11 @@ class AddAudienceModal extends React.Component {
               placeholder={'Enter Audience Name…'}
             />
           </FieldContainer>
-          {this.renderSelectedCriteria()}
-          <FieldContainer>
+          <Box mb={3}>
             <Label>Targeting Criteria</Label>
+          </Box>
+          {this.renderSelectedCriteria()}
+          <Box mb={4}>
             <div ref={ref => (this.criteriaTriggers[ROOT_MENU] = ref)}>
               <Button href="#" onClick={() => this.openMenu(ROOT_MENU)}>
                 <StyledPlusIcon>
@@ -412,7 +402,7 @@ class AddAudienceModal extends React.Component {
               color={v.colors.commonMedium}
               style={{ borderWidth: '0 0 1px 0' }}
             />
-          </FieldContainer>
+          </Box>
           <Box mt={1} mb={25}>
             <Heading3>Need help with your audience?</Heading3>
             <DisplayText>
@@ -443,7 +433,11 @@ class AddAudienceModal extends React.Component {
                   onClick={this.handleSave}
                   width={190}
                   type="submit"
-                  disabled={!this.state.valid || this.reachedCriteriaLimit}
+                  disabled={
+                    !this.state.valid ||
+                    this.reachedCriteriaLimit ||
+                    numSelectedOptions === 0
+                  }
                 >
                   Save
                 </FormButton>
