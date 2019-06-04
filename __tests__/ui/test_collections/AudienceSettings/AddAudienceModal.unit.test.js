@@ -13,7 +13,6 @@ describe('AddAudienceModal', () => {
       close: jest.fn(),
       afterSave: jest.fn(),
     }
-
     wrapper = shallow(<AddAudienceModal.wrappedComponent {...props} />)
   })
 
@@ -31,6 +30,16 @@ describe('AddAudienceModal', () => {
     const state = wrapper.state()
     expect(state.name).toEqual(name)
     expect(state.valid).toEqual(true)
+
+    // Add a criteria interest so button is not disabled
+    const addCriteriaButton = wrapper.find('Button')
+    addCriteriaButton.simulate('click')
+    const criteriaMenu = wrapper.find('StyledSelect')
+    criteriaMenu.simulate('change', { target: { value: ['Age'] } })
+    const ageMenu = wrapper.find('StyledSelect')
+    const genX = 'Age Gen X (born 1965-1980)'
+    wrapper.find(`StyledCheckboxSelectOption[value="${genX}"]`)
+    ageMenu.simulate('change', { target: { value: [genX] } })
 
     submitButton = wrapper.find('StyledFormButton')
     expect(submitButton.props()['disabled']).toBeFalsy()
