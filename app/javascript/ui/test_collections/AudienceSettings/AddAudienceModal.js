@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { filter, flatten, includes, remove } from 'lodash'
+import { filter, flatten, includes, remove, forEach } from 'lodash'
 import { Flex, Box } from 'reflexbox'
 import { Grid } from '@material-ui/core'
 
@@ -13,7 +13,11 @@ import Modal from '~/ui/global/modals/Modal'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import TrashIcon from '~/ui/icons/TrashIcon'
 import v from '~/utils/variables'
-import { groupCriteriaByGroup, getCriterionByName } from './AudienceCriteria'
+import {
+  groupCriteriaByGroup,
+  getCriterionByName,
+  criteriaLimitByGroup,
+} from './AudienceCriteria'
 import {
   Checkbox,
   CheckboxSelectOption,
@@ -43,6 +47,7 @@ const StyledPlusIcon = styled.span`
 const EditButton = styled.button`
   height: 22px;
   width: 22px;
+  margin-right: 6px;
 `
 EditButton.displayName = 'EditButton'
 
@@ -80,6 +85,7 @@ class AddAudienceModal extends React.Component {
     name: '',
     valid: false,
     selectedCriteria: [],
+    numCriteriaPerGroup: {},
     openMenus: {},
     selectedCriteriaOptions: [],
   }
@@ -140,6 +146,7 @@ class AddAudienceModal extends React.Component {
       name: '',
       valid: false,
       selectedCriteria: [],
+      numCriteriaPerGroup: {},
       openMenus: {},
       selectedCriteriaOptions: [],
     })
@@ -150,6 +157,7 @@ class AddAudienceModal extends React.Component {
     if (!criteria) return
 
     const { selectedCriteria } = this.state
+
     selectedCriteria.push(criteria)
     this.setState({ selectedCriteria })
 
@@ -158,28 +166,58 @@ class AddAudienceModal extends React.Component {
   }
 
   removeCriteria(criteria) {
-    const { selectedCriteria, selectedCriteriaOptions } = this.state
+    const {
+      numCriteriaPerGroup,
+      selectedCriteria,
+      selectedCriteriaOptions,
+    } = this.state
 
     remove(selectedCriteria, c => c === criteria)
 
-    const { options } = getCriterionByName(criteria)
+    const { options, group } = getCriterionByName(criteria)
     remove(selectedCriteriaOptions, o => includes(options, o))
-
-    this.setState({ selectedCriteria, selectedCriteriaOptions })
+    numCriteriaPerGroup[group] -= 1
+    this.setState({
+      selectedCriteria,
+      selectedCriteriaOptions,
+      numCriteriaPerGroup,
+    })
   }
 
-  selectCriteraOption = e => {
-    const { selectedCriteriaOptions } = this.state
+  toggleCriteriaOption = (e, criteria) => {
+    const { selectedCriteriaOptions, numCriteriaPerGroup } = this.state
+
+    const { group } = getCriterionByName(criteria)
+
+    if (!numCriteriaPerGroup[group]) numCriteriaPerGroup[group] = 0
 
     e.target.value.forEach(value => {
       if (includes(selectedCriteriaOptions, value)) {
         remove(selectedCriteriaOptions, o => o === value)
+        numCriteriaPerGroup[group] -= 1
       } else {
         selectedCriteriaOptions.push(value)
+        numCriteriaPerGroup[group] += 1
       }
     })
 
-    this.setState({ selectedCriteriaOptions })
+    this.setState({ selectedCriteriaOptions, numCriteriaPerGroup })
+  }
+
+  get reachedCriteriaLimit() {
+    const { numCriteriaPerGroup } = this.state
+
+    if (!criteriaLimitByGroup) return false
+
+    let overLimit = false
+
+    forEach(criteriaLimitByGroup, (limit, group) => {
+      if (numCriteriaPerGroup[group] > limit) {
+        overLimit = true
+      }
+    })
+
+    return overLimit
   }
 
   validateForm() {
@@ -261,14 +299,14 @@ class AddAudienceModal extends React.Component {
     const { selectedCriteriaOptions } = this.state
 
     return this.state.selectedCriteria.map(criteria => {
-      const { options } = getCriterionByName(criteria)
+      const { options, group } = getCriterionByName(criteria)
       const prefixedOptions = options.map(o =>
         this.prefixCriteriaOption(criteria, o)
       )
       const selectedOptions = filter(selectedCriteriaOptions, o =>
         includes(prefixedOptions, o)
       )
-
+      const isLimited = criteriaLimitByGroup[group]
       return (
         <FieldContainer key={`menu_${criteria}`}>
           <FloatRight>
@@ -281,6 +319,14 @@ class AddAudienceModal extends React.Component {
           </FloatRight>
           <span ref={ref => (this.criteriaTriggers[criteria] = ref)}>
             <Label>{criteria}</Label>
+            {isLimited && (
+              <Box mt={-14} mb={14}>
+                <SmallHelperText>
+                  Audiences are limited to a total of two interests or
+                  publications.
+                </SmallHelperText>
+              </Box>
+            )}
           </span>
           <SelectedOptionsWrapper wrap>
             {selectedOptions.map(option => (
@@ -326,7 +372,7 @@ class AddAudienceModal extends React.Component {
       return this.renderSelectMenu({
         isOpen: menuOpen,
         menuId: criteria,
-        onChange: this.selectCriteraOption,
+        onChange: e => this.toggleCriteriaOption(e, criteria),
         selectOptions: options,
       })
     })
@@ -340,6 +386,7 @@ class AddAudienceModal extends React.Component {
           onClose={this.reset}
           open={this.props.open}
         >
+          {this.reachedCriteriaLimit && <div>BIG WARNING</div>}
           <FieldContainer>
             <Label htmlFor="audienceName">Audience Name</Label>
             <TextField
@@ -396,7 +443,7 @@ class AddAudienceModal extends React.Component {
                   onClick={this.handleSave}
                   width={190}
                   type="submit"
-                  disabled={!this.state.valid}
+                  disabled={!this.state.valid || this.reachedCriteriaLimit}
                 >
                   Save
                 </FormButton>
