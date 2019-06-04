@@ -70,7 +70,7 @@ export const KEYS = {
 }
 
 // global vars from Rails application (or undefined, e.g. in a unit test)
-export const FEEDBACK_INCENTIVE_AMOUNT = window.FEEDBACK_INCENTIVE_AMOUNT || 2
+export const FEEDBACK_INCENTIVE_AMOUNT = window.FEEDBACK_INCENTIVE_AMOUNT || 2.5
 
 export default {
   headerHeight: 50,

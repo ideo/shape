@@ -4,7 +4,7 @@ import { observer } from 'mobx-react'
 import Emoji from '~/ui/icons/Emoji'
 import { EmojiButton, EmojiHolder } from '~/ui/test_collections/ScaleQuestion'
 import { QuestionText } from '~/ui/test_collections/shared'
-import v from '~/utils/variables'
+import v, { FEEDBACK_INCENTIVE_AMOUNT } from '~/utils/variables'
 import { QuestionSpacingContainer } from '~/ui/test_collections/OpenQuestion'
 
 @observer
@@ -52,8 +52,7 @@ WelcomeQuestion.propTypes = {
 }
 WelcomeQuestion.defaultProps = {
   backgroundColor: null,
-  incentive: 2.5,
-  // TODO: Are we paying $2.50 for link sharing?
+  incentive: FEEDBACK_INCENTIVE_AMOUNT,
 }
 
 export default WelcomeQuestion
