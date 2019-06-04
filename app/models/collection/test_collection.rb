@@ -625,7 +625,7 @@ class Collection
     end
 
     def link_sharing_enabled?
-      link_sharing_audience.present?
+      link_sharing_audience.present? && link_sharing_audience.open?
     end
 
     def paid_audiences_sample_size
