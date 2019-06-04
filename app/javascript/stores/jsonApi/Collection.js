@@ -905,6 +905,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     uiStore.update('multiMoveCardIds', [])
     uiStore.update('movingIntoCollection', null)
 
+    // Explicitly remove cards from this collection so front-end updates
+    this.removeCardIds(cardIds)
+
     // onSuccess is really "successfully able to edit this collection"
     if (_.isFunction(onSuccess)) onSuccess()
   }

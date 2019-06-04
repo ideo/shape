@@ -138,12 +138,7 @@ class FoamcoreGrid extends React.Component {
       uiStore.selectedAreaEnabled = true
     })
     // now that component is mounted, calculate visible area and calculateCardsToRender
-    const visRows = this.visibleRows
-    const visCols = this.visibleCols
-    this.loadCards({
-      rows: [visRows.min, visRows.max],
-      cols: [visCols.min, visCols.max],
-    })
+    this.loadAfterScroll()
     this.updateCollectionScrollBottom()
     window.addEventListener('scroll', this.handleScroll)
   }
@@ -701,19 +696,15 @@ class FoamcoreGrid extends React.Component {
   }
 
   async moveCardsIntoCollection(cardIds, hoveringRecord) {
+    const onCancelOrSuccess = () => {
+      this.hoveringOver = false
+      this.calculateCardsToRender()
+    }
     this.props.collection.API_moveCardsIntoCollection({
       toCollection: hoveringRecord,
       cardIds,
-      onCancel: () => {
-        this.hoveringOver = false
-        this.calculateCardsToRender()
-      },
-      onSuccess: () => {
-        this.hoveringOver = false
-        console.log('success')
-        this.reloadLoadedCards()
-        this.calculateCardsToRender()
-      },
+      onCancel: onCancelOrSuccess,
+      onSuccess: onCancelOrSuccess,
     })
   }
 
@@ -1160,8 +1151,6 @@ class FoamcoreGrid extends React.Component {
 
       cards = [...cards, ...draggingPlaceholders]
     }
-
-    console.log('calculateCardsToRender', cards.length)
 
     // Don't render cards that are being dragged along
     cards = cards.filter(

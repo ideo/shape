@@ -53,8 +53,7 @@ class CollectionPage extends React.Component {
       // NOTE: the user will see a brief flash of the collection name before redirect
       routeToLogin({ redirect: collection.frontend_url })
     }
-    // If regular collection, load cards. If board, FoamcoreGrid will handle load
-    if (!collection.isBoard) this.loadCollectionCards({})
+    this.loadCollectionCards({})
   }
 
   componentDidUpdate(prevProps) {
