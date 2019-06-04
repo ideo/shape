@@ -13,7 +13,7 @@ import LinkIcon from '~/ui/icons/LinkIcon'
 import SearchIcon from '~/ui/icons/SearchIcon'
 import Section from '~shared/components/molecules/Section'
 import v from '~/utils/variables'
-import { AddButton, CircledIcon } from '~/ui/global/styled/buttons'
+import { CircledIcon } from '~/ui/global/styled/buttons'
 import { Heading1, Heading2, Heading3 } from '~/ui/global/styled/typography'
 import { showOnHoverCss } from '~/ui/grid/shared'
 import Tooltip from '~/ui/global/Tooltip'
@@ -28,6 +28,7 @@ const SubHeadingWrapper = styled(Flex)`
   flex-direction: column;
   height: 100%;
   justify-content: flex-end;
+  text-align: right;
 `
 
 const SubHeading = styled.div`
@@ -54,7 +55,7 @@ const AudienceWrapper = styled(Flex)`
   ${showOnHoverCss};
 `
 
-const AudienceActions = styled.div`
+const AudienceAction = styled.div`
   margin-left: 8px;
 `
 
@@ -148,48 +149,56 @@ class AdminFeedback extends React.Component {
           <Grid container item xs={6}>
             {testCollection.test_audiences.map(testAudience => (
               <React.Fragment key={testAudience.id}>
-                <AudienceRowItem item xs={6}>
+                <AudienceRowItem item xs={4}>
                   <AudienceWrapper align="center">
                     {testAudience.audience.name}
-                    <AudienceActions className="show-on-hover">
-                      <Tooltip
-                        classes={{ tooltip: 'Tooltip' }}
-                        title={'copy survey link'}
-                        placement="top"
-                      >
-                        <CopyToClipboard
-                          text={`${testCollection.publicTestURL}?ta=${
-                            testAudience.id
-                          }`}
-                          onCopy={() =>
-                            this.props.uiStore.popupSnackbar({
-                              message: 'Survey link copied',
-                            })
-                          }
+                    <Flex className="show-on-hover">
+                      <AudienceAction>
+                        <Tooltip
+                          classes={{ tooltip: 'Tooltip' }}
+                          title={'start new query'}
+                          placement="top"
                         >
-                          <CircledIcon>
-                            <LinkIcon />
+                          <CircledIcon
+                            onClick={() =>
+                              this.searchForRespondents(testAudience)
+                            }
+                          >
+                            <SearchIcon />
                           </CircledIcon>
-                        </CopyToClipboard>
-                      </Tooltip>
-                    </AudienceActions>
+                        </Tooltip>
+                      </AudienceAction>
+                      <AudienceAction>
+                        <Tooltip
+                          classes={{ tooltip: 'Tooltip' }}
+                          title={'copy survey link'}
+                          placement="top"
+                        >
+                          <CopyToClipboard
+                            text={`${testCollection.publicTestURL}?ta=${
+                              testAudience.id
+                            }`}
+                            onCopy={() =>
+                              this.props.uiStore.popupSnackbar({
+                                message: 'Survey link copied',
+                              })
+                            }
+                          >
+                            <CircledIcon>
+                              <LinkIcon />
+                            </CircledIcon>
+                          </CopyToClipboard>
+                        </Tooltip>
+                      </AudienceAction>
+                    </Flex>
                   </AudienceWrapper>
                 </AudienceRowItem>
-                <AudienceRowItem item xs={2}>
-                  <Flex justify="flex-end">
-                    {testAudience.num_survey_responses}
-                  </Flex>
-                </AudienceRowItem>
-                <AudienceRowItem item xs={2}>
+                <AudienceRowItem item xs={4}>
                   <Flex justify="flex-end">{testAudience.sample_size}</Flex>
                 </AudienceRowItem>
-                <AudienceRowItem item xs={2}>
+                <AudienceRowItem item xs={4}>
                   <Flex justify="flex-end">
-                    <AddButton
-                      onClick={() => this.searchForRespondents(testAudience)}
-                    >
-                      <SearchIcon />
-                    </AddButton>
+                    {testAudience.num_survey_responses}
                   </Flex>
                 </AudienceRowItem>
               </React.Fragment>
@@ -231,29 +240,24 @@ class AdminFeedback extends React.Component {
                 <Heading3>Launch State</Heading3>
               </Grid>
               <Grid item xs={2}>
-                <Heading3>Time Since Launch</Heading3>
+                <Heading3>Time Elapsed</Heading3>
               </Grid>
-              <Grid item xs={3}>
+              <Grid item xs={2}>
                 <Flex column>
                   <Heading3>Audience(s)</Heading3>
                   <SubHeading>Audience Name</SubHeading>
                 </Flex>
               </Grid>
-              <Grid item xs={1}>
+              <Grid item xs={2}>
                 <SubHeadingWrapper>
-                  <SubHeading>Complete Responses</SubHeading>
+                  <SubHeading>n Requested</SubHeading>
                 </SubHeadingWrapper>
               </Grid>
-              <Grid item xs={1}>
+              <Grid item xs={2}>
                 <SubHeadingWrapper>
-                  <SubHeading>
-                    Total
-                    <br />
-                    Requested
-                  </SubHeading>
+                  <SubHeading>Completed</SubHeading>
                 </SubHeadingWrapper>
               </Grid>
-              <Grid item xs={1} />
             </Grid>
             <Grid container>
               <Grid item xs={12}>

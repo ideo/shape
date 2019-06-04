@@ -34,18 +34,18 @@ describe('AdminFeedback', () => {
 
     it('shows audience data for each test', () => {
       const audienceRowItems = wrapper.find('AudienceRowItem')
-      expect(audienceRowItems.length).toEqual(4)
+      expect(audienceRowItems.length).toEqual(3)
 
       const audienceName = audienceRowItems.at(0)
       expect(audienceName.html()).toContain(fakeAudience.name)
 
-      const audienceResponseCount = audienceRowItems.at(1)
+      const audienceSampleSize = audienceRowItems.at(1)
+      expect(audienceSampleSize.html()).toContain(fakeTestAudience.sample_size)
+
+      const audienceResponseCount = audienceRowItems.at(2)
       expect(audienceResponseCount.html()).toContain(
         fakeTestAudience.num_survey_responses
       )
-
-      const audienceSampleSize = audienceRowItems.at(2)
-      expect(audienceSampleSize.html()).toContain(fakeTestAudience.sample_size)
     })
 
     describe('pagination', () => {
