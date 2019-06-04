@@ -32,7 +32,7 @@ class QuestionAnswer < ApplicationRecord
 
   after_commit :update_survey_response, on: %i[create destroy], if: :survey_response_present?
   after_commit :update_collection_test_scores, if: :survey_response_present?
-  before_create :create_open_response_item, if: :create_open_response_item?
+  before_save :create_open_response_item, if: :create_open_response_item?
   after_update :update_open_response_item, if: :update_open_response_item?
   before_destroy :destroy_open_response_item_and_card, if: :open_response_item_present?
 
@@ -62,7 +62,8 @@ class QuestionAnswer < ApplicationRecord
   end
 
   def create_open_response_item?
-    question.test_open_responses_collection.present?
+    return unless answer_text.present?
+    question.test_open_responses_collection.present? && open_response_item.blank?
   end
 
   def create_open_response_item

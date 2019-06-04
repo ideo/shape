@@ -82,6 +82,7 @@ module.exports = {
     'no-param-reassign': ['error', { props: false }],
     'no-underscore-dangle': 0,
     'no-undef': 2,
+    'no-duplicate-imports': 2,
     'prettier/prettier': 'error',
     'prefer-destructuring': [
       'error',

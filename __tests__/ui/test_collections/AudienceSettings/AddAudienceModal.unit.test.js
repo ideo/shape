@@ -1,13 +1,17 @@
 import fakeApiStore from '#/mocks/fakeApiStore'
 import AddAudienceModal from '~/ui/test_collections/AudienceSettings/AddAudienceModal'
 
+const waitForAsync = () => new Promise(resolve => setImmediate(resolve))
+
 describe('AddAudienceModal', () => {
-  let wrapper
+  let props, wrapper
+
   beforeEach(() => {
-    const props = {
+    props = {
       apiStore: fakeApiStore(),
       open: true,
       close: jest.fn(),
+      afterSave: jest.fn(),
     }
     wrapper = shallow(<AddAudienceModal.wrappedComponent {...props} />)
   })
@@ -76,5 +80,18 @@ describe('AddAudienceModal', () => {
 
     selectedOption = wrapper.find('SelectedOption')
     expect(selectedOption.exists()).toBeFalsy()
+  })
+
+  it('runs a post-save callback', async () => {
+    const submitButton = wrapper.find('StyledFormButton')
+    const nameField = wrapper.find('#audienceName')
+
+    nameField.simulate('change', { target: { value: 'Test Audience' } })
+    submitButton.simulate('click')
+
+    await waitForAsync()
+    expect(props.afterSave).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'Test Audience' })
+    )
   })
 })

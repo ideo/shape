@@ -19,6 +19,9 @@ const createNamedRoutes = () => {
   cy.route('PATCH', '/api/v1/collection_cards/archive').as(
     'apiArchiveCollectionCards'
   )
+  cy.route('PATCH', '/api/v1/collection_cards/move').as(
+    'apiMoveCollectionCards'
+  )
   cy.route('PATCH', '/api/v1/collection_cards/*/replace').as(
     'apiReplaceCollectionCard'
   )
@@ -35,6 +38,7 @@ const createNamedRoutes = () => {
   cy.route('PATCH', '/api/v1/test_collections/*/close').as('apiCloseTest')
   cy.route('PATCH', '/api/v1/test_collections/*/reopen').as('apiReopenTest')
 
+  cy.route('GET', '/api/v1/items/*').as('apiGetItem')
   cy.route('PATCH', '/api/v1/items/*').as('apiUpdateItem')
 
   cy.route('POST', '/api/v1/organizations').as('apiCreateOrganization')
@@ -45,6 +49,8 @@ const createNamedRoutes = () => {
   cy.route('POST', '/api/v1/survey_responses/*/question_answers').as(
     'apiCreateQuestionAnswer'
   )
+
+  cy.route('PATCH', '/api/v1/test_audiences/*').as('apiUpdateTestAudience')
 
   cy.route('POST', '/api/v1/users/create_limited_user').as(
     'apiCreateLimitedUser'

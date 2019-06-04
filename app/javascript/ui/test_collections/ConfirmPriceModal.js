@@ -72,13 +72,16 @@ class ConfirmPriceModal extends React.Component {
       : `${organization.name}'s default payment method will be charged.`
     const paymentBrand = paymentMethod ? paymentMethod.brand : null
 
-    // Is this logic working right?
-    return this.isOrgAdmin ? (
-      <React.Fragment>
-        <CardBrandIcon brand={paymentBrand} width={32} height={30} />{' '}
-        <DisplayText>{message}</DisplayText>
-      </React.Fragment>
-    ) : (
+    if (this.hasPaymentMethod) {
+      return (
+        <React.Fragment>
+          <CardBrandIcon brand={paymentBrand} width={32} height={30} />{' '}
+          <DisplayText>{message}</DisplayText>
+        </React.Fragment>
+      )
+    }
+
+    return (
       <React.Fragment>
         <CardBrandIcon brand={null} width={32} height={30} />
         <DisplayText>
@@ -116,7 +119,7 @@ class ConfirmPriceModal extends React.Component {
         </StyledModalCloseButton>
         <StyledDialogContent classes={{ root: 'root__dialog-content' }}>
           <PaperAirplane />
-          {this.hasPaymentMethod
+          {this.hasPaymentMethod || this.isOrgAdmin
             ? this.renderPaymentMethodContent()
             : this.renderMissingPaymentContent()}
         </StyledDialogContent>

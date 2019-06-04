@@ -80,7 +80,7 @@ Cypress.Commands.add('createTextItem', () => {
   cy.selectBctType({ type: 'text' })
   cy.get('.ql-editor')
     .first()
-    .type('la dee daaaaa')
+    .type('Testing')
   cy.locate('TextItemClose')
     .first()
     .click({ force: true })

@@ -59,7 +59,7 @@ class AvatarDropdown extends React.Component {
 }
 
 AvatarDropdown.propTypes = {
-  className: PropTypes.string,
+  className: PropTypes.string.isRequired,
   renderAvatar: PropTypes.func.isRequired,
   renderDropdown: PropTypes.func.isRequired,
 }

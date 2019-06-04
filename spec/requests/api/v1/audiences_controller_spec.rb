@@ -24,6 +24,10 @@ describe Api::V1::AudiencesController, type: :request, json: true, create_org: t
         expect(audience_ids.size).to eq(2)
         expect(audience_ids).to include(audience1.id.to_s)
         expect(audience_ids).to include(audience2.id.to_s)
+
+        json['data'].each do |actual_audience|
+          expect(actual_audience['attributes']['global']).to eq(actual_audience['id'] == audience1.id.to_s)
+        end
       end
     end
   end
@@ -66,7 +70,7 @@ describe Api::V1::AudiencesController, type: :request, json: true, create_org: t
         expect(audience.name).to eq('Anyone')
         expect(audience.tag_list.size).to eq(3)
         expect(audience.organizations).to include(user.current_organization)
-        expect(audience.price_per_response).to eq(Audience::TARGETED_PRICE_PER_RESPONSE)
+        expect(audience.price_per_response).to eq(Shape::TARGETED_AUDIENCE_PRICE_PER_RESPONSE)
       end
 
       it 'matches JSON schema' do
