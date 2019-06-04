@@ -404,14 +404,9 @@ class MovableGridCard extends React.PureComponent {
     </PositionedGridCard>
   )
 
-  renderEmpty = ({ beginningOfRow } = {}) => (
+  renderEmpty = () => (
     <PositionedGridCard {...this.styleProps()} transition={cardCSSTransition}>
-      <GridCardEmpty
-        card={this.props.card}
-        dragging={this.state.dragging}
-        showHotspot={beginningOfRow}
-        showHotEdge={this.props.showHotEdge}
-      />
+      <GridCardEmpty card={this.props.card} />
     </PositionedGridCard>
   )
 
@@ -530,7 +525,7 @@ class MovableGridCard extends React.PureComponent {
     } else if (cardType === 'blank' || cardType === 'submission') {
       return this.renderBlank(cardType)
     } else if (cardType === 'empty') {
-      return this.renderEmpty({ beginningOfRow: card.position.x === 0 })
+      return this.renderEmpty()
     } else if (cardType === 'pagination') {
       return this.renderPagination()
     }
