@@ -35,7 +35,7 @@ When('I click the first text item', () => {
 When('I type {string} in the first quill editor', string => {
   cy.get('.ql-editor')
     .first()
-    .click()
+    .click({ force: true })
     .type(string)
 })
 
