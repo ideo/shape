@@ -70,13 +70,18 @@ class Collection
              class_name: 'Item::QuestionItem',
              through: :primary_collection_cards
     has_many :test_audiences, dependent: :destroy
+    has_many :paid_test_audiences,
+      -> { paid },
+      class_name: 'TestAudience'
     belongs_to :collection_to_test, class_name: 'Collection', optional: true
 
     has_many :datasets,
              through: :data_items
 
     before_create :setup_default_status_and_questions, unless: :cloned_from_present?
-    after_create :add_test_tag, :add_child_roles
+    after_create :add_test_tag
+    after_create :add_child_roles
+    after_create :setup_link_sharing_test_audience
     after_update :touch_test_design, if: :saved_change_to_test_status?
 
     delegate :answerable_complete_question_items, to: :test_design, allow_nil: true
@@ -395,7 +400,7 @@ class Collection
       }
     end
 
-    def serialized_for_test_survey
+    def serialized_for_test_survey(test_audience_id = nil)
       renderer = JSONAPI::Serializable::Renderer.new
       renderer.render(
         self,
@@ -403,6 +408,9 @@ class Collection
         # This uses a special serializer that defers collection cards to test design
         class: test_survey_render_class_mappings,
         include: test_survey_render_includes,
+        expose: {
+          test_audience_id: test_audience_id,
+        },
       )
     end
 
@@ -519,6 +527,17 @@ class Collection
       end
     end
 
+    def setup_link_sharing_test_audience
+      # find the link sharing audience
+      audience = Audience.find_by(price_per_response: 0)
+      # e.g. in unit tests
+      return unless audience.present?
+      test_audiences.find_or_create_by(
+        audience_id: audience.id,
+        status: :closed,
+      )
+    end
+
     def add_test_tag
       # create the special #test tag
       tag(
@@ -588,12 +607,16 @@ class Collection
       test_audiences.paid.present?
     end
 
+    def gives_incentive_for?(test_audience_id)
+      test_audiences.paid.find_by(id: test_audience_id).present?
+    end
+
     def purchased?
       gives_incentive? && live?
     end
 
     def link_sharing?
-      test_audiences.where(price_per_response: 0).present?
+      test_audiences.link_sharing.where(status: :open).present?
     end
 
     def link_sharing_audience
@@ -605,7 +628,7 @@ class Collection
     end
 
     def link_sharing_enabled?
-      link_sharing_audience.present?
+      link_sharing_audience.present? && link_sharing_audience.open?
     end
 
     def paid_audiences_sample_size

@@ -15,7 +15,7 @@ class Api::V1::AudiencesController < Api::V1::BaseController
   before_action :authorize_current_organization, only: %i[create]
   def create
     @audience = Audience.new(audience_params)
-    @audience.price_per_response = Audience::TARGETED_PRICE_PER_RESPONSE
+    @audience.price_per_response = Shape::TARGETED_AUDIENCE_PRICE_PER_RESPONSE
     @audience.organizations << current_organization
     if @audience.save
       render jsonapi: @audience.reload
@@ -31,6 +31,7 @@ class Api::V1::AudiencesController < Api::V1::BaseController
                  .includes(:organizations)
                  .where(organizations: { id: nil })
                  .or(Audience.includes(:organizations).where(organizations: { id: @organization.id }))
+                 .order(price_per_response: :asc)
   end
 
   def authorize_current_organization

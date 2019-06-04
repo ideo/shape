@@ -64,13 +64,27 @@ class TermsOfUseModal extends React.Component {
   @observable
   mailingListChecked = false
   @observable
+  shapeCircleChecked = false
+  @observable
   isLoading = false
   @observable
   submitted = false
 
   @action
+  componentDidMount() {
+    const { currentUser } = this.props
+    this.mailingListChecked = currentUser.mailing_list
+    this.shapeCircleChecked = currentUser.shape_circle_member
+  }
+
+  @action
   handleMailingListCheck = event => {
     this.mailingListChecked = event.target.checked
+  }
+
+  @action
+  handleShapeCircleCheck = event => {
+    this.shapeCircleChecked = event.target.checked
   }
 
   @action
@@ -80,7 +94,11 @@ class TermsOfUseModal extends React.Component {
     const { currentUser } = this.props
     this.isLoading = true
     currentUser
-      .API_acceptTerms({ mailing_list: this.mailingListChecked })
+      .API_updateCurrentUser({
+        terms_accepted: true,
+        mailing_list: this.mailingListChecked,
+        shape_circle_member: this.shapeCircleChecked,
+      })
       .finally(() => {
         runInAction(() => {
           this.isLoading = false
@@ -142,10 +160,24 @@ class TermsOfUseModal extends React.Component {
                     value="yes"
                   />
                 }
-                label="Stay current on new features and case studies by signing up for our mailing list"
+                label="Stay current on product updates and case studies by signing up for our mailing list"
               />
             </FormControl>
-
+            <br />
+            <br />
+            <FormControl component="fieldset">
+              <FormControlLabel
+                classes={{ label: 'form-control' }}
+                control={
+                  <Checkbox
+                    checked={this.shapeCircleChecked}
+                    onChange={this.handleShapeCircleCheck}
+                    value="yes"
+                  />
+                }
+                label="Join the Shape Circle for early access to new Shape features and more"
+              />
+            </FormControl>
             <p>
               <br />
             </p>

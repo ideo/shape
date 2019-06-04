@@ -68,7 +68,7 @@ class TermsPage extends React.PureComponent {
       <div>
         {!loggedIn && <BasicHeader />}
         <PageContainer>
-          <Heading1>Legal</Heading1>
+          <Heading1>Terms and Privacy</Heading1>
           {loggedIn && <OverdueBanner />}
           {inner}
         </PageContainer>

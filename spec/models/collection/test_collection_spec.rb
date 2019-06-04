@@ -60,6 +60,21 @@ describe Collection::TestCollection, type: :model do
         expect(test_collection.cached_owned_tag_list).to match_array(['feedback'])
       end
     end
+
+    describe '#setup_link_sharing_test_audience' do
+      let!(:link_sharing_audience) { create(:audience, price_per_response: 0) }
+      let(:test_audience) { test_collection.test_audiences.first }
+
+      it 'should add the test_audience with status of "closed"' do
+        expect(test_collection.test_audiences.count).to be 1
+        expect(test_audience.status).to eq 'closed'
+        expect(test_audience.link_sharing?).to be true
+      end
+
+      it 'returns gives_incentive_for test_audience = false' do
+        expect(test_collection.gives_incentive_for?(test_audience.id)).to be false
+      end
+    end
   end
 
   describe '#create_uniq_survey_response' do
@@ -312,7 +327,7 @@ describe Collection::TestCollection, type: :model do
 
           context 'with test audiences' do
             let(:audience) { create(:audience) }
-            let!(:test_audience) { create(:test_audience, audience: audience, test_collection: test_collection) }
+            let!(:test_audience) { create(:test_audience, audience: audience, test_collection: test_collection, price_per_response: 2) }
 
             it 'should create test audience datasets for each question' do
               expect do
@@ -323,6 +338,10 @@ describe Collection::TestCollection, type: :model do
               expect(Dataset::Question.last.groupings).to eq(
                 [{ 'id' => test_audience.id, 'type' => 'TestAudience' }],
               )
+            end
+
+            it 'returns gives_incentive_for test_audience = true' do
+              expect(test_collection.gives_incentive_for?(test_audience.id)).to be true
             end
           end
 

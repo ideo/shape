@@ -8,7 +8,7 @@ Feature: Creating a Test Collection
     And I wait for "@apiGetAudiences" to finish
     Then I should see "Test Prototype" in a "EditableNameHeading"
     # verify the existence of the default questions
-    Then I should see "Photo or Video of Idea" in a "QuestionSelectOption"
+    Then I should see "Photo/Video" in a "QuestionSelectOption"
     Then I should see "Description" in a "QuestionSelectOption"
     Then I should see "Useful" in a "QuestionSelectOption"
     Then I should see "End of Survey" in a ".DisplayText"
@@ -19,6 +19,7 @@ Feature: Creating a Test Collection
     And I wait for "@apiUpdateItem" to finish
     And I add an open response question
     And I click the "audienceCheckbox-share-via-link"
+    And I wait for "@apiUpdateTestAudience" to finish
     When I click the "LaunchFormButton" containing "Get Feedback"
     And I wait for "@apiLaunchTest" to finish
     And I wait for 1 second
@@ -37,6 +38,9 @@ Feature: Creating a Test Collection
     When I capture the current URL
     And I visit the current Test URL
     Then I should see a "StandaloneTestSurvey"
+    Then I should see a question with "WelcomeQuestionEmojiHolder" and 1 emojis
+    When I click the last "WelcomeQuestionEmojiButton"
+    Then I should see a question with "TermsEmojiHolder" and 2 emojis
     When I accept the feedback survey terms
     Then I should see "Why Coding Needs" in a "GridCard"
     Then I should see a question with "ScaleEmojiHolder" and 4 emojis

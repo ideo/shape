@@ -11585,6 +11585,13 @@ react-truncator@0.0.5:
     react-dom "^16.4.2"
     webpack "^3.11.0"
 
+react-viewer@^2.9.1:
+  version "2.9.1"
+  resolved "https://registry.yarnpkg.com/react-viewer/-/react-viewer-2.9.1.tgz#18f9ed2f58361a187e099aa9dbebcbe729e58853"
+  integrity sha512-sH358UoWT3Z2tsroqohzCcz0V0zXbLx50qw4RLMSuxCG1FujVunq/0h12GgtbeCPyWn97ry8HWxA4ZwSQbMb3Q==
+  dependencies:
+    classnames "^2.2.5"
+
 react-visibility-sensor@^3.11.0:
   version "3.11.0"
   resolved "https://registry.yarnpkg.com/react-visibility-sensor/-/react-visibility-sensor-3.11.0.tgz#2da089ccb18b33ec3539914b300b120684aff2e0"

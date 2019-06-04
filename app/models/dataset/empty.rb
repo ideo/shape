@@ -44,11 +44,16 @@ class Dataset
       0
     end
 
-    def name
-      return self[:name] if self[:name].present?
+    def identifier
+      return self[:identifier] if self[:identifier].present?
       return if data_source.blank?
       return data_source.name if data_source.is_a?(Collection)
       data_source.parent.name if data_source.is_a?(Item)
+    end
+
+    def test_collection_id
+      return unless data_source.present?
+      return data_source.id if data_source.is_a?(Collection::TestCollection)
     end
 
     private

@@ -18,7 +18,6 @@ class QuestionAnswer extends BaseRecord {
       )
       return res.data
     } catch (e) {
-      console.log('catching error from API_save')
       const test_collection = this.apiStore.find(
         'collections',
         this.survey_response.test_collection_id

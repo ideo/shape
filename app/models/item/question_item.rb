@@ -43,7 +43,16 @@ class Item
   class QuestionItem < Item
     has_many :question_answers, inverse_of: :question, foreign_key: :question_id, dependent: :destroy
     has_one :test_open_responses_collection, class_name: 'Collection::TestOpenResponses'
-    has_one :dataset, as: :data_source, class_name: 'Dataset::Question', dependent: :destroy
+    has_one :question_dataset,
+            -> { without_groupings },
+            as: :data_source,
+            class_name: 'Dataset::Question',
+            dependent: :destroy
+    # This includes question and audience datasets
+    has_many :datasets,
+             as: :data_source,
+             class_name: 'Dataset::Question',
+             dependent: :destroy
     has_many :data_items,
              as: :data_source,
              class_name: 'Item::DataItem'
@@ -51,7 +60,7 @@ class Item
     # TODO: Deprecate once migrating to datasets
     has_one :test_data_item, class_name: 'Item::DataItem', as: :data_source
 
-    after_create :create_dataset
+    after_create :create_question_dataset
 
     after_commit :notify_test_design_of_creation,
                  on: :create,
@@ -219,7 +228,7 @@ class Item
       builder.create
       if builder.collection_card.persisted?
         data_item = builder.collection_card.record
-        dataset.data_items_datasets.create(
+        question_dataset.data_items_datasets.create(
           data_item: data_item,
         )
         data_item.data_items_datasets.create(
@@ -274,8 +283,8 @@ class Item
 
     private
 
-    def create_dataset
-      self.dataset = Dataset::Question.create(
+    def create_question_dataset
+      self.question_dataset = Dataset::Question.create(
         data_source: self,
         timeframe: :month,
         chart_type: :bar,

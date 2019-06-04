@@ -3,10 +3,9 @@ class Api::V1::Admin::TestCollectionsController < Api::V1::BaseController
 
   def index
     collections =
-      Collection::TestCollection.includes(test_audiences: [:audience])
-                                .joins(:test_audiences)
+      Collection::TestCollection.includes(paid_test_audiences: [:audience])
+                                .joins(:paid_test_audiences)
                                 .where(test_status: :live)
-                                .where('test_audiences.price_per_response > 0')
                                 .order(test_launched_at: :desc)
                                 .page(@page)
                                 .per(25)

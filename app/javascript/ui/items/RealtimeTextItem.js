@@ -24,7 +24,7 @@ const DockedToolbar = styled.div`
   left: 0;
   margin-bottom: 20px;
   padding: 5px 10px 0;
-  position: fixed;
+  position: absolute;
   width: 100%;
   z-index: ${v.zIndex.gridCardTop};
   opacity: 0.95;
@@ -42,7 +42,7 @@ const DockedToolbar = styled.div`
   ${props =>
     !props.fullPageView &&
     `
-      top: 0;
+      top: 5px;
     `};
 `
 

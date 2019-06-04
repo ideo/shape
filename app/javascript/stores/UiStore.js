@@ -44,6 +44,8 @@ export default class UiStore {
   @observable
   rolesMenuOpen = null
   @observable
+  isCypress = navigator && navigator.userAgent === 'cypress'
+  @observable
   isTouchDevice =
     // https://hacks.mozilla.org/2013/04/detecting-touch-its-the-why-not-the-how/
     'ontouchstart' in window ||
@@ -445,6 +447,7 @@ export default class UiStore {
     )
   }
 
+  @computed
   get isMobileXs() {
     return this.windowWidth && this.windowWidth < v.responsive.smallBreakpoint
   }
@@ -861,7 +864,6 @@ export default class UiStore {
         'id'
       )
     } else {
-      // console.log(record.name, record.id, 'bummer.')
       // does this reset belong here? i.e. linkedBreadcrumbTrail has no proper connection here
       this.linkedBreadcrumbTrail.replace([])
       return breadcrumb

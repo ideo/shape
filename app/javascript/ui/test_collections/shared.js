@@ -172,7 +172,7 @@ export const TextEnterButton = styled.button`
   }
 
   svg {
-    transform: scale(1, -1);
+    transform: rotate(180deg);
   }
 
   &:hover {
@@ -187,9 +187,9 @@ export const TextEnterButton = styled.button`
     color: ${v.colors.commonMedium};
 
     &:hover {
-      background: transparent;
-      border: 2px solid ${v.colors.commonMedium};
-      color: ${v.colors.commonMedium};
+      background-color: ${props.theme.questionText};
+      border: none;
+      color: white;
     }
   `};
 `

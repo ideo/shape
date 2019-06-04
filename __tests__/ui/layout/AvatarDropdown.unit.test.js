@@ -12,6 +12,7 @@ describe('AvatarDropdown', () => {
     props = {
       renderAvatar: jest.fn(() => <div id="test-avatar" />),
       renderDropdown: jest.fn(() => <div id="test-dropdown" />),
+      className: 'userDropdown',
     }
   })
 
