@@ -8,6 +8,7 @@ import { Element as ScrollElement, scroller } from 'react-scroll'
 import { ThemeProvider } from 'styled-components'
 
 import ProgressDots from '~/ui/global/ProgressDots'
+import ProgressSquare from '~/ui/global/ProgressSquare'
 import {
   TestQuestionHolder,
   styledTestTheme,
@@ -206,6 +207,10 @@ class TestSurveyResponder extends React.Component {
       <ThemeProvider theme={styledTestTheme(theme)}>
         <div id="surveyContainer">
           <ProgressDots
+            totalAmount={this.answerableCards.length + 1}
+            currentProgress={this.currentCardIdx}
+          />
+          <ProgressSquare
             totalAmount={this.answerableCards.length + 1}
             currentProgress={this.currentCardIdx}
           />
