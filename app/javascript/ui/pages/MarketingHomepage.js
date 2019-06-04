@@ -41,7 +41,10 @@ class MarketingPage extends React.Component {
       content.footer.header =
         content.footer.header && content.footer.header.replace('$5', '$7')
     }
-    if (hasKeyValueParam(paramString, 'videoPlaying', 'true')) {
+    if (
+      hasKeyValueParam(paramString, 'videoPlaying', 'true') ||
+      hasKeyValueParam(paramString, 'videoplaying', 'true')
+    ) {
       this.setState({ videoPlaying: true })
     }
   }
