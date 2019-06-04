@@ -92,6 +92,10 @@ class TestQuestion extends React.Component {
     afterQuestionAnswered(card)
   }
 
+  get givesIncentive() {
+    return this.props.parent.gives_incentive
+  }
+
   renderQuestion() {
     const {
       parent,
@@ -181,7 +185,7 @@ class TestQuestion extends React.Component {
         }
         return (
           <FinishQuestion
-            givesIncentive={parent.gives_incentive}
+            givesIncentive={this.givesIncentive}
             submissionBox={
               parent.is_submission_box_template_test ||
               parent.is_submission_test
@@ -194,7 +198,7 @@ class TestQuestion extends React.Component {
             user={apiStore.currentUser}
             onAnswer={this.handleQuestionAnswer}
             sessionUid={surveyResponse.session_uid}
-            givesIncentive={parent.gives_incentive}
+            givesIncentive={this.givesIncentive}
           />
         )
       case 'question_terms':
@@ -207,6 +211,7 @@ class TestQuestion extends React.Component {
       case 'question_welcome':
         return (
           <WelcomeQuestion
+            givesIncentive={this.givesIncentive}
             numberOfQuestions={numberOfQuestions}
             onAnswer={this.handleQuestionAnswer}
           />

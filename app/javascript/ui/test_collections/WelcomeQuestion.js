@@ -19,8 +19,17 @@ class WelcomeQuestion extends React.Component {
   }
 
   render() {
-    const { numberOfQuestions } = this.props
+    const { givesIncentive, numberOfQuestions } = this.props
 
+    let incentiveMessage = ''
+    if (givesIncentive) {
+      incentiveMessage = (
+        <span>
+          , and we’ll reward you <strong>${this.incentive}</strong> for your
+          participation
+        </span>
+      )
+    }
     return (
       <QuestionSpacingContainer
         editing={false}
@@ -32,9 +41,8 @@ class WelcomeQuestion extends React.Component {
         </QuestionText>
         <QuestionText>
           There are <strong>{numberOfQuestions} questions</strong> in this
-          survey. Completing it should take around <strong>2 minutes</strong>,
-          and we’ll reward you <strong>${this.incentive}</strong> for your
-          participation.
+          survey. Completing it should take around <strong>2 minutes</strong>
+          {incentiveMessage}.
         </QuestionText>
         <EmojiHolder data-cy="WelcomeQuestionEmojiHolder">
           <EmojiButton
@@ -53,6 +61,7 @@ class WelcomeQuestion extends React.Component {
 WelcomeQuestion.propTypes = {
   onAnswer: PropTypes.func.isRequired,
   numberOfQuestions: PropTypes.number.isRequired,
+  givesIncentive: PropTypes.bool.isRequired,
 }
 WelcomeQuestion.defaultProps = {}
 

@@ -223,7 +223,7 @@ class TestSurveyResponder extends React.Component {
                         order={card.order}
                         editing={false}
                         canEdit={this.canEdit}
-                        numberOfCards={this.answerableCards.length}
+                        numberOfQuestions={this.answerableCards.length}
                       />
                     </TestQuestionHolder>
                   </Flex>
