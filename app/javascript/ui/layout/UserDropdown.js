@@ -1,14 +1,13 @@
 import { computed } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
-import {
+import MainMenuDropdown, {
   CONTEXT_ADMIN,
   CONTEXT_COMBO,
   CONTEXT_USER,
 } from '~/ui/global/MainMenuDropdown'
 import Avatar from '~/ui/global/Avatar'
 import AvatarDropdown from '~/ui/layout/AvatarDropdown'
-import MainMenuDropdown from '~/ui/global/MainMenuDropdown'
 
 @inject('apiStore', 'routingStore', 'uiStore')
 @observer

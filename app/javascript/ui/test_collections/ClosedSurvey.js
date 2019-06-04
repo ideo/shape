@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled, { ThemeProvider } from 'styled-components'
 import Emoji from '~/ui/icons/Emoji'
 import {
@@ -12,7 +12,6 @@ import DialogWrapper from '~/ui/global/modals/DialogWrapper'
 import { LoudDisplayLink } from '~/ui/global/styled/typography'
 import RecontactQuestion from '~/ui/test_collections/RecontactQuestion'
 import { observable, action } from 'mobx'
-import { observer } from 'mobx-react'
 
 @observer
 class ClosedSurvey extends React.Component {
