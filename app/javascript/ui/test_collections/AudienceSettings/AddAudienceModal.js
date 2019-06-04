@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { filter, flatten, includes, remove } from 'lodash'
+import { filter, flatten, includes, remove, forEach } from 'lodash'
 import { Flex, Box } from 'reflexbox'
 import { Grid } from '@material-ui/core'
 
@@ -202,6 +202,22 @@ class AddAudienceModal extends React.Component {
     })
 
     this.setState({ selectedCriteriaOptions, numCriteriaPerGroup })
+  }
+
+  get reachedCriteriaLimit() {
+    const { numCriteriaPerGroup } = this.state
+
+    if (!criteriaLimitByGroup) return false
+
+    let overLimit = false
+
+    forEach(criteriaLimitByGroup, (limit, group) => {
+      if (numCriteriaPerGroup[group] > limit) {
+        overLimit = true
+      }
+    })
+
+    return overLimit
   }
 
   validateForm() {
