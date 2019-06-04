@@ -23,12 +23,19 @@ StyledImageCover.displayName = 'StyledImageCover'
 const StyledMagnifyIcon = styled.div`
   position: absolute;
   top: 10px;
-  right: 5px;
-  color: ${v.colors.white};
+  right: 10px;
   cursor: pointer;
+  padding: 8px 0 0 12px;
+  border-radius: 4px;
+  width: 35px;
+  height: 35px;
+  background-color: ${v.colors.commonMedium};
+  text-align: center;
+  color: ${v.colors.secondaryDarkest};
   .icon {
-    width: 30px;
-    height: 30px;
+    width: 35px;
+    height: 35px;
+    margin: auto;
   }
 `
 
@@ -48,7 +55,7 @@ class ImageItemCover extends React.Component {
     return item.imageUrl({ resize: { width: retina ? 2400 : 1200 } })
   }
 
-  get renderFullscreenImage() {
+  get renderFullscreenImageViewer() {
     const { fullscreen } = this.state
     return (
       <Viewer
@@ -73,7 +80,7 @@ class ImageItemCover extends React.Component {
     const { contain } = this.props
     return (
       <Fragment>
-        {this.renderFullscreenImage}
+        {this.renderFullscreenImageViewer}
         <StyledMagnifyIcon onClick={this.toggleFullscreen}>
           <SearchIcon />
         </StyledMagnifyIcon>
