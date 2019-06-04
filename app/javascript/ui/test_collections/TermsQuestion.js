@@ -42,14 +42,8 @@ class TermsQuestion extends React.Component {
           backgroundColor: this.backgroundColor,
         }}
       >
-        <div style={{ textAlign: 'center' }}>
-          <Emoji name="Wave" symbol="👋" scale={2} />
-        </div>
         <QuestionSpacingContainer editing={false}>
           <QuestionText>
-            Thanks for taking the time to provide your feedback here on Shape,
-            we look forward to hearing your thoughts!
-            <br /> <br />
             Before continuing, we ask that you read the following statement and
             select the appropriate response.
           </QuestionText>

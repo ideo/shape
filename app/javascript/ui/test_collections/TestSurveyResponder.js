@@ -13,6 +13,7 @@ import {
   styledTestTheme,
 } from '~/ui/test_collections/shared'
 import TestQuestion from '~/ui/test_collections/TestQuestion'
+import GreetingMessage from '~/ui/test_collections/GreetingMessage'
 
 const UNANSWERABLE_QUESTION_TYPES = [
   'question_media',
@@ -29,6 +30,8 @@ class TestSurveyResponder extends React.Component {
   recontactAnswered = false
   @observable
   termsAnswered = false
+  @observable
+  welcomeAnswered = false
   @observable
   currentCardIdx = 0
 
@@ -64,6 +67,12 @@ class TestSurveyResponder extends React.Component {
         record: { id: 'terms', content: '' },
       })
     }
+    // Always have the respondent welcome come first
+    questionCards.unshift({
+      id: 'welcome',
+      card_question_type: 'question_welcome',
+      record: { id: 'welcome', content: '' },
+    })
     runInAction(() => {
       this.questionCards = questionCards
     })
@@ -71,12 +80,13 @@ class TestSurveyResponder extends React.Component {
 
   questionAnswerForCard = card => {
     const { surveyResponse } = this.props
+    if (card.card_question_type === 'question_welcome') {
+      return this.welcomeAnswered
+    }
     if (card.card_question_type === 'question_terms') {
       return this.termsAnswered
     }
     if (!surveyResponse) return undefined
-    // This method is supposed to return a questionAnswer, not a boolean
-    // https://www.dropbox.com/s/72mafwlzukz13ir/Screenshot%202019-05-15%2012.17.10.png?dl=0
     if (card.card_question_type === 'question_recontact') {
       return this.recontactAnswered
     }
@@ -98,7 +108,12 @@ class TestSurveyResponder extends React.Component {
     let reachedLastVisibleCard = false
     const questions = questionCards.filter(card => {
       // turn off the card's actionmenu (dot-dot-dot)
-      if (card.id !== 'recontact' && card.id !== 'terms')
+      console.log('card id: ', card.id)
+      if (
+        ['recontact', 'terms', 'welcome'].every(
+          questionId => card.id !== questionId
+        )
+      )
         card.record.disableMenu()
       if (reachedLastVisibleCard) {
         return false
@@ -116,6 +131,11 @@ class TestSurveyResponder extends React.Component {
   }
 
   afterQuestionAnswered = (card, answer) => {
+    if (card.id === 'welcome') {
+      runInAction(() => {
+        this.welcomeAnswered = true
+      })
+    }
     if (card.id === 'recontact') {
       runInAction(() => {
         this.recontactAnswered = true
@@ -168,6 +188,7 @@ class TestSurveyResponder extends React.Component {
             totalAmount={this.answerableCards.length + 1}
             currentProgress={this.currentCardIdx}
           />
+          <GreetingMessage />
           {this.viewableCards.map(card => (
             // ScrollElement only gets the right offsetTop if outside the FlipMove
             <ScrollElement name={`card-${card.id}`} key={card.id}>
@@ -191,6 +212,7 @@ class TestSurveyResponder extends React.Component {
                         order={card.order}
                         editing={false}
                         canEdit={this.canEdit}
+                        numberOfCards={this.answerableCards.length}
                       />
                     </TestQuestionHolder>
                   </Flex>

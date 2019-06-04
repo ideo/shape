@@ -3,6 +3,7 @@
   "properties": {
     "session_uid": { "type": "string" },
     "user_id": { "type": ["integer", "null"] },
-    "test_collection_id": { "type": ["integer", "null"] }
+    "test_collection_id": { "type": ["integer", "null"] },
+    "incentive": { "type": ["number", "null"] }
   }
 }
