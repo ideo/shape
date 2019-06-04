@@ -40,6 +40,7 @@ const fakeUiStore = {
     x: 0,
     y: 0,
   },
+  openBlankContentTool: jest.fn(),
   closeBlankContentTool: jest.fn(),
   closeCardMenu: jest.fn(),
   openCardMenu: jest.fn(),

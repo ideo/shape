@@ -23,7 +23,7 @@ const StyledGridCardEmpty = styled.div`
 
 @inject('uiStore')
 @observer
-class GridCardEmpty extends React.Component {
+class GridCardEmptyHotspot extends React.Component {
   onClickHotspot = () => {
     const { uiStore, card } = this.props
     const { order } = card
@@ -50,13 +50,13 @@ class GridCardEmpty extends React.Component {
   }
 }
 
-GridCardEmpty.propTypes = {
+GridCardEmptyHotspot.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
 }
-GridCardEmpty.wrappedComponent.propTypes = {
+GridCardEmptyHotspot.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
-GridCardEmpty.displayName = 'GridCardEmpty'
+GridCardEmptyHotspot.displayName = 'GridCardEmptyHotspot'
 
-export default GridCardEmpty
+export default GridCardEmptyHotspot

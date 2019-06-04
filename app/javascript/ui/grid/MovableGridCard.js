@@ -13,7 +13,7 @@ import GridCardPlaceholder from '~/ui/grid/GridCardPlaceholder'
 import GridCardPagination from '~/ui/grid/GridCardPagination'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import AddSubmission from '~/ui/grid/blankContentTool/AddSubmission'
-import GridCardEmpty from '~/ui/grid/GridCardEmpty'
+import GridCardEmptyHotspot from '~/ui/grid/GridCardEmptyHotspot'
 import ResizeIcon from '~/ui/icons/ResizeIcon'
 import { StyledCardWrapper } from '~/ui/grid/shared'
 
@@ -406,7 +406,7 @@ class MovableGridCard extends React.PureComponent {
 
   renderEmpty = () => (
     <PositionedGridCard {...this.styleProps()} transition={cardCSSTransition}>
-      <GridCardEmpty card={this.props.card} />
+      <GridCardEmptyHotspot card={this.props.card} />
     </PositionedGridCard>
   )
 
