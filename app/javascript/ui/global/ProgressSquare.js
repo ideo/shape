@@ -4,11 +4,18 @@ import v from '~/utils/variables'
 
 const Square = styled.div`
   background: ${v.colors.primaryDark};
-  float: right;
   width: 40px;
   height: 40px;
   padding: 10px;
   border-radius: 7px;
+  margin-left: calc(75%);
+  top: calc(2%);
+  position: fixed;
+  z-index: 2;
+  box-shadow: 0px 0px 12px -2px rgba(0, 0, 0, 0.33);
+  @media only screen and (min-width: ${v.responsive.medBreakpoint}px) {
+    display: none;
+  }
   div {
     line-height: 40px;
     text-align: center;
@@ -21,7 +28,7 @@ const Square = styled.div`
 class ProgressSquare extends React.Component {
   render() {
     const { currentProgress, totalAmount } = this.props
-    const fraction = `${currentProgress} / ${totalAmount}`
+    const fraction = `${currentProgress + 1} / ${totalAmount}`
 
     return (
       <div>
