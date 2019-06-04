@@ -85,10 +85,8 @@ class NetworkStore extends jsonapi(Collection) {
     this.fetch('invoices', invoice_id, {
       include: [
         'organization',
-        'subscriptions',
         'subscriptions.plan',
-        'invoice_items',
-        'payment_methods',
+        'invoice_items.payment_method',
       ],
     })
   }

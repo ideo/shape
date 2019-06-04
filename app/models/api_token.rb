@@ -1,3 +1,21 @@
+# == Schema Information
+#
+# Table name: api_tokens
+#
+#  id              :bigint(8)        not null, primary key
+#  token           :text
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  application_id  :bigint(8)
+#  created_by_id   :bigint(8)
+#  organization_id :bigint(8)
+#
+# Indexes
+#
+#  index_api_tokens_on_app_id_org_id  (application_id,organization_id)
+#  index_api_tokens_on_token          (token)
+#
+
 class ApiToken < ApplicationRecord
   belongs_to :application, required: false
   belongs_to :organization, required: false

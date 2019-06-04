@@ -1,3 +1,41 @@
+# == Schema Information
+#
+# Table name: collection_cards
+#
+#  id                :bigint(8)        not null, primary key
+#  archive_batch     :string
+#  archived          :boolean          default(FALSE)
+#  archived_at       :datetime
+#  col               :integer
+#  filter            :integer          default("transparent_gray")
+#  height            :integer
+#  hidden            :boolean          default(FALSE)
+#  image_contain     :boolean          default(FALSE)
+#  is_cover          :boolean          default(FALSE)
+#  order             :integer          not null
+#  pinned            :boolean          default(FALSE)
+#  row               :integer
+#  show_replace      :boolean          default(TRUE)
+#  type              :string
+#  unarchived_at     :datetime
+#  width             :integer
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  collection_id     :bigint(8)
+#  item_id           :bigint(8)
+#  parent_id         :bigint(8)
+#  templated_from_id :integer
+#
+# Indexes
+#
+#  index_collection_cards_on_collection_id          (collection_id)
+#  index_collection_cards_on_item_id                (item_id)
+#  index_collection_cards_on_order_and_row_and_col  (order,row,col)
+#  index_collection_cards_on_parent_id              (parent_id)
+#  index_collection_cards_on_templated_from_id      (templated_from_id)
+#  index_collection_cards_on_type                   (type)
+#
+
 class CollectionCard < ApplicationRecord
   include Archivable
 
@@ -65,6 +103,17 @@ class CollectionCard < ApplicationRecord
     nullify :is_cover
     # don't recognize any relations, easiest way to turn them all off
     recognize []
+  end
+
+  def self.default_relationships_for_api
+    [
+      :parent,
+      record: [
+        :filestack_file,
+        :datasets,
+        collection_cover_items: :datasets,
+      ],
+    ]
   end
 
   def duplicate!(

@@ -30,7 +30,7 @@ class BillingStatement extends React.Component {
         <PrintableInvoice
           invoice={invoice}
           organization={invoice.organization}
-          subscription={invoice.subscriptions[0]}
+          subscription={invoice.subscriptions && invoice.subscriptions[0]}
           brandTitle="Shape"
           logo={
             'https://s3-us-west-2.amazonaws.com/assets.shape.space/logo_1x.png'

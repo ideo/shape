@@ -61,7 +61,7 @@ class RolesAdd extends React.Component {
 
     const { ownerType } = this.props
     let searchMethod = 'searchUsersAndGroups'
-    if (ownerType === 'groups') {
+    if (ownerType === 'groups' || ownerType === 'shapeAdmins') {
       searchMethod = 'searchUsers'
     }
     apiStore[searchMethod](term)

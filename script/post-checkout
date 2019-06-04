@@ -7,18 +7,18 @@ NEW_BRANCH=$2
 if [ $CHECKING_OUT_BRANCH -eq 1 ]
   then
     FILES_CHANGED=`git diff $OLD_BRANCH $NEW_BRANCH --name-status`
-    MIGRATIONS_REMOVED=`echo "$FILES_CHANGED" | egrep 'D\tdb/migrate/([0-9]+)' | sort -r`
-    MIGRATIONS_ADDED=`echo "$FILES_CHANGED" | egrep 'A\tdb/migrate/([0-9]+)'`
+    MIGRATIONS_REMOVED=`echo "$FILES_CHANGED" | egrep --color=never 'D\tdb/migrate/([0-9]+)' | sort -r`
+    MIGRATIONS_ADDED=`echo "$FILES_CHANGED" | egrep --color=never 'A\tdb/migrate/([0-9]+)'`
 
     # check if we need to do a bundle
-    BUNDLE_CHANGED=`echo "$FILES_CHANGED" | egrep 'M\tGemfile.lock'`
+    BUNDLE_CHANGED=`echo "$FILES_CHANGED" | egrep --color=never 'M\tGemfile.lock'`
     if [ ! -z "$BUNDLE_CHANGED" ]; then
       echo "Your Gemfile.lock has changed, running bundle"
       bundle
     fi
 
     # check if we need to do a yarn install
-    PACKAGE_CHANGED=`echo "$FILES_CHANGED" | egrep 'M\tyarn.lock'`
+    PACKAGE_CHANGED=`echo "$FILES_CHANGED" | egrep --color=never 'M\tyarn.lock'`
     if [ ! -z "$PACKAGE_CHANGED" ]; then
       echo "Your yarn.lock has changed, running yarn"
       yarn

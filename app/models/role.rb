@@ -1,3 +1,22 @@
+# == Schema Information
+#
+# Table name: roles
+#
+#  id                  :bigint(8)        not null, primary key
+#  name                :string
+#  resource_identifier :string
+#  resource_type       :string
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#  resource_id         :bigint(8)
+#
+# Indexes
+#
+#  index_roles_on_name_and_resource_type_and_resource_id  (name,resource_type,resource_id)
+#  index_roles_on_resource_identifier_and_name            (resource_identifier,name) UNIQUE
+#  index_roles_on_resource_type_and_resource_id           (resource_type,resource_id)
+#
+
 class Role < ApplicationRecord
   has_many :users_roles, dependent: :destroy
   has_many :users, through: :users_roles
@@ -23,6 +42,7 @@ class Role < ApplicationRecord
   CONTENT_EDITOR = :content_editor
   MEMBER = :member
   ADMIN = :admin
+  SHAPE_ADMIN = :shape_admin
   SUPER_ADMIN = :super_admin
   APPLICATION_USER = :application_user
 

@@ -26,8 +26,11 @@
       IdeoSSO.init(<%= ideo_sso_init_params.to_json.html_safe %>)
       // useful variables for analytics
       window.analytics = {
-        LOGGED_IN: <%= user_signed_in? %>
+        LOGGED_IN: <%= user_signed_in? %>,
       }
+      // this is just for frontend display, still important to make sure this is aligned with application.rb
+      window.FEEDBACK_INCENTIVE_AMOUNT = <%= Shape::FEEDBACK_INCENTIVE_AMOUNT %>;
+      window.TARGETED_AUDIENCE_PRICE_PER_RESPONSE = <%= Shape::TARGETED_AUDIENCE_PRICE_PER_RESPONSE %>;
     </script>
     <%= render 'layouts/trackers_and_widgets_head' %>
 

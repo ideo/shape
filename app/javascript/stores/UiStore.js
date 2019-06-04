@@ -44,6 +44,8 @@ export default class UiStore {
   @observable
   rolesMenuOpen = null
   @observable
+  isCypress = navigator && navigator.userAgent === 'cypress'
+  @observable
   isTouchDevice =
     // https://hacks.mozilla.org/2013/04/detecting-touch-its-the-why-not-the-how/
     'ontouchstart' in window ||
@@ -58,6 +60,8 @@ export default class UiStore {
   submissionBoxSettingsOpen = null
   @observable
   loadedSubmissions = false
+  @observable
+  adminUsersMenuOpen = null
   defaultGridSettings = {
     // layout will track we are at "size 3" i.e. "small 4 cols" even though cols === 4
     layoutSize: 4,
@@ -141,6 +145,8 @@ export default class UiStore {
   activityLogMoving = false
   @observable
   windowWidth = 0
+  @observable
+  emptySpaceClickHandlers = new Set()
 
   // Comments + Threads
   @observable
@@ -401,6 +407,28 @@ export default class UiStore {
   }
 
   @action
+  addEmptySpaceClickHandler(handler) {
+    this.emptySpaceClickHandlers.add(handler)
+  }
+
+  @action
+  removeEmptySpaceClickHandler(handler) {
+    this.emptySpaceClickHandlers.delete(handler)
+  }
+
+  @action
+  clearEmptySpaceClickHandlers() {
+    this.emptySpaceClickHandlers.clear()
+  }
+
+  @action
+  onEmptySpaceClick(ev) {
+    const { emptySpaceClickHandlers } = this
+    if (emptySpaceClickHandlers.size === 0) return
+    emptySpaceClickHandlers.forEach(handler => handler(ev))
+  }
+
+  @action
   setMovingCards(ids, { cardAction } = {}) {
     this.movingCardIds.replace(ids)
     this.cardAction = cardAction
@@ -417,6 +445,21 @@ export default class UiStore {
       this.movingCardIds.length > 0 &&
       this.cardAction !== 'moveWithinCollection'
     )
+  }
+
+  @computed
+  get isMobileXs() {
+    return this.windowWidth && this.windowWidth < v.responsive.smallBreakpoint
+  }
+
+  @computed
+  get isMobile() {
+    return this.windowWidth && this.windowWidth < v.responsive.medBreakpoint
+  }
+
+  @computed
+  get isLargeBreakpoint() {
+    return this.windowWidth && this.windowWidth >= v.responsive.largeBreakpoint
   }
 
   // NOTE: because we aren't tracking a difference between "closed" and null,
@@ -821,7 +864,6 @@ export default class UiStore {
         'id'
       )
     } else {
-      // console.log(record.name, record.id, 'bummer.')
       // does this reset belong here? i.e. linkedBreadcrumbTrail has no proper connection here
       this.linkedBreadcrumbTrail.replace([])
       return breadcrumb
@@ -834,5 +876,10 @@ export default class UiStore {
     // (e.g. if there were two different links in the trail)
     this.linkedBreadcrumbTrail.replace([])
     this.linkedInMyCollection = false
+  }
+
+  @action
+  closeAdminUsersMenu() {
+    this.adminUsersMenuOpen = null
   }
 }

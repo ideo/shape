@@ -7,6 +7,8 @@ import DialogContent from '@material-ui/core/DialogContent'
 import FormControl from '@material-ui/core/FormControl'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 
+import ICONS from '~/ui/icons/dialogIcons'
+const { CloseIcon } = ICONS
 import { TextButton, Checkbox } from '~/ui/global/styled/forms'
 import v from '~/utils/variables'
 
@@ -37,6 +39,16 @@ const StyledDialog = styled(Dialog)`
   }
 `
 StyledDialog.displayName = 'StyledDialog'
+
+const ModalCloseButton = styled.button`
+  cursor: pointer;
+  display: block;
+  right: 14px;
+  position: absolute;
+  top: 12px;
+  width: 12px;
+`
+ModalCloseButton.displayName = 'ModalCloseButton'
 
 const StyledDialogContent = styled(DialogContent)`
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
@@ -98,6 +110,9 @@ class MoveHelperModal extends React.Component {
           invisible: true,
         }}
       >
+        <ModalCloseButton onClick={this.handleSubmit}>
+          <CloseIcon />
+        </ModalCloseButton>
         <StyledDialogContent>
           <form onSubmit={this.handleSubmit}>
             <img
@@ -123,7 +138,12 @@ class MoveHelperModal extends React.Component {
             </FormControl>
 
             <div className="button--center">
-              <TextButton disabled={this.isLoading}>Close</TextButton>
+              <TextButton
+                data-cy="MoveHelperModal-button"
+                disabled={this.isLoading}
+              >
+                Close
+              </TextButton>
             </div>
           </form>
         </StyledDialogContent>

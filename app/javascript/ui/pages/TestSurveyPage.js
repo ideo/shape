@@ -1,19 +1,13 @@
-import styled, { ThemeProvider } from 'styled-components'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
-
+import styled from 'styled-components'
+import { PropTypes as MobxPropTypes, observer } from 'mobx-react'
 import v from '~/utils/variables'
 import DialogWrapper from '~/ui/global/modals/DialogWrapper'
-import Emoji from '~/ui/icons/Emoji'
 import Logo from '~/ui/layout/Logo'
 import TestSurveyResponder from '~/ui/test_collections/TestSurveyResponder'
 import { apiStore } from '~/stores'
 import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
-import { LoudDisplayLink } from '~/ui/global/styled/typography'
-import {
-  EmojiMessageContainer,
-  SurveyClosed,
-  styledTestTheme,
-} from '~/ui/test_collections/shared'
+import ClosedSurvey from '~/ui/test_collections/ClosedSurvey'
+import RespondentBanner from '~/ui/test_collections/RespondentBanner'
 
 const StyledBg = styled.div`
   background: #e3edee;
@@ -37,19 +31,7 @@ const StyledSurvey = styled.div`
   max-width: 580px; /* responsive but constrain media QuestionCards to 420px tall */
 `
 
-// TODO move blue background, rounded-corner box to shared component
-
-const StyledClosedText = styled.div`
-  margin: 10px 0 40px 0;
-`
-
-const LearnMoreLink = LoudDisplayLink.extend`
-  font-size: 0.75rem;
-  letter-spacing: 2px;
-  color: ${v.colors.white};
-`
-LearnMoreLink.displayName = 'LearnMoreLink'
-
+@observer
 class TestSurveyPage extends React.Component {
   state = {
     surveyResponse: null,
@@ -64,6 +46,13 @@ class TestSurveyPage extends React.Component {
       )
     }
     apiStore.filestackToken = window.filestackToken
+    if (window.invalid) {
+      this.collection.test_status = 'closed'
+    }
+  }
+
+  async componentDidMount() {
+    await apiStore.loadCurrentUser()
   }
 
   createSurveyResponse = async () => {
@@ -73,58 +62,81 @@ class TestSurveyPage extends React.Component {
       },
       apiStore
     )
-    const surveyResponse = await newResponse.save()
-    if (surveyResponse) {
-      this.setState({ surveyResponse })
+    try {
+      const surveyResponse = await newResponse.save()
+      if (surveyResponse) {
+        this.setState({ surveyResponse })
+      }
+      return surveyResponse
+    } catch (e) {
+      this.collection.test_status = 'closed'
     }
-    return surveyResponse
+  }
+
+  get currentUser() {
+    const { currentUser } = apiStore
+
+    return currentUser
+  }
+
+  get includeRecontactQuestion() {
+    return (
+      !this.collection.live_test_collection &&
+      (!this.currentUser ||
+        this.currentUser.feedback_contact_preference ===
+          'feedback_contact_unanswered')
+    )
+  }
+
+  get includeTerms() {
+    return !this.currentUser || !this.currentUser.respondent_terms_accepted
   }
 
   get renderSurvey() {
     const { collection, createSurveyResponse } = this
     const { surveyResponse } = this.state
     if (!collection) return null
-    if (collection.test_status === 'live') {
-      return (
-        <StyledSurvey data-cy="StandaloneTestSurvey">
-          <TestSurveyResponder
-            collection={collection}
-            surveyResponse={surveyResponse}
-            createSurveyResponse={createSurveyResponse}
-            editing={false}
-          />
-        </StyledSurvey>
-      )
-    }
-    let message = 'Thank you for stopping by! This feedback is now closed.'
-    if (window.noneAvailable) {
-      message = 'No ideas are ready to test yet. Please come back later.'
-    }
+
     return (
-      <ThemeProvider theme={styledTestTheme('primary')}>
-        <StyledSurvey>
-          <DialogWrapper />
-          <SurveyClosed>
-            <EmojiMessageContainer>
-              <Emoji scale={2} name="Raising hands" symbol="🙌" />
-            </EmojiMessageContainer>
-            <StyledClosedText>{message}</StyledClosedText>
-            <LearnMoreLink href={'/'}>Learn More About Shape</LearnMoreLink>
-          </SurveyClosed>
-        </StyledSurvey>
-      </ThemeProvider>
+      <StyledSurvey data-cy="StandaloneTestSurvey">
+        <TestSurveyResponder
+          collection={collection}
+          surveyResponse={surveyResponse}
+          createSurveyResponse={createSurveyResponse}
+          editing={false}
+          includeRecontactQuestion={this.includeRecontactQuestion}
+          includeTerms={this.includeTerms}
+        />
+      </StyledSurvey>
     )
+  }
+
+  get sessionUid() {
+    const { surveyResponse } = this.state
+
+    surveyResponse ? surveyResponse.session_uid : null
   }
 
   render() {
     return (
-      <StyledBg>
-        <LogoWrapper>
-          <Logo withText width={83} />
-        </LogoWrapper>
-        <DialogWrapper />
-        {this.renderSurvey}
-      </StyledBg>
+      <React.Fragment>
+        {this.currentUser ? <RespondentBanner user={this.currentUser} /> : null}
+        <StyledBg>
+          <LogoWrapper>
+            <Logo withText width={83} />
+          </LogoWrapper>
+          <DialogWrapper />
+          {this.collection.test_status === 'live' ? (
+            this.renderSurvey
+          ) : (
+            <ClosedSurvey
+              includeRecontactQuestion={this.includeRecontactQuestion}
+              currentUser={this.currentUser}
+              sessionUid={this.sessionUid}
+            />
+          )}
+        </StyledBg>
+      </React.Fragment>
     )
   }
 }

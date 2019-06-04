@@ -1,9 +1,10 @@
 class InvitationMailer < ApplicationMailer
-  def invite(user_id:, invited_by_id:, invited_to_id:, invited_to_type:)
+  def invite(user_id:, invited_by_id:, invited_to_id: nil, invited_to_type:)
     @user = User.find(user_id)
     @invited_by = User.find(invited_by_id)
     @invited_to_type = invited_to_type
-    @invited_to = invited_to_type.safe_constantize.find(invited_to_id)
+    @invited_to = invited_to_type == Role::SHAPE_ADMIN.to_s.titleize ? invited_to_type : invited_to_type.safe_constantize.find(invited_to_id)
+    @invited_to_name = get_invited_to_name(@invited_to)
     invited_to_url = frontend_url_for(@invited_to)
 
     if @invited_to.is_a?(Group) && !@invited_to.org_group?
@@ -17,7 +18,15 @@ class InvitationMailer < ApplicationMailer
       @url = invited_to_url
     end
     mail to: @user.email,
-         subject: "Your invitation to \"#{@invited_to.name}\" on Shape",
+         subject: "Your invitation to \"#{@invited_to_name}\" on Shape",
          users: [@user]
+  end
+
+  private
+
+  def get_invited_to_name(invited_to)
+    return invited_to.name if invited_to.respond_to?(:name)
+
+    invited_to
   end
 end

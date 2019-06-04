@@ -15,7 +15,7 @@ import { uiStore } from '~/stores'
 
 const SearchIconContainer = styled.span`
   display: block;
-  left: 0;
+  left: 5px;
   position: absolute;
   width: 14px;
   top: 14px;
@@ -71,12 +71,14 @@ const selectStyles = (theme, menuStyles = {}, numOptionsToShow = 3.5) => ({
   clearIndicator: () => ({}),
   container: () => ({}),
   control: () => ({
+    paddingBottom: '3px',
+    backgroundColor: 'white',
+    marginBottom: '-5px',
     paddingLeft: '24px',
     display: 'flex',
     alignItems: 'center',
     border: 0,
     height: 'auto',
-    background: 'transparent',
     '&:hover': {
       boxShadow: 'none',
     },
@@ -128,12 +130,14 @@ const SelectWrapped = props => {
     classes,
     theme,
     creatable,
+    defaultOptions,
     options,
     optionSearch,
     menuPlacement,
     keepMenuClosed,
     menuStyles,
     numOptionsToShow,
+    onMenuClose,
     ...other
   } = props
   if (keepMenuClosed) {
@@ -144,9 +148,10 @@ const SelectWrapped = props => {
     return (
       <AsyncSelect
         loadOptions={optionSearch}
-        defaultOptions
+        defaultOptions={defaultOptions}
         menuPlacement={menuPlacement}
         styles={selectStyles(theme, menuStyles, numOptionsToShow)}
+        onMenuClose={onMenuClose}
         components={{
           valueComponent: valueComponent(classes),
           LoadingIndicator,
@@ -174,7 +179,10 @@ const SelectWrapped = props => {
         uiStore.autocompleteMenuClosed()
         return 'No results found'
       }}
-      onMenuClose={() => uiStore.autocompleteMenuClosed()}
+      onMenuClose={() => {
+        uiStore.autocompleteMenuClosed()
+        onMenuClose()
+      }}
       options={options}
       {...other}
     />
@@ -195,8 +203,10 @@ const SelectWrapped = props => {
 
 const styles = theme => ({
   root: {
+    backgroundColor: 'white',
     flexGrow: 1,
     height: 30,
+    width: '100%',
   },
   chip: {
     margin: theme.spacing.unit / 4,
@@ -248,6 +258,7 @@ class AutoComplete extends React.Component {
     const {
       classes,
       keepSelectedOptions,
+      defaultOptions,
       options,
       optionSearch,
       placeholder,
@@ -255,6 +266,7 @@ class AutoComplete extends React.Component {
       keepMenuClosed,
       creatable,
       menuStyles,
+      onMenuClose,
       numOptionsToShow,
     } = this.props
     const { option, inputValue } = this.state
@@ -269,6 +281,7 @@ class AutoComplete extends React.Component {
             numOptionsToShow,
             multi: true,
             value: keepSelectedOptions ? option : null,
+            defaultOptions,
             inputValue: inputValue,
             options,
             optionSearch,
@@ -278,6 +291,7 @@ class AutoComplete extends React.Component {
             creatable,
             menuPlacement,
             keepMenuClosed,
+            onMenuClose,
             instanceId: 'react-select-chip',
             id: 'react-select-chip',
             name: 'react-select-chip',
@@ -303,6 +317,12 @@ AutoComplete.propTypes = {
       value: PropTypes.string,
     })
   ).isRequired,
+  defaultOptions: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string,
+      value: PropTypes.string,
+    })
+  ),
   onOptionSelect: PropTypes.func.isRequired,
   optionSearch: PropTypes.func,
   keepSelectedOptions: PropTypes.bool,
@@ -312,6 +332,7 @@ AutoComplete.propTypes = {
   menuPlacement: PropTypes.string,
   keepMenuClosed: PropTypes.bool,
   numOptionsToShow: PropTypes.number,
+  onMenuClose: PropTypes.func,
   menuStyles: PropTypes.shape({
     width: PropTypes.string,
     zIndex: PropTypes.number,
@@ -324,10 +345,13 @@ AutoComplete.defaultProps = {
   creatable: false,
   placeholder: '',
   value: undefined,
+  options: [],
+  defaultOptions: [],
   optionSearch: null,
   menuPlacement: 'bottom',
   keepMenuClosed: false,
   numOptionsToShow: 3.5,
+  onMenuClose: () => {},
   menuStyles: {
     width: '370px',
     zIndex: 2,

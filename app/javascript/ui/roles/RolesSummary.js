@@ -6,9 +6,9 @@ import pluralize from 'pluralize'
 
 import Tooltip from '~/ui/global/Tooltip'
 import Avatar from '~/ui/global/Avatar'
+import AvatarGroup, { MAX_AVATARS_TO_SHOW } from '~/ui/global/AvatarGroup'
 import v from '~/utils/variables'
-
-const MAX_USERS_TO_SHOW = 4
+import { AddButton } from '~/ui/global/styled/buttons'
 
 const StyledRolesSummary = styled.div`
   position: relative;
@@ -22,75 +22,12 @@ const StyledRolesSummary = styled.div`
 `
 StyledRolesSummary.displayName = 'StyledRolesSummary'
 
-const StyledAvatarGroup = styled.div`
-  display: inline-block;
-  margin: 0 8px;
-  .placeholder,
-  .editor,
-  .viewer {
-    display: inline-block;
-    margin-left: 0px;
-    margin-right: -12px;
-    border: 1px solid ${v.colors.commonLight};
-    /* for any transparent avatars */
-    background-color: white;
-    &:last-child {
-      margin-right: 0;
-    }
-    ${props =>
-      _.map(
-        _.range(1, 6),
-        i =>
-          `:nth-child(${i}) {
-            z-index: ${10 - i};
-          }`
-      )};
-  }
-  .placeholder {
-    background-color: ${v.colors.commonMedium};
-  }
-`
-StyledAvatarGroup.displayName = 'StyledAvatarGroup'
-
 const StyledSeparator = styled.div`
   width: 1px;
   height: 32px;
   background-color: ${v.colors.commonMedium};
   display: inline-block;
 `
-
-const StyledAddUserBtn = styled.div`
-  display: inline-block;
-  vertical-align: top;
-  margin-right: 0;
-  width: 32px;
-  height: 32px;
-  border-radius: 32px;
-  background-color: white;
-  color: ${v.colors.black};
-  line-height: 32px;
-  font-size: 1.5rem;
-  text-align: center;
-  cursor: pointer;
-`
-StyledAddUserBtn.displayName = 'StyledAddUserBtn'
-
-const MORE_EDITORS = (
-  <Avatar
-    title="...and more editors"
-    url=""
-    className="placeholder"
-    displayName
-  />
-)
-const MORE_VIEWERS = (
-  <Avatar
-    title="...and more viewers"
-    url=""
-    className="placeholder"
-    displayName
-  />
-)
 
 // NOTE: intentionally not an observer so that searching roles within the menu doesn't affect this list on the fly
 // however it will automatically update after you close the RolesModal
@@ -116,17 +53,17 @@ class RolesSummary extends React.Component {
     return [...viewerRole.users, ...viewerRole.groups]
   }
 
-  // Return at most MAX_USERS_TO_SHOW users,
+  // Return at most MAX_AVATARS_TO_SHOW users,
   // prioritizing editors over viewers
   get viewersAndEditorsLimited() {
     let editors = _.sortBy(this.editors, ['first_name'])
     let viewers = _.sortBy(this.viewers, ['first_name'])
     const editorCount = editors.length
     const viewerCount = viewers.length
-    editors = editors.slice(0, MAX_USERS_TO_SHOW)
+    editors = editors.slice(0, MAX_AVATARS_TO_SHOW)
 
-    if (editors.length < MAX_USERS_TO_SHOW) {
-      const numViewers = MAX_USERS_TO_SHOW - editors.length
+    if (editors.length < MAX_AVATARS_TO_SHOW) {
+      const numViewers = MAX_AVATARS_TO_SHOW - editors.length
       viewers = viewers.slice(0, numViewers)
     } else {
       viewers = []
@@ -164,10 +101,13 @@ class RolesSummary extends React.Component {
     ))
 
     return (
-      <StyledAvatarGroup align="right">
+      <AvatarGroup
+        align="right"
+        avatarCount={editorCount}
+        placeholderTitle="...and more editors"
+      >
         {editorAvatars}
-        {editorCount > MAX_USERS_TO_SHOW && MORE_EDITORS}
-      </StyledAvatarGroup>
+      </AvatarGroup>
     )
   }
 
@@ -187,10 +127,12 @@ class RolesSummary extends React.Component {
       />
     ))
     return (
-      <StyledAvatarGroup>
+      <AvatarGroup
+        avatarCount={viewerCount}
+        placeholderTitle="...and more viewers"
+      >
         {viewerAvatars}
-        {viewerCount > MAX_USERS_TO_SHOW && MORE_VIEWERS}
-      </StyledAvatarGroup>
+      </AvatarGroup>
     )
   }
 
@@ -199,7 +141,7 @@ class RolesSummary extends React.Component {
     if (!canEdit) return ''
     return (
       <Tooltip title="Share">
-        <StyledAddUserBtn onClick={this.props.handleClick}>+</StyledAddUserBtn>
+        <AddButton onClick={this.props.handleClick}>+</AddButton>
       </Tooltip>
     )
   }

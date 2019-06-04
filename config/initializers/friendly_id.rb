@@ -44,6 +44,8 @@ FriendlyId.defaults do |config|
     user_settings
     billing
     print
+    test
+    tests
   ]
 
   #  ## Friendly Finders

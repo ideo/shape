@@ -1,17 +1,20 @@
 import _ from 'lodash'
 import { Fragment } from 'react'
 import PropTypes from 'prop-types'
-import styled from 'styled-components'
 import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { Collapse } from '@material-ui/core'
 
-import v from '~/utils/variables'
 import { ShowMoreButton } from '~/ui/global/styled/forms'
-import { Heading3, DisplayText } from '~/ui/global/styled/typography'
-import { Row, RowItemLeft } from '~/ui/global/styled/layout'
+import { Heading3 } from '~/ui/global/styled/typography'
+import {
+  Row,
+  ScrollArea,
+  StyledHeaderRow,
+  FooterBreak,
+  FooterArea,
+} from '~/ui/global/styled/layout'
 import SearchButton from '~/ui/global/SearchButton'
-import DropdownIcon from '~/ui/icons/DropdownIcon'
+import Panel from '~/ui/global/Panel'
 import RolesAdd from '~/ui/roles/RolesAdd'
 import RoleSelect from '~/ui/roles/RoleSelect'
 import PublicSharingOptions from '~/ui/global/PublicSharingOptions'
@@ -21,79 +24,12 @@ function sortUserOrGroup(a, b) {
   return a.entity.name.localeCompare(b.entity.name)
 }
 
-const ScrollArea = styled.div`
-  flex: 1 1 auto;
-  min-height: 220px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-`
-
-const FooterBreak = styled.div`
-  border-top: 1px solid ${v.colors.commonMedium};
-  width: 100%;
-`
-
-const FooterArea = styled.div`
-  flex: 0 0 auto;
-  padding-top: 24px;
-  padding-bottom: 30px;
-`
-
-const StyledHeaderRow = styled(Row)`
-  flex: 0 0 auto;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  margin-left: 0;
-  margin-bottom: 0;
-
-  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
-    width: 100%;
-  }
-`
-const GroupHeader = styled.div`
-  background-color: ${v.colors.white};
-  cursor: pointer;
-  margin-bottom: 15px;
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  ${props =>
-    props.open &&
-    `&:after {
-      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 4%, rgba(0, 0, 0, 0));
-      content: "";
-      display: block;
-      position: absolute;
-      height: 5px;
-      width: 100%;
-    }`};
-`
-const StyledRow = styled(Row)`
-  margin-left: 0;
-  margin-bottom: 0;
-`
-
-const StyledCollapseToggle = styled.button`
-  .icon {
-    width: 24px;
-    transform: translateY(4px);
-  }
-`
-const StyledExpandToggle = styled.button`
-  .icon {
-    width: 24px;
-    transform: translateY(2px) rotate(-90deg);
-  }
-`
-
 @inject('apiStore', 'routingStore')
 @observer
 class RolesMenu extends React.Component {
   state = {
     searchText: '',
     groups: [],
-    pendingPanelOpen: false,
-    activePanelOpen: true,
     page: {
       pending: 1,
       active: 1,
@@ -205,16 +141,6 @@ class RolesMenu extends React.Component {
       ),
     },
   ]
-
-  togglePanel = panel => {
-    this.updatePanel(panel, !this.isOpenPanel(panel))
-  }
-
-  updatePanel = (panel, isOpen) => {
-    this.setState({ [`${panel.status}PanelOpen`]: isOpen })
-  }
-
-  isOpenPanel = panel => this.state[`${panel.status}PanelOpen`]
 
   updateSearchText = searchText => {
     this.setState({ searchText }, () => {
@@ -347,33 +273,12 @@ class RolesMenu extends React.Component {
             if (entities.length === 0) return null
 
             return (
-              <div key={panelTitle}>
-                <GroupHeader
-                  onClick={() => this.togglePanel(group)}
-                  open={this.isOpenPanel(group)}
-                >
-                  <StyledRow align="center">
-                    <DisplayText>
-                      {panelTitle} ({count})
-                    </DisplayText>
-                    <RowItemLeft style={{ marginLeft: '0px' }}>
-                      {this.isOpenPanel(group) ? (
-                        <StyledCollapseToggle aria-label="Collapse">
-                          <DropdownIcon />
-                        </StyledCollapseToggle>
-                      ) : (
-                        <StyledExpandToggle aria-label="Expand">
-                          <DropdownIcon />
-                        </StyledExpandToggle>
-                      )}
-                    </RowItemLeft>
-                  </StyledRow>
-                </GroupHeader>
-                <Collapse
-                  in={this.isOpenPanel(group)}
-                  timeout="auto"
-                  unmountOnExit
-                >
+              <Panel
+                key={panelTitle}
+                title={`${panelTitle} (${count})`}
+                open={status !== 'pending'}
+              >
+                <React.Fragment>
                   {entities.map(
                     combined =>
                       // NOTE: content_editor is a "hidden" role for now
@@ -406,8 +311,8 @@ class RolesMenu extends React.Component {
                       {this.loadingMore ? 'Loading...' : 'Show more...'}
                     </ShowMoreButton>
                   )}
-                </Collapse>
-              </div>
+                </React.Fragment>
+              </Panel>
             )
           })}
         </ScrollArea>

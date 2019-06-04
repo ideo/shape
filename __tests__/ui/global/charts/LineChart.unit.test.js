@@ -1,13 +1,13 @@
 import LineChart from '~/ui/global/charts/LineChart'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
-import { fakeDataset } from '#/mocks/data'
+import { fakeAreaChartDataset } from '#/mocks/data'
 
 const props = {}
 let wrapper, render
 
 describe('LineChart', () => {
   beforeEach(() => {
-    props.dataset = fakeDataset
+    props.dataset = fakeAreaChartDataset
     props.simpleDateTooltip = true
     render = () => (wrapper = shallow(<LineChart {...props} />))
     render()

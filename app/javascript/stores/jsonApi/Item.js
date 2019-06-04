@@ -30,7 +30,6 @@ class Item extends SharedRecordMixin(BaseRecord) {
     'tag_list',
     'thumbnail_url',
     'filestack_file_attributes',
-    'data_settings',
     'report_type',
     'selected_measures',
   ]
@@ -80,7 +79,12 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return this.report_type === 'report_type_record'
   }
 
+  get isReportTypeQuestionItem() {
+    return this.report_type === 'report_type_question_item'
+  }
+
   get pdfCoverUrl() {
+    if (!this.filestack_file) return ''
     return FilestackUpload.pdfCoverUrl(this.filestack_file.handle)
   }
 
@@ -173,7 +177,17 @@ class Item extends SharedRecordMixin(BaseRecord) {
     const { datasets } = this
     if (!datasets) return null
     if (datasets.length <= 1) return datasets[0]
-    return datasets.find(dataset => dataset.order === 0)
+    const primary = datasets.find(dataset => dataset.order === 0)
+    return primary
+  }
+
+  secondaryDatasets = ({ selected } = { selected: true }) => {
+    const { datasets } = this
+    if (!datasets) return []
+    const allDatasets = this.datasets.filter(
+      dataset => dataset.order !== 0 && dataset.selected === selected
+    )
+    return allDatasets
   }
 
   get measure() {
@@ -190,6 +204,12 @@ class Item extends SharedRecordMixin(BaseRecord) {
     }
   }
 
+  get legendItem() {
+    const { legend_item_id } = this
+    if (!legend_item_id) return null
+    return this.apiStore.find('items', legend_item_id.toString())
+  }
+
   get timeframe() {
     const { timeframe } = this.primaryDataset
     return timeframe || ''
@@ -200,11 +220,8 @@ class Item extends SharedRecordMixin(BaseRecord) {
   }
 
   get collectionFilter() {
-    if (!this.data_settings) return null
-    return (
-      this.data_settings.d_filters &&
-      _.find(this.data_settings.d_filters, { type: 'Collection' })
-    )
+    if (!this.primaryDataset) return null
+    return _.find(this.primaryDataset.data_source_id, { type: 'Collection' })
   }
 
   API_updateWithoutSync({ cancel_sync } = {}) {
@@ -229,16 +246,6 @@ class Item extends SharedRecordMixin(BaseRecord) {
 Item.defaults = {
   data_content: '',
   can_edit: false,
-  datasets: [
-    {
-      order: 0,
-      data: [],
-      count: 0,
-    },
-  ],
-  data_settings: {
-    d_measure: null,
-  },
   thumbnail_url: '',
 }
 Item.refDefaults = {

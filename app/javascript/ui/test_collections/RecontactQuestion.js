@@ -7,8 +7,12 @@ import Emoji from '~/ui/icons/Emoji'
 import { EmojiButton, EmojiHolder } from '~/ui/test_collections/ScaleQuestion'
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
 import OkIcon from '~/ui/icons/OkIcon'
-import { QuestionText } from './shared'
-import { TextInput, TextResponseHolder, TextEnterButton } from './shared'
+import {
+  QuestionText,
+  TextInput,
+  TextResponseHolder,
+  TextEnterButton,
+} from '~/ui/test_collections/shared'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 
@@ -27,6 +31,21 @@ class RecontactQuestion extends React.Component {
     showContactInfo: false,
     contactInfo: '',
     submittedContactInfo: false,
+    showFeedbackRecontact: 'noIncentiveForGuest',
+    answer: '',
+    createdUser: null,
+  }
+
+  componentDidMount() {
+    const { user, givesIncentive } = this.props
+    if (!user && givesIncentive) {
+      // this is the state with a guest user and a test with an incentive
+      // we need to ask for their info before asking to recontact
+      this.setState({
+        showFeedbackRecontact: false,
+        showContactInfo: true,
+      })
+    }
   }
 
   async createLimitedUser(contactInfo) {
@@ -34,8 +53,18 @@ class RecontactQuestion extends React.Component {
     const { sessionUid } = this.props
     try {
       const res = await apiStore.createLimitedUser({ contactInfo, sessionUid })
-      if (!res) throw { errors: ['Contact information invalid'] }
+      if (!res) {
+        throw { errors: ['Contact information invalid'] }
+        return
+      }
       user = res.data
+      const { showFeedbackRecontact } = this.state
+      this.setState({
+        showFeedbackRecontact: !showFeedbackRecontact
+          ? 'afterPaymentInfo'
+          : 'noIncentiveForGuest',
+        createdUser: user,
+      })
     } catch (err) {
       uiStore.alert(err.errors[0])
       return
@@ -49,7 +78,10 @@ class RecontactQuestion extends React.Component {
   }
 
   handleClick = choice => ev => {
-    const { onAnswer, user } = this.props
+    const { onAnswer } = this.props
+    const user = this.props.user || this.state.createdUser
+    this.setState({ answer: choice })
+
     if (choice === 'feedback_contact_yes' && !user) {
       this.setState({ showContactInfo: true })
       return
@@ -60,52 +92,77 @@ class RecontactQuestion extends React.Component {
       })
     }
     // there was a user, or anon user answered "no", move on
-    onAnswer()
+    onAnswer(choice)
   }
 
   handleContactInfoSubmit = async ev => {
     const { onAnswer } = this.props
     const { contactInfo } = this.state
     ev.preventDefault()
-    const created = this.createLimitedUser(contactInfo)
+    const created = await this.createLimitedUser(contactInfo)
     if (!created) return
-    onAnswer()
+    onAnswer('feedback_contact_yes')
     this.setState({ submittedContactInfo: true })
   }
 
-  render() {
+  get backgroundColor() {
+    const { backgroundColor } = this.props
+    return backgroundColor ? backgroundColor : v.colors.primaryDark
+  }
+
+  get showFeedbackRecontactForm() {
     const { user } = this.props
-    const { contactInfo, showContactInfo, submittedContactInfo } = this.state
+    const { answer } = this.state
     return (
-      <div style={{ width: '100%' }}>
+      <React.Fragment>
         <QuestionText>
-          Would you like to be contacted about future surveys?
+          Would you like to be contacted about future feedback opportunities?
         </QuestionText>
         <EmojiHolder data-cy="RecontactEmojiHolder">
           <EmojiButton
             selected={
-              user && user.feedback_contact_preference === 'feedback_contact_no'
+              (user &&
+                user.feedback_contact_preference === 'feedback_contact_no') ||
+              answer === 'feedback_contact_no' ||
+              !answer
             }
             onClick={this.handleClick('feedback_contact_no')}
           >
-            <Emoji name="Finished" symbol="👎" />
+            <Emoji scale={1.375} name="Finished" symbol="👎" />
           </EmojiButton>
           <EmojiButton
             selected={
-              showContactInfo ||
+              !answer ||
               (user &&
-                user.feedback_contact_preference === 'feedback_contact_yes')
+                user.feedback_contact_preference === 'feedback_contact_yes') ||
+              answer === 'feedback_contact_yes'
             }
             onClick={this.handleClick('feedback_contact_yes')}
             data-cy="RecontactEmojiBtnThumbUp"
           >
-            <Emoji name="Yes" symbol="👍" />
+            <Emoji scale={1.375} name="Yes" symbol="👍" />
           </EmojiButton>
         </EmojiHolder>
+      </React.Fragment>
+    )
+  }
 
-        {showContactInfo && (
-          <form ref="form" onSubmit={this.handleContactInfoSubmit}>
-            <div style={{ padding: '16px 20px' }}>
+  get showContactInfoForm() {
+    const {
+      contactInfo,
+      submittedContactInfo,
+      showFeedbackRecontact,
+    } = this.state
+
+    const placeholder = `email${
+      showFeedbackRecontact === 'noIncentiveForGuest' ? ' or phone number' : ''
+    }`
+
+    return (
+      <form ref="form" onSubmit={this.handleContactInfoSubmit}>
+        <div style={{ padding: '16px 20px' }}>
+          {showFeedbackRecontact === 'noIncentiveForGuest' && (
+            <div>
               <DisplayText color={v.colors.white}>
                 Please enter an email or mobile number to be recontacted.
               </DisplayText>
@@ -117,30 +174,54 @@ class RecontactQuestion extends React.Component {
               </DisplayText>
               <br />
             </div>
-            <TextResponseHolder>
-              <TextInput
-                onChange={this.handleChange}
-                value={contactInfo}
-                type="questionText"
-                placeholder="email or phone number"
-                data-cy="RecontactTextInput"
-              />
-              {submittedContactInfo ? (
-                <IconHolder>
-                  <OkIcon />
-                </IconHolder>
-              ) : (
-                <TextEnterButton
-                  focused
-                  onClick={this.handleContactInfoSubmit}
-                  data-cy="RecontactTextResponseButton"
-                >
-                  <ReturnArrowIcon />
-                </TextEnterButton>
-              )}
-            </TextResponseHolder>
-          </form>
-        )}
+          )}
+          {(!showFeedbackRecontact ||
+            showFeedbackRecontact === 'afterPaymentInfo') && (
+            <div>
+              <DisplayText color={v.colors.white}>
+                Please enter an email in order to receive your payment.
+              </DisplayText>
+              <br />
+            </div>
+          )}
+        </div>
+        <TextResponseHolder>
+          <TextInput
+            onChange={this.handleChange}
+            value={contactInfo}
+            type="questionText"
+            placeholder={placeholder}
+            data-cy="RecontactTextInput"
+          />
+          {submittedContactInfo ? (
+            <IconHolder>
+              <OkIcon />
+            </IconHolder>
+          ) : (
+            <TextEnterButton
+              focused
+              onClick={this.handleContactInfoSubmit}
+              data-cy="RecontactTextResponseButton"
+            >
+              <ReturnArrowIcon />
+            </TextEnterButton>
+          )}
+        </TextResponseHolder>
+      </form>
+    )
+  }
+
+  render() {
+    const { showContactInfo, showFeedbackRecontact } = this.state
+    return (
+      <div style={{ width: '100%', backgroundColor: this.backgroundColor }}>
+        {showFeedbackRecontact === 'noIncentiveForGuest' &&
+          this.showFeedbackRecontactForm}
+
+        {showContactInfo && this.showContactInfoForm}
+
+        {showFeedbackRecontact === 'afterPaymentInfo' &&
+          this.showFeedbackRecontactForm}
       </div>
     )
   }
@@ -149,10 +230,15 @@ class RecontactQuestion extends React.Component {
 RecontactQuestion.propTypes = {
   user: MobxPropTypes.objectOrObservableObject,
   onAnswer: PropTypes.func.isRequired,
-  sessionUid: PropTypes.string.isRequired,
+  sessionUid: PropTypes.string,
+  backgroundColor: PropTypes.string,
+  givesIncentive: PropTypes.bool,
 }
 RecontactQuestion.defaultProps = {
   user: null,
+  backgroundColor: null,
+  sessionUid: null,
+  givesIncentive: false,
 }
 
 export default RecontactQuestion
