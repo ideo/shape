@@ -17,7 +17,6 @@ import {
 } from '~/ui/global/styled/marketing.js'
 import MarketingMenu from '~/ui/marketing/MarketingMenu'
 import ContentBlock from '~/ui/marketing/ContentBlock'
-import BetaSticker from '~/ui/marketing/BetaSticker'
 import marketingFirebaseClient from '~/vendor/firebase/clients/marketingFirebaseClient'
 import ReactPlayer from 'react-player'
 import PageFooter from '~/ui/marketing/PageFooter.js'
@@ -73,7 +72,6 @@ class MarketingPage extends React.Component {
           <MarketingGradientTop>
             <ScrollElement name="TopAnchor" />
             <MarketingMenu location={location} />
-            <BetaSticker />
 
             <Center>
               <MarketingShapeLogo videoPlaying={videoPlaying} />
