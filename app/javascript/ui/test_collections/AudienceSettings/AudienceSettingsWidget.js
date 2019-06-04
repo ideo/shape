@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import { concat, filter, reject, sortBy } from 'lodash'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
 
@@ -16,7 +17,9 @@ import TableBody from './TableBody'
 import AudienceCheckbox from './AudienceCheckbox'
 import AddAudienceModal from './AddAudienceModal'
 import Button from '~shared/components/atoms/Button'
-import PlusIcon from '~shared/images/icon-plus.svg'
+import PlusIcon from '~/ui/icons/PlusIcon'
+import PopoutMenu from '~/ui/global/PopoutMenu'
+import ClickWrapper from '~/ui/layout/ClickWrapper'
 
 const AudienceSettingsWrapper = styled.div`
   width: 100%;
@@ -39,13 +42,49 @@ const MobileWrapper = styled.div`
   }
 `
 
+const AddAudienceButton = styled(Button)`
+  z-index: ${v.zIndex.aboveClickWrapper};
+`
+
+const AddAudienceMenu = styled.span`
+  .menu-wrapper {
+    left: 0;
+    top: -35px;
+  }
+
+  .icon {
+    left: 0;
+    line-height: 2.4rem !important;
+    margin-right: 8px;
+    position: relative !important;
+    vertical-align: middle;
+  }
+`
+
+const StyledPlusIcon = styled.span`
+  height: 15px;
+  margin-right: 8px;
+  width: 15px;
+`
+
 @observer
 class AudienceSettingsWidget extends React.Component {
   state = {
+    addAudienceMenuOpen: false,
     addAudienceModalOpen: false,
+    selectedOrgAudiences: [],
+  }
+
+  toggleAddAudienceMenu = () => {
+    this.setState({ addAudienceMenuOpen: !this.state.addAudienceMenuOpen })
+  }
+
+  closeAddAudienceMenu = () => {
+    this.setState({ addAudienceMenuOpen: false })
   }
 
   openAddAudienceModal = () => {
+    this.closeAddAudienceMenu()
     this.setState({ addAudienceModalOpen: true })
   }
 
@@ -53,15 +92,58 @@ class AudienceSettingsWidget extends React.Component {
     this.setState({ addAudienceModalOpen: false })
   }
 
+  defaultAudiences() {
+    const { audiences } = this.props
+    const defaultAudiences = filter(audiences, a => a.global)
+    return sortBy(defaultAudiences, a => a.price_per_response)
+  }
+
+  organizationAudiences() {
+    const { audiences } = this.props
+    const orgAudiences = reject(audiences, a => a.global)
+    return sortBy(orgAudiences, a => a.name)
+  }
+
+  addAudienceMenuItems() {
+    const orgAudiences = this.organizationAudiences()
+    const audienceItems = orgAudiences.map(audience => ({
+      name: audience.name,
+      onClick: () => {
+        this.closeAddAudienceMenu()
+        this.addAudience(audience)
+      },
+    }))
+
+    audienceItems.push({
+      name: 'New Audience',
+      iconLeft: <PlusIcon />,
+      onClick: this.openAddAudienceModal,
+    })
+
+    return audienceItems
+  }
+
+  addAudience(audience) {
+    const { afterAddAudience } = this.props
+    const { selectedOrgAudiences } = this.state
+    if (selectedOrgAudiences.indexOf(audience) === -1) {
+      selectedOrgAudiences.push(audience)
+      this.setState({ selectedOrgAudiences })
+    }
+    if (afterAddAudience) {
+      afterAddAudience(audience)
+    }
+  }
+
   audienceSelected(audience) {
     const { audienceSettings } = this.props
-    const option = audienceSettings[audience.id]
+    const option = audienceSettings.get(audience.id)
     return option ? option.selected : false
   }
 
   sampleSize(audience) {
     const { audienceSettings } = this.props
-    const option = audienceSettings[audience.id]
+    const option = audienceSettings.get(audience.id)
     return option && option.sample_size ? option.sample_size.toString() : ''
   }
 
@@ -97,16 +179,31 @@ class AudienceSettingsWidget extends React.Component {
   }
 
   render() {
-    const { audiences, totalPrice, locked } = this.props
+    const { totalPrice, locked } = this.props
+    const { addAudienceMenuOpen, selectedOrgAudiences } = this.state
+    const audiences = concat(this.defaultAudiences(), selectedOrgAudiences)
 
     let newAudienceButton = (
       <Flex align="center">
         <StyledRowFlexItem style={{ marginTop: '5px' }}>
-          <Button href="#" onClick={this.openAddAudienceModal}>
-            <PlusIcon width={15} style={{ fill: v.colors.black }} />
-            New Audience
-          </Button>
+          <AddAudienceButton onClick={this.toggleAddAudienceMenu}>
+            <StyledPlusIcon>
+              <PlusIcon />
+            </StyledPlusIcon>
+            Audience
+          </AddAudienceButton>
+          <AddAudienceMenu>
+            <PopoutMenu
+              wrapperClassName="add-audience-menu"
+              menuOpen={addAudienceMenuOpen}
+              menuItems={this.addAudienceMenuItems()}
+              hideDotMenu
+            />
+          </AddAudienceMenu>
         </StyledRowFlexItem>
+        {addAudienceMenuOpen && (
+          <ClickWrapper clickHandlers={[this.closeAddAudienceMenu]} />
+        )}
       </Flex>
     )
     if (locked) newAudienceButton = <div style={{ width: '250px' }} />
@@ -119,6 +216,7 @@ class AudienceSettingsWidget extends React.Component {
         </StyledRowFlexCell>
       </React.Fragment>
     )
+
     return (
       <AudienceSettingsWrapper>
         <h3 style={{ marginBottom: '0px' }}>Audience</h3>
@@ -169,6 +267,7 @@ class AudienceSettingsWidget extends React.Component {
         <AddAudienceModal
           open={this.state.addAudienceModalOpen}
           close={this.closeAddAudienceModal}
+          afterSave={audience => this.addAudience(audience)}
         />
       </AudienceSettingsWrapper>
     )
@@ -180,6 +279,7 @@ AudienceSettingsWidget.propTypes = {
   audienceSettings: MobxPropTypes.objectOrObservableObject.isRequired,
   onInputChange: PropTypes.func.isRequired,
   onToggleCheckbox: PropTypes.func.isRequired,
+  afterAddAudience: PropTypes.func.isRequired,
   totalPrice: PropTypes.string.isRequired,
   locked: PropTypes.bool,
 }
