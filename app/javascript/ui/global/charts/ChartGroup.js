@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
-import { observer } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import {
   LineSegment,

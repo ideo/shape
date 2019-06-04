@@ -12,7 +12,7 @@ import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import Modal from '~/ui/global/modals/Modal'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import TrashIcon from '~/ui/icons/TrashIcon'
-import v from '~/utils/variables'
+import v, { TARGETED_AUDIENCE_PRICE_PER_RESPONSE } from '~/utils/variables'
 import { groupCriteriaByGroup, getCriterionByName } from './AudienceCriteria'
 import {
   Checkbox,
@@ -25,11 +25,7 @@ import {
   TextButton,
   TextField,
 } from '~/ui/global/styled/forms'
-import {
-  Heading3,
-  DisplayText,
-  SmallHelperText,
-} from '~/ui/global/styled/typography'
+import { Heading3, DisplayText } from '~/ui/global/styled/typography'
 import { FloatRight } from '~/ui/global/styled/layout'
 
 const ROOT_MENU = 'root'
@@ -380,9 +376,10 @@ class AddAudienceModal extends React.Component {
             </DisplayText>
           </Box>
           <Box mt={2} mb={35}>
-            <SmallHelperText>
-              Default price per respondent for a custom audience is $4.70
-            </SmallHelperText>
+            <DisplayText>
+              The default price per respondent for a custom audience is $
+              {TARGETED_AUDIENCE_PRICE_PER_RESPONSE.toFixed(2)}.
+            </DisplayText>
           </Box>
           <Grid container alignItems="center" style={{ paddingBottom: '32px' }}>
             <Grid item xs={6}>

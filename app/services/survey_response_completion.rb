@@ -41,6 +41,7 @@ class SurveyResponseCompletion < SimpleService
 
   def ping_collection
     # real-time update any graphs, etc.
+    test_collection.touch
     CollectionUpdateBroadcaster.call(test_collection)
   end
 end
