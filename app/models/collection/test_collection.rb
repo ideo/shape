@@ -70,6 +70,9 @@ class Collection
              class_name: 'Item::QuestionItem',
              through: :primary_collection_cards
     has_many :test_audiences, dependent: :destroy
+    has_many :paid_test_audiences,
+      -> { paid },
+      class_name: 'TestAudience'
     belongs_to :collection_to_test, class_name: 'Collection', optional: true
 
     has_many :datasets,
