@@ -2,33 +2,6 @@
 
 exports[`ImageItemCover renders snapshot 1`] = `
 <React.Fragment>
-  <Viewer
-    changeable={false}
-    downloadable={false}
-    drag={true}
-    images={
-      Array [
-        Object {
-          "alt": "",
-          "src": "http://fake.url/img",
-        },
-      ]
-    }
-    noImgDetails={true}
-    noNavbar={true}
-    onClose={[Function]}
-    onMaskClick={[Function]}
-    rotatable={false}
-    scalable={false}
-    visible={false}
-    zIndex={1000}
-    zoomSpeed={0.25}
-  />
-  <styled.div
-    onClick={[Function]}
-  >
-    <SearchIcon />
-  </styled.div>
   <StyledImageCover
     contain={false}
     onClick={[Function]}
