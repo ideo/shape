@@ -173,7 +173,8 @@ class RoleSelect extends React.Component {
             </LeaveButton>
           </Tooltip>
         )}
-        {!showLeaveIcon && <LeaveIconHolder enabled={false} />}
+        {/* just show placeholder for button */}
+        {!showLeaveIcon && <LeaveButton />}
       </Row>
     )
   }
