@@ -4,7 +4,7 @@ import { observer } from 'mobx-react'
 import Emoji from '~/ui/icons/Emoji'
 import { EmojiButton, EmojiHolder } from '~/ui/test_collections/ScaleQuestion'
 import { QuestionText } from '~/ui/test_collections/shared'
-import v, { FEEDBACK_INCENTIVE_AMOUNT } from '~/utils/variables'
+import { FEEDBACK_INCENTIVE_AMOUNT } from '~/utils/variables'
 import { QuestionSpacingContainer } from '~/ui/test_collections/OpenQuestion'
 
 @observer
@@ -14,8 +14,12 @@ class WelcomeQuestion extends React.Component {
     onAnswer(choice)
   }
 
+  get incentive() {
+    return FEEDBACK_INCENTIVE_AMOUNT.toFixed(2)
+  }
+
   render() {
-    const { numberOfQuestions, incentive } = this.props
+    const { numberOfQuestions } = this.props
 
     return (
       <QuestionSpacingContainer editing={false}>
@@ -26,7 +30,7 @@ class WelcomeQuestion extends React.Component {
         <QuestionText>
           There are <strong>{numberOfQuestions} questions</strong> in this
           survey. Completing it should take around <strong>2 minutes</strong>,
-          and we’ll reward you <strong>${incentive.toFixed(2)}</strong> for your
+          and we’ll reward you <strong>${this.incentive}</strong> for your
           participation.
         </QuestionText>
         <EmojiHolder data-cy="WelcomeQuestionEmojiHolder">
@@ -42,10 +46,7 @@ class WelcomeQuestion extends React.Component {
 WelcomeQuestion.propTypes = {
   onAnswer: PropTypes.func.isRequired,
   numberOfQuestions: PropTypes.number.isRequired,
-  incentive: PropTypes.number,
 }
-WelcomeQuestion.defaultProps = {
-  incentive: FEEDBACK_INCENTIVE_AMOUNT,
-}
+WelcomeQuestion.defaultProps = {}
 
 export default WelcomeQuestion
