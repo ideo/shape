@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { observer } from 'mobx-react'
+import pluralize from 'pluralize'
 
 import Emoji from '~/ui/icons/Emoji'
 import { EmojiButton, EmojiHolder } from '~/ui/test_collections/ScaleQuestion'
@@ -40,8 +41,10 @@ class WelcomeQuestion extends React.Component {
           look forward to hearing your thoughts!
         </QuestionText>
         <QuestionText>
-          There are <strong>{numberOfQuestions} questions</strong> in this
-          survey. Completing it should take around <strong>2 minutes</strong>
+          There {numberOfQuestions > 1 ? 'are ' : 'is '}
+          <strong>{pluralize('questions', numberOfQuestions, true)}</strong> in
+          this survey. Completing it should take around{' '}
+          <strong>2 minutes</strong>
           {incentiveMessage}.
         </QuestionText>
         <EmojiHolder data-cy="WelcomeQuestionEmojiHolder">

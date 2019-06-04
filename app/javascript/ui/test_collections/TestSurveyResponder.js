@@ -110,6 +110,17 @@ class TestSurveyResponder extends React.Component {
     return this.questionCards.filter(card => this.answerableCard(card))
   }
 
+  get numAnswerableQuestionItems() {
+    const { question_cards } = this.props.collection
+    return question_cards.filter(
+      questionCard =>
+        !_.includes(
+          UNANSWERABLE_QUESTION_TYPES,
+          questionCard.card_question_type
+        )
+    ).length
+  }
+
   get viewableCards() {
     const { questionCards } = this
 
@@ -191,7 +202,6 @@ class TestSurveyResponder extends React.Component {
       createSurveyResponse,
       theme,
     } = this.props
-
     return (
       <ThemeProvider theme={styledTestTheme(theme)}>
         <div id="surveyContainer">
@@ -223,7 +233,7 @@ class TestSurveyResponder extends React.Component {
                         order={card.order}
                         editing={false}
                         canEdit={this.canEdit}
-                        numberOfQuestions={this.answerableCards.length}
+                        numberOfQuestions={this.numAnswerableQuestionItems}
                       />
                     </TestQuestionHolder>
                   </Flex>
