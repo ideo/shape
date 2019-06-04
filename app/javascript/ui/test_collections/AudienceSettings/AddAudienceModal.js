@@ -30,7 +30,11 @@ import {
   TextButton,
   TextField,
 } from '~/ui/global/styled/forms'
-import { Heading3, DisplayText } from '~/ui/global/styled/typography'
+import {
+  Heading3,
+  DisplayText,
+  SmallHelperText,
+} from '~/ui/global/styled/typography'
 import { FloatRight } from '~/ui/global/styled/layout'
 
 const ROOT_MENU = 'root'
