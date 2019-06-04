@@ -76,7 +76,9 @@ class Collection
              through: :data_items
 
     before_create :setup_default_status_and_questions, unless: :cloned_from_present?
-    after_create :add_test_tag, :add_child_roles
+    after_create :add_test_tag
+    after_create :add_child_roles
+    after_create :setup_link_sharing_test_audience
     after_update :touch_test_design, if: :saved_change_to_test_status?
 
     delegate :answerable_complete_question_items, to: :test_design, allow_nil: true
@@ -519,6 +521,17 @@ class Collection
       end
     end
 
+    def setup_link_sharing_test_audience
+      # find the link sharing audience
+      audience = Audience.find_by(price_per_response: 0)
+      # e.g. in unit tests
+      return unless audience.present?
+      test_audiences.find_or_create_by(
+        audience_id: audience.id,
+        status: :closed,
+      )
+    end
+
     def add_test_tag
       # create the special #test tag
       tag(
@@ -593,7 +606,7 @@ class Collection
     end
 
     def link_sharing?
-      test_audiences.where(price_per_response: 0).present?
+      test_audiences.link_sharing.where(status: :open).present?
     end
 
     def link_sharing_audience

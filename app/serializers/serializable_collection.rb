@@ -29,6 +29,7 @@ class SerializableCollection < BaseJsonSerializer
   belongs_to :organization
   belongs_to :created_by
   has_many :test_audiences
+  has_one :test_design
 
   attribute :organization_id do
     @object.organization_id.to_s
