@@ -82,7 +82,7 @@ const SharedRecordMixin = superclass =>
       return res.__response.data
     }
 
-    pushUndo({ snapshot, message = '', apiCall } = {}) {
+    pushUndo({ snapshot, message = '', apiCall, redirectTo = this } = {}) {
       let undoApiCall = apiCall
       if (!apiCall) {
         undoApiCall = () => this.API_revertTo({ snapshot })
@@ -90,7 +90,7 @@ const SharedRecordMixin = superclass =>
       undoStore.pushUndoAction({
         message,
         apiCall: undoApiCall,
-        redirectPath: { type: this.internalType, id: this.id },
+        redirectPath: { type: redirectTo.internalType, id: redirectTo.id },
       })
     }
   }

@@ -35,6 +35,7 @@ const createNamedRoutes = () => {
   cy.route('PATCH', '/api/v1/test_collections/*/close').as('apiCloseTest')
   cy.route('PATCH', '/api/v1/test_collections/*/reopen').as('apiReopenTest')
 
+  cy.route('GET', '/api/v1/items/*').as('apiGetItem')
   cy.route('PATCH', '/api/v1/items/*').as('apiUpdateItem')
 
   cy.route('POST', '/api/v1/organizations').as('apiCreateOrganization')
