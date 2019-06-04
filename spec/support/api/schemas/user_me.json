@@ -22,6 +22,7 @@
     "feedback_terms_accepted": { "type": "boolean" },
     "respondent_terms_accepted": { "type": "boolean" },
     "current_incentive_balance": { "type": "number" },
+    "shape_circle_member": { "type": "boolean" },
     "incentive_due_date": { "type": ["string", "null"] }
   },
   "required": ["email", "first_name", "last_name", "status"]
