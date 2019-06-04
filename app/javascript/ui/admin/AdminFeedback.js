@@ -14,6 +14,7 @@ import v from '~/utils/variables'
 import { CircledIcon } from '~/ui/global/styled/buttons'
 import { Heading1, Heading2, Heading3 } from '~/ui/global/styled/typography'
 import { showOnHoverCss } from '~/ui/grid/shared'
+import Tooltip from '~/ui/global/Tooltip'
 import * as colors from '~shared/styles/constants/colors'
 
 const Wrapper = styled.div`
@@ -138,20 +139,26 @@ class AdminFeedback extends React.Component {
                   <AudienceWrapper align="center">
                     {testAudience.audience.name}
                     <AudienceActions className="show-on-hover">
-                      <CopyToClipboard
-                        text={`${testCollection.publicTestURL}?ta=${
-                          testAudience.id
-                        }`}
-                        onCopy={() =>
-                          this.props.uiStore.popupSnackbar({
-                            message: 'Test link copied',
-                          })
-                        }
+                      <Tooltip
+                        classes={{ tooltip: 'Tooltip' }}
+                        title={'copy survey link'}
+                        placement="top"
                       >
-                        <CircledIcon>
-                          <LinkIcon />
-                        </CircledIcon>
-                      </CopyToClipboard>
+                        <CopyToClipboard
+                          text={`${testCollection.publicTestURL}?ta=${
+                            testAudience.id
+                          }`}
+                          onCopy={() =>
+                            this.props.uiStore.popupSnackbar({
+                              message: 'Survey link copied',
+                            })
+                          }
+                        >
+                          <CircledIcon>
+                            <LinkIcon />
+                          </CircledIcon>
+                        </CopyToClipboard>
+                      </Tooltip>
                     </AudienceActions>
                   </AudienceWrapper>
                 </AudienceRowItem>
