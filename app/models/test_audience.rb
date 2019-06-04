@@ -73,6 +73,7 @@ class TestAudience < ApplicationRecord
   end
 
   def reached_sample_size?
+    return false if link_sharing?
     survey_responses.completed.size >= sample_size
   end
 
