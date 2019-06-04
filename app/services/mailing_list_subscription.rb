@@ -45,7 +45,7 @@ class MailingListSubscription < SimpleService
       mailing_list_id: network_mailing_list.id,
       organization_id: current_network_organization.id,
       user_uid: @user.uid,
-    )
+    ).first
     membership.destroy if membership.present?
   end
 end
