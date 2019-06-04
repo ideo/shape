@@ -19,6 +19,7 @@ Feature: Creating a Test Collection
     And I wait for "@apiUpdateItem" to finish
     And I add an open response question
     And I click the "audienceCheckbox-share-via-link"
+    And I wait for "@apiUpdateTestAudience" to finish
     When I click the "LaunchFormButton" containing "Get Feedback"
     And I wait for "@apiLaunchTest" to finish
     And I wait for 1 second

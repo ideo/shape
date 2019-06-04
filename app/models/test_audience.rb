@@ -27,11 +27,13 @@
 class TestAudience < ApplicationRecord
   belongs_to :audience
   belongs_to :test_collection,
-             class_name: 'Collection::TestCollection'
-  belongs_to :launched_by, class_name: 'User'
+             class_name: 'Collection::TestCollection',
+             touch: true
+  belongs_to :launched_by, class_name: 'User', optional: true
   has_many :survey_responses
 
   delegate :name,
+           :link_sharing?,
            to: :audience
   validates :price_per_response, presence: true
 
@@ -71,6 +73,7 @@ class TestAudience < ApplicationRecord
   end
 
   def reached_sample_size?
+    return false if link_sharing?
     survey_responses.completed.size >= sample_size
   end
 

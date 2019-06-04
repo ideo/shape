@@ -4,6 +4,7 @@ class CollectionCardBuilder
   def initialize(params:, parent_collection:, user: nil, type: 'primary')
     @datasets_params = params.try(:[], :item_attributes).try(:[], :datasets_attributes)
     @params = params
+    @params[:order] ||= parent_collection.cached_card_count
     @collection_card = parent_collection.send("#{type}_collection_cards").build(@params)
     @errors = @collection_card.errors
     @user = user

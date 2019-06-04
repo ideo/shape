@@ -97,7 +97,7 @@ FactoryBot.define do
 
       trait :with_link_sharing do
         after(:create) do |collection|
-          create(:test_audience, test_collection: collection, audience: create(:audience, price_per_response: 0), price_per_response: 0)
+          create(:test_audience, test_collection: collection, audience: create(:audience, price_per_response: 0), sample_size: nil, price_per_response: 0)
         end
       end
     end

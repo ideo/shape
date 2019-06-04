@@ -20,6 +20,8 @@ class TestComparison < SimpleService
         comparable_datasets: datasets,
       )
     end
+    # break any collection caching
+    @collection.touch
     errors.blank?
   end
 
@@ -28,13 +30,16 @@ class TestComparison < SimpleService
     collection_question_data_items.includes(data_items_datasets: :dataset).each do |data_item|
       data_item.data_items_datasets.each do |data_items_dataset|
         dataset = data_items_dataset.dataset
-        next unless comparison_collection_datasets.include?(dataset)
+        is_empty_for_comparison = dataset.is_a?(Dataset::Empty) && dataset.data_source == @comparison_collection
+        next unless comparison_collection_datasets.include?(dataset) || is_empty_for_comparison
         # If this question dataset comes from the comparison, remove it
         unless data_items_dataset.destroy
           errors.push('Could not remove a dataset')
         end
       end
     end
+    # break any collection caching
+    @collection.touch
     errors.blank?
   end
 

@@ -132,5 +132,25 @@ RSpec.describe TestComparison do
       expect(test_data_item.datasets).not_to include(comparison_data_item.datasets.first)
       expect(test_data_item.datasets.size).to eq(2)
     end
+
+    context 'with an empty dataset' do
+      let!(:empty_dataset) { create(:empty_dataset, data_source: comparison_collection) }
+      let(:data_items) { test_collection.data_items }
+
+      before do
+        data_items.each do |di|
+          di.data_items_datasets.create(dataset: empty_dataset)
+        end
+      end
+
+      it 'removes empty datasets' do
+        expect {
+          remove
+        }.to change(DataItemsDataset, :count).by(-2)
+        data_items.each do |di|
+          expect(di.datasets).not_to include(empty_dataset)
+        end
+      end
+    end
   end
 end

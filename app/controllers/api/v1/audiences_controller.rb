@@ -31,6 +31,7 @@ class Api::V1::AudiencesController < Api::V1::BaseController
                  .includes(:organizations)
                  .where(organizations: { id: nil })
                  .or(Audience.includes(:organizations).where(organizations: { id: @organization.id }))
+                 .order(price_per_response: :asc)
   end
 
   def authorize_current_organization

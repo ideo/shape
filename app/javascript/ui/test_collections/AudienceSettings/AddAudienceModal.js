@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { filter, flatten, includes, remove } from 'lodash'
-import { Flex } from 'reflexbox'
+import { Flex, Box } from 'reflexbox'
 import { Grid } from '@material-ui/core'
 
 import Audience from '~/stores/jsonApi/Audience'
@@ -25,6 +25,7 @@ import {
   TextButton,
   TextField,
 } from '~/ui/global/styled/forms'
+import { Heading3, DisplayText } from '~/ui/global/styled/typography'
 import { FloatRight } from '~/ui/global/styled/layout'
 
 const ROOT_MENU = 'root'
@@ -59,6 +60,14 @@ const SelectedOption = styled.span`
   padding: 8px 12px;
 `
 SelectedOption.displayName = 'SelectedOption'
+
+const UnderlineLink = styled.div`
+  text-decoration: underline;
+  cursor: pointer;
+  display: inline;
+  margin-left: 4px;
+  margin-right: 4px;
+`
 
 @inject('apiStore')
 @observer
@@ -112,7 +121,15 @@ class AddAudienceModal extends React.Component {
     const audience = new Audience({ name, tag_list }, apiStore)
     await audience.API_create()
 
+    this.props.afterSave(audience)
+
     this.reset()
+  }
+
+  handleShowSupportWidget = () => {
+    const { zE } = window
+    zE('webWidget', 'show')
+    zE('webWidget', 'open')
   }
 
   reset = () => {
@@ -347,6 +364,22 @@ class AddAudienceModal extends React.Component {
               style={{ borderWidth: '0 0 1px 0' }}
             />
           </FieldContainer>
+          <Box mt={1} mb={25}>
+            <Heading3>Need help with your audience?</Heading3>
+            <DisplayText>
+              Want to include unavailable criteria or add more interests? We're
+              happy to help you create the audience you need.
+              <UnderlineLink onClick={this.handleShowSupportWidget}>
+                Submit a request
+              </UnderlineLink>
+              and we’ll get back to you in 24 hours.
+            </DisplayText>
+          </Box>
+          <Box mt={2} mb={35}>
+            <DisplayText color={v.colors.commonDark}>
+              Default price per respondent for a custom audience is $4.70
+            </DisplayText>
+          </Box>
           <Grid container alignItems="center" style={{ paddingBottom: '32px' }}>
             <Grid item xs={6}>
               <Grid container justify="center">
@@ -379,6 +412,10 @@ class AddAudienceModal extends React.Component {
 AddAudienceModal.propTypes = {
   open: PropTypes.bool.isRequired,
   close: PropTypes.func.isRequired,
+  afterSave: PropTypes.func,
+}
+AddAudienceModal.defaultProps = {
+  afterSave: () => {},
 }
 AddAudienceModal.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,

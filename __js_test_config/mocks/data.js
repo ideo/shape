@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { observable } from "mobx"
+import { observable } from 'mobx'
 
 const fakeJsonApiAttrs = {
   assign: jest.fn(),
@@ -38,7 +38,10 @@ export const fakeTextItemAttrs = {
   can_view: true,
   data_content: {
     ops: [
-      {insert: 'This is the content for the item and it contains multiple sentences. Like this one.'}
+      {
+        insert:
+          'This is the content for the item and it contains multiple sentences. Like this one.',
+      },
     ],
     version: 1,
   },
@@ -93,15 +96,13 @@ export const fakeDataItemCollectionsItemsAttrs = {
   isReportTypeRecord: false,
   data_settings: {
     d_measure: 'participants',
-    d_timeframe: 'month'
+    d_timeframe: 'month',
   },
   measure: {
-    name: 'Participants'
+    name: 'Participants',
   },
   primaryDataset: fakeAreaChartDataset,
-  datasets: [
-    fakeAreaChartDataset
-  ],
+  datasets: [fakeAreaChartDataset],
 }
 
 export const creativeDifferenceQualityDataset = {
@@ -165,8 +166,8 @@ export const fakeDataItemRecordAttrs = {
       ...creativeDifferenceQualityDataset,
       measure: '95th Percentile',
       order: 1,
-      chart_type: 'line'
-    }
+      chart_type: 'line',
+    },
   ],
   primaryDataset: jest.fn(),
   secondaryDatasets: jest.fn(),
@@ -186,13 +187,25 @@ export const fakeLegendItemAttrs = {
   primary_measure: {
     measure: 'Business Unit',
     order: 0,
-    style: { fill: '#9874AB' }
+    style: { fill: '#9874AB' },
   },
   primaryDataset: fakeDataset,
   datasets: [
     fakeDataset,
-    { order: 1, measure: '95th Percentile', name: '85th', fakeDataset, selected: true, },
-    { order: 2, measure: '75th Percentile', name: '75th', fakeDataset, selected: true },
+    {
+      order: 1,
+      measure: '95th Percentile',
+      name: '85th',
+      fakeDataset,
+      selected: true,
+    },
+    {
+      order: 2,
+      measure: '75th Percentile',
+      name: '75th',
+      fakeDataset,
+      selected: true,
+    },
   ],
 }
 
@@ -209,12 +222,12 @@ export const fakeLegendItemCard = {
   parent: fakeCollection,
 }
 
-
 export const fakeTextItem = {
   ...fakeTextItemAttrs,
   rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
   getRecordType: jest.fn().mockReturnValue('items'),
   toJSON: jest.fn().mockReturnValue(fakeTextItemAttrs),
+  pushUndo: jest.fn(),
   ...fakeJsonApiAttrs,
 }
 export const fakeVideoItemAttrs = {
@@ -356,7 +369,7 @@ export const fakeCollection = {
     name: 'Proto-typo',
   },
   links: {
-    self: 'https://www.shape.space/ideo/collections/1'
+    self: 'https://www.shape.space/ideo/collections/1',
   },
   card_order: 'order',
   collection_cards: fakeCards,
@@ -373,8 +386,12 @@ export const fakeCollection = {
   API_fetchCards: jest.fn().mockReturnValue(Promise.resolve({})),
   API_batchUpdateCards: jest.fn().mockReturnValue(Promise.resolve({})),
   API_batchUpdateCardsWithUndo: jest.fn().mockReturnValue(Promise.resolve({})),
-  API_selectDatasetsWithIdentifier: jest.fn().mockReturnValue(Promise.resolve({})),
-  API_unselectDatasetsWithIdentifier: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_selectDatasetsWithIdentifier: jest
+    .fn()
+    .mockReturnValue(Promise.resolve({})),
+  API_unselectDatasetsWithIdentifier: jest
+    .fn()
+    .mockReturnValue(Promise.resolve({})),
   API_removeComparison: jest.fn().mockReturnValue(Promise.resolve({})),
   API_addComparison: jest.fn().mockReturnValue(Promise.resolve({})),
   checkCurrentOrg: jest.fn(),
@@ -472,7 +489,21 @@ export const fakeComment = {
   author: fakeUser,
   message:
     'This is my message to the world. Go to the source: https://www.ideo.com',
-  draftjs_data: {"blocks":[{"key":"74h6f","data":{},"text":"This is my message to the world. Go to the source: https://www.ideo.com","type":"unstyled","depth":0,"entityRanges":[],"inlineStyleRanges":[]}],"entityMap":{}},
+  draftjs_data: {
+    blocks: [
+      {
+        key: '74h6f',
+        data: {},
+        text:
+          'This is my message to the world. Go to the source: https://www.ideo.com',
+        type: 'unstyled',
+        depth: 0,
+        entityRanges: [],
+        inlineStyleRanges: [],
+      },
+    ],
+    entityMap: {},
+  },
   created_at: new Date('2019-05-09T03:18:00'),
   updated_at: new Date('2019-05-09T03:18:00'),
 }
@@ -486,7 +517,7 @@ export const fakeThread = {
     subscribed: true,
     get currentSubscribed() {
       return this.subscribed
-    }
+    },
   },
   latestUnreadComments: [fakeComment, fakeComment],
   API_saveComment: jest.fn().mockReturnValue(Promise.resolve({})),
@@ -527,7 +558,7 @@ export const fakeSurveyResponse = {
 }
 export const fakeAudience = {
   id: '1',
-  name: 'Anybody'
+  name: 'Anybody',
 }
 export const fakeTestAudience = {
   id: '1',
