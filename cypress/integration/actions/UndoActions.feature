@@ -67,6 +67,43 @@ Feature: Undo actions
     And I close the snackbar
     Then I should see the last of 3 cards as 1x1
 
+    # Undo moving cards to a collection
+    When I select the index 0 text card
+    And I select the index 2 collection card
+    And I click the action menu for the index 0 card
+    And I click the move action for the index 0 card
+    And I close the move helper modal
+    Then I should see "2 in transit" in a ".MuiSnackbarContent-message"
+
+    When I navigate to the collection named "Inner Collection" via the "CollectionCover"
+    And I wait for 1 second
+    Then I should see "2 in transit" in a ".MuiSnackbarContent-message"
+
+    When I click the down arrow on the MDL snackbar
+    And I wait for "@apiGetCollectionCards" to finish
+    # And I wait for "@apiMoveCollectionCards" to finish
+    Then I should see a collection card named "Hello World"
+    Then I should see a "TextItemCover" in the first card
+    Then I should see the value "Testing" in the first text item
+    And I close the snackbar
+
+    # test undoing the move
+    When I undo with CTRL+Z
+    And I wait for 1 second
+
+    # And I wait for "@apiMoveCollectionCards" to finish
+    # And I wait for "@apiGetCollectionCards" to finish
+    And I wait for "@apiGetCollection" to finish
+    And I wait for "@apiGetInMyCollection" to finish
+    And I wait for "@apiUpdateCollection" to finish
+    And I wait for "@apiGetCollectionCards" to finish
+
+    Then I should see a collection card named "Hello World"
+    Then I should see a collection card named "Inner Collection"
+    Then I should see a "TextItemCover" in the first card
+    Then I should see a "CollectionCover" in the index 1 card
+    Then I should see a "CollectionCover" in the index 2 card
+
     # empty stack
     When I undo with CTRL+Z
     Then I should not see a ".MuiSnackbarContent-message"

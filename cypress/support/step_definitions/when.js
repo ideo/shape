@@ -292,6 +292,30 @@ When('I edit the report item', () => {
   cy.wait(100)
 })
 
+When('I select the index {int} {word} card', (pos, type) => {
+  cy.get(
+    `[data-cy="GridCard"][data-order="${pos}"] [data-cy="CardAction-select"]`
+  )
+    .first()
+    .click()
+  cy.wait(100)
+})
+
+When('I click the action menu for the index {int} card', pos => {
+  cy.get(`[data-cy="GridCard"][data-order="${pos}"] [data-cy="PopoutMenu"]`)
+    .first()
+    .click({ force: true })
+  cy.wait(100)
+})
+
+When('I click the {word} action for the index {int} card', (action, pos) => {
+  const value = `PopoutMenu_${_.camelCase(action)}`
+  cy.get(`[data-cy="GridCard"][data-order="${pos}"] [data-cy="${value}"]`)
+    .first()
+    .click({ force: true })
+  cy.wait(100)
+})
+
 When(
   'I select {string} on the {string} select on the report item',
   (option, select) => {
@@ -305,3 +329,20 @@ When(
     cy.wait(50)
   }
 )
+
+// ----------------------
+// Modals
+// ----------------------
+When('I close the move helper modal', () => {
+  cy.locate('MoveHelperModal-button')
+    .first()
+    .click({ force: true })
+  cy.wait(100)
+})
+
+When('I click the {word} arrow on the MDL snackbar', direction => {
+  cy.locate(`MoveModalArrow-${direction}`)
+    .first()
+    .click({ force: true })
+  cy.wait(100)
+})
