@@ -44,10 +44,10 @@ class AudienceSettings extends React.Component {
     this.updateAudienceSettings()
   }
 
+  @action
   updateAudienceSettings() {
     const { testCollection } = this.props
-    const audienceSettings = {}
-    const { audiences } = this
+    const { audiences, audienceSettings } = this
     _.each(audiences, audience => {
       const testAudience = testCollection.test_audiences.find(
         testAudience => testAudience.audience_id.toString() === audience.id
@@ -57,15 +57,12 @@ class AudienceSettings extends React.Component {
       if (testAudience && testAudience.price_per_response === 0) {
         selected = testAudience.status === 'open'
       }
-      audienceSettings[audience.id] = {
+      audienceSettings.set(audience.id, {
         selected,
         sample_size: testAudience ? testAudience.sample_size : '0',
         audience: audience,
         test_audience: testAudience,
-      }
-    })
-    runInAction(() => {
-      this.audienceSettings = audienceSettings
+      })
     })
   }
 
@@ -88,7 +85,7 @@ class AudienceSettings extends React.Component {
     return _.round(
       audiences
         .map(audience => {
-          const setting = audienceSettings[audience.id]
+          const setting = audienceSettings.get(audience.id)
           if (!setting || !setting.selected) return 0
           const sampleSize = setting.sample_size
             ? parseInt(setting.sample_size)
@@ -104,35 +101,37 @@ class AudienceSettings extends React.Component {
     return `$${this.totalPrice.toFixed(2)}`
   }
 
+  @action
+  updateAudienceSetting(audienceId, key, value) {
+    const { audienceSettings } = this
+    const setting = audienceSettings.get(audienceId)
+    setting[key] = value
+    audienceSettings.set(audienceId, setting)
+  }
+
   onToggleCheckbox = async e => {
     const id = e.target.value
     const { audienceSettings } = this
-    runInAction(() => {
-      audienceSettings[id].selected = !audienceSettings[id].selected
-    })
-    const { audience, test_audience } = audienceSettings[id]
+    const setting = audienceSettings.get(id)
+    this.updateAudienceSetting(id, 'selected', !setting.selected)
+    const { audience, test_audience } = setting
     if (audience.price_per_response === 0) {
       this.toggleLinkSharing(audience, test_audience)
     }
   }
 
   async toggleLinkSharing(audience, testAudience) {
-    // const { testCollection } = this.props
-    // const testDesign = testCollection
+    let open = testAudience.status === 'open'
     runInAction(() => {
-      // _.remove(testDesign.test_audiences, tA => tA.id === testAudience.id)
-      // toggle the status
-      testAudience.status = testAudience.status === 'open' ? 'closed' : 'open'
+      testAudience.status = open ? 'closed' : 'open'
+      open = !open
+      this.updateAudienceSetting(audience.id, 'selected', open)
     })
     await testAudience.patch()
-    this.updateAudienceSettings()
   }
 
   onInputChange = (audienceId, value) => {
-    const { audienceSettings } = this
-    runInAction(() => {
-      audienceSettings[audienceId].sample_size = value
-    })
+    this.updateAudienceSetting(audienceId, 'sample_size', value)
   }
 
   @action
@@ -196,6 +195,18 @@ class AudienceSettings extends React.Component {
     )
   }
 
+  afterAddAudience = audience => {
+    const { audienceSettings } = this
+    runInAction(() => {
+      audienceSettings.set(audience.id, {
+        selected: false,
+        sample_size: '0',
+        audience: audience,
+        test_audience: null,
+      })
+    })
+  }
+
   render() {
     const { uiStore, testCollection } = this.props
     const { apiStore } = this.props
@@ -226,6 +237,7 @@ class AudienceSettings extends React.Component {
             totalPrice={this.totalPriceDollars}
             audiences={this.audiences}
             audienceSettings={this.audienceSettings}
+            afterAddAudience={this.afterAddAudience}
             locked={this.locked}
           />
         )}

@@ -124,20 +124,26 @@ class AudienceSettingsWidget extends React.Component {
   }
 
   addAudience(audience) {
+    const { afterAddAudience } = this.props
     const { selectedOrgAudiences } = this.state
-    selectedOrgAudiences.push(audience)
-    this.setState({ selectedOrgAudiences })
+    if (selectedOrgAudiences.indexOf(audience) === -1) {
+      selectedOrgAudiences.push(audience)
+      this.setState({ selectedOrgAudiences })
+    }
+    if (afterAddAudience) {
+      afterAddAudience(audience)
+    }
   }
 
   audienceSelected(audience) {
     const { audienceSettings } = this.props
-    const option = audienceSettings[audience.id]
+    const option = audienceSettings.get(audience.id)
     return option ? option.selected : false
   }
 
   sampleSize(audience) {
     const { audienceSettings } = this.props
-    const option = audienceSettings[audience.id]
+    const option = audienceSettings.get(audience.id)
     return option && option.sample_size ? option.sample_size.toString() : ''
   }
 
@@ -273,6 +279,7 @@ AudienceSettingsWidget.propTypes = {
   audienceSettings: MobxPropTypes.objectOrObservableObject.isRequired,
   onInputChange: PropTypes.func.isRequired,
   onToggleCheckbox: PropTypes.func.isRequired,
+  afterAddAudience: PropTypes.func.isRequired,
   totalPrice: PropTypes.string.isRequired,
   locked: PropTypes.bool,
 }
