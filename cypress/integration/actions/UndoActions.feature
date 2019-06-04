@@ -105,5 +105,6 @@ Feature: Undo actions
     Then I should see a "CollectionCover" in the index 2 card
 
     # empty stack
-    When I undo with CTRL+Z
+    When I close the snackbar
+    And I undo with CTRL+Z
     Then I should not see a ".MuiSnackbarContent-message"
