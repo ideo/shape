@@ -1,4 +1,5 @@
 import { Fragment } from 'react'
+import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import Headroom from 'react-headroom'
 import AppBar from '@material-ui/core/AppBar'
@@ -10,6 +11,7 @@ import Logo from '~/ui/layout/Logo.js'
 import Hamburger from '~/ui/layout/Hamburger.js'
 import { MarketingFlex } from '~/ui/global/styled/marketing.js'
 import { scroller } from 'react-scroll'
+import { browserHistory } from '~/ui/MarketingRoutes'
 
 const NavLink = styled.button`
   font-weight: ${v.weights.medium};
@@ -89,7 +91,12 @@ const MenuBar = styled(AppBar)`
   }
 `
 
-function handleScrollToContent() {
+function handleScrollToContent(isHome) {
+  console.log('isHome', isHome)
+  if (!isHome) {
+    browserHistory.push('/')
+    return
+  }
   scroller.scrollTo('ContentAnchor', {
     duration: 1500,
     delay: 100,
@@ -116,43 +123,50 @@ function handleScrollToTop() {
   })
 }
 
-const MobileLinks = (
-  <MarketingFlex align="left" justify="left" w={1} column>
-    <Box>
-      <NavLink align="center" onClick={handleScrollToTop}>
-        <ToggleLogo className="ToggleLogo" width={48} />
-      </NavLink>
-    </Box>
+const MobileLinks = ({ isHome }) => {
+  return (
+    <MarketingFlex align="left" justify="left" w={1} column>
+      <Box>
+        <NavLink align="center" onClick={handleScrollToTop}>
+          <ToggleLogo className="ToggleLogo" width={48} />
+        </NavLink>
+      </Box>
 
-    <Box>
-      <NavLink align="left" onClick={handleScrollToContent}>
-        PRODUCT
-      </NavLink>
-    </Box>
+      <Box>
+        <NavLink align="left" onClick={() => handleScrollToContent(isHome)}>
+          PRODUCT
+        </NavLink>
+      </Box>
 
-    <Box>
-      <NavLink align="left" onClick={handleScrollToFooter}>
-        PRICING
-      </NavLink>
-    </Box>
+      <Box>
+        <NavLink align="left" onClick={handleScrollToFooter}>
+          PRICING
+        </NavLink>
+      </Box>
 
-    <Box>
-      <NavLink align="left" onClick={handleScrollToFooter}>
-        CONTACT
-      </NavLink>
-    </Box>
+      <Box>
+        <NavLink align="left" onClick={handleScrollToFooter}>
+          CONTACT
+        </NavLink>
+      </Box>
 
-    <Box>
-      <a href="/login" rel="noopener noreferrer">
-        <NavLink align="left">Login</NavLink>
-      </a>
-    </Box>
-  </MarketingFlex>
-)
+      <Box>
+        <a href="/login" rel="noopener noreferrer">
+          <NavLink align="left">Login</NavLink>
+        </a>
+      </Box>
+    </MarketingFlex>
+  )
+}
+
+MobileLinks.propTypes = {
+  isHome: PropTypes.bool.isRequired,
+}
 
 class MarketingMenu extends React.PureComponent {
   constructor(props) {
     super(props)
+    this.isHome = location.pathname === '/'
     this.state = {
       width: window.innerWidth,
       drawerState: false,
@@ -175,74 +189,85 @@ class MarketingMenu extends React.PureComponent {
     this.setState({ drawerState: isOpen })
   }
 
-  renderDesktop = () => (
-    <Fragment>
-      <MenuBar className="MenuBar top">
-        <Toolbar>
-          <MarketingFlex align="center" justify="center" w={1}>
-            <Box w={15 / 32}>
-              <MarketingFlex align="center" justify="flex-start">
-                <NavLink onClick={handleScrollToContent}>Product</NavLink>
-                <NavLink onClick={handleScrollToFooter}>Pricing</NavLink>
-              </MarketingFlex>
-            </Box>
+  renderDesktop = () => {
+    const { isHome } = this
+    return (
+      <Fragment>
+        <MenuBar className="MenuBar top">
+          <Toolbar>
+            <MarketingFlex align="center" justify="center" w={1}>
+              <Box w={15 / 32}>
+                <MarketingFlex align="center" justify="flex-start">
+                  <NavLink onClick={() => handleScrollToContent(isHome)}>
+                    Product
+                  </NavLink>
+                  <NavLink onClick={handleScrollToFooter}>Pricing</NavLink>
+                </MarketingFlex>
+              </Box>
 
-            <Box w={2 / 32}>
-              <section align="center">
+              <Box w={2 / 32}>
+                <section align="center">
+                  <button onClick={handleScrollToTop}>
+                    <ToggleLogo className="ToggleLogo" width={48} />
+                  </button>
+                </section>
+              </Box>
+
+              <Box w={15 / 32}>
+                <MarketingFlex align="center" justify="flex-end">
+                  <NavLink onClick={handleScrollToFooter}>Contact</NavLink>
+                  <a href="/login" rel="noopener noreferrer">
+                    <NavLink>Login</NavLink>
+                  </a>
+                </MarketingFlex>
+              </Box>
+            </MarketingFlex>
+          </Toolbar>
+        </MenuBar>
+      </Fragment>
+    )
+  }
+
+  renderMobile = () => {
+    const { isHome } = this
+    return (
+      <Fragment>
+        <MenuBar className={`MenuBar top`}>
+          <Toolbar disableGutters>
+            <MarketingFlex align="center" w={1}>
+              <Box ml={2}>
                 <button onClick={handleScrollToTop}>
                   <ToggleLogo className="ToggleLogo" width={48} />
                 </button>
-              </section>
-            </Box>
+              </Box>
 
-            <Box w={15 / 32}>
-              <MarketingFlex align="center" justify="flex-end">
-                <NavLink onClick={handleScrollToFooter}>Contact</NavLink>
-                <a href="/login" rel="noopener noreferrer">
-                  <NavLink>Login</NavLink>
-                </a>
-              </MarketingFlex>
-            </Box>
-          </MarketingFlex>
-        </Toolbar>
-      </MenuBar>
-    </Fragment>
-  )
-
-  renderMobile = () => (
-    <Fragment>
-      <MenuBar className={`MenuBar top`}>
-        <Toolbar disableGutters>
-          <MarketingFlex align="center" w={1}>
-            <Box ml={2}>
-              <button onClick={handleScrollToTop}>
-                <ToggleLogo className="ToggleLogo" width={48} />
-              </button>
-            </Box>
-
-            <Box ml="auto">
-              <Hamburger
-                role="button"
-                onClick={this.toggleDrawer(true)}
-                float="right"
-                style={{ marginBottom: 0 }}
-              />
-            </Box>
-          </MarketingFlex>
-        </Toolbar>
-      </MenuBar>
-      <Drawer open={this.state.drawerState} onClose={this.toggleDrawer(false)}>
-        <div
-          tabIndex={0}
-          role="button"
-          onClick={this.toggleDrawer(false)}
-          onKeyDown={this.toggleDrawer(false)}
+              <Box ml="auto">
+                <Hamburger
+                  role="button"
+                  onClick={this.toggleDrawer(true)}
+                  float="right"
+                  style={{ marginBottom: 0 }}
+                />
+              </Box>
+            </MarketingFlex>
+          </Toolbar>
+        </MenuBar>
+        <Drawer
+          open={this.state.drawerState}
+          onClose={this.toggleDrawer(false)}
         >
-          {MobileLinks}
-        </div>
-      </Drawer>
-    </Fragment>
-  )
+          <div
+            tabIndex={0}
+            role="button"
+            onClick={this.toggleDrawer(false)}
+            onKeyDown={this.toggleDrawer(false)}
+          >
+            <MobileLinks isHome={isHome} />
+          </div>
+        </Drawer>
+      </Fragment>
+    )
+  }
 
   render() {
     const { width } = this.state

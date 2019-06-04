@@ -55,7 +55,8 @@ class CollectionCardFilter < SimpleService
     # Do no filtering if user is super admin
     return if @user.has_cached_role?(Role::SUPER_ADMIN)
 
-    group_ids = @user.current_org_group_ids
+    # always include the Common Resource group as it may grant you access
+    group_ids = @user.current_org_group_ids + [Shape::COMMON_RESOURCE_GROUP_ID]
     resource_identifier_sql = %(
       CASE WHEN COALESCE(
         items.roles_anchor_collection_id,

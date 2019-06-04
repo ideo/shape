@@ -124,6 +124,8 @@ describe('GridCard', () => {
     describe('as link', () => {
       beforeEach(() => {
         props.card.link = true
+        uiStore.viewingCollection = { breadcrumb: [] }
+        uiStore.update = jest.fn()
         rerender()
       })
 
@@ -134,6 +136,14 @@ describe('GridCard', () => {
             .find('LinkIcon')
             .exists()
         ).toBe(true)
+      })
+
+      it('calls storeLinkedBreadcrumb on handleClick', () => {
+        wrapper.instance().handleClick({})
+        expect(uiStore.update).toHaveBeenCalledWith(
+          'actionAfterRoute',
+          expect.any(Function)
+        )
       })
     })
 

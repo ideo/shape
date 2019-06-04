@@ -92,7 +92,8 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
     end
 
     context 'with parents' do
-      let!(:collection) { create(:collection) }
+      let!(:org) { create(:organization, member: user) }
+      let!(:collection) { create(:collection, organization: org) }
       let!(:collection_card) { create(:collection_card_text, parent: collection) }
       let!(:item) { collection_card.item }
 
@@ -112,9 +113,9 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
         user.add_role(Role::VIEWER, collection)
         get(path)
         expect(json['data']['attributes']['breadcrumb']).to match_array([
-          { 'type' => 'collections', 'id' => collection.id, 'name' => collection.name, 'can_edit' => false },
-          { 'type' => 'items', 'id' => item.id, 'name' => item.name, 'can_edit' => false },
-        ])
+          { type: 'collections', id: collection.id.to_s, name: collection.name, can_edit: false },
+          { type: 'items', id: item.id.to_s, name: item.name, can_edit: false },
+        ].as_json)
       end
     end
 

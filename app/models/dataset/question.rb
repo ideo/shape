@@ -91,6 +91,11 @@ class Dataset
       :answer_count
     end
 
+    def question_type
+      return self[:question_type] if self[:question_type].present?
+      question_item&.question_type
+    end
+
     private
 
     def data_report

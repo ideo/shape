@@ -28,7 +28,7 @@ describe('TestDesigner', () => {
   it('renders the question options alphabetically', () => {
     const select = wrapper.find('StyledSelect StyledSelectOption')
 
-    expect(select.get(2).props.value).toEqual('question_context')
-    expect(select.get(3).props.value).toEqual('question_different')
+    expect(select.get(2).props.value).toEqual('question_description')
+    expect(select.get(3).props.value).toEqual('question_media')
   })
 })

@@ -100,6 +100,13 @@ class Ability
       can :manage, DataItemsDataset do |data_items_dataset|
         data_items_dataset.data_item.can_edit?(user)
       end
+
+      can :manage, TestAudience do |test_audience|
+        # TestAudience can only be updated through the API, not created/destroyed
+        # which happens via PurchaseTestAudience service
+        test_audience.link_sharing? &&
+          test_audience.test_collection.can_edit?(user)
+      end
     end
     # for logged-out users and fallback for all users
     can :read, Collection, anyone_can_view: true

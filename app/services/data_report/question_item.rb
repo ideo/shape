@@ -81,19 +81,19 @@ module DataReport
     def org_survey_answers
       organization_id = @dataset.grouping['id']
       QuestionAnswer
-        .joins(:question)
+        .joins(
+          :question,
+          survey_response: :test_collection,
+        )
         .where(
           Item::QuestionItem.arel_table[:question_type].eq(
             question_type,
-          ),
-        )
-        .joins(survey_response: :test_collection)
-        .where(
-          SurveyResponse.arel_table[:status].eq(:completed),
-        )
-        .where(
-          Collection::TestCollection.arel_table[:organization_id].eq(
-            organization_id,
+          ).and(
+            SurveyResponse.arel_table[:status].eq(:completed),
+          ).and(
+            Collection::TestCollection.arel_table[:organization_id].eq(
+              organization_id,
+            ),
           ),
         )
     end

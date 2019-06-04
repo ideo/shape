@@ -30,7 +30,7 @@ const HotEdgeVisuals = styled.div`
 const VisualBar = styled.div`
   background-color: ${v.colors.primaryLight};
   height: 10px;
-  left: 20px;
+  left: 15px;
   position: absolute;
   top: 20px;
   width: calc(100% - 40px);

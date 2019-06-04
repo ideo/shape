@@ -9,7 +9,7 @@ class SerializableItem < BaseJsonSerializer
 
   has_many :roles do
     data do
-      @object.anchored_roles
+      @object.anchored_roles(viewing_organization_id: @current_user.current_organization_id)
     end
   end
 
@@ -74,5 +74,10 @@ class SerializableItem < BaseJsonSerializer
 
   attribute :pending_transcoding do
     @object.pending_transcoding_uuid.present?
+  end
+
+  attribute :common_viewable do
+    # only `true` if you're viewing the common resource outside of its home org
+    @object.common_viewable? && @object.organization_id != @current_user.current_organization_id
   end
 end

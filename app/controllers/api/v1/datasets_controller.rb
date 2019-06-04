@@ -31,6 +31,8 @@ class Api::V1::DatasetsController < Api::V1::BaseController
         selected: selected,
       )
     end
+    # break any collection caching
+    @collection.touch
   end
 
   def collection_data_items_datasets(identifier:)

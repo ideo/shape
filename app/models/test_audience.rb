@@ -3,8 +3,10 @@
 # Table name: test_audiences
 #
 #  id                 :bigint(8)        not null, primary key
+#  closed_at          :datetime
 #  price_per_response :decimal(10, 2)
 #  sample_size        :integer
+#  status             :integer          default("open")
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  audience_id        :bigint(8)
@@ -25,11 +27,13 @@
 class TestAudience < ApplicationRecord
   belongs_to :audience
   belongs_to :test_collection,
-             class_name: 'Collection::TestCollection'
-  belongs_to :launched_by, class_name: 'User'
+             class_name: 'Collection::TestCollection',
+             touch: true
+  belongs_to :launched_by, class_name: 'User', optional: true
   has_many :survey_responses
 
   delegate :name,
+           :link_sharing?,
            to: :audience
   validates :price_per_response, presence: true
 
@@ -47,11 +51,28 @@ class TestAudience < ApplicationRecord
   # this will only get set in PurchaseTestAudience
   attr_writer :payment_method
 
+  scope :link_sharing, -> { where(price_per_response: 0) }
+  scope :paid, -> { where('price_per_response > 0') }
+  scope :ordered_last_closed_at, -> { order(closed_at: :desc) }
+
+  enum status: {
+    open: 0,
+    closed: 1,
+  }
+
   def self.display_name
     'Audience'
   end
 
-  def closed?
+  def survey_response_completed!
+    return unless reached_sample_size?
+    self.status = :closed
+    self.closed_at = Time.current
+    save
+    test_collection.test_audience_closed!
+  end
+
+  def reached_sample_size?
     survey_responses.completed.size >= sample_size
   end
 

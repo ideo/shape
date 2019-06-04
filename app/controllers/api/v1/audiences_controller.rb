@@ -3,7 +3,7 @@ class Api::V1::AudiencesController < Api::V1::BaseController
   load_and_authorize_resource :audience, only: %i[index show]
   load_and_authorize_resource :organization, only: %i[index]
 
-  before_action :load_user_audiences, only: %i[index]
+  before_action :load_org_audiences, only: %i[index]
   def index
     render jsonapi: @audiences
   end
@@ -26,11 +26,12 @@ class Api::V1::AudiencesController < Api::V1::BaseController
 
   private
 
-  def load_user_audiences
+  def load_org_audiences
     @audiences = Audience
                  .includes(:organizations)
                  .where(organizations: { id: nil })
                  .or(Audience.includes(:organizations).where(organizations: { id: @organization.id }))
+                 .order(created_at: :asc)
   end
 
   def authorize_current_organization

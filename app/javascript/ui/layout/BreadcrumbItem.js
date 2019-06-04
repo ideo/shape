@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
 import { routingStore } from '~/stores'
+import LinkIconSm from '~/ui/icons/LinkIconSm'
 import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
 import WithDropTarget from '~/ui/global/WithDropTarget'
@@ -36,11 +37,26 @@ const StyledBreadcrumbItem = styled.div`
     }
   }
 `
+StyledBreadcrumbItem.displayName = 'StyledBreadcrumbItem'
+
+const StyledRestoreButton = styled.button`
+  height: 15px;
+  width: 15px;
+  margin-right: 5px;
+  display: inline-block;
+  position: relative;
+  top: 1px;
+  background-color: ${v.colors.primaryMediumDark};
+  color: ${v.colors.white};
+  border-radius: 50%;
+`
+StyledRestoreButton.displayName = 'StyledRestoreButton'
 
 @observer
-class BreadcrumbItem extends React.Component {
+// also export unwrapped component for unit test
+export class BreadcrumbItem extends React.Component {
   render() {
-    const { item, index, numItems } = this.props
+    const { item, index, numItems, restoreBreadcrumb } = this.props
     const isLast = index === numItems - 1
     let path
     if (item.id === 'homepage') {
@@ -60,6 +76,16 @@ class BreadcrumbItem extends React.Component {
           currentlyDraggedOn={!!showDrag}
           isLast={isLast}
         >
+          {item.link && (
+            <Tooltip
+              title={`switch to ${item.name}'s actual location`}
+              placement="top"
+            >
+              <StyledRestoreButton onClick={restoreBreadcrumb}>
+                <LinkIconSm />
+              </StyledRestoreButton>
+            </Tooltip>
+          )}
           {item.ellipses || item.truncatedName ? (
             <Tooltip
               classes={{ tooltip: 'Tooltip' }}
@@ -78,13 +104,13 @@ class BreadcrumbItem extends React.Component {
   }
 }
 
-// TODO move wrapped props to certain place?
 BreadcrumbItem.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   index: PropTypes.number.isRequired,
   numItems: PropTypes.number.isRequired,
   forwardedRef: PropTypes.oneOfType([PropTypes.element, PropTypes.object]),
   currentlyDraggedOn: MobxPropTypes.objectOrObservableObject,
+  restoreBreadcrumb: PropTypes.func.isRequired,
 }
 
 BreadcrumbItem.defaultProps = {

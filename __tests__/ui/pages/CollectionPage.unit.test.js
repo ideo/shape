@@ -147,4 +147,22 @@ describe('CollectionPage', () => {
       expect(undoStore.performUndoAfterRoute).toHaveBeenCalled()
     })
   })
+
+  describe('with actionAfterRoute', () => {
+    beforeEach(() => {
+      wrapper = shallow(
+        <CollectionPage.wrappedComponent
+          {...props}
+          uiStore={{
+            ...uiStore,
+            actionAfterRoute: () => 'do something',
+          }}
+        />
+      )
+    })
+
+    it('should call uiStore to perform the action', () => {
+      expect(uiStore.performActionAfterRoute).toHaveBeenCalled()
+    })
+  })
 })

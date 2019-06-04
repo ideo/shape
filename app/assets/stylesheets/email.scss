@@ -4,7 +4,7 @@
 $color-white: #ffffff;
 $color-gray-bg: #f0f2f4;
 $color-gray-boulder: #787878;
-$color-gray-tundora: #4A4A4A;
+$color-gray-tundora: #4a4a4a;
 $color-blacklava: #120f0e;
 $gotham-font: 'Gotham', 'Verdana', sans-serif;
 $sentinel-font: 'Sentinel', Palatino, Georgia, serif;
@@ -22,9 +22,11 @@ $sentinel-lt-font: 'Sentinel-Light', 'Sentinel', Palatino, Georgia, serif;
   margin: 0 auto;
   background-color: $color-gray-bg;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale; color: $color-blacklava;
+  -moz-osx-font-smoothing: grayscale;
+  color: $color-blacklava;
 
-  a, a:visited {
+  a,
+  a:visited {
     text-decoration: none;
   }
   a.underlined {
@@ -50,7 +52,12 @@ $sentinel-lt-font: 'Sentinel-Light', 'Sentinel', Palatino, Georgia, serif;
     font-size: 16px;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: $gotham-font;
     font-weight: bold;
   }
@@ -115,8 +122,9 @@ $sentinel-lt-font: 'Sentinel-Light', 'Sentinel', Palatino, Georgia, serif;
       display: block;
       background: black;
       margin: 40px auto;
-      max-width: 250px;
+      max-width: 300px;
       border-radius: 24px;
+      text-transform: uppercase;
     }
   }
 
@@ -130,7 +138,9 @@ $sentinel-lt-font: 'Sentinel-Light', 'Sentinel', Palatino, Georgia, serif;
     text-align: center;
     padding: 40px;
 
-    &, a, a:visited {
+    &,
+    a,
+    a:visited {
       color: $color-gray-boulder;
     }
   }
@@ -157,7 +167,7 @@ $sentinel-lt-font: 'Sentinel-Light', 'Sentinel', Palatino, Georgia, serif;
 
 // Invite mailer
 .header {
-  color: #120F0E;
+  color: #120f0e;
   font-family: $gotham-font;
   font-size: 22px;
   font-weight: 600;
@@ -290,7 +300,6 @@ button {
   }
 }
 
-
 .CommentThread__ThumbnailHolder {
   display: block;
   flex-shrink: 0;
@@ -394,7 +403,8 @@ button {
   font-size: 1rem;
 }
 
-.billing-email {
+.billing-email,
+.feedback-email {
   font-family: $gotham-font;
 
   .subject {

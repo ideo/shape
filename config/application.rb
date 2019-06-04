@@ -19,6 +19,10 @@ Bundler.require(*Rails.groups)
 module Shape
   SUPPORT_EMAIL = 'hello@shape.space'.freeze
   ZENDESK_EMAIL = 'help@shape.space'.freeze
+  IDEO_PRODUCTS_GROUP_ID = 27
+  COMMON_RESOURCE_GROUP_ID = (ENV['COMMON_RESOURCE_GROUP_ID'] || 1000).to_i
+  FEEDBACK_INCENTIVE_AMOUNT = BigDecimal('2.00')
+
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 5.1
@@ -32,8 +36,5 @@ module Shape
 
     # for serving gzipped assets
     config.middleware.use Rack::Deflater
-
-    ::IDEO_PRODUCTS_GROUP_ID = 27
-    ::FEEDBACK_INCENTIVE_AMOUNT = BigDecimal('2.00')
   end
 end

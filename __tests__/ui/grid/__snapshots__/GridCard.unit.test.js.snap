@@ -1267,7 +1267,15 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
       }
       cardType="collections"
       dragging={false}
-      handleClick={[MockFunction]}
+      handleClick={
+        [MockFunction] {
+          "calls": Array [
+            Array [
+              Object {},
+            ],
+          ],
+        }
+      }
       height={100}
       isBoardCollection={false}
       isCoverItem={false}
@@ -7236,7 +7244,15 @@ exports[`GridCard when selected renders snapshot 1`] = `
       }
       cardType="collections"
       dragging={false}
-      handleClick={[MockFunction]}
+      handleClick={
+        [MockFunction] {
+          "calls": Array [
+            Array [
+              Object {},
+            ],
+          ],
+        }
+      }
       height={100}
       isBoardCollection={false}
       isCoverItem={false}
@@ -13853,7 +13869,15 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
       }
       cardType="collections"
       dragging={false}
-      handleClick={[MockFunction]}
+      handleClick={
+        [MockFunction] {
+          "calls": Array [
+            Array [
+              Object {},
+            ],
+          ],
+        }
+      }
       height={100}
       isBoardCollection={false}
       isCoverItem={false}
@@ -19823,7 +19847,15 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
       }
       cardType="collections"
       dragging={false}
-      handleClick={[MockFunction]}
+      handleClick={
+        [MockFunction] {
+          "calls": Array [
+            Array [
+              Object {},
+            ],
+          ],
+        }
+      }
       height={100}
       isBoardCollection={false}
       isCoverItem={false}
@@ -25764,7 +25796,15 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
       }
       cardType="collections"
       dragging={false}
-      handleClick={[MockFunction]}
+      handleClick={
+        [MockFunction] {
+          "calls": Array [
+            Array [
+              Object {},
+            ],
+          ],
+        }
+      }
       height={100}
       isBoardCollection={false}
       isCoverItem={false}
@@ -31736,7 +31776,15 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
       }
       cardType="collections"
       dragging={false}
-      handleClick={[MockFunction]}
+      handleClick={
+        [MockFunction] {
+          "calls": Array [
+            Array [
+              Object {},
+            ],
+          ],
+        }
+      }
       height={100}
       isBoardCollection={false}
       isCoverItem={false}
@@ -40912,7 +40960,15 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
       }
       cardType="collections"
       dragging={false}
-      handleClick={[MockFunction]}
+      handleClick={
+        [MockFunction] {
+          "calls": Array [
+            Array [
+              Object {},
+            ],
+          ],
+        }
+      }
       height={100}
       isBoardCollection={false}
       isCoverItem={false}

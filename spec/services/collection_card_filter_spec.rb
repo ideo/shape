@@ -162,8 +162,23 @@ RSpec.describe CollectionCardFilter, type: :service do
       end
     end
 
-    context 'as a guest' do
+    context 'with no user (#filter_for_public)' do
       it 'returns all cards with same role as collection' do
+        expect(subject).to match_array(
+          [visible_card_1, visible_card_2],
+        )
+      end
+    end
+
+    context 'with common resource group' do
+      let(:common_resource_group) { create(:global_group, :common_resource) }
+      let(:user) { create(:user) }
+
+      before do
+        common_resource_group.add_role(Role::VIEWER, collection)
+      end
+
+      it 'returns all cards that common resource group can view' do
         expect(subject).to match_array(
           [visible_card_1, visible_card_2],
         )
