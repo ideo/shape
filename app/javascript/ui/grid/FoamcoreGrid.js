@@ -159,19 +159,11 @@ class FoamcoreGrid extends React.Component {
     window.removeEventListener('scroll', this.handleScroll)
   }
 
-  reloadLoadedCards() {
-    this.loadCards({
-      rows: [0, this.loadedRows.max],
-      cols: [0, this.loadedCols.max],
-    })
-  }
-
   loadCards({ rows, cols }) {
     const { loadCollectionCards } = this.props
     // Track what we've loaded
     // Set these immediately so further calls won't load the same rows
     this.updateMaxLoaded({ row: rows[1], col: cols[1] })
-    console.log('load cards', rows, cols)
     loadCollectionCards({
       rows,
       cols,
