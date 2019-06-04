@@ -239,7 +239,7 @@ class Header extends React.Component {
   render() {
     const { record } = this
     const { apiStore, routingStore, uiStore } = this.props
-    const { currentUser } = apiStore
+    const { currentUser, currentUserOrganization } = apiStore
 
     if (!currentUser) {
       // user is not logged in, or:
@@ -250,7 +250,7 @@ class Header extends React.Component {
           redirectPath={record ? record.frontendPath : null}
         />
       )
-    } else if (!currentUser.current_organization) {
+    } else if (!currentUserOrganization) {
       return <BasicHeader orgMenu={uiStore.organizationMenuOpen} />
     }
     if (routingStore.isSearch && uiStore.isMobileXs) {
@@ -330,7 +330,7 @@ class Header extends React.Component {
                   </StyledActivityLogBtn>
                 )}
                 <OrganizationMenu
-                  organization={currentUser.current_organization}
+                  organization={currentUserOrganization}
                   userGroups={currentUser.groups}
                   onClose={this.closeOrgMenu}
                   open={uiStore.organizationMenuOpen}
