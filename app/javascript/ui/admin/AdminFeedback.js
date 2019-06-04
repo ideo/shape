@@ -133,47 +133,45 @@ class AdminFeedback extends React.Component {
               : null}
           </Grid>
           <Grid container item xs={6}>
-            {testCollection.test_audiences
-              .filter(testAudience => testAudience.status === 'open')
-              .map(testAudience => (
-                <React.Fragment key={testAudience.id}>
-                  <AudienceRowItem item xs={4}>
-                    <AudienceWrapper align="center">
-                      {testAudience.audience.name}
-                      <AudienceActions className="show-on-hover">
-                        <Tooltip
-                          classes={{ tooltip: 'Tooltip' }}
-                          title={'copy survey link'}
-                          placement="top"
+            {testCollection.test_audiences.map(testAudience => (
+              <React.Fragment key={testAudience.id}>
+                <AudienceRowItem item xs={4}>
+                  <AudienceWrapper align="center">
+                    {testAudience.audience.name}
+                    <AudienceActions className="show-on-hover">
+                      <Tooltip
+                        classes={{ tooltip: 'Tooltip' }}
+                        title={'copy survey link'}
+                        placement="top"
+                      >
+                        <CopyToClipboard
+                          text={`${testCollection.publicTestURL}?ta=${
+                            testAudience.id
+                          }`}
+                          onCopy={() =>
+                            this.props.uiStore.popupSnackbar({
+                              message: 'Survey link copied',
+                            })
+                          }
                         >
-                          <CopyToClipboard
-                            text={`${testCollection.publicTestURL}?ta=${
-                              testAudience.id
-                            }`}
-                            onCopy={() =>
-                              this.props.uiStore.popupSnackbar({
-                                message: 'Survey link copied',
-                              })
-                            }
-                          >
-                            <CircledIcon>
-                              <LinkIcon />
-                            </CircledIcon>
-                          </CopyToClipboard>
-                        </Tooltip>
-                      </AudienceActions>
-                    </AudienceWrapper>
-                  </AudienceRowItem>
-                  <AudienceRowItem item xs={4}>
-                    <Flex justify="flex-end">
-                      {testAudience.num_survey_responses}
-                    </Flex>
-                  </AudienceRowItem>
-                  <AudienceRowItem item xs={4}>
-                    <Flex justify="flex-end">{testAudience.sample_size}</Flex>
-                  </AudienceRowItem>
-                </React.Fragment>
-              ))}
+                          <CircledIcon>
+                            <LinkIcon />
+                          </CircledIcon>
+                        </CopyToClipboard>
+                      </Tooltip>
+                    </AudienceActions>
+                  </AudienceWrapper>
+                </AudienceRowItem>
+                <AudienceRowItem item xs={4}>
+                  <Flex justify="flex-end">
+                    {testAudience.num_survey_responses}
+                  </Flex>
+                </AudienceRowItem>
+                <AudienceRowItem item xs={4}>
+                  <Flex justify="flex-end">{testAudience.sample_size}</Flex>
+                </AudienceRowItem>
+              </React.Fragment>
+            ))}
           </Grid>
         </FeedbackRow>
         <Grid container>
