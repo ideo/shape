@@ -141,15 +141,20 @@ class AdminFeedback extends React.Component {
           <Grid item xs={2}>
             {testCollection.name}
           </Grid>
-          <Grid item xs={2}>
+          <Grid item xs={1}>
             <LaunchState>Launched</LaunchState>
+          </Grid>
+          <Grid item xs={2}>
+            {testCollection.test_launched_at
+              ? moment(testCollection.test_launched_at).format('L LT')
+              : null}
           </Grid>
           <Grid item xs={2}>
             {testCollection.test_launched_at
               ? moment(testCollection.test_launched_at).fromNow(true)
               : null}
           </Grid>
-          <Grid container item xs={6}>
+          <Grid container item xs={5}>
             {testCollection.test_audiences.map(testAudience => (
               <React.Fragment key={testAudience.id}>
                 <AudienceRowItem item xs={5}>
@@ -242,13 +247,16 @@ class AdminFeedback extends React.Component {
               <Grid item xs={2}>
                 <Heading3>Test Name</Heading3>
               </Grid>
+              <Grid item xs={1}>
+                <Heading3>State</Heading3>
+              </Grid>
               <Grid item xs={2}>
-                <Heading3>Launch State</Heading3>
+                <Heading3>Time Initiated</Heading3>
               </Grid>
               <Grid item xs={2}>
                 <Heading3>Time Elapsed</Heading3>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={5}>
                 <Flex column>
                   <Heading3>Audience(s)</Heading3>
                   <Grid container>
