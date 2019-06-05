@@ -16,7 +16,8 @@ export ELASTICSEARCH_PORT=9333
 \curl -sSL https://raw.githubusercontent.com/codeship/scripts/master/packages/elasticsearch.sh | bash -s
 
 # Setup nvm
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" 
 nvm install $(cat .nvmrc)
 nvm use $(cat .nvmrc)
 nvm alias default $(cat .nvmrc)
