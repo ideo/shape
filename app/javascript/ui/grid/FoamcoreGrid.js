@@ -63,7 +63,7 @@ const Grid = styled.div`
   min-height: ${props => `${props.height}px`};
 `
 
-const StyledPlusIcon = styled.div`
+export const StyledPlusIcon = styled.div`
   position: relative;
   /* TODO: better styling than this? */
   width: 20%;

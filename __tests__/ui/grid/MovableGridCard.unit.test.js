@@ -60,7 +60,7 @@ describe('MovableGridCard', () => {
     props.card.position = { x: 0 }
     wrapper = shallow(<MovableGridCard {...props} />)
     expect(wrapper.find('PositionedGridCard').exists()).toBeTruthy()
-    expect(wrapper.find('GridCardEmpty').exists()).toBeTruthy()
+    expect(wrapper.find('GridCardEmptyHotspot').exists()).toBeTruthy()
   })
 
   describe('as viewer, with grid cards for items and collections', () => {

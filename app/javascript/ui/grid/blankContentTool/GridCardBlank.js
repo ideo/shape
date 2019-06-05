@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { runInAction } from 'mobx'
 import styled from 'styled-components'
 import { Flex } from 'reflexbox'
 
@@ -344,6 +345,13 @@ class GridCardBlank extends React.Component {
     const card = new CollectionCard(attrs, apiStore)
     card.parent = parent // Assign parent so store can get access to it
     this.setState({ loading: true }, async () => {
+      if (apiStore.currentUser.show_helper) {
+        // after creating the card this will get set in the backend
+        // so just make it false locally
+        runInAction(() => {
+          apiStore.currentUser.show_helper = false
+        })
+      }
       let newCard
       if (isReplacing) {
         newCard = await card.API_replace({ replacingId })
