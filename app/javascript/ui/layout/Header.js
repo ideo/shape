@@ -21,6 +21,7 @@ import {
   MaxWidthContainer,
   HeaderSpacer,
 } from '~/ui/global/styled/layout'
+import Avatar from '~/ui/global/Avatar'
 import v from '~/utils/variables'
 import BasicHeader from '~/ui/layout/BasicHeader'
 import LoggedOutBasicHeader from '~/ui/layout/LoggedOutBasicHeader'
