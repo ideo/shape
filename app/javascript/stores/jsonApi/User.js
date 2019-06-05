@@ -66,10 +66,6 @@ class User extends BaseRecord {
     this[show_helper] = false
     return this.API_updateCurrentUser({ [show_helper]: false })
   }
-
-  API_hideMoveHelper() {
-    return this.API_updateCurrentUser({ show_move_helper: false })
-  }
 }
 
 export default User
