@@ -25,6 +25,27 @@ When('I create a text item', num => {
   cy.createTextItem()
 })
 
+When('I click the first text item', () => {
+  cy.locate('TextItemCover')
+    .first()
+    .click({ force: true })
+    .wait(50)
+})
+
+When('I type {string} in the first quill editor', string => {
+  cy.get('.ql-editor')
+    .first()
+    .click({ force: true })
+    .wait(25)
+    .type(string)
+})
+
+When('I close the first open text item', () => {
+  cy.locate('TextItemClose')
+    .first()
+    .click({ force: true })
+})
+
 When('I create a data item', num => {
   cy.createDataItem()
 })
@@ -47,7 +68,7 @@ When('I undo with CTRL+Z', () => {
 When('I close the snackbar', () => {
   cy.locateDataOrClass('.MuiSnackbarContent-action')
     .find('button')
-    .click()
+    .click({ force: true })
   // allow it to disappear
   cy.wait(1200)
 })
@@ -67,6 +88,7 @@ When('I add a link URL', () => {
     }
   )
   cy.locate('LinkCreatorFormButton').click()
+  cy.wait('@apiReplaceCollectionCard')
 })
 
 When('I fill {string} with some text', string => {
@@ -89,8 +111,8 @@ When('I add an open response question', () => {
     .click()
   cy.wait('@apiCreateCollectionCard')
   // have to wait for the flipmove fade-in
-  cy.wait(FLIPMOVE_DELAY + 3000)
-  cy.locateDataOrClass('.QuestionSelectHolder')
+  cy.wait(FLIPMOVE_DELAY + 500)
+  cy.locateDataOrClass('.SelectHolderContainer')
     .eq(3)
     .find('.select')
     .click()
@@ -98,7 +120,8 @@ When('I add an open response question', () => {
     .first()
     .click()
   cy.wait(FLIPMOVE_DELAY)
-  cy.wait('@apiReplaceCollectionCard')
+  cy.wait('@apiArchiveCollectionCards')
+  cy.wait('@apiCreateCollectionCard')
   // have to wait for the flipmove fade-in
   cy.wait(FLIPMOVE_DELAY)
 
@@ -106,6 +129,14 @@ When('I add an open response question', () => {
     .last()
     .click()
     .type('What do you think about pizza?')
+  cy.wait('@apiUpdateItem')
+})
+
+When('I accept the feedback survey terms', () => {
+  cy.locate('AcceptFeedbackTerms')
+    .last()
+    .click()
+  cy.wait(FLIPMOVE_DELAY)
 })
 
 // ----------------------
@@ -118,6 +149,7 @@ When(
       .last()
       .click({ force: true })
     cy.wait('@apiGetCollection')
+    cy.wait('@apiGetCollectionCards')
   }
 )
 
@@ -245,7 +277,7 @@ When('I fill out the organization name with {string}', orgName => {
 When('I click ... in the nav and select {string}', option => {
   cy.locate('PopoutMenu')
     .first()
-    .click()
+    .click({ force: true })
 
   cy.locate(`PopoutMenu_${option}`).click()
 })
@@ -258,6 +290,30 @@ When('I edit the report item', () => {
   cy.locate('CardAction-Edit')
     .first()
     .click()
+  cy.wait(100)
+})
+
+When('I select the index {int} {word} card', (pos, type) => {
+  cy.get(
+    `[data-cy="GridCard"][data-order="${pos}"] [data-cy="CardAction-select"]`
+  )
+    .first()
+    .click()
+  cy.wait(100)
+})
+
+When('I click the action menu for the index {int} card', pos => {
+  cy.get(`[data-cy="GridCard"][data-order="${pos}"] [data-cy="PopoutMenu"]`)
+    .first()
+    .click({ force: true })
+  cy.wait(100)
+})
+
+When('I click the {word} action for the index {int} card', (action, pos) => {
+  const value = `PopoutMenu_${_.camelCase(action)}`
+  cy.get(`[data-cy="GridCard"][data-order="${pos}"] [data-cy="${value}"]`)
+    .first()
+    .click({ force: true })
   cy.wait(100)
 })
 
@@ -274,3 +330,20 @@ When(
     cy.wait(50)
   }
 )
+
+// ----------------------
+// Modals
+// ----------------------
+When('I close the move helper modal', () => {
+  cy.locate('MoveHelperModal-button')
+    .first()
+    .click({ force: true })
+  cy.wait(100)
+})
+
+When('I click the {word} arrow on the MDL snackbar', direction => {
+  cy.locate(`MoveModalArrow-${direction}`)
+    .first()
+    .click({ force: true })
+  cy.wait(100)
+})

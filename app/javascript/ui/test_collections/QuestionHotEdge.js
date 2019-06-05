@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 import PlusIcon from '~/ui/icons/PlusIcon'
 import v from '~/utils/variables'
+import { uiStore } from '~/stores'
 
 const HotEdge = styled.div`
   height: 0;
@@ -29,7 +30,7 @@ const HotEdgeVisuals = styled.div`
 const VisualBar = styled.div`
   background-color: ${v.colors.primaryLight};
   height: 10px;
-  left: 20px;
+  left: 15px;
   position: absolute;
   top: 20px;
   width: calc(100% - 40px);
@@ -61,6 +62,12 @@ const HotAreaButton = styled.button`
 
 class QuestionHotEdge extends React.Component {
   state = { showing: false }
+
+  componentDidMount() {
+    if (uiStore.isTouchDevice) {
+      this.setState({ showing: true })
+    }
+  }
 
   handleAdd = ev => {
     ev.preventDefault()

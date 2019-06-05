@@ -92,23 +92,80 @@ describe Api::V1::TestCollectionsController, type: :request, json: true, auth: t
     end
   end
 
-  describe 'GET #token_auth' do
-    let!(:collection) { create(:test_collection, test_status: :live) }
-    let(:path) { token_auth_test_path(collection) }
-
-    it 'redirects to collection' do
-      get(path)
-      expect(response).to redirect_to(test_url(collection))
+  describe 'POST #add_comparison' do
+    let!(:collection) { create(:test_collection, test_status: :live, add_editors: [user]) }
+    let!(:comparison_collection) { create(:test_collection, test_status: :live, add_editors: [user]) }
+    let(:path) do
+      add_comparison_api_v1_test_collection_path(collection)
+    end
+    let(:params) do
+      {
+        data: {
+          comparison_collection_id: comparison_collection.id,
+        },
+      }.to_json
+    end
+    before do
+      allow(
+        TestComparison,
+      ).to receive(:new).and_return(test_comparison_instance)
     end
 
-    context 'user not logged in' do
-      before do
-        logout(:user)
-      end
+    context 'if add succeeds' do
+      let(:test_comparison_instance) { double(add: true) }
 
-      it 'redirects to Network token auth' do
-        get(path)
-        expect(response.location).to include(ideo_sso_api_base_url.to_s)
+      it 'calls TestComparison.add' do
+        expect(test_comparison_instance).to receive(:add)
+        post(path, params: params)
+        expect(response.status).to eq(200)
+      end
+    end
+
+    context 'if add fails' do
+      let(:test_comparison_instance) { double(add: false, errors: ['Bad things']) }
+
+      it 'returns errors' do
+        expect(test_comparison_instance).to receive(:add)
+        post(path, params: params)
+        expect(response.status).to eq(422)
+      end
+    end
+  end
+
+  describe 'POST #remove_comparison' do
+    let!(:collection) { create(:test_collection, test_status: :live) }
+    let!(:comparison_collection) { create(:test_collection, test_status: :live, add_editors: [user]) }
+    let(:path) do
+      remove_comparison_api_v1_test_collection_path(collection)
+    end
+    let(:params) do
+      {
+        data: { comparison_collection_id: comparison_collection.id },
+      }.to_json
+    end
+    before do
+      allow(
+        TestComparison,
+      ).to receive(:new).and_return(test_comparison_instance)
+    end
+
+    context 'if add succeeds' do
+      let(:test_comparison_instance) { double(remove: true) }
+
+      it 'calls TestComparison.remove' do
+        expect(test_comparison_instance).to receive(:remove)
+        post(path, params: params)
+        expect(response.status).to eq(200)
+      end
+    end
+
+    context 'if TestComparison.remove fails' do
+      let(:test_comparison_instance) { double(remove: false, errors: ['Bad things']) }
+
+      it 'returns errors' do
+        expect(test_comparison_instance).to receive(:remove)
+        post(path, params: params)
+        expect(response.status).to eq(422)
       end
     end
   end

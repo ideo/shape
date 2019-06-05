@@ -1,4 +1,7 @@
-import MainMenuDropdown from '~/ui/global/MainMenuDropdown'
+import MainMenuDropdown, {
+  CONTEXT_USER,
+  CONTEXT_ORG,
+} from '~/ui/global/MainMenuDropdown'
 import { fakeOrganization } from '#/mocks/data'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
@@ -26,7 +29,7 @@ describe('MainMenuDropdown', () => {
       'Settings',
       'Contact Support',
       'Billing',
-      'Legal',
+      'Terms and Privacy',
     ]
     props.uiStore.alert.mockClear()
     props.uiStore.confirm.mockClear()
@@ -78,7 +81,7 @@ describe('MainMenuDropdown', () => {
 
     describe('if displaying the user menu', () => {
       beforeEach(() => {
-        props.context = 'user'
+        props.context = CONTEXT_USER
         render()
       })
 
@@ -117,7 +120,7 @@ describe('MainMenuDropdown', () => {
 
     describe('if displaying the org menu', () => {
       beforeEach(() => {
-        props.context = 'org'
+        props.context = CONTEXT_ORG
         render()
       })
 

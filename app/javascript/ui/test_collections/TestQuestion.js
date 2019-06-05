@@ -9,8 +9,10 @@ import FinishQuestion from '~/ui/test_collections/FinishQuestion'
 import RecontactQuestion from '~/ui/test_collections/RecontactQuestion'
 import NextTestQuestion from '~/ui/test_collections/NextTestQuestion'
 import NewQuestionGraphic from '~/ui/icons/NewQuestionGraphic'
-import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
 import OpenQuestion from '~/ui/test_collections/OpenQuestion'
+import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
+import TermsQuestion from '~/ui/test_collections/TermsQuestion'
+import WelcomeQuestion from '~/ui/test_collections/WelcomeQuestion'
 import { QuestionText } from '~/ui/test_collections/shared'
 import { apiStore, uiStore } from '~/stores'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
@@ -36,9 +38,15 @@ const QuestionCardInner = styled.div`
   height: 100%;
 `
 
+const NON_TEST_QUESTIONS = [
+  'question_recontact',
+  'question_terms',
+  'question_welcome',
+]
+
 @observer
 class TestQuestion extends React.Component {
-  handleQuestionAnswer = async ({ text, number } = {}) => {
+  handleQuestionAnswer = async answer => {
     const {
       card,
       item,
@@ -46,11 +54,12 @@ class TestQuestion extends React.Component {
       createSurveyResponse,
       afterQuestionAnswered,
     } = this.props
+    const { text, number } = answer
     let { surveyResponse, questionAnswer } = this.props
     // components should never trigger this when editing, but double-check here
     if (editing) return
-    if (card.card_question_type === 'question_recontact') {
-      afterQuestionAnswered(card)
+    if (NON_TEST_QUESTIONS.includes(card.card_question_type)) {
+      afterQuestionAnswered(card, answer)
       return
     }
 
@@ -58,6 +67,8 @@ class TestQuestion extends React.Component {
       if (!surveyResponse) {
         surveyResponse = await createSurveyResponse()
       }
+      // if creation fails due to test being closed, exit early
+      if (!surveyResponse) return
       // create new answer if we didn't have one
       questionAnswer = new QuestionAnswer(
         {
@@ -81,6 +92,10 @@ class TestQuestion extends React.Component {
     afterQuestionAnswered(card)
   }
 
+  get givesIncentive() {
+    return this.props.parent.gives_incentive
+  }
+
   renderQuestion() {
     const {
       parent,
@@ -90,7 +105,9 @@ class TestQuestion extends React.Component {
       questionAnswer,
       canEdit,
       surveyResponse,
+      numberOfQuestions,
     } = this.props
+
     let inner
     switch (card.card_question_type) {
       case 'question_useful':
@@ -168,6 +185,7 @@ class TestQuestion extends React.Component {
         }
         return (
           <FinishQuestion
+            givesIncentive={this.givesIncentive}
             submissionBox={
               parent.is_submission_box_template_test ||
               parent.is_submission_test
@@ -180,8 +198,25 @@ class TestQuestion extends React.Component {
             user={apiStore.currentUser}
             onAnswer={this.handleQuestionAnswer}
             sessionUid={surveyResponse.session_uid}
+            givesIncentive={this.givesIncentive}
           />
         )
+      case 'question_terms':
+        return (
+          <TermsQuestion
+            user={apiStore.currentUser}
+            onAnswer={this.handleQuestionAnswer}
+          />
+        )
+      case 'question_welcome':
+        return (
+          <WelcomeQuestion
+            givesIncentive={this.givesIncentive}
+            numberOfQuestions={numberOfQuestions}
+            onAnswer={this.handleQuestionAnswer}
+          />
+        )
+
       default:
         return <NewQuestionGraphic />
     }
@@ -208,6 +243,7 @@ TestQuestion.propTypes = {
   createSurveyResponse: PropTypes.func,
   afterQuestionAnswered: PropTypes.func,
   canEdit: PropTypes.bool,
+  numberOfQuestions: PropTypes.number.isRequired,
 }
 
 TestQuestion.defaultProps = {

@@ -17,7 +17,7 @@ class GlobalSearchBar extends React.Component {
   }
 
   _search = query => {
-    if (!query) this.clearSearch()
+    if (!query) return this.clearSearch()
     const { routingStore } = this.props
     return routingStore.routeTo('search', query)
   }

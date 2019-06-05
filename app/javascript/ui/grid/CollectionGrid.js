@@ -330,7 +330,10 @@ class CollectionGrid extends React.Component {
       toCollection: hoveringRecord,
       cardIds,
       onCancel: () => this.positionCardsFromProps(),
-      onSuccess: () => this.setState({ hoveringOver: false }),
+      onSuccess: () =>
+        this.setState({
+          hoveringOver: false,
+        }),
     })
   }
 

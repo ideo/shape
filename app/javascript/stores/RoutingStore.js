@@ -17,6 +17,11 @@ class RoutingStore extends RouterStore {
   }
 
   @computed
+  get isAdmin() {
+    return this.location.pathname === this.pathTo('admin')
+  }
+
+  @computed
   get query() {
     return queryString.parse(this.location.search)
   }
@@ -32,6 +37,8 @@ class RoutingStore extends RouterStore {
         const path = `/${this.slug()}/search`
         const qs = id ? `?q=${encodeURIComponent(id)}` : ''
         return `${path}${qs}`
+      case 'admin':
+        return '/admin'
       case 'homepage':
       default:
         return `/${this.slug()}`
@@ -57,9 +64,6 @@ class RoutingStore extends RouterStore {
     }
     if (type === 'search') {
       this.updatePreviousPageBeforeSearch(this.location)
-      // don't route to search without a search query (passed in as `id`)
-      // e.g. when you clear out the search query
-      if (!id) return
     }
     const path = this.pathTo(type, id)
     this.push(path)

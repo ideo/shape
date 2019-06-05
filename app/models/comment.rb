@@ -1,3 +1,20 @@
+# == Schema Information
+#
+# Table name: comments
+#
+#  id                :bigint(8)        not null, primary key
+#  draftjs_data      :jsonb
+#  message           :text
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  author_id         :integer
+#  comment_thread_id :integer
+#
+# Indexes
+#
+#  index_comments_on_comment_thread_id  (comment_thread_id)
+#
+
 class Comment < ApplicationRecord
   include Firestoreable
 

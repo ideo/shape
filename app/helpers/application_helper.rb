@@ -1,6 +1,8 @@
 module ApplicationHelper
   # NOTE: this is somewhat similar to RoutingStore.js by necessity
   def frontend_url_for(obj)
+    return admin_root_url if (obj == Role::SHAPE_ADMIN.to_s.titleize)
+
     url = "#{root_url}#{obj.organization.slug}/"
     if obj.is_a? Collection
       url += "collections/#{obj.id}"

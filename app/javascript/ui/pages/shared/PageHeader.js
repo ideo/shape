@@ -194,33 +194,17 @@ class PageHeader extends React.Component {
 
   get launchTestButton() {
     const { record, uiStore } = this.props
-    if (
-      record.can_edit_content &&
-      (record.isDraftTest || record.isClosedTest)
-    ) {
-      if (record.isDraftTest) {
-        return (
-          <HeaderFormButton
-            onClick={record.launchTest}
-            disabled={uiStore.launchButtonLoading}
-          >
-            {record.is_submission_box_template_test
-              ? 'Launch Tests'
-              : 'Get Feedback'}
-          </HeaderFormButton>
-        )
-      } else if (record.isClosedTest) {
-        return (
-          <HeaderFormButton
-            onClick={record.reopenTest}
-            color={v.colors.transparent}
-            width="200"
-            disabled={uiStore.launchButtonLoading}
-          >
-            Re-open Feedback
-          </HeaderFormButton>
-        )
-      }
+    if (record.can_edit_content && record.isClosedTest) {
+      return (
+        <HeaderFormButton
+          onClick={record.reopenTest}
+          color={v.colors.transparent}
+          width="200"
+          disabled={uiStore.launchButtonLoading}
+        >
+          Re-open Feedback
+        </HeaderFormButton>
+      )
     }
     if (this.isCurrentlyHiddenSubmission) {
       return (
@@ -306,7 +290,8 @@ class PageHeader extends React.Component {
                 )}
                 {this.launchTestButton}
                 {this.joinCollectionButton}
-                {record.isLiveTest && (
+                {((record.isLiveTest && record.has_link_sharing) ||
+                  record.collection_to_test_id) && (
                   <Fragment>
                     <CopyToClipboard
                       text={record.publicTestURL}
@@ -316,7 +301,9 @@ class PageHeader extends React.Component {
                         width="140"
                         color={v.colors.transparent}
                         onClick={() =>
-                          uiStore.popupSnackbar({ message: 'Test link copied' })
+                          uiStore.popupSnackbar({
+                            message: 'Test link copied',
+                          })
                         }
                       >
                         <span
@@ -339,16 +326,17 @@ class PageHeader extends React.Component {
                         </span>
                       </HeaderFormButton>
                     </CopyToClipboard>
-                    {record.can_edit_content && (
-                      <HeaderFormButton
-                        width="170"
-                        color={v.colors.transparent}
-                        onClick={record.closeTest}
-                        disabled={uiStore.launchButtonLoading}
-                      >
-                        Stop Feedback
-                      </HeaderFormButton>
-                    )}
+                    {record.can_edit_content &&
+                      !record.is_test_locked && (
+                        <HeaderFormButton
+                          width="170"
+                          color={v.colors.transparent}
+                          onClick={record.closeTest}
+                          disabled={uiStore.launchButtonLoading}
+                        >
+                          Stop Feedback
+                        </HeaderFormButton>
+                      )}
                   </Fragment>
                 )}
               </Flex>

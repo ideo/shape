@@ -2,7 +2,7 @@ import _ from 'lodash'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { computed, runInAction, observable } from 'mobx'
+import { runInAction, observable } from 'mobx'
 
 import Avatar from '~/ui/global/Avatar'
 import LeaveIcon from '~/ui/icons/LeaveIcon'
@@ -10,11 +10,11 @@ import PopoutMenu from '~/ui/global/PopoutMenu'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import SettingsIcon from '~/ui/icons/SettingsIcon'
 import SearchBar from '~/ui/layout/SearchBar'
-import v from '~/utils/variables'
 
-const CONTEXT_USER = 'user'
-const CONTEXT_ORG = 'org'
-const CONTEXT_COMBO = 'combo'
+export const CONTEXT_USER = 'user'
+export const CONTEXT_ORG = 'org'
+export const CONTEXT_COMBO = 'combo'
+export const CONTEXT_ADMIN = 'admin'
 const MAX_ORGS_IN_LIST = 10
 
 const IconHolder = styled.span`
@@ -58,14 +58,6 @@ class MainMenuDropdown extends React.Component {
   constructor(props) {
     super(props)
     this.searchOrganizations = _.debounce(this._searchOrganizations, 300)
-  }
-
-  @computed
-  get isMobileXs() {
-    const { uiStore } = this.props
-    return (
-      uiStore.windowWidth && uiStore.windowWidth < v.responsive.smallBreakpoint
-    )
   }
 
   handleOrgPeople = ev => {
@@ -202,7 +194,7 @@ class MainMenuDropdown extends React.Component {
       bottom: [
         { name: 'New Organization', onClick: this.handleNewOrg },
         { name: 'Contact Support', onClick: this.handleZendesk },
-        { name: 'Legal', onClick: this.handleLegal },
+        { name: 'Terms and Privacy', onClick: this.handleLegal },
       ],
     }
     // splice these into the correct placement
@@ -280,6 +272,21 @@ class MainMenuDropdown extends React.Component {
     return extras
   }
 
+  get adminMenuGroups() {
+    const { uiStore } = this.props
+    return {
+      admin: [
+        {
+          name: 'Invite Shape Admins',
+          icon: '+',
+          onClick: () => {
+            uiStore.update('adminUsersMenuOpen', true)
+          },
+        },
+      ],
+    }
+  }
+
   get menuItems() {
     const { context, onItemClick } = this.props
     const onItemClickWrapper = cb => e => {
@@ -293,11 +300,14 @@ class MainMenuDropdown extends React.Component {
       Object.assign(menuItems, this.userMenuGroups)
     } else if (context === CONTEXT_ORG) {
       Object.assign(menuItems, this.orgMenuGroups)
+    } else if (context === CONTEXT_ADMIN) {
+      Object.assign(menuItems, this.adminMenuGroups)
+      Object.assign(menuItems, this.userMenuGroups)
     } else {
       Object.assign(menuItems, this.orgMenuGroups)
       Object.assign(menuItems, this.userMenuGroups)
     }
-    if (this.isMobileXs) {
+    if (this.props.uiStore.isMobileXs && context !== CONTEXT_ADMIN) {
       menuItems.top = menuItems.top || []
       menuItems.top.splice(0, 0, {
         name: 'Search',

@@ -9,7 +9,7 @@ class Ability
     # modify represents all the non-read-only actions
     alias_action :create, :update, :destroy, to: :modify
 
-    if user.has_cached_role?(Role::SUPER_ADMIN)
+    if user.has_cached_role?(Role::SUPER_ADMIN) || user.has_cached_role?(Role::SHAPE_ADMIN)
       can :read, :all
       can :manage, :all
 
@@ -84,8 +84,28 @@ class Ability
         # equivalent to comment_thread.record.can_view?
         comment_thread.can_edit?(user)
       end
+
+      can :read, Audience do |audience|
+        audience.can_view?(user)
+      end
+      can :manage, Audience do |audience|
+        audience.can_edit?(user)
+      end
+
       can %i[read manage], Comment do |comment|
         comment.can_edit?(user)
+      end
+
+      can :create, DataItemsDataset
+      can :manage, DataItemsDataset do |data_items_dataset|
+        data_items_dataset.data_item.can_edit?(user)
+      end
+
+      can :manage, TestAudience do |test_audience|
+        # TestAudience can only be updated through the API, not created/destroyed
+        # which happens via PurchaseTestAudience service
+        test_audience.link_sharing? &&
+          test_audience.test_collection.can_edit?(user)
       end
     end
     # for logged-out users and fallback for all users

@@ -3,7 +3,9 @@ require 'rails_helper'
 RSpec.describe SurveyResponse, type: :model do
   context 'associations' do
     it { should belong_to(:test_collection) }
+    it { should belong_to(:user) }
     it { should have_many(:question_answers) }
+    it { should have_one(:feedback_incentive_record) }
   end
 
   describe 'callbacks' do
@@ -30,16 +32,6 @@ RSpec.describe SurveyResponse, type: :model do
             answer.open_response_item.present?
           end,
         ).to be true
-      end
-    end
-
-    describe '#ping_collection' do
-      let!(:test_collection) { create(:test_collection) }
-      let!(:survey_response) { create(:survey_response, test_collection: test_collection) }
-
-      it 'should call CollectionUpdateBroadcaster with the test_collection if status changes' do
-        expect(CollectionUpdateBroadcaster).to receive(:call).with(test_collection)
-        survey_response.update(status: :completed)
       end
     end
   end
@@ -117,12 +109,6 @@ RSpec.describe SurveyResponse, type: :model do
 
       it 'marks response as completed' do
         expect(survey_response.reload.completed?).to be true
-      end
-
-      it 'when answer is deleted, marks response as in_progress' do
-        expect(survey_response.reload.completed?).to be true
-        question_answers.first.destroy
-        expect(survey_response.reload.in_progress?).to be true
       end
     end
   end

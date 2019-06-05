@@ -10,20 +10,24 @@ import trackError from '~/utils/trackError'
 import googleTagManager from '~/vendor/googleTagManager'
 
 import Activity from './jsonApi/Activity'
+import Audience from './jsonApi/Audience'
 import Collection from './jsonApi/Collection'
 import CollectionCard from './jsonApi/CollectionCard'
-import Role from './jsonApi/Role'
+import DataItemsDataset from './jsonApi/DataItemsDataset'
+import Dataset from './jsonApi/Dataset'
+import Comment from './jsonApi/Comment'
+import CommentThread from './jsonApi/CommentThread'
 import FilestackFile from './jsonApi/FilestackFile'
 import Group from './jsonApi/Group'
 import Item from './jsonApi/Item'
 import Notification from './jsonApi/Notification'
 import Organization from './jsonApi/Organization'
-import User from './jsonApi/User'
-import Comment from './jsonApi/Comment'
-import CommentThread from './jsonApi/CommentThread'
-import UsersThread from './jsonApi/UsersThread'
-import SurveyResponse from './jsonApi/SurveyResponse'
 import QuestionAnswer from './jsonApi/QuestionAnswer'
+import Role from './jsonApi/Role'
+import SurveyResponse from './jsonApi/SurveyResponse'
+import TestAudience from './jsonApi/TestAudience'
+import User from './jsonApi/User'
+import UsersThread from './jsonApi/UsersThread'
 
 class ApiStore extends jsonapi(datxCollection) {
   @observable
@@ -51,6 +55,9 @@ class ApiStore extends jsonapi(datxCollection) {
 
   @observable
   usableTemplates = []
+
+  @observable
+  shapeAdminUsers = []
 
   // doesn't have any need to be observable...
   filestackToken = {}
@@ -215,6 +222,7 @@ class ApiStore extends jsonapi(datxCollection) {
     return this.request(`search/organizations?query=${query}`)
   }
 
+  // TODO rename searchRecords?
   searchCollections(params) {
     const defaultParams = { query: '' }
     return this.request(
@@ -233,6 +241,48 @@ class ApiStore extends jsonapi(datxCollection) {
     resource.roles = roles
     this.add(roles, 'roles')
     return roles
+  }
+
+  @action
+  async fetchShapeAdminUsers() {
+    const res = await this.request('admin/users')
+    const adminUsers = _.sortBy(res.data, ['first_name'])
+    runInAction(() => {
+      this.shapeAdminUsers = adminUsers
+    })
+    return adminUsers
+  }
+
+  @action
+  async removeShapeAdminUser(user) {
+    await this.request(`admin/users/${user.id}`, 'DELETE')
+    runInAction(() => {
+      _.remove(this.shapeAdminUsers, u => u.id === user.id)
+    })
+
+    if (user.isCurrentUser) {
+      window.location.href = '/'
+    }
+  }
+
+  @action
+  async addShapeAdminUsers(users, opts) {
+    const userIds = users.map(user => user.id)
+    const data = { user_ids: userIds, sendInvites: opts.sendInvites }
+    await this.request('admin/users', 'POST', data)
+    runInAction(() => {
+      this.shapeAdminUsers = _.sortBy(this.shapeAdminUsers.concat(users), [
+        'first_name',
+      ])
+    })
+  }
+
+  async fetchTestCollections(page = 1) {
+    const res = await this.request(`admin/test_collections?page=${page}`)
+    return {
+      data: res.data,
+      totalPages: parseInt(res.headers.get('X-Total-Pages')),
+    }
   }
 
   @action
@@ -400,6 +450,12 @@ class ApiStore extends jsonapi(datxCollection) {
     return res.data
   }
 
+  async fetchOrganizationAudiences(orgId) {
+    const res = await this.request(`organizations/${orgId}/audiences/`, 'GET')
+    const audiences = res.data
+    return audiences
+  }
+
   async createTemplateInstance(data) {
     return this.request('collections/create_template', 'POST', data)
   }
@@ -456,10 +512,47 @@ class ApiStore extends jsonapi(datxCollection) {
     collection.API_fetchCards()
   }
 
-  async moveCards(data) {
+  async moveCards(data, { undoSnapshot = {} } = {}) {
+    // trigger card_mover in backend
     const res = await this.request('collection_cards/move', 'PATCH', data)
+
+    // revert data if undoing card move
+    if (!_.isEmpty(undoSnapshot)) {
+      await this.request(`collections/${data.to_id}`, 'PATCH', {
+        data: undoSnapshot,
+      })
+      const toCollection = this.find('collections', data.to_id)
+      await toCollection.API_fetchCards()
+      return
+    }
+
+    // find origin collection
     const fromCollection = this.find('collections', data.from_id)
+    // make snapshot of fromCollection data with cards for potential undo
+    const originalData = fromCollection.toJsonApiWithCards()
+    // update UI for collection that cards were moved away from
     await fromCollection.API_fetchCards()
+
+    // reverse to and from values for potential undo operation
+    const reversedData = Object.assign({}, data, {
+      to_id: data.from_id,
+      from_id: data.to_id,
+    })
+
+    // add undo operation to stack so users can undo moving cards
+    this.undoStore.pushUndoAction({
+      message: 'Move undone',
+      apiCall: async () => {
+        await this.moveCards(reversedData, {
+          undoSnapshot: originalData,
+        })
+      },
+      redirectPath: {
+        type: 'collections',
+        id: fromCollection.id,
+      },
+    })
+
     return res
   }
 
@@ -548,6 +641,10 @@ class ApiStore extends jsonapi(datxCollection) {
     return org
   }
 
+  get currentOrganization() {
+    return this.currentUser.current_organization
+  }
+
   // default action for updating any basic apiStore value
   @action
   update(name, value) {
@@ -587,20 +684,24 @@ class ApiStore extends jsonapi(datxCollection) {
 }
 ApiStore.types = [
   Activity,
+  Audience,
   Collection,
   CollectionCard,
+  Comment,
+  CommentThread,
+  Dataset,
+  DataItemsDataset,
   FilestackFile,
   Group,
   Item,
-  Role,
-  Organization,
-  User,
-  Comment,
-  CommentThread,
   Notification,
-  UsersThread,
-  SurveyResponse,
+  Organization,
   QuestionAnswer,
+  Role,
+  SurveyResponse,
+  TestAudience,
+  User,
+  UsersThread,
 ]
 
 export default ApiStore

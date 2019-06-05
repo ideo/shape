@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
 import Emoji from '~/ui/icons/Emoji'
+import { FEEDBACK_INCENTIVE_AMOUNT } from '~/utils/variables'
 import { QuestionText } from './shared'
 
 const FinishedEmojiHolder = styled.div`
@@ -9,7 +10,7 @@ const FinishedEmojiHolder = styled.div`
   text-align: center;
 `
 
-const FinishQuestion = ({ submissionBox }) => (
+const FinishQuestion = ({ submissionBox, givesIncentive }) => (
   <div>
     <QuestionText>
       {submissionBox
@@ -18,15 +19,24 @@ const FinishQuestion = ({ submissionBox }) => (
     </QuestionText>
     <FinishedEmojiHolder data-cy="FinishedEmojiHolder">
       <Emoji name="Finished" symbol="🎉" />
+      {givesIncentive &&
+        FEEDBACK_INCENTIVE_AMOUNT && (
+          <QuestionText>
+            You just earned ${FEEDBACK_INCENTIVE_AMOUNT.toFixed(2)} with this
+            survey!
+          </QuestionText>
+        )}
     </FinishedEmojiHolder>
   </div>
 )
 
 FinishQuestion.propTypes = {
   submissionBox: PropTypes.bool,
+  givesIncentive: PropTypes.bool,
 }
 FinishQuestion.defaultProps = {
   submissionBox: false,
+  givesIncentive: false,
 }
 
 export default FinishQuestion

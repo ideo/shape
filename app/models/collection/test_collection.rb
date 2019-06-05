@@ -1,3 +1,62 @@
+# == Schema Information
+#
+# Table name: collections
+#
+#  id                         :bigint(8)        not null, primary key
+#  anyone_can_join            :boolean          default(FALSE)
+#  anyone_can_view            :boolean          default(FALSE)
+#  archive_batch              :string
+#  archived                   :boolean          default(FALSE)
+#  archived_at                :datetime
+#  breadcrumb                 :jsonb
+#  cached_attributes          :jsonb
+#  cached_test_scores         :jsonb
+#  cover_type                 :integer          default("cover_type_default")
+#  hide_submissions           :boolean          default(FALSE)
+#  master_template            :boolean          default(FALSE)
+#  name                       :string
+#  processing_status          :integer
+#  shared_with_organization   :boolean          default(FALSE)
+#  submission_box_type        :integer
+#  submissions_enabled        :boolean          default(TRUE)
+#  test_closed_at             :datetime
+#  test_launched_at           :datetime
+#  test_status                :integer
+#  type                       :string
+#  unarchived_at              :datetime
+#  created_at                 :datetime         not null
+#  updated_at                 :datetime         not null
+#  cloned_from_id             :bigint(8)
+#  collection_to_test_id      :bigint(8)
+#  created_by_id              :integer
+#  joinable_group_id          :bigint(8)
+#  organization_id            :bigint(8)
+#  question_item_id           :integer
+#  roles_anchor_collection_id :bigint(8)
+#  submission_box_id          :bigint(8)
+#  submission_template_id     :integer
+#  template_id                :integer
+#  test_collection_id         :bigint(8)
+#
+# Indexes
+#
+#  index_collections_on_breadcrumb                  (breadcrumb) USING gin
+#  index_collections_on_cached_test_scores          (cached_test_scores) USING gin
+#  index_collections_on_cloned_from_id              (cloned_from_id)
+#  index_collections_on_created_at                  (created_at)
+#  index_collections_on_organization_id             (organization_id)
+#  index_collections_on_roles_anchor_collection_id  (roles_anchor_collection_id)
+#  index_collections_on_submission_box_id           (submission_box_id)
+#  index_collections_on_submission_template_id      (submission_template_id)
+#  index_collections_on_template_id                 (template_id)
+#  index_collections_on_test_status                 (test_status)
+#  index_collections_on_type                        (type)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (organization_id => organizations.id)
+#
+
 class Collection
   class TestCollection < Collection
     include AASM
@@ -10,10 +69,19 @@ class Collection
              source: :item,
              class_name: 'Item::QuestionItem',
              through: :primary_collection_cards
+    has_many :test_audiences, dependent: :destroy
+    has_many :paid_test_audiences,
+      -> { paid },
+      class_name: 'TestAudience'
     belongs_to :collection_to_test, class_name: 'Collection', optional: true
 
+    has_many :datasets,
+             through: :data_items
+
     before_create :setup_default_status_and_questions, unless: :cloned_from_present?
-    after_create :add_test_tag, :add_child_roles
+    after_create :add_test_tag
+    after_create :add_child_roles
+    after_create :setup_link_sharing_test_audience, unless: :collection_to_test
     after_update :touch_test_design, if: :saved_change_to_test_status?
 
     delegate :answerable_complete_question_items, to: :test_design, allow_nil: true
@@ -32,9 +100,19 @@ class Collection
       error_on_all_events :aasm_event_failed
 
       event :launch,
-            guard: :completed_and_launchable?,
+            guards: [
+              :completed_and_launchable?,
+              proc { |**args|
+                attempt_to_purchase_test_audiences!(
+                  user: args[:initiated_by],
+                  test_audience_params: args[:test_audience_params],
+                )
+              },
+            ],
             after_commit: proc { |**args|
-                            launch_test!(initiated_by: args[:initiated_by])
+                            post_launch_setup!(
+                              initiated_by: args[:initiated_by],
+                            )
                           } do
         transitions from: :draft, to: :live
       end
@@ -47,7 +125,7 @@ class Collection
       event :reopen,
             guard: :can_reopen?,
             after_commit: proc { |**args|
-                            launch_test!(initiated_by: args[:initiated_by], reopening: true)
+                            post_launch_setup!(initiated_by: args[:initiated_by], reopening: true)
                           } do
         transitions from: :closed, to: :live
       end
@@ -67,7 +145,20 @@ class Collection
       self
     end
 
-    def launch_test!(initiated_by: nil, reopening: false)
+    def attempt_to_purchase_test_audiences!(user:, test_audience_params: nil)
+      return true if test_audience_params.blank?
+
+      purchaser = PurchaseTestAudience.call(
+        test_collection: self,
+        test_audience_params: test_audience_params,
+        user: user,
+      )
+      return true if purchaser.success?
+      errors.add(:base, purchaser.message) if purchaser.message.present?
+      false
+    end
+
+    def post_launch_setup!(initiated_by: nil, reopening: false)
       # remove the "blanks"
       remove_incomplete_question_items
       if submission_box_template_test?
@@ -84,17 +175,36 @@ class Collection
         return true
       end
       update_cached_submission_status(parent_submission) if inside_a_submission?
-      # TODO: Perhaps need to do *some* of this setup when reopening?
       create_test_design_and_move_cards!(initiated_by: initiated_by) unless reopening
-      update(test_launched_at: Time.current)
+      update(test_launched_at: Time.current, test_closed_at: nil)
+      TestCollectionMailer.notify_launch(id).deliver_later if gives_incentive? && ENV['ENABLE_ZENDESK_FOR_TEST_LAUNCH']
+    end
+
+    def test_audience_closed!
+      # Never close a test that still has link sharing enabled,
+      # or if there are any remaining paid audiences open
+      return if link_sharing_enabled? || any_paid_audiences_open?
+
+      # Otherwise close the test
+      close!
+    end
+
+    def still_accepting_answers?
+      return true if live?
+      return false if test_closed_at.nil?
+      closed? && 10.minutes.ago < test_closed_at
     end
 
     def after_close_test
+      update(test_closed_at: Time.current)
+
       if inside_a_submission?
         update_cached_submission_status(parent_submission)
       elsif submission_box_template_test?
         update_cached_submission_status(parent_submission_box_template)
         close_all_submissions_tests!
+      elsif gives_incentive?
+        NotifyFeedbackCompletedWorker.perform_async(id)
       end
     end
 
@@ -248,14 +358,21 @@ class Collection
       prelaunch_question_items
     end
 
+    def legend_item
+      question_item = question_items.includes(test_data_item: :legend_item).first
+      question_item&.test_data_item&.legend_item
+    end
+
     def test_open_response_collections
       collections.where(type: 'Collection::TestOpenResponses')
     end
 
-    def create_uniq_survey_response(user_id: nil)
+    def create_uniq_survey_response(user_id: nil, test_audience_id: nil)
       survey_responses.create(
         session_uid: SecureRandom.uuid,
         user_id: user_id,
+        # only include passed in test_audience_id if it is a valid relation
+        test_audience_id: test_audience_ids.include?(test_audience_id) ? test_audience_id : nil,
       )
     end
 
@@ -283,7 +400,7 @@ class Collection
       }
     end
 
-    def serialized_for_test_survey
+    def serialized_for_test_survey(test_audience_id = nil)
       renderer = JSONAPI::Serializable::Renderer.new
       renderer.render(
         self,
@@ -291,6 +408,9 @@ class Collection
         # This uses a special serializer that defers collection cards to test design
         class: test_survey_render_class_mappings,
         include: test_survey_render_includes,
+        expose: {
+          test_audience_id: test_audience_id,
+        },
       )
     end
 
@@ -333,7 +453,7 @@ class Collection
         # push it to the end, will get resorted after creation is complete
         order: 999,
         collection_attributes: {
-          name: "#{name} Feedback Design",
+          name: Collection::TestDesign.generate_name(name),
           type: 'Collection::TestDesign',
           test_collection_id: id,
           template_id: template_id,
@@ -357,14 +477,25 @@ class Collection
     end
 
     def create_response_graphs(initiated_by:)
+      legend = nil
+      graphs = []
       question_items
         .select(&:scale_question?)
-        .map do |question|
-        question.create_response_graph(
+        .each_with_index do |question, i|
+        data_item_card = question.create_response_graph(
           parent_collection: self,
           initiated_by: initiated_by,
+          legend_item: legend,
         )
+        legend = data_item_card.item.legend_item if i.zero?
+        graphs << data_item_card
+        test_audiences.each do |test_audience|
+          data_item = data_item_card.item
+          question.create_test_audience_dataset(test_audience, data_item)
+        end
       end
+
+      graphs
     end
 
     def create_media_item_link(media_question_items: nil)
@@ -394,6 +525,17 @@ class Collection
           },
         )
       end
+    end
+
+    def setup_link_sharing_test_audience
+      # find the link sharing audience
+      audience = Audience.find_by(price_per_response: 0)
+      # e.g. in unit tests
+      return unless audience.present?
+      test_audiences.find_or_create_by(
+        audience_id: audience.id,
+        status: :closed,
+      )
     end
 
     def add_test_tag
@@ -458,6 +600,39 @@ class Collection
 
     def cloned_from_present?
       cloned_from.present?
+    end
+
+    def gives_incentive?
+      # right now the check is basically any paid tests == gives_incentive
+      test_audiences.paid.present?
+    end
+
+    def gives_incentive_for?(test_audience_id)
+      test_audiences.paid.find_by(id: test_audience_id).present?
+    end
+
+    def purchased?
+      gives_incentive? && live?
+    end
+
+    def link_sharing?
+      test_audiences.link_sharing.where(status: :open).present?
+    end
+
+    def link_sharing_audience
+      test_audiences.link_sharing.first
+    end
+
+    def any_paid_audiences_open?
+      test_audiences.paid.open.count.positive?
+    end
+
+    def link_sharing_enabled?
+      link_sharing_audience.present? && link_sharing_audience.open?
+    end
+
+    def paid_audiences_sample_size
+      test_audiences.paid.sum(:sample_size)
     end
   end
 end

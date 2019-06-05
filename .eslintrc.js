@@ -6,7 +6,7 @@ module.exports = {
     'cypress',
     'prettier',
     'import',
-    'compat'
+    'compat',
   ],
   env: {
     es6: true,
@@ -14,11 +14,7 @@ module.exports = {
     'jest/globals': true,
     'cypress/globals': true,
   },
-  extends: [
-    'prettier',
-    'plugin:prettier/recommended',
-    'prettier/react',
-  ],
+  extends: ['prettier', 'plugin:prettier/recommended', 'prettier/react'],
   parser: 'babel-eslint',
   parserOptions: {
     ecmaVersion: 7,
@@ -50,14 +46,14 @@ module.exports = {
       node: {},
     },
     'module-resolver': {},
-    'polyfills': [
+    polyfills: [
       // Example of marking entire API and all methods and properties as polyfilled
-      "Array.from",
-      "Promise",
-      "Object.assign",
-      "Object.values",
-      "fetch",
-      "Array.prototype.push"
+      'Array.from',
+      'Promise',
+      'Object.assign',
+      'Object.values',
+      'fetch',
+      'Array.prototype.push',
     ],
   },
   rules: {
@@ -82,6 +78,7 @@ module.exports = {
     'no-param-reassign': ['error', { props: false }],
     'no-underscore-dangle': 0,
     'no-undef': 2,
+    'no-duplicate-imports': 2,
     'prettier/prettier': 'error',
     'prefer-destructuring': [
       'error',
@@ -117,6 +114,7 @@ module.exports = {
     'react/prefer-stateless-function': 0,
     'react/jsx-curly-brace-presence': 0,
     'react/jsx-closing-tag-location': 0,
+    'react/jsx-no-undef': [2, { allowGlobals: true }],
     'react/no-did-mount-set-state': 0,
     'react/no-unknown-property': 2,
     'react/jsx-uses-vars': 1,

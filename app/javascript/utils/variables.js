@@ -18,6 +18,7 @@ export const COLLECTION_TYPES = {
 export const DATASET_CHART_TYPES = {
   AREA: 'area',
   LINE: 'line',
+  BAR: 'bar',
 }
 
 export const DATA_MEASURES = [
@@ -30,10 +31,48 @@ export const DATA_MEASURES = [
   { name: 'Collections & Items', value: 'records' },
 ]
 
+export const TEST_COLLECTION_SELECT_OPTIONS = [
+  {
+    values: [{ value: '', label: 'select question type' }],
+  },
+  {
+    category: 'Idea Content',
+    values: [
+      { value: 'question_description', label: 'Description' },
+      { value: 'question_media', label: 'Photo/Video' },
+    ],
+  },
+  {
+    category: 'Scaled Rating',
+    values: [
+      { value: 'question_clarity', label: 'Clear' },
+      { value: 'question_different', label: 'Different' },
+      { value: 'question_excitement', label: 'Exciting' },
+      { value: 'question_useful', label: 'Useful' },
+    ],
+  },
+  {
+    category: 'Customizable',
+    values: [
+      {
+        value: 'question_category_satisfaction',
+        label: 'Category Satisfaction',
+      },
+      { value: 'question_context', label: 'Context Setting' },
+      { value: 'question_open', label: 'Open Response' },
+    ],
+  },
+]
+
 export const KEYS = {
   ENTER: 13,
   ESC: 27,
 }
+
+// global vars from Rails application (or undefined, e.g. in a unit test)
+export const FEEDBACK_INCENTIVE_AMOUNT = window.FEEDBACK_INCENTIVE_AMOUNT || 2.5
+export const TARGETED_AUDIENCE_PRICE_PER_RESPONSE =
+  window.TARGETED_AUDIENCE_PRICE_PER_RESPONSE || 2
 
 export default {
   headerHeight: 50,

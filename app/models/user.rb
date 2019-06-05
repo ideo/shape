@@ -1,3 +1,51 @@
+# == Schema Information
+#
+# Table name: users
+#
+#  id                          :bigint(8)        not null, primary key
+#  cached_attributes           :jsonb
+#  current_sign_in_at          :datetime
+#  current_sign_in_ip          :inet
+#  email                       :string           default("")
+#  encrypted_password          :string           default(""), not null
+#  feedback_contact_preference :integer          default("feedback_contact_unanswered")
+#  feedback_terms_accepted     :boolean          default(FALSE)
+#  first_name                  :string
+#  handle                      :string
+#  invitation_token            :string
+#  last_active_at              :datetime
+#  last_name                   :string
+#  last_notification_mail_sent :datetime
+#  last_sign_in_at             :datetime
+#  last_sign_in_ip             :inet
+#  mailing_list                :boolean          default(FALSE)
+#  network_data                :jsonb
+#  notify_through_email        :boolean          default(TRUE)
+#  phone                       :string
+#  provider                    :string
+#  remember_created_at         :datetime
+#  respondent_terms_accepted   :boolean          default(FALSE)
+#  shape_circle_member         :boolean          default(FALSE)
+#  show_helper                 :boolean          default(TRUE)
+#  show_move_helper            :boolean          default(TRUE)
+#  show_template_helper        :boolean          default(TRUE)
+#  sign_in_count               :integer          default(0), not null
+#  status                      :integer          default("active")
+#  terms_accepted              :boolean          default(FALSE)
+#  uid                         :string
+#  created_at                  :datetime         not null
+#  updated_at                  :datetime         not null
+#  current_organization_id     :integer
+#  current_user_collection_id  :integer
+#
+# Indexes
+#
+#  index_users_on_email             (email)
+#  index_users_on_handle            (handle) UNIQUE
+#  index_users_on_invitation_token  (invitation_token)
+#  index_users_on_provider_and_uid  (provider,uid) UNIQUE
+#
+
 class User < ApplicationRecord
   prepend RolifyExtensions # Prepend so it can call rolify methods using super
 
@@ -46,6 +94,7 @@ class User < ApplicationRecord
   has_many :activities_as_subject, through: :activity_subjects, class_name: 'Activity'
   has_many :activity_subjects, as: :subject
   has_many :notifications
+  has_many :feedback_incentive_records
 
   has_many :user_profiles,
            class_name: 'Collection::UserProfile',
@@ -203,8 +252,8 @@ class User < ApplicationRecord
     find_or_initialize_from_external(user, auth.provider)
   end
 
-  def self.find_or_initialize_from_network(network_user)
-    find_or_initialize_from_external(network_user, 'ideo')
+  def self.find_or_initialize_from_network(network_user_auth)
+    find_or_initialize_from_external(network_user_auth, 'ideo')
   end
 
   def self.create_pending_user(email:)
@@ -371,6 +420,32 @@ class User < ApplicationRecord
 
   def bot_user?
     application.present?
+  end
+
+  def current_incentive_balance
+    last_record = feedback_incentive_records.order(created_at: :desc).first
+    last_record ? last_record.current_balance : 0
+  end
+
+
+  def incentive_due_date
+    first_record = feedback_incentive_records.order(created_at: :asc).first
+    return if first_record.blank?
+    first_record.created_at  + FeedbackIncentiveRecord::PAYMENT_WAITING_PERIOD
+  end
+
+  def network_user
+    NetworkApi::User.find(uid).first
+  end
+
+  def generate_network_auth_token
+    return unless limited?
+    nu = network_user
+    return unless nu.present?
+    nu.generate_auth_token.first.try(:authentication_token)
+  rescue JsonApiClient::Errors::NotAuthorized
+    # shouldn't happen since we are already escaping `unless limited?`
+    nil
   end
 
   private

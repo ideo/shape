@@ -23,7 +23,8 @@ const Heading1Css = css`
     props.wrapLine ? 'normal' : 'nowrap'}; /* better this way for responsive? */
 
   @media only screen and (max-width: ${v.responsive.largeBreakpoint}px) {
-    padding: 1rem 0;
+    /* Allow us not to have responsive behavior */
+    ${props => (props.notResponsive ? '' : 'padding: 1rem 0;')};
   }
 `
 /** @component */
@@ -54,13 +55,17 @@ export const Heading3 = styled.h3`
 `
 Heading3.displayName = 'StyledHeading3'
 
-/** @component */
-export const DisplayText = styled.span`
+export const DisplayTextCss = css`
   color: ${props => props.color || v.colors.black};
   font-weight: ${v.weights.book};
   font-family: ${v.fonts.sans};
   font-size: 1rem;
   text-transform: none;
+`
+
+/** @component */
+export const DisplayText = styled.span`
+  ${DisplayTextCss};
 `
 DisplayText.displayName = 'StyledDisplayText'
 

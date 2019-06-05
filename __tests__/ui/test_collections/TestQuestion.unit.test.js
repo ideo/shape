@@ -9,6 +9,7 @@ describe('TestQuestion', () => {
       card: fakeItemCard,
       item: fakeQuestionItem,
       editing: true,
+      numberOfQuestions: 4,
     }
   })
 
@@ -43,6 +44,21 @@ describe('TestQuestion', () => {
     it('renders DescriptionQuestion', () => {
       expect(wrapper.find('DescriptionQuestion').props().item).toEqual(
         props.item
+      )
+    })
+  })
+
+  describe('with "question_finish" type', () => {
+    beforeEach(() => {
+      props.parent.gives_incentive = true
+      props.card.card_question_type = 'question_finish'
+      wrapper = shallow(<TestQuestion {...props} />)
+    })
+
+    it('renders DescriptionQuestion', () => {
+      const finishQuestion = wrapper.find('FinishQuestion')
+      expect(finishQuestion.props().givesIncentive).toEqual(
+        props.parent.gives_incentive
       )
     })
   })

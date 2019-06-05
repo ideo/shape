@@ -4,25 +4,21 @@ namespace :cypress do
     # clear out any orgs we created
     # NOTE: have to do this first, or else it gets mad if we do this after the user is loaded
     Organization.where('slug LIKE ?', 'our-test-org%').destroy_all
+    Organization.where(name: 'CypressTest').destroy_all
 
     email = 'cypress-test@ideo.com'
-    user = User.find_by(email: email)
-    user ||= FactoryBot.create(:user, email: email).becomes(User)
-    organization = Organization.find_by(name: 'CypressTest')
-    unless organization.present?
-      builder = OrganizationBuilder.new(
-        { name: 'CypressTest' }, user, full_setup: false
-      )
-      builder.save
-      organization = builder.organization
-    end
+    User.where('handle LIKE ?', 'cy-test-%').destroy_all
+    User.where(email: email).destroy_all
+
+    user = FactoryBot.create(:user, email: email).becomes(User)
+    builder = OrganizationBuilder.new(
+      { name: 'CypressTest' }, user, full_setup: false
+    )
+    builder.save
+    organization = builder.organization
     user.switch_to_organization(organization)
 
-    my_collection = user.current_user_collection
-    # via dependent: :destroy this will also remove everything in the test area
-    my_collection.collections.where(name: 'Cypress Test Area').destroy_all
-    User.where('handle LIKE ?', 'cy-test-%').destroy_all
-    create_cards(my_collection, user)
+    create_cards(user.current_user_collection, user)
     create_events(organization)
   end
 

@@ -8,7 +8,7 @@ import Tooltip from '~/ui/global/Tooltip'
 import Emoji from '~/ui/icons/Emoji'
 import { DisplayText, SmallHelperText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
-import { emojiSeriesMap, questionInformation } from './shared'
+import { emojiSeriesForQuestionType } from '~/ui/global/charts/ChartUtils'
 
 const Question = styled.div`
   border-color: ${props =>
@@ -36,10 +36,6 @@ const Scale = styled.div`
   box-sizing: border-box;
   padding: 7px 13px;
   width: 100%;
-
-  span {
-    color: ${props => props.theme.questionText};
-  }
 `
 
 export const EmojiHolder = styled.div`
@@ -54,6 +50,10 @@ export const EmojiButton = styled.button`
   transition: opacity 0.3s;
   &:hover {
     opacity: 1;
+  }
+  @media only screen and (max-width: ${v.responsive.muiSmBreakpoint}px) {
+    opacity: ${props => (props.selected ? 1 : 0.2)};
+    transition: opacity 0.3s;
   }
 `
 EmojiButton.displayName = 'EmojiButton'
@@ -162,16 +162,16 @@ class ScaleQuestion extends React.Component {
 
   render() {
     const { question, editing, questionAnswer } = this.props
-    const { emojiSeriesName, questionText } = questionInformation(question)
-    const emojis = emojiSeriesMap[emojiSeriesName]
+    const { question_type, question_description } = question
+    const emojis = emojiSeriesForQuestionType(question_type)
     return (
       <div style={{ width: '100%' }}>
         <Question editing={editing}>
           {this.hasEditableCategory ? (
-            this.renderEditableCategory(questionText)
+            this.renderEditableCategory(question_description)
           ) : (
             <DisplayText color={v.colors.white}>
-              {questionText}
+              {question_description}
               {/* editable category questions have question.content */}
               {question.content ? ` ${question.content}?` : ''}
             </DisplayText>
