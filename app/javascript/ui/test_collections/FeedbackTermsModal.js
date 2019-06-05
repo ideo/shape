@@ -6,21 +6,18 @@ import DialogContent from '@material-ui/core/DialogContent'
 import { ModalCloseButton } from '~/ui/global/modals/Modal'
 import PaperAirplane from '~/ui/test_collections/PaperAirplane'
 import { FormButton } from '~/ui/global/styled/forms'
-import { DisplayText } from '~/ui/global/styled/typography'
+import {
+  DisplayText,
+  SpecialDisplayHeading,
+} from '~/ui/global/styled/typography'
 import Link from '~/ui/global/Link'
 import v from '~/utils/variables'
 import CloseIcon from '../icons/CloseIcon'
 
-const SpecialDisplayHeading = styled.p`
+const StyledSpecialDisplayHeading = styled(SpecialDisplayHeading)`
   margin: 0;
   margin-top: 2rem;
   margin-bottom: 1.25rem;
-  line-height: 30px;
-  font-family: ${v.fonts.sans};
-  font-size: 1.25rem;
-  font-weight: ${v.weights.book};
-  color: ${v.colors.black};
-  text-align: center;
 `
 
 const StyledDialog = styled(Dialog)`
@@ -61,10 +58,10 @@ const FeedbackTermsModal = ({ onSubmit, open, close }) => (
     <DialogContent>
       <form onSubmit={onSubmit} style={{ padding: '0 29px' }}>
         <PaperAirplane />
-        <SpecialDisplayHeading wrapLine>
+        <StyledSpecialDisplayHeading wrapLine>
           Before you launch your first test, please review and agree to the
           terms below.
-        </SpecialDisplayHeading>
+        </StyledSpecialDisplayHeading>
         <div style={{ marginTop: '1.25rem' }}>
           <StyledDisplayText>
             You understand that as a human-centered business, Shape expects you
