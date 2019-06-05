@@ -19,7 +19,7 @@ RSpec.describe MailingListSubscription, type: :service do
       it 'should call NetworkApi::MailingListMembership.create' do
         expect(NetworkApi::MailingListMembership).to receive(:create).with(
           mailing_list_id: 'list-123',
-          organization_id: 'network-org-123',
+          organization_ids: ['network-org-123'],
           user_uid: user.uid,
         )
         MailingListSubscription.call(user: user, subscribe: true)

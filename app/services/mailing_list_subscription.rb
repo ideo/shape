@@ -4,7 +4,7 @@ class MailingListSubscription < SimpleService
   # this is for marking the Shape mailchimp "interest" value
   SHAPE_ID = '9a0c2fe37c'.freeze
 
-  delegate :current_organization, to: :@user
+  delegate :organizations, to: :@user
 
   def initialize(user:, subscribe:)
     @user = user
@@ -12,7 +12,7 @@ class MailingListSubscription < SimpleService
   end
 
   def call
-    return if network_mailing_list.blank? || current_network_organization.blank?
+    return if network_mailing_list.blank? || network_organization_ids.blank?
     if @subscribe
       subscribe
     else
@@ -22,8 +22,8 @@ class MailingListSubscription < SimpleService
 
   private
 
-  def current_network_organization
-    current_organization&.network_organization
+  def network_organization_ids
+    organizations.map { |org| org.network_organization&.id }.compact
   end
 
   def network_mailing_list
@@ -35,7 +35,7 @@ class MailingListSubscription < SimpleService
   def subscribe
     NetworkApi::MailingListMembership.create(
       mailing_list_id: network_mailing_list.id,
-      organization_id: current_network_organization.id,
+      organization_ids: network_organization_ids,
       user_uid: @user.uid,
     )
   end
@@ -43,7 +43,6 @@ class MailingListSubscription < SimpleService
   def unsubscribe
     membership = NetworkApi::MailingListMembership.where(
       mailing_list_id: network_mailing_list.id,
-      organization_id: current_network_organization.id,
       user_uid: @user.uid,
     ).first
     membership.destroy if membership.present?
