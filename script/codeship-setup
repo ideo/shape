@@ -9,11 +9,15 @@ source ~/.bash_profile
 source $HOME/bin/jdk/jdk_switcher
 jdk_switcher home oraclejdk8
 jdk_switcher use oraclejdk8
+
 # Start up ElasticSearch Version 6.2.0 on port 9333 (so it doesn't conflict with default)
 export ELASTICSEARCH_VERSION=6.2.0
 export ELASTICSEARCH_PORT=9333
 \curl -sSL https://raw.githubusercontent.com/codeship/scripts/master/packages/elasticsearch.sh | bash -s
+
 # Setup nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" 
 nvm install $(cat .nvmrc)
 nvm use $(cat .nvmrc)
 nvm alias default $(cat .nvmrc)
