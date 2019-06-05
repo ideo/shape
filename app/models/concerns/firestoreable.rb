@@ -18,6 +18,7 @@ module Firestoreable
     'Item::DataItem': SerializableSimpleItem,
     'Item::LegendItem': SerializableLegendItem,
     'Collection::Global': SerializableSimpleCollection,
+    'Collection::Board': SerializableSimpleCollection,
     'Collection::UserCollection': SerializableSimpleCollection,
     'Collection::SharedWithMeCollection': SerializableSimpleCollection,
     'Collection::TestCollection': SerializableSimpleCollection,
@@ -27,6 +28,7 @@ module Firestoreable
     'Collection::UserProfile': SerializableSimpleCollection,
     'CollectionCard::Primary': SerializableCollectionCard,
     'CollectionCard::Link': SerializableCollectionCard,
+    'Group::Global': SerializableSimpleGroup,
   }.freeze
 
   included do
