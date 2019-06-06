@@ -131,7 +131,14 @@ class CollectionGrid extends React.Component {
     if (bctOpen) {
       // make the BCT appear to the right of the current card
       let { order } = blankContentToolState
-      const { height, replacingId, blankType, width } = blankContentToolState
+      const {
+        height,
+        replacingId,
+        blankType,
+        width,
+        row,
+        col,
+      } = blankContentToolState
       if (replacingId) {
         // remove the card being replaced from our current state cards
         _.remove(cards, { id: replacingId })
@@ -140,14 +147,19 @@ class CollectionGrid extends React.Component {
         // so we have to bump it back by 0.5 so it isn't == with the next card
         order -= 0.5
       }
+      const blankAttrs = {
+        width,
+        height,
+        order,
+        row,
+        col,
+      }
       let blankCard = {
+        ...blankAttrs,
         id: 'blank',
         num: 0,
         cardType: 'blank',
         blankType,
-        width,
-        height,
-        order,
       }
       // If we already have a BCT open, find it in our cards
       const blankFound = _.find(this.state.cards, { cardType: 'blank' })
@@ -158,7 +170,7 @@ class CollectionGrid extends React.Component {
         blankFound.num += 1
         blankFound.id = `blank-${blankFound.num}`
         // Increments order from existing BCT order
-        blankCard = { ...blankFound, order, width, height }
+        blankCard = { ...blankFound, ...blankAttrs }
       }
       if (canEditCollection || blankCard.blankType) {
         // Add the BCT to the array of cards to be positioned, if they can edit
@@ -670,8 +682,14 @@ class CollectionGrid extends React.Component {
         const maxGap = _.find(gaps, g => g.length >= cardWidth) || {
           length: 0,
         }
+        const hotspotPositionedBCT =
+          card.cardType === 'blank' && (card.col || card.row)
+
         if (maxGap && maxGap.length) {
           ;[nextX] = maxGap
+          itFits = true
+        } else if (hotspotPositionedBCT) {
+          // in this case BCT was absolutely positioned by clicking a Hotspot, we know it fits
           itFits = true
         } else {
           // 2-COLUMN SPECIAL CASE FOR TEXT CARD:
@@ -755,6 +773,10 @@ class CollectionGrid extends React.Component {
           position = {
             x: nextX,
             y: row,
+          }
+          if (hotspotPositionedBCT) {
+            position.x = card.col
+            position.y = card.row
           }
           // add position attrs to card
           position = this.calculateGridPosition({
