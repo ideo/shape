@@ -1,25 +1,21 @@
 import PropTypes from 'prop-types'
 import { VictoryLabel } from 'victory'
 
-import Tooltip from '~/ui/global/Tooltip'
+import TickWrapper from '~/ui/global/charts/TickWrapper'
 import v from '~/utils/variables'
 
 const Tick = props => {
   const emoji = props.emojiScale[props.index]
   if (!emoji) return <div />
-  const fontSize = parseInt((emoji.scale || 1) * 24)
+  const { scale, name } = emoji
+  const fontSize = parseInt((scale || 1) * 24)
   return (
-    <Tooltip
-      classes={{ tooltip: 'Tooltip' }}
-      title={emoji.name}
-      placement="top"
-      open={props.isHovered}
-    >
+    <TickWrapper title={name}>
       <VictoryLabel
         {...props}
         style={{ fill: v.colors.tertiaryMedium, fontSize }}
       />
-    </Tooltip>
+    </TickWrapper>
   )
 }
 
