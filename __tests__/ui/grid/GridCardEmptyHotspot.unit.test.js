@@ -11,6 +11,10 @@ describe('GridCardEmptyHotspot', () => {
       width: 1,
       height: 1,
       order: 5,
+      position: {
+        x: 1,
+        y: 2,
+      },
     }
 
     uiStore = fakeUiStore
@@ -40,6 +44,8 @@ describe('GridCardEmptyHotspot', () => {
     component.onClickHotspot()
     expect(uiStore.openBlankContentTool).toHaveBeenCalledWith({
       order: props.card.order,
+      col: props.card.position.x,
+      row: props.card.position.y,
     })
   })
 })
