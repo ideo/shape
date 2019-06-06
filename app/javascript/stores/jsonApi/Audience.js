@@ -34,6 +34,9 @@ class Audience extends BaseRecord {
     return this.currentTestAudience.sample_size
   }
 
+  // @computed
+  // get
+
   async API_create() {
     const { uiStore } = this
 

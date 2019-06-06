@@ -6,6 +6,7 @@
     "price_per_response": { "type": ["number", "null"] },
     "test_collection_id": { "type": "number" },
     "num_survey_responses": { "type": "number" },
-    "status": { "type": "string" }
+    "status": { "type": "string" },
+    "created_at": { "type": "string" }
   }
 }

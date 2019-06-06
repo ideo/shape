@@ -95,12 +95,19 @@ class AudienceSettingsWidget extends React.Component {
   defaultAudiences() {
     const { audiences } = this.props
     const defaultAudiences = filter(audiences, a => a.global)
+    console.log({ defaultAudiences })
     return sortBy(defaultAudiences, a => a.price_per_response)
   }
 
   organizationAudiences() {
     const { audiences } = this.props
     const orgAudiences = reject(audiences, a => a.global)
+    // need to limit this to 6 audiences AT FIRST
+    // What does "at first" mean?
+    console.log(orgAudiences.map(audience => `${audience.name}`))
+    console.log(
+      orgAudiences.map(audience => `${audience.currentTestAudience.createdAt}`)
+    )
     return sortBy(orgAudiences, a => a.name)
   }
 

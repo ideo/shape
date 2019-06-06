@@ -34,6 +34,11 @@ class Api::V1::AudiencesController < Api::V1::BaseController
                  .order(price_per_response: :asc)
   end
 
+  def load_recent_org_audiences
+    # Fetch the last 4 most recently used audiences for this org
+    # If none have been used, return the first 4 alphabetically
+  end
+
   def authorize_current_organization
     authorize! :read, current_organization
   end
