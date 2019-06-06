@@ -107,7 +107,10 @@ class TestAudience < ApplicationRecord
       unit_amount: price_per_response.to_f,
     )
     self.network_payment_id = payment.id
-    return payment if payment.status == 'succeeded'
+    if payment.status == 'succeeded'
+      Accounting.record_payment(payment: payment, test_audience: self)
+      return payment
+    end
 
     errors.add(:base, "Payment failed: #{payment.errors.full_messages.join('. ')}")
     throw :abort

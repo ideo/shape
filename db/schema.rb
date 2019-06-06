@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190604040111) do
+ActiveRecord::Schema.define(version: 20190605235936) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -204,7 +204,6 @@ ActiveRecord::Schema.define(version: 20190604040111) do
 
   create_table "datasets", force: :cascade do |t|
     t.string "type"
-    t.string "identifier"
     t.string "measure"
     t.string "question_type"
     t.string "url"
@@ -221,8 +220,73 @@ ActiveRecord::Schema.define(version: 20190604040111) do
     t.datetime "updated_at", null: false
     t.text "description"
     t.jsonb "groupings", default: []
+    t.string "identifier"
     t.index ["data_source_type", "data_source_id"], name: "index_datasets_on_data_source_type_and_data_source_id"
     t.index ["organization_id"], name: "index_datasets_on_organization_id"
+  end
+
+  create_table "double_entry_account_balances", force: :cascade do |t|
+    t.string "account", limit: 31, null: false
+    t.string "scope", limit: 23
+    t.integer "balance", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account"], name: "index_account_balances_on_account"
+    t.index ["scope", "account"], name: "index_account_balances_on_scope_and_account", unique: true
+  end
+
+  create_table "double_entry_line_aggregates", force: :cascade do |t|
+    t.string "function", limit: 15, null: false
+    t.string "account", limit: 31, null: false
+    t.string "code", limit: 47
+    t.string "scope", limit: 23
+    t.integer "year"
+    t.integer "month"
+    t.integer "week"
+    t.integer "day"
+    t.integer "hour"
+    t.integer "amount", null: false
+    t.string "filter"
+    t.string "range_type", limit: 15, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["function", "account", "code", "year", "month", "week", "day"], name: "line_aggregate_idx"
+  end
+
+  create_table "double_entry_line_checks", force: :cascade do |t|
+    t.integer "last_line_id", null: false
+    t.boolean "errors_found", null: false
+    t.text "log"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "double_entry_line_metadata", force: :cascade do |t|
+    t.integer "line_id", null: false
+    t.string "key", limit: 48, null: false
+    t.string "value", limit: 64, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["line_id", "key", "value"], name: "lines_meta_line_id_key_value_idx"
+  end
+
+  create_table "double_entry_lines", force: :cascade do |t|
+    t.string "account", limit: 31, null: false
+    t.string "scope", limit: 23
+    t.string "code", limit: 47, null: false
+    t.integer "amount", null: false
+    t.integer "balance", null: false
+    t.integer "partner_id"
+    t.string "partner_account", limit: 31, null: false
+    t.string "partner_scope", limit: 23
+    t.integer "detail_id"
+    t.string "detail_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account", "code", "created_at"], name: "lines_account_code_created_at_idx"
+    t.index ["account", "created_at"], name: "lines_account_created_at_idx"
+    t.index ["scope", "account", "created_at"], name: "lines_scope_account_created_at_idx"
+    t.index ["scope", "account", "id"], name: "lines_scope_account_id_idx"
   end
 
   create_table "external_records", force: :cascade do |t|
