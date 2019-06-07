@@ -49,7 +49,8 @@ class AdminAudienceModal extends React.Component {
   renderCriteria() {
     const { audience } = this.props
     const criteria = audience.tag_list
-    criteria.map(criteria => {
+    console.log('audience criteria: ', criteria)
+    return criteria.map(criteria => {
       return this.renderCriteriaRow(criteria)
     })
   }
