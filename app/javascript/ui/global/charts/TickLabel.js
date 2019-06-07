@@ -37,8 +37,8 @@ class TickLabel extends React.Component {
             <rect
               x={0}
               y={labelBoxY}
-              rx={4}
-              ry={4}
+              rx={1.5}
+              ry={1.5}
               width={labelBoxWidth}
               height={15}
               fill={v.colors.black}
