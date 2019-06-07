@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import { Flex } from 'reflexbox'
+import { Flex, Box } from 'reflexbox'
 
 import Modal from '~/ui/global/modals/Modal'
 import { FieldContainer, Label, TextField } from '~/ui/global/styled/forms'
@@ -24,23 +24,42 @@ SelectedOption.displayName = 'SelectedOption'
 @inject('apiStore', 'uiStore')
 @observer
 class AdminAudienceModal extends React.Component {
-  componentDidMount() {
-    // Fetch a single audience?
-    // Or is that already available from initial page load / props
+  handleClose = () => {
+    const { uiStore } = this.props
+    console.log('handle close')
+    uiStore.update('adminAudienceMenuOpen', null)
   }
 
-  handleClose = async ev => {
-    const { uiStore, open } = this.props
-    if (open) {
-      uiStore.closeAdminUsersMenu()
-    }
+  renderCriteriaRow(criteria) {
+    return (
+      <FieldContainer>
+        <SelectedOptionsWrapper wrap>
+          <SelectedOption key={`selected_${criteria}`}>
+            {criteria}
+          </SelectedOption>
+        </SelectedOptionsWrapper>
+        <HorizontalDivider
+          color={v.colors.commonMedium}
+          style={{ borderWidth: '0 0 1px 0', marginBlockStart: 0 }}
+        />
+      </FieldContainer>
+    )
+  }
+
+  renderCriteria() {
+    const { audience } = this.props
+    const criteria = audience.tag_list
+    criteria.map(criteria => {
+      return this.renderCriteriaRow(criteria)
+    })
   }
 
   render() {
     const { audience, open } = this.props
+    console.log('open: ', open)
+    if (!open) return null
+
     const title = `${audience.name} Definition`
-    // const { criteria } = audience
-    const criteria = ['vegans', 'chocolate lovers']
 
     return (
       <Modal title={title} onClose={this.handleClose} open={open} noScroll>
@@ -56,21 +75,10 @@ class AdminAudienceModal extends React.Component {
               disabled
             />
           </FieldContainer>
-          <FieldContainer>
-            <Label htmlFor="audienceCriteria">Targeting Criteria</Label>
-            <SelectedOptionsWrapper wrap>
-              {criteria.map((option, index) => (
-                // Need to split out the criteria by category, e.g., country, age, etc.
-                <SelectedOption key={`selected_${option}`}>
-                  Option {index}
-                </SelectedOption>
-              ))}
-            </SelectedOptionsWrapper>
-            <HorizontalDivider
-              color={v.colors.commonMedium}
-              style={{ borderWidth: '0 0 1px 0', marginBlockStart: 0 }}
-            />
-          </FieldContainer>
+          <Box mb={2}>
+            <Label>Targeting Criteria</Label>
+          </Box>
+          {this.renderCriteria()}
         </React.Fragment>
       </Modal>
     )

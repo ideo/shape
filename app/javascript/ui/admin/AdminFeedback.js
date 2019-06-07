@@ -96,6 +96,7 @@ class AdminFeedback extends React.Component {
     testCollections: [],
     currentPage: 1,
     totalPages: 1,
+    selectedAudience: null,
   }
 
   componentDidMount() {
@@ -120,6 +121,9 @@ class AdminFeedback extends React.Component {
   }
 
   renderTestCollections() {
+    const { uiStore } = this.props
+    console.log(uiStore.adminAudienceMenuOpen)
+
     return this.state.testCollections.map(testCollection => (
       <React.Fragment key={testCollection.id}>
         <FeedbackRow container>
@@ -166,13 +170,12 @@ class AdminFeedback extends React.Component {
                         title={'view audience definition'}
                         placement="top"
                       >
-                        <CircledIcon>
+                        <CircledIcon
+                          onClick={() =>
+                            this.showAdminAudienceDialog(testAudience.audience)
+                          }
+                        >
                           <InfoNoCircleIcon />
-                          <AdminAudienceModal
-                            // may need to pass both test audience and regular audience?
-                            audience={testAudience.audience}
-                            open={open}
-                          />
                         </CircledIcon>
                       </Tooltip>
                     </AudienceActions>
@@ -199,8 +202,9 @@ class AdminFeedback extends React.Component {
     ))
   }
 
-  showAdminAudienceDialog = () => {
+  showAdminAudienceDialog = audience => {
     const { uiStore } = this.props
+    this.setState({ selectedAudience: audience })
     uiStore.update('adminAudienceMenuOpen', true)
   }
 
@@ -208,9 +212,14 @@ class AdminFeedback extends React.Component {
     const { currentPage, totalPages } = this.state
     const previousPageDisabled = currentPage === 1
     const nextPageDisabled = currentPage === totalPages
+    const { uiStore } = this.props
 
     return (
       <Wrapper>
+        <AdminAudienceModal
+          audience={this.state.selectedAudience}
+          open={uiStore.adminAudienceMenuOpen}
+        />
         <Heading1>Feedback</Heading1>
         <Section>
           <Box mb={40}>
