@@ -25,6 +25,17 @@ class DataItemsDataset < ApplicationRecord
   scope :ordered, -> { order(order: :asc) }
   scope :selected, -> { where(selected: true) }
 
+  amoeba do
+    enable
+
+    exclude_association :data_item
+
+    customize(lambda { |orig_data_items_dataset, dup_data_items_dataset|
+      new_dataset = orig_data_items_dataset.dataset.amoeba_dup
+      dup_data_items_dataset.dataset = new_dataset
+    })
+  end
+
   private
 
   def set_order
