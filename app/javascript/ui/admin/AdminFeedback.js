@@ -21,6 +21,7 @@ import * as colors from '~shared/styles/constants/colors'
 
 const Wrapper = styled.div`
   font-family: ${v.fonts.sans};
+  min-width: 1316px; // allow horizontal scrolling for grid layout
 `
 
 const SubHeading = styled.div`
