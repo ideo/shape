@@ -3,7 +3,6 @@ import styled from 'styled-components'
 import v from '~/utils/variables'
 
 const StyledSvgText = styled.svg`
-  font-size: 8px;
   visibility: hidden;
   :hover {
     visibility: visible;
@@ -13,7 +12,7 @@ const StyledSvgText = styled.svg`
 class TickLabel extends React.Component {
   render() {
     const { title, x, y } = this.props
-    const originX = x - 50 // shift collision box to the left of the emoji
+    const originX = x - 50 // shift collision box to the left to wrap around the emoji
     const originY = y
     const labelBoxWidth = 100
     const labelBoxY = 30
@@ -66,10 +65,6 @@ TickLabel.propTypes = {
   title: PropTypes.string.isRequired,
   x: PropTypes.number.isRequired,
   y: PropTypes.number.isRequired,
-}
-
-TickLabel.defaultProps = {
-  dy: 0,
 }
 
 export default TickLabel
