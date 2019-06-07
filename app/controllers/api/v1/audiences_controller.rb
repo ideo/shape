@@ -28,9 +28,7 @@ class Api::V1::AudiencesController < Api::V1::BaseController
 
   def load_org_audiences
     @audiences = Audience
-                 .includes(:organizations)
-                 .where(organizations: { id: nil })
-                 .or(Audience.includes(:organizations).where(organizations: { id: @organization.id }))
+                 .viewable_by_org(@organization)
                  .order(price_per_response: :asc)
   end
 

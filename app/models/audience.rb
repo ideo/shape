@@ -4,10 +4,15 @@
 #
 #  id                 :bigint(8)        not null, primary key
 #  criteria           :string
+#  global_default     :integer
 #  name               :string
 #  price_per_response :decimal(10, 2)   default(0.0)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
+#
+# Indexes
+#
+#  index_audiences_on_global_default  (global_default)
 #
 
 class Audience < ApplicationRecord
@@ -30,6 +35,32 @@ class Audience < ApplicationRecord
            :can_view?,
            to: :organization,
            allow_nil: true
+
+  def self.global_defaults
+    where.not(global_default: nil).order(global_default: :asc)
+  end
+
+  def self.viewable_by_org(organization)
+    # find global or org-connected audiences
+    includes(:organizations)
+      .where(organizations: { id: nil })
+      .or(Audience.includes(:organizations).where(organizations: { id: organization.id }))
+  end
+
+  def self.default_for_user(user:, organization:)
+    viewable_by_org(organization)
+      .joins(%(
+        LEFT JOIN test_audiences ON test_audiences.audience_id = audiences.id
+        AND test_audiences.launched_by_id = #{user.id}
+      ))
+      .group('audiences.id', 'organizations.id')
+      .select('audiences.*, MAX(test_audiences.updated_at)')
+      .order(%(
+        audiences.global_default ASC NULLS LAST,
+        MAX(test_audiences.updated_at) DESC NULLS LAST,
+        audiences.name ASC
+      ))
+  end
 
   def link_sharing?
     # NOTE: for now this logic should suffice, however we could eventually change it
