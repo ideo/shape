@@ -31,6 +31,7 @@ class TestAudience < ApplicationRecord
              touch: true
   belongs_to :launched_by, class_name: 'User', optional: true
   has_many :survey_responses
+  has_many :payments, as: :purchasable
 
   delegate :name,
            :link_sharing?,
@@ -48,8 +49,10 @@ class TestAudience < ApplicationRecord
 
   delegate :number_to_currency, to: 'ActionController::Base.helpers'
 
+  PAYMENT_WAITING_PERIOD = 1.week
+
   # this will only get set in PurchaseTestAudience
-  attr_writer :payment_method
+  attr_writer :network_payment_method
 
   scope :link_sharing, -> { where(price_per_response: 0) }
   scope :paid, -> { where('price_per_response > 0') }
@@ -88,36 +91,28 @@ class TestAudience < ApplicationRecord
     sample_size * price_per_response
   end
 
-  def network_payment
-    return if network_payment_id.blank?
-    @network_payment ||= NetworkApi::Payment.find(network_payment_id)
-  end
-
   private
 
   # This callback only gets called when using PurchaseTestAudience and setting payment_method
   def purchase
     return unless valid?
 
-    payment = NetworkApi::Payment.create(
-      payment_method_id: @payment_method.id,
+    payment = payments.create(
+      network_payment_method_id: @network_payment_method.id,
       description: description,
       amount: total_price.to_f,
       quantity: sample_size,
       unit_amount: price_per_response.to_f,
     )
-    self.network_payment_id = payment.id
-    if payment.status == 'succeeded'
-      Accounting.record_payment(payment: payment, test_audience: self)
-      return payment
-    end
+
+    return if payment.persisted?
 
     errors.add(:base, "Payment failed: #{payment.errors.full_messages.join('. ')}")
     throw :abort
   end
 
   def requires_payment?
-    @payment_method.present? && total_price.positive?
+    @network_payment_method.present? && total_price.positive?
   end
 
   def set_price_per_response_from_audience

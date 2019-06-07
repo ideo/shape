@@ -3,6 +3,7 @@ require 'rails_helper'
 describe SurveyResponseCompletion, type: :service do
   let(:test_collection) { create(:test_collection, :with_test_audience, test_status: :live) }
   let(:survey_response) { create(:survey_response, test_collection: test_collection) }
+  let(:test_audience) { survey_response.test_audience }
   let(:service) { SurveyResponseCompletion.new(survey_response) }
   let(:payment_method_double) { double(id: SecureRandom.hex(10)) }
   let(:network_payment_double) { double(id: 5, status: 'succeeded') }
@@ -28,18 +29,24 @@ describe SurveyResponseCompletion, type: :service do
         survey_response.update(user: user)
       end
 
-      it 'will only create one feedback_incentive_record per survey_response' do
-        expect do
-          service.call
-        end.to change(FeedbackIncentiveRecord, :count).by 1
+      it 'will only mark amount owed once' do
+        service.call
+        expect(survey_response.payout_owed_amount.to_f).to eq(test_audience.price_per_response)
+
         # call it again
-        expect do
-          service.call
-        end.not_to change(FeedbackIncentiveRecord, :count)
+        service.call
+        expect(
+          survey_response.reload.payout_owed_amount.to_f,
+        ).to eq(test_audience.price_per_response)
+
+        expect(
+          survey_response.user.payout_owed_account_balance.to_f,
+        ).to eq(test_audience.price_per_response)
       end
 
       context 'with an existing balance' do
-        let!(:feedback_incentive_record) { create(:feedback_incentive_record, user: user, current_balance: 25.00) }
+        let(:test_collection) { create(:test_collection, :with_test_audience, test_status: :live) }
+        let(:survey_response) { create(:survey_response, test_collection: test_collection, user: user) }
 
         it 'calculates the correct balance' do
           expect(user.current_incentive_balance).to eq 25.00
@@ -52,20 +59,20 @@ describe SurveyResponseCompletion, type: :service do
     context 'without test audience' do
       let(:test_collection) { create(:test_collection) }
 
-      it 'does not create feedback_incentive_records' do
+      it 'does not create accounting lines' do
         expect do
           service.call
-        end.not_to change(FeedbackIncentiveRecord, :count)
+        end.not_to change(DoubleEntry::Line, :count)
       end
     end
 
     context 'with link sharing' do
       let(:test_collection) { create(:test_collection, :with_link_sharing) }
 
-      it 'does not create feedback_incentive_records' do
+      it 'does not create accounting lines' do
         expect do
           service.call
-        end.not_to change(FeedbackIncentiveRecord, :count)
+        end.not_to change(DoubleEntry::Line, :count)
       end
     end
   end

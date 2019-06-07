@@ -72,7 +72,7 @@ class PurchaseTestAudience
         sample_size: sample_size,
         audience: audience,
         launched_by: user,
-        payment_method: payment_method,
+        network_payment_method: payment_method,
       )
 
     rescue ActiveRecord::RecordNotFound

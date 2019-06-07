@@ -28,14 +28,35 @@ class SurveyResponse < ApplicationRecord
 
   before_save :mark_as_completed, if: :mark_as_completed?
 
-  delegate :question_items, to: :test_collection
-  delegate :answerable_complete_question_items, to: :test_collection
+  delegate :question_items, :answerable_complete_question_items,
+           to: :test_collection
+
+  delegate :payout_owed_account_balance,
+           :payout_paid_account_balance,
+           to: :user
 
   enum status: {
     in_progress: 0,
     completed: 1,
     completed_late: 2,
   }
+
+  def record_payout_owed!
+    return if amount_earned.zero? || payout_owed_account_balance.positive?
+    Accounting.record_payout_owed(self)
+    payout_owed_account_balance
+  end
+
+  def record_payout_paid!
+    return if amount_earned.zero? || payout_paid_account_balance.positive?
+    Accounting.record_payout_paid(self)
+    payout_paid_account_balance
+  end
+
+  def amount_earned
+    return 0 if !completed? || test_audience.blank?
+    test_audience.price_per_response
+  end
 
   def all_questions_answered?
     # nil case should only happen in test env (test_design is not created)

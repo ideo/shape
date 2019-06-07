@@ -32,11 +32,7 @@ class SurveyResponseCompletion < SimpleService
     # TODO: do we want this service to validate if the user has a duplicate response for the same TestCollection?
     # e.g.
     # return if SurveyResponse.find_by(user: user, test_collection: @survey_response.test_collection)
-    @survey_response.create_feedback_incentive_record(
-      user: user,
-      amount: Shape::FEEDBACK_INCENTIVE_AMOUNT,
-      current_balance: user.current_incentive_balance + Shape::FEEDBACK_INCENTIVE_AMOUNT,
-    )
+    @survey_response.record_payout_owed!
   end
 
   def ping_collection
