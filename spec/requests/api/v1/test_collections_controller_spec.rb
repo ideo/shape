@@ -169,4 +169,16 @@ describe Api::V1::TestCollectionsController, type: :request, json: true, auth: t
       end
     end
   end
+
+  describe 'GET #csv_report' do
+    let!(:collection) { create(:test_collection, test_status: :live, add_editors: [user]) }
+    let(:path) do
+      csv_report_api_v1_test_collection_path(collection)
+    end
+
+    it 'should call TestCollectionToCsv to generate report' do
+      expect(TestCollectionToCsv).to receive(:call).with(collection)
+      get(path)
+    end
+  end
 end
