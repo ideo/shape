@@ -11,7 +11,16 @@
 #
 
 class Audience < ApplicationRecord
-  acts_as_taggable
+  acts_as_taggable_on(
+    :ages,
+    :children_ages,
+    :countries,
+    :education_levels,
+    :genders,
+    :adopter_types,
+    :interests,
+    :publications
+  )
 
   has_many :audience_organizations, dependent: :destroy
   has_many :organizations, through: :audience_organizations
@@ -26,5 +35,10 @@ class Audience < ApplicationRecord
     # NOTE: for now this logic should suffice, however we could eventually change it
     # to be more explicit, like a bool field on the model
     price_per_response.blank? || price_per_response.zero?
+  end
+
+  def all_tags
+    # should we have this as a constant AND as a
+    # convenience wrapper to access all at once as a hash of arrays?
   end
 end

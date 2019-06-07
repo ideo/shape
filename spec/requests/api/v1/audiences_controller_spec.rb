@@ -38,7 +38,7 @@ describe Api::V1::AudiencesController, type: :request, json: true, create_org: t
       json_api_params(
         'audiences',
         name: 'Anyone',
-        tag_list: 'one, two, three',
+        interest_list: %w(Pets Commuter Athlete),
       )
     end
 
@@ -65,7 +65,7 @@ describe Api::V1::AudiencesController, type: :request, json: true, create_org: t
 
         audience = Audience.last
         expect(audience.name).to eq('Anyone')
-        expect(audience.tag_list.size).to eq(3)
+        expect(audience.interest_list.size).to eq(3)
         expect(audience.organizations).to include(user.current_organization)
         expect(audience.price_per_response).to eq(Shape::TARGETED_AUDIENCE_PRICE_PER_RESPONSE)
       end

@@ -40,7 +40,6 @@ describe('AddAudienceModal', () => {
     const genX = 'Age Gen X (born 1965-1980)'
     wrapper.find(`StyledCheckboxSelectOption[value="${genX}"]`)
     ageMenu.simulate('change', { target: { value: [genX] } })
-
     submitButton = wrapper.find('StyledFormButton')
     expect(submitButton.props()['disabled']).toBeFalsy()
   })
@@ -62,7 +61,7 @@ describe('AddAudienceModal', () => {
     const ageMenu = wrapper.find('StyledSelect')
     expect(ageMenu.exists()).toBeTruthy()
 
-    const genX = 'Age Gen X (born 1965-1980)'
+    const genX = 'Gen X (born 1965-1980)'
     const genXOption = wrapper.find(
       `StyledCheckboxSelectOption[value="${genX}"]`
     )
