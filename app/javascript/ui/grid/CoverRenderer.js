@@ -104,6 +104,7 @@ class CoverRenderer extends React.Component {
           height={card.maxHeight}
           collection={record}
           dragging={dragging}
+          searchResult={searchResult}
           inSubmissionsCollection={
             card.parentCollection &&
             card.parentCollection.isSubmissionsCollection
