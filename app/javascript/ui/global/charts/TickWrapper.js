@@ -18,7 +18,7 @@ class TickWrapper extends React.Component {
     return _children.map(child => {
       const { props } = child
       const { x, y } = props
-      return <TickLabel key={title} title={title} x={x} y={y} dx={-20} />
+      return <TickLabel key={title} title={title} x={x} y={y} />
     })
   }
 

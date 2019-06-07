@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import v from '~/utils/variables'
 
 const StyledSvgText = styled.svg`
-  font-size: 0.5em;
+  font-size: 8px;
   visibility: hidden;
   :hover {
     visibility: visible;
@@ -11,12 +12,51 @@ const StyledSvgText = styled.svg`
 
 class TickLabel extends React.Component {
   render() {
-    const { title, x, y, dx, dy } = this.props
+    const { title, x, y } = this.props
+    const originX = x - 50 // shift collision box to the left of the emoji
+    const originY = y
+    const labelBoxWidth = 100
+    const labelBoxY = 30
     return (
-      <StyledSvgText>
-        <text x={x} y={y} dx={dx} dy={dy}>
-          {title}
-        </text>
+      <StyledSvgText
+        x={originX}
+        y={originY}
+        viewBox="0 0 120 140"
+        width="120"
+        height="140"
+      >
+        <g>
+          <g>
+            <rect
+              x={0}
+              y={0}
+              width={labelBoxWidth}
+              height={70}
+              fill="#dddddd"
+              fillOpacity={0}
+            />
+            <rect
+              x={0}
+              y={labelBoxY}
+              rx={4}
+              ry={4}
+              width={labelBoxWidth}
+              height={15}
+              fill={v.colors.black}
+              opacity={0.8}
+            />
+            <text
+              x={labelBoxWidth / 2}
+              textAnchor="middle"
+              y={labelBoxY + 10}
+              fontSize={8}
+              fontFamily={v.fonts.sans}
+              fill={v.colors.white}
+            >
+              {title}
+            </text>
+          </g>
+        </g>
       </StyledSvgText>
     )
   }
@@ -26,8 +66,6 @@ TickLabel.propTypes = {
   title: PropTypes.string.isRequired,
   x: PropTypes.number.isRequired,
   y: PropTypes.number.isRequired,
-  dx: PropTypes.number.isRequired,
-  dy: PropTypes.number,
 }
 
 TickLabel.defaultProps = {
