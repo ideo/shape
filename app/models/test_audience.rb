@@ -49,14 +49,14 @@ class TestAudience < ApplicationRecord
 
   delegate :number_to_currency, to: 'ActionController::Base.helpers'
 
-  PAYMENT_WAITING_PERIOD = 1.week
-
   # this will only get set in PurchaseTestAudience
   attr_writer :network_payment_method
 
   scope :link_sharing, -> { where(price_per_response: 0) }
   scope :paid, -> { where('price_per_response > 0') }
   scope :ordered_last_closed_at, -> { order(closed_at: :desc) }
+
+  PAYMENT_WAITING_PERIOD = 1.week
 
   enum status: {
     open: 0,
@@ -65,6 +65,10 @@ class TestAudience < ApplicationRecord
 
   def self.display_name
     'Audience'
+  end
+
+  def paid?
+    price_per_response > 0
   end
 
   def survey_response_completed!

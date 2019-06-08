@@ -116,8 +116,8 @@ class User < ApplicationRecord
   after_save :update_profile_names, if: :saved_change_to_name?
   after_save :update_mailing_list_subscription, if: :saved_change_to_mailing_list?
 
-  delegate :balance, to: :payout_owed_account, prefix: true
-  delegate :balance, to: :payout_paid_account, prefix: true
+  delegate :balance, to: :incentive_owed_account, prefix: true
+  delegate :balance, to: :incentive_paid_account, prefix: true
 
   def saved_change_to_name?
     saved_change_to_first_name? || saved_change_to_last_name?
@@ -439,17 +439,17 @@ class User < ApplicationRecord
     nil
   end
 
-  def payout_owed_account
+  def incentive_owed_account
     DoubleEntry.account(:individual_owed, scope: self)
   end
 
-  def payout_paid_account
+  def incentive_paid_account
     DoubleEntry.account(:individual_paid, scope: self)
   end
 
   def incentive_due_date
     return if payout_owed_account_balance.zero?
-    lines = Accounting.lines_for_account(payout_owed_account, code: :payout_owed, order: :desc)
+    lines = Accounting::Query.lines_for_account(payout_owed_account, code: :payout_owed, order: :desc)
     first_line_owed = nil
     # Iterate through lines to find when the balance was last zero
     lines.each do |line|

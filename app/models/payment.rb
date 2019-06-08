@@ -72,6 +72,6 @@ class Payment < ApplicationRecord
   end
 
   def record_payment
-    Accounting.record_payment(self)
+    Accounting::RecordTransfer.payment_received(self)
   end
 end

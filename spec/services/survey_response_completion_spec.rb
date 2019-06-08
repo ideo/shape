@@ -29,6 +29,13 @@ describe SurveyResponseCompletion, type: :service do
         survey_response.update(user: user)
       end
 
+      it 'updates survey response payment status' do
+        expect {
+          service.call
+        }.to change(survey_response, :payment_status)
+        expect(survey_response.payment_status).to eq('payment_owed')
+      end
+
       it 'will only mark amount owed once' do
         service.call
         expect(survey_response.payout_owed_amount.to_f).to eq(test_audience.price_per_response)
@@ -58,6 +65,12 @@ describe SurveyResponseCompletion, type: :service do
 
     context 'without test audience' do
       let(:test_collection) { create(:test_collection) }
+
+      it 'does not update survey response payment_status' do
+        expect do
+          service.call
+        end.not_to change(survey_response, :payment_status)
+      end
 
       it 'does not create accounting lines' do
         expect do

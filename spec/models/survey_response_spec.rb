@@ -129,30 +129,37 @@ RSpec.describe SurveyResponse, type: :model do
   end
 
   # Truncation must be used when testing double entry
-  describe '#record_payout_owed!', truncate: true do
+  describe '#record_incentive_owed!', truncate: true do
     let(:user) { create(:user) }
     let!(:test_collection) { create(:test_collection) }
     let(:test_audience) { create(:test_audience, test_collection: test_collection, price_per_response: 4.75) }
     let(:survey_response) { create(:survey_response, user: user, test_audience: test_audience, status: :completed) }
     let(:receivable_account) { DoubleEntry.account(:receivable) }
 
+    it 'updates incentive_status' do
+      expect {
+        survey_response.record_incentive_owed!
+      }.to change(survey_response, :incentive_status)
+      expect(survey_response.incentive_owed?).to be true
+    end
+
     it 'increases individual_owed balance' do
       expect {
-        survey_response.record_payout_owed!
+        survey_response.record_incentive_owed!
       }.to change(user.payout_owed_account, :balance)
       expect(user.payout_owed_account_balance.to_f).to eq(4.75)
     end
 
     it 'decreases receivable balance' do
       expect {
-        survey_response.record_payout_owed!
+        survey_response.record_incentive_owed!
       }.to change(receivable_account, :balance)
       expect(receivable_account.balance.to_f).to eq(-4.75)
     end
   end
 
   # Truncation must be used when testing double entry
-  describe '#record_payout_paid!', truncate: true do
+  describe '#record_incentive_paid!', truncate: true do
     let(:user) { create(:user) }
     let!(:test_collection) { create(:test_collection) }
     let(:test_audience) { create(:test_audience, test_collection: test_collection, price_per_response: 4.75) }
@@ -161,41 +168,48 @@ RSpec.describe SurveyResponse, type: :model do
     let(:revenue_account) { DoubleEntry.account(:revenue) }
 
     before do
-      survey_response.record_payout_owed!
+      survey_response.record_incentive_owed!
+    end
+
+    it 'updates incentive_status' do
+      expect {
+        survey_response.record_incentive_paid!
+      }.to change(survey_response, :incentive_status)
+      expect(survey_response.incentive_paid?).to be true
     end
 
     it 'increases individual_paid balance' do
       expect {
-        survey_response.record_payout_paid!
-      }.to change(user.payout_paid_account, :balance)
-      expect(user.payout_paid_account_balance.to_f).to eq(4.75)
+        survey_response.record_incentive_paid!
+      }.to change(user.incentive_paid_account, :balance)
+      expect(user.incentive_paid_account_balance.to_f).to eq(4.75)
     end
-
 
     it 'decreases individual_owed balance' do
       expect {
-        survey_response.record_payout_paid!
+        survey_response.record_incentive_paid!
       }.to change(user.payout_owed_account, :balance)
       expect(user.payout_owed_account_balance.to_f).to eq(0)
     end
 
     pending 'increases revenue (commission) balance' do
       expect {
-        survey_response.record_payout_paid!
+        survey_response.record_incentive_paid!
       }.to change(revenue_account, :balance)
     end
 
     # Since we are not taking commissions, this won't happen yet
     pending 'decreases receivable balance' do
       expect {
-        survey_response.record_payout_paid!
+        survey_response.record_incentive_paid!
       }.to change(receivable_account, :balance)
       expect(receivable_account.balance.to_f).to eq(-5.25)
     end
   end
 
   describe '#amount_earned' do
-    let(:test_audience) { create(:test_audience, price_per_response: 4.75) }
+    let!(:test_collection) { create(:test_collection) }
+    let(:test_audience) { create(:test_audience, test_collection: test_collection, price_per_response: 4.75) }
     let(:survey_response) { create(:survey_response, test_audience: test_audience, status: :completed) }
 
     it 'returns test audience.price_per_response' do
@@ -204,7 +218,7 @@ RSpec.describe SurveyResponse, type: :model do
 
     context 'if not completed' do
       before do
-        survey_response.update_column(status: SurveyResponse.statuses[:in_progress])
+        survey_response.update_columns(status: SurveyResponse.statuses[:in_progress])
       end
 
       it 'is 0' do

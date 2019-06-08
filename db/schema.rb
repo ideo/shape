@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190607205613) do
+ActiveRecord::Schema.define(version: 20190607215955) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -288,9 +288,9 @@ ActiveRecord::Schema.define(version: 20190607205613) do
     t.bigint "user_id"
     t.bigint "survey_response_id"
     t.decimal "amount", precision: 10, scale: 2
-    t.decimal "current_balance", precision: 10, scale: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.float "current_balance"
     t.index ["survey_response_id"], name: "index_feedback_incentive_records_on_survey_response_id"
     t.index ["user_id"], name: "index_feedback_incentive_records_on_user_id"
   end
@@ -479,6 +479,8 @@ ActiveRecord::Schema.define(version: 20190607205613) do
     t.integer "status", default: 0
     t.bigint "user_id"
     t.bigint "test_audience_id"
+    t.integer "incentive_status"
+    t.index ["incentive_status"], name: "index_survey_responses_on_incentive_status"
     t.index ["session_uid"], name: "index_survey_responses_on_session_uid", unique: true
     t.index ["test_audience_id"], name: "index_survey_responses_on_test_audience_id"
     t.index ["test_collection_id"], name: "index_survey_responses_on_test_collection_id"
