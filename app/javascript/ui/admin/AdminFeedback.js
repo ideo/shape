@@ -13,7 +13,6 @@ import Section from '~shared/components/molecules/Section'
 import v from '~/utils/variables'
 import { CircledIcon } from '~/ui/global/styled/buttons'
 import { Heading1, Heading2, Heading3 } from '~/ui/global/styled/typography'
-import { showOnHoverCss } from '~/ui/grid/shared'
 import Tooltip from '~/ui/global/Tooltip'
 import * as colors from '~shared/styles/constants/colors'
 import InfoNoCircleIcon from '~/ui/icons/InfoNoCircleIcon'
@@ -121,9 +120,6 @@ class AdminFeedback extends React.Component {
   }
 
   renderTestCollections() {
-    const { uiStore } = this.props
-    console.log(uiStore.adminAudienceMenuOpen)
-
     return this.state.testCollections.map(testCollection => (
       <React.Fragment key={testCollection.id}>
         <FeedbackRow container>

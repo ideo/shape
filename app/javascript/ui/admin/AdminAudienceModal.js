@@ -26,7 +26,6 @@ SelectedOption.displayName = 'SelectedOption'
 class AdminAudienceModal extends React.Component {
   handleClose = () => {
     const { uiStore } = this.props
-    console.log('handle close')
     uiStore.update('adminAudienceMenuOpen', null)
   }
 
@@ -49,7 +48,6 @@ class AdminAudienceModal extends React.Component {
   renderCriteria() {
     const { audience } = this.props
     const criteria = audience.tag_list
-    console.log('audience criteria: ', criteria)
     return criteria.map(criteria => {
       return this.renderCriteriaRow(criteria)
     })
@@ -57,7 +55,6 @@ class AdminAudienceModal extends React.Component {
 
   render() {
     const { audience, open } = this.props
-    console.log('open: ', open)
     if (!open) return null
 
     const title = `${audience.name} Definition`
