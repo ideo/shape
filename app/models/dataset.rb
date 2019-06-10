@@ -32,7 +32,7 @@ class Dataset < ApplicationRecord
   belongs_to :organization, optional: true
   belongs_to :data_source, polymorphic: true, optional: true
 
-  has_many :data_items_datasets, dependent: :destroy
+  has_many :data_items_datasets, dependent: :destroy, inverse_of: :dataset
 
   has_many :data_items,
            through: :data_items_datasets,
@@ -61,6 +61,12 @@ class Dataset < ApplicationRecord
     area: 1,
     line: 2,
   }
+
+  amoeba do
+    enable
+    recognize []
+    propagate
+  end
 
   def self.identifier_for_object(object)
     "#{object.class.base_class.name}-#{object.id}"

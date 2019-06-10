@@ -68,7 +68,7 @@ class Item
         text += splitter if i.positive?
         text += t
       end
-      text
+      CGI.unescapeHTML(text)
     end
 
     def threadlocked_transform_realtime_delta(user, data)

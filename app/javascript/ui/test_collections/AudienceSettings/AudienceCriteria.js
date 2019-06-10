@@ -39,7 +39,7 @@ export const criteria = [
   {
     name: 'Gender',
     group: 'Demographics',
-    options: ['Female', 'Male', 'Non-Binary', 'Transexual'],
+    options: ['Female', 'Male', 'All'],
   },
   {
     name: 'Early/Late Adopter',
