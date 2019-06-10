@@ -44,11 +44,14 @@ describe Api::V1::Admin::FeedbackIncentivesController, type: :request, json: tru
       )
     end
 
-    context 'after all have been marked as paid' do
+    it 'marks response as paid' do
+      get(path)
+      expect(survey_response.reload.incentive_paid?).to be true
+    end
+
+    context 'after requesting once' do
       before do
-        SurveyResponse
-          .incentive_owed
-          .each(&:record_incentive_paid!)
+        get(path)
       end
 
       it 'returns empty csv' do
@@ -56,15 +59,6 @@ describe Api::V1::Admin::FeedbackIncentivesController, type: :request, json: tru
         csv = CSV.parse(response.body, headers: true)
         expect(csv.length).to eq(0)
       end
-    end
-  end
-
-  describe 'POST #mark_all_paid' do
-    let(:path) { mark_all_paid_api_v1_admin_feedback_incentives_path }
-
-    it 'updates all responses to status of paid' do
-      post(path)
-      expect(survey_response.reload.incentive_paid?).to be true
     end
   end
 end

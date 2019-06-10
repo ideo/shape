@@ -14,6 +14,12 @@ class ExportPendingIncentives < SimpleService
     end
   end
 
+  def self.mark_as_paid!
+    SurveyResponse
+      .incentive_owed
+      .each(&:record_incentive_paid!)
+  end
+
   private
 
   def csv_header

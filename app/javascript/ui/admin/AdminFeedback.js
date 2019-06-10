@@ -112,30 +112,12 @@ class AdminFeedback extends React.Component {
     })
   }
 
-  handleMarkIncentivesPaid = () => {
-    const success = () => {
-      uiStore.popupSnackbar({
-        message: 'All incentives marked as paid!',
-      })
-    }
-
-    const failure = () => {
-      uiStore.popupSnackbar({
-        message: 'Error - could not mark as paid',
-      })
-    }
-
-    return fetch('/api/v1/admin/feedback_incentives/mark_all_paid', {
-      method: 'POST',
+  handleDownloadFeedbackIncentives = () => {
+    window.location.href = '/api/v1/admin/feedback_incentives.csv'
+    uiStore.popupSnackbar({
+      message: 'All incentives marked as paid!',
     })
-      .then(res => {
-        if (res.status === 200) success()
-        else failure()
-      })
-      .catch(err => {
-        console.log('Error', err)
-        failure()
-      })
+    return false
   }
 
   loadPreviousPage() {
@@ -228,11 +210,8 @@ class AdminFeedback extends React.Component {
               </Box>
             </Grid>
             <Grid item xs={6}>
-              <a href="/api/v1/admin/feedback_incentives.csv">
-                Export Pending Incentives
-              </a>
-              <FormButton onClick={this.handleMarkIncentivesPaid}>
-                Mark Paid
+              <FormButton onClick={this.handleDownloadFeedbackIncentives}>
+                Export Incentives
               </FormButton>
             </Grid>
           </Grid>
