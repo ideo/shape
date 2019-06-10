@@ -73,7 +73,6 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
     params_allowed = [
       :name,
       :domain_whitelist,
-      :handle,
       :deactivated,
       :terms_text_item_id,
       filestack_file_attributes: Group.filestack_file_attributes_whitelist,
