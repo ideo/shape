@@ -76,6 +76,25 @@ Cypress.Commands.add(
   }
 )
 
+Cypress.Commands.add('createItem', itemType => {
+  switch (itemType) {
+    case 'text':
+      cy.selectBctType({ type: 'text' })
+      cy.get('.ql-editor')
+        .first()
+        .type('Testing')
+      cy.locate('TextItemClose')
+        .first()
+        .click({ force: true })
+      cy.wait('@apiCreateCollectionCard')
+      cy.wait(50)
+      break
+    default:
+      cy.selectBctType({ type: itemType })
+      break
+  }
+})
+
 Cypress.Commands.add('createTextItem', () => {
   cy.selectBctType({ type: 'text' })
   cy.get('.ql-editor')
@@ -86,18 +105,6 @@ Cypress.Commands.add('createTextItem', () => {
     .click({ force: true })
   cy.wait('@apiCreateCollectionCard')
   cy.wait(50)
-})
-
-Cypress.Commands.add('createVideoItem', () => {
-  cy.selectBctType({ type: 'video' })
-})
-
-Cypress.Commands.add('createLinkItem', () => {
-  cy.selectBctType({ type: 'link' })
-})
-
-Cypress.Commands.add('createFileItem', () => {
-  cy.selectBctType({ type: 'file' })
 })
 
 Cypress.Commands.add('createDataItem', () => {

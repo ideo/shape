@@ -21,8 +21,8 @@ When(
   }
 )
 
-When('I create a text item', num => {
-  cy.createTextItem()
+When('I create a {word} item', itemType => {
+  cy.createItem(itemType)
 })
 
 When('I click the first text item', () => {
@@ -44,22 +44,6 @@ When('I close the first open text item', () => {
   cy.locate('TextItemClose')
     .first()
     .click({ force: true })
-})
-
-When('I create a data item', num => {
-  cy.createDataItem()
-})
-
-When('I create a video item', num => {
-  cy.createVideoItem()
-})
-
-When('I create a link item', num => {
-  cy.createLinkItem()
-})
-
-When('I create a file item', num => {
-  cy.createFileItem()
 })
 
 // ----------------------
