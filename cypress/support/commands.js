@@ -89,6 +89,14 @@ Cypress.Commands.add('createItem', itemType => {
       cy.wait('@apiCreateCollectionCard')
       cy.wait(50)
       break
+    case 'data':
+      cy.selectBctType({ type: 'report', order: 'first', empty: true })
+      cy.wait('@apiCreateCollectionCard')
+      cy.wait(50)
+      break
+    case 'submissionBox':
+      cy.selectBctType({ type: 'submissionBox', order: 'first', empty: false })
+      break
     default:
       cy.selectBctType({ type: itemType })
       break
@@ -103,12 +111,6 @@ Cypress.Commands.add('createTextItem', () => {
   cy.locate('TextItemClose')
     .first()
     .click({ force: true })
-  cy.wait('@apiCreateCollectionCard')
-  cy.wait(50)
-})
-
-Cypress.Commands.add('createDataItem', () => {
-  cy.selectBctType({ type: 'report', order: 'first', empty: true })
   cy.wait('@apiCreateCollectionCard')
   cy.wait(50)
 })
@@ -170,6 +172,25 @@ Cypress.Commands.add(
       cy.locate('PopoutMenu_createReport')
         .first()
         .click({ force: true })
+      return
+    }
+    if (type === 'submissionBox') {
+      cy.locate('BctButton-more')
+        .last()
+        .click({ force: true })
+      cy.wait(100)
+      cy.locate('PopoutMenu_createSubmissionBox')
+        .first()
+        .click({ force: true })
+      cy.locate('CollectionCreatorTextField')
+        .first()
+        .click()
+        .type('Submissions')
+      cy.locate(`CollectionCreatorFormButton`)
+        .first()
+        .click({ force: true })
+      cy.wait('@apiCreateCollectionCard')
+      cy.wait(50)
       return
     }
     cy.locate(`BctButton-${type}`)

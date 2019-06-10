@@ -32,6 +32,13 @@ When('I click the first text item', () => {
     .wait(50)
 })
 
+When('I add a link URL {string}', url => {
+  cy.locate('BctTextField').type(url, {
+    force: true,
+  })
+  cy.locate('LinkCreatorFormButton').click()
+})
+
 When('I type {string} in the first quill editor', string => {
   cy.get('.ql-editor')
     .first()
@@ -44,6 +51,14 @@ When('I close the first open text item', () => {
   cy.locate('TextItemClose')
     .first()
     .click({ force: true })
+})
+
+When('I choose a text item from the submission box', () => {
+  cy.locateDataOrClass('DialogContent')
+    .first()
+    .children()
+    .first()
+    .click({ first: true })
 })
 
 // ----------------------
