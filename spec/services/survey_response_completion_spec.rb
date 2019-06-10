@@ -38,16 +38,16 @@ describe SurveyResponseCompletion, type: :service do
 
       it 'will only mark amount owed once' do
         service.call
-        expect(survey_response.payout_owed_amount.to_f).to eq(test_audience.price_per_response)
+        expect(survey_response.incentive_owed_amount.to_f).to eq(test_audience.price_per_response)
 
         # call it again
         service.call
         expect(
-          survey_response.reload.payout_owed_amount.to_f,
+          survey_response.reload.incentive_owed_amount.to_f,
         ).to eq(test_audience.price_per_response)
 
         expect(
-          survey_response.user.payout_owed_account_balance.to_f,
+          survey_response.user.incentive_owed_account_balance.to_f,
         ).to eq(test_audience.price_per_response)
       end
 

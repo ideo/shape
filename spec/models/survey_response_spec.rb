@@ -146,8 +146,8 @@ RSpec.describe SurveyResponse, type: :model do
     it 'increases individual_owed balance' do
       expect {
         survey_response.record_incentive_owed!
-      }.to change(user.payout_owed_account, :balance)
-      expect(user.payout_owed_account_balance.to_f).to eq(4.75)
+      }.to change(user.incentive_owed_account, :balance)
+      expect(user.incentive_owed_account_balance.to_f).to eq(4.75)
     end
 
     it 'decreases receivable balance' do

@@ -38,7 +38,7 @@ module Accounting
         Money.new(amount * 100),
         from: DoubleEntry.account(:receivable),
         to: DoubleEntry.account(:individual_owed, scope: user),
-        code: :payout_owed,
+        code: :incentive_owed,
         metadata: { survey_response_id: survey_response.id },
       )
     end
@@ -55,7 +55,7 @@ module Accounting
         Money.new(amount * 100),
         from: DoubleEntry.account(:individual_owed, scope: user),
         to: DoubleEntry.account(:individual_paid, scope: user),
-        code: :payout,
+        code: :incentive_paid,
         metadata: { survey_response_id: survey_response.id },
       )
 

@@ -448,8 +448,8 @@ class User < ApplicationRecord
   end
 
   def incentive_due_date
-    return if payout_owed_account_balance.zero?
-    lines = Accounting::Query.lines_for_account(payout_owed_account, code: :payout_owed, order: :desc)
+    return if incentive_owed_account_balance.zero?
+    lines = Accounting::Query.lines_for_account(incentive_owed_account, code: :incentive_owed, order: :desc)
     first_line_owed = nil
     # Iterate through lines to find when the balance was last zero
     lines.each do |line|

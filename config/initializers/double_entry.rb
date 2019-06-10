@@ -18,8 +18,8 @@ DoubleEntry.configure do |config|
     transfers.define(from: :cash, to: :receivable, code: :purchase)
     transfers.define(from: :cash, to: :payment_processor, code: :stripe_fee)
     transfers.define(from: :receivable, to: :payment_processor, code: :paypal_fee)
-    transfers.define(from: :receivable, to: :individual_owed, code: :payout_owed)
+    transfers.define(from: :receivable, to: :individual_owed, code: :incentive_owed)
     transfers.define(from: :receivable, to: :revenue, code: :commission)
-    transfers.define(from: :individual_owed, to: :individual_paid, code: :payout)
+    transfers.define(from: :individual_owed, to: :individual_paid, code: :incentive_paid)
   end
 end

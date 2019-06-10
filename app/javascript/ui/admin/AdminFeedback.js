@@ -4,7 +4,9 @@ import styled from 'styled-components'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { Flex } from 'reflexbox'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import 'whatwg-fetch'
 
+import { uiStore } from '~/stores'
 import Box from '~shared/components/atoms/Box'
 import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import LeftButtonIcon from '~/ui/icons/LeftButtonIcon'
@@ -15,6 +17,7 @@ import { CircledIcon } from '~/ui/global/styled/buttons'
 import { Heading1, Heading2, Heading3 } from '~/ui/global/styled/typography'
 import { showOnHoverCss } from '~/ui/grid/shared'
 import Tooltip from '~/ui/global/Tooltip'
+import { FormButton } from '~/ui/global/styled/forms'
 import * as colors from '~shared/styles/constants/colors'
 
 const Wrapper = styled.div`
@@ -109,6 +112,32 @@ class AdminFeedback extends React.Component {
     })
   }
 
+  handleMarkIncentivesPaid = () => {
+    const success = () => {
+      uiStore.popupSnackbar({
+        message: 'All incentives marked as paid!',
+      })
+    }
+
+    const failure = () => {
+      uiStore.popupSnackbar({
+        message: 'Error - could not mark as paid',
+      })
+    }
+
+    return fetch('/api/v1/admin/feedback_incentives/mark_all_paid', {
+      method: 'POST',
+    })
+      .then(res => {
+        if (res.status === 200) success()
+        else failure()
+      })
+      .catch(err => {
+        console.log('Error', err)
+        failure()
+      })
+  }
+
   loadPreviousPage() {
     this.loadTestCollections(this.state.currentPage - 1)
   }
@@ -192,9 +221,21 @@ class AdminFeedback extends React.Component {
       <Wrapper>
         <Heading1>Feedback</Heading1>
         <Section>
-          <Box mb={40}>
-            <Heading2>All Shape Feedback</Heading2>
-          </Box>
+          <Grid container>
+            <Grid item xs={6}>
+              <Box mb={40}>
+                <Heading2>All Shape Feedback</Heading2>
+              </Box>
+            </Grid>
+            <Grid item xs={6}>
+              <a href="/api/v1/admin/feedback_incentives.csv">
+                Export Pending Incentives
+              </a>
+              <FormButton onClick={this.handleMarkIncentivesPaid}>
+                Mark Paid
+              </FormButton>
+            </Grid>
+          </Grid>
           <Grid container>
             <Grid container>
               <Grid item xs={2}>

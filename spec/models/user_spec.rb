@@ -588,7 +588,7 @@ describe User, type: :model do
     let(:user) { create(:user) }
 
     it 'is nil without a balance' do
-      expect(user.payout_owed_account_balance.to_f).to eq(0.0)
+      expect(user.incentive_owed_account_balance.to_f).to eq(0.0)
       expect(user.incentive_paid_account_balance.to_f).to eq(0.0)
       expect(user.incentive_due_date).to be_nil
     end
@@ -609,7 +609,7 @@ describe User, type: :model do
       end
 
       it 'is first incentive created_at + waiting period' do
-        expect(user.payout_owed_account_balance.to_f).to eq(3.25)
+        expect(user.incentive_owed_account_balance.to_f).to eq(3.25)
         expect(user.incentive_paid_account_balance.to_f).to eq(5.5)
         expect(user.incentive_due_date).to be_within(0.1).of(
           prev_survey_completed_at + TestAudience::PAYMENT_WAITING_PERIOD,
@@ -619,7 +619,7 @@ describe User, type: :model do
       it 'is nil after paid' do
         Accounting::RecordTransfer.incentive_paid(unpaid_survey_response)
         expect(user.incentive_due_date).to be_nil
-        expect(user.payout_owed_account_balance.to_f).to eq(0.0)
+        expect(user.incentive_owed_account_balance.to_f).to eq(0.0)
         expect(user.incentive_paid_account_balance.to_f).to eq(8.75)
       end
     end
