@@ -58,6 +58,7 @@ const createNamedRoutes = () => {
 
   // external routes
   cy.route('GET', '**/youtube/v3/videos*', 'fx:youtube-api').as('youtubeApi')
+  cy.route('GET', '**/cloud.filestackapi.com/**').as('fileStackApi')
   cy.route('GET', /passthru/, 'fx:blog').as('externalUrl')
 }
 

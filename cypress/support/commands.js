@@ -92,6 +92,14 @@ Cypress.Commands.add('createVideoItem', () => {
   cy.selectBctType({ type: 'video' })
 })
 
+Cypress.Commands.add('createLinkItem', () => {
+  cy.selectBctType({ type: 'link' })
+})
+
+Cypress.Commands.add('createFileItem', () => {
+  cy.selectBctType({ type: 'file' })
+})
+
 Cypress.Commands.add('createDataItem', () => {
   cy.selectBctType({ type: 'report', order: 'first', empty: true })
   cy.wait('@apiCreateCollectionCard')

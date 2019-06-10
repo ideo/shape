@@ -54,6 +54,14 @@ When('I create a video item', num => {
   cy.createVideoItem()
 })
 
+When('I create a link item', num => {
+  cy.createLinkItem()
+})
+
+When('I create a file item', num => {
+  cy.createFileItem()
+})
+
 // ----------------------
 // Resizing/moving cards
 // ----------------------
