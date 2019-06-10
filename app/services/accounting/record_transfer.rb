@@ -1,5 +1,9 @@
 module Accounting
   class RecordTransfer
+    def self.paypal_fee(amount)
+      (amount * 0.05).round(2)
+    end
+
     def self.our_commission(_amount)
       0
     end
@@ -19,7 +23,7 @@ module Accounting
         Money.new(payment.stripe_fee * 100),
         from: DoubleEntry.account(:cash),
         to: DoubleEntry.account(:payment_processor),
-        code: :transaction_fee,
+        code: :stripe_fee,
         metadata: { payment_id: payment.id },
       )
     end
@@ -44,6 +48,7 @@ module Accounting
     def self.incentive_paid(survey_response)
       user = survey_response.user
       amount = survey_response.amount_earned
+      paypal_fee = paypal_fee(amount)
       commission = our_commission(amount)
 
       DoubleEntry.transfer(
@@ -51,6 +56,15 @@ module Accounting
         from: DoubleEntry.account(:individual_owed, scope: user),
         to: DoubleEntry.account(:individual_paid, scope: user),
         code: :payout,
+        metadata: { survey_response_id: survey_response.id },
+      )
+
+      # We absorb the Paypal fee, so it comes out of our receivable account
+      DoubleEntry.transfer(
+        Money.new(paypal_fee * 100),
+        from: DoubleEntry.account(:receivable),
+        to: DoubleEntry.account(:payment_processor),
+        code: :paypal_fee,
         metadata: { survey_response_id: survey_response.id },
       )
 

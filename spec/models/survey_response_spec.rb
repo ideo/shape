@@ -166,6 +166,8 @@ RSpec.describe SurveyResponse, type: :model do
     let(:survey_response) { create(:survey_response, user: user, test_audience: test_audience, status: :completed) }
     let(:receivable_account) { DoubleEntry.account(:receivable) }
     let(:revenue_account) { DoubleEntry.account(:revenue) }
+    let(:payment_processor_account) { DoubleEntry.account(:payment_processor) }
+    let(:paypal_fee) { (4.75 * 0.05).round(2) }
 
     before do
       survey_response.record_incentive_owed!
@@ -188,17 +190,34 @@ RSpec.describe SurveyResponse, type: :model do
     it 'decreases individual_owed balance' do
       expect {
         survey_response.record_incentive_paid!
-      }.to change(user.payout_owed_account, :balance)
-      expect(user.payout_owed_account_balance.to_f).to eq(0)
+      }.to change(user.incentive_owed_account, :balance)
+      expect(user.incentive_owed_account_balance.to_f).to eq(0)
     end
 
+    it 'decreases receivable balance by paypal fee' do
+      previous_balance = receivable_account.balance.to_f
+      expect {
+        survey_response.record_incentive_paid!
+      }.to change(receivable_account, :balance)
+      expect(receivable_account.balance.to_f).to eq(previous_balance - paypal_fee)
+    end
+
+    it 'increases payment_processor balance by paypal fee' do
+      previous_balance = payment_processor_account.balance.to_f
+      expect {
+        survey_response.record_incentive_paid!
+      }.to change(payment_processor_account, :balance)
+      expect(payment_processor_account.balance.to_f).to eq(previous_balance + paypal_fee)
+    end
+
+    # We aren't taking commission yet, so this is pending
     pending 'increases revenue (commission) balance' do
       expect {
         survey_response.record_incentive_paid!
       }.to change(revenue_account, :balance)
     end
 
-    # Since we are not taking commissions, this won't happen yet
+    # We aren't taking commission yet, so this is pending
     pending 'decreases receivable balance' do
       expect {
         survey_response.record_incentive_paid!

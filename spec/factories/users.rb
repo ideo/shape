@@ -9,6 +9,7 @@ FactoryBot.define do
     last_name { Faker::Name.last_name }
     handle { Faker::Internet.unique.slug }
     uid { SecureRandom.hex(15) }
+    phone { '415-555-5555' }
     provider 'ideo'
     network_data do
       {

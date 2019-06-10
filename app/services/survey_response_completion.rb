@@ -28,7 +28,7 @@ class SurveyResponseCompletion < SimpleService
     user = @survey_response.user
     return unless user.present?
     # Return if already marked as being owed
-    return if @survey_response.payment_owed?
+    return if @survey_response.incentive_owed?
     # TODO: do we want this service to validate if the user has a duplicate response for the same TestCollection?
     # e.g.
     # return if SurveyResponse.find_by(user: user, test_collection: @survey_response.test_collection)
