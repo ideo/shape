@@ -50,6 +50,10 @@ When('I create a data item', num => {
   cy.createDataItem()
 })
 
+When('I create a video item', num => {
+  cy.createVideoItem()
+})
+
 // ----------------------
 // Resizing/moving cards
 // ----------------------
@@ -96,6 +100,13 @@ When('I fill {string} with some text', string => {
     .first()
     .click()
     .type('Let me introduce my lovely prototype.')
+})
+
+When('I fill {string} with {string}', (string, url) => {
+  cy.locateDataOrClass(string)
+    .first()
+    .click()
+    .type(url)
 })
 
 When('I add a test email for {string}', string => {

@@ -88,6 +88,10 @@ Cypress.Commands.add('createTextItem', () => {
   cy.wait(50)
 })
 
+Cypress.Commands.add('createVideoItem', () => {
+  cy.selectBctType({ type: 'video' })
+})
+
 Cypress.Commands.add('createDataItem', () => {
   cy.selectBctType({ type: 'report', order: 'first', empty: true })
   cy.wait('@apiCreateCollectionCard')
