@@ -45,6 +45,10 @@ const createNamedRoutes = () => {
   cy.route('GET', '/api/v1/organizations/*/audiences').as('apiGetAudiences')
   cy.route('GET', '/api/v1/groups/*').as('apiGetGroup')
 
+  cy.route('GET', '/api/v1/comment_threads/find_by_record/Collection/*').as(
+    'apiGetCommentThread'
+  )
+
   cy.route('POST', '/api/v1/survey_responses').as('apiCreateSurveyResponse')
   cy.route('POST', '/api/v1/survey_responses/*/question_answers').as(
     'apiCreateQuestionAnswer'
