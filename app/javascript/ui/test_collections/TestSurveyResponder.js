@@ -22,6 +22,23 @@ const UNANSWERABLE_QUESTION_TYPES = [
   'question_finish',
 ]
 
+const createFakeCollectionCard = ({
+  id,
+  cardQuestionType = `question_${id}`,
+  order,
+  recordId = id,
+  recordContent = '',
+}) => ({
+  id,
+  card_question_type: cardQuestionType,
+  order,
+  record: {
+    id: recordId,
+    content: recordContent,
+    disableMenu: () => {}, // noop
+  },
+})
+
 @inject('apiStore')
 @observer
 class TestSurveyResponder extends React.Component {
@@ -62,26 +79,29 @@ class TestSurveyResponder extends React.Component {
     if (includeRecontactQuestion) {
       // Put recontact question after the finish question
       const recontactOrder = questionCards[questionFinishIndex].order + 1
-      questionCards.splice(questionFinishIndex + 1, 0, {
-        id: 'recontact',
-        card_question_type: 'question_recontact',
-        order: recontactOrder,
-        record: { id: 'recontact_item', content: '' },
-      })
+      questionCards.splice(
+        questionFinishIndex + 1,
+        0,
+        createFakeCollectionCard({
+          id: 'recontact',
+          order: recontactOrder,
+          recordId: 'recontact_item',
+        })
+      )
     }
     if (includeTerms) {
-      questionCards.unshift({
-        id: 'terms',
-        card_question_type: 'question_terms',
-        record: { id: 'terms', content: '' },
-      })
+      questionCards.unshift(
+        createFakeCollectionCard({
+          id: 'terms',
+        })
+      )
     }
     // Always have the respondent welcome come first
-    questionCards.unshift({
-      id: 'welcome',
-      card_question_type: 'question_welcome',
-      record: { id: 'welcome', content: '' },
-    })
+    questionCards.unshift(
+      createFakeCollectionCard({
+        id: 'welcome',
+      })
+    )
     runInAction(() => {
       this.questionCards = questionCards
     })
@@ -127,13 +147,6 @@ class TestSurveyResponder extends React.Component {
 
     let reachedLastVisibleCard = false
     const questions = questionCards.filter(card => {
-      // turn off the card's actionmenu (dot-dot-dot)
-      if (
-        ['recontact', 'terms', 'welcome'].every(
-          questionId => card.id !== questionId
-        )
-      )
-        card.record.disableMenu()
       if (reachedLastVisibleCard) {
         return false
       } else if (
@@ -146,6 +159,9 @@ class TestSurveyResponder extends React.Component {
       reachedLastVisibleCard = true
       return true
     })
+
+    // turn off the card's actionmenu (dot-dot-dot)
+    questions.forEach(card => card.record.disableMenu())
     return questions
   }
 
