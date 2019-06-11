@@ -103,10 +103,10 @@ class AdminFeedback extends React.Component {
     testCollections: [],
     currentPage: 1,
     totalPages: 1,
-    newQueryAudience: null,
     newQueryModalOpen: false,
     newQueryResponseCount: null,
-    selectedAudience: null,
+    newQueryRowVisible: false,
+    selectedCollection: null,
   }
 
   componentDidMount() {
@@ -141,12 +141,21 @@ class AdminFeedback extends React.Component {
     this.setState({ newQueryModalOpen: false })
   }
 
-  showNewQueryRow(testAudience) {
-    this.setState({ newQueryAudience: testAudience })
+  showNewQueryRow(collection) {
+    this.setState({
+      newQueryRowVisible: true,
+      selectedCollection: collection,
+    })
   }
 
   hideNewQueryRow() {
-    this.setState({ newQueryAudience: null })
+    this.setState({ newQueryRowVisible: false })
+  }
+
+  showAdminAudienceDialog = collection => {
+    const { uiStore } = this.props
+    this.setState({ selectedCollection: collection })
+    uiStore.update('adminAudienceMenuOpen', true)
   }
 
   renderTestCollections() {
@@ -170,21 +179,22 @@ class AdminFeedback extends React.Component {
               : null}
           </Grid>
           <Grid container item xs={5}>
-            {testCollection.test_audiences.map(testAudience => {
+            {testCollection.test_audiences.map(testCollection => {
               const editingQuery =
-                this.state.newQueryAudience &&
-                testAudience.id === this.state.newQueryAudience.id
+                this.state.newQueryRowVisible &&
+                this.state.selectedCollection &&
+                testCollection.id === this.state.selectedCollection.id
 
               const audienceNameStyle = editingQuery
                 ? { borderBottom: `1px solid ${v.colors.black}` }
                 : undefined
 
               return (
-                <React.Fragment key={testAudience.id}>
+                <React.Fragment key={testCollection.id}>
                   <AudienceRowItem item xs={5}>
                     <AudienceWrapper align="center">
                       <div style={audienceNameStyle}>
-                        {testAudience.audience.name}
+                        {testCollection.audience.name}
                       </div>
                       <Flex className="show-on-hover">
                         <AudienceAction>
@@ -194,7 +204,9 @@ class AdminFeedback extends React.Component {
                             placement="top"
                           >
                             <CircledIcon
-                              onClick={() => this.showNewQueryRow(testAudience)}
+                              onClick={() =>
+                                this.showNewQueryRow(testCollection)
+                              }
                             >
                               <SearchIcon />
                             </CircledIcon>
@@ -208,7 +220,7 @@ class AdminFeedback extends React.Component {
                           >
                             <CopyToClipboard
                               text={`${testCollection.publicTestURL}?ta=${
-                                testAudience.id
+                                testCollection.id
                               }`}
                               onCopy={() =>
                                 this.props.uiStore.popupSnackbar({
@@ -230,9 +242,7 @@ class AdminFeedback extends React.Component {
                           >
                             <CircledIcon
                               onClick={() =>
-                                this.showAdminAudienceDialog(
-                                  testAudience.audience
-                                )
+                                this.showAdminAudienceDialog(testCollection)
                               }
                             >
                               <InfoNoCircleIcon />
@@ -243,14 +253,14 @@ class AdminFeedback extends React.Component {
                     </AudienceWrapper>
                   </AudienceRowItem>
                   <AudienceRowItem item xs={2}>
-                    <Flex justify="flex-end">{testAudience.sample_size}</Flex>
+                    <Flex justify="flex-end">{testCollection.sample_size}</Flex>
                   </AudienceRowItem>
                   <AudienceRowItem item xs={3}>
                     <Flex justify="flex-end">0</Flex>
                   </AudienceRowItem>
                   <AudienceRowItem item xs={2}>
                     <Flex justify="flex-end">
-                      {testAudience.num_survey_responses}
+                      {testCollection.num_survey_responses}
                     </Flex>
                   </AudienceRowItem>
                   {editingQuery && (
@@ -273,17 +283,11 @@ class AdminFeedback extends React.Component {
     ))
   }
 
-  showAdminAudienceDialog = audience => {
-    const { uiStore } = this.props
-    this.setState({ selectedAudience: audience })
-    uiStore.update('adminAudienceMenuOpen', true)
-  }
-
   render() {
     const {
       currentPage,
       totalPages,
-      newQueryAudience,
+      selectedCollection,
       newQueryModalOpen,
       newQueryResponseCount,
     } = this.state
@@ -293,10 +297,9 @@ class AdminFeedback extends React.Component {
 
     return (
       <Wrapper>
-        <AdminAudienceModal
-          audience={this.state.selectedAudience}
-          open={uiStore.adminAudienceMenuOpen}
-        />
+        {uiStore.adminAudienceMenuOpen && (
+          <AdminAudienceModal audience={selectedCollection.audience} open />
+        )}
         <Heading1>Feedback</Heading1>
         <Section>
           <Box mb={40}>
@@ -369,10 +372,10 @@ class AdminFeedback extends React.Component {
         </Section>
         {newQueryModalOpen && (
           <AdminNewQueryModal
-            open={newQueryModalOpen}
+            open
             close={() => this.closeNewQueryModal()}
-            testAudience={newQueryAudience}
-            requestedResponseCount={newQueryResponseCount}
+            audience={selectedCollection.audience}
+            responseCount={newQueryResponseCount}
           />
         )}
       </Wrapper>
