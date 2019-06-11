@@ -35,9 +35,14 @@ class SurveyResponse < ApplicationRecord
   delegate :question_items, :answerable_complete_question_items,
            to: :test_collection
 
+  delegate :price_per_response,
+           to: :test_audience,
+           allow_nil: true
+
   delegate :incentive_owed_account_balance,
            :incentive_paid_account_balance,
-           to: :user
+           to: :user,
+           allow_nil: true
 
   enum status: {
     in_progress: 0,
@@ -67,7 +72,7 @@ class SurveyResponse < ApplicationRecord
 
   def amount_earned
     return 0 if !completed? || !gives_incentive?
-    test_audience.price_per_response
+    TestAudience.incentive_amount
   end
 
   def all_questions_answered?

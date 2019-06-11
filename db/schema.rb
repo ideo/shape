@@ -432,8 +432,8 @@ ActiveRecord::Schema.define(version: 20190607215955) do
 
   create_table "payments", force: :cascade do |t|
     t.text "description"
-    t.float "amount"
-    t.float "unit_amount"
+    t.decimal "amount", precision: 10, scale: 2
+    t.decimal "unit_amount", precision: 10, scale: 2
     t.integer "quantity"
     t.integer "network_payment_id"
     t.integer "network_payment_method_id"

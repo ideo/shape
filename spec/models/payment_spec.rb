@@ -20,7 +20,7 @@ RSpec.describe Payment, type: :model do
   describe '#create', truncate: true do
     let(:payment) { build(:payment) }
     let(:cash_account) { DoubleEntry.account(:cash) }
-    let(:receivable_account) { DoubleEntry.account(:receivable) }
+    let(:revenue_deferred) { DoubleEntry.account(:revenue_deferred) }
     let(:payment_processor) { DoubleEntry.account(:payment_processor) }
 
     it 'calls NetworkApi::Payment.create' do
@@ -34,11 +34,11 @@ RSpec.describe Payment, type: :model do
       payment.save
     end
 
-    it 'adds to balance in receivable and payment processor' do
+    it 'adds to balance in revenue_deferred and payment processor' do
       payment.save
       stripe_fee = ((payment.amount * 0.029) + 0.3).round(2)
       expect(cash_account.balance.to_f).to eq(-payment.amount)
-      expect(receivable_account.balance.to_f).to eq(payment.amount - stripe_fee)
+      expect(revenue_deferred.balance.to_f).to eq(payment.amount - stripe_fee)
       expect(payment_processor.balance.to_f).to eq(stripe_fee)
     end
 
@@ -55,6 +55,14 @@ RSpec.describe Payment, type: :model do
           ['Payment failed: Bank declined the card'],
         )
       end
+    end
+  end
+
+  describe '#stripe_fee' do
+    let(:payment) { build(:payment, amount: 10.00) }
+
+    it 'is 2.9% + 0.30' do
+      expect(payment.stripe_fee.to_f).to eq(0.59)
     end
   end
 end

@@ -134,7 +134,17 @@ RSpec.describe SurveyResponse, type: :model do
     let!(:test_collection) { create(:test_collection) }
     let(:test_audience) { create(:test_audience, test_collection: test_collection, price_per_response: 4.75) }
     let(:survey_response) { create(:survey_response, user: user, test_audience: test_audience, status: :completed) }
-    let(:receivable_account) { DoubleEntry.account(:receivable) }
+    let(:revenue_deferred_account) { DoubleEntry.account(:revenue_deferred) }
+
+    before do
+      # Make sure revenue_deferred has a positive balance
+      DoubleEntry.transfer(
+        Money.new(10_00),
+        from: DoubleEntry.account(:cash),
+        to: DoubleEntry.account(:revenue_deferred),
+        code: :purchase,
+      )
+    end
 
     it 'updates incentive_status' do
       expect {
@@ -147,14 +157,14 @@ RSpec.describe SurveyResponse, type: :model do
       expect {
         survey_response.record_incentive_owed!
       }.to change(user.incentive_owed_account, :balance)
-      expect(user.incentive_owed_account_balance.to_f).to eq(4.75)
+      expect(user.incentive_owed_account_balance.to_f).to eq(2.50)
     end
 
-    it 'decreases receivable balance' do
+    it 'decreases revenue_deferred balance' do
       expect {
         survey_response.record_incentive_owed!
-      }.to change(receivable_account, :balance)
-      expect(receivable_account.balance.to_f).to eq(-4.75)
+      }.to change(revenue_deferred_account, :balance)
+      expect(revenue_deferred_account.balance.to_f).to eq(10.00 - 2.50)
     end
   end
 
@@ -164,12 +174,21 @@ RSpec.describe SurveyResponse, type: :model do
     let!(:test_collection) { create(:test_collection) }
     let(:test_audience) { create(:test_audience, test_collection: test_collection, price_per_response: 4.75) }
     let(:survey_response) { create(:survey_response, user: user, test_audience: test_audience, status: :completed) }
-    let(:receivable_account) { DoubleEntry.account(:receivable) }
-    let(:revenue_account) { DoubleEntry.account(:revenue) }
+    let(:revenue_deferred_account) { DoubleEntry.account(:revenue_deferred) }
     let(:payment_processor_account) { DoubleEntry.account(:payment_processor) }
-    let(:paypal_fee) { (4.75 * 0.05).round(2) }
+    let(:revenue_account) { DoubleEntry.account(:revenue) }
+    let(:incentive_amount) { 2.50 }
+    let(:paypal_fee) { (incentive_amount * 0.05).round(2) }
+    let(:our_earning) { test_audience.price_per_response - incentive_amount - paypal_fee }
 
     before do
+      # Make sure revenue_deferred has a positive balance
+      DoubleEntry.transfer(
+        Money.new(10_00),
+        from: DoubleEntry.account(:cash),
+        to: DoubleEntry.account(:revenue_deferred),
+        code: :purchase,
+      )
       survey_response.record_incentive_owed!
     end
 
@@ -184,7 +203,7 @@ RSpec.describe SurveyResponse, type: :model do
       expect {
         survey_response.record_incentive_paid!
       }.to change(user.incentive_paid_account, :balance)
-      expect(user.incentive_paid_account_balance.to_f).to eq(4.75)
+      expect(user.incentive_paid_account_balance.to_f).to eq(incentive_amount)
     end
 
     it 'decreases individual_owed balance' do
@@ -194,12 +213,14 @@ RSpec.describe SurveyResponse, type: :model do
       expect(user.incentive_owed_account_balance.to_f).to eq(0)
     end
 
-    it 'decreases receivable balance by paypal fee' do
-      previous_balance = receivable_account.balance.to_f
+    it 'decreases revenue_deferred account balance by paypal fee + our earning' do
+      previous_balance = revenue_deferred_account.balance.to_f
       expect {
         survey_response.record_incentive_paid!
-      }.to change(receivable_account, :balance)
-      expect(receivable_account.balance.to_f).to eq(previous_balance - paypal_fee)
+      }.to change(revenue_deferred_account, :balance)
+      expect(revenue_deferred_account.balance.to_f).to eq(
+        previous_balance - paypal_fee - our_earning,
+      )
     end
 
     it 'increases payment_processor balance by paypal fee' do
@@ -207,22 +228,16 @@ RSpec.describe SurveyResponse, type: :model do
       expect {
         survey_response.record_incentive_paid!
       }.to change(payment_processor_account, :balance)
-      expect(payment_processor_account.balance.to_f).to eq(previous_balance + paypal_fee)
+      expect(payment_processor_account.balance.to_f).to eq(
+        previous_balance + paypal_fee,
+      )
     end
 
-    # We aren't taking commission yet, so this is pending
-    pending 'increases revenue (commission) balance' do
+    it 'increases revenue balance by our earning' do
       expect {
         survey_response.record_incentive_paid!
       }.to change(revenue_account, :balance)
-    end
-
-    # We aren't taking commission yet, so this is pending
-    pending 'decreases receivable balance' do
-      expect {
-        survey_response.record_incentive_paid!
-      }.to change(receivable_account, :balance)
-      expect(receivable_account.balance.to_f).to eq(-5.25)
+      expect(revenue_account.balance.to_f).to eq(our_earning)
     end
   end
 
@@ -231,8 +246,8 @@ RSpec.describe SurveyResponse, type: :model do
     let(:test_audience) { create(:test_audience, test_collection: test_collection, price_per_response: 4.75) }
     let(:survey_response) { create(:survey_response, test_audience: test_audience, status: :completed) }
 
-    it 'returns test audience.price_per_response' do
-      expect(survey_response.amount_earned).to eq(4.75)
+    it 'returns fixed incentive amount' do
+      expect(survey_response.amount_earned.to_f).to eq(2.50)
     end
 
     context 'if not completed' do

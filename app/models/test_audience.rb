@@ -63,6 +63,10 @@ class TestAudience < ApplicationRecord
     closed: 1,
   }
 
+  def self.incentive_amount
+    Shape::FEEDBACK_INCENTIVE_AMOUNT
+  end
+
   def self.display_name
     'Audience'
   end

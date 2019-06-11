@@ -1,7 +1,7 @@
 module Accounting
   class RecordTransfer
     def self.paypal_fee(amount)
-      (amount * 0.05).round(2)
+      (amount * BigDecimal('0.05')).round(2)
     end
 
     def self.our_commission(_amount)
@@ -15,7 +15,7 @@ module Accounting
       DoubleEntry.transfer(
         Money.new(payment.amount_without_stripe_fee * 100),
         from: DoubleEntry.account(:cash),
-        to: DoubleEntry.account(:receivable),
+        to: DoubleEntry.account(:revenue_deferred),
         code: :purchase,
         metadata: { payment_id: payment.id },
       )
@@ -36,7 +36,7 @@ module Accounting
 
       DoubleEntry.transfer(
         Money.new(amount * 100),
-        from: DoubleEntry.account(:receivable),
+        from: DoubleEntry.account(:revenue_deferred),
         to: DoubleEntry.account(:individual_owed, scope: user),
         code: :incentive_owed,
         metadata: { survey_response_id: survey_response.id },
@@ -47,34 +47,34 @@ module Accounting
     # transferring from their individual_owed to their individual_paid account
     def self.incentive_paid(survey_response)
       user = survey_response.user
-      amount = survey_response.amount_earned
-      paypal_fee = paypal_fee(amount)
-      commission = our_commission(amount)
+      incentive = survey_response.amount_earned
+      paypal_fee = paypal_fee(incentive)
+      revenue = survey_response.price_per_response - incentive - paypal_fee
 
       DoubleEntry.transfer(
-        Money.new(amount * 100),
+        Money.new(incentive * 100),
         from: DoubleEntry.account(:individual_owed, scope: user),
         to: DoubleEntry.account(:individual_paid, scope: user),
         code: :incentive_paid,
         metadata: { survey_response_id: survey_response.id },
       )
 
-      # We absorb the Paypal fee, so it comes out of our receivable account
+      # We absorb the Paypal fee, so it comes out of our revenue
       DoubleEntry.transfer(
         Money.new(paypal_fee * 100),
-        from: DoubleEntry.account(:receivable),
+        from: DoubleEntry.account(:revenue_deferred),
         to: DoubleEntry.account(:payment_processor),
         code: :paypal_fee,
         metadata: { survey_response_id: survey_response.id },
       )
 
-      return if commission <= 0
+      return if revenue <= 0
 
       DoubleEntry.transfer(
-        Money.new(commission * 100),
-        from: DoubleEntry.account(:receivable),
+        Money.new(revenue * 100),
+        from: DoubleEntry.account(:revenue_deferred),
         to: DoubleEntry.account(:revenue),
-        code: :commission,
+        code: :revenue,
         metadata: { survey_response_id: survey_response.id },
       )
     end

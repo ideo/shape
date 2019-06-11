@@ -3,11 +3,11 @@
 # Table name: payments
 #
 #  id                        :bigint(8)        not null, primary key
-#  amount                    :float
+#  amount                    :decimal(10, 2)
 #  description               :text
 #  purchasable_type          :string
 #  quantity                  :integer
-#  unit_amount               :float
+#  unit_amount               :decimal(10, 2)
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
 #  network_payment_id        :integer
@@ -47,7 +47,7 @@ class Payment < ApplicationRecord
   end
 
   def stripe_fee
-    ((amount * 0.029) + 0.30).round(2)
+    ((amount * BigDecimal('0.029')) + BigDecimal('0.3')).round(2)
   end
 
   def amount_without_stripe_fee

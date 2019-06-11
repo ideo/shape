@@ -11,13 +11,13 @@ import Box from '~shared/components/atoms/Box'
 import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import LeftButtonIcon from '~/ui/icons/LeftButtonIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
+import DownloadIcon from '~/ui/icons/DownloadIcon'
 import Section from '~shared/components/molecules/Section'
 import v from '~/utils/variables'
 import { CircledIcon } from '~/ui/global/styled/buttons'
 import { Heading1, Heading2, Heading3 } from '~/ui/global/styled/typography'
 import { showOnHoverCss } from '~/ui/grid/shared'
 import Tooltip from '~/ui/global/Tooltip'
-import { FormButton } from '~/ui/global/styled/forms'
 import * as colors from '~shared/styles/constants/colors'
 
 const Wrapper = styled.div`
@@ -89,6 +89,17 @@ const NextPageButton = styled(PaginationButton)`
   }
 `
 NextPageButton.displayName = 'NextPageButton'
+
+const ExportIncentivesButton = styled(Heading3)`
+  cursor: pointer;
+  display: inline-block;
+  .icon {
+    width: 26px;
+    height: 26px;
+    margin-right: 7px;
+    vertical-align: middle;
+  }
+`
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -210,9 +221,14 @@ class AdminFeedback extends React.Component {
               </Box>
             </Grid>
             <Grid item xs={6}>
-              <FormButton onClick={this.handleDownloadFeedbackIncentives}>
-                Export Incentives
-              </FormButton>
+              <Flex justify="flex-end">
+                <ExportIncentivesButton
+                  onClick={this.handleDownloadFeedbackIncentives}
+                >
+                  <DownloadIcon />
+                  Export Pending Incentives
+                </ExportIncentivesButton>
+              </Flex>
             </Grid>
           </Grid>
           <Grid container>
