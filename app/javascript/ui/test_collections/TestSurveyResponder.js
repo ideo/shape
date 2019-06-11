@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { find, findIndex, includes } from 'lodash'
 import { Flex } from 'reflexbox'
 import PropTypes from 'prop-types'
 import { observable, runInAction } from 'mobx'
@@ -71,7 +71,7 @@ class TestSurveyResponder extends React.Component {
 
     const questionCards = [...collection.question_cards]
 
-    const questionFinishIndex = _.findIndex(
+    const questionFinishIndex = findIndex(
       questionCards,
       card => card.card_question_type === 'question_finish'
     )
@@ -119,7 +119,7 @@ class TestSurveyResponder extends React.Component {
     if (card.card_question_type === 'question_recontact') {
       return this.recontactAnswered
     }
-    return _.find(surveyResponse.question_answers, {
+    return find(surveyResponse.question_answers, {
       question_id: card.record.id,
     })
   }
@@ -135,10 +135,7 @@ class TestSurveyResponder extends React.Component {
     const { question_cards } = this.props.collection
     return question_cards.filter(
       questionCard =>
-        !_.includes(
-          UNANSWERABLE_QUESTION_TYPES,
-          questionCard.card_question_type
-        )
+        !includes(UNANSWERABLE_QUESTION_TYPES, questionCard.card_question_type)
     ).length
   }
 
