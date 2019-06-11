@@ -321,6 +321,7 @@ class GridCard extends React.Component {
       searchResult,
       handleClick,
       isBoardCollection,
+      testCollectionCard,
     } = this.props
     let { record, cardType } = this.props
     if (this.coverItem) {
@@ -339,6 +340,7 @@ class GridCard extends React.Component {
         searchResult={searchResult}
         handleClick={handleClick}
         isBoardCollection={isBoardCollection}
+        isTestCollectionCard={testCollectionCard}
       />
     )
   }

@@ -81,7 +81,7 @@ class Collection
     before_create :setup_default_status_and_questions, unless: :cloned_from_present?
     after_create :add_test_tag
     after_create :add_child_roles
-    after_create :setup_link_sharing_test_audience
+    after_create :setup_link_sharing_test_audience, unless: :collection_to_test
     after_update :touch_test_design, if: :saved_change_to_test_status?
 
     delegate :answerable_complete_question_items, to: :test_design, allow_nil: true

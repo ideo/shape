@@ -16,9 +16,10 @@ import Section from '~shared/components/molecules/Section'
 import v from '~/utils/variables'
 import { CircledIcon } from '~/ui/global/styled/buttons'
 import { Heading1, Heading2, Heading3 } from '~/ui/global/styled/typography'
-import { showOnHoverCss } from '~/ui/grid/shared'
 import Tooltip from '~/ui/global/Tooltip'
 import * as colors from '~shared/styles/constants/colors'
+import InfoNoCircleIcon from '~/ui/icons/InfoNoCircleIcon'
+import AdminAudienceModal from '~/ui/admin/AdminAudienceModal'
 
 const Wrapper = styled.div`
   font-family: ${v.fonts.sans};
@@ -50,7 +51,7 @@ const AudienceRowItem = styled(Grid)`
 AudienceRowItem.displayName = 'AudienceRowItem'
 
 const AudienceWrapper = styled(Flex)`
-  ${showOnHoverCss};
+  ${'' /* ${showOnHoverCss}; */};
   position: relative;
   top: -0.5rem;
   /*
@@ -105,6 +106,7 @@ class AdminFeedback extends React.Component {
     newQueryAudience: null,
     newQueryModalOpen: false,
     newQueryResponseCount: null,
+    selectedAudience: null,
   }
 
   componentDidMount() {
@@ -220,6 +222,23 @@ class AdminFeedback extends React.Component {
                             </CopyToClipboard>
                           </Tooltip>
                         </AudienceAction>
+                        <AudienceAction>
+                          <Tooltip
+                            classes={{ tooltip: 'Tooltip' }}
+                            title={'view audience definition'}
+                            placement="top"
+                          >
+                            <CircledIcon
+                              onClick={() =>
+                                this.showAdminAudienceDialog(
+                                  testAudience.audience
+                                )
+                              }
+                            >
+                              <InfoNoCircleIcon />
+                            </CircledIcon>
+                          </Tooltip>
+                        </AudienceAction>
                       </Flex>
                     </AudienceWrapper>
                   </AudienceRowItem>
@@ -254,6 +273,12 @@ class AdminFeedback extends React.Component {
     ))
   }
 
+  showAdminAudienceDialog = audience => {
+    const { uiStore } = this.props
+    this.setState({ selectedAudience: audience })
+    uiStore.update('adminAudienceMenuOpen', true)
+  }
+
   render() {
     const {
       currentPage,
@@ -264,9 +289,14 @@ class AdminFeedback extends React.Component {
     } = this.state
     const previousPageDisabled = currentPage === 1
     const nextPageDisabled = currentPage === totalPages
+    const { uiStore } = this.props
 
     return (
       <Wrapper>
+        <AdminAudienceModal
+          audience={this.state.selectedAudience}
+          open={uiStore.adminAudienceMenuOpen}
+        />
         <Heading1>Feedback</Heading1>
         <Section>
           <Box mb={40}>

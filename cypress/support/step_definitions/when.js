@@ -29,13 +29,16 @@ When('I click the first text item', () => {
   cy.locate('TextItemCover')
     .first()
     .click({ force: true })
-    .wait(50)
+    // clicking text item + loading + initializing quill seems to be happier if we wait a bit
+    .wait(500)
+  cy.wait('@apiGetItem')
 })
 
 When('I type {string} in the first quill editor', string => {
   cy.get('.ql-editor')
     .first()
     .click({ force: true })
+    .wait(25)
     .type(string)
 })
 
@@ -149,6 +152,8 @@ When(
       .click({ force: true })
     cy.wait('@apiGetCollection')
     cy.wait('@apiGetCollectionCards')
+    cy.wait('@apiGetCommentThread')
+    cy.wait('@apiGetInMyCollection')
   }
 )
 
@@ -186,6 +191,13 @@ When('I click {string}', el => {
 
 When('I wait for {string} to finish', apiCall => {
   cy.wait(apiCall)
+})
+
+When('I wait for the collection to finish loading', () => {
+  cy.wait('@apiGetCollection')
+  cy.wait('@apiGetCollectionCards')
+  cy.wait('@apiGetCommentThread')
+  cy.wait('@apiGetInMyCollection')
 })
 
 When('I wait for {int} second(s)', num => {

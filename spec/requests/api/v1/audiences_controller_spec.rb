@@ -42,22 +42,19 @@ describe Api::V1::AudiencesController, type: :request, json: true, create_org: t
       )
     end
 
-    context 'without org admin access' do
+    context 'without org access' do
       before do
-        user.remove_role(Role::ADMIN, user.current_organization.primary_group)
+        RemoveUserRolesFromOrganizationWorker.new.perform(user.current_organization_id, user.id)
+        user.reset_cached_roles!
       end
 
-      it 'returns a 401 if user is not an org admin' do
+      it 'returns a 401 if user is not an org member' do
         post(path, params: params)
         expect(response.status).to eq(401)
       end
     end
 
-    context 'with org admin access' do
-      before do
-        user.add_role(Role::ADMIN, user.current_organization.primary_group)
-      end
-
+    context 'with org access' do
       it 'returns a 200' do
         post(path, params: params)
         expect(response.status).to eq(200)

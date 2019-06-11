@@ -230,6 +230,7 @@ SelectWrapped.propTypes = {
 class AutoComplete extends React.Component {
   state = {
     option: this.props.options.find(x => x.value === this.props.value),
+    inputValue: '',
   }
 
   handleChange = option => {
@@ -247,6 +248,12 @@ class AutoComplete extends React.Component {
     this.props.onOptionSelect(fullOption.data)
   }
 
+  handleOnInputChange = (inputValue, action) => {
+    if (action.action !== 'input-blur' && action.action !== 'menu-close') {
+      this.setState({ inputValue })
+    }
+  }
+
   render() {
     const {
       classes,
@@ -262,7 +269,7 @@ class AutoComplete extends React.Component {
       onMenuClose,
       numOptionsToShow,
     } = this.props
-    const { option } = this.state
+    const { option, inputValue } = this.state
     return (
       <div className={classes.root}>
         <Input
@@ -275,9 +282,11 @@ class AutoComplete extends React.Component {
             multi: true,
             value: keepSelectedOptions ? option : null,
             defaultOptions,
+            inputValue: inputValue,
             options,
             optionSearch,
             onChange: this.handleChange,
+            onInputChange: this.handleOnInputChange,
             placeholder,
             creatable,
             menuPlacement,

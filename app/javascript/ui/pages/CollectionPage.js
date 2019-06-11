@@ -464,7 +464,7 @@ class CollectionPage extends React.Component {
           // pull in cols, gridW, gridH, gutter
           {...gridSettings}
           // don't add the extra row for submission box
-          addEmptyCard={!isSubmissionBox}
+          shouldAddEmptyRow={!isSubmissionBox}
           cardsFetched={this.cardsFetched}
         />
       )

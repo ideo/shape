@@ -3,7 +3,8 @@ import { Fragment } from 'react'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import Viewer from 'react-viewer'
-import 'react-viewer/dist/index.css'
+// 'react-viewer/dist/index.css' is imported in application.scss
+// to get it to work on Heroku
 
 import SearchIcon from '~/ui/icons/SearchIcon'
 import v from '~/utils/variables'
@@ -58,32 +59,39 @@ class ImageItemCover extends React.Component {
   get renderFullscreenImageViewer() {
     const { fullscreen } = this.state
     return (
-      <Viewer
-        images={[{ src: this.imageUrl, alt: '' }]}
-        visible={fullscreen}
-        onClose={this.toggleFullscreen}
-        onMaskClick={this.toggleFullscreen}
-        rotatable={false}
-        scalable={false}
-        zIndex={1000}
-        drag={true}
-        changeable={false}
-        noImgDetails={true}
-        downloadable={false}
-        noNavbar={true}
-        zoomSpeed={0.25}
-      />
+      <Fragment>
+        <StyledMagnifyIcon onClick={this.toggleFullscreen}>
+          <SearchIcon />
+        </StyledMagnifyIcon>
+        <Viewer
+          images={[{ src: this.imageUrl, alt: '' }]}
+          visible={fullscreen}
+          onClose={this.toggleFullscreen}
+          onMaskClick={this.toggleFullscreen}
+          rotatable={false}
+          scalable={false}
+          zIndex={1000}
+          drag={true}
+          changeable={false}
+          noImgDetails={true}
+          downloadable={false}
+          noNavbar={true}
+          zoomSpeed={0.25}
+        />
+      </Fragment>
     )
   }
 
   render() {
-    const { contain } = this.props
+    const {
+      contain,
+      isTestCollectionCard,
+      item: { can_view },
+    } = this.props
+    const showFullscreenViewer = isTestCollectionCard && !can_view
     return (
       <Fragment>
-        {this.renderFullscreenImageViewer}
-        <StyledMagnifyIcon onClick={this.toggleFullscreen}>
-          <SearchIcon />
-        </StyledMagnifyIcon>
+        {showFullscreenViewer && this.renderFullscreenImageViewer}
         <StyledImageCover
           url={this.imageUrl}
           contain={contain}
@@ -97,10 +105,12 @@ class ImageItemCover extends React.Component {
 ImageItemCover.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   contain: PropTypes.bool,
+  isTestCollectionCard: PropTypes.bool,
 }
 
 ImageItemCover.defaultProps = {
   contain: false,
+  isTestCollectionCard: false,
 }
 
 export default ImageItemCover
