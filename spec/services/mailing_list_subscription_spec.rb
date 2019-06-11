@@ -2,10 +2,12 @@ require 'rails_helper'
 
 RSpec.describe MailingListSubscription, type: :service do
   describe '#call' do
+    let(:mailing_list) { double('NetworkApi::MailingList', id: 'list-123') }
+    let(:mailing_list_membership) { double('NetworkApi::MailingList', id: 'membership-123') }
     before do
       network_mailing_list_doubles(
         mailing_list: mailing_list,
-        mailing_list_membership: mailing_list_membership
+        mailing_list_membership: mailing_list_membership,
       )
     end
     let(:organization) { create(:organization) }
