@@ -6,6 +6,15 @@ import v from '~/utils/variables'
 import { TextField } from '~/ui/global/styled/forms'
 
 class AdminNewQueryRow extends React.Component {
+  constructor(props) {
+    super(props)
+    this.textFieldRef = React.createRef()
+  }
+
+  componentDidMount() {
+    this.textFieldRef.current.focus()
+  }
+
   handleKeyDown(ev) {
     const enter = 13
     const escape = 27
@@ -43,6 +52,7 @@ class AdminNewQueryRow extends React.Component {
                 width: '35px',
                 backgroundColor: v.colors.commonLight,
               }}
+              innerRef={this.textFieldRef}
             />
           </Flex>
         </NewQueryRowItem>
