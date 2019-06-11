@@ -889,6 +889,8 @@ class CollectionGrid extends React.Component {
   }
 
   renderMobileHotspot() {
+    const { canEditCollection } = this.props
+    if (!canEditCollection) return ''
     return (
       <CornerPositioned>
         <IconAvatar title="Create new item">
