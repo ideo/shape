@@ -143,6 +143,12 @@ describe User, type: :model do
           expect(
             MailingListSubscriptionWorker,
           ).to have_received(:perform_async).with(active_user.id, :shape_users, false)
+          expect(
+            MailingListSubscriptionWorker,
+          ).to have_received(:perform_async).with(active_user.id, :shape_circle, false)
+          expect(
+            MailingListSubscriptionWorker,
+          ).to have_received(:perform_async).with(active_user.id, :products_mailing_list, false)
         end
       end
     end
