@@ -29,9 +29,9 @@ When('I click the first text item', () => {
   cy.locate('TextItemCover')
     .first()
     .click({ force: true })
+    .wait('@apiGetItem')
     // clicking text item + loading + initializing quill seems to be happier if we wait a bit
     .wait(500)
-  cy.wait('@apiGetItem')
 })
 
 When('I type {string} in the first quill editor', string => {

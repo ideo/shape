@@ -149,6 +149,8 @@ class CoverImageSelector extends React.Component {
       order: null,
       height: 1,
       width: 1,
+      row: 0,
+      col: 0,
       parent_id: collection.id,
       is_cover: true,
       hidden: true,
@@ -156,9 +158,11 @@ class CoverImageSelector extends React.Component {
     Object.assign(cardAttrs, attrs)
     const newCard = new CollectionCard(cardAttrs, apiStore)
     newCard.parent = collection
+    this.setLoading(true)
     await newCard.API_create()
     // get collection with new collection_cover info attached
     apiStore.fetch('collections', collection.id, true)
+    this.setLoading(false)
   }
 
   changeCover = async file => {
