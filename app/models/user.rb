@@ -486,10 +486,11 @@ class User < ApplicationRecord
   end
 
   def update_shape_user_list_subscription_after_update
-    # If now active and was previously not active
     prev_value = attribute_before_last_save(:status)
+    # If now active and was previously not active (e.g. pending or limited)
     if active? && prev_value != 'active'
       update_shape_user_list_subscription(subscribed: true)
+    # Or if they were active, and are now not (likely archived)
     elsif prev_value == 'active' && !active?
       update_shape_user_list_subscription(subscribed: false)
     end
