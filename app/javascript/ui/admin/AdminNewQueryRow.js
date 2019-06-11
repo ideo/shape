@@ -60,7 +60,7 @@ class AdminNewQueryRow extends React.Component {
           <Flex justify="flex-end">-</Flex>
         </NewQueryRowItem>
         <NewQueryRowItem item xs={2}>
-          <Flex justify="flex-end">0</Flex>
+          <Flex justify="flex-end">-</Flex>
         </NewQueryRowItem>
       </Grid>
     )
