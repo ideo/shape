@@ -23,19 +23,19 @@ RSpec.describe BillingChangesMailer, type: :mailer do
 
   describe '#notify' do
     it 'sends to the user associated with the payment method' do
-      mail = BillingChangesMailer.notify(organization, new_active_users)
+      mail = BillingChangesMailer.notify(organization.id, new_active_users)
       expect(mail.to).to eql([user.email])
     end
 
     it 'has a subject describing the updated user situation' do
-      mail = BillingChangesMailer.notify(organization, new_active_users)
+      mail = BillingChangesMailer.notify(organization.id, new_active_users)
       expect(mail.subject).to eq("#{new_active_users} new users joined Shape")
-      mail = BillingChangesMailer.notify(organization, 1)
+      mail = BillingChangesMailer.notify(organization.id, 1)
       expect(mail.subject).to eq('1 new user joined Shape')
     end
 
     it 'renders details about billing changes' do
-      mail = BillingChangesMailer.notify(organization, new_active_users)
+      mail = BillingChangesMailer.notify(organization.id, new_active_users)
       expect(mail.body.encoded).to match("#{new_active_users} new users joined Shape for your organization: #{organization.name}")
       expect(mail.body.encoded).to include("New users: #{new_active_users}")
       expect(mail.body.encoded).to include("Total users: #{organization.active_users_count}")
