@@ -31,7 +31,7 @@ class AdminAudienceModal extends React.Component {
 
   renderCriteriaRow(criteria) {
     return (
-      <FieldContainer>
+      <FieldContainer key={criteria}>
         <SelectedOptionsWrapper wrap>
           <SelectedOption key={`selected_${criteria}`}>
             {criteria}
