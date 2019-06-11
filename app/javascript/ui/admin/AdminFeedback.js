@@ -6,6 +6,7 @@ import { Flex } from 'reflexbox'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import AdminNewQueryModal from './AdminNewQueryModal'
+import AdminNewQueryRow from './AdminNewQueryRow'
 import Box from '~shared/components/atoms/Box'
 import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import LeftButtonIcon from '~/ui/icons/LeftButtonIcon'
@@ -17,7 +18,6 @@ import { CircledIcon } from '~/ui/global/styled/buttons'
 import { Heading1, Heading2, Heading3 } from '~/ui/global/styled/typography'
 import { showOnHoverCss } from '~/ui/grid/shared'
 import Tooltip from '~/ui/global/Tooltip'
-import { TextField } from '~/ui/global/styled/forms'
 import * as colors from '~shared/styles/constants/colors'
 
 const Wrapper = styled.div`
@@ -48,13 +48,6 @@ const AudienceRowItem = styled(Grid)`
   padding-bottom: 0.5rem;
 `
 AudienceRowItem.displayName = 'AudienceRowItem'
-
-const NewQueryRowItem = styled(AudienceRowItem)`
-  background-color: ${v.colors.commonLight};
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-`
-NewQueryRowItem.displayName = 'NewQueryRowItem'
 
 const AudienceWrapper = styled(Flex)`
   ${showOnHoverCss};
@@ -135,42 +128,23 @@ class AdminFeedback extends React.Component {
     this.loadTestCollections(this.state.currentPage + 1)
   }
 
-  handleKeyDown(ev) {
-    const enter = 13
-    const escape = 27
-
-    if (ev.keyCode === enter) {
-      // un-focus & submit
-      ev.target.blur()
-    } else if (ev.keyCode === escape) {
-      // cancel
-      ev.target.value = ''
-      ev.target.blur()
-    }
-  }
-
-  handleBlur(ev) {
-    if (parseInt(ev.target.value)) {
-      this.setState({
-        newQueryModalOpen: true,
-        newQueryResponseCount: parseInt(ev.target.value),
-      })
-    } else {
-      this.setState({ newQueryAudience: null })
-    }
-  }
-
-  handleStartNewQuery(testAudience) {
-    if (this.state.newQueryAudience === testAudience) {
-      // button can toggle visibility
-      this.setState({ newQueryAudience: null })
-    } else {
-      this.setState({ newQueryAudience: testAudience })
-    }
+  openNewQueryModal(newQueryResponseCount) {
+    this.setState({
+      newQueryModalOpen: true,
+      newQueryResponseCount,
+    })
   }
 
   closeNewQueryModal() {
     this.setState({ newQueryModalOpen: false })
+  }
+
+  showNewQueryRow(testAudience) {
+    this.setState({ newQueryAudience: testAudience })
+  }
+
+  hideNewQueryRow() {
+    this.setState({ newQueryAudience: null })
   }
 
   renderTestCollections() {
@@ -218,9 +192,7 @@ class AdminFeedback extends React.Component {
                             placement="top"
                           >
                             <CircledIcon
-                              onClick={() =>
-                                this.handleStartNewQuery(testAudience)
-                              }
+                              onClick={() => this.showNewQueryRow(testAudience)}
                             >
                               <SearchIcon />
                             </CircledIcon>
@@ -262,7 +234,12 @@ class AdminFeedback extends React.Component {
                       {testAudience.num_survey_responses}
                     </Flex>
                   </AudienceRowItem>
-                  {editingQuery && this.renderNewQuery()}
+                  {editingQuery && (
+                    <AdminNewQueryRow
+                      openNewQueryModal={count => this.openNewQueryModal(count)}
+                      hideNewQueryRow={() => this.hideNewQueryRow()}
+                    />
+                  )}
                 </React.Fragment>
               )
             })}
@@ -275,35 +252,6 @@ class AdminFeedback extends React.Component {
         </Grid>
       </React.Fragment>
     ))
-  }
-
-  // refactor to separate component
-  renderNewQuery() {
-    return (
-      <Grid container item xs={12} style={{ marginBottom: '1rem' }}>
-        <NewQueryRowItem item xs={5} />
-        <NewQueryRowItem item xs={2}>
-          <Flex justify="flex-end">
-            <TextField
-              type="text"
-              onKeyDown={ev => this.handleKeyDown(ev)}
-              onBlur={ev => this.handleBlur(ev)}
-              style={{
-                textAlign: 'right',
-                width: '35px',
-                backgroundColor: v.colors.commonLight,
-              }}
-            />
-          </Flex>
-        </NewQueryRowItem>
-        <NewQueryRowItem item xs={3}>
-          <Flex justify="flex-end">-</Flex>
-        </NewQueryRowItem>
-        <NewQueryRowItem item xs={2}>
-          <Flex justify="flex-end">0</Flex>
-        </NewQueryRowItem>
-      </Grid>
-    )
   }
 
   render() {
