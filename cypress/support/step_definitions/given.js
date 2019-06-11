@@ -17,6 +17,8 @@ Given('I login and visit the Test Area', () => {
     .click()
   cy.wait('@apiGetCollection')
   cy.wait('@apiGetCollectionCards')
+  cy.wait('@apiGetCommentThread')
+  cy.wait('@apiGetInMyCollection')
 })
 
 Given('I logout', () => {
