@@ -42,14 +42,14 @@ Feature: Undo actions
     Then I should see the first of 3 cards as 3x1
 
     When I undo with CTRL+Z
-    And I wait for "@apiUpdateCollection" to finish
     Then I should see "Card resize undone" in a ".MuiSnackbarContent-message"
+    And I wait for "@apiUpdateCollection" to finish
     Then I should see the first of 3 cards as 1x1
     And I close the snackbar
 
     When I undo with CTRL+Z
-    And I wait for "@apiUpdateCollection" to finish
     Then I should see "Card move undone" in a ".MuiSnackbarContent-message"
+    And I wait for "@apiUpdateCollection" to finish
     Then I should see a "TextItemCover" in the first card
     And I close the snackbar
 
