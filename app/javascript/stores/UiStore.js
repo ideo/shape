@@ -825,6 +825,10 @@ export default class UiStore {
     this.scroll.scrollToBottom()
   }
 
+  scrollToPosition(position) {
+    this.scroll.scrollTo(position)
+  }
+
   @action
   updateLinkedBreadcrumbTrail = ({
     breadcrumb,

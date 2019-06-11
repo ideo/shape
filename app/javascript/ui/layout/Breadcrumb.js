@@ -25,6 +25,9 @@ const StyledBreadcrumbWrapper = styled.div`
   font-weight: ${v.weights.book};
   color: ${v.colors.commonDark};
   letter-spacing: 1.1px;
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    margin-top: 0;
+  }
 `
 StyledBreadcrumbWrapper.displayName = 'StyledBreadcrumbWrapper'
 

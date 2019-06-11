@@ -5,10 +5,13 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 import styled from 'styled-components'
 
+import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import CollectionSort from '~/ui/grid/CollectionSort'
+import CornerPositioned from '~/ui/global/CornerPositioned'
+import PlusIcon from '~/ui/icons/PlusIcon'
+import IconAvatar from '~/ui/global/IconAvatar'
 import Loader from '~/ui/layout/Loader'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
-import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import { objectsEqual } from '~/utils/objectUtils'
 import v from '~/utils/variables'
 
@@ -595,6 +598,53 @@ class CollectionGrid extends React.Component {
     }
   }
 
+  openMobileBct = ev => {
+    ev.preventDefault()
+    const { uiStore } = this.props
+    let order = 0
+    const { pageYOffset } = window
+    const scrollPoint = Math.max(
+      0,
+      pageYOffset + window.innerHeight - window.innerHeight / 2 + 200
+    )
+    const { cards } = this.state
+    const closestCard = cards.find(
+      card =>
+        card.position.yPos < scrollPoint &&
+        card.position.yPos + card.position.height > scrollPoint
+    )
+    if (!closestCard) {
+      return uiStore.openBlankContentTool({ order })
+    }
+    order = closestCard.order
+    const newPosition = {
+      x: 0,
+      y: closestCard.position.y - 1,
+    }
+    const newGridPosition = this.calculateGridPosition({
+      cardWidth: 1,
+      cardHeight: 1,
+      position: newPosition,
+    })
+    uiStore.openBlankContentTool({ order })
+    if (!this.isVerticallyVisible(newPosition)) {
+      uiStore.scrollToPosition(newGridPosition.yPos)
+    }
+  }
+
+  isVerticallyVisible(position) {
+    const winTop = window.pageYOffset
+    const winBottom = pageYOffset + window.innerHeight
+    const eleBottom = position.yPos + position.height
+    const eleTop = position.yPos
+    return (
+      eleTop >= winTop &&
+      eleTop <= winBottom &&
+      eleBottom <= winBottom &&
+      eleBottom >= winTop
+    )
+  }
+
   addPaginationCard = cards => {
     if (_.find(cards, { id: 'pagination' })) return
     let order = cards.length
@@ -838,6 +888,21 @@ class CollectionGrid extends React.Component {
     )
   }
 
+  renderMobileHotspot() {
+    return (
+      <CornerPositioned>
+        <IconAvatar title="Create new item">
+          <button
+            onClick={this.openMobileBct}
+            style={{ width: '70%', height: '70%' }}
+          >
+            <PlusIcon />
+          </button>
+        </IconAvatar>
+      </CornerPositioned>
+    )
+  }
+
   fakeCardType = cardType =>
     // "fake" cards are the placeholder ones we create
     _.includes(['placeholder', 'blank', 'empty', 'pagination'], cardType)
@@ -925,6 +990,7 @@ class CollectionGrid extends React.Component {
           </SortContainer>
         )}
         {this.renderPositionedCards()}
+        {uiStore.isMobile && this.renderMobileHotspot()}
       </StyledGrid>
     )
   }
