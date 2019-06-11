@@ -10,7 +10,7 @@ class SerializableAudience < BaseJsonSerializer
     :gender_list,
     :adopter_type_list,
     :interest_list,
-    :publication_list
+    :publication_list,
   )
 
   attribute :price_per_response do
