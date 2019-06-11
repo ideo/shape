@@ -5,6 +5,7 @@ RSpec.describe MailingListSubscription, type: :service do
     let(:mailing_list) { double('NetworkApi::MailingList', id: 'list-123') }
     let(:mailing_list_membership) { double('NetworkApi::MailingList', id: 'membership-123') }
     before do
+      network_organization_doubles
       network_mailing_list_doubles(
         mailing_list: mailing_list,
         mailing_list_membership: mailing_list_membership,
