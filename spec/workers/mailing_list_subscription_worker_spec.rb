@@ -8,9 +8,10 @@ RSpec.describe MailingListSubscriptionWorker, type: :worker do
     it 'calls MailingListSubscription with user' do
       expect(MailingListSubscription).to receive(:call).with(
         user: user,
+        list: :shape_users,
         subscribe: subscribe,
       )
-      MailingListSubscriptionWorker.new.perform(user.id, subscribe)
+      MailingListSubscriptionWorker.new.perform(user.id, :shape_users, subscribe)
     end
   end
 end

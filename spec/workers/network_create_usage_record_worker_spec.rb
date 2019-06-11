@@ -148,7 +148,7 @@ RSpec.describe NetworkCreateUsageRecordWorker, type: :worker do
         allow(Organization).to receive(:find_each)
           .and_yield(all_criteria_met)
         expect(BillingChangesMailer).to receive(:notify).with(
-          all_criteria_met, 5
+          all_criteria_met.id, 5
         ).and_return(mailer)
         expect(mailer).to receive(:deliver_later)
         NetworkCreateUsageRecordWorker.new.perform

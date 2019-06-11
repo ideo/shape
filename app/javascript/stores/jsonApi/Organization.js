@@ -26,7 +26,6 @@ class Organization extends BaseRecord {
     'in_app_billing',
     'name',
     'domain_whitelist',
-    'handle',
     'filestack_file_attributes',
     'deactivated',
   ]
