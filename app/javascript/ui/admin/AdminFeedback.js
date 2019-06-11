@@ -11,7 +11,7 @@ import Box from '~shared/components/atoms/Box'
 import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import LeftButtonIcon from '~/ui/icons/LeftButtonIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
-import SearchIcon from '~/ui/icons/SearchIcon'
+import SearchLargeIcon from '~/ui/icons/SearchLargeIcon'
 import Section from '~shared/components/molecules/Section'
 import v from '~/utils/variables'
 import { CircledIcon } from '~/ui/global/styled/buttons'
@@ -209,7 +209,7 @@ class AdminFeedback extends React.Component {
                                 this.showNewQueryRow(testCollection)
                               }
                             >
-                              <SearchIcon />
+                              <SearchLargeIcon />
                             </CircledIcon>
                           </Tooltip>
                         </AudienceAction>
