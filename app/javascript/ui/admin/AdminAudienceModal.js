@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Flex, Box } from 'reflexbox'
-import { map } from 'lodash'
+import { map, capitalize } from 'lodash'
 import Modal from '~/ui/global/modals/Modal'
 import {
   FieldContainer,
@@ -36,6 +36,13 @@ class AdminAudienceModal extends React.Component {
     uiStore.update('adminAudienceMenuOpen', null)
   }
 
+  capitalizeOption(option) {
+    return option
+      .split(' ')
+      .map(str => capitalize(str))
+      .join(' ')
+  }
+
   renderCriteriaRow(criteria, listName) {
     return (
       <FieldContainer key={`selected_${listName}`}>
@@ -47,7 +54,7 @@ class AdminAudienceModal extends React.Component {
                 data-cy="AdminAudienceCategoryOption"
                 key={`selected_${option}`}
               >
-                {option}
+                {this.capitalizeOption(option)}
               </SelectedOption>
             )
           })}
