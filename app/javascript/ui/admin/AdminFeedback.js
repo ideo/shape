@@ -20,6 +20,7 @@ import Tooltip from '~/ui/global/Tooltip'
 import * as colors from '~shared/styles/constants/colors'
 import InfoNoCircleIcon from '~/ui/icons/InfoNoCircleIcon'
 import AdminAudienceModal from '~/ui/admin/AdminAudienceModal'
+import { showOnHoverCss } from '~/ui/grid/shared'
 
 const Wrapper = styled.div`
   font-family: ${v.fonts.sans};
@@ -51,7 +52,7 @@ const AudienceRowItem = styled(Grid)`
 AudienceRowItem.displayName = 'AudienceRowItem'
 
 const AudienceWrapper = styled(Flex)`
-  ${'' /* ${showOnHoverCss}; */};
+  ${showOnHoverCss};
   position: relative;
   top: -0.5rem;
   /*
