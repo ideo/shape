@@ -21,6 +21,9 @@ export default function trackError(err, opts = {}) {
   }
 }
 
+// So it's available in the network components
+window.trackError = trackError
+
 export function trackErrorSpecify(source, message, name, backtrace) {
   const data = {
     action: source,
