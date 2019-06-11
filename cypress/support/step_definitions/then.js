@@ -129,3 +129,11 @@ Then('I should see a pending user invite', () => {
       expect(span.get(0).innerText).to.eq('Pending Invitations (1)')
     })
 })
+
+Then('I should see {int} active user(s)', num => {
+  cy.locateDataOrClass('.DisplayText')
+    .first()
+    .should(span => {
+      expect(span.get(0).innerText).to.eq(`Active Users (${num})`)
+    })
+})

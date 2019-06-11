@@ -60,6 +60,16 @@ const createNamedRoutes = () => {
     'apiCreateLimitedUser'
   )
 
+  cy.route('POST', '/api/v1/collections/**/roles').as(
+    'apiInviteUserToCollection'
+  )
+
+  cy.route('GET', '/api/v1/collections/**/roles/**').as('apiGetCollectionRoles')
+
+  cy.route('DELETE', '/api/v1/collections/**/roles/**').as(
+    'apiDeleteCollectionRoles'
+  )
+
   cy.route('GET', '/api/v1/search/users_and_groups*').as(
     'apiSearchUsersAndGroups'
   )

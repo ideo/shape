@@ -69,10 +69,45 @@ When('I choose a link item from the submission box', () => {
 // Sharing collections
 // ----------------------
 
-When('I add an email to the sharing dialog', () => {
-  cy.get('#react-select-react-select-chip-input').type('name@example.com', {
+When('I add an existing email to the sharing dialog', () => {
+  cy.get('#react-select-react-select-chip-input').type(
+    'cypress-test-1@ideo.com',
+    {
+      force: true,
+    }
+  )
+  cy.wait('@apiSearchUsersAndGroups')
+})
+
+When('I add {string} to the sharing dialog', email => {
+  cy.get('#react-select-react-select-chip-input').type(email, {
     force: true,
   })
+})
+
+When('I select to invite a new user into the collection', () => {
+  cy.get('.selectOption')
+    .last()
+    .children()
+    .last()
+    .click({ force: true })
+  cy.wait('@apiSearchUsersAndGroups')
+})
+
+When('I remove the user to the collection', () => {
+  cy.locateDataOrClass('.LeaveButton')
+    .last()
+    .click({ force: true })
+  cy.wait('@apiGetCollectionRoles')
+  cy.locateDataOrClass('ConfirmButton').click({ force: true })
+  cy.wait('@apiDeleteCollectionRoles')
+})
+
+When('I click the form add button in the sharing modal', () => {
+  cy.locateDataOrClass('.FormButton').click({ force: true })
+  cy.wait('@apiInviteUserToCollection')
+  cy.wait('@apiSearchUsersAndGroups')
+  cy.wait('@apiSearchUsersAndGroups')
 })
 
 // ----------------------
