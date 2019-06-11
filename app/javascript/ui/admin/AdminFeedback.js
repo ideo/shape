@@ -5,7 +5,7 @@ import CopyToClipboard from 'react-copy-to-clipboard'
 import { Flex } from 'reflexbox'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
-import AdminRespondentsModal from './AdminRespondentsModal'
+import AdminNewQueryModal from './AdminNewQueryModal'
 import Box from '~shared/components/atoms/Box'
 import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import LeftButtonIcon from '~/ui/icons/LeftButtonIcon'
@@ -17,6 +17,7 @@ import { CircledIcon } from '~/ui/global/styled/buttons'
 import { Heading1, Heading2, Heading3 } from '~/ui/global/styled/typography'
 import { showOnHoverCss } from '~/ui/grid/shared'
 import Tooltip from '~/ui/global/Tooltip'
+import { TextField } from '~/ui/global/styled/forms'
 import * as colors from '~shared/styles/constants/colors'
 
 const Wrapper = styled.div`
@@ -47,6 +48,13 @@ const AudienceRowItem = styled(Grid)`
   padding-bottom: 0.5rem;
 `
 AudienceRowItem.displayName = 'AudienceRowItem'
+
+const NewQueryRowItem = styled(AudienceRowItem)`
+  background-color: ${v.colors.commonLight};
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+`
+NewQueryRowItem.displayName = 'NewQueryRowItem'
 
 const AudienceWrapper = styled(Flex)`
   ${showOnHoverCss};
@@ -101,8 +109,9 @@ class AdminFeedback extends React.Component {
     testCollections: [],
     currentPage: 1,
     totalPages: 1,
-    respondentsModalOpen: false,
-    testAudience: null,
+    newQueryAudience: null,
+    newQueryModalOpen: false,
+    newQueryResponseCount: null,
   }
 
   componentDidMount() {
@@ -126,13 +135,39 @@ class AdminFeedback extends React.Component {
     this.loadTestCollections(this.state.currentPage + 1)
   }
 
-  searchForRespondents(testAudience) {
-    console.log('search for respondents', testAudience.audience.name)
-    this.setState({ respondentsModalOpen: true, testAudience })
+  handleKeyDown(ev) {
+    const enter = 13
+    const escape = 27
+
+    if (ev.keyCode === enter) {
+      // un-focus & submit
+      ev.target.blur()
+    } else if (ev.keyCode === escape) {
+      // cancel
+      ev.target.value = ''
+      ev.target.blur()
+    }
   }
 
-  closeRespondentsModal = () => {
-    this.setState({ respondentsModalOpen: false })
+  handleBlur(ev) {
+    if (parseInt(ev.target.value)) {
+      this.setState({
+        newQueryModalOpen: true,
+        newQueryResponseCount: parseInt(ev.target.value),
+      })
+    } else {
+      this.setState({ newQueryAudience: null })
+    }
+  }
+
+  startNewQuery(testAudience) {
+    this.setState({
+      newQueryAudience: testAudience,
+    })
+  }
+
+  closeNewQueryModal() {
+    this.setState({ newQueryModalOpen: false })
   }
 
   renderTestCollections() {
@@ -156,65 +191,76 @@ class AdminFeedback extends React.Component {
               : null}
           </Grid>
           <Grid container item xs={5}>
-            {testCollection.test_audiences.map(testAudience => (
-              <React.Fragment key={testAudience.id}>
-                <AudienceRowItem item xs={5}>
-                  <AudienceWrapper align="center">
-                    {testAudience.audience.name}
-                    <Flex className="show-on-hover">
-                      <AudienceAction>
-                        <Tooltip
-                          classes={{ tooltip: 'Tooltip' }}
-                          title={'start new query'}
-                          placement="top"
-                        >
-                          <CircledIcon
-                            onClick={() =>
-                              this.searchForRespondents(testAudience)
-                            }
+            {testCollection.test_audiences.map(testAudience => {
+              const editingQuery =
+                this.state.newQueryAudience &&
+                testAudience.id === this.state.newQueryAudience.id
+
+              const audienceNameStyle = editingQuery
+                ? { borderBottom: `1px solid ${v.colors.black}` }
+                : undefined
+
+              return (
+                <React.Fragment key={testAudience.id}>
+                  <AudienceRowItem item xs={5}>
+                    <AudienceWrapper align="center">
+                      <div style={audienceNameStyle}>
+                        {testAudience.audience.name}
+                      </div>
+                      <Flex className="show-on-hover">
+                        <AudienceAction>
+                          <Tooltip
+                            classes={{ tooltip: 'Tooltip' }}
+                            title={'start new query'}
+                            placement="top"
                           >
-                            <SearchIcon />
-                          </CircledIcon>
-                        </Tooltip>
-                      </AudienceAction>
-                      <AudienceAction>
-                        <Tooltip
-                          classes={{ tooltip: 'Tooltip' }}
-                          title={'copy survey link'}
-                          placement="top"
-                        >
-                          <CopyToClipboard
-                            text={`${testCollection.publicTestURL}?ta=${
-                              testAudience.id
-                            }`}
-                            onCopy={() =>
-                              this.props.uiStore.popupSnackbar({
-                                message: 'Survey link copied',
-                              })
-                            }
-                          >
-                            <CircledIcon>
-                              <LinkIcon />
+                            <CircledIcon
+                              onClick={() => this.startNewQuery(testAudience)}
+                            >
+                              <SearchIcon />
                             </CircledIcon>
-                          </CopyToClipboard>
-                        </Tooltip>
-                      </AudienceAction>
+                          </Tooltip>
+                        </AudienceAction>
+                        <AudienceAction>
+                          <Tooltip
+                            classes={{ tooltip: 'Tooltip' }}
+                            title={'copy survey link'}
+                            placement="top"
+                          >
+                            <CopyToClipboard
+                              text={`${testCollection.publicTestURL}?ta=${
+                                testAudience.id
+                              }`}
+                              onCopy={() =>
+                                this.props.uiStore.popupSnackbar({
+                                  message: 'Survey link copied',
+                                })
+                              }
+                            >
+                              <CircledIcon>
+                                <LinkIcon />
+                              </CircledIcon>
+                            </CopyToClipboard>
+                          </Tooltip>
+                        </AudienceAction>
+                      </Flex>
+                    </AudienceWrapper>
+                  </AudienceRowItem>
+                  <AudienceRowItem item xs={2}>
+                    <Flex justify="flex-end">{testAudience.sample_size}</Flex>
+                  </AudienceRowItem>
+                  <AudienceRowItem item xs={3}>
+                    <Flex justify="flex-end">0</Flex>
+                  </AudienceRowItem>
+                  <AudienceRowItem item xs={2}>
+                    <Flex justify="flex-end">
+                      {testAudience.num_survey_responses}
                     </Flex>
-                  </AudienceWrapper>
-                </AudienceRowItem>
-                <AudienceRowItem item xs={2}>
-                  <Flex justify="flex-end">{testAudience.sample_size}</Flex>
-                </AudienceRowItem>
-                <AudienceRowItem item xs={3}>
-                  <Flex justify="flex-end">0</Flex>
-                </AudienceRowItem>
-                <AudienceRowItem item xs={2}>
-                  <Flex justify="flex-end">
-                    {testAudience.num_survey_responses}
-                  </Flex>
-                </AudienceRowItem>
-              </React.Fragment>
-            ))}
+                  </AudienceRowItem>
+                  {editingQuery && this.renderNewQuery()}
+                </React.Fragment>
+              )
+            })}
           </Grid>
         </FeedbackRow>
         <Grid container>
@@ -226,12 +272,41 @@ class AdminFeedback extends React.Component {
     ))
   }
 
+  renderNewQuery() {
+    return (
+      <Grid container item xs={12} style={{ marginBottom: '1rem' }}>
+        <NewQueryRowItem item xs={5} />
+        <NewQueryRowItem item xs={2}>
+          <Flex justify="flex-end">
+            <TextField
+              type="text"
+              onKeyDown={ev => this.handleKeyDown(ev)}
+              onBlur={ev => this.handleBlur(ev)}
+              style={{
+                textAlign: 'right',
+                width: '35px',
+                backgroundColor: v.colors.commonLight,
+              }}
+            />
+          </Flex>
+        </NewQueryRowItem>
+        <NewQueryRowItem item xs={3}>
+          <Flex justify="flex-end">-</Flex>
+        </NewQueryRowItem>
+        <NewQueryRowItem item xs={2}>
+          <Flex justify="flex-end">0</Flex>
+        </NewQueryRowItem>
+      </Grid>
+    )
+  }
+
   render() {
     const {
       currentPage,
       totalPages,
-      respondentsModalOpen,
-      testAudience,
+      newQueryAudience,
+      newQueryModalOpen,
+      newQueryResponseCount,
     } = this.state
     const previousPageDisabled = currentPage === 1
     const nextPageDisabled = currentPage === totalPages
@@ -308,11 +383,12 @@ class AdminFeedback extends React.Component {
             </Grid>
           )}
         </Section>
-        {respondentsModalOpen && (
-          <AdminRespondentsModal
-            open={respondentsModalOpen}
-            close={this.closeRespondentsModal}
-            testAudience={testAudience}
+        {newQueryModalOpen && (
+          <AdminNewQueryModal
+            open={newQueryModalOpen}
+            close={() => this.closeNewQueryModal()}
+            testAudience={newQueryAudience}
+            requestedResponseCount={newQueryResponseCount}
           />
         )}
       </Wrapper>
