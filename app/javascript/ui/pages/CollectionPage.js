@@ -4,6 +4,8 @@ import pluralize from 'pluralize'
 import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { animateScroll as scroll } from 'react-scroll'
+import html2canvas from 'html2canvas'
+import jsPDF from 'jspdf'
 
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 import ChannelManager from '~/utils/ChannelManager'
@@ -398,6 +400,17 @@ class CollectionPage extends React.Component {
     </div>
   )
 
+  printToPdf = () => {
+    const input = document.getElementById('page-container')
+    console.log('poop', input)
+    html2canvas(input).then(canvas => {
+      const imgData = canvas.toDataURL('image/png')
+      const pdf = new jsPDF()
+      pdf.addImage(imgData, 'PNG', 0, 0)
+      pdf.save('download.pdf')
+    })
+  }
+
   render() {
     const { collection, uiStore, apiStore } = this.props
 
@@ -471,7 +484,7 @@ class CollectionPage extends React.Component {
     }
 
     return (
-      <Fragment>
+      <div id="colpage">
         <PageHeader record={collection} />
         {userRequiresOrg && (
           // for new user's trying to add a common resource, they'll see the Create Org modal
@@ -503,7 +516,7 @@ class CollectionPage extends React.Component {
         )}
         {isLoading && this.loader()}
         {!isLoading && isTransparentLoading && this.transparentLoader()}
-      </Fragment>
+      </div>
     )
   }
 }

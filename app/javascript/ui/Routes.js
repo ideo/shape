@@ -214,6 +214,46 @@ class Routes extends React.Component {
             <WindowSizeListener onResize={this.handleWindowResize} />
             <DialogWrapper />
             <ZendeskWidget />
+            <style>
+              {`@media print {
+                body {
+                  color: #000;
+                  background: ${v.colors.black};
+                }
+                * {
+                  -webkit-print-color-adjust: exact;
+                  print-color-adjust: exact;
+                }
+                h1, h2 {
+                  color: black;
+                }
+                header {
+                  display: block;
+                }
+                img {
+                   max-width: 100% !important;
+                }
+                body, article {
+                  width: 100%;
+                  margin: 0;
+                  padding: 0;
+                }
+                .gridCardWrap {
+                  page-break-inside: avoid;
+                  page-break-after: always;
+                }
+                .video-play-button {
+                  display: none;
+                }
+                .page-header {
+                  display: block !important;
+                  visibility: visible;
+                  overflow: visible;
+                  position: fixed; /* Display only on print page (each) */
+                  top: 0px; /* Because it's header */
+                }
+              }}`}
+            </style>
 
             <Header />
 

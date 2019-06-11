@@ -371,11 +371,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
           :data_source_type,
           :data_source_id,
           style: {},
-          cached_data: [
-            :value,
-            :date,
-            :percentage,
-            :column,
+          cached_data: %i[
+            value
+            date
+            percentage
+            column
           ],
         ],
       ],

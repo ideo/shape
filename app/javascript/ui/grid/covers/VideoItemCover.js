@@ -122,7 +122,7 @@ class VideoItemCover extends React.Component {
           >
             <Flex className="inner" align="center" justify="center">
               <Box>
-                <button className="cancelGridClick" onClick={this.playVideo}>
+                <button className="cancelGridClick video-play-button" onClick={this.playVideo}>
                   &#9658;
                 </button>
               </Box>

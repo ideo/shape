@@ -625,7 +625,7 @@ class MovableGridCard extends React.PureComponent {
 
     return (
       <StyledCardWrapper
-        className={touchDeviceClass}
+        className={`${touchDeviceClass}`}
         dragging={!moveComplete}
         zIndex={zIndex}
         onClick={this.handleWrapperClick}
@@ -698,6 +698,7 @@ class MovableGridCard extends React.PureComponent {
           }}
         >
           <InnerCardWrapper
+            className="gridCardWrap"
             animatedBounce={holdingOver}
             width={width + resizeWidth}
             height={height + resizeHeight}

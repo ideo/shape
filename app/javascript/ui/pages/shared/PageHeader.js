@@ -243,7 +243,7 @@ class PageHeader extends React.Component {
     const rolesRecord = uiStore.rolesMenuOpen ? uiStore.rolesMenuOpen : record
 
     return (
-      <StyledHeader data-empty-space-click>
+      <StyledHeader data-empty-space-click className="page-header">
         <MaxWidthContainer>
           <RolesModal record={rolesRecord} open={!!uiStore.rolesMenuOpen} />
           <div>

@@ -20,6 +20,7 @@ const PageContainer = ({ children, fullWidth, padding }) => (
     data-empty-space-click
     fullWidth={fullWidth}
     padding={padding}
+    id="page-container"
   >
     {children}
   </StyledContainer>
