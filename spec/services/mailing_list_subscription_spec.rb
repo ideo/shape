@@ -2,15 +2,11 @@ require 'rails_helper'
 
 RSpec.describe MailingListSubscription, type: :service do
   describe '#call' do
-    let(:mailing_list) { double('NetworkApi::MailingList', id: 'list-123') }
-    let(:mailing_list_membership) { double('NetworkApi::MailingList', id: 'membership-123') }
     before do
-      allow_any_instance_of(Organization).to receive(:network_organization).and_return(
-        double('NetworkApi::Organization', id: 'network-org-123')
+      network_mailing_list_doubles(
+        mailing_list: mailing_list,
+        mailing_list_membership: mailing_list_membership
       )
-      allow(NetworkApi::MailingList).to receive(:where).and_return([mailing_list])
-      allow(NetworkApi::MailingListMembership).to receive(:create).and_return(mailing_list_membership)
-      allow(NetworkApi::MailingListMembership).to receive(:where).and_return([mailing_list_membership])
     end
     let(:organization) { create(:organization) }
     let(:user) { create(:user, add_to_org: organization) }
