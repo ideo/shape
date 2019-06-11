@@ -84,15 +84,72 @@ describe User, type: :model do
 
     describe '#update_mailing_list_subscription' do
       it 'should call the MailingListSubscriptionWorker if mailing_list value is changed' do
-        expect(MailingListSubscriptionWorker).to receive(:perform_async).with(user.id, true)
+        expect(
+          MailingListSubscriptionWorker,
+        ).to receive(:perform_async).with(user.id, :products_mailing_list, true)
+
         user.update(mailing_list: true)
-        expect(MailingListSubscriptionWorker).to receive(:perform_async).with(user.id, false)
+
+        expect(
+          MailingListSubscriptionWorker,
+        ).to receive(:perform_async).with(user.id, :products_mailing_list, false)
         user.update(mailing_list: false)
       end
 
       it 'should not call the MailingListSubscriptionWorker if mailing_list value is not changed' do
-        expect(MailingListSubscriptionWorker).not_to receive(:perform_async)
+        expect(
+          MailingListSubscriptionWorker,
+        ).not_to receive(:perform_async).with(user.id, :products_mailing_list, user.mailing_list)
         user.update(first_name: 'Velma')
+      end
+    end
+
+    describe '#update_shape_user_list_subscription' do
+      before do
+        allow(MailingListSubscriptionWorker).to receive(:perform_async).and_call_original
+      end
+
+      it 'calls worker to subscribe on user create' do
+        user = create(:user)
+        expect(
+          MailingListSubscriptionWorker,
+        ).to have_received(:perform_async).with(user.id, :shape_users, true)
+      end
+
+      context 'activating pending user' do
+        let!(:pending_user) { create(:user, :pending) }
+
+        it 'calls subscribe' do
+          expect(
+            MailingListSubscriptionWorker,
+          ).not_to have_received(:perform_async).with(pending_user.id, :shape_users, true)
+          pending_user.update(
+            uid: SecureRandom.hex(10),
+            provider: 'ideo',
+            status: :active,
+          )
+          expect(pending_user.active?).to be true
+          expect(
+            MailingListSubscriptionWorker,
+          ).to have_received(:perform_async).with(pending_user.id, :shape_users, true)
+        end
+      end
+
+      context 'archiving active user' do
+        let(:active_user) { user }
+
+        it 'calls unsubscribe' do
+          active_user.update(status: :archived)
+          expect(
+            MailingListSubscriptionWorker,
+          ).to have_received(:perform_async).with(active_user.id, :shape_users, false)
+          expect(
+            MailingListSubscriptionWorker,
+          ).to have_received(:perform_async).with(active_user.id, :shape_circle, false)
+          expect(
+            MailingListSubscriptionWorker,
+          ).to have_received(:perform_async).with(active_user.id, :products_mailing_list, false)
+        end
       end
     end
   end
