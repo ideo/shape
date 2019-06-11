@@ -37,8 +37,25 @@ class Audience < ApplicationRecord
     price_per_response.blank? || price_per_response.zero?
   end
 
-  def all_tags
-    # should we have this as a constant AND as a
-    # convenience wrapper to access all at once as a hash of arrays?
+  def tags_by_tag_list
+    tags = {}
+    tag_types.map.with_index do |tag_name, index|
+      list = tag_lists[index]
+      tags[list] = tag_list_on(tag_name)
+    end
+    tags
+  end
+
+  def tag_lists
+    %i(
+      age_list
+      children_age_list
+      country_list
+      education_level_list
+      gender_list
+      adopter_type_list
+      interest_list
+      publication_list
+    )
   end
 end
