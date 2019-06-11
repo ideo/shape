@@ -160,10 +160,13 @@ class AdminFeedback extends React.Component {
     }
   }
 
-  startNewQuery(testAudience) {
-    this.setState({
-      newQueryAudience: testAudience,
-    })
+  handleStartNewQuery(testAudience) {
+    if (this.state.newQueryAudience === testAudience) {
+      // button can toggle visibility
+      this.setState({ newQueryAudience: null })
+    } else {
+      this.setState({ newQueryAudience: testAudience })
+    }
   }
 
   closeNewQueryModal() {
@@ -215,7 +218,9 @@ class AdminFeedback extends React.Component {
                             placement="top"
                           >
                             <CircledIcon
-                              onClick={() => this.startNewQuery(testAudience)}
+                              onClick={() =>
+                                this.handleStartNewQuery(testAudience)
+                              }
                             >
                               <SearchIcon />
                             </CircledIcon>
@@ -272,6 +277,7 @@ class AdminFeedback extends React.Component {
     ))
   }
 
+  // refactor to separate component
   renderNewQuery() {
     return (
       <Grid container item xs={12} style={{ marginBottom: '1rem' }}>
