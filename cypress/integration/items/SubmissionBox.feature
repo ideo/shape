@@ -4,7 +4,7 @@ Feature: Submission Box
     Given I login and visit the Test Area
     When I create a submissionBox item
     Then I should see a ".MuiModal-root"
-    When I choose a text item from the submission box
+    When I choose a link item from the submission box
     Then I should see a ".SubmissionButton"
     When I click ".SubmissionButton"
     And I add a link URL "https://www.shape.space"

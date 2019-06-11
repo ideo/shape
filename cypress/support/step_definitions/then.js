@@ -115,3 +115,17 @@ Then('I should see the value {string} in the first text item', text => {
     .first()
     .should('contain', text)
 })
+
+Then('I should see {string} not be disabled', selector => {
+  cy.locateDataOrClass(selector)
+    .first()
+    .should('not.be.disabled')
+})
+
+Then('I should see a pending user invite', () => {
+  cy.locateDataOrClass('.DisplayText')
+    .first()
+    .should(span => {
+      expect(span.get(0).innerText).to.eq('Pending Invitations (1)')
+    })
+})

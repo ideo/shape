@@ -60,6 +60,10 @@ const createNamedRoutes = () => {
     'apiCreateLimitedUser'
   )
 
+  cy.route('GET', '/api/v1/search/users_and_groups*').as(
+    'apiSearchUsersAndGroups'
+  )
+
   // external routes
   cy.route('GET', '**/youtube/v3/videos*', 'fx:youtube-api').as('youtubeApi')
   cy.route('GET', '**/cloud.filestackapi.com/**').as('fileStackApi')

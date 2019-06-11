@@ -55,12 +55,24 @@ When('I close the first open text item', () => {
     .click({ force: true })
 })
 
-When('I choose a text item from the submission box', () => {
+When('I choose a link item from the submission box', () => {
   cy.locateDataOrClass('DialogContent')
     .first()
     .children()
     .first()
-    .click({ first: true })
+    .children()
+    .eq(3)
+    .click({ force: true })
+})
+
+// ----------------------
+// Sharing collections
+// ----------------------
+
+When('I add an email to the sharing dialog', () => {
+  cy.get('#react-select-react-select-chip-input').type('name@example.com', {
+    force: true,
+  })
 })
 
 // ----------------------
