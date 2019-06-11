@@ -4,8 +4,10 @@ const webpack = require('webpack')
 const { environment } = require('@rails/webpacker')
 const path = require('path')
 const { castArray, identity, flow, mapValues } = require('lodash/fp')
+const SentryWebpackPlugin = require('@sentry/webpack-plugin');
 
 const DEV = process.env.RAILS_ENV === 'development'
+const PROD = process.env.SHAPE_APP === 'production'
 const root = p => path.resolve(__dirname, '..', '..', p)
 
 const addReactHotLoader = env => {
@@ -93,15 +95,18 @@ const addReactGlobal = env => {
 }
 
 const addSentryWebpack = env => {
-  env.plugins.insert(
-    'Sentry',
-    new SentryWebpackPlugin({
-      include: '.',
-      ignoreFile: '.sentrycliignore',
-      ignore: ['node_modules', 'webpack.config.js'],
-      configFile: 'sentry.properties'
-    })
-  )
+  if (PROD) {
+    env.plugins.insert(
+      'Sentry',
+      new SentryWebpackPlugin({
+        include: '.',
+        ignoreFile: '.sentrycliignore',
+        ignore: ['node_modules', 'webpack.config.js'],
+        configFile: 'sentry.properties'
+      })
+    )
+  }
+  return env
 }
 
 const updateEnvironment = flow(
