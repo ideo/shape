@@ -19,15 +19,15 @@ RSpec.describe Audience, type: :model, seed: true do
     end
   end
 
-  describe '.default_for_user' do
+  describe '.viewable_by_user_in_org' do
     let(:organization) { create(:organization_without_groups) }
     let(:user) { create(:user) }
-    let(:default_for_user) do
-      Audience.default_for_user(user: user, organization: organization)
+    let(:viewable_by_user_in_org) do
+      Audience.viewable_by_user_in_org(user: user, organization: organization)
     end
 
     it 'should always return the global defaults first' do
-      expect(default_for_user.first(2)).to match_array(Audience.global_defaults)
+      expect(viewable_by_user_in_org.first(2)).to match_array(Audience.global_defaults)
     end
 
     context 'with recently used test audiences' do
@@ -39,7 +39,7 @@ RSpec.describe Audience, type: :model, seed: true do
       end
 
       it 'should return the most recently launched test audience after the two global defaults' do
-        expect(default_for_user.third).to eq launched_audience
+        expect(viewable_by_user_in_org.third).to eq launched_audience
       end
     end
   end

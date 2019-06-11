@@ -41,27 +41,30 @@ class AudienceSettings extends React.Component {
     await apiStore.fetchOrganizationAudiences(
       apiStore.currentUserOrganizationId
     )
-    this.updateAudienceSettings()
+    this.initAudienceSettings()
   }
 
   @action
-  updateAudienceSettings() {
+  initAudienceSettings() {
     const { testCollection } = this.props
     const { audiences, audienceSettings } = this
     _.each(audiences, audience => {
       const testAudience = testCollection.test_audiences.find(
-        testAudience => testAudience.audience_id.toString() === audience.id
+        testAudience => testAudience.audience_id === audience.id
       )
+      const linkSharing = audience.price_per_response === 0
       let selected = !!testAudience
-      // check for link sharing
-      if (testAudience && testAudience.price_per_response === 0) {
+      if (testAudience && linkSharing) {
         selected = testAudience.status === 'open'
       }
+      const displayCheckbox =
+        selected || linkSharing || (!this.locked && audience.order <= 6)
       audienceSettings.set(audience.id, {
         selected,
         sample_size: testAudience ? testAudience.sample_size : '0',
         audience: audience,
         test_audience: testAudience,
+        displayCheckbox,
       })
     })
   }
@@ -203,6 +206,7 @@ class AudienceSettings extends React.Component {
         sample_size: '0',
         audience: audience,
         test_audience: null,
+        displayCheckbox: true,
       })
     })
   }

@@ -42,24 +42,25 @@ class Audience < ApplicationRecord
 
   def self.viewable_by_org(organization)
     # find global or org-connected audiences
-    includes(:organizations)
+    left_joins(:organizations)
       .where(organizations: { id: nil })
-      .or(Audience.includes(:organizations).where(organizations: { id: organization.id }))
+      .or(Audience.left_joins(:organizations).where(organizations: { id: organization.id }))
   end
 
-  def self.default_for_user(user:, organization:)
+  def self.viewable_by_user_in_org(user:, organization:)
+    order_sql = %(
+      audiences.global_default ASC NULLS LAST,
+      MAX(test_audiences.updated_at) DESC NULLS LAST,
+      audiences.name ASC
+    )
     viewable_by_org(organization)
       .joins(%(
         LEFT JOIN test_audiences ON test_audiences.audience_id = audiences.id
         AND test_audiences.launched_by_id = #{user.id}
       ))
       .group('audiences.id', 'organizations.id')
-      .select('audiences.*, MAX(test_audiences.updated_at)')
-      .order(%(
-        audiences.global_default ASC NULLS LAST,
-        MAX(test_audiences.updated_at) DESC NULLS LAST,
-        audiences.name ASC
-      ))
+      .select("audiences.*, MAX(test_audiences.updated_at), ROW_NUMBER() OVER (ORDER BY #{order_sql}) as order")
+      .order(order_sql)
   end
 
   def link_sharing?

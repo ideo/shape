@@ -28,8 +28,7 @@ class Api::V1::AudiencesController < Api::V1::BaseController
 
   def load_org_audiences
     @audiences = Audience
-                 .viewable_by_org(@organization)
-                 .order(price_per_response: :asc)
+                 .viewable_by_user_in_org(user: current_user, organization: @organization)
   end
 
   def authorize_current_organization

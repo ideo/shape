@@ -1,6 +1,7 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { concat, filter, reject, sortBy } from 'lodash'
+// import { pick, filter, reject, sortBy } from 'lodash'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
 
@@ -67,12 +68,27 @@ const StyledPlusIcon = styled.span`
   width: 15px;
 `
 
+const audienceSelected = (audience, audienceSettings) => {
+  const option = audienceSettings.get(audience.id)
+  return option ? option.selected : false
+}
+
 @observer
 class AudienceSettingsWidget extends React.Component {
   state = {
     addAudienceMenuOpen: false,
     addAudienceModalOpen: false,
-    selectedOrgAudiences: [],
+  }
+
+  get displayedAudiences() {
+    const { audiences, audienceSettings } = this.props
+    return _.sortBy(
+      _.filter(audiences, a => {
+        const setting = audienceSettings.get(a.id)
+        return setting && setting.displayCheckbox
+      }),
+      'order'
+    )
   }
 
   toggleAddAudienceMenu = () => {
@@ -92,20 +108,18 @@ class AudienceSettingsWidget extends React.Component {
     this.setState({ addAudienceModalOpen: false })
   }
 
-  defaultAudiences() {
+  audiencesInMenu() {
     const { audiences } = this.props
-    const defaultAudiences = filter(audiences, a => a.global)
-    return sortBy(defaultAudiences, a => a.price_per_response)
-  }
-
-  organizationAudiences() {
-    const { audiences } = this.props
-    const orgAudiences = reject(audiences, a => a.global)
-    return sortBy(orgAudiences, a => a.name)
+    const { displayedAudiences } = this
+    const orgAudiences = _.reject(
+      audiences,
+      a => displayedAudiences.indexOf(a) > -1
+    )
+    return _.sortBy(orgAudiences, a => a.order)
   }
 
   addAudienceMenuItems() {
-    const orgAudiences = this.organizationAudiences()
+    const orgAudiences = this.audiencesInMenu()
     const audienceItems = orgAudiences.map(audience => ({
       name: audience.name,
       onClick: () => {
@@ -125,20 +139,13 @@ class AudienceSettingsWidget extends React.Component {
 
   addAudience(audience) {
     const { afterAddAudience } = this.props
-    const { selectedOrgAudiences } = this.state
-    if (selectedOrgAudiences.indexOf(audience) === -1) {
-      selectedOrgAudiences.push(audience)
-      this.setState({ selectedOrgAudiences })
-    }
     if (afterAddAudience) {
       afterAddAudience(audience)
     }
   }
 
   audienceSelected(audience) {
-    const { audienceSettings } = this.props
-    const option = audienceSettings.get(audience.id)
-    return option ? option.selected : false
+    return audienceSelected(audience, this.props.audienceSettings)
   }
 
   sampleSize(audience) {
@@ -180,8 +187,8 @@ class AudienceSettingsWidget extends React.Component {
 
   render() {
     const { totalPrice, locked } = this.props
-    const { addAudienceMenuOpen, selectedOrgAudiences } = this.state
-    const audiences = concat(this.defaultAudiences(), selectedOrgAudiences)
+    const { displayedAudiences } = this
+    const { addAudienceMenuOpen } = this.state
 
     let newAudienceButton = (
       <Flex align="center">
@@ -223,7 +230,7 @@ class AudienceSettingsWidget extends React.Component {
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <MobileWrapper>
             <StyledColumnFlexParent>
-              {audiences.map(audience => {
+              {displayedAudiences.map(audience => {
                 return (
                   <StyledColumnFlexParent key={audience.id}>
                     {this.renderCheckbox(audience)}
@@ -246,7 +253,7 @@ class AudienceSettingsWidget extends React.Component {
                 <StyledRowFlexItem />
                 <TableHeader />
               </StyledRowFlexParent>
-              {audiences.map(audience => {
+              {displayedAudiences.map(audience => {
                 return (
                   <StyledRowFlexParent key={audience.id}>
                     {this.renderCheckbox(audience)}

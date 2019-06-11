@@ -17,7 +17,8 @@ class SerializableAudience < BaseJsonSerializer
     @object.price_per_response.to_f
   end
 
-  attribute :global do
-    @object.organizations.empty?
+  attribute :order do
+    # this is an attribute that may be attached via #viewable_by_user_in_org query
+    @object.try(:order)
   end
 end
