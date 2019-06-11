@@ -92,9 +92,22 @@ const addReactGlobal = env => {
   return env
 }
 
+const addSentryWebpack = env => {
+  env.plugins.insert(
+    'Sentry',
+    new SentryWebpackPlugin({
+      include: '.',
+      ignoreFile: '.sentrycliignore',
+      ignore: ['node_modules', 'webpack.config.js'],
+      configFile: 'sentry.properties'
+    })
+  )
+}
+
 const updateEnvironment = flow(
   DEV ? addReactHotLoader : identity,
   addReactGlobal,
+  addSentryWebpack,
   addReactSVGLoader,
   addTypescriptLoader,
   addIdeoSSOExternal,

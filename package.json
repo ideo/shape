@@ -159,6 +159,7 @@
     "whatwg-fetch": "^3.0.0"
   },
   "devDependencies": {
+    "@sentry/webpack-plugin": "^1.6.2",
     "babel-core": "^6.26.0",
     "babel-engine-plugin": "^0.2.1",
     "babel-eslint": "~8.2.1",
