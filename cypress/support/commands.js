@@ -84,6 +84,7 @@ Cypress.Commands.add('createTextItem', () => {
   cy.locate('TextItemClose')
     .first()
     .click({ force: true })
+  cy.wait('@apiUpdateItem')
   cy.wait('@apiCreateCollectionCard')
   cy.wait(50)
 })
