@@ -67,6 +67,7 @@ RSpec.configure do |config|
   config.include ApiHelper, json: true
   config.include JsonHeaders, json: true
   config.include SessionHelper
+  config.include TestDoubles
 
   # Database Cleaner Configuration
   # See: http://www.virtuouscode.com/2012/08/31/configuring-database_cleaner-with-rails-rspec-capybara-and-selenium/
