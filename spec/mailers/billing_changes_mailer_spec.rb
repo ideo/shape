@@ -5,14 +5,15 @@ def format_currency(x)
 end
 
 RSpec.describe BillingChangesMailer, type: :mailer do
+  before { network_mailing_list_doubles }
   let!(:organization) { create(:organization, active_users_count: 123) }
   let!(:network_organization) { double('network_organization', id: 123) }
-  let!(:user) { create(:user) }
+  let!(:user) { create(:user, add_to_org: organization) }
   let!(:payment_method) { [double('payment_method', user: user)] }
   let!(:new_active_users) { 2 }
 
   before do
-    allow(organization).to receive(:network_organization).and_return(network_organization)
+    allow_any_instance_of(Organization).to receive(:network_organization).and_return(network_organization)
     includes = double('includes')
     allow(NetworkApi::PaymentMethod).to receive(:includes).with(:user).and_return(includes)
     allow(includes).to receive(:find).with(
