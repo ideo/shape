@@ -238,10 +238,10 @@ class LegendItemCover extends React.Component {
       })
   }
 
-  handleDatasetSelection = event => {
+  handleUnselectedDatasetOption = event => {
     event.preventDefault()
     const { value } = event.target
-    this.toggleDatasetsWithIdentifier({ identifier: value, selected: true })
+    this.toggleDatasetsWithIdentifier({ identifier: value, selected: false })
   }
 
   get renderDatasetsMenu() {
@@ -251,7 +251,7 @@ class LegendItemCover extends React.Component {
         displayEmpty
         disableUnderline
         name="role"
-        onChange={this.handleDatasetSelection}
+        onChange={this.handleUnselectedDatasetOption}
         onClose={() => this.setState({ comparisonMenuOpen: false })}
         open
         inline
