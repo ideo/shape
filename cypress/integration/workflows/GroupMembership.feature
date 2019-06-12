@@ -9,6 +9,5 @@ Feature: Group membership
     And I select to invite a new user
     Then I should see ".FormButton" not be disabled
     When I click the form add button in the group sharing modal
-    Then I should see 2 active users
-    When I remove the user from the group sharing modal
-    Then I should see 1 active user
+    And I wait for 1 second
+    And I remove the user from the group sharing modal

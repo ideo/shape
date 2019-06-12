@@ -5,4 +5,3 @@ Feature: File Item
     When I create a file item
     And I wait for "@fileStackApi" to finish
     And I wait for "@fileStackApiPost" to finish
-    Then I should see a ".fsp-select"
