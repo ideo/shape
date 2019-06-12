@@ -28,10 +28,8 @@ class Api::V1::AudiencesController < Api::V1::BaseController
 
   def load_org_audiences
     @audiences = Audience
-                 .includes(:organizations)
-                 .where(organizations: { id: nil })
-                 .or(Audience.includes(:organizations).where(organizations: { id: @organization.id }))
-                 .order(price_per_response: :asc)
+                 .includes(:base_tags)
+                 .viewable_by_user_in_org(user: current_user, organization: @organization)
   end
 
   def authorize_current_organization
@@ -39,6 +37,16 @@ class Api::V1::AudiencesController < Api::V1::BaseController
   end
 
   def audience_params
-    params.require(:audience).permit(:name, :tag_list)
+    params.require(:audience).permit(
+      :name,
+      age_list: [],
+      children_age_list: [],
+      country_list: [],
+      education_level_list: [],
+      gender_list: [],
+      adopter_type_list: [],
+      interest_list: [],
+      publication_list: [],
+    )
   end
 end

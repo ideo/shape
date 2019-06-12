@@ -242,6 +242,7 @@ class AdminFeedback extends React.Component {
                             placement="top"
                           >
                             <CircledIcon
+                              data-cy="AudienceInfoButton"
                               onClick={() =>
                                 this.showAdminAudienceDialog(testCollection)
                               }
@@ -304,10 +305,10 @@ class AdminFeedback extends React.Component {
         <Heading1>Feedback</Heading1>
         <Section>
           <Box mb={40}>
-            <Heading2>All Shape Feedback</Heading2>
+            <Heading2 data-cy="AdminHeader">All Shape Feedback</Heading2>
           </Box>
           <Grid container>
-            <Grid container>
+            <Grid data-cy="AdminRowHeaderWrapper" container>
               <Grid item xs={2}>
                 <Heading3>Test Name</Heading3>
               </Grid>

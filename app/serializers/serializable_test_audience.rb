@@ -1,9 +1,13 @@
 class SerializableTestAudience < BaseJsonSerializer
   type 'test_audiences'
-  attributes :sample_size, :audience_id, :test_collection_id, :status
+  attributes :sample_size, :status
 
   belongs_to :audience
   belongs_to :test_collection
+
+  attribute :audience_id do
+    @object.audience_id.to_s
+  end
 
   attribute :price_per_response do
     @object.price_per_response.to_f

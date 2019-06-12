@@ -5,12 +5,15 @@ namespace :cypress do
     # NOTE: have to do this first, or else it gets mad if we do this after the user is loaded
     Organization.where('slug LIKE ?', 'our-test-org%').destroy_all
     Organization.where(name: 'CypressTest').destroy_all
+    Audience.where(name: "My Test Audience").destroy_all
 
     email = 'cypress-test@ideo.com'
     User.where('handle LIKE ?', 'cy-test-%').destroy_all
     User.where(email: email).destroy_all
 
     user = FactoryBot.create(:user, email: email).becomes(User)
+    user.add_role(Role::SHAPE_ADMIN)
+    user.save
     builder = OrganizationBuilder.new(
       { name: 'CypressTest' }, user, full_setup: false
     )
@@ -20,6 +23,7 @@ namespace :cypress do
 
     create_cards(user.current_user_collection, user)
     create_events(organization)
+    create_test_collection(organization)
   end
 
   def create_cards(collection, user)
@@ -62,5 +66,29 @@ namespace :cypress do
                         target: Collection.last,
                         created_at: Date.today - rand(100))
     end
+  end
+
+  def create_test_collection(organization)
+    test_collection = FactoryBot.create(
+      :test_collection,
+      :with_test_audience,
+      :completed,
+      test_status: :live,
+      organization_id: organization.id
+    )
+    audience = test_collection.test_audiences.last.audience
+    set_audience_criteria(audience)
+    test_collection.reload
+  end
+
+  def set_audience_criteria(audience)
+    {
+      age_list: %W(Young Old),
+      country_list: "United States of America",
+      interest_list: %W(Athlete Pets)
+    }.each do |key, value|
+      audience.send("#{key}=", value)
+    end
+    audience.update(name: "My Test Audience")
   end
 end

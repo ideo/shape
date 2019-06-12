@@ -1,4 +1,4 @@
-import { uniq } from 'lodash'
+import { invert, uniq } from 'lodash'
 
 export const criteria = [
   {
@@ -15,10 +15,10 @@ export const criteria = [
     name: 'Children',
     group: 'Demographics',
     options: [
-      'None',
-      'Children Under 12',
-      'Children 12-17',
-      'Children Over 17',
+      'No Children',
+      'Parents of young children',
+      'Parents of teenagers',
+      'Parents of adult children',
     ],
   },
   {
@@ -36,11 +36,7 @@ export const criteria = [
     group: 'Demographics',
     options: ['High School', 'College or Bachelor’s'],
   },
-  {
-    name: 'Gender',
-    group: 'Demographics',
-    options: ['Female', 'Male', 'All'],
-  },
+  { name: 'Gender', group: 'Demographics', options: ['Female', 'Male', 'All'] },
   {
     name: 'Early/Late Adopter',
     group: 'Psychographics',
@@ -127,10 +123,30 @@ const getCriteriaGroups = () =>
 
 export const getCriteriaByGroup = group => getCriteriaBy('group', group)
 
-export const getCriterionByName = name => getCriteriaBy('name', name)[0]
+export const getCriterionByName = name => {
+  const criteria = getCriteriaBy('name', name)[0]
+  const tagList = criteriaToTagLists[name]
+  return {
+    ...criteria,
+    tagList,
+  }
+}
 
 export const groupCriteriaByGroup = () =>
   getCriteriaGroups().reduce(
     (acc, group) => [...acc, [group, getCriteriaByGroup(group)]],
     []
   )
+
+export const tagListsToCriteria = {
+  age_list: 'Age',
+  children_age_list: 'Children',
+  country_list: 'Country',
+  education_level_list: 'Education',
+  gender_list: 'Gender',
+  adopter_type_list: 'Early/Late Adopter',
+  interest_list: 'Interest',
+  publication_list: 'Publications',
+}
+
+export const criteriaToTagLists = invert(tagListsToCriteria)
