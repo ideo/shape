@@ -23,6 +23,8 @@ namespace :cypress do
     user.switch_to_organization(organization)
     # add an additional test user into the org
     FactoryBot.create(:user, email: 'cypress-test-1@ideo.com', add_to_org: organization)
+    # add an a test group into the org
+    FactoryBot.create(:group, organization: organization, add_admins: [user])
     create_cards(user.current_user_collection, user)
     create_events(organization)
     # create_test_collection(organization) TODO: uncomment me once this is fixed

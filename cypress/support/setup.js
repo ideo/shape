@@ -46,6 +46,8 @@ const createNamedRoutes = () => {
     'apiGetOrganizationAudiences'
   )
   cy.route('GET', '/api/v1/groups/*').as('apiGetGroup')
+  cy.route('POST', '/api/v1/groups/**/roles').as('apiInviteUserToGroup')
+  cy.route('DELETE', '/api/v1/groups/**/roles/**').as('apiDeleteGroupRoles')
 
   cy.route('GET', '/api/v1/comment_threads/find_by_record/Collection/*').as(
     'apiGetCommentThread'

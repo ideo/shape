@@ -69,32 +69,14 @@ When('I choose a link item from the submission box', () => {
 // ----------------------
 // Sharing collections
 // ----------------------
-
-When('I add an existing email to the sharing dialog', () => {
-  cy.get('#react-select-react-select-chip-input').type(
-    'cypress-test-1@ideo.com',
-    {
-      force: true,
-    }
-  )
+When('I click the form add button in the collection sharing modal', () => {
+  cy.locateDataOrClass('.FormButton').click({ force: true })
+  cy.wait('@apiInviteUserToCollection')
+  cy.wait('@apiSearchUsersAndGroups')
   cy.wait('@apiSearchUsersAndGroups')
 })
 
-When('I add {string} to the sharing dialog', email => {
-  cy.get('#react-select-react-select-chip-input').type(email, {
-    force: true,
-  })
-})
-
-When('I select to invite a new user into the collection', () => {
-  cy.get('.selectOption')
-    .last()
-    .children()
-    .last()
-    .click({ force: true })
-})
-
-When('I remove the user to the collection', () => {
+When('I remove the user from the collection sharing modal', () => {
   cy.locateDataOrClass('.LeaveButton')
     .last()
     .click({ force: true })
@@ -103,11 +85,26 @@ When('I remove the user to the collection', () => {
   cy.wait('@apiDeleteCollectionRoles')
 })
 
-When('I click the form add button in the sharing modal', () => {
+// ----------------------
+// Group membership
+// ----------------------
+When('I click a sample group', () => {
+  cy.get('.groupEdit').click({ force: true })
+})
+
+When('I click the form add button in the group sharing modal', () => {
   cy.locateDataOrClass('.FormButton').click({ force: true })
-  cy.wait('@apiInviteUserToCollection')
+  cy.wait('@apiInviteUserToGroup')
   cy.wait('@apiSearchUsersAndGroups')
   cy.wait('@apiSearchUsersAndGroups')
+})
+
+When('I remove the user from the group sharing modal', () => {
+  cy.locateDataOrClass('.LeaveButton')
+    .last()
+    .click({ force: true })
+  cy.locateDataOrClass('ConfirmButton').click({ force: true })
+  cy.wait('@apiDeleteGroupRoles')
 })
 
 // ----------------------
@@ -422,6 +419,23 @@ When('I click the {word} arrow on the MDL snackbar', direction => {
     .first()
     .click({ force: true })
   cy.wait(100)
+})
+
+// ----------------------
+// Sharing Modal
+// ----------------------
+When('I add {string} to the sharing modal', email => {
+  cy.get('#react-select-react-select-chip-input').type(email, {
+    force: true,
+  })
+})
+
+When('I select to invite a new user', () => {
+  cy.get('.selectOption')
+    .last()
+    .children()
+    .last()
+    .click({ force: true })
 })
 
 // ----------------------
