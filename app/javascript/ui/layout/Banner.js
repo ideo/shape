@@ -5,7 +5,7 @@ import { MaxWidthContainer } from '~/ui/global/styled/layout'
 import v from '~/utils/variables'
 
 const StyledBanner = styled.div`
-  background-color: ${v.colors.alert};
+  background-color: ${props => (props.color ? props.color : v.colors.alert)};
   color: white;
   font-family: ${v.fonts.sans};
   font-size: 1.33rem;
@@ -24,8 +24,9 @@ const StyledAction = styled.div`
 
 class Banner extends React.Component {
   render() {
+    const { leftComponent, rightComponent, color } = this.props
     return (
-      <StyledBanner>
+      <StyledBanner color={color}>
         <MaxWidthContainer>
           <Grid container justify="space-between" alignItems="center">
             <Grid
@@ -36,10 +37,10 @@ class Banner extends React.Component {
               spacing={16}
               alignItems="flex-end"
             >
-              {this.props.leftComponent}
+              {leftComponent}
             </Grid>
             <Grid item xs={12} md={4}>
-              <StyledAction>{this.props.rightComponent}</StyledAction>
+              <StyledAction>{rightComponent}</StyledAction>
             </Grid>
           </Grid>
         </MaxWidthContainer>
@@ -51,11 +52,13 @@ class Banner extends React.Component {
 Banner.propTypes = {
   leftComponent: PropTypes.object.isRequired,
   rightComponent: PropTypes.object.isRequired,
+  color: PropTypes.string, // should this be required or just leave the default?
 }
 
 Banner.defaultProps = {
   leftComponent: () => null,
   rightComponent: () => null,
+  color: v.colors.alert,
 }
 
 export default Banner

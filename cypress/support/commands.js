@@ -24,6 +24,12 @@ Cypress.Commands.add('loginAndVisitAdmin', () => {
   cy.wait('@apiAdminGetTestCollections')
 })
 
+Cypress.Commands.add('visitRespondentSurvey', () => {
+  cy.login({ email: 'cypress-test@ideo.com' })
+  const name = 'Shazam'
+  cy.visit(`/tests/visit_with_cypress?name=${name}`)
+})
+
 Cypress.Commands.add('logout', () => {
   cy.request('DELETE', '/api/v1/sessions')
 })

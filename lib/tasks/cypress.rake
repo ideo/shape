@@ -24,6 +24,7 @@ namespace :cypress do
     create_cards(user.current_user_collection, user)
     create_events(organization)
     create_test_collection(organization)
+    create_test_collection_for_respondent(organization)
   end
 
   def create_cards(collection, user)
@@ -90,5 +91,16 @@ namespace :cypress do
       audience.send("#{key}=", value)
     end
     audience.update(name: "My Test Audience")
+  end
+
+  def create_test_collection_for_respondent(organization)
+    test_collection = FactoryBot.create(
+      :test_collection,
+      :with_test_audience,
+      :completed,
+      test_status: :live,
+      name: "Shazam",
+      organization_id: organization.id
+    )
   end
 end
