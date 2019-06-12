@@ -3,6 +3,7 @@ import { Collection as datxCollection, assignModel, ReferenceType } from 'datx'
 import { jsonapi } from 'datx-jsonapi'
 import _ from 'lodash'
 import moment from 'moment-mini'
+import * as Sentry from '@sentry/browser'
 import queryString from 'query-string'
 
 import { apiUrl } from '~/utils/url'
@@ -91,6 +92,9 @@ class ApiStore extends jsonapi(datxCollection) {
     this.currentUserId = id
     this.filestackToken = filestackToken
     this.currentUserOrganizationId = organizationId || null
+    Sentry.configureScope(scope => {
+      scope.setUser({ id: id, currentOrganizationId: organizationId })
+    })
   }
 
   @action

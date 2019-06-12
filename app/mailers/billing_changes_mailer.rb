@@ -1,5 +1,6 @@
 class BillingChangesMailer < ApplicationMailer
-  def notify(organization, new_active_users_count)
+  def notify(organization_id, new_active_users_count)
+    organization = Organization.find(organization_id)
     payment_method = NetworkApi::PaymentMethod
                      .includes(:user)
                      .find(default: true, organization_id: organization.network_organization.id)
