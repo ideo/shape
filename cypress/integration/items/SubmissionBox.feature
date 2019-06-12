@@ -8,4 +8,4 @@ Feature: Submission Box
     Then I should see a ".SubmissionButton"
     When I click ".SubmissionButton"
     And I add a link URL "https://www.shape.space"
-    Then I should see "Why Coding Needs" in a "GridCard"
+    Then I should see a "GridCard"

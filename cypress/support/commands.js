@@ -178,6 +178,13 @@ Cypress.Commands.add(
         [order]()
         .click({ force: true })
     }
+    switch (type) {
+      case 'file':
+        cy.wait(1000)
+        break
+      default:
+        break
+    }
     cy.locate(`BctButton-${type}`)
       .first()
       .click({ force: true })

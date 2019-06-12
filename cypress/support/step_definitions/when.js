@@ -34,11 +34,12 @@ When('I click the first text item', () => {
     .wait(500)
 })
 
-When('I add a link URL {string}', url => {
+When('I add a link URL {string} and wait for {string}', (url, request) => {
   cy.locate('BctTextField').type(url, {
     force: true,
   })
-  cy.locate('LinkCreatorFormButton').click()
+  cy.wait(request)
+  cy.locate('LinkCreatorFormButton').click({ force: true })
 })
 
 When('I type {string} in the first quill editor', string => {
@@ -91,7 +92,6 @@ When('I select to invite a new user into the collection', () => {
     .children()
     .last()
     .click({ force: true })
-  cy.wait('@apiSearchUsersAndGroups')
 })
 
 When('I remove the user to the collection', () => {
