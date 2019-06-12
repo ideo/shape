@@ -36,6 +36,28 @@ const AppWrapper = styled.div`
     `
     filter: blur(10px);
   `};
+  // Global print styling rules
+  @media print {
+    body {
+      background: ${v.colors.white};
+    }
+    * {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    header {
+      display: block;
+    }
+    img {
+      max-width: 100% !important;
+    }
+    body,
+    article {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  }
 `
 AppWrapper.displayName = 'AppWrapper'
 

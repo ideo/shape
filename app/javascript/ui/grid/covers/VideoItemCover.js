@@ -67,6 +67,12 @@ const StyledIconHolder = styled.span`
   width: 60px;
 `
 
+const VideoPlayButton = styled.button`
+  @media print {
+    display: none;
+  }
+`
+
 @observer
 class VideoItemCover extends React.Component {
   state = {
@@ -122,9 +128,12 @@ class VideoItemCover extends React.Component {
           >
             <Flex className="inner" align="center" justify="center">
               <Box>
-                <button className="cancelGridClick" onClick={this.playVideo}>
+                <VideoPlayButton
+                  className="cancelGridClick"
+                  onClick={this.playVideo}
+                >
                   &#9658;
-                </button>
+                </VideoPlayButton>
               </Box>
             </Flex>
             <div className="overlay" />
