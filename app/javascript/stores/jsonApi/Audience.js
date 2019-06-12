@@ -2,6 +2,7 @@ import { computed } from 'mobx'
 
 import { apiUrl } from '~/utils/url'
 import BaseRecord from './BaseRecord'
+import { tagListsToCriteria } from '~/ui/test_collections/AudienceSettings/AudienceCriteria'
 
 class Audience extends BaseRecord {
   static type = 'audiences'
@@ -32,6 +33,15 @@ class Audience extends BaseRecord {
   get currentSampleSize() {
     if (!this.currentTestAudience) return 0
     return this.currentTestAudience.sample_size
+  }
+
+  @computed
+  get tagLists() {
+    const tagLists = {}
+    for (const key in tagListsToCriteria) {
+      tagLists[key] = this[key]
+    }
+    return tagLists
   }
 
   async API_create() {

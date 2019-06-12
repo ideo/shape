@@ -11,7 +11,16 @@
 #
 
 class Audience < ApplicationRecord
-  acts_as_taggable
+  acts_as_taggable_on(
+    :ages,
+    :children_ages,
+    :countries,
+    :education_levels,
+    :genders,
+    :adopter_types,
+    :interests,
+    :publications
+  )
 
   has_many :audience_organizations, dependent: :destroy
   has_many :organizations, through: :audience_organizations
@@ -26,5 +35,27 @@ class Audience < ApplicationRecord
     # NOTE: for now this logic should suffice, however we could eventually change it
     # to be more explicit, like a bool field on the model
     price_per_response.blank? || price_per_response.zero?
+  end
+
+  def tags_by_tag_list
+    tags = {}
+    tag_types.map.with_index do |tag_name, index|
+      list = tag_lists[index]
+      tags[list] = tag_list_on(tag_name)
+    end
+    tags
+  end
+
+  def tag_lists
+    %i(
+      age_list
+      children_age_list
+      country_list
+      education_level_list
+      gender_list
+      adopter_type_list
+      interest_list
+      publication_list
+    )
   end
 end

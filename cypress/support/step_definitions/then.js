@@ -70,6 +70,10 @@ Then('I should see the {string} modal', modalTitle => {
     .should('exist')
 })
 
+Then('I should not see the {string} modal', modalTitle => {
+  cy.get(`[role="dialog"][aria-labelledby="${modalTitle}"]`).should('not.exist')
+})
+
 Then('I should see the {word} of {int} cards as {word}', (pos, count, size) => {
   // size e.g. "2x1" so we split on 'x'
   const sizes = size.split('x')
@@ -137,3 +141,12 @@ Then('I should see {int} active user(s)', num => {
       expect(span.get(0).innerText).to.eq(`Active Users (${num})`)
     })
 })
+// https://docs.cypress.io/api/commands/eq.html#Yields
+Then(
+  'I should see {string} in the {int} index {string}',
+  (text, pos, selector) => {
+    cy.get(`[data-cy="${selector}"]`)
+      .eq(pos)
+      .should('contain', text)
+  }
+)

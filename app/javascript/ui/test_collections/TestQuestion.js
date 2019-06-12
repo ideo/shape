@@ -252,6 +252,7 @@ TestQuestion.defaultProps = {
   createSurveyResponse: null,
   afterQuestionAnswered: null,
   canEdit: false,
+  numberOfQuestions: null,
 }
 
 export default TestQuestion

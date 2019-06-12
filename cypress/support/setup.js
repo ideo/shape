@@ -42,7 +42,9 @@ const createNamedRoutes = () => {
   cy.route('PATCH', '/api/v1/items/*').as('apiUpdateItem')
 
   cy.route('POST', '/api/v1/organizations').as('apiCreateOrganization')
-  cy.route('GET', '/api/v1/organizations/*/audiences').as('apiGetAudiences')
+  cy.route('GET', '/api/v1/organizations/*/audiences').as(
+    'apiGetOrganizationAudiences'
+  )
   cy.route('GET', '/api/v1/groups/*').as('apiGetGroup')
 
   cy.route('GET', '/api/v1/comment_threads/find_by_record/Collection/*').as(
@@ -72,6 +74,11 @@ const createNamedRoutes = () => {
 
   cy.route('GET', '/api/v1/search/users_and_groups*').as(
     'apiSearchUsersAndGroups'
+  )
+  // Admin routes
+  cy.route('GET', '/api/v1/admin/users').as('apiAdminGetUsers')
+  cy.route('GET', '/api/v1/admin/test_collections*').as(
+    'apiAdminGetTestCollections'
   )
 
   // external routes
