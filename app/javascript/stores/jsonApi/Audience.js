@@ -1,6 +1,8 @@
+import { computed } from 'mobx'
+
 import { apiUrl } from '~/utils/url'
-import BaseRecord from './BaseRecord'
 import { tagListsToCriteria } from '~/ui/test_collections/AudienceSettings/AudienceCriteria'
+import BaseRecord from './BaseRecord'
 
 class Audience extends BaseRecord {
   static type = 'audiences'
