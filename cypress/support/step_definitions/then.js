@@ -127,7 +127,9 @@ Then('I should see {string} not be disabled', selector => {
 })
 
 Then('I should see a pending user invite', () => {
-  cy.locateDataOrClass('.DisplayText')
+  cy.locateDataOrClass('.StyledRow')
+    .first()
+    .children()
     .first()
     .should(span => {
       expect(span.get(0).innerText).to.eq('Pending Invitations (1)')
@@ -135,7 +137,9 @@ Then('I should see a pending user invite', () => {
 })
 
 Then('I should see {int} active user(s)', num => {
-  cy.locateDataOrClass('.DisplayText')
+  cy.locateDataOrClass('.StyledRow')
+    .last()
+    .children()
     .first()
     .should(span => {
       expect(span.get(0).innerText).to.eq(`Active Users (${num})`)

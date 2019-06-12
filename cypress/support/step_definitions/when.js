@@ -83,6 +83,8 @@ When('I remove the user from the collection sharing modal', () => {
   cy.wait('@apiGetCollectionRoles')
   cy.locateDataOrClass('ConfirmButton').click({ force: true })
   cy.wait('@apiDeleteCollectionRoles')
+  cy.wait('@apiSearchUsersAndGroups')
+  cy.wait('@apiSearchUsersAndGroups')
 })
 
 // ----------------------
