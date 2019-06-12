@@ -5,14 +5,15 @@ def format_currency(x)
 end
 
 RSpec.describe BillingChangesMailer, type: :mailer do
+  before { network_mailing_list_doubles }
   let!(:organization) { create(:organization, active_users_count: 123) }
   let!(:network_organization) { double('network_organization', id: 123) }
-  let!(:user) { create(:user) }
+  let!(:user) { create(:user, add_to_org: organization) }
   let!(:payment_method) { [double('payment_method', user: user)] }
   let!(:new_active_users) { 2 }
 
   before do
-    allow(organization).to receive(:network_organization).and_return(network_organization)
+    allow_any_instance_of(Organization).to receive(:network_organization).and_return(network_organization)
     includes = double('includes')
     allow(NetworkApi::PaymentMethod).to receive(:includes).with(:user).and_return(includes)
     allow(includes).to receive(:find).with(
@@ -23,19 +24,19 @@ RSpec.describe BillingChangesMailer, type: :mailer do
 
   describe '#notify' do
     it 'sends to the user associated with the payment method' do
-      mail = BillingChangesMailer.notify(organization, new_active_users)
+      mail = BillingChangesMailer.notify(organization.id, new_active_users)
       expect(mail.to).to eql([user.email])
     end
 
     it 'has a subject describing the updated user situation' do
-      mail = BillingChangesMailer.notify(organization, new_active_users)
+      mail = BillingChangesMailer.notify(organization.id, new_active_users)
       expect(mail.subject).to eq("#{new_active_users} new users joined Shape")
-      mail = BillingChangesMailer.notify(organization, 1)
+      mail = BillingChangesMailer.notify(organization.id, 1)
       expect(mail.subject).to eq('1 new user joined Shape')
     end
 
     it 'renders details about billing changes' do
-      mail = BillingChangesMailer.notify(organization, new_active_users)
+      mail = BillingChangesMailer.notify(organization.id, new_active_users)
       expect(mail.body.encoded).to match("#{new_active_users} new users joined Shape for your organization: #{organization.name}")
       expect(mail.body.encoded).to include("New users: #{new_active_users}")
       expect(mail.body.encoded).to include("Total users: #{organization.active_users_count}")

@@ -6,22 +6,65 @@ import DialogContent from '@material-ui/core/DialogContent'
 import PaperAirplane from '~/ui/test_collections/PaperAirplane'
 import { ModalCloseButton } from '~/ui/global/modals/Modal'
 import { TextButton, FormButton } from '~/ui/global/styled/forms'
-import { DisplayText } from '~/ui/global/styled/typography'
+import {
+  DisplayText,
+  SpecialDisplayHeading,
+} from '~/ui/global/styled/typography'
 import PlainLink from '~/ui/global/PlainLink'
 import v from '~/utils/variables'
 import CloseIcon from '~/ui/icons/CloseIcon'
 import CardBrandIcon from '~shared/components/atoms/CardBrandIcon'
 
-// Extract children from here
+const StyledSpecialDisplayHeading = styled(SpecialDisplayHeading)`
+  margin-bottom: 0;
+  padding: 30px 0;
+  width: 422px;
+`
+
+const StyledDialog = styled(Dialog)`
+  .modal__paper {
+    text-align: center;
+    padding: 20px 35px;
+    padding-top: 35px;
+    max-width: 560px;
+    max-height: 480px;
+
+    @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+      margin: 0;
+      max-width: 100%;
+      min-height: 100vh;
+    }
+  }
+`
+StyledDialog.displayName = 'StyledDialog'
+
+const StyledDialogContent = styled(DialogContent)`
+  &.root__dialog-content {
+    padding: 20px 35px;
+  }
+
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    padding-bottom: 120px !important;
+  }
+`
+
+const StyledModalCloseButton = styled(ModalCloseButton)`
+  top: 35px;
+`
+
+const StyledDiv = styled.div`
+  padding: 1rem 0;
+`
+
 class ConfirmPriceModal extends React.Component {
   renderMissingPaymentContent() {
     const { close } = this.props
     return (
       <React.Fragment>
-        <SpecialDisplayHeading wrapLine>
+        <StyledSpecialDisplayHeading wrapLine>
           Oh no! It looks like you don't have a valid payment method for this
           feedback request. Please ask an administrator to add a payment method.
-        </SpecialDisplayHeading>
+        </StyledSpecialDisplayHeading>
         <StyledDiv style={{ textAlign: 'center' }}>
           <TextButton onClick={close} width={200}>
             Close
@@ -40,12 +83,12 @@ class ConfirmPriceModal extends React.Component {
 
     return (
       <form onSubmit={onSubmit}>
-        <SpecialDisplayHeading wrapLine>
+        <StyledSpecialDisplayHeading wrapLine>
           "{testName}" is about to be launched. You will receive an email
           notification when your results are ready in 2-5 business days. Your
           payment method will be charged <strong>{totalPrice}</strong> for this
           feedback.
-        </SpecialDisplayHeading>
+        </StyledSpecialDisplayHeading>
         <StyledDiv
           style={{
             display: 'flex',
@@ -127,52 +170,6 @@ class ConfirmPriceModal extends React.Component {
     )
   }
 }
-
-const SpecialDisplayHeading = styled.p`
-  padding: 30px 0;
-  line-height: 1.625rem;
-  font-family: ${v.fonts.sans};
-  font-size: 1.25rem;
-  font-weight: ${v.weights.book};
-  color: ${v.colors.black};
-  width: 422px;
-  margin-bottom: 0;
-`
-
-const StyledDialog = styled(Dialog)`
-  .modal__paper {
-    text-align: center;
-    padding: 20px 35px;
-    padding-top: 35px;
-    max-width: 560px;
-    max-height: 480px;
-
-    @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
-      margin: 0;
-      max-width: 100%;
-      min-height: 100vh;
-    }
-  }
-`
-StyledDialog.displayName = 'StyledDialog'
-
-const StyledDialogContent = styled(DialogContent)`
-  &.root__dialog-content {
-    padding: 20px 35px;
-  }
-
-  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
-    padding-bottom: 120px !important;
-  }
-`
-
-const StyledModalCloseButton = styled(ModalCloseButton)`
-  top: 35px;
-`
-
-const StyledDiv = styled.div`
-  padding: 1rem 0;
-`
 
 ConfirmPriceModal.propTypes = {
   open: PropTypes.bool.isRequired,
