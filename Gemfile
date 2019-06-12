@@ -12,7 +12,7 @@ end
 gem 'dotenv-rails', groups: [:development, :test], require: 'dotenv/rails-now'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 5.1.6'
+gem 'rails', '~> 5.2'
 
 # Use postgresql as the database for Active Record
 gem 'pg', '~> 1.1'
@@ -32,14 +32,14 @@ gem 'uglifier', '>= 1.3.0'
 gem 'jbuilder', '~> 2.5'
 
 # Devise for auth
-gem 'devise'
+gem 'devise', '~> 4.6.0'
 gem 'omniauth-ideo', git: 'https://github.com/ideo/omniauth-ideo.git'
 
 # Consumer for IDEO Network JSON APIs
 gem 'network-api-ruby', git: 'https://github.com/ideo/network-api-ruby.git'
 
 # Webpacker
-gem 'webpacker', '>= 4.0.x'
+gem 'webpacker', '>= 4.0.0'
 
 # JSON serializer
 gem 'jsonapi-rails'
@@ -72,10 +72,10 @@ gem 'rack-rewrite', '~> 1.5'
 gem 'rack-cors', '~> 1.0.1'
 
 # Filestack API Wrapper
-gem 'filestack'
+gem 'filestack', '~> 2.6.1'
 
 # inline styles for email
-gem 'roadie-rails', '~> 1.2'
+gem 'roadie-rails', '~> 1.3'
 
 # For easier http request
 gem 'httparty'
