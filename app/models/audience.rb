@@ -19,7 +19,7 @@ class Audience < ApplicationRecord
     :genders,
     :adopter_types,
     :interests,
-    :publications
+    :publications,
   )
 
   has_many :audience_organizations, dependent: :destroy
@@ -37,25 +37,11 @@ class Audience < ApplicationRecord
     price_per_response.blank? || price_per_response.zero?
   end
 
-  def tags_by_tag_list
+  def all_tags
     tags = {}
-    tag_types.map.with_index do |tag_name, index|
-      list = tag_lists[index]
-      tags[list] = tag_list_on(tag_name)
+    tag_types.each do |tag_name|
+      tags[tag_name] = tag_list_on(tag_name)
     end
     tags
-  end
-
-  def tag_lists
-    %i(
-      age_list
-      children_age_list
-      country_list
-      education_level_list
-      gender_list
-      adopter_type_list
-      interest_list
-      publication_list
-    )
   end
 end
