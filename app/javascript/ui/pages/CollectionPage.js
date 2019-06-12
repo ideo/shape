@@ -24,6 +24,7 @@ import Collection from '~/stores/jsonApi/Collection'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
 import routeToLogin from '~/utils/routeToLogin'
 import CreateOrgPage from '~/ui/pages/CreateOrgPage'
+import { Helmet } from 'react-helmet'
 
 // more global way to do this?
 pluralize.addPluralRule(/canvas$/i, 'canvases')
@@ -439,7 +440,8 @@ class CollectionPage extends React.Component {
     }
 
     // submissions_collection will only exist for submission boxes
-    const { isSubmissionBox, requiresTestDesigner } = collection
+    const { isSubmissionBox, requiresTestDesigner, name, id } = collection
+    const title = `collections/${id}/${name}`
     const userRequiresOrg =
       !apiStore.currentUserOrganization && collection.common_viewable
 
@@ -472,6 +474,7 @@ class CollectionPage extends React.Component {
 
     return (
       <Fragment>
+        <Helmet title={title} />
         <PageHeader record={collection} />
         {userRequiresOrg && (
           // for new user's trying to add a common resource, they'll see the Create Org modal
