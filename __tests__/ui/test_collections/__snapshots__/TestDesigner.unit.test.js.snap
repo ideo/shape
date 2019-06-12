@@ -889,6 +889,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                   "type": "Item::TextItem",
                 }
               }
+              numberOfQuestions={null}
               order={0}
               parent={
                 Object {
@@ -4269,6 +4270,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                   "type": "Item::TextItem",
                 }
               }
+              numberOfQuestions={null}
               order={0}
               parent={
                 Object {
@@ -7648,6 +7650,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                   "type": "Item::TextItem",
                 }
               }
+              numberOfQuestions={null}
               order={0}
               parent={
                 Object {

@@ -5,7 +5,7 @@ Feature: Creating a Test Collection
     When I create a test collection named "Test Prototype"
     Then I should see a collection card named "Test Prototype"
     When I navigate to the collection named "Test Prototype" via the "CollectionCover"
-    And I wait for "@apiGetAudiences" to finish
+    And I wait for "@apiGetOrganizationAudiences" to finish
     Then I should see "Test Prototype" in a "EditableNameHeading"
     # verify the existence of the default questions
     Then I should see "Photo/Video" in a "QuestionSelectOption"
