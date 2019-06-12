@@ -4,10 +4,6 @@ module Accounting
       (amount * BigDecimal('0.05')).round(2)
     end
 
-    def self.our_commission(_amount)
-      0
-    end
-
     # Record that a payment has been made,
     # documenting what we have earned in our 'receivable' account,
     # and what has been taken out due to payment processing fees

@@ -52,7 +52,7 @@ RSpec.describe Payment, type: :model do
       it 'returns error' do
         payment.save
         expect(payment.errors.full_messages).to eq(
-          ['Payment failed: Bank declined the card'],
+          ['Bank declined the card'],
         )
       end
     end

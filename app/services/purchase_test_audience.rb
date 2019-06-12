@@ -40,7 +40,7 @@ class PurchaseTestAudience
       next if test_audience.errors.blank?
 
       error_message = "Could not purchase #{test_audience.audience_name} audience. " +
-                      test_audience.errors.full_messages.join('. ')
+                      test_audience.errors.full_messages.join('. ') + '.'
 
       context.fail!(message: error_message)
     end

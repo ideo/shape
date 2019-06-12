@@ -31,7 +31,7 @@ class Payment < ApplicationRecord
   validates :amount, :network_payment_method_id, :description,
             presence: true
 
-  before_create :create_network_payment
+  before_create :create_network_payment, unless: :network_payment_id
   after_commit :record_payment, on: :create # Must be after commit so it is after transaction completes
 
   def network_payment_method
@@ -67,7 +67,7 @@ class Payment < ApplicationRecord
     self.network_payment_id = network_payment.id
     return if network_payment.status == 'succeeded'
 
-    errors.add(:base, "Payment failed: #{network_payment.errors.full_messages.join('. ')}")
+    errors.add(:base, network_payment.errors.full_messages.join('. '))
     throw :abort
   end
 

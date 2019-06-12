@@ -5,7 +5,7 @@ describe Api::V1::Admin::FeedbackIncentivesController, type: :request, json: tru
   let!(:test_collection) { create(:test_collection, :with_test_audience, :completed, num_cards: 1) }
   let!(:test_audience) { test_collection.test_audiences.first }
   let(:user) { create(:user) }
-  let(:amount_owed) { test_audience.price_per_response }
+  let(:amount_owed) { TestAudience.incentive_amount }
   let(:survey_response) do
     create(
       :survey_response,
@@ -17,6 +17,13 @@ describe Api::V1::Admin::FeedbackIncentivesController, type: :request, json: tru
   end
 
   before do
+    # Add balance to revenue_deferred account so we can debit from it
+    DoubleEntry.transfer(
+      Money.new(10_00),
+      from: DoubleEntry.account(:cash),
+      to: DoubleEntry.account(:revenue_deferred),
+      code: :purchase,
+    )
     test_collection.launch!
     expect(survey_response.completed?).to be true
     survey_response.record_incentive_owed!

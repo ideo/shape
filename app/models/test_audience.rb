@@ -39,7 +39,7 @@ class TestAudience < ApplicationRecord
   validates :price_per_response, presence: true
 
   before_validation :set_price_per_response_from_audience, on: :create
-  before_create :purchase, if: :requires_payment?
+  after_create :purchase, if: :requires_payment?
 
   delegate :name, :price_per_response,
            to: :audience,
@@ -72,7 +72,11 @@ class TestAudience < ApplicationRecord
   end
 
   def paid?
-    price_per_response > 0
+    price_per_response.positive?
+  end
+
+  def link_sharing?
+    !paid?
   end
 
   def survey_response_completed!
@@ -103,9 +107,9 @@ class TestAudience < ApplicationRecord
 
   # This callback only gets called when using PurchaseTestAudience and setting payment_method
   def purchase
-    return unless valid?
-
     payment = payments.create(
+      user: launched_by,
+      organization: organization,
       network_payment_method_id: @network_payment_method.id,
       description: description,
       amount: total_price.to_f,
@@ -116,7 +120,8 @@ class TestAudience < ApplicationRecord
     return if payment.persisted?
 
     errors.add(:base, "Payment failed: #{payment.errors.full_messages.join('. ')}")
-    throw :abort
+    # throw doesn't work in after_* callbacks, so use this to stop the transaction
+    raise ActiveRecord::RecordInvalid, self
   end
 
   def requires_payment?

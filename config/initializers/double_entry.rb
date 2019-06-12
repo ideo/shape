@@ -30,6 +30,8 @@ DoubleEntry.configure do |config|
 
     # - When a test has been paid out, we debit our revenue_deferred account,
     #   and move it into our revenue account
+    # - After a certain period of time (TBD), we can move any unclaimed earnings from
+    #   our revenue_deferred account to our revenue account
     accounts.define(identifier: :revenue, positive_only: true)
   end
 
@@ -39,6 +41,7 @@ DoubleEntry.configure do |config|
     transfers.define(from: :revenue_deferred, to: :payment_processor, code: :paypal_fee)
     transfers.define(from: :revenue_deferred, to: :individual_owed, code: :incentive_owed)
     transfers.define(from: :revenue_deferred, to: :revenue, code: :revenue)
+    transfers.define(from: :revenue_deferred, to: :revenue, code: :unclaimed_incentive)
     transfers.define(from: :individual_owed, to: :individual_paid, code: :incentive_paid)
   end
 end

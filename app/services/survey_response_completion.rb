@@ -1,5 +1,5 @@
 class SurveyResponseCompletion < SimpleService
-  delegate :test_collection, :gives_incentive?, to: :@survey_response
+  delegate :test_collection, :gives_incentive?, :user, to: :@survey_response
   delegate :test_audience, to: :@survey_response, allow_nil: true
 
   def initialize(survey_response)
@@ -18,15 +18,11 @@ class SurveyResponseCompletion < SimpleService
 
   def update_test_audience_status
     return if test_audience.blank?
-
     test_audience.survey_response_completed!
   end
 
   def mark_response_as_payment_owed
-    return unless gives_incentive?
-
-    user = @survey_response.user
-    return unless user.present?
+    return unless gives_incentive? && user.present?
     # Return if already marked as being owed
     return if @survey_response.incentive_owed?
     # TODO: do we want this service to validate if the user has a duplicate response for the same TestCollection?
