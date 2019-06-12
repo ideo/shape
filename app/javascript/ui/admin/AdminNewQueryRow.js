@@ -44,6 +44,7 @@ class AdminNewQueryRow extends React.Component {
         <NewQueryRowItem item xs={2}>
           <Flex justify="flex-end">
             <TextField
+              data-cy="NewQueryCountTextField"
               type="text"
               onKeyDown={ev => this.handleKeyDown(ev)}
               onBlur={ev => this.handleBlur(ev)}

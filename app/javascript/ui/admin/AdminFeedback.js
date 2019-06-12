@@ -205,6 +205,7 @@ class AdminFeedback extends React.Component {
                             placement="top"
                           >
                             <CircledIcon
+                              data-cy="NewQueryButton"
                               onClick={() =>
                                 this.showNewQueryRow(testCollection)
                               }
