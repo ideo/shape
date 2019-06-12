@@ -28,10 +28,8 @@ class Api::V1::AudiencesController < Api::V1::BaseController
 
   def load_org_audiences
     @audiences = Audience
-                 .includes(:organizations)
-                 .where(organizations: { id: nil })
-                 .or(Audience.includes(:organizations).where(organizations: { id: @organization.id }))
-                 .order(price_per_response: :asc)
+                 .includes(:base_tags)
+                 .viewable_by_user_in_org(user: current_user, organization: @organization)
   end
 
   def authorize_current_organization

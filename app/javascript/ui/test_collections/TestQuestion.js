@@ -243,7 +243,7 @@ TestQuestion.propTypes = {
   createSurveyResponse: PropTypes.func,
   afterQuestionAnswered: PropTypes.func,
   canEdit: PropTypes.bool,
-  numberOfQuestions: PropTypes.number.isRequired,
+  numberOfQuestions: PropTypes.number,
 }
 
 TestQuestion.defaultProps = {
