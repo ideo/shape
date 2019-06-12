@@ -15,10 +15,10 @@ export const criteria = [
     name: 'Children',
     group: 'Demographics',
     options: [
-      'None',
-      'Children Under 12',
-      'Children 12-17',
-      'Children Over 17',
+      'No Children',
+      'Parents of young children',
+      'Parents of teenagers',
+      'Parents of adult children',
     ],
   },
   {
@@ -36,11 +36,7 @@ export const criteria = [
     group: 'Demographics',
     options: ['High School', 'College or Bachelor’s'],
   },
-  {
-    name: 'Gender',
-    group: 'Demographics',
-    options: ['Female', 'Male', 'All'],
-  },
+  { name: 'Gender', group: 'Demographics', options: ['Female', 'Male', 'All'] },
   {
     name: 'Early/Late Adopter',
     group: 'Psychographics',
