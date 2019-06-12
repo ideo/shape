@@ -1,17 +1,13 @@
 class SerializableAudience < BaseJsonSerializer
   type 'audiences'
-  attributes(
-    :name,
-    :criteria,
-    :age_list,
-    :children_age_list,
-    :country_list,
-    :education_level_list,
-    :gender_list,
-    :adopter_type_list,
-    :interest_list,
-    :publication_list,
-  )
+  attributes :name, :criteria
+
+  Audience.tag_types.each do |tag_type|
+    # much more efficient to pull these tag_lists out of audience.all_tags
+    attribute :"#{tag_type.to_s.singularize}_list" do
+      @object.all_tags[tag_type] || []
+    end
+  end
 
   attribute :price_per_response do
     @object.price_per_response.to_f

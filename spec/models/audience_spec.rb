@@ -43,4 +43,14 @@ RSpec.describe Audience, type: :model, seed: true do
       end
     end
   end
+
+  describe '#all_tags' do
+    let!(:audience) { create(:audience, country_list: %w[canada usa], interest_list: %w[fun music]) }
+
+    it 'should return a hash with all the tags' do
+      all_tags = audience.all_tags
+      expect(all_tags[:countries]).to match_array(%w[canada usa])
+      expect(all_tags[:interests]).to match_array(%w[fun music])
+    end
+  end
 end

@@ -48,10 +48,15 @@ class Audience < ApplicationRecord
   end
 
   def self.viewable_by_user_in_org(user:, organization:)
+    # get audiences for user (within org) in order of:
+    # 1. global defaults (e.g. Share via Link, All People)
+    # 2. audiences they have launched tests with recently
+    # 3. all other audiences ordered by name
+    # - `order` is selected via ROW_NUMBER to preserve sort order on frontend
     order_sql = %(
       audiences.global_default ASC NULLS LAST,
       MAX(test_audiences.updated_at) DESC NULLS LAST,
-      audiences.name ASC
+      lower(audiences.name) ASC
     )
     viewable_by_org(organization)
       .joins(%(
@@ -71,8 +76,10 @@ class Audience < ApplicationRecord
 
   def all_tags
     tags = {}
-    tag_types.each do |tag_name|
-      tags[tag_name] = tag_list_on(tag_name)
+    taggings.each do |tagging|
+      category = tagging.context.to_sym
+      tags[category] ||= []
+      tags[category] << tagging.tag.name
     end
     tags
   end
