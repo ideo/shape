@@ -6,6 +6,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { animateScroll as scroll } from 'react-scroll'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
+import ReactToPdf from 'react-to-pdf'
 
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 import ChannelManager from '~/utils/ChannelManager'
@@ -484,39 +485,44 @@ class CollectionPage extends React.Component {
     }
 
     return (
-      <div id="colpage">
-        <PageHeader record={collection} />
-        {userRequiresOrg && (
-          // for new user's trying to add a common resource, they'll see the Create Org modal
-          // pop up over the CollectionGrid
-          <CreateOrgPage commonViewableResource={collection} />
-        )}
-        {!isLoading && (
-          <PageContainer fullWidth={collection.isBoard}>
-            <OverdueBanner />
-            {this.renderEditorPill}
-            {inner}
-            {(collection.requiresSubmissionBoxSettings ||
-              submissionBoxSettingsOpen) && (
-              <SubmissionBoxSettingsModal collection={collection} />
+      <ReactToPdf>
+        {({ toPdf, targetRef }) => (
+          <div id="colpage">
+            <PageHeader record={collection} />
+            <button onClick={toPdf}>Print to pdf</button>
+            {userRequiresOrg && (
+              // for new user's trying to add a common resource, they'll see the Create Org modal
+              // pop up over the CollectionGrid
+              <CreateOrgPage commonViewableResource={collection} />
             )}
-            {/* Listen to this pastingCards value which comes from pressing CTRL+V */}
-            <MoveModal pastingCards={uiStore.pastingCards} />
-            {isSubmissionBox &&
-              apiStore.currentUser &&
-              collection.submission_box_type &&
-              this.renderSubmissionsCollection()}
-            {(uiStore.dragging || uiStore.cardMenuOpenAndPositioned) && (
-              <ClickWrapper
-                clickHandlers={[this.handleAllClick]}
-                onContextMenu={this.handleAllClick}
-              />
+            {!isLoading && (
+              <PageContainer fullWidth={collection.isBoard}>
+                <OverdueBanner />
+                {this.renderEditorPill}
+                <div ref={targetRef}>{inner}</div>
+                {(collection.requiresSubmissionBoxSettings ||
+                  submissionBoxSettingsOpen) && (
+                  <SubmissionBoxSettingsModal collection={collection} />
+                )}
+                {/* Listen to this pastingCards value which comes from pressing CTRL+V */}
+                <MoveModal pastingCards={uiStore.pastingCards} />
+                {isSubmissionBox &&
+                  apiStore.currentUser &&
+                  collection.submission_box_type &&
+                  this.renderSubmissionsCollection()}
+                {(uiStore.dragging || uiStore.cardMenuOpenAndPositioned) && (
+                  <ClickWrapper
+                    clickHandlers={[this.handleAllClick]}
+                    onContextMenu={this.handleAllClick}
+                  />
+                )}
+              </PageContainer>
             )}
-          </PageContainer>
+            {isLoading && this.loader()}
+            {!isLoading && isTransparentLoading && this.transparentLoader()}
+          </div>
         )}
-        {isLoading && this.loader()}
-        {!isLoading && isTransparentLoading && this.transparentLoader()}
-      </div>
+      </ReactToPdf>
     )
   }
 }
