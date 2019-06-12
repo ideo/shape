@@ -47,7 +47,7 @@ class User extends BaseRecord {
       })
     } catch (e) {
       uiStore.defaultAlertError()
-      return e
+      return Promise.reject(e)
     }
   }
 
