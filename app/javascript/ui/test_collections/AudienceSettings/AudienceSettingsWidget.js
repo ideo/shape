@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-// import { pick, filter, reject, sortBy } from 'lodash'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
 
@@ -68,11 +67,6 @@ const StyledPlusIcon = styled.span`
   width: 15px;
 `
 
-const audienceSelected = (audience, audienceSettings) => {
-  const option = audienceSettings.get(audience.id)
-  return option ? option.selected : false
-}
-
 @observer
 class AudienceSettingsWidget extends React.Component {
   state = {
@@ -111,11 +105,11 @@ class AudienceSettingsWidget extends React.Component {
   audiencesInMenu() {
     const { audiences } = this.props
     const { displayedAudiences } = this
-    const orgAudiences = _.reject(
+    const unselectedAudiences = _.filter(
       audiences,
-      a => displayedAudiences.indexOf(a) > -1
+      a => !_.includes(displayedAudiences, a)
     )
-    return _.sortBy(orgAudiences, a => a.order)
+    return _.sortBy(unselectedAudiences, a => a.order)
   }
 
   addAudienceMenuItems() {
@@ -144,8 +138,10 @@ class AudienceSettingsWidget extends React.Component {
     }
   }
 
-  audienceSelected(audience) {
-    return audienceSelected(audience, this.props.audienceSettings)
+  isAudienceSelected(audience) {
+    const { audienceSettings } = this.props
+    const option = audienceSettings.get(audience.id)
+    return option ? option.selected : false
   }
 
   sampleSize(audience) {
@@ -165,7 +161,7 @@ class AudienceSettingsWidget extends React.Component {
       <TableBody
         audience={audience}
         onInputChange={onInputChange}
-        selected={this.audienceSelected(audience)}
+        selected={this.isAudienceSelected(audience)}
         sampleSize={this.sampleSize(audience)}
         locked={this.isAudienceLocked(audience)}
       />
@@ -178,7 +174,7 @@ class AudienceSettingsWidget extends React.Component {
       <AudienceCheckbox
         audienceId={audience.id}
         audienceName={audience.name}
-        selected={this.audienceSelected(audience)}
+        selected={this.isAudienceSelected(audience)}
         onToggleCheckbox={onToggleCheckbox}
         disabled={this.isAudienceLocked(audience)}
       />
