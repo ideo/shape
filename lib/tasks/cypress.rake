@@ -25,7 +25,7 @@ namespace :cypress do
     FactoryBot.create(:user, email: 'cypress-test-1@ideo.com', add_to_org: organization)
     create_cards(user.current_user_collection, user)
     create_events(organization)
-    create_test_collection(organization)
+    # create_test_collection(organization) TODO: uncomment me once this is fixed
   end
 
   def create_cards(collection, user)
