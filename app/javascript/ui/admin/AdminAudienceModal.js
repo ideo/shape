@@ -12,7 +12,6 @@ import {
 } from '~/ui/global/styled/forms'
 import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import v from '~/utils/variables'
-import { DisplayText } from '../global/styled/typography'
 import { tagListsToCriteria } from '~/ui/test_collections/AudienceSettings/AudienceCriteria'
 
 const SelectedOptionsWrapper = styled(Flex)`
@@ -46,7 +45,7 @@ class AdminAudienceModal extends React.Component {
   renderCriteriaRow(criteria, listName) {
     return (
       <FieldContainer key={`selected_${listName}`}>
-        <DisplayText data-cy="AdminAudienceCategory">{listName}</DisplayText>
+        <Label data-cy="AdminAudienceCategory">{listName}</Label>
         <SelectedOptionsWrapper wrap>
           {map(criteria, option => {
             return (
@@ -99,7 +98,7 @@ class AdminAudienceModal extends React.Component {
               disabled
             />
           </FieldContainer>
-          <Box mb={2}>
+          <Box mb={1}>
             <Label>Targeting Criteria</Label>
           </Box>
           {this.renderCriteria()}
@@ -119,10 +118,8 @@ class AdminAudienceModal extends React.Component {
 }
 
 AdminAudienceModal.propTypes = {
-  open: PropTypes.bool.isRequired,
-  audience: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-  }).isRequired,
+  open: PropTypes.bool,
+  audience: MobxPropTypes.objectOrObservableObject,
 }
 AdminAudienceModal.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,

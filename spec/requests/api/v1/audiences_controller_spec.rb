@@ -17,7 +17,7 @@ describe Api::V1::AudiencesController, type: :request, json: true, create_org: t
         expect(response.status).to eq(200)
       end
 
-      it 'returns audiences' do
+      it 'returns audiences with order attribute' do
         get(path)
 
         audience_ids = json['data'].map { |a| a['id'] }
@@ -25,8 +25,8 @@ describe Api::V1::AudiencesController, type: :request, json: true, create_org: t
         expect(audience_ids).to include(audience1.id.to_s)
         expect(audience_ids).to include(audience2.id.to_s)
 
-        json['data'].each do |actual_audience|
-          expect(actual_audience['attributes']['global']).to eq(actual_audience['id'] == audience1.id.to_s)
+        json['data'].each_with_index do |actual_audience, i|
+          expect(actual_audience['attributes']['order']).to eq(i + 1)
         end
       end
     end
