@@ -401,14 +401,30 @@ class CollectionPage extends React.Component {
     </div>
   )
 
-  printToPdf = () => {
-    const input = document.getElementById('page-container')
-    console.log('poop', input)
-    html2canvas(input).then(canvas => {
-      const imgData = canvas.toDataURL('image/png')
-      const pdf = new jsPDF()
-      pdf.addImage(imgData, 'PNG', 0, 0)
-      pdf.save('download.pdf')
+  toPdf = ev => {
+    ev.preventDefault()
+    const input = document.getElementById('print-to-pdf')
+    const canvasOptions = {
+      allowTaint: true,
+      foreignObjectRendering: true,
+      logging: true,
+      x: 0,
+      y: 0,
+      width: 1321,
+      height: 2112,
+    }
+    html2canvas(input, canvasOptions).then(canvas => {
+      // const imgData = canvas.toDataURL('image/png')
+      // const pdf = new jsPDF()
+      // pdf.addImage(imgData, 'PNG', 0, 0)
+      // pdf.save('another.pdf')
+      document.body.appendChild(canvas)
+      // const a = document.createElement('a')
+      // a.href = canvas
+      //   .toDataURL('image/jpeg')
+      //   .replace('image/jpeg', 'image/octet-stream')
+      // a.download = 'somefilename.jpg'
+      // a.click()
     })
   }
 
@@ -485,44 +501,45 @@ class CollectionPage extends React.Component {
     }
 
     return (
-      <ReactToPdf>
-        {({ toPdf, targetRef }) => (
-          <div id="colpage">
-            <PageHeader record={collection} />
-            <button onClick={toPdf}>Print to pdf</button>
-            {userRequiresOrg && (
-              // for new user's trying to add a common resource, they'll see the Create Org modal
-              // pop up over the CollectionGrid
-              <CreateOrgPage commonViewableResource={collection} />
-            )}
-            {!isLoading && (
-              <PageContainer fullWidth={collection.isBoard}>
-                <OverdueBanner />
-                {this.renderEditorPill}
-                <div ref={targetRef}>{inner}</div>
-                {(collection.requiresSubmissionBoxSettings ||
-                  submissionBoxSettingsOpen) && (
-                  <SubmissionBoxSettingsModal collection={collection} />
-                )}
-                {/* Listen to this pastingCards value which comes from pressing CTRL+V */}
-                <MoveModal pastingCards={uiStore.pastingCards} />
-                {isSubmissionBox &&
-                  apiStore.currentUser &&
-                  collection.submission_box_type &&
-                  this.renderSubmissionsCollection()}
-                {(uiStore.dragging || uiStore.cardMenuOpenAndPositioned) && (
-                  <ClickWrapper
-                    clickHandlers={[this.handleAllClick]}
-                    onContextMenu={this.handleAllClick}
-                  />
-                )}
-              </PageContainer>
-            )}
-            {isLoading && this.loader()}
-            {!isLoading && isTransparentLoading && this.transparentLoader()}
-          </div>
+      <div id="colpage">
+        <PageHeader record={collection} />
+        {userRequiresOrg && (
+          // for new user's trying to add a common resource, they'll see the Create Org modal
+          // pop up over the CollectionGrid
+          <CreateOrgPage commonViewableResource={collection} />
         )}
-      </ReactToPdf>
+        {!isLoading && (
+          <PageContainer fullWidth={collection.isBoard}>
+            <button onClick={this.toPdf}>Print to pdf</button>
+            <OverdueBanner />
+            {this.renderEditorPill}
+            <div
+              id="print-to-pdf"
+              style={{ width: '1384px', height: '2112px' }}
+            >
+              {inner}
+            </div>
+            {(collection.requiresSubmissionBoxSettings ||
+              submissionBoxSettingsOpen) && (
+              <SubmissionBoxSettingsModal collection={collection} />
+            )}
+            {/* Listen to this pastingCards value which comes from pressing CTRL+V */}
+            <MoveModal pastingCards={uiStore.pastingCards} />
+            {isSubmissionBox &&
+              apiStore.currentUser &&
+              collection.submission_box_type &&
+              this.renderSubmissionsCollection()}
+            {(uiStore.dragging || uiStore.cardMenuOpenAndPositioned) && (
+              <ClickWrapper
+                clickHandlers={[this.handleAllClick]}
+                onContextMenu={this.handleAllClick}
+              />
+            )}
+          </PageContainer>
+        )}
+        {isLoading && this.loader()}
+        {!isLoading && isTransparentLoading && this.transparentLoader()}
+      </div>
     )
   }
 }
