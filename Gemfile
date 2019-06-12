@@ -64,7 +64,7 @@ gem 'sidekiq-scheduler'
 gem 'searchkick', '~> 3.0.0'
 
 # For taggable collections/items
-gem 'acts-as-taggable-on'
+gem 'acts-as-taggable-on', '~> 6.0.0'
 
 # middleware for 301 redirects
 gem 'rack-rewrite', '~> 1.5'
@@ -96,7 +96,7 @@ gem 'google-cloud-firestore', '~> 0.21.0'
 gem 'jwt', '~> 1.5'
 
 # looking up records by slug
-gem 'friendly_id', '~> 5.1.0'
+gem 'friendly_id', '~> 5.2.0'
 
 # State machine for ruby classes
 gem 'aasm', '~> 5.0'

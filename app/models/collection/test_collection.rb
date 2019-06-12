@@ -519,10 +519,9 @@ class Collection
           .each_with_index do |question_type, i|
         primary_collection_cards.build(
           order: i,
-          item_attributes: {
-            type: 'Item::QuestionItem',
+          item: Item::QuestionItem.new(
             question_type: question_type,
-          },
+          ),
         )
       end
     end

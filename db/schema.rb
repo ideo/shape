@@ -10,11 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190607170549) do
+ActiveRecord::Schema.define(version: 2019_06_07_170549) do
 
   # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
   enable_extension "pg_stat_statements"
+  enable_extension "plpgsql"
 
   create_table "activities", force: :cascade do |t|
     t.bigint "actor_id"

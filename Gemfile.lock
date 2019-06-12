@@ -69,8 +69,8 @@ GEM
       i18n (>= 0.7, < 2)
       minitest (~> 5.1)
       tzinfo (~> 1.1)
-    acts-as-taggable-on (5.0.0)
-      activerecord (>= 4.2.8)
+    acts-as-taggable-on (6.0.0)
+      activerecord (~> 5.0)
     addressable (2.3.8)
     amoeba (3.1.0)
       activerecord (>= 3.2.6)
@@ -173,7 +173,7 @@ GEM
       progress_bar
       typhoeus (~> 1.1)
     formatador (0.2.5)
-    friendly_id (5.1.0)
+    friendly_id (5.2.5)
       activerecord (>= 4.0.0)
     get_process_mem (0.2.3)
     gibbon (3.2.0)
@@ -528,7 +528,7 @@ DEPENDENCIES
   aasm (~> 5.0)
   action-cable-testing
   active_record_query_trace
-  acts-as-taggable-on
+  acts-as-taggable-on (~> 6.0.0)
   amoeba
   annotate
   appsignal
@@ -549,7 +549,7 @@ DEPENDENCIES
   faker (~> 1.8.7)
   fakeredis
   filestack (~> 2.6.1)
-  friendly_id (~> 5.1.0)
+  friendly_id (~> 5.2.0)
   gibbon (~> 3.2)
   google-cloud-firestore (~> 0.21.0)
   guard
