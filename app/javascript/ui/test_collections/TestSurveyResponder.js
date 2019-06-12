@@ -20,6 +20,7 @@ const UNANSWERABLE_QUESTION_TYPES = [
   'question_media',
   'question_description',
   'question_finish',
+  'question_demographics_intro',
 ]
 
 const createFakeCollectionCard = ({
@@ -89,6 +90,19 @@ class TestSurveyResponder extends React.Component {
         })
       )
     }
+
+    const includeDemographicQuestions = true // TODO
+    if (includeDemographicQuestions) {
+      questionCards.push(createFakeCollectionCard({ id: 'demographics_intro' }))
+
+      questionCards.push(
+        createFakeCollectionCard({
+          id: 'demographics_question',
+          cardQuestionType: 'question_single_choice',
+        })
+      )
+    }
+
     if (includeTerms) {
       questionCards.unshift(
         createFakeCollectionCard({
@@ -96,12 +110,14 @@ class TestSurveyResponder extends React.Component {
         })
       )
     }
+
     // Always have the respondent welcome come first
     questionCards.unshift(
       createFakeCollectionCard({
         id: 'welcome',
       })
     )
+
     runInAction(() => {
       this.questionCards = questionCards
     })

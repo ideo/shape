@@ -11,6 +11,8 @@ import NextTestQuestion from '~/ui/test_collections/NextTestQuestion'
 import NewQuestionGraphic from '~/ui/icons/NewQuestionGraphic'
 import OpenQuestion from '~/ui/test_collections/OpenQuestion'
 import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
+import SingleChoiceQuestion from '~/ui/test_collections/SingleChoiceQuestion'
+import DemographicsIntroQuestion from '~/ui/test_collections/DemographicsIntroQuestion'
 import TermsQuestion from '~/ui/test_collections/TermsQuestion'
 import WelcomeQuestion from '~/ui/test_collections/WelcomeQuestion'
 import { QuestionText } from '~/ui/test_collections/shared'
@@ -213,6 +215,19 @@ class TestQuestion extends React.Component {
           <WelcomeQuestion
             givesIncentive={this.givesIncentive}
             numberOfQuestions={numberOfQuestions}
+            onAnswer={this.handleQuestionAnswer}
+          />
+        )
+
+      case 'question_demographics_intro':
+        return <DemographicsIntroQuestion />
+
+      case 'question_single_choice':
+        return (
+          <SingleChoiceQuestion
+            question={item}
+            editing={editing}
+            questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}
           />
         )
