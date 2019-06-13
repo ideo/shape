@@ -11,6 +11,7 @@ import DuplicateIcon from '~/ui/icons/DuplicateIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import MoveIcon from '~/ui/icons/MoveIcon'
 import ReplaceIcon from '~/ui/icons/ReplaceIcon'
+import PrintIcon from '~/ui/icons/PrintIcon'
 import SharingIcon from '~/ui/icons/SharingIcon'
 import SubmissionBoxIconSm from '~/ui/icons/SubmissionBoxIconSm'
 import PopoutMenu from '~/ui/global/PopoutMenu'
@@ -229,7 +230,7 @@ class ActionMenu extends React.Component {
     if (location === 'PageMenu' && record.isCollection) {
       items.push({
         name: 'Print',
-        // iconRight: <PrintIcon />,
+        iconRight: <PrintIcon />,
         onClick: this.printPage,
       })
     }
