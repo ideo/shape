@@ -66,8 +66,7 @@ describe Api::V1::Admin::UsersController, type: :request, json: true, auth: true
   end
 
   describe 'GET #search' do
-    let(:tag_list) { %w[millenial usa]}
-    let(:audience) { create(:audience, tag_list: tag_list) }
+    let(:audience) { create(:audience, age_list: ['millenial'], country_list: ['usa']) }
     let(:num_respondents) { 5 }
     let(:path) do
       "/api/v1/admin/users/search?audience_id=#{audience.id}&num_respondents=#{num_respondents}"
@@ -88,7 +87,7 @@ describe Api::V1::Admin::UsersController, type: :request, json: true, auth: true
     end
     let!(:millenial_user) { create(:user, tag_list: ['millennial']) }
     let!(:usa_user) { create(:user, tag_list: ['usa']) }
-    let!(:millenial_usa_user1) { create(:user, tag_list: tag_list) }
+    let!(:millenial_usa_user1) { create(:user, tag_list: %w[millenial usa]) }
     let!(:millenial_invitation1) do
       create(
         :test_audience_invitation,
@@ -97,7 +96,7 @@ describe Api::V1::Admin::UsersController, type: :request, json: true, auth: true
         created_at: Time.now - 2.days,
       )
     end
-    let!(:millenial_usa_user2) { create(:user, tag_list: tag_list) }
+    let!(:millenial_usa_user2) { create(:user, tag_list: %w[millenial usa]) }
     let!(:millenial_invitation2) do
       create(
         :test_audience_invitation,
@@ -114,7 +113,7 @@ describe Api::V1::Admin::UsersController, type: :request, json: true, auth: true
         created_at: Time.now,
       )
     end
-    let!(:everything_user) { create(:user, tag_list: %w[millenial usa everything])}
+    let!(:everything_user) { create(:user, tag_list: %w[millenial usa everything]) }
 
     it 'returns users tagged with the given audience tags' do
       get path

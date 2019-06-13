@@ -31,7 +31,8 @@ class Api::V1::Admin::UsersController < Api::V1::BaseController
 
   def search
     audience = Audience.find(params[:audience_id])
-    users = User.tagged_with(audience.tag_list)
+
+    users = User.tagged_with(audience.age_list + audience.children_age_list + audience.country_list + audience.education_level_list + audience.gender_list + audience.adopter_type_list + audience.interest_list + audience.publication_list)
                 .left_outer_joins(:test_audience_invitations)
                 .select('users.*, MAX(test_audience_invitations.created_at) AS date_of_participation')
                 .group('users.id')
