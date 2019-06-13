@@ -111,6 +111,18 @@ class LegendItemCover extends React.Component {
     uiStore.removeEmptySpaceClickHandler(this.onSearchClose)
   }
 
+  usesTestComparisonApi(entity) {
+    const isTestCollection = entity.internalType === 'collections'
+    // If it is a test collection, it uses the test comparison api
+    if (isTestCollection) return true
+    // If not a dataset, does not use test comparison API
+    if (!entity.internalType === 'datasets') return false
+    const hasGroupings = entity.groupings && entity.groupings.length
+    // Uses test comparison API if it references a test collection,
+    // and does not have any groupings
+    return entity.test_collection_id && !hasGroupings
+  }
+
   /*
    * Unique dataset and whether selected or not
    */
@@ -175,18 +187,12 @@ class LegendItemCover extends React.Component {
    * This behavior may change in the future
    */
   onDeselectComparison = async dataset => {
-    const {
-      card: { parent },
-      item: { legend_search_source },
-    } = this.props
-    if (
-      dataset.groupings.length ||
-      legend_search_source === 'select_from_datasets'
-    ) {
+    const { parent } = this.props.card
+    if (this.usesTestComparisonApi(dataset)) {
+      await parent.API_removeComparison({ id: dataset.test_collection_id })
+    } else {
       const { identifier, selected } = dataset
       this.toggleDatasetsWithIdentifier({ identifier, selected })
-    } else {
-      await parent.API_removeComparison({ id: dataset.test_collection_id })
     }
     parent.API_fetchCards()
   }
@@ -201,15 +207,12 @@ class LegendItemCover extends React.Component {
    * This behavior may change in the future
    */
   onSelectComparison = async entity => {
-    const {
-      card,
-      item: { legend_search_source },
-    } = this.props
-    if (legend_search_source === 'select_from_datasets') {
+    const { card } = this.props
+    if (this.usesTestComparisonApi(entity)) {
+      await card.parent.API_addComparison(entity)
+    } else {
       const { identifier, selected } = entity
       this.toggleDatasetsWithIdentifier({ identifier, selected })
-    } else {
-      await card.parent.API_addComparison(entity)
     }
     card.parent.API_fetchCards()
   }
