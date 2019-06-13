@@ -3,6 +3,7 @@ require 'rails_helper'
 describe SurveyResponseCompletion, type: :service, truncate: true do
   let(:test_collection) { create(:test_collection, :with_test_audience, :completed, num_cards: 1, test_status: :live) }
   let(:test_audience) { test_collection.test_audiences.first }
+  let!(:payment) { create(:payment, :paid, purchasable: test_audience, amount: test_audience.total_price) }
   let(:survey_response) { create(:survey_response, test_collection: test_collection, test_audience: test_audience) }
   let(:service) { SurveyResponseCompletion.new(survey_response) }
   let(:payment_method_double) { double(id: rand(1000..100_000)) }
@@ -12,8 +13,8 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
     # Add balance to revenue_deferred account so we can debit from it
     DoubleEntry.transfer(
       Money.new(10_00),
-      from: DoubleEntry.account(:cash),
-      to: DoubleEntry.account(:revenue_deferred),
+      from: DoubleEntry.account(:cash, scope: payment),
+      to: DoubleEntry.account(:revenue_deferred, scope: payment),
       code: :purchase,
     )
     test_audience.update(price_per_response: 4.50)
@@ -62,7 +63,7 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
         before do
           DoubleEntry.transfer(
             Money.new(TestAudience.incentive_amount * 100),
-            from: DoubleEntry.account(:revenue_deferred),
+            from: DoubleEntry.account(:revenue_deferred, scope: payment),
             to: DoubleEntry.account(:individual_owed, scope: user),
             code: :incentive_owed,
             metadata: { survey_response_id: rand(1000) },

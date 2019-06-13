@@ -587,7 +587,7 @@ describe User, type: :model do
   describe '#incentive_due_date' do
     let(:user) { create(:user) }
     let(:test_collection) { create(:test_collection) }
-    let(:test_audience) { create(:test_audience, price_per_response: 2.50, test_collection: test_collection) }
+    let(:test_audience) { create(:test_audience, :payment, price_per_response: 2.50, test_collection: test_collection) }
 
     it 'is nil without a balance' do
       expect(user.incentive_owed_account_balance.to_f).to eq(0.0)
@@ -601,13 +601,6 @@ describe User, type: :model do
       let!(:unpaid_survey_response) { create(:survey_response, user: user, test_audience: test_audience) }
       let!(:prev_survey_completed_at) { 3.days.ago }
       before do
-        # Add balance to revenue_deferred account so we can debit from it
-        DoubleEntry.transfer(
-          Money.new(10_00),
-          from: DoubleEntry.account(:cash),
-          to: DoubleEntry.account(:revenue_deferred),
-          code: :purchase,
-        )
         # Mock out methods so we don't have to complete the response in this spec
         allow(paid_survey_response).to receive(:amount_earned).and_return(test_audience.price_per_response)
         allow(unpaid_survey_response).to receive(:amount_earned).and_return(test_audience.price_per_response)

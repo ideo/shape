@@ -4,6 +4,7 @@ describe Api::V1::Admin::FeedbackIncentivesController, type: :request, json: tru
   let(:admin_user) { @user }
   let!(:test_collection) { create(:test_collection, :with_test_audience, :completed, num_cards: 1) }
   let!(:test_audience) { test_collection.test_audiences.first }
+  let!(:payment) { create(:payment, :paid, purchasable: test_audience, amount: test_audience.total_price) }
   let(:user) { create(:user) }
   let(:amount_owed) { TestAudience.incentive_amount }
   let(:survey_response) do
@@ -20,8 +21,8 @@ describe Api::V1::Admin::FeedbackIncentivesController, type: :request, json: tru
     # Add balance to revenue_deferred account so we can debit from it
     DoubleEntry.transfer(
       Money.new(10_00),
-      from: DoubleEntry.account(:cash),
-      to: DoubleEntry.account(:revenue_deferred),
+      from: DoubleEntry.account(:cash, scope: payment),
+      to: DoubleEntry.account(:revenue_deferred, scope: payment),
       code: :purchase,
     )
     test_collection.launch!

@@ -132,19 +132,10 @@ RSpec.describe SurveyResponse, type: :model do
   describe '#record_incentive_owed!', truncate: true do
     let(:user) { create(:user) }
     let!(:test_collection) { create(:test_collection) }
-    let(:test_audience) { create(:test_audience, test_collection: test_collection, price_per_response: 4.75) }
+    let(:test_audience) { create(:test_audience, :payment, test_collection: test_collection, price_per_response: 4.75) }
+    let(:payment) { test_audience.payment }
     let(:survey_response) { create(:survey_response, user: user, test_audience: test_audience, status: :completed) }
-    let(:revenue_deferred_account) { DoubleEntry.account(:revenue_deferred) }
-
-    before do
-      # Make sure revenue_deferred has a positive balance
-      DoubleEntry.transfer(
-        Money.new(10_00),
-        from: DoubleEntry.account(:cash),
-        to: DoubleEntry.account(:revenue_deferred),
-        code: :purchase,
-      )
-    end
+    let(:revenue_deferred_account) { DoubleEntry.account(:revenue_deferred, scope: test_audience.payment) }
 
     it 'updates incentive_status' do
       expect {
@@ -164,7 +155,7 @@ RSpec.describe SurveyResponse, type: :model do
       expect {
         survey_response.record_incentive_owed!
       }.to change(revenue_deferred_account, :balance)
-      expect(revenue_deferred_account.balance.to_f).to eq(10.00 - 2.50)
+      expect(revenue_deferred_account.balance.to_f).to eq(payment.amount.to_f - payment.stripe_fee - 2.50)
     end
   end
 
@@ -172,23 +163,16 @@ RSpec.describe SurveyResponse, type: :model do
   describe '#record_incentive_paid!', truncate: true do
     let(:user) { create(:user) }
     let!(:test_collection) { create(:test_collection) }
-    let(:test_audience) { create(:test_audience, test_collection: test_collection, price_per_response: 4.75) }
+    let(:test_audience) { create(:test_audience, :payment, test_collection: test_collection, price_per_response: 4.75) }
     let(:survey_response) { create(:survey_response, user: user, test_audience: test_audience, status: :completed) }
-    let(:revenue_deferred_account) { DoubleEntry.account(:revenue_deferred) }
-    let(:payment_processor_account) { DoubleEntry.account(:payment_processor) }
-    let(:revenue_account) { DoubleEntry.account(:revenue) }
+    let(:revenue_deferred_account) { DoubleEntry.account(:revenue_deferred, scope: test_audience.payment) }
+    let(:payment_processor_account) { DoubleEntry.account(:payment_processor, scope: test_audience.payment) }
+    let(:revenue_account) { DoubleEntry.account(:revenue, scope: test_audience.payment) }
     let(:incentive_amount) { 2.50 }
     let(:paypal_fee) { (incentive_amount * 0.05).round(2) }
     let(:our_earning) { test_audience.price_per_response - incentive_amount - paypal_fee }
 
     before do
-      # Make sure revenue_deferred has a positive balance
-      DoubleEntry.transfer(
-        Money.new(10_00),
-        from: DoubleEntry.account(:cash),
-        to: DoubleEntry.account(:revenue_deferred),
-        code: :purchase,
-      )
       survey_response.record_incentive_owed!
     end
 

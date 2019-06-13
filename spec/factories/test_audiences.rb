@@ -5,6 +5,13 @@ FactoryBot.define do
     test_collection nil
     launched_by factory: :user
 
+    trait :payment do
+      after(:build) do |test_audience|
+        payment = build(:payment, :paid, purchasable: test_audience)
+        test_audience.payment = payment
+      end
+    end
+
     trait :link_sharing do
       audience factory: [:audience, :link_sharing]
     end

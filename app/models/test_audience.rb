@@ -31,7 +31,7 @@ class TestAudience < ApplicationRecord
              touch: true
   belongs_to :launched_by, class_name: 'User', optional: true
   has_many :survey_responses
-  has_many :payments, as: :purchasable
+  has_one :payment, as: :purchasable
 
   delegate :name,
            :link_sharing?,
@@ -107,7 +107,7 @@ class TestAudience < ApplicationRecord
 
   # This callback only gets called when using PurchaseTestAudience and setting payment_method
   def purchase
-    payment = payments.create(
+    create_payment(
       user: launched_by,
       organization: organization,
       network_payment_method_id: @network_payment_method.id,
