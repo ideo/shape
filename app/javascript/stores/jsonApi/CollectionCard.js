@@ -300,7 +300,7 @@ class CollectionCard extends BaseRecord {
       const popupAgreed = new Promise((resolve, reject) => {
         let prompt = 'Are you sure you want to delete this?'
         const confirmText = 'Delete'
-        let iconName = 'Trash'
+        let iconName = 'TrashXl'
         let snoozeChecked = null
         let onToggleSnoozeDialog = null
         if (collection.isMasterTemplate) {

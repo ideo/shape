@@ -17,6 +17,7 @@ import OverdueClockIcon from '~/ui/icons/OverdueClockIcon'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import TestGraphIcon from '~/ui/icons/TestGraphIcon'
 import TrashIcon from '~/ui/icons/TrashIcon'
+import TrashIconXl from '~/ui/icons/TrashIconXl'
 
 export const iconNames = [
   'Alert',
@@ -36,6 +37,7 @@ export const iconNames = [
   'Template',
   'TestGraph',
   'TrashIcon',
+  'TrashIconXl',
 ]
 
 export default {
@@ -57,4 +59,5 @@ export default {
   TemplateIcon: () => <TemplateIcon circled />,
   TestGraphIcon,
   TrashIcon,
+  TrashIconXl,
 }
