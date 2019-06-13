@@ -1274,6 +1274,12 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
               Object {},
             ],
           ],
+          "results": Array [
+            Object {
+              "type": "return",
+              "value": undefined,
+            },
+          ],
         }
       }
       height={100}
@@ -7251,6 +7257,12 @@ exports[`GridCard when selected renders snapshot 1`] = `
             Array [
               Object {},
             ],
+          ],
+          "results": Array [
+            Object {
+              "type": "return",
+              "value": undefined,
+            },
           ],
         }
       }
@@ -13878,6 +13890,12 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
               Object {},
             ],
           ],
+          "results": Array [
+            Object {
+              "type": "return",
+              "value": undefined,
+            },
+          ],
         }
       }
       height={100}
@@ -19857,6 +19875,12 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
               Object {},
             ],
           ],
+          "results": Array [
+            Object {
+              "type": "return",
+              "value": undefined,
+            },
+          ],
         }
       }
       height={100}
@@ -25806,6 +25830,12 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
             Array [
               Object {},
             ],
+          ],
+          "results": Array [
+            Object {
+              "type": "return",
+              "value": undefined,
+            },
           ],
         }
       }
@@ -31787,6 +31817,12 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
             Array [
               Object {},
             ],
+          ],
+          "results": Array [
+            Object {
+              "type": "return",
+              "value": undefined,
+            },
           ],
         }
       }
@@ -40974,6 +41010,12 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
             Array [
               Object {},
             ],
+          ],
+          "results": Array [
+            Object {
+              "type": "return",
+              "value": undefined,
+            },
           ],
         }
       }

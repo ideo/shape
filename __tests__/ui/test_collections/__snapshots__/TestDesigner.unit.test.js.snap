@@ -975,6 +975,12 @@ exports[`TestDesigner renders snapshot 1`] = `
                           undefined,
                         ],
                       ],
+                      "results": Array [
+                        Object {
+                          "type": "return",
+                          "value": Promise {},
+                        },
+                      ],
                     },
                     "fetchNotifications": [MockFunction],
                     "fetchRoles": [MockFunction fetchRoles],
@@ -4356,6 +4362,12 @@ exports[`TestDesigner renders snapshot 1`] = `
                           undefined,
                         ],
                       ],
+                      "results": Array [
+                        Object {
+                          "type": "return",
+                          "value": Promise {},
+                        },
+                      ],
                     },
                     "fetchNotifications": [MockFunction],
                     "fetchRoles": [MockFunction fetchRoles],
@@ -7736,6 +7748,12 @@ exports[`TestDesigner renders snapshot 1`] = `
                           undefined,
                         ],
                       ],
+                      "results": Array [
+                        Object {
+                          "type": "return",
+                          "value": Promise {},
+                        },
+                      ],
                     },
                     "fetchNotifications": [MockFunction],
                     "fetchRoles": [MockFunction fetchRoles],
@@ -10278,6 +10296,12 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "collections",
                     undefined,
                   ],
+                ],
+                "results": Array [
+                  Object {
+                    "type": "return",
+                    "value": Promise {},
+                  },
                 ],
               },
               "fetchNotifications": [MockFunction],
