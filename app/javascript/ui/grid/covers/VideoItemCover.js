@@ -72,6 +72,7 @@ const VideoPlayButton = styled.button`
     display: none;
   }
 `
+VideoPlayButton.displayName = 'VideoPlayButton'
 
 @observer
 class VideoItemCover extends React.Component {

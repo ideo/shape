@@ -122,6 +122,11 @@ class ActionMenu extends React.Component {
     uiStore.update('submissionBoxSettingsOpen', true)
   }
 
+  printPage = ev => {
+    ev.preventDefault()
+    window.print()
+  }
+
   get movingFromCollectionId() {
     const { card, uiStore, location } = this.props
     // For PageMenu we're moving "from" the parent collection
@@ -219,6 +224,14 @@ class ActionMenu extends React.Component {
         viewActions.push('Sharing')
       }
       items = _.filter(items, a => _.includes(viewActions, a.name))
+    }
+
+    if (location === 'PageMenu' && record.isCollection) {
+      items.push({
+        name: 'Print',
+        // iconRight: <PrintIcon />,
+        onClick: this.printPage,
+      })
     }
 
     // if record is system required, we always remove these actions

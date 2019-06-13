@@ -22,6 +22,9 @@ const FloatingButton = styled.button`
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
     display: none;
   }
+  @media print {
+    display: none;
+  }
 `
 
 const MAX_RETRIES = 20
