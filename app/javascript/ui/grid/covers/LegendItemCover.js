@@ -175,8 +175,14 @@ class LegendItemCover extends React.Component {
    * This behavior may change in the future
    */
   onDeselectComparison = async dataset => {
-    const { parent } = this.props.card
-    if (dataset.groupings.length) {
+    const {
+      card: { parent },
+      item: { legend_search_source },
+    } = this.props
+    if (
+      dataset.groupings.length ||
+      legend_search_source === 'select_from_datasets'
+    ) {
       const { identifier, selected } = dataset
       this.toggleDatasetsWithIdentifier({ identifier, selected })
     } else {
@@ -195,8 +201,11 @@ class LegendItemCover extends React.Component {
    * This behavior may change in the future
    */
   onSelectComparison = async entity => {
-    const { card } = this.props
-    if (entity.internalType === 'datasets') {
+    const {
+      card,
+      item: { legend_search_source },
+    } = this.props
+    if (legend_search_source === 'select_from_datasets') {
       const { identifier, selected } = entity
       this.toggleDatasetsWithIdentifier({ identifier, selected })
     } else {
