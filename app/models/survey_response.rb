@@ -3,6 +3,8 @@
 # Table name: survey_responses
 #
 #  id                 :bigint(8)        not null, primary key
+#  incentive_owed_at  :datetime
+#  incentive_paid_at  :datetime
 #  incentive_status   :integer
 #  session_uid        :text
 #  status             :integer          default("in_progress")
@@ -59,14 +61,14 @@ class SurveyResponse < ApplicationRecord
   def record_incentive_owed!
     return if !incentive_unearned? || amount_earned.zero?
     Accounting::RecordTransfer.incentive_owed(self)
-    update(incentive_status: :incentive_owed)
+    update(incentive_status: :incentive_owed, incentive_owed_at: Time.current)
     incentive_owed_account_balance
   end
 
   def record_incentive_paid!
     return if !incentive_owed? || amount_earned.zero? || !incentive_owed_account_balance.positive?
     Accounting::RecordTransfer.incentive_paid(self)
-    update(incentive_status: :incentive_paid)
+    update(incentive_status: :incentive_paid, incentive_paid_at: Time.current)
     incentive_paid_account_balance
   end
 

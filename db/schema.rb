@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190607215955) do
+ActiveRecord::Schema.define(version: 20190613230119) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -482,6 +482,8 @@ ActiveRecord::Schema.define(version: 20190607215955) do
     t.bigint "user_id"
     t.bigint "test_audience_id"
     t.integer "incentive_status"
+    t.datetime "incentive_owed_at"
+    t.datetime "incentive_paid_at"
     t.index ["incentive_status"], name: "index_survey_responses_on_incentive_status"
     t.index ["session_uid"], name: "index_survey_responses_on_session_uid", unique: true
     t.index ["test_audience_id"], name: "index_survey_responses_on_test_audience_id"
