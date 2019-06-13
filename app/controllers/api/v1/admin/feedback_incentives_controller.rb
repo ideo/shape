@@ -5,7 +5,7 @@ class Api::V1::Admin::FeedbackIncentivesController < Api::V1::BaseController
   def index
     respond_to do |format|
       format.csv do
-        send_data ExportPendingIncentives.call,
+        send_data PaidTests::ExportPendingIncentives.call,
                   type: 'text/csv',
                   filename: "feedback-incentives-#{Time.now}.csv",
                   disposition: 'attachment'
@@ -14,6 +14,6 @@ class Api::V1::Admin::FeedbackIncentivesController < Api::V1::BaseController
   end
 
   def mark_all_paid
-    ExportPendingIncentives.mark_as_paid!
+    PaidTests::ExportPendingIncentives.mark_as_paid!
   end
 end

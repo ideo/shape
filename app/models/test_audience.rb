@@ -45,6 +45,8 @@ class TestAudience < ApplicationRecord
            to: :audience,
            prefix: true
 
+  delegate :stripe_fee, to: :payment, allow_nil: true
+
   delegate :organization, to: :test_collection
 
   delegate :number_to_currency, to: 'ActionController::Base.helpers'

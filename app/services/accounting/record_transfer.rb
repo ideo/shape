@@ -34,6 +34,7 @@ module Accounting
         from: DoubleEntry.account(:revenue_deferred, scope: payment),
         to: DoubleEntry.account(:individual_owed, scope: user),
         code: :incentive_owed,
+        detail: payment,
         metadata: { survey_response_id: survey_response.id },
       )
     end
@@ -51,6 +52,7 @@ module Accounting
         Money.new(incentive * 100),
         from: DoubleEntry.account(:individual_owed, scope: user),
         to: DoubleEntry.account(:individual_paid, scope: user),
+        detail: payment,
         code: :incentive_paid,
         metadata: { survey_response_id: survey_response.id },
       )

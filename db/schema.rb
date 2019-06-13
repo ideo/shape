@@ -90,6 +90,8 @@ ActiveRecord::Schema.define(version: 20190607215955) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.decimal "price_per_response", precision: 10, scale: 2, default: "0.0"
+    t.integer "global_default"
+    t.index ["global_default"], name: "index_audiences_on_global_default"
   end
 
   create_table "collection_cards", force: :cascade do |t|
@@ -288,9 +290,9 @@ ActiveRecord::Schema.define(version: 20190607215955) do
     t.bigint "user_id"
     t.bigint "survey_response_id"
     t.decimal "amount", precision: 10, scale: 2
+    t.decimal "current_balance", precision: 10, scale: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.float "current_balance"
     t.index ["survey_response_id"], name: "index_feedback_incentive_records_on_survey_response_id"
     t.index ["user_id"], name: "index_feedback_incentive_records_on_user_id"
   end
