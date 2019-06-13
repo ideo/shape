@@ -68,6 +68,7 @@ class User < ApplicationRecord
          :rememberable, :validatable, :omniauthable,
          omniauth_providers: [:ideo]
 
+  # TODO: this should change to match the tag categories in Audience
   acts_as_taggable
 
   has_many :collections,
