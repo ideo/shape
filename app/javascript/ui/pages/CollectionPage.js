@@ -440,8 +440,15 @@ class CollectionPage extends React.Component {
     }
 
     // submissions_collection will only exist for submission boxes
-    const { isSubmissionBox, requiresTestDesigner, name, id } = collection
-    const title = `collections/${id}/${name}`
+    const {
+      isSubmissionBox,
+      requiresTestDesigner,
+      name,
+      id,
+      organization,
+    } = collection
+    const { name: orgName } = organization
+    const title = `${orgName}/collections/${id}/${name}`
     const userRequiresOrg =
       !apiStore.currentUserOrganization && collection.common_viewable
 
