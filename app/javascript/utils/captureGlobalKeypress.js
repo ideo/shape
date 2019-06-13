@@ -38,6 +38,10 @@ const captureGlobalKeypress = e => {
       }
       break
     case 'KeyZ':
+      if (e.shiftKey && (e.metaKey || e.ctrlKey)) {
+        undoStore.handleRedoKeyPress() // CTRL+Shift+Z: Redo
+        break
+      }
       if (e.metaKey || e.ctrlKey) {
         undoStore.handleUndoKeypress() // CTRL+Z: Undo
       }

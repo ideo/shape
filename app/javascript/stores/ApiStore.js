@@ -496,36 +496,55 @@ class ApiStore extends jsonapi(datxCollection) {
       }
     )
     if (undoable) {
-      const snapshot = collection.toJsonApiWithCards()
       this.undoStore.pushUndoAction({
         message: 'Archive undone',
-        apiCall: () => this.unarchiveCards({ cardIds, snapshot }),
+        apiCall: () => this.unarchiveCards({ cardIds, collection }),
         redirectPath: { type: 'collections', id: collection.id },
+        redoAction: {
+          message: 'Archive redone',
+          apiCall: () => this.archiveCards({ cardIds, collection, undoable }),
+          undoable: false,
+        },
       })
     }
     collection.removeCardIds(cardIds)
     return archiveResult
   }
 
-  async unarchiveCards({ cardIds, snapshot }) {
+  async unarchiveCards({ cardIds, collection, undoable = true }) {
+    const snapshot = collection.toJsonApiWithCards()
     const res = await this.request('collection_cards/unarchive', 'PATCH', {
       card_ids: cardIds,
       collection_snapshot: snapshot,
     })
-    const collection = res.data
-    collection.API_fetchCards()
+
+    if (undoable) {
+      this.undoStore.pushUndoAction({
+        message: 'Undoing Duplicate',
+        apiCall: () => {
+          this.archiveCards({ cardIds, collection, undoable: false })
+        },
+        redirectPath: { type: 'collections', id: snapshot.id },
+        redoAction: {
+          message: 'Redoing Duplicate',
+          apiCall: () => this.unarchiveCards({ cardIds, collection }),
+        },
+      })
+    }
+
+    const unarchivedCollection = res.data
+    unarchivedCollection.API_fetchCards()
   }
 
   async moveCards(data, { undoSnapshot = {} } = {}) {
     // trigger card_mover in backend
     const res = await this.request('collection_cards/move', 'PATCH', data)
-
+    const toCollection = this.find('collections', data.to_id)
     // revert data if undoing card move
     if (!_.isEmpty(undoSnapshot)) {
       await this.request(`collections/${data.to_id}`, 'PATCH', {
         data: undoSnapshot,
       })
-      const toCollection = this.find('collections', data.to_id)
       await toCollection.API_fetchCards()
       return
     }
@@ -555,6 +574,12 @@ class ApiStore extends jsonapi(datxCollection) {
         type: 'collections',
         id: fromCollection.id,
       },
+      redoAction: {
+        message: 'Move redone',
+        apiCall: async () => {
+          await this.moveCards(data, {})
+        },
+      },
     })
 
     return res
@@ -576,6 +601,15 @@ class ApiStore extends jsonapi(datxCollection) {
           undoable: false,
         }),
       redirectPath: { type: 'collections', id: collection.id },
+      redoAction: {
+        message: 'Redoing Duplicate',
+        apiCall: () => {
+          this.unarchiveCards({
+            cardIds: res.meta.new_cards,
+            collection: collection,
+          })
+        },
+      },
     })
     return res
   }
