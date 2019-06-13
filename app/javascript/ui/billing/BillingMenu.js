@@ -57,11 +57,7 @@ class BillingMenu extends React.Component {
       <Fragment>
         {this.confirm && (
           <ConfirmationDialog
-            prompt={`Are you sure you want to close the ${
-              organization.name
-            } account? Once you cancel, nobody in ${
-              organization.name
-            } will be able to access content on Shape.`}
+            prompt={`Are you sure you want to close the ${organization.name} account? Once you cancel, nobody in ${organization.name} will be able to access content on Shape.`}
             onConfirm={this.deactivateAccount}
             onClose={this.confirmCancel}
             open="confirm"

@@ -74,9 +74,7 @@ class RoleSelect extends React.Component {
         : 'the parent collection'
       iconName = 'Hidden'
       prompt += ` This change will break permission inheritance from ${parentName}.`
-      prompt += ` New people added to ${parentName} will no longer get access to "${
-        record.name
-      }".`
+      prompt += ` New people added to ${parentName} will no longer get access to "${record.name}".`
       // confirmText = 'Continue'
     }
 

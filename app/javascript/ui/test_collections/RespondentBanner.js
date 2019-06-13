@@ -8,9 +8,7 @@ class RespondentBanner extends React.Component {
   }
 
   renderRightComponent() {
-    return `You will receive your payment before ${
-      this.user.incentive_due_date
-    }.`
+    return `You will receive your payment before ${this.user.incentive_due_date}.`
   }
 
   get user() {

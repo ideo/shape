@@ -40,11 +40,7 @@ class OverdueBanner extends React.Component {
 
   get overdueMessage() {
     const { currentOrganization } = this
-    return `${
-      currentOrganization.name
-    } account is overdue. Your content will become inaccessible on ${
-      currentOrganization.inaccessible_at
-    }.`
+    return `${currentOrganization.name} account is overdue. Your content will become inaccessible on ${currentOrganization.inaccessible_at}.`
   }
 
   renderLeftComponent() {

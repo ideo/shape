@@ -147,9 +147,7 @@ class AdminFeedback extends React.Component {
                         placement="top"
                       >
                         <CopyToClipboard
-                          text={`${testCollection.publicTestURL}?ta=${
-                            testAudience.id
-                          }`}
+                          text={`${testCollection.publicTestURL}?ta=${testAudience.id}`}
                           onCopy={() =>
                             this.props.uiStore.popupSnackbar({
                               message: 'Survey link copied',
