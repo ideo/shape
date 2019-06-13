@@ -22,20 +22,25 @@ module PaidTests
 
     def csv_line_for_test_collection(test_collection)
       payment_summaries = payment_summaries_for_test_collection(test_collection)
+      test_summary = PaidTests::TestCollectionSummary.new(
+        test_collection: test_collection,
+        start_time: @start_time,
+        end_time: @end_time,
+      )
       [
-        test_collection.id, # Test ID
-        test_collection.name, # Test Name
-        payment_summaries.sum(&:revenue), # Revenue
-        payment_summaries.sum(&:amount_owed), # Amount Owed
-        payment_summaries.sum(&:amount_paid), # Amount Paid
-        payment_summaries.sum(&:payment_processor_fees), # Payment Processing Fees
+        test_collection.id,
+        test_collection.name,
+        payment_summaries.sum(&:total_revenue),
+        test_summary.amount_owed,
+        test_summary.amount_paid,
+        payment_summaries.sum(&:payment_processor_fees),
       ]
     end
 
     def payment_summaries_for_test_collection(test_collection)
       payments = test_collection.test_audiences.map(&:payment)
       payments.map do |payment|
-        PaidTests::PaymentFinanceSummary.new(
+        PaidTests::PaymentSummary.new(
           payment: payment,
           start_time: @start_time,
           end_time: @end_time,
