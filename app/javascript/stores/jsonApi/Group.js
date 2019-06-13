@@ -34,9 +34,9 @@ class Group extends BaseRecord {
       }
     }
     this.uiStore.confirm({
-      prompt: 'Are you sure you want to archive this group?',
-      confirmText: 'Archive',
-      iconName: 'Archive',
+      prompt: 'Are you sure you want to delete this group?',
+      confirmText: 'Delete',
+      iconName: 'Trash',
       onConfirm: onAgree,
     })
     return onAgree

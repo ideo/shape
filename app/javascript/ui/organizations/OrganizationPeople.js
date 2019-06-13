@@ -9,7 +9,7 @@ import {
   DisplayText,
   SubduedText,
 } from '~/ui/global/styled/typography'
-import ArchiveIcon from '~/ui/icons/ArchiveIcon'
+import TrashIcon from '~/ui/icons/TrashIcon'
 
 const RemoveIconHolder = styled.button`
   width: 16px;
@@ -30,7 +30,7 @@ class OrganizationPeople extends React.Component {
         </button>
         {group.can_edit && (
           <RemoveIconHolder onClick={this.props.onGroupRemove(group)}>
-            <ArchiveIcon />
+            <TrashIcon />
           </RemoveIconHolder>
         )}
       </Row>
