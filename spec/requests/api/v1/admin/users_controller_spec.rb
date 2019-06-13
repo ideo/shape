@@ -85,9 +85,9 @@ describe Api::V1::Admin::UsersController, type: :request, json: true, auth: true
              test_collection: test_collection2,
              sample_size: 10)
     end
-    let!(:millenial_user) { create(:user, tag_list: ['millennial']) }
-    let!(:usa_user) { create(:user, tag_list: ['usa']) }
-    let!(:millenial_usa_user1) { create(:user, tag_list: %w[millenial usa]) }
+    let!(:millenial_user) { create(:user, age_list: ['millennial']) }
+    let!(:usa_user) { create(:user, country_list: ['usa']) }
+    let!(:millenial_usa_user1) { create(:user, age_list: ['millenial'], country_list: ['usa']) }
     let!(:millenial_invitation1) do
       create(
         :test_audience_invitation,
@@ -96,7 +96,7 @@ describe Api::V1::Admin::UsersController, type: :request, json: true, auth: true
         created_at: Time.now - 2.days,
       )
     end
-    let!(:millenial_usa_user2) { create(:user, tag_list: %w[millenial usa]) }
+    let!(:millenial_usa_user2) { create(:user, age_list: ['millenial'], country_list: ['usa']) }
     let!(:millenial_invitation2) do
       create(
         :test_audience_invitation,
@@ -113,7 +113,7 @@ describe Api::V1::Admin::UsersController, type: :request, json: true, auth: true
         created_at: Time.now,
       )
     end
-    let!(:everything_user) { create(:user, tag_list: %w[millenial usa everything]) }
+    let!(:everything_user) { create(:user, age_list: ['millenial'], country_list: ['usa'], interest_list: ['everything']) }
 
     it 'returns users tagged with the given audience tags' do
       get path
