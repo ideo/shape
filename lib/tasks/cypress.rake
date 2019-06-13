@@ -27,7 +27,7 @@ namespace :cypress do
     FactoryBot.create(:group, organization: organization, add_admins: [user])
     create_cards(user.current_user_collection, user)
     create_events(organization)
-    # create_test_collection(organization) TODO: uncomment me once this is fixed
+    create_test_collection(organization)
   end
 
   def create_cards(collection, user)
