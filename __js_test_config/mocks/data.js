@@ -189,6 +189,7 @@ export const fakeLegendItemAttrs = {
     order: 0,
     style: { fill: '#9874AB' },
   },
+  legend_search_source: 'search_test_collections',
   primaryDataset: fakeDataset,
   datasets: [
     fakeDataset,
