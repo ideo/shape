@@ -440,15 +440,7 @@ class CollectionPage extends React.Component {
     }
 
     // submissions_collection will only exist for submission boxes
-    const {
-      isSubmissionBox,
-      requiresTestDesigner,
-      name,
-      id,
-      organization,
-    } = collection
-    const { name: orgName } = organization
-    const title = `${orgName}/collections/${id}/${name}`
+    const { isSubmissionBox, requiresTestDesigner } = collection
     const userRequiresOrg =
       !apiStore.currentUserOrganization && collection.common_viewable
 
@@ -481,7 +473,7 @@ class CollectionPage extends React.Component {
 
     return (
       <Fragment>
-        <Helmet title={title} />
+        <Helmet title={collection.pageTitle} />
         <PageHeader record={collection} />
         {userRequiresOrg && (
           // for new user's trying to add a common resource, they'll see the Create Org modal
