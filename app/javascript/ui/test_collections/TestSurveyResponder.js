@@ -98,7 +98,7 @@ class TestSurveyResponder extends React.Component {
       questionCards.push(
         createFakeCollectionCard({
           id: 'demographics_question',
-          cardQuestionType: 'question_single_choice',
+          cardQuestionType: 'question_demographic_single_choice',
         })
       )
     }

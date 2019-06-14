@@ -33,7 +33,7 @@ const Scale = styled.div`
   width: 100%;
 `
 
-class SingleChoiceQuestion extends React.Component {
+class DemographicSingleChoiceQuestion extends React.Component {
   handleAnswer(event) {
     this.props.onAnswer({ text: event.target.value })
   }
@@ -82,8 +82,8 @@ class SingleChoiceQuestion extends React.Component {
   }
 }
 
-SingleChoiceQuestion.propTypes = {
+DemographicSingleChoiceQuestion.propTypes = {
   onAnswer: PropTypes.func.isRequired,
 }
 
-export default SingleChoiceQuestion
+export default DemographicSingleChoiceQuestion
