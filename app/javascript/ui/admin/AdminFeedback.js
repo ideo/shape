@@ -10,6 +10,7 @@ import AdminNewQueryRow from './AdminNewQueryRow'
 import Box from '~shared/components/atoms/Box'
 import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import LeftButtonIcon from '~/ui/icons/LeftButtonIcon'
+import IconAvatar from '~/ui/global/IconAvatar'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import SearchLargeIcon from '~/ui/icons/SearchLargeIcon'
 import Section from '~shared/components/molecules/Section'
@@ -200,20 +201,15 @@ class AdminFeedback extends React.Component {
                       </div>
                       <Flex className="show-on-hover">
                         <AudienceAction>
-                          <Tooltip
-                            classes={{ tooltip: 'Tooltip' }}
-                            title={'start new query'}
-                            placement="top"
+                          <IconAvatar
+                            color={v.colors.black}
+                            backgroundColor={v.colors.commonLight}
+                            data-cy="NewQueryButton"
+                            tooltip="start new query"
+                            onClick={() => this.showNewQueryRow(testCollection)}
                           >
-                            <CircledIcon
-                              data-cy="NewQueryButton"
-                              onClick={() =>
-                                this.showNewQueryRow(testCollection)
-                              }
-                            >
-                              <SearchLargeIcon />
-                            </CircledIcon>
-                          </Tooltip>
+                            <SearchLargeIcon />
+                          </IconAvatar>
                         </AudienceAction>
                         <AudienceAction>
                           <Tooltip
