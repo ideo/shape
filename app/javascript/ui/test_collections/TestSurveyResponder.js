@@ -207,11 +207,11 @@ class TestSurveyResponder extends React.Component {
       <ThemeProvider theme={styledTestTheme(theme)}>
         <div id="surveyContainer">
           <ProgressDots
-            totalAmount={this.answerableCards.length + 1}
+            totalAmount={this.numAnswerableQuestionItems}
             currentProgress={this.currentCardIdx}
           />
           <ProgressSquare
-            totalAmount={this.answerableCards.length + 1}
+            totalAmount={this.numAnswerableQuestionItems}
             currentProgress={this.currentCardIdx}
           />
           <GreetingMessage />
