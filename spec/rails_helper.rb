@@ -144,6 +144,11 @@ RSpec.configure do |config|
     allow(Twilio::REST::Client).to receive(:new).and_return(fake_twilio)
   end
 
+  config.before(:each, seed: true) do
+    # e.g. to get the default audiences
+    Rails.application.load_seed
+  end
+
   config.after(:each) do
     DatabaseCleaner.clean
     Warden.test_reset!

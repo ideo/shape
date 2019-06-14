@@ -9,6 +9,10 @@ Given('I login and visit My Collection', () => {
   cy.loginAndVisitMyCollection()
 })
 
+Given('I login and visit the Admin area', () => {
+  cy.loginAndVisitAdmin()
+})
+
 Given('I login and visit the Test Area', () => {
   cy.loginAndVisitMyCollection()
   // navigate into collection

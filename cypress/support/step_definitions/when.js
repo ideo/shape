@@ -358,3 +358,13 @@ When('I click the {word} arrow on the MDL snackbar', direction => {
     .click({ force: true })
   cy.wait(100)
 })
+
+// ----------------------
+// Admin (Test Collection Feedback)
+// ----------------------
+When('I click the info button for the first audience', index => {
+  cy.locate('AudienceInfoButton')
+    .first()
+    .click()
+  cy.wait(100)
+})

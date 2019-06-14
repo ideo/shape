@@ -455,7 +455,7 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   async fetchOrganizationAudiences(orgId) {
-    const res = await this.request(`organizations/${orgId}/audiences/`, 'GET')
+    const res = await this.request(`organizations/${orgId}/audiences`, 'GET')
     const audiences = res.data
     return audiences
   }

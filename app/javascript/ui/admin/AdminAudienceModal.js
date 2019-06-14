@@ -2,11 +2,17 @@ import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Flex, Box } from 'reflexbox'
-
+import { map, capitalize } from 'lodash'
 import Modal from '~/ui/global/modals/Modal'
-import { FieldContainer, Label, TextField } from '~/ui/global/styled/forms'
+import {
+  FieldContainer,
+  Label,
+  TextField,
+  TextButton,
+} from '~/ui/global/styled/forms'
 import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import v from '~/utils/variables'
+import { tagListsToCriteria } from '~/ui/test_collections/AudienceSettings/AudienceCriteria'
 
 const SelectedOptionsWrapper = styled(Flex)`
   min-height: 40px;
@@ -29,13 +35,28 @@ class AdminAudienceModal extends React.Component {
     uiStore.update('adminAudienceMenuOpen', null)
   }
 
-  renderCriteriaRow(criteria) {
+  capitalizeOption(option) {
+    return option
+      .split(' ')
+      .map(str => capitalize(str))
+      .join(' ')
+  }
+
+  renderCriteriaRow(criteria, listName) {
     return (
-      <FieldContainer>
+      <FieldContainer key={`selected_${listName}`}>
+        <Label data-cy="AdminAudienceCategory">{listName}</Label>
         <SelectedOptionsWrapper wrap>
-          <SelectedOption key={`selected_${criteria}`}>
-            {criteria}
-          </SelectedOption>
+          {map(criteria, option => {
+            return (
+              <SelectedOption
+                data-cy="AdminAudienceCategoryOption"
+                key={`selected_${option}`}
+              >
+                {this.capitalizeOption(option)}
+              </SelectedOption>
+            )
+          })}
         </SelectedOptionsWrapper>
         <HorizontalDivider
           color={v.colors.commonMedium}
@@ -47,9 +68,12 @@ class AdminAudienceModal extends React.Component {
 
   renderCriteria() {
     const { audience } = this.props
-    const criteria = audience.tag_list
-    return criteria.map(criteria => {
-      return this.renderCriteriaRow(criteria)
+    const { tagLists } = audience
+
+    return map(tagLists, (value, key) => {
+      if (value.length < 1) return null
+      const listName = tagListsToCriteria[key]
+      return this.renderCriteriaRow(value, listName)
     })
   }
 
@@ -63,20 +87,30 @@ class AdminAudienceModal extends React.Component {
       <Modal title={title} onClose={this.handleClose} open={open} noScroll>
         <React.Fragment>
           <FieldContainer>
-            <Label htmlFor="audienceName">Audience Name</Label>
+            <Label data-cy="Label_audienceName" htmlFor="audienceName">
+              Audience Name
+            </Label>
             <TextField
               id="audienceName"
               type="text"
               data-cy="TextField_audienceName"
               value={audience.name}
-              onChange={this.handleNameChange}
               disabled
             />
           </FieldContainer>
-          <Box mb={2}>
+          <Box mb={1}>
             <Label>Targeting Criteria</Label>
           </Box>
           {this.renderCriteria()}
+          <div style={{ textAlign: 'center', paddingBottom: '2rem' }}>
+            <TextButton
+              data-cy="CloseModalButton"
+              onClick={this.handleClose}
+              width={200}
+            >
+              Close
+            </TextButton>
+          </div>
         </React.Fragment>
       </Modal>
     )
@@ -84,15 +118,16 @@ class AdminAudienceModal extends React.Component {
 }
 
 AdminAudienceModal.propTypes = {
-  open: PropTypes.bool.isRequired,
-  audience: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    // TODO:  need anything else here?
-  }).isRequired,
+  open: PropTypes.bool,
+  audience: MobxPropTypes.objectOrObservableObject,
 }
 AdminAudienceModal.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+AdminAudienceModal.defaultProps = {
+  open: false,
+  audience: null,
 }
 
 export default AdminAudienceModal

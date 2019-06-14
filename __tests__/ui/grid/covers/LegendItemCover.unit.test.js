@@ -72,6 +72,30 @@ describe('LegendItemCover', () => {
       })
     })
 
+    describe('when unselecting a dataset in legend with select_from_datasets search source', () => {
+      beforeEach(() => {
+        props.item.legend_search_source = 'select_from_datasets'
+        props.item.datasets = [
+          fakeDataset,
+          {
+            ...fakeDataset,
+            groupings: [],
+            selected: true,
+            identifier: 'creative-difference-purpose',
+            name: 'Purpose',
+          },
+        ]
+        render()
+        getUnselect().simulate('click')
+      })
+
+      it('should unselect the dataset by identifier', () => {
+        expect(
+          props.card.parent.API_unselectDatasetsWithIdentifier
+        ).toHaveBeenCalled()
+      })
+    })
+
     describe('when unselecting a test dataset', () => {
       beforeEach(() => {
         props.item.datasets = [
@@ -84,6 +108,7 @@ describe('LegendItemCover', () => {
             selected: true,
             name: 'something-else',
             identifier: 'Something Else',
+            test_collection_id: fakeCollection.id,
           },
         ]
         render()
@@ -164,8 +189,8 @@ describe('LegendItemCover', () => {
         identifier: 'org-wide-question',
         name: 'Organization stuff',
         internalType: 'datasets',
+        test_collection_id: fakeCollection.id,
       }
-
       props.item.datasets = [groupedDataset]
       render()
     })

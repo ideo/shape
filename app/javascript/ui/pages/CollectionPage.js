@@ -24,6 +24,7 @@ import Collection from '~/stores/jsonApi/Collection'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
 import routeToLogin from '~/utils/routeToLogin'
 import CreateOrgPage from '~/ui/pages/CreateOrgPage'
+import { Helmet } from 'react-helmet'
 
 // more global way to do this?
 pluralize.addPluralRule(/canvas$/i, 'canvases')
@@ -472,6 +473,7 @@ class CollectionPage extends React.Component {
 
     return (
       <Fragment>
+        <Helmet title={collection.pageTitle} />
         <PageHeader record={collection} />
         {userRequiresOrg && (
           // for new user's trying to add a common resource, they'll see the Create Org modal

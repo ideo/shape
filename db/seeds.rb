@@ -40,6 +40,6 @@ end
 
 # Add universally available audiences
 if Audience.count.zero?
-  Audience.create(name: 'Share via Link', price_per_response: 0)
-  Audience.create(name: 'All People (No Filters)', price_per_response: 3.75)
+  Audience.create(name: 'Share via Link', global_default: 1, price_per_response: 0)
+  Audience.create(name: 'All People (No Filters)', global_default: 2, price_per_response: 3.75)
 end

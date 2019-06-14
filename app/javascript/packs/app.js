@@ -30,6 +30,7 @@ if (process.env.SENTRY_DSN) {
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
     environment: process.env.SHAPE_APP,
+    release: process.env.SOURCE_VERSION,
   })
 }
 

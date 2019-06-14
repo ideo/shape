@@ -189,6 +189,7 @@ export const fakeLegendItemAttrs = {
     order: 0,
     style: { fill: '#9874AB' },
   },
+  legend_search_source: 'search_test_collections',
   primaryDataset: fakeDataset,
   datasets: [
     fakeDataset,
@@ -347,6 +348,7 @@ const fakeCards = [fakeItemCard, fakeItemCard, fakeItemCard]
 export const fakeCollection = {
   id: '1',
   name: 'My Workspace X',
+  pageTitle: 'My Workspace X | Shape',
   type: 'Collection',
   breadcrumb: [],
   roles: [],
