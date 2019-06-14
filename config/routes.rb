@@ -167,7 +167,6 @@ Rails.application.routes.draw do
     collection do
       get 't/:token', to: 'tests#token_auth'
       get 'completed'
-      get 'visit_with_cypress', to: 'tests#visit_with_cypress'
     end
   end
 

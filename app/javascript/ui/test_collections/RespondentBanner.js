@@ -11,18 +11,17 @@ const StyledRespondentBanner = styled.div`
   padding: 15px 25px;
   position: fixed;
 
-  @media only screen and (min-width: ${v.responsive.medBreakpoint}px) {
-    border-radius: 7px;
-    font-size: 20px;
-    margin-top: -16px; // due to required padding in TestSurveyPage StyledBg
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 950px; // cut from 1000 due to padding
-    left: 10%;
-    right: 10%;
-  }
+  border-radius: 7px;
+  font-size: 20px;
+  margin-top: -16px; // due to required padding in TestSurveyPage StyledBg
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 950px; // cut from 1000 due to padding
+  left: 10%;
+  right: 10%;
 
-  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    border-radius: 0;
     margin-top: -36px;
     font-size: 16px;
     line-height: 20px;

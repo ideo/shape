@@ -28,7 +28,3 @@ Given('I login and visit the Test Area', () => {
 Given('I logout', () => {
   cy.logout()
 })
-
-Given('I visit a test as a respondent', () => {
-  cy.visitRespondentSurvey()
-})

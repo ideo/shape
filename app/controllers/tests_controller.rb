@@ -19,15 +19,6 @@ class TestsController < ApplicationController
     redirect_to ideo_sso_token_auth_url(@user_token)
   end
 
-  def visit_with_cypress
-    return 422 if (!Rails.env.development? || !Rails.env.test?)
-    @collection = Collection::TestCollection.find_by_name params[:name]
-    p '*' * 1000
-    p @collection
-    p '*' * 1000
-    redirect_to test_path(@collection, ta_id: @collection.test_audiences.last.id) and return
-  end
-
   private
 
   def load_test_collection
