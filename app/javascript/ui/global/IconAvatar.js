@@ -77,7 +77,7 @@ IconAvatar.defaultProps = {
   className: '',
   onClick: () => {},
   size: 32,
-  title: 'Avatar',
+  title: null,
 }
 
 export default IconAvatar
