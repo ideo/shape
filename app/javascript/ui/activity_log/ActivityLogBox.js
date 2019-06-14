@@ -236,7 +236,14 @@ class ActivityLogBox extends React.Component {
 
   renderNotifications = () => <NotificationsContainer />
 
-  renderTest = () => <InlineCollectionTest />
+  // surfaced these props from TestSurveyResponder
+  renderTest = () => (
+    <InlineCollectionTest
+      theme="secondary"
+      // for scrolling purposes
+      containerId="InlineTestContainer"
+    />
+  )
 
   renderPage = () => {
     switch (this.currentPage) {

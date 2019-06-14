@@ -20,6 +20,7 @@ const UNANSWERABLE_QUESTION_TYPES = [
   'question_media',
   'question_description',
   'question_finish',
+  'question_opt_in',
 ]
 
 @inject('apiStore')
@@ -35,6 +36,8 @@ class TestSurveyResponder extends React.Component {
   welcomeAnswered = false
   @observable
   currentCardIdx = 0
+  @observable
+  acceptedOptIn = null
 
   componentDidMount() {
     this.initializeCards()
@@ -68,6 +71,14 @@ class TestSurveyResponder extends React.Component {
         order: recontactOrder,
         record: { id: 'recontact_item', content: '' },
       })
+
+      const optInOrder = recontactOrder + 1
+      questionCards.splice(optInOrder + 1, 0, {
+        id: 'opt_in',
+        card_question_type: 'question_opt_in',
+        order: optInOrder,
+        record: { id: 'opt_in_item', content: '' },
+      })
     }
     if (includeTerms) {
       questionCards.unshift({
@@ -89,6 +100,9 @@ class TestSurveyResponder extends React.Component {
 
   questionAnswerForCard = card => {
     const { surveyResponse } = this.props
+    if (card.card_question_type === 'question_opt_in') {
+      return this.acceptedOptIn
+    }
     if (card.card_question_type === 'question_welcome') {
       return this.welcomeAnswered
     }
@@ -111,17 +125,6 @@ class TestSurveyResponder extends React.Component {
     return this.questionCards.filter(card => this.answerableCard(card))
   }
 
-  get numAnswerableQuestionItems() {
-    const { question_cards } = this.props.collection
-    return question_cards.filter(
-      questionCard =>
-        !_.includes(
-          UNANSWERABLE_QUESTION_TYPES,
-          questionCard.card_question_type
-        )
-    ).length
-  }
-
   get viewableCards() {
     const { questionCards } = this
 
@@ -129,7 +132,7 @@ class TestSurveyResponder extends React.Component {
     const questions = questionCards.filter(card => {
       // turn off the card's actionmenu (dot-dot-dot)
       if (
-        ['recontact', 'terms', 'welcome'].every(
+        ['recontact', 'terms', 'welcome', 'opt_in'].every(
           questionId => card.id !== questionId
         )
       )
@@ -150,6 +153,14 @@ class TestSurveyResponder extends React.Component {
   }
 
   afterQuestionAnswered = (card, answer) => {
+    if (card.id === 'opt_in') {
+      runInAction(() => {
+        this.acceptedOptIn = answer // optInAnswered?
+        // this will come from TestQuestion
+      })
+      // this is the last question, don't try to scroll
+      return
+    }
     if (card.id === 'welcome') {
       runInAction(() => {
         this.welcomeAnswered = true
@@ -159,8 +170,6 @@ class TestSurveyResponder extends React.Component {
       runInAction(() => {
         this.recontactAnswered = true
       })
-      // this is the last question, don't try to scroll
-      return
     }
     if (card.id === 'terms') {
       if (!answer) {

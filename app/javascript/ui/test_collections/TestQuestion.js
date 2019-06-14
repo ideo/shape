@@ -13,6 +13,7 @@ import OpenQuestion from '~/ui/test_collections/OpenQuestion'
 import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
 import TermsQuestion from '~/ui/test_collections/TermsQuestion'
 import WelcomeQuestion from '~/ui/test_collections/WelcomeQuestion'
+import OptInFollowUpQuestion from '~/ui/test_collections/OptInFollowUpQuestion'
 import { QuestionText } from '~/ui/test_collections/shared'
 import { apiStore, uiStore } from '~/stores'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
@@ -216,7 +217,12 @@ class TestQuestion extends React.Component {
             onAnswer={this.handleQuestionAnswer}
           />
         )
-
+      case 'question_opt_in':
+        return (
+          <OptInFollowUpQuestion
+            acceptOptIn={this.acceptOptIn} // currentUser.feedback_contact_preference?
+          />
+        )
       default:
         return <NewQuestionGraphic />
     }

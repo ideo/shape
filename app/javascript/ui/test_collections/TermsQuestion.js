@@ -25,12 +25,16 @@ class TermsQuestion extends React.Component {
     this.answered = true
     this.choice = choice ? 'yes' : 'no'
     // there was a user, or anon user answered "no", move on
-    onAnswer(choice)
+    onAnswer({ id: 'terms' }, choice)
   }
 
   render() {
     const { user } = this.props
     const { answered, choice } = this
+    if (user && user.respondent_terms_accepted) {
+      return null
+    }
+
     return (
       <QuestionSpacingContainer editing={false}>
         <QuestionText>

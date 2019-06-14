@@ -138,6 +138,11 @@ class InlineCollectionTest extends React.Component {
               <CommentThreadHeader record={testCollection} />
             </StyledTestHeader>
           )}
+          {/*
+            If we get rid of TestSurveyResponder so that we have
+            direct access between TestSurveyPage and Test Question,
+            we will need to revise this as well
+           */}
           <TestSurveyResponder
             collection={testCollection}
             surveyResponse={surveyResponse}

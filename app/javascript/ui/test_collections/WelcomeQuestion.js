@@ -12,7 +12,7 @@ import { QuestionSpacingContainer } from '~/ui/test_collections/OpenQuestion'
 class WelcomeQuestion extends React.Component {
   handleClick = choice => ev => {
     const { onAnswer } = this.props
-    onAnswer(choice)
+    onAnswer({ id: 'welcome' }, choice)
   }
 
   get incentive() {
