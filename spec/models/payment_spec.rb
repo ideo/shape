@@ -19,9 +19,9 @@ RSpec.describe Payment, type: :model do
   # Truncation must be used when testing double entry
   describe '#create', truncate: true do
     let(:payment) { build(:payment) }
-    let(:cash_account) { DoubleEntry.account(:cash) }
-    let(:revenue_deferred) { DoubleEntry.account(:revenue_deferred) }
-    let(:payment_processor) { DoubleEntry.account(:payment_processor) }
+    let(:cash_account) { DoubleEntry.account(:cash, scope: payment) }
+    let(:revenue_deferred) { DoubleEntry.account(:revenue_deferred, scope: payment) }
+    let(:payment_processor) { DoubleEntry.account(:payment_processor, scope: payment) }
 
     it 'calls NetworkApi::Payment.create' do
       expect(NetworkApi::Payment).to receive(:create).with(
