@@ -128,6 +128,8 @@ export default {
     offset: '#6a7c7e',
     placeholderGray: '#bcbcbc',
     transparent: 'transparent',
+    respondentBannerBackground: '#41d3bd',
+    respondentBannerText: '#305d6c',
   },
 
   iconSizes: {

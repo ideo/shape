@@ -5,8 +5,8 @@ import { Grid } from '@material-ui/core'
 
 const StyledRespondentBanner = styled.div`
   z-index: 3;
-  background-color: #41d3bd;
-  color: #305d6c;
+  background-color: ${v.colors.respondentBannerBackground};
+  color: ${v.colors.respondentBannerText};
   font-family: ${v.fonts.sans};
   padding: 15px 25px;
   position: fixed;
