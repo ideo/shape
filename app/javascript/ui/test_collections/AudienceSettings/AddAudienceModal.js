@@ -17,7 +17,7 @@ import {
   groupCriteriaByGroup,
   getCriterionByName,
   criteriaLimitByGroup,
-} from './AudienceCriteria'
+} from '~/ui/test_collections/AudienceSettings/AudienceCriteria'
 
 import {
   Checkbox,
@@ -88,7 +88,14 @@ class AddAudienceModal extends React.Component {
     selectedCriteria: [],
     numCriteriaPerGroup: {},
     openMenus: {},
-    selectedCriteriaOptions: [],
+    age_list: [],
+    children_age_list: [],
+    country_list: [],
+    education_level_list: [],
+    gender_list: [],
+    adopter_type_list: [],
+    interest_list: [],
+    publication_list: [],
   }
 
   criteriaTriggers = {}
@@ -126,10 +133,32 @@ class AddAudienceModal extends React.Component {
 
   handleSave = async () => {
     const { apiStore } = this.props
-    const { name, selectedCriteriaOptions } = this.state
-    const tag_list = selectedCriteriaOptions.join(', ')
+    const {
+      name,
+      age_list,
+      children_age_list,
+      country_list,
+      education_level_list,
+      gender_list,
+      adopter_type_list,
+      interest_list,
+      publication_list,
+    } = this.state
 
-    const audience = new Audience({ name, tag_list }, apiStore)
+    const audience = new Audience(
+      {
+        name,
+        age_list,
+        children_age_list,
+        country_list,
+        education_level_list,
+        gender_list,
+        adopter_type_list,
+        interest_list,
+        publication_list,
+      },
+      apiStore
+    )
     await audience.API_create()
 
     this.props.afterSave(audience)
@@ -151,7 +180,14 @@ class AddAudienceModal extends React.Component {
       selectedCriteria: [],
       numCriteriaPerGroup: {},
       openMenus: {},
-      selectedCriteriaOptions: [],
+      age_list: [],
+      children_age_list: [],
+      country_list: [],
+      education_level_list: [],
+      gender_list: [],
+      adopter_type_list: [],
+      interest_list: [],
+      publication_list: [],
     })
   }
 
@@ -169,28 +205,25 @@ class AddAudienceModal extends React.Component {
   }
 
   removeCriteria(criteria) {
-    const {
-      numCriteriaPerGroup,
-      selectedCriteria,
-      selectedCriteriaOptions,
-    } = this.state
+    const { numCriteriaPerGroup, selectedCriteria } = this.state
 
     remove(selectedCriteria, c => c === criteria)
 
-    const { options, group } = getCriterionByName(criteria)
-    remove(selectedCriteriaOptions, o => includes(options, o))
+    const { tagList, group } = getCriterionByName(criteria)
     numCriteriaPerGroup[group] -= 1
+
     this.setState({
       selectedCriteria,
-      selectedCriteriaOptions,
       numCriteriaPerGroup,
+      [tagList]: [],
     })
   }
 
   toggleCriteriaOption = (e, criteria) => {
-    const { selectedCriteriaOptions, numCriteriaPerGroup } = this.state
+    const { numCriteriaPerGroup } = this.state
 
-    const { group } = getCriterionByName(criteria)
+    const { tagList, group } = getCriterionByName(criteria)
+    const selectedCriteriaOptions = this.state[tagList]
 
     if (!numCriteriaPerGroup[group]) numCriteriaPerGroup[group] = 0
 
@@ -204,7 +237,7 @@ class AddAudienceModal extends React.Component {
       }
     })
 
-    this.setState({ selectedCriteriaOptions, numCriteriaPerGroup })
+    this.setState({ [tagList]: selectedCriteriaOptions, numCriteriaPerGroup })
   }
 
   get reachedCriteriaLimit() {
@@ -226,14 +259,6 @@ class AddAudienceModal extends React.Component {
   validateForm() {
     const valid = this.state.name.length > 0
     this.setState({ valid })
-  }
-
-  prefixCriteriaOption(criteria, option) {
-    return `${criteria} ${option}`
-  }
-
-  unPrefixCriteriaOption(criteria, prefixedOption) {
-    return prefixedOption.replace(`${criteria} `, '')
   }
 
   renderCriteriaMenu() {
@@ -299,15 +324,14 @@ class AddAudienceModal extends React.Component {
   }
 
   renderSelectedCriteria() {
-    const { selectedCriteriaOptions, numCriteriaPerGroup } = this.state
+    const { numCriteriaPerGroup } = this.state
 
     return this.state.selectedCriteria.map(criteria => {
-      const { options, group } = getCriterionByName(criteria)
-      const prefixedOptions = options.map(o =>
-        this.prefixCriteriaOption(criteria, o)
-      )
+      const { options, group, tagList } = getCriterionByName(criteria)
+      const selectedCriteriaOptions = this.state[tagList]
+
       const selectedOptions = filter(selectedCriteriaOptions, o =>
-        includes(prefixedOptions, o)
+        includes(options, o)
       )
       const isLimited = criteriaLimitByGroup[group]
       const atLimit = numCriteriaPerGroup[group] > criteriaLimitByGroup[group]
@@ -339,7 +363,7 @@ class AddAudienceModal extends React.Component {
           <SelectedOptionsWrapper wrap>
             {selectedOptions.map(option => (
               <SelectedOption key={`selected_${option}`}>
-                {this.unPrefixCriteriaOption(criteria, option)}
+                {option}
               </SelectedOption>
             ))}
           </SelectedOptionsWrapper>
@@ -353,23 +377,22 @@ class AddAudienceModal extends React.Component {
   }
 
   renderSelectedCriteriaMenus() {
-    const { selectedCriteria, selectedCriteriaOptions, openMenus } = this.state
+    const { selectedCriteria, openMenus } = this.state
 
     return selectedCriteria.map(criteria => {
-      const { options: availableOptions } = getCriterionByName(criteria)
+      const { options: availableOptions, tagList } = getCriterionByName(
+        criteria
+      )
+      const selectedCriteriaOptions = this.state[tagList]
 
       const options = availableOptions.map(option => {
-        const prefixedOption = this.prefixCriteriaOption(criteria, option)
-
         return (
           <CheckboxSelectOption
-            key={prefixedOption}
+            key={option}
             classes={{ root: 'selectOption' }}
-            value={prefixedOption}
+            value={option}
           >
-            <Checkbox
-              checked={includes(selectedCriteriaOptions, prefixedOption)}
-            />
+            <Checkbox checked={includes(selectedCriteriaOptions, option)} />
             {option}
           </CheckboxSelectOption>
         )
@@ -384,9 +407,16 @@ class AddAudienceModal extends React.Component {
     })
   }
 
+  get allSelectedCriteriaOptions() {
+    const stateListKeys = filter(Object.keys(this.state), k =>
+      includes(k, '_list')
+    )
+    return flatten(stateListKeys.map(k => this.state[k]))
+  }
+
   render() {
-    const { selectedCriteriaOptions } = this.state
-    const numSelectedOptions = selectedCriteriaOptions.length
+    const numSelectedOptions = this.allSelectedCriteriaOptions.length
+
     return (
       <React.Fragment>
         <Modal

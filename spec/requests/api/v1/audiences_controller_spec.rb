@@ -17,7 +17,7 @@ describe Api::V1::AudiencesController, type: :request, json: true, create_org: t
         expect(response.status).to eq(200)
       end
 
-      it 'returns audiences' do
+      it 'returns audiences with order attribute' do
         get(path)
 
         audience_ids = json['data'].map { |a| a['id'] }
@@ -25,8 +25,8 @@ describe Api::V1::AudiencesController, type: :request, json: true, create_org: t
         expect(audience_ids).to include(audience1.id.to_s)
         expect(audience_ids).to include(audience2.id.to_s)
 
-        json['data'].each do |actual_audience|
-          expect(actual_audience['attributes']['global']).to eq(actual_audience['id'] == audience1.id.to_s)
+        json['data'].each_with_index do |actual_audience, i|
+          expect(actual_audience['attributes']['order']).to eq(i + 1)
         end
       end
     end
@@ -38,26 +38,23 @@ describe Api::V1::AudiencesController, type: :request, json: true, create_org: t
       json_api_params(
         'audiences',
         name: 'Anyone',
-        tag_list: 'one, two, three',
+        interest_list: %w(Pets Commuter Athlete),
       )
     end
 
-    context 'without org admin access' do
+    context 'without org access' do
       before do
-        user.remove_role(Role::ADMIN, user.current_organization.primary_group)
+        RemoveUserRolesFromOrganizationWorker.new.perform(user.current_organization_id, user.id)
+        user.reset_cached_roles!
       end
 
-      it 'returns a 401 if user is not an org admin' do
+      it 'returns a 401 if user is not an org member' do
         post(path, params: params)
         expect(response.status).to eq(401)
       end
     end
 
-    context 'with org admin access' do
-      before do
-        user.add_role(Role::ADMIN, user.current_organization.primary_group)
-      end
-
+    context 'with org access' do
       it 'returns a 200' do
         post(path, params: params)
         expect(response.status).to eq(200)
@@ -68,7 +65,7 @@ describe Api::V1::AudiencesController, type: :request, json: true, create_org: t
 
         audience = Audience.last
         expect(audience.name).to eq('Anyone')
-        expect(audience.tag_list.size).to eq(3)
+        expect(audience.interest_list.size).to eq(3)
         expect(audience.organizations).to include(user.current_organization)
         expect(audience.price_per_response).to eq(Shape::TARGETED_AUDIENCE_PRICE_PER_RESPONSE)
       end

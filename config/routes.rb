@@ -67,6 +67,7 @@ Rails.application.routes.draw do
           get 'next_available'
           post 'add_comparison'
           post 'remove_comparison'
+          get 'csv_report'
         end
       end
       resources :items, only: %i[create]

@@ -26,19 +26,28 @@ const StyledGridCardEmpty = styled.div`
 @inject('uiStore')
 @observer
 class GridCardEmptyHotspot extends React.Component {
-  onClickHotspot = () => {
+  openBlankContentTool = () => {
     const { uiStore, card } = this.props
-    const { order } = card
+    const { order, position } = card
+    uiStore.openBlankContentTool({
+      order,
+      col: position.x,
+      row: position.y,
+    })
+  }
+
+  onClickHotspot = () => {
+    const { card } = this.props
     const collection = card.parentCollection
 
     // confirmEdit will check if we're in a template and need to confirm changes
     if (collection) {
       collection.confirmEdit({
-        onConfirm: () => uiStore.openBlankContentTool({ order }),
+        onConfirm: () => this.openBlankContentTool(),
       })
       return
     }
-    uiStore.openBlankContentTool({ order })
+    this.openBlankContentTool()
   }
 
   render() {

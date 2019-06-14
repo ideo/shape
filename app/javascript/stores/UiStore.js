@@ -62,6 +62,8 @@ export default class UiStore {
   loadedSubmissions = false
   @observable
   adminUsersMenuOpen = null
+  @observable
+  adminAudienceMenuOpen = null
   defaultGridSettings = {
     // layout will track we are at "size 3" i.e. "small 4 cols" even though cols === 4
     layoutSize: 4,
@@ -823,6 +825,10 @@ export default class UiStore {
       return
     }
     this.scroll.scrollToBottom()
+  }
+
+  scrollToPosition(position) {
+    this.scroll.scrollTo(position)
   }
 
   @action

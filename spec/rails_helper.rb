@@ -67,6 +67,7 @@ RSpec.configure do |config|
   config.include ApiHelper, json: true
   config.include JsonHeaders, json: true
   config.include SessionHelper
+  config.include TestDoubles
 
   # Database Cleaner Configuration
   # See: http://www.virtuouscode.com/2012/08/31/configuring-database_cleaner-with-rails-rspec-capybara-and-selenium/
@@ -141,6 +142,11 @@ RSpec.configure do |config|
     )
     allow(fake_twilio).to receive(:messages).and_return(fake_methods)
     allow(Twilio::REST::Client).to receive(:new).and_return(fake_twilio)
+  end
+
+  config.before(:each, seed: true) do
+    # e.g. to get the default audiences
+    Rails.application.load_seed
   end
 
   config.after(:each) do

@@ -90,7 +90,10 @@ class ManagePaymentMethods extends React.Component {
   render() {
     const { apiStore } = this.props
     const { paymentMethods } = this
-    if (!apiStore.currentUserOrganization.in_app_billing) {
+    if (
+      apiStore.currentUserOrganization &&
+      !apiStore.currentUserOrganization.in_app_billing
+    ) {
       return null
     }
     if (!this.loaded) {

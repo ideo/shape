@@ -12,6 +12,7 @@ import PageHeader from '~/ui/pages/shared/PageHeader'
 import RealtimeTextItem from '~/ui/items/RealtimeTextItem'
 import VideoItem from '~/ui/items/VideoItem'
 import { ITEM_TYPES } from '~/utils/variables'
+import { Helmet } from 'react-helmet'
 
 const ItemPageContainer = styled.div`
   background: white;
@@ -152,6 +153,7 @@ class ItemPage extends React.Component {
     }
     return (
       <Fragment>
+        <Helmet title={item.pageTitle} />
         <PageHeader record={item} />
         <ItemPageContainer>
           <PageContainer {...containerProps}>

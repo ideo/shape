@@ -11,6 +11,7 @@ describe Collection::TestDesign, type: :model do
     let!(:parent_collection) { create(:collection) }
     let!(:test_collection) { create(:test_collection, :completed) }
     before do
+      network_mailing_list_doubles
       user.add_role(Role::EDITOR, parent_collection)
       user.add_role(Role::EDITOR, test_collection)
       test_collection.children.each do |record|

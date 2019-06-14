@@ -16,6 +16,14 @@ Cypress.Commands.add('loginAndVisitMyCollection', () => {
   cy.wait('@apiGetCollectionCards')
 })
 
+Cypress.Commands.add('loginAndVisitAdmin', () => {
+  cy.login({ email: 'cypress-test@ideo.com' })
+  cy.visit('/admin')
+  cy.wait('@apiGetCurrentUser')
+  cy.wait('@apiAdminGetUsers')
+  cy.wait('@apiAdminGetTestCollections')
+})
+
 Cypress.Commands.add('logout', () => {
   cy.request('DELETE', '/api/v1/sessions')
 })
@@ -84,6 +92,7 @@ Cypress.Commands.add('createTextItem', () => {
   cy.locate('TextItemClose')
     .first()
     .click({ force: true })
+  cy.wait('@apiUpdateItem')
   cy.wait('@apiCreateCollectionCard')
   cy.wait(50)
 })
