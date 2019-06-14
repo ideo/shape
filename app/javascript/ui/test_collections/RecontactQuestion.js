@@ -102,6 +102,8 @@ class RecontactQuestion extends React.Component {
     const created = await this.createLimitedUser(contactInfo)
     if (!created) return
     onAnswer('feedback_contact_yes')
+    // Why is this setting feedback contact yes?
+    // Isn't this only for getting money?
     this.setState({ submittedContactInfo: true })
   }
 
@@ -110,6 +112,7 @@ class RecontactQuestion extends React.Component {
     return backgroundColor ? backgroundColor : v.colors.primaryDark
   }
 
+  // I think this should be a separate question
   get showFeedbackRecontactForm() {
     const { user } = this.props
     const { answer } = this.state
@@ -143,8 +146,20 @@ class RecontactQuestion extends React.Component {
             <Emoji scale={1.375} name="Yes" symbol="👍" />
           </EmojiButton>
         </EmojiHolder>
+        {this.renderPostOptInModule}
       </React.Fragment>
     )
+  }
+
+  get renderPostOptInModule() {
+    switch (this.feedback_contact_preference) {
+      case 'feedback_contact_yes':
+        return <Emoji scale={2} name="Okay gesture" symbol="👌" />
+      case 'feedback_contact_no':
+        return <Emoji scale={1.375} name="crying face" symbol="😢" />
+      default:
+        return null
+    }
   }
 
   get showContactInfoForm() {
