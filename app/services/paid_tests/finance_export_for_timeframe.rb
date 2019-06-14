@@ -17,7 +17,15 @@ module PaidTests
     private
 
     def csv_header
-      ['Test Collection ID', 'Test Name', 'Revenue', 'Amount Owed', 'Amount Paid', 'Payment Processing Fees']
+      [
+        'Test Collection ID',
+        'Test Name',
+        'Revenue',
+        'Amount Owed',
+        'Amount Paid',
+        'Payment Processing Fees',
+        'Net Profit'
+      ]
     end
 
     def csv_line_for_test_collection(test_collection)
@@ -30,10 +38,11 @@ module PaidTests
       [
         test_collection.id,
         test_collection.name,
-        payment_summaries.sum(&:total_revenue),
+        payment_summaries.sum(&:amount),
         test_summary.amount_owed,
         test_summary.amount_paid,
         payment_summaries.sum(&:payment_processor_fees),
+        payment_summaries.sum(&:net_profit),
       ]
     end
 

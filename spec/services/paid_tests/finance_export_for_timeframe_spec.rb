@@ -10,9 +10,7 @@ RSpec.describe PaidTests::FinanceExportForTimeframe, type: :service, truncate: t
   let(:test_audience) { create(:test_audience, :payment, sample_size: 10, price_per_response: 4.75, test_collection: test_collection) }
   let(:survey_response_owed) { create(:survey_response, user: user, test_audience: test_audience, test_collection: test_collection) }
   let(:survey_response_paid) { create(:survey_response, user: user_2, test_audience: test_audience, test_collection: test_collection) }
-  let(:paypal_fee) { (incentive_amount * 0.05).round(2) }
   let(:incentive_amount) { 2.50 }
-  let(:our_earning) { test_audience.price_per_response - incentive_amount - paypal_fee }
 
   before do
     allow_any_instance_of(SurveyResponse).to receive(:completed?).and_return(true)
@@ -30,23 +28,46 @@ RSpec.describe PaidTests::FinanceExportForTimeframe, type: :service, truncate: t
 
   describe '#call' do
     let(:csv) { CSV.parse(subject, headers: true) }
+    let(:revenue) { test_audience.total_price }
+    let(:payment_processing_fees) { test_audience.stripe_fee + paypal_fee }
+    let(:paypal_fee) { (incentive_amount * 0.05).round(2) }
+    let(:net_profit) { test_audience.price_per_response - TestAudience.incentive_amount - paypal_fee }
+    let(:expected_csv_line) do
+      {
+        'Test Collection ID' => test_collection.id.to_s,
+        'Test Name' => test_collection.name,
+        'Revenue' => revenue.to_s,
+        'Amount Owed' => incentive_amount.to_s,
+        'Amount Paid' => incentive_amount.to_s,
+        'Payment Processing Fees' => payment_processing_fees.to_s,
+        'Net Profit' => net_profit.to_s,
+      }
+    end
 
     it 'returns expected headers' do
       expect(csv.headers).to match_array(
-        ['Test Collection ID', 'Test Name', 'Revenue', 'Amount Owed', 'Amount Paid', 'Payment Processing Fees']
+        ['Test Collection ID', 'Test Name', 'Revenue', 'Amount Owed', 'Amount Paid', 'Payment Processing Fees', 'Net Profit']
       )
     end
 
     it 'has expected test data for timeframe' do
-      debugger
-      revenue = test_audience.total_price - test_audience.stripe_fee - paypal_fee - incentive_amount
-      payment_processing_fees = test_audience.stripe_fee + paypal_fee
-      expect(csv[0]['Test Collection ID']).to eq(test_collection.id.to_s)
-      expect(csv[0]['Test Name']).to eq(test_collection.name)
-      expect(csv[0]['Revenue']).to eq((test_audience.total_price - test_audience.stripe_fee).to_s)
-      expect(csv[0]['Amount Owed']).to eq(incentive_amount.to_s)
-      expect(csv[0]['Amount Paid']).to eq(incentive_amount.to_s)
-      expect(csv[0]['Payment Processing Fees']).to eq((test_audience.stripe_fee + paypal_fee).to_s)
+      expect(csv[0].to_h).to eq(expected_csv_line)
+    end
+
+    context 'with additional purchases the next month' do
+      before { Timecop.travel(end_time + 1.day) }
+      let!(:test_audience) { create(:test_audience, :payment, sample_size: 10, price_per_response: 4.75, test_collection: test_collection) }
+      let!(:survey_response_owed_next_month) { create(:survey_response, user: user, test_audience: test_audience, test_collection: test_collection) }
+      let!(:survey_response_paid_next_month) { create(:survey_response, user: user_2, test_audience: test_audience, test_collection: test_collection) }
+      before do
+        SurveyResponseCompletion.call(survey_response_owed_next_month)
+        SurveyResponseCompletion.call(survey_response_paid_next_month)
+        survey_response_paid_next_month.record_incentive_paid!
+      end
+
+      it 'does not affect export data for previous month' do
+        expect(csv[0].to_h).to eq(expected_csv_line)
+      end
     end
   end
 end

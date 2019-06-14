@@ -1,14 +1,18 @@
 module PaidTests
   class PaymentSummary
-
     def initialize(payment:, start_time:, end_time:)
       @payment = payment
       @start_time = start_time
       @end_time = end_time
     end
 
-    def total_revenue
-      revenue_deferred + revenue
+    def amount
+      return BigDecimal(@payment.amount.to_s) if within_timeframe?
+      BigDecimal('0.0')
+    end
+
+    def within_timeframe?
+      @payment.created_at > @start_time && @payment.created_at < @end_time
     end
 
     def revenue_deferred
@@ -20,7 +24,7 @@ module PaidTests
       )
     end
 
-    def revenue
+    def net_profit
       DoubleEntry::BalanceCalculator.calculate(
         DoubleEntry.account(:revenue, scope: @payment),
         from: @start_time,
