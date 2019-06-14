@@ -7,9 +7,9 @@ GIT
 
 GIT
   remote: https://github.com/ideo/network-api-ruby.git
-  revision: 652625087411194c5b03ff0a825643da343884ca
+  revision: d687696d84834a18912cb18cabdb9580563fa5d9
   specs:
-    network-api-ruby (0.0.16)
+    network-api-ruby (0.0.17)
       json_api_client (~> 1.5, >= 1.5.3)
 
 GIT
@@ -491,7 +491,7 @@ GEM
     tilt (2.0.8)
     timecop (0.9.1)
     tunemygc (1.0.71)
-    twilio-ruby (5.23.0)
+    twilio-ruby (5.23.1)
       faraday (~> 0.9)
       jwt (>= 1.5, <= 2.5)
       nokogiri (>= 1.6, < 2.0)

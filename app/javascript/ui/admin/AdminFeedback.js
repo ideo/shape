@@ -17,9 +17,10 @@ import { Select, SelectOption } from '~/ui/global/styled/forms'
 import v from '~/utils/variables'
 import { CircledIcon } from '~/ui/global/styled/buttons'
 import { Heading1, Heading2, Heading3 } from '~/ui/global/styled/typography'
-import { showOnHoverCss } from '~/ui/grid/shared'
 import Tooltip from '~/ui/global/Tooltip'
 import * as colors from '~shared/styles/constants/colors'
+import InfoNoCircleIcon from '~/ui/icons/InfoNoCircleIcon'
+import AdminAudienceModal from '~/ui/admin/AdminAudienceModal'
 
 const Wrapper = styled.div`
   font-family: ${v.fonts.sans};
@@ -53,7 +54,7 @@ const AudienceRowItem = styled(Grid)`
 AudienceRowItem.displayName = 'AudienceRowItem'
 
 const AudienceWrapper = styled(Flex)`
-  ${showOnHoverCss};
+  ${'' /* ${showOnHoverCss}; */};
 `
 
 const AudienceActions = styled.div`
@@ -110,6 +111,7 @@ class AdminFeedback extends React.Component {
     monthsForExport: [],
     currentPage: 1,
     totalPages: 1,
+    selectedAudience: null,
   }
 
   componentDidMount() {
@@ -202,6 +204,20 @@ class AdminFeedback extends React.Component {
                           </CircledIcon>
                         </CopyToClipboard>
                       </Tooltip>
+                      <Tooltip
+                        classes={{ tooltip: 'Tooltip' }}
+                        title={'view audience definition'}
+                        placement="top"
+                      >
+                        <CircledIcon
+                          data-cy="AudienceInfoButton"
+                          onClick={() =>
+                            this.showAdminAudienceDialog(testAudience.audience)
+                          }
+                        >
+                          <InfoNoCircleIcon />
+                        </CircledIcon>
+                      </Tooltip>
                     </AudienceActions>
                   </AudienceWrapper>
                 </AudienceRowItem>
@@ -226,18 +242,29 @@ class AdminFeedback extends React.Component {
     ))
   }
 
+  showAdminAudienceDialog = audience => {
+    const { uiStore } = this.props
+    this.setState({ selectedAudience: audience })
+    uiStore.update('adminAudienceMenuOpen', true)
+  }
+
   render() {
     const { currentPage, totalPages, monthsForExport } = this.state
     const previousPageDisabled = currentPage === 1
     const nextPageDisabled = currentPage === totalPages
+    const { uiStore } = this.props
 
     return (
       <Wrapper>
+        <AdminAudienceModal
+          audience={this.state.selectedAudience}
+          open={uiStore.adminAudienceMenuOpen}
+        />
         <Heading1>Feedback</Heading1>
         <Section>
           <Box mb={40}>
             <Flex justify="space-between">
-              <Heading2>All Shape Feedback</Heading2>
+              <Heading2 data-cy="AdminHeader">All Shape Feedback</Heading2>
               <Select
                 classes={{ root: 'select' }}
                 disableUnderline
@@ -265,7 +292,7 @@ class AdminFeedback extends React.Component {
             </Flex>
           </Box>
           <Grid container>
-            <Grid container>
+            <Grid data-cy="AdminRowHeaderWrapper" container>
               <Grid item xs={2}>
                 <Heading3>Test Name</Heading3>
               </Grid>

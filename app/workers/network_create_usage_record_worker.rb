@@ -13,7 +13,9 @@ class NetworkCreateUsageRecordWorker
       new_active_users_count = organization.reload.active_users_count - active_users_count
       next unless new_active_users_count.positive?
 
-      BillingChangesMailer.notify(organization, new_active_users_count).deliver_later
+      BillingChangesMailer.notify(
+        organization.id, new_active_users_count
+      ).deliver_later
     end
   end
 end

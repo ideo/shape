@@ -47,6 +47,11 @@ describe('CollectionPage', () => {
     expect(grid.props().collection).toBe(collection)
   })
 
+  it('renders a <Helmet> with the pageTitle', () => {
+    const helmet = wrapper.find('HelmetWrapper')
+    expect(helmet.props().title).toBe(collection.pageTitle)
+  })
+
   describe('componentDidUpdate()', () => {
     describe('on a different collection', () => {
       beforeEach(() => {

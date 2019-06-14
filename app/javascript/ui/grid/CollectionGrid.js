@@ -5,10 +5,13 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 import styled from 'styled-components'
 
+import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import CollectionSort from '~/ui/grid/CollectionSort'
+import CornerPositioned from '~/ui/global/CornerPositioned'
+import PlusIcon from '~/ui/icons/PlusIcon'
+import IconAvatar from '~/ui/global/IconAvatar'
 import Loader from '~/ui/layout/Loader'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
-import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import { objectsEqual } from '~/utils/objectUtils'
 import v from '~/utils/variables'
 
@@ -131,7 +134,14 @@ class CollectionGrid extends React.Component {
     if (bctOpen) {
       // make the BCT appear to the right of the current card
       let { order } = blankContentToolState
-      const { height, replacingId, blankType, width } = blankContentToolState
+      const {
+        height,
+        replacingId,
+        blankType,
+        width,
+        row,
+        col,
+      } = blankContentToolState
       if (replacingId) {
         // remove the card being replaced from our current state cards
         _.remove(cards, { id: replacingId })
@@ -140,14 +150,19 @@ class CollectionGrid extends React.Component {
         // so we have to bump it back by 0.5 so it isn't == with the next card
         order -= 0.5
       }
+      const blankAttrs = {
+        width,
+        height,
+        order,
+        row,
+        col,
+      }
       let blankCard = {
+        ...blankAttrs,
         id: 'blank',
         num: 0,
         cardType: 'blank',
         blankType,
-        width,
-        height,
-        order,
       }
       // If we already have a BCT open, find it in our cards
       const blankFound = _.find(this.state.cards, { cardType: 'blank' })
@@ -158,7 +173,7 @@ class CollectionGrid extends React.Component {
         blankFound.num += 1
         blankFound.id = `blank-${blankFound.num}`
         // Increments order from existing BCT order
-        blankCard = { ...blankFound, order, width, height }
+        blankCard = { ...blankFound, ...blankAttrs }
       }
       if (canEditCollection || blankCard.blankType) {
         // Add the BCT to the array of cards to be positioned, if they can edit
@@ -583,6 +598,53 @@ class CollectionGrid extends React.Component {
     }
   }
 
+  openMobileBct = ev => {
+    ev.preventDefault()
+    const { uiStore } = this.props
+    let order = 0
+    const { pageYOffset } = window
+    const scrollPoint = Math.max(
+      0,
+      pageYOffset + window.innerHeight - window.innerHeight / 2
+    )
+    const { cards } = this.state
+    const closestCard = cards.find(
+      card =>
+        card.position.yPos < scrollPoint &&
+        card.position.yPos + card.position.height > scrollPoint
+    )
+    if (!closestCard) {
+      return uiStore.openBlankContentTool({ order })
+    }
+    order = closestCard.order
+    const newPosition = {
+      x: 0,
+      y: closestCard.position.y - 1,
+    }
+    const newGridPosition = this.calculateGridPosition({
+      cardWidth: 1,
+      cardHeight: 1,
+      position: newPosition,
+    })
+    uiStore.openBlankContentTool({ order })
+    if (!this.isVerticallyVisible(newPosition)) {
+      uiStore.scrollToPosition(newGridPosition.yPos)
+    }
+  }
+
+  isVerticallyVisible(position) {
+    const winTop = window.pageYOffset
+    const winBottom = pageYOffset + window.innerHeight
+    const eleBottom = position.yPos + position.height
+    const eleTop = position.yPos
+    return (
+      eleTop >= winTop &&
+      eleTop <= winBottom &&
+      eleBottom <= winBottom &&
+      eleBottom >= winTop
+    )
+  }
+
   addPaginationCard = cards => {
     if (_.find(cards, { id: 'pagination' })) return
     let order = cards.length
@@ -622,6 +684,7 @@ class CollectionGrid extends React.Component {
       gutter,
       cols,
       shouldAddEmptyRow,
+      canEditCollection,
     } = this.props
     const { currentOrder } = collection
     let row = 0
@@ -670,8 +733,14 @@ class CollectionGrid extends React.Component {
         const maxGap = _.find(gaps, g => g.length >= cardWidth) || {
           length: 0,
         }
+        const hotspotPositionedBCT =
+          card.cardType === 'blank' && (card.col || card.row)
+
         if (maxGap && maxGap.length) {
           ;[nextX] = maxGap
+          itFits = true
+        } else if (hotspotPositionedBCT) {
+          // in this case BCT was absolutely positioned by clicking a Hotspot, we know it fits
           itFits = true
         } else {
           // 2-COLUMN SPECIAL CASE FOR TEXT CARD:
@@ -756,6 +825,10 @@ class CollectionGrid extends React.Component {
             x: nextX,
             y: row,
           }
+          if (hotspotPositionedBCT) {
+            position.x = card.col
+            position.y = card.row
+          }
           // add position attrs to card
           position = this.calculateGridPosition({
             card,
@@ -797,7 +870,7 @@ class CollectionGrid extends React.Component {
       // don't add space for an empty row if we don't want it to appear
       // because `rows` gets calculated for minHeight of grid
       rows -= 1
-    } else if (shouldAddEmptyRow && !opts.dragging) {
+    } else if (canEditCollection && shouldAddEmptyRow && !opts.dragging) {
       matrix.push(_.fill(Array(cols), null))
       this.addEmptyCards(cards, matrix)
     }
@@ -812,6 +885,23 @@ class CollectionGrid extends React.Component {
       () => {
         if (_.isFunction(opts.onMoveComplete)) opts.onMoveComplete()
       }
+    )
+  }
+
+  renderMobileHotspot() {
+    const { canEditCollection } = this.props
+    if (!canEditCollection) return ''
+    return (
+      <CornerPositioned>
+        <IconAvatar title="Create new item">
+          <button
+            onClick={this.openMobileBct}
+            style={{ width: '70%', height: '70%' }}
+          >
+            <PlusIcon />
+          </button>
+        </IconAvatar>
+      </CornerPositioned>
     )
   }
 
@@ -902,6 +992,7 @@ class CollectionGrid extends React.Component {
           </SortContainer>
         )}
         {this.renderPositionedCards()}
+        {uiStore.isMobile && this.renderMobileHotspot()}
       </StyledGrid>
     )
   }

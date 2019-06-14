@@ -79,6 +79,7 @@ module.exports = {
     'no-underscore-dangle': 0,
     'no-undef': 2,
     'no-duplicate-imports': 2,
+    'no-console': ['warn', { allow: ['warn', 'error'] }],
     'prettier/prettier': 'error',
     'prefer-destructuring': [
       'error',
