@@ -33,7 +33,7 @@ const StyledRespondentBanner = styled.div`
 StyledRespondentBanner.displayName = 'StyledRespondentBanner'
 
 const StyledGrid = styled(Grid)`
-  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
     text-align: center;
   }
 `
