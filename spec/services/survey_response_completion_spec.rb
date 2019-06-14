@@ -17,31 +17,6 @@ describe SurveyResponseCompletion, type: :service do
   end
 
   describe '#call', :vcr do
-    context 'completed after test closed but within allowable window' do
-      let(:test_collection) do
-        collection = create(:test_collection, :with_test_audience)
-        collection.close!
-        collection
-      end
-      it 'marks the survey_response as completed_late' do
-        expect do
-          service.call
-        end.to change(survey_response, :status)
-
-        expect(survey_response.status).to eq 'completed_late'
-      end
-    end
-
-    context 'completed before test was closed' do
-      it 'marks the survey_response as completed' do
-        expect do
-          service.call
-        end.to change(survey_response, :status)
-
-        expect(survey_response.status).to eq 'completed'
-      end
-    end
-
     it 'should call CollectionUpdateBroadcaster with the test_collection if status changes' do
       expect(CollectionUpdateBroadcaster).to receive(:call).with(test_collection)
       service.call
@@ -69,13 +44,23 @@ describe SurveyResponseCompletion, type: :service do
         it 'calculates the correct balance' do
           expect(user.current_incentive_balance).to eq 25.00
           service.call
-          expect(user.current_incentive_balance).to eq 25.00 + ::FEEDBACK_INCENTIVE_AMOUNT
+          expect(user.current_incentive_balance).to eq 25.00 + Shape::FEEDBACK_INCENTIVE_AMOUNT
         end
       end
     end
 
     context 'without test audience' do
       let(:test_collection) { create(:test_collection) }
+
+      it 'does not create feedback_incentive_records' do
+        expect do
+          service.call
+        end.not_to change(FeedbackIncentiveRecord, :count)
+      end
+    end
+
+    context 'with link sharing' do
+      let(:test_collection) { create(:test_collection, :with_link_sharing) }
 
       it 'does not create feedback_incentive_records' do
         expect do

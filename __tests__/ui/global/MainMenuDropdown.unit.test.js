@@ -29,7 +29,7 @@ describe('MainMenuDropdown', () => {
       'Settings',
       'Contact Support',
       'Billing',
-      'Legal',
+      'Terms and Privacy',
     ]
     props.uiStore.alert.mockClear()
     props.uiStore.confirm.mockClear()

@@ -1,16 +1,22 @@
 import Grid from '@material-ui/core/Grid'
 import moment from 'moment-mini'
 import styled from 'styled-components'
+import CopyToClipboard from 'react-copy-to-clipboard'
 import { Flex } from 'reflexbox'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import Box from '~shared/components/atoms/Box'
 import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import LeftButtonIcon from '~/ui/icons/LeftButtonIcon'
+import LinkIcon from '~/ui/icons/LinkIcon'
 import Section from '~shared/components/molecules/Section'
 import v from '~/utils/variables'
+import { CircledIcon } from '~/ui/global/styled/buttons'
 import { Heading1, Heading2, Heading3 } from '~/ui/global/styled/typography'
+import Tooltip from '~/ui/global/Tooltip'
 import * as colors from '~shared/styles/constants/colors'
+import InfoNoCircleIcon from '~/ui/icons/InfoNoCircleIcon'
+import AdminAudienceModal from '~/ui/admin/AdminAudienceModal'
 
 const Wrapper = styled.div`
   font-family: ${v.fonts.sans};
@@ -43,6 +49,14 @@ const AudienceRowItem = styled(Grid)`
 `
 AudienceRowItem.displayName = 'AudienceRowItem'
 
+const AudienceWrapper = styled(Flex)`
+  ${'' /* ${showOnHoverCss}; */};
+`
+
+const AudienceActions = styled.div`
+  margin-left: 8px;
+`
+
 const PaginationWrapper = styled.div`
   background-color: ${v.colors.commonDark};
   border-radius: 1px;
@@ -74,13 +88,14 @@ const NextPageButton = styled(PaginationButton)`
 `
 NextPageButton.displayName = 'NextPageButton'
 
-@inject('apiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class AdminFeedback extends React.Component {
   state = {
     testCollections: [],
     currentPage: 1,
     totalPages: 1,
+    selectedAudience: null,
   }
 
   componentDidMount() {
@@ -123,7 +138,45 @@ class AdminFeedback extends React.Component {
             {testCollection.test_audiences.map(testAudience => (
               <React.Fragment key={testAudience.id}>
                 <AudienceRowItem item xs={4}>
-                  {testAudience.audience.name}
+                  <AudienceWrapper align="center">
+                    {testAudience.audience.name}
+                    <AudienceActions className="show-on-hover">
+                      <Tooltip
+                        classes={{ tooltip: 'Tooltip' }}
+                        title={'copy survey link'}
+                        placement="top"
+                      >
+                        <CopyToClipboard
+                          text={`${testCollection.publicTestURL}?ta=${
+                            testAudience.id
+                          }`}
+                          onCopy={() =>
+                            this.props.uiStore.popupSnackbar({
+                              message: 'Survey link copied',
+                            })
+                          }
+                        >
+                          <CircledIcon>
+                            <LinkIcon />
+                          </CircledIcon>
+                        </CopyToClipboard>
+                      </Tooltip>
+                      <Tooltip
+                        classes={{ tooltip: 'Tooltip' }}
+                        title={'view audience definition'}
+                        placement="top"
+                      >
+                        <CircledIcon
+                          data-cy="AudienceInfoButton"
+                          onClick={() =>
+                            this.showAdminAudienceDialog(testAudience.audience)
+                          }
+                        >
+                          <InfoNoCircleIcon />
+                        </CircledIcon>
+                      </Tooltip>
+                    </AudienceActions>
+                  </AudienceWrapper>
                 </AudienceRowItem>
                 <AudienceRowItem item xs={4}>
                   <Flex justify="flex-end">
@@ -146,20 +199,31 @@ class AdminFeedback extends React.Component {
     ))
   }
 
+  showAdminAudienceDialog = audience => {
+    const { uiStore } = this.props
+    this.setState({ selectedAudience: audience })
+    uiStore.update('adminAudienceMenuOpen', true)
+  }
+
   render() {
     const { currentPage, totalPages } = this.state
     const previousPageDisabled = currentPage === 1
     const nextPageDisabled = currentPage === totalPages
+    const { uiStore } = this.props
 
     return (
       <Wrapper>
+        <AdminAudienceModal
+          audience={this.state.selectedAudience}
+          open={uiStore.adminAudienceMenuOpen}
+        />
         <Heading1>Feedback</Heading1>
         <Section>
           <Box mb={40}>
-            <Heading2>All Shape Feedback</Heading2>
+            <Heading2 data-cy="AdminHeader">All Shape Feedback</Heading2>
           </Box>
           <Grid container>
-            <Grid container>
+            <Grid data-cy="AdminRowHeaderWrapper" container>
               <Grid item xs={2}>
                 <Heading3>Test Name</Heading3>
               </Grid>
@@ -224,6 +288,7 @@ class AdminFeedback extends React.Component {
 
 AdminFeedback.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default AdminFeedback

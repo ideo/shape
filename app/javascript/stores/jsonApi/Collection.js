@@ -892,8 +892,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       return
     }
 
-    // onSuccess is really "successfully able to edit this collection"
-    if (_.isFunction(onSuccess)) onSuccess()
     uiStore.update('movingIntoCollection', toCollection)
 
     const data = {
@@ -906,6 +904,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     uiStore.setMovingCards([])
     uiStore.update('multiMoveCardIds', [])
     uiStore.update('movingIntoCollection', null)
+
+    // Explicitly remove cards from this collection so front-end updates
+    this.removeCardIds(cardIds)
+
+    // onSuccess is really "successfully able to edit this collection"
+    if (_.isFunction(onSuccess)) onSuccess()
   }
 
   static async createSubmission(parent_id, submissionSettings) {

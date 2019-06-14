@@ -23,6 +23,14 @@ const SharedRecordMixin = superclass =>
       return `/${this.internalType}/${this.id}`
     }
 
+    get isCommonViewable() {
+      return this.common_viewable
+    }
+
+    get pageTitle() {
+      return `${this.name} | Shape`
+    }
+
     API_updateName(name) {
       const previousName = this.name
       this.name = name
@@ -45,7 +53,10 @@ const SharedRecordMixin = superclass =>
           if (card) {
             _.assign(
               card,
-              _.pick(cardData, ['order', 'width', 'height', 'row', 'col'])
+              _.pick(cardData, ['order', 'width', 'height', 'row', 'col']),
+              {
+                updated_at: new Date(),
+              }
             )
           }
         })
@@ -55,7 +66,7 @@ const SharedRecordMixin = superclass =>
         _.assign(this, snapshot)
         data = this.toJsonApi()
       }
-      data.cancel_sync = true
+
       return this.apiStore.request(this.baseApiPath, 'PATCH', { data })
     }
 
@@ -78,7 +89,7 @@ const SharedRecordMixin = superclass =>
       return res.__response.data
     }
 
-    pushUndo({ snapshot, message = '', apiCall } = {}) {
+    pushUndo({ snapshot, message = '', apiCall, redirectTo = this } = {}) {
       let undoApiCall = apiCall
       if (!apiCall) {
         undoApiCall = () => this.API_revertTo({ snapshot })
@@ -86,7 +97,7 @@ const SharedRecordMixin = superclass =>
       undoStore.pushUndoAction({
         message,
         apiCall: undoApiCall,
-        redirectPath: { type: this.internalType, id: this.id },
+        redirectPath: { type: redirectTo.internalType, id: redirectTo.id },
       })
     }
   }

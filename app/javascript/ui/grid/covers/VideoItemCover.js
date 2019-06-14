@@ -61,7 +61,7 @@ const StyledVideoCover = styled.div`
 `
 StyledVideoCover.displayName = 'StyledVideoCover'
 
-const InfoIconHolder = styled.span`
+const StyledIconHolder = styled.span`
   display: inline-block;
   height: 60px;
   width: 60px;
@@ -99,9 +99,9 @@ class VideoItemCover extends React.Component {
       return (
         <StyledVideoCover pending={item.pending_transcoding}>
           <DisplayText color={v.colors.white}>
-            <InfoIconHolder>
+            <StyledIconHolder>
               <AddVideoIcon />
-            </InfoIconHolder>
+            </StyledIconHolder>
             <div>
               Your video upload is currently processing.
               <br />

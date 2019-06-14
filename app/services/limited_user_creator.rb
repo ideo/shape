@@ -54,13 +54,17 @@ class LimitedUserCreator < SimpleService
 
     return false if params.empty?
 
-    if Rails.env.development?
-      # always look up the same user so we don't keep creating real ones
-      params[:email] = 'test.user@shape.space'
-      params.delete :phone
-    end
+    # if Rails.env.development?
+    #   # always look up the same user so we don't keep creating real ones
+    #   params[:email] = 'test.user@shape.space'
+    #   params.delete :phone
+    # end
+
     @network_user = NetworkApi::User.where(params).first
-    return if @network_user.present?
+    if @network_user.present?
+      @network_user = NetworkApi::User.update(params)
+      return
+    end
 
     params[:limited_user] = true
     params.merge!(@user_info)
@@ -70,18 +74,17 @@ class LimitedUserCreator < SimpleService
 
   def create_user(network_user)
     @limited_user = User.find_or_initialize_from_network(network_user)
-    @limited_user.feedback_contact_preference = :feedback_contact_yes
     @limited_user.created_at = @date_of_participation if @date_of_participation.present?
     saved = @limited_user.save
 
-    create_test_audience_invitation(@limited_user)
+    if user.persisted? && @date_of_participation.present?
+      create_test_audience_invitation(@limited_user)
+    end
 
     saved
   end
 
   def create_test_audience_invitation(user)
-    return if user.new_record? || @date_of_participation.nil?
-
     TestAudienceInvitation.create(user: user, created_at: @date_of_participation)
   end
 end

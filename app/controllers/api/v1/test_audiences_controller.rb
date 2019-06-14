@@ -1,28 +1,11 @@
 class Api::V1::TestAudiencesController < Api::V1::BaseController
-  deserializable_resource :test_audience, class: DeserializableTestAudience, only: %i[create update]
-  before_action :load_and_authorize_test_collection_update, only: %i[create update]
-  load_resource
-
-  def create
-    @test_audience.launched_by = current_user
-    if @test_audience.save
-      render_test_audience
-    else
-      render_api_errors @test_audience.errors
-    end
-  end
-
-  def destroy
-    if @test_audience.destroy
-      render_test_audience
-    else
-      render_api_errors @test_audience.errors
-    end
-  end
+  deserializable_resource :test_audience, class: DeserializableTestAudience, only: %i[update]
+  load_and_authorize_resource
 
   def update
     @test_audience.attributes = test_audience_params
     if @test_audience.save
+      @test_audience.test_collection&.test_design&.touch
       render_test_audience
     else
       render_api_errors @test_audience.errors
@@ -33,24 +16,17 @@ class Api::V1::TestAudiencesController < Api::V1::BaseController
 
   def render_test_audience
     render jsonapi: @test_audience,
-           include: [:audience, test_collection: [:test_audiences]],
+           include: [test_collection: [:test_design]],
            class: {
-             Audience: SerializableAudience,
              TestAudience: SerializableTestAudience,
              'Collection::TestCollection': SerializableCollection,
+             'Collection::TestDesign': SerializableCollection,
            }
-  end
-
-  def load_and_authorize_test_collection_update
-    @test_collection = Collection.find(test_audience_params[:test_collection_id])
-    authorize! :edit, @test_collection
   end
 
   def test_audience_params
     params.require(:test_audience).permit(
-      :sample_size,
-      :audience_id,
-      :test_collection_id,
+      :status,
     )
   end
 end

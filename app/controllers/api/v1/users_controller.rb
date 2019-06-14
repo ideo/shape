@@ -1,5 +1,6 @@
 class Api::V1::UsersController < Api::V1::BaseController
-  skip_before_action :check_api_authentication!, only: %i[me create_limited_user]
+  before_action :authenticate_user!, only: :update_current_user
+  skip_before_action :check_api_authentication!, only: %i[me update_current_user create_limited_user]
   load_and_authorize_resource only: %i[show]
   def show
     render jsonapi: @user, include: [
@@ -55,6 +56,8 @@ class Api::V1::UsersController < Api::V1::BaseController
     session_uid = json_api_params[:session_uid]
     creator = LimitedUserCreator.new(contact_info: contact_info)
     if creator.call
+      # sign you in so you can update yourself later (e.g. phone + recontact)
+      sign_in(:user, creator.limited_user)
       if session_uid
         survey_response = SurveyResponse.find_by_session_uid(session_uid)
         survey_response.update(user_id: creator.limited_user.id)
@@ -84,6 +87,7 @@ class Api::V1::UsersController < Api::V1::BaseController
       # these are the only fields you would update via the API
       :terms_accepted,
       :show_helper,
+      :shape_circle_member,
       :show_move_helper,
       :show_template_helper,
       :notify_through_email,

@@ -1,5 +1,5 @@
 class Api::V1::TestCollectionsController < Api::V1::BaseController
-  before_action :load_and_authorize_test_collection, only: %i[launch close reopen add_comparison]
+  before_action :load_and_authorize_test_collection, only: %i[launch close reopen add_comparison csv_report]
   before_action :load_test_collection, only: %i[show next_available add_comparison remove_comparison]
   before_action :load_submission_box_test_collection, only: %i[next_available]
   before_action :load_comparison_collection, only: %i[add_comparison remove_comparison]
@@ -17,7 +17,7 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
       test_audience_params: json_api_params[:audiences],
     )
     if success
-      render_collection
+      render_test_collection
     else
       render_api_errors @test_collection.errors
     end
@@ -25,7 +25,7 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
 
   def close
     if @test_collection.close!
-      render_collection
+      render_test_collection
     else
       render_api_errors @test_collection.errors
     end
@@ -33,7 +33,7 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
 
   def reopen
     if @test_collection.reopen!
-      render_collection
+      render_test_collection
     else
       render_api_errors @test_collection.errors
     end
@@ -58,7 +58,7 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
       comparison_collection: @comparison_collection,
     )
     if test_comparison.add
-      render_collection
+      render_test_collection
     else
       render json: { errors: test_comparison.errors }, status: :unprocessable_entity
     end
@@ -70,13 +70,26 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
       comparison_collection: @comparison_collection,
     )
     if test_comparison.remove
-      render_collection
+      render_test_collection
     else
       render json: { errors: test_comparison.errors }, status: :unprocessable_entity
     end
   end
 
+  def csv_report
+    @report = TestCollectionToCsv.call(@test_collection)
+    respond_to do |format|
+      format.any { send_data @report, filename: "test-#{params[:id]}-#{Date.today}.csv" }
+    end
+  end
+
   private
+
+  def render_test_collection
+    included = Collection.default_relationships_for_api
+    included << :test_design
+    render_collection(include: included)
+  end
 
   def load_test_collection
     @collection = @test_collection = Collection::TestCollection.find_by(id: params[:id])

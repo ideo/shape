@@ -67,6 +67,7 @@ Rails.application.routes.draw do
           get 'next_available'
           post 'add_comparison'
           post 'remove_comparison'
+          get 'csv_report'
         end
       end
       resources :items, only: %i[create]
@@ -153,7 +154,7 @@ Rails.application.routes.draw do
         resources :question_answers, only: %i[create update]
       end
 
-      resources :audiences, only: %i[index show]
+      resources :audiences, only: %i[index show create]
 
       namespace :admin do
         resources :users, only: %i[index destroy create]
@@ -202,6 +203,8 @@ Rails.application.routes.draw do
   # custom URL for GCI
   get '/earlychildhood', to: redirect('/collections/4764')
 
+  # catch all marketing route request
+  get '/product/*path', to: 'home#marketing', constraints: ->(req) { req.format == :html || req.format == '*/*' }
   # catch all HTML route requests, send to frontend
   get '*path', to: 'home#index', constraints: ->(req) { req.format == :html || req.format == '*/*' }
 end

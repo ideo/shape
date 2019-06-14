@@ -16,6 +16,7 @@ import {
   ItemApiWrapper,
 } from '~/ui/pages/PageWithApiWrapper'
 import Loader from '~/ui/layout/Loader'
+import LowerRightCorner from '~/ui/global/LowerRightCorner'
 import SearchPage from '~/ui/pages/SearchPage'
 import SettingsPage from '~/ui/pages/SettingsPage'
 import TermsPage from '~/ui/pages/TermsPage'
@@ -25,7 +26,7 @@ import TermsOfUseModal from '~/ui/users/TermsOfUseModal'
 import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
 import UserSettings from '~/ui/users/UserSettings'
 import v from '~/utils/variables'
-import firebaseClient from '~/vendor/firestore'
+import firebaseClient from '~/vendor/firebase/clients/firebaseClient'
 import MuiTheme, { BillingMuiTheme } from '~/ui/theme'
 import captureGlobalKeypress from '~/utils/captureGlobalKeypress'
 
@@ -205,6 +206,7 @@ class Routes extends React.Component {
         blur={displayTermsPopup}
         id="AppWrapper"
       >
+        <LowerRightCorner />
         {selectedAreaEnabled && (
           <SelectedArea coords={this.selectedAreaStyleProps} />
         )}

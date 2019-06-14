@@ -1,8 +1,9 @@
 class Api::V1::AudiencesController < Api::V1::BaseController
+  deserializable_resource :audience, class: DeserializableAudience, only: %i[create]
   load_and_authorize_resource :audience, only: %i[index show]
   load_and_authorize_resource :organization, only: %i[index]
 
-  before_action :load_user_audiences, only: %i[index]
+  before_action :load_org_audiences, only: %i[index]
   def index
     render jsonapi: @audiences
   end
@@ -11,11 +12,41 @@ class Api::V1::AudiencesController < Api::V1::BaseController
     render jsonapi: @audience
   end
 
+  before_action :authorize_current_organization, only: %i[create]
+  def create
+    @audience = Audience.new(audience_params)
+    @audience.price_per_response = Shape::TARGETED_AUDIENCE_PRICE_PER_RESPONSE
+    @audience.organizations << current_organization
+    if @audience.save
+      render jsonapi: @audience.reload
+    else
+      render_api_errors @audience.errors
+    end
+  end
+
   private
 
-  def load_user_audiences
+  def load_org_audiences
     @audiences = Audience
-                 .where(organization_id: nil)
-                 .or(Audience.where(organization_id: @organization.id))
+                 .includes(:base_tags)
+                 .viewable_by_user_in_org(user: current_user, organization: @organization)
+  end
+
+  def authorize_current_organization
+    authorize! :read, current_organization
+  end
+
+  def audience_params
+    params.require(:audience).permit(
+      :name,
+      age_list: [],
+      children_age_list: [],
+      country_list: [],
+      education_level_list: [],
+      gender_list: [],
+      adopter_type_list: [],
+      interest_list: [],
+      publication_list: [],
+    )
   end
 end

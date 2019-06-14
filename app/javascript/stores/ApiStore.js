@@ -3,6 +3,7 @@ import { Collection as datxCollection, assignModel, ReferenceType } from 'datx'
 import { jsonapi } from 'datx-jsonapi'
 import _ from 'lodash'
 import moment from 'moment-mini'
+import * as Sentry from '@sentry/browser'
 import queryString from 'query-string'
 
 import { apiUrl } from '~/utils/url'
@@ -91,6 +92,9 @@ class ApiStore extends jsonapi(datxCollection) {
     this.currentUserId = id
     this.filestackToken = filestackToken
     this.currentUserOrganizationId = organizationId || null
+    Sentry.configureScope(scope => {
+      scope.setUser({ id: id, currentOrganizationId: organizationId })
+    })
   }
 
   @action
@@ -123,6 +127,9 @@ class ApiStore extends jsonapi(datxCollection) {
 
   @computed
   get currentUserOrganization() {
+    if (!this.currentUserOrganizationId) {
+      return null
+    }
     return this.find('organizations', this.currentUserOrganizationId)
   }
 
@@ -448,7 +455,7 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   async fetchOrganizationAudiences(orgId) {
-    const res = await this.request(`organizations/${orgId}/audiences/`, 'GET')
+    const res = await this.request(`organizations/${orgId}/audiences`, 'GET')
     const audiences = res.data
     return audiences
   }
@@ -509,10 +516,47 @@ class ApiStore extends jsonapi(datxCollection) {
     collection.API_fetchCards()
   }
 
-  async moveCards(data) {
+  async moveCards(data, { undoSnapshot = {} } = {}) {
+    // trigger card_mover in backend
     const res = await this.request('collection_cards/move', 'PATCH', data)
+
+    // revert data if undoing card move
+    if (!_.isEmpty(undoSnapshot)) {
+      await this.request(`collections/${data.to_id}`, 'PATCH', {
+        data: undoSnapshot,
+      })
+      const toCollection = this.find('collections', data.to_id)
+      await toCollection.API_fetchCards()
+      return
+    }
+
+    // find origin collection
     const fromCollection = this.find('collections', data.from_id)
+    // make snapshot of fromCollection data with cards for potential undo
+    const originalData = fromCollection.toJsonApiWithCards()
+    // update UI for collection that cards were moved away from
     await fromCollection.API_fetchCards()
+
+    // reverse to and from values for potential undo operation
+    const reversedData = Object.assign({}, data, {
+      to_id: data.from_id,
+      from_id: data.to_id,
+    })
+
+    // add undo operation to stack so users can undo moving cards
+    this.undoStore.pushUndoAction({
+      message: 'Move undone',
+      apiCall: async () => {
+        await this.moveCards(reversedData, {
+          undoSnapshot: originalData,
+        })
+      },
+      redirectPath: {
+        type: 'collections',
+        id: fromCollection.id,
+      },
+    })
+
     return res
   }
 

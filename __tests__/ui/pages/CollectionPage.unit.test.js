@@ -47,6 +47,11 @@ describe('CollectionPage', () => {
     expect(grid.props().collection).toBe(collection)
   })
 
+  it('renders a <Helmet> with the pageTitle', () => {
+    const helmet = wrapper.find('HelmetWrapper')
+    expect(helmet.props().title).toBe(collection.pageTitle)
+  })
+
   describe('componentDidUpdate()', () => {
     describe('on a different collection', () => {
       beforeEach(() => {
@@ -145,6 +150,24 @@ describe('CollectionPage', () => {
 
     it('should call undoStore to perform the action', () => {
       expect(undoStore.performUndoAfterRoute).toHaveBeenCalled()
+    })
+  })
+
+  describe('with actionAfterRoute', () => {
+    beforeEach(() => {
+      wrapper = shallow(
+        <CollectionPage.wrappedComponent
+          {...props}
+          uiStore={{
+            ...uiStore,
+            actionAfterRoute: () => 'do something',
+          }}
+        />
+      )
+    })
+
+    it('should call uiStore to perform the action', () => {
+      expect(uiStore.performActionAfterRoute).toHaveBeenCalled()
     })
   })
 })

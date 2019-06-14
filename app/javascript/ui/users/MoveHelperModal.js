@@ -7,18 +7,15 @@ import DialogContent from '@material-ui/core/DialogContent'
 import FormControl from '@material-ui/core/FormControl'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 
+import ICONS from '~/ui/icons/dialogIcons'
+const { CloseIcon } = ICONS
 import { TextButton, Checkbox } from '~/ui/global/styled/forms'
+import { SpecialDisplayHeading } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 
-const SpecialDisplayHeading = styled.p`
-  text-align: center;
+const StyledSpecialDisplayHeading = styled(SpecialDisplayHeading)`
   margin: 0;
   margin-bottom: 30px;
-  line-height: 1.625rem;
-  font-family: ${v.fonts.sans};
-  font-size: 1.25rem;
-  font-weight: ${v.weights.book};
-  color: ${v.colors.black};
 `
 
 const StyledDialog = styled(Dialog)`
@@ -37,6 +34,16 @@ const StyledDialog = styled(Dialog)`
   }
 `
 StyledDialog.displayName = 'StyledDialog'
+
+const ModalCloseButton = styled.button`
+  cursor: pointer;
+  display: block;
+  right: 14px;
+  position: absolute;
+  top: 12px;
+  width: 12px;
+`
+ModalCloseButton.displayName = 'ModalCloseButton'
 
 const StyledDialogContent = styled(DialogContent)`
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
@@ -98,6 +105,9 @@ class MoveHelperModal extends React.Component {
           invisible: true,
         }}
       >
+        <ModalCloseButton onClick={this.handleSubmit}>
+          <CloseIcon />
+        </ModalCloseButton>
         <StyledDialogContent>
           <form onSubmit={this.handleSubmit}>
             <img
@@ -105,7 +115,9 @@ class MoveHelperModal extends React.Component {
               alt="Diagram showing moving items between multiple collections"
               style={{ width: '100%', maxWidth: '410px', marginBottom: '40px' }}
             />
-            <SpecialDisplayHeading>{this.helperText}</SpecialDisplayHeading>
+            <StyledSpecialDisplayHeading>
+              {this.helperText}
+            </StyledSpecialDisplayHeading>
             <FormControl component="fieldset" required>
               <FormControlLabel
                 classes={{ label: 'form-control' }}
@@ -123,7 +135,12 @@ class MoveHelperModal extends React.Component {
             </FormControl>
 
             <div className="button--center">
-              <TextButton disabled={this.isLoading}>Close</TextButton>
+              <TextButton
+                data-cy="MoveHelperModal-button"
+                disabled={this.isLoading}
+              >
+                Close
+              </TextButton>
             </div>
           </form>
         </StyledDialogContent>

@@ -93,6 +93,21 @@ RSpec.describe TestComparison do
         expect(add).to be false
       end
     end
+
+    context 'if dataset is already linked' do
+      let!(:data_items_dataset) do
+        test_data_item.data_items_datasets.create(
+          dataset: comparison_data_item.datasets.first,
+          selected: false,
+        )
+      end
+
+      it 'makes sure it is selected' do
+        expect(data_items_dataset.selected).to be false
+        expect(add).to be true
+        expect(data_items_dataset.reload.selected).to be true
+      end
+    end
   end
 
   describe '#remove' do
@@ -116,6 +131,26 @@ RSpec.describe TestComparison do
       test_data_item.datasets.reload
       expect(test_data_item.datasets).not_to include(comparison_data_item.datasets.first)
       expect(test_data_item.datasets.size).to eq(2)
+    end
+
+    context 'with an empty dataset' do
+      let!(:empty_dataset) { create(:empty_dataset, data_source: comparison_collection) }
+      let(:data_items) { test_collection.data_items }
+
+      before do
+        data_items.each do |di|
+          di.data_items_datasets.create(dataset: empty_dataset)
+        end
+      end
+
+      it 'removes empty datasets' do
+        expect {
+          remove
+        }.to change(DataItemsDataset, :count).by(-2)
+        data_items.each do |di|
+          expect(di.datasets).not_to include(empty_dataset)
+        end
+      end
     end
   end
 end

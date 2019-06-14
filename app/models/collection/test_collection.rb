@@ -70,13 +70,18 @@ class Collection
              class_name: 'Item::QuestionItem',
              through: :primary_collection_cards
     has_many :test_audiences, dependent: :destroy
+    has_many :paid_test_audiences,
+      -> { paid },
+      class_name: 'TestAudience'
     belongs_to :collection_to_test, class_name: 'Collection', optional: true
 
     has_many :datasets,
              through: :data_items
 
     before_create :setup_default_status_and_questions, unless: :cloned_from_present?
-    after_create :add_test_tag, :add_child_roles
+    after_create :add_test_tag
+    after_create :add_child_roles
+    after_create :setup_link_sharing_test_audience, unless: :collection_to_test
     after_update :touch_test_design, if: :saved_change_to_test_status?
 
     delegate :answerable_complete_question_items, to: :test_design, allow_nil: true
@@ -175,6 +180,15 @@ class Collection
       TestCollectionMailer.notify_launch(id).deliver_later if gives_incentive? && ENV['ENABLE_ZENDESK_FOR_TEST_LAUNCH']
     end
 
+    def test_audience_closed!
+      # Never close a test that still has link sharing enabled,
+      # or if there are any remaining paid audiences open
+      return if link_sharing_enabled? || any_paid_audiences_open?
+
+      # Otherwise close the test
+      close!
+    end
+
     def still_accepting_answers?
       return true if live?
       return false if test_closed_at.nil?
@@ -189,6 +203,8 @@ class Collection
       elsif submission_box_template_test?
         update_cached_submission_status(parent_submission_box_template)
         close_all_submissions_tests!
+      elsif gives_incentive?
+        NotifyFeedbackCompletedWorker.perform_async(id)
       end
     end
 
@@ -384,7 +400,7 @@ class Collection
       }
     end
 
-    def serialized_for_test_survey
+    def serialized_for_test_survey(test_audience_id = nil)
       renderer = JSONAPI::Serializable::Renderer.new
       renderer.render(
         self,
@@ -392,6 +408,9 @@ class Collection
         # This uses a special serializer that defers collection cards to test design
         class: test_survey_render_class_mappings,
         include: test_survey_render_includes,
+        expose: {
+          test_audience_id: test_audience_id,
+        },
       )
     end
 
@@ -508,6 +527,17 @@ class Collection
       end
     end
 
+    def setup_link_sharing_test_audience
+      # find the link sharing audience
+      audience = Audience.find_by(price_per_response: 0)
+      # e.g. in unit tests
+      return unless audience.present?
+      test_audiences.find_or_create_by(
+        audience_id: audience.id,
+        status: :closed,
+      )
+    end
+
     def add_test_tag
       # create the special #test tag
       tag(
@@ -574,7 +604,11 @@ class Collection
 
     def gives_incentive?
       # right now the check is basically any paid tests == gives_incentive
-      test_audiences.where('price_per_response > 0').present?
+      test_audiences.paid.present?
+    end
+
+    def gives_incentive_for?(test_audience_id)
+      test_audiences.paid.find_by(id: test_audience_id).present?
     end
 
     def purchased?
@@ -582,15 +616,23 @@ class Collection
     end
 
     def link_sharing?
-      test_audiences.where(price_per_response: 0).present?
+      test_audiences.link_sharing.where(status: :open).present?
     end
 
     def link_sharing_audience
-      test_audiences.where(price_per_response: 0).first
+      test_audiences.link_sharing.first
+    end
+
+    def any_paid_audiences_open?
+      test_audiences.paid.open.count.positive?
     end
 
     def link_sharing_enabled?
-      link_sharing_audience.present?
+      link_sharing_audience.present? && link_sharing_audience.open?
+    end
+
+    def paid_audiences_sample_size
+      test_audiences.paid.sum(:sample_size)
     end
   end
 end

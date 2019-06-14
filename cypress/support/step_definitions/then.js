@@ -20,6 +20,12 @@ Then('I should see a {string} in the first card', el => {
     .should('be.visible')
 })
 
+Then('I should see a {string} in the index {int} card', (el, pos) => {
+  cy.get(`[data-cy="GridCard"][data-order="${pos}"]`)
+    .locateDataOrClass(el)
+    .should('be.visible')
+})
+
 Then('I should see the element {string}', el => {
   cy.locate(el).should('be.visible')
 })
@@ -64,6 +70,10 @@ Then('I should see the {string} modal', modalTitle => {
     .should('exist')
 })
 
+Then('I should not see the {string} modal', modalTitle => {
+  cy.get(`[role="dialog"][aria-labelledby="${modalTitle}"]`).should('not.exist')
+})
+
 Then('I should see the {word} of {int} cards as {word}', (pos, count, size) => {
   // size e.g. "2x1" so we split on 'x'
   const sizes = size.split('x')
@@ -101,5 +111,21 @@ Then(
     cy.locateDataOrClass(selector)
       .children()
       .should('have.length', count)
+  }
+)
+
+Then('I should see the value {string} in the first text item', text => {
+  cy.get('.ql-editor')
+    .first()
+    .should('contain', text)
+})
+
+// https://docs.cypress.io/api/commands/eq.html#Yields
+Then(
+  'I should see {string} in the {int} index {string}',
+  (text, pos, selector) => {
+    cy.get(`[data-cy="${selector}"]`)
+      .eq(pos)
+      .should('contain', text)
   }
 )

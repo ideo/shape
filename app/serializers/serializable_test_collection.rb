@@ -20,6 +20,6 @@ class SerializableTestCollection < SerializableSimpleCollection
   end
 
   attribute :gives_incentive do
-    @object.try(:gives_incentive?)
+    @object.gives_incentive_for?(@test_audience_id)
   end
 end

@@ -23,6 +23,8 @@ import v from '~/utils/variables'
 import Collection from '~/stores/jsonApi/Collection'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
 import routeToLogin from '~/utils/routeToLogin'
+import CreateOrgPage from '~/ui/pages/CreateOrgPage'
+import { Helmet } from 'react-helmet'
 
 // more global way to do this?
 pluralize.addPluralRule(/canvas$/i, 'canvases')
@@ -439,6 +441,8 @@ class CollectionPage extends React.Component {
 
     // submissions_collection will only exist for submission boxes
     const { isSubmissionBox, requiresTestDesigner } = collection
+    const userRequiresOrg =
+      !apiStore.currentUserOrganization && collection.common_viewable
 
     let inner
     if (collection.isBoard) {
@@ -461,7 +465,7 @@ class CollectionPage extends React.Component {
           // pull in cols, gridW, gridH, gutter
           {...gridSettings}
           // don't add the extra row for submission box
-          addEmptyCard={!isSubmissionBox}
+          shouldAddEmptyRow={!isSubmissionBox}
           cardsFetched={this.cardsFetched}
         />
       )
@@ -469,7 +473,13 @@ class CollectionPage extends React.Component {
 
     return (
       <Fragment>
+        <Helmet title={collection.pageTitle} />
         <PageHeader record={collection} />
+        {userRequiresOrg && (
+          // for new user's trying to add a common resource, they'll see the Create Org modal
+          // pop up over the CollectionGrid
+          <CreateOrgPage commonViewableResource={collection} />
+        )}
         {!isLoading && (
           <PageContainer fullWidth={collection.isBoard}>
             <OverdueBanner />

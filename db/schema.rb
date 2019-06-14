@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190529222849) do
+ActiveRecord::Schema.define(version: 20190607170549) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -75,14 +75,23 @@ ActiveRecord::Schema.define(version: 20190529222849) do
     t.index ["user_id"], name: "index_applications_on_user_id"
   end
 
-  create_table "audiences", force: :cascade do |t|
-    t.string "name"
-    t.string "criteria"
+  create_table "audience_organizations", force: :cascade do |t|
+    t.bigint "audience_id"
     t.bigint "organization_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["audience_id"], name: "index_audience_organizations_on_audience_id"
+    t.index ["organization_id"], name: "index_audience_organizations_on_organization_id"
+  end
+
+  create_table "audiences", force: :cascade do |t|
+    t.string "name"
+    t.string "criteria"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.decimal "price_per_response", precision: 10, scale: 2, default: "0.0"
-    t.index ["organization_id"], name: "index_audiences_on_organization_id"
+    t.integer "global_default"
+    t.index ["global_default"], name: "index_audiences_on_global_default"
   end
 
   create_table "collection_cards", force: :cascade do |t|
@@ -276,9 +285,11 @@ ActiveRecord::Schema.define(version: 20190529222849) do
     t.datetime "archived_at"
     t.string "archive_batch"
     t.jsonb "autojoin_emails", default: []
+    t.string "type"
     t.index ["autojoin_emails"], name: "index_groups_on_autojoin_emails", using: :gin
     t.index ["handle"], name: "index_groups_on_handle"
     t.index ["organization_id"], name: "index_groups_on_organization_id"
+    t.index ["type"], name: "index_groups_on_type"
   end
 
   create_table "groups_roles", force: :cascade do |t|
@@ -382,8 +393,7 @@ ActiveRecord::Schema.define(version: 20190529222849) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "open_response_item_id"
-    t.index ["question_id"], name: "index_question_answers_on_question_id"
-    t.index ["survey_response_id"], name: "index_question_answers_on_survey_response_id"
+    t.index ["survey_response_id", "question_id"], name: "index_question_answers_on_survey_response_id_and_question_id", unique: true
   end
 
   create_table "roles", force: :cascade do |t|
@@ -457,6 +467,8 @@ ActiveRecord::Schema.define(version: 20190529222849) do
     t.decimal "price_per_response", precision: 10, scale: 2
     t.string "network_payment_id"
     t.integer "launched_by_id"
+    t.integer "status", default: 0
+    t.datetime "closed_at"
     t.index ["audience_id"], name: "index_test_audiences_on_audience_id"
     t.index ["test_collection_id"], name: "index_test_audiences_on_test_collection_id"
   end
@@ -495,6 +507,7 @@ ActiveRecord::Schema.define(version: 20190529222849) do
     t.integer "feedback_contact_preference", default: 0
     t.boolean "feedback_terms_accepted", default: false
     t.boolean "respondent_terms_accepted", default: false
+    t.boolean "shape_circle_member", default: false
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"

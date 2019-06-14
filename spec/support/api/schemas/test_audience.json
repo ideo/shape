@@ -2,9 +2,9 @@
   "type": "object",
   "properties": {
     "sample_size": { "type": ["number", "null"] },
-    "audience_id": { "type": "number" },
+    "audience_id": { "type": "string" },
     "price_per_response": { "type": ["number", "null"] },
-    "test_collection_id": { "type": "number" },
-    "num_survey_responses": { "type": "number" }
+    "num_survey_responses": { "type": "number" },
+    "status": { "type": "string" }
   }
 }

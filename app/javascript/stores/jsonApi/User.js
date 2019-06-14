@@ -47,19 +47,11 @@ class User extends BaseRecord {
       })
     } catch (e) {
       uiStore.defaultAlertError()
-      return e
+      return Promise.reject(e)
     }
   }
 
-  API_acceptTerms({ mailing_list = false }) {
-    return this.API_updateCurrentUser({
-      terms_accepted: true,
-      mailing_list,
-    })
-  }
-
   API_acceptFeedbackTerms() {
-    console.log('executing API_acceptFeedbackTerms')
     return this.API_updateCurrentUser({
       feedback_terms_accepted: true,
     })
@@ -73,10 +65,6 @@ class User extends BaseRecord {
     // set it ahead of time so the helper immediately disappears
     this[show_helper] = false
     return this.API_updateCurrentUser({ [show_helper]: false })
-  }
-
-  API_hideMoveHelper() {
-    return this.API_updateCurrentUser({ show_move_helper: false })
   }
 }
 

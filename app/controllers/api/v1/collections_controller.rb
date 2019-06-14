@@ -119,7 +119,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def log_viewing_activities
-    return unless user_signed_in?
+    return unless user_signed_in? && current_user.current_organization.present?
     log_organization_view_activity
     # TODO: we may want to log collection view for anonymous user
     log_collection_activity(:viewed)
@@ -250,6 +250,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def switch_to_organization
+    return if @collection.common_viewable?
     current_user.switch_to_organization(@collection.organization)
   end
 end

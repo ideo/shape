@@ -95,6 +95,7 @@ class Api::V1::SearchController < Api::V1::BaseController
       fields: %w[name^5 email^2 handle],
       match: :word_start,
       where: {
+        # TODO: enable way to surface global groups e.g. Common Resource
         organization_ids: [current_organization.id],
       },
       per_page: 6,

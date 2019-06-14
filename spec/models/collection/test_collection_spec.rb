@@ -60,6 +60,21 @@ describe Collection::TestCollection, type: :model do
         expect(test_collection.cached_owned_tag_list).to match_array(['feedback'])
       end
     end
+
+    describe '#setup_link_sharing_test_audience' do
+      let!(:link_sharing_audience) { create(:audience, price_per_response: 0) }
+      let(:test_audience) { test_collection.test_audiences.first }
+
+      it 'should add the test_audience with status of "closed"' do
+        expect(test_collection.test_audiences.count).to be 1
+        expect(test_audience.status).to eq 'closed'
+        expect(test_audience.link_sharing?).to be true
+      end
+
+      it 'returns gives_incentive_for test_audience = false' do
+        expect(test_collection.gives_incentive_for?(test_audience.id)).to be false
+      end
+    end
   end
 
   describe '#create_uniq_survey_response' do
@@ -312,7 +327,7 @@ describe Collection::TestCollection, type: :model do
 
           context 'with test audiences' do
             let(:audience) { create(:audience) }
-            let!(:test_audience) { create(:test_audience, audience: audience, test_collection: test_collection) }
+            let!(:test_audience) { create(:test_audience, audience: audience, test_collection: test_collection, price_per_response: 2) }
 
             it 'should create test audience datasets for each question' do
               expect do
@@ -323,6 +338,10 @@ describe Collection::TestCollection, type: :model do
               expect(Dataset::Question.last.groupings).to eq(
                 [{ 'id' => test_audience.id, 'type' => 'TestAudience' }],
               )
+            end
+
+            it 'returns gives_incentive_for test_audience = true' do
+              expect(test_collection.gives_incentive_for?(test_audience.id)).to be true
             end
           end
 
@@ -434,12 +453,38 @@ describe Collection::TestCollection, type: :model do
       describe '#close!' do
         before do
           test_collection.launch!(initiated_by: user)
+          allow(NotifyFeedbackCompletedWorker).to receive(:perform_async).and_call_original
         end
 
         it 'should set status as closed and set closed_at datetime' do
           expect(test_collection.close!).to be true
           expect(test_collection.closed?).to be true
           expect(test_collection.test_closed_at).to be_within(1.second).of Time.current
+        end
+
+        it 'does not call NotifyFeedbackCompletedWorker' do
+          expect(NotifyFeedbackCompletedWorker).not_to receive(:perform_async)
+          expect(test_collection.close!).to be true
+        end
+
+        context 'with link sharing audiences' do
+          let!(:test_audience) { create(:test_audience, :link_sharing, test_collection: test_collection) }
+
+          it 'does not call NotifyFeedbackCompletedWorker' do
+            expect(NotifyFeedbackCompletedWorker).not_to receive(:perform_async)
+            expect(test_collection.close!).to be true
+          end
+        end
+
+        context 'with paid audiences' do
+          let!(:test_audience) { create(:test_audience, test_collection: test_collection) }
+
+          it 'calls NotifyFeedbackCompletedWorker' do
+            expect(NotifyFeedbackCompletedWorker).to receive(:perform_async).with(
+              test_collection.id,
+            )
+            expect(test_collection.close!).to be true
+          end
         end
       end
 

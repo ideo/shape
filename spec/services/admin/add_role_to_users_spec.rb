@@ -25,6 +25,7 @@ RSpec.describe Admin::AddRoleToUsers, type: :service do
   end
 
   before do
+    network_mailing_list_doubles
     Sidekiq::Worker.clear_all
     allow(InvitationMailer).to receive(:invite).and_return(deliver_double)
     allow(deliver_double).to receive(:deliver_later).and_return(true)

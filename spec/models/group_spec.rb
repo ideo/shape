@@ -50,6 +50,18 @@ RSpec.describe Group, type: :model do
     end
   end
 
+  describe '.viewable_in_org' do
+    let!(:in_org_groups) { create_list(:group, 2, organization: organization) }
+    let!(:other_org_groups) { create_list(:group, 2) }
+    let!(:global_group) { create(:global_group, organization: nil) }
+
+    it 'should include global groups and org groups' do
+      # 3 org groups (admin, primary, guest), 2 more groups, 1 global group
+      expect(Group.viewable_in_org(organization.id).count).to eq 6
+      expect(Group.count).to eq 8
+    end
+  end
+
   describe '#archive!' do
     let(:members) { create_list(:users, 3) }
     let(:collection) { create(:collection, organization: organization) }

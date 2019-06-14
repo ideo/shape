@@ -34,7 +34,10 @@ class DialogWrapper extends React.Component {
           message={<StyledSnackbarText>{message}</StyledSnackbarText>}
           action={
             <div style={{ height: '19px', width: '16px' }}>
-              <button onClick={() => onClose()}>
+              <button
+                onClick={() => onClose()}
+                style={{ height: '19px', width: '16px' }}
+              >
                 <CloseIcon />
               </button>
             </div>

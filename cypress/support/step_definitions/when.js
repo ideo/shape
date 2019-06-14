@@ -25,6 +25,29 @@ When('I create a text item', num => {
   cy.createTextItem()
 })
 
+When('I click the first text item', () => {
+  cy.locate('TextItemCover')
+    .first()
+    .click({ force: true })
+    .wait('@apiGetItem')
+    // clicking text item + loading + initializing quill seems to be happier if we wait a bit
+    .wait(500)
+})
+
+When('I type {string} in the first quill editor', string => {
+  cy.get('.ql-editor')
+    .first()
+    .click({ force: true })
+    .wait(25)
+    .type(string)
+})
+
+When('I close the first open text item', () => {
+  cy.locate('TextItemClose')
+    .first()
+    .click({ force: true })
+})
+
 When('I create a data item', num => {
   cy.createDataItem()
 })
@@ -47,7 +70,7 @@ When('I undo with CTRL+Z', () => {
 When('I close the snackbar', () => {
   cy.locateDataOrClass('.MuiSnackbarContent-action')
     .find('button')
-    .click()
+    .click({ force: true })
   // allow it to disappear
   cy.wait(1200)
 })
@@ -129,6 +152,8 @@ When(
       .click({ force: true })
     cy.wait('@apiGetCollection')
     cy.wait('@apiGetCollectionCards')
+    cy.wait('@apiGetCommentThread')
+    cy.wait('@apiGetInMyCollection')
   }
 )
 
@@ -166,6 +191,13 @@ When('I click {string}', el => {
 
 When('I wait for {string} to finish', apiCall => {
   cy.wait(apiCall)
+})
+
+When('I wait for the collection to finish loading', () => {
+  cy.wait('@apiGetCollection')
+  cy.wait('@apiGetCollectionCards')
+  cy.wait('@apiGetCommentThread')
+  cy.wait('@apiGetInMyCollection')
 })
 
 When('I wait for {int} second(s)', num => {
@@ -256,7 +288,7 @@ When('I fill out the organization name with {string}', orgName => {
 When('I click ... in the nav and select {string}', option => {
   cy.locate('PopoutMenu')
     .first()
-    .click()
+    .click({ force: true })
 
   cy.locate(`PopoutMenu_${option}`).click()
 })
@@ -269,6 +301,30 @@ When('I edit the report item', () => {
   cy.locate('CardAction-Edit')
     .first()
     .click()
+  cy.wait(100)
+})
+
+When('I select the index {int} {word} card', (pos, type) => {
+  cy.get(
+    `[data-cy="GridCard"][data-order="${pos}"] [data-cy="CardAction-select"]`
+  )
+    .first()
+    .click()
+  cy.wait(100)
+})
+
+When('I click the action menu for the index {int} card', pos => {
+  cy.get(`[data-cy="GridCard"][data-order="${pos}"] [data-cy="PopoutMenu"]`)
+    .first()
+    .click({ force: true })
+  cy.wait(100)
+})
+
+When('I click the {word} action for the index {int} card', (action, pos) => {
+  const value = `PopoutMenu_${_.camelCase(action)}`
+  cy.get(`[data-cy="GridCard"][data-order="${pos}"] [data-cy="${value}"]`)
+    .first()
+    .click({ force: true })
   cy.wait(100)
 })
 
@@ -285,3 +341,30 @@ When(
     cy.wait(50)
   }
 )
+
+// ----------------------
+// Modals
+// ----------------------
+When('I close the move helper modal', () => {
+  cy.locate('MoveHelperModal-button')
+    .first()
+    .click({ force: true })
+  cy.wait(100)
+})
+
+When('I click the {word} arrow on the MDL snackbar', direction => {
+  cy.locate(`MoveModalArrow-${direction}`)
+    .first()
+    .click({ force: true })
+  cy.wait(100)
+})
+
+// ----------------------
+// Admin (Test Collection Feedback)
+// ----------------------
+When('I click the info button for the first audience', index => {
+  cy.locate('AudienceInfoButton')
+    .first()
+    .click()
+  cy.wait(100)
+})

@@ -2,8 +2,9 @@ require 'rails_helper'
 
 RSpec.describe QuestionAnswer, type: :model do
   let(:user) { create(:user) }
-  let(:test_collection) { create(:test_collection) }
-  let!(:survey_response) { create(:survey_response, test_collection: test_collection) }
+  let!(:test_collection) { create(:test_collection, :open_response_questions, :completed) }
+  before { test_collection.launch!(initiated_by: user) }
+  let(:survey_response) { create(:survey_response, test_collection: test_collection) }
   let(:question) { survey_response.question_items.first }
 
   context 'associations' do
@@ -65,8 +66,6 @@ RSpec.describe QuestionAnswer, type: :model do
           content: 'some question?',
         )
       end
-      test_collection
-        .launch!(initiated_by: user)
     end
 
     describe '#update_survey_response' do
@@ -82,12 +81,29 @@ RSpec.describe QuestionAnswer, type: :model do
       end
     end
 
-    context 'incomplete response' do
-      describe '#update_open_response_item' do
-        it 'does not create open response item' do
-          expect {
-            question_answer.save
-          }.not_to change(Item::TextItem, :count)
+    context 'complete after test closed' do
+      before do
+        test_collection.close!
+      end
+      let!(:question_answers) do
+        # Note - if you create survey response above at the top of the test,
+        # it will already be marked as completed because it thinks it has no questions
+        survey_response.question_items.map do |question|
+          create(:question_answer,
+                 survey_response: survey_response,
+                 question: question)
+        end
+      end
+
+      describe 'within allowable window' do
+        it 'marks the survey_response as completed_late' do
+          expect(survey_response.reload.status).to eq 'completed_late'
+        end
+      end
+
+      describe 'after allowable window' do
+        pending 'marks the survey_response as completed_late' do
+          expect(survey_response.reload.status).to eq 'in_progress'
         end
       end
     end

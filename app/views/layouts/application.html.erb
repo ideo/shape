@@ -4,6 +4,19 @@
     <title>
       Shape <%= "| #{ENV['SHAPE_APP']}" unless ENV['SHAPE_APP'] == 'production' %>
     </title>
+    <meta property="og:url" content="<%=ENV['BASE_HOST'] || 'https://www.shape.space/'%>"/>
+    <meta property="og:site_name" content="Shape" />
+    <meta property="og:description" content="Shape is IDEO’s latest digital innovation tool for building, testing, and refining your ideas." />
+    <meta property="og:title" content="Shape - IDEO’s Visual Collaborative Tool - Build, Test, and Refine Your Ideas" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/shape-marketing.appspot.com/o/marketing%2FOpen%20Graph%20Images%2FShape_Logo_White_1.91-1.png?alt=media&token=83b08af8-06b6-4ed7-beef-368da4a241a1" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1558" />
+    <meta property="og:image:height" content="816" />
+    <meta property="og:image:alt" content="Shape Logo" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@IDEO_Shape" />
+    <meta name="twitter:creator" content="@IDEO_Shape" />
     <%= render 'layouts/metatags_and_favicons' %>
     <script>
       window.CONFIG = {
@@ -29,7 +42,8 @@
         LOGGED_IN: <%= user_signed_in? %>,
       }
       // this is just for frontend display, still important to make sure this is aligned with application.rb
-      window.FEEDBACK_INCENTIVE_AMOUNT = <%= ::FEEDBACK_INCENTIVE_AMOUNT %>;
+      window.FEEDBACK_INCENTIVE_AMOUNT = <%= Shape::FEEDBACK_INCENTIVE_AMOUNT %>;
+      window.TARGETED_AUDIENCE_PRICE_PER_RESPONSE = <%= Shape::TARGETED_AUDIENCE_PRICE_PER_RESPONSE %>;
     </script>
     <%= render 'layouts/trackers_and_widgets_head' %>
 

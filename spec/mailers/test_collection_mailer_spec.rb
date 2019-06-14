@@ -36,4 +36,35 @@ RSpec.describe TestCollectionMailer, type: :mailer do
       expect(body).to include("#{audience.name}: #{test_audience.sample_size}")
     end
   end
+
+  describe '#notify_closed' do
+    let(:editor) { create(:user) }
+    let(:mail) do
+      TestCollectionMailer.notify_closed(
+        collection_id: collection.id,
+        user_id: editor.id,
+      )
+    end
+    let(:body) { mail.body.encoded }
+
+    before do
+      test_audience.status = :closed
+      test_audience.closed_at = Time.current
+      test_audience.save
+    end
+
+    it 'should send to the user' do
+      expect(mail.to).to eql([editor.email])
+    end
+
+    it 'should have correct subject' do
+      expect(mail.subject).to eq(
+        "Your #{collection.name} feedback has been completed."
+      )
+    end
+
+    it 'should include link to collection' do
+      expect(body).to include("/collections/#{collection.id}")
+    end
+  end
 end

@@ -17,7 +17,7 @@ import {
   StyledDataItemQuestionCover,
 } from './StyledDataItemCover'
 
-const StyledInfoIcon = styled.div`
+const StyledIconHolder = styled.div`
   display: inline-block;
   vertical-align: middle;
   color: ${props => props.color};
@@ -109,13 +109,13 @@ class DataItemCoverDisplayOnly extends React.Component {
                 title={tooltip}
                 placement="bottom"
               >
-                <StyledInfoIcon color={this.fillColor}>
+                <StyledIconHolder color={this.fillColor}>
                   <InfoIcon
                     style={{ fill: v.colors.grayBoulder }}
                     height={11}
                     width={11}
                   />
-                </StyledInfoIcon>
+                </StyledIconHolder>
               </Tooltip>
             )}
           </StyledTitleAndDescription>

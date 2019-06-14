@@ -1,22 +1,36 @@
+import PropTypes from 'prop-types'
+import { Box, Flex } from 'reflexbox'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 
-const StyledColumnFlexParent = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-`
+const StyledColumnFlexParent = ({ children }) => (
+  <Flex column justify="flex-start">
+    {children}
+  </Flex>
+)
+StyledColumnFlexParent.propTypes = {
+  children: PropTypes.node,
+}
+StyledColumnFlexParent.defaultProps = {
+  children: null,
+}
 
-const StyledRowFlexParent = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: space-between;
-`
+const StyledRowFlexParent = ({ children, column }) => (
+  <Flex wrap justify="space-between" column={column}>
+    {children}
+  </Flex>
+)
+StyledRowFlexParent.propTypes = {
+  children: PropTypes.node,
+  column: PropTypes.bool,
+}
+StyledRowFlexParent.defaultProps = {
+  children: null,
+  column: false,
+}
 
 // flex-grow, flex-shrink and flex-basis combined
-const StyledRowFlexItem = styled.div`
+const StyledRowFlexItem = styled(Box)`
   width: 250px;
   @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
     /* width: 100px; */

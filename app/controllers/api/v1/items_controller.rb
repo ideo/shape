@@ -112,6 +112,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
   end
 
   def switch_to_organization
+    return if @item.common_viewable?
     current_user.switch_to_organization(@item.organization)
   end
 end

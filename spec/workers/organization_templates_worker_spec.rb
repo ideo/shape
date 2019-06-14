@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe OrganizationTemplatesWorker, type: :service do
+RSpec.describe OrganizationTemplatesWorker, type: :worker do
   let(:user) { create(:user) }
   let(:organization) { create(:organization) }
   let(:user_collection) { create(:user_collection, organization: organization, add_editors: [user]) }

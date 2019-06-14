@@ -25,6 +25,7 @@
 #  provider                    :string
 #  remember_created_at         :datetime
 #  respondent_terms_accepted   :boolean          default(FALSE)
+#  shape_circle_member         :boolean          default(FALSE)
 #  show_helper                 :boolean          default(TRUE)
 #  show_move_helper            :boolean          default(TRUE)
 #  show_template_helper        :boolean          default(TRUE)
@@ -113,7 +114,10 @@ class User < ApplicationRecord
   validates :uid, uniqueness: { scope: :provider }, if: :active?
 
   after_save :update_profile_names, if: :saved_change_to_name?
-  after_save :update_mailing_list_subscription, if: :saved_change_to_mailing_list?
+  after_save :update_shape_circle_subscription, if: :saved_change_to_shape_circle_member?
+  after_save :update_products_mailing_list_subscription, if: :saved_change_to_mailing_list?
+  after_create :update_shape_user_list_subscription, if: :active?
+  after_update :update_shape_user_list_subscription_after_update, if: :saved_change_to_status?
 
   def saved_change_to_name?
     saved_change_to_first_name? || saved_change_to_last_name?
@@ -472,12 +476,34 @@ class User < ApplicationRecord
     end
   end
 
-  # gets called via background worker
-  def update_mailing_list_subscription
-    MailchimpSubscriptionWorker.perform_async(id, mailing_list)
+  def update_products_mailing_list_subscription(subscribed: mailing_list)
+    MailingListSubscriptionWorker.perform_async(id, :products_mailing_list, subscribed)
   end
 
-  def after_role_update(role)
+  def update_shape_circle_subscription(subscribed: shape_circle_member)
+    MailingListSubscriptionWorker.perform_async(id, :shape_circle, subscribed)
+  end
+
+  def update_shape_user_list_subscription(subscribed: true)
+    MailingListSubscriptionWorker.perform_async(id, :shape_users, subscribed)
+  end
+
+  def update_shape_user_list_subscription_after_update
+    prev_value = attribute_before_last_save(:status)
+    # If now active and was previously not active (e.g. pending or limited)
+    if active? && prev_value != 'active'
+      update_shape_user_list_subscription(subscribed: true)
+    # Or if they were active, and are now not (likely archived)
+    elsif prev_value == 'active' && !active?
+      update_shape_user_list_subscription(subscribed: false)
+      if archived?
+        update_shape_circle_subscription(subscribed: false)
+        update_products_mailing_list_subscription(subscribed: false)
+      end
+    end
+  end
+
+  def after_role_update(role, _method)
     reset_cached_roles!
     resource = role.resource
     if resource.is_a?(Group) && role.resource.primary?

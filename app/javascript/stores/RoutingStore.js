@@ -64,9 +64,6 @@ class RoutingStore extends RouterStore {
     }
     if (type === 'search') {
       this.updatePreviousPageBeforeSearch(this.location)
-      // don't route to search without a search query (passed in as `id`)
-      // e.g. when you clear out the search query
-      if (!id) return
     }
     const path = this.pathTo(type, id)
     this.push(path)

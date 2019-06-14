@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled, { css } from 'styled-components'
 
-import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
+import ArrowIcon from '~/ui/icons/ArrowIcon'
 import DescriptionQuestion from './DescriptionQuestion'
 import {
   QuestionText,
@@ -67,7 +67,7 @@ class OpenQuestion extends React.Component {
           <DescriptionQuestion
             item={item}
             maxLength={100}
-            placeholder="Write question here…"
+            placeholder="this question is optional"
             canEdit={canEdit}
           />
         </QuestionSpacingContainer>
@@ -93,7 +93,7 @@ class OpenQuestion extends React.Component {
               onBlur={() => this.setState({ focused: false })}
               value={this.state.response}
               type="questionText"
-              placeholder="write response here"
+              placeholder="this question is optional"
               disabled={editing}
               data-cy="OpenQuestionTextInput"
             />
@@ -101,7 +101,7 @@ class OpenQuestion extends React.Component {
               focused={this.state.focused}
               data-cy="OpenQuestionTextButton"
             >
-              <ReturnArrowIcon />
+              <ArrowIcon />
             </TextEnterButton>
           </TextResponseHolder>
         </form>

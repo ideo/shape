@@ -5,10 +5,13 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 import styled from 'styled-components'
 
+import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import CollectionSort from '~/ui/grid/CollectionSort'
+import CornerPositioned from '~/ui/global/CornerPositioned'
+import PlusIcon from '~/ui/icons/PlusIcon'
+import IconAvatar from '~/ui/global/IconAvatar'
 import Loader from '~/ui/layout/Loader'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
-import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import { objectsEqual } from '~/utils/objectUtils'
 import v from '~/utils/variables'
 
@@ -106,7 +109,7 @@ class CollectionGrid extends React.Component {
 
   initialize(props) {
     const cards = this.positionMovingCardsAndBCT(props)
-    this.positionCards(cards, { props })
+    this.positionCards(cards)
   }
 
   positionMovingCardsAndBCT(props) {
@@ -131,7 +134,14 @@ class CollectionGrid extends React.Component {
     if (bctOpen) {
       // make the BCT appear to the right of the current card
       let { order } = blankContentToolState
-      const { height, replacingId, blankType, width } = blankContentToolState
+      const {
+        height,
+        replacingId,
+        blankType,
+        width,
+        row,
+        col,
+      } = blankContentToolState
       if (replacingId) {
         // remove the card being replaced from our current state cards
         _.remove(cards, { id: replacingId })
@@ -140,14 +150,19 @@ class CollectionGrid extends React.Component {
         // so we have to bump it back by 0.5 so it isn't == with the next card
         order -= 0.5
       }
+      const blankAttrs = {
+        width,
+        height,
+        order,
+        row,
+        col,
+      }
       let blankCard = {
+        ...blankAttrs,
         id: 'blank',
         num: 0,
         cardType: 'blank',
         blankType,
-        width,
-        height,
-        order,
       }
       // If we already have a BCT open, find it in our cards
       const blankFound = _.find(this.state.cards, { cardType: 'blank' })
@@ -158,7 +173,7 @@ class CollectionGrid extends React.Component {
         blankFound.num += 1
         blankFound.id = `blank-${blankFound.num}`
         // Increments order from existing BCT order
-        blankCard = { ...blankFound, order, width, height }
+        blankCard = { ...blankFound, ...blankAttrs }
       }
       if (canEditCollection || blankCard.blankType) {
         // Add the BCT to the array of cards to be positioned, if they can edit
@@ -330,7 +345,10 @@ class CollectionGrid extends React.Component {
       toCollection: hoveringRecord,
       cardIds,
       onCancel: () => this.positionCardsFromProps(),
-      onSuccess: () => this.setState({ hoveringOver: false }),
+      onSuccess: () =>
+        this.setState({
+          hoveringOver: false,
+        }),
     })
   }
 
@@ -521,22 +539,110 @@ class CollectionGrid extends React.Component {
   // </end Drag related functions>
   // --------------------------
 
-  // empty card acts as a spacer to always show the last row even if empty,
-  // and to show a GridCardHotspot to the left when it's the first item in the empty row
-  addEmptyCard = cards => {
-    if (!this.props.canEditCollection) return
-    if (_.find(cards, { id: 'empty' })) return
-    let order = cards.length
-    const max = _.maxBy(cards, 'order')
-    if (max) order = max.order + 1
+  createEmptyCard = (order, id) => {
     const emptyCard = {
-      id: 'empty',
+      id,
       cardType: 'empty',
       width: 1,
       height: 1,
       order,
+      skipPositioning: true,
+      visible: false,
     }
-    cards.push(emptyCard)
+    return emptyCard
+  }
+
+  addEmptyCards = (cards, matrix) => {
+    const { apiStore, uiStore, canEditCollection } = this.props
+    const { currentUser } = apiStore
+    let previousCell = null
+    const encountered = []
+    matrix.forEach((row, rowIdx) => {
+      row.forEach((cell, colIdx) => {
+        if (cell !== null && !_.includes(encountered, cell)) {
+          previousCell = cell
+          encountered.push(cell)
+        } else if (cell === null) {
+          const previousCard = cards.find(c => c.id === previousCell)
+          if (!previousCard) return
+          const order = previousCard.order + 1
+          const id = `empty-${order}-${colIdx}-${rowIdx}`
+          const emptyCard = this.createEmptyCard(order, id)
+          emptyCard.position = this.calculateGridPosition({
+            card: emptyCard,
+            cardWidth: 1,
+            cardHeight: 1,
+            position: {
+              x: colIdx,
+              y: rowIdx,
+            },
+          })
+          cards.push(emptyCard)
+        }
+      })
+    })
+    // ---- new user case ---
+    // when `show_helper` is enabled
+    if (
+      !uiStore.blankContentToolIsOpen &&
+      currentUser &&
+      currentUser.show_helper &&
+      canEditCollection
+    ) {
+      // should find the first one with the highest order...
+      const maxOrderEmptyCard = _.maxBy(
+        _.filter(cards, { cardType: 'empty' }),
+        'order'
+      )
+      if (maxOrderEmptyCard) maxOrderEmptyCard.visible = true
+    }
+  }
+
+  openMobileBct = ev => {
+    ev.preventDefault()
+    const { uiStore } = this.props
+    let order = 0
+    const { pageYOffset } = window
+    const scrollPoint = Math.max(
+      0,
+      pageYOffset + window.innerHeight - window.innerHeight / 2
+    )
+    const { cards } = this.state
+    const closestCard = cards.find(
+      card =>
+        card.position.yPos < scrollPoint &&
+        card.position.yPos + card.position.height > scrollPoint
+    )
+    if (!closestCard) {
+      return uiStore.openBlankContentTool({ order })
+    }
+    order = closestCard.order
+    const newPosition = {
+      x: 0,
+      y: closestCard.position.y - 1,
+    }
+    const newGridPosition = this.calculateGridPosition({
+      cardWidth: 1,
+      cardHeight: 1,
+      position: newPosition,
+    })
+    uiStore.openBlankContentTool({ order })
+    if (!this.isVerticallyVisible(newPosition)) {
+      uiStore.scrollToPosition(newGridPosition.yPos)
+    }
+  }
+
+  isVerticallyVisible(position) {
+    const winTop = window.pageYOffset
+    const winBottom = pageYOffset + window.innerHeight
+    const eleBottom = position.yPos + position.height
+    const eleTop = position.yPos
+    return (
+      eleTop >= winTop &&
+      eleTop <= winBottom &&
+      eleBottom <= winBottom &&
+      eleBottom >= winTop
+    )
   }
 
   addPaginationCard = cards => {
@@ -554,23 +660,38 @@ class CollectionGrid extends React.Component {
     cards.push(paginationCard)
   }
 
+  calculateGridPosition({ card, cardWidth, cardHeight, position }) {
+    const { gridW, gridH, gutter } = this.props
+    _.assign(position, {
+      xPos: position.x * (gridW + gutter),
+      yPos: position.y * (gridH + gutter),
+      width: cardWidth * (gridW + gutter) - gutter,
+      height: cardHeight * (gridH + gutter) - gutter,
+    })
+    return position
+  }
+
   // Sorts cards and sets state.cards after doing so
   @action
   positionCards = (collectionCards = [], opts = {}) => {
     // even though hidden cards are not loaded by default in the API, we still filter here because
     // it's possible that some hidden cards were loaded in memory via the CoverImageSelector
     const cards = [...collectionCards].filter(c => !c.hidden)
-
-    // props might get passed in e.g. nextProps for componentWillReceiveProps
-    if (!opts.props) opts.props = this.props
-    const { collection, gridW, gridH, gutter, cols, addEmptyCard } = opts.props
+    const {
+      collection,
+      gridW,
+      gridH,
+      gutter,
+      cols,
+      shouldAddEmptyRow,
+      canEditCollection,
+    } = this.props
     const { currentOrder } = collection
     let row = 0
     const matrix = []
     // create an empty row
     matrix.push(_.fill(Array(cols), null))
     if (collection.hasMore) this.addPaginationCard(cards)
-    if (addEmptyCard) this.addEmptyCard(cards)
     let sortedCards = cards
     if (currentOrder === 'order') {
       // For most collections, we will be sorting by `order`. In that case we call
@@ -612,8 +733,14 @@ class CollectionGrid extends React.Component {
         const maxGap = _.find(gaps, g => g.length >= cardWidth) || {
           length: 0,
         }
+        const hotspotPositionedBCT =
+          card.cardType === 'blank' && (card.col || card.row)
+
         if (maxGap && maxGap.length) {
           ;[nextX] = maxGap
+          itFits = true
+        } else if (hotspotPositionedBCT) {
+          // in this case BCT was absolutely positioned by clicking a Hotspot, we know it fits
           itFits = true
         } else {
           // 2-COLUMN SPECIAL CASE FOR TEXT CARD:
@@ -698,14 +825,17 @@ class CollectionGrid extends React.Component {
             x: nextX,
             y: row,
           }
-          _.assign(position, {
-            xPos: position.x * (gridW + gutter),
-            yPos: position.y * (gridH + gutter),
-            width: cardWidth * (gridW + gutter) - gutter,
-            height: cardHeight * (gridH + gutter) - gutter,
-          })
-
+          if (hotspotPositionedBCT) {
+            position.x = card.col
+            position.y = card.row
+          }
           // add position attrs to card
+          position = this.calculateGridPosition({
+            card,
+            cardWidth,
+            cardHeight,
+            position,
+          })
           card.position = position
           // when we're moving/hovering, placeholders should not take up any space
           const hoverPlaceholder =
@@ -735,9 +865,14 @@ class CollectionGrid extends React.Component {
     })
 
     let rows = matrix.length
-    if (!addEmptyCard && _.isEmpty(_.compact(_.last(matrix)))) {
+
+    if (!shouldAddEmptyRow && _.isEmpty(_.compact(_.last(matrix)))) {
       // don't add space for an empty row if we don't want it to appear
+      // because `rows` gets calculated for minHeight of grid
       rows -= 1
+    } else if (canEditCollection && shouldAddEmptyRow && !opts.dragging) {
+      matrix.push(_.fill(Array(cols), null))
+      this.addEmptyCards(cards, matrix)
     }
 
     // update cards in state
@@ -750,6 +885,23 @@ class CollectionGrid extends React.Component {
       () => {
         if (_.isFunction(opts.onMoveComplete)) opts.onMoveComplete()
       }
+    )
+  }
+
+  renderMobileHotspot() {
+    const { canEditCollection } = this.props
+    if (!canEditCollection) return ''
+    return (
+      <CornerPositioned>
+        <IconAvatar title="Create new item">
+          <button
+            onClick={this.openMobileBct}
+            style={{ width: '70%', height: '70%' }}
+          >
+            <PlusIcon />
+          </button>
+        </IconAvatar>
+      </CornerPositioned>
     )
   }
 
@@ -840,6 +992,7 @@ class CollectionGrid extends React.Component {
           </SortContainer>
         )}
         {this.renderPositionedCards()}
+        {uiStore.isMobile && this.renderMobileHotspot()}
       </StyledGrid>
     )
   }
@@ -863,7 +1016,7 @@ CollectionGrid.propTypes = {
   canEditCollection: PropTypes.bool.isRequired,
   movingCardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
   loadCollectionCards: PropTypes.func.isRequired,
-  addEmptyCard: PropTypes.bool,
+  shouldAddEmptyRow: PropTypes.bool,
   submissionSettings: PropTypes.shape({
     type: PropTypes.string,
     template: MobxPropTypes.objectOrObservableObject,
@@ -877,7 +1030,7 @@ CollectionGrid.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 CollectionGrid.defaultProps = {
-  addEmptyCard: true,
+  shouldAddEmptyRow: true,
   submissionSettings: null,
   blankContentToolState: null,
   sorting: false,

@@ -36,4 +36,28 @@ describe('ImageItemCover', () => {
       expect(cover).toHaveStyleRule('background-size', 'contain')
     })
   })
+
+  describe('when isTestCollectionCard is true and can_view', () => {
+    beforeEach(() => {
+      props.item.can_view = true
+      props.isTestCollectionCard = true
+      wrapper.setProps({ props })
+    })
+
+    it('does not render the fullscreen viewer', () => {
+      expect(wrapper.find('Viewer').exists()).toBe(false)
+    })
+  })
+
+  describe('when isTestCollectionCard is true and !can_view', () => {
+    beforeEach(() => {
+      props.item.can_view = false
+      props.isTestCollectionCard = true
+      wrapper.setProps({ props })
+    })
+
+    it('does render the fullscreen viewer', () => {
+      expect(wrapper.find('Viewer').exists()).toBe(true)
+    })
+  })
 })

@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
-import { observer } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import {
   LineSegment,
@@ -299,7 +298,7 @@ class ChartGroup extends React.Component {
         <VictoryChart
           theme={victoryTheme}
           domainPadding={{ y: 70 }}
-          padding={{ top: 0, left: 60, right: 60, bottom: 15 }}
+          padding={{ top: 0, left: 60, right: 60, bottom: 30 }}
         >
           <VictoryGroup offset={30 / (this.totalBarsPerGroup / 3)}>
             {this.renderedDatasets.map(dataset => dataset)}

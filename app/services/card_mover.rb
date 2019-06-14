@@ -172,6 +172,7 @@ class CardMover
     return if @to_collection == @from_collection
     return unless move?
     @moving_cards.each do |card|
+      next if card.link?
       Roles::MergeToChild.call(parent: @to_collection, child: card.record)
     end
   end

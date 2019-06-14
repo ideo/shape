@@ -40,6 +40,7 @@ const fakeUiStore = {
     x: 0,
     y: 0,
   },
+  openBlankContentTool: jest.fn(),
   closeBlankContentTool: jest.fn(),
   closeCardMenu: jest.fn(),
   openCardMenu: jest.fn(),
@@ -98,6 +99,8 @@ const fakeUiStore = {
   popupSnackbar: jest.fn(),
   showPermissionsAlert: jest.fn(),
   gridHeightFor: jest.fn().mockReturnValue(250),
+  performActionAfterRoute: jest.fn(),
+  linkedBreadcrumbTrailForRecord: jest.fn().mockImplementation(x => x.breadcrumb),
   addEmptySpaceClickHandler: jest.fn(),
   removeEmptySpaceClickHandler: jest.fn(),
 }

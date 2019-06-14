@@ -1,11 +1,8 @@
 /* eslint global-require: 0 */
 import ReactDOM from 'react-dom'
-import createBrowserHistory from 'history/createBrowserHistory'
 import { Router } from 'react-router-dom'
 
-import MarketingRoutes from '~/ui/MarketingRoutes'
-
-const browserHistory = createBrowserHistory()
+import MarketingRoutes, { browserHistory } from '~/ui/MarketingRoutes'
 
 if (module.hot) {
   module.hot.accept('../ui/MarketingRoutes', () => {

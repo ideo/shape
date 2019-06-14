@@ -8,6 +8,7 @@
     "last_name": { "type": "string" },
     "pic_url_square": { "type": "string" },
     "status": { "type": "string" },
+    "shape_circle_member": { "type": "boolean" },
     "user_profile_collection_id": { "type": ["string", "null"] }
   },
   "required": ["email", "first_name", "last_name", "status"]

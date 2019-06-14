@@ -9,7 +9,6 @@ import AudienceSettingsWidget from '~/ui/test_collections/AudienceSettings/Audie
 // import TestAudience from '~/stores/jsonApi/TestAudience'
 import FeedbackTermsModal from '~/ui/test_collections/FeedbackTermsModal'
 import ConfirmPriceModal from '~/ui/test_collections/ConfirmPriceModal'
-import TestAudience from '~/stores/jsonApi/TestAudience'
 import v from '~/utils/variables'
 
 const FormButtonWrapper = styled.div`
@@ -42,33 +41,38 @@ class AudienceSettings extends React.Component {
     await apiStore.fetchOrganizationAudiences(
       apiStore.currentUserOrganizationId
     )
-    this.updateAudienceSettings()
+    this.initAudienceSettings()
   }
 
-  updateAudienceSettings() {
+  @action
+  initAudienceSettings() {
     const { testCollection } = this.props
-    const audienceSettings = {}
-    const { audiences } = this
+    const { audiences, audienceSettings } = this
     _.each(audiences, audience => {
       const testAudience = testCollection.test_audiences.find(
-        testAudience => testAudience.audience_id.toString() === audience.id
+        testAudience => testAudience.audience_id === audience.id
       )
-      audienceSettings[audience.id] = {
-        selected: !!testAudience,
+      const linkSharing = audience.price_per_response === 0
+      let selected = !!testAudience
+      if (testAudience && linkSharing) {
+        selected = testAudience.status === 'open'
+      }
+      const displayCheckbox =
+        selected || linkSharing || (!this.locked && audience.order <= 6)
+      audienceSettings.set(audience.id, {
+        selected,
         sample_size: testAudience ? testAudience.sample_size : '0',
         audience: audience,
         test_audience: testAudience,
-      }
-    })
-    runInAction(() => {
-      this.audienceSettings = audienceSettings
+        displayCheckbox,
+      })
     })
   }
 
   @computed
   get locked() {
     const { testCollection } = this.props
-    return testCollection.is_test_locked
+    return testCollection.isLiveTest || testCollection.isClosedTest
   }
 
   @computed
@@ -84,7 +88,7 @@ class AudienceSettings extends React.Component {
     return _.round(
       audiences
         .map(audience => {
-          const setting = audienceSettings[audience.id]
+          const setting = audienceSettings.get(audience.id)
           if (!setting || !setting.selected) return 0
           const sampleSize = setting.sample_size
             ? parseInt(setting.sample_size)
@@ -100,50 +104,37 @@ class AudienceSettings extends React.Component {
     return `$${this.totalPrice.toFixed(2)}`
   }
 
+  @action
+  updateAudienceSetting(audienceId, key, value) {
+    const { audienceSettings } = this
+    const setting = audienceSettings.get(audienceId)
+    setting[key] = value
+    audienceSettings.set(audienceId, setting)
+  }
+
   onToggleCheckbox = async e => {
     const id = e.target.value
     const { audienceSettings } = this
-    runInAction(() => {
-      audienceSettings[id].selected = !audienceSettings[id].selected
-    })
-    const { audience, test_audience } = audienceSettings[id]
-    if (this.locked && audience.price_per_response === 0) {
+    const setting = audienceSettings.get(id)
+    this.updateAudienceSetting(id, 'selected', !setting.selected)
+    const { audience, test_audience } = setting
+    if (audience.price_per_response === 0) {
       this.toggleLinkSharing(audience, test_audience)
     }
   }
 
   async toggleLinkSharing(audience, testAudience) {
-    const { apiStore, testCollection } = this.props
-    const testDesign = testCollection
-    if (testAudience) {
-      runInAction(() => {
-        _.remove(testDesign.test_audiences, tA => tA.id === testAudience.id)
-      })
-      await testAudience.destroy()
-      this.updateAudienceSettings()
-    } else {
-      const testAudience = new TestAudience(
-        {
-          test_collection_id: testDesign.test_collection_id,
-          audience_id: audience.id,
-          price_per_response: 0,
-        },
-        apiStore
-      )
-      await testAudience.save()
-      await testDesign.refetch()
-      runInAction(() => {
-        testDesign.test_audiences.push(testAudience)
-      })
-      this.updateAudienceSettings()
-    }
+    let open = testAudience.status === 'open'
+    runInAction(() => {
+      testAudience.status = open ? 'closed' : 'open'
+      open = !open
+      this.updateAudienceSetting(audience.id, 'selected', open)
+    })
+    await testAudience.patch()
   }
 
   onInputChange = (audienceId, value) => {
-    const { audienceSettings } = this
-    runInAction(() => {
-      audienceSettings[audienceId].sample_size = value
-    })
+    this.updateAudienceSetting(audienceId, 'sample_size', value)
   }
 
   @action
@@ -207,6 +198,19 @@ class AudienceSettings extends React.Component {
     )
   }
 
+  afterAddAudience = audience => {
+    const { audienceSettings } = this
+    runInAction(() => {
+      audienceSettings.set(audience.id, {
+        selected: false,
+        sample_size: '0',
+        audience: audience,
+        test_audience: null,
+        displayCheckbox: true,
+      })
+    })
+  }
+
   render() {
     const { uiStore, testCollection } = this.props
     const { apiStore } = this.props
@@ -237,6 +241,7 @@ class AudienceSettings extends React.Component {
             totalPrice={this.totalPriceDollars}
             audiences={this.audiences}
             audienceSettings={this.audienceSettings}
+            afterAddAudience={this.afterAddAudience}
             locked={this.locked}
           />
         )}

@@ -246,7 +246,7 @@ class CollectionCover extends React.Component {
   }
 
   handleClick = e => {
-    const { dragging, uiStore, collection } = this.props
+    const { searchResult, dragging, uiStore, collection } = this.props
     const makingSelection =
       (e.metaKey || e.ctrlKey || e.shiftKey) && uiStore.selectedCardIds.length
     if (dragging || makingSelection) {
@@ -254,7 +254,7 @@ class CollectionCover extends React.Component {
       return false
     }
 
-    if (collection.can_view) return true
+    if (collection.can_view || searchResult) return true
 
     // User does not have permission to see collection
     e.preventDefault()
@@ -264,7 +264,7 @@ class CollectionCover extends React.Component {
   }
 
   render() {
-    const { height, width, collection, uiStore, onClick } = this.props
+    const { height, width, collection, uiStore } = this.props
     const { cover } = collection
     const { gridW, gutter } = uiStore.gridSettings
 
@@ -273,8 +273,6 @@ class CollectionCover extends React.Component {
         data-cy="CollectionCover"
         url={this.coverImageUrl}
         isSpecialCollection={collection.isSpecialCollection}
-        // onClick can be null, is used by SearchResultsInfinite
-        onClick={onClick}
       >
         <StyledCardContent
           height={height}
@@ -318,7 +316,7 @@ CollectionCover.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   inSubmissionsCollection: PropTypes.bool,
   dragging: PropTypes.bool,
-  onClick: PropTypes.func,
+  searchResult: PropTypes.bool,
 }
 CollectionCover.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -326,7 +324,7 @@ CollectionCover.wrappedComponent.propTypes = {
 CollectionCover.defaultProps = {
   inSubmissionsCollection: false,
   dragging: false,
-  onClick: null,
+  searchResult: false,
 }
 
 CollectionCover.displayName = 'CollectionCover'

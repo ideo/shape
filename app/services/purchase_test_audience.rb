@@ -1,4 +1,5 @@
-# NOTE: if audiences are free, will not really "purchase" but just create
+# NOTE: This is no longer creating link sharing audiences (they will be skipped since they already exist)
+# could refactor this to more explicitly just focus on paid audiences
 class PurchaseTestAudience
   include Interactor
   include Interactor::Schema
@@ -62,6 +63,8 @@ class PurchaseTestAudience
       # skip any TestAudience for audiences that cost money,
       # where no sample_size was indicated
       next if audience.price_per_response.positive? && sample_size.zero?
+      # skip any TestAudience that this test already has
+      next if test_collection.test_audiences.find_by_audience_id(id).present?
 
       ensure_valid_payment_method if audience.price_per_response.positive?
 

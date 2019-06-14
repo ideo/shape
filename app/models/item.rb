@@ -65,7 +65,8 @@ class Item < ApplicationRecord
                  :cached_filestack_file_info,
                  :previous_thumbnail_urls,
                  :cached_inheritance,
-                 :pending_transcoding_uuid
+                 :pending_transcoding_uuid,
+                 :common_viewable
 
   attr_accessor :datasets_attributes
 
