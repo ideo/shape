@@ -1,3 +1,5 @@
+import * as Sentry from '@sentry/browser'
+
 export default function trackError(err, opts = {}) {
   // 404 not really an "error" don't need to alert appsignal
   if (err && err.status === 404) return
@@ -10,7 +12,17 @@ export default function trackError(err, opts = {}) {
     opts.name || err.name,
     err.stack ? err.stack.split('\n') : ''
   )
+  if (process.env.SENTRY_DSN) {
+    Sentry.withScope(scope => {
+      if (opts.message) scope.setExtra('extraMessage', opts.message)
+      if (opts.source) scope.setExtra('extraSource', opts.source)
+      Sentry.captureException(err)
+    })
+  }
 }
+
+// So it's available in the network components
+window.trackError = trackError
 
 export function trackErrorSpecify(source, message, name, backtrace) {
   const data = {

@@ -5,6 +5,7 @@ import { configure } from 'mobx'
 import { Provider } from 'mobx-react'
 import { syncHistoryWithStore } from 'mobx-react-router'
 import { Router } from 'react-router-dom'
+import * as Sentry from '@sentry/browser'
 
 import Routes from '~/ui/Routes'
 import stores, { routingStore } from '~/stores'
@@ -23,6 +24,14 @@ const RenderApp = inner => {
     </Provider>,
     document.getElementById('react-root')
   )
+}
+
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.SHAPE_APP,
+    release: process.env.SOURCE_VERSION,
+  })
 }
 
 if (module.hot) {

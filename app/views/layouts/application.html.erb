@@ -4,8 +4,7 @@
     <title>
       Shape <%= "| #{ENV['SHAPE_APP']}" unless ENV['SHAPE_APP'] == 'production' %>
     </title>
-    <title>Shape</title>
-    <meta property="og:url" content="https://www.shape.space/" />
+    <meta property="og:url" content="<%=ENV['BASE_HOST'] || 'https://www.shape.space/'%>"/>
     <meta property="og:site_name" content="Shape" />
     <meta property="og:description" content="Shape is IDEO’s latest digital innovation tool for building, testing, and refining your ideas." />
     <meta property="og:title" content="Shape - IDEO’s Visual Collaborative Tool - Build, Test, and Refine Your Ideas" />

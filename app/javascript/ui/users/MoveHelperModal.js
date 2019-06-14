@@ -10,17 +10,12 @@ import FormControlLabel from '@material-ui/core/FormControlLabel'
 import ICONS from '~/ui/icons/dialogIcons'
 const { CloseIcon } = ICONS
 import { TextButton, Checkbox } from '~/ui/global/styled/forms'
+import { SpecialDisplayHeading } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 
-const SpecialDisplayHeading = styled.p`
-  text-align: center;
+const StyledSpecialDisplayHeading = styled(SpecialDisplayHeading)`
   margin: 0;
   margin-bottom: 30px;
-  line-height: 1.625rem;
-  font-family: ${v.fonts.sans};
-  font-size: 1.25rem;
-  font-weight: ${v.weights.book};
-  color: ${v.colors.black};
 `
 
 const StyledDialog = styled(Dialog)`
@@ -120,7 +115,9 @@ class MoveHelperModal extends React.Component {
               alt="Diagram showing moving items between multiple collections"
               style={{ width: '100%', maxWidth: '410px', marginBottom: '40px' }}
             />
-            <SpecialDisplayHeading>{this.helperText}</SpecialDisplayHeading>
+            <StyledSpecialDisplayHeading>
+              {this.helperText}
+            </StyledSpecialDisplayHeading>
             <FormControl component="fieldset" required>
               <FormControlLabel
                 classes={{ label: 'form-control' }}

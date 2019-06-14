@@ -76,6 +76,15 @@ export const NumberListText = DisplayText.extend`
 `
 NumberListText.displayName = 'NumberListText'
 
+export const SpecialDisplayHeading = styled.p`
+  color: ${v.colors.black};
+  font-family: ${v.fonts.sans};
+  font-size: 1.25rem;
+  font-weight: ${v.weights.book};
+  line-height: 1.625rem;
+  text-align: center;
+`
+
 export const SubduedHeading1 = styled.h1`
   color: ${v.colors.commonMedium};
   font-size: 1.5rem;

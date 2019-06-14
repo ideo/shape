@@ -1,5 +1,5 @@
 class Api::V1::TestCollectionsController < Api::V1::BaseController
-  before_action :load_and_authorize_test_collection, only: %i[launch close reopen add_comparison]
+  before_action :load_and_authorize_test_collection, only: %i[launch close reopen add_comparison csv_report]
   before_action :load_test_collection, only: %i[show next_available add_comparison remove_comparison]
   before_action :load_submission_box_test_collection, only: %i[next_available]
   before_action :load_comparison_collection, only: %i[add_comparison remove_comparison]
@@ -73,6 +73,13 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
       render_test_collection
     else
       render json: { errors: test_comparison.errors }, status: :unprocessable_entity
+    end
+  end
+
+  def csv_report
+    @report = TestCollectionToCsv.call(@test_collection)
+    respond_to do |format|
+      format.any { send_data @report, filename: "test-#{params[:id]}-#{Date.today}.csv" }
     end
   end
 

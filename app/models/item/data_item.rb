@@ -45,6 +45,7 @@ class Item
 
     has_many :data_items_datasets,
              -> { ordered },
+             inverse_of: :data_item,
              dependent: :destroy,
              foreign_key: 'data_item_id'
 
@@ -78,6 +79,12 @@ class Item
       report_type_record: 2,
       report_type_question_item: 3,
     }
+
+    amoeba do
+      enable
+      recognize :has_many
+      include_association :data_items_datasets
+    end
 
     attr_accessor :dont_create_legend_item
 
