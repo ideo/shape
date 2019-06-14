@@ -497,11 +497,11 @@ class ApiStore extends jsonapi(datxCollection) {
     )
     if (undoable) {
       this.undoStore.pushUndoAction({
-        message: 'Archive undone',
+        message: 'Delete undone',
         apiCall: () => this.unarchiveCards({ cardIds, collection }),
         redirectPath: { type: 'collections', id: collection.id },
         redoAction: {
-          message: 'Archive redone',
+          message: 'Delete redone',
           apiCall: () => this.archiveCards({ cardIds, collection, undoable }),
           undoable: false,
         },

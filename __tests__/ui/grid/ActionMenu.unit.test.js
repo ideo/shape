@@ -27,7 +27,7 @@ describe('ActionMenu', () => {
         'Add to My Collection',
         'Tags',
         'Sharing',
-        'Archive',
+        'Delete',
         'Replace',
       ]
       actions = _.without(allActions, 'Replace')
@@ -204,7 +204,7 @@ describe('ActionMenu', () => {
         'Add to My Collection',
         'Tags',
         'Sharing',
-        'Archive',
+        'Delete',
       ]
       props.card.can_move = false
       props.card.record.name = 'haho'
