@@ -301,7 +301,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def collection_snapshot_params
     json_api_params[:collection_snapshot].require(:attributes).permit(
-      collection_cards_attributes: %i[id order width height],
+      collection_cards_attributes: %i[id order width height row col],
     )
   end
 
