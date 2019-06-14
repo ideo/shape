@@ -4,7 +4,6 @@ import styled from 'styled-components'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { Flex } from 'reflexbox'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import 'whatwg-fetch'
 
 import { uiStore } from '~/stores'
 import Box from '~shared/components/atoms/Box'
