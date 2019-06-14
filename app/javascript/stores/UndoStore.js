@@ -1,6 +1,6 @@
-import { observable, action } from 'mobx'
+import { observable, action, computed } from 'mobx'
 import { routingStore, uiStore } from '~/stores'
-
+import { UndoActionStatus } from '~/enums/actionEnums'
 const MAX_UNDOSTACK_LENGTH = 10
 
 export default class UndoStore {
@@ -12,11 +12,24 @@ export default class UndoStore {
   @observable
   undoAfterRoute = null
 
+  @observable
+  actionStatus = UndoActionStatus.IDLE
+
   // block multiple requests from happening too quickly
-  @observable
-  currentlyUndoing = false
-  @observable
-  currentlyRedoing = false
+  @computed
+  get currentlyUndoing() {
+    return this.actionStatus === UndoActionStatus.UNDO
+  }
+
+  @computed
+  get currentlyRedoing() {
+    return this.actionStatus === UndoActionStatus.REDO
+  }
+
+  @computed
+  get currentlyIdle() {
+    return this.actionStatus === UndoActionStatus.IDLE
+  }
 
   @action
   pushUndoAction(undoAction) {
@@ -40,36 +53,35 @@ export default class UndoStore {
   async undoLastAction() {
     const undoAction = this.undoStack.pop()
     if (!undoAction) return
-    this.currentlyUndoing = true
-    if (undoAction.redirectPath) {
-      const { type, id } = undoAction.redirectPath
-      const { viewingRecord } = uiStore
-      // check if we don't have to redirect
-      if (viewingRecord.internalType !== type || viewingRecord.id !== id) {
-        routingStore.routeTo(type, id)
-        this.undoAfterRoute = undoAction
-        return
-      }
+    this.status = UndoActionStatus.UNDO
+    const { redirectPath } = undoAction
+    if (redirectPath) {
+      this.redirectAction()
     }
     this.performUndo(undoAction)
   }
-
-  @action
   async redoLastAction() {
     const redoAction = this.redoStack.pop()
     if (!redoAction) return
-    this.currentlyRedoing = true
-    if (redoAction.redirectPath) {
-      const { type, id } = redoAction.redirectPath
-      const { viewingRecord } = uiStore
-      // check if we don't have to redirect
-      if (viewingRecord.internalType !== type || viewingRecord.id !== id) {
-        routingStore.routeTo(type, id)
-        this.undoAfterRoute = redoAction
-        return
-      }
+    this.status = UndoActionStatus.REDO
+    const { redirectPath } = redoAction
+    if (redirectPath) {
+      this.redirectAction()
     }
     this.performRedo(redoAction)
+  }
+
+  @action
+  async redirectAction(redirectPath) {
+    const { type, id } = redirectPath
+    const { viewingRecord } = uiStore
+    const { internalType, id: recordId } = viewingRecord
+    // check if we don't have to redirect
+    if (internalType === type || recordId === id) {
+      return
+    }
+    routingStore.routeTo(type, id)
+    this.undoAfterRoute = action
   }
 
   @action
@@ -81,7 +93,7 @@ export default class UndoStore {
     })
     uiStore.popupSnackbar({ message })
     await undoAction.apiCall()
-    this.currentlyUndoing = false
+    this.status = UndoActionStatus.IDLE
   }
 
   @action
@@ -89,7 +101,7 @@ export default class UndoStore {
     const { message } = redoAction
     uiStore.popupSnackbar({ message })
     await redoAction.apiCall()
-    this.currentlyRedoing = false
+    this.status = UndoActionStatus.IDLE
   }
 
   @action
