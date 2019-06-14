@@ -234,6 +234,10 @@ class Header extends React.Component {
       return this.renderMobileSearch()
     }
 
+    const ActivityButtonWrapper = uiStore.isMobileXs
+      ? CornerPositioned
+      : styled.div``
+
     return (
       <Fragment>
         <FixedHeader data-empty-space-click>
@@ -302,11 +306,20 @@ class Header extends React.Component {
                   <GlobalSearch className="search-bar" />
                 </Hidden>
                 {record && (
-                  <CornerPositioned>
-                    <IconAvatar>
+                  <ActivityButtonWrapper>
+                    <IconAvatar
+                      color={
+                        uiStore.isMobileXs ? v.colors.white : v.colors.black
+                      }
+                      backgroundColor={
+                        uiStore.isMobileXs
+                          ? v.colors.secondaryDark
+                          : v.colors.white
+                      }
+                    >
                       <ActivityLogButton key="activity" />
                     </IconAvatar>
-                  </CornerPositioned>
+                  </ActivityButtonWrapper>
                 )}
                 <OrganizationMenu
                   organization={currentUserOrganization}
