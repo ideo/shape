@@ -261,35 +261,45 @@ class AdminFeedback extends React.Component {
         />
         <Heading1>Feedback</Heading1>
         <Section>
-          <Box mb={40}>
-            <Flex justify="space-between">
-              <Heading2 data-cy="AdminHeader">All Shape Feedback</Heading2>
-              <Select
-                classes={{ root: 'select' }}
-                disableUnderline
-                displayEmpty
-                name="finance_export_month"
-                onChange={this.handleFinanceExportSelection}
-              >
-                <SelectOption key="">Finance Export...</SelectOption>
-                {monthsForExport.map(month => (
-                  <SelectOption
-                    classes={{ root: 'selectOption', selected: 'selected' }}
-                    key={month}
-                    value={month}
+          <Grid container>
+            <Grid item xs={4}>
+              <Box mb={40}>
+                <Heading2 data-cy="AdminHeader">All Shape Feedback</Heading2>
+              </Box>
+            </Grid>
+            <Grid item xs={8}>
+              <Flex style={{ flexDirection: 'column' }}>
+                <Box mb={5} style={{ alignSelf: 'flex-end' }}>
+                  <ExportIncentivesButton
+                    onClick={this.handleDownloadFeedbackIncentives}
                   >
-                    {month}
-                  </SelectOption>
-                ))}
-              </Select>
-              <ExportIncentivesButton
-                onClick={this.handleDownloadFeedbackIncentives}
-              >
-                <DownloadIcon />
-                Export Pending Incentives
-              </ExportIncentivesButton>
-            </Flex>
-          </Box>
+                    <DownloadIcon />
+                    Export Pending Incentives
+                  </ExportIncentivesButton>
+                </Box>
+                <Box mb={20} style={{ alignSelf: 'flex-end' }}>
+                  <Select
+                    classes={{ root: 'select' }}
+                    disableUnderline
+                    displayEmpty
+                    name="finance_export_month"
+                    onChange={this.handleFinanceExportSelection}
+                  >
+                    <SelectOption key="">IDEO Finance Report</SelectOption>
+                    {monthsForExport.map(month => (
+                      <SelectOption
+                        classes={{ root: 'selectOption', selected: 'selected' }}
+                        key={month}
+                        value={month}
+                      >
+                        {month}
+                      </SelectOption>
+                    ))}
+                  </Select>
+                </Box>
+              </Flex>
+            </Grid>
+          </Grid>
           <Grid container>
             <Grid data-cy="AdminRowHeaderWrapper" container>
               <Grid item xs={2}>
