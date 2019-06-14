@@ -27,6 +27,10 @@ const SharedRecordMixin = superclass =>
       return this.common_viewable
     }
 
+    get pageTitle() {
+      return `${this.name} | Shape`
+    }
+
     API_updateName(name) {
       const previousName = this.name
       this.name = name
