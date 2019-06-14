@@ -36,7 +36,7 @@ class TestAudience < ApplicationRecord
   delegate :name,
            :link_sharing?,
            to: :audience
-  validates :price_per_response, presence: true
+  validate :price_per_response_greater_than_minimum
 
   before_validation :set_price_per_response_from_audience, on: :create
   after_create :purchase, if: :requires_payment?
@@ -64,6 +64,13 @@ class TestAudience < ApplicationRecord
     open: 0,
     closed: 1,
   }
+
+  # The absolute minimum we can charge per response and not be losing money
+  def self.minimum_price_per_response
+    payout_cost = incentive_amount + Accounting::RecordTransfer.paypal_fee(incentive_amount)
+    stripe_cost = Accounting::RecordTransfer.stripe_fee(payout_cost)
+    (payout_cost + stripe_cost).to_f
+  end
 
   def self.incentive_amount
     Shape::FEEDBACK_INCENTIVE_AMOUNT
@@ -132,5 +139,14 @@ class TestAudience < ApplicationRecord
 
   def set_price_per_response_from_audience
     self.price_per_response ||= audience&.price_per_response
+  end
+
+  def price_per_response_greater_than_minimum
+    return if total_price.zero?
+    return if price_per_response >= TestAudience.minimum_price_per_response
+    errors.add(
+      :price_per_response,
+      "must be greater than minimum of $#{TestAudience.minimum_price_per_response}",
+    )
   end
 end

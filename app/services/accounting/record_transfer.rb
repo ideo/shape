@@ -4,6 +4,10 @@ module Accounting
       (amount * BigDecimal('0.05')).round(2)
     end
 
+    def self.stripe_fee(amount)
+      ((amount * BigDecimal('0.029')) + BigDecimal('0.3')).round(2)
+    end
+
     # Record that a payment has been made,
     # documenting what we have earned in our 'receivable' account,
     # and what has been taken out due to payment processing fees
@@ -43,10 +47,13 @@ module Accounting
     # transferring from their individual_owed to their individual_paid account
     def self.incentive_paid(survey_response)
       user = survey_response.user
-      incentive = survey_response.amount_earned
-      paypal_fee = paypal_fee(incentive)
-      revenue = survey_response.price_per_response - incentive - paypal_fee
       payment = survey_response.test_audience.payment
+
+      price_per_response = survey_response.price_per_response
+      incentive = survey_response.amount_earned
+      stripe_fee = stripe_fee(price_per_response)
+      paypal_fee = paypal_fee(incentive)
+      revenue = price_per_response - stripe_fee - incentive - paypal_fee
 
       DoubleEntry.transfer(
         Money.new(incentive * 100),

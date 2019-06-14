@@ -15,7 +15,7 @@ describe Api::V1::Admin::TestCollectionsController, type: :request, json: true, 
         :test_audience,
         audience: audience,
         test_collection: collection,
-        price_per_response: 1,
+        price_per_response: 4.50,
       )
     end
     let!(:survey_response) do
@@ -76,25 +76,6 @@ describe Api::V1::Admin::TestCollectionsController, type: :request, json: true, 
       get(path)
 
       expect(response.header['X-Total-Pages']).to eq(1)
-    end
-  end
-
-  describe 'GET #finance_export' do
-    let(:path) { finance_export_api_v1_admin_test_collections(month: 'July 2018') }
-  end
-
-  describe 'GET #finance_export_dates' do
-    let(:payments) do
-      [
-        create(:payment, created_at: Time.parse('June 2018')),
-        create(:payment, created_at: Time.parse('July 2018')),
-        create(:payment, created_at: Time.parse('September 2018')),
-      ]
-    end
-    let(:path) { finance_export_dates_api_v1_admin_test_collections }
-
-    it 'returns month range' do
-      expect()
     end
   end
 end

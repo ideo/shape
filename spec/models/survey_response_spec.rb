@@ -170,7 +170,8 @@ RSpec.describe SurveyResponse, type: :model do
     let(:revenue_account) { DoubleEntry.account(:revenue, scope: test_audience.payment) }
     let(:incentive_amount) { 2.50 }
     let(:paypal_fee) { (incentive_amount * 0.05).round(2) }
-    let(:our_earning) { test_audience.price_per_response - incentive_amount - paypal_fee }
+    let(:stripe_fee) { ((test_audience.price_per_response * 0.029) + 0.3).round(2) }
+    let(:our_earning) { test_audience.price_per_response - stripe_fee - incentive_amount - paypal_fee }
 
     before do
       survey_response.record_incentive_owed!
@@ -213,7 +214,7 @@ RSpec.describe SurveyResponse, type: :model do
         survey_response.record_incentive_paid!
       }.to change(payment_processor_account, :balance)
       expect(payment_processor_account.balance.to_f).to eq(
-        previous_balance + paypal_fee,
+        (previous_balance + paypal_fee).round(2),
       )
     end
 

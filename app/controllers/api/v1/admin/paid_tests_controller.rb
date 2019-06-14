@@ -20,7 +20,6 @@ class Api::V1::Admin::PaidTestsController < Api::V1::BaseController
 
   def months_with_purchases
     months = PaidTests::FinanceExportForTimeframe.months_with_purchases
-    months = ['July 2018', 'August 2018']
     render json: { months: months }
   end
 
