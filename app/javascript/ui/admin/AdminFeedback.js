@@ -205,7 +205,7 @@ class AdminFeedback extends React.Component {
                             color={v.colors.black}
                             backgroundColor={v.colors.commonLight}
                             data-cy="NewQueryButton"
-                            tooltip="start new query"
+                            title="start new query"
                             onClick={() => this.showNewQueryRow(testCollection)}
                           >
                             <SearchLargeIcon />
