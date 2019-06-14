@@ -65,6 +65,7 @@ class RecontactQuestion extends React.Component {
           : 'noIncentiveForGuest',
         createdUser: user,
       })
+      apiStore.loadCurrentUser()
     } catch (err) {
       uiStore.alert(err.errors[0])
       return

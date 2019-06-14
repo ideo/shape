@@ -1,6 +1,6 @@
 class Api::V1::UsersController < Api::V1::BaseController
   before_action :authenticate_user!, only: :update_current_user
-  skip_before_action :check_api_authentication!, only: %i[me update_current_user create_limited_user]
+  skip_before_action :check_api_authentication!, only: %i[me update_current_user update_current_user_demographics create_limited_user]
   load_and_authorize_resource only: %i[show]
   def show
     render jsonapi: @user, include: [
@@ -49,6 +49,12 @@ class Api::V1::UsersController < Api::V1::BaseController
     else
       render_api_errors current_user.errors
     end
+  end
+
+  def update_current_user_demographics
+    render jsonapi: current_user, class: {
+      User: SerializableCurrentUser,
+    }
   end
 
   def create_limited_user

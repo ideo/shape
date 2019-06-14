@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import { DisplayText, SmallHelperText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
@@ -33,9 +34,12 @@ const Scale = styled.div`
   width: 100%;
 `
 
+@observer
 class DemographicSingleChoiceQuestion extends React.Component {
   handleAnswer(event) {
-    this.props.onAnswer({ text: event.target.value })
+    const { onAnswer, user } = this.props
+    onAnswer({ text: event.target.value })
+    user.API_updateCurrentUserDemographics()
   }
 
   render() {
@@ -83,7 +87,11 @@ class DemographicSingleChoiceQuestion extends React.Component {
 }
 
 DemographicSingleChoiceQuestion.propTypes = {
+  user: MobxPropTypes.objectOrObservableObject,
   onAnswer: PropTypes.func.isRequired,
+}
+DemographicSingleChoiceQuestion.defaultProps = {
+  user: null,
 }
 
 export default DemographicSingleChoiceQuestion
