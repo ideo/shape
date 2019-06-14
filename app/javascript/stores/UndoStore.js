@@ -13,22 +13,22 @@ export default class UndoStore {
   undoAfterRoute = null
 
   @observable
-  actionStatus = UndoActionStatus.IDLE
+  actionStatus = UndoActionStatus.idle
 
   // block multiple requests from happening too quickly
   @computed
   get currentlyUndoing() {
-    return this.actionStatus === UndoActionStatus.UNDO
+    return this.actionStatus === UndoActionStatus.undo
   }
 
   @computed
   get currentlyRedoing() {
-    return this.actionStatus === UndoActionStatus.REDO
+    return this.actionStatus === UndoActionStatus.redo
   }
 
   @computed
   get currentlyIdle() {
-    return this.actionStatus === UndoActionStatus.IDLE
+    return this.actionStatus === UndoActionStatus.idle
   }
 
   @action
@@ -53,35 +53,36 @@ export default class UndoStore {
   async undoLastAction() {
     const undoAction = this.undoStack.pop()
     if (!undoAction) return
-    this.status = UndoActionStatus.UNDO
+    this.status = UndoActionStatus.undo
     const { redirectPath } = undoAction
     if (redirectPath) {
-      this.redirectAction()
+      this.redirectAction(redirectPath, undoAction)
     }
     this.performUndo(undoAction)
   }
+
+  @action
   async redoLastAction() {
     const redoAction = this.redoStack.pop()
     if (!redoAction) return
-    this.status = UndoActionStatus.REDO
+    this.status = UndoActionStatus.redo
     const { redirectPath } = redoAction
     if (redirectPath) {
-      this.redirectAction()
+      this.redirectAction(redirectPath, redoAction)
     }
     this.performRedo(redoAction)
   }
 
   @action
-  async redirectAction(redirectPath) {
+  async redirectAction(redirectPath, action) {
     const { type, id } = redirectPath
     const { viewingRecord } = uiStore
     const { internalType, id: recordId } = viewingRecord
     // check if we don't have to redirect
-    if (internalType === type || recordId === id) {
-      return
+    if (internalType !== type || recordId !== id) {
+      routingStore.routeTo(type, id)
+      this.undoAfterRoute = action
     }
-    routingStore.routeTo(type, id)
-    this.undoAfterRoute = action
   }
 
   @action
@@ -93,7 +94,7 @@ export default class UndoStore {
     })
     uiStore.popupSnackbar({ message })
     await undoAction.apiCall()
-    this.status = UndoActionStatus.IDLE
+    this.status = UndoActionStatus.idle
   }
 
   @action
@@ -101,7 +102,7 @@ export default class UndoStore {
     const { message } = redoAction
     uiStore.popupSnackbar({ message })
     await redoAction.apiCall()
-    this.status = UndoActionStatus.IDLE
+    this.status = UndoActionStatus.idle
   }
 
   @action

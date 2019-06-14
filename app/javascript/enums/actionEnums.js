@@ -1,7 +1,7 @@
-const UndoActionStatus = Object.freeze({
-  IDLE: Symbol('idle'),
-  UNDO: Symbol('undo'),
-  REDO: Symbol('redo'),
-})
+const UndoActionStatus = {
+  idle: 0,
+  undo: 1,
+  redo: 2,
+}
 
 export { UndoActionStatus }
