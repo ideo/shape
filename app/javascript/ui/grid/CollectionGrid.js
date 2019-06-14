@@ -605,7 +605,7 @@ class CollectionGrid extends React.Component {
     const { pageYOffset } = window
     const scrollPoint = Math.max(
       0,
-      pageYOffset + window.innerHeight - window.innerHeight / 2 + 200
+      pageYOffset + window.innerHeight - window.innerHeight / 2
     )
     const { cards } = this.state
     const closestCard = cards.find(

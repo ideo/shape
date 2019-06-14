@@ -7,6 +7,7 @@ class CornerPositioned extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
+      // this refers to the <LowerRightCorner> that gets rendered in Routes.js
       element: document.querySelector(`.${CLASS_LOWER_RIGHT_CORNER}`),
     }
   }
