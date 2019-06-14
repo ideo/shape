@@ -204,7 +204,7 @@ class Collection < ApplicationRecord
   # active == don't index archived collections
   # where(type: nil) == don't index User/SharedWithMe collections
   scope :search_import, -> do
-    active.searchable.includes(
+    searchable.includes(
       [
         {
           items: %i[
@@ -251,6 +251,7 @@ class Collection < ApplicationRecord
       activity_dates: activity_dates.empty? ? nil : activity_dates,
       created_at: created_at,
       updated_at: updated_at,
+      archived: archived,
     }
   end
 

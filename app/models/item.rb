@@ -121,7 +121,7 @@ class Item < ApplicationRecord
 
   # active == don't index archived items
   scope :search_import, -> do
-    active.includes(
+    includes(
       :tags,
       :taggings,
       parent_collection_card: :parent,
@@ -154,6 +154,7 @@ class Item < ApplicationRecord
       user_ids: search_user_ids,
       group_ids: search_group_ids,
       organization_id: organization_id,
+      archived: archived,
     }
   end
 
