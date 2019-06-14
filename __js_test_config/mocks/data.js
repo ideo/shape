@@ -348,6 +348,7 @@ const fakeCards = [fakeItemCard, fakeItemCard, fakeItemCard]
 export const fakeCollection = {
   id: '1',
   name: 'My Workspace X',
+  pageTitle: 'My Workspace X | Shape',
   type: 'Collection',
   breadcrumb: [],
   roles: [],
