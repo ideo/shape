@@ -24,7 +24,8 @@ import { showOnHoverCss } from '~/ui/grid/shared'
 
 const Wrapper = styled.div`
   font-family: ${v.fonts.sans};
-  min-width: 1316px; // allow horizontal scrolling for grid layout
+  min-width: ${v.responsive.largeBreakpoint}px;
+  // allow horizontal scrolling for grid layout
 `
 
 const SubHeading = styled.div`
@@ -56,7 +57,7 @@ const AudienceWrapper = styled(Flex)`
   position: relative;
   top: -0.5rem;
   /*
-    adjust upward, so audience name is plum with the rest of the row's
+    adjust upward, so audience name is plumb with the rest of the row's
     contents. the AudienceAction buttons had the effect of pushing the
     audience name down.
   */
