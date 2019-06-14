@@ -111,6 +111,18 @@ class LegendItemCover extends React.Component {
     uiStore.removeEmptySpaceClickHandler(this.onSearchClose)
   }
 
+  usesTestComparisonApi(entity) {
+    const isTestCollection = entity.internalType === 'collections'
+    // If it is a test collection, it uses the test comparison api
+    if (isTestCollection) return true
+    // If not a dataset, does not use test comparison API
+    if (!entity.internalType === 'datasets') return false
+    const hasGroupings = entity.groupings && entity.groupings.length
+    // Uses test comparison API if it references a test collection,
+    // and does not have any groupings
+    return entity.test_collection_id && !hasGroupings
+  }
+
   /*
    * Unique dataset and whether selected or not
    */
@@ -176,11 +188,11 @@ class LegendItemCover extends React.Component {
    */
   onDeselectComparison = async dataset => {
     const { parent } = this.props.card
-    if (dataset.groupings.length) {
+    if (this.usesTestComparisonApi(dataset)) {
+      await parent.API_removeComparison({ id: dataset.test_collection_id })
+    } else {
       const { identifier, selected } = dataset
       this.toggleDatasetsWithIdentifier({ identifier, selected })
-    } else {
-      await parent.API_removeComparison({ id: dataset.test_collection_id })
     }
     parent.API_fetchCards()
   }
@@ -196,11 +208,11 @@ class LegendItemCover extends React.Component {
    */
   onSelectComparison = async entity => {
     const { card } = this.props
-    if (entity.internalType === 'datasets') {
+    if (this.usesTestComparisonApi(entity)) {
+      await card.parent.API_addComparison(entity)
+    } else {
       const { identifier, selected } = entity
       this.toggleDatasetsWithIdentifier({ identifier, selected })
-    } else {
-      await card.parent.API_addComparison(entity)
     }
     card.parent.API_fetchCards()
   }
@@ -238,10 +250,10 @@ class LegendItemCover extends React.Component {
       })
   }
 
-  handleDatasetSelection = event => {
+  handleUnselectedDatasetOption = event => {
     event.preventDefault()
     const { value } = event.target
-    this.toggleDatasetsWithIdentifier({ identifier: value, selected: true })
+    this.toggleDatasetsWithIdentifier({ identifier: value, selected: false })
   }
 
   get renderDatasetsMenu() {
@@ -251,7 +263,7 @@ class LegendItemCover extends React.Component {
         displayEmpty
         disableUnderline
         name="role"
-        onChange={this.handleDatasetSelection}
+        onChange={this.handleUnselectedDatasetOption}
         onClose={() => this.setState({ comparisonMenuOpen: false })}
         open
         inline
