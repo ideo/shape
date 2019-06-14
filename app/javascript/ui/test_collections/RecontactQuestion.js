@@ -147,6 +147,36 @@ class RecontactQuestion extends React.Component {
     )
   }
 
+  get showPostOptInConfirmation() {
+    switch (this.state.answer) {
+      case 'feedback_contact_yes':
+        return (
+          <div>
+            <QuestionText>
+              Great, thanks! We'll reach out as soon as we have new feedback
+              opportunities for you.
+            </QuestionText>
+            <EmojiHolder data-cy="PostOptInEmojiHolder">
+              <Emoji scale={1.375} name="Okay gesture" symbol="👌" />
+            </EmojiHolder>
+          </div>
+        )
+      case 'feedback_contact_no':
+        return (
+          <div>
+            <QuestionText>
+              We're sorry to hear that. Have a nice day!
+            </QuestionText>
+            <EmojiHolder data-cy="PostOptInEmojiHolder">
+              <Emoji scale={1.375} name="crying face" symbol="😢" />
+            </EmojiHolder>
+          </div>
+        )
+      default:
+        return null
+    }
+  }
+
   get showContactInfoForm() {
     const {
       contactInfo,
@@ -212,16 +242,23 @@ class RecontactQuestion extends React.Component {
   }
 
   render() {
-    const { showContactInfo, showFeedbackRecontact } = this.state
+    const {
+      showContactInfo,
+      showFeedbackRecontact,
+      submittedContactInfo,
+      answer,
+    } = this.state
     return (
       <div style={{ width: '100%', backgroundColor: this.backgroundColor }}>
         {showFeedbackRecontact === 'noIncentiveForGuest' &&
           this.showFeedbackRecontactForm}
+        {answer === 'feedback_contact_no' && this.showPostOptInConfirmation}
 
         {showContactInfo && this.showContactInfoForm}
 
         {showFeedbackRecontact === 'afterPaymentInfo' &&
           this.showFeedbackRecontactForm}
+        {submittedContactInfo && this.showPostOptInConfirmation}
       </div>
     )
   }
