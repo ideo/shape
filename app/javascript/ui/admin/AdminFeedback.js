@@ -13,6 +13,7 @@ import LeftButtonIcon from '~/ui/icons/LeftButtonIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import DownloadIcon from '~/ui/icons/DownloadIcon'
 import Section from '~shared/components/molecules/Section'
+import { Select, SelectOption } from '~/ui/global/styled/forms'
 import v from '~/utils/variables'
 import { CircledIcon } from '~/ui/global/styled/buttons'
 import { Heading1, Heading2, Heading3 } from '~/ui/global/styled/typography'
@@ -106,12 +107,14 @@ const ExportIncentivesButton = styled(Heading3)`
 class AdminFeedback extends React.Component {
   state = {
     testCollections: [],
+    monthsForExport: [],
     currentPage: 1,
     totalPages: 1,
   }
 
   componentDidMount() {
     this.loadTestCollections(this.state.currentPage)
+    this.loadMonthsForFinanceExport()
   }
 
   async loadTestCollections(page) {
@@ -123,8 +126,26 @@ class AdminFeedback extends React.Component {
     })
   }
 
+  async loadMonthsForFinanceExport() {
+    const response = await fetch(
+      '/api/v1/admin/paid_tests/months_with_purchases'
+    )
+    const data = await response.json()
+    this.setState({
+      monthsForExport: data.months,
+    })
+  }
+
+  handleFinanceExportSelection = e => {
+    const month = e.target.value
+    if (!month) return
+    window.location.href = `/api/v1/admin/paid_tests/finance_export.csv?month=${month}`
+    return false
+  }
+
   handleDownloadFeedbackIncentives = () => {
-    window.location.href = '/api/v1/admin/feedback_incentives.csv'
+    window.location.href =
+      '/api/v1/admin/paid_tests/pending_incentives_export.csv'
     uiStore.popupSnackbar({
       message: 'All incentives marked as paid!',
     })
@@ -206,7 +227,7 @@ class AdminFeedback extends React.Component {
   }
 
   render() {
-    const { currentPage, totalPages } = this.state
+    const { currentPage, totalPages, monthsForExport } = this.state
     const previousPageDisabled = currentPage === 1
     const nextPageDisabled = currentPage === totalPages
 
@@ -214,23 +235,35 @@ class AdminFeedback extends React.Component {
       <Wrapper>
         <Heading1>Feedback</Heading1>
         <Section>
-          <Grid container>
-            <Grid item xs={6}>
-              <Box mb={40}>
-                <Heading2>All Shape Feedback</Heading2>
-              </Box>
-            </Grid>
-            <Grid item xs={6}>
-              <Flex justify="flex-end">
-                <ExportIncentivesButton
-                  onClick={this.handleDownloadFeedbackIncentives}
-                >
-                  <DownloadIcon />
-                  Export Pending Incentives
-                </ExportIncentivesButton>
-              </Flex>
-            </Grid>
-          </Grid>
+          <Box mb={40}>
+            <Flex justify="space-between">
+              <Heading2>All Shape Feedback</Heading2>
+              <Select
+                classes={{ root: 'select' }}
+                disableUnderline
+                displayEmpty
+                name="finance_export_month"
+                onChange={this.handleFinanceExportSelection}
+              >
+                <SelectOption key="">Finance Export...</SelectOption>
+                {monthsForExport.map(month => (
+                  <SelectOption
+                    classes={{ root: 'selectOption', selected: 'selected' }}
+                    key={month}
+                    value={month}
+                  >
+                    {month}
+                  </SelectOption>
+                ))}
+              </Select>
+              <ExportIncentivesButton
+                onClick={this.handleDownloadFeedbackIncentives}
+              >
+                <DownloadIcon />
+                Export Pending Incentives
+              </ExportIncentivesButton>
+            </Flex>
+          </Box>
           <Grid container>
             <Grid container>
               <Grid item xs={2}>

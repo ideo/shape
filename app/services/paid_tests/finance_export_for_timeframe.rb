@@ -7,16 +7,26 @@ module PaidTests
 
     def call
       CSV.generate do |csv|
-        csv << csv_header
+        csv << self.class.csv_header
         paid_test_collections.each do |test_collection|
           csv << csv_line_for_test_collection(test_collection)
         end
       end
     end
 
-    private
+    def self.months_with_purchases
+      return [] if Payment.count.zero?
+      first_month = Payment.order(created_at: :asc).first.created_at.beginning_of_month.to_date
+      last_month = Payment.order(created_at: :desc).first.created_at.end_of_month.to_date
+      months = []
+      (first_month..last_month).each do |date|
+        next unless date.day == 1
+        months << date.strftime('%B %Y')
+      end
+      months
+    end
 
-    def csv_header
+    def self.csv_header
       [
         'Test Collection ID',
         'Test Name',
@@ -24,12 +34,17 @@ module PaidTests
         'Amount Owed',
         'Amount Paid',
         'Payment Processing Fees',
-        'Net Profit'
+        'Net Profit',
       ]
     end
 
+    private
+
     def csv_line_for_test_collection(test_collection)
       payment_summaries = payment_summaries_for_test_collection(test_collection)
+      revenue = payment_summaries.sum(&:amount)
+      payment_processor_fees = payment_summaries.sum(&:payment_processor_fees)
+      net_profit = payment_summaries.sum(&:net_profit)
       test_summary = PaidTests::TestCollectionSummary.new(
         test_collection: test_collection,
         start_time: @start_time,
@@ -38,16 +53,16 @@ module PaidTests
       [
         test_collection.id,
         test_collection.name,
-        payment_summaries.sum(&:amount),
+        revenue,
         test_summary.amount_owed,
         test_summary.amount_paid,
-        payment_summaries.sum(&:payment_processor_fees),
-        payment_summaries.sum(&:net_profit),
+        payment_processor_fees,
+        net_profit,
       ]
     end
 
     def payment_summaries_for_test_collection(test_collection)
-      payments = test_collection.test_audiences.map(&:payment)
+      payments = test_collection.test_audiences.map(&:payment).compact
       payments.map do |payment|
         PaidTests::PaymentSummary.new(
           payment: payment,
