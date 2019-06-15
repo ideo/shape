@@ -108,7 +108,7 @@
                 <span class="bold"><%= notification.activity.subject_users.map(&:name).join(', ') %></span>
                 a(n) <%= notification.activity.action.to_s.split('_')[1] %> of <%= notification.activity.target.name %>
               <% when "archived" %>
-                <span class="bold"><%= notification.activity.actor.name %></span> has archived <span class="bold"><%= notification.activity.target.name %></span>
+                <span class="bold"><%= notification.activity.actor.name %></span> has deleted <span class="bold"><%= notification.activity.target.name %></span>
               <% when "commented" %>
                 <span class="bold"><%= notification.activity.actor.name %></span> commented on <%= notification.activity.target.name %>
               <% when "mentioned" %>
