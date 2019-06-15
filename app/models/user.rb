@@ -101,6 +101,7 @@ class User < ApplicationRecord
            inverse_of: :created_by,
            foreign_key: :created_by_id
   has_one :application
+  has_many :test_audience_invitations, dependent: :destroy
 
   belongs_to :current_organization,
              class_name: 'Organization',

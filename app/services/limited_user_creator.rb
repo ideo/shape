@@ -54,21 +54,23 @@ class LimitedUserCreator < SimpleService
 
     return false if params.empty?
 
-    # if Rails.env.development?
-    #   # always look up the same user so we don't keep creating real ones
-    #   params[:email] = 'test.user@shape.space'
-    #   params.delete :phone
-    # end
+    if Rails.env.development?
+      # always look up the same user so we don't keep creating real ones
+      params[:email] = 'test.user@shape.space'
+      params.delete :phone
+    end
 
     @network_user = NetworkApi::User.where(params).first
+    # after finding based on email/phone, merge any additional info
+    params.merge!(@user_info)
     if @network_user.present?
-      @network_user = NetworkApi::User.update(params)
+      # perform an update
+      @network_user.attributes = params
+      @network_user.save
       return
     end
 
     params[:limited_user] = true
-    params.merge!(@user_info)
-
     @network_user = NetworkApi::User.create(params)
   end
 
@@ -77,7 +79,7 @@ class LimitedUserCreator < SimpleService
     @limited_user.created_at = @date_of_participation if @date_of_participation.present?
     saved = @limited_user.save
 
-    if user.persisted? && @date_of_participation.present?
+    if @limited_user.persisted? && @date_of_participation.present?
       create_test_audience_invitation(@limited_user)
     end
 
@@ -85,6 +87,10 @@ class LimitedUserCreator < SimpleService
   end
 
   def create_test_audience_invitation(user)
-    TestAudienceInvitation.create(user: user, created_at: @date_of_participation)
+    return unless @date_of_participation.present?
+    # this is a unique case where there was no test_audience but we want to record
+    # when we last contacted them
+    ta = TestAudienceInvitation.find_or_create_by(user: user, test_audience: nil)
+    ta.update(created_at: @date_of_participation)
   end
 end

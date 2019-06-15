@@ -24,30 +24,33 @@ namespace :respondents do
       begin
         phone = row[:mobile].present? ? Phony.normalize(row[:mobile]) : nil
       rescue Phony::NormalizationError
+        puts "PHONE ERROR #{row[:mobile]}"
         phone = nil
       end
 
       user_info = {
         first_name: row[:first_name],
         last_name: row[:last_name],
-      }
-      user_info[:phone] = phone if phone.present?
+        phone: phone,
+      }.compact # remove nils
 
-      success = LimitedUserCreator.call(
+      service = LimitedUserCreator.new(
         contact_info: row[:email],
         user_info: user_info,
         date_of_participation: Date.parse(row[:date_of_participation]),
       )
-
+      success = service.call
       if success
+        user = service.limited_user
+        user.update(feedback_contact_preference: :feedback_contact_yes)
         imported += 1
       else
         errors += 1
       end
     end
 
-    puts "Imported: #{imported}"
-    puts "Skipped: #{skipped}"
-    puts "Errors: #{errors}"
+    puts "Imported: #{imported} rows"
+    puts "Skipped: #{skipped} rows"
+    puts "Errors: #{errors} rows"
   end
 end
