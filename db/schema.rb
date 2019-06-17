@@ -290,9 +290,9 @@ ActiveRecord::Schema.define(version: 20190613230119) do
     t.bigint "user_id"
     t.bigint "survey_response_id"
     t.decimal "amount", precision: 10, scale: 2
+    t.decimal "current_balance", precision: 10, scale: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.float "current_balance"
     t.index ["survey_response_id"], name: "index_feedback_incentive_records_on_survey_response_id"
     t.index ["user_id"], name: "index_feedback_incentive_records_on_user_id"
   end
