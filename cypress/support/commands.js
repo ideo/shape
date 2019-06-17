@@ -86,7 +86,7 @@ Cypress.Commands.add(
 
 Cypress.Commands.add('createCard', cardType => {
   switch (cardType) {
-    case 'text':
+    case 'textItem':
       cy.selectBctType({ type: 'text' })
       cy.get('.ql-editor')
         .first()
