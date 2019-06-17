@@ -14,7 +14,7 @@ import SharingIcon from '~/ui/icons/SharingIcon'
 import SubmissionBoxIconSm from '~/ui/icons/SubmissionBoxIconSm'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import TagIcon from '~/ui/icons/TagIcon'
-import TrashIcon from '~/ui/icons/TrashIcon'
+import TrashXlIcon from '~/ui/icons/TrashXlIcon'
 
 @inject('uiStore')
 @observer
@@ -171,7 +171,7 @@ class ActionMenu extends React.Component {
       },
       {
         name: 'Delete',
-        iconRight: <TrashIcon />,
+        iconRight: <TrashXlIcon />,
         onClick: this.archiveCard,
       },
       {
