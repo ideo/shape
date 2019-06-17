@@ -101,6 +101,7 @@ class User < ApplicationRecord
            inverse_of: :created_by,
            foreign_key: :created_by_id
   has_one :application
+  has_many :test_audience_invitations, dependent: :destroy
 
   belongs_to :current_organization,
              class_name: 'Organization',
@@ -215,6 +216,9 @@ class User < ApplicationRecord
         user = User.find_or_initialize_by(email: attrs.email)
         user.status = User.statuses[:active]
       end
+      user.first_name = attrs[:first_name]
+      user.last_name = attrs[:last_name]
+      user.phone = attrs[:phone]
       user.invitation_token = nil
       user.password = Devise.friendly_token(40)
       user.password_confirmation = user.password
