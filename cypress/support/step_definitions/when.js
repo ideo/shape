@@ -21,17 +21,8 @@ When(
   }
 )
 
-When('I create a {word} item', itemType => {
-  cy.createItem(itemType)
-})
-
-When('I click the first text item', () => {
-  cy.locate('TextItemCover')
-    .first()
-    .click({ force: true })
-    .wait('@apiGetItem')
-    // clicking text item + loading + initializing quill seems to be happier if we wait a bit
-    .wait(500)
+When('I create a {word} card', itemType => {
+  cy.createCard(itemType)
 })
 
 When('I add a link URL {string} and wait for {string}', (url, request) => {
@@ -360,6 +351,15 @@ When('I click ... in the nav and select {string}', option => {
 // ----------------------
 // Items
 // ----------------------
+
+When('I click the first text item', () => {
+  cy.locate('TextItemCover')
+    .first()
+    .click({ force: true })
+    .wait('@apiGetItem')
+    // clicking text item + loading + initializing quill seems to be happier if we wait a bit
+    .wait(500)
+})
 
 When('I edit the report item', () => {
   cy.locate('CardAction-Edit')

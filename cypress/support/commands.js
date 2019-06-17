@@ -84,8 +84,8 @@ Cypress.Commands.add(
   }
 )
 
-Cypress.Commands.add('createItem', itemType => {
-  switch (itemType) {
+Cypress.Commands.add('createCard', cardType => {
+  switch (cardType) {
     case 'text':
       cy.selectBctType({ type: 'text' })
       cy.get('.ql-editor')
@@ -119,7 +119,7 @@ Cypress.Commands.add('createItem', itemType => {
       })
       break
     default:
-      cy.selectBctType({ type: itemType })
+      cy.selectBctType({ type: cardType })
       break
   }
 })
