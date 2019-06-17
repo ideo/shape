@@ -101,6 +101,7 @@ class User < ApplicationRecord
            inverse_of: :created_by,
            foreign_key: :created_by_id
   has_one :application
+  has_many :test_audience_invitations, dependent: :destroy
 
   belongs_to :current_organization,
              class_name: 'Organization',
@@ -118,6 +119,9 @@ class User < ApplicationRecord
   after_save :update_products_mailing_list_subscription, if: :saved_change_to_mailing_list?
   after_create :update_shape_user_list_subscription, if: :active?
   after_update :update_shape_user_list_subscription_after_update, if: :saved_change_to_status?
+
+  delegate :balance, to: :incentive_owed_account, prefix: true
+  delegate :balance, to: :incentive_paid_account, prefix: true
 
   def saved_change_to_name?
     saved_change_to_first_name? || saved_change_to_last_name?
@@ -215,6 +219,9 @@ class User < ApplicationRecord
         user = User.find_or_initialize_by(email: attrs.email)
         user.status = User.statuses[:active]
       end
+      user.first_name = attrs[:first_name]
+      user.last_name = attrs[:last_name]
+      user.phone = attrs[:phone]
       user.invitation_token = nil
       user.password = Devise.friendly_token(40)
       user.password_confirmation = user.password
@@ -425,18 +432,6 @@ class User < ApplicationRecord
     application.present?
   end
 
-  def current_incentive_balance
-    last_record = feedback_incentive_records.order(created_at: :desc).first
-    last_record ? last_record.current_balance : 0
-  end
-
-
-  def incentive_due_date
-    first_record = feedback_incentive_records.order(created_at: :asc).first
-    return if first_record.blank?
-    first_record.created_at  + FeedbackIncentiveRecord::PAYMENT_WAITING_PERIOD
-  end
-
   def network_user
     NetworkApi::User.find(uid).first
   end
@@ -449,6 +444,27 @@ class User < ApplicationRecord
   rescue JsonApiClient::Errors::NotAuthorized
     # shouldn't happen since we are already escaping `unless limited?`
     nil
+  end
+
+  def incentive_owed_account
+    DoubleEntry.account(:individual_owed, scope: self)
+  end
+
+  def incentive_paid_account
+    DoubleEntry.account(:individual_paid, scope: self)
+  end
+
+  def incentive_due_date
+    return if incentive_owed_account_balance.zero?
+    lines = Accounting::Query.lines_for_account(incentive_owed_account, code: :incentive_owed, order: :desc)
+    first_line_owed = nil
+    # Iterate through lines to find when the balance was last zero
+    lines.each do |line|
+      break if line.balance.zero?
+      first_line_owed = line
+    end
+    return if first_line_owed.blank?
+    first_line_owed.created_at + TestAudience::PAYMENT_WAITING_PERIOD
   end
 
   private

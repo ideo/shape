@@ -186,6 +186,8 @@ class TestSurveyResponder extends React.Component {
     })
     const nextCard = questionCards[index + 1]
     if (!nextCard) return
+    if (this.hasFinishedSurvey(nextCard)) this.refreshUserAfterSurvey()
+
     scroller.scrollTo(`card-${nextCard.id}`, {
       duration: 400,
       smooth: true,
@@ -194,6 +196,15 @@ class TestSurveyResponder extends React.Component {
       // when inside ActivityLog we want to account for the header at the top
       offset: containerId ? -75 : 0,
     })
+  }
+
+  hasFinishedSurvey(nextCard) {
+    return nextCard.card_question_type === 'question_finish'
+  }
+
+  refreshUserAfterSurvey() {
+    const { apiStore } = this.props
+    apiStore.loadCurrentUser()
   }
 
   render() {

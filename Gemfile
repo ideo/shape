@@ -122,6 +122,9 @@ gem "twilio-ruby"
 gem 'interactor'
 gem 'interactor-schema'
 
+# Double-entry accounting system
+gem 'double_entry', '~> 2.0.0.beta1'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
@@ -164,6 +167,7 @@ group :test do
   gem 'json-schema'
   gem 'vcr'
   gem 'webmock'
+  gem 'timecop'
 end
 
 group :production do
