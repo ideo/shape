@@ -92,7 +92,7 @@ class Item
       parent_collection ||= parent
       builder = CollectionCardBuilder.new(
         params: {
-          order: 3, # default legend position on inserts
+          order: parent_collection_card.order + 1,
           width: 1,
           height: 2,
           item_attributes: {

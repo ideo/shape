@@ -312,6 +312,31 @@ describe Collection::TestCollection, type: :model do
             )
           end
 
+          context 'with more scaled questions', only: true do
+            let!(:scale_questions) { create_list(:question_item, 2, parent_collection: test_collection) }
+            let(:legend_item) { test_collection.items.legend_items.first }
+
+            it 'should create a LegendItem at the 3rd spot (order == 2)' do
+              expect(test_collection.launch!(initiated_by: user)).to be true
+              expect(legend_item.parent_collection_card.order).to eq 2
+              expect(
+                test_collection
+                .collection_cards
+                .reload
+                .map { |card| card.record.class },
+              ).to eq(
+                [
+                  Item::VideoItem,
+                  Item::DataItem,
+                  Item::LegendItem,
+                  Item::DataItem,
+                  Item::DataItem,
+                  Collection::TestDesign,
+                ],
+              )
+            end
+          end
+
           it 'should update the status to "live"' do
             expect(test_collection.launch!(initiated_by: user)).to be true
             expect(test_collection.live?).to be true
