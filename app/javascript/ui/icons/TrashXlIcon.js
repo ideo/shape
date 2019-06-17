@@ -1,8 +1,13 @@
 import Icon from './Icon'
 
-const TrashIconXl = () => (
+const TrashXlIcon = () => (
   <Icon fill>
-    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      version="1.1"
+      id="Layer_1"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 120 120"
+    >
       <g>
         <path
           d="M102.5,21.9h-7.8H79.5V9.7c0-1.7-1.3-3-3-3h-33c-1.7,0-3,1.3-3,3v12.3H26.6h-9.1c-1.7,0-3,1.3-3,3s1.3,3,3,3h6.1v77
@@ -17,4 +22,4 @@ const TrashIconXl = () => (
   </Icon>
 )
 
-export default TrashIconXl
+export default TrashXlIcon
