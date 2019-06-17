@@ -84,6 +84,46 @@ Cypress.Commands.add(
   }
 )
 
+Cypress.Commands.add('createCard', cardType => {
+  switch (cardType) {
+    case 'text':
+      cy.selectBctType({ type: 'text' })
+      cy.get('.ql-editor')
+        .first()
+        .type('Testing')
+      cy.locate('TextItemClose')
+        .first()
+        .click({ force: true })
+      cy.wait('@apiCreateCollectionCard')
+      cy.wait(50)
+      break
+    case 'data':
+      cy.selectPopoutTemplateBctType({
+        type: 'report',
+        order: 'first',
+        empty: true,
+      })
+      break
+    case 'submissionBox':
+      cy.selectPopoutTemplateBctType({
+        type: 'submissionBox',
+        order: 'first',
+        empty: false,
+      })
+      break
+    case 'template':
+      cy.selectPopoutTemplateBctType({
+        type: 'template',
+        order: 'first',
+        empty: false,
+      })
+      break
+    default:
+      cy.selectBctType({ type: cardType })
+      break
+  }
+})
+
 Cypress.Commands.add('createTextItem', () => {
   cy.selectBctType({ type: 'text' })
   cy.get('.ql-editor')
@@ -93,12 +133,6 @@ Cypress.Commands.add('createTextItem', () => {
     .first()
     .click({ force: true })
   cy.wait('@apiUpdateItem')
-  cy.wait('@apiCreateCollectionCard')
-  cy.wait(50)
-})
-
-Cypress.Commands.add('createDataItem', () => {
-  cy.selectBctType({ type: 'report', order: 'first', empty: true })
   cy.wait('@apiCreateCollectionCard')
   cy.wait(50)
 })
@@ -152,19 +186,64 @@ Cypress.Commands.add(
         [order]()
         .click({ force: true })
     }
-    if (type === 'report') {
-      cy.locate('BctButton-more')
-        .last()
-        .click({ force: true })
-      cy.wait(100)
-      cy.locate('PopoutMenu_createReport')
-        .first()
-        .click({ force: true })
-      return
+    switch (type) {
+      case 'file':
+        cy.wait(1000)
+        break
+      default:
+        break
     }
     cy.locate(`BctButton-${type}`)
       .first()
       .click({ force: true })
+  }
+)
+
+Cypress.Commands.add(
+  'selectPopoutTemplateBctType',
+  ({ type, empty = false, order = 'last' }) => {
+    if (!empty) {
+      cy.locateDataOrClass('.StyledHotspot')
+        [order]()
+        .click({ force: true })
+    }
+    cy.locate('BctButton-more')
+      .last()
+      .click({ force: true })
+    cy.wait(100)
+    switch (type) {
+      case 'template':
+        cy.locate('PopoutMenu_createTemplate')
+          .first()
+          .click({ force: true })
+        cy.locate('CollectionCreatorTextField')
+          .first()
+          .click()
+          .type('Test Template')
+        break
+      case 'report':
+        cy.locate('PopoutMenu_createReport')
+          .first()
+          .click({ force: true })
+        return
+      case 'submissionBox':
+        cy.locate('PopoutMenu_createSubmissionBox')
+          .first()
+          .click({ force: true })
+        cy.locate('CollectionCreatorTextField')
+          .first()
+          .click()
+          .type('Submissions')
+        break
+      default:
+        break
+    }
+    cy.locate(`CollectionCreatorFormButton`)
+      .first()
+      .click({ force: true })
+    cy.wait('@apiCreateCollectionCard')
+    cy.wait(50)
+    return
   }
 )
 

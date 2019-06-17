@@ -5,7 +5,7 @@ Feature: Data Item
     And I create a normal collection named "Test data items"
     And I navigate to the collection named "Test data items" via the "CollectionCover"
 
-    And I create a data item
+    And I create a data card
     Then I should see a "DataItemCover" in the first card
     Then I should see 1 for the single data value
 
