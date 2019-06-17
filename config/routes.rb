@@ -159,6 +159,7 @@ Rails.application.routes.draw do
       namespace :admin do
         resources :users, only: %i[index destroy create]
         resources :test_collections, only: %i[index]
+        resources :feedback_incentives, only: %i[index]
       end
     end
   end

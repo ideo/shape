@@ -4,7 +4,7 @@
 #
 #  id                 :bigint(8)        not null, primary key
 #  amount             :decimal(10, 2)
-#  current_balance    :decimal(10, 2)
+#  current_balance    :float
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  survey_response_id :bigint(8)
@@ -25,6 +25,4 @@ class FeedbackIncentiveRecord < ApplicationRecord
   belongs_to :user
   belongs_to :survey_response
   validates :survey_response, uniqueness: true
-
-  PAYMENT_WAITING_PERIOD = 1.week
 end

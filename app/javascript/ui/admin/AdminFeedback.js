@@ -5,10 +5,12 @@ import CopyToClipboard from 'react-copy-to-clipboard'
 import { Flex } from 'reflexbox'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
+import { uiStore } from '~/stores'
 import Box from '~shared/components/atoms/Box'
 import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import LeftButtonIcon from '~/ui/icons/LeftButtonIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
+import DownloadIcon from '~/ui/icons/DownloadIcon'
 import Section from '~shared/components/molecules/Section'
 import v from '~/utils/variables'
 import { CircledIcon } from '~/ui/global/styled/buttons'
@@ -88,6 +90,17 @@ const NextPageButton = styled(PaginationButton)`
 `
 NextPageButton.displayName = 'NextPageButton'
 
+const ExportIncentivesButton = styled(Heading3)`
+  cursor: pointer;
+  display: inline-block;
+  .icon {
+    width: 26px;
+    height: 26px;
+    margin-right: 7px;
+    vertical-align: middle;
+  }
+`
+
 @inject('apiStore', 'uiStore')
 @observer
 class AdminFeedback extends React.Component {
@@ -109,6 +122,14 @@ class AdminFeedback extends React.Component {
       currentPage: page,
       totalPages: testCollections.totalPages,
     })
+  }
+
+  handleDownloadFeedbackIncentives = () => {
+    window.location.href = '/api/v1/admin/feedback_incentives.csv'
+    uiStore.popupSnackbar({
+      message: 'All incentives marked as paid!',
+    })
+    return false
   }
 
   loadPreviousPage() {
@@ -219,9 +240,23 @@ class AdminFeedback extends React.Component {
         />
         <Heading1>Feedback</Heading1>
         <Section>
-          <Box mb={40}>
-            <Heading2 data-cy="AdminHeader">All Shape Feedback</Heading2>
-          </Box>
+          <Grid container>
+            <Grid item xs={6}>
+              <Box mb={40}>
+                <Heading2 data-cy="AdminHeader">All Shape Feedback</Heading2>
+              </Box>
+            </Grid>
+            <Grid item xs={6}>
+              <Flex justify="flex-end">
+                <ExportIncentivesButton
+                  onClick={this.handleDownloadFeedbackIncentives}
+                >
+                  <DownloadIcon />
+                  Export Pending Incentives
+                </ExportIncentivesButton>
+              </Flex>
+            </Grid>
+          </Grid>
           <Grid container>
             <Grid data-cy="AdminRowHeaderWrapper" container>
               <Grid item xs={2}>

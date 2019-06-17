@@ -6,7 +6,7 @@ FactoryBot.define do
 
     trait :fully_answered do
       after(:build) do |survey_response|
-        survey_response.test_collection.question_items.each do |question_item|
+        survey_response.test_collection.question_items.answerable.each do |question_item|
           survey_response.question_answers << build(
             :question_answer,
             survey_response: survey_response,
