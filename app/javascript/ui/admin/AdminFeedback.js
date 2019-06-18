@@ -17,7 +17,6 @@ import SearchLargeIcon from '~/ui/icons/SearchLargeIcon'
 import DownloadIcon from '~/ui/icons/DownloadIcon'
 import Section from '~shared/components/molecules/Section'
 import v from '~/utils/variables'
-import { CircledIcon } from '~/ui/global/styled/buttons'
 import { Heading1, Heading2, Heading3 } from '~/ui/global/styled/typography'
 import Tooltip from '~/ui/global/Tooltip'
 import * as colors from '~shared/styles/constants/colors'
@@ -55,6 +54,11 @@ const AudienceRowItem = styled(Grid)`
 `
 AudienceRowItem.displayName = 'AudienceRowItem'
 
+const SizedIcon = styled.div`
+  height: 20px;
+  width: 20px;
+`
+
 const AudienceWrapper = styled(Flex)`
   ${showOnHoverCss};
   position: relative;
@@ -64,10 +68,6 @@ const AudienceWrapper = styled(Flex)`
     contents. the AudienceAction buttons had the effect of pushing the
     audience name down.
   */
-`
-
-const AudienceAction = styled.div`
-  margin-left: 8px;
 `
 
 const PaginationWrapper = styled.div`
@@ -221,55 +221,53 @@ class AdminFeedback extends React.Component {
                         {testCollection.audience.name}
                       </div>
                       <Flex className="show-on-hover">
-                        <AudienceAction>
+                        <IconAvatar
+                          color={v.colors.black}
+                          backgroundColor={v.colors.commonLight}
+                          data-cy="NewQueryButton"
+                          title="start new query"
+                          onClick={() => this.showNewQueryRow(testCollection)}
+                        >
+                          <SearchLargeIcon />
+                        </IconAvatar>
+                        <CopyToClipboard
+                          text={`${testCollection.publicTestURL}?ta=${
+                            testCollection.id
+                          }`}
+                          onCopy={() =>
+                            this.props.uiStore.popupSnackbar({
+                              message: 'Survey link copied',
+                            })
+                          }
+                        >
                           <IconAvatar
                             color={v.colors.black}
                             backgroundColor={v.colors.commonLight}
-                            data-cy="NewQueryButton"
-                            title="start new query"
-                            onClick={() => this.showNewQueryRow(testCollection)}
+                            title="copy survey link"
                           >
-                            <SearchLargeIcon />
+                            <SizedIcon>
+                              <LinkIcon />
+                            </SizedIcon>
                           </IconAvatar>
-                        </AudienceAction>
-                        <AudienceAction>
-                          <Tooltip
-                            classes={{ tooltip: 'Tooltip' }}
-                            title={'copy survey link'}
-                            placement="top"
+                        </CopyToClipboard>
+                        <Tooltip
+                          classes={{ tooltip: 'Tooltip' }}
+                          title={'view audience definition'}
+                          placement="top"
+                        >
+                          <IconAvatar
+                            color={v.colors.black}
+                            backgroundColor={v.colors.commonLight}
+                            data-cy="AudienceInfoButton"
+                            onClick={() => {
+                              this.showAdminAudienceDialog(testCollection)
+                            }}
                           >
-                            <CopyToClipboard
-                              text={`${testCollection.publicTestURL}?ta=${
-                                testCollection.id
-                              }`}
-                              onCopy={() =>
-                                this.props.uiStore.popupSnackbar({
-                                  message: 'Survey link copied',
-                                })
-                              }
-                            >
-                              <CircledIcon>
-                                <LinkIcon />
-                              </CircledIcon>
-                            </CopyToClipboard>
-                          </Tooltip>
-                        </AudienceAction>
-                        <AudienceAction>
-                          <Tooltip
-                            classes={{ tooltip: 'Tooltip' }}
-                            title={'view audience definition'}
-                            placement="top"
-                          >
-                            <CircledIcon
-                              data-cy="AudienceInfoButton"
-                              onClick={() =>
-                                this.showAdminAudienceDialog(testCollection)
-                              }
-                            >
+                            <SizedIcon>
                               <InfoNoCircleIcon />
-                            </CircledIcon>
-                          </Tooltip>
-                        </AudienceAction>
+                            </SizedIcon>
+                          </IconAvatar>
+                        </Tooltip>
                       </Flex>
                     </AudienceWrapper>
                   </AudienceRowItem>
