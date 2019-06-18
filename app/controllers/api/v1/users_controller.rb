@@ -52,9 +52,19 @@ class Api::V1::UsersController < Api::V1::BaseController
   end
 
   def update_current_user_demographics
-    render jsonapi: current_user, class: {
-      User: SerializableCurrentUser,
-    }
+    category = json_api_params.require(:category).to_sym
+    tags = json_api_params.require(:tags)
+
+    if Audience::DEMOGRAPHIC_TAGS.include? category
+      current_user.set_tag_list_on(category, tags)
+      current_user.save
+
+      render jsonapi: current_user, class: {
+        User: SerializableCurrentUser,
+      }
+    else
+      render_api_errors current_user.errors
+    end
   end
 
   def create_limited_user

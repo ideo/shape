@@ -132,6 +132,40 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
     end
   end
 
+  describe 'PATCH #update_current_user_demographics' do
+    let(:path) { '/api/v1/users/update_current_user_demographics' }
+    let(:params) do
+      {
+        category: 'ages',
+        tags: ['young'],
+      }.to_json
+    end
+
+    it 'returns a 200' do
+      patch(path, params: params)
+      expect(response.status).to eq(200)
+    end
+
+    it 'modifies age_list' do
+      expect(user.age_list).to eq([])
+      patch(path, params: params)
+      expect(user.reload.age_list).to eq(['young'])
+    end
+
+    it 'clears age_list when modifying' do
+      user.age_list = ['old']
+      user.save
+
+      patch(path, params: params)
+      expect(user.reload.age_list).to eq(['young'])
+    end
+
+    it 'returns an error on invalid category' do
+      patch(path, params: { category: 'bad', tags: ['testing'] }.to_json)
+      expect(response.status).to eq(422)
+    end
+  end
+
   describe 'POST #create_limited_user', auth: false, create_org: false do
     let(:path) { '/api/v1/users/create_limited_user' }
     let(:raw_params) do
