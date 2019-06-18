@@ -460,13 +460,13 @@ class ApiStore extends jsonapi(datxCollection) {
     return res.data
   }
 
-  async fetchOrganizationAudiences(orgId) {
-    const res = await this.request(`organizations/${orgId}/audiences`, 'GET')
-    const audiences = res.data
-    return audiences
+  fetchOrganizationAudiences(orgId) {
+    // removeAll first, in case you had switched orgs
+    this.removeAll('audiences')
+    return this.request(`organizations/${orgId}/audiences`, 'GET')
   }
 
-  async createTemplateInstance(data) {
+  createTemplateInstance(data) {
     return this.request('collections/create_template', 'POST', data)
   }
 

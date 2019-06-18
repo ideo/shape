@@ -3,6 +3,9 @@
 # Table name: survey_responses
 #
 #  id                 :bigint(8)        not null, primary key
+#  incentive_owed_at  :datetime
+#  incentive_paid_at  :datetime
+#  incentive_status   :integer
 #  session_uid        :text
 #  status             :integer          default("in_progress")
 #  created_at         :datetime         not null
@@ -13,6 +16,7 @@
 #
 # Indexes
 #
+#  index_survey_responses_on_incentive_status    (incentive_status)
 #  index_survey_responses_on_session_uid         (session_uid) UNIQUE
 #  index_survey_responses_on_test_audience_id    (test_audience_id)
 #  index_survey_responses_on_test_collection_id  (test_collection_id)
@@ -24,18 +28,54 @@ class SurveyResponse < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :test_audience, optional: true
   has_many :question_answers, dependent: :destroy
+  # Deprecating this - storing status on this record and in accounting double entry records
   has_one :feedback_incentive_record
 
+  before_create :set_default_incentive_status, if: :gives_incentive?
   before_save :mark_as_completed, if: :mark_as_completed?
 
-  delegate :question_items, to: :test_collection
-  delegate :answerable_complete_question_items, to: :test_collection
+  delegate :question_items, :answerable_complete_question_items,
+           to: :test_collection
+
+  delegate :price_per_response,
+           to: :test_audience,
+           allow_nil: true
+
+  delegate :incentive_owed_account_balance,
+           :incentive_paid_account_balance,
+           to: :user,
+           allow_nil: true
 
   enum status: {
     in_progress: 0,
     completed: 1,
     completed_late: 2,
   }
+
+  enum incentive_status: {
+    incentive_unearned: 0,
+    incentive_owed: 1,
+    incentive_paid: 2,
+  }
+
+  def record_incentive_owed!
+    return if !incentive_unearned? || amount_earned.zero?
+    Accounting::RecordTransfer.incentive_owed(self)
+    update(incentive_status: :incentive_owed, incentive_owed_at: Time.current)
+    incentive_owed_account_balance
+  end
+
+  def record_incentive_paid!
+    return if !incentive_owed? || amount_earned.zero? || !incentive_owed_account_balance.positive?
+    Accounting::RecordTransfer.incentive_paid(self)
+    update(incentive_status: :incentive_paid, incentive_paid_at: Time.current)
+    incentive_paid_account_balance
+  end
+
+  def amount_earned
+    return 0 if !completed? || !gives_incentive?
+    TestAudience.incentive_amount
+  end
 
   def all_questions_answered?
     # nil case should only happen in test env (test_design is not created)
@@ -57,7 +97,15 @@ class SurveyResponse < ApplicationRecord
     test_collection.parent_submission.cache_test_scores!
   end
 
+  def gives_incentive?
+    test_audience&.paid? ? true : false
+  end
+
   private
+
+  def set_default_incentive_status
+    self.incentive_status ||= :incentive_unearned
+  end
 
   def mark_as_completed?
     in_progress? && all_questions_answered?

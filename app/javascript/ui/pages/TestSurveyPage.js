@@ -120,8 +120,10 @@ class TestSurveyPage extends React.Component {
   render() {
     return (
       <React.Fragment>
-        {this.currentUser ? <RespondentBanner user={this.currentUser} /> : null}
         <StyledBg>
+          {this.currentUser ? (
+            <RespondentBanner user={this.currentUser} />
+          ) : null}
           <LogoWrapper>
             <Logo withText width={83} />
           </LogoWrapper>

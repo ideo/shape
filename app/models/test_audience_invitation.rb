@@ -22,7 +22,7 @@
 #
 
 class TestAudienceInvitation < ApplicationRecord
-  belongs_to :test_audience
+  belongs_to :test_audience, optional: true
   belongs_to :user
   delegate :test_collection, to: :test_audience
 
