@@ -17,6 +17,7 @@ const captureGlobalKeypress = e => {
   switch (e.code) {
     case 'KeyX':
       if (e.metaKey || e.ctrlKey) {
+        if (!uiStore.viewingCollection) return
         uiStore.openMoveMenu({
           from: uiStore.viewingCollection.id, // CTRL+X: Move
           cardAction: 'move',
@@ -24,11 +25,13 @@ const captureGlobalKeypress = e => {
       }
       break
     case 'KeyC':
-      if (e.metaKey || e.ctrlKey)
+      if (e.metaKey || e.ctrlKey) {
+        if (!uiStore.viewingCollection) return
         uiStore.openMoveMenu({
           from: uiStore.viewingCollection.id, // CTRL+C: Duplicate
           cardAction: 'duplicate',
         })
+      }
       break
     case 'KeyV':
       if (e.metaKey || e.ctrlKey) {
