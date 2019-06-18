@@ -3,6 +3,7 @@ import { computed } from 'mobx'
 import queryString from 'query-string'
 
 import { apiStore, uiStore } from '~/stores'
+import { stringifyUrlParams } from '~/utils/url'
 
 // mobx-react-router with a couple of helper methods
 class RoutingStore extends RouterStore {
@@ -26,7 +27,7 @@ class RoutingStore extends RouterStore {
     return queryString.parse(this.location.search)
   }
 
-  pathTo = (type, id = null) => {
+  pathTo = (type, id = null, params = {}) => {
     switch (type) {
       case 'collections':
         return `/${this.slug()}/collections/${id}`
@@ -36,7 +37,7 @@ class RoutingStore extends RouterStore {
         // `id` means query in this case
         const path = `/${this.slug()}/search`
         const qs = id ? `?q=${encodeURIComponent(id)}` : ''
-        return `${path}${qs}`
+        return `${path}${qs}&${stringifyUrlParams(params)}`
       case 'admin':
         return '/admin'
       case 'homepage':
@@ -45,7 +46,7 @@ class RoutingStore extends RouterStore {
     }
   }
 
-  routeTo = (type, id = null) => {
+  routeTo = (type, id = null, params = {}) => {
     this.routingTo = { type, id }
 
     // prevent accidental route changes while you are dragging/moving into collection
@@ -65,7 +66,7 @@ class RoutingStore extends RouterStore {
     if (type === 'search') {
       this.updatePreviousPageBeforeSearch(this.location)
     }
-    const path = this.pathTo(type, id)
+    const path = this.pathTo(type, id, params)
     this.push(path)
   }
 

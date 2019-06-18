@@ -72,8 +72,9 @@ class Api::V1::SearchController < Api::V1::BaseController
       order_opts = { params[:order_by] => params[:order_direction] }
     end
 
-    if params[:include_archived].present?
-      where_clause.delete(:archived)
+    if params[:show_archived].present?
+      # Only show deleted content when this is included
+      where_clause[:archived] = true
     end
 
     # super_admin has access to everything regardless of user/group_ids
