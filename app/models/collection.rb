@@ -524,10 +524,12 @@ class Collection < ApplicationRecord
 
   def unarchive_cards!(cards, card_attrs_snapshot)
     cards.each(&:unarchive!)
-    CollectionUpdater.call(self, card_attrs_snapshot)
+    if card_attrs_snapshot.present?
+      CollectionUpdater.call(self, card_attrs_snapshot)
+    end
     reorder_cards!
     # if snapshot includes card attrs then CollectionUpdater will trigger the same thing
-    return unless master_template? && card_attrs_snapshot[:collection_cards_attributes].blank?
+    return unless master_template? && card_attrs_snapshot && card_attrs_snapshot[:collection_cards_attributes].blank?
     queue_update_template_instances
   end
 
