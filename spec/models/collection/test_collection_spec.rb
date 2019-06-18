@@ -312,7 +312,7 @@ describe Collection::TestCollection, type: :model do
             )
           end
 
-          context 'with more scaled questions', only: true do
+          context 'with more scaled questions' do
             let!(:scale_questions) { create_list(:question_item, 2, parent_collection: test_collection) }
             let(:legend_item) { test_collection.items.legend_items.first }
 

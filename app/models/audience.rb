@@ -31,6 +31,8 @@ class Audience < ApplicationRecord
   has_many :organizations, through: :audience_organizations
   has_many :test_audiences, dependent: :destroy
 
+  validates :name, presence: true
+
   delegate :can_edit?,
            :can_view?,
            to: :organization,
