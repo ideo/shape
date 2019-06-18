@@ -1,6 +1,6 @@
 Feature: Sharing a collection
   Scenario: Adding an existing org member to a collection and removing them
-    Given I login and visit My Collection
+    Given I login and visit the Test Area
     And I click the ".AddButton"
     And I wait for "@apiSearchUsersAndGroups" to finish
     And I wait for "@apiSearchUsersAndGroups" to finish
