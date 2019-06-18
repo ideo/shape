@@ -9,6 +9,7 @@ import Deactivated from '~/ui/layout/Deactivated'
 import MoveModal from '~/ui/grid/MoveModal'
 import PageContainer from '~/ui/layout/PageContainer'
 import SearchResultsInfinite from '~/ui/search/SearchResultsInfinite'
+import { stringifyUrlParams } from '~/utils/url'
 
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
@@ -109,9 +110,20 @@ class SearchPage extends React.Component {
     return query
   }
 
+  searchParams = location => {
+    const parsedParams = queryString.parse(location.search)
+    const params = parsedParams
+    delete params.q
+    if (!params) return {}
+    return params
+  }
+
   requestPath = (page = 1) => {
     const q = this.searchQuery(this.props.location, { url: true })
-    return `organizations/${this.urlSlug}/search?query=${q}&page=${page}`
+    const params = stringifyUrlParams(this.searchParams(this.props.location))
+    return `organizations/${
+      this.urlSlug
+    }/search?query=${q}&page=${page}&${params}`
   }
 
   handleInfiniteLoad = page => {
