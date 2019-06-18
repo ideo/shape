@@ -30,12 +30,18 @@ function optionSort(a, b) {
 }
 
 const questionSelectOption = opt => {
-  const { value, label, category } = opt
-
+  const { value, label, category, isOptionDisabled = false } = opt
   let rootClass
-  if (category) rootClass = 'category'
-  else if (!value) rootClass = 'grayedOut'
-  else rootClass = 'selectOption'
+  let disabled = false
+  if (category) {
+    rootClass = 'category'
+    disabled = true
+  } else if (isOptionDisabled) {
+    rootClass = 'grayedOut'
+    disabled = true
+  } else {
+    rootClass = 'selectOption'
+  }
 
   return (
     <SelectOption
@@ -44,7 +50,7 @@ const questionSelectOption = opt => {
         root: rootClass,
         selected: 'selected',
       }}
-      disabled={!value}
+      disabled={disabled}
       value={value}
     >
       <span data-cy="QuestionSelectOption">{label}</span>
@@ -57,6 +63,7 @@ const QuestionSelectHolder = ({
   canEdit,
   handleSelectChange,
   handleTrash,
+  selectedQuestionTypes,
 }) => {
   const blank = !card.card_question_type
   return (
@@ -86,7 +93,30 @@ const QuestionSelectHolder = ({
                 category: true,
               })
             }
-            optGroup.values.sort(optionSort).forEach(opt => options.push(opt))
+            optGroup.values.sort(optionSort).forEach(opt => {
+              const { value } = opt
+              const scaledRatingQuestionTypes = [
+                'question_clarity',
+                'question_different',
+                'question_excitement',
+                'question_useful',
+              ]
+
+              const isValueSelected = selectedQuestionTypes.indexOf(value) >= 0
+              const isValueAScaledQuestion =
+                scaledRatingQuestionTypes.indexOf(value) >= 0
+
+              // scaledRating should be disabled when value is null
+              // or if scaled rating question type already exists in the test designer
+              const shouldBeDisabled =
+                !value || (isValueSelected && isValueAScaledQuestion)
+
+              const disabledOptions = {
+                isOptionDisabled: shouldBeDisabled,
+              }
+
+              options.push({ ...opt, ...disabledOptions })
+            })
             return options.map(opt => questionSelectOption(opt))
           })}
         </Select>
@@ -115,6 +145,7 @@ QuestionSelectHolder.propTypes = {
   canEdit: PropTypes.bool.isRequired,
   handleSelectChange: PropTypes.func.isRequired,
   handleTrash: PropTypes.func.isRequired,
+  selectedQuestionTypes: PropTypes.array.isRequired,
 }
 
 export default QuestionSelectHolder

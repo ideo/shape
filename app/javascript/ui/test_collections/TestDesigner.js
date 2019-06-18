@@ -330,6 +330,9 @@ class TestDesigner extends React.Component {
   render() {
     const { collection } = this.props
     const cardCount = collection.sortedCards.length
+    const selectedQuestionTypes = collection.sortedCards.map(
+      c => c.record.question_type
+    )
     const inner = collection.sortedCards.map((card, i) => {
       let position
       const item = card.record
@@ -351,6 +354,7 @@ class TestDesigner extends React.Component {
               canEdit={this.canEdit}
               handleSelectChange={this.handleSelectChange}
               handleTrash={this.handleTrash}
+              selectedQuestionTypes={selectedQuestionTypes}
             />
             <TestQuestionHolder editing userEditable={userEditable}>
               <TestQuestion
