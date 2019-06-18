@@ -28,6 +28,14 @@ namespace :cypress do
     create_cards(user.current_user_collection, user)
     create_events(organization)
     create_test_collection(organization)
+    reindex
+  end
+
+  def reindex
+    User.reindex
+    Collection.reindex
+    Group.reindex
+    Item.reindex
   end
 
   def create_cards(collection, user)

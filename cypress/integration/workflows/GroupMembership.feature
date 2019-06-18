@@ -1,6 +1,6 @@
 Feature: Group membership
   Scenario: Adding an existing org member to a group and removing them
-    Given I login and visit the Test Area
+    Given I login and visit My Collection
     And I click the "OrgMenuBtn"
     And I click the "PopoutMenu_peopleGroups"
     Then I should see a "DialogContent"
@@ -12,5 +12,5 @@ Feature: Group membership
     And I wait for 1 second
     # Then I should see 2 active users
     When I remove the user from the group sharing modal
-    # And I wait for 1 second
+    And I wait for 1 second
     # Then I should see 1 active user
