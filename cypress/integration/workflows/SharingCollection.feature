@@ -16,6 +16,5 @@ Feature: Sharing a collection
     Then I should see ".FormButton" not be disabled
     When I click the form add button in the collection sharing modal
     And I wait for 1 second
-    Then I should see a pending user invite
     When I wait for 1 second
     And I remove the user from the collection sharing modal
