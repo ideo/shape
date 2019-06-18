@@ -16,16 +16,18 @@
 #
 
 class Audience < ApplicationRecord
-  acts_as_taggable_on(
-    :ages,
-    :children_ages,
-    :countries,
-    :education_levels,
-    :genders,
-    :adopter_types,
-    :interests,
-    :publications,
-  )
+  DEMOGRAPHIC_TAGS = %i[
+    ages
+    children_ages
+    countries
+    education_levels
+    genders
+    adopter_types
+    interests
+    publications
+  ].freeze
+
+  acts_as_taggable_on(DEMOGRAPHIC_TAGS)
 
   has_many :audience_organizations, dependent: :destroy
   has_many :organizations, through: :audience_organizations
