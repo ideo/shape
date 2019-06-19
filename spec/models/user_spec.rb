@@ -13,7 +13,6 @@ describe User, type: :model do
     it { should have_many :comments }
     it { should have_many :activities_as_actor }
     it { should have_many :notifications }
-    it { should have_many :feedback_incentive_records }
 
     context 'as application bot user' do
       let(:organizations) { create_list(:organization, 2) }
@@ -633,16 +632,6 @@ describe User, type: :model do
     end
   end
 
-  describe '#current_incentive_balance' do
-    let!(:feedback_incentive_record1) { create(:feedback_incentive_record, amount: 2, current_balance: 2, user: user) }
-    let!(:feedback_incentive_record2) { create(:feedback_incentive_record, amount: 4, current_balance: 6, user: user) }
-
-    it 'gets the balance from the most recent record' do
-      expect(user.feedback_incentive_records.count).to eq 2
-      expect(user.current_incentive_balance).to eq feedback_incentive_record2.current_balance
-    end
-  end
-
   describe '#network_user' do
     let(:user) { create(:user) }
 
@@ -654,18 +643,44 @@ describe User, type: :model do
 
   describe '#incentive_due_date' do
     let(:user) { create(:user) }
+    let(:test_collection) { create(:test_collection) }
+    let(:test_audience) { create(:test_audience, :payment, price_per_response: 2.50, test_collection: test_collection) }
 
-    it 'is nil without an incentive record' do
+    it 'is nil without a balance' do
+      expect(user.incentive_owed_account_balance.to_f).to eq(0.0)
+      expect(user.incentive_paid_account_balance.to_f).to eq(0.0)
       expect(user.incentive_due_date).to be_nil
     end
 
-    context 'with incentive record' do
-      let!(:incentive) { create(:feedback_incentive_record, user: user) }
+    # Truncation must be used when testing double entry
+    context 'with a balance', truncate: true do
+      let!(:paid_survey_response) { create(:survey_response, user: user, test_audience: test_audience) }
+      let!(:unpaid_survey_response) { create(:survey_response, user: user, test_audience: test_audience) }
+      let!(:prev_survey_completed_at) { 3.days.ago }
+      before do
+        # Mock out methods so we don't have to complete the response in this spec
+        allow(paid_survey_response).to receive(:amount_earned).and_return(test_audience.price_per_response)
+        allow(unpaid_survey_response).to receive(:amount_earned).and_return(test_audience.price_per_response)
+        Timecop.travel prev_survey_completed_at do
+          Accounting::RecordTransfer.incentive_owed(paid_survey_response)
+          Accounting::RecordTransfer.incentive_paid(paid_survey_response)
+          Accounting::RecordTransfer.incentive_owed(unpaid_survey_response)
+        end
+      end
 
       it 'is first incentive created_at + waiting period' do
+        expect(user.incentive_owed_account_balance.to_f).to eq(2.50)
+        expect(user.incentive_paid_account_balance.to_f).to eq(2.50)
         expect(user.incentive_due_date).to be_within(0.1).of(
-          incentive.created_at + FeedbackIncentiveRecord::PAYMENT_WAITING_PERIOD,
+          prev_survey_completed_at + TestAudience::PAYMENT_WAITING_PERIOD,
         )
+      end
+
+      it 'is nil after paid' do
+        Accounting::RecordTransfer.incentive_paid(unpaid_survey_response)
+        expect(user.incentive_due_date).to be_nil
+        expect(user.incentive_owed_account_balance.to_f).to eq(0.0)
+        expect(user.incentive_paid_account_balance.to_f).to eq(5.00)
       end
     end
   end

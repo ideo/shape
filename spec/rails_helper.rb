@@ -50,7 +50,7 @@ RSpec.configure do |config|
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false
   # instead of true.
-  config.use_transactional_fixtures = true
+  config.use_transactional_fixtures = false
 
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/docs
@@ -95,6 +95,14 @@ RSpec.configure do |config|
     DatabaseCleaner.strategy = :transaction
   end
 
+  config.before(:each, truncate: true) do
+    DatabaseCleaner.strategy = :truncation
+  end
+
+  config.before(:each) do
+    DatabaseCleaner.start
+  end
+
   config.before(:each, auth: true) do
     log_in_as_user
   end
@@ -113,14 +121,6 @@ RSpec.configure do |config|
     VCR.use_cassette('auth_organization_create_for_user', {
                        match_requests_on: %i[host path],
                      }, &example)
-  end
-
-  config.before(:each, truncate: true) do
-    DatabaseCleaner.strategy = :truncation
-  end
-
-  config.before(:each) do
-    DatabaseCleaner.start
   end
 
   config.before(:each) do

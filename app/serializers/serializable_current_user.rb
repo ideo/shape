@@ -20,7 +20,7 @@ class SerializableCurrentUser < SerializableUser
   end
 
   attribute :current_incentive_balance do
-    @object.current_incentive_balance
+    @object.incentive_owed_account_balance.to_f
   end
 
   attribute :incentive_due_date do

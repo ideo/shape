@@ -2,10 +2,10 @@ require 'rails_helper'
 
 describe PurchaseTestAudience, type: :service do
   let(:payment_errors) { [] }
-  let(:payment_method_double) { double(id: SecureRandom.hex(10)) }
+  let(:payment_method_double) { double(id: rand(1000..100_000)) }
   before do
     allow(NetworkApi::Organization).to receive(:find_by_external_id).and_return(
-      double(id: SecureRandom.hex(10)),
+      double(id: rand(1000..100_000)),
     )
     allow(NetworkApi::PaymentMethod).to receive(:find).and_return(
       [payment_method_double],
@@ -41,7 +41,7 @@ describe PurchaseTestAudience, type: :service do
     )
   end
 
-  context 'with a paid audience' do
+  context 'with a paid audience', truncate: true do
     let(:audiences) { create_list(:audience, 2, price_per_response: 5) }
 
     it 'is successful' do
@@ -88,7 +88,7 @@ describe PurchaseTestAudience, type: :service do
       it 'returns error' do
         expect(result.message).to eq(
           "Could not purchase #{audiences[0].name} audience. " \
-          'Payment failed: Bank declined the card',
+          'Payment failed: Bank declined the card.',
         )
       end
     end

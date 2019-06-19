@@ -1,4 +1,3 @@
-// NOTE: we import this one as just AlertIcon for consistency
 import AlertIcon from '~/ui/icons/AlertIcon'
 import ArchiveIcon from '~/ui/icons/ArchiveIcon'
 import BackIcon from '~/ui/icons/BackIcon'
