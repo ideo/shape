@@ -68,6 +68,8 @@ class User < ApplicationRecord
          :rememberable, :validatable, :omniauthable,
          omniauth_providers: [:ideo]
 
+  acts_as_taggable_on(Audience::DEMOGRAPHIC_TAGS)
+
   has_many :collections,
            through: :roles,
            source: :resource,
@@ -109,6 +111,8 @@ class User < ApplicationRecord
   belongs_to :current_user_collection,
              class_name: 'Collection',
              optional: true
+
+  has_many :test_audience_invitations
 
   validates :email, presence: true, uniqueness: true, if: :email_required?
   validates :uid, :provider, presence: true, if: :active?

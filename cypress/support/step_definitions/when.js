@@ -322,7 +322,11 @@ When('I visit the current Test URL', () => {
 })
 
 When('I type {string} in {string}', (text, element) => {
-  cy.get(element).type(text, { force: true })
+  cy.locateDataOrClass(element).type(text)
+})
+
+When('I blur {string}', element => {
+  cy.locateDataOrClass(element).blur()
 })
 
 // ----------------------
@@ -445,6 +449,13 @@ When('I select to invite a new user', () => {
 // ----------------------
 When('I click the info button for the first audience', index => {
   cy.locate('AudienceInfoButton')
+    .first()
+    .click()
+  cy.wait(100)
+})
+
+When('I click the new query button for the first audience', index => {
+  cy.locate('NewQueryButton')
     .first()
     .click()
   cy.wait(100)
