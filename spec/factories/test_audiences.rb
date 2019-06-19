@@ -13,7 +13,7 @@ FactoryBot.define do
     end
 
     trait :link_sharing do
-      audience factory: [:audience, :link_sharing]
+      audience factory: %i[audience link_sharing]
     end
   end
 end
