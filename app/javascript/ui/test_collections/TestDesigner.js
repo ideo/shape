@@ -330,9 +330,9 @@ class TestDesigner extends React.Component {
   render() {
     const { collection } = this.props
     const cardCount = collection.sortedCards.length
-    const selectedQuestionTypes = collection.sortedCards.map(
-      c => c.record.question_type
-    )
+    const selectedQuestionTypes = collection.sortedCards
+      .filter(c => c.record)
+      .map(record => record.question_type)
     const inner = collection.sortedCards.map((card, i) => {
       let position
       const item = card.record

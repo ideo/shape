@@ -148,4 +148,8 @@ QuestionSelectHolder.propTypes = {
   selectedQuestionTypes: PropTypes.array.isRequired,
 }
 
+QuestionSelectHolder.defaultProps = {
+  selectedQuestionTypes: [],
+}
+
 export default QuestionSelectHolder
