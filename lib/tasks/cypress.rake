@@ -5,12 +5,13 @@ namespace :cypress do
     # NOTE: have to do this first, or else it gets mad if we do this after the user is loaded
     Organization.where('slug LIKE ?', 'our-test-org%').destroy_all
     Organization.where(name: 'CypressTest').destroy_all
+    User.where('email LIKE ?', 'cypress-test%').destroy_all
     Audience.where(name: "My Test Audience").destroy_all
 
     email = 'cypress-test@ideo.com'
     User.where('handle LIKE ?', 'cy-test-%').destroy_all
-    User.where(email: email).destroy_all
 
+    email = 'cypress-test@ideo.com'
     user = FactoryBot.create(:user, email: email).becomes(User)
     user.add_role(Role::SHAPE_ADMIN)
     user.save
@@ -20,7 +21,10 @@ namespace :cypress do
     builder.save
     organization = builder.organization
     user.switch_to_organization(organization)
-
+    # add an additional test user into the org
+    FactoryBot.create(:user, email: 'cypress-test-1@ideo.com', add_to_org: organization)
+    # add an a test group into the org
+    FactoryBot.create(:group, organization: organization, add_admins: [user])
     create_cards(user.current_user_collection, user)
     create_events(organization)
     create_test_collection(organization)

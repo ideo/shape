@@ -141,7 +141,7 @@ class ChartTooltip extends React.PureComponent {
             <VictoryTooltip
               active={showAlways}
               {...this.props}
-              dx={labelText.length > 8 ? dx : dx}
+              dx={dx}
               dy={-10}
               style={{ fontSize: this.fontSizes.label, fontWeight: 'normal' }}
               text={labelText}

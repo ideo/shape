@@ -1,22 +1,33 @@
 require 'rails_helper'
 
-describe SurveyResponseCompletion, type: :service do
-  let(:test_collection) { create(:test_collection, :with_test_audience, test_status: :live) }
-  let(:survey_response) { create(:survey_response, test_collection: test_collection) }
+describe SurveyResponseCompletion, type: :service, truncate: true do
+  let(:test_collection) { create(:test_collection, :with_test_audience, :completed, num_cards: 1, test_status: :live) }
+  let(:test_audience) { test_collection.test_audiences.first }
+  let!(:payment) { create(:payment, :paid, purchasable: test_audience, amount: test_audience.total_price) }
+  let(:survey_response) { create(:survey_response, test_collection: test_collection, test_audience: test_audience) }
   let(:service) { SurveyResponseCompletion.new(survey_response) }
-  let(:payment_method_double) { double(id: SecureRandom.hex(10)) }
+  let(:payment_method_double) { double(id: rand(1000..100_000)) }
   let(:network_payment_double) { double(id: 5, status: 'succeeded') }
 
   before do
+    # Add balance to revenue_deferred account so we can debit from it
+    DoubleEntry.transfer(
+      Money.new(10_00),
+      from: DoubleEntry.account(:cash, scope: payment),
+      to: DoubleEntry.account(:revenue_deferred, scope: payment),
+      code: :purchase,
+    )
+    test_audience.update(price_per_response: 4.50)
     allow(NetworkApi::Payment).to receive(:create).and_return(
       network_payment_double,
     )
     allow(NetworkApi::PaymentMethod).to receive(:find).and_return(
       [payment_method_double],
     )
+    allow(survey_response).to receive(:completed?).and_return(true)
   end
 
-  describe '#call', :vcr do
+  describe '#call' do
     it 'should call CollectionUpdateBroadcaster with the test_collection if status changes' do
       expect(CollectionUpdateBroadcaster).to receive(:call).with(test_collection)
       service.call
@@ -28,44 +39,73 @@ describe SurveyResponseCompletion, type: :service do
         survey_response.update(user: user)
       end
 
-      it 'will only create one feedback_incentive_record per survey_response' do
-        expect do
+      it 'updates survey response payment status' do
+        expect {
           service.call
-        end.to change(FeedbackIncentiveRecord, :count).by 1
+        }.to change(survey_response, :incentive_status)
+        expect(survey_response.incentive_status).to eq('incentive_owed')
+      end
+
+      it 'will only mark amount owed once' do
+        service.call
+        expect(
+          user.incentive_owed_account_balance.to_f,
+        ).to eq(TestAudience.incentive_amount)
+
         # call it again
-        expect do
-          service.call
-        end.not_to change(FeedbackIncentiveRecord, :count)
+        service.call
+        expect(
+          user.reload.incentive_owed_account_balance.to_f,
+        ).to eq(TestAudience.incentive_amount)
       end
 
       context 'with an existing balance' do
-        let!(:feedback_incentive_record) { create(:feedback_incentive_record, user: user, current_balance: 25.00) }
+        before do
+          DoubleEntry.transfer(
+            Money.new(TestAudience.incentive_amount * 100),
+            from: DoubleEntry.account(:revenue_deferred, scope: payment),
+            to: DoubleEntry.account(:individual_owed, scope: user),
+            code: :incentive_owed,
+            metadata: { survey_response_id: rand(1000) },
+          )
+        end
 
         it 'calculates the correct balance' do
-          expect(user.current_incentive_balance).to eq 25.00
+          expect(user.incentive_owed_account_balance.to_f).to eq 2.50
           service.call
-          expect(user.current_incentive_balance).to eq 25.00 + Shape::FEEDBACK_INCENTIVE_AMOUNT
+          expect(user.incentive_owed_account_balance.to_f).to eq 2.50 + Shape::FEEDBACK_INCENTIVE_AMOUNT
         end
       end
     end
 
     context 'without test audience' do
-      let(:test_collection) { create(:test_collection) }
+      before do
+        test_collection.test_audiences.delete_all
+      end
 
-      it 'does not create feedback_incentive_records' do
+      it 'does not update survey response payment_status' do
         expect do
           service.call
-        end.not_to change(FeedbackIncentiveRecord, :count)
+        end.not_to change(survey_response, :incentive_status)
+      end
+
+      it 'does not create accounting lines' do
+        expect do
+          service.call
+        end.not_to change(DoubleEntry::Line, :count)
       end
     end
 
     context 'with link sharing' do
-      let(:test_collection) { create(:test_collection, :with_link_sharing) }
+      before do
+        test_audience.update(price_per_response: 0.0)
+      end
 
-      it 'does not create feedback_incentive_records' do
+      it 'does not create accounting lines' do
+        expect(survey_response.gives_incentive?).to be false
         expect do
           service.call
-        end.not_to change(FeedbackIncentiveRecord, :count)
+        end.not_to change(DoubleEntry::Line, :count)
       end
     end
   end
