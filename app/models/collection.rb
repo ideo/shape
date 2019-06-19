@@ -111,21 +111,21 @@ class Collection < ApplicationRecord
   # all active cards including links
   # i.e. this is what is displayed in the frontend for collection.collection_cards
   has_many :collection_cards,
-           -> { ordered },
+           -> { active.ordered },
            class_name: 'CollectionCard',
            foreign_key: :parent_id,
            inverse_of: :parent
 
   # cards where the item/collection "lives" in this collection
   has_many :primary_collection_cards,
-           -> { ordered },
+           -> { active.ordered },
            class_name: 'CollectionCard::Primary',
            foreign_key: :parent_id,
            inverse_of: :parent
 
   # cards where the item/collection is linked into this collection
   has_many :link_collection_cards,
-           -> { ordered },
+           -> { active.ordered },
            class_name: 'CollectionCard::Link',
            foreign_key: :parent_id,
            inverse_of: :parent

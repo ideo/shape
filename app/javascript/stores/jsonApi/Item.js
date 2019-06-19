@@ -224,6 +224,14 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return _.find(this.primaryDataset.data_source_id, { type: 'Collection' })
   }
 
+  async restore() {
+    await this.apiStore.unarchiveCards({
+      cardIds: [this.parent_collection_card.id],
+      snapshot: null,
+    })
+    routingStore.routeTo('collections', this.parent.id)
+  }
+
   API_updateWithoutSync({ cancel_sync } = {}) {
     const { apiStore } = this
     const data = this.toJsonApi()

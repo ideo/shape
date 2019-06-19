@@ -858,11 +858,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   async restore() {
+    const { routingStore } = apiStore
     await this.apiStore.unarchiveCards({
       cardIds: [this.parent_collection_card.id],
       snapshot: null,
     })
-    this.refetch()
+    routingStore.routeTo('collections', this.parent.id)
   }
 
   async API_moveCardsIntoCollection({
