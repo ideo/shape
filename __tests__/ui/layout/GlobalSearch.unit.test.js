@@ -1,6 +1,8 @@
 import GlobalSearch from '~/ui/layout/GlobalSearch'
 import fakeUiStore from '#/mocks/fakeUiStore'
 
+jest.useFakeTimers()
+
 let props, wrapper, component
 describe('GlobalSearch', () => {
   beforeEach(() => {
@@ -24,5 +26,20 @@ describe('GlobalSearch', () => {
       'searchText',
       ev.target.value
     )
+  })
+
+  describe('when searching archived content', () => {
+    beforeEach(() => {
+      component.searchArchived = true
+    })
+
+    it('should include search archived in the params', () => {
+      component._search('hello')
+      expect(props.routingStore.routeTo).toHaveBeenCalledWith(
+        'search',
+        'hello',
+        { show_archived: true }
+      )
+    })
   })
 })

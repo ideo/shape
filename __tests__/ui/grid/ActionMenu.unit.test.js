@@ -237,4 +237,22 @@ describe('ActionMenu', () => {
       expect(_.map(popout.props().menuItems, i => i.name)).toContain('Download')
     })
   })
+
+  describe('with an archived record', () => {
+    beforeEach(() => {
+      props.canEdit = true
+      props.card.record.archived = true
+      wrapper = shallow(<ActionMenu.wrappedComponent {...props} />)
+    })
+
+    it('should only render tags and sharing', () => {
+      const popout = wrapper.find('PopoutMenu').at(0)
+      expect(popout.props().menuItems.length).toEqual(3)
+      expect(_.map(popout.props().menuItems, i => i.name)).toEqual([
+        'Download',
+        'Tags',
+        'Sharing',
+      ])
+    })
+  })
 })

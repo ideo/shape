@@ -74,7 +74,6 @@ class GlobalSearch extends React.Component {
 
   render() {
     const { routingStore } = this.props
-    console.log('global search', this.open)
     return (
       <div>
         <SearchButton
