@@ -93,6 +93,7 @@ Feature: Undo actions
 
     And I wait for "@apiMoveCollectionCards" to finish
     And I wait for the collection to finish loading
+    And I wait for 1 second
 
     Then I should see a collection card named "Hello World"
     Then I should see a collection card named "Inner Collection"
