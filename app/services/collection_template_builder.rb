@@ -2,7 +2,7 @@
 class CollectionTemplateBuilder
   attr_reader :collection, :errors
 
-  def initialize(parent:, template:, placement: 'beginning', created_by: nil, parent_card: nil)
+  def initialize(parent:, template:, placement: 'beginning', created_by: nil, parent_card: nil, external_id: nil)
     @parent = parent
     @template = template
     @placement = placement
@@ -10,6 +10,7 @@ class CollectionTemplateBuilder
     @collection = template.class.new
     @errors = @collection.errors
     @parent_card = parent_card
+    @external_id = external_id
   end
 
   def call
@@ -49,6 +50,7 @@ class CollectionTemplateBuilder
       @parent.follow_submission_box(@created_by)
       @created_by.upgrade_to_edit_role(@collection)
     end
+    add_external_record
     # capture newly added roles
     @collection.reload
     @collection
@@ -118,5 +120,13 @@ class CollectionTemplateBuilder
     users_thread = comment_thread.users_thread_for(@created_by)
     return if users_thread.present?
     comment_thread.add_user_follower!(@created_by.id)
+  end
+
+  def add_external_record
+    return unless @external_id.present? && @created_by.application.present?
+    @collection.add_external_id(
+      @external_id,
+      @created_by.application.id,
+    )
   end
 end

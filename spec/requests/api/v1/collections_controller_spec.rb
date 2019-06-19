@@ -286,6 +286,23 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         )
         post(path, params: params)
       end
+
+      context 'as bot user' do
+        let!(:application) { create(:application, user: user, add_orgs: [organization]) }
+        let(:params_with_external_id) do
+          raw_params.merge(external_id: 'abc123').to_json
+        end
+
+        it 'adds external_id if present' do
+          expect {
+            post(path, params: params_with_external_id)
+          }.to change(ExternalRecord, :count).by(1)
+          expect(response.status).to eq(200)
+          template_instance = Collection.find(json['data']['id'])
+          external_record = template_instance.external_records.find_by(application_id: application.id)
+          expect(external_record.external_id).to eq('abc123')
+        end
+      end
     end
 
     context 'without permission' do

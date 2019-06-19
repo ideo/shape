@@ -29,6 +29,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       template: @template_collection,
       placement: json_api_params[:placement],
       created_by: current_user,
+      external_id: json_api_params[:external_id],
     )
 
     if builder.call
