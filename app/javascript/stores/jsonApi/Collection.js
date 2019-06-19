@@ -857,6 +857,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.request(apiPath, 'POST', { data })
   }
 
+  async restore() {
+    await this.apiStore.unarchiveCards({
+      cardIds: [this.parent_collection_card.id],
+      snapshot: null,
+    })
+    this.refetch()
+  }
+
   async API_moveCardsIntoCollection({
     toCollection,
     cardIds,

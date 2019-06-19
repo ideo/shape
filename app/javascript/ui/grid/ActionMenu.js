@@ -251,6 +251,17 @@ class ActionMenu extends React.Component {
       return _.filter(actions, { name: 'Replace' })
     }
 
+    if (record && record.archived) {
+      // Turn off most actions if looking at archived record
+      items = _.reject(items, { name: 'Duplicate' })
+      items = _.reject(items, { name: 'Move' })
+      items = _.reject(items, { name: 'Link' })
+      items = _.reject(items, { name: 'Replace' })
+      items = _.reject(items, { name: 'Delete' })
+      items = _.reject(items, { name: 'Sub. Box Settings' })
+      items = _.reject(items, { name: 'Add to My Collection' })
+    }
+
     return items
   }
 

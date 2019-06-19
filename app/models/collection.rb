@@ -111,21 +111,21 @@ class Collection < ApplicationRecord
   # all active cards including links
   # i.e. this is what is displayed in the frontend for collection.collection_cards
   has_many :collection_cards,
-           -> { active.ordered },
+           -> { ordered },
            class_name: 'CollectionCard',
            foreign_key: :parent_id,
            inverse_of: :parent
 
   # cards where the item/collection "lives" in this collection
   has_many :primary_collection_cards,
-           -> { active.ordered },
+           -> { ordered },
            class_name: 'CollectionCard::Primary',
            foreign_key: :parent_id,
            inverse_of: :parent
 
   # cards where the item/collection is linked into this collection
   has_many :link_collection_cards,
-           -> { active.ordered },
+           -> { ordered },
            class_name: 'CollectionCard::Link',
            foreign_key: :parent_id,
            inverse_of: :parent
@@ -799,6 +799,13 @@ class Collection < ApplicationRecord
   # check for template instances anywhere in the entire collection tree
   def any_template_instance_children?
     Collection.in_collection(id).where.not(template_id: nil).any?
+  end
+
+  # Collections are restorable only if they are currently archived and their
+  # parent is not archived (otherwise they would be restored to an archived
+  # collection
+  def restorable?
+    archived && !parent.archived
   end
 
   # =================================

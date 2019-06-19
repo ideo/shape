@@ -5,7 +5,7 @@ class SerializableItem < BaseJsonSerializer
              :url, :thumbnail_url, :icon_url, :question_type,
              :data_source_type, :data_source_id, :data_settings,
              :previous_thumbnail_urls, :legend_item_id,
-             :question_title, :question_description
+             :question_title, :question_description, :archived
 
   has_many :roles do
     data do
@@ -64,7 +64,7 @@ class SerializableItem < BaseJsonSerializer
   end
 
   attribute :can_edit_content do
-    @current_ability.can?(:edit_content, @object)
+    !@object.archived && @current_ability.can?(:edit_content, @object)
   end
 
   attribute :pinned_and_locked do
@@ -79,5 +79,9 @@ class SerializableItem < BaseJsonSerializer
   attribute :common_viewable do
     # only `true` if you're viewing the common resource outside of its home org
     @object.common_viewable? && @object.organization_id != @current_user.current_organization_id
+  end
+
+  attribute :is_restorable do
+    @object.restorable?
   end
 end

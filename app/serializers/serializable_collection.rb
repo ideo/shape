@@ -6,7 +6,7 @@ class SerializableCollection < BaseJsonSerializer
              :master_template, :template_id,
              :submission_box_type, :submission_box_id, :submission_template_id,
              :test_status, :collection_to_test_id, :hide_submissions, :submissions_enabled,
-             :anyone_can_view, :anyone_can_join
+             :anyone_can_view, :anyone_can_join, :archived
   has_many :roles do
     data do
       @object.anchored_roles(viewing_organization_id: @current_user.current_organization_id)
@@ -90,7 +90,7 @@ class SerializableCollection < BaseJsonSerializer
   attribute :can_edit_content do
     # NOTE: this also ends up coming into play when you are an editor
     # but the collection is "pinned_and_locked"
-    @current_ability.can?(:edit_content, @object)
+    !@object.archived && @current_ability.can?(:edit_content, @object)
   end
 
   attribute :submissions_collection_id, if: -> { @object.is_a? Collection::SubmissionBox } do
@@ -196,5 +196,9 @@ class SerializableCollection < BaseJsonSerializer
 
   attribute :has_link_sharing do
     @object.try(:link_sharing?)
+  end
+
+  attribute :is_restorable do
+    @object.restorable?
   end
 end

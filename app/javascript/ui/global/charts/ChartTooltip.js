@@ -59,11 +59,11 @@ class ChartTooltip extends React.PureComponent {
     // Ratio is the general amount between x's to move them toward center
     const ratio = 6
     if (x < 52) {
-      return 14 - x / ratio
+      return 10 - x / ratio
     }
     if (x > 398) {
       const diff = 450 - x
-      return -(14 - diff / ratio)
+      return -(10 - diff / ratio)
     }
     return 0
   }
@@ -141,7 +141,7 @@ class ChartTooltip extends React.PureComponent {
             <VictoryTooltip
               active={showAlways}
               {...this.props}
-              dx={labelText.length > 8 ? dx : 0}
+              dx={labelText.length > 8 ? dx : dx}
               dy={-10}
               style={{ fontSize: this.fontSizes.label, fontWeight: 'normal' }}
               text={labelText}

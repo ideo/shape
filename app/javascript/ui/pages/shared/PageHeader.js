@@ -101,6 +101,12 @@ class PageHeader extends React.Component {
     }
   }
 
+  handleRestore = ev => {
+    ev.preventDefault()
+    const { record } = this.props
+    record.restore()
+  }
+
   openMoveMenuForTemplate = () => {
     const { record, uiStore } = this.props
     uiStore.openMoveMenu({
@@ -192,7 +198,51 @@ class PageHeader extends React.Component {
     return record.isHiddenSubmission
   }
 
-  get launchTestButton() {
+  get renderTestUi() {
+    const { record, uiStore } = this.props
+    if (
+      (record.isLiveTest && record.has_link_sharing) ||
+      record.collection_to_test_id
+    ) {
+      return (
+        <Fragment>
+          <CopyToClipboard text={record.publicTestURL} onCopy={() => null}>
+            <HeaderFormButton
+              width="140"
+              color={v.colors.transparent}
+              onClick={() =>
+                uiStore.popupSnackbar({
+                  message: 'Test link copied',
+                })
+              }
+            >
+              <span
+                style={{
+                  display: 'inline-block',
+                  height: 24,
+                  width: 27,
+                  verticalAlign: 'middle',
+                }}
+              >
+                <LinkIconSm />
+              </span>
+              <span
+                style={{
+                  display: 'inline-block',
+                  verticalAlign: 'middle',
+                }}
+              >
+                Get Link
+              </span>
+            </HeaderFormButton>
+          </CopyToClipboard>
+          {this.renderStopFeedbackButton}
+        </Fragment>
+      )
+    }
+  }
+
+  get renderLaunchTestButton() {
     const { record, uiStore } = this.props
     if (record.can_edit_content && record.isClosedTest) {
       return (
@@ -220,7 +270,7 @@ class PageHeader extends React.Component {
     return null
   }
 
-  get joinCollectionButton() {
+  get renderJoinCollectionButton() {
     const { record } = this.props
     if (!record.isPublicJoinable) return null
     return (
@@ -232,6 +282,52 @@ class PageHeader extends React.Component {
         Join
       </HeaderFormButton>
     )
+  }
+
+  get renderRestoreButton() {
+    const { record } = this.props
+    if (!record.can_edit) return null
+    if (!record.is_restorable) return null
+    return (
+      <HeaderFormButton
+        style={{ marginLeft: '1rem' }}
+        color={v.colors.primaryDarkest}
+        onClick={this.handleRestore}
+      >
+        Restore
+      </HeaderFormButton>
+    )
+  }
+
+  get renderTemplateButton() {
+    const { record } = this.props
+    if (!record.isUsableTemplate) return null
+    return (
+      <HeaderFormButton
+        width="160"
+        color={v.colors.primaryDark}
+        onClick={this.openMoveMenuForTemplate}
+      >
+        Use Template
+      </HeaderFormButton>
+    )
+  }
+
+  get renderStopFeebackButton() {
+    const { record, uiStore } = this.props
+    if (record.can_edit_content && !record.is_test_locked) {
+      return (
+        <HeaderFormButton
+          width="170"
+          color={v.colors.transparent}
+          onClick={record.closeTest}
+          disabled={uiStore.launchButtonLoading}
+        >
+          Stop Feedback
+        </HeaderFormButton>
+      )
+    }
+    return null
   }
 
   render() {
@@ -279,66 +375,11 @@ class PageHeader extends React.Component {
                   )}
                   {this.collectionTypeOrInheritedTags}
                 </div>
-                {record.isUsableTemplate && (
-                  <HeaderFormButton
-                    width="160"
-                    color={v.colors.primaryDark}
-                    onClick={this.openMoveMenuForTemplate}
-                  >
-                    Use Template
-                  </HeaderFormButton>
-                )}
-                {this.launchTestButton}
-                {this.joinCollectionButton}
-                {((record.isLiveTest && record.has_link_sharing) ||
-                  record.collection_to_test_id) && (
-                  <Fragment>
-                    <CopyToClipboard
-                      text={record.publicTestURL}
-                      onCopy={() => null}
-                    >
-                      <HeaderFormButton
-                        width="140"
-                        color={v.colors.transparent}
-                        onClick={() =>
-                          uiStore.popupSnackbar({
-                            message: 'Test link copied',
-                          })
-                        }
-                      >
-                        <span
-                          style={{
-                            display: 'inline-block',
-                            height: 24,
-                            width: 27,
-                            verticalAlign: 'middle',
-                          }}
-                        >
-                          <LinkIconSm />
-                        </span>
-                        <span
-                          style={{
-                            display: 'inline-block',
-                            verticalAlign: 'middle',
-                          }}
-                        >
-                          Get Link
-                        </span>
-                      </HeaderFormButton>
-                    </CopyToClipboard>
-                    {record.can_edit_content &&
-                      !record.is_test_locked && (
-                        <HeaderFormButton
-                          width="170"
-                          color={v.colors.transparent}
-                          onClick={record.closeTest}
-                          disabled={uiStore.launchButtonLoading}
-                        >
-                          Stop Feedback
-                        </HeaderFormButton>
-                      )}
-                  </Fragment>
-                )}
+                {this.renderTemplateButton}
+                {this.renderRestoreButton}
+                {this.renderLaunchTestButton}
+                {this.renderJoinCollectionButton}
+                {this.renderTestUi}
               </Flex>
             </StyledTitleAndRoles>
           </div>

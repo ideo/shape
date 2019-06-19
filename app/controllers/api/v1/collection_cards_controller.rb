@@ -78,7 +78,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def unarchive
-    @collection = Collection.find(json_api_params[:collection_snapshot][:id])
+    if json_api_params[:collection_snapshot].present?
+      @collection = Collection.find(json_api_params[:collection_snapshot][:id])
+    else
+      @collection = Collection.find(@collection_cards.first.parent.id)
+    end
     @collection.unarchive_cards!(@collection_cards, collection_snapshot_params)
     render jsonapi: @collection.reload
   end
@@ -300,7 +304,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def collection_snapshot_params
-    json_api_params[:collection_snapshot].require(:attributes).permit(
+    return {} if json_api_params[:collection_snapshot].nil?
+    json_api_params[:collection_snapshot].permit(:attributes).permit(
       collection_cards_attributes: %i[id order width height row col],
     )
   end
@@ -371,11 +376,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
           :data_source_type,
           :data_source_id,
           style: {},
-          cached_data: [
-            :value,
-            :date,
-            :percentage,
-            :column,
+          cached_data: %i[
+            value
+            date
+            percentage
+            column
           ],
         ],
       ],
