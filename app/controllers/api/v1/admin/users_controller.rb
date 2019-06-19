@@ -28,4 +28,18 @@ class Api::V1::Admin::UsersController < Api::V1::BaseController
       render_api_errors []
     end
   end
+
+  def search
+    audience = Audience.find(params[:audience_id])
+    audience_tags = audience.base_tags.map(&:name)
+
+    users = User.tagged_with(audience_tags)
+                .left_outer_joins(:test_audience_invitations)
+                .select('users.*, MAX(test_audience_invitations.created_at) AS date_of_participation')
+                .group('users.id')
+                .limit(params[:num_respondents])
+                .order('date_of_participation ASC NULLS FIRST')
+                .uniq
+    render jsonapi: users
+  end
 end
