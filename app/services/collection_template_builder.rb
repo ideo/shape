@@ -2,7 +2,15 @@
 class CollectionTemplateBuilder
   attr_reader :collection, :errors
 
-  def initialize(parent:, template:, placement: 'beginning', created_by: nil, parent_card: nil, external_id: nil)
+  def initialize(
+    parent:,
+    template:,
+    placement: 'beginning',
+    created_by: nil,
+    parent_card: nil,
+    external_id: nil,
+    collection_params: {}
+  )
     @parent = parent
     @template = template
     @placement = placement
@@ -11,6 +19,7 @@ class CollectionTemplateBuilder
     @errors = @collection.errors
     @parent_card = parent_card
     @external_id = external_id
+    @raw_collection_params = collection_params
   end
 
   def call
@@ -34,11 +43,8 @@ class CollectionTemplateBuilder
     end
 
     # NOTE: Any issue with creating the template instance in a different org from the template?
-    @collection = @template.templated_collections.create(
-      name: created_template_name,
-      organization: @parent.organization,
-      created_by: @created_by,
-    )
+    @collection = @template.templated_collections.create(collection_params)
+
     # make sure to assign these permissions before the template cards are generated
     @collection.inherit_roles_anchor_from_parent!(@parent)
     if creating_a_submission?
@@ -54,6 +60,14 @@ class CollectionTemplateBuilder
     # capture newly added roles
     @collection.reload
     @collection
+  end
+
+  def collection_params
+    {
+      name: created_template_name,
+      organization_id: @parent.organization.id,
+      created_by_id: @created_by.id,
+    }.merge(@raw_collection_params)
   end
 
   def place_collection_in_parent

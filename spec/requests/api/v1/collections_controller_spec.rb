@@ -269,6 +269,8 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
           template: template,
           placement: 'beginning',
           created_by: user,
+          external_id: nil,
+          collection_params: {},
         ).and_return(instance_double)
         post(path, params: params)
       end
@@ -285,6 +287,18 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
           user,
         )
         post(path, params: params)
+      end
+
+      context 'with collection name in params' do
+        let(:params_with_name) do
+          raw_params.merge(collection: { name: 'Awesomeness' }).to_json
+        end
+
+        it 'sets to given name' do
+          post(path, params: params_with_name)
+          template_instance = Collection.find(json['data']['id'])
+          expect(template_instance.name).to eq('Awesomeness')
+        end
       end
 
       context 'as bot user' do
