@@ -10,7 +10,11 @@ describe('TestDesigner', () => {
       handleTrash: jest.fn().mockName('handleTrash'),
       handleSelectChange: jest.fn().mockName('handleSelectChange'),
       canEdit: true,
-      selectedQuestionTypes: [],
+      selectedQuestionTypes: [
+        fakeCollectionCard.card_question_type,
+        fakeCollectionCard.card_question_type,
+        fakeCollectionCard.card_question_type,
+      ],
     }
     props.card.card_question_type = 'question_useful'
     wrapper = shallow(<QuestionSelectHolder {...props} />)

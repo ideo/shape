@@ -337,6 +337,12 @@ export const fakeItemCard = {
   ...fakeJsonApiAttrs,
 }
 
+// very basic way to turn collection item into a "test collection item"
+export const fakeTestItemCard = {
+  card_question_type: 'question_media',
+  ...fakeItemCard
+}
+
 export const fakeQuestionItemCard = {
   ...fakeItemCard,
   record: fakeQuestionItem,
@@ -344,6 +350,8 @@ export const fakeQuestionItemCard = {
 }
 
 const fakeCards = [fakeItemCard, fakeItemCard, fakeItemCard]
+
+export const fakeFeedbackCards = [fakeTestItemCard, fakeTestItemCard, fakeTestItemCard]
 
 export const fakeCollection = {
   id: '1',

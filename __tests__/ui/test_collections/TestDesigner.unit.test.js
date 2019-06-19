@@ -1,5 +1,5 @@
 import TestDesigner from '~/ui/test_collections/TestDesigner'
-import { fakeCollection } from '#/mocks/data'
+import { fakeCollection, fakeFeedbackCards } from '#/mocks/data'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
@@ -11,8 +11,9 @@ describe('TestDesigner', () => {
     props = {
       collection: fakeCollection,
     }
-    // very basic way to turn fakeCollection into a "test collection"
-    props.collection.collection_cards[0].card_question_type = 'question_useful'
+    props.collection.collection_cards = fakeFeedbackCards
+    props.collection.soretedCards = fakeFeedbackCards
+
     props.collection.apiStore = fakeApiStore({
       requestResult: { data: { id: 99, name: 'Parent Collection' } },
     })
