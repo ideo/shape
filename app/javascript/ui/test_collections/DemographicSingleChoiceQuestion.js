@@ -1,8 +1,13 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { FormControlLabel, Radio, RadioGroup } from '@material-ui/core'
 
-import { DisplayText, SmallHelperText } from '~/ui/global/styled/typography'
+import {
+  DisplayText,
+  SmallHelperText,
+  DisplayTextCss,
+} from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 
 // TODO duplication
@@ -34,12 +39,28 @@ const Scale = styled.div`
   width: 100%;
 `
 
+const StyledFormControlLabel = styled(FormControlLabel)`
+  .label {
+    ${DisplayTextCss};
+    color: ${v.colors.primaryDark};
+  }
+`
+
 @observer
 class DemographicSingleChoiceQuestion extends React.Component {
-  handleAnswer(event) {
+  state = {
+    answer: null,
+  }
+
+  handleAnswer(value) {
     const { onAnswer, user } = this.props
-    onAnswer({ text: event.target.value })
+
+    onAnswer({ text: value })
     user.API_updateCurrentUserDemographics()
+
+    this.setState({
+      answer: value,
+    })
   }
 
   render() {
@@ -49,37 +70,35 @@ class DemographicSingleChoiceQuestion extends React.Component {
           <DisplayText color={v.colors.white}>
             What's the highest level of education you have completed?
           </DisplayText>
+          <SmallHelperText color="#99b8c2" style={{ display: 'block' }}>
+            This question is optional.
+          </SmallHelperText>
         </Question>
         <Scale>
-          <SmallHelperText>This question is optional.</SmallHelperText>
-
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <span>
-              <input
-                type="radio"
-                id="demographics_education_highschool"
-                name="demographics_education"
-                value="High School Diploma"
-                onChange={e => this.handleAnswer(e)}
-              />
-              <label htmlFor="demographics_education_highschool">
-                High School Diploma
-              </label>
-            </span>
-
-            <span>
-              <input
-                type="radio"
-                id="demographics_education_college"
-                name="demographics_education"
-                value="College or Bachelor's Degree"
-                onChange={e => this.handleAnswer(e)}
-              />
-              <label htmlFor="demographics_education_college">
-                College or Bachelor's Degree
-              </label>
-            </span>
-          </div>
+          <RadioGroup
+            value={this.state.answer}
+            name="demographics_education"
+            onChange={(_e, value) => this.handleAnswer(value)}
+            style={{
+              paddingTop: '1rem',
+              paddingBottom: '1rem',
+            }}
+          >
+            <StyledFormControlLabel
+              value="High School Diploma"
+              classes={{ label: 'label' }}
+              label="High School Diploma"
+              labelPlacement="end"
+              control={<Radio />}
+            />
+            <StyledFormControlLabel
+              classes={{ label: 'label' }}
+              value="College or Bachelor's Degree"
+              label="College or Bachelor's Degree"
+              labelPlacement="end"
+              control={<Radio />}
+            />
+          </RadioGroup>
         </Scale>
       </div>
     )
