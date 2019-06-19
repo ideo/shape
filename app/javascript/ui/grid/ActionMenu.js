@@ -171,7 +171,7 @@ class ActionMenu extends React.Component {
       },
       {
         name: 'Delete',
-        iconRight: <TrashXlIcon />,
+        iconRight: <TrashIcon />,
         onClick: this.archiveCard,
       },
       {
