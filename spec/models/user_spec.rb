@@ -657,7 +657,15 @@ describe User, type: :model do
       let!(:paid_survey_response) { create(:survey_response, user: user, test_audience: test_audience) }
       let!(:unpaid_survey_response) { create(:survey_response, user: user, test_audience: test_audience) }
       let!(:prev_survey_completed_at) { 3.days.ago }
+
       before do
+        # Add balance to revenue_deferred account so we can debit from it
+        DoubleEntry.transfer(
+          Money.new(10_00 * 100),
+          from: DoubleEntry.account(:cash, scope: test_audience.payment),
+          to: DoubleEntry.account(:revenue_deferred, scope: test_audience.payment),
+          code: :purchase,
+        )
         # Mock out methods so we don't have to complete the response in this spec
         allow(paid_survey_response).to receive(:amount_earned).and_return(test_audience.price_per_response)
         allow(unpaid_survey_response).to receive(:amount_earned).and_return(test_audience.price_per_response)
