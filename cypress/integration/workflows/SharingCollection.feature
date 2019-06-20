@@ -18,4 +18,5 @@ Feature: Sharing a collection
     And I wait for 1 second
     And I remove the user from the collection sharing modal
     And I wait for "@apiSearchUsersAndGroups" to finish
+    And I wait for 1 second
     Then I should see 1 active user
