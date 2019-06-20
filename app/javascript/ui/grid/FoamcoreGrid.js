@@ -1094,7 +1094,7 @@ class FoamcoreGrid extends React.Component {
 
   @action
   calculateCardsToRender() {
-    const { collection, movingCardIds, uiStore } = this.props
+    const { collection, movingCardIds, uiStore, canEditCollection } = this.props
     // any cards that are being moved don't appear at all
     const collectionCards = _.reject(collection.collection_cards, c =>
       _.includes(movingCardIds, c.id)
@@ -1170,8 +1170,10 @@ class FoamcoreGrid extends React.Component {
       return null
     })
 
-    // Add blank cards for all empty spaces - for hover and click -> BCT actions
-    cards = [...cards, ...this.blankCardsForEmptySpacesWithinVisibleArea]
+    if (canEditCollection) {
+      // Add blank cards for all empty spaces - for hover and click -> BCT actions
+      cards = [...cards, ...this.blankCardsForEmptySpacesWithinVisibleArea]
+    }
 
     this.cardsToRender = cards
     return this.cardsToRender

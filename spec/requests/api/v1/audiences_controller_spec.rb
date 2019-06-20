@@ -24,6 +24,7 @@ describe Api::V1::AudiencesController, type: :request, json: true, create_org: t
         expect(audience_ids.size).to eq(2)
         expect(audience_ids).to include(audience1.id.to_s)
         expect(audience_ids).to include(audience2.id.to_s)
+        expect(audience_ids).not_to include(audience3.id.to_s)
 
         json['data'].each_with_index do |actual_audience, i|
           expect(actual_audience['attributes']['order']).to eq(i + 1)

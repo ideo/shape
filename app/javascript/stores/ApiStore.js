@@ -281,6 +281,12 @@ class ApiStore extends jsonapi(datxCollection) {
     })
   }
 
+  async searchForRespondents(audienceId, numRespondents) {
+    const url = `admin/users/search?audience_id=${audienceId}&num_respondents=${numRespondents}`
+    const res = await this.request(url)
+    return res.data
+  }
+
   async fetchTestCollections(page = 1) {
     const res = await this.request(`admin/test_collections?page=${page}`)
     return {
@@ -454,13 +460,13 @@ class ApiStore extends jsonapi(datxCollection) {
     return res.data
   }
 
-  async fetchOrganizationAudiences(orgId) {
-    const res = await this.request(`organizations/${orgId}/audiences`, 'GET')
-    const audiences = res.data
-    return audiences
+  fetchOrganizationAudiences(orgId) {
+    // removeAll first, in case you had switched orgs
+    this.removeAll('audiences')
+    return this.request(`organizations/${orgId}/audiences`, 'GET')
   }
 
-  async createTemplateInstance(data) {
+  createTemplateInstance(data) {
     return this.request('collections/create_template', 'POST', data)
   }
 
@@ -498,7 +504,7 @@ class ApiStore extends jsonapi(datxCollection) {
     if (undoable) {
       const snapshot = collection.toJsonApiWithCards()
       this.undoStore.pushUndoAction({
-        message: 'Archive undone',
+        message: 'Delete undone',
         apiCall: () => this.unarchiveCards({ cardIds, snapshot }),
         redirectPath: { type: 'collections', id: collection.id },
       })

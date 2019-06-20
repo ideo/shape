@@ -8,6 +8,10 @@ RSpec.describe Audience, type: :model, seed: true do
     it { should have_many :test_audiences }
   end
 
+  context 'validations' do
+    it { should validate_presence_of(:name) }
+  end
+
   describe '.global_defaults' do
     it 'should return Share via Link and All People' do
       expect(Audience.global_defaults.map(&:name)).to eq(
@@ -16,6 +20,32 @@ RSpec.describe Audience, type: :model, seed: true do
           'All People (No Filters)',
         ],
       )
+    end
+  end
+
+  describe '.viewable_by_org' do
+    let(:organization) { create(:organization_without_groups) }
+    let(:organization2) { create(:organization_without_groups) }
+    let!(:audiences_global) { create_list(:audience, 1) }
+    let!(:audiences) { create_list(:audience, 2, organizations: [organization]) }
+    let!(:audiences2) { create_list(:audience, 2, organizations: [organization2]) }
+    let(:user) { create(:user) }
+
+    let(:viewable_by_org) do
+      Audience.viewable_by_org(organization)
+    end
+    let(:viewable_by_user_in_org) do
+      Audience.viewable_by_user_in_org(user: user, organization: organization)
+    end
+
+    it 'should only return audiences in the organization (2), global (1), and global defaults (2)' do
+      expect(viewable_by_org.size).to eq 5
+      # should not include 2 Audiences outside the org
+      expect(Audience.count).to eq 7
+    end
+
+    it 'should return the same count for .viewable_by_user_in_org' do
+      expect(viewable_by_user_in_org.to_a.size).to eq 5
     end
   end
 
