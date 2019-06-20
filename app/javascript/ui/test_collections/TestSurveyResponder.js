@@ -15,6 +15,11 @@ import {
 } from '~/ui/test_collections/shared'
 import TestQuestion from '~/ui/test_collections/TestQuestion'
 import GreetingMessage from '~/ui/test_collections/GreetingMessage'
+import {
+  allDemographicQuestions,
+  cardQuestionTypeForQuestion,
+  createDemographicsCardId,
+} from '~/ui/test_collections/RespondentDemographics'
 
 const UNANSWERABLE_QUESTION_TYPES = [
   'question_media',
@@ -23,11 +28,13 @@ const UNANSWERABLE_QUESTION_TYPES = [
   'question_demographics_intro',
 ]
 
+// Allow us to insert non-test questions into the survey while faking out some
+// things that would otherwise cause us trouble.
 const createFakeCollectionCard = ({
-  id,
-  cardQuestionType = `question_${id}`,
+  id, // *
+  cardQuestionType = `question_${id}`, // *
   order,
-  recordId = id,
+  recordId = id, // *
   recordContent = '',
 }) => ({
   id,
@@ -40,7 +47,31 @@ const createFakeCollectionCard = ({
   },
 })
 
-@inject('apiStore')
+// Insert demographic questions into the survey. These need to mimic a
+// CollectionCard closely enough to get passed to the TestQuestion component
+// without issue, at which point the code diverges enough that we can apply
+// special processing.
+function createDemographicsQuestionCard(question) {
+  const id = createDemographicsCardId(question)
+  const cardQuestionType = cardQuestionTypeForQuestion(question)
+
+  return {
+    id,
+    card_question_type: cardQuestionType,
+    prompt: question.text,
+    category: question.category,
+    choices: question.choices,
+
+    // a fake record to prevent errors.
+    record: {
+      id,
+      content: question.text,
+      disableMenu: () => {}, // noop
+    },
+  }
+}
+
+@inject('apiStore') // TODO rm?
 @observer
 class TestSurveyResponder extends React.Component {
   state = {
@@ -107,12 +138,9 @@ class TestSurveyResponder extends React.Component {
     if (includeDemographicQuestions) {
       questionCards.push(createFakeCollectionCard({ id: 'demographics_intro' }))
 
-      questionCards.push(
-        createFakeCollectionCard({
-          id: 'demographics_question',
-          cardQuestionType: 'question_demographic_single_choice',
-        })
-      )
+      allDemographicQuestions().forEach(q => {
+        questionCards.push(createDemographicsQuestionCard(q))
+      })
     }
 
     if (includeTerms) {

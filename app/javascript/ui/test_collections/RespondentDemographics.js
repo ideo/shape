@@ -1,3 +1,21 @@
+import { kebabCase, uniq } from 'lodash'
+
+const CHOICE_STYLE_SINGLE = 'single'
+
+const EDUCATION_HIGH_SCHOOL = `High school diploma`
+const EDUCATION_VOCATIONAL = `Vocational training`
+const EDUCATION_COLLEGE = `College or bachelor’s degree`
+const EDUCATION_POSTGRADUTATE = `Postgraduate or master’s degree`
+const EDUCATION_DOCTORATE = `Doctorate degree`
+const EDUCATION_OTHER = `Other`
+const EDUCATION_NONE = `None of these`
+
+const GENDER_FEMALE = `Female`
+const GENDER_MALE = `Male`
+const GENDER_NB = `Non-binary`
+const GENDER_OTHER = `Other`
+const GENDER_DECLINE = `Prefer not to say`
+
 const INCOME_LOW = 'low income'
 const INCOME_MEDIUM = 'medium income'
 const INCOME_GTAVG = 'above average income'
@@ -12,86 +30,134 @@ const RESIDENCE_URBAN = 'urban dweller'
 const RESIDENCE_SUBURBAN = 'suburban dweller'
 const RESIDENCE_RURAL = 'rural dweller'
 
-export const questions = [
+const choiceStyleCardQuestionTypeMap = {
+  [CHOICE_STYLE_SINGLE]: 'question_demographic_single_choice',
+}
+
+const questions = [
   {
     text: `What’s the highest level of education you have completed?`,
+    category: 'education_levels',
+    choiceStyle: CHOICE_STYLE_SINGLE,
     choices: [
-      `High school diploma`,
-      `Vocational training`,
-      `College or bachelor’s degree`,
-      `Postgraduate or master’s degree`,
-      `Doctorate degree`,
-      `Other`,
-      `None of these`,
+      { text: `High school diploma`, tags: [EDUCATION_HIGH_SCHOOL] },
+      { text: `Vocational training`, tags: [EDUCATION_VOCATIONAL] },
+      { text: `College or bachelor’s degree`, tags: [EDUCATION_COLLEGE] },
+      {
+        text: `Postgraduate or master’s degree`,
+        tags: [EDUCATION_POSTGRADUTATE],
+      },
+      { text: `Doctorate degree`, tags: [EDUCATION_DOCTORATE] },
+      { text: `Other`, tags: [EDUCATION_OTHER] },
+      { text: `None of these`, tags: [EDUCATION_NONE] },
     ],
-    demographicTag: 'education_levels',
   },
   {
     text: `What is your gender?`,
-    choices: [`Female`, `Male`, `Non-binary`, `Other`, `Prefer not to say`],
-    demographicTag: 'genders',
+    category: 'genders',
+    choiceStyle: CHOICE_STYLE_SINGLE,
+    choices: [
+      { text: `Female`, tags: [GENDER_FEMALE] },
+      { text: `Male`, tags: [GENDER_MALE] },
+      { text: `Non-binary`, tags: [GENDER_NB] },
+      { text: `Other`, tags: [GENDER_OTHER] },
+      { text: `Prefer not to say`, tags: [GENDER_DECLINE] },
+    ],
   },
   {
     text: `Which of the following best describes where you stand financially?`,
+    category: 'income_levels',
+    choiceStyle: CHOICE_STYLE_SINGLE,
     choices: [
-      [`Sometimes paying the monthly bills is a struggle`, INCOME_LOW],
-      [
-        `Living month to month and just breaking even`,
-        INCOME_LOW,
-        INCOME_MEDIUM,
-      ],
-      [`Have enough but should save more`, INCOME_MEDIUM],
-      [
-        `Living comfortably, with some money left over at the end of each month`,
-        INCOME_GTAVG,
-      ],
-      [
-        `Living very comfortably, and spending freely on things I enjoy`,
-        INCOME_GTAVG,
-      ],
+      {
+        text: `Sometimes paying the monthly bills is a struggle`,
+        tags: [INCOME_LOW],
+      },
+      {
+        text: `Living month to month and just breaking even`,
+        tags: [INCOME_LOW, INCOME_MEDIUM],
+      },
+      {
+        text: `Have enough but should save more`,
+        tags: [INCOME_MEDIUM],
+      },
+      {
+        text: `Living comfortably, with some money left over at the end of each month`,
+        tags: [INCOME_GTAVG],
+      },
+      {
+        text: `Living very comfortably, and spending freely on things I enjoy`,
+        tags: [INCOME_GTAVG],
+      },
     ],
-    demographicTag: 'income_levels',
   },
   {
     text: `Which of these statements best describes you?`,
+    category: 'adopter_types',
+    choiceStyle: CHOICE_STYLE_SINGLE,
     choices: [
-      [
-        `I’m always the first of my friends to try new products and services. I’ll camp out in line over night if it means being first!`,
-        ADOPTER_VERY_EARLY,
-      ],
-      [
-        `I’m usually one of the first to try a new product or service, but I’ll wait for the long line to die down.`,
-        ADOPTER_VERY_EARLY,
-      ],
-      [
-        `I’m happy to try new products or services if sources I respect vouch for them`,
-        ADOPTER_EARLY,
-      ],
-      [
-        `If over time I continually hear great things about a product or service, I’d be willing to try it out.`,
-        ADOPTER_LATE,
-      ],
-      [
-        `I prefer to stick with my tried and trusted brands and products`,
-        ADOPTER_VERY_LATE,
-      ],
+      {
+        text: `I’m always the first of my friends to try new products and services. I’ll camp out in line over night if it means being first!`,
+        tags: [ADOPTER_VERY_EARLY],
+      },
+      {
+        text: `I’m usually one of the first to try a new product or service, but I’ll wait for the long line to die down.`,
+        tags: [ADOPTER_VERY_EARLY],
+      },
+      {
+        text: `I’m happy to try new products or services if sources I respect vouch for them`,
+        tags: [ADOPTER_EARLY],
+      },
+      {
+        text: `If over time I continually hear great things about a product or service, I’d be willing to try it out.`,
+        tags: [ADOPTER_LATE],
+      },
+      {
+        text: `I prefer to stick with my tried and trusted brands and products`,
+        tags: [ADOPTER_VERY_LATE],
+      },
     ],
-    demographicTag: 'adopter_types',
   },
   {
     text: `Which of these best describes where you live?`,
+    category: 'dweller_types',
+    choiceStyle: CHOICE_STYLE_SINGLE,
     choices: [
-      [`Metropolis: my city never sleeps`, RESIDENCE_METRO, RESIDENCE_URBAN],
-      [`City: it’s all about the hustle and bustle`, RESIDENCE_URBAN],
-      [
-        `Suburban area: it’s peaceful, but within easy reach of a city`,
-        RESIDENCE_SUBURBAN,
-      ],
-      [
-        `Rural area: there’s nature all around and going to the city is a trip`,
-        RESIDENCE_RURAL,
-      ],
+      {
+        text: `Metropolis: my city never sleeps`,
+        tags: [RESIDENCE_METRO, RESIDENCE_URBAN],
+      },
+      {
+        text: `City: it’s all about the hustle and bustle`,
+        tags: [RESIDENCE_URBAN],
+      },
+      {
+        text: `Suburban area: it’s peaceful, but within easy reach of a city`,
+        tags: [RESIDENCE_SUBURBAN],
+      },
+      {
+        text: `Rural area: there’s nature all around and going to the city is a trip`,
+        tags: [RESIDENCE_RURAL],
+      },
     ],
-    demographicTag: 'dweller_types',
   },
 ]
+
+export function allDemographicQuestions() {
+  return questions
+}
+
+export function cardQuestionTypeForQuestion(question) {
+  return choiceStyleCardQuestionTypeMap[question.choiceStyle]
+}
+
+export function createDemographicsCardId(question) {
+  const category = kebabCase(question.category)
+  const title = kebabCase(question.text)
+
+  return `card-demographics-${category}-${title}`
+}
+
+export function validDemographicsCategories() {
+  return uniq(questions.map(q => q.category))
+}

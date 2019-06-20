@@ -9,6 +9,7 @@ import {
   DisplayTextCss,
 } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
+import { validDemographicsCategories } from '~/ui/test_collections/RespondentDemographics'
 
 // TODO duplication
 const Question = styled.div`
@@ -48,6 +49,7 @@ const StyledFormControlLabel = styled(FormControlLabel)`
 
 @observer
 class DemographicSingleChoiceQuestion extends React.Component {
+  // TODO temp code (probably) so that the radio buttons act properly
   state = {
     answer: null,
   }
@@ -61,19 +63,25 @@ class DemographicSingleChoiceQuestion extends React.Component {
       tags: ['High school diploma'],
     })
 
+    // TODO temp code (probably) so that the radio buttons act properly
     this.setState({
       answer: value,
     })
   }
 
   render() {
+    const {
+      question: { prompt, choices },
+    } = this.props
+
     return (
       <div style={{ width: '100%' }}>
         <Question editing={false}>
-          <DisplayText color={v.colors.white}>
-            What's the highest level of education you have completed?
-          </DisplayText>
-          <SmallHelperText color="#99b8c2" style={{ display: 'block' }}>
+          <DisplayText color={v.colors.white}>{prompt}</DisplayText>
+          <SmallHelperText
+            color={v.colors.demographicsHint}
+            style={{ display: 'block' }}
+          >
             This question is optional.
           </SmallHelperText>
         </Question>
@@ -87,20 +95,16 @@ class DemographicSingleChoiceQuestion extends React.Component {
               paddingBottom: '1rem',
             }}
           >
-            <StyledFormControlLabel
-              value="High School Diploma"
-              classes={{ label: 'label' }}
-              label="High School Diploma"
-              labelPlacement="end"
-              control={<Radio />}
-            />
-            <StyledFormControlLabel
-              classes={{ label: 'label' }}
-              value="College or Bachelor's Degree"
-              label="College or Bachelor's Degree"
-              labelPlacement="end"
-              control={<Radio />}
-            />
+            {choices.map(choice => (
+              <StyledFormControlLabel
+                key={choice.text}
+                value={choice.text}
+                classes={{ label: 'label' }}
+                label={choice.text}
+                labelPlacement="end"
+                control={<Radio />}
+              />
+            ))}
           </RadioGroup>
         </Scale>
       </div>
@@ -109,6 +113,16 @@ class DemographicSingleChoiceQuestion extends React.Component {
 }
 
 DemographicSingleChoiceQuestion.propTypes = {
+  question: PropTypes.shape({
+    prompt: PropTypes.string.isRequired,
+    category: PropTypes.oneOf(validDemographicsCategories()).isRequired,
+    choices: PropTypes.arrayOf(
+      PropTypes.shape({
+        text: PropTypes.string.isRequired,
+        // tags: PropTypes.arrayOf(PropTypes.string).isRequired,
+      })
+    ),
+  }).isRequired,
   user: MobxPropTypes.objectOrObservableObject,
   onAnswer: PropTypes.func.isRequired,
 }

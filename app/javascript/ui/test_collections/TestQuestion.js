@@ -226,9 +226,8 @@ class TestQuestion extends React.Component {
       case 'question_demographic_single_choice':
         return (
           <DemographicSingleChoiceQuestion
-            question={item}
-            editing={editing}
-            questionAnswer={questionAnswer}
+            question={card}
+            // questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}
             user={apiStore.currentUser}
           />
