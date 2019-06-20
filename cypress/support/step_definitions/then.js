@@ -135,3 +135,13 @@ Then(
       .should('contain', text)
   }
 )
+
+Then('I should see {int} active user(s)', num => {
+  cy.locateDataOrClass('.StyledRow')
+    .last()
+    .children()
+    .first()
+    .should(span => {
+      expect(span.get(0).innerText).to.eq(`Active Users (${num})`)
+    })
+})
