@@ -51,21 +51,28 @@ const StyledFormControlLabel = styled(FormControlLabel)`
 class DemographicSingleChoiceQuestion extends React.Component {
   // TODO temp code (probably) so that the radio buttons act properly
   state = {
-    answer: null,
+    selectedChoice: null,
   }
 
-  handleAnswer(value) {
-    const { onAnswer, user } = this.props
+  handleAnswer(choiceIndex) {
+    const {
+      onAnswer,
+      user,
+      question: { category, choices },
+    } = this.props
 
-    onAnswer({ text: value })
+    const choice = choices[choiceIndex]
+
+    onAnswer({ text: choice.text })
+
     user.API_updateCurrentUserDemographics({
-      category: 'education_levels',
-      tags: ['High school diploma'],
+      category,
+      tags: choice.tags,
     })
 
     // TODO temp code (probably) so that the radio buttons act properly
     this.setState({
-      answer: value,
+      selectedChoice: choiceIndex,
     })
   }
 
@@ -87,18 +94,17 @@ class DemographicSingleChoiceQuestion extends React.Component {
         </Question>
         <Scale>
           <RadioGroup
-            value={this.state.answer}
-            name="demographics_education"
+            value={this.state.selectedChoice}
             onChange={(_e, value) => this.handleAnswer(value)}
             style={{
               paddingTop: '1rem',
               paddingBottom: '1rem',
             }}
           >
-            {choices.map(choice => (
+            {choices.map((choice, index) => (
               <StyledFormControlLabel
-                key={choice.text}
-                value={choice.text}
+                key={index}
+                value={index.toString()}
                 classes={{ label: 'label' }}
                 label={choice.text}
                 labelPlacement="end"
