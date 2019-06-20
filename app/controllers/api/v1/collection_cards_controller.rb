@@ -324,6 +324,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :filter,
       :hidden,
       :show_replace,
+      :pinned,
       collection_attributes: %i[
         id
         type
