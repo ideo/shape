@@ -252,7 +252,9 @@ class RecontactQuestion extends React.Component {
       <div style={{ width: '100%', backgroundColor: this.backgroundColor }}>
         {showFeedbackRecontact === 'noIncentiveForGuest' &&
           this.showFeedbackRecontactForm}
-        {answer === 'feedback_contact_no' && this.showPostOptInConfirmation}
+        {answer === 'feedback_contact_no' &&
+          !submittedContactInfo &&
+          this.showPostOptInConfirmation}
 
         {showContactInfo && this.showContactInfoForm}
 
