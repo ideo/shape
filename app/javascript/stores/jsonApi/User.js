@@ -51,11 +51,15 @@ class User extends BaseRecord {
     }
   }
 
-  async API_updateCurrentUserDemographics() {
+  async API_updateCurrentUserDemographics({ category, tags }) {
     try {
       return await this.apiStore.request(
         'users/update_current_user_demographics',
-        'PATCH'
+        'PATCH',
+        {
+          category,
+          tags,
+        }
       )
     } catch (e) {
       uiStore.defaultAlertError()

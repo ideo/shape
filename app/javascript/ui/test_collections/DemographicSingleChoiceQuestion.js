@@ -56,7 +56,10 @@ class DemographicSingleChoiceQuestion extends React.Component {
     const { onAnswer, user } = this.props
 
     onAnswer({ text: value })
-    user.API_updateCurrentUserDemographics()
+    user.API_updateCurrentUserDemographics({
+      category: 'education_levels',
+      tags: ['High school diploma'],
+    })
 
     this.setState({
       answer: value,
