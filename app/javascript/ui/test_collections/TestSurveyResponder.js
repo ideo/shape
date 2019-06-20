@@ -43,8 +43,10 @@ const createFakeCollectionCard = ({
 @inject('apiStore')
 @observer
 class TestSurveyResponder extends React.Component {
-  @observable
-  questionCards = []
+  state = {
+    questionCards: [],
+  }
+
   @observable
   recontactAnswered = false
   @observable
@@ -65,6 +67,16 @@ class TestSurveyResponder extends React.Component {
     ) {
       this.initializeCards()
     }
+  }
+
+  get questionCards() {
+    return this.state.questionCards
+  }
+
+  set questionCards(collection) {
+    this.setState({
+      questionCards: collection,
+    })
   }
 
   initializeCards() {
@@ -118,9 +130,7 @@ class TestSurveyResponder extends React.Component {
       })
     )
 
-    runInAction(() => {
-      this.questionCards = questionCards
-    })
+    this.questionCards = questionCards
   }
 
   questionAnswerForCard = card => {
