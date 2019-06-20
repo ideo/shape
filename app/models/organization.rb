@@ -265,7 +265,7 @@ class Organization < ApplicationRecord
 
   def network_default_payment_method
     return unless network_organization.present?
-    NetworkApi::PaymentMethod.find(
+    @network_default_payment_method ||= NetworkApi::PaymentMethod.find(
       organization_id: network_organization.id,
       default: true,
     ).first

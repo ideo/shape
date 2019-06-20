@@ -12,6 +12,7 @@ import Moment from '~/ui/global/Moment'
 import Avatar from '~/ui/global/Avatar'
 import { StyledCommentInput } from './CustomCommentMentions'
 import { apiStore, uiStore } from '~/stores'
+// NOTE: this is the only usage of TrashLgIcon -- TrashXl looks a tiny bit off if used here
 import TrashLgIcon from '~/ui/icons/TrashLgIcon'
 import EditPencilIcon from '~/ui/icons/EditPencilIcon'
 import { showOnHoverCss, hideOnHoverCss } from '~/ui/grid/shared'

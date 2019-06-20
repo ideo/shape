@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_07_170549) do
+ActiveRecord::Schema.define(version: 2019_06_13_230119) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -227,6 +227,53 @@ ActiveRecord::Schema.define(version: 2019_06_07_170549) do
     t.index ["organization_id"], name: "index_datasets_on_organization_id"
   end
 
+  create_table "double_entry_account_balances", force: :cascade do |t|
+    t.string "account", null: false
+    t.string "scope"
+    t.bigint "balance", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account"], name: "index_account_balances_on_account"
+    t.index ["scope", "account"], name: "index_account_balances_on_scope_and_account", unique: true
+  end
+
+  create_table "double_entry_line_checks", force: :cascade do |t|
+    t.bigint "last_line_id", null: false
+    t.boolean "errors_found", null: false
+    t.text "log"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at", "last_line_id"], name: "line_checks_created_at_last_line_id_idx"
+  end
+
+  create_table "double_entry_line_metadata", force: :cascade do |t|
+    t.bigint "line_id", null: false
+    t.string "key", null: false
+    t.string "value", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["line_id", "key", "value"], name: "lines_meta_line_id_key_value_idx"
+  end
+
+  create_table "double_entry_lines", force: :cascade do |t|
+    t.string "account", null: false
+    t.string "scope"
+    t.string "code", null: false
+    t.bigint "amount", null: false
+    t.bigint "balance", null: false
+    t.bigint "partner_id"
+    t.string "partner_account", null: false
+    t.string "partner_scope"
+    t.string "detail_type"
+    t.integer "detail_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account", "code", "created_at"], name: "lines_account_code_created_at_idx"
+    t.index ["account", "created_at"], name: "lines_account_created_at_idx"
+    t.index ["scope", "account", "created_at"], name: "lines_scope_account_created_at_idx"
+    t.index ["scope", "account", "id"], name: "lines_scope_account_id_idx"
+  end
+
   create_table "external_records", force: :cascade do |t|
     t.string "external_id"
     t.bigint "application_id"
@@ -385,6 +432,24 @@ ActiveRecord::Schema.define(version: 2019_06_07_170549) do
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end
 
+  create_table "payments", force: :cascade do |t|
+    t.text "description"
+    t.decimal "amount", precision: 10, scale: 2
+    t.decimal "unit_amount", precision: 10, scale: 2
+    t.integer "quantity"
+    t.integer "network_payment_id"
+    t.integer "network_payment_method_id"
+    t.bigint "user_id"
+    t.bigint "organization_id"
+    t.string "purchasable_type"
+    t.bigint "purchasable_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["organization_id"], name: "index_payments_on_organization_id"
+    t.index ["purchasable_type", "purchasable_id"], name: "index_payments_on_purchasable_type_and_purchasable_id"
+    t.index ["user_id"], name: "index_payments_on_user_id"
+  end
+
   create_table "question_answers", force: :cascade do |t|
     t.bigint "survey_response_id"
     t.bigint "question_id"
@@ -416,6 +481,10 @@ ActiveRecord::Schema.define(version: 2019_06_07_170549) do
     t.integer "status", default: 0
     t.bigint "user_id"
     t.bigint "test_audience_id"
+    t.integer "incentive_status"
+    t.datetime "incentive_owed_at"
+    t.datetime "incentive_paid_at"
+    t.index ["incentive_status"], name: "index_survey_responses_on_incentive_status"
     t.index ["session_uid"], name: "index_survey_responses_on_session_uid", unique: true
     t.index ["test_audience_id"], name: "index_survey_responses_on_test_audience_id"
     t.index ["test_collection_id"], name: "index_survey_responses_on_test_collection_id"

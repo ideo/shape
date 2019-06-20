@@ -46,6 +46,8 @@ const createNamedRoutes = () => {
     'apiGetOrganizationAudiences'
   )
   cy.route('GET', '/api/v1/groups/*').as('apiGetGroup')
+  cy.route('POST', '/api/v1/groups/**/roles').as('apiInviteUserToGroup')
+  cy.route('DELETE', '/api/v1/groups/**/roles/**').as('apiDeleteGroupRoles')
 
   cy.route('GET', '/api/v1/comment_threads/find_by_record/Collection/*').as(
     'apiGetCommentThread'
@@ -62,6 +64,19 @@ const createNamedRoutes = () => {
     'apiCreateLimitedUser'
   )
 
+  cy.route('POST', '/api/v1/collections/**/roles').as(
+    'apiInviteUserToCollection'
+  )
+
+  cy.route('GET', '/api/v1/collections/**/roles/**').as('apiGetCollectionRoles')
+
+  cy.route('DELETE', '/api/v1/collections/**/roles/**').as(
+    'apiDeleteCollectionRoles'
+  )
+
+  cy.route('GET', '/api/v1/search/users_and_groups*').as(
+    'apiSearchUsersAndGroups'
+  )
   // Admin routes
   cy.route('GET', '/api/v1/admin/users').as('apiAdminGetUsers')
   cy.route('GET', '/api/v1/admin/test_collections*').as(
@@ -70,6 +85,9 @@ const createNamedRoutes = () => {
 
   // external routes
   cy.route('GET', '**/youtube/v3/videos*', 'fx:youtube-api').as('youtubeApi')
+  cy.route('GET', '**/cloud.filestackapi.com/**').as('fileStackApi')
+  cy.route('POST', '**/cloud.filestackapi.com/**').as('fileStackApiPost')
+  cy.route('GET', '**/api.vimeo.com/**').as('vimeoApi')
   cy.route('GET', /passthru/, 'fx:blog').as('externalUrl')
 }
 

@@ -87,6 +87,8 @@ class TextItemCover extends React.Component {
       },
       message: 'Text undone!',
       redirectTo: uiStore.viewingCollection,
+      // TODO: there is no way to push a redoAction because the edit hasn't happened yet!
+      // so we'd have to figure out a different way to capture the redo after you undo
     })
     uiStore.update('textEditingItem', this.state.item)
     return null

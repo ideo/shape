@@ -134,7 +134,7 @@ class Activity extends React.PureComponent {
       case 'archived':
         return (
           <ActivityText>
-            <strong className="actor">{actorNames}</strong> has archived{' '}
+            <strong className="actor">{actorNames}</strong> has deleted{' '}
             <strong className="target">
               &ldquo;
               {targetName}
