@@ -1,7 +1,6 @@
 import { find, findIndex, includes } from 'lodash'
 import { Flex } from 'reflexbox'
 import PropTypes from 'prop-types'
-import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import FlipMove from 'react-flip-move'
 import { Element as ScrollElement, scroller } from 'react-scroll'
@@ -78,17 +77,14 @@ function createDemographicsQuestionCard(question) {
   }
 }
 
-@inject('apiStore') // TODO rm?
+@inject('apiStore')
 @observer
 class TestSurveyResponder extends React.Component {
   state = {
     questionCards: [],
+    currentCardIdx: 0,
+    nonTestQuestionsAnswered: {}, // [card.id] => boolean
   }
-
-  @observable
-  nonTestQuestionsAnswered = {} // [card.id] => boolean
-  @observable
-  currentCardIdx = 0
 
   componentDidMount() {
     this.initializeCards()
@@ -107,9 +103,32 @@ class TestSurveyResponder extends React.Component {
     return this.state.questionCards
   }
 
+  get currentCardIdx() {
+    return this.state.currentCardIdx
+  }
+
+  get nonTestQuestionsAnswered() {
+    return this.state.nonTestQuestionsAnswered
+  }
+
   set questionCards(collection) {
     this.setState({
       questionCards: collection,
+    })
+  }
+
+  set currentCardIdx(value) {
+    this.setState({
+      currentCardIdx: value,
+    })
+  }
+
+  setNonTestQuestionAnswered(cardId, answered = true) {
+    this.setState({
+      nonTestQuestionsAnswered: {
+        ...this.nonTestQuestionsAnswered,
+        [cardId]: answered,
+      },
     })
   }
 
@@ -217,9 +236,7 @@ class TestSurveyResponder extends React.Component {
 
   afterQuestionAnswered = (card, answer) => {
     if (NON_TEST_QUESTION_TYPES.includes(card.card_question_type)) {
-      runInAction(() => {
-        this.nonTestQuestionsAnswered[card.id] = true
-      })
+      this.setNonTestQuestionAnswered(card.id)
     }
     if (card.card_question_type === 'question_recontact') {
       // this is the last question, don't try to scroll
@@ -242,9 +259,7 @@ class TestSurveyResponder extends React.Component {
     const { containerId } = this.props
     const index = questionCards.indexOf(card)
     const answerableIdx = this.answerableCards.indexOf(card)
-    runInAction(() => {
-      this.currentCardIdx = answerableIdx + 1
-    })
+    this.currentCardIdx = answerableIdx + 1
     const nextCard = questionCards[index + 1]
     if (!nextCard) return
     if (this.hasFinishedSurvey(nextCard)) this.refreshUserAfterSurvey()
