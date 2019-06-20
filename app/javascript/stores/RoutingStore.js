@@ -53,11 +53,7 @@ class RoutingStore extends RouterStore {
     if (uiStore.movingIntoCollection) {
       return
     }
-    // close the org/roles menus if either are open when we route to a new page
-    uiStore.update('organizationMenuPage', null)
-    uiStore.update('rolesMenuOpen', null)
-    uiStore.setViewingCollection(null)
-    uiStore.closeDialog()
+    this.beforeRouting()
     if (!id && type !== 'homepage' && type !== 'search') {
       // in this case, type is a path like '/' or '/terms'
       this.push(type)
@@ -67,6 +63,19 @@ class RoutingStore extends RouterStore {
       this.updatePreviousPageBeforeSearch(this.location)
     }
     const path = this.pathTo(type, id, params)
+    this.push(path)
+  }
+
+  beforeRouting() {
+    // close the org/roles menus if either are open when we route to a new page
+    uiStore.update('organizationMenuPage', null)
+    uiStore.update('rolesMenuOpen', null)
+    uiStore.setViewingCollection(null)
+    uiStore.closeDialog()
+  }
+
+  goToPath = path => {
+    this.beforeRouting()
     this.push(path)
   }
 

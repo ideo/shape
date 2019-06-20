@@ -863,7 +863,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       cardIds: [this.parent_collection_card.id],
       snapshot: null,
     })
-    routingStore.routeTo('collections', this.parent.id)
+    if (this.parent) {
+      routingStore.routeTo('collections', this.parent.id)
+    } else if (this.parentPath) {
+      routingStore.goToPath(this.parentPath)
+    }
   }
 
   async API_moveCardsIntoCollection({
