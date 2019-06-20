@@ -134,7 +134,7 @@ This will open separate tabs to:
 ./dev.sh -e [your favorite editor]
 ```
 
-## Post-checkout hook for switching between branches
+### Post-checkout hook for switching between branches
 
 Use the post-checkout hook here to keep your branches in sync:
 https://github.com/ideo/shape/wiki/Git-post-checkout-hook
@@ -144,6 +144,8 @@ Upon switching branches, this will (as necessary):
  - yarn install
  - migrate or rollback any migrations relevant (or not relevant) to the branch, and checkout `db/schema.rb`
  - git submodule update
+
+You can also decline the updates e.g. if you are just making a quick branch update don't want to rollback migrations (and lose data).
 
 ### Keeping database in sync
 
