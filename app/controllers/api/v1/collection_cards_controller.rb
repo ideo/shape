@@ -70,8 +70,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     end
   end
 
-  before_action :load_and_authorize_cards, only: %i[archive unarchive]
-  after_action :broadcast_collection_archive_updates, only: %i[archive unarchive]
+  before_action :load_and_authorize_cards, only: %i[archive unarchive unarchive_from_email]
+  after_action :broadcast_collection_archive_updates, only: %i[archive unarchive unarchive_from_email]
   def archive
     @collection_cards.archive_all!(user_id: current_user.id)
     render json: { archived: true }
@@ -85,6 +85,14 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     end
     @collection.unarchive_cards!(@collection_cards, collection_snapshot_params)
     render jsonapi: @collection.reload
+  end
+
+  def unarchive_from_email
+    @collection = Collection.find(@collection_cards.first.parent.id)
+    if @collection_cards.first.archived
+      @collection.unarchive_cards!(@collection_cards, {})
+    end
+    redirect_to frontend_url_for(@collection).to_s
   end
 
   before_action :load_and_authorize_replacing_card, only: %i[replace]

@@ -194,6 +194,27 @@ button {
   user-select: none;
 }
 
+.standard-button {
+  border-radius: 20px;
+  background-color: #3f526a;
+  color: white;
+  cursor: pointer;
+  display: inline-block;
+  font-family: $gotham-font;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 40px;
+  height: 40px;
+  overflow: visible;
+  padding: 0;
+  width: 183px;
+  text-transform: uppercase;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
 .Notification__Container {
   background-color: #3f526a;
   border-radius: 2px;
