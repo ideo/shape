@@ -59,7 +59,8 @@ class SurveyResponse < ApplicationRecord
   }
 
   def record_incentive_owed!
-    return if !incentive_unearned? || amount_earned.zero? || user.blank?
+    return if !incentive_unearned? || amount_earned.zero? || user&.email.blank?
+    # TODO: what if a user (phone only?) fills out their email later to be "owed" for a previous response?
     Accounting::RecordTransfer.incentive_owed(self)
     update(incentive_status: :incentive_owed, incentive_owed_at: Time.current)
     incentive_owed_account_balance

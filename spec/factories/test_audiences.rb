@@ -7,7 +7,7 @@ FactoryBot.define do
 
     trait :payment do
       after(:build) do |test_audience|
-        payment = build(:payment, :paid, purchasable: test_audience)
+        payment = build(:payment, :paid, purchasable: test_audience, amount: test_audience.price_per_response * test_audience.sample_size)
         test_audience.payment = payment
       end
     end
