@@ -199,6 +199,6 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   attribute :is_restorable do
-    @object.restorable?
+    @object.try(:restorable?)
   end
 end

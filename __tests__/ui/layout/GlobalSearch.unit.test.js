@@ -1,8 +1,6 @@
 import GlobalSearch from '~/ui/layout/GlobalSearch'
 import fakeUiStore from '#/mocks/fakeUiStore'
 
-jest.useFakeTimers()
-
 let props, wrapper, component
 describe('GlobalSearch', () => {
   beforeEach(() => {
