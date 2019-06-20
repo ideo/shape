@@ -208,9 +208,9 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         collection.archive!
       end
 
-      it 'should return a 404' do
+      it 'should return a collection' do
         get(path)
-        expect(response.status).to eq(404)
+        expect(response.status).to eq(200)
       end
     end
 
@@ -436,7 +436,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
               width: 3,
               row: 4,
               col: 5,
-            }
+            },
           ),
         )
       end
