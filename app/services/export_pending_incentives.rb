@@ -32,14 +32,17 @@ class ExportPendingIncentives < SimpleService
       .group(:user_id, :id)
       .includes(:user)
       .map(&:user)
+      .uniq
   end
 
   def amount_owed_by_user_id
-    @amount_owed_by_user_id ||= Accounting::Query
-      .account_balances(:individual_owed)
-      .where(scope: pending_incentive_users.map(&:id))
-      .each_with_object({}) do |account_balance, h|
-        h[account_balance.scope.to_i] = account_balance.balance.to_f
-      end
+    @amount_owed_by_user_id ||= begin
+      Accounting::Query
+        .account_balances(:individual_owed)
+        .where(scope: pending_incentive_users.map(&:id))
+        .each_with_object({}) do |account_balance, h|
+          h[account_balance.scope.to_i] = account_balance.balance.to_f
+        end
+    end
   end
 end
