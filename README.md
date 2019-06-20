@@ -134,6 +134,17 @@ This will open separate tabs to:
 ./dev.sh -e [your favorite editor]
 ```
 
+## Post-checkout hook for switching between branches
+
+Use the post-checkout hook here to keep your branches in sync:
+https://github.com/ideo/shape/wiki/Git-post-checkout-hook
+
+Upon switching branches, this will (as necessary):
+ - bundle install
+ - yarn install
+ - migrate or rollback any migrations relevant (or not relevant) to the branch, and checkout `db/schema.rb`
+ - git submodule update
+
 ### Keeping database in sync
 
 Sometimes your local database environment will drift away from production. You can pull the current production database to your local machine using a shell command from `.shell-commands` (NOTE: this is only possible if you have been granted access to the Heroku instance). First, run `source .shell-commands`, then run:
