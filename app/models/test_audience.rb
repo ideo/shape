@@ -31,6 +31,7 @@ class TestAudience < ApplicationRecord
              touch: true
   belongs_to :launched_by, class_name: 'User', optional: true
   has_many :survey_responses
+  has_one :payment, as: :purchasable
 
   delegate :name,
            :link_sharing?,
@@ -38,7 +39,7 @@ class TestAudience < ApplicationRecord
   validates :price_per_response, presence: true
 
   before_validation :set_price_per_response_from_audience, on: :create
-  before_create :purchase, if: :requires_payment?
+  after_create :purchase, if: :requires_payment?
 
   delegate :name, :price_per_response,
            to: :audience,
@@ -49,19 +50,33 @@ class TestAudience < ApplicationRecord
   delegate :number_to_currency, to: 'ActionController::Base.helpers'
 
   # this will only get set in PurchaseTestAudience
-  attr_writer :payment_method
+  attr_writer :network_payment_method
 
   scope :link_sharing, -> { where(price_per_response: 0) }
   scope :paid, -> { where('price_per_response > 0') }
   scope :ordered_last_closed_at, -> { order(closed_at: :desc) }
+
+  PAYMENT_WAITING_PERIOD = 1.week
 
   enum status: {
     open: 0,
     closed: 1,
   }
 
+  def self.incentive_amount
+    Shape::FEEDBACK_INCENTIVE_AMOUNT
+  end
+
   def self.display_name
     'Audience'
+  end
+
+  def paid?
+    price_per_response.positive?
+  end
+
+  def link_sharing?
+    !paid?
   end
 
   def survey_response_completed!
@@ -88,33 +103,29 @@ class TestAudience < ApplicationRecord
     sample_size * price_per_response
   end
 
-  def network_payment
-    return if network_payment_id.blank?
-    @network_payment ||= NetworkApi::Payment.find(network_payment_id)
-  end
-
   private
 
   # This callback only gets called when using PurchaseTestAudience and setting payment_method
   def purchase
-    return unless valid?
-
-    payment = NetworkApi::Payment.create(
-      payment_method_id: @payment_method.id,
+    create_payment(
+      user: launched_by,
+      organization: organization,
+      network_payment_method_id: @network_payment_method.id,
       description: description,
       amount: total_price.to_f,
       quantity: sample_size,
       unit_amount: price_per_response.to_f,
     )
-    self.network_payment_id = payment.id
-    return payment if payment.status == 'succeeded'
+
+    return if payment.persisted?
 
     errors.add(:base, "Payment failed: #{payment.errors.full_messages.join('. ')}")
-    throw :abort
+    # throw doesn't work in after_* callbacks, so use this to stop the transaction
+    raise ActiveRecord::RecordInvalid, self
   end
 
   def requires_payment?
-    @payment_method.present? && total_price.positive?
+    @network_payment_method.present? && total_price.positive?
   end
 
   def set_price_per_response_from_audience

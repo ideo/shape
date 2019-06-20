@@ -202,18 +202,16 @@ class Collection < ApplicationRecord
   searchkick callbacks: :queue
 
   # active == don't index archived collections
-  # where(type: nil) == don't index User/SharedWithMe collections
+  # searchable == don't index User/SharedWithMe collections
   scope :search_import, -> do
     active.searchable.includes(
       [
         {
           items: %i[
             tags
-            taggings
           ],
         },
         :tags,
-        :taggings,
       ],
     )
   end
@@ -235,14 +233,11 @@ class Collection < ApplicationRecord
   # By default all string fields are searchable
   def search_data
     parent_ids = breadcrumb
-    activity_dates = activities.map do |activity|
-      activity.updated_at.to_date
-    end.uniq
+    activity_dates = activities.group('DATE(updated_at)').pluck('DATE(updated_at)')
     {
       type: type,
       name: name,
       tags: all_tag_names,
-      item_tags: items.map(&:tags).flatten.map(&:name),
       content: search_content,
       organization_id: organization_id,
       user_ids: search_user_ids,
@@ -256,7 +251,7 @@ class Collection < ApplicationRecord
 
   def all_tag_names
     # We include item tags because you currently can't search for items
-    (all_tags_list + items.map(&:tag_list)).uniq
+    (tags.map(&:name) + items.map(&:tags).flatten.map(&:name)).uniq
   end
 
   def search_content

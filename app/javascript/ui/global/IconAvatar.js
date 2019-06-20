@@ -7,9 +7,10 @@ import v from '~/utils/variables'
 
 const StyledAvatar = styled(MuiAvatar)`
   &.avatar {
-    background: ${({ backgroundColor }) => backgroundColor};
+    background: ${({ backgroundcolor }) => backgroundcolor};
     box-sizing: border-box;
     color: ${({ color }) => color};
+    cursor: pointer;
     height: ${({ size }) => size}px;
     margin-left: 5px;
     margin-right: 5px;
@@ -36,11 +37,13 @@ class IconAvatar extends React.Component {
     const renderAvatar = (
       <StyledAvatar
         alt={title}
-        backgroundColor={backgroundColor}
+        // named lowercase to get around React DOM props warning
+        backgroundcolor={backgroundColor}
         className={`avatar ${className}`}
         color={color}
         onClick={onClick}
         size={size}
+        data-cy={this.props['data-cy']}
       >
         {children}
       </StyledAvatar>
@@ -69,6 +72,7 @@ IconAvatar.propTypes = {
   onClick: PropTypes.func,
   size: PropTypes.number,
   title: PropTypes.string,
+  'data-cy': PropTypes.string,
 }
 IconAvatar.defaultProps = {
   backgroundColor: v.colors.secondaryDark,
@@ -78,6 +82,7 @@ IconAvatar.defaultProps = {
   onClick: () => {},
   size: 32,
   title: null,
+  'data-cy': null,
 }
 
 export default IconAvatar

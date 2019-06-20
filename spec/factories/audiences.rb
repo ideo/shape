@@ -12,7 +12,6 @@ FactoryBot.define do
     interest_list []
     publication_list []
 
-
     trait :link_sharing do
       price_per_response 0
     end

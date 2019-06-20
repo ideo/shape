@@ -54,10 +54,10 @@ RSpec.describe TestAudience, type: :model do
   end
 
   let(:payment_errors) { [] }
-  let(:payment_method_double) { double(id: SecureRandom.hex(10)) }
+  let(:payment_method_double) { double(id: rand(1000..100_000)) }
   before do
     allow(NetworkApi::Organization).to receive(:find_by_external_id).and_return(
-      double(id: SecureRandom.hex(10)),
+      double(id: rand(1000..100_000)),
     )
     allow(NetworkApi::PaymentMethod).to receive(:find).and_return(
       [payment_method_double],
@@ -85,7 +85,7 @@ RSpec.describe TestAudience, type: :model do
   end
 
   describe 'callbacks' do
-    describe '#purchase' do
+    describe '#purchase', truncate: true do
       it 'charges organization payment method' do
         # .valid? is also necessary to generate description
         expect(test_audience.valid?).to be true
@@ -97,14 +97,14 @@ RSpec.describe TestAudience, type: :model do
           unit_amount: audience.price_per_response.to_f,
         )
         # set the payment method
-        test_audience.payment_method = payment_method_double
+        test_audience.network_payment_method = payment_method_double
         test_audience.save
       end
 
       context 'if payment fails' do
         let!(:payment_errors) { ['Bank declined the card'] }
         before do
-          test_audience.payment_method = payment_method_double
+          test_audience.network_payment_method = payment_method_double
           test_audience.save
         end
 
@@ -113,7 +113,7 @@ RSpec.describe TestAudience, type: :model do
         end
 
         it 'returns error' do
-          expect(test_audience.errors.full_messages).to eq(
+          expect(test_audience.errors.to_a).to eq(
             ['Payment failed: Bank declined the card'],
           )
         end
