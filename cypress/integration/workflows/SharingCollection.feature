@@ -10,13 +10,11 @@ Feature: Sharing a collection
     Then I should see ".FormButton" not be disabled
     When I click the form add button in the collection sharing modal
     And I wait for 1 second
-    And I add "cypress-test-2@ideo.com" to the sharing modal
+    Then I should see 3 active users
+    When I add "cypress-test-2@ideo.com" to the sharing modal
     And I wait for '@apiSearchUsersAndGroups' to finish
     And I select to invite a new user
     Then I should see ".FormButton" not be disabled
-    When I click the form add button in the collection sharing modal
-    And I wait for 1 second
-    And I remove the user from the collection sharing modal
+    When I remove the user from the collection sharing modal
     And I wait for "@apiSearchUsersAndGroups" to finish
-    And I wait for 1 second
-    Then I should see 1 active user
+    Then I should see 2 active users

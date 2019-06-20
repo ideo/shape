@@ -137,11 +137,7 @@ Then(
 )
 
 Then('I should see {int} active user(s)', num => {
-  cy.locateDataOrClass('.StyledRow')
-    .last()
+  cy.locateDataOrClass('.MuiCollapse-wrapperInner')
     .children()
-    .first()
-    .should(span => {
-      expect(span.get(0).innerText).to.eq(`Active Users (${num})`)
-    })
+    .should('have.length', num)
 })
