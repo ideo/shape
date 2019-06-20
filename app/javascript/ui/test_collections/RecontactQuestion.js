@@ -131,7 +131,7 @@ class RecontactQuestion extends React.Component {
             }
             onClick={this.handleClick('feedback_contact_no')}
           >
-            <Emoji scale={1.375} name="Finished" symbol="👎" />
+            <Emoji size="large" name="Finished" symbol="👎" />
           </EmojiButton>
           <EmojiButton
             selected={
@@ -143,7 +143,7 @@ class RecontactQuestion extends React.Component {
             onClick={this.handleClick('feedback_contact_yes')}
             data-cy="RecontactEmojiBtnThumbUp"
           >
-            <Emoji scale={1.375} name="Yes" symbol="👍" />
+            <Emoji size="large" name="Yes" symbol="👍" />
           </EmojiButton>
         </EmojiHolder>
         {this.renderPostOptInModule}
@@ -154,9 +154,9 @@ class RecontactQuestion extends React.Component {
   get renderPostOptInModule() {
     switch (this.feedback_contact_preference) {
       case 'feedback_contact_yes':
-        return <Emoji scale={2} name="Okay gesture" symbol="👌" />
+        return <Emoji size="xl" name="Okay gesture" symbol="👌" />
       case 'feedback_contact_no':
-        return <Emoji scale={1.375} name="crying face" symbol="😢" />
+        return <Emoji size="large" name="crying face" symbol="😢" />
       default:
         return null
     }

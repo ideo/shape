@@ -40,7 +40,27 @@ const EmojiImage = styled.img`
 `
 
 const Emoji = props => {
-  const { name, symbol, scale } = props
+  const { name, symbol, scale, size } = props
+
+  const emojiSize = () => {
+    let multiplier
+    switch (size) {
+      case 'medium':
+        multiplier = 1.25
+        break
+      case 'large':
+        multiplier = 1.375
+        break
+      case 'xl':
+        multiplier = 2
+        break
+      case 'scaled':
+      default:
+        multiplier = scale
+    }
+    return `${parseInt(32 * multiplier)}px`
+  }
+
   return emojiSupported(symbol) ? (
     <span
       className="emoji"
@@ -48,7 +68,7 @@ const Emoji = props => {
       aria-label={name || ''}
       aria-hidden={name ? 'false' : 'true'}
       style={{
-        fontSize: `${parseInt(32 * scale)}px`,
+        fontSize: emojiSize(),
         fontFamily: 'Segoe UI Emoji',
       }}
     >
@@ -56,7 +76,7 @@ const Emoji = props => {
     </span>
   ) : (
     <EmojiImage
-      style={{ width: `${parseInt(32 * scale)}px` }}
+      style={{ width: emojiSize() }}
       src={emojiFallback(symbol)}
       alt={name}
     />
@@ -67,11 +87,13 @@ Emoji.propTypes = {
   name: PropTypes.string,
   symbol: PropTypes.string,
   scale: PropTypes.number,
+  size: PropTypes.oneOf(['scaled', 'medium', 'large', 'xl']),
 }
 Emoji.defaultProps = {
   name: null,
   symbol: null,
-  scale: 1,
+  scale: 1, // default, aka "small"
+  size: 'scaled', // scaled means just use the "scale" prop
 }
 
 export default Emoji
