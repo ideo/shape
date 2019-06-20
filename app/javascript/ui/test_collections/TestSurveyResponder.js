@@ -15,6 +15,7 @@ import {
 } from '~/ui/test_collections/shared'
 import TestQuestion from '~/ui/test_collections/TestQuestion'
 import GreetingMessage from '~/ui/test_collections/GreetingMessage'
+import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
 
 const UNANSWERABLE_QUESTION_TYPES = [
   'question_media',
@@ -35,9 +36,13 @@ class TestSurveyResponder extends React.Component {
   welcomeAnswered = false
   @observable
   currentCardIdx = 0
+  @observable
+  surveyResponse = null
 
-  componentDidMount() {
+  async componentDidMount() {
     this.initializeCards()
+
+    await this.fetchSurveyResponse()
   }
 
   componentDidUpdate(prevProps) {
@@ -46,6 +51,38 @@ class TestSurveyResponder extends React.Component {
       this.props.includeRecontactQuestion != prevProps.includeRecontactQuestion
     ) {
       this.initializeCards()
+    }
+  }
+
+  async fetchSurveyResponse() {
+    const { apiStore } = this.props
+    const surveyResponseId = this.collection.survey_response_for_user_id
+    const surveyResponseResult =
+      surveyResponseId &&
+      (await apiStore.fetch('survey_responses', surveyResponseId))
+    const surveyResponse = surveyResponseResult
+      ? surveyResponseResult.data
+      : null
+    this.surveyResponse = surveyResponse
+  }
+
+  createSurveyResponse = async () => {
+    const { collection, apiStore } = this.props
+
+    const newResponse = new SurveyResponse(
+      {
+        test_collection_id: collection.id,
+      },
+      apiStore
+    )
+    try {
+      const surveyResponse = await newResponse.save()
+      if (surveyResponse) {
+        this.surveyResponse = surveyResponse
+      }
+      return surveyResponse
+    } catch (e) {
+      collection.test_status = 'closed'
     }
   }
 

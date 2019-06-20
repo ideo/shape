@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes, inject } from 'mobx-react'
 import { observable, action } from 'mobx'
 import styled, { ThemeProvider } from 'styled-components'
 
@@ -13,68 +13,6 @@ import v from '~/utils/variables'
 import DialogWrapper from '~/ui/global/modals/DialogWrapper'
 import { LoudDisplayLink } from '~/ui/global/styled/typography'
 import RecontactQuestion from '~/ui/test_collections/RecontactQuestion'
-
-@observer
-class ClosedSurvey extends React.Component {
-  @observable
-  answer = null
-
-  @action
-  onAnswer = answer => {
-    this.answer = answer
-  }
-
-  renderEmoji() {
-    switch (this.answer) {
-      case 'feedback_contact_yes':
-        return <Emoji size="xl" name="Raising hands" symbol="🙌" />
-      case 'feedback_contact_no':
-        return <Emoji size="xl" name="Okay gesture" symbol="👌" />
-      default:
-        return <Emoji size="xl" name="Confused face" symbol="😕" />
-    }
-  }
-
-  get message() {
-    if (window.noneAvailable) {
-      return 'No ideas are ready to test yet. Please come back later.'
-    }
-    switch (this.answer) {
-      case 'feedback_contact_yes':
-        return "Great, thanks! We'll reach out as soon as we have new feedback opportunities for you."
-      case 'feedback_contact_no':
-        return "Okay, we won't contact you about future feedback opportunities."
-      default:
-        return 'Sorry! This survey has now been closed.'
-    }
-  }
-
-  render() {
-    const { currentUser, includeRecontactQuestion, sessionUid } = this.props
-
-    return (
-      <ThemeProvider theme={styledTestTheme('primary')}>
-        <StyledSurvey>
-          <DialogWrapper />
-          <SurveyClosed>
-            <EmojiMessageContainer>{this.renderEmoji()}</EmojiMessageContainer>
-            <StyledClosedText>{this.message}</StyledClosedText>
-            {includeRecontactQuestion && !this.answer ? (
-              <RecontactQuestion
-                backgroundColor={v.colors.primaryDarkest}
-                user={currentUser}
-                onAnswer={this.onAnswer}
-                sessionUid={sessionUid}
-              />
-            ) : (
-              <LearnMoreLink href={'/'}>Learn More About Shape</LearnMoreLink>
-            )}
-          </SurveyClosed>
-        </StyledSurvey>
-      </ThemeProvider>
-    )
-  }
-}
 
 // TODO move blue background, rounded-corner box to shared component
 const StyledClosedText = styled.div`
@@ -104,15 +42,116 @@ const LearnMoreLink = LoudDisplayLink.extend`
 `
 LearnMoreLink.displayName = 'LearnMoreLink'
 
+@inject('apiStore')
+@observer
+class ClosedSurvey extends React.Component {
+  @observable
+  answer = null
+  @observable
+  surveyResponse = null
+
+  async componentDidMount() {
+    this.initializeCards()
+
+    await this.fetchSurveyResponse()
+  }
+
+  @action
+  onAnswer = answer => {
+    this.answer = answer
+  }
+
+  async fetchSurveyResponse() {
+    const { collection, apiStore } = this.props
+    const surveyResponseId = collection.survey_response_for_user_id
+    const surveyResponseResult =
+      surveyResponseId &&
+      (await apiStore.fetch('survey_responses', surveyResponseId))
+    const surveyResponse = surveyResponseResult
+      ? surveyResponseResult.data
+      : null
+    this.surveyResponse = surveyResponse
+  }
+
+  renderEmoji() {
+    switch (this.answer) {
+      case 'feedback_contact_yes':
+        return <Emoji size="xl" name="Raising hands" symbol="🙌" />
+      case 'feedback_contact_no':
+        return <Emoji size="xl" name="Okay gesture" symbol="👌" />
+      default:
+        return <Emoji size="xl" name="Confused face" symbol="😕" />
+    }
+  }
+
+  get message() {
+    if (window.noneAvailable) {
+      return 'No ideas are ready to test yet. Please come back later.'
+    }
+    switch (this.answer) {
+      case 'feedback_contact_yes':
+        return "Great, thanks! We'll reach out as soon as we have new feedback opportunities for you."
+      case 'feedback_contact_no':
+        return "Okay, we won't contact you about future feedback opportunities."
+      default:
+        return 'Sorry! This survey has now been closed.'
+    }
+  }
+
+  get currentUser() {
+    const { apiStore } = this.props
+    const { currentUser } = apiStore
+
+    return currentUser
+  }
+
+  get sessionUid() {
+    const { surveyResponse } = this
+
+    surveyResponse ? surveyResponse.session_uid : null
+  }
+
+  render() {
+    const { currentUser, includeRecontactQuestion } = this.props
+
+    return (
+      <ThemeProvider theme={styledTestTheme('primary')}>
+        <StyledSurvey>
+          <DialogWrapper />
+          <SurveyClosed>
+            <EmojiMessageContainer>{this.renderEmoji()}</EmojiMessageContainer>
+            <StyledClosedText>{this.message}</StyledClosedText>
+            {includeRecontactQuestion && !this.answer ? (
+              <RecontactQuestion
+                backgroundColor={v.colors.primaryDarkest}
+                user={currentUser}
+                onAnswer={this.onAnswer}
+                sessionUid={this.sessionUid}
+              />
+            ) : (
+              <LearnMoreLink href={'/'}>Learn More About Shape</LearnMoreLink>
+            )}
+          </SurveyClosed>
+        </StyledSurvey>
+      </ThemeProvider>
+    )
+  }
+}
+
 ClosedSurvey.propTypes = {
   currentUser: MobxPropTypes.objectOrObservableObject,
   includeRecontactQuestion: PropTypes.bool,
-  sessionUid: PropTypes.string,
+  collection: MobxPropTypes.objectOrObservableObject,
 }
+
+ClosedSurvey.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+
 ClosedSurvey.defaultProps = {
   currentUser: null,
   includeRecontactQuestion: false,
-  sessionUid: null,
+  collection: undefined,
 }
 
 export default ClosedSurvey

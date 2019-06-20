@@ -140,8 +140,6 @@ class InlineCollectionTest extends React.Component {
           )}
           <TestSurveyResponder
             collection={testCollection}
-            surveyResponse={surveyResponse}
-            createSurveyResponse={createSurveyResponse}
             editing={false}
             theme="secondary"
             // for scrolling purposes

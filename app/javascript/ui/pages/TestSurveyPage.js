@@ -5,7 +5,7 @@ import DialogWrapper from '~/ui/global/modals/DialogWrapper'
 import Logo from '~/ui/layout/Logo'
 import TestSurveyResponder from '~/ui/test_collections/TestSurveyResponder'
 import { apiStore } from '~/stores'
-import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
+
 import ClosedSurvey from '~/ui/test_collections/ClosedSurvey'
 import RespondentBanner from '~/ui/test_collections/RespondentBanner'
 
@@ -33,10 +33,6 @@ const StyledSurvey = styled.div`
 
 @observer
 class TestSurveyPage extends React.Component {
-  state = {
-    surveyResponse: null,
-  }
-
   constructor(props) {
     super(props)
     this.collection = props.collection || apiStore.sync(window.collectionData)
@@ -54,38 +50,6 @@ class TestSurveyPage extends React.Component {
   async componentDidMount() {
     await apiStore.loadCurrentUser()
     if (!apiStore.currentUser) return
-    await this.fetchSurveyResponse()
-  }
-
-  async fetchSurveyResponse() {
-    const surveyResponseId = this.collection.survey_response_for_user_id
-    const surveyResponseResult =
-      surveyResponseId &&
-      (await apiStore.fetch('survey_responses', surveyResponseId))
-    const surveyResponse = surveyResponseResult
-      ? surveyResponseResult.data
-      : null
-    this.setState({
-      surveyResponse,
-    })
-  }
-
-  createSurveyResponse = async () => {
-    const newResponse = new SurveyResponse(
-      {
-        test_collection_id: this.collection.id,
-      },
-      apiStore
-    )
-    try {
-      const surveyResponse = await newResponse.save()
-      if (surveyResponse) {
-        this.setState({ surveyResponse })
-      }
-      return surveyResponse
-    } catch (e) {
-      this.collection.test_status = 'closed'
-    }
   }
 
   get currentUser() {
@@ -108,28 +72,19 @@ class TestSurveyPage extends React.Component {
   }
 
   get renderSurvey() {
-    const { collection, createSurveyResponse } = this
-    const { surveyResponse } = this.state
+    const { collection } = this
     if (!collection) return null
 
     return (
       <StyledSurvey data-cy="StandaloneTestSurvey">
         <TestSurveyResponder
           collection={collection}
-          surveyResponse={surveyResponse}
-          createSurveyResponse={createSurveyResponse}
           editing={false}
           includeRecontactQuestion={this.includeRecontactQuestion}
           includeTerms={this.includeTerms}
         />
       </StyledSurvey>
     )
-  }
-
-  get sessionUid() {
-    const { surveyResponse } = this.state
-
-    surveyResponse ? surveyResponse.session_uid : null
   }
 
   render() {
@@ -149,7 +104,7 @@ class TestSurveyPage extends React.Component {
             <ClosedSurvey
               includeRecontactQuestion={this.includeRecontactQuestion}
               currentUser={this.currentUser}
-              sessionUid={this.sessionUid}
+              collection={this.collection}
             />
           )}
         </StyledBg>
