@@ -23,8 +23,11 @@ end
 
 def reindex_models(klasses)
   klasses.each do |klass|
+    total = klass.search_import.count
+    agg = 0
     klass.search_import.find_in_batches.with_index do |batch, i|
-      puts "Reindexing #{klass} batch #{i}... size: #{batch.count}"
+      agg += batch.count
+      puts "Reindexing #{klass} batch #{i}... #{agg}/#{total}"
       klass.searchkick_index.import(batch)
     end
   end

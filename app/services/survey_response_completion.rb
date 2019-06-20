@@ -1,6 +1,5 @@
 class SurveyResponseCompletion < SimpleService
-
-  delegate :test_collection, to: :@survey_response
+  delegate :test_collection, :gives_incentive?, :user, to: :@survey_response
   delegate :test_audience, to: :@survey_response, allow_nil: true
 
   def initialize(survey_response)
@@ -11,7 +10,7 @@ class SurveyResponseCompletion < SimpleService
     @survey_response.save
     @survey_response.cache_test_scores!
     update_test_audience_status
-    find_or_create_incentive_record
+    mark_response_as_payment_owed
     ping_collection
   end
 
@@ -19,24 +18,18 @@ class SurveyResponseCompletion < SimpleService
 
   def update_test_audience_status
     return if test_audience.blank?
-
     test_audience.survey_response_completed!
   end
 
-  def find_or_create_incentive_record
-    return unless test_collection.gives_incentive?
-
-    user = @survey_response.user
-    return unless user.present?
-    return if @survey_response.feedback_incentive_record.present?
-    # TODO: do we want this service to validate if the user has a duplicate response for the same TestCollection?
-    # e.g.
-    # return if SurveyResponse.find_by(user: user, test_collection: @survey_response.test_collection)
-    @survey_response.create_feedback_incentive_record(
-      user: user,
-      amount: Shape::FEEDBACK_INCENTIVE_AMOUNT,
-      current_balance: user.current_incentive_balance + Shape::FEEDBACK_INCENTIVE_AMOUNT,
-    )
+  def mark_response_as_payment_owed
+    return unless gives_incentive? && user&.email.present?
+    # perform some checks: you can only get marked owed + paid once per TestCollection
+    return if @survey_response.incentive_owed?
+    already_owed_or_paid = SurveyResponse
+                           .where(incentive_status: %i[incentive_paid incentive_owed])
+                           .find_by(user: user, test_collection: @survey_response.test_collection)
+    return if already_owed_or_paid.present?
+    @survey_response.record_incentive_owed!
   end
 
   def ping_collection

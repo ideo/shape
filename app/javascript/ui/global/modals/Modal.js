@@ -194,6 +194,7 @@ class Modal extends React.Component {
           </ModalCloseButton>
         )}
         <StyledDialogContent
+          data-cy="DialogContent"
           innerRef={this.contentArea}
           className={['modal__padding', noScroll && 'modal__no-scroll'].join(
             ' '

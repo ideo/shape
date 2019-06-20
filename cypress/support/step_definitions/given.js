@@ -25,6 +25,16 @@ Given('I login and visit the Test Area', () => {
   cy.wait('@apiGetInMyCollection')
 })
 
+Given('I visit the Test Area', () => {
+  cy.locateWith('CollectionCover', 'Cypress Test Area')
+    .last()
+    .click()
+  cy.wait('@apiGetCollection')
+  cy.wait('@apiGetCollectionCards')
+  cy.wait('@apiGetCommentThread')
+  cy.wait('@apiGetInMyCollection')
+})
+
 Given('I logout', () => {
   cy.logout()
 })

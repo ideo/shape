@@ -2,7 +2,15 @@
 class CollectionTemplateBuilder
   attr_reader :collection, :errors
 
-  def initialize(parent:, template:, placement: 'beginning', created_by: nil, parent_card: nil)
+  def initialize(
+    parent:,
+    template:,
+    placement: 'beginning',
+    created_by: nil,
+    parent_card: nil,
+    external_id: nil,
+    collection_params: {}
+  )
     @parent = parent
     @template = template
     @placement = placement
@@ -10,6 +18,8 @@ class CollectionTemplateBuilder
     @collection = template.class.new
     @errors = @collection.errors
     @parent_card = parent_card
+    @external_id = external_id
+    @raw_collection_params = collection_params
   end
 
   def call
@@ -33,11 +43,8 @@ class CollectionTemplateBuilder
     end
 
     # NOTE: Any issue with creating the template instance in a different org from the template?
-    @collection = @template.templated_collections.create(
-      name: created_template_name,
-      organization: @parent.organization,
-      created_by: @created_by,
-    )
+    @collection = @template.templated_collections.create(collection_params)
+
     # make sure to assign these permissions before the template cards are generated
     @collection.inherit_roles_anchor_from_parent!(@parent)
     if creating_a_submission?
@@ -49,9 +56,18 @@ class CollectionTemplateBuilder
       @parent.follow_submission_box(@created_by)
       @created_by.upgrade_to_edit_role(@collection)
     end
+    add_external_record
     # capture newly added roles
     @collection.reload
     @collection
+  end
+
+  def collection_params
+    {
+      name: created_template_name,
+      organization_id: @parent.organization.id,
+      created_by_id: @created_by.id,
+    }.merge(@raw_collection_params)
   end
 
   def place_collection_in_parent
@@ -118,5 +134,13 @@ class CollectionTemplateBuilder
     users_thread = comment_thread.users_thread_for(@created_by)
     return if users_thread.present?
     comment_thread.add_user_follower!(@created_by.id)
+  end
+
+  def add_external_record
+    return unless @external_id.present? && @created_by.application.present?
+    @collection.add_external_id(
+      @external_id,
+      @created_by.application.id,
+    )
   end
 end

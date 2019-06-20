@@ -127,4 +127,133 @@ RSpec.describe SurveyResponse, type: :model do
       expect(test_collection.parent_submission.cached_test_scores).to eq('total' => 0, 'question_context' => 0)
     end
   end
+
+  # Truncation must be used when testing double entry
+  describe '#record_incentive_owed!', truncate: true do
+    let(:user) { create(:user) }
+    let!(:test_collection) { create(:test_collection) }
+    let(:test_audience) { create(:test_audience, :payment, test_collection: test_collection, price_per_response: 4.75) }
+    let(:payment) { test_audience.payment }
+    let(:survey_response) { create(:survey_response, user: user, test_audience: test_audience, status: :completed) }
+    let(:revenue_deferred_account) { DoubleEntry.account(:revenue_deferred, scope: test_audience.payment) }
+
+    it 'updates incentive_status' do
+      expect {
+        survey_response.record_incentive_owed!
+      }.to change(survey_response, :incentive_status)
+      expect(survey_response.incentive_owed?).to be true
+    end
+
+    it 'increases individual_owed balance' do
+      expect {
+        survey_response.record_incentive_owed!
+      }.to change(user.incentive_owed_account, :balance)
+      expect(user.incentive_owed_account_balance.to_f).to eq(TestAudience.incentive_amount)
+    end
+
+    it 'decreases revenue_deferred balance' do
+      expect {
+        survey_response.record_incentive_owed!
+      }.to change(revenue_deferred_account, :balance)
+      expect(revenue_deferred_account.balance.to_f).to eq(payment.amount.to_f - payment.stripe_fee - TestAudience.incentive_amount)
+    end
+  end
+
+  # Truncation must be used when testing double entry
+  describe '#record_incentive_paid!', truncate: true do
+    let(:user) { create(:user) }
+    let!(:test_collection) { create(:test_collection) }
+    let(:test_audience) { create(:test_audience, :payment, test_collection: test_collection, price_per_response: 4.75) }
+    let(:survey_response) { create(:survey_response, user: user, test_audience: test_audience, status: :completed) }
+    let(:revenue_deferred_account) { DoubleEntry.account(:revenue_deferred, scope: test_audience.payment) }
+    let(:payment_processor_account) { DoubleEntry.account(:payment_processor, scope: test_audience.payment) }
+    let(:revenue_account) { DoubleEntry.account(:revenue, scope: test_audience.payment) }
+    let(:incentive_amount) { TestAudience.incentive_amount }
+    let(:paypal_fee) { (incentive_amount * 0.05).round(2) }
+    let(:divided_stripe_fee) { test_audience.payment.stripe_fee / test_audience.sample_size }
+    let(:our_earning) { test_audience.price_per_response - divided_stripe_fee - incentive_amount - paypal_fee }
+
+    before do
+      survey_response.record_incentive_owed!
+    end
+
+    it 'updates incentive_status' do
+      expect {
+        survey_response.record_incentive_paid!
+      }.to change(survey_response, :incentive_status)
+      expect(survey_response.incentive_paid?).to be true
+    end
+
+    it 'increases individual_paid balance' do
+      expect {
+        survey_response.record_incentive_paid!
+      }.to change(user.incentive_paid_account, :balance)
+      expect(user.incentive_paid_account_balance.to_f).to eq(incentive_amount)
+    end
+
+    it 'decreases individual_owed balance' do
+      expect {
+        survey_response.record_incentive_paid!
+      }.to change(user.incentive_owed_account, :balance)
+      expect(user.incentive_owed_account_balance.to_f).to eq(0)
+    end
+
+    it 'decreases revenue_deferred account balance by paypal fee + our earning' do
+      previous_balance = revenue_deferred_account.balance.to_f
+      expect {
+        survey_response.record_incentive_paid!
+      }.to change(revenue_deferred_account, :balance)
+      expect(revenue_deferred_account.balance).to eq 0
+      expect(revenue_deferred_account.balance.to_f).to eq(
+        previous_balance - paypal_fee - our_earning,
+      )
+    end
+
+    it 'increases payment_processor balance by paypal fee' do
+      previous_balance = payment_processor_account.balance.to_f
+      expect {
+        survey_response.record_incentive_paid!
+      }.to change(payment_processor_account, :balance)
+      expect(payment_processor_account.balance.to_f).to eq(
+        previous_balance + paypal_fee,
+      )
+    end
+
+    it 'increases revenue balance by our earning' do
+      expect {
+        survey_response.record_incentive_paid!
+      }.to change(revenue_account, :balance)
+      expect(revenue_account.balance.to_f).to eq(our_earning)
+    end
+  end
+
+  describe '#amount_earned' do
+    let!(:test_collection) { create(:test_collection) }
+    let(:test_audience) { create(:test_audience, test_collection: test_collection, price_per_response: 4.75) }
+    let(:survey_response) { create(:survey_response, test_audience: test_audience, status: :completed) }
+
+    it 'returns fixed incentive amount' do
+      expect(survey_response.amount_earned.to_f).to eq(TestAudience.incentive_amount)
+    end
+
+    context 'if not completed' do
+      before do
+        survey_response.update_columns(status: SurveyResponse.statuses[:in_progress])
+      end
+
+      it 'is 0' do
+        expect(survey_response.amount_earned).to eq(0)
+      end
+    end
+
+    context 'if test audience is blank' do
+      before do
+        survey_response.update(test_audience: nil)
+      end
+
+      it 'is 0' do
+        expect(survey_response.amount_earned).to eq(0)
+      end
+    end
+  end
 end

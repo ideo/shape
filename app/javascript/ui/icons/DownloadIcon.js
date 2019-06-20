@@ -1,6 +1,6 @@
 import Icon from './Icon'
 
-const DownlaodIcon = () => (
+const DownloadIcon = () => (
   <Icon fill>
     <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
       <g>
@@ -14,4 +14,4 @@ const DownlaodIcon = () => (
   </Icon>
 )
 
-export default DownlaodIcon
+export default DownloadIcon
