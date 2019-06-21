@@ -1,5 +1,8 @@
 Rails.application.configure do
-  config.webpacker.check_yarn_integrity = false # Settings specified here will take precedence over those in config/application.rb.
+  # Settings specified here will take precedence over those in config/application.rb.
+
+  # we turn this off because it gets confused about our "resolutions" in package.json
+  config.webpacker.check_yarn_integrity = false
 
   # In the development environment your application's code is reloaded on
   # every request. This slows down response time but is perfect for development
