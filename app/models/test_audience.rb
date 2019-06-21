@@ -144,7 +144,8 @@ class TestAudience < ApplicationRecord
   def price_per_response_greater_than_minimum
     if price_per_response.nil?
       errors.add(:price_per_response, 'must be present')
-    elsif price_per_response <= TestAudience.minimum_price_per_response
+    elsif !price_per_response.zero? &&
+          (price_per_response <= TestAudience.minimum_price_per_response)
       errors.add(
         :price_per_response,
         "must be greater than minimum of $#{TestAudience.minimum_price_per_response}",

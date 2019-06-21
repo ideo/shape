@@ -352,7 +352,7 @@ describe Collection::TestCollection, type: :model do
 
           context 'with test audiences' do
             let(:audience) { create(:audience) }
-            let!(:test_audience) { create(:test_audience, audience: audience, test_collection: test_collection, price_per_response: 2) }
+            let!(:test_audience) { create(:test_audience, audience: audience, test_collection: test_collection, price_per_response: 4.50) }
 
             it 'should create test audience datasets for each question' do
               expect do
