@@ -26,14 +26,6 @@ namespace :cypress do
     create_cards(user.current_user_collection, user)
     create_events(organization)
     create_test_collection(organization)
-    reindex
-  end
-
-  def reindex
-    User.reindex
-    Collection.reindex
-    Group.reindex
-    Item.reindex
   end
 
   def create_cards(collection, user)
@@ -65,7 +57,7 @@ namespace :cypress do
   end
 
   def create_events(organization)
-    15.times do |_i|
+    15.times do
       user = FactoryBot.create(:user, handle: "cy-test-#{Faker::Internet.unique.slug}")
       FactoryBot.create(:activity,
                         # with cache_classes = false, it gets angry if you try to pass in the
