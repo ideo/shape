@@ -17,7 +17,7 @@ export ELASTICSEARCH_PORT=9333
 
 # Setup nvm
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" 
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 nvm install $(cat .nvmrc)
 nvm use $(cat .nvmrc)
 nvm alias default $(cat .nvmrc)

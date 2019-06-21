@@ -351,7 +351,7 @@ class Collection
       }
     end
 
-    def serialized_for_test_survey(test_audience_id = nil)
+    def serialized_for_test_survey(test_audience_id: nil, current_user: nil)
       renderer = JSONAPI::Serializable::Renderer.new
       renderer.render(
         self,
@@ -361,6 +361,7 @@ class Collection
         include: test_survey_render_includes,
         expose: {
           test_audience_id: test_audience_id,
+          survey_response_for_user: current_user ? survey_response_for_user(current_user.id) : nil,
         },
       )
     end
@@ -447,10 +448,9 @@ class Collection
           .each_with_index do |question_type, i|
         primary_collection_cards.build(
           order: i,
-          item_attributes: {
-            type: 'Item::QuestionItem',
+          item: Item::QuestionItem.new(
             question_type: question_type,
-          },
+          ),
         )
       end
     end

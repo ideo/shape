@@ -516,26 +516,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     })
   }
 
-  API_updateCard({ card, updates, undoMessage } = {}) {
-    // this works a little differently than the typical "undo" snapshot...
-    // we snapshot the collection_cards.attributes so that they can be reverted
-    const jsonData = this.toJsonApiWithCards()
-    this.pushUndo({
-      snapshot: jsonData.attributes,
-      message: undoMessage,
-    })
-    // now actually make the change to the card
-    _.assign(card, updates)
-
-    this._reorderCards()
-
-    const data = this.toJsonApiWithCards()
-    // we don't want to receive updates which are just going to try to re-render
-    data.cancel_sync = true
-    const apiPath = `collections/${this.id}`
-    return this.apiStore.request(apiPath, 'PATCH', { data })
-  }
-
   /*
   Perform batch updates on multiple cards at once
 
@@ -570,6 +550,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
           card[key] = value
         })
       }
+      // force the grid to immediately observe that things have changed
+      card.updated_at = new Date()
     })
 
     this._reorderCards()
@@ -625,6 +607,18 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       this.pushUndo({
         snapshot: cardsData.attributes,
         message: undoMessage,
+        redoAction: {
+          message: 'Move redone',
+          apiCall: () =>
+            // re-call the same function
+            this.API_batchUpdateCardsWithUndo({
+              updates,
+              updateAllCards,
+              undoMessage,
+              onConfirm,
+              onCancel,
+            }),
+        },
       })
 
       return this.API_batchUpdateCards({ updates, updateAllCards }).then(
@@ -945,6 +939,27 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         blankType: type,
       })
     }
+  }
+
+  // NOTE: this is only used as a Cypress test method, to simulate card resizing
+  API_updateCard({ card, updates, undoMessage } = {}) {
+    // this works a little differently than the typical "undo" snapshot...
+    // we snapshot the collection_cards.attributes so that they can be reverted
+    const jsonData = this.toJsonApiWithCards()
+    this.pushUndo({
+      snapshot: jsonData.attributes,
+      message: undoMessage,
+    })
+    // now actually make the change to the card
+    _.assign(card, updates)
+
+    this._reorderCards()
+
+    const data = this.toJsonApiWithCards()
+    // we don't want to receive updates which are just going to try to re-render
+    data.cancel_sync = true
+    const apiPath = `collections/${this.id}`
+    return this.apiStore.request(apiPath, 'PATCH', { data })
   }
 }
 

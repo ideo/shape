@@ -269,6 +269,8 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
           template: template,
           placement: 'beginning',
           created_by: user,
+          external_id: nil,
+          collection_params: {},
         ).and_return(instance_double)
         post(path, params: params)
       end
@@ -285,6 +287,35 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
           user,
         )
         post(path, params: params)
+      end
+
+      context 'with collection name in params' do
+        let(:params_with_name) do
+          raw_params.merge(collection: { name: 'Awesomeness' }).to_json
+        end
+
+        it 'sets to given name' do
+          post(path, params: params_with_name)
+          template_instance = Collection.find(json['data']['id'])
+          expect(template_instance.name).to eq('Awesomeness')
+        end
+      end
+
+      context 'as bot user' do
+        let!(:application) { create(:application, user: user, add_orgs: [organization]) }
+        let(:params_with_external_id) do
+          raw_params.merge(external_id: 'abc123').to_json
+        end
+
+        it 'adds external_id if present' do
+          expect {
+            post(path, params: params_with_external_id)
+          }.to change(ExternalRecord, :count).by(1)
+          expect(response.status).to eq(200)
+          template_instance = Collection.find(json['data']['id'])
+          external_record = template_instance.external_records.find_by(application_id: application.id)
+          expect(external_record.external_id).to eq('abc123')
+        end
       end
     end
 

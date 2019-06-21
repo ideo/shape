@@ -35,8 +35,12 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
 
     context 'with a user' do
       let(:user) { create(:user) }
+      let(:survey_response2) { create(:survey_response, test_collection: test_collection, test_audience: test_audience) }
+
       before do
         survey_response.update(user: user)
+        survey_response2.update(user: user)
+        allow(survey_response2).to receive(:completed?).and_return(true)
       end
 
       it 'updates survey response payment status' do
@@ -57,6 +61,13 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
         expect(
           user.reload.incentive_owed_account_balance.to_f,
         ).to eq(TestAudience.incentive_amount)
+
+        # call it with a 2nd response
+        SurveyResponseCompletion.call(survey_response2)
+        expect(
+          user.reload.incentive_owed_account_balance.to_f,
+        ).to eq(TestAudience.incentive_amount)
+        expect(survey_response2.incentive_unearned?).to be true
       end
 
       context 'with an existing balance' do

@@ -1,15 +1,13 @@
 namespace :cypress do
   desc 'set up the test env for cypress E2E testing'
   task db_setup: :environment do
-    # clear out any orgs we created
-    # NOTE: have to do this first, or else it gets mad if we do this after the user is loaded
-    Organization.where('slug LIKE ?', 'our-test-org%').destroy_all
-    Organization.where(name: 'CypressTest').destroy_all
-    User.where('email LIKE ?', 'cypress-test%').destroy_all
-    Audience.where(name: "My Test Audience").destroy_all
+    unless Rails.env.test?
+      puts 'you do not want to run this, except in test env.'
+      return
+    end
 
-    email = 'cypress-test@ideo.com'
-    User.where('handle LIKE ?', 'cy-test-%').destroy_all
+    DatabaseCleaner.clean_with(:truncation)
+    Rails.application.load_seed
 
     email = 'cypress-test@ideo.com'
     user = FactoryBot.create(:user, email: email).becomes(User)
@@ -78,21 +76,21 @@ namespace :cypress do
       :with_test_audience,
       :completed,
       test_status: :live,
-      organization_id: organization.id
+      organization_id: organization.id,
     )
     audience = test_collection.test_audiences.last.audience
-    set_audience_criteria(audience)
+    update_audience_criteria(audience)
     test_collection.reload
   end
 
-  def set_audience_criteria(audience)
+  def update_audience_criteria(audience)
     {
-      age_list: %W(Young Old),
-      country_list: "United States of America",
-      interest_list: %W(Athlete Pets)
+      age_list: %w[Young Old],
+      country_list: 'United States of America',
+      interest_list: %w[Athlete Pets],
     }.each do |key, value|
       audience.send("#{key}=", value)
     end
-    audience.update(name: "My Test Audience")
+    audience.update(name: 'My Test Audience')
   end
 end

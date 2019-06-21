@@ -70,9 +70,10 @@ describe('OverdueBanner', () => {
       expect(wrapper.instance().overdueMessage).toMatch(
         `${
           apiStore.currentUser.current_organization.name
-        } account is overdue. Your content will become inaccessible on ${
-          apiStore.currentUser.current_organization.inaccessible_at
-        }.`
+        } account is overdue.` +
+          ` Your content will become inaccessible on ${
+            apiStore.currentUser.current_organization.inaccessible_at
+          }.`
       )
     })
 

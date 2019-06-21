@@ -41,11 +41,24 @@ module Accounting
     # Record that we have paid out to an individual,
     # transferring from their individual_owed to their individual_paid account
     def self.incentive_paid(survey_response)
-      user = survey_response.user
       incentive = survey_response.amount_earned
       paypal_fee = paypal_fee(incentive)
-      revenue = survey_response.price_per_response - incentive - paypal_fee
       payment = survey_response.test_audience.payment
+      user = survey_response.user
+
+      # calculate revenue:
+      sample_size = survey_response.test_audience.sample_size
+      # how much (after the fee) did they end up paying us for this individual response
+      received_payment_per_response = (payment.amount_without_stripe_fee / sample_size).round(2)
+      revenue = received_payment_per_response - incentive - paypal_fee
+
+      # consider the rounding difference, include it in the first revenue calculation for this payment
+      rounding_difference = (payment.amount_without_stripe_fee - (received_payment_per_response * sample_size)).round(2)
+      revenue_collected = DoubleEntry.account(:revenue, scope: payment).balance
+      if rounding_difference && revenue_collected.zero?
+        # NOTE: difference may be negative
+        revenue += rounding_difference
+      end
 
       DoubleEntry.transfer(
         Money.new(incentive * 100),

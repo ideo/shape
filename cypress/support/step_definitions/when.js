@@ -116,11 +116,12 @@ When('I undo with CTRL+Z', () => {
 })
 
 When('I close the snackbar', () => {
-  cy.locateDataOrClass('.MuiSnackbarContent-action')
-    .find('button')
-    .click({ force: true })
+  // NOTE: snackbar tests have proven fickle, so instead we just wait a bit for it
+  // cy.locateDataOrClass('.MuiSnackbarContent-action')
+  //   .find('button')
+  //   .click({ force: true })
   // allow it to disappear
-  cy.wait(1200)
+  cy.wait(300)
 })
 
 // ----------------------
