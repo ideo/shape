@@ -137,7 +137,7 @@ RSpec.describe DefaultCollectionCover, type: :service do
           # private data does not include the viewer
           editor.add_role(Role::EDITOR, obj)
           # the `private_child?` caching only checks for updated_at to the second, have to fudge that
-          obj.roles.first.update(updated_at: 10.seconds.from_now)
+          obj.roles.each { |r| r.update(updated_at: 1.minute.from_now) }
         end
       end
 
