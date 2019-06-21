@@ -1,6 +1,13 @@
 {
   "name": "Shape",
   "private": true,
+  "scripts": {
+    "cypress": "./node_modules/.bin/cypress open",
+    "cypress-ci": "./node_modules/.bin/cypress run",
+    "lint": "./node_modules/.bin/eslint .",
+    "styleguide": "yarn styleguidist server",
+    "test": "jest --watch"
+  },
   "engines": {
     "node": "^8.15.0",
     "yarn": "^1.10.0"
@@ -10,15 +17,34 @@
     "last 1 version",
     "> 1%"
   ],
-  "scripts": {
-    "styleguide": "yarn styleguidist server",
-    "test": "jest --watch",
-    "lint": "./node_modules/.bin/eslint .",
-    "cypress": "./node_modules/.bin/cypress open",
-    "cypress-ci": "./node_modules/.bin/cypress run"
-  },
   "jest": {
-    "testURL": "http://localhost",
+    "automock": false,
+    "globals": {
+      "ts-jest": {
+        "useBabelrc": true
+      }
+    },
+    "moduleDirectories": [
+      "node_modules",
+      "app/javascript/src",
+      "__tests__",
+      "<rootDir>"
+    ],
+    "moduleFileExtensions": [
+      "js",
+      "jsx",
+      "json",
+      "ts",
+      "tsx"
+    ],
+    "moduleNameMapper": {
+      ".+\\.(css|styl|less|sass|scss|png|jpg|svg|ttf|woff|woff2|otf)$": "identity-obj-proxy",
+      "ideo-sso": "<rootDir>/__mocks__/ideo-sso.js"
+    },
+    "modulePaths": [
+      "__js_test_config"
+    ],
+    "resetMocks": false,
     "roots": [
       "<rootDir>/__tests__",
       "<rootDir>/app/javascript"
@@ -29,49 +55,31 @@
     "setupFilesAfterEnv": [
       "./__js_test_config/setup.js"
     ],
-    "modulePaths": [
-      "__js_test_config"
+    "snapshotSerializers": [
+      "enzyme-to-json/serializer"
     ],
-    "moduleNameMapper": {
-      ".+\\.(css|styl|less|sass|scss|png|jpg|svg|ttf|woff|woff2|otf)$": "identity-obj-proxy",
-      "ideo-sso": "<rootDir>/__mocks__/ideo-sso.js"
-    },
     "testPathIgnorePatterns": [
       "/app/javascript/ui/shared",
       "/config/webpack/"
     ],
-    "snapshotSerializers": [
-      "enzyme-to-json/serializer"
-    ],
-    "resetMocks": false,
-    "automock": false,
-    "moduleFileExtensions": [
-      "js",
-      "jsx",
-      "json",
-      "ts",
-      "tsx"
-    ],
-    "transformIgnorePatterns": [
-      "/node_modules/"
-    ],
-    "moduleDirectories": [
-      "node_modules",
-      "app/javascript/src",
-      "__tests__",
-      "<rootDir>"
-    ],
-    "globals": {
-      "ts-jest": {
-        "useBabelrc": true
-      }
-    },
+    "testURL": "http://localhost",
     "transform": {
       "^.+\\.js$": "babel-jest",
       "^.+\\.tsx?$": "ts-jest"
-    }
+    },
+    "transformIgnorePatterns": [
+      "/node_modules/"
+    ]
   },
   "dependencies": {
+    "@babel/core": "^7.0.0",
+    "@babel/plugin-proposal-class-properties": "^7.4.4",
+    "@babel/plugin-proposal-decorators": "^7.4.0",
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.4.3",
+    "@babel/plugin-transform-runtime": "^7.4.4",
+    "@babel/preset-env": "^7.0.0",
+    "@babel/preset-react": "^7.0.0",
     "@firebase/app-types": "^0.3.2",
     "@material-ui/core": "^1.5",
     "@rails/webpacker": "4.0.7",
@@ -79,6 +87,10 @@
     "@sentry/webpack-plugin": "^1.6.2",
     "actioncable": "^5.2.0",
     "axios": "^0.18.0",
+    "babel-engine-plugin": "^0.2.1",
+    "babel-eslint": "^10.0.0",
+    "babel-jest": "^24.8.0",
+    "babel-loader": "^8.0.0",
     "babel-plugin-lodash": "^3.3.2",
     "babel-plugin-module-resolver": "^3.1.1",
     "babel-plugin-styled-components": "^1.7.0",
@@ -89,11 +101,13 @@
     "date-fns": "2.0.0-alpha.27",
     "datx": "^0.11.4",
     "datx-jsonapi": "^0.11.4",
+    "dotenv": "^5.0.1",
     "draft-js": "^0.10.5",
     "draft-js-linkify-plugin": "^2.0.1",
     "draft-js-mention-plugin": "^3.0.4",
     "draft-js-plugins-editor": "^2.0.8",
     "element-matches-polyfill": "^1.0.0",
+    "file-loader": "^4.0.0",
     "filestack-js": "^0.11.2",
     "firebase": "^5.0.4",
     "formik": "0.11.11",
@@ -103,6 +117,7 @@
     "hyphenation.en-us": "^0.2.1",
     "hypher": "^0.2.5",
     "i18n-iso-countries": "3.7.3",
+    "identity-obj-proxy": "^3.0.0",
     "if-emoji": "^0.1.0",
     "lodash": "~4.17.4",
     "mime-types": "^2.1.19",
@@ -161,21 +176,8 @@
     "whatwg-fetch": "^3.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0",
-    "@babel/plugin-proposal-class-properties": "^7.4.4",
-    "@babel/plugin-proposal-decorators": "^7.4.0",
-    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
-    "@babel/plugin-transform-modules-commonjs": "^7.4.3",
-    "@babel/plugin-transform-runtime": "^7.4.4",
-    "@babel/preset-env": "^7.0.0",
-    "@babel/preset-react": "^7.0.0",
-    "babel-engine-plugin": "^0.2.1",
-    "babel-eslint": "^10.0.0",
-    "babel-jest": "^24.8.0",
-    "babel-loader": "^8.0.0",
     "cypress": "^3.3.1",
     "cypress-cucumber-preprocessor": "ideo/cypress-cucumber-preprocessor#3e39b05",
-    "dotenv": "^5.0.1",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
     "enzyme-to-json": "^3.3.3",
@@ -192,8 +194,6 @@
     "eslint-plugin-promise": "~3.5.0",
     "eslint-plugin-react": "~7.11.0",
     "eslint-plugin-standard": "~3.0.1",
-    "file-loader": "^4.0.0",
-    "identity-obj-proxy": "^3.0.0",
     "jest": "^24.8.0",
     "jest-css-modules": "^1.1.0",
     "jest-enzyme": "^4.2.0",
@@ -209,7 +209,7 @@
     "webpack-dev-server": "^3.7.1"
   },
   "resolutions": {
-    "react-draggable": "git+https://git@github.com/ideo/react-draggable.git#3.0.5-beta.1",
-    "@cypress/browserify-preprocessor": "1.0.3"
+    "@cypress/browserify-preprocessor": "1.0.3",
+    "react-draggable": "git+https://git@github.com/ideo/react-draggable.git#3.0.5-beta.1"
   }
 }

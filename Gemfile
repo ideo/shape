@@ -9,7 +9,7 @@ end
 # NOTE: IMPORTANT for this to be first so that gems e.g. omniauth-ideo
 #       can pull in the right ENV vars
 # ENV variables in dev
-gem 'dotenv-rails', groups: [:development, :test], require: 'dotenv/rails-now'
+gem 'dotenv-rails', require: 'dotenv/rails-now'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.2'
