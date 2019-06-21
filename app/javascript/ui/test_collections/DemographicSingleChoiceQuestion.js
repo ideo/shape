@@ -125,7 +125,7 @@ DemographicSingleChoiceQuestion.propTypes = {
     choices: PropTypes.arrayOf(
       PropTypes.shape({
         text: PropTypes.string.isRequired,
-        // tags: PropTypes.arrayOf(PropTypes.string).isRequired,
+        tags: PropTypes.arrayOf(PropTypes.string).isRequired,
       })
     ),
   }).isRequired,

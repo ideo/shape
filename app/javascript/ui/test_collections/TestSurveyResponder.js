@@ -28,6 +28,13 @@ const UNANSWERABLE_QUESTION_TYPES = [
   'question_demographics_intro',
 ]
 
+export const NON_TEST_QUESTION_TYPES = [
+  'question_recontact',
+  'question_terms',
+  'question_welcome',
+  'question_demographic_single_choice',
+]
+
 // Allow us to insert non-test questions into the survey while faking out some
 // things that would otherwise cause us trouble.
 const createFakeCollectionCard = ({
@@ -79,11 +86,7 @@ class TestSurveyResponder extends React.Component {
   }
 
   @observable
-  recontactAnswered = false
-  @observable
-  termsAnswered = false
-  @observable
-  welcomeAnswered = false
+  nonTestQuestionsAnswered = {} // [card.id] => boolean
   @observable
   currentCardIdx = 0
 
@@ -162,17 +165,13 @@ class TestSurveyResponder extends React.Component {
   }
 
   questionAnswerForCard = card => {
+    if (NON_TEST_QUESTION_TYPES.includes(card.card_question_type)) {
+      return this.nonTestQuestionsAnswered[card.id] === true
+    }
+
     const { surveyResponse } = this.props
-    if (card.card_question_type === 'question_welcome') {
-      return this.welcomeAnswered
-    }
-    if (card.card_question_type === 'question_terms') {
-      return this.termsAnswered
-    }
     if (!surveyResponse) return undefined
-    if (card.card_question_type === 'question_recontact') {
-      return this.recontactAnswered
-    }
+
     return find(surveyResponse.question_answers, {
       question_id: card.record.id,
     })
@@ -217,26 +216,21 @@ class TestSurveyResponder extends React.Component {
   }
 
   afterQuestionAnswered = (card, answer) => {
-    if (card.id === 'welcome') {
+    if (NON_TEST_QUESTION_TYPES.includes(card.card_question_type)) {
       runInAction(() => {
-        this.welcomeAnswered = true
+        this.nonTestQuestionsAnswered[card.id] = true
       })
     }
-    if (card.id === 'recontact') {
-      runInAction(() => {
-        this.recontactAnswered = true
-      })
+    if (card.card_question_type === 'question_recontact') {
       // this is the last question, don't try to scroll
+      // TODO: is this still relevant now that we have demographic questions?
       return
     }
-    if (card.id === 'terms') {
+    if (card.card_question_type === 'question_terms') {
       if (!answer) {
         // If they didn't agree to the terms, send to marketing page
         window.location.href = '/'
       }
-      runInAction(() => {
-        this.termsAnswered = true
-      })
     }
     setTimeout(() => {
       this.scrollToTopOfNextCard(card)

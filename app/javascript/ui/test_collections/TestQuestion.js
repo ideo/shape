@@ -19,6 +19,7 @@ import { QuestionText } from '~/ui/test_collections/shared'
 import { apiStore, uiStore } from '~/stores'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
 import QuestionAnswer from '~/stores/jsonApi/QuestionAnswer'
+import { NON_TEST_QUESTION_TYPES } from './TestSurveyResponder'
 
 const QuestionHolder = styled.div`
   display: flex;
@@ -39,14 +40,6 @@ const QuestionCardInner = styled.div`
   width: 100%;
   height: 100%;
 `
-
-const NON_TEST_QUESTIONS = [
-  'question_recontact',
-  'question_terms',
-  'question_welcome',
-  'question_demographic_single_choice',
-]
-
 @observer
 class TestQuestion extends React.Component {
   handleQuestionAnswer = async answer => {
@@ -61,7 +54,7 @@ class TestQuestion extends React.Component {
     let { surveyResponse, questionAnswer } = this.props
     // components should never trigger this when editing, but double-check here
     if (editing) return
-    if (NON_TEST_QUESTIONS.includes(card.card_question_type)) {
+    if (NON_TEST_QUESTION_TYPES.includes(card.card_question_type)) {
       afterQuestionAnswered(card, answer)
       return
     }
@@ -220,14 +213,13 @@ class TestQuestion extends React.Component {
           />
         )
 
-      case 'question_demographics_intro':
+      case 'question_demographics_intro': // TODO: either use plural or singular 'demographics'
         return <DemographicsIntroQuestion />
 
       case 'question_demographic_single_choice':
         return (
           <DemographicSingleChoiceQuestion
             question={card}
-            // questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}
             user={apiStore.currentUser}
           />
