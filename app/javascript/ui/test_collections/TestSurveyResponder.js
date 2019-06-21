@@ -183,17 +183,24 @@ class TestSurveyResponder extends React.Component {
     this.questionCards = questionCards
   }
 
-  questionAnswerForCard = card => {
-    if (NON_TEST_QUESTION_TYPES.includes(card.card_question_type)) {
-      return this.nonTestQuestionsAnswered[card.id] === true
-    }
+  isNonTestQuestionCard = card =>
+    NON_TEST_QUESTION_TYPES.includes(card.card_question_type)
 
+  questionAnswerForCard = card => {
     const { surveyResponse } = this.props
     if (!surveyResponse) return undefined
 
     return find(surveyResponse.question_answers, {
       question_id: card.record.id,
     })
+  }
+
+  answeredCard = card => {
+    if (this.isNonTestQuestionCard(card)) {
+      return this.nonTestQuestionsAnswered[card.id] === true
+    }
+
+    return !!this.questionAnswerForCard(card)
   }
 
   answerableCard = card =>
@@ -218,10 +225,7 @@ class TestSurveyResponder extends React.Component {
     const questions = questionCards.filter(card => {
       if (reachedLastVisibleCard) {
         return false
-      } else if (
-        !this.answerableCard(card) ||
-        this.questionAnswerForCard(card)
-      ) {
+      } else if (!this.answerableCard(card) || this.answeredCard(card)) {
         // If not answerable, or they already answered, show it
         return true
       }
@@ -235,7 +239,7 @@ class TestSurveyResponder extends React.Component {
   }
 
   afterQuestionAnswered = (card, answer) => {
-    if (NON_TEST_QUESTION_TYPES.includes(card.card_question_type)) {
+    if (this.isNonTestQuestionCard(card)) {
       this.setNonTestQuestionAnswered(card.id)
     }
     if (card.card_question_type === 'question_recontact') {
