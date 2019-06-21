@@ -320,7 +320,7 @@ class TestSurveyResponder extends React.Component {
           />
           <GreetingMessage />
           {this.viewableCards.map(card => (
-            <ScrollingModule name={`card-${card.id}`} key={card.id}>
+            <ScrollingModule key={card.id} name={`card-${card.id}`}>
               <TestQuestionHolder editing={false} userEditable={false}>
                 <TestQuestion
                   createSurveyResponse={createSurveyResponse}
