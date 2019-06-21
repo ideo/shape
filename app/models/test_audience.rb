@@ -54,7 +54,6 @@ class TestAudience < ApplicationRecord
 
   scope :link_sharing, -> { where(price_per_response: 0) }
   scope :paid, -> { where('price_per_response > 0') }
-  scope :ordered_last_closed_at, -> { order(closed_at: :desc) }
 
   PAYMENT_WAITING_PERIOD = 1.week
 

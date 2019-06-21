@@ -122,7 +122,7 @@ class AdminFeedback extends React.Component {
     newQueryModalOpen: false,
     newQueryResponseCount: null,
     newQueryRowVisible: false,
-    selectedCollection: null,
+    selectedTestAudience: null,
   }
 
   componentDidMount() {
@@ -165,10 +165,10 @@ class AdminFeedback extends React.Component {
     this.setState({ newQueryModalOpen: false })
   }
 
-  showNewQueryRow(collection) {
+  showNewQueryRow(audience) {
     this.setState({
       newQueryRowVisible: true,
-      selectedCollection: collection,
+      selectedTestAudience: audience,
     })
   }
 
@@ -176,9 +176,9 @@ class AdminFeedback extends React.Component {
     this.setState({ newQueryRowVisible: false })
   }
 
-  showAdminAudienceDialog = collection => {
+  showAdminAudienceDialog = audience => {
     const { uiStore } = this.props
-    this.setState({ selectedCollection: collection })
+    this.setState({ selectedTestAudience: audience })
     uiStore.update('adminAudienceMenuOpen', true)
   }
 
@@ -203,22 +203,22 @@ class AdminFeedback extends React.Component {
               : null}
           </Grid>
           <Grid container item xs={5}>
-            {testCollection.test_audiences.map(testCollection => {
+            {testCollection.test_audiences.map(testAudience => {
               const editingQuery =
                 this.state.newQueryRowVisible &&
-                this.state.selectedCollection &&
-                testCollection.id === this.state.selectedCollection.id
+                this.state.selectedTestAudience &&
+                testAudience.id === this.state.selectedTestAudience.id
 
               const audienceNameStyle = editingQuery
                 ? { borderBottom: `1px solid ${v.colors.black}` }
                 : undefined
 
               return (
-                <React.Fragment key={testCollection.id}>
+                <React.Fragment key={testAudience.id}>
                   <AudienceRowItem item xs={5}>
                     <AudienceWrapper align="center">
                       <div style={audienceNameStyle}>
-                        {testCollection.audience.name}
+                        {testAudience.audience.name}
                       </div>
                       <Flex className="show-on-hover">
                         <IconAvatar
@@ -226,7 +226,7 @@ class AdminFeedback extends React.Component {
                           backgroundColor={v.colors.commonLight}
                           data-cy="NewQueryButton"
                           title="start new query"
-                          onClick={() => this.showNewQueryRow(testCollection)}
+                          onClick={() => this.showNewQueryRow(testAudience)}
                         >
                           <SearchLargeIcon />
                         </IconAvatar>
@@ -260,7 +260,7 @@ class AdminFeedback extends React.Component {
                             backgroundColor={v.colors.commonLight}
                             data-cy="AudienceInfoButton"
                             onClick={() => {
-                              this.showAdminAudienceDialog(testCollection)
+                              this.showAdminAudienceDialog(testAudience)
                             }}
                           >
                             <SizedIcon>
@@ -272,14 +272,14 @@ class AdminFeedback extends React.Component {
                     </AudienceWrapper>
                   </AudienceRowItem>
                   <AudienceRowItem item xs={2}>
-                    <Flex justify="flex-end">{testCollection.sample_size}</Flex>
+                    <Flex justify="flex-end">{testAudience.sample_size}</Flex>
                   </AudienceRowItem>
                   <AudienceRowItem item xs={3}>
                     <Flex justify="flex-end">0</Flex>
                   </AudienceRowItem>
                   <AudienceRowItem item xs={2}>
                     <Flex justify="flex-end">
-                      {testCollection.num_survey_responses}
+                      {testAudience.num_completed_responses}
                     </Flex>
                   </AudienceRowItem>
                   {editingQuery && (
@@ -306,7 +306,7 @@ class AdminFeedback extends React.Component {
     const {
       currentPage,
       totalPages,
-      selectedCollection,
+      selectedTestAudience,
       newQueryModalOpen,
       newQueryResponseCount,
     } = this.state
@@ -317,7 +317,7 @@ class AdminFeedback extends React.Component {
     return (
       <Wrapper>
         {uiStore.adminAudienceMenuOpen && (
-          <AdminAudienceModal audience={selectedCollection.audience} open />
+          <AdminAudienceModal audience={selectedTestAudience.audience} open />
         )}
         <Heading1>Feedback</Heading1>
         <Section>
@@ -407,7 +407,7 @@ class AdminFeedback extends React.Component {
           <AdminNewQueryModal
             open
             close={() => this.closeNewQueryModal()}
-            audience={selectedCollection.audience}
+            audience={selectedTestAudience.audience}
             responseCount={newQueryResponseCount}
           />
         )}

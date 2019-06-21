@@ -94,6 +94,7 @@ const createNamedRoutes = () => {
 before(() => {
   // clean out the DB before running the suite
   cy.exec('RAILS_ENV=test CYPRESS=true bin/rake cypress:db_setup')
+  cy.exec('RAILS_ENV=test bin/rake searchkick:batch_reindex:all')
 })
 
 beforeEach(() => {
