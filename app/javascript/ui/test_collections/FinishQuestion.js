@@ -19,13 +19,12 @@ const FinishQuestion = ({ submissionBox, givesIncentive }) => (
     </QuestionText>
     <FinishedEmojiHolder data-cy="FinishedEmojiHolder">
       <Emoji name="Finished" symbol="🎉" />
-      {givesIncentive &&
-        FEEDBACK_INCENTIVE_AMOUNT && (
-          <QuestionText>
-            You just earned ${FEEDBACK_INCENTIVE_AMOUNT.toFixed(2)} with this
-            survey!
-          </QuestionText>
-        )}
+      {givesIncentive && FEEDBACK_INCENTIVE_AMOUNT && (
+        <QuestionText>
+          You just earned ${FEEDBACK_INCENTIVE_AMOUNT.toFixed(2)} with this
+          survey!
+        </QuestionText>
+      )}
     </FinishedEmojiHolder>
   </div>
 )

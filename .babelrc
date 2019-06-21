@@ -1,31 +1,14 @@
 {
   "presets": [
-    [
-      "env",
-      {
-        "test": {
-          "modules": "commonjs"
-        },
-        "development": {
-          "modules": false
-        },
-        "production": {
-          "modules": false
-        },
-        "targets": {
-          "uglify": true
-        },
-        "useBuiltIns": true
-      }
-    ],
-    "react"
+    "@babel/preset-env",
+    "@babel/preset-react"
   ],
   "plugins": [
     "lodash",
-    "syntax-dynamic-import",
-    "transform-decorators-legacy",
-    "transform-object-rest-spread",
-    "transform-class-properties",
+    "@babel/plugin-syntax-dynamic-import",
+    ["@babel/plugin-proposal-decorators", { "legacy": true }],
+    ["@babel/plugin-proposal-class-properties", { "loose" : true }],
+    "@babel/plugin-transform-modules-commonjs",
     [
       "module-resolver",
       {
@@ -39,17 +22,10 @@
       }
     ],
     [
-      "transform-runtime",
+      "@babel/plugin-transform-runtime",
       {
         "helpers": false,
-        "polyfill": false,
         "regenerator": true
-      }
-    ],
-    [
-      "transform-class-properties",
-      {
-        "spec": true
       }
     ]
   ],

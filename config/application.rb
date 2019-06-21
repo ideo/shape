@@ -1,16 +1,19 @@
 require_relative 'boot'
 
 require 'rails'
-# Pick the frameworks you want:
-require 'active_model/railtie'
-require 'active_job/railtie'
-require 'active_record/railtie'
-require 'action_controller/railtie'
-require 'action_mailer/railtie'
-require 'action_view/railtie'
-require 'action_cable/engine'
-require 'sprockets/railtie'
-require 'rails/test_unit/railtie'
+# we omit 'active_storage/engine' since we're not using it
+%w[
+  active_record/railtie
+  action_controller/railtie
+  action_view/railtie
+  action_mailer/railtie
+  active_job/railtie
+  action_cable/engine
+  rails/test_unit/railtie
+  sprockets/railtie
+].each do |railtie|
+  require railtie
+end
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -26,7 +29,7 @@ module Shape
 
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 5.1
+    config.load_defaults 5.2
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
@@ -34,6 +37,9 @@ module Shape
 
     # ActionCable settings
     config.action_cable.url = ENV.fetch('ACTION_CABLE_URL') { 'ws://localhost:3000/cable' }
+
+    # override protect_from_forgery; TODO: use JWT instead of cookie for auth?
+    config.action_controller.default_protect_from_forgery = false
 
     # for serving gzipped assets
     config.middleware.use Rack::Deflater

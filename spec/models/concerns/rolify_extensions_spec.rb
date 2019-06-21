@@ -85,6 +85,9 @@ describe RolifyExtensions, type: :concern do
       collection_cards.each do |cc|
         group.add_role(Role::VIEWER, cc.item)
         cc.record.unanchor_and_inherit_roles_from_anchor!
+        # make the user a viewer on the records
+        user.remove_role(Role::EDITOR, cc.record)
+        user.add_role(Role::VIEWER, cc.record)
       end
       user.reset_cached_roles!
     end

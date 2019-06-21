@@ -27,11 +27,11 @@ class ClosedSurvey extends React.Component {
   renderEmoji() {
     switch (this.answer) {
       case 'feedback_contact_yes':
-        return <Emoji scale={2} name="Raising hands" symbol="🙌" />
+        return <Emoji size="xl" name="Raising hands" symbol="🙌" />
       case 'feedback_contact_no':
-        return <Emoji scale={2} name="Okay gesture" symbol="👌" />
+        return <Emoji size="xl" name="Okay gesture" symbol="👌" />
       default:
-        return <Emoji scale={2} name="Confused face" symbol="😕" />
+        return <Emoji size="xl" name="Confused face" symbol="😕" />
     }
   }
 

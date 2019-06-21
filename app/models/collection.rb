@@ -233,7 +233,8 @@ class Collection < ApplicationRecord
   # By default all string fields are searchable
   def search_data
     parent_ids = breadcrumb
-    activity_dates = activities.group('DATE(updated_at)').pluck('DATE(updated_at)')
+    updated_date = Arel.sql('DATE(updated_at)')
+    activity_dates = activities.group(updated_date).pluck(updated_date)
     {
       type: type,
       name: name,

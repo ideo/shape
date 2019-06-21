@@ -91,12 +91,11 @@ const QuestionSelectHolder = ({
           })}
         </Select>
       )}
-      {canEdit &&
-        card.card_question_type !== 'question_finish' && (
-          <TrashButton onClick={() => handleTrash(card)}>
-            <TrashIcon />
-          </TrashButton>
-        )}
+      {canEdit && card.card_question_type !== 'question_finish' && (
+        <TrashButton onClick={() => handleTrash(card)}>
+          <TrashIcon />
+        </TrashButton>
+      )}
       <div style={{ color: v.colors.commonMedium }}>
         {card.isPinnedAndLocked && <PinnedIcon locked />}
         {card.isPinnedInTemplate && <PinnedIcon />}
