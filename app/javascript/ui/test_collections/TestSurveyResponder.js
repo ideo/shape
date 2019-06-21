@@ -34,6 +34,11 @@ export const NON_TEST_QUESTION_TYPES = [
   'question_demographic_single_choice',
 ]
 
+const DEMOGRAPHIC_QUESTION_TYPES = [
+  'question_demographics_intro',
+  'question_demographic_single_choice',
+]
+
 // Allow us to insert non-test questions into the survey while faking out some
 // things that would otherwise cause us trouble.
 const createFakeCollectionCard = ({
@@ -186,6 +191,12 @@ class TestSurveyResponder extends React.Component {
   isNonTestQuestionCard = card =>
     NON_TEST_QUESTION_TYPES.includes(card.card_question_type)
 
+  isDemograpicCard = card =>
+    DEMOGRAPHIC_QUESTION_TYPES.includes(card.card_question_type)
+
+  isAnswerableCard = card =>
+    UNANSWERABLE_QUESTION_TYPES.indexOf(card.card_question_type) === -1
+
   questionAnswerForCard = card => {
     const { surveyResponse } = this.props
     if (!surveyResponse) return undefined
@@ -203,11 +214,8 @@ class TestSurveyResponder extends React.Component {
     return !!this.questionAnswerForCard(card)
   }
 
-  answerableCard = card =>
-    UNANSWERABLE_QUESTION_TYPES.indexOf(card.card_question_type) === -1
-
   get answerableCards() {
-    return this.questionCards.filter(card => this.answerableCard(card))
+    return this.questionCards.filter(card => this.isAnswerableCard(card))
   }
 
   get numAnswerableQuestionItems() {
@@ -225,7 +233,7 @@ class TestSurveyResponder extends React.Component {
     const questions = questionCards.filter(card => {
       if (reachedLastVisibleCard) {
         return false
-      } else if (!this.answerableCard(card) || this.answeredCard(card)) {
+      } else if (!this.isAnswerableCard(card) || this.answeredCard(card)) {
         // If not answerable, or they already answered, show it
         return true
       }
@@ -294,16 +302,23 @@ class TestSurveyResponder extends React.Component {
       createSurveyResponse,
       theme,
     } = this.props
+
+    const surveyQuestions = this.questionCards.filter(
+      card => this.isAnswerableCard(card) && !this.isDemograpicCard(card)
+    )
+    const surveyDuration = surveyQuestions.length
+    const surveyProgress = Math.min(this.currentCardIdx, surveyDuration - 1) // this assumes demographic cards are after the survey
+
     return (
       <ThemeProvider theme={styledTestTheme(theme)}>
         <div id="surveyContainer">
           <ProgressDots
-            totalAmount={this.answerableCards.length + 1}
-            currentProgress={this.currentCardIdx}
+            totalAmount={surveyDuration}
+            currentProgress={surveyProgress}
           />
           <ProgressSquare
-            totalAmount={this.answerableCards.length + 1}
-            currentProgress={this.currentCardIdx}
+            totalAmount={surveyDuration}
+            currentProgress={surveyProgress}
           />
           <GreetingMessage />
           {this.viewableCards.map(card => (
