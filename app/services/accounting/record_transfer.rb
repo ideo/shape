@@ -47,7 +47,6 @@ module Accounting
     # transferring from their individual_owed to their individual_paid account
     def self.incentive_paid(survey_response)
       incentive = survey_response.amount_earned
-      stripe_fee = stripe_fee(price_per_response)
       paypal_fee = paypal_fee(incentive)
       payment = survey_response.test_audience.payment
       user = survey_response.user
