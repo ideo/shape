@@ -14,6 +14,6 @@ class Api::V1::Admin::FeedbackIncentivesController < Api::V1::BaseController
   end
 
   def mark_all_paid
-    ExportPendingIncentives.mark_as_paid!
+    ExportPendingIncentivesWorker.perform_async
   end
 end

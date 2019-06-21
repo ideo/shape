@@ -980,6 +980,12 @@ exports[`TestDesigner renders snapshot 1`] = `
                           undefined,
                         ],
                       ],
+                      "results": Array [
+                        Object {
+                          "type": "return",
+                          "value": Promise {},
+                        },
+                      ],
                     },
                     "fetchNotifications": [MockFunction],
                     "fetchRoles": [MockFunction fetchRoles],
@@ -1024,6 +1030,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       },
                       "addEmptySpaceClickHandler": [MockFunction],
                       "addNewCard": [MockFunction],
+                      "adminAudienceMenuOpen": false,
                       "alert": [MockFunction],
                       "alertOk": [MockFunction],
                       "autocompleteMenuClosed": [MockFunction],
@@ -4380,6 +4387,12 @@ exports[`TestDesigner renders snapshot 1`] = `
                           undefined,
                         ],
                       ],
+                      "results": Array [
+                        Object {
+                          "type": "return",
+                          "value": Promise {},
+                        },
+                      ],
                     },
                     "fetchNotifications": [MockFunction],
                     "fetchRoles": [MockFunction fetchRoles],
@@ -4424,6 +4437,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       },
                       "addEmptySpaceClickHandler": [MockFunction],
                       "addNewCard": [MockFunction],
+                      "adminAudienceMenuOpen": false,
                       "alert": [MockFunction],
                       "alertOk": [MockFunction],
                       "autocompleteMenuClosed": [MockFunction],
@@ -7779,6 +7793,12 @@ exports[`TestDesigner renders snapshot 1`] = `
                           undefined,
                         ],
                       ],
+                      "results": Array [
+                        Object {
+                          "type": "return",
+                          "value": Promise {},
+                        },
+                      ],
                     },
                     "fetchNotifications": [MockFunction],
                     "fetchRoles": [MockFunction fetchRoles],
@@ -7823,6 +7843,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       },
                       "addEmptySpaceClickHandler": [MockFunction],
                       "addNewCard": [MockFunction],
+                      "adminAudienceMenuOpen": false,
                       "alert": [MockFunction],
                       "alertOk": [MockFunction],
                       "autocompleteMenuClosed": [MockFunction],
@@ -10336,6 +10357,12 @@ exports[`TestDesigner renders snapshot 1`] = `
                     undefined,
                   ],
                 ],
+                "results": Array [
+                  Object {
+                    "type": "return",
+                    "value": Promise {},
+                  },
+                ],
               },
               "fetchNotifications": [MockFunction],
               "fetchRoles": [MockFunction fetchRoles],
@@ -10380,6 +10407,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                 },
                 "addEmptySpaceClickHandler": [MockFunction],
                 "addNewCard": [MockFunction],
+                "adminAudienceMenuOpen": false,
                 "alert": [MockFunction],
                 "alertOk": [MockFunction],
                 "autocompleteMenuClosed": [MockFunction],

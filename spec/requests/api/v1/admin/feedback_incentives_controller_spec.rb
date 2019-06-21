@@ -53,13 +53,14 @@ describe Api::V1::Admin::FeedbackIncentivesController, type: :request, json: tru
     end
 
     it 'marks response as paid' do
+      expect(ExportPendingIncentivesWorker).to receive(:perform_async)
       get(path)
-      expect(survey_response.reload.incentive_paid?).to be true
     end
 
     context 'after requesting once' do
       before do
-        get(path)
+        # perform as if the worker had run
+        ExportPendingIncentives.mark_as_paid!
       end
 
       it 'returns empty csv' do

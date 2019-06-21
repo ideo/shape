@@ -117,12 +117,11 @@ class Dialog extends React.PureComponent {
         // using suggestion here: https://git.io/fpUnP
         variant={{ backgroundColor }}
       >
-        {closeable &&
-          onClose && (
-            <ModalCloseButton onClick={this.handleClose}>
-              <CloseIcon />
-            </ModalCloseButton>
-          )}
+        {closeable && onClose && (
+          <ModalCloseButton onClick={this.handleClose}>
+            <CloseIcon />
+          </ModalCloseButton>
+        )}
         <CenteredPaddedContent paddingSides={maxWidth === 'md' ? 50 : 20}>
           {this.icon}
           <PromptText

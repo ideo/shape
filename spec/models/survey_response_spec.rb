@@ -148,14 +148,14 @@ RSpec.describe SurveyResponse, type: :model do
       expect {
         survey_response.record_incentive_owed!
       }.to change(user.incentive_owed_account, :balance)
-      expect(user.incentive_owed_account_balance.to_f).to eq(2.50)
+      expect(user.incentive_owed_account_balance.to_f).to eq(TestAudience.incentive_amount)
     end
 
     it 'decreases revenue_deferred balance' do
       expect {
         survey_response.record_incentive_owed!
       }.to change(revenue_deferred_account, :balance)
-      expect(revenue_deferred_account.balance.to_f).to eq(payment.amount.to_f - payment.stripe_fee - 2.50)
+      expect(revenue_deferred_account.balance.to_f).to eq(payment.amount.to_f - payment.stripe_fee - TestAudience.incentive_amount)
     end
   end
 
@@ -168,9 +168,10 @@ RSpec.describe SurveyResponse, type: :model do
     let(:revenue_deferred_account) { DoubleEntry.account(:revenue_deferred, scope: test_audience.payment) }
     let(:payment_processor_account) { DoubleEntry.account(:payment_processor, scope: test_audience.payment) }
     let(:revenue_account) { DoubleEntry.account(:revenue, scope: test_audience.payment) }
-    let(:incentive_amount) { 2.50 }
+    let(:incentive_amount) { TestAudience.incentive_amount }
     let(:paypal_fee) { (incentive_amount * 0.05).round(2) }
-    let(:our_earning) { test_audience.price_per_response - incentive_amount - paypal_fee }
+    let(:divided_stripe_fee) { test_audience.payment.stripe_fee / test_audience.sample_size }
+    let(:our_earning) { test_audience.price_per_response - divided_stripe_fee - incentive_amount - paypal_fee }
 
     before do
       survey_response.record_incentive_owed!
@@ -202,6 +203,7 @@ RSpec.describe SurveyResponse, type: :model do
       expect {
         survey_response.record_incentive_paid!
       }.to change(revenue_deferred_account, :balance)
+      expect(revenue_deferred_account.balance).to eq 0
       expect(revenue_deferred_account.balance.to_f).to eq(
         previous_balance - paypal_fee - our_earning,
       )
@@ -231,7 +233,7 @@ RSpec.describe SurveyResponse, type: :model do
     let(:survey_response) { create(:survey_response, test_audience: test_audience, status: :completed) }
 
     it 'returns fixed incentive amount' do
-      expect(survey_response.amount_earned.to_f).to eq(2.50)
+      expect(survey_response.amount_earned.to_f).to eq(TestAudience.incentive_amount)
     end
 
     context 'if not completed' do

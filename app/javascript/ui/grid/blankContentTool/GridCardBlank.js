@@ -76,9 +76,7 @@ const StyledBlankCreationTool = styled.div`
   ${props =>
     !props.board &&
     `
-      @media only screen and (min-width: ${
-        v.responsive.medBreakpoint
-      }px) and (max-width: ${v.responsive.largeBreakpoint}px) {
+      @media only screen and (min-width: ${v.responsive.medBreakpoint}px) and (max-width: ${v.responsive.largeBreakpoint}px) {
         padding: 1.5rem 1.33rem;
 
         .foreground.foreground-bottom {
@@ -462,19 +460,18 @@ class GridCardBlank extends React.Component {
             droppingFile={droppingFile}
             id="dropzone"
           >
-            {!loading &&
-              !droppingFile && (
-                <div className="text">
-                  <img
-                    src={bctIcons}
-                    alt="dropzone icons"
-                    style={{ width: '80px' }}
-                  />
-                  <div className="top">Drag &amp; Drop</div>
-                  <div className="or">or</div>
-                  <div className="bottom">Browse</div>
-                </div>
-              )}
+            {!loading && !droppingFile && (
+              <div className="text">
+                <img
+                  src={bctIcons}
+                  alt="dropzone icons"
+                  style={{ width: '80px' }}
+                />
+                <div className="top">Drag &amp; Drop</div>
+                <div className="or">or</div>
+                <div className="bottom">Browse</div>
+              </div>
+            )}
           </BctDropzone>
         )
     }
@@ -527,17 +524,16 @@ class GridCardBlank extends React.Component {
       >
         <Flex className="foreground" justify="space-between">
           {/* First row of options */}
-          {!isReplacing &&
-            !creating && (
-              <BctButtonBox
-                tooltip="Add text box"
-                type="text"
-                creating={creating}
-                size={size}
-                onClick={this.createTextItem}
-                Icon={AddTextIcon}
-              />
-            )}
+          {!isReplacing && !creating && (
+            <BctButtonBox
+              tooltip="Add text box"
+              type="text"
+              creating={creating}
+              size={size}
+              onClick={this.createTextItem}
+              Icon={AddTextIcon}
+            />
+          )}
           {(!creating || creating === 'file') && (
             <BctButtonBox
               tooltip="Add file"
@@ -603,41 +599,40 @@ class GridCardBlank extends React.Component {
           )}
         </Flex>
         {/* Second row display on initial load */}
-        {!isReplacing &&
-          !creating && (
-            <Flex
-              className="foreground foreground-bottom"
-              justify="space-between"
-            >
-              {collectionBctBox}
-              {foamcoreBoardBctBox}
-              {testBctBox}
-              <PopoutMenu
-                width={240}
-                buttonStyle="bct"
-                menuOpen={this.state.bctMenuOpen}
-                onClick={this.toggleBctMenu}
-                direction="right"
-                menuItems={[
-                  {
-                    name: 'Create Submission Box',
-                    iconLeft: <SubmissionBoxIcon />,
-                    onClick: this.startCreating('submissionBox'),
-                  },
-                  {
-                    name: 'Create Template',
-                    iconLeft: <TemplateIcon />,
-                    onClick: this.startCreating('template'),
-                  },
-                  {
-                    name: 'Create Report',
-                    iconLeft: <ReportIcon />,
-                    onClick: this.createDefaultReportCard,
-                  },
-                ]}
-              />
-            </Flex>
-          )}
+        {!isReplacing && !creating && (
+          <Flex
+            className="foreground foreground-bottom"
+            justify="space-between"
+          >
+            {collectionBctBox}
+            {foamcoreBoardBctBox}
+            {testBctBox}
+            <PopoutMenu
+              width={240}
+              buttonStyle="bct"
+              menuOpen={this.state.bctMenuOpen}
+              onClick={this.toggleBctMenu}
+              direction="right"
+              menuItems={[
+                {
+                  name: 'Create Submission Box',
+                  iconLeft: <SubmissionBoxIcon />,
+                  onClick: this.startCreating('submissionBox'),
+                },
+                {
+                  name: 'Create Template',
+                  iconLeft: <TemplateIcon />,
+                  onClick: this.startCreating('template'),
+                },
+                {
+                  name: 'Create Report',
+                  iconLeft: <ReportIcon />,
+                  onClick: this.createDefaultReportCard,
+                },
+              ]}
+            />
+          </Flex>
+        )}
         {inner}
         <BctBackground className="bct-background" />
       </StyledBlankCreationTool>
@@ -662,10 +657,9 @@ class GridCardBlank extends React.Component {
           {this.renderInner()}
         </StyledGridCardInner>
         {this.state.loading && <InlineLoader />}
-        {!this.emptyState &&
-          !testCollectionCard && (
-            <CloseButton onClick={this.closeBlankContentTool} />
-          )}
+        {!this.emptyState && !testCollectionCard && (
+          <CloseButton onClick={this.closeBlankContentTool} />
+        )}
       </StyledGridCardBlank>
     )
   }

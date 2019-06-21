@@ -123,7 +123,6 @@ class Item < ApplicationRecord
   scope :search_import, -> do
     active.includes(
       :tags,
-      :taggings,
       parent_collection_card: :parent,
     )
   end

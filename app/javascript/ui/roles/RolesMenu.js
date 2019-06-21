@@ -288,9 +288,7 @@ class RolesMenu extends React.Component {
                             canEdit &&
                             this.notCurrentUser(combined.entity, combined.role)
                           }
-                          key={`${combined.entity.id}_${
-                            combined.entity.internalType
-                          }_r${combined.role.id}`}
+                          key={`${combined.entity.id}_${combined.entity.internalType}_r${combined.role.id}`}
                           record={record}
                           role={combined.role}
                           roleTypes={roleTypes}

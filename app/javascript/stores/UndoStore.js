@@ -1,51 +1,112 @@
-import { observable, action } from 'mobx'
+import { observable, action, computed } from 'mobx'
 import { routingStore, uiStore } from '~/stores'
-
+import { UndoActionStatus } from '~/enums/actionEnums'
 const MAX_UNDOSTACK_LENGTH = 10
 
 export default class UndoStore {
   @observable
-  stack = []
+  undoStack = []
+  @observable
+  redoStack = []
+
   @observable
   undoAfterRoute = null
 
-  // block multiple requests from happening too quickly
   @observable
-  currentlyUndoing = false
+  actionStatus = UndoActionStatus.idle
+
+  // block multiple requests from happening too quickly
+  @computed
+  get currentlyUndoing() {
+    return this.actionStatus === UndoActionStatus.undo
+  }
+
+  @computed
+  get currentlyRedoing() {
+    return this.actionStatus === UndoActionStatus.redo
+  }
+
+  @computed
+  get currentlyIdle() {
+    return this.actionStatus === UndoActionStatus.idle
+  }
 
   @action
-  pushUndoAction({ apiCall, redirectPath = null, message = '' }) {
-    this.stack.push({ apiCall, redirectPath, message })
-    if (this.stack.length > MAX_UNDOSTACK_LENGTH) {
+  pushUndoAction(undoAction) {
+    this.undoStack.push(undoAction)
+    if (this.undoStack.length > MAX_UNDOSTACK_LENGTH) {
       // only keep 10 items at a time
-      this.stack.shift()
+      this.undoStack.shift()
+    }
+  }
+
+  @action
+  pushRedoAction(redoAction) {
+    this.redoStack.push(redoAction)
+    if (this.redoStack.length > MAX_UNDOSTACK_LENGTH) {
+      // only keep 10 items at a time
+      this.redoStack.shift()
     }
   }
 
   @action
   async undoLastAction() {
-    const undoAction = this.stack.pop()
+    const undoAction = this.undoStack.pop()
     if (!undoAction) return
-    this.currentlyUndoing = true
-    if (undoAction.redirectPath) {
-      const { type, id } = undoAction.redirectPath
-      const { viewingRecord } = uiStore
-      // check if we don't have to redirect
-      if (viewingRecord.internalType !== type || viewingRecord.id !== id) {
-        routingStore.routeTo(type, id)
-        this.undoAfterRoute = undoAction
-        return
-      }
+    this.status = UndoActionStatus.undo
+    const { redirectPath } = undoAction
+    if (redirectPath) {
+      this.redirectAction(redirectPath, undoAction)
     }
     this.performUndo(undoAction)
   }
 
   @action
+  async redoLastAction() {
+    const redoAction = this.redoStack.pop()
+    if (!redoAction) return
+    this.status = UndoActionStatus.redo
+    const { redirectPath } = redoAction
+    if (redirectPath) {
+      this.redirectAction(redirectPath, redoAction)
+    }
+    this.performRedo(redoAction)
+  }
+
+  @action
+  async redirectAction(redirectPath, action) {
+    const { type, id } = redirectPath
+    const { viewingRecord } = uiStore
+    const { internalType, id: recordId } = viewingRecord
+    // check if we don't have to redirect
+    if (internalType !== type || recordId !== id) {
+      routingStore.routeTo(type, id)
+      this.undoAfterRoute = action
+    }
+  }
+
+  @action
   async performUndo(undoAction) {
-    const { message } = undoAction
+    const { message, redoAction, redirectPath } = undoAction
+    if (redoAction) {
+      // there should usually always be a redoAction...
+      // however TextItemCover has a unique way of undo/redo
+      this.pushRedoAction({
+        ...redoAction,
+        redirectPath: redirectPath,
+      })
+    }
     uiStore.popupSnackbar({ message })
     await undoAction.apiCall()
-    this.currentlyUndoing = false
+    this.status = UndoActionStatus.idle
+  }
+
+  @action
+  async performRedo(redoAction) {
+    const { message } = redoAction
+    uiStore.popupSnackbar({ message })
+    await redoAction.apiCall()
+    this.status = UndoActionStatus.idle
   }
 
   @action
@@ -59,5 +120,11 @@ export default class UndoStore {
     if (this.currentlyUndoing) return false
     if (uiStore.cancelUndo) return false
     return this.undoLastAction()
+  }
+
+  handleRedoKeyPress = () => {
+    if (this.currentlyRedoing) return false
+    if (uiStore.cancelRedo) return false
+    return this.redoLastAction()
   }
 }
