@@ -35,13 +35,8 @@ const StyledSurvey = styled.div`
 class TestSurveyPage extends React.Component {
   constructor(props) {
     super(props)
-    // Cannot find where this is ever passed collection as props
-    // Does it always do apiStore.sync?
     this.collection = props.collection || apiStore.sync(window.collectionData)
-    console.log(
-      'TestSurveyPage#constructor, this.collection: ',
-      this.collection
-    )
+
     if (window.nextAvailableId) {
       this.collection.setNextAvailableTestPath(
         `/tests/${window.nextAvailableId}`
@@ -56,10 +51,7 @@ class TestSurveyPage extends React.Component {
   get renderSurvey() {
     const { collection } = this
     if (!collection) return null
-    console.log(
-      'TestSurveyPage#renderSurvey, this.collection: ',
-      this.collection
-    )
+
     return (
       <StyledSurvey data-cy="StandaloneTestSurvey">
         <TestSurveyResponder collection={collection} editing={false} />

@@ -1,10 +1,8 @@
 import _ from 'lodash'
-import { Flex } from 'reflexbox'
 import PropTypes from 'prop-types'
 import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import FlipMove from 'react-flip-move'
-import { Element as ScrollElement, scroller } from 'react-scroll'
+import { scroller } from 'react-scroll'
 import { ThemeProvider } from 'styled-components'
 
 import ProgressDots from '~/ui/global/ProgressDots'
@@ -16,6 +14,7 @@ import {
 import TestQuestion from '~/ui/test_collections/TestQuestion'
 import GreetingMessage from '~/ui/test_collections/GreetingMessage'
 import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
+import ScrollingModule from '~/ui/test_collections/ScrollingModule'
 
 const UNANSWERABLE_QUESTION_TYPES = [
   'question_media',
@@ -43,7 +42,6 @@ class TestSurveyResponder extends React.Component {
 
   constructor(props) {
     super(props)
-    console.log('TestSurveyResponder#constructor: ', props.collection)
     this.collection = props.collection
   }
 
@@ -77,8 +75,6 @@ class TestSurveyResponder extends React.Component {
 
   get collection() {
     const { collection } = this
-
-    console.log('TestSurveyResponder# get collection: ', collection)
 
     return collection.live_test_collection
       ? collection.live_test_collection
@@ -137,7 +133,6 @@ class TestSurveyResponder extends React.Component {
 
   initializeCards() {
     const { collection } = this
-    console.log('TestSurveyResponder#initializeCards: ', collection)
 
     const questionCards = [...collection.question_cards]
 
@@ -325,35 +320,23 @@ class TestSurveyResponder extends React.Component {
           />
           <GreetingMessage />
           {this.viewableCards.map(card => (
-            // ScrollElement only gets the right offsetTop if outside the FlipMove
-            <ScrollElement name={`card-${card.id}`} key={card.id}>
-              <FlipMove appearAnimation="fade">
-                <div>
-                  <Flex
-                    style={{
-                      width: 'auto',
-                      flexWrap: 'wrap',
-                    }}
-                  >
-                    <TestQuestionHolder editing={false} userEditable={false}>
-                      <TestQuestion
-                        createSurveyResponse={createSurveyResponse}
-                        surveyResponse={surveyResponse}
-                        questionAnswer={questionAnswerForCard(card)}
-                        afterQuestionAnswered={afterQuestionAnswered}
-                        parent={collection}
-                        card={card}
-                        item={card.record}
-                        order={card.order}
-                        editing={false}
-                        canEdit={canEdit}
-                        numberOfQuestions={numAnswerableQuestionItems}
-                      />
-                    </TestQuestionHolder>
-                  </Flex>
-                </div>
-              </FlipMove>
-            </ScrollElement>
+            <ScrollingModule name={`card-${card.id}`} key={card.id}>
+              <TestQuestionHolder editing={false} userEditable={false}>
+                <TestQuestion
+                  createSurveyResponse={createSurveyResponse}
+                  surveyResponse={surveyResponse}
+                  questionAnswer={questionAnswerForCard(card)}
+                  afterQuestionAnswered={afterQuestionAnswered}
+                  parent={collection}
+                  card={card}
+                  item={card.record}
+                  order={card.order}
+                  editing={false}
+                  canEdit={canEdit}
+                  numberOfQuestions={numAnswerableQuestionItems}
+                />
+              </TestQuestionHolder>
+            </ScrollingModule>
           ))}
         </div>
       </ThemeProvider>
