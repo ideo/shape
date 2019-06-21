@@ -94,8 +94,8 @@ export const FormButton = styled.button`
       props.disabledHover
         ? props.color
         : props.color === v.colors.primaryDark
-          ? v.colors.primaryDarkest
-          : v.colors.commonDark};
+        ? v.colors.primaryDarkest
+        : v.colors.commonDark};
   }
   ${props =>
     props.disabled &&

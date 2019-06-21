@@ -1,15 +1,13 @@
 namespace :cypress do
   desc 'set up the test env for cypress E2E testing'
   task db_setup: :environment do
-    # clear out any orgs we created
-    # NOTE: have to do this first, or else it gets mad if we do this after the user is loaded
-    Organization.where('slug LIKE ?', 'our-test-org%').destroy_all
-    Organization.where(name: 'CypressTest').destroy_all
-    User.where('email LIKE ?', 'cypress-test%').destroy_all
-    Audience.where(name: "My Test Audience").destroy_all
+    unless Rails.env.test?
+      puts 'you do not want to run this, except in test env.'
+      return
+    end
 
-    email = 'cypress-test@ideo.com'
-    User.where('handle LIKE ?', 'cy-test-%').destroy_all
+    DatabaseCleaner.clean_with(:truncation)
+    Rails.application.load_seed
 
     email = 'cypress-test@ideo.com'
     user = FactoryBot.create(:user, email: email).becomes(User)
@@ -22,8 +20,8 @@ namespace :cypress do
     organization = builder.organization
     user.switch_to_organization(organization)
     # add an additional test user into the org
-    FactoryBot.create(:user, email: 'cypress-test-1@ideo.com', add_to_org: organization)
-    # add an a test group into the org
+    FactoryBot.create(:user, email: 'cypress-test-1@ideo.com')
+    # add a test group into the org
     FactoryBot.create(:group, organization: organization, add_admins: [user])
     create_cards(user.current_user_collection, user)
     create_events(organization)
@@ -59,7 +57,7 @@ namespace :cypress do
   end
 
   def create_events(organization)
-    15.times do |_i|
+    15.times do
       user = FactoryBot.create(:user, handle: "cy-test-#{Faker::Internet.unique.slug}")
       FactoryBot.create(:activity,
                         # with cache_classes = false, it gets angry if you try to pass in the
@@ -78,21 +76,21 @@ namespace :cypress do
       :with_test_audience,
       :completed,
       test_status: :live,
-      organization_id: organization.id
+      organization_id: organization.id,
     )
     audience = test_collection.test_audiences.last.audience
-    set_audience_criteria(audience)
+    update_audience_criteria(audience)
     test_collection.reload
   end
 
-  def set_audience_criteria(audience)
+  def update_audience_criteria(audience)
     {
-      age_list: %W(Young Old),
-      country_list: "United States of America",
-      interest_list: %W(Athlete Pets)
+      age_list: %w[Young Old],
+      country_list: 'United States of America',
+      interest_list: %w[Athlete Pets],
     }.each do |key, value|
       audience.send("#{key}=", value)
     end
-    audience.update(name: "My Test Audience")
+    audience.update(name: 'My Test Audience')
   end
 end

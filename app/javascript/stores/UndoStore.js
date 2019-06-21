@@ -88,10 +88,14 @@ export default class UndoStore {
   @action
   async performUndo(undoAction) {
     const { message, redoAction, redirectPath } = undoAction
-    this.redoStack.push({
-      ...redoAction,
-      redirectPath: redirectPath,
-    })
+    if (redoAction) {
+      // there should usually always be a redoAction...
+      // however TextItemCover has a unique way of undo/redo
+      this.pushRedoAction({
+        ...redoAction,
+        redirectPath: redirectPath,
+      })
+    }
     uiStore.popupSnackbar({ message })
     await undoAction.apiCall()
     this.status = UndoActionStatus.idle

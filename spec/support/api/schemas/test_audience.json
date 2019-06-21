@@ -4,7 +4,7 @@
     "sample_size": { "type": ["number", "null"] },
     "audience_id": { "type": "string" },
     "price_per_response": { "type": ["number", "null"] },
-    "num_survey_responses": { "type": "number" },
+    "num_completed_responses": { "type": "number" },
     "status": { "type": "string" }
   }
 }

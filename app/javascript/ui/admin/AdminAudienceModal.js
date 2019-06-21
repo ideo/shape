@@ -4,12 +4,7 @@ import styled from 'styled-components'
 import { Flex, Box } from 'reflexbox'
 import { map, capitalize } from 'lodash'
 import Modal from '~/ui/global/modals/Modal'
-import {
-  FieldContainer,
-  Label,
-  TextField,
-  TextButton,
-} from '~/ui/global/styled/forms'
+import { FieldContainer, Label, TextButton } from '~/ui/global/styled/forms'
 import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import v from '~/utils/variables'
 import { tagListsToCriteria } from '~/ui/test_collections/AudienceSettings/AudienceCriteria'
@@ -81,25 +76,13 @@ class AdminAudienceModal extends React.Component {
     const { audience, open } = this.props
     if (!open) return null
 
-    const title = `${audience.name} Definition`
+    const title = `${audience.name}`
 
     return (
       <Modal title={title} onClose={this.handleClose} open={open} noScroll>
         <React.Fragment>
-          <FieldContainer>
-            <Label data-cy="Label_audienceName" htmlFor="audienceName">
-              Audience Name
-            </Label>
-            <TextField
-              id="audienceName"
-              type="text"
-              data-cy="TextField_audienceName"
-              value={audience.name}
-              disabled
-            />
-          </FieldContainer>
           <Box mb={1}>
-            <Label>Targeting Criteria</Label>
+            <Label>Targeting Criteria:</Label>
           </Box>
           {this.renderCriteria()}
           <div style={{ textAlign: 'center', paddingBottom: '2rem' }}>
