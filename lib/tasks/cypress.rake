@@ -20,12 +20,20 @@ namespace :cypress do
     organization = builder.organization
     user.switch_to_organization(organization)
     # add an additional test user into the org
-    FactoryBot.create(:user, email: 'cypress-test-1@ideo.com', add_to_org: organization)
-    # add an a test group into the org
+    FactoryBot.create(:user, email: 'cypress-test-1@ideo.com')
+    # add a test group into the org
     FactoryBot.create(:group, organization: organization, add_admins: [user])
     create_cards(user.current_user_collection, user)
     create_events(organization)
     create_test_collection(organization)
+    reindex
+  end
+
+  def reindex
+    User.reindex
+    Collection.reindex
+    Group.reindex
+    Item.reindex
   end
 
   def create_cards(collection, user)
