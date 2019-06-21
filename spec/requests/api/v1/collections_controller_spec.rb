@@ -32,8 +32,9 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
 
     describe 'GET #index', create_org: true do
+      let(:parent_collection) { create(:collection) }
       let!(:collection) do
-        create(:collection, num_cards: 1, add_viewers: [api_user])
+        create(:collection, num_cards: 1, add_viewers: [api_user], parent_collection: parent_collection)
       end
       let!(:external_record) do
         create(
