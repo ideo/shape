@@ -13,6 +13,7 @@ import TestSurveyResponder from '~/ui/test_collections/TestSurveyResponder'
 import Tooltip from '~/ui/global/Tooltip'
 import CommentThreadHeader from '~/ui/threads/CommentThreadHeader'
 import { threadTitleCss } from '~/ui/threads/CommentThread'
+import { observable } from 'mobx'
 
 const StyledTestHeader = styled.div`
   ${threadTitleCss};
@@ -22,10 +23,8 @@ const StyledTestHeader = styled.div`
 @inject('apiStore', 'uiStore')
 @observer
 class InlineCollectionTest extends React.Component {
-  state = {
-    surveyResponse: null,
-  }
-
+  // I'm hung up on this
+  // Not sure how it works, much less what I'm breaking
   async componentDidMount() {
     if (!this.testCollection) {
       return
@@ -38,17 +37,6 @@ class InlineCollectionTest extends React.Component {
       // this will also set nextAvailableTestPath on the testCollection
       testCollection.API_getNextAvailableTest()
     }
-    const surveyResponseResult =
-      testCollection.survey_response_for_user_id &&
-      (await this.fetchSurveyResponse(
-        testCollection.survey_response_for_user_id
-      ))
-    const surveyResponse = surveyResponseResult
-      ? surveyResponseResult.data
-      : null
-    this.setState({
-      surveyResponse,
-    })
   }
 
   componentWillUnmount() {
@@ -56,7 +44,11 @@ class InlineCollectionTest extends React.Component {
   }
 
   get collection() {
-    return this.props.uiStore.viewingCollection
+    const { collection } = this
+
+    return collection.live_test_collection
+      ? collection.live_test_collection
+      : collection
   }
 
   get testCollection() {
@@ -71,29 +63,8 @@ class InlineCollectionTest extends React.Component {
     )
   }
 
-  fetchSurveyResponse(surveyResponseId) {
-    const { apiStore } = this.props
-    return apiStore.fetch('survey_responses', surveyResponseId)
-  }
-
-  createSurveyResponse = async () => {
-    const { apiStore } = this.props
-    const newResponse = new SurveyResponse(
-      {
-        test_collection_id: this.testCollection.id,
-      },
-      apiStore
-    )
-    const surveyResponse = await newResponse.save()
-    if (surveyResponse) {
-      this.setState({ surveyResponse })
-    }
-    return surveyResponse
-  }
-
   renderInner() {
-    const { collection, createSurveyResponse, testCollection } = this
-    const { surveyResponse } = this.state
+    const { collection, testCollection } = this
     if (!collection) return null
     if (!testCollection) {
       return (

@@ -35,7 +35,13 @@ const StyledSurvey = styled.div`
 class TestSurveyPage extends React.Component {
   constructor(props) {
     super(props)
+    // Cannot find where this is ever passed collection as props
+    // Does it always do apiStore.sync?
     this.collection = props.collection || apiStore.sync(window.collectionData)
+    console.log(
+      'TestSurveyPage#constructor, this.collection: ',
+      this.collection
+    )
     if (window.nextAvailableId) {
       this.collection.setNextAvailableTestPath(
         `/tests/${window.nextAvailableId}`
@@ -47,42 +53,16 @@ class TestSurveyPage extends React.Component {
     }
   }
 
-  async componentDidMount() {
-    await apiStore.loadCurrentUser()
-    if (!apiStore.currentUser) return
-  }
-
-  get currentUser() {
-    const { currentUser } = apiStore
-
-    return currentUser
-  }
-
-  get includeRecontactQuestion() {
-    return (
-      !this.collection.live_test_collection &&
-      (!this.currentUser ||
-        this.currentUser.feedback_contact_preference ===
-          'feedback_contact_unanswered')
-    )
-  }
-
-  get includeTerms() {
-    return !this.currentUser || !this.currentUser.respondent_terms_accepted
-  }
-
   get renderSurvey() {
     const { collection } = this
     if (!collection) return null
-
+    console.log(
+      'TestSurveyPage#renderSurvey, this.collection: ',
+      this.collection
+    )
     return (
       <StyledSurvey data-cy="StandaloneTestSurvey">
-        <TestSurveyResponder
-          collection={collection}
-          editing={false}
-          includeRecontactQuestion={this.includeRecontactQuestion}
-          includeTerms={this.includeTerms}
-        />
+        <TestSurveyResponder collection={collection} editing={false} />
       </StyledSurvey>
     )
   }
@@ -101,11 +81,7 @@ class TestSurveyPage extends React.Component {
           {this.collection.test_status === 'live' ? (
             this.renderSurvey
           ) : (
-            <ClosedSurvey
-              includeRecontactQuestion={this.includeRecontactQuestion}
-              currentUser={this.currentUser}
-              collection={this.collection}
-            />
+            <ClosedSurvey collection={this.collection} />
           )}
         </StyledBg>
       </React.Fragment>

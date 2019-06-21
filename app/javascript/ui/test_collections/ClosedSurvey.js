@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes, inject } from 'mobx-react'
 import { observable, action } from 'mobx'
 import styled, { ThemeProvider } from 'styled-components'
@@ -53,6 +52,9 @@ class ClosedSurvey extends React.Component {
   async componentDidMount() {
     this.initializeCards()
 
+    const { apiStore } = this.props
+    await apiStore.loadCurrentUser()
+    if (!apiStore.currentUser) return
     await this.fetchSurveyResponse()
   }
 
@@ -111,8 +113,16 @@ class ClosedSurvey extends React.Component {
     surveyResponse ? surveyResponse.session_uid : null
   }
 
+  get includeRecontactQuestion() {
+    return (
+      !this.currentUser ||
+      this.currentUser.feedback_contact_preference ===
+        'feedback_contact_unanswered'
+    )
+  }
+
   render() {
-    const { currentUser, includeRecontactQuestion } = this.props
+    const { currentUser, includeRecontactQuestion } = this
 
     return (
       <ThemeProvider theme={styledTestTheme('primary')}>
@@ -139,8 +149,6 @@ class ClosedSurvey extends React.Component {
 }
 
 ClosedSurvey.propTypes = {
-  currentUser: MobxPropTypes.objectOrObservableObject,
-  includeRecontactQuestion: PropTypes.bool,
   collection: MobxPropTypes.objectOrObservableObject,
 }
 
@@ -149,8 +157,6 @@ ClosedSurvey.wrappedComponent.propTypes = {
 }
 
 ClosedSurvey.defaultProps = {
-  currentUser: null,
-  includeRecontactQuestion: false,
   collection: undefined,
 }
 
