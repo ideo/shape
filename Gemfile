@@ -107,7 +107,7 @@ gem 'gibbon', '~> 3.2'
 gem "redis-mutex", "~> 4.0.1"
 
 # performance tuning
-gem 'tunemygc'
+# gem 'tunemygc'
 gem 'scout_apm'
 gem 'barnes'
 gem 'oj'
