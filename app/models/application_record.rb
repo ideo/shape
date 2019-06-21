@@ -13,4 +13,8 @@ class ApplicationRecord < ActiveRecord::Base
   def searchable?
     false
   end
+
+  def skip_network_actions?
+    Rails.env.development? || ENV['CYPRESS'].present?
+  end
 end

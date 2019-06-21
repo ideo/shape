@@ -101,12 +101,11 @@ class MarketingPage extends React.Component {
                     {hero && hero.getStartedButton}
                   </MarketingCallToAction>
                 </a>
-                {hero &&
-                  hero.videoUrl && (
-                    <MarketingVideoLink onClick={this.toggleVideoPlaying}>
-                      {videoPlayingButtonText}
-                    </MarketingVideoLink>
-                  )}
+                {hero && hero.videoUrl && (
+                  <MarketingVideoLink onClick={this.toggleVideoPlaying}>
+                    {videoPlayingButtonText}
+                  </MarketingVideoLink>
+                )}
               </MarketingHeroButtonContainer>
             </Center>
           </MarketingGradientTop>

@@ -1,4 +1,3 @@
-// NOTE: we import this one as just AlertIcon for consistency
 import AlertIcon from '~/ui/icons/AlertIcon'
 import ArchiveIcon from '~/ui/icons/ArchiveIcon'
 import BackIcon from '~/ui/icons/BackIcon'
@@ -16,6 +15,8 @@ import OkIcon from '~/ui/icons/OkIcon'
 import OverdueClockIcon from '~/ui/icons/OverdueClockIcon'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import TestGraphIcon from '~/ui/icons/TestGraphIcon'
+import TrashIcon from '~/ui/icons/TrashIcon'
+import TrashXlIcon from '~/ui/icons/TrashXlIcon'
 
 export const iconNames = [
   'Alert',
@@ -34,6 +35,8 @@ export const iconNames = [
   'OverdueClock',
   'Template',
   'TestGraph',
+  'Trash',
+  'TrashXl',
 ]
 
 export default {
@@ -54,4 +57,6 @@ export default {
   OverdueClockIcon,
   TemplateIcon: () => <TemplateIcon circled />,
   TestGraphIcon,
+  TrashIcon,
+  TrashXlIcon,
 }

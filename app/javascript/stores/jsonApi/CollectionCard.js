@@ -298,9 +298,9 @@ class CollectionCard extends BaseRecord {
 
     if (this.shouldShowArchiveWarning) {
       const popupAgreed = new Promise((resolve, reject) => {
-        let prompt = 'Are you sure you want to archive this?'
-        const confirmText = 'Archive'
-        let iconName = 'Archive'
+        let prompt = 'Are you sure you want to delete this?'
+        const confirmText = 'Delete'
+        let iconName = 'TrashXl'
         let snoozeChecked = null
         let onToggleSnoozeDialog = null
         if (collection.isMasterTemplate) {
@@ -312,7 +312,7 @@ class CollectionCard extends BaseRecord {
         } else if (selectedCardIds.length > 1) {
           // check if multiple cards were selected
           const removedCount = this.reselectOnlyEditableCards(selectedCardIds)
-          prompt = 'Are you sure you want to archive '
+          prompt = 'Are you sure you want to delete '
           if (selectedCardIds.length > 1) {
             prompt += `these ${selectedCardIds.length} objects?`
           } else {
@@ -325,9 +325,9 @@ class CollectionCard extends BaseRecord {
           }
         } else if (this.link) {
           iconName = 'Link'
-          prompt = 'Are you sure you want to archive this link?'
+          prompt = 'Are you sure you want to delete this link?'
         } else if (this.isTestDesignCollection) {
-          prompt = 'Are you sure you want to archive this test design?'
+          prompt = 'Are you sure you want to delete this test design?'
           prompt += ' It will close your feedback.'
         }
         this.uiStore.confirm({

@@ -5,7 +5,6 @@ import _ from 'lodash'
 
 import AddIntoIcon from '~/ui/icons/AddIntoIcon'
 import Activity from '~/stores/jsonApi/Activity'
-import ArchiveIcon from '~/ui/icons/ArchiveIcon'
 import DownloadIcon from '~/ui/icons/DownloadIcon'
 import DuplicateIcon from '~/ui/icons/DuplicateIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
@@ -15,6 +14,7 @@ import SharingIcon from '~/ui/icons/SharingIcon'
 import SubmissionBoxIconSm from '~/ui/icons/SubmissionBoxIconSm'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import TagIcon from '~/ui/icons/TagIcon'
+import TrashXlIcon from '~/ui/icons/TrashXlIcon'
 
 @inject('uiStore')
 @observer
@@ -85,7 +85,7 @@ class ActionMenu extends React.Component {
 
   archiveCard = async () => {
     const { afterArchive } = this.props
-    const result = await this.callCardAction('Archive', 'API_archive')
+    const result = await this.callCardAction('Delete', 'API_archive')
     if (afterArchive && result) afterArchive({ type: 'archive' })
   }
 
@@ -170,8 +170,8 @@ class ActionMenu extends React.Component {
         onClick: this.showRolesMenu,
       },
       {
-        name: 'Archive',
-        iconRight: <ArchiveIcon />,
+        name: 'Delete',
+        iconRight: <TrashXlIcon />,
         onClick: this.archiveCard,
       },
       {
@@ -206,7 +206,7 @@ class ActionMenu extends React.Component {
         items = _.reject(items, { name: 'Move' })
       }
       if (record && record.is_submission_box_template) {
-        items = _.reject(items, { name: 'Archive' })
+        items = _.reject(items, { name: 'Delete' })
         items = _.reject(items, { name: 'Move' })
       }
     } else {
@@ -226,7 +226,7 @@ class ActionMenu extends React.Component {
       items = _.reject(items, { name: 'Duplicate' })
       items = _.reject(items, { name: 'Tags' })
       if (!card.link) {
-        items = _.reject(items, { name: 'Archive' })
+        items = _.reject(items, { name: 'Delete' })
       }
     }
 

@@ -150,7 +150,7 @@ class Role < ApplicationRecord
   def update_resource_collection_card
     return unless resource.present?
     card = resource.try(:parent_collection_card)
-    return unless card.present?
+    return unless card.present? && card.persisted?
     card.touch
   end
 end

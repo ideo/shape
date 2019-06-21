@@ -1,7 +1,12 @@
 <div id="react-root"></div>
 
 <script>
-  window.collectionData = <%= @collection.serialized_for_test_survey(@test_audience&.id).to_json.html_safe %>;
+  window.collectionData = <%=
+    @collection.serialized_for_test_survey(
+      test_audience_id: @test_audience&.id,
+      current_user: current_user
+    ).to_json.html_safe
+  %>;
   window.nextAvailableId = <%= @next_submission_test ? @next_submission_test.id : 'null' %>;
   window.noneAvailable = <%= params[:action] == 'completed' %>;
   window.filestackToken = <%= FilestackFile.filestack_security(read_only: true).to_json.html_safe %>;

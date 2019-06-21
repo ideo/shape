@@ -60,7 +60,7 @@ class TermsQuestion extends React.Component {
             }
             onClick={this.handleClick(false)}
           >
-            <Emoji scale={1.375} name="Disagree" symbol="👎" />
+            <Emoji size="large" name="Disagree" symbol="👎" />
           </EmojiButton>
           <EmojiButton
             data-cy="AcceptFeedbackTerms"
@@ -71,7 +71,7 @@ class TermsQuestion extends React.Component {
             }
             onClick={this.handleClick(true)}
           >
-            <Emoji scale={1.375} name="Yes" symbol="👍" />
+            <Emoji size="large" name="Yes" symbol="👍" />
           </EmojiButton>
         </EmojiHolder>
       </QuestionSpacingContainer>

@@ -58,8 +58,8 @@ class Activity extends React.PureComponent {
 
   renameYourself() {
     const { subjectUsers } = this.props
-    return subjectUsers.map(
-      user => (user.id === apiStore.currentUserId ? { name: 'you' } : user)
+    return subjectUsers.map(user =>
+      user.id === apiStore.currentUserId ? { name: 'you' } : user
     )
   }
 
@@ -134,7 +134,7 @@ class Activity extends React.PureComponent {
       case 'archived':
         return (
           <ActivityText>
-            <strong className="actor">{actorNames}</strong> has archived{' '}
+            <strong className="actor">{actorNames}</strong> has deleted{' '}
             <strong className="target">
               &ldquo;
               {targetName}

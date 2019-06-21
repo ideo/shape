@@ -4,7 +4,7 @@ Here are the commands you can use to get started:
 
 **Install all the dependencies first:**
 
-```
+```sh
 brew install nvm
 nvm install 8.16.0
 # use nvm + npm to install yarn; `brew install yarn` would try to reinstall node
@@ -41,7 +41,7 @@ Note: `./dev.sh -s` will run `rails db:setup` which will also seed your database
 
 If these two collections don't exist then you won't be able to create a new organization and setup your first account.
 
-```
+```sh
 git clone https://github.com/ideo/shape
 cd shape
 # Setup the `.env` file with valid credentials: (get these from the IDEO team)
@@ -59,7 +59,7 @@ Ensure your text editor has [eslint](https://eslint.org/) and [rubocop](https://
 
 Rails Unit & Controller Tests
 
-```
+```sh
 # run rails tests once:
 bin/rspec
 # watch files and re-run tests:
@@ -68,7 +68,7 @@ bundle exec guard
 
 Jest Unit Tests
 
-```
+```sh
 # run JS tests once:
 yarn run jest
 # watch files and re-run JS tests:
@@ -79,31 +79,35 @@ Cypress Integration Tests
 
 Note: Make sure to select **Electron** as your browser in the cypress dropdown when running it locally.
 
-```
-# Run cypress integration tests:
-yarn cypress-ci
+```sh
+# Start Rails test server and run cypress GUI (which hits http://localhost:3001)
+./cypress.sh
 
-# Or control the tests:
+# Once your test server is running...
+# Run cypress integration tests using the GUI:
 yarn cypress
+
+# Or run in CI mode:
+yarn cypress-ci [-s <path/to/feature>]
 ```
 
 ## Running your dev environment
 
 1. Run your webpack server:
 
-```
+```sh
 heroku local webpack -f Procfile.development
 ```
 
 2. Run your sidekiq worker:
 
-```
+```sh
 heroku local worker -f Procfile.development
 ```
 
 3. Run your rails server:
 
-```
+```sh
 rails s
 ```
 
@@ -111,14 +115,14 @@ rails s
 
 Install ttab and [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli#download-and-install):
 
-```
+```sh
 npm install -g ttab
 brew tap heroku/brew && brew install heroku
 ```
 
 Run dev script:
 
-```
+```sh
 ./dev.sh
 ```
 
@@ -129,18 +133,32 @@ This will open separate tabs to:
 1. Open [Atom](https://atom.io/) in the project directory
    And will open your browser (may need to refresh page after initial webpack)
 
-```
+```sh
 # run the script with a different text editor
 ./dev.sh -e [your favorite editor]
 ```
 
+### Post-checkout hook for switching between branches
+
+Use the post-checkout hook here to keep your branches in sync:
+https://github.com/ideo/shape/wiki/Git-post-checkout-hook
+
+Upon switching branches, this will (as necessary):
+ - bundle install
+ - yarn install
+ - migrate or rollback any migrations relevant (or not relevant) to the branch, and checkout `db/schema.rb`
+ - git submodule update
+
+You can also decline the updates e.g. if you are just making a quick branch update don't want to rollback migrations (and lose data).
+
 ### Keeping database in sync
 
 Sometimes your local database environment will drift away from production. You can pull the current production database to your local machine using a shell command from `.shell-commands` (NOTE: this is only possible if you have been granted access to the Heroku instance). First, run `source .shell-commands`, then run:
-```
+
+```sh
 shapecopydb local
 ```
-It shouldn't take too long, although `Searchkick` will take longer to reindex records. 
+It shouldn't take too long, although `Searchkick` will take longer to reindex records.
 
 ### (Optional) Create your own Firebase instance
 

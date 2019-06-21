@@ -62,32 +62,31 @@ class ReplaceCardButton extends React.PureComponent {
         >
           Replace
         </FormButton>
-        {card.is_master_template_card &&
-          canEditCollection && (
-            <Tooltip
-              classes={{ tooltip: 'Tooltip' }}
-              title={`${
-                card.show_replace ? "don't show" : 'show'
-              } the Replace button`}
-              placement="bottom"
-            >
-              <StyledFormControlLabel
-                classes={{ label: 'form-control' }}
-                style={{ textAlign: 'center' }}
-                control={
-                  <Checkbox
-                    classes={{
-                      root: 'checkbox--black',
-                    }}
-                    checked={card.show_replace}
-                    onChange={this.handleReplaceToggle}
-                    value="yes"
-                  />
-                }
-                label="Show"
-              />
-            </Tooltip>
-          )}
+        {card.is_master_template_card && canEditCollection && (
+          <Tooltip
+            classes={{ tooltip: 'Tooltip' }}
+            title={`${
+              card.show_replace ? "don't show" : 'show'
+            } the Replace button`}
+            placement="bottom"
+          >
+            <StyledFormControlLabel
+              classes={{ label: 'form-control' }}
+              style={{ textAlign: 'center' }}
+              control={
+                <Checkbox
+                  classes={{
+                    root: 'checkbox--black',
+                  }}
+                  checked={card.show_replace}
+                  onChange={this.handleReplaceToggle}
+                  value="yes"
+                />
+              }
+              label="Show"
+            />
+          </Tooltip>
+        )}
       </CenteredContainer>
     )
   }

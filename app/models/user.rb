@@ -68,6 +68,8 @@ class User < ApplicationRecord
          :rememberable, :validatable, :omniauthable,
          omniauth_providers: [:ideo]
 
+  acts_as_taggable_on(Audience::DEMOGRAPHIC_TAGS)
+
   has_many :collections,
            through: :roles,
            source: :resource,
@@ -101,6 +103,7 @@ class User < ApplicationRecord
            inverse_of: :created_by,
            foreign_key: :created_by_id
   has_one :application
+  has_many :test_audience_invitations, dependent: :destroy
 
   belongs_to :current_organization,
              class_name: 'Organization',
@@ -108,6 +111,8 @@ class User < ApplicationRecord
   belongs_to :current_user_collection,
              class_name: 'Collection',
              optional: true
+
+  has_many :test_audience_invitations
 
   validates :email, presence: true, uniqueness: true, if: :email_required?
   validates :uid, :provider, presence: true, if: :active?
@@ -218,6 +223,9 @@ class User < ApplicationRecord
         user = User.find_or_initialize_by(email: attrs.email)
         user.status = User.statuses[:active]
       end
+      user.first_name = attrs[:first_name]
+      user.last_name = attrs[:last_name]
+      user.phone = attrs[:phone]
       user.invitation_token = nil
       user.password = Devise.friendly_token(40)
       user.password_confirmation = user.password
@@ -472,6 +480,7 @@ class User < ApplicationRecord
   def change_network_admin(action, org_id)
     # must have uid for network request
     return true unless uid
+    return true if skip_network_actions?
 
     NetworkOrganizationUserSyncWorker.perform_async(
       uid, org_id, NetworkApi::Organization::ADMIN_ROLE, action
@@ -486,14 +495,17 @@ class User < ApplicationRecord
   end
 
   def update_products_mailing_list_subscription(subscribed: mailing_list)
+    return if skip_network_actions?
     MailingListSubscriptionWorker.perform_async(id, :products_mailing_list, subscribed)
   end
 
   def update_shape_circle_subscription(subscribed: shape_circle_member)
+    return if skip_network_actions?
     MailingListSubscriptionWorker.perform_async(id, :shape_circle, subscribed)
   end
 
   def update_shape_user_list_subscription(subscribed: true)
+    return if skip_network_actions?
     MailingListSubscriptionWorker.perform_async(id, :shape_users, subscribed)
   end
 

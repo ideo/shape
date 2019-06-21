@@ -15,5 +15,9 @@ module Accounting
       lines = lines.where(code: code) if code.present?
       lines.order(created_at: order)
     end
+
+    def self.sum(type)
+      DoubleEntry::AccountBalance.where(account: type).sum(:balance).to_f / 100
+    end
   end
 end
