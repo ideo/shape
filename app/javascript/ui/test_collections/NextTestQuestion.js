@@ -34,7 +34,7 @@ const NextTestQuestion = ({ path }) => {
       <FinishedEmojiHolder>
         <Tooltip classes={{ tooltip: 'Tooltip' }} title="Stop giving feedback">
           <button onClick={() => uiStore.update('activityLogOpen', false)}>
-            <Emoji scale={1.25} name="Stop giving feedback" symbol="✋" />
+            <Emoji size="medium" name="Stop giving feedback" symbol="✋" />
           </button>
         </Tooltip>
         <Tooltip
@@ -42,7 +42,7 @@ const NextTestQuestion = ({ path }) => {
           title="Continue giving feedback"
         >
           <button onClick={goToNextTest}>
-            <Emoji scale={1.25} name="Continue giving feedback" symbol="👉" />
+            <Emoji size="medium" name="Continue giving feedback" symbol="👉" />
           </button>
         </Tooltip>
       </FinishedEmojiHolder>

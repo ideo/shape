@@ -326,9 +326,14 @@ export default class UiStore {
     this.dialogConfig.open = null
   }
 
+  @action
   openCardMenu(id, opts = {}) {
     const { x = 0, y = 0, direction = 'left' } = opts
     this.update('cardMenuOpen', { id, x, y, direction })
+    if (this.selectedCardIds.length && this.selectedCardIds.indexOf(id) < 0) {
+      // deselect all cards when card menu is opened on a non-selected card
+      this.selectedCardIds.replace([])
+    }
   }
 
   closeCardMenu() {
@@ -577,6 +582,12 @@ export default class UiStore {
   @computed
   get cancelUndo() {
     // certain UI states should prevent CTRL+Z from triggering an undo
+    return this.organizationMenuOpen || this.dialogConfig.open
+  }
+
+  @computed
+  get cancelRedo() {
+    // certain UI states should prevent CTRL+Shift+Z from triggering an undo
     return this.organizationMenuOpen || this.dialogConfig.open
   }
 

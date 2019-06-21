@@ -82,9 +82,7 @@ describe('AdminUsersModal', () => {
         adminUser.isCurrentUser = false
 
         const confirmParams = {
-          prompt: `Are you sure you want to remove ${
-            adminUser.name
-          } from Shape Admin?`,
+          prompt: `Are you sure you want to remove ${adminUser.name} from Shape Admin?`,
           confirmText: 'Remove',
           iconName: 'Leave',
           onConfirm: expect.any(Function),

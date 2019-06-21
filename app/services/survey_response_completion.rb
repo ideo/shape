@@ -22,12 +22,13 @@ class SurveyResponseCompletion < SimpleService
   end
 
   def mark_response_as_payment_owed
-    return unless gives_incentive? && user.present?
-    # Return if already marked as being owed
+    return unless gives_incentive? && user&.email.present?
+    # perform some checks: you can only get marked owed + paid once per TestCollection
     return if @survey_response.incentive_owed?
-    # TODO: do we want this service to validate if the user has a duplicate response for the same TestCollection?
-    # e.g.
-    # return if SurveyResponse.find_by(user: user, test_collection: @survey_response.test_collection)
+    already_owed_or_paid = SurveyResponse
+                           .where(incentive_status: %i[incentive_paid incentive_owed])
+                           .find_by(user: user, test_collection: @survey_response.test_collection)
+    return if already_owed_or_paid.present?
     @survey_response.record_incentive_owed!
   end
 

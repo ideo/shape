@@ -24,6 +24,7 @@ const UNANSWERABLE_QUESTION_TYPES = [
   'question_media',
   'question_description',
   'question_finish',
+  'question_recontact',
   'question_demographics_intro',
 ]
 
@@ -134,7 +135,7 @@ class TestSurveyResponder extends React.Component {
 
   initializeCards() {
     const { collection, includeRecontactQuestion, includeTerms } = this.props
-
+    if (!collection.question_cards) return
     const questionCards = [...collection.question_cards]
 
     const questionFinishIndex = findIndex(

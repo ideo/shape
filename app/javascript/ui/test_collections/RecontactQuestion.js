@@ -103,6 +103,8 @@ class RecontactQuestion extends React.Component {
     const created = await this.createLimitedUser(contactInfo)
     if (!created) return
     onAnswer('feedback_contact_yes')
+    // Why is this setting feedback contact yes?
+    // Isn't this only for getting money?
     this.setState({ submittedContactInfo: true })
   }
 
@@ -111,6 +113,7 @@ class RecontactQuestion extends React.Component {
     return backgroundColor ? backgroundColor : v.colors.primaryDark
   }
 
+  // I think this should be a separate question
   get showFeedbackRecontactForm() {
     const { user } = this.props
     const { answer } = this.state
@@ -129,7 +132,7 @@ class RecontactQuestion extends React.Component {
             }
             onClick={this.handleClick('feedback_contact_no')}
           >
-            <Emoji scale={1.375} name="Finished" symbol="👎" />
+            <Emoji size="large" name="Finished" symbol="👎" />
           </EmojiButton>
           <EmojiButton
             selected={
@@ -141,11 +144,41 @@ class RecontactQuestion extends React.Component {
             onClick={this.handleClick('feedback_contact_yes')}
             data-cy="RecontactEmojiBtnThumbUp"
           >
-            <Emoji scale={1.375} name="Yes" symbol="👍" />
+            <Emoji size="large" name="Yes" symbol="👍" />
           </EmojiButton>
         </EmojiHolder>
       </React.Fragment>
     )
+  }
+
+  get showPostOptInConfirmation() {
+    switch (this.state.answer) {
+      case 'feedback_contact_yes':
+        return (
+          <div>
+            <QuestionText>
+              Great, thanks! We'll reach out as soon as we have new feedback
+              opportunities for you.
+            </QuestionText>
+            <EmojiHolder data-cy="PostOptInEmojiHolder">
+              <Emoji size="large" name="Okay gesture" symbol="👌" />
+            </EmojiHolder>
+          </div>
+        )
+      case 'feedback_contact_no':
+        return (
+          <div>
+            <QuestionText>
+              We're sorry to hear that. Have a nice day!
+            </QuestionText>
+            <EmojiHolder data-cy="PostOptInEmojiHolder">
+              <Emoji size="large" name="crying face" symbol="😢" />
+            </EmojiHolder>
+          </div>
+        )
+      default:
+        return null
+    }
   }
 
   get showContactInfoForm() {
@@ -213,16 +246,25 @@ class RecontactQuestion extends React.Component {
   }
 
   render() {
-    const { showContactInfo, showFeedbackRecontact } = this.state
+    const {
+      showContactInfo,
+      showFeedbackRecontact,
+      submittedContactInfo,
+      answer,
+    } = this.state
     return (
       <div style={{ width: '100%', backgroundColor: this.backgroundColor }}>
         {showFeedbackRecontact === 'noIncentiveForGuest' &&
           this.showFeedbackRecontactForm}
+        {answer === 'feedback_contact_no' &&
+          !submittedContactInfo &&
+          this.showPostOptInConfirmation}
 
         {showContactInfo && this.showContactInfoForm}
 
         {showFeedbackRecontact === 'afterPaymentInfo' &&
           this.showFeedbackRecontactForm}
+        {submittedContactInfo && this.showPostOptInConfirmation}
       </div>
     )
   }

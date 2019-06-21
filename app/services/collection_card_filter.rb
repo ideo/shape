@@ -118,7 +118,7 @@ class CollectionCardFilter < SimpleService
     if card_order
       if card_order == 'total' || card_order.include?('question_')
         @collection_order = "collections.cached_test_scores->'#{card_order}'"
-        order = "#{@collection_order} DESC NULLS LAST"
+        order = Arel.sql("#{@collection_order} DESC NULLS LAST")
       else
         # e.g. updated_at
         order = { card_order => :desc }
