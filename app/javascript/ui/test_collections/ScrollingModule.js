@@ -17,7 +17,7 @@ const ScrollingModule = ({ name, children }) => {
 }
 
 ScrollingModule.propTypes = {
-  children: PropTypes.func,
+  children: PropTypes.object,
   name: PropTypes.string.isRequired,
 }
 ScrollingModule.defaultProps = {
