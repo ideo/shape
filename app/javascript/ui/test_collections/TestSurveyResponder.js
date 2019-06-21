@@ -24,7 +24,6 @@ const UNANSWERABLE_QUESTION_TYPES = [
   'question_media',
   'question_description',
   'question_finish',
-  'question_recontact',
   'question_demographics_intro',
 ]
 
