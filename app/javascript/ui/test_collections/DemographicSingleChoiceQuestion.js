@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { FormControlLabel, Radio, RadioGroup } from '@material-ui/core'
+import { CheckCircle, CheckCircleOutline } from '@material-ui/icons'
 
 import {
   DisplayText,
@@ -108,7 +109,12 @@ class DemographicSingleChoiceQuestion extends React.Component {
                 classes={{ label: 'label' }}
                 label={choice.text}
                 labelPlacement="end"
-                control={<Radio />}
+                control={
+                  <Radio
+                    checkedIcon={<CheckCircle />}
+                    icon={<CheckCircleOutline />}
+                  />
+                }
               />
             ))}
           </RadioGroup>

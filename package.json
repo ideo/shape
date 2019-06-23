@@ -82,6 +82,7 @@
     "@babel/preset-react": "^7.0.0",
     "@firebase/app-types": "^0.3.2",
     "@material-ui/core": "^1.5",
+    "@material-ui/icons": "^3.0",
     "@rails/webpacker": "4.0.7",
     "@sentry/browser": "^5.4.0",
     "@sentry/webpack-plugin": "^1.6.2",
