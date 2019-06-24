@@ -31,7 +31,7 @@ const RESIDENCE_SUBURBAN = 'suburban dweller'
 const RESIDENCE_RURAL = 'rural dweller'
 
 const choiceStyleCardQuestionTypeMap = {
-  [CHOICE_STYLE_SINGLE]: 'question_demographic_single_choice',
+  [CHOICE_STYLE_SINGLE]: 'question_demographics_single_choice',
 }
 
 const questions = [

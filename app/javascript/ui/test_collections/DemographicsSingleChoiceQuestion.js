@@ -49,7 +49,7 @@ const StyledFormControlLabel = styled(FormControlLabel)`
 `
 
 @observer
-class DemographicSingleChoiceQuestion extends React.Component {
+class DemographicsSingleChoiceQuestion extends React.Component {
   // TODO temp code (probably) so that the radio buttons act properly
   state = {
     selectedChoice: null,
@@ -124,7 +124,7 @@ class DemographicSingleChoiceQuestion extends React.Component {
   }
 }
 
-DemographicSingleChoiceQuestion.propTypes = {
+DemographicsSingleChoiceQuestion.propTypes = {
   question: PropTypes.shape({
     prompt: PropTypes.string.isRequired,
     category: PropTypes.oneOf(validDemographicsCategories()).isRequired,
@@ -138,8 +138,8 @@ DemographicSingleChoiceQuestion.propTypes = {
   user: MobxPropTypes.objectOrObservableObject,
   onAnswer: PropTypes.func.isRequired,
 }
-DemographicSingleChoiceQuestion.defaultProps = {
+DemographicsSingleChoiceQuestion.defaultProps = {
   user: null,
 }
 
-export default DemographicSingleChoiceQuestion
+export default DemographicsSingleChoiceQuestion

@@ -11,7 +11,7 @@ import NextTestQuestion from '~/ui/test_collections/NextTestQuestion'
 import NewQuestionGraphic from '~/ui/icons/NewQuestionGraphic'
 import OpenQuestion from '~/ui/test_collections/OpenQuestion'
 import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
-import DemographicSingleChoiceQuestion from '~/ui/test_collections/DemographicSingleChoiceQuestion'
+import DemographicsSingleChoiceQuestion from '~/ui/test_collections/DemographicsSingleChoiceQuestion'
 import DemographicsIntroQuestion from '~/ui/test_collections/DemographicsIntroQuestion'
 import TermsQuestion from '~/ui/test_collections/TermsQuestion'
 import WelcomeQuestion from '~/ui/test_collections/WelcomeQuestion'
@@ -216,9 +216,9 @@ class TestQuestion extends React.Component {
       case 'question_demographics_intro': // TODO: either use plural or singular 'demographics'
         return <DemographicsIntroQuestion />
 
-      case 'question_demographic_single_choice':
+      case 'question_demographics_single_choice':
         return (
-          <DemographicSingleChoiceQuestion
+          <DemographicsSingleChoiceQuestion
             question={card}
             onAnswer={this.handleQuestionAnswer}
             user={apiStore.currentUser}
