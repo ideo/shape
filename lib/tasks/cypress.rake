@@ -20,8 +20,8 @@ namespace :cypress do
     organization = builder.organization
     user.switch_to_organization(organization)
     # add an additional test user into the org
-    FactoryBot.create(:user, email: 'cypress-test-1@ideo.com', add_to_org: organization)
-    # add an a test group into the org
+    FactoryBot.create(:user, email: 'cypress-test-1@ideo.com')
+    # add a test group into the org
     FactoryBot.create(:group, organization: organization, add_admins: [user])
     create_cards(user.current_user_collection, user)
     create_events(organization)
@@ -57,7 +57,7 @@ namespace :cypress do
   end
 
   def create_events(organization)
-    15.times do |_i|
+    15.times do
       user = FactoryBot.create(:user, handle: "cy-test-#{Faker::Internet.unique.slug}")
       FactoryBot.create(:activity,
                         # with cache_classes = false, it gets angry if you try to pass in the
