@@ -186,7 +186,13 @@ export const StyledGridCardInner = styled.div`
     background: transparent;
   }
 
-  .overlay {
+  ${props =>
+    props.isText &&
+    `
+    @media print {
+      border: 1px solid ${v.colors.commonLight};
+    }
+  `} .overlay {
     position: absolute;
     right: 0;
     top: 0;
