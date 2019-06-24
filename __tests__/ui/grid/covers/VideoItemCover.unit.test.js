@@ -36,7 +36,7 @@ describe('VideoItemCover', () => {
   })
 
   it('opens an auto-playing VideoPlayer when clicking the play button', () => {
-    wrapper.find('button').simulate('click')
+    wrapper.find('VideoPlayButton').simulate('click')
     expect(wrapper.state().playing).toBe(true)
     expect(wrapper.find('VideoPlayer').props().playing).toBe(true)
     expect(wrapper.find('VideoPlayer').props().url).toEqual(fakeVideoItem.url)
