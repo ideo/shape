@@ -333,15 +333,14 @@ class LegendItemCover extends React.Component {
       <Dataset key={`dataset-${identifier}`}>
         {icon && <DatasetIconWrapper>{icon}</DatasetIconWrapper>}
         <DatasetText color={v.colors.black}>{name}</DatasetText>
-        {!primary &&
-          dataset.selected && (
-            <UnselectDataset
-              role="button"
-              onClick={() => this.onDeselectComparison(dataset)}
-            >
-              <XIcon />
-            </UnselectDataset>
-          )}
+        {!primary && dataset.selected && (
+          <UnselectDataset
+            role="button"
+            onClick={() => this.onDeselectComparison(dataset)}
+          >
+            <XIcon />
+          </UnselectDataset>
+        )}
       </Dataset>
     )
   }

@@ -101,9 +101,7 @@ class TestDesigner extends React.Component {
       })
     } catch (e) {
       trackError(e, {
-        message: `Unable to load parent collection for Collection ${
-          collection.id
-        }`,
+        message: `Unable to load parent collection for Collection ${collection.id}`,
       })
     }
   }

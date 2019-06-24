@@ -121,9 +121,7 @@ class SearchPage extends React.Component {
   requestPath = (page = 1) => {
     const q = this.searchQuery(this.props.location, { url: true })
     const params = stringifyUrlParams(this.searchParams(this.props.location))
-    return `organizations/${
-      this.urlSlug
-    }/search?query=${q}&page=${page}&${params}`
+    return `organizations/${this.urlSlug}/search?query=${q}&page=${page}&${params}`
   }
 
   handleInfiniteLoad = page => {

@@ -59,8 +59,8 @@ class Activity extends React.PureComponent {
 
   renameYourself() {
     const { subjectUsers } = this.props
-    return subjectUsers.map(
-      user => (user.id === apiStore.currentUserId ? { name: 'you' } : user)
+    return subjectUsers.map(user =>
+      user.id === apiStore.currentUserId ? { name: 'you' } : user
     )
   }
 

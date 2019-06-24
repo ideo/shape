@@ -205,12 +205,9 @@ class TextItemCover extends React.Component {
         <QuillStyleWrapper notEditing={!isEditing}>
           {this.state.loading && <InlineLoader />}
           {content}
-          {this.state.readMore &&
-            !isEditing && (
-              <StyledReadMore onClick={this.expand}>
-                Read more...
-              </StyledReadMore>
-            )}
+          {this.state.readMore && !isEditing && (
+            <StyledReadMore onClick={this.expand}>Read more...</StyledReadMore>
+          )}
         </QuillStyleWrapper>
       </PaddedCardCover>
     )

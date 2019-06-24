@@ -141,9 +141,7 @@ class RolesAdd extends React.Component {
       }
       if (ownerType === 'groups') {
         confirmOpts.prompt = `
-          Are you sure you want to add ${
-            this.selectedUsers.length
-          } users to this group?
+          Are you sure you want to add ${this.selectedUsers.length} users to this group?
         `
       } else {
         confirmOpts.prompt = `
