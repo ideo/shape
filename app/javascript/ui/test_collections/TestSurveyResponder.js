@@ -252,7 +252,9 @@ class TestSurveyResponder extends React.Component {
     }
     if (card.card_question_type === 'question_recontact') {
       // this is the last question, don't try to scroll
-      // TODO: is this still relevant now that we have demographic questions?
+      //
+      // n.b. this hack hides a scrolling bug that triggers, because the props
+      // change when a user asks to be recontacted
       return
     }
     if (card.card_question_type === 'question_terms') {
