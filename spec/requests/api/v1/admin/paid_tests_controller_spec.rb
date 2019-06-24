@@ -38,6 +38,17 @@ describe Api::V1::Admin::PaidTestsController, type: :request, json: true, auth: 
 
     let(:path) { pending_incentives_export_api_v1_admin_paid_tests_path(format: 'csv') }
 
+    context 'without admin role' do
+      before do
+        admin_user.remove_role(Role::SHAPE_ADMIN)
+      end
+
+      it 'returns a 401' do
+        get(path)
+        expect(response.status).to eq(401)
+      end
+    end
+
     it 'returns 200' do
       get(path)
       expect(response.status).to eq(200)
@@ -56,13 +67,14 @@ describe Api::V1::Admin::PaidTestsController, type: :request, json: true, auth: 
     end
 
     it 'marks response as paid' do
+      expect(ExportPendingIncentivesWorker).to receive(:perform_async)
       get(path)
-      expect(survey_response.reload.incentive_paid?).to be true
     end
 
     context 'after requesting once' do
       before do
-        get(path)
+        # perform as if the worker had run
+        PaidTests::ExportPendingIncentives.mark_as_paid!
       end
 
       it 'returns empty csv' do

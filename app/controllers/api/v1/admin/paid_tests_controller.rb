@@ -1,6 +1,4 @@
-class Api::V1::Admin::PaidTestsController < Api::V1::BaseController
-  before_action :authorize_shape_admin!
-
+class Api::V1::Admin::PaidTestsController < Api::V1::Admin::BaseController
   def finance_export
     # Expects parse-able date, e.g. "May 2019"
     start_time = Time.parse(params[:month]).beginning_of_day if params[:month].present?
@@ -38,6 +36,6 @@ class Api::V1::Admin::PaidTestsController < Api::V1::BaseController
   private
 
   def mark_all_tests_paid
-    PaidTests::ExportPendingIncentives.mark_as_paid!
+    ExportPendingIncentivesWorker.perform_async
   end
 end
