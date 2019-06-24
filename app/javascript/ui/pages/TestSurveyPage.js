@@ -53,6 +53,21 @@ class TestSurveyPage extends React.Component {
 
   async componentDidMount() {
     await apiStore.loadCurrentUser()
+    if (!apiStore.currentUser) return
+    await this.fetchSurveyResponse()
+  }
+
+  async fetchSurveyResponse() {
+    const surveyResponseId = this.collection.survey_response_for_user_id
+    const surveyResponseResult =
+      surveyResponseId &&
+      (await apiStore.fetch('survey_responses', surveyResponseId))
+    const surveyResponse = surveyResponseResult
+      ? surveyResponseResult.data
+      : null
+    this.setState({
+      surveyResponse,
+    })
   }
 
   createSurveyResponse = async () => {
@@ -120,8 +135,10 @@ class TestSurveyPage extends React.Component {
   render() {
     return (
       <React.Fragment>
-        {this.currentUser ? <RespondentBanner user={this.currentUser} /> : null}
         <StyledBg>
+          {this.currentUser ? (
+            <RespondentBanner user={this.currentUser} />
+          ) : null}
           <LogoWrapper>
             <Logo withText width={83} />
           </LogoWrapper>

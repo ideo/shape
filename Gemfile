@@ -12,7 +12,7 @@ end
 gem 'dotenv-rails', groups: [:development, :test], require: 'dotenv/rails-now'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 5.1.6'
+gem 'rails', '~> 5.2'
 
 # Use postgresql as the database for Active Record
 gem 'pg', '~> 1.1'
@@ -32,14 +32,14 @@ gem 'uglifier', '>= 1.3.0'
 gem 'jbuilder', '~> 2.5'
 
 # Devise for auth
-gem 'devise'
+gem 'devise', '~> 4.6.0'
 gem 'omniauth-ideo', git: 'https://github.com/ideo/omniauth-ideo.git'
 
 # Consumer for IDEO Network JSON APIs
 gem 'network-api-ruby', git: 'https://github.com/ideo/network-api-ruby.git'
 
 # Webpacker
-gem 'webpacker', '>= 4.0.x'
+gem 'webpacker', '>= 4.0.0'
 
 # JSON serializer
 gem 'jsonapi-rails'
@@ -64,7 +64,7 @@ gem 'sidekiq-scheduler'
 gem 'searchkick', '~> 3.0.0'
 
 # For taggable collections/items
-gem 'acts-as-taggable-on'
+gem 'acts-as-taggable-on', '~> 6.0.0'
 
 # middleware for 301 redirects
 gem 'rack-rewrite', '~> 1.5'
@@ -72,10 +72,10 @@ gem 'rack-rewrite', '~> 1.5'
 gem 'rack-cors', '~> 1.0.1'
 
 # Filestack API Wrapper
-gem 'filestack'
+gem 'filestack', '~> 2.6.1'
 
 # inline styles for email
-gem 'roadie-rails', '~> 1.2'
+gem 'roadie-rails', '~> 1.3'
 
 # For easier http request
 gem 'httparty'
@@ -96,7 +96,7 @@ gem 'google-cloud-firestore', '~> 0.21.0'
 gem 'jwt', '~> 1.5'
 
 # looking up records by slug
-gem 'friendly_id', '~> 5.1.0'
+gem 'friendly_id', '~> 5.2.0'
 
 # State machine for ruby classes
 gem 'aasm', '~> 5.0'
@@ -122,14 +122,17 @@ gem "twilio-ruby"
 gem 'interactor'
 gem 'interactor-schema'
 
+# Double-entry accounting system
+gem 'double_entry', '~> 2.0.0.beta1'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   # Adds support for Capybara system testing and selenium driver
   gem 'capybara', '~> 2.13'
   gem 'selenium-webdriver'
-
   gem 'pry-rails'
+  gem 'pry-byebug'
   gem 'factory_bot_rails'
   gem 'faker', '~> 1.8.7'
   gem 'rspec-rails', '~> 3.7'
@@ -164,6 +167,7 @@ group :test do
   gem 'json-schema'
   gem 'vcr'
   gem 'webmock'
+  gem 'timecop'
 end
 
 group :production do

@@ -145,41 +145,6 @@ class Collection
       self
     end
 
-    def attempt_to_purchase_test_audiences!(user:, test_audience_params: nil)
-      return true if test_audience_params.blank?
-
-      purchaser = PurchaseTestAudience.call(
-        test_collection: self,
-        test_audience_params: test_audience_params,
-        user: user,
-      )
-      return true if purchaser.success?
-      errors.add(:base, purchaser.message) if purchaser.message.present?
-      false
-    end
-
-    def post_launch_setup!(initiated_by: nil, reopening: false)
-      # remove the "blanks"
-      remove_incomplete_question_items
-      if submission_box_template_test?
-        parent_submission_box_template.update(
-          submission_attrs: {
-            template: true,
-            launchable_test_id: id,
-            test_status: test_status,
-          },
-        )
-        # make sure all templates get the latest question setup
-        queue_update_template_instances
-        # submission box master template test doesn't create a test_design, move cards, etc.
-        return true
-      end
-      update_cached_submission_status(parent_submission) if inside_a_submission?
-      create_test_design_and_move_cards!(initiated_by: initiated_by) unless reopening
-      update(test_launched_at: Time.current, test_closed_at: nil)
-      TestCollectionMailer.notify_launch(id).deliver_later if gives_incentive? && ENV['ENABLE_ZENDESK_FOR_TEST_LAUNCH']
-    end
-
     def test_audience_closed!
       # Never close a test that still has link sharing enabled,
       # or if there are any remaining paid audiences open
@@ -193,19 +158,6 @@ class Collection
       return true if live?
       return false if test_closed_at.nil?
       closed? && 10.minutes.ago < test_closed_at
-    end
-
-    def after_close_test
-      update(test_closed_at: Time.current)
-
-      if inside_a_submission?
-        update_cached_submission_status(parent_submission)
-      elsif submission_box_template_test?
-        update_cached_submission_status(parent_submission_box_template)
-        close_all_submissions_tests!
-      elsif gives_incentive?
-        NotifyFeedbackCompletedWorker.perform_async(id)
-      end
     end
 
     def update_cached_submission_status(related)
@@ -359,8 +311,7 @@ class Collection
     end
 
     def legend_item
-      question_item = question_items.includes(test_data_item: :legend_item).first
-      question_item&.test_data_item&.legend_item
+      items.legend_items.first
     end
 
     def test_open_response_collections
@@ -400,7 +351,7 @@ class Collection
       }
     end
 
-    def serialized_for_test_survey(test_audience_id = nil)
+    def serialized_for_test_survey(test_audience_id: nil, current_user: nil)
       renderer = JSONAPI::Serializable::Renderer.new
       renderer.render(
         self,
@@ -410,6 +361,7 @@ class Collection
         include: test_survey_render_includes,
         expose: {
           test_audience_id: test_audience_id,
+          survey_response_for_user: current_user ? survey_response_for_user(current_user.id) : nil,
         },
       )
     end
@@ -422,29 +374,6 @@ class Collection
       return if errors.present?
       message = "You can't #{event} because the feedback is #{current_state}"
       errors.add(:base, message)
-    end
-
-    def create_test_design_and_move_cards!(initiated_by:)
-      test_design_card_builder = build_test_design_collection_card(initiated_by)
-      transaction do
-        return false unless test_design_card_builder.create
-        self.test_design = test_design_card_builder.collection_card.record
-        self.template_id = nil # Moves association to the TestDesign
-        # move all the cards into the test design collection
-        collection_cards
-          .where.not(
-            id: test_design_card_builder.collection_card.id,
-          )
-          .each_with_index do |card, i|
-            card.update(parent_id: test_design.id, order: i)
-          end
-        create_open_response_collections(initiated_by: initiated_by)
-        create_response_graphs(initiated_by: initiated_by)
-        create_media_item_link
-        test_design.cache_cover!
-      end
-      reorder_cards!
-      true
     end
 
     def build_test_design_collection_card(initiated_by)
@@ -519,10 +448,9 @@ class Collection
           .each_with_index do |question_type, i|
         primary_collection_cards.build(
           order: i,
-          item_attributes: {
-            type: 'Item::QuestionItem',
+          item: Item::QuestionItem.new(
             question_type: question_type,
-          },
+          ),
         )
       end
     end
@@ -633,6 +561,85 @@ class Collection
 
     def paid_audiences_sample_size
       test_audiences.paid.sum(:sample_size)
+    end
+
+    private
+
+    def attempt_to_purchase_test_audiences!(user:, test_audience_params: nil)
+      return true if test_audience_params.blank?
+
+      purchaser = PurchaseTestAudience.call(
+        test_collection: self,
+        test_audience_params: test_audience_params,
+        user: user,
+      )
+      return true if purchaser.success?
+      errors.add(:base, purchaser.message) if purchaser.message.present?
+      false
+    end
+
+    def post_launch_setup!(initiated_by: nil, reopening: false)
+      # remove the "blanks"
+      remove_incomplete_question_items
+      if submission_box_template_test?
+        parent_submission_box_template.update(
+          submission_attrs: {
+            template: true,
+            launchable_test_id: id,
+            test_status: test_status,
+          },
+        )
+        # make sure all templates get the latest question setup
+        queue_update_template_instances
+        # submission box master template test doesn't create a test_design, move cards, etc.
+        return true
+      end
+      update_cached_submission_status(parent_submission) if inside_a_submission?
+      create_test_design_and_move_cards!(initiated_by: initiated_by) unless reopening
+      update(test_launched_at: Time.current, test_closed_at: nil)
+      TestCollectionMailer.notify_launch(id).deliver_later if gives_incentive? && ENV['ENABLE_ZENDESK_FOR_TEST_LAUNCH']
+    end
+
+    def after_close_test
+      update(test_closed_at: Time.current)
+
+      if inside_a_submission?
+        update_cached_submission_status(parent_submission)
+      elsif submission_box_template_test?
+        update_cached_submission_status(parent_submission_box_template)
+        close_all_submissions_tests!
+      elsif gives_incentive?
+        NotifyFeedbackCompletedWorker.perform_async(id)
+      end
+    end
+
+    def create_test_design_and_move_cards!(initiated_by:)
+      test_design_card_builder = build_test_design_collection_card(initiated_by)
+      transaction do
+        return false unless test_design_card_builder.create
+        self.test_design = test_design_card_builder.collection_card.record
+        self.template_id = nil # Moves association to the TestDesign
+        # move all the cards into the test design collection
+        collection_cards
+          .where.not(
+            id: test_design_card_builder.collection_card.id,
+          )
+          .each_with_index do |card, i|
+            card.update(parent_id: test_design.id, order: i)
+          end
+        create_open_response_collections(initiated_by: initiated_by)
+        create_response_graphs(initiated_by: initiated_by)
+        create_media_item_link
+        test_design.cache_cover!
+      end
+      move_legend_item_to_third_spot
+      reorder_cards!
+      true
+    end
+
+    def move_legend_item_to_third_spot
+      return unless legend_item.present?
+      legend_item.parent_collection_card.update(order: 2)
     end
   end
 end

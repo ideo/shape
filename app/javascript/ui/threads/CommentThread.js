@@ -106,8 +106,9 @@ class CommentThread extends React.Component {
           className="comments"
           onClick={unexpandedClickable ? this.props.onClick : () => true}
         >
-          {thread.hasMore &&
-            expanded && <CommentThreadLoader thread={thread} />}
+          {thread.hasMore && expanded && (
+            <CommentThreadLoader thread={thread} />
+          )}
           {this.renderComments()}
         </StyledCommentsWrapper>
         <CommentEntryForm

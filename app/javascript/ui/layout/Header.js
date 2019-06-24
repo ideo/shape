@@ -6,12 +6,14 @@ import { Flex, Box } from 'reflexbox'
 import Hidden from '@material-ui/core/Hidden'
 
 import Breadcrumb from '~/ui/layout/Breadcrumb'
+import CornerPositioned from '~/ui/global/CornerPositioned'
 import Logo from '~/ui/layout/Logo'
 import PlainLink from '~/ui/global/PlainLink'
 import GlobalSearch from '~/ui/layout/GlobalSearch'
 import ActionMenu from '~/ui/grid/ActionMenu'
 import ArrowIcon from '~/ui/icons/ArrowIcon'
 import ActivityLogButton from '~/ui/notifications/ActivityLogButton'
+import IconAvatar from '~/ui/global/IconAvatar'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
 import UserDropdown from '~/ui/layout/UserDropdown'
@@ -43,32 +45,6 @@ const StyledSeparator = styled.div`
   background-color: ${v.colors.commonMedium};
   display: inline-block;
   margin-left: 8px;
-`
-
-const StyledRoundBtn = styled.div`
-  box-sizing: border-box;
-  display: inline-block;
-  vertical-align: top;
-  width: 32px;
-  height: 32px;
-  border-radius: 32px;
-  background-color: white;
-  margin: 0 0 0 8px;
-  line-height: 32px;
-  font-size: 1.5rem;
-  text-align: center;
-  cursor: pointer;
-`
-StyledRoundBtn.displayName = 'StyledRoundBtn'
-
-const StyledActivityLogBtn = styled(StyledRoundBtn)`
-  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
-    position: fixed;
-    bottom: 15px;
-    right: 15px;
-    color: ${v.colors.white};
-    background: ${v.colors.secondaryDark};
-  }
 `
 
 @inject('apiStore', 'routingStore', 'uiStore')
@@ -178,7 +154,7 @@ class Header extends React.Component {
       // TODO hacky way to include the record on the card link
       record.parent_collection_card.record = record
       return (
-        <StyledRoundBtn style={{ paddingLeft: '2px' }}>
+        <IconAvatar backgroundColor={v.colors.white} color={v.colors.black}>
           <ActionMenu
             key="action-menu"
             location="PageMenu"
@@ -195,7 +171,7 @@ class Header extends React.Component {
             onMoveMenu={this.routeBack}
             afterArchive={this.routeBack}
           />
-        </StyledRoundBtn>
+        </IconAvatar>
       )
     }
     return null
@@ -257,6 +233,10 @@ class Header extends React.Component {
     if (routingStore.isSearch && uiStore.isMobileXs) {
       return this.renderMobileSearch()
     }
+
+    const ActivityButtonWrapper = uiStore.isMobileXs
+      ? CornerPositioned
+      : styled.div``
 
     return (
       <Fragment>
@@ -326,9 +306,20 @@ class Header extends React.Component {
                   <GlobalSearch className="search-bar" />
                 </Hidden>
                 {record && (
-                  <StyledActivityLogBtn>
-                    <ActivityLogButton key="activity" />
-                  </StyledActivityLogBtn>
+                  <ActivityButtonWrapper>
+                    <IconAvatar
+                      color={
+                        uiStore.isMobileXs ? v.colors.white : v.colors.black
+                      }
+                      backgroundColor={
+                        uiStore.isMobileXs
+                          ? v.colors.secondaryDark
+                          : v.colors.white
+                      }
+                    >
+                      <ActivityLogButton key="activity" />
+                    </IconAvatar>
+                  </ActivityButtonWrapper>
                 )}
                 <OrganizationMenu
                   organization={currentUserOrganization}

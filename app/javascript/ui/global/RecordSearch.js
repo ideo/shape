@@ -30,11 +30,10 @@ class RecordSearch extends React.Component {
           per_page: 30,
         })
         .then(res => res.data.filter(props.searchFilter))
-        .then(
-          records =>
-            props.onSearch
-              ? props.onSearch(records)
-              : callback(formatCollections(records))
+        .then(records =>
+          props.onSearch
+            ? props.onSearch(records)
+            : callback(formatCollections(records))
         )
         .catch(e => {
           trackError(e)

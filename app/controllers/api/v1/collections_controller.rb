@@ -29,6 +29,8 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       template: @template_collection,
       placement: json_api_params[:placement],
       created_by: current_user,
+      external_id: json_api_params[:external_id],
+      collection_params: json_api_params[:collection].present? ? json_api_collection_params : {},
     )
 
     if builder.call
@@ -189,7 +191,15 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def collection_params
-    params.require(:collection).permit(
+    params.require(:collection).permit(permitted_collection_params)
+  end
+
+  def json_api_collection_params
+    json_api_params.require(:collection).permit(permitted_collection_params)
+  end
+
+  def permitted_collection_params
+    [
       :name,
       :tag_list,
       :submission_template_id,
@@ -201,7 +211,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :anyone_can_join,
       :joinable_group_id,
       collection_cards_attributes: %i[id order width height row col],
-    )
+    ]
   end
 
   def log_organization_view_activity

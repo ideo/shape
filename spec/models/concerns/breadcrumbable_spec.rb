@@ -33,10 +33,10 @@ describe Breadcrumbable, type: :concern do
   context 'with nested items' do
     let(:user) { create(:user) }
     let(:collection) { create(:collection, num_cards: 1) }
-    let(:subcollection_card) { create(:collection_card_collection, parent: collection) }
+    let!(:subcollection_card) { create(:collection_card_collection, parent: collection) }
     let(:subcollection) { subcollection_card.collection }
     let!(:subcollection_item_card) { create(:collection_card_text, parent: subcollection) }
-    let(:item) { subcollection.items.first }
+    let(:item) { subcollection_item_card.record }
 
     describe '#breadcrumb_viewable_by' do
       it 'should return nothing if no permissions' do

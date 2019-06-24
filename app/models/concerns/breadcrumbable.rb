@@ -29,7 +29,7 @@ module Breadcrumbable
       end
       scoped = active.where('breadcrumb @> ?', [collection_id].to_s)
       # order from the top of the tree down
-      scoped.order('jsonb_array_length(breadcrumb) ASC')
+      scoped.order(Arel.sql('jsonb_array_length(breadcrumb) ASC'))
     end
   end
 

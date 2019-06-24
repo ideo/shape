@@ -27,6 +27,10 @@ const SharedRecordMixin = superclass =>
       return this.common_viewable
     }
 
+    get pageTitle() {
+      return `${this.name} | Shape`
+    }
+
     API_updateName(name) {
       const previousName = this.name
       this.name = name
@@ -85,7 +89,13 @@ const SharedRecordMixin = superclass =>
       return res.__response.data
     }
 
-    pushUndo({ snapshot, message = '', apiCall, redirectTo = this } = {}) {
+    pushUndo({
+      snapshot,
+      message = '',
+      apiCall,
+      redirectTo = this,
+      redoAction = null,
+    } = {}) {
       let undoApiCall = apiCall
       if (!apiCall) {
         undoApiCall = () => this.API_revertTo({ snapshot })
@@ -94,6 +104,7 @@ const SharedRecordMixin = superclass =>
         message,
         apiCall: undoApiCall,
         redirectPath: { type: redirectTo.internalType, id: redirectTo.id },
+        redoAction,
       })
     }
   }

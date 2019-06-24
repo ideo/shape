@@ -21,17 +21,16 @@ When(
   }
 )
 
-When('I create a text item', num => {
-  cy.createTextItem()
+When('I create a {word} card', itemType => {
+  cy.createCard(itemType)
 })
 
-When('I click the first text item', () => {
-  cy.locate('TextItemCover')
-    .first()
-    .click({ force: true })
-    .wait('@apiGetItem')
-    // clicking text item + loading + initializing quill seems to be happier if we wait a bit
-    .wait(500)
+When('I add a link URL {string} and wait for {string}', (url, request) => {
+  cy.locate('BctTextField').type(url, {
+    force: true,
+  })
+  cy.wait(request)
+  cy.locate('LinkCreatorFormButton').click({ force: true })
 })
 
 When('I type {string} in the first quill editor', string => {
@@ -48,8 +47,57 @@ When('I close the first open text item', () => {
     .click({ force: true })
 })
 
-When('I create a data item', num => {
-  cy.createDataItem()
+When('I choose a link item from the submission box', () => {
+  cy.locateDataOrClass('DialogContent')
+    .first()
+    .children()
+    .first()
+    .children()
+    .eq(3)
+    .click({ force: true })
+})
+
+// ----------------------
+// Sharing collections
+// ----------------------
+When('I click the form add button in the collection sharing modal', () => {
+  cy.locateDataOrClass('.FormButton').click({ force: true })
+  cy.wait('@apiInviteUserToCollection')
+  cy.wait('@apiSearchUsersAndGroups')
+  cy.wait('@apiSearchUsersAndGroups')
+})
+
+When('I remove the user from the collection sharing modal', () => {
+  cy.locateDataOrClass('.LeaveButton')
+    .last()
+    .click({ force: true })
+  cy.wait('@apiGetCollectionRoles')
+  cy.locateDataOrClass('ConfirmButton').click({ force: true })
+  cy.wait('@apiDeleteCollectionRoles')
+  cy.wait('@apiSearchUsersAndGroups')
+  cy.wait('@apiSearchUsersAndGroups')
+})
+
+// ----------------------
+// Group membership
+// ----------------------
+When('I click a sample group', () => {
+  cy.get('.groupEdit').click({ force: true })
+})
+
+When('I click the form add button in the group sharing modal', () => {
+  cy.locateDataOrClass('.FormButton').click({ force: true })
+  cy.wait('@apiInviteUserToGroup')
+  cy.wait('@apiSearchUsersAndGroups')
+  cy.wait('@apiSearchUsersAndGroups')
+})
+
+When('I remove the user from the group sharing modal', () => {
+  cy.locateDataOrClass('.LeaveButton')
+    .last()
+    .click({ force: true })
+  cy.locateDataOrClass('ConfirmButton').click({ force: true })
+  cy.wait('@apiDeleteGroupRoles')
 })
 
 // ----------------------
@@ -68,11 +116,12 @@ When('I undo with CTRL+Z', () => {
 })
 
 When('I close the snackbar', () => {
-  cy.locateDataOrClass('.MuiSnackbarContent-action')
-    .find('button')
-    .click({ force: true })
+  // NOTE: snackbar tests have proven fickle, so instead we just wait a bit for it
+  // cy.locateDataOrClass('.MuiSnackbarContent-action')
+  //   .find('button')
+  //   .click({ force: true })
   // allow it to disappear
-  cy.wait(1200)
+  cy.wait(300)
 })
 
 // ----------------------
@@ -98,6 +147,13 @@ When('I fill {string} with some text', string => {
     .first()
     .click()
     .type('Let me introduce my lovely prototype.')
+})
+
+When('I fill {string} with {string}', (string, url) => {
+  cy.locateDataOrClass(string)
+    .first()
+    .click()
+    .type(url)
 })
 
 When('I add a test email for {string}', string => {
@@ -267,7 +323,11 @@ When('I visit the current Test URL', () => {
 })
 
 When('I type {string} in {string}', (text, element) => {
-  cy.get(element).type(text, { force: true })
+  cy.locateDataOrClass(element).type(text)
+})
+
+When('I blur {string}', element => {
+  cy.locateDataOrClass(element).blur()
 })
 
 // ----------------------
@@ -296,6 +356,15 @@ When('I click ... in the nav and select {string}', option => {
 // ----------------------
 // Items
 // ----------------------
+
+When('I click the first text item', () => {
+  cy.locate('TextItemCover')
+    .first()
+    .click({ force: true })
+    .wait('@apiGetItem')
+    // clicking text item + loading + initializing quill seems to be happier if we wait a bit
+    .wait(500)
+})
 
 When('I edit the report item', () => {
   cy.locate('CardAction-Edit')
@@ -360,10 +429,34 @@ When('I click the {word} arrow on the MDL snackbar', direction => {
 })
 
 // ----------------------
+// Sharing Modal
+// ----------------------
+When('I add {string} to the sharing modal', email => {
+  cy.get('#react-select-react-select-chip-input').type(email, {
+    force: true,
+  })
+})
+
+When('I select to invite a new user', () => {
+  cy.get('.selectOption')
+    .last()
+    .children()
+    .last()
+    .click({ force: true })
+})
+
+// ----------------------
 // Admin (Test Collection Feedback)
 // ----------------------
 When('I click the info button for the first audience', index => {
   cy.locate('AudienceInfoButton')
+    .first()
+    .click()
+  cy.wait(100)
+})
+
+When('I click the new query button for the first audience', index => {
+  cy.locate('NewQueryButton')
     .first()
     .click()
   cy.wait(100)

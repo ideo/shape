@@ -16,6 +16,7 @@ import {
   ItemApiWrapper,
 } from '~/ui/pages/PageWithApiWrapper'
 import Loader from '~/ui/layout/Loader'
+import LowerRightCorner from '~/ui/global/LowerRightCorner'
 import SearchPage from '~/ui/pages/SearchPage'
 import SettingsPage from '~/ui/pages/SettingsPage'
 import TermsPage from '~/ui/pages/TermsPage'
@@ -227,6 +228,7 @@ class Routes extends React.Component {
         blur={displayTermsPopup}
         id="AppWrapper"
       >
+        <LowerRightCorner />
         {selectedAreaEnabled && (
           <SelectedArea coords={this.selectedAreaStyleProps} />
         )}

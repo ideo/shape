@@ -580,6 +580,12 @@ export default class UiStore {
     return this.organizationMenuOpen || this.dialogConfig.open
   }
 
+  @computed
+  get cancelRedo() {
+    // certain UI states should prevent CTRL+Shift+Z from triggering an undo
+    return this.organizationMenuOpen || this.dialogConfig.open
+  }
+
   @action
   resetSelectionAndBCT() {
     this.deselectCards()
@@ -825,6 +831,10 @@ export default class UiStore {
       return
     }
     this.scroll.scrollToBottom()
+  }
+
+  scrollToPosition(position) {
+    this.scroll.scrollTo(position)
   }
 
   @action
