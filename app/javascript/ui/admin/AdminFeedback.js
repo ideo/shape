@@ -366,7 +366,9 @@ class AdminFeedback extends React.Component {
                     onChange={this.handleFinanceExportSelection}
                     value=""
                   >
-                    <SelectOption key="empty">IDEO Finance Report</SelectOption>
+                    <SelectOption value="" key="empty">
+                      IDEO Finance Report
+                    </SelectOption>
                     {monthsForExport.map(month => (
                       <SelectOption
                         classes={{ root: 'selectOption', selected: 'selected' }}
