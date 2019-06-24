@@ -110,6 +110,11 @@ class Organization < ApplicationRecord
 
   validates :name, presence: true
 
+  SLUG_FORMAT = /\A[A-Za-z][A-Za-z0-9_\-\.]*\z/i
+  validates :slug,
+            length: { within: 2..30, allow_blank: true },
+            format: { with: SLUG_FORMAT, allow_blank: true }
+
   scope :active, -> { where(deactivated: false) }
   scope :billable, -> do
     active
