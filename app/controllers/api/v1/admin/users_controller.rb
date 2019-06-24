@@ -34,7 +34,8 @@ class Api::V1::Admin::UsersController < Api::V1::BaseController
     audience_tags = audience.base_tags.map(&:name)
 
     users = User.tagged_with(audience_tags)
-                .left_outer_joins(:test_audience_invitations)
+                .feedback_contact_yes
+                .left_joins(:test_audience_invitations)
                 .select('users.*, MAX(test_audience_invitations.created_at) AS date_of_participation')
                 .group('users.id')
                 .limit(params[:num_respondents])

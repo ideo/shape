@@ -13,7 +13,7 @@ class SerializableTestAudience < BaseJsonSerializer
     @object.price_per_response.to_f
   end
 
-  attribute :num_survey_responses do
-    @object.survey_responses.size
+  attribute :num_completed_responses do
+    @object.survey_responses.completed.size
   end
 end
