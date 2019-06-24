@@ -146,10 +146,15 @@ class Collection
     end
 
     def test_audience_closed!
-      # Never close a test that still has link sharing enabled,
-      # or if there are any remaining paid audiences open
-      return if link_sharing_enabled? || any_paid_audiences_open?
-
+      # Never close a test or notify, if paid audiences are still open
+      return if any_paid_audiences_open?
+      # in the case a paid test was running, and the last paid audience closed
+      if gives_incentive?
+        # notify the editors
+        NotifyFeedbackCompletedWorker.perform_async(id)
+      end
+      # Never close a test that still has link sharing enabled
+      return if link_sharing_enabled?
       # Otherwise close the test
       close!
     end
@@ -608,8 +613,6 @@ class Collection
       elsif submission_box_template_test?
         update_cached_submission_status(parent_submission_box_template)
         close_all_submissions_tests!
-      elsif gives_incentive?
-        NotifyFeedbackCompletedWorker.perform_async(id)
       end
     end
 

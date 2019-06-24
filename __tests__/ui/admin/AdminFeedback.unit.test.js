@@ -48,7 +48,7 @@ describe('AdminFeedback', () => {
 
       const audienceResponseCount = audienceRowItems.at(3)
       expect(audienceResponseCount.html()).toContain(
-        fakeTestAudience.num_survey_responses
+        fakeTestAudience.num_completed_responses
       )
     })
 
