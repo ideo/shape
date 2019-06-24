@@ -1,3 +1,4 @@
+import axios from 'axios'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import AdminFeedback from '~/ui/admin/AdminFeedback'
@@ -6,6 +7,10 @@ import {
   fakeAudience,
   fakeTestAudience,
 } from '#/mocks/data'
+
+// mock the result of the API call w/ axios
+jest.mock('axios')
+axios.get.mockReturnValue(Promise.resolve({ data: { months: ['June 2019'] } }))
 
 const waitForAsync = () => new Promise(resolve => setImmediate(resolve))
 

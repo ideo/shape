@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { Flex } from 'reflexbox'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import axios from 'axios'
 
 import AdminNewQueryModal from './AdminNewQueryModal'
 import AdminNewQueryRow from './AdminNewQueryRow'
@@ -142,12 +143,11 @@ class AdminFeedback extends React.Component {
   }
 
   async loadMonthsForFinanceExport() {
-    const response = await fetch(
+    const response = await axios.get(
       '/api/v1/admin/paid_tests/months_with_purchases'
     )
-    const data = await response.json()
     this.setState({
-      monthsForExport: data.months,
+      monthsForExport: response.data.months,
     })
   }
 
@@ -364,8 +364,9 @@ class AdminFeedback extends React.Component {
                     displayEmpty
                     name="finance_export_month"
                     onChange={this.handleFinanceExportSelection}
+                    value=""
                   >
-                    <SelectOption key="">IDEO Finance Report</SelectOption>
+                    <SelectOption key="empty">IDEO Finance Report</SelectOption>
                     {monthsForExport.map(month => (
                       <SelectOption
                         classes={{ root: 'selectOption', selected: 'selected' }}

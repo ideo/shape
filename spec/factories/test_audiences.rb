@@ -5,7 +5,7 @@ FactoryBot.define do
     test_collection nil
     launched_by factory: :user
     # Need to set a minimum or else our price will be below a valid amount
-    price_per_response { 4.50 }
+    price_per_response { audience.price_per_response || 4.50 }
 
     trait :payment do
       after(:build) do |test_audience|

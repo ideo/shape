@@ -12,6 +12,7 @@ RSpec.describe TestAudience, type: :model do
   let!(:test_audience) do
     build(:test_audience,
           audience: audience,
+          price_per_response: audience.price_per_response,
           test_collection: test_collection,
           sample_size: 10,
           launched_by: user)
@@ -60,6 +61,7 @@ RSpec.describe TestAudience, type: :model do
           quantity: test_audience.sample_size,
           unit_amount: audience.price_per_response.to_f,
         )
+
         # set the payment method
         test_audience.network_payment_method = payment_method_double
         test_audience.save
