@@ -116,7 +116,6 @@ class SearchButton extends React.Component {
   render() {
     const { value, background } = this.props
     const { open } = this
-    console.log('search button', open)
     return (
       <StyledSearchButton open={open} background={background}>
         <button className="search" onClick={this.handleOpen(true)}>

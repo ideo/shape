@@ -89,7 +89,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def unarchive_from_email
     @collection = Collection.find(@collection_cards.first.parent.id)
-    if @collection_cards.first.archived
+    if @collection_cards.any?(&:archived)
       @collection.unarchive_cards!(@collection_cards, {})
     end
     redirect_to frontend_url_for(@collection).to_s
