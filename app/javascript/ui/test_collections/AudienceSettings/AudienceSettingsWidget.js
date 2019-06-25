@@ -70,14 +70,18 @@ const StyledPlusIcon = styled.span`
   width: 15px;
 `
 
-const StyledGlobeIcon = styled.span`
+const StyledGlobeIconWrapper = styled.span`
   float: left;
   display: ${props => (props.global ? 'inline' : 'none')};
 `
 
-const StyledInfoIcon = styled.span`
+const StyledInfoIconWrapper = styled.span`
   float: right;
   display: ${props => (props.global ? 'inline' : 'none')};
+  opacity: 0.5;
+  &:hover {
+    opacity: 1;
+  }
 `
 
 @inject('uiStore')
@@ -140,12 +144,12 @@ class AudienceSettingsWidget extends React.Component {
       return {
         name: name,
         iconLeft: (
-          <StyledGlobeIcon global={global}>
+          <StyledGlobeIconWrapper global={global}>
             <GlobeIcon />
-          </StyledGlobeIcon>
+          </StyledGlobeIconWrapper>
         ),
         iconRight: (
-          <StyledInfoIcon
+          <StyledInfoIconWrapper
             global={global}
             onClick={() => {
               this.openAudienceMenu(audience)
@@ -153,7 +157,7 @@ class AudienceSettingsWidget extends React.Component {
             className="infoIcon"
           >
             <InfoIcon />
-          </StyledInfoIcon>
+          </StyledInfoIconWrapper>
         ),
         onClick: e => {
           if (e.target.closest('.infoIcon')) return

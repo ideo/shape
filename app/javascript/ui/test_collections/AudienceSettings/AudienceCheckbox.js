@@ -13,6 +13,12 @@ import styled from 'styled-components'
 const StyledInfoIconWrapper = styled.span`
   display: ${props => (props.global ? 'inline-block' : 'none')};
   width: 8%;
+  opacity: 0.5;
+  padding-left: 2px;
+  transform: translateY(1px);
+  &:hover {
+    opacity: 1;
+  }
 `
 
 const AudienceCheckbox = ({
