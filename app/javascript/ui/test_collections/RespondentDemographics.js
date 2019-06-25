@@ -2,33 +2,33 @@ import { kebabCase, uniq } from 'lodash'
 
 const CHOICE_STYLE_SINGLE = 'single'
 
-const EDUCATION_HIGH_SCHOOL = `High school diploma`
-const EDUCATION_VOCATIONAL = `Vocational training`
-const EDUCATION_COLLEGE = `College or bachelor’s degree`
-const EDUCATION_POSTGRADUTATE = `Postgraduate or master’s degree`
-const EDUCATION_DOCTORATE = `Doctorate degree`
-const EDUCATION_OTHER = `Other`
-const EDUCATION_NONE = `None of these`
+const EDUCATION_HIGH_SCHOOL = 'High school'
+const EDUCATION_VOCATIONAL = 'Vocational training'
+const EDUCATION_COLLEGE = 'College or bachelor’s'
+const EDUCATION_POSTGRADUTATE = 'Postgraduate or master’s'
+const EDUCATION_DOCTORATE = 'Doctorate'
+const EDUCATION_OTHER = 'Other'
+const EDUCATION_NONE = 'None of these'
 
-const GENDER_FEMALE = `Female`
-const GENDER_MALE = `Male`
-const GENDER_NB = `Non-binary`
-const GENDER_OTHER = `Other`
-const GENDER_DECLINE = `Prefer not to say`
+const GENDER_FEMALE = 'Female'
+const GENDER_MALE = 'Male'
+const GENDER_NONBINARY = 'Non-binary'
+const GENDER_OTHER = 'Other'
+const GENDER_DECLINE = 'Prefer not to say'
 
-const INCOME_LOW = 'low income'
-const INCOME_MEDIUM = 'medium income'
-const INCOME_GTAVG = 'above average income'
+const INCOME_LOW = 'Low Income'
+const INCOME_MEDIUM = 'Medium Income'
+const INCOME_ABOVE_AVERAGE = 'Above Average Income'
 
-const ADOPTER_VERY_EARLY = 'early adopter'
-const ADOPTER_EARLY = 'early majority'
-const ADOPTER_LATE = 'late majority'
-const ADOPTER_VERY_LATE = 'late majority / laggard'
+const ADOPTER_VERY_EARLY = 'Early Adopter'
+const ADOPTER_EARLY = 'Early Majority'
+const ADOPTER_LATE = 'Late Majority'
+const ADOPTER_VERY_LATE = 'Laggard'
 
-const RESIDENCE_METRO = 'metropolis dweller'
-const RESIDENCE_URBAN = 'urban dweller'
-const RESIDENCE_SUBURBAN = 'suburban dweller'
-const RESIDENCE_RURAL = 'rural dweller'
+const RESIDENCE_METRO = 'Metropolis Dweller'
+const RESIDENCE_URBAN = 'Urban Dweller'
+const RESIDENCE_SUBURBAN = 'Suburban Dweller'
+const RESIDENCE_RURAL = 'Rural Dweller'
 
 const choiceStyleCardQuestionTypeMap = {
   [CHOICE_STYLE_SINGLE]: 'question_demographics_single_choice',
@@ -59,7 +59,7 @@ const questions = [
     choices: [
       { text: `Female`, tags: [GENDER_FEMALE] },
       { text: `Male`, tags: [GENDER_MALE] },
-      { text: `Non-binary`, tags: [GENDER_NB] },
+      { text: `Non-binary`, tags: [GENDER_NONBINARY] },
       { text: `Other`, tags: [GENDER_OTHER] },
       { text: `Prefer not to say`, tags: [GENDER_DECLINE] },
     ],
@@ -83,11 +83,11 @@ const questions = [
       },
       {
         text: `Living comfortably, with some money left over at the end of each month`,
-        tags: [INCOME_GTAVG],
+        tags: [INCOME_ABOVE_AVERAGE],
       },
       {
         text: `Living very comfortably, and spending freely on things I enjoy`,
-        tags: [INCOME_GTAVG],
+        tags: [INCOME_ABOVE_AVERAGE],
       },
     ],
   },
@@ -114,7 +114,7 @@ const questions = [
       },
       {
         text: `I prefer to stick with my tried and trusted brands and products`,
-        tags: [ADOPTER_VERY_LATE],
+        tags: [ADOPTER_LATE, ADOPTER_VERY_LATE],
       },
     ],
   },
