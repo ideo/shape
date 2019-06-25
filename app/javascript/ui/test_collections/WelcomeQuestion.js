@@ -4,9 +4,11 @@ import pluralize from 'pluralize'
 
 import Emoji from '~/ui/icons/Emoji'
 import { EmojiButton, EmojiHolder } from '~/ui/test_collections/ScaleQuestion'
-import { QuestionText } from '~/ui/test_collections/shared'
+import {
+  QuestionText,
+  QuestionSpacingContainer,
+} from '~/ui/test_collections/shared'
 import { FEEDBACK_INCENTIVE_AMOUNT } from '~/utils/variables'
-import { QuestionSpacingContainer } from '~/ui/test_collections/OpenQuestion'
 
 @observer
 class WelcomeQuestion extends React.Component {

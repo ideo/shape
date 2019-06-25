@@ -1,39 +1,23 @@
-import _ from 'lodash'
+import { debounce } from 'lodash'
 import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import styled, { css } from 'styled-components'
 
 import ArrowIcon from '~/ui/icons/ArrowIcon'
 import DescriptionQuestion from './DescriptionQuestion'
 import {
-  QuestionText,
+  QuestionSpacingContainer,
+  QuestionTextWithSpacing,
   TextResponseHolder,
   TextInput,
   TextEnterButton,
-} from './shared'
-
-const QuestionSpacing = css`
-  border-bottom-color: ${props =>
-    props.editing ? props.theme.borderColorEditing : props.theme.borderColor};
-  border-bottom-style: solid;
-  border-bottom-width: 4px;
-`
-
-export const QuestionSpacingContainer = styled.div`
-  ${QuestionSpacing};
-`
-
-const QuestionTextWithSpacing = QuestionText.extend`
-  ${QuestionSpacing};
-`
-QuestionTextWithSpacing.displayName = 'QuestionTextWithSpacing'
+} from '~/ui/test_collections/shared'
 
 @observer
 class OpenQuestion extends React.Component {
   constructor(props) {
     super(props)
     const { questionAnswer } = props
-    this.save = _.debounce(this._save, 1000)
+    this.save = debounce(this._save, 1000)
     this.state = {
       response: questionAnswer ? questionAnswer.answer_text : '',
       focused: false,

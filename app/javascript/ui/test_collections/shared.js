@@ -39,6 +39,22 @@ QuestionText.defaultProps = {
   fontSizeEm: 1,
 }
 
+const QuestionSpacing = css`
+  border-bottom-color: ${props =>
+    props.editing ? props.theme.borderColorEditing : props.theme.borderColor};
+  border-bottom-style: solid;
+  border-bottom-width: 4px;
+`
+
+export const QuestionSpacingContainer = styled.div`
+  ${QuestionSpacing};
+`
+
+export const QuestionTextWithSpacing = QuestionText.extend`
+  ${QuestionSpacing};
+`
+QuestionTextWithSpacing.displayName = 'QuestionTextWithSpacing'
+
 export const TextInputHolder = StyledCommentTextarea.extend`
   color: white;
   padding: 6px;
