@@ -318,25 +318,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     )
   end
 
-  def collection_card_params
-    params.require(:collection_card).permit(
-      :order,
-      :row,
-      :col,
-      :width,
-      :height,
-      :row,
-      :col,
-      :reference,
-      :parent_id,
-      :collection_id,
-      :item_id,
-      :type,
-      :image_contain,
-      :is_cover,
-      :filter,
-      :hidden,
-      :show_replace,
+  def collection_card_nested_attributes
+    [
       collection_attributes: %i[
         id
         type
@@ -392,6 +375,37 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
           ],
         ],
       ],
+    ]
+  end
+
+  def collection_card_attributes
+    attrs = [
+      :order,
+      :row,
+      :col,
+      :width,
+      :height,
+      :row,
+      :col,
+      :reference,
+      :parent_id,
+      :collection_id,
+      :item_id,
+      :type,
+      :image_contain,
+      :is_cover,
+      :filter,
+      :hidden,
+      :show_replace,
+    ]
+    # Allow pinning if this is an application/bot user
+    attrs << :pinned if current_application.present?
+    attrs
+  end
+
+  def collection_card_params
+    params.require(:collection_card).permit(
+      collection_card_attributes + collection_card_nested_attributes,
     )
   end
 end

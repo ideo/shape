@@ -15,12 +15,12 @@ exports[`VideoItemCover renders snapshot 1`] = `
       justify="center"
     >
       <Reflex>
-        <button
+        <VideoPlayButton
           className="cancelGridClick"
           onClick={[Function]}
         >
           ►
-        </button>
+        </VideoPlayButton>
       </Reflex>
     </Flex>
     <div

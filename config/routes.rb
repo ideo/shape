@@ -164,7 +164,13 @@ Rails.application.routes.draw do
           end
         end
         resources :test_collections, only: %i[index]
-        resources :feedback_incentives, only: %i[index]
+        resources :paid_tests, only: [] do
+          collection do
+            get 'finance_export'
+            get 'months_with_purchases'
+            get 'pending_incentives_export'
+          end
+        end
       end
     end
   end

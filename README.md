@@ -81,7 +81,7 @@ Note: Make sure to select **Electron** as your browser in the cypress dropdown w
 
 ```sh
 # Start Rails test server and run cypress GUI (which hits http://localhost:3001)
-./cypress.sh
+bin/cypress
 
 # Once your test server is running...
 # Run cypress integration tests using the GUI:

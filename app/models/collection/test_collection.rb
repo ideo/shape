@@ -71,8 +71,8 @@ class Collection
              through: :primary_collection_cards
     has_many :test_audiences, dependent: :destroy
     has_many :paid_test_audiences,
-      -> { paid },
-      class_name: 'TestAudience'
+             -> { paid },
+             class_name: 'TestAudience'
     belongs_to :collection_to_test, class_name: 'Collection', optional: true
 
     has_many :datasets,
@@ -146,10 +146,15 @@ class Collection
     end
 
     def test_audience_closed!
-      # Never close a test that still has link sharing enabled,
-      # or if there are any remaining paid audiences open
-      return if link_sharing_enabled? || any_paid_audiences_open?
-
+      # Never close a test or notify, if paid audiences are still open
+      return if any_paid_audiences_open?
+      # in the case a paid test was running, and the last paid audience closed
+      if gives_incentive?
+        # notify the editors
+        NotifyFeedbackCompletedWorker.perform_async(id)
+      end
+      # Never close a test that still has link sharing enabled
+      return if link_sharing_enabled?
       # Otherwise close the test
       close!
     end
@@ -608,8 +613,6 @@ class Collection
       elsif submission_box_template_test?
         update_cached_submission_status(parent_submission_box_template)
         close_all_submissions_tests!
-      elsif gives_incentive?
-        NotifyFeedbackCompletedWorker.perform_async(id)
       end
     end
 
@@ -632,14 +635,16 @@ class Collection
         create_media_item_link
         test_design.cache_cover!
       end
-      move_legend_item_to_third_spot
       reorder_cards!
+      move_legend_item_to_third_spot
       true
     end
 
     def move_legend_item_to_third_spot
       return unless legend_item.present?
-      legend_item.parent_collection_card.update(order: 2)
+      legend_card = legend_item.parent_collection_card
+      legend_card.update(order: 2)
+      legend_card.increment_card_orders!
     end
   end
 end

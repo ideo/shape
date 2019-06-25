@@ -10,6 +10,7 @@ import DuplicateIcon from '~/ui/icons/DuplicateIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import MoveIcon from '~/ui/icons/MoveIcon'
 import ReplaceIcon from '~/ui/icons/ReplaceIcon'
+import PrintIcon from '~/ui/icons/PrintIcon'
 import SharingIcon from '~/ui/icons/SharingIcon'
 import SubmissionBoxIconSm from '~/ui/icons/SubmissionBoxIconSm'
 import PopoutMenu from '~/ui/global/PopoutMenu'
@@ -122,6 +123,11 @@ class ActionMenu extends React.Component {
     uiStore.update('submissionBoxSettingsOpen', true)
   }
 
+  printPage = ev => {
+    ev.preventDefault()
+    window.print()
+  }
+
   get movingFromCollectionId() {
     const { card, uiStore, location } = this.props
     // For PageMenu we're moving "from" the parent collection
@@ -219,6 +225,14 @@ class ActionMenu extends React.Component {
         viewActions.push('Sharing')
       }
       items = _.filter(items, a => _.includes(viewActions, a.name))
+    }
+
+    if (location === 'PageMenu' && record.isCollection) {
+      items.push({
+        name: 'Print',
+        iconRight: <PrintIcon />,
+        onClick: this.printPage,
+      })
     }
 
     // if record is system required, we always remove these actions

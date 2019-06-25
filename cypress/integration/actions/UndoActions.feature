@@ -89,9 +89,8 @@ Feature: Undo actions
 
     # test undoing the move
     When I undo with CTRL+Z
-    And I wait for 1 second
-
     And I wait for "@apiMoveCollectionCards" to finish
+    And I wait for "@apiUpdateCollection" to finish
     And I wait for the collection to finish loading
     And I wait for 1 second
 
