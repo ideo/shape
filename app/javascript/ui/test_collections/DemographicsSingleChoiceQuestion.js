@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { FormControlLabel, Radio, RadioGroup } from '@material-ui/core'
-import { CheckCircle, CheckCircleOutline } from '@material-ui/icons'
+import { CheckCircle, RadioButtonUnchecked } from '@material-ui/icons'
 
 import {
   DisplayText,
@@ -48,6 +48,28 @@ const StyledFormControlLabel = styled(FormControlLabel)`
   }
 `
 
+const StyledRoundChevronRight = styled.span`
+  height: 30px;
+  width: 30px;
+  color: ${v.colors.white};
+  background-color: ${v.colors.primaryDark};
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: center;
+  font-size: 1.6rem;
+`
+
+const SkipButton = ({ onClick }) => (
+  <button onClick={onClick}>
+    <StyledRoundChevronRight>&#62;</StyledRoundChevronRight>
+  </button>
+)
+SkipButton.propTypes = {
+  onClick: PropTypes.func.isRequired,
+}
+
 @observer
 class DemographicsSingleChoiceQuestion extends React.Component {
   // TODO temp code (probably) so that the radio buttons act properly
@@ -75,6 +97,11 @@ class DemographicsSingleChoiceQuestion extends React.Component {
     this.setState({
       selectedChoice: choiceIndex,
     })
+  }
+
+  skipQuestion() {
+    const { onAnswer } = this.props
+    onAnswer({})
   }
 
   render() {
@@ -112,12 +139,15 @@ class DemographicsSingleChoiceQuestion extends React.Component {
                 control={
                   <Radio
                     checkedIcon={<CheckCircle />}
-                    icon={<CheckCircleOutline />}
+                    icon={<RadioButtonUnchecked />}
                   />
                 }
               />
             ))}
           </RadioGroup>
+          <div style={{ textAlign: 'right' }}>
+            <SkipButton onClick={_e => this.skipQuestion()} />
+          </div>
         </Scale>
       </div>
     )
