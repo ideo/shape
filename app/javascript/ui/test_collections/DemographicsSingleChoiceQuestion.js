@@ -78,9 +78,9 @@ class DemographicsSingleChoiceQuestion extends React.Component {
     })
   }
 
-  skipQuestion() {
+  showNextQuestion() {
     const { onAnswer } = this.props
-    onAnswer({})
+    onAnswer()
   }
 
   render() {
@@ -127,7 +127,7 @@ class DemographicsSingleChoiceQuestion extends React.Component {
             ))}
           </RadioGroup>
           <div style={{ textAlign: 'right' }}>
-            <SkipButton onClick={_e => this.skipQuestion()} />
+            <SkipButton onClick={_e => this.showNextQuestion()} />
           </div>
         </Scale>
       </div>

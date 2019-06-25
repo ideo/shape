@@ -48,6 +48,28 @@ const StyledFormControlLabel = styled(FormControlLabel)`
   }
 `
 
+const StyledRoundChevronRight = styled.span`
+  height: 30px;
+  width: 30px;
+  color: ${v.colors.white};
+  background-color: ${v.colors.primaryDark};
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: center;
+  font-size: 1.6rem;
+`
+
+const SkipButton = ({ onClick }) => (
+  <button onClick={onClick}>
+    <StyledRoundChevronRight>&#62;</StyledRoundChevronRight>
+  </button>
+)
+SkipButton.propTypes = {
+  onClick: PropTypes.func.isRequired,
+}
+
 @observer
 class DemographicsMultipleChoiceQuestion extends React.Component {
   state = {
@@ -64,12 +86,9 @@ class DemographicsMultipleChoiceQuestion extends React.Component {
 
   handleAnswer(choiceIndex, checked) {
     const {
-      onAnswer, // TODO: remove
       user,
       question: { category, choices },
     } = this.props
-
-    onAnswer({ text: undefined }) // TODO: remove
 
     // update selections
     const { selections } = this.state
@@ -91,7 +110,10 @@ class DemographicsMultipleChoiceQuestion extends React.Component {
     }
   }
 
-  // TODO: add ability to proceed to next question
+  showNextQuestion() {
+    const { onAnswer } = this.props
+    onAnswer()
+  }
 
   render() {
     const {
@@ -134,6 +156,9 @@ class DemographicsMultipleChoiceQuestion extends React.Component {
               />
             ))}
           </FormGroup>
+          <div style={{ textAlign: 'right' }}>
+            <SkipButton onClick={_e => this.showNextQuestion()} />
+          </div>
         </Scale>
       </div>
     )
