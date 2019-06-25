@@ -11,6 +11,17 @@ describe Api::V1::Admin::UsersController, type: :request, json: true, auth: true
     let!(:non_admin_user) { create(:user) }
     let(:path) { '/api/v1/admin/users' }
 
+    context 'without admin role' do
+      before do
+        admin_user.remove_role(Role::SHAPE_ADMIN)
+      end
+
+      it 'returns a 401' do
+        get(path)
+        expect(response.status).to eq(401)
+      end
+    end
+
     it 'returns a 200' do
       get(path)
       expect(response.status).to eq(200)
