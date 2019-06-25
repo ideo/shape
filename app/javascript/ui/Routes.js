@@ -126,9 +126,14 @@ class Routes extends React.Component {
   }
 
   handleMouseDownSelection = e => {
+    const { uiStore } = this.props
+    const quillSelectors =
+      '.quill, .ql-container, .ql-editor, .ql-clipboard, .quill-toolbar, .ql-formats, .ql-header, .ql-link, .ql-stroke'
+    if (!e.target.closest(quillSelectors)) {
+      uiStore.update('textEditingItem', null)
+    }
     if (!emptySpaceClick(e)) return
     // if we clicked an empty space...
-    const { uiStore } = this.props
     uiStore.deselectCards()
     uiStore.onEmptySpaceClick(e)
     uiStore.closeBlankContentTool()
