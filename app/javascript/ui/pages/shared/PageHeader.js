@@ -236,7 +236,7 @@ class PageHeader extends React.Component {
               </span>
             </HeaderFormButton>
           </CopyToClipboard>
-          {this.renderStopFeedbackButton}
+          {this.renderStopFeebackButton}
         </Fragment>
       )
     }
