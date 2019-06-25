@@ -53,7 +53,7 @@ class Api::V1::UsersController < Api::V1::BaseController
 
   def update_current_user_demographics
     category = json_api_params.require(:category).to_sym
-    tags = json_api_params.require(:tags)
+    tags = json_api_params[:tags]
 
     if Audience::DEMOGRAPHIC_TAGS.include? category
       current_user.set_tag_list_on(category, tags)
