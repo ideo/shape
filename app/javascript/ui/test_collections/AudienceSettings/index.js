@@ -52,9 +52,7 @@ class AudienceSettings extends React.Component {
       const testAudience = testCollection.test_audiences.find(
         testAudience => testAudience.audience_id === audience.id
       )
-      // link sharing is global by default
-      const isLinkSharing =
-        audience.price_per_response === 0 && !audience.global
+      const { isLinkSharing } = audience
       let selected = !!testAudience
       if (testAudience && isLinkSharing) {
         selected = testAudience.status === 'open'
@@ -120,9 +118,7 @@ class AudienceSettings extends React.Component {
     const setting = audienceSettings.get(id)
     this.updateAudienceSetting(id, 'selected', !setting.selected)
     const { audience, test_audience } = setting
-    // link sharing is global by default
-    const isLinkSharing = audience.price_per_response === 0 && !audience.global
-    if (isLinkSharing) {
+    if (audience.isLinkSharing) {
       this.toggleLinkSharing(audience, test_audience)
     }
   }

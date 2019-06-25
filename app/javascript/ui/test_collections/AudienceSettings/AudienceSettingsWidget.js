@@ -184,7 +184,7 @@ class AudienceSettingsWidget extends React.Component {
 
   isAudienceLocked(audience) {
     const { locked } = this.props
-    return audience.price_per_response > 0 && locked
+    return !audience.isLinkSharing && locked
   }
 
   selectedAudienceHasCheckbox() {
