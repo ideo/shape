@@ -6,8 +6,98 @@ RSpec.describe TestAudience, type: :model do
     it { should belong_to :test_collection }
     it { should have_many :survey_responses }
   end
+  let(:test_collection) { create(:test_collection) }
+  let(:user) { create(:user) }
+  let(:audience) { create(:audience, price_per_response: 9.99) }
+  let!(:test_audience) do
+    build(:test_audience,
+          audience: audience,
+          price_per_response: audience.price_per_response,
+          test_collection: test_collection,
+          sample_size: 10,
+          launched_by: user)
+  end
+  let(:payment_errors) { [] }
+  let(:payment_method_double) { double(id: rand(1000..100_000)) }
+  before do
+    allow(NetworkApi::Organization).to receive(:find_by_external_id).and_return(
+      double(id: rand(1000..100_000)),
+    )
+    allow(NetworkApi::PaymentMethod).to receive(:find).and_return(
+      [payment_method_double],
+    )
+    allow(NetworkApi::Payment).to receive(:create).and_return(
+      double(
+        id: SecureRandom.hex(10),
+        status: payment_errors.present? ? 'failed' : 'succeeded',
+        errors: double(
+          ':[]': payment_errors,
+          full_messages: payment_errors,
+        ),
+      ),
+    )
+  end
+
+  describe '.minimum_price_per_response' do
+    it 'returns minimum value so we do not lose money' do
+      incentive_amount = Shape::FEEDBACK_INCENTIVE_AMOUNT
+      paypal_fee = (incentive_amount * BigDecimal('0.05')).round(2)
+      stripe_fee = (((incentive_amount + paypal_fee) * BigDecimal('0.029')) + BigDecimal('0.30')).round(2)
+      expect(TestAudience.minimum_price_per_response).to eq(
+        (incentive_amount + paypal_fee + stripe_fee).to_f
+      )
+    end
+  end
 
   describe 'callbacks' do
+    describe '#purchase', truncate: true do
+      it 'charges organization payment method' do
+        # .valid? is also necessary to generate description
+        expect(test_audience.valid?).to be true
+        expect(NetworkApi::Payment).to receive(:create).with(
+          payment_method_id: payment_method_double.id,
+          amount: test_audience.total_price.to_f,
+          description: test_audience.description,
+          quantity: test_audience.sample_size,
+          unit_amount: audience.price_per_response.to_f,
+        )
+
+        # set the payment method
+        test_audience.network_payment_method = payment_method_double
+        test_audience.save
+      end
+
+      context 'if payment fails' do
+        let!(:payment_errors) { ['Bank declined the card'] }
+        before do
+          test_audience.network_payment_method = payment_method_double
+          test_audience.save
+        end
+
+        it 'is not successful' do
+          expect(test_audience.persisted?).to be false
+        end
+
+        it 'returns error' do
+          expect(test_audience.errors.to_a).to eq(
+            ['Payment failed: Bank declined the card'],
+          )
+        end
+      end
+
+      context 'if price_per_response is 0' do
+        before do
+          test_audience.price_per_response = 0
+        end
+
+        it 'does not charge payment method' do
+          expect(test_audience.total_price).to eq(0)
+          expect(NetworkApi::Payment).not_to have_received(:create)
+          test_audience.save
+        end
+      end
+    end
+
     describe '#closed?' do
       let(:user) { create(:user) }
       let(:test_collection) { create(:test_collection, :completed) }
@@ -48,86 +138,6 @@ RSpec.describe TestAudience, type: :model do
 
         it 'leaves the test open' do
           expect(test_collection.reload.live?).to be true
-        end
-      end
-    end
-  end
-
-  let(:payment_errors) { [] }
-  let(:payment_method_double) { double(id: rand(1000..100_000)) }
-  before do
-    allow(NetworkApi::Organization).to receive(:find_by_external_id).and_return(
-      double(id: rand(1000..100_000)),
-    )
-    allow(NetworkApi::PaymentMethod).to receive(:find).and_return(
-      [payment_method_double],
-    )
-    allow(NetworkApi::Payment).to receive(:create).and_return(
-      double(
-        id: SecureRandom.hex(10),
-        status: payment_errors.present? ? 'failed' : 'succeeded',
-        errors: double(
-          ':[]': payment_errors,
-          full_messages: payment_errors,
-        ),
-      ),
-    )
-  end
-  let(:test_collection) { create(:test_collection) }
-  let(:user) { create(:user) }
-  let(:audience) { create(:audience, price_per_response: 9.99) }
-  let!(:test_audience) do
-    build(:test_audience,
-          audience: audience,
-          test_collection: test_collection,
-          sample_size: 10,
-          launched_by: user)
-  end
-
-  describe 'callbacks' do
-    describe '#purchase', truncate: true do
-      it 'charges organization payment method' do
-        # .valid? is also necessary to generate description
-        expect(test_audience.valid?).to be true
-        expect(NetworkApi::Payment).to receive(:create).with(
-          payment_method_id: payment_method_double.id,
-          amount: test_audience.total_price.to_f,
-          description: test_audience.description,
-          quantity: test_audience.sample_size,
-          unit_amount: audience.price_per_response.to_f,
-        )
-        # set the payment method
-        test_audience.network_payment_method = payment_method_double
-        test_audience.save
-      end
-
-      context 'if payment fails' do
-        let!(:payment_errors) { ['Bank declined the card'] }
-        before do
-          test_audience.network_payment_method = payment_method_double
-          test_audience.save
-        end
-
-        it 'is not successful' do
-          expect(test_audience.persisted?).to be false
-        end
-
-        it 'returns error' do
-          expect(test_audience.errors.to_a).to eq(
-            ['Payment failed: Bank declined the card'],
-          )
-        end
-      end
-
-      context 'if price_per_response is 0' do
-        before do
-          test_audience.price_per_response = 0
-        end
-
-        it 'does not charge payment method' do
-          expect(test_audience.total_price).to eq(0)
-          expect(NetworkApi::Payment).not_to have_received(:create)
-          test_audience.save
         end
       end
     end

@@ -25,6 +25,16 @@ const StyledGrid = styled.div`
     /* this is to transition the draggable back to its original spot when you let go */
     transition: all 0.5s;
   }
+  // On a large screen, the page needs to be scaled down so it fits on a piece
+  // of paper
+  ${({ isLargeScreen }) =>
+    isLargeScreen &&
+    `
+    @media print {
+      transform: scale(0.6);
+      transform-origin: top left;
+    }
+  `}
 `
 StyledGrid.displayName = 'StyledGrid'
 
@@ -985,7 +995,11 @@ class CollectionGrid extends React.Component {
     const minHeight = rows * (gridSettings.gridH + gridSettings.gutter)
 
     return (
-      <StyledGrid data-empty-space-click minHeight={minHeight}>
+      <StyledGrid
+        data-empty-space-click
+        minHeight={minHeight}
+        isLargeScreen={uiStore.isLargeBreakpoint}
+      >
         {sorting && (
           <SortContainer>
             <CollectionSort collection={collection} />

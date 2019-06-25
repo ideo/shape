@@ -91,7 +91,7 @@ FactoryBot.define do
 
       trait :with_test_audience do
         after(:create) do |collection|
-          create(:test_audience, test_collection: collection, audience: create(:audience), price_per_response: 2, launched_by: create(:user))
+          create(:test_audience, test_collection: collection, audience: create(:audience), price_per_response: 4.50, launched_by: create(:user))
         end
       end
 

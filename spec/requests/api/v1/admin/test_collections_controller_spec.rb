@@ -15,7 +15,7 @@ describe Api::V1::Admin::TestCollectionsController, type: :request, json: true, 
         :test_audience,
         audience: audience,
         test_collection: collection,
-        price_per_response: 1,
+        price_per_response: 4.50,
       )
     end
     let!(:survey_response) do

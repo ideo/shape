@@ -47,7 +47,7 @@ class Payment < ApplicationRecord
   end
 
   def stripe_fee
-    ((amount * BigDecimal('0.029')) + BigDecimal('0.3')).round(2)
+    Accounting::RecordTransfer.stripe_fee(amount)
   end
 
   def amount_without_stripe_fee
