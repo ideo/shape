@@ -8,12 +8,10 @@ import {
   SurveyClosed,
 } from '~/ui/test_collections/shared'
 import { DisplayText } from '~/ui/global/styled/typography'
-import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
 import TestSurveyResponder from '~/ui/test_collections/TestSurveyResponder'
 import Tooltip from '~/ui/global/Tooltip'
 import CommentThreadHeader from '~/ui/threads/CommentThreadHeader'
 import { threadTitleCss } from '~/ui/threads/CommentThread'
-import { observable } from 'mobx'
 
 const StyledTestHeader = styled.div`
   ${threadTitleCss};
@@ -44,11 +42,10 @@ class InlineCollectionTest extends React.Component {
   }
 
   get collection() {
-    const { collection } = this
-
-    return collection.live_test_collection
-      ? collection.live_test_collection
-      : collection
+    return this.props.uiStore.viewingCollection
+    // return collection.live_test_collection
+    //   ? collection.live_test_collection
+    //   : collection
   }
 
   get testCollection() {
