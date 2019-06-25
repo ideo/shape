@@ -91,7 +91,7 @@ export const StyledMenuItem = styled.li`
   button {
     width: 100%;
     padding-left: 1rem;
-    height: 2.5rem;
+    height: 3rem;
     text-transform: capitalize;
     position: relative;
     opacity: ${props => (props.loading ? 0.5 : 1)};
