@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
 
 import { DisplayTextCss } from '~/ui/global/styled/typography'
@@ -16,8 +16,11 @@ import TableHeader from './TableHeader'
 import TableBody from './TableBody'
 import AudienceCheckbox from './AudienceCheckbox'
 import AddAudienceModal from './AddAudienceModal'
+import AdminAudienceModal from '~/ui/admin/AdminAudienceModal.js'
 import Button from '~shared/components/atoms/Button'
 import PlusIcon from '~/ui/icons/PlusIcon'
+import GlobeIcon from '~/ui/icons/GlobeIcon'
+import InfoIcon from '~/ui/icons/InfoIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 
@@ -67,11 +70,23 @@ const StyledPlusIcon = styled.span`
   width: 15px;
 `
 
+const StyledGlobeIcon = styled.span`
+  float: left;
+  display: ${props => (props.global ? 'inline' : 'none')};
+`
+
+const StyledInfoIcon = styled.span`
+  float: right;
+  display: ${props => (props.global ? 'inline' : 'none')};
+`
+
+@inject('uiStore')
 @observer
 class AudienceSettingsWidget extends React.Component {
   state = {
     addAudienceMenuOpen: false,
     addAudienceModalOpen: false,
+    selectedAudienceMenuItem: null,
   }
 
   get displayedAudiences() {
@@ -102,6 +117,12 @@ class AudienceSettingsWidget extends React.Component {
     this.setState({ addAudienceModalOpen: false })
   }
 
+  openAudienceMenu = audience => {
+    const { uiStore } = this.props
+    this.setState({ selectedAudienceMenuItem: audience })
+    uiStore.update('feedbackAudienceMenuOpen', true)
+  }
+
   audiencesInMenu() {
     const { audiences } = this.props
     const { displayedAudiences } = this
@@ -114,13 +135,33 @@ class AudienceSettingsWidget extends React.Component {
 
   addAudienceMenuItems() {
     const orgAudiences = this.audiencesInMenu()
-    const audienceItems = orgAudiences.map(audience => ({
-      name: audience.name,
-      onClick: () => {
-        this.closeAddAudienceMenu()
-        this.addAudience(audience)
-      },
-    }))
+    const audienceItems = orgAudiences.map(audience => {
+      const { name, global } = audience
+      return {
+        name: name,
+        iconLeft: (
+          <StyledGlobeIcon global={global}>
+            <GlobeIcon />
+          </StyledGlobeIcon>
+        ),
+        iconRight: (
+          <StyledInfoIcon
+            global={global}
+            onClick={() => {
+              this.openAudienceMenu(audience)
+            }}
+            className="infoIcon"
+          >
+            <InfoIcon />
+          </StyledInfoIcon>
+        ),
+        onClick: e => {
+          if (e.target.closest('.infoIcon')) return
+          this.closeAddAudienceMenu()
+          this.addAudience(audience)
+        },
+      }
+    })
 
     audienceItems.push({
       name: 'New Audience',
@@ -155,6 +196,12 @@ class AudienceSettingsWidget extends React.Component {
     return audience.price_per_response > 0 && locked
   }
 
+  selectedAudienceHasCheckbox() {
+    const { selectedAudienceMenuItem } = this.state
+    const { displayedAudiences } = this
+    return !_.includes(displayedAudiences, selectedAudienceMenuItem)
+  }
+
   renderTableBody(audience) {
     const { onInputChange } = this.props
     return (
@@ -172,11 +219,11 @@ class AudienceSettingsWidget extends React.Component {
     const { onToggleCheckbox } = this.props
     return (
       <AudienceCheckbox
-        audienceId={audience.id}
-        audienceName={audience.name}
+        audience={audience}
         selected={this.isAudienceSelected(audience)}
         onToggleCheckbox={onToggleCheckbox}
         disabled={this.isAudienceLocked(audience)}
+        openAudienceMenu={this.openAudienceMenu}
       />
     )
   }
@@ -185,6 +232,7 @@ class AudienceSettingsWidget extends React.Component {
     const { totalPrice, locked } = this.props
     const { displayedAudiences } = this
     const { addAudienceMenuOpen } = this.state
+    const { uiStore } = this.props
 
     let newAudienceButton = (
       <Flex align="center">
@@ -219,6 +267,8 @@ class AudienceSettingsWidget extends React.Component {
         </StyledRowFlexCell>
       </React.Fragment>
     )
+
+    const { selectedAudienceMenuItem } = this.state
 
     return (
       <AudienceSettingsWrapper>
@@ -272,6 +322,14 @@ class AudienceSettingsWidget extends React.Component {
           close={this.closeAddAudienceModal}
           afterSave={audience => this.addAudience(audience)}
         />
+        {uiStore.feedbackAudienceMenuOpen && (
+          <AdminAudienceModal
+            audience={selectedAudienceMenuItem}
+            afterClose={audience => this.addAudience(audience)}
+            showModalButton={this.selectedAudienceHasCheckbox()}
+            open
+          />
+        )}
       </AudienceSettingsWrapper>
     )
   }
@@ -285,6 +343,10 @@ AudienceSettingsWidget.propTypes = {
   afterAddAudience: PropTypes.func.isRequired,
   totalPrice: PropTypes.string.isRequired,
   locked: PropTypes.bool,
+}
+
+AudienceSettingsWidget.wrappedComponent.propTypes = {
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 AudienceSettingsWidget.defaultProps = {

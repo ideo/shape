@@ -91,8 +91,8 @@ export const StyledMenuItem = styled.li`
   button {
     width: 100%;
     padding-left: 1rem;
-    line-height: 2.5rem;
-    text-transform: uppercase;
+    height: 2.5rem;
+    text-transform: capitalize;
     position: relative;
     opacity: ${props => (props.loading ? 0.5 : 1)};
     border-left: 7px solid transparent;
@@ -110,6 +110,9 @@ export const StyledMenuItem = styled.li`
       right: 1.5rem;
       width: 16px;
       height: 16px;
+      line-height: 1.4rem;
+    }
+    span {
       line-height: 1.4rem;
     }
   }
@@ -155,7 +158,7 @@ class PopoutMenu extends React.Component {
                   className={`menu-${_.kebabCase(name)}`}
                 >
                   {iconLeft}
-                  {name}
+                  <span>{name}</span>
                   {iconRight}
                 </button>
               </StyledMenuItem>

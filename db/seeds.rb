@@ -42,4 +42,8 @@ end
 if Audience.count.zero?
   Audience.create(name: 'Share via Link', global_default: 1, price_per_response: 0)
   Audience.create(name: 'All People (No Filters)', global_default: 2, price_per_response: 3.75)
+  a = Audience.create(name: 'Vegans', price_per_response: 2.0)
+  a.country_list = ['United States']
+  a.interest_list = ['Health Conscious', 'Fitness']
+  a.save
 end
