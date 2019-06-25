@@ -1,6 +1,6 @@
 class SerializableAudience < BaseJsonSerializer
   type 'audiences'
-  attributes :name, :criteria
+  attributes :name, :criteria, :global_default
 
   Audience.tag_types.each do |tag_type|
     # much more efficient to pull these tag_lists out of audience.all_tags
@@ -19,8 +19,8 @@ class SerializableAudience < BaseJsonSerializer
   end
 
   attribute :global do
-    # an audience is belongs to all organizations if it does not belong to an org 
+    # an audience is belongs to all organizations if it does not belong to an org
     # and is not set glopbal by default, ie: Link Sharing
-    @object.organizations.empty? && @object.global_default.nil?
+    @object.organizations.empty?
   end
 end

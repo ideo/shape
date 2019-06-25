@@ -11,14 +11,13 @@ import InfoIcon from '~/ui/icons/InfoIcon'
 import styled from 'styled-components'
 
 const StyledInfoIconWrapper = styled.span`
-  display: ${props => (props.global ? 'inline-block' : 'none')};
   width: 8%;
   opacity: 0.5;
-  padding-left: 2px;
   transform: translateY(1px);
   &:hover {
     opacity: 1;
   }
+  float: right;
 `
 
 const AudienceCheckbox = ({
@@ -28,7 +27,7 @@ const AudienceCheckbox = ({
   disabled,
   openAudienceMenu,
 }) => {
-  const { id, name, global } = audience
+  const { id, name, global_default } = audience
   return (
     <StyledRowFlexParent>
       <StyledRowFlexItem>
@@ -51,16 +50,17 @@ const AudienceCheckbox = ({
               <div style={{ maxWidth: '582px', paddingTop: '15px' }}>
                 <StyledLabelText>
                   {name}
-                  <StyledInfoIconWrapper
-                    global={global}
-                    onClick={e => {
-                      e.preventDefault()
-                      openAudienceMenu(audience)
-                    }}
-                    className="audienceLabel"
-                  >
-                    <InfoIcon />
-                  </StyledInfoIconWrapper>
+                  {!global_default && (
+                    <StyledInfoIconWrapper
+                      onClick={e => {
+                        e.preventDefault()
+                        openAudienceMenu(audience)
+                      }}
+                      className="audienceLabel"
+                    >
+                      <InfoIcon />
+                    </StyledInfoIconWrapper>
+                  )}
                 </StyledLabelText>
               </div>
             </div>

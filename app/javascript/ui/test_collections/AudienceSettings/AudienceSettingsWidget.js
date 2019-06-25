@@ -49,18 +49,10 @@ const AddAudienceButton = styled(Button)`
   z-index: ${v.zIndex.aboveClickWrapper};
 `
 
-const AddAudienceMenu = styled.span`
+const AddAudienceMenu = styled.div`
   .menu-wrapper {
     left: 0;
     top: -35px;
-  }
-
-  .icon {
-    left: 0;
-    line-height: 2.4rem !important;
-    margin-right: 8px;
-    position: relative !important;
-    vertical-align: middle;
   }
 `
 
@@ -70,14 +62,14 @@ const StyledPlusIcon = styled.span`
   width: 15px;
 `
 
-const StyledGlobeIconWrapper = styled.span`
-  float: left;
-  display: ${props => (props.global ? 'inline' : 'none')};
+const StyledNewAudienceButton = styled.span`
+  text-transform: uppercase;
+  font-family: ${v.fonts.sans};
+  font-size: 0.875rem;
+  font-weight: ${v.weights.medium};
 `
 
 const StyledInfoIconWrapper = styled.span`
-  float: right;
-  display: ${props => (props.global ? 'inline' : 'none')};
   opacity: 0.5;
   &:hover {
     opacity: 1;
@@ -143,14 +135,9 @@ class AudienceSettingsWidget extends React.Component {
       const { name, global } = audience
       return {
         name: name,
-        iconLeft: (
-          <StyledGlobeIconWrapper global={global}>
-            <GlobeIcon />
-          </StyledGlobeIconWrapper>
-        ),
+        iconLeft: global ? <GlobeIcon /> : null,
         iconRight: (
           <StyledInfoIconWrapper
-            global={global}
             onClick={() => {
               this.openAudienceMenu(audience)
             }}
@@ -168,7 +155,7 @@ class AudienceSettingsWidget extends React.Component {
     })
 
     audienceItems.push({
-      name: 'New Audience',
+      name: <StyledNewAudienceButton>New Audience</StyledNewAudienceButton>,
       iconLeft: <PlusIcon />,
       onClick: this.openAddAudienceModal,
     })
@@ -249,6 +236,7 @@ class AudienceSettingsWidget extends React.Component {
           </AddAudienceButton>
           <AddAudienceMenu>
             <PopoutMenu
+              width={280}
               wrapperClassName="add-audience-menu"
               menuOpen={addAudienceMenuOpen}
               menuItems={this.addAudienceMenuItems()}

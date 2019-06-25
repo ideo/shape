@@ -90,27 +90,44 @@ StyledMenuToggle.displayName = 'StyledMenuToggle'
 export const StyledMenuItem = styled.li`
   button {
     width: 100%;
-    padding-left: 1rem;
-    height: 3rem;
+    min-height: 2rem;
+    padding: 0.75rem 0 0.75rem 1rem;
     text-transform: capitalize;
     position: relative;
     opacity: ${props => (props.loading ? 0.5 : 1)};
     border-left: 7px solid transparent;
     font-family: ${v.fonts.sans};
     font-weight: 300;
-    font-size: 0.8rem;
+    font-size: 1rem;
     text-align: left;
     border-bottom: solid ${v.colors.commonMedium};
     border-bottom-width: ${props => (props.noBorder ? 0 : 1)}px;
     color: ${v.colors.black};
+    &.with-left {
+      padding-left: 2rem;
+    }
+    &.with-avatar {
+      padding-left: 3.75rem;
+      padding-right: 1rem;
+    }
+    &.with-right {
+      padding-right: 2.5rem;
+    }
     .icon {
+      left: 0;
       top: 50%;
       transform: translateY(-50%);
       position: absolute;
-      right: 1.5rem;
       width: 16px;
       height: 16px;
       line-height: 1.4rem;
+    }
+    .icon-left .icon {
+      left: 8px;
+    }
+    .icon-right .icon {
+      left: auto;
+      right: 1.5rem;
     }
     span {
       line-height: 1.4rem;
@@ -145,7 +162,19 @@ class PopoutMenu extends React.Component {
         <div className={groupName} key={groupName}>
           {groupExtraComponent[groupName]}
           {groupedMenuItems[groupName].map((item, i) => {
-            const { id, name, iconLeft, iconRight, onClick, loading } = item
+            const {
+              id,
+              name,
+              iconLeft,
+              iconRight,
+              onClick,
+              loading,
+              withAvatar,
+            } = item
+            let className = `menu-${_.kebabCase(name)}`
+            if (iconLeft) className += ' with-left'
+            if (iconRight) className += ' with-right'
+            if (withAvatar) className += ' with-avatar'
             return (
               <StyledMenuItem
                 key={`${name}-${id || ''}`}
@@ -155,11 +184,11 @@ class PopoutMenu extends React.Component {
                 <button
                   onClick={loading ? () => null : onClick}
                   data-cy={`PopoutMenu_${_.camelCase(name)}`}
-                  className={`menu-${_.kebabCase(name)}`}
+                  className={className}
                 >
-                  {iconLeft}
+                  <span className="icon-left">{iconLeft}</span>
                   <span>{name}</span>
-                  {iconRight}
+                  <span className="icon-right">{iconRight}</span>
                 </button>
               </StyledMenuItem>
             )
@@ -247,12 +276,13 @@ class PopoutMenu extends React.Component {
 
 const propTypeMenuItem = PropTypes.arrayOf(
   PropTypes.shape({
-    name: PropTypes.string,
+    name: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
     iconLeft: PropTypes.element,
     iconRight: PropTypes.element,
     onClick: PropTypes.func,
     noBorder: PropTypes.bool,
     loading: PropTypes.bool,
+    withAvatar: PropTypes.bool,
   })
 )
 
