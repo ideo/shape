@@ -2,36 +2,15 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { FormControlLabel, Checkbox, FormGroup } from '@material-ui/core'
-import { CheckCircle, CheckCircleOutline } from '@material-ui/icons'
+import { CheckCircle, RadioButtonUnchecked } from '@material-ui/icons'
 
-import {
-  DisplayText,
-  SmallHelperText,
-  DisplayTextCss,
-} from '~/ui/global/styled/typography'
+import { SmallHelperText, DisplayTextCss } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 import { validDemographicsCategories } from '~/ui/test_collections/RespondentDemographics'
-
-// TODO duplication
-const Question = styled.div`
-  border-color: ${props => props.theme.borderColor};
-  border-bottom-style: solid;
-  border-bottom-width: 4px;
-  box-sizing: border-box;
-  color: white;
-  padding: 12px 12px 16px 12px;
-  width: 100%;
-  .editable-text {
-    margin: -1px -1px -1px 5px;
-    padding: 2px 3px;
-    transition: background-color 250ms;
-    display: inline-block;
-  }
-  &:hover .editable-text {
-    background-color: rgba(255, 255, 255, 0.5);
-  }
-`
-Question.displayName = 'Question'
+import {
+  QuestionText,
+  QuestionSpacingContainer,
+} from '~/ui/test_collections/shared'
 
 // TODO duplication
 const Scale = styled.div`
@@ -122,15 +101,17 @@ class DemographicsMultipleChoiceQuestion extends React.Component {
 
     return (
       <div style={{ width: '100%' }}>
-        <Question editing={false}>
-          <DisplayText color={v.colors.white}>{prompt}</DisplayText>
-          <SmallHelperText
-            color={v.colors.demographicsHint}
-            style={{ display: 'block' }}
-          >
-            Please select all that apply. This question is optional.
-          </SmallHelperText>
-        </Question>
+        <QuestionSpacingContainer>
+          <QuestionText>
+            {prompt}
+            <SmallHelperText
+              color={v.colors.demographicsHint}
+              style={{ display: 'block' }}
+            >
+              Please select all that apply. This question is optional.
+            </SmallHelperText>
+          </QuestionText>
+        </QuestionSpacingContainer>
         <Scale>
           <FormGroup
             style={{
@@ -147,7 +128,7 @@ class DemographicsMultipleChoiceQuestion extends React.Component {
                 control={
                   <Checkbox
                     checkedIcon={<CheckCircle />}
-                    icon={<CheckCircleOutline />}
+                    icon={<RadioButtonUnchecked />}
                     onChange={(_e, checked) =>
                       this.handleAnswer(index, checked)
                     }
@@ -179,6 +160,7 @@ DemographicsMultipleChoiceQuestion.propTypes = {
   user: MobxPropTypes.objectOrObservableObject,
   onAnswer: PropTypes.func.isRequired,
 }
+
 DemographicsMultipleChoiceQuestion.defaultProps = {
   user: null,
 }

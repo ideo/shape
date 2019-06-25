@@ -57,14 +57,11 @@ class DemographicsSingleChoiceQuestion extends React.Component {
 
   handleAnswer(choiceIndex) {
     const {
-      onAnswer,
       user,
       question: { category, choices },
     } = this.props
 
     const choice = choices[choiceIndex]
-
-    onAnswer()
 
     if (user) {
       user.API_updateCurrentUserDemographics({
@@ -76,6 +73,8 @@ class DemographicsSingleChoiceQuestion extends React.Component {
     this.setState({
       selectedChoice: choiceIndex,
     })
+
+    this.showNextQuestion()
   }
 
   showNextQuestion() {
@@ -149,6 +148,7 @@ DemographicsSingleChoiceQuestion.propTypes = {
   user: MobxPropTypes.objectOrObservableObject,
   onAnswer: PropTypes.func.isRequired,
 }
+
 DemographicsSingleChoiceQuestion.defaultProps = {
   user: null,
 }
