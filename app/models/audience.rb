@@ -27,6 +27,7 @@ class Audience < ApplicationRecord
     publications
     income_levels
     dweller_types
+    employment_types
   ].freeze
 
   acts_as_taggable_on(DEMOGRAPHIC_TAGS)

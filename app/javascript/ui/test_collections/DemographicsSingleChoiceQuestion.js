@@ -64,12 +64,14 @@ class DemographicsSingleChoiceQuestion extends React.Component {
 
     const choice = choices[choiceIndex]
 
-    onAnswer({ text: choice.text })
+    onAnswer()
 
-    user.API_updateCurrentUserDemographics({
-      category,
-      tags: choice.tags,
-    })
+    if (user) {
+      user.API_updateCurrentUserDemographics({
+        category,
+        tags: choice.tags,
+      })
+    }
 
     this.setState({
       selectedChoice: choiceIndex,

@@ -32,11 +32,13 @@ export const NON_TEST_QUESTION_TYPES = [
   'question_terms',
   'question_welcome',
   'question_demographics_single_choice',
+  'question_demographics_multiple_choice',
 ]
 
 const DEMOGRAPHIC_QUESTION_TYPES = [
   'question_demographics_intro',
   'question_demographics_single_choice',
+  'question_demographics_multiple_choice',
 ]
 
 // Allow us to insert non-test questions into the survey while faking out some
