@@ -41,6 +41,7 @@ const EMPLOYMENT_PARTTIME = 'Part-time'
 const EMPLOYMENT_SEEKER = 'Job Seeker'
 const EMPLOYMENT_STUDENT = 'Student'
 const EMPLOYMENT_RETIRED = 'Retired'
+const EMPLOYMENT_OTHER = 'Other'
 
 const choiceStyleCardQuestionTypeMap = {
   [CHOICE_STYLE_SINGLE]: 'question_demographics_single_choice',
@@ -187,7 +188,7 @@ const questions = [
       { text: `I’m currently looking for a job`, tags: [EMPLOYMENT_SEEKER] },
       { text: `I’m a student (full or part time)`, tags: [EMPLOYMENT_STUDENT] },
       { text: `I’m retired`, tags: [EMPLOYMENT_RETIRED] },
-      { text: `Other`, tags: [] },
+      { text: `Other`, tags: [EMPLOYMENT_OTHER] },
     ],
   },
 ]
