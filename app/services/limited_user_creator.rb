@@ -41,8 +41,12 @@ class LimitedUserCreator < SimpleService
   end
 
   def normalize_phone_number
-    Phony.normalize(@contact_info)
-  rescue Phony::NormalizationError
+    phone = @contact_info.gsub(/[^0-9]/, '')
+    # TODO: would be nice to use Phony here but it does not work well without
+    # specifying the country code or using E164 Format
+    # https://github.com/floere/phony/issues/8
+    # return phone if Phony.plausible?(phone)
+    return phone if phone.length >= 9 && phone.length <= 14
     @errors << 'Contact information invalid'
     false
   end
