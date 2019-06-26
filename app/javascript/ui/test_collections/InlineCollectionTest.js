@@ -1,3 +1,4 @@
+import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
@@ -21,20 +22,14 @@ const StyledTestHeader = styled.div`
 @inject('apiStore', 'uiStore')
 @observer
 class InlineCollectionTest extends React.Component {
-  // I'm hung up on this
-  // Not sure how it works, much less what I'm breaking
-  async componentDidMount() {
-    if (!this.testCollection) {
+  @observable
+  testCollection = null
+
+  componentDidMount() {
+    if (!this.hasLiveTestCollection) {
       return
     }
-    const res = await this.fetchTestCollection()
-    const testCollection = res.data
-    // for submission tests, want to know if any other tests can be taken next
-    if (testCollection.is_submission_test) {
-      // don't need to `await` this, can happen async
-      // this will also set nextAvailableTestPath on the testCollection
-      testCollection.API_getNextAvailableTest()
-    }
+    this.fetchTestCollection()
   }
 
   componentWillUnmount() {
@@ -43,27 +38,33 @@ class InlineCollectionTest extends React.Component {
 
   get collection() {
     return this.props.uiStore.viewingCollection
-    // return collection.live_test_collection
-    //   ? collection.live_test_collection
-    //   : collection
   }
 
-  get testCollection() {
-    if (!this.collection) return null
-    return this.collection.live_test_collection
+  get hasLiveTestCollection() {
+    return !!this.collection.live_test_collection
   }
 
-  fetchTestCollection() {
+  async fetchTestCollection() {
     const { apiStore } = this.props
-    return apiStore.request(
+    const res = await apiStore.request(
       `test_collections/${this.collection.live_test_collection.id}`
     )
+    const testCollection = res.data
+    runInAction(() => {
+      this.testCollection = testCollection
+    })
+    // for submission tests, want to know if any other tests can be taken next
+    if (testCollection.is_submission_test) {
+      // don't need to `await` this, can happen async
+      // this will also set nextAvailableTestPath on the testCollection
+      testCollection.API_getNextAvailableTest()
+    }
   }
 
   renderInner() {
     const { collection, testCollection } = this
     if (!collection) return null
-    if (!testCollection) {
+    if (!this.hasLiveTestCollection) {
       return (
         <div>
           {/*
