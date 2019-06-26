@@ -13,6 +13,7 @@ import HiddenIconButton from '~/ui/icons/HiddenIconButton'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import SystemIcon from '~/ui/icons/SystemIcon'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
+import TrashIconXl from '~/ui/icons/TrashIconXl'
 import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
@@ -149,6 +150,16 @@ class PageHeader extends React.Component {
       )
     }
     return null
+  }
+
+  get trashIcon() {
+    const { record } = this.props
+    if (!record.archived) return null
+    return (
+      <IconHolder align="left">
+        <TrashIconXl />
+      </IconHolder>
+    )
   }
 
   get collectionTypeOrInheritedTags() {
@@ -354,6 +365,7 @@ class PageHeader extends React.Component {
                 className="title"
                 onClick={this.handleTitleClick}
               >
+                {this.trashIcon}
                 {this.collectionIcon}
                 <EditableName
                   name={record.name}

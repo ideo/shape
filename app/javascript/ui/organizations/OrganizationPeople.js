@@ -9,7 +9,7 @@ import {
   DisplayText,
   SubduedText,
 } from '~/ui/global/styled/typography'
-import TrashIcon from '~/ui/icons/TrashIcon'
+import TrashIcon from '~/ui/icons/TrashIconXl'
 
 const RemoveIconHolder = styled.button`
   width: 16px;
