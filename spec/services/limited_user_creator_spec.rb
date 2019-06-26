@@ -65,14 +65,22 @@ RSpec.describe LimitedUserCreator, type: :service do
           expect(limited_user_creator.call).to be false
         end
       end
+
+      context 'with an invalid phone number' do
+        let(:contact_info) { '1251254' }
+
+        it 'should return false with errors' do
+          expect(limited_user_creator.call).to be false
+        end
+      end
     end
 
     context 'with a phone number' do
-      let(:contact_info) { '415-423-9843' }
+      let(:contact_info) { '920-423-9843' }
 
       it 'should create a user with normalized phone number' do
         expect(NetworkApi::User).to receive(:create).with(
-          phone: '4154239843',
+          phone: '9204239843',
           limited_user: true,
         )
         limited_user_creator.call

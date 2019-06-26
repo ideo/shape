@@ -41,12 +41,12 @@ class LimitedUserCreator < SimpleService
   end
 
   def normalize_phone_number
-    unless Phony.plausible?(@contact_info)
-      @errors << 'Contact information invalid'
-      return false
-    end
-    Phony.normalize(@contact_info)
-  rescue Phony::NormalizationError
+    phone = @contact_info.gsub(/[^0-9]/, '')
+    # TODO: would be nice to use Phony here but it does not work well without
+    # specifying the country code or using E164 Format
+    # https://github.com/floere/phony/issues/8
+    # return phone if Phony.plausible?(phone)
+    return phone if phone.length >= 9 && phone.length <= 14
     @errors << 'Contact information invalid'
     false
   end
@@ -58,8 +58,9 @@ class LimitedUserCreator < SimpleService
 
     return false if params.empty?
 
-    if Rails.env.development?
-      # always look up the same user so we don't keep creating real ones
+    if ENV['IDEO_SSO_ENV'] == 'production' && !Rails.env.production? && ENV['SHAPE_APP'] != 'production'
+      # if using prod SSO environment but not on shape-production,
+      # just look up the same test user to not push fake users to ideo-sso
       params[:email] = 'test.user@shape.space'
       params.delete :phone
     end
