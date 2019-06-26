@@ -64,7 +64,7 @@ class Group < ApplicationRecord
   has_many :activities_as_subject, through: :activity_subjects, class_name: 'Activity'
   has_many :activity_subjects, as: :subject
 
-  before_validation :set_handle_if_none, on: :create
+  before_validation :set_unique_handle, on: :create
 
   validates :name, presence: true
   validates :organization_id, presence: true, if: :requires_org?
@@ -189,8 +189,17 @@ class Group < ApplicationRecord
     new_record? || will_save_change_to_attribute?(:handle)
   end
 
-  def set_handle_if_none
-    self.handle ||= name.parameterize
+  def set_unique_handle
+    return if handle.blank? && name.blank?
+
+    self.handle ||= name
+    # Make sure it is parameterized
+    self.handle = handle.parameterize
+    original_handle = handle
+    i = 0
+    while Group.where(organization_id: organization_id, handle: handle).count.positive?
+      self.handle = "#{original_handle}-#{i += 1}"
+    end
   end
 
   def after_archive_group

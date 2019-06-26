@@ -8,7 +8,8 @@
     "is_guest": { "type": "boolean" },
     "is_admin": { "type": "boolean" },
     "can_edit": { "type": "boolean" },
-    "filestack_file_url": { "type": ["string", "null"] }
+    "filestack_file_url": { "type": ["string", "null"] },
+    "organization_id": { "type": "integer" }
   },
   "required": ["name"]
 }

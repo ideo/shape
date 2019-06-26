@@ -86,7 +86,9 @@ class Api::V1::RolesController < Api::V1::BaseController
   private
 
   def role_params
-    json_api_params.require(:role).permit(:name)
+    root_params = json_api_params
+    root_params = json_api_params[:data][:attributes] if json_api_params[:data].present?
+    root_params.require(:role).permit(:name)
   end
 
   def authorize_manage_record

@@ -1,14 +1,18 @@
 class Api::V1::GroupsController < Api::V1::BaseController
   deserializable_resource :group, class: DeserializableGroup, only: %i[create update]
-  load_and_authorize_resource :organization, only: %i[index]
-  load_and_authorize_resource
+  before_action :load_current_organization_from_nested_routes, only: %i[index create]
+  load_and_authorize_resource except: :index
 
   # All the current user's groups in this org
   # /organizations/:id/groups
   before_action :load_user_groups, only: %i[index]
   before_action :load_and_filter_index, only: %i[index]
   def index
-    render jsonapi: @groups
+    if current_organization.blank?
+      render json: { errors: ['Organization is required'] }, status: :bad_request
+    else
+      render jsonapi: @groups
+    end
   end
 
   def show
@@ -19,7 +23,7 @@ class Api::V1::GroupsController < Api::V1::BaseController
   before_action :authorize_current_organization, only: %i[create]
   def create
     external_id = params[:group].delete(:external_id)
-    @group.organization = current_organization
+    @group.organization ||= current_organization
     if external_id.present? && current_user.application
       @group.external_records.build(
         external_id: external_id,
@@ -62,7 +66,7 @@ class Api::V1::GroupsController < Api::V1::BaseController
   def check_group_organization_param
     organization_id = params[:group].delete(:organization_id)
     return unless organization_id.present?
-    @current_organization = Organization.find(organization_id)
+    @current_organization = Organization.find_by(id: organization_id)
   end
 
   def authorize_current_organization
@@ -90,5 +94,13 @@ class Api::V1::GroupsController < Api::V1::BaseController
       :handle,
       filestack_file_attributes: Group.filestack_file_attributes_whitelist,
     )
+  end
+
+  def load_current_organization_from_nested_routes
+    return if params[:organization_id].blank?
+    org = Organization.find_by(id: params[:organization_id])
+    # Authorize they have access
+    authorize! :read, org
+    @current_organization = org
   end
 end
