@@ -7,7 +7,7 @@ class Api::V1::RolesController < Api::V1::BaseController
   # All roles that exist on this resource (collection, item or group)
   # /[collections/items/group]/:id/roles
   def index
-    @roles = record.roles.includes(:users, :groups, :resource)
+    @roles = record.roles.includes(:resource)
     render jsonapi: @roles, include: %i[users groups resource]
   end
 
@@ -21,7 +21,7 @@ class Api::V1::RolesController < Api::V1::BaseController
   # - array of roles successfully created, including users with that role
   # /[collections/items/groups]/:id/roles
   def create
-    is_switching = json_api_params[:is_switching]
+    is_switching = root_object_params[:is_switching]
     service = Roles::MassAssign.new(
       mass_assignment_params.merge(
         invited_by: current_user,
@@ -32,7 +32,12 @@ class Api::V1::RolesController < Api::V1::BaseController
     if service.call
       head :no_content
     else
-      render_api_errors assigner.errors
+      render_api_errors service.errors.map.with_index do |message, i|
+        JSONAPI::Serializable::Error.create(
+          id: i,
+          title: message,
+        )
+      end
     end
   end
 
@@ -49,7 +54,7 @@ class Api::V1::RolesController < Api::V1::BaseController
   # - array of roles successfully removed
   # /[collections/items/groups]/:id/roles
   def destroy
-    is_switching = json_api_params[:is_switching]
+    is_switching = root_object_params[:is_switching]
     service = Roles::MassRemove.new(
       mass_assignment_params.merge(
         removed_by: current_user,
@@ -85,10 +90,16 @@ class Api::V1::RolesController < Api::V1::BaseController
 
   private
 
+  # This is necessary because the front-end doesn't use JSON:API spec,
+  # but our Shape Ruby SDK does
+  def root_object_params
+    root_object_params = json_api_params
+    root_object_params = json_api_params[:data][:attributes] if json_api_params[:data].present?
+    root_object_params
+  end
+
   def role_params
-    root_params = json_api_params
-    root_params = json_api_params[:data][:attributes] if json_api_params[:data].present?
-    root_params.require(:role).permit(:name)
+    root_object_params.require(:role).permit(:name)
   end
 
   def authorize_manage_record
@@ -101,19 +112,28 @@ class Api::V1::RolesController < Api::V1::BaseController
 
   def authorize_remove_role_from_record
     # you can always choose to "leave" something even if not editor
-    if json_api_params[:group_ids].blank? &&
-       json_api_params[:user_ids].count == 1 &&
-       json_api_params[:user_ids].first.to_i == current_user.id
+    if root_object_params[:group_ids].blank? &&
+       root_object_params[:user_ids].count == 1 &&
+       root_object_params[:user_ids].first.to_i == current_user.id
       return true
     end
     authorize! :manage, record
   end
 
   def mass_assignment_params
-    users = User.where(id: json_api_params[:user_ids])
-    groups = Group
-             .viewable_in_org(current_organization.id)
-             .where(id: json_api_params[:group_ids])
+    users = User.where(id: root_object_params[:user_ids])
+    groups = Group.where(id: root_object_params[:group_ids])
+    if current_api_token&.application.present?
+      org_ids = current_api_token.application.organization_ids
+      if org_ids.present?
+        groups = groups.where(organization_id: org_ids)
+      else
+        groups = groups.none
+      end
+    else
+      groups = groups.viewable_in_org(current_organization.id)
+    end
+
     {
       object: record,
       role_name: role_params[:name],
@@ -128,7 +148,7 @@ class Api::V1::RolesController < Api::V1::BaseController
   end
 
   def send_invites_bool
-    return true unless json_api_params.key?(:send_invites)
-    json_api_params[:send_invites]
+    return true unless root_object_params.key?(:send_invites)
+    root_object_params[:send_invites]
   end
 end
