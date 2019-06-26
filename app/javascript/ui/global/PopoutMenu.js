@@ -72,10 +72,7 @@ export const StyledMenu = styled.ul`
 `
 
 export const StyledMenuToggle = styled.button`
-  margin-left: 7px;
-  margin-right: 7px;
-  padding: 2px 0 0 0;
-  padding-bottom: 2px;
+  padding: 2px 7px;
   .icon {
     width: ${props => props.size}px;
     height: ${props => props.size}px;
