@@ -1,7 +1,8 @@
 FactoryBot.define do
   factory :audience do
     name { Faker::Superhero.power }
-    price_per_response { rand(1..20) }
+    # Need to set a minimum or else our price will be below a valid amount
+    price_per_response { 4.50 }
     criteria 'MyString'
     age_list []
     children_age_list []

@@ -301,7 +301,8 @@ describe Collection::TestCollection, type: :model do
               test_collection
               .collection_cards
               .reload
-              .map { |card| card.record.class },
+              .map(&:record)
+              .map(&:class),
             ).to eq(
               [
                 Item::VideoItem,
@@ -352,7 +353,7 @@ describe Collection::TestCollection, type: :model do
 
           context 'with test audiences' do
             let(:audience) { create(:audience) }
-            let!(:test_audience) { create(:test_audience, audience: audience, test_collection: test_collection, price_per_response: 2) }
+            let!(:test_audience) { create(:test_audience, audience: audience, test_collection: test_collection, price_per_response: 4.50) }
 
             it 'should create test audience datasets for each question' do
               expect do
@@ -424,7 +425,7 @@ describe Collection::TestCollection, type: :model do
           context 'with targeted audience' do
             it 'should send a notification email' do
               audience = create(:audience)
-              create(:test_audience, audience: audience, test_collection: test_collection, price_per_response: 1)
+              create(:test_audience, audience: audience, test_collection: test_collection, price_per_response: 3.25)
 
               deliver_double = double('TestCollectionMailer')
               allow(TestCollectionMailer).to receive(:notify_launch).and_return(deliver_double)
@@ -541,13 +542,13 @@ describe Collection::TestCollection, type: :model do
 
         context 'with both paid and link sharing audiences' do
           let!(:test_audience) { create(:test_audience, :link_sharing, test_collection: test_collection) }
-          let!(:paid_test_audience) { create(:test_audience, test_collection: test_collection) }
+          let!(:paid_test_audience) { create(:test_audience, status: :closed, test_collection: test_collection) }
 
           it 'does not close the test, but notifies when the paid audience is closed' do
             expect(NotifyFeedbackCompletedWorker).to receive(:perform_async).with(
               test_collection.id,
             )
-            paid_test_audience.closed!
+            # simulate test_collection getting pinged with last test audience being closed
             test_collection.test_audience_closed!
             # should not be closed yet...
             expect(test_collection.closed?).to be false
@@ -707,8 +708,6 @@ describe Collection::TestCollection, type: :model do
         expect(submission.reload.submission_attrs['test_status']).to eq 'live'
       end
     end
-
-    describe ''
   end
 
   context 'with an in-collection test' do

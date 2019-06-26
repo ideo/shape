@@ -463,6 +463,7 @@ class GridCard extends React.Component {
           hasOverflow={record.isData || record.isLegend}
           filter={card.filter}
           forceFilter={!this.hasCover}
+          isText={record.isText}
         >
           {this.renderCover}
         </StyledGridCardInner>

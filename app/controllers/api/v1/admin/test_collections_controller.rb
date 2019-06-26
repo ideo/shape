@@ -1,6 +1,4 @@
-class Api::V1::Admin::TestCollectionsController < Api::V1::BaseController
-  before_action :authorize_shape_admin!
-
+class Api::V1::Admin::TestCollectionsController < Api::V1::Admin::BaseController
   def index
     collections =
       Collection::TestCollection.includes(paid_test_audiences: [:audience])

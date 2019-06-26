@@ -3,7 +3,7 @@ require 'rails_helper'
 describe Api::V1::TestAudiencesController, type: :request, json: true, auth: true do
   let(:current_user) { @user }
   let(:organization) { create(:organization, admin: current_user) }
-  let!(:link_sharing_audience) { create(:audience, organizations: [organization], price_per_response: 0) }
+  let!(:link_sharing_audience) { create(:audience, :link_sharing, organizations: [organization]) }
   let!(:paid_audience) { create(:audience, organizations: [organization], price_per_response: 5) }
   let!(:test_collection) { create(:test_collection, :completed, add_editors: [current_user]) }
 
@@ -27,7 +27,7 @@ describe Api::V1::TestAudiencesController, type: :request, json: true, auth: tru
     end
 
     context 'with a paid audience' do
-      let(:test_audience) do
+      let!(:test_audience) do
         # link sharing gets created after_create
         create(:test_audience, test_collection: test_collection, audience: paid_audience)
       end

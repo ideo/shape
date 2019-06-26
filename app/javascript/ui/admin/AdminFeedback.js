@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { Flex } from 'reflexbox'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import axios from 'axios'
 
 import AdminNewQueryModal from './AdminNewQueryModal'
 import AdminNewQueryRow from './AdminNewQueryRow'
@@ -16,6 +17,7 @@ import LinkIcon from '~/ui/icons/LinkIcon'
 import SearchLargeIcon from '~/ui/icons/SearchLargeIcon'
 import DownloadIcon from '~/ui/icons/DownloadIcon'
 import Section from '~shared/components/molecules/Section'
+import { Select, SelectOption } from '~/ui/global/styled/forms'
 import v from '~/utils/variables'
 import { Heading1, Heading2, Heading3 } from '~/ui/global/styled/typography'
 import Tooltip from '~/ui/global/Tooltip'
@@ -117,6 +119,7 @@ const ExportIncentivesButton = styled(Heading3)`
 class AdminFeedback extends React.Component {
   state = {
     testCollections: [],
+    monthsForExport: [],
     currentPage: 1,
     totalPages: 1,
     newQueryModalOpen: false,
@@ -127,6 +130,7 @@ class AdminFeedback extends React.Component {
 
   componentDidMount() {
     this.loadTestCollections(this.state.currentPage)
+    this.loadMonthsForFinanceExport()
   }
 
   async loadTestCollections(page) {
@@ -138,8 +142,25 @@ class AdminFeedback extends React.Component {
     })
   }
 
+  async loadMonthsForFinanceExport() {
+    const response = await axios.get(
+      '/api/v1/admin/paid_tests/months_with_purchases'
+    )
+    this.setState({
+      monthsForExport: response.data.months,
+    })
+  }
+
+  handleFinanceExportSelection = e => {
+    const month = e.target.value
+    if (!month) return
+    window.location.href = `/api/v1/admin/paid_tests/finance_export.csv?month=${month}`
+    return false
+  }
+
   handleDownloadFeedbackIncentives = () => {
-    window.location.href = '/api/v1/admin/feedback_incentives.csv'
+    window.location.href =
+      '/api/v1/admin/paid_tests/pending_incentives_export.csv'
     uiStore.popupSnackbar({
       message: 'All incentives marked as paid!',
     })
@@ -306,6 +327,7 @@ class AdminFeedback extends React.Component {
       totalPages,
       selectedTestAudience,
       newQueryModalOpen,
+      monthsForExport,
       newQueryResponseCount,
     } = this.state
     const previousPageDisabled = currentPage === 1
@@ -320,19 +342,44 @@ class AdminFeedback extends React.Component {
         <Heading1>Feedback</Heading1>
         <Section>
           <Grid container>
-            <Grid item xs={6}>
+            <Grid item xs={4}>
               <Box mb={40}>
                 <Heading2 data-cy="AdminHeader">All Shape Feedback</Heading2>
               </Box>
             </Grid>
-            <Grid item xs={6}>
-              <Flex justify="flex-end">
-                <ExportIncentivesButton
-                  onClick={this.handleDownloadFeedbackIncentives}
-                >
-                  <DownloadIcon />
-                  Export Pending Incentives
-                </ExportIncentivesButton>
+            <Grid item xs={8}>
+              <Flex style={{ flexDirection: 'column' }}>
+                <Box mb={5} style={{ alignSelf: 'flex-end' }}>
+                  <ExportIncentivesButton
+                    onClick={this.handleDownloadFeedbackIncentives}
+                  >
+                    <DownloadIcon />
+                    Export Pending Incentives
+                  </ExportIncentivesButton>
+                </Box>
+                <Box mb={20} style={{ alignSelf: 'flex-end' }}>
+                  <Select
+                    classes={{ root: 'select' }}
+                    disableUnderline
+                    displayEmpty
+                    name="finance_export_month"
+                    onChange={this.handleFinanceExportSelection}
+                    value=""
+                  >
+                    <SelectOption value="" key="empty">
+                      IDEO Finance Report
+                    </SelectOption>
+                    {monthsForExport.map(month => (
+                      <SelectOption
+                        classes={{ root: 'selectOption', selected: 'selected' }}
+                        key={month}
+                        value={month}
+                      >
+                        {month}
+                      </SelectOption>
+                    ))}
+                  </Select>
+                </Box>
               </Flex>
             </Grid>
           </Grid>
