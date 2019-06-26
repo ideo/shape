@@ -9,6 +9,11 @@ import Emoji from '~/ui/icons/Emoji'
 import { DisplayText, SmallHelperText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 import { emojiSeriesForQuestionType } from '~/ui/global/charts/ChartUtils'
+import {
+  EmojiHolder,
+  EmojiButton,
+  ResponseContainer,
+} from '~/ui/test_collections/shared'
 
 const Question = styled.div`
   border-color: ${props =>
@@ -30,33 +35,6 @@ const Question = styled.div`
   }
 `
 Question.displayName = 'Question'
-
-const Scale = styled.div`
-  background-color: ${props => props.theme.responseHolder};
-  box-sizing: border-box;
-  padding: 7px 13px;
-  width: 100%;
-`
-
-export const EmojiHolder = styled.div`
-  align-items: center;
-  display: flex;
-  justify-content: space-around;
-  margin-top: 10px;
-`
-
-export const EmojiButton = styled.button`
-  opacity: ${props => (props.selected ? 1 : 0.2)};
-  transition: opacity 0.3s;
-  &:hover {
-    opacity: 1;
-  }
-  @media only screen and (max-width: ${v.responsive.muiSmBreakpoint}px) {
-    opacity: ${props => (props.selected ? 1 : 0.2)};
-    transition: opacity 0.3s;
-  }
-`
-EmojiButton.displayName = 'EmojiButton'
 
 const EditableInput = styled(AutosizeInput)`
   input {
@@ -177,7 +155,7 @@ class ScaleQuestion extends React.Component {
             </DisplayText>
           )}
         </Question>
-        <Scale>
+        <ResponseContainer>
           <SmallHelperText>select your response below</SmallHelperText>
           <EmojiHolder data-cy="ScaleEmojiHolder">
             {emojis.map(emoji => (
@@ -210,7 +188,7 @@ class ScaleQuestion extends React.Component {
               </Tooltip>
             ))}
           </EmojiHolder>
-        </Scale>
+        </ResponseContainer>
       </div>
     )
   }

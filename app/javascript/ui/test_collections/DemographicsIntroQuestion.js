@@ -1,9 +1,9 @@
 import Emoji from '~/ui/icons/Emoji'
 import {
+  EmojiHolder,
   QuestionText,
   QuestionSpacingContainer,
 } from '~/ui/test_collections/shared'
-import { EmojiHolder } from '~/ui/test_collections/ScaleQuestion'
 
 class DemographicsIntroQuestion extends React.Component {
   render() {

@@ -3,8 +3,9 @@ import { observable } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import Emoji from '~/ui/icons/Emoji'
-import { EmojiButton, EmojiHolder } from '~/ui/test_collections/ScaleQuestion'
 import {
+  EmojiButton,
+  EmojiHolder,
   QuestionText,
   QuestionSpacingContainer,
 } from '~/ui/test_collections/shared'

@@ -8,17 +8,10 @@ import { SmallHelperText, DisplayTextCss } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 import { validDemographicsCategories } from '~/ui/test_collections/RespondentDemographics'
 import {
+  ResponseContainer,
   QuestionText,
   QuestionSpacingContainer,
 } from '~/ui/test_collections/shared'
-
-// TODO duplication
-const Scale = styled.div`
-  background-color: ${props => props.theme.responseHolder};
-  box-sizing: border-box;
-  padding: 7px 13px;
-  width: 100%;
-`
 
 const StyledFormControlLabel = styled(FormControlLabel)`
   .label {
@@ -99,7 +92,7 @@ class DemographicsSingleChoiceQuestion extends React.Component {
             </SmallHelperText>
           </QuestionText>
         </QuestionSpacingContainer>
-        <Scale>
+        <ResponseContainer>
           <RadioGroup
             value={this.state.selectedChoice}
             onChange={(_e, value) => this.handleAnswer(value)}
@@ -127,7 +120,7 @@ class DemographicsSingleChoiceQuestion extends React.Component {
           <div style={{ textAlign: 'right' }}>
             <SkipButton onClick={_e => this.skipQuestion()} />
           </div>
-        </Scale>
+        </ResponseContainer>
       </div>
     )
   }
