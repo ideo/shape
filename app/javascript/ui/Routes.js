@@ -87,6 +87,12 @@ const SelectedArea = styled.div.attrs({
   z-index: ${v.zIndex.clickWrapper};
 `
 
+const quillEditorClick = e => {
+  const quillSelectors =
+    '.quill, .ql-container, .ql-editor, .ql-clipboard, .quill-toolbar, .ql-formats, .ql-header, .ql-link, .ql-stroke'
+  return e.target.closest(quillSelectors)
+}
+
 const emptySpaceClick = e => {
   const { target } = e
   return target.getAttribute && target.getAttribute('data-empty-space-click')
@@ -125,19 +131,24 @@ class Routes extends React.Component {
     uiStore.update('windowWidth', windowWidth)
   }
 
-  handleMouseDownSelection = e => {
+  handleMouseDownSelection = async e => {
     const { uiStore } = this.props
-    const quillSelectors =
-      '.quill, .ql-container, .ql-editor, .ql-clipboard, .quill-toolbar, .ql-formats, .ql-header, .ql-link, .ql-stroke'
-    if (!e.target.closest(quillSelectors)) {
+    const emptySpaceMouseDown = emptySpaceClick(e)
+    const outsideQuillMouseDown = !quillEditorClick(e)
+    if (!outsideQuillMouseDown && !emptySpaceMouseDown) return
+    if (outsideQuillMouseDown) {
+      // if we clicked outside the quill editor...
+      const { textEditingItem } = uiStore
+      if (!textEditingItem) return
+      await textEditingItem.API_updateWithoutSync()
       uiStore.update('textEditingItem', null)
+    } else {
+      // if we clicked an empty space...
+      uiStore.deselectCards()
+      uiStore.onEmptySpaceClick(e)
+      uiStore.closeBlankContentTool()
+      this.mouseDownAt = { x: e.pageX, y: e.pageY }
     }
-    if (!emptySpaceClick(e)) return
-    // if we clicked an empty space...
-    uiStore.deselectCards()
-    uiStore.onEmptySpaceClick(e)
-    uiStore.closeBlankContentTool()
-    this.mouseDownAt = { x: e.pageX, y: e.pageY }
   }
 
   handleMouseMoveSelection = e => {
