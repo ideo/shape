@@ -61,6 +61,10 @@ class InlineCollectionTest extends React.Component {
     }
   }
 
+  get containerId() {
+    return 'InlineTestContainer'
+  }
+
   renderInner() {
     const { collection, testCollection } = this
     if (!collection) return null
@@ -109,10 +113,9 @@ class InlineCollectionTest extends React.Component {
           )}
           <TestSurveyResponder
             collection={testCollection}
-            editing={false}
-            theme="secondary"
             // for scrolling purposes
-            containerId="InlineTestContainer"
+            containerId={this.containerId}
+            inline
           />
         </div>
       )
@@ -124,7 +127,7 @@ class InlineCollectionTest extends React.Component {
     const { uiStore } = this.props
     return (
       <ActivityContainer
-        id="InlineTestContainer"
+        id={this.containerId}
         data-cy="ActivityLogSurveyResponder"
         moving={uiStore.activityLogMoving}
       >

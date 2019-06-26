@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes, inject } from 'mobx-react'
 import { observable, action } from 'mobx'
 import styled, { ThemeProvider } from 'styled-components'
@@ -49,30 +50,9 @@ class ClosedSurvey extends React.Component {
   @observable
   surveyResponse = null
 
-  async componentDidMount() {
-    this.initializeCards()
-
-    const { apiStore } = this.props
-    await apiStore.loadCurrentUser()
-    if (!apiStore.currentUser) return
-    await this.fetchSurveyResponse()
-  }
-
   @action
   onAnswer = answer => {
     this.answer = answer
-  }
-
-  async fetchSurveyResponse() {
-    const { collection, apiStore } = this.props
-    const surveyResponseId = collection.survey_response_for_user_id
-    const surveyResponseResult =
-      surveyResponseId &&
-      (await apiStore.fetch('survey_responses', surveyResponseId))
-    const surveyResponse = surveyResponseResult
-      ? surveyResponseResult.data
-      : null
-    this.surveyResponse = surveyResponse
   }
 
   renderEmoji() {
@@ -107,12 +87,6 @@ class ClosedSurvey extends React.Component {
     return currentUser
   }
 
-  get sessionUid() {
-    const { surveyResponse } = this
-
-    surveyResponse ? surveyResponse.session_uid : null
-  }
-
   get includeRecontactQuestion() {
     return (
       !this.currentUser ||
@@ -122,6 +96,7 @@ class ClosedSurvey extends React.Component {
   }
 
   render() {
+    const { sessionUid } = this.props
     const { currentUser, includeRecontactQuestion } = this
 
     return (
@@ -136,7 +111,7 @@ class ClosedSurvey extends React.Component {
                 backgroundColor={v.colors.primaryDarkest}
                 user={currentUser}
                 onAnswer={this.onAnswer}
-                sessionUid={this.sessionUid}
+                sessionUid={sessionUid}
               />
             ) : (
               <LearnMoreLink href={'/'}>Learn More About Shape</LearnMoreLink>
@@ -150,6 +125,7 @@ class ClosedSurvey extends React.Component {
 
 ClosedSurvey.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject,
+  sessionUid: PropTypes.string,
 }
 
 ClosedSurvey.wrappedComponent.propTypes = {
@@ -158,6 +134,7 @@ ClosedSurvey.wrappedComponent.propTypes = {
 
 ClosedSurvey.defaultProps = {
   collection: undefined,
+  sessionUid: null,
 }
 
 export default ClosedSurvey

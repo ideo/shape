@@ -1,12 +1,12 @@
 import styled from 'styled-components'
-import { PropTypes as MobxPropTypes, observer } from 'mobx-react'
+import { observable, runInAction } from 'mobx'
+import { observer } from 'mobx-react'
 import v from '~/utils/variables'
 import DialogWrapper from '~/ui/global/modals/DialogWrapper'
 import Logo from '~/ui/layout/Logo'
 import TestSurveyResponder from '~/ui/test_collections/TestSurveyResponder'
 import { apiStore } from '~/stores'
 
-import ClosedSurvey from '~/ui/test_collections/ClosedSurvey'
 import RespondentBanner from '~/ui/test_collections/RespondentBanner'
 
 const StyledBg = styled.div`
@@ -33,9 +33,12 @@ const StyledSurvey = styled.div`
 
 @observer
 class TestSurveyPage extends React.Component {
+  @observable
+  loadedCurrentUser = false
+
   constructor(props) {
     super(props)
-    this.collection = props.collection || apiStore.sync(window.collectionData)
+    this.collection = apiStore.sync(window.collectionData)
 
     if (window.nextAvailableId) {
       this.collection.setNextAvailableTestPath(
@@ -46,6 +49,17 @@ class TestSurveyPage extends React.Component {
     if (window.invalid) {
       this.collection.test_status = 'closed'
     }
+  }
+
+  async componentDidMount() {
+    await apiStore.loadCurrentUser()
+    runInAction(() => {
+      this.loadedCurrentUser = true
+    })
+  }
+
+  get currentUser() {
+    return apiStore.currentUser
   }
 
   get renderSurvey() {
@@ -60,6 +74,7 @@ class TestSurveyPage extends React.Component {
   }
 
   render() {
+    if (!this.loadedCurrentUser) return ''
     return (
       <React.Fragment>
         <StyledBg>
@@ -70,23 +85,14 @@ class TestSurveyPage extends React.Component {
             <Logo withText width={83} />
           </LogoWrapper>
           <DialogWrapper />
-          {this.collection.test_status === 'live' ? (
-            this.renderSurvey
-          ) : (
-            <ClosedSurvey collection={this.collection} />
-          )}
+
+          <StyledSurvey data-cy="StandaloneTestSurvey">
+            <TestSurveyResponder collection={this.collection} editing={false} />
+          </StyledSurvey>
         </StyledBg>
       </React.Fragment>
     )
   }
-}
-
-TestSurveyPage.propTypes = {
-  collection: MobxPropTypes.objectOrObservableObject,
-}
-
-TestSurveyPage.defaultProps = {
-  collection: undefined,
 }
 
 export default TestSurveyPage

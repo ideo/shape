@@ -1,6 +1,6 @@
 class SerializableAudience < BaseJsonSerializer
   type 'audiences'
-  attributes :name, :criteria
+  attributes :name
 
   Audience.tag_types.each do |tag_type|
     # much more efficient to pull these tag_lists out of audience.all_tags

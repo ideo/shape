@@ -41,6 +41,10 @@ class LimitedUserCreator < SimpleService
   end
 
   def normalize_phone_number
+    unless Phony.plausible?(@contact_info)
+      @errors << 'Contact information invalid'
+      return false
+    end
     Phony.normalize(@contact_info)
   rescue Phony::NormalizationError
     @errors << 'Contact information invalid'

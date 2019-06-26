@@ -5,6 +5,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { scroller } from 'react-scroll'
 import { ThemeProvider } from 'styled-components'
 
+import trackError from '~/utils/trackError'
 import ProgressDots from '~/ui/global/ProgressDots'
 import ProgressSquare from '~/ui/global/ProgressSquare'
 import {
@@ -15,6 +16,7 @@ import TestQuestion from '~/ui/test_collections/TestQuestion'
 import GreetingMessage from '~/ui/test_collections/GreetingMessage'
 import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
 import ScrollingModule from '~/ui/test_collections/ScrollingModule'
+import ClosedSurvey from '~/ui/test_collections/ClosedSurvey'
 
 const UNANSWERABLE_QUESTION_TYPES = [
   'question_media',
@@ -49,67 +51,42 @@ class TestSurveyResponder extends React.Component {
   async componentDidMount() {
     this.initializeCards()
 
-    const { apiStore } = this.props
-    await apiStore.loadCurrentUser()
-    if (!apiStore.currentUser) return
+    if (!this.currentUser) return
     await this.fetchSurveyResponse()
   }
 
   get includeRecontactQuestion() {
+    const { inline } = this.props
+    if (inline) return false
     return (
-      // isn't this addressed in the ternary render in TestSurveyPage?
-      !this.collection.live_test_collection &&
-      (!this.currentUser ||
-        this.currentUser.feedback_contact_preference ===
-          'feedback_contact_unanswered')
+      !this.currentUser ||
+      this.currentUser.feedback_contact_preference ===
+        'feedback_contact_unanswered'
     )
   }
 
   get includeTerms() {
+    const { inline } = this.props
+    // inline test does not show terms
+    if (inline) return false
     return !this.currentUser || !this.currentUser.respondent_terms_accepted
   }
 
-  isSurveyInline() {
-    // should this just be a boolean since it isn't being used elsewhere?
-    return this.props.containerId === 'InlineTestContainer'
-  }
-
-  get collection() {
-    const { collection } = this
-
-    return collection.live_test_collection
-      ? collection.live_test_collection
-      : collection
-  }
-
-  get testCollection() {
-    if (!this.collection) return null
-    return this.collection.live_test_collection
-  }
-
   async fetchSurveyResponse() {
+    const { collection } = this
     const { apiStore } = this.props
 
-    if (!this.testCollection) {
-      return
-    }
-    const res = await this.fetchTestCollection()
-    const testCollection = res.data
-    // for submission tests, want to know if any other tests can be taken next
-    if (testCollection.is_submission_test) {
-      // don't need to `await` this, can happen async
-      // this will also set nextAvailableTestPath on the testCollection
-      testCollection.API_getNextAvailableTest()
-    }
-
-    const surveyResponseId = this.collection.survey_response_for_user_id
+    const surveyResponseId = collection.survey_response_for_user_id
     const surveyResponseResult =
       surveyResponseId &&
       (await apiStore.fetch('survey_responses', surveyResponseId))
     const surveyResponse = surveyResponseResult
       ? surveyResponseResult.data
       : null
-    this.surveyResponse = surveyResponse
+
+    runInAction(() => {
+      this.surveyResponse = surveyResponse
+    })
   }
 
   createSurveyResponse = async () => {
@@ -124,16 +101,20 @@ class TestSurveyResponder extends React.Component {
     try {
       const surveyResponse = await newResponse.save()
       if (surveyResponse) {
-        this.surveyResponse = surveyResponse
+        runInAction(() => {
+          this.surveyResponse = surveyResponse
+        })
       }
       return surveyResponse
     } catch (e) {
+      trackError(e, { source: 'createSurveyResponse' })
       collection.test_status = 'closed'
     }
   }
 
   initializeCards() {
     const { collection } = this
+    if (!collection || !collection.question_cards) return
 
     const questionCards = [...collection.question_cards]
 
@@ -195,7 +176,8 @@ class TestSurveyResponder extends React.Component {
   }
 
   get numAnswerableQuestionItems() {
-    const { question_cards } = this.props.collection
+    const { collection } = this.props
+    const { question_cards } = collection
     return question_cards.filter(
       questionCard =>
         !_.includes(
@@ -286,10 +268,7 @@ class TestSurveyResponder extends React.Component {
   }
 
   get currentUser() {
-    const { apiStore } = this.props
-    const { currentUser } = apiStore
-
-    return currentUser
+    return this.props.apiStore.currentUser
   }
 
   refreshUserAfterSurvey() {
@@ -297,11 +276,25 @@ class TestSurveyResponder extends React.Component {
     apiStore.loadCurrentUser()
   }
 
+  get theme() {
+    const { inline } = this.props
+    return inline ? 'secondary' : 'primary'
+  }
+
   render() {
-    const { collection, theme } = this.props
+    const { collection } = this.props
+    const { surveyResponse } = this
+    if (collection.test_status !== 'live') {
+      return (
+        <ClosedSurvey
+          collection={collection}
+          sessionUid={surveyResponse && surveyResponse.sessionUid}
+        />
+      )
+    }
+
     const {
       createSurveyResponse,
-      surveyResponse,
       questionAnswerForCard,
       afterQuestionAnswered,
       canEdit,
@@ -309,7 +302,7 @@ class TestSurveyResponder extends React.Component {
     } = this
 
     return (
-      <ThemeProvider theme={styledTestTheme(theme)}>
+      <ThemeProvider theme={styledTestTheme(this.theme)}>
         <div id="surveyContainer">
           <ProgressDots
             totalAmount={this.answerableCards.length + 1}
@@ -347,8 +340,8 @@ class TestSurveyResponder extends React.Component {
 
 TestSurveyResponder.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
-  theme: PropTypes.string,
   containerId: PropTypes.string,
+  inline: PropTypes.bool,
 }
 
 TestSurveyResponder.wrappedComponent.propTypes = {
@@ -356,8 +349,8 @@ TestSurveyResponder.wrappedComponent.propTypes = {
 }
 
 TestSurveyResponder.defaultProps = {
-  theme: 'primary',
   containerId: '',
+  inline: false,
 }
 TestSurveyResponder.displayName = 'TestSurveyResponder'
 
