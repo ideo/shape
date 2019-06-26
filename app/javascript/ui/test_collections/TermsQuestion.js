@@ -52,6 +52,8 @@ class TermsQuestion extends React.Component {
           different personal data laws and may be less strict than the EU for
           example.
           <br />
+          <br />
+          Only one response per person will be accepted and rewarded.
         </QuestionText>
         <EmojiHolder data-cy="TermsEmojiHolder">
           <EmojiButton

@@ -215,7 +215,7 @@ RSpec.describe SurveyResponse, type: :model do
         survey_response.record_incentive_paid!
       }.to change(payment_processor_account, :balance)
       expect(payment_processor_account.balance.to_f).to eq(
-        previous_balance + paypal_fee,
+        (previous_balance + paypal_fee).round(2),
       )
     end
 

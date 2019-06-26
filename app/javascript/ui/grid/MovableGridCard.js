@@ -55,6 +55,10 @@ const InnerCardWrapper = styled.div.attrs({
     `
     animation: ${bounceAnim(props.zoomLevel)} 0.25s ease-out;
     `};
+  @media print {
+    page-break-inside: avoid;
+    page-break-after: always;
+  }
 `
 
 const cardCSSTransition = 'transform 0.4s, width 0.25s, height 0.25s'
