@@ -4,11 +4,11 @@ import { FormControlLabel } from '@material-ui/core'
 
 import { SmallHelperText, DisplayTextCss } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
-import { validDemographicsCategories } from '~/ui/test_collections/RespondentDemographics'
 import {
   QuestionText,
   QuestionSpacingContainer,
 } from '~/ui/test_collections/shared'
+import { QuestionShape } from '~/ui/test_collections/DemographicsQuestionBase'
 
 const DemographicsResponseHolder = styled.div`
   background-color: ${props => props.theme.responseHolder};
@@ -83,17 +83,6 @@ export class DemographicsQuestionHolder extends React.Component {
     )
   }
 }
-
-export const QuestionShape = PropTypes.shape({
-  prompt: PropTypes.string.isRequired,
-  category: PropTypes.oneOf(validDemographicsCategories()).isRequired,
-  choices: PropTypes.arrayOf(
-    PropTypes.shape({
-      text: PropTypes.string.isRequired,
-      tags: PropTypes.arrayOf(PropTypes.string).isRequired,
-    })
-  ),
-})
 
 DemographicsQuestionHolder.propTypes = {
   question: QuestionShape.isRequired,

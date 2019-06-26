@@ -1,44 +1,31 @@
-import PropTypes from 'prop-types'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { Radio, RadioGroup } from '@material-ui/core'
 import { CheckCircle, RadioButtonUnchecked } from '@material-ui/icons'
 
 import {
   DemographicsQuestionHolder,
-  QuestionShape,
   StyledFormControlLabel,
-} from './DemographicsQuestionHolder'
+} from '~/ui/test_collections/DemographicsQuestionHolder'
+import DemographicsQuestionBase from '~/ui/test_collections/DemographicsQuestionBase'
 
-class DemographicsSingleChoiceQuestion extends React.Component {
+class DemographicsSingleChoiceQuestion extends DemographicsQuestionBase {
   state = {
     selectedChoice: null,
   }
 
   handleAnswer(choiceIndex) {
+    this.setState({
+      selectedChoice: choiceIndex,
+    })
+
     const {
-      user,
       question: { category, choices },
     } = this.props
 
     const choice = choices[choiceIndex]
 
-    if (user) {
-      user.API_updateCurrentUserDemographics({
-        category,
-        tags: choice.tags,
-      })
-    }
-
-    this.setState({
-      selectedChoice: choiceIndex,
-    })
+    this.updateUserDemographics({ category, tags: choice.tags })
 
     this.showNextQuestion()
-  }
-
-  showNextQuestion() {
-    const { onAnswer } = this.props
-    onAnswer()
   }
 
   render() {
@@ -73,16 +60,6 @@ class DemographicsSingleChoiceQuestion extends React.Component {
       </DemographicsQuestionHolder>
     )
   }
-}
-
-DemographicsSingleChoiceQuestion.propTypes = {
-  question: QuestionShape.isRequired,
-  user: MobxPropTypes.objectOrObservableObject,
-  onAnswer: PropTypes.func.isRequired,
-}
-
-DemographicsSingleChoiceQuestion.defaultProps = {
-  user: null,
 }
 
 export default DemographicsSingleChoiceQuestion

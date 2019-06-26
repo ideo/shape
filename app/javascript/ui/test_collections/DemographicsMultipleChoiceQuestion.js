@@ -1,15 +1,13 @@
-import PropTypes from 'prop-types'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { Checkbox, FormGroup } from '@material-ui/core'
 import { CheckCircle, RadioButtonUnchecked } from '@material-ui/icons'
 
 import {
   DemographicsQuestionHolder,
-  QuestionShape,
   StyledFormControlLabel,
-} from './DemographicsQuestionHolder'
+} from '~/ui/test_collections/DemographicsQuestionHolder'
+import DemographicsQuestionBase from '~/ui/test_collections/DemographicsQuestionBase'
 
-class DemographicsMultipleChoiceQuestion extends React.Component {
+class DemographicsMultipleChoiceQuestion extends DemographicsQuestionBase {
   state = {
     selections: [],
   }
@@ -22,12 +20,7 @@ class DemographicsMultipleChoiceQuestion extends React.Component {
     this.setState({ selections: new Array(choices.length).fill(false) })
   }
 
-  handleAnswer(choiceIndex, checked) {
-    const {
-      user,
-      question: { category, choices },
-    } = this.props
-
+  onChange(choiceIndex, checked) {
     // update selections
     const { selections } = this.state
 
@@ -36,21 +29,18 @@ class DemographicsMultipleChoiceQuestion extends React.Component {
     this.setState({ selections })
 
     // update demographic tags
+    const {
+      question: { category, choices },
+    } = this.props
+
     const tags = choices
       .map((choice, index) => (selections[index] ? choice.tags : []))
       .flat()
 
-    if (user) {
-      user.API_updateCurrentUserDemographics({
-        category,
-        tags,
-      })
-    }
-  }
-
-  showNextQuestion() {
-    const { onAnswer } = this.props
-    onAnswer()
+    this.updateUserDemographics({
+      category,
+      tags,
+    })
   }
 
   render() {
@@ -73,7 +63,7 @@ class DemographicsMultipleChoiceQuestion extends React.Component {
                 <Checkbox
                   checkedIcon={<CheckCircle />}
                   icon={<RadioButtonUnchecked />}
-                  onChange={(_e, checked) => this.handleAnswer(index, checked)}
+                  onChange={(_e, checked) => this.onChange(index, checked)}
                 />
               }
             />
@@ -82,16 +72,6 @@ class DemographicsMultipleChoiceQuestion extends React.Component {
       </DemographicsQuestionHolder>
     )
   }
-}
-
-DemographicsMultipleChoiceQuestion.propTypes = {
-  question: QuestionShape.isRequired,
-  user: MobxPropTypes.objectOrObservableObject,
-  onAnswer: PropTypes.func.isRequired,
-}
-
-DemographicsMultipleChoiceQuestion.defaultProps = {
-  user: null,
 }
 
 export default DemographicsMultipleChoiceQuestion
