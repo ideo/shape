@@ -40,12 +40,9 @@ class CollectionCardFilter < SimpleService
       )
     end
 
-    if @collection.archived
-      # Only return cards that were archived at the same time as parent
-      after_parent_archived = @collection.archived_at.advance(minutes: 10)
-      before_parent_archived = @collection.archived_at.advance(minutes: -10)
+    if @collection.archived? && @collection.archive_batch.present?
       @cards = @cards.where(
-        archived_at: before_parent_archived..after_parent_archived,
+        archive_batch: @collection.archive_batch,
       )
     else
       @cards = @cards.active

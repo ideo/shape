@@ -64,7 +64,7 @@ class SerializableItem < BaseJsonSerializer
   end
 
   attribute :can_edit_content do
-    !@object.archived && @current_ability.can?(:edit_content, @object)
+    @object.active? && @current_ability.can?(:edit_content, @object)
   end
 
   attribute :pinned_and_locked do

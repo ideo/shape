@@ -289,13 +289,6 @@ class Item < ApplicationRecord
     'items'
   end
 
-  # Items are restorable only if they are currently archived and their
-  # parent is not archived (otherwise they would be restored to an archived
-  # collection
-  def restorable?
-    archived && !parent.archived
-  end
-
   private
 
   def name_present?

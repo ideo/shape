@@ -108,6 +108,12 @@ module Archivable
     end
   end
 
+  # Records are restorable only if they are currently archived, and their parent
+  # is not archived (otherwise they would be restored to an archived collection)
+  def restorable?
+    archived? && !parent&.archived?
+  end
+
   private
 
   def archived_on_previous_save?

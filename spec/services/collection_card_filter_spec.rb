@@ -115,11 +115,11 @@ RSpec.describe CollectionCardFilter, type: :service do
     context 'with an archived collection' do
       before do
         collection.archive!
-        visible_card_2.archived_at = Time.now - 1.month
-        visible_card_2.save
+        # put this card in a different batch
+        visible_card_2.update(archive_batch: 'xyz')
       end
 
-      it 'should return all cards archived at same time as parent' do
+      it 'should return all cards archived in the same batch as parent' do
         expect(subject.size).to eq 2
         expect(subject).to match_array(
           [visible_card_1, archived_card],

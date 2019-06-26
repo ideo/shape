@@ -90,7 +90,8 @@ class SerializableCollection < BaseJsonSerializer
   attribute :can_edit_content do
     # NOTE: this also ends up coming into play when you are an editor
     # but the collection is "pinned_and_locked"
-    !@object.archived && @current_ability.can?(:edit_content, @object)
+    # -- also, if the collection is archived you can't edit content e.g. add/move cards
+    @object.active? && @current_ability.can?(:edit_content, @object)
   end
 
   attribute :submissions_collection_id, if: -> { @object.is_a? Collection::SubmissionBox } do
