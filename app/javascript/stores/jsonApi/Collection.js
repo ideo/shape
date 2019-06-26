@@ -855,7 +855,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const { routingStore } = apiStore
     await this.apiStore.unarchiveCards({
       cardIds: [this.parent_collection_card.id],
-      snapshot: null,
+      collection: this,
+      undoable: false,
     })
     if (this.parent) {
       routingStore.routeTo('collections', this.parent.id)

@@ -227,7 +227,8 @@ class Item extends SharedRecordMixin(BaseRecord) {
   async restore() {
     await this.apiStore.unarchiveCards({
       cardIds: [this.parent_collection_card.id],
-      snapshot: null,
+      collection: this.parent,
+      undoable: false,
     })
     routingStore.routeTo('collections', this.parent.id)
   }
