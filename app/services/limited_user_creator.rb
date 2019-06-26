@@ -54,8 +54,9 @@ class LimitedUserCreator < SimpleService
 
     return false if params.empty?
 
-    if Rails.env.development?
-      # always look up the same user so we don't keep creating real ones
+    if ENV['IDEO_SSO_ENV'] == 'production' && !Rails.env.production? && ENV['SHAPE_APP'] != 'production'
+      # if using prod SSO environment but not on shape-production,
+      # just look up the same test user to not push fake users to ideo-sso
       params[:email] = 'test.user@shape.space'
       params.delete :phone
     end
