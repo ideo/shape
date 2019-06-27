@@ -212,7 +212,9 @@ class TestSurveyResponder extends React.Component {
       })
     )
 
-    this.questionCards = questionCards
+    runInAction(() => {
+      this.questionCards = questionCards
+    })
   }
 
   isNonTestQuestionCard = card =>
@@ -303,7 +305,9 @@ class TestSurveyResponder extends React.Component {
     const { containerId } = this.props
     const index = questionCards.indexOf(card)
     const answerableIdx = this.answerableCards.indexOf(card)
-    this.currentCardIdx = answerableIdx + 1
+    runInAction(() => {
+      this.currentCardIdx = answerableIdx + 1
+    })
     const nextCard = questionCards[index + 1]
     if (!nextCard) return
     if (this.hasFinishedSurvey(nextCard)) this.refreshUserAfterSurvey()
