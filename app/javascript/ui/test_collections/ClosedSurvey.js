@@ -137,4 +137,6 @@ ClosedSurvey.defaultProps = {
   sessionUid: null,
 }
 
+ClosedSurvey.displayName = 'ClosedSurvey'
+
 export default ClosedSurvey

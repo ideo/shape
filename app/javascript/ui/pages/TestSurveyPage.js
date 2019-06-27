@@ -1,12 +1,11 @@
 import styled from 'styled-components'
 import { observable, runInAction } from 'mobx'
-import { observer } from 'mobx-react'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+
 import v from '~/utils/variables'
 import DialogWrapper from '~/ui/global/modals/DialogWrapper'
 import Logo from '~/ui/layout/Logo'
 import TestSurveyResponder from '~/ui/test_collections/TestSurveyResponder'
-import { apiStore } from '~/stores'
-
 import RespondentBanner from '~/ui/test_collections/RespondentBanner'
 
 const StyledBg = styled.div`
@@ -31,6 +30,7 @@ const StyledSurvey = styled.div`
   max-width: 580px; /* responsive but constrain media QuestionCards to 420px tall */
 `
 
+@inject('apiStore')
 @observer
 class TestSurveyPage extends React.Component {
   @observable
@@ -38,20 +38,21 @@ class TestSurveyPage extends React.Component {
 
   constructor(props) {
     super(props)
-    this.collection = apiStore.sync(window.collectionData)
+    this.collection = props.apiStore.sync(window.collectionData)
 
     if (window.nextAvailableId) {
       this.collection.setNextAvailableTestPath(
         `/tests/${window.nextAvailableId}`
       )
     }
-    apiStore.filestackToken = window.filestackToken
+    props.apiStore.filestackToken = window.filestackToken
     if (window.invalid) {
       this.collection.test_status = 'closed'
     }
   }
 
   async componentDidMount() {
+    const { apiStore } = this.props
     await apiStore.loadCurrentUser()
     runInAction(() => {
       this.loadedCurrentUser = true
@@ -59,22 +60,12 @@ class TestSurveyPage extends React.Component {
   }
 
   get currentUser() {
+    const { apiStore } = this.props
     return apiStore.currentUser
   }
 
-  get renderSurvey() {
-    const { collection } = this
-    if (!collection) return null
-
-    return (
-      <StyledSurvey data-cy="StandaloneTestSurvey">
-        <TestSurveyResponder collection={collection} editing={false} />
-      </StyledSurvey>
-    )
-  }
-
   render() {
-    if (!this.loadedCurrentUser) return ''
+    if (!this.loadedCurrentUser || !this.collection) return ''
     return (
       <React.Fragment>
         <StyledBg>
@@ -93,6 +84,10 @@ class TestSurveyPage extends React.Component {
       </React.Fragment>
     )
   }
+}
+
+TestSurveyPage.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default TestSurveyPage
