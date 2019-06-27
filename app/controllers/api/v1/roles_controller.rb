@@ -93,9 +93,8 @@ class Api::V1::RolesController < Api::V1::BaseController
   # This is necessary because the front-end doesn't use JSON:API spec,
   # but our Shape Ruby SDK does
   def root_object_params
-    root_object_params = json_api_params
-    root_object_params = json_api_params[:data][:attributes] if json_api_params[:data].present?
-    root_object_params
+    return json_api_params if json_api_params[:data].blank?
+    json_api_params[:data][:attributes]
   end
 
   def role_params
