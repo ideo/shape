@@ -163,6 +163,13 @@ class Group < ApplicationRecord
     true
   end
 
+  def update_from_network_profile(params)
+    %i[name external_id].each do |field|
+      send("#{field}=", params[field]) if params[field].present?
+    end
+    save
+  end
+
   private
 
   def create_shared_collection

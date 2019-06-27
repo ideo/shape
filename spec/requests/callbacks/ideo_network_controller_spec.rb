@@ -308,11 +308,11 @@ describe 'Ideo Profile API Requests' do
     end
 
     context 'invalid auth secret' do
-      let(:invalid_headers) {
+      let(:invalid_headers) do
         json_headers.merge(
           'Authorization': 'invalid_shared_secret',
         )
-      }
+      end
 
       it 'returns a 401' do
         post(
@@ -321,6 +321,141 @@ describe 'Ideo Profile API Requests' do
           headers: invalid_headers,
         )
         expect(response.status).to eq(401)
+      end
+    end
+  end
+
+  describe 'POST #group' do
+    let!(:group) { create(:group) }
+    let(:group_data) do
+      {
+        id: group.id,
+        uid: SecureRandom.hex(15),
+        name: group.name,
+        admin_ids: [],
+        member_ids: [],
+      }
+    end
+
+    context 'event: created' do
+      before do
+        post(
+          '/callbacks/ideo_network/groups',
+          params: { id: group.id, event: :created, data: { attributes: group_data } }.to_json,
+          headers: valid_headers,
+        )
+      end
+
+      it 'returns a 200' do
+        expect(response.status).to eq(200)
+      end
+
+      it 'creates the group' do
+        expect(Group.last.name).to eq(group.name)
+      end
+    end
+
+    context 'event: deleted' do
+      before do
+        post(
+          '/callbacks/ideo_network/groups',
+          params: { id: group.id, event: :deleted, data: { attributes: group_data } }.to_json,
+          headers: valid_headers,
+        )
+      end
+
+      it 'returns a 200' do
+        expect(response.status).to eq(200)
+      end
+
+      it 'archives the group' do
+        group.reload
+        expect(group.archived).to be true
+      end
+    end
+
+    context 'event: updated' do
+      it 'returns a 200' do
+        post(
+          '/callbacks/ideo_network/groups',
+          params: { id: group.id, event: :updated, data: { attributes: group_data } }.to_json,
+          headers: valid_headers,
+        )
+        expect(response.status).to eq(200)
+      end
+
+      it 'updates the group' do
+        expect(group.name).not_to eq('Fancy')
+
+        post(
+          '/callbacks/ideo_network/groups',
+          params: {
+            id: group.id,
+            event: :updated,
+            data: {
+              attributes: {
+                id: group.id,
+                name: 'Fancy',
+              },
+            },
+          }.to_json,
+          headers: valid_headers,
+        )
+
+        group.reload
+        expect(group.name).to eq('Fancy')
+      end
+    end
+  end
+
+  describe 'POST #users_role' do
+    let(:user) { create(:user) }
+    let!(:group) { create(:group) }
+    let(:users_role) { user.add_role(:member, group) }
+
+    let(:users_role_data) do
+      {
+        id: users_role.id,
+        name: 'member',
+        user_id: user.id,
+        resource_type: 'Group',
+        resource_id: group.id,
+      }
+    end
+
+    context 'event: added' do
+      before do
+        post(
+          '/callbacks/ideo_network/users_roles',
+          params: { id: users_role.id, event: :added, data: { attributes: users_role_data } }.to_json,
+          headers: valid_headers,
+        )
+      end
+
+      it 'returns a 200' do
+        expect(response.status).to eq(200)
+      end
+
+      it 'assigns the new role' do
+        expect(user.has_role?(:member, group)).to be true
+      end
+    end
+
+    context 'event: added' do
+      before do
+        post(
+          '/callbacks/ideo_network/users_roles',
+          params: { id: users_role.id, event: :added, data: { attributes: users_role_data } }.to_json,
+          headers: valid_headers,
+        )
+      end
+
+      it 'returns a 200' do
+        expect(response.status).to eq(200)
+      end
+
+      it 'assigns the new role' do
+        expect(user.has_role?(:member, group)).to be true
       end
     end
   end
