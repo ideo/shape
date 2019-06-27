@@ -409,6 +409,7 @@ export const fakeCollection = {
   ...fakeJsonApiAttrs,
 }
 // also set parentCollection on fakeCard
+// TODO: fix circular reference!
 fakeCollectionCard.parentCollection = { ...fakeCollection }
 
 export const fakeGroupAttrs = {
