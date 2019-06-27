@@ -148,7 +148,7 @@ describe('CollectionPage', () => {
       )
     })
 
-    it('should call uiStore to open the comments', () => {
+    it('should call uiStore to open the group editing modal', () => {
       expect(uiStore.openOptionalMenus).toHaveBeenCalledWith(
         '?manage_group_id=1'
       )
