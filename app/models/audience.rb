@@ -60,11 +60,11 @@ class Audience < ApplicationRecord
     # 2. audiences they have launched tests with recently
     # 3. all other audiences ordered by name
     # - `order` is selected via ROW_NUMBER to preserve sort order on frontend
-    order_sql = %(
+    order_sql = Arel.sql(%(
       audiences.global_default ASC NULLS LAST,
       MAX(test_audiences.updated_at) DESC NULLS LAST,
       lower(audiences.name) ASC
-    )
+    ))
     viewable_by_org(organization)
       .joins(%(
         LEFT JOIN test_audiences ON test_audiences.audience_id = audiences.id
