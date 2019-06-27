@@ -46,6 +46,10 @@ class RecontactQuestion extends React.Component {
         showFeedbackRecontact: false,
         showContactInfo: true,
       })
+    } else if (user) {
+      this.setState({
+        submittedContactInfo: true,
+      })
     }
   }
 
@@ -84,8 +88,9 @@ class RecontactQuestion extends React.Component {
     const user = this.props.user || this.state.createdUser
     this.setState({ answer: choice })
 
-    if (choice === 'feedback_contact_yes' && !user) {
-      this.setState({ showContactInfo: true })
+    if (!user) {
+      const showContactInfo = choice === 'feedback_contact_yes'
+      this.setState({ showContactInfo })
       return
     }
     if (user) {
@@ -162,7 +167,7 @@ class RecontactQuestion extends React.Component {
               opportunities for you.
             </QuestionText>
             <EmojiHolder data-cy="PostOptInEmojiHolder">
-              <Emoji size="large" name="Okay gesture" symbol="👌" />
+              <Emoji size="large" name="Okay gesture" symbol="🙌" />
             </EmojiHolder>
           </div>
         )
