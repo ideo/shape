@@ -26,4 +26,8 @@ class SerializableGroup < BaseJsonSerializer
     # the front end
     @object.can_edit? @current_user
   end
+
+  link :manage do
+    "#{ENV['BASE_HOST']}/#{@object.organization.slug}?manage_group_id=#{@object.id}"
+  end
 end

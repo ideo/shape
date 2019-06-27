@@ -131,13 +131,13 @@ class CollectionPage extends React.Component {
     if (collection.joinable_group_id) {
       apiStore.checkJoinableGroup(collection.joinable_group_id)
     }
+    if (apiStore.currentUser && routingStore.query) {
+      uiStore.openOptionalMenus(routingStore.query)
+    }
     if (collection.isNormalCollection) {
       if (apiStore.currentUser) {
         const thread = await apiStore.findOrBuildCommentThread(collection)
         uiStore.expandThread(thread.key)
-        if (routingStore.query) {
-          uiStore.openOptionalMenus(routingStore.query)
-        }
       }
       this.checkSubmissionBox()
     } else {

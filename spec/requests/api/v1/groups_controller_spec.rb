@@ -69,6 +69,7 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
     it 'matches JSON schema' do
       get(path)
       expect(json['data']['attributes']).to match_json_schema('group')
+      expect(json['data']['links']['manage']).to match("/#{organization.slug}?manage_group_id=#{group.id}")
     end
 
     it 'includes the role' do
@@ -228,9 +229,7 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
     let(:params) do
       json_api_params(
         'groups',
-        {
-          name: 'Creative Competitors',
-        }
+        name: 'Creative Competitors',
       )
     end
 
