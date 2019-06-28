@@ -648,6 +648,17 @@ describe Collection::TestCollection, type: :model do
           'launchable_test_id' => submission_test.id,
         )
       end
+
+      it 'should only run if the test itself is live' do
+        submission_test.reload
+        test_collection.update_submissions_launch_status
+        submission.reload
+        submission_template.reload
+        expect(submission_template.submission_attrs).to eq(nil)
+        expect(submission.submission_attrs).to eq(
+          'submission' => true,
+        )
+      end
     end
 
     describe '#close!' do
