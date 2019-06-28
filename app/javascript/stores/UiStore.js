@@ -64,6 +64,8 @@ export default class UiStore {
   adminUsersMenuOpen = null
   @observable
   adminAudienceMenuOpen = null
+  @observable
+  feedbackAudienceMenuOpen = null
   defaultGridSettings = {
     // layout will track we are at "size 3" i.e. "small 4 cols" even though cols === 4
     layoutSize: 4,

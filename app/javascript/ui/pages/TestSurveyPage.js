@@ -1,12 +1,11 @@
 import styled from 'styled-components'
-import { PropTypes as MobxPropTypes, observer } from 'mobx-react'
+import { observable, runInAction } from 'mobx'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+
 import v from '~/utils/variables'
 import DialogWrapper from '~/ui/global/modals/DialogWrapper'
 import Logo from '~/ui/layout/Logo'
 import TestSurveyResponder from '~/ui/test_collections/TestSurveyResponder'
-import { apiStore } from '~/stores'
-import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
-import ClosedSurvey from '~/ui/test_collections/ClosedSurvey'
 import RespondentBanner from '~/ui/test_collections/RespondentBanner'
 
 const StyledBg = styled.div`
@@ -31,108 +30,42 @@ const StyledSurvey = styled.div`
   max-width: 580px; /* responsive but constrain media QuestionCards to 420px tall */
 `
 
+@inject('apiStore')
 @observer
 class TestSurveyPage extends React.Component {
-  state = {
-    surveyResponse: null,
-  }
+  @observable
+  loadedCurrentUser = false
 
   constructor(props) {
     super(props)
-    this.collection = props.collection || apiStore.sync(window.collectionData)
+    this.collection = props.apiStore.sync(window.collectionData)
+
     if (window.nextAvailableId) {
       this.collection.setNextAvailableTestPath(
         `/tests/${window.nextAvailableId}`
       )
     }
-    apiStore.filestackToken = window.filestackToken
+    props.apiStore.filestackToken = window.filestackToken
     if (window.invalid) {
       this.collection.test_status = 'closed'
     }
   }
 
   async componentDidMount() {
+    const { apiStore } = this.props
     await apiStore.loadCurrentUser()
-    if (!apiStore.currentUser) return
-    await this.fetchSurveyResponse()
-  }
-
-  async fetchSurveyResponse() {
-    const surveyResponseId = this.collection.survey_response_for_user_id
-    const surveyResponseResult =
-      surveyResponseId &&
-      (await apiStore.fetch('survey_responses', surveyResponseId))
-    const surveyResponse = surveyResponseResult
-      ? surveyResponseResult.data
-      : null
-    this.setState({
-      surveyResponse,
+    runInAction(() => {
+      this.loadedCurrentUser = true
     })
   }
 
-  createSurveyResponse = async () => {
-    const newResponse = new SurveyResponse(
-      {
-        test_collection_id: this.collection.id,
-      },
-      apiStore
-    )
-    try {
-      const surveyResponse = await newResponse.save()
-      if (surveyResponse) {
-        this.setState({ surveyResponse })
-      }
-      return surveyResponse
-    } catch (e) {
-      this.collection.test_status = 'closed'
-    }
-  }
-
   get currentUser() {
-    const { currentUser } = apiStore
-
-    return currentUser
-  }
-
-  get includeRecontactQuestion() {
-    return (
-      !this.collection.live_test_collection &&
-      (!this.currentUser ||
-        this.currentUser.feedback_contact_preference ===
-          'feedback_contact_unanswered')
-    )
-  }
-
-  get includeTerms() {
-    return !this.currentUser || !this.currentUser.respondent_terms_accepted
-  }
-
-  get renderSurvey() {
-    const { collection, createSurveyResponse } = this
-    const { surveyResponse } = this.state
-    if (!collection) return null
-
-    return (
-      <StyledSurvey data-cy="StandaloneTestSurvey">
-        <TestSurveyResponder
-          collection={collection}
-          surveyResponse={surveyResponse}
-          createSurveyResponse={createSurveyResponse}
-          editing={false}
-          includeRecontactQuestion={this.includeRecontactQuestion}
-          includeTerms={this.includeTerms}
-        />
-      </StyledSurvey>
-    )
-  }
-
-  get sessionUid() {
-    const { surveyResponse } = this.state
-
-    surveyResponse ? surveyResponse.session_uid : null
+    const { apiStore } = this.props
+    return apiStore.currentUser
   }
 
   render() {
+    if (!this.loadedCurrentUser || !this.collection) return ''
     return (
       <React.Fragment>
         <StyledBg>
@@ -143,27 +76,18 @@ class TestSurveyPage extends React.Component {
             <Logo withText width={83} />
           </LogoWrapper>
           <DialogWrapper />
-          {this.collection.test_status === 'live' ? (
-            this.renderSurvey
-          ) : (
-            <ClosedSurvey
-              includeRecontactQuestion={this.includeRecontactQuestion}
-              currentUser={this.currentUser}
-              sessionUid={this.sessionUid}
-            />
-          )}
+
+          <StyledSurvey data-cy="StandaloneTestSurvey">
+            <TestSurveyResponder collection={this.collection} editing={false} />
+          </StyledSurvey>
         </StyledBg>
       </React.Fragment>
     )
   }
 }
 
-TestSurveyPage.propTypes = {
-  collection: MobxPropTypes.objectOrObservableObject,
-}
-
-TestSurveyPage.defaultProps = {
-  collection: undefined,
+TestSurveyPage.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default TestSurveyPage
