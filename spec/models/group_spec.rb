@@ -4,6 +4,18 @@ RSpec.describe Group, type: :model do
   let(:organization) { create(:organization) }
   let(:group) { create(:group, organization: organization) }
 
+  describe 'callbacks' do
+    describe '#set_unique_handle' do
+      let!(:group_2) do
+        create(:group, organization: organization, handle: group.handle)
+      end
+
+      it 'automatically generates unique handle' do
+        expect(group_2.handle).to eq(group.handle + '-1')
+      end
+    end
+  end
+
   it 'should create a group shared collection' do
     expect(group.current_shared_collection).to be_truthy
   end

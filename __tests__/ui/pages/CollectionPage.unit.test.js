@@ -135,6 +135,25 @@ describe('CollectionPage', () => {
     })
   })
 
+  describe('with params ?manage_group_id=1', () => {
+    beforeEach(() => {
+      wrapper = shallow(
+        <CollectionPage.wrappedComponent
+          {...props}
+          routingStore={{
+            ...routingStore,
+            query: '?manage_group_id=1',
+          }}
+        />
+      )
+    })
+
+    it('should call uiStore to open the group editing modal', () => {
+      expect(uiStore.openOptionalMenus).toHaveBeenCalledWith(
+        '?manage_group_id=1'
+      )
+    })
+  })
   describe('with undoAfterRoute', () => {
     beforeEach(() => {
       wrapper = shallow(

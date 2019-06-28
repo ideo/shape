@@ -75,6 +75,61 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
         post(path, params: params)
       end
 
+      context 'with api token', api_token: true, auth: false do
+        let!(:application_organization) do
+          create(
+            :application_organization,
+            application: @api_token.application,
+            organization: organization)
+        end
+        let!(:organization) { create(:organization) }
+        let(:json_api_params) {
+          {
+            data: {
+              attributes: {
+                role: { name: role_name },
+                user_ids: user_ids,
+              },
+            },
+          }.to_json
+        }
+
+        context 'if user is not editor on collection' do
+          # Adds user as editor of collection
+          let!(:user) { create(:user) }
+
+          it 'does not add role' do
+            expect(Roles::MassAssign).not_to receive(:new)
+            post(path, params: json_api_params)
+            expect(response.status).to eq(401)
+          end
+        end
+
+        context "with collection's organization linked" do
+          # Adds user as editor of collection
+          let!(:user) { @api_token.application.user }
+
+          it 'returns a 204 no_content' do
+            post(path, params: json_api_params)
+            expect(response.status).to eq(204)
+          end
+
+          it 'adds role' do
+            expect(Roles::MassAssign).to receive(:new).with(
+              hash_including(
+                object: collection,
+                users: users,
+                role_name: Role::EDITOR.to_s,
+                propagate_to_children: true,
+                new_role: true,
+                invited_by: user,
+              ),
+            )
+            post(path, params: json_api_params)
+          end
+        end
+      end
+
       context 'granting access to a group' do
         let(:params) {
           {
