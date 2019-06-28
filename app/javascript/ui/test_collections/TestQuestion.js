@@ -12,6 +12,7 @@ import NewQuestionGraphic from '~/ui/icons/NewQuestionGraphic'
 import OpenQuestion from '~/ui/test_collections/OpenQuestion'
 import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
 import DemographicsSingleChoiceQuestion from '~/ui/test_collections/DemographicsSingleChoiceQuestion'
+import DemographicsMultipleChoiceQuestion from '~/ui/test_collections/DemographicsMultipleChoiceQuestion'
 import DemographicsIntroQuestion from '~/ui/test_collections/DemographicsIntroQuestion'
 import TermsQuestion from '~/ui/test_collections/TermsQuestion'
 import WelcomeQuestion from '~/ui/test_collections/WelcomeQuestion'
@@ -50,14 +51,17 @@ class TestQuestion extends React.Component {
       createSurveyResponse,
       afterQuestionAnswered,
     } = this.props
-    const { text, number } = answer
-    let { surveyResponse, questionAnswer } = this.props
+
     // components should never trigger this when editing, but double-check here
     if (editing) return
+
     if (NON_TEST_QUESTION_TYPES.includes(card.card_question_type)) {
       afterQuestionAnswered(card, answer)
       return
     }
+
+    const { text, number } = answer
+    let { surveyResponse, questionAnswer } = this.props
 
     if (!questionAnswer) {
       if (!surveyResponse) {
@@ -219,6 +223,15 @@ class TestQuestion extends React.Component {
       case 'question_demographics_single_choice':
         return (
           <DemographicsSingleChoiceQuestion
+            question={card}
+            onAnswer={this.handleQuestionAnswer}
+            user={apiStore.currentUser}
+          />
+        )
+
+      case 'question_demographics_multiple_choice':
+        return (
+          <DemographicsMultipleChoiceQuestion
             question={card}
             onAnswer={this.handleQuestionAnswer}
             user={apiStore.currentUser}

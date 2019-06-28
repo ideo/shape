@@ -1,6 +1,7 @@
 import { kebabCase, uniq } from 'lodash'
 
 const CHOICE_STYLE_SINGLE = 'single'
+const CHOICE_STYLE_MULTIPLE = 'multiple'
 
 const EDUCATION_HIGH_SCHOOL = 'High school'
 const EDUCATION_VOCATIONAL = 'Vocational training'
@@ -30,8 +31,21 @@ const RESIDENCE_URBAN = 'Urban Dweller'
 const RESIDENCE_SUBURBAN = 'Suburban Dweller'
 const RESIDENCE_RURAL = 'Rural Dweller'
 
+const CHILDREN_NO = 'No Children'
+const CHILDREN_YOUNG = 'Parents of young children'
+const CHILDREN_TEEN = 'Parents of teenagers'
+const CHILDREN_ADULT = 'Parents of adult children'
+
+const EMPLOYMENT_FULLTIME = 'Full-time'
+const EMPLOYMENT_PARTTIME = 'Part-time'
+const EMPLOYMENT_SEEKER = 'Job Seeker'
+const EMPLOYMENT_STUDENT = 'Student'
+const EMPLOYMENT_RETIRED = 'Retired'
+const EMPLOYMENT_OTHER = 'Other'
+
 const choiceStyleCardQuestionTypeMap = {
   [CHOICE_STYLE_SINGLE]: 'question_demographics_single_choice',
+  [CHOICE_STYLE_MULTIPLE]: 'question_demographics_multiple_choice',
 }
 
 const questions = [
@@ -139,6 +153,42 @@ const questions = [
         text: `Rural area: there’s nature all around and going to the city is a trip`,
         tags: [RESIDENCE_RURAL],
       },
+    ],
+  },
+  {
+    text: `Do you have any children?`,
+    category: 'children_ages',
+    choiceStyle: CHOICE_STYLE_MULTIPLE,
+    choices: [
+      { text: `No`, tags: [CHILDREN_NO] },
+      {
+        text: `Yes, I have one or more kids younger than 12`,
+        tags: [CHILDREN_YOUNG],
+      },
+      {
+        text: `Yes, I have one or more kids aged 12-17`,
+        tags: [CHILDREN_TEEN],
+      },
+      {
+        text: `Yes, but my kids are older than 17`,
+        tags: [CHILDREN_ADULT],
+      },
+    ],
+  },
+  {
+    text: `Which best describes your work situation?`,
+    category: 'employment_types',
+    choiceStyle: CHOICE_STYLE_MULTIPLE,
+    choices: [
+      {
+        text: `I have a full time job (35+ hours per week)`,
+        tags: [EMPLOYMENT_FULLTIME],
+      },
+      { text: `I work part time`, tags: [EMPLOYMENT_PARTTIME] },
+      { text: `I’m currently looking for a job`, tags: [EMPLOYMENT_SEEKER] },
+      { text: `I’m a student (full or part time)`, tags: [EMPLOYMENT_STUDENT] },
+      { text: `I’m retired`, tags: [EMPLOYMENT_RETIRED] },
+      { text: `Other`, tags: [EMPLOYMENT_OTHER] },
     ],
   },
 ]

@@ -1,4 +1,4 @@
-import { Radio, RadioGroup } from '@material-ui/core'
+import { Checkbox, FormGroup } from '@material-ui/core'
 import { CheckCircle, RadioButtonUnchecked } from '@material-ui/icons'
 
 import {
@@ -7,25 +7,40 @@ import {
 } from '~/ui/test_collections/DemographicsQuestionHolder'
 import DemographicsQuestionBase from '~/ui/test_collections/DemographicsQuestionBase'
 
-class DemographicsSingleChoiceQuestion extends DemographicsQuestionBase {
+class DemographicsMultipleChoiceQuestion extends DemographicsQuestionBase {
   state = {
-    selectedChoice: null,
+    selections: [],
   }
 
-  handleAnswer(choiceIndex) {
-    this.setState({
-      selectedChoice: choiceIndex,
-    })
+  componentDidMount() {
+    const {
+      question: { choices },
+    } = this.props
 
+    this.setState({ selections: new Array(choices.length).fill(false) })
+  }
+
+  onChange(choiceIndex, checked) {
+    // update selections
+    const { selections } = this.state
+
+    selections[choiceIndex] = checked
+
+    this.setState({ selections })
+
+    // update demographic tags
     const {
       question: { category, choices },
     } = this.props
 
-    const choice = choices[choiceIndex]
+    const tags = choices
+      .map((choice, index) => (selections[index] ? choice.tags : []))
+      .flat()
 
-    this.updateUserDemographics({ category, tags: choice.tags })
-
-    this.showNextQuestion()
+    this.updateUserDemographics({
+      category,
+      tags,
+    })
   }
 
   render() {
@@ -33,33 +48,30 @@ class DemographicsSingleChoiceQuestion extends DemographicsQuestionBase {
 
     return (
       <DemographicsQuestionHolder
-        instructions="This question is optional."
+        instructions="Please select all that apply. This question is optional."
         question={question}
         onNextQuestion={() => this.showNextQuestion()}
       >
-        <RadioGroup
-          value={this.state.selectedChoice}
-          onChange={(_e, value) => this.handleAnswer(value)}
-        >
+        <FormGroup>
           {question.choices.map((choice, index) => (
             <StyledFormControlLabel
               key={index}
-              value={index.toString()}
               classes={{ label: 'label' }}
               label={choice.text}
               labelPlacement="end"
               control={
-                <Radio
+                <Checkbox
                   checkedIcon={<CheckCircle />}
                   icon={<RadioButtonUnchecked />}
+                  onChange={(_e, checked) => this.onChange(index, checked)}
                 />
               }
             />
           ))}
-        </RadioGroup>
+        </FormGroup>
       </DemographicsQuestionHolder>
     )
   }
 }
 
-export default DemographicsSingleChoiceQuestion
+export default DemographicsMultipleChoiceQuestion
