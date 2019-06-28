@@ -19,12 +19,11 @@ const MAX_ORGS_IN_LIST = 10
 
 const IconHolder = styled.span`
   .org_avatar {
-    display: inline-block;
-    margin-bottom: 7px;
-    margin-left: 0;
-    margin-right: 15px;
-    margin-top: 7px;
-    vertical-align: middle;
+    left: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    position: absolute;
+    line-height: 1.4rem;
   }
 `
 IconHolder.displayName = 'StyledIconHolder'
@@ -244,6 +243,7 @@ class MainMenuDropdown extends React.Component {
           id: org.id,
           name: org.primary_group.name,
           iconLeft: avatar,
+          withAvatar: true,
           onClick: this.handleSwitchOrg(org),
           noBorder: true,
         }

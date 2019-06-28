@@ -13,39 +13,53 @@ const captureGlobalKeypress = e => {
     ]).length > 0
 
   if (shouldNormalKeyPressBeAllowed) return false
-
-  switch (e.code) {
+  const { code, metaKey, ctrlKey, shiftKey } = e
+  const { viewingCollection } = uiStore
+  switch (code) {
     case 'KeyX':
-      if (e.metaKey || e.ctrlKey) {
+      if (!viewingCollection) {
+        return false
+      }
+      if (metaKey || ctrlKey) {
+        const { id: viewingCollectionId } = viewingCollection
         uiStore.openMoveMenu({
-          from: uiStore.viewingCollection.id, // CTRL+X: Move
+          from: viewingCollectionId, // CTRL+X: Move
           cardAction: 'move',
         })
       }
       break
     case 'KeyC':
-      if (e.metaKey || e.ctrlKey)
+      if (!viewingCollection) {
+        return false
+      }
+      if (metaKey || ctrlKey) {
+        const { id: viewingCollectionId } = viewingCollection
         uiStore.openMoveMenu({
-          from: uiStore.viewingCollection.id, // CTRL+C: Duplicate
+          from: viewingCollectionId, // CTRL+C: Duplicate
           cardAction: 'duplicate',
         })
+      }
       break
     case 'KeyV':
-      if (e.metaKey || e.ctrlKey) {
+      if (metaKey || ctrlKey) {
         // CTRL+V: Place
         // MoveModal will listen to this value and then set it to false
         uiStore.update('pastingCards', true)
       }
       break
     case 'KeyZ':
-      if (e.metaKey || e.ctrlKey) {
+      if (shiftKey && (metaKey || ctrlKey)) {
+        undoStore.handleRedoKeyPress() // CTRL+Shift+Z: Redo
+        break
+      }
+      if (metaKey || ctrlKey) {
         undoStore.handleUndoKeypress() // CTRL+Z: Undo
       }
       break
     case 'Backspace':
     case 'Delete':
       const { selectedCardIds } = uiStore
-      if (!selectedCardIds.length) {
+      if (!selectedCardIds || !selectedCardIds.length) {
         return false
       }
       const card = apiStore.find('collection_cards', selectedCardIds[0])

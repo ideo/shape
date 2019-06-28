@@ -85,11 +85,21 @@ export const StyledHeader = styled.header`
   width: 100%;
   padding: 0 ${v.containerPadding.horizontal}rem 1.875rem;
   position: relative; /* necessary to get above the FixedBoundary */
+  // Page headers should still show up in print styles
   @media print {
-    display: none;
+    ${props =>
+      props.pageHeader &&
+      `
+      display: block;
+      position: fixed;
+      top: 0;
+    `};
   }
 `
 StyledHeader.displayName = 'StyledHeader'
+StyledHeader.defaultProps = {
+  pageHeader: false,
+}
 
 export const FixedHeader = styled(StyledHeader)`
   position: fixed;
@@ -106,6 +116,9 @@ export const FixedHeader = styled(StyledHeader)`
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
     padding-left: 5px;
     padding-right: 5px;
+  }
+  @media print {
+    display: none !important;
   }
 `
 FixedHeader.displayName = 'FixedHeader'

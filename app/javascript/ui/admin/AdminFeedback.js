@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { Flex } from 'reflexbox'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import axios from 'axios'
 
 import AdminNewQueryModal from './AdminNewQueryModal'
 import AdminNewQueryRow from './AdminNewQueryRow'
@@ -16,6 +17,7 @@ import LinkIcon from '~/ui/icons/LinkIcon'
 import SearchLargeIcon from '~/ui/icons/SearchLargeIcon'
 import DownloadIcon from '~/ui/icons/DownloadIcon'
 import Section from '~shared/components/molecules/Section'
+import { Select, SelectOption } from '~/ui/global/styled/forms'
 import v from '~/utils/variables'
 import { Heading1, Heading2, Heading3 } from '~/ui/global/styled/typography'
 import Tooltip from '~/ui/global/Tooltip'
@@ -117,16 +119,18 @@ const ExportIncentivesButton = styled(Heading3)`
 class AdminFeedback extends React.Component {
   state = {
     testCollections: [],
+    monthsForExport: [],
     currentPage: 1,
     totalPages: 1,
     newQueryModalOpen: false,
     newQueryResponseCount: null,
     newQueryRowVisible: false,
-    selectedCollection: null,
+    selectedTestAudience: null,
   }
 
   componentDidMount() {
     this.loadTestCollections(this.state.currentPage)
+    this.loadMonthsForFinanceExport()
   }
 
   async loadTestCollections(page) {
@@ -138,8 +142,25 @@ class AdminFeedback extends React.Component {
     })
   }
 
+  async loadMonthsForFinanceExport() {
+    const response = await axios.get(
+      '/api/v1/admin/paid_tests/months_with_purchases'
+    )
+    this.setState({
+      monthsForExport: response.data.months,
+    })
+  }
+
+  handleFinanceExportSelection = e => {
+    const month = e.target.value
+    if (!month) return
+    window.location.href = `/api/v1/admin/paid_tests/finance_export.csv?month=${month}`
+    return false
+  }
+
   handleDownloadFeedbackIncentives = () => {
-    window.location.href = '/api/v1/admin/feedback_incentives.csv'
+    window.location.href =
+      '/api/v1/admin/paid_tests/pending_incentives_export.csv'
     uiStore.popupSnackbar({
       message: 'All incentives marked as paid!',
     })
@@ -165,10 +186,10 @@ class AdminFeedback extends React.Component {
     this.setState({ newQueryModalOpen: false })
   }
 
-  showNewQueryRow(collection) {
+  showNewQueryRow(audience) {
     this.setState({
       newQueryRowVisible: true,
-      selectedCollection: collection,
+      selectedTestAudience: audience,
     })
   }
 
@@ -176,9 +197,9 @@ class AdminFeedback extends React.Component {
     this.setState({ newQueryRowVisible: false })
   }
 
-  showAdminAudienceDialog = collection => {
+  showAdminAudienceDialog = audience => {
     const { uiStore } = this.props
-    this.setState({ selectedCollection: collection })
+    this.setState({ selectedTestAudience: audience })
     uiStore.update('adminAudienceMenuOpen', true)
   }
 
@@ -203,22 +224,22 @@ class AdminFeedback extends React.Component {
               : null}
           </Grid>
           <Grid container item xs={5}>
-            {testCollection.test_audiences.map(testCollection => {
+            {testCollection.test_audiences.map(testAudience => {
               const editingQuery =
                 this.state.newQueryRowVisible &&
-                this.state.selectedCollection &&
-                testCollection.id === this.state.selectedCollection.id
+                this.state.selectedTestAudience &&
+                testAudience.id === this.state.selectedTestAudience.id
 
               const audienceNameStyle = editingQuery
                 ? { borderBottom: `1px solid ${v.colors.black}` }
                 : undefined
 
               return (
-                <React.Fragment key={testCollection.id}>
+                <React.Fragment key={testAudience.id}>
                   <AudienceRowItem item xs={5}>
                     <AudienceWrapper align="center">
                       <div style={audienceNameStyle}>
-                        {testCollection.audience.name}
+                        {testAudience.audience.name}
                       </div>
                       <Flex className="show-on-hover">
                         <IconAvatar
@@ -226,14 +247,12 @@ class AdminFeedback extends React.Component {
                           backgroundColor={v.colors.commonLight}
                           data-cy="NewQueryButton"
                           title="start new query"
-                          onClick={() => this.showNewQueryRow(testCollection)}
+                          onClick={() => this.showNewQueryRow(testAudience)}
                         >
                           <SearchLargeIcon />
                         </IconAvatar>
                         <CopyToClipboard
-                          text={`${testCollection.publicTestURL}?ta=${
-                            testCollection.id
-                          }`}
+                          text={`${testCollection.publicTestURL}?ta=${testAudience.id}`}
                           onCopy={() =>
                             this.props.uiStore.popupSnackbar({
                               message: 'Survey link copied',
@@ -260,7 +279,7 @@ class AdminFeedback extends React.Component {
                             backgroundColor={v.colors.commonLight}
                             data-cy="AudienceInfoButton"
                             onClick={() => {
-                              this.showAdminAudienceDialog(testCollection)
+                              this.showAdminAudienceDialog(testAudience)
                             }}
                           >
                             <SizedIcon>
@@ -272,14 +291,14 @@ class AdminFeedback extends React.Component {
                     </AudienceWrapper>
                   </AudienceRowItem>
                   <AudienceRowItem item xs={2}>
-                    <Flex justify="flex-end">{testCollection.sample_size}</Flex>
+                    <Flex justify="flex-end">{testAudience.sample_size}</Flex>
                   </AudienceRowItem>
                   <AudienceRowItem item xs={3}>
                     <Flex justify="flex-end">0</Flex>
                   </AudienceRowItem>
                   <AudienceRowItem item xs={2}>
                     <Flex justify="flex-end">
-                      {testCollection.num_survey_responses}
+                      {testAudience.num_completed_responses}
                     </Flex>
                   </AudienceRowItem>
                   {editingQuery && (
@@ -306,8 +325,9 @@ class AdminFeedback extends React.Component {
     const {
       currentPage,
       totalPages,
-      selectedCollection,
+      selectedTestAudience,
       newQueryModalOpen,
+      monthsForExport,
       newQueryResponseCount,
     } = this.state
     const previousPageDisabled = currentPage === 1
@@ -317,24 +337,49 @@ class AdminFeedback extends React.Component {
     return (
       <Wrapper>
         {uiStore.adminAudienceMenuOpen && (
-          <AdminAudienceModal audience={selectedCollection.audience} open />
+          <AdminAudienceModal audience={selectedTestAudience.audience} open />
         )}
         <Heading1>Feedback</Heading1>
         <Section>
           <Grid container>
-            <Grid item xs={6}>
+            <Grid item xs={4}>
               <Box mb={40}>
                 <Heading2 data-cy="AdminHeader">All Shape Feedback</Heading2>
               </Box>
             </Grid>
-            <Grid item xs={6}>
-              <Flex justify="flex-end">
-                <ExportIncentivesButton
-                  onClick={this.handleDownloadFeedbackIncentives}
-                >
-                  <DownloadIcon />
-                  Export Pending Incentives
-                </ExportIncentivesButton>
+            <Grid item xs={8}>
+              <Flex style={{ flexDirection: 'column' }}>
+                <Box mb={5} style={{ alignSelf: 'flex-end' }}>
+                  <ExportIncentivesButton
+                    onClick={this.handleDownloadFeedbackIncentives}
+                  >
+                    <DownloadIcon />
+                    Export Pending Incentives
+                  </ExportIncentivesButton>
+                </Box>
+                <Box mb={20} style={{ alignSelf: 'flex-end' }}>
+                  <Select
+                    classes={{ root: 'select' }}
+                    disableUnderline
+                    displayEmpty
+                    name="finance_export_month"
+                    onChange={this.handleFinanceExportSelection}
+                    value=""
+                  >
+                    <SelectOption value="" key="empty">
+                      IDEO Finance Report
+                    </SelectOption>
+                    {monthsForExport.map(month => (
+                      <SelectOption
+                        classes={{ root: 'selectOption', selected: 'selected' }}
+                        key={month}
+                        value={month}
+                      >
+                        {month}
+                      </SelectOption>
+                    ))}
+                  </Select>
+                </Box>
               </Flex>
             </Grid>
           </Grid>
@@ -407,7 +452,7 @@ class AdminFeedback extends React.Component {
           <AdminNewQueryModal
             open
             close={() => this.closeNewQueryModal()}
-            audience={selectedCollection.audience}
+            audience={selectedTestAudience.audience}
             responseCount={newQueryResponseCount}
           />
         )}

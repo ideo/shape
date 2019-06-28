@@ -56,7 +56,7 @@ RSpec.describe CollectionCardArchiveWorker, type: :worker do
             subject_group_ids: [],
           }
 
-          if card.collection.present? && card.collection.children.present?
+          if card.collection.present? && card.collection&.cached_card_count&.positive?
             expect(ActivityAndNotificationBuilder).to receive(:call).with(builder_args)
           else
             # Users are not notified about items or empty collections

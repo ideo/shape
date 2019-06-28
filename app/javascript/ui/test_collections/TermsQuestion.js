@@ -50,6 +50,8 @@ class TermsQuestion extends React.Component {
           different personal data laws and may be less strict than the EU for
           example.
           <br />
+          <br />
+          Only one response per person will be accepted and rewarded.
         </QuestionText>
         <EmojiHolder data-cy="TermsEmojiHolder">
           <EmojiButton
@@ -60,7 +62,7 @@ class TermsQuestion extends React.Component {
             }
             onClick={this.handleClick(false)}
           >
-            <Emoji scale={1.375} name="Disagree" symbol="👎" />
+            <Emoji size="large" name="Disagree" symbol="👎" />
           </EmojiButton>
           <EmojiButton
             data-cy="AcceptFeedbackTerms"
@@ -71,7 +73,7 @@ class TermsQuestion extends React.Component {
             }
             onClick={this.handleClick(true)}
           >
-            <Emoji scale={1.375} name="Yes" symbol="👍" />
+            <Emoji size="large" name="Yes" symbol="👍" />
           </EmojiButton>
         </EmojiHolder>
       </QuestionSpacingContainer>

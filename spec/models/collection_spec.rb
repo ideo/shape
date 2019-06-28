@@ -479,7 +479,8 @@ describe Collection, type: :model do
       let(:private_card) { subcollection_card }
 
       before do
-        private_card.record.unanchor_and_inherit_roles_from_anchor!
+        record = private_card.record.reload
+        record.unanchor_and_inherit_roles_from_anchor!
         user.remove_role(Role::VIEWER, subcollection_card.collection)
       end
 
@@ -628,10 +629,11 @@ describe Collection, type: :model do
     it 'applies snapshot to revert the state' do
       expect(cards.first.width).to eq 1 # default
       collection.unarchive_cards!(cards, snapshot)
-      cards.first.reload
-      expect(cards.first.width).to eq 2
+      # pick up new attrs
+      card = collection.reload.collection_cards.first
+      expect(card.width).to eq 2
       # should always reorder the cards
-      expect(cards.first.order).to eq 0
+      expect(card.order).to eq 0
     end
 
     context 'with a master_template' do

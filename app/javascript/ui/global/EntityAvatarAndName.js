@@ -45,27 +45,26 @@ class EntityAvatarAndName extends React.Component {
     return (
       <Flex align="center" onClick={this.handleClick}>
         <Avatar key={entity.id} url={this.avatarUrl} />
-        {entity.name &&
-          entity.name.trim().length > 0 && (
-            <Flex ml={10} column>
-              <DisplayText>
-                <Flex align="center">
-                  {this.renderName}
-                  {isJoinableGroup && (
-                    <StyledJoinableGroupLabel>
-                      <PublicSharingIcon />
-                      <SmallHelperText
-                        style={{ position: 'relative', top: '-10px' }}
-                      >
-                        Public Group
-                      </SmallHelperText>
-                    </StyledJoinableGroupLabel>
-                  )}
-                </Flex>
-              </DisplayText>
-              <SubText>{entity.email}</SubText>
-            </Flex>
-          )}
+        {entity.name && entity.name.trim().length > 0 && (
+          <Flex ml={10} column>
+            <DisplayText>
+              <Flex align="center">
+                {this.renderName}
+                {isJoinableGroup && (
+                  <StyledJoinableGroupLabel>
+                    <PublicSharingIcon />
+                    <SmallHelperText
+                      style={{ position: 'relative', top: '-10px' }}
+                    >
+                      Public Group
+                    </SmallHelperText>
+                  </StyledJoinableGroupLabel>
+                )}
+              </Flex>
+            </DisplayText>
+            <SubText>{entity.email}</SubText>
+          </Flex>
+        )}
       </Flex>
     )
   }

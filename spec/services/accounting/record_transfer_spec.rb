@@ -43,6 +43,8 @@ RSpec.describe Accounting::RecordTransfer, type: :service, truncate: true do
 
     context 'after recording incentive paid for first response' do
       let(:survey_response) { survey_responses.first }
+      let(:calculator) { Accounting::SurveyResponseRevenue.new(survey_response) }
+      let(:revenue) { calculator.revenue.to_f.round(2) }
 
       before do
         Accounting::RecordTransfer.incentive_paid(survey_response)
@@ -55,19 +57,11 @@ RSpec.describe Accounting::RecordTransfer, type: :service, truncate: true do
 
       it 'transfers from revenue_deferred to payment_processor and revenue; including rounding_difference' do
         paypal_fee = Accounting::RecordTransfer.paypal_fee(incentive)
-        received_payment_per_response = (payment_amount_after_fee / sample_size).round(2)
-        revenue = received_payment_per_response - incentive - paypal_fee
-        paypal_and_stripe_fee = (paypal_fee.to_f.round(2) + payment.stripe_fee.to_f.round(2))
-
         # rounding_difference should get included in this first response
-        rounding_difference = (payment_amount_after_fee - (received_payment_per_response * sample_size)).round(2)
-        revenue += rounding_difference
-        expect(rounding_difference).to eq(-0.02)
-
+        expect(calculator.rounding_difference).to eq(-0.02)
         revenue_deferred_result = (deferred_total_after_responses - revenue - paypal_fee).to_f.round(2)
-
-        expect(Accounting::Query.sum(:revenue)).to eq revenue.to_f.round(2)
-        expect(Accounting::Query.sum(:payment_processor)).to eq paypal_and_stripe_fee
+        expect(Accounting::Query.sum(:revenue)).to eq revenue
+        expect(Accounting::Query.sum(:payment_processor)).to eq calculator.paypal_fee + test_audience.stripe_fee
         expect(Accounting::Query.sum(:revenue_deferred)).to eq revenue_deferred_result
       end
     end

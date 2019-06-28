@@ -11,6 +11,17 @@ describe Api::V1::Admin::UsersController, type: :request, json: true, auth: true
     let!(:non_admin_user) { create(:user) }
     let(:path) { '/api/v1/admin/users' }
 
+    context 'without admin role' do
+      before do
+        admin_user.remove_role(Role::SHAPE_ADMIN)
+      end
+
+      it 'returns a 401' do
+        get(path)
+        expect(response.status).to eq(401)
+      end
+    end
+
     it 'returns a 200' do
       get(path)
       expect(response.status).to eq(200)
@@ -85,9 +96,15 @@ describe Api::V1::Admin::UsersController, type: :request, json: true, auth: true
              test_collection: test_collection2,
              sample_size: 10)
     end
-    let!(:millenial_user) { create(:user, age_list: ['millennial']) }
-    let!(:usa_user) { create(:user, country_list: ['usa']) }
-    let!(:millenial_usa_user1) { create(:user, age_list: ['millenial'], country_list: ['usa']) }
+    let!(:millenial_user) do
+      create(:user, age_list: ['millennial'], feedback_contact_preference: 'feedback_contact_yes')
+    end
+    let!(:usa_user) do
+      create(:user, country_list: ['usa'], feedback_contact_preference: 'feedback_contact_yes')
+    end
+    let!(:millenial_usa_user1) do
+      create(:user, age_list: ['millenial'], country_list: ['usa'], feedback_contact_preference: 'feedback_contact_yes')
+    end
     let!(:millenial_invitation1) do
       create(
         :test_audience_invitation,
@@ -96,7 +113,9 @@ describe Api::V1::Admin::UsersController, type: :request, json: true, auth: true
         created_at: Time.now - 2.days,
       )
     end
-    let!(:millenial_usa_user2) { create(:user, age_list: ['millenial'], country_list: ['usa']) }
+    let!(:millenial_usa_user2) do
+      create(:user, age_list: ['millenial'], country_list: ['usa'], feedback_contact_preference: 'feedback_contact_yes')
+    end
     let!(:millenial_invitation2) do
       create(
         :test_audience_invitation,
@@ -113,7 +132,24 @@ describe Api::V1::Admin::UsersController, type: :request, json: true, auth: true
         created_at: Time.now,
       )
     end
-    let!(:everything_user) { create(:user, age_list: ['millenial'], country_list: ['usa'], interest_list: ['everything']) }
+    let!(:everything_user) do
+      create(
+        :user,
+        age_list: ['millenial'],
+        country_list: ['usa'],
+        interest_list: ['everything'],
+        feedback_contact_preference: 'feedback_contact_yes',
+      )
+    end
+    # should not count non-opted in user even though they match the tags
+    let!(:non_opted_in_user) do
+      create(
+        :user,
+        age_list: ['millenial'],
+        country_list: ['usa'],
+        interest_list: ['everything'],
+      )
+    end
 
     it 'returns users tagged with the given audience tags' do
       get path

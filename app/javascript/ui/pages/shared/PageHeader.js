@@ -243,7 +243,7 @@ class PageHeader extends React.Component {
     const rolesRecord = uiStore.rolesMenuOpen ? uiStore.rolesMenuOpen : record
 
     return (
-      <StyledHeader data-empty-space-click>
+      <StyledHeader pageHeader data-empty-space-click>
         <MaxWidthContainer>
           <RolesModal record={rolesRecord} open={!!uiStore.rolesMenuOpen} />
           <div>
@@ -326,17 +326,16 @@ class PageHeader extends React.Component {
                         </span>
                       </HeaderFormButton>
                     </CopyToClipboard>
-                    {record.can_edit_content &&
-                      !record.is_test_locked && (
-                        <HeaderFormButton
-                          width="170"
-                          color={v.colors.transparent}
-                          onClick={record.closeTest}
-                          disabled={uiStore.launchButtonLoading}
-                        >
-                          Stop Feedback
-                        </HeaderFormButton>
-                      )}
+                    {record.can_edit_content && !record.is_test_locked && (
+                      <HeaderFormButton
+                        width="170"
+                        color={v.colors.transparent}
+                        onClick={record.closeTest}
+                        disabled={uiStore.launchButtonLoading}
+                      >
+                        Stop Feedback
+                      </HeaderFormButton>
+                    )}
                   </Fragment>
                 )}
               </Flex>

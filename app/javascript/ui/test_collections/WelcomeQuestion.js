@@ -53,7 +53,7 @@ class WelcomeQuestion extends React.Component {
             selected={true}
             onClick={this.handleClick('continue')}
           >
-            <Emoji scale={1.375} name="Continue" symbol="👉" />
+            <Emoji size="large" name="Continue" symbol="👉" />
           </EmojiButton>
         </EmojiHolder>
       </QuestionSpacingContainer>
