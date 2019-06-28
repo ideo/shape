@@ -74,6 +74,27 @@ export const FEEDBACK_INCENTIVE_AMOUNT = window.FEEDBACK_INCENTIVE_AMOUNT || 2.5
 export const TARGETED_AUDIENCE_PRICE_PER_RESPONSE =
   window.TARGETED_AUDIENCE_PRICE_PER_RESPONSE || 2
 
+export const EVENT_SOURCE_TYPES = {
+  GRID_CARD: 'gridCard',
+  AUDIENCE_SETTINGS: 'audienceSettings',
+}
+
+// bottom and left are default values
+export const POPOUT_MENU_TRANSLATE_MAP = {
+  audienceSettings: {
+    left: -1 * 250,
+    right: 50,
+    top: 0,
+    bottom: -1 * 26, // actionMenuHeight
+  },
+  gridCard: {
+    bottomLeft: { x: 250, y: 0 }, // actionMenuWidth
+    bottomRight: { x: 0, y: 0 }, // actionMenuWidth
+    topRight: { x: 0, y: 26 * -2 }, // move up twice actionMenuHeight
+    topLeft: { x: 250, y: 26 * -2 }, // move up twice actionMenuHeight
+  },
+}
+
 export default {
   headerHeight: 50,
   maxWidth: 1320,
@@ -83,6 +104,7 @@ export default {
   topScrollTrigger: 210,
   maxTitleLength: 144,
   actionMenuWidth: 250,
+  actionMenuHeight: 26,
 
   // Keep in sync with assets/stylesheets/core/base.scss
   responsive: {

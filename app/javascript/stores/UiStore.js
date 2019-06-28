@@ -24,6 +24,8 @@ export default class UiStore {
     id: null,
     x: 0,
     y: 0,
+    offsetX: 0,
+    offsetY: 0,
     direction: 'left',
   }
   @observable
@@ -328,8 +330,15 @@ export default class UiStore {
 
   @action
   openCardMenu(id, opts = {}) {
-    const { x = 0, y = 0, direction = 'left' } = opts
-    this.update('cardMenuOpen', { id, x, y, direction })
+    const { x = 0, y = 0, offsetX = 0, offsetY = 0, direction = 'left' } = opts
+    this.update('cardMenuOpen', {
+      id,
+      x,
+      y,
+      offsetX,
+      offsetY,
+      direction,
+    })
     if (this.selectedCardIds.length && this.selectedCardIds.indexOf(id) < 0) {
       // deselect all cards when card menu is opened on a non-selected card
       this.selectedCardIds.replace([])

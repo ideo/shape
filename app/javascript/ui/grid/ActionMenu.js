@@ -291,6 +291,10 @@ class ActionMenu extends React.Component {
         menuOpen={menuOpen}
         buttonStyle={this.buttonStyle}
         position={{ x: uiStore.cardMenuOpen.x, y: uiStore.cardMenuOpen.y }}
+        offsetPosition={{
+          x: uiStore.cardMenuOpen.offsetX,
+          y: uiStore.cardMenuOpen.offsetY,
+        }}
         direction={direction}
         width={250}
       />

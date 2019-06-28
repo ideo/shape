@@ -47,21 +47,31 @@ export const StyledMenuWrapper = styled.div`
   padding: 10px;
   z-index: ${v.zIndex.aboveClickWrapper};
   ${props => {
-    if (props.position) {
-      let adjustLeft = 250
-      if (props.direction === 'right') {
-        adjustLeft = 50
-      }
+    const { position, offsetPosition } = props
+    const useFixedPositioning =
+      (position && position.x === 0 && position.y === 0) || !position
+    if (!useFixedPositioning) {
+      const { x, y } = position
+      const { x: offsetX, y: offsetY } = offsetPosition
+      const transformX = x - offsetX
+      const transformY = y + offsetY
+      // dynamic positioning used for gridCard, see clickUtils
       return `
-      position: absolute;
-      left: ${props.position.x - adjustLeft + 32}px;
-      top: ${props.position.y + 10}px;
+        left: ${transformX}px;
+        top: ${transformY}px;
       `
     }
-    return ''
-  }} ${props =>
-    !props.position &&
-    (props.direction === 'right' ? 'left: 0; top: 42px;' : 'right: -32px;')};
+    // todo: not sure when fixed positioning should have left, and top modified... probably audience settings?
+    // return `
+    //   left: 0;
+    //   top: 42px;
+    // `
+
+    // fixed positioning for default popout menu instances, org, collection, action menu, etc.
+    return `
+      right: -10px
+    `
+  }}}
 `
 StyledMenuWrapper.displayName = 'StyledMenuWrapper'
 
@@ -201,8 +211,8 @@ class PopoutMenu extends React.Component {
       onClick,
       width,
       buttonStyle,
-      direction,
       position,
+      offsetPosition,
       hideDotMenu,
     } = this.props
 
@@ -230,10 +240,11 @@ class PopoutMenu extends React.Component {
           </MenuToggle>
         )}
         <StyledMenuWrapper
-          direction={direction}
           position={position}
+          offsetPosition={offsetPosition}
           height={200}
           className="menu-wrapper"
+          menu={wrapperClassName}
         >
           <StyledMenu width={width}>{this.renderMenuItems}</StyledMenu>
         </StyledMenuWrapper>
@@ -268,6 +279,10 @@ PopoutMenu.propTypes = {
     x: PropTypes.number,
     y: PropTypes.number,
   }),
+  offsetPosition: PropTypes.shape({
+    x: PropTypes.number,
+    y: PropTypes.number,
+  }),
   groupedMenuItems: PropTypes.shape({
     top: propTypeMenuItem,
     organizations: propTypeMenuItem,
@@ -289,6 +304,7 @@ PopoutMenu.defaultProps = {
   wrapperClassName: 'card-menu',
   menuOpen: false,
   position: null,
+  offsetPosition: null,
   disabled: false,
   buttonStyle: '',
   width: 200,

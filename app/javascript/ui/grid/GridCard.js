@@ -24,7 +24,8 @@ import SelectionCircle from '~/ui/grid/SelectionCircle'
 import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
 import Tooltip from '~/ui/global/Tooltip'
 import { routingStore, uiStore } from '~/stores'
-import v, { ITEM_TYPES } from '~/utils/variables'
+import v, { ITEM_TYPES, EVENT_SOURCE_TYPES } from '~/utils/variables'
+import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 import ReplaceCardButton from '~/ui/grid/ReplaceCardButton'
 import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
 import {
@@ -186,11 +187,31 @@ class GridCard extends React.Component {
 
   openMenu = (ev, { x = 0, y = 0 } = {}) => {
     const { card } = this.props
-    const direction = ev.screenX < v.actionMenuWidth ? 'right' : 'left'
+
+    // todo: dynamically assign this based on user permissions, context = templates have 3 items...
+    const menuItemCount = 6
+    // dynamically move popout menu in the right position
+    // based on based click's position and action menu size
+    const positionOffset = calculatePopoutMenuOffset(
+      ev,
+      EVENT_SOURCE_TYPES.GRID_CARD,
+      menuItemCount
+    )
+
+    const { offsetX, offsetY } = positionOffset
+
+    const direction = 'left'
+
     if (this.props.menuOpen) {
       uiStore.closeCardMenu()
     } else {
-      uiStore.openCardMenu(card.id, { direction, x, y })
+      uiStore.openCardMenu(card.id, {
+        direction,
+        x,
+        y,
+        offsetX,
+        offsetY,
+      })
     }
   }
 
@@ -199,6 +220,8 @@ class GridCard extends React.Component {
     const rect = this.gridCardRef.getBoundingClientRect()
     const x = ev.clientX - rect.left - rect.width * 0.95
     const y = ev.clientY - rect.top - 15
+
+    // this is responsible for making fixed: false
 
     this.openMenu(ev, { x, y })
     return false
