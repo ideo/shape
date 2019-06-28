@@ -20,10 +20,10 @@ class DemographicsQuestionBase extends React.Component {
 export const QuestionShape = PropTypes.shape({
   prompt: PropTypes.string.isRequired,
   category: PropTypes.oneOf(validDemographicsCategories()).isRequired,
-  choices: PropTypes.arrayOf(
+  choices: MobxPropTypes.observableArrayOf(
     PropTypes.shape({
       text: PropTypes.string.isRequired,
-      tags: PropTypes.arrayOf(PropTypes.string).isRequired,
+      tags: MobxPropTypes.observableArrayOf(PropTypes.string).isRequired,
     })
   ),
 })

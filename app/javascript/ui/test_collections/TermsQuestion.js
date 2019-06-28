@@ -1,10 +1,11 @@
 import PropTypes from 'prop-types'
-import { observable } from 'mobx'
+import { observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import Emoji from '~/ui/icons/Emoji'
-import { EmojiButton, EmojiHolder } from '~/ui/test_collections/ScaleQuestion'
 import {
+  EmojiButton,
+  EmojiHolder,
   QuestionText,
   QuestionSpacingContainer,
 } from '~/ui/test_collections/shared'
@@ -24,8 +25,10 @@ class TermsQuestion extends React.Component {
         respondent_terms_accepted: choice,
       })
     }
-    this.answered = true
-    this.choice = choice ? 'yes' : 'no'
+    runInAction(() => {
+      this.answered = true
+      this.choice = choice ? 'yes' : 'no'
+    })
     // there was a user, or anon user answered "no", move on
     onAnswer(choice)
   }

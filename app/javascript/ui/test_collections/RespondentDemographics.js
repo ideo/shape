@@ -203,9 +203,7 @@ export function cardQuestionTypeForQuestion(question) {
 
 export function createDemographicsCardId(question) {
   const category = kebabCase(question.category)
-  const title = kebabCase(question.text)
-
-  return `card-demographics-${category}-${title}`
+  return `card-demographics-${category}`
 }
 
 export function validDemographicsCategories() {

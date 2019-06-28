@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes, inject } from 'mobx-react'
 import { observable, action } from 'mobx'
 import styled, { ThemeProvider } from 'styled-components'
 
@@ -14,10 +14,41 @@ import DialogWrapper from '~/ui/global/modals/DialogWrapper'
 import { LoudDisplayLink } from '~/ui/global/styled/typography'
 import RecontactQuestion from '~/ui/test_collections/RecontactQuestion'
 
+// TODO move blue background, rounded-corner box to shared component
+const StyledClosedText = styled.div`
+  margin: 10px 0 40px 0;
+  font-size: 1.25rem;
+  line-height: 20px;
+  text-align: center;
+  padding-left: 44px;
+  padding-right: 44px;
+`
+
+const StyledSurvey = styled.div`
+  background-color: ${v.colors.primaryMedium};
+  border-radius: 7px;
+  border: 10px solid ${v.colors.primaryMedium};
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0 auto;
+  max-width: 580px; /* responsive but constrain media QuestionCards to 420px tall */
+`
+
+const LearnMoreLink = LoudDisplayLink.extend`
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  color: ${v.colors.white};
+  text-align: center;
+`
+LearnMoreLink.displayName = 'LearnMoreLink'
+
+@inject('apiStore')
 @observer
 class ClosedSurvey extends React.Component {
   @observable
   answer = null
+  @observable
+  surveyResponse = null
 
   @action
   onAnswer = answer => {
@@ -49,8 +80,24 @@ class ClosedSurvey extends React.Component {
     }
   }
 
+  get currentUser() {
+    const { apiStore } = this.props
+    const { currentUser } = apiStore
+
+    return currentUser
+  }
+
+  get includeRecontactQuestion() {
+    return (
+      !this.currentUser ||
+      this.currentUser.feedback_contact_preference ===
+        'feedback_contact_unanswered'
+    )
+  }
+
   render() {
-    const { currentUser, includeRecontactQuestion, sessionUid } = this.props
+    const { sessionUid } = this.props
+    const { currentUser, includeRecontactQuestion } = this
 
     return (
       <ThemeProvider theme={styledTestTheme('primary')}>
@@ -76,43 +123,20 @@ class ClosedSurvey extends React.Component {
   }
 }
 
-// TODO move blue background, rounded-corner box to shared component
-const StyledClosedText = styled.div`
-  margin: 10px 0 40px 0;
-  font-size: 1.25rem;
-  line-height: 20px;
-  text-align: center;
-  padding-left: 44px;
-  padding-right: 44px;
-`
-
-const StyledSurvey = styled.div`
-  background-color: ${v.colors.primaryMedium};
-  border-radius: 7px;
-  border: 10px solid ${v.colors.primaryMedium};
-  box-sizing: border-box;
-  width: 100%;
-  margin: 0 auto;
-  max-width: 580px; /* responsive but constrain media QuestionCards to 420px tall */
-`
-
-const LearnMoreLink = LoudDisplayLink.extend`
-  font-size: 0.75rem;
-  letter-spacing: 2px;
-  color: ${v.colors.white};
-  text-align: center;
-`
-LearnMoreLink.displayName = 'LearnMoreLink'
-
 ClosedSurvey.propTypes = {
-  currentUser: MobxPropTypes.objectOrObservableObject,
-  includeRecontactQuestion: PropTypes.bool,
+  collection: MobxPropTypes.objectOrObservableObject,
   sessionUid: PropTypes.string,
 }
+
+ClosedSurvey.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+
 ClosedSurvey.defaultProps = {
-  currentUser: null,
-  includeRecontactQuestion: false,
+  collection: undefined,
   sessionUid: null,
 }
+
+ClosedSurvey.displayName = 'ClosedSurvey'
 
 export default ClosedSurvey

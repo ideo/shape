@@ -3,8 +3,9 @@ import { observer } from 'mobx-react'
 import pluralize from 'pluralize'
 
 import Emoji from '~/ui/icons/Emoji'
-import { EmojiButton, EmojiHolder } from '~/ui/test_collections/ScaleQuestion'
 import {
+  EmojiButton,
+  EmojiHolder,
   QuestionText,
   QuestionSpacingContainer,
 } from '~/ui/test_collections/shared'

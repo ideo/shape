@@ -4,15 +4,16 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { apiStore, uiStore } from '~/stores'
 import { DisplayText } from '~/ui/global/styled/typography'
 import Emoji from '~/ui/icons/Emoji'
-import { EmojiButton, EmojiHolder } from '~/ui/test_collections/ScaleQuestion'
-import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
-import OkIcon from '~/ui/icons/OkIcon'
 import {
+  EmojiButton,
+  EmojiHolder,
   QuestionText,
   TextInput,
   TextResponseHolder,
   TextEnterButton,
 } from '~/ui/test_collections/shared'
+import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
+import OkIcon from '~/ui/icons/OkIcon'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 
@@ -44,6 +45,10 @@ class RecontactQuestion extends React.Component {
       this.setState({
         showFeedbackRecontact: false,
         showContactInfo: true,
+      })
+    } else if (user) {
+      this.setState({
+        submittedContactInfo: true,
       })
     }
   }
@@ -83,8 +88,9 @@ class RecontactQuestion extends React.Component {
     const user = this.props.user || this.state.createdUser
     this.setState({ answer: choice })
 
-    if (choice === 'feedback_contact_yes' && !user) {
-      this.setState({ showContactInfo: true })
+    if (!user) {
+      const showContactInfo = choice === 'feedback_contact_yes'
+      this.setState({ showContactInfo })
       return
     }
     if (user) {
@@ -161,7 +167,7 @@ class RecontactQuestion extends React.Component {
               opportunities for you.
             </QuestionText>
             <EmojiHolder data-cy="PostOptInEmojiHolder">
-              <Emoji size="large" name="Okay gesture" symbol="👌" />
+              <Emoji size="large" name="Okay gesture" symbol="🙌" />
             </EmojiHolder>
           </div>
         )

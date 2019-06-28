@@ -55,6 +55,13 @@ export const QuestionTextWithSpacing = QuestionText.extend`
 `
 QuestionTextWithSpacing.displayName = 'QuestionTextWithSpacing'
 
+export const ResponseContainer = styled.div`
+  background-color: ${props => props.theme.responseHolder};
+  box-sizing: border-box;
+  padding: 7px 13px;
+  width: 100%;
+`
+
 export const TextInputHolder = StyledCommentTextarea.extend`
   color: white;
   padding: 6px;
@@ -209,3 +216,23 @@ export const TextEnterButton = styled.button`
     }
   `};
 `
+
+export const EmojiHolder = styled.div`
+  align-items: center;
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+`
+
+export const EmojiButton = styled.button`
+  opacity: ${props => (props.selected ? 1 : 0.2)};
+  transition: opacity 0.3s;
+  &:hover {
+    opacity: 1;
+  }
+  @media only screen and (max-width: ${v.responsive.muiSmBreakpoint}px) {
+    opacity: ${props => (props.selected ? 1 : 0.2)};
+    transition: opacity 0.3s;
+  }
+`
+EmojiButton.displayName = 'EmojiButton'

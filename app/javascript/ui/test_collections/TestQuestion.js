@@ -217,7 +217,7 @@ class TestQuestion extends React.Component {
           />
         )
 
-      case 'question_demographics_intro': // TODO: either use plural or singular 'demographics'
+      case 'question_demographics_intro':
         return <DemographicsIntroQuestion />
 
       case 'question_demographics_single_choice':
