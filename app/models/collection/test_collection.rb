@@ -175,7 +175,7 @@ class Collection
 
     # This gets called by template update worker when you launch
     def update_submissions_launch_status
-      return unless master_template?
+      return unless master_template? && live?
       parent_submission_box.submissions_collection.collections.each do |submission|
         update_submission_launch_status(submission)
       end
