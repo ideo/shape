@@ -1,12 +1,11 @@
 import _ from 'lodash'
-import { Flex } from 'reflexbox'
 import PropTypes from 'prop-types'
 import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import FlipMove from 'react-flip-move'
-import { Element as ScrollElement, scroller } from 'react-scroll'
+import { scroller } from 'react-scroll'
 import { ThemeProvider } from 'styled-components'
 
+import trackError from '~/utils/trackError'
 import ProgressDots from '~/ui/global/ProgressDots'
 import ProgressSquare from '~/ui/global/ProgressSquare'
 import {
@@ -15,6 +14,9 @@ import {
 } from '~/ui/test_collections/shared'
 import TestQuestion from '~/ui/test_collections/TestQuestion'
 import GreetingMessage from '~/ui/test_collections/GreetingMessage'
+import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
+import ScrollingModule from '~/ui/test_collections/ScrollingModule'
+import ClosedSurvey from '~/ui/test_collections/ClosedSurvey'
 
 const UNANSWERABLE_QUESTION_TYPES = [
   'question_media',
@@ -36,23 +38,84 @@ class TestSurveyResponder extends React.Component {
   welcomeAnswered = false
   @observable
   currentCardIdx = 0
+  @observable
+  surveyResponse = null
+  @observable
+  collection = null
 
-  componentDidMount() {
-    this.initializeCards()
+  constructor(props) {
+    super(props)
+    this.collection = props.collection
   }
 
-  componentDidUpdate(prevProps) {
-    if (
-      this.props.includeTerms != prevProps.includeTerms ||
-      this.props.includeRecontactQuestion != prevProps.includeRecontactQuestion
-    ) {
-      this.initializeCards()
+  async componentDidMount() {
+    this.initializeCards()
+
+    if (!this.currentUser) return
+    await this.fetchSurveyResponse()
+  }
+
+  get includeRecontactQuestion() {
+    const { inline } = this.props
+    if (inline) return false
+    return (
+      !this.currentUser ||
+      this.currentUser.feedback_contact_preference ===
+        'feedback_contact_unanswered'
+    )
+  }
+
+  get includeTerms() {
+    const { inline } = this.props
+    // inline test does not show terms
+    if (inline) return false
+    return !this.currentUser || !this.currentUser.respondent_terms_accepted
+  }
+
+  async fetchSurveyResponse() {
+    const { collection } = this
+    const { apiStore } = this.props
+
+    const surveyResponseId = collection.survey_response_for_user_id
+    const surveyResponseResult =
+      surveyResponseId &&
+      (await apiStore.fetch('survey_responses', surveyResponseId))
+    const surveyResponse = surveyResponseResult
+      ? surveyResponseResult.data
+      : null
+
+    runInAction(() => {
+      this.surveyResponse = surveyResponse
+    })
+  }
+
+  createSurveyResponse = async () => {
+    const { collection, apiStore } = this.props
+
+    const newResponse = new SurveyResponse(
+      {
+        test_collection_id: this.collection.id,
+      },
+      apiStore
+    )
+    try {
+      const surveyResponse = await newResponse.save()
+      if (surveyResponse) {
+        runInAction(() => {
+          this.surveyResponse = surveyResponse
+        })
+      }
+      return surveyResponse
+    } catch (e) {
+      trackError(e, { source: 'createSurveyResponse' })
+      collection.test_status = 'closed'
     }
   }
 
   initializeCards() {
-    const { collection, includeRecontactQuestion, includeTerms } = this.props
-    if (!collection.question_cards) return
+    const { collection } = this
+    if (!collection || !collection.question_cards) return
+
     const questionCards = [...collection.question_cards]
 
     const questionFinishIndex = _.findIndex(
@@ -60,7 +123,7 @@ class TestSurveyResponder extends React.Component {
       card => card.card_question_type === 'question_finish'
     )
 
-    if (includeRecontactQuestion) {
+    if (this.includeRecontactQuestion) {
       // Put recontact question after the finish question
       const recontactOrder = questionCards[questionFinishIndex].order + 1
       questionCards.splice(questionFinishIndex + 1, 0, {
@@ -70,7 +133,7 @@ class TestSurveyResponder extends React.Component {
         record: { id: 'recontact_item', content: '' },
       })
     }
-    if (includeTerms) {
+    if (this.includeTerms) {
       questionCards.unshift({
         id: 'terms',
         card_question_type: 'question_terms',
@@ -89,7 +152,7 @@ class TestSurveyResponder extends React.Component {
   }
 
   questionAnswerForCard = card => {
-    const { surveyResponse } = this.props
+    const { surveyResponse } = this
     if (card.card_question_type === 'question_welcome') {
       return this.welcomeAnswered
     }
@@ -113,7 +176,8 @@ class TestSurveyResponder extends React.Component {
   }
 
   get numAnswerableQuestionItems() {
-    const { question_cards } = this.props.collection
+    const { collection } = this.props
+    const { question_cards } = collection
     return question_cards.filter(
       questionCard =>
         !_.includes(
@@ -203,20 +267,42 @@ class TestSurveyResponder extends React.Component {
     return nextCard.card_question_type === 'question_finish'
   }
 
+  get currentUser() {
+    return this.props.apiStore.currentUser
+  }
+
   refreshUserAfterSurvey() {
     const { apiStore } = this.props
     apiStore.loadCurrentUser()
   }
 
+  get theme() {
+    const { inline } = this.props
+    return inline ? 'secondary' : 'primary'
+  }
+
   render() {
+    const { collection } = this.props
+    const { surveyResponse } = this
+    if (collection.test_status !== 'live') {
+      return (
+        <ClosedSurvey
+          collection={collection}
+          sessionUid={surveyResponse && surveyResponse.sessionUid}
+        />
+      )
+    }
+
     const {
-      collection,
-      surveyResponse,
       createSurveyResponse,
-      theme,
-    } = this.props
+      questionAnswerForCard,
+      afterQuestionAnswered,
+      canEdit,
+      numAnswerableQuestionItems,
+    } = this
+
     return (
-      <ThemeProvider theme={styledTestTheme(theme)}>
+      <ThemeProvider theme={styledTestTheme(this.theme)}>
         <div id="surveyContainer">
           <ProgressDots
             totalAmount={this.answerableCards.length + 1}
@@ -228,35 +314,23 @@ class TestSurveyResponder extends React.Component {
           />
           <GreetingMessage />
           {this.viewableCards.map(card => (
-            // ScrollElement only gets the right offsetTop if outside the FlipMove
-            <ScrollElement name={`card-${card.id}`} key={card.id}>
-              <FlipMove appearAnimation="fade">
-                <div>
-                  <Flex
-                    style={{
-                      width: 'auto',
-                      flexWrap: 'wrap',
-                    }}
-                  >
-                    <TestQuestionHolder editing={false} userEditable={false}>
-                      <TestQuestion
-                        createSurveyResponse={createSurveyResponse}
-                        surveyResponse={surveyResponse}
-                        questionAnswer={this.questionAnswerForCard(card)}
-                        afterQuestionAnswered={this.afterQuestionAnswered}
-                        parent={collection}
-                        card={card}
-                        item={card.record}
-                        order={card.order}
-                        editing={false}
-                        canEdit={this.canEdit}
-                        numberOfQuestions={this.numAnswerableQuestionItems}
-                      />
-                    </TestQuestionHolder>
-                  </Flex>
-                </div>
-              </FlipMove>
-            </ScrollElement>
+            <ScrollingModule key={card.id} name={`card-${card.id}`}>
+              <TestQuestionHolder editing={false} userEditable={false}>
+                <TestQuestion
+                  createSurveyResponse={createSurveyResponse}
+                  surveyResponse={surveyResponse}
+                  questionAnswer={questionAnswerForCard(card)}
+                  afterQuestionAnswered={afterQuestionAnswered}
+                  parent={collection}
+                  card={card}
+                  item={card.record}
+                  order={card.order}
+                  editing={false}
+                  canEdit={canEdit}
+                  numberOfQuestions={numAnswerableQuestionItems}
+                />
+              </TestQuestionHolder>
+            </ScrollingModule>
           ))}
         </div>
       </ThemeProvider>
@@ -266,13 +340,8 @@ class TestSurveyResponder extends React.Component {
 
 TestSurveyResponder.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
-  createSurveyResponse: PropTypes.func.isRequired,
-  user: MobxPropTypes.objectOrObservableObject,
-  surveyResponse: MobxPropTypes.objectOrObservableObject,
-  includeRecontactQuestion: PropTypes.bool,
-  includeTerms: PropTypes.bool,
-  theme: PropTypes.string,
   containerId: PropTypes.string,
+  inline: PropTypes.bool,
 }
 
 TestSurveyResponder.wrappedComponent.propTypes = {
@@ -280,12 +349,8 @@ TestSurveyResponder.wrappedComponent.propTypes = {
 }
 
 TestSurveyResponder.defaultProps = {
-  user: null,
-  surveyResponse: undefined,
-  theme: 'primary',
   containerId: '',
-  includeRecontactQuestion: false,
-  includeTerms: false,
+  inline: false,
 }
 TestSurveyResponder.displayName = 'TestSurveyResponder'
 
