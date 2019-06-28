@@ -186,7 +186,7 @@ class Header extends React.Component {
   @computed
   get record() {
     const { uiStore } = this.props
-    return uiStore.viewingCollection || uiStore.viewingItem
+    return uiStore.viewingRecord
   }
 
   renderMobileSearch() {
