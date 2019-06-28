@@ -274,13 +274,7 @@ class ActionMenu extends React.Component {
   }
 
   render() {
-    const {
-      className,
-      menuOpen,
-      wrapperClassName,
-      direction,
-      uiStore,
-    } = this.props
+    const { className, menuOpen, wrapperClassName, uiStore } = this.props
     return (
       <PopoutMenu
         className={className}
@@ -295,7 +289,6 @@ class ActionMenu extends React.Component {
           x: uiStore.cardMenuOpen.offsetX,
           y: uiStore.cardMenuOpen.offsetY,
         }}
-        direction={direction}
         width={250}
       />
     )
@@ -305,7 +298,6 @@ class ActionMenu extends React.Component {
 ActionMenu.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   className: PropTypes.string,
-  direction: PopoutMenu.propTypes.direction,
   wrapperClassName: PropTypes.string,
   location: PropTypes.string.isRequired,
   menuOpen: PropTypes.bool.isRequired,
@@ -326,7 +318,6 @@ ActionMenu.displayName = 'ActionMenu'
 
 ActionMenu.defaultProps = {
   className: '',
-  direction: null,
   wrapperClassName: 'card-menu',
   onMoveMenu: null,
   afterArchive: null,

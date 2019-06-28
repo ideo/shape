@@ -291,7 +291,6 @@ PopoutMenu.propTypes = {
   groupExtraComponent: PropTypes.shape({
     component: PropTypes.node,
   }),
-  direction: PropTypes.oneOf(['left', 'right']),
 }
 
 PopoutMenu.defaultProps = {
@@ -309,7 +308,6 @@ PopoutMenu.defaultProps = {
   buttonStyle: '',
   width: 200,
   groupExtraComponent: {},
-  direction: 'left',
   hideDotMenu: false,
 }
 

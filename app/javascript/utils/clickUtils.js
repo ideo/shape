@@ -9,18 +9,19 @@ import v, {
 // popoutMenuItemCount: menu item count used to determine menu height
 const calculatePopoutMenuOffset = (e, eventSource, popoutMenuItemCount) => {
   const { actionMenuWidth, actionMenuHeight } = v
-  const { clientY, screenX } = e
-  const { innerHeight } = window
+  const { clientX, clientY } = e
+  const { innerWidth, innerHeight } = window
   let menuBoundaryXMin
   let menuBoundaryXMax
   let menuBoundaryYMin
   let menuBoundaryYMax
 
+  // todo: add pageMenu, orgMenu, etc. if necessary
   switch (eventSource) {
     case EVENT_SOURCE_TYPES.GRID_CARD:
-      menuBoundaryXMin = screenX
-      menuBoundaryXMax = actionMenuWidth
-      menuBoundaryYMin = clientY + actionMenuHeight * popoutMenuItemCount
+      menuBoundaryXMin = clientX
+      menuBoundaryXMax = innerWidth - actionMenuWidth
+      menuBoundaryYMin = 60 + clientY + actionMenuHeight * popoutMenuItemCount
       menuBoundaryYMax = innerHeight
       break
     default:
@@ -36,20 +37,22 @@ const calculatePopoutMenuOffset = (e, eventSource, popoutMenuItemCount) => {
   ) {
     // moves bottom left of the cursor
     const { bottomLeft } = translateComponent
-    return bottomLeft
+    const { x, y } = bottomLeft
+    return { offsetX: x, offsetY: y }
   } else if (
     menuBoundaryXMin > menuBoundaryXMax &&
     menuBoundaryYMin < menuBoundaryYMax
   ) {
     // moves bottom right of the cursor
     const { bottomRight } = translateComponent
-    return bottomRight
+    const { x, y } = bottomRight
+    const offsetX = -20 + x
+    return { offsetX: offsetX, offsetY: y }
   } else if (
     menuBoundaryXMin < menuBoundaryXMax &&
     menuBoundaryYMin > menuBoundaryYMax
   ) {
     // moves component top right of the cursor
-    // todo: fix this
     const { topLeft } = translateComponent
     const { x, y } = topLeft
     const offsetX = -20 + x // -20 aligns width with mouse pos

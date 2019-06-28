@@ -197,16 +197,12 @@ class GridCard extends React.Component {
       EVENT_SOURCE_TYPES.GRID_CARD,
       menuItemCount
     )
-
     const { offsetX, offsetY } = positionOffset
-
-    const direction = 'left'
 
     if (this.props.menuOpen) {
       uiStore.closeCardMenu()
     } else {
       uiStore.openCardMenu(card.id, {
-        direction,
         x,
         y,
         offsetX,
@@ -470,7 +466,6 @@ class GridCard extends React.Component {
               canView={record.can_view}
               canEdit={this.canEditCard}
               canReplace={record.canReplace && !card.link && !searchResult}
-              direction={uiStore.cardMenuOpen.direction}
               menuOpen={menuOpen}
               onOpen={this.openMenu}
               onLeave={this.closeMenu}

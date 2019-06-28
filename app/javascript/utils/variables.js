@@ -81,17 +81,11 @@ export const EVENT_SOURCE_TYPES = {
 
 // bottom and left are default values
 export const POPOUT_MENU_TRANSLATE_MAP = {
-  audienceSettings: {
-    left: -1 * 250,
-    right: 50,
-    top: 0,
-    bottom: -1 * 26, // actionMenuHeight
-  },
   gridCard: {
-    bottomLeft: { x: 250, y: 0 }, // actionMenuWidth
-    bottomRight: { x: 0, y: 0 }, // actionMenuWidth
-    topRight: { x: 0, y: 26 * -2 }, // move up twice actionMenuHeight
-    topLeft: { x: 250, y: 26 * -2 }, // move up twice actionMenuHeight
+    bottomLeft: { x: 0, y: 0 }, // {actionMenuWidth, 0}
+    bottomRight: { x: 250, y: 0 }, // {actionMenuWidth, 0}
+    topRight: { x: 250, y: 26 * -2 }, // {actionMenuWidth, actionMenuHeight * 2}
+    topLeft: { x: 0, y: 26 * -2 }, // {0, actionMenuHeight * 2}
   },
 }
 

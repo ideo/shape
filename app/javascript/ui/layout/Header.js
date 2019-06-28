@@ -76,8 +76,7 @@ class Header extends React.Component {
 
   openMenu = ev => {
     const { uiStore } = this.props
-    const direction = ev.screenX < v.actionMenuWidth ? 'right' : 'left'
-    uiStore.update('pageMenuOpen', direction)
+    uiStore.update('pageMenuOpen', true)
   }
 
   closeMenu = () => {
@@ -163,7 +162,6 @@ class Header extends React.Component {
             canView={record.can_view}
             canEdit={record.can_edit}
             canReplace={record.canReplace}
-            direction={uiStore.pageMenuOpen || 'left'}
             submissionBox={record.isSubmissionBox}
             menuOpen={!!uiStore.pageMenuOpen}
             onOpen={this.openMenu}
