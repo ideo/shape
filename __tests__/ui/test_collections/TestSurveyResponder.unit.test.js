@@ -30,19 +30,24 @@ describe('TestSurveyResponder', () => {
 
   describe('with a live survey', () => {
     it('has 3 answerable questions', () => {
-      expect(component.answerableCards.length).toEqual(3)
+      // see note below
+      expect(component.answerableCards.length).toEqual(8)
       expect(component.answerableCards.map(c => c.card_question_type)).toEqual([
         'question_welcome',
         'question_terms',
         'question_useful',
+        // TODO: these 5 are hardcoded as appearing for now
+        'question_demographics_single_choice',
+        'question_demographics_single_choice',
+        'question_demographics_single_choice',
+        'question_demographics_single_choice',
+        'question_demographics_single_choice',
       ])
     })
 
     it('renders ProgressDots', () => {
-      // should be 3 + 1 more for "You're done!"
-      expect(wrapper.find('ProgressDots').props().totalAmount).toEqual(
-        component.answerableCards.length + 1
-      )
+      // welcome, terms, useful
+      expect(wrapper.find('ProgressDots').props().totalAmount).toEqual(3)
     })
 
     it('renders the first viewable question', () => {
