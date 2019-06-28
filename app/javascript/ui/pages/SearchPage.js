@@ -58,10 +58,7 @@ class SearchPage extends React.Component {
       return true
     }
     // i.e. you are on SearchPage and perform a new search
-    return (
-      this.searchQuery(prevProps.location) !== this.searchQuery(location) &&
-      this.searchQuery(location)
-    )
+    return prevProps.location !== location && this.searchQuery(location)
   }
 
   fetchData = (page = 1) => {

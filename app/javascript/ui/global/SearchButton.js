@@ -83,9 +83,10 @@ class SearchButton extends React.Component {
   @observable
   open = false
 
-  componentDidMount() {
+  constructor(props) {
+    super(props)
     runInAction(() => {
-      this.open = this.defaultOpen
+      this.open = props.defaultOpen
     })
   }
 

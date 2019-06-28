@@ -19,7 +19,15 @@ class GlobalSearch extends React.Component {
     super(props)
     this.search = _.debounce(this._search, 300)
     runInAction(() => {
+      this.open = !!this.props.uiStore.searchText
       if (props.alwaysOpen) this.open = true
+    })
+  }
+
+  componentDidUpdate() {
+    runInAction(() => {
+      this.open = !!this.props.uiStore.searchText
+      console.log('update', this.open)
     })
   }
 
@@ -66,6 +74,7 @@ class GlobalSearch extends React.Component {
     runInAction(() => {
       this.searchArchived = !this.searchArchived
     })
+    this.search(this.searchText)
   }
 
   clearSearch = () => {
