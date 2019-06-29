@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
+import { observable, action } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import ContainImage from '~/ui/grid/ContainImage'
@@ -37,6 +38,8 @@ import {
 
 @observer
 class GridCard extends React.Component {
+  @observable
+  menuItemCount = 1
   get canEditCard() {
     const {
       isSharedCollection,
@@ -185,11 +188,17 @@ class GridCard extends React.Component {
     )
   }
 
+  @action
+  getMenuItemsCount = count => {
+    // counts menuitems in actionmenu
+    this.menuItemCount = count
+  }
+
   openMenu = (ev, { x = 0, y = 0 } = {}) => {
-    const { card } = this.props
+    const { menuItemCount, props } = this
+    const { card } = props
 
     // todo: dynamically assign this based on user permissions, context = templates have 3 items...
-    const menuItemCount = 6
     // dynamically move popout menu in the right position
     // based on based click's position and action menu size
     const positionOffset = calculatePopoutMenuOffset(
@@ -470,6 +479,7 @@ class GridCard extends React.Component {
               onOpen={this.openMenu}
               onLeave={this.closeMenu}
               testCollectionCard={testCollectionCard}
+              menuItemsCount={this.getMenuItemsCount}
             />
           </StyledTopRightActions>
         )}

@@ -80,12 +80,14 @@ export const EVENT_SOURCE_TYPES = {
 }
 
 // bottom and left are default values
-export const POPOUT_MENU_TRANSLATE_MAP = {
+export const POPOUT_MENU_OFFSET_MAP = {
+  audienceSettings: {
+    x: -20,
+    y: -90,
+  },
   gridCard: {
-    bottomLeft: { x: 0, y: 0 }, // {actionMenuWidth, 0}
-    bottomRight: { x: 250, y: 0 }, // {actionMenuWidth, 0}
-    topRight: { x: 250, y: 26 * -2 }, // {actionMenuWidth, actionMenuHeight * 2}
-    topLeft: { x: 0, y: 26 * -2 }, // {0, actionMenuHeight * 2}
+    x: 20,
+    y: 90,
   },
 }
 

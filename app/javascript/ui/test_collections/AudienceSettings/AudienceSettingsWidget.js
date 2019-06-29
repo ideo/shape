@@ -47,11 +47,6 @@ const AddAudienceButton = styled(Button)`
 `
 
 const AddAudienceMenu = styled.span`
-  .menu-wrapper {
-    left: 0;
-    top: -35px;
-  }
-
   .icon {
     left: 0;
     line-height: 2.4rem !important;
@@ -72,6 +67,8 @@ class AudienceSettingsWidget extends React.Component {
   state = {
     addAudienceMenuOpen: false,
     addAudienceModalOpen: false,
+    offsetX: 0,
+    offsetY: 0,
   }
 
   get displayedAudiences() {
@@ -220,6 +217,8 @@ class AudienceSettingsWidget extends React.Component {
       </React.Fragment>
     )
 
+    const { addAudienceModalOpen, offsetX, offsetY } = this.state
+
     return (
       <AudienceSettingsWrapper>
         <h3 style={{ marginBottom: '0px' }}>Audience</h3>
@@ -268,8 +267,10 @@ class AudienceSettingsWidget extends React.Component {
           <StyledColumnFlexParent />
         </div>
         <AddAudienceModal
-          open={this.state.addAudienceModalOpen}
+          open={addAudienceModalOpen}
           close={this.closeAddAudienceModal}
+          offsetX={offsetX}
+          offsetY={offsetY}
           afterSave={audience => this.addAudience(audience)}
         />
       </AudienceSettingsWrapper>

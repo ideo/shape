@@ -265,6 +265,11 @@ class ActionMenu extends React.Component {
       return _.filter(actions, { name: 'Replace' })
     }
 
+    const { menuItemsCount } = this.props
+    if (menuItemsCount) {
+      menuItemsCount(items.length)
+    }
+
     return items
   }
 
@@ -310,6 +315,7 @@ ActionMenu.propTypes = {
   onMoveMenu: PropTypes.func,
   afterArchive: PropTypes.func,
   testCollectionCard: PropTypes.bool,
+  menuItemsCount: PropTypes.func,
 }
 ActionMenu.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -324,6 +330,7 @@ ActionMenu.defaultProps = {
   canReplace: false,
   submissionBox: false,
   testCollectionCard: false,
+  menuItemsCount: null,
 }
 
 export default ActionMenu

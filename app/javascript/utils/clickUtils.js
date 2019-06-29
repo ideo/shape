@@ -1,6 +1,6 @@
 import v, {
   EVENT_SOURCE_TYPES,
-  POPOUT_MENU_TRANSLATE_MAP,
+  POPOUT_MENU_OFFSET_MAP,
 } from '~/utils/variables'
 
 // returns position to move popout menu dynamically
@@ -11,6 +11,8 @@ const calculatePopoutMenuOffset = (e, eventSource, popoutMenuItemCount) => {
   const { actionMenuWidth, actionMenuHeight } = v
   const { clientX, clientY } = e
   const { innerWidth, innerHeight } = window
+  let totalHeight
+  let totalWidth
   let menuBoundaryXMin
   let menuBoundaryXMax
   let menuBoundaryYMin
@@ -19,52 +21,53 @@ const calculatePopoutMenuOffset = (e, eventSource, popoutMenuItemCount) => {
   // todo: add pageMenu, orgMenu, etc. if necessary
   switch (eventSource) {
     case EVENT_SOURCE_TYPES.GRID_CARD:
+      totalWidth = actionMenuWidth
+      totalHeight = actionMenuHeight * popoutMenuItemCount
       menuBoundaryXMin = clientX
       menuBoundaryXMax = innerWidth - actionMenuWidth
-      menuBoundaryYMin = 60 + clientY + actionMenuHeight * popoutMenuItemCount
+      menuBoundaryYMin = 60 + clientY + totalHeight
       menuBoundaryYMax = innerHeight
       break
+    case EVENT_SOURCE_TYPES.AUDIENCE_SETTINGS:
+      totalWidth = actionMenuWidth
+      totalHeight = actionMenuHeight * popoutMenuItemCount
+      menuBoundaryXMin = clientX + actionMenuWidth
+      menuBoundaryXMax = innerWidth
+      menuBoundaryYMin = 60 + clientY + totalHeight
+      menuBoundaryYMax = innerHeight
     default:
       break
   }
 
-  const translateComponent = POPOUT_MENU_TRANSLATE_MAP[eventSource]
+  const componentOffsets = POPOUT_MENU_OFFSET_MAP[eventSource]
+  const { x, y } = componentOffsets
+  const leftOffset = totalWidth - x
+  const rightOffset = -x
+  const topOffset = -totalHeight - y
+  const bottomOffset = 0
 
   // if click happens outside menu boundary, then move component
   if (
-    menuBoundaryXMin < menuBoundaryXMax &&
-    menuBoundaryYMin < menuBoundaryYMax
-  ) {
-    // moves bottom left of the cursor
-    const { bottomLeft } = translateComponent
-    const { x, y } = bottomLeft
-    return { offsetX: x, offsetY: y }
-  } else if (
     menuBoundaryXMin > menuBoundaryXMax &&
     menuBoundaryYMin < menuBoundaryYMax
   ) {
-    // moves bottom right of the cursor
-    const { bottomRight } = translateComponent
-    const { x, y } = bottomRight
-    const offsetX = -20 + x
-    return { offsetX: offsetX, offsetY: y }
+    // bottom left of the cursor
+    return { offsetX: leftOffset, offsetY: bottomOffset }
   } else if (
     menuBoundaryXMin < menuBoundaryXMax &&
+    menuBoundaryYMin < menuBoundaryYMax
+  ) {
+    // bottom right of the cursor
+    return { offsetX: rightOffset, offsetY: bottomOffset }
+  } else if (
+    menuBoundaryXMin > menuBoundaryXMax &&
     menuBoundaryYMin > menuBoundaryYMax
   ) {
-    // moves component top right of the cursor
-    const { topLeft } = translateComponent
-    const { x, y } = topLeft
-    const offsetX = -20 + x // -20 aligns width with mouse pos
-    const offsetY = 60 + y * popoutMenuItemCount // 60 aligns width with mouse pos
-    return { offsetX: offsetX, offsetY: offsetY }
+    // top left of the cursor
+    return { offsetX: leftOffset, offsetY: topOffset }
   } else {
-    // moves component top right of the cursor
-    const { topRight } = translateComponent
-    const { x, y } = topRight
-    const offsetX = -20 + x // -20 aligns width with mouse pos
-    const offsetY = 60 + y * popoutMenuItemCount // 60 aligns width with mouse pos
-    return { offsetX: offsetX, offsetY: offsetY }
+    // top right of the cursor
+    return { offsetX: rightOffset, offsetY: topOffset }
   }
 }
 

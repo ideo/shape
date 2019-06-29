@@ -48,25 +48,18 @@ export const StyledMenuWrapper = styled.div`
   z-index: ${v.zIndex.aboveClickWrapper};
   ${props => {
     const { position, offsetPosition } = props
-    const useFixedPositioning =
-      (position && position.x === 0 && position.y === 0) || !position
-    if (!useFixedPositioning) {
+    if (position) {
       const { x, y } = position
       const { x: offsetX, y: offsetY } = offsetPosition
       const transformX = x - offsetX
       const transformY = y + offsetY
+
       // dynamic positioning used for gridCard, see clickUtils
       return `
         left: ${transformX}px;
         top: ${transformY}px;
       `
     }
-    // todo: not sure when fixed positioning should have left, and top modified... probably audience settings?
-    // return `
-    //   left: 0;
-    //   top: 42px;
-    // `
-
     // fixed positioning for default popout menu instances, org, collection, action menu, etc.
     return `
       right: -10px
