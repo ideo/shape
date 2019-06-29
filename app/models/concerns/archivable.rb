@@ -114,6 +114,15 @@ module Archivable
     archived? && !parent&.archived?
   end
 
+  def restorable_parent
+    return nil if restorable?
+    potential_parent = parent
+    while potential_parent
+      return potential_parent if potential_parent.restorable?
+      potential_parent = potential_parent.parent
+    end
+  end
+
   private
 
   def archived_on_previous_save?

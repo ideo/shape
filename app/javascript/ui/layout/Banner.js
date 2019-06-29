@@ -5,11 +5,16 @@ import { MaxWidthContainer } from '~/ui/global/styled/layout'
 import v from '~/utils/variables'
 
 const StyledBanner = styled.div`
-  background-color: ${v.colors.alert};
+  background-color: ${({ color }) => color};
   color: white;
   font-family: ${v.fonts.sans};
   font-size: 1.33rem;
   padding: 20px;
+
+  margin-bottom: 10px;
+  margin-left: calc(-100vw / 2 + 500px / 2);
+  margin-right: calc(-100vw / 2 + 500px / 2);
+  margin-top: -15px;
 
   a {
     color: white;
@@ -25,7 +30,7 @@ const StyledAction = styled.div`
 class Banner extends React.Component {
   render() {
     return (
-      <StyledBanner>
+      <StyledBanner color={this.props.color}>
         <MaxWidthContainer>
           <Grid container justify="space-between" alignItems="center">
             <Grid
@@ -49,11 +54,13 @@ class Banner extends React.Component {
 }
 
 Banner.propTypes = {
+  color: PropTypes.oneOf(Object.values(v.colors)),
   leftComponent: PropTypes.object.isRequired,
   rightComponent: PropTypes.object.isRequired,
 }
 
 Banner.defaultProps = {
+  color: v.colors.alert,
   leftComponent: () => null,
   rightComponent: () => null,
 }

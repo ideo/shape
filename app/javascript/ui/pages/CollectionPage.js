@@ -21,6 +21,7 @@ import EditorPill from '~/ui/items/EditorPill'
 import TestDesigner from '~/ui/test_collections/TestDesigner'
 import v from '~/utils/variables'
 import Collection from '~/stores/jsonApi/Collection'
+import ArchivedBanner from '~/ui/layout/ArchivedBanner'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
 import routeToLogin from '~/utils/routeToLogin'
 import CreateOrgPage from '~/ui/pages/CreateOrgPage'
@@ -483,6 +484,7 @@ class CollectionPage extends React.Component {
         {!isLoading && (
           <PageContainer fullWidth={collection.isBoard}>
             <OverdueBanner />
+            <ArchivedBanner />
             {this.renderEditorPill}
             {inner}
             {(collection.requiresSubmissionBoxSettings ||

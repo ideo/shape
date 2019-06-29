@@ -286,6 +286,7 @@ class Collection < ApplicationRecord
       :live_test_collection,
       :collection_cover_items,
       :test_audiences,
+      :restorable_parent,
       roles: %i[pending_users users groups resource],
     ]
   end

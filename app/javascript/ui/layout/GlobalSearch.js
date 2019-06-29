@@ -21,13 +21,14 @@ class GlobalSearch extends React.Component {
     runInAction(() => {
       this.open = !!this.props.uiStore.searchText
       if (props.alwaysOpen) this.open = true
+      if (props.routingStore.extraSearchParams.show_archived)
+        this.searchArchived = true
     })
   }
 
   componentDidUpdate() {
     runInAction(() => {
       this.open = !!this.props.uiStore.searchText
-      console.log('update', this.open)
     })
   }
 
@@ -95,7 +96,13 @@ class GlobalSearch extends React.Component {
           onOpen={this.onOpen}
         />
         {this.open && (
-          <div style={{ marginLeft: '8px', position: 'absolute' }}>
+          <div
+            style={{
+              marginTop: '-8px',
+              marginLeft: '8px',
+              position: 'absolute',
+            }}
+          >
             <FormControlLabel
               control={
                 <Checkbox

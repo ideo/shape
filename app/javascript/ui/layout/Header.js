@@ -5,6 +5,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
 import Hidden from '@material-ui/core/Hidden'
 
+import hexToRgba from '~/utils/hexToRgba'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 import CornerPositioned from '~/ui/global/CornerPositioned'
 import Logo from '~/ui/layout/Logo'
@@ -87,6 +88,16 @@ class Header extends React.Component {
 
   closeOrgMenu = () => {
     this.props.uiStore.update('organizationMenuPage', null)
+  }
+
+  get onArchivedPage() {
+    const { record } = this
+    const { routingStore } = this.props
+    const searchingArchived = routingStore.extraSearchParams.show_archived
+    return (
+      (record && record.archived) ||
+      (routingStore.isSearch && searchingArchived)
+    )
   }
 
   routeBack = ({ type } = {}) => {
@@ -240,7 +251,20 @@ class Header extends React.Component {
 
     return (
       <Fragment>
-        <FixedHeader data-empty-space-click>
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+          body { background-color:  ${
+            this.onArchivedPage
+              ? hexToRgba(v.colors.commonMedium, 0.6)
+              : hexToRgba(v.colors.commonLight, 1)
+          };
+          transition: background-color 0.5s ease;
+          }
+        `,
+          }}
+        />
+        <FixedHeader noBackground={this.onArchivedPage} data-empty-space-click>
           <MaxWidthContainer>
             <Flex
               data-empty-space-click

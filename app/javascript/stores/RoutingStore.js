@@ -14,7 +14,7 @@ class RoutingStore extends RouterStore {
 
   @computed
   get isSearch() {
-    return this.location.pathname === this.pathTo('search')
+    return this.location.pathname.includes('search')
   }
 
   @computed
@@ -25,6 +25,14 @@ class RoutingStore extends RouterStore {
   @computed
   get query() {
     return queryString.parse(this.location.search)
+  }
+
+  @computed
+  get extraSearchParams() {
+    if (!this.isSearch) return {}
+    const params = queryString.parse(this.location.search)
+    delete params.q
+    return params
   }
 
   pathTo = (type, id = null, params = {}) => {

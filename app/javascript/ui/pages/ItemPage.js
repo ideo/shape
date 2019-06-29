@@ -2,6 +2,7 @@ import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import ArchivedBanner from '~/ui/layout/ArchivedBanner'
 import FilePreview from '~/ui/grid/covers/FilePreview'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import ImageItem from '~/ui/items/ImageItem'
@@ -157,6 +158,7 @@ class ItemPage extends React.Component {
         <PageHeader record={item} />
         <ItemPageContainer>
           <PageContainer {...containerProps}>
+            <ArchivedBanner />
             {item.parent_collection_card &&
             replacingId === item.parent_collection_card.id ? (
               <GridCardBlank parent={item.parent} afterCreate={this.reroute} />
