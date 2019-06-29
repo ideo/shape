@@ -685,6 +685,10 @@ export default class UiStore {
       if (opts.open) {
         this.activityLogPage = opts.open
         this.activityLogOpen = true
+      } else if (opts.manage_group_id) {
+        // /shape.space/ideo?manage_group_id=123`
+        this.organizationMenuPage = 'editRoles'
+        this.organizationMenuGroupId = opts.manage_group_id
       }
       if (opts.testing_completed) {
         this.alert(
