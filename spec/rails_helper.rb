@@ -114,7 +114,7 @@ RSpec.configure do |config|
   # `create_org` only makes sense within specs also tagged `auth`
   config.before(:each, create_org: true) do
     # @user from `log_in_as_user` above
-    create_org_for_user(@user)
+    create_org_for_user(@user) if @user.present?
   end
 
   config.around(:each, auth: true) do |example|

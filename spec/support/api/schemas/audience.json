@@ -3,7 +3,6 @@
   "properties": {
     "name": { "type": "string" },
     "price_per_response": { "type": ["number", "null"] },
-    "criteria": { "type": ["number", "null"] },
     "age_list": { "type": "array" },
     "children_age_list": { "type": "array" },
     "country_list": { "type": "array" },
@@ -12,6 +11,8 @@
     "adopter_type_list": { "type": "array" },
     "interest_list": { "type": "array" },
     "publication_list": { "type": "array" },
-    "order": { "type": ["number", "null"] }
+    "order": { "type": ["number", "null"] },
+    "global": { "type": ["boolean", "null"] },
+    "global_default": { "type": ["boolean", "null"] }
   }
 }

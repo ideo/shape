@@ -25,5 +25,9 @@ class Audience extends BaseRecord {
       uiStore.defaultAlertError()
     }
   }
+
+  get isLinkSharing() {
+    return this.price_per_response === 0 && this.global_default === 1
+  }
 }
 export default Audience

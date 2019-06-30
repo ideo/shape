@@ -160,6 +160,11 @@ class Item
           title: 'Context',
           description: 'How satisfied are you with your current solution?',
         }
+      when :total
+        {
+          title: 'Total',
+          description: '',
+        }
       else
         {}
       end

@@ -64,6 +64,8 @@ export default class UiStore {
   adminUsersMenuOpen = null
   @observable
   adminAudienceMenuOpen = null
+  @observable
+  feedbackAudienceMenuOpen = null
   defaultGridSettings = {
     // layout will track we are at "size 3" i.e. "small 4 cols" even though cols === 4
     layoutSize: 4,
@@ -683,6 +685,10 @@ export default class UiStore {
       if (opts.open) {
         this.activityLogPage = opts.open
         this.activityLogOpen = true
+      } else if (opts.manage_group_id) {
+        // /shape.space/ideo?manage_group_id=123`
+        this.organizationMenuPage = 'editRoles'
+        this.organizationMenuGroupId = opts.manage_group_id
       }
       if (opts.testing_completed) {
         this.alert(
