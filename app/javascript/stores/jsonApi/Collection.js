@@ -853,6 +853,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   async restore() {
     const { routingStore } = apiStore
+    const { uiStore } = this
+    uiStore.update('isLoading', true)
     await this.apiStore.unarchiveCards({
       cardIds: [this.parent_collection_card.id],
       collection: this,
@@ -863,6 +865,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     } else if (this.parentPath) {
       routingStore.goToPath(this.parentPath)
     }
+    uiStore.update('isLoading', false)
   }
 
   async API_moveCardsIntoCollection({

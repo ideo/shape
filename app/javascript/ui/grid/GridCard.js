@@ -13,12 +13,14 @@ import ActionMenu from '~/ui/grid/ActionMenu'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import EditButton from '~/ui/reporting/EditButton'
+import { NamedActionButton } from '~/ui/global/styled/buttons'
 import FullScreenIcon from '~/ui/icons/FullScreenIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import HiddenIconButton from '~/ui/icons/HiddenIconButton'
 import Download from '~/ui/grid/Download'
 import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
 import RequiredCollectionIcon from '~/ui/icons/RequiredCollectionIcon'
+import RestoreIcon from '~/ui/icons/RestoreIcon'
 import PinnedIcon from '~/ui/icons/PinnedIcon'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
 import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
@@ -284,6 +286,12 @@ class GridCard extends React.Component {
     this.props.handleClick(e)
   }
 
+  handleRestore = ev => {
+    ev.preventDefault()
+    const { record } = this.props
+    record.restore()
+  }
+
   storeLinkedBreadcrumb = card => {
     if (uiStore.isViewingHomepage) return
     const { record } = card
@@ -372,6 +380,7 @@ class GridCard extends React.Component {
 
     const firstCardInRow = card.position && card.position.x === 0
     const tagEditorOpen = uiStore.tagsModalOpenId === card.id
+    const showRestore = searchResult && record.archived && record.is_restorable
 
     return (
       <StyledGridCard
@@ -403,58 +412,60 @@ class GridCard extends React.Component {
             <GridCardHotspot card={card} dragging={dragging} position="left" />
           )}
         {record.isMedia && this.renderReplaceControl()}
-        {!record.menuDisabled && uiStore.textEditingItem !== record && (
-          <StyledTopRightActions
-            color={this.actionsColor}
-            className="show-on-hover"
-            zoomLevel={zoomLevel}
-          >
-            {record.isDownloadable && <Download record={record} />}
-            {record.canSetACover && (
-              <CoverImageSelector card={card} parentRef={this.gridCardRef} />
-            )}
-            {record.canBeSetAsCover && canEditCollection && (
-              <CoverImageToggle
-                card={card}
-                onReassign={this.onCollectionCoverChange}
-              />
-            )}
-            {record.isData && record.isReportTypeCollectionsItems && (
-              <EditButton onClick={this.editCard} />
-            )}
-            {record.isImage && this.canContentEditCard && (
-              <ContainImage card={card} image_contain={card.image_contain} />
-            )}
-            {(record.isImage || record.isText) && (
-              <CardActionHolder
-                className="show-on-hover"
-                onClick={() => this.goToPage(card)}
-                tooltipText="go to page"
-              >
-                <FullScreenIcon />
-              </CardActionHolder>
-            )}
-            {!testCollectionCard && (
-              <CardActionHolder tooltipText="select">
-                <SelectionCircle cardId={card.id} />
-              </CardActionHolder>
-            )}
-            <ActionMenu
-              location={searchResult ? 'Search' : 'GridCard'}
+        {!record.menuDisabled &&
+          uiStore.textEditingItem !== record &&
+          !record.archived && (
+            <StyledTopRightActions
+              color={this.actionsColor}
               className="show-on-hover"
-              wrapperClassName="card-menu"
-              card={card}
-              canView={record.can_view}
-              canEdit={this.canEditCard}
-              canReplace={record.canReplace && !card.link && !searchResult}
-              direction={uiStore.cardMenuOpen.direction}
-              menuOpen={menuOpen}
-              onOpen={this.openMenu}
-              onLeave={this.closeMenu}
-              testCollectionCard={testCollectionCard}
-            />
-          </StyledTopRightActions>
-        )}
+              zoomLevel={zoomLevel}
+            >
+              {record.isDownloadable && <Download record={record} />}
+              {record.canSetACover && (
+                <CoverImageSelector card={card} parentRef={this.gridCardRef} />
+              )}
+              {record.canBeSetAsCover && canEditCollection && (
+                <CoverImageToggle
+                  card={card}
+                  onReassign={this.onCollectionCoverChange}
+                />
+              )}
+              {record.isData && record.isReportTypeCollectionsItems && (
+                <EditButton onClick={this.editCard} />
+              )}
+              {record.isImage && this.canContentEditCard && (
+                <ContainImage card={card} image_contain={card.image_contain} />
+              )}
+              {(record.isImage || record.isText) && (
+                <CardActionHolder
+                  className="show-on-hover"
+                  onClick={() => this.goToPage(card)}
+                  tooltipText="go to page"
+                >
+                  <FullScreenIcon />
+                </CardActionHolder>
+              )}
+              {!testCollectionCard && (
+                <CardActionHolder tooltipText="select">
+                  <SelectionCircle cardId={card.id} />
+                </CardActionHolder>
+              )}
+              <ActionMenu
+                location={searchResult ? 'Search' : 'GridCard'}
+                className="show-on-hover"
+                wrapperClassName="card-menu"
+                card={card}
+                canView={record.can_view}
+                canEdit={this.canEditCard}
+                canReplace={record.canReplace && !card.link && !searchResult}
+                direction={uiStore.cardMenuOpen.direction}
+                menuOpen={menuOpen}
+                onOpen={this.openMenu}
+                onLeave={this.closeMenu}
+                testCollectionCard={testCollectionCard}
+              />
+            </StyledTopRightActions>
+          )}
         {this.renderIcon}
         {this.renderHidden}
         {/* onClick placed here so it's separate from hotspot click */}
@@ -465,6 +476,17 @@ class GridCard extends React.Component {
           forceFilter={!this.hasCover}
           isText={record.isText}
         >
+          {showRestore && (
+            <StyledTopRightActions
+              color={this.actionsColor}
+              zoomLevel={zoomLevel}
+            >
+              <NamedActionButton onClick={this.handleRestore}>
+                <RestoreIcon />
+                Restore
+              </NamedActionButton>
+            </StyledTopRightActions>
+          )}
           {this.renderCover}
         </StyledGridCardInner>
         <TagEditorModal

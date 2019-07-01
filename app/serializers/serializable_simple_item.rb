@@ -2,7 +2,8 @@ class SerializableSimpleItem < BaseJsonSerializer
   type 'items'
   attributes :name, :content,
              :url, :thumbnail_url, :icon_url,
-             :question_type, :question_description, :question_title
+             :question_type, :question_description, :question_title,
+             :archived, :is_restorable
 
   belongs_to :filestack_file
 
@@ -12,5 +13,9 @@ class SerializableSimpleItem < BaseJsonSerializer
 
   attribute :filestack_handle do
     @object.filestack_file_handle
+  end
+
+  attribute :is_restorable do
+    @object.try(:restorable?)
   end
 end
