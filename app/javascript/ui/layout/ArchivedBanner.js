@@ -3,7 +3,6 @@ import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Grid } from '@material-ui/core'
-import TrashIcon from '~/ui/icons/TrashIcon'
 import Banner from '~/ui/layout/Banner'
 import v from '~/utils/variables'
 
@@ -22,23 +21,12 @@ const StyledBanner = styled(Banner)`
 `
 StyledBanner.displayName = 'StyledBanner'
 
-const StyledIconWrapper = styled.div`
-  vertical-align: middle;
-  width: ${props => props.width || props.height || '32'}px;
-  margin-top: -4px;
-  height: ${props => props.height || props.width || '32'}px;
-  display: inline-block;
-`
-
 @inject('routingStore', 'uiStore')
 @observer
 class ArchivedBanner extends React.Component {
   renderLeftComponent() {
     return (
       <div>
-        <StyledIconWrapper>
-          <TrashIcon />
-        </StyledIconWrapper>
         <span>
           This {_.toLower(this.currentRecord.className) || 'record'} has been
           archived
@@ -49,9 +37,9 @@ class ArchivedBanner extends React.Component {
 
   renderRightComponent() {
     const { routingStore } = this.props
-    if (!this.currentRecord) return null
+    if (!this.currentRecord) return <span></span>
     const { className, restorable_parent } = this.currentRecord
-    if (!restorable_parent) return null
+    if (!restorable_parent) return <span></span>
     const restorableParentPath = routingStore.pathTo(
       restorable_parent.internalType,
       restorable_parent.id

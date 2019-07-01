@@ -90,10 +90,20 @@ class SearchButton extends React.Component {
     })
   }
 
+  componentDidUpdate() {
+    runInAction(() => {
+      if (this.props.controlled) {
+        this.open = this.props.open
+      }
+    })
+  }
+
   @action
   updateOpen = val => {
-    this.open = val
-    this.props.onOpen(val)
+    if (!this.props.controlled) {
+      this.open = val
+    }
+    this.props.onToggle(val)
   }
 
   handleOpen = val => () => this.updateOpen(val)
@@ -143,15 +153,20 @@ SearchButton.propTypes = {
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   onClear: PropTypes.func.isRequired,
-  onOpen: PropTypes.func,
+  onToggle: PropTypes.func,
   defaultOpen: PropTypes.bool,
   background: PropTypes.string,
+  controlled: PropTypes.bool,
+  open: PropTypes.bool,
 }
 
 SearchButton.defaultProps = {
   defaultOpen: false,
+  forceClose: false,
   background: v.colors.commonLightest,
-  onOpen: () => {},
+  onToggle: () => {},
+  controlled: false,
+  open: false,
 }
 
 export default SearchButton

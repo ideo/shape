@@ -2,7 +2,7 @@ import _ from 'lodash'
 import PropTypes from 'prop-types'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { observable, runInAction } from 'mobx'
+import { observe, observable, runInAction } from 'mobx'
 
 import { Checkbox } from '~/ui/global/styled/forms'
 import SearchButton from '~/ui/global/SearchButton'
@@ -21,15 +21,21 @@ class GlobalSearch extends React.Component {
     runInAction(() => {
       this.open = !!this.props.uiStore.searchText
       if (props.alwaysOpen) this.open = true
+      // Toggle the search archived checkbox on if the URL param for it is there.
       if (props.routingStore.extraSearchParams.show_archived)
         this.searchArchived = true
     })
-  }
 
-  componentDidUpdate() {
-    runInAction(() => {
-      this.open = !!this.props.uiStore.searchText
-    })
+    this.disposers = {}
+    this.disposers.isSearch = observe(
+      props.routingStore,
+      'isSearch',
+      change => {
+        runInAction(() => {
+          this.open = change.newValue
+        })
+      }
+    )
   }
 
   get searchText() {
@@ -52,7 +58,7 @@ class GlobalSearch extends React.Component {
     this.search(this.searchText)
   }
 
-  onOpen = val => {
+  onToggle = val => {
     if (val) {
       // Timeout for animation of opening and closing search bar
       setTimeout(() => {
@@ -89,11 +95,13 @@ class GlobalSearch extends React.Component {
         <SearchButton
           background="white"
           defaultOpen={this.open}
+          open={this.open}
+          controlled={true}
           focused={routingStore.pathContains('/search')}
           value={this.searchText}
           onChange={this.handleTextChange}
           onClear={this.clearSearch}
-          onOpen={this.onOpen}
+          onToggle={this.onToggle}
         />
         {this.open && (
           <div
