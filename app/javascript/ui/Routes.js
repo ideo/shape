@@ -28,7 +28,9 @@ import UserSettings from '~/ui/users/UserSettings'
 import v from '~/utils/variables'
 import firebaseClient from '~/vendor/firebase/clients/firebaseClient'
 import MuiTheme, { BillingMuiTheme } from '~/ui/theme'
-import captureGlobalKeypress from '~/utils/captureGlobalKeypress'
+import captureGlobalKeypress, {
+  handleMouseDownSelection,
+} from '~/utils/captureGlobalKeypress'
 
 const AppWrapper = styled.div`
   /* used by terms of use modal to blur the whole site */
@@ -87,17 +89,6 @@ const SelectedArea = styled.div.attrs({
   z-index: ${v.zIndex.clickWrapper};
 `
 
-const quillEditorClick = e => {
-  const quillSelectors =
-    '.quill, .ql-container, .ql-editor, .ql-clipboard, .quill-toolbar, .ql-formats, .ql-header, .ql-link, .ql-stroke'
-  return e.target.closest(quillSelectors)
-}
-
-const emptySpaceClick = e => {
-  const { target } = e
-  return target.getAttribute && target.getAttribute('data-empty-space-click')
-}
-
 // withRouter allows it to respond automatically to routing changes in props
 @withRouter
 @inject('apiStore', 'uiStore', 'routingStore')
@@ -131,22 +122,9 @@ class Routes extends React.Component {
     uiStore.update('windowWidth', windowWidth)
   }
 
-  handleMouseDownSelection = async e => {
-    const { uiStore } = this.props
-    const emptySpaceMouseDown = emptySpaceClick(e)
-    const outsideQuillMouseDown = !quillEditorClick(e)
-    if (!outsideQuillMouseDown && !emptySpaceMouseDown) return
-    if (outsideQuillMouseDown) {
-      // if we clicked outside the quill editor...
-      const { textEditingItem } = uiStore
-      if (!textEditingItem) return
-      await textEditingItem.API_updateWithoutSync()
-      uiStore.update('textEditingItem', null)
-    } else {
-      // if we clicked an empty space...
-      uiStore.deselectCards()
-      uiStore.onEmptySpaceClick(e)
-      uiStore.closeBlankContentTool()
+  handleMouseDownSelection = e => {
+    const globalClick = handleMouseDownSelection(e)
+    if (globalClick === 'emptySpace') {
       this.mouseDownAt = { x: e.pageX, y: e.pageY }
     }
   }
