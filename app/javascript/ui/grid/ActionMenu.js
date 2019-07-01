@@ -274,6 +274,7 @@ class ActionMenu extends React.Component {
       items = _.reject(items, { name: 'Delete' })
       items = _.reject(items, { name: 'Sub. Box Settings' })
       items = _.reject(items, { name: 'Add to My Collection' })
+      items = _.reject(items, { name: 'Sharing' })
     }
 
     return items
