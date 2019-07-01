@@ -20,6 +20,7 @@ import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
 import XIcon from '~/ui/icons/XIcon'
 import Tooltip from '~/ui/global/Tooltip'
 import CommentInput from './CommentInput'
+import Linkify from 'linkifyjs/react'
 
 const StyledComment = StyledCommentInput.extend`
   ${showOnHoverCss};
@@ -42,7 +43,7 @@ const StyledComment = StyledCommentInput.extend`
     a:hover,
     a:active,
     a:visited {
-      color: ${v.colors.ctaPrimary};
+      color: ${v.colors.white};
     }
   }
 `
@@ -218,7 +219,7 @@ class Comment extends React.Component {
       <React.Fragment>
         {!this.state.editing && (
           <div>
-            {comment.message}
+            <Linkify tagName="p">{comment.message}</Linkify>
             {comment.wasEdited && (
               <EditedIndicator>{'(edited)'}</EditedIndicator>
             )}
@@ -269,26 +270,27 @@ class Comment extends React.Component {
                   <Moment date={comment.created_at} />
                 </Timestamp>
                 <StyledCommentActions className="show-on-hover">
-                  {comment.persisted && isCurrentUserComment && (
-                    <React.Fragment>
-                      <Tooltip placement="top" title="edit comment">
-                        <ActionButton
-                          onClick={this.handleEditClick}
-                          className="test-edit-comment"
-                        >
-                          <EditPencilIcon />
-                        </ActionButton>
-                      </Tooltip>
-                      <Tooltip placement="top" title="delete comment">
-                        <ActionButton
-                          onClick={this.handleDeleteClick}
-                          className="test-delete-comment"
-                        >
-                          <TrashLgIcon />
-                        </ActionButton>
-                      </Tooltip>
-                    </React.Fragment>
-                  )}
+                  {comment.persisted &&
+                    isCurrentUserComment && (
+                      <React.Fragment>
+                        <Tooltip placement="top" title="edit comment">
+                          <ActionButton
+                            onClick={this.handleEditClick}
+                            className="test-edit-comment"
+                          >
+                            <EditPencilIcon />
+                          </ActionButton>
+                        </Tooltip>
+                        <Tooltip placement="top" title="delete comment">
+                          <ActionButton
+                            onClick={this.handleDeleteClick}
+                            className="test-delete-comment"
+                          >
+                            <TrashLgIcon />
+                          </ActionButton>
+                        </Tooltip>
+                      </React.Fragment>
+                    )}
                 </StyledCommentActions>
               </React.Fragment>
             )}
