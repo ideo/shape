@@ -84,4 +84,8 @@ class SerializableItem < BaseJsonSerializer
   attribute :is_restorable do
     @object.restorable?
   end
+
+  has_one :restorable_parent do
+    @object.try(:restorable_parent)
+  end
 end
