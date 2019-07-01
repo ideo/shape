@@ -7,44 +7,47 @@ import v, {
 // params: e, click event used to get cursor position
 // eventSource: where the click happened, used to get component dimensions
 // popoutMenuItemCount: menu item count used to determine menu height
-const calculatePopoutMenuOffset = (e, eventSource, popoutMenuItemCount) => {
+const calculatePopoutMenuOffset = (e, eventSource, popoutMenuItemCount = 1) => {
   const { actionMenuWidth, actionMenuHeight } = v
   const { clientX, clientY } = e
   const { innerWidth, innerHeight } = window
-  let totalHeight
-  let totalWidth
-  let menuBoundaryXMin
-  let menuBoundaryXMax
-  let menuBoundaryYMin
-  let menuBoundaryYMax
+  const totalWidth = actionMenuWidth
+  const totalHeight = actionMenuHeight * popoutMenuItemCount
+  // where component must not overlap
+  const menuBoundaryXMin = clientX + actionMenuWidth
+  const menuBoundaryYMin = 60 + clientY + totalHeight
+  // where the component is and the area in the screen it covers
+  const menuBoundaryXMax = innerWidth
+  const menuBoundaryYMax = innerHeight
 
-  // todo: add pageMenu, orgMenu, etc. if necessary
-  switch (eventSource) {
-    case EVENT_SOURCE_TYPES.GRID_CARD:
-      totalWidth = actionMenuWidth
-      totalHeight = actionMenuHeight * popoutMenuItemCount
-      menuBoundaryXMin = clientX
-      menuBoundaryXMax = innerWidth - actionMenuWidth
-      menuBoundaryYMin = 60 + clientY + totalHeight
-      menuBoundaryYMax = innerHeight
-      break
-    case EVENT_SOURCE_TYPES.AUDIENCE_SETTINGS:
-      totalWidth = actionMenuWidth
-      totalHeight = actionMenuHeight * popoutMenuItemCount
-      menuBoundaryXMin = clientX + actionMenuWidth
-      menuBoundaryXMax = innerWidth
-      menuBoundaryYMin = 60 + clientY + totalHeight
-      menuBoundaryYMax = innerHeight
-    default:
-      break
-  }
-
+  // set offsets per component
   const componentOffsets = POPOUT_MENU_OFFSET_MAP[eventSource]
   const { x, y } = componentOffsets
-  const leftOffset = totalWidth - x
-  const rightOffset = -x
-  const topOffset = -totalHeight - y
-  const bottomOffset = 0
+  let leftOffset
+  let rightOffset
+  let topOffset
+  let bottomOffset
+
+  // todo: add pageMenu, orgMenu, bctMenu etc. if necessary since offsets may differ per component
+  switch (eventSource) {
+    case EVENT_SOURCE_TYPES.AUDIENCE_SETTINGS:
+      const topOffsetMaxValue = -230 // never exceed click position
+      leftOffset = totalWidth - x
+      rightOffset = -x + 20
+      topOffset =
+        -totalHeight - y - 60 > topOffsetMaxValue
+          ? -y - 20
+          : -totalHeight - y - 60
+      bottomOffset = -35
+      break
+    case EVENT_SOURCE_TYPES.GRID_CARD:
+    default:
+      leftOffset = totalWidth - x
+      rightOffset = -x
+      topOffset = -totalHeight - y
+      bottomOffset = 0
+      break
+  }
 
   // if click happens outside menu boundary, then move component
   if (

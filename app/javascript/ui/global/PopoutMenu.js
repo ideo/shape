@@ -59,6 +59,13 @@ export const StyledMenuWrapper = styled.div`
         left: ${transformX}px;
         top: ${transformY}px;
       `
+    } else if (offsetPosition) {
+      // dynamic positioning based off component dimensions and click position
+      const { x, y } = offsetPosition
+      return `
+        left: ${x}px;
+        top: ${y}px;
+      `
     }
     // fixed positioning for default popout menu instances, org, collection, action menu, etc.
     return `

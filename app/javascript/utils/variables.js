@@ -79,11 +79,11 @@ export const EVENT_SOURCE_TYPES = {
   AUDIENCE_SETTINGS: 'audienceSettings',
 }
 
-// bottom and left are default values
+// used for moving components around by setting top and left values after click
 export const POPOUT_MENU_OFFSET_MAP = {
   audienceSettings: {
-    x: -20,
-    y: -90,
+    x: 20,
+    y: 90,
   },
   gridCard: {
     x: 20,

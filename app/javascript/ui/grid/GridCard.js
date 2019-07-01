@@ -198,9 +198,7 @@ class GridCard extends React.Component {
     const { menuItemCount, props } = this
     const { card } = props
 
-    // todo: dynamically assign this based on user permissions, context = templates have 3 items...
-    // dynamically move popout menu in the right position
-    // based on based click's position and action menu size
+    // use util method to dynamically move the component on open
     const positionOffset = calculatePopoutMenuOffset(
       ev,
       EVENT_SOURCE_TYPES.GRID_CARD,
