@@ -31,17 +31,19 @@ describe('TestSurveyResponder', () => {
   describe('with a live survey', () => {
     it('has 3 answerable questions', () => {
       // see note below
-      expect(component.answerableCards.length).toEqual(8)
+      expect(component.answerableCards.length).toEqual(10)
       expect(component.answerableCards.map(c => c.card_question_type)).toEqual([
         'question_welcome',
         'question_terms',
         'question_useful',
-        // TODO: these 5 are hardcoded as appearing for now
+        // TODO: these are hardcoded as appearing for now
         'question_demographics_single_choice',
         'question_demographics_single_choice',
         'question_demographics_single_choice',
         'question_demographics_single_choice',
         'question_demographics_single_choice',
+        'question_demographics_multiple_choice',
+        'question_demographics_multiple_choice',
       ])
     })
 
