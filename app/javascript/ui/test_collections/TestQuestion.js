@@ -11,12 +11,16 @@ import NextTestQuestion from '~/ui/test_collections/NextTestQuestion'
 import NewQuestionGraphic from '~/ui/icons/NewQuestionGraphic'
 import OpenQuestion from '~/ui/test_collections/OpenQuestion'
 import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
+import DemographicsSingleChoiceQuestion from '~/ui/test_collections/DemographicsSingleChoiceQuestion'
+import DemographicsMultipleChoiceQuestion from '~/ui/test_collections/DemographicsMultipleChoiceQuestion'
+import DemographicsIntroQuestion from '~/ui/test_collections/DemographicsIntroQuestion'
 import TermsQuestion from '~/ui/test_collections/TermsQuestion'
 import WelcomeQuestion from '~/ui/test_collections/WelcomeQuestion'
 import { QuestionText } from '~/ui/test_collections/shared'
 import { apiStore, uiStore } from '~/stores'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
 import QuestionAnswer from '~/stores/jsonApi/QuestionAnswer'
+import { NON_TEST_QUESTION_TYPES } from './TestSurveyResponder'
 
 const QuestionHolder = styled.div`
   display: flex;
@@ -37,13 +41,6 @@ const QuestionCardInner = styled.div`
   width: 100%;
   height: 100%;
 `
-
-const NON_TEST_QUESTIONS = [
-  'question_recontact',
-  'question_terms',
-  'question_welcome',
-]
-
 @observer
 class TestQuestion extends React.Component {
   handleQuestionAnswer = async answer => {
@@ -54,14 +51,17 @@ class TestQuestion extends React.Component {
       createSurveyResponse,
       afterQuestionAnswered,
     } = this.props
-    const { text, number } = answer
-    let { surveyResponse, questionAnswer } = this.props
+
     // components should never trigger this when editing, but double-check here
     if (editing) return
-    if (NON_TEST_QUESTIONS.includes(card.card_question_type)) {
+
+    if (NON_TEST_QUESTION_TYPES.includes(card.card_question_type)) {
       afterQuestionAnswered(card, answer)
       return
     }
+
+    const { text, number } = answer
+    let { surveyResponse, questionAnswer } = this.props
 
     if (!questionAnswer) {
       if (!surveyResponse) {
@@ -214,6 +214,27 @@ class TestQuestion extends React.Component {
             givesIncentive={this.givesIncentive}
             numberOfQuestions={numberOfQuestions}
             onAnswer={this.handleQuestionAnswer}
+          />
+        )
+
+      case 'question_demographics_intro':
+        return <DemographicsIntroQuestion />
+
+      case 'question_demographics_single_choice':
+        return (
+          <DemographicsSingleChoiceQuestion
+            question={card}
+            onAnswer={this.handleQuestionAnswer}
+            user={apiStore.currentUser}
+          />
+        )
+
+      case 'question_demographics_multiple_choice':
+        return (
+          <DemographicsMultipleChoiceQuestion
+            question={card}
+            onAnswer={this.handleQuestionAnswer}
+            user={apiStore.currentUser}
           />
         )
 

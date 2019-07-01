@@ -17,12 +17,15 @@
 
 class Audience < ApplicationRecord
   DEMOGRAPHIC_TAGS = %i[
+    adopter_types
     ages
     children_ages
     countries
+    dweller_types
     education_levels
+    employment_types
     genders
-    adopter_types
+    income_levels
     interests
     publications
   ].freeze

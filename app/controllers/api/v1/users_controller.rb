@@ -1,6 +1,6 @@
 class Api::V1::UsersController < Api::V1::BaseController
   before_action :authenticate_user!, only: :update_current_user
-  skip_before_action :check_api_authentication!, only: %i[me update_current_user create_limited_user]
+  skip_before_action :check_api_authentication!, only: %i[me update_current_user update_current_user_demographics create_limited_user]
   load_and_authorize_resource only: %i[show]
   def show
     render jsonapi: @user, include: [
@@ -43,6 +43,22 @@ class Api::V1::UsersController < Api::V1::BaseController
   # since the only user you can update via the API is yourself, this keeps it simple
   def update_current_user
     if current_user.update(user_params)
+      render jsonapi: current_user, class: {
+        User: SerializableCurrentUser,
+      }
+    else
+      render_api_errors current_user.errors
+    end
+  end
+
+  def update_current_user_demographics
+    category = json_api_params.require(:category).to_sym
+    tags = json_api_params[:tags]
+
+    if Audience::DEMOGRAPHIC_TAGS.include? category
+      current_user.set_tag_list_on(category, tags)
+      current_user.save
+
       render jsonapi: current_user, class: {
         User: SerializableCurrentUser,
       }

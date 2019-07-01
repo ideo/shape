@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { observable, runInAction } from 'mobx'
+import { action, runInAction, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { scroller } from 'react-scroll'
 import { ThemeProvider } from 'styled-components'
@@ -14,6 +14,11 @@ import {
 } from '~/ui/test_collections/shared'
 import TestQuestion from '~/ui/test_collections/TestQuestion'
 import GreetingMessage from '~/ui/test_collections/GreetingMessage'
+import {
+  allDemographicQuestions,
+  cardQuestionTypeForQuestion,
+  createDemographicsCardId,
+} from '~/ui/test_collections/RespondentDemographics'
 import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
 import ScrollingModule from '~/ui/test_collections/ScrollingModule'
 import ClosedSurvey from '~/ui/test_collections/ClosedSurvey'
@@ -22,8 +27,65 @@ const UNANSWERABLE_QUESTION_TYPES = [
   'question_media',
   'question_description',
   'question_finish',
-  'question_recontact',
+  'question_demographics_intro',
 ]
+
+export const NON_TEST_QUESTION_TYPES = [
+  'question_recontact',
+  'question_terms',
+  'question_welcome',
+  'question_demographics_single_choice',
+  'question_demographics_multiple_choice',
+]
+
+const DEMOGRAPHIC_QUESTION_TYPES = [
+  'question_demographics_intro',
+  'question_demographics_single_choice',
+  'question_demographics_multiple_choice',
+]
+
+// Allow us to insert non-test questions into the survey while faking out some
+// things that would otherwise cause us trouble.
+const createFakeCollectionCard = ({
+  id, // *
+  cardQuestionType = `question_${id}`, // *
+  order,
+  recordId = id, // *
+  recordContent = '',
+}) => ({
+  id,
+  card_question_type: cardQuestionType,
+  order,
+  record: {
+    id: recordId,
+    content: recordContent,
+    disableMenu: () => {}, // noop
+  },
+})
+
+// Insert demographic questions into the survey. These need to mimic a
+// CollectionCard closely enough to get passed to the TestQuestion component
+// without issue, at which point the code diverges enough that we can apply
+// special processing.
+function createDemographicsQuestionCard(question) {
+  const id = createDemographicsCardId(question)
+  const cardQuestionType = cardQuestionTypeForQuestion(question)
+
+  return {
+    id,
+    card_question_type: cardQuestionType,
+    prompt: question.text,
+    category: question.category,
+    choices: question.choices,
+
+    // a fake record to prevent errors.
+    record: {
+      id,
+      content: question.text,
+      disableMenu: () => {}, // noop
+    },
+  }
+}
 
 @inject('apiStore')
 @observer
@@ -31,22 +93,9 @@ class TestSurveyResponder extends React.Component {
   @observable
   questionCards = []
   @observable
-  recontactAnswered = false
-  @observable
-  termsAnswered = false
-  @observable
-  welcomeAnswered = false
-  @observable
   currentCardIdx = 0
   @observable
-  surveyResponse = null
-  @observable
-  collection = null
-
-  constructor(props) {
-    super(props)
-    this.collection = props.collection
-  }
+  nonTestQuestionsAnswered = new Map()
 
   async componentDidMount() {
     this.initializeCards()
@@ -73,8 +122,7 @@ class TestSurveyResponder extends React.Component {
   }
 
   async fetchSurveyResponse() {
-    const { collection } = this
-    const { apiStore } = this.props
+    const { collection, apiStore } = this.props
 
     const surveyResponseId = collection.survey_response_for_user_id
     const surveyResponseResult =
@@ -94,7 +142,7 @@ class TestSurveyResponder extends React.Component {
 
     const newResponse = new SurveyResponse(
       {
-        test_collection_id: this.collection.id,
+        test_collection_id: collection.id,
       },
       apiStore
     )
@@ -112,8 +160,13 @@ class TestSurveyResponder extends React.Component {
     }
   }
 
+  @action
+  setNonTestQuestionAnswered(cardId, answered = true) {
+    this.nonTestQuestionsAnswered.set(cardId, answered)
+  }
+
   initializeCards() {
-    const { collection } = this
+    const { collection } = this.props
     if (!collection || !collection.question_cards) return
 
     const questionCards = [...collection.question_cards]
@@ -126,53 +179,73 @@ class TestSurveyResponder extends React.Component {
     if (this.includeRecontactQuestion) {
       // Put recontact question after the finish question
       const recontactOrder = questionCards[questionFinishIndex].order + 1
-      questionCards.splice(questionFinishIndex + 1, 0, {
-        id: 'recontact',
-        card_question_type: 'question_recontact',
-        order: recontactOrder,
-        record: { id: 'recontact_item', content: '' },
+      questionCards.splice(
+        questionFinishIndex + 1,
+        0,
+        createFakeCollectionCard({
+          id: 'recontact',
+          order: recontactOrder,
+          recordId: 'recontact_item',
+        })
+      )
+    }
+
+    const includeDemographicQuestions = true // TODO
+    if (includeDemographicQuestions) {
+      questionCards.push(createFakeCollectionCard({ id: 'demographics_intro' }))
+
+      allDemographicQuestions().forEach(q => {
+        questionCards.push(createDemographicsQuestionCard(q))
       })
     }
+
     if (this.includeTerms) {
-      questionCards.unshift({
-        id: 'terms',
-        card_question_type: 'question_terms',
-        record: { id: 'terms', content: '' },
-      })
+      questionCards.unshift(
+        createFakeCollectionCard({
+          id: 'terms',
+        })
+      )
     }
+
     // Always have the respondent welcome come first
-    questionCards.unshift({
-      id: 'welcome',
-      card_question_type: 'question_welcome',
-      record: { id: 'welcome', content: '' },
-    })
+    questionCards.unshift(
+      createFakeCollectionCard({
+        id: 'welcome',
+      })
+    )
+
     runInAction(() => {
       this.questionCards = questionCards
     })
   }
 
+  isNonTestQuestionCard = card =>
+    _.includes(NON_TEST_QUESTION_TYPES, card.card_question_type)
+
+  isDemograpicCard = card =>
+    _.includes(DEMOGRAPHIC_QUESTION_TYPES, card.card_question_type)
+
+  isAnswerableCard = card =>
+    !_.includes(UNANSWERABLE_QUESTION_TYPES, card.card_question_type)
+
   questionAnswerForCard = card => {
     const { surveyResponse } = this
-    if (card.card_question_type === 'question_welcome') {
-      return this.welcomeAnswered
-    }
-    if (card.card_question_type === 'question_terms') {
-      return this.termsAnswered
-    }
     if (!surveyResponse) return undefined
-    if (card.card_question_type === 'question_recontact') {
-      return this.recontactAnswered
-    }
+
     return _.find(surveyResponse.question_answers, {
       question_id: card.record.id,
     })
   }
 
-  answerableCard = card =>
-    UNANSWERABLE_QUESTION_TYPES.indexOf(card.card_question_type) === -1
+  answeredCard = card => {
+    if (this.isNonTestQuestionCard(card)) {
+      return this.nonTestQuestionsAnswered.get(card.id) === true
+    }
+    return !!this.questionAnswerForCard(card)
+  }
 
   get answerableCards() {
-    return this.questionCards.filter(card => this.answerableCard(card))
+    return this.questionCards.filter(card => this.isAnswerableCard(card))
   }
 
   get numAnswerableQuestionItems() {
@@ -192,49 +265,37 @@ class TestSurveyResponder extends React.Component {
 
     let reachedLastVisibleCard = false
     const questions = questionCards.filter(card => {
-      // turn off the card's actionmenu (dot-dot-dot)
-      if (
-        ['recontact', 'terms', 'welcome'].every(
-          questionId => card.id !== questionId
-        )
-      )
-        card.record.disableMenu()
       if (reachedLastVisibleCard) {
         return false
-      } else if (
-        !this.answerableCard(card) ||
-        this.questionAnswerForCard(card)
-      ) {
+      } else if (!this.isAnswerableCard(card) || this.answeredCard(card)) {
         // If not answerable, or they already answered, show it
         return true
       }
       reachedLastVisibleCard = true
       return true
     })
+
+    // turn off the card's actionmenu (dot-dot-dot)
+    questions.forEach(card => card.record.disableMenu())
     return questions
   }
 
   afterQuestionAnswered = (card, answer) => {
-    if (card.id === 'welcome') {
-      runInAction(() => {
-        this.welcomeAnswered = true
-      })
+    if (this.isNonTestQuestionCard(card)) {
+      this.setNonTestQuestionAnswered(card.id)
     }
-    if (card.id === 'recontact') {
-      runInAction(() => {
-        this.recontactAnswered = true
-      })
+    if (card.card_question_type === 'question_recontact') {
       // this is the last question, don't try to scroll
+      //
+      // n.b. this hack hides a scrolling bug that triggers, because the props
+      // change when a user asks to be recontacted
       return
     }
-    if (card.id === 'terms') {
+    if (card.card_question_type === 'question_terms') {
       if (!answer) {
         // If they didn't agree to the terms, send to marketing page
         window.location.href = '/'
       }
-      runInAction(() => {
-        this.termsAnswered = true
-      })
     }
     setTimeout(() => {
       this.scrollToTopOfNextCard(card)
@@ -301,16 +362,22 @@ class TestSurveyResponder extends React.Component {
       numAnswerableQuestionItems,
     } = this
 
+    const surveyQuestions = this.questionCards.filter(
+      card => this.isAnswerableCard(card) && !this.isDemograpicCard(card)
+    )
+    const surveyDuration = surveyQuestions.length
+    const surveyProgress = Math.min(this.currentCardIdx, surveyDuration - 1) // this assumes demographic cards are after the survey
+
     return (
       <ThemeProvider theme={styledTestTheme(this.theme)}>
         <div id="surveyContainer">
           <ProgressDots
-            totalAmount={this.answerableCards.length + 1}
-            currentProgress={this.currentCardIdx}
+            totalAmount={surveyDuration}
+            currentProgress={surveyProgress}
           />
           <ProgressSquare
-            totalAmount={this.answerableCards.length + 1}
-            currentProgress={this.currentCardIdx}
+            totalAmount={surveyDuration}
+            currentProgress={surveyProgress}
           />
           <GreetingMessage />
           {this.viewableCards.map(card => (

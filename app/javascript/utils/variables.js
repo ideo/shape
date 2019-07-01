@@ -130,6 +130,7 @@ export default {
     transparent: 'transparent',
     respondentBannerBackground: '#41d3bd',
     respondentBannerText: '#305d6c',
+    respondentTextHint: '#99b8c2',
   },
 
   iconSizes: {
