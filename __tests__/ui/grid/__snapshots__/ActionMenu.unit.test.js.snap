@@ -4,7 +4,6 @@ exports[`ActionMenu as editor renders snapshot 1`] = `
 <PopoutMenu
   buttonStyle=""
   className=""
-  direction="left"
   disabled={false}
   groupExtraComponent={Object {}}
   groupedMenuItems={Object {}}
@@ -51,6 +50,12 @@ exports[`ActionMenu as editor renders snapshot 1`] = `
     ]
   }
   menuOpen={false}
+  offsetPosition={
+    Object {
+      "x": 0,
+      "y": 0,
+    }
+  }
   onClick={[Function]}
   onMouseLeave={[Function]}
   position={

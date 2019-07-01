@@ -110,6 +110,7 @@ exports[`GridCardBlank renders snapshot 1`] = `
             ]
           }
           menuOpen={false}
+          offsetPosition={null}
           onClick={[Function]}
           onMouseLeave={[Function]}
           position={null}
