@@ -9,7 +9,8 @@ const fakeRoutingStore = {
   location: {
     pathname: '/xyz',
     search: '',
-  }
+  },
+  extraSearchParams: {},
 }
 
 export default fakeRoutingStore

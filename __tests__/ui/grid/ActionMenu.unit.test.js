@@ -247,11 +247,10 @@ describe('ActionMenu', () => {
 
     it('should only render tags and sharing', () => {
       const popout = wrapper.find('PopoutMenu').at(0)
-      expect(popout.props().menuItems.length).toEqual(3)
+      expect(popout.props().menuItems.length).toEqual(2)
       expect(_.map(popout.props().menuItems, i => i.name)).toEqual([
         'Download',
         'Tags',
-        'Sharing',
       ])
     })
   })

@@ -8,6 +8,7 @@ describe('GlobalSearch', () => {
       pathTo: jest.fn(),
       routeTo: jest.fn(),
       pathContains: jest.fn(),
+      extraSearchParams: {},
     }
     props = {
       routingStore,
