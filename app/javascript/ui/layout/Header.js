@@ -97,11 +97,12 @@ class Header extends React.Component {
       type === 'move' ||
       type === 'archive'
     ) {
-      if (record.parent_collection_card.parent_id) {
-        routingStore.routeTo(
-          'collections',
-          record.parent_collection_card.parent_id
-        )
+      const { parent_collection_card } = record
+      if (
+        parent_collection_card.parent_id &&
+        parent_collection_card.can_view_parent
+      ) {
+        routingStore.routeTo('collections', parent_collection_card.parent_id)
       } else {
         routingStore.routeTo('homepage')
       }

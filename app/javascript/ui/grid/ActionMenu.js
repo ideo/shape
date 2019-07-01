@@ -208,9 +208,6 @@ class ActionMenu extends React.Component {
     if (canEdit && !card.isPinnedAndLocked) {
       // Replace action is added later if this.props.canReplace
       items = _.reject(items, { name: 'Replace' })
-      if (!card.can_move) {
-        items = _.reject(items, { name: 'Move' })
-      }
       if (record && record.is_submission_box_template) {
         items = _.reject(items, { name: 'Delete' })
         items = _.reject(items, { name: 'Move' })

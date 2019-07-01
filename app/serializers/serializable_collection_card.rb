@@ -12,8 +12,8 @@ class SerializableCollectionCard < BaseJsonSerializer
     @object.pinned_and_locked?
   end
 
-  attribute :can_move do
-    @current_ability ? @current_ability.can?(:edit_content, (@parent || @object.try(:parent))) : false
+  attribute :can_view_parent do
+    @current_ability ? @current_ability.can?(:view_content, (@parent || @object.try(:parent))) : false
   end
 
   attribute :is_master_template_card do
