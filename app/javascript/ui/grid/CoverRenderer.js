@@ -36,23 +36,6 @@ class CoverRenderer extends React.Component {
       isTestCollectionCard,
       nestedTextItem,
     } = this.props
-    if (nestedTextItem) {
-      return (
-        <CollectionCover
-          cardId={card.id}
-          width={card.maxWidth}
-          height={card.maxHeight}
-          collection={record}
-          dragging={dragging}
-          searchResult={searchResult}
-          inSubmissionsCollection={
-            card.parentCollection &&
-            card.parentCollection.isSubmissionsCollection
-          }
-          textItem={nestedTextItem}
-        />
-      )
-    }
     if (this.isItem) {
       switch (record.type) {
         case ITEM_TYPES.TEXT:
@@ -128,6 +111,7 @@ class CoverRenderer extends React.Component {
             card.parentCollection &&
             card.parentCollection.isSubmissionsCollection
           }
+          textItem={nestedTextItem}
         />
       )
     }
