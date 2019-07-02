@@ -270,27 +270,26 @@ class Comment extends React.Component {
                   <Moment date={comment.created_at} />
                 </Timestamp>
                 <StyledCommentActions className="show-on-hover">
-                  {comment.persisted &&
-                    isCurrentUserComment && (
-                      <React.Fragment>
-                        <Tooltip placement="top" title="edit comment">
-                          <ActionButton
-                            onClick={this.handleEditClick}
-                            className="test-edit-comment"
-                          >
-                            <EditPencilIcon />
-                          </ActionButton>
-                        </Tooltip>
-                        <Tooltip placement="top" title="delete comment">
-                          <ActionButton
-                            onClick={this.handleDeleteClick}
-                            className="test-delete-comment"
-                          >
-                            <TrashLgIcon />
-                          </ActionButton>
-                        </Tooltip>
-                      </React.Fragment>
-                    )}
+                  {comment.persisted && isCurrentUserComment && (
+                    <React.Fragment>
+                      <Tooltip placement="top" title="edit comment">
+                        <ActionButton
+                          onClick={this.handleEditClick}
+                          className="test-edit-comment"
+                        >
+                          <EditPencilIcon />
+                        </ActionButton>
+                      </Tooltip>
+                      <Tooltip placement="top" title="delete comment">
+                        <ActionButton
+                          onClick={this.handleDeleteClick}
+                          className="test-delete-comment"
+                        >
+                          <TrashLgIcon />
+                        </ActionButton>
+                      </Tooltip>
+                    </React.Fragment>
+                  )}
                 </StyledCommentActions>
               </React.Fragment>
             )}

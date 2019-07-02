@@ -7,6 +7,11 @@ js_files=$(comm -23 <(git diff --cached --name-only --diff-filter=ACM) <(git dif
 
 set -e
 
+if [ -n "$prettier_files" ]; then
+  "$DIR"/node_modules/.bin/prettier --write $js_files
+  git add -f $js_files
+fi
+
 if [ -n "$js_files" ]; then
   "$DIR"/node_modules/.bin/eslint --fix $js_files
   git add -f $js_files
