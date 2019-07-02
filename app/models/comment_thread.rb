@@ -20,7 +20,8 @@ class CommentThread < ApplicationRecord
 
   belongs_to :record,
              polymorphic: true
-  belongs_to :organization
+  # optional relation gives way to inherit_record_organization_id
+  belongs_to :organization, optional: true
   before_validation :inherit_record_organization_id, on: :create
   validates :record_id, uniqueness: { scope: %i[organization_id record_type] }
 

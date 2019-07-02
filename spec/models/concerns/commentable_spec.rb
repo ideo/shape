@@ -3,6 +3,7 @@ require 'rails_helper'
 describe Commentable, type: :concern do
   let!(:record) { create(:collection) }
   let!(:comment_thread) { create(:comment_thread, record: record, organization: record.organization) }
+  let(:other_org) { create(:organization_without_groups) }
 
   it 'should have concern included' do
     expect(Item.ancestors).to include(Commentable)
@@ -11,7 +12,7 @@ describe Commentable, type: :concern do
 
   context 'callbacks' do
     describe '#update_comment_threads_in_firestore' do
-      let!(:comment_thread_2) { create(:collection_comment_thread, record: record) }
+      let!(:comment_thread_2) { create(:collection_comment_thread, record: record, organization: other_org) }
       it 'should update all related threads' do
         expect(record.comment_threads.count).to eq 2
         record.comment_threads.each do |ct|
@@ -32,7 +33,7 @@ describe Commentable, type: :concern do
   end
 
   describe '#comment_thread' do
-    let!(:comment_thread_2) { create(:collection_comment_thread, record: record) }
+    let!(:comment_thread_2) { create(:collection_comment_thread, record: record, organization: other_org) }
 
     it 'should return the comment_thread that matches the record\'s organization' do
       expect(record.comment_threads.count).to eq 2
