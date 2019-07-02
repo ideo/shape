@@ -66,6 +66,7 @@ class Collection < ApplicationRecord
   include Templateable
   include Testable
   include Externalizable
+  include Commentable
 
   resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
@@ -74,7 +75,6 @@ class Collection < ApplicationRecord
 
   archivable as: :parent_collection_card,
              with: %i[collection_cards cards_linked_to_this_collection]
-  after_archive :remove_comment_followers!
   acts_as_taggable
 
   store_accessor :cached_attributes,
@@ -98,7 +98,6 @@ class Collection < ApplicationRecord
   after_touch :touch_related_cards, unless: :destroyed?
   after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
   after_commit :reindex_sync, on: :create
-  after_commit :update_comment_thread_in_firestore, unless: :destroyed?
   after_save :pin_all_primary_cards, if: :now_master_template?
 
   # all cards including archived (i.e. undo default :collection_cards scope)
@@ -164,8 +163,6 @@ class Collection < ApplicationRecord
            source: :item,
            class_name: 'Item::DataItem',
            through: :primary_collection_cards
-
-  has_one :comment_thread, as: :record, dependent: :destroy
 
   delegate :parent, :pinned, :pinned?, :pinned_and_locked?,
            to: :parent_collection_card, allow_nil: true
@@ -634,11 +631,6 @@ class Collection < ApplicationRecord
       "/roles_#{anchored_roles.maximum(:updated_at).to_i}"
   end
 
-  def remove_comment_followers!
-    return unless comment_thread.present?
-    RemoveCommentThreadFollowers.perform_async(comment_thread.id)
-  end
-
   def jsonapi_type_name
     'collections'
   end
@@ -827,12 +819,6 @@ class Collection < ApplicationRecord
     return true if organization.present?
     return true unless parent_collection.present?
     self.organization_id = parent_collection.organization_id
-  end
-
-  def update_comment_thread_in_firestore
-    return unless comment_thread.present?
-    return unless saved_change_to_name? || saved_change_to_cached_attributes?
-    comment_thread.store_in_firestore
   end
 
   def pin_all_primary_cards
