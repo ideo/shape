@@ -71,6 +71,20 @@ RSpec.describe CardMover, type: :service do
         # double check that breadcrumb is showing the new collection
         expect(card.item.breadcrumb.first).to eq to_collection.id
       end
+
+      context 'with private record' do
+        let(:moving_cards) { from_collection.collection_cards.limit(1) }
+        let(:card) { moving_cards.first }
+        before do
+          card.record.unanchor!
+          card.record.update(cached_inheritance: { private: true })
+        end
+
+        it 'should not assign permissions' do
+          expect(Roles::MergeToChild).not_to receive(:call)
+          card_mover.call
+        end
+      end
     end
 
     context 'with placement "end"' do

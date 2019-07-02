@@ -1,8 +1,12 @@
 /* eslint global-require: 0 */
 import ReactDOM from 'react-dom'
+import { configure } from 'mobx'
 import TestSurveyPage from '~/ui/pages/TestSurveyPage'
 import { Provider } from 'mobx-react'
 import stores from '~/stores'
+
+// Enable MobX Strict functionality -- requires explicit @actions
+configure({ enforceActions: 'observed' })
 
 if (module.hot) {
   module.hot.accept('../ui/pages/TestSurveyPage', () => {

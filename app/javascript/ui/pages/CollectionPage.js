@@ -135,13 +135,15 @@ class CollectionPage extends React.Component {
       if (apiStore.currentUser) {
         const thread = await apiStore.findOrBuildCommentThread(collection)
         uiStore.expandThread(thread.key)
-        if (routingStore.query) {
-          uiStore.openOptionalMenus(routingStore.query)
-        }
       }
       this.checkSubmissionBox()
     } else {
       apiStore.clearUnpersistedThreads()
+    }
+    if (apiStore.currentUser && routingStore.query) {
+      // This must run after findOrBuildCommentThread,
+      // as it needs that if displaying in-collection test
+      uiStore.openOptionalMenus(routingStore.query)
     }
     if (collection.processing_status) {
       const message = `${collection.processing_status}...`

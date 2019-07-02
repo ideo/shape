@@ -51,7 +51,7 @@ export const fakeTextItemAttrs = {
   inherited_tag_list: [],
   internalType: 'items',
   fullyLoaded: true,
-  parent_collection_card: fakeCollectionCard,
+  parent_collection_card: { ...fakeCollectionCard },
 }
 
 export const fakeAreaChartDataset = {
@@ -308,7 +308,7 @@ export const fakeFileItem = {
 }
 export const fakeQuestionItem = {
   id: '3',
-  ...fakeTextItemAttrs,
+  // ...fakeTextItemAttrs,
   type: 'Item::QuestionItem',
   question_type: 'question_description',
   rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
@@ -328,6 +328,7 @@ export const fakeItemCard = {
   height: 1,
   width: 1,
   maxWidth: 1,
+  visible: true,
   record: fakeTextItem,
   item: fakeTextItem,
   image_contain: false,
@@ -409,6 +410,7 @@ export const fakeCollection = {
   ...fakeJsonApiAttrs,
 }
 // also set parentCollection on fakeCard
+// TODO: fix circular reference!
 fakeCollectionCard.parentCollection = { ...fakeCollection }
 
 export const fakeGroupAttrs = {

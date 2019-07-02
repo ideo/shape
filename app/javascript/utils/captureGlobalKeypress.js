@@ -1,6 +1,37 @@
 import _ from 'lodash'
 import { apiStore, uiStore, undoStore } from '~/stores'
 
+const quillEditorClick = e => {
+  const quillSelectors =
+    '.quill, .ql-close, .ql-toolbar, .ql-container, .ql-editor, .ql-clipboard, .quill-toolbar, .ql-formats, .ql-header, .ql-link, .ql-stroke'
+  return e.target.closest(quillSelectors)
+}
+
+const emptySpaceClick = e => {
+  const { target } = e
+  return !!(
+    target.getAttribute && target.getAttribute('data-empty-space-click')
+  )
+}
+
+export const handleMouseDownSelection = e => {
+  const { textEditingItem } = uiStore
+  const emptySpaceMouseDown = emptySpaceClick(e)
+  const outsideQuillMouseDown = !quillEditorClick(e) && textEditingItem
+  if (outsideQuillMouseDown) {
+    // if we clicked outside the quill editor...
+    uiStore.update('textEditingItem', null)
+  }
+  if (emptySpaceMouseDown) {
+    // if we clicked an empty space...
+    uiStore.deselectCards()
+    uiStore.onEmptySpaceClick(e)
+    uiStore.closeBlankContentTool()
+    return 'emptySpace'
+  }
+  return false
+}
+
 const captureGlobalKeypress = e => {
   const { activeElement } = document
 

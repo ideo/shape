@@ -95,7 +95,7 @@ class PageFooter extends React.PureComponent {
               <span role="img" aria-label="Copyright Symbol">
                 &copy;
               </span>{' '}
-              2018
+              2019
             </InvertMarketingLink>
           </ResponsivePadInlineBlock>
         </Center>
