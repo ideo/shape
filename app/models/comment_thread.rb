@@ -11,8 +11,7 @@
 #
 # Indexes
 #
-#  index_comment_threads_on_organization_id  (organization_id)
-#  index_comment_threads_on_record_id        (record_id) UNIQUE
+#  index_comment_threads_on_record_and_org  (record_id,record_type,organization_id) UNIQUE
 #
 
 class CommentThread < ApplicationRecord
