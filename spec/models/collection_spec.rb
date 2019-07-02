@@ -24,6 +24,8 @@ describe Collection, type: :model do
     # these come from Testable concern
     it { should have_many :test_collections }
     it { should have_one :live_test_collection }
+    # from Commentable
+    it { should have_many :comment_threads }
 
     describe '#collection_cards' do
       let!(:collection) { create(:collection, num_cards: 3) }

@@ -22,6 +22,7 @@ class CommentThread < ApplicationRecord
              polymorphic: true
   belongs_to :organization
   before_validation :inherit_record_organization_id, on: :create
+  validates :record_id, uniqueness: { scope: %i[organization_id record_type] }
 
   has_many :comments,
            -> { order(created_at: :asc) },
