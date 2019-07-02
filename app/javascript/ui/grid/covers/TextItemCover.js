@@ -90,6 +90,8 @@ class TextItemCover extends React.Component {
       // TODO: there is no way to push a redoAction because the edit hasn't happened yet!
       // so we'd have to figure out a different way to capture the redo after you undo
     })
+    // entering edit mode should deselect all cards
+    uiStore.deselectCards()
     uiStore.update('textEditingItem', this.state.item)
     return null
   }
@@ -106,7 +108,7 @@ class TextItemCover extends React.Component {
     }
   }
 
-  blur = async (item, ev) => {
+  cancel = async (item, ev) => {
     if (this.unmounted) {
       return
     }
@@ -167,7 +169,7 @@ class TextItemCover extends React.Component {
         item={item}
         currentUserId={apiStore.currentUser.id}
         onExpand={item.id ? this.expand : null}
-        onCancel={this.blur}
+        onCancel={this.cancel}
         initialFontTag={initialFontTag}
         // if we are rendering editing then the item has been fetched
         fullyLoaded
