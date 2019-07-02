@@ -324,11 +324,18 @@ class GridCard extends React.Component {
       testCollectionCard,
     } = this.props
     let { record, cardType } = this.props
-    if (this.coverItem) {
+
+    let nestedTextItem = null
+    if (this.coverItem && record.cover_type === 'cover_type_text_and_media') {
+      // If this is a special cover with both image and text, pass the text
+      // item through
+      nestedTextItem = this.coverItem
+    } else if (this.coverItem) {
       // Instead use the item for the cover rather than the collection
       record = this.coverItem
       cardType = 'items'
     }
+
     return (
       <CoverRenderer
         card={card}
@@ -341,6 +348,7 @@ class GridCard extends React.Component {
         handleClick={handleClick}
         isBoardCollection={isBoardCollection}
         isTestCollectionCard={testCollectionCard}
+        nestedTextItem={nestedTextItem}
       />
     )
   }

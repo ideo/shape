@@ -34,7 +34,25 @@ class CoverRenderer extends React.Component {
       searchResult,
       isBoardCollection,
       isTestCollectionCard,
+      nestedTextItem,
     } = this.props
+    if (nestedTextItem) {
+      return (
+        <CollectionCover
+          cardId={card.id}
+          width={card.maxWidth}
+          height={card.maxHeight}
+          collection={record}
+          dragging={dragging}
+          searchResult={searchResult}
+          inSubmissionsCollection={
+            card.parentCollection &&
+            card.parentCollection.isSubmissionsCollection
+          }
+          textItem={nestedTextItem}
+        />
+      )
+    }
     if (this.isItem) {
       switch (record.type) {
         case ITEM_TYPES.TEXT:
@@ -100,6 +118,7 @@ class CoverRenderer extends React.Component {
     } else if (this.isCollection) {
       return (
         <CollectionCover
+          cardId={card.id}
           width={card.maxWidth}
           height={card.maxHeight}
           collection={record}
@@ -158,6 +177,7 @@ CoverRenderer.propTypes = {
   dragging: PropTypes.bool,
   searchResult: PropTypes.bool,
   handleClick: PropTypes.func,
+  nestedTextItem: MobxPropTypes.objectOrObservableObject,
 }
 
 CoverRenderer.defaultProps = {
@@ -168,6 +188,7 @@ CoverRenderer.defaultProps = {
   isBoardCollection: false,
   isTestCollectionCard: false,
   handleClick: () => null,
+  nestedTextItem: null,
 }
 
 export default CoverRenderer

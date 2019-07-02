@@ -210,6 +210,10 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :anyone_can_view,
       :anyone_can_join,
       :joinable_group_id,
+      :cover_icon_url,
+      :cover_text,
+      :cover_headline,
+      :cover_cta,
       collection_cards_attributes: %i[id order width height row col],
     ]
   end

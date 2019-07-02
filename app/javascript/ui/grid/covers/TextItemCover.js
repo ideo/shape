@@ -144,6 +144,7 @@ class TextItemCover extends React.Component {
 
   checkTextAreaHeight = height => {
     if (!this.quillEditor) return
+    if (this.props.hideReadMore) return
     // The height of the editor is constrained to the container,
     // we must get the .ql-editor div to calculate text height
     const qlEditor = this.quillEditor.editingArea.getElementsByClassName(
@@ -222,11 +223,13 @@ TextItemCover.propTypes = {
   initialFontTag: PropTypes.string.isRequired,
   height: PropTypes.number,
   searchResult: PropTypes.bool,
+  hideReadMore: PropTypes.bool,
 }
 
 TextItemCover.defaultProps = {
   height: null,
   searchResult: false,
+  hideReadMore: false,
 }
 
 export default TextItemCover
