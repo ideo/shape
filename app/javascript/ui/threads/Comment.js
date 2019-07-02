@@ -20,7 +20,10 @@ import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
 import XIcon from '~/ui/icons/XIcon'
 import Tooltip from '~/ui/global/Tooltip'
 import CommentInput from './CommentInput'
+import * as linkify from 'linkifyjs'
 import Linkify from 'linkifyjs/react'
+import mention from 'linkifyjs/plugins/mention'
+mention(linkify)
 
 const StyledComment = StyledCommentInput.extend`
   ${showOnHoverCss};
@@ -212,6 +215,27 @@ class Comment extends React.Component {
     this.initializeEditorState()
   }
 
+  formatCommentMessage(message) {
+    const options = {
+      format: {
+        mention: value => <span style={{ fontWeight: 700 }}>{value}</span>,
+        url: value => value,
+      },
+      formatHref: {
+        mention: function(href) {
+          // We don't add a link to mentions since we don't link to user profiles
+          return null
+        },
+      },
+    }
+
+    return (
+      <Linkify tagName="p" options={options}>
+        {message}
+      </Linkify>
+    )
+  }
+
   renderMessage() {
     const { comment } = this.props
 
@@ -219,7 +243,7 @@ class Comment extends React.Component {
       <React.Fragment>
         {!this.state.editing && (
           <div>
-            <Linkify tagName="p">{comment.message}</Linkify>
+            {this.formatCommentMessage(comment.message)}
             {comment.wasEdited && (
               <EditedIndicator>{'(edited)'}</EditedIndicator>
             )}
