@@ -60,6 +60,10 @@ const StyledLabelText = styled.span`
   vertical-align: middle;
 `
 
+const AudienceRowCell = styled(StyledRowFlexCell)`
+  text-align: right;
+`
+
 export {
   StyledRowFlexCell,
   StyledRowFlexItem,
@@ -67,4 +71,5 @@ export {
   StyledRowFlexParent,
   StyledColumnFlexParent,
   StyledLabelText,
+  AudienceRowCell,
 }
