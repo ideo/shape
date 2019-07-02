@@ -20,7 +20,6 @@ class CommentThread < ApplicationRecord
 
   belongs_to :record,
              polymorphic: true
-  # org comes from the item/collection, but cached on here for easy lookup
   belongs_to :organization
   before_validation :inherit_record_organization_id, on: :create
 
