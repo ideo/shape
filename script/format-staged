@@ -3,7 +3,7 @@
 cd "$(dirname "$0")/.."
 DIR=$(pwd)
 
-js_files=$(comm -23 <(git diff --cached --name-only --diff-filter=ACM) <(git diff --name-only) | grep -e '\.\(js\)x\?$')
+js_files=$(comm -23 <(git diff --cached --name-only --diff-filter=ACM) <(git diff --name-only) | grep --color=never -e '\.\(js\)x\?$')
 
 set -e
 
