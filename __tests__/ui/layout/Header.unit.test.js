@@ -110,6 +110,24 @@ describe('Header', () => {
         )
       })
     })
+
+    describe('with a parent collection that you have access to', () => {
+      beforeEach(() => {
+        props.uiStore.update.mockClear()
+        props.uiStore.pageMenuOpen = null
+        component.record.parent_collection_card = {}
+        component.record.parent_collection_card.can_view_parent = true
+        component.record.parent_collection_card.parent_id = 1
+        component.routeBack()
+      })
+
+      it('should route user back to the parent collection', () => {
+        expect(props.routingStore.routeTo).toHaveBeenCalledWith(
+          'collections',
+          1
+        )
+      })
+    })
   })
 
   describe('with no current_organization', () => {
