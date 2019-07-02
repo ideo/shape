@@ -5,7 +5,6 @@ import { fakeCollection, fakeCollectionCard } from '#/mocks/data'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 const card = fakeCollectionCard
-card.can_move = true
 const uiStore = { ...fakeUiStore, viewingCollection: fakeCollection }
 const props = {
   card,
@@ -196,17 +195,17 @@ describe('ActionMenu', () => {
     })
   })
 
-  describe('as editor of a record that you cannot move (no editor access to parent)', () => {
+  describe('as editor of a record that you can move', () => {
     beforeEach(() => {
       actions = [
         'Duplicate',
+        'Move',
         'Link',
         'Add to My Collection',
         'Tags',
         'Sharing',
         'Delete',
       ]
-      props.card.can_move = false
       props.card.record.name = 'haho'
       wrapper = shallow(
         <ActionMenu.wrappedComponent {...props} canEdit canReplace={false} />
@@ -214,10 +213,9 @@ describe('ActionMenu', () => {
     })
     afterEach(() => {
       props.card.record.name = 'smaho'
-      props.card.can_move = true
     })
 
-    it('creates a PopoutMenu without Move action', () => {
+    it('creates a PopoutMenu with Move action', () => {
       const popout = wrapper.find('PopoutMenu').at(0)
       expect(popout.props().menuItems.length).toEqual(actions.length)
       expect(_.map(popout.props().menuItems, i => i.name)).toEqual(actions)

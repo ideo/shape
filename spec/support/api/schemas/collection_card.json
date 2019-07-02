@@ -10,7 +10,7 @@
     "class_type": { "type": "string" },
     "card_question_type": { "type": ["string", "null"] },
     "link": { "type": "boolean" },
-    "can_move": { "type": "boolean" },
+    "can_view_parent": { "type": "boolean" },
     "pinned": { "type": "boolean" },
     "is_master_template_card": { "type": "boolean" },
     "show_replace": { "type": "boolean" },
