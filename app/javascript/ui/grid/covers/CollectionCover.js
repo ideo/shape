@@ -68,6 +68,7 @@ const calcSectionWidth = props => {
 }
 
 const calcSectionHeight = props => {
+  if (props.isTextItem) return '160px;'
   if (props.height > 1) {
     return `calc(50% - ${pad + props.gutter / 2}px)`
   }
@@ -101,7 +102,8 @@ const StyledCardContent = styled.div`
     }
   }
   .top {
-    top: ${props => props.gutter / 2 + pad}px;
+    top: ${props => (props.isTextItem ? 'auto' : props.gutter / 2 + pad)}px;
+    bottom: ${props => (props.isTextItem ? '13px' : 'auto')};
   }
   .bottom {
     bottom: ${props => (props.height === 1 ? 4 : pad)}px;
@@ -302,6 +304,7 @@ class CollectionCover extends React.Component {
           width={width}
           gutter={gutter}
           gridW={gridW}
+          isTextItem={!!textItem}
         >
           <div className="overlay" />
           {textItem ? (
