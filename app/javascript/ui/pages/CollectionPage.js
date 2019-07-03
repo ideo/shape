@@ -94,6 +94,16 @@ class CollectionPage extends React.Component {
       })
   }
 
+  loadSubmissionsCollectionCards = async ({ page, per_page, rows, cols }) => {
+    const { collection } = this.props
+    return collection.submissions_collection.API_fetchCards({
+      page,
+      per_page,
+      rows,
+      cols,
+    })
+  }
+
   async onAPILoad() {
     const {
       collection,
@@ -348,7 +358,7 @@ class CollectionPage extends React.Component {
         {this.submissionsPageSeparator}
         <CollectionGrid
           {...gridSettings}
-          loadCollectionCards={this.loadCollectionCards}
+          loadCollectionCards={this.loadSubmissionsCollectionCards}
           trackCollectionUpdated={this.trackCollectionUpdated}
           collection={submissions_collection}
           canEditCollection={false}
