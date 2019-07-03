@@ -328,7 +328,6 @@ export const fakeItemCard = {
   height: 1,
   width: 1,
   maxWidth: 1,
-  visible: true,
   record: fakeTextItem,
   item: fakeTextItem,
   image_contain: false,

@@ -173,7 +173,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                 },
                 "save": [MockFunction],
                 "update": [MockFunction],
-                "visible": true,
                 "width": 1,
               }
             }
@@ -317,7 +316,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                   },
                   "save": [MockFunction],
                   "update": [MockFunction],
-                  "visible": true,
                   "width": 1,
                 }
               }
@@ -763,7 +761,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       },
                       "save": [MockFunction],
                       "update": [MockFunction],
-                      "visible": true,
                       "width": 1,
                     },
                     Object {
@@ -895,7 +892,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       },
                       "save": [MockFunction],
                       "update": [MockFunction],
-                      "visible": true,
                       "width": 1,
                     },
                     Object {
@@ -1027,7 +1023,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       },
                       "save": [MockFunction],
                       "update": [MockFunction],
-                      "visible": true,
                       "width": 1,
                     },
                   ],
@@ -1235,7 +1230,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                           },
                           "save": [MockFunction],
                           "update": [MockFunction],
-                          "visible": true,
                           "width": 1,
                         },
                         Object {
@@ -1367,7 +1361,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                           },
                           "save": [MockFunction],
                           "update": [MockFunction],
-                          "visible": true,
                           "width": 1,
                         },
                         Object {
@@ -1499,7 +1492,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                           },
                           "save": [MockFunction],
                           "update": [MockFunction],
-                          "visible": true,
                           "width": 1,
                         },
                       ],
@@ -1664,7 +1656,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                           },
                           "save": [MockFunction],
                           "update": [MockFunction],
-                          "visible": true,
                           "width": 1,
                         },
                         Object {
@@ -1796,7 +1787,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                           },
                           "save": [MockFunction],
                           "update": [MockFunction],
-                          "visible": true,
                           "width": 1,
                         },
                         Object {
@@ -1928,7 +1918,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                           },
                           "save": [MockFunction],
                           "update": [MockFunction],
-                          "visible": true,
                           "width": 1,
                         },
                       ],
@@ -2081,7 +2070,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       },
                       "save": [MockFunction],
                       "update": [MockFunction],
-                      "visible": true,
                       "width": 1,
                     },
                     Object {
@@ -2213,7 +2201,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       },
                       "save": [MockFunction],
                       "update": [MockFunction],
-                      "visible": true,
                       "width": 1,
                     },
                     Object {
@@ -2345,7 +2332,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       },
                       "save": [MockFunction],
                       "update": [MockFunction],
-                      "visible": true,
                       "width": 1,
                     },
                   ],
@@ -2516,7 +2502,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                 },
                 "save": [MockFunction],
                 "update": [MockFunction],
-                "visible": true,
                 "width": 1,
               }
             }
@@ -2660,7 +2645,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                   },
                   "save": [MockFunction],
                   "update": [MockFunction],
-                  "visible": true,
                   "width": 1,
                 }
               }
@@ -3106,7 +3090,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       },
                       "save": [MockFunction],
                       "update": [MockFunction],
-                      "visible": true,
                       "width": 1,
                     },
                     Object {
@@ -3238,7 +3221,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       },
                       "save": [MockFunction],
                       "update": [MockFunction],
-                      "visible": true,
                       "width": 1,
                     },
                     Object {
@@ -3370,7 +3352,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       },
                       "save": [MockFunction],
                       "update": [MockFunction],
-                      "visible": true,
                       "width": 1,
                     },
                   ],
@@ -3578,7 +3559,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                           },
                           "save": [MockFunction],
                           "update": [MockFunction],
-                          "visible": true,
                           "width": 1,
                         },
                         Object {
@@ -3710,7 +3690,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                           },
                           "save": [MockFunction],
                           "update": [MockFunction],
-                          "visible": true,
                           "width": 1,
                         },
                         Object {
@@ -3842,7 +3821,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                           },
                           "save": [MockFunction],
                           "update": [MockFunction],
-                          "visible": true,
                           "width": 1,
                         },
                       ],
@@ -4007,7 +3985,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                           },
                           "save": [MockFunction],
                           "update": [MockFunction],
-                          "visible": true,
                           "width": 1,
                         },
                         Object {
@@ -4139,7 +4116,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                           },
                           "save": [MockFunction],
                           "update": [MockFunction],
-                          "visible": true,
                           "width": 1,
                         },
                         Object {
@@ -4271,7 +4247,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                           },
                           "save": [MockFunction],
                           "update": [MockFunction],
-                          "visible": true,
                           "width": 1,
                         },
                       ],
@@ -4424,7 +4399,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       },
                       "save": [MockFunction],
                       "update": [MockFunction],
-                      "visible": true,
                       "width": 1,
                     },
                     Object {
@@ -4556,7 +4530,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       },
                       "save": [MockFunction],
                       "update": [MockFunction],
-                      "visible": true,
                       "width": 1,
                     },
                     Object {
@@ -4688,7 +4661,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       },
                       "save": [MockFunction],
                       "update": [MockFunction],
-                      "visible": true,
                       "width": 1,
                     },
                   ],
@@ -4858,7 +4830,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                 },
                 "save": [MockFunction],
                 "update": [MockFunction],
-                "visible": true,
                 "width": 1,
               }
             }
@@ -5002,7 +4973,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                   },
                   "save": [MockFunction],
                   "update": [MockFunction],
-                  "visible": true,
                   "width": 1,
                 }
               }
@@ -5448,7 +5418,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       },
                       "save": [MockFunction],
                       "update": [MockFunction],
-                      "visible": true,
                       "width": 1,
                     },
                     Object {
@@ -5580,7 +5549,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       },
                       "save": [MockFunction],
                       "update": [MockFunction],
-                      "visible": true,
                       "width": 1,
                     },
                     Object {
@@ -5712,7 +5680,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       },
                       "save": [MockFunction],
                       "update": [MockFunction],
-                      "visible": true,
                       "width": 1,
                     },
                   ],
@@ -5920,7 +5887,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                           },
                           "save": [MockFunction],
                           "update": [MockFunction],
-                          "visible": true,
                           "width": 1,
                         },
                         Object {
@@ -6052,7 +6018,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                           },
                           "save": [MockFunction],
                           "update": [MockFunction],
-                          "visible": true,
                           "width": 1,
                         },
                         Object {
@@ -6184,7 +6149,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                           },
                           "save": [MockFunction],
                           "update": [MockFunction],
-                          "visible": true,
                           "width": 1,
                         },
                       ],
@@ -6349,7 +6313,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                           },
                           "save": [MockFunction],
                           "update": [MockFunction],
-                          "visible": true,
                           "width": 1,
                         },
                         Object {
@@ -6481,7 +6444,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                           },
                           "save": [MockFunction],
                           "update": [MockFunction],
-                          "visible": true,
                           "width": 1,
                         },
                         Object {
@@ -6613,7 +6575,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                           },
                           "save": [MockFunction],
                           "update": [MockFunction],
-                          "visible": true,
                           "width": 1,
                         },
                       ],
@@ -6766,7 +6727,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       },
                       "save": [MockFunction],
                       "update": [MockFunction],
-                      "visible": true,
                       "width": 1,
                     },
                     Object {
@@ -6898,7 +6858,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       },
                       "save": [MockFunction],
                       "update": [MockFunction],
-                      "visible": true,
                       "width": 1,
                     },
                     Object {
@@ -7030,7 +6989,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       },
                       "save": [MockFunction],
                       "update": [MockFunction],
-                      "visible": true,
                       "width": 1,
                     },
                   ],
@@ -7461,7 +7419,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                 },
                 "save": [MockFunction],
                 "update": [MockFunction],
-                "visible": true,
                 "width": 1,
               },
               Object {
@@ -7593,7 +7550,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                 },
                 "save": [MockFunction],
                 "update": [MockFunction],
-                "visible": true,
                 "width": 1,
               },
               Object {
@@ -7725,7 +7681,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                 },
                 "save": [MockFunction],
                 "update": [MockFunction],
-                "visible": true,
                 "width": 1,
               },
             ],
@@ -7933,7 +7888,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                     },
                     "save": [MockFunction],
                     "update": [MockFunction],
-                    "visible": true,
                     "width": 1,
                   },
                   Object {
@@ -8065,7 +8019,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                     },
                     "save": [MockFunction],
                     "update": [MockFunction],
-                    "visible": true,
                     "width": 1,
                   },
                   Object {
@@ -8197,7 +8150,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                     },
                     "save": [MockFunction],
                     "update": [MockFunction],
-                    "visible": true,
                     "width": 1,
                   },
                 ],
@@ -8362,7 +8314,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                     },
                     "save": [MockFunction],
                     "update": [MockFunction],
-                    "visible": true,
                     "width": 1,
                   },
                   Object {
@@ -8494,7 +8445,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                     },
                     "save": [MockFunction],
                     "update": [MockFunction],
-                    "visible": true,
                     "width": 1,
                   },
                   Object {
@@ -8626,7 +8576,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                     },
                     "save": [MockFunction],
                     "update": [MockFunction],
-                    "visible": true,
                     "width": 1,
                   },
                 ],
@@ -8779,7 +8728,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                 },
                 "save": [MockFunction],
                 "update": [MockFunction],
-                "visible": true,
                 "width": 1,
               },
               Object {
@@ -8911,7 +8859,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                 },
                 "save": [MockFunction],
                 "update": [MockFunction],
-                "visible": true,
                 "width": 1,
               },
               Object {
@@ -9043,7 +8990,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                 },
                 "save": [MockFunction],
                 "update": [MockFunction],
-                "visible": true,
                 "width": 1,
               },
             ],
