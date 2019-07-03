@@ -9,7 +9,7 @@ class RecordOrganizationUsage
   organize(
     CalculateOrganizationActiveUsers,
     CalculateOrganizationBillableUsers,
-    # CreateNetworkUsageRecord,
-    # NotifyBillingChanges,
+    CreateNetworkUsageRecord,
+    NotifyBillingChanges,
   )
 end

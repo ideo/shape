@@ -282,25 +282,6 @@ class Organization < ApplicationRecord
     active_users_count > trial_users_count
   end
 
-  def create_network_usage_record
-    calculate_active_users_count!
-    return true unless in_app_billing
-
-
-
-    if NetworkApi::UsageRecord.create(
-      quantity: count,
-      timestamp: Time.current.end_of_day.to_i,
-      external_organization_id: id,
-    )
-      true
-    else
-      false
-    end
-  rescue JsonApiClient::Errors::ServerError
-    false
-  end
-
   def update_payment_status
     payment_method = network_default_payment_method
     update_attributes!(
