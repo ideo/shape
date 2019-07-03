@@ -42,6 +42,7 @@ class Organization < ApplicationRecord
   RECENTLY_ACTIVE_RANGE = 90.days
   DEFAULT_TRIAL_ENDS_AT = 30.days
   DEFAULT_TRIAL_USERS_COUNT = 25
+  FREEMIUM_USER_LIMIT = 5
   PRICE_PER_USER = 5.00
   SUPER_ADMIN_EMAIL = ENV['SUPER_ADMIN_EMAIL'] || 'admin@shape.space'.freeze
 
@@ -285,13 +286,7 @@ class Organization < ApplicationRecord
     calculate_active_users_count!
     return true unless in_app_billing
 
-    count = active_users_count
 
-    if within_trial_period?
-      return true unless count > DEFAULT_TRIAL_USERS_COUNT
-
-      count -= DEFAULT_TRIAL_USERS_COUNT
-    end
 
     if NetworkApi::UsageRecord.create(
       quantity: count,

@@ -3,7 +3,13 @@ class RecordOrganizationUsage
   include Interactor::Schema
 
   schema :organization,
-         :active_users_initial_count
+         :active_users_initial_count,
+         :billable_users_count
 
-  organize CalculateOrganizationActiveUsers
+  organize(
+    CalculateOrganizationActiveUsers,
+    CalculateOrganizationBillableUsers,
+    # CreateNetworkUsageRecord,
+    # NotifyBillingChanges,
+  )
 end
