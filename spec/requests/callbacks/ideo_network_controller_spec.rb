@@ -325,11 +325,12 @@ describe 'Ideo Profile API Requests' do
     end
   end
 
-  describe 'POST #group' do
-    let!(:group) { create(:group) }
+  describe 'POST #groups' do
+    let(:group_network_id) { SecureRandom.hex(15) }
+    let!(:group) { create(:group, network_id: group_network_id) }
     let(:group_data) do
       {
-        id: group.id,
+        id: group_network_id,
         uid: SecureRandom.hex(15),
         name: group.name,
         admin_ids: [],
@@ -341,7 +342,7 @@ describe 'Ideo Profile API Requests' do
       before do
         post(
           '/callbacks/ideo_network/groups',
-          params: { id: group.id, event: :created, data: { attributes: group_data } }.to_json,
+          params: { id: group_network_id, event: :created, data: { attributes: group_data } }.to_json,
           headers: valid_headers,
         )
       end
@@ -351,7 +352,9 @@ describe 'Ideo Profile API Requests' do
       end
 
       it 'creates the group' do
-        expect(Group.last.name).to eq(group.name)
+        created_group = Group.last
+        expect(created_group.name).to eq(group.name)
+        expect(created_group.network_id).to eq(group_network_id)
       end
     end
 
@@ -359,7 +362,7 @@ describe 'Ideo Profile API Requests' do
       before do
         post(
           '/callbacks/ideo_network/groups',
-          params: { id: group.id, event: :deleted, data: { attributes: group_data } }.to_json,
+          params: { id: group_network_id, event: :deleted, data: { attributes: group_data } }.to_json,
           headers: valid_headers,
         )
       end
@@ -378,7 +381,7 @@ describe 'Ideo Profile API Requests' do
       it 'returns a 200' do
         post(
           '/callbacks/ideo_network/groups',
-          params: { id: group.id, event: :updated, data: { attributes: group_data } }.to_json,
+          params: { id: group_network_id, event: :updated, data: { attributes: group_data } }.to_json,
           headers: valid_headers,
         )
         expect(response.status).to eq(200)
@@ -390,11 +393,11 @@ describe 'Ideo Profile API Requests' do
         post(
           '/callbacks/ideo_network/groups',
           params: {
-            id: group.id,
+            id: group_network_id,
             event: :updated,
             data: {
               attributes: {
-                id: group.id,
+                id: group_network_id,
                 name: 'Fancy',
               },
             },
@@ -411,15 +414,23 @@ describe 'Ideo Profile API Requests' do
   describe 'POST #users_role' do
     let(:user) { create(:user) }
     let!(:group) { create(:group) }
-    let(:users_role) { user.add_role(:member, group) }
+    let(:users_role_id) { SecureRandom.hex }
+    let(:role_data) { {
+      id: SecureRandom.hex,
+      type: 'roles',
+      attributes: {
+        name: 'member',
+        resource_id: group.network_id,
+        resource_type: 'Group',
+      }
+    }}
 
     let(:users_role_data) do
       {
-        id: users_role.id,
+        id: users_role_id,
         name: 'member',
         user_id: user.id,
-        resource_type: 'Group',
-        resource_id: group.id,
+        user_uid: user.uid,
       }
     end
 
@@ -427,7 +438,7 @@ describe 'Ideo Profile API Requests' do
       before do
         post(
           '/callbacks/ideo_network/users_roles',
-          params: { id: users_role.id, event: :added, data: { attributes: users_role_data } }.to_json,
+          params: { id: users_role_id, event: :added, data: { attributes: users_role_data }, included: [role_data] }.to_json,
           headers: valid_headers,
         )
       end
@@ -441,11 +452,12 @@ describe 'Ideo Profile API Requests' do
       end
     end
 
-    context 'event: added' do
+    context 'event: removed' do
       before do
+        user.add_role(:member, group)
         post(
           '/callbacks/ideo_network/users_roles',
-          params: { id: users_role.id, event: :added, data: { attributes: users_role_data } }.to_json,
+          params: { id: users_role_id, event: :removed, data: { attributes: users_role_data }, included: [role_data]}.to_json,
           headers: valid_headers,
         )
       end
@@ -454,8 +466,8 @@ describe 'Ideo Profile API Requests' do
         expect(response.status).to eq(200)
       end
 
-      it 'assigns the new role' do
-        expect(user.has_role?(:member, group)).to be true
+      it 'unassigns the role' do
+        expect(user.reload.has_role?(:member, group)).to be false
       end
     end
   end

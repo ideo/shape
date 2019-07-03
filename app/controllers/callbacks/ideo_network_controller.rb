@@ -42,13 +42,18 @@ class Callbacks::IdeoNetworkController < ApplicationController
   end
 
   def users_roles
+    role = find_included('roles')[:attributes]
+    return unless role[:resource_type] == 'Group'
+    group = Group.find_by(network_id: role[:resource_id])
+    user = User.find_by(uid: users_role_params[:user_uid])
+
     case event
     when :added
-      process_group_role_added
+      process_group_role_added(role: role, group: group, user: user)
     when :removed
-      process_group_role_removed
+      process_group_role_removed(role: role, group: group, user: user)
     else
-      logger.debug("Unsupported users event: #{event}")
+      logger.debug("Unsupported user roles event: #{event}")
       head :bad_request
       return
       end
@@ -65,7 +70,7 @@ class Callbacks::IdeoNetworkController < ApplicationController
     when :updated
       process_group_updated
     else
-      logger.debug("Unsupported users event: #{event}")
+      logger.debug("Unsupported group event: #{event}")
       head :bad_request
       return
     end
@@ -84,8 +89,8 @@ class Callbacks::IdeoNetworkController < ApplicationController
   end
 
   def process_group_created
-    Group.create(name: group_params[:name],
-                 external_id: group_params[:external_id])
+    Group.find_or_create_by(name: group_params[:name],
+                            network_id: group_params[:id])
   end
 
   def process_group_deleted
@@ -96,19 +101,19 @@ class Callbacks::IdeoNetworkController < ApplicationController
     group.update_from_network_profile(group_params)
   end
 
-  def process_group_role_added
+  def process_group_role_added(role: , group: , user: )
     Roles::MassAssign.call(
-      object: @resource,
-      role_name: users_role_params[:name],
-      users: [@user],
+      object: group,
+      role_name: role[:name],
+      users: [user],
     )
   end
 
-  def process_group_role_removed
+  def process_group_role_removed(role: , group: , user: )
     Roles::MassRemove.call(
-      object: @resource,
-      role_name: users_role_params[:name],
-      users: [@user],
+      object: group,
+      role_name: role[:name],
+      users: [user],
     )
   end
 
@@ -166,12 +171,10 @@ class Callbacks::IdeoNetworkController < ApplicationController
 
   def users_role
     @users_role ||= UsersRole.find(users_role_params[:id])
-    @resource = Object.const_get(users_role_params[:resource_type]).find(users_role_params[:resource_id])
-    @user = Users.find(users_role_params[:user_id])
   end
 
   def group
-    @group ||= Group.find(group_params[:id])
+    @group ||= Group.find_by(network_id: group_params[:id])
   end
 
   def user_params
@@ -191,8 +194,7 @@ class Callbacks::IdeoNetworkController < ApplicationController
       :id,
       :name,
       :user_id,
-      :resource_id,
-      :resource_type,
+      :user_uid,
     )
   end
 
