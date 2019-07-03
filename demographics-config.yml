@@ -1,0 +1,460 @@
+---
+query_categories:
+  - category_key: category_generation
+    name: Age
+    group: Demographics
+    criteria_keys:
+      - criteria_generation_boomer
+      - criteria_generation_x
+      - criteria_generation_millennial
+      - criteria_generation_z
+  - category_key: category_children
+    name: Children
+    group: Demographics
+    criteria_keys:
+      - criteria_children_none
+      - criteria_children_young
+      - criteria_children_teen
+      - criteria_children_adult
+  - category_key: category_country
+    name: Country
+    group: Demographics
+    criteria_keys:
+      - criteria_country_au
+      - criteria_country_ca
+      - criteria_country_gb
+      - criteria_country_us
+  - category_key: category_education
+    name: Education
+    group: Demographics
+    criteria_keys:
+      - criteria_education_highschool
+      - criteria_education_college
+  - category_key: category_gender
+    name: Gender
+    group: Demographics
+    criteria_keys:
+      - criteria_gender_female
+      - criteria_gender_male
+  - category_key: category_adopter
+    name: Early/Late Adopter
+    group: Psychographics
+    criteria_keys:
+      - criteria_adopter_earlyadopter
+      - criteria_adopter_earlymajority
+      - criteria_adopter_latemajority
+      - criteria_adopter_laggard
+  - category_key: category_interest
+    name: Interests
+    group: Psychographics
+    criteria_keys:
+      - criteria_interest_apps
+      - criteria_interest_athlete
+      - criteria_interest_carowner
+      - criteria_interest_commuter
+      - criteria_interest_consciousconsumer
+      - criteria_interest_digitalnative
+      - criteria_interest_entrepreneur
+      - criteria_interest_fashion
+      - criteria_interest_fastfood
+      - criteria_interest_fitness
+      - criteria_interest_foodie
+      - criteria_interest_frequentflyer
+      - criteria_interest_gadgets
+      - criteria_interest_gamer
+      - criteria_interest_gardening
+      - criteria_interest_gigeconomy
+      - criteria_interest_healthconscious
+      - criteria_interest_healthworker
+      - criteria_interest_homeimprovement
+      - criteria_interest_homeowner
+      - criteria_interest_mindfulness
+      - criteria_interest_outdoorsy
+      - criteria_interest_petowner
+      - criteria_interest_quantifiedself
+      - criteria_interest_smallbusinessowner
+      - criteria_interest_smarthome
+      - criteria_interest_tradesperson
+      - criteria_interest_vegetarian
+      - criteria_interest_vegan
+  - category_key: category_publication
+    name: Publications
+    group: Psychographics
+    criteria_keys:
+      - criteria_publication_architecturaldigest
+      - criteria_publication_bloombergbusinessweek
+      - criteria_publication_cosmopolitan
+      - criteria_publication_elle
+      - criteria_publication_fastcompany
+      - criteria_publication_foodnetworkmagazine
+      - criteria_publication_forbes
+      - criteria_publication_fortune
+      - criteria_publication_gq
+      - criteria_publication_goodhousekeeping
+      - criteria_publication_instyle
+      - criteria_publication_marieclaire
+      - criteria_publication_menshealth
+      - criteria_publication_nationalgeographic
+      - criteria_publication_people
+      - criteria_publication_popularmechanics
+      - criteria_publication_popularscience
+      - criteria_publication_rollingstone
+      - criteria_publication_sportsillustrated
+      - criteria_publication_thenewyorker
+      - criteria_publication_timeout
+      - criteria_publication_time
+      - criteria_publication_usweekly
+      - criteria_publication_vanityfair
+      - criteria_publication_wired
+      - criteria_publication_womenshealth
+
+survey_questions:
+  - question_key: question_education
+    text: What’s the highest level of education you have completed?
+    type: single
+    answers:
+      - answer_key: answer_education_highschool
+        criteria_keys: [criteria_education_highschool]
+        text: High school diploma
+      - answer_key: answer_education_vocational
+        criteria_keys: [criteria_education_vocational]
+        text: Vocational training
+      - answer_key: answer_education_college
+        criteria_keys: [criteria_education_college]
+        text: College or bachelor’s degree
+      - answer_key: answer_education_postgraduate
+        criteria_keys: [criteria_education_postgraduate]
+        text: Postgraduate or master’s degree
+      - answer_key: answer_education_doctorate
+        criteria_keys: [criteria_education_doctorate]
+        text: Doctorate degree
+      - answer_key: answer_education_other
+        criteria_keys: [criteria_education_other]
+        text: Other
+      - answer_key: answer_education_none
+        criteria_keys: [criteria_education_none]
+        text: None of these
+  - question_key: question_gender
+    text: What is your gender?
+    type: single
+    answers:
+      - answer_key: answer_gender_female
+        criteria_keys: [criteria_gender_female]
+        text: Female
+      - answer_key: answer_gender_male
+        criteria_keys: [criteria_gender_male]
+        text: Male
+      - answer_key: answer_gender_nonbinary
+        criteria_keys: [criteria_gender_nonbinary]
+        text: Non-binary
+      - answer_key: answer_gender_other
+        criteria_keys: [criteria_gender_other]
+        text: Other
+      - answer_key: answer_gender_no_answer
+        criteria_keys: [criteria_gender_no_answer]
+        text: No Answer
+  - question_key: question_income
+    text: Which of the following best describes where you stand financially?
+    type: single
+    answers:
+      - answer_key: answer_income_struggling
+        criteria_keys: [criteria_income_low]
+        text: Sometimes paying the monthly bills is a struggle
+      - answer_key: answer_income_monthtomonth
+        criteria_keys: [criteria_income_low, criteria_income_medium]
+        text: Living month to month and just breaking even
+      - answer_key: answer_income_middle
+        criteria_keys: [criteria_income_medium]
+        text: Have enough but should save more
+      - answer_key: answer_income_comfortable
+        criteria_keys: [criteria_income_aboveaverage]
+        text: Living comfortably, with some money left over at the end of each month
+      - answer_key: answer_income_verycomfortable
+        criteria_keys: [criteria_income_aboveaverage]
+        text: Living very comfortably, and spending freely on things I enjoy
+  - question_key: question_adopter
+    text: Which of these statements best describes you?
+    type: single
+    answers:
+      - answer_key: answer_adopter_thefirst
+        criteria_keys: [criteria_adopter_earlyadopter]
+        text:
+          I’m always the first of my friends to try new products and services. I’ll
+          camp out in line over night if it means being first!
+      - answer_key: answer_adopter_oneofthefirst
+        criteria_keys: [criteria_adopter_earlyadopter]
+        text:
+          I’m usually one of the first to try a new product or service, but I’ll wait
+          for the long line to die down.
+      - answer_key: answer_adopter_earlymajority
+        criteria_keys: [criteria_adopter_earlymajority]
+        text:
+          I’m happy to try new products or services if sources I respect vouch for
+          them
+      - answer_key: answer_adopter_latemajority
+        criteria_keys: [criteria_adopter_latemajority]
+        text:
+          If over time I continually hear great things about a product or service,
+          I’d be willing to try it out.
+      - answer_key: answer_adopter_sticky
+        criteria_keys: [criteria_adopter_latemajority, criteria_adopter_laggard]
+        text: I prefer to stick with my tried and trusted brands and products
+  - question_key: question_dweller
+    text: Which of these best describes where you live?
+    type: single
+    answers:
+      - answer_key: answer_dweller_metropolis
+        criteria_keys: [criteria_dweller_metropolis, criteria_dweller_urban]
+        text: 'Metropolis: my city never sleeps'
+      - answer_key: answer_dweller_urban
+        criteria_keys: [criteria_dweller_urban]
+        text: 'City: it’s all about the hustle and bustle'
+      - answer_key: answer_dweller_suburban
+        criteria_keys: [criteria_dweller_suburban]
+        text: 'Suburban area: it’s peaceful, but within easy reach of a city'
+      - answer_key: answer_dweller_rural
+        criteria_keys: [criteria_dweller_rural]
+        text: 'Rural area: there’s nature all around and going to the city is a trip'
+  - question_key: question_children
+    text: Do you have any children?
+    type: multiple
+    answers:
+      - answer_key: answer_children_none
+        criteria_keys: [criteria_children_none]
+        text: 'No'
+      - answer_key: answer_children_young
+        criteria_keys: [criteria_children_young]
+        text: Yes, I have one or more kids younger than 12
+      - answer_key: answer_children_teen
+        criteria_keys: [criteria_children_teen]
+        text: Yes, I have one or more kids aged 12-17
+      - answer_key: answer_children_adult
+        criteria_keys: [criteria_children_adult]
+        text: Yes, but my kids are older than 17
+  - question_key: question_employment
+    text: Which best describes your work situation?
+    type: multiple
+    answers:
+      - answer_key: answer_employment_fulltime
+        criteria_keys: [criteria_employment_fulltime]
+        text: I have a full time job (35+ hours per week)
+      - answer_key: answer_employment_parttime
+        criteria_keys: [criteria_employment_parttime]
+        text: I work part time
+      - answer_key: answer_employment_seeking
+        criteria_keys: [criteria_employment_seeking]
+        text: I’m currently looking for a job
+      - answer_key: answer_employment_student
+        criteria_keys: [criteria_employment_student]
+        text: I’m a student (full or part time)
+      - answer_key: answer_employment_retired
+        criteria_keys: [criteria_employment_retired]
+        text: I’m retired
+      - answer_key: answer_employment_other
+        criteria_keys: [criteria_employment_other]
+        text: Other
+
+criteria:
+  # education
+  - criteria_key: criteria_education_highschool
+    name: High School
+  - criteria_key: criteria_education_vocational
+    name: Vocational Training
+  - criteria_key: criteria_education_college
+    name: College or Bachelor’s
+  - criteria_key: criteria_education_postgraduate
+    name: Postgraduate or Master’s
+  - criteria_key: criteria_education_doctorate
+    name: Doctorate
+  - criteria_key: criteria_education_other
+    name: Other
+  - criteria_key: criteria_education_none
+    name: None
+  # gender
+  - criteria_key: criteria_gender_female
+    name: Female
+  - criteria_key: criteria_gender_male
+    name: Male
+  - criteria_key: criteria_gender_nonbinary
+    name: Non-binary
+  - criteria_key: criteria_gender_other
+    name: Other
+  - criteria_key: criteria_gender_no_answer
+    name: No Answer
+  # income
+  - criteria_key: criteria_income_low
+    name: Low Income
+  - criteria_key: criteria_income_medium
+    name: Medium Income
+  - criteria_key: criteria_income_aboveaverage
+    name: Above Average Icome
+  # early/late adopter
+  - criteria_key: criteria_adopter_earlyadopter
+    name: Early Adopter
+  - criteria_key: criteria_adopter_earlymajority
+    name: Early Majority
+  - criteria_key: criteria_adopter_latemajority
+    name: Late Majority
+  - criteria_key: criteria_adopter_laggard
+    name: Laggard
+  # urban/rural
+  - criteria_key: criteria_dweller_metropolis
+    name: Metropolis Dweller
+  - criteria_key: criteria_dweller_urban
+    name: Urban Dweller
+  - criteria_key: criteria_dweller_suburban
+    name: Suburban Dweller
+  - criteria_key: criteria_dweller_rural
+    name: Rural Dweller
+  # children ages
+  - criteria_key: criteria_children_none
+    name: No Children
+  - criteria_key: criteria_children_young
+    name: Parents of Young Children
+  - criteria_key: criteria_children_teen
+    name: Parents of Teenagers
+  - criteria_key: criteria_children_adult
+    name: Parents of Adult Children
+  # employment
+  - criteria_key: criteria_employment_fulltime
+    name: Full-time
+  - criteria_key: criteria_employment_parttime
+    name: Part-time
+  - criteria_key: criteria_employment_seeking
+    name: Job Seeker
+  - criteria_key: criteria_employment_student
+    name: Student
+  - criteria_key: criteria_employment_retired
+    name: Retired
+  - criteria_key: criteria_employment_other
+    name: Other
+  # generation
+  - criteria_key: criteria_generation_boomer
+    name: Baby Boomer (born 1946-1964)
+  - criteria_key: criteria_generation_x
+    name: Gen X (born 1965-1980)
+  - criteria_key: criteria_generation_millennial
+    name: Millennial (born 1981-1996)
+  - criteria_key: criteria_generation_z
+    name: Gen Z (born 1995-2001)
+  # country
+  - criteria_key: criteria_country_au
+    name: Australia
+  - criteria_key: criteria_country_ca
+    name: Canada
+  - criteria_key: criteria_country_gb
+    name: United Kingdom
+  - criteria_key: criteria_country_us
+    name: United States of America
+  # interests
+  - criteria_key: criteria_interest_apps
+    name: Apps
+  - criteria_key: criteria_interest_athlete
+    name: Athlete
+  - criteria_key: criteria_interest_carowner
+    name: Car Owner
+  - criteria_key: criteria_interest_commuter
+    name: Commuter
+  - criteria_key: criteria_interest_consciousconsumer
+    name: Conscious Consumer
+  - criteria_key: criteria_interest_digitalnative
+    name: Digital Native
+  - criteria_key: criteria_interest_entrepreneur
+    name: Entrepreneur
+  - criteria_key: criteria_interest_fashion
+    name: Fashion
+  - criteria_key: criteria_interest_fastfood
+    name: Fast Food
+  - criteria_key: criteria_interest_fitness
+    name: Fitness
+  - criteria_key: criteria_interest_foodie
+    name: Foodie
+  - criteria_key: criteria_interest_frequentflyer
+    name: Frequent Flyer
+  - criteria_key: criteria_interest_gadgets
+    name: Gadgets
+  - criteria_key: criteria_interest_gamer
+    name: Gamer
+  - criteria_key: criteria_interest_gardening
+    name: Gardening
+  - criteria_key: criteria_interest_gigeconomy
+    name: Gig Economy
+  - criteria_key: criteria_interest_healthconscious
+    name: Health Conscious
+  - criteria_key: criteria_interest_healthworker
+    name: Health Worker
+  - criteria_key: criteria_interest_homeimprovement
+    name: Home Improvement
+  - criteria_key: criteria_interest_homeowner
+    name: Home Owner
+  - criteria_key: criteria_interest_mindfulness
+    name: Mindfulness/Yoga
+  - criteria_key: criteria_interest_outdoorsy
+    name: Outdoorsy
+  - criteria_key: criteria_interest_petowner
+    name: Pet Owner
+  - criteria_key: criteria_interest_quantifiedself
+    name: Quantified Self
+  - criteria_key: criteria_interest_smallbusinessowner
+    name: Small Business Owner
+  - criteria_key: criteria_interest_smarthome
+    name: Smart Home
+  - criteria_key: criteria_interest_tradesperson
+    name: Tradesman/woman
+  - criteria_key: criteria_interest_vegetarian
+    name: Vegetarian
+  - criteria_key: criteria_interest_vegan
+    name: Vegan
+  # publications
+  - criteria_key: criteria_publication_architecturaldigest
+    name: Architectural Digest
+  - criteria_key: criteria_publication_bloombergbusinessweek
+    name: Bloomberg Businessweek
+  - criteria_key: criteria_publication_cosmopolitan
+    name: Cosmopolitan
+  - criteria_key: criteria_publication_elle
+    name: Elle
+  - criteria_key: criteria_publication_fastcompany
+    name: Fast Company
+  - criteria_key: criteria_publication_foodnetworkmagazine
+    name: Food Network Magazine
+  - criteria_key: criteria_publication_forbes
+    name: Forbes
+  - criteria_key: criteria_publication_fortune
+    name: Fortune
+  - criteria_key: criteria_publication_gq
+    name: GQ
+  - criteria_key: criteria_publication_goodhousekeeping
+    name: Good Housekeeping
+  - criteria_key: criteria_publication_instyle
+    name: InStyle
+  - criteria_key: criteria_publication_marieclaire
+    name: Marie Claire
+  - criteria_key: criteria_publication_menshealth
+    name: Men's Health
+  - criteria_key: criteria_publication_nationalgeographic
+    name: National Geographic
+  - criteria_key: criteria_publication_people
+    name: People
+  - criteria_key: criteria_publication_popularmechanics
+    name: Popular Mechanics
+  - criteria_key: criteria_publication_popularscience
+    name: Popular Science
+  - criteria_key: criteria_publication_rollingstone
+    name: Rolling Stone
+  - criteria_key: criteria_publication_sportsillustrated
+    name: Sports Illustrated
+  - criteria_key: criteria_publication_thenewyorker
+    name: The New Yorker
+  - criteria_key: criteria_publication_timeout
+    name: Time Out
+  - criteria_key: criteria_publication_time
+    name: Time
+  - criteria_key: criteria_publication_usweekly
+    name: Us Weekly
+  - criteria_key: criteria_publication_vanityfair
+    name: Vanity Fair
+  - criteria_key: criteria_publication_wired
+    name: Wired
+  - criteria_key: criteria_publication_womenshealth
+    name: Women's Health
