@@ -20,7 +20,7 @@ import AutoComplete from '~/ui/global/AutoComplete'
 import PillList from '~/ui/global/PillList'
 import EmailCSVUploader from '~/ui/global/EmailCSVUploader'
 import InlineLoader from '~/ui/layout/InlineLoader'
-import { apiStore, uiStore } from '~/stores'
+import { apiStore, uiStore, routingStore } from '~/stores'
 
 const RightAligner = styled(Grid)`
   padding-right: 78px;
@@ -31,7 +31,6 @@ RightAligner.displayName = 'StyledRightAligner'
 const StyledFormControlLabel = styled(FormControlLabel)`
   margin-top: -10px;
 `
-
 @observer
 class RolesAdd extends React.Component {
   @observable
@@ -162,25 +161,72 @@ class RolesAdd extends React.Component {
   }
 
   handleSave = async () => {
-    const { sendInvites } = this
-    const emails = this.selectedUsers
+    const {
+      sendInvites,
+      selectedUsers,
+      selectedRole,
+      setLoading,
+      resetSelectedUsers,
+    } = this
+    const emails = selectedUsers
       .filter(selected => !selected.id)
       .map(selected => selected.email)
-
-    const fullUsers = this.selectedUsers.filter(selected => !!selected.id)
+    const { currentUserOrganization } = apiStore
+    const {
+      name = 'this organization',
+      active_users_count,
+      trial_users_count,
+      has_payment_method,
+    } = currentUserOrganization
+    const willReachMaxUsers =
+      emails.length + active_users_count >= trial_users_count
+    const shouldAskForPaymentMethod = !has_payment_method && willReachMaxUsers
+    if (shouldAskForPaymentMethod) {
+      const popupAgreed = new Promise((resolve, reject) => {
+        const { admin_group } = currentUserOrganization
+        const { is_admin } = admin_group // or should we use primary_group.can_edit?
+        const prompt = `Inviting these people will take ${name} over the free limit of ${trial_users_count}. Please add a payment method to continue`
+        const confirmText = 'Add Payment Method'
+        // todo: add subprompt support for confirm modal
+        // temp logic as follows:
+        // const adminEmails = admins.map(a => `${a.name} ${a.email}`).join('\n')
+        // const subprompt = `The administrators are:\n` + adminEmails // show administrators for members
+        const modalProps = {
+          prompt: is_admin
+            ? prompt
+            : `${prompt} Please ask an administrator of ${name} to add a payment method.`,
+          iconName: 'InviteUsersXl',
+          confirmText,
+          onCancel: () => {
+            resolve(false)
+          },
+          onConfirm: () => resolve(true),
+        }
+        uiStore.confirm(modalProps)
+      })
+      const agreed = await popupAgreed
+      if (!agreed) {
+        setLoading(false)
+        resetSelectedUsers()
+        return
+      }
+      // todo: should open the card modal if openPaymentMethod=true
+      routingStore.routeTo('/billing?openPaymentMethod=true') // routes to billing and opens card modal
+    }
+    const fullUsers = selectedUsers.filter(selected => !!selected.id)
 
     let created = { data: [] }
-    this.setLoading(true)
+    setLoading(true)
     if (emails.length) {
       created = await this.props.onCreateUsers(emails)
     }
     const roles = await this.props.onCreateRoles(
       [...created.data, ...fullUsers],
-      this.selectedRole,
+      selectedRole,
       { sendInvites }
     )
-    this.setLoading(false)
-    this.resetSelectedUsers()
+    setLoading(false)
+    resetSelectedUsers()
     return roles
   }
 

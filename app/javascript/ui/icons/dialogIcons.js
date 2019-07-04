@@ -17,6 +17,7 @@ import TemplateIcon from '~/ui/icons/TemplateIcon'
 import TestGraphIcon from '~/ui/icons/TestGraphIcon'
 import TrashIcon from '~/ui/icons/TrashIcon'
 import TrashXlIcon from '~/ui/icons/TrashXlIcon'
+import InviteUsersXlIcon from '~/ui/icons/InviteUsersXlIcon'
 
 export const iconNames = [
   'Alert',
@@ -37,6 +38,7 @@ export const iconNames = [
   'TestGraph',
   'Trash',
   'TrashXl',
+  'InviteUsersXl',
 ]
 
 export default {
@@ -59,4 +61,5 @@ export default {
   TestGraphIcon,
   TrashIcon,
   TrashXlIcon,
+  InviteUsersXlIcon,
 }
