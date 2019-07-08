@@ -6,14 +6,20 @@ describe Organization, type: :model do
   end
 
   describe 'billable scope' do
-    it 'only includes organizations with in app billing that are not deactivated' do
-      billable = create(:organization, in_app_billing: true, deactivated: false)
-      in_app_billing_false = create(:organization, in_app_billing: false, deactivated: false)
-      deactivated_true = create(:organization, in_app_billing: true, deactivated: true)
+    let!(:billable) do
+      create(:organization, in_app_billing: true, deactivated: false, active_users_count: Organization::FREEMIUM_USER_LIMIT + 2)
+    end
+    let!(:not_enough_users) do
+      create(:organization, in_app_billing: true, deactivated: false, active_users_count: Organization::FREEMIUM_USER_LIMIT - 2)
+    end
+    let!(:in_app_billing_false) { create(:organization, in_app_billing: false, deactivated: false) }
+    let!(:deactivated_true) { create(:organization, in_app_billing: true, deactivated: true) }
 
+    it 'only includes organizations with in app billing that are not deactivated' do
       expect(Organization.billable.length).to be 1
       expect(Organization.billable).to include(billable)
-      expect(Organization.billable).not_to include(in_app_billing_false)
+      expect(Organization.billable).not_to include(not_enough_users)
+      expect(Organization.billable).not_to include(deactivated_true)
       expect(Organization.billable).not_to include(deactivated_true)
     end
   end
@@ -580,38 +586,6 @@ describe Organization, type: :model do
     end
   end
 
-  describe '#calculate_active_users_count!' do
-    let(:organization) { create(:organization) }
-    let(:pending_user) do
-      create(:user, :recently_active, current_organization: organization, status: User.statuses[:pending], first_name: 'pending_user')
-    end
-    let(:deleted_user) do
-      create(:user, :recently_active, current_organization: organization, status: User.statuses[:deleted], first_name: 'deleted_user')
-    end
-    let(:recently_active_user) do
-      create(:user, :recently_active, current_organization: organization, first_name: 'recently_active_user')
-    end
-    let(:recently_active_guest_user) do
-      create(:user, :recently_active, current_organization: organization, first_name: 'recently_active_guest_user')
-    end
-    let(:not_recently_active_user) { create(:user, first_name: 'not_recently_active_user') }
-    let(:not_recently_active_guest_user) { create(:user, first_name: 'not_recently_active_guest_user') }
-
-    before do
-      pending_user.add_role(Role::MEMBER, organization.primary_group)
-      deleted_user.add_role(Role::MEMBER, organization.primary_group)
-      recently_active_user.add_role(Role::MEMBER, organization.primary_group)
-      recently_active_guest_user.add_role(Role::ADMIN, organization.guest_group)
-      not_recently_active_user.add_role(Role::MEMBER, organization.primary_group)
-      not_recently_active_guest_user.add_role(Role::ADMIN, organization.guest_group)
-    end
-
-    it 'updates active users count' do
-      organization.calculate_active_users_count!
-      expect(organization.active_users_count).to eql(2)
-    end
-  end
-
   describe '#within_trial_period?' do
     let(:organization) { create(:organization) }
     context 'trial_ends_at is set' do
@@ -650,91 +624,6 @@ describe Organization, type: :model do
     it 'returns false when there are fewer active users than trial users' do
       organization = create(:organization, trial_users_count: 6, active_users_count: 5)
       expect(organization.trial_users_exceeded?).to be false
-    end
-  end
-
-  describe '#create_network_usage_record' do
-    let(:organization) { create(:organization, in_app_billing: true) }
-    before do
-      allow(organization).to receive(:calculate_active_users_count!)
-    end
-
-    context 'in app billing is disabled' do
-      it 'does not create a network usage record' do
-        organization = create(:organization, in_app_billing: false)
-        expect(organization).to receive(:calculate_active_users_count!)
-        expect(NetworkApi::UsageRecord).not_to receive(:create)
-        expect(organization.create_network_usage_record).to be true
-      end
-    end
-
-    context 'within trial period with fewer users than limit' do
-      before do
-        organization.update_attributes(trial_ends_at: 1.day.from_now)
-      end
-      it 'does not create the network usage record' do
-        expect(NetworkApi::UsageRecord).not_to receive(:create)
-        expect(organization.create_network_usage_record).to be true
-      end
-    end
-
-    context 'within trial period with more users than limit' do
-      let(:active_users_count) { 100 }
-      let(:trial_users_count) { 50 }
-      before do
-        organization.update_attributes(trial_ends_at: 1.day.from_now, active_users_count: active_users_count)
-      end
-
-      it 'creates the network usage record, active_users_count - quantity trial user count' do
-        stub_const('Organization::DEFAULT_TRIAL_USERS_COUNT', trial_users_count)
-        allow(NetworkApi::UsageRecord).to receive(:create)
-        organization.create_network_usage_record
-        expect(NetworkApi::UsageRecord).to have_received(:create).with(
-          quantity: active_users_count - trial_users_count,
-          timestamp: Time.current.end_of_day.to_i,
-          external_organization_id: organization.id,
-        )
-      end
-    end
-
-    context 'outside of trial limit' do
-      before do
-        organization.update_attributes(trial_ends_at: 1.day.ago)
-        allow(NetworkApi::UsageRecord).to receive(:create)
-        allow(organization).to receive(:calculate_active_users_count!)
-      end
-
-      context 'usage record created successfully' do
-        it 'returns true' do
-          allow(organization).to receive(:active_users_count).and_return(123)
-          expect(organization).to receive(:calculate_active_users_count!)
-          allow(NetworkApi::UsageRecord).to receive(:create).and_return(true)
-          expect(organization.create_network_usage_record).to be true
-          expect(NetworkApi::UsageRecord).to have_received(:create).with(
-            quantity: 123,
-            timestamp: Time.current.end_of_day.to_i,
-            external_organization_id: organization.id,
-          )
-        end
-      end
-
-      context 'usage record not created successfully' do
-        it 'returns false' do
-          allow(organization).to receive(:calculate_active_users_count!)
-          allow(organization).to receive(:active_users_count).and_return('bad value')
-          allow(NetworkApi::UsageRecord).to receive(:create).and_return(false)
-          expect(organization.create_network_usage_record).to be false
-        end
-      end
-
-      context 'network error' do
-        it 'returns false' do
-          allow(organization).to receive(:active_users_count).and_return(123)
-          allow(NetworkApi::UsageRecord).to receive(:create)
-            .and_raise(JsonApiClient::Errors::ServerError.new('an error'))
-          expect(organization.create_network_usage_record).to be false
-        end
-      end
     end
   end
 
