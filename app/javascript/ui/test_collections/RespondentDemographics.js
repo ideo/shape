@@ -1,7 +1,13 @@
-import { kebabCase, uniq } from 'lodash'
+import countries from 'i18n-iso-countries'
+import en from 'i18n-iso-countries/langs/en.json'
+import { kebabCase, range, uniq } from 'lodash'
+
+countries.registerLocale(en)
+const countryNames = Object.entries(countries.getNames('en'))
 
 const CHOICE_STYLE_SINGLE = 'single'
 const CHOICE_STYLE_MULTIPLE = 'multiple'
+const CHOICE_STYLE_SELECT = 'select'
 
 const EDUCATION_HIGH_SCHOOL = 'High school'
 const EDUCATION_VOCATIONAL = 'Vocational training'
@@ -43,12 +49,33 @@ const EMPLOYMENT_STUDENT = 'Student'
 const EMPLOYMENT_RETIRED = 'Retired'
 const EMPLOYMENT_OTHER = 'Other'
 
+const birthYears = range(1920, new Date().getFullYear())
+
 const choiceStyleCardQuestionTypeMap = {
   [CHOICE_STYLE_SINGLE]: 'question_demographics_single_choice',
   [CHOICE_STYLE_MULTIPLE]: 'question_demographics_multiple_choice',
+  [CHOICE_STYLE_SELECT]: 'question_demographics_single_choice_menu',
 }
 
 const questions = [
+  {
+    text: `In which country do you live?`,
+    category: 'country',
+    choiceStyle: CHOICE_STYLE_SELECT,
+    choices: countryNames.map(([code, name]) => ({
+      text: name,
+      tags: [`country_${code}`],
+    })),
+  },
+  {
+    text: `In what year were you born? (Please type your birth year)`,
+    category: 'birth_year',
+    choiceStyle: CHOICE_STYLE_SELECT,
+    choices: birthYears.map(year => ({
+      text: `${year}`,
+      tags: [],
+    })),
+  },
   {
     text: `What’s the highest level of education you have completed?`,
     category: 'education_levels',

@@ -12,6 +12,7 @@ import NewQuestionGraphic from '~/ui/icons/NewQuestionGraphic'
 import OpenQuestion from '~/ui/test_collections/OpenQuestion'
 import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
 import DemographicsSingleChoiceQuestion from '~/ui/test_collections/DemographicsSingleChoiceQuestion'
+import DemographicsSingleChoiceMenuQuestion from '~/ui/test_collections/DemographicsSingleChoiceMenuQuestion'
 import DemographicsMultipleChoiceQuestion from '~/ui/test_collections/DemographicsMultipleChoiceQuestion'
 import DemographicsIntroQuestion from '~/ui/test_collections/DemographicsIntroQuestion'
 import TermsQuestion from '~/ui/test_collections/TermsQuestion'
@@ -232,6 +233,15 @@ class TestQuestion extends React.Component {
       case 'question_demographics_multiple_choice':
         return (
           <DemographicsMultipleChoiceQuestion
+            question={card}
+            onAnswer={this.handleQuestionAnswer}
+            user={apiStore.currentUser}
+          />
+        )
+
+      case 'question_demographics_single_choice_menu':
+        return (
+          <DemographicsSingleChoiceMenuQuestion
             question={card}
             onAnswer={this.handleQuestionAnswer}
             user={apiStore.currentUser}
