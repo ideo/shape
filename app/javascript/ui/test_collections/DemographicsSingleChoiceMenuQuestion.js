@@ -27,7 +27,7 @@ class DemographicsSingleChoiceMenuQuestion extends DemographicsQuestionBase {
     const { question } = this.props
 
     const autocompleteOptions = question.choices.map(({ text }, index) => ({
-      value: `${index}`,
+      value: `${index}`, // react-select expects a string value.
       label: text,
     }))
 

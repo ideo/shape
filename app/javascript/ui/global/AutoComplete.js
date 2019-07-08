@@ -328,7 +328,11 @@ AutoComplete.propTypes = {
   keepSelectedOptions: PropTypes.bool,
   placeholder: PropTypes.string,
   creatable: PropTypes.bool,
-  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  value: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.bool,
+  ]),
   menuPlacement: PropTypes.string,
   keepMenuClosed: PropTypes.bool,
   numOptionsToShow: PropTypes.number,
