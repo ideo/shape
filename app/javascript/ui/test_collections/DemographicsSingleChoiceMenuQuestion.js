@@ -1,10 +1,5 @@
-import { Radio, RadioGroup } from '@material-ui/core'
-import { CheckCircle, RadioButtonUnchecked } from '@material-ui/icons'
-
-import {
-  DemographicsQuestionHolder,
-  StyledFormControlLabel,
-} from '~/ui/test_collections/DemographicsQuestionHolder'
+import AutoComplete from '~/ui//global/AutoComplete'
+import { DemographicsQuestionHolder } from '~/ui/test_collections/DemographicsQuestionHolder'
 import DemographicsQuestionBase from '~/ui/test_collections/DemographicsQuestionBase'
 
 class DemographicsSingleChoiceMenuQuestion extends DemographicsQuestionBase {
@@ -12,7 +7,7 @@ class DemographicsSingleChoiceMenuQuestion extends DemographicsQuestionBase {
     selectedChoice: null,
   }
 
-  handleAnswer(choiceIndex) {
+  handleAnswer({ custom: choiceIndex }) {
     this.setState({
       selectedChoice: choiceIndex,
     })
@@ -31,32 +26,23 @@ class DemographicsSingleChoiceMenuQuestion extends DemographicsQuestionBase {
   render() {
     const { question } = this.props
 
+    const autocompleteOptions = question.choices.map(({ text }, index) => ({
+      value: `${index}`,
+      label: text,
+    }))
+
     return (
       <DemographicsQuestionHolder
         instructions="This question is optional."
         question={question}
         onNextQuestion={() => this.showNextQuestion()}
       >
-        <RadioGroup
-          value={this.state.selectedChoice}
-          onChange={(_e, value) => this.handleAnswer(value)}
-        >
-          {question.choices.map((choice, index) => (
-            <StyledFormControlLabel
-              key={index}
-              value={index.toString()}
-              classes={{ label: 'label' }}
-              label={choice.text}
-              labelPlacement="end"
-              control={
-                <Radio
-                  checkedIcon={<CheckCircle />}
-                  icon={<RadioButtonUnchecked />}
-                />
-              }
-            />
-          ))}
-        </RadioGroup>
+        <AutoComplete
+          value={this.setState.selectedChoice}
+          options={autocompleteOptions}
+          onOptionSelect={option => this.handleAnswer(option)}
+          placeholder="TKTK"
+        />
       </DemographicsQuestionHolder>
     )
   }
