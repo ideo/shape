@@ -110,11 +110,14 @@ class Organization < ApplicationRecord
   validates :name, presence: true
 
   scope :active, -> { where(deactivated: false) }
-  scope :billable, -> { active.where(in_app_billing: true) }
+  scope :billable, -> do
+    active
+      .where(in_app_billing: true)
+      .where(arel_table[:active_users_count].gt(FREEMIUM_USER_LIMIT))
+  end
   scope :overdue, -> do
     billable
       .where.not(overdue_at: nil)
-      .where(arel_table[:active_users_count].gt(0))
   end
 
   def self.display_name

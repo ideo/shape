@@ -6,14 +6,20 @@ describe Organization, type: :model do
   end
 
   describe 'billable scope' do
-    it 'only includes organizations with in app billing that are not deactivated' do
-      billable = create(:organization, in_app_billing: true, deactivated: false)
-      in_app_billing_false = create(:organization, in_app_billing: false, deactivated: false)
-      deactivated_true = create(:organization, in_app_billing: true, deactivated: true)
+    let!(:billable) do
+      create(:organization, in_app_billing: true, deactivated: false, active_users_count: Organization::FREEMIUM_USER_LIMIT + 2)
+    end
+    let!(:not_enough_users) do
+      create(:organization, in_app_billing: true, deactivated: false, active_users_count: Organization::FREEMIUM_USER_LIMIT - 2)
+    end
+    let!(:in_app_billing_false) { create(:organization, in_app_billing: false, deactivated: false) }
+    let!(:deactivated_true) { create(:organization, in_app_billing: true, deactivated: true) }
 
+    it 'only includes organizations with in app billing that are not deactivated' do
       expect(Organization.billable.length).to be 1
       expect(Organization.billable).to include(billable)
-      expect(Organization.billable).not_to include(in_app_billing_false)
+      expect(Organization.billable).not_to include(not_enough_users)
+      expect(Organization.billable).not_to include(deactivated_true)
       expect(Organization.billable).not_to include(deactivated_true)
     end
   end
