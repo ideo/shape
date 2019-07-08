@@ -11,7 +11,7 @@ class Api::V1::RolesController < Api::V1::BaseController
     render jsonapi: @roles, include: %i[users groups resource]
   end
 
-  before_action :authorize_manage_record, only: :create
+  before_action :authorize_manage_record, :check_freemium_limit, only: :create
   # Create role(s) on this resource (collection, item or group)
   # Params:
   # - role: { name: 'editor' }
@@ -103,6 +103,10 @@ class Api::V1::RolesController < Api::V1::BaseController
 
   def authorize_manage_record
     authorize! :manage, record
+  end
+
+  def check_freemium_limit
+    current_organization.active_users_count + 1 < Organizationn::FREEMIUM_USER_LIMIT
   end
 
   def authorize_view_record
