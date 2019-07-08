@@ -41,9 +41,11 @@ class CollectionCardFilter < SimpleService
     end
 
     if @collection.archived? && @collection.archive_batch.present?
+      # NOTE: not sure why some archived collections have unarchived cards inside;
+      # but that is the reason for the `or(@cards.active)`
       @cards = @cards.where(
         archive_batch: @collection.archive_batch,
-      )
+      ).or(@cards.active)
     else
       @cards = @cards.active
     end
