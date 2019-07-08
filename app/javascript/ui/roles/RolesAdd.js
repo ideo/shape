@@ -172,20 +172,20 @@ class RolesAdd extends React.Component {
       .filter(selected => !selected.id)
       .map(selected => selected.email)
     const { currentUserOrganization } = apiStore
+    const { FREEMIUM_USER_LIMIT } = window
     const {
       name = 'this organization',
       active_users_count,
-      trial_users_count,
       has_payment_method,
     } = currentUserOrganization
     const willReachMaxUsers =
-      emails.length + active_users_count >= trial_users_count
+      emails.length + active_users_count >= FREEMIUM_USER_LIMIT
     const shouldAskForPaymentMethod = !has_payment_method && willReachMaxUsers
     if (shouldAskForPaymentMethod) {
       const popupAgreed = new Promise((resolve, reject) => {
         const { admin_group } = currentUserOrganization
         const { is_admin } = admin_group // or should we use primary_group.can_edit?
-        const prompt = `Inviting these people will take ${name} over the free limit of ${trial_users_count}. Please add a payment method to continue`
+        const prompt = `Inviting these people will take ${name} over the free limit of ${FREEMIUM_USER_LIMIT}. Please add a payment method to continue`
         const confirmText = 'Add Payment Method'
         // todo: add subprompt support for confirm modal
         // temp logic as follows:
@@ -210,7 +210,6 @@ class RolesAdd extends React.Component {
         resetSelectedUsers()
         return
       }
-      // todo: should open the card modal if openPaymentMethod=true
       routingStore.routeTo('/billing?openPaymentMethod=true') // routes to billing and opens card modal
     }
     const fullUsers = selectedUsers.filter(selected => !!selected.id)
