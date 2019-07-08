@@ -89,8 +89,9 @@ class ManagePaymentMethods extends React.Component {
   }
 
   render() {
-    const { apiStore } = this.props
+    const { apiStore, openPaymentMethod } = this.props
     const { paymentMethods } = this
+
     if (
       apiStore.currentUserOrganization &&
       !apiStore.currentUserOrganization.in_app_billing
@@ -101,7 +102,6 @@ class ManagePaymentMethods extends React.Component {
       return <Loader />
     }
 
-    // todo: how do we open the modal by default?
     return (
       <PaymentMethods
         paymentMethods={paymentMethods}
@@ -130,6 +130,7 @@ class ManagePaymentMethods extends React.Component {
             .
           </FinePrintWrapper>
         )}
+        openImmediately={openPaymentMethod}
       />
     )
   }
