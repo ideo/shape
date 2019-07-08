@@ -89,7 +89,10 @@ class Callbacks::IdeoNetworkController < ApplicationController
   end
 
   def process_group_created
+    return unless group_params[:organization_id]
+    organization = find_included('organizations')[:attributes]
     Group.find_or_create_by(name: group_params[:name],
+                            organization_id: organization[:external_id],
                             network_id: group_params[:id])
   end
 
@@ -203,6 +206,7 @@ class Callbacks::IdeoNetworkController < ApplicationController
       :id,
       :uid,
       :name,
+      :organization_id,
       :external_id,
       :created_at,
       :updated_at,

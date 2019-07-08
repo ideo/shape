@@ -327,34 +327,68 @@ describe 'Ideo Profile API Requests' do
 
   describe 'POST #groups' do
     let(:group_network_id) { SecureRandom.hex(15) }
+    let!(:organization) { create(:organization) }
     let!(:group) { create(:group, network_id: group_network_id) }
     let(:group_data) do
       {
         id: group_network_id,
         uid: SecureRandom.hex(15),
         name: group.name,
+        organization_id: SecureRandom.hex,
         admin_ids: [],
         member_ids: [],
       }
     end
 
     context 'event: created' do
-      before do
-        post(
-          '/callbacks/ideo_network/groups',
-          params: { id: group_network_id, event: :created, data: { attributes: group_data } }.to_json,
-          headers: valid_headers,
-        )
+      context 'with an organization' do
+        let(:organization_data) { {
+          id: SecureRandom.hex,
+          type: 'organizations',
+          attributes: {
+            external_id: organization.id,
+          }
+        }}
+
+        before do
+          post(
+            '/callbacks/ideo_network/groups',
+            params: { id: group_network_id, event: :created, data: { attributes: group_data }, included: [organization_data] }.to_json,
+            headers: valid_headers,
+          )
+        end
+
+        it 'returns a 200' do
+          expect(response.status).to eq(200)
+        end
+
+        it 'creates the group' do
+          created_group = Group.last
+          expect(created_group.name).to eq(group.name)
+          expect(created_group.network_id).to eq(group_network_id)
+          expect(created_group.organization_id).to eq(organization.id)
+        end
       end
 
-      it 'returns a 200' do
-        expect(response.status).to eq(200)
-      end
+      context 'without an organization' do
+        before do
+          group_data.delete(:organization_id)
+          post(
+            '/callbacks/ideo_network/groups',
+            params: { id: group_network_id, event: :created, data: { attributes: group_data } }.to_json,
+            headers: valid_headers,
+          )
+        end
 
-      it 'creates the group' do
-        created_group = Group.last
-        expect(created_group.name).to eq(group.name)
-        expect(created_group.network_id).to eq(group_network_id)
+        it 'returns a 200' do
+          expect(response.status).to eq(200)
+        end
+
+        it 'does not create the group' do
+          created_group = Group.last
+          expect(created_group.name).to eq(group.name)
+          expect(created_group.network_id).to eq(group_network_id)
+        end
       end
     end
 
