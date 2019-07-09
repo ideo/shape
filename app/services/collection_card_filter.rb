@@ -1,9 +1,10 @@
 class CollectionCardFilter < SimpleService
-  def initialize(collection:, user:, filters:)
+  def initialize(collection:, user:, filters:, application: nil)
     @collection_order = nil
     @collection = collection
     @user = user
     @filters = filters
+    @application = application
     @cards = []
   end
 
@@ -16,6 +17,8 @@ class CollectionCardFilter < SimpleService
     else
       filter_for_public
     end
+    filter_external_id
+    debugger
     @cards
   end
 
@@ -131,5 +134,27 @@ class CollectionCardFilter < SimpleService
   def apply_hidden
     # `hidden` means include both hidden and unhidden cards
     @cards = @cards.visible unless @filters[:hidden].present?
+  end
+
+  def filter_external_id
+    return if @filters[:external_id].blank? || @application.blank?
+
+    join_sql = %(
+      LEFT OUTER JOIN external_records ON external_records.id = collection_cards.item_id
+      LEFT OUTER JOIN external_records ON external_records.id = collection_cards.collection_id
+    )
+
+    @cards = @cards
+      .left_joins(:item, :collection)
+      .joins(join_sql).where(
+        "(item_id IS NOT NULL AND items.id = external_records.id AND external_records.externalizable_type = 'Item') OR " \
+        "(collection_id IS NOT NULL AND collections.id = external_records.id AND external_records.externalizable_type = 'Collection')",
+      )
+      .where(
+        ExternalRecord.arel_table[:external_id].eq(@filters[:external_id])
+        .and(
+          ExternalRecord.arel_table[:application_id].eq(@application.id),
+        )
+      )
   end
 end
