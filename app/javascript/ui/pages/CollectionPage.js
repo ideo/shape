@@ -482,28 +482,30 @@ class CollectionPage extends React.Component {
           <CreateOrgPage commonViewableResource={collection} />
         )}
         {!isLoading && (
-          <PageContainer fullWidth={collection.isBoard}>
-            <OverdueBanner />
+          <Fragment>
             <ArchivedBanner />
-            {this.renderEditorPill}
-            {inner}
-            {(collection.requiresSubmissionBoxSettings ||
-              submissionBoxSettingsOpen) && (
-              <SubmissionBoxSettingsModal collection={collection} />
-            )}
-            {/* Listen to this pastingCards value which comes from pressing CTRL+V */}
-            <MoveModal pastingCards={uiStore.pastingCards} />
-            {isSubmissionBox &&
-              apiStore.currentUser &&
-              collection.submission_box_type &&
-              this.renderSubmissionsCollection()}
-            {(uiStore.dragging || uiStore.cardMenuOpenAndPositioned) && (
-              <ClickWrapper
-                clickHandlers={[this.handleAllClick]}
-                onContextMenu={this.handleAllClick}
-              />
-            )}
-          </PageContainer>
+            <OverdueBanner />
+            <PageContainer fullWidth={collection.isBoard}>
+              {this.renderEditorPill}
+              {inner}
+              {(collection.requiresSubmissionBoxSettings ||
+                submissionBoxSettingsOpen) && (
+                <SubmissionBoxSettingsModal collection={collection} />
+              )}
+              {/* Listen to this pastingCards value which comes from pressing CTRL+V */}
+              <MoveModal pastingCards={uiStore.pastingCards} />
+              {isSubmissionBox &&
+                apiStore.currentUser &&
+                collection.submission_box_type &&
+                this.renderSubmissionsCollection()}
+              {(uiStore.dragging || uiStore.cardMenuOpenAndPositioned) && (
+                <ClickWrapper
+                  clickHandlers={[this.handleAllClick]}
+                  onContextMenu={this.handleAllClick}
+                />
+              )}
+            </PageContainer>
+          </Fragment>
         )}
         {isLoading && this.loader()}
         {!isLoading && isTransparentLoading && this.transparentLoader()}

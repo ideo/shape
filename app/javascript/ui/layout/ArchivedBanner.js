@@ -1,25 +1,9 @@
 import _ from 'lodash'
-import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Grid } from '@material-ui/core'
 import Banner from '~/ui/layout/Banner'
 import v from '~/utils/variables'
-
-const StyledBanner = styled(Banner)`
-  margin-left: calc(-100vw / 2 + ${v.maxWidth - 2 * v.fonts.baseSize}px / 2);
-  margin-right: calc(-100vw / 2 + ${v.maxWidth - 2 * v.fonts.baseSize}px / 2);
-  margin-top: 20px;
-  margin-bottom: 20px;
-
-  @media only screen and (max-width: ${v.maxWidth +
-      v.containerPadding.horizontal * v.fonts.baseSize}px) {
-    margin-left: -${v.containerPadding.horizontal}rem;
-    margin-right: -${v.containerPadding.horizontal}rem;
-    padding: 20px ${v.containerPadding.horizontal}rem;
-  }
-`
-StyledBanner.displayName = 'StyledBanner'
 
 @inject('routingStore', 'uiStore')
 @observer
@@ -37,9 +21,10 @@ class ArchivedBanner extends React.Component {
 
   renderRightComponent() {
     const { routingStore } = this.props
-    if (!this.currentRecord) return <span></span>
-    const { className, restorable_parent } = this.currentRecord
-    if (!restorable_parent) return <span></span>
+    const { currentRecord } = this
+    if (!currentRecord) return <span />
+    const { className, restorable_parent } = currentRecord
+    if (!restorable_parent) return <span />
     const restorableParentPath = routingStore.pathTo(
       restorable_parent.internalType,
       restorable_parent.id
@@ -59,19 +44,19 @@ class ArchivedBanner extends React.Component {
 
   get currentRecord() {
     const { uiStore } = this.props
-
-    return uiStore.viewingCollection || uiStore.viewingItem
+    return uiStore.viewingRecord
   }
 
   get showArchivedBanner() {
-    return this.currentRecord && this.currentRecord.archived
+    const { currentRecord } = this
+    return currentRecord && currentRecord.archived
   }
 
   render() {
     if (!this.showArchivedBanner) return null
 
     return (
-      <StyledBanner
+      <Banner
         color={v.colors.commonDark}
         leftComponent={this.renderLeftComponent()}
         rightComponent={this.renderRightComponent()}

@@ -10,11 +10,7 @@ const StyledBanner = styled.div`
   font-family: ${v.fonts.sans};
   font-size: 1.33rem;
   padding: 20px;
-
-  margin-bottom: 10px;
-  margin-left: calc(-100vw / 2 + 500px / 2);
-  margin-right: calc(-100vw / 2 + 500px / 2);
-  margin-top: -15px;
+  margin: 10px 0;
 
   a {
     color: white;
@@ -25,6 +21,10 @@ StyledBanner.displayName = 'StyledBanner'
 const StyledAction = styled.div`
   font-size: 1rem;
   text-align: right;
+
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    margin-top: 1rem;
+  }
 `
 
 class Banner extends React.Component {

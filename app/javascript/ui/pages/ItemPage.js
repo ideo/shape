@@ -156,9 +156,9 @@ class ItemPage extends React.Component {
       <Fragment>
         <Helmet title={item.pageTitle} />
         <PageHeader record={item} />
+        <ArchivedBanner />
         <ItemPageContainer>
           <PageContainer {...containerProps}>
-            <ArchivedBanner />
             {item.parent_collection_card &&
             replacingId === item.parent_collection_card.id ? (
               <GridCardBlank parent={item.parent} afterCreate={this.reroute} />
