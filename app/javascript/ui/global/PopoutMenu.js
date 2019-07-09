@@ -113,15 +113,9 @@ export const StyledMenuItem = styled.li`
     border-bottom: solid ${v.colors.commonMedium};
     border-bottom-width: ${props => (props.noBorder ? 0 : 1)}px;
     color: ${v.colors.black};
-    &.with-left {
-      padding-left: 2rem;
-    }
     &.with-avatar {
       padding-left: 3.75rem;
       padding-right: 1rem;
-    }
-    &.with-right {
-      padding-right: 2.5rem;
     }
     .icon {
       left: 0;
@@ -132,12 +126,10 @@ export const StyledMenuItem = styled.li`
       height: 16px;
       line-height: 1.4rem;
     }
-    .icon-left .icon {
-      left: 8px;
-    }
     .icon-right .icon {
       left: auto;
-      right: 1.5rem;
+      right: ${props =>
+        props.wrapperClassName === 'add-audience-menu' ? -0.5 : 1.5}rem;
     }
     span {
       line-height: 1.4rem;
@@ -164,7 +156,7 @@ class PopoutMenu extends React.Component {
   }
 
   get renderMenuItems() {
-    const { groupExtraComponent } = this.props
+    const { groupExtraComponent, wrapperClassName } = this.props
     const { groupedMenuItems } = this
     const rendered = []
     Object.keys(groupedMenuItems).forEach(groupName => {
@@ -182,14 +174,14 @@ class PopoutMenu extends React.Component {
               withAvatar,
             } = item
             let className = `menu-${_.kebabCase(name)}`
-            if (iconLeft) className += ' with-left'
-            if (iconRight) className += ' with-right'
+            const rightIconClassName = 'icon-right'
             if (withAvatar) className += ' with-avatar'
             return (
               <StyledMenuItem
                 key={`${name}-${id || ''}`}
                 noBorder={item.noBorder}
                 loading={loading}
+                wrapperClassName={wrapperClassName}
               >
                 <button
                   onClick={loading ? () => null : onClick}
@@ -198,7 +190,7 @@ class PopoutMenu extends React.Component {
                 >
                   <span className="icon-left">{iconLeft}</span>
                   <span>{name}</span>
-                  <span className="icon-right">{iconRight}</span>
+                  <span className={rightIconClassName}>{iconRight}</span>
                 </button>
               </StyledMenuItem>
             )
