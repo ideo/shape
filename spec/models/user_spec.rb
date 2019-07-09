@@ -81,6 +81,13 @@ describe User, type: :model do
       end
     end
 
+    describe '#sync_network_groups', :vcr do
+      it 'should add the user to the group' do
+        expect(SyncNetworkGroups).to receive(:call)
+        create(:user)
+      end
+    end
+
     describe '#update_mailing_list_subscription' do
       it 'should call the MailingListSubscriptionWorker if mailing_list value is changed' do
         expect(
