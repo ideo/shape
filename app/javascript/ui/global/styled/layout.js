@@ -106,8 +106,10 @@ export const FixedHeader = styled(StyledHeader)`
   top: 0;
   padding: 4px ${v.containerPadding.horizontal}rem 0;
   z-index: ${v.zIndex.globalHeader};
-  background: ${({ noBackground }) =>
-    noBackground ? 'transparent' : hexToRgba(v.colors.commonLight, 0.96)};
+  background: ${({ darkBackground }) =>
+    darkBackground
+      ? hexToRgba(v.colors.commonMediumTint, 0.96)
+      : hexToRgba(v.colors.commonLight, 0.96)};
   @supports (
     (-webkit-backdrop-filter: blur(4px)) or (backdrop-filter: blur(4px))
   ) {

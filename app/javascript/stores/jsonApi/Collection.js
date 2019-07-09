@@ -851,23 +851,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.request(apiPath, 'POST', { data })
   }
 
-  async restore() {
-    const { routingStore } = apiStore
-    const { uiStore } = this
-    uiStore.update('isLoading', true)
-    await this.apiStore.unarchiveCards({
-      cardIds: [this.parent_collection_card.id],
-      collection: this,
-      undoable: false,
-    })
-    if (this.parent) {
-      routingStore.routeTo('collections', this.parent.id)
-    } else if (this.parentPath) {
-      routingStore.goToPath(this.parentPath)
-    }
-    uiStore.update('isLoading', false)
-  }
-
   async API_moveCardsIntoCollection({
     toCollection,
     cardIds,

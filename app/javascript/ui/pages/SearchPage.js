@@ -111,6 +111,7 @@ class SearchPage extends React.Component {
     const parsedParams = queryString.parse(location.search)
     const params = parsedParams
     delete params.q
+    delete params['']
     if (!params) return {}
     return params
   }
@@ -133,10 +134,10 @@ class SearchPage extends React.Component {
     if (!query) {
       return null
     }
+    if (uiStore.isLoading) {
+      return <Loader />
+    }
     if (this.searchResults.length === 0) {
-      if (uiStore.isLoading) {
-        return <Loader />
-      }
       return (
         <div>
           No results found for &quot;

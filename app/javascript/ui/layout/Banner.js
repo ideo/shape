@@ -5,6 +5,7 @@ import { MaxWidthContainer } from '~/ui/global/styled/layout'
 import v from '~/utils/variables'
 
 const StyledBanner = styled.div`
+  position: relative; /* necessary to get above the FixedBoundary */
   background-color: ${({ color }) => color};
   color: white;
   font-family: ${v.fonts.sans};

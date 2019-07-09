@@ -5,7 +5,6 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
 import Hidden from '@material-ui/core/Hidden'
 
-import hexToRgba from '~/utils/hexToRgba'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 import CornerPositioned from '~/ui/global/CornerPositioned'
 import Logo from '~/ui/layout/Logo'
@@ -256,15 +255,18 @@ class Header extends React.Component {
             __html: `
           body { background-color:  ${
             this.onArchivedPage
-              ? hexToRgba(v.colors.commonMedium, 0.6)
-              : hexToRgba(v.colors.commonLight, 1)
+              ? v.colors.commonMediumTint
+              : v.colors.commonLight
           };
           transition: background-color 0.5s ease;
           }
         `,
           }}
         />
-        <FixedHeader noBackground={this.onArchivedPage} data-empty-space-click>
+        <FixedHeader
+          darkBackground={this.onArchivedPage}
+          data-empty-space-click
+        >
           <MaxWidthContainer>
             <Flex
               data-empty-space-click

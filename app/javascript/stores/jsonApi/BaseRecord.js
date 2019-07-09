@@ -33,6 +33,11 @@ class BaseRecord extends jsonapi(Model) {
     return this.apiStore.routingStore
   }
 
+  get undoStore() {
+    // undoStore gets supplied via apiStore
+    return this.apiStore.undoStore
+  }
+
   @computed
   get id() {
     return this.meta.id
@@ -115,6 +120,22 @@ class BaseRecord extends jsonapi(Model) {
     runInAction(() => {
       setModelMetaKey(this, DATX_PERSISTED_KEY, false)
     })
+  }
+
+  async restore() {
+    const { routingStore, uiStore } = this
+    uiStore.update('isLoading', true)
+    await this.apiStore.unarchiveCards({
+      cardIds: [this.parent_collection_card.id],
+      collection: this,
+      undoable: false,
+    })
+    if (this.parent) {
+      routingStore.routeTo('collections', this.parent.id)
+    } else if (this.parentPath) {
+      routingStore.goToPath(this.parentPath)
+    }
+    uiStore.update('isLoading', false)
   }
 }
 

@@ -288,6 +288,7 @@ class GridCard extends React.Component {
 
   handleRestore = ev => {
     ev.preventDefault()
+    ev.stopPropagation()
     const { record } = this.props
     record.restore()
   }
@@ -380,7 +381,7 @@ class GridCard extends React.Component {
 
     const firstCardInRow = card.position && card.position.x === 0
     const tagEditorOpen = uiStore.tagsModalOpenId === card.id
-    const showRestore = searchResult && record.archived && record.is_restorable
+    const showRestore = searchResult && record.isRestorable
 
     return (
       <StyledGridCard

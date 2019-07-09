@@ -1,10 +1,8 @@
 import _ from 'lodash'
 import { action, observable } from 'mobx'
 import queryString from 'query-string'
-import { undoStore } from '~/stores'
 
 // This contains some shared methods between Collection and Item
-
 const SharedRecordMixin = superclass =>
   class extends superclass {
     @observable
@@ -33,6 +31,14 @@ const SharedRecordMixin = superclass =>
 
     get isRestorable() {
       return this.archived && this.is_restorable && this.can_edit
+    }
+
+    get parentPath() {
+      if (this.breadcrumb && this.breadcrumb.length > 1) {
+        const { type, id } = this.breadcrumb[this.breadcrumb.length - 2]
+        return this.routingStore.pathTo(type, id)
+      }
+      return this.routingStore.pathTo('homepage')
     }
 
     API_updateName(name) {
@@ -104,7 +110,7 @@ const SharedRecordMixin = superclass =>
       if (!apiCall) {
         undoApiCall = () => this.API_revertTo({ snapshot })
       }
-      undoStore.pushUndoAction({
+      this.undoStore.pushUndoAction({
         message,
         apiCall: undoApiCall,
         redirectPath: { type: redirectTo.internalType, id: redirectTo.id },
