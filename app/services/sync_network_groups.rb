@@ -6,7 +6,7 @@ class SyncNetworkGroups < SimpleService
 
   def call
     begin
-      return if @roles.size == 0
+      return true if @roles.size == 0
       assign_user_to_groups
     rescue JsonApiClient::Errors::ServerError
       return false
@@ -26,8 +26,7 @@ class SyncNetworkGroups < SimpleService
     @roles.each do |users_role|
       role_name = users_role.role.name
       group_id = users_role.role.resource_id
-      group = Group.find(group_id)
-      debugger
+      group = Group.find_by(network_id: group_id)
       if !@user.has_role?(role_name, group)
         Roles::MassAssign.call(
           object: group,
