@@ -1,6 +1,6 @@
 import { invert, uniq } from 'lodash'
 
-export const criteria = [
+const criteria = [
   {
     name: 'Age',
     group: 'Demographics',
@@ -121,7 +121,7 @@ const getCriteriaBy = (key, value) =>
 const getCriteriaGroups = () =>
   uniq(criteria.reduce((acc, criterion) => [...acc, criterion.group], []))
 
-export const getCriteriaByGroup = group => getCriteriaBy('group', group)
+const getCriteriaByGroup = group => getCriteriaBy('group', group)
 
 export const getCriterionByName = name => {
   const criteria = getCriteriaBy('name', name)[0]
