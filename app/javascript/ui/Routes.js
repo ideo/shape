@@ -28,7 +28,9 @@ import UserSettings from '~/ui/users/UserSettings'
 import v from '~/utils/variables'
 import firebaseClient from '~/vendor/firebase/clients/firebaseClient'
 import MuiTheme, { BillingMuiTheme } from '~/ui/theme'
-import captureGlobalKeypress from '~/utils/captureGlobalKeypress'
+import captureGlobalKeypress, {
+  handleMouseDownSelection,
+} from '~/utils/captureGlobalKeypress'
 
 const AppWrapper = styled.div`
   /* used by terms of use modal to blur the whole site */
@@ -87,11 +89,6 @@ const SelectedArea = styled.div.attrs({
   z-index: ${v.zIndex.clickWrapper};
 `
 
-const emptySpaceClick = e => {
-  const { target } = e
-  return target.getAttribute && target.getAttribute('data-empty-space-click')
-}
-
 // withRouter allows it to respond automatically to routing changes in props
 @withRouter
 @inject('apiStore', 'uiStore', 'routingStore')
@@ -126,13 +123,10 @@ class Routes extends React.Component {
   }
 
   handleMouseDownSelection = e => {
-    if (!emptySpaceClick(e)) return
-    // if we clicked an empty space...
-    const { uiStore } = this.props
-    uiStore.deselectCards()
-    uiStore.onEmptySpaceClick(e)
-    uiStore.closeBlankContentTool()
-    this.mouseDownAt = { x: e.pageX, y: e.pageY }
+    const globalClick = handleMouseDownSelection(e)
+    if (globalClick === 'emptySpace') {
+      this.mouseDownAt = { x: e.pageX, y: e.pageY }
+    }
   }
 
   handleMouseMoveSelection = e => {

@@ -224,7 +224,7 @@ class DataItemCoverCollectionsItems extends React.Component {
     if (timeframe === 'ever') {
       return (
         <span className="titleAndControls">
-          within {!item.datasets[0].data_source ? 'the ' : ''}
+          within {!item.datasets[0].data_source_id ? 'the ' : ''}
           {this.targetControl} {this.timeframeControl}
         </span>
       )

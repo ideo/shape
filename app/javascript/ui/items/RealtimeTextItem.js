@@ -125,6 +125,8 @@ class RealtimeTextItem extends React.Component {
   componentWillUnmount() {
     this.sendCombinedDelta.flush()
     this.unmounted = true
+    // this will set the datx item to have the right data
+    this.cancel()
     const { routingTo } = routingStore
     const { item } = this.props
     const routingToSameItem =
@@ -486,6 +488,7 @@ class RealtimeTextItem extends React.Component {
           {canEdit && <TextItemToolbar onExpand={onExpand} />}
           <CloseButton
             data-cy="TextItemClose"
+            className="ql-close"
             onClick={this.cancel}
             size={fullPageView ? 'lg' : 'sm'}
           />

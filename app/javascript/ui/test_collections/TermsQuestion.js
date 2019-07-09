@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { observable } from 'mobx'
+import { observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import Emoji from '~/ui/icons/Emoji'
@@ -22,8 +22,10 @@ class TermsQuestion extends React.Component {
         respondent_terms_accepted: choice,
       })
     }
-    this.answered = true
-    this.choice = choice ? 'yes' : 'no'
+    runInAction(() => {
+      this.answered = true
+      this.choice = choice ? 'yes' : 'no'
+    })
     // there was a user, or anon user answered "no", move on
     onAnswer(choice)
   }
@@ -50,6 +52,8 @@ class TermsQuestion extends React.Component {
           different personal data laws and may be less strict than the EU for
           example.
           <br />
+          <br />
+          Only one response per person will be accepted and rewarded.
         </QuestionText>
         <EmojiHolder data-cy="TermsEmojiHolder">
           <EmojiButton

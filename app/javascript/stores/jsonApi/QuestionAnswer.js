@@ -1,4 +1,5 @@
 import { apiUrl } from '~/utils/url'
+import trackError from '~/utils/trackError'
 import { runInAction } from 'mobx'
 import BaseRecord from './BaseRecord'
 
@@ -21,6 +22,7 @@ class QuestionAnswer extends BaseRecord {
         this.survey_response.test_collection_id
       )
       test_collection.test_status = 'closed'
+      trackError(e, { source: 'QuestionAnswer.API_save' })
       return false
     }
   }

@@ -207,6 +207,18 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
           expect(Group.find(json['data']['id']).organization_id).to eq organization.id
         end
       end
+
+      context 'nested under organization in route' do
+        let!(:organization) { create(:organization, member: user) }
+        let!(:path) do
+          api_v1_organization_groups_path(organization)
+        end
+
+        it 'creates the group in the organization' do
+          post(path, params: params)
+          expect(Group.find(json['data']['id']).organization_id).to eq organization.id
+        end
+      end
     end
   end
 
@@ -216,9 +228,7 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
     let(:params) do
       json_api_params(
         'groups',
-        {
-          name: 'Creative Competitors',
-        }
+        name: 'Creative Competitors',
       )
     end
 

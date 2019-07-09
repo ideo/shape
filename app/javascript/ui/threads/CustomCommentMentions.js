@@ -7,6 +7,13 @@ export const StyledCommentInput = styled.div`
   padding-right: 45px;
   font-size: 1rem;
 
+  a,
+  a:hover,
+  a:active,
+  a:visited {
+    color: ${v.colors.white};
+  }
+
   .public-DraftEditor-content {
     min-height: ${props => (props.editing ? '25px' : '15px')};
   }

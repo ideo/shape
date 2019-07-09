@@ -53,6 +53,7 @@ const fakeUiStore = {
   setSelectedArea: jest.fn(),
   selectedCardIds: [],
   selectCardId: jest.fn(),
+  deselectCards: jest.fn(),
   setViewingCollection: jest.fn(),
   setViewingItem: jest.fn(),
   viewingCollection: null,

@@ -239,7 +239,7 @@ TestQuestion.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   editing: PropTypes.bool.isRequired,
   surveyResponse: MobxPropTypes.objectOrObservableObject,
-  questionAnswer: MobxPropTypes.objectOrObservableObject,
+  questionAnswer: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]),
   createSurveyResponse: PropTypes.func,
   afterQuestionAnswered: PropTypes.func,
   canEdit: PropTypes.bool,

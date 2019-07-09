@@ -173,6 +173,8 @@ class CardMover
     return unless move?
     @moving_cards.each do |card|
       next if card.link?
+      # private records remain private, do not alter their permissions
+      next if card.record.private?
       Roles::MergeToChild.call(parent: @to_collection, child: card.record)
     end
   end

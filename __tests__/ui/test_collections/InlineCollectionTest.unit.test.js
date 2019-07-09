@@ -5,35 +5,45 @@ import { fakeCollection } from '#/mocks/data'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 
-let wrapper, props, uiStore
+let wrapper, props, uiStore, respondedTestCollection
 const fakeTestCollection = {
-  ...fakeCollection,
-  question_cards: fakeCollection.collection_cards,
+  // NOTE: weird error when using fakeCollection and its fakeCollectionCards...
+  // would get "maximum call stack", so we just create a simpler data set here
+  question_cards: [{ id: '1', record: {} }],
 }
 
 describe('InlineCollectionTest', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     uiStore = fakeUiStore
-    uiStore.viewingCollection = fakeTestCollection
+    uiStore.viewingCollection = fakeCollection
     props = {
       apiStore: fakeApiStore({
         requestResult: { data: fakeTestCollection },
       }),
       uiStore,
     }
-    wrapper = shallow(<InlineCollectionTest.wrappedComponent {...props} />)
+    wrapper = await shallow(
+      <InlineCollectionTest.wrappedComponent {...props} />
+    )
+    wrapper.update()
   })
 
   describe('render', () => {
     describe('with a test collection', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         const testCollection = {
           ...fakeTestCollection,
           survey_response_for_user_id: null,
           test_status: 'live',
         }
+        props.apiStore = fakeApiStore({
+          requestResult: { data: testCollection },
+        })
         props.uiStore.viewingCollection.live_test_collection = testCollection
-        wrapper = shallow(<InlineCollectionTest.wrappedComponent {...props} />)
+        wrapper = await shallow(
+          <InlineCollectionTest.wrappedComponent {...props} />
+        )
+        wrapper.update()
       })
 
       it('should render a test survey responder with collection', () => {
@@ -80,40 +90,23 @@ describe('InlineCollectionTest', () => {
       )
     })
 
-    describe('if there is a survey response already for the user', () => {
-      beforeEach(() => {
-        const respondedTestCollection = {
-          ...testCollection,
-          survey_response_for_user_id: 57,
-        }
-        props.apiStore.request.mockReturnValue({
-          data: respondedTestCollection,
-        })
-        wrapper = shallow(<InlineCollectionTest.wrappedComponent {...props} />)
-      })
-
-      it('should fetch the survey response', () => {
-        expect(props.apiStore.fetch).toHaveBeenCalledWith(
-          'survey_responses',
-          57
-        )
-      })
-    })
-
     describe('if the testCollection is_submission_test', () => {
       beforeEach(() => {
-        const respondedTestCollection = {
+        respondedTestCollection = {
           ...testCollection,
+          API_getNextAvailableTest: jest.fn(),
           is_submission_test: true,
         }
-        props.apiStore.request.mockReturnValue({
-          data: respondedTestCollection,
+        props.apiStore = fakeApiStore({
+          requestResult: { data: respondedTestCollection },
         })
         wrapper = shallow(<InlineCollectionTest.wrappedComponent {...props} />)
       })
 
       it('should check for the next available test', () => {
-        expect(testCollection.API_getNextAvailableTest).toHaveBeenCalled()
+        expect(
+          respondedTestCollection.API_getNextAvailableTest
+        ).toHaveBeenCalled()
       })
     })
   })

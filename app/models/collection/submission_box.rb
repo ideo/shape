@@ -139,7 +139,7 @@ class Collection
       # need to use inner query to combine `order` + `distinct`
       Collection::TestCollection
         .from(available, :collections)
-        .order('RANDOM()')
+        .order(Arel.sql('RANDOM()'))
         .first
     end
 

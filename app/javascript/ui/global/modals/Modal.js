@@ -143,7 +143,7 @@ class Modal extends React.Component {
   handleClose = ev => {
     ev.preventDefault()
     const { onClose } = this.props
-    if (onClose) onClose()
+    if (onClose) onClose(ev)
   }
 
   render() {

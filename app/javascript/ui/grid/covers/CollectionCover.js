@@ -191,7 +191,7 @@ class CollectionCover extends React.Component {
     if (!this.hasCollectionScore) return ''
 
     const orderName = order.question_title
-    const score = collection.test_scores[order.question_type]
+    const score = collection.test_scores[order]
     return (
       <RoundPill>
         Result: {orderName}: <strong>{score}%</strong>
