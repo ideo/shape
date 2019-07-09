@@ -96,6 +96,23 @@ class ConfirmationDialog extends React.PureComponent {
     return this.props.open === 'confirm'
   }
 
+  get twoColumn() {
+    return !!(this.confirmPrompt || this.cancelPrompt)
+  }
+
+  get bigModal() {
+    return !!(this.props.image || this.twoColumn)
+  }
+
+  get backgroundColor() {
+    if (this.props.backgroundColor) {
+      return this.props.backgroundColor
+    } else if (this.bigModal) {
+      return v.colors.white
+    }
+    return v.colors.commonDark
+  }
+
   render() {
     // these props get passed in from uiStore.dialogConfig in DialogWrapper
     const {
@@ -106,29 +123,75 @@ class ConfirmationDialog extends React.PureComponent {
       confirmPrompt,
       confirmText,
       prompt,
+      subPromptNode,
       onToggleSnoozeDialog,
       snoozeChecked,
       image,
+      singleConfirmButton,
     } = this.props
-
-    const twoColumn = !!(confirmPrompt || cancelPrompt)
-    const bigModal = !!(image || twoColumn)
 
     const modalProps = {
       ...this.props,
       onClose: this.handleCancel,
       open: this.isOpen,
-      maxWidth: bigModal ? 'md' : 'sm',
+      maxWidth: this.bigModal ? 'md' : 'sm',
       iconImageOverride: image,
-      backgroundColor: bigModal ? v.colors.white : v.colors.commonDark,
+      backgroundColor: this.backgroundColor,
     }
 
-    const ButtonEl = bigModal ? OptionsButton : TextButton
+    const ButtonEl = this.bigModal ? OptionsButton : TextButton
+
+    const ConfirmButton = props => (
+      <FormActionsContainer>
+        <ButtonEl
+          data-cy="CancelButton"
+          maxWidth="200"
+          onClick={props.handleClick}
+        >
+          {props.buttonText}
+        </ButtonEl>
+      </FormActionsContainer>
+    )
+
+    const ConfirmButtons = props => (
+      <Grid container justify="center">
+        <Grid item xs={this.twoColumn ? 12 : true} sm>
+          {props.cancelImage && <OptionImage src={props.cancelImage} alt="" />}
+          {props.cancelPrompt && (
+            <ConfirmOption>{props.cancelPrompt}</ConfirmOption>
+          )}
+          <ConfirmButton
+            buttonText={props.cancelText}
+            handleClick={this.handleCancel}
+          />
+        </Grid>
+        {this.twoColumn && (
+          <Grid item xs={12} sm={1} style={{ color: v.colors.primaryDark }}>
+            <OrLabel>
+              <span>or</span>
+            </OrLabel>
+          </Grid>
+        )}
+        <Grid item xs={props.twoColumn ? 12 : true} sm>
+          {props.confirmImage && (
+            <OptionImage src={props.confirmImage} alt="" />
+          )}
+          {props.confirmPrompt && (
+            <ConfirmOption>{props.confirmPrompt}</ConfirmOption>
+          )}
+          <ConfirmButton
+            buttonText={props.confirmText}
+            handleClick={this.handleConfirm}
+          />
+        </Grid>
+      </Grid>
+    )
 
     return (
       <Dialog {...modalProps}>
         <form>
           {prompt && <p data-cy="ConfirmPrompt">{prompt}</p>}
+          {subPromptNode && subPromptNode.props.children}
           {onToggleSnoozeDialog && (
             <StyledFormControlLabel
               classes={{ label: 'form-control' }}
@@ -146,41 +209,21 @@ class ConfirmationDialog extends React.PureComponent {
               label="Please don’t show me this warning for a while."
             />
           )}
-          <Grid container justify="center">
-            <Grid item xs={twoColumn ? 12 : true} sm>
-              {cancelImage && <OptionImage src={cancelImage} alt="" />}
-              {cancelPrompt && <ConfirmOption>{cancelPrompt}</ConfirmOption>}
-              <FormActionsContainer>
-                <ButtonEl
-                  data-cy="CancelButton"
-                  maxWidth="200"
-                  onClick={this.handleCancel}
-                >
-                  {cancelText}
-                </ButtonEl>
-              </FormActionsContainer>
-            </Grid>
-            {twoColumn && (
-              <Grid item xs={12} sm={1} style={{ color: v.colors.primaryDark }}>
-                <OrLabel>
-                  <span>or</span>
-                </OrLabel>
-              </Grid>
-            )}
-            <Grid item xs={twoColumn ? 12 : true} sm>
-              {confirmImage && <OptionImage src={confirmImage} alt="" />}
-              {confirmPrompt && <ConfirmOption>{confirmPrompt}</ConfirmOption>}
-              <FormActionsContainer>
-                <ButtonEl
-                  data-cy="ConfirmButton"
-                  maxWidth="200"
-                  onClick={this.handleConfirm}
-                >
-                  {confirmText}
-                </ButtonEl>
-              </FormActionsContainer>
-            </Grid>
-          </Grid>
+          {singleConfirmButton ? (
+            <ConfirmButton
+              buttonText={confirmText}
+              handleCancel={this.handleCancel}
+            />
+          ) : (
+            <ConfirmButtons
+              cancelText={cancelText}
+              cancelImage={cancelImage}
+              cancelPrompt={cancelPrompt}
+              confirmText={confirmText}
+              confirmImage={confirmImage}
+              confirmPrompt={confirmPrompt}
+            />
+          )}
         </form>
       </Dialog>
     )
@@ -190,6 +233,7 @@ class ConfirmationDialog extends React.PureComponent {
 ConfirmationDialog.propTypes = {
   ...Dialog.childPropTypes,
   prompt: PropTypes.string,
+  subPromptNode: PropTypes.node,
   open: PropTypes.string,
   image: PropTypes.string,
   onConfirm: PropTypes.func,
@@ -202,10 +246,12 @@ ConfirmationDialog.propTypes = {
   cancelText: PropTypes.string,
   onToggleSnoozeDialog: PropTypes.func,
   snoozeChecked: PropTypes.bool,
+  singleConfirmButton: PropTypes.bool,
 }
 ConfirmationDialog.defaultProps = {
   ...Dialog.defaultProps,
   prompt: '',
+  subPromptNode: null,
   open: '',
   image: null,
   onConfirm: null,
@@ -218,6 +264,7 @@ ConfirmationDialog.defaultProps = {
   cancelText: 'Cancel',
   onToggleSnoozeDialog: null,
   snoozeChecked: false,
+  singleConfirmButton: false,
 }
 
 export default ConfirmationDialog

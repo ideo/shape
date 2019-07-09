@@ -21,10 +21,18 @@ import PillList from '~/ui/global/PillList'
 import EmailCSVUploader from '~/ui/global/EmailCSVUploader'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import { apiStore, uiStore, routingStore } from '~/stores'
+import v from '~/utils/variables'
 
 const RightAligner = styled(Grid)`
   padding-right: 78px;
   min-width: 175px; /* 97px + padding */
+`
+RightAligner.displayName = 'StyledRightAligner'
+
+const GridTextSmall = styled.p`
+  /* override default dialog font size and margin*/
+  font-size: 0.75rem !important;
+  margin-bottom: 10px !important;
 `
 RightAligner.displayName = 'StyledRightAligner'
 
@@ -184,25 +192,77 @@ class RolesAdd extends React.Component {
     if (shouldAskForPaymentMethod) {
       const popupAgreed = new Promise((resolve, reject) => {
         const { admin_group } = currentUserOrganization
-        const { is_admin } = admin_group // or should we use primary_group.can_edit?
+        const { is_admin } = admin_group
         const prompt = `Inviting these people will take ${name} over the free limit of ${FREEMIUM_USER_LIMIT}. Please add a payment method to continue`
         const confirmText = 'Add Payment Method'
-        // todo: add subprompt support for confirm modal
-        // temp logic as follows:
-        // const adminEmails = admins.map(a => `${a.name} ${a.email}`).join('\n')
-        // const subprompt = `The administrators are:\n` + adminEmails // show administrators for members
-        const modalProps = {
-          prompt: is_admin
-            ? prompt
-            : `${prompt} Please ask an administrator of ${name} to add a payment method.`,
+        // todo: remove once backend method is available
+        const admins = [
+          {
+            id: 1,
+            name: 'David Aycan',
+            email: 'daycan@ideo.com',
+          },
+          {
+            id: 2,
+            name: 'Sophie Chow',
+            email: 'schow@ideo.com',
+          },
+          {
+            id: 3,
+            name: 'Dave Kaplan',
+            email: 'dkaplan@ideo.com',
+          },
+        ]
+
+        const AdminGridWrapper = ({ children }) => ({ children })
+
+        const adminGrid = (
+          <AdminGridWrapper admins={admins}>
+            <div>
+              <Grid container>
+                <Grid item xs={12}>
+                  <GridTextSmall>The administrators are</GridTextSmall>
+                </Grid>
+                {admins.map(a => (
+                  <Grid container key={a.id}>
+                    <Grid item xs={6}>
+                      <GridTextSmall>{a.name}</GridTextSmall>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <GridTextSmall>{a.email}</GridTextSmall>
+                    </Grid>
+                  </Grid>
+                ))}
+              </Grid>
+            </div>
+          </AdminGridWrapper>
+        )
+
+        const adminModalProps = {
+          prompt: prompt,
           iconName: 'InviteUsersXl',
           confirmText,
           onCancel: () => {
             resolve(false)
           },
           onConfirm: () => resolve(true),
+          backgroundColor: `${v.colors.commonDark}`,
         }
-        uiStore.confirm(modalProps)
+
+        const modalProps = {
+          prompt: `${prompt} Please ask an administrator of ${name} to add payment method.`,
+          subPromptNode: adminGrid,
+          iconName: 'InviteUsersXl',
+          backgroundColor: `${v.colors.primaryLight}`,
+          confirmText: 'Close',
+          singleConfirmButton: true,
+        }
+
+        if (is_admin) {
+          uiStore.confirm(adminModalProps)
+        } else {
+          uiStore.confirm(modalProps)
+        }
       })
       const agreed = await popupAgreed
       if (!agreed) {
