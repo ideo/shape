@@ -182,6 +182,21 @@ describe Collection, type: :model do
         expect(organization.primary_group.has_role?(Role::VIEWER, collection)).to be false
       end
     end
+
+    describe '#reindex_sync' do
+      let(:collection) { create(:collection) }
+
+      it 'should get called on create' do
+        expect(Searchkick).to receive(:callbacks).with(true)
+        collection.save
+      end
+
+      it 'should get called after archive' do
+        # once on create, second for archive
+        expect(Searchkick).to receive(:callbacks).with(true).twice
+        collection.archive!
+      end
+    end
   end
 
   describe '#duplicate!' do

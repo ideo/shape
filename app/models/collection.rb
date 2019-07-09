@@ -98,7 +98,7 @@ class Collection < ApplicationRecord
   after_touch :touch_related_cards, unless: :destroyed?
   after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
   after_commit :reindex_sync, on: :create
-  after_commit :reindex_sync, if: :saved_change_to_archived?
+  after_commit :reindex_after_archive, if: :saved_change_to_archived?
   after_commit :update_comment_thread_in_firestore, unless: :destroyed?
   after_save :pin_all_primary_cards, if: :now_master_template?
 
@@ -546,6 +546,12 @@ class Collection < ApplicationRecord
     Searchkick.callbacks(true) do
       reindex
     end
+  end
+
+  # even though this just calls the above method, this gets around the issue
+  # where you can't declare `after_commit :reindex_sync` with two different conditions
+  def reindex_after_archive
+    reindex_sync
   end
 
   def touch_related_cards
