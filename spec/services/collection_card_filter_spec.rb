@@ -123,6 +123,27 @@ RSpec.describe CollectionCardFilter, type: :service do
         )
       end
 
+      context 'with external_id filter' do
+        let!(:application) { create(:application) }
+        let!(:external_record) do
+          create(
+            :external_record,
+            external_id: 'creative-difference-card',
+            externalizable: visible_card_2.record,
+            application: application,
+          )
+        end
+        let!(:filters) do
+          { external_id: 'creative-difference-card' }
+        end
+
+        it 'returns card that has collection with external id' do
+          expect(subject).to match_array(
+            [visible_card_2],
+          )
+        end
+      end
+
       context 'hidden true' do
         let!(:filters) { { hidden: true } }
 
@@ -192,7 +213,7 @@ RSpec.describe CollectionCardFilter, type: :service do
       let!(:external_record) do
         create(
           :external_record,
-          external_id: 'creative-difference-item',
+          external_id: 'creative-difference-card',
           externalizable: visible_card_2.record,
           application: application,
         )
@@ -201,7 +222,7 @@ RSpec.describe CollectionCardFilter, type: :service do
         { external_id: 'creative-difference-card' }
       end
 
-      it 'returns all card that has item with external id' do
+      it 'returns card that has collection with external id' do
         expect(subject).to match_array(
           [visible_card_2],
         )

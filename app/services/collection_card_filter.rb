@@ -18,7 +18,6 @@ class CollectionCardFilter < SimpleService
       filter_for_public
     end
     filter_external_id
-    debugger
     @cards
   end
 
@@ -140,15 +139,13 @@ class CollectionCardFilter < SimpleService
     return if @filters[:external_id].blank? || @application.blank?
 
     join_sql = %(
-      LEFT OUTER JOIN external_records ON external_records.id = collection_cards.item_id
-      LEFT OUTER JOIN external_records ON external_records.id = collection_cards.collection_id
+      INNER JOIN external_records ON external_records.externalizable_id = COALESCE(collection_cards.item_id, collection_cards.collection_id)
     )
 
     @cards = @cards
-      .left_joins(:item, :collection)
       .joins(join_sql).where(
-        "(item_id IS NOT NULL AND items.id = external_records.id AND external_records.externalizable_type = 'Item') OR " \
-        "(collection_id IS NOT NULL AND collections.id = external_records.id AND external_records.externalizable_type = 'Collection')",
+        "(collection_cards.item_id IS NOT NULL AND external_records.externalizable_type = 'Item') OR " \
+        "(collection_cards.collection_id IS NOT NULL AND external_records.externalizable_type = 'Collection')",
       )
       .where(
         ExternalRecord.arel_table[:external_id].eq(@filters[:external_id])
