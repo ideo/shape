@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/users_roles?filter%5Brole_resource_type%5D=Group&filter%5Buser_uid%5D=5e90da6bc4d0559c214d31f4d3d05e&include=role
+    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/users_roles?filter%5Brole_resource_type%5D=Group&filter%5Buser_uid%5D=2d815a9a7c640dc4a3a1b8ebcfdd34&include=role
     body:
       encoding: US-ASCII
       string: ''
@@ -25,7 +25,7 @@ http_interactions:
       Server:
       - Cowboy
       Date:
-      - Tue, 09 Jul 2019 20:34:41 GMT
+      - Tue, 09 Jul 2019 21:40:13 GMT
       Connection:
       - keep-alive
       X-Frame-Options:
@@ -43,16 +43,16 @@ http_interactions:
       Content-Type:
       - application/scim+json; charset=utf-8
       Set-Cookie:
-      - _sso_profile_session=SGwwSHVDMEMzUmsyWExXRDdvQSt3TGFpU0x5U0JOaWh3Q2tsVXJrUm5BbjNTZDhhZjNrbEFnMmZxUVhja2NzQk9GbTZDVGh2eUNSNklQSFJHc250Wk1FemNCYnZhSHh3SDlFUkg3QjVIZVBpNjJtSFVDRU82eGtFR2dBVzh0UEgtLXdGWWdObkNXdGdmYkJUclhYNlZuWUE9PQ%3D%3D--b5b7bac54b7b108a6ec620c89328373dead735bd;
-        path=/; expires=Wed, 10 Jul 2019 00:34:42 -0000; HttpOnly; secure
-      - rack.session=BAh7BkkiD3Nlc3Npb25faWQGOgZFVEkiRTVmZTk5YmUxMzZhZDE5ZjI0MTcw%0AMzU2OTRiNjc4OWRmOGZhNzM1ZGNjZjJlNjMxYjM5YTQ2ODQ5NjA4ZTJlNGIG%0AOwBG%0A--fa5a3a335e47cccf497448773d0f94ff6bd99c86;
-        path=/; expires=Wed, 10 Jul 2019 00:34:42 -0000; HttpOnly; secure
+      - _sso_profile_session=OWtpamJCdnpjQzJlLzdmOEtZaUU4c0tUbFNHL1hRYTE3dGRMZlNIeUVmdjJRSFJIaHFSd0xyQlhLMkJyOFk5SnZJOVpoUEp2WTlTOXc4M2hYZmd2ZnZWY0l6dmZ6M3BxK2EyNFkxNk1RL2NDWEFFVVcxbTFXZW02YS9mNjhtaXctLUlORDJSNmdPdFlXOUdxVHBVcW5HUUE9PQ%3D%3D--c954aa0acc4ef6b9d6f9e70bbd2362f723fa00a0;
+        path=/; expires=Wed, 10 Jul 2019 01:40:13 -0000; HttpOnly; secure
+      - rack.session=BAh7BkkiD3Nlc3Npb25faWQGOgZFVEkiRTVkZTA0YTYyZjcyZTJjMTE1NGE4%0AZjE4NGFiODE2ZGI5NzdiY2U0M2I2MmY1ZjViNGMwMjc1NTY2ZmJjYTZjZmYG%0AOwBG%0A--4a360ed5c82bb946b248f10829a3eac2b8c79716;
+        path=/; expires=Wed, 10 Jul 2019 01:40:13 -0000; HttpOnly; secure
       Cache-Control:
       - no-cache
       X-Request-Id:
-      - 7d1cfc62-7bf0-4e8a-a6f1-71918632b224
+      - afdd833e-27be-4b60-99d8-9d920dbccf56
       X-Runtime:
-      - '0.008661'
+      - '0.031285'
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains
       Vary:
@@ -66,5 +66,5 @@ http_interactions:
       string: '{"errors":[{"code":"internal_server_error","status":"500","title":"Error","detail":"We''ve
         notified our engineers and hope to address this issue shortly.","meta":{}}]}'
     http_version: 
-  recorded_at: Tue, 09 Jul 2019 20:34:42 GMT
+  recorded_at: Tue, 09 Jul 2019 21:40:13 GMT
 recorded_with: VCR 4.0.0

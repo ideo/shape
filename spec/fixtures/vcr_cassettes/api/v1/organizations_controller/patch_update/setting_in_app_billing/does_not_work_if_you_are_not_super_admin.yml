@@ -1,11 +1,11 @@
 ---
 http_interactions:
 - request:
-    method: post
-    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/usage_records
+    method: get
+    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/users_roles?filter%5Brole_resource_type%5D=Group&filter%5Buser_uid%5D=75a4942541ab3c01d390e86fde132c&include=role
     body:
-      encoding: UTF-8
-      string: '{"data":{"type":"usage_records","attributes":{"quantity":0,"timestamp":1539129599,"external_organization_id":"4"}}}'
+      encoding: US-ASCII
+      string: ''
     headers:
       User-Agent:
       - Faraday v0.12.2
@@ -19,13 +19,13 @@ http_interactions:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
   response:
     status:
-      code: 422
-      message: Unprocessable Entity
+      code: 500
+      message: Internal Server Error
     headers:
       Server:
       - Cowboy
       Date:
-      - Tue, 09 Oct 2018 22:29:09 GMT
+      - Tue, 09 Jul 2019 21:41:03 GMT
       Connection:
       - keep-alive
       X-Frame-Options:
@@ -41,13 +41,18 @@ http_interactions:
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Content-Type:
-      - application/json; charset=utf-8
+      - application/scim+json; charset=utf-8
+      Set-Cookie:
+      - _sso_profile_session=TGpDSkZQZVI4UEFiSHBhU2Mwa25qN2JBZ2w0bmJqUmdyekp0Z1QvcFdIR2xtTWtHSWVMcHJheFlZTnVuYUVwQzhjWTdIMm9aU3FKVjU4VXpjVkFTdGwxQWo1VVVIYmpDdlFqVDVIdU1nb2NsOENPYnBRYm9BaC9yOHVpMUEwTE8tLVU4QTlKQU5OWEJ0K01pTVYwMWpIb1E9PQ%3D%3D--84d847a5c908e8e58ae3e2818320134ae83ae41f;
+        path=/; expires=Wed, 10 Jul 2019 01:41:04 -0000; HttpOnly; secure
+      - rack.session=BAh7BkkiD3Nlc3Npb25faWQGOgZFVEkiRWU0NDQ2MTdmOGYwYzQ0MzVmNDRk%0AYjkyOTAyMjJhOGNhZWM3ZDlhZDI5ZWZhMTU5NTZjOTlhYzljZmI0YWVlOGUG%0AOwBG%0A--c06a79b4f80ec8915f011015b28432b233883429;
+        path=/; expires=Wed, 10 Jul 2019 01:41:04 -0000; HttpOnly; secure
       Cache-Control:
       - no-cache
       X-Request-Id:
-      - cb609996-6abf-4d4c-8742-ab574b1aca3f
+      - 69cd8e5e-077c-427e-b264-1baf73f53de7
       X-Runtime:
-      - '0.024007'
+      - '0.011220'
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains
       Vary:
@@ -58,9 +63,8 @@ http_interactions:
       - 1.1 vegur
     body:
       encoding: UTF-8
-      string: '{"errors":[{"code":"unprocessable_entity","status":"422","title":"Validation
-        Error","detail":"Subscription must exist","source":{"pointer":"/data/relationships/subscription"},"meta":{"attribute":"subscription","message":"must
-        exist","code":"blank"}}]}'
+      string: '{"errors":[{"code":"internal_server_error","status":"500","title":"Error","detail":"We''ve
+        notified our engineers and hope to address this issue shortly.","meta":{}}]}'
     http_version: 
-  recorded_at: Tue, 09 Oct 2018 22:29:10 GMT
+  recorded_at: Tue, 09 Jul 2019 21:41:04 GMT
 recorded_with: VCR 4.0.0

@@ -122,7 +122,6 @@ class User < ApplicationRecord
   after_save :update_shape_circle_subscription, if: :saved_change_to_shape_circle_member?
   after_save :update_products_mailing_list_subscription, if: :saved_change_to_mailing_list?
   after_create :update_shape_user_list_subscription, if: :active?
-  after_create :sync_network_groups
   after_update :update_shape_user_list_subscription_after_update, if: :saved_change_to_status?
 
   delegate :balance, to: :incentive_owed_account, prefix: true
@@ -472,6 +471,10 @@ class User < ApplicationRecord
     first_line_owed.created_at + TestAudience::PAYMENT_WAITING_PERIOD
   end
 
+  def sync_network_groups
+    SyncNetworkGroups.call(self)
+  end
+
   private
 
   def email_required?
@@ -523,10 +526,6 @@ class User < ApplicationRecord
         update_products_mailing_list_subscription(subscribed: false)
       end
     end
-  end
-
-  def sync_network_groups
-    SyncNetworkGroups.call(self)
   end
 
   def after_role_update(role, _method)
