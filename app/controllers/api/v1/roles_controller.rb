@@ -106,7 +106,7 @@ class Api::V1::RolesController < Api::V1::BaseController
   end
 
   def check_freemium_limit
-    current_organization.active_users_count + 1 < Organizationn::FREEMIUM_USER_LIMIT
+    current_organization.active_users_count + 1 < Organization::FREEMIUM_USER_LIMIT
   end
 
   def authorize_view_record
