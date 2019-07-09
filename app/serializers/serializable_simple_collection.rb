@@ -26,6 +26,10 @@ class SerializableSimpleCollection < BaseJsonSerializer
     @object.try(:restorable?)
   end
 
+  attribute :can_edit do
+    @current_ability.can?(:edit, @object)
+  end
+
   has_one :parent_collection_card
   has_many :collection_cards
 end

@@ -98,6 +98,7 @@ class Collection < ApplicationRecord
   after_touch :touch_related_cards, unless: :destroyed?
   after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
   after_commit :reindex_sync, on: :create
+  after_commit :reindex_sync, if: :saved_change_to_archived?
   after_commit :update_comment_thread_in_firestore, unless: :destroyed?
   after_save :pin_all_primary_cards, if: :now_master_template?
 
@@ -198,7 +199,7 @@ class Collection < ApplicationRecord
   }
 
   # Searchkick Config
-  # Use queue to bulk reindex every 5m (with Sidekiq Scheduled Job/ActiveJob)
+  # Use queue to bulk reindex every 1m (with Sidekiq Scheduled Job/ActiveJob)
   searchkick callbacks: :queue
 
   # where(type: nil) == don't index User/SharedWithMe collections

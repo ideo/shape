@@ -31,6 +31,10 @@ const SharedRecordMixin = superclass =>
       return `${this.name} | Shape`
     }
 
+    get isRestorable() {
+      return this.archived && this.is_restorable && this.can_edit
+    }
+
     API_updateName(name) {
       const previousName = this.name
       this.name = name

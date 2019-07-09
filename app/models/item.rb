@@ -116,7 +116,7 @@ class Item < ApplicationRecord
   end
 
   # Searchkick Config
-  # Use queue to bulk reindex every 5m (with Sidekiq Scheduled Job/ActiveJob)
+  # Use queue to bulk reindex every 1m (with Sidekiq Scheduled Job/ActiveJob)
   searchkick callbacks: :queue
 
   # active == don't index archived items
