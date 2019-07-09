@@ -1,3 +1,7 @@
+# Simple serializer used by:
+# - Firestoreable
+# - SearchController
+# - TestCollection#test_survey_render_class_mappings
 class SerializableSimpleCollection < BaseJsonSerializer
   type 'collections'
 
@@ -26,7 +30,7 @@ class SerializableSimpleCollection < BaseJsonSerializer
     @object.try(:restorable?)
   end
 
-  attribute :can_edit do
+  attribute :can_edit, if: -> { @current_ability } do
     @current_ability.can?(:edit, @object)
   end
 
