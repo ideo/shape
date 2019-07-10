@@ -15,7 +15,6 @@ class DemographicsSingleChoiceMenuQuestion extends DemographicsQuestionBase {
     } = this.props
 
     if (user) {
-      console.log(user, question, userAttribute, choice)
       user.API_updateCurrentUser({
         [userAttribute]: choice,
       })
