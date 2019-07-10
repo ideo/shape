@@ -191,78 +191,64 @@ class RolesAdd extends React.Component {
     const shouldAskForPaymentMethod = !has_payment_method && willReachMaxUsers
     if (shouldAskForPaymentMethod) {
       const popupAgreed = new Promise((resolve, reject) => {
-        const { admin_group } = currentUserOrganization
+        const { admin_group, id } = currentUserOrganization
         const { is_admin } = admin_group
         const prompt = `Inviting these people will take ${name} over the free limit of ${FREEMIUM_USER_LIMIT}. Please add a payment method to continue`
         const confirmText = 'Add Payment Method'
-        // todo: remove once backend method is available
-        const admins = [
-          {
-            id: 1,
-            name: 'David Aycan',
-            email: 'daycan@ideo.com',
-          },
-          {
-            id: 2,
-            name: 'Sophie Chow',
-            email: 'schow@ideo.com',
-          },
-          {
-            id: 3,
-            name: 'Dave Kaplan',
-            email: 'dkaplan@ideo.com',
-          },
-        ]
+        apiStore.fetchOrganizationAdmins(id).then(response => {
+          const { data: admins } = response
+          const AdminGridWrapper = ({ children }) => ({ children })
 
-        const AdminGridWrapper = ({ children }) => ({ children })
-
-        const adminGrid = (
-          <AdminGridWrapper admins={admins}>
-            <div>
-              <Grid container>
-                <Grid item xs={12}>
-                  <GridTextSmall>The administrators are</GridTextSmall>
-                </Grid>
-                {admins.map(a => (
-                  <Grid container key={a.id}>
-                    <Grid item xs={6}>
-                      <GridTextSmall>{a.name}</GridTextSmall>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <GridTextSmall>{a.email}</GridTextSmall>
-                    </Grid>
+          const adminGrid = (
+            <AdminGridWrapper admins={admins}>
+              <div>
+                <Grid container>
+                  <Grid item xs={12}>
+                    <GridTextSmall>The administrators are</GridTextSmall>
                   </Grid>
-                ))}
-              </Grid>
-            </div>
-          </AdminGridWrapper>
-        )
+                  {admins.map(a => (
+                    <Grid container key={a.id}>
+                      <Grid item xs={6}>
+                        <GridTextSmall>
+                          {a.first_name} {a.last_name}
+                        </GridTextSmall>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <GridTextSmall>{a.email}</GridTextSmall>
+                      </Grid>
+                    </Grid>
+                  ))}
+                </Grid>
+              </div>
+            </AdminGridWrapper>
+          )
 
-        const adminModalProps = {
-          prompt: prompt,
-          iconName: 'InviteUsersXl',
-          confirmText,
-          onCancel: () => {
-            resolve(false)
-          },
-          onConfirm: () => resolve(true),
-          backgroundColor: `${v.colors.commonDark}`,
-        }
+          const adminModalProps = {
+            prompt: prompt,
+            iconName: 'InviteUsersXl',
+            confirmText,
+            onCancel: () => {
+              resolve(false)
+            },
+            onConfirm: () => resolve(true),
+            backgroundColor: `${v.colors.commonDark}`,
+          }
 
-        const modalProps = {
-          prompt: `${prompt} Please ask an administrator of ${name} to add payment method.`,
-          subPromptNode: adminGrid,
-          iconName: 'InviteUsersXl',
-          backgroundColor: `${v.colors.primaryLight}`,
-          confirmText: 'Close',
-          singleConfirmButton: true,
-        }
+          const modalProps = {
+            prompt: `${prompt} Please ask an administrator of ${name} to add payment method.`,
+            subPromptNode: adminGrid,
+            iconName: 'InviteUsersXl',
+            backgroundColor: `${v.colors.primaryLight}`,
+            confirmText: 'Close',
+            singleConfirmButton: true,
+          }
 
-        if (is_admin) {
-          uiStore.confirm(adminModalProps)
-        } else {
-          uiStore.confirm(modalProps)
-        }
+          if (is_admin) {
+            uiStore.confirm(adminModalProps)
+          } else {
+            uiStore.confirm(modalProps)
+          }
+        })
       })
       const agreed = await popupAgreed
       if (!agreed) {

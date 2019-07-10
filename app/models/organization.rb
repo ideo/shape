@@ -375,6 +375,10 @@ class Organization < ApplicationRecord
     nil
   end
 
+  def admin_users
+    User.find(admin_group.user_ids)
+  end
+
   private
 
   def should_generate_new_friendly_id?

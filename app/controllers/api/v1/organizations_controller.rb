@@ -63,6 +63,10 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
     render jsonapi: @organization
   end
 
+  def admin_users
+    render jsonapi: @organization.admin_users
+  end
+
   private
 
   def load_user_organizations
