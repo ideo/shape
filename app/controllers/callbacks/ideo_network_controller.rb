@@ -91,9 +91,10 @@ class Callbacks::IdeoNetworkController < ApplicationController
   def process_group_created
     return unless group_params[:organization_id]
     organization = find_included('organizations')[:attributes]
-    Group.find_or_create_by(name: group_params[:name],
-                            organization_id: organization[:external_id],
-                            network_id: group_params[:id])
+    return if Group.find_by(network_id: group_params[:id]).present?
+    Group.create(name: group_params[:name],
+                 organization_id: organization[:external_id],
+                 network_id: group_params[:id])
   end
 
   def process_group_deleted
@@ -104,7 +105,7 @@ class Callbacks::IdeoNetworkController < ApplicationController
     group.update_from_network_profile(group_params)
   end
 
-  def process_group_role_added(role: , group: , user: )
+  def process_group_role_added(role:, group:, user:)
     Roles::MassAssign.call(
       object: group,
       role_name: role[:name],
@@ -112,7 +113,7 @@ class Callbacks::IdeoNetworkController < ApplicationController
     )
   end
 
-  def process_group_role_removed(role: , group: , user: )
+  def process_group_role_removed(role:, group:, user:)
     Roles::MassRemove.call(
       object: group,
       role_name: role[:name],

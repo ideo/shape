@@ -328,12 +328,11 @@ describe 'Ideo Profile API Requests' do
   describe 'POST #groups' do
     let(:group_network_id) { SecureRandom.hex(15) }
     let!(:organization) { create(:organization) }
-    let!(:group) { create(:group, network_id: group_network_id) }
     let(:group_data) do
       {
         id: group_network_id,
         uid: SecureRandom.hex(15),
-        name: group.name,
+        name: 'group name',
         organization_id: SecureRandom.hex,
         admin_ids: [],
         member_ids: [],
@@ -342,13 +341,15 @@ describe 'Ideo Profile API Requests' do
 
     context 'event: created' do
       context 'with an organization' do
-        let(:organization_data) { {
-          id: SecureRandom.hex,
-          type: 'organizations',
-          attributes: {
-            external_id: organization.id,
+        let(:organization_data) do
+          {
+            id: SecureRandom.hex,
+            type: 'organizations',
+            attributes: {
+              external_id: organization.id,
+            },
           }
-        }}
+        end
 
         before do
           post(
@@ -364,7 +365,7 @@ describe 'Ideo Profile API Requests' do
 
         it 'creates the group' do
           created_group = Group.last
-          expect(created_group.name).to eq(group.name)
+          expect(created_group.name).to eq(group_data[:name])
           expect(created_group.network_id).to eq(group_network_id)
           expect(created_group.organization_id).to eq(organization.id)
         end
@@ -385,14 +386,15 @@ describe 'Ideo Profile API Requests' do
         end
 
         it 'does not create the group' do
-          created_group = Group.last
-          expect(created_group.name).to eq(group.name)
-          expect(created_group.network_id).to eq(group_network_id)
+          last_group = Group.last
+          expect(last_group.name).not_to eq(group_data[:name])
         end
       end
     end
 
     context 'event: deleted' do
+      let!(:group) { create(:group, network_id: group_network_id) }
+
       before do
         post(
           '/callbacks/ideo_network/groups',
@@ -412,6 +414,7 @@ describe 'Ideo Profile API Requests' do
     end
 
     context 'event: updated' do
+      let!(:group) { create(:group, network_id: group_network_id) }
       it 'returns a 200' do
         post(
           '/callbacks/ideo_network/groups',
@@ -449,15 +452,17 @@ describe 'Ideo Profile API Requests' do
     let(:user) { create(:user) }
     let!(:group) { create(:group) }
     let(:users_role_id) { SecureRandom.hex }
-    let(:role_data) { {
-      id: SecureRandom.hex,
-      type: 'roles',
-      attributes: {
-        name: 'member',
-        resource_id: group.network_id,
-        resource_type: 'Group',
+    let(:role_data) do
+      {
+        id: SecureRandom.hex,
+        type: 'roles',
+        attributes: {
+          name: 'member',
+          resource_id: group.network_id,
+          resource_type: 'Group',
+        },
       }
-    }}
+    end
 
     let(:users_role_data) do
       {
@@ -491,7 +496,7 @@ describe 'Ideo Profile API Requests' do
         user.add_role(:member, group)
         post(
           '/callbacks/ideo_network/users_roles',
-          params: { id: users_role_id, event: :removed, data: { attributes: users_role_data }, included: [role_data]}.to_json,
+          params: { id: users_role_id, event: :removed, data: { attributes: users_role_data }, included: [role_data] }.to_json,
           headers: valid_headers,
         )
       end
