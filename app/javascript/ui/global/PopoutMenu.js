@@ -47,30 +47,39 @@ export const StyledMenuWrapper = styled.div`
   padding: 10px;
   z-index: ${v.zIndex.aboveClickWrapper};
   ${props => {
-    const { position, offsetPosition } = props
-    if (position) {
+    const { position, offsetPosition, menu } = props
+    const defaultFixedPosition = `
+      right: -10px;
+    `
+
+    // dynamic positioning based on component dimensions, click position relative to the screen
+    if (position && offsetPosition) {
       const { x, y } = position
+      if (x === 0 && y === 0 && menu === 'card-menu') {
+        // don't use offset position when card click event happens within dot menu
+        return defaultFixedPosition
+      }
       const { x: offsetX, y: offsetY } = offsetPosition
       const transformX = x - offsetX
       const transformY = y + offsetY
 
-      // dynamic positioning used for gridCard, see clickUtils
       return `
         left: ${transformX}px;
         top: ${transformY}px;
       `
-    } else if (offsetPosition) {
-      // dynamic positioning based off component dimensions and click position
-      const { x, y } = offsetPosition
+    }
+
+    // dynamic positioning based on component dimensions, click position relative to the parent component
+    if (offsetPosition) {
+      const { x: offsetX, y: offsetY } = offsetPosition
       return `
-        left: ${x}px;
-        top: ${y}px;
+        left: ${offsetX}px;
+        top: ${offsetY}px;
       `
     }
-    // fixed positioning for default popout menu instances, org, collection, action menu, etc.
-    return `
-      right: -10px
-    `
+    // fallback default position for all other menus that don't use dynamic positioning
+    // popout menu instances, org, collection, action menu, etc.
+    return defaultFixedPosition
   }}}
 `
 StyledMenuWrapper.displayName = 'StyledMenuWrapper'
