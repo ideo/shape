@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_13_230119) do
+ActiveRecord::Schema.define(version: 2019_07_10_231842) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -73,6 +73,14 @@ ActiveRecord::Schema.define(version: 2019_06_13_230119) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_applications_on_user_id"
+  end
+
+  create_table "audience_demographic_criteria", force: :cascade do |t|
+    t.bigint "audience_id"
+    t.string "criteria_key"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["audience_id"], name: "index_audience_demographic_criteria_on_audience_id"
   end
 
   create_table "audience_organizations", force: :cascade do |t|
