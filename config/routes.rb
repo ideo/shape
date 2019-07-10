@@ -81,6 +81,7 @@ Rails.application.routes.draw do
           patch 'move'
           patch 'archive'
           patch 'unarchive'
+          get 'unarchive_from_email'
           post 'link'
           post 'duplicate'
         end

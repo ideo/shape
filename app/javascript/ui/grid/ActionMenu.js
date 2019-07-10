@@ -15,7 +15,7 @@ import SharingIcon from '~/ui/icons/SharingIcon'
 import SubmissionBoxIconSm from '~/ui/icons/SubmissionBoxIconSm'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import TagIcon from '~/ui/icons/TagIcon'
-import TrashXlIcon from '~/ui/icons/TrashXlIcon'
+import TrashIconXl from '~/ui/icons/TrashIconXl'
 
 @inject('uiStore')
 @observer
@@ -177,7 +177,7 @@ class ActionMenu extends React.Component {
       },
       {
         name: 'Delete',
-        iconRight: <TrashXlIcon />,
+        iconRight: <TrashIconXl />,
         onClick: this.archiveCard,
       },
       {
@@ -268,6 +268,18 @@ class ActionMenu extends React.Component {
     const { menuItemsCount } = this.props
     if (menuItemsCount) {
       menuItemsCount(items.length)
+    }
+
+    if (record && record.archived) {
+      // Turn off most actions if looking at archived record
+      items = _.reject(items, { name: 'Duplicate' })
+      items = _.reject(items, { name: 'Move' })
+      items = _.reject(items, { name: 'Link' })
+      items = _.reject(items, { name: 'Replace' })
+      items = _.reject(items, { name: 'Delete' })
+      items = _.reject(items, { name: 'Sub. Box Settings' })
+      items = _.reject(items, { name: 'Add to My Collection' })
+      items = _.reject(items, { name: 'Sharing' })
     }
 
     return items

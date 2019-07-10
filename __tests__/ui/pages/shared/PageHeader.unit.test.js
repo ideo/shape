@@ -141,4 +141,24 @@ describe('PageHeader', () => {
       expect(wrapper.find('TestCollectionIcon').exists()).toBeTruthy()
     })
   })
+
+  describe('with an archived collection', () => {
+    beforeEach(() => {
+      props.record = fakeCollection
+      props.record.archived = true
+      props.record.is_restorable = true
+      props.record.can_edit = true
+      wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
+    })
+
+    it('should render the restore button', () => {
+      expect(
+        wrapper
+          .find('HeaderFormButton')
+          .children()
+          .first()
+          .text()
+      ).toEqual('Restore')
+    })
+  })
 })

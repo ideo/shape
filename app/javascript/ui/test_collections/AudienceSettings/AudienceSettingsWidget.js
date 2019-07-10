@@ -9,7 +9,7 @@ import v, { EVENT_SOURCE_TYPES } from '~/utils/variables'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 import {
   StyledRowFlexItem,
-  StyledRowFlexCell,
+  AudienceRowCell,
   StyledRowFlexParent,
   StyledColumnFlexParent,
 } from './styled'
@@ -270,10 +270,10 @@ class AudienceSettingsWidget extends React.Component {
 
     const totalPriceDisplay = (
       <React.Fragment>
-        <StyledRowFlexCell>Total</StyledRowFlexCell>
-        <StyledRowFlexCell>
+        <AudienceRowCell>Total</AudienceRowCell>
+        <AudienceRowCell>
           <strong>{totalPrice}</strong>
-        </StyledRowFlexCell>
+        </AudienceRowCell>
       </React.Fragment>
     )
 
@@ -296,7 +296,7 @@ class AudienceSettingsWidget extends React.Component {
               })}
               <StyledRowFlexParent style={{ marginTop: '15px' }}>
                 {newAudienceButton}
-                <StyledRowFlexCell />
+                <AudienceRowCell />
                 {totalPriceDisplay}
               </StyledRowFlexParent>
             </StyledColumnFlexParent>
@@ -318,7 +318,7 @@ class AudienceSettingsWidget extends React.Component {
               })}
               <StyledRowFlexParent>
                 {newAudienceButton}
-                <StyledRowFlexCell />
+                <AudienceRowCell />
                 {totalPriceDisplay}
               </StyledRowFlexParent>
             </StyledRowFlexParent>

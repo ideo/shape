@@ -103,3 +103,23 @@ export const LeaveButton = styled.button`
   width: 16px;
 `
 LeaveButton.displayName = 'StyledLeaveIconHolder'
+
+export const NamedActionButton = styled.button`
+  background: transparent;
+  color: ${v.colors.black};
+  font-family: ${v.fonts.sans};
+  font-size: 0.75rem;
+  font-weight: ${v.weights.medium};
+  letter-spacing: 0.0625rem;
+  padding: 16px 8px;
+  text-transform: uppercase;
+
+  svg,
+  .icon {
+    display: inline-block;
+    height: 30px;
+    margin-bottom: 2px;
+    vertical-align: middle;
+    width: 30px;
+  }
+`

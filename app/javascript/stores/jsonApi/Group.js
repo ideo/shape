@@ -36,7 +36,7 @@ class Group extends BaseRecord {
     this.uiStore.confirm({
       prompt: 'Are you sure you want to delete this group?',
       confirmText: 'Delete',
-      iconName: 'TrashXl',
+      iconName: 'Trash',
       onConfirm: onAgree,
     })
     return onAgree

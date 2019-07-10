@@ -6,6 +6,17 @@ RSpec.describe CommentThread, type: :model do
     it { should have_many :comments }
   end
 
+  context 'validations' do
+    let!(:comment_thread) { create(:collection_comment_thread) }
+    let(:record) { comment_thread.record }
+    let(:comment_thread_2) { build(:collection_comment_thread, record: record, organization: comment_thread.organization) }
+
+    it 'should not allow the same comment_thread for the same record + organization' do
+      expect(comment_thread_2.save).to be false
+      expect(comment_thread_2.errors.full_messages.first).to eq 'Record has already been taken'
+    end
+  end
+
   describe '#unread_comments_for' do
     let(:user) { create(:user) }
     let(:comment_thread) { create(:collection_comment_thread, num_comments: 2, add_followers: [user]) }

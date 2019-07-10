@@ -43,7 +43,7 @@ exports[`ActionMenu as editor renders snapshot 1`] = `
         "onClick": [Function],
       },
       Object {
-        "iconRight": <TrashXlIcon />,
+        "iconRight": <TrashIconXl />,
         "name": "Delete",
         "onClick": [Function],
       },

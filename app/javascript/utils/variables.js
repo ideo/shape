@@ -125,6 +125,7 @@ export default {
     white: '#ffffff',
     commonLightest: '#f5f4f3',
     commonLight: '#f2f1ee',
+    commonMediumTint: '#e3dedc',
     commonMedium: '#c6c1bf',
     commonDark: '#a89f9b',
     commonDarkest: '#787878',

@@ -224,6 +224,31 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
       end
     end
 
+    context 'when searching for archived' do
+      let(:deleted_collection) do
+        create(:collection,
+               name: 'dinosaur',
+               organization: organization,
+               add_viewers: [current_user])
+      end
+      let(:alive_collection) do
+        create(:collection,
+               name: 'dinosaur',
+               organization: organization,
+               add_viewers: [current_user])
+      end
+
+      before do
+        deleted_collection.archive!
+        batch_reindex(Collection)
+      end
+
+      it 'should returned deleted objects only' do
+        get(path, params: { query: 'dinosaur',  show_archived: true })
+        expect(json['data'].size).to eq(1)
+      end
+    end
+
     context 'if user cannot view collection' do
       before do
         current_user.remove_role(Role::EDITOR, find_collection)

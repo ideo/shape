@@ -649,6 +649,7 @@ export default class UiStore {
     )
   }
 
+  @computed
   get viewingRecord() {
     // only one should be present at a time depending on what page you're on
     return this.viewingCollection || this.viewingItem
