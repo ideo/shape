@@ -51,23 +51,23 @@ describe('ItemPage', () => {
 
   describe('cancel', () => {
     beforeEach(() => {
-      component.setState({
-        item: {
-          ...item,
-          API_updateWithoutSync: jest.fn(),
-          can_edit_content: true,
-        },
-      })
+      item.API_updateWithoutSync = jest.fn()
+      routingStore.goToPath.mockClear()
     })
+
     it('saves the item if you are an editor', () => {
-      component.cancel()
-      expect(component.state.item.API_updateWithoutSync).toHaveBeenCalled()
-      expect(routingStore.goToPath).toHaveBeenCalled
+      component.cancel({
+        item: { ...item, can_edit_content: true },
+      })
+      expect(item.API_updateWithoutSync).toHaveBeenCalled()
+      expect(routingStore.goToPath).toHaveBeenCalled()
     })
     it('does not route if route = false', () => {
-      component.cancel({ route: false })
-      expect(component.state.item.API_updateWithoutSync).toHaveBeenCalled()
-      expect(routingStore.goToPath).not.toHaveBeenCalled
+      expect(routingStore.goToPath).not.toHaveBeenCalled()
+    })
+    it('does not save unless item.can_edit_content', () => {
+      component.cancel({ item })
+      expect(item.API_updateWithoutSync).not.toHaveBeenCalled()
     })
   })
 

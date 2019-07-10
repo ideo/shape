@@ -62,9 +62,8 @@ class ItemPage extends React.Component {
   save = (item, { cancel_sync = true } = {}) =>
     item.API_updateWithoutSync({ cancel_sync })
 
-  cancel = ({ route = true } = {}) => {
+  cancel = ({ item = this.state.item, route = true } = {}) => {
     const { uiStore, routingStore } = this.props
-    const { item } = this.state
     if (item.can_edit_content) this.save(item)
     if (!route) return
     if (uiStore.previousViewingCollection) {
