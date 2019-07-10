@@ -10,7 +10,6 @@ class DemographicsSingleChoiceMenuQuestion extends DemographicsQuestionBase {
   handleAnswer({ custom: choice }) {
     const {
       user,
-      question,
       question: { userAttribute },
     } = this.props
 
@@ -30,7 +29,7 @@ class DemographicsSingleChoiceMenuQuestion extends DemographicsQuestionBase {
   render() {
     const { question } = this.props
 
-    const autocompleteOptions = question.choices.map(({ text }, index) => ({
+    const autocompleteOptions = question.choices.map(({ text }) => ({
       value: text,
       label: text,
     }))
