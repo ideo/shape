@@ -1,6 +1,6 @@
+import _ from 'lodash'
 import countries from 'i18n-iso-countries'
 import en from 'i18n-iso-countries/langs/en.json'
-import _ from 'lodash'
 
 const CHOICE_STYLE_SINGLE = 'single'
 const CHOICE_STYLE_MULTIPLE = 'multiple'
@@ -47,7 +47,7 @@ const EMPLOYMENT_RETIRED = 'Retired'
 const EMPLOYMENT_OTHER = 'Other'
 
 countries.registerLocale(en)
-const countryNames = Object.entries(countries.getNames('en'))
+const countryNames = _.toPairs(countries.getNames('en'))
 
 const birthYearsStart = 1920
 const birthYearsEnd = new Date().getFullYear()
