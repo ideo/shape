@@ -62,15 +62,15 @@ class ItemPage extends React.Component {
   save = (item, { cancel_sync = true } = {}) =>
     item.API_updateWithoutSync({ cancel_sync })
 
-  cancel = () => {
-    const { uiStore } = this.props
+  cancel = ({ route = true } = {}) => {
+    const { uiStore, routingStore } = this.props
     const { item } = this.state
     if (item.can_edit_content) this.save(item)
-
+    if (!route) return
     if (uiStore.previousViewingCollection) {
       window.history.back()
     } else {
-      this.props.routingStore.push(item.parentPath)
+      routingStore.goToPath(item.parentPath)
     }
   }
 
