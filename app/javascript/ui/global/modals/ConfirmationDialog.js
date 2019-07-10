@@ -152,9 +152,9 @@ class ConfirmationDialog extends React.PureComponent {
             <ButtonEl
               data-cy="CancelButton"
               maxWidth="200"
-              onClick={props.handleCancel}
+              onClick={this.handleCancel}
             >
-              {props.buttonText}
+              {props.cancelText}
             </ButtonEl>
           </FormActionsContainer>
         </Grid>
@@ -165,7 +165,7 @@ class ConfirmationDialog extends React.PureComponent {
             </OrLabel>
           </Grid>
         )}
-        <Grid item xs={props.twoColumn ? 12 : true} sm>
+        <Grid item xs={this.twoColumn ? 12 : true} sm>
           {props.confirmImage && (
             <OptionImage src={props.confirmImage} alt="" />
           )}
@@ -176,9 +176,9 @@ class ConfirmationDialog extends React.PureComponent {
             <ButtonEl
               data-cy="ConfirmButton"
               maxWidth="200"
-              onClick={props.handleCancel}
+              onClick={this.handleConfirm}
             >
-              {props.buttonText}
+              {props.confirmText}
             </ButtonEl>
           </FormActionsContainer>
         </Grid>
