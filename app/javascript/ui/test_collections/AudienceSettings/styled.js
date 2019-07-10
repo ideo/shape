@@ -48,6 +48,7 @@ const StyledRowFlexCell = styled(StyledRowFlexItem)`
 
 const StyledRowFlexHeader = styled(StyledRowFlexCell)`
   padding-top: 0px;
+  text-align: right;
 `
 
 const StyledLabelText = styled.span`
@@ -60,6 +61,10 @@ const StyledLabelText = styled.span`
   vertical-align: middle;
 `
 
+const AudienceRowCell = styled(StyledRowFlexCell)`
+  text-align: right;
+`
+
 export {
   StyledRowFlexCell,
   StyledRowFlexItem,
@@ -67,4 +72,5 @@ export {
   StyledRowFlexParent,
   StyledColumnFlexParent,
   StyledLabelText,
+  AudienceRowCell,
 }

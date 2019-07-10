@@ -68,6 +68,7 @@ class Api::V1::CommentThreadsController < Api::V1::BaseController
     params.require(:comment_thread).permit(
       :record_id,
       :record_type,
+      :organization_id,
     )
   end
 
@@ -75,6 +76,7 @@ class Api::V1::CommentThreadsController < Api::V1::BaseController
     @comment_thread = CommentThread.where(
       record_id: params[:record_id],
       record_type: params[:record_type],
+      organization_id: params[:organization_id] || current_organization&.id,
     ).first
     return false unless @comment_thread.present?
     authorize! :read, @comment_thread.record

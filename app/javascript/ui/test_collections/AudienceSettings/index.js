@@ -202,7 +202,7 @@ class AudienceSettings extends React.Component {
     const { audienceSettings } = this
     runInAction(() => {
       audienceSettings.set(audience.id, {
-        selected: false,
+        selected: true,
         sample_size: '0',
         audience: audience,
         test_audience: null,

@@ -22,6 +22,14 @@ const SelectedOption = styled.span`
 `
 SelectedOption.displayName = 'SelectedOption'
 
+const CloseModalButton = styled(TextButton)`
+  background: ${v.colors.black};
+  border-radius: 20px;
+  width: 183px;
+  height: 40px;
+  color: ${v.colors.white};
+`
+
 @inject('apiStore', 'uiStore')
 @observer
 class AdminAudienceModal extends React.Component {
@@ -98,14 +106,14 @@ class AdminAudienceModal extends React.Component {
           {this.renderCriteria()}
           {showModalButton && (
             <div style={{ textAlign: 'center', paddingBottom: '2rem' }}>
-              <TextButton
+              <CloseModalButton
                 data-cy="CloseModalButton"
                 onClick={this.handleClose}
                 width={200}
                 className="adminAudienceModalButton"
               >
                 {feedbackAudienceMenuOpen ? 'Add Audience' : 'Close'}
-              </TextButton>
+              </CloseModalButton>
             </div>
           )}
         </React.Fragment>

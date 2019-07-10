@@ -212,14 +212,17 @@ class MainMenuDropdown extends React.Component {
 
   get currentOrganization() {
     // Alias to often used property
-    return this.props.apiStore.currentUser.current_organization
+    return this.props.apiStore.currentUserOrganization
   }
 
   get organizationItems() {
-    const { apiStore } = this.props
+    const { apiStore, showCurrentOrg } = this.props
     const { currentUser } = apiStore
-    const orgItems = currentUser.organizations
-      .filter(org => org.id !== this.currentOrganization.id)
+    let orgs = currentUser.organizations
+    if (!showCurrentOrg) {
+      orgs = orgs.filter(org => org.id !== this.currentOrganization.id)
+    }
+    const orgItems = orgs
       .sort((orgA, orgB) => orgA.name.localeCompare(orgB.name))
       .filter(org => {
         if (this.orgSearchText === '' || currentUser.is_super_admin) return org
@@ -358,6 +361,7 @@ MainMenuDropdown.propTypes = {
   context: PropTypes.string.isRequired,
   onItemClick: PropTypes.func,
   open: PropTypes.bool,
+  showCurrentOrg: PropTypes.bool,
 }
 
 MainMenuDropdown.wrappedComponent.propTypes = {
@@ -369,6 +373,7 @@ MainMenuDropdown.wrappedComponent.propTypes = {
 MainMenuDropdown.defaultProps = {
   onItemClick: null,
   open: false,
+  showCurrentOrg: false,
 }
 
 export default MainMenuDropdown

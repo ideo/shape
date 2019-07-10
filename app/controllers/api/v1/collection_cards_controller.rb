@@ -177,11 +177,13 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def load_collection_cards
+    filter_params = params[:filter].present? ? params[:filter] : params
     @collection_cards = CollectionCardFilter
                         .call(
                           collection: @collection,
                           user: current_user,
-                          filters: params.merge(page: @page),
+                          filters: filter_params.merge(page: @page),
+                          application: current_application,
                         )
 
     return unless user_signed_in?

@@ -25,7 +25,7 @@ RSpec.describe Roles::MassAssign, type: :service do
   let(:deliver_double) do
     double('InvitationMailer')
   end
-  
+
   before :all do
     Sidekiq::Testing.inline!
   end
@@ -85,7 +85,7 @@ RSpec.describe Roles::MassAssign, type: :service do
     end
 
     context 'with a comment thread' do
-      let(:comment_thread) { create(:comment_thread, record: object) }
+      let!(:comment_thread) { create(:collection_comment_thread, record: object) }
 
       it 'should add users and groups as comment thread followers' do
         # to pick up comment_thread
