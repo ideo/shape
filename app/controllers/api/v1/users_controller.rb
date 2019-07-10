@@ -111,6 +111,8 @@ class Api::V1::UsersController < Api::V1::BaseController
       :feedback_contact_preference,
       :feedback_terms_accepted,
       :respondent_terms_accepted,
+      :country,
+      :birth_year,
       age_list: [],
       children_age_list: [],
       country_list: [],

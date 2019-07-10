@@ -77,6 +77,7 @@ function createDemographicsQuestionCard(question) {
     id,
     card_question_type: cardQuestionType,
     prompt: question.text,
+    userAttribute: question.userAttribute,
     category: question.category,
     choices: question.choices,
 

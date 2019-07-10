@@ -7,18 +7,23 @@ class DemographicsSingleChoiceMenuQuestion extends DemographicsQuestionBase {
     selectedChoice: null,
   }
 
-  handleAnswer({ custom: choiceIndex }) {
-    this.setState({
-      selectedChoice: choiceIndex,
-    })
-
+  handleAnswer({ custom: choice }) {
     const {
-      question: { category, choices },
+      user,
+      question,
+      question: { userAttribute },
     } = this.props
 
-    const choice = choices[choiceIndex]
+    if (user) {
+      console.log(user, question, userAttribute, choice)
+      user.API_updateCurrentUser({
+        [userAttribute]: choice,
+      })
+    }
 
-    this.updateUserDemographics({ category, tags: choice.tags })
+    this.setState({
+      selectedChoice: choice,
+    })
 
     this.showNextQuestion()
   }
@@ -27,7 +32,7 @@ class DemographicsSingleChoiceMenuQuestion extends DemographicsQuestionBase {
     const { question } = this.props
 
     const autocompleteOptions = question.choices.map(({ text }, index) => ({
-      value: `${index}`, // react-select expects a string value.
+      value: text,
       label: text,
     }))
 
