@@ -1,6 +1,4 @@
 class DemographicsConfig
-  attr_reader :config
-
   def initialize
     @config = YAML.load_file('demographics-config.yml')
   end
@@ -47,11 +45,6 @@ class Api::V1::AudiencesController < Api::V1::BaseController
     else
       render_api_errors @audience.errors
     end
-  end
-
-  def foobar
-    config = DemographicsConfig.new
-    render json: config.config
   end
 
   def query_categories
