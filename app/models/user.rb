@@ -3,7 +3,9 @@
 # Table name: users
 #
 #  id                          :bigint(8)        not null, primary key
+#  birth_year                  :integer
 #  cached_attributes           :jsonb
+#  country                     :string
 #  current_sign_in_at          :datetime
 #  current_sign_in_ip          :inet
 #  email                       :string           default("")

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_13_230119) do
+ActiveRecord::Schema.define(version: 2019_07_10_182723) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -577,6 +577,8 @@ ActiveRecord::Schema.define(version: 2019_06_13_230119) do
     t.boolean "feedback_terms_accepted", default: false
     t.boolean "respondent_terms_accepted", default: false
     t.boolean "shape_circle_member", default: false
+    t.integer "birth_year"
+    t.string "country"
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"
