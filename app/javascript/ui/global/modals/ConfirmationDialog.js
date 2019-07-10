@@ -139,8 +139,6 @@ class ConfirmationDialog extends React.PureComponent {
       backgroundColor: this.backgroundColor,
     }
 
-    console.log(this.backgroundColor)
-
     const ButtonEl = this.bigModal ? OptionsButton : TextButton
 
     const ConfirmButtons = props => (

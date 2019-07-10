@@ -120,6 +120,7 @@ export default class UiStore {
     fadeOutTime: undefined,
     snoozeChecked: false,
     onToggleSnoozeDialog: null,
+    backgroundColor: v.colors.commonDark,
     image: null,
     options: [],
     onClose: () => this.closeDialog(),
