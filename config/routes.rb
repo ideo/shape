@@ -154,7 +154,11 @@ Rails.application.routes.draw do
         resources :question_answers, only: %i[create update]
       end
 
-      resources :audiences, only: %i[index show create]
+      resources :audiences, only: %i[index show create] do
+        collection do
+          get :query_categories
+        end
+      end
 
       namespace :admin do
         resources :users, only: %i[index destroy create] do

@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { filter, flatten, includes, remove, forEach } from 'lodash'
+import { filter, flatten, includes, remove, forEach, uniq } from 'lodash'
 import { Flex, Box } from 'reflexbox'
 import { Grid } from '@material-ui/core'
+import axios from 'axios'
 
 import Audience from '~/stores/jsonApi/Audience'
 import Button from '~shared/components/atoms/Button'
@@ -13,11 +14,7 @@ import Modal from '~/ui/global/modals/Modal'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import TrashIcon from '~/ui/icons/TrashIcon'
 import v, { TARGETED_AUDIENCE_PRICE_PER_RESPONSE } from '~/utils/variables'
-import {
-  groupCriteriaByGroup,
-  getCriterionByName,
-  criteriaLimitByGroup,
-} from '~/ui/test_collections/AudienceSettings/AudienceCriteria'
+import { criteriaLimitByGroup } from '~/ui/test_collections/AudienceSettings/AudienceCriteria'
 
 import {
   Checkbox,
@@ -85,20 +82,23 @@ class AddAudienceModal extends React.Component {
   state = {
     name: '',
     valid: false,
-    selectedCriteria: [],
+    selectedCategories: [],
     numCriteriaPerGroup: {},
     openMenus: {},
-    age_list: [],
-    children_age_list: [],
-    country_list: [],
-    education_level_list: [],
-    gender_list: [],
-    adopter_type_list: [],
-    interest_list: [],
-    publication_list: [],
+    selectedCriteria: {},
   }
 
   criteriaTriggers = {}
+  queryCategories = null
+
+  componentDidMount() {
+    this.fetchQueryCategories()
+  }
+
+  fetchQueryCategories = async () => {
+    const request = await axios.get('/api/v1/audiences/query_categories')
+    this.queryCategories = request.data
+  }
 
   openMenu = menu => {
     const { openMenus } = this.state
@@ -133,29 +133,20 @@ class AddAudienceModal extends React.Component {
 
   handleSave = async () => {
     const { apiStore } = this.props
-    const {
-      name,
-      age_list,
-      children_age_list,
-      country_list,
-      education_level_list,
-      gender_list,
-      adopter_type_list,
-      interest_list,
-      publication_list,
-    } = this.state
+    const { name, selectedCriteria } = this.state
 
     const audience = new Audience(
       {
         name,
-        age_list,
-        children_age_list,
-        country_list,
-        education_level_list,
-        gender_list,
-        adopter_type_list,
-        interest_list,
-        publication_list,
+        // TODO: clean up
+        age_list: selectedCriteria['category_generation'],
+        children_age_list: selectedCriteria['category_children'],
+        country_list: selectedCriteria['category_country'],
+        education_level_list: selectedCriteria['category_education'],
+        gender_list: selectedCriteria['category_gender'],
+        adopter_type_list: selectedCriteria['category_adopter'],
+        interest_list: selectedCriteria['category_interest'],
+        publication_list: selectedCriteria['category_publication'],
       },
       apiStore
     )
@@ -177,17 +168,10 @@ class AddAudienceModal extends React.Component {
     this.setState({
       name: '',
       valid: false,
-      selectedCriteria: [],
+      selectedCategories: [],
+      selectedCriteria: {},
       numCriteriaPerGroup: {},
       openMenus: {},
-      age_list: [],
-      children_age_list: [],
-      country_list: [],
-      education_level_list: [],
-      gender_list: [],
-      adopter_type_list: [],
-      interest_list: [],
-      publication_list: [],
     })
   }
 
@@ -195,49 +179,56 @@ class AddAudienceModal extends React.Component {
     const criteria = e.target.value[0]
     if (!criteria) return
 
-    const { selectedCriteria } = this.state
+    const { selectedCategories } = this.state
 
-    selectedCriteria.push(criteria)
-    this.setState({ selectedCriteria })
+    selectedCategories.push(criteria)
+    this.setState({ selectedCategories })
 
     this.closeMenu(ROOT_MENU)
     this.openMenu(criteria)
   }
 
   removeCriteria(criteria) {
-    const { numCriteriaPerGroup, selectedCriteria } = this.state
+    const { numCriteriaPerGroup, selectedCategories } = this.state
 
-    remove(selectedCriteria, c => c === criteria)
+    remove(selectedCategories, c => c === criteria)
 
-    const { tagList, group } = getCriterionByName(criteria)
+    const { group, categoryKey } = this.getCategoryByName(criteria)
     numCriteriaPerGroup[group] -= 1
 
     this.setState({
-      selectedCriteria,
+      selectedCategories,
       numCriteriaPerGroup,
-      [tagList]: [],
+      [categoryKey]: [],
     })
   }
 
-  toggleCriteriaOption = (e, criteria) => {
+  toggleCriteriaOption = (e, categoryName) => {
     const { numCriteriaPerGroup } = this.state
 
-    const { tagList, group } = getCriterionByName(criteria)
-    const selectedCriteriaOptions = this.state[tagList]
+    const { group, categoryKey } = this.getCategoryByName(categoryName)
+    const selectedCriteriaForCategory =
+      this.state.selectedCriteria[categoryKey] || []
 
     if (!numCriteriaPerGroup[group]) numCriteriaPerGroup[group] = 0
 
     e.target.value.forEach(value => {
-      if (includes(selectedCriteriaOptions, value)) {
-        remove(selectedCriteriaOptions, o => o === value)
+      if (includes(selectedCriteriaForCategory, value)) {
+        remove(selectedCriteriaForCategory, o => o === value)
         numCriteriaPerGroup[group] -= 1
       } else {
-        selectedCriteriaOptions.push(value)
+        selectedCriteriaForCategory.push(value)
         numCriteriaPerGroup[group] += 1
       }
     })
 
-    this.setState({ [tagList]: selectedCriteriaOptions, numCriteriaPerGroup })
+    this.setState({
+      selectedCriteria: {
+        [categoryKey]: selectedCriteriaForCategory,
+        ...this.state.selectedCriteria,
+      },
+      numCriteriaPerGroup,
+    })
   }
 
   get reachedCriteriaLimit() {
@@ -262,7 +253,7 @@ class AddAudienceModal extends React.Component {
   }
 
   renderCriteriaMenu() {
-    const { openMenus, selectedCriteria } = this.state
+    const { openMenus, selectedCategories } = this.state
 
     // Since the menu is displayed in a MUI dialog, it must be
     // rendered after the add audience modal is opened.
@@ -270,8 +261,24 @@ class AddAudienceModal extends React.Component {
     const menuOpen = openMenus[ROOT_MENU]
     if (!menuOpen) return null
 
-    const criteria = groupCriteriaByGroup()
-    const groups = criteria.map(([group, groupCriteria]) => {
+    if (!this.queryCategories) return null
+
+    const getCategoryGroups = () =>
+      uniq(
+        this.queryCategories.reduce(
+          (acc, criterion) => [...acc, criterion.group],
+          []
+        )
+      )
+
+    const groupCategoriesByGroup = () =>
+      getCategoryGroups().reduce(
+        (acc, group) => [...acc, [group, this.getCategoriesBy('group', group)]],
+        []
+      )
+
+    const categories = groupCategoriesByGroup()
+    const groups = categories.map(([group, groupCategories]) => {
       const groupOption = (
         <SelectOption
           key={group}
@@ -282,11 +289,11 @@ class AddAudienceModal extends React.Component {
         </SelectOption>
       )
 
-      const options = groupCriteria.map(({ name }) => (
+      const options = groupCategories.map(({ name }) => (
         <SelectOption
           key={name}
           classes={{ root: 'selectOption' }}
-          disabled={includes(selectedCriteria, name)}
+          disabled={includes(selectedCategories, name)}
           value={name}
         >
           {name}
@@ -326,27 +333,24 @@ class AddAudienceModal extends React.Component {
   renderSelectedCriteria() {
     const { numCriteriaPerGroup } = this.state
 
-    return this.state.selectedCriteria.map(criteria => {
-      const { options, group, tagList } = getCriterionByName(criteria)
-      const selectedCriteriaOptions = this.state[tagList]
+    return this.state.selectedCategories.map(categoryName => {
+      const { group, categoryKey } = this.getCategoryByName(categoryName)
+      const selectedCriteria = this.state.selectedCriteria[categoryKey] || []
 
-      const selectedOptions = filter(selectedCriteriaOptions, o =>
-        includes(options, o)
-      )
       const isLimited = criteriaLimitByGroup[group]
       const atLimit = numCriteriaPerGroup[group] > criteriaLimitByGroup[group]
       return (
-        <FieldContainer key={`menu_${criteria}`}>
+        <FieldContainer key={`menu_${categoryName}`}>
           <FloatRight>
-            <EditButton onClick={() => this.openMenu(criteria)}>
+            <EditButton onClick={() => this.openMenu(categoryName)}>
               <EditPencilIcon />
             </EditButton>
-            <DeleteButton onClick={() => this.removeCriteria(criteria)}>
+            <DeleteButton onClick={() => this.removeCriteria(categoryName)}>
               <TrashIcon />
             </DeleteButton>
           </FloatRight>
-          <span ref={ref => (this.criteriaTriggers[criteria] = ref)}>
-            <Label>{criteria}</Label>
+          <span ref={ref => (this.criteriaTriggers[categoryName] = ref)}>
+            <Label>{categoryName}</Label>
             {isLimited && (
               <Box mt={-14} mb={14}>
                 <SmallHelperText
@@ -361,7 +365,7 @@ class AddAudienceModal extends React.Component {
             )}
           </span>
           <SelectedOptionsWrapper wrap>
-            {selectedOptions.map(option => (
+            {selectedCriteria.map(option => (
               <SelectedOption key={`selected_${option}`}>
                 {option}
               </SelectedOption>
@@ -376,46 +380,47 @@ class AddAudienceModal extends React.Component {
     })
   }
 
+  getCategoriesBy = (key, value) =>
+    filter(this.queryCategories, criterion => criterion[key] === value)
+
+  getCategoryByName = name => this.getCategoriesBy('name', name)[0]
+
   renderSelectedCriteriaMenus() {
-    const { selectedCriteria, openMenus } = this.state
+    const { selectedCategories, openMenus } = this.state
 
-    return selectedCriteria.map(criteria => {
-      const { options: availableOptions, tagList } = getCriterionByName(
-        criteria
-      )
-      const selectedCriteriaOptions = this.state[tagList]
+    return selectedCategories.map(name => {
+      const { criteria, categoryKey } = this.getCategoryByName(name)
+      const selectedCriteria = this.state.selectedCriteria[categoryKey]
 
-      const options = availableOptions.map(option => {
+      const options = criteria.map(option => {
         return (
           <CheckboxSelectOption
-            key={option}
+            key={option.criteriaKey}
             classes={{ root: 'selectOption' }}
-            value={option}
+            value={option.name}
           >
-            <Checkbox checked={includes(selectedCriteriaOptions, option)} />
-            {option}
+            <Checkbox checked={includes(selectedCriteria, option.name)} />
+            {option.name}
           </CheckboxSelectOption>
         )
       })
-      const menuOpen = openMenus[criteria]
+      const menuOpen = openMenus[name]
       return this.renderSelectMenu({
         isOpen: menuOpen,
-        menuId: criteria,
-        onChange: e => this.toggleCriteriaOption(e, criteria),
+        menuId: name,
+        onChange: e => this.toggleCriteriaOption(e, name),
         selectOptions: options,
       })
     })
   }
 
-  get allSelectedCriteriaOptions() {
-    const stateListKeys = filter(Object.keys(this.state), k =>
-      includes(k, '_list')
-    )
-    return flatten(stateListKeys.map(k => this.state[k]))
+  get allselectedCriteria() {
+    const categoryKeys = Object.keys(this.state.selectedCriteria)
+    return flatten(categoryKeys.map(k => this.state.selectedCriteria[k]))
   }
 
   render() {
-    const numSelectedOptions = this.allSelectedCriteriaOptions.length
+    const numSelectedOptions = this.allselectedCriteria.length
 
     return (
       <React.Fragment>
