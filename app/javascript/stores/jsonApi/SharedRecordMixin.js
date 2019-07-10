@@ -99,6 +99,22 @@ const SharedRecordMixin = superclass =>
       return res.__response.data
     }
 
+    async restore() {
+      const { routingStore, uiStore } = this
+      uiStore.update('isLoading', true)
+      await this.apiStore.unarchiveCards({
+        cardIds: [this.parent_collection_card.id],
+        collection: this,
+        undoable: false,
+      })
+      if (this.parent) {
+        routingStore.routeTo('collections', this.parent.id)
+      } else if (this.parentPath) {
+        routingStore.goToPath(this.parentPath)
+      }
+      uiStore.update('isLoading', false)
+    }
+
     pushUndo({
       snapshot,
       message = '',
