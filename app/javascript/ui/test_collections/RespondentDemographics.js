@@ -62,6 +62,7 @@ const questions = [
     text: `In which country do you live?`,
     category: 'countries', // unused but needs to be unique.
     userAttribute: 'country',
+    placeholderText: 'country',
     choiceStyle: CHOICE_STYLE_SELECT,
     choices: countryNames.map(([code, name]) => ({
       text: name,
@@ -72,6 +73,7 @@ const questions = [
     text: `In what year were you born? (Please type your birth year)`,
     category: 'n/a', // unused
     userAttribute: 'birth_year', // unused but needs to be unique.
+    placeholderText: 'YYYY',
     choiceStyle: CHOICE_STYLE_SELECT,
     choices: birthYears.map(year => ({
       text: `${year}`,
