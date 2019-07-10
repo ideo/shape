@@ -2,9 +2,6 @@ import countries from 'i18n-iso-countries'
 import en from 'i18n-iso-countries/langs/en.json'
 import _ from 'lodash'
 
-countries.registerLocale(en)
-const countryNames = Object.entries(countries.getNames('en'))
-
 const CHOICE_STYLE_SINGLE = 'single'
 const CHOICE_STYLE_MULTIPLE = 'multiple'
 const CHOICE_STYLE_SELECT = 'select'
@@ -49,7 +46,12 @@ const EMPLOYMENT_STUDENT = 'Student'
 const EMPLOYMENT_RETIRED = 'Retired'
 const EMPLOYMENT_OTHER = 'Other'
 
-const birthYears = _.range(1920, new Date().getFullYear())
+countries.registerLocale(en)
+const countryNames = Object.entries(countries.getNames('en'))
+
+const birthYearsStart = 1920
+const birthYearsEnd = new Date().getFullYear()
+const birthYears = _.range(birthYearsStart, birthYearsEnd)
 
 const choiceStyleCardQuestionTypeMap = {
   [CHOICE_STYLE_SINGLE]: 'question_demographics_single_choice',

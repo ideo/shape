@@ -49,10 +49,10 @@ const DEMOGRAPHIC_QUESTION_TYPES = [
 // Allow us to insert non-test questions into the survey while faking out some
 // things that would otherwise cause us trouble.
 const createFakeCollectionCard = ({
-  id, // *
-  cardQuestionType = `question_${id}`, // *
+  id, // required
+  cardQuestionType = `question_${id}`, // required
   order,
-  recordId = id, // *
+  recordId = id, // required
   recordContent = '',
 }) => ({
   id,
