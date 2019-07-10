@@ -125,6 +125,10 @@ class RealtimeTextItem extends React.Component {
   componentWillUnmount() {
     this.sendCombinedDelta.flush()
     this.unmounted = true
+    // this will set the datx item to have the right data
+    this.cancel({ route: false })
+    // check if you're leaving to go to the same item, e.g. item on CollectionPage -> ItemPage
+    // in which case we keep the channel open
     const { routingTo } = routingStore
     const { item } = this.props
     const routingToSameItem =
@@ -460,7 +464,10 @@ class RealtimeTextItem extends React.Component {
   }
 
   render() {
-    const { onExpand, fullPageView } = this.props
+    const { item, onExpand, fullPageView } = this.props
+    // item is not fully loaded yet, e.g. from a CommentThread
+    if (!item.data_content) return null
+
     const { canEdit } = this
     const quillProps = {
       ...v.quillDefaults,
@@ -486,6 +493,7 @@ class RealtimeTextItem extends React.Component {
           {canEdit && <TextItemToolbar onExpand={onExpand} />}
           <CloseButton
             data-cy="TextItemClose"
+            className="ql-close"
             onClick={this.cancel}
             size={fullPageView ? 'lg' : 'sm'}
           />

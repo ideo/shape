@@ -33,6 +33,11 @@ class BaseRecord extends jsonapi(Model) {
     return this.apiStore.routingStore
   }
 
+  get undoStore() {
+    // undoStore gets supplied via apiStore
+    return this.apiStore.undoStore
+  }
+
   @computed
   get id() {
     return this.meta.id

@@ -3,7 +3,6 @@ FactoryBot.define do
     name { Faker::Superhero.power }
     # Need to set a minimum or else our price will be below a valid amount
     price_per_response { 4.50 }
-    criteria 'MyString'
     age_list []
     children_age_list []
     country_list []

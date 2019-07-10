@@ -81,6 +81,7 @@ Rails.application.routes.draw do
           patch 'move'
           patch 'archive'
           patch 'unarchive'
+          get 'unarchive_from_email'
           post 'link'
           post 'duplicate'
         end
@@ -107,9 +108,8 @@ Rails.application.routes.draw do
         end
 
         get 'search', to: 'search#search'
-
         resources :collections, only: %i[create]
-        resources :groups, only: %i[index]
+        resources :groups, only: %i[index create]
         resources :users, only: %i[index]
         resources :audiences, only: %i[index]
       end

@@ -191,7 +191,7 @@ class CollectionCover extends React.Component {
     if (!this.hasCollectionScore) return ''
 
     const orderName = order.question_title
-    const score = collection.test_scores[order.question_type]
+    const score = collection.test_scores[order]
     return (
       <RoundPill>
         Result: {orderName}: <strong>{score}%</strong>
@@ -311,8 +311,8 @@ class CollectionCover extends React.Component {
 }
 
 CollectionCover.propTypes = {
-  width: PropTypes.number.isRequired,
-  height: PropTypes.number.isRequired,
+  width: PropTypes.number,
+  height: PropTypes.number,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   inSubmissionsCollection: PropTypes.bool,
   dragging: PropTypes.bool,
@@ -322,6 +322,8 @@ CollectionCover.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 CollectionCover.defaultProps = {
+  width: 1,
+  height: 1,
   inSubmissionsCollection: false,
   dragging: false,
   searchResult: false,

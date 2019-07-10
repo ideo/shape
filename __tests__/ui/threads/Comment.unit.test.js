@@ -32,7 +32,9 @@ describe('Comment', () => {
   })
 
   it('renders the message', () => {
-    expect(wrapper.find('.message').text()).toEqual(props.comment.message)
+    expect(wrapper.find('Linkify').props().children).toEqual(
+      props.comment.message
+    )
   })
 
   it('renders the timestamp', () => {

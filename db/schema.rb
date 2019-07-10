@@ -179,8 +179,7 @@ ActiveRecord::Schema.define(version: 2019_07_03_185758) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "organization_id"
-    t.index ["organization_id"], name: "index_comment_threads_on_organization_id"
-    t.index ["record_id"], name: "index_comment_threads_on_record_id", unique: true
+    t.index ["record_id", "record_type", "organization_id"], name: "index_comment_threads_on_record_and_org", unique: true
   end
 
   create_table "comments", force: :cascade do |t|

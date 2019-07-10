@@ -67,8 +67,11 @@ class GridCardEmptyHotspot extends React.Component {
 }
 
 GridCardEmptyHotspot.propTypes = {
-  visible: PropTypes.bool.isRequired,
+  visible: PropTypes.bool,
   card: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+GridCardEmptyHotspot.defaultProps = {
+  visible: false,
 }
 GridCardEmptyHotspot.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,

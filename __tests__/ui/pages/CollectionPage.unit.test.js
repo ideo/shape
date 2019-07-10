@@ -47,6 +47,13 @@ describe('CollectionPage', () => {
     expect(grid.props().collection).toBe(collection)
   })
 
+  it('passes the loadCollectionCards pagination function to the CollectionGrid', () => {
+    const grid = wrapper.find('CollectionGrid')
+    expect(grid.props().loadCollectionCards).toEqual(
+      component.loadCollectionCards
+    )
+  })
+
   it('renders a <Helmet> with the pageTitle', () => {
     const helmet = wrapper.find('HelmetWrapper')
     expect(helmet.props().title).toBe(collection.pageTitle)
@@ -135,6 +142,25 @@ describe('CollectionPage', () => {
     })
   })
 
+  describe('with params ?manage_group_id=1', () => {
+    beforeEach(() => {
+      wrapper = shallow(
+        <CollectionPage.wrappedComponent
+          {...props}
+          routingStore={{
+            ...routingStore,
+            query: '?manage_group_id=1',
+          }}
+        />
+      )
+    })
+
+    it('should call uiStore to open the group editing modal', () => {
+      expect(uiStore.openOptionalMenus).toHaveBeenCalledWith(
+        '?manage_group_id=1'
+      )
+    })
+  })
   describe('with undoAfterRoute', () => {
     beforeEach(() => {
       wrapper = shallow(
@@ -168,6 +194,57 @@ describe('CollectionPage', () => {
 
     it('should call uiStore to perform the action', () => {
       expect(uiStore.performActionAfterRoute).toHaveBeenCalled()
+    })
+  })
+
+  describe('with SubmissionBox and submissions', () => {
+    beforeEach(() => {
+      wrapper = shallow(
+        <CollectionPage.wrappedComponent
+          {...props}
+          collection={{
+            ...fakeCollection,
+            submissionTypeName: 'Submission',
+            isSubmissionBox: true,
+            submission_box_type: 'template',
+            submissions_enabled: true,
+            submission_template: { id: '123' },
+            submissions_collection: {
+              id: 100,
+              collection_cards: [],
+              cardProperties: [],
+            },
+          }}
+          uiStore={{
+            ...uiStore,
+            loadedSubmissions: true,
+          }}
+        />
+      )
+      component = wrapper.instance()
+    })
+
+    it('should render a second CollectionGrid for the submissions', () => {
+      expect(wrapper.find('PageSeparator').exists()).toBe(true)
+      expect(wrapper.find('CollectionGrid').length).toEqual(2)
+    })
+
+    it('should pass the right props to the SubmissionCollection', () => {
+      // should be the second grid
+      const collectionGrid = wrapper.find('CollectionGrid').get(0)
+      const submissionsGrid = wrapper.find('CollectionGrid').get(1)
+      expect(submissionsGrid.props.submissionSettings).toEqual({
+        type: 'template',
+        template: { id: '123' },
+        enabled: true,
+      })
+      expect(collectionGrid.props.loadCollectionCards).toEqual(
+        component.loadCollectionCards
+      )
+      // submissionsCollection specific pagination method
+      expect(submissionsGrid.props.loadCollectionCards).toEqual(
+        component.loadSubmissionsCollectionCards
+      )
     })
   })
 })

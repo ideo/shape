@@ -32,8 +32,9 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
 
     describe 'GET #index', create_org: true do
+      let(:parent_collection) { create(:collection) }
       let!(:collection) do
-        create(:collection, num_cards: 1, add_viewers: [api_user])
+        create(:collection, num_cards: 1, add_viewers: [api_user], parent_collection: parent_collection)
       end
       let!(:external_record) do
         create(
@@ -72,8 +73,9 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
   end
 
   describe 'GET #show', create_org: true do
+    let(:parent_collection) { create(:collection) }
     let!(:collection) do
-      create(:collection, num_cards: 5, add_viewers: [user])
+      create(:collection, num_cards: 5, add_viewers: [user], parent_collection: parent_collection)
     end
     let(:path) { "/api/v1/collections/#{collection.id}" }
 
@@ -208,9 +210,9 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         collection.archive!
       end
 
-      it 'should return a 404' do
+      it 'should return a collection' do
         get(path)
-        expect(response.status).to eq(404)
+        expect(response.status).to eq(200)
       end
     end
 
@@ -308,9 +310,9 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         end
 
         it 'adds external_id if present' do
-          expect {
+          expect do
             post(path, params: params_with_external_id)
-          }.to change(ExternalRecord, :count).by(1)
+          end.to change(ExternalRecord, :count).by(1)
           expect(response.status).to eq(200)
           template_instance = Collection.find(json['data']['id'])
           external_record = template_instance.external_records.find_by(application_id: application.id)
@@ -467,7 +469,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
               width: 3,
               row: 4,
               col: 5,
-            }
+            },
           ),
         )
       end

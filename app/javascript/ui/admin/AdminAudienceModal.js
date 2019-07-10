@@ -22,12 +22,30 @@ const SelectedOption = styled.span`
 `
 SelectedOption.displayName = 'SelectedOption'
 
+const CloseModalButton = styled(TextButton)`
+  background: ${v.colors.black};
+  border-radius: 20px;
+  width: 183px;
+  height: 40px;
+  color: ${v.colors.white};
+`
+
 @inject('apiStore', 'uiStore')
 @observer
 class AdminAudienceModal extends React.Component {
-  handleClose = () => {
-    const { uiStore } = this.props
-    uiStore.update('adminAudienceMenuOpen', null)
+  handleClose = ev => {
+    const { uiStore, afterClose, audience } = this.props
+    const { adminAudienceMenuOpen, feedbackAudienceMenuOpen } = uiStore
+    if (adminAudienceMenuOpen) {
+      uiStore.update('adminAudienceMenuOpen', null)
+    }
+    if (feedbackAudienceMenuOpen) {
+      uiStore.update('feedbackAudienceMenuOpen', null)
+      if (!ev.target.closest('.adminAudienceModalButton')) return
+      if (afterClose) {
+        afterClose(audience)
+      }
+    }
   }
 
   capitalizeOption(option) {
@@ -73,10 +91,11 @@ class AdminAudienceModal extends React.Component {
   }
 
   render() {
-    const { audience, open } = this.props
+    const { audience, open, uiStore, showModalButton } = this.props
     if (!open) return null
 
     const title = `${audience.name}`
+    const { feedbackAudienceMenuOpen } = uiStore
 
     return (
       <Modal title={title} onClose={this.handleClose} open={open} noScroll>
@@ -85,15 +104,18 @@ class AdminAudienceModal extends React.Component {
             <Label>Targeting Criteria:</Label>
           </Box>
           {this.renderCriteria()}
-          <div style={{ textAlign: 'center', paddingBottom: '2rem' }}>
-            <TextButton
-              data-cy="CloseModalButton"
-              onClick={this.handleClose}
-              width={200}
-            >
-              Close
-            </TextButton>
-          </div>
+          {showModalButton && (
+            <div style={{ textAlign: 'center', paddingBottom: '2rem' }}>
+              <CloseModalButton
+                data-cy="CloseModalButton"
+                onClick={this.handleClose}
+                width={200}
+                className="adminAudienceModalButton"
+              >
+                {feedbackAudienceMenuOpen ? 'Add Audience' : 'Close'}
+              </CloseModalButton>
+            </div>
+          )}
         </React.Fragment>
       </Modal>
     )
@@ -103,6 +125,8 @@ class AdminAudienceModal extends React.Component {
 AdminAudienceModal.propTypes = {
   open: PropTypes.bool,
   audience: MobxPropTypes.objectOrObservableObject,
+  afterClose: PropTypes.func,
+  showModalButton: PropTypes.bool,
 }
 AdminAudienceModal.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -111,6 +135,8 @@ AdminAudienceModal.wrappedComponent.propTypes = {
 AdminAudienceModal.defaultProps = {
   open: false,
   audience: null,
+  afterClose: null,
+  showModalButton: true,
 }
 
 export default AdminAudienceModal

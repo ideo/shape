@@ -19,7 +19,7 @@ module Testable
     def order_by_score(question_type)
       where
         .not(cached_test_scores: nil)
-        .order("cached_test_scores->'#{question_type}' DESC NULLS LAST")
+        .order(Arel.sql("cached_test_scores->'#{question_type}' DESC NULLS LAST"))
     end
   end
 

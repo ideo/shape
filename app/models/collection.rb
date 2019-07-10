@@ -66,6 +66,7 @@ class Collection < ApplicationRecord
   include Templateable
   include Testable
   include Externalizable
+  include Commentable
 
   resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
@@ -74,7 +75,6 @@ class Collection < ApplicationRecord
 
   archivable as: :parent_collection_card,
              with: %i[collection_cards cards_linked_to_this_collection]
-  after_archive :remove_comment_followers!
   acts_as_taggable
 
   store_accessor :cached_attributes,
@@ -98,7 +98,7 @@ class Collection < ApplicationRecord
   after_touch :touch_related_cards, unless: :destroyed?
   after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
   after_commit :reindex_sync, on: :create
-  after_commit :update_comment_thread_in_firestore, unless: :destroyed?
+  after_commit :reindex_after_archive, if: :saved_change_to_archived?
   after_save :pin_all_primary_cards, if: :now_master_template?
 
   # all cards including archived (i.e. undo default :collection_cards scope)
@@ -165,8 +165,6 @@ class Collection < ApplicationRecord
            class_name: 'Item::DataItem',
            through: :primary_collection_cards
 
-  has_one :comment_thread, as: :record, dependent: :destroy
-
   delegate :parent, :pinned, :pinned?, :pinned_and_locked?,
            to: :parent_collection_card, allow_nil: true
 
@@ -198,13 +196,13 @@ class Collection < ApplicationRecord
   }
 
   # Searchkick Config
-  # Use queue to bulk reindex every 5m (with Sidekiq Scheduled Job/ActiveJob)
+  # Use queue to bulk reindex every 1m (with Sidekiq Scheduled Job/ActiveJob)
   searchkick callbacks: :queue
 
-  # active == don't index archived collections
+  # where(type: nil) == don't index User/SharedWithMe collections
   # searchable == don't index User/SharedWithMe collections
   scope :search_import, -> do
-    active.searchable.includes(
+    searchable.includes(
       [
         {
           items: %i[
@@ -247,6 +245,7 @@ class Collection < ApplicationRecord
       activity_dates: activity_dates.empty? ? nil : activity_dates,
       created_at: created_at,
       updated_at: updated_at,
+      archived: archived,
     }
   end
 
@@ -285,6 +284,7 @@ class Collection < ApplicationRecord
       :live_test_collection,
       :collection_cover_items,
       :test_audiences,
+      :restorable_parent,
       roles: %i[pending_users users groups resource],
     ]
   end
@@ -428,10 +428,6 @@ class Collection < ApplicationRecord
     true
   end
 
-  def should_index?
-    active?
-  end
-
   def read_only?
     false
   end
@@ -524,10 +520,12 @@ class Collection < ApplicationRecord
 
   def unarchive_cards!(cards, card_attrs_snapshot)
     cards.each(&:unarchive!)
-    CollectionUpdater.call(self, card_attrs_snapshot)
+    if card_attrs_snapshot.present?
+      CollectionUpdater.call(self, card_attrs_snapshot)
+    end
     reorder_cards!
     # if snapshot includes card attrs then CollectionUpdater will trigger the same thing
-    return unless master_template? && card_attrs_snapshot[:collection_cards_attributes].blank?
+    return unless master_template? && card_attrs_snapshot && card_attrs_snapshot[:collection_cards_attributes].blank?
     queue_update_template_instances
   end
 
@@ -545,6 +543,12 @@ class Collection < ApplicationRecord
     Searchkick.callbacks(true) do
       reindex
     end
+  end
+
+  # even though this just calls the above method, this gets around the issue
+  # where you can't declare `after_commit :reindex_sync` with two different conditions
+  def reindex_after_archive
+    reindex_sync
   end
 
   def touch_related_cards
@@ -632,11 +636,6 @@ class Collection < ApplicationRecord
       "/#{organization.updated_at}" \
       "/user_id_#{user_id}" \
       "/roles_#{anchored_roles.maximum(:updated_at).to_i}"
-  end
-
-  def remove_comment_followers!
-    return unless comment_thread.present?
-    RemoveCommentThreadFollowers.perform_async(comment_thread.id)
   end
 
   def jsonapi_type_name
@@ -827,12 +826,6 @@ class Collection < ApplicationRecord
     return true if organization.present?
     return true unless parent_collection.present?
     self.organization_id = parent_collection.organization_id
-  end
-
-  def update_comment_thread_in_firestore
-    return unless comment_thread.present?
-    return unless saved_change_to_name? || saved_change_to_cached_attributes?
-    comment_thread.store_in_firestore
   end
 
   def pin_all_primary_cards

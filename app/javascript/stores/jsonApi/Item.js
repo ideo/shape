@@ -3,7 +3,6 @@ import { observable } from 'mobx'
 import { ReferenceType } from 'datx'
 
 import { apiUrl } from '~/utils/url'
-import { routingStore } from '~/stores'
 import trackError from '~/utils/trackError'
 import FilestackUpload from '~/utils/FilestackUpload'
 import { ITEM_TYPES, DATA_MEASURES } from '~/utils/variables'
@@ -39,14 +38,6 @@ class Item extends SharedRecordMixin(BaseRecord) {
     temp.innerHTML = this.content
     const sanitized = temp.textContent || temp.innerText
     return sanitized.replace(/(?:\r\n|\r|\n)/g, '')
-  }
-
-  get parentPath() {
-    if (this.breadcrumb && this.breadcrumb.length > 1) {
-      const { type, id } = this.breadcrumb[this.breadcrumb.length - 2]
-      return routingStore.pathTo(type, id)
-    }
-    return routingStore.pathTo('homepage')
   }
 
   get canReplace() {

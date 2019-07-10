@@ -2,6 +2,7 @@ import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import ArchivedBanner from '~/ui/layout/ArchivedBanner'
 import FilePreview from '~/ui/grid/covers/FilePreview'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import ImageItem from '~/ui/items/ImageItem'
@@ -61,15 +62,15 @@ class ItemPage extends React.Component {
   save = (item, { cancel_sync = true } = {}) =>
     item.API_updateWithoutSync({ cancel_sync })
 
-  cancel = () => {
-    const { uiStore } = this.props
+  cancel = ({ route = true } = {}) => {
+    const { uiStore, routingStore } = this.props
     const { item } = this.state
     if (item.can_edit_content) this.save(item)
-
+    if (!route) return
     if (uiStore.previousViewingCollection) {
       window.history.back()
     } else {
-      this.props.routingStore.push(item.parentPath)
+      routingStore.goToPath(item.parentPath)
     }
   }
 
@@ -155,6 +156,7 @@ class ItemPage extends React.Component {
       <Fragment>
         <Helmet title={item.pageTitle} />
         <PageHeader record={item} />
+        <ArchivedBanner />
         <ItemPageContainer>
           <PageContainer {...containerProps}>
             {item.parent_collection_card &&

@@ -7,9 +7,9 @@ class SettingsPage extends React.PureComponent {
   render() {
     return (
       <div>
+        <OverdueBanner />
         <PageContainer>
           <Heading1>Settings</Heading1>
-          <OverdueBanner />
           {this.props.children}
         </PageContainer>
       </div>

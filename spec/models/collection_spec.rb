@@ -24,6 +24,8 @@ describe Collection, type: :model do
     # these come from Testable concern
     it { should have_many :test_collections }
     it { should have_one :live_test_collection }
+    # from Commentable
+    it { should have_many :comment_threads }
 
     describe '#collection_cards' do
       let!(:collection) { create(:collection, num_cards: 3) }
@@ -180,6 +182,21 @@ describe Collection, type: :model do
       it 'does not give view access to its organization\'s primary group' do
         expect(collection.enable_org_view_access_if_allowed(parent_collection)).to be false
         expect(organization.primary_group.has_role?(Role::VIEWER, collection)).to be false
+      end
+    end
+
+    describe '#reindex_sync' do
+      let(:collection) { create(:collection) }
+
+      it 'should get called on create' do
+        expect(Searchkick).to receive(:callbacks).with(true)
+        collection.save
+      end
+
+      it 'should get called after archive' do
+        # once on create, second for archive
+        expect(Searchkick).to receive(:callbacks).with(true).twice
+        collection.archive!
       end
     end
   end

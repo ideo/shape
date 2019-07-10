@@ -52,13 +52,13 @@ class AudienceSettings extends React.Component {
       const testAudience = testCollection.test_audiences.find(
         testAudience => testAudience.audience_id === audience.id
       )
-      const linkSharing = audience.price_per_response === 0
+      const { isLinkSharing } = audience
       let selected = !!testAudience
-      if (testAudience && linkSharing) {
+      if (testAudience && isLinkSharing) {
         selected = testAudience.status === 'open'
       }
       const displayCheckbox =
-        selected || linkSharing || (!this.locked && audience.order <= 6)
+        selected || isLinkSharing || (!this.locked && audience.order <= 6)
       audienceSettings.set(audience.id, {
         selected,
         sample_size: testAudience ? testAudience.sample_size : '0',
@@ -118,7 +118,7 @@ class AudienceSettings extends React.Component {
     const setting = audienceSettings.get(id)
     this.updateAudienceSetting(id, 'selected', !setting.selected)
     const { audience, test_audience } = setting
-    if (audience.price_per_response === 0) {
+    if (audience.isLinkSharing) {
       this.toggleLinkSharing(audience, test_audience)
     }
   }
@@ -202,7 +202,7 @@ class AudienceSettings extends React.Component {
     const { audienceSettings } = this
     runInAction(() => {
       audienceSettings.set(audience.id, {
-        selected: false,
+        selected: true,
         sample_size: '0',
         audience: audience,
         test_audience: null,

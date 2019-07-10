@@ -232,7 +232,7 @@ RSpec.describe Roles::MassRemove, type: :service do
     end
 
     context 'with comment_threads' do
-      let(:comment_thread) { create(:comment_thread, record: collection) }
+      let(:comment_thread) { create(:collection_comment_thread, record: collection) }
 
       it 'removes all followers from comment threads if they no longer have access' do
         collection.reload

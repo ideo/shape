@@ -19,6 +19,7 @@ RSpec.describe CollectionCardFilter, type: :service do
              record_type: :collection)
     end
     let(:filters) { {} }
+    let(:application) { nil }
     let(:cards) { collection.collection_cards }
     let(:visible_card_1) { cards[0] }
     let(:visible_card_2) { cards[1] }
@@ -62,6 +63,7 @@ RSpec.describe CollectionCardFilter, type: :service do
         collection: collection,
         user: user,
         filters: filters,
+        application: application,
       )
     end
 
@@ -112,6 +114,21 @@ RSpec.describe CollectionCardFilter, type: :service do
       end
     end
 
+    context 'with an archived collection' do
+      before do
+        collection.archive!
+        # put this card in a different batch
+        visible_card_2.update(archive_batch: 'xyz')
+      end
+
+      it 'should return all cards archived in the same batch as parent' do
+        expect(subject.size).to eq 2
+        expect(subject).to match_array(
+          [visible_card_1, archived_card],
+        )
+      end
+    end
+
     context 'as a viewer' do
       let!(:user) { viewer }
 
@@ -119,6 +136,27 @@ RSpec.describe CollectionCardFilter, type: :service do
         expect(subject).to match_array(
           [visible_card_1, visible_card_2],
         )
+      end
+
+      context 'with external_id filter' do
+        let!(:application) { create(:application) }
+        let!(:external_record) do
+          create(
+            :external_record,
+            external_id: 'creative-difference-card',
+            externalizable: visible_card_2.record,
+            application: application,
+          )
+        end
+        let!(:filters) do
+          { external_id: 'creative-difference-card' }
+        end
+
+        it 'returns card that has collection with external id' do
+          expect(subject).to match_array(
+            [visible_card_2],
+          )
+        end
       end
 
       context 'hidden true' do
@@ -181,6 +219,27 @@ RSpec.describe CollectionCardFilter, type: :service do
       it 'returns all cards that common resource group can view' do
         expect(subject).to match_array(
           [visible_card_1, visible_card_2],
+        )
+      end
+    end
+
+    context 'with external_id filter' do
+      let!(:application) { create(:application) }
+      let!(:external_record) do
+        create(
+          :external_record,
+          external_id: 'creative-difference-card',
+          externalizable: visible_card_2.record,
+          application: application,
+        )
+      end
+      let!(:filters) do
+        { external_id: 'creative-difference-card' }
+      end
+
+      it 'returns card that has collection with external id' do
+        expect(subject).to match_array(
+          [visible_card_2],
         )
       end
     end
