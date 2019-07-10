@@ -61,7 +61,7 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
     end
   end
 
-  describe 'POST #create_from_emails' do
+  describe 'POST #create_from_emails', :vcr do
     let(:emails) { Array.new(3).map { Faker::Internet.email } }
     let(:users_json) { json_included_objects_of_type('users') }
     let(:path) { '/api/v1/users/create_from_emails' }

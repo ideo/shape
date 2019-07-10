@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations?filter%5Bclient_id%5D=3695c5fe55ab3db6f9ee25f18c0ef2fe7025eb4717f1a031fd7824a5d8cddbb5&filter%5Bexternal_id%5D=44&page%5Bnumber%5D=1&page%5Bsize%5D=1
+    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations?filter%5Bclient_id%5D=3695c5fe55ab3db6f9ee25f18c0ef2fe7025eb4717f1a031fd7824a5d8cddbb5&filter%5Bexternal_id%5D=2&page%5Bnumber%5D=1&page%5Bsize%5D=1
     body:
       encoding: US-ASCII
       string: ''
@@ -25,7 +25,7 @@ http_interactions:
       Server:
       - Cowboy
       Date:
-      - Fri, 19 Oct 2018 18:23:28 GMT
+      - Tue, 09 Jul 2019 21:40:10 GMT
       Connection:
       - keep-alive
       X-Frame-Options:
@@ -42,14 +42,19 @@ http_interactions:
       - strict-origin-when-cross-origin
       Content-Type:
       - application/vnd.api+json; charset=utf-8
+      Set-Cookie:
+      - _sso_profile_session=UUIyN3ZSdUNKalMxMmhnM1pRbEt4dDg1bHdyaW92TzR0WEs2SEZQKytaMVYwcGxORjJrRDgxdWF2NUZlaFlrR0syNm5MQllkVTZydnIyZmtSeUhlRXQ2eTNJaEdYRDRjN29FQXU4T3ZGQ2tIUFNVZE9wd2xqS3JWUTZJdjZrYU0tLUw5bUREcDh5SUZ3aTdJWUd2Njl3Unc9PQ%3D%3D--a6ee3dc7e98bfa8b1738f52bdfbe06d8d3a0d6ff;
+        path=/; expires=Wed, 10 Jul 2019 01:40:10 -0000; HttpOnly; secure
+      - rack.session=BAh7BkkiD3Nlc3Npb25faWQGOgZFVEkiRTQ5ZDAwZGYxNzU1OTFkYzlmODUx%0AMTAzNjA2MDUzZTE0MDg3ZTdlOWU1ZTc0MjNlODJhZDczMDNmZWZmNWVkNTQG%0AOwBG%0A--d2be06a8d5f55a8488fbcadd76ab6876af0d5d62;
+        path=/; expires=Wed, 10 Jul 2019 01:40:10 -0000; HttpOnly; secure
       Etag:
-      - W/"9cb0f11ceff0010d135e52d64db2d726"
+      - W/"aa579d1898c13e1cdbcba24fc285deca"
       Cache-Control:
       - max-age=0, private, must-revalidate
       X-Request-Id:
-      - 25a012d5-889c-4c0a-9a32-643ee523d5a4
+      - e435d9be-5625-4c80-97f7-d38829a7aadf
       X-Runtime:
-      - '0.062369'
+      - '0.196887'
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains
       Vary:
@@ -60,80 +65,17 @@ http_interactions:
       - 1.1 vegur
     body:
       encoding: UTF-8
-      string: '{"data":[],"meta":{},"jsonapi":{"version":"1.0"}}'
-    http_version: 
-  recorded_at: Fri, 19 Oct 2018 18:23:29 GMT
-- request:
-    method: get
-    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations?filter%5Bclient_id%5D=3695c5fe55ab3db6f9ee25f18c0ef2fe7025eb4717f1a031fd7824a5d8cddbb5&filter%5Bexternal_id%5D=17&page%5Bnumber%5D=1&page%5Bsize%5D=1
-    body:
-      encoding: US-ASCII
-      string: ''
-    headers:
-      User-Agent:
-      - Faraday v0.12.2
-      Content-Type:
-      - application/vnd.api+json
-      Accept:
-      - application/vnd.api+json
-      Authorization:
-      - Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJ0eXBlIjoiYXBwbGljYXRpb24iLCJjbGllbnRfaWQiOiIzNjk1YzVmZTU1YWIzZGI2ZjllZTI1ZjE4YzBlZjJmZTcwMjVlYjQ3MTdmMWEwMzFmZDc4MjRhNWQ4Y2RkYmI1IiwidWlkIjoiMDB1ZXFieGc5ZUFpODBTWjQwaDciLCJleHBpcmVzIjoxNTUzNjMyMjI3fQ.FxfLmkVWB70FBcm9rZ3odahqNjTephdbNhtAWAZ2F6Wk34aZVhdxc8yCXgijIq49p5LTx-6pG09hQARvC7jJLNVPo3N2Ht8QgVurrfStCu3LOEMbOrzgJH7wDp62q1UG8A0JCqooSWlZhWmO_vh9J99Q5nrALmafTej1jL2WYnjpPk6K16PlDrOf14nLjhWx9NWn0hm1BAAHjWTC11H1AXhMrvxiLgHuAqupMOBZZUBKBw6MWBRwfWBCyKaB-dbvbLKj0pHFGuScouzOSDzzr4JJq0l2JgSWbxrcsvevH0UTA3XPrQA5ciDAwNdf0PzhcSOIgN14xv-fcGwE8B2HXQ
-      Accept-Encoding:
-      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
-  response:
-    status:
-      code: 200
-      message: OK
-    headers:
-      Server:
-      - Cowboy
-      Date:
-      - Wed, 24 Oct 2018 23:09:22 GMT
-      Connection:
-      - keep-alive
-      X-Frame-Options:
-      - SAMEORIGIN
-      X-Xss-Protection:
-      - 1; mode=block
-      X-Content-Type-Options:
-      - nosniff
-      X-Download-Options:
-      - noopen
-      X-Permitted-Cross-Domain-Policies:
-      - none
-      Referrer-Policy:
-      - strict-origin-when-cross-origin
-      Content-Type:
-      - application/vnd.api+json; charset=utf-8
-      Etag:
-      - W/"5e9205cca39744b781ea47d3351b9d4b"
-      Cache-Control:
-      - max-age=0, private, must-revalidate
-      X-Request-Id:
-      - 70f95623-e24f-4981-8f8a-1f9faa266f11
-      X-Runtime:
-      - '0.060085'
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains
-      Vary:
-      - Origin
-      Transfer-Encoding:
-      - chunked
-      Via:
-      - 1.1 vegur
-    body:
-      encoding: UTF-8
-      string: '{"data":[{"id":"652","type":"organizations","attributes":{"id":652,"name":"Acme
+      string: '{"data":[{"id":"731","type":"organizations","attributes":{"id":731,"name":"Acme
         Inc 2.0"},"relationships":{"applications":{"data":[{"type":"applications","id":"17"}]},"application_organizations":{"meta":{"included":false}}}}],"included":[{"id":"17","type":"applications","attributes":{"name":"Shape
-        -  development","client_id":"3695c5fe55ab3db6f9ee25f18c0ef2fe7025eb4717f1a031fd7824a5d8cddbb5"}}],"meta":{},"jsonapi":{"version":"1.0"}}'
+        - local development","client_id":"3695c5fe55ab3db6f9ee25f18c0ef2fe7025eb4717f1a031fd7824a5d8cddbb5"}}],"meta":{},"jsonapi":{"version":"1.0"}}'
     http_version: 
-  recorded_at: Wed, 24 Oct 2018 23:09:23 GMT
+  recorded_at: Tue, 09 Jul 2019 21:40:10 GMT
 - request:
     method: patch
-    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations/652
+    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations/731
     body:
       encoding: UTF-8
-      string: '{"data":{"id":652,"type":"organizations","attributes":{"name":"Org
+      string: '{"data":{"id":731,"type":"organizations","attributes":{"name":"Org
         2.0"}}}'
     headers:
       User-Agent:
@@ -154,7 +96,7 @@ http_interactions:
       Server:
       - Cowboy
       Date:
-      - Wed, 24 Oct 2018 23:09:23 GMT
+      - Tue, 09 Jul 2019 21:40:11 GMT
       Connection:
       - keep-alive
       X-Frame-Options:
@@ -171,14 +113,19 @@ http_interactions:
       - strict-origin-when-cross-origin
       Content-Type:
       - application/vnd.api+json; charset=utf-8
+      Set-Cookie:
+      - _sso_profile_session=STFXNk9GVjN6OHZ4RzVqc3lDWkVIN05ud1V2V1c5MHBZT1Vkc2NlVVN5UnFOZyt4UW9EWmdQNDdBK1BjblozUHVUb0Q5a21LQkNYNG94WnBaeWN1UXVpQTFQbnB5OVdDSzdBdmJ5dHdrTjJreGUrYTQwa2lFK1FsUmpHdTdwVHEtLVo3OGtDbFJLZlZhMnlGTmJheGVLemc9PQ%3D%3D--6a0925f4784c6f0659f20a4840f7c742efae1dc0;
+        path=/; expires=Wed, 10 Jul 2019 01:40:11 -0000; HttpOnly; secure
+      - rack.session=BAh7BkkiD3Nlc3Npb25faWQGOgZFVEkiRTkyNGJmZGY5Y2E2MGUxZjIxYjU4%0AOWI2YzQxMDU2YjkyMThhNWRlOWQ0OGRhM2FiMDVjMWViMTExNjA0YzNhNGQG%0AOwBG%0A--5d0ab923417f7f029604ad8e1d38e2a15836d8e2;
+        path=/; expires=Wed, 10 Jul 2019 01:40:11 -0000; HttpOnly; secure
       Etag:
-      - W/"698be2e463e7c98f62920d6c9b4be960"
+      - W/"923f673cf1d7482a87d3b445497888ca"
       Cache-Control:
       - max-age=0, private, must-revalidate
       X-Request-Id:
-      - d9f7a7cb-8dd4-492e-a9a9-ed54c68ff4f1
+      - db48df6a-5af1-42a7-b160-d97b61dec802
       X-Runtime:
-      - '0.058717'
+      - '0.171453'
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains
       Vary:
@@ -189,8 +136,8 @@ http_interactions:
       - 1.1 vegur
     body:
       encoding: UTF-8
-      string: '{"data":{"id":"652","type":"organizations","attributes":{"id":652,"name":"Org
+      string: '{"data":{"id":"731","type":"organizations","attributes":{"id":731,"name":"Org
         2.0"},"relationships":{"applications":{"meta":{"included":false}},"application_organizations":{"meta":{"included":false}}}},"meta":{},"jsonapi":{"version":"1.0"}}'
     http_version: 
-  recorded_at: Wed, 24 Oct 2018 23:09:24 GMT
+  recorded_at: Tue, 09 Jul 2019 21:40:11 GMT
 recorded_with: VCR 4.0.0

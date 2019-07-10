@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations?filter%5Bclient_id%5D=3695c5fe55ab3db6f9ee25f18c0ef2fe7025eb4717f1a031fd7824a5d8cddbb5&filter%5Bexternal_id%5D=742&page%5Bnumber%5D=1&page%5Bsize%5D=1
+    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations?filter%5Bclient_id%5D=3695c5fe55ab3db6f9ee25f18c0ef2fe7025eb4717f1a031fd7824a5d8cddbb5&filter%5Bexternal_id%5D=1&page%5Bnumber%5D=1&page%5Bsize%5D=1
     body:
       encoding: US-ASCII
       string: ''
@@ -25,7 +25,7 @@ http_interactions:
       Server:
       - Cowboy
       Date:
-      - Tue, 02 Oct 2018 21:00:10 GMT
+      - Tue, 09 Jul 2019 21:40:53 GMT
       Connection:
       - keep-alive
       X-Frame-Options:
@@ -42,14 +42,19 @@ http_interactions:
       - strict-origin-when-cross-origin
       Content-Type:
       - application/vnd.api+json; charset=utf-8
+      Set-Cookie:
+      - _sso_profile_session=NFhEOFBrN21QSkFiejhPcG0xWnIrT1dPNzRkcGdmTGszMHJhWXB4K0NYWTNXNjFBUGw4VXBUalZDS2tNaFRZRU9pQ3NPWldZUk1sRWM4V0tDaFVVOGFvTHVJWmc2MERQcDBJQVVxZVNINUJKY25rZE4ySEZoTXZ6cnlZeGp3MlUtLU03ZGJVNThhOFZlYngwZGpFb3RGcnc9PQ%3D%3D--868dba36ba35ace47344aca681f713f59d43f3d9;
+        path=/; expires=Wed, 10 Jul 2019 01:40:54 -0000; HttpOnly; secure
+      - rack.session=BAh7BkkiD3Nlc3Npb25faWQGOgZFVEkiRTNkYmZkNmE4OGQzZTYzNTZjMjkw%0AZWExMmI1Yzg0NDcwODc0MTVhNTNiYWRmYTJkMzA1ZjRjZjUzZjYwY2Q1NDMG%0AOwBG%0A--ac44d861c298774a01fcfc1d4df7dc59a05b9aef;
+        path=/; expires=Wed, 10 Jul 2019 01:40:54 -0000; HttpOnly; secure
       Etag:
-      - W/"9cb0f11ceff0010d135e52d64db2d726"
+      - W/"b64830ec57c5cee9bc978a927e8aafca"
       Cache-Control:
       - max-age=0, private, must-revalidate
       X-Request-Id:
-      - 1eb934e8-539b-40dd-a863-1c39775d359c
+      - e0ac9c8b-0099-47b3-b764-24c8b16c39d9
       X-Runtime:
-      - '0.020930'
+      - '0.056322'
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains
       Vary:
@@ -60,7 +65,77 @@ http_interactions:
       - 1.1 vegur
     body:
       encoding: UTF-8
-      string: '{"data":[],"meta":{},"jsonapi":{"version":"1.0"}}'
+      string: '{"data":[{"id":"186","type":"organizations","attributes":{"id":186,"name":"Org
+        2.0"},"relationships":{"applications":{"data":[{"type":"applications","id":"17"}]},"application_organizations":{"meta":{"included":false}}}}],"included":[{"id":"17","type":"applications","attributes":{"name":"Shape
+        - local development","client_id":"3695c5fe55ab3db6f9ee25f18c0ef2fe7025eb4717f1a031fd7824a5d8cddbb5"}}],"meta":{},"jsonapi":{"version":"1.0"}}'
     http_version: 
-  recorded_at: Tue, 02 Oct 2018 21:00:10 GMT
+  recorded_at: Tue, 09 Jul 2019 21:40:54 GMT
+- request:
+    method: patch
+    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations/186
+    body:
+      encoding: UTF-8
+      string: '{"data":{"id":186,"type":"organizations","attributes":{"name":"12345"}}}'
+    headers:
+      User-Agent:
+      - Faraday v0.12.2
+      Content-Type:
+      - application/vnd.api+json
+      Accept:
+      - application/vnd.api+json
+      Authorization:
+      - Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJ0eXBlIjoiYXBwbGljYXRpb24iLCJjbGllbnRfaWQiOiIzNjk1YzVmZTU1YWIzZGI2ZjllZTI1ZjE4YzBlZjJmZTcwMjVlYjQ3MTdmMWEwMzFmZDc4MjRhNWQ4Y2RkYmI1IiwidWlkIjoiMDB1ZXFieGc5ZUFpODBTWjQwaDciLCJleHBpcmVzIjoxNTUzNjMyMjI3fQ.FxfLmkVWB70FBcm9rZ3odahqNjTephdbNhtAWAZ2F6Wk34aZVhdxc8yCXgijIq49p5LTx-6pG09hQARvC7jJLNVPo3N2Ht8QgVurrfStCu3LOEMbOrzgJH7wDp62q1UG8A0JCqooSWlZhWmO_vh9J99Q5nrALmafTej1jL2WYnjpPk6K16PlDrOf14nLjhWx9NWn0hm1BAAHjWTC11H1AXhMrvxiLgHuAqupMOBZZUBKBw6MWBRwfWBCyKaB-dbvbLKj0pHFGuScouzOSDzzr4JJq0l2JgSWbxrcsvevH0UTA3XPrQA5ciDAwNdf0PzhcSOIgN14xv-fcGwE8B2HXQ
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - Cowboy
+      Date:
+      - Tue, 09 Jul 2019 21:40:55 GMT
+      Connection:
+      - keep-alive
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/vnd.api+json; charset=utf-8
+      Set-Cookie:
+      - _sso_profile_session=aGoxUFBTN1F0SDl3N1pLN2Z0MDFmVU9hdmh0L0ZpMklic0IrTnpIQTdWQlpScGp0ZFVlcVkzNXBqc1NGaEtvLzhFcXlBVG9tWUN5RS9iZUlYc3NDdFcza3h5aUszTHVrT0gwWEJON2JERzBWOFpBcksyR0o5ejAzcjBrZmRBaFotLU9zV2VSN0tUTjNESUUwREdnRktzbnc9PQ%3D%3D--0d3599d13c028f709558156035c9568f3931a6ce;
+        path=/; expires=Wed, 10 Jul 2019 01:40:55 -0000; HttpOnly; secure
+      - rack.session=BAh7BkkiD3Nlc3Npb25faWQGOgZFVEkiRThkMDY0ZmNiNzM5M2YyMjA1YWE0%0ANjcwNDlmODc2Y2JlYmYzYjk2Y2UwYTYwOTM0MTZhNTlhMWU3MGE2MDUzMzkG%0AOwBG%0A--4a81a1679e197432133af745378befc4f5c8bbab;
+        path=/; expires=Wed, 10 Jul 2019 01:40:55 -0000; HttpOnly; secure
+      Etag:
+      - W/"107de66c39fd102019415fb7b72a6556"
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      X-Request-Id:
+      - 17724aa9-bb07-4498-807d-874833c00f6e
+      X-Runtime:
+      - '0.640322'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Vary:
+      - Origin
+      Transfer-Encoding:
+      - chunked
+      Via:
+      - 1.1 vegur
+    body:
+      encoding: UTF-8
+      string: '{"data":{"id":"186","type":"organizations","attributes":{"id":186,"name":"12345"},"relationships":{"applications":{"meta":{"included":false}},"application_organizations":{"meta":{"included":false}}}},"meta":{},"jsonapi":{"version":"1.0"}}'
+    http_version: 
+  recorded_at: Tue, 09 Jul 2019 21:40:55 GMT
 recorded_with: VCR 4.0.0

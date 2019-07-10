@@ -471,6 +471,10 @@ class User < ApplicationRecord
     first_line_owed.created_at + TestAudience::PAYMENT_WAITING_PERIOD
   end
 
+  def sync_network_groups
+    SyncNetworkGroups.call(self)
+  end
+
   private
 
   def email_required?
