@@ -559,7 +559,14 @@ class ApiStore extends jsonapi(datxCollection) {
     const fromCollection = this.find('collections', data.from_id)
     // make snapshot of fromCollection data with cards for potential undo
     const originalData = fromCollection.toJsonApiWithCards()
-    if (!fromCollection.can_view) return // also push undo warning to undoStack
+    if (!fromCollection.can_view) {
+      this.undoStore.pushUndoAction({
+        message:
+          "Move can't be undone. You have no access to the original collection.",
+        apiCall: () => {},
+      })
+      return
+    }
     // update UI for collection that cards were moved away from
     await fromCollection.API_fetchCards()
 
