@@ -21,6 +21,7 @@ import EditorPill from '~/ui/items/EditorPill'
 import TestDesigner from '~/ui/test_collections/TestDesigner'
 import v from '~/utils/variables'
 import Collection from '~/stores/jsonApi/Collection'
+import ArchivedBanner from '~/ui/layout/ArchivedBanner'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
 import routeToLogin from '~/utils/routeToLogin'
 import CreateOrgPage from '~/ui/pages/CreateOrgPage'
@@ -92,6 +93,16 @@ class CollectionPage extends React.Component {
           this.onAPILoad()
         })
       })
+  }
+
+  loadSubmissionsCollectionCards = async ({ page, per_page, rows, cols }) => {
+    const { collection } = this.props
+    return collection.submissions_collection.API_fetchCards({
+      page,
+      per_page,
+      rows,
+      cols,
+    })
   }
 
   async onAPILoad() {
@@ -350,7 +361,7 @@ class CollectionPage extends React.Component {
         {this.submissionsPageSeparator}
         <CollectionGrid
           {...gridSettings}
-          loadCollectionCards={this.loadCollectionCards}
+          loadCollectionCards={this.loadSubmissionsCollectionCards}
           trackCollectionUpdated={this.trackCollectionUpdated}
           collection={submissions_collection}
           canEditCollection={false}
@@ -483,27 +494,30 @@ class CollectionPage extends React.Component {
           <CreateOrgPage commonViewableResource={collection} />
         )}
         {!isLoading && (
-          <PageContainer fullWidth={collection.isBoard}>
+          <Fragment>
+            <ArchivedBanner />
             <OverdueBanner />
-            {this.renderEditorPill}
-            {inner}
-            {(collection.requiresSubmissionBoxSettings ||
-              submissionBoxSettingsOpen) && (
-              <SubmissionBoxSettingsModal collection={collection} />
-            )}
-            {/* Listen to this pastingCards value which comes from pressing CTRL+V */}
-            <MoveModal pastingCards={uiStore.pastingCards} />
-            {isSubmissionBox &&
-              apiStore.currentUser &&
-              collection.submission_box_type &&
-              this.renderSubmissionsCollection()}
-            {(uiStore.dragging || uiStore.cardMenuOpenAndPositioned) && (
-              <ClickWrapper
-                clickHandlers={[this.handleAllClick]}
-                onContextMenu={this.handleAllClick}
-              />
-            )}
-          </PageContainer>
+            <PageContainer fullWidth={collection.isBoard}>
+              {this.renderEditorPill}
+              {inner}
+              {(collection.requiresSubmissionBoxSettings ||
+                submissionBoxSettingsOpen) && (
+                <SubmissionBoxSettingsModal collection={collection} />
+              )}
+              {/* Listen to this pastingCards value which comes from pressing CTRL+V */}
+              <MoveModal pastingCards={uiStore.pastingCards} />
+              {isSubmissionBox &&
+                apiStore.currentUser &&
+                collection.submission_box_type &&
+                this.renderSubmissionsCollection()}
+              {(uiStore.dragging || uiStore.cardMenuOpenAndPositioned) && (
+                <ClickWrapper
+                  clickHandlers={[this.handleAllClick]}
+                  onContextMenu={this.handleAllClick}
+                />
+              )}
+            </PageContainer>
+          </Fragment>
         )}
         {isLoading && this.loader()}
         {!isLoading && isTransparentLoading && this.transparentLoader()}

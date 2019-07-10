@@ -546,6 +546,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "gridW": 312,
                         "gutter": 20,
                       },
+                      "deselectCards": [MockFunction],
                       "dialogConfig": Object {
                         "cancelText": "Cancel",
                         "confirmText": "OK",
@@ -2874,6 +2875,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "gridW": 312,
                         "gutter": 20,
                       },
+                      "deselectCards": [MockFunction],
                       "dialogConfig": Object {
                         "cancelText": "Cancel",
                         "confirmText": "OK",
@@ -5201,6 +5203,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "gridW": 312,
                         "gutter": 20,
                       },
+                      "deselectCards": [MockFunction],
                       "dialogConfig": Object {
                         "cancelText": "Cancel",
                         "confirmText": "OK",
@@ -7201,6 +7204,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                   "gridW": 312,
                   "gutter": 20,
                 },
+                "deselectCards": [MockFunction],
                 "dialogConfig": Object {
                   "cancelText": "Cancel",
                   "confirmText": "OK",

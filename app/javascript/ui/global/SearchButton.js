@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { action, observable } from 'mobx'
+import { action, observable, runInAction } from 'mobx'
 import { observer } from 'mobx-react'
 import styled from 'styled-components'
 import v from '~/utils/variables'
@@ -83,9 +83,27 @@ class SearchButton extends React.Component {
   @observable
   open = false
 
+  constructor(props) {
+    super(props)
+    runInAction(() => {
+      this.open = props.defaultOpen
+    })
+  }
+
+  componentDidUpdate() {
+    runInAction(() => {
+      if (this.props.controlled) {
+        this.open = this.props.open
+      }
+    })
+  }
+
   @action
   updateOpen = val => {
-    this.open = val
+    if (!this.props.controlled) {
+      this.open = val
+    }
+    this.props.onToggle(val)
   }
 
   handleOpen = val => () => this.updateOpen(val)
@@ -108,7 +126,7 @@ class SearchButton extends React.Component {
 
   render() {
     const { value, background } = this.props
-    const open = this.props.open || this.open
+    const { open } = this
     return (
       <StyledSearchButton open={open} background={background}>
         <button className="search" onClick={this.handleOpen(true)}>
@@ -135,13 +153,20 @@ SearchButton.propTypes = {
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   onClear: PropTypes.func.isRequired,
-  open: PropTypes.bool,
+  onToggle: PropTypes.func,
+  defaultOpen: PropTypes.bool,
   background: PropTypes.string,
+  controlled: PropTypes.bool,
+  open: PropTypes.bool,
 }
 
 SearchButton.defaultProps = {
-  open: false,
+  defaultOpen: false,
+  forceClose: false,
   background: v.colors.commonLightest,
+  onToggle: () => {},
+  controlled: false,
+  open: false,
 }
 
 export default SearchButton

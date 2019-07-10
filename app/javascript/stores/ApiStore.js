@@ -406,8 +406,10 @@ class ApiStore extends jsonapi(datxCollection) {
     if (!thread) {
       // first search for it via API
       try {
+        // comment threads are unique by org_id so we pass that along
+        const identifier = `${record.className}/${record.id}?organization_id=${this.currentUserOrganizationId}`
         const res = await this.request(
-          `comment_threads/find_by_record/${record.className}/${record.id}`,
+          `comment_threads/find_by_record/${identifier}`,
           'GET'
         )
         if (res.data && res.data.id) {
@@ -420,6 +422,8 @@ class ApiStore extends jsonapi(datxCollection) {
             {
               record_id: record.id,
               record_type: record.className,
+              // set this for saving...
+              organization_id: this.currentUserOrganizationId,
               updated_at: new Date(),
             },
             this

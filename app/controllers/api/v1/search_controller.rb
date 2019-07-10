@@ -59,6 +59,7 @@ class Api::V1::SearchController < Api::V1::BaseController
     # search for tags via hashtag e.g. "#template"
     where_clause = {
       organization_id: current_organization.id,
+      archived: false,
     }
 
     order_opts = { _score: :desc }
@@ -69,6 +70,11 @@ class Api::V1::SearchController < Api::V1::BaseController
 
     if params[:order_by].present? && params[:order_direction].present?
       order_opts = { params[:order_by] => params[:order_direction] }
+    end
+
+    if params[:show_archived].present?
+      # Only show deleted content when this is included
+      where_clause[:archived] = true
     end
 
     # super_admin has access to everything regardless of user/group_ids

@@ -5,6 +5,7 @@ import pluralize from 'pluralize'
 import styled from 'styled-components'
 
 import { Anchor } from '~/ui/global/styled/typography'
+import { FormButton } from '~/ui/global/styled/forms'
 import Link from '~/ui/global/Link'
 import { apiStore, uiStore, routingStore } from '~/stores'
 import v from '~/utils/variables'
@@ -82,6 +83,11 @@ class Activity extends React.PureComponent {
     )
   }
 
+  handleRestore = ev => {
+    const { target } = this.props
+    target.restore()
+  }
+
   handleClick = async e => {
     e.preventDefault()
     const { action, target, handleRead } = this.props
@@ -120,7 +126,7 @@ class Activity extends React.PureComponent {
   }
 
   getMessageText() {
-    const { action } = this.props
+    const { action, target } = this.props
     const {
       actorNames,
       targetName,
@@ -140,6 +146,16 @@ class Activity extends React.PureComponent {
               {targetName}
               &rdquo;
             </strong>
+            {_.includes(['collections', 'items'], target.internalType) && (
+              <div style={{ textAlign: 'center', marginTop: '10px' }}>
+                <FormButton
+                  color={v.colors.secondaryDark}
+                  onClick={this.handleRestore}
+                >
+                  Restore
+                </FormButton>
+              </div>
+            )}
           </ActivityText>
         )
       case 'archived_from_template':

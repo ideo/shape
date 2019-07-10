@@ -47,7 +47,7 @@ describe('Header', () => {
     beforeEach(() => {
       fakeCollection.isNormalCollection = true
       fakeCollection.breadcrumb = [{ id: 12 }]
-      props.uiStore.viewingCollection = fakeCollection
+      props.uiStore.viewingRecord = fakeCollection
       render()
     })
 
@@ -70,7 +70,7 @@ describe('Header', () => {
   describe('with an editable item', () => {
     beforeEach(() => {
       fakeTextItem.can_edit = true
-      props.uiStore.viewingItem = fakeTextItem
+      props.uiStore.viewingRecord = fakeTextItem
       render()
     })
 

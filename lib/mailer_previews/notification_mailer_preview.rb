@@ -1,7 +1,7 @@
 # for previewing emailer in browser
 class NotificationMailerPreview < ActionMailer::Preview
   def notify
-    u = User.first
+    u = User.find(22)
     NotificationMailer.notify(
       user_id: u.id,
       notification_ids: u.notifications.last(10).map(&:id),

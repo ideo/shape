@@ -135,7 +135,7 @@ class EditableName extends React.Component {
     if (canEdit && editingName) {
       const clickHandlers = [() => this.stopEditingName()]
       return (
-        <StyledEditableName fontSize={fontSize}>
+        <StyledEditableName className="styled-name" fontSize={fontSize}>
           <AutosizeInput
             maxLength={v.maxTitleLength}
             className="input__name"
@@ -149,7 +149,7 @@ class EditableName extends React.Component {
       )
     }
     return (
-      <StyledName>
+      <StyledName className="styled-name">
         <Heading1
           data-cy="EditableNameHeading"
           innerRef={ref => {

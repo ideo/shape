@@ -508,6 +508,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         // NOTE: If we ever want to "remember" collections where you've previously loaded 50+
         // we could think about handling this differently.
         this.collection_cards.replace(data)
+      } else if (!this.isBoard) {
+        // Just concat onto the array -- cards should already arrive in the right order
+        // e.g. `updated_at` for submissions
+        this.collection_cards = this.collection_cards.concat(data)
       } else {
         // For foam core collections we sometimes retrieve
         // the same card twice so we must de-dupe (using new `data` as the tiebreaker)

@@ -1,7 +1,8 @@
 import ActionCable from 'actioncable'
 
-const { ACTION_CABLE_URL } = process.env
-
-const consumer = ActionCable.createConsumer(ACTION_CABLE_URL)
+// get actionCableUrl from metatags in head
+const metatag = document.head.querySelector('[name~=action-cable-url][content]')
+const actionCableUrl = metatag ? metatag.content : process.env.ACTION_CABLE_URL
+const consumer = ActionCable.createConsumer(actionCableUrl)
 
 export default consumer

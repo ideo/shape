@@ -28,6 +28,7 @@ class BillingPage extends React.Component {
   render() {
     return (
       <Box mb={v.headerHeight}>
+        <OverdueBanner />
         <PageContainer>
           <Heading1>
             <Grid container justify="space-between">
@@ -37,7 +38,6 @@ class BillingPage extends React.Component {
               </Grid>
             </Grid>
           </Heading1>
-          <OverdueBanner />
           <SuperAdminBillingControls />
           <ReactivateAccount />
           <BillingInformation />
