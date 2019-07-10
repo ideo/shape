@@ -1,22 +1,17 @@
 import { StyledRowFlexParent, StyledRowFlexHeader } from './styled'
 import { SmallHelperText } from '~/ui/global/styled/typography'
-import styled from 'styled-components'
-
-const AudienceHeader = styled(StyledRowFlexHeader)`
-  text-align: right;
-`
 
 const AudienceTableHeader = () => (
   <StyledRowFlexParent>
-    <AudienceHeader>
+    <StyledRowFlexHeader>
       <SmallHelperText>$/Response</SmallHelperText>
-    </AudienceHeader>
-    <AudienceHeader>
+    </StyledRowFlexHeader>
+    <StyledRowFlexHeader>
       <SmallHelperText>Size</SmallHelperText>
-    </AudienceHeader>
-    <AudienceHeader>
+    </StyledRowFlexHeader>
+    <StyledRowFlexHeader>
       <SmallHelperText>Price</SmallHelperText>
-    </AudienceHeader>
+    </StyledRowFlexHeader>
   </StyledRowFlexParent>
 )
 

@@ -48,6 +48,7 @@ const StyledRowFlexCell = styled(StyledRowFlexItem)`
 
 const StyledRowFlexHeader = styled(StyledRowFlexCell)`
   padding-top: 0px;
+  text-align: right;
 `
 
 const StyledLabelText = styled.span`
