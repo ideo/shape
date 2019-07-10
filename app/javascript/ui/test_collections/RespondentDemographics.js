@@ -62,9 +62,7 @@ const choiceStyleCardQuestionTypeMap = {
 const questions = [
   {
     text: `In which country do you live?`,
-    category: 'countries', // unused but needs to be unique.
-    userAttribute: 'country',
-    placeholderText: 'country',
+    category: 'countries',
     choiceStyle: CHOICE_STYLE_SELECT,
     choices: countryNames.map(([code, name]) => ({
       text: name,
@@ -73,9 +71,7 @@ const questions = [
   },
   {
     text: `In what year were you born? (Please type your birth year)`,
-    category: 'birth_year', // unused but needs to be unique
-    userAttribute: 'birth_year',
-    placeholderText: 'YYYY',
+    category: 'birth_year',
     choiceStyle: CHOICE_STYLE_SELECT,
     choices: birthYears.map(year => ({
       text: `${year}`,

@@ -245,7 +245,6 @@ class TestQuestion extends React.Component {
             question={card}
             onAnswer={this.handleQuestionAnswer}
             user={apiStore.currentUser}
-            placeholderText={card.placeholderText}
           />
         )
 
