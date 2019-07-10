@@ -1,6 +1,6 @@
 class Api::V1::OrganizationsController < Api::V1::BaseController
   deserializable_resource :organization, only: %i[create update]
-  load_and_authorize_resource except: %i[create my_collection]
+  load_and_authorize_resource except: %i[create my_collection admin_users]
 
   before_action :load_user_organizations, only: %i[index]
   before_action :load_and_filter_index, only: %i[index]
@@ -64,7 +64,8 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
   end
 
   def admin_users
-    render jsonapi: @organization.admin_users
+    admin_users = @organization ? @organization.admin_users : Organization.find(@current_user.current_organization_id).admin_users
+    render jsonapi: admin_users
   end
 
   private

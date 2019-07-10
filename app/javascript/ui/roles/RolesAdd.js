@@ -179,7 +179,7 @@ class RolesAdd extends React.Component {
     const emails = selectedUsers
       .filter(selected => !selected.id)
       .map(selected => selected.email)
-    const { currentUserOrganization } = apiStore
+    const { currentUserId, currentUserOrganization } = apiStore
     const { FREEMIUM_USER_LIMIT } = window
     const {
       name = 'this organization',
@@ -191,8 +191,7 @@ class RolesAdd extends React.Component {
     const shouldAskForPaymentMethod = !has_payment_method && willReachMaxUsers
     if (shouldAskForPaymentMethod) {
       const popupAgreed = new Promise((resolve, reject) => {
-        const { admin_group, id } = currentUserOrganization
-        const { is_admin } = admin_group
+        const { id } = currentUserOrganization
         const prompt = `Inviting these people will take ${name} over the free limit of ${FREEMIUM_USER_LIMIT}. Please add a payment method to continue`
         const confirmText = 'Add Payment Method'
         apiStore.fetchOrganizationAdmins(id).then(response => {
@@ -243,7 +242,12 @@ class RolesAdd extends React.Component {
             singleConfirmButton: true,
           }
 
-          if (is_admin) {
+          const adminIds = admins.map(a => a.id)
+          const isAdmin = adminIds.indexOf(currentUserId) > -1
+
+          console.log(isAdmin)
+
+          if (isAdmin) {
             uiStore.confirm(adminModalProps)
           } else {
             uiStore.confirm(modalProps)
