@@ -1,7 +1,6 @@
 import AutoComplete from '~/ui//global/AutoComplete'
 import { DemographicsQuestionHolder } from '~/ui/test_collections/DemographicsQuestionHolder'
 import DemographicsQuestionBase from '~/ui/test_collections/DemographicsQuestionBase'
-import PropTypes from 'prop-types'
 
 const questionCategoryToApiParamMap = {
   countries: 'country',
@@ -67,10 +66,6 @@ class DemographicsSingleChoiceMenuQuestion extends DemographicsQuestionBase {
       </DemographicsQuestionHolder>
     )
   }
-}
-
-DemographicsSingleChoiceMenuQuestion.propTypes = {
-  placeholderText: PropTypes.string.isRequired,
 }
 
 export default DemographicsSingleChoiceMenuQuestion
