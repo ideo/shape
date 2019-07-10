@@ -73,7 +73,7 @@ const questions = [
   },
   {
     text: `In what year were you born? (Please type your birth year)`,
-    category: 'n/a', // unused but needs to be unique
+    category: 'birth_year', // unused but needs to be unique
     userAttribute: 'birth_year',
     placeholderText: 'YYYY',
     choiceStyle: CHOICE_STYLE_SELECT,
