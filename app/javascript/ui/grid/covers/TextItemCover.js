@@ -64,8 +64,9 @@ class TextItemCover extends React.Component {
 
   handleClick = async e => {
     e.stopPropagation()
-    const { item, dragging, cardId, searchResult } = this.props
-    if (dragging || uiStore.dragging || this.isEditing) return false
+    const { item, dragging, cardId, searchResult, uneditable } = this.props
+    if (dragging || uiStore.dragging || this.isEditing || uneditable)
+      return false
     // allow both editors/viewers to capture keyboard clicks
     if (uiStore.captureKeyboardGridClick(e, cardId)) {
       return false
@@ -226,12 +227,14 @@ TextItemCover.propTypes = {
   height: PropTypes.number,
   searchResult: PropTypes.bool,
   hideReadMore: PropTypes.bool,
+  uneditable: PropTypes.bool,
 }
 
 TextItemCover.defaultProps = {
   height: null,
   searchResult: false,
   hideReadMore: false,
+  uneditable: false,
 }
 
 export default TextItemCover

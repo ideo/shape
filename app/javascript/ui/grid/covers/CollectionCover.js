@@ -318,6 +318,7 @@ class CollectionCover extends React.Component {
                 searchResult={searchResult}
                 initialFontTag={'P'}
                 hideReadMore
+                uneditable
               />
             </div>
           ) : (
