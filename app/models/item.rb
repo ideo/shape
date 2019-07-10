@@ -47,6 +47,7 @@ class Item < ApplicationRecord
   include RealtimeEditorsViewers
   include HasActivities
   include Externalizable
+  include Commentable
 
   resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
@@ -55,7 +56,6 @@ class Item < ApplicationRecord
 
   archivable as: :parent_collection_card,
              with: %i[cards_linked_to_this_item]
-  after_archive :remove_comment_followers!
 
   acts_as_taggable
 
@@ -90,7 +90,6 @@ class Item < ApplicationRecord
            to: :parent_collection_card, allow_nil: true
   delegate :organization, to: :parent, allow_nil: true
   belongs_to :cloned_from, class_name: 'Item', optional: true
-  has_one :comment_thread, as: :record, dependent: :destroy
   has_one :question_item, class_name: 'Item::QuestionItem'
 
   scope :questions, -> { where(type: 'Item::QuestionItem') }
@@ -253,11 +252,6 @@ class Item < ApplicationRecord
       self.cached_tag_list = tag_list
     end
     cached_attributes
-  end
-
-  def remove_comment_followers!
-    return unless comment_thread.present?
-    RemoveCommentThreadFollowers.perform_async(comment_thread.id)
   end
 
   def touch_related_cards

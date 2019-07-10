@@ -11,8 +11,7 @@
 #
 # Indexes
 #
-#  index_comment_threads_on_organization_id  (organization_id)
-#  index_comment_threads_on_record_id        (record_id) UNIQUE
+#  index_comment_threads_on_record_and_org  (record_id,record_type,organization_id) UNIQUE
 #
 
 class CommentThread < ApplicationRecord
@@ -21,9 +20,10 @@ class CommentThread < ApplicationRecord
 
   belongs_to :record,
              polymorphic: true
-  # org comes from the item/collection, but cached on here for easy lookup
-  belongs_to :organization
+  # optional relation gives way to inherit_record_organization_id
+  belongs_to :organization, optional: true
   before_validation :inherit_record_organization_id, on: :create
+  validates :record_id, uniqueness: { scope: %i[organization_id record_type] }
 
   has_many :comments,
            -> { order(created_at: :asc) },
