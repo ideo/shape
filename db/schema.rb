@@ -577,7 +577,7 @@ ActiveRecord::Schema.define(version: 2019_07_10_182723) do
     t.boolean "feedback_terms_accepted", default: false
     t.boolean "respondent_terms_accepted", default: false
     t.boolean "shape_circle_member", default: false
-    t.integer "birth_year"
+    t.integer "birth_year", limit: 2
     t.string "country"
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
