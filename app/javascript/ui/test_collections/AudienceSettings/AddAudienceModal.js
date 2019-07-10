@@ -83,7 +83,7 @@ class AddAudienceModal extends React.Component {
     name: '',
     valid: false,
     selectedCategories: [],
-    numCriteriaPerGroup: {},
+    numCategoriesPerGroup: {},
     openMenus: {},
     selectedCriteria: {},
   }
@@ -170,76 +170,78 @@ class AddAudienceModal extends React.Component {
       valid: false,
       selectedCategories: [],
       selectedCriteria: {},
-      numCriteriaPerGroup: {},
+      numCategoriesPerGroup: {},
       openMenus: {},
     })
   }
 
-  addCriteria = e => {
-    const criteria = e.target.value[0]
-    if (!criteria) return
+  addCategory = e => {
+    const category = e.target.value[0]
+    if (!category) return
 
     const { selectedCategories } = this.state
 
-    selectedCategories.push(criteria)
+    selectedCategories.push(category)
     this.setState({ selectedCategories })
 
     this.closeMenu(ROOT_MENU)
-    this.openMenu(criteria)
+    this.openMenu(category)
   }
 
-  removeCriteria(criteria) {
-    const { numCriteriaPerGroup, selectedCategories } = this.state
+  removeCategory = category => {
+    const { numCategoriesPerGroup, selectedCategories } = this.state
 
-    remove(selectedCategories, c => c === criteria)
+    remove(selectedCategories, c => c === category)
 
-    const { group, categoryKey } = this.getCategoryByName(criteria)
-    numCriteriaPerGroup[group] -= 1
+    const { group, categoryKey } = this.getCategoryByName(category)
+    numCategoriesPerGroup[group] -= 1
 
     this.setState({
-      selectedCategories,
-      numCriteriaPerGroup,
-      [categoryKey]: [],
+      selectedCriteria: {
+        ...this.state.selectedCriteria,
+        [categoryKey]: [],
+      },
+      numCategoriesPerGroup,
     })
   }
 
   toggleCriteriaOption = (e, categoryName) => {
-    const { numCriteriaPerGroup } = this.state
+    const { numCategoriesPerGroup } = this.state
 
     const { group, categoryKey } = this.getCategoryByName(categoryName)
     const selectedCriteriaForCategory =
       this.state.selectedCriteria[categoryKey] || []
 
-    if (!numCriteriaPerGroup[group]) numCriteriaPerGroup[group] = 0
+    if (!numCategoriesPerGroup[group]) numCategoriesPerGroup[group] = 0
 
     e.target.value.forEach(value => {
       if (includes(selectedCriteriaForCategory, value)) {
         remove(selectedCriteriaForCategory, o => o === value)
-        numCriteriaPerGroup[group] -= 1
+        numCategoriesPerGroup[group] -= 1
       } else {
         selectedCriteriaForCategory.push(value)
-        numCriteriaPerGroup[group] += 1
+        numCategoriesPerGroup[group] += 1
       }
     })
 
     this.setState({
       selectedCriteria: {
-        [categoryKey]: selectedCriteriaForCategory,
         ...this.state.selectedCriteria,
+        [categoryKey]: selectedCriteriaForCategory,
       },
-      numCriteriaPerGroup,
+      numCategoriesPerGroup,
     })
   }
 
   get reachedCriteriaLimit() {
-    const { numCriteriaPerGroup } = this.state
+    const { numCategoriesPerGroup } = this.state
 
     if (!criteriaLimitByGroup) return false
 
     let overLimit = false
 
     forEach(criteriaLimitByGroup, (limit, group) => {
-      if (numCriteriaPerGroup[group] > limit) {
+      if (numCategoriesPerGroup[group] > limit) {
         overLimit = true
       }
     })
@@ -252,7 +254,7 @@ class AddAudienceModal extends React.Component {
     this.setState({ valid })
   }
 
-  renderCriteriaMenu() {
+  renderCategoriesMenu() {
     const { openMenus, selectedCategories } = this.state
 
     // Since the menu is displayed in a MUI dialog, it must be
@@ -263,6 +265,7 @@ class AddAudienceModal extends React.Component {
 
     if (!this.queryCategories) return null
 
+    // TODO: clean up
     const getCategoryGroups = () =>
       uniq(
         this.queryCategories.reduce(
@@ -306,7 +309,7 @@ class AddAudienceModal extends React.Component {
     return this.renderSelectMenu({
       isOpen: menuOpen,
       menuId: ROOT_MENU,
-      onChange: this.addCriteria,
+      onChange: this.addCategory,
       selectOptions: flatten(groups),
     })
   }
@@ -331,21 +334,21 @@ class AddAudienceModal extends React.Component {
   }
 
   renderSelectedCriteria() {
-    const { numCriteriaPerGroup } = this.state
+    const { numCategoriesPerGroup } = this.state
 
     return this.state.selectedCategories.map(categoryName => {
       const { group, categoryKey } = this.getCategoryByName(categoryName)
       const selectedCriteria = this.state.selectedCriteria[categoryKey] || []
 
       const isLimited = criteriaLimitByGroup[group]
-      const atLimit = numCriteriaPerGroup[group] > criteriaLimitByGroup[group]
+      const atLimit = numCategoriesPerGroup[group] > criteriaLimitByGroup[group]
       return (
         <FieldContainer key={`menu_${categoryName}`}>
           <FloatRight>
             <EditButton onClick={() => this.openMenu(categoryName)}>
               <EditPencilIcon />
             </EditButton>
-            <DeleteButton onClick={() => this.removeCriteria(categoryName)}>
+            <DeleteButton onClick={() => this.removeCategory(categoryName)}>
               <TrashIcon />
             </DeleteButton>
           </FloatRight>
@@ -385,7 +388,7 @@ class AddAudienceModal extends React.Component {
 
   getCategoryByName = name => this.getCategoriesBy('name', name)[0]
 
-  renderSelectedCriteriaMenus() {
+  renderSelectedCategoryMenus() {
     const { selectedCategories, openMenus } = this.state
 
     return selectedCategories.map(name => {
@@ -414,13 +417,15 @@ class AddAudienceModal extends React.Component {
     })
   }
 
-  get allselectedCriteria() {
+  get allSelectedCriteria() {
     const categoryKeys = Object.keys(this.state.selectedCriteria)
     return flatten(categoryKeys.map(k => this.state.selectedCriteria[k]))
   }
 
   render() {
-    const numSelectedOptions = this.allselectedCriteria.length
+    // TODO: show loading state when `queryCategories` is null
+
+    const numSelectedOptions = this.allSelectedCriteria.length
 
     return (
       <React.Fragment>
@@ -500,8 +505,8 @@ class AddAudienceModal extends React.Component {
             </Grid>
           </Grid>
         </Modal>
-        {this.renderCriteriaMenu()}
-        {this.renderSelectedCriteriaMenus()}
+        {this.renderCategoriesMenu()}
+        {this.renderSelectedCategoryMenus()}
       </React.Fragment>
     )
   }
