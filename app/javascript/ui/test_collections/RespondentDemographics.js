@@ -1,6 +1,6 @@
 import countries from 'i18n-iso-countries'
 import en from 'i18n-iso-countries/langs/en.json'
-import { kebabCase, range, uniq } from 'lodash'
+import _ from 'lodash'
 
 countries.registerLocale(en)
 const countryNames = Object.entries(countries.getNames('en'))
@@ -49,7 +49,7 @@ const EMPLOYMENT_STUDENT = 'Student'
 const EMPLOYMENT_RETIRED = 'Retired'
 const EMPLOYMENT_OTHER = 'Other'
 
-const birthYears = range(1920, new Date().getFullYear())
+const birthYears = _.range(1920, new Date().getFullYear())
 
 const choiceStyleCardQuestionTypeMap = {
   [CHOICE_STYLE_SINGLE]: 'question_demographics_single_choice',
@@ -231,10 +231,10 @@ export function cardQuestionTypeForQuestion(question) {
 }
 
 export function createDemographicsCardId(question) {
-  const category = kebabCase(question.category)
+  const category = _.kebabCase(question.category)
   return `card-demographics-${category}`
 }
 
 export function validDemographicsCategories() {
-  return uniq(questions.map(q => q.category))
+  return _.uniq(questions.map(q => q.category))
 }
