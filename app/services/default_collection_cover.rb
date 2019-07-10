@@ -37,7 +37,7 @@ class DefaultCollectionCover < SimpleService
     # This cover type uses a separate text item, so remove all text properties
     # from the cover
     if @collection.cover_type_text_and_media?
-      cover.delete(:test)
+      cover.delete(:text)
       cover.delete(:item_id_text)
     end
 
@@ -51,11 +51,12 @@ class DefaultCollectionCover < SimpleService
   def cover_media_item_card
     return nil if @no_cover
     cover_card = find_manually_set_cover
-    return cover_card if cover_card.present?
+    return cover_card if cover_card.present? && !@collection.cover_type_text_and_media?
 
     # this is the case where the system looks for the first/best image for the cover
     cover_card = first_media_item_card
     return nil unless cover_card.present?
+    return cover_card if @collection.cover_type_text_and_media?
     cover_card.update(is_cover: true)
     CollectionUpdateBroadcaster.call(@collection)
     cover_card
