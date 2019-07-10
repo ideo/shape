@@ -139,19 +139,9 @@ class ConfirmationDialog extends React.PureComponent {
       backgroundColor: this.backgroundColor,
     }
 
-    const ButtonEl = this.bigModal ? OptionsButton : TextButton
+    console.log(this.backgroundColor)
 
-    const ConfirmButton = props => (
-      <FormActionsContainer>
-        <ButtonEl
-          data-cy="CancelButton"
-          maxWidth="200"
-          onClick={props.handleClick}
-        >
-          {props.buttonText}
-        </ButtonEl>
-      </FormActionsContainer>
-    )
+    const ButtonEl = this.bigModal ? OptionsButton : TextButton
 
     const ConfirmButtons = props => (
       <Grid container justify="center">
@@ -160,10 +150,15 @@ class ConfirmationDialog extends React.PureComponent {
           {props.cancelPrompt && (
             <ConfirmOption>{props.cancelPrompt}</ConfirmOption>
           )}
-          <ConfirmButton
-            buttonText={props.cancelText}
-            handleClick={this.handleCancel}
-          />
+          <FormActionsContainer>
+            <ButtonEl
+              data-cy="CancelButton"
+              maxWidth="200"
+              onClick={props.handleCancel}
+            >
+              {props.buttonText}
+            </ButtonEl>
+          </FormActionsContainer>
         </Grid>
         {this.twoColumn && (
           <Grid item xs={12} sm={1} style={{ color: v.colors.primaryDark }}>
@@ -179,10 +174,15 @@ class ConfirmationDialog extends React.PureComponent {
           {props.confirmPrompt && (
             <ConfirmOption>{props.confirmPrompt}</ConfirmOption>
           )}
-          <ConfirmButton
-            buttonText={props.confirmText}
-            handleClick={this.handleConfirm}
-          />
+          <FormActionsContainer>
+            <ButtonEl
+              data-cy="ConfirmButton"
+              maxWidth="200"
+              onClick={props.handleCancel}
+            >
+              {props.buttonText}
+            </ButtonEl>
+          </FormActionsContainer>
         </Grid>
       </Grid>
     )
@@ -210,10 +210,15 @@ class ConfirmationDialog extends React.PureComponent {
             />
           )}
           {singleConfirmButton ? (
-            <ConfirmButton
-              buttonText={confirmText}
-              handleCancel={this.handleCancel}
-            />
+            <FormActionsContainer>
+              <ButtonEl
+                data-cy="ConfirmButton"
+                maxWidth="200"
+                onClick={this.handleConfirm}
+              >
+                {confirmText}
+              </ButtonEl>
+            </FormActionsContainer>
           ) : (
             <ConfirmButtons
               cancelText={cancelText}

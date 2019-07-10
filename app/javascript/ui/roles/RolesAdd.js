@@ -29,6 +29,10 @@ const RightAligner = styled(Grid)`
 `
 RightAligner.displayName = 'StyledRightAligner'
 
+const AdminGrid = styled.div`
+  margin-bottom: 30px;
+`
+
 const GridTextSmall = styled.p`
   /* override default dialog font size and margin*/
   font-size: 0.75rem !important;
@@ -200,25 +204,25 @@ class RolesAdd extends React.Component {
 
           const adminGrid = (
             <AdminGridWrapper admins={admins}>
-              <div>
+              <AdminGrid>
                 <Grid container>
-                  <Grid item xs={12}>
-                    <GridTextSmall>The administrators are</GridTextSmall>
+                  <Grid item xs={12} key={'adminGridTitle'}>
+                    <GridTextSmall>The administrators are:</GridTextSmall>
                   </Grid>
                   {admins.map(a => (
                     <Grid container key={a.id}>
-                      <Grid item xs={6}>
+                      <Grid item xs={6} key={`${a.id}-name`}>
                         <GridTextSmall>
                           {a.first_name} {a.last_name}
                         </GridTextSmall>
                       </Grid>
-                      <Grid item xs={6}>
+                      <Grid item xs={6} key={`${a.id}-email`}>
                         <GridTextSmall>{a.email}</GridTextSmall>
                       </Grid>
                     </Grid>
                   ))}
                 </Grid>
-              </div>
+              </AdminGrid>
             </AdminGridWrapper>
           )
 
@@ -239,13 +243,14 @@ class RolesAdd extends React.Component {
             iconName: 'InviteUsersXl',
             backgroundColor: `${v.colors.primaryLight}`,
             confirmText: 'Close',
+            onConfirm: () => {
+              resolve(false)
+            },
             singleConfirmButton: true,
           }
 
           const adminIds = admins.map(a => a.id)
           const isAdmin = adminIds.indexOf(currentUserId) > -1
-
-          console.log(isAdmin)
 
           if (isAdmin) {
             uiStore.confirm(adminModalProps)
