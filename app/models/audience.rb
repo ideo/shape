@@ -28,6 +28,7 @@ class Audience < ApplicationRecord
     income_levels
     interests
     publications
+    temp_criteria_keys
   ].freeze
 
   acts_as_taggable_on(DEMOGRAPHIC_TAGS)

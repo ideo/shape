@@ -75,6 +75,7 @@ class Api::V1::AudiencesController < Api::V1::BaseController
       adopter_type_list: [],
       interest_list: [],
       publication_list: [],
+      temp_criteria_key_list: [],
     )
   end
 end

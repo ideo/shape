@@ -180,9 +180,13 @@ class AddAudienceModal extends React.Component {
     const { apiStore } = this.props
     const { name, selectedCriteria } = this.state
 
-    console.log('TODO: selectedCriteria', selectedCriteria)
-
-    const audience = new Audience({ name }, apiStore)
+    const audience = new Audience(
+      {
+        name,
+        temp_criteria_key_list: selectedCriteria,
+      },
+      apiStore
+    )
     await audience.API_create()
 
     this.props.afterSave(audience)
