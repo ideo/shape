@@ -28,7 +28,7 @@ export const iconNames = [
   'Clock',
   'Hidden',
   'Info',
-  'InviteUsersIcon',
+  'InviteUsers',
   'Key',
   'Leave',
   'Link',
