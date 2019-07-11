@@ -291,7 +291,6 @@ class CollectionCover extends React.Component {
     } = this.props
     const { cover } = collection
     const { gridW, gutter } = uiStore.gridSettings
-    console.log('collection', collection, cover)
 
     return (
       <StyledCollectionCover
