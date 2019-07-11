@@ -12,8 +12,13 @@ describe('MainMenuDropdown', () => {
 
   beforeEach(() => {
     const apiStore = fakeApiStore()
-    otherFakeOrg = Object.assign({}, fakeOrganization, { id: 999, name: 'new' })
-    apiStore.currentUser.current_organization = fakeOrganization
+    otherFakeOrg = {
+      ...fakeOrganization,
+      id: 999,
+      name: 'new',
+      primary_group: { name: 'new' },
+    }
+    apiStore.currentUserOrganization = fakeOrganization
     fakeOrganization.primary_group.can_edit = true
     apiStore.currentUser.organizations = [fakeOrganization, otherFakeOrg]
     props = {
@@ -22,6 +27,7 @@ describe('MainMenuDropdown', () => {
       apiStore,
       routingStore: fakeRoutingStore,
       uiStore: fakeUiStore,
+      showCurrentOrg: false,
     }
     itemNames = [
       'People & Groups',
@@ -49,11 +55,8 @@ describe('MainMenuDropdown', () => {
     })
 
     it('should not add your current organization to list of items', () => {
-      expect(
-        component.menuItems.organizations.indexOf(
-          otherFakeOrg.primary_group.name
-        )
-      ).toEqual(-1)
+      const orgNames = component.menuItems.organizations.map(o => o.name)
+      expect(orgNames.indexOf(fakeOrganization.primary_group.name)).toEqual(-1)
     })
 
     it('should have all other menu items', () => {
@@ -220,6 +223,20 @@ describe('MainMenuDropdown', () => {
 
     it('should route to the terms page', () => {
       expect(props.routingStore.routeTo).toHaveBeenCalledWith('/terms')
+    })
+  })
+
+  describe('with showCurrentOrg = true', () => {
+    beforeEach(() => {
+      props.showCurrentOrg = true
+      render()
+    })
+
+    it('should still show the current organization in the dropdown', () => {
+      const orgNames = component.menuItems.organizations.map(o => o.name)
+      expect(orgNames.indexOf(fakeOrganization.primary_group.name)).not.toEqual(
+        -1
+      )
     })
   })
 })

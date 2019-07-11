@@ -19,7 +19,7 @@ class ImageItem extends React.PureComponent {
     const { item, onCancel } = this.props
     return (
       <div>
-        <CloseButton onClick={onCancel} />
+        <CloseButton onClick={ev => onCancel()} />
         <StyledImage src={item.imageUrl()} alt={item.name} />
       </div>
     )

@@ -8,11 +8,13 @@ FactoryBot.define do
     end
 
     factory :item_comment_thread do
+      organization nil
       record factory: :file_item
       record_type 'Item'
     end
 
     factory :collection_comment_thread do
+      organization nil
       record factory: :collection
       record_type 'Collection'
     end

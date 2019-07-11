@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe FindOrCreateUsersByEmail, type: :service do
   let(:emails) { Array.new(3).map { Faker::Internet.email } }
 
-  describe '#call' do
+  describe '#call', :vcr do
     let(:emails) { Array.new(3).map { Faker::Internet.email } }
     let(:subject) { FindOrCreateUsersByEmail.new(emails: emails) }
 
@@ -18,6 +18,12 @@ RSpec.describe FindOrCreateUsersByEmail, type: :service do
       cpu = FindOrCreateUsersByEmail.new(emails: ['email@address.com '])
       cpu.call
       expect(cpu.users.first.email).to eq('email@address.com')
+    end
+
+    it 'should add the user to the group' do
+      expect(SyncNetworkGroups).to receive(:call)
+      cpu = FindOrCreateUsersByEmail.new(emails: ['email@address.com '])
+      cpu.call
     end
 
     context 'existing user with email' do

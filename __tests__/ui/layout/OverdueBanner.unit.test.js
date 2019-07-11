@@ -80,9 +80,7 @@ describe('OverdueBanner', () => {
 
       it('should render a link to billing with a message', () => {
         const wrapper = render()
-        const RightComponent = wrapper
-          .find('StyledBanner')
-          .prop('rightComponent')
+        const RightComponent = wrapper.find('Banner').prop('rightComponent')
         const html = shallow(RightComponent)
         const link = html.find('Link')
         expect(link.props().to).toEqual('/billing')
@@ -97,9 +95,7 @@ describe('OverdueBanner', () => {
 
       it('should render a link to billing with a message', () => {
         const wrapper = render()
-        const RightComponent = wrapper
-          .find('StyledBanner')
-          .prop('rightComponent')
+        const RightComponent = wrapper.find('Banner').prop('rightComponent')
         const html = shallow(RightComponent)
         expect(html.find('Link').length).toEqual(0)
         expect(html.html()).toMatch('Contact your admin for assistance.')
@@ -107,9 +103,7 @@ describe('OverdueBanner', () => {
 
       it('allows the overdue banner to be hidden', () => {
         const wrapper = render()
-        const RightComponent = wrapper
-          .find('StyledBanner')
-          .prop('rightComponent')
+        const RightComponent = wrapper.find('Banner').prop('rightComponent')
         const html = shallow(RightComponent)
         html
           .find('CloseIcon')

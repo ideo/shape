@@ -44,7 +44,9 @@
     "test_collection_id": { "type": ["string"] },
     "test_closed_at": { "type": ["string"] },
     "frontend_url": { "type": ["string"] },
-    "common_viewable": { "type": ["boolean", "null"] }
+    "common_viewable": { "type": ["boolean", "null"] },
+    "archived": { "type": ["boolean", "null"] },
+    "is_restorable": { "type": ["boolean", "null"] }
   },
   "required": ["name", "class_type", "created_at", "cover"]
 }

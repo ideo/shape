@@ -81,6 +81,7 @@ Rails.application.routes.draw do
           patch 'move'
           patch 'archive'
           patch 'unarchive'
+          get 'unarchive_from_email'
           post 'link'
           post 'duplicate'
         end
@@ -194,6 +195,8 @@ Rails.application.routes.draw do
     post 'ideo_network/payment_methods' => 'ideo_network#payment_methods'
     post 'ideo_network/invoices' => 'ideo_network#invoices'
     post 'ideo_network/users' => 'ideo_network#users'
+    post 'ideo_network/groups' => 'ideo_network#groups'
+    post 'ideo_network/users_roles' => 'ideo_network#users_roles'
   end
 
   resources :reports, only: %i[show]

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_13_230119) do
+ActiveRecord::Schema.define(version: 2019_07_03_185758) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -179,8 +179,7 @@ ActiveRecord::Schema.define(version: 2019_06_13_230119) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "organization_id"
-    t.index ["organization_id"], name: "index_comment_threads_on_organization_id"
-    t.index ["record_id"], name: "index_comment_threads_on_record_id", unique: true
+    t.index ["record_id", "record_type", "organization_id"], name: "index_comment_threads_on_record_and_org", unique: true
   end
 
   create_table "comments", force: :cascade do |t|
@@ -333,8 +332,10 @@ ActiveRecord::Schema.define(version: 2019_06_13_230119) do
     t.string "archive_batch"
     t.jsonb "autojoin_emails", default: []
     t.string "type"
+    t.string "network_id"
     t.index ["autojoin_emails"], name: "index_groups_on_autojoin_emails", using: :gin
     t.index ["handle"], name: "index_groups_on_handle"
+    t.index ["network_id"], name: "index_groups_on_network_id"
     t.index ["organization_id"], name: "index_groups_on_organization_id"
     t.index ["type"], name: "index_groups_on_type"
   end

@@ -1,9 +1,10 @@
 class CollectionCardFilter < SimpleService
-  def initialize(collection:, user:, filters:)
+  def initialize(collection:, user:, filters:, application: nil)
     @collection_order = nil
     @collection = collection
     @user = user
     @filters = filters
+    @application = application
     @cards = []
   end
 
@@ -16,6 +17,7 @@ class CollectionCardFilter < SimpleService
     else
       filter_for_public
     end
+    filter_external_id
     @cards
   end
 
@@ -40,8 +42,17 @@ class CollectionCardFilter < SimpleService
       )
     end
 
+    if @collection.archived? && @collection.archive_batch.present?
+      # NOTE: not sure why some archived collections have unarchived cards inside;
+      # but that is the reason for the `or(@cards.active)`
+      @cards = @cards.where(
+        archive_batch: @collection.archive_batch,
+      ).or(@cards.active)
+    else
+      @cards = @cards.active
+    end
+
     @cards = @cards
-             .active
              .includes(
                collection: [:collection_cover_items],
                item: [
@@ -131,5 +142,25 @@ class CollectionCardFilter < SimpleService
   def apply_hidden
     # `hidden` means include both hidden and unhidden cards
     @cards = @cards.visible unless @filters[:hidden].present?
+  end
+
+  def filter_external_id
+    return if @filters[:external_id].blank? || @application.blank?
+
+    join_sql = %(
+      INNER JOIN external_records ON external_records.externalizable_id = COALESCE(collection_cards.item_id, collection_cards.collection_id)
+    )
+
+    @cards = @cards
+      .joins(join_sql).where(
+        "(collection_cards.item_id IS NOT NULL AND external_records.externalizable_type = 'Item') OR " \
+        "(collection_cards.collection_id IS NOT NULL AND external_records.externalizable_type = 'Collection')",
+      )
+      .where(
+        ExternalRecord.arel_table[:external_id].eq(@filters[:external_id])
+        .and(
+          ExternalRecord.arel_table[:application_id].eq(@application.id),
+        )
+      )
   end
 end

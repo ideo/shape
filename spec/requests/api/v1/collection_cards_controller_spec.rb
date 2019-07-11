@@ -873,6 +873,29 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       patch(path, params: params)
     end
 
+    context 'when changing the is_cover property' do
+      let(:parent_collection) { create(:collection, organization: organization) }
+      let(:collection) { create(:collection, organization: organization, parent_collection: parent_collection, add_editors: [user]) }
+
+      let(:raw_params) do
+        {
+          is_cover: true,
+        }
+      end
+
+      it 'broadcasts both collection + parent collection updates' do
+        expect(CollectionUpdateBroadcaster).to receive(:call).with(
+          collection,
+          user,
+        )
+        expect(CollectionUpdateBroadcaster).to receive(:call).with(
+          parent_collection,
+          user,
+        )
+        patch(path, params: params)
+      end
+    end
+
     context 'without content editor access on the parent collection' do
       let(:user) { create(:user, add_to_org: create(:organization)) }
 
