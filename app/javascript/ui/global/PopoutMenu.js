@@ -123,6 +123,16 @@ export const StyledMenuItem = styled.li`
       padding-left: 3.75rem;
       padding-right: 1rem;
     }
+
+    .icon-left {
+      margin-right: ${props =>
+        props.wrapperClassName === 'card-menu' ? 16 : 0}px;
+    }
+
+    .icon-left .icon {
+      left: ${props => (props.wrapperClassName === 'card-menu' ? 8 : 0)}px;
+    }
+
     .icon {
       left: 0;
       top: 50%;
@@ -182,6 +192,7 @@ class PopoutMenu extends React.Component {
             let className = `menu-${_.kebabCase(name)}`
             const rightIconClassName = 'icon-right'
             if (withAvatar) className += ' with-avatar'
+
             return (
               <StyledMenuItem
                 key={`${name}-${id || ''}`}
@@ -194,9 +205,11 @@ class PopoutMenu extends React.Component {
                   data-cy={`PopoutMenu_${_.camelCase(name)}`}
                   className={className}
                 >
-                  <span className="icon-left">{iconLeft}</span>
+                  {iconLeft && <span className="icon-left">{iconLeft}</span>}
                   <span>{name}</span>
-                  <span className={rightIconClassName}>{iconRight}</span>
+                  {iconRight && (
+                    <span className={rightIconClassName}>{iconRight}</span>
+                  )}
                 </button>
               </StyledMenuItem>
             )
