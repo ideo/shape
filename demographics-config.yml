@@ -77,7 +77,7 @@ query_categories:
         name: "Metropolis Dweller"
       -
         answer_keys:
-          - answer_dweller_urban
+          - answer_dweller_city
           - answer_dweller_metropolis
         criteria_key: criteria_dweller_urban
         name: "Urban Dweller"
