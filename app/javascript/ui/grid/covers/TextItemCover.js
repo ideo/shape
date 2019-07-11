@@ -11,6 +11,7 @@ import { QuillStyleWrapper } from '~/ui/global/styled/typography'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import RealtimeTextItem from '~/ui/items/RealtimeTextItem'
 import PaddedCardCover from './PaddedCardCover'
+import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 
 const stripTags = str => str.replace(/(<([^>]+)>)/gi, '')
 
@@ -87,6 +88,7 @@ class TextItemCover extends React.Component {
       },
       message: 'Text undone!',
       redirectTo: uiStore.viewingCollection,
+      actionType: POPUP_ACTION_TYPES.SNACKBAR,
       // TODO: there is no way to push a redoAction because the edit hasn't happened yet!
       // so we'd have to figure out a different way to capture the redo after you undo
     })

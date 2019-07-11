@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { action, observable } from 'mobx'
 import queryString from 'query-string'
+import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 
 // This contains some shared methods between Collection and Item
 const SharedRecordMixin = superclass =>
@@ -47,6 +48,7 @@ const SharedRecordMixin = superclass =>
       this.pushUndo({
         snapshot: { name: previousName },
         message: `${this.className} name edit undone`,
+        actionType: POPUP_ACTION_TYPES.SNACKBAR,
       })
       const data = this.toJsonApi()
       // cancel sync so that name edits don't roundtrip and interfere with your <input>
@@ -121,6 +123,7 @@ const SharedRecordMixin = superclass =>
       apiCall,
       redirectTo = this,
       redoAction = null,
+      actionType = POPUP_ACTION_TYPES.SNACKBAR,
     } = {}) {
       let undoApiCall = apiCall
       if (!apiCall) {
@@ -131,6 +134,7 @@ const SharedRecordMixin = superclass =>
         apiCall: undoApiCall,
         redirectPath: { type: redirectTo.internalType, id: redirectTo.id },
         redoAction,
+        actionType,
       })
     }
   }

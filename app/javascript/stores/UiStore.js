@@ -5,6 +5,7 @@ import { observable, action, runInAction, computed } from 'mobx'
 import routeToLogin from '~/utils/routeToLogin'
 import sleep from '~/utils/sleep'
 import v from '~/utils/variables'
+import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 
 export default class UiStore {
   // store this for usage by other components
@@ -269,6 +270,19 @@ export default class UiStore {
   @action
   setSelectedArea(selectedArea) {
     this.selectedArea = selectedArea
+  }
+
+  @action
+  performPopupAction(message, actionType) {
+    switch (actionType) {
+      case POPUP_ACTION_TYPES.ALERT:
+        this.popupAlert({ prompt: message, fadeOutTime: 6000 })
+        return
+      case POPUP_ACTION_TYPES.SNACKBAR:
+      default:
+        this.popupSnackbar({ message })
+        return
+    }
   }
 
   @action

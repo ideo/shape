@@ -29,6 +29,7 @@ import SurveyResponse from './jsonApi/SurveyResponse'
 import TestAudience from './jsonApi/TestAudience'
 import User from './jsonApi/User'
 import UsersThread from './jsonApi/UsersThread'
+import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 
 class ApiStore extends jsonapi(datxCollection) {
   @observable
@@ -515,6 +516,7 @@ class ApiStore extends jsonapi(datxCollection) {
           apiCall: () => this.archiveCards({ cardIds, collection, undoable }),
           undoable: false,
         },
+        actionType: POPUP_ACTION_TYPES.SNACKBAR,
       })
     }
     collection.removeCardIds(cardIds)
@@ -539,6 +541,7 @@ class ApiStore extends jsonapi(datxCollection) {
           message: 'Redoing Duplicate',
           apiCall: () => this.unarchiveCards({ cardIds, collection }),
         },
+        actionType: POPUP_ACTION_TYPES.SNACKBAR,
       })
     }
 
@@ -566,8 +569,9 @@ class ApiStore extends jsonapi(datxCollection) {
     if (!fromCollection.can_view) {
       this.undoStore.pushUndoAction({
         message:
-          "Move can't be undone. You have no access to the original collection.",
+          "Move can't be undone. You do not have access to the original collection.",
         apiCall: () => {},
+        actionType: POPUP_ACTION_TYPES.ALERT,
       })
       return
     }
@@ -597,6 +601,7 @@ class ApiStore extends jsonapi(datxCollection) {
         apiCall: async () => {
           await this.moveCards(data, {})
         },
+        actionType: POPUP_ACTION_TYPES.SNACKBAR,
       },
     })
 
@@ -627,6 +632,7 @@ class ApiStore extends jsonapi(datxCollection) {
             collection: collection,
           })
         },
+        actionType: POPUP_ACTION_TYPES.SNACKBAR,
       },
     })
     return res

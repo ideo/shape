@@ -13,6 +13,7 @@ import CollectionCard from './CollectionCard'
 import Role from './Role'
 import TestAudience from './TestAudience'
 import SharedRecordMixin from './SharedRecordMixin'
+import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 
 class Collection extends SharedRecordMixin(BaseRecord) {
   static type = 'collections'
@@ -623,6 +624,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
               onCancel,
             }),
         },
+        actionType: POPUP_ACTION_TYPES.SNACKBAR,
       })
 
       return this.API_batchUpdateCards({ updates, updateAllCards }).then(
@@ -940,6 +942,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     this.pushUndo({
       snapshot: jsonData.attributes,
       message: undoMessage,
+      actionType: POPUP_ACTION_TYPES.SNACKBAR,
     })
     // now actually make the change to the card
     _.assign(card, updates)
