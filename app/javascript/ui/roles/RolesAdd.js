@@ -266,6 +266,7 @@ class RolesAdd extends React.Component {
         return
       }
       routingStore.routeTo('/billing?openPaymentMethod=true') // routes to billing and opens card modal
+      return
     }
     const fullUsers = selectedUsers.filter(selected => !!selected.id)
 
