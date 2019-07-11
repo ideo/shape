@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/payment_methods?filter%5Bdefault%5D=true&filter%5Borganization_id%5D=234
+    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/users_roles?filter%5Brole_resource_type%5D=Group&filter%5Buser_uid%5D&include=role
     body:
       encoding: US-ASCII
       string: ''
@@ -19,13 +19,13 @@ http_interactions:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
   response:
     status:
-      code: 200
-      message: OK
+      code: 500
+      message: Internal Server Error
     headers:
       Server:
       - Cowboy
       Date:
-      - Wed, 24 Oct 2018 23:11:55 GMT
+      - Tue, 09 Jul 2019 21:52:07 GMT
       Connection:
       - keep-alive
       X-Frame-Options:
@@ -41,15 +41,18 @@ http_interactions:
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Content-Type:
-      - application/vnd.api+json; charset=utf-8
-      Etag:
-      - W/"9cb0f11ceff0010d135e52d64db2d726"
+      - application/scim+json; charset=utf-8
+      Set-Cookie:
+      - _sso_profile_session=U1B0dUZKdmREOU4yQm5aeWI2Z2pJNGxGV2lSajdicitFNkswSXNHZzhKNUdMWnRzUU5zdUV2RXFFVGsyamtBR2RZcVJGeXZhRE5vMy8yc3d6RVY0MVhBMVhXam1nd2dtdXp1S3V2dzliTjdRV0ViM1lLZzUzUzE2M2VncXRsVVEtLVpTYVU3TGZ0aFM3MlY5MTNucVNsbUE9PQ%3D%3D--b8b21811d25253d3a1678fa82c4285cdf48433d1;
+        path=/; expires=Wed, 10 Jul 2019 01:52:07 -0000; HttpOnly; secure
+      - rack.session=BAh7BkkiD3Nlc3Npb25faWQGOgZFVEkiRTdmNzNlN2I0MDM2MmRmNjFmMWE3%0AODhhOTlkYTZiM2MxOTFkMWU1ZWY2ZDAwNmNlODhlZjUwZTgzZWIxZWMyMjgG%0AOwBG%0A--e66bf10c575634f991343504836cf8772fb94675;
+        path=/; expires=Wed, 10 Jul 2019 01:52:07 -0000; HttpOnly; secure
       Cache-Control:
-      - max-age=0, private, must-revalidate
+      - no-cache
       X-Request-Id:
-      - 5317d64e-dfd4-44da-a6c8-72a6134d7cd4
+      - 12afccb2-f093-4c45-bdc9-ecc06a761fc2
       X-Runtime:
-      - '0.021391'
+      - '0.134199'
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains
       Vary:
@@ -60,7 +63,8 @@ http_interactions:
       - 1.1 vegur
     body:
       encoding: UTF-8
-      string: '{"data":[],"meta":{},"jsonapi":{"version":"1.0"}}'
+      string: '{"errors":[{"code":"internal_server_error","status":"500","title":"Error","detail":"We''ve
+        notified our engineers and hope to address this issue shortly.","meta":{}}]}'
     http_version: 
-  recorded_at: Wed, 24 Oct 2018 23:11:56 GMT
+  recorded_at: Tue, 09 Jul 2019 21:52:07 GMT
 recorded_with: VCR 4.0.0

@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations?filter%5Bclient_id%5D=3695c5fe55ab3db6f9ee25f18c0ef2fe7025eb4717f1a031fd7824a5d8cddbb5&filter%5Bexternal_id%5D=3&page%5Bnumber%5D=1&page%5Bsize%5D=1
+    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/users_roles?filter%5Brole_resource_type%5D=Group&filter%5Buser_uid%5D&include=role
     body:
       encoding: US-ASCII
       string: ''
@@ -19,13 +19,13 @@ http_interactions:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
   response:
     status:
-      code: 200
-      message: OK
+      code: 500
+      message: Internal Server Error
     headers:
       Server:
       - Cowboy
       Date:
-      - Tue, 09 Jul 2019 21:40:11 GMT
+      - Tue, 09 Jul 2019 21:52:08 GMT
       Connection:
       - keep-alive
       X-Frame-Options:
@@ -41,20 +41,18 @@ http_interactions:
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Content-Type:
-      - application/vnd.api+json; charset=utf-8
+      - application/scim+json; charset=utf-8
       Set-Cookie:
-      - _sso_profile_session=ZlBaL09JV2VWSGI4R0t3RUw3eTNseHo5VDNLampOL21nRGNMMmtJV0VZV2tIK3pKbWE4K0xHQkE3RmlvRlhuRHU5Rk9Wd0FPNFExWG9uTU9ab1NxYUpMVWlPQ3RkMnY5OURoUWk1OW5OSmJJOW5qMFYzTnFySWJLU24yV05yU1UtLVZnaFhHZ2oydzJMM0JtcGZ4NWtJY1E9PQ%3D%3D--23bca6acb65d1e54408463c20bf53ef7d0c150f8;
-        path=/; expires=Wed, 10 Jul 2019 01:40:11 -0000; HttpOnly; secure
-      - rack.session=BAh7BkkiD3Nlc3Npb25faWQGOgZFVEkiRWFjZGFkZjBlYWUzYmZiMjE4NWIy%0AOTZkY2Q4YWZkNmE0NjE4ZWExMzc0M2RhYzMxYjk1N2Y0NTUwYmQ2NGFhZGQG%0AOwBG%0A--9e1a3fa555b30e18a3fec6d0f58c1311244d742e;
-        path=/; expires=Wed, 10 Jul 2019 01:40:11 -0000; HttpOnly; secure
-      Etag:
-      - W/"c8f4e0bcdee7e1e44fa5b10d689c4dde"
+      - _sso_profile_session=WTR5TVRRc3BMcEZnMzZsZ1hLSzR2bFdmSGE4MCtOb1NmcXdYdnFaYXJkanppaWpsYzIwZndWSzg5b0lRL2YwRzJ6QWF0V0NaUjZGRXp6L28xcGdOcDFQNk9VYUdPZXVuWVVmVE5BODFPbVJ2bDdvalJpRnZoRHkzV2xHMDArVmYtLXdRai9ydXdYTDRvdkxpM0lIVTQ3a3c9PQ%3D%3D--6f88bd74f50fbdf1a17d516a1768c308035f4ed6;
+        path=/; expires=Wed, 10 Jul 2019 01:52:09 -0000; HttpOnly; secure
+      - rack.session=BAh7BkkiD3Nlc3Npb25faWQGOgZFVEkiRTc1ODFkYjkzNWFhYTZjNTk2NzZi%0AY2I0NzcxYmEwNmY2ZmZhNjgwNzBlMWVmZTRhNDVlZWRkMjJlMjI2MGQxNGIG%0AOwBG%0A--770e3f3f55ba2d409b726d51ae58a18166102405;
+        path=/; expires=Wed, 10 Jul 2019 01:52:09 -0000; HttpOnly; secure
       Cache-Control:
-      - max-age=0, private, must-revalidate
+      - no-cache
       X-Request-Id:
-      - 56c74bfb-60ed-4d12-807b-c320e71985df
+      - c2601e4e-2ce1-4889-923d-02ddbc3cfb28
       X-Runtime:
-      - '0.144865'
+      - '0.013861'
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains
       Vary:
@@ -65,18 +63,16 @@ http_interactions:
       - 1.1 vegur
     body:
       encoding: UTF-8
-      string: '{"data":[{"id":"187","type":"organizations","attributes":{"id":187,"name":"Amina
-        Mann Organization"},"relationships":{"applications":{"data":[{"type":"applications","id":"17"}]},"application_organizations":{"meta":{"included":false}}}}],"included":[{"id":"17","type":"applications","attributes":{"name":"Shape
-        - local development","client_id":"3695c5fe55ab3db6f9ee25f18c0ef2fe7025eb4717f1a031fd7824a5d8cddbb5"}}],"meta":{},"jsonapi":{"version":"1.0"}}'
+      string: '{"errors":[{"code":"internal_server_error","status":"500","title":"Error","detail":"We''ve
+        notified our engineers and hope to address this issue shortly.","meta":{}}]}'
     http_version: 
-  recorded_at: Tue, 09 Jul 2019 21:40:12 GMT
+  recorded_at: Tue, 09 Jul 2019 21:52:09 GMT
 - request:
-    method: patch
-    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations/187
+    method: get
+    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/users_roles?filter%5Brole_resource_type%5D=Group&filter%5Buser_uid%5D&include=role
     body:
-      encoding: UTF-8
-      string: '{"data":{"id":187,"type":"organizations","attributes":{"name":"Org
-        2.0"}}}'
+      encoding: US-ASCII
+      string: ''
     headers:
       User-Agent:
       - Faraday v0.12.2
@@ -90,13 +86,13 @@ http_interactions:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
   response:
     status:
-      code: 200
-      message: OK
+      code: 500
+      message: Internal Server Error
     headers:
       Server:
       - Cowboy
       Date:
-      - Tue, 09 Jul 2019 21:40:12 GMT
+      - Tue, 09 Jul 2019 21:52:10 GMT
       Connection:
       - keep-alive
       X-Frame-Options:
@@ -112,20 +108,18 @@ http_interactions:
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Content-Type:
-      - application/vnd.api+json; charset=utf-8
+      - application/scim+json; charset=utf-8
       Set-Cookie:
-      - _sso_profile_session=NENqd3pyVjkzeHpjSVA3MzRISlFyRm16NjZLWWVMTWVvalIxVFZBd0lFZFQ2TGJYVm5QZHFHTHJUVjNzYTYvUzdWaHJPRlFnV2xmWHIyQ0ROd3ZqeU9Cb2txUWc5R0dNTzcyVHVLZVlmdHRSNUF4bGZYdkFWcmNEZ0o2a1ZXcHItLVgvRkE0MGdyS0VVcis5MVpHak93cVE9PQ%3D%3D--a3ed8cd03137ac9425a0abb1833caa0056c0d52b;
-        path=/; expires=Wed, 10 Jul 2019 01:40:12 -0000; HttpOnly; secure
-      - rack.session=BAh7BkkiD3Nlc3Npb25faWQGOgZFVEkiRWQ1OWU4MzlkYzA3N2IzNzVhYTg3%0AOTE3ODdkODhkYmIxY2Y1OGYzN2ZlNmRlMDAxYWMzNDM1MWI2MmNlYmZkZGEG%0AOwBG%0A--2c583932b738601a6f23fb229f4fd1be9575c4ca;
-        path=/; expires=Wed, 10 Jul 2019 01:40:12 -0000; HttpOnly; secure
-      Etag:
-      - W/"155013fbec34031f85d6ef60559211e3"
+      - _sso_profile_session=NWZRNEF5RmUvOVU4TE9ySWx0d0w3TjZGdndxMGRRemNERmtscmtNbnhzdS9QTWQ5aUNkdU0wUGU4UVpGaVlmVUltZ3l3aCtRWDNPc3NLTTRrbmRUWnZaYnR4WUJDL3l2L0JvK2dqVFpWd2cvamZqWE4vWDQ0Q0JtVU11WnZBUGItLTRTOU9vVjN4SnFuT3pqamtHSHZoSXc9PQ%3D%3D--f5f1afe2ac69f6d8fffdaeaa04c4ccdff873687a;
+        path=/; expires=Wed, 10 Jul 2019 01:52:10 -0000; HttpOnly; secure
+      - rack.session=BAh7BkkiD3Nlc3Npb25faWQGOgZFVEkiRTVjMDNjMGRhODU5MDE4YTA1MGU4%0AMTlkYTlmZWFiMTA5NDM3MTU0Yzc3ZjFhZmIyZWNlZDZjZmMwNGQwZGU1MzYG%0AOwBG%0A--dab9cde03d7944b5fd422efd12259aecbeba148a;
+        path=/; expires=Wed, 10 Jul 2019 01:52:10 -0000; HttpOnly; secure
       Cache-Control:
-      - max-age=0, private, must-revalidate
+      - no-cache
       X-Request-Id:
-      - 5bb5688d-dd5b-493b-8d4b-b3e3f8d773d6
+      - 4f24f845-b2e8-4c81-af6b-ed0f72b7fa64
       X-Runtime:
-      - '0.123950'
+      - '0.016632'
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains
       Vary:
@@ -136,8 +130,8 @@ http_interactions:
       - 1.1 vegur
     body:
       encoding: UTF-8
-      string: '{"data":{"id":"187","type":"organizations","attributes":{"id":187,"name":"Org
-        2.0"},"relationships":{"applications":{"meta":{"included":false}},"application_organizations":{"meta":{"included":false}}}},"meta":{},"jsonapi":{"version":"1.0"}}'
+      string: '{"errors":[{"code":"internal_server_error","status":"500","title":"Error","detail":"We''ve
+        notified our engineers and hope to address this issue shortly.","meta":{}}]}'
     http_version: 
-  recorded_at: Tue, 09 Jul 2019 21:40:12 GMT
+  recorded_at: Tue, 09 Jul 2019 21:52:10 GMT
 recorded_with: VCR 4.0.0

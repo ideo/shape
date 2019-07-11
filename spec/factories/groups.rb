@@ -7,6 +7,7 @@ FactoryBot.define do
     organization factory: :organization_without_groups
     name { Faker::Team.name }
     handle { Faker::Internet.unique.slug }
+    network_id { SecureRandom.hex }
 
     after(:create) do |group, evaluator|
       if evaluator.add_admins.present?
