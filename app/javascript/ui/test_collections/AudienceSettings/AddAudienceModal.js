@@ -126,7 +126,7 @@ class AddAudienceModal extends React.Component {
     name: '',
     valid: false,
     selectedCategories: [],
-    numCategoriesPerGroup: {},
+    numCriteriaPerGroup: {},
     openMenus: {},
     selectedCriteria: {},
   }
@@ -215,7 +215,7 @@ class AddAudienceModal extends React.Component {
       valid: false,
       selectedCategories: [],
       selectedCriteria: {},
-      numCategoriesPerGroup: {},
+      numCriteriaPerGroup: {},
       openMenus: {},
     })
   }
@@ -234,26 +234,26 @@ class AddAudienceModal extends React.Component {
   }
 
   removeCategory = category => {
-    const { numCategoriesPerGroup, selectedCategories } = this.state
+    const { numCriteriaPerGroup, selectedCategories } = this.state
 
     remove(selectedCategories, c => c === category)
 
     const { group, categoryKey } = this.queryCategories.getCategoryByName(
       category
     )
-    numCategoriesPerGroup[group] -= 1
+    numCriteriaPerGroup[group] -= 1
 
     this.setState({
       selectedCriteria: {
         ...this.state.selectedCriteria,
         [categoryKey]: [],
       },
-      numCategoriesPerGroup,
+      numCriteriaPerGroup,
     })
   }
 
   toggleCriteriaOption = (e, categoryName) => {
-    const { numCategoriesPerGroup } = this.state
+    const { numCriteriaPerGroup } = this.state
 
     const { group, categoryKey } = this.queryCategories.getCategoryByName(
       categoryName
@@ -261,15 +261,15 @@ class AddAudienceModal extends React.Component {
     const selectedCriteriaForCategory =
       this.state.selectedCriteria[categoryKey] || []
 
-    if (!numCategoriesPerGroup[group]) numCategoriesPerGroup[group] = 0
+    if (!numCriteriaPerGroup[group]) numCriteriaPerGroup[group] = 0
 
     e.target.value.forEach(value => {
       if (includes(selectedCriteriaForCategory, value)) {
         remove(selectedCriteriaForCategory, o => o === value)
-        numCategoriesPerGroup[group] -= 1
+        numCriteriaPerGroup[group] -= 1
       } else {
         selectedCriteriaForCategory.push(value)
-        numCategoriesPerGroup[group] += 1
+        numCriteriaPerGroup[group] += 1
       }
     })
 
@@ -278,19 +278,19 @@ class AddAudienceModal extends React.Component {
         ...this.state.selectedCriteria,
         [categoryKey]: selectedCriteriaForCategory,
       },
-      numCategoriesPerGroup,
+      numCriteriaPerGroup,
     })
   }
 
   get reachedCriteriaLimit() {
-    const { numCategoriesPerGroup } = this.state
+    const { numCriteriaPerGroup } = this.state
 
     if (!criteriaLimitByGroup) return false
 
     let overLimit = false
 
     forEach(criteriaLimitByGroup, (limit, group) => {
-      if (numCategoriesPerGroup[group] > limit) {
+      if (numCriteriaPerGroup[group] > limit) {
         overLimit = true
       }
     })
@@ -370,7 +370,7 @@ class AddAudienceModal extends React.Component {
   }
 
   renderSelectedCategories() {
-    const { numCategoriesPerGroup } = this.state
+    const { numCriteriaPerGroup } = this.state
 
     return this.state.selectedCategories.map(categoryName => {
       const { group, categoryKey } = this.queryCategories.getCategoryByName(
@@ -379,7 +379,7 @@ class AddAudienceModal extends React.Component {
       const selectedCriteria = this.state.selectedCriteria[categoryKey] || []
 
       const isLimited = criteriaLimitByGroup[group]
-      const atLimit = numCategoriesPerGroup[group] > criteriaLimitByGroup[group]
+      const atLimit = numCriteriaPerGroup[group] > criteriaLimitByGroup[group]
       return (
         <FieldContainer key={`menu_${categoryName}`}>
           <FloatRight>
