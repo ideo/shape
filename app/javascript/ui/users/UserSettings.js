@@ -55,7 +55,7 @@ class UserSettings extends React.Component {
   }
 
   get sendToLogin() {
-    window.location = '/login'
+    window.location = '/login?redirect=/user_settings'
   }
 
   render() {
