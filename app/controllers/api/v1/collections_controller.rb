@@ -30,6 +30,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       placement: json_api_params[:placement],
       created_by: current_user,
       external_id: json_api_params[:external_id],
+      collection_card_params: json_api_params[:collection_card].present? ? json_api_collection_card_params : {},
       collection_params: json_api_params[:collection].present? ? json_api_collection_params : {},
     )
 
@@ -197,6 +198,18 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def json_api_collection_params
     json_api_params.require(:collection).permit(permitted_collection_params)
+  end
+
+  def json_api_collection_card_params
+    json_api_params.require(:collection_card).permit(
+      :order,
+      :row,
+      :col,
+      :width,
+      :height,
+      :is_cover,
+      :hidden,
+    )
   end
 
   def permitted_collection_params

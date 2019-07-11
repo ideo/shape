@@ -61,6 +61,8 @@ const pad = 16
 const calcSectionWidth = props => {
   if (props.width === 4) {
     return `${props.gridW * 2 - props.gutter * 2}px`
+  } else if (props.width === 3) {
+    return `${props.gridW * 1.6 - props.gutter * 1.6}px`
   } else if (props.width > 1) {
     return `${props.gridW - props.gutter * 3}px`
   }
@@ -94,7 +96,7 @@ const StyledCardContent = styled.div`
       color: white;
     }
 
-    h3 {
+    &.text-item {
       a {
         color: ${v.colors.ctaPrimary};
         text-decoration: none;
@@ -307,7 +309,7 @@ class CollectionCover extends React.Component {
         >
           <div className="overlay" />
           {textItem ? (
-            <div className="top">
+            <div className="top text-item">
               <TextItemCover
                 item={textItem}
                 height={height}
