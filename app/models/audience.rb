@@ -28,7 +28,6 @@ class Audience < ApplicationRecord
     income_levels
     interests
     publications
-    temp_criteria_keys
   ].freeze
 
   acts_as_taggable_on(DEMOGRAPHIC_TAGS)
@@ -37,6 +36,8 @@ class Audience < ApplicationRecord
   has_many :organizations, through: :audience_organizations
   has_many :test_audiences, dependent: :destroy
   has_many :audience_demographic_criteria, dependent: :destroy
+
+  accepts_nested_attributes_for :audience_demographic_criteria
 
   validates :name, presence: true
 

@@ -2,6 +2,7 @@ class SerializableAudience < BaseJsonSerializer
   type 'audiences'
   attributes :name, :global_default
 
+  # TODO: remove when demographic tags are deprecated
   Audience.tag_types.each do |tag_type|
     # much more efficient to pull these tag_lists out of audience.all_tags
     attribute :"#{tag_type.to_s.singularize}_list" do

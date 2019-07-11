@@ -15,7 +15,6 @@
     "income_level_list": { "type": "array" },
     "interest_list": { "type": "array" },
     "publication_list": { "type": "array" },
-    "temp_criteria_key_list": { "type": "array" },
     "global": { "type": ["boolean", "null"] },
     "global_default": { "type": ["boolean", "null"] }
   }

@@ -67,15 +67,7 @@ class Api::V1::AudiencesController < Api::V1::BaseController
   def audience_params
     params.require(:audience).permit(
       :name,
-      age_list: [],
-      children_age_list: [],
-      country_list: [],
-      education_level_list: [],
-      gender_list: [],
-      adopter_type_list: [],
-      interest_list: [],
-      publication_list: [],
-      temp_criteria_key_list: [],
+      audience_demographic_criteria_attributes: %i[criteria_key],
     )
   end
 end

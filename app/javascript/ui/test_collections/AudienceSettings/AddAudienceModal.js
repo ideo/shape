@@ -183,7 +183,9 @@ class AddAudienceModal extends React.Component {
     const audience = new Audience(
       {
         name,
-        temp_criteria_key_list: selectedCriteria,
+        audience_demographic_criteria_attributes: selectedCriteria.map(d => ({
+          criteria_key: d,
+        })),
       },
       apiStore
     )
