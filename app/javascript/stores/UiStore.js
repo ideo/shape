@@ -106,6 +106,7 @@ export default class UiStore {
   defaultDialogProps = {
     open: null, // track whether "info" or "confirm" dialog are open, or none
     prompt: null,
+    subPromptNode: null,
     onConfirm: null,
     onCancel: null,
     iconName: null,
@@ -119,6 +120,7 @@ export default class UiStore {
     fadeOutTime: undefined,
     snoozeChecked: false,
     onToggleSnoozeDialog: null,
+    backgroundColor: v.colors.commonDark,
     image: null,
     options: [],
     onClose: () => this.closeDialog(),

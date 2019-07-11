@@ -20,7 +20,8 @@ import AutoComplete from '~/ui/global/AutoComplete'
 import PillList from '~/ui/global/PillList'
 import EmailCSVUploader from '~/ui/global/EmailCSVUploader'
 import InlineLoader from '~/ui/layout/InlineLoader'
-import { apiStore, uiStore } from '~/stores'
+import { apiStore, uiStore, routingStore } from '~/stores'
+import v from '~/utils/variables'
 
 const RightAligner = styled(Grid)`
   padding-right: 78px;
@@ -28,10 +29,20 @@ const RightAligner = styled(Grid)`
 `
 RightAligner.displayName = 'StyledRightAligner'
 
+const AdminGrid = styled.div`
+  margin-bottom: 30px;
+`
+
+const GridTextSmall = styled.p`
+  /* override default dialog font size and margin*/
+  font-size: 0.75rem !important;
+  margin-bottom: 10px !important;
+`
+RightAligner.displayName = 'StyledRightAligner'
+
 const StyledFormControlLabel = styled(FormControlLabel)`
   margin-top: -10px;
 `
-
 @observer
 class RolesAdd extends React.Component {
   @observable
@@ -162,25 +173,114 @@ class RolesAdd extends React.Component {
   }
 
   handleSave = async () => {
-    const { sendInvites } = this
-    const emails = this.selectedUsers
+    const {
+      sendInvites,
+      selectedUsers,
+      selectedRole,
+      setLoading,
+      resetSelectedUsers,
+    } = this
+    const emails = selectedUsers
       .filter(selected => !selected.id)
       .map(selected => selected.email)
+    const { currentUserId, currentUserOrganization } = apiStore
+    const { FREEMIUM_USER_LIMIT } = window
+    const {
+      name = 'this organization',
+      active_users_count,
+      has_payment_method,
+    } = currentUserOrganization
+    const willReachMaxUsers =
+      emails.length + active_users_count >= FREEMIUM_USER_LIMIT
+    const shouldAskForPaymentMethod = !has_payment_method && willReachMaxUsers
+    if (shouldAskForPaymentMethod) {
+      const popupAgreed = new Promise((resolve, reject) => {
+        const { id } = currentUserOrganization
+        const prompt = `Inviting these people will take ${name} over the free limit of ${FREEMIUM_USER_LIMIT}. Please add a payment method to continue`
+        const confirmText = 'Add Payment Method'
+        apiStore.fetchOrganizationAdmins(id).then(response => {
+          const { data: admins } = response
+          const AdminGridWrapper = ({ children }) => ({ children })
 
-    const fullUsers = this.selectedUsers.filter(selected => !!selected.id)
+          const adminGrid = (
+            <AdminGridWrapper admins={admins}>
+              <AdminGrid>
+                <Grid container>
+                  <Grid item xs={12} key={'adminGridTitle'}>
+                    <GridTextSmall>The administrators are:</GridTextSmall>
+                  </Grid>
+                  {admins.map(a => (
+                    <Grid container key={a.id}>
+                      <Grid item xs={6} key={`${a.id}-name`}>
+                        <GridTextSmall>
+                          {a.first_name} {a.last_name}
+                        </GridTextSmall>
+                      </Grid>
+                      <Grid item xs={6} key={`${a.id}-email`}>
+                        <GridTextSmall>{a.email}</GridTextSmall>
+                      </Grid>
+                    </Grid>
+                  ))}
+                </Grid>
+              </AdminGrid>
+            </AdminGridWrapper>
+          )
+
+          const adminModalProps = {
+            prompt: prompt,
+            iconName: 'InviteUsersXl',
+            confirmText,
+            onCancel: () => {
+              resolve(false)
+            },
+            onConfirm: () => resolve(true),
+            backgroundColor: `${v.colors.commonDark}`,
+          }
+
+          const modalProps = {
+            prompt: `${prompt} Please ask an administrator of ${name} to add payment method.`,
+            subPromptNode: adminGrid,
+            iconName: 'InviteUsersXl',
+            backgroundColor: `${v.colors.primaryLight}`,
+            confirmText: 'Close',
+            onConfirm: () => {
+              resolve(false)
+            },
+            singleConfirmButton: true,
+          }
+
+          const adminIds = admins.map(a => a.id)
+          const isAdmin = adminIds.indexOf(currentUserId) > -1
+
+          if (isAdmin) {
+            uiStore.confirm(adminModalProps)
+          } else {
+            uiStore.confirm(modalProps)
+          }
+        })
+      })
+      const agreed = await popupAgreed
+      if (!agreed) {
+        setLoading(false)
+        resetSelectedUsers()
+        return
+      }
+      routingStore.routeTo('/billing?openPaymentMethod=true') // routes to billing and opens card modal
+    }
+    const fullUsers = selectedUsers.filter(selected => !!selected.id)
 
     let created = { data: [] }
-    this.setLoading(true)
+    setLoading(true)
     if (emails.length) {
       created = await this.props.onCreateUsers(emails)
     }
     const roles = await this.props.onCreateRoles(
       [...created.data, ...fullUsers],
-      this.selectedRole,
+      selectedRole,
       { sendInvites }
     )
-    this.setLoading(false)
-    this.resetSelectedUsers()
+    setLoading(false)
+    resetSelectedUsers()
     return roles
   }
 
