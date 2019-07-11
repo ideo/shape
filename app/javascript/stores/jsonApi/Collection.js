@@ -3,6 +3,7 @@ import { observable, computed, action, runInAction } from 'mobx'
 import { ReferenceType } from 'datx'
 import pluralize from 'pluralize'
 import queryString from 'query-string'
+import googleTagManager from '~/vendor/googleTagManager'
 
 // TODO: remove this apiStore import by refactoring static methods that depend on it
 import { apiStore } from '~/stores'
@@ -736,16 +737,41 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.API_performTestAction(actionName)
   }
 
+  trackTestAction = actionName => {
+    googleTagManager.push({
+      event: 'formSubmission',
+      formType: `${actionName} Feedback Test`,
+    })
+  }
+
+  trackAudienceTargeting = audience => {
+    if (audience.isLinkSharing) return
+    googleTagManager.push({
+      event: 'formSubmission',
+      formType: `Audience targeted with a test`,
+      // Do we want more metadata here?
+    })
+  }
+
   API_performTestAction = async (actionName, audiences = null) => {
     const { uiStore } = this
     // this will disable any test launch/close/reopen buttons until loading is complete
     uiStore.update('launchButtonLoading', true)
+
     try {
-      await this.apiStore.request(
+      const launchedTest = await this.apiStore.request(
         `test_collections/${this.launchableTestId}/${actionName}`,
         'PATCH',
         { audiences }
       )
+
+      if (launchedTest) this.trackTestAction(actionName)
+
+      if (launchedTest && actionName === 'launch') {
+        audiences.map(audienceData =>
+          this.trackAudienceTargeting(audienceData.audience)
+        )
+      }
     } catch (e) {
       const errorMessages = e.error.map(e => ` ${e.detail}`)
       let prompt = `You have questions that have not yet been finalized:\n

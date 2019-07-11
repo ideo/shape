@@ -4,6 +4,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { filter, flatten, includes, remove, forEach } from 'lodash'
 import { Flex, Box } from 'reflexbox'
 import { Grid } from '@material-ui/core'
+import googleTagManager from '~/vendor/googleTagManager'
 
 import Audience from '~/stores/jsonApi/Audience'
 import Button from '~shared/components/atoms/Button'
@@ -159,11 +160,20 @@ class AddAudienceModal extends React.Component {
       },
       apiStore
     )
-    await audience.API_create()
+    const createAudience = await audience.API_create()
+
+    if (createAudience) this.trackAudienceCreation()
 
     this.props.afterSave(audience)
 
     this.reset()
+  }
+
+  trackAudienceCreation = () => {
+    googleTagManager.push({
+      event: 'formSubmission',
+      formType: 'Create Audience',
+    })
   }
 
   handleShowSupportWidget = () => {

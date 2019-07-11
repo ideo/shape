@@ -5,6 +5,9 @@ import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import FilestackUpload from '~/utils/FilestackUpload'
 import { fakeCollectionCard } from '#/mocks/data'
+import googleTagManager from '~/vendor/googleTagManager'
+
+jest.mock('../../../../app/javascript/vendor/googleTagManager')
 
 const mockCardMethods = {
   API_create: jest.fn().mockResolvedValue({ record: { id: 1 } }),
@@ -39,7 +42,7 @@ describe('GridCardBlank', () => {
     expectTreeToMatchSnapshot(wrapper)
   })
 
-  describe('when creating a new card', () => {
+  describe('when starting to create a new card (choosing an option)', () => {
     it('renders the content creation buttons', () => {
       expect(wrapper.find('BctButtonBox').length).toBe(7)
     })
@@ -69,11 +72,6 @@ describe('GridCardBlank', () => {
       expect(wrapper.find('LinkCreator').props().type).toEqual('video')
     })
 
-    it('calls API_create with TextItem onClick handler', async () => {
-      await wrapper.instance().createTextItem()
-      expect(mockCardMethods.API_create).toHaveBeenCalled()
-    })
-
     it('opens LinkCreator (link) with onClick handler', () => {
       component.startCreating('link')()
       wrapper.update()
@@ -81,21 +79,28 @@ describe('GridCardBlank', () => {
       expect(wrapper.find('LinkCreator').props().type).toEqual('link')
     })
 
-    it('calls API_create when creating', async () => {
-      await wrapper.instance().createCard()
-      expect(wrapper.state().loading).toBeTruthy()
-      expect(mockCardMethods.API_create).toHaveBeenCalled()
-    })
+    describe('when creating a card', () => {
+      it('calls API_create with TextItem onClick handler', async () => {
+        await wrapper.instance().createTextItem()
+        expect(mockCardMethods.API_create).toHaveBeenCalled()
+      })
 
-    // TODO: was having all sorts of problems getting this test to work without breaking others
-    it('adds the card record to the uiStore as a new card', async () => {
-      await wrapper.instance().createCard()
-      return new Promise(resolve => {
-        setTimeout(() => {
-          expect(fakeUiStore.addNewCard).toHaveBeenCalled()
-          // id: 1 comes from mockCardMethods defined at top
-          expect(fakeUiStore.addNewCard).toHaveBeenCalledWith(1)
-          resolve()
+      it('calls API_create when creating', async () => {
+        await wrapper.instance().createCard()
+        expect(wrapper.state().loading).toBeTruthy()
+        expect(mockCardMethods.API_create).toHaveBeenCalled()
+      })
+
+      // TODO: was having all sorts of problems getting this test to work without breaking others
+      it('adds the card record to the uiStore as a new card', async () => {
+        await wrapper.instance().createCard()
+        return new Promise(resolve => {
+          setTimeout(() => {
+            expect(fakeUiStore.addNewCard).toHaveBeenCalled()
+            // id: 1 comes from mockCardMethods defined at top
+            expect(fakeUiStore.addNewCard).toHaveBeenCalledWith(1)
+            resolve()
+          })
         })
       })
     })
@@ -138,6 +143,21 @@ describe('GridCardBlank', () => {
       await wrapper.instance().createCard()
       expect(wrapper.state().loading).toBeTruthy()
       expect(mockCardMethods.API_replace).toHaveBeenCalledWith({ replacingId })
+    })
+  })
+
+  describe('afterCreate', () => {
+    describe('when creating a TextItem', () => {
+      it('pushes an event to google tag manager', () => {
+        const afterCreate = component.afterCreate('Item::TextItem')
+        afterCreate({ record: {} })
+
+        expect(googleTagManager.push).toHaveBeenCalledWith({
+          event: 'formSubmission',
+          formType: `Create Item::TextItem`,
+          parentType: 'anywhere',
+        })
+      })
     })
   })
 })

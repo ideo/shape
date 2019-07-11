@@ -1,10 +1,13 @@
 import fakeApiStore from '#/mocks/fakeApiStore'
 import AddAudienceModal from '~/ui/test_collections/AudienceSettings/AddAudienceModal'
+import googleTagManager from '~/vendor/googleTagManager'
+
+jest.mock('../../../../app/javascript/vendor/googleTagManager')
 
 const waitForAsync = () => new Promise(resolve => setImmediate(resolve))
 
 describe('AddAudienceModal', () => {
-  let props, wrapper
+  let props, wrapper, component
 
   beforeEach(() => {
     props = {
@@ -14,6 +17,7 @@ describe('AddAudienceModal', () => {
       afterSave: jest.fn(),
     }
     wrapper = shallow(<AddAudienceModal.wrappedComponent {...props} />)
+    component = wrapper.instance()
   })
 
   it('validates form when inputting name', () => {
@@ -92,5 +96,16 @@ describe('AddAudienceModal', () => {
     expect(props.afterSave).toHaveBeenCalledWith(
       expect.objectContaining({ name: 'Test Audience' })
     )
+  })
+
+  describe('trackAudienceCreation', () => {
+    it('pushes an event to google tag manager', () => {
+      component.trackAudienceCreation()
+
+      expect(googleTagManager.push).toHaveBeenCalledWith({
+        event: 'formSubmission',
+        formType: 'Create Audience',
+      })
+    })
   })
 })

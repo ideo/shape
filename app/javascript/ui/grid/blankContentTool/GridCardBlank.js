@@ -4,6 +4,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { runInAction } from 'mobx'
 import styled from 'styled-components'
 import { Flex } from 'reflexbox'
+import googleTagManager from '~/vendor/googleTagManager'
 
 import AddTextIcon from '~/ui/icons/AddTextIcon'
 import AddCollectionIcon from '~/ui/icons/AddCollectionIcon'
@@ -290,7 +291,23 @@ class GridCardBlank extends React.Component {
         },
       },
     }
-    this.createCard(attrs)
+    this.createCard(attrs, {
+      afterCreate: this.afterCreate(ITEM_TYPES.FILE),
+    })
+  }
+
+  afterCreate = type => {
+    return card => {
+      googleTagManager.push({
+        event: 'formSubmission',
+        formType: `Create ${type}`,
+        parentType: this.props.parent.isBoard ? 'foamcore' : 'anywhere',
+      })
+
+      if (type === ITEM_TYPES.TEXT) {
+        this.props.uiStore.update('textEditingItem', card.record)
+      }
+    }
   }
 
   createDefaultReportCard = () => {
@@ -307,6 +324,7 @@ class GridCardBlank extends React.Component {
           },
         },
       },
+      afterCreate: this.afterCreate(ITEM_TYPES.DATA),
     })
   }
 
@@ -377,9 +395,7 @@ class GridCardBlank extends React.Component {
         },
       },
       {
-        afterCreate: card => {
-          this.props.uiStore.update('textEditingItem', card.record)
-        },
+        afterCreate: this.afterCreate(ITEM_TYPES.TEXT),
       }
     )
   }
