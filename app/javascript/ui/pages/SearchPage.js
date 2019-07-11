@@ -9,6 +9,7 @@ import Deactivated from '~/ui/layout/Deactivated'
 import MoveModal from '~/ui/grid/MoveModal'
 import PageContainer from '~/ui/layout/PageContainer'
 import SearchResultsInfinite from '~/ui/search/SearchResultsInfinite'
+import { stringifyUrlParams } from '~/utils/url'
 
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
@@ -57,10 +58,7 @@ class SearchPage extends React.Component {
       return true
     }
     // i.e. you are on SearchPage and perform a new search
-    return (
-      this.searchQuery(prevProps.location) !== this.searchQuery(location) &&
-      this.searchQuery(location)
-    )
+    return prevProps.location !== location && this.searchQuery(location)
   }
 
   fetchData = (page = 1) => {
@@ -109,9 +107,19 @@ class SearchPage extends React.Component {
     return query
   }
 
+  searchParams = location => {
+    const parsedParams = queryString.parse(location.search)
+    const params = parsedParams
+    delete params.q
+    delete params['']
+    if (!params) return {}
+    return params
+  }
+
   requestPath = (page = 1) => {
     const q = this.searchQuery(this.props.location, { url: true })
-    return `organizations/${this.urlSlug}/search?query=${q}&page=${page}`
+    const params = stringifyUrlParams(this.searchParams(this.props.location))
+    return `organizations/${this.urlSlug}/search?query=${q}&page=${page}&${params}`
   }
 
   handleInfiniteLoad = page => {
@@ -126,10 +134,10 @@ class SearchPage extends React.Component {
     if (!query) {
       return null
     }
+    if (uiStore.isLoading) {
+      return <Loader />
+    }
     if (this.searchResults.length === 0) {
-      if (uiStore.isLoading) {
-        return <Loader />
-      }
       return (
         <div>
           No results found for &quot;

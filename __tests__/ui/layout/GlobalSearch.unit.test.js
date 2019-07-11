@@ -8,6 +8,7 @@ describe('GlobalSearch', () => {
       pathTo: jest.fn(),
       routeTo: jest.fn(),
       pathContains: jest.fn(),
+      extraSearchParams: {},
     }
     props = {
       routingStore,
@@ -24,5 +25,20 @@ describe('GlobalSearch', () => {
       'searchText',
       ev.target.value
     )
+  })
+
+  describe('when searching archived content', () => {
+    beforeEach(() => {
+      component.searchArchived = true
+    })
+
+    it('should include search archived in the params', () => {
+      component._search('hello')
+      expect(props.routingStore.routeTo).toHaveBeenCalledWith(
+        'search',
+        'hello',
+        { show_archived: true }
+      )
+    })
   })
 })

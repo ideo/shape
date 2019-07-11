@@ -63,24 +63,26 @@ describe Api::V1::CommentThreadsController, type: :request, json: true, auth: tr
   end
 
   describe 'GET #find_by_record' do
+    let(:record_type) { 'Item' }
+    let(:record_id) { comment_thread.record_id }
     let!(:comment_thread) { create(:item_comment_thread, num_comments: 1) }
     let(:path) { "/api/v1/comment_threads/find_by_record/#{record_type}/#{record_id}" }
 
     before do
+      # default to user `current_organization` when none is passed in
+      user.update(current_organization_id: comment_thread.organization_id)
       user.add_role(Role::EDITOR, comment_thread.record)
       get(path)
     end
 
     context 'with valid record' do
-      let(:record_type) { 'Item' }
-      let(:record_id) { comment_thread.record_id }
-
       it 'returns a 200' do
         expect(response.status).to eq(200)
       end
 
       it 'matches JSON schema' do
         expect(json['data']['attributes']).to match_json_schema('comment_thread')
+        expect(json['data']['id']).to eq(comment_thread.id.to_s)
       end
     end
 
@@ -93,6 +95,35 @@ describe Api::V1::CommentThreadsController, type: :request, json: true, auth: tr
       end
       it 'returns nil' do
         expect(json['data']).to be nil
+      end
+    end
+
+    context 'without matching organization' do
+      let(:path) { "/api/v1/comment_threads/find_by_record/#{record_type}/#{record_id}?organization_id=9999" }
+
+      it 'returns a 200' do
+        expect(response.status).to eq(200)
+      end
+      it 'returns nil' do
+        expect(json['data']).to be nil
+      end
+    end
+
+    context 'with multiple organizations' do
+      let(:org_2) { create(:organization_without_groups) }
+      let!(:comment_thread_2) do
+        create(:item_comment_thread, num_comments: 1, record: comment_thread.record, organization_id: org_2.id)
+      end
+      let(:path) { "/api/v1/comment_threads/find_by_record/#{record_type}/#{record_id}?organization_id=#{org_2.id}" }
+
+      before do
+        user.add_role(Role::EDITOR, comment_thread_2.record)
+        get(path)
+      end
+
+      it 'finds the comment thread for that organization' do
+        expect(response.status).to eq(200)
+        expect(json['data']['id']).to eq(comment_thread_2.id.to_s)
       end
     end
   end

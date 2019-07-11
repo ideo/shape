@@ -36,7 +36,7 @@ describe('SearchPage', () => {
   it('makes an API call to fetch the search results', () => {
     const { slug } = apiStore.currentUserOrganization
     expect(apiStore.request).toBeCalledWith(
-      `organizations/${slug}/search?query=${query}&page=1`
+      `organizations/${slug}/search?query=${query}&page=1&`
     )
   })
 

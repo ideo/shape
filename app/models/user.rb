@@ -344,7 +344,11 @@ class User < ApplicationRecord
   def current_user_collection(org_id = current_organization_id)
     return nil unless org_id
     type = bot_user? ? 'Application' : 'User'
-    collections.find_by(organization_id: org_id, type: "Collection::#{type}Collection")
+    user_collection = collections.find_by(organization_id: org_id, type: "Collection::#{type}Collection")
+    if user_collection.nil? && has_cached_role?(Role::SUPER_ADMIN)
+      user_collection = Organization.find(org_id).template_collection
+    end
+    user_collection
   end
 
   def current_shared_collection(org_id = current_organization_id)
@@ -469,6 +473,10 @@ class User < ApplicationRecord
     end
     return if first_line_owed.blank?
     first_line_owed.created_at + TestAudience::PAYMENT_WAITING_PERIOD
+  end
+
+  def sync_network_groups
+    SyncNetworkGroups.call(self)
   end
 
   private

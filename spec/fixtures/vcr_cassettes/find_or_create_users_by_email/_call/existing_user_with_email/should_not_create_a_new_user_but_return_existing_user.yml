@@ -1,0 +1,137 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/users_roles?filter%5Brole_resource_type%5D=Group&filter%5Buser_uid%5D&include=role
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.12.2
+      Content-Type:
+      - application/vnd.api+json
+      Accept:
+      - application/vnd.api+json
+      Authorization:
+      - Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJ0eXBlIjoiYXBwbGljYXRpb24iLCJjbGllbnRfaWQiOiIzNjk1YzVmZTU1YWIzZGI2ZjllZTI1ZjE4YzBlZjJmZTcwMjVlYjQ3MTdmMWEwMzFmZDc4MjRhNWQ4Y2RkYmI1IiwidWlkIjoiMDB1ZXFieGc5ZUFpODBTWjQwaDciLCJleHBpcmVzIjoxNTUzNjMyMjI3fQ.FxfLmkVWB70FBcm9rZ3odahqNjTephdbNhtAWAZ2F6Wk34aZVhdxc8yCXgijIq49p5LTx-6pG09hQARvC7jJLNVPo3N2Ht8QgVurrfStCu3LOEMbOrzgJH7wDp62q1UG8A0JCqooSWlZhWmO_vh9J99Q5nrALmafTej1jL2WYnjpPk6K16PlDrOf14nLjhWx9NWn0hm1BAAHjWTC11H1AXhMrvxiLgHuAqupMOBZZUBKBw6MWBRwfWBCyKaB-dbvbLKj0pHFGuScouzOSDzzr4JJq0l2JgSWbxrcsvevH0UTA3XPrQA5ciDAwNdf0PzhcSOIgN14xv-fcGwE8B2HXQ
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 500
+      message: Internal Server Error
+    headers:
+      Server:
+      - Cowboy
+      Date:
+      - Tue, 09 Jul 2019 21:52:08 GMT
+      Connection:
+      - keep-alive
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/scim+json; charset=utf-8
+      Set-Cookie:
+      - _sso_profile_session=WjlqS1IwZUVkS3pPazRRMURVRG5OdWRtcmU3V05WOW9MalRxMHdYTThWZnNLTW0xdFNmTlBNVHpTbCsxOWpyZWhNajV0dkN2R1I2TGdmMkpRY2RnM0hoUUd6czJCSjNIZnYvWXZ3dmwwL0RKd0J3Ui8yamtnLzVSTEtqamFtZ2YtLTFmeWd3dzdVaVA1U2dGLzZHQVN1MGc9PQ%3D%3D--0133f53b15b97c5bd4c7dce5c695cfa81c280dbe;
+        path=/; expires=Wed, 10 Jul 2019 01:52:08 -0000; HttpOnly; secure
+      - rack.session=BAh7BkkiD3Nlc3Npb25faWQGOgZFVEkiRWY0MmY4YmY1ODNiYTJmODJkMDE0%0ANWVlYzlmZTgyNjU5NGQyNzI0NzE2ZjhjZmYwMGYyYzc2OGVlZmFjNzA3MmQG%0AOwBG%0A--194cb4bf08ea178a10c945f42a47f3a4c88d07d1;
+        path=/; expires=Wed, 10 Jul 2019 01:52:08 -0000; HttpOnly; secure
+      Cache-Control:
+      - no-cache
+      X-Request-Id:
+      - b4cd4298-d597-40bb-b03e-d72c3760f450
+      X-Runtime:
+      - '0.013227'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Vary:
+      - Origin
+      Transfer-Encoding:
+      - chunked
+      Via:
+      - 1.1 vegur
+    body:
+      encoding: UTF-8
+      string: '{"errors":[{"code":"internal_server_error","status":"500","title":"Error","detail":"We''ve
+        notified our engineers and hope to address this issue shortly.","meta":{}}]}'
+    http_version: 
+  recorded_at: Tue, 09 Jul 2019 21:52:09 GMT
+- request:
+    method: get
+    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/users_roles?filter%5Brole_resource_type%5D=Group&filter%5Buser_uid%5D&include=role
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.12.2
+      Content-Type:
+      - application/vnd.api+json
+      Accept:
+      - application/vnd.api+json
+      Authorization:
+      - Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJ0eXBlIjoiYXBwbGljYXRpb24iLCJjbGllbnRfaWQiOiIzNjk1YzVmZTU1YWIzZGI2ZjllZTI1ZjE4YzBlZjJmZTcwMjVlYjQ3MTdmMWEwMzFmZDc4MjRhNWQ4Y2RkYmI1IiwidWlkIjoiMDB1ZXFieGc5ZUFpODBTWjQwaDciLCJleHBpcmVzIjoxNTUzNjMyMjI3fQ.FxfLmkVWB70FBcm9rZ3odahqNjTephdbNhtAWAZ2F6Wk34aZVhdxc8yCXgijIq49p5LTx-6pG09hQARvC7jJLNVPo3N2Ht8QgVurrfStCu3LOEMbOrzgJH7wDp62q1UG8A0JCqooSWlZhWmO_vh9J99Q5nrALmafTej1jL2WYnjpPk6K16PlDrOf14nLjhWx9NWn0hm1BAAHjWTC11H1AXhMrvxiLgHuAqupMOBZZUBKBw6MWBRwfWBCyKaB-dbvbLKj0pHFGuScouzOSDzzr4JJq0l2JgSWbxrcsvevH0UTA3XPrQA5ciDAwNdf0PzhcSOIgN14xv-fcGwE8B2HXQ
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 500
+      message: Internal Server Error
+    headers:
+      Server:
+      - Cowboy
+      Date:
+      - Tue, 09 Jul 2019 21:52:08 GMT
+      Connection:
+      - keep-alive
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/scim+json; charset=utf-8
+      Set-Cookie:
+      - _sso_profile_session=YmdpL2tiTGNQNUlNZC9PSDhKTmh6Q1hrblEzYVZIVCtKYzNUREQxQVMyd3o2amdsM2MrS3JaWldGNnk4QWkrMHJZNGp2Y2VLQkkvTWNYUmhIa29xMGhKUktycmZYYjViZitVRnN3WXlaSFRwVFoxTFVCd3lGL1JSVmpJL2JQblEtLUxETTFOUEZHVVFpNXpLaXhIZDNwMGc9PQ%3D%3D--d6c65c0d4e5a7bb878b7927182b92aa22933f965;
+        path=/; expires=Wed, 10 Jul 2019 01:52:09 -0000; HttpOnly; secure
+      - rack.session=BAh7BkkiD3Nlc3Npb25faWQGOgZFVEkiRWMyNzQxMWM4MGYzYWYwMDM2OGFk%0AYWIyODRhYTEzNTQyYThjYzgzNmMyNmI3YmNjYzY0MjNmOGQ2MDI1OGQ0ZGUG%0AOwBG%0A--07caf3e866095234af36edf2415f5ed72658b5a3;
+        path=/; expires=Wed, 10 Jul 2019 01:52:09 -0000; HttpOnly; secure
+      Cache-Control:
+      - no-cache
+      X-Request-Id:
+      - f32ab226-a410-4386-8862-3884f0cdb5a5
+      X-Runtime:
+      - '0.018610'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Vary:
+      - Origin
+      Transfer-Encoding:
+      - chunked
+      Via:
+      - 1.1 vegur
+    body:
+      encoding: UTF-8
+      string: '{"errors":[{"code":"internal_server_error","status":"500","title":"Error","detail":"We''ve
+        notified our engineers and hope to address this issue shortly.","meta":{}}]}'
+    http_version: 
+  recorded_at: Tue, 09 Jul 2019 21:52:09 GMT
+recorded_with: VCR 4.0.0

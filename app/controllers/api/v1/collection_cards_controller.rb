@@ -63,6 +63,9 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     if @collection_card.save
       create_notification(@collection_card, :edited)
       broadcast_collection_create_updates
+      if @collection_card.saved_change_to_is_cover?
+        broadcast_parent_collection_updates
+      end
       render jsonapi: @collection_card.reload,
              include: CollectionCard.default_relationships_for_api
     else
@@ -70,17 +73,29 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     end
   end
 
-  before_action :load_and_authorize_cards, only: %i[archive unarchive]
-  after_action :broadcast_collection_archive_updates, only: %i[archive unarchive]
+  before_action :load_and_authorize_cards, only: %i[archive unarchive unarchive_from_email]
+  after_action :broadcast_collection_archive_updates, only: %i[archive unarchive unarchive_from_email]
   def archive
     @collection_cards.archive_all!(user_id: current_user.id)
     render json: { archived: true }
   end
 
   def unarchive
-    @collection = Collection.find(json_api_params[:collection_snapshot][:id])
+    if json_api_params[:collection_snapshot].present?
+      @collection = Collection.find(json_api_params[:collection_snapshot][:id])
+    else
+      @collection = Collection.find(@collection_cards.first.parent.id)
+    end
     @collection.unarchive_cards!(@collection_cards, collection_snapshot_params)
     render jsonapi: @collection.reload
+  end
+
+  def unarchive_from_email
+    @collection = Collection.find(@collection_cards.first.parent.id)
+    if @collection_cards.any?(&:archived)
+      @collection.unarchive_cards!(@collection_cards, {})
+    end
+    redirect_to frontend_url_for(@collection).to_s
   end
 
   before_action :load_and_authorize_replacing_card, only: %i[replace]
@@ -165,11 +180,13 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def load_collection_cards
+    filter_params = params[:filter].present? ? params[:filter] : params
     @collection_cards = CollectionCardFilter
                         .call(
                           collection: @collection,
                           user: current_user,
-                          filters: params.merge(page: @page),
+                          filters: filter_params.merge(page: @page),
+                          application: current_application,
                         )
 
     return unless user_signed_in?
@@ -278,6 +295,12 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     CollectionUpdateBroadcaster.call(@collection, current_user)
   end
 
+  def broadcast_parent_collection_updates
+    parent = @collection.parent
+    return unless parent.present?
+    CollectionUpdateBroadcaster.call(parent, current_user)
+  end
+
   def broadcast_collection_archive_updates
     return unless @collection_cards.first.present?
     CollectionUpdateBroadcaster.call(@collection_cards.first.parent, current_user)
@@ -300,7 +323,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def collection_snapshot_params
-    json_api_params[:collection_snapshot].require(:attributes).permit(
+    return {} if json_api_params[:collection_snapshot].nil?
+    json_api_params[:collection_snapshot].permit(:attributes).permit(
       collection_cards_attributes: %i[id order width height row col],
     )
   end
@@ -354,11 +378,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
           :data_source_type,
           :data_source_id,
           style: {},
-          cached_data: [
-            :value,
-            :date,
-            :percentage,
-            :column,
+          cached_data: %i[
+            value
+            date
+            percentage
+            column
           ],
         ],
       ],

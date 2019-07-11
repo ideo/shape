@@ -87,15 +87,15 @@
 </div>
 <div class="Notification__Container">
   <% @notifications.each do |notification| %>
-    <a
-      href="<%= notification.activity.action != 'archived' ? frontend_url_for(notification.activity.target) : root_url %>?open=notifications"
-    >
       <div class="Notification">
+        <a
+          href="<%= frontend_url_for(notification.activity.target) %>?open=notifications"
+        >
         <div class="Rfx">
           <div class="Notification__ButtonContainer">
-            <div class="buttons__NotificationButton"></div>
+            <div class="button_sg_NotificationButton"></div>
           </div>
-          <div>
+          <div style="width: 100%">
             <span class="Moment">
               <%= notification.created_at.strftime('%b %e - %l:%M %p') %>
             </span>
@@ -108,7 +108,9 @@
                 <span class="bold"><%= notification.activity.subject_users.map(&:name).join(', ') %></span>
                 a(n) <%= notification.activity.action.to_s.split('_')[1] %> of <%= notification.activity.target.name %>
               <% when "archived" %>
-                <span class="bold"><%= notification.activity.actor.name %></span> has deleted <span class="bold"><%= notification.activity.target.name %></span>
+                <div class="Activity__ActivityText">
+                  <span class="bold"><%= notification.activity.actor.name %></span> has deleted <span class="bold"><%= notification.activity.target.name %></span>
+                </div>
               <% when "commented" %>
                 <span class="bold"><%= notification.activity.actor.name %></span> commented on <%= notification.activity.target.name %>
               <% when "mentioned" %>
@@ -120,7 +122,12 @@
             </div>
           </div>
         </div>
+        </a>
+        <% if notification.activity.action == 'archived' %>
+          <div class="center">
+            <a class="standard-button" href="<%=frontend_url_for_type(notification.activity.target) %>/unarchive_from_email?card_ids=[<%= notification.activity.target.parent_collection_card.id%>]">Restore</a>
+          </div>
+        <% end %>
       </div>
-    </a>
   <% end %>
 </div>

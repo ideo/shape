@@ -109,7 +109,7 @@ class TextItemCover extends React.Component {
     }
   }
 
-  cancel = async (item, ev) => {
+  cancel = async ({ item, ev } = {}) => {
     if (this.unmounted) {
       return
     }

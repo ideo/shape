@@ -355,8 +355,8 @@ class CollectionCover extends React.Component {
 }
 
 CollectionCover.propTypes = {
-  width: PropTypes.number.isRequired,
-  height: PropTypes.number.isRequired,
+  width: PropTypes.number,
+  height: PropTypes.number,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   cardId: PropTypes.string.isRequired,
   inSubmissionsCollection: PropTypes.bool,
@@ -368,6 +368,8 @@ CollectionCover.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 CollectionCover.defaultProps = {
+  width: 1,
+  height: 1,
   inSubmissionsCollection: false,
   dragging: false,
   searchResult: false,

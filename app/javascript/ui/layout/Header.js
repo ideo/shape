@@ -89,6 +89,16 @@ class Header extends React.Component {
     this.props.uiStore.update('organizationMenuPage', null)
   }
 
+  get onArchivedPage() {
+    const { record } = this
+    const { routingStore } = this.props
+    const searchingArchived = routingStore.extraSearchParams.show_archived
+    return (
+      (record && record.archived) ||
+      (routingStore.isSearch && searchingArchived)
+    )
+  }
+
   routeBack = ({ type } = {}) => {
     const { record } = this
     const { routingStore } = this.props
@@ -186,7 +196,7 @@ class Header extends React.Component {
   @computed
   get record() {
     const { uiStore } = this.props
-    return uiStore.viewingCollection || uiStore.viewingItem
+    return uiStore.viewingRecord
   }
 
   renderMobileSearch() {
@@ -240,7 +250,23 @@ class Header extends React.Component {
 
     return (
       <Fragment>
-        <FixedHeader data-empty-space-click>
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+          body { background-color:  ${
+            this.onArchivedPage
+              ? v.colors.commonMediumTint
+              : v.colors.commonLight
+          };
+          transition: background-color 0.5s ease;
+          }
+        `,
+          }}
+        />
+        <FixedHeader
+          darkBackground={this.onArchivedPage}
+          data-empty-space-click
+        >
           <MaxWidthContainer>
             <Flex
               data-empty-space-click

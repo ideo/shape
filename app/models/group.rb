@@ -14,12 +14,14 @@
 #  updated_at                   :datetime         not null
 #  current_shared_collection_id :integer
 #  filestack_file_id            :integer
+#  network_id                   :string
 #  organization_id              :bigint(8)
 #
 # Indexes
 #
 #  index_groups_on_autojoin_emails  (autojoin_emails) USING gin
 #  index_groups_on_handle           (handle)
+#  index_groups_on_network_id       (network_id)
 #  index_groups_on_organization_id  (organization_id)
 #  index_groups_on_type             (type)
 #
@@ -161,6 +163,13 @@ class Group < ApplicationRecord
 
   def requires_org?
     true
+  end
+
+  def update_from_network_profile(params)
+    %i[name external_id].each do |field|
+      send("#{field}=", params[field]) if params[field].present?
+    end
+    save
   end
 
   private

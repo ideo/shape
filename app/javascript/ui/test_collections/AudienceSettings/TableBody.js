@@ -4,7 +4,7 @@ import AutosizeInput from 'react-input-autosize'
 
 import v from '~/utils/variables'
 import styled from 'styled-components'
-import { StyledRowFlexParent, StyledRowFlexCell } from './styled'
+import { StyledRowFlexParent, AudienceRowCell } from './styled'
 import { DisplayText } from '~/ui/global/styled/typography'
 
 const EditableInput = styled(AutosizeInput)`
@@ -51,7 +51,7 @@ class TableBody extends React.Component {
 
     return (
       <StyledRowFlexParent>
-        <StyledRowFlexCell>
+        <AudienceRowCell>
           <DisplayText color={textColor}>
             <strong>
               {selectedWithPrice
@@ -59,8 +59,8 @@ class TableBody extends React.Component {
                 : '–'}
             </strong>
           </DisplayText>
-        </StyledRowFlexCell>
-        <StyledRowFlexCell>
+        </AudienceRowCell>
+        <AudienceRowCell>
           {selectedWithPrice ? (
             <EditableInput
               id={audience.id}
@@ -73,8 +73,8 @@ class TableBody extends React.Component {
           ) : (
             <DisplayText color={textColor}>–</DisplayText>
           )}
-        </StyledRowFlexCell>
-        <StyledRowFlexCell>
+        </AudienceRowCell>
+        <AudienceRowCell>
           <DisplayText color={textColor}>
             <strong>
               {sampleSize > 0 && selected
@@ -82,7 +82,7 @@ class TableBody extends React.Component {
                 : '–'}
             </strong>
           </DisplayText>
-        </StyledRowFlexCell>
+        </AudienceRowCell>
       </StyledRowFlexParent>
     )
   }
