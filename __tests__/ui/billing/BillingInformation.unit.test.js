@@ -3,8 +3,9 @@ import { shallow } from 'enzyme'
 import Loader from '~/ui/layout/Loader'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
+let wrapper
 const render = async (apiStore, networkStore) => {
-  const wrapper = shallow(
+  wrapper = shallow(
     <BillingInformation.wrappedComponent
       apiStore={apiStore}
       networkStore={networkStore}
@@ -36,7 +37,7 @@ describe('BillingInformation', () => {
         trial_users_count: 0,
         trial_ends_at: '2022-01-01',
         is_within_trial_period: true,
-        price_per_user: 1.23,
+        price_per_user: 5,
         current_billing_period_start: '2015-01-01',
         current_billing_period_end: '2015-01-31',
         deactivated: false,
@@ -70,6 +71,7 @@ describe('BillingInformation', () => {
       })
       it('renders trial information', async () => {
         await render(apiStore, networkStore)
+        expect(wrapper.find('FreeTrial').exists()).toBe(true)
       })
     })
 
@@ -81,6 +83,7 @@ describe('BillingInformation', () => {
 
       it('renders without trial information', async () => {
         await render(apiStore, networkStore)
+        expect(wrapper.find('FreeTrial').exists()).toBe(false)
       })
     })
 
@@ -93,17 +96,53 @@ describe('BillingInformation', () => {
 
       it('renders with trial and billing information', async () => {
         await render(apiStore, networkStore)
+        const hasBillableCount = wrapper.find('[data-jest="billableUserCount"]')
+        expect(wrapper.find('FreeTrial').exists()).toBe(true)
+        expect(hasBillableCount.prop('children')).toEqual(95)
+      })
+    })
+
+    describe('with freemium users not over the limit', () => {
+      beforeEach(() => {
+        apiStore.currentUserOrganization.active_users_count = 3
+        global.FREEMIUM_USER_LIMIT = 5
+        apiStore.currentUserOrganization.is_within_trial_period = false
+      })
+
+      it('renders the trial information', async () => {
+        await render(apiStore, networkStore)
+        expect(wrapper.find('FreeTrial').exists()).toBe(true)
+        expect(wrapper.find('FancyDollarAmount').prop('children')).toEqual(0)
+      })
+    })
+
+    describe('with freemium users are over the limit', () => {
+      beforeEach(() => {
+        apiStore.currentUserOrganization.active_users_count = 6
+        global.FREEMIUM_USER_LIMIT = 5
+        apiStore.currentUserOrganization.is_within_trial_period = false
+      })
+
+      it('does not render the trial information', async () => {
+        await render(apiStore, networkStore)
+        expect(wrapper.find('FreeTrial').exists()).toBe(false)
+        expect(wrapper.find('FancyDollarAmount').prop('children')).toEqual(30)
       })
     })
   })
 
   describe('in app billing disabled', () => {
     beforeEach(() => {
-      apiStore.currentUserOrganization.in_app_billing = true
+      apiStore.currentUserOrganization.in_app_billing = false
     })
 
     it('renders with the in app billing notice', async () => {
       await render(apiStore, networkStore)
+    })
+
+    it('does not render the trial information', async () => {
+      await render(apiStore, networkStore)
+      expect(wrapper.find('FreeTrial').exists()).toBe(false)
     })
   })
 })
