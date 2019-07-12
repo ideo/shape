@@ -2,13 +2,17 @@ require 'rails_helper'
 
 RSpec.describe MarkAsOverdueWorker, type: :worker do
   describe '#perform' do
+    let(:over_trial_user_count) { Organization::DEFAULT_TRIAL_USERS_COUNT + 5 }
+    let(:under_trial_user_count) { Organization::DEFAULT_TRIAL_USERS_COUNT - 5 }
+    let(:over_freemium_user_count) { Organization::FREEMIUM_USER_LIMIT + 2 }
+    let(:under_freemium_user_count) { Organization::FREEMIUM_USER_LIMIT - 2 }
     let!(:in_app_billing_disabled) do
       create(:organization,
              in_app_billing: false,
              trial_ends_at: 1.week.ago,
              has_payment_method: false,
-             active_users_count: 10,
-             trial_users_count: 5,
+             active_users_count: over_trial_user_count,
+             trial_users_count: Organization::DEFAULT_TRIAL_USERS_COUNT,
              overdue_at: nil)
     end
 
@@ -18,8 +22,8 @@ RSpec.describe MarkAsOverdueWorker, type: :worker do
              in_app_billing: true,
              trial_ends_at: 1.week.ago,
              has_payment_method: false,
-             active_users_count: 10,
-             trial_users_count: 5,
+             active_users_count: over_trial_user_count,
+             trial_users_count: Organization::DEFAULT_TRIAL_USERS_COUNT,
              overdue_at: nil)
     end
 
@@ -28,8 +32,8 @@ RSpec.describe MarkAsOverdueWorker, type: :worker do
              in_app_billing: true,
              trial_ends_at: 1.week.ago,
              has_payment_method: true,
-             active_users_count: 10,
-             trial_users_count: 5,
+             active_users_count: over_trial_user_count,
+             trial_users_count: Organization::DEFAULT_TRIAL_USERS_COUNT,
              overdue_at: nil)
     end
 
@@ -38,8 +42,8 @@ RSpec.describe MarkAsOverdueWorker, type: :worker do
              in_app_billing: true,
              trial_ends_at: 1.week.ago,
              has_payment_method: false,
-             active_users_count: 10,
-             trial_users_count: 5,
+             active_users_count: over_trial_user_count,
+             trial_users_count: Organization::DEFAULT_TRIAL_USERS_COUNT,
              overdue_at: 1.week.ago)
     end
 
@@ -48,8 +52,28 @@ RSpec.describe MarkAsOverdueWorker, type: :worker do
              in_app_billing: true,
              trial_ends_at: 1.week.from_now,
              has_payment_method: false,
-             active_users_count: 1,
-             trial_users_count: 5,
+             active_users_count: under_trial_user_count,
+             trial_users_count: Organization::DEFAULT_TRIAL_USERS_COUNT,
+             overdue_at: nil)
+    end
+
+    let!(:no_trial_and_has_not_exceeded_freemium_limit) do
+      create(:organization,
+             in_app_billing: true,
+             trial_ends_at: nil,
+             has_payment_method: false,
+             active_users_count: under_freemium_user_count,
+             trial_users_count: 0,
+             overdue_at: nil)
+    end
+
+    let!(:trial_ended_but_has_not_exceeded_freemium_limit) do
+      create(:organization,
+             in_app_billing: true,
+             trial_ends_at: 1.week.ago,
+             has_payment_method: false,
+             active_users_count: under_freemium_user_count,
+             trial_users_count: 0,
              overdue_at: nil)
     end
 
@@ -58,18 +82,18 @@ RSpec.describe MarkAsOverdueWorker, type: :worker do
              in_app_billing: true,
              trial_ends_at: 1.week.from_now,
              has_payment_method: false,
-             active_users_count: 10,
-             trial_users_count: 5,
+             active_users_count: over_trial_user_count,
+             trial_users_count: Organization::DEFAULT_TRIAL_USERS_COUNT,
              overdue_at: nil)
     end
 
-    let!(:trial_ended) do
+    let!(:trial_ended_over_freemium_limit) do
       create(:organization,
              in_app_billing: true,
              trial_ends_at: 1.week.ago,
              has_payment_method: false,
-             active_users_count: 1,
-             trial_users_count: 5,
+             active_users_count: over_freemium_user_count,
+             trial_users_count: Organization::DEFAULT_TRIAL_USERS_COUNT,
              overdue_at: nil)
     end
 
@@ -82,15 +106,17 @@ RSpec.describe MarkAsOverdueWorker, type: :worker do
         has_payment_method,
         already_set_as_overdue,
         has_not_exceeded_user_count_within_trial,
+        no_trial_and_has_not_exceeded_freemium_limit,
+        trial_ended_but_has_not_exceeded_freemium_limit,
       ].each do |org|
-        expect { org.reload }.not_to change { org.overdue_at.try(:round) }
+        expect { org.reload }.not_to(change { org.overdue_at.try(:round) })
       end
 
       [
         has_exceeded_user_count_within_trial,
-        trial_ended,
+        trial_ended_over_freemium_limit,
       ].each do |org|
-        expect { org.reload }.to change { org.overdue_at.try(:round) }
+        expect { org.reload }.to(change { org.overdue_at.try(:round) })
         expect(org.overdue_at).to be_within(5.seconds).of Time.current
       end
     end

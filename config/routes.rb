@@ -105,6 +105,7 @@ Rails.application.routes.draw do
           patch 'remove_terms_text'
           get 'check_payments'
           get 'my_collection'
+          get 'admin_users'
         end
 
         get 'search', to: 'search#search'

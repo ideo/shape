@@ -2,21 +2,23 @@ require 'rails_helper'
 
 RSpec.describe TrialUsersCountExceededWorker, type: :worker do
   describe '#perform' do
+    let(:over_trial_user_count) { Organization::DEFAULT_TRIAL_USERS_COUNT + 5 }
+    let(:under_trial_user_count) { Organization::DEFAULT_TRIAL_USERS_COUNT - 5 }
     let!(:already_sent) do
       create(:organization,
              trial_users_count_exceeded_email_sent: true,
              in_app_billing: true,
              trial_ends_at: 1.day.ago,
-             active_users_count: 10,
-             trial_users_count: 5)
+             active_users_count: over_trial_user_count,
+             trial_users_count: Organization::DEFAULT_TRIAL_USERS_COUNT)
     end
     let!(:in_app_billing_disabled) do
       create(:organization,
              trial_users_count_exceeded_email_sent: false,
              in_app_billing: false,
              trial_ends_at: 1.day.ago,
-             active_users_count: 10,
-             trial_users_count: 5)
+             active_users_count: over_trial_user_count,
+             trial_users_count: Organization::DEFAULT_TRIAL_USERS_COUNT)
     end
     let!(:deactivated) do
       create(:organization,
@@ -24,40 +26,40 @@ RSpec.describe TrialUsersCountExceededWorker, type: :worker do
              in_app_billing: true,
              deactivated: true,
              trial_ends_at: 1.day.ago,
-             active_users_count: 10,
-             trial_users_count: 5)
+             active_users_count: over_trial_user_count,
+             trial_users_count: Organization::DEFAULT_TRIAL_USERS_COUNT)
     end
     let!(:trial_has_not_ended) do
       create(:organization,
              trial_users_count_exceeded_email_sent: false,
              in_app_billing: true,
              trial_ends_at: 1.day.from_now,
-             active_users_count: 10,
-             trial_users_count: 5)
+             active_users_count: over_trial_user_count,
+             trial_users_count: Organization::DEFAULT_TRIAL_USERS_COUNT)
     end
     let!(:trial_users_count_not_exceeding) do
       create(:organization,
              trial_users_count_exceeded_email_sent: false,
              in_app_billing: true,
              trial_ends_at: 1.day.ago,
-             active_users_count: 5,
-             trial_users_count: 10)
+             active_users_count: under_trial_user_count,
+             trial_users_count: Organization::DEFAULT_TRIAL_USERS_COUNT)
     end
     let!(:should_process_a) do
       create(:organization,
              trial_users_count_exceeded_email_sent: false,
              in_app_billing: true,
              trial_ends_at: 1.day.ago,
-             active_users_count: 10,
-             trial_users_count: 5)
+             active_users_count: over_trial_user_count,
+             trial_users_count: Organization::DEFAULT_TRIAL_USERS_COUNT)
     end
     let!(:should_process_b) do
       create(:organization,
              trial_users_count_exceeded_email_sent: false,
              in_app_billing: true,
              trial_ends_at: 1.day.ago,
-             active_users_count: 10,
-             trial_users_count: 5)
+             active_users_count: over_trial_user_count,
+             trial_users_count: Organization::DEFAULT_TRIAL_USERS_COUNT)
     end
 
     it 'sends notices to organizations that meet the criteria' do

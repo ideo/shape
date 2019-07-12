@@ -12,8 +12,6 @@ class OrganizationBuilder
 
   def save
     result = @organization.transaction do
-      @organization.trial_ends_at = Organization::DEFAULT_TRIAL_ENDS_AT.from_now
-      @organization.trial_users_count = Organization::DEFAULT_TRIAL_USERS_COUNT
       # set it to 1 so that it doesn't start off at 0
       @organization.active_users_count = 1
       @organization.save!

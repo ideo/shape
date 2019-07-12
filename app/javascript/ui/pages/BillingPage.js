@@ -10,10 +10,18 @@ import ReactivateAccount from '~/ui/billing/ReactivateAccount'
 import ManagePaymentMethods from '~/ui/billing/ManagePaymentMethods'
 import ManageInvoices from '~/ui/billing/ManageInvoices'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
+import ReactRouterPropTypes from 'react-router-prop-types'
+import { hasKeyValueParam } from '~/utils/paramUtils.js'
 
 import { apiStore, routingStore } from '~/stores'
 
 class BillingPage extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      openPaymentMethod: false,
+    }
+  }
   componentDidMount() {
     // kick out if you're not an org admin (i.e. primary_group admin)
     if (!apiStore.currentUserOrganization.primary_group.can_edit) {
@@ -23,6 +31,10 @@ class BillingPage extends React.Component {
       // for some reason currentUser.logout() does not seem to be behaving here.
       IdeoSSO.logout('/login')
     })
+    const paramString = this.props.location.search
+    if (hasKeyValueParam(paramString, 'openPaymentMethod', 'true')) {
+      this.setState({ openPaymentMethod: true })
+    }
   }
 
   render() {
@@ -41,7 +53,9 @@ class BillingPage extends React.Component {
           <SuperAdminBillingControls />
           <ReactivateAccount />
           <BillingInformation />
-          <ManagePaymentMethods />
+          <ManagePaymentMethods
+            openPaymentMethod={this.state.openPaymentMethod}
+          />
           <ManageInvoices />
         </PageContainer>
       </Box>
@@ -49,4 +63,7 @@ class BillingPage extends React.Component {
   }
 }
 
+BillingPage.propTypes = {
+  location: ReactRouterPropTypes.location.isRequired,
+}
 export default BillingPage

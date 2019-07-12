@@ -10,7 +10,7 @@ class SerializableOrganization < BaseJsonSerializer
   belongs_to :terms_text_item
 
   attribute :filestack_file_url do
-    @object.primary_group.avatar_url
+    @object&.primary_group&.avatar_url
   end
 
   attribute :current_user_collection_id, if: -> { @include_user_collection_ids } do

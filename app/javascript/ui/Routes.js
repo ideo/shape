@@ -259,11 +259,11 @@ class Routes extends React.Component {
 
               <Route
                 path="/billing"
-                render={() => (
+                render={props => (
                   // There must be a better way to apply BillingMuiTheme to all billing pages,
                   // however sticking MuiThemeProvider within the <Switch> made it angry
                   <MuiThemeProvider theme={BillingMuiTheme}>
-                    <BillingPage />
+                    <BillingPage {...props} />
                   </MuiThemeProvider>
                 )}
               />
