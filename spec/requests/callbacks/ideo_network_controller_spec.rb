@@ -473,11 +473,11 @@ describe 'Ideo Profile API Requests' do
       }
     end
 
-    context 'event: added' do
+    context 'event: created' do
       before do
         post(
           '/callbacks/ideo_network/users_roles',
-          params: { id: users_role_id, event: 'users_role.added', data: { attributes: users_role_data }, included: [role_data] }.to_json,
+          params: { id: users_role_id, event: 'users_role.created', data: { attributes: users_role_data }, included: [role_data] }.to_json,
           headers: valid_headers,
         )
       end
@@ -491,12 +491,12 @@ describe 'Ideo Profile API Requests' do
       end
     end
 
-    context 'event: removed' do
+    context 'event: deleted' do
       before do
         user.add_role(:member, group)
         post(
           '/callbacks/ideo_network/users_roles',
-          params: { id: users_role_id, event: 'users_role.removed', data: { attributes: users_role_data }, included: [role_data] }.to_json,
+          params: { id: users_role_id, event: 'users_role.deleted', data: { attributes: users_role_data }, included: [role_data] }.to_json,
           headers: valid_headers,
         )
       end

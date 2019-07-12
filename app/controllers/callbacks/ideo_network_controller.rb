@@ -48,10 +48,10 @@ class Callbacks::IdeoNetworkController < ApplicationController
     user = User.find_by(uid: users_role_params[:user_uid])
 
     case event.to_s
-    when 'users_role.added'
-      process_group_role_added(role: role, group: group, user: user)
-    when 'users_role.removed'
-      process_group_role_removed(role: role, group: group, user: user)
+    when 'users_role.created'
+      process_group_role_created(role: role, group: group, user: user)
+    when 'users_role.deleted'
+      process_group_role_deleted(role: role, group: group, user: user)
     else
       logger.debug("Unsupported user roles event: #{event}")
       head :bad_request
@@ -105,7 +105,7 @@ class Callbacks::IdeoNetworkController < ApplicationController
     group.update_from_network_profile(group_params)
   end
 
-  def process_group_role_added(role:, group:, user:)
+  def process_group_role_created(role:, group:, user:)
     Roles::MassAssign.call(
       object: group,
       role_name: role[:name],
@@ -113,7 +113,7 @@ class Callbacks::IdeoNetworkController < ApplicationController
     )
   end
 
-  def process_group_role_removed(role:, group:, user:)
+  def process_group_role_deleted(role:, group:, user:)
     Roles::MassRemove.call(
       object: group,
       role_name: role[:name],
