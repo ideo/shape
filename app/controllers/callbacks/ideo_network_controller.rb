@@ -47,7 +47,7 @@ class Callbacks::IdeoNetworkController < ApplicationController
     group = Group.find_by(network_id: role[:resource_id])
     user = User.find_by(uid: users_role_params[:user_uid])
 
-    case event
+    case event.to_s
     when 'users_role.added'
       process_group_role_added(role: role, group: group, user: user)
     when 'users_role.removed'
@@ -56,13 +56,13 @@ class Callbacks::IdeoNetworkController < ApplicationController
       logger.debug("Unsupported user roles event: #{event}")
       head :bad_request
       return
-      end
+    end
 
     head :ok
   end
 
   def groups
-    case event
+    case event.to_s
     when 'group.created'
       process_group_created
     when 'group.deleted'
@@ -89,7 +89,7 @@ class Callbacks::IdeoNetworkController < ApplicationController
   end
 
   def process_group_created
-    organization = find_included('organizations').try(:attributes)
+    organization = find_included('organizations').try(:[], :attributes)
     return if organization.blank?
     return if Group.find_by(network_id: group_params[:id]).present?
     Group.create(name: group_params[:name],

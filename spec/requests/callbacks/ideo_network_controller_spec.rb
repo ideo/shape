@@ -354,7 +354,7 @@ describe 'Ideo Profile API Requests' do
         before do
           post(
             '/callbacks/ideo_network/groups',
-            params: { id: group_network_id, event: :created, data: { attributes: group_data }, included: [organization_data] }.to_json,
+            params: { id: group_network_id, event: 'group.created', data: { attributes: group_data }, included: [organization_data] }.to_json,
             headers: valid_headers,
           )
         end
@@ -376,7 +376,7 @@ describe 'Ideo Profile API Requests' do
           group_data.delete(:organization_id)
           post(
             '/callbacks/ideo_network/groups',
-            params: { id: group_network_id, event: :created, data: { attributes: group_data } }.to_json,
+            params: { id: group_network_id, event: 'group.created', data: { attributes: group_data } }.to_json,
             headers: valid_headers,
           )
         end
@@ -398,7 +398,7 @@ describe 'Ideo Profile API Requests' do
       before do
         post(
           '/callbacks/ideo_network/groups',
-          params: { id: group_network_id, event: :deleted, data: { attributes: group_data } }.to_json,
+          params: { id: group_network_id, event: 'group.deleted', data: { attributes: group_data } }.to_json,
           headers: valid_headers,
         )
       end
@@ -418,7 +418,7 @@ describe 'Ideo Profile API Requests' do
       it 'returns a 200' do
         post(
           '/callbacks/ideo_network/groups',
-          params: { id: group_network_id, event: :updated, data: { attributes: group_data } }.to_json,
+          params: { id: group_network_id, event: 'group.updated', data: { attributes: group_data } }.to_json,
           headers: valid_headers,
         )
         expect(response.status).to eq(200)
@@ -431,7 +431,7 @@ describe 'Ideo Profile API Requests' do
           '/callbacks/ideo_network/groups',
           params: {
             id: group_network_id,
-            event: :updated,
+            event: 'group.updated',
             data: {
               attributes: {
                 id: group_network_id,
@@ -477,7 +477,7 @@ describe 'Ideo Profile API Requests' do
       before do
         post(
           '/callbacks/ideo_network/users_roles',
-          params: { id: users_role_id, event: :added, data: { attributes: users_role_data }, included: [role_data] }.to_json,
+          params: { id: users_role_id, event: 'users_role.added', data: { attributes: users_role_data }, included: [role_data] }.to_json,
           headers: valid_headers,
         )
       end
@@ -496,7 +496,7 @@ describe 'Ideo Profile API Requests' do
         user.add_role(:member, group)
         post(
           '/callbacks/ideo_network/users_roles',
-          params: { id: users_role_id, event: :removed, data: { attributes: users_role_data }, included: [role_data] }.to_json,
+          params: { id: users_role_id, event: 'users_role.removed', data: { attributes: users_role_data }, included: [role_data] }.to_json,
           headers: valid_headers,
         )
       end
