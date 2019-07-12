@@ -14,7 +14,6 @@ import Modal from '~/ui/global/modals/Modal'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import TrashIcon from '~/ui/icons/TrashIcon'
 import v, { TARGETED_AUDIENCE_PRICE_PER_RESPONSE } from '~/utils/variables'
-import { criteriaLimitByGroup } from '~/ui/test_collections/AudienceSettings/AudienceCriteria'
 
 import {
   Checkbox,
@@ -75,6 +74,10 @@ const UnderlineLink = styled.div`
   margin-left: 4px;
   margin-right: 4px;
 `
+
+const criteriaLimitByGroup = {
+  Psychographics: 2,
+}
 
 class QueryCategoriesConfig {
   queryCategories = null
@@ -285,8 +288,6 @@ class AddAudienceModal extends React.Component {
   get reachedCriteriaLimit() {
     const { numCriteriaPerGroup } = this.state
 
-    if (!criteriaLimitByGroup) return false
-
     let overLimit = false
 
     forEach(criteriaLimitByGroup, (limit, group) => {
@@ -380,6 +381,7 @@ class AddAudienceModal extends React.Component {
 
       const isLimited = criteriaLimitByGroup[group]
       const atLimit = numCriteriaPerGroup[group] > criteriaLimitByGroup[group]
+
       return (
         <FieldContainer key={`menu_${categoryName}`}>
           <FloatRight>

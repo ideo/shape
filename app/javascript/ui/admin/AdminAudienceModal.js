@@ -7,7 +7,6 @@ import Modal from '~/ui/global/modals/Modal'
 import { FieldContainer, Label, TextButton } from '~/ui/global/styled/forms'
 import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import v from '~/utils/variables'
-import { tagListsToCriteria } from '~/ui/test_collections/AudienceSettings/AudienceCriteria'
 
 const SelectedOptionsWrapper = styled(Flex)`
   min-height: 40px;
@@ -47,18 +46,15 @@ class AdminAudienceModal extends React.Component {
       .join(' ')
   }
 
-  renderCriteriaRow(criteria, listName) {
+  renderCriteriaRow(criteriaNames, listName) {
     return (
       <FieldContainer key={`selected_${listName}`}>
         <Label data-cy="AdminAudienceCategory">{listName}</Label>
         <SelectedOptionsWrapper wrap>
-          {map(criteria, option => {
+          {map(criteriaNames, name => {
             return (
-              <SelectedOption
-                data-cy="AdminAudienceCategoryOption"
-                key={`selected_${option}`}
-              >
-                {this.capitalizeOption(option)}
+              <SelectedOption data-cy="AdminAudienceCategoryOption" key={name}>
+                {name}
               </SelectedOption>
             )
           })}
@@ -73,12 +69,11 @@ class AdminAudienceModal extends React.Component {
 
   renderCriteria() {
     const { audience } = this.props
-    const { tagLists } = audience
+    const { demographic_criteria } = audience
 
-    return map(tagLists, (value, key) => {
-      if (value.length < 1) return null
-      const listName = tagListsToCriteria[key]
-      return this.renderCriteriaRow(value, listName)
+    return map(demographic_criteria, value => {
+      const listName = value.categoryName
+      return this.renderCriteriaRow(value.criteriaNames, listName)
     })
   }
 

@@ -10,6 +10,32 @@ class SerializableAudience < BaseJsonSerializer
     end
   end
 
+  attribute :demographic_criteria do
+    response = []
+
+    audience_criteria_keys = @object.audience_demographic_criteria.map(&:criteria_key)
+    categories = DemographicsConfig.new.query_categories
+
+    categories.each do |category|
+      criteria_from_category = []
+
+      category[:criteria].each do |criteria|
+        next unless audience_criteria_keys.include? criteria[:criteriaKey]
+
+        criteria_from_category << criteria[:name]
+      end
+
+      next if criteria_from_category.empty?
+
+      response << {
+        categoryName: category[:name],
+        criteriaNames: criteria_from_category,
+      }
+    end
+
+    response
+  end
+
   attribute :price_per_response do
     @object.price_per_response.to_f
   end
