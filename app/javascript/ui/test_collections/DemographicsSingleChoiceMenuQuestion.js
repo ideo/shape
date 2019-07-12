@@ -58,7 +58,7 @@ class DemographicsSingleChoiceMenuQuestion extends DemographicsQuestionBase {
         onNextQuestion={() => this.showNextQuestion()}
       >
         <AutoComplete
-          value={this.setState.selectedChoice}
+          value={this.state.selectedChoice}
           options={autocompleteOptions}
           onOptionSelect={option => this.handleAnswer(option)}
           placeholder={placeholderText}
