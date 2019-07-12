@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe TrialExpiredWorker, type: :worker do
   describe '#perform' do
+    let(:billable_users_count) { Organization::FREEMIUM_USER_LIMIT + 5 }
     let!(:already_sent) do
       create(:organization,
              trial_expired_email_sent: true,
@@ -25,18 +26,21 @@ RSpec.describe TrialExpiredWorker, type: :worker do
       create(:organization,
              trial_expired_email_sent: false,
              in_app_billing: true,
+             active_users_count: billable_users_count,
              trial_ends_at: 1.day.from_now)
     end
     let!(:should_process_a) do
       create(:organization,
              trial_expired_email_sent: false,
              in_app_billing: true,
+             active_users_count: billable_users_count,
              trial_ends_at: 1.day.ago)
     end
     let!(:should_process_b) do
       create(:organization,
              trial_expired_email_sent: false,
              in_app_billing: true,
+             active_users_count: billable_users_count,
              trial_ends_at: 1.day.ago)
     end
 

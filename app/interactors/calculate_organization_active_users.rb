@@ -1,0 +1,38 @@
+class CalculateOrganizationActiveUsers
+  include Interactor
+  require_in_context :organization
+  delegate_to_context :organization
+
+  def call
+    # record this before the number gets re-calculated on the org
+    context.active_users_initial_count = organization.active_users_count
+    update_active_users_count
+  end
+
+  def rollback
+    organization.update_attributes(active_users_count: context.active_users_initial_count)
+  end
+
+  private
+
+  def calculate_active_users_count
+    # We only want to count activity users have done within this particular org
+    # e.g. a user may have logged in recently and been "active" but in a different org
+
+    # TODO: refactor last_active_at to be a json of org_id => timestamp e.g. { "1": timestamp, "22" : timestamp }
+    Activity
+      .joins(:actor)
+      .where(User.arel_table[:status].eq(User.statuses[:active]))
+      .where(User.arel_table[:email].not_eq(Organization::SUPER_ADMIN_EMAIL))
+      .where(organization_id: organization.id)
+      .where(Activity.arel_table[:created_at].gt(Organization::RECENTLY_ACTIVE_RANGE.ago))
+      .select(:actor_id)
+      .distinct
+      .count
+  end
+
+  def update_active_users_count
+    # this will update the org in our context
+    organization.update_attributes(active_users_count: calculate_active_users_count)
+  end
+end

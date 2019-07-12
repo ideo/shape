@@ -1,4 +1,5 @@
 import { observable, runInAction } from 'mobx'
+import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import trackError from '~/utils/trackError'
 import PaymentMethods from '~shared/components/compounds/PaymentMethods'
@@ -88,8 +89,9 @@ class ManagePaymentMethods extends React.Component {
   }
 
   render() {
-    const { apiStore } = this.props
+    const { apiStore, openPaymentMethod } = this.props
     const { paymentMethods } = this
+
     if (
       apiStore.currentUserOrganization &&
       !apiStore.currentUserOrganization.in_app_billing
@@ -99,6 +101,7 @@ class ManagePaymentMethods extends React.Component {
     if (!this.loaded) {
       return <Loader />
     }
+
     return (
       <PaymentMethods
         paymentMethods={paymentMethods}
@@ -127,6 +130,7 @@ class ManagePaymentMethods extends React.Component {
             .
           </FinePrintWrapper>
         )}
+        openImmediately={openPaymentMethod}
       />
     )
   }
@@ -135,6 +139,11 @@ class ManagePaymentMethods extends React.Component {
 ManagePaymentMethods.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   networkStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  openPaymentMethod: PropTypes.bool,
+}
+
+ManagePaymentMethods.defaultProps = {
+  openPaymentMethod: false,
 }
 
 export default ManagePaymentMethods

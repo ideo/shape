@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import Modal from '~/ui/global/modals/Modal'
 
 const AddCardModal = ({ children, close }) => (
-  <Modal title="Add payment method" open onClose={close}>
+  <Modal title="Add payment method" open={true} onClose={close}>
     {children}
   </Modal>
 )

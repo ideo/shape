@@ -28,13 +28,9 @@ RSpec.describe OrganizationBuilder, type: :service do
         expect(result).to be true
       end
 
-      it 'should set the trial ends at date' do
-        expect(organization.trial_ends_at).to be_within(5.seconds)
-          .of(Organization::DEFAULT_TRIAL_ENDS_AT.from_now)
-      end
-
-      it 'should set the default trial user count' do
-        expect(organization.trial_users_count).to eq Organization::DEFAULT_TRIAL_USERS_COUNT
+      it 'should not set any trial data by default' do
+        expect(organization.trial_ends_at).to be_nil
+        expect(organization.trial_users_count).to eq 0
       end
 
       it 'should initialize the active_users_count to 1' do

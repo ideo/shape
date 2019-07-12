@@ -38,7 +38,7 @@ production:
     # we only schedule daily billing jobs on heroku envs (which includes heroku staging)
     network_create_usage_record:
       cron: '0 18 * * * America/Los_Angeles'
-      class: NetworkCreateUsageRecordWorker
+      class: DailyOrganizationUsageWorker
     # after NetworkCreateUsageRecordWorker
     trial_users_count_exceeded:
       cron: '5 18 * * * America/Los_Angeles'
