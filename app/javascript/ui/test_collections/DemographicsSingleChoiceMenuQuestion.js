@@ -62,6 +62,7 @@ class DemographicsSingleChoiceMenuQuestion extends DemographicsQuestionBase {
           options={autocompleteOptions}
           onOptionSelect={option => this.handleAnswer(option)}
           placeholder={placeholderText}
+          keepSelectedOptions
         />
       </DemographicsQuestionHolder>
     )
