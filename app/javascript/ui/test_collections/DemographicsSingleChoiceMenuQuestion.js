@@ -63,6 +63,7 @@ class DemographicsSingleChoiceMenuQuestion extends DemographicsQuestionBase {
           onOptionSelect={option => this.handleAnswer(option)}
           placeholder={placeholderText}
           keepSelectedOptions
+          dropdownIndicator={() => null}
         />
       </DemographicsQuestionHolder>
     )

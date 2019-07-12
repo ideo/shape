@@ -30,7 +30,7 @@ const LoadingContainer = SearchIconContainer.extend`
   right: 30px;
 `
 
-const DropdownIndicator = () => (
+const SearchIconIndicator = () => (
   <SearchIconContainer>
     <SearchIcon />
   </SearchIconContainer>
@@ -138,11 +138,14 @@ const SelectWrapped = props => {
     menuStyles,
     numOptionsToShow,
     onMenuClose,
+    dropdownIndicator: DropdownIndicator,
     ...other
   } = props
+
   if (keepMenuClosed) {
     other.menuIsOpen = false
   }
+
   if (optionSearch && !creatable) {
     // Option search will do an async search for options.
     return (
@@ -268,6 +271,7 @@ class AutoComplete extends React.Component {
       menuStyles,
       onMenuClose,
       numOptionsToShow,
+      dropdownIndicator,
     } = this.props
     const { option, inputValue } = this.state
     return (
@@ -277,6 +281,7 @@ class AutoComplete extends React.Component {
           inputComponent={SelectWrappedWithStyles}
           inputProps={{
             classes,
+            dropdownIndicator,
             menuStyles,
             numOptionsToShow,
             multi: true,
@@ -341,6 +346,7 @@ AutoComplete.propTypes = {
     width: PropTypes.string,
     zIndex: PropTypes.number,
   }),
+  dropdownIndicator: PropTypes.func,
 }
 
 AutoComplete.defaultProps = {
@@ -360,6 +366,7 @@ AutoComplete.defaultProps = {
     width: '370px',
     zIndex: 2,
   },
+  dropdownIndicator: SearchIconIndicator,
 }
 
 export default withStyles(styles)(AutoComplete)
