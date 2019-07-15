@@ -9,16 +9,24 @@ class SurveyResponseCompletion < SimpleService
   def call
     @survey_response.save
     @survey_response.cache_test_scores!
-    update_test_audience_status
+    update_test_audience_if_complete
     mark_response_as_payment_owed
     ping_collection
   end
 
   private
 
-  def update_test_audience_status
-    return if test_audience.blank?
-    test_audience.survey_response_completed!
+  def update_test_audience_if_complete
+    return unless test_audience.present? &&
+                  test_audience.reached_sample_size? &&
+                  test_audience.open?
+    # if we have reached the sample size on an open test audience, then close it
+    test_audience.update(
+      status: :closed,
+      closed_at: Time.current,
+    )
+    # also let the test_collection now that an audience has closed
+    test_collection.test_audience_closed!
   end
 
   def mark_response_as_payment_owed
