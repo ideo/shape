@@ -17,7 +17,7 @@ import {
   dateParseISO,
   formatDate,
 } from '~shared/utils/formatters'
-import v from '~/utils/variables'
+import v, { FREEMIUM_USER_LIMIT } from '~/utils/variables'
 
 const Wrapper = styled.div`
   font-family: 'Gotham';
@@ -114,6 +114,18 @@ const FreeTrial = ({
   </div>
 )
 
+FreeTrial.propTypes = {
+  trialTitle: PropTypes.string.isRequired,
+  trialLabel: PropTypes.string.isRequired,
+  trialsUsedCount: PropTypes.number.isRequired,
+  trialUsersCount: PropTypes.number.isRequired,
+  trialEndsAt: PropTypes.string,
+}
+
+FreeTrial.defaultProps = {
+  trialEndsAt: null,
+}
+
 @inject('apiStore', 'networkStore')
 @observer
 class BillingInformation extends React.Component {
@@ -174,8 +186,7 @@ class BillingInformation extends React.Component {
     const formatISODate = d => formatDate(dateParseISO(d), 'MM/dd/yyyy')
 
     const isOrgWithinFreemiumLimit =
-      !is_within_trial_period &&
-      active_users_count <= window.FREEMIUM_USER_LIMIT
+      !is_within_trial_period && active_users_count <= FREEMIUM_USER_LIMIT
 
     const currentMonthlyRate =
       billableUserCount > 0 ? billableUserCount * price_per_user : 0
@@ -252,7 +263,7 @@ class BillingInformation extends React.Component {
                       trialTitle={'FREE'}
                       trialLabel={'Free users'}
                       trialsUsedCount={active_users_count}
-                      trialUsersCount={window.FREEMIUM_USER_LIMIT}
+                      trialUsersCount={FREEMIUM_USER_LIMIT}
                     />
                   )}
                   {is_within_trial_period && (
@@ -291,18 +302,6 @@ class BillingInformation extends React.Component {
 BillingInformation.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   networkStore: MobxPropTypes.objectOrObservableObject.isRequired,
-}
-
-FreeTrial.propTypes = {
-  trialTitle: PropTypes.string.isRequired,
-  trialLabel: PropTypes.string.isRequired,
-  trialsUsedCount: PropTypes.number.isRequired,
-  trialUsersCount: PropTypes.number.isRequired,
-  trialEndsAt: PropTypes.string,
-}
-
-FreeTrial.defaultProps = {
-  trialEndsAt: null,
 }
 
 export default BillingInformation

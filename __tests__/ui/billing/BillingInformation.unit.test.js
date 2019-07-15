@@ -105,7 +105,6 @@ describe('BillingInformation', () => {
     describe('with freemium users not over the limit', () => {
       beforeEach(() => {
         apiStore.currentUserOrganization.active_users_count = 3
-        global.FREEMIUM_USER_LIMIT = 5
         apiStore.currentUserOrganization.is_within_trial_period = false
       })
 
@@ -119,7 +118,6 @@ describe('BillingInformation', () => {
     describe('with freemium users are over the limit', () => {
       beforeEach(() => {
         apiStore.currentUserOrganization.active_users_count = 6
-        global.FREEMIUM_USER_LIMIT = 5
         apiStore.currentUserOrganization.is_within_trial_period = false
       })
 
