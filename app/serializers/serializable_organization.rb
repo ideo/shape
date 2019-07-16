@@ -2,12 +2,16 @@ class SerializableOrganization < BaseJsonSerializer
   include SerializedExternalId
   type 'organizations'
   attributes :name, :domain_whitelist, :slug, :active_users_count, :has_payment_method,
-             :trial_users_count, :in_app_billing, :deactivated, :terms_text_item_id,
-             :filestack_file_url
+             :trial_users_count, :in_app_billing, :deactivated, :terms_text_item_id
+
   belongs_to :primary_group
   belongs_to :guest_group
   belongs_to :admin_group
   belongs_to :terms_text_item
+
+  attribute :filestack_file_url do
+    @object&.primary_group&.avatar_url
+  end
 
   attribute :current_user_collection_id, if: -> { @include_user_collection_ids } do
     @current_user.current_user_collection(@object.id)&.id

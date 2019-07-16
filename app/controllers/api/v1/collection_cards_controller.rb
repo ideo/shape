@@ -63,6 +63,9 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     if @collection_card.save
       create_notification(@collection_card, :edited)
       broadcast_collection_create_updates
+      if @collection_card.saved_change_to_is_cover?
+        broadcast_parent_collection_updates
+      end
       render jsonapi: @collection_card.reload,
              include: CollectionCard.default_relationships_for_api
     else
@@ -290,6 +293,12 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def broadcast_collection_create_updates
     CollectionUpdateBroadcaster.call(@collection, current_user)
+  end
+
+  def broadcast_parent_collection_updates
+    parent = @collection.parent
+    return unless parent.present?
+    CollectionUpdateBroadcaster.call(parent, current_user)
   end
 
   def broadcast_collection_archive_updates

@@ -11,11 +11,8 @@ const { CloseIcon } = ICONS
 const StyledDialog = styled(MuiDialog)`
   .modal__paper {
     background-color: ${props => props.variant.backgroundColor};
+    color: ${props => props.variant.color};
     border-radius: 6px;
-    color: ${props =>
-      props.variant.backgroundColor === v.colors.white
-        ? v.colors.black
-        : v.colors.white};
     opacity: 0.95;
     width: 100%;
     &-sm {
@@ -92,6 +89,18 @@ class Dialog extends React.PureComponent {
     return null
   }
 
+  get variantColor() {
+    const { backgroundColor } = this.props
+    switch (backgroundColor) {
+      case v.colors.primaryLight:
+        return v.colors.secondaryDark
+      case v.colors.white:
+        return v.colors.black
+      default:
+        return v.colors.white
+    }
+  }
+
   render() {
     const {
       children,
@@ -101,6 +110,10 @@ class Dialog extends React.PureComponent {
       open,
       maxWidth,
     } = this.props
+    const variant = {
+      backgroundColor: backgroundColor,
+      color: this.variantColor,
+    }
     return (
       <StyledDialog
         open={open}
@@ -115,7 +128,7 @@ class Dialog extends React.PureComponent {
         BackdropProps={{ invisible: true }}
         maxWidth={maxWidth}
         // using suggestion here: https://git.io/fpUnP
-        variant={{ backgroundColor }}
+        variant={variant}
       >
         {closeable && onClose && (
           <ModalCloseButton onClick={this.handleClose}>

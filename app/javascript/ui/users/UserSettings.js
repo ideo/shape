@@ -12,7 +12,7 @@ const SettingsPageWrapper = styled.div`
 
 @inject('apiStore', 'uiStore')
 @observer
-class OrganizationSettings extends React.Component {
+class UserSettings extends React.Component {
   get user() {
     const { apiStore } = this.props
     return apiStore.currentUser
@@ -54,7 +54,13 @@ class OrganizationSettings extends React.Component {
     return this.user.notify_through_email ? 'on' : 'off'
   }
 
+  get sendToLogin() {
+    window.location = '/login?redirect=/user_settings'
+  }
+
   render() {
+    if (!this.user) this.sendToLogin()
+
     return (
       <SettingsPageWrapper>
         <Label style={{ display: 'inline-block', marginRight: '25px' }}>
@@ -106,9 +112,9 @@ class OrganizationSettings extends React.Component {
   }
 }
 
-OrganizationSettings.wrappedComponent.propTypes = {
+UserSettings.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
-export default OrganizationSettings
+export default UserSettings

@@ -1,6 +1,73 @@
 ---
 http_interactions:
 - request:
+    method: get
+    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/users_roles?filter%5Brole_resource_type%5D=Group&filter%5Buser_uid%5D=b9c9ff68e0a52b716f30ba1062d4af&include=role
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.12.2
+      Content-Type:
+      - application/vnd.api+json
+      Accept:
+      - application/vnd.api+json
+      Authorization:
+      - Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJ0eXBlIjoiYXBwbGljYXRpb24iLCJjbGllbnRfaWQiOiIzNjk1YzVmZTU1YWIzZGI2ZjllZTI1ZjE4YzBlZjJmZTcwMjVlYjQ3MTdmMWEwMzFmZDc4MjRhNWQ4Y2RkYmI1IiwidWlkIjoiMDB1ZXFieGc5ZUFpODBTWjQwaDciLCJleHBpcmVzIjoxNTUzNjMyMjI3fQ.FxfLmkVWB70FBcm9rZ3odahqNjTephdbNhtAWAZ2F6Wk34aZVhdxc8yCXgijIq49p5LTx-6pG09hQARvC7jJLNVPo3N2Ht8QgVurrfStCu3LOEMbOrzgJH7wDp62q1UG8A0JCqooSWlZhWmO_vh9J99Q5nrALmafTej1jL2WYnjpPk6K16PlDrOf14nLjhWx9NWn0hm1BAAHjWTC11H1AXhMrvxiLgHuAqupMOBZZUBKBw6MWBRwfWBCyKaB-dbvbLKj0pHFGuScouzOSDzzr4JJq0l2JgSWbxrcsvevH0UTA3XPrQA5ciDAwNdf0PzhcSOIgN14xv-fcGwE8B2HXQ
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 500
+      message: Internal Server Error
+    headers:
+      Server:
+      - Cowboy
+      Date:
+      - Tue, 09 Jul 2019 21:40:59 GMT
+      Connection:
+      - keep-alive
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/scim+json; charset=utf-8
+      Set-Cookie:
+      - _sso_profile_session=SDFDcW5nMW5JT0ZGUTRJVUJNRU0vZkUwT2RMcE16anlPZUtLZnpnT2Y2YU9wendmNlBjWGtqY0lWb2IyWGsvWDFKekJIL0s5dFd0ZEl0UE03Q25SMFBidnYyOVRlL2FXRHVVN3k2YTNMa0lOWjluTWt2bEhkbkdVcndOWWhRamYtLTlqRGZvK1diSzFmWmYvSUFWaVJaeGc9PQ%3D%3D--83dfdde2b2f99cd0b18c9bfe07dfcfb02ecd0ad7;
+        path=/; expires=Wed, 10 Jul 2019 01:40:59 -0000; HttpOnly; secure
+      - rack.session=BAh7BkkiD3Nlc3Npb25faWQGOgZFVEkiRTNmYjNiZTVhN2ViZTNmYzQ1YTI5%0AMTI5MWZjMWQxMDhjYjZlZDAzMzViYmNkYTFiNDYyMWZjYTE0MjY2NDQ3MTEG%0AOwBG%0A--3fe5a04ac9f1333a25164c1f3b87e9f9963fdba6;
+        path=/; expires=Wed, 10 Jul 2019 01:40:59 -0000; HttpOnly; secure
+      Cache-Control:
+      - no-cache
+      X-Request-Id:
+      - d40caa8c-3a11-4ef8-83e7-0dab93203f6b
+      X-Runtime:
+      - '0.012442'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Vary:
+      - Origin
+      Transfer-Encoding:
+      - chunked
+      Via:
+      - 1.1 vegur
+    body:
+      encoding: UTF-8
+      string: '{"errors":[{"code":"internal_server_error","status":"500","title":"Error","detail":"We''ve
+        notified our engineers and hope to address this issue shortly.","meta":{}}]}'
+    http_version: 
+  recorded_at: Tue, 09 Jul 2019 21:40:59 GMT
+- request:
     method: patch
     uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations/186
     body:
@@ -26,7 +93,7 @@ http_interactions:
       Server:
       - Cowboy
       Date:
-      - Thu, 17 Jan 2019 20:40:45 GMT
+      - Tue, 09 Jul 2019 21:41:00 GMT
       Connection:
       - keep-alive
       X-Frame-Options:
@@ -43,14 +110,19 @@ http_interactions:
       - strict-origin-when-cross-origin
       Content-Type:
       - application/vnd.api+json; charset=utf-8
+      Set-Cookie:
+      - _sso_profile_session=b0M0cjF0N1c1elo3UXNVajhGZjRmT2ptVUg4QjVxY3ZPOTVmVnRXd3d1ZzE3SS9YZlJUQzhLUmJRK0d2b1ZpVHdUSmZxbVdMbkhCWHo3TXRqUlArNnlxSE93dkt2UE9JcW5uM25ZRG40cnMzV3grYUdGNU9xVVo1Z0VDcE8yMjUtLW1GRC9zbWhlbE9hN3JNTFA1SnlCZmc9PQ%3D%3D--d4f14d029630195efc9d85eeffeb69a9d8236ed6;
+        path=/; expires=Wed, 10 Jul 2019 01:41:00 -0000; HttpOnly; secure
+      - rack.session=BAh7BkkiD3Nlc3Npb25faWQGOgZFVEkiRTQxMzA5NDc0NzAxNDAyNzJkZWQx%0AOTAwYmRlYzUwNjRiOGRmY2FiZjRmMzkwOTgxMzM0YmUwNGEyZjllOGE0NTgG%0AOwBG%0A--ddf5aff029a3b749b9aced55dba7b40947e24098;
+        path=/; expires=Wed, 10 Jul 2019 01:41:00 -0000; HttpOnly; secure
       Etag:
       - W/"de5ad3315bbca87eacb5dc127d011dc9"
       Cache-Control:
       - max-age=0, private, must-revalidate
       X-Request-Id:
-      - 53fb52d8-a066-4abe-8053-c22ef63c18f0
+      - b8d45924-e4c4-404d-b0d6-732622506a77
       X-Runtime:
-      - '0.046678'
+      - '0.642256'
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains
       Vary:
@@ -64,7 +136,7 @@ http_interactions:
       string: '{"data":{"id":"186","type":"organizations","attributes":{"id":186,"name":"Acme
         Inc 2.0"},"relationships":{"applications":{"meta":{"included":false}},"application_organizations":{"meta":{"included":false}}}},"meta":{},"jsonapi":{"version":"1.0"}}'
     http_version: 
-  recorded_at: Thu, 17 Jan 2019 20:40:46 GMT
+  recorded_at: Tue, 09 Jul 2019 21:41:00 GMT
 - request:
     method: patch
     uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations/650
@@ -91,7 +163,7 @@ http_interactions:
       Server:
       - Cowboy
       Date:
-      - Thu, 17 Jan 2019 20:40:45 GMT
+      - Tue, 09 Jul 2019 21:41:01 GMT
       Connection:
       - keep-alive
       X-Frame-Options:
@@ -108,14 +180,19 @@ http_interactions:
       - strict-origin-when-cross-origin
       Content-Type:
       - application/vnd.api+json; charset=utf-8
+      Set-Cookie:
+      - _sso_profile_session=R0twZVo1NGVWUklLVEF6bXZzUldGOUJyYzBNYUl4OFJ0bC94V215QnJGMlo2Zm5aWWxqOWpHL1NGOGhUQnFZU0NkWExSeFpRdzhLSlpKaFlnU0YrdHZSM0xUSG5sak8xVlkvdGxOQTAwUVZRL3ZZZEJaU3lhcHFYTFhsajlIeWEtLWRxTDJJUG05T0o1RFFZV1FZR1RNMGc9PQ%3D%3D--bead2e2f3fbfc76810a951596dca01da5da2b8de;
+        path=/; expires=Wed, 10 Jul 2019 01:41:01 -0000; HttpOnly; secure
+      - rack.session=BAh7BkkiD3Nlc3Npb25faWQGOgZFVEkiRWMyNzA4OTQ5NmI3NmVhZjQ1ODFl%0AOWVjMmQ3OTdlYTIwODBhODU2M2FhOThmYzUzYWQzMGUyNWZmYjNkZTNjNzUG%0AOwBG%0A--55adb4f602455054660cd2dfbbdc0180a05000ac;
+        path=/; expires=Wed, 10 Jul 2019 01:41:01 -0000; HttpOnly; secure
       Etag:
       - W/"13e732316b50ef044ddb4c3f00d6cef3"
       Cache-Control:
       - max-age=0, private, must-revalidate
       X-Request-Id:
-      - f1cd5186-3784-486b-9cd7-1fad8769a59b
+      - ebcaeca2-9d1b-43e0-9c2c-c00028731554
       X-Runtime:
-      - '0.022330'
+      - '0.027388'
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains
       Vary:
@@ -129,5 +206,5 @@ http_interactions:
       string: '{"data":{"id":"650","type":"organizations","attributes":{"id":650,"name":"Acme
         Inc 2.0"},"relationships":{"applications":{"meta":{"included":false}},"application_organizations":{"meta":{"included":false}}}},"meta":{},"jsonapi":{"version":"1.0"}}'
     http_version: 
-  recorded_at: Thu, 17 Jan 2019 20:40:46 GMT
+  recorded_at: Tue, 09 Jul 2019 21:41:01 GMT
 recorded_with: VCR 4.0.0

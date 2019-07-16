@@ -14,12 +14,14 @@
 #  updated_at                   :datetime         not null
 #  current_shared_collection_id :integer
 #  filestack_file_id            :integer
+#  network_id                   :string
 #  organization_id              :bigint(8)
 #
 # Indexes
 #
 #  index_groups_on_autojoin_emails  (autojoin_emails) USING gin
 #  index_groups_on_handle           (handle)
+#  index_groups_on_network_id       (network_id)
 #  index_groups_on_organization_id  (organization_id)
 #  index_groups_on_type             (type)
 #
@@ -161,6 +163,21 @@ class Group < ApplicationRecord
 
   def requires_org?
     true
+  end
+
+  def update_from_network_profile(params)
+    %i[name external_id].each do |field|
+      send("#{field}=", params[field]) if params[field].present?
+    end
+    save
+  end
+
+  def avatar_url
+    if filestack_file_signed_url.present?
+      filestack_file_signed_url
+    else
+      'https://s3-us-west-2.amazonaws.com/assets.shape.space/group-avatar.png'
+    end
   end
 
   private
