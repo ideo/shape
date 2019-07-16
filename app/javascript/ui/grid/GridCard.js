@@ -390,6 +390,18 @@ class GridCard extends React.Component {
     return false
   }
 
+  get location() {
+    const { searchResult } = this.props
+    return searchResult ? 'Search' : 'GridCard'
+  }
+
+  get offsetPosition() {
+    return {
+      x: uiStore.cardMenuOpen.offsetX,
+      y: uiStore.cardMenuOpen.offsetY,
+    }
+  }
+
   render() {
     const {
       card,
@@ -478,7 +490,7 @@ class GridCard extends React.Component {
                 </CardActionHolder>
               )}
               <ActionMenu
-                location={searchResult ? 'Search' : 'GridCard'}
+                location={this.location}
                 className="show-on-hover"
                 wrapperClassName="card-menu"
                 card={card}
@@ -486,6 +498,7 @@ class GridCard extends React.Component {
                 canEdit={this.canEditCard}
                 canReplace={record.canReplace && !card.link && !searchResult}
                 direction={uiStore.cardMenuOpen.direction}
+                offsetPosition={this.offsetPosition}
                 menuOpen={menuOpen}
                 onOpen={this.openMenu}
                 onLeave={this.closeMenu}
