@@ -768,7 +768,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
       if (launchedTest && actionName === 'launch' && audiences) {
         audiences.forEach((value, key, _map) => {
-          console.log(key, value)
           if (value.selected && !value.audience.isLinkSharing)
             this.trackAudienceTargeting(value.audience)
         })
