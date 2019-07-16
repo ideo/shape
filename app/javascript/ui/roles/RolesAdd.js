@@ -16,7 +16,7 @@ import {
 } from '~/ui/global/styled/forms'
 import EntityAvatarAndName from '~/ui/global/EntityAvatarAndName'
 import { Row, RowItemRight } from '~/ui/global/styled/layout'
-import { Heading3 } from '~/ui/global/styled/typography'
+import { DisplayText, Heading3 } from '~/ui/global/styled/typography'
 import AutoComplete from '~/ui/global/AutoComplete'
 import PillList from '~/ui/global/PillList'
 import EmailCSVUploader from '~/ui/global/EmailCSVUploader'
@@ -306,6 +306,7 @@ class RolesAdd extends React.Component {
       this.selectedRole = 'member'
     } else {
       this.syncedRoleTypes = this.props.roleTypes
+      this.selectedRole = 'editor'
     }
   }
 
@@ -376,8 +377,8 @@ class RolesAdd extends React.Component {
     const { addableGroups, title } = this.props
     return (
       <div>
-        <Row style={{ marginBottom: 0 }}>
-          <Heading3>{title}</Heading3>
+        <Row align="center" style={{ marginBottom: 0, height: '32px' }}>
+          <Heading3 noSpacing>{title}</Heading3>
           {addableGroups.length && (
             <RowItemRight>
               <Select
@@ -388,6 +389,11 @@ class RolesAdd extends React.Component {
                 onChange={this.handleGroupSelect}
                 value={this.selectedGroupId}
               >
+                <MenuItem key="no-group" value="">
+                  <DisplayText color={v.colors.commonMedium}>
+                    No group
+                  </DisplayText>
+                </MenuItem>
                 {addableGroups.map(group => (
                   <MenuItem key={group.handle} value={group.id}>
                     <EntityAvatarAndName entity={group} />
