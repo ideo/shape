@@ -102,6 +102,7 @@ export default {
   navOpacity: 0.9,
 
   cardHoldTime: 0.4 * 1000,
+  touchDeviceHoldToDragTime: 1000,
 
   colors: {
     black: '#120f0e',
