@@ -99,7 +99,7 @@ RSpec.describe SurveyResponse, type: :model do
     end
 
     context 'with all questions answered' do
-      let!(:question_answers) do
+      let(:question_answers) do
         survey_response.answerable_complete_question_items.map do |question|
           create(:question_answer,
                  survey_response: survey_response,
@@ -107,8 +107,10 @@ RSpec.describe SurveyResponse, type: :model do
         end
       end
 
-      it 'marks response as completed' do
-        expect(survey_response.reload.completed?).to be true
+      it 'calls SurveyResponseCompletion to mark response as completed' do
+        expect(SurveyResponseCompletion).to receive(:call).with(survey_response)
+        # create question answers
+        question_answers
       end
     end
   end

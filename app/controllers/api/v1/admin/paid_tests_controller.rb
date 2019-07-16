@@ -21,7 +21,6 @@ class Api::V1::Admin::PaidTestsController < Api::V1::Admin::BaseController
     render json: { months: months }
   end
 
-  after_action :mark_all_tests_paid, only: :pending_incentives_export
   def pending_incentives_export
     respond_to do |format|
       format.csv do
@@ -31,11 +30,5 @@ class Api::V1::Admin::PaidTestsController < Api::V1::Admin::BaseController
                   disposition: 'attachment'
       end
     end
-  end
-
-  private
-
-  def mark_all_tests_paid
-    ExportPendingIncentivesWorker.perform_async
   end
 end

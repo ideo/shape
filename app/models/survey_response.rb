@@ -32,7 +32,6 @@ class SurveyResponse < ApplicationRecord
   has_one :feedback_incentive_record
 
   before_create :set_default_incentive_status, if: :gives_incentive?
-  before_save :mark_as_completed, if: :mark_as_completed?
 
   delegate :question_items, :answerable_complete_question_items,
            to: :test_collection
@@ -61,20 +60,21 @@ class SurveyResponse < ApplicationRecord
   def record_incentive_owed!
     return if !incentive_unearned? || amount_earned.zero? || user&.email.blank?
     # TODO: what if a user (phone only?) fills out their email later to be "owed" for a previous response?
-    Accounting::RecordTransfer.incentive_owed(self)
     update(incentive_status: :incentive_owed, incentive_owed_at: Time.current)
+    Accounting::RecordTransfer.incentive_owed(self)
     incentive_owed_account_balance
   end
 
   def record_incentive_paid!
     return if !incentive_owed? || amount_earned.zero? || !incentive_owed_account_balance.positive?
-    Accounting::RecordTransfer.incentive_paid(self)
     update(incentive_status: :incentive_paid, incentive_paid_at: Time.current)
+    Accounting::RecordTransfer.incentive_paid(self)
     incentive_paid_account_balance
   end
 
   def amount_earned
     return 0 if !completed? || !gives_incentive?
+    # NOTE: incentive amount is currently global, not per test_audience
     TestAudience.incentive_amount
   end
 
@@ -106,18 +106,6 @@ class SurveyResponse < ApplicationRecord
 
   def set_default_incentive_status
     self.incentive_status ||= :incentive_unearned
-  end
-
-  def mark_as_completed?
-    in_progress? && all_questions_answered?
-  end
-
-  def mark_as_completed
-    self.status = if test_collection.live?
-                    :completed
-                  else
-                    :completed_late
-                  end
   end
 
   def create_open_response_items
