@@ -30,6 +30,7 @@ class RolesMenu extends React.Component {
   state = {
     searchText: '',
     groups: [],
+    bareGroups: [],
     page: {
       pending: 1,
       active: 1,
@@ -86,6 +87,7 @@ class RolesMenu extends React.Component {
       pending: record.roles[0].pendingCount,
       active: record.roles[0].activeCount,
     }
+    const assignedBareGroups = []
     record.roles.forEach(role => {
       role.users.forEach(user => {
         roleEntities.push(Object.assign({}, { role, entity: user }))
@@ -94,6 +96,7 @@ class RolesMenu extends React.Component {
       if (!role.groups) return
       role.groups.forEach(group => {
         roleEntities.push(Object.assign({}, { role, entity: group }))
+        assignedBareGroups.push(group)
       })
     })
     const sortedRoleEntities = roleEntities.sort(sortUserOrGroup)
@@ -105,6 +108,7 @@ class RolesMenu extends React.Component {
 
     this.setState(prevState => ({
       groups,
+      bareGroups: assignedBareGroups,
       pendingPanelOpen,
       page: {
         pending:
@@ -178,9 +182,8 @@ class RolesMenu extends React.Component {
     const {
       apiStore,
       apiStore: { uiStore },
-      ownerId,
-      ownerType,
     } = this.props
+    let { ownerId, ownerType } = this.props
     const userIds = entities
       .filter(entity => entity.internalType === 'users')
       .map(user => user.id)
@@ -193,6 +196,10 @@ class RolesMenu extends React.Component {
       user_ids: userIds,
       is_switching: opts.isSwitching,
       send_invites: opts.sendInvites,
+    }
+    if (opts.addToGroupId) {
+      ownerId = opts.addToGroupId
+      ownerType = 'groups'
     }
     return apiStore
       .request(`${ownerType}/${ownerId}/roles`, 'POST', data)
@@ -243,7 +250,7 @@ class RolesMenu extends React.Component {
       submissionBox,
     } = this.props
 
-    const { groups } = this.state
+    const { groups, bareGroups } = this.state
 
     const roleTypes =
       ownerType === 'groups' ? ['member', 'admin'] : ['editor', 'viewer']
@@ -327,6 +334,7 @@ class RolesMenu extends React.Component {
                 onCreateRoles={this.createRoles}
                 onCreateUsers={this.onCreateUsers}
                 ownerType={ownerType}
+                addableGroups={bareGroups}
               />
             </FooterArea>
           </Fragment>

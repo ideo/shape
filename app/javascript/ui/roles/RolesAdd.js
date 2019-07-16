@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { observable, action } from 'mobx'
-import { observer } from 'mobx-react'
+import { observable, action, runInAction } from 'mobx'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import { Grid, Hidden, MenuItem } from '@material-ui/core'
@@ -14,6 +14,7 @@ import {
   FormActionsContainer,
   Select,
 } from '~/ui/global/styled/forms'
+import EntityAvatarAndName from '~/ui/global/EntityAvatarAndName'
 import { Row, RowItemRight } from '~/ui/global/styled/layout'
 import { Heading3 } from '~/ui/global/styled/typography'
 import AutoComplete from '~/ui/global/AutoComplete'
@@ -50,7 +51,11 @@ class RolesAdd extends React.Component {
   @observable
   selectedRole = ''
   @observable
+  selectedGroupId = ''
+  @observable
   sendInvites = true
+  @observable
+  syncedRoleTypes = []
   @observable
   loading = false
 
@@ -59,6 +64,9 @@ class RolesAdd extends React.Component {
     const [first] = this.props.roleTypes
     this.selectedRole = first
     uiStore.autocompleteMenuClosed()
+    runInAction(() => {
+      this.syncedRoleTypes = this.props.roleTypes
+    })
 
     this.debouncedSearch = _.debounce(this._autocompleteSearch, 350)
   }
@@ -150,7 +158,7 @@ class RolesAdd extends React.Component {
         confirmText: 'Continue',
         onConfirm: this.handleSave,
       }
-      if (ownerType === 'groups') {
+      if (ownerType === 'groups' || this.selectedGroupId) {
         confirmOpts.prompt = `
           Are you sure you want to add ${this.selectedUsers.length} users to this group?
         `
@@ -278,7 +286,7 @@ class RolesAdd extends React.Component {
     const roles = await this.props.onCreateRoles(
       [...created.data, ...fullUsers],
       selectedRole,
-      { sendInvites }
+      { sendInvites, addToGroupId: this.selectedGroupId }
     )
     setLoading(false)
     resetSelectedUsers()
@@ -288,6 +296,17 @@ class RolesAdd extends React.Component {
   @action
   handleRoleSelect = ev => {
     this.selectedRole = ev.target.value
+  }
+
+  @action
+  handleGroupSelect = ev => {
+    this.selectedGroupId = ev.target.value
+    if (this.selectedGroupId) {
+      this.syncedRoleTypes = ['admin', 'member']
+      this.selectedRole = 'member'
+    } else {
+      this.syncedRoleTypes = this.props.roleTypes
+    }
   }
 
   @action
@@ -354,11 +373,29 @@ class RolesAdd extends React.Component {
   }
 
   render() {
-    const { title, roleTypes } = this.props
+    const { addableGroups, title } = this.props
     return (
       <div>
         <Row style={{ marginBottom: 0 }}>
           <Heading3>{title}</Heading3>
+          {addableGroups.length && (
+            <RowItemRight>
+              <Select
+                classes={{ root: 'select', selectMenu: 'selectMenu' }}
+                displayEmpty
+                disableUnderline
+                name="group"
+                onChange={this.handleGroupSelect}
+                value={this.selectedGroupId}
+              >
+                {addableGroups.map(group => (
+                  <MenuItem key={group.handle} value={group.id}>
+                    <EntityAvatarAndName entity={group} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </RowItemRight>
+          )}
           <RowItemRight>
             <Select
               classes={{ root: 'select', selectMenu: 'selectMenu' }}
@@ -368,7 +405,7 @@ class RolesAdd extends React.Component {
               onChange={this.handleRoleSelect}
               value={this.selectedRole}
             >
-              {roleTypes.map(roleType => (
+              {this.syncedRoleTypes.map(roleType => (
                 <MenuItem key={roleType} value={roleType}>
                   {this.labelFor(roleType)}
                 </MenuItem>
@@ -422,14 +459,18 @@ RolesAdd.propTypes = {
   roleLabels: PropTypes.shape({
     editor: PropTypes.string,
     viewer: PropTypes.string,
+    admin: PropTypes.string,
+    member: PropTypes.string,
   }),
   onCreateRoles: PropTypes.func.isRequired,
   onCreateUsers: PropTypes.func.isRequired,
   ownerType: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
+  addableGroups: MobxPropTypes.arrayOrObservableArray,
 }
 RolesAdd.defaultProps = {
   roleLabels: {},
+  addableGroups: [],
 }
 
 export default RolesAdd
