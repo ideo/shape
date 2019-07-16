@@ -388,6 +388,7 @@ class RolesAdd extends React.Component {
                 name="group"
                 onChange={this.handleGroupSelect}
                 value={this.selectedGroupId}
+                data-cy="permissionsGroupSelect"
               >
                 <MenuItem key="no-group" value="">
                   <DisplayText color={v.colors.commonMedium}>
@@ -410,10 +411,13 @@ class RolesAdd extends React.Component {
               name="role"
               onChange={this.handleRoleSelect}
               value={this.selectedRole}
+              data-cy="permissionsRoleSelect"
             >
               {this.syncedRoleTypes.map(roleType => (
                 <MenuItem key={roleType} value={roleType}>
-                  {this.labelFor(roleType)}
+                  <span data-cy="permissonsRoleLabel">
+                    {this.labelFor(roleType)}
+                  </span>
                 </MenuItem>
               ))}
             </Select>

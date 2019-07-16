@@ -3,6 +3,8 @@ import { apiStore } from '~/stores'
 
 jest.mock('../../../app/javascript/stores')
 
+import { fakeGroup } from '#/mocks/data'
+
 let props
 let wrapper
 let defaultOpts
@@ -13,14 +15,21 @@ describe('RolesAdd', () => {
       title: 'Add groups',
       searchableItems: [],
       roleTypes: ['viewer', 'editor'],
+      roleLabels: {
+        viewer: 'Viewer',
+        editor: 'Editor',
+        member: 'Member',
+        admin: 'Admin',
+      },
       onCreate: jest.fn(),
       onCreateUsers: jest.fn(),
       onCreateRoles: jest.fn(),
       onSearch: jest.fn(),
       ownerType: 'collections',
+      addableGroups: [fakeGroup],
     }
     wrapper = mount(<RolesAdd {...props} />)
-    defaultOpts = { sendInvites: true }
+    defaultOpts = { sendInvites: true, addToGroupId: '' }
   })
 
   describe('_autocompleteSearch', () => {
@@ -86,6 +95,7 @@ describe('RolesAdd', () => {
 
     describe('for a new user', () => {
       const newUserData = { custom: 'm@m.com', internalType: 'users' }
+
       let existingUsers
 
       beforeEach(() => {
@@ -159,6 +169,27 @@ describe('RolesAdd', () => {
     })
   })
 
+  describe('when selecting groups', () => {
+    let component
+    let roleMenuItems, roleSelect
+
+    beforeEach(() => {
+      component = wrapper.instance()
+      component.handleGroupSelect({ target: { value: fakeGroup.id } })
+      wrapper.update()
+      roleSelect = wrapper.find('[data-cy="permissionsRoleSelect"]').first()
+    })
+
+    it('should switch menu items to the group role types', () => {
+      roleMenuItems = roleSelect.find('[data-cy="permissonsRoleLabel"]')
+      expect(roleMenuItems.first().text()).toEqual('Member')
+    })
+
+    it('should auto select the member role type by default', () => {
+      expect(roleSelect.props().value).toEqual('member')
+    })
+  })
+
   describe('handleSave', () => {
     let component
     let unregisteredUsers
@@ -219,6 +250,24 @@ describe('RolesAdd', () => {
       })
     })
 
+    describe('when adding to a group', () => {
+      beforeEach(() => {
+        component.selectedUsers = registeredUsers
+        component.handleGroupSelect({ target: { value: fakeGroup.id } })
+      })
+
+      it('should pass the group to onCreateRoles()', done => {
+        component.handleSave().then(() => {
+          expect(props.onCreateRoles).toHaveBeenCalledWith(
+            registeredUsers,
+            'member',
+            Object.assign({}, defaultOpts, { addToGroupId: fakeGroup.id })
+          )
+          done()
+        })
+      })
+    })
+
     describe('without invites', () => {
       const ev = { target: {} }
 
@@ -233,7 +282,7 @@ describe('RolesAdd', () => {
           expect(props.onCreateRoles).toHaveBeenCalledWith(
             registeredUsers,
             'viewer',
-            { sendInvites: false }
+            { sendInvites: false, addToGroupId: '' }
           )
           done()
         })
