@@ -25,7 +25,8 @@ export default class UiStore {
     id: null,
     x: 0,
     y: 0,
-    direction: 'left',
+    offsetX: 0,
+    offsetY: 0,
   }
   @observable
   pageError = null
@@ -107,6 +108,7 @@ export default class UiStore {
   defaultDialogProps = {
     open: null, // track whether "info" or "confirm" dialog are open, or none
     prompt: null,
+    subPromptNode: null,
     onConfirm: null,
     onCancel: null,
     iconName: null,
@@ -120,6 +122,7 @@ export default class UiStore {
     fadeOutTime: undefined,
     snoozeChecked: false,
     onToggleSnoozeDialog: null,
+    backgroundColor: v.colors.commonDark,
     image: null,
     options: [],
     onClose: () => this.closeDialog(),
@@ -344,8 +347,14 @@ export default class UiStore {
 
   @action
   openCardMenu(id, opts = {}) {
-    const { x = 0, y = 0, direction = 'left' } = opts
-    this.update('cardMenuOpen', { id, x, y, direction })
+    const { x = 0, y = 0, offsetX = 0, offsetY = 0 } = opts
+    this.update('cardMenuOpen', {
+      id,
+      x,
+      y,
+      offsetX,
+      offsetY,
+    })
     if (this.selectedCardIds.length && this.selectedCardIds.indexOf(id) < 0) {
       // deselect all cards when card menu is opened on a non-selected card
       this.selectedCardIds.replace([])

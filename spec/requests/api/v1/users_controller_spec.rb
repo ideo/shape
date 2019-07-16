@@ -61,7 +61,7 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
     end
   end
 
-  describe 'POST #create_from_emails' do
+  describe 'POST #create_from_emails', :vcr do
     let(:emails) { Array.new(3).map { Faker::Internet.email } }
     let(:users_json) { json_included_objects_of_type('users') }
     let(:path) { '/api/v1/users/create_from_emails' }
@@ -134,21 +134,45 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
 
   describe 'POST #create_limited_user', auth: false, create_org: false do
     let(:path) { '/api/v1/users/create_limited_user' }
-    let(:raw_params) do
+    let(:session_uid) { nil }
+    let(:contact_info) do
       { contact_info: 'something@somewhere.com' }
+    end
+    let(:raw_params) do
+      contact_info.merge(session_uid: session_uid)
     end
     let(:params) { raw_params.to_json }
     let(:service_double) { double('service') }
+    let(:limited_user) { create(:user, status: :limited) }
 
     before do
       allow(service_double).to receive(:call).and_return(true)
-      allow(service_double).to receive(:limited_user).and_return(User.new)
+      allow(service_double).to receive(:limited_user).and_return(limited_user)
     end
 
     it 'returns a 200 and calls LimitedUserCreator' do
-      expect(LimitedUserCreator).to receive(:new).with(raw_params).and_return(service_double)
+      expect(LimitedUserCreator).to receive(:new).with(contact_info).and_return(service_double)
       post(path, params: params)
       expect(response.status).to eq 200
+    end
+
+    context 'with an existing survey response' do
+      let(:session_uid) { '123-xyz' }
+      let!(:survey_response) { create(:survey_response, user_id: nil, session_uid: session_uid) }
+
+      before do
+        expect(LimitedUserCreator).to receive(:new).with(contact_info).and_return(service_double)
+      end
+
+      it 'updates the survey response to be marked with the newly created user id' do
+        post(path, params: params)
+        expect(survey_response.reload.user_id).to eq limited_user.id
+      end
+
+      it 're-runs SurveyResponseCompletion to ensure that incentives are marked' do
+        expect(SurveyResponseCompletion).to receive(:call).with(survey_response)
+        post(path, params: params)
+      end
     end
   end
 end

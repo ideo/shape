@@ -214,6 +214,39 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
         )
         post(path, params: params)
       end
+
+      context 'going over freemium limit' do
+        before do
+          organization.update(active_users_count: 3)
+        end
+
+        it 'should return a 401' do
+          post(path, params: params)
+          expect(response.status).to eq(401)
+        end
+      end
+
+      context 'going over freemium limit with a payment method' do
+        before do
+          organization.update(active_users_count: 3, has_payment_method: true)
+        end
+
+        it 'should return a 204' do
+          post(path, params: params)
+          expect(response.status).to eq(204)
+        end
+      end
+
+      context 'going over freemium limit with in app billing off' do
+        before do
+          organization.update_columns(active_users_count: 3, in_app_billing: false)
+        end
+
+        it 'should return a 204' do
+          post(path, params: params)
+          expect(response.status).to eq(204)
+        end
+      end
     end
   end
 

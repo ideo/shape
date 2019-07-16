@@ -8,6 +8,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :switch_to_organization, only: :show, if: :user_signed_in?
   before_action :load_and_authorize_collection_update, only: %i[update]
   before_action :load_collection_with_roles, only: %i[show update]
+  after_action :broadcast_parent_collection_updates, only: %i[create_template clear_collection_cover]
 
   before_action :load_and_filter_index, only: %i[index]
   def index
@@ -22,7 +23,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   before_action :load_and_authorize_template_and_parent, only: %i[create_template]
-  after_action :broadcast_parent_collection_updates, only: %i[create_template]
   def create_template
     builder = CollectionTemplateBuilder.new(
       parent: @parent_collection,
@@ -54,6 +54,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   load_and_authorize_resource only: %i[clear_collection_cover]
   def clear_collection_cover
+    @parent_collection = @collection.parent
     @collection.clear_collection_cover
     @collection.reload
     render_collection

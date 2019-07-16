@@ -262,6 +262,11 @@ class ActionMenu extends React.Component {
       return _.filter(actions, { name: 'Replace' })
     }
 
+    const { menuItemsCount } = this.props
+    if (menuItemsCount) {
+      menuItemsCount(items.length)
+    }
+
     if (record && record.archived) {
       // Turn off most actions if looking at archived record
       items = _.reject(items, { name: 'Duplicate' })
@@ -283,13 +288,7 @@ class ActionMenu extends React.Component {
   }
 
   render() {
-    const {
-      className,
-      menuOpen,
-      wrapperClassName,
-      direction,
-      uiStore,
-    } = this.props
+    const { className, menuOpen, wrapperClassName, uiStore } = this.props
     return (
       <PopoutMenu
         className={className}
@@ -300,7 +299,10 @@ class ActionMenu extends React.Component {
         menuOpen={menuOpen}
         buttonStyle={this.buttonStyle}
         position={{ x: uiStore.cardMenuOpen.x, y: uiStore.cardMenuOpen.y }}
-        direction={direction}
+        offsetPosition={{
+          x: uiStore.cardMenuOpen.offsetX,
+          y: uiStore.cardMenuOpen.offsetY,
+        }}
         width={250}
       />
     )
@@ -310,7 +312,6 @@ class ActionMenu extends React.Component {
 ActionMenu.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   className: PropTypes.string,
-  direction: PopoutMenu.propTypes.direction,
   wrapperClassName: PropTypes.string,
   location: PropTypes.string.isRequired,
   menuOpen: PropTypes.bool.isRequired,
@@ -323,6 +324,7 @@ ActionMenu.propTypes = {
   onMoveMenu: PropTypes.func,
   afterArchive: PropTypes.func,
   testCollectionCard: PropTypes.bool,
+  menuItemsCount: PropTypes.func,
 }
 ActionMenu.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -331,13 +333,13 @@ ActionMenu.displayName = 'ActionMenu'
 
 ActionMenu.defaultProps = {
   className: '',
-  direction: null,
   wrapperClassName: 'card-menu',
   onMoveMenu: null,
   afterArchive: null,
   canReplace: false,
   submissionBox: false,
   testCollectionCard: false,
+  menuItemsCount: null,
 }
 
 export default ActionMenu

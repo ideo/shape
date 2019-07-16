@@ -41,6 +41,43 @@ class Callbacks::IdeoNetworkController < ApplicationController
     head :ok
   end
 
+  def users_roles
+    role = find_included('roles')[:attributes]
+    return unless role[:resource_type] == 'Group'
+    group = Group.find_by(network_id: role[:resource_id])
+    user = User.find_by(uid: users_role_params[:user_uid])
+
+    case event.to_s
+    when 'users_role.created'
+      process_group_role_created(role: role, group: group, user: user)
+    when 'users_role.deleted'
+      process_group_role_deleted(role: role, group: group, user: user)
+    else
+      logger.debug("Unsupported user roles event: #{event}")
+      head :bad_request
+      return
+    end
+
+    head :ok
+  end
+
+  def groups
+    case event.to_s
+    when 'group.created'
+      process_group_created
+    when 'group.deleted'
+      process_group_deleted
+    when 'group.updated'
+      process_group_updated
+    else
+      logger.debug("Unsupported group event: #{event}")
+      head :bad_request
+      return
+    end
+
+    head :ok
+  end
+
   private
 
   def process_user_updated
@@ -49,6 +86,39 @@ class Callbacks::IdeoNetworkController < ApplicationController
 
   def process_user_deleted
     user.archive!
+  end
+
+  def process_group_created
+    organization = find_included('organizations').try(:[], :attributes)
+    return if organization.blank?
+    return if Group.find_by(network_id: group_params[:id]).present?
+    Group.create(name: group_params[:name],
+                 organization_id: organization[:external_id],
+                 network_id: group_params[:id])
+  end
+
+  def process_group_deleted
+    group.archive!
+  end
+
+  def process_group_updated
+    group.update_from_network_profile(group_params)
+  end
+
+  def process_group_role_created(role:, group:, user:)
+    Roles::MassAssign.call(
+      object: group,
+      role_name: role[:name],
+      users: [user],
+    )
+  end
+
+  def process_group_role_deleted(role:, group:, user:)
+    Roles::MassRemove.call(
+      object: group,
+      role_name: role[:name],
+      users: [user],
+    )
   end
 
   def process_invoice_payment_failed_event
@@ -103,6 +173,14 @@ class Callbacks::IdeoNetworkController < ApplicationController
     @user ||= User.find_by_uid(user_params[:uid])
   end
 
+  def users_role
+    @users_role ||= UsersRole.find(users_role_params[:id])
+  end
+
+  def group
+    @group ||= Group.find_by(network_id: group_params[:id])
+  end
+
   def user_params
     params.require(:data).require(:attributes).permit(
       :uid,
@@ -112,6 +190,29 @@ class Callbacks::IdeoNetworkController < ApplicationController
       :email,
       :picture,
       :username,
+    )
+  end
+
+  def users_role_params
+    params.require(:data).require(:attributes).permit(
+      :id,
+      :name,
+      :user_id,
+      :user_uid,
+    )
+  end
+
+  def group_params
+    params.require(:data).require(:attributes).permit(
+      :id,
+      :uid,
+      :name,
+      :organization_id,
+      :external_id,
+      :created_at,
+      :updated_at,
+      :member_ids,
+      :admin_ids,
     )
   end
 

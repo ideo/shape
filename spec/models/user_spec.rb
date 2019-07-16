@@ -13,6 +13,7 @@ describe User, type: :model do
     it { should have_many :comments }
     it { should have_many :activities_as_actor }
     it { should have_many :notifications }
+    it { should have_many :survey_responses }
 
     context 'as application bot user' do
       let(:organizations) { create_list(:organization, 2) }
@@ -524,6 +525,31 @@ describe User, type: :model do
       it 'returns nil' do
         # can't switch to the org
         expect(user.switch_to_organization(other_org)).to be_nil
+      end
+    end
+
+    context 'as a super admin' do
+      before do
+        user.add_role(Role::SUPER_ADMIN)
+      end
+
+      context 'with a user collection' do
+        it 'sets current_user_collection' do
+          expect(user.current_user_collection).to be_nil
+          expect(user.switch_to_organization(organization)).to be_truthy
+          expect(user.current_user_collection).to eq(org_user_collection)
+        end
+      end
+
+      context 'without a user collection on that org' do
+        let!(:template_collection) { create(:global_collection) }
+        let!(:other_org) { create(:organization_without_groups, template_collection: template_collection) }
+
+        it 'switches to the org and sets current_user_collection to the org template_collection' do
+          expect(user.switch_to_organization(other_org)).to be_truthy
+          expect(user.current_organization).to eq(other_org)
+          expect(user.current_user_collection).to eq(other_org.template_collection)
+        end
       end
     end
   end

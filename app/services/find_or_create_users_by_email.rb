@@ -28,6 +28,7 @@ class FindOrCreateUsersByEmail
       user = User.create_pending_user(email: email)
       if user.persisted?
         users << user
+        user.sync_network_groups
       else
         failed_emails << email
       end

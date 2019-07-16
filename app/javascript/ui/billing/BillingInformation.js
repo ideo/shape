@@ -17,7 +17,7 @@ import {
   dateParseISO,
   formatDate,
 } from '~shared/utils/formatters'
-import v from '~/utils/variables'
+import v, { FREEMIUM_USER_LIMIT } from '~/utils/variables'
 
 const Wrapper = styled.div`
   font-family: 'Gotham';
@@ -71,7 +71,7 @@ const TrialHighlight = styled.div`
   background-color: #c0dbde;
 `
 
-const FreeTrial = styled(TrialHighlight)`
+const FreeTrialTitle = styled(TrialHighlight)`
   font-size: 1rem;
   line-height: 11px;
   letter-spacing: 0.5px;
@@ -85,6 +85,46 @@ const Label = styled.span`
   font-size: 1rem;
   color: ${v.colors.commonDark};
 `
+
+const FreeTrial = ({
+  trialTitle,
+  trialLabel,
+  trialsUsedCount,
+  trialUsersCount,
+  trialEndsAt,
+}) => (
+  <div>
+    <FreeTrialTitle>{trialTitle}</FreeTrialTitle>
+    <Grid container justify="space-between" spacing={16}>
+      <Grid item>
+        <Label>{trialLabel}</Label>
+      </Grid>
+      <Grid item>
+        {trialsUsedCount} of {trialUsersCount}
+      </Grid>
+    </Grid>
+    {trialEndsAt && (
+      <Grid container justify="space-between" spacing={16}>
+        <Grid item>
+          <Label>Trial expires:</Label>
+        </Grid>
+        <Grid item>{trialEndsAt}</Grid>
+      </Grid>
+    )}
+  </div>
+)
+
+FreeTrial.propTypes = {
+  trialTitle: PropTypes.string.isRequired,
+  trialLabel: PropTypes.string.isRequired,
+  trialsUsedCount: PropTypes.number.isRequired,
+  trialUsersCount: PropTypes.number.isRequired,
+  trialEndsAt: PropTypes.string,
+}
+
+FreeTrial.defaultProps = {
+  trialEndsAt: null,
+}
 
 @inject('apiStore', 'networkStore')
 @observer
@@ -143,10 +183,13 @@ class BillingInformation extends React.Component {
       ? active_users_count - trial_users_count
       : active_users_count
 
+    const formatISODate = d => formatDate(dateParseISO(d), 'MM/dd/yyyy')
+
+    const isOrgWithinFreemiumLimit =
+      !is_within_trial_period && active_users_count <= FREEMIUM_USER_LIMIT
+
     const currentMonthlyRate =
       billableUserCount > 0 ? billableUserCount * price_per_user : 0
-
-    const formatISODate = d => formatDate(dateParseISO(d), 'MM/dd/yyyy')
 
     return (
       <Wrapper>
@@ -174,7 +217,7 @@ class BillingInformation extends React.Component {
                   <HorizontalDivider />
                   <Box p={10}>
                     <Grid container justify="space-between">
-                      <Grid item>
+                      <Grid data-jest="billableUserCount" item>
                         {billableUserCount < 1 ? 0 : billableUserCount}
                       </Grid>
                       <Grid item>Billable people</Grid>
@@ -186,7 +229,9 @@ class BillingInformation extends React.Component {
             {in_app_billing ? (
               <Fragment>
                 <Block title="Current Monthly Rate">
-                  <FancyDollarAmount>{currentMonthlyRate}</FancyDollarAmount>
+                  <FancyDollarAmount>
+                    {isOrgWithinFreemiumLimit ? 0 : currentMonthlyRate}
+                  </FancyDollarAmount>
                   <Box my={25}>
                     {formatAsDollarAmount(price_per_user)}
                     /person per month
@@ -213,24 +258,22 @@ class BillingInformation extends React.Component {
                       {formatISODate(current_billing_period_end)}
                     </Grid>
                   </Grid>
+                  {isOrgWithinFreemiumLimit && (
+                    <FreeTrial
+                      trialTitle={'FREE'}
+                      trialLabel={'Free users'}
+                      trialsUsedCount={active_users_count}
+                      trialUsersCount={FREEMIUM_USER_LIMIT}
+                    />
+                  )}
                   {is_within_trial_period && (
-                    <div>
-                      <FreeTrial>FREE TRIAL</FreeTrial>
-                      <Grid container justify="space-between" spacing={16}>
-                        <Grid item>
-                          <Label>Free trials used:</Label>
-                        </Grid>
-                        <Grid item>
-                          {trialsUsedCount} of {trial_users_count}
-                        </Grid>
-                      </Grid>
-                      <Grid container justify="space-between" spacing={16}>
-                        <Grid item>
-                          <Label>Trial expires:</Label>
-                        </Grid>
-                        <Grid item>{formatISODate(trial_ends_at)}</Grid>
-                      </Grid>
-                    </div>
+                    <FreeTrial
+                      trialTitle={'FREE TRIAL'}
+                      trialLabel={'Free trials used'}
+                      trialsUsedCount={trialsUsedCount}
+                      trialUsersCount={trial_users_count}
+                      trialEndsAt={formatISODate(trial_ends_at)}
+                    />
                   )}
                 </Block>
               </Fragment>
