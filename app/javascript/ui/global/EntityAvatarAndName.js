@@ -43,7 +43,11 @@ class EntityAvatarAndName extends React.Component {
   render() {
     const { entity, isJoinableGroup } = this.props
     return (
-      <Flex align="center" onClick={this.handleClick}>
+      <Flex
+        align="center"
+        style={{ height: '42px' }}
+        onClick={this.handleClick}
+      >
         <Avatar key={entity.id} url={this.avatarUrl} />
         {entity.name && entity.name.trim().length > 0 && (
           <Flex ml={10} column>

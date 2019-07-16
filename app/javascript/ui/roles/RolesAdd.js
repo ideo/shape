@@ -379,7 +379,7 @@ class RolesAdd extends React.Component {
       <div>
         <Row align="center" style={{ marginBottom: 0, height: '32px' }}>
           <Heading3 noSpacing>{title}</Heading3>
-          {addableGroups.length && (
+          {!!addableGroups.length && (
             <RowItemRight>
               <Select
                 classes={{ root: 'select', selectMenu: 'selectMenu' }}
