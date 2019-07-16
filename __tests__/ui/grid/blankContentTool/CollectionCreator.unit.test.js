@@ -1,5 +1,10 @@
 import CollectionCreator from '~/ui/grid/blankContentTool/CollectionCreator'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
+import googleTagManager from '~/vendor/googleTagManager'
+import { routingStore } from '~/stores'
+
+jest.mock('../../../../app/javascript/vendor/googleTagManager')
+jest.mock('../../../../app/javascript/stores')
 
 const e = { preventDefault: jest.fn() }
 let wrapper, props, component
@@ -42,12 +47,12 @@ describe('MovableGridCard', () => {
           },
         },
         {
-          afterCreate: null,
+          afterCreate: component.afterCreate,
         }
       )
     })
 
-    describe('with SubmissionBox', () => {
+    describe('when collection is a SubmissionBox', () => {
       beforeEach(() => {
         props.type = 'submissionBox'
         props.createCard.mockClear()
@@ -55,7 +60,7 @@ describe('MovableGridCard', () => {
         component = wrapper.instance()
       })
 
-      it('calls createCard with input name', () => {
+      it('creates a card with submission box type and input text name', () => {
         component.state = {
           inputText: 'Challenge #1',
         }
@@ -69,7 +74,7 @@ describe('MovableGridCard', () => {
             },
           },
           {
-            afterCreate: expect.any(Function),
+            afterCreate: component.afterCreate,
           }
         )
       })
@@ -83,7 +88,7 @@ describe('MovableGridCard', () => {
         component = wrapper.instance()
       })
 
-      it('calls createCard with input name', () => {
+      it('creates a card with test collection type and input text name', () => {
         component.state = {
           inputText: 'My New Test',
         }
@@ -97,9 +102,37 @@ describe('MovableGridCard', () => {
             },
           },
           {
-            afterCreate: null,
+            afterCreate: component.afterCreate,
           }
         )
+      })
+    })
+  })
+  describe('afterCreate', () => {
+    describe('when collection is any collection', () => {
+      it('pushes an event to google tag manager', () => {
+        wrapper.setProps({ type: 'collection' })
+        component.afterCreate({})
+        expect(googleTagManager.push).toHaveBeenCalledWith({
+          event: 'formSubmission',
+          formType: 'Create Collection',
+        })
+      })
+    })
+    describe('when collection is a submission box', () => {
+      it('pushes an event to google tag manager and redirects', () => {
+        wrapper.setProps({ type: 'submissionBox' })
+        component.afterCreate({
+          record: {
+            id: 1,
+          },
+        })
+
+        expect(googleTagManager.push).toHaveBeenCalledWith({
+          event: 'formSubmission',
+          formType: 'Create Collection::SubmissionBox',
+        })
+        expect(routingStore.routeTo).toHaveBeenCalledWith('collections', 1)
       })
     })
   })

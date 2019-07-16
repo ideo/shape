@@ -3,6 +3,7 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled, { ThemeProvider } from 'styled-components'
 import FlipMove from 'react-flip-move'
 import pluralize from 'pluralize'
+import googleTagManager from '~/vendor/googleTagManager'
 
 import v, { ITEM_TYPES } from '~/utils/variables'
 import QuestionSelectHolder from '~/ui/test_collections/QuestionSelectHolder'
@@ -172,9 +173,18 @@ class TestDesigner extends React.Component {
     this.confirmActionIfResponsesExist({
       action: () => {
         const order = addBefore ? card.order - 0.5 : card.order + 1
-        this.createNewQuestionCard({ order })
+        const createdCard = this.createNewQuestionCard({ order })
+
+        if (createdCard) this.trackQuestionCreation()
       },
       message: 'Are you sure you want to add a new question?',
+    })
+  }
+
+  trackQuestionCreation = () => {
+    googleTagManager.push({
+      event: 'formSubmission',
+      formType: `Create ${ITEM_TYPES.QUESTION}`,
     })
   }
 

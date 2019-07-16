@@ -5,6 +5,7 @@ import { BctTextField, FormButton } from '~/ui/global/styled/forms'
 import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
 import v, { KEYS } from '~/utils/variables'
 import { routingStore } from '~/stores'
+import googleTagManager from '~/vendor/googleTagManager'
 
 class CollectionCreator extends React.Component {
   state = {
@@ -24,31 +25,46 @@ class CollectionCreator extends React.Component {
     }
   }
 
+  afterCreate = card => {
+    googleTagManager.push({
+      event: 'formSubmission',
+      formType: `Create ${this.dbType || 'Collection'}`,
+    })
+
+    // if creating a submissionBox we route you to finish setting up the collection
+    if (this.props.type === 'submissionBox')
+      routingStore.routeTo('collections', card.record.id)
+  }
+
   createCollection = e => {
     e.preventDefault()
     if (!this.state.inputText) return
     const { createCard, type } = this.props
-    let dbType = null
-    if (type === 'submissionBox') dbType = 'Collection::SubmissionBox'
-    else if (type === 'testCollection') dbType = 'Collection::TestCollection'
-    else if (type === 'foamcoreBoard') dbType = 'Collection::Board'
+
     createCard(
       {
         // `collection` is the collection being created within the card
         collection_attributes: {
           name: this.state.inputText,
           master_template: type === 'template',
-          type: dbType,
+          type: this.dbType,
         },
       },
       {
-        // if creating a submissionBox we route you to finish setting up the collection
-        afterCreate:
-          type === 'submissionBox'
-            ? card => routingStore.routeTo('collections', card.record.id)
-            : null,
+        afterCreate: this.afterCreate,
       }
     )
+  }
+
+  get dbType() {
+    const { type } = this.props
+    let dbType = null
+
+    if (type === 'submissionBox') dbType = 'Collection::SubmissionBox'
+    else if (type === 'testCollection') dbType = 'Collection::TestCollection'
+    else if (type === 'foamcoreBoard') dbType = 'Collection::Board'
+
+    return dbType
   }
 
   get typeName() {

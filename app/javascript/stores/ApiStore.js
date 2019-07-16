@@ -383,7 +383,7 @@ class ApiStore extends jsonapi(datxCollection) {
     let thread = null
     // look within our local store
     this.findAll('comment_threads').forEach(ct => {
-      if (ct.record && ct.record.id === record.id) {
+      if (ct.record && ct.record === record) {
         thread = ct
       }
     })
