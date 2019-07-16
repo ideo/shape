@@ -109,7 +109,7 @@ class Header extends React.Component {
       const { parent_collection_card } = record
       if (
         parent_collection_card.parent_id &&
-        parent_collection_card.can_view_parent
+        parent_collection_card.can_edit_parent
       ) {
         routingStore.routeTo('collections', parent_collection_card.parent_id)
       } else {

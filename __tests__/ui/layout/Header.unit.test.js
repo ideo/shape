@@ -116,7 +116,7 @@ describe('Header', () => {
         props.uiStore.update.mockClear()
         props.uiStore.pageMenuOpen = null
         component.record.parent_collection_card = {}
-        component.record.parent_collection_card.can_view_parent = true
+        component.record.parent_collection_card.can_edit_parent = true
         component.record.parent_collection_card.parent_id = 1
         component.routeBack()
       })
