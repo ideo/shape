@@ -63,18 +63,20 @@ describe Api::V1::Admin::PaidTestsController, type: :request, json: true, auth: 
         'Email' => user.email,
         'Phone' => user.phone,
         'Amount Owed' => format('%.2f', amount_owed),
+        'Test Collection(s)' => test_collection.name,
+        'Test Audience(s)' => test_audience.audience.name,
+        'Completed/Owed At' => survey_response.incentive_owed_at.to_s,
       )
     end
 
     it 'marks response as paid' do
-      expect(ExportPendingIncentivesWorker).to receive(:perform_async)
+      expect(RecordPaidSurveyResponseWorker).to receive(:perform_async).with(survey_response.id)
       get(path)
     end
 
     context 'after requesting once' do
       before do
-        # perform as if the worker had run
-        PaidTests::ExportPendingIncentives.mark_as_paid!
+        survey_response.record_incentive_paid!
       end
 
       it 'returns empty csv' do
@@ -127,7 +129,7 @@ describe Api::V1::Admin::PaidTestsController, type: :request, json: true, auth: 
     it 'returns month range' do
       get(path)
       expect(json['months']).to eq(
-        ['June 2018', 'July 2018', 'August 2018', 'September 2018']
+        ['June 2018', 'July 2018', 'August 2018', 'September 2018'],
       )
     end
   end
