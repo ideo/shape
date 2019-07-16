@@ -745,7 +745,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   trackAudienceTargeting = audience => {
-    if (audience.isLinkSharing) return
     googleTagManager.push({
       event: 'formSubmission',
       formType: `Audience targeted with a test`,
@@ -767,10 +766,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
       if (launchedTest) this.trackTestAction(actionName)
 
-      if (launchedTest && actionName === 'launch') {
-        audiences.map(audienceData =>
-          this.trackAudienceTargeting(audienceData.audience)
-        )
+      if (launchedTest && actionName === 'launch' && audiences) {
+        audiences.forEach((value, key, _map) => {
+          console.log(key, value)
+          if (value.selected && !value.audience.isLinkSharing)
+            this.trackAudienceTargeting(value.audience)
+        })
       }
     } catch (e) {
       const errorMessages = e.error.map(e => ` ${e.detail}`)
