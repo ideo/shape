@@ -87,14 +87,6 @@ class TestAudience < ApplicationRecord
     !paid?
   end
 
-  def survey_response_completed!
-    return unless reached_sample_size?
-    self.status = :closed
-    self.closed_at = Time.current
-    save
-    test_collection.test_audience_closed!
-  end
-
   def reached_sample_size?
     return false if link_sharing?
     survey_responses.completed.size >= sample_size

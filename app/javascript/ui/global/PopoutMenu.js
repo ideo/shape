@@ -47,21 +47,42 @@ export const StyledMenuWrapper = styled.div`
   padding: 10px;
   z-index: ${v.zIndex.aboveClickWrapper};
   ${props => {
-    if (props.position) {
-      let adjustLeft = 250
-      if (props.direction === 'right') {
-        adjustLeft = 50
+    const { position, offsetPosition, menu } = props
+    // this is for the GridCard actionmenu
+    const defaultFixedPosition = `
+      top: 22px;
+      right: -10px;
+    `
+
+    // dynamic positioning based on component dimensions, click position relative to the screen
+    if (position && offsetPosition) {
+      const { x, y } = position
+      if (x === 0 && y === 0 && menu === 'card-menu') {
+        // don't use offset position when card click event happens within dot menu
+        return defaultFixedPosition
       }
+      const { x: offsetX, y: offsetY } = offsetPosition
+      const transformX = x - offsetX
+      const transformY = y + offsetY
+
       return `
-      position: absolute;
-      left: ${props.position.x - adjustLeft + 32}px;
-      top: ${props.position.y + 10}px;
+        left: ${transformX}px;
+        top: ${transformY}px;
       `
     }
-    return ''
-  }} ${props =>
-    !props.position &&
-    (props.direction === 'right' ? 'left: 0; top: 42px;' : 'right: -32px;')};
+
+    // dynamic positioning based on component dimensions, click position relative to the parent component
+    if (offsetPosition) {
+      const { x: offsetX, y: offsetY } = offsetPosition
+      return `
+        left: ${offsetX}px;
+        top: ${offsetY}px;
+      `
+    }
+    // fallback default position for all other menus that don't use dynamic positioning
+    // popout menu instances, org, collection, action menu, etc.
+    return defaultFixedPosition
+  }}}
 `
 StyledMenuWrapper.displayName = 'StyledMenuWrapper'
 
@@ -100,16 +121,20 @@ export const StyledMenuItem = styled.li`
     border-bottom: solid ${v.colors.commonMedium};
     border-bottom-width: ${props => (props.noBorder ? 0 : 1)}px;
     color: ${v.colors.black};
-    &.with-left {
-      padding-left: 2rem;
-    }
     &.with-avatar {
       padding-left: 3.75rem;
       padding-right: 1rem;
     }
-    &.with-right {
-      padding-right: 2.5rem;
+
+    .icon-left {
+      margin-right: ${props =>
+        props.wrapperClassName === 'card-menu' ? 16 : 0}px;
     }
+
+    .icon-left .icon {
+      left: ${props => (props.wrapperClassName === 'card-menu' ? 8 : 0)}px;
+    }
+
     .icon {
       left: 0;
       top: 50%;
@@ -119,12 +144,10 @@ export const StyledMenuItem = styled.li`
       height: 16px;
       line-height: 1.4rem;
     }
-    .icon-left .icon {
-      left: 8px;
-    }
     .icon-right .icon {
       left: auto;
-      right: 1.5rem;
+      right: ${props =>
+        props.wrapperClassName === 'add-audience-menu' ? -0.5 : 1.5}rem;
     }
     span {
       line-height: 1.4rem;
@@ -151,7 +174,7 @@ class PopoutMenu extends React.Component {
   }
 
   get renderMenuItems() {
-    const { groupExtraComponent } = this.props
+    const { groupExtraComponent, wrapperClassName } = this.props
     const { groupedMenuItems } = this
     const rendered = []
     Object.keys(groupedMenuItems).forEach(groupName => {
@@ -169,23 +192,26 @@ class PopoutMenu extends React.Component {
               withAvatar,
             } = item
             let className = `menu-${_.kebabCase(name)}`
-            if (iconLeft) className += ' with-left'
-            if (iconRight) className += ' with-right'
+            const rightIconClassName = 'icon-right'
             if (withAvatar) className += ' with-avatar'
+
             return (
               <StyledMenuItem
                 key={`${name}-${id || ''}`}
                 noBorder={item.noBorder}
                 loading={loading}
+                wrapperClassName={wrapperClassName}
               >
                 <button
                   onClick={loading ? () => null : onClick}
                   data-cy={`PopoutMenu_${_.camelCase(name)}`}
                   className={className}
                 >
-                  <span className="icon-left">{iconLeft}</span>
+                  {iconLeft && <span className="icon-left">{iconLeft}</span>}
                   <span>{name}</span>
-                  <span className="icon-right">{iconRight}</span>
+                  {iconRight && (
+                    <span className={rightIconClassName}>{iconRight}</span>
+                  )}
                 </button>
               </StyledMenuItem>
             )
@@ -230,8 +256,8 @@ class PopoutMenu extends React.Component {
       onClick,
       width,
       buttonStyle,
-      direction,
       position,
+      offsetPosition,
       hideDotMenu,
     } = this.props
 
@@ -259,10 +285,11 @@ class PopoutMenu extends React.Component {
           </MenuToggle>
         )}
         <StyledMenuWrapper
-          direction={direction}
           position={position}
+          offsetPosition={offsetPosition}
           height={200}
           className="menu-wrapper"
+          menu={wrapperClassName}
         >
           <StyledMenu width={width}>{this.renderMenuItems}</StyledMenu>
         </StyledMenuWrapper>
@@ -298,6 +325,10 @@ PopoutMenu.propTypes = {
     x: PropTypes.number,
     y: PropTypes.number,
   }),
+  offsetPosition: PropTypes.shape({
+    x: PropTypes.number,
+    y: PropTypes.number,
+  }),
   groupedMenuItems: PropTypes.shape({
     top: propTypeMenuItem,
     organizations: propTypeMenuItem,
@@ -306,7 +337,6 @@ PopoutMenu.propTypes = {
   groupExtraComponent: PropTypes.shape({
     component: PropTypes.node,
   }),
-  direction: PropTypes.oneOf(['left', 'right']),
 }
 
 PopoutMenu.defaultProps = {
@@ -319,11 +349,11 @@ PopoutMenu.defaultProps = {
   wrapperClassName: 'card-menu',
   menuOpen: false,
   position: null,
+  offsetPosition: null,
   disabled: false,
   buttonStyle: '',
   width: 200,
   groupExtraComponent: {},
-  direction: 'left',
   hideDotMenu: false,
 }
 

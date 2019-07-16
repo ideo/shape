@@ -554,6 +554,19 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
+    context 'without edit access for all cards' do
+      let!(:to_collection) { create(:collection, add_editors: [user]) }
+      before do
+        # user will no longer be an editor
+        moving_cards.first.record.unanchor!
+      end
+
+      it 'returns a 401' do
+        patch(path, params: params)
+        expect(response.status).to eq(401)
+      end
+    end
+
     context 'trying to move inside itself' do
       let!(:from_collection) do
         create(:collection, organization: to_collection.organization, add_editors: [user])

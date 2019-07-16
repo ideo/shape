@@ -13,6 +13,7 @@ describe User, type: :model do
     it { should have_many :comments }
     it { should have_many :activities_as_actor }
     it { should have_many :notifications }
+    it { should have_many :survey_responses }
 
     context 'as application bot user' do
       let(:organizations) { create_list(:organization, 2) }

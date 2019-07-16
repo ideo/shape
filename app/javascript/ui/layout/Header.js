@@ -76,8 +76,7 @@ class Header extends React.Component {
 
   openMenu = ev => {
     const { uiStore } = this.props
-    const direction = ev.screenX < v.actionMenuWidth ? 'right' : 'left'
-    uiStore.update('pageMenuOpen', direction)
+    uiStore.update('pageMenuOpen', true)
   }
 
   closeMenu = () => {
@@ -107,11 +106,12 @@ class Header extends React.Component {
       type === 'move' ||
       type === 'archive'
     ) {
-      if (record.parent_collection_card.parent_id) {
-        routingStore.routeTo(
-          'collections',
-          record.parent_collection_card.parent_id
-        )
+      const { parent_collection_card } = record
+      if (
+        parent_collection_card.parent_id &&
+        parent_collection_card.can_edit_parent
+      ) {
+        routingStore.routeTo('collections', parent_collection_card.parent_id)
       } else {
         routingStore.routeTo('homepage')
       }
@@ -173,7 +173,6 @@ class Header extends React.Component {
             canView={record.can_view}
             canEdit={record.can_edit}
             canReplace={record.canReplace}
-            direction={uiStore.pageMenuOpen || 'left'}
             submissionBox={record.isSubmissionBox}
             menuOpen={!!uiStore.pageMenuOpen}
             onOpen={this.openMenu}

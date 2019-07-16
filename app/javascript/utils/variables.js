@@ -1,3 +1,9 @@
+// global vars from Rails application (or undefined, e.g. in a unit test)
+export const FEEDBACK_INCENTIVE_AMOUNT = window.FEEDBACK_INCENTIVE_AMOUNT || 2.5
+export const TARGETED_AUDIENCE_PRICE_PER_RESPONSE =
+  window.TARGETED_AUDIENCE_PRICE_PER_RESPONSE || 2
+export const FREEMIUM_USER_LIMIT = window.FREEMIUM_USER_LIMIT || 5
+
 export const ITEM_TYPES = {
   TEXT: 'Item::TextItem',
   FILE: 'Item::FileItem',
@@ -69,10 +75,22 @@ export const KEYS = {
   ESC: 27,
 }
 
-// global vars from Rails application (or undefined, e.g. in a unit test)
-export const FEEDBACK_INCENTIVE_AMOUNT = window.FEEDBACK_INCENTIVE_AMOUNT || 2.5
-export const TARGETED_AUDIENCE_PRICE_PER_RESPONSE =
-  window.TARGETED_AUDIENCE_PRICE_PER_RESPONSE || 2
+export const EVENT_SOURCE_TYPES = {
+  GRID_CARD: 'gridCard',
+  AUDIENCE_SETTINGS: 'audienceSettings',
+}
+
+// used for moving components around by setting top and left values after click
+export const POPOUT_MENU_OFFSET_MAP = {
+  audienceSettings: {
+    x: 20,
+    y: 90,
+  },
+  gridCard: {
+    x: 20,
+    y: 90,
+  },
+}
 
 export default {
   headerHeight: 50,
@@ -83,6 +101,7 @@ export default {
   topScrollTrigger: 210,
   maxTitleLength: 144,
   actionMenuWidth: 250,
+  actionMenuHeight: 26,
 
   // Keep in sync with assets/stylesheets/core/base.scss
   responsive: {

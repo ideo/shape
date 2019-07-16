@@ -41,7 +41,6 @@ class Avatar extends React.Component {
     if (this.error) {
       return Avatar.defaultProps.url
     }
-    console.log(this.props.url)
     return this.props.url
   }
 
