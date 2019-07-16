@@ -7,14 +7,22 @@ class SurveyResponseCompletion < SimpleService
   end
 
   def call
-    @survey_response.save
+    mark_as_completed!
     @survey_response.cache_test_scores!
     update_test_audience_if_complete
     mark_response_as_payment_owed
     ping_collection
+    @survey_response
   end
 
   private
+
+  def mark_as_completed!
+    return unless @survey_response.in_progress?
+    status = :completed
+    status = :completed_late if test_collection.closed? || test_audience&.closed?
+    @survey_response.update(status: status)
+  end
 
   def update_test_audience_if_complete
     return unless test_audience.present? &&

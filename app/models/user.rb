@@ -96,7 +96,7 @@ class User < ApplicationRecord
   has_many :activities_as_subject, through: :activity_subjects, class_name: 'Activity'
   has_many :activity_subjects, as: :subject
   has_many :notifications
-  has_many :feedback_incentive_records
+  has_many :survey_responses
 
   has_many :user_profiles,
            class_name: 'Collection::UserProfile',

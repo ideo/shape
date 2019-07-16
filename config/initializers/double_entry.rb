@@ -17,7 +17,8 @@ DoubleEntry.configure do |config|
 
     # - For tests, cash moves into deferred revenue account because we can't immediately
     #   book the revenue for tests (we have to wait for payouts)
-    accounts.define(identifier: :revenue_deferred, scope_identifier: payment_scope, positive_only: true)
+    # NOTE: allows negative, because we may actually pay out more people > sample_size
+    accounts.define(identifier: :revenue_deferred, scope_identifier: payment_scope)
 
     # - Payment processor accounts track all of our expenses for transactions,
     #   e.g. Stripe and Paypal

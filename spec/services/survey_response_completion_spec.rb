@@ -24,7 +24,6 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
     allow(NetworkApi::PaymentMethod).to receive(:find).and_return(
       [payment_method_double],
     )
-    allow(survey_response).to receive(:completed?).and_return(true)
   end
 
   describe '#call' do
@@ -33,9 +32,33 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
       service.call
     end
 
+    context 'when test audience is open' do
+      it 'marks the survey_response as completed' do
+        expect(survey_response.completed?).to be false
+        service.call
+        expect(survey_response.completed?).to be true
+      end
+    end
+
+    context 'when test audience is closed' do
+      before do
+        test_audience.closed!
+      end
+
+      it 'marks the survey_response as completed_late' do
+        expect(survey_response.completed_late?).to be false
+        service.call
+        expect(survey_response.completed_late?).to be true
+      end
+    end
+
     context 'when sample size has not been reached' do
-      it 'returns nil and test_audience remains open' do
-        expect(test_collection).not_to receive(:test_audience_closed!)
+      before do
+        test_audience.update(sample_size: 5)
+      end
+
+      it 'does not close the test audience' do
+        expect(test_audience.status).to eq 'open'
         service.call
         expect(test_audience.status).to eq 'open'
       end
@@ -43,10 +66,10 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
 
     context 'when test audience has reached sample size' do
       before do
-        allow(test_audience).to receive(:reached_sample_size?).and_return(true)
+        test_audience.update(sample_size: 1)
       end
 
-      it 'updates the status' do
+      it 'updates the test audience status' do
         expect(test_audience.status).to eq 'open'
         service.call
         expect(test_audience.status).to eq 'closed'
@@ -83,13 +106,13 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
         expect(survey_response.incentive_status).to eq('incentive_owed')
       end
 
-      it 'will only mark amount owed once' do
+      it 'will only mark amount owed once and not for additional dupe survey response' do
         service.call
         expect(
           user.incentive_owed_account_balance.to_f,
         ).to eq(TestAudience.incentive_amount)
 
-        # call it again
+        # call it again, balance shouldn't change
         service.call
         expect(
           user.reload.incentive_owed_account_balance.to_f,
@@ -100,6 +123,7 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
         expect(
           user.reload.incentive_owed_account_balance.to_f,
         ).to eq(TestAudience.incentive_amount)
+        # dupe response remains unearned
         expect(survey_response2.incentive_unearned?).to be true
       end
 
