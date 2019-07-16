@@ -177,7 +177,7 @@
     "whatwg-fetch": "^3.0.0"
   },
   "devDependencies": {
-    "cypress": "^3.3.1",
+    "cypress": "3.4.0",
     "cypress-cucumber-preprocessor": "ideo/cypress-cucumber-preprocessor#3e39b05",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
