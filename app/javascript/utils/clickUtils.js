@@ -1,6 +1,7 @@
 import v, {
   EVENT_SOURCE_TYPES,
-  POPOUT_MENU_OFFSET_MAP,
+  INITIAL_OFFSET_X,
+  INITIAL_OFFSET_Y,
 } from '~/utils/variables'
 
 // returns position to move popout menu dynamically
@@ -21,30 +22,34 @@ const calculatePopoutMenuOffset = (e, eventSource, popoutMenuItemCount = 1) => {
   const menuBoundaryYMax = innerHeight
 
   // set offsets per component
-  const componentOffsets = POPOUT_MENU_OFFSET_MAP[eventSource]
-  const { x, y } = componentOffsets
   let leftOffset
   let rightOffset
   let topOffset
   let bottomOffset
 
-  // todo: add pageMenu, orgMenu, bctMenu etc. if necessary since offsets may differ per component
+  // todo: add orgMenu, bctMenu etc. if necessary since offsets may differ per component
   switch (eventSource) {
     case EVENT_SOURCE_TYPES.AUDIENCE_SETTINGS:
       const topOffsetMaxValue = -230 // never exceed click position
-      leftOffset = totalWidth - x
-      rightOffset = -x + 20
+      leftOffset = totalWidth - INITIAL_OFFSET_X
+      rightOffset = -INITIAL_OFFSET_X + 20
       topOffset =
-        -totalHeight - y - 60 > topOffsetMaxValue
-          ? -y - 20
-          : -totalHeight - y - 60
+        -totalHeight - INITIAL_OFFSET_Y - 60 > topOffsetMaxValue
+          ? -INITIAL_OFFSET_Y - 20
+          : -totalHeight - INITIAL_OFFSET_Y - 60
       bottomOffset = -35
+      break
+    case EVENT_SOURCE_TYPES.PAGE_MENU:
+      leftOffset = totalWidth - INITIAL_OFFSET_X + 15
+      rightOffset = -INITIAL_OFFSET_X + 20
+      topOffset = -totalHeight - INITIAL_OFFSET_Y
+      bottomOffset = 0
       break
     case EVENT_SOURCE_TYPES.GRID_CARD:
     default:
-      leftOffset = totalWidth - x
-      rightOffset = -x
-      topOffset = -totalHeight - y
+      leftOffset = totalWidth - INITIAL_OFFSET_X
+      rightOffset = -INITIAL_OFFSET_X
+      topOffset = -totalHeight - INITIAL_OFFSET_Y
       bottomOffset = 0
       break
   }

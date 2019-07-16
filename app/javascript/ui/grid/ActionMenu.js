@@ -288,7 +288,15 @@ class ActionMenu extends React.Component {
   }
 
   render() {
-    const { className, menuOpen, wrapperClassName, uiStore } = this.props
+    const {
+      className,
+      menuOpen,
+      wrapperClassName,
+      uiStore,
+      location,
+      offsetPosition,
+    } = this.props
+
     return (
       <PopoutMenu
         className={className}
@@ -299,11 +307,9 @@ class ActionMenu extends React.Component {
         menuOpen={menuOpen}
         buttonStyle={this.buttonStyle}
         position={{ x: uiStore.cardMenuOpen.x, y: uiStore.cardMenuOpen.y }}
-        offsetPosition={{
-          x: uiStore.cardMenuOpen.offsetX,
-          y: uiStore.cardMenuOpen.offsetY,
-        }}
+        offsetPosition={offsetPosition}
         width={250}
+        location={location}
       />
     )
   }
@@ -325,6 +331,10 @@ ActionMenu.propTypes = {
   afterArchive: PropTypes.func,
   testCollectionCard: PropTypes.bool,
   menuItemsCount: PropTypes.func,
+  offsetPosition: PropTypes.shape({
+    x: PropTypes.number,
+    y: PropTypes.number,
+  }),
 }
 ActionMenu.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -340,6 +350,7 @@ ActionMenu.defaultProps = {
   submissionBox: false,
   testCollectionCard: false,
   menuItemsCount: null,
+  offsetPosition: null,
 }
 
 export default ActionMenu

@@ -78,19 +78,12 @@ export const KEYS = {
 export const EVENT_SOURCE_TYPES = {
   GRID_CARD: 'gridCard',
   AUDIENCE_SETTINGS: 'audienceSettings',
+  PAGE_MENU: 'pageMenu',
 }
 
-// used for moving components around by setting top and left values after click
-export const POPOUT_MENU_OFFSET_MAP = {
-  audienceSettings: {
-    x: 20,
-    y: 90,
-  },
-  gridCard: {
-    x: 20,
-    y: 90,
-  },
-}
+// warning: don't change, modify component based offsets instead. see: clickUtils::calculatePopoutMenuOffset
+export const INITIAL_OFFSET_X = 20
+export const INITIAL_OFFSET_Y = 90
 
 export default {
   headerHeight: 50,

@@ -24,9 +24,10 @@ import {
   HeaderSpacer,
 } from '~/ui/global/styled/layout'
 import Avatar from '~/ui/global/Avatar'
-import v from '~/utils/variables'
+import v, { EVENT_SOURCE_TYPES } from '~/utils/variables'
 import BasicHeader from '~/ui/layout/BasicHeader'
 import LoggedOutBasicHeader from '~/ui/layout/LoggedOutBasicHeader'
+import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 
 /* global IdeoSSO */
 
@@ -50,6 +51,9 @@ const StyledSeparator = styled.div`
 @inject('apiStore', 'routingStore', 'uiStore')
 @observer
 class Header extends React.Component {
+  state = {
+    headerMenuOffsetPosition: null,
+  }
   @observable
   actionsWidth = 0
 
@@ -77,6 +81,13 @@ class Header extends React.Component {
   openMenu = ev => {
     const { uiStore } = this.props
     uiStore.update('pageMenuOpen', true)
+    const { offsetX, offsetY } = calculatePopoutMenuOffset(
+      ev,
+      EVENT_SOURCE_TYPES.PAGE_MENU
+    )
+    this.setState({
+      headerMenuOffsetPosition: { x: offsetX, y: offsetY },
+    })
   }
 
   closeMenu = () => {
@@ -157,8 +168,9 @@ class Header extends React.Component {
   }
 
   get actionMenu() {
-    const { record } = this
+    const { record, state } = this
     const { uiStore } = this.props
+    const { headerMenuOffsetPosition } = state
     if (!this.hasActions) return null
     if (record.parent_collection_card) {
       // TODO hacky way to include the record on the card link
@@ -179,6 +191,7 @@ class Header extends React.Component {
             onLeave={this.closeMenu}
             onMoveMenu={this.routeBack}
             afterArchive={this.routeBack}
+            offsetPosition={headerMenuOffsetPosition}
           />
         </IconAvatar>
       )
