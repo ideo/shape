@@ -48,7 +48,9 @@ export const StyledMenuWrapper = styled.div`
   z-index: ${v.zIndex.aboveClickWrapper};
   ${props => {
     const { position, offsetPosition, menu } = props
+    // this is for the GridCard actionmenu
     const defaultFixedPosition = `
+      top: 22px;
       right: -10px;
     `
 
