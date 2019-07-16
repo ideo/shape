@@ -191,7 +191,7 @@ class RolesAdd extends React.Component {
       has_payment_method,
     } = currentUserOrganization
     const willReachMaxUsers =
-      emails.length + active_users_count >= FREEMIUM_USER_LIMIT
+      emails.length + active_users_count > FREEMIUM_USER_LIMIT
     const shouldAskForPaymentMethod = !has_payment_method && willReachMaxUsers
     if (shouldAskForPaymentMethod) {
       const popupAgreed = new Promise((resolve, reject) => {
