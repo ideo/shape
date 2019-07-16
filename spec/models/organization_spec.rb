@@ -135,7 +135,7 @@ describe Organization, type: :model do
       context 'in_app_billing changed to true' do
         let(:organization) { create(:organization, in_app_billing: false) }
 
-        context 'payment method exits' do
+        context 'payment method exists' do
           it 'creates a new subscription' do
             plan = double('plan', id: 123)
             payment_method = double('payment_method', id: 234)
@@ -697,6 +697,27 @@ describe Organization, type: :model do
         [],
       )
       organization.add_shared_with_org_collections(user)
+    end
+  end
+
+  describe '#days_before_payment_added' do
+    let(:organization) { create(:organization, has_payment_method: true, created_at: 3.days.ago) }
+    let(:network_organization) { double('network_organization', id: 345) }
+    let(:payment_method) { double('payment_method', id: 234, created_at: Date.today) }
+
+    before do
+      allow(organization).to receive(:network_organization).and_return(network_organization)
+      allow(NetworkApi::PaymentMethod).to receive(:find).with(
+        organization_id: network_organization.id,
+        default: true,
+      ).and_return([payment_method])
+    end
+
+    context 'when there is a payment method' do
+      it 'returns the number of days between creating org and adding payment method' do
+        # huh?s
+        expect(organization.days_before_payment_added).to eq 3
+      end
     end
   end
 end
