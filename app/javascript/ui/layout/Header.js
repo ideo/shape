@@ -83,8 +83,7 @@ class Header extends React.Component {
     uiStore.update('pageMenuOpen', true)
     const { offsetX, offsetY } = calculatePopoutMenuOffset(
       ev,
-      EVENT_SOURCE_TYPES.PAGE_MENU,
-      6 // hardcoded number of menu items
+      EVENT_SOURCE_TYPES.PAGE_MENU
     )
     this.setState({
       headerMenuOffsetPosition: { x: offsetX, y: offsetY },
