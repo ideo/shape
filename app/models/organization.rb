@@ -42,6 +42,7 @@ class Organization < ApplicationRecord
   RECENTLY_ACTIVE_RANGE = 90.days
   DEFAULT_TRIAL_ENDS_AT = 30.days
   DEFAULT_TRIAL_USERS_COUNT = 25
+  FREEMIUM_USER_LIMIT = 5
   PRICE_PER_USER = 5.00
   SUPER_ADMIN_EMAIL = ENV['SUPER_ADMIN_EMAIL'] || 'admin@shape.space'.freeze
 
@@ -103,17 +104,20 @@ class Organization < ApplicationRecord
   after_update :update_subscription, if: :saved_change_to_in_app_billing?
   after_update :update_deactivated, if: :saved_change_to_deactivated?
 
-  delegate :admins, :members, :filestack_file_url, :handle,
+  delegate :admins, :members, :handle,
            to: :primary_group, allow_nil: true
 
   validates :name, presence: true
 
   scope :active, -> { where(deactivated: false) }
-  scope :billable, -> { active.where(in_app_billing: true) }
+  scope :billable, -> do
+    active
+      .where(in_app_billing: true)
+      .where(arel_table[:active_users_count].gt(FREEMIUM_USER_LIMIT))
+  end
   scope :overdue, -> do
     billable
       .where.not(overdue_at: nil)
-      .where(arel_table[:active_users_count].gt(0))
   end
 
   def self.display_name
@@ -271,23 +275,6 @@ class Organization < ApplicationRecord
     ).first
   end
 
-  def calculate_active_users_count!
-    # We only want to count activity users have done within this particular org
-    # e.g. a user may have logged in recently and been "active" but in a different org
-
-    # TODO: refactor last_active_at to be a json of org_id => timestamp e.g. { "1": timestamp, "22" : timestamp }
-    count = Activity
-            .joins(:actor)
-            .where(User.arel_table[:status].eq(User.statuses[:active]))
-            .where(User.arel_table[:email].not_eq(SUPER_ADMIN_EMAIL))
-            .where(organization_id: id)
-            .where(Activity.arel_table[:created_at].gt(RECENTLY_ACTIVE_RANGE.ago))
-            .select(:actor_id)
-            .distinct
-            .count
-    update_attributes(active_users_count: count)
-  end
-
   def within_trial_period?
     return false unless trial_ends_at
 
@@ -296,31 +283,6 @@ class Organization < ApplicationRecord
 
   def trial_users_exceeded?
     active_users_count > trial_users_count
-  end
-
-  def create_network_usage_record
-    calculate_active_users_count!
-    return true unless in_app_billing
-
-    count = active_users_count
-
-    if within_trial_period?
-      return true unless count > DEFAULT_TRIAL_USERS_COUNT
-
-      count -= DEFAULT_TRIAL_USERS_COUNT
-    end
-
-    if NetworkApi::UsageRecord.create(
-      quantity: count,
-      timestamp: Time.current.end_of_day.to_i,
-      external_organization_id: id,
-    )
-      true
-    else
-      false
-    end
-  rescue JsonApiClient::Errors::ServerError
-    false
   end
 
   def update_payment_status
@@ -411,6 +373,10 @@ class Organization < ApplicationRecord
 
   def roles_anchor_collection_id
     nil
+  end
+
+  def admin_users
+    User.find(admin_group.user_ids)
   end
 
   private

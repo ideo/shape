@@ -61,6 +61,8 @@ class Api::V1::UsersController < Api::V1::BaseController
       if session_uid
         survey_response = SurveyResponse.find_by_session_uid(session_uid)
         survey_response.update(user_id: creator.limited_user.id)
+        # run this to capture potential incentive_owed
+        SurveyResponseCompletion.call(survey_response)
       end
       render jsonapi: creator.limited_user
     else

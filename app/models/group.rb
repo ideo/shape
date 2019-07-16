@@ -172,6 +172,14 @@ class Group < ApplicationRecord
     save
   end
 
+  def avatar_url
+    if filestack_file_signed_url.present?
+      filestack_file_signed_url
+    else
+      'https://s3-us-west-2.amazonaws.com/assets.shape.space/group-avatar.png'
+    end
+  end
+
   private
 
   def create_shared_collection

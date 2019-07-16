@@ -33,6 +33,39 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
       service.call
     end
 
+    context 'when sample size has not been reached' do
+      it 'returns nil and test_audience remains open' do
+        expect(test_collection).not_to receive(:test_audience_closed!)
+        service.call
+        expect(test_audience.status).to eq 'open'
+      end
+    end
+
+    context 'when test audience has reached sample size' do
+      before do
+        allow(test_audience).to receive(:reached_sample_size?).and_return(true)
+      end
+
+      it 'updates the status' do
+        expect(test_audience.status).to eq 'open'
+        service.call
+        expect(test_audience.status).to eq 'closed'
+      end
+
+      it 'calls test_collection.test_audience_closed!' do
+        expect(test_collection).to receive(:test_audience_closed!)
+        service.call
+      end
+
+      context 'when already closed' do
+        it 'does not call test_collection.test_audience_closed!' do
+          test_audience.closed!
+          expect(test_collection).not_to receive(:test_audience_closed!)
+          service.call
+        end
+      end
+    end
+
     context 'with a user' do
       let(:user) { create(:user) }
       let(:survey_response2) { create(:survey_response, test_collection: test_collection, test_audience: test_audience) }

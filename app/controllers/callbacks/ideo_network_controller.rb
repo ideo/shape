@@ -47,27 +47,27 @@ class Callbacks::IdeoNetworkController < ApplicationController
     group = Group.find_by(network_id: role[:resource_id])
     user = User.find_by(uid: users_role_params[:user_uid])
 
-    case event
-    when :added
-      process_group_role_added(role: role, group: group, user: user)
-    when :removed
-      process_group_role_removed(role: role, group: group, user: user)
+    case event.to_s
+    when 'users_role.created'
+      process_group_role_created(role: role, group: group, user: user)
+    when 'users_role.deleted'
+      process_group_role_deleted(role: role, group: group, user: user)
     else
       logger.debug("Unsupported user roles event: #{event}")
       head :bad_request
       return
-      end
+    end
 
     head :ok
   end
 
   def groups
-    case event
-    when :created
+    case event.to_s
+    when 'group.created'
       process_group_created
-    when :deleted
+    when 'group.deleted'
       process_group_deleted
-    when :updated
+    when 'group.updated'
       process_group_updated
     else
       logger.debug("Unsupported group event: #{event}")
@@ -89,8 +89,8 @@ class Callbacks::IdeoNetworkController < ApplicationController
   end
 
   def process_group_created
-    return unless group_params[:organization_id]
-    organization = find_included('organizations')[:attributes]
+    organization = find_included('organizations').try(:[], :attributes)
+    return if organization.blank?
     return if Group.find_by(network_id: group_params[:id]).present?
     Group.create(name: group_params[:name],
                  organization_id: organization[:external_id],
@@ -105,7 +105,7 @@ class Callbacks::IdeoNetworkController < ApplicationController
     group.update_from_network_profile(group_params)
   end
 
-  def process_group_role_added(role:, group:, user:)
+  def process_group_role_created(role:, group:, user:)
     Roles::MassAssign.call(
       object: group,
       role_name: role[:name],
@@ -113,7 +113,7 @@ class Callbacks::IdeoNetworkController < ApplicationController
     )
   end
 
-  def process_group_role_removed(role:, group:, user:)
+  def process_group_role_deleted(role:, group:, user:)
     Roles::MassRemove.call(
       object: group,
       role_name: role[:name],

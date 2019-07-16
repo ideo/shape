@@ -470,6 +470,10 @@ class ApiStore extends jsonapi(datxCollection) {
     return this.request(`organizations/${orgId}/audiences`, 'GET')
   }
 
+  fetchOrganizationAdmins(orgId) {
+    return this.request(`organizations/${orgId}/admin_users`, 'GET')
+  }
+
   createTemplateInstance(data) {
     return this.request('collections/create_template', 'POST', data)
   }

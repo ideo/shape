@@ -1,3 +1,9 @@
+// global vars from Rails application (or undefined, e.g. in a unit test)
+export const FEEDBACK_INCENTIVE_AMOUNT = window.FEEDBACK_INCENTIVE_AMOUNT || 2.5
+export const TARGETED_AUDIENCE_PRICE_PER_RESPONSE =
+  window.TARGETED_AUDIENCE_PRICE_PER_RESPONSE || 2
+export const FREEMIUM_USER_LIMIT = window.FREEMIUM_USER_LIMIT || 5
+
 export const ITEM_TYPES = {
   TEXT: 'Item::TextItem',
   FILE: 'Item::FileItem',
@@ -68,11 +74,6 @@ export const KEYS = {
   ENTER: 13,
   ESC: 27,
 }
-
-// global vars from Rails application (or undefined, e.g. in a unit test)
-export const FEEDBACK_INCENTIVE_AMOUNT = window.FEEDBACK_INCENTIVE_AMOUNT || 2.5
-export const TARGETED_AUDIENCE_PRICE_PER_RESPONSE =
-  window.TARGETED_AUDIENCE_PRICE_PER_RESPONSE || 2
 
 export default {
   headerHeight: 50,
