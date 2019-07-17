@@ -458,8 +458,4 @@ class Organization < ApplicationRecord
       create_network_subscription
     end
   end
-
-  def has_payment_method?
-    network_default_payment_method.present?
-  end
 end
