@@ -119,7 +119,7 @@ export const StyledMenuItem = styled.li`
     opacity: ${props => (props.loading ? 0.5 : 1)};
     border-left: 7px solid transparent;
     font-family: ${v.fonts.sans};
-    font-weight: 300;
+    font-weight: 400;
     font-size: 1rem;
     text-align: left;
     border-bottom: solid ${v.colors.commonMedium};
