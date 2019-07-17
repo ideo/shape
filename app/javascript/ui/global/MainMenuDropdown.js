@@ -84,10 +84,7 @@ class MainMenuDropdown extends React.Component {
   }
 
   handlePrivacy = ev => {
-    const privacyLink = document.createElement('a')
-    privacyLink.href = 'https://www.ideo.com/privacy'
-    privacyLink.target = '_blank'
-    privacyLink.click()
+    window.open('https://www.ideo.com/privacy', '_blank')
   }
 
   handleZendesk = ev => {
