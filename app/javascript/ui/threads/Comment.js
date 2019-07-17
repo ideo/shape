@@ -48,6 +48,7 @@ const StyledComment = StyledCommentInput.extend`
     a:visited {
       color: ${v.colors.white};
     }
+    word-wrap: break-word;
   }
 `
 
