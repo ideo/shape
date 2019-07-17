@@ -35,7 +35,8 @@ describe('MainMenuDropdown', () => {
       'Settings',
       'Contact Support',
       'Billing',
-      'Terms and Privacy',
+      'Terms of Use',
+      'Privacy Policy',
     ]
     props.uiStore.alert.mockClear()
     props.uiStore.confirm.mockClear()
@@ -216,9 +217,9 @@ describe('MainMenuDropdown', () => {
     })
   })
 
-  describe('handleLegal', () => {
+  describe('handleTerms', () => {
     beforeEach(() => {
-      component.handleLegal()
+      component.handleTerms()
     })
 
     it('should route to the terms page', () => {
