@@ -701,9 +701,9 @@ describe Organization, type: :model do
   end
 
   describe '#days_before_payment_added' do
-    let(:organization) { create(:organization, has_payment_method: true, created_at: 2.days.ago) }
+    let(:organization) { create(:organization, has_payment_method: true, created_at: 48.hours.ago) }
     let(:network_organization) { double('network_organization', id: 345) }
-    let(:payment_method) { double('payment_method', id: 234, created_at: Date.today) }
+    let(:payment_method) { double('payment_method', id: 234, created_at: Time.zone.now) }
 
     before do
       allow(organization).to receive(:network_organization).and_return(network_organization)
@@ -715,7 +715,7 @@ describe Organization, type: :model do
 
     context 'when there is a payment method' do
       it 'returns the number of days between creating org and adding payment method' do
-        expect(organization.days_before_payment_added).to eq 1
+        expect(organization.days_before_payment_added).to eq 2
       end
     end
   end
