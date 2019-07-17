@@ -46,7 +46,7 @@ const calculatePopoutMenuOffset = (e, eventSource, popoutMenuItemCount = 1) => {
       bottomOffset = 0
       break
     case EVENT_SOURCE_TYPES.BCT_MENU:
-      leftOffset = -INITIAL_OFFSET_X + 20
+      leftOffset = -totalWidth + 20
       rightOffset = -INITIAL_OFFSET_X + 20
       topOffset = -totalHeight - INITIAL_OFFSET_Y
       bottomOffset = 0
