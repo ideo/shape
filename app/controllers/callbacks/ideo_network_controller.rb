@@ -47,6 +47,16 @@ class Callbacks::IdeoNetworkController < ApplicationController
     group = Group.find_by(network_id: role[:resource_id])
     user = User.find_by(uid: users_role_params[:user_uid])
 
+    if group.blank?
+      logger.debug("Group with ID #{role[:resource_id]} not found.")
+      head :ok
+      return
+    elsif user.blank?
+      logger.debug("User with UID #{users_role_params[:user_uid]} not found.")
+      head :ok
+      return
+    end
+
     case event.to_s
     when 'users_role.created'
       process_group_role_created(role: role, group: group, user: user)
