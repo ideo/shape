@@ -106,7 +106,7 @@ class GlobalSearch extends React.Component {
         {this.open && (
           <div
             style={{
-              marginTop: '-8px',
+              zIndex: '0',
               marginLeft: '8px',
               position: 'absolute',
             }}

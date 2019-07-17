@@ -18,6 +18,8 @@ const StyledSearchButton = styled.div`
   display: flex;
   align-items: center;
   transition: all 0.5s ease-in-out;
+  /* So this gets clicked instead of search deleted content checkbox */
+  z-index: 2;
 
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
     /* encourage input width to take up the full screen minus our 16px viewport gutters */
