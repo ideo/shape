@@ -189,10 +189,12 @@ class RolesAdd extends React.Component {
       name = 'this organization',
       active_users_count,
       has_payment_method,
+      in_app_billing,
     } = currentUserOrganization
     const willReachMaxUsers =
       emails.length + active_users_count > FREEMIUM_USER_LIMIT
-    const shouldAskForPaymentMethod = !has_payment_method && willReachMaxUsers
+    const shouldAskForPaymentMethod =
+      in_app_billing && !has_payment_method && willReachMaxUsers
     if (shouldAskForPaymentMethod) {
       const popupAgreed = new Promise((resolve, reject) => {
         const { id } = currentUserOrganization
