@@ -79,8 +79,15 @@ class MainMenuDropdown extends React.Component {
     this.props.routingStore.routeTo('/billing')
   }
 
-  handleLegal = ev => {
+  handleTerms = ev => {
     this.props.routingStore.routeTo('/terms')
+  }
+
+  handlePrivacy = ev => {
+    const privacyLink = document.createElement('a')
+    privacyLink.href = 'https://www.ideo.com/privacy'
+    privacyLink.target = '_blank'
+    privacyLink.click()
   }
 
   handleZendesk = ev => {
@@ -193,7 +200,8 @@ class MainMenuDropdown extends React.Component {
       bottom: [
         { name: 'New Organization', onClick: this.handleNewOrg },
         { name: 'Contact Support', onClick: this.handleZendesk },
-        { name: 'Terms and Privacy', onClick: this.handleLegal },
+        { name: 'Terms of Use', onClick: this.handleTerms },
+        { name: 'Privacy Policy', onClick: this.handlePrivacy },
       ],
     }
     // splice these into the correct placement
