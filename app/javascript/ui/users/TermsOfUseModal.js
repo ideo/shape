@@ -133,7 +133,11 @@ class TermsOfUseModal extends React.Component {
       ? `Welcome to Shape! Shape is free for up to ${FREEMIUM_USER_LIMIT} people. Once you invite your sixth collaborator Shape will be $5 per person per month. Please take a moment to`
       : 'Welcome to Shape! Before you proceed, please take a moment to'
 
-    if (showBillingInformation && organization.is_within_trial_period) {
+    if (
+      showBillingInformation &&
+      organization &&
+      !organization.is_within_trial_period
+    ) {
       termsIntroMessage = `Welcome to your 1 month free trial of Shape. The first ${trialUsersCount} people who use Shape at your organization will be free for the first month. Shape licenses are $${trialPricePerUser} per person per month. Please take a moment to`
     }
 
