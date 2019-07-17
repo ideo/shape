@@ -1,5 +1,5 @@
 import { RouterStore } from 'mobx-react-router'
-import { computed } from 'mobx'
+import { computed, observable, action } from 'mobx'
 import queryString from 'query-string'
 
 import { apiStore, uiStore } from '~/stores'
@@ -11,6 +11,9 @@ class RoutingStore extends RouterStore {
   routingTo = { type: null, id: null }
 
   slug = () => apiStore.currentOrgSlug
+
+  @observable
+  scrollStates = []
 
   @computed
   get isSearch() {
@@ -33,6 +36,19 @@ class RoutingStore extends RouterStore {
     const params = queryString.parse(this.location.search)
     delete params.q
     return params
+  }
+
+  @computed
+  get hasScrollState() {
+    // wip: history object obfuscates history paths, this will always return false
+    // maybe we can use history.state.key
+    return this.scrollStates.map(s => s.path === this.history[this.history.length-1]).length > 1
+  }
+
+  @action
+  pushScrollState(path, scrollY) {
+    // wip: this here is undefined, not sure why
+    this.scrollStates.push({path: path, scrollY: scrollY})
   }
 
   pathTo = (type, id = null, params = {}) => {

@@ -1,3 +1,4 @@
+import {toJS} from 'mobx' // temp
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Switch, Route, Redirect, withRouter } from 'react-router-dom'
 import { MuiThemeProvider } from '@material-ui/core/styles'
@@ -108,6 +109,18 @@ class Routes extends React.Component {
       },
     })
     document.addEventListener('keydown', captureGlobalKeypress)
+  }
+
+  componentDidUpdate(prevProps) {
+    const {location, routingStore} = this.props
+    const {scrollStates, hasScrollState, pushScrollState} = routingStore
+    const locationChanged = location !== prevProps.location;
+    console.log(toJS(scrollStates))
+    console.log(hasScrollState)
+    if (locationChanged && !hasScrollState) {
+      // keep track of previous location and scroll position
+      pushScrollState(prevProps.location, window.scrollY)
+    }
   }
 
   componentWillUnmount() {
