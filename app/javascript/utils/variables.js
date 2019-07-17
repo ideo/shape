@@ -79,6 +79,7 @@ export const EVENT_SOURCE_TYPES = {
   GRID_CARD: 'gridCard',
   AUDIENCE_SETTINGS: 'audienceSettings',
   PAGE_MENU: 'pageMenu',
+  BCT_MENU: 'bctMenu',
 }
 
 // warning: don't change, modify component based offsets instead. see: clickUtils::calculatePopoutMenuOffset
