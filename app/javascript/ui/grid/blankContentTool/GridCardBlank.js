@@ -16,7 +16,7 @@ import TemplateIcon from '~/ui/icons/TemplateIcon'
 import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import SubmissionBoxIcon from '~/ui/icons/SubmissionBoxIcon'
 import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
-import v, { ITEM_TYPES } from '~/utils/variables'
+import v, { ITEM_TYPES, EVENT_SOURCE_TYPES } from '~/utils/variables'
 import FilestackUpload, { MAX_SIZE } from '~/utils/FilestackUpload'
 import { StyledGridCard } from '~/ui/grid/shared'
 import InlineLoader from '~/ui/layout/InlineLoader'
@@ -30,6 +30,7 @@ import LinkCreator from './LinkCreator'
 import DataItemCreator from './DataItemCreator'
 import BctButtonBox from './BctButtonBox'
 import BctButtonRotation from './BctButtonRotation'
+import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 
 const StyledGridCardBlank = StyledGridCard.extend`
   background-color: transparent;
@@ -192,6 +193,7 @@ class GridCardBlank extends React.Component {
       loading: false,
       droppingFile: false,
       bctMenuOpen: false,
+      bctMenuOffsetPosition: null,
     }
   }
 
@@ -414,8 +416,23 @@ class GridCardBlank extends React.Component {
     }
   }
 
-  toggleBctMenu = () => {
-    this.setState(({ bctMenuOpen }) => ({ bctMenuOpen: !bctMenuOpen }))
+  toggleBctMenu = e => {
+    const { bctMenuOpen } = this.state
+    const { offsetX, offsetY } = calculatePopoutMenuOffset(
+      e,
+      EVENT_SOURCE_TYPES.BCT_MENU
+    )
+    if (bctMenuOpen) {
+      this.setState({
+        bctMenuOpen: false,
+        bctMenuOffsetPosition: null,
+      })
+    } else {
+      this.setState({
+        bctMenuOpen: true,
+        bctMenuOffsetPosition: { x: offsetX, y: offsetY },
+      })
+    }
   }
 
   renderInner = () => {
@@ -646,6 +663,7 @@ class GridCardBlank extends React.Component {
                   onClick: this.createDefaultReportCard,
                 },
               ]}
+              offsetPosition={this.state.bctMenuOffsetPosition}
             />
           </Flex>
         )}

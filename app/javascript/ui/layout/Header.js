@@ -93,6 +93,9 @@ class Header extends React.Component {
   closeMenu = () => {
     const { uiStore } = this.props
     uiStore.update('pageMenuOpen', false)
+    this.setState({
+      headerMenuOffsetPosition: null,
+    })
   }
 
   closeOrgMenu = () => {

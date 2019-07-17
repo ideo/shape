@@ -27,7 +27,7 @@ const calculatePopoutMenuOffset = (e, eventSource, popoutMenuItemCount = 1) => {
   let topOffset
   let bottomOffset
 
-  // todo: add orgMenu, bctMenu etc. if necessary since offsets may differ per component
+  // todo: add orgMenu, etc. if necessary since offsets may differ per component
   switch (eventSource) {
     case EVENT_SOURCE_TYPES.AUDIENCE_SETTINGS:
       const topOffsetMaxValue = -230 // never exceed click position
@@ -41,6 +41,12 @@ const calculatePopoutMenuOffset = (e, eventSource, popoutMenuItemCount = 1) => {
       break
     case EVENT_SOURCE_TYPES.PAGE_MENU:
       leftOffset = totalWidth - INITIAL_OFFSET_X + 15
+      rightOffset = -INITIAL_OFFSET_X + 20
+      topOffset = -totalHeight - INITIAL_OFFSET_Y
+      bottomOffset = 0
+      break
+    case EVENT_SOURCE_TYPES.BCT_MENU:
+      leftOffset = -totalWidth + 20
       rightOffset = -INITIAL_OFFSET_X + 20
       topOffset = -totalHeight - INITIAL_OFFSET_Y
       bottomOffset = 0
