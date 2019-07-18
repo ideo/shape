@@ -391,7 +391,7 @@ class RolesAdd extends React.Component {
                 value={this.selectedGroupId}
                 data-cy="permissionsGroupSelect"
               >
-                <MenuItem key="no-group" value={null}>
+                <MenuItem key="no-group" value={''}>
                   <DisplayText color={v.colors.commonMedium}>
                     No group
                   </DisplayText>
