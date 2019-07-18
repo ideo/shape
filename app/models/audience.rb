@@ -45,6 +45,7 @@ class Audience < ApplicationRecord
   end
 
   def self.viewable_by_org(organization)
+    debugger
     # find global or org-connected audiences
     left_joins(:organizations)
       .where(organizations: { id: nil })

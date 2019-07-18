@@ -20,6 +20,9 @@
   "jest": {
     "automock": false,
     "globals": {
+      "IdeoSSO": {
+        "baseApiUrl": "http://localhost"
+      },
       "ts-jest": {
         "useBabelrc": true
       }
@@ -82,6 +85,7 @@
     "@babel/preset-react": "^7.0.0",
     "@firebase/app-types": "^0.3.2",
     "@material-ui/core": "^1.5",
+    "@pollyjs/adapter-fetch": "^2.5.0",
     "@rails/webpacker": "4.0.7",
     "@sentry/browser": "^5.4.0",
     "@sentry/webpack-plugin": "^1.6.2",
@@ -177,6 +181,9 @@
     "whatwg-fetch": "^3.0.0"
   },
   "devDependencies": {
+    "@pollyjs/adapter-node-http": "^2.5.0",
+    "@pollyjs/core": "^2.5.0",
+    "@pollyjs/persister-fs": "^2.1.0",
     "cypress": "^3.3.1",
     "cypress-cucumber-preprocessor": "ideo/cypress-cucumber-preprocessor#3e39b05",
     "enzyme": "^3.3.0",
@@ -204,6 +211,7 @@
     "react-router-enzyme-context": "^1.2.0",
     "react-styleguidist": "^7.0.9",
     "react-test-renderer": "^16.2.0",
+    "setup-polly-jest": "^0.5.2",
     "wait-on": "^3.1.0",
     "webpack-bundle-analyzer": "^3.3.2",
     "webpack-cli": "^3.3.4",

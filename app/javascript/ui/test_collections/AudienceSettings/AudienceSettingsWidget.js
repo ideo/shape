@@ -38,6 +38,7 @@ const DesktopWrapper = styled.div`
     display: none;
   }
 `
+DesktopWrapper.displayName = 'DesktopWrapper'
 
 const MobileWrapper = styled.div`
   @media only screen and (min-width: ${v.responsive.medBreakpoint}px) {
@@ -48,6 +49,7 @@ const MobileWrapper = styled.div`
 const AddAudienceButton = styled(Button)`
   z-index: ${v.zIndex.aboveClickWrapper};
 `
+AddAudienceButton.displayName = 'AddAudienceButton'
 
 const AddAudienceMenu = styled.div`
   .menu-wrapper {
@@ -255,7 +257,7 @@ class AudienceSettingsWidget extends React.Component {
       <React.Fragment>
         <AudienceRowCell>Total</AudienceRowCell>
         <AudienceRowCell>
-          <strong>{totalPrice}</strong>
+          <strong data-cy="audience-totalPrice">{totalPrice}</strong>
         </AudienceRowCell>
       </React.Fragment>
     )
@@ -270,7 +272,10 @@ class AudienceSettingsWidget extends React.Component {
             <StyledColumnFlexParent>
               {displayedAudiences.map(audience => {
                 return (
-                  <StyledColumnFlexParent key={audience.id}>
+                  <StyledColumnFlexParent
+                    key={audience.id}
+                    data-cy="audience-current"
+                  >
                     {this.renderCheckbox(audience)}
                     <TableHeader />
                     {this.renderTableBody(audience)}
@@ -293,7 +298,10 @@ class AudienceSettingsWidget extends React.Component {
               </StyledRowFlexParent>
               {displayedAudiences.map(audience => {
                 return (
-                  <StyledRowFlexParent key={audience.id}>
+                  <StyledRowFlexParent
+                    key={audience.id}
+                    data-cy="audience-current"
+                  >
                     {this.renderCheckbox(audience)}
                     {this.renderTableBody(audience)}
                   </StyledRowFlexParent>
@@ -344,5 +352,6 @@ AudienceSettingsWidget.wrappedComponent.propTypes = {
 AudienceSettingsWidget.defaultProps = {
   locked: false,
 }
+AudienceSettingsWidget.displayName = 'AudienceSettingsWidget'
 
 export default AudienceSettingsWidget

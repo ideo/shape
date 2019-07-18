@@ -35,9 +35,22 @@ class AudienceSettings extends React.Component {
     this.fetchAvailableAudiences()
   }
 
+  @computed
+  get locked() {
+    const { testCollection } = this.props
+    return testCollection.isLiveTest || testCollection.isClosedTest
+  }
+
+  @computed
+  get audiences() {
+    const { apiStore } = this.props
+    return apiStore.findAll('audiences')
+  }
+
   fetchAvailableAudiences = async () => {
     const { apiStore } = this.props
 
+    console.log('FCETCHING ASUDIENCES', IdeoSSO)
     await apiStore.fetchOrganizationAudiences(
       apiStore.currentUserOrganizationId
     )
@@ -67,18 +80,6 @@ class AudienceSettings extends React.Component {
         displayCheckbox,
       })
     })
-  }
-
-  @computed
-  get locked() {
-    const { testCollection } = this.props
-    return testCollection.isLiveTest || testCollection.isClosedTest
-  }
-
-  @computed
-  get audiences() {
-    const { apiStore } = this.props
-    return apiStore.findAll('audiences')
   }
 
   @computed
