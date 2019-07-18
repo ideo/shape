@@ -6,7 +6,7 @@ class SerializableCollection < BaseJsonSerializer
              :master_template, :template_id,
              :submission_box_type, :submission_box_id, :submission_template_id,
              :test_status, :collection_to_test_id, :hide_submissions, :submissions_enabled,
-             :anyone_can_view, :anyone_can_join, :archived, :default_group_id
+             :anyone_can_view, :anyone_can_join, :archived
   has_many :roles do
     data do
       @object.anchored_roles(viewing_organization_id: @current_user.current_organization_id)
@@ -201,6 +201,10 @@ class SerializableCollection < BaseJsonSerializer
 
   attribute :is_restorable do
     @object.try(:restorable?)
+  end
+
+  attribute :inherited_default_group_id do
+    @object.inherited_default_group_id
   end
 
   has_one :restorable_parent do
