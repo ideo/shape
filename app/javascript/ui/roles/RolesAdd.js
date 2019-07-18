@@ -67,6 +67,10 @@ class RolesAdd extends React.Component {
     runInAction(() => {
       this.syncedRoleTypes = props.roleTypes
       this.selectedGroupId = props.defaultGroupId
+      if (this.selectedGroupId) {
+        this.syncedRoleTypes = ['admin', 'member']
+        this.selectedRole = 'member'
+      }
     })
 
     this.debouncedSearch = _.debounce(this._autocompleteSearch, 350)
@@ -278,6 +282,14 @@ class RolesAdd extends React.Component {
       return
     }
     const fullUsers = selectedUsers.filter(selected => !!selected.id)
+
+    if (this.selectedGroupId) {
+      // If any of the selected entities are groups, this is an error condition
+      // to add a group to a group
+      if (fullUsers.find(entity => entity.internalType === 'groups')) {
+        return uiStore.alert('You cannot add a group to another group')
+      }
+    }
 
     let created = { data: [] }
     setLoading(true)

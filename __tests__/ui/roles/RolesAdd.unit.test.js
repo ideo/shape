@@ -1,5 +1,5 @@
 import RolesAdd from '~/ui/roles/RolesAdd'
-import { apiStore } from '~/stores'
+import { apiStore, uiStore } from '~/stores'
 
 jest.mock('../../../app/javascript/stores')
 
@@ -41,6 +41,10 @@ describe('RolesAdd', () => {
 
       it('should set the selected group id to the default', () => {
         expect(wrapper.instance().selectedGroupId).toEqual('2')
+        expect(wrapper.instance().syncedRoleTypes).toEqual(['admin', 'member'])
+        expect(wrapper.instance().syncedRoleTypes).toContain('admin')
+        expect(wrapper.instance().syncedRoleTypes).toContain('member')
+        expect(wrapper.instance().selectedRole).toEqual('member')
       })
     })
   })
@@ -182,7 +186,7 @@ describe('RolesAdd', () => {
     })
   })
 
-  describe('when selecting groups', () => {
+  describe('when selecting a group to add to', () => {
     let component
     let roleMenuItems, roleSelect
 
@@ -277,6 +281,18 @@ describe('RolesAdd', () => {
             Object.assign({}, defaultOpts, { addToGroupId: fakeGroup.id })
           )
           done()
+        })
+      })
+
+      describe('when having selected a group', () => {
+        beforeEach(async () => {
+          component.selectedUsers = [fakeGroup, ...registeredUsers]
+          component.handleGroupSelect({ target: { value: fakeGroup.id } })
+          await component.handleSave()
+        })
+
+        it('should throw an alert with the UI store', () => {
+          expect(uiStore.alert).toHaveBeenCalled()
         })
       })
     })
