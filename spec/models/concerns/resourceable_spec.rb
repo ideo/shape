@@ -285,6 +285,21 @@ describe Resourceable, type: :concern do
           end
         end
       end
+
+      context 'with pre-existing roles' do
+        let!(:role) { Role.find_or_create(Role::EDITOR, item) }
+
+        it 'should remove pre-existing roles' do
+          # roles existed
+          expect(item.roles).not_to be_empty
+          item.unanchor_and_inherit_roles_from_anchor!
+          # now anchored to itself with copied roles
+          expect(item.roles.count).to eq collection.roles.count
+          expect(item.roles_anchor).to eq item
+          # original role was destroyed
+          expect(Role.where(id: role.id)).to be_empty
+        end
+      end
     end
   end
 end
