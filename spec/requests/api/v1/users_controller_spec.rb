@@ -148,21 +148,25 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
     before do
       allow(service_double).to receive(:call).and_return(true)
       allow(service_double).to receive(:limited_user).and_return(limited_user)
+      allow(service_double).to receive(:created).and_return(true)
+      # LimitedUserCreator should get called
+      expect(LimitedUserCreator).to receive(:new).with(contact_info).and_return(service_double)
     end
 
-    it 'returns a 200 and calls LimitedUserCreator' do
-      expect(LimitedUserCreator).to receive(:new).with(contact_info).and_return(service_double)
+    it 'returns a 200' do
       post(path, params: params)
       expect(response.status).to eq 200
+    end
+
+    it 'signs in the user' do
+      expect {
+        post(path, params: params)
+      }.to change(limited_user, :last_sign_in_at)
     end
 
     context 'with an existing survey response' do
       let(:session_uid) { '123-xyz' }
       let!(:survey_response) { create(:survey_response, user_id: nil, session_uid: session_uid) }
-
-      before do
-        expect(LimitedUserCreator).to receive(:new).with(contact_info).and_return(service_double)
-      end
 
       it 'updates the survey response to be marked with the newly created user id' do
         post(path, params: params)
@@ -172,6 +176,21 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
       it 're-runs SurveyResponseCompletion to ensure that incentives are marked' do
         expect(SurveyResponseCompletion).to receive(:call).with(survey_response)
         post(path, params: params)
+      end
+    end
+
+    context 'with an existing user' do
+      before do
+        allow(service_double).to receive(:created).and_return(false)
+      end
+
+      let(:session_uid) { '123-xyz' }
+      let!(:survey_response) { create(:survey_response, user_id: nil, session_uid: session_uid) }
+
+      it 'does not sign in the user' do
+        expect {
+          post(path, params: params)
+        }.not_to change(limited_user, :last_sign_in_at)
       end
     end
   end

@@ -57,7 +57,8 @@ class Api::V1::UsersController < Api::V1::BaseController
     creator = LimitedUserCreator.new(contact_info: contact_info)
     if creator.call
       # sign you in so you can update yourself later (e.g. phone + recontact)
-      sign_in(:user, creator.limited_user)
+      # TODO: what if creator found (but not created) a network user, any issue w/ later fields e.g. recontact?
+      sign_in(:user, creator.limited_user) if creator.created
       if session_uid
         survey_response = SurveyResponse.find_by_session_uid(session_uid)
         survey_response.update(user_id: creator.limited_user.id)
