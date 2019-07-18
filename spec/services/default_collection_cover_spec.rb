@@ -50,6 +50,32 @@ RSpec.describe DefaultCollectionCover, type: :service do
       end
     end
 
+    context 'with media and text' do
+      let!(:collection) { create(:collection) }
+      let!(:image_item) { create(:collection_card_image, parent: collection, order: 0) }
+      let!(:text_item) { create(:collection_card_text, parent: collection, order: 1) }
+      let(:collection_cover) { DefaultCollectionCover.call(collection) }
+
+      before do
+        collection.update(cover_type: :cover_type_text_and_media)
+        text_item.update(is_cover: true)
+        collection_cover = DefaultCollectionCover.call(collection)
+      end
+
+      it 'should keep the text item as the cover' do
+        expect(text_item.is_cover).to be true
+        expect(image_item.is_cover).to be false
+      end
+
+      it 'should set the first media item as the image url' do
+        expect(collection_cover['image_url']).to eq(image_item.item.image_url)
+      end
+
+      it 'should not have any text on the cover' do
+        expect(collection_cover['text']).to be_nil
+      end
+    end
+
     context 'with an image manually set' do
       let!(:collection) { create(:collection) }
       let!(:text_item) { create(:collection_card_text, parent: collection) }

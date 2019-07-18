@@ -273,6 +273,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
           created_by: user,
           external_id: nil,
           collection_params: {},
+          collection_card_params: {},
         ).and_return(instance_double)
         post(path, params: params)
       end
