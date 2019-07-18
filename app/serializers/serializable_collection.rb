@@ -6,7 +6,7 @@ class SerializableCollection < BaseJsonSerializer
              :master_template, :template_id,
              :submission_box_type, :submission_box_id, :submission_template_id,
              :test_status, :collection_to_test_id, :hide_submissions, :submissions_enabled,
-             :anyone_can_view, :anyone_can_join, :archived
+             :anyone_can_view, :anyone_can_join, :archived, :default_group_id
   has_many :roles do
     data do
       @object.anchored_roles(viewing_organization_id: @current_user.current_organization_id)

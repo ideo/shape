@@ -32,6 +32,19 @@ describe('RolesAdd', () => {
     defaultOpts = { sendInvites: true, addToGroupId: '' }
   })
 
+  describe('constructor', () => {
+    describe('when passing in a default group id', () => {
+      beforeEach(() => {
+        props.defaultGroupId = '2'
+        wrapper = mount(<RolesAdd {...props} />)
+      })
+
+      it('should set the selected group id to the default', () => {
+        expect(wrapper.instance().selectedGroupId).toEqual('2')
+      })
+    })
+  })
+
   describe('_autocompleteSearch', () => {
     // test the non-debounced function
 

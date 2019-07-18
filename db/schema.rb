@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_03_185758) do
+ActiveRecord::Schema.define(version: 2019_07_18_204608) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -160,6 +160,7 @@ ActiveRecord::Schema.define(version: 2019_07_03_185758) do
     t.boolean "anyone_can_join", default: false
     t.bigint "joinable_group_id"
     t.datetime "test_closed_at"
+    t.integer "default_group_id"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"

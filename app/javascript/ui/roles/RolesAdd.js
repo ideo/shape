@@ -65,7 +65,8 @@ class RolesAdd extends React.Component {
     this.selectedRole = first
     uiStore.autocompleteMenuClosed()
     runInAction(() => {
-      this.syncedRoleTypes = this.props.roleTypes
+      this.syncedRoleTypes = props.roleTypes
+      this.selectedGroupId = props.defaultGroupId
     })
 
     this.debouncedSearch = _.debounce(this._autocompleteSearch, 350)
@@ -390,7 +391,7 @@ class RolesAdd extends React.Component {
                 value={this.selectedGroupId}
                 data-cy="permissionsGroupSelect"
               >
-                <MenuItem key="no-group" value="">
+                <MenuItem key="no-group" value={null}>
                   <DisplayText color={v.colors.commonMedium}>
                     No group
                   </DisplayText>
@@ -477,10 +478,12 @@ RolesAdd.propTypes = {
   ownerType: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   addableGroups: MobxPropTypes.arrayOrObservableArray,
+  defaultGroupId: PropTypes.string,
 }
 RolesAdd.defaultProps = {
   roleLabels: {},
   addableGroups: [],
+  defaultGroupId: '',
 }
 
 export default RolesAdd
