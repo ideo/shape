@@ -21,7 +21,7 @@ class DefaultCollectionCover < SimpleService
 
     media = media_item(cover_media_item_card)
     text = media_item(first_text_item_card)
-    {
+    cover = {
       # NOTE: image_url should only be used on the frontend for video items, e.g. a youtube image url
       image_url: media[:content],
       # image items use handle so that they can generate a secure filestack URL
@@ -33,7 +33,15 @@ class DefaultCollectionCover < SimpleService
       item_id_text: text[:item_id],
       item_id_media: media[:item_id],
       no_cover: @no_cover,
-    }.as_json
+    }
+    # This cover type uses a separate text item, so remove all text properties
+    # from the cover
+    if @collection.cover_type_text_and_media?
+      cover.delete(:text)
+      cover.delete(:item_id_text)
+    end
+
+    cover.as_json
   end
 
   def cover_text(text_item)
@@ -43,11 +51,12 @@ class DefaultCollectionCover < SimpleService
   def cover_media_item_card
     return nil if @no_cover
     cover_card = find_manually_set_cover
-    return cover_card if cover_card.present?
+    return cover_card if cover_card.present? && !@collection.cover_type_text_and_media?
 
     # this is the case where the system looks for the first/best image for the cover
     cover_card = first_media_item_card
     return nil unless cover_card.present?
+    return cover_card if @collection.cover_type_text_and_media?
     cover_card.update(is_cover: true)
     CollectionUpdateBroadcaster.call(@collection)
     cover_card

@@ -193,6 +193,7 @@ class Collection < ApplicationRecord
   enum cover_type: {
     cover_type_default: 0,
     cover_type_items: 1,
+    cover_type_text_and_media: 2,
   }
 
   # Searchkick Config
