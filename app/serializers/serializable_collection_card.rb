@@ -12,7 +12,7 @@ class SerializableCollectionCard < BaseJsonSerializer
     @object.pinned_and_locked?
   end
 
-  attribute :can_move do
+  attribute :can_edit_parent do
     @current_ability ? @current_ability.can?(:edit_content, (@parent || @object.try(:parent))) : false
   end
 

@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe Roles::MergeToChild, type: :service do
   let(:user) { create(:user) }
-  let(:collection) { create(:collection, add_editors: [user]) }
-  let(:child) { create(:collection, parent_collection: collection, add_editors: [user]) }
+  let!(:collection) { create(:collection, add_editors: [user]) }
+  let!(:child) { create(:collection, parent_collection: collection, add_editors: [user]) }
   let(:merge_service) do
     Roles::MergeToChild.new(
       parent: collection,
@@ -27,7 +27,6 @@ RSpec.describe Roles::MergeToChild, type: :service do
       let(:other_user) { create(:user) }
 
       before do
-        child.unanchor_and_inherit_roles_from_anchor!
         other_user.add_role(Role::VIEWER, collection)
       end
 

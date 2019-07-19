@@ -24,13 +24,82 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
     allow(NetworkApi::PaymentMethod).to receive(:find).and_return(
       [payment_method_double],
     )
-    allow(survey_response).to receive(:completed?).and_return(true)
   end
 
   describe '#call' do
     it 'should call CollectionUpdateBroadcaster with the test_collection if status changes' do
       expect(CollectionUpdateBroadcaster).to receive(:call).with(test_collection)
       service.call
+    end
+
+    context 'when test audience is open' do
+      it 'marks the survey_response as completed' do
+        expect(survey_response.completed?).to be false
+        service.call
+        expect(survey_response.completed?).to be true
+      end
+    end
+
+    context 'when test audience is closed' do
+      before do
+        test_audience.closed!
+      end
+
+      it 'marks the survey_response as completed_late' do
+        expect(survey_response.completed_late?).to be false
+        service.call
+        expect(survey_response.completed_late?).to be true
+      end
+    end
+
+    context 'when test audience is closed, but it is an in-collection test' do
+      before do
+        test_collection.collection_to_test = create(:collection)
+        test_audience.closed!
+      end
+
+      it 'marks the survey_response as completed' do
+        expect(survey_response.completed?).to be false
+        service.call
+        expect(survey_response.completed?).to be true
+      end
+    end
+
+    context 'when sample size has not been reached' do
+      before do
+        test_audience.update(sample_size: 5)
+      end
+
+      it 'does not close the test audience' do
+        expect(test_audience.status).to eq 'open'
+        service.call
+        expect(test_audience.status).to eq 'open'
+      end
+    end
+
+    context 'when test audience has reached sample size' do
+      before do
+        test_audience.update(sample_size: 1)
+      end
+
+      it 'updates the test audience status' do
+        expect(test_audience.status).to eq 'open'
+        service.call
+        expect(test_audience.status).to eq 'closed'
+      end
+
+      it 'calls test_collection.test_audience_closed!' do
+        expect(test_collection).to receive(:test_audience_closed!)
+        service.call
+      end
+
+      context 'when already closed' do
+        it 'does not call test_collection.test_audience_closed!' do
+          test_audience.closed!
+          expect(test_collection).not_to receive(:test_audience_closed!)
+          service.call
+        end
+      end
     end
 
     context 'with a user' do
@@ -50,13 +119,13 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
         expect(survey_response.incentive_status).to eq('incentive_owed')
       end
 
-      it 'will only mark amount owed once' do
+      it 'will only mark amount owed once and not for additional dupe survey response' do
         service.call
         expect(
           user.incentive_owed_account_balance.to_f,
         ).to eq(TestAudience.incentive_amount)
 
-        # call it again
+        # call it again, balance shouldn't change
         service.call
         expect(
           user.reload.incentive_owed_account_balance.to_f,
@@ -67,6 +136,7 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
         expect(
           user.reload.incentive_owed_account_balance.to_f,
         ).to eq(TestAudience.incentive_amount)
+        # dupe response remains unearned
         expect(survey_response2.incentive_unearned?).to be true
       end
 

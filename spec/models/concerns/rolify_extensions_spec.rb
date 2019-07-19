@@ -165,6 +165,21 @@ describe RolifyExtensions, type: :concern do
       user.reload
       expect(collection.can_edit?(user)).to be true
     end
+
+    context 'with roles_anchor already set' do
+      let!(:collection) { create(:collection, organization: organization, roles_anchor_collection_id: 99) }
+
+      it 'returns false and does not add the role' do
+        expect(user.add_role(Role::EDITOR, collection)).to be false
+        expect(collection.can_edit?(user)).to be false
+      end
+
+      it 'does not create a Role' do
+        expect {
+          user.add_role(Role::EDITOR, collection)
+        }.to not_change(Role, :count)
+      end
+    end
   end
 
   describe '#upgrade_to_edit_role' do

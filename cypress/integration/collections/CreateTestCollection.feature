@@ -23,7 +23,7 @@ Feature: Creating a Test Collection
     And I wait for "@apiUpdateTestAudience" to finish
     When I click the "LaunchFormButton" containing "Get Feedback"
     And I wait for "@apiLaunchTest" to finish
-    And I wait for 1 second
+    And I wait for 3 second
 
     Then I should see "Usefulness" in a "DataItemCover"
     # assuming the collection cover is not truncated...

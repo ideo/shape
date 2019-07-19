@@ -4,6 +4,9 @@ import fakeApiStore from '#/mocks/fakeApiStore'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 import v from '~/utils/variables'
+import googleTagManager from '~/vendor/googleTagManager'
+
+jest.mock('../../../app/javascript/vendor/googleTagManager')
 
 let wrapper, props, instance, component
 describe('TestDesigner', () => {
@@ -17,6 +20,7 @@ describe('TestDesigner', () => {
       requestResult: { data: { id: 99, name: 'Parent Collection' } },
     })
     wrapper = shallow(<TestDesigner {...props} />)
+    component = wrapper.instance()
   })
 
   it('renders snapshot', () => {
@@ -106,6 +110,18 @@ describe('TestDesigner', () => {
           onConfirm: expect.any(Function),
           prompt:
             'This test has 5 responses. Are you sure you want to remove this question?',
+        })
+      })
+    })
+
+    describe('handleNew', () => {})
+    describe('trackQuestionCreation', () => {
+      it('pushes an event to google tag manager', () => {
+        component.trackQuestionCreation()
+
+        expect(googleTagManager.push).toHaveBeenCalledWith({
+          event: 'formSubmission',
+          formType: 'Create Item::QuestionItem',
         })
       })
     })

@@ -83,6 +83,7 @@ exports[`GridCardBlank renders snapshot 1`] = `
           groupExtraComponent={Object {}}
           groupedMenuItems={Object {}}
           hideDotMenu={false}
+          location={null}
           menuItems={
             Array [
               Object {
@@ -110,6 +111,7 @@ exports[`GridCardBlank renders snapshot 1`] = `
             ]
           }
           menuOpen={false}
+          offsetPosition={null}
           onClick={[Function]}
           onMouseLeave={[Function]}
           position={null}

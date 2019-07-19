@@ -193,13 +193,13 @@ class Collection < ApplicationRecord
   enum cover_type: {
     cover_type_default: 0,
     cover_type_items: 1,
+    cover_type_text_and_media: 2,
   }
 
   # Searchkick Config
   # Use queue to bulk reindex every 1m (with Sidekiq Scheduled Job/ActiveJob)
   searchkick callbacks: :queue
 
-  # where(type: nil) == don't index User/SharedWithMe collections
   # searchable == don't index User/SharedWithMe collections
   scope :search_import, -> do
     searchable.includes(
@@ -249,9 +249,18 @@ class Collection < ApplicationRecord
     }
   end
 
+  # just for reindexing, you can call:
+  # Collection.reindex(:new_search_data) to only reindex those fields (more efficiently)
+  def new_search_data
+    {
+      tags: all_tag_names,
+      archived: archived,
+    }
+  end
+
   def all_tag_names
     # We include item tags because you currently can't search for items
-    (tags.map(&:name) + items.map(&:tags).flatten.map(&:name)).uniq
+    (tags.map(&:name) + items.map(&:tags).flatten.map(&:name)).map(&:downcase).uniq
   end
 
   def search_content

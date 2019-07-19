@@ -3,9 +3,20 @@ import PropTypes from 'prop-types'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observe, observable, runInAction } from 'mobx'
+import styled from 'styled-components'
 
 import { Checkbox } from '~/ui/global/styled/forms'
 import SearchButton from '~/ui/global/SearchButton'
+
+const StyledFormControlLabel = styled(FormControlLabel)`
+  &.wrapper {
+    z-index: 0;
+    margin-top: 5px;
+    position: absolute;
+    margin-left: -4px;
+    height: 25px;
+  }
+`
 
 @inject('routingStore', 'uiStore') // needed for routeTo method
 @observer
@@ -104,23 +115,16 @@ class GlobalSearch extends React.Component {
           onToggle={this.onToggle}
         />
         {this.open && (
-          <div
-            style={{
-              marginTop: '-8px',
-              marginLeft: '8px',
-              position: 'absolute',
-            }}
-          >
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={this.searchArchived}
-                  onChange={this.handleArchivedToggle}
-                />
-              }
-              label="search deleted content"
-            />
-          </div>
+          <StyledFormControlLabel
+            classes={{ root: 'wrapper' }}
+            control={
+              <Checkbox
+                checked={this.searchArchived}
+                onChange={this.handleArchivedToggle}
+              />
+            }
+            label="search deleted content"
+          />
         )}
       </div>
     )

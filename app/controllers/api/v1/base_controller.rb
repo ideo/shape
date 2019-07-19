@@ -148,7 +148,7 @@ class Api::V1::BaseController < ApplicationController
     @current_application ||= begin
       @current_api_token&.application ||
         # this second case is more useful in specs (login_as(api_user))
-        current_user.application
+        current_user&.application
     end
   end
 

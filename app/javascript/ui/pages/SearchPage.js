@@ -134,10 +134,12 @@ class SearchPage extends React.Component {
     if (!query) {
       return null
     }
-    if (uiStore.isLoading) {
-      return <Loader />
-    }
     if (this.searchResults.length === 0) {
+      // don't override the whole search with a loader unless we know nothing has loaded yet,
+      // e.g. for pagination
+      if (uiStore.isLoading) {
+        return <Loader />
+      }
       return (
         <div>
           No results found for &quot;

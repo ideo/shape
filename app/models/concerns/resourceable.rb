@@ -258,11 +258,11 @@ module Resourceable
 
   private
 
-  # only makes sense to call this method if there are no roles and you have unanchored the resource
+  # only makes sense to call this method if you have unanchored the resource
   def inherit_roles_from_parent!(parent = self.parent)
     return false unless requires_roles?
     return false unless parent.present?
-    return false if roles.present?
+    roles.destroy_all
     if parent.is_a? Collection::SubmissionsCollection
       role_parent = parent.submission_box
     else

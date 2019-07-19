@@ -129,7 +129,7 @@ class ConfirmPriceModal extends React.Component {
         <CardBrandIcon brand={null} width={32} height={30} />
         <DisplayText>
           <PlainLink to={'/billing'}>
-            Please add a payment method to continue
+            Please add a payment method to continue.
           </PlainLink>
         </DisplayText>
       </React.Fragment>

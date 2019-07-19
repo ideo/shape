@@ -100,12 +100,6 @@ RSpec.describe QuestionAnswer, type: :model do
           expect(survey_response.reload.status).to eq 'completed_late'
         end
       end
-
-      describe 'after allowable window' do
-        pending 'marks the survey_response as completed_late' do
-          expect(survey_response.reload.status).to eq 'in_progress'
-        end
-      end
     end
 
     context 'completed response' do

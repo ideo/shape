@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
+import { observable, action } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import ContainImage from '~/ui/grid/ContainImage'
@@ -26,7 +27,8 @@ import SelectionCircle from '~/ui/grid/SelectionCircle'
 import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
 import Tooltip from '~/ui/global/Tooltip'
 import { routingStore, uiStore } from '~/stores'
-import v, { ITEM_TYPES } from '~/utils/variables'
+import v, { ITEM_TYPES, EVENT_SOURCE_TYPES } from '~/utils/variables'
+import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 import ReplaceCardButton from '~/ui/grid/ReplaceCardButton'
 import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
 import {
@@ -38,6 +40,8 @@ import {
 
 @observer
 class GridCard extends React.Component {
+  @observable
+  menuItemCount = 1
   get canEditCard() {
     const {
       isSharedCollection,
@@ -186,13 +190,33 @@ class GridCard extends React.Component {
     )
   }
 
+  @action
+  getMenuItemsCount = count => {
+    // counts menuitems in actionmenu
+    this.menuItemCount = count
+  }
+
   openMenu = (ev, { x = 0, y = 0 } = {}) => {
-    const { card } = this.props
-    const direction = ev.screenX < v.actionMenuWidth ? 'right' : 'left'
+    const { menuItemCount, props } = this
+    const { card } = props
+
+    // use util method to dynamically move the component on open
+    const positionOffset = calculatePopoutMenuOffset(
+      ev,
+      EVENT_SOURCE_TYPES.GRID_CARD,
+      menuItemCount
+    )
+    const { offsetX, offsetY } = positionOffset
+
     if (this.props.menuOpen) {
       uiStore.closeCardMenu()
     } else {
-      uiStore.openCardMenu(card.id, { direction, x, y })
+      uiStore.openCardMenu(card.id, {
+        x,
+        y,
+        offsetX,
+        offsetY,
+      })
     }
   }
 
@@ -201,6 +225,8 @@ class GridCard extends React.Component {
     const rect = this.gridCardRef.getBoundingClientRect()
     const x = ev.clientX - rect.left - rect.width * 0.95
     const y = ev.clientY - rect.top - 15
+
+    // this is responsible for making fixed: false
 
     this.openMenu(ev, { x, y })
     return false
@@ -333,11 +359,18 @@ class GridCard extends React.Component {
       testCollectionCard,
     } = this.props
     let { record, cardType } = this.props
-    if (this.coverItem) {
+
+    let nestedTextItem = null
+    if (this.coverItem && record.cover_type === 'cover_type_text_and_media') {
+      // If this is a special cover with both image and text, pass the text
+      // item through
+      nestedTextItem = this.coverItem
+    } else if (this.coverItem) {
       // Instead use the item for the cover rather than the collection
       record = this.coverItem
       cardType = 'items'
     }
+
     return (
       <CoverRenderer
         card={card}
@@ -350,6 +383,7 @@ class GridCard extends React.Component {
         handleClick={handleClick}
         isBoardCollection={isBoardCollection}
         isTestCollectionCard={testCollectionCard}
+        nestedTextItem={nestedTextItem}
       />
     )
   }
@@ -362,6 +396,18 @@ class GridCard extends React.Component {
     if (this.coverItem && this.coverItem.isData) return true
 
     return false
+  }
+
+  get location() {
+    const { searchResult } = this.props
+    return searchResult ? 'Search' : 'GridCard'
+  }
+
+  get offsetPosition() {
+    return {
+      x: uiStore.cardMenuOpen.offsetX,
+      y: uiStore.cardMenuOpen.offsetY,
+    }
   }
 
   render() {
@@ -452,7 +498,7 @@ class GridCard extends React.Component {
                 </CardActionHolder>
               )}
               <ActionMenu
-                location={searchResult ? 'Search' : 'GridCard'}
+                location={this.location}
                 className="show-on-hover"
                 wrapperClassName="card-menu"
                 card={card}
@@ -460,10 +506,12 @@ class GridCard extends React.Component {
                 canEdit={this.canEditCard}
                 canReplace={record.canReplace && !card.link && !searchResult}
                 direction={uiStore.cardMenuOpen.direction}
+                offsetPosition={this.offsetPosition}
                 menuOpen={menuOpen}
                 onOpen={this.openMenu}
                 onLeave={this.closeMenu}
                 testCollectionCard={testCollectionCard}
+                menuItemsCount={this.getMenuItemsCount}
               />
             </StyledTopRightActions>
           )}

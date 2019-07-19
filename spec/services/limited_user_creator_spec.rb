@@ -48,6 +48,7 @@ RSpec.describe LimitedUserCreator, type: :service do
 
       it 'should return true' do
         expect(limited_user_creator.call).to be true
+        expect(limited_user_creator.created).to be true
       end
 
       it 'should create create a user on the network api with email' do
@@ -84,6 +85,17 @@ RSpec.describe LimitedUserCreator, type: :service do
           limited_user: true,
         )
         limited_user_creator.call
+      end
+    end
+
+    context 'with an existing user' do
+      before do
+        allow(NetworkApi::User).to receive(:where).and_return([fake_user])
+      end
+
+      it 'should set created = false' do
+        limited_user_creator.call
+        expect(limited_user_creator.created).to be false
       end
     end
 

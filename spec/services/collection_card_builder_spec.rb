@@ -13,6 +13,8 @@ RSpec.describe CollectionCardBuilder, type: :service do
       order: 1,
       width: 3,
       height: 1,
+      row: 3,
+      col: 2,
     }
   end
 
@@ -76,6 +78,12 @@ RSpec.describe CollectionCardBuilder, type: :service do
         expect(user.show_helper).to be false
       end
 
+      it 'should ignore the row and col values' do
+        expect(builder.create).to be true
+        expect(builder.collection_card.row).to eq nil
+        expect(builder.collection_card.col).to eq nil
+      end
+
       describe 'creating card with collection in UserCollection' do
         let(:parent) do
           create(:user_collection, organization: organization, add_editors: [user])
@@ -95,6 +103,20 @@ RSpec.describe CollectionCardBuilder, type: :service do
         it 'should create a pinned card by default' do
           expect(builder.create).to be true
           expect(builder.collection_card.pinned?).to be true
+        end
+      end
+
+      context 'on a Foamcore Board' do
+        let(:parent) do
+          create(:board_collection,
+                 organization: organization,
+                 add_editors: [user])
+        end
+
+        it 'should save the row and col values' do
+          expect(builder.create).to be true
+          expect(builder.collection_card.row).to eq 3
+          expect(builder.collection_card.col).to eq 2
         end
       end
 

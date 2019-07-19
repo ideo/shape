@@ -36,9 +36,17 @@ RSpec.describe CollectionCardFilter, type: :service do
       editor.add_role(Role::EDITOR, collection)
 
       cards.each do |card|
-        # Don't add group/viewer role to the private card
-        group.add_role(Role::VIEWER, card.record) unless card == private_card
-        editor.add_role(Role::EDITOR, card.record)
+        record = card.record
+        record.unanchor!
+        editor.add_role(Role::EDITOR, record)
+        if card == private_card
+          # Make private card private
+          record.cached_inheritance = { private: true, updated_at: Time.current }
+          record.save
+        else
+          # Don't add group/viewer role to the private card
+          group.add_role(Role::VIEWER, record)
+        end
       end
 
       # Anchor visible and hidden cards
@@ -48,12 +56,6 @@ RSpec.describe CollectionCardFilter, type: :service do
 
       # Hide the hidden card
       hidden_card.update(hidden: true)
-
-      # Make private card private
-      record = private_card.record
-      record.cached_inheritance = { private: true, updated_at: Time.current }
-      record.roles_anchor_collection = nil
-      record.save
 
       # Archive the last card
       archived_card.archive!
@@ -175,7 +177,7 @@ RSpec.describe CollectionCardFilter, type: :service do
 
       it 'returns all non-hidden cards' do
         expect(subject).to match_array(
-          [visible_card_1, visible_card_2],
+          [visible_card_1, visible_card_2, private_card],
         )
       end
     end

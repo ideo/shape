@@ -5,6 +5,7 @@ import { observable, action, runInAction, computed } from 'mobx'
 import routeToLogin from '~/utils/routeToLogin'
 import sleep from '~/utils/sleep'
 import v from '~/utils/variables'
+import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 
 export default class UiStore {
   // store this for usage by other components
@@ -24,7 +25,8 @@ export default class UiStore {
     id: null,
     x: 0,
     y: 0,
-    direction: 'left',
+    offsetX: 0,
+    offsetY: 0,
   }
   @observable
   pageError = null
@@ -274,6 +276,19 @@ export default class UiStore {
   }
 
   @action
+  performPopupAction(message, actionType) {
+    switch (actionType) {
+      case POPUP_ACTION_TYPES.ALERT:
+        this.popupAlert({ prompt: message, fadeOutTime: 6000 })
+        return
+      case POPUP_ACTION_TYPES.SNACKBAR:
+      default:
+        this.popupSnackbar({ message })
+        return
+    }
+  }
+
+  @action
   popupAlert(props = {}) {
     _.assign(this.dialogConfig, {
       ...this.defaultDialogProps,
@@ -332,8 +347,14 @@ export default class UiStore {
 
   @action
   openCardMenu(id, opts = {}) {
-    const { x = 0, y = 0, direction = 'left' } = opts
-    this.update('cardMenuOpen', { id, x, y, direction })
+    const { x = 0, y = 0, offsetX = 0, offsetY = 0 } = opts
+    this.update('cardMenuOpen', {
+      id,
+      x,
+      y,
+      offsetX,
+      offsetY,
+    })
     if (this.selectedCardIds.length && this.selectedCardIds.indexOf(id) < 0) {
       // deselect all cards when card menu is opened on a non-selected card
       this.selectedCardIds.replace([])

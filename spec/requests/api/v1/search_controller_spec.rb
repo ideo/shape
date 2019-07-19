@@ -11,7 +11,8 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
   describe 'GET #search' do
     let!(:current_user) { @user }
     let!(:organization) { current_user.current_organization }
-    let(:tag_list) { %w[blockchain prototype innovation] }
+    # check for case-sensitivity
+    let(:tag_list) { %w[BLOCKchain prototype innovation] }
     let!(:collection_with_tags) do
       create(
         :collection,
@@ -86,7 +87,11 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
       end
 
       it 'returns the collection when hashtags are in the query' do
-        get(path, params: { query: '#blockchain' })
+        # casing shouldn't matter
+        get(path, params: { query: '#blockChain' })
+        expect(json['data'].size).to eq(1)
+        expect(json['data'].first['id'].to_i).to eq(collection_with_tags.id)
+        get(path, params: { query: '#prototype' })
         expect(json['data'].size).to eq(1)
         expect(json['data'].first['id'].to_i).to eq(collection_with_tags.id)
       end

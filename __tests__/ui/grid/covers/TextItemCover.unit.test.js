@@ -1,6 +1,7 @@
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
 import { apiStore, uiStore } from '~/stores'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
+import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 
 import { fakeTextItem } from '#/mocks/data'
 
@@ -125,6 +126,7 @@ describe('TextItemCover', () => {
         message: 'Text undone!',
         redirectTo: null,
         snapshot: { data_content: item.data_content },
+        actionType: POPUP_ACTION_TYPES.SNACKBAR,
       })
     })
 
