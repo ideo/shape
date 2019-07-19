@@ -22,7 +22,7 @@ import PillList from '~/ui/global/PillList'
 import EmailCSVUploader from '~/ui/global/EmailCSVUploader'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import { apiStore, uiStore, routingStore } from '~/stores'
-import v, { FREEMIUM_USER_LIMIT } from '~/utils/variables'
+import v from '~/utils/variables'
 
 const RightAligner = styled(Grid)`
   padding-right: 78px;
@@ -185,24 +185,6 @@ class RolesAdd extends React.Component {
     this.handleSave()
   }
 
-  get shouldAskForPaymentMethod() {
-    const {
-      active_users_count,
-      has_payment_method,
-      in_app_billing,
-    } = apiStore.currentUserOrganization
-    if (!in_app_billing || has_payment_method) return false
-    const adding = this.emailUsers.length
-    // if you're adding enough to go over the limit, show the warning
-    return adding + active_users_count > FREEMIUM_USER_LIMIT
-  }
-
-  get emailUsers() {
-    return this.selectedUsers
-      .filter(selected => !selected.id)
-      .map(selected => selected.email)
-  }
-
   handleSave = async () => {
     const {
       sendInvites,
@@ -210,14 +192,24 @@ class RolesAdd extends React.Component {
       selectedRole,
       setLoading,
       resetSelectedUsers,
-      emailUsers,
     } = this
+    const emails = selectedUsers
+      .filter(selected => !selected.id)
+      .map(selected => selected.email)
     const { currentUserId, currentUserOrganization } = apiStore
-    const { name = 'this organization' } = currentUserOrganization
-    if (this.shouldAskForPaymentMethod) {
+    const { FREEMIUM_USER_LIMIT } = window
+    const {
+      name = 'this organization',
+      active_users_count,
+      has_payment_method,
+    } = currentUserOrganization
+    const willReachMaxUsers =
+      emails.length + active_users_count >= FREEMIUM_USER_LIMIT
+    const shouldAskForPaymentMethod = !has_payment_method && willReachMaxUsers
+    if (shouldAskForPaymentMethod) {
       const popupAgreed = new Promise((resolve, reject) => {
         const { id } = currentUserOrganization
-        const prompt = `Inviting these people will take ${name} over the free limit of ${FREEMIUM_USER_LIMIT}.`
+        const prompt = `Inviting these people will take ${name} over the free limit of ${FREEMIUM_USER_LIMIT}. Please add a payment method to continue`
         const confirmText = 'Add Payment Method'
         apiStore.fetchOrganizationAdmins(id).then(response => {
           const { data: admins } = response
@@ -248,7 +240,7 @@ class RolesAdd extends React.Component {
           )
 
           const adminModalProps = {
-            prompt: `${prompt} Please add a payment method to continue.`,
+            prompt: prompt,
             iconName: 'InviteUsers',
             confirmText,
             onCancel: () => {
@@ -301,8 +293,8 @@ class RolesAdd extends React.Component {
 
     let created = { data: [] }
     setLoading(true)
-    if (emailUsers.length) {
-      created = await this.props.onCreateUsers(emailUsers)
+    if (emails.length) {
+      created = await this.props.onCreateUsers(emails)
     }
     const roles = await this.props.onCreateRoles(
       [...created.data, ...fullUsers],
@@ -396,6 +388,9 @@ class RolesAdd extends React.Component {
 
   render() {
     const { addableGroups, title } = this.props
+    const filteredAddableGroups = addableGroups.filter(
+      group => !group.is_primary
+    )
     return (
       <div>
         <Row align="center" style={{ marginBottom: 0, height: '32px' }}>
@@ -416,7 +411,7 @@ class RolesAdd extends React.Component {
                     No group
                   </DisplayText>
                 </MenuItem>
-                {addableGroups.map(group => (
+                {filteredAddableGroups.map(group => (
                   <MenuItem key={group.handle} value={group.id}>
                     <EntityAvatarAndName entity={group} />
                   </MenuItem>
