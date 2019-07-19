@@ -530,6 +530,8 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "cardAction": "move",
                       "cardMenuOpen": Object {
                         "id": false,
+                        "offsetX": 0,
+                        "offsetY": 0,
                         "x": 0,
                         "y": 0,
                       },
@@ -2860,6 +2862,8 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "cardAction": "move",
                       "cardMenuOpen": Object {
                         "id": false,
+                        "offsetX": 0,
+                        "offsetY": 0,
                         "x": 0,
                         "y": 0,
                       },
@@ -5189,6 +5193,8 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "cardAction": "move",
                       "cardMenuOpen": Object {
                         "id": false,
+                        "offsetX": 0,
+                        "offsetY": 0,
                         "x": 0,
                         "y": 0,
                       },
@@ -7191,6 +7197,8 @@ exports[`TestDesigner renders snapshot 1`] = `
                 "cardAction": "move",
                 "cardMenuOpen": Object {
                   "id": false,
+                  "offsetX": 0,
+                  "offsetY": 0,
                   "x": 0,
                   "y": 0,
                 },

@@ -5,7 +5,8 @@ import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
 
 import { DisplayTextCss } from '~/ui/global/styled/typography'
-import v from '~/utils/variables'
+import v, { EVENT_SOURCE_TYPES } from '~/utils/variables'
+import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 import {
   StyledRowFlexItem,
   AudienceRowCell,
@@ -49,10 +50,13 @@ const AddAudienceButton = styled(Button)`
   z-index: ${v.zIndex.aboveClickWrapper};
 `
 
-const AddAudienceMenu = styled.div`
-  .menu-wrapper {
+const AddAudienceMenu = styled.span`
+  .icon {
     left: 0;
-    top: -35px;
+    line-height: 2.4rem !important;
+    margin-right: 8px;
+    position: relative !important;
+    vertical-align: middle;
   }
 `
 
@@ -82,6 +86,7 @@ class AudienceSettingsWidget extends React.Component {
   state = {
     addAudienceMenuOpen: false,
     addAudienceModalOpen: false,
+    popoutMenuOffsetPosition: null,
     selectedAudienceMenuItem: null,
   }
 
@@ -96,8 +101,19 @@ class AudienceSettingsWidget extends React.Component {
     )
   }
 
-  toggleAddAudienceMenu = () => {
-    this.setState({ addAudienceMenuOpen: !this.state.addAudienceMenuOpen })
+  toggleAddAudienceMenu = e => {
+    const menuItems = this.addAudienceMenuItems()
+    const menuItemCount = menuItems && menuItems.length ? menuItems.length : 1
+    const { offsetX, offsetY } = calculatePopoutMenuOffset(
+      e,
+      EVENT_SOURCE_TYPES.AUDIENCE_SETTINGS,
+      menuItemCount
+    )
+
+    this.setState({
+      addAudienceMenuOpen: !this.state.addAudienceMenuOpen,
+      popoutMenuOffsetPosition: { x: offsetX, y: offsetY },
+    })
   }
 
   closeAddAudienceMenu = () => {
@@ -222,7 +238,7 @@ class AudienceSettingsWidget extends React.Component {
   render() {
     const { totalPrice, locked } = this.props
     const { displayedAudiences } = this
-    const { addAudienceMenuOpen } = this.state
+    const { addAudienceMenuOpen, popoutMenuOffsetPosition } = this.state
     const { uiStore } = this.props
 
     let newAudienceButton = (
@@ -240,6 +256,7 @@ class AudienceSettingsWidget extends React.Component {
               wrapperClassName="add-audience-menu"
               menuOpen={addAudienceMenuOpen}
               menuItems={this.addAudienceMenuItems()}
+              offsetPosition={popoutMenuOffsetPosition}
               hideDotMenu
             />
           </AddAudienceMenu>
@@ -260,7 +277,7 @@ class AudienceSettingsWidget extends React.Component {
       </React.Fragment>
     )
 
-    const { selectedAudienceMenuItem } = this.state
+    const { addAudienceModalOpen, selectedAudienceMenuItem } = this.state
 
     return (
       <AudienceSettingsWrapper>
@@ -310,7 +327,7 @@ class AudienceSettingsWidget extends React.Component {
           <StyledColumnFlexParent />
         </div>
         <AddAudienceModal
-          open={this.state.addAudienceModalOpen}
+          open={addAudienceModalOpen}
           close={this.closeAddAudienceModal}
           afterSave={audience => this.addAudience(audience)}
         />

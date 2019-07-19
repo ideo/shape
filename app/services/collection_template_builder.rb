@@ -9,6 +9,7 @@ class CollectionTemplateBuilder
     created_by: nil,
     parent_card: nil,
     external_id: nil,
+    collection_card_params: {},
     collection_params: {}
   )
     @parent = parent
@@ -19,6 +20,7 @@ class CollectionTemplateBuilder
     @errors = @collection.errors
     @parent_card = parent_card
     @external_id = external_id
+    @collection_card_params = collection_card_params.to_h.symbolize_keys
     @raw_collection_params = collection_params
   end
 
@@ -71,14 +73,11 @@ class CollectionTemplateBuilder
   end
 
   def place_collection_in_parent
-    unless @parent_card.present?
-      card = @parent.primary_collection_cards.create(
-        width: 1,
-        height: 1,
-        pinned: @parent.master_template?,
-        collection: @collection,
-        order: order_placement,
+    if @parent_card.blank?
+      card_params = default_collection_card_params.merge(
+        @collection_card_params,
       )
+      card = @parent.primary_collection_cards.create(card_params)
       card.increment_card_orders! if @placement == 'beginning'
     end
     @collection.recalculate_breadcrumb!
@@ -109,6 +108,16 @@ class CollectionTemplateBuilder
     else
       @placement.is_a?(Integer) ? @placement : last
     end
+  end
+
+  def default_collection_card_params
+    {
+      width: 1,
+      height: 1,
+      pinned: @parent.master_template?,
+      collection: @collection,
+      order: order_placement,
+    }
   end
 
   def setup_submission

@@ -87,17 +87,14 @@ FactoryBot.define do
     end
 
     after(:create) do |item, evaluator|
-      if evaluator.add_editors.present?
-        item.unanchor_and_inherit_roles_from_anchor!
-        evaluator.add_editors.each do |user|
-          user.add_role(Role::EDITOR, item.becomes(Item))
+      %w[editor viewer].each do |role_type|
+        evaluator_role = evaluator.send("add_#{role_type.pluralize}")
+        next unless evaluator_role.present?
+        if item.roles_anchor_collection_id
+          item.unanchor_and_inherit_roles_from_anchor!
         end
-      end
-
-      if evaluator.add_viewers.present?
-        item.unanchor_and_inherit_roles_from_anchor!
-        evaluator.add_viewers.each do |user|
-          user.add_role(Role::VIEWER, item.becomes(Item))
+        evaluator_role.each do |user|
+          user.add_role(role_type, item)
         end
       end
     end

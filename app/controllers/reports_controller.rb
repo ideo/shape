@@ -12,6 +12,8 @@ class ReportsController < ApplicationController
       @report = OrganizationUserReport.all_user_counts
     elsif params[:id] == 'shape-user-report'
       @report = ShapeUserReport.all_users
+    elsif params[:id] == 'incentive-report'
+      @report = ShapeUserReport.incentives_paid
     end
     respond_to do |format|
       format.any { send_data @report, filename: "#{params[:id]}-#{Date.today}.csv" }

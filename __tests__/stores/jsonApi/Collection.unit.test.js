@@ -5,8 +5,10 @@ import { ReferenceType } from 'datx'
 import { apiStore } from '~/stores'
 import Collection from '~/stores/jsonApi/Collection'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
+import googleTagManager from '~/vendor/googleTagManager'
 
 import { fakeRole } from '#/mocks/data'
+jest.mock('../../../app/javascript/vendor/googleTagManager')
 
 describe('Collection', () => {
   let collection
@@ -218,6 +220,41 @@ describe('Collection', () => {
         expect(
           collection.cardIdsBetweenByColRow(cardIds[3], cardIds[0])
         ).toEqual(cardIds)
+      })
+    })
+  })
+
+  describe('trackTestAction', () => {
+    describe('when launching a test', () => {
+      it('pushes a feedback test launch event to google tag manager', () => {
+        collection.trackTestAction('launch')
+
+        expect(googleTagManager.push).toHaveBeenCalledWith({
+          event: 'formSubmission',
+          formType: 'launch Feedback Test',
+        })
+      })
+    })
+  })
+
+  describe('trackAudienceTargeting', () => {
+    describe('when launching a test successfully', () => {
+      describe('when link sharing audience', () => {
+        it('pushes a feedback test launch event to google tag manager', () => {
+          collection.trackAudienceTargeting({ isLinkSharing: true })
+
+          expect(googleTagManager.push).toHaveReturned(undefined)
+        })
+      })
+      describe('when paid audience', () => {
+        it('pushes a feedback test launch event to google tag manager', () => {
+          collection.trackAudienceTargeting({ isLinkSharing: false })
+
+          expect(googleTagManager.push).toHaveBeenCalledWith({
+            event: 'formSubmission',
+            formType: `Audience targeted with a test`,
+          })
+        })
       })
     })
   })

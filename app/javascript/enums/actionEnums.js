@@ -1,7 +1,12 @@
-const UndoActionStatus = {
-  idle: 0,
-  undo: 1,
-  redo: 2,
+const UNDO_ACTION_STATUS = {
+  IDLE: 0,
+  UNDO: 1,
+  REDO: 2,
 }
 
-export { UndoActionStatus }
+const POPUP_ACTION_TYPES = {
+  SNACKBAR: 'snackbar',
+  ALERT: 'alert',
+}
+
+export { UNDO_ACTION_STATUS, POPUP_ACTION_TYPES }

@@ -10,7 +10,7 @@ import { FormButton, Checkbox } from '~/ui/global/styled/forms'
 import { Heading1, Anchor } from '~/ui/global/styled/typography'
 import Link from '~/ui/global/Link'
 import Logo from '~/ui/layout/Logo'
-import v from '~/utils/variables'
+import v, { FREEMIUM_USER_LIMIT } from '~/utils/variables'
 import poweredByIdeo from '~/assets/Powered-by-IDEO.png'
 
 const StyledDialog = styled(Dialog)`
@@ -113,6 +113,7 @@ class TermsOfUseModal extends React.Component {
       !organization ||
       (organization &&
         organization.in_app_billing &&
+        !organization.has_payment_method &&
         organization.primary_group.can_edit)
     const trialUsersCount =
       (organization && organization.trial_users_count) || 25
@@ -127,6 +128,19 @@ class TermsOfUseModal extends React.Component {
         </Link>
       </span>
     )
+
+    let termsIntroMessage = showBillingInformation
+      ? `Welcome to Shape! Shape is free for up to ${FREEMIUM_USER_LIMIT} people. Once you invite your sixth collaborator Shape will be $5 per person per month. Please take a moment to`
+      : 'Welcome to Shape! Before you proceed, please take a moment to'
+
+    if (
+      showBillingInformation &&
+      organization &&
+      !organization.is_within_trial_period
+    ) {
+      termsIntroMessage = `Welcome to your 1 month free trial of Shape. The first ${trialUsersCount} people who use Shape at your organization will be free for the first month. Shape licenses are $${trialPricePerUser} per person per month. Please take a moment to`
+    }
+
     return (
       <StyledDialog
         classes={{ root: 'root__dialog', paper: 'modal__paper' }}
@@ -140,10 +154,7 @@ class TermsOfUseModal extends React.Component {
             <StyledLogo withText width={128} />
             <Heading1 wrapLine>Hello {currentUser.first_name}!</Heading1>
             <p>
-              {showBillingInformation
-                ? `Welcome to your 1 month free trial of Shape. The first ${trialUsersCount} people who use Shape at your organization will be free for the first month. Shape licenses are $${trialPricePerUser} per person per month. Please take a moment to`
-                : 'Welcome to Shape. Before you proceed, please take a moment to'}{' '}
-              review our{' '}
+              {termsIntroMessage} review our{' '}
               <Link target="_blank" to="/terms">
                 Terms of Use
               </Link>

@@ -248,6 +248,31 @@ describe('RolesAdd', () => {
           done()
         })
       })
+
+      describe('adding users over the freemium limit with in_app_billing', () => {
+        beforeEach(() => {
+          apiStore.currentUserOrganization.in_app_billing = true
+          apiStore.currentUserOrganization.has_payment_method = false
+          apiStore.currentUserOrganization.active_users_count = 4
+        })
+
+        it('should ask for payment method', () => {
+          // we are adding 2 users, active_users_count = 4, so this would take us over 5
+          expect(component.shouldAskForPaymentMethod).toBeTruthy()
+        })
+      })
+
+      describe('adding users over the freemium limit with enterprise billing', () => {
+        beforeEach(() => {
+          apiStore.currentUserOrganization.in_app_billing = false
+          apiStore.currentUserOrganization.has_payment_method = false
+          apiStore.currentUserOrganization.active_users_count = 40
+        })
+
+        it('should not ask for payment method', () => {
+          expect(component.shouldAskForPaymentMethod).toBeFalsy()
+        })
+      })
     })
 
     describe('with registered users', () => {

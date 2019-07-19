@@ -20,9 +20,9 @@ RSpec.describe QuillContentConverter, type: :service do
       QuillContentConverter.new(content).html_to_quill_ops
     end
 
-    context 'with h1, h2 and p tags' do
+    context 'with h1, h2, p and a tags' do
       let!(:content) do
-        '<h1>Amazing</h1><h2>Text</h2><p>Here</p>'
+        '<h1>Amazing</h1><h2>Text</h2><p>Here</p><h3><a href="/ideo/collections/id">Learn More</a></h3>'
       end
 
       it 'generates quill operations' do
@@ -32,7 +32,9 @@ RSpec.describe QuillContentConverter, type: :service do
             { insert: "\n", attributes: { header: 1 } },
             { insert: 'Text' },
             { insert: "\n", attributes: { header: 2 } },
-            { insert: 'Here' },
+            { insert: "Here\n" },
+            { insert: 'Learn More', attributes: { link: '/ideo/collections/id' } },
+            { insert: "\n", attributes: { header: 3 } },
           ],
         )
       end

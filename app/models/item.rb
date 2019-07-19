@@ -146,12 +146,21 @@ class Item < ApplicationRecord
   def search_data
     {
       name: name,
-      tags: tags.map(&:name),
+      tags: tags.map(&:name).map(&:downcase),
       content: search_content,
       # NOTE: could change this back to defer to parent if we ever remove item roles
       user_ids: search_user_ids,
       group_ids: search_group_ids,
       organization_id: organization_id,
+      archived: archived,
+    }
+  end
+
+  # just for reindexing, you can call:
+  # Item.reindex(:new_search_data) to only reindex those fields (more efficiently)
+  def new_search_data
+    {
+      tags: tags.map(&:name).map(&:downcase),
       archived: archived,
     }
   end

@@ -10,6 +10,7 @@ import v from '~/utils/variables'
 import PlainLink from '~/ui/global/PlainLink'
 import { CardHeading } from '~/ui/global/styled/typography'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
+import TextItemCover from '~/ui/grid/covers/TextItemCover'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import { FormButton, RoundPill } from '~/ui/global/styled/forms'
 import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
@@ -60,6 +61,8 @@ const pad = 16
 const calcSectionWidth = props => {
   if (props.width === 4) {
     return `${props.gridW * 2 - props.gutter * 2}px`
+  } else if (props.width === 3) {
+    return `${props.gridW * 1.6 - props.gutter * 1.6}px`
   } else if (props.width > 1) {
     return `${props.gridW - props.gutter * 3}px`
   }
@@ -67,6 +70,7 @@ const calcSectionWidth = props => {
 }
 
 const calcSectionHeight = props => {
+  if (props.isTextItem) return '160px;'
   if (props.height > 1) {
     return `calc(50% - ${pad + props.gutter / 2}px)`
   }
@@ -76,6 +80,7 @@ const calcSectionHeight = props => {
 const StyledCardContent = styled.div`
   .top,
   .bottom {
+    color: white;
     font-family: ${v.fonts.sans};
     font-size: 1rem;
     letter-spacing: 0;
@@ -85,9 +90,22 @@ const StyledCardContent = styled.div`
     right: 1.5rem;
     width: ${props => calcSectionWidth(props)};
     height: ${props => calcSectionHeight(props)};
+
+    // Text style for the text and media covers
+    h1 {
+      color: white;
+    }
+
+    &.text-item {
+      a {
+        color: ${v.colors.ctaPrimary};
+        text-decoration: none;
+      }
+    }
   }
   .top {
-    top: ${props => props.gutter / 2 + pad}px;
+    top: ${props => (props.isTextItem ? 'auto' : props.gutter / 2 + pad)}px;
+    bottom: ${props => (props.isTextItem ? '13px' : 'auto')};
   }
   .bottom {
     bottom: ${props => (props.height === 1 ? 4 : pad)}px;
@@ -264,7 +282,15 @@ class CollectionCover extends React.Component {
   }
 
   render() {
-    const { height, width, collection, uiStore } = this.props
+    const {
+      height,
+      width,
+      collection,
+      searchResult,
+      uiStore,
+      textItem,
+      cardId,
+    } = this.props
     const { cover } = collection
     const { gridW, gutter } = uiStore.gridSettings
 
@@ -279,31 +305,50 @@ class CollectionCover extends React.Component {
           width={width}
           gutter={gutter}
           gridW={gridW}
+          isTextItem={!!textItem}
         >
           <div className="overlay" />
-          <div className="top">
-            <PositionedCardHeading>
-              <Dotdotdot clamp={height > 1 ? 6 : 3}>
-                <PlainLink
-                  className="no-select cancelGridClick"
-                  onClick={this.handleClick}
-                  to={routingStore.pathTo('collections', collection.id)}
-                  data-cy="collection-cover-link"
-                >
-                  {this.name}
-                </PlainLink>
-              </Dotdotdot>
-            </PositionedCardHeading>
-          </div>
-          <div className="bottom">
-            {this.launchTestButton}
-            {this.collectionScore}
-            {!this.hasLaunchTestButton && (
-              <Dotdotdot clamp={this.hasCollectionScore ? 2 : 3}>
-                {cover.text}
-              </Dotdotdot>
-            )}
-          </div>
+          {textItem ? (
+            <div className="top text-item">
+              <TextItemCover
+                item={textItem}
+                height={height}
+                dragging={false}
+                cardId={cardId}
+                handleClick={this.handleClick}
+                searchResult={searchResult}
+                initialFontTag={'P'}
+                hideReadMore
+                uneditable
+              />
+            </div>
+          ) : (
+            <div>
+              <div className="top">
+                <PositionedCardHeading>
+                  <Dotdotdot clamp={height > 1 ? 6 : 3}>
+                    <PlainLink
+                      className="no-select cancelGridClick"
+                      onClick={this.handleClick}
+                      to={routingStore.pathTo('collections', collection.id)}
+                      data-cy="collection-cover-link"
+                    >
+                      {this.name}
+                    </PlainLink>
+                  </Dotdotdot>
+                </PositionedCardHeading>
+              </div>
+              <div className="bottom">
+                {this.launchTestButton}
+                {this.collectionScore}
+                {!this.hasLaunchTestButton && (
+                  <Dotdotdot clamp={this.hasCollectionScore ? 2 : 3}>
+                    {cover.text}
+                  </Dotdotdot>
+                )}
+              </div>
+            </div>
+          )}
         </StyledCardContent>
       </StyledCollectionCover>
     )
@@ -314,9 +359,11 @@ CollectionCover.propTypes = {
   width: PropTypes.number,
   height: PropTypes.number,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  cardId: PropTypes.string.isRequired,
   inSubmissionsCollection: PropTypes.bool,
   dragging: PropTypes.bool,
   searchResult: PropTypes.bool,
+  textItem: MobxPropTypes.objectOrObservableObject,
 }
 CollectionCover.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -327,6 +374,7 @@ CollectionCover.defaultProps = {
   inSubmissionsCollection: false,
   dragging: false,
   searchResult: false,
+  textItem: null,
 }
 
 CollectionCover.displayName = 'CollectionCover'

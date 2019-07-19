@@ -379,6 +379,14 @@ class Organization < ApplicationRecord
     User.find(admin_group.user_ids)
   end
 
+  def days_before_payment_added
+    # Should this check against all possible payment methods and not just default?
+    payment_method = network_default_payment_method
+    return 'No payment method' if payment_method.blank?
+
+    (network_default_payment_method.created_at.to_date - self.created_at.to_date).to_i
+  end
+
   private
 
   def should_generate_new_friendly_id?

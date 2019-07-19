@@ -11,6 +11,7 @@ import { QuillStyleWrapper } from '~/ui/global/styled/typography'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import RealtimeTextItem from '~/ui/items/RealtimeTextItem'
 import PaddedCardCover from './PaddedCardCover'
+import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 
 const stripTags = str => str.replace(/(<([^>]+)>)/gi, '')
 
@@ -64,8 +65,9 @@ class TextItemCover extends React.Component {
 
   handleClick = async e => {
     e.stopPropagation()
-    const { item, dragging, cardId, searchResult } = this.props
-    if (dragging || uiStore.dragging || this.isEditing) return false
+    const { item, dragging, cardId, searchResult, uneditable } = this.props
+    if (dragging || uiStore.dragging || this.isEditing || uneditable)
+      return false
     // allow both editors/viewers to capture keyboard clicks
     if (uiStore.captureKeyboardGridClick(e, cardId)) {
       return false
@@ -87,6 +89,7 @@ class TextItemCover extends React.Component {
       },
       message: 'Text undone!',
       redirectTo: uiStore.viewingCollection,
+      actionType: POPUP_ACTION_TYPES.SNACKBAR,
       // TODO: there is no way to push a redoAction because the edit hasn't happened yet!
       // so we'd have to figure out a different way to capture the redo after you undo
     })
@@ -146,6 +149,7 @@ class TextItemCover extends React.Component {
 
   checkTextAreaHeight = height => {
     if (!this.quillEditor) return
+    if (this.props.hideReadMore) return
     // The height of the editor is constrained to the container,
     // we must get the .ql-editor div to calculate text height
     const qlEditor = this.quillEditor.editingArea.getElementsByClassName(
@@ -224,11 +228,15 @@ TextItemCover.propTypes = {
   initialFontTag: PropTypes.string.isRequired,
   height: PropTypes.number,
   searchResult: PropTypes.bool,
+  hideReadMore: PropTypes.bool,
+  uneditable: PropTypes.bool,
 }
 
 TextItemCover.defaultProps = {
   height: null,
   searchResult: false,
+  hideReadMore: false,
+  uneditable: false,
 }
 
 export default TextItemCover

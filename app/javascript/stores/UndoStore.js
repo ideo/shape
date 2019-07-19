@@ -1,6 +1,6 @@
 import { observable, action, computed } from 'mobx'
 import { routingStore, uiStore } from '~/stores'
-import { UndoActionStatus } from '~/enums/actionEnums'
+import { UNDO_ACTION_STATUS } from '~/enums/actionEnums'
 const MAX_UNDOSTACK_LENGTH = 10
 
 export default class UndoStore {
@@ -13,22 +13,22 @@ export default class UndoStore {
   undoAfterRoute = null
 
   @observable
-  actionStatus = UndoActionStatus.idle
+  actionStatus = UNDO_ACTION_STATUS.IDLE
 
   // block multiple requests from happening too quickly
   @computed
   get currentlyUndoing() {
-    return this.actionStatus === UndoActionStatus.undo
+    return this.actionStatus === UNDO_ACTION_STATUS.UNDO
   }
 
   @computed
   get currentlyRedoing() {
-    return this.actionStatus === UndoActionStatus.redo
+    return this.actionStatus === UNDO_ACTION_STATUS.REDO
   }
 
   @computed
   get currentlyIdle() {
-    return this.actionStatus === UndoActionStatus.idle
+    return this.actionStatus === UNDO_ACTION_STATUS.IDLE
   }
 
   @action
@@ -53,7 +53,7 @@ export default class UndoStore {
   async undoLastAction() {
     const undoAction = this.undoStack.pop()
     if (!undoAction) return
-    this.status = UndoActionStatus.undo
+    this.status = UNDO_ACTION_STATUS.UNDO
     const { redirectPath } = undoAction
     if (redirectPath) {
       this.redirectAction(redirectPath, undoAction)
@@ -65,7 +65,7 @@ export default class UndoStore {
   async redoLastAction() {
     const redoAction = this.redoStack.pop()
     if (!redoAction) return
-    this.status = UndoActionStatus.redo
+    this.status = UNDO_ACTION_STATUS.REDO
     const { redirectPath } = redoAction
     if (redirectPath) {
       this.redirectAction(redirectPath, redoAction)
@@ -87,26 +87,27 @@ export default class UndoStore {
 
   @action
   async performUndo(undoAction) {
-    const { message, redoAction, redirectPath } = undoAction
+    const { message, redoAction, redirectPath, actionType } = undoAction
     if (redoAction) {
       // there should usually always be a redoAction...
       // however TextItemCover has a unique way of undo/redo
       this.pushRedoAction({
         ...redoAction,
         redirectPath: redirectPath,
+        actionType,
       })
     }
-    uiStore.popupSnackbar({ message })
+    uiStore.performPopupAction(message, actionType)
     await undoAction.apiCall()
-    this.status = UndoActionStatus.idle
+    this.status = UNDO_ACTION_STATUS.IDLE
   }
 
   @action
   async performRedo(redoAction) {
-    const { message } = redoAction
-    uiStore.popupSnackbar({ message })
+    const { message, actionType } = redoAction
+    uiStore.performPopupAction(message, actionType)
     await redoAction.apiCall()
-    this.status = UndoActionStatus.idle
+    this.status = UNDO_ACTION_STATUS.IDLE
   }
 
   @action
