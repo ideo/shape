@@ -5,6 +5,11 @@ class CollectionCardBuilder
     @datasets_params = params.try(:[], :item_attributes).try(:[], :datasets_attributes)
     @params = params
     @params[:order] ||= parent_collection.cached_card_count
+    unless parent_collection.is_a? Collection::Board
+      # row and col can come from GridCardHotspot, but we nullify for non-Boards
+      @params.delete :row
+      @params.delete :col
+    end
     @collection_card = parent_collection.send("#{type}_collection_cards").build(@params)
     @errors = @collection_card.errors
     @user = user
