@@ -9,12 +9,13 @@ import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
 import OkIcon from '~/ui/icons/OkIcon'
 import {
   QuestionText,
-  TextInput,
+  SingleLineInput,
   TextResponseHolder,
   TextEnterButton,
 } from '~/ui/test_collections/shared'
 import styled from 'styled-components'
 import v from '~/utils/variables'
+import trackError from '~/utils/trackError'
 
 const IconHolder = styled.div`
   bottom: 14px;
@@ -57,10 +58,11 @@ class RecontactQuestion extends React.Component {
     const { sessionUid } = this.props
     try {
       const res = await apiStore.createLimitedUser({ contactInfo, sessionUid })
-      if (!res) {
-        throw { errors: ['Contact information invalid'] }
-        return
-      }
+      console.log({ res })
+      // if (!res) {
+      //   throw { errors: ['Contact information invalid'] }
+      //   return
+      // }
       user = res.data
       const { showFeedbackRecontact } = this.state
       this.setState({
@@ -70,7 +72,8 @@ class RecontactQuestion extends React.Component {
         createdUser: user,
       })
     } catch (err) {
-      uiStore.alert(err.errors[0])
+      trackError(err, { source: 'createLimitedUser' })
+      uiStore.alert(err.error[0])
       return
     }
 
@@ -224,12 +227,13 @@ class RecontactQuestion extends React.Component {
           )}
         </div>
         <TextResponseHolder>
-          <TextInput
+          <SingleLineInput
             onChange={this.handleChange}
             value={contactInfo}
             type="questionText"
             placeholder={placeholder}
             data-cy="RecontactTextInput"
+            disabled={submittedContactInfo}
           />
           {submittedContactInfo ? (
             <IconHolder>

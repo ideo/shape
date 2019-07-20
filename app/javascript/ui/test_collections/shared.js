@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 import TextareaAutosize from 'react-autosize-textarea'
 
 import { StyledCommentTextarea } from '~/ui/global/styled/forms'
@@ -71,31 +71,16 @@ export const TextInput = styled(TextareaAutosize)`
 `
 TextInput.displayName = 'TextInput'
 
-export const TestQuestionInput = css`
-  background-color: ${props =>
-    props.editable ? v.colors.primaryMedium : v.colors.primaryDark};
-  border: 0;
-  box-sizing: border-box;
-  color: white;
-  font-family: ${v.fonts.sans};
-  font-size: 1rem;
-  outline: 0;
-  resize: none;
-  padding: 12px 12px 16px 12px;
-  width: 100%;
+export const SingleLineInput = styled.input`
+  color: ${props => props.theme[props.type]};
+  font-family: ${v.fonts.sans} !important;
+  width: calc(100% - 20px);
 
   ::placeholder {
-    color: white !important;
+    color: ${props => props.theme[props.type]} !important;
     opacity: 1;
   }
 `
-
-TestQuestionInput.propTypes = {
-  editable: PropTypes.bool,
-}
-TestQuestionInput.defaultProps = {
-  editable: false,
-}
 
 export const TestQuestionHolder = styled.div`
   background-color: ${props =>
