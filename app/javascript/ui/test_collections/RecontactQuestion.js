@@ -58,11 +58,6 @@ class RecontactQuestion extends React.Component {
     const { sessionUid } = this.props
     try {
       const res = await apiStore.createLimitedUser({ contactInfo, sessionUid })
-      console.log({ res })
-      // if (!res) {
-      //   throw { errors: ['Contact information invalid'] }
-      //   return
-      // }
       user = res.data
       const { showFeedbackRecontact } = this.state
       this.setState({
