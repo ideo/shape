@@ -73,10 +73,8 @@ class Collection
     end
 
     def system_required?
+      # NOTE: org_templates is not system_required
       return true if profiles? || getting_started?
-      # org templates collection is only required if it contains the profile_template
-      # NOTE: could search all its children if they're required but seems like overkill?
-      org_templates? && collection_ids.include?(organization.profile_template_id)
     end
 
     def reorder_cards!

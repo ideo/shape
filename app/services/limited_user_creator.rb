@@ -1,5 +1,5 @@
 class LimitedUserCreator < SimpleService
-  attr_accessor :limited_user, :errors
+  attr_accessor :limited_user, :errors, :created
 
   def initialize(contact_info:, user_info: {}, date_of_participation: nil)
     @contact_info = contact_info
@@ -9,6 +9,7 @@ class LimitedUserCreator < SimpleService
     @phone = nil
     @limited_user = nil
     @network_user = nil
+    @created = false
 
     @errors = []
   end
@@ -77,6 +78,7 @@ class LimitedUserCreator < SimpleService
 
     params[:limited_user] = true
     @network_user = NetworkApi::User.create(params)
+    @created = true unless @network_user.errors.present?
   end
 
   def create_user(network_user)
@@ -84,6 +86,7 @@ class LimitedUserCreator < SimpleService
     @limited_user.created_at = @date_of_participation if @date_of_participation.present?
     saved = @limited_user.save
 
+    # this is just for the CSV import
     if @limited_user.persisted? && @date_of_participation.present?
       create_test_audience_invitation(@limited_user)
     end

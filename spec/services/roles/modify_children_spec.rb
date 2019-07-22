@@ -143,10 +143,13 @@ RSpec.describe Roles::ModifyChildren, type: :service do
     context 'with private child' do
       let(:other_users) { create_list(:user, 2) }
       let(:other_user) { other_users.first }
-      let!(:collection) { create(:collection, add_editors: other_users) }
 
       before do
-        subcollection.reload.unanchor_and_inherit_roles_from_anchor!
+        other_users.each do |u|
+          u.add_role(Role::EDITOR, collection)
+        end
+        subcollection.update(roles_anchor_collection_id: collection.id)
+        subcollection.unanchor_and_inherit_roles_from_anchor!
         other_user.remove_role(Role::EDITOR, subcollection)
         # simulate a time difference, otherwise the seconds will match and think its cached
         subcollection.roles.first.update(updated_at: 20.seconds.from_now)

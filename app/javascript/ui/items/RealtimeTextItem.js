@@ -9,12 +9,14 @@ import styled from 'styled-components'
 
 import ChannelManager from '~/utils/ChannelManager'
 import { CloseButton } from '~/ui/global/styled/buttons'
+import QuillLink from '~/ui/global/QuillLink'
 import { QuillStyleWrapper } from '~/ui/global/styled/typography'
 import TextItemToolbar from '~/ui/items/TextItemToolbar'
 import { routingStore } from '~/stores'
 import v from '~/utils/variables'
 
 Quill.register('modules/cursors', QuillCursors)
+Quill.register('formats/link', QuillLink)
 
 const FULL_PAGE_TOP_PADDING = '2rem'
 const DockedToolbar = styled.div`

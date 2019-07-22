@@ -66,6 +66,7 @@ class Collection
              :gives_incentive?,
              :test_status,
              :collection_to_test,
+             :collection_to_test_id,
              :purchased?,
              :link_sharing?,
              :test_audiences,

@@ -81,6 +81,9 @@ module RolifyExtensions
   # NOTE: add_role will not do anything on anchored items/collections
   # you must make sure to unanchor first if you want it to have its own roles
   def add_role(role_name, resource = nil)
+    # anchored items/collections aren't allowed to have their own roles, you need to unanchor them first
+    return false if resource&.roles_anchor_collection_id.present?
+
     role = Role.find_or_create(role_name, resource)
     return add_resource_role(role, resource) if resource.present?
     return role unless is_a?(User)
@@ -122,7 +125,7 @@ module RolifyExtensions
 
   def remove_role(role_name, resource = nil)
     # anchored items/collections aren't allowed to have their own roles, you need to unanchor them first
-    return false if resource && resource.roles_anchor_collection_id.present?
+    return false if resource&.roles_anchor_collection_id.present?
 
     if resource.blank?
       role = Role.where(name: role_name, resource: nil).first

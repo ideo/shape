@@ -84,14 +84,14 @@ class CardMover
   end
 
   def move_cards_to_board
-    return if !@to_collection.is_a? Collection::Board
+    return unless @to_collection.is_a? Collection::Board
 
     target_empty_row = @to_collection.empty_row_for_moving_cards
     @moving_cards.each_with_index do |card, i|
       card.update(
         parent_id: @to_collection.id,
         row: target_empty_row,
-        col: i
+        col: i,
       )
     end
   end

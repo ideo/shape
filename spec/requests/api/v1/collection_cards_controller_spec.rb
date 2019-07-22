@@ -567,6 +567,30 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
+    context 'moving link cards' do
+      let!(:from_collection) do
+        create(
+          :collection,
+          organization: to_collection.organization,
+          num_cards: 3,
+          record_type: :link_text,
+          card_relation: :link,
+          add_editors: [user],
+        )
+      end
+      let!(:to_collection) { create(:collection, add_editors: [user]) }
+      before do
+        # similar to above, user will no longer be an editor
+        # shouldn't matter since it's a link
+        moving_cards.first.record.unanchor!
+      end
+
+      it 'returns a 204' do
+        patch(path, params: params)
+        expect(response.status).to eq(204)
+      end
+    end
+
     context 'trying to move inside itself' do
       let!(:from_collection) do
         create(:collection, organization: to_collection.organization, add_editors: [user])

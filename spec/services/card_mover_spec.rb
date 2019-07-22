@@ -3,8 +3,8 @@ require 'rails_helper'
 RSpec.describe CardMover, type: :service do
   let(:user) { create(:user) }
   let(:organization) { create(:organization) }
-  let(:from_collection) { create(:collection, organization: organization, num_cards: 3) }
-  let(:to_collection) { create(:collection, organization: organization, num_cards: 3) }
+  let!(:from_collection) { create(:collection, organization: organization, num_cards: 3) }
+  let!(:to_collection) { create(:collection, organization: organization, num_cards: 3) }
   let!(:moving_cards) { from_collection.collection_cards }
   let(:cards) { moving_cards }
   let(:placement) { 'beginning' }
@@ -75,9 +75,12 @@ RSpec.describe CardMover, type: :service do
       context 'with private record' do
         let(:moving_cards) { from_collection.collection_cards.limit(1) }
         let(:card) { moving_cards.first }
+        let(:record) { card.record }
         before do
-          card.record.unanchor!
+          record.unanchor_and_inherit_roles_from_anchor!
+          user.remove_role(Role::EDITOR, record)
           card.record.update(cached_inheritance: { private: true })
+          puts "card.record #{card.record.cached_inheritance}"
         end
 
         it 'should not assign permissions' do

@@ -216,9 +216,10 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     @from_collection = Collection.find(json_api_params[:from_id])
     @cards = ordered_cards
     @to_collection = Collection.find(json_api_params[:to_id])
-    @cards.each do |card|
+    @cards.primary.each do |card|
       authorize! :edit, card.record
     end
+    authorize! :edit_content, @from_collection
     authorize! :edit_content, @to_collection
   end
 
@@ -398,8 +399,6 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :col,
       :width,
       :height,
-      :row,
-      :col,
       :reference,
       :parent_id,
       :collection_id,
