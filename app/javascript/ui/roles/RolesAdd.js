@@ -22,7 +22,7 @@ import PillList from '~/ui/global/PillList'
 import EmailCSVUploader from '~/ui/global/EmailCSVUploader'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import { apiStore, uiStore, routingStore } from '~/stores'
-import v from '~/utils/variables'
+import v, { FREEMIUM_USER_LIMIT } from '~/utils/variables'
 
 const RightAligner = styled(Grid)`
   padding-right: 78px;
@@ -185,6 +185,24 @@ class RolesAdd extends React.Component {
     this.handleSave()
   }
 
+  get shouldAskForPaymentMethod() {
+    const {
+      active_users_count,
+      has_payment_method,
+      in_app_billing,
+    } = apiStore.currentUserOrganization
+    if (!in_app_billing || has_payment_method) return false
+    const adding = this.emailUsers.length
+    // if you're adding enough to go over the limit, show the warning
+    return adding + active_users_count > FREEMIUM_USER_LIMIT
+  }
+
+  get emailUsers() {
+    return this.selectedUsers
+      .filter(selected => !selected.id)
+      .map(selected => selected.email)
+  }
+
   handleSave = async () => {
     const {
       sendInvites,
@@ -192,21 +210,12 @@ class RolesAdd extends React.Component {
       selectedRole,
       setLoading,
       resetSelectedUsers,
+      emailUsers,
     } = this
-    const emails = selectedUsers
-      .filter(selected => !selected.id)
-      .map(selected => selected.email)
     const { currentUserId, currentUserOrganization } = apiStore
     const { FREEMIUM_USER_LIMIT } = window
-    const {
-      name = 'this organization',
-      active_users_count,
-      has_payment_method,
-    } = currentUserOrganization
-    const willReachMaxUsers =
-      emails.length + active_users_count >= FREEMIUM_USER_LIMIT
-    const shouldAskForPaymentMethod = !has_payment_method && willReachMaxUsers
-    if (shouldAskForPaymentMethod) {
+    const { name = 'this organization' } = currentUserOrganization
+    if (this.shouldAskForPaymentMethod) {
       const popupAgreed = new Promise((resolve, reject) => {
         const { id } = currentUserOrganization
         const prompt = `Inviting these people will take ${name} over the free limit of ${FREEMIUM_USER_LIMIT}. Please add a payment method to continue`
@@ -293,8 +302,8 @@ class RolesAdd extends React.Component {
 
     let created = { data: [] }
     setLoading(true)
-    if (emails.length) {
-      created = await this.props.onCreateUsers(emails)
+    if (emailUsers.length) {
+      created = await this.props.onCreateUsers(emailUsers)
     }
     const roles = await this.props.onCreateRoles(
       [...created.data, ...fullUsers],

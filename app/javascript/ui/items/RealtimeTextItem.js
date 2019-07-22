@@ -15,6 +15,7 @@ import TextItemToolbar from '~/ui/items/TextItemToolbar'
 import { routingStore } from '~/stores'
 import v from '~/utils/variables'
 
+Quill.debug('error')
 Quill.register('modules/cursors', QuillCursors)
 Quill.register('formats/link', QuillLink)
 
