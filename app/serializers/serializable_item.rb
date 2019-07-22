@@ -35,7 +35,9 @@ class SerializableItem < BaseJsonSerializer
   end
 
   attribute :filestack_file_url do
-    @object.filestack_file_signed_url
+    @object.filestack_file.handle == 'none' ?
+      @object.filestack_file_url :
+      @object.filestack_file_signed_url
   end
 
   attribute :filestack_handle do
