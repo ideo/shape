@@ -16,7 +16,10 @@ class HomeController < ApplicationController
   end
 
   def login
-    store_location_for :user, params[:redirect] if params[:redirect].present?
+    if params[:redirect].present?
+      load_redirect_organization_from_url(params[:redirect])
+      store_location_for :user, params[:redirect]
+    end
   end
 
   def sign_up
