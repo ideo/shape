@@ -135,14 +135,8 @@ class Collection
     return unless card.present?
     item = card.item
     item.update(
-      # TODO: set up a non "FilestackFile" way of creating an image card?
-      filestack_file: FilestackFile.create(
-        handle: 'none',
-        mimetype: 'image/jpg',
-        size: 15_945,
-        filename: 'profile.jpg',
-        url: user.picture_medium,
-      ),
+      type: 'Item::ExternalImageItem',
+      url: user.picture_medium,
     )
     cache_cover!
   end
