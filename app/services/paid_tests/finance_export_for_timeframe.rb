@@ -30,6 +30,7 @@ module PaidTests
       [
         'Test Collection ID',
         'Test Name',
+        'Audience',
         'Revenue',
         'Amount Owed',
         'Amount Paid',
@@ -80,6 +81,7 @@ module PaidTests
           TestAudience.paid,
         )
         .order(id: :desc)
+        .distinct
     end
   end
 end
