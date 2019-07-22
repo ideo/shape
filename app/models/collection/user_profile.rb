@@ -90,9 +90,12 @@ class Collection
         order: profile_collection.collection_cards.count,
       )
       profile_collection.reorder_cards!
+      # now that it's a child of the profiles collection, reanchor
+      profile.reanchor!
 
       # copy roles down from the profile_collection
       profile.unanchor_and_inherit_roles_from_anchor!
+
       user.add_role(Role::EDITOR, profile.becomes(Collection))
       organization.admin_group.add_role(Role::EDITOR, profile.becomes(Collection))
       # create the templated cards from the Profile Template
