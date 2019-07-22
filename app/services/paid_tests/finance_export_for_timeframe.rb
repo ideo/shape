@@ -30,7 +30,6 @@ module PaidTests
       [
         'Test Collection ID',
         'Test Name',
-        'Audience',
         'Revenue',
         'Amount Owed',
         'Amount Paid',
@@ -79,6 +78,14 @@ module PaidTests
         .includes(test_audiences: :payment)
         .merge(
           TestAudience.paid,
+        )
+        .where(
+          # We want to allow collections to be included from previous months,
+          # (as they still may be collection responses/paying respondents),
+          # but don't include any collections created after the export timeframe
+          Collection::TestCollection
+            .arel_table[:created_at]
+            .lteq(@end_time),
         )
         .order(id: :desc)
         .distinct
