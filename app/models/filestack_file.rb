@@ -101,6 +101,9 @@ class FilestackFile < ApplicationRecord
   end
 
   def signed_url
+    if handle == 'none'
+      return url
+    end
     FilestackFile.signed_url(handle, type: :image)
   end
 
