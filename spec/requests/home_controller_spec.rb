@@ -1,10 +1,13 @@
 require 'rails_helper'
 
 describe HomeController, type: :request do
+
   before do
     # NOTE: not doing any normal rendering of the index page because we defer to Cypress for those,
     # and they make for slow request specs
-    allow_any_instance_of(HomeController).to receive(:render).and_return 'rendered.'
+    allow_any_instance_of(
+      HomeController,
+    ).to receive(:render).and_return 'rendered.'
   end
 
   describe 'GET #index' do
@@ -37,6 +40,16 @@ describe HomeController, type: :request do
           :user, redirect
         )
         get(path)
+      end
+
+      context 'with organization slug' do
+        let!(:organization) { create(:organization, slug: 'intl-company') }
+        let!(:redirect) { 'http://www.shape.space/intl-company' }
+
+        it 'assigns @redirect_organization' do
+          get(path)
+          expect(assigns(:redirect_organization)).to eq(organization)
+        end
       end
     end
   end
