@@ -245,28 +245,27 @@ class Collection
     end
 
     def test_completed?
-      complete = true
-      unless incomplete_media_items.count.zero?
-        errors.add(:base,
-                   'Please add an image or video for your idea to question ' +
-                   incomplete_media_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
-        complete = false
+      return true if incomplete_test_design_items.count.zero?
+
+      item_errors = incomplete_test_design_items.map do |item|
+        case item.question_type
+        when "question_media"
+          prefix = 'Please add an image or video for your idea to question'
+        when "question_description"
+          prefix = 'Please add your idea description to question'
+        when "question_open"
+          prefix = 'Please add your open response prompt to question'
+        when "question_category_satisfaction"
+          prefix = 'Please add your category to question'
+        end
+
+        order = item.parent_collection_card.order + 1
+
+        "#{prefix} #{order}"
       end
 
-      unless incomplete_description_items.count.zero?
-        errors.add(:base,
-                   'Please add your idea description to question ' +
-                   incomplete_description_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
-        complete = false
-      end
-
-      unless incomplete_category_satisfaction_items.count.zero?
-        errors.add(:base,
-                   'Please add your category to question ' +
-                   incomplete_category_satisfaction_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
-        complete = false
-      end
-      complete
+      errors.add(:base, item_errors.to_sentence)
+      false
     end
 
     def completed_and_launchable?
@@ -498,33 +497,23 @@ class Collection
       reorder_cards!
     end
 
-    # Return array of incomplete media items, with index of item
-    def incomplete_media_items
-      question_items.joins(
-        :parent_collection_card,
-      ).where(question_type: :question_media)
-    end
-
-    def incomplete_description_items
-      question_items
-        .joins(
-          :parent_collection_card,
-        ).where(question_type: :question_description, content: [nil, ''])
-    end
-
-    def incomplete_category_satisfaction_items
-      question_items
-        .joins(
-          :parent_collection_card,
-        ).where(question_type: :question_category_satisfaction, content: [nil, ''])
-    end
-
     # Returns the question cards that are in the blank default state
     def incomplete_question_items
       question_items
-        .joins(
-          :parent_collection_card,
+      .joins(
+        :parent_collection_card,
         ).where(question_type: nil, filestack_file_id: nil, url: nil)
+      end
+
+    # Return array of incomplete question items, with index of item (from parent card)
+    def incomplete_test_design_items
+      question_items.joins(:parent_collection_card)
+        .where(
+          question_type: [:question_category_satisfaction, :question_description, :question_open],
+          content: [nil, ''],
+        ).or(question_items.joins(:parent_collection_card)
+          .where(question_type: :question_media)
+        )
     end
 
     def remove_incomplete_question_items
