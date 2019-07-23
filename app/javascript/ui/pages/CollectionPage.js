@@ -161,6 +161,8 @@ class CollectionPage extends React.Component {
       uiStore.popupSnackbar({ message })
     }
 
+    const { toPathScrollY } = routingStore
+    window.scrollTo(0, toPathScrollY)
     uiStore.update('dragTargets', [])
   }
 

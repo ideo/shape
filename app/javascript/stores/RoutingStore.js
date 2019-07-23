@@ -39,16 +39,27 @@ class RoutingStore extends RouterStore {
   }
 
   @computed
-  get hasScrollState() {
-    // wip: history object obfuscates history paths, this will always return false
-    // maybe we can use history.state.key
-    return this.scrollStates.map(s => s.path === this.history[this.history.length-1]).length > 1
+  get hasPathWithScrollState() {
+    const pathNames = this.scrollStates.map(s => s.path.pathname)
+    return pathNames.findIndex(p => p === this.location.pathname) > -1
   }
 
-  @action
-  pushScrollState(path, scrollY) {
-    // wip: this here is undefined, not sure why
-    this.scrollStates.push({path: path, scrollY: scrollY})
+  @computed
+  get toPathScrollY() {
+    const pathNames = this.scrollStates.map(s => s.path.pathname)
+    const toPathIndex = pathNames.findIndex(p => p === this.location.pathname)
+    return toPathIndex > -1 ? this.scrollStates[toPathIndex].scrollY : 0
+  }
+
+  @action.bound // see: https://mobx.js.org/refguide/action.html
+  updateScrollState(path, scrollY) {
+    const pathNames = this.scrollStates.map(s => s.path.pathname)
+    const routeFromPathIndex = pathNames.findIndex(p => p === path.pathname)
+    if (routeFromPathIndex > -1) {
+      this.scrollStates[routeFromPathIndex].scrollY = scrollY
+    } else {
+      this.scrollStates.push({ path: path, scrollY: scrollY })
+    }
   }
 
   pathTo = (type, id = null, params = {}) => {
