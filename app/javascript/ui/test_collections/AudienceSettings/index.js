@@ -155,7 +155,6 @@ class AudienceSettings extends React.Component {
 
   // @action
   openWarningDialog = () => {
-    console.log('opening warning dialog')
     const { uiStore } = this.props
     const errorMessages = this.errors.map(e => ` ${e.detail}`)
     const prompt = `You have questions that have not yet been finalized:\n
@@ -171,35 +170,28 @@ class AudienceSettings extends React.Component {
   async isReadyToLaunch() {
     this.errors = null
     const { testCollection, apiStore } = this.props
-    console.log(testCollection.launchableTestId)
-    // move this into Collection.js?
+
     try {
-      const res = await apiStore.request(
+      await apiStore.request(
         `test_collections/${testCollection.launchableTestId}/inspect_test_launchability`
       )
-      console.log('Good response: ', res)
       return true
     } catch (err) {
       // trackError and send to Sentry?
-      console.log('Caught error:', err)
       this.errors = err.error
-      console.log(this.errors)
       return false
     }
   }
 
   async confirmOrLaunchTest() {
     const readyToLaunch = await this.isReadyToLaunch()
-    console.log('ready? ', readyToLaunch)
     if (!readyToLaunch) {
-      console.log('YEP ready to launch:')
       this.openWarningDialog()
       return
     }
     if (this.totalPrice === 0) {
       this.launchTestWithAudienceSettings()
     } else {
-      console.log('opening price modal')
       this.openConfirmPriceModal()
     }
   }
