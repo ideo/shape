@@ -40,8 +40,20 @@ describe InvitationsController, type: :request do
       let!(:redirect) { 'http://www.shape.space/intl-company' }
 
       it 'assigns @redirect_organization' do
-        get("#{path}?redirect=#{redirect}")
+        get(path)
         expect(assigns(:redirect_organization)).to eq(organization)
+      end
+    end
+
+    context 'with redirect that has invalid organization slug' do
+      let!(:redirect) { 'http://www.shape.space/intl-company' }
+
+      it 'does not assign @redirect_organization' do
+        get(path)
+        expect(response).to redirect_to(
+          sign_up_url(email: pending_user.email),
+        )
+        expect(assigns(:redirect_organization)).to be_nil
       end
     end
   end
