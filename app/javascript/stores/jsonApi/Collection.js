@@ -15,6 +15,7 @@ import Role from './Role'
 import TestAudience from './TestAudience'
 import SharedRecordMixin from './SharedRecordMixin'
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
+import { async } from 'q';
 
 class Collection extends SharedRecordMixin(BaseRecord) {
   static type = 'collections'
@@ -752,13 +753,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       formType: `Audience targeted with a test`,
       // Do we want more metadata here?
     })
-  }
-
-  hasPaidAudiences(audiences = null) {
-    if (!audiences) return
-    // Drill into audiences
-    // Check if any have a cost
-    // return boolean
   }
 
   API_performTestAction = async (actionName, audiences = null) => {

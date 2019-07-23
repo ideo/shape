@@ -155,17 +155,18 @@ class AudienceSettings extends React.Component {
 
   // @action
   openWarningDialog = () => {
+    console.log('opening warning dialog')
     const { uiStore } = this.props
-    const prompt = this.errors
-    // Shouldn't call this if no errors ....
+    const errorMessages = this.errors.map(e => ` ${e.detail}`)
+    const prompt = `You have questions that have not yet been finalized:\n
+         ${errorMessages}
+        `
+
     uiStore.popupAlert({
       prompt,
       fadeOutTime: 10 * 1000,
     })
   }
-
-  // @action
-  // closeWarningDialog = () => (this.warningDialogOpen = false)
 
   async isReadyToLaunch() {
     this.errors = null
@@ -176,31 +177,30 @@ class AudienceSettings extends React.Component {
       const res = await apiStore.request(
         `test_collections/${testCollection.launchableTestId}/inspect_test_launchability`
       )
-      console.log({ res })
-      if (res.error || res.status == 422) {
-        this.errors = res.error
-        console.log(this.errors)
-        return false
-      } else {
-        return true
-      }
+      console.log('Good response: ', res)
+      return true
     } catch (err) {
       // trackError and send to Sentry?
-      console.log({ err })
+      console.log('Caught error:', err)
       this.errors = err.error
       console.log(this.errors)
       return false
     }
   }
 
-  confirmOrLaunchTest() {
+  async confirmOrLaunchTest() {
+    const readyToLaunch = await this.isReadyToLaunch()
+    console.log('ready? ', readyToLaunch)
+    if (!readyToLaunch) {
+      console.log('YEP ready to launch:')
+      this.openWarningDialog()
+      return
+    }
     if (this.totalPrice === 0) {
       this.launchTestWithAudienceSettings()
     } else {
-      // WHY IS THIS FORK NOT WROKING?
-      this.isReadyToLaunch()
-        ? this.openConfirmPriceModal()
-        : this.openWarningDialog()
+      console.log('opening price modal')
+      this.openConfirmPriceModal()
     }
   }
 
