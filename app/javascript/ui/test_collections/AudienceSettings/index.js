@@ -168,7 +168,6 @@ class AudienceSettings extends React.Component {
   }
 
   async isReadyToLaunch() {
-    this.errors = null
     const { testCollection, apiStore } = this.props
 
     try {
@@ -184,7 +183,9 @@ class AudienceSettings extends React.Component {
   }
 
   async confirmOrLaunchTest() {
+    this.errors = null
     const readyToLaunch = await this.isReadyToLaunch()
+
     if (!readyToLaunch) {
       this.openWarningDialog()
       return
