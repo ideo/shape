@@ -247,24 +247,35 @@ class Collection
     def test_completed?
       return true if incomplete_test_design_items.count.zero?
 
-      item_errors = incomplete_test_design_items.map do |item|
-        case item.question_type
-        when "question_media"
-          prefix = 'Please add an image or video for your idea to question'
-        when "question_description"
-          prefix = 'Please add your idea description to question'
-        when "question_open"
-          prefix = 'Please add your open response prompt to question'
-        when "question_category_satisfaction"
-          prefix = 'Please add your category to question'
-        end
+      error_map = {
+        question_media: {
+          prefix: 'add an image or video for your idea to question ',
+          indices: [],
+        },
+        question_description: {
+          prefix: 'add your idea description to question ',
+          indices: [],
+        },
+        question_open: {
+          prefix: 'add your open response prompt to question ',
+          indices: [],
+        },
+        question_category_satisfaction: {
+          prefix: 'add your category to question ',
+          indices: [],
+        }
+      }
 
-        order = item.parent_collection_card.order + 1
-
-        "#{prefix} #{order}"
+      incomplete_test_design_items.each do |item|
+        question_type = item.question_type.to_sym
+        error_map[question_type][:indices] << item.parent_collection_card.order + 1
       end
 
-      errors.add(:base, item_errors.to_sentence)
+      error_message = error_map.delete_if { |k, v| v[:indices].blank? }.map do |key, value|
+        value[:prefix] + value[:indices].to_sentence
+      end
+
+      errors.add(:base, "Please #{error_message.to_sentence}")
       false
     end
 
