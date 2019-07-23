@@ -90,9 +90,12 @@ class Collection
         order: profile_collection.collection_cards.count,
       )
       profile_collection.reorder_cards!
+      # now that it's a child of the profiles collection, reanchor
+      profile.reanchor!
 
       # copy roles down from the profile_collection
       profile.unanchor_and_inherit_roles_from_anchor!
+
       user.add_role(Role::EDITOR, profile.becomes(Collection))
       organization.admin_group.add_role(Role::EDITOR, profile.becomes(Collection))
       # create the templated cards from the Profile Template
@@ -132,14 +135,8 @@ class Collection
     return unless card.present?
     item = card.item
     item.update(
-      # TODO: set up a non "FilestackFile" way of creating an image card?
-      filestack_file: FilestackFile.create(
-        handle: 'none',
-        mimetype: 'image/jpg',
-        size: 15_945,
-        filename: 'profile.jpg',
-        url: user.picture_medium,
-      ),
+      type: 'Item::ExternalImageItem',
+      url: user.picture_medium,
     )
     cache_cover!
   end

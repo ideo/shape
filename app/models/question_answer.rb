@@ -89,6 +89,7 @@ class QuestionAnswer < ApplicationRecord
   end
 
   def destroy_open_response_item_and_card
+    return if open_response_item.nil?
     open_response_item.parent_collection_card.destroy.destroyed? &&
       open_response_item.destroy.destroyed?
   end
