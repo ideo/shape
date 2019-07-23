@@ -754,6 +754,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     })
   }
 
+  hasPaidAudiences(audiences = null) {
+    if (!audiences) return
+    // Drill into audiences
+    // Check if any have a cost
+    // return boolean
+  }
+
   API_performTestAction = async (actionName, audiences = null) => {
     const { uiStore } = this
     // this will disable any test launch/close/reopen buttons until loading is complete

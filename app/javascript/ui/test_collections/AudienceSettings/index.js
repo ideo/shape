@@ -30,6 +30,10 @@ class AudienceSettings extends React.Component {
   confirmPriceModalOpen = false
   @observable
   audienceSettings = new Map()
+  @observable
+  warningDialogOpen = false
+  @observable
+  errors = null
 
   componentDidMount() {
     this.fetchAvailableAudiences()
@@ -149,11 +153,54 @@ class AudienceSettings extends React.Component {
   @action
   closeConfirmPriceModal = () => (this.confirmPriceModalOpen = false)
 
+  // @action
+  openWarningDialog = () => {
+    const { uiStore } = this.props
+    const prompt = this.errors
+    // Shouldn't call this if no errors ....
+    uiStore.popupAlert({
+      prompt,
+      fadeOutTime: 10 * 1000,
+    })
+  }
+
+  // @action
+  // closeWarningDialog = () => (this.warningDialogOpen = false)
+
+  async isReadyToLaunch() {
+    this.errors = null
+    const { testCollection, apiStore } = this.props
+    console.log(testCollection.launchableTestId)
+    // move this into Collection.js?
+    try {
+      const res = await apiStore.request(
+        `test_collections/${testCollection.launchableTestId}/inspect_test_launchability`
+      )
+      console.log({ res })
+      if (res.error || res.status == 422) {
+        this.errors = res.error
+        console.log(this.errors)
+        return false
+      } else {
+        return true
+      }
+    } catch (err) {
+      // trackError and send to Sentry?
+      console.log({ err })
+      this.errors = err.error
+      console.log(this.errors)
+      return false
+    }
+  }
+
   confirmOrLaunchTest() {
     if (this.totalPrice === 0) {
       this.launchTestWithAudienceSettings()
     } else {
-      this.openConfirmPriceModal()
+      // WHY IS THIS FORK NOT WROKING?
+      this.isReadyToLaunch()
+        ? this.openConfirmPriceModal()
+        : this.openWarningDialog()
     }
   }
 
