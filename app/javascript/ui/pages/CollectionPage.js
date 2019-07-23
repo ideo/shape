@@ -161,8 +161,12 @@ class CollectionPage extends React.Component {
       uiStore.popupSnackbar({ message })
     }
 
-    const { toPathScrollY } = routingStore
-    window.scrollTo(0, toPathScrollY)
+    const { toPathScrollY, history } = routingStore
+    const { action } = history
+    if (action === 'POP') {
+      // on browser back button click, scroll to original state, does not work with breadcrumb
+      window.scrollTo(0, toPathScrollY)
+    }
     uiStore.update('dragTargets', [])
   }
 

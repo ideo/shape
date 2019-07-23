@@ -39,12 +39,6 @@ class RoutingStore extends RouterStore {
   }
 
   @computed
-  get hasPathWithScrollState() {
-    const pathNames = this.scrollStates.map(s => s.path.pathname)
-    return pathNames.findIndex(p => p === this.location.pathname) > -1
-  }
-
-  @computed
   get toPathScrollY() {
     const pathNames = this.scrollStates.map(s => s.path.pathname)
     const toPathIndex = pathNames.findIndex(p => p === this.location.pathname)
