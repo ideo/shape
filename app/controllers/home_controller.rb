@@ -1,6 +1,7 @@
 # Serve up static pages
 class HomeController < ApplicationController
   before_action :set_omniauth_state
+  before_action :store_redirect_param, only: %i[login sign_up]
 
   def index
     # limited users aren't allowed to access the full Shape app
@@ -15,24 +16,13 @@ class HomeController < ApplicationController
   def marketing
   end
 
-  def login
-    if params[:redirect].present?
-      load_redirect_organization_from_url(params[:redirect])
-      store_location_for :user, params[:redirect]
-    end
-  end
+  def login; end
 
   def sign_up
     @user_was_signed_in = false
     if user_signed_in?
       sign_out :user
       @user_was_signed_in = true
-    end
-    # devise helper method
-    if params[:redirect].present?
-      redirect_uri = params.require(:redirect)
-      store_location_for :user, redirect_uri
-      load_redirect_organization_from_url(redirect_uri)
     end
     # might be nil which is ok
     @email = params[:email]
@@ -62,6 +52,14 @@ class HomeController < ApplicationController
   end
 
   private
+
+  def store_redirect_param
+    return if params[:redirect].blank?
+
+    redirect_uri = params.require(:redirect)
+    store_location_for :user, redirect_uri
+    load_redirect_organization_from_url(redirect_uri)
+  end
 
   def set_omniauth_state
     session['omniauth.state'] = cookies['IdeoSSO-State']
