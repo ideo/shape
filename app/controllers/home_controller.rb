@@ -28,6 +28,12 @@ class HomeController < ApplicationController
       sign_out :user
       @user_was_signed_in = true
     end
+    # devise helper method
+    if params[:redirect].present?
+      redirect_uri = params.require(:redirect)
+      store_location_for :user, redirect_uri
+      load_redirect_organization_from_url(redirect_uri)
+    end
     # might be nil which is ok
     @email = params[:email]
   end

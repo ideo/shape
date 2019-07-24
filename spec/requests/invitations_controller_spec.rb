@@ -22,7 +22,7 @@ describe InvitationsController, type: :request do
     it 'redirects to sign up' do
       get(path)
       expect(response).to redirect_to(
-        sign_up_url(email: pending_user.email),
+        sign_up_url(email: pending_user.email, redirect: redirect),
       )
     end
 
@@ -32,28 +32,6 @@ describe InvitationsController, type: :request do
       it 'redirects to login' do
         get(path)
         expect(response).to redirect_to(login_url)
-      end
-    end
-
-    context 'with redirect that has organization slug' do
-      let!(:organization) { create(:organization, slug: 'intl-company') }
-      let!(:redirect) { 'http://www.shape.space/intl-company' }
-
-      it 'assigns @redirect_organization' do
-        get(path)
-        expect(assigns(:redirect_organization)).to eq(organization)
-      end
-    end
-
-    context 'with redirect that has invalid organization slug' do
-      let!(:redirect) { 'http://www.shape.space/intl-company' }
-
-      it 'does not assign @redirect_organization' do
-        get(path)
-        expect(response).to redirect_to(
-          sign_up_url(email: pending_user.email),
-        )
-        expect(assigns(:redirect_organization)).to be_nil
       end
     end
   end
