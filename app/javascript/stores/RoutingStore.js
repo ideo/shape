@@ -13,7 +13,7 @@ class RoutingStore extends RouterStore {
   slug = () => apiStore.currentOrgSlug
 
   @observable
-  scrollStates = []
+  scrollStates = {} // collection page scroll states
 
   @computed
   get isSearch() {
@@ -38,22 +38,13 @@ class RoutingStore extends RouterStore {
     return params
   }
 
-  @computed
-  get toPathScrollY() {
-    const pathNames = this.scrollStates.map(s => s.path.pathname)
-    const toPathIndex = pathNames.findIndex(p => p === this.location.pathname)
-    return toPathIndex > -1 ? this.scrollStates[toPathIndex].scrollY : 0
+  toPathScrollY = collectionId => {
+    return this.scrollStates[collectionId] || 0
   }
 
-  @action.bound // see: https://mobx.js.org/refguide/action.html
-  updateScrollState(path, scrollY) {
-    const pathNames = this.scrollStates.map(s => s.path.pathname)
-    const routeFromPathIndex = pathNames.findIndex(p => p === path.pathname)
-    if (routeFromPathIndex > -1) {
-      this.scrollStates[routeFromPathIndex].scrollY = scrollY
-    } else {
-      this.scrollStates.push({ path: path, scrollY: scrollY })
-    }
+  @action
+  updateScrollState = (collectionId, scrollY) => {
+    this.scrollStates[collectionId] = scrollY
   }
 
   pathTo = (type, id = null, params = {}) => {
@@ -99,7 +90,7 @@ class RoutingStore extends RouterStore {
     // close the org/roles menus if either are open when we route to a new page
     uiStore.update('organizationMenuPage', null)
     uiStore.update('rolesMenuOpen', null)
-    uiStore.setViewingCollection(null)
+    uiStore.setViewingRecord(null)
     uiStore.closeDialog()
   }
 
@@ -111,7 +102,7 @@ class RoutingStore extends RouterStore {
   pathContains = str => this.location.pathname.indexOf(str) > -1
 
   updatePreviousPageBeforeSearch(page) {
-    uiStore.setViewingCollection(null)
+    uiStore.setViewingRecord(null)
     if (page.pathname.indexOf('/search') === -1) {
       this.previousPageBeforeSearch = page.pathname
     }

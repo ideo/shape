@@ -110,15 +110,6 @@ class Routes extends React.Component {
     document.addEventListener('keydown', captureGlobalKeypress)
   }
 
-  componentDidUpdate(prevProps) {
-    const { location, routingStore } = this.props
-    const { updateScrollState } = routingStore
-    const locationChanged = location !== prevProps.location
-    if (locationChanged) {
-      updateScrollState(prevProps.location, window.scrollY)
-    }
-  }
-
   componentWillUnmount() {
     document.removeEventListener('keydown', captureGlobalKeypress)
   }

@@ -164,7 +164,9 @@ export const CollectionApiWrapper = routerProps => (
   <PageWithApiWrapper
     {...routerProps}
     fetchType="collections"
-    render={collection => <CollectionPage collection={collection} />}
+    render={collection => (
+      <CollectionPage {...routerProps} collection={collection} />
+    )}
   />
 )
 
