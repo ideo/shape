@@ -84,11 +84,9 @@ export default class UiStore {
   @observable
   gridSettings = { ...this.defaultGridSettings }
   @observable
-  viewingCollection = null
+  previousViewingRecord = null
   @observable
-  previousViewingCollection = null
-  @observable
-  viewingItem = null
+  viewingRecord = null
   @observable
   selectedCardIds = []
   @observable
@@ -635,27 +633,33 @@ export default class UiStore {
   }
 
   @action
-  setViewingCollection(collection = null) {
+  setViewingRecord(record = null) {
     // escape if we're already viewing this collection
     if (
-      this.viewingCollection &&
-      collection &&
-      this.viewingCollection.id === collection.id
+      this.viewingRecord &&
+      record &&
+      this.viewingRecord.id === record.id &&
+      this.viewingRecord.internalType == record.internalType
     )
       return
-    this.previousViewingCollection = this.viewingCollection
-    this.viewingCollection = collection
-    this.viewingItem = null
+    if (this.viewingRecord) this.previousViewingRecord = this.viewingRecord
+    this.viewingRecord = record
     this.deselectCards()
   }
 
-  @action
-  setViewingItem(item = null) {
-    // escape if we're already viewing this item
-    if (this.viewingItem && item && this.viewingItem.id === item.id) return
-    this.previousViewingCollection = this.viewingCollection
-    this.viewingCollection = null
-    this.viewingItem = item
+  @computed
+  get viewingCollection() {
+    return this.viewingRecord &&
+      this.viewingRecord.internalType === 'collections'
+      ? this.viewingRecord
+      : null
+  }
+
+  @computed
+  get viewingItem() {
+    return this.viewingRecord && this.viewingRecord.internalType === 'items'
+      ? this.viewingRecord
+      : null
   }
 
   get isViewingHomepage() {
@@ -663,12 +667,6 @@ export default class UiStore {
       this.viewingCollection &&
       this.viewingCollection.class_type === 'Collection::UserCollection'
     )
-  }
-
-  @computed
-  get viewingRecord() {
-    // only one should be present at a time depending on what page you're on
-    return this.viewingCollection || this.viewingItem
   }
 
   @action
