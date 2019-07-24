@@ -26,6 +26,18 @@ describe InvitationsController, type: :request do
       )
     end
 
+    context 'with a pending user' do
+      let(:pending_user) { create(:user, :pending) }
+      let!(:token) { pending_user.invitation_token }
+
+      it 'redirects to signup with the user email' do
+        get(path)
+        expect(response).to redirect_to(
+          sign_up_url(email: pending_user.email, redirect: redirect),
+        )
+      end
+    end
+
     context 'with invalid token' do
       let!(:token) { SecureRandom.hex }
 
