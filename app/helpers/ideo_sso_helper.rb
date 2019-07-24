@@ -59,6 +59,11 @@ module IdeoSsoHelper
   def ideo_sso_redirect_url
     return unless ENV['BASE_HOST'].present? && ENV['IDEO_SSO_REDIRECT_PATH'].present?
 
-    URI.join(ENV['BASE_HOST'], ENV['IDEO_SSO_REDIRECT_PATH'])
+    organization_id_param = ''
+    if redirect_organization.present?
+      organization_id_param = "?organization_id=#{redirect_organization.id}"
+    end
+
+    URI.join(ENV['BASE_HOST'], ENV['IDEO_SSO_REDIRECT_PATH'], organization_id_param)
   end
 end

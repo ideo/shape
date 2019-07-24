@@ -1,10 +1,13 @@
 require 'rails_helper'
 
 describe HomeController, type: :request do
+
   before do
     # NOTE: not doing any normal rendering of the index page because we defer to Cypress for those,
     # and they make for slow request specs
-    allow_any_instance_of(HomeController).to receive(:render).and_return 'rendered.'
+    allow_any_instance_of(
+      HomeController,
+    ).to receive(:render).and_return 'rendered.'
   end
 
   describe 'GET #index' do
@@ -15,6 +18,7 @@ describe HomeController, type: :request do
       before do
         log_in_as_user(limited_user)
       end
+
       it 'redirects if you are signed in as a limited user' do
         expect(get(path)).to redirect_to(root_url)
       end
@@ -37,6 +41,45 @@ describe HomeController, type: :request do
           :user, redirect
         )
         get(path)
+      end
+
+      context 'with organization slug' do
+        let!(:organization) { create(:organization, slug: 'intl-company') }
+        let!(:redirect) { 'http://www.shape.space/intl-company' }
+
+        it 'assigns @redirect_organization' do
+          get(path)
+          expect(assigns(:redirect_organization)).to eq(organization)
+        end
+      end
+    end
+  end
+
+  describe 'GET #sign_up' do
+    let(:redirect) { nil }
+    let(:path) { "/sign_up?redirect=#{redirect}" }
+
+    it 'returns 200' do
+      get(path)
+      expect(response.status).to eq 200
+    end
+
+    context 'with redirect that has organization slug' do
+      let!(:organization) { create(:organization, slug: 'intl-company') }
+      let!(:redirect) { 'http://www.shape.space/intl-company' }
+
+      it 'assigns @redirect_organization' do
+        get(path)
+        expect(assigns(:redirect_organization)).to eq(organization)
+      end
+    end
+
+    context 'with redirect that has invalid organization slug' do
+      let!(:redirect) { 'http://www.shape.space/intl-company' }
+
+      it 'does not assign @redirect_organization' do
+        get(path)
+        expect(assigns(:redirect_organization)).to be_nil
       end
     end
   end
