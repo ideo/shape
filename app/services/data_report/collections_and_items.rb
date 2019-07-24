@@ -86,16 +86,18 @@ module DataReport
       end
     end
 
+    # The fact that we are doing this indicates that it should probably be a separate object
     def generate_base_query
+      p "GENERATE BASE QUERY: #{measure}"
       case measure
       when 'participants'
-        Activity.where_participated
+        Activity.for_org(organization_id).where_participated
       when 'viewers'
-        Activity.where_viewed
+        Activity.for_org(organization_id).where_viewed
       when 'activity'
-        Activity.where_active
+        Activity.for_org(organization_id).where_active
       when 'content'
-        Activity.where_content
+        Activity.for_org(organization_id).where_content
       when 'collections'
         Collection.data_collectable.active
       when 'items'
@@ -104,9 +106,12 @@ module DataReport
     end
 
     def filtered_query
+      p "FILTERED QUERY: #{@record}" * 100
+      p "measure_queries_activities: #{measure_queries_activities?}"
       if @record.is_a?(Collection)
         collection_opts = { collection_id: @record.id }
         if measure_queries_activities?
+          # TODO: How can we improve this?
           @query.where(target_type: %w[Collection Item])
                 .joins(%(left join collections on
                            activities.target_id = collections.id and
@@ -155,8 +160,10 @@ module DataReport
     end
 
     def calculate_timeframe_values
-      sql_table = query_table.table_name
-      earliest = @query.select("min(#{sql_table}.created_at)").to_a.first.min
+      p "CALCULATE TIMEFRAME VALUES" * 100
+      p sql_table = query_table.table_name
+      p earliest = @query.select("min(#{sql_table}.created_at)").to_a.first.min
+
       return unless earliest.present?
 
       min = [earliest, 6.months.ago].max
@@ -173,6 +180,7 @@ module DataReport
       # we are actually finding all activities/collections created before January 2 00:00
       columns = %i[id created_at]
       columns.push(:actor_id) if measure_queries_activities?
+      # TODO: How can we improve this?
       sql = %{
         SELECT
           LEAST(series.date, now()::DATE) date,
@@ -193,6 +201,7 @@ module DataReport
           ) AS series
         ORDER BY series.date;
       }
+
       values = query_table.connection.execute(sql)
                           .map { |val| { date: val['date'], value: val['count'] } }
                           .uniq { |i| i[:date] } # this will filter out dupe when final series.date == now()

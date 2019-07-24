@@ -92,6 +92,7 @@ class Item < ApplicationRecord
   belongs_to :cloned_from, class_name: 'Item', optional: true
   has_one :question_item, class_name: 'Item::QuestionItem'
 
+  # Should this be scoped by organization?
   scope :questions, -> { where(type: 'Item::QuestionItem') }
   scope :data_items, -> { where(type: 'Item::DataItem') }
   scope :legend_items, -> { where(type: 'Item::LegendItem') }

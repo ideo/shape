@@ -22,6 +22,10 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
       DataReport::CollectionsAndItems.call(dataset: dataset)
     end
 
+    context 'performance' do
+      # expect(call).to take_less_than_forever
+    end
+
     it 'returns time series' do
       expect(call).to eq(
         [
