@@ -4426,8 +4426,12 @@ exports[`ChartGroup renders snapshot 1`] = `
         />
       }
       axisLabelComponent={
-        <TickLabel
-          fontSize="18px"
+        <VictoryLabel
+          capHeight={0.71}
+          direction="inherit"
+          lineHeight={1}
+          textComponent={<Text />}
+          tspanComponent={<TSpan />}
         />
       }
       containerComponent={
@@ -4450,7 +4454,6 @@ exports[`ChartGroup renders snapshot 1`] = `
           role="presentation"
         />
       }
-      label="07/10/18"
       offsetY={13}
       scale="linear"
       standalone={true}
@@ -4954,12 +4957,9 @@ exports[`ChartGroup renders snapshot 1`] = `
       }
       tickFormat={[Function]}
       tickLabelComponent={
-        <VictoryLabel
-          capHeight={0.71}
-          direction="inherit"
-          lineHeight={1}
-          textComponent={<Text />}
-          tspanComponent={<TSpan />}
+        <TickLabel
+          dy={-5}
+          fontSize="18px"
         />
       }
     />
