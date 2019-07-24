@@ -45,6 +45,8 @@ class QuillContentConverter < SimpleService
       process_header(element)
     elsif element.name == 'a'
       process_link(element)
+    elsif element.name == 'img'
+      process_img(element)
     end
   end
 
@@ -73,5 +75,11 @@ class QuillContentConverter < SimpleService
       attributes: { link: element.attributes['href'].value },
     )
     @current_string = ''
+  end
+
+  def process_img(element)
+    @quill_ops.push(
+      insert: { image: element.attributes['src'].value },
+    )
   end
 end
