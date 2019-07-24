@@ -59,8 +59,8 @@ FactoryBot.define do
 
       trait :open_response_questions do
         after(:create) do |collection|
-          collection.prelaunch_question_items.each do |item|
-            item.update(question_type: :question_open)
+          collection.prelaunch_question_items.each_with_index do |item, index|
+            item.update(question_type: :question_open, content: "Item #{index}")
           end
         end
       end
