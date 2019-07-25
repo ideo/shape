@@ -31,8 +31,6 @@ class AudienceSettings extends React.Component {
   @observable
   audienceSettings = new Map()
   @observable
-  warningDialogOpen = false
-  @observable
   errors = null
 
   componentDidMount() {
@@ -153,7 +151,6 @@ class AudienceSettings extends React.Component {
   @action
   closeConfirmPriceModal = () => (this.confirmPriceModalOpen = false)
 
-  // @action
   openWarningDialog = () => {
     const { uiStore } = this.props
     const errorMessages = this.errors.map(e => ` ${e.detail}`)
@@ -172,11 +169,10 @@ class AudienceSettings extends React.Component {
 
     try {
       await apiStore.request(
-        `test_collections/${testCollection.launchableTestId}/inspect_test_launchability`
+        `test_collections/${testCollection.launchableTestId}/validate_launch`
       )
       return true
     } catch (err) {
-      // trackError and send to Sentry?
       this.errors = err.error
       return false
     }

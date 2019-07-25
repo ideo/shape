@@ -1,5 +1,5 @@
 class Api::V1::TestCollectionsController < Api::V1::BaseController
-  before_action :load_and_authorize_test_collection, only: %i[inspect_test_launchability launch close reopen add_comparison csv_report]
+  before_action :load_and_authorize_test_collection, only: %i[validate_launch launch close reopen add_comparison csv_report]
   before_action :load_test_collection, only: %i[show next_available add_comparison remove_comparison]
   before_action :load_submission_box_test_collection, only: %i[next_available]
   before_action :load_comparison_collection, only: %i[add_comparison remove_comparison]
@@ -11,8 +11,7 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
            expose: { survey_response_for_user: @test_collection.survey_response_for_user(current_user.id) }
   end
 
-  # Rename prelaunch_check?
-  def inspect_test_launchability
+  def validate_launch
     if @test_collection.completed_and_launchable?
       render json: :ok
     else
