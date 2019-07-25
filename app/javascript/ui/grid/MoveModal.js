@@ -8,6 +8,8 @@ import InlineLoader from '~/ui/layout/InlineLoader'
 import MoveArrowIcon from '~/ui/icons/MoveArrowIcon'
 import MoveHelperModal from '~/ui/users/MoveHelperModal'
 import Tooltip from '~/ui/global/Tooltip'
+import CoverRenderer from '~/ui/grid/CoverRenderer'
+import v from '~/utils/variables'
 import {
   StyledSnackbar,
   StyledSnackbarContent,
@@ -34,6 +36,29 @@ const CloseIconHolder = styled.span`
     height: 19px;
     width: 16px;
   }
+`
+
+const CoverRendererWrapper = styled.div`
+  ${props => {
+    const { width, height, isMobile, selectedMultiple } = props
+    const { cardTiltDegrees, colors } = v
+    const shouldScaleSmaller = width >= 2 && height >= 2 // scale even smaller for 2x2, 2x3 or 2x4 ratio
+    const scalarTransform = shouldScaleSmaller && !isMobile ? 0.25 : 0.4
+    return `
+      height: ${height * 250 * scalarTransform}px;
+      width: ${width * 316 * scalarTransform}px;
+      margin-left: ${!isMobile ? 9 : 30}px;
+      position: relative;
+      top: 30px;
+      z-index: -1;
+      transform: rotate(${cardTiltDegrees}deg);
+      background: white;
+      color: black;
+      box-shadow: ${
+        selectedMultiple ? `-5px 5px 0 0px ${colors.secondaryLight}` : 'none'
+      };
+    `
+  }}
 `
 
 @inject('uiStore', 'apiStore')
@@ -209,6 +234,14 @@ class MoveModal extends React.Component {
     this.moveCards('end')
   }
 
+  get selectedMovingCard() {
+    const { uiStore, apiStore } = this.props
+    return apiStore.find(
+      'collection_cards',
+      uiStore.movingCardIds[0] // todo: should be the card where openMoveMenu was called
+    )
+  }
+
   get moveMessage() {
     const { uiStore } = this.props
     const { cardAction, templateName } = uiStore
@@ -313,7 +346,11 @@ class MoveModal extends React.Component {
 
   render() {
     const { uiStore } = this.props
-
+    const { width, height } = this.selectedMovingCard
+    const { gridSettings, isTouchDevice } = uiStore
+    const { cols } = gridSettings
+    const isMobile = isTouchDevice && cols === 1
+    const selectedMultiple = true // todo: add handler for this
     return (
       <div>
         {uiStore.shouldOpenMoveModal && (
@@ -324,15 +361,29 @@ class MoveModal extends React.Component {
                   <InlineLoader />
                 </SnackbarBackground>
               ) : (
-                <StyledSnackbarContent
-                  classes={{ root: 'SnackbarContent' }}
-                  message={
-                    <StyledSnackbarText id="message-id">
-                      {this.moveMessage}
-                    </StyledSnackbarText>
-                  }
-                  action={this.snackbarActions}
-                />
+                <div>
+                  <CoverRendererWrapper
+                    width={width}
+                    height={height}
+                    isMobile={isMobile}
+                    selectedMultiple={selectedMultiple}
+                  >
+                    <CoverRenderer
+                      card={this.selectedMovingCard}
+                      record={this.selectedMovingCard.record}
+                      cardType={'items'}
+                    />
+                  </CoverRendererWrapper>
+                  <StyledSnackbarContent
+                    classes={{ root: 'SnackbarContent' }}
+                    message={
+                      <StyledSnackbarText id="message-id">
+                        {this.moveMessage}
+                      </StyledSnackbarText>
+                    }
+                    action={this.snackbarActions}
+                  />
+                </div>
               )}
             </StyledSnackbar>
             {this.moveHelper}

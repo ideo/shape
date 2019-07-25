@@ -108,6 +108,8 @@ export default {
     muiSmBreakpoint: 960,
   },
 
+  cardTiltDegrees: -5, // tilt left
+
   transition: 'all 0.2s',
   transitionWithDelay: 'all 0.3s 0.2s',
 
