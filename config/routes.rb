@@ -61,6 +61,7 @@ Rails.application.routes.draw do
       resources :datasets, only: %i[update]
       resources :test_collections, only: %i[show] do
         member do
+          get 'validate_launch'
           patch 'launch'
           patch 'close'
           patch 'reopen'

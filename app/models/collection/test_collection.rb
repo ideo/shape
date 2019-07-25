@@ -266,6 +266,13 @@ class Collection
                    incomplete_category_satisfaction_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
         complete = false
       end
+
+      unless incomplete_open_response_items.count.zero?
+        errors.add(:base,
+                   'Please add your open response to question ' +
+                   incomplete_open_response_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
+        complete = false
+      end
       complete
     end
 
@@ -517,6 +524,13 @@ class Collection
         .joins(
           :parent_collection_card,
         ).where(question_type: :question_category_satisfaction, content: [nil, ''])
+    end
+
+    def incomplete_open_response_items
+      question_items
+        .joins(
+          :parent_collection_card,
+        ).where(question_type: :question_open, content: [nil, ''])
     end
 
     # Returns the question cards that are in the blank default state

@@ -30,6 +30,8 @@ class AudienceSettings extends React.Component {
   confirmPriceModalOpen = false
   @observable
   audienceSettings = new Map()
+  @observable
+  errors = null
 
   componentDidMount() {
     this.fetchAvailableAudiences()
@@ -149,7 +151,41 @@ class AudienceSettings extends React.Component {
   @action
   closeConfirmPriceModal = () => (this.confirmPriceModalOpen = false)
 
-  confirmOrLaunchTest() {
+  openWarningDialog = () => {
+    const { uiStore } = this.props
+    const errorMessages = this.errors.map(e => ` ${e.detail}`)
+    const prompt = `You have questions that have not yet been finalized:\n
+         ${errorMessages}
+        `
+
+    uiStore.popupAlert({
+      prompt,
+      fadeOutTime: 10 * 1000,
+    })
+  }
+
+  async isReadyToLaunch() {
+    const { testCollection, apiStore } = this.props
+
+    try {
+      await apiStore.request(
+        `test_collections/${testCollection.launchableTestId}/validate_launch`
+      )
+      return true
+    } catch (err) {
+      this.errors = err.error
+      return false
+    }
+  }
+
+  async confirmOrLaunchTest() {
+    this.errors = null
+    const readyToLaunch = await this.isReadyToLaunch()
+
+    if (!readyToLaunch) {
+      this.openWarningDialog()
+      return
+    }
     if (this.totalPrice === 0) {
       this.launchTestWithAudienceSettings()
     } else {
