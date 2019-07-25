@@ -12,6 +12,10 @@ const fakeRoutingStore = {
     search: '',
   },
   extraSearchParams: {},
+  scrollStates: [],
+  updateScrollState: jest.fn(),
+  toPathScrollY: jest.fn(),
+  history: {}
 }
 
 export default fakeRoutingStore

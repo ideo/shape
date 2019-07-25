@@ -177,6 +177,8 @@ class GridCard extends React.Component {
   renderReplaceControl() {
     const { card, canEditCollection } = this.props
     if (!canEditCollection) return null
+    const { record } = card
+    if (!record.isMedia) return
     if (!card.is_master_template_card && !card.isPinned) return null
     if (!card.is_master_template_card && card.record.has_replaced_media)
       return null
@@ -458,7 +460,7 @@ class GridCard extends React.Component {
           !card.isPinnedAndLocked && (
             <GridCardHotspot card={card} dragging={dragging} position="left" />
           )}
-        {record.isMedia && this.renderReplaceControl()}
+        {this.renderReplaceControl()}
         {!record.menuDisabled &&
           uiStore.textEditingItem !== record &&
           !record.archived && (

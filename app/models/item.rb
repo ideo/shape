@@ -270,10 +270,10 @@ class Item < ApplicationRecord
   end
 
   def replaced_media?
-    return false unless filestack_file.present?
     templated_from_item = try(:parent_collection_card).try(:templated_from).try(:item)
-    return false unless templated_from_item
-    templated_from_item.filestack_file.handle != filestack_file.handle
+    return true unless templated_from_item.present?
+    return false if image_url.nil? || image_url.include?('avatars/missing')
+    templated_from_item.image_url != image_url
   end
 
   def chart_data

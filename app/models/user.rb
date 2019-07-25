@@ -222,6 +222,8 @@ class User < ApplicationRecord
       else
         user = User.find_or_initialize_by(email: attrs.email)
         user.status = User.statuses[:active]
+        # Users see terms on the Network, so we can mark them as accepted
+        user.terms_accepted = true
       end
       user.first_name = attrs[:first_name]
       user.last_name = attrs[:last_name]

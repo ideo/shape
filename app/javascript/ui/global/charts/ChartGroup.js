@@ -204,7 +204,7 @@ class ChartGroup extends React.Component {
 
     // NOTE: The transform property is for IE11 which doesn't recognize CSS
     // transform properties on SVG
-    return this.primaryDatasetValues > 1 ? (
+    return this.primaryDatasetValues.length > 1 ? (
       <VictoryAxis
         tickLabelComponent={
           <TickLabel

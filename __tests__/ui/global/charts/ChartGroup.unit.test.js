@@ -52,10 +52,6 @@ describe('ChartGroup', () => {
     expect(chart.find('VictoryAxis').exists()).toBe(true)
   })
 
-  it('renders axis', () => {
-    expect(wrapper.find('VictoryAxis').props().label).toEqual('07/10/18')
-  })
-
   it('displays x-axis labels for dates near the end of the month', () => {
     let label
     // if it's not near month end, the label is blank

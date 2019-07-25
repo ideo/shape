@@ -245,6 +245,7 @@ class Organization < ApplicationRecord
       external_id: id,
       name: name,
       admin_user_uid: admin.try(:uid) || '',
+      enterprise: !in_app_billing,
     )
   end
 
@@ -336,7 +337,7 @@ class Organization < ApplicationRecord
     CollectionCardBuilder.new(
       params: {
         order: 0,
-        collection_id: user_getting_started.id
+        collection_id: user_getting_started.id,
       },
       parent_collection: user_collection,
       user: user,
@@ -450,6 +451,10 @@ class Organization < ApplicationRecord
     else
       cancel_network_subscription
     end
+
+    network_organization.update_attributes(
+      enterprise: !in_app_billing,
+    )
   end
 
   def update_deactivated
