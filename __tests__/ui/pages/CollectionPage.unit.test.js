@@ -1,3 +1,4 @@
+import { animateScroll } from 'react-scroll'
 import CollectionPage from '~/ui/pages/CollectionPage'
 import ChannelManager from '~/utils/ChannelManager'
 import fakeApiStore from '#/mocks/fakeApiStore'
@@ -8,6 +9,7 @@ import { fakeCollection } from '#/mocks/data'
 
 jest.mock('../../../app/javascript/utils/ChannelManager')
 jest.mock('../../../app/javascript/stores')
+jest.mock('react-scroll')
 
 const collections = [
   Object.assign({}, fakeCollection, { id: 1 }),
@@ -85,6 +87,84 @@ describe('CollectionPage', () => {
         expect(collection.API_fetchCards).toHaveBeenCalled()
         expect(component.cardsFetched).toBe(true)
       })
+
+      it('should have a different viewingRecord', () => {
+        expect(uiStore.setViewingRecord).toHaveBeenCalled()
+      })
+
+      it('should scroll check to update scroll state', () => {
+        expect(routingStore.toPathScrollY).toHaveBeenCalledWith(collection.id)
+        expect(routingStore.updateScrollState).toHaveBeenCalledWith(
+          collection.id,
+          0
+        )
+      })
+    })
+  })
+
+  describe('clicked search but cancelled it', () => {
+    beforeEach(() => {
+      wrapper = shallow(
+        <CollectionPage.wrappedComponent
+          {...props}
+          routingStore={{
+            ...routingStore,
+            previousPageBeforeSearch: `/ideo/collections/${collection.id}`,
+            location: {
+              pathname: `/ideo/collections/${collection.id}`,
+            },
+          }}
+        />
+      )
+    })
+
+    it('should scroll to previous scroll position', () => {
+      expect(animateScroll.scrollTo).toHaveBeenCalled()
+    })
+  })
+
+  describe('click from breadcrumb', () => {
+    const childCollection = {
+      ...collection[2],
+      breadcrumb: [collection],
+    }
+    beforeEach(() => {
+      wrapper = shallow(
+        <CollectionPage.wrappedComponent
+          {...props}
+          uiStore={{
+            ...uiStore,
+            previousViewingRecord: childCollection,
+          }}
+        />
+      )
+    })
+
+    it('should scroll to previous scroll position', () => {
+      expect(uiStore.linkedBreadcrumbTrailForRecord).toHaveBeenCalled()
+      expect(routingStore.toPathScrollY).toHaveBeenCalled()
+      expect(animateScroll.scrollTo).toHaveBeenCalled()
+    })
+  })
+
+  describe('move back or forward via history', () => {
+    beforeEach(() => {
+      wrapper = shallow(
+        <CollectionPage.wrappedComponent
+          {...props}
+          routingStore={{
+            ...routingStore,
+            history: {
+              action: 'POP',
+            },
+          }}
+        />
+      )
+    })
+
+    it('should scroll to previous scroll position', () => {
+      expect(routingStore.toPathScrollY).toHaveBeenCalled()
+      expect(animateScroll.scrollTo).toHaveBeenCalled()
     })
   })
 

@@ -158,6 +158,10 @@ describe Organization, type: :model do
               payment_method_id: payment_method.id,
             )
 
+            expect(network_organization).to receive(:update_attributes).with(
+              enterprise: false,
+            )
+
             organization.update_attributes(in_app_billing: true)
           end
         end
@@ -179,6 +183,10 @@ describe Organization, type: :model do
             expect(NetworkApi::Subscription).to receive(:create).with(
               organization_id: network_organization.id,
               plan_id: plan.id,
+            )
+
+            expect(network_organization).to receive(:update_attributes).with(
+              enterprise: false,
             )
 
             organization.update_attributes(in_app_billing: true)
@@ -206,6 +214,9 @@ describe Organization, type: :model do
 
           expect(subscription).to receive(:cancel).with(
             immediately: true,
+          )
+          expect(network_organization).to receive(:update_attributes).with(
+            enterprise: true,
           )
 
           organization.update_attributes(in_app_billing: false)
@@ -465,6 +476,7 @@ describe Organization, type: :model do
           external_id: organization.id,
           name: organization.name,
           admin_user_uid: admin_user.uid,
+          enterprise: false,
         )
       end
     end
@@ -476,6 +488,7 @@ describe Organization, type: :model do
           external_id: organization.id,
           name: organization.name,
           admin_user_uid: '',
+          enterprise: false,
         )
       end
     end

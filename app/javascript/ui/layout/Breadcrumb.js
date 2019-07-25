@@ -275,7 +275,7 @@ class Breadcrumb extends React.Component {
           <StyledBreadcrumbWrapper>
             {this.renderBackButton()}
             {items.map((item, index) => (
-              <span className="breadcrumb_item" key={item.name}>
+              <span className="breadcrumb_item" key={`${item.name}-${index}`}>
                 <BreadcrumbItem
                   identifier={item.identifier}
                   item={item}

@@ -55,32 +55,43 @@ class CollectionPage extends React.Component {
       // NOTE: the user will see a brief flash of the collection name before redirect
       routeToLogin({ redirect: collection.frontend_url })
     }
+    this.setViewingRecordAndRestoreScrollPosition()
     this.loadCollectionCards({})
   }
 
   componentDidUpdate(prevProps) {
-    const { collection } = this.props
+    const { collection, routingStore } = this.props
     const previousId = prevProps.collection.id
     const currentId = collection.id
     if (currentId !== previousId) {
       runInAction(() => {
         this.cardsFetched = false
       })
-      scroll.scrollToTop({ duration: 0 })
       ChannelManager.unsubscribeAllFromChannel(this.channelName)
       // when navigating between collections, close BCT
       this.props.uiStore.closeBlankContentTool()
+      this.setViewingRecordAndRestoreScrollPosition()
       this.loadCollectionCards({})
+      routingStore.updateScrollState(previousId, window.pageYOffset)
     }
   }
 
   componentWillUnmount() {
+    const { routingStore, collection } = this.props
     ChannelManager.unsubscribeAllFromChannel(this.channelName)
+    routingStore.updateScrollState(collection.id, window.pageYOffset)
   }
 
   get collection() {
     // TODO: replace all references to this.collection with this.props.collection
     return this.props.collection
+  }
+
+  setViewingRecordAndRestoreScrollPosition() {
+    const { collection, uiStore } = this.props
+    // setViewingRecord has to happen first bc we use it in openBlankContentTool
+    uiStore.setViewingRecord(collection)
+    this.restoreWindowScrollPosition()
   }
 
   loadCollectionCards = async ({ page, per_page, rows, cols }) => {
@@ -117,9 +128,6 @@ class CollectionPage extends React.Component {
     apiStore.checkCurrentOrg({ id: collection.organization_id })
 
     this.subscribeToChannel(collection.id)
-
-    // setViewingCollection has to happen first bc we use it in openBlankContentTool
-    uiStore.setViewingCollection(collection)
 
     if (collection.isSubmissionsCollection) {
       // NOTE: SubmissionsCollections are not meant to be viewable, so we route
@@ -160,8 +168,39 @@ class CollectionPage extends React.Component {
       const message = `${collection.processing_status}...`
       uiStore.popupSnackbar({ message })
     }
-
     uiStore.update('dragTargets', [])
+    this.restoreWindowScrollPosition()
+  }
+
+  restoreWindowScrollPosition() {
+    const { collection, uiStore, routingStore } = this.props
+    const { previousViewingRecord } = uiStore
+    const linkedBreadCrumbTrail = previousViewingRecord
+      ? uiStore.linkedBreadcrumbTrailForRecord(previousViewingRecord)
+      : []
+    const isComingFromViewingRecordBreadcrumb = _.find(linkedBreadCrumbTrail, {
+      id: collection.id,
+    })
+    const {
+      toPathScrollY,
+      history,
+      location,
+      previousPageBeforeSearch,
+    } = routingStore
+    const { action } = history
+    const originalScrollY = toPathScrollY(collection.id)
+    const returningFromSearch = previousPageBeforeSearch === location.pathname
+    routingStore.previousPageBeforeSearch = null // reset previous page back to original state
+    // on browser back button click, breadcrumb, or cancel search, scroll to original position
+    const shouldScrollToOriginalPosition =
+      action === 'POP' ||
+      isComingFromViewingRecordBreadcrumb ||
+      returningFromSearch
+    if (shouldScrollToOriginalPosition) {
+      scroll.scrollTo(originalScrollY, { duration: 200 })
+    } else {
+      scroll.scrollToTop({ duration: 0 })
+    }
   }
 
   pollForUpdates() {

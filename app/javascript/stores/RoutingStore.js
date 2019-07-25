@@ -1,5 +1,5 @@
 import { RouterStore } from 'mobx-react-router'
-import { computed } from 'mobx'
+import { computed, observable, action } from 'mobx'
 import queryString from 'query-string'
 
 import { apiStore, uiStore } from '~/stores'
@@ -11,6 +11,9 @@ class RoutingStore extends RouterStore {
   routingTo = { type: null, id: null }
 
   slug = () => apiStore.currentOrgSlug
+
+  @observable
+  scrollStates = {} // collection page scroll states
 
   @computed
   get isSearch() {
@@ -33,6 +36,15 @@ class RoutingStore extends RouterStore {
     const params = queryString.parse(this.location.search)
     delete params.q
     return params
+  }
+
+  toPathScrollY = collectionId => {
+    return this.scrollStates[collectionId] || 0
+  }
+
+  @action
+  updateScrollState = (collectionId, scrollY) => {
+    this.scrollStates[collectionId] = scrollY
   }
 
   pathTo = (type, id = null, params = {}) => {
@@ -78,7 +90,7 @@ class RoutingStore extends RouterStore {
     // close the org/roles menus if either are open when we route to a new page
     uiStore.update('organizationMenuPage', null)
     uiStore.update('rolesMenuOpen', null)
-    uiStore.setViewingCollection(null)
+    uiStore.setViewingRecord(null)
     uiStore.closeDialog()
   }
 
@@ -90,7 +102,7 @@ class RoutingStore extends RouterStore {
   pathContains = str => this.location.pathname.indexOf(str) > -1
 
   updatePreviousPageBeforeSearch(page) {
-    uiStore.setViewingCollection(null)
+    uiStore.setViewingRecord(null)
     if (page.pathname.indexOf('/search') === -1) {
       this.previousPageBeforeSearch = page.pathname
     }
