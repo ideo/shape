@@ -45,6 +45,7 @@ class Activity < ApplicationRecord
   belongs_to :source, polymorphic: true, optional: true
   belongs_to :destination, polymorphic: true, optional: true
 
+  scope :in_org, ->(organization_id) { where(organization_id: organization_id) }
   scope :where_participated, -> { where(action: participant_actions) }
   scope :where_viewed, -> { where(action: viewer_actions) }
   scope :where_active, -> { where(action: activity_actions) }

@@ -89,13 +89,13 @@ module DataReport
     def generate_base_query
       case measure
       when 'participants'
-        Activity.where_participated
+        Activity.in_org(organization_id).where_participated
       when 'viewers'
-        Activity.where_viewed
+        Activity.in_org(organization_id).where_viewed
       when 'activity'
-        Activity.where_active
+        Activity.in_org(organization_id).where_active
       when 'content'
-        Activity.where_content
+        Activity.in_org(organization_id).where_content
       when 'collections'
         Collection.data_collectable.active
       when 'items'
@@ -107,16 +107,31 @@ module DataReport
       if @record.is_a?(Collection)
         collection_opts = { collection_id: @record.id }
         if measure_queries_activities?
-          @query.where(target_type: %w[Collection Item])
-                .joins(%(left join collections on
-                           activities.target_id = collections.id and
-                           activities.target_type = 'Collection'))
-                .joins(%(left join items on
-                           activities.target_id = items.id and
-                           activities.target_type = 'Item'))
-                .where(%(coalesce(collections.breadcrumb, items.breadcrumb) @> ':collection_id' or
-                           collections.id = :collection_id),
-                       collection_opts)
+          # @query.where(target_type: %w[Collection Item])
+          #       .joins(%(left join collections on
+          #                  activities.target_id = collections.id and
+          #                  activities.target_type = 'Collection'))
+          #       .joins(%(left join items on
+          #                  activities.target_id = items.id and
+          #                  activities.target_type = 'Item'))
+          #       .where(%(coalesce(collections.breadcrumb, items.breadcrumb) @> ':collection_id' or
+          #                  collections.id = :collection_id),
+          #              collection_opts)
+
+          q1 = @query
+            .joins(%(join collections on
+                       activities.target_id = collections.id and
+                       activities.target_type = 'Collection'))
+            .where(%(collections.breadcrumb @> ':collection_id' or
+                      collections.id = :collection_id),
+              collection_opts)
+
+          q2 = @query
+            .joins(%(join items on
+                       activities.target_id = items.id and
+                       activities.target_type = 'Item'))
+            .where(%(items.breadcrumb @> ':collection_id'), collection_opts)
+          Activity.from("(#{q1.to_sql} UNION #{q2.to_sql}) AS activities")
         elsif measure == 'collections'
           @query.where(%(breadcrumb @> ':collection_id' or
                          id = :collection_id),
@@ -162,9 +177,9 @@ module DataReport
       min = [earliest, 6.months.ago].max
       case measure
       when 'participants', 'viewers'
-        selection = 'count(distinct(actor_id))'
+        count = 'count(distinct(actor_id))'
       when 'activity', 'content', 'collections', 'items'
-        selection = 'count(*)'
+        count = 'count(*)'
       else
         return
       end
@@ -173,25 +188,30 @@ module DataReport
       # we are actually finding all activities/collections created before January 2 00:00
       columns = %i[id created_at]
       columns.push(:actor_id) if measure_queries_activities?
-      sql = %{
+
+      intervals = %{
         SELECT
-          LEAST(series.date, now()::DATE) date,
-          (
-            SELECT #{selection}
-              FROM (#{@query.select(*columns).to_sql}) inner_query
-              WHERE
-                created_at BETWEEN
-                  LEAST(series.date, now()::DATE) - INTERVAL '1 #{timeframe}'
-                  AND
-                  LEAST(series.date, now()::DATE) + INTERVAL '1 #{timeframe}'
-          )
+          LEAST(series.date, now()::DATE) date
         FROM
           GENERATE_SERIES(
             ('#{min.send("beginning_of_#{timeframe}")}'::DATE + INTERVAL '1 #{timeframe}'),
             now()::DATE + INTERVAL '1 #{timeframe}',
             INTERVAL '1 #{timeframe}'
           ) AS series
-        ORDER BY series.date;
+      }
+
+      sql = %{
+        with intervals as (#{intervals})
+          SELECT i.date, #{count}
+            FROM (#{@query.select(*columns).to_sql}) inner_query
+            RIGHT JOIN intervals i
+            ON
+              created_at BETWEEN
+                LEAST(i.date, now()::DATE) - INTERVAL '1 #{timeframe}'
+                AND
+                LEAST(i.date, now()::DATE) + INTERVAL '1 #{timeframe}'
+            GROUP BY i.date
+            ORDER BY i.date
       }
       values = query_table.connection.execute(sql)
                           .map { |val| { date: val['date'], value: val['count'] } }
