@@ -681,9 +681,10 @@ export default class UiStore {
   // For certain actions we want to force a toggle on
   @action
   selectCardId(cardId) {
-    if (!this.isSelected(cardId)) {
-      this.selectedCardIds.push(cardId)
-    }
+    this.reselectCardIds(
+      // always put the newly selected card at the end
+      _.reject(this.selectedCardIds, i => i === cardId).concat(cardId)
+    )
   }
 
   @action

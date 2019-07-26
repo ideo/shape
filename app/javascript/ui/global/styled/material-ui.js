@@ -23,8 +23,7 @@ export const StyledSnackbarContent = styled(SnackbarContent)`
     max-width: none;
     padding: 15px 30px;
     width: 100%;
-    /* todo: can we remove this?*/
-    /* margin-top: ${v.headerHeight + 20}px; */
+    margin-top: ${v.headerHeight + 20}px;
     &.autoWidth {
       width: auto;
     }
