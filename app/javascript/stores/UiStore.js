@@ -418,9 +418,11 @@ export default class UiStore {
     if (this.cardAction === 'useTemplate') {
       // fake the selected card to trigger the menu open,
       // because we aren't really moving an existing card
-      this.movingCardIds.replace(['template'])
+      const { name, parent_collection_card } = this.viewingCollection
+      const { id } = parent_collection_card
+      this.movingCardIds.replace([id])
       // store the name e.g. "CoLab Prototype in transit"
-      this.templateName = this.viewingCollection.name
+      this.templateName = name
     } else {
       this.movingCardIds.replace([...this.selectedCardIds])
       this.templateName = ''
