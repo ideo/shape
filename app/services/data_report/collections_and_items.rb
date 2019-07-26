@@ -107,31 +107,20 @@ module DataReport
       if @record.is_a?(Collection)
         collection_opts = { collection_id: @record.id }
         if measure_queries_activities?
-          # @query.where(target_type: %w[Collection Item])
-          #       .joins(%(left join collections on
-          #                  activities.target_id = collections.id and
-          #                  activities.target_type = 'Collection'))
-          #       .joins(%(left join items on
-          #                  activities.target_id = items.id and
-          #                  activities.target_type = 'Item'))
-          #       .where(%(coalesce(collections.breadcrumb, items.breadcrumb) @> ':collection_id' or
-          #                  collections.id = :collection_id),
-          #              collection_opts)
-
-          q1 = @query
-            .joins(%(join collections on
+          collections = @query
+                        .joins(%(join collections on
                        activities.target_id = collections.id and
                        activities.target_type = 'Collection'))
-            .where(%(collections.breadcrumb @> ':collection_id' or
+                        .where(%(collections.breadcrumb @> ':collection_id' or
                       collections.id = :collection_id),
-              collection_opts)
+                               collection_opts)
 
-          q2 = @query
-            .joins(%(join items on
+          items = @query
+                  .joins(%(join items on
                        activities.target_id = items.id and
                        activities.target_type = 'Item'))
-            .where(%(items.breadcrumb @> ':collection_id'), collection_opts)
-          Activity.from("(#{q1.to_sql} UNION #{q2.to_sql}) AS activities")
+                  .where(%(items.breadcrumb @> ':collection_id'), collection_opts)
+          Activity.from("(#{collections.to_sql} UNION #{items.to_sql}) AS activities")
         elsif measure == 'collections'
           @query.where(%(breadcrumb @> ':collection_id' or
                          id = :collection_id),
@@ -213,10 +202,13 @@ module DataReport
             GROUP BY i.date
             ORDER BY i.date
       }
-      values = query_table.connection.execute(sql)
-                          .map { |val| { date: val['date'], value: val['count'] } }
-                          .uniq { |i| i[:date] } # this will filter out dupe when final series.date == now()
 
+      timeframe_cache_key = "#{cache_key_base}::Time-#{timeframe}"
+      values = Rails.cache.fetch timeframe_cache_key do
+        query_table.connection.execute(sql)
+                   .map { |val| { date: val['date'], value: val['count'] } }
+                   .uniq { |i| i[:date] } # this will filter out dupe when final series.date == now()
+      end
       @data = values
     end
 
@@ -239,7 +231,18 @@ module DataReport
         return
       end
 
-      @single_value = value.count
+      @single_value = Rails.cache.fetch "#{cache_key_base}::SingleValue" do
+        value.count
+      end
+    end
+
+    def cache_key_base
+      if @record
+        identifier = "#{@record.class.base_class.name}/#{@record.id}"
+      else
+        identifier = "Org/#{organization_id}"
+      end
+      "Dataset::#{identifier}::#{measure}::#{Date.today}"
     end
   end
 end
