@@ -97,6 +97,8 @@ Feature: Undo actions
 
     Then I should see a collection card named "Hello World"
     Then I should see a collection card named "Inner Collection"
+    # wait for header pill to pop out
+    When I wait for 1 second
     Then I should see a "TextItemCover" in the first card
     Then I should see a "CollectionCover" in the index 1 card
     Then I should see a "CollectionCover" in the index 2 card
