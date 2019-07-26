@@ -90,6 +90,7 @@ class CollectionCard < ApplicationRecord
   scope :visible, -> { where(hidden: false) }
   scope :is_cover, -> { where(is_cover: true) }
   scope :primary, -> { where(type: 'CollectionCard::Primary') }
+  scope :link, -> { where(type: 'CollectionCard::Link') }
 
   enum filter: {
     nothing: 0,

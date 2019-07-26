@@ -217,9 +217,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     @cards = ordered_cards
     @to_collection = Collection.find(json_api_params[:to_id])
     @cards.primary.each do |card|
-      authorize! :edit, card.record
+      authorize! :edit, card
     end
-    authorize! :edit_content, @from_collection
+    @cards.link.each do |card|
+      authorize! :read, card
+    end
     authorize! :edit_content, @to_collection
   end
 
@@ -228,7 +230,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     @from_collection = Collection.find(json_api_params[:from_id])
     @cards = ordered_cards
     @cards.each do |card|
-      authorize! :read, card.record
+      authorize! :read, card
     end
     @to_collection = Collection.find(json_api_params[:to_id])
     authorize! :edit_content, @to_collection
@@ -241,8 +243,10 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def load_and_authorize_cards
     @collection_cards = CollectionCard.where(id: json_api_params[:card_ids])
-    @collection_cards.each do |cc|
-      authorize! :edit, cc
+    @collection_cards.each do |card|
+      # - primary cards authorize edit via the record
+      # - link cards authorize edit via the parent collection
+      authorize! :edit, card
     end
   end
 
