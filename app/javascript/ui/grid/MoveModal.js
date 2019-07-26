@@ -360,7 +360,8 @@ class MoveModal extends React.Component {
 
   render() {
     const { uiStore } = this.props
-    const { position, maxWidth, maxHeight } = this.selectedMovingCard
+    const { position, maxWidth, maxHeight, record } = this.selectedMovingCard
+    const { internalType } = record
     const { movingCardIds } = uiStore
     return (
       <div>
@@ -392,7 +393,8 @@ class MoveModal extends React.Component {
                     <CoverRenderer
                       card={this.selectedMovingCard}
                       record={this.selectedMovingCard.record}
-                      cardType={'items'}
+                      cardType={internalType}
+                      nestedTextItem={null}
                     />
                   </CoverRendererWrapper>
                 </Fragment>
