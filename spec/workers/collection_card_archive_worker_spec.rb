@@ -4,6 +4,7 @@ RSpec.describe CollectionCardArchiveWorker, type: :worker do
   describe '#perform' do
     let(:user) { create(:user) }
     let(:collection) { create(:collection) }
+    let(:organization) { collection.organization }
     let(:collection_card_collections) do
       create_list(:collection_card_collection, 2, parent: collection)
     end
@@ -29,14 +30,17 @@ RSpec.describe CollectionCardArchiveWorker, type: :worker do
 
     before do
       user.add_role(Role::EDITOR, collection)
+      collection_card_collections.each do |card|
+        card.record.update(organization_id: organization.id)
+      end
     end
 
     context 'with collection cards' do
       before do
         collection_card_collections.each do |card|
-          create(:activity, actor: user, target: card.record, action: 6)
+          create(:activity, actor: user, target: card.record, action: 6, organization: organization)
         end
-        create(:activity, actor: user, target: subcollection_card.record, action: 6)
+        create(:activity, actor: user, target: subcollection_card.record, action: 6, organization: organization)
       end
 
       it 'archives all cards and their records' do
@@ -81,7 +85,7 @@ RSpec.describe CollectionCardArchiveWorker, type: :worker do
           user.id,
         )
       end
-      let!(:activity) { create(:activity, actor: user, target: subcollection_card.record, action: 6) }
+      let!(:activity) { create(:activity, actor: user, target: subcollection_card.record, action: 6, organization: organization) }
 
       let(:builder_args) do
         {

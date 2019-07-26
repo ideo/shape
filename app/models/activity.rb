@@ -18,6 +18,7 @@
 #
 # Indexes
 #
+#  index_activities_action_target_org                       (action,target_type,organization_id)
 #  index_activities_on_actor_id                             (actor_id)
 #  index_activities_on_created_at                           (created_at)
 #  index_activities_on_destination_type_and_destination_id  (destination_type,destination_id)
@@ -45,6 +46,7 @@ class Activity < ApplicationRecord
   belongs_to :source, polymorphic: true, optional: true
   belongs_to :destination, polymorphic: true, optional: true
 
+  scope :in_org, ->(organization_id) { where(organization_id: organization_id) }
   scope :where_participated, -> { where(action: participant_actions) }
   scope :where_viewed, -> { where(action: viewer_actions) }
   scope :where_active, -> { where(action: activity_actions) }

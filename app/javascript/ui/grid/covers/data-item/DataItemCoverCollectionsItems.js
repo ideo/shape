@@ -31,7 +31,6 @@ const GraphKey = styled.span`
   width: 16px;
 `
 
-// eslint-disable-next-line react/no-multi-comp
 @inject('uiStore', 'apiStore')
 @observer
 class DataItemCoverCollectionsItems extends React.Component {
@@ -41,17 +40,18 @@ class DataItemCoverCollectionsItems extends React.Component {
   loading = false
 
   componentDidMount() {
-    const { primaryDataset } = this.props.item
-    const dataSourceId = primaryDataset.data_source_id
-    if (dataSourceId) {
-      this.loadTargetCollection(dataSourceId)
+    const {
+      primaryDataset: { data_source_id },
+    } = this.props.item
+    if (data_source_id) {
+      this.loadTargetCollection(data_source_id)
     }
   }
 
-  async loadTargetCollection(source) {
+  async loadTargetCollection(id) {
     const { apiStore } = this.props
     try {
-      const res = await apiStore.fetch('collections', source)
+      const res = await apiStore.fetch('collections', id)
       runInAction(() => {
         this.targetCollection = res.data
       })
