@@ -130,18 +130,18 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
       let(:actor) { create(:user) }
 
       before do
-        create_list(:activity, 1, target: parent_collection, action: :created, created_at: 2.months.ago)
-        create_list(:activity, 5, target: parent_collection, action: :viewed, created_at: 2.months.ago)
+        create_list(:activity, 1, target: parent_collection, action: :created, created_at: 2.months.ago, organization: organization)
+        create_list(:activity, 5, target: parent_collection, action: :viewed, created_at: 2.months.ago, organization: organization)
         # same actor did this activity twice
-        create_list(:activity, 2, target: child_collection, action: :edited, actor: actor)
-        create_list(:activity, 4, target: child_collection, action: :viewed)
-        create_list(:activity, 3, target: child_child_collection, action: :edited)
-        create_list(:activity, 3, target: child_child_collection, action: :viewed)
-        create_list(:activity, 4, target: item, action: :replaced)
-        create_list(:activity, 2, target: item, action: :viewed)
+        create_list(:activity, 2, target: child_collection, action: :edited, actor: actor, organization: organization)
+        create_list(:activity, 4, target: child_collection, action: :viewed, organization: organization)
+        create_list(:activity, 3, target: child_child_collection, action: :edited, organization: organization)
+        create_list(:activity, 3, target: child_child_collection, action: :viewed, organization: organization)
+        create_list(:activity, 4, target: item, action: :replaced, organization: organization)
+        create_list(:activity, 2, target: item, action: :viewed, organization: organization)
         # other collection exists in the same org but outside the parent tree
-        create_list(:activity, 5, target: other_collection, action: :created)
-        create_list(:activity, 1, target: other_collection, action: :viewed)
+        create_list(:activity, 5, target: other_collection, action: :created, organization: organization)
+        create_list(:activity, 1, target: other_collection, action: :viewed, organization: organization)
       end
 
       context 'with a participant measure' do
