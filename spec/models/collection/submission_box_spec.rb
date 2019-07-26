@@ -25,10 +25,14 @@ describe Collection::SubmissionBox, type: :model do
 
   describe '#duplicate!' do
     let(:user) { create(:user) }
-    let(:parent_collection) { create(:collection) }
+    let(:group) { create(:group) }
+    let(:parent_collection) { create(:collection, add_editors: [user]) }
     # duplicate! method expects a parent_collection to be present
     let(:submission_box) { create(:submission_box, parent_collection: parent_collection) }
-    let(:duplicate) { submission_box.duplicate!(for_user: user) }
+    let(:duplicate) do
+      submission_box.duplicate!(for_user: user, synchronous: true)
+    end
+    let(:submissions_collection) { duplicate.submissions_collection }
 
     before do
       submission_box.setup_submissions_collection!
@@ -38,6 +42,40 @@ describe Collection::SubmissionBox, type: :model do
       expect(submission_box.submissions_collection.present?).to be true
       expect(duplicate.submissions_collection.present?).to be true
       expect(duplicate.submissions_collection).not_to eq submission_box.submissions_collection
+    end
+
+    it 'should update the submissions_collection roles_anchor when assigning a role' do
+      expect(duplicate.roles_anchor).to eq parent_collection
+      expect(submissions_collection.roles_anchor).to eq parent_collection
+      Roles::MassAssign.call(
+        object: duplicate,
+        role_name: Role::EDITOR,
+        groups: [group],
+        propagate_to_children: true,
+        synchronous: true,
+      )
+      expect(duplicate.roles_anchor).to eq duplicate
+      expect(submissions_collection.reload.roles_anchor).to eq duplicate
+    end
+
+    context 'with a template' do
+      let!(:template_card) { create(:collection_card, parent: parent_collection) }
+      let!(:template) { create(:collection, master_template: true, parent_collection_card: template_card) }
+
+      before do
+        SubmissionBoxTemplateSetter.call(
+          submission_box: submission_box,
+          template_card: template_card,
+          submission_box_type: :template,
+          user: user,
+        )
+      end
+
+      it 'should create its own template' do
+        expect(submission_box.submission_template.cloned_from).to eq template
+        expect(duplicate.submission_template).not_to eq submission_box.submission_template
+        expect(duplicate.submission_template.cloned_from).to eq submission_box.submission_template
+      end
     end
   end
 

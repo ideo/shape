@@ -74,6 +74,11 @@ class Collection
       file: 3,
     }
 
+    # override base collection method e.g. for ModifyChildrenRolesWorker
+    def children
+      (items + collections + [submissions_collection]).compact
+    end
+
     def duplicate!(**args)
       duplicate = super(args)
       return duplicate if duplicate.new_record? || duplicate.errors.present?
