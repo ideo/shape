@@ -38,10 +38,10 @@ const StyledLink = DisplayLink.extend`
 const StyledSeal = styled.div`
   height: 80px;
   width: 57.98px;
-  float: 'none';
+  float: none;
   position: relative;
   background-image: url(${props => props.assetUrl});
-  background-position: 'left';
+  background-position: left;
   background-repeat: no-repeat;
   background-size: contain;
   margin-bottom: 10px;
