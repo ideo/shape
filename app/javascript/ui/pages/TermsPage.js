@@ -38,10 +38,10 @@ const StyledLink = DisplayLink.extend`
 const StyledSeal = styled.div`
   height: 80px;
   width: 57.98px;
-  float: ${props => (props.float === 'right' ? 'right' : 'none')};
+  float: 'none';
   position: relative;
   background-image: url(${props => props.assetUrl});
-  background-position: ${props => (props.float === 'right' ? 'right' : 'left')};
+  background-position: 'left';
   background-repeat: no-repeat;
   background-size: contain;
   margin-bottom: 10px;
@@ -86,14 +86,12 @@ class TermsPage extends React.PureComponent {
             assetUrl={
               'https://ideo-sso.s3-us-west-2.amazonaws.com/assets/privacy_certified_globe.png'
             }
-            float={'left'}
           />
           {inner}
           <StyledSeal
             assetUrl={
               'https://ideo-sso.s3-us-west-2.amazonaws.com/assets/privacy_certified_globe.png'
             }
-            float={'right'}
           />
         </PageContainer>
       </div>
