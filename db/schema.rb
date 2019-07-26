@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_03_185758) do
+ActiveRecord::Schema.define(version: 2019_07_26_063501) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -29,6 +29,7 @@ ActiveRecord::Schema.define(version: 2019_07_03_185758) do
     t.bigint "source_id"
     t.string "destination_type"
     t.bigint "destination_id"
+    t.index ["action", "target_type", "organization_id"], name: "index_activities_action_target_org"
     t.index ["actor_id"], name: "index_activities_on_actor_id"
     t.index ["created_at"], name: "index_activities_on_created_at"
     t.index ["destination_type", "destination_id"], name: "index_activities_on_destination_type_and_destination_id"
