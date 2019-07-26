@@ -11,6 +11,12 @@ RSpec.describe Activity, type: :model do
     it { should have_many :notifications }
   end
 
+  describe 'scopes' do
+    context 'performance' do
+
+    end
+  end
+
   describe 'self.map_move_action' do
     it 'should map move action strings with activity actions' do
       expect(Activity.map_move_action('move')).to eq :moved
