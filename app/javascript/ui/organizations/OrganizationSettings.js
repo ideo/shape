@@ -42,9 +42,16 @@ class OrganizationSettings extends React.Component {
   }
 
   renderTermsTextBox() {
-    if (!this.organization.terms_text_item) return null
+    const { routingStore } = this.props
+    const { organization } = this
+    if (!organization.terms_text_item) return null
 
-    return <TextEditor item={this.organization.terms_text_item} />
+    return (
+      <TextEditor
+        item={organization.terms_text_item}
+        onExpand={() => routingStore.routeTo(`terms/${organization.slug}`)}
+      />
+    )
   }
 
   render() {

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { runInAction } from 'mobx'
 import ReactQuill from 'react-quill'
@@ -87,7 +88,7 @@ class TextEditor extends React.Component {
     return (
       <form>
         <EditorWrapper>
-          <TextItemToolbar onExpand={() => {}} />
+          <TextItemToolbar onExpand={this.props.onExpand} />
           <QuillStyleWrapper>
             <ReactQuill {...quillProps} value={this.textData} />
           </QuillStyleWrapper>
@@ -100,6 +101,11 @@ class TextEditor extends React.Component {
 
 TextEditor.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
+  onExpand: PropTypes.func,
+}
+
+TextEditor.defaultProps = {
+  onExpand: () => null,
 }
 
 export default TextEditor
