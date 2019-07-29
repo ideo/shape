@@ -229,15 +229,25 @@ export const QuillStyleWrapper = styled.div`
     }
 
     h1,
-    h3 {
+    h2 {
       margin-bottom: 0.75rem;
     }
 
-    h3 {
+    h2 {
       font-size: 0.8125rem;
       letter-spacing: 1px;
       margin-bottom: 0.8125rem;
       text-transform: uppercase;
+    }
+
+    h5 {
+      color: ${v.colors.black};
+      font-size: 4rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      line-height: 4rem;
+      text-transform: capitalize;
+      vertical-align: bottom;
     }
 
     p {

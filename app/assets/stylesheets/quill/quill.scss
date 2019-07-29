@@ -87,16 +87,6 @@
 .ql-header {
   display: block;
 }
-
-.ql-format-huge {
-  svg {
-    display: none !important;
-  }
-
-  &:before {
-    content: 'T';
-  }
-}
 .ql-formats > .ql-link {
   margin-bottom: 3px;
 }
