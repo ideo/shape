@@ -32,6 +32,7 @@
 #  sign_in_count               :integer          default(0), not null
 #  status                      :integer          default("active")
 #  terms_accepted              :boolean          default(FALSE)
+#  terms_accepted_data         :jsonb
 #  uid                         :string
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
@@ -63,6 +64,12 @@ class User < ApplicationRecord
                  :picture,
                  :picture_medium,
                  :picture_large
+
+  store_accessor :terms_accepted_data,
+                 :terms_accepted,
+                 :feedback_terms_accepted,
+                 :respondent_terms_accepted,
+                 :org_terms_accepted_versions
 
   devise :database_authenticatable, :registerable, :trackable,
          :rememberable, :validatable, :omniauthable,
@@ -479,6 +486,28 @@ class User < ApplicationRecord
 
   def sync_network_groups
     SyncNetworkGroups.call(self)
+  end
+
+  def current_org_terms_accepted
+    return false unless current_organization.present?
+    return true if current_organization.terms_version.nil? || current_organization.terms_text_item.nil?
+    versions = org_terms_accepted_versions || {}
+    user_accepted_version = versions[current_organization_id.to_s]
+
+    if user_accepted_version
+      if user_accepted_version == current_organization.terms_version
+        return true
+      else
+        return 'outdated'
+      end
+    end
+    false
+  end
+
+  def accept_current_org_terms
+    self.org_terms_accepted_versions ||= {}
+    self.org_terms_accepted_versions[current_organization_id.to_s] = current_organization.terms_version
+    save
   end
 
   private

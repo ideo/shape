@@ -21,6 +21,7 @@
     "feedback_contact_preference": { "type": "string" },
     "feedback_terms_accepted": { "type": "boolean" },
     "respondent_terms_accepted": { "type": "boolean" },
+    "current_org_terms_accepted": { "type": "boolean" },
     "current_incentive_balance": { "type": "number" },
     "shape_circle_member": { "type": "boolean" },
     "incentive_due_date": { "type": ["string", "null"] }

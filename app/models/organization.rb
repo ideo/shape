@@ -15,6 +15,7 @@
 #  sent_high_charges_low_email           :boolean          default(FALSE), not null
 #  sent_high_charges_middle_email        :boolean          default(FALSE), not null
 #  slug                                  :string
+#  terms_version                         :integer
 #  trial_ends_at                         :datetime
 #  trial_expired_email_sent              :boolean          default(FALSE), not null
 #  trial_users_count                     :integer          default(0), not null
