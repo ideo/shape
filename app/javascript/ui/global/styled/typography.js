@@ -246,7 +246,7 @@ export const QuillStyleWrapper = styled.div`
       font-weight: 700;
       letter-spacing: -0.5px;
       line-height: 4rem;
-      text-transform: capitalize;
+      text-transform: none;
       vertical-align: bottom;
     }
 
@@ -258,7 +258,7 @@ export const QuillStyleWrapper = styled.div`
       margin-bottom: 0.625rem;
     }
 
-    p + h3 {
+    p + h2 {
       margin-top: 0.85rem;
     }
 

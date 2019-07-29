@@ -522,7 +522,7 @@ class GridCard extends React.Component {
         {/* onClick placed here so it's separate from hotspot click */}
         <StyledGridCardInner
           onClick={this.handleClick}
-          hasOverflow={record.isData || record.isLegend}
+          hasOverflow={record.isData || record.isLegend || record.isText}
           filter={card.filter}
           forceFilter={!this.hasCover}
           isText={record.isText}
