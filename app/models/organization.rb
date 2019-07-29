@@ -365,12 +365,18 @@ class Organization < ApplicationRecord
       type: 'Item::TextItem',
       name: "#{name} Terms",
       content: 'Terms',
-      data_content: { a: {} },
+      data_content: { ops: [] },
     )
     admin_group.add_role(Role::EDITOR, item)
     self.terms_text_item = item
     save
     item
+  end
+
+  def bump_terms_version
+    self.terms_version = 0 if terms_version.nil?
+    self.terms_version += 1
+    save
   end
 
   def roles_anchor_collection_id

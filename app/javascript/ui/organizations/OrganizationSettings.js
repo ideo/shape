@@ -1,27 +1,36 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { runInAction } from 'mobx'
+import { observable, action, runInAction } from 'mobx'
 import FormControl from '@material-ui/core/FormControl'
 
 import {
   Checkbox,
   LabelContainer,
   LabelTextStandalone,
+  FormButton,
 } from '~/ui/global/styled/forms'
 import { Heading2, SmallHelperText } from '~/ui/global/styled/typography'
 import TagEditor from '~/ui/pages/shared/TagEditor'
 import TextEditor from '~/ui/global/TextEditor'
 import v from '~/utils/variables'
 
-@inject('apiStore', 'routingStore')
+@inject('apiStore', 'routingStore', 'uiStore')
 @observer
 class OrganizationSettings extends React.Component {
+  @observable
+  bumpTermsVersion = false
+
   componentDidMount() {
+    const { organization } = this
     // kick out if you're not an org admin (i.e. primary_group admin)
-    if (!this.organization.primary_group.can_edit) {
+    if (!organization.primary_group.can_edit) {
       this.props.routingStore.routeTo('homepage')
     }
-    const { apiStore } = this.props
-    apiStore.fetch('organizations', this.organization.id)
+    if (organization.terms_version === null) {
+      runInAction(() => {
+        // always bump the terms when none exist
+        this.bumpTermsVersion = true
+      })
+    }
   }
 
   get organization() {
@@ -41,16 +50,79 @@ class OrganizationSettings extends React.Component {
     return this.organization.API_createTermsTextItem()
   }
 
+  handleSaveTerms = ev => {
+    ev.preventDefault()
+    const { uiStore } = this.props
+    const { organization } = this
+
+    const onConfirm = async () => {
+      const item = organization.terms_text_item
+      await item.save()
+      if (this.bumpTermsVersion) {
+        await organization.API_bumpTermsVersion()
+      }
+      uiStore.popupSnackbar({ message: 'Terms of Use saved!' })
+    }
+
+    if (this.bumpTermsVersion) {
+      uiStore.confirm({
+        iconName: 'Alert',
+        confirmText: 'Continue',
+        prompt:
+          'Are you sure you want all existing users to agree to these terms? You can not reverse this action.',
+        onConfirm,
+      })
+    } else {
+      onConfirm()
+    }
+  }
+
+  @action
+  handleTermsVersionChange = ev => {
+    this.bumpTermsVersion = !this.bumpTermsVersion
+  }
+
   renderTermsTextBox() {
     const { routingStore } = this.props
     const { organization } = this
     if (!organization.terms_text_item) return null
 
     return (
-      <TextEditor
-        item={organization.terms_text_item}
-        onExpand={() => routingStore.routeTo(`terms/${organization.slug}`)}
-      />
+      <form>
+        <TextEditor
+          item={organization.terms_text_item}
+          onExpand={() => routingStore.routeTo(`terms/${organization.slug}`)}
+        />
+        <FormButton
+          style={{ marginTop: '24px' }}
+          onClick={this.handleSaveTerms}
+        >
+          Save
+        </FormButton>
+
+        <FormControl
+          style={{ marginLeft: '12px' }}
+          component="fieldset"
+          required
+        >
+          <LabelContainer
+            classes={{ label: 'form-control' }}
+            control={
+              <Checkbox
+                disabled={organization.terms_version === null}
+                checked={this.bumpTermsVersion}
+                onChange={this.handleTermsVersionChange}
+              />
+            }
+            label={
+              <div style={{ marginTop: '12px' }}>
+                Require existing users to agree to updated Terms
+              </div>
+            }
+          />
+          <div style={{ height: '54px' }} />
+        </FormControl>
+      </form>
     )
   }
 
@@ -112,6 +184,7 @@ class OrganizationSettings extends React.Component {
 OrganizationSettings.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default OrganizationSettings

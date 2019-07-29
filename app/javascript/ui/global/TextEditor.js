@@ -4,7 +4,6 @@ import { runInAction } from 'mobx'
 import ReactQuill from 'react-quill'
 import styled from 'styled-components'
 
-import { FormButton } from '~/ui/global/styled/forms'
 import { QuillStyleWrapper } from '~/ui/global/styled/typography'
 import TextItemToolbar from '~/ui/items/TextItemToolbar'
 import v from '~/utils/variables'
@@ -60,12 +59,6 @@ class TextEditor extends React.Component {
     }
   }
 
-  handleSave = ev => {
-    ev.preventDefault()
-    const { item } = this.props
-    item.save()
-  }
-
   get textData() {
     const { item } = this.props
     return item.toJSON().data_content
@@ -86,15 +79,12 @@ class TextEditor extends React.Component {
       },
     }
     return (
-      <form>
-        <EditorWrapper>
-          <TextItemToolbar onExpand={this.props.onExpand} />
-          <QuillStyleWrapper>
-            <ReactQuill {...quillProps} value={this.textData} />
-          </QuillStyleWrapper>
-        </EditorWrapper>
-        <FormButton onClick={this.handleSave}>Save</FormButton>
-      </form>
+      <EditorWrapper>
+        <TextItemToolbar onExpand={this.props.onExpand} />
+        <QuillStyleWrapper>
+          <ReactQuill {...quillProps} value={this.textData} />
+        </QuillStyleWrapper>
+      </EditorWrapper>
     )
   }
 }
