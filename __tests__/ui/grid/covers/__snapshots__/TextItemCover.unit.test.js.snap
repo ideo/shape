@@ -6,6 +6,7 @@ exports[`TextItemCover renders snapshot 1`] = `
   data-cy="TextItemCover"
   hasTitleText={null}
   isEditing={false}
+  isTransparent={false}
   onClick={[Function]}
   style={
     Object {
