@@ -564,7 +564,7 @@ ActiveRecord::Schema.define(version: 2019_07_29_171554) do
     t.integer "status", default: 0
     t.string "invitation_token"
     t.integer "current_user_collection_id"
-    t.boolean "terms_accepted", default: false
+    t.boolean "old_terms_accepted", default: false
     t.boolean "show_helper", default: true
     t.string "handle"
     t.boolean "notify_through_email", default: true
@@ -577,8 +577,8 @@ ActiveRecord::Schema.define(version: 2019_07_29_171554) do
     t.datetime "last_active_at"
     t.string "phone"
     t.integer "feedback_contact_preference", default: 0
-    t.boolean "feedback_terms_accepted", default: false
-    t.boolean "respondent_terms_accepted", default: false
+    t.boolean "old_feedback_terms_accepted", default: false
+    t.boolean "old_respondent_terms_accepted", default: false
     t.boolean "shape_circle_member", default: false
     t.jsonb "terms_accepted_data", default: {}
     t.index ["email"], name: "index_users_on_email"

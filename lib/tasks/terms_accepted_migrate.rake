@@ -11,9 +11,9 @@ namespace :terms_accepted do
     User.find_in_batches.each_with_index do |batch, i|
       puts "Starting batch #{i}"
       batch.each do |user|
-        user.terms_accepted = user.terms_accepted_in_database
-        user.feedback_terms_accepted = user.feedback_terms_accepted_in_database
-        user.respondent_terms_accepted = user.respondent_terms_accepted_in_database
+        user.terms_accepted = user.old_terms_accepted
+        user.feedback_terms_accepted = user.old_feedback_terms_accepted
+        user.respondent_terms_accepted = user.old_respondent_terms_accepted
 
         user_orgs_with_terms = user.organization_ids & orgs_with_term_ids
         if user_orgs_with_terms.present?
