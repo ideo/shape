@@ -114,6 +114,6 @@ class Ability
 
     # don't allow any of the editing actions unless you've accepted terms
     # (i.e. user becomes view-only)
-    cannot :modify, :all unless user.terms_accepted?
+    cannot :modify, :all unless user.current_terms_accepted?
   end
 end

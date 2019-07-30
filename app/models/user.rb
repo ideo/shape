@@ -488,18 +488,15 @@ class User < ApplicationRecord
     SyncNetworkGroups.call(self)
   end
 
+  # can return true, false, or 'outdated'
   def current_org_terms_accepted
-    return false unless current_organization.present?
-    return true if current_organization.terms_version.nil? || current_organization.terms_text_item.nil?
-    versions = org_terms_accepted_versions || {}
-    user_accepted_version = versions[current_organization_id.to_s]
-
+    return true if current_organization.blank? ||
+                   current_organization.terms_version.blank? ||
+                   current_organization.terms_text_item.blank?
+    user_accepted_version = org_terms_accepted_versions.try(:[], current_organization_id.to_s)
     if user_accepted_version
-      if user_accepted_version == current_organization.terms_version
-        return true
-      else
-        return 'outdated'
-      end
+      return true if user_accepted_version == current_organization.terms_version
+      return 'outdated'
     end
     false
   end
@@ -508,6 +505,10 @@ class User < ApplicationRecord
     self.org_terms_accepted_versions ||= {}
     self.org_terms_accepted_versions[current_organization_id.to_s] = current_organization.terms_version
     save
+  end
+
+  def current_terms_accepted?
+    terms_accepted && current_org_terms_accepted
   end
 
   private
