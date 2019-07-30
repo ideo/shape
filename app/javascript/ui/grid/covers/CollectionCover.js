@@ -320,6 +320,7 @@ class CollectionCover extends React.Component {
                 initialFontTag={'P'}
                 hideReadMore
                 uneditable
+                isTransparent={true}
               />
             </div>
           ) : (

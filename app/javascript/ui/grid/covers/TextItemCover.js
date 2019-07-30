@@ -19,7 +19,7 @@ const StyledPaddedCover = styled(PaddedCardCover)`
   border-bottom: ${props =>
     !props.isEditing && props.hasTitleText ? '2px solid black' : 'none'};
   background: ${props =>
-    !props.isEditing && props.hasTitleText
+    (!props.isEditing && props.hasTitleText) || props.isTransparent
       ? v.colors.transparent
       : v.colors.white};
 `
@@ -217,7 +217,8 @@ class TextItemCover extends React.Component {
   }
 
   render() {
-    const { isEditing, hasTitleText } = this
+    const { isEditing, hasTitleText, props } = this
+    const { isTransparent } = props
     const content = isEditing ? this.renderEditing() : this.renderDefault()
     return (
       <StyledPaddedCover
@@ -229,6 +230,7 @@ class TextItemCover extends React.Component {
         onClick={this.handleClick}
         isEditing={isEditing}
         hasTitleText={hasTitleText}
+        isTransparent={isTransparent}
       >
         <QuillStyleWrapper notEditing={!isEditing} hasTitleText={hasTitleText}>
           {this.state.loading && <InlineLoader />}
@@ -258,6 +260,7 @@ TextItemCover.propTypes = {
   searchResult: PropTypes.bool,
   hideReadMore: PropTypes.bool,
   uneditable: PropTypes.bool,
+  isTransparent: PropTypes.bool,
 }
 
 TextItemCover.defaultProps = {
@@ -265,6 +268,7 @@ TextItemCover.defaultProps = {
   searchResult: false,
   hideReadMore: false,
   uneditable: false,
+  isTransparent: false,
 }
 
 export default TextItemCover

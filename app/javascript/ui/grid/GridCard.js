@@ -392,7 +392,6 @@ class GridCard extends React.Component {
 
   get transparentBackground() {
     const { cardType, record } = this.props
-    const { cover_type } = record
     // If a data item and is a collection cover, it's transparent
     if (this.coverItem && this.coverItem.isData) return true
     // If this is a legend, data or text item it's transparent
@@ -400,11 +399,6 @@ class GridCard extends React.Component {
       cardType === 'items' &&
       (record.isLegend || record.isData || record.isText)
     ) {
-      return true
-    }
-
-    // if a collection's cover type is cover_type_text_and_media, it's transparent
-    if (cover_type && cover_type === 'cover_type_text_and_media') {
       return true
     }
 
