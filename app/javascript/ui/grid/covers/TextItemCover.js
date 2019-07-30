@@ -16,9 +16,12 @@ import styled from 'styled-components'
 const stripTags = str => str.replace(/(<([^>]+)>)/gi, '')
 
 const StyledPaddedCover = styled(PaddedCardCover)`
-  border-bottom: ${props => (!props.isEditing ? '2px solid black' : 'none')};
+  border-bottom: ${props =>
+    !props.isEditing && props.hasTitleText ? '2px solid black' : 'none'};
   background-color: ${props =>
-    !props.isEditing ? v.colors.commonLight : v.colors.white};
+    !props.isEditing && props.hasTitleText
+      ? v.colors.commonLight
+      : v.colors.white};
 `
 
 const StyledReadMore = ShowMoreButton.extend`
@@ -202,8 +205,16 @@ class TextItemCover extends React.Component {
     return <ReactQuill {...quillProps} value={textData} />
   }
 
+  get hasTitleText() {
+    const { props } = this
+    const { item } = props
+    const { content } = item
+    const quillDOM = new DOMParser().parseFromString(content, 'text/html')
+    return quillDOM.querySelector('h5')
+  }
+
   render() {
-    const { isEditing } = this
+    const { isEditing, hasTitleText } = this
     const content = isEditing ? this.renderEditing() : this.renderDefault()
     return (
       <StyledPaddedCover
@@ -214,8 +225,9 @@ class TextItemCover extends React.Component {
         class="cancelGridClick"
         onClick={this.handleClick}
         isEditing={isEditing}
+        hasTitleText={hasTitleText}
       >
-        <QuillStyleWrapper notEditing={!isEditing}>
+        <QuillStyleWrapper notEditing={!isEditing} hasTitleText={hasTitleText}>
           {this.state.loading && <InlineLoader />}
           {content}
           {this.state.readMore && !isEditing && (
