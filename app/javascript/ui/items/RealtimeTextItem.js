@@ -236,7 +236,6 @@ class RealtimeTextItem extends React.Component {
       }
       // clear out our combinedDelta with whatever had been typed in the meantime
       this.combinedDelta = this.bufferDelta.slice()
-      this.bufferDelta = new Delta()
       if (this.combinedDelta.length()) {
         // if we had some waiting content
         this.sendCombinedDelta()
@@ -246,17 +245,18 @@ class RealtimeTextItem extends React.Component {
   }
 
   applyIncomingDelta(remoteDelta) {
-    // mostly just for unit tests
-    if (!this.quillEditor) return
-    // apply the incoming other person's delta, accounting for our own changes,
-    // but prioritizing theirs
-    const remoteDeltaWithLocalChanges = this.combinedDelta.transform(
-      remoteDelta
-    )
-    // make sure our local editor is up to date with changes.
-    this.quillEditor.updateContents(remoteDeltaWithLocalChanges, 'silent')
-    // persist local changes
-    this.setItemDataContent()
+    // this.quillEditor may not exist in unit tests
+    if (this.quillEditor) {
+      // apply the incoming other person's delta, accounting for our own changes,
+      // but prioritizing theirs
+      const remoteDeltaWithLocalChanges = this.combinedDelta.transform(
+        remoteDelta
+      )
+      // make sure our local editor is up to date with changes.
+      this.quillEditor.updateContents(remoteDeltaWithLocalChanges, 'silent')
+      // persist local changes
+      this.setItemDataContent()
+    }
 
     if (this.combinedDelta.length()) {
       // transform our awaiting content, prioritizing the remote delta
@@ -346,6 +346,8 @@ class RealtimeTextItem extends React.Component {
     const lastOp = _.last(delta.ops)
     if (!lastOp.attributes) {
       lastOp.attributes = { header: prevHeader }
+    } else if (lastOp.attributes.header) {
+      return
     } else {
       lastOp.attributes.header = prevHeader
     }
@@ -369,7 +371,7 @@ class RealtimeTextItem extends React.Component {
     })
   }
 
-  handleTextChange = (content, delta, source, _editor) => {
+  handleTextChange = (_content, delta, source, _editor) => {
     if (source === 'user') {
       // This adjustment is made so that the currently-selected
       // header size is preserved on new lines
@@ -451,6 +453,8 @@ class RealtimeTextItem extends React.Component {
       version: this.version,
     }
 
+    // now that we have sent off our data, we can clear out what's in our buffer;
+    // our combinedDelta won't clear out until we know it has successfully sent
     this.bufferDelta = new Delta()
     return this.combinedDelta
   }

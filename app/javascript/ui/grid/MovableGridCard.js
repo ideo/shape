@@ -16,6 +16,7 @@ import AddSubmission from '~/ui/grid/blankContentTool/AddSubmission'
 import GridCardEmptyHotspot from '~/ui/grid/GridCardEmptyHotspot'
 import ResizeIcon from '~/ui/icons/ResizeIcon'
 import { StyledCardWrapper } from '~/ui/grid/shared'
+import _ from 'lodash'
 
 const StyledResizeIcon = styled.div`
   position: absolute;
@@ -103,7 +104,11 @@ class MovableGridCard extends React.PureComponent {
       y: props.position.yPos,
       resizeWidth: 0,
       resizeHeight: 0,
+      allowTouchDeviceDragging: false,
     }
+    this.debouncedAllowTouchDeviceDrag = _.debounce(() => {
+      this.setState({ allowTouchDeviceDragging: true })
+    }, v.touchDeviceHoldToDragTime)
   }
 
   componentWillReceiveProps({ position }) {
@@ -120,6 +125,13 @@ class MovableGridCard extends React.PureComponent {
     this.clearDragTimeout()
   }
 
+  get shouldDragCard() {
+    return (
+      !uiStore.isTouchDevice ||
+      (uiStore.isTouchDevice && this.state.allowTouchDeviceDragging)
+    )
+  }
+
   handleStart = (e, data) => {
     e.preventDefault()
     this.scrolling = false
@@ -127,7 +139,7 @@ class MovableGridCard extends React.PureComponent {
     // e.g. bottom left corner of the card itself
     const initialOffsetX = e.screenX - e.target.getBoundingClientRect().x
     const initialOffsetY = e.screenY - e.target.getBoundingClientRect().y
-
+    this.debouncedAllowTouchDeviceDrag()
     this.setState({
       initialOffsetX,
       initialOffsetY,
@@ -229,6 +241,7 @@ class MovableGridCard extends React.PureComponent {
   }
 
   handleDrag = (e, data, dX, dY) => {
+    if (!this.shouldDragCard) return
     const { position, dragOffset, zoomLevel } = this.props
     // Global dragging should use screen coordinates
     // TODO this could also be a HOC that publishes to the UI store
@@ -289,6 +302,9 @@ class MovableGridCard extends React.PureComponent {
     this.scrolling = false
     document.body.style['overflow-y'] = 'auto'
     if (horizontalScroll) document.body.style['overflow-x'] = 'auto'
+    this.setState({
+      allowTouchDeviceDragging: false,
+    })
     this.setState({ dragging: false, resizing: false }, () => {
       // Resizing has to be reset first, before the handler or the card dimensions
       // will jump back in forth as the grid resizes the actual card while this

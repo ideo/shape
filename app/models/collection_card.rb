@@ -90,6 +90,7 @@ class CollectionCard < ApplicationRecord
   scope :visible, -> { where(hidden: false) }
   scope :is_cover, -> { where(is_cover: true) }
   scope :primary, -> { where(type: 'CollectionCard::Primary') }
+  scope :link, -> { where(type: 'CollectionCard::Link') }
 
   enum filter: {
     nothing: 0,
@@ -193,6 +194,13 @@ class CollectionCard < ApplicationRecord
     # now that the card exists, we can recalculate the breadcrumb
     cc.record.recalculate_breadcrumb!
     cc.increment_card_orders! if placement != 'end'
+
+    # if we are duplicating a submission box template,
+    # the cloned template should be marked as the clone's submission_template
+    if collection&.submission_box_template?
+      cc.collection.parent_submission_box&.update(submission_template: cc.collection)
+    end
+
     if parent.master_template?
       # we just added a template card, so update the instances
       parent.queue_update_template_instances

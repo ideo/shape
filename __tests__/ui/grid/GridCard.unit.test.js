@@ -124,7 +124,7 @@ describe('GridCard', () => {
     describe('as link', () => {
       beforeEach(() => {
         props.card.link = true
-        uiStore.viewingCollection = { breadcrumb: [] }
+        uiStore.viewingRecord = { breadcrumb: [] }
         uiStore.update = jest.fn()
         rerender()
       })

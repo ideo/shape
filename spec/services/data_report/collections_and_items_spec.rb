@@ -4,7 +4,7 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
   let(:users) { create_list(:user, 2) }
   let(:organization) { create(:organization_without_groups) }
   let(:parent) { create(:collection, organization: organization) }
-  let!(:collection) { create(:collection, parent_collection: parent, num_cards: 1) }
+  let!(:collection) { create(:collection, organization: organization, parent_collection: parent, num_cards: 1) }
   let(:items) { collection.items }
   let!(:activities) do
     create(:activity, action: Activity.actions[:created], actor: users[0], target: collection, organization: organization)
@@ -39,7 +39,7 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
       DataReport::CollectionsAndItems.new(dataset: dataset).single_value
     end
 
-    it 'returns time series' do
+    it 'returns single value' do
       expect(single_value).to eq(2)
     end
   end

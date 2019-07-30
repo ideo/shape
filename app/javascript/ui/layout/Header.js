@@ -175,8 +175,9 @@ class Header extends React.Component {
     const { uiStore } = this.props
     const { headerMenuOffsetPosition } = state
     if (!this.hasActions) return null
+    // NOTE: Org templates has no parent card, therefore no actions
     if (record.parent_collection_card) {
-      // TODO hacky way to include the record on the card link
+      // this is how we relate the record back to its card
       record.parent_collection_card.record = record
       return (
         <IconAvatar backgroundColor={v.colors.white} color={v.colors.black}>

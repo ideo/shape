@@ -433,6 +433,7 @@ export const CommentForm = styled.form`
 CommentForm.displayName = 'CommentForm'
 
 export const StyledCommentTextarea = styled.div`
+  input,
   textarea {
     resize: none;
     padding: 10px;

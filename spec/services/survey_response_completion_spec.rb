@@ -52,6 +52,19 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
       end
     end
 
+    context 'when test audience is closed, but it is an in-collection test' do
+      before do
+        test_collection.collection_to_test = create(:collection)
+        test_audience.closed!
+      end
+
+      it 'marks the survey_response as completed' do
+        expect(survey_response.completed?).to be false
+        service.call
+        expect(survey_response.completed?).to be true
+      end
+    end
+
     context 'when sample size has not been reached' do
       before do
         test_audience.update(sample_size: 5)

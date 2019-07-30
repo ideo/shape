@@ -20,7 +20,13 @@ describe Collection::UserProfile, type: :model do
       pin_cards: true,
     )
   end
-  let(:profiles) { create(:global_collection, organization: organization) }
+  let(:profiles) do
+    create(
+      :global_collection,
+      organization: organization,
+      add_viewers: [organization.primary_group, organization.guest_group],
+    )
+  end
 
   before do
     # configure the org to set up the necessary global collections
@@ -59,6 +65,13 @@ describe Collection::UserProfile, type: :model do
       expect(user_profile.collection_cards.first.record.can_edit?(organization.admin_group)).to be true
     end
 
+    it 'should set the organization guest and primary groups as viewer of profile and items' do
+      expect(user_profile.can_view?(organization.primary_group)).to be true
+      expect(user_profile.collection_cards.first.record.can_view?(organization.primary_group)).to be true
+      expect(user_profile.can_view?(organization.guest_group)).to be true
+      expect(user_profile.collection_cards.first.record.can_view?(organization.guest_group)).to be true
+    end
+
     it 'should copy the pinned status of the template cards' do
       expect(user_profile.collection_cards.first.pinned?).to be true
     end
@@ -77,8 +90,10 @@ describe Collection::UserProfile, type: :model do
     context 'profile image' do
       it 'should replace the first image with the user.picture_medium' do
         placeholder = template.collection_cards.first.item.image_url
-        expect(user_profile.collection_cards.first.item.filestack_file.url).not_to eq placeholder
-        expect(user_profile.collection_cards.first.item.filestack_file.url).to eq user.picture_medium
+        item = user_profile.collection_cards.first.item
+        expect(item.url).not_to eq placeholder
+        expect(item.url).to eq user.picture_medium
+        expect(item.is_a?(Item::ExternalImageItem)).to be true
       end
 
       context 'with default user image' do

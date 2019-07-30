@@ -76,7 +76,7 @@ class Api::V1::RolesController < Api::V1::BaseController
                          else
                            [params[:remove_identifiers]]
                          end
-    if parent.is_a?(Collection::UserCollection)
+    if parent.nil? || parent.is_a?(Collection::UserCollection)
       inherit = true
     else
       inherit = inheritance.inherit_from_parent?(

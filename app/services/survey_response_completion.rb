@@ -20,7 +20,11 @@ class SurveyResponseCompletion < SimpleService
   def mark_as_completed!
     return unless @survey_response.in_progress?
     status = :completed
-    status = :completed_late if test_collection.closed? || test_audience&.closed?
+    # For in-collection tests the response may technically be attached to a "share via link" audience;
+    # but we only care if the entire test has been closed
+    if test_collection.closed? || (test_collection.collection_to_test.nil? && test_audience&.closed?)
+      status = :completed_late
+    end
     @survey_response.update(status: status)
   end
 

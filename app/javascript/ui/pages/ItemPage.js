@@ -42,7 +42,7 @@ class ItemPage extends React.Component {
     }
     this.setState({ item }, async () => {
       uiStore.update('dragTargets', [])
-      uiStore.setViewingItem(item)
+      uiStore.setViewingRecord(item)
       if (item.parent)
         apiStore.checkCurrentOrg({ id: item.parent.organization_id })
       const thread = await apiStore.findOrBuildCommentThread(item)
@@ -66,7 +66,10 @@ class ItemPage extends React.Component {
     const { uiStore, routingStore } = this.props
     if (item.can_edit_content) this.save(item)
     if (!route) return
-    if (uiStore.previousViewingCollection) {
+    if (
+      uiStore.previousViewingRecord &&
+      uiStore.previousViewingRecord.internalType === 'collections'
+    ) {
       window.history.back()
     } else {
       routingStore.goToPath(item.parentPath)

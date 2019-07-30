@@ -435,6 +435,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
   end
 
   describe 'PATCH #archive' do
+    # user is an editor of collection
     let!(:collection_cards) { create_list(:collection_card_collection, 3, parent: collection) }
     let(:path) { '/api/v1/collection_cards/archive' }
     let(:params) { { card_ids: collection_cards.map(&:id) }.to_json }
@@ -447,6 +448,20 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       it 'returns a 401' do
         patch(path, params: params)
         expect(response.status).to eq(401)
+      end
+    end
+
+    context 'with link cards', only: true do
+      let!(:collection_cards) { create_list(:collection_card_link_text, 3, parent: collection) }
+      context 'without record edit access, but with collection access' do
+        before do
+          remove_access(collection_cards, user)
+        end
+
+        it 'returns a 200' do
+          patch(path, params: params)
+          expect(response.status).to eq(200)
+        end
       end
     end
 
@@ -564,6 +579,37 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       it 'returns a 401' do
         patch(path, params: params)
         expect(response.status).to eq(401)
+      end
+    end
+
+    context 'without read access for from_collection' do
+      let!(:to_collection) { create(:collection, add_editors: [user]) }
+      before do
+        user.remove_role(Role::EDITOR, from_collection)
+      end
+
+      it 'returns a 401' do
+        patch(path, params: params)
+        expect(response.status).to eq(401)
+      end
+    end
+
+    context 'with read access for from_collection' do
+      let!(:from_collection) do
+        create(:collection, organization: to_collection.organization, num_cards: 3, add_viewers: [user])
+      end
+      let!(:to_collection) { create(:collection, add_editors: [user]) }
+      before do
+        moving_cards.each do |card|
+          card.record.unanchor!
+          # user can edit the records but not the parent collection
+          user.add_role(Role::EDITOR, card.record)
+        end
+      end
+
+      it 'returns a 204' do
+        patch(path, params: params)
+        expect(response.status).to eq(204)
       end
     end
 
