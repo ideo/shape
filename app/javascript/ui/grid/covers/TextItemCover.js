@@ -12,8 +12,14 @@ import InlineLoader from '~/ui/layout/InlineLoader'
 import RealtimeTextItem from '~/ui/items/RealtimeTextItem'
 import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
-
+import styled from 'styled-components'
 const stripTags = str => str.replace(/(<([^>]+)>)/gi, '')
+
+const StyledPaddedCover = styled(PaddedCardCover)`
+  border-bottom: ${props => (!props.isEditing ? '2px solid black' : 'none')};
+  background-color: ${props =>
+    !props.isEditing ? v.colors.commonLight : v.colors.white};
+`
 
 const StyledReadMore = ShowMoreButton.extend`
   z-index: ${v.zIndex.gridCard};
@@ -200,7 +206,7 @@ class TextItemCover extends React.Component {
     const { isEditing } = this
     const content = isEditing ? this.renderEditing() : this.renderDefault()
     return (
-      <PaddedCardCover
+      <StyledPaddedCover
         data-cy="TextItemCover"
         style={{
           height: 'calc(100% - 30px)',
@@ -216,7 +222,7 @@ class TextItemCover extends React.Component {
             <StyledReadMore onClick={this.expand}>Read more...</StyledReadMore>
           )}
         </QuillStyleWrapper>
-      </PaddedCardCover>
+      </StyledPaddedCover>
     )
   }
 }

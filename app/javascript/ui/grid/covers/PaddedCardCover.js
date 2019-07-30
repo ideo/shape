@@ -6,9 +6,6 @@ const PaddedCardCover = styled.div`
   position: relative;
   z-index: ${v.zIndex.gridCardBg + 1};
   padding: 1rem;
-  border-bottom: ${props => (!props.isEditing ? '2px solid black' : 'none')};
-  background-color: ${props =>
-    !props.isEditing ? v.colors.commonLight : v.colors.white};
 
   .form {
     text-align: center;
