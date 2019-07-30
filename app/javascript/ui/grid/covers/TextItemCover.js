@@ -10,7 +10,7 @@ import { ShowMoreButton } from '~/ui/global/styled/forms'
 import { QuillStyleWrapper } from '~/ui/global/styled/typography'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import RealtimeTextItem from '~/ui/items/RealtimeTextItem'
-import PaddedCardCover from './PaddedCardCover'
+import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 
 const stripTags = str => str.replace(/(<([^>]+)>)/gi, '')
