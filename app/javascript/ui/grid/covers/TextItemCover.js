@@ -18,9 +18,9 @@ const stripTags = str => str.replace(/(<([^>]+)>)/gi, '')
 const StyledPaddedCover = styled(PaddedCardCover)`
   border-bottom: ${props =>
     !props.isEditing && props.hasTitleText ? '2px solid black' : 'none'};
-  background-color: ${props =>
+  background: ${props =>
     !props.isEditing && props.hasTitleText
-      ? v.colors.commonLight
+      ? v.colors.transparent
       : v.colors.white};
 `
 
@@ -31,7 +31,10 @@ const StyledReadMore = ShowMoreButton.extend`
   left: 0;
   padding: 0.5rem;
   opacity: 0.975;
-  background: white;
+  background: ${props =>
+    !props.isEditing && props.hasTitleText
+      ? v.colors.transparent
+      : v.colors.white};
 
   &:hover {
     background: ${v.colors.commonLightest};
@@ -231,7 +234,13 @@ class TextItemCover extends React.Component {
           {this.state.loading && <InlineLoader />}
           {content}
           {this.state.readMore && !isEditing && (
-            <StyledReadMore onClick={this.expand}>Read more...</StyledReadMore>
+            <StyledReadMore
+              onClick={this.expand}
+              isEditing={isEditing}
+              hasTitleText={hasTitleText}
+            >
+              Read more...
+            </StyledReadMore>
           )}
         </QuillStyleWrapper>
       </StyledPaddedCover>

@@ -392,10 +392,21 @@ class GridCard extends React.Component {
 
   get transparentBackground() {
     const { cardType, record } = this.props
-    // If this is a legend or data item, it's transparent
-    if (cardType === 'items' && (record.isLegend || record.isData)) return true
+    const { cover_type } = record
     // If a data item and is a collection cover, it's transparent
     if (this.coverItem && this.coverItem.isData) return true
+    // If this is a legend, data or text item it's transparent
+    if (
+      cardType === 'items' &&
+      (record.isLegend || record.isData || record.isText)
+    ) {
+      return true
+    }
+
+    // if a collection's cover type is cover_type_text_and_media, it's transparent
+    if (cover_type && cover_type === 'cover_type_text_and_media') {
+      return true
+    }
 
     return false
   }
@@ -433,7 +444,9 @@ class GridCard extends React.Component {
 
     return (
       <StyledGridCard
-        background={this.transparentBackground ? 'transparent' : 'white'}
+        background={
+          this.transparentBackground ? v.colors.transparent : v.colors.white
+        }
         className="gridCard"
         id={`gridCard-${card.id}`}
         dragging={dragging}
