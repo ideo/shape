@@ -270,6 +270,10 @@ export const QuillStyleWrapper = styled.div`
 
     .ql-container {
       ${props => (props.notEditing ? '' : 'overflow: visible !important;')};
+      ${props =>
+        props.notEditing && props.hasTitleText
+          ? 'justify-content: flex-end;'
+          : ''};
     }
 
     .ql-cursor {
@@ -283,6 +287,10 @@ export const QuillStyleWrapper = styled.div`
     .ql-editor {
       overflow-x: hidden;
       ${props => (props.notEditing ? 'overflow-y: hidden;' : '')};
+      ${props =>
+        props.notEditing && props.hasTitleText
+          ? 'display: block; height: auto; flex-grow: 0 !important;'
+          : ''};
     }
   }
 `
