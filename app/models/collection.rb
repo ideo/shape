@@ -810,6 +810,11 @@ class Collection < ApplicationRecord
   # =================================
   # <--- end boolean checks
 
+  def to_param
+    kebab_name = name.parameterize(separator: "-", preserve_case: false)
+    "#{id}-#{kebab_name}"
+  end
+
   private
 
   def organization_blank?

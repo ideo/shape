@@ -80,7 +80,7 @@ export default class UndoStore {
     const { internalType, id: recordId } = viewingRecord
     // check if we don't have to redirect
     if (internalType !== type || recordId !== id) {
-      routingStore.routeTo(type, id)
+      routingStore.routeTo(type, id, { name: viewingRecord.name })
       this.undoAfterRoute = action
     }
   }

@@ -340,7 +340,7 @@ class GridCard extends React.Component {
     if (card.link) {
       this.storeLinkedBreadcrumb(card)
     }
-    routingStore.routeTo('items', card.record.id)
+    routingStore.routeTo('items', card.record.id, { name: card.record.name })
   }
 
   get coverItem() {

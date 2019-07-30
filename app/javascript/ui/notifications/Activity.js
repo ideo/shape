@@ -75,7 +75,7 @@ class Activity extends React.PureComponent {
         </Anchor>
       )
     }
-    const link = routingStore.pathTo(internalType, id)
+    const link = routingStore.pathTo(internalType, id, { name: target.name })
     return (
       <Link className="target" to={link}>
         {targetName}
@@ -98,7 +98,7 @@ class Activity extends React.PureComponent {
       return
     }
     if (action !== 'archived') {
-      routingStore.routeTo(internalType, id)
+      routingStore.routeTo(internalType, id, { name: target.name })
     }
     if (_.includes(['commented', 'mentioned'], action)) {
       const thread = await apiStore.findOrBuildCommentThread(target)

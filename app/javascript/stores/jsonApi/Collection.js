@@ -835,7 +835,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       `test_collections/${this.id}/next_available`
     )
     if (!res.data) return
-    const path = this.routingStore.pathTo('collections', res.data.id)
+    const path = this.routingStore.pathTo(
+      'collections',
+      res.data.id,
+      res.data.name
+    )
 
     this.setNextAvailableTestPath(`${path}?open=tests`)
   }
@@ -950,7 +954,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       uiStore.update('isLoading', true)
       const res = await apiStore.createTemplateInstance(templateData)
       uiStore.update('isLoading', false)
-      routingStore.routeTo('collections', res.data.id)
+      routingStore.routeTo('collections', res.data.id, { name: res.data.name })
     } else {
       uiStore.openBlankContentTool({
         order: 0,

@@ -330,7 +330,9 @@ class CollectionCover extends React.Component {
                     <PlainLink
                       className="no-select cancelGridClick"
                       onClick={this.handleClick}
-                      to={routingStore.pathTo('collections', collection.id)}
+                      to={routingStore.pathTo('collections', collection.id, {
+                        name: collection.name,
+                      })}
                       data-cy="collection-cover-link"
                     >
                       {this.name}

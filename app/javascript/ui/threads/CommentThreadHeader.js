@@ -120,9 +120,11 @@ class CommentThreadHeader extends React.Component {
     const { record } = this
 
     if (record.internalType === 'collections') {
-      return routingStore.pathTo('collections', record.id)
+      return routingStore.pathTo('collections', record.id, {
+        name: record.name,
+      })
     } else if (record.internalType === 'items') {
-      return routingStore.pathTo('items', record.id)
+      return routingStore.pathTo('items', record.id, { name: record.name })
     }
     return routingStore.pathTo('homepage')
   }

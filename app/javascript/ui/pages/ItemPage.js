@@ -116,7 +116,7 @@ class ItemPage extends React.Component {
 
   reroute = card => {
     const { routingStore } = this.props
-    routingStore.routeTo('items', card.record.id)
+    routingStore.routeTo('items', card.record.id, { name: card.record.name })
   }
 
   updateItemName = name => {

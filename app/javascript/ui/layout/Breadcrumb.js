@@ -243,7 +243,7 @@ class Breadcrumb extends React.Component {
     if (item.id === 'homepage') {
       path = routingStore.pathTo('homepage')
     } else {
-      path = routingStore.pathTo(item.type, item.id)
+      path = routingStore.pathTo(item.type, item.id, { name: item.name })
     }
     return (
       <Link to={path}>

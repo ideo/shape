@@ -125,7 +125,9 @@ class Header extends React.Component {
         parent_collection_card.parent_id &&
         parent_collection_card.can_edit_parent
       ) {
-        routingStore.routeTo('collections', parent_collection_card.parent_id)
+        routingStore.routeTo('collections', parent_collection_card.parent_id, {
+          name: parent_collection_card.name,
+        })
       } else {
         routingStore.routeTo('homepage')
       }

@@ -4,6 +4,7 @@ import queryString from 'query-string'
 
 import { apiStore, uiStore } from '~/stores'
 import { stringifyUrlParams } from '~/utils/url'
+import _ from 'lodash'
 
 // mobx-react-router with a couple of helper methods
 class RoutingStore extends RouterStore {
@@ -48,11 +49,15 @@ class RoutingStore extends RouterStore {
   }
 
   pathTo = (type, id = null, params = {}) => {
+    // need access to name collection or item
+    // how to get this? From params?
+    const suffix = params.name ? `-${_.kebabCase(params.name)}` : ''
+    // TODO: TEST THIS with Jest
     switch (type) {
       case 'collections':
-        return `/${this.slug()}/collections/${id}`
+        return `/${this.slug()}/collections/${id}${suffix}`
       case 'items':
-        return `/${this.slug()}/items/${id}`
+        return `/${this.slug()}/items/${id}${suffix}`
       case 'search':
         // `id` means query in this case
         const path = `/${this.slug()}/search`

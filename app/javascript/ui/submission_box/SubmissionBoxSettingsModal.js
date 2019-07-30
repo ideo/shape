@@ -80,7 +80,8 @@ class SubmissionBoxSettingsModal extends React.Component {
         if (collection.parent_collection_card.parent_id) {
           routingStore.routeTo(
             'collections',
-            collection.parent_collection_card.parent_id
+            collection.parent_collection_card.parent_id,
+            { name: collection.parent_collection_card.name }
           )
         } else {
           routingStore.routeTo('homepage')

@@ -138,7 +138,9 @@ class CoverRenderer extends React.Component {
         <PlainLink
           onClick={this.handleClickToCollection}
           onKeyDown={this.handleClickToCollection}
-          to={routingStore.pathTo('collections', record.id)}
+          to={routingStore.pathTo('collections', record.id, {
+            name: record.name,
+          })}
           role="link"
           tabIndex="0"
         >

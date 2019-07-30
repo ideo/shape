@@ -20,6 +20,8 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :activities, only: %i[create]
       resources :collections do
+        # how to adjust this?
+        # How to test this?
         member do
           get 'in_my_collection'
           post 'clear_collection_cover'

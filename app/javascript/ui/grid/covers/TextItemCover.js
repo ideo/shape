@@ -101,7 +101,7 @@ class TextItemCover extends React.Component {
 
   expand = () => {
     const { item } = this.props
-    routingStore.routeTo('items', item.id)
+    routingStore.routeTo('items', item.id, { name: item.name })
   }
 
   clearTextEditingItem = () => {

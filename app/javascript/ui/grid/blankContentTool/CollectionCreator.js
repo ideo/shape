@@ -33,7 +33,9 @@ class CollectionCreator extends React.Component {
 
     // if creating a submissionBox we route you to finish setting up the collection
     if (this.props.type === 'submissionBox')
-      routingStore.routeTo('collections', card.record.id)
+      routingStore.routeTo('collections', card.record.id, {
+        name: card.record.name,
+      })
   }
 
   createCollection = e => {

@@ -37,7 +37,9 @@ class EntityAvatarAndName extends React.Component {
   handleClick = () => {
     const { user_profile_collection_id } = this.props.entity
     if (!user_profile_collection_id) return false
-    return routingStore.routeTo('collections', user_profile_collection_id)
+    return routingStore.routeTo('collections', user_profile_collection_id, {
+      name: this.props.entity.name,
+    })
   }
 
   render() {

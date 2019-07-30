@@ -110,7 +110,9 @@ const SharedRecordMixin = superclass =>
         undoable: false,
       })
       if (this.parent) {
-        routingStore.routeTo('collections', this.parent.id)
+        routingStore.routeTo('collections', this.parent.id, {
+          name: this.parent.name,
+        })
       } else if (this.parentPath) {
         routingStore.goToPath(this.parentPath)
       }

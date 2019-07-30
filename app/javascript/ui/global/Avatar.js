@@ -51,6 +51,7 @@ class Avatar extends React.Component {
   handleClick = () => {
     const { linkToCollectionId } = this.props
     if (!linkToCollectionId) return false
+    // TODO: Where can we get the collection name here?
     return routingStore.routeTo('collections', linkToCollectionId)
   }
 
