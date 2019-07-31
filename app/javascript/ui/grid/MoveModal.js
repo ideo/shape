@@ -264,7 +264,7 @@ class MoveModal extends React.Component {
     if (cardAction === 'move') {
       message = `${amount} ${cardsString} in transit`
     } else if (cardAction === 'useTemplate') {
-      message = `${templateName} ${cardsString} in transit`
+      message = `${templateName} in transit`
     } else {
       message = `${amount} ${cardsString} selected to ${cardAction}`
     }
