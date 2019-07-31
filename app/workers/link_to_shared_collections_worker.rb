@@ -41,7 +41,12 @@ class LinkToSharedCollectionsWorker
       collection_id: (object.is_a?(Collection) ? object.id : nil),
       width: 1,
       height: 1,
-      order: collection.collection_cards.count,
+      order: card_order(object, collection),
     )
+  end
+
+  def card_order(object, collection)
+    return -1 if object.child_of_or_current_application_collection?
+    collection.collection_cards.count
   end
 end

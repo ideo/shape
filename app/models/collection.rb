@@ -813,6 +813,13 @@ class Collection < ApplicationRecord
     Collection.in_collection(id).where.not(template_id: nil).any?
   end
 
+  def child_of_or_current_application_collection?
+    if roles_anchor != self
+      return true if roles_anchor&.child_of_or_current_application_collection?
+    end
+    parents.find_by(type: 'Collection::ApplicationCollection').present?
+  end
+
   # =================================
   # <--- end boolean checks
 
