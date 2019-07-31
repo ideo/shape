@@ -18,7 +18,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :log_viewing_activities, only: %i[show], if: :log_activity?
   before_action :check_cache, only: %i[show]
   def show
-    # Does this need to parse the param?
     check_getting_started_shell
     render_collection
   end

@@ -111,7 +111,7 @@ const SharedRecordMixin = superclass =>
       })
       if (this.parent) {
         routingStore.routeTo('collections', this.parent.id, {
-          name: this.parent.name,
+          name: this.parent.name, // does this need to be parent.record.name?
         })
       } else if (this.parentPath) {
         routingStore.goToPath(this.parentPath)

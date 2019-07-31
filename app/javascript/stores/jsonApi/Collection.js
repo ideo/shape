@@ -835,11 +835,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       `test_collections/${this.id}/next_available`
     )
     if (!res.data) return
-    const path = this.routingStore.pathTo(
-      'collections',
-      res.data.id,
-      res.data.name
-    )
+    const path = this.routingStore.pathTo('collections', res.data.id, {
+      name: res.data.name,
+    })
 
     this.setNextAvailableTestPath(`${path}?open=tests`)
   }

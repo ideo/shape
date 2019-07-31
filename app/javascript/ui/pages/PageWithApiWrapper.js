@@ -10,7 +10,7 @@ import ItemPage from '~/ui/pages/ItemPage'
 import trackError from '~/utils/trackError'
 import routeToLogin from '~/utils/routeToLogin'
 
-@inject('apiStore', 'uiStore', 'routingStore')
+@inject('apiStore', 'uiStore')
 @observer
 class PageWithApiWrapper extends React.Component {
   unmounted = false
@@ -101,7 +101,7 @@ class PageWithApiWrapper extends React.Component {
   }
 
   fetchData = async () => {
-    const { apiStore, uiStore, routingStore, match, fetchType } = this.props
+    const { apiStore, uiStore, match } = this.props
     uiStore.update('pageError', null)
 
     return apiStore
@@ -110,13 +110,14 @@ class PageWithApiWrapper extends React.Component {
         if (this.unmounted) return
         const { data } = res
         const { id } = match.params
-        if (id.toString() === this.fetchId) {
+
+        if (id && id.toString() === this.fetchId) {
+          // Update URL so collections and items have slug with id and name
           history.replaceState(
             {},
             data.name,
             `${data.id}-${_.kebabCase(data.name)}`
           )
-          // routingStore.routeTo(fetchType, id, { name: data.name })
         }
         data.fullyLoaded = true
         this.setState({ data })

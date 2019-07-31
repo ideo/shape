@@ -49,8 +49,6 @@ class RoutingStore extends RouterStore {
   }
 
   pathTo = (type, id = null, params = {}) => {
-    // need access to name collection or item
-    // how to get this? From params?
     const suffix = params.name ? `-${_.kebabCase(params.name)}` : ''
     // TODO: TEST THIS with Jest
     switch (type) {
