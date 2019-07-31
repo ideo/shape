@@ -204,6 +204,10 @@ class SerializableCollection < BaseJsonSerializer
     @object.try(:restorable?)
   end
 
+  attribute :inherited_default_group_id do
+    @object.inherited_default_group_id.to_s
+  end
+
   has_one :restorable_parent do
     @object.try(:restorable_parent)
   end

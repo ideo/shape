@@ -30,6 +30,7 @@ class RolesMenu extends React.Component {
   state = {
     searchText: '',
     groups: [],
+    groupsByStatus: [],
     page: {
       pending: 1,
       active: 1,
@@ -86,6 +87,7 @@ class RolesMenu extends React.Component {
       pending: record.roles[0].pendingCount,
       active: record.roles[0].activeCount,
     }
+    const groups = []
     record.roles.forEach(role => {
       role.users.forEach(user => {
         roleEntities.push(Object.assign({}, { role, entity: user }))
@@ -94,17 +96,19 @@ class RolesMenu extends React.Component {
       if (!role.groups) return
       role.groups.forEach(group => {
         roleEntities.push(Object.assign({}, { role, entity: group }))
+        groups.push(group)
       })
     })
     const sortedRoleEntities = roleEntities.sort(sortUserOrGroup)
 
-    const groups = this.setupEntityGroups(sortedRoleEntities, counts)
+    const groupsByStatus = this.setupEntityGroups(sortedRoleEntities, counts)
 
     const pendingPanelOpen =
       (counts.active === 0 && counts.pending > 0) || status === 'pending'
 
     this.setState(prevState => ({
       groups,
+      groupsByStatus,
       pendingPanelOpen,
       page: {
         pending:
@@ -178,9 +182,8 @@ class RolesMenu extends React.Component {
     const {
       apiStore,
       apiStore: { uiStore },
-      ownerId,
-      ownerType,
     } = this.props
+    let { ownerId, ownerType } = this.props
     const userIds = entities
       .filter(entity => entity.internalType === 'users')
       .map(user => user.id)
@@ -193,6 +196,10 @@ class RolesMenu extends React.Component {
       user_ids: userIds,
       is_switching: opts.isSwitching,
       send_invites: opts.sendInvites,
+    }
+    if (opts.addToGroupId) {
+      ownerId = opts.addToGroupId
+      ownerType = 'groups'
     }
     return apiStore
       .request(`${ownerType}/${ownerId}/roles`, 'POST', data)
@@ -243,7 +250,7 @@ class RolesMenu extends React.Component {
       submissionBox,
     } = this.props
 
-    const { groups } = this.state
+    const { groups, groupsByStatus } = this.state
 
     const roleTypes =
       ownerType === 'groups' ? ['member', 'admin'] : ['editor', 'viewer']
@@ -268,7 +275,7 @@ class RolesMenu extends React.Component {
           />
         </StyledHeaderRow>
         <ScrollArea>
-          {groups.map(group => {
+          {groupsByStatus.map(group => {
             const { panelTitle, entities, count, status } = group
             if (entities.length === 0) return null
 
@@ -327,6 +334,8 @@ class RolesMenu extends React.Component {
                 onCreateRoles={this.createRoles}
                 onCreateUsers={this.onCreateUsers}
                 ownerType={ownerType}
+                addableGroups={groups}
+                defaultGroupId={record.inherited_default_group_id}
               />
             </FooterArea>
           </Fragment>

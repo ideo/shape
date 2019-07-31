@@ -120,6 +120,26 @@ describe('RolesMenu', () => {
           expect(apiStore.request.mock.calls[0][2].is_switching).toBeFalsy()
         })
       })
+
+      describe('when assigning to a group', () => {
+        beforeEach(async () => {
+          opts.addToGroupId = 4
+          await component.createRoles(users, 'member', opts)
+        })
+
+        it('should request the groups endpoint with the group id', () => {
+          expect(apiStore.request).toHaveBeenCalledWith(
+            'groups/4/roles',
+            'POST',
+            {
+              role: { name: 'member' },
+              user_ids: [3, 5],
+              group_ids: [],
+              is_switching: true,
+            }
+          )
+        })
+      })
     })
   })
 
