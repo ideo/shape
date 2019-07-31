@@ -10,8 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-
-ActiveRecord::Schema.define(version: 2019_07_26_063501) do
+ActiveRecord::Schema.define(version: 2019_07_29_171554) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -432,6 +431,7 @@ ActiveRecord::Schema.define(version: 2019_07_26_063501) do
     t.boolean "deactivated", default: false, null: false
     t.jsonb "autojoin_domains", default: []
     t.bigint "terms_text_item_id"
+    t.integer "terms_version"
     t.index ["autojoin_domains"], name: "index_organizations_on_autojoin_domains", using: :gin
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end
@@ -565,7 +565,7 @@ ActiveRecord::Schema.define(version: 2019_07_26_063501) do
     t.integer "status", default: 0
     t.string "invitation_token"
     t.integer "current_user_collection_id"
-    t.boolean "terms_accepted", default: false
+    t.boolean "old_terms_accepted", default: false
     t.boolean "show_helper", default: true
     t.string "handle"
     t.boolean "notify_through_email", default: true
@@ -578,9 +578,10 @@ ActiveRecord::Schema.define(version: 2019_07_26_063501) do
     t.datetime "last_active_at"
     t.string "phone"
     t.integer "feedback_contact_preference", default: 0
-    t.boolean "feedback_terms_accepted", default: false
-    t.boolean "respondent_terms_accepted", default: false
+    t.boolean "old_feedback_terms_accepted", default: false
+    t.boolean "old_respondent_terms_accepted", default: false
     t.boolean "shape_circle_member", default: false
+    t.jsonb "terms_accepted_data", default: {}
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"

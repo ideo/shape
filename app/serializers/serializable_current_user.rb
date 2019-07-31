@@ -4,7 +4,8 @@ class SerializableCurrentUser < SerializableUser
   attributes :terms_accepted, :notify_through_email,
              :show_helper, :show_move_helper, :show_template_helper,
              :mailing_list, :feedback_contact_preference,
-             :feedback_terms_accepted, :respondent_terms_accepted
+             :feedback_terms_accepted, :respondent_terms_accepted,
+             :current_org_terms_accepted
 
   attribute :google_auth_token do
     # generate user login token for firebase

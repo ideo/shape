@@ -17,6 +17,7 @@
     "trial_ends_at": { "type": "date" },
     "trial_users_count": { "type": "number" },
     "terms_text_item_id": { "type": ["integer", "null"] },
+    "terms_version": { "type": ["integer", "null"] },
     "filestack_file_url": { "type": ["string", "null"] }
   },
   "required": ["name"]
