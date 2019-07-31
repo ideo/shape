@@ -65,7 +65,8 @@ class GroupModify extends React.Component {
   changeHandle(handle) {
     // limit to 30
     this.editingGroup.handle = handle.slice(0, 30)
-    this.formDisabled = handle.length < 2
+    // disable the form if the handle is numbers only
+    this.formDisabled = parseInt(handle).toString() === handle
   }
 
   @action
@@ -150,7 +151,7 @@ class GroupModify extends React.Component {
           <Label htmlFor="grouphandle">{groupType} handle</Label>
           <div style={{ marginTop: '-10px', marginBottom: '10px' }}>
             <SmallHelperText>
-              Must be 2 or more characters, starting with a letter.
+              Must be 1-30 characters, starting with a letter.
             </SmallHelperText>
           </div>
           <TextField
