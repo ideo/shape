@@ -22,6 +22,13 @@ class Organization extends BaseRecord {
     )
   }
 
+  API_bumpTermsVersion() {
+    return this.apiStore.request(
+      `organizations/${this.id}/bump_terms_version`,
+      'PATCH'
+    )
+  }
+
   attributesForAPI = [
     'in_app_billing',
     'name',

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_03_185758) do
+ActiveRecord::Schema.define(version: 2019_07_29_171554) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -29,6 +29,7 @@ ActiveRecord::Schema.define(version: 2019_07_03_185758) do
     t.bigint "source_id"
     t.string "destination_type"
     t.bigint "destination_id"
+    t.index ["action", "target_type", "organization_id"], name: "index_activities_action_target_org"
     t.index ["actor_id"], name: "index_activities_on_actor_id"
     t.index ["created_at"], name: "index_activities_on_created_at"
     t.index ["destination_type", "destination_id"], name: "index_activities_on_destination_type_and_destination_id"
@@ -160,6 +161,7 @@ ActiveRecord::Schema.define(version: 2019_07_03_185758) do
     t.boolean "anyone_can_join", default: false
     t.bigint "joinable_group_id"
     t.datetime "test_closed_at"
+    t.integer "default_group_id"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
@@ -429,6 +431,7 @@ ActiveRecord::Schema.define(version: 2019_07_03_185758) do
     t.boolean "deactivated", default: false, null: false
     t.jsonb "autojoin_domains", default: []
     t.bigint "terms_text_item_id"
+    t.integer "terms_version"
     t.index ["autojoin_domains"], name: "index_organizations_on_autojoin_domains", using: :gin
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end
@@ -562,7 +565,7 @@ ActiveRecord::Schema.define(version: 2019_07_03_185758) do
     t.integer "status", default: 0
     t.string "invitation_token"
     t.integer "current_user_collection_id"
-    t.boolean "terms_accepted", default: false
+    t.boolean "old_terms_accepted", default: false
     t.boolean "show_helper", default: true
     t.string "handle"
     t.boolean "notify_through_email", default: true
@@ -575,9 +578,10 @@ ActiveRecord::Schema.define(version: 2019_07_03_185758) do
     t.datetime "last_active_at"
     t.string "phone"
     t.integer "feedback_contact_preference", default: 0
-    t.boolean "feedback_terms_accepted", default: false
-    t.boolean "respondent_terms_accepted", default: false
+    t.boolean "old_feedback_terms_accepted", default: false
+    t.boolean "old_respondent_terms_accepted", default: false
     t.boolean "shape_circle_member", default: false
+    t.jsonb "terms_accepted_data", default: {}
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"

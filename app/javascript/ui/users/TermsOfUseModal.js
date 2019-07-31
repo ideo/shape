@@ -3,14 +3,12 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
-import FormControl from '@material-ui/core/FormControl'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
 
-import { FormButton, Checkbox } from '~/ui/global/styled/forms'
+import { FormButton } from '~/ui/global/styled/forms'
 import { Heading1, Anchor } from '~/ui/global/styled/typography'
 import Link from '~/ui/global/Link'
 import Logo from '~/ui/layout/Logo'
-import v, { FREEMIUM_USER_LIMIT } from '~/utils/variables'
+import v from '~/utils/variables'
 import poweredByIdeo from '~/assets/Powered-by-IDEO.png'
 
 const StyledDialog = styled(Dialog)`
@@ -62,30 +60,9 @@ const StyledLogo = styled(Logo)`
 @observer
 class TermsOfUseModal extends React.Component {
   @observable
-  mailingListChecked = false
-  @observable
-  shapeCircleChecked = false
-  @observable
   isLoading = false
   @observable
   submitted = false
-
-  @action
-  componentDidMount() {
-    const { currentUser } = this.props
-    this.mailingListChecked = currentUser.mailing_list
-    this.shapeCircleChecked = currentUser.shape_circle_member
-  }
-
-  @action
-  handleMailingListCheck = event => {
-    this.mailingListChecked = event.target.checked
-  }
-
-  @action
-  handleShapeCircleCheck = event => {
-    this.shapeCircleChecked = event.target.checked
-  }
 
   @action
   handleSubmit = e => {
@@ -93,53 +70,31 @@ class TermsOfUseModal extends React.Component {
     this.submitted = true
     const { currentUser } = this.props
     this.isLoading = true
-    currentUser
-      .API_updateCurrentUser({
-        terms_accepted: true,
-        mailing_list: this.mailingListChecked,
-        shape_circle_member: this.shapeCircleChecked,
+    currentUser.API_acceptCurrentOrgTerms().finally(() => {
+      runInAction(() => {
+        this.isLoading = false
       })
-      .finally(() => {
-        runInAction(() => {
-          this.isLoading = false
-        })
-      })
+    })
   }
 
   render() {
     const { currentUser } = this.props
+    const { current_org_terms_accepted } = currentUser
     const organization = currentUser.current_organization
-    const showBillingInformation =
-      !organization ||
-      (organization &&
-        organization.in_app_billing &&
-        !organization.has_payment_method &&
-        organization.primary_group.can_edit)
-    const trialUsersCount =
-      (organization && organization.trial_users_count) || 25
-    const trialPricePerUser = (organization && organization.price_per_user) || 5
+    const outdated = current_org_terms_accepted === 'outdated'
+    const introMessage = outdated
+      ? `${organization.name}'s Terms for Shape have changed! Please take a moment to review the`
+      : 'Welcome to Shape! Before you proceed, please take a moment to review the'
+
     const orgTermsOfUse = organization && organization.terms_text_item_id && (
       <span>
-        {' '}
-        and {organization.name}
-        &apos;s{' '}
+        {outdated && 'updated '}
+        {organization.name}{' '}
         <Link target="_blank" to={`/terms/${organization.name}`}>
           Terms of Use
         </Link>
       </span>
     )
-
-    let termsIntroMessage = showBillingInformation
-      ? `Welcome to Shape! Shape is free for up to ${FREEMIUM_USER_LIMIT} people. Once you invite your sixth collaborator Shape will be $5 per person per month. Please take a moment to`
-      : 'Welcome to Shape! Before you proceed, please take a moment to'
-
-    if (
-      showBillingInformation &&
-      organization &&
-      !organization.is_within_trial_period
-    ) {
-      termsIntroMessage = `Welcome to your 1 month free trial of Shape. The first ${trialUsersCount} people who use Shape at your organization will be free for the first month. Shape licenses are $${trialPricePerUser} per person per month. Please take a moment to`
-    }
 
     return (
       <StyledDialog
@@ -154,50 +109,9 @@ class TermsOfUseModal extends React.Component {
             <StyledLogo withText width={128} />
             <Heading1 wrapLine>Hello {currentUser.first_name}!</Heading1>
             <p>
-              {termsIntroMessage} review our{' '}
-              <Link target="_blank" to="/terms">
-                Terms of Use
-              </Link>
-              {orgTermsOfUse}.
+              {introMessage} {orgTermsOfUse}.
             </p>
-            <FormControl component="fieldset">
-              <FormControlLabel
-                classes={{ label: 'form-control' }}
-                control={
-                  <Checkbox
-                    checked={this.mailingListChecked}
-                    onChange={this.handleMailingListCheck}
-                    value="yes"
-                  />
-                }
-                label="Stay current on product updates and case studies by signing up for our mailing list"
-              />
-            </FormControl>
-            <br />
-            <br />
-            <FormControl component="fieldset">
-              <FormControlLabel
-                classes={{ label: 'form-control' }}
-                control={
-                  <Checkbox
-                    checked={this.shapeCircleChecked}
-                    onChange={this.handleShapeCircleCheck}
-                    value="yes"
-                  />
-                }
-                label="Join the Shape Circle for early access to new Shape features and more"
-              />
-            </FormControl>
-            <p>
-              <br />
-            </p>
-            <p>
-              By clicking ‘Continue’ you agree to Shape’s{' '}
-              <Link target="_blank" to="/terms">
-                Terms of Use
-              </Link>
-              {orgTermsOfUse}.
-            </p>
+            <p>By clicking ‘Continue’ you agree to the {orgTermsOfUse}.</p>
 
             <div className="button--center">
               <FormButton disabled={this.isLoading}>Continue</FormButton>

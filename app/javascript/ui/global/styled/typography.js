@@ -47,7 +47,7 @@ Heading2.displayName = 'Heading2'
 /** @component */
 export const Heading3 = styled.h3`
   text-transform: uppercase;
-  margin-bottom: 13px;
+  margin-bottom: ${({ noSpacing }) => (noSpacing ? 0 : 13)}px;
   font-size: 0.9375rem;
   font-weight: ${v.weights.medium};
   letter-spacing: 0.0625rem;

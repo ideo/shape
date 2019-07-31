@@ -132,6 +132,27 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
     end
   end
 
+  describe 'PATCH #update_current_user' do
+    let(:organization) { user.current_organization }
+    let(:path) { '/api/v1/users/accept_current_org_terms' }
+
+    before do
+      organization.update(terms_version: 3, terms_text_item: create(:text_item))
+    end
+
+    it 'returns a 200' do
+      patch(path)
+      expect(response.status).to eq(200)
+    end
+
+    it 'updates current_org_terms_accepted for current_user' do
+      expect(user.current_org_terms_accepted).to be false
+      patch(path)
+      expect(user.reload.current_org_terms_accepted).to be true
+      expect(user.org_terms_accepted_versions[organization.id.to_s]).to eq 3
+    end
+  end
+
   describe 'POST #create_limited_user', auth: false, create_org: false do
     let(:path) { '/api/v1/users/create_limited_user' }
     let(:session_uid) { nil }

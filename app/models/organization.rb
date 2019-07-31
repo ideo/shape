@@ -15,6 +15,7 @@
 #  sent_high_charges_low_email           :boolean          default(FALSE), not null
 #  sent_high_charges_middle_email        :boolean          default(FALSE), not null
 #  slug                                  :string
+#  terms_version                         :integer
 #  trial_ends_at                         :datetime
 #  trial_expired_email_sent              :boolean          default(FALSE), not null
 #  trial_users_count                     :integer          default(0), not null
@@ -364,12 +365,18 @@ class Organization < ApplicationRecord
       type: 'Item::TextItem',
       name: "#{name} Terms",
       content: 'Terms',
-      data_content: { a: {} },
+      data_content: { ops: [] },
     )
     admin_group.add_role(Role::EDITOR, item)
     self.terms_text_item = item
     save
     item
+  end
+
+  def bump_terms_version
+    self.terms_version = 0 if terms_version.nil?
+    self.terms_version += 1
+    save
   end
 
   def roles_anchor_collection_id

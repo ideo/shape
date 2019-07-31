@@ -205,9 +205,10 @@ class Routes extends React.Component {
     if (!sessionLoaded) {
       return <Loader />
     }
+    const termsAccepted = currentUser && currentUser.current_org_terms_accepted
     const displayTermsPopup =
       currentUser &&
-      !currentUser.terms_accepted &&
+      (!termsAccepted || termsAccepted === 'outdated') &&
       !routingStore.pathContains('/terms')
 
     const {

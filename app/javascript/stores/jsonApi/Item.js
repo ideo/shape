@@ -210,6 +210,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return this.measure.tooltip || this.measure.name.toLowerCase()
   }
 
+  // not used any more??
   get collectionFilter() {
     if (!this.primaryDataset) return null
     return _.find(this.primaryDataset.data_source_id, { type: 'Collection' })

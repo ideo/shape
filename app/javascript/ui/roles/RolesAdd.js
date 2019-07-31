@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { observable, action } from 'mobx'
-import { observer } from 'mobx-react'
+import { observable, action, runInAction } from 'mobx'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import { Grid, Hidden, MenuItem } from '@material-ui/core'
@@ -14,8 +14,9 @@ import {
   FormActionsContainer,
   Select,
 } from '~/ui/global/styled/forms'
+import EntityAvatarAndName from '~/ui/global/EntityAvatarAndName'
 import { Row, RowItemRight } from '~/ui/global/styled/layout'
-import { Heading3 } from '~/ui/global/styled/typography'
+import { DisplayText, Heading3 } from '~/ui/global/styled/typography'
 import AutoComplete from '~/ui/global/AutoComplete'
 import PillList from '~/ui/global/PillList'
 import EmailCSVUploader from '~/ui/global/EmailCSVUploader'
@@ -50,7 +51,11 @@ class RolesAdd extends React.Component {
   @observable
   selectedRole = ''
   @observable
+  selectedGroupId = ''
+  @observable
   sendInvites = true
+  @observable
+  syncedRoleTypes = []
   @observable
   loading = false
 
@@ -59,6 +64,14 @@ class RolesAdd extends React.Component {
     const [first] = this.props.roleTypes
     this.selectedRole = first
     uiStore.autocompleteMenuClosed()
+    runInAction(() => {
+      this.syncedRoleTypes = props.roleTypes
+      this.selectedGroupId = props.defaultGroupId
+      if (this.selectedGroupId) {
+        this.syncedRoleTypes = ['admin', 'member']
+        this.selectedRole = 'member'
+      }
+    })
 
     this.debouncedSearch = _.debounce(this._autocompleteSearch, 350)
   }
@@ -150,7 +163,7 @@ class RolesAdd extends React.Component {
         confirmText: 'Continue',
         onConfirm: this.handleSave,
       }
-      if (ownerType === 'groups') {
+      if (ownerType === 'groups' || this.selectedGroupId) {
         confirmOpts.prompt = `
           Are you sure you want to add ${this.selectedUsers.length} users to this group?
         `
@@ -200,11 +213,12 @@ class RolesAdd extends React.Component {
       emailUsers,
     } = this
     const { currentUserId, currentUserOrganization } = apiStore
+    const { FREEMIUM_USER_LIMIT } = window
     const { name = 'this organization' } = currentUserOrganization
     if (this.shouldAskForPaymentMethod) {
       const popupAgreed = new Promise((resolve, reject) => {
         const { id } = currentUserOrganization
-        const prompt = `Inviting these people will take ${name} over the free limit of ${FREEMIUM_USER_LIMIT}.`
+        const prompt = `Inviting these people will take ${name} over the free limit of ${FREEMIUM_USER_LIMIT}. Please add a payment method to continue`
         const confirmText = 'Add Payment Method'
         apiStore.fetchOrganizationAdmins(id).then(response => {
           const { data: admins } = response
@@ -235,7 +249,7 @@ class RolesAdd extends React.Component {
           )
 
           const adminModalProps = {
-            prompt: `${prompt} Please add a payment method to continue.`,
+            prompt: prompt,
             iconName: 'InviteUsers',
             confirmText,
             onCancel: () => {
@@ -278,6 +292,14 @@ class RolesAdd extends React.Component {
     }
     const fullUsers = selectedUsers.filter(selected => !!selected.id)
 
+    if (this.selectedGroupId) {
+      // If any of the selected entities are groups, this is an error condition
+      // to add a group to a group
+      if (fullUsers.find(entity => entity.internalType === 'groups')) {
+        return uiStore.alert('You cannot add a group to another group')
+      }
+    }
+
     let created = { data: [] }
     setLoading(true)
     if (emailUsers.length) {
@@ -286,7 +308,7 @@ class RolesAdd extends React.Component {
     const roles = await this.props.onCreateRoles(
       [...created.data, ...fullUsers],
       selectedRole,
-      { sendInvites }
+      { sendInvites, addToGroupId: this.selectedGroupId }
     )
     setLoading(false)
     resetSelectedUsers()
@@ -296,6 +318,18 @@ class RolesAdd extends React.Component {
   @action
   handleRoleSelect = ev => {
     this.selectedRole = ev.target.value
+  }
+
+  @action
+  handleGroupSelect = ev => {
+    this.selectedGroupId = ev.target.value
+    if (this.selectedGroupId) {
+      this.syncedRoleTypes = ['admin', 'member']
+      this.selectedRole = 'member'
+    } else {
+      this.syncedRoleTypes = this.props.roleTypes
+      this.selectedRole = 'editor'
+    }
   }
 
   @action
@@ -362,11 +396,38 @@ class RolesAdd extends React.Component {
   }
 
   render() {
-    const { title, roleTypes } = this.props
+    const { addableGroups, title } = this.props
+    const filteredAddableGroups = addableGroups.filter(
+      group => !group.is_primary
+    )
     return (
       <div>
-        <Row style={{ marginBottom: 0 }}>
-          <Heading3>{title}</Heading3>
+        <Row align="center" style={{ marginBottom: 0, height: '32px' }}>
+          <Heading3 noSpacing>{title}</Heading3>
+          {!!addableGroups.length && (
+            <RowItemRight>
+              <Select
+                classes={{ root: 'select', selectMenu: 'selectMenu' }}
+                displayEmpty
+                disableUnderline
+                name="group"
+                onChange={this.handleGroupSelect}
+                value={this.selectedGroupId}
+                data-cy="permissionsGroupSelect"
+              >
+                <MenuItem key="no-group" value={''}>
+                  <DisplayText color={v.colors.commonMedium}>
+                    No group
+                  </DisplayText>
+                </MenuItem>
+                {filteredAddableGroups.map(group => (
+                  <MenuItem key={group.handle} value={group.id}>
+                    <EntityAvatarAndName entity={group} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </RowItemRight>
+          )}
           <RowItemRight>
             <Select
               classes={{ root: 'select', selectMenu: 'selectMenu' }}
@@ -375,10 +436,13 @@ class RolesAdd extends React.Component {
               name="role"
               onChange={this.handleRoleSelect}
               value={this.selectedRole}
+              data-cy="permissionsRoleSelect"
             >
-              {roleTypes.map(roleType => (
+              {this.syncedRoleTypes.map(roleType => (
                 <MenuItem key={roleType} value={roleType}>
-                  {this.labelFor(roleType)}
+                  <span data-cy="permissonsRoleLabel">
+                    {this.labelFor(roleType)}
+                  </span>
                 </MenuItem>
               ))}
             </Select>
@@ -430,14 +494,20 @@ RolesAdd.propTypes = {
   roleLabels: PropTypes.shape({
     editor: PropTypes.string,
     viewer: PropTypes.string,
+    admin: PropTypes.string,
+    member: PropTypes.string,
   }),
   onCreateRoles: PropTypes.func.isRequired,
   onCreateUsers: PropTypes.func.isRequired,
   ownerType: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
+  addableGroups: MobxPropTypes.arrayOrObservableArray,
+  defaultGroupId: PropTypes.string,
 }
 RolesAdd.defaultProps = {
   roleLabels: {},
+  addableGroups: [],
+  defaultGroupId: '',
 }
 
 export default RolesAdd
