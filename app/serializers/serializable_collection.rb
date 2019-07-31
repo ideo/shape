@@ -205,7 +205,7 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   attribute :inherited_default_group_id do
-    @object.inherited_default_group_id
+    @object.inherited_default_group_id.to_s
   end
 
   has_one :restorable_parent do

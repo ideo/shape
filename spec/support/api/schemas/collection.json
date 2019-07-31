@@ -46,6 +46,8 @@
     "frontend_url": { "type": ["string"] },
     "common_viewable": { "type": ["boolean", "null"] },
     "archived": { "type": ["boolean", "null"] },
+    "has_link_sharing": { "type": ["boolean", "null"] },
+    "inherited_default_group_id": { "type": ["string"] },
     "is_restorable": { "type": ["boolean", "null"] }
   },
   "required": ["name", "class_type", "created_at", "cover"]

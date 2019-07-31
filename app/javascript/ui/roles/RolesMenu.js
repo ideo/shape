@@ -335,10 +335,7 @@ class RolesMenu extends React.Component {
                 onCreateUsers={this.onCreateUsers}
                 ownerType={ownerType}
                 addableGroups={groups}
-                defaultGroupId={
-                  record.inherited_default_group_id &&
-                  record.inherited_default_group_id.toString()
-                }
+                defaultGroupId={record.inherited_default_group_id}
               />
             </FooterArea>
           </Fragment>

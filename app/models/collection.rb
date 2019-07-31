@@ -725,9 +725,7 @@ class Collection < ApplicationRecord
 
   # This is the default group ID inherited from the roles anchor
   def inherited_default_group_id
-    return default_group_id unless roles_anchor_collection_id.present?
-    roles_anchor_collection = Collection.find(roles_anchor_collection_id)
-    roles_anchor_collection.default_group_id
+    roles_anchor.default_group_id
   end
 
   # =================================
