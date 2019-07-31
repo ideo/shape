@@ -353,6 +353,23 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
     end
   end
 
+  describe 'PATCH #bump_terms_version' do
+    let!(:current_user) { @user }
+    let!(:organization) { create(:organization, admin: user) }
+    let(:path) { "/api/v1/organizations/#{organization.id}/bump_terms_version" }
+
+    it 'returns a 200' do
+      patch(path)
+      expect(response.status).to eq(200)
+    end
+
+    it 'updates the organization terms_version' do
+      expect(organization.terms_version).to be nil
+      patch(path)
+      expect(organization.terms_version).not_to eq 1
+    end
+  end
+
   describe 'GET #check_payments' do
     let!(:current_user) { @user }
     let!(:organization) { create(:organization, admin: user) }
