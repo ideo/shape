@@ -368,6 +368,13 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
       patch(path)
       expect(organization.terms_version).not_to eq 1
     end
+
+    it 'updates the user org_terms_accepted_versions' do
+      expect(user.org_terms_accepted_versions).to be nil
+      patch(path)
+      expect(user.org_terms_accepted_versions).not_to be nil
+      expect(user.current_org_terms_accepted).to be true
+    end
   end
 
   describe 'GET #check_payments' do
