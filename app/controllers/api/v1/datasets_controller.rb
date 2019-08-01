@@ -70,6 +70,7 @@ class Api::V1::DatasetsController < Api::V1::BaseController
       :measure,
       :timeframe,
       :identifier,
+      :tiers,
       :data_source_id,
       :data_source_type,
       :data_source,
