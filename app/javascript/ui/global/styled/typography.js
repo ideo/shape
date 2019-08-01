@@ -219,7 +219,11 @@ export const HugeNumber = Heading1.extend`
 `
 
 export const QuillStyleWrapper = styled.div`
-  height: 100%;
+  ${props =>
+    props.notEditing && props.hasTitleText
+      ? 'height: calc(100% - 40px); margin-top: 40px;'
+      : 'height: 100%;'}
+
   .quill {
     height: 100%;
 
@@ -289,7 +293,7 @@ export const QuillStyleWrapper = styled.div`
       ${props => (props.notEditing ? 'overflow-y: hidden;' : '')};
       ${props =>
         props.notEditing && props.hasTitleText
-          ? 'display: block; height: auto; flex-grow: 0 !important;'
+          ? 'display: block; height: auto; flex: initial;'
           : ''};
     }
   }
