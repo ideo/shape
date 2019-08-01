@@ -814,10 +814,7 @@ class Collection < ApplicationRecord
   end
 
   def child_of_or_current_application_collection?
-    if roles_anchor != self
-      return true if roles_anchor&.child_of_or_current_application_collection?
-    end
-    parents.find_by(type: 'Collection::ApplicationCollection').present?
+    parent.is_a?(Collection::ApplicationCollection)
   end
 
   # =================================
