@@ -397,25 +397,26 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def collection_card_attributes
-    attrs = [
-      :order,
-      :row,
-      :col,
-      :width,
-      :height,
-      :reference,
-      :parent_id,
-      :collection_id,
-      :item_id,
-      :type,
-      :image_contain,
-      :is_cover,
-      :filter,
-      :hidden,
-      :show_replace,
+    attrs = %i[
+      order
+      row
+      col
+      width
+      height
+      reference
+      parent_id
+      collection_id
+      item_id
+      type
+      image_contain
+      is_cover
+      filter
+      hidden
+      show_replace
     ]
-    # Allow pinning if this is an application/bot user
+    # Allow pinning, replacing if this is an application/bot user
     attrs << :pinned if current_application.present?
+    attrs << :show_replace if current_application.present?
     attrs
   end
 

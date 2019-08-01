@@ -1,4 +1,6 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
+import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observable, runInAction } from 'mobx'
 import styled from 'styled-components'
@@ -8,6 +10,8 @@ import InlineLoader from '~/ui/layout/InlineLoader'
 import MoveArrowIcon from '~/ui/icons/MoveArrowIcon'
 import MoveHelperModal from '~/ui/users/MoveHelperModal'
 import Tooltip from '~/ui/global/Tooltip'
+import CoverRenderer from '~/ui/grid/CoverRenderer'
+import v from '~/utils/variables'
 import {
   StyledSnackbar,
   StyledSnackbarContent,
@@ -34,6 +38,43 @@ const CloseIconHolder = styled.span`
     height: 19px;
     width: 16px;
   }
+`
+const CoverRendererWrapper = styled.div`
+  ${props => {
+    const { width, height, maxWidth, maxHeight, selectedMultiple } = props
+    const { cardTiltDegrees, colors, zIndex } = v
+    const shouldScaleSmaller = maxWidth >= 2 && maxHeight >= 2 // scale even smaller for 2x2, 2x3 or 2x4 ratio
+    const scalarTransform = shouldScaleSmaller ? 0.25 : 0.4
+
+    return `
+      height: ${height}px;
+      width: ${width}px;
+      left: 15px;
+      position: absolute;
+      transform-origin: 0 100%;
+      bottom: 25px;
+      background: white;
+      overflow: hidden;
+      z-index: -1;
+      transform: rotate(${cardTiltDegrees}deg) scale(${scalarTransform});
+      color: black;
+      box-shadow: ${
+        selectedMultiple ? `-15px 15px 0 0px ${colors.secondaryLight}` : 'none'
+      };
+      &:before {
+        background: ${colors.primaryDark};
+        content: '';
+        height: 100%;
+        left: 0;
+        opacity: 0.45;
+        pointer-events: none;
+        position: absolute;
+        width: 100%;
+        top: 0;
+        z-index: ${zIndex.gridCardTop};
+      }
+    `
+  }}
 `
 
 @inject('uiStore', 'apiStore')
@@ -209,17 +250,23 @@ class MoveModal extends React.Component {
     this.moveCards('end')
   }
 
+  get selectedMovingCard() {
+    const { uiStore, apiStore } = this.props
+    return apiStore.find('collection_cards', _.last(uiStore.movingCardIds))
+  }
+
   get moveMessage() {
     const { uiStore } = this.props
     const { cardAction, templateName } = uiStore
     const amount = uiStore.movingCardIds.length
+    const cardsString = amount > 1 ? `cards` : `card`
     let message = ''
     if (cardAction === 'move') {
-      message = `${amount} in transit`
+      message = `${amount} ${cardsString} in transit`
     } else if (cardAction === 'useTemplate') {
       message = `${templateName} in transit`
     } else {
-      message = `${amount} selected to ${cardAction}`
+      message = `${amount} ${cardsString} selected to ${cardAction}`
     }
     return message
   }
@@ -313,7 +360,9 @@ class MoveModal extends React.Component {
 
   render() {
     const { uiStore } = this.props
-
+    const { position, maxWidth, maxHeight, record } = this.selectedMovingCard
+    const { internalType } = record
+    const { movingCardIds } = uiStore
     return (
       <div>
         {uiStore.shouldOpenMoveModal && (
@@ -324,15 +373,31 @@ class MoveModal extends React.Component {
                   <InlineLoader />
                 </SnackbarBackground>
               ) : (
-                <StyledSnackbarContent
-                  classes={{ root: 'SnackbarContent' }}
-                  message={
-                    <StyledSnackbarText id="message-id">
-                      {this.moveMessage}
-                    </StyledSnackbarText>
-                  }
-                  action={this.snackbarActions}
-                />
+                <Fragment>
+                  <StyledSnackbarContent
+                    classes={{ root: 'SnackbarContent' }}
+                    message={
+                      <StyledSnackbarText id="message-id">
+                        {this.moveMessage}
+                      </StyledSnackbarText>
+                    }
+                    action={this.snackbarActions}
+                  />
+                  <CoverRendererWrapper
+                    maxWidth={maxWidth}
+                    maxHeight={maxHeight}
+                    width={position && position.width}
+                    height={position && position.height}
+                    selectedMultiple={movingCardIds.length > 1}
+                  >
+                    <CoverRenderer
+                      card={this.selectedMovingCard}
+                      record={this.selectedMovingCard.record}
+                      cardType={internalType}
+                      nestedTextItem={null}
+                    />
+                  </CoverRendererWrapper>
+                </Fragment>
               )}
             </StyledSnackbar>
             {this.moveHelper}

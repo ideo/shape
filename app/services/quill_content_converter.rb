@@ -45,12 +45,14 @@ class QuillContentConverter < SimpleService
       process_header(element)
     elsif element.name == 'a'
       process_link(element)
+    elsif element.name == 'img'
+      process_img(element)
     end
   end
 
   def write_current_string(element)
     # Need to add a newline if the next element is not a header
-    @current_string += "\n" unless %w[h1 h2 h3].include?(element.name)
+    @current_string += "\n" unless %w[h1 h2 h3 img].include?(element.name)
     @quill_ops.push(insert: @current_string)
     @current_string = ''
   end
@@ -73,5 +75,11 @@ class QuillContentConverter < SimpleService
       attributes: { link: element.attributes['href'].value },
     )
     @current_string = ''
+  end
+
+  def process_img(element)
+    @quill_ops.push(
+      insert: { image: element.attributes['src'].value },
+    )
   end
 end

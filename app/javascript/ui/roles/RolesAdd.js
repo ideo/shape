@@ -218,7 +218,7 @@ class RolesAdd extends React.Component {
     if (this.shouldAskForPaymentMethod) {
       const popupAgreed = new Promise((resolve, reject) => {
         const { id } = currentUserOrganization
-        const prompt = `Inviting these people will take ${name} over the free limit of ${FREEMIUM_USER_LIMIT}. Please add a payment method to continue`
+        const freeLimitPrompt = `Inviting these people will take ${name} over the free limit of ${FREEMIUM_USER_LIMIT}.`
         const confirmText = 'Add Payment Method'
         apiStore.fetchOrganizationAdmins(id).then(response => {
           const { data: admins } = response
@@ -249,7 +249,7 @@ class RolesAdd extends React.Component {
           )
 
           const adminModalProps = {
-            prompt: prompt,
+            prompt: `${freeLimitPrompt} Please add a payment method to continue.`,
             iconName: 'InviteUsers',
             confirmText,
             onCancel: () => {
@@ -260,7 +260,7 @@ class RolesAdd extends React.Component {
           }
 
           const modalProps = {
-            prompt: `${prompt} Please ask an administrator of ${name} to add payment method.`,
+            prompt: `${freeLimitPrompt} Please ask an administrator of ${name} to add payment method.`,
             subPromptNode: adminGrid,
             iconName: 'InviteUsers',
             backgroundColor: `${v.colors.primaryLight}`,

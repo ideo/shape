@@ -60,7 +60,7 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
 
   def bump_terms_version
     if @organization.bump_terms_version
-      current_user.accept_current_org_terms
+      current_user.reload.accept_current_org_terms
       render jsonapi: @organization
     else
       render_api_errors @organization.errors
