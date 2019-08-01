@@ -50,7 +50,7 @@ class RoutingStore extends RouterStore {
 
   pathTo = (type, id = null, params = {}) => {
     const suffix = params.name ? `-${_.kebabCase(params.name)}` : ''
-    // TODO: TEST THIS with Jest
+
     switch (type) {
       case 'collections':
         return `/${this.slug()}/collections/${id}${suffix}`

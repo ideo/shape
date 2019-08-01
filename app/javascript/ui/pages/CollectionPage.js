@@ -133,8 +133,8 @@ class CollectionPage extends React.Component {
       // NOTE: SubmissionsCollections are not meant to be viewable, so we route
       // back to the SubmissionBox instead
       routingStore.routeTo('collections', collection.submission_box_id, {
-        // TODO: Add submission box name to collection.js
-        name: collection.submission_box_name,
+        // Since we don't have access to the submission box record
+        name: `${collection.name} submission box`,
       })
       return
     }

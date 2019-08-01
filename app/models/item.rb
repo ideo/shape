@@ -239,11 +239,6 @@ class Item < ApplicationRecord
     true
   end
 
-  def to_param
-    kebab_name = name.parameterize(separator: "-", preserve_case: false)
-    "#{id}-#{kebab_name}"
-  end
-
   def truncate_name
     self.name = name ? name.truncate(40, separator: /[,?\.\s]+/, omission: '') : 'item'
   end

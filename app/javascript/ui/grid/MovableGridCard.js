@@ -393,7 +393,6 @@ class MovableGridCard extends React.PureComponent {
     } else {
       uiStore.showPermissionsAlert()
     }
-    x
   }
 
   clearDragTimeout = () => {

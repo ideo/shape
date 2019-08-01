@@ -9,6 +9,7 @@ import CollectionPage from '~/ui/pages/CollectionPage'
 import ItemPage from '~/ui/pages/ItemPage'
 import trackError from '~/utils/trackError'
 import routeToLogin from '~/utils/routeToLogin'
+import _ from 'lodash'
 
 @inject('apiStore', 'uiStore')
 @observer
