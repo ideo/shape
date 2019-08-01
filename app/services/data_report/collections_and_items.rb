@@ -177,28 +177,29 @@ module DataReport
       # we are actually finding all activities/collections created before January 2 00:00
       columns = %i[id created_at]
       columns.push(:actor_id) if measure_queries_activities?
+      beginning_of_timeframe = min.send("beginning_of_#{timeframe}")
 
       intervals = %{
         SELECT
-          LEAST(series.date, now()::DATE) date
+          DISTINCT LEAST(series.date, 'now()'::DATE) date
         FROM
           GENERATE_SERIES(
-            ('#{min.send("beginning_of_#{timeframe}")}'::DATE + INTERVAL '1 #{timeframe}'),
-            now()::DATE + INTERVAL '1 #{timeframe}',
+            ('#{beginning_of_timeframe}'::DATE + INTERVAL '1 #{timeframe}'),
+            'now()'::DATE + INTERVAL '1 #{timeframe}',
             INTERVAL '1 #{timeframe}'
           ) AS series
       }
 
       sql = %{
-        with intervals as (#{intervals})
+        WITH intervals AS (#{intervals})
           SELECT i.date, #{count}
             FROM (#{@query.select(*columns).to_sql}) inner_query
             RIGHT JOIN intervals i
             ON
               created_at BETWEEN
-                LEAST(i.date, now()::DATE) - INTERVAL '1 #{timeframe}'
+                i.date - INTERVAL '1 #{timeframe}'
                 AND
-                LEAST(i.date, now()::DATE) + INTERVAL '1 #{timeframe}'
+                i.date + INTERVAL '1 #{timeframe}'
             GROUP BY i.date
             ORDER BY i.date
       }
@@ -207,7 +208,6 @@ module DataReport
       values = Rails.cache.fetch timeframe_cache_key do
         query_table.connection.execute(sql)
                    .map { |val| { date: val['date'], value: val['count'] } }
-                   .uniq { |i| i[:date] } # this will filter out dupe when final series.date == now()
       end
       @data = values
     end
