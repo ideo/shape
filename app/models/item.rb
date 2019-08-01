@@ -292,6 +292,11 @@ class Item < ApplicationRecord
     'items'
   end
 
+  def inherited_default_group_id
+    # if roles_anchor is itself, it will not have a default_group_id
+    roles_anchor.try(:default_group_id)
+  end
+
   private
 
   def name_present?

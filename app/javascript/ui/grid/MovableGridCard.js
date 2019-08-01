@@ -543,6 +543,9 @@ class MovableGridCard extends React.PureComponent {
       y,
     } = this.state
 
+    const { zIndex, cardTiltDegrees } = v
+    const { cardDragging, aboveClickWrapper, cardHovering } = zIndex
+
     if (cardType === 'placeholder') {
       return this.renderPlaceholder()
     } else if (cardType === 'blank' || cardType === 'submission') {
@@ -609,10 +612,10 @@ class MovableGridCard extends React.PureComponent {
     const draggingMultiple =
       cardProps.dragging && uiStore.multiMoveCardIds.length > 1
 
-    let zIndex = 1
-    if (!moveComplete) zIndex = v.zIndex.cardDragging
+    let _zIndex = 1
+    if (!moveComplete) _zIndex = cardDragging
     if (uiStore.cardMenuOpen.id === card.id) {
-      zIndex = v.zIndex.aboveClickWrapper
+      _zIndex = aboveClickWrapper
     }
     let transform = `translateZ(0) scale(${1 / zoomLevel})`
     const adjustedWidth = (width + resizeWidth) / zoomLevel
@@ -622,18 +625,18 @@ class MovableGridCard extends React.PureComponent {
     // TODO this should actually check it's a breadcrumb
     const draggedOverBreadcrumb = !!uiStore.activeDragTarget
     if (dragging) {
-      transform += ` translate(${xAdjust}px, ${yAdjust}px) rotate(3deg)`
+      transform += ` translate(${xAdjust}px, ${yAdjust}px) rotate(${cardTiltDegrees}deg)`
       if (draggedOverBreadcrumb) {
         transform += ' scaleX(0.75) scaleY(0.75) translate(0px, 180px)'
         transition = cardHoverTransition
       }
     } else if (hoveringOverLeft) {
-      zIndex = v.zIndex.cardHovering
+      _zIndex = cardHovering
       const amount = 32 / zoomLevel
       transform += ` translate(${amount}px, -${amount}px)`
       transition = cardHoverTransition
     } else if (hoveringOverRight) {
-      zIndex = v.zIndex.cardHovering
+      _zIndex = cardHovering
       transform += ' scaleX(1.075) scaleY(1.075)'
       transition = cardHoverTransition
     }
@@ -647,7 +650,7 @@ class MovableGridCard extends React.PureComponent {
       <StyledCardWrapper
         className={touchDeviceClass}
         dragging={!moveComplete}
-        zIndex={zIndex}
+        zIndex={_zIndex}
         onClick={this.handleWrapperClick}
         innerRef={c => (this.gridCardRef = c)}
         style={{

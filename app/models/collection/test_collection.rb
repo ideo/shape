@@ -29,6 +29,7 @@
 #  cloned_from_id             :bigint(8)
 #  collection_to_test_id      :bigint(8)
 #  created_by_id              :integer
+#  default_group_id           :integer
 #  joinable_group_id          :bigint(8)
 #  organization_id            :bigint(8)
 #  question_item_id           :integer

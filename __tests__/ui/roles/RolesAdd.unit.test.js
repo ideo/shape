@@ -1,7 +1,9 @@
 import RolesAdd from '~/ui/roles/RolesAdd'
-import { apiStore } from '~/stores'
+import { apiStore, uiStore } from '~/stores'
 
 jest.mock('../../../app/javascript/stores')
+
+import { fakeGroup } from '#/mocks/data'
 
 let props
 let wrapper
@@ -13,14 +15,38 @@ describe('RolesAdd', () => {
       title: 'Add groups',
       searchableItems: [],
       roleTypes: ['viewer', 'editor'],
+      roleLabels: {
+        viewer: 'Viewer',
+        editor: 'Editor',
+        member: 'Member',
+        admin: 'Admin',
+      },
       onCreate: jest.fn(),
       onCreateUsers: jest.fn(),
       onCreateRoles: jest.fn(),
       onSearch: jest.fn(),
       ownerType: 'collections',
+      addableGroups: [fakeGroup],
     }
     wrapper = mount(<RolesAdd {...props} />)
-    defaultOpts = { sendInvites: true }
+    defaultOpts = { sendInvites: true, addToGroupId: '' }
+  })
+
+  describe('constructor', () => {
+    describe('when passing in a default group id', () => {
+      beforeEach(() => {
+        props.defaultGroupId = '2'
+        wrapper = mount(<RolesAdd {...props} />)
+      })
+
+      it('should set the selected group id to the default', () => {
+        expect(wrapper.instance().selectedGroupId).toEqual('2')
+        expect(wrapper.instance().syncedRoleTypes).toEqual(['admin', 'member'])
+        expect(wrapper.instance().syncedRoleTypes).toContain('admin')
+        expect(wrapper.instance().syncedRoleTypes).toContain('member')
+        expect(wrapper.instance().selectedRole).toEqual('member')
+      })
+    })
   })
 
   describe('_autocompleteSearch', () => {
@@ -86,6 +112,7 @@ describe('RolesAdd', () => {
 
     describe('for a new user', () => {
       const newUserData = { custom: 'm@m.com', internalType: 'users' }
+
       let existingUsers
 
       beforeEach(() => {
@@ -156,6 +183,27 @@ describe('RolesAdd', () => {
           data: searchableItems[0],
         })
       })
+    })
+  })
+
+  describe('when selecting a group to add to', () => {
+    let component
+    let roleMenuItems, roleSelect
+
+    beforeEach(() => {
+      component = wrapper.instance()
+      component.handleGroupSelect({ target: { value: fakeGroup.id } })
+      wrapper.update()
+      roleSelect = wrapper.find('[data-cy="permissionsRoleSelect"]').first()
+    })
+
+    it('should switch menu items to the group role types', () => {
+      roleMenuItems = roleSelect.find('[data-cy="permissonsRoleLabel"]')
+      expect(roleMenuItems.first().text()).toEqual('Member')
+    })
+
+    it('should auto select the member role type by default', () => {
+      expect(roleSelect.props().value).toEqual('member')
     })
   })
 
@@ -244,6 +292,36 @@ describe('RolesAdd', () => {
       })
     })
 
+    describe('when adding to a group', () => {
+      beforeEach(() => {
+        component.selectedUsers = registeredUsers
+        component.handleGroupSelect({ target: { value: fakeGroup.id } })
+      })
+
+      it('should pass the group to onCreateRoles()', done => {
+        component.handleSave().then(() => {
+          expect(props.onCreateRoles).toHaveBeenCalledWith(
+            registeredUsers,
+            'member',
+            Object.assign({}, defaultOpts, { addToGroupId: fakeGroup.id })
+          )
+          done()
+        })
+      })
+
+      describe('when having selected a group', () => {
+        beforeEach(async () => {
+          component.selectedUsers = [fakeGroup, ...registeredUsers]
+          component.handleGroupSelect({ target: { value: fakeGroup.id } })
+          await component.handleSave()
+        })
+
+        it('should throw an alert with the UI store', () => {
+          expect(uiStore.alert).toHaveBeenCalled()
+        })
+      })
+    })
+
     describe('without invites', () => {
       const ev = { target: {} }
 
@@ -258,7 +336,7 @@ describe('RolesAdd', () => {
           expect(props.onCreateRoles).toHaveBeenCalledWith(
             registeredUsers,
             'viewer',
-            { sendInvites: false }
+            { sendInvites: false, addToGroupId: '' }
           )
           done()
         })
