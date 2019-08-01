@@ -163,24 +163,25 @@ class ChartGroup extends React.Component {
       <VictoryAxis
         dependentAxis
         orientation="left"
-        tickValues={[25, 50, 75]}
-        offsetX={30}
+        tickValues={tiers.map(t => t.value)}
+        tickFormat={tiers.map(t => t.name)}
+        offsetX={40}
         style={{
           axis: {
             stroke: 'transparent',
           },
           grid: { stroke: 'black' },
+          ticks: { padding: 10 },
         }}
-      >
-        {tiers.map((tier, i) => (
+        tickLabelComponent={
           <VictoryLabel
-            text={tier.name}
-            x={20}
-            y={tier.value}
-            textAnchor="left"
+            textAnchor="start"
+            verticalAnchor="end"
+            dy={-5}
+            style={{ fontSize: '20px' }}
           />
-        ))}
-      </VictoryAxis>
+        }
+      ></VictoryAxis>
     )
   }
 
