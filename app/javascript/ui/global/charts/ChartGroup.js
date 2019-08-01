@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import { Fragment } from 'react'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import {
@@ -155,6 +156,34 @@ class ChartGroup extends React.Component {
     }
   }
 
+  get tierAxis() {
+    const { tiers } = this.primaryDataset
+    if (!tiers.length) return
+    return (
+      <VictoryAxis
+        dependentAxis
+        orientation="left"
+        tickValues={[25, 50, 75]}
+        offsetX={30}
+        style={{
+          axis: {
+            stroke: 'transparent',
+          },
+          grid: { stroke: 'black' },
+        }}
+      >
+        {tiers.map((tier, i) => (
+          <VictoryLabel
+            text={tier.name}
+            x={20}
+            y={tier.value}
+            textAnchor="left"
+          />
+        ))}
+      </VictoryAxis>
+    )
+  }
+
   get chartAxis() {
     let tickLabelStyle = {}
     if (this.isSmallChartStyle) {
@@ -206,6 +235,8 @@ class ChartGroup extends React.Component {
     // transform properties on SVG
     return this.primaryDatasetValues.length > 1 ? (
       <VictoryAxis
+        dependentAxis={false}
+        orientation="bottom"
         tickLabelComponent={
           <TickLabel
             fontSize={tickLabelStyle.fontSize}
@@ -223,6 +254,7 @@ class ChartGroup extends React.Component {
       />
     ) : (
       <VictoryAxis
+        dependentAxis={false}
         axisLabelComponent={<TickLabel fontSize={tickLabelStyle.fontSize} />}
         style={this.chartAxisStyle}
         tickFormat={t => null}
@@ -304,19 +336,23 @@ class ChartGroup extends React.Component {
             {this.renderedDatasets.map(dataset => dataset)}
           </VictoryGroup>
           {this.chartAxis}
+          {this.tierAxis}
         </VictoryChart>
       )
     }
     return (
-      <VictoryChart
-        theme={victoryTheme}
-        domainPadding={{ y: 80 }}
-        padding={{ top: 0, left: 0, right: 0, bottom: 0 }}
-        containerComponent={<VictoryVoronoiContainer />}
-      >
-        {this.renderedDatasets.map(dataset => dataset)}
-        {this.chartAxis}
-      </VictoryChart>
+      <Fragment>
+        <VictoryChart
+          theme={victoryTheme}
+          domainPadding={{ y: 80 }}
+          padding={{ top: 0, left: 0, right: 0, bottom: 0 }}
+          containerComponent={<VictoryVoronoiContainer />}
+        >
+          {this.renderedDatasets.map(dataset => dataset)}
+          {this.chartAxis}
+          {this.tierAxis}
+        </VictoryChart>
+      </Fragment>
     )
   }
 

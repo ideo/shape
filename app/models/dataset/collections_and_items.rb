@@ -13,6 +13,7 @@
 #  measure          :string
 #  question_type    :string
 #  style            :jsonb
+#  tiers            :jsonb
 #  timeframe        :integer
 #  total            :integer
 #  type             :string
