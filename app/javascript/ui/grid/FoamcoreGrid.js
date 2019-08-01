@@ -10,6 +10,7 @@ import MovableGridCard from '~/ui/grid/MovableGridCard'
 import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
 import v from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
+import { animateScroll as scroll } from 'react-scroll'
 
 // When you have attributes that will change a lot,
 // it's a performance gain to use `styled.div.attrs`
@@ -493,11 +494,26 @@ class FoamcoreGrid extends React.Component {
     this.throttledCalculateCardsToRender()
   }
 
+  get scrollZoomLevel() {
+    return this.zoomLevel === 2 ? 1 : 2
+  }
+
+  get innerCenter() {
+    const { gridH, gutter } = this.gridSettings
+    return window.scrollY > (window.innerHeight - gridH - gutter) / 2
+      ? window.scrollY * this.scrollZoomLevel
+      : 0
+  }
+
   handleZoomOut = ev => {
     if (this.zoomLevel === 3) return
     runInAction(() => {
       this.zoomLevel = this.zoomLevel + 1
     })
+
+    // reset scrollY calculation using inverse math?
+    const zoomOutInnerCenter = this.innerCenter / 2
+    scroll.scrollTo(zoomOutInnerCenter, { duration: 200 })
     this.updateCollectionScrollBottom()
     this.throttledCalculateCardsToRender()
   }
@@ -509,6 +525,7 @@ class FoamcoreGrid extends React.Component {
     })
     this.updateCollectionScrollBottom()
     this.throttledCalculateCardsToRender()
+    scroll.scrollTo(this.innerCenter, { duration: 200 })
   }
 
   updateCollectionScrollBottom() {
