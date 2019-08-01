@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import { computed } from 'mobx'
@@ -19,7 +20,8 @@ const StyledPaddedCover = styled(PaddedCardCover)`
   border-bottom: ${props =>
     !props.isEditing && props.hasTitleText ? '2px solid black' : 'none'};
   background: ${props =>
-    (!props.isEditing && props.hasTitleText) || props.isTransparent
+    (!props.isEditing && !props.dragging && props.hasTitleText) ||
+    props.isTransparent
       ? v.colors.transparent
       : v.colors.white};
 `
@@ -211,14 +213,19 @@ class TextItemCover extends React.Component {
   get hasTitleText() {
     const { props } = this
     const { item } = props
-    const { content } = item
-    const quillDOM = new DOMParser().parseFromString(content, 'text/html')
-    return quillDOM.querySelector('h5')
+    const { data_content } = item
+    let hasTitle = false
+    _.each(data_content.ops, op => {
+      if (op.attributes && op.attributes.header === 5) {
+        hasTitle = true
+      }
+    })
+    return hasTitle
   }
 
   render() {
     const { isEditing, hasTitleText, props } = this
-    const { isTransparent } = props
+    const { isTransparent, dragging } = props
     const content = isEditing ? this.renderEditing() : this.renderDefault()
     return (
       <StyledPaddedCover
@@ -231,6 +238,7 @@ class TextItemCover extends React.Component {
         isEditing={isEditing}
         hasTitleText={hasTitleText}
         isTransparent={isTransparent}
+        dragging={dragging}
       >
         <QuillStyleWrapper notEditing={!isEditing} hasTitleText={hasTitleText}>
           {this.state.loading && <InlineLoader />}
