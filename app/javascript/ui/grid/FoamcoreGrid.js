@@ -507,7 +507,7 @@ class FoamcoreGrid extends React.Component {
         left: window.pageXOffset / 3,
         behavior: 'auto',
       })
-    }, 200)
+    }, 10)
   }
 
   handleZoomIn = ev => {
@@ -523,7 +523,7 @@ class FoamcoreGrid extends React.Component {
         left: window.pageXOffset * 3,
         behavior: 'auto',
       })
-    }, 200)
+    }, 10)
   }
 
   updateCollectionScrollBottom() {
