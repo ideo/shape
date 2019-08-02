@@ -4,7 +4,8 @@ exports[`TextItemCover renders snapshot 1`] = `
 <Styled(styled.div)
   class="cancelGridClick"
   data-cy="TextItemCover"
-  hasTitleText={null}
+  dragging={false}
+  hasTitleText={false}
   isEditing={false}
   isTransparent={false}
   onClick={[Function]}
@@ -15,7 +16,7 @@ exports[`TextItemCover renders snapshot 1`] = `
   }
 >
   <styled.div
-    hasTitleText={null}
+    hasTitleText={false}
     notEditing={true}
   >
     <Quill
