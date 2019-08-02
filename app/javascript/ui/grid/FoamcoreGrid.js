@@ -500,8 +500,8 @@ class FoamcoreGrid extends React.Component {
 
   get innerCenter() {
     const { gridH, gutter } = this.gridSettings
-    return window.scrollY > (window.innerHeight - gridH - gutter) / 2
-      ? window.scrollY * this.scrollZoomLevel
+    return window.pageYOffset > (window.innerHeight - gridH - gutter) / 2
+      ? window.pageYOffset * this.scrollZoomLevel
       : 0
   }
 
