@@ -36,3 +36,6 @@ else
   # echo 'Opening code editor and browser...'
   ttab "$EDITOR . && open http://localhost:3000"
 fi
+
+# add network-react-components
+git submodule update --init

@@ -392,10 +392,15 @@ class GridCard extends React.Component {
 
   get transparentBackground() {
     const { cardType, record } = this.props
-    // If this is a legend or data item, it's transparent
-    if (cardType === 'items' && (record.isLegend || record.isData)) return true
     // If a data item and is a collection cover, it's transparent
     if (this.coverItem && this.coverItem.isData) return true
+    // If this is a legend, data or text item it's transparent
+    if (
+      cardType === 'items' &&
+      (record.isLegend || record.isData || record.isText)
+    ) {
+      return true
+    }
 
     return false
   }
@@ -433,7 +438,9 @@ class GridCard extends React.Component {
 
     return (
       <StyledGridCard
-        background={this.transparentBackground ? 'transparent' : 'white'}
+        background={
+          this.transparentBackground ? v.colors.transparent : v.colors.white
+        }
         className="gridCard"
         id={`gridCard-${card.id}`}
         dragging={dragging}
@@ -522,7 +529,7 @@ class GridCard extends React.Component {
         {/* onClick placed here so it's separate from hotspot click */}
         <StyledGridCardInner
           onClick={this.handleClick}
-          hasOverflow={record.isData || record.isLegend}
+          hasOverflow={record.isData || record.isLegend || record.isText}
           filter={card.filter}
           forceFilter={!this.hasCover}
           isText={record.isText}

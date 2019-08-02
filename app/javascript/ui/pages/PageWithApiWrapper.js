@@ -9,6 +9,7 @@ import CollectionPage from '~/ui/pages/CollectionPage'
 import ItemPage from '~/ui/pages/ItemPage'
 import trackError from '~/utils/trackError'
 import routeToLogin from '~/utils/routeToLogin'
+import _ from 'lodash'
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -109,6 +110,17 @@ class PageWithApiWrapper extends React.Component {
       .then(res => {
         if (this.unmounted) return
         const { data } = res
+        const { id } = match.params
+
+        if (id && id.toString() === this.fetchId) {
+          // Update URL so collections and items have slug with id and name
+          history.replaceState(
+            {},
+            data.name,
+            `${data.id}-${_.kebabCase(data.name)}`
+          )
+        }
+
         data.fullyLoaded = true
         this.setState({ data })
       })

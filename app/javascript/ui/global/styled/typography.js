@@ -219,7 +219,11 @@ export const HugeNumber = Heading1.extend`
 `
 
 export const QuillStyleWrapper = styled.div`
-  height: 100%;
+  ${props =>
+    props.notEditing && props.hasTitleText
+      ? 'height: calc(100% - 40px); margin-top: 40px;'
+      : 'height: 100%;'}
+
   .quill {
     height: 100%;
 
@@ -229,15 +233,25 @@ export const QuillStyleWrapper = styled.div`
     }
 
     h1,
-    h3 {
+    h2 {
       margin-bottom: 0.75rem;
     }
 
-    h3 {
+    h2 {
       font-size: 0.8125rem;
       letter-spacing: 1px;
       margin-bottom: 0.8125rem;
       text-transform: uppercase;
+    }
+
+    h5 {
+      color: ${v.colors.black};
+      font-size: 4rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      line-height: 4rem;
+      text-transform: none;
+      vertical-align: bottom;
     }
 
     p {
@@ -248,7 +262,7 @@ export const QuillStyleWrapper = styled.div`
       margin-bottom: 0.625rem;
     }
 
-    p + h3 {
+    p + h2 {
       margin-top: 0.85rem;
     }
 
@@ -260,6 +274,10 @@ export const QuillStyleWrapper = styled.div`
 
     .ql-container {
       ${props => (props.notEditing ? '' : 'overflow: visible !important;')};
+      ${props =>
+        props.notEditing && props.hasTitleText
+          ? 'justify-content: flex-end;'
+          : ''};
     }
 
     .ql-cursor {
@@ -273,6 +291,10 @@ export const QuillStyleWrapper = styled.div`
     .ql-editor {
       overflow-x: hidden;
       ${props => (props.notEditing ? 'overflow-y: hidden;' : '')};
+      ${props =>
+        props.notEditing && props.hasTitleText
+          ? 'display: block; height: auto; flex: initial;'
+          : ''};
     }
   }
 `

@@ -1,22 +1,26 @@
+import ReactDOMServer from 'react-dom/server'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
 import ExpandIcon from '~/ui/icons/ExpandIcon'
+import LinkIcon from '~/ui/icons/LinkIcon'
+import ReactQuill from 'react-quill'
+
+// see: https://github.com/zenoamaro/react-quill/issues/188#issuecomment-445272662
+const icons = ReactQuill.Quill.import('ui/icons')
+icons['link'] = () => ReactDOMServer.renderToString(<LinkIcon />)
 
 const StyledButton = styled.button`
   color: ${v.colors.commonDark};
   &.ql-format-reg {
-    font-size: 0.9rem;
-    font-family: 'Sentintel', serif;
+    font-family: ${v.fonts.sans};
   }
-  &.ql-format-large {
+  &.ql-format-title {
+    font-family: ${v.fonts.sans};
     font-size: 1.1rem;
-    font-family: ${v.fonts.sans};
-  }
-  &.ql-format-huge {
-    font-size: 1.3rem;
-    font-family: ${v.fonts.sans};
+    font-weight: bold;
+    text-align: center;
   }
 `
 
@@ -30,19 +34,26 @@ const TextItemToolbar = props => (
   <div id="quill-toolbar">
     <span className="ql-formats">
       <StyledButton className="ql-header ql-format-reg" value="">
-        T
+        b
       </StyledButton>
-      {/* when using H2, quill inserts its own SVG -- couldn't figure out a way around */}
-      <StyledButton className="ql-header ql-format-large" value="3">
-        T
-      </StyledButton>
-      <StyledButton className="ql-header ql-format-huge" value="1">
+      <StyledButton
+        className="ql-header ql-format-large"
+        value="2"
+      ></StyledButton>
+      <StyledButton
+        className="ql-header ql-format-huge"
+        value="1"
+      ></StyledButton>
+      {/* use h5 for title */}
+      <StyledButton className="ql-header ql-format-title" value="5">
         T
       </StyledButton>
       {/* quill inserts ql-link SVG */}
-      <StyledButton className="ql-link" />
+      <StyledButton className="ql-link">
+        <LinkIcon />
+      </StyledButton>
       {props.onExpand && (
-        <IconButton onClick={props.onExpand}>
+        <IconButton onClick={props.onExpand} className="ql-expand">
           <ExpandIcon />
         </IconButton>
       )}
