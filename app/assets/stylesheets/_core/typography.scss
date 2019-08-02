@@ -35,6 +35,13 @@ html {
 
 @font-face {
   font-family: 'Gotham';
+  src: asset-url('Gotham-Bold.otf');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Gotham';
   src: asset-url('Gotham-Medium.otf');
   font-weight: 500;
   font-style: normal;

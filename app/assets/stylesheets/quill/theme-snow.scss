@@ -10,6 +10,11 @@ $dark: #06c;
 .ql-snow.ql-toolbar button {
   height: auto;
 }
+.ql-snow.ql-toolbar button.ql-header {
+  &:hover{
+    border-bottom: 1px solid black;
+  }
+}
 .ql-snow .ql-stroke {
   stroke-width: 1.5px;
 }
