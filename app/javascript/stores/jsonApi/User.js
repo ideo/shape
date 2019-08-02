@@ -51,6 +51,18 @@ class User extends BaseRecord {
     }
   }
 
+  async API_acceptCurrentOrgTerms() {
+    try {
+      return await this.apiStore.request(
+        'users/accept_current_org_terms',
+        'PATCH'
+      )
+    } catch (e) {
+      uiStore.defaultAlertError()
+      return Promise.reject(e)
+    }
+  }
+
   API_acceptFeedbackTerms() {
     return this.API_updateCurrentUser({
       feedback_terms_accepted: true,

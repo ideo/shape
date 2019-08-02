@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
@@ -265,9 +266,17 @@ class CollectionCover extends React.Component {
 
   handleClick = e => {
     const { searchResult, dragging, uiStore, collection } = this.props
+    const { movingCardIds } = uiStore
+    const movingCard =
+      movingCardIds &&
+      _.includes(
+        movingCardIds,
+        collection.parent_collection_card &&
+          collection.parent_collection_card.id
+      )
     const makingSelection =
       (e.metaKey || e.ctrlKey || e.shiftKey) && uiStore.selectedCardIds.length
-    if (dragging || makingSelection) {
+    if (dragging || makingSelection || movingCard) {
       e.preventDefault()
       return false
     }
@@ -320,6 +329,7 @@ class CollectionCover extends React.Component {
                 initialFontTag={'P'}
                 hideReadMore
                 uneditable
+                isTransparent={true}
               />
             </div>
           ) : (

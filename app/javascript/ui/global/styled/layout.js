@@ -44,6 +44,10 @@ RowItemLeft.displayName = 'StyledRowItemLeft'
 /** @component */
 export const RowItemRight = styled.span`
   margin-left: auto;
+
+  &:last-child {
+    margin-left: 10px;
+  }
 `
 RowItemRight.displayName = 'StyledRowItemRight'
 

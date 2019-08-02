@@ -1,5 +1,5 @@
 import MoveModal from '~/ui/grid/MoveModal'
-import { fakeCollection, fakeUser } from '#/mocks/data'
+import { fakeCollection, fakeUser, fakeItemCard } from '#/mocks/data'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 import fakeApiStore from '#/mocks/fakeApiStore'
@@ -12,10 +12,12 @@ describe('MoveModal', () => {
     uiStore.viewingCollection = {
       id: 3,
       API_fetchCards: jest.fn(),
+      movingCardIds: [10],
     }
     props = {
       apiStore: fakeApiStore({
         requestResult: { data: fakeCollection },
+        findResult: fakeItemCard,
       }),
       uiStore,
     }

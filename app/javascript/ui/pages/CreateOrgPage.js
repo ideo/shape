@@ -1,6 +1,7 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import askForInvitationImage from '~/assets/ask_for_invitation.png'
 import createNewOrgImage from '~/assets/create_new_org.png'
+import v from '~/utils/variables'
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -60,6 +61,7 @@ class CreateOrgPage extends React.Component {
       onConfirm: this.onConfirm,
       onCancel: this.onCancel,
       closeable: false,
+      backgroundColor: v.colors.white,
     })
   }
 

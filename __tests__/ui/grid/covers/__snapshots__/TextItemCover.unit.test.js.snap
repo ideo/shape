@@ -1,9 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`TextItemCover renders snapshot 1`] = `
-<styled.div
+<Styled(styled.div)
   class="cancelGridClick"
   data-cy="TextItemCover"
+  dragging={false}
+  hasTitleText={false}
+  isEditing={false}
+  isTransparent={false}
   onClick={[Function]}
   style={
     Object {
@@ -12,6 +16,7 @@ exports[`TextItemCover renders snapshot 1`] = `
   }
 >
   <styled.div
+    hasTitleText={false}
     notEditing={true}
   >
     <Quill
@@ -30,5 +35,5 @@ exports[`TextItemCover renders snapshot 1`] = `
       }
     />
   </styled.div>
-</styled.div>
+</Styled(styled.div)>
 `;
