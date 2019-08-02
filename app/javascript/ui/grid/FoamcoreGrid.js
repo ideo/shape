@@ -493,13 +493,6 @@ class FoamcoreGrid extends React.Component {
     this.throttledCalculateCardsToRender()
   }
 
-  get centerScrollY() {
-    const { gridH, gutter } = this.gridSettings
-    return window.pageYOffset > (window.innerHeight - gridH - gutter) / 2
-      ? window.pageYOffset
-      : 0
-  }
-
   handleZoomOut = ev => {
     if (this.zoomLevel === 3) return
     runInAction(() => {
@@ -510,7 +503,7 @@ class FoamcoreGrid extends React.Component {
     this.throttledCalculateCardsToRender()
     setTimeout(() => {
       window.scrollTo({
-        top: this.centerScrollY / 1.9,
+        top: window.pageYOffset / 1.9,
         left: window.pageXOffset / 3,
         behavior: 'auto',
       })
@@ -526,7 +519,7 @@ class FoamcoreGrid extends React.Component {
     this.throttledCalculateCardsToRender()
     setTimeout(() => {
       window.scrollTo({
-        top: this.centerScrollY * 1.9,
+        top: window.pageYOffset * 1.9,
         left: window.pageXOffset * 3,
         behavior: 'auto',
       })
