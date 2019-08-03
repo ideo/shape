@@ -140,6 +140,7 @@ group :development, :test do
   gem 'rails-controller-testing'
   gem 'action-cable-testing'
   gem 'active_record_query_trace'
+  gem 'lefthook'
 end
 
 group :development do
