@@ -14,6 +14,16 @@
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
+  if ENV['CRYSTALBALL'] == 'true'
+     require 'crystalball'
+     require 'crystalball/rails'
+
+     Crystalball::MapGenerator.start! do |config|
+       config.register Crystalball::MapGenerator::CoverageStrategy.new
+       config.register Crystalball::Rails::MapGenerator::I18nStrategy.new
+       config.register Crystalball::MapGenerator::DescribedClassStrategy.new
+     end
+   end
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
   # assertions if you prefer.

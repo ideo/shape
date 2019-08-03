@@ -141,6 +141,7 @@ group :development, :test do
   gem 'action-cable-testing'
   gem 'active_record_query_trace'
   gem 'lefthook'
+  gem 'crystalball'
 end
 
 group :development do
