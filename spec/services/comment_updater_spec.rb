@@ -17,43 +17,55 @@ RSpec.describe CommentUpdater, type: :service do
       comment_thread: comment_thread,
       author: author,
       draftjs_data: {
-        'blocks' =>
-         [{ 'key' => 'a0te4',
-            'data' => {},
-            'text' => 'hi @group and @person how r u doing?',
-            'type' => 'unstyled',
-            'depth' => 0 }],
-        'entityMap' =>
-          {
-            '0' =>
-            { 'data' =>
-              { 'mention' =>
-                { 'id' => "#{originally_mentioned_user.id}__users",
-                  'name' => originally_mentioned_user.name,
-                  'handle' => originally_mentioned_user.handle } },
-              'type' => 'mention',
-              'mutability' => 'IMMUTABLE'},,
-            '1' =>
-            { 'data' =>
-              { 'mention' =>
-                { 'id' => "#{formerly_mentioned_user.id}__users",
-                  'name' => formerly_mentioned_user.name,
-                  'handle' => formerly_mentioned_user.handle } },
-              'type' => 'mention',
-              'mutability' => 'IMMUTABLE'},,
-            '2' =>
-            { 'data' =>
-              { 'mention' =>
-                { 'id' => "#{originally_mentioned_group.id}__groups", 'name' => 'Open IDEO', 'handle' => 'open-ideo' } },
-              'type' => 'mention',
-              'mutability' => 'IMMUTABLE'},,
-            '3' =>
-            { 'data' =>
-              { 'mention' =>
-                { 'id' => "#{formerly_mentioned_group.id}__groups", 'name' => 'Open IDEO', 'handle' => 'open-ideo' } },
-              'type' => 'mention',
-              'mutability' => 'IMMUTABLE'},,
+        'blocks' => [{
+          'key' => 'a0te4',
+          'data' => {},
+          'text' => 'hi @group and @person how r u doing?',
+          'type' => 'unstyled',
+          'depth' => 0,
+        }],
+        'entityMap' => {
+          '0' => {
+            'data' => {
+              'mention' => {
+                'id' => "#{originally_mentioned_user.id}__users",
+                'name' => originally_mentioned_user.name,
+                'handle' => originally_mentioned_user.handle,
+              },
+            },
+            'type' => 'mention',
+            'mutability' => 'IMMUTABLE',
           },
+          '1' => {
+            'data' => {
+              'mention' => {
+                'id' => "#{formerly_mentioned_user.id}__users",
+                'name' => formerly_mentioned_user.name,
+                'handle' => formerly_mentioned_user.handle,
+              },
+            },
+            'type' => 'mention',
+            'mutability' => 'IMMUTABLE',
+          },
+          '2' => {
+            'data' => {
+              'mention' => {
+                'id' => "#{originally_mentioned_group.id}__groups", 'name' => 'Open IDEO', 'handle' => 'open-ideo'
+              },
+            },
+            'type' => 'mention',
+            'mutability' => 'IMMUTABLE',
+          },
+          '3' => {
+            'data' => {
+              'mention' => {
+                'id' => "#{formerly_mentioned_group.id}__groups", 'name' => 'Open IDEO', 'handle' => 'open-ideo'
+              },
+            },
+            'type' => 'mention',
+            'mutability' => 'IMMUTABLE',
+          },
+        },
       },
     )
   end
@@ -65,43 +77,55 @@ RSpec.describe CommentUpdater, type: :service do
       comment: comment,
       message: message,
       draftjs_data: {
-        'blocks' =>
-         [{ 'key' => 'a0te4',
-            'data' => {},
-            'text' => 'hi @group and @person how r u doing?',
-            'type' => 'unstyled',
-            'depth' => 0 }],
-        'entityMap' =>
-          {
-            '0' =>
-            { 'data' =>
-              { 'mention' =>
-                { 'id' => "#{originally_mentioned_user.id}__users",
-                  'name' => originally_mentioned_user.name,
-                  'handle' => originally_mentioned_user.handle } },
-              'type' => 'mention',
-              'mutability' => 'IMMUTABLE'},,
-            '1' =>
-            { 'data' =>
-              { 'mention' =>
-                { 'id' => "#{newly_mentioned_user.id}__users",
-                  'name' => newly_mentioned_user.name,
-                  'handle' => newly_mentioned_user.handle } },
-              'type' => 'mention',
-              'mutability' => 'IMMUTABLE'},,
-            '2' =>
-            { 'data' =>
-              { 'mention' =>
-                { 'id' => "#{originally_mentioned_group.id}__groups", 'name' => 'Open IDEO', 'handle' => 'open-ideo' } },
-              'type' => 'mention',
-              'mutability' => 'IMMUTABLE'},,
-            '3' =>
-            { 'data' =>
-              { 'mention' =>
-                { 'id' => "#{newly_mentioned_group.id}__groups", 'name' => 'Open IDEO', 'handle' => 'open-ideo' } },
-              'type' => 'mention',
-              'mutability' => 'IMMUTABLE'},,
+        'blocks' => [{
+          'key' => 'a0te4',
+          'data' => {},
+          'text' => 'hi @group and @person how r u doing?',
+          'type' => 'unstyled',
+          'depth' => 0,
+        }],
+        'entityMap' => {
+          '0' => {
+            'data' => {
+              'mention' => {
+                'id' => "#{originally_mentioned_user.id}__users",
+                'name' => originally_mentioned_user.name,
+                'handle' => originally_mentioned_user.handle,
+              },
+            },
+            'type' => 'mention',
+            'mutability' => 'IMMUTABLE',
           },
+          '1' => {
+            'data' => {
+              'mention' => {
+                'id' => "#{newly_mentioned_user.id}__users",
+                'name' => newly_mentioned_user.name,
+                'handle' => newly_mentioned_user.handle,
+              },
+            },
+            'type' => 'mention',
+            'mutability' => 'IMMUTABLE',
+          },
+          '2' => {
+            'data' => {
+              'mention' => {
+                'id' => "#{originally_mentioned_group.id}__groups", 'name' => 'Open IDEO', 'handle' => 'open-ideo'
+              },
+            },
+            'type' => 'mention',
+            'mutability' => 'IMMUTABLE',
+          },
+          '3' => {
+            'data' => {
+              'mention' => {
+                'id' => "#{newly_mentioned_group.id}__groups", 'name' => 'Open IDEO', 'handle' => 'open-ideo'
+              },
+            },
+            'type' => 'mention',
+            'mutability' => 'IMMUTABLE',
+          },
+        },
       },
     )
   end
