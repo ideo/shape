@@ -222,7 +222,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         datasets = json_included_objects_of_type('datasets')
         expect(datasets.size).to eq(1)
         expect(
-          datasets.map{ |d| d['id'].to_i },
+          datasets.map { |d| d['id'].to_i },
         ).to eq(data_item.datasets.map(&:id))
       end
 

@@ -32,8 +32,7 @@ RSpec.describe CommentUpdater, type: :service do
                   'name' => originally_mentioned_user.name,
                   'handle' => originally_mentioned_user.handle } },
               'type' => 'mention',
-              'mutability' => 'IMMUTABLE'
-            },
+              'mutability' => 'IMMUTABLE'},,
             '1' =>
             { 'data' =>
               { 'mention' =>
@@ -41,22 +40,19 @@ RSpec.describe CommentUpdater, type: :service do
                   'name' => formerly_mentioned_user.name,
                   'handle' => formerly_mentioned_user.handle } },
               'type' => 'mention',
-              'mutability' => 'IMMUTABLE'
-            },
+              'mutability' => 'IMMUTABLE'},,
             '2' =>
             { 'data' =>
               { 'mention' =>
                 { 'id' => "#{originally_mentioned_group.id}__groups", 'name' => 'Open IDEO', 'handle' => 'open-ideo' } },
               'type' => 'mention',
-              'mutability' => 'IMMUTABLE'
-            },
+              'mutability' => 'IMMUTABLE'},,
             '3' =>
             { 'data' =>
               { 'mention' =>
                 { 'id' => "#{formerly_mentioned_group.id}__groups", 'name' => 'Open IDEO', 'handle' => 'open-ideo' } },
               'type' => 'mention',
-              'mutability' => 'IMMUTABLE'
-            },
+              'mutability' => 'IMMUTABLE'},,
           },
       },
     )
@@ -84,8 +80,7 @@ RSpec.describe CommentUpdater, type: :service do
                   'name' => originally_mentioned_user.name,
                   'handle' => originally_mentioned_user.handle } },
               'type' => 'mention',
-              'mutability' => 'IMMUTABLE'
-            },
+              'mutability' => 'IMMUTABLE'},,
             '1' =>
             { 'data' =>
               { 'mention' =>
@@ -93,25 +88,22 @@ RSpec.describe CommentUpdater, type: :service do
                   'name' => newly_mentioned_user.name,
                   'handle' => newly_mentioned_user.handle } },
               'type' => 'mention',
-              'mutability' => 'IMMUTABLE'
-            },
+              'mutability' => 'IMMUTABLE'},,
             '2' =>
             { 'data' =>
               { 'mention' =>
                 { 'id' => "#{originally_mentioned_group.id}__groups", 'name' => 'Open IDEO', 'handle' => 'open-ideo' } },
               'type' => 'mention',
-              'mutability' => 'IMMUTABLE'
-            },
+              'mutability' => 'IMMUTABLE'},,
             '3' =>
             { 'data' =>
               { 'mention' =>
                 { 'id' => "#{newly_mentioned_group.id}__groups", 'name' => 'Open IDEO', 'handle' => 'open-ideo' } },
               'type' => 'mention',
-              'mutability' => 'IMMUTABLE'
-            },
+              'mutability' => 'IMMUTABLE'},,
           },
       },
-)
+    )
   end
 
   describe '#call' do

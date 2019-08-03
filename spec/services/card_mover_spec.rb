@@ -103,12 +103,11 @@ RSpec.describe CardMover, type: :service do
       context 'when to_collection is a foamcore board' do
         let!(:to_collection) do
           create(:board_collection,
-            num_cards: 3,
-            add_editors: [user],
-            organization: organization
-          )
+                 num_cards: 3,
+                 add_editors: [user],
+                 organization: organization)
         end
-        let(:placement) { "end" }
+        let(:placement) { 'end' }
 
         it 'sets row of moved cards 2 rows after the last non-blank row' do
           card_mover.call
@@ -142,16 +141,14 @@ RSpec.describe CardMover, type: :service do
         card_mover.call
       end
 
-
       context 'when to_collection is a foamcore board' do
         let!(:to_collection) do
           create(:board_collection,
-            num_cards: 3,
-            add_editors: [user],
-            organization: organization
-          )
+                 num_cards: 3,
+                 add_editors: [user],
+                 organization: organization)
         end
-        let(:placement) { "end" }
+        let(:placement) { 'end' }
 
         it 'sets row of linked cards 2 rows after the last non-blank row' do
           card_mover.call
@@ -172,7 +169,8 @@ RSpec.describe CardMover, type: :service do
         create(
           :data_item,
           :report_type_record,
-          parent_collection: from_collection)
+          parent_collection: from_collection,
+        )
       end
       let(:legend_item) { data_item.legend_item }
 

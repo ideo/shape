@@ -214,9 +214,7 @@ class Group < ApplicationRecord
     self.handle = handle.parameterize
     original_handle = handle
     i = 0
-    while Group.where(organization_id: organization_id, handle: handle).count.positive?
-      self.handle = "#{original_handle}-#{i += 1}"
-    end
+    self.handle = "#{original_handle}-#{i += 1}" while Group.where(organization_id: organization_id, handle: handle).count.positive?
   end
 
   def after_archive_group

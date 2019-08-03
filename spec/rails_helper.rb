@@ -77,7 +77,7 @@ RSpec.configure do |config|
     Searchkick.models.each do |model|
       begin
         model.search_index.delete
-      rescue
+      rescue StandardError
       end
 
       model.reindex

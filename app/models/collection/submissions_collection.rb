@@ -86,7 +86,7 @@ class Collection
         {
           question_type: question_type,
           question_title: data[:title],
-         }
+        }
       end
     end
   end

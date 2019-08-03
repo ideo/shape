@@ -19,8 +19,8 @@ module ApiHelper
     params = {
       data: {
         type: resource_name,
-        attributes: attrs
-      }.merge(merge_data)
+        attributes: attrs,
+      }.merge(merge_data),
     }.to_json
   end
 

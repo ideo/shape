@@ -34,8 +34,8 @@ describe Collection::SubmissionsCollection, type: :model do
           {
             question_type: 'question_useful',
             question_title: 'Usefulness',
-          }
-        ]
+          },
+        ],
       )
     end
   end

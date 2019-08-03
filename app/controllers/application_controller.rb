@@ -23,7 +23,6 @@ class ApplicationController < ActionController::Base
     return if org_slug.blank?
 
     @redirect_organization = Organization.friendly.find(org_slug)
-
   rescue ActiveRecord::RecordNotFound
     # no-op, organization not found by slug
   end

@@ -551,7 +551,7 @@ describe Collection, type: :model do
 
     it 'returns cards on page' do
       expect(collection.collection_cards_by_page(page: 2, per_page: 1)).to eq(
-        [collection.collection_cards[1]]
+        [collection.collection_cards[1]],
       )
     end
   end
@@ -577,7 +577,7 @@ describe Collection, type: :model do
         collection.collection_cards_by_row_and_col(
           rows: [3, 10],
           cols: [4, 6],
-        )
+        ),
       ).to match_array(matching_cards)
     end
   end

@@ -11,12 +11,10 @@ class FirestoreBatchWriter
   # expects objects in the form of ["klass", "id"]
   def retrieve_objects(objects)
     objects.map do |klass, id|
-      begin
-        klass.classify.constantize.find(id)
-      rescue ActiveRecord::RecordNotFound
-        # record has already been deleted, no prob...
-        logger.debug 'record already deleted.'
-      end
+      klass.classify.constantize.find(id)
+    rescue ActiveRecord::RecordNotFound
+      # record has already been deleted, no prob...
+      logger.debug 'record already deleted.'
     end
   end
 

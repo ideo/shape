@@ -152,15 +152,15 @@ class CollectionCardFilter < SimpleService
     )
 
     @cards = @cards
-      .joins(join_sql).where(
-        "(collection_cards.item_id IS NOT NULL AND external_records.externalizable_type = 'Item') OR " \
-        "(collection_cards.collection_id IS NOT NULL AND external_records.externalizable_type = 'Collection')",
-      )
-      .where(
-        ExternalRecord.arel_table[:external_id].eq(@filters[:external_id])
-        .and(
-          ExternalRecord.arel_table[:application_id].eq(@application.id),
-        )
-      )
+             .joins(join_sql).where(
+               "(collection_cards.item_id IS NOT NULL AND external_records.externalizable_type = 'Item') OR " \
+               "(collection_cards.collection_id IS NOT NULL AND external_records.externalizable_type = 'Collection')",
+             )
+             .where(
+               ExternalRecord.arel_table[:external_id].eq(@filters[:external_id])
+               .and(
+                 ExternalRecord.arel_table[:application_id].eq(@application.id),
+               ),
+             )
   end
 end

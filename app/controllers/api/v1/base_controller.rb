@@ -51,7 +51,7 @@ class Api::V1::BaseController < ApplicationController
       current_user: current_user || User.new,
       current_ability: current_ability,
       current_api_token: current_api_token,
-      frontend_url_for: lambda { |obj| frontend_url_for(obj) }
+      frontend_url_for: lambda { |obj| frontend_url_for(obj) },
     }
   end
 
@@ -68,7 +68,7 @@ class Api::V1::BaseController < ApplicationController
       first: 1,
       last: collection.total_pages,
       prev: collection.first_page? ? nil : current_page - 1,
-      next: collection.last_page? ? nil : current_page + 1
+      next: collection.last_page? ? nil : current_page + 1,
     }
   end
 

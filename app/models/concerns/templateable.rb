@@ -196,16 +196,16 @@ module Templateable
 
   def templated_cards_by_templated_from_id
     @templated_cards_by_templated_from_id ||= collection_cards
-    .where.not(templated_from: nil)
-    .each_with_object({}) do |card, h|
+                                              .where.not(templated_from: nil)
+                                              .each_with_object({}) do |card, h|
       h[card.templated_from_id] = card
     end
   end
 
   def pinned_cards_by_id
     @pinned_cards_by_id ||= collection_cards
-    .pinned
-    .each_with_object({}) do |card, h|
+                            .pinned
+                            .each_with_object({}) do |card, h|
       h[card.id] = card
     end
   end

@@ -32,9 +32,7 @@ describe Api::V1::NotificationsController, type: :request, json: true, auth: tru
     let(:params) do
       json_api_params(
         'notifications',
-        {
-          read: true,
-        }
+        read: true,
       )
     end
 

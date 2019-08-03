@@ -25,7 +25,7 @@ RSpec.describe Item::QuestionItem, type: :model do
           allow_any_instance_of(Item::QuestionItem).to receive(:parent).and_return(test_design)
           question_item = create(:question_item)
           expect(
-            test_design
+            test_design,
           ).to have_received(:question_item_created).with(question_item)
         end
       end

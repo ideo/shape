@@ -7,7 +7,7 @@ RSpec.describe TestCollectionMailer, type: :mailer do
       :test_collection,
       test_status: :live,
       test_launched_at: DateTime.new(2019, 5, 20, 8, 57),
-      collection_to_test: collection_to_test
+      collection_to_test: collection_to_test,
     )
   end
   let!(:audience) { create(:audience) }
@@ -30,7 +30,7 @@ RSpec.describe TestCollectionMailer, type: :mailer do
       expect(body).to include("Test name: #{collection.name}")
       expect(body).to include("Test URL: http://test.shape.com//tests/#{collection.id}")
       expect(body).to include("Test ID: #{collection.id}")
-      expect(body).to include("Test launched: 5/20/2019 08:57AM")
+      expect(body).to include('Test launched: 5/20/2019 08:57AM')
       expect(body).to include("Feedback collection URL: http://test.shape.com//collections/#{collection_to_test.id}")
       expect(body).to include("Feedback design collection URL: http://test.shape.com//collections/#{collection.id}")
       expect(body).to include("#{audience.name}: #{test_audience.sample_size}")
@@ -59,7 +59,7 @@ RSpec.describe TestCollectionMailer, type: :mailer do
 
     it 'should have correct subject' do
       expect(mail.subject).to eq(
-        "Your #{collection.name} feedback has been completed."
+        "Your #{collection.name} feedback has been completed.",
       )
     end
 
