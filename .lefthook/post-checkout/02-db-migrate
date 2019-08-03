@@ -1,0 +1,53 @@
+#!/usr/bin/env ruby
+
+require "git"
+
+# Rails.root if we look from .lefthook/post-checkout dir
+app_dir = File.expand_path("../..", __dir__)
+
+git = Git.open(app_dir)
+
+# Don't run if there were no database changes between revisions
+diff = git.diff(prev_head, curr_head).path("db/migrate")
+exit if diff.size.zero?
+
+require File.expand_path("config/boot", app_dir)
+require File.expand_path("config/application", app_dir)
+require "rake"
+Rails.application.load_tasks
+
+Rake::Task["db:load_config"].invoke
+
+# migrations added in prev_head (deleted in curr_head) that we need to rollback
+rollback_migration_files = diff.select { |file| file.type == "deleted" }
+
+if rollback_migration_files.any?
+  require "tmpdir"
+  MigrationFilenameRegexp = ActiveRecord::Migration::MigrationFilenameRegexp
+  versions = []
+
+  Dir.mktmpdir do |directory|
+    rollback_migration_files.each do |diff_file|
+      filename = File.basename(diff_file.path)
+      contents = git.gblob("#{prev_head}:#{diff_file.path}").contents
+      File.write(File.join(directory, filename), contents)
+      version = filename.scan(MigrationFilenameRegexp).first&.first
+      versions.push(version) if version
+    end
+  end
+end
+
+begin
+  old_migration_paths = ActiveRecord::Migrator.migrations_paths
+  ActiveRecord::Migrator.migrations_paths.push(directory)
+
+  versions.sort.reverse_each do |version|
+    ENV["VERSION"] = version
+    Rake::Task["db:migrate:down"].execute
+  end
+ensure
+  ENV.delete("VERSION")
+  ActiveRecord::Migrator.migrations_paths = old_migration_paths
+end
+
+Rake::Task["db:migrate"].invoke

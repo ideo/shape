@@ -1,5 +1,4 @@
-# Managing our hooks
-
+# Managing git hooks
 pre-commit:
   commands:
     lint:
@@ -18,8 +17,13 @@ pre-push: # githook name
       run: yarn audit # command for execution
 
 post-checkout:
+  piped: true # Exit early if preceding command fails
   scripts:
-    crystalball-update:
+    01-bundle-checkinstall:
+      tags: backend
+    02-db-migrate:
+      tags: backend
+    03-crystalball-update:
       tags: rspec backend
 
 

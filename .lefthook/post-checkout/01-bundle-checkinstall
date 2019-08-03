@@ -1,0 +1,15 @@
+#!/bin/bash
+
+BRANCH_CHANGE=$3
+[[ $BRANCH_CHANGE -eq 0 ]] && exit
+
+PREV_HEAD=$1
+CURR_HEAD=$2
+[ $PREV_HEAD == $CURR_HEAD ] && exit
+
+
+# Don't run bundler if there were no changes in gems
+git diff --quiet --exit-code $PREV_HEAD $CURR_HEAD -- Gemfile.lock && exit;
+
+bundle check || bundle install
+
