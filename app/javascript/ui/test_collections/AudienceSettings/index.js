@@ -50,7 +50,7 @@ class AudienceSettings extends React.Component {
   fetchAvailableAudiences = async () => {
     const { apiStore } = this.props
 
-    console.log('FCETCHING ASUDIENCES', IdeoSSO)
+    // console.log('FCETCHING ASUDIENCES', IdeoSSO)
     await apiStore.fetchOrganizationAudiences(
       apiStore.currentUserOrganizationId
     )

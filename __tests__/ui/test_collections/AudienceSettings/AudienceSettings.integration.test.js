@@ -1,36 +1,44 @@
 const path = require('path')
 
-import 'node-fetch'
 import { Polly } from '@pollyjs/core'
-import NodeHttpAdapter from '@pollyjs/adapter-node-http'
 import FileStoragePersister from '@pollyjs/persister-fs'
 import { Provider } from 'mobx-react'
+import { setupPolly } from 'setup-polly-jest'
+import FetchAdapter from '@pollyjs/adapter-fetch'
 
 import { apiStore, uiStore } from '~/stores'
 import AudienceSettings from '~/ui/test_collections/AudienceSettings'
 import Collection from '~/stores/jsonApi/Collection'
-import sleep from '~/utils/sleep'
+// import sleep from '~/utils/sleep'
 
-Polly.register(NodeHttpAdapter)
 Polly.register(FileStoragePersister)
+Polly.register(FetchAdapter)
 
 describe('AudienceSettings', function() {
   describe('something', function() {
-    /*
-      Create a new polly instance.
-
-      Connect Polly to fetch. By default, it will record any requests that it
-      hasn't yet seen while replaying ones it has already recorded.
-    */
-    const polly = new Polly('AudienceSettings', {
-      adapters: ['node-http'],
-      mode: 'replay',
-      persister: 'fs',
-      persisterOptions: {
-        fs: {
-          recordingsDir: path.resolve(__dirname, './recordings'),
+    setupPolly({
+      adapters: ['fetch'],
+      adapterOptions: {
+        fetch: {
+          context: global,
         },
       },
+      persister: 'fs',
+      persisterOptions: {
+        host: 'http://localhost:3001',
+        fs: {
+          recordingsDir: path.resolve(__dirname, './__recordings__'),
+        },
+      },
+      testURL: 'http://localhost:3001',
+    })
+
+    beforeEach(async () => {
+      const response = await global.fetch(
+        'https://jsonplaceholder.typicode.com/posts/1'
+      )
+      const post = await response.json()
+      console.log('shit', post)
     })
 
     // TODO factory here
@@ -102,7 +110,7 @@ describe('AudienceSettings', function() {
     apiStore.add(currentOrganization, 'organizations')
     apiStore.add(currentUser, 'users')
     apiStore.currentUserId = '22'
-    console.log('12345', apiStore.currentUser.first_name)
+    // console.log('12345', apiStore.currentUser.first_name)
 
     // TODO factory here
     const collection = new Collection(
@@ -140,27 +148,27 @@ describe('AudienceSettings', function() {
       expect(audienceSettingsWidget.length).toBe(1)
     })
 
-    it('should render the total as $0 to start', () => {
-      const totalQuery = widgetDesktop.find('[data-cy="audience-totalPrice"]')
-      expect(totalQuery.length).toEqual(1)
-      const total = totalQuery.first()
-      expect(total.text()).toEqual('$0.00')
-    })
+    // it('should render the total as $0 to start', () => {
+    //   const totalQuery = widgetDesktop.find('[data-cy="audience-totalPrice"]')
+    //   expect(totalQuery.length).toEqual(1)
+    //   const total = totalQuery.first()
+    //   expect(total.text()).toEqual('$0.00')
+    // })
 
-    it('should render at least 2 global audiences', async () => {
-      await sleep(10)
-      const audiencesQuery = widgetDesktop.find('[data-cy="audience-current"]')
-      // console.log(widgetDesktop.debug())
-      expect(audiencesQuery.length).toBeGreaterThan(1)
-    })
+    // it('should render at least 2 global audiences', async () => {
+    //   await sleep(10)
+    //   const audiencesQuery = widgetDesktop.find('[data-cy="audience-current"]')
+    //   // console.log(widgetDesktop.debug())
+    //   expect(audiencesQuery.length).toBeGreaterThan(1)
+    // })
 
-    it('should render the modal if the add audience button is clicked', () => {
-      const addAudienceButton = audienceSettingsWidget
-        .find('AddAudienceButton')
-        .first()
-      addAudienceButton.simulate('click', { preventDefault: jest.fn() })
-      expect(audienceSettingsWidget.find('AddAudienceModal').length).toEqual(1)
-    })
+    // it('should render the modal if the add audience button is clicked', () => {
+    //   const addAudienceButton = audienceSettingsWidget
+    //     .find('AddAudienceButton')
+    //     .first()
+    //   addAudienceButton.simulate('click', { preventDefault: jest.fn() })
+    //   expect(audienceSettingsWidget.find('AddAudienceModal').length).toEqual(1)
+    // })
 
     /*
       Calling `stop` will persist requests as well as disconnect from any
