@@ -3,7 +3,10 @@ pre-commit:
   commands:
     lint:
       glob: "*.{js,ts}*" # JS, TS, and TSX files
-      run: yarn run lint # Shouldn't this also run Prettier beforehand?
+      run: yarn run lint
+      # Shouldn't this also run Prettier beforehand?
+      # Are we using Prettier for Ruby or just Rubocop?
+      # How to automate Ruby autoformatting?
 
 pre-push: # githook name
   commands: # list of commands
