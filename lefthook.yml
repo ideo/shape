@@ -3,7 +3,7 @@ pre-commit:
   commands:
     lint:
       glob: "*.{js,ts}*" # JS, TS, and TSX files
-      run: yarn run eslint
+      run: yarn run eslint # Shouldn't this also run Prettier beforehand?
 
 pre-push: # githook name
   commands: # list of commands
