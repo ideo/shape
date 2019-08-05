@@ -9,7 +9,7 @@ pre-push: # githook name
   commands: # list of commands
     rubocop:
       tags: backend
-      run: bundle exec rubocop
+      run: bundle exec rubocop --fail-level E # only fail on error or failure
     rspec:
       tags: rspec backend
       run: bundle exec crystalball --fail-fast
