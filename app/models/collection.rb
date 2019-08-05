@@ -813,7 +813,7 @@ class Collection < ApplicationRecord
     Collection.in_collection(id).where.not(template_id: nil).any?
   end
 
-  def child_of_or_current_application_collection?
+  def child_of_application_collection?
     parent.is_a?(Collection::ApplicationCollection)
   end
 

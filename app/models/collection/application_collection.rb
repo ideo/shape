@@ -73,10 +73,6 @@ class Collection
       collection
     end
 
-    def child_of_or_current_application_collection?
-      true
-    end
-
     def system_required?
       true
     end
