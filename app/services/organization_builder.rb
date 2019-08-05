@@ -18,6 +18,7 @@ class OrganizationBuilder
       update_primary_group!
       add_role
       setup_user_membership_and_collections
+      create_application_organization if @user.application_bot?
       if @full_setup
         create_templates
         # this check is for running Cypress, don't create real Network orgs for every test org
@@ -70,5 +71,12 @@ class OrganizationBuilder
     @organization.create_network_subscription
   rescue JsonApiClient::Errors::ApiError
     raise ActiveRecord::Rollback
+  end
+
+  def create_application_organization
+    ApplicationOrganization.create(
+      organization: @organization,
+      application: @user.application,
+    )
   end
 end

@@ -78,6 +78,8 @@ class Collection < ApplicationRecord
              with: %i[collection_cards cards_linked_to_this_collection]
   acts_as_taggable
 
+  attr_accessor :newly_created
+
   store_accessor :cached_attributes,
                  :cached_cover,
                  :cached_tag_list,
