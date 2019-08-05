@@ -501,11 +501,14 @@ class FoamcoreGrid extends React.Component {
 
     this.updateCollectionScrollBottom()
     this.throttledCalculateCardsToRender()
+    const fromScrollWidth =
+      window.document.documentElement.scrollWidth - window.screen.width
+    const fromScrollRatio = window.pageXOffset / fromScrollWidth
     setTimeout(() => {
-      const leftScroll = window.pageXOffset / 8
+      const leftOffset = fromScrollWidth * 0.32 * fromScrollRatio
       window.scrollTo({
         top: window.pageYOffset / 1.9,
-        left: leftScroll,
+        left: leftOffset,
         behavior: 'auto',
       })
     }, 10)
@@ -518,12 +521,15 @@ class FoamcoreGrid extends React.Component {
     })
     this.updateCollectionScrollBottom()
     this.throttledCalculateCardsToRender()
+    const fromScrollWidth =
+      window.document.documentElement.scrollWidth - window.screen.width
+    const fromScrollRatio = window.pageXOffset / fromScrollWidth
+    const leftOffset =
+      window.document.documentElement.scrollWidth * 1.5 * fromScrollRatio
     setTimeout(() => {
-      const totalScrollX =
-        window.document.documentElement.scrollWidth - window.screen.width
       window.scrollTo({
         top: window.pageYOffset * 1.9,
-        left: totalScrollX / 2,
+        left: leftOffset,
         behavior: 'auto',
       })
     }, 10)
