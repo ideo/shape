@@ -7,7 +7,6 @@ import styled from 'styled-components'
 import FlipMove from 'react-flip-move'
 
 import CardActionHolder from '~/ui/icons/CardActionHolder'
-import CoverImageToggleIcon from '~/ui/icons/CoverImageToggleIcon'
 import FilestackUpload from '~/utils/FilestackUpload'
 import QuickOptionSelector from '~/ui/global/QuickOptionSelector'
 import SingleCrossIcon from '~/ui/icons/SingleCrossIcon'
@@ -18,6 +17,7 @@ import v, { ITEM_TYPES } from '~/utils/variables'
 // This must be imported last, or else it leads to a cryptic
 // circular dependency issue
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
+import EditPencilIconLarge from '~/ui/icons/EditPencilIconLarge'
 
 const removeOption = {
   type: 'remove',
@@ -266,7 +266,7 @@ class CoverImageSelector extends React.Component {
           role="button"
           onClick={this.handleClick}
         >
-          <CoverImageToggleIcon />
+          <EditPencilIconLarge />
         </CardActionHolder>
         {this.open &&
           ReactDOM.createPortal(this.renderInner(), this.parentCard)}

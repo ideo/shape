@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import CardActionHolder from '~/ui/icons/CardActionHolder'
-import CoverImageToggleIcon from '~/ui/icons/CoverImageToggleIcon'
+import EditPencilIconLarge from '~/ui/icons/EditPencilIconLarge'
 
 @observer
 class CoverImageToggle extends React.Component {
@@ -25,7 +25,7 @@ class CoverImageToggle extends React.Component {
         }
         role="button"
       >
-        <CoverImageToggleIcon />
+        <EditPencilIconLarge />
       </CardActionHolder>
     )
   }
