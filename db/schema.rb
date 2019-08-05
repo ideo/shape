@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_29_171554) do
+ActiveRecord::Schema.define(version: 2019_08_05_183858) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -124,6 +124,17 @@ ActiveRecord::Schema.define(version: 2019_07_29_171554) do
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
     t.index ["templated_from_id"], name: "index_collection_cards_on_templated_from_id"
     t.index ["type"], name: "index_collection_cards_on_type"
+  end
+
+  create_table "collection_translations", force: :cascade do |t|
+    t.integer "collection_id", null: false
+    t.string "locale", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "name"
+    t.jsonb "confirmed"
+    t.index ["collection_id"], name: "index_collection_translations_on_collection_id"
+    t.index ["locale"], name: "index_collection_translations_on_locale"
   end
 
   create_table "collections", force: :cascade do |t|
@@ -357,6 +368,19 @@ ActiveRecord::Schema.define(version: 2019_07_29_171554) do
     t.index ["group_id", "comment_thread_id"], name: "by_groups_comment_thread", unique: true
   end
 
+  create_table "item_translations", force: :cascade do |t|
+    t.integer "item_id", null: false
+    t.string "locale", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "name"
+    t.text "content"
+    t.jsonb "data_content"
+    t.jsonb "confirmed"
+    t.index ["item_id"], name: "index_item_translations_on_item_id"
+    t.index ["locale"], name: "index_item_translations_on_locale"
+  end
+
   create_table "items", force: :cascade do |t|
     t.string "name"
     t.string "type"
@@ -565,7 +589,6 @@ ActiveRecord::Schema.define(version: 2019_07_29_171554) do
     t.integer "status", default: 0
     t.string "invitation_token"
     t.integer "current_user_collection_id"
-    t.boolean "old_terms_accepted", default: false
     t.boolean "show_helper", default: true
     t.string "handle"
     t.boolean "notify_through_email", default: true
@@ -578,8 +601,6 @@ ActiveRecord::Schema.define(version: 2019_07_29_171554) do
     t.datetime "last_active_at"
     t.string "phone"
     t.integer "feedback_contact_preference", default: 0
-    t.boolean "old_feedback_terms_accepted", default: false
-    t.boolean "old_respondent_terms_accepted", default: false
     t.boolean "shape_circle_member", default: false
     t.jsonb "terms_accepted_data", default: {}
     t.index ["email"], name: "index_users_on_email"
