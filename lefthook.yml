@@ -2,11 +2,14 @@
 pre-commit:
   commands:
     lint:
+      files: git diff --name-only development
       glob: "*.{js,ts}*" # JS, TS, and TSX files
-      run: yarn run lint
-      # Shouldn't this also run Prettier beforehand?
-      # Are we using Prettier for Ruby or just Rubocop?
-      # How to automate Ruby autoformatting?
+      run: yarn run lint {files}
+    rubocop:
+      files: git diff --name-only development
+      # exclude: "excluded_filename.rb"
+      tags: backend
+      run: bundle exec rubocop -a {files}
 
 pre-push: # githook name
   commands: # list of commands

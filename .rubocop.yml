@@ -89,5 +89,5 @@ Metrics/BlockLength:
     - 'spec/**/*.rb'
     - 'lib/tasks/cypress.rake'
 
-Layout/IndentArray:
+Layout/IndentFirstArrayElement:
   EnforcedStyle: 'consistent'
