@@ -10,6 +10,6 @@ exports[`CoverImageToggle renders snapshot 1`] = `
   size={32}
   tooltipText="make cover image"
 >
-  <EditPencilIconLarge />
+  <CoverImageToggleIcon />
 </CardActionHolder>
 `;
