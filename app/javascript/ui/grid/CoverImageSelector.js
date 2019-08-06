@@ -13,6 +13,7 @@ import SingleCrossIcon from '~/ui/icons/SingleCrossIcon'
 import UploadIcon from '~/ui/icons/UploadIcon'
 import XIcon from '~/ui/icons/XIcon'
 import { SmallBreak } from '~/ui/global/styled/layout'
+import { DisplayText } from '~/ui/global/styled/typography'
 import v, { ITEM_TYPES } from '~/utils/variables'
 // This must be imported last, or else it leads to a cryptic
 // circular dependency issue
@@ -41,14 +42,25 @@ const linkBackgroundOption = {
 }
 
 const TopRightHolder = styled.div`
-  max-width: 192px;
-  right: 5px;
+  width: 316px;
+  height: 250px;
+  padding: 15px;
+  right: 0px;
+  top: 0px;
+  display: block;
   position: absolute;
-  top: 46px;
-  width: ${props => props.width}px;
   z-index: ${v.zIndex.gridCardTop};
+  background: ${v.colors.primaryLight};
+  opacity: 0.9;
+  box-sizing: border-box;
 `
 TopRightHolder.displayName = 'TopRightHolder'
+
+const StyledEditTitle = styled.div`
+  border-bottom: 1px solid black;
+`
+
+StyledEditTitle.displayName = 'StyledEditTitle'
 
 const filterOptions = [
   {
@@ -231,19 +243,30 @@ class CoverImageSelector extends React.Component {
     return !!record.thumbnail_url
   }
 
+  get cardTitle() {
+    const { card } = this.props
+    const { record } = card
+    const { name } = record
+    return name
+  }
+
   renderInner() {
     return (
-      <TopRightHolder
-        className="show-on-hover"
-        width={this.imageOptions.length * 32}
-      >
+      <TopRightHolder>
         {!this.loading && (
           <FlipMove appearAnimation="elevator" duration={300} easing="ease-out">
+            <StyledEditTitle>
+              <h3>Title</h3>
+              <DisplayText>{this.cardTitle}</DisplayText>
+            </StyledEditTitle>
+            <SmallBreak />
+            <h3>Cover Image</h3>
             <QuickOptionSelector
               options={toJS(this.imageOptions)}
               onSelect={this.onImageOptionSelect}
             />
             <SmallBreak />
+            <h3>Cover effects</h3>
             {this.showFilters && (
               <QuickOptionSelector
                 options={filterOptions}
