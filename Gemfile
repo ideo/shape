@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 ruby '2.5.5'
 
 git_source(:github) do |repo_name|
-  repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
+  repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?('/')
   "https://github.com/#{repo_name}.git"
 end
 
@@ -21,9 +21,9 @@ gem 'pg', '~> 1.1'
 gem 'puma', '~> 3.12'
 
 # Use SCSS for stylesheets
-gem 'sass-rails', '~> 5.0'
 gem 'autoprefixer-rails'
 gem 'normalize-rails', '~> 4.1'
+gem 'sass-rails', '~> 5.0'
 
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
@@ -104,19 +104,19 @@ gem 'aasm', '~> 5.0'
 gem 'gibbon', '~> 3.2'
 
 # distributed mutex
-gem "redis-mutex", "~> 4.0.1"
+gem 'redis-mutex', '~> 4.0.1'
 
 # performance tuning
 # gem 'tunemygc'
-gem 'scout_apm'
 gem 'barnes'
 gem 'oj'
+gem 'scout_apm'
 
 # phone number normalization
 gem 'phony'
 
 # sending sms messages
-gem "twilio-ruby"
+gem 'twilio-ruby'
 
 # Nice patterns for service objects
 gem 'interactor'
@@ -127,49 +127,49 @@ gem 'double_entry', '~> 2.0.0.beta1'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
-  gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
+  gem 'byebug', platforms: %i[mri mingw x64_mingw]
   # Adds support for Capybara system testing and selenium driver
-  gem 'capybara', '~> 2.13'
-  gem 'selenium-webdriver'
-  gem 'pry-rails'
-  gem 'pry-byebug'
-  gem 'factory_bot_rails'
-  gem 'faker', '~> 1.8.7'
-  gem 'rspec-rails', '~> 3.7'
-  gem 'database_cleaner'
-  gem 'rails-controller-testing'
   gem 'action-cable-testing'
   gem 'active_record_query_trace'
-  gem 'lefthook'
+  gem 'capybara', '~> 2.13'
   gem 'crystalball'
+  gem 'database_cleaner'
+  gem 'factory_bot_rails'
+  gem 'faker', '~> 1.8.7'
+  gem 'lefthook'
+  gem 'pry-byebug'
+  gem 'pry-rails'
+  gem 'rails-controller-testing'
+  gem 'rspec-rails', '~> 3.7'
+  gem 'selenium-webdriver'
 end
 
 group :development do
   # annotate models with schema attributes
   gem 'annotate' # https://github.com/ctran/annotate_models
   # Access an IRB console on exception pages or by using <%= console %> anywhere in the code.
-  gem 'web-console', '>= 3.3.0'
   gem 'listen', '>= 3.0.5', '< 3.2'
+  gem 'web-console', '>= 3.3.0'
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
-  gem 'spring'
-  gem 'spring-watcher-listen', '~> 2.0.0'
-  gem 'rubocop', require: false
-  gem 'spring-commands-rspec'
+  gem 'better_errors'
+  gem 'binding_of_caller'
+  gem 'derailed_benchmarks'
   gem 'guard', require: false
   gem 'guard-rspec', require: false
-  gem 'binding_of_caller'
-  gem 'better_errors'
-  gem 'derailed_benchmarks'
+  gem 'rubocop', require: false
+  gem 'spring'
+  gem 'spring-commands-rspec'
+  gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'stackprof'
 end
 
 group :test do
   gem 'fakeredis', require: 'fakeredis/rspec'
-  gem 'shoulda-matchers', '~> 3.1'
   gem 'json-schema'
+  gem 'shoulda-matchers', '~> 3.1'
+  gem 'timecop'
   gem 'vcr'
   gem 'webmock'
-  gem 'timecop'
 end
 
 group :production do

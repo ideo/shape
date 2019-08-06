@@ -100,7 +100,7 @@ class NotificationDigest < SimpleService
   def notifications_for_user(user)
     user.notifications
         .joins(:activity)
-        .where(Activity.arel_table[:action].not_in(['commented', 'mentioned']))
+        .where(Activity.arel_table[:action].not_in(%w[commented mentioned]))
         .where(read: [false, nil])
         .where(
           Notification.arel_table[:created_at].gt(

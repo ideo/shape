@@ -8,29 +8,29 @@ app_dir = File.expand_path('../..', __dir__)
 ENV['BUNDLE_GEMFILE'] ||= File.join(app_dir, 'Gemfile')
 require 'bundler/setup'
 
-require "git"
+require 'git'
 
 # Rails.root if we look from .lefthook/post-checkout dir
-app_dir = File.expand_path("../..", __dir__)
+app_dir = File.expand_path('../..', __dir__)
 
 git = Git.open(app_dir)
 
 # Don't run if there were no database changes between revisions
-diff = git.diff(prev_head, curr_head).path("db/migrate")
+diff = git.diff(prev_head, curr_head).path('db/migrate')
 exit if diff.size.zero?
 
-require File.expand_path("config/boot", app_dir)
-require File.expand_path("config/application", app_dir)
-require "rake"
+require File.expand_path('config/boot', app_dir)
+require File.expand_path('config/application', app_dir)
+require 'rake'
 Rails.application.load_tasks
 
-Rake::Task["db:load_config"].invoke
+Rake::Task['db:load_config'].invoke
 
 # migrations added in prev_head (deleted in curr_head) that we need to rollback
-rollback_migration_files = diff.select { |file| file.type == "deleted" }
+rollback_migration_files = diff.select { |file| file.type == 'deleted' }
 
 if rollback_migration_files.any?
-  require "tmpdir"
+  require 'tmpdir'
   MigrationFilenameRegexp = ActiveRecord::Migration::MigrationFilenameRegexp
   versions = []
 
@@ -50,12 +50,12 @@ begin
   ActiveRecord::Migrator.migrations_paths.push(directory)
 
   versions.sort.reverse_each do |version|
-    ENV["VERSION"] = version
-    Rake::Task["db:migrate:down"].execute
+    ENV['VERSION'] = version
+    Rake::Task['db:migrate:down'].execute
   end
 ensure
-  ENV.delete("VERSION")
+  ENV.delete('VERSION')
   ActiveRecord::Migrator.migrations_paths = old_migration_paths
 end
 
-Rake::Task["db:migrate"].invoke
+Rake::Task['db:migrate'].invoke
