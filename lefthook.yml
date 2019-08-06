@@ -1,5 +1,6 @@
 # Managing git hooks
 pre-commit:
+  parallel: true
   commands:
     lint:
       files: git diff --name-only development
@@ -12,6 +13,7 @@ pre-commit:
       run: bundle exec rubocop -a {files}
 
 pre-push: # githook name
+  parallel: true
   commands: # list of commands
     rubocop:
       tags: backend
