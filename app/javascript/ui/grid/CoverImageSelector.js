@@ -13,12 +13,12 @@ import SingleCrossIcon from '~/ui/icons/SingleCrossIcon'
 import UploadIcon from '~/ui/icons/UploadIcon'
 import XIcon from '~/ui/icons/XIcon'
 import { SmallBreak } from '~/ui/global/styled/layout'
-import { DisplayText } from '~/ui/global/styled/typography'
 import v, { ITEM_TYPES } from '~/utils/variables'
 // This must be imported last, or else it leads to a cryptic
 // circular dependency issue
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import EditPencilIconLarge from '~/ui/icons/EditPencilIconLarge'
+import AutosizeInput from 'react-input-autosize'
 
 const removeOption = {
   type: 'remove',
@@ -57,7 +57,21 @@ const TopRightHolder = styled.div`
 TopRightHolder.displayName = 'TopRightHolder'
 
 const StyledEditTitle = styled.div`
-  border-bottom: 1px solid black;
+  h3 {
+    display: inline;
+  }
+  input {
+    display: inline;
+    background: transparent;
+    border: none;
+    color: ${props => props.color || v.colors.black};
+    font-weight: ${v.weights.book};
+    font-family: ${v.fonts.sans};
+    font-size: 1rem;
+    text-transform: none;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid black;
+  }
 `
 
 StyledEditTitle.displayName = 'StyledEditTitle'
@@ -86,9 +100,13 @@ class CoverImageSelector extends React.Component {
   parentCard = null
   @observable
   loading = false
+  @observable cardTitle = ''
 
   componentDidMount() {
     const { card } = this.props
+    const { record } = card
+    const { name } = record
+    this.cardTitle = name
     // TODO don't like how id name is in two separate places
     runInAction(() => {
       this.parentCard = document.getElementById(`gridCard-${card.id}`)
@@ -179,9 +197,31 @@ class CoverImageSelector extends React.Component {
 
   changeCover = async file => {
     const { apiStore, card } = this.props
-    const item = apiStore.find('items', card.record.id)
+    const { record } = card
+    const item = apiStore.find('items', record.id)
     item.thumbnail_url = file.url
     return item.save()
+  }
+
+  @action
+  changeTitle = ev => {
+    this.cardTitle = ev.target.value
+  }
+
+  handleSave = ev => {
+    const { card } = this.props
+    const { record } = card
+    record.name = this.cardTitle
+    return record.save()
+  }
+
+  handleInputKeys = ev => {
+    if (ev.key === 'Enter') this.handleSave(ev)
+  }
+
+  handleInputClick = ev => {
+    ev.stopPropagation()
+    ev.target.focus()
   }
 
   handleClick = ev => {
@@ -243,11 +283,18 @@ class CoverImageSelector extends React.Component {
     return !!record.thumbnail_url
   }
 
-  get cardTitle() {
-    const { card } = this.props
-    const { record } = card
-    const { name } = record
-    return name
+  renderEditTitleInput(title) {
+    return (
+      <AutosizeInput
+        maxLength={20}
+        value={title}
+        placeholder={'untitled'}
+        onChange={this.changeTitle}
+        onKeyPress={this.handleInputKeys}
+        onBlur={this.handleSave}
+        onClick={this.handleInputClick}
+      />
+    )
   }
 
   renderInner() {
@@ -257,7 +304,7 @@ class CoverImageSelector extends React.Component {
           <FlipMove appearAnimation="elevator" duration={300} easing="ease-out">
             <StyledEditTitle>
               <h3>Title</h3>
-              <DisplayText>{this.cardTitle}</DisplayText>
+              {this.renderEditTitleInput(this.cardTitle)}
             </StyledEditTitle>
             <SmallBreak />
             <h3>Cover Image</h3>
