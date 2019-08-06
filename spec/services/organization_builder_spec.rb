@@ -71,7 +71,10 @@ RSpec.describe OrganizationBuilder, type: :service do
         let(:user) { create(:user, :application_bot) }
 
         it 'should create an application organization' do
+          apporg = ApplicationOrganization.last
           expect(ApplicationOrganization.count).to be 1
+          expect(apporg.application_id).to eq user.application.id
+          expect(apporg.organization_id).to eq organization.id
         end
       end
     end
