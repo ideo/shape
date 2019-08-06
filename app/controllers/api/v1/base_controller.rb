@@ -1,5 +1,6 @@
 class Api::V1::BaseController < ApplicationController
   include ApplicationHelper
+  include ReplaceGlobalTranslationVariables
   before_action :check_api_authentication!
   before_action :check_cancel_sync
   before_action :check_page_param
