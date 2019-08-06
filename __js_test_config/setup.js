@@ -8,7 +8,7 @@ import dotenv from 'dotenv'
 global.React = React
 
 // mocked version of fetch for all API requests
-global.fetch = require('jest-fetch-mock')
+global.fetch = require('node-fetch')
 // Make Enzyme functions available in all test files without importing
 global.shallow = shallow
 global.render = render
