@@ -21,8 +21,8 @@ pre-push: # githook name
     rspec:
       tags: rspec backend
       run: bundle exec crystalball --fail-fast
-    packages-audit: # command name
-      run: # yarn audit # command for execution
+    # packages-audit: # command name
+    #   run: yarn audit # command for execution
 
 post-checkout:
   piped: true # Exit early if preceding command fails
