@@ -78,6 +78,7 @@ describe('AudienceSettings', function() {
     // }
     apiStore.add(currentOrganization, 'organizations')
     apiStore.add(currentUser, 'users')
+    apiStore.__addSingle(currentUser, 'users')
     apiStore.currentUserId = '22'
     apiStore.currentUserOrganizationId = currentOrganization.id
     // console.log('12345', apiStore.currentUser.first_name)
@@ -171,10 +172,10 @@ describe('AudienceSettings', function() {
       expect(total.text()).toEqual('$0.00')
     })
 
-    it('should render at least 2 global audiences', async () => {
-      await sleep(10)
+    it('should render at least 2 global audiences', () => {
       const audiencesQuery = widgetDesktop.find('[data-cy="audience-current"]')
-      // console.log(widgetDesktop.debug())
+      console.log('testaudes', apiStore.findAll('audiences').length)
+      console.log(widgetDesktop.debug())
       expect(audiencesQuery.length).toBeGreaterThan(1)
     })
 
