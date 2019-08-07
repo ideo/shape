@@ -18,7 +18,7 @@ import v, { ITEM_TYPES } from '~/utils/variables'
 // circular dependency issue
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import EditPencilIconLarge from '~/ui/icons/EditPencilIconLarge'
-import AutosizeInput from 'react-input-autosize'
+import TextareaAutosize from 'react-autosize-textarea'
 import { CloseButton } from '~/ui/global/styled/buttons'
 
 const removeOption = {
@@ -64,11 +64,15 @@ const StyledEditTitle = styled.div`
     flex: 1;
     margin-right: 10px;
     height: 100%;
+    max-width: 50px;
   }
   div {
     flex: 3 1 auto;
     height: 100%;
-    input {
+    border-bottom: 1px solid ${v.colors.black};
+    max-width: 205px;
+    textarea {
+      width: 100%;
       background: transparent;
       border: none;
       color: ${props => props.color || v.colors.black};
@@ -76,7 +80,6 @@ const StyledEditTitle = styled.div`
       font-family: ${v.fonts.sans};
       font-size: 1rem;
       text-transform: none;
-      text-decoration: underline;
       outline-width: 0;
     }
   }
@@ -301,16 +304,21 @@ class CoverImageSelector extends React.Component {
   }
 
   renderEditTitleInput(title) {
+    // max length 144 matches StyledEditableName's max length
     return (
-      <AutosizeInput
-        maxLength={100}
-        value={title}
-        placeholder={'untitled'}
-        onChange={this.changeTitle}
-        onKeyPress={this.handleInputKeys}
-        onBlur={this.handleSave}
-        onClick={this.handleInputClick}
-      />
+      <div>
+        <TextareaAutosize
+          minRows={1}
+          maxRows={3}
+          maxLength={144}
+          value={title}
+          placeholder={'untitled'}
+          onChange={this.changeTitle}
+          onKeyPress={this.handleInputKeys}
+          onBlur={this.handleSave}
+          onClick={this.handleInputClick}
+        />
+      </div>
     )
   }
 
