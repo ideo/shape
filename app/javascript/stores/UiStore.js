@@ -202,6 +202,8 @@ export default class UiStore {
   linkedBreadcrumbTrail = []
   @observable
   linkedInMyCollection = false
+  @observable
+  isEditingCardTitle = false
 
   @action
   toggleEditingCardId(cardId) {
@@ -210,6 +212,11 @@ export default class UiStore {
     } else {
       this.editingCardId = cardId
     }
+  }
+
+  @action
+  setEditingCardTitle(isEditingCardTitle) {
+    this.isEditingCardTitle = isEditingCardTitle
   }
 
   @action

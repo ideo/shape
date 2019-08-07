@@ -19,6 +19,7 @@ import v, { ITEM_TYPES } from '~/utils/variables'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import EditPencilIconLarge from '~/ui/icons/EditPencilIconLarge'
 import AutosizeInput from 'react-input-autosize'
+import { CloseButton } from '~/ui/global/styled/buttons'
 
 const removeOption = {
   type: 'remove',
@@ -57,20 +58,27 @@ const TopRightHolder = styled.div`
 TopRightHolder.displayName = 'TopRightHolder'
 
 const StyledEditTitle = styled.div`
+  display: flex;
+  margin-bottom: 0.75rem;
   h3 {
-    display: inline;
+    flex: 1;
+    margin-right: 10px;
+    height: 100%;
   }
-  input {
-    display: inline;
-    background: transparent;
-    border: none;
-    color: ${props => props.color || v.colors.black};
-    font-weight: ${v.weights.book};
-    font-family: ${v.fonts.sans};
-    font-size: 1rem;
-    text-transform: none;
-    margin-bottom: 0.75rem;
-    border-bottom: 1px solid black;
+  div {
+    flex: 3 1 auto;
+    height: 100%;
+    input {
+      background: transparent;
+      border: none;
+      color: ${props => props.color || v.colors.black};
+      font-weight: ${v.weights.book};
+      font-family: ${v.fonts.sans};
+      font-size: 1rem;
+      text-transform: none;
+      text-decoration: underline;
+      outline-width: 0;
+    }
   }
 `
 
@@ -89,7 +97,7 @@ const filterOptions = [
   },
 ]
 
-@inject('apiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class CoverImageSelector extends React.Component {
   @observable
@@ -225,9 +233,18 @@ class CoverImageSelector extends React.Component {
   }
 
   handleClick = ev => {
+    const { uiStore } = this.props
     ev.preventDefault()
     this.populateAllOptions()
     runInAction(() => (this.open = !this.open))
+    // fixme: check how we can use this.open along with uiStore.editingCardTitle to turn this off
+    uiStore.setEditingCardTitle(true)
+  }
+
+  handleClose = ev => {
+    const { uiStore } = this.props
+    runInAction(() => (this.open = !this.open))
+    uiStore.setEditingCardTitle(false)
   }
 
   async clearCover() {
@@ -286,7 +303,7 @@ class CoverImageSelector extends React.Component {
   renderEditTitleInput(title) {
     return (
       <AutosizeInput
-        maxLength={20}
+        maxLength={100}
         value={title}
         placeholder={'untitled'}
         onChange={this.changeTitle}
@@ -322,6 +339,7 @@ class CoverImageSelector extends React.Component {
             )}
           </FlipMove>
         )}
+        <CloseButton size="lg" onClick={this.handleClose} />
       </TopRightHolder>
     )
   }
@@ -350,6 +368,7 @@ CoverImageSelector.propTypes = {
 }
 CoverImageSelector.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default CoverImageSelector
