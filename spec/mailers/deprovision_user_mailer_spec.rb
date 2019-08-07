@@ -17,7 +17,9 @@ RSpec.describe DeprovisionUserMailer, type: :mailer do
     end
 
     it 'renders the body' do
-      expect(mail.body.encoded).to include("#{user.email} was deprovisioned, and now the organization: \"#{group.organization.name}\" has no organization admin.")
+      expect(mail.body.encoded).to include(
+        "#{user.email} was deprovisioned, and now the organization: \"#{group.organization.name}\" has no organization admin.",
+      )
       expect(mail.body.encoded).to include('The org is probably in a somewhat broken state.')
     end
   end
@@ -36,7 +38,9 @@ RSpec.describe DeprovisionUserMailer, type: :mailer do
     end
 
     it 'renders the body' do
-      expect(mail.body.encoded).to include("#{user.email} was deprovisioned, and now the group: \"#{group.name}\" has no admin.  No organization admins were available to set as new group admins.")
+      expect(mail.body.encoded).to include(
+        "#{user.email} was deprovisioned, and now the group: \"#{group.name}\" has no admin.  No organization admins were available to set as new group admins.",
+      )
       expect(mail.body.encoded).to include('The group is probably in a somewhat broken state.')
     end
   end
@@ -51,7 +55,9 @@ RSpec.describe DeprovisionUserMailer, type: :mailer do
     end
 
     it 'renders the subject' do
-      expect(mail.subject).to eql("[User Deprovisioned] #{user.email} has been deprovisioned, collection #{collection.name} in #{collection.organization.name} organization, set org admins as editors")
+      expect(mail.subject).to eql(
+        "[User Deprovisioned] #{user.email} has been deprovisioned, collection #{collection.name} in #{collection.organization.name} organization, set org admins as editors",
+      )
     end
 
     it 'renders the body' do

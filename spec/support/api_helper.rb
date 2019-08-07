@@ -16,7 +16,7 @@ module ApiHelper
   end
 
   def json_api_params(resource_name, attrs, merge_data = {})
-    params = {
+    {
       data: {
         type: resource_name,
         attributes: attrs,

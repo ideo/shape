@@ -35,6 +35,7 @@ module Admin
       added_users.each do |user|
         # skip people who have opted out
         next unless user.notify_through_email
+
         InvitationMailer.invite(
           user_id: user.id,
           invited_by_id: @invited_by.id,

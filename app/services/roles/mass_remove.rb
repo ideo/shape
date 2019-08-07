@@ -70,6 +70,7 @@ module Roles
     def unfollow_comment_thread
       return unless @object.item_or_collection?
       return unless @object.comment_thread.present?
+
       RemoveCommentThreadFollowers.perform_async(
         @object.comment_thread.id,
         @users.map(&:id),
@@ -79,8 +80,10 @@ module Roles
 
     def unfollow_groups_comment_threads
       return unless @object.is_a?(Group)
+
       thread_ids = @object.groups_threads.pluck(:comment_thread_id)
       return if thread_ids.empty?
+
       RemoveCommentThreadFollowers.perform_async(
         thread_ids,
         @users.map(&:id),
@@ -98,11 +101,13 @@ module Roles
 
     def remove_org_membership_if_necessary
       return unless @object.is_a?(Group) && (@object.guest? || @object.primary?)
+
       @users.each do |user|
         # if someone is in both primary + guest for whatever reason, removing them
         # from one shouldn't kick them out of the whole org
         next if @object.organization.primary_group.can_view?(user) ||
                 @object.organization.guest_group.can_view?(user)
+
         @object.organization.remove_user_membership(user)
       end
     end
@@ -115,6 +120,7 @@ module Roles
 
     def remove_roles_from_children
       return if @object.is_a?(Group) || @object.try(:children).blank?
+
       ModifyChildrenRolesWorker.perform_async(
         @removed_by.try(:id),
         @users.map(&:id),

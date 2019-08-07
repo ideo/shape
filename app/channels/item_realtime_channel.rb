@@ -3,17 +3,20 @@ class ItemRealtimeChannel < ApplicationCable::Channel
 
   def subscribed
     return reject if item.nil? || current_ability.cannot?(:edit_content, item)
+
     item.started_viewing(current_user)
     stream_from item.stream_name
   end
 
   def unsubscribed
     return reject if item.nil?
+
     item.stopped_viewing(current_user)
   end
 
   def delta(data)
     return reject if item.nil?
+
     # update delta with transformed one
     new_data = item.threadlocked_transform_realtime_delta(current_user, Mashie.new(data))
     # new_data may include an error message
@@ -23,6 +26,7 @@ class ItemRealtimeChannel < ApplicationCable::Channel
 
   def cursor(data)
     return reject if item.nil?
+
     item.received_changes(data, current_user)
   end
 

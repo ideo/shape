@@ -1,7 +1,7 @@
 require 'rails_helper'
 
-def format_currency(x)
-  format('$%.2f', x.round(2))
+def format_currency(amount)
+  format('$%.2f', amount.round(2))
 end
 
 RSpec.describe BillingChangesMailer, type: :mailer do

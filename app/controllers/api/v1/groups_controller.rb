@@ -66,6 +66,7 @@ class Api::V1::GroupsController < Api::V1::BaseController
   def check_group_organization_param
     organization_id = params[:group].delete(:organization_id)
     return unless organization_id.present?
+
     @current_organization = Organization.find_by(id: organization_id)
   end
 
@@ -98,6 +99,7 @@ class Api::V1::GroupsController < Api::V1::BaseController
 
   def load_current_organization_from_nested_routes
     return if params[:organization_id].blank?
+
     org = Organization.find_by(id: params[:organization_id])
     # Authorize they have access
     authorize! :read, org

@@ -50,6 +50,7 @@ module DataReport
     def initialize_data
       @query = generate_base_query
       return [] unless @query
+
       @query = filtered_query
     end
 
@@ -148,6 +149,7 @@ module DataReport
 
     def query_table
       return Activity if measure_queries_activities?
+
       case measure
       when 'collections'
         Collection

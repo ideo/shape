@@ -26,6 +26,7 @@ class Api::V1::DatasetsController < Api::V1::BaseController
 
   def update_measure(identifier: nil, selected: true)
     return if identifier.blank?
+
     collection_data_items_datasets(identifier: identifier).each do |data_items_dataset|
       data_items_dataset.update(
         selected: selected,

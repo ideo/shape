@@ -90,6 +90,7 @@ FactoryBot.define do
       %w[editor viewer].each do |role_type|
         evaluator_role = evaluator.send("add_#{role_type.pluralize}")
         next unless evaluator_role.present?
+
         if item.roles_anchor_collection_id
           item.unanchor_and_inherit_roles_from_anchor!
         end

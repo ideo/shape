@@ -34,6 +34,7 @@ class Api::V1::SurveyResponsesController < Api::V1::BaseController
 
   def load_test_audience
     return unless @collection.test_audiences.present?
+
     ta_id = session[:test_audience_id] || json_api_params['data']['attributes']['test_audience_id']
     if ta_id
       test_audience = @collection.test_audiences.find_by(id: ta_id)
@@ -41,6 +42,7 @@ class Api::V1::SurveyResponsesController < Api::V1::BaseController
       test_audience = @collection.link_sharing_audience
     end
     return head(:unprocessable_entity) if test_audience.nil?
+
     @test_audience_id = test_audience.id
   end
 

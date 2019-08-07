@@ -24,6 +24,7 @@ class FirestoreBatchWriter
     FirestoreClient.client.batch do |batch|
       @objects.each do |object|
         next unless object.is_a?(Firestoreable)
+
         object.store_in_batch(batch)
       end
     end

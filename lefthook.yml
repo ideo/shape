@@ -10,14 +10,14 @@ pre-commit:
       files: git diff --name-only development
       # exclude: "excluded_filename.rb"
       tags: backend
-      run: bundle exec rubocop -a {files}
+      run: bundle exec rubocop --fail-level error {files}
 
 pre-push: # githook name
   parallel: true
   commands: # list of commands
     rubocop:
       tags: backend
-      run: bundle exec rubocop --fail-level E # only fail on error or failure
+      run: bundle exec rubocop --fail-level error
     rspec:
       tags: rspec backend
       run: bundle exec crystalball --fail-fast

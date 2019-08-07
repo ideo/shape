@@ -23,6 +23,7 @@ class MailingListSubscription < SimpleService
 
   def call
     return false if network_mailing_list.blank?
+
     if @subscribe
       subscribe
     else

@@ -145,6 +145,7 @@ class Group < ApplicationRecord
   def can_view?(user)
     # NOTE: guest group access can be granted via primary_group membership
     return true if guest? && organization.primary_group.can_view?(user)
+
     # otherwise pass through to the normal resourceable method
     resourceable_can_view?(user)
   end
@@ -152,6 +153,7 @@ class Group < ApplicationRecord
   def can_edit?(user)
     return true if new_record?
     return true if guest? && organization.primary_group.can_edit?(user)
+
     # otherwise pass through to the normal resourceable method
     resourceable_can_edit?(user)
   end
@@ -195,6 +197,7 @@ class Group < ApplicationRecord
     # Reindex record if it is a searchkick model
     resource.reindex if resource && Searchkick.callbacks? && resource.searchable?
     return unless common_resource?
+
     if method == :add
       resource.update(common_viewable: true)
     elsif method == :remove
@@ -245,6 +248,7 @@ class Group < ApplicationRecord
   def unfollow_group_users_from_group_threads
     thread_ids = groups_threads.pluck(:comment_thread_id)
     return if thread_ids.empty?
+
     RemoveCommentThreadFollowers.perform_async(
       thread_ids,
       user_ids,
@@ -253,6 +257,7 @@ class Group < ApplicationRecord
 
   def update_organization
     return unless primary?
+
     # regenerate the org's slug if we're changing the primary handle
     organization.slug = nil if saved_change_to_handle?
     organization.update(name: name)

@@ -1,8 +1,8 @@
 class Search
   module Filters
     class ActivityDateRange < Base
-      DATE_FORMAT_REGEXP = /(\d{1,2}\/\d{1,2}\/\d{4})/
-      REGEXP = /(Not)?Updated\(#{DATE_FORMAT_REGEXP},\s*#{DATE_FORMAT_REGEXP}\s*\)/i
+      DATE_FORMAT_REGEXP = %r{(\d{1,2}/\d{1,2}/\d{4})}.freeze
+      REGEXP = /(Not)?Updated\(#{DATE_FORMAT_REGEXP},\s*#{DATE_FORMAT_REGEXP}\s*\)/i.freeze
       def options
         not_in_range, first_date, last_date = @query.scan(REGEXP).flatten
 

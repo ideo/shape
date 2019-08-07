@@ -2,16 +2,33 @@ AllCops:
   Include:
     - '**/Rakefile'
     - '**/config.ru'
-    - 'lib/tasks/**/*'
+    - 'lib/**/*'
+    - 'app/**/*'
+    - 'config/**/*.rb'
+    - 'db/**/*'
+    - 'spec/**/*'
   Exclude:
+    - '**/*.yml'
+    - '__mocks__/**/*'
+    - '__tests__/**/*'
+    - '__js_test_config'
     - Gemfile*
     - 'db/migrate/*'
     - 'db/schema.rb'
+    - 'db/import/*'
+    - 'app/assets/**/*'
+    - 'app/javascript/**/*'
+    - 'app/views/**/*'
     - 'bin/**/*'
+    - 'spec/support/api/**/*'
+    - 'spec/fixtures/**/*'
     - 'vendor/bundle/**/*'
     - 'node_modules/**/*'
     - 'config/environments/production.rb'
     - 'config/initializers/devise.rb'
+    - 'config/*.yml'
+    - 'config/locales/*'
+    - 'config/webpack/*'
 
 # We don't care about method length, since we check method cyclomatic
 # complexity.

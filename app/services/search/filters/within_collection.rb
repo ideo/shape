@@ -1,7 +1,7 @@
 class Search
   module Filters
     class WithinCollection < Base
-      REGEXP = %r{within\([A-z\/]*(\d+)\)}i
+      REGEXP = %r{within\([A-z\/]*(\d+)\)}i.freeze
 
       def options
         within_collection_id = @query.scan(REGEXP).flatten[0]

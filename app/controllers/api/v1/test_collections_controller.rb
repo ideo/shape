@@ -131,6 +131,7 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
 
   def load_and_authorize_test_collection
     return unless load_test_collection
+
     # e.g. with "edit_content" ability of a test template instance, you can still launch the test
     authorize! :edit_content, @test_collection
   end

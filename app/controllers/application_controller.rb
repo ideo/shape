@@ -18,7 +18,7 @@ class ApplicationController < ActionController::Base
   end
 
   def load_redirect_organization_from_url(url)
-    regex = /^\/([a-z0-9\-\_]+)/i
+    regex = %r{^/([a-z0-9\-\_]+)}i
     org_slug = URI.parse(url).path.match(regex).try(:[], 1)
     return if org_slug.blank?
 

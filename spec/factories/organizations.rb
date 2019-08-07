@@ -21,6 +21,7 @@ FactoryBot.define do
       [Role::ADMIN, Role::MEMBER].each do |role|
         user = evaluator.send(role)
         next if user.blank?
+
         user.add_role(role, org.primary_group)
         org.setup_user_membership_and_collections(user)
       end

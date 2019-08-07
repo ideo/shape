@@ -7,12 +7,14 @@ class QuillContentConverter < SimpleService
 
   def text_to_quill_ops
     return unless @content.present?
+
     # preserve newlines but squeeze multiple newlines/spaces
     { ops: [{ insert: @content.squeeze("\n ").strip }] }
   end
 
   def html_to_quill_ops
     return unless @content.present?
+
     html = Nokogiri::HTML.fragment(@content)
     html.children.each do |element|
       process_element(element)

@@ -13,6 +13,7 @@ class Search
     filters.each do |filter|
       f = filter.new(query)
       next unless f.match?
+
       @options = @options.deep_merge(f.options)
       query = f.modify_query
     end

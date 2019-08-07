@@ -95,6 +95,7 @@ class Dataset < ApplicationRecord
 
   def data
     return cached_data if cached_data.present?
+
     []
   end
 

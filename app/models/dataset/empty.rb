@@ -48,6 +48,7 @@ class Dataset
       return self[:identifier] if self[:identifier].present?
       return if data_source.blank?
       return data_source.name if data_source.is_a?(Collection)
+
       data_source.parent.name if data_source.is_a?(Item)
     end
 

@@ -9,6 +9,7 @@ class TextMessenger < SimpleService
 
   def call
     return false unless init_twilio
+
     send_message
   end
 

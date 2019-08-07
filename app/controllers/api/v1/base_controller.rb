@@ -62,6 +62,7 @@ class Api::V1::BaseController < ApplicationController
   def jsonapi_pagination(collection)
     # check for pagination being enabled
     return unless (current_page = collection.try(:current_page))
+
     # NOTE: we are not following JSONAPI format, instead
     # just returning the page number rather than absolute URL
     {
@@ -86,6 +87,7 @@ class Api::V1::BaseController < ApplicationController
     # currently the only usage of filtering is for API applications + external_ids,
     # so escape if we are not in that context
     return unless current_application.present?
+
     # This will return:
     # - 422 error if appropriate
     # - results, which will also get set into the instance variable e.g. @collections
@@ -110,11 +112,13 @@ class Api::V1::BaseController < ApplicationController
   def check_api_authentication!
     return if user_signed_in? && current_user.active?
     return if current_api_token.present?
+
     head(:unauthorized)
   end
 
   def current_ability
     return @current_ability if @current_ability.present?
+
     if current_api_token.present? &&
        current_api_token.organization_id.present?
       @current_ability = Api::OrganizationAbility.new(current_api_token.organization)
@@ -134,6 +138,7 @@ class Api::V1::BaseController < ApplicationController
 
   def current_api_token
     return if authorization_token_from_header.blank?
+
     @current_api_token ||= ApiToken.where(
       token: authorization_token_from_header,
     ).includes(:organization, application: [:user]).first
@@ -154,11 +159,13 @@ class Api::V1::BaseController < ApplicationController
 
   def authorization_token_from_header
     return if request.headers['AUTHORIZATION'].blank?
+
     request.headers['AUTHORIZATION'].sub(/^Bearer\s+/, '')
   end
 
   def check_cancel_sync
     return unless json_api_params[:data]
+
     @cancel_sync = json_api_params[:data].delete :cancel_sync
   end
 

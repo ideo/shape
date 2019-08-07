@@ -9,6 +9,7 @@ class CollectionCardArchiveWorker
       .includes(:item, :collection)
       .each do |card|
       next if card.finished_archiving?
+
       # Check if we should notify before archiving,
       # because afterwards the collection's cards will be archived
       notify = notify?(card)
@@ -25,12 +26,14 @@ class CollectionCardArchiveWorker
                    card.collection.present? &&
                    card.collection.cached_card_count &&
                    card.collection.cached_card_count.positive?
+
     false
   end
 
   def create_notification(card)
     participant_ids = get_target_participant_ids(card.record)
     return if participant_ids.empty?
+
     ActivityAndNotificationBuilder.call(
       actor: @actor,
       target: card.record,

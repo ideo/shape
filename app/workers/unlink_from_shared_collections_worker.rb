@@ -10,6 +10,7 @@ class UnlinkFromSharedCollectionsWorker
       objects.each do |object|
         shared = entity.current_shared_collection
         next unless shared.present?
+
         shared_link = shared.link_collection_cards.with_record(object).first
         if shared_link.present? && !object.can_view?(entity)
           shared_link.destroy

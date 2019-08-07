@@ -32,6 +32,7 @@ class CommentCreator < SimpleService
     # this will find or create the users thread, which may already exist
     users_thread = @comment_thread.add_user_follower!(@author.id)
     return unless users_thread.present?
+
     # also mark the author as having viewed the thread
     users_thread.update_last_viewed!
   end

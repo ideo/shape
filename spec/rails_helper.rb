@@ -37,7 +37,7 @@ VCR.configure do |config|
   config.register_request_matcher :path_ignore_id do |req1, req2|
     path1 = URI(req1.uri).path
     path2 = URI(req2.uri).path
-    path1.gsub(/\/\d+/, '/x') == path2.gsub(/\/\d+/, '/x')
+    path1.gsub(%r{/\d+}, '/x') == path2.gsub(%r{/\d+}, '/x')
   end
 end
 

@@ -59,6 +59,7 @@ class SurveyResponse < ApplicationRecord
 
   def record_incentive_owed!
     return if !incentive_unearned? || amount_earned.zero? || user&.email.blank?
+
     # TODO: what if a user (phone only?) fills out their email later to be "owed" for a previous response?
     update(incentive_status: :incentive_owed, incentive_owed_at: Time.current)
     Accounting::RecordTransfer.incentive_owed(self)
@@ -67,6 +68,7 @@ class SurveyResponse < ApplicationRecord
 
   def record_incentive_paid!
     return if !incentive_owed? || amount_earned.zero? || !incentive_owed_account_balance.positive?
+
     update(incentive_status: :incentive_paid, incentive_paid_at: Time.current)
     Accounting::RecordTransfer.incentive_paid(self)
     incentive_paid_account_balance
@@ -74,6 +76,7 @@ class SurveyResponse < ApplicationRecord
 
   def amount_earned
     return 0 if !completed? || !gives_incentive?
+
     # NOTE: incentive amount is currently global, not per test_audience
     TestAudience.incentive_amount
   end
@@ -81,6 +84,7 @@ class SurveyResponse < ApplicationRecord
   def all_questions_answered?
     # nil case should only happen in test env (test_design is not created)
     return false if answerable_complete_question_items.nil?
+
     # compare answerable question items to the ones we've answered
     (answerable_complete_question_items.pluck(:id) - question_answers.pluck(:question_id)).empty?
   end
@@ -95,6 +99,7 @@ class SurveyResponse < ApplicationRecord
 
   def cache_test_scores!
     return unless test_collection.inside_a_submission?
+
     test_collection.parent_submission.cache_test_scores!
   end
 
@@ -118,6 +123,7 @@ class SurveyResponse < ApplicationRecord
           .eq(Item::QuestionItem.question_types[:question_open]),
       ).each do |question_answer|
         next if question_answer.open_response_item.present?
+
         # Save will trigger the callback to create the item
         question_answer.save
       end

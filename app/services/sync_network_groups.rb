@@ -6,6 +6,7 @@ class SyncNetworkGroups < SimpleService
 
   def call
     return true if @roles.empty?
+
     assign_user_to_groups
   rescue JsonApiClient::Errors::ServerError
     false
@@ -26,6 +27,7 @@ class SyncNetworkGroups < SimpleService
       group_id = users_role.role.resource_id
       group = Group.find_by(network_id: group_id)
       next if @user.has_role?(role_name, group)
+
       Roles::MassAssign.call(
         object: group,
         role_name: role_name,

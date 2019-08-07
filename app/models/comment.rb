@@ -33,6 +33,7 @@ class Comment < ApplicationRecord
     entity_map.each_pair do |_k, v|
       entity = Hashie::Mash.new(v)
       next unless entity.type == 'mention'
+
       id, type = entity.data.mention.id.split('__')
       mentions[type.to_sym] << id.to_i
     end
