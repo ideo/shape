@@ -498,8 +498,20 @@ class FoamcoreGrid extends React.Component {
     runInAction(() => {
       this.zoomLevel = this.zoomLevel + 1
     })
+
     this.updateCollectionScrollBottom()
     this.throttledCalculateCardsToRender()
+    const fromScrollWidth =
+      window.document.documentElement.scrollWidth - window.screen.width
+    const fromScrollRatio = window.pageXOffset / fromScrollWidth
+    setTimeout(() => {
+      const leftOffset = fromScrollWidth * 0.32 * fromScrollRatio
+      window.scrollTo({
+        top: window.pageYOffset / 1.9,
+        left: leftOffset,
+        behavior: 'auto',
+      })
+    }, 10)
   }
 
   handleZoomIn = ev => {
@@ -509,6 +521,18 @@ class FoamcoreGrid extends React.Component {
     })
     this.updateCollectionScrollBottom()
     this.throttledCalculateCardsToRender()
+    const fromScrollWidth =
+      window.document.documentElement.scrollWidth - window.screen.width
+    const fromScrollRatio = window.pageXOffset / fromScrollWidth
+    const leftOffset =
+      window.document.documentElement.scrollWidth * 1.5 * fromScrollRatio
+    setTimeout(() => {
+      window.scrollTo({
+        top: window.pageYOffset * 1.9,
+        left: leftOffset,
+        behavior: 'auto',
+      })
+    }, 10)
   }
 
   updateCollectionScrollBottom() {
