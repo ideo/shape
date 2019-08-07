@@ -81,6 +81,7 @@ const StyledEditTitle = styled.div`
       font-size: 1rem;
       text-transform: none;
       outline-width: 0;
+      resize: none;
     }
   }
 `
