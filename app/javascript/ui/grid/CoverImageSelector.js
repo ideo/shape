@@ -241,7 +241,6 @@ class CoverImageSelector extends React.Component {
     ev.preventDefault()
     this.populateAllOptions()
     runInAction(() => (this.open = !this.open))
-    // fixme: check how we can use this.open along with uiStore.editingCardTitle to turn this off
     uiStore.setEditingCardTitle(true)
   }
 
@@ -249,6 +248,7 @@ class CoverImageSelector extends React.Component {
     const { uiStore } = this.props
     runInAction(() => (this.open = !this.open))
     uiStore.setEditingCardTitle(false)
+    this.handleSave()
   }
 
   async clearCover() {
@@ -263,8 +263,9 @@ class CoverImageSelector extends React.Component {
   }
 
   onImageOptionSelect = async option => {
-    const { apiStore, card } = this.props
+    const { apiStore, uiStore, card } = this.props
     runInAction(() => (this.open = false))
+    uiStore.setEditingCardTitle(false)
     if (option.cardId) {
       const selectedCard = apiStore.find('collection_cards', option.cardId)
       selectedCard.is_cover = true
@@ -292,8 +293,9 @@ class CoverImageSelector extends React.Component {
   }
 
   onFilterOptionSelect = async option => {
-    const { card } = this.props
+    const { uiStore, card } = this.props
     runInAction(() => (this.open = false))
+    uiStore.setEditingCardTitle(false)
     card.filter = option.type
     await card.save()
   }
