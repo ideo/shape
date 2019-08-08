@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { action, observable, runInAction } from 'mobx'
+import { action, observable, runInAction, observe } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
@@ -87,6 +87,8 @@ const pageMargins = {
 const MAX_CARD_W = 4
 const MAX_CARD_H = 2
 const MAX_COLS = 16
+const MIN_ZOOM_LEVEL = 1
+const MAX_ZOOM_LEVEL = 3
 
 // needs to be an observer to observe changes to the collection + items
 @inject('apiStore', 'routingStore', 'uiStore')
@@ -96,7 +98,7 @@ class FoamcoreGrid extends React.Component {
   @observable
   cardsToRender = []
   @observable
-  zoomLevel = 3
+  zoomLevel = MAX_ZOOM_LEVEL
   dragGridSpot = observable.map({})
   @observable
   dragging = false
@@ -256,7 +258,7 @@ class FoamcoreGrid extends React.Component {
 
   // Default zoom level is that which fits all columns in the browser viewport
   get relativeZoomLevel() {
-    if (this.zoomLevel !== 3) return this.zoomLevel
+    if (this.zoomLevel !== MAX_ZOOM_LEVEL) return this.zoomLevel
     const { gridW, gutter } = this.gridSettings
     const gridWidth =
       (gridW + gutter) * MAX_COLS + pageMargins.left * 2 * this.zoomLevel
@@ -494,21 +496,46 @@ class FoamcoreGrid extends React.Component {
   }
 
   handleZoomOut = ev => {
-    if (this.zoomLevel === 3) return
+    if (this.zoomLevel === MAX_ZOOM_LEVEL) return
     runInAction(() => {
       this.zoomLevel = this.zoomLevel + 1
     })
+
     this.updateCollectionScrollBottom()
     this.throttledCalculateCardsToRender()
+    const fromScrollWidth =
+      window.document.documentElement.scrollWidth - window.screen.width
+    const fromScrollRatio = window.pageXOffset / fromScrollWidth
+    setTimeout(() => {
+      const leftOffset = fromScrollWidth * 0.32 * fromScrollRatio
+      window.scrollTo({
+        top: window.pageYOffset / 1.9,
+        left: this.zoomLevel === MAX_ZOOM_LEVEL ? 0 : leftOffset,
+        behavior: 'auto',
+      })
+    }, 10)
   }
 
   handleZoomIn = ev => {
-    if (this.zoomLevel === 1) return
+    if (this.zoomLevel === MIN_ZOOM_LEVEL) return
     runInAction(() => {
       this.zoomLevel = this.zoomLevel - 1
     })
     this.updateCollectionScrollBottom()
     this.throttledCalculateCardsToRender()
+    const fromScrollWidth =
+      window.document.documentElement.scrollWidth - window.screen.width
+    const fromScrollRatio = window.pageXOffset / fromScrollWidth
+    const leftOffset =
+      window.document.documentElement.scrollWidth * 1.5 * fromScrollRatio
+    setTimeout(() => {
+      const toScrollWidth = (window.document.documentElement.scrollWidth - window.screen.width) * .5
+      window.scrollTo({
+        top: window.pageYOffset * 1.9,
+        left: this.zoomLevel === MAX_ZOOM_LEVEL - 1 ? toScrollWidth : leftOffset,
+        behavior: 'auto',
+      })
+    }, 10)
   }
 
   updateCollectionScrollBottom() {
@@ -938,7 +965,7 @@ class FoamcoreGrid extends React.Component {
     const position = this.positionForCoordinates(card)
 
     // TODO reorganize
-    if (card.id === 'blank' && this.zoomLevel !== 1) {
+    if (card.id === 'blank' && this.zoomLevel !== MIN_ZOOM_LEVEL) {
       position.xPos = position.x - this.zoomLevel * 38
       position.yPos = position.y - this.zoomLevel * 30
     }
