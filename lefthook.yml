@@ -14,7 +14,7 @@ pre-commit:
       run: bundle exec rubocop --fail-level error {files}
 
 pre-push: # githook name
-  parallel: true
+  parallel: false
   commands: # list of commands
     rubocop:
       tags: backend
