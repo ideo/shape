@@ -43,8 +43,10 @@ const linkBackgroundOption = {
 }
 
 const TopRightHolder = styled.div`
-  width: 316px;
-  height: 250px;
+  width: 100%;
+  height: 100%;
+  max-width: 316px;
+  max-height: 250px;
   padding: 15px;
   right: 0px;
   top: 0px;
@@ -54,6 +56,7 @@ const TopRightHolder = styled.div`
   background: ${v.colors.primaryLight};
   opacity: 0.9;
   box-sizing: border-box;
+  overflow-y: scroll;
 `
 TopRightHolder.displayName = 'TopRightHolder'
 
@@ -311,7 +314,6 @@ class CoverImageSelector extends React.Component {
     return (
       <div>
         <TextareaAutosize
-          minRows={1}
           maxRows={3}
           maxLength={144}
           value={title}
