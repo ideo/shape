@@ -1,61 +1,51 @@
-#!/usr/bin/env ruby
-prev_head, curr_head, branch_change, * = ARGV
+# modified from https://gist.github.com/brysgo/9980344
 
-exit if branch_change == '0'   # Don't run on file checkouts
-exit if prev_head == curr_head # Don't run if we're still on the same commit
+CHECKING_OUT_BRANCH=$3
+OLD_BRANCH=$1
+NEW_BRANCH=$2
 
-app_dir = File.expand_path('../..', __dir__)
-ENV['BUNDLE_GEMFILE'] ||= File.join(app_dir, 'Gemfile')
-require 'bundler/setup'
+if [ $CHECKING_OUT_BRANCH -eq 1 ]
+  then
+    FILES_CHANGED=`git diff $OLD_BRANCH $NEW_BRANCH --name-status`
+    MIGRATIONS_REMOVED=`echo "$FILES_CHANGED" | egrep --color=never 'D\tdb/migrate/([0-9]+)' | sort -r`
+    MIGRATIONS_ADDED=`echo "$FILES_CHANGED" | egrep --color=never 'A\tdb/migrate/([0-9]+)'`
 
-require 'git'
+    # check if we need to do a bundle
+    BUNDLE_CHANGED=`echo "$FILES_CHANGED" | egrep --color=never 'M\tGemfile.lock'`
+    if [ ! -z "$BUNDLE_CHANGED" ]; then
+      echo "Your Gemfile.lock has changed, running bundle"
+      bundle
+    fi
 
-# Rails.root if we look from .lefthook/post-checkout dir
-app_dir = File.expand_path('../..', __dir__)
+    # check if we need to do a yarn install
+    PACKAGE_CHANGED=`echo "$FILES_CHANGED" | egrep --color=never 'M\tyarn.lock'`
+    if [ ! -z "$PACKAGE_CHANGED" ]; then
+      echo "Your yarn.lock has changed, running yarn"
+      yarn
+    fi
 
-git = Git.open(app_dir)
+    if [ ! -z "$MIGRATIONS_REMOVED" ]; then
+      echo "Rolling back missing migrations"
+      for migration in $MIGRATIONS_REMOVED
+      do
+        if [ $migration == "D" ]; then
+          continue
+        fi
+        git checkout "$OLD_BRANCH" -- "$migration"
+        VERSION=`echo "$migration" | cut -d'_' -f1 | cut -d'/' -f3`
+        bundle exec rake db:migrate:down VERSION="$VERSION"
+        git reset
+        rm "$migration"
+      done
+      bundle exec rake db:test:prepare
+      git checkout db/schema.rb
+    fi
 
-# Don't run if there were no database changes between revisions
-diff = git.diff(prev_head, curr_head).path('db/migrate')
-exit if diff.size.zero?
+    if [ ! -z "$MIGRATIONS_ADDED" ]; then
+      echo "New migrations have been added running migrations"
+      bundle exec rake db:migrate db:test:prepare
+    fi
 
-require File.expand_path('config/boot', app_dir)
-require File.expand_path('config/application', app_dir)
-require 'rake'
-Rails.application.load_tasks
-
-Rake::Task['db:load_config'].invoke
-
-# migrations added in prev_head (deleted in curr_head) that we need to rollback
-rollback_migration_files = diff.select { |file| file.type == 'deleted' }
-
-if rollback_migration_files.any?
-  require 'tmpdir'
-  MigrationFilenameRegexp = ActiveRecord::Migration::MigrationFilenameRegexp
-  versions = []
-
-  Dir.mktmpdir do |directory|
-    rollback_migration_files.each do |diff_file|
-      filename = File.basename(diff_file.path)
-      contents = git.gblob("#{prev_head}:#{diff_file.path}").contents
-      File.write(File.join(directory, filename), contents)
-      version = filename.scan(MigrationFilenameRegexp).first&.first
-      versions.push(version) if version
-    end
-  end
-end
-
-begin
-  old_migration_paths = ActiveRecord::Migrator.migrations_paths
-  ActiveRecord::Migrator.migrations_paths.push(directory)
-
-  versions.sort.reverse_each do |version|
-    ENV['VERSION'] = version
-    Rake::Task['db:migrate:down'].execute
-  end
-ensure
-  ENV.delete('VERSION')
-  ActiveRecord::Migrator.migrations_paths = old_migration_paths
-end
-
-Rake::Task['db:migrate'].invoke
+    # always check out the branch's correct version of the submodule
+    git submodule update app/javascript/ui/shared
+fi
