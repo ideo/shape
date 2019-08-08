@@ -4,7 +4,8 @@ pre-commit:
   commands:
     lint:
       files: git diff --name-only development
-      glob: "*.{js,ts}*" # JS, TS, and TSX files
+      glob: "*.js" 
+      exclude: '__tests__/ui/grid/__snapshots__/*'
       run: yarn run lint {files}
     rubocop:
       files: git diff --name-only development

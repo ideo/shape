@@ -1,1 +1,1 @@
-export default jest.fn.mockReturnValue(Promise.resolve)
+export default jest.fn().mockReturnValue(Promise.resolve())
