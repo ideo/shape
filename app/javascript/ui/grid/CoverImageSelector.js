@@ -73,7 +73,7 @@ const StyledEditTitle = styled.div`
     flex: 3 1 auto;
     height: 100%;
     border-bottom: 1px solid ${v.colors.black};
-    max-width: 205px;
+    max-width: 200px;
     textarea {
       width: 100%;
       background: transparent;
