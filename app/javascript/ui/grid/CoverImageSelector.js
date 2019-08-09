@@ -108,8 +108,6 @@ const filterOptions = [
 @observer
 class CoverImageSelector extends React.Component {
   @observable
-  open = false
-  @observable
   imageOptions = []
   @observable
   parentCard = null
@@ -245,12 +243,10 @@ class CoverImageSelector extends React.Component {
     const { id } = card
     ev.preventDefault()
     this.populateAllOptions()
-    runInAction(() => (this.open = !this.open))
     uiStore.setEditingCardCover(id)
   }
 
   handleClose = ev => {
-    runInAction(() => (this.open = !this.open))
     this.handleSave()
   }
 
@@ -267,7 +263,6 @@ class CoverImageSelector extends React.Component {
 
   onImageOptionSelect = async option => {
     const { apiStore, uiStore, card } = this.props
-    runInAction(() => (this.open = false))
     uiStore.setEditingCardCover(null)
     if (option.cardId) {
       const selectedCard = apiStore.find('collection_cards', option.cardId)
@@ -297,7 +292,6 @@ class CoverImageSelector extends React.Component {
 
   onFilterOptionSelect = async option => {
     const { uiStore, card } = this.props
-    runInAction(() => (this.open = false))
     uiStore.setEditingCardCover(null)
     card.filter = option.type
     await card.save()
@@ -362,7 +356,7 @@ class CoverImageSelector extends React.Component {
     return (
       <Fragment>
         <CardActionHolder
-          active={this.open}
+          active={this.isEditingCardCover}
           className="show-on-hover"
           tooltipText="select cover image"
           role="button"
@@ -370,8 +364,7 @@ class CoverImageSelector extends React.Component {
         >
           <EditPencilIconLarge />
         </CardActionHolder>
-        {this.open &&
-          isEditingCardCover &&
+        {isEditingCardCover &&
           ReactDOM.createPortal(this.renderInner(), this.parentCard)}
       </Fragment>
     )
