@@ -62,7 +62,7 @@ TopRightHolder.displayName = 'TopRightHolder'
 
 const StyledEditTitle = styled.div`
   display: flex;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
   h3 {
     flex: 1;
     margin-right: 10px;
@@ -330,7 +330,6 @@ class CoverImageSelector extends React.Component {
               <h3>Title</h3>
               {this.renderEditTitleInput(this.cardTitle)}
             </StyledEditTitle>
-            <SmallBreak />
             <h3>Cover Image</h3>
             <QuickOptionSelector
               options={toJS(this.imageOptions)}
