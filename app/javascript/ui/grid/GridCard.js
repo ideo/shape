@@ -184,13 +184,10 @@ class GridCard extends React.Component {
       testCollectionCard,
       searchResult,
     } = this.props
-    const { isEditingCardTitle } = uiStore
     return (
       <StyledTopRightActions
         color={this.actionsColor}
-        className={
-          !isEditingCardTitle ? 'show-on-hover' : 'hide-on-editing-title'
-        }
+        className="show-on-hover"
         zoomLevel={zoomLevel}
       >
         {record.isDownloadable && <Download record={record} />}

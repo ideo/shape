@@ -4,7 +4,6 @@ import _ from 'lodash'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observable, action, runInAction, toJS } from 'mobx'
 import styled from 'styled-components'
-import FlipMove from 'react-flip-move'
 
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import FilestackUpload from '~/utils/FilestackUpload'
@@ -224,9 +223,10 @@ class CoverImageSelector extends React.Component {
   }
 
   handleSave = ev => {
-    const { card } = this.props
+    const { card, uiStore } = this.props
     const { record } = card
     record.name = this.cardTitle
+    uiStore.setEditingCardCover(null)
     return record.save()
   }
 
@@ -240,17 +240,16 @@ class CoverImageSelector extends React.Component {
   }
 
   handleClick = ev => {
-    const { uiStore } = this.props
+    const { card, uiStore } = this.props
+    const { id } = card
     ev.preventDefault()
     this.populateAllOptions()
     runInAction(() => (this.open = !this.open))
-    uiStore.setEditingCardTitle(true)
+    uiStore.setEditingCardCover(id)
   }
 
   handleClose = ev => {
-    const { uiStore } = this.props
     runInAction(() => (this.open = !this.open))
-    uiStore.setEditingCardTitle(false)
     this.handleSave()
   }
 
@@ -268,7 +267,7 @@ class CoverImageSelector extends React.Component {
   onImageOptionSelect = async option => {
     const { apiStore, uiStore, card } = this.props
     runInAction(() => (this.open = false))
-    uiStore.setEditingCardTitle(false)
+    uiStore.setEditingCardCover(null)
     if (option.cardId) {
       const selectedCard = apiStore.find('collection_cards', option.cardId)
       selectedCard.is_cover = true
@@ -298,7 +297,7 @@ class CoverImageSelector extends React.Component {
   onFilterOptionSelect = async option => {
     const { uiStore, card } = this.props
     runInAction(() => (this.open = false))
-    uiStore.setEditingCardTitle(false)
+    uiStore.setEditingCardCover(null)
     card.filter = option.type
     await card.save()
   }
@@ -331,7 +330,7 @@ class CoverImageSelector extends React.Component {
     return (
       <TopRightHolder>
         {!this.loading && (
-          <FlipMove appearAnimation="elevator" duration={300} easing="ease-out">
+          <div>
             <StyledEditTitle>
               <h3>Title</h3>
               {this.renderEditTitleInput(this.cardTitle)}
@@ -350,7 +349,7 @@ class CoverImageSelector extends React.Component {
                 onSelect={this.onFilterOptionSelect}
               />
             )}
-          </FlipMove>
+          </div>
         )}
         <CloseButton size="lg" onClick={this.handleClose} />
       </TopRightHolder>
@@ -358,6 +357,8 @@ class CoverImageSelector extends React.Component {
   }
 
   render() {
+    const { uiStore } = this.props
+    const { editingCardTitle } = uiStore
     return (
       <Fragment>
         <CardActionHolder
@@ -370,6 +371,7 @@ class CoverImageSelector extends React.Component {
           <EditPencilIconLarge />
         </CardActionHolder>
         {this.open &&
+          !editingCardTitle &&
           ReactDOM.createPortal(this.renderInner(), this.parentCard)}
       </Fragment>
     )
