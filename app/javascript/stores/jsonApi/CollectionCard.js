@@ -141,6 +141,9 @@ class CollectionCard extends BaseRecord {
       })
       // important to close BCT before adding the new card so that the grid reflows properly
       uiStore.closeBlankContentTool({ force: true })
+      if (!res.data.record.name && res.data.record.isLink) {
+        uiStore.addNewCard(res.data.record.id)
+      }
       this.parentCollection.addCard(res.data)
       uiStore.trackEvent('create', this.parentCollection)
       return res.data

@@ -104,7 +104,10 @@ class LinkCreator extends React.Component {
   createItem = e => {
     e.preventDefault()
     const { urlValid } = this.state
-    if (!urlValid) return
+    if (!urlValid) {
+      this.createLinkItem()
+      return
+    }
     if (urlValid === 'link') {
       this.createLinkItem()
     } else if (urlValid === 'image') {

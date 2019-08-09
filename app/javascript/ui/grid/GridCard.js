@@ -185,6 +185,8 @@ class GridCard extends React.Component {
       searchResult,
     } = this.props
     const { isEditingCardTitle } = uiStore
+    console.log('renderTopRightActions')
+
     return (
       <StyledTopRightActions
         color={this.actionsColor}

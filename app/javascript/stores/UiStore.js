@@ -826,7 +826,9 @@ export default class UiStore {
 
   @action
   addNewCard(id) {
+    console.log('addNewCard, id: ', id)
     if (!this.isNewCard(id)) {
+      console.log('pushing new card to array: ', id)
       this.newCards.push(id)
     }
   }

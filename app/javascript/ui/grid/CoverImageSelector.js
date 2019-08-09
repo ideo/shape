@@ -1,5 +1,6 @@
 import { Fragment } from 'react'
 import ReactDOM from 'react-dom'
+import PropTypes from 'prop-types'
 import _ from 'lodash'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observable, action, runInAction, toJS } from 'mobx'
@@ -115,16 +116,24 @@ class CoverImageSelector extends React.Component {
   parentCard = null
   @observable
   loading = false
-  @observable cardTitle = ''
+  @observable
+  cardTitle = ''
 
   componentDidMount() {
-    const { card } = this.props
+    const { card, uiStore } = this.props
     const { record } = card
     const { name } = record
     this.cardTitle = name
     // TODO don't like how id name is in two separate places
     runInAction(() => {
       this.parentCard = document.getElementById(`gridCard-${card.id}`)
+
+      if (this.props.uiStore.isNewCard(record.id) && record.isLink) {
+        this.populateAllOptions()
+        this.open = true
+        uiStore.setEditingCardTitle(true)
+        this.props.uiStore.removeNewCard(record.id)
+      }
     })
   }
 
@@ -204,6 +213,7 @@ class CoverImageSelector extends React.Component {
     const newCard = new CollectionCard(cardAttrs, apiStore)
     newCard.parent = collection
     this.setLoading(true)
+    // TODO: Is this where that foamcore cover image bug comes from?
     await newCard.API_create()
     // get collection with new collection_cover info attached
     apiStore.fetch('collections', collection.id, true)
@@ -378,7 +388,12 @@ class CoverImageSelector extends React.Component {
 
 CoverImageSelector.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
+  openEditOnCreate: PropTypes.bool,
 }
+CoverImageSelector.defaultProps = {
+  openEditOnCreate: false,
+}
+
 CoverImageSelector.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
