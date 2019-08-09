@@ -299,8 +299,10 @@ class CoverImageSelector extends React.Component {
 
   get showFilters() {
     const { record } = this.props.card
+    const { thumbnail_url, isLink } = record
     if (this.recordIsCollection) return true
-    return !!record.thumbnail_url
+    if (isLink) return true
+    return !!thumbnail_url
   }
 
   renderEditTitleInput(title) {
