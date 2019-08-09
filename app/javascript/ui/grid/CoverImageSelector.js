@@ -352,7 +352,7 @@ class CoverImageSelector extends React.Component {
   }
 
   render() {
-    const { isEditingCardCover } = this.props
+    const { isEditingCardCover, dragging } = this.props
     return (
       <Fragment>
         <CardActionHolder
@@ -365,6 +365,7 @@ class CoverImageSelector extends React.Component {
           <EditPencilIconLarge />
         </CardActionHolder>
         {isEditingCardCover &&
+          !dragging &&
           ReactDOM.createPortal(this.renderInner(), this.parentCard)}
       </Fragment>
     )
@@ -374,6 +375,7 @@ class CoverImageSelector extends React.Component {
 CoverImageSelector.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   isEditingCardCover: PropTypes.bool.isRequired,
+  dragging: PropTypes.bool.isRequired,
 }
 CoverImageSelector.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,

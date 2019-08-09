@@ -275,6 +275,8 @@ class MovableGridCard extends React.PureComponent {
       uiStore.closeBlankContentTool()
       // close the MoveMenu to prevent weird behaviors
       uiStore.closeMoveMenu({ deselect: false })
+      // close editing to prevent weird behaviors
+      uiStore.setEditingCardCover(null)
       uiStore.startDragging(this.props.card.id)
       this.setState(
         {
@@ -336,6 +338,7 @@ class MovableGridCard extends React.PureComponent {
       uiStore.resetSelectionAndBCT()
       // close the MoveMenu to prevent weird behaviors
       uiStore.closeMoveMenu()
+      uiStore.setEditingCardCover(null)
     }
     const gridSettings = isBoardCollection
       ? uiStore.defaultGridSettings

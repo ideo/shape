@@ -190,6 +190,7 @@ class GridCard extends React.Component {
       canEditCollection,
       testCollectionCard,
       searchResult,
+      dragging,
     } = this.props
     return (
       <StyledTopRightActions
@@ -205,6 +206,7 @@ class GridCard extends React.Component {
             card={card}
             parentRef={this.gridCardRef}
             isEditingCardCover={this.isEditingCardCover}
+            dragging={dragging}
           />
         )}
         {record.canBeSetAsCover && canEditCollection && (
