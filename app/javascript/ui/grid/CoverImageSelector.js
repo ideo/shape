@@ -19,6 +19,7 @@ import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import EditPencilIconLarge from '~/ui/icons/EditPencilIconLarge'
 import TextareaAutosize from 'react-autosize-textarea'
 import { CloseButton } from '~/ui/global/styled/buttons'
+import PropTypes from 'prop-types'
 
 const removeOption = {
   type: 'remove',
@@ -357,8 +358,7 @@ class CoverImageSelector extends React.Component {
   }
 
   render() {
-    const { uiStore } = this.props
-    const { editingCardTitle } = uiStore
+    const { isEditingCardCover } = this.props
     return (
       <Fragment>
         <CardActionHolder
@@ -371,7 +371,7 @@ class CoverImageSelector extends React.Component {
           <EditPencilIconLarge />
         </CardActionHolder>
         {this.open &&
-          !editingCardTitle &&
+          isEditingCardCover &&
           ReactDOM.createPortal(this.renderInner(), this.parentCard)}
       </Fragment>
     )
@@ -380,6 +380,7 @@ class CoverImageSelector extends React.Component {
 
 CoverImageSelector.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
+  isEditingCardCover: PropTypes.bool,
 }
 CoverImageSelector.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,

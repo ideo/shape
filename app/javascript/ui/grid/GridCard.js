@@ -192,7 +192,11 @@ class GridCard extends React.Component {
       >
         {record.isDownloadable && <Download record={record} />}
         {record.canSetACover && (
-          <CoverImageSelector card={card} parentRef={this.gridCardRef} />
+          <CoverImageSelector
+            card={card}
+            parentRef={this.gridCardRef}
+            isEditingCardCover={uiStore.editingCardCover === card.id}
+          />
         )}
         {record.canBeSetAsCover && canEditCollection && (
           <CoverImageToggle
