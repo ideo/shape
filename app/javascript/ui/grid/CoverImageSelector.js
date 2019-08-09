@@ -380,7 +380,7 @@ class CoverImageSelector extends React.Component {
 
 CoverImageSelector.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
-  isEditingCardCover: PropTypes.bool,
+  isEditingCardCover: PropTypes.bool.isRequired,
 }
 CoverImageSelector.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
