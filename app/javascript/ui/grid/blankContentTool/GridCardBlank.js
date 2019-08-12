@@ -280,7 +280,6 @@ class GridCardBlank extends React.Component {
   }
 
   createCardWith = file => {
-    console.log('create card with: ', file)
     const attrs = {
       item_attributes: {
         type: ITEM_TYPES.FILE,
@@ -300,22 +299,15 @@ class GridCardBlank extends React.Component {
   }
 
   afterCreate = type => {
-    console.log('in after create')
     return card => {
       googleTagManager.push({
         event: 'formSubmission',
         formType: `Create ${type}`,
         parentType: this.props.parent.isBoard ? 'foamcore' : 'anywhere',
       })
-      console.log('in after create, post GTM.push', type)
 
       if (type === ITEM_TYPES.TEXT) {
         this.props.uiStore.update('textEditingItem', card.record)
-      }
-      if (type === ITEM_TYPES.LINK) {
-        console.log('created a link item')
-        console.log(this.props.uiStore)
-        // this.props.uiStore
       }
     }
   }
