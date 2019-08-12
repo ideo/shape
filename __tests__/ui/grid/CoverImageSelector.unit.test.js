@@ -68,6 +68,10 @@ describe('CoverImageSelector', () => {
       expect(innerWrapper.find('QuickOptionSelector').length).toEqual(2)
     })
 
+    it('should render a TextareaAutosize for editing card titles', () => {
+      expect(innerWrapper.find('TextareaAutosize').length).toEqual(1)
+    })
+
     describe('with a VideoItem that has no thumbnail_url', () => {
       beforeEach(() => {
         rerender({
@@ -93,7 +97,7 @@ describe('CoverImageSelector', () => {
       holder.simulate('click', fakeEv)
     })
 
-    it('should set open to true', () => {
+    it('should set an editing card cover', () => {
       expect(uiStore.setEditingCardCover).toHaveBeenCalledWith(card.id)
     })
 
