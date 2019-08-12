@@ -1,5 +1,6 @@
 import { observable } from 'mobx'
 import RolesMenu from '~/ui/roles/RolesMenu'
+import sleep from '~/utils/sleep'
 import fakeUiStore from '#/mocks/fakeUiStore'
 
 import { fakeUser, fakeRole, fakeCollection } from '#/mocks/data'
@@ -27,7 +28,7 @@ describe('RolesMenu', () => {
     }
     const record = {
       ...fakeCollection,
-      roles: [{ pendingCount: 0, activeCount: 0, users: [] }],
+      roles: [{ name: 'editors', pendingCount: 0, activeCount: 0, users: [] }],
     }
     props = {
       record,
@@ -166,5 +167,21 @@ describe('RolesMenu', () => {
     expect(
       wrapper.find('[data-cy="anyone-can-view-checkbox"]').exists()
     ).toEqual(false)
+  })
+
+  describe('with role of content_editor', () => {
+    beforeEach(() => {
+      props.record.roles[0].activeCount = 1
+      props.record.roles[0].name = 'content_editor'
+      props.record.roles[0].users = [
+        { id: 5, internalType: 'users', name: 'Real Person' },
+      ]
+      wrapper = shallow(<RolesMenu.wrappedComponent {...props} />)
+    })
+
+    it('does not show user in list', async () => {
+      await sleep(1000)
+      expect(wrapper.find('RoleSelect').length).toEqual(0)
+    })
   })
 })

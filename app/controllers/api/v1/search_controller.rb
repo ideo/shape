@@ -128,6 +128,7 @@ class Api::V1::SearchController < Api::V1::BaseController
       search_opts[:index_name] = [User]
       search_opts[:where] = {
         status: status,
+        application_bot: false,
         _id: @resource.user_ids,
       }
     else
@@ -137,6 +138,7 @@ class Api::V1::SearchController < Api::V1::BaseController
             _type: 'user',
             _id: @resource.search_user_ids,
             status: status,
+            application_bot: false,
           },
         ],
       }
