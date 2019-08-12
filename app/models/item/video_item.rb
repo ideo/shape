@@ -8,13 +8,10 @@
 #  archived_at                :datetime
 #  breadcrumb                 :jsonb
 #  cached_attributes          :jsonb
-#  content                    :text
-#  data_content               :jsonb
 #  data_settings              :jsonb
 #  data_source_type           :string
 #  icon_url                   :string
 #  legend_search_source       :integer
-#  name                       :string
 #  question_type              :integer
 #  report_type                :integer
 #  thumbnail_url              :string
