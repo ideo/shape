@@ -325,7 +325,7 @@ class CoverImageSelector extends React.Component {
 
   renderInner() {
     return (
-      <TopRightHolder>
+      <TopRightHolder data-cy="EditCoverOptions">
         {!this.loading && (
           <div>
             <StyledEditTitle>
@@ -347,7 +347,11 @@ class CoverImageSelector extends React.Component {
             )}
           </div>
         )}
-        <CloseButton size="lg" onClick={this.handleClose} />
+        <CloseButton
+          size="lg"
+          onClick={this.handleClose}
+          data-cy="EditCoverCloseBtn"
+        />
       </TopRightHolder>
     )
   }
