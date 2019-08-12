@@ -174,6 +174,75 @@ class GridCard extends React.Component {
     )
   }
 
+  renderTopRightActions() {
+    const {
+      record,
+      menuOpen,
+      zoomLevel,
+      card,
+      canEditCollection,
+      testCollectionCard,
+      searchResult,
+    } = this.props
+    const { isEditingCardTitle } = uiStore
+    return (
+      <StyledTopRightActions
+        color={this.actionsColor}
+        className={
+          !isEditingCardTitle ? 'show-on-hover' : 'hide-on-editing-title'
+        }
+        zoomLevel={zoomLevel}
+      >
+        {record.isDownloadable && <Download record={record} />}
+        {record.canSetACover && (
+          <CoverImageSelector card={card} parentRef={this.gridCardRef} />
+        )}
+        {record.canBeSetAsCover && canEditCollection && (
+          <CoverImageToggle
+            card={card}
+            onReassign={this.onCollectionCoverChange}
+          />
+        )}
+        {record.isData && record.isReportTypeCollectionsItems && (
+          <EditButton onClick={this.editCard} />
+        )}
+        {record.isImage && this.canContentEditCard && (
+          <ContainImage card={card} image_contain={card.image_contain} />
+        )}
+        {(record.isImage || record.isText) && (
+          <CardActionHolder
+            className="show-on-hover"
+            onClick={() => this.goToPage(card)}
+            tooltipText="go to page"
+          >
+            <FullScreenIcon />
+          </CardActionHolder>
+        )}
+        {!testCollectionCard && (
+          <CardActionHolder tooltipText="select">
+            <SelectionCircle cardId={card.id} />
+          </CardActionHolder>
+        )}
+        <ActionMenu
+          location={this.location}
+          className="show-on-hover"
+          wrapperClassName="card-menu"
+          card={card}
+          canView={record.can_view}
+          canEdit={this.canEditCard}
+          canReplace={record.canReplace && !card.link && !searchResult}
+          direction={uiStore.cardMenuOpen.direction}
+          offsetPosition={this.offsetPosition}
+          menuOpen={menuOpen}
+          onOpen={this.openMenu}
+          onLeave={this.closeMenu}
+          testCollectionCard={testCollectionCard}
+          menuItemsCount={this.getMenuItemsCount}
+        />
+      </StyledTopRightActions>
+    )
+  }
+
   renderReplaceControl() {
     const { card, canEditCollection } = this.props
     if (!canEditCollection) return null
@@ -424,7 +493,6 @@ class GridCard extends React.Component {
       canEditCollection,
       dragging,
       draggingMultiple,
-      menuOpen,
       lastPinnedCard,
       testCollectionCard,
       searchResult,
@@ -470,60 +538,8 @@ class GridCard extends React.Component {
         {this.renderReplaceControl()}
         {!record.menuDisabled &&
           uiStore.textEditingItem !== record &&
-          !record.archived && (
-            <StyledTopRightActions
-              color={this.actionsColor}
-              className="show-on-hover"
-              zoomLevel={zoomLevel}
-            >
-              {record.isDownloadable && <Download record={record} />}
-              {record.canSetACover && (
-                <CoverImageSelector card={card} parentRef={this.gridCardRef} />
-              )}
-              {record.canBeSetAsCover && canEditCollection && (
-                <CoverImageToggle
-                  card={card}
-                  onReassign={this.onCollectionCoverChange}
-                />
-              )}
-              {record.isData && record.isReportTypeCollectionsItems && (
-                <EditButton onClick={this.editCard} />
-              )}
-              {record.isImage && this.canContentEditCard && (
-                <ContainImage card={card} image_contain={card.image_contain} />
-              )}
-              {(record.isImage || record.isText) && (
-                <CardActionHolder
-                  className="show-on-hover"
-                  onClick={() => this.goToPage(card)}
-                  tooltipText="go to page"
-                >
-                  <FullScreenIcon />
-                </CardActionHolder>
-              )}
-              {!testCollectionCard && (
-                <CardActionHolder tooltipText="select">
-                  <SelectionCircle cardId={card.id} />
-                </CardActionHolder>
-              )}
-              <ActionMenu
-                location={this.location}
-                className="show-on-hover"
-                wrapperClassName="card-menu"
-                card={card}
-                canView={record.can_view}
-                canEdit={this.canEditCard}
-                canReplace={record.canReplace && !card.link && !searchResult}
-                direction={uiStore.cardMenuOpen.direction}
-                offsetPosition={this.offsetPosition}
-                menuOpen={menuOpen}
-                onOpen={this.openMenu}
-                onLeave={this.closeMenu}
-                testCollectionCard={testCollectionCard}
-                menuItemsCount={this.getMenuItemsCount}
-              />
-            </StyledTopRightActions>
-          )}
+          !record.archived &&
+          this.renderTopRightActions()}
         {this.renderIcon}
         {this.renderHidden}
         {/* onClick placed here so it's separate from hotspot click */}

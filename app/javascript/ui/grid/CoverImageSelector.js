@@ -7,7 +7,6 @@ import styled from 'styled-components'
 import FlipMove from 'react-flip-move'
 
 import CardActionHolder from '~/ui/icons/CardActionHolder'
-import CoverImageToggleIcon from '~/ui/icons/CoverImageToggleIcon'
 import FilestackUpload from '~/utils/FilestackUpload'
 import QuickOptionSelector from '~/ui/global/QuickOptionSelector'
 import SingleCrossIcon from '~/ui/icons/SingleCrossIcon'
@@ -18,6 +17,9 @@ import v, { ITEM_TYPES } from '~/utils/variables'
 // This must be imported last, or else it leads to a cryptic
 // circular dependency issue
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
+import EditPencilIconLarge from '~/ui/icons/EditPencilIconLarge'
+import TextareaAutosize from 'react-autosize-textarea'
+import { CloseButton } from '~/ui/global/styled/buttons'
 
 const removeOption = {
   type: 'remove',
@@ -41,14 +43,53 @@ const linkBackgroundOption = {
 }
 
 const TopRightHolder = styled.div`
-  max-width: 192px;
-  right: 5px;
+  width: 100%;
+  height: 100%;
+  max-width: 316px;
+  max-height: 250px;
+  padding: 15px;
+  right: 0px;
+  top: 0px;
+  display: block;
   position: absolute;
-  top: 46px;
-  width: ${props => props.width}px;
   z-index: ${v.zIndex.gridCardTop};
+  background: ${v.colors.primaryLight};
+  opacity: 0.9;
+  box-sizing: border-box;
+  overflow-y: scroll;
 `
 TopRightHolder.displayName = 'TopRightHolder'
+
+const StyledEditTitle = styled.div`
+  display: flex;
+  margin-bottom: 0.75rem;
+  h3 {
+    flex: 1;
+    margin-right: 10px;
+    height: 100%;
+    max-width: 50px;
+  }
+  div {
+    flex: 3 1 auto;
+    height: 100%;
+    border-bottom: 1px solid ${v.colors.black};
+    max-width: 205px;
+    textarea {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: ${props => props.color || v.colors.black};
+      font-weight: ${v.weights.book};
+      font-family: ${v.fonts.sans};
+      font-size: 1rem;
+      text-transform: none;
+      outline-width: 0;
+      resize: none;
+    }
+  }
+`
+
+StyledEditTitle.displayName = 'StyledEditTitle'
 
 const filterOptions = [
   {
@@ -63,7 +104,7 @@ const filterOptions = [
   },
 ]
 
-@inject('apiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class CoverImageSelector extends React.Component {
   @observable
@@ -74,9 +115,13 @@ class CoverImageSelector extends React.Component {
   parentCard = null
   @observable
   loading = false
+  @observable cardTitle = ''
 
   componentDidMount() {
     const { card } = this.props
+    const { record } = card
+    const { name } = record
+    this.cardTitle = name
     // TODO don't like how id name is in two separate places
     runInAction(() => {
       this.parentCard = document.getElementById(`gridCard-${card.id}`)
@@ -167,15 +212,46 @@ class CoverImageSelector extends React.Component {
 
   changeCover = async file => {
     const { apiStore, card } = this.props
-    const item = apiStore.find('items', card.record.id)
+    const { record } = card
+    const item = apiStore.find('items', record.id)
     item.thumbnail_url = file.url
     return item.save()
   }
 
+  @action
+  changeTitle = ev => {
+    this.cardTitle = ev.target.value
+  }
+
+  handleSave = ev => {
+    const { card } = this.props
+    const { record } = card
+    record.name = this.cardTitle
+    return record.save()
+  }
+
+  handleInputKeys = ev => {
+    if (ev.key === 'Enter') this.handleSave(ev)
+  }
+
+  handleInputClick = ev => {
+    ev.stopPropagation()
+    ev.target.focus()
+  }
+
   handleClick = ev => {
+    const { uiStore } = this.props
     ev.preventDefault()
     this.populateAllOptions()
     runInAction(() => (this.open = !this.open))
+    uiStore.setEditingCardTitle(true)
+  }
+
+  handleClose = ev => {
+    const { uiStore } = this.props
+    runInAction(() => (this.open = !this.open))
+    uiStore.setEditingCardTitle(false)
+    this.handleSave()
   }
 
   async clearCover() {
@@ -190,8 +266,9 @@ class CoverImageSelector extends React.Component {
   }
 
   onImageOptionSelect = async option => {
-    const { apiStore, card } = this.props
+    const { apiStore, uiStore, card } = this.props
     runInAction(() => (this.open = false))
+    uiStore.setEditingCardTitle(false)
     if (option.cardId) {
       const selectedCard = apiStore.find('collection_cards', option.cardId)
       selectedCard.is_cover = true
@@ -219,8 +296,9 @@ class CoverImageSelector extends React.Component {
   }
 
   onFilterOptionSelect = async option => {
-    const { card } = this.props
+    const { uiStore, card } = this.props
     runInAction(() => (this.open = false))
+    uiStore.setEditingCardTitle(false)
     card.filter = option.type
     await card.save()
   }
@@ -231,19 +309,41 @@ class CoverImageSelector extends React.Component {
     return !!record.thumbnail_url
   }
 
+  renderEditTitleInput(title) {
+    // max length 144 matches StyledEditableName's max length
+    return (
+      <div>
+        <TextareaAutosize
+          maxRows={3}
+          maxLength={144}
+          value={title}
+          placeholder={'untitled'}
+          onChange={this.changeTitle}
+          onKeyPress={this.handleInputKeys}
+          onBlur={this.handleSave}
+          onClick={this.handleInputClick}
+        />
+      </div>
+    )
+  }
+
   renderInner() {
     return (
-      <TopRightHolder
-        className="show-on-hover"
-        width={this.imageOptions.length * 32}
-      >
+      <TopRightHolder>
         {!this.loading && (
           <FlipMove appearAnimation="elevator" duration={300} easing="ease-out">
+            <StyledEditTitle>
+              <h3>Title</h3>
+              {this.renderEditTitleInput(this.cardTitle)}
+            </StyledEditTitle>
+            <SmallBreak />
+            <h3>Cover Image</h3>
             <QuickOptionSelector
               options={toJS(this.imageOptions)}
               onSelect={this.onImageOptionSelect}
             />
             <SmallBreak />
+            <h3>Cover effects</h3>
             {this.showFilters && (
               <QuickOptionSelector
                 options={filterOptions}
@@ -252,6 +352,7 @@ class CoverImageSelector extends React.Component {
             )}
           </FlipMove>
         )}
+        <CloseButton size="lg" onClick={this.handleClose} />
       </TopRightHolder>
     )
   }
@@ -266,7 +367,7 @@ class CoverImageSelector extends React.Component {
           role="button"
           onClick={this.handleClick}
         >
-          <CoverImageToggleIcon />
+          <EditPencilIconLarge />
         </CardActionHolder>
         {this.open &&
           ReactDOM.createPortal(this.renderInner(), this.parentCard)}
@@ -280,6 +381,7 @@ CoverImageSelector.propTypes = {
 }
 CoverImageSelector.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default CoverImageSelector

@@ -2,18 +2,18 @@ require 'rails_helper'
 
 RSpec.describe OrganizationBuilder, type: :service do
   let(:user) { create(:user) }
-  let(:params) {
+  let(:params) do
     {
       'name': 'An org',
       'handle': 'an-org',
     }
-  }
+  end
 
   describe '#save' do
-    let(:builder) {
+    let(:builder) do
       OrganizationBuilder.new(params,
                               user)
-    }
+    end
     context 'with valid params' do
       before do
         allow(builder.organization).to receive(:create_network_organization)
@@ -66,6 +66,17 @@ RSpec.describe OrganizationBuilder, type: :service do
       it 'should create the network organization' do
         expect(organization).to have_received(:create_network_subscription)
       end
+
+      context 'with an application bot user' do
+        let(:user) { create(:user, :application_bot) }
+
+        it 'should create an application organization' do
+          apporg = ApplicationOrganization.last
+          expect(ApplicationOrganization.count).to be 1
+          expect(apporg.application_id).to eq user.application.id
+          expect(apporg.organization_id).to eq organization.id
+        end
+      end
     end
 
     context 'with invalid params' do
@@ -76,9 +87,9 @@ RSpec.describe OrganizationBuilder, type: :service do
       end
 
       it 'should rollback the transaction' do
-        expect {
+        expect do
           builder.save
-        }.to not_change(Organization, :count)
+        end.to not_change(Organization, :count)
           .and not_change(Group, :count)
       end
     end

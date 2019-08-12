@@ -20,7 +20,7 @@ RSpec.describe NotificationDigest, type: :service do
   describe '#call' do
     context 'with type = :notifications' do
       let(:type) { :notifications }
-      let!(:activity) { create(:activity, organization: organization) }
+      let!(:activity) { create(:activity, organization: organization, action: 'moved') }
       let!(:notification) { create(:notification, user: user, activity: activity) }
 
       it 'should send a notification digest for each user that has a recent notification' do
@@ -39,6 +39,27 @@ RSpec.describe NotificationDigest, type: :service do
 
         it 'should not send a notification' do
           expect(NotificationMailer).not_to receive(:notify)
+          digest_service.call
+        end
+      end
+
+      context 'with a notification of a comment' do
+        let!(:comment_activity) { create(:activity, organization: organization, action: 'commented') }
+        let!(:comment_notification) { create(:notification, user: user, activity: comment_activity) }
+
+        it 'does not send a (redundant) notification' do
+          expect(NotificationMailer).to receive(:notify).with(
+            user_id: user.id,
+            notification_ids: [notification.id],
+            comment_thread_ids: [],
+          )
+
+          expect(NotificationMailer).to_not receive(:notify).with(
+            user_id: user.id,
+            notification_ids: [comment_notification.id],
+            comment_thread_ids: [],
+          )
+
           digest_service.call
         end
       end
@@ -97,7 +118,22 @@ RSpec.describe NotificationDigest, type: :service do
         )
         digest_service.call
       end
+
+      context 'when comment has been deleted before email sent' do
+        before { comment_with_mentions.destroy }
+
+        it 'does not send a notification' do
+          expect(NotificationMailer).to_not receive(:notify).with(
+            user_id: user.id,
+            notification_ids: [],
+            comment_thread_ids: [],
+          )
+
+          digest_service.call
+        end
+      end
     end
+
 
     context 'with unsupported type' do
       let(:type) { :other }

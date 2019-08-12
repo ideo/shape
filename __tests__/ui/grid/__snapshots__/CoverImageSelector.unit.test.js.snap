@@ -11,7 +11,7 @@ exports[`CoverImageSelector renders snapshot 1`] = `
     size={32}
     tooltipText="select cover image"
   >
-    <CoverImageToggleIcon />
+    <EditPencilIconLarge />
   </CardActionHolder>
 </React.Fragment>
 `;
