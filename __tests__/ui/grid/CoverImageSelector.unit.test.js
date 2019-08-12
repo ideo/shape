@@ -94,7 +94,7 @@ describe('CoverImageSelector', () => {
     })
 
     it('should set open to true', () => {
-      expect(component.open).toBe(true)
+      expect(uiStore.setEditingCardCover).toHaveBeenCalledWith(card.id)
     })
 
     it('should set the list of options from the api', () => {
@@ -146,7 +146,7 @@ describe('CoverImageSelector', () => {
       })
 
       it('should close the selector', () => {
-        expect(component.open).toBe(false)
+        expect(uiStore.setEditingCardCover).toHaveBeenCalledWith(null)
       })
     })
 
@@ -170,7 +170,7 @@ describe('CoverImageSelector', () => {
     })
 
     it('should close the menu', () => {
-      expect(component.open).toBe(false)
+      expect(uiStore.setEditingCardCover).toHaveBeenCalledWith(null)
     })
 
     it('should save the card', () => {
