@@ -276,7 +276,6 @@ class MovableGridCard extends React.PureComponent {
       // close the MoveMenu to prevent weird behaviors
       uiStore.closeMoveMenu({ deselect: false })
       // close editing to prevent weird behaviors
-      uiStore.setEditingCardCover(null)
       uiStore.startDragging(this.props.card.id)
       this.setState(
         {
@@ -692,7 +691,8 @@ class MovableGridCard extends React.PureComponent {
             !canEditCollection ||
             // NOTE: disabling dragging for touchscreens because of conflict with touch scrolling
             (uiStore.isTouchDevice && cols === 1) ||
-            card.isPinnedAndLocked
+            card.isPinnedAndLocked ||
+            !!uiStore.editingCardCover
           }
           enableResizing={{
             bottomRight:
