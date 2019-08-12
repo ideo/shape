@@ -318,6 +318,7 @@ class CoverImageSelector extends React.Component {
           onKeyPress={this.handleInputKeys}
           onBlur={this.handleSave}
           onClick={this.handleInputClick}
+          className={'edit-cover-text'}
         />
       </div>
     )

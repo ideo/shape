@@ -43,6 +43,7 @@ const captureGlobalKeypress = e => {
     _.intersection(activeElement.classList, [
       'ql-editor',
       'public-DraftEditor-content',
+      'edit-cover-text',
     ]).length > 0
 
   if (shouldNormalKeyPressBeAllowed) return false
