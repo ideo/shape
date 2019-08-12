@@ -1,9 +1,9 @@
 class CreateGlobalTranslations < ActiveRecord::Migration[5.2]
   def up
-    GlobalTranslationMigration.up
+    Migrations::GlobalTranslationMigration.up
   end
 
   def down
-    GlobalTranslationMigration.down
+    Migrations::GlobalTranslationMigration.down
   end
 end
