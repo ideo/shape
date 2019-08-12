@@ -314,6 +314,8 @@ class RolesMenu extends React.Component {
     // e.g. "admin" is the only selection for Org Admins group
     const addRoleTypes = fixedRole ? [fixedRole] : roleTypes(ownerType)
 
+    const editableGroups = groups.filter(group => group.can_edit)
+
     return (
       <Fragment>
         <PublicSharingOptions
@@ -343,7 +345,7 @@ class RolesMenu extends React.Component {
                 onCreateRoles={this.createRoles}
                 onCreateUsers={this.onCreateUsers}
                 ownerType={ownerType}
-                addableGroups={groups}
+                addableGroups={editableGroups}
                 defaultGroupId={record.inherited_default_group_id}
               />
             </FooterArea>
