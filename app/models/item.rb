@@ -63,7 +63,8 @@ class Item < ApplicationRecord
   translates_custom :name,
                     :content,
                     :data_content,
-                    confirmable: true
+                    confirmable: true,
+                    fallbacks_for_empty_translations: true
 
   store_accessor :cached_attributes,
                  :cached_tag_list,

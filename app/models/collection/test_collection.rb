@@ -517,7 +517,14 @@ class Collection
       question_items
         .joins(
           :parent_collection_card,
-        ).where(question_type: :question_description, content: [nil, ''])
+        )
+        .left_joins(
+          :translations,
+        )
+        .where(
+          question_type: :question_description,
+          'item_translations.content': [nil, ''],
+        )
     end
 
     def incomplete_category_satisfaction_items

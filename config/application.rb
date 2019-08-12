@@ -45,5 +45,8 @@ module Shape
 
     # for serving gzipped assets
     config.middleware.use Rack::Deflater
+
+    # https://github.com/globalize/globalize#i18n-fallbacks-for-empty-translations
+    config.i18n.fallbacks = [I18n.default_locale]
   end
 end

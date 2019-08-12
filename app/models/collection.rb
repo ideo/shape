@@ -80,7 +80,8 @@ class Collection < ApplicationRecord
   acts_as_taggable
 
   translates_custom :name,
-                    confirmable: true
+                    confirmable: true,
+                    fallbacks_for_empty_translations: true
 
   store_accessor :cached_attributes,
                  :cached_cover,
