@@ -123,7 +123,7 @@ class CoverImageSelector extends React.Component {
     const { card, uiStore } = this.props
     const { record } = card
     const { name } = record
-    this.cardTitle = name
+    this.cardTitle = name || record.url
     // TODO don't like how id name is in two separate places
     runInAction(() => {
       this.parentCard = document.getElementById(`gridCard-${card.id}`)
