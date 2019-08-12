@@ -176,7 +176,7 @@ class LinkCreator extends React.Component {
     return (
       <GenericLinkCreator
         url={url}
-        urlValid={!!urlValid}
+        urlValid={type === 'link' || !!urlValid}
         placeholder={`${_.capitalize(type)} URL`}
         onSubmit={this.createItem}
         onChange={this.onUrlChange}
