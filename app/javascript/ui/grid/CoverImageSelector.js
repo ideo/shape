@@ -45,9 +45,9 @@ const linkBackgroundOption = {
 const TopRightHolder = styled.div`
   width: 100%;
   height: 100%;
-  max-width: 316px;
-  max-height: 250px;
-  padding: 15px;
+  max-width: ${props => props.maxWidth}px;
+  max-height: ${props => props.maxHeight}px;
+  padding: 14px 14px 16px;
   right: 0px;
   top: 0px;
   display: block;
@@ -56,22 +56,21 @@ const TopRightHolder = styled.div`
   background: ${v.colors.primaryLight};
   opacity: 0.9;
   box-sizing: border-box;
-  overflow-y: scroll;
 `
 TopRightHolder.displayName = 'TopRightHolder'
 
 const StyledEditTitle = styled.div`
   display: flex;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
   h3 {
     flex: 1;
     margin-right: 10px;
     height: 100%;
     max-width: 50px;
+    margin-bottom: 0px;
   }
   div {
     flex: 3 1 auto;
-    height: 100%;
     border-bottom: 1px solid ${v.colors.black};
     max-width: 200px;
     textarea {
@@ -325,8 +324,15 @@ class CoverImageSelector extends React.Component {
   }
 
   renderInner() {
+    const { uiStore } = this.props
+    const { gridSettings } = uiStore
+    const { gridH, gridW } = gridSettings
     return (
-      <TopRightHolder data-cy="EditCoverOptions">
+      <TopRightHolder
+        data-cy="EditCoverOptions"
+        maxWidth={gridW}
+        maxHeight={gridH}
+      >
         {!this.loading && (
           <div>
             <StyledEditTitle>
