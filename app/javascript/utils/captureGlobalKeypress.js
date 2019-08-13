@@ -27,11 +27,24 @@ export const handleMouseDownSelection = e => {
     uiStore.deselectCards()
     uiStore.onEmptySpaceClick(e)
     uiStore.closeBlankContentTool()
-    // todo: should we save the card before cancelling it?
+    saveCardBeforeExit()
     uiStore.update('editingCardCover', null)
     return 'emptySpace'
   }
   return false
+}
+
+const saveCardBeforeExit = () => {
+  const { activeElement } = document
+  const { value } = activeElement
+  // this should always be the value of the active text area
+  if (!!value) {
+    const { editingCardCover } = uiStore
+    const card = apiStore.find('collection_cards', editingCardCover)
+    const { record } = card
+    record.name = value
+    record.save()
+  }
 }
 
 const captureGlobalKeypress = e => {
