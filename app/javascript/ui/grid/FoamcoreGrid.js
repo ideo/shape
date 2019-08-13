@@ -96,7 +96,7 @@ class FoamcoreGrid extends React.Component {
   @observable
   cardsToRender = []
   @observable
-  zoomLevel = 3
+  zoomLevel = this.maxZoomLevel
   dragGridSpot = observable.map({})
   @observable
   dragging = false
@@ -157,6 +157,12 @@ class FoamcoreGrid extends React.Component {
       uiStore.selectedAreaEnabled = false
     })
     window.removeEventListener('scroll', this.handleScroll)
+  }
+
+  get maxZoomLevel() {
+    const { uiStore } = this.props
+    const { isMobile } = uiStore
+    return isMobile ? 1 : 3
   }
 
   loadCards({ rows, cols }) {
@@ -256,7 +262,7 @@ class FoamcoreGrid extends React.Component {
 
   // Default zoom level is that which fits all columns in the browser viewport
   get relativeZoomLevel() {
-    if (this.zoomLevel !== 3) return this.zoomLevel
+    if (this.zoomLevel !== this.maxZoomLevel) return this.zoomLevel
     const { gridW, gutter } = this.gridSettings
     const gridWidth =
       (gridW + gutter) * MAX_COLS + pageMargins.left * 2 * this.zoomLevel
@@ -494,7 +500,7 @@ class FoamcoreGrid extends React.Component {
   }
 
   handleZoomOut = ev => {
-    if (this.zoomLevel === 3) return
+    if (this.zoomLevel === this.maxZoomLevel) return
     runInAction(() => {
       this.zoomLevel = this.zoomLevel + 1
     })
@@ -1180,6 +1186,8 @@ class FoamcoreGrid extends React.Component {
   }
 
   render() {
+    const { uiStore } = this.props
+    const { isMobile } = uiStore
     const gridSize = this.totalGridSize
     return (
       <Grid
@@ -1191,10 +1199,12 @@ class FoamcoreGrid extends React.Component {
         width={gridSize.width}
         height={gridSize.height}
       >
-        <FoamcoreZoomControls
-          onZoomIn={this.handleZoomIn}
-          onZoomOut={this.handleZoomOut}
-        />
+        {!isMobile && (
+          <FoamcoreZoomControls
+            onZoomIn={this.handleZoomIn}
+            onZoomOut={this.handleZoomOut}
+          />
+        )}
         {this.cardsToRender}
       </Grid>
     )
