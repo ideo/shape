@@ -14,6 +14,7 @@
 #  cover_type                 :integer          default("cover_type_default")
 #  hide_submissions           :boolean          default(FALSE)
 #  master_template            :boolean          default(FALSE)
+#  name                       :string
 #  processing_status          :integer
 #  shared_with_organization   :boolean          default(FALSE)
 #  submission_box_type        :integer
@@ -78,7 +79,7 @@ class Collection < ApplicationRecord
              with: %i[collection_cards cards_linked_to_this_collection]
   acts_as_taggable
 
-  translates_custom :name,
+  translates_custom :translated_name,
                     confirmable: true,
                     fallbacks_for_empty_translations: true
 

@@ -131,7 +131,7 @@ ActiveRecord::Schema.define(version: 2019_08_05_230103) do
     t.string "locale", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "name"
+    t.string "translated_name"
     t.jsonb "confirmed"
     t.index ["collection_id"], name: "index_collection_translations_on_collection_id"
     t.index ["locale"], name: "index_collection_translations_on_locale"
@@ -388,9 +388,9 @@ ActiveRecord::Schema.define(version: 2019_08_05_230103) do
     t.string "locale", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "name"
-    t.text "content"
-    t.jsonb "data_content"
+    t.string "translated_name"
+    t.text "translated_content"
+    t.jsonb "translated_data_content"
     t.jsonb "confirmed"
     t.index ["item_id"], name: "index_item_translations_on_item_id"
     t.index ["locale"], name: "index_item_translations_on_locale"

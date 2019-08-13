@@ -14,6 +14,7 @@
 #  cover_type                 :integer          default("cover_type_default")
 #  hide_submissions           :boolean          default(FALSE)
 #  master_template            :boolean          default(FALSE)
+#  name                       :string
 #  processing_status          :integer
 #  shared_with_organization   :boolean          default(FALSE)
 #  submission_box_type        :integer

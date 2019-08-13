@@ -14,6 +14,7 @@
 #  cover_type                 :integer          default("cover_type_default")
 #  hide_submissions           :boolean          default(FALSE)
 #  master_template            :boolean          default(FALSE)
+#  name                       :string
 #  processing_status          :integer
 #  shared_with_organization   :boolean          default(FALSE)
 #  submission_box_type        :integer
@@ -516,14 +517,7 @@ class Collection
       question_items
         .joins(
           :parent_collection_card,
-        )
-        .left_joins(
-          :translations,
-        )
-        .where(
-          question_type: :question_description,
-          'item_translations.content': [nil, ''],
-        )
+        ).where(question_type: :question_description, content: [nil, ''])
     end
 
     def incomplete_category_satisfaction_items

@@ -41,7 +41,7 @@ class CollectionCardReplacer
     # the class type may have changed
     @item = @item.becomes(@attrs[:type].constantize)
 
-    # proper way to clear out content?
+    # clearing data means removing any existing translated content
     @item.translations.destroy_all
 
     # this needs to happen after the @item.becomes

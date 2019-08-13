@@ -1,13 +1,13 @@
 class AddGlobalizableToCollectionsAndItems < ActiveRecord::Migration[5.2]
   def up
     Collection.create_translation_table!(
-      name: :string,
+      translated_name: :string,
     )
     Collection.add_globalize_confirmable_column!
     Item.create_translation_table!(
-      name: :string,
-      content: :text,
-      data_content: :jsonb,
+      translated_name: :string,
+      translated_content: :text,
+      translated_data_content: :jsonb,
     )
     Item.add_globalize_confirmable_column!
   end
