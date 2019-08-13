@@ -1,5 +1,5 @@
 class InvitationMailer < ApplicationMailer
-  def invite(user_id:, invited_by_id:, invited_to_id: nil, invited_to_type:)
+  def invite(user_id:, invited_by_id:, invited_to_id: nil, invited_to_type:, application_user: nil)
     @user = User.find(user_id)
     @invited_by = User.find(invited_by_id)
     @invited_to_type = invited_to_type
@@ -17,9 +17,13 @@ class InvitationMailer < ApplicationMailer
     else
       @url = invited_to_url
     end
+    from = 'Creative Difference <hello@ideocreativedifference.com>' if application_user.present?
+    layout = 'creative_difference' if application_user.present?
     mail to: @user.email,
          subject: "Your invitation to \"#{@invited_to_name}\" on Shape",
-         users: [@user]
+         users: [@user],
+         from: from,
+         layout: layout
   end
 
   private
