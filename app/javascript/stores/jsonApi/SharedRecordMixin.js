@@ -49,6 +49,7 @@ const SharedRecordMixin = superclass =>
         snapshot: { name: previousName },
         message: `${this.className} name edit undone`,
         actionType: POPUP_ACTION_TYPES.SNACKBAR,
+        redirectTo: { internalType: null, id: null }, // we don't need to redirect when undoing a cover title edit
       })
       const data = this.toJsonApi()
       // cancel sync so that name edits don't roundtrip and interfere with your <input>

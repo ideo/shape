@@ -42,8 +42,7 @@ const saveCardBeforeExit = () => {
     const { editingCardCover } = uiStore
     const card = apiStore.find('collection_cards', editingCardCover)
     const { record } = card
-    record.name = value
-    record.save()
+    record.API_updateName(value)
   }
 }
 

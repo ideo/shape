@@ -220,16 +220,15 @@ class CoverImageSelector extends React.Component {
     this.cardTitle = ev.target.value
   }
 
-  handleSave = ev => {
+  handleTitleSave = ev => {
     const { card, uiStore } = this.props
     const { record } = card
-    record.name = this.cardTitle
     uiStore.setEditingCardCover(null)
-    return record.save()
+    record.API_updateName(this.cardTitle)
   }
 
   handleInputKeys = ev => {
-    if (ev.key === 'Enter') this.handleSave(ev)
+    if (ev.key === 'Enter') this.handleTitleSave(ev)
   }
 
   handleInputClick = ev => {
@@ -246,7 +245,7 @@ class CoverImageSelector extends React.Component {
   }
 
   handleClose = ev => {
-    this.handleSave()
+    this.handleTitleSave()
   }
 
   async clearCover() {
@@ -315,7 +314,7 @@ class CoverImageSelector extends React.Component {
           placeholder={'untitled'}
           onChange={this.changeTitle}
           onKeyPress={this.handleInputKeys}
-          onBlur={this.handleSave}
+          onBlur={this.handleTitleSave}
           onClick={this.handleInputClick}
           className={'edit-cover-text'}
         />
