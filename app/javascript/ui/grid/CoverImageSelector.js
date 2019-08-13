@@ -213,7 +213,6 @@ class CoverImageSelector extends React.Component {
     const newCard = new CollectionCard(cardAttrs, apiStore)
     newCard.parent = collection
     this.setLoading(true)
-    // TODO: Is this where that foamcore cover image bug comes from?
     await newCard.API_create()
     // get collection with new collection_cover info attached
     apiStore.fetch('collections', collection.id, true)

@@ -376,6 +376,7 @@ class GridCardBlank extends React.Component {
       } else {
         newCard = await card.API_create()
       }
+      if (newCard.record.isData) uiStore.addNewCard(newCard.record.id)
       // afterCreate can come passed down from props
       if (afterCreate) afterCreate(newCard)
       // or separately from the createCard action (e.g. CollectionCreator)
