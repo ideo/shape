@@ -4,7 +4,7 @@ pre-commit:
   commands:
     lint:
       files: git diff --name-only development
-      glob: "*.js" 
+      glob: "*.js"
       exclude: '__tests__/ui/grid/__snapshots__/*'
       run: yarn run lint {files}
     rubocop:
@@ -19,9 +19,9 @@ pre-push: # githook name
     rubocop:
       tags: backend
       run: bundle exec rubocop --fail-level error
-    rspec:
-      tags: rspec backend
-      run: bundle exec crystalball --fail-fast
+    # rspec:
+    #   tags: rspec backend
+    #   run: bundle exec crystalball --fail-fast
     # packages-audit: # command name
     #   run: yarn audit # command for execution
 
