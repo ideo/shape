@@ -131,7 +131,8 @@ class LinkCreator extends React.Component {
   }
 
   createLinkItem = () => {
-    const { url, meta } = this.state
+    const { meta } = this.state
+    const { url } = meta
     let attrs = {
       item_attributes: {
         type: ITEM_TYPES.LINK,
