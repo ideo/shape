@@ -105,8 +105,6 @@ class Api::V1::DatasetsController < Api::V1::BaseController
       :type,
       :identifier,
       :description,
-      :order,
-      :selected,
       :max_domain,
       :measure,
       :timeframe,
