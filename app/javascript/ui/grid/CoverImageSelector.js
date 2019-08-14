@@ -115,16 +115,24 @@ class CoverImageSelector extends React.Component {
   parentCard = null
   @observable
   loading = false
-  @observable cardTitle = ''
+  @observable
+  cardTitle = ''
 
   componentDidMount() {
-    const { card } = this.props
+    const { card, uiStore } = this.props
     const { record } = card
     const { name } = record
-    this.cardTitle = name
+    this.cardTitle = name || record.url
     // TODO don't like how id name is in two separate places
     runInAction(() => {
       this.parentCard = document.getElementById(`gridCard-${card.id}`)
+
+      if (this.props.uiStore.isNewCard(record.id) && record.isLink) {
+        this.populateAllOptions()
+        this.open = true
+        uiStore.setEditingCardTitle(true)
+        this.props.uiStore.removeNewCard(record.id)
+      }
     })
   }
 
@@ -379,6 +387,7 @@ class CoverImageSelector extends React.Component {
 CoverImageSelector.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
 }
+
 CoverImageSelector.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
