@@ -203,7 +203,7 @@ export default class UiStore {
   @observable
   linkedInMyCollection = false
   @observable
-  isEditingCardTitle = false
+  editingCardCover = null
 
   @action
   toggleEditingCardId(cardId) {
@@ -215,8 +215,8 @@ export default class UiStore {
   }
 
   @action
-  setEditingCardTitle(isEditingCardTitle) {
-    this.isEditingCardTitle = isEditingCardTitle
+  setEditingCardCover(editingCardCoverId) {
+    this.editingCardCover = editingCardCoverId
   }
 
   @action

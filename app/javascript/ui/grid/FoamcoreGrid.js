@@ -1096,8 +1096,9 @@ class FoamcoreGrid extends React.Component {
   calculateCardsToRender() {
     const { collection, movingCardIds, uiStore, canEditCollection } = this.props
     // any cards that are being moved don't appear at all
-    const collectionCards = _.reject(collection.collection_cards, c =>
-      _.includes(movingCardIds, c.id)
+    const collectionCards = _.reject(
+      collection.collection_cards,
+      c => _.includes(movingCardIds, c.id) || (c.is_cover && c.hidden)
     )
 
     let cards = []
