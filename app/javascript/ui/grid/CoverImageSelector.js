@@ -1,6 +1,5 @@
 import { Fragment } from 'react'
 import ReactDOM from 'react-dom'
-import PropTypes from 'prop-types'
 import _ from 'lodash'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observable, action, runInAction, toJS } from 'mobx'
@@ -387,10 +386,6 @@ class CoverImageSelector extends React.Component {
 
 CoverImageSelector.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
-  openEditOnCreate: PropTypes.bool,
-}
-CoverImageSelector.defaultProps = {
-  openEditOnCreate: false,
 }
 
 CoverImageSelector.wrappedComponent.propTypes = {
