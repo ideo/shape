@@ -1,3 +1,4 @@
+#!/bin/bash
 # modified from https://gist.github.com/brysgo/9980344
 
 CHECKING_OUT_BRANCH=$3
