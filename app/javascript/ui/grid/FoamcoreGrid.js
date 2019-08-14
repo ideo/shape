@@ -262,7 +262,9 @@ class FoamcoreGrid extends React.Component {
 
   // Default zoom level is that which fits all columns in the browser viewport
   get relativeZoomLevel() {
-    if (this.zoomLevel !== this.maxZoomLevel) return this.zoomLevel
+    const { uiStore } = this.props
+    const { isMobile } = uiStore
+    if (this.zoomLevel !== this.maxZoomLevel || isMobile) return this.zoomLevel
     const { gridW, gutter } = this.gridSettings
     const gridWidth =
       (gridW + gutter) * MAX_COLS + pageMargins.left * 2 * this.zoomLevel
