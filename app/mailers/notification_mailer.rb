@@ -21,6 +21,8 @@ class NotificationMailer < ApplicationMailer
       comment_count += ct.comments.where('created_at > ?', @last_notification_mail_sent).count
     end
 
+    return if comment_count.zero? && notification_count.zero?
+
     subject = subject_line(comment_count, notification_count)
 
     # TODO: Figure out user's timezone if we want to include the proper timestamp?
