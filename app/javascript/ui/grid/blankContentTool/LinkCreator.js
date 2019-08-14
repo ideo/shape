@@ -82,7 +82,7 @@ class LinkCreator extends React.Component {
         urlValid: 'image',
       })
     } else {
-      this.setState({ urlValid: false })
+      this.setState({ meta, urlValid: false })
     }
   }
 

@@ -34,8 +34,9 @@ const parseURLMeta = async urlStr => {
     const metadata = metaDataParser.getMetadata(doc, url)
     return metadata
   } catch (e) {
-    // will fail w/ 404 if link is invalid
-    return false
+    // will catch a 404 if link is invalid.
+    // we still return a metadata object ensuring "http" prefixed URL
+    return { url }
   }
 }
 

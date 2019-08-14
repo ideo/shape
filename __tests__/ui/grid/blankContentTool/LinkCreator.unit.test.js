@@ -101,7 +101,8 @@ describe('LinkCreator', () => {
       }
       component.state = {
         urlValid: 'link',
-        url: 'https://cnn.com',
+        // if user typed cnn.com, the meta.url should still have a protocol
+        url: 'cnn.com',
         meta,
       }
       component.createLinkItem()
