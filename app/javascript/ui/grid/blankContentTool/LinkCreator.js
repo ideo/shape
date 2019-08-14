@@ -104,7 +104,10 @@ class LinkCreator extends React.Component {
   createItem = e => {
     e.preventDefault()
     const { urlValid } = this.state
-    if (!urlValid) return
+    if (!urlValid) {
+      this.createLinkItem()
+      return
+    }
     if (urlValid === 'link') {
       this.createLinkItem()
     } else if (urlValid === 'image') {
@@ -174,7 +177,7 @@ class LinkCreator extends React.Component {
     return (
       <GenericLinkCreator
         url={url}
-        urlValid={!!urlValid}
+        urlValid={type === 'link' || !!urlValid}
         placeholder={`${_.capitalize(type)} URL`}
         onSubmit={this.createItem}
         onChange={this.onUrlChange}

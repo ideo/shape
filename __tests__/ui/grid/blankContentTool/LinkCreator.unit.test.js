@@ -44,15 +44,6 @@ describe('LinkCreator', () => {
         filter: 'nothing',
       })
     })
-
-    it('does not call createCard when link is invalid', () => {
-      component.state = {
-        url: 'httpmy.url.com',
-        urlValid: false,
-      }
-      component.createItem(e)
-      expect(props.createCard).not.toHaveBeenCalled()
-    })
   })
 
   describe('with video password props', () => {
@@ -97,16 +88,6 @@ describe('LinkCreator', () => {
           icon_url: meta.icon,
         },
       })
-    })
-
-    it('does not call createCard when link is invalid', () => {
-      component.state = {
-        urlValid: false,
-        url: 'httpmy.url.com',
-        meta: {},
-      }
-      component.createItem(e)
-      expect(props.createCard).not.toHaveBeenCalled()
     })
   })
   describe('createLinkItem', () => {
