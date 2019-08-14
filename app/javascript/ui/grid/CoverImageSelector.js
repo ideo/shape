@@ -124,10 +124,9 @@ class CoverImageSelector extends React.Component {
     runInAction(() => {
       this.parentCard = document.getElementById(`gridCard-${card.id}`)
 
-      if (this.props.uiStore.isNewCard(record.id) && record.isLink) {
+      if (uiStore.isNewCard(record.id) && record.isLink) {
         this.populateAllOptions()
-        this.open = true
-        uiStore.setEditingCardTitle(true)
+        uiStore.setEditingCardCover(card.id)
         this.props.uiStore.removeNewCard(record.id)
       }
     })
