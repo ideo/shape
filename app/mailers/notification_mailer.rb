@@ -15,19 +15,37 @@ class NotificationMailer < ApplicationMailer
                        .order(updated_at: :desc)
                        .first(5)
 
-    subject = ''
     comment_count = 0
+    notification_count = @notifications.count
     @comment_threads.map do |ct|
       comment_count += ct.comments.where('created_at > ?', @last_notification_mail_sent).count
     end
-    if comment_count.positive?
-      subject += "#{comment_count} new comments and "
-    end
 
-    subject += "#{@notifications.count} new notifications on Shape "
+    subject = subject_line(comment_count, notification_count)
+
     # TODO: Figure out user's timezone if we want to include the proper timestamp?
     # subject += "since#{@last_notification_mail_sent.strftime('%l:%M%P (%B %d, %Y)')}"
 
     mail to: @user.email, subject: subject, users: [@user]
+  end
+
+  private
+
+  def subject_line(comment_count, notification_count)
+    subject = ''
+
+    if comment_count.positive?
+      subject += "#{comment_count} new comments"
+    end
+    if comment_count.positive? & notification_count.positive?
+      subject += " and "
+    end
+    if notification_count.positive?
+      subject += "#{notification_count} new notifications"
+    end
+
+    subject += " on Shape"
+
+    subject
   end
 end
