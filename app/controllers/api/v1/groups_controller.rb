@@ -24,6 +24,7 @@ class Api::V1::GroupsController < Api::V1::BaseController
   def create
     external_id = params[:group].delete(:external_id)
     @group.organization ||= current_organization
+    @group.created_by = current_user
     if external_id.present? && current_user.application
       @group.external_records.build(
         external_id: external_id,
