@@ -168,6 +168,7 @@ group :test do
   gem 'vcr'
   gem 'webmock'
   gem 'timecop'
+  gem 'jsonapi_spec_helpers'
 end
 
 group :production do

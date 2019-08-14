@@ -7,12 +7,7 @@ FactoryBot.define do
     trait :with_cached_data do
       measure 'Widgets'
       cached_data do
-        {
-          total: 24,
-          chart_type: 'area',
-          measure: 'pandas',
-          data: [{ value: 24, date: '2018-09-10' }],
-        }
+        [{ value: 24, date: '2018-09-10' }]
       end
     end
 
