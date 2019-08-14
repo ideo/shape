@@ -813,8 +813,8 @@ class Collection < ApplicationRecord
     Collection.in_collection(id).where.not(template_id: nil).any?
   end
 
-  def child_of_application_collection?
-    parent.is_a?(Collection::ApplicationCollection)
+  def parent_application_collection
+    parents.find_by(type: 'Collection::ApplicationCollection')
   end
 
   # =================================
