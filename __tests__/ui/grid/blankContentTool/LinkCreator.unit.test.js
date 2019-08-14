@@ -70,10 +70,11 @@ describe('LinkCreator', () => {
         content: 'Site content here',
         image: 'http://image.url',
         icon: 'http://image.url/icon',
+        url: 'http://cnn.com',
       }
       component.state = {
         urlValid: 'link',
-        url: 'http://my.url.com',
+        url: 'http://cnn.com',
         meta,
       }
       component.createItem(e)
@@ -81,6 +82,34 @@ describe('LinkCreator', () => {
         item_attributes: {
           type: ITEM_TYPES.LINK,
           url: component.state.url,
+          name: meta.title,
+          content: meta.description,
+          thumbnail_url: meta.image,
+          icon_url: meta.icon,
+        },
+      })
+    })
+  })
+  describe('createLinkItem', () => {
+    it('calls createCard with correct URL protocol for external site links', () => {
+      const meta = {
+        title: 'My Site',
+        content: 'Site content here',
+        image: 'http://image.url',
+        icon: 'http://image.url/icon',
+        url: 'https://cnn.com',
+      }
+      component.state = {
+        urlValid: 'link',
+        // if user typed cnn.com, the meta.url should still have a protocol
+        url: 'cnn.com',
+        meta,
+      }
+      component.createLinkItem()
+      expect(props.createCard).toHaveBeenCalledWith({
+        item_attributes: {
+          type: ITEM_TYPES.LINK,
+          url: meta.url,
           name: meta.title,
           content: meta.description,
           thumbnail_url: meta.image,
