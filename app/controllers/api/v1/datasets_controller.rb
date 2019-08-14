@@ -3,10 +3,39 @@ class Api::V1::DatasetsController < Api::V1::BaseController
   load_and_authorize_resource :collection
   load_resource
 
+  before_action :load_and_filter_index, only: %i[index]
+  def index
+    render jsonapi: @datasets
+  end
+
+  def create
+    external_id = @dataset.external_id
+    @dataset.application = current_application
+    if @dataset.save
+      if external_id.present? && current_application.present?
+        @dataset.add_external_id(
+          external_id,
+          current_application.id,
+        )
+      end
+      render jsonapi: @dataset
+    else
+      render_api_errors @dataset.errors
+    end
+  end
+
   def update
     @dataset.attributes = dataset_params
     if @dataset.save
       render jsonapi: @dataset
+    else
+      render_api_errors @dataset.errors
+    end
+  end
+
+  def destroy
+    if @dataset.destroy
+      head :no_content
     else
       render_api_errors @dataset.errors
     end
@@ -67,12 +96,24 @@ class Api::V1::DatasetsController < Api::V1::BaseController
   def dataset_params
     params.require(:dataset).permit(
       :type,
+      :identifier,
+      :description,
+      :order,
+      :selected,
+      :max_domain,
+      :cached_data,
       :measure,
       :timeframe,
-      :identifier,
-      :data_source_id,
+      :chart_type,
       :data_source_type,
-      :data_source,
+      :data_source_id,
+      style: {},
+      cached_data: %i[
+        value
+        date
+        percentage
+        column
+      ],
     )
   end
 end
