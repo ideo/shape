@@ -6,6 +6,7 @@ class InvitationMailer < ApplicationMailer
     @invited_to = invited_to_type == Role::SHAPE_ADMIN.to_s.titleize ? invited_to_type : invited_to_type.safe_constantize.find(invited_to_id)
     @invited_to_name = get_invited_to_name(@invited_to)
     invited_to_url = frontend_url_for(@invited_to)
+    @application_user = application_user
 
     if @invited_to.is_a?(Group) && !@invited_to.org_group?
       # only include the org name if it's not one of the main org groups
@@ -18,12 +19,10 @@ class InvitationMailer < ApplicationMailer
       @url = invited_to_url
     end
     from = 'Creative Difference <hello@ideocreativedifference.com>' if application_user.present?
-    layout = 'creative_difference' if application_user.present?
     mail to: @user.email,
          subject: "Your invitation to \"#{@invited_to_name}\" on Shape",
          users: [@user],
-         from: from,
-         layout: layout
+         from: from
   end
 
   private
