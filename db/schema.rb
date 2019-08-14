@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_02_172427) do
+ActiveRecord::Schema.define(version: 2019_08_14_210208) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -335,6 +335,7 @@ ActiveRecord::Schema.define(version: 2019_08_02_172427) do
     t.jsonb "autojoin_emails", default: []
     t.string "type"
     t.string "network_id"
+    t.integer "created_by_id"
     t.index ["autojoin_emails"], name: "index_groups_on_autojoin_emails", using: :gin
     t.index ["handle"], name: "index_groups_on_handle"
     t.index ["network_id"], name: "index_groups_on_network_id"
