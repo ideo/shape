@@ -576,9 +576,21 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         moving_cards.first.record.unanchor!
       end
 
-      it 'returns a 401' do
-        patch(path, params: params)
-        expect(response.status).to eq(401)
+      context 'but with edit access to the from_collection' do
+        it 'returns a 204' do
+          patch(path, params: params)
+          expect(response.status).to eq(204)
+        end
+      end
+
+      context 'and without edit access to the from_collection' do
+        before do
+          user.remove_role(Role::EDITOR, from_collection)
+        end
+        it 'returns a 401' do
+          patch(path, params: params)
+          expect(response.status).to eq(401)
+        end
       end
     end
 
