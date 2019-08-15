@@ -14,6 +14,7 @@ FactoryBot.define do
     name { Faker::Company.buzzword }
     # don't automatically call the `create_groups` callback when building a fake org for this collection
     organization factory: :organization_without_groups
+    created_by factory: :user
 
     factory :board_collection, class: Collection::Board
     factory :user_collection, class: Collection::UserCollection

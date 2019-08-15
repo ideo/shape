@@ -155,7 +155,7 @@ module Roles
       @added_users.each do |user|
         # skip people who have opted out
         next unless user.notify_through_email
-        application = @object.created_by.application if @object.created_by.appication_bot?
+        application = @object.created_by.application if @object.created_by.application_bot?
         InvitationMailer.invite(
           user_id: user.id,
           invited_by_id: @invited_by.id,
