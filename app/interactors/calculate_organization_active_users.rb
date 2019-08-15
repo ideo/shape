@@ -18,16 +18,10 @@ class CalculateOrganizationActiveUsers
   def calculate_active_users_count
     # We only want to count activity users have done within this particular org
     # e.g. a user may have logged in recently and been "active" but in a different org
-
-    # TODO: refactor last_active_at to be a json of org_id => timestamp e.g. { "1": timestamp, "22" : timestamp }
-    Activity
-      .joins(:actor)
-      .where(User.arel_table[:status].eq(User.statuses[:active]))
+    User
+      .active
       .where(User.arel_table[:email].not_eq(Organization::SUPER_ADMIN_EMAIL))
-      .where(organization_id: organization.id)
-      .where(Activity.arel_table[:created_at].gt(Organization::RECENTLY_ACTIVE_RANGE.ago))
-      .select(:actor_id)
-      .distinct
+      .where("last_active_at->>'#{organization.id}' > ?", Organization::RECENTLY_ACTIVE_RANGE.ago)
       .count
   end
 
