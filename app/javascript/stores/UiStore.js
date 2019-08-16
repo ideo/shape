@@ -92,6 +92,8 @@ export default class UiStore {
   @observable
   isLoading = false
   @observable
+  isLoadingMoveAction = false
+  @observable
   dismissedMoveHelper = false
   @observable
   movingCardIds = []
@@ -475,7 +477,7 @@ export default class UiStore {
 
   @computed
   get isMovingCards() {
-    return this.movingCardIds.length && this.cardAction === 'move'
+    return !!(this.movingCardIds.length && this.cardAction === 'move')
   }
 
   @computed

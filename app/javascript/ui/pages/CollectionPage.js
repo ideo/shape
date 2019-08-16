@@ -488,7 +488,8 @@ class CollectionPage extends React.Component {
       // Pass in BCT state so grid will re-render when open/closed
       blankContentToolState,
       // to trigger a re-render
-      movingCardIds: uiStore.isMovingCards ? [...uiStore.movingCardIds] : [],
+      movingCardIds: [...uiStore.movingCardIds],
+      isMovingCards: uiStore.isMovingCards,
     }
 
     // submissions_collection will only exist for submission boxes
