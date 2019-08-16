@@ -82,7 +82,7 @@ class LinkCreator extends React.Component {
         urlValid: 'image',
       })
     } else {
-      this.setState({ urlValid: false })
+      this.setState({ meta, urlValid: false })
     }
   }
 
@@ -104,7 +104,10 @@ class LinkCreator extends React.Component {
   createItem = e => {
     e.preventDefault()
     const { urlValid } = this.state
-    if (!urlValid) return
+    if (!urlValid) {
+      this.createLinkItem()
+      return
+    }
     if (urlValid === 'link') {
       this.createLinkItem()
     } else if (urlValid === 'image') {
@@ -131,7 +134,8 @@ class LinkCreator extends React.Component {
   }
 
   createLinkItem = () => {
-    const { url, meta } = this.state
+    const { meta } = this.state
+    const { url } = meta
     let attrs = {
       item_attributes: {
         type: ITEM_TYPES.LINK,
@@ -173,7 +177,7 @@ class LinkCreator extends React.Component {
     return (
       <GenericLinkCreator
         url={url}
-        urlValid={!!urlValid}
+        urlValid={type === 'link' || !!urlValid}
         placeholder={`${_.capitalize(type)} URL`}
         onSubmit={this.createItem}
         onChange={this.onUrlChange}

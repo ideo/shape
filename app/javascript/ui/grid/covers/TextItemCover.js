@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import { computed } from 'mobx'
@@ -10,10 +11,20 @@ import { ShowMoreButton } from '~/ui/global/styled/forms'
 import { QuillStyleWrapper } from '~/ui/global/styled/typography'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import RealtimeTextItem from '~/ui/items/RealtimeTextItem'
-import PaddedCardCover from './PaddedCardCover'
+import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
-
+import styled from 'styled-components'
 const stripTags = str => str.replace(/(<([^>]+)>)/gi, '')
+
+const StyledPaddedCover = styled(PaddedCardCover)`
+  border-bottom: ${props =>
+    !props.isEditing && props.hasTitleText ? '2px solid black' : 'none'};
+  background: ${props =>
+    (!props.isEditing && !props.dragging && props.hasTitleText) ||
+    props.isTransparent
+      ? v.colors.transparent
+      : v.colors.white};
+`
 
 const StyledReadMore = ShowMoreButton.extend`
   z-index: ${v.zIndex.gridCard};
@@ -22,7 +33,10 @@ const StyledReadMore = ShowMoreButton.extend`
   left: 0;
   padding: 0.5rem;
   opacity: 0.975;
-  background: white;
+  background: ${props =>
+    !props.isEditing && props.hasTitleText
+      ? v.colors.transparent
+      : v.colors.white};
 
   &:hover {
     background: ${v.colors.commonLightest};
@@ -196,26 +210,50 @@ class TextItemCover extends React.Component {
     return <ReactQuill {...quillProps} value={textData} />
   }
 
+  get hasTitleText() {
+    const { props } = this
+    const { item } = props
+    const { data_content } = item
+    let hasTitle = false
+    _.each(data_content.ops, op => {
+      if (op.attributes && op.attributes.header === 5) {
+        hasTitle = true
+      }
+    })
+    return hasTitle
+  }
+
   render() {
-    const { isEditing } = this
+    const { isEditing, hasTitleText, props } = this
+    const { isTransparent, dragging } = props
     const content = isEditing ? this.renderEditing() : this.renderDefault()
     return (
-      <PaddedCardCover
+      <StyledPaddedCover
         data-cy="TextItemCover"
         style={{
           height: 'calc(100% - 30px)',
         }}
         class="cancelGridClick"
         onClick={this.handleClick}
+        isEditing={isEditing}
+        hasTitleText={hasTitleText}
+        isTransparent={isTransparent}
+        dragging={dragging}
       >
-        <QuillStyleWrapper notEditing={!isEditing}>
+        <QuillStyleWrapper notEditing={!isEditing} hasTitleText={hasTitleText}>
           {this.state.loading && <InlineLoader />}
           {content}
           {this.state.readMore && !isEditing && (
-            <StyledReadMore onClick={this.expand}>Read more...</StyledReadMore>
+            <StyledReadMore
+              onClick={this.expand}
+              isEditing={isEditing}
+              hasTitleText={hasTitleText}
+            >
+              Read more...
+            </StyledReadMore>
           )}
         </QuillStyleWrapper>
-      </PaddedCardCover>
+      </StyledPaddedCover>
     )
   }
 }
@@ -230,6 +268,7 @@ TextItemCover.propTypes = {
   searchResult: PropTypes.bool,
   hideReadMore: PropTypes.bool,
   uneditable: PropTypes.bool,
+  isTransparent: PropTypes.bool,
 }
 
 TextItemCover.defaultProps = {
@@ -237,6 +276,7 @@ TextItemCover.defaultProps = {
   searchResult: false,
   hideReadMore: false,
   uneditable: false,
+  isTransparent: false,
 }
 
 export default TextItemCover

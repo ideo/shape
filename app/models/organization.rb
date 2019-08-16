@@ -140,7 +140,9 @@ class Organization < ApplicationRecord
     user_collection = Collection::UserCollection.find_or_create_for_user(user, self)
     setup_user_membership(user)
     # only create the getting started content for new users
-    if user_collection.newly_created
+    # Application bot users return application collections vs user collections.
+    if user_collection.is_a?(Collection::UserCollection) &&
+       user_collection.newly_created
       create_user_getting_started_content(user, synchronous: synchronous)
     end
     add_shared_with_org_collections(user) if primary_group.can_view? user
@@ -216,7 +218,7 @@ class Organization < ApplicationRecord
       %i[handle id],
       :name,
       [:name, 1],
-      [:name, 2]
+      [:name, 2],
     ]
   end
 
@@ -260,7 +262,7 @@ class Organization < ApplicationRecord
     plan = NetworkApi::Plan.first
     subscription_params = {
       organization_id: network_organization.id,
-      plan_id: plan.id
+      plan_id: plan.id,
     }
     payment_method = network_default_payment_method
     if payment_method
@@ -392,7 +394,7 @@ class Organization < ApplicationRecord
     payment_method = network_default_payment_method
     return 'No payment method' if payment_method.blank?
 
-    (network_default_payment_method.created_at.to_date - self.created_at.to_date).to_i
+    (network_default_payment_method.created_at.to_date - created_at.to_date).to_i
   end
 
   private

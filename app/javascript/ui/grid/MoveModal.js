@@ -361,6 +361,10 @@ class MoveModal extends React.Component {
   render() {
     const { uiStore } = this.props
     const { position, maxWidth, maxHeight, record } = this.selectedMovingCard
+    if (!record) {
+      return null
+    }
+
     const { internalType } = record
     const { movingCardIds } = uiStore
     return (

@@ -35,13 +35,21 @@ class LinkToSharedCollectionsWorker
   private
 
   def create_link(object, collection)
+    if object.parent_application_collection.present?
+      object = object.parent_application_collection
+    end
     CollectionCard::Link.create(
       parent: collection,
       item_id: (object.is_a?(Item) ? object.id : nil),
       collection_id: (object.is_a?(Collection) ? object.id : nil),
       width: 1,
       height: 1,
-      order: collection.collection_cards.count,
+      order: card_order(object, collection),
     )
+  end
+
+  def card_order(object, collection)
+    return -1 if object.is_a?(Collection::ApplicationCollection)
+    collection.collection_cards.count
   end
 end

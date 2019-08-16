@@ -90,19 +90,6 @@ describe('GridCardBlank', () => {
         expect(wrapper.state().loading).toBeTruthy()
         expect(mockCardMethods.API_create).toHaveBeenCalled()
       })
-
-      // TODO: was having all sorts of problems getting this test to work without breaking others
-      it('adds the card record to the uiStore as a new card', async () => {
-        await wrapper.instance().createCard()
-        return new Promise(resolve => {
-          setTimeout(() => {
-            expect(fakeUiStore.addNewCard).toHaveBeenCalled()
-            // id: 1 comes from mockCardMethods defined at top
-            expect(fakeUiStore.addNewCard).toHaveBeenCalledWith(1)
-            resolve()
-          })
-        })
-      })
     })
   })
 

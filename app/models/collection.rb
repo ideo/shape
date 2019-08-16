@@ -813,6 +813,10 @@ class Collection < ApplicationRecord
     Collection.in_collection(id).where.not(template_id: nil).any?
   end
 
+  def parent_application_collection
+    parents.find_by(type: 'Collection::ApplicationCollection')
+  end
+
   # =================================
   # <--- end boolean checks
 

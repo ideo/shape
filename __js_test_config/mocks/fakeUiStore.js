@@ -106,6 +106,7 @@ const fakeUiStore = {
   linkedBreadcrumbTrailForRecord: jest.fn().mockImplementation(x => x.breadcrumb),
   addEmptySpaceClickHandler: jest.fn(),
   removeEmptySpaceClickHandler: jest.fn(),
+  setEditingCardCover: jest.fn(),
   adminAudienceMenuOpen: false,
 }
 

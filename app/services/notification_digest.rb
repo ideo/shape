@@ -83,9 +83,9 @@ class NotificationDigest < SimpleService
   def comment_threads_for_user(user)
     # gather comment threads with new activity since the last notification mail
     user.users_threads
-        .joins(:comment_thread)
+        .joins(comment_thread: :comments)
         .where(
-          CommentThread.arel_table[:updated_at].gt(
+          Comment.arel_table[:created_at].gt(
             UsersThread.arel_table[:last_viewed_at],
           ),
         )
@@ -99,6 +99,8 @@ class NotificationDigest < SimpleService
 
   def notifications_for_user(user)
     user.notifications
+        .joins(:activity)
+        .where(Activity.arel_table[:action].not_in(['commented', 'mentioned']))
         .where(read: [false, nil])
         .where(
           Notification.arel_table[:created_at].gt(

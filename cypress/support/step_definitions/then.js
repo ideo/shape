@@ -17,12 +17,14 @@ Then('I should see the value {string} in a {string}', (text, el) => {
 Then('I should see a {string} in the first card', el => {
   cy.get('[data-cy="GridCard"][data-order="0"]')
     .locateDataOrClass(el)
+    .first()
     .should('be.visible')
 })
 
 Then('I should see a {string} in the index {int} card', (el, pos) => {
   cy.get(`[data-cy="GridCard"][data-order="${pos}"]`)
     .locateDataOrClass(el)
+    .first()
     .should('be.visible')
 })
 
