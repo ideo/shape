@@ -39,8 +39,6 @@ describe Api::V1::CommentsController, type: :request, json: true, auth: true do
 
     before do
       user.add_role(Role::EDITOR, comment_thread.record)
-      # Run background jobs to create activities and notifications
-      Sidekiq::Testing.inline!
     end
 
     it 'returns a 200' do
@@ -60,18 +58,20 @@ describe Api::V1::CommentsController, type: :request, json: true, auth: true do
     end
 
     it 'creates an activity and notifications for the content' do
-      expect(ActivityAndNotificationBuilder).to receive(:call).with(
-        actor: @user,
-        target: comment_thread.record,
-        action: :commented,
-        subject_user_ids: [user.id],
-        subject_group_ids: [],
-        omit_user_ids: [],
-        omit_group_ids: [],
-        combine: true,
-        content: 'heyo',
-      )
-      post(path, params: params)
+      Sidekiq::Testing.inline! do
+        expect(ActivityAndNotificationBuilder).to receive(:call).with(
+          actor: @user,
+          target: comment_thread.record,
+          action: :commented,
+          subject_user_ids: [user.id],
+          subject_group_ids: [],
+          omit_user_ids: [],
+          omit_group_ids: [],
+          combine: true,
+          content: 'heyo',
+        )
+        post(path, params: params)
+      end
     end
   end
 
