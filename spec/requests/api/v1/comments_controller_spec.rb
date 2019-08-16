@@ -39,6 +39,8 @@ describe Api::V1::CommentsController, type: :request, json: true, auth: true do
 
     before do
       user.add_role(Role::EDITOR, comment_thread.record)
+      # Run background jobs to create activities and notifications
+      Sidekiq::Testing.inline!
     end
 
     it 'returns a 200' do
