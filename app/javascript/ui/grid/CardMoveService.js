@@ -1,17 +1,18 @@
-import { apiStore, uiStore } from '~/stores'
+import { apiStore as globalApiStore, uiStore as globalUiStore } from '~/stores'
 
 class CardMoveService {
-  constructor({ apiStore, uiStore }) {
+  // stores can be passed in e.g. for unit testing, but default to the imported ones
+  constructor({ apiStore = globalApiStore, uiStore = globalUiStore }) {
     this.apiStore = apiStore
     this.uiStore = uiStore
   }
 
   static async moveCards(placement) {
-    return new this({ apiStore, uiStore }).moveCards(placement)
+    return new this().moveCards(placement)
   }
 
   static moveErrors() {
-    return new this({ apiStore, uiStore }).moveErrors()
+    return new this().moveErrors()
   }
 
   async moveCards(placement) {
