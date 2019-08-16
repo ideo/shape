@@ -8,33 +8,42 @@ RSpec.describe CommentNotificationWorker, type: :worker do
     let(:author) { create(:user) }
     let(:mentioned) { create(:user) }
     let(:mentioned_group) { create(:group) }
-    let!(:comment) {
-      create(:comment, comment_thread: comment_thread, author: author,
-                       draftjs_data: {
-                         'blocks' =>
-                          [{ 'key' => 'a0te4',
-                             'data' => {},
-                             'text' => 'hi @group and @person how r u doing?',
-                             'type' => 'unstyled',
-                             'depth' => 0 }],
-                         'entityMap' =>
-          {
-            '0' =>
-            { 'data' =>
-              { 'mention' =>
-                { 'id' => "#{mentioned_group.id}__groups", 'name' => 'Open IDEO', 'handle' => 'open-ideo' } },
-              'type' => 'mention',
-              'mutability' => 'IMMUTABLE' },
-            '1' =>
-            { 'data' =>
-              { 'mention' =>
-                { 'id' => "#{mentioned.id}__users",
-                  'name' => mentioned.name,
-                  'handle' => mentioned.handle } },
-              'type' => 'mention',
-              'mutability' => 'IMMUTABLE' },
+    let(:draftjs_data) do
+      {
+        'blocks' => [{
+          'key' => 'a0te4',
+          'data' => {},
+          'text' => 'hi @group and @person how r u doing?',
+          'type' => 'unstyled',
+          'depth' => 0,
+        }],
+        'entityMap' => {
+          '0' => {
+            'data' => {
+              'mention' => {
+                'id' => "#{mentioned_group.id}__groups", 'name' => 'Open IDEO', 'handle' => 'open-ideo'
+              },
+            },
+            'type' => 'mention',
+            'mutability' => 'IMMUTABLE',
           },
-                       }) }
+          '1' => {
+            'data' => {
+              'mention' => {
+                'id' => "#{mentioned.id}__users",
+                'name' => mentioned.name,
+                'handle' => mentioned.handle,
+              },
+            },
+            'type' => 'mention',
+            'mutability' => 'IMMUTABLE',
+          },
+        },
+      }
+    end
+    let(:comment) {
+      create(:comment, comment_thread: comment_thread, author: author, draftjs_data: draftjs_data)
+    }
 
     context 'with results of CommentCreator' do
       before do
