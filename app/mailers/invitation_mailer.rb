@@ -24,6 +24,10 @@ class InvitationMailer < ApplicationMailer
     else
       @url = invited_to_url
     end
+    if application.present?
+      @url = 'https://creativedifference.ideo.com/shape'
+    end
+
     from = 'Creative Difference <hello@ideocreativedifference.com>' if application.present?
     mail to: @user.email,
          subject: "Your invitation to \"#{@invited_to_name}\" on Shape",
