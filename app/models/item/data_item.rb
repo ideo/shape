@@ -148,12 +148,12 @@ class Item
 
     def dataset_type
       case report_type.to_s
-      when
-        'report_type_collections_and_items  Dataset::CollectionsAndItems'
-      when
-        'report_type_question_item  Dataset::Question'
-      when
-        'report_type_network_app_metric  Dataset::NetworkAppMetric'
+      when 'report_type_collections_and_items'
+        'Dataset::CollectionsAndItems'
+      when 'report_type_question_item'
+        'Dataset::Question'
+      when 'report_type_network_app_metric'
+        'Dataset::NetworkAppMetric'
       end
     end
 

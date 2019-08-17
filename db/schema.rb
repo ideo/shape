@@ -574,11 +574,11 @@ ActiveRecord::Schema.define(version: 2019_08_02_172427) do
     t.boolean "show_move_helper", default: true
     t.boolean "show_template_helper", default: true
     t.boolean "mailing_list", default: false
-    t.datetime "last_active_at"
     t.string "phone"
     t.integer "feedback_contact_preference", default: 0
     t.boolean "shape_circle_member", default: false
     t.jsonb "terms_accepted_data", default: {}
+    t.datetime "last_active_at"
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"
