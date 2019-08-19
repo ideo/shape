@@ -20,7 +20,11 @@ RSpec.describe ChargesLimitMailer, type: :mailer do
 
     it 'renders a message details about the organization' do
       mail = ChargesLimitMailer.notify(organization)
-      expect(mail.body.encoded).to include("#{organization.name} has #{organization.active_users_count} active users and monthly charge will be #{format_currency(organization.active_users_count * Organization::PRICE_PER_USER)}. Please reach out to #{organization.name} to arrange a new billing method.")
+      expect(mail.body.encoded).to include(
+        "#{organization.name} has #{organization.active_users_count} active users and monthly charge will"\
+        " be #{format_currency(organization.active_users_count * Organization::PRICE_PER_USER)}. "\
+        "Please reach out to #{organization.name} to arrange a new billing method.",
+      )
     end
   end
 end

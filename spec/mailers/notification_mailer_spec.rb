@@ -44,7 +44,6 @@ RSpec.describe NotificationMailer, type: :mailer do
 
       describe 'when there are notifications and comments' do
         it 'renders the headers' do
-
           expect(mail.subject).to match("#{comments.count} new comments and #{notifications.count} new notifications on Shape")
           expect(mail.to).to eq([user.email])
         end

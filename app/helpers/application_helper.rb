@@ -18,9 +18,10 @@ module ApplicationHelper
     url = "#{root_url}#{obj.organization.slug}/"
 
     if obj.is_a? Collection
-      url += 'collections'
+      "#{url}collections"
     elsif obj.is_a? Item
-      url += 'items'
+      "#{url}items"
     end
+    url
   end
 end

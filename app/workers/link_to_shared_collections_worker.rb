@@ -52,6 +52,7 @@ class LinkToSharedCollectionsWorker
 
   def card_order(object, collection)
     return -1 if object.is_a?(Collection::ApplicationCollection)
+
     collection.collection_cards.count
   end
 end

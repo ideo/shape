@@ -83,7 +83,12 @@ FactoryBot.define do
       trait :completed do
         after(:create) do |collection|
           media_question = collection.prelaunch_question_items.detect(&:question_media?)
-          media_question&.update(type: 'Item::VideoItem', url: 'something', thumbnail_url: 'something', question_type: nil)
+          media_question&.update(
+            type: 'Item::VideoItem',
+            url: 'something',
+            thumbnail_url: 'something',
+            question_type: nil,
+          )
           description_question = collection.prelaunch_question_items.detect(&:question_description?)
           description_question&.update(content: 'something')
         end
@@ -91,13 +96,25 @@ FactoryBot.define do
 
       trait :with_test_audience do
         after(:create) do |collection|
-          create(:test_audience, test_collection: collection, audience: create(:audience), price_per_response: 4.50, launched_by: create(:user))
+          create(
+            :test_audience,
+            test_collection: collection,
+            audience: create(:audience),
+            price_per_response: 4.50,
+            launched_by: create(:user),
+          )
         end
       end
 
       trait :with_link_sharing do
         after(:create) do |collection|
-          create(:test_audience, test_collection: collection, audience: create(:audience, price_per_response: 0), sample_size: nil, price_per_response: 0)
+          create(
+            :test_audience,
+            test_collection: collection,
+            audience: create(:audience, price_per_response: 0),
+            sample_size: nil,
+            price_per_response: 0,
+          )
         end
       end
     end
