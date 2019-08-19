@@ -547,8 +547,9 @@ class MovableGridCard extends React.PureComponent {
       moveComplete,
       resizeWidth,
       resizeHeight,
+      x,
+      y,
     } = this.state
-    const { x, y } = this.state
 
     const { zIndex, cardTiltDegrees } = v
     const { cardDragging, aboveClickWrapper, cardHovering } = zIndex

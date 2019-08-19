@@ -195,7 +195,7 @@ export const StyledCardWrapper = styled.div`
   &:hover {
     z-index: ${props => props.zIndex + 1};
   }
-  position: absolute;
+  ${props => props.dragging && 'position: absolute;'}
   ${props => props.hidden && 'display: none;'}
   ${props => props.moving && mdlPillPlaceholderCss}
 `
