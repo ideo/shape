@@ -25,6 +25,7 @@ describe('MoveModal', () => {
     props.apiStore.request = jest.fn()
     props.uiStore.alert.mockClear()
     props.uiStore.scrollToTop.mockClear()
+    props.uiStore.shouldOpenMoveModal = true
     wrapper = shallow(<MoveModal.wrappedComponent {...props} />)
     component = wrapper.instance()
   })
@@ -45,34 +46,46 @@ describe('MoveModal', () => {
   })
 
   describe('moveHelper', () => {
-    describe('template helper', () => {
+    describe('with template helper', () => {
       beforeEach(() => {
         props.apiStore.currentUser.show_template_helper = true
         props.uiStore.cardAction = 'useTemplate'
         wrapper = shallow(<MoveModal.wrappedComponent {...props} />)
       })
-      it('should display if the user should see the template helper', () => {
+      it('should display if user.show_template_helper is true', () => {
         expect(wrapper.find(MoveHelperModal).exists()).toBeTruthy()
       })
     })
-    describe('move helper', () => {
+    describe('with move (MDL) helper', () => {
       beforeEach(() => {
         props.apiStore.currentUser.show_move_helper = true
         props.uiStore.cardAction = 'move'
         wrapper = shallow(<MoveModal.wrappedComponent {...props} />)
       })
-      it('should display if the user should see the move helper', () => {
+      it('should display if user.show_move_helper is true', () => {
         expect(wrapper.find(MoveHelperModal).exists()).toBeTruthy()
       })
     })
 
-    describe('dismissed helper', () => {
+    describe('with dismissedMoveHelper = true', () => {
       beforeEach(() => {
         props.uiStore.dismissedMoveHelper = true
       })
-      it('should not display the helper', () => {
+      it('should not display any helper', () => {
         expect(wrapper.find(MoveHelperModal).exists()).toBeFalsy()
       })
+    })
+  })
+
+  describe('with shouldOpenMoveModal = false', () => {
+    beforeEach(() => {
+      props.uiStore.shouldOpenMoveModal = false
+      wrapper = shallow(<MoveModal.wrappedComponent {...props} />)
+      component = wrapper.instance()
+    })
+
+    it('should not render anything', () => {
+      expect(wrapper.find('div').length).toEqual(0)
     })
   })
 })

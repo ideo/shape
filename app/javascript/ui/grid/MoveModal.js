@@ -186,8 +186,9 @@ class MoveModal extends React.Component {
 
   render() {
     const { uiStore } = this.props
+    if (!uiStore.shouldOpenMoveModal) return null
     return (
-      <div style={{ display: uiStore.shouldOpenMoveModal ? 'block' : 'none' }}>
+      <div>
         <StyledSnackbar classes={{ root: 'Snackbar' }} open>
           {uiStore.isLoadingMoveAction ? (
             <SnackbarBackground>
