@@ -277,10 +277,10 @@ class MovableGridCard extends React.PureComponent {
 
     if (!this.state.dragging) {
       uiStore.closeBlankContentTool()
-      if (!card.isMovePlaceholder) {
-        // unless we're dragging the movePlaceholder,
-        // close the MoveMenu to prevent weird behaviors
-        uiStore.closeMoveMenu({ deselect: true })
+      if (!card.isMDLPlaceholder) {
+        // unless we're dragging the mdlPlaceholder, close the MoveMenu to prevent weird behaviors.
+        // don't deselect otherwise multimove (dragging multiple) will also deselect
+        uiStore.closeMoveMenu({ deselect: false })
       }
       uiStore.startDragging(card.id)
       this.setState(
@@ -653,18 +653,20 @@ class MovableGridCard extends React.PureComponent {
         ? 'touch-device'
         : ''
 
-    const shouldHide = !dragging && hidden
+    let shouldHide = !dragging && hidden
     const defaultPosition = {
       width: adjustedWidth,
       height: adjustedHeight,
       x: xPos,
       y: yPos,
     }
-    const mdlPlaceholder = !dragging && card.isMovePlaceholder
+    const mdlPlaceholder = !dragging && card.isMDLPlaceholder
 
-    if (card.isMovePlaceholder) {
+    if (card.isMDLPlaceholder) {
+      _zIndex = cardDragging
       cardProps.searchResult = true
       cardProps.canEditCollection = false
+      shouldHide = shouldHide || !uiStore.shouldOpenMoveModal
     }
 
     return (

@@ -103,12 +103,11 @@ RSpec.describe CardMover, type: :service do
       context 'when to_collection is a foamcore board' do
         let!(:to_collection) do
           create(:board_collection,
-            num_cards: 3,
-            add_editors: [user],
-            organization: organization
-          )
+                 num_cards: 3,
+                 add_editors: [user],
+                 organization: organization)
         end
-        let(:placement) { "end" }
+        let(:placement) { 'end' }
 
         it 'sets row of moved cards 2 rows after the last non-blank row' do
           card_mover.call
@@ -118,6 +117,47 @@ RSpec.describe CardMover, type: :service do
             expect(card.row).to eq target_empty_row
             expect(card.col).to eq index
           end
+        end
+      end
+    end
+
+    context 'with placement as an order number (insert cards in middle of collection)' do
+      let(:placement) { 1 }
+
+      it 'should place the moved cards in the middle of the collection' do
+        original_cards = to_collection.collection_cards.to_a
+        card_mover.call
+        expect(to_collection.reload.collection_cards.map(&:id)).to match_array([
+          # 3 cards so order '1' should be in the middle
+          # before: [0, 1, 2]
+          # after: [0, x, x, x, 1, 2]
+          original_cards[0].id,
+          moving_cards[0].id,
+          moving_cards[1].id,
+          moving_cards[2].id,
+          original_cards[1].id,
+          original_cards[2].id,
+        ])
+      end
+
+      context 'with pinned cards' do
+        before do
+          # update first 2 cards to be pinned
+          to_collection.collection_cards.limit(2).update_all(pinned: true)
+        end
+
+        it 'should place the moved cards in the middle of the collection' do
+          original_cards = to_collection.collection_cards.to_a
+          card_mover.call
+          expect(to_collection.reload.collection_cards.map(&:id)).to match_array([
+            original_cards[0].id,
+            # even though we use placement: 1, the first two cards are pinned
+            original_cards[1].id,
+            moving_cards[0].id,
+            moving_cards[1].id,
+            moving_cards[2].id,
+            original_cards[2].id,
+          ])
         end
       end
     end
@@ -142,16 +182,14 @@ RSpec.describe CardMover, type: :service do
         card_mover.call
       end
 
-
       context 'when to_collection is a foamcore board' do
         let!(:to_collection) do
           create(:board_collection,
-            num_cards: 3,
-            add_editors: [user],
-            organization: organization
-          )
+                 num_cards: 3,
+                 add_editors: [user],
+                 organization: organization)
         end
-        let(:placement) { "end" }
+        let(:placement) { 'end' }
 
         it 'sets row of linked cards 2 rows after the last non-blank row' do
           card_mover.call
@@ -172,7 +210,8 @@ RSpec.describe CardMover, type: :service do
         create(
           :data_item,
           :report_type_record,
-          parent_collection: from_collection)
+          parent_collection: from_collection,
+        )
       end
       let(:legend_item) { data_item.legend_item }
 

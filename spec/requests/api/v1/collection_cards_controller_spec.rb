@@ -451,7 +451,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
-    context 'with link cards', only: true do
+    context 'with link cards' do
       let!(:collection_cards) { create_list(:collection_card_link_text, 3, parent: collection) }
       context 'without record edit access, but with collection access' do
         before do

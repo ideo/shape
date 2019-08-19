@@ -416,14 +416,14 @@ export default class UiStore {
   }
 
   @action
-  openMoveMenu({ from: fromCollectionId, cardAction }) {
+  openMoveMenu({ from: fromCollectionId, cardAction = 'move' }) {
     this.dismissedMoveHelper = false
     this.pageMenuOpen = false
     this.closeCardMenu()
     // On move, copy over selected cards to moving cards
     this.movingFromCollectionId = fromCollectionId
-    // cardAction can be 'move' or 'link'
-    this.cardAction = cardAction || 'move'
+    // cardAction can be 'move', 'link', 'duplicate', 'useTemplate'
+    this.cardAction = cardAction
     if (this.cardAction === 'useTemplate') {
       // fake the selected card to trigger the menu open,
       // because we aren't really moving an existing card
@@ -442,6 +442,8 @@ export default class UiStore {
   closeMoveMenu({ deselect = true } = {}) {
     this.dismissedMoveHelper = false
     this.templateName = ''
+    this.isLoadingMoveAction = false
+    this.cardAction = 'move'
     this.movingCardIds.replace([])
     this.movingFromCollectionId = null
     if (deselect) this.deselectCards()
@@ -470,9 +472,8 @@ export default class UiStore {
   }
 
   @action
-  setMovingCards(ids, { cardAction } = {}) {
+  setMovingCards(ids) {
     this.movingCardIds.replace(ids)
-    this.cardAction = cardAction
   }
 
   @computed
@@ -482,10 +483,7 @@ export default class UiStore {
 
   @computed
   get shouldOpenMoveModal() {
-    return (
-      this.movingCardIds.length > 0 &&
-      this.cardAction !== 'moveWithinCollection'
-    )
+    return this.movingCardIds.length > 0 && !this.movingIntoCollection
   }
 
   @computed

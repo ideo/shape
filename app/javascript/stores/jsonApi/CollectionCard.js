@@ -255,8 +255,8 @@ class CollectionCard extends BaseRecord {
     return this.uiStore.selectedCardIds.indexOf(this.id) > -1
   }
 
-  get isMovePlaceholder() {
-    return _.includes(this.id, '-movePlaceholder')
+  get isMDLPlaceholder() {
+    return _.includes(this.id, '-mdlPlaceholder')
   }
 
   // placeholder cards have a reference to the original card they are standing in for
@@ -268,7 +268,7 @@ class CollectionCard extends BaseRecord {
   get isBeingMoved() {
     const { movingCardIds, cardAction } = this.uiStore
     // only count "being moved" for the move actions (not link, duplicate, etc)
-    if (!_.includes(['move', 'moveWithinCollection'], cardAction)) return false
+    if (cardAction !== 'move') return false
     return _.includes(movingCardIds, this.id)
   }
 

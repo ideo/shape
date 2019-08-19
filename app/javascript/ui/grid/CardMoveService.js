@@ -1,21 +1,22 @@
+import _ from 'lodash'
 import { apiStore as globalApiStore, uiStore as globalUiStore } from '~/stores'
 
-class CardMoveService {
+export default class CardMoveService {
   // stores can be passed in e.g. for unit testing, but default to the imported ones
-  constructor({ apiStore = globalApiStore, uiStore = globalUiStore }) {
+  constructor({ apiStore = globalApiStore, uiStore = globalUiStore } = {}) {
     this.apiStore = apiStore
     this.uiStore = uiStore
   }
 
-  static async moveCards(placement) {
-    return new this().moveCards(placement)
+  static async moveCards(placement, overrideData = {}) {
+    return new this().moveCards(placement, overrideData)
   }
 
   static moveErrors() {
     return new this().moveErrors()
   }
 
-  async moveCards(placement) {
+  async moveCards(placement, overrideData = {}) {
     const { apiStore, uiStore } = this
     const { viewingCollection, cardAction } = uiStore
     // Viewing collection might not be set, such as on the search page
@@ -53,13 +54,13 @@ class CardMoveService {
       return
     }
 
-    const cardIds = [...uiStore.movingCardIds]
     let data = {
       to_id: collectionId,
       from_id: uiStore.movingFromCollectionId,
-      collection_card_ids: cardIds,
+      collection_card_ids: [...uiStore.movingCardIds],
       placement,
     }
+    _.assign(data, overrideData)
 
     try {
       uiStore.update('isLoadingMoveAction', true)
@@ -98,14 +99,16 @@ class CardMoveService {
       uiStore.popupSnackbar({ message: successMessage })
       uiStore.resetSelectionAndBCT()
       uiStore.closeMoveMenu()
-      if (placement === 'beginning') {
-        uiStore.scrollToTop()
-      } else {
-        uiStore.scrollToBottom()
+      if (!uiStore.movingIntoCollection) {
+        if (placement === 'beginning') {
+          uiStore.scrollToTop()
+        } else if (placement === 'end') {
+          uiStore.scrollToBottom()
+        }
       }
       if (cardAction === 'move') {
         // we actually want to reselect the cards at this point
-        uiStore.reselectCardIds(cardIds)
+        uiStore.reselectCardIds(data.collection_card_ids)
       }
     } catch (e) {
       uiStore.update('isLoadingMoveAction', false)
@@ -142,5 +145,3 @@ class CardMoveService {
     return ''
   }
 }
-
-export default CardMoveService
