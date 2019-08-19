@@ -110,6 +110,8 @@ module Roles
 
         @object.organization.remove_user_membership(user)
       end
+      # Recalculate active users after removing people from an organization
+      CalculateOrganizationActiveUsers.call(organization: @object.organization)
     end
 
     def children

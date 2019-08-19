@@ -156,6 +156,9 @@ class Organization < ApplicationRecord
     profile = Collection::UserProfile.find_by(user: user, organization: self)
     profile.archive! if profile.present?
 
+    # Remove last_active_at for org they are being removed from
+    timestamps = user.last_active_at.except(self.id.to_s)
+    user.update_columns(last_active_at: timestamps)
     # Set current org as one they are a member of
     # If nil, that is fine as they shouldn't have a current organization
     user.switch_to_organization(user.organizations.first)

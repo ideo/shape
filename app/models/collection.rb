@@ -317,6 +317,7 @@ class Collection < ApplicationRecord
     nullify :breadcrumb
     nullify :created_by_id
     nullify :organization_id
+    nullify :shared_with_organization
     set archived: false
     # don't recognize any relations, easiest way to turn them all off
     recognize []

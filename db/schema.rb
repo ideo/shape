@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_02_172427) do
+ActiveRecord::Schema.define(version: 2019_08_15_222240) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -578,7 +578,7 @@ ActiveRecord::Schema.define(version: 2019_08_02_172427) do
     t.integer "feedback_contact_preference", default: 0
     t.boolean "shape_circle_member", default: false
     t.jsonb "terms_accepted_data", default: {}
-    t.datetime "last_active_at"
+    t.jsonb "last_active_at", default: {}
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"

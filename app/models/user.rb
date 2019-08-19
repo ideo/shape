@@ -12,7 +12,7 @@
 #  first_name                  :string
 #  handle                      :string
 #  invitation_token            :string
-#  last_active_at              :datetime
+#  last_active_at              :jsonb
 #  last_name                   :string
 #  last_notification_mail_sent :datetime
 #  last_sign_in_at             :datetime
@@ -519,6 +519,12 @@ class User < ApplicationRecord
 
   def current_terms_accepted?
     terms_accepted && current_org_terms_accepted
+  end
+
+  def last_active_at_in_org(org_id)
+    date_string = last_active_at[org_id.to_s]
+    return if date_string.nil?
+    Time.parse(date_string)
   end
 
   private
