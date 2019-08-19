@@ -12,6 +12,7 @@ import MoveIcon from '~/ui/icons/MoveIcon'
 import ReplaceIcon from '~/ui/icons/ReplaceIcon'
 import CommentIcon from '~/ui/icons/CommentIcon'
 import PrintIcon from '~/ui/icons/PrintIcon'
+import SelectAllIcon from '~/ui/icons/SelectAllIcon'
 import SharingIcon from '~/ui/icons/SharingIcon'
 import SubmissionBoxIconSm from '~/ui/icons/SubmissionBoxIconSm'
 import PopoutMenu from '~/ui/global/PopoutMenu'
@@ -96,6 +97,12 @@ class ActionMenu extends React.Component {
     const { afterArchive } = this.props
     const result = await this.callCardAction('Delete', 'API_archive')
     if (afterArchive && result) afterArchive({ type: 'archive' })
+  }
+
+  selectAll = () => {
+    const { uiStore } = this.props
+    const { viewingCollection } = uiStore
+    uiStore.reselectCardIds(_.map(viewingCollection.collection_cards, 'id'))
   }
 
   showTags = () => {
@@ -185,6 +192,11 @@ class ActionMenu extends React.Component {
       { name: 'Move', iconRight: <MoveIcon />, onClick: this.moveCard },
       { name: 'Link', iconRight: <LinkIcon />, onClick: this.linkCard },
       {
+        name: 'Select All',
+        iconRight: <SelectAllIcon />,
+        onClick: this.selectAll,
+      },
+      {
         name: 'Add to My Collection',
         iconRight: <AddIntoIcon />,
         onClick: this.addToMyCollection,
@@ -241,6 +253,7 @@ class ActionMenu extends React.Component {
       const viewActions = [
         'Comment',
         'Link',
+        'Select All',
         'Add to My Collection',
         'Download',
       ]
