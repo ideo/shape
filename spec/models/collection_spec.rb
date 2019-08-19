@@ -240,6 +240,17 @@ describe Collection, type: :model do
       end
     end
 
+    context 'with shared_with_organization' do
+      before do
+        collection.update(shared_with_organization: true)
+      end
+
+      it 'nullifies shared_with_organization' do
+        expect(collection.shared_with_organization?).to be true
+        expect(duplicate.shared_with_organization?).to be false
+      end
+    end
+
     context 'without user' do
       let(:duplicate_without_user) do
         dupe = collection.duplicate!(

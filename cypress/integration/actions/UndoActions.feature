@@ -35,7 +35,7 @@ Feature: Undo actions
     And I resize the last card to 2x2
     Then I should see the last of 3 cards as 2x2
 
-    When I click the "CardAction-select cover image"
+    When I click the "CardAction-edit cover"
     Then I should see a 'EditCoverOptions'
 
     When I type "Undo" in the textarea

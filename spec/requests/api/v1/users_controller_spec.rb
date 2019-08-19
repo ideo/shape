@@ -25,7 +25,9 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
 
     it 'updates the users last_active_at timestamp' do
       expect { get(path) }.to change(user, :last_active_at)
-      expect(user.last_active_at).to be_within(1.second).of(Time.current)
+      expect(
+        user.last_active_at_in_org(user.current_organization_id)
+      ).to be_within(1.second).of(Time.current)
     end
 
     it 'returns a 200' do
