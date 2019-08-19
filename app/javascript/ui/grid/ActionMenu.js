@@ -11,6 +11,7 @@ import LinkIcon from '~/ui/icons/LinkIcon'
 import MoveIcon from '~/ui/icons/MoveIcon'
 import ReplaceIcon from '~/ui/icons/ReplaceIcon'
 import PrintIcon from '~/ui/icons/PrintIcon'
+import SelectAllIcon from '~/ui/icons/SelectAllIcon'
 import SharingIcon from '~/ui/icons/SharingIcon'
 import SubmissionBoxIconSm from '~/ui/icons/SubmissionBoxIconSm'
 import PopoutMenu from '~/ui/global/PopoutMenu'
@@ -90,6 +91,12 @@ class ActionMenu extends React.Component {
     if (afterArchive && result) afterArchive({ type: 'archive' })
   }
 
+  selectAll = () => {
+    const { uiStore } = this.props
+    const { viewingCollection } = uiStore
+    uiStore.reselectCardIds(_.map(viewingCollection.collection_cards, 'id'))
+  }
+
   showTags = () => {
     const { card, uiStore } = this.props
     uiStore.update('tagsModalOpenId', card.id)
@@ -160,6 +167,11 @@ class ActionMenu extends React.Component {
       { name: 'Move', iconRight: <MoveIcon />, onClick: this.moveCard },
       { name: 'Link', iconRight: <LinkIcon />, onClick: this.linkCard },
       {
+        name: 'Select All',
+        iconRight: <SelectAllIcon />,
+        onClick: this.selectAll,
+      },
+      {
         name: 'Add to My Collection',
         iconRight: <AddIntoIcon />,
         onClick: this.addToMyCollection,
@@ -213,7 +225,12 @@ class ActionMenu extends React.Component {
         items = _.reject(items, { name: 'Move' })
       }
     } else {
-      const viewActions = ['Link', 'Add to My Collection', 'Download']
+      const viewActions = [
+        'Link',
+        'Select All',
+        'Add to My Collection',
+        'Download',
+      ]
       if (canView) {
         viewActions.unshift('Duplicate')
       }
