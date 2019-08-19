@@ -184,6 +184,11 @@ RSpec.describe Roles::MassRemove, type: :service do
             )
             mass_remove.call
           end
+
+          it 'updates the active user count for the organization' do
+            expect(CalculateOrganizationActiveUsers).to receive(:call).with(organization: organization)
+            mass_remove.call
+          end
         end
 
         context 'when the object is a guest group, but user is a primary member' do

@@ -11,6 +11,6 @@ exports[`LinkCreator renders snapshot 1`] = `
   passwordField={false}
   placeholder="Link URL"
   url=""
-  urlValid={false}
+  urlValid={true}
 />
 `;

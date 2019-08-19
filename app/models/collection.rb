@@ -317,6 +317,7 @@ class Collection < ApplicationRecord
     nullify :breadcrumb
     nullify :created_by_id
     nullify :organization_id
+    nullify :shared_with_organization
     set archived: false
     # don't recognize any relations, easiest way to turn them all off
     recognize []
@@ -813,8 +814,8 @@ class Collection < ApplicationRecord
     Collection.in_collection(id).where.not(template_id: nil).any?
   end
 
-  def child_of_application_collection?
-    parent.is_a?(Collection::ApplicationCollection)
+  def parent_application_collection
+    parents.find_by(type: 'Collection::ApplicationCollection')
   end
 
   # =================================
