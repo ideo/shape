@@ -376,7 +376,7 @@ class CoverImageSelector extends React.Component {
         <CardActionHolder
           active={this.isEditingCardCover}
           className="show-on-hover"
-          tooltipText="select cover image"
+          tooltipText="edit cover"
           role="button"
           onClick={this.handleClick}
         >
