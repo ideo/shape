@@ -9,6 +9,7 @@ import googleTagManager from '~/vendor/googleTagManager'
 import { apiStore } from '~/stores'
 import { apiUrl } from '~/utils/url'
 
+import CardMoveService from '~/ui/grid/CardMoveService'
 import BaseRecord from './BaseRecord'
 import CollectionCard from './CollectionCard'
 import Role from './Role'
@@ -544,6 +545,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     _.each(updates, update => {
       updatesByCardId[update.card.id] = update
     })
+    let minOrder = _.minBy(updates, 'order')
+    minOrder = minOrder ? minOrder.order : 0
+    let maxOrder = _.maxBy(updates, 'order')
+    maxOrder = maxOrder ? maxOrder.order : 0
+    const moveOrder = _.min([minOrder, maxOrder])
 
     // Apply all updates to in-memory cards
     _.each(this.collection_cards, card => {
@@ -555,6 +561,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         _.forEach(allowedAttrs, (value, key) => {
           card[key] = value
         })
+      } else if (moveOrder && card.order >= moveOrder) {
+        // make sure this card gets bumped out of the way of our moving ones
+        card.order += maxOrder
       }
       // force the grid to immediately observe that things have changed
       card.updated_at = new Date()
@@ -607,6 +616,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     })
 
     const performUpdate = () => {
+      // close MoveMenu e.g. if you were dragging from MDL
+      this.uiStore.closeMoveMenu()
       // Store snapshot of existing cards so changes can be un-done
       const cardsData = this.toJsonApiWithCards(updateAllCards ? [] : cardIds)
 
@@ -890,9 +901,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     onSuccess,
   } = {}) {
     const { uiStore } = this
+    const { cardAction } = uiStore
     const can_edit = toCollection.can_edit_content || toCollection.can_edit
     const cancel = () => {
-      uiStore.setMovingCards([])
+      uiStore.closeMoveMenu()
       uiStore.update('multiMoveCardIds', [])
       uiStore.stopDragging()
       if (_.isFunction(onCancel)) onCancel()
@@ -908,7 +920,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
           uiStore.reselectCardIds(cardIds)
           uiStore.openMoveMenu({
             from: this.id,
-            cardAction: 'move',
+            cardAction,
           })
         },
         onCancel: () => {
@@ -918,21 +930,23 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       return
     }
 
+    if (_.isEmpty(uiStore.multiMoveCardIds)) {
+      uiStore.update('multiMoveCardIds', cardIds)
+    }
     uiStore.update('movingIntoCollection', toCollection)
 
-    const data = {
+    await CardMoveService.moveCards('beginning', {
       to_id: toCollection.id.toString(),
       from_id: this.id.toString(),
       collection_card_ids: cardIds,
-      placement: 'beginning',
-    }
-    await apiStore.moveCards(data)
-    uiStore.setMovingCards([])
+    })
     uiStore.update('multiMoveCardIds', [])
     uiStore.update('movingIntoCollection', null)
 
     // Explicitly remove cards from this collection so front-end updates
-    this.removeCardIds(cardIds)
+    if (cardAction === 'move') {
+      this.removeCardIds(cardIds)
+    }
 
     // onSuccess is really "successfully able to edit this collection"
     if (_.isFunction(onSuccess)) onSuccess()

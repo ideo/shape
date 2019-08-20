@@ -121,6 +121,47 @@ RSpec.describe CardMover, type: :service do
       end
     end
 
+    context 'with placement as an order number (insert cards in middle of collection)' do
+      let(:placement) { 1 }
+
+      it 'should place the moved cards in the middle of the collection' do
+        original_cards = to_collection.collection_cards.to_a
+        card_mover.call
+        expect(to_collection.reload.collection_cards.map(&:id)).to match_array([
+          # 3 cards so order '1' should be in the middle
+          # before: [0, 1, 2]
+          # after: [0, x, x, x, 1, 2]
+          original_cards[0].id,
+          moving_cards[0].id,
+          moving_cards[1].id,
+          moving_cards[2].id,
+          original_cards[1].id,
+          original_cards[2].id,
+        ])
+      end
+
+      context 'with pinned cards' do
+        before do
+          # update first 2 cards to be pinned
+          to_collection.collection_cards.limit(2).update_all(pinned: true)
+        end
+
+        it 'should place the moved cards in the middle of the collection' do
+          original_cards = to_collection.collection_cards.to_a
+          card_mover.call
+          expect(to_collection.reload.collection_cards.map(&:id)).to match_array([
+            original_cards[0].id,
+            # even though we use placement: 1, the first two cards are pinned
+            original_cards[1].id,
+            moving_cards[0].id,
+            moving_cards[1].id,
+            moving_cards[2].id,
+            original_cards[2].id,
+          ])
+        end
+      end
+    end
+
     context 'with card_action "link"' do
       let(:card_action) { 'link' }
       let(:linking_cards) { moving_cards }
