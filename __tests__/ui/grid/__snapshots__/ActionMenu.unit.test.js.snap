@@ -29,6 +29,13 @@ exports[`ActionMenu as editor renders snapshot 1`] = `
         "onClick": [Function],
       },
       Object {
+        "iconRight": <SelectAllIcon
+          viewBox="0 0 15 15"
+        />,
+        "name": "Select All",
+        "onClick": [Function],
+      },
+      Object {
         "iconRight": <AddIntoIcon />,
         "name": "Add to My Collection",
         "onClick": [Function],
