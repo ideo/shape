@@ -6,7 +6,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
   height={NaN}
   innerRef={[Function]}
   onScroll={[Function]}
-  width={988.2790697674419}
+  width={988.0701754385965}
 >
   <FoamcoreZoomControls
     onZoomIn={[Function]}
@@ -22,13 +22,13 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
     key="blank-unrendered-1:5"
     onClick={[Function]}
     type="unrendered"
-    w={312}
-    width={312}
-    x={308.83720930232556}
-    xPos={308.83720930232556}
-    y={50.23255813953488}
-    yPos={50.23255813953488}
-    zoomLevel={5.375}
+    w={316}
+    width={316}
+    x={308.7719298245614}
+    xPos={308.7719298245614}
+    y={49.40350877192982}
+    yPos={49.40350877192982}
+    zoomLevel={5.34375}
   >
     <InlineLoader
       background="#f5f4f3"
@@ -40,18 +40,18 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
     data-blank-type="unrendered"
     data-empty-space-click={true}
     draggedOn={true}
-    h={520}
-    height={520}
+    h={514}
+    height={514}
     key="blank-unrendered-0:1"
     onClick={[Function]}
     type="unrendered"
-    w={644}
-    width={644}
-    x={61.76744186046512}
-    xPos={61.76744186046512}
+    w={646}
+    width={646}
+    x={61.75438596491228}
+    xPos={61.75438596491228}
     y={0}
     yPos={0}
-    zoomLevel={5.375}
+    zoomLevel={5.34375}
   >
     <InlineLoader
       background="#f5f4f3"
@@ -68,13 +68,13 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
     key="blank-unrendered-2:0"
     onClick={[Function]}
     type="unrendered"
-    w={644}
-    width={644}
+    w={646}
+    width={646}
     x={0}
     xPos={0}
-    y={100.46511627906976}
-    yPos={100.46511627906976}
-    zoomLevel={5.375}
+    y={98.80701754385964}
+    yPos={98.80701754385964}
+    zoomLevel={5.34375}
   >
     <InlineLoader
       background="#f5f4f3"

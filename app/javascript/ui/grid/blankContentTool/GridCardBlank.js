@@ -678,7 +678,7 @@ class GridCardBlank extends React.Component {
     const { isBoard } = parent
     let { gridW, gridH } = gridSettings
     if (isBoard) {
-      ;({ gridW, gridH } = uiStore.defaultGridSettings)
+      ;({ gridW, gridH } = v.defaultGridSettings)
     }
     return (
       <StyledGridCardBlank boxShadow={isBoard}>

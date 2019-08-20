@@ -45,6 +45,7 @@ end
 require 'fakeredis/rspec'
 require 'action_cable/testing/rspec'
 require 'cancan/matchers'
+require 'jsonapi_spec_helpers'
 
 RSpec.configure do |config|
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
@@ -66,6 +67,7 @@ RSpec.configure do |config|
 
   config.include ApiHelper, json: true
   config.include JsonHeaders, json: true
+  config.include JsonapiSpecHelpers
   config.include SessionHelper
   config.include TestDoubles
 

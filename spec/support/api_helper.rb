@@ -29,4 +29,12 @@ module ApiHelper
       'AUTHORIZATION' => "Bearer #{token}",
     }
   end
+
+  # Hooks into jsonapi_spec_helpers to provide API token
+  def jsonapi_headers
+    headers = super
+    return headers if @api_token.blank?
+    headers['Authorization'] = "Bearer #{@api_token.token}"
+    headers
+  end
 end

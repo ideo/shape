@@ -87,9 +87,10 @@ class Api::V1::UsersController < Api::V1::BaseController
   def update_user_last_active_at
     return if current_user.current_organization_id.nil?
 
-    timestamps = current_user.last_active_at.merge({
-      current_user.current_organization_id.to_s => Time.zone.now
-    })
+    timestamps = current_user.last_active_at || {}
+    timestamps = timestamps.merge(
+      current_user.current_organization_id.to_s => Time.zone.now,
+    )
 
     current_user.update_attributes(last_active_at: timestamps)
   end

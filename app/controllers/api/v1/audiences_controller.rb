@@ -1,6 +1,6 @@
 class Api::V1::AudiencesController < Api::V1::BaseController
   deserializable_resource :audience, class: DeserializableAudience, only: %i[create]
-  load_and_authorize_resource :audience, only: %i[index show]
+  load_and_authorize_resource :audience, only: %i[show]
   load_and_authorize_resource :organization, only: %i[index]
 
   before_action :load_org_audiences, only: %i[index]

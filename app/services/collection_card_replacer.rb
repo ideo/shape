@@ -40,6 +40,10 @@ class CollectionCardReplacer
     @item.attributes = @attrs
     # the class type may have changed
     @item = @item.becomes(@attrs[:type].constantize)
+
+    # clearing data means removing any existing translated content
+    @item.translations.destroy_all
+
     # this needs to happen after the @item.becomes
     return unless @attrs[:filestack_file_attributes].present?
 

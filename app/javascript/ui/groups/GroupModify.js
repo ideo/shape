@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import { action, observable } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import parameterize from 'parameterize'
+import { SmallHelperText } from '~/ui/global/styled/typography'
 import {
   FormButton,
   FieldContainer,
@@ -32,6 +33,8 @@ class GroupModify extends React.Component {
   }
   @observable
   syncing = false
+  @observable
+  formDisabled = false
 
   constructor(props) {
     super(props)
@@ -43,6 +46,9 @@ class GroupModify extends React.Component {
       filestack_file_attributes: null,
     }
     if (!group.id) this.setSyncing(true)
+    if (this.editingGroup.handle.length < 2) {
+      this.formDisabled = true
+    }
   }
 
   @action
@@ -57,7 +63,10 @@ class GroupModify extends React.Component {
 
   @action
   changeHandle(handle) {
-    this.editingGroup.handle = handle
+    // limit to 30
+    this.editingGroup.handle = handle.slice(0, 30)
+    // disable the form if the handle is numbers only
+    this.formDisabled = parseInt(handle).toString() === handle
   }
 
   @action
@@ -140,6 +149,11 @@ class GroupModify extends React.Component {
         </FieldContainer>
         <FieldContainer>
           <Label htmlFor="grouphandle">{groupType} handle</Label>
+          <div style={{ marginTop: '-10px', marginBottom: '10px' }}>
+            <SmallHelperText>
+              Must be 1-30 characters, starting with a letter.
+            </SmallHelperText>
+          </div>
           <TextField
             id="grouphandle"
             type="text"
@@ -158,6 +172,7 @@ class GroupModify extends React.Component {
         <FormActionsContainer>
           <FormButton
             data-cy="FormButton_submitGroup"
+            disabled={this.formDisabled}
             onClick={this.handleSave}
             width={190}
             type="submit"

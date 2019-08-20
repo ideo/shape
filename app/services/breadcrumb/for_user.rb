@@ -32,7 +32,7 @@ module Breadcrumb
             Collection.where("cached_attributes->'common_viewable' = 'true'"),
           ),
         )
-        .order(Arel.sql("position(id::text in '#{ids.join(',')}')"))
+        .order(Arel.sql("position(collections.id::text in '#{ids.join(',')}')"))
         .select(:id, :name)
     end
 
