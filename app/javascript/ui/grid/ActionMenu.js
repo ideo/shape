@@ -91,10 +91,9 @@ class ActionMenu extends React.Component {
     if (afterArchive && result) afterArchive({ type: 'archive' })
   }
 
-  selectAll = () => {
-    const { uiStore } = this.props
-    const { viewingCollection } = uiStore
-    uiStore.reselectCardIds(_.map(viewingCollection.collection_cards, 'id'))
+  selectAll = async () => {
+    const { uiStore, location, card } = this.props
+    uiStore.selectAll({ location, card })
   }
 
   showTags = () => {
@@ -239,6 +238,11 @@ class ActionMenu extends React.Component {
         viewActions.push('Sharing')
       }
       items = _.filter(items, a => _.includes(viewActions, a.name))
+    }
+
+    if (location === 'Search') {
+      // Select All doesn't work from the search page
+      items = _.reject(items, { name: 'Select All' })
     }
 
     if (location === 'PageMenu' && record.isCollection) {

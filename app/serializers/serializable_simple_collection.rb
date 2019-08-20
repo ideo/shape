@@ -30,6 +30,11 @@ class SerializableSimpleCollection < BaseJsonSerializer
     @object.try(:restorable?)
   end
 
+  attribute :can_view, if: -> { @current_ability } do
+    # intentionally not using ability so `anyone_can_view?` does not return true
+    @current_user ? @object.can_view?(@current_user) : false
+  end
+
   attribute :can_edit, if: -> { @current_ability } do
     @current_ability.can?(:edit, @object)
   end

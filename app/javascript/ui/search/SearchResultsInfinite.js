@@ -107,7 +107,7 @@ class SearchResultsInfinite extends React.Component {
       gridMaxW,
       hasMore,
       loadMore,
-      // total, using filtered length because of hidden text items
+      total,
     } = this.props
 
     const results = searchResults.map((result, i) => {
@@ -179,7 +179,7 @@ class SearchResultsInfinite extends React.Component {
     return (
       <Fragment>
         <StyledScrollIndicator active={this.hovering}>
-          {this.firstVisible}/{filteredResults.length}
+          {this.firstVisible}/{total}
         </StyledScrollIndicator>
         <InfiniteScroll
           useWindow
