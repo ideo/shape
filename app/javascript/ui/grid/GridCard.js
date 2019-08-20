@@ -281,9 +281,6 @@ class GridCard extends React.Component {
     const { menuItemCount, props } = this
     const { card } = props
 
-    // for some reason, Android treats long-press as right click
-    if (uiStore.isMobile) return false
-
     // use util method to dynamically move the component on open
     const positionOffset = calculatePopoutMenuOffset(
       ev,
@@ -306,6 +303,9 @@ class GridCard extends React.Component {
 
   openContextMenu = ev => {
     ev.preventDefault()
+    // for some reason, Android treats long-press as right click
+    if (uiStore.isMobile) return false
+
     const rect = this.gridCardRef.getBoundingClientRect()
     const x = ev.clientX - rect.left - rect.width * 0.95
     const y = ev.clientY - rect.top - 15
