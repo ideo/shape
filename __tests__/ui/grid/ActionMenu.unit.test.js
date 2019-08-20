@@ -26,6 +26,7 @@ describe('ActionMenu', () => {
         'Duplicate',
         'Move',
         'Link',
+        'Select All',
         'Add to My Collection',
         'Tags',
         'Sharing',
@@ -133,6 +134,7 @@ describe('ActionMenu', () => {
         'Comment',
         'Duplicate',
         'Link',
+        'Select All',
         'Add to My Collection',
         'Tags',
         'Sharing',
@@ -157,6 +159,7 @@ describe('ActionMenu', () => {
         'Comment',
         'Duplicate',
         'Link',
+        'Select All',
         'Add to My Collection',
         'Tags',
         'Sharing',
@@ -199,7 +202,14 @@ describe('ActionMenu', () => {
 
   describe('as editor of a system required record', () => {
     beforeEach(() => {
-      actions = ['Comment', 'Move', 'Link', 'Add to My Collection', 'Sharing']
+      actions = [
+        'Comment',
+        'Move',
+        'Link',
+        'Select All',
+        'Add to My Collection',
+        'Sharing',
+      ]
       props.card.record.system_required = true
       props.card.isPinnedAndLocked = false
       wrapper = shallow(
@@ -224,6 +234,7 @@ describe('ActionMenu', () => {
         'Duplicate',
         'Move',
         'Link',
+        'Select All',
         'Add to My Collection',
         'Tags',
         'Sharing',
@@ -261,19 +272,16 @@ describe('ActionMenu', () => {
 
   describe('with an archived record', () => {
     beforeEach(() => {
+      actions = ['Comment', 'Select All', 'Download', 'Tags']
       props.canEdit = true
       props.card.record.archived = true
       wrapper = shallow(<ActionMenu.wrappedComponent {...props} />)
     })
 
-    it('should only render tags and sharing', () => {
+    it('should only render limited options', () => {
       const popout = wrapper.find('PopoutMenu').at(0)
-      expect(popout.props().menuItems.length).toEqual(3)
-      expect(_.map(popout.props().menuItems, i => i.name)).toEqual([
-        'Comment',
-        'Download',
-        'Tags',
-      ])
+      expect(popout.props().menuItems.length).toEqual(actions.length)
+      expect(_.map(popout.props().menuItems, 'name')).toEqual(actions)
     })
   })
 })
