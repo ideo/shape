@@ -68,6 +68,7 @@ class Collection < ApplicationRecord
   include Testable
   include Externalizable
   include Commentable
+  include Globalizable
 
   resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
@@ -77,6 +78,10 @@ class Collection < ApplicationRecord
   archivable as: :parent_collection_card,
              with: %i[collection_cards cards_linked_to_this_collection]
   acts_as_taggable
+
+  translates_custom :translated_name,
+                    confirmable: true,
+                    fallbacks_for_empty_translations: true
 
   store_accessor :cached_attributes,
                  :cached_cover,
