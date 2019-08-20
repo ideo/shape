@@ -77,6 +77,18 @@ RSpec.describe InvitationMailer, type: :mailer do
           "#{invited_by.name} has invited you to join #{organization.name}'s \"#{invited_to.name}\" group",
         )
       end
+
+      context 'with an application' do
+        let(:application) { create(:application) }
+
+        it 'sets the from to creative difference' do
+          expect(mail.from).to eq(['hello@ideocreativedifference.com'])
+        end
+
+        it 'sets the invite url to creative difference' do
+          expect(mail.body.encoded).to match('https://creativedifference.ideo.com/shape')
+        end
+      end
     end
 
     context 'with Shape admin' do
@@ -97,10 +109,6 @@ RSpec.describe InvitationMailer, type: :mailer do
       it 'renders the body' do
         expect(mail.body.encoded).to match("#{invited_by.name} has invited you to join \"#{invited_to_type}\"")
       end
-    end
-
-    context 'with an application' do
-      let(:application) { create(:application) }
     end
   end
 end
