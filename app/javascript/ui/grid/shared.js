@@ -86,12 +86,6 @@ export const StyledGridCard = styled.div`
   z-index: 1;
 
   ${props =>
-    props.dragging &&
-    `
-      user-select: none;
-    `}
-
-  ${props =>
     props.selected &&
     `
   &:before {
@@ -131,7 +125,6 @@ export const showOnHoverCss = css`
       /* don't show hover items while dragging */
       opacity: ${props => (props.dragging ? 0 : 1)};
     }
-    user-select: none;
   }
 `
 
@@ -197,6 +190,13 @@ export const StyledGridCardInner = styled.div`
   *::selection {
     background: transparent;
   }
+
+  ${props =>
+    !props.isText &&
+    `
+      /*disable text highlighting*/
+      user-select: none;
+    `}
 
   ${props =>
     props.isText &&
