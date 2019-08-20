@@ -61,8 +61,6 @@ const AppWrapper = styled.div`
       padding: 0;
     }
   }
-  /* disable pull to refresh on android, only on Chrome 63+ */
-  overscroll-behavior: none;
 `
 AppWrapper.displayName = 'AppWrapper'
 
