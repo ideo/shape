@@ -19,6 +19,7 @@ class CollectionCardFilter < SimpleService
       filter_for_public
     end
     filter_external_id
+    return @cards.pluck(:id) if @ids_only
     @cards
   end
 

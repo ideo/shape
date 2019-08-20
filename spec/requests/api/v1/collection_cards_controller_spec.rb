@@ -237,6 +237,18 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
   end
 
+  describe 'GET #ids' do
+    let!(:collection) { create(:collection, num_cards: 5, add_editors: [user]) }
+    let(:path) { "/api/v1/collections/#{collection.id}/collection_cards/ids" }
+
+    it 'returns stringified ids of collection.collection_cards' do
+      get(path)
+      expect(response.status).to eq(200)
+      expect(json.length).to eq(5)
+      expect(json).to eq(collection.collection_cards.pluck(:id).map(&:to_s))
+    end
+  end
+
   describe 'POST #create' do
     let(:path) { '/api/v1/collection_cards' }
     let(:item_attributes) do
