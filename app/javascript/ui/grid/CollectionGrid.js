@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { action } from 'mobx'
+import { action, runInAction } from 'mobx'
 import { updateModelId } from 'datx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
@@ -456,10 +456,6 @@ class CollectionGrid extends React.Component {
     const { gutter, gridW, gridH } = this.props
     const { cards, matrix } = this.state
     let placeholder = _.find(cards, { cardType: 'placeholder' })
-    if (placeholder) {
-      // always reset this setting, unless we manually position below
-      placeholder.skipPositioning = false
-    }
 
     // calculate row/col that we are dragging over (with some padding to account for our desired logic)
     const row = Math.floor((dragY + gutter * 0.5) / (gridH + gutter))
@@ -468,6 +464,11 @@ class CollectionGrid extends React.Component {
     let overlapCardId = null
     if (matrix[row] && matrix[row][col]) {
       // first case: we're directly overlapping an existing card
+      if (placeholder && placeholder.skipPositioning) {
+        // in this case placeholder is positioned inside the grid
+        placeholder.skipPositioning = false
+      }
+
       overlapCardId = matrix[row][col]
       const overlapped = _.find(cards, { id: overlapCardId })
       const { record, position } = overlapped
@@ -511,19 +512,29 @@ class CollectionGrid extends React.Component {
           const positionedCard = _.find(cards, { id: cardId })
           placeholder = this.createPlaceholderCard(positionedCard)
         }
-        // update the placeholder attrs to move it to our desired spot.
-        placeholder.order = near.order + 0.5
-        placeholder.width = 1
-        placeholder.height = 1
-        // we want to skip positioning in positionCards because we are manually setting x/yPos
-        placeholder.skipPositioning = true
-        placeholder.position = {
-          x: row,
-          y: col,
-          xPos: col * (gridW + gutter),
-          yPos: row * (gridH + gutter),
-          width: gridW,
-          height: gridH,
+        const newAttrs = {
+          // update the placeholder attrs to move it to our desired spot.
+          order: near.order + 0.5,
+          width: 1,
+          height: 1,
+          // we want to skip positioning in positionCards because we are manually setting x/yPos
+          skipPositioning: true,
+          position: {
+            x: row,
+            y: col,
+            xPos: col * (gridW + gutter),
+            yPos: row * (gridH + gutter),
+            width: gridW,
+            height: gridH,
+          },
+        }
+        // we want to be intentional about changing the placeholder's observable attrs,
+        // otherwise we can very eagerly trigger too many re-renders
+        const oldAttrs = _.pick(placeholder, _.keys(newAttrs))
+        if (!objectsEqual(oldAttrs, newAttrs)) {
+          runInAction(() => {
+            _.assign(placeholder, newAttrs)
+          })
         }
 
         return {

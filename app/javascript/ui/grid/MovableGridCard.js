@@ -275,6 +275,7 @@ class MovableGridCard extends React.PureComponent {
       uiStore.closeBlankContentTool()
       // close the MoveMenu to prevent weird behaviors
       uiStore.closeMoveMenu({ deselect: false })
+      // close editing to prevent weird behaviors
       uiStore.startDragging(this.props.card.id)
       this.setState(
         {
@@ -336,9 +337,10 @@ class MovableGridCard extends React.PureComponent {
       uiStore.resetSelectionAndBCT()
       // close the MoveMenu to prevent weird behaviors
       uiStore.closeMoveMenu()
+      uiStore.setEditingCardCover(null)
     }
     const gridSettings = isBoardCollection
-      ? uiStore.defaultGridSettings
+      ? v.defaultGridSettings
       : uiStore.gridSettings
     const { cols } = gridSettings
     const gridW = gridSettings.gridW / zoomLevel
@@ -557,7 +559,7 @@ class MovableGridCard extends React.PureComponent {
     }
 
     const gridSettings = isBoardCollection
-      ? uiStore.defaultGridSettings
+      ? v.defaultGridSettings
       : uiStore.gridSettings
     const { gridW, gridH, cols, gutter } = gridSettings
     // TODO: esp. for foamcore, change this min/max pixel based resize logic...
@@ -689,7 +691,8 @@ class MovableGridCard extends React.PureComponent {
             !canEditCollection ||
             // NOTE: disabling dragging for touchscreens because of conflict with touch scrolling
             (uiStore.isTouchDevice && cols === 1) ||
-            card.isPinnedAndLocked
+            card.isPinnedAndLocked ||
+            !!uiStore.editingCardCover
           }
           enableResizing={{
             bottomRight:

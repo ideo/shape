@@ -68,6 +68,7 @@ class Collection < ApplicationRecord
   include Testable
   include Externalizable
   include Commentable
+  include Globalizable
 
   resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
@@ -77,6 +78,10 @@ class Collection < ApplicationRecord
   archivable as: :parent_collection_card,
              with: %i[collection_cards cards_linked_to_this_collection]
   acts_as_taggable
+
+  translates_custom :translated_name,
+                    confirmable: true,
+                    fallbacks_for_empty_translations: true
 
   store_accessor :cached_attributes,
                  :cached_cover,
@@ -317,6 +322,7 @@ class Collection < ApplicationRecord
     nullify :breadcrumb
     nullify :created_by_id
     nullify :organization_id
+    nullify :shared_with_organization
     set archived: false
     # don't recognize any relations, easiest way to turn them all off
     recognize []
@@ -813,8 +819,8 @@ class Collection < ApplicationRecord
     Collection.in_collection(id).where.not(template_id: nil).any?
   end
 
-  def child_of_application_collection?
-    parent.is_a?(Collection::ApplicationCollection)
+  def parent_application_collection
+    parents.find_by(type: 'Collection::ApplicationCollection')
   end
 
   # =================================

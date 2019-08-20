@@ -5,12 +5,14 @@ RSpec.describe InvitationMailer, type: :mailer do
     let(:user) { create(:user, :pending) }
     let(:invited_by) { create(:user) }
     let(:organization) { create(:organization) }
+    let(:application) { nil }
     let(:mail) do
       InvitationMailer.invite(
         user_id: user.id,
         invited_by_id: invited_by.id,
         invited_to_type: invited_to.class.name,
         invited_to_id: invited_to.id,
+        application: application,
       )
     end
 
@@ -95,6 +97,10 @@ RSpec.describe InvitationMailer, type: :mailer do
       it 'renders the body' do
         expect(mail.body.encoded).to match("#{invited_by.name} has invited you to join \"#{invited_to_type}\"")
       end
+    end
+
+    context 'with an application' do
+      let(:application) { create(:application) }
     end
   end
 end

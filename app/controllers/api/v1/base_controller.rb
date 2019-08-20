@@ -1,5 +1,6 @@
 class Api::V1::BaseController < ApplicationController
   include ApplicationHelper
+  include ReplaceGlobalTranslationVariables
   before_action :check_api_authentication!
   before_action :check_cancel_sync
   before_action :check_page_param
@@ -119,7 +120,7 @@ class Api::V1::BaseController < ApplicationController
        current_api_token.organization_id.present?
       @current_ability = Api::OrganizationAbility.new(current_api_token.organization)
     else
-      @current_ability = Ability.new(current_user)
+      @current_ability = Ability.new(current_user, current_application)
     end
   end
 

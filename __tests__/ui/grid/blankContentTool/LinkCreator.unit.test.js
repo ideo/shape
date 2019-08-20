@@ -44,15 +44,6 @@ describe('LinkCreator', () => {
         filter: 'nothing',
       })
     })
-
-    it('does not call createCard when link is invalid', () => {
-      component.state = {
-        url: 'httpmy.url.com',
-        urlValid: false,
-      }
-      component.createItem(e)
-      expect(props.createCard).not.toHaveBeenCalled()
-    })
   })
 
   describe('with video password props', () => {
@@ -79,10 +70,11 @@ describe('LinkCreator', () => {
         content: 'Site content here',
         image: 'http://image.url',
         icon: 'http://image.url/icon',
+        url: 'http://cnn.com',
       }
       component.state = {
         urlValid: 'link',
-        url: 'http://my.url.com',
+        url: 'http://cnn.com',
         meta,
       }
       component.createItem(e)
@@ -97,15 +89,33 @@ describe('LinkCreator', () => {
         },
       })
     })
-
-    it('does not call createCard when link is invalid', () => {
-      component.state = {
-        urlValid: false,
-        url: 'httpmy.url.com',
-        meta: {},
+  })
+  describe('createLinkItem', () => {
+    it('calls createCard with correct URL protocol for external site links', () => {
+      const meta = {
+        title: 'My Site',
+        content: 'Site content here',
+        image: 'http://image.url',
+        icon: 'http://image.url/icon',
+        url: 'https://cnn.com',
       }
-      component.createItem(e)
-      expect(props.createCard).not.toHaveBeenCalled()
+      component.state = {
+        urlValid: 'link',
+        // if user typed cnn.com, the meta.url should still have a protocol
+        url: 'cnn.com',
+        meta,
+      }
+      component.createLinkItem()
+      expect(props.createCard).toHaveBeenCalledWith({
+        item_attributes: {
+          type: ITEM_TYPES.LINK,
+          url: meta.url,
+          name: meta.title,
+          content: meta.description,
+          thumbnail_url: meta.image,
+          icon_url: meta.icon,
+        },
+      })
     })
   })
 })
