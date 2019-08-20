@@ -66,7 +66,7 @@ class Group < ApplicationRecord
   has_many :activities_as_subject, through: :activity_subjects, class_name: 'Activity'
   has_many :activity_subjects, as: :subject
 
-  before_validation :set_unique_handle, on: :create
+  before_validation :set_unique_handle, if: :validate_handle?
 
   validates :name, presence: true
   validates :organization_id, presence: true, if: :requires_org?
@@ -76,8 +76,8 @@ class Group < ApplicationRecord
             if: :validate_handle?
 
   validates :handle,
-            # requires at least one letter in it
-            format: { with: /[a-zA-Z0-9\-_]*[a-zA-Z][a-zA-Z0-9\-_]*/ },
+            length: { within: Organization::SLUG_LENGTH },
+            format: { with: Organization::SLUG_FORMAT },
             if: :validate_handle?
 
   # Searchkick Config
@@ -203,7 +203,9 @@ class Group < ApplicationRecord
   end
 
   def validate_handle?
-    new_record? || will_save_change_to_attribute?(:handle)
+    new_record? ||
+      will_save_change_to_name? ||
+      will_save_change_to_handle?
   end
 
   def set_unique_handle
@@ -211,12 +213,18 @@ class Group < ApplicationRecord
 
     self.handle ||= name
     # Make sure it is parameterized
-    self.handle = handle.parameterize
+    self.handle = handle.parameterize.slice(0, 30)
     original_handle = handle
     i = 0
-    while Group.where(organization_id: organization_id, handle: handle).count.positive?
-      self.handle = "#{original_handle}-#{i += 1}"
+    while groups_matching_handle.any?
+      self.handle = "#{original_handle.slice(0, 27)}-#{i += 1}"
     end
+  end
+
+  def groups_matching_handle
+    Group
+      .where.not(id: id)
+      .where(organization_id: organization_id, handle: handle)
   end
 
   def after_archive_group
