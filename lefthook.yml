@@ -6,7 +6,7 @@ pre-commit:
       files: git diff --name-only development
       glob: "*.js"
       exclude: '__tests__/ui/grid/__snapshots__/*'
-      run: yarn run lint {files}
+      run: yarn run lint --fix {files}
     rubocop:
       files: git diff --name-only development
       # exclude: "excluded_filename.rb"
@@ -28,12 +28,9 @@ pre-push: # githook name
 post-checkout:
   piped: true # Exit early if preceding command fails
   scripts:
-    01-bundle-checkinstall:
+    01-check-packages:
       tags: backend
     02-db-migrate:
       tags: backend
     03-crystalball-update:
       tags: rspec backend
-
-
-

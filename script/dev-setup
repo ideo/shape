@@ -5,13 +5,6 @@ set -e
 cd "$(dirname "$0")/.."
 DIR=$(pwd)
 
-GIT_DIR=$(git rev-parse --git-dir)
-HOOK="$GIT_DIR/hooks/pre-commit"
-
-if [ ! -f "$HOOK" ]; then
-  $DIR/script/add-pre-commit-hook.sh
-fi
-
 git submodule init
 git submodule update
 
@@ -24,3 +17,6 @@ yarn install
 bundle install
 # setup runs db:create, db:schema:load and db:seed
 bin/rails db:setup
+# install git hooks
+bundle exec lefthook install
+script/override-post-checkout-hook
