@@ -24,7 +24,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   # return all collection_card_ids for this particular collection
   def ids
-    render json: @collection_cards.pluck(:id).map(&:to_s)
+    render json: @collection_cards.map(&:to_s)
   end
 
   def create

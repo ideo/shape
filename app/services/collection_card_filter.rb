@@ -26,7 +26,8 @@ class CollectionCardFilter < SimpleService
     if @filters[:external_id].present? && @application.present?
       filter_external_id
     end
-
+    filter_external_id
+    return @cards.pluck(:id) if @ids_only
     @cards
   end
 
