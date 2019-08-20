@@ -224,6 +224,7 @@ ActiveRecord::Schema.define(version: 2019_08_15_222240) do
     t.datetime "updated_at", null: false
     t.text "description"
     t.jsonb "groupings", default: []
+    t.integer "application_id"
     t.index ["data_source_type", "data_source_id"], name: "index_datasets_on_data_source_type_and_data_source_id"
     t.index ["organization_id"], name: "index_datasets_on_organization_id"
   end
