@@ -682,8 +682,8 @@ class MovableGridCard extends React.PureComponent {
         // for mdlPlaceholder
         maxWidth={card.maxWidth}
         maxHeight={card.maxHeight}
-        width={card.maxWidth * uiStore.defaultGridSettings.gridW}
-        height={card.maxHeight * uiStore.defaultGridSettings.gridH}
+        width={card.maxWidth * v.defaultGridSettings.gridW}
+        height={card.maxHeight * v.defaultGridSettings.gridH}
         selectedMultiple={uiStore.movingCardIds.length > 1}
         // <-----
       >
