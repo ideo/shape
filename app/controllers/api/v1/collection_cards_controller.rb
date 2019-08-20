@@ -5,9 +5,9 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :load_and_authorize_parent_collection, only: %i[create replace]
   before_action :load_and_authorize_parent_collection_for_update, only: %i[update]
 
-  before_action :load_and_authorize_parent_collection_for_index, only: %i[index]
-  before_action :check_cache, only: %i[index]
-  before_action :load_collection_cards, only: %i[index]
+  before_action :load_and_authorize_parent_collection_for_index, only: %i[index ids]
+  before_action :check_cache, only: %i[index ids]
+  before_action :load_collection_cards, only: %i[index ids]
   def index
     params[:card_order] ||= @collection.default_card_order
 
@@ -20,6 +20,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
              inside_a_submission: @collection.submission? || @collection.inside_a_submission?,
              inside_hidden_submission_box: @collection.hide_submissions || @collection.inside_hidden_submission_box?,
            }
+  end
+
+  # return all collection_card_ids for this particular collection
+  def ids
+    render json: @collection_cards.pluck(:id).map(&:to_s)
   end
 
   def create
@@ -199,6 +204,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def load_collection_cards
+    ids_only = params[:action] == 'ids'
     filter_params = params[:filter].present? ? params[:filter] : params
     filter_params.merge(q: params[:q]) if params[:q].present?
     @collection_cards = CollectionCardFilter
@@ -207,10 +213,12 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
                           user: current_user,
                           filters: filter_params.merge(page: @page),
                           application: current_application,
+                          ids_only: ids_only,
                         )
 
     return unless user_signed_in?
-
+    # ids_only does not need to precache roles
+    return if ids_only
     # precache roles because these will be referred to in the serializers (e.g. can_edit?)
     current_user.precache_roles_for(
       [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],

@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import axios from 'axios'
 import { observable, computed, action, runInAction } from 'mobx'
 import { ReferenceType } from 'datx'
 import pluralize from 'pluralize'
@@ -971,6 +972,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (this.parent && this.parent.submission_attrs) {
       this.apiStore.request(`collections/${this.parent.id}`)
     }
+  }
+
+  API_fetchAllCardIds() {
+    return axios.get(`/api/v1/collections/${this.id}/collection_cards/ids`)
   }
 
   async API_setSubmissionBoxTemplate(data) {

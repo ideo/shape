@@ -49,6 +49,7 @@ const captureGlobalKeypress = e => {
     activeElement.nodeName === 'INPUT' ||
     _.intersection(activeElement.classList, [
       'ql-editor',
+      'ql-container',
       'public-DraftEditor-content',
       'edit-cover-title',
       'edit-cover-subtitle',
@@ -109,6 +110,12 @@ const captureGlobalKeypress = e => {
       // CTRL+Z: Undo
       if (metaKey || ctrlKey) {
         undoStore.handleUndoKeypress()
+      }
+      break
+    case 'KeyA':
+      if (uiStore.viewingCollection && (metaKey || ctrlKey)) {
+        e.preventDefault()
+        uiStore.selectAll({ location: 'Global' }) // CTRL+A: Select All
       }
       break
     case 'Backspace':

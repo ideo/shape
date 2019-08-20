@@ -1,16 +1,17 @@
 class CollectionCardFilter < SimpleService
-  def initialize(collection:, user:, filters:, application: nil)
+  def initialize(collection:, user:, filters:, application: nil, ids_only: false)
     @collection_order = nil
     @collection = collection
     @user = user
     @filters = filters
     @application = application
     @cards = []
+    @ids_only = ids_only
   end
 
   def call
     initialize_cards
-    apply_order
+    apply_order unless @ids_only
     apply_hidden
 
     if public_collection? && user_does_not_have_access?
@@ -40,7 +41,10 @@ class CollectionCardFilter < SimpleService
   end
 
   def initialize_cards
-    if @collection.is_a?(Collection::Board)
+    if @ids_only
+      # start with all_collection_cards to unscope the order, and `active` will be applied below
+      @cards = @collection.all_collection_cards
+    elsif @collection.is_a?(Collection::Board)
       # Defaults to 16x16 since we default to a fully zoomed-out view
       rows = @filters[:rows].is_a?(Array) ? @filters[:rows] : [0, 16]
       cols = @filters[:cols].is_a?(Array) ? @filters[:cols] : [0, 16]
@@ -98,6 +102,7 @@ class CollectionCardFilter < SimpleService
       @cards = @cards.active
     end
 
+    return @cards if @ids_only
     @cards = @cards
              .includes(
                collection: [:collection_cover_items],
@@ -145,7 +150,11 @@ class CollectionCardFilter < SimpleService
       groups_roles.group_id IN (#{group_ids.present? ? group_ids.join(',') : 'NULL'})
     )
 
-    fields = ['collection_cards.*']
+    if @ids_only
+      fields = ['collection_cards.id']
+    else
+      fields = ['collection_cards.*']
+    end
     fields << @collection_order if @collection_order.present?
 
     @cards = @cards
