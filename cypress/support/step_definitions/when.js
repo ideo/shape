@@ -115,6 +115,18 @@ When('I undo with CTRL+Z', () => {
   cy.undo()
 })
 
+// ----------------------
+// Editing cards
+// ----------------------
+When('I type {string} in the textarea', string => {
+  cy.get('textarea')
+    .first()
+    .clear()
+    .wait(25)
+    .type(string)
+    .wait(25)
+})
+
 When('I close the snackbar', () => {
   // NOTE: snackbar tests have proven fickle, so instead we just wait a bit for it
   // cy.locateDataOrClass('.MuiSnackbarContent-action')

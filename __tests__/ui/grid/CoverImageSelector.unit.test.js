@@ -68,6 +68,10 @@ describe('CoverImageSelector', () => {
       expect(innerWrapper.find('QuickOptionSelector').length).toEqual(2)
     })
 
+    it('should render a TextareaAutosize for editing card titles', () => {
+      expect(innerWrapper.find('TextareaAutosize').length).toEqual(1)
+    })
+
     describe('with a VideoItem that has no thumbnail_url', () => {
       beforeEach(() => {
         rerender({
@@ -93,8 +97,8 @@ describe('CoverImageSelector', () => {
       holder.simulate('click', fakeEv)
     })
 
-    it('should set open to true', () => {
-      expect(component.open).toBe(true)
+    it('should set an editing card cover', () => {
+      expect(uiStore.setEditingCardCover).toHaveBeenCalledWith(card.id)
     })
 
     it('should set the list of options from the api', () => {
@@ -146,7 +150,7 @@ describe('CoverImageSelector', () => {
       })
 
       it('should close the selector', () => {
-        expect(component.open).toBe(false)
+        expect(uiStore.setEditingCardCover).toHaveBeenCalledWith(null)
       })
     })
 
@@ -170,7 +174,7 @@ describe('CoverImageSelector', () => {
     })
 
     it('should close the menu', () => {
-      expect(component.open).toBe(false)
+      expect(uiStore.setEditingCardCover).toHaveBeenCalledWith(null)
     })
 
     it('should save the card', () => {

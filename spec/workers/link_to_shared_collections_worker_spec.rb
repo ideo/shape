@@ -68,6 +68,25 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
       end
     end
 
+    context 'when the link is a child of a child of an application collection' do
+      let!(:application_collection) { create(:application_collection, organization: organization) }
+      let(:child_collection) do
+        create(:collection,
+               parent_collection: application_collection,
+               organization: organization)
+      end
+      let!(:collection_to_link) do
+        create(:collection,
+               parent_collection: child_collection,
+               organization: organization)
+      end
+
+      it 'should add the link at the first position' do
+        link = user.current_shared_collection.collection_cards.first
+        expect(link.collection_id).to eq application_collection.id
+      end
+    end
+
     context 'with multiple users' do
       let(:users_to_add) { create_list(:user, 4, add_to_org: organization) }
 

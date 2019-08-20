@@ -174,6 +174,13 @@ class GridCard extends React.Component {
     )
   }
 
+  get isEditingCardCover() {
+    const { card } = this.props
+    const { id } = card
+    // uiStore.editingCardCover gets set when handleClick is fired when edit icon is clicked
+    return uiStore.editingCardCover === id
+  }
+
   renderTopRightActions() {
     const {
       record,
@@ -184,18 +191,21 @@ class GridCard extends React.Component {
       testCollectionCard,
       searchResult,
     } = this.props
-    const { isEditingCardTitle } = uiStore
     return (
       <StyledTopRightActions
         color={this.actionsColor}
         className={
-          !isEditingCardTitle ? 'show-on-hover' : 'hide-on-editing-title'
+          this.isEditingCardCover ? 'hide-on-cover-edit' : 'show-on-hover'
         }
         zoomLevel={zoomLevel}
       >
         {record.isDownloadable && <Download record={record} />}
         {record.canSetACover && (
-          <CoverImageSelector card={card} parentRef={this.gridCardRef} />
+          <CoverImageSelector
+            card={card}
+            parentRef={this.gridCardRef}
+            isEditingCardCover={this.isEditingCardCover}
+          />
         )}
         {record.canBeSetAsCover && canEditCollection && (
           <CoverImageToggle

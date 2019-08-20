@@ -29,10 +29,10 @@ class OrganizationUserReport
     end
   end
 
-  def self.active_users_in_domain(email: 'ideo.com', within: 3.months)
+  def self.active_users_in_domain(email: 'ideo.com', within: 3.months, id: 1)
     User
       .active
-      .where('last_active_at > ?', within.ago)
+      .where("last_active_at->>'#{id}' > ?", within.ago)
       .where('email LIKE ?', "%#{email}")
   end
 end
