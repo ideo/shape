@@ -56,12 +56,13 @@ class Item
     # build up a plaintext string of all the text content, with elements separated by pipes "|"
     # e.g. "Mission Statement | How might we do x..."
     def plain_content(only_first_line: false, splitter: ' | ')
-      return '' unless data_content.present? && data_content['ops'].present?
+      ops = HashWithIndifferentAccess.new(data_content).try(:[], :ops)
+      return '' unless ops.present?
       text = ''
-      data_content['ops'].each_with_index do |data, i|
+      ops.each_with_index do |data, i|
         # strip out escaped strings e.g. "&lt;strong&gt;" if someone typed raw HTML
         # strip out extra whitespaces/newlines
-        t = StripTags.new(data['insert']).call
+        t = StripTags.new(data[:insert]).call
         # sometimes the data['insert'] is just a newline, ignore
         next if t.empty?
         return t if only_first_line

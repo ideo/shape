@@ -125,6 +125,9 @@ gem 'interactor-schema'
 # Double-entry accounting system
 gem 'double_entry', '~> 2.0.0.beta1'
 
+# custom wrapper for globalize gem
+gem 'ideo-translation', git: 'https://github.com/ideo/ideo-translation.git'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
@@ -168,6 +171,7 @@ group :test do
   gem 'vcr'
   gem 'webmock'
   gem 'timecop'
+  gem 'jsonapi_spec_helpers'
 end
 
 group :production do

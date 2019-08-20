@@ -266,7 +266,7 @@ class FoamcoreGrid extends React.Component {
   get gridSettings() {
     // Foamcore doesn't change gridSettings based on browser size,
     // instead always refer to the defaults
-    return this.props.uiStore.defaultGridSettings
+    return v.defaultGridSettings
   }
 
   get totalGridSize() {
@@ -1098,7 +1098,7 @@ class FoamcoreGrid extends React.Component {
     // any cards that are being moved don't appear at all
     const collectionCards = _.reject(
       collection.collection_cards,
-      c => _.includes(movingCardIds, c.id) || (c.is_cover && c.hidden)
+      c => _.includes(movingCardIds, c.id) || c.hidden
     )
 
     let cards = []

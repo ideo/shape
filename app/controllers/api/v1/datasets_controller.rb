@@ -1,12 +1,48 @@
 class Api::V1::DatasetsController < Api::V1::BaseController
-  deserializable_resource :dataset, class: DeserializableDataset, only: %i[update]
+  deserializable_resource :dataset, class: DeserializableDataset, only: %i[create update]
   load_and_authorize_resource :collection
-  load_resource
+  load_resource except: :index
+
+  def index
+    @datasets = datasets_scope
+    load_and_filter_index
+    render jsonapi: @datasets
+  end
+
+  def show; end
+
+  def create
+    external_id = @dataset.external_id
+    if current_application.present?
+      @dataset.application = current_application
+    elsif current_organization.present?
+      @dataset.organization = current_organization
+    end
+    if @dataset.save
+      if external_id.present? && current_application.present?
+        @dataset.add_external_id(
+          external_id,
+          current_application.id,
+        )
+      end
+      render jsonapi: @dataset
+    else
+      render_api_errors @dataset.errors
+    end
+  end
 
   def update
     @dataset.attributes = dataset_params
     if @dataset.save
       render jsonapi: @dataset
+    else
+      render_api_errors @dataset.errors
+    end
+  end
+
+  def destroy
+    if @dataset.destroy
+      head :no_content
     else
       render_api_errors @dataset.errors
     end
@@ -67,12 +103,31 @@ class Api::V1::DatasetsController < Api::V1::BaseController
   def dataset_params
     params.require(:dataset).permit(
       :type,
+      :identifier,
+      :description,
+      :max_domain,
       :measure,
       :timeframe,
-      :identifier,
-      :data_source_id,
+      :chart_type,
       :data_source_type,
-      :data_source,
+      :data_source_id,
+      style: {},
+      cached_data: %i[
+        value
+        date
+        percentage
+        column
+      ],
     )
+  end
+
+  def datasets_scope
+    if current_api_token.present?
+      current_application.datasets
+    else
+      Dataset.where(
+        organization_id: current_user.organization_ids,
+      )
+    end
   end
 end

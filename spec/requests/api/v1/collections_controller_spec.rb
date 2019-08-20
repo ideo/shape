@@ -240,6 +240,46 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         end
       end
     end
+
+    context 'with content variables' do
+      before do
+        GlobalTranslation.create(
+          value_en: {
+            'CD-QUALITIES-PURPOSE': 'Purpose',
+          },
+        )
+      end
+
+      context 'matching variables' do
+        before do
+          collection.update(
+            name: '{{CD-QUALITIES-PURPOSE}} is my name',
+          )
+        end
+
+        it 'replaces with value' do
+          get(path)
+          expect(json['data']['attributes']['name']).to eq(
+            'Purpose is my name',
+          )
+        end
+      end
+
+      context 'non-matching variables' do
+        before do
+          collection.update(
+            name: '{{CD-SOMETHING-ELSE}} is my name',
+          )
+        end
+
+        it 'leaves them in-place' do
+          get(path)
+          expect(json['data']['attributes']['name']).to eq(
+            '{{CD-SOMETHING-ELSE}} is my name',
+          )
+        end
+      end
+    end
   end
 
   describe 'POST #create_template' do

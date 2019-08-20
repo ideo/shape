@@ -346,7 +346,7 @@ class MovableGridCard extends React.PureComponent {
       uiStore.setEditingCardCover(null)
     }
     const gridSettings = isBoardCollection
-      ? uiStore.defaultGridSettings
+      ? v.defaultGridSettings
       : uiStore.gridSettings
     const { cols } = gridSettings
     const gridW = gridSettings.gridW / zoomLevel
@@ -565,7 +565,7 @@ class MovableGridCard extends React.PureComponent {
     }
 
     const gridSettings = isBoardCollection
-      ? uiStore.defaultGridSettings
+      ? v.defaultGridSettings
       : uiStore.gridSettings
     const { gridW, gridH, cols, gutter } = gridSettings
     // TODO: esp. for foamcore, change this min/max pixel based resize logic...

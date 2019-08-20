@@ -42,22 +42,30 @@ const linkBackgroundOption = {
   color: v.colors.black,
 }
 
-const TopRightHolder = styled.div`
+const TopRightHolderWrapper = styled.div`
+  display: flex;
   width: 100%;
-  height: 100%;
   max-width: ${props => props.maxWidth}px;
-  max-height: ${props => props.maxHeight}px;
-  padding: 14px 14px 16px;
+  position: absolute;
   right: 0px;
   top: 0px;
-  display: block;
-  position: absolute;
   z-index: ${v.zIndex.gridCardTop};
-  background: ${v.colors.primaryLight};
   opacity: 0.9;
-  box-sizing: border-box;
+  align-items: stretch;
+  background: ${v.colors.primaryLight};
+  padding-bottom: ${props => (props.hasMaxHeight ? 0 : 16)}px;
+  ${props =>
+    props.hasMaxHeight &&
+    `
+    height: 100%;
+    max-height: ${v.defaultGridSettings.gridH}px;
+  `}
 `
-TopRightHolder.displayName = 'TopRightHolder'
+TopRightHolderWrapper.displayName = 'TopRightHolderWrapper'
+
+const TopRightHolder = styled.div`
+  margin: 14px 14px 0px;
+`
 
 const StyledEditTitle = styled.div`
   display: flex;
@@ -333,39 +341,38 @@ class CoverImageSelector extends React.Component {
     const { uiStore } = this.props
     const { gridSettings } = uiStore
     const { gridH, gridW } = gridSettings
+    const isDefaultGridSize = gridH === v.defaultGridSettings.gridH
     return (
-      <TopRightHolder
-        data-cy="EditCoverOptions"
-        maxWidth={gridW}
-        maxHeight={gridH}
-      >
-        {!this.loading && (
-          <div>
-            <StyledEditTitle>
-              <h3>Title</h3>
-              {this.renderEditTitleInput(this.cardTitle)}
-            </StyledEditTitle>
-            <h3>Cover Image</h3>
-            <QuickOptionSelector
-              options={toJS(this.imageOptions)}
-              onSelect={this.onImageOptionSelect}
-            />
-            <SmallBreak />
-            <h3>Cover effects</h3>
-            {this.showFilters && (
+      <TopRightHolderWrapper maxWidth={gridW} hasMaxHeight={isDefaultGridSize}>
+        <TopRightHolder data-cy="EditCoverOptions">
+          {!this.loading && (
+            <div>
+              <StyledEditTitle>
+                <h3>Title</h3>
+                {this.renderEditTitleInput(this.cardTitle)}
+              </StyledEditTitle>
+              <h3>Cover Image</h3>
               <QuickOptionSelector
-                options={filterOptions}
-                onSelect={this.onFilterOptionSelect}
+                options={toJS(this.imageOptions)}
+                onSelect={this.onImageOptionSelect}
               />
-            )}
-          </div>
-        )}
-        <CloseButton
-          size="lg"
-          onClick={this.handleClose}
-          data-cy="EditCoverCloseBtn"
-        />
-      </TopRightHolder>
+              <SmallBreak />
+              <h3>Cover effects</h3>
+              {this.showFilters && (
+                <QuickOptionSelector
+                  options={filterOptions}
+                  onSelect={this.onFilterOptionSelect}
+                />
+              )}
+            </div>
+          )}
+          <CloseButton
+            size="lg"
+            onClick={this.handleClose}
+            data-cy="EditCoverCloseBtn"
+          />
+        </TopRightHolder>
+      </TopRightHolderWrapper>
     )
   }
 

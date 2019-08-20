@@ -1,7 +1,7 @@
 class Ability
   include CanCan::Ability
 
-  def initialize(user)
+  def initialize(user, current_application = nil)
     # See the wiki for details:
     # https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities
 
@@ -98,6 +98,11 @@ class Ability
 
       can %i[read manage], Comment do |comment|
         comment.can_edit?(user)
+      end
+
+      can :create, Dataset
+      if current_application.present?
+        can :manage, Dataset, application_id: current_application.id
       end
 
       can :create, DataItemsDataset
