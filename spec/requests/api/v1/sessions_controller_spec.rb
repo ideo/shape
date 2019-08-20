@@ -4,7 +4,7 @@ describe Api::V1::SessionsController, type: :request, json: true, auth: true do
   let(:user) { @user }
 
   describe 'DELETE #destroy' do
-    let(:path) { "/api/v1/sessions" }
+    let(:path) { '/api/v1/sessions' }
 
     it 'returns a 200' do
       delete(path)

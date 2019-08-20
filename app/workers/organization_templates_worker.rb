@@ -28,6 +28,7 @@ class OrganizationTemplatesWorker
 
   def create_profile_template
     return if @organization.profile_template.present?
+
     # Create default profile template and add it to the templates collection
     profile_template = @organization.create_profile_master_template(
       name: 'Profile',
@@ -48,6 +49,7 @@ class OrganizationTemplatesWorker
 
   def create_profile_template_items
     return if @organization.profile_template.items.any?
+
     photo = Item::FileItem.create(
       name: 'Default profile',
       filestack_file: FilestackFile.create(
@@ -98,6 +100,7 @@ class OrganizationTemplatesWorker
 
   def create_profile_collection
     return if @organization.profile_collection.present?
+
     # Create profile collection (directory of user profiles)
     @organization.create_profile_collection(
       name: 'People',
@@ -109,6 +112,7 @@ class OrganizationTemplatesWorker
 
   def create_org_getting_started_collection
     return if @organization.getting_started_collection.present?
+
     getting_started_collection = @original_getting_started_collection.duplicate!(
       copy_parent_card: true,
       parent: @organization.template_collection,

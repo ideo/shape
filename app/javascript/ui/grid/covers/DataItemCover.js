@@ -10,6 +10,8 @@ import DataItemCoverDisplayOnly from '~/ui/grid/covers/data-item/DataItemCoverDi
 class DataItemCover extends React.Component {
   render() {
     const { item, card } = this.props
+    console.log('item:', item)
+    console.log('card:', card)
     if (item.isReportTypeCollectionsItems) {
       return <DataItemCoverCollectionsItems item={item} card={card} />
     }

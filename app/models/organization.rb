@@ -134,6 +134,7 @@ class Organization < ApplicationRecord
 
   def can_view?(user)
     return true if user.has_role?(Role::APPLICATION_USER, self)
+
     primary_group.can_view?(user) || admin_group.can_view?(user) || guest_group.can_view?(user)
   end
 
@@ -190,6 +191,7 @@ class Organization < ApplicationRecord
   def add_shared_with_org_collections(user)
     collections_to_share = collections.where(shared_with_organization: true)
     return unless collections_to_share.any?
+
     LinkToSharedCollectionsWorker.perform_async(
       [user.id],
       [],
@@ -283,6 +285,7 @@ class Organization < ApplicationRecord
 
   def network_default_payment_method
     return unless network_organization.present?
+
     @network_default_payment_method ||= NetworkApi::PaymentMethod.find(
       organization_id: network_organization.id,
       default: true,
@@ -456,11 +459,13 @@ class Organization < ApplicationRecord
 
   def cancel_network_subscription
     return unless network_organization
+
     subscription = NetworkApi::Subscription.find(
       organization_id: network_organization.id,
       active: true,
     ).first
     return unless subscription
+
     subscription.cancel(immediately: true)
   end
 

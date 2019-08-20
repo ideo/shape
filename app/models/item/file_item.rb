@@ -59,6 +59,7 @@ class Item
 
     def requires_roles?
       return false if parent.test_collection?
+
       true
     end
 
@@ -81,6 +82,7 @@ class Item
     def transcode!
       return if filestack_file.blank?
       return if mime_ext_type == 'mp4'
+
       response = HTTParty.get(filestack_file.video_conversion_url)
       conversion_result = JSON.parse(response.body)
       update(

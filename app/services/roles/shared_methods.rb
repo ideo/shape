@@ -18,6 +18,7 @@ module Roles
       # TODO: use relation to query this?
       if @object.is_a?(Group)
         return [] if @object.primary?
+
         @object.current_shared_collection.link_collection_cards.map(&:record)
       else
         [@object]
@@ -42,6 +43,7 @@ module Roles
     def unanchor_object
       # note this will always return nil for Groups
       return if @object.roles_anchor_collection_id.nil?
+
       # store this for later querying
       @previous_anchor_id = @object.roles_anchor_collection_id
       @object.unanchor_and_inherit_roles_from_anchor!

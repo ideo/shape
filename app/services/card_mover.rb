@@ -25,6 +25,7 @@ class CardMover
 
   def call
     return false if to_collection_invalid
+
     select_existing_cards
     select_pinned_cards
     select_to_collection_cards
@@ -57,6 +58,7 @@ class CardMover
     # for moving cards in a master template, all cards are pinned;
     # so we don't need to "lock" the existing pinned cards to the front
     return if @to_collection.master_template?
+
     @pinned_cards = @to_collection.collection_cards.pinned.to_a
   end
 
@@ -98,6 +100,7 @@ class CardMover
 
   def move_cards_to_collection
     return [] if @to_collection.is_a? Collection::Board
+
     # Reorder all cards based on order of joined_cards
     @to_collection_cards.map.with_index do |card, i|
       # parent_id will already be set for existing_cards but no harm to indicate
@@ -145,6 +148,7 @@ class CardMover
   def to_collection_invalid
     # these only apply for moving actions
     return unless move?
+
     # Not allowed to move between organizations
     if @to_collection.organization_id != @from_collection.organization_id
       @errors << 'You can\'t move a collection to a different organization.'
@@ -156,6 +160,7 @@ class CardMover
     @moving_cards.each do |card|
       collection = card.collection
       next unless collection.present?
+
       if @to_collection.within_collection_or_self?(collection)
         @errors << 'You can\'t move a collection inside of itself.'
         return true
@@ -171,10 +176,12 @@ class CardMover
   def assign_permissions
     return if @to_collection == @from_collection
     return unless move?
+
     @moving_cards.each do |card|
       next if card.link?
       # private records remain private, do not alter their permissions
       next if card.record.private?
+
       Roles::MergeToChild.call(parent: @to_collection, child: card.record)
     end
   end

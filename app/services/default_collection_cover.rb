@@ -50,6 +50,7 @@ class DefaultCollectionCover < SimpleService
 
   def cover_media_item_card
     return nil if @no_cover
+
     cover_card = find_manually_set_cover
     return cover_card if cover_card.present? && !@collection.cover_type_text_and_media?
 
@@ -57,6 +58,7 @@ class DefaultCollectionCover < SimpleService
     cover_card = first_media_item_card
     return nil unless cover_card.present?
     return cover_card if @collection.cover_type_text_and_media?
+
     cover_card.update(is_cover: true)
     CollectionUpdateBroadcaster.call(@collection)
     cover_card
@@ -66,6 +68,7 @@ class DefaultCollectionCover < SimpleService
 
   def media_item(card)
     return {} if card.blank?
+
     {
       card_id: card.id,
       card_order: card.order,
@@ -83,6 +86,7 @@ class DefaultCollectionCover < SimpleService
       # for FileItems we find, skip over any non-images
       next if item.is_a?(Item::FileItem) && !item.image?
       next if @inheritance.private_child?(item)
+
       first_item = item
       break
     end

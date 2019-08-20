@@ -56,6 +56,7 @@ class QuestionAnswer < ApplicationRecord
   def update_open_response_item
     item = open_response_item
     return destroy_open_response_item_and_card if answer_text.blank?
+
     item.content = answer_text
     item.import_plaintext_content(answer_text)
     item.save
@@ -63,6 +64,7 @@ class QuestionAnswer < ApplicationRecord
 
   def create_open_response_item?
     return unless answer_text.present?
+
     question.test_open_responses_collection.present? && open_response_item.blank?
   end
 
@@ -90,18 +92,21 @@ class QuestionAnswer < ApplicationRecord
 
   def destroy_open_response_item_and_card
     return if open_response_item.nil?
+
     open_response_item.parent_collection_card.destroy.destroyed? &&
       open_response_item.destroy.destroyed?
   end
 
   def update_survey_response
     return if survey_response.destroyed?
+
     survey_response.question_answer_created_or_destroyed
   end
 
   def update_collection_test_scores
     return if survey_response.destroyed?
     return unless survey_response.completed?
+
     survey_response.cache_test_scores!
   end
 

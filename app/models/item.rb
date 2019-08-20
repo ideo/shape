@@ -200,6 +200,7 @@ class Item < ApplicationRecord
     # save the dupe item first so that we can reference it later
     # return if it didn't work for whatever reason
     return i unless i.save
+
     i.parent_collection_card.save if i.parent_collection_card.present?
 
     # Clone parent + increase order
@@ -256,11 +257,13 @@ class Item < ApplicationRecord
 
   def update_parent_collection_if_needed
     return if destroyed?
+
     collection = try(:parent)
     collection.touch if collection && saved_change_to_updated_at?
     return unless collection.present? && collection.cached_cover.present?
     # currently text item is the only one that matters
     return unless id == collection.cached_cover['item_id_text']
+
     collection.update_cover_text!(self)
   end
 
@@ -280,6 +283,7 @@ class Item < ApplicationRecord
     templated_from_item = try(:parent_collection_card).try(:templated_from).try(:item)
     return true unless templated_from_item.present?
     return false if image_url.nil? || image_url.include?('avatars/missing')
+
     templated_from_item.image_url != image_url
   end
 
@@ -312,6 +316,7 @@ class Item < ApplicationRecord
 
   def reindex_parent_collection
     return if @dont_reindex_parent || !Searchkick.callbacks? || parent.blank?
+
     parent.reindex
   end
 

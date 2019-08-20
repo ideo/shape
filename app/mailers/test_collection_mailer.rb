@@ -8,7 +8,7 @@ class TestCollectionMailer < ApplicationMailer
 
     mail(
       to: Shape::ZENDESK_EMAIL,
-      subject: "Shape Feedback: #{@collection.name} launched | ID: #{@collection.id}"
+      subject: "Shape Feedback: #{@collection.name} launched | ID: #{@collection.id}",
     )
   end
 

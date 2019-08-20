@@ -9,6 +9,7 @@ module IdeoSsoHelper
 
   def ideo_sso_env
     return ENV['IDEO_SSO_ENV'].to_sym if ENV['IDEO_SSO_ENV'].present?
+
     hostname = URI.parse(request.url).hostname
     if hostname.match(/(localhost|(staging\.shape\.space))$/).present?
       :staging

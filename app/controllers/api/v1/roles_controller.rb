@@ -94,6 +94,7 @@ class Api::V1::RolesController < Api::V1::BaseController
   # but our Shape Ruby SDK does
   def root_object_params
     return json_api_params if json_api_params[:data].blank?
+
     json_api_params[:data][:attributes]
   end
 
@@ -108,6 +109,7 @@ class Api::V1::RolesController < Api::V1::BaseController
   def check_freemium_limit
     return unless root_object_params[:user_ids].present?
     return if current_organization.has_payment_method || !current_organization.in_app_billing
+
     users_to_add_count = root_object_params[:user_ids].length
     over_limit = current_organization.active_users_count + users_to_add_count > Organization::FREEMIUM_USER_LIMIT
     if over_limit
@@ -126,6 +128,7 @@ class Api::V1::RolesController < Api::V1::BaseController
        root_object_params[:user_ids].first.to_i == current_user.id
       return true
     end
+
     authorize! :manage, record
   end
 
@@ -158,6 +161,7 @@ class Api::V1::RolesController < Api::V1::BaseController
 
   def send_invites_bool
     return true unless root_object_params.key?(:send_invites)
+
     root_object_params[:send_invites]
   end
 end

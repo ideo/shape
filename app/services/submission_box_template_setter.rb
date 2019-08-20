@@ -51,6 +51,7 @@ class SubmissionBoxTemplateSetter < SimpleService
 
   def build_submissions_collection_if_needed
     return if @submission_box.submissions_collection.present?
+
     @submission_box.setup_submissions_collection!
   end
 
@@ -75,6 +76,7 @@ class SubmissionBoxTemplateSetter < SimpleService
   def update_submission_names
     @submission_box.submissions_collection.collections.each do |collection|
       next if collection.name.include? '[Inactive]'
+
       collection.update(name: "[Inactive] #{collection.name}")
     end
   end

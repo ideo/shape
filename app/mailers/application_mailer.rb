@@ -17,6 +17,7 @@ class ApplicationMailer < ActionMailer::Base
       # in a worker that emails all admins, and there are no admins left
       return
     end
+
     args.delete :users
     super(args)
   rescue ActiveRecord::RecordNotFound

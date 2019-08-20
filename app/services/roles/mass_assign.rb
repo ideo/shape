@@ -35,6 +35,7 @@ module Roles
 
     def call
       return false unless valid_object_and_role_name?
+
       unanchor_object # from shared methods
       assign_role_to_users
       setup_org_membership if newly_invited?
@@ -90,6 +91,7 @@ module Roles
     def add_roles_to_children
       return unless @object.respond_to?(:children)
       return if @object.children.blank?
+
       params = [
         @invited_by.try(:id),
         @added_users.map(&:id),
@@ -110,6 +112,7 @@ module Roles
     def create_activities_and_notifications
       action = Activity.role_name_to_action(@role_name.to_sym)
       return if action.nil?
+
       ActivityAndNotificationBuilder.call(
         actor: @invited_by,
         target: @object,
@@ -124,6 +127,7 @@ module Roles
       return unless @role_name.to_sym == Role::EDITOR
       return unless @object.item_or_collection?
       return unless @object.comment_thread.present?
+
       AddCommentThreadFollowers.perform_async(
         @object.comment_thread.id,
         @added_users.map(&:id),
@@ -133,8 +137,10 @@ module Roles
 
     def add_group_members_as_comment_thread_followers
       return unless @object.is_a?(Group)
+
       thread_ids = @object.groups_threads.pluck(:comment_thread_id)
       return if thread_ids.empty?
+
       AddCommentThreadFollowers.perform_async(
         thread_ids,
         @added_users.map(&:id),
@@ -155,6 +161,7 @@ module Roles
       @added_users.each do |user|
         # skip people who have opted out
         next unless user.notify_through_email
+
         InvitationMailer.invite(
           user_id: user.id,
           invited_by_id: @invited_by.id,
