@@ -22,6 +22,7 @@ module Roles
 
     def call
       return false unless %w[add remove].include? @method
+
       modify_children_roles(Collection.in_collection(@parent))
       modify_children_roles(Item.in_collection(@parent))
       true
@@ -72,6 +73,7 @@ module Roles
 
     def modify_anchored_children(children)
       return unless @previous_anchor_id.present?
+
       children
         .where(roles_anchor_collection_id: @previous_anchor_id)
         .update_all(roles_anchor_collection_id: @parent.id)

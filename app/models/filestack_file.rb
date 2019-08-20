@@ -72,6 +72,7 @@ class FilestackFile < ApplicationRecord
 
   def self.filestack_security(read_only: true)
     raise 'FilestackSecurity needs FILESTACK_API_SECRET to be set' if ENV['FILESTACK_API_SECRET'].blank?
+
     permissions = %w[read convert stat exif]
     permissions += %w[store pick] unless read_only
     FilestackSecurity.new(

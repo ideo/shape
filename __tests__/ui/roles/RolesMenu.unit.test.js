@@ -180,7 +180,7 @@ describe('RolesMenu', () => {
     })
 
     it('does not show user in list', async () => {
-      await sleep(1000)
+      await sleep(10)
       expect(wrapper.find('RoleSelect').length).toEqual(0)
     })
   })

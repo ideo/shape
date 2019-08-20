@@ -58,7 +58,7 @@ Rails.application.routes.draw do
           end
         end
       end
-      resources :datasets, only: %i[update]
+      resources :datasets, only: %i[index show create update destroy]
       resources :test_collections, only: %i[show] do
         member do
           get 'validate_launch'

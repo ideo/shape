@@ -19,6 +19,7 @@ class SurveyResponseCompletion < SimpleService
 
   def mark_as_completed!
     return unless @survey_response.in_progress?
+
     status = :completed
     # For in-collection tests the response may technically be attached to a "share via link" audience;
     # but we only care if the entire test has been closed
@@ -32,6 +33,7 @@ class SurveyResponseCompletion < SimpleService
     return unless test_audience.present? &&
                   test_audience.reached_sample_size? &&
                   test_audience.open?
+
     # if we have reached the sample size on an open test audience, then close it
     test_audience.update(
       status: :closed,
@@ -45,10 +47,12 @@ class SurveyResponseCompletion < SimpleService
     return unless gives_incentive? && user&.email.present?
     # perform some checks: you can only get marked owed + paid once per TestCollection
     return if @survey_response.incentive_owed?
+
     already_owed_or_paid = SurveyResponse
                            .where(incentive_status: %i[incentive_paid incentive_owed])
                            .find_by(user: user, test_collection: @survey_response.test_collection)
     return if already_owed_or_paid.present?
+
     @survey_response.record_incentive_owed!
   end
 

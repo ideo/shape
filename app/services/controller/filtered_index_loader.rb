@@ -12,8 +12,10 @@ module Controller
     def call
       init_results
       return error_422 if required_filters_not_present
+
       apply_filters
       return error_422 if @errors.present?
+
       load_controller_instance_variable
       @results
     end
@@ -69,6 +71,7 @@ module Controller
 
     def filter_external_id
       return if @filter[:external_id].blank?
+
       unless @application.present?
         @errors << 'application required to filter by external_id'
         return false
@@ -81,6 +84,7 @@ module Controller
 
     def filter_collection_id
       return if @filter[:collection_id].blank?
+
       @results = @results.where(
         collection_id: @filter[:collection_id],
       )

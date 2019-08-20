@@ -9,12 +9,12 @@ RSpec.describe SyncNetworkGroups, type: :service do
     let(:users_role) { create(:users_role, role: role) }
 
     before do
-      wrapped_return = double({includes: [users_role]})
+      wrapped_return = double(includes: [users_role])
       allow(NetworkApi::UsersRole).to receive(:where).and_return(wrapped_return)
       SyncNetworkGroups.call(user)
     end
 
-    context'when the user has not been added to the group' do
+    context 'when the user has not been added to the group' do
       it 'should add the user to the group' do
         expect(user.has_role?(role.name, group)).to be true
       end

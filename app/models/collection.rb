@@ -68,6 +68,7 @@ class Collection < ApplicationRecord
   include Testable
   include Externalizable
   include Commentable
+  include Globalizable
 
   resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
@@ -77,6 +78,10 @@ class Collection < ApplicationRecord
   archivable as: :parent_collection_card,
              with: %i[collection_cards cards_linked_to_this_collection]
   acts_as_taggable
+
+  translates_custom :translated_name,
+                    confirmable: true,
+                    fallbacks_for_empty_translations: true
 
   store_accessor :cached_attributes,
                  :cached_cover,
@@ -317,6 +322,7 @@ class Collection < ApplicationRecord
     nullify :breadcrumb
     nullify :created_by_id
     nullify :organization_id
+    nullify :shared_with_organization
     set archived: false
     # don't recognize any relations, easiest way to turn them all off
     recognize []
@@ -365,6 +371,7 @@ class Collection < ApplicationRecord
     # save the dupe collection first so that we can reference it later
     # return if it didn't work for whatever reason
     return c unless c.save
+
     c.parent_collection_card.save if c.parent_collection_card.present?
 
     if copy_parent_card && parent_collection_card.present?
@@ -412,6 +419,7 @@ class Collection < ApplicationRecord
       # ensures single copy, if existing copies already exist it will skip those
       existing_records = target_collection.collection_cards.map(&:record)
       next if existing_records.select { |r| r.cloned_from == card.record }.present?
+
       duplicates << card.duplicate!(
         parent: target_collection,
         placement: placement,
@@ -475,6 +483,7 @@ class Collection < ApplicationRecord
   def recalculate_child_breadcrumbs(cards = collection_cards)
     cards.each do |card|
       next if card.link?
+
       if card.item.present?
         # have to reload in order to pick up new parent relationship
         card.item.reload.recalculate_breadcrumb!
@@ -536,6 +545,7 @@ class Collection < ApplicationRecord
     reorder_cards!
     # if snapshot includes card attrs then CollectionUpdater will trigger the same thing
     return unless master_template? && card_attrs_snapshot && card_attrs_snapshot[:collection_cards_attributes].blank?
+
     queue_update_template_instances
   end
 
@@ -544,6 +554,7 @@ class Collection < ApplicationRecord
     # As long as it isn't the 'Getting Started' collection
     return false unless parent.is_a?(Collection::UserCollection) &&
                         (cloned_from.blank? || !cloned_from.getting_started?)
+
     # collections created in My Collection always get unanchored
     unanchor_and_inherit_roles_from_anchor!
     organization.primary_group.add_role(Role::VIEWER, self).try(:persisted?)
@@ -657,6 +668,7 @@ class Collection < ApplicationRecord
       # special behavior where it defaults to newest first
       return 'updated_at'
     end
+
     'order'
   end
 
@@ -684,6 +696,7 @@ class Collection < ApplicationRecord
   def clear_collection_cover
     cover = primary_collection_cards.where(is_cover: true).first
     return if cover.nil?
+
     cover.update(is_cover: false)
     touch
   end
@@ -705,6 +718,7 @@ class Collection < ApplicationRecord
 
   def submit_submission!
     return unless submission?
+
     # have to unset this before we can call MergeToChild
     submission_attrs['hidden'] = false
     result = save
@@ -747,11 +761,13 @@ class Collection < ApplicationRecord
 
   def inside_a_master_template?
     return true if master_template?
+
     parents.where(master_template: true).any?
   end
 
   def inside_a_template_instance?
     return true if templated?
+
     parents.where.not(template_id: nil).any?
   end
 
@@ -766,14 +782,17 @@ class Collection < ApplicationRecord
   def parent_submission_box_template
     @parent_submission_box_template ||= begin
       return nil unless inside_a_submission_box?
+
       template_id = parent_submission_box&.submission_template_id
       return nil unless template_id.present?
+
       parents.find_by(id: template_id)
     end
   end
 
   def submission_box_template?
     return false unless master_template? && inside_a_submission_box?
+
     id == parent_submission_box&.submission_template_id
   end
 
@@ -783,11 +802,13 @@ class Collection < ApplicationRecord
 
   def inside_a_submission_box?
     return true if is_a?(Collection::SubmissionBox)
+
     parents.where(type: 'Collection::SubmissionBox').any?
   end
 
   def submission_box_template_test?
     return false unless is_a?(Collection::TestCollection)
+
     master_template? && inside_a_submission_box_template?
   end
 
@@ -805,6 +826,7 @@ class Collection < ApplicationRecord
 
   def submission_test?
     return unless inside_a_submission?
+
     parent_submission.submission_attrs['launchable_test_id'] == id
   end
 
@@ -813,8 +835,8 @@ class Collection < ApplicationRecord
     Collection.in_collection(id).where.not(template_id: nil).any?
   end
 
-  def child_of_application_collection?
-    parent.is_a?(Collection::ApplicationCollection)
+  def parent_application_collection
+    parents.find_by(type: 'Collection::ApplicationCollection')
   end
 
   # =================================
@@ -838,12 +860,14 @@ class Collection < ApplicationRecord
     if (primary = collection_cards.first)
       return primary.parent
     end
+
     nil
   end
 
   def inherit_parent_organization_id
     return true if organization.present?
     return true unless parent_collection.present?
+
     self.organization_id = parent_collection.organization_id
   end
 
@@ -863,6 +887,7 @@ class Collection < ApplicationRecord
 
   def add_viewer_to_joinable_group
     return if joinable_group.blank?
+
     joinable_group.add_role(Role::VIEWER, self)
   end
 end

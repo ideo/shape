@@ -47,6 +47,7 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
       before do
         subject_users.each do |user|
           next if user.users_threads.any?
+
           create(:users_thread,
                  comment_thread: comment_thread,
                  user: user,
@@ -117,6 +118,7 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
         subject_groups.each do |group|
           group.members[:users].each do |user|
             next if user.users_threads.any?
+
             create(:users_thread,
                    comment_thread: comment_thread,
                    user: user,
@@ -231,6 +233,7 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
       before do
         subject_users.each do |user|
           next if user.users_threads.any?
+
           create(:users_thread,
                  comment_thread: comment_thread,
                  user: user,

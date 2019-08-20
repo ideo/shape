@@ -37,6 +37,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
       end
       # cancel_sync means we don't want to render the item JSON
       return if @cancel_sync
+
       render jsonapi: @item, expose: { current_record: @item }
     else
       render_api_errors @item.errors
@@ -113,6 +114,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
 
   def switch_to_organization
     return if @item.common_viewable?
+
     current_user.switch_to_organization(@item.organization)
   end
 end

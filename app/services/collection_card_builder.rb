@@ -33,6 +33,7 @@ class CollectionCardBuilder
   def hide_helper_for_user
     # if the user has "show_helper" then set it to false, now that they've created a card
     return unless @user.try(:show_helper)
+
     @user.update(show_helper: false)
   end
 
@@ -103,6 +104,7 @@ class CollectionCardBuilder
 
   def add_external_record
     return unless @external_id.present? && @user.application.present?
+
     @collection_card.record.add_external_id(
       @external_id,
       @user.application.id,

@@ -128,12 +128,14 @@ class Collection
 
   def replace_placeholder_with_user_pic!
     return if user.picture_medium.blank?
+
     card = collection_cards
            .pinned
            .joins(:item)
            .where('items.type = ?', 'Item::FileItem')
            .first
     return unless card.present?
+
     item = card.item
     item.update(
       type: 'Item::ExternalImageItem',

@@ -6,7 +6,7 @@ RSpec.describe LimitedUserCreator, type: :service do
     Hashie::Mash.new(
       uid: SecureRandom.hex(15),
       type: 'User::Limited',
-      email:  Faker::Internet.unique.email,
+      email: Faker::Internet.unique.email,
       phone: Faker::PhoneNumber.cell_phone,
       first_name: Faker::Name.first_name,
       last_name: Faker::Name.last_name,

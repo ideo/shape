@@ -15,9 +15,11 @@ class CollectionPermissionResetter < SimpleService
   def reset_child_permissions
     @collection.collection_cards.each do |card|
       next if card.link?
+
       record = card.record
       reassign_roles(record)
       next unless record.is_a? Collection
+
       # recursively reset for subcollections
       CollectionPermissionResetter.call(
         collection: record, parent_collection: @parent_collection,

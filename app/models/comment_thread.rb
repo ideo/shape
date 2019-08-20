@@ -36,6 +36,7 @@ class CommentThread < ApplicationRecord
   def unread_comments_for(user)
     ut = users_threads.where(user_id: user.id).first
     return [] unless ut.present?
+
     comments
       .order(updated_at: :desc)
       .where('updated_at > ?', ut.last_viewed_at)
@@ -52,12 +53,14 @@ class CommentThread < ApplicationRecord
   def latest_unread_comments_for(user)
     unread = unread_comments_for(user)
     return [] unless unread.present?
+
     unread.limit(3)
   end
 
   def viewed_by!(user)
     ut = users_threads.where(user_id: user.id).first
     return unless ut.present?
+
     ut.update_last_viewed!
     ut.store_in_firestore
   end
@@ -90,6 +93,7 @@ class CommentThread < ApplicationRecord
       User.where(id: user_ids).each do |user|
         # if user still has access to this thread, then carry on
         next if can_edit?(user)
+
         users_threads.where(user_id: user.id).destroy_all
       end
     end
@@ -103,6 +107,7 @@ class CommentThread < ApplicationRecord
 
   def can_edit?(user)
     return false if record.archived?
+
     # anyone who can view the record can contribute to the comment thread
     record.can_view?(user)
   end
@@ -150,12 +155,14 @@ class CommentThread < ApplicationRecord
 
   def inherit_record_organization_id
     return true if organization.present?
+
     self.organization_id = record.organization_id
   end
 
   def toggle_subscribed(to_subscribe, user)
     users_thread = users_threads.find_or_create_by(user_id: user.id)
     return false if users_thread.nil?
+
     users_thread.subscribed = to_subscribe
     users_thread.save
     update_firestore_users_threads

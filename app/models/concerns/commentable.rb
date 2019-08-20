@@ -17,6 +17,7 @@ module Commentable
 
   def remove_comment_followers!
     return unless comment_threads.any?
+
     comment_threads.each do |ct|
       RemoveCommentThreadFollowers.perform_async(ct.id)
     end
@@ -25,6 +26,7 @@ module Commentable
   def update_comment_threads_in_firestore
     return unless comment_threads.any?
     return unless saved_change_to_name? || saved_change_to_cached_attributes?
+
     comment_threads.each(&:store_in_firestore)
   end
 end

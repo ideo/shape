@@ -21,15 +21,7 @@ namespace :searchkick do
   end
 
   task new_search_data: :environment do
-    [Collection, Item].each do |klass|
-      total = klass.search_import.count
-      agg = 0
-      klass.search_import.find_in_batches.with_index do |batch, i|
-        agg += batch.count
-        puts "Reindexing #{klass} batch #{i}... #{agg}/#{total}"
-        klass.search_import.where(id: batch.pluck(:id)).reindex(:new_search_data)
-      end
-    end
+    find_search_import_in_batches
   end
 
   task new_user_search_data: :environment do
@@ -51,6 +43,18 @@ def reindex_models(klasses)
       agg += batch.count
       puts "Reindexing #{klass} batch #{i}... #{agg}/#{total}"
       klass.searchkick_index.import(batch)
+    end
+  end
+end
+
+def find_search_import_in_batches
+  [Collection, Item].each do |klass|
+    total = klass.search_import.count
+    agg = 0
+    klass.search_import.find_in_batches.with_index do |batch, i|
+      agg += batch.count
+      puts "Reindexing #{klass} batch #{i}... #{agg}/#{total}"
+      klass.search_import.where(id: batch.pluck(:id)).reindex(:new_search_data)
     end
   end
 end

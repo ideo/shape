@@ -13,7 +13,7 @@ module Admin
     def call
       assign_role_to_users
       send_invitation_emails if @send_invites
-      return failed_users.blank?
+      failed_users.blank?
     end
 
     private
@@ -35,10 +35,11 @@ module Admin
       added_users.each do |user|
         # skip people who have opted out
         next unless user.notify_through_email
+
         InvitationMailer.invite(
           user_id: user.id,
           invited_by_id: @invited_by.id,
-          invited_to_type: invited_to_type
+          invited_to_type: invited_to_type,
         ).deliver_later
       end
     end

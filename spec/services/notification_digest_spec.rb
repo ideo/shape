@@ -134,12 +134,45 @@ RSpec.describe NotificationDigest, type: :service do
       end
     end
 
-
     context 'with unsupported type' do
       let(:type) { :other }
 
       it 'should raise an error' do
         expect { digest_service.call }.to raise_error(StandardError)
+      end
+    end
+
+    describe 'when there are no notifications' do
+      let(:type) { :notifications }
+
+      it 'returns early and does not send the notification mailer' do
+        expect(NotificationMailer).not_to have_received(:notify)
+        digest_service.call
+      end
+    end
+
+    describe 'when there are no mentions' do
+      let(:group_user) { create(:user) }
+      let(:group) { create(:group, add_admins: [group_user]) }
+      let(:type) { :mentions }
+      let!(:comment_thread) do
+        create(:item_comment_thread, organization: organization, add_followers: [user, other_user, group_user])
+      end
+      let!(:comment_with_mentions) do
+        create(:comment,
+               add_mentions: [user, other_user],
+               add_group_mentions: [group],
+               comment_thread: comment_thread)
+      end
+
+      before do
+        User.update_all(last_notification_mail_sent: 1.day.ago)
+        user.reload # pick up model change from update_all
+      end
+
+      it 'returns early and does not send the notification mailer' do
+        expect(NotificationMailer).not_to have_received(:notify)
+        digest_service.call
       end
     end
   end

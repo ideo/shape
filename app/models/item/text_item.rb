@@ -56,15 +56,17 @@ class Item
     # build up a plaintext string of all the text content, with elements separated by pipes "|"
     # e.g. "Mission Statement | How might we do x..."
     def plain_content(only_first_line: false, splitter: ' | ')
-      return '' unless data_content.present? && data_content['ops'].present?
+      ops = HashWithIndifferentAccess.new(data_content).try(:[], :ops)
+      return '' unless ops.present?
       text = ''
-      data_content['ops'].each_with_index do |data, i|
+      ops.each_with_index do |data, i|
         # strip out escaped strings e.g. "&lt;strong&gt;" if someone typed raw HTML
         # strip out extra whitespaces/newlines
-        t = StripTags.new(data['insert']).call
+        t = StripTags.new(data[:insert]).call
         # sometimes the data['insert'] is just a newline, ignore
         next if t.empty?
         return t if only_first_line
+
         text += splitter if i.positive?
         text += t
       end
@@ -94,6 +96,7 @@ class Item
         # error needs to alert the frontend to the latest version
         return { error: 'locked', version: saved_version }
       end
+
       new_version = saved_version + 1
       full_content['version'] = new_version
       full_content['last_10'] = data_content['last_10'] || []
@@ -126,11 +129,13 @@ class Item
 
     def import_html_content_if_blank
       return if data_content.present?
+
       import_html_content(content)
     end
 
     def rename_if_name_was_default
       return unless name == 'Text'
+
       generate_name
     end
   end

@@ -68,21 +68,8 @@ export default class UiStore {
   adminAudienceMenuOpen = null
   @observable
   feedbackAudienceMenuOpen = null
-  defaultGridSettings = {
-    // layout will track we are at "size 3" i.e. "small 4 cols" even though cols === 4
-    layoutSize: 4,
-    cols: 4,
-    gutter: 14,
-    gridW: 316,
-    gridH: 250,
-  }
-  smallGridSettings = {
-    gutter: 14,
-    gridW: 253,
-    gridH: 200,
-  }
   @observable
-  gridSettings = { ...this.defaultGridSettings }
+  gridSettings = { ...v.defaultGridSettings }
   @observable
   previousViewingRecord = null
   @observable
@@ -91,6 +78,8 @@ export default class UiStore {
   selectedCardIds = []
   @observable
   isLoading = false
+  @observable
+  isLoadingMoveAction = false
   @observable
   dismissedMoveHelper = false
   @observable
@@ -203,7 +192,7 @@ export default class UiStore {
   @observable
   linkedInMyCollection = false
   @observable
-  isEditingCardTitle = false
+  editingCardCover = null
 
   @action
   toggleEditingCardId(cardId) {
@@ -215,8 +204,8 @@ export default class UiStore {
   }
 
   @action
-  setEditingCardTitle(isEditingCardTitle) {
-    this.isEditingCardTitle = isEditingCardTitle
+  setEditingCardCover(editingCardCoverId) {
+    this.editingCardCover = editingCardCoverId
   }
 
   @action
@@ -414,14 +403,14 @@ export default class UiStore {
   }
 
   @action
-  openMoveMenu({ from: fromCollectionId, cardAction }) {
+  openMoveMenu({ from: fromCollectionId, cardAction = 'move' }) {
     this.dismissedMoveHelper = false
     this.pageMenuOpen = false
     this.closeCardMenu()
     // On move, copy over selected cards to moving cards
     this.movingFromCollectionId = fromCollectionId
-    // cardAction can be 'move' or 'link'
-    this.cardAction = cardAction || 'move'
+    // cardAction can be 'move', 'link', 'duplicate', 'useTemplate'
+    this.cardAction = cardAction
     if (this.cardAction === 'useTemplate') {
       // fake the selected card to trigger the menu open,
       // because we aren't really moving an existing card
@@ -440,6 +429,8 @@ export default class UiStore {
   closeMoveMenu({ deselect = true } = {}) {
     this.dismissedMoveHelper = false
     this.templateName = ''
+    this.isLoadingMoveAction = false
+    this.cardAction = 'move'
     this.movingCardIds.replace([])
     this.movingFromCollectionId = null
     if (deselect) this.deselectCards()
@@ -468,22 +459,18 @@ export default class UiStore {
   }
 
   @action
-  setMovingCards(ids, { cardAction } = {}) {
+  setMovingCards(ids) {
     this.movingCardIds.replace(ids)
-    this.cardAction = cardAction
   }
 
   @computed
   get isMovingCards() {
-    return this.movingCardIds.length && this.cardAction === 'move'
+    return !!(this.movingCardIds.length && this.cardAction === 'move')
   }
 
   @computed
   get shouldOpenMoveModal() {
-    return (
-      this.movingCardIds.length > 0 &&
-      this.cardAction !== 'moveWithinCollection'
-    )
+    return this.movingCardIds.length > 0 && !this.movingIntoCollection
   }
 
   @computed
@@ -537,9 +524,9 @@ export default class UiStore {
 
   gridWidthFor(virtualCols) {
     let cols = virtualCols
-    let { gridW, gutter } = this.defaultGridSettings
+    let { gridW, gutter } = v.defaultGridSettings
     if (virtualCols === 3) {
-      ;({ gridW, gutter } = this.smallGridSettings)
+      ;({ gridW, gutter } = v.smallGridSettings)
       // the "3 col" layout is used as a breakpoint, however it actually renders with 4 cols
       cols = 4
     }
@@ -548,7 +535,7 @@ export default class UiStore {
 
   gridHeightFor(cols, { useDefault = false } = {}) {
     const { gridH, gutter } = useDefault
-      ? this.defaultGridSettings
+      ? v.defaultGridSettings
       : this.gridSettings
     return gridH * cols + gutter
   }
@@ -567,13 +554,13 @@ export default class UiStore {
     if (!cols) cols = 1
 
     let update = {
-      ...this.defaultGridSettings,
+      ...v.defaultGridSettings,
       cols,
       layoutSize: cols,
     }
     if (cols === 3) {
       update = {
-        ...this.smallGridSettings,
+        ...v.smallGridSettings,
         cols: 4,
         layoutSize: cols,
       }

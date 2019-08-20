@@ -4,10 +4,12 @@ DoubleEntry.configure do |config|
   config.define_accounts do |accounts|
     user_scope = ->(user) do
       raise 'not a User' unless user.class.name == 'User'
+
       user.id
     end
     payment_scope = ->(payment) do
       raise 'not a Payment' unless payment.class.name == 'Payment'
+
       payment.id
     end
     # - We always debit cash when we receive revenue,

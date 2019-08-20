@@ -376,7 +376,6 @@ class GridCardBlank extends React.Component {
       } else {
         newCard = await card.API_create()
       }
-      uiStore.addNewCard(newCard.record.id)
       // afterCreate can come passed down from props
       if (afterCreate) afterCreate(newCard)
       // or separately from the createCard action (e.g. CollectionCreator)
@@ -679,7 +678,7 @@ class GridCardBlank extends React.Component {
     const { isBoard } = parent
     let { gridW, gridH } = gridSettings
     if (isBoard) {
-      ;({ gridW, gridH } = uiStore.defaultGridSettings)
+      ;({ gridW, gridH } = v.defaultGridSettings)
     }
     return (
       <StyledGridCardBlank boxShadow={isBoard}>

@@ -4,6 +4,7 @@ class NotificationDigest < SimpleService
     unless %i[notifications mentions].include? type
       raise StandardError, 'Unsupported notification digest type'
     end
+
     @type = type
     @timeframe = timeframe
   end
@@ -21,6 +22,7 @@ class NotificationDigest < SimpleService
     notification_ids = notifications_for_user(user)
     comment_thread_ids = comment_threads_for_user(user)
     return if notification_ids.count.zero? && comment_thread_ids.count.zero?
+
     mailer = NotificationMailer.notify(
       user_id: user.id,
       notification_ids: notification_ids,
@@ -70,6 +72,7 @@ class NotificationDigest < SimpleService
     mentioned_groups = Group.where(id: mentioned_group_ids)
     group_user_ids = mentioned_groups.try(:user_ids)
     return [] if group_user_ids.nil?
+
     mentioned_user_ids += group_user_ids
     User.where(id: mentioned_user_ids.uniq)
   end
@@ -100,7 +103,7 @@ class NotificationDigest < SimpleService
   def notifications_for_user(user)
     user.notifications
         .joins(:activity)
-        .where(Activity.arel_table[:action].not_in(['commented', 'mentioned']))
+        .where(Activity.arel_table[:action].not_in(%w[commented mentioned]))
         .where(read: [false, nil])
         .where(
           Notification.arel_table[:created_at].gt(

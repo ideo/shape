@@ -222,7 +222,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         datasets = json_included_objects_of_type('datasets')
         expect(datasets.size).to eq(1)
         expect(
-          datasets.map{ |d| d['id'].to_i },
+          datasets.map { |d| d['id'].to_i },
         ).to eq(data_item.datasets.map(&:id))
       end
 
@@ -451,7 +451,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
-    context 'with link cards', only: true do
+    context 'with link cards' do
       let!(:collection_cards) { create_list(:collection_card_link_text, 3, parent: collection) }
       context 'without record edit access, but with collection access' do
         before do
@@ -576,9 +576,21 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         moving_cards.first.record.unanchor!
       end
 
-      it 'returns a 401' do
-        patch(path, params: params)
-        expect(response.status).to eq(401)
+      context 'but with edit access to the from_collection' do
+        it 'returns a 204' do
+          patch(path, params: params)
+          expect(response.status).to eq(204)
+        end
+      end
+
+      context 'and without edit access to the from_collection' do
+        before do
+          user.remove_role(Role::EDITOR, from_collection)
+        end
+        it 'returns a 401' do
+          patch(path, params: params)
+          expect(response.status).to eq(401)
+        end
       end
     end
 

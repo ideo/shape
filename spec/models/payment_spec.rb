@@ -12,7 +12,7 @@ RSpec.describe Payment, type: :model do
           ':[]': payment_errors,
           full_messages: payment_errors,
         ),
-      )
+      ),
     )
   end
 

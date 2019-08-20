@@ -19,6 +19,7 @@
 #  url              :string
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
+#  application_id   :integer
 #  data_source_id   :bigint(8)
 #  organization_id  :bigint(8)
 #
@@ -30,7 +31,6 @@
 
 class Dataset
   class External < Dataset
-
     def data
       # Add service method
       {}

@@ -45,7 +45,7 @@ RSpec.describe Admin::AddRoleToUsers, type: :service do
       expect(InvitationMailer).to receive(:invite).with(
         user_id: users.first.id,
         invited_by_id: invited_by.id,
-        invited_to_type: Role::SHAPE_ADMIN.to_s.titleize
+        invited_to_type: Role::SHAPE_ADMIN.to_s.titleize,
       )
       service.call
     end

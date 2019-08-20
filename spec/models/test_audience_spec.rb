@@ -44,7 +44,7 @@ RSpec.describe TestAudience, type: :model do
       paypal_fee = (incentive_amount * BigDecimal('0.05')).round(2)
       stripe_fee = (((incentive_amount + paypal_fee) * BigDecimal('0.029')) + BigDecimal('0.30')).round(2)
       expect(TestAudience.minimum_price_per_response).to eq(
-        (incentive_amount + paypal_fee + stripe_fee).to_f
+        (incentive_amount + paypal_fee + stripe_fee).to_f,
       )
     end
   end

@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 describe HomeController, type: :request do
-
   before do
     # NOTE: not doing any normal rendering of the index page because we defer to Cypress for those,
     # and they make for slow request specs

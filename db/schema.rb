@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_02_172427) do
+ActiveRecord::Schema.define(version: 2019_08_15_222240) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -126,6 +126,17 @@ ActiveRecord::Schema.define(version: 2019_08_02_172427) do
     t.index ["type"], name: "index_collection_cards_on_type"
   end
 
+  create_table "collection_translations", force: :cascade do |t|
+    t.integer "collection_id", null: false
+    t.string "locale", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "translated_name"
+    t.jsonb "confirmed"
+    t.index ["collection_id"], name: "index_collection_translations_on_collection_id"
+    t.index ["locale"], name: "index_collection_translations_on_locale"
+  end
+
   create_table "collections", force: :cascade do |t|
     t.string "name"
     t.string "type"
@@ -224,6 +235,7 @@ ActiveRecord::Schema.define(version: 2019_08_02_172427) do
     t.datetime "updated_at", null: false
     t.text "description"
     t.jsonb "groupings", default: []
+    t.integer "application_id"
     t.index ["data_source_type", "data_source_id"], name: "index_datasets_on_data_source_type_and_data_source_id"
     t.index ["organization_id"], name: "index_datasets_on_organization_id"
   end
@@ -321,6 +333,21 @@ ActiveRecord::Schema.define(version: 2019_08_02_172427) do
     t.index ["sluggable_type"], name: "index_friendly_id_slugs_on_sluggable_type"
   end
 
+  create_table "global_translation_translations", force: :cascade do |t|
+    t.integer "global_translation_id", null: false
+    t.string "locale", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.jsonb "value"
+    t.index ["global_translation_id"], name: "index_global_translation_translations_on_global_translation_id"
+    t.index ["locale"], name: "index_global_translation_translations_on_locale"
+  end
+
+  create_table "global_translations", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "groups", force: :cascade do |t|
     t.string "name"
     t.bigint "organization_id"
@@ -355,6 +382,19 @@ ActiveRecord::Schema.define(version: 2019_08_02_172427) do
     t.bigint "comment_thread_id"
     t.datetime "created_at", null: false
     t.index ["group_id", "comment_thread_id"], name: "by_groups_comment_thread", unique: true
+  end
+
+  create_table "item_translations", force: :cascade do |t|
+    t.integer "item_id", null: false
+    t.string "locale", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "translated_name"
+    t.text "translated_content"
+    t.jsonb "translated_data_content"
+    t.jsonb "confirmed"
+    t.index ["item_id"], name: "index_item_translations_on_item_id"
+    t.index ["locale"], name: "index_item_translations_on_locale"
   end
 
   create_table "items", force: :cascade do |t|
@@ -574,11 +614,11 @@ ActiveRecord::Schema.define(version: 2019_08_02_172427) do
     t.boolean "show_move_helper", default: true
     t.boolean "show_template_helper", default: true
     t.boolean "mailing_list", default: false
-    t.datetime "last_active_at"
     t.string "phone"
     t.integer "feedback_contact_preference", default: 0
     t.boolean "shape_circle_member", default: false
     t.jsonb "terms_accepted_data", default: {}
+    t.jsonb "last_active_at", default: {}
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"

@@ -5,6 +5,7 @@ class CreateNetworkUsageRecord
 
   def call
     return unless context.billable_users_count.positive?
+
     create_network_usage_record
   end
 

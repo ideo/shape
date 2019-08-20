@@ -110,7 +110,7 @@ export const StyledGridCard = styled.div`
 StyledGridCard.displayName = 'StyledGridCard'
 
 export const showOnHoverCss = css`
-  .hide-on-editing-title {
+  .hide-on-cover-edit {
     /* don't show hover items while editing a title */
     opacity: 0;
     z-index: 1;
@@ -142,12 +142,62 @@ export const hideOnHoverCss = css`
   }
 `
 
+const mdlPillPlaceholderCss = css`
+  position: fixed !important;
+
+  ${props => {
+    const { width, height, maxWidth, maxHeight, selectedMultiple } = props
+    const { cardTiltDegrees, colors } = v
+    const shouldScaleSmaller = maxWidth >= 2 && maxHeight >= 2 // scale even smaller for 2x2, 2x3 or 2x4 ratio
+    const scalarTransform = shouldScaleSmaller ? 0.25 : 0.4
+    const marginLeft = width / maxWidth
+
+    return `
+      height: ${height}px;
+      width: ${width}px;
+      left: 50%;
+      margin-left: -${marginLeft}px;
+      bottom: 40px;
+      transform-origin: 0 100%;
+      overflow: hidden;
+      transform: rotate(${cardTiltDegrees}deg) scale(${scalarTransform});
+      box-shadow: ${
+        selectedMultiple ? `-15px 15px 0 0px ${colors.secondaryLight}` : 'none'
+      };
+      @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+        left: 5%;
+        margin: 0;
+      }
+    `
+  }}
+
+  /* hide hover actions */
+  .show-on-hover {
+    display: none;
+  }
+  .react-draggable:before {
+    background: ${v.colors.primaryDark};
+    content: '';
+    height: 100%;
+    left: 0;
+    opacity: 0.45;
+    pointer-events: none;
+    position: absolute;
+    width: 100%;
+    top: 0;
+    z-index: ${v.zIndex.gridCardTop};
+  }
+`
+
 export const StyledCardWrapper = styled.div`
   ${showOnHoverCss};
   z-index: ${props => props.zIndex};
   &:hover {
     z-index: ${props => props.zIndex + 1};
   }
+  ${props => props.dragging && 'position: absolute;'}
+  ${props => props.hidden && 'display: none;'}
+  ${props => props.moving && mdlPillPlaceholderCss}
 `
 StyledCardWrapper.defaultProps = {
   zIndex: 1,

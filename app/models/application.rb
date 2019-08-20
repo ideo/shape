@@ -21,6 +21,7 @@ class Application < ApplicationRecord
   has_many :application_organizations
   has_many :organizations, through: :application_organizations
   has_many :external_records
+  has_many :datasets
 
   before_validation :create_user, on: :create
   after_update :update_application_collection_names, if: :saved_change_to_name?

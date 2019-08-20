@@ -12,7 +12,8 @@ class Api::V1::UsersController < Api::V1::BaseController
 
   def me
     if user_signed_in? || current_api_token.present?
-      current_user.update_attributes(last_active_at: Time.current)
+      update_user_last_active_at
+
       render jsonapi: current_user, include: [
         :groups,
         organizations: %i[primary_group],
@@ -82,6 +83,17 @@ class Api::V1::UsersController < Api::V1::BaseController
   end
 
   private
+
+  def update_user_last_active_at
+    return if current_user.current_organization_id.nil?
+
+    timestamps = current_user.last_active_at || {}
+    timestamps = timestamps.merge(
+      current_user.current_organization_id.to_s => Time.zone.now,
+    )
+
+    current_user.update_attributes(last_active_at: timestamps)
+  end
 
   def load_and_authorize_organization
     # NOTE: friendly.find can cause issues here with numeric slugs e.g. "1", so we check for that

@@ -191,6 +191,7 @@ class CollectionCard < ApplicationRecord
     end
 
     return cc unless cc.save
+
     # now that the card exists, we can recalculate the breadcrumb
     cc.record.recalculate_breadcrumb!
     cc.increment_card_orders! if placement != 'end'
@@ -216,6 +217,7 @@ class CollectionCard < ApplicationRecord
 
   def record_type
     return nil if record.blank?
+
     record.class.base_class.name.underscore.to_sym
   end
 
@@ -287,6 +289,7 @@ class CollectionCard < ApplicationRecord
     unless scope_attributes['id'].present? || scope_attributes['parent_id'].present?
       return false
     end
+
     # capture these before `self` potentially gets altered by archive scope
     ids = pluck(:id)
     # ensure we're now working with an unscoped AR::Relation
@@ -348,6 +351,7 @@ class CollectionCard < ApplicationRecord
   def should_update_parent_collection_cover?
     collection = try(:parent)
     return unless collection.present? && collection.display_cover?
+
     cover = collection.cached_cover
     cover.blank? ||
       cover['card_ids'].blank? ||
@@ -369,6 +373,7 @@ class CollectionCard < ApplicationRecord
   def card_question_type
     return nil unless parent.is_a?(Collection::TestCollection) || parent.is_a?(Collection::TestDesign)
     return nil unless item.present?
+
     case item.type
     when 'Item::QuestionItem'
       return item.question_type
@@ -435,6 +440,7 @@ class CollectionCard < ApplicationRecord
 
   def test_collection_within_master_template_after_save?
     return false if collection_id.blank? || !collection.is_a?(Collection::TestCollection)
+
     saved_change_to_parent_id? && master_template_card?
   end
 
@@ -444,6 +450,7 @@ class CollectionCard < ApplicationRecord
 
   def touch_collection
     return unless collection.present?
+
     collection.touch
   end
 end
