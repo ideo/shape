@@ -8,9 +8,9 @@ import { Grid, Hidden, MenuItem } from '@material-ui/core'
 
 import trackError from '~/utils/trackError'
 import isEmail from '~/utils/isEmail'
+import { StyledFormButton } from '~/ui/global/styled/buttons'
 import {
   Checkbox,
-  FormButton,
   FormActionsContainer,
   Select,
 } from '~/ui/global/styled/forms'
@@ -477,12 +477,12 @@ class RolesAdd extends React.Component {
           </Hidden>
         </Row>
         <FormActionsContainer style={{ paddingBottom: '0' }}>
-          <FormButton
+          <StyledFormButton
             onClick={this.confirmSave}
             disabled={this.selectedUsers.length === 0}
           >
             Add
-          </FormButton>
+          </StyledFormButton>
         </FormActionsContainer>
       </div>
     )

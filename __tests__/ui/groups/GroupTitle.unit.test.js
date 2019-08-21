@@ -80,7 +80,7 @@ describe('GroupTitle', () => {
         props.canEdit = false
         wrapper.setProps(props)
         expect(wrapper.find('EditIconHolder').exists()).toBeFalsy()
-        expect(wrapper.find('FormButton').exists()).toBeFalsy()
+        expect(wrapper.find('StyledFormButton').exists()).toBeFalsy()
       })
     })
 

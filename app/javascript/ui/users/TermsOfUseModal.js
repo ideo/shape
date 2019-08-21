@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
 
-import { FormButton } from '~/ui/global/styled/forms'
+import { StyledFormButton } from '~/ui/global/styled/buttons'
 import { Heading1, Anchor } from '~/ui/global/styled/typography'
 import Link from '~/ui/global/Link'
 import Logo from '~/ui/layout/Logo'
@@ -114,7 +114,9 @@ class TermsOfUseModal extends React.Component {
             <p>By clicking ‘Continue’ you agree to the {orgTermsOfUse}.</p>
 
             <div className="button--center">
-              <FormButton disabled={this.isLoading}>Continue</FormButton>
+              <StyledFormButton disabled={this.isLoading}>
+                Continue
+              </StyledFormButton>
             </div>
             <div className="footer">
               <p>

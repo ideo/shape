@@ -2,11 +2,11 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observable, action, runInAction } from 'mobx'
 import FormControl from '@material-ui/core/FormControl'
 
+import { StyledFormButton } from '~/ui/global/styled/buttons'
 import {
   Checkbox,
   LabelContainer,
   LabelTextStandalone,
-  FormButton,
 } from '~/ui/global/styled/forms'
 import { Heading2, SmallHelperText } from '~/ui/global/styled/typography'
 import TagEditor from '~/ui/pages/shared/TagEditor'
@@ -93,12 +93,12 @@ class OrganizationSettings extends React.Component {
           item={organization.terms_text_item}
           onExpand={() => routingStore.routeTo(`terms/${organization.slug}`)}
         />
-        <FormButton
+        <StyledFormButton
           style={{ marginTop: '24px' }}
           onClick={this.handleSaveTerms}
         >
           Save
-        </FormButton>
+        </StyledFormButton>
 
         <FormControl
           style={{ marginLeft: '12px' }}

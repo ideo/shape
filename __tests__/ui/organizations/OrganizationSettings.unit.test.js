@@ -1,7 +1,8 @@
 import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
-import { LabelContainer, FormButton } from '~/ui/global/styled/forms'
+import { StyledFormButton } from '~/ui/global/styled/buttons'
+import { LabelContainer } from '~/ui/global/styled/forms'
 import TextEditor from '~/ui/global/TextEditor'
 
 let wrapper, apiStore, routingStore, uiStore, props, organization, component
@@ -58,7 +59,7 @@ describe('OrganizationSettings', () => {
     })
 
     it('should render the save button', () => {
-      expect(wrapper.find(FormButton).exists()).toBe(true)
+      expect(wrapper.find(StyledFormButton).exists()).toBe(true)
     })
 
     it('should track bumpTermsVersion', () => {

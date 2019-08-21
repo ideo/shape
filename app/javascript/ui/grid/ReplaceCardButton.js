@@ -4,7 +4,8 @@ import FormControlLabel from '@material-ui/core/FormControlLabel'
 import styled from 'styled-components'
 
 import Tooltip from '~/ui/global/Tooltip'
-import { Checkbox, FormButton } from '~/ui/global/styled/forms'
+import { StyledFormButton } from '~/ui/global/styled/buttons'
+import { Checkbox } from '~/ui/global/styled/forms'
 import v from '~/utils/variables'
 
 const CenteredContainer = styled.div`
@@ -47,7 +48,7 @@ class ReplaceCardButton extends React.PureComponent {
 
     return (
       <CenteredContainer removeBackground={card.is_master_template_card}>
-        <FormButton
+        <StyledFormButton
           color={v.colors.alert}
           disabled={!card.show_replace}
           disabledHover={card.is_master_template_card}
@@ -61,7 +62,7 @@ class ReplaceCardButton extends React.PureComponent {
           }}
         >
           Replace
-        </FormButton>
+        </StyledFormButton>
         {card.is_master_template_card && canEditCollection && (
           <Tooltip
             classes={{ tooltip: 'Tooltip' }}

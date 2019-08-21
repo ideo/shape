@@ -5,7 +5,7 @@ import pluralize from 'pluralize'
 import styled from 'styled-components'
 
 import { Anchor } from '~/ui/global/styled/typography'
-import { FormButton } from '~/ui/global/styled/forms'
+import { StyledFormButton } from '~/ui/global/styled/buttons'
 import Link from '~/ui/global/Link'
 import { apiStore, uiStore, routingStore } from '~/stores'
 import v from '~/utils/variables'
@@ -148,12 +148,12 @@ class Activity extends React.PureComponent {
             </strong>
             {_.includes(['collections', 'items'], target.internalType) && (
               <div style={{ textAlign: 'center', marginTop: '10px' }}>
-                <FormButton
+                <StyledFormButton
                   color={v.colors.secondaryDark}
                   onClick={this.handleRestore}
                 >
                   Restore
-                </FormButton>
+                </StyledFormButton>
               </div>
             )}
           </ActivityText>

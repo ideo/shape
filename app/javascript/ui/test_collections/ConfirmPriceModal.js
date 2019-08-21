@@ -5,7 +5,8 @@ import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
 import PaperAirplane from '~/ui/test_collections/PaperAirplane'
 import { ModalCloseButton } from '~/ui/global/modals/Modal'
-import { TextButton, FormButton } from '~/ui/global/styled/forms'
+import { StyledFormButton } from '~/ui/global/styled/buttons'
+import { TextButton } from '~/ui/global/styled/forms'
 import {
   DisplayText,
   SpecialDisplayHeading,
@@ -100,7 +101,7 @@ class ConfirmPriceModal extends React.Component {
           {this.renderPaymentMethodToCharge()}
         </StyledDiv>
         <StyledDiv style={{ textAlign: 'center' }}>
-          <FormButton {...buttonProps}>Get Feedback</FormButton>
+          <StyledFormButton {...buttonProps}>Get Feedback</StyledFormButton>
         </StyledDiv>
       </form>
     )

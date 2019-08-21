@@ -17,9 +17,9 @@ import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
 import { StyledHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
+import { StyledHeaderFormButton } from '~/ui/global/styled/buttons'
 import { SubduedHeading1 } from '~/ui/global/styled/typography'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
-import { FormButton } from '~/ui/global/styled/forms'
 import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
 import v from '~/utils/variables'
 import routeToLogin from '~/utils/routeToLogin'
@@ -42,16 +42,6 @@ const IconHolder = styled.span`
     width: 20px;
   }
 `
-
-const HeaderFormButton = FormButton.extend`
-  margin-top: 10px;
-  font-size: 0.825rem;
-`
-HeaderFormButton.displayName = 'HeaderFormButton'
-HeaderFormButton.defaultProps = {
-  'data-cy': 'HeaderFormButton',
-  color: v.colors.black,
-}
 
 const LiveTestIndicator = styled.span`
   display: inline-block;
@@ -207,7 +197,7 @@ class PageHeader extends React.Component {
       return (
         <Fragment>
           <CopyToClipboard text={record.publicTestURL} onCopy={() => null}>
-            <HeaderFormButton
+            <StyledHeaderFormButton
               width="140"
               color={v.colors.transparent}
               onClick={() =>
@@ -234,7 +224,7 @@ class PageHeader extends React.Component {
               >
                 Get Link
               </span>
-            </HeaderFormButton>
+            </StyledHeaderFormButton>
           </CopyToClipboard>
           {this.renderStopFeebackButton}
         </Fragment>
@@ -246,25 +236,25 @@ class PageHeader extends React.Component {
     const { record, uiStore } = this.props
     if (record.can_edit_content && record.isClosedTest) {
       return (
-        <HeaderFormButton
+        <StyledHeaderFormButton
           onClick={record.reopenTest}
           color={v.colors.transparent}
           width="200"
           disabled={uiStore.launchButtonLoading}
         >
           Re-open Feedback
-        </HeaderFormButton>
+        </StyledHeaderFormButton>
       )
     }
     if (this.isCurrentlyHiddenSubmission) {
       return (
-        <HeaderFormButton
+        <StyledHeaderFormButton
           color={v.colors.alert}
           onClick={record.API_submitSubmission}
           disabled={uiStore.launchButtonLoading}
         >
           Submit
-        </HeaderFormButton>
+        </StyledHeaderFormButton>
       )
     }
     return null
@@ -274,13 +264,13 @@ class PageHeader extends React.Component {
     const { record } = this.props
     if (!record.isPublicJoinable) return null
     return (
-      <HeaderFormButton
+      <StyledHeaderFormButton
         style={{ marginLeft: '1rem' }}
         color={v.colors.primaryDarkest}
         onClick={() => routeToLogin({ redirect: record.frontend_url })}
       >
         Join
-      </HeaderFormButton>
+      </StyledHeaderFormButton>
     )
   }
 
@@ -289,13 +279,13 @@ class PageHeader extends React.Component {
     if (!record.can_edit) return null
     if (!record.is_restorable) return null
     return (
-      <HeaderFormButton
+      <StyledHeaderFormButton
         style={{ marginLeft: '1rem' }}
         color={v.colors.primaryDarkest}
         onClick={this.handleRestore}
       >
         Restore
-      </HeaderFormButton>
+      </StyledHeaderFormButton>
     )
   }
 
@@ -303,13 +293,13 @@ class PageHeader extends React.Component {
     const { record } = this.props
     if (!record.isUsableTemplate) return null
     return (
-      <HeaderFormButton
+      <StyledHeaderFormButton
         width="160"
         color={v.colors.primaryDark}
         onClick={this.openMoveMenuForTemplate}
       >
         Use Template
-      </HeaderFormButton>
+      </StyledHeaderFormButton>
     )
   }
 
@@ -317,14 +307,14 @@ class PageHeader extends React.Component {
     const { record, uiStore } = this.props
     if (record.can_edit_content && !record.is_test_locked) {
       return (
-        <HeaderFormButton
+        <StyledHeaderFormButton
           width="170"
           color={v.colors.transparent}
           onClick={record.closeTest}
           disabled={uiStore.launchButtonLoading}
         >
           Stop Feedback
-        </HeaderFormButton>
+        </StyledHeaderFormButton>
       )
     }
     return null

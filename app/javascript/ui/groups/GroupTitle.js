@@ -5,11 +5,8 @@ import styled from 'styled-components'
 import Grid from '@material-ui/core/Grid'
 import { Row, RowItem } from '~/ui/global/styled/layout'
 import { SubduedTitle, Heading2 } from '~/ui/global/styled/typography'
-import {
-  FormButton,
-  StyledAutosizeInput,
-  EditAvatarButton,
-} from '~/ui/global/styled/forms'
+import { StyledFormButton } from '~/ui/global/styled/buttons'
+import { StyledAutosizeInput, EditAvatarButton } from '~/ui/global/styled/forms'
 import Avatar from '~/ui/global/Avatar'
 import EditPencilIcon from '~/ui/icons/EditPencilIcon'
 import FilestackUpload from '~/utils/FilestackUpload'
@@ -124,9 +121,9 @@ class GroupTitle extends React.Component {
     if (!this.props.canEdit) return ''
     if (this.editing) {
       return (
-        <FormButton onClick={this.handleSave} width={130} type="submit">
+        <StyledFormButton onClick={this.handleSave} width={130} type="submit">
           Save
-        </FormButton>
+        </StyledFormButton>
       )
     }
     return (
