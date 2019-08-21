@@ -291,8 +291,6 @@ class DataItemCoverCollectionsItems extends React.Component {
 
   render() {
     const { item, uiStore } = this.props
-    console.log('item: ', item)
-    console.log('primary dataset: ', item.primaryDataset)
     const { timeframe } = item.primaryDataset
 
     if (uiStore.isNewCard(item.id)) {
