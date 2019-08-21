@@ -129,7 +129,7 @@ export const FormButton = styled.button`
   width: ${props => (props.width ? props.width : 183)}px;
   text-transform: uppercase;
   font-family: ${v.fonts.sans};
-  font-size: 1rem;
+  font-size: ${props => (props.fontSize ? props.fontSize : 1)}rem;
   font-weight: ${v.weights.medium};
   letter-spacing: 0.09375rem;
   height: 40px;
@@ -171,15 +171,5 @@ export const FormButton = styled.button`
 `
 FormButton.displayName = 'FormButton'
 FormButton.defaultProps = {
-  color: v.colors.black,
-}
-
-export const HeaderFormButton = FormButton.extend`
-  margin-top: 10px;
-  font-size: 0.825rem;
-`
-HeaderFormButton.displayName = 'HeaderFormButton'
-HeaderFormButton.defaultProps = {
-  'data-cy': 'HeaderFormButton',
   color: v.colors.black,
 }

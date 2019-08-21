@@ -149,6 +149,10 @@ export default {
     respondentBannerText: '#305d6c',
   },
 
+  buttonSizes: {
+    header: 0.825,
+  },
+
   iconSizes: {
     bct: 47,
   },
