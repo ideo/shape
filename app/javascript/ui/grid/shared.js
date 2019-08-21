@@ -242,6 +242,13 @@ export const StyledGridCardInner = styled.div`
   }
 
   ${props =>
+    !props.isText &&
+    `
+      /*disable text highlighting*/
+      user-select: none;
+    `}
+
+  ${props =>
     props.isText &&
     `
     @media print {
