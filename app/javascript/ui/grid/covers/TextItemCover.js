@@ -21,7 +21,8 @@ const StyledPaddedCover = styled(PaddedCardCover)`
     !props.isEditing && props.hasTitleText ? '2px solid black' : 'none'};
   background: ${props =>
     (!props.isEditing && !props.dragging && props.hasTitleText) ||
-    props.isTransparent
+    props.isTransparent ||
+    (props.isEditing && props.hasTitleText)
       ? v.colors.transparent
       : v.colors.white};
 `
@@ -227,6 +228,7 @@ class TextItemCover extends React.Component {
     const { isEditing, hasTitleText, props } = this
     const { isTransparent, dragging } = props
     const content = isEditing ? this.renderEditing() : this.renderDefault()
+
     return (
       <StyledPaddedCover
         data-cy="TextItemCover"
