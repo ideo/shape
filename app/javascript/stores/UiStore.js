@@ -571,6 +571,10 @@ export default class UiStore {
       _.assign(this.gridSettings, update)
     }
   }
+
+  get isSmallGrid() {
+    return this.gridSettings.layoutSize === 3
+  }
   // --- grid properties />
 
   // --- BCT + GridCard properties
