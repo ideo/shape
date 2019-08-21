@@ -72,8 +72,6 @@ class User < ApplicationRecord
          :rememberable, :validatable, :omniauthable,
          omniauth_providers: [:ideo]
 
-  acts_as_taggable_on(Audience::DEMOGRAPHIC_TAGS)
-
   has_many :collections,
            through: :roles,
            source: :resource,
