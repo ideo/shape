@@ -210,6 +210,7 @@ class PageHeader extends React.Component {
                 })
               }
               fontSize={v.buttonSizes.header}
+              data-cy="HeaderFormButton"
             >
               <span
                 style={{
@@ -247,6 +248,7 @@ class PageHeader extends React.Component {
           width="200"
           disabled={uiStore.launchButtonLoading}
           fontSize={v.buttonSizes.header}
+          data-cy="HeaderFormButton"
         >
           Re-open Feedback
         </FormButton>
@@ -259,6 +261,7 @@ class PageHeader extends React.Component {
           onClick={record.API_submitSubmission}
           disabled={uiStore.launchButtonLoading}
           fontSize={v.buttonSizes.header}
+          data-cy="HeaderFormButton"
         >
           Submit
         </FormButton>
@@ -276,6 +279,7 @@ class PageHeader extends React.Component {
         color={v.colors.primaryDarkest}
         onClick={() => routeToLogin({ redirect: record.frontend_url })}
         fontSize={v.buttonSizes.header}
+        data-cy="HeaderFormButton"
       >
         Join
       </FormButton>
@@ -292,6 +296,7 @@ class PageHeader extends React.Component {
         color={v.colors.primaryDarkest}
         onClick={this.handleRestore}
         fontSize={v.buttonSizes.header}
+        data-cy="HeaderFormButton"
       >
         Restore
       </FormButton>
@@ -307,6 +312,7 @@ class PageHeader extends React.Component {
         color={v.colors.primaryDark}
         onClick={this.openMoveMenuForTemplate}
         fontSize={v.buttonSizes.header}
+        data-cy="HeaderFormButton"
       >
         Use Template
       </FormButton>
@@ -323,6 +329,7 @@ class PageHeader extends React.Component {
           onClick={record.closeTest}
           disabled={uiStore.launchButtonLoading}
           fontSize={v.buttonSizes.header}
+          data-cy="HeaderFormButton"
         >
           Stop Feedback
         </FormButton>
