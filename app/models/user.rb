@@ -157,7 +157,9 @@ class User < ApplicationRecord
   searchkick callbacks: false, word_start: %i[name handle email]
   after_commit :reindex
   alias searchkick_reindex reindex
-  scope :search_import, -> { where(status: %i[active pending]) }
+  scope :search_import, -> do
+    where(status: %i[active pending]).includes(:application)
+  end
 
   def search_data
     {
@@ -166,6 +168,13 @@ class User < ApplicationRecord
       email: email_search_tokens,
       status: status,
       organization_ids: organization_ids,
+      application_bot: application_bot?,
+    }
+  end
+
+  def new_search_data
+    {
+      application_bot: application_bot?,
     }
   end
 

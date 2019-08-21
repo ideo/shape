@@ -23,6 +23,16 @@ namespace :searchkick do
   task new_search_data: :environment do
     find_search_import_in_batches
   end
+
+  task new_user_search_data: :environment do
+    total = User.search_import.count
+    agg = 0
+    User.search_import.find_in_batches.with_index do |batch, i|
+      agg += batch.count
+      puts "Reindexing User batch #{i}... #{agg}/#{total}"
+      User.search_import.where(id: batch.pluck(:id)).reindex(:new_search_data)
+    end
+  end
 end
 
 def reindex_models(klasses)

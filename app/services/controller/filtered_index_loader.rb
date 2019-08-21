@@ -49,7 +49,7 @@ module Controller
 
     def apply_filters
       return if @filter.empty?
-
+      filter_id
       filter_external_id
       filter_collection_id
       # if results is an empty array it won't be pagination-friendly
@@ -59,6 +59,13 @@ module Controller
     def load_controller_instance_variable
       @controller.instance_variable_set(
         "@#{controller_name}", @results
+      )
+    end
+
+    def filter_id
+      return if @filter[:id].blank?
+      @results = @results.where(
+        id: @filter[:id],
       )
     end
 

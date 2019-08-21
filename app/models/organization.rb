@@ -147,13 +147,16 @@ class Organization < ApplicationRecord
     # make sure they're on the org
     user_collection = Collection::UserCollection.find_or_create_for_user(user, self)
     setup_user_membership(user)
-    # only create the getting started content for new users
-    # Application bot users return application collections vs user collections.
+
+    # Don't add any shared content for application bots
+    return if user.application_bot?
+
+    # Create the getting started content for new users
     if user_collection.is_a?(Collection::UserCollection) &&
        user_collection.newly_created
       create_user_getting_started_content(user, synchronous: synchronous)
     end
-    add_shared_with_org_collections(user) if primary_group.can_view? user
+    add_shared_with_org_collections(user) if primary_group.can_view?(user)
   end
 
   # This gets called from Roles::MassRemove after leaving a primary/guest group
