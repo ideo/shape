@@ -321,6 +321,7 @@ describe User, type: :model do
         handle: user.handle.downcase,
         status: user.status,
         organization_ids: [],
+        application_bot: false,
       )
     end
 
