@@ -9,7 +9,8 @@ import FormControlLabel from '@material-ui/core/FormControlLabel'
 
 import ICONS from '~/ui/icons/dialogIcons'
 const { CloseIcon } = ICONS
-import { TextButton, Checkbox } from '~/ui/global/styled/forms'
+import { TextButton } from '~/ui/global/styled/buttons'
+import { Checkbox } from '~/ui/global/styled/forms'
 import { SpecialDisplayHeading } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 
