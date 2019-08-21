@@ -216,11 +216,11 @@ class Group < ApplicationRecord
 
     self.handle ||= name
     # Make sure it is parameterized
-    self.handle = handle.parameterize.slice(0, 30)
+    self.handle = handle.parameterize.slice(0, 36)
     original_handle = handle
     i = 0
     while groups_matching_handle.any?
-      self.handle = "#{original_handle.slice(0, 27)}-#{i += 1}"
+      self.handle = "#{original_handle.slice(0, 33)}-#{i += 1}"
     end
   end
 
