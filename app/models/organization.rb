@@ -111,8 +111,8 @@ class Organization < ApplicationRecord
   validates :name, presence: true
 
   # must start with a letter, can include letters/numbers/dashes/underscore
-  SLUG_FORMAT = /\A\d*[a-zA-Z][a-zA-Z0-9_\-\.]*\z/i
-  SLUG_LENGTH = 1..30
+  SLUG_FORMAT = /\A\d*[a-zA-Z][a-zA-Z0-9_\-\.]*\z/i.freeze
+  SLUG_LENGTH = (1..50).freeze
   validates :slug,
             length: { within: SLUG_LENGTH, allow_blank: true },
             format: { with: SLUG_FORMAT, allow_blank: true }
