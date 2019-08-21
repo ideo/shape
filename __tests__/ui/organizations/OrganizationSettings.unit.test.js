@@ -1,7 +1,7 @@
 import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
-import { StyledFormButton } from '~/ui/global/styled/buttons'
+import { FormButton } from '~/ui/global/styled/buttons'
 import { LabelContainer } from '~/ui/global/styled/forms'
 import TextEditor from '~/ui/global/TextEditor'
 
@@ -59,7 +59,7 @@ describe('OrganizationSettings', () => {
     })
 
     it('should render the save button', () => {
-      expect(wrapper.find(StyledFormButton).exists()).toBe(true)
+      expect(wrapper.find(FormButton).exists()).toBe(true)
     })
 
     it('should track bumpTermsVersion', () => {

@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 
-import { StyledFormButton } from '~/ui/global/styled/buttons'
+import { FormButton } from '~/ui/global/styled/buttons'
 import { BctTextField } from '~/ui/global/styled/forms'
 import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
 import { KEYS } from '~/utils/variables'
@@ -59,9 +59,9 @@ const GenericLinkCreator = ({
         )}
         {validIndicator}
         {pwValidIndicator}
-        <StyledFormButton disabled={loading} data-cy="LinkCreatorFormButton">
+        <FormButton disabled={loading} data-cy="LinkCreatorFormButton">
           Add
-        </StyledFormButton>
+        </FormButton>
       </form>
     </PaddedCardCover>
   )

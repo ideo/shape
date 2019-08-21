@@ -7,7 +7,7 @@ Feature: Creating an Organization
     And I fill out the organization name with "Our Test Org"
     Then I should see the value "our-test-org" in a "TextField_groupHandle"
 
-    When I click the "StyledFormButton_submitGroup"
+    When I click the "FormButton_submitGroup"
     And I wait for "@apiCreateOrganization" to finish
     And I wait for "@apiGetCollection" to finish
     Then I should see "Please wait while we build your account" in a "DialogPrompt"

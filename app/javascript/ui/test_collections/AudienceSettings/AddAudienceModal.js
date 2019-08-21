@@ -19,7 +19,7 @@ import {
   getCriterionByName,
   criteriaLimitByGroup,
 } from '~/ui/test_collections/AudienceSettings/AudienceCriteria'
-import { StyledFormButton } from '~/ui/global/styled/buttons'
+import { FormButton } from '~/ui/global/styled/buttons'
 import {
   Checkbox,
   CheckboxSelectOption,
@@ -488,7 +488,7 @@ class AddAudienceModal extends React.Component {
             </Grid>
             <Grid item xs={6}>
               <Grid container justify="center">
-                <StyledFormButton
+                <FormButton
                   onClick={this.handleSave}
                   width={190}
                   type="submit"
@@ -499,7 +499,7 @@ class AddAudienceModal extends React.Component {
                   }
                 >
                   Save
-                </StyledFormButton>
+                </FormButton>
               </Grid>
             </Grid>
           </Grid>

@@ -13,7 +13,7 @@ import { CardHeading } from '~/ui/global/styled/typography'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
-import { StyledFormButton } from '~/ui/global/styled/buttons'
+import { FormButton } from '~/ui/global/styled/buttons'
 import { RoundPill } from '~/ui/global/styled/forms'
 import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
@@ -28,7 +28,7 @@ const IconHolder = styled.span`
   width: 27px;
 `
 
-const LaunchButton = StyledFormButton.extend`
+const LaunchButton = FormButton.extend`
   font-size: 0.9rem;
   padding: 0 1rem;
   width: auto;

@@ -114,7 +114,7 @@ describe('PageHeader', () => {
     it('should show the Use Template button', () => {
       expect(
         wrapper
-          .find('StyledHeaderFormButton')
+          .find('HeaderFormButton')
           .children()
           .first()
           .text()
@@ -154,7 +154,7 @@ describe('PageHeader', () => {
     it('should render the restore button', () => {
       expect(
         wrapper
-          .find('StyledHeaderFormButton')
+          .find('HeaderFormButton')
           .children()
           .first()
           .text()

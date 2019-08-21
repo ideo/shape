@@ -125,7 +125,7 @@ export const NamedActionButton = styled.button`
 `
 /* eslint-disable no-nested-ternary */
 /** @component */
-export const StyledFormButton = styled.button`
+export const FormButton = styled.button`
   width: ${props => (props.width ? props.width : 183)}px;
   text-transform: uppercase;
   font-family: ${v.fonts.sans};
@@ -169,17 +169,17 @@ export const StyledFormButton = styled.button`
       }
     `};
 `
-StyledFormButton.displayName = 'StyledFormButton'
-StyledFormButton.defaultProps = {
+FormButton.displayName = 'FormButton'
+FormButton.defaultProps = {
   color: v.colors.black,
 }
 
-export const StyledHeaderFormButton = StyledFormButton.extend`
+export const HeaderFormButton = FormButton.extend`
   margin-top: 10px;
   font-size: 0.825rem;
 `
-StyledHeaderFormButton.displayName = 'StyledHeaderFormButton'
-StyledHeaderFormButton.defaultProps = {
+HeaderFormButton.displayName = 'HeaderFormButton'
+HeaderFormButton.defaultProps = {
   'data-cy': 'HeaderFormButton',
   color: v.colors.black,
 }

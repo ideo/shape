@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import { action, observable } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import parameterize from 'parameterize'
-import { StyledFormButton } from '~/ui/global/styled/buttons'
+import { FormButton } from '~/ui/global/styled/buttons'
 import {
   FieldContainer,
   FormActionsContainer,
@@ -156,14 +156,14 @@ class GroupModify extends React.Component {
           </button>
         </FieldContainer>
         <FormActionsContainer>
-          <StyledFormButton
-            data-cy="StyledFormButton_submitGroup"
+          <FormButton
+            data-cy="FormButton_submitGroup"
             onClick={this.handleSave}
             width={190}
             type="submit"
           >
             {groupType === 'Group' ? 'Add Members' : 'Save'}
-          </StyledFormButton>
+          </FormButton>
         </FormActionsContainer>
       </form>
     )
