@@ -242,7 +242,11 @@ class TextItemCover extends React.Component {
         isTransparent={isTransparent}
         dragging={dragging}
       >
-        <QuillStyleWrapper notEditing={!isEditing} hasTitleText={hasTitleText}>
+        <QuillStyleWrapper
+          notEditing={!isEditing}
+          hasTitleText={hasTitleText}
+          smallGrid={uiStore.isSmallGrid}
+        >
           {this.state.loading && <InlineLoader />}
           {content}
           {this.state.readMore && !isEditing && (
