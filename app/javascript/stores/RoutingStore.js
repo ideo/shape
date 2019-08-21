@@ -47,6 +47,13 @@ class RoutingStore extends RouterStore {
     this.scrollStates[collectionId] = scrollY
   }
 
+  // this gets called when you click the Logo so that it always takes you to the top
+  clearHomepageScrollState = () => {
+    const { currentUser } = apiStore
+    if (!currentUser) return
+    this.updateScrollState(currentUser.current_user_collection_id, 0)
+  }
+
   pathTo = (type, id = null, params = {}) => {
     switch (type) {
       case 'collections':
