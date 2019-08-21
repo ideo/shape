@@ -7,6 +7,10 @@ describe User, type: :model do
     it { should belong_to :current_organization }
     it { should belong_to :current_user_collection }
     it { should have_many :collections }
+    it { should have_many :users_roles }
+    it { should have_and_belong_to_many :roles }
+    it { should have_many :roles_for_groups }
+    it { should have_many :roles_for_collections }
     it { should have_many :groups }
     it { should have_many :current_org_groups }
     it { should have_many :organizations }
