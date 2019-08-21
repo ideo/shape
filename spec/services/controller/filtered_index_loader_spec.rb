@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Controller::FilteredIndexLoader do
   let(:controller) { Api::V1::CollectionsController.new }
   let(:klass) { Collection }
-  let(:filter) { { external_id: '99' } }
+  let(:filter) { {} }
   let(:params) do
     {
       controller: 'collections',
@@ -26,7 +26,24 @@ RSpec.describe Controller::FilteredIndexLoader do
     allow(results).to receive(:page).and_return(results)
   end
 
+  context 'with id filter' do
+    let(:collection) { create(:collection) }
+    let!(:filter) do
+      { id: collection.id }
+    end
+
+    it 'filters by id' do
+      expect(
+        service.call,
+      ).to eq([collection])
+    end
+  end
+
   context 'with external_id filter' do
+    let!(:filter) do
+      { external_id: '99' }
+    end
+
     it 'should filter by external_id' do
       expect(klass).to receive(:where_external_id).with(
         '99',
@@ -56,7 +73,8 @@ RSpec.describe Controller::FilteredIndexLoader do
   end
 
   context 'with CollectionsController and no filters present' do
-    let(:filter) { nil }
+    let!(:filter) { nil }
+
     it 'should return an error because filter is required' do
       expect(service.call).to eq :unprocessable_entity_error
     end

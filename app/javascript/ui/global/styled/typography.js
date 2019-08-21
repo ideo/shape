@@ -219,10 +219,13 @@ export const HugeNumber = Heading1.extend`
 `
 
 export const QuillStyleWrapper = styled.div`
-  ${props =>
-    props.notEditing && props.hasTitleText
-      ? 'height: calc(100% - 40px); margin-top: 40px;'
-      : 'height: 100%;'}
+  ${props => {
+    let margin = 40
+    if (props.smallGrid) margin = 20
+    return props.notEditing && props.hasTitleText
+      ? `height: calc(100% - ${margin}px); margin-top: ${margin}px;`
+      : 'height: 100%;'
+  }}
 
   .quill {
     height: 100%;

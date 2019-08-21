@@ -194,6 +194,8 @@ export const ScrollArea = styled.div`
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 `
+ScrollArea.displayName = 'ScrollArea'
+
 export const FooterBreak = styled.div`
   border-top: 1px solid ${v.colors.commonMedium};
   width: 100%;

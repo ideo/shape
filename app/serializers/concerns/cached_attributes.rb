@@ -41,6 +41,7 @@ module CachedAttributes
 
     def cached_attribute?(name)
       return false if cached_attribute_names.blank?
+
       cached_attribute_names.include?(name.to_s)
     end
   end

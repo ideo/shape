@@ -1,7 +1,7 @@
 class Search
   module Filters
     class Tag < Base
-      REGEXP = /#\w+/
+      REGEXP = /#\w+/.freeze
 
       def options
         tags = @query.scan(REGEXP).flatten.map { |tag| tag.delete('#') }

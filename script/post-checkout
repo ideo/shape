@@ -1,51 +1,31 @@
-# modified from https://gist.github.com/brysgo/9980344
+#!/bin/sh
 
-CHECKING_OUT_BRANCH=$3
-OLD_BRANCH=$1
-NEW_BRANCH=$2
+if [ "{$LEFTHOOK}" = "0" ]; then
+	exit 0
+fi
 
-if [ $CHECKING_OUT_BRANCH -eq 1 ]
-  then
-    FILES_CHANGED=`git diff $OLD_BRANCH $NEW_BRANCH --name-status`
-    MIGRATIONS_REMOVED=`echo "$FILES_CHANGED" | egrep --color=never 'D\tdb/migrate/([0-9]+)' | sort -r`
-    MIGRATIONS_ADDED=`echo "$FILES_CHANGED" | egrep --color=never 'A\tdb/migrate/([0-9]+)'`
+# added setup to prompt user for changes
+exec < /dev/tty
+echo "Do you want to proceed with lefthook scripts? y/n"
+read -n 1 -r
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+	exit 0
+fi
+echo ""
+echo "running post-checkout..."
+# -----
 
-    # check if we need to do a bundle
-    BUNDLE_CHANGED=`echo "$FILES_CHANGED" | egrep --color=never 'M\tGemfile.lock'`
-    if [ ! -z "$BUNDLE_CHANGED" ]; then
-      echo "Your Gemfile.lock has changed, running bundle"
-      bundle
-    fi
+cmd="lefthook run post-checkout $@"
 
-    # check if we need to do a yarn install
-    PACKAGE_CHANGED=`echo "$FILES_CHANGED" | egrep --color=never 'M\tyarn.lock'`
-    if [ ! -z "$PACKAGE_CHANGED" ]; then
-      echo "Your yarn.lock has changed, running yarn"
-      yarn
-    fi
-
-    if [ ! -z "$MIGRATIONS_REMOVED" ]; then
-      echo "Rolling back missing migrations"
-      for migration in $MIGRATIONS_REMOVED
-      do
-        if [ $migration == "D" ]; then
-          continue
-        fi
-        git checkout "$OLD_BRANCH" -- "$migration"
-        VERSION=`echo "$migration" | cut -d'_' -f1 | cut -d'/' -f3`
-        bundle exec rake db:migrate:down VERSION="$VERSION"
-        git reset
-        rm "$migration"
-      done
-      bundle exec rake db:test:prepare
-      git checkout db/schema.rb
-    fi
-
-    if [ ! -z "$MIGRATIONS_ADDED" ]; then
-      echo "New migrations have been added running migrations"
-      bundle exec rake db:migrate db:test:prepare
-    fi
-
-    # always check out the branch's correct version of the submodule
-    git submodule update app/javascript/ui/shared
+if lefthook >/dev/null 2>&1
+then
+  exec $cmd
+elif bundle exec lefthook >/dev/null 2>&1
+then
+  bundle exec $cmd
+elif npx lefthook >/dev/null 2>&1
+then
+  npx $cmd
+else
+  echo "Can't find lefthook in PATH"
 fi

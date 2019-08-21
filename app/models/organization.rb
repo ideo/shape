@@ -110,6 +110,13 @@ class Organization < ApplicationRecord
 
   validates :name, presence: true
 
+  # must start with a letter, can include letters/numbers/dashes/underscore
+  SLUG_FORMAT = /\A\d*[a-zA-Z][a-zA-Z0-9_\-\.]*\z/i.freeze
+  SLUG_LENGTH = (1..50).freeze
+  validates :slug,
+            length: { within: SLUG_LENGTH, allow_blank: true },
+            format: { with: SLUG_FORMAT, allow_blank: true }
+
   scope :active, -> { where(deactivated: false) }
   scope :billable, -> do
     active
@@ -127,6 +134,7 @@ class Organization < ApplicationRecord
 
   def can_view?(user)
     return true if user.has_role?(Role::APPLICATION_USER, self)
+
     primary_group.can_view?(user) || admin_group.can_view?(user) || guest_group.can_view?(user)
   end
 
@@ -139,13 +147,16 @@ class Organization < ApplicationRecord
     # make sure they're on the org
     user_collection = Collection::UserCollection.find_or_create_for_user(user, self)
     setup_user_membership(user)
-    # only create the getting started content for new users
-    # Application bot users return application collections vs user collections.
+
+    # Don't add any shared content for application bots
+    return if user.application_bot?
+
+    # Create the getting started content for new users
     if user_collection.is_a?(Collection::UserCollection) &&
        user_collection.newly_created
       create_user_getting_started_content(user, synchronous: synchronous)
     end
-    add_shared_with_org_collections(user) if primary_group.can_view? user
+    add_shared_with_org_collections(user) if primary_group.can_view?(user)
   end
 
   # This gets called from Roles::MassRemove after leaving a primary/guest group
@@ -155,6 +166,9 @@ class Organization < ApplicationRecord
     profile = Collection::UserProfile.find_by(user: user, organization: self)
     profile.archive! if profile.present?
 
+    # Remove last_active_at for org they are being removed from
+    timestamps = user.last_active_at.except(self.id.to_s)
+    user.update_columns(last_active_at: timestamps)
     # Set current org as one they are a member of
     # If nil, that is fine as they shouldn't have a current organization
     user.switch_to_organization(user.organizations.first)
@@ -180,6 +194,7 @@ class Organization < ApplicationRecord
   def add_shared_with_org_collections(user)
     collections_to_share = collections.where(shared_with_organization: true)
     return unless collections_to_share.any?
+
     LinkToSharedCollectionsWorker.perform_async(
       [user.id],
       [],
@@ -273,6 +288,7 @@ class Organization < ApplicationRecord
 
   def network_default_payment_method
     return unless network_organization.present?
+
     @network_default_payment_method ||= NetworkApi::PaymentMethod.find(
       organization_id: network_organization.id,
       default: true,
@@ -446,11 +462,13 @@ class Organization < ApplicationRecord
 
   def cancel_network_subscription
     return unless network_organization
+
     subscription = NetworkApi::Subscription.find(
       organization_id: network_organization.id,
       active: true,
     ).first
     return unless subscription
+
     subscription.cancel(immediately: true)
   end
 

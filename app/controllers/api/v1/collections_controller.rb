@@ -47,6 +47,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     if updated
       log_collection_activity(:edited) if log_activity?
       return if @cancel_sync
+
       render_collection
     else
       render_api_errors @collection.errors
@@ -124,6 +125,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def log_viewing_activities
     return unless user_signed_in? && current_user.current_organization.present?
+
     log_organization_view_activity
     # TODO: we may want to log collection view for anonymous user
     log_collection_activity(:viewed)
@@ -152,6 +154,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     @submission_box = Collection.find(json_api_params[:box_id])
     authorize! :edit, @submission_box
     return true if json_api_params[:template_card_id].blank?
+
     @template_card = CollectionCard.find(json_api_params[:template_card_id])
     authorize! :read, @template_card
   end
@@ -167,6 +170,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def check_getting_started_shell
     return unless @collection.getting_started_shell && @collection.can_edit?(current_user)
+
     PopulateGettingStartedShellCollection.call(@collection, for_user: current_user)
     @collection.reload
   end
@@ -186,6 +190,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
                   .includes(Collection.default_relationships_for_query)
                   .first
     return unless user_signed_in?
+
     current_user.precache_roles_for(
       [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],
       ([@collection] + Collection.where(id: @collection.breadcrumb)),
@@ -235,6 +240,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     organization = current_user.current_organization
     previous = Activity.where(actor: current_user, target: organization.primary_group, action: :joined)
     return if previous.present?
+
     ActivityAndNotificationBuilder.call(
       actor: current_user,
       target: organization.primary_group,
@@ -277,6 +283,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def switch_to_organization
     return if @collection.common_viewable?
+
     current_user.switch_to_organization(@collection.organization)
   end
 end

@@ -39,6 +39,7 @@ class ActivityAndNotificationBuilder < SimpleService
   def call
     create_activity
     return unless @should_notify && @activity&.should_notify?
+
     create_notifications
     store_in_firestore
   end
@@ -71,7 +72,6 @@ class ActivityAndNotificationBuilder < SimpleService
       .where(id: all_user_ids)
       .where.not(status: :archived)
       .find_each do |user|
-
       skippable = (
         # don't notify for user's own activities
         user.id == @actor.id ||
@@ -116,6 +116,7 @@ class ActivityAndNotificationBuilder < SimpleService
     similar_activities = find_similar_activities
     similar_notifications = find_similar_notifications(user_id, similar_activities)
     return if similar_notifications.empty?
+
     activity_ids = []
     if similar_notifications.first.combined_activities_ids.count.positive?
       activity_ids = similar_notifications.first.combined_activities_ids
@@ -134,6 +135,7 @@ class ActivityAndNotificationBuilder < SimpleService
 
   def store_in_firestore
     return unless @created_notifications.present?
+
     FirestoreBatchWriter.perform_in(
       3.seconds,
       @created_notifications.compact.map(&:batch_job_identifier),
@@ -145,8 +147,10 @@ class ActivityAndNotificationBuilder < SimpleService
 
     parents_unsubscribed = @target.any_parent_unsubscribed?(user)
     return !parents_unsubscribed if @target.comment_thread.nil?
+
     users_thread = @target.comment_thread.users_thread_for(user)
     return !parents_unsubscribed if users_thread.nil?
+
     users_thread.subscribed
   end
 end

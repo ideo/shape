@@ -24,6 +24,7 @@ module RolifyExtensions
   def precache_roles_for(role_names, resources)
     return unless @has_role_by_identifier.present? && is_a?(User)
     return unless resources.present?
+
     resource_identifiers = resources.map(&:roles_anchor_resource_identifier).uniq
     roles = rolify_roles.where(
       name: role_names,
@@ -87,6 +88,7 @@ module RolifyExtensions
     role = Role.find_or_create(role_name, resource)
     return add_resource_role(role, resource) if resource.present?
     return role unless is_a?(User)
+
     # otherwise if no resource, just create a UsersRole linking to the role
     UsersRole.find_or_create_by(role: role, user: self)
     role
@@ -111,6 +113,7 @@ module RolifyExtensions
     # this will re-start the add_role process, after first removing user's viewer role
     return upgrade_to_edit_role(resource) if should_upgrade
     return existing if existing.present?
+
     if is_a?(User)
       role.users << self
     elsif is_a?(Group)
@@ -133,6 +136,7 @@ module RolifyExtensions
       role = Role.for_resource(resource).where(name: role_name).first
     end
     return [] unless role.present?
+
     # `remove_role` will too aggressively destroy the entire role, so just remove objects directly
     if is_a?(User)
       role.users.destroy(self)
@@ -142,6 +146,7 @@ module RolifyExtensions
       raise "RolifyExtension: Unsupported model '#{self.class.name}' for remove_role"
     end
     return role if resource.blank?
+
     sync_groups_after_removing(role) if is_a?(User)
     after_role_update(role, :remove)
     role
@@ -151,11 +156,13 @@ module RolifyExtensions
     role_type = is_a?(User) ? :users : :groups
     # lookup role.users / role.groups to find self
     return role if role.send(role_type).include? self
+
     existing_other_role_for_self(role, role_type)
   end
 
   def existing_other_role_for_self(role, role_type)
     return false if role.resource.blank?
+
     found = nil
     # find other roles on this resource, e.g. if we're adding member role, look up admins
     Role.for_resource(role.resource).each do |r|
@@ -167,6 +174,7 @@ module RolifyExtensions
   def upgrade_to_edit_role(resource)
     return unless is_a?(User) || is_a?(Group)
     return true if resource.can_edit? self
+
     other_roles = Role
                   .for_resource(resource)
                   .where.not(name: resource.class.edit_role)

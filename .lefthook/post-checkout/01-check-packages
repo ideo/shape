@@ -1,0 +1,27 @@
+#!/bin/bash
+# modified from https://gist.github.com/brysgo/9980344
+
+CHECKING_OUT_BRANCH=$3
+OLD_BRANCH=$1
+NEW_BRANCH=$2
+
+if [ $CHECKING_OUT_BRANCH -eq 1 ]; then
+  FILES_CHANGED=`git diff $OLD_BRANCH $NEW_BRANCH --name-status`
+
+  # check if we need to do a bundle
+  BUNDLE_CHANGED=`echo "$FILES_CHANGED" | egrep --color=never 'M\tGemfile.lock'`
+  if [ ! -z "$BUNDLE_CHANGED" ]; then
+    echo "Your Gemfile.lock has changed, running bundle"
+    bundle
+  fi
+
+  # check if we need to do a yarn install
+  PACKAGE_CHANGED=`echo "$FILES_CHANGED" | egrep --color=never 'M\tyarn.lock'`
+  if [ ! -z "$PACKAGE_CHANGED" ]; then
+    echo "Your yarn.lock has changed, running yarn"
+    yarn
+  fi
+
+  # always check out the branch's correct version of the submodule
+  git submodule update app/javascript/ui/shared
+fi

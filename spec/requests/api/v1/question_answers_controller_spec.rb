@@ -40,7 +40,7 @@ describe Api::V1::QuestionAnswersController, type: :request, json: true do
         end
       end
 
-      context "after 10 minutes of being closed" do
+      context 'after 10 minutes of being closed' do
         let(:test_collection) { create(:test_collection, test_status: :closed, test_closed_at: 11.minutes.ago) }
 
         it 'returns a 422' do

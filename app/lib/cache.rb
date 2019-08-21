@@ -19,6 +19,7 @@ class Cache
   def self.get(key, expires_in: nil, raw: false, &block)
     value = client.get(key)
     return value if value.present? && raw
+
     value = JSON.parse(value) if value.present?
     if value.blank? && block.present?
       value = yield

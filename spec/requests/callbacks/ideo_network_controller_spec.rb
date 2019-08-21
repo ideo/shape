@@ -58,7 +58,14 @@ describe 'Ideo Profile API Requests' do
         it 'responds with not found' do
           post(
             '/callbacks/ideo_network/invoices',
-            params: { event: 'invoice.payment_failed', included: [{ type: 'application_organizations', attributes: { external_id: nil } }, payment_method] }.to_json,
+            params: {
+              event: 'invoice.payment_failed',
+              included: [{
+                type: 'application_organizations',
+                attributes: { external_id: nil },
+              },
+                         payment_method],
+            }.to_json,
             headers: valid_headers,
           )
           expect(response.status).to eq(404)
@@ -74,7 +81,10 @@ describe 'Ideo Profile API Requests' do
           ).and_return(mailer)
           post(
             '/callbacks/ideo_network/invoices',
-            params: { event: 'invoice.payment_failed', included: [application_organization, payment_method] }.to_json,
+            params: {
+              event: 'invoice.payment_failed',
+              included: [application_organization, payment_method],
+            }.to_json,
             headers: valid_headers,
           )
         end
@@ -82,7 +92,10 @@ describe 'Ideo Profile API Requests' do
         it 'responds 200' do
           post(
             '/callbacks/ideo_network/invoices',
-            params: { event: 'invoice.payment_failed', included: [application_organization, payment_method] }.to_json,
+            params: {
+              event: 'invoice.payment_failed',
+              included: [application_organization, payment_method],
+            }.to_json,
             headers: valid_headers,
           )
           expect(response.status).to eq(200)
@@ -117,7 +130,20 @@ describe 'Ideo Profile API Requests' do
       it 'responds with bad request if no application organization is found' do
         post(
           '/callbacks/ideo_network/payment_methods',
-          params: { data: { relationships: { application_organizations: { relationships: { application_organization: { data: { id: 123 } } } } } }, event: 'payment_method.created' }.to_json,
+          params: {
+            data: {
+              relationships: {
+                application_organizations: {
+                  relationships: {
+                    application_organization: {
+                      data: { id: 123 },
+                    },
+                  },
+                },
+              },
+            },
+            event: 'payment_method.created',
+          }.to_json,
           headers: valid_headers,
         )
         expect(response.status).to eq(400)
@@ -126,7 +152,26 @@ describe 'Ideo Profile API Requests' do
       it 'responds with bad request if unable to find organization' do
         post(
           '/callbacks/ideo_network/payment_methods',
-          params: { data: { relationships: { application_organizations: { relationships: { application_organization: { data: { id: 123 } } } } } }, included: [{ id: 123, type: 'application_organizations', attributes: { external_id: 234 } }], event: 'payment_method.created' }.to_json,
+          params: {
+            data: {
+              relationships: {
+                application_organizations: {
+                  relationships: {
+                    application_organization: {
+                      data: {
+                        id: 123,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            included: [{
+              id: 123, type: 'application_organizations',
+              attributes: { external_id: 234 }
+            }],
+            event: 'payment_method.created',
+          }.to_json,
           headers: valid_headers,
         )
         expect(response.status).to eq(404)
@@ -137,7 +182,27 @@ describe 'Ideo Profile API Requests' do
         expect(organization).to receive(:update_payment_status)
         post(
           '/callbacks/ideo_network/payment_methods',
-          params: { data: { relationships: { application_organizations: { relationships: { application_organization: { data: { id: 123 } } } } } }, included: [{ id: 123, type: 'application_organizations', attributes: { external_id: organization.id } }], event: 'payment_method.created' }.to_json,
+          params: {
+            data: {
+              relationships: {
+                application_organizations: {
+                  relationships: {
+                    application_organization: {
+                      data: {
+                        id: 123,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            included: [{
+              id: 123,
+              type: 'application_organizations',
+              attributes: { external_id: organization.id },
+            }],
+            event: 'payment_method.created',
+          }.to_json,
           headers: valid_headers,
         )
         expect(response.status).to eq(200)
@@ -176,7 +241,11 @@ describe 'Ideo Profile API Requests' do
           application_organization[:attributes][:external_id] = 123
           post(
             '/callbacks/ideo_network/payment_methods',
-            params: { event: 'payment_method.expiring', data: { attributes: { id: payment_method_id } }, included: [application_organization] }.to_json,
+            params: {
+              event: 'payment_method.expiring',
+              data: { attributes: { id: payment_method_id } },
+              included: [application_organization],
+            }.to_json,
             headers: valid_headers,
           )
           expect(response.status).to eq(404)
@@ -192,7 +261,11 @@ describe 'Ideo Profile API Requests' do
           ).and_return(mailer)
           post(
             '/callbacks/ideo_network/payment_methods',
-            params: { event: 'payment_method.expiring', data: { attributes: { id: payment_method_id } }, included: [application_organization] }.to_json,
+            params: {
+              event: 'payment_method.expiring',
+              data: { attributes: { id: payment_method_id } },
+              included: [application_organization],
+            }.to_json,
             headers: valid_headers,
           )
         end
@@ -200,7 +273,11 @@ describe 'Ideo Profile API Requests' do
         it 'responds 200' do
           post(
             '/callbacks/ideo_network/payment_methods',
-            params: { event: 'payment_method.expiring', data: { attributes: { id: payment_method_id } }, included: [application_organization] }.to_json,
+            params: {
+              event: 'payment_method.expiring',
+              data: { attributes: { id: payment_method_id } },
+              included: [application_organization],
+            }.to_json,
             headers: valid_headers,
           )
           expect(response.status).to eq(200)
@@ -354,7 +431,12 @@ describe 'Ideo Profile API Requests' do
         before do
           post(
             '/callbacks/ideo_network/groups',
-            params: { id: group_network_id, event: 'group.created', data: { attributes: group_data }, included: [organization_data] }.to_json,
+            params: {
+              id: group_network_id,
+              event: 'group.created',
+              data: { attributes: group_data },
+              included: [organization_data],
+            }.to_json,
             headers: valid_headers,
           )
         end

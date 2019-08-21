@@ -32,7 +32,7 @@ module Breadcrumb
             Collection.where("cached_attributes->'common_viewable' = 'true'"),
           ),
         )
-        .order(Arel.sql("position(id::text in '#{ids.join(',')}')"))
+        .order(Arel.sql("position(collections.id::text in '#{ids.join(',')}')"))
         .select(:id, :name)
     end
 
@@ -41,6 +41,7 @@ module Breadcrumb
       unless @user.persisted?
         return [breadcrumb_item_for_api(@object)]
       end
+
       (viewable_collections + [@object]).map do |object|
         breadcrumb_item_for_api(object)
       end
@@ -82,8 +83,10 @@ module Breadcrumb
     # we directly look up has_role_by_identifier for the breadcrumb, e.g. [5] becomes "Collection_5"
     def user_can?(action, breadcrumb_item)
       return true if @user.has_cached_role?(Role::SUPER_ADMIN)
+
       collection = breadcrumb_collections.select { |c| c.id == breadcrumb_item }.first
       return false unless collection.present?
+
       collection.send("can_#{action}?", @user)
     end
   end

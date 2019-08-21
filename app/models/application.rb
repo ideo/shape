@@ -21,9 +21,11 @@ class Application < ApplicationRecord
   has_many :application_organizations
   has_many :organizations, through: :application_organizations
   has_many :external_records
+  has_many :datasets
 
   before_validation :create_user, on: :create
   after_update :update_application_collection_names, if: :saved_change_to_name?
+  after_commit :reindex_user, on: :create
 
   private
 
@@ -44,5 +46,10 @@ class Application < ApplicationRecord
     application_organizations.map(&:root_collection).each do |collection|
       collection.update(name: name)
     end
+  end
+
+  def reindex_user
+    # So that they can be marked as application bot user in ElasticSearch
+    user.reindex
   end
 end

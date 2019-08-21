@@ -37,7 +37,7 @@ VCR.configure do |config|
   config.register_request_matcher :path_ignore_id do |req1, req2|
     path1 = URI(req1.uri).path
     path2 = URI(req2.uri).path
-    path1.gsub(/\/\d+/, '/x') == path2.gsub(/\/\d+/, '/x')
+    path1.gsub(%r{/\d+}, '/x') == path2.gsub(%r{/\d+}, '/x')
   end
 end
 
@@ -45,6 +45,7 @@ end
 require 'fakeredis/rspec'
 require 'action_cable/testing/rspec'
 require 'cancan/matchers'
+require 'jsonapi_spec_helpers'
 
 RSpec.configure do |config|
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
@@ -66,6 +67,7 @@ RSpec.configure do |config|
 
   config.include ApiHelper, json: true
   config.include JsonHeaders, json: true
+  config.include JsonapiSpecHelpers
   config.include SessionHelper
   config.include TestDoubles
 
@@ -77,7 +79,7 @@ RSpec.configure do |config|
     Searchkick.models.each do |model|
       begin
         model.search_index.delete
-      rescue
+      rescue StandardError
       end
 
       model.reindex

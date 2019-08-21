@@ -58,6 +58,7 @@ module RealtimeEditorsViewers
   def currently_editing_user_as_json
     user_id = Cache.get(editing_cache_key, raw: true)
     return {} if user_id.blank?
+
     User.find(user_id).as_json
   end
 

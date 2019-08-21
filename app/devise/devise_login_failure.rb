@@ -5,6 +5,7 @@ class DeviseLoginFailure < Devise::FailureApp
     if request.path == '/sidekiq/unauthenticated'
       return super
     end
+
     store_location!
     redirect_to login_url
   end

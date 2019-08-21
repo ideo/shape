@@ -4,7 +4,7 @@
   "scripts": {
     "cypress": "./node_modules/.bin/cypress open",
     "cypress-ci": "./node_modules/.bin/cypress run",
-    "lint": "./node_modules/.bin/eslint .",
+    "lint": "./node_modules/.bin/eslint",
     "styleguide": "yarn styleguidist server",
     "test": "jest --watch"
   },

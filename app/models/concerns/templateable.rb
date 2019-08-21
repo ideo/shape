@@ -17,11 +17,13 @@ module Templateable
 
   def profile_template?
     return false unless master_template?
+
     organization.profile_template_id == id
   end
 
   def system_required?
     return false unless master_template?
+
     profile_template?
   end
 
@@ -48,11 +50,13 @@ module Templateable
   def queue_update_template_instances
     # no need to queue up the job for nonexistent instances
     return unless master_template? && templated_collections.active.present?
+
     UpdateTemplateInstancesWorker.perform_async(id)
   end
 
   def update_test_template_instance_types!
     return unless is_a?(Collection::TestCollection) || is_a?(Collection::TestDesign)
+
     templated_collections.active.each do |instance|
       instance.update(
         collection_to_test_id: collection_to_test_id.nil? ? nil : instance.parent.id,
@@ -72,6 +76,7 @@ module Templateable
     end
 
     return unless submission_box_template_test?
+
     # method in test_collection to update all submissions
     update_submissions_launch_status
   end
@@ -94,15 +99,18 @@ module Templateable
     instance.collection_cards.pinned.each do |card|
       master = master_cards[card.templated_from_id]
       next if master.blank? # Blank if this card was just added
+
       card.update_columns(
         height: master.height,
         width: master.width,
         order: master.order,
       )
       next unless is_a?(Collection::TestCollection) && inside_a_submission_box_template?
+
       # copy more details over if we are still setting up our submission template test
       test = card.parent
       next unless test.is_a?(Collection::TestCollection) && !test.launchable?
+
       card.item.update(
         type: master.item.type,
         content: master.item.content,
@@ -116,6 +124,7 @@ module Templateable
   def move_cards_deleted_from_master_template(instance)
     cards = cards_removed_from_master_template(instance)
     return unless cards.present?
+
     if [Collection::TestCollection, Collection::TestDesign].include?(instance.class)
       # for tests, we just delete any pinned cards that were removed from the master
       CollectionCard.where(id: cards.pluck(:id)).destroy_all
@@ -138,6 +147,7 @@ module Templateable
       moved_cards = card_mover.call
       # card_mover will return false if error
       return false unless moved_cards
+
       # Unpin all cards so user can edit
       CollectionCard.where(
         id: moved_cards.map(&:id),
@@ -162,6 +172,7 @@ module Templateable
   def find_or_create_deleted_cards_collection
     coll = deleted_cards_collection
     return coll if coll.present?
+
     builder = CollectionCardBuilder.new(
       params: {
         order: 0,
@@ -196,16 +207,16 @@ module Templateable
 
   def templated_cards_by_templated_from_id
     @templated_cards_by_templated_from_id ||= collection_cards
-    .where.not(templated_from: nil)
-    .each_with_object({}) do |card, h|
+                                              .where.not(templated_from: nil)
+                                              .each_with_object({}) do |card, h|
       h[card.templated_from_id] = card
     end
   end
 
   def pinned_cards_by_id
     @pinned_cards_by_id ||= collection_cards
-    .pinned
-    .each_with_object({}) do |card, h|
+                            .pinned
+                            .each_with_object({}) do |card, h|
       h[card.id] = card
     end
   end

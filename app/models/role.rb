@@ -103,6 +103,7 @@ class Role < ApplicationRecord
 
   def label
     return name unless name.to_sym == VIEWER && resource.is_a?(Collection::SubmissionBox)
+
     'participant'
   end
 
@@ -149,8 +150,10 @@ class Role < ApplicationRecord
   # necessary for busting collection cache e.g. when you update a role of a sub-collection
   def update_resource_collection_card
     return unless resource.present?
+
     card = resource.try(:parent_collection_card)
     return unless card.present? && card.persisted?
+
     card.touch
   end
 end

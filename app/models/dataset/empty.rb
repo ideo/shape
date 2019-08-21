@@ -19,6 +19,7 @@
 #  url              :string
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
+#  application_id   :integer
 #  data_source_id   :bigint(8)
 #  organization_id  :bigint(8)
 #
@@ -48,6 +49,7 @@ class Dataset
       return self[:identifier] if self[:identifier].present?
       return if data_source.blank?
       return data_source.name if data_source.is_a?(Collection)
+
       data_source.parent.name if data_source.is_a?(Item)
     end
 

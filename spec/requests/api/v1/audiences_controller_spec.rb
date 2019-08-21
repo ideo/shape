@@ -39,7 +39,7 @@ describe Api::V1::AudiencesController, type: :request, json: true, create_org: t
       json_api_params(
         'audiences',
         name: 'Anyone',
-        interest_list: %w(Pets Commuter Athlete),
+        interest_list: %w[Pets Commuter Athlete],
       )
     end
 

@@ -134,7 +134,6 @@ RSpec.describe NotificationDigest, type: :service do
       end
     end
 
-
     context 'with unsupported type' do
       let(:type) { :other }
 

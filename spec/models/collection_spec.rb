@@ -240,6 +240,17 @@ describe Collection, type: :model do
       end
     end
 
+    context 'with shared_with_organization' do
+      before do
+        collection.update(shared_with_organization: true)
+      end
+
+      it 'nullifies shared_with_organization' do
+        expect(collection.shared_with_organization?).to be true
+        expect(duplicate.shared_with_organization?).to be false
+      end
+    end
+
     context 'without user' do
       let(:duplicate_without_user) do
         dupe = collection.duplicate!(
@@ -551,7 +562,7 @@ describe Collection, type: :model do
 
     it 'returns cards on page' do
       expect(collection.collection_cards_by_page(page: 2, per_page: 1)).to eq(
-        [collection.collection_cards[1]]
+        [collection.collection_cards[1]],
       )
     end
   end
@@ -577,7 +588,7 @@ describe Collection, type: :model do
         collection.collection_cards_by_row_and_col(
           rows: [3, 10],
           cols: [4, 6],
-        )
+        ),
       ).to match_array(matching_cards)
     end
   end

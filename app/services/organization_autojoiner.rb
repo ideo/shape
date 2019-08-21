@@ -19,6 +19,7 @@ class OrganizationAutojoiner
     available_orgs.map do |org|
       # bypass if they're already a member
       next if org.can_view? @user
+
       org.setup_user_membership_and_collections(@user)
       if @group
         Roles::MassAssign.call(

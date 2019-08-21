@@ -2,7 +2,6 @@ import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { observable, runInAction } from 'mobx'
 import styled from 'styled-components'
 
 import CloseIcon from '~/ui/icons/CloseIcon'
@@ -10,8 +9,8 @@ import InlineLoader from '~/ui/layout/InlineLoader'
 import MoveArrowIcon from '~/ui/icons/MoveArrowIcon'
 import MoveHelperModal from '~/ui/users/MoveHelperModal'
 import Tooltip from '~/ui/global/Tooltip'
-import CoverRenderer from '~/ui/grid/CoverRenderer'
-import v from '~/utils/variables'
+import CardMoveService from '~/ui/grid/CardMoveService'
+
 import {
   StyledSnackbar,
   StyledSnackbarContent,
@@ -39,50 +38,10 @@ const CloseIconHolder = styled.span`
     width: 16px;
   }
 `
-const CoverRendererWrapper = styled.div`
-  ${props => {
-    const { width, height, maxWidth, maxHeight, selectedMultiple } = props
-    const { cardTiltDegrees, colors, zIndex } = v
-    const shouldScaleSmaller = maxWidth >= 2 && maxHeight >= 2 // scale even smaller for 2x2, 2x3 or 2x4 ratio
-    const scalarTransform = shouldScaleSmaller ? 0.25 : 0.4
-
-    return `
-      height: ${height}px;
-      width: ${width}px;
-      left: 15px;
-      position: absolute;
-      transform-origin: 0 100%;
-      bottom: 25px;
-      background: white;
-      overflow: hidden;
-      z-index: -1;
-      transform: rotate(${cardTiltDegrees}deg) scale(${scalarTransform});
-      color: black;
-      box-shadow: ${
-        selectedMultiple ? `-15px 15px 0 0px ${colors.secondaryLight}` : 'none'
-      };
-      &:before {
-        background: ${colors.primaryDark};
-        content: '';
-        height: 100%;
-        left: 0;
-        opacity: 0.45;
-        pointer-events: none;
-        position: absolute;
-        width: 100%;
-        top: 0;
-        z-index: ${zIndex.gridCardTop};
-      }
-    `
-  }}
-`
 
 @inject('uiStore', 'apiStore')
 @observer
 class MoveModal extends React.Component {
-  @observable
-  isLoading = false
-
   componentDidUpdate() {
     const { uiStore, pastingCards } = this.props
     if (pastingCards) {
@@ -109,145 +68,12 @@ class MoveModal extends React.Component {
     uiStore.closeMoveMenu()
   }
 
-  moveCards = async placement => {
-    const { uiStore, apiStore } = this.props
-    const { viewingCollection, cardAction } = uiStore
-    // Viewing collection might not be set, such as on the search page
-    if (!viewingCollection) {
-      uiStore.alert("You can't move an item here")
-      return
-    }
-
-    const collectionId = viewingCollection.id
-    const movingFromCollection = apiStore.find(
-      'collections',
-      uiStore.movingFromCollectionId
-    )
-    const error = this.moveErrors({
-      viewingCollection,
-      movingFromCollection,
-      cardAction,
-    })
-
-    if (error) {
-      if (!viewingCollection.can_edit_content) {
-        uiStore.confirm({
-          prompt: error,
-          confirmText: 'Continue',
-          iconName: 'Alert',
-          onConfirm: () => {},
-          onCancel: () => {
-            uiStore.setMovingCards([])
-            uiStore.update('selectedCardIds', [])
-          },
-        })
-      } else {
-        uiStore.alert(error)
-      }
-      return
-    }
-
-    const cardIds = [...uiStore.movingCardIds]
-    let data = {
-      to_id: collectionId,
-      from_id: uiStore.movingFromCollectionId,
-      collection_card_ids: cardIds,
-      placement,
-    }
-
-    try {
-      runInAction(() => {
-        this.isLoading = true
-      })
-      let successMessage
-      switch (cardAction) {
-        case 'move':
-          await apiStore.moveCards(data)
-          successMessage = 'Items successfully moved!'
-          break
-        case 'link':
-          await apiStore.linkCards(data)
-          successMessage = 'Items successfully linked!'
-          break
-        case 'duplicate':
-          await apiStore.duplicateCards(data)
-          successMessage = 'Items successfully duplicated!'
-          break
-        case 'useTemplate': {
-          data = {
-            parent_id: data.to_id,
-            template_id: data.from_id,
-            placement,
-          }
-          await apiStore.createTemplateInstance(data)
-          successMessage = 'Your template instance has been created!'
-          break
-        }
-        default:
-          return
-      }
-      // always refresh the current collection
-      // TODO: what if you "moved/duplicated to BOTTOM"?
-      await viewingCollection.API_fetchCards()
-
-      runInAction(() => {
-        this.isLoading = false
-      })
-      uiStore.popupSnackbar({ message: successMessage })
-      uiStore.resetSelectionAndBCT()
-      uiStore.closeMoveMenu()
-      if (placement === 'beginning') {
-        uiStore.scrollToTop()
-      } else {
-        uiStore.scrollToBottom()
-      }
-      if (cardAction === 'move') {
-        // we actually want to reselect the cards at this point
-        uiStore.reselectCardIds(cardIds)
-      }
-    } catch (e) {
-      runInAction(() => {
-        this.isLoading = false
-      })
-      let message = 'You cannot move a collection within itself.'
-      if (e && e.error && e.error[0]) {
-        message = e.error[0]
-      }
-      uiStore.alert(message)
-    }
-  }
-
-  moveErrors = ({ viewingCollection, movingFromCollection, cardAction }) => {
-    if (!viewingCollection.can_edit_content) {
-      return 'You only have view access to this collection. Would you like to keep moving the cards?'
-    } else if (
-      // don't allow moving cards from templates to non-templates
-      cardAction === 'move' &&
-      movingFromCollection &&
-      movingFromCollection.isMasterTemplate &&
-      !viewingCollection.isMasterTemplate
-    ) {
-      return "You can't move pinned template items out of a template"
-    } else if (
-      cardAction === 'useTemplate' &&
-      viewingCollection.isMasterTemplate
-    ) {
-      return "You can't create a template instance inside another template. You may be intending to create or duplicate a master template into here instead."
-    } else if (
-      viewingCollection.isTestCollection ||
-      viewingCollection.isTestDesign
-    ) {
-      return "You can't move cards into a test collection"
-    }
-    return ''
-  }
-
   handleMoveToBeginning = () => {
-    this.moveCards('beginning')
+    CardMoveService.moveCards('beginning')
   }
 
   handleMoveToEnd = () => {
-    this.moveCards('end')
+    CardMoveService.moveCards('end')
   }
 
   get selectedMovingCard() {
@@ -360,53 +186,29 @@ class MoveModal extends React.Component {
 
   render() {
     const { uiStore } = this.props
-    const { position, maxWidth, maxHeight, record } = this.selectedMovingCard
-    if (!record) {
-      return null
-    }
-
-    const { internalType } = record
-    const { movingCardIds } = uiStore
+    if (!uiStore.shouldOpenMoveModal) return null
     return (
       <div>
-        {uiStore.shouldOpenMoveModal && (
-          <div>
-            <StyledSnackbar classes={{ root: 'Snackbar' }} open>
-              {this.isLoading ? (
-                <SnackbarBackground>
-                  <InlineLoader />
-                </SnackbarBackground>
-              ) : (
-                <Fragment>
-                  <StyledSnackbarContent
-                    classes={{ root: 'SnackbarContent' }}
-                    message={
-                      <StyledSnackbarText id="message-id">
-                        {this.moveMessage}
-                      </StyledSnackbarText>
-                    }
-                    action={this.snackbarActions}
-                  />
-                  <CoverRendererWrapper
-                    maxWidth={maxWidth}
-                    maxHeight={maxHeight}
-                    width={position && position.width}
-                    height={position && position.height}
-                    selectedMultiple={movingCardIds.length > 1}
-                  >
-                    <CoverRenderer
-                      card={this.selectedMovingCard}
-                      record={this.selectedMovingCard.record}
-                      cardType={internalType}
-                      nestedTextItem={null}
-                    />
-                  </CoverRendererWrapper>
-                </Fragment>
-              )}
-            </StyledSnackbar>
-            {this.moveHelper}
-          </div>
-        )}
+        <StyledSnackbar classes={{ root: 'Snackbar' }} open>
+          {uiStore.isLoadingMoveAction ? (
+            <SnackbarBackground>
+              <InlineLoader />
+            </SnackbarBackground>
+          ) : (
+            <Fragment>
+              <StyledSnackbarContent
+                classes={{ root: 'SnackbarContent' }}
+                message={
+                  <StyledSnackbarText id="message-id">
+                    {this.moveMessage}
+                  </StyledSnackbarText>
+                }
+                action={this.snackbarActions}
+              />
+            </Fragment>
+          )}
+        </StyledSnackbar>
+        {this.moveHelper}
       </div>
     )
   }

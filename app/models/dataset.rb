@@ -19,6 +19,7 @@
 #  url              :string
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
+#  application_id   :integer
 #  data_source_id   :bigint(8)
 #  organization_id  :bigint(8)
 #
@@ -29,8 +30,10 @@
 #
 
 class Dataset < ApplicationRecord
+  include Externalizable
   belongs_to :organization, optional: true
   belongs_to :data_source, polymorphic: true, optional: true
+  belongs_to :application, optional: true
 
   has_many :data_items_datasets, dependent: :destroy, inverse_of: :dataset
 
@@ -95,6 +98,7 @@ class Dataset < ApplicationRecord
 
   def data
     return cached_data if cached_data.present?
+
     []
   end
 

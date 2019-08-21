@@ -207,4 +207,19 @@ export default {
       name: 'Video',
     },
   },
+
+  defaultGridSettings: {
+    // layout will track we are at "size 3" i.e. "small 4 cols" even though cols === 4
+    layoutSize: 4,
+    cols: 4,
+    gutter: 14,
+    gridW: 316,
+    gridH: 250,
+  },
+
+  smallGridSettings: {
+    gutter: 14,
+    gridW: 253,
+    gridH: 200,
+  },
 }
