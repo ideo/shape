@@ -471,6 +471,12 @@ class RealtimeTextItem extends React.Component {
     this.channel.perform(method, data)
   }
 
+  handleKeyDown = e => {
+    if (e.key === 'Escape') {
+      this.cancel()
+    }
+  }
+
   render() {
     const { item, onExpand, fullPageView } = this.props
     // item is not fully loaded yet, e.g. from a CommentThread
@@ -507,7 +513,11 @@ class RealtimeTextItem extends React.Component {
           />
         </DockedToolbar>
         <QuillStyleWrapper>
-          <ReactQuill {...quillProps} value={this.dataContent} />
+          <ReactQuill
+            {...quillProps}
+            value={this.dataContent}
+            onKeyDown={this.handleKeyDown}
+          />
         </QuillStyleWrapper>
       </StyledContainer>
     )
