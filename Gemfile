@@ -170,7 +170,6 @@ group :test do
   gem 'fakeredis', require: 'fakeredis/rspec'
   gem 'json-schema'
   gem 'shoulda-matchers', '~> 3.1'
-  gem 'timecop'
   gem 'vcr'
   gem 'webmock'
   gem 'timecop'
