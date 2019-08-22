@@ -50,12 +50,12 @@ RSpec.describe Item::DataItem, type: :model do
     let(:collection) { create(:collection) }
     let!(:data_item) { create(:data_item, :report_type_record) }
 
-    it 'should duplicate the dataset' do
+    it 'should not duplicate the dataset' do
       expect do
         data_item.duplicate!(
           parent: collection,
         )
-      end.to change(Dataset, :count).by 1
+      end.to change(Dataset, :count).by 0
     end
   end
 
