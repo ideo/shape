@@ -13,7 +13,7 @@ RSpec.describe CardMover, type: :service do
     CardMover.new(
       from_collection: from_collection,
       to_collection: to_collection,
-      cards: cards.ordered,
+      cards: cards,
       placement: placement,
       card_action: card_action,
     )
@@ -123,6 +123,7 @@ RSpec.describe CardMover, type: :service do
 
     context 'with placement as an order number (insert cards in middle of collection)' do
       let(:placement) { 1 }
+      let(:cards) { moving_cards.ordered }
       let(:original_cards) { to_collection.collection_cards.to_a }
       before do
         # mix them around to make sure we're following `order` and not id/date
