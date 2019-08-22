@@ -421,6 +421,7 @@ export default class UiStore {
       this.templateName = name
     } else {
       this.movingCardIds.replace([...this.selectedCardIds])
+      this.deselectCards()
       this.templateName = ''
     }
   }
