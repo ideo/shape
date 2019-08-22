@@ -13,7 +13,7 @@ import {
   FooterBreak,
   FooterArea,
 } from '~/ui/global/styled/layout'
-import SearchButton from '~/ui/global/SearchButton'
+import ExpandableSearch from '~/ui/global/ExpandableSearch'
 import Panel from '~/ui/global/Panel'
 import RolesAdd from '~/ui/roles/RolesAdd'
 import RoleSelect from '~/ui/roles/RoleSelect'
@@ -325,7 +325,7 @@ class RolesMenu extends React.Component {
         />
         <StyledHeaderRow align="flex-end">
           <Heading3>{title}</Heading3>
-          <SearchButton
+          <ExpandableSearch
             value={this.state.searchText}
             onChange={this.handleSearchChange}
             onClear={this.clearSearch}

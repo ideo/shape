@@ -25,7 +25,7 @@ class SearchPage extends React.Component {
   componentDidMount() {
     const { uiStore, location } = this.props
     const query = this.searchQuery(location)
-    // initialize SearchBar to the queryString, e.g. when directly loading a search URL
+    // initialize search bar to the queryString, e.g. when directly loading a search URL
     uiStore.update('searchText', query)
 
     this.fetchData()

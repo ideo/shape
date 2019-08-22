@@ -1,7 +1,7 @@
-import SearchBar from '~/ui/layout/SearchBar'
+import SearchInput from '~/ui/layout/SearchInput'
 
 let props, wrapper, rerender
-describe('SearchBar', () => {
+describe('SearchInput', () => {
   beforeEach(() => {
     props = {
       value: '',
@@ -9,7 +9,7 @@ describe('SearchBar', () => {
       onClear: jest.fn(),
     }
     rerender = () => {
-      wrapper = shallow(<SearchBar {...props} />)
+      wrapper = shallow(<SearchInput {...props} />)
     }
     rerender()
   })
