@@ -488,6 +488,7 @@ export default class UiStore {
       }
     } else {
       this.movingCardIds.replace([...this.selectedCardIds])
+      this.deselectCards()
       this.templateName = ''
     }
   }
