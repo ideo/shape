@@ -303,6 +303,9 @@ class GridCard extends React.Component {
 
   openContextMenu = ev => {
     ev.preventDefault()
+    // for some reason, Android treats long-press as right click
+    if (uiStore.isMobile) return false
+
     const rect = this.gridCardRef.getBoundingClientRect()
     const x = ev.clientX - rect.left - rect.width * 0.95
     const y = ev.clientY - rect.top - 15

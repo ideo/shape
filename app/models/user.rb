@@ -72,30 +72,37 @@ class User < ApplicationRecord
          :rememberable, :validatable, :omniauthable,
          omniauth_providers: [:ideo]
 
-  acts_as_taggable_on(Audience::DEMOGRAPHIC_TAGS)
-
+  has_many :users_roles, dependent: :destroy
+  has_many :roles_for_collections,
+           -> { where(resource_type: 'Collection') },
+           through: :users_roles,
+           source: :role,
+           class_name: 'Role'
   has_many :collections,
-           through: :roles,
+           through: :roles_for_collections,
            source: :resource,
            source_type: 'Collection'
+  has_many :roles_for_groups,
+           -> { where(resource_type: 'Group') },
+           through: :users_roles,
+           source: :role,
+           class_name: 'Role'
   has_many :groups,
            -> { active },
-           through: :roles,
+           through: :roles_for_groups,
            source: :resource,
            source_type: 'Group'
   has_many :current_org_groups,
            ->(u) { active.where(organization_id: u.current_organization_id) },
-           through: :roles,
+           through: :roles_for_groups,
            source: :resource,
            source_type: 'Group'
+  has_many :organizations, -> { distinct }, through: :groups
+
   has_many :users_threads, dependent: :destroy
   has_many :comment_threads,
            through: :users_threads
-
-  has_many :organizations, -> { distinct }, through: :groups
-  has_many :users_roles, dependent: :destroy
   has_many :comments, foreign_key: :author_id
-
   has_many :activities_as_actor, class_name: 'Activity', inverse_of: :actor, foreign_key: :actor_id
   has_many :activities_as_subject, through: :activity_subjects, class_name: 'Activity'
   has_many :activity_subjects, as: :subject
@@ -157,7 +164,9 @@ class User < ApplicationRecord
   searchkick callbacks: false, word_start: %i[name handle email]
   after_commit :reindex
   alias searchkick_reindex reindex
-  scope :search_import, -> { where(status: %i[active pending]) }
+  scope :search_import, -> do
+    where(status: %i[active pending]).includes(:application)
+  end
 
   def search_data
     {
@@ -166,6 +175,13 @@ class User < ApplicationRecord
       email: email_search_tokens,
       status: status,
       organization_ids: organization_ids,
+      application_bot: application_bot?,
+    }
+  end
+
+  def new_search_data
+    {
+      application_bot: application_bot?,
     }
   end
 
@@ -524,6 +540,7 @@ class User < ApplicationRecord
   def last_active_at_in_org(org_id)
     date_string = last_active_at[org_id.to_s]
     return if date_string.nil?
+
     Time.parse(date_string)
   end
 

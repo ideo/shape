@@ -48,7 +48,8 @@
     "archived": { "type": ["boolean", "null"] },
     "has_link_sharing": { "type": ["boolean", "null"] },
     "is_restorable": { "type": ["boolean", "null"] },
-    "inherited_default_group_id": { "type": ["string"] }
+    "inherited_default_group_id": { "type": ["string"] },
+    "cache_key": { "type": ["string"] }
   },
   "required": ["name", "class_type", "created_at", "cover"]
 }

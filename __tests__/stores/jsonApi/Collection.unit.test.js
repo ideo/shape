@@ -1,5 +1,7 @@
 import _ from 'lodash'
-import { ReferenceType } from 'datx'
+import { runInAction } from 'mobx'
+import { ReferenceType, updateModelId } from 'datx'
+
 // apiStore must be imported first
 // or else you run into a circular dependency issue
 import { apiStore } from '~/stores'
@@ -254,6 +256,111 @@ describe('Collection', () => {
             event: 'formSubmission',
             formType: `Audience targeted with a test`,
           })
+        })
+      })
+    })
+  })
+
+  describe('API_fetchCards', () => {
+    const collectionCard_1 = new CollectionCard()
+    updateModelId(collectionCard_1, '1')
+    const collectionCard_2 = new CollectionCard()
+    updateModelId(collectionCard_2, '2')
+    const collectionCard_3 = new CollectionCard()
+    updateModelId(collectionCard_3, '3')
+
+    const fakeCollectionCardData = {
+      type: 'collection_cards',
+      attributes: {
+        order: 0,
+        parent_id: '101',
+      },
+    }
+    let requestResult = () => {
+      return {
+        data: [
+          { id: '1', ...fakeCollectionCardData },
+          { id: '2', ...fakeCollectionCardData },
+        ],
+        links: {
+          last: 5,
+        },
+      }
+    }
+    beforeEach(() => {
+      apiStore.request = jest.fn().mockImplementation(x => {
+        collection.cache_key = 'new-cache-key'
+        return Promise.resolve(requestResult())
+      })
+      collection = new Collection(
+        {
+          name: 'fakeCollection',
+          cache_key: 'old-cache-key',
+        },
+        apiStore
+      )
+      updateModelId(collection, '101')
+    })
+
+    it('should call apiStore with default params', () => {
+      collection.API_fetchCards()
+      expect(apiStore.request).toHaveBeenCalledWith(
+        `collections/${collection.id}/collection_cards?page=1&per_page=${collection.recordsPerPage}`
+      )
+    })
+
+    it('should update collection attributes accordingly', async () => {
+      // before
+      expect(collection.totalPages).toEqual(1)
+      expect(collection.cache_key).toEqual('old-cache-key')
+      expect(collection.collection_cards.length).toEqual(0)
+
+      await collection.API_fetchCards()
+      // after
+      expect(collection.totalPages).toEqual(5)
+      expect(collection.cache_key).toEqual('new-cache-key')
+      expect(collection.storedCacheKey).toEqual('new-cache-key')
+      expect(collection.collection_cards.length).toEqual(2)
+    })
+
+    describe('with cache keys', () => {
+      beforeEach(() => {
+        requestResult = () => {
+          return {
+            data: [{ id: '3', ...fakeCollectionCardData }],
+            links: {
+              last: 5,
+            },
+          }
+        }
+        runInAction(() => {
+          collection.collection_cards = [collectionCard_1, collectionCard_2]
+          collection.storedCacheKey = 'new-cache-key'
+        })
+      })
+      describe('with same cache key', () => {
+        it('should do a union of collection_cards', async () => {
+          await collection.API_fetchCards()
+          // order should be preserved as 1, 2, 3 (new data last)
+          expect(_.map(collection.collection_cards, 'id')).toEqual([
+            '1',
+            '2',
+            '3',
+          ])
+        })
+      })
+
+      describe('with new cache key', () => {
+        beforeEach(() => {
+          runInAction(() => {
+            collection.storedCacheKey = 'old-cache-key'
+          })
+        })
+
+        it('should replace collection_cards', async () => {
+          await collection.API_fetchCards()
+          // should just replace collection_cards with [2]
+          expect(_.map(collection.collection_cards, 'id')).toEqual(['3'])
         })
       })
     })

@@ -38,6 +38,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   recordsPerPage = 50
   @observable
   scrollBottom = 0
+  @observable
+  storedCacheKey = null
 
   attributesForAPI = [
     'name',
@@ -508,18 +510,22 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     runInAction(() => {
       this.totalPages = links.last
       this.currentPage = page
-      if (!this.isBoard && page === 1) {
-        // NOTE: If we ever want to "remember" collections where you've previously loaded 50+
-        // we could think about handling this differently.
+      if (page === 1 && this.storedCacheKey !== this.cache_key) {
+        this.storedCacheKey = this.cache_key
         this.collection_cards.replace(data)
-      } else if (!this.isBoard) {
-        // Just concat onto the array -- cards should already arrive in the right order
-        // e.g. `updated_at` for submissions
-        this.collection_cards = this.collection_cards.concat(data)
       } else {
-        // For foam core collections we sometimes retrieve
-        // the same card twice so we must de-dupe (using new `data` as the tiebreaker)
-        this.collection_cards = _.unionBy(data, this.collection_cards, 'id')
+        // NOTE: (potential pre-optimization) if collection_cards grows in size,
+        // at some point do we reset back to a reasonable number?
+        const newData = _.reverse(
+          // de-dupe merged data (deferring to new cards first)
+          // reverse + reverse so that new cards (e.g. page 2) are replaced first but then put back at the end
+          _.unionBy(
+            _.reverse([...data]),
+            _.reverse([...this.collection_cards]),
+            'id'
+          )
+        )
+        this.collection_cards.replace(newData)
       }
     })
   }

@@ -8,11 +8,12 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
   let(:viewer) { create(:user) }
   let(:parent) { create(:collection, num_cards: 2, organization: organization, add_viewers: [viewer]) }
   let(:user) { create(:user) }
+  let(:placement) { 'beginning' }
   let(:builder) do
     CollectionTemplateBuilder.new(
       parent: parent,
       template: template,
-      placement: 'beginning',
+      placement: placement,
       created_by: user,
     )
   end
@@ -53,6 +54,16 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
 
     it 'should tag the collection instance with the template name' do
       expect(instance.owned_tag_list).to include(template.name.parameterize)
+    end
+
+    context 'with integer order placement' do
+      let(:placement) { 1 }
+
+      it 'should place the collection in the parent collection at the right order' do
+        instance # evaluate builder.call
+        parent.reload
+        expect(parent.primary_collection_cards.second.record).to eq instance
+      end
     end
 
     context 'when parent is a master_template' do

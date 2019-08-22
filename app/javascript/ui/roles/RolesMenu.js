@@ -24,6 +24,11 @@ function sortUserOrGroup(a, b) {
   return a.entity.name.localeCompare(b.entity.name)
 }
 
+const roleTypes = type => {
+  if (type === 'groups') return ['member', 'admin']
+  return ['editor', 'viewer']
+}
+
 @inject('apiStore', 'routingStore')
 @observer
 class RolesMenu extends React.Component {
@@ -239,6 +244,59 @@ class RolesMenu extends React.Component {
     return currentUser.id !== entity.id
   }
 
+  get renderEntities() {
+    const { canEdit, record, submissionBox, ownerType } = this.props
+    const { groupsByStatus } = this.state
+
+    const showEntity = (entity, role) => {
+      // content_editor is a "hidden" role for now
+      return role.name !== 'content_editor'
+    }
+
+    return groupsByStatus.map(group => {
+      const { panelTitle, entities, count, status } = group
+      if (entities.length === 0) return null
+
+      return (
+        <Panel
+          key={panelTitle}
+          title={`${panelTitle} (${count})`}
+          open={status !== 'pending'}
+        >
+          <React.Fragment>
+            {entities.map(
+              combined =>
+                showEntity(combined.entity, combined.role) && (
+                  <RoleSelect
+                    enabled={
+                      canEdit &&
+                      this.notCurrentUser(combined.entity, combined.role)
+                    }
+                    key={`${combined.entity.id}_${combined.entity.internalType}_r${combined.role.id}`}
+                    record={record}
+                    role={combined.role}
+                    roleTypes={roleTypes(ownerType)}
+                    roleLabels={submissionBox ? { viewer: 'participant' } : {}}
+                    entity={combined.entity}
+                    onDelete={this.deleteRoles}
+                    onCreate={this.createRoles}
+                  />
+                )
+            )}
+            {entities.length < count && (
+              <ShowMoreButton
+                disabled={this.loadingMore}
+                onClick={this.nextPage(status)}
+              >
+                {this.loadingMore ? 'Loading...' : 'Show more...'}
+              </ShowMoreButton>
+            )}
+          </React.Fragment>
+        </Panel>
+      )
+    })
+  }
+
   render() {
     const {
       record,
@@ -250,14 +308,13 @@ class RolesMenu extends React.Component {
       submissionBox,
     } = this.props
 
-    const { groups, groupsByStatus } = this.state
-
-    const roleTypes =
-      ownerType === 'groups' ? ['member', 'admin'] : ['editor', 'viewer']
+    const { groups } = this.state
 
     // ability to restrict the selection to only one role type
     // e.g. "admin" is the only selection for Org Admins group
-    const addRoleTypes = fixedRole ? [fixedRole] : roleTypes
+    const addRoleTypes = fixedRole ? [fixedRole] : roleTypes(ownerType)
+
+    const editableGroups = groups.filter(group => group.can_edit)
 
     return (
       <Fragment>
@@ -274,53 +331,7 @@ class RolesMenu extends React.Component {
             onClear={this.clearSearch}
           />
         </StyledHeaderRow>
-        <ScrollArea>
-          {groupsByStatus.map(group => {
-            const { panelTitle, entities, count, status } = group
-            if (entities.length === 0) return null
-
-            return (
-              <Panel
-                key={panelTitle}
-                title={`${panelTitle} (${count})`}
-                open={status !== 'pending'}
-              >
-                <React.Fragment>
-                  {entities.map(
-                    combined =>
-                      // NOTE: content_editor is a "hidden" role for now
-                      combined.role.name !== 'content_editor' && (
-                        <RoleSelect
-                          enabled={
-                            canEdit &&
-                            this.notCurrentUser(combined.entity, combined.role)
-                          }
-                          key={`${combined.entity.id}_${combined.entity.internalType}_r${combined.role.id}`}
-                          record={record}
-                          role={combined.role}
-                          roleTypes={roleTypes}
-                          roleLabels={
-                            submissionBox ? { viewer: 'participant' } : {}
-                          }
-                          entity={combined.entity}
-                          onDelete={this.deleteRoles}
-                          onCreate={this.createRoles}
-                        />
-                      )
-                  )}
-                  {entities.length < count && (
-                    <ShowMoreButton
-                      disabled={this.loadingMore}
-                      onClick={this.nextPage(status)}
-                    >
-                      {this.loadingMore ? 'Loading...' : 'Show more...'}
-                    </ShowMoreButton>
-                  )}
-                </React.Fragment>
-              </Panel>
-            )
-          })}
-        </ScrollArea>
+        <ScrollArea>{this.renderEntities}</ScrollArea>
         {canEdit && (
           <Fragment>
             <Row>
@@ -334,7 +345,7 @@ class RolesMenu extends React.Component {
                 onCreateRoles={this.createRoles}
                 onCreateUsers={this.onCreateUsers}
                 ownerType={ownerType}
-                addableGroups={groups}
+                addableGroups={editableGroups}
                 defaultGroupId={record.inherited_default_group_id}
               />
             </FooterArea>

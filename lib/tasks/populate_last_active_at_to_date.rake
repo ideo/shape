@@ -1,7 +1,7 @@
 namespace :last_active_at do
   desc 'Populate users with new last_active_at format (now with multiple orgs!)'
   task populate: :environment do
-      User.active.includes(:organizations).find_each do |user|
+      User.active.includes(:organizations).find_each(batch_size: 350) do |user|
         org_to_timestamps = {}
         p "Updating organization timestamps for user"
         user.organizations.each do |org|

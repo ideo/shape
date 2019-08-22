@@ -79,7 +79,7 @@ class CollectionTemplateBuilder
         @collection_card_params,
       )
       card = @parent.primary_collection_cards.create(card_params)
-      card.increment_card_orders! if @placement == 'beginning'
+      card.increment_card_orders! if @placement != 'end'
     end
     @collection.recalculate_breadcrumb!
   end

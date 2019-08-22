@@ -169,7 +169,6 @@ class CollectionPage extends React.Component {
       uiStore.popupSnackbar({ message })
     }
     uiStore.update('dragTargets', [])
-    this.restoreWindowScrollPosition()
   }
 
   restoreWindowScrollPosition() {
@@ -178,9 +177,17 @@ class CollectionPage extends React.Component {
     const linkedBreadCrumbTrail = previousViewingRecord
       ? uiStore.linkedBreadcrumbTrailForRecord(previousViewingRecord)
       : []
-    const isComingFromViewingRecordBreadcrumb = _.find(linkedBreadCrumbTrail, {
+    let isComingFromViewingRecordBreadcrumb = _.find(linkedBreadCrumbTrail, {
       id: collection.id,
     })
+    if (
+      collection.isUserCollection &&
+      previousViewingRecord &&
+      previousViewingRecord.inMyCollection
+    ) {
+      // we went from a record in my collection -> My Collection
+      isComingFromViewingRecordBreadcrumb = true
+    }
     const {
       toPathScrollY,
       history,
@@ -196,6 +203,7 @@ class CollectionPage extends React.Component {
       action === 'POP' ||
       isComingFromViewingRecordBreadcrumb ||
       returningFromSearch
+
     if (shouldScrollToOriginalPosition) {
       scroll.scrollTo(originalScrollY, { duration: 200 })
     } else {
