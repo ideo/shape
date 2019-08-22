@@ -107,7 +107,7 @@ class CollectionCard < ApplicationRecord
 
     customize(lambda { |orig_card, dup_card|
       end_collection = dup_card.parent
-      dup_card.is_cover = false if end_collection.cached['no_cover'] == true
+      dup_card.is_cover = false if end_collection.cached_cover.try(:[], 'no_cover') == true
       dup_card.is_cover = false if end_collection.collection_cards.is_cover.count.positive?
     })
   end

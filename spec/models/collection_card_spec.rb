@@ -183,7 +183,7 @@ RSpec.describe CollectionCard, type: :model do
     let!(:collection_card) { create(:collection_card_text) }
     let(:shallow) { false }
     let(:duplicate_linked_records) { false }
-    let(:parent) { nil }
+    let(:parent) { collection_card.parent }
     let(:placement) { 'end' }
     let(:system_collection) { false }
     let(:duplicate) do
