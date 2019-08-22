@@ -105,10 +105,9 @@ class GlobalSearch extends React.Component {
       <div>
         <SearchButton
           background="white"
-          defaultOpen={this.open}
+          defaultOpen={routingStore.pathContains('/search')}
           open={this.open}
           controlled={true}
-          focused={routingStore.pathContains('/search')}
           value={this.searchText}
           onChange={this.handleTextChange}
           onClear={this.clearSearch}
