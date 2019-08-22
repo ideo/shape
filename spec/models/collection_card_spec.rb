@@ -183,11 +183,13 @@ RSpec.describe CollectionCard, type: :model do
     let!(:collection_card) { create(:collection_card_text) }
     let(:shallow) { false }
     let(:duplicate_linked_records) { false }
+    let(:parent) { nil }
     let(:placement) { 'end' }
     let(:system_collection) { false }
     let(:duplicate) do
       collection_card.duplicate!(
         for_user: user,
+        parent: parent,
         shallow: shallow,
         placement: placement,
         duplicate_linked_records: duplicate_linked_records,
@@ -210,6 +212,23 @@ RSpec.describe CollectionCard, type: :model do
     it 'should not call increment_card_orders!' do
       expect_any_instance_of(CollectionCard).not_to receive(:increment_card_orders!)
       duplicate
+    end
+
+    context 'when copying into a collection with no cover set' do
+      let(:parent) { create(:collection, cached_cover: { 'no_cover': true }) }
+
+      it 'should nullify the is cover attribute' do
+        expect(duplicate.is_cover).to be false
+      end
+    end
+
+    context 'when copying into a collection with an existing cover' do
+      let(:parent) { create(:collection, cached_cover: { 'no_cover': true }) }
+      let(:cover) { create(:collection_card, parent: parent, is_cover: true) }
+
+      it 'should nullify the is cover attribute' do
+        expect(duplicate.is_cover).to be false
+      end
     end
 
     context 'without user' do
