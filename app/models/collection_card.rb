@@ -105,11 +105,6 @@ class CollectionCard < ApplicationRecord
     # don't recognize any relations, easiest way to turn them all off
     recognize []
 
-    customize(lambda { |orig_card, dup_card|
-      end_collection = dup_card.parent
-      dup_card.is_cover = false if end_collection.cached_cover.try(:[], 'no_cover') == true
-      dup_card.is_cover = false if end_collection.collection_cards.is_cover.count.positive?
-    })
   end
 
   def self.default_relationships_for_api
@@ -176,6 +171,11 @@ class CollectionCard < ApplicationRecord
     elsif placement.is_a? Integer
       cc.order = placement
     end
+
+    # Nullify is_cover if the collection going into already has a cover or
+    # should specifically not have a cover.
+    cc.is_cover = false if parent.cached_cover.try(:[], 'no_cover') == true
+    cc.is_cover = false if parent.collection_cards.is_cover.count.positive?
 
     unless shallow || link?
       opts = {

@@ -217,6 +217,10 @@ RSpec.describe CollectionCard, type: :model do
     context 'when copying into a collection with no cover set' do
       let(:parent) { create(:collection, cached_cover: { 'no_cover': true }) }
 
+      before do
+        collection_card.update(is_cover: true)
+      end
+
       it 'should nullify the is cover attribute' do
         expect(duplicate.is_cover).to be false
       end
@@ -226,8 +230,24 @@ RSpec.describe CollectionCard, type: :model do
       let(:parent) { create(:collection, cached_cover: { 'no_cover': true }) }
       let(:cover) { create(:collection_card, parent: parent, is_cover: true) }
 
+      before do
+        collection_card.update(is_cover: true)
+      end
+
       it 'should nullify the is cover attribute' do
         expect(duplicate.is_cover).to be false
+      end
+    end
+
+    context 'when copying a cover card into a collection' do
+      let(:parent) { create(:collection) }
+
+      before do
+        collection_card.update(is_cover: true)
+      end
+
+      it 'should keep the is_cover attribute' do
+        expect(duplicate.is_cover).to be true
       end
     end
 
