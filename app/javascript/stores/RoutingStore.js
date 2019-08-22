@@ -63,8 +63,11 @@ class RoutingStore extends RouterStore {
       case 'search':
         // `id` means query in this case
         const path = `/${this.slug()}/search`
-        const qs = id ? `?q=${encodeURIComponent(id)}` : ''
-        return `${path}${qs}&${stringifyUrlParams(params)}`
+        const queryString = id ? `?q=${encodeURIComponent(id)}` : ''
+        if (queryString.length > 0) {
+          return `${path}${queryString}&${stringifyUrlParams(params)}`
+        }
+        return path
       case 'admin':
         return '/admin'
       case 'homepage':

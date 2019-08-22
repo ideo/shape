@@ -123,40 +123,49 @@ RSpec.describe CardMover, type: :service do
 
     context 'with placement as an order number (insert cards in middle of collection)' do
       let(:placement) { 1 }
+      let(:cards) { moving_cards.ordered }
+      let(:original_cards) { to_collection.collection_cards.to_a }
+      before do
+        # mix them around to make sure we're following `order` and not id/date
+        original_cards[0].update_columns(order: 0)
+        original_cards[2].update_columns(order: 1)
+        original_cards[1].update_columns(order: 2)
+        moving_cards[1].update_columns(order: 0)
+        moving_cards[2].update_columns(order: 1)
+        moving_cards[0].update_columns(order: 2)
+      end
 
-      it 'should place the moved cards in the middle of the collection' do
-        original_cards = to_collection.collection_cards.to_a
+      it 'should place the moved cards in the middle of the collection, preserving their order' do
         card_mover.call
-        expect(to_collection.reload.collection_cards.map(&:id)).to match_array([
+        expect(to_collection.reload.collection_cards.map(&:id)).to eq([
           # 3 cards so order '1' should be in the middle
-          # before: [0, 1, 2]
-          # after: [0, x, x, x, 1, 2]
+          # before: [0, 2, 1]
+          # after: [0, x, x, x, 2, 1]
           original_cards[0].id,
-          moving_cards[0].id,
           moving_cards[1].id,
           moving_cards[2].id,
-          original_cards[1].id,
+          moving_cards[0].id,
           original_cards[2].id,
+          original_cards[1].id,
         ])
       end
 
       context 'with pinned cards' do
         before do
           # update first 2 cards to be pinned
-          to_collection.collection_cards.limit(2).update_all(pinned: true)
+          to_collection.reload.collection_cards.limit(2).update_all(pinned: true)
         end
 
         it 'should place the moved cards in the middle of the collection' do
-          original_cards = to_collection.collection_cards.to_a
           card_mover.call
-          expect(to_collection.reload.collection_cards.map(&:id)).to match_array([
+          expect(to_collection.reload.collection_cards.map(&:id)).to eq([
             original_cards[0].id,
             # even though we use placement: 1, the first two cards are pinned
-            original_cards[1].id,
-            moving_cards[0].id,
+            original_cards[2].id,
             moving_cards[1].id,
             moving_cards[2].id,
-            original_cards[2].id,
+            moving_cards[0].id,
+            original_cards[1].id,
           ])
         end
       end
