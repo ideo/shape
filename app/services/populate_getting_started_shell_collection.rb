@@ -15,12 +15,8 @@ class PopulateGettingStartedShellCollection < SimpleService
   end
 
   def duplicate_cards
-    CollectionCardDuplicator.call(
-      to_collection: @collection,
-      cards: @cloned_from.collection_cards,
-      placement: 'beginning',
-      for_user: @for_user,
-      system_collection: true,
-    )
+    # todo: test this
+    collection_card_duplicator = CollectionCardDuplicator.new(to_collection: @collection, cards: @cloned_from.collection_cards, placement: 'beginning', for_user: @for_user)
+    collection_card_duplicator.duplicate_system_collection
   end
 end

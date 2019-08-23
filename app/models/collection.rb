@@ -340,7 +340,6 @@ class Collection < ApplicationRecord
     system_collection: false,
     synchronous: false
   )
-
     # check if we are cloning a template inside a template instance;
     # - this means we should likewise turn the template dup into its own instance
     if master_template? && building_template_instance
@@ -393,18 +392,12 @@ class Collection < ApplicationRecord
     c.enable_org_view_access_if_allowed(parent)
 
     if collection_cards.any? && !c.getting_started_shell
-      worker_opts = [
-        collection_cards.map(&:id),
-        c.id,
-        for_user.try(:id),
-        system_collection,
-        synchronous,
-      ]
-      if synchronous
-        CollectionCardDuplicationWorker.new.perform(*worker_opts)
-      else
-        CollectionCardDuplicationWorker.perform_async(*worker_opts)
-      end
+      collection_card_duplicator = CollectionCardDuplicator.new(
+        to_collection: c,
+        cards: @cards,
+        for_user: for_user,
+      )
+      collection_card_duplicator.duplicate_child_collection_cards(system_collection, synchronous)
     end
 
     # pick up newly created relationships
