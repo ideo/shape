@@ -6,7 +6,7 @@ import v from '~/utils/variables'
 import SearchIcon from '~/ui/icons/SearchIcon'
 import CloseIcon from '~/ui/icons/CloseIcon'
 
-const StyledExpandableSearch = styled.div`
+const StyledExpandableSearchInput = styled.div`
   border-radius: 20px;
   background: ${props => props.background};
   position: relative;
@@ -78,10 +78,10 @@ const StyledExpandableSearch = styled.div`
     }
   }
 `
-StyledExpandableSearch.displayName = 'StyledExpandableSearch'
+StyledExpandableSearchInput.displayName = 'StyledExpandableSearchInput'
 
 @observer
-class ExpandableSearch extends React.Component {
+class ExpandableSearchInput extends React.Component {
   @observable
   open = false
 
@@ -130,7 +130,7 @@ class ExpandableSearch extends React.Component {
     const { value, background } = this.props
     const { open } = this
     return (
-      <StyledExpandableSearch open={open} background={background}>
+      <StyledExpandableSearchInput open={open} background={background}>
         <button className="search" onClick={this.handleOpen(true)}>
           <SearchIcon />
         </button>
@@ -146,12 +146,12 @@ class ExpandableSearch extends React.Component {
         <button open={open} onClick={this.handleClose} className="close">
           <CloseIcon />
         </button>
-      </StyledExpandableSearch>
+      </StyledExpandableSearchInput>
     )
   }
 }
 
-ExpandableSearch.propTypes = {
+ExpandableSearchInput.propTypes = {
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   onClear: PropTypes.func.isRequired,
@@ -162,7 +162,7 @@ ExpandableSearch.propTypes = {
   open: PropTypes.bool,
 }
 
-ExpandableSearch.defaultProps = {
+ExpandableSearchInput.defaultProps = {
   defaultOpen: false,
   forceClose: false,
   background: v.colors.commonLightest,
@@ -171,4 +171,4 @@ ExpandableSearch.defaultProps = {
   open: false,
 }
 
-export default ExpandableSearch
+export default ExpandableSearchInput

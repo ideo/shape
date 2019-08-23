@@ -9,7 +9,7 @@ import LeaveIcon from '~/ui/icons/LeaveIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import SettingsIcon from '~/ui/icons/SettingsIcon'
-import SearchInput from '~/ui/layout/SearchInput'
+import SearchInput from '~/ui/global/SearchInput'
 
 export const CONTEXT_USER = 'user'
 export const CONTEXT_ORG = 'org'

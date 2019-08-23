@@ -1,7 +1,7 @@
-import SearchInput from '~/ui/layout/SearchInput'
+import ExpandableSearchInput from '~/ui/global/ExpandableSearchInput'
 
-let props, wrapper, rerender
-describe('SearchInput', () => {
+let props, wrapper, rerender, component
+describe('ExpandableSearchInput', () => {
   beforeEach(() => {
     props = {
       value: '',
@@ -9,12 +9,12 @@ describe('SearchInput', () => {
       onClear: jest.fn(),
     }
     rerender = () => {
-      wrapper = shallow(<SearchInput {...props} />)
+      wrapper = shallow(<ExpandableSearchInput {...props} />)
     }
     rerender()
   })
 
-  describe('render()', () => {
+  describe('render', () => {
     it('renders the search icon', () => {
       expect(wrapper.find('SearchIcon').exists()).toBeTruthy()
     })
@@ -26,7 +26,7 @@ describe('SearchInput', () => {
     })
   })
 
-  describe('clearSearch()', () => {
+  describe('clearSearch', () => {
     const fakeEv = { preventDefault: jest.fn() }
     beforeEach(() => {
       props.value = 'something'
@@ -39,7 +39,19 @@ describe('SearchInput', () => {
     })
   })
 
-  describe('onSearching', () => {
+  describe('handleOpen on click', () => {
+    it('sets this.open = true', () => {
+      component = wrapper.instance()
+      expect(component.open).toEqual(false)
+      wrapper.find('button.search').simulate('click')
+      expect(component.open).toEqual(true)
+      expect(wrapper.find('StyledExpandableSearchInput').prop('open')).toEqual(
+        true
+      )
+    })
+  })
+
+  describe('handleTextChange', () => {
     const value = 'test'
 
     beforeEach(() => {
