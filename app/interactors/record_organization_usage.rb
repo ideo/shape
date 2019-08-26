@@ -3,6 +3,7 @@ class RecordOrganizationUsage
   include Interactor::Schema
 
   schema :organization,
+         # these get added by underlying services
          :active_users_initial_count,
          :billable_users_count
 

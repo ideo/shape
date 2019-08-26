@@ -14,7 +14,7 @@ class CollectionCardDuplicationWorker
 
     @new_cards = []
     collection_cards = CollectionCard.active.where(id: card_ids).ordered
-    # fixme: ActiveRecord::RecordNotFound: Couldn't find Collection without an ID
+    # FIXME: ActiveRecord::RecordNotFound: Couldn't find Collection without an ID
     # when duplicating collections with child collections
     @current_user = User.find(for_user_id) if for_user_id.present?
     @to_collection = Collection.find(parent_collection_id)

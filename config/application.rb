@@ -36,6 +36,7 @@ module Shape
     # -- all .rb files in that directory are automatically loaded.
 
     config.autoload_paths << "#{config.root}/app/interactors"
+    config.autoload_paths << "#{config.root}/app/interactors/**/*"
 
     # ActionCable settings
     config.action_cable.url = ENV.fetch('ACTION_CABLE_URL') { 'ws://localhost:3000/cable' }

@@ -44,19 +44,6 @@ class Api::V1::ItemsController < Api::V1::BaseController
     end
   end
 
-  def duplicate
-    duplicate = @item.duplicate!(
-      for_user: current_user,
-      copy_parent_card: true,
-      parent: current_user.current_user_collection,
-    )
-    if duplicate.persisted?
-      render jsonapi: duplicate, include: [:parent], expose: { current_record: @item }
-    else
-      render_api_errors duplicate.errors
-    end
-  end
-
   def archive
     if @item.archive!
       CollectionUpdateBroadcaster.call(@item.parent, current_user)

@@ -71,6 +71,8 @@ GEM
       activemodel (= 5.2.3)
       activesupport (= 5.2.3)
       arel (>= 9.0)
+    activerecord-import (1.0.2)
+      activerecord (>= 3.2)
     activestorage (5.2.3)
       actionpack (= 5.2.3)
       activerecord (= 5.2.3)
@@ -583,6 +585,7 @@ DEPENDENCIES
   aasm (~> 5.0)
   action-cable-testing
   active_record_query_trace
+  activerecord-import
   acts-as-taggable-on (~> 6.0.0)
   amoeba
   annotate

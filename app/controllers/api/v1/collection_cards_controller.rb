@@ -149,14 +149,13 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   before_action :check_valid_duplication, only: %i[duplicate]
   def duplicate
-    @from_collection = Collection.find(json_api_params[:from_id])
     collection_card_duplicator = CollectionCardDuplicator.new(
       to_collection: @to_collection,
       cards: @cards,
       for_user: current_user,
     )
     collection_card_duplicator.duplicate_current_cards(@from_collection)
-    # todo: test this
+    # TODO: test this
     render jsonapi: @to_collection.reload,
            include: Collection.default_relationships_for_api,
            expose: { current_record: @to_collection }

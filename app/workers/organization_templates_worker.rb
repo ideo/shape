@@ -113,6 +113,7 @@ class OrganizationTemplatesWorker
   def create_org_getting_started_collection
     return if @organization.getting_started_collection.present?
 
+    # TODO: change this to literally call duplicate on the parent instead of `copy_parent_card: true`
     getting_started_collection = @original_getting_started_collection.duplicate!(
       copy_parent_card: true,
       parent: @organization.template_collection,

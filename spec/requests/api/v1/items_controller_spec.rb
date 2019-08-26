@@ -223,25 +223,6 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
     end
   end
 
-  describe 'POST #duplicate', create_org: true do
-    let!(:item) { create(:text_item, add_editors: [user]) }
-    let(:path) { "/api/v1/items/#{item.id}/duplicate" }
-
-    it 'returns a 200' do
-      post(path)
-      expect(response.status).to eq(200)
-    end
-
-    it 'creates new item' do
-      expect { post(path) }.to change(Item, :count).by(1)
-    end
-
-    it 'returns new item' do
-      post(path)
-      expect(json['data']['attributes']['id']).not_to eq(item.id)
-    end
-  end
-
   describe 'PATCH #restore_permissions' do
     let!(:collection) { create(:collection) }
     let(:path) { "/api/v1/items/#{item.id}/restore_permissions" }
