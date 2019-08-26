@@ -77,6 +77,8 @@ Rails.application.routes.draw do
           patch 'replace'
           patch 'update'
           delete 'destroy'
+          patch 'vote'
+          patch 'unvote'
         end
         collection do
           patch 'move'

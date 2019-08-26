@@ -24,6 +24,7 @@
 #  test_status                :integer
 #  type                       :string
 #  unarchived_at              :datetime
+#  voting_enabled             :boolean          default(FALSE)
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
 #  cloned_from_id             :bigint(8)

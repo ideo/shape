@@ -38,6 +38,7 @@
 
 class CollectionCard < ApplicationRecord
   include Archivable
+  include Votable
 
   DEFAULT_PER_PAGE = 50
   paginates_per DEFAULT_PER_PAGE

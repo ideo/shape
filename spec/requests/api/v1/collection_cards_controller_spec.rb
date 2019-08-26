@@ -1146,4 +1146,56 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
   end
+
+  describe 'PUT #vote' do
+    let(:collection_card) { create(:collection_card_text, parent: collection) }
+    let(:path) { vote_api_v1_collection_card_path(collection_card) }
+
+    before do
+      user.add_role(Role::EDITOR, collection_card.item)
+    end
+
+    it 'returns a 204' do
+      patch(path)
+      expect(response.status).to eq(204)
+    end
+
+    it 'creates a Vote' do
+      expect {
+        patch(path)
+      }.to change(collection_card.votes, :count).by(1)
+    end
+
+    context 'with vote existing' do
+      before do
+        collection_card.vote!(user)
+      end
+
+      it 'does not create another vote' do
+        expect {
+          patch(path)
+        }.not_to change(collection_card.votes, :count)
+      end
+    end
+  end
+
+  describe 'PUT #unvote' do
+    let(:collection_card) { create(:collection_card_text, parent: collection) }
+    let(:path) { unvote_api_v1_collection_card_path(collection_card) }
+    let!(:vote) { create(:vote, votable: collection_card, user: user) }
+    before do
+      user.add_role(Role::EDITOR, collection_card.item)
+    end
+
+    it 'returns a 204' do
+      patch(path)
+      expect(response.status).to eq(204)
+    end
+
+    it 'deletes vote' do
+      expect {
+        patch(path)
+      }.to change(collection_card.votes, :count).by(-1)
+    end
+  end
 end

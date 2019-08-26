@@ -163,6 +163,24 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
            expose: { current_record: @to_collection }
   end
 
+  def vote
+    if @collection_card.vote!(current_user.id)
+      broadcast_collection_updated
+      head :no_content
+    else
+      render_api_errors @collection_card.errors
+    end
+  end
+
+  def unvote
+    if @collection_card.unvote!(current_user.id)
+      broadcast_collection_updated
+      head :no_content
+    else
+      render_api_errors @collection_card.errors
+    end
+  end
+
   private
 
   def check_cache
@@ -299,6 +317,10 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       CollectionUpdateBroadcaster.call(@from_collection, current_user)
     end
     CollectionUpdateBroadcaster.call(@to_collection, current_user)
+  end
+
+  def broadcast_collection_updated
+    CollectionUpdateBroadcaster.call(@collection, current_user)
   end
 
   def broadcast_collection_create_updates
