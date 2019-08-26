@@ -37,6 +37,7 @@ import {
   StyledGridCardInner,
   StyledTopRightActions,
 } from './shared'
+import VotingArea from '~/ui/grid/VotingArea'
 
 @observer
 class GridCard extends React.Component {
@@ -556,6 +557,9 @@ class GridCard extends React.Component {
           this.renderTopRightActions()}
         {this.renderIcon}
         {this.renderHidden}
+        <VotingArea
+        // voteCount={voteCountForCard}
+        />
         {/* onClick placed here so it's separate from hotspot click */}
         <StyledGridCardInner
           onClick={this.handleClick}
