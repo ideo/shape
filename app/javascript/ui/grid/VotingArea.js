@@ -9,6 +9,73 @@ import v from '~/utils/variables'
 //   return <StyledVoteAreaDots>+ {numVotes}</StyledVoteAreaDots>
 // }
 
+const StyledGrowingDotWrapper = styled.div`
+  position: absolute;
+  z-index: 150;
+  bottom: 0.5rem;
+  left: 40%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
+
+const StyledVoteAreaGrowingDot = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 100%;
+  height: ${props => calculateSizeBy(props.numVotes)};
+  width: ${props => calculateSizeBy(props.numVotes)};
+  background: ${v.colors.primaryLight};
+
+  div {
+    max-width: 90%;
+  }
+`
+
+const StyledVoteButton = styled.div`
+  border-radius: 0.25rem;
+  border: 1px ${v.colors.white};
+  padding: 0.25rem;
+  margin-left: 0.5rem;
+  background: ${props =>
+    props.userHasVoted ? v.colors.alert : v.colors.ctaPrimary};
+
+  &:hover {
+    opacity: 0.9;
+    border: 1px solid ${v.colors.primaryLight};
+  }
+`
+
+const VoteAreaGrowingDot = ({ numVotes, userHasVoted, toggleVote }) => {
+  return (
+    <StyledGrowingDotWrapper>
+      {numVotes > 0 && (
+        <StyledVoteAreaGrowingDot
+          userHasVoted={userHasVoted}
+          numVotes={numVotes}
+        >
+          <div>{numVotes}</div>
+        </StyledVoteAreaGrowingDot>
+      )}
+      <StyledVoteButton
+        userHasVoted={userHasVoted}
+        onClick={toggleVote}
+        role="button"
+      >
+        {userHasVoted ? 'Unvote' : 'Vote'}
+      </StyledVoteButton>
+    </StyledGrowingDotWrapper>
+  )
+}
+VoteAreaGrowingDot.propTypes = {
+  numVotes: PropTypes.number.isRequired,
+  userHasVoted: PropTypes.bool.isRequired,
+  toggleVote: PropTypes.func.isRequired,
+}
+
 const StyledVoteAreaButton = styled.div`
   position: absolute;
   z-index: 150;
@@ -24,11 +91,6 @@ const StyledVoteAreaButton = styled.div`
 
   &:hover {
     border-color: ${v.colors.black};
-  }
-
-  &.selected {
-    border-color: ${v.colors.commonMedium};
-    background-color: ${v.colors.commonMedium};
   }
 `
 StyledVoteAreaButton.displayName = 'StyledVoteAreaButton'
@@ -48,6 +110,11 @@ VoteAreaButton.propTypes = {
   toggleVote: PropTypes.func.isRequired,
 }
 
+const calculateSizeBy = votes => {
+  const number = 20 + votes * 2.5
+  return `${number}px`
+}
+
 @inject('uiStore')
 @observer
 class VoteArea extends React.Component {
@@ -62,7 +129,7 @@ class VoteArea extends React.Component {
     const { user_has_voted, num_votes } = card
 
     return (
-      <VoteAreaButton
+      <VoteAreaGrowingDot
         userHasVoted={user_has_voted}
         numVotes={num_votes}
         toggleVote={this.toggleVote}
