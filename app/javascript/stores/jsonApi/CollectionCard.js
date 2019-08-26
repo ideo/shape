@@ -391,6 +391,22 @@ class CollectionCard extends BaseRecord {
     }
     return false
   }
+
+  async API_toggleVote() {
+    const action = this.user_has_voted ? 'unvote' : 'vote'
+    if (action === 'vote') {
+      this.num_votes++
+      this.user_has_voted = true
+    } else {
+      this.num_votes--
+      this.user_has_voted = false
+    }
+
+    await this.apiStore.request(
+      `collection_cards/${this.id}/${action}`,
+      'PATCH'
+    )
+  }
 }
 
 export default CollectionCard

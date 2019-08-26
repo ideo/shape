@@ -2,7 +2,7 @@ class SerializableCollectionCard < BaseJsonSerializer
   type 'collection_cards'
   attributes :order, :width, :height, :parent_id, :pinned,
              :image_contain, :card_question_type, :is_cover, :filter, :hidden,
-             :show_replace, :updated_at, :col, :row, :num_votes
+             :show_replace, :updated_at, :col, :row, :num_votes, :user_has_voted
 
   attribute :link do
     @object.is_a? CollectionCard::Link
@@ -18,6 +18,10 @@ class SerializableCollectionCard < BaseJsonSerializer
 
   attribute :is_master_template_card do
     @object.master_template_card?
+  end
+
+  attribute :user_has_voted do
+    @object.user_has_voted?(@current_user)
   end
 
   belongs_to :item

@@ -1,7 +1,5 @@
-import PropTypes from 'prop-types'
-import { inject, observer } from 'mobx-react'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-
 import v from '~/utils/variables'
 
 const StyledVoteArea = styled.div`
@@ -11,7 +9,8 @@ const StyledVoteArea = styled.div`
   left: 40%;
   border: 2px solid ${v.colors.commonMedium};
   border-radius: 0.25rem;
-  background: orange;
+  background: ${props =>
+    props.userHasVoted ? v.colors.alert : v.colors.primaryLight};
   height: 1rem;
   padding: 0.25rem;
   width: 4rem;
@@ -30,24 +29,28 @@ StyledVoteArea.displayName = 'StyledVotingArea'
 @inject('uiStore')
 @observer
 class VoteArea extends React.Component {
+  toggleVote = e => {
+    e.stopPropagation()
+    const { card } = this.props
+    return card.API_toggleVote()
+  }
+
   render() {
-    const { voteCount } = this.props
-    if (!voteCount || parseInt(voteCount) < 1) return null
+    const { card } = this.props
+    // const { user_has_voted, num_votes } = card
 
     return (
-      <StyledVoteArea>
-        <div>+{voteCount} votes</div>
+      <StyledVoteArea userHasVoted={card.user_has_voted}>
+        <div onClick={this.toggleVote} role="button">
+          +{card.num_votes} votes
+        </div>
       </StyledVoteArea>
     )
   }
 }
 
 VoteArea.propTypes = {
-  voteCount: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-}
-
-VoteArea.defaultProps = {
-  voteCount: 0,
+  card: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 // to override the long 'injected-xxx' name

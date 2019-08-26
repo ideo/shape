@@ -534,6 +534,7 @@ class MovableGridCard extends React.PureComponent {
       maxResizeCol,
       zoomLevel,
       showHotEdge,
+      parent,
     } = this.props
 
     let {
@@ -761,6 +762,7 @@ class MovableGridCard extends React.PureComponent {
               draggingMultiple={draggingMultiple}
               hoveringOver={hoveringOverRight}
               zoomLevel={zoomLevel}
+              votingEnabled={parent.voting_enabled}
             />
           </InnerCardWrapper>
         </Rnd>

@@ -320,7 +320,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def broadcast_collection_updated
-    CollectionUpdateBroadcaster.call(@collection, current_user)
+    @collection ||= @collection_card.parent
+    CollectionUpdateBroadcaster.call(@collection)
   end
 
   def broadcast_collection_create_updates
