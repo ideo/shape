@@ -195,6 +195,7 @@ class Header extends React.Component {
             onLeave={this.closeMenu}
             onMoveMenu={this.routeBack}
             afterArchive={this.routeBack}
+            votingEnabled={record.voting_enabled}
             offsetPosition={headerMenuOffsetPosition}
           />
         </IconAvatar>

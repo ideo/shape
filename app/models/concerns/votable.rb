@@ -10,20 +10,10 @@ module Votable
   end
 
   def vote!(user_id)
-    vote_scope(user_id).first_or_create
+    votes.where(user_id: user_id).first_or_create
   end
 
   def unvote!(user_id)
-    vote_scope(user_id).first&.destroy
-  end
-
-  private
-
-  def vote_scope(user_id)
-    Vote.where(
-      votable_type: self.class.base_class.name,
-      votable_id: id,
-      user_id: user_id
-    )
+    votes.where(user_id: user_id).first&.destroy
   end
 end

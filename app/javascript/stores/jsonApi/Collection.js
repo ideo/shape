@@ -900,6 +900,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.request(apiPath, 'POST', { data })
   }
 
+  API_toggleVoting() {
+    this.voting_enabled = !this.voting_enabled
+    this.save()
+  }
+
   async API_moveCardsIntoCollection({
     toCollection,
     cardIds,

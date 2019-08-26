@@ -247,6 +247,7 @@ class GridCard extends React.Component {
           onOpen={this.openMenu}
           onLeave={this.closeMenu}
           testCollectionCard={testCollectionCard}
+          votingEnabled={record.voting_enabled}
           menuItemsCount={this.getMenuItemsCount}
         />
       </StyledTopRightActions>

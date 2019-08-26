@@ -16,6 +16,7 @@ import SubmissionBoxIconSm from '~/ui/icons/SubmissionBoxIconSm'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import TagIcon from '~/ui/icons/TagIcon'
 import TrashIconXl from '~/ui/icons/TrashIconXl'
+import VoteIcon from '~/ui/icons/VoteIcon'
 
 @inject('uiStore')
 @observer
@@ -128,6 +129,11 @@ class ActionMenu extends React.Component {
     window.print()
   }
 
+  toggleVoting = () => {
+    const { record } = this.props.card
+    record.API_toggleVoting()
+  }
+
   get movingFromCollectionId() {
     const { card, uiStore, location } = this.props
     // For PageMenu we're moving "from" the parent collection
@@ -148,9 +154,10 @@ class ActionMenu extends React.Component {
       location,
       testCollectionCard,
       uiStore,
+      votingEnabled,
     } = this.props
     const { record } = card
-
+    const votingLabel = votingEnabled ? 'Disable Voting' : 'Enable Voting'
     const actions = [
       {
         name: 'Duplicate',
@@ -163,6 +170,11 @@ class ActionMenu extends React.Component {
         name: 'Add to My Collection',
         iconRight: <AddIntoIcon />,
         onClick: this.addToMyCollection,
+      },
+      {
+        name: votingLabel,
+        iconRight: <VoteIcon />,
+        onClick: this.toggleVoting,
       },
       {
         name: 'Download',
@@ -277,6 +289,7 @@ class ActionMenu extends React.Component {
       items = _.reject(items, { name: 'Sub. Box Settings' })
       items = _.reject(items, { name: 'Add to My Collection' })
       items = _.reject(items, { name: 'Sharing' })
+      items = _.reject(items, { name: votingLabel })
     }
 
     return items
@@ -331,6 +344,7 @@ ActionMenu.propTypes = {
   afterArchive: PropTypes.func,
   testCollectionCard: PropTypes.bool,
   menuItemsCount: PropTypes.func,
+  votingEnabled: PropTypes.bool,
   offsetPosition: PropTypes.shape({
     x: PropTypes.number,
     y: PropTypes.number,
@@ -349,6 +363,7 @@ ActionMenu.defaultProps = {
   canReplace: false,
   submissionBox: false,
   testCollectionCard: false,
+  votingEnabled: false,
   menuItemsCount: null,
   offsetPosition: null,
 }

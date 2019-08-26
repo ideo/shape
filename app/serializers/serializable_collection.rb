@@ -6,7 +6,7 @@ class SerializableCollection < BaseJsonSerializer
              :master_template, :template_id,
              :submission_box_type, :submission_box_id, :submission_template_id,
              :test_status, :collection_to_test_id, :hide_submissions, :submissions_enabled,
-             :anyone_can_view, :anyone_can_join, :cover_type, :archived
+             :anyone_can_view, :anyone_can_join, :cover_type, :archived, :voting_enabled
 
   has_many :roles do
     data do
