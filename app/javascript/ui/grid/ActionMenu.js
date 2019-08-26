@@ -261,6 +261,11 @@ class ActionMenu extends React.Component {
       }
     }
 
+    // Don't show voting enabled for items
+    if (record.internalType === 'items') {
+      items = _.reject(items, { name: votingLabel })
+    }
+
     if (!record || !record.isDownloadable) {
       items = _.reject(items, { name: 'Download' })
     }
