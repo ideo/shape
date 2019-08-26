@@ -513,6 +513,7 @@ class GridCard extends React.Component {
       searchResult,
       showHotEdge,
       zoomLevel,
+      votingEnabled,
     } = this.props
 
     const firstCardInRow = card.position && card.position.x === 0
@@ -557,9 +558,7 @@ class GridCard extends React.Component {
           this.renderTopRightActions()}
         {this.renderIcon}
         {this.renderHidden}
-        <VotingArea
-        // voteCount={voteCountForCard}
-        />
+        {votingEnabled && <VotingArea card={card} />}
         {/* onClick placed here so it's separate from hotspot click */}
         <StyledGridCardInner
           onClick={this.handleClick}
@@ -609,6 +608,7 @@ GridCard.propTypes = {
   draggingMultiple: PropTypes.bool,
   showHotEdge: PropTypes.bool,
   zoomLevel: PropTypes.number,
+  votingEnabled: PropTypes.bool,
 }
 
 GridCard.defaultProps = {
@@ -626,6 +626,7 @@ GridCard.defaultProps = {
   searchResult: false,
   showHotEdge: true,
   zoomLevel: 1,
+  votingEnabled: false,
 }
 
 export default GridCard
