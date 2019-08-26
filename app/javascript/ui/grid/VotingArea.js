@@ -1,8 +1,15 @@
+import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 
-const StyledVoteArea = styled.div`
+// const StyledVoteAreaDots = styled.div
+//
+// const VoteAreaDots = (numVotes, userHasVoted, toggleVote) => {
+//   return <StyledVoteAreaDots>+ {numVotes}</StyledVoteAreaDots>
+// }
+
+const StyledVoteAreaButton = styled.div`
   position: absolute;
   z-index: 150;
   bottom: 0.5rem;
@@ -24,7 +31,22 @@ const StyledVoteArea = styled.div`
     background-color: ${v.colors.commonMedium};
   }
 `
-StyledVoteArea.displayName = 'StyledVotingArea'
+StyledVoteAreaButton.displayName = 'StyledVoteAreaButton'
+
+const VoteAreaButton = ({ numVotes, userHasVoted, toggleVote }) => {
+  return (
+    <StyledVoteAreaButton userHasVoted={userHasVoted}>
+      <div onClick={toggleVote} role="button">
+        +{numVotes} votes
+      </div>
+    </StyledVoteAreaButton>
+  )
+}
+VoteAreaButton.propTypes = {
+  numVotes: PropTypes.number.isRequired,
+  userHasVoted: PropTypes.bool.isRequired,
+  toggleVote: PropTypes.func.isRequired,
+}
 
 @inject('uiStore')
 @observer
@@ -37,14 +59,14 @@ class VoteArea extends React.Component {
 
   render() {
     const { card } = this.props
-    // const { user_has_voted, num_votes } = card
+    const { user_has_voted, num_votes } = card
 
     return (
-      <StyledVoteArea userHasVoted={card.user_has_voted}>
-        <div onClick={this.toggleVote} role="button">
-          +{card.num_votes} votes
-        </div>
-      </StyledVoteArea>
+      <VoteAreaButton
+        userHasVoted={user_has_voted}
+        numVotes={num_votes}
+        toggleVote={this.toggleVote}
+      />
     )
   }
 }
