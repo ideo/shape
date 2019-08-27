@@ -17,13 +17,10 @@ class ApplicationMailer < ActionMailer::Base
       # in a worker that emails all admins, and there are no admins left
       return
     end
-    @application_name = @application.present? ?
-      @application.name : 'Shape'
+    @application_name = @application.name
     # This might eventually be a field on the application table when
     # we have a need for more than one.
-    @application_logo = @application.present? ?
-      'https://s3.amazonaws.com/assets.creativedifference/cdelta-logo_colorful.png' :
-      'https://s3-us-west-2.amazonaws.com/assets.shape.space/logo_2x.png'
+    @application_logo = @application.invite_url
     args.delete :users
     super(args)
   rescue ActiveRecord::RecordNotFound

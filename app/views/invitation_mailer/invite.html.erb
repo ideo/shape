@@ -3,15 +3,15 @@
 </div>
 
 <div class='p'>
-  <% if @application.present? %>
-    You've been invited to join <%= @org_name %>'s <%= @application_name %> account <% if @group_name.present? %>to view <%= @group_name %>’s results<% end %>. To view your results, please click on the button below.
-  <% else %>
+  <% if @application.default? %>
     <%= @invited_by.name %> has invited you to join<%= @org_name ? " #{@org_name}'s" : '' %> "<%= @invited_to_name %>"<%= @org_name ? ' group ' : '' %>on Shape.
+  <% else %>
+    You've been invited to join <%= @org_name %>'s <%= @application_name %> account <% if @group_name.present? %>to view <%= @group_name %>’s results<% end %>. To view your results, please click on the button below.
   <% end %>
   <br/>
 
   <div class='email-link'>
-    <%= link_to @application.present? ? "View your results" : "Join #{@invited_to_type}", @url %>
+    <%= link_to @application.invite_cta(@invited_to_type), @url %>
   </div>
 </div>
 
