@@ -12286,10 +12286,10 @@ rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-re-resizable@^4.1.0:
-  version "4.3.2"
-  resolved "https://registry.yarnpkg.com/re-resizable/-/re-resizable-4.3.2.tgz#2f3c106f0d5d3156ff1648ea3bb15b314a4f4cb8"
-  integrity sha512-b/72ODt5zz6Tz50ws2UubpXkUcgsm6+vuj/XdMahqn/25zer7Y0tZJvQa/Yn5kQhcwDP7VJy0ng4KHT52huOCA==
+re-resizable@4.5.1:
+  version "4.5.1"
+  resolved "https://registry.yarnpkg.com/re-resizable/-/re-resizable-4.5.1.tgz#4688e8311ea4b70d558f7aebb3168a25926e62d9"
+  integrity sha512-amjlp4IuTSHs4XG1bP5WbAgBDIZitODKIsqcpZsNhEBYYEidol0dlP4S9zHiN3iu6Tff4WfYuruihLgN7RJeQw==
 
 react-autosize-textarea@^3.0.3:
   version "3.0.3"
@@ -12395,6 +12395,16 @@ react-dom@^16.0.0, react-dom@^16.4.2:
     object-assign "^4.1.1"
     prop-types "^15.6.0"
 
+react-dom@^16.6.3:
+  version "16.9.0"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.9.0.tgz#5e65527a5e26f22ae3701131bcccaee9fb0d3962"
+  integrity sha512-YFT2rxO9hM70ewk9jq0y6sQk8cL02xm4+IzYBz75CQGlClQQ1Bxq0nhHF6OtSbit+AIahujJgb/CPRibFkMNJQ==
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+    prop-types "^15.6.2"
+    scheduler "^0.15.0"
+
 react-dotdotdot@^1.2.3:
   version "1.2.3"
   resolved "https://registry.yarnpkg.com/react-dotdotdot/-/react-dotdotdot-1.2.3.tgz#45bb264153cee73471f55c51c8d1542f4880a34f"
@@ -12402,7 +12412,7 @@ react-dotdotdot@^1.2.3:
   dependencies:
     object.pick "^1.3.0"
 
-react-draggable@^3.0.3, "react-draggable@git+https://git@github.com/ideo/react-draggable.git#3.0.5-beta.1":
+react-draggable@^3.0.5, "react-draggable@git+https://git@github.com/ideo/react-draggable.git#3.0.5-beta.1":
   version "3.0.5-beta.1"
   resolved "git+https://git@github.com/ideo/react-draggable.git#67015426f9c7baf0d10534ea925f18b8366260a2"
   dependencies:
@@ -12550,12 +12560,12 @@ react-reconciler@^0.7.0:
     prop-types "^15.6.0"
 
 react-rnd@^7.3.0:
-  version "7.3.0"
-  resolved "https://registry.yarnpkg.com/react-rnd/-/react-rnd-7.3.0.tgz#b5def82c217abf5f201ccf3941aec1f5dde57749"
-  integrity sha512-bSbR6/fQGkFQek0rLNGnZe7DEg9p883yP/vJNndNZ92HDkBRBERmcul76MeX6XtMfe9EGACuel6RcfX4paOuBw==
+  version "7.4.3"
+  resolved "https://registry.yarnpkg.com/react-rnd/-/react-rnd-7.4.3.tgz#76adc591fd78f543a66cc63595d0002599d1d408"
+  integrity sha512-TLQ35nqXup7rC63qAETebbO6Znilr20CroTTeAdlYu8nvRSwB7BrmPKZhHB2GgeiSucOoeCyAA9pHPhbMpEd/Q==
   dependencies:
-    re-resizable "^4.1.0"
-    react-draggable "^3.0.3"
+    re-resizable "4.5.1"
+    react-draggable "^3.0.5"
 
 react-router-dom@^4.3.1:
   version "4.3.1"
@@ -12787,6 +12797,15 @@ react@^16.0.0, react@^16.4.2:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
     prop-types "^15.6.0"
+
+react@^16.6.3:
+  version "16.9.0"
+  resolved "https://registry.yarnpkg.com/react/-/react-16.9.0.tgz#40ba2f9af13bc1a38d75dbf2f4359a5185c4f7aa"
+  integrity sha512-+7LQnFBwkiw+BobzOF6N//BdoNw0ouwmSJTEm9cglOOmsg/TMiFHZLe2sEoN5M7LgJTj9oHH0gxklfnQe66S1w==
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+    prop-types "^15.6.2"
 
 reactive-localstorage@^0.0.2:
   version "0.0.2"
@@ -13480,6 +13499,14 @@ sax@>=0.6.0, sax@^1.2.4, sax@~1.2.1, sax@~1.2.4:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
   integrity sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==
+
+scheduler@^0.15.0:
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.15.0.tgz#6bfcf80ff850b280fed4aeecc6513bc0b4f17f8e"
+  integrity sha512-xAefmSfN6jqAa7Kuq7LIJY0bwAPG3xlCj0HMEBQk1lxYiDKZscY2xJ5U/61ZTrYbmNQbXa+gc7czPkVo11tnCg==
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
 
 schema-utils@^0.4.5:
   version "0.4.7"

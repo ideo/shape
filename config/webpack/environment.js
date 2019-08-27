@@ -5,6 +5,7 @@ const { environment } = require('@rails/webpacker')
 const path = require('path')
 const { castArray, identity, flow, mapValues } = require('lodash/fp')
 const SentryWebpackPlugin = require('@sentry/webpack-plugin');
+const reactProfiler = require('./custom/react-profiler')
 
 const DEV = process.env.RAILS_ENV === 'development'
 const PROD = process.env.SHAPE_APP === 'production'
@@ -109,6 +110,13 @@ const addSentryWebpack = env => {
   return env
 }
 
+const addReactProfiler = env => {
+    if (DEV) {
+      env.config.merge(reactProfiler)
+      return env
+    }
+}
+
 const updateEnvironment = flow(
   DEV ? addReactHotLoader : identity,
   addReactGlobal,
@@ -116,6 +124,7 @@ const updateEnvironment = flow(
   addReactSVGLoader,
   addTypescriptLoader,
   addIdeoSSOExternal,
+  addReactProfiler,
   process.env.ANALYZE ? addBundleAnalyzerPlugin : identity
 )
 
