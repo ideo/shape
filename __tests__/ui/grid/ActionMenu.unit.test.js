@@ -74,7 +74,7 @@ describe('ActionMenu', () => {
         component.openMoveMenu('move')
         expect(props.uiStore.selectCardId).toHaveBeenCalledWith(card.id)
         expect(props.uiStore.openMoveMenu).toHaveBeenCalledWith({
-          from: props.uiStore.viewingCollection.id,
+          from: card.record,
           cardAction: 'move',
         })
       })
@@ -84,7 +84,7 @@ describe('ActionMenu', () => {
       component.duplicateCard()
       expect(props.uiStore.selectCardId).toHaveBeenCalledWith(card.id)
       expect(props.uiStore.openMoveMenu).toHaveBeenCalledWith({
-        from: props.uiStore.viewingCollection.id,
+        from: card.record,
         cardAction: 'duplicate',
       })
     })
@@ -93,7 +93,7 @@ describe('ActionMenu', () => {
       component.linkCard()
       expect(props.uiStore.selectCardId).toHaveBeenCalledWith(card.id)
       expect(props.uiStore.openMoveMenu).toHaveBeenCalledWith({
-        from: props.uiStore.viewingCollection.id,
+        from: card.record,
         cardAction: 'link',
       })
     })

@@ -19,6 +19,7 @@ import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import { routingStore } from '~/stores'
+import { ACTION_SOURCES } from '~/enums/actionEnums'
 
 const IconHolder = styled.span`
   display: inline-block;
@@ -158,6 +159,15 @@ class CollectionCover extends React.Component {
     )
   }
 
+  get hasButton() {
+    const { collection } = this.props
+    return (
+      collection.isTemplated ||
+      collection.isMasterTemplate ||
+      collection.isUsableTemplate
+    )
+  }
+
   get name() {
     const { collection } = this.props
     const tooLong = namePartTooLong(collection.name)
@@ -194,6 +204,32 @@ class CollectionCover extends React.Component {
       )
     }
     return <span style={{ hyphens }}>{collection.name}</span>
+  }
+
+  get button() {
+    return (
+      this.hasButton && (
+        <FormButton
+          width="160"
+          color={'transparent'}
+          onClick={this.openMoveMenuForTemplate}
+          fontSize={v.buttonSizes.header}
+          data-cy="HeaderFormButton"
+        >
+          Use Template
+        </FormButton>
+      )
+    )
+  }
+
+  openMoveMenuForTemplate = e => {
+    const { collection, uiStore } = this.props
+    uiStore.openMoveMenu({
+      from: collection,
+      cardAction: 'useTemplate',
+      context: ACTION_SOURCES.COVER,
+    })
+    e.stopPropagation()
   }
 
   get hasCollectionScore() {
@@ -347,6 +383,7 @@ class CollectionCover extends React.Component {
                       {this.name}
                     </PlainLink>
                   </Dotdotdot>
+                  {this.button}
                 </PositionedCardHeading>
               </div>
               <div className="bottom">

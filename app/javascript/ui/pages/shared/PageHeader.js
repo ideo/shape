@@ -23,6 +23,8 @@ import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
 import v from '~/utils/variables'
 import routeToLogin from '~/utils/routeToLogin'
+import { ACTION_SOURCES } from '~/enums/actionEnums'
+
 /* global IdeoSSO */
 
 const IconHolder = styled.span`
@@ -101,11 +103,12 @@ class PageHeader extends React.Component {
     record.restore()
   }
 
-  openMoveMenuForTemplate = () => {
+  openMoveMenuForTemplate = e => {
     const { record, uiStore } = this.props
     uiStore.openMoveMenu({
-      from: record.id,
+      from: record,
       cardAction: 'useTemplate',
+      context: ACTION_SOURCES.HEADER,
     })
   }
 

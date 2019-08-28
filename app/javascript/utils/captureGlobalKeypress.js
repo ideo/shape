@@ -67,9 +67,8 @@ const captureGlobalKeypress = e => {
         return false
       }
       if (metaKey || ctrlKey) {
-        const { id: viewingCollectionId } = viewingCollection
         uiStore.openMoveMenu({
-          from: viewingCollectionId, // CTRL+X: Move
+          from: viewingCollection, // CTRL+X: Move
           cardAction: 'move',
         })
       }
@@ -79,9 +78,8 @@ const captureGlobalKeypress = e => {
         return false
       }
       if (metaKey || ctrlKey) {
-        const { id: viewingCollectionId } = viewingCollection
         uiStore.openMoveMenu({
-          from: viewingCollectionId, // CTRL+C: Duplicate
+          from: viewingCollection, // CTRL+C: Duplicate
           cardAction: 'duplicate',
         })
       }
