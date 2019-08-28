@@ -210,6 +210,7 @@ GEM
       faraday (>= 0.9.1)
       multi_json (>= 1.11.0)
     git (1.5.0)
+    gli (2.18.2)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
     globalize (5.2.0)
@@ -514,6 +515,13 @@ GEM
       faraday (~> 0.9)
       jwt (>= 1.5, < 3.0)
       multi_json (~> 1.10)
+    slack-ruby-client (0.14.4)
+      activesupport
+      faraday (>= 0.9)
+      faraday_middleware
+      gli
+      hashie
+      websocket-driver
     spring (2.0.2)
       activesupport (>= 4.2)
     spring-commands-rspec (1.0.4)
@@ -641,6 +649,7 @@ DEPENDENCIES
   shoulda-matchers (~> 3.1)
   sidekiq
   sidekiq-scheduler
+  slack-ruby-client
   spring
   spring-commands-rspec
   spring-watcher-listen (~> 2.0.0)
