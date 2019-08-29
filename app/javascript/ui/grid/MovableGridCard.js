@@ -396,6 +396,8 @@ class MovableGridCard extends React.PureComponent {
     if (record.can_view) {
       // timeout is just a stupid thing so that Draggable doesn't complain about unmounting
       setTimeout(() => {
+        // prevent routing when template cards are used from the cover
+        if (record.isUsableTemplate) return
         this.props.routeTo(cardType, record.id)
       })
     } else {

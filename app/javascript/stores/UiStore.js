@@ -415,7 +415,8 @@ export default class UiStore {
     if (this.cardAction === 'useTemplate') {
       const fromCover = !!context && context === ACTION_SOURCES.COVER
       if (fromCover) {
-        const { id, name } = from
+        const { parent_collection_card, name } = from
+        const { id } = parent_collection_card
         // selected card is the card whose cover was selected
         this.movingCardIds.replace([id])
         this.templateName = name

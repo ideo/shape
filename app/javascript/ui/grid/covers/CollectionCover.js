@@ -158,7 +158,7 @@ function namePartTooLong(fullName) {
   return parts.some(part => part.length > 14)
 }
 
-@inject('uiStore')
+@inject('uiStore', 'apiStore')
 @observer
 class CollectionCover extends React.Component {
   get hasIcon() {
@@ -209,14 +209,15 @@ class CollectionCover extends React.Component {
     return <span style={{ hyphens }}>{collection.name}</span>
   }
 
-  openMoveMenuForTemplate = e => {
-    const { collection, uiStore } = this.props
+  openMoveMenuForTemplate = async e => {
+    const { collection, uiStore, apiStore } = this.props
+    // load additional data needed for moving template from card cover, ie. parent_collection_card
+    await apiStore.fetch('collections', collection.id)
     uiStore.openMoveMenu({
       from: collection,
       cardAction: 'useTemplate',
       context: ACTION_SOURCES.COVER,
     })
-    e.stopPropagation()
   }
 
   get hasCollectionScore() {
