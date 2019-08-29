@@ -170,7 +170,7 @@ class ChartGroup extends React.Component {
           axis: {
             stroke: 'transparent',
           },
-          grid: { stroke: 'black' },
+          grid: { stroke: 'black', strokeWidth: 0.5, strokeDasharray: [1, 1] },
           ticks: { padding: 10 },
         }}
         tickLabelComponent={
@@ -178,7 +178,7 @@ class ChartGroup extends React.Component {
             textAnchor="start"
             verticalAnchor="end"
             dy={-5}
-            style={{ fontSize: '20px' }}
+            style={{ fill: v.colors.commonDarkest, fontSize: '20px' }}
           />
         }
       ></VictoryAxis>
@@ -345,7 +345,6 @@ class ChartGroup extends React.Component {
       <Fragment>
         <VictoryChart
           theme={victoryTheme}
-          domainPadding={{ y: 80 }}
           padding={{ top: 0, left: 0, right: 0, bottom: 0 }}
           containerComponent={<VictoryVoronoiContainer />}
         >

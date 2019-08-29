@@ -274,9 +274,7 @@ class DataItemCoverCollectionsItems extends React.Component {
     return (
       <Fragment>
         <AboveChartContainer>
-          <DisplayText color={this.fillColor}>
-            {this.titleAndControls}
-          </DisplayText>
+          <DisplayText>{this.titleAndControls}</DisplayText>
           <br />
         </AboveChartContainer>
         <ChartGroup
