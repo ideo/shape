@@ -150,7 +150,10 @@ export default {
   },
 
   buttonSizes: {
-    header: 0.825,
+    header: {
+      width: 160,
+      fontSize: 0.825,
+    },
   },
 
   iconSizes: {

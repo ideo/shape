@@ -40,6 +40,18 @@ const LaunchButton = FormButton.extend`
 `
 LaunchButton.displayName = 'LaunchButton'
 
+const CardButtonWrapper = styled.div`
+  margin-left: calc(50% - ${v.buttonSizes.header.width / 2}px);
+  padding-bottom: 4px;
+`
+CardButtonWrapper.displayName = 'CardButtonWrapper'
+
+const UseTemplateButton = FormButton.extend`
+  border-color: white;
+  color: white;
+`
+UseTemplateButton.displayName = 'UseTemplateButton'
+
 const StyledCollectionCover = styled.div`
   width: 100%;
   height: 100%;
@@ -159,15 +171,6 @@ class CollectionCover extends React.Component {
     )
   }
 
-  get hasButton() {
-    const { collection } = this.props
-    return (
-      collection.isTemplated ||
-      collection.isMasterTemplate ||
-      collection.isUsableTemplate
-    )
-  }
-
   get name() {
     const { collection } = this.props
     const tooLong = namePartTooLong(collection.name)
@@ -204,22 +207,6 @@ class CollectionCover extends React.Component {
       )
     }
     return <span style={{ hyphens }}>{collection.name}</span>
-  }
-
-  get button() {
-    return (
-      this.hasButton && (
-        <FormButton
-          width="160"
-          color={'transparent'}
-          onClick={this.openMoveMenuForTemplate}
-          fontSize={v.buttonSizes.header}
-          data-cy="HeaderFormButton"
-        >
-          Use Template
-        </FormButton>
-      )
-    )
   }
 
   openMoveMenuForTemplate = e => {
@@ -288,6 +275,31 @@ class CollectionCover extends React.Component {
       >
         {buttonText}
       </LaunchButton>
+    )
+  }
+
+  get hasUseTemplateButton() {
+    const { collection } = this.props
+    return (
+      collection.isTemplated ||
+      collection.isMasterTemplate ||
+      collection.isUsableTemplate
+    )
+  }
+
+  get useTemplateButton() {
+    return (
+      <CardButtonWrapper>
+        <UseTemplateButton
+          width={v.buttonSizes.header.width}
+          fontSize={v.buttonSizes.header.fontSize}
+          color={'transparent'}
+          onClick={this.openMoveMenuForTemplate}
+          data-cy="CollectionCoverFormButton"
+        >
+          Use Template
+        </UseTemplateButton>
+      </CardButtonWrapper>
     )
   }
 
@@ -389,6 +401,7 @@ class CollectionCover extends React.Component {
               <div className="bottom">
                 {this.launchTestButton}
                 {this.collectionScore}
+                {this.hasUseTemplateButton && this.useTemplateButton}
                 {!this.hasLaunchTestButton && (
                   <Dotdotdot clamp={this.hasCollectionScore ? 2 : 3}>
                     {cover.text}

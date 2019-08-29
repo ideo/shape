@@ -205,14 +205,14 @@ class PageHeader extends React.Component {
         <Fragment>
           <CopyToClipboard text={record.publicTestURL} onCopy={() => null}>
             <FormButton
-              width="140"
+              width={v.buttonSizes.header.width}
               color={v.colors.transparent}
               onClick={() =>
                 uiStore.popupSnackbar({
                   message: 'Test link copied',
                 })
               }
-              fontSize={v.buttonSizes.header}
+              fontSize={v.buttonSizes.header.fontSize}
               data-cy="HeaderFormButton"
             >
               <span
@@ -250,7 +250,7 @@ class PageHeader extends React.Component {
           color={v.colors.transparent}
           width="200"
           disabled={uiStore.launchButtonLoading}
-          fontSize={v.buttonSizes.header}
+          fontSize={v.buttonSizes.header.fontSize}
           data-cy="HeaderFormButton"
         >
           Re-open Feedback
@@ -263,7 +263,7 @@ class PageHeader extends React.Component {
           color={v.colors.alert}
           onClick={record.API_submitSubmission}
           disabled={uiStore.launchButtonLoading}
-          fontSize={v.buttonSizes.header}
+          fontSize={v.buttonSizes.header.fontSize}
           data-cy="HeaderFormButton"
         >
           Submit
@@ -281,7 +281,7 @@ class PageHeader extends React.Component {
         style={{ marginLeft: '1rem' }}
         color={v.colors.primaryDarkest}
         onClick={() => routeToLogin({ redirect: record.frontend_url })}
-        fontSize={v.buttonSizes.header}
+        fontSize={v.buttonSizes.header.fontSize}
         data-cy="HeaderFormButton"
       >
         Join
@@ -298,7 +298,7 @@ class PageHeader extends React.Component {
         style={{ marginLeft: '1rem' }}
         color={v.colors.primaryDarkest}
         onClick={this.handleRestore}
-        fontSize={v.buttonSizes.header}
+        fontSize={v.buttonSizes.header.fontSize}
         data-cy="HeaderFormButton"
       >
         Restore
@@ -314,7 +314,7 @@ class PageHeader extends React.Component {
         width="160"
         color={v.colors.primaryDark}
         onClick={this.openMoveMenuForTemplate}
-        fontSize={v.buttonSizes.header}
+        fontSize={v.buttonSizes.header.fontSize}
         data-cy="HeaderFormButton"
       >
         Use Template
@@ -331,7 +331,7 @@ class PageHeader extends React.Component {
           color={v.colors.transparent}
           onClick={record.closeTest}
           disabled={uiStore.launchButtonLoading}
-          fontSize={v.buttonSizes.header}
+          fontSize={v.buttonSizes.header.fontSize}
           data-cy="HeaderFormButton"
         >
           Stop Feedback
