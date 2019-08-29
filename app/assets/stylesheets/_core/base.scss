@@ -6,6 +6,7 @@ $largeBreakpoint: 1308px;
 
 body {
   background: #f2f1ee;
+  overscroll-behavior: none;
 }
 
 h1, h2, h3, h4, h5, h6 {

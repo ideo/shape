@@ -40,6 +40,7 @@ class CommentUpdater < SimpleService
     newly_mentioned_user_ids = mentions[:user_ids] - @previous_mentions[:user_ids]
     newly_mentioned_group_ids = mentions[:group_ids] - @previous_mentions[:group_ids]
     return unless newly_mentioned_user_ids.present? || newly_mentioned_group_ids.present?
+
     ActivityAndNotificationBuilder.call(
       actor: @comment.author,
       target: @comment.comment_thread.record,

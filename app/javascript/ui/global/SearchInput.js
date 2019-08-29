@@ -6,7 +6,7 @@ import v from '~/utils/variables'
 import SearchIcon from '~/ui/icons/SearchIcon'
 import CloseIcon from '~/ui/icons/CloseIcon'
 
-const StyledSearchBar = styled.div`
+const StyledSearchInput = styled.div`
   border-bottom: 1px solid
     ${props => (props.focused ? v.colors.black : v.colors.commonDark)};
   color: ${props => (props.focused ? v.colors.black : v.colors.commonDark)};
@@ -62,10 +62,10 @@ const StyledSearchBar = styled.div`
     }
   }
 `
-StyledSearchBar.displayName = 'StyledSearchBar'
+StyledSearchInput.displayName = 'StyledSearchInput'
 
 @observer
-class SearchBar extends React.Component {
+class SearchInput extends React.Component {
   @observable
   focused = false
 
@@ -98,7 +98,7 @@ class SearchBar extends React.Component {
   render() {
     const { value } = this.props
     return (
-      <StyledSearchBar focused={this.props.focused || this.focused}>
+      <StyledSearchInput focused={this.props.focused || this.focused}>
         <span className="search">
           <SearchIcon />
         </span>
@@ -118,20 +118,20 @@ class SearchBar extends React.Component {
             <CloseIcon />
           </button>
         )}
-      </StyledSearchBar>
+      </StyledSearchInput>
     )
   }
 }
 
-SearchBar.propTypes = {
+SearchInput.propTypes = {
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   onClear: PropTypes.func.isRequired,
   focused: PropTypes.bool,
 }
 
-SearchBar.defaultProps = {
+SearchInput.defaultProps = {
   focused: false,
 }
 
-export default SearchBar
+export default SearchInput

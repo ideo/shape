@@ -222,7 +222,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         datasets = json_included_objects_of_type('datasets')
         expect(datasets.size).to eq(1)
         expect(
-          datasets.map{ |d| d['id'].to_i },
+          datasets.map { |d| d['id'].to_i },
         ).to eq(data_item.datasets.map(&:id))
       end
 
@@ -451,7 +451,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
-    context 'with link cards', only: true do
+    context 'with link cards' do
       let!(:collection_cards) { create_list(:collection_card_link_text, 3, parent: collection) }
       context 'without record edit access, but with collection access' do
         before do
@@ -576,9 +576,21 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         moving_cards.first.record.unanchor!
       end
 
-      it 'returns a 401' do
-        patch(path, params: params)
-        expect(response.status).to eq(401)
+      context 'but with edit access to the from_collection' do
+        it 'returns a 204' do
+          patch(path, params: params)
+          expect(response.status).to eq(204)
+        end
+      end
+
+      context 'and without edit access to the from_collection' do
+        before do
+          user.remove_role(Role::EDITOR, from_collection)
+        end
+        it 'returns a 401' do
+          patch(path, params: params)
+          expect(response.status).to eq(401)
+        end
       end
     end
 
@@ -813,12 +825,13 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     let!(:moving_cards) { from_collection.collection_cards.first(2) }
     let!(:unmoved_card) { from_collection.collection_cards.last }
     let(:path) { '/api/v1/collection_cards/duplicate' }
+    let(:placement) { 'beginning' }
     let(:raw_params) do
       {
         from_id: from_collection.id,
         to_id: to_collection.id,
         collection_card_ids: moving_cards.map(&:id),
-        placement: 'beginning',
+        placement: placement,
       }
     end
     let(:params) { raw_params.to_json }
@@ -891,13 +904,28 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         first_cards = to_collection.collection_cards.first(2)
         expect(first_cards.map(&:item)).not_to match_array moving_cards.map(&:item)
         # names should match, in same order
-        expect(first_cards.map(&:item).map(&:name)).to match_array moving_cards.map(&:item).map(&:name)
+        expect(first_cards.map(&:item).map(&:name)).to eq moving_cards.map(&:item).map(&:name)
         expect(to_collection.collection_cards.first.primary?).to be true
       end
 
       it 'calls reorder_cards! to make sure card orders are not wacky' do
         expect_any_instance_of(Collection).to receive(:reorder_cards!)
         post(path, params: params)
+      end
+
+      context 'with integer order' do
+        let(:placement) { 1 }
+
+        it 'duplicates cards from one collection to the other, preserving order' do
+          expect(moving_cards.map(&:parent_id).uniq).to match_array [from_collection.id]
+          post(path, params: params)
+          # newly created cards should be duplicates
+          dupe_cards = to_collection.collection_cards[1..2]
+          # names should match, in same order
+          expect(dupe_cards.map(&:item).map(&:name)).to eq moving_cards.map(&:item).map(&:name)
+          expect(dupe_cards.map(&:item).map(&:cloned_from)).to eq moving_cards.map(&:item)
+          expect(dupe_cards.first.primary?).to be true
+        end
       end
     end
   end

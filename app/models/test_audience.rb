@@ -89,6 +89,7 @@ class TestAudience < ApplicationRecord
 
   def reached_sample_size?
     return false if link_sharing?
+
     survey_responses.completed.size >= sample_size
   end
 
@@ -100,6 +101,7 @@ class TestAudience < ApplicationRecord
 
   def total_price
     return 0 if price_per_response.blank?
+
     sample_size * price_per_response
   end
 

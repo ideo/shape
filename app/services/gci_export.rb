@@ -36,6 +36,7 @@ class GciExport
       profiles.collections.find_each do |profile|
         user = profile.created_by
         next unless user.present?
+
         profile_items = Item.in_collection(profile)
         item_activities_count = profile_items.collect { |i| i.activities.where.not(action: %i[commented mentioned]).count }.sum
         row = [

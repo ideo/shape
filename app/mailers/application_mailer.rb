@@ -18,8 +18,6 @@ class ApplicationMailer < ActionMailer::Base
       return
     end
     @application_name = @application.name
-    # This might eventually be a field on the application table when
-    # we have a need for more than one.
     @application_logo = @application.invite_url
     args.delete :users
     super(args)

@@ -60,7 +60,8 @@ describe Organization, type: :model do
       it 'should create guest group with same name as org + Guests' do
         expect(organization.guest_group.persisted?).to be true
         expect(organization.guest_group.name).to eq("#{organization.name} Guests")
-        expect(organization.guest_group.handle).to eq("#{organization.name.parameterize}-guest")
+        slug = "#{organization.name.parameterize}-guest".slice(0, 36)
+        expect(organization.guest_group.handle).to eq(slug)
       end
     end
 
@@ -68,7 +69,8 @@ describe Organization, type: :model do
       it 'should create admin group with same name as org + Admins' do
         expect(organization.admin_group.persisted?).to be true
         expect(organization.admin_group.name).to eq("#{organization.name} Admins")
-        expect(organization.admin_group.handle).to eq("#{organization.name.parameterize}-admins")
+        slug = "#{organization.name.parameterize}-admins".slice(0, 36)
+        expect(organization.admin_group.handle).to eq(slug)
       end
     end
 

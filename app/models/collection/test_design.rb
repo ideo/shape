@@ -92,6 +92,7 @@ class Collection
     def duplicate!(**args)
       duplicate = super(args)
       return duplicate unless duplicate.persisted?
+
       duplicate = duplicate.becomes(Collection::TestCollection)
       duplicate.update(
         test_collection_id: nil,

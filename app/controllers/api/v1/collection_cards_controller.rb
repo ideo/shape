@@ -190,6 +190,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
                         )
 
     return unless user_signed_in?
+
     # precache roles because these will be referred to in the serializers (e.g. can_edit?)
     current_user.precache_roles_for(
       [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],
@@ -217,7 +218,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     @cards = ordered_cards
     @to_collection = Collection.find(json_api_params[:to_id])
     @cards.primary.each do |card|
-      authorize! :edit, card
+      authorize! :move, card
     end
     @cards.link.each do |card|
       authorize! :read, card
@@ -255,6 +256,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     @cards.each do |card|
       collection = card.collection
       next unless collection.present?
+
       if @to_collection.within_collection_or_self?(collection)
         @errors << 'You can\'t duplicate a collection inside of itself.'
         break
@@ -288,6 +290,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def broadcast_replacing_updates
     return unless @replacing_card.parent.present?
+
     CollectionUpdateBroadcaster.call(@replacing_card.parent, current_user)
   end
 
@@ -305,11 +308,13 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def broadcast_parent_collection_updates
     parent = @collection.parent
     return unless parent.present?
+
     CollectionUpdateBroadcaster.call(parent, current_user)
   end
 
   def broadcast_collection_archive_updates
     return unless @collection_cards.first.present?
+
     CollectionUpdateBroadcaster.call(@collection_cards.first.parent, current_user)
   end
 
@@ -331,6 +336,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def collection_snapshot_params
     return {} if json_api_params[:collection_snapshot].nil?
+
     json_api_params[:collection_snapshot].permit(:attributes).permit(
       collection_cards_attributes: %i[id order width height row col],
     )

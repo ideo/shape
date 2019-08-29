@@ -255,16 +255,26 @@ class CollectionCard extends BaseRecord {
     return this.uiStore.selectedCardIds.indexOf(this.id) > -1
   }
 
+  get isMDLPlaceholder() {
+    return _.includes(this.id, '-mdlPlaceholder')
+  }
+
+  // placeholder cards have a reference to the original card they are standing in for
+  get original() {
+    if (!this.originalId) return null
+    return this.apiStore.find('collection_cards', this.originalId)
+  }
+
   get isBeingMoved() {
     const { movingCardIds, cardAction } = this.uiStore
     // only count "being moved" for the move actions (not link, duplicate, etc)
-    if (!_.includes(['move', 'moveWithinCollection'], cardAction)) return false
-    return movingCardIds.indexOf(this.id) > -1
+    if (cardAction !== 'move') return false
+    return _.includes(movingCardIds, this.id)
   }
 
   get isBeingMultiMoved() {
     const { uiStore } = this
-    return uiStore.multiMoveCardIds.indexOf(this.id) > -1
+    return _.includes(uiStore.multiMoveCardIds, this.id)
   }
 
   get isBeingMultiDragged() {

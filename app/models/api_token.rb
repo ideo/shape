@@ -34,6 +34,7 @@ class ApiToken < ApplicationRecord
 
   def application_or_organization_present
     return if application.present? || organization.present?
+
     errors.add(:base, 'Application or organization must be present')
   end
 

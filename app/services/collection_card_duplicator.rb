@@ -19,8 +19,11 @@ class CollectionCardDuplicator < SimpleService
   private
 
   def duplicate_cards
-    # reverse cards for 'beginning' since they get duplicated one by one to the front
-    @cards = @cards.reverse if @placement == 'beginning'
+    # reverse cards for 'beginning' or dropping into a particular order,
+    # since they get duplicated one by one to the front
+    if @placement != 'end'
+      @cards = @cards.reverse
+    end
     target_empty_row = @to_collection.empty_row_for_moving_cards
 
     @cards.each_with_index do |card, i|

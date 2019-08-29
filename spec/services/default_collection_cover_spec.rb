@@ -59,7 +59,7 @@ RSpec.describe DefaultCollectionCover, type: :service do
       before do
         collection.update(cover_type: :cover_type_text_and_media)
         text_item.update(is_cover: true)
-        collection_cover = DefaultCollectionCover.call(collection)
+        DefaultCollectionCover.call(collection)
       end
 
       it 'should keep the text item as the cover' do

@@ -79,6 +79,7 @@ class Api::V1::CommentThreadsController < Api::V1::BaseController
       organization_id: params[:organization_id] || current_organization&.id,
     ).first
     return false unless @comment_thread.present?
+
     authorize! :read, @comment_thread.record
   end
 

@@ -46,16 +46,19 @@ class CollectionCardReplacer
 
     # this needs to happen after the @item.becomes
     return unless @attrs[:filestack_file_attributes].present?
+
     @item.filestack_file_attributes = @attrs[:filestack_file_attributes]
   end
 
   def check_parent_collection_cover
     return unless @replacing_card.should_update_parent_collection_cover?
+
     @replacing_card.parent.cache_cover!
   end
 
   def update_template_instances
     return unless @replacing_card.parent.submission_box_template_test?
+
     @replacing_card.parent.queue_update_template_instances
   end
 end

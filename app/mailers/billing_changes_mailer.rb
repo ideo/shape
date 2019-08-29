@@ -7,6 +7,7 @@ class BillingChangesMailer < ApplicationMailer
                      .first
 
     return unless payment_method.present?
+
     @new_users_count = new_active_users_count
 
     @subject = "#{new_active_users_count} new #{'user'.pluralize(@new_users_count)} joined Shape"

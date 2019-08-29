@@ -26,6 +26,7 @@ class CollectionTemplateBuilder
 
   def call
     return false unless create_collection
+
     place_collection_in_parent
     setup_template_cards
     # mainly so template_num_instances will be refreshed in API cache
@@ -78,7 +79,7 @@ class CollectionTemplateBuilder
         @collection_card_params,
       )
       card = @parent.primary_collection_cards.create(card_params)
-      card.increment_card_orders! if @placement == 'beginning'
+      card.increment_card_orders! if @placement != 'end'
     end
     @collection.recalculate_breadcrumb!
   end
@@ -129,6 +130,7 @@ class CollectionTemplateBuilder
     submission_template = @parent.submission_box.submission_template
     test_id = submission_template.try(:submission_attrs).try(:[], 'launchable_test_id')
     return unless test_id.present?
+
     master_test = Collection::TestCollection.find(test_id)
     master_test.update_submission_launch_status(@collection)
   end
@@ -140,13 +142,16 @@ class CollectionTemplateBuilder
   def follow_submission_box
     comment_thread = @parent.submission_box.comment_thread
     return if comment_thread.nil?
+
     users_thread = comment_thread.users_thread_for(@created_by)
     return if users_thread.present?
+
     comment_thread.add_user_follower!(@created_by.id)
   end
 
   def add_external_record
     return unless @external_id.present? && @created_by.application.present?
+
     @collection.add_external_id(
       @external_id,
       @created_by.application.id,

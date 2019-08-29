@@ -27,8 +27,10 @@ module Testable
   def collect_test_scores
     scores = {}
     return scores unless submission_attrs.present?
+
     launchable_test = Collection.find_by(id: submission_attrs['launchable_test_id'])
     return scores unless launchable_test.present?
+
     launchable_test.question_items.scale_questions.each do |question|
       scores[question.question_type] = question.score
     end

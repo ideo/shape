@@ -36,6 +36,7 @@ class Payment < ApplicationRecord
 
   def network_payment_method
     return if network_payment_method_id.blank?
+
     @network_payment_method ||= NetworkApi::PaymentMethod.find(
       network_payment_method_id,
     )
@@ -43,6 +44,7 @@ class Payment < ApplicationRecord
 
   def network_payment
     return if network_payment_id.blank?
+
     @network_payment ||= NetworkApi::Payment.find(network_payment_id)
   end
 

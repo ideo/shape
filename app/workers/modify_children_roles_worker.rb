@@ -18,6 +18,7 @@ class ModifyChildrenRolesWorker
     object = object_class.safe_constantize.find(object_id)
     # no need to proceed unless this object has children
     return unless object.try(:children).try(:any?)
+
     Roles::ModifyChildren.new(
       user: user,
       role_name: role_name,

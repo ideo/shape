@@ -28,6 +28,7 @@ module DataReport
 
     def question_type
       return question_item.question_type if question_item.present?
+
       @dataset.question_type
     end
 
@@ -38,6 +39,7 @@ module DataReport
       counts.each do |answer_number, count|
         answer_data = data.find { |d| d[:column] == answer_number }
         next if answer_data.nil?
+
         begin
           answer_data[:value] = count
         rescue StandardError => e

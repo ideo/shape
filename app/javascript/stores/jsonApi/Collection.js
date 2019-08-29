@@ -9,6 +9,7 @@ import googleTagManager from '~/vendor/googleTagManager'
 import { apiStore } from '~/stores'
 import { apiUrl } from '~/utils/url'
 
+import CardMoveService from '~/ui/grid/CardMoveService'
 import BaseRecord from './BaseRecord'
 import CollectionCard from './CollectionCard'
 import Role from './Role'
@@ -36,6 +37,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   recordsPerPage = 50
   @observable
   scrollBottom = 0
+  @observable
+  storedCacheKey = null
 
   attributesForAPI = [
     'name',
@@ -506,18 +509,22 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     runInAction(() => {
       this.totalPages = links.last
       this.currentPage = page
-      if (!this.isBoard && page === 1) {
-        // NOTE: If we ever want to "remember" collections where you've previously loaded 50+
-        // we could think about handling this differently.
+      if (page === 1 && this.storedCacheKey !== this.cache_key) {
+        this.storedCacheKey = this.cache_key
         this.collection_cards.replace(data)
-      } else if (!this.isBoard) {
-        // Just concat onto the array -- cards should already arrive in the right order
-        // e.g. `updated_at` for submissions
-        this.collection_cards = this.collection_cards.concat(data)
       } else {
-        // For foam core collections we sometimes retrieve
-        // the same card twice so we must de-dupe (using new `data` as the tiebreaker)
-        this.collection_cards = _.unionBy(data, this.collection_cards, 'id')
+        // NOTE: (potential pre-optimization) if collection_cards grows in size,
+        // at some point do we reset back to a reasonable number?
+        const newData = _.reverse(
+          // de-dupe merged data (deferring to new cards first)
+          // reverse + reverse so that new cards (e.g. page 2) are replaced first but then put back at the end
+          _.unionBy(
+            _.reverse([...data]),
+            _.reverse([...this.collection_cards]),
+            'id'
+          )
+        )
+        this.collection_cards.replace(newData)
       }
     })
   }
@@ -544,6 +551,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     _.each(updates, update => {
       updatesByCardId[update.card.id] = update
     })
+    let minOrder = _.minBy(updates, 'order')
+    minOrder = minOrder ? minOrder.order : 0
+    let maxOrder = _.maxBy(updates, 'order')
+    maxOrder = maxOrder ? maxOrder.order : 0
+    const moveOrder = _.min([minOrder, maxOrder])
 
     // Apply all updates to in-memory cards
     _.each(this.collection_cards, card => {
@@ -555,6 +567,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         _.forEach(allowedAttrs, (value, key) => {
           card[key] = value
         })
+      } else if (moveOrder && card.order >= moveOrder) {
+        // make sure this card gets bumped out of the way of our moving ones
+        card.order += maxOrder
       }
       // force the grid to immediately observe that things have changed
       card.updated_at = new Date()
@@ -607,6 +622,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     })
 
     const performUpdate = () => {
+      // close MoveMenu e.g. if you were dragging from MDL
+      this.uiStore.closeMoveMenu()
       // Store snapshot of existing cards so changes can be un-done
       const cardsData = this.toJsonApiWithCards(updateAllCards ? [] : cardIds)
 
@@ -890,9 +907,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     onSuccess,
   } = {}) {
     const { uiStore } = this
+    const { cardAction } = uiStore
     const can_edit = toCollection.can_edit_content || toCollection.can_edit
     const cancel = () => {
-      uiStore.setMovingCards([])
+      uiStore.closeMoveMenu()
       uiStore.update('multiMoveCardIds', [])
       uiStore.stopDragging()
       if (_.isFunction(onCancel)) onCancel()
@@ -908,7 +926,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
           uiStore.reselectCardIds(cardIds)
           uiStore.openMoveMenu({
             from: this.id,
-            cardAction: 'move',
+            cardAction,
           })
         },
         onCancel: () => {
@@ -918,21 +936,23 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       return
     }
 
+    if (_.isEmpty(uiStore.multiMoveCardIds)) {
+      uiStore.update('multiMoveCardIds', cardIds)
+    }
     uiStore.update('movingIntoCollection', toCollection)
 
-    const data = {
+    await CardMoveService.moveCards('beginning', {
       to_id: toCollection.id.toString(),
       from_id: this.id.toString(),
       collection_card_ids: cardIds,
-      placement: 'beginning',
-    }
-    await apiStore.moveCards(data)
-    uiStore.setMovingCards([])
+    })
     uiStore.update('multiMoveCardIds', [])
     uiStore.update('movingIntoCollection', null)
 
     // Explicitly remove cards from this collection so front-end updates
-    this.removeCardIds(cardIds)
+    if (cardAction === 'move') {
+      this.removeCardIds(cardIds)
+    }
 
     // onSuccess is really "successfully able to edit this collection"
     if (_.isFunction(onSuccess)) onSuccess()

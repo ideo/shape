@@ -9,9 +9,11 @@ class LinkToSharedCollectionsWorker
     (users_to_add + groups_to_add).each do |entity|
       # bot users don't get anything shared in their ApplicationCollection
       next if entity.try(:bot_user?)
+
       objects.each do |object|
         # Don't create any links if object was created by user
         next if object.try(:created_by_id) == entity.id
+
         org_id = object.organization_id
         if entity.is_a?(User)
           shared = entity.current_shared_collection(org_id)
@@ -50,6 +52,7 @@ class LinkToSharedCollectionsWorker
 
   def card_order(object, collection)
     return -1 if object.is_a?(Collection::ApplicationCollection)
+
     collection.collection_cards.count
   end
 end

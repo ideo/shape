@@ -1,7 +1,7 @@
 require 'rails_helper'
 
-def format_currency(x)
-  format('$%.2f', x.round(2))
+def format_currency(amount)
+  format('$%.2f', amount.round(2))
 end
 
 RSpec.describe BillingChangesMailer, type: :mailer do
@@ -37,11 +37,17 @@ RSpec.describe BillingChangesMailer, type: :mailer do
 
     it 'renders details about billing changes' do
       mail = BillingChangesMailer.notify(organization.id, new_active_users)
-      expect(mail.body.encoded).to match("#{new_active_users} new users joined Shape for your organization: #{organization.name}")
+      expect(mail.body.encoded).to match(
+        "#{new_active_users} new users joined Shape for your organization: #{organization.name}",
+      )
       expect(mail.body.encoded).to include("New users: #{new_active_users}")
       expect(mail.body.encoded).to include("Total users: #{organization.active_users_count}")
-      expect(mail.body.encoded).to include("Additional Monthly Charge: #{format_currency(Organization::PRICE_PER_USER * new_active_users)}")
-      expect(mail.body.encoded).to include("New total monthly charge: #{format_currency(Organization::PRICE_PER_USER * organization.active_users_count)}")
+      expect(mail.body.encoded).to include(
+        "Additional Monthly Charge: #{format_currency(Organization::PRICE_PER_USER * new_active_users)}",
+      )
+      expect(mail.body.encoded).to include(
+        "New total monthly charge: #{format_currency(Organization::PRICE_PER_USER * organization.active_users_count)}",
+      )
 
       price_per_user_day = Organization::PRICE_PER_USER / Time.days_in_month(Time.current.month)
       days_remaining_in_month = (Time.current.end_of_month.day - Time.current.day) + 1

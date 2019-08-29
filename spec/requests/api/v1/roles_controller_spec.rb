@@ -80,7 +80,8 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
           create(
             :application_organization,
             application: @api_token.application,
-            organization: organization)
+            organization: organization,
+          )
         end
         let!(:organization) { create(:organization) }
         let(:json_api_params) {

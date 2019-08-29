@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import FlipMove from 'react-flip-move'
@@ -16,7 +17,6 @@ import AddSubmission from '~/ui/grid/blankContentTool/AddSubmission'
 import GridCardEmptyHotspot from '~/ui/grid/GridCardEmptyHotspot'
 import ResizeIcon from '~/ui/icons/ResizeIcon'
 import { StyledCardWrapper } from '~/ui/grid/shared'
-import _ from 'lodash'
 
 const StyledResizeIcon = styled.div`
   position: absolute;
@@ -89,6 +89,8 @@ const scrollAmount = () => {
 }
 
 class MovableGridCard extends React.PureComponent {
+  unmounted = false
+
   constructor(props) {
     super(props)
     this.state = {
@@ -107,12 +109,13 @@ class MovableGridCard extends React.PureComponent {
       allowTouchDeviceDragging: false,
     }
     this.debouncedAllowTouchDeviceDrag = _.debounce(() => {
+      if (this.unmounted) return
       this.setState({ allowTouchDeviceDragging: true })
     }, v.touchDeviceHoldToDragTime)
   }
 
   componentWillReceiveProps({ position }) {
-    if (this.state.dragging) {
+    if (this.state.dragging || this.unmounted) {
       return
     }
     this.setState({
@@ -122,6 +125,7 @@ class MovableGridCard extends React.PureComponent {
   }
 
   componentWillUnmount() {
+    this.unmounted = true
     this.clearDragTimeout()
   }
 
@@ -242,7 +246,7 @@ class MovableGridCard extends React.PureComponent {
 
   handleDrag = (e, data, dX, dY) => {
     if (!this.shouldDragCard) return
-    const { position, dragOffset, zoomLevel } = this.props
+    const { card, position, dragOffset, zoomLevel } = this.props
     // Global dragging should use screen coordinates
     // TODO this could also be a HOC that publishes to the UI store
     const { pageX, pageY } = e
@@ -273,17 +277,19 @@ class MovableGridCard extends React.PureComponent {
 
     if (!this.state.dragging) {
       uiStore.closeBlankContentTool()
-      // close the MoveMenu to prevent weird behaviors
-      uiStore.closeMoveMenu({ deselect: false })
-      // close editing to prevent weird behaviors
-      uiStore.startDragging(this.props.card.id)
+      if (!card.isMDLPlaceholder) {
+        // unless we're dragging the mdlPlaceholder, close the MoveMenu to prevent weird behaviors.
+        // don't deselect otherwise multimove (dragging multiple) will also deselect
+        uiStore.closeMoveMenu({ deselect: false })
+      }
+      uiStore.startDragging(card.id)
       this.setState(
         {
           dragging: true,
           moveComplete: false,
         },
         () => {
-          this.props.onDragStart && this.props.onDragStart(this.props.card.id)
+          this.props.onDragStart && this.props.onDragStart(card.id)
         }
       )
     }
@@ -294,12 +300,12 @@ class MovableGridCard extends React.PureComponent {
     }
 
     this.dragPosition = dragPosition
-    this.props.card.dragPosition = dragPosition
-    this.props.onDrag(this.props.card.id, dragPosition)
+    card.dragPosition = dragPosition
+    this.props.onDrag(card.id, dragPosition)
   }
 
   handleStop = type => ev => {
-    const { horizontalScroll } = this.props
+    const { horizontalScroll, onDragOrResizeStop } = this.props
     this.scrolling = false
     document.body.style['overflow-y'] = 'auto'
     if (horizontalScroll) document.body.style['overflow-x'] = 'auto'
@@ -314,7 +320,7 @@ class MovableGridCard extends React.PureComponent {
         resizeWidth: 0,
         resizeHeight: 0,
       })
-      this.props.onDragOrResizeStop(this.props.card.id, type, ev)
+      onDragOrResizeStop(this.props.card.id, type, ev)
       const timeoutId = setTimeout(() => {
         // have this item remain "on top" while it animates back
         this.setState({
@@ -648,6 +654,22 @@ class MovableGridCard extends React.PureComponent {
         ? 'touch-device'
         : ''
 
+    let shouldHide = !dragging && hidden
+    const defaultPosition = {
+      width: adjustedWidth,
+      height: adjustedHeight,
+      x: xPos,
+      y: yPos,
+    }
+    const mdlPlaceholder = !dragging && card.isMDLPlaceholder
+
+    if (card.isMDLPlaceholder) {
+      _zIndex = cardDragging
+      cardProps.searchResult = true
+      cardProps.canEditCollection = false
+      shouldHide = shouldHide || !uiStore.shouldOpenMoveModal
+    }
+
     return (
       <StyledCardWrapper
         className={touchDeviceClass}
@@ -655,9 +677,15 @@ class MovableGridCard extends React.PureComponent {
         zIndex={_zIndex}
         onClick={this.handleWrapperClick}
         innerRef={c => (this.gridCardRef = c)}
-        style={{
-          display: !dragging && hidden ? 'none' : 'block',
-        }}
+        moving={mdlPlaceholder}
+        hidden={shouldHide}
+        // for mdlPlaceholder
+        maxWidth={card.maxWidth}
+        maxHeight={card.maxHeight}
+        width={card.maxWidth * v.defaultGridSettings.gridW}
+        height={card.maxHeight * v.defaultGridSettings.gridH}
+        selectedMultiple={uiStore.movingCardIds.length > 1}
+        // <-----
       >
         <Rnd
           ref={c => {
@@ -680,13 +708,10 @@ class MovableGridCard extends React.PureComponent {
             width: adjustedWidth,
             height: adjustedHeight,
           }}
-          position={{ x, y }}
-          default={{
-            width: adjustedWidth,
-            height: adjustedHeight,
-            x: xPos,
-            y: yPos,
-          }}
+          // the position that updates as you drag the card
+          position={mdlPlaceholder ? null : { x, y }}
+          // "home base" for this card; where it actually sits in the grid
+          default={defaultPosition}
           disableDragging={
             !canEditCollection ||
             // NOTE: disabling dragging for touchscreens because of conflict with touch scrolling
@@ -747,22 +772,22 @@ class MovableGridCard extends React.PureComponent {
 MovableGridCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   cardType: PropTypes.string.isRequired,
-  canEditCollection: PropTypes.bool.isRequired,
-  isUserCollection: PropTypes.bool.isRequired,
-  isSharedCollection: PropTypes.bool.isRequired,
-  isBoardCollection: PropTypes.bool.isRequired,
-  hoveringOverLeft: PropTypes.bool,
-  hoveringOverRight: PropTypes.bool,
-  holdingOver: PropTypes.bool,
   position: PropTypes.shape(propShapes.position).isRequired,
-  dragOffset: PropTypes.shape(propShapes.xy).isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
   onDrag: PropTypes.func.isRequired,
   onResize: PropTypes.func.isRequired,
   onDragOrResizeStop: PropTypes.func.isRequired,
-  routeTo: PropTypes.func.isRequired,
-  menuOpen: PropTypes.bool.isRequired,
+  dragOffset: PropTypes.shape(propShapes.xy),
+  canEditCollection: PropTypes.bool,
+  isUserCollection: PropTypes.bool,
+  isSharedCollection: PropTypes.bool,
+  isBoardCollection: PropTypes.bool,
+  hoveringOverLeft: PropTypes.bool,
+  hoveringOverRight: PropTypes.bool,
+  holdingOver: PropTypes.bool,
+  routeTo: PropTypes.func,
+  menuOpen: PropTypes.bool,
   lastPinnedCard: PropTypes.bool,
   hidden: PropTypes.bool,
   zoomLevel: PropTypes.number,
@@ -774,6 +799,10 @@ MovableGridCard.propTypes = {
 }
 
 MovableGridCard.defaultProps = {
+  canEditCollection: false,
+  isUserCollection: false,
+  isSharedCollection: false,
+  isBoardCollection: false,
   lastPinnedCard: false,
   hidden: false,
   zoomLevel: 1,
@@ -785,6 +814,12 @@ MovableGridCard.defaultProps = {
   hoveringOverLeft: false,
   hoveringOverRight: false,
   holdingOver: false,
+  dragOffset: {
+    x: 0,
+    y: 0,
+  },
+  routeTo: () => null,
+  menuOpen: false,
 }
 
 export default MovableGridCard

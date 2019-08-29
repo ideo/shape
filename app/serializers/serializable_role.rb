@@ -10,6 +10,8 @@ class SerializableRole < BaseJsonSerializer
         @object
           .users
           .order(first_name: :asc, status: :asc)
+          .left_joins(:application)
+          .where(applications: { id: nil }) # Don't include application bot users
           .limit(5)
       end
     end

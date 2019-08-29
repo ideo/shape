@@ -22,15 +22,18 @@
   height: 100%;
   margin: 0px;
   position: relative;
+
   &.ql-disabled {
     .ql-tooltip {
       visibility: hidden;
     }
-    .ql-editor ul[data-checked] > li::before {
+
+    .ql-editor ul[data-checked]>li::before {
       pointer-events: none;
     }
+
     // added this for draggable
-    .ql-editor > * {
+    .ql-editor>* {
       cursor: inherit;
     }
   }
@@ -42,6 +45,7 @@
   overflow-y: hidden;
   position: absolute;
   top: 50%;
+
   p {
     margin: 0;
     padding: 0;
@@ -58,7 +62,8 @@
   text-align: left;
   white-space: pre-wrap;
   word-wrap: break-word;
-  > * {
+
+  >* {
     cursor: text;
   }
 
@@ -81,10 +86,12 @@
   margin-left: -5px;
   width: calc(100% - 50px);
 }
+
 .ql-header {
   display: block;
 }
-.ql-formats > .ql-link {
+
+.ql-formats>.ql-link {
   margin-bottom: 3px;
 }
 

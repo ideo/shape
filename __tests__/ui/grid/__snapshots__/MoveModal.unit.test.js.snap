@@ -1,3 +1,92 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`MoveModal renders snapshot 1`] = `<div />`;
+exports[`MoveModal renders snapshot 1`] = `
+<div>
+  <StyledSnackbar
+    classes={
+      Object {
+        "root": "Snackbar",
+      }
+    }
+    open={true}
+  >
+    <React.Fragment>
+      <StyledSnackbarContent
+        action={
+          Array [
+            <styled.span>
+              <Tooltip
+                classes={
+                  Object {
+                    "tooltip": "Tooltip",
+                  }
+                }
+                placement="top"
+                title="Place at top"
+              >
+                <button
+                  data-cy="MoveModalArrow-up"
+                  onClick={[Function]}
+                >
+                  <ArrowIcon
+                    direction="up"
+                  />
+                </button>
+              </Tooltip>
+            </styled.span>,
+            <styled.span>
+              <Tooltip
+                classes={
+                  Object {
+                    "tooltip": "Tooltip",
+                  }
+                }
+                placement="top"
+                title="Place at bottom"
+              >
+                <button
+                  data-cy="MoveModalArrow-down"
+                  onClick={[Function]}
+                >
+                  <ArrowIcon
+                    direction="down"
+                  />
+                </button>
+              </Tooltip>
+            </styled.span>,
+            <styled.span>
+              <Tooltip
+                classes={
+                  Object {
+                    "tooltip": "Tooltip",
+                  }
+                }
+                placement="top"
+                title="Cancel"
+              >
+                <button
+                  onClick={[Function]}
+                >
+                  <CloseIcon />
+                </button>
+              </Tooltip>
+            </styled.span>,
+          ]
+        }
+        classes={
+          Object {
+            "root": "SnackbarContent",
+          }
+        }
+        message={
+          <StyledSnackbarText
+            id="message-id"
+          >
+            0 card in transit
+          </StyledSnackbarText>
+        }
+      />
+    </React.Fragment>
+  </StyledSnackbar>
+</div>
+`;
