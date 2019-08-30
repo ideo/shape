@@ -27,7 +27,6 @@ exports[`TestDesigner renders snapshot 1`] = `
         }
       }
       disabled={true}
-      key=""
       value=""
     >
       <span
@@ -44,7 +43,6 @@ exports[`TestDesigner renders snapshot 1`] = `
         }
       }
       disabled={true}
-      key=""
       value=""
     >
       <span
@@ -95,7 +93,6 @@ exports[`TestDesigner renders snapshot 1`] = `
         }
       }
       disabled={true}
-      key=""
       value=""
     >
       <span
@@ -180,7 +177,6 @@ exports[`TestDesigner renders snapshot 1`] = `
         }
       }
       disabled={true}
-      key=""
       value=""
     >
       <span

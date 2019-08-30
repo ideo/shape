@@ -65,6 +65,10 @@ describe('CollectionCover', () => {
     expect(props.uiStore.showPermissionsAlert).not.toHaveBeenCalled()
   })
 
+  it('does not show the cover button', () => {
+    expect(wrapper.find('CardButtonWrapper').exists()).toBeFalsy()
+  })
+
   describe('with a launchable submission test', () => {
     beforeEach(() => {
       props.collection = {
@@ -93,6 +97,17 @@ describe('CollectionCover', () => {
         .find('[data-cy="collection-cover-link"]')
         .simulate('click', fakeEvent)
       expect(props.uiStore.showPermissionsAlert).toHaveBeenCalled()
+    })
+  })
+
+  describe('with template', () => {
+    beforeEach(() => {
+      props.collection.isUsableTemplate = true
+      wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
+    })
+
+    it('shows the use template button', () => {
+      expect(wrapper.find('CardButtonWrapper').exists()).toBeTruthy()
     })
   })
 })
