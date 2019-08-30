@@ -388,7 +388,8 @@ class MovableGridCard extends React.PureComponent {
       // cancel for links within the card as these should handle their own routing
       (e.target.tagName === 'A' && e.target.href) ||
       formTags.includes(e.target.tagName) ||
-      record.type === 'Item::DataItem'
+      record.type === 'Item::DataItem' ||
+      e.target.className.match(/CollectionCoverFormButton/)
     ) {
       return
     }
@@ -396,8 +397,6 @@ class MovableGridCard extends React.PureComponent {
     if (record.can_view) {
       // timeout is just a stupid thing so that Draggable doesn't complain about unmounting
       setTimeout(() => {
-        // prevent routing when template cards are used from the cover
-        if (record.isUsableTemplate) return
         this.props.routeTo(cardType, record.id)
       })
     } else {

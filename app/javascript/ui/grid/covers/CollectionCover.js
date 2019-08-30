@@ -297,6 +297,7 @@ class CollectionCover extends React.Component {
           color={'transparent'}
           onClick={this.openMoveMenuForTemplate}
           data-cy="CollectionCoverFormButton"
+          className="CollectionCoverFormButton"
         >
           Use Template
         </UseTemplateButton>
