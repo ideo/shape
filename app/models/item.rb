@@ -75,7 +75,9 @@ class Item < ApplicationRecord
                  :pending_transcoding_uuid,
                  :common_viewable
 
-  attr_accessor :datasets_attributes
+  # So that we can assign these params in collection card builder
+  # We have assignment logic instead of using nested attributes
+  attr_accessor :datasets_attributes, :data_items_datasets_attributes
 
   # The card that 'holds' this item and determines its breadcrumb
   has_one :parent_collection_card,
