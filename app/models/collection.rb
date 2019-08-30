@@ -738,8 +738,7 @@ class Collection < ApplicationRecord
   end
 
   def default_group_id
-    return self[:default_group_id] if self[:default_group_id].present?
-    return if roles_anchor == self
+    return self[:default_group_id] if self[:default_group_id].present? || roles_anchor == self
 
     roles_anchor&.default_group_id
   end
