@@ -303,9 +303,11 @@ class Item < ApplicationRecord
     'items'
   end
 
-  def inherited_default_group_id
-    # if roles_anchor is itself, it will not have a default_group_id
-    roles_anchor.try(:default_group_id)
+  def default_group_id
+    return self[:default_group_id] if self[:default_group_id].present?
+    return if roles_anchor == self
+
+    roles_anchor&.default_group_id
   end
 
   private

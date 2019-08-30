@@ -208,8 +208,8 @@ class SerializableCollection < BaseJsonSerializer
     @object.try(:restorable_parent)
   end
 
-  attribute :inherited_default_group_id do
-    @object.inherited_default_group_id.to_s
+  attribute :default_group_id do
+    @object.default_group_id.to_s
   end
 
   attribute :cache_key do

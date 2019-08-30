@@ -737,9 +737,11 @@ class Collection < ApplicationRecord
     last_non_blank_row + 2
   end
 
-  # This is the default group ID inherited from the roles anchor
-  def inherited_default_group_id
-    roles_anchor.default_group_id
+  def default_group_id
+    return self[:default_group_id] if self[:default_group_id].present?
+    return if roles_anchor == self
+
+    roles_anchor&.default_group_id
   end
 
   # =================================
