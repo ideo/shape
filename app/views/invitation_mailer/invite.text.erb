@@ -2,4 +2,6 @@ Hello<%= " #{@user.name}" if @user.name.present?%>,
 
 <%= @application.invite_message %>
 
+<%= @application.support_message if @application.support_message.present? %>
+
 <%= @url %>

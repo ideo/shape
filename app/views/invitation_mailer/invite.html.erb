@@ -11,6 +11,12 @@
   </div>
 </div>
 
+<% if @application.support_message.present? %>
+  <div class='p'>
+    <%= @application.support_message %>
+  </div>
+<% end %>
+
 <div class='p'>
   Or copy and paste this link into your browser: <%= @url %>
 </div>

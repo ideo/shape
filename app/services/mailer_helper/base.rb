@@ -16,6 +16,8 @@ module MailerHelper
 
     def branding_byline; end
 
+    def support_message; end
+
     def invite_from_email
       "#{name} <#{email}>"
     end
@@ -37,6 +39,7 @@ module MailerHelper
     end
 
     def org_name
+      return unless invited_to.is_a?(Group)
       return if invited_to_org_group?
 
       invited_to.organization.name

@@ -17,6 +17,11 @@ module MailerHelper
       msg + '. To view your results, please click on the button below.'
     end
 
+    def support_message
+      'If you have any questions about the features on the dashboard feel free to contact' \
+      " the Creative Difference team at #{email}."
+    end
+
     def branding_byline
       "#{name} and Shape"
     end
