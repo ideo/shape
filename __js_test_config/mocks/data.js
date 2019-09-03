@@ -123,9 +123,9 @@ export const creativeDifferenceQualityDataset = {
   },
   max_domain: 60,
   tiers: [
-    { value: 20, name: 'Novice' },
-    { value: 40, name: 'Learning' },
-    { value: 60, name: 'Expert' },
+    { value: 0, name: 'Novice' },
+    { value: 20, name: 'Learning' },
+    { value: 40, name: 'Expert' },
   ],
   data: [
     { date: '2018-07-10', value: 10 },

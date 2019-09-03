@@ -50,15 +50,15 @@ exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
           "tiers": Array [
             Object {
               "name": "Novice",
-              "value": 20,
+              "value": 0,
             },
             Object {
               "name": "Learning",
-              "value": 40,
+              "value": 20,
             },
             Object {
               "name": "Expert",
-              "value": 60,
+              "value": 40,
             },
           ],
           "timeframe": "month",
@@ -93,15 +93,15 @@ exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
           "tiers": Array [
             Object {
               "name": "Novice",
-              "value": 20,
+              "value": 0,
             },
             Object {
               "name": "Learning",
-              "value": 40,
+              "value": 20,
             },
             Object {
               "name": "Expert",
-              "value": 60,
+              "value": 40,
             },
           ],
           "timeframe": "month",
@@ -206,15 +206,15 @@ exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
             "tiers": Array [
               Object {
                 "name": "Novice",
-                "value": 20,
+                "value": 0,
               },
               Object {
                 "name": "Learning",
-                "value": 40,
+                "value": 20,
               },
               Object {
                 "name": "Expert",
-                "value": 60,
+                "value": 40,
               },
             ],
             "timeframe": "month",
@@ -249,15 +249,15 @@ exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
             "tiers": Array [
               Object {
                 "name": "Novice",
-                "value": 20,
+                "value": 0,
               },
               Object {
                 "name": "Learning",
-                "value": 40,
+                "value": 20,
               },
               Object {
                 "name": "Expert",
-                "value": 60,
+                "value": 40,
               },
             ],
             "timeframe": "month",
