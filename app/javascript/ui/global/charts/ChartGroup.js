@@ -71,9 +71,7 @@ class ChartGroup extends React.Component {
 
   get secondaryDatasetsWithData() {
     const { secondaryDatasets } = this.props.dataItem
-    return secondaryDatasets().filter(
-      dataset => dataset.order !== 0 && dataset.data.length > 0
-    )
+    return secondaryDatasets().filter(dataset => dataset.data.length > 0)
   }
 
   get primaryDatasetBarChart() {
