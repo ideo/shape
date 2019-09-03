@@ -102,11 +102,12 @@ describe('CollectionCover', () => {
 
   describe('with template', () => {
     beforeEach(() => {
+      props.collection.isMasterTemplate = true
       props.collection.isUsableTemplate = true
       wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
     })
 
-    it('shows the use template button', () => {
+    it('shows the use template button for master templates', () => {
       expect(wrapper.find('CardButtonWrapper').exists()).toBeTruthy()
     })
   })
