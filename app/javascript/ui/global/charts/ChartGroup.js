@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types'
-import { Fragment } from 'react'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import {
@@ -342,17 +341,15 @@ class ChartGroup extends React.Component {
       )
     }
     return (
-      <Fragment>
-        <VictoryChart
-          theme={victoryTheme}
-          padding={{ top: 0, left: 0, right: 0, bottom: 0 }}
-          containerComponent={<VictoryVoronoiContainer />}
-        >
-          {this.renderedDatasets.map(dataset => dataset)}
-          {this.chartAxis}
-          {this.tierAxis}
-        </VictoryChart>
-      </Fragment>
+      <VictoryChart
+        theme={victoryTheme}
+        padding={{ top: 0, left: 0, right: 0, bottom: 0 }}
+        containerComponent={<VictoryVoronoiContainer />}
+      >
+        {this.renderedDatasets.map(dataset => dataset)}
+        {this.chartAxis}
+        {this.tierAxis}
+      </VictoryChart>
     )
   }
 
