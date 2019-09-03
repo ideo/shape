@@ -1,7 +1,7 @@
 # for previewing emailer in browser
 class InvitationMailerPreview < ActionMailer::Preview
   def invite
-    u = User.find 22
+    u = User.first
     InvitationMailer.invite(
       user_id: u.id,
       invited_by_id: User.second.id,
@@ -11,7 +11,7 @@ class InvitationMailerPreview < ActionMailer::Preview
   end
 
   def invite_group
-    u = User.find 22
+    u = User.first
     InvitationMailer.invite(
       user_id: u.id,
       invited_by_id: User.second.id,
