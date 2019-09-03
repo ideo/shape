@@ -3,8 +3,7 @@ require 'rails_helper'
 RSpec.describe Roles::MassAssign, type: :service do
   let(:organization) { create(:organization) }
   let(:object) do
-    create(:collection, organization: organization, num_cards: 2,
-                        created_by: create(:user))
+    create(:collection, organization: organization, num_cards: 2)
   end
   let(:users) { create_list(:user, 3) }
   let(:groups) { create_list(:group, 3) }
@@ -125,7 +124,7 @@ RSpec.describe Roles::MassAssign, type: :service do
 
     context 'with anchored collection' do
       let(:anchor) { create(:collection, organization: organization, add_editors: [invited_by]) }
-      let(:object) { create(:collection, organization: organization, num_cards: 2, roles_anchor_collection: anchor, created_by: create(:user)) }
+      let(:object) { create(:collection, organization: organization, num_cards: 2, roles_anchor_collection: anchor) }
       let(:invited_by) { create(:user) }
       let!(:propagate_to_children) { true }
 
@@ -228,7 +227,7 @@ RSpec.describe Roles::MassAssign, type: :service do
         let!(:users) { [user] }
         let!(:groups) { [] }
         let!(:linked_collection) { create(:collection) }
-        let!(:object) { create(:group, created_by: create(:user)) }
+        let!(:object) { create(:group) }
         let!(:comment_thread) { create(:item_comment_thread) }
         let!(:groups_thread) { create(:groups_thread, group: object, comment_thread: comment_thread) }
         let(:thread_ids) { object.groups_threads.pluck(:comment_thread_id) }
@@ -269,6 +268,7 @@ RSpec.describe Roles::MassAssign, type: :service do
             invited_by_id: invited_by.id,
             invited_to_type: object.class.name,
             invited_to_id: object.id,
+            application: nil,
           )
           expect(ActivityAndNotificationBuilder).to receive(:call)
           assign_role.call
