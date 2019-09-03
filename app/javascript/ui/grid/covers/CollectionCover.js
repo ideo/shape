@@ -150,10 +150,11 @@ class CollectionCover extends React.Component {
   get hasIcon() {
     const { collection } = this.props
     return (
-      collection.isTemplated ||
-      collection.isMasterTemplate ||
-      collection.isSubmissionBox ||
-      collection.isTestCollectionOrTestDesign
+      !collection.isSubTemplate &&
+      (collection.isTemplated ||
+        collection.isMasterTemplate ||
+        collection.isSubmissionBox ||
+        collection.isTestCollectionOrTestDesign)
     )
   }
 

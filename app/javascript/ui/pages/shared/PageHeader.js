@@ -117,6 +117,7 @@ class PageHeader extends React.Component {
 
   get collectionIcon() {
     const { record } = this.props
+    if (record.isSubTemplate) return null
     if (record.isProfileTemplate) {
       return (
         <IconHolder align="left">
@@ -301,7 +302,7 @@ class PageHeader extends React.Component {
 
   get renderTemplateButton() {
     const { record } = this.props
-    if (!record.isUsableTemplate) return null
+    if (record.isSubTemplate || !record.isUsableTemplate) return null
     return (
       <HeaderFormButton
         width="160"
