@@ -145,7 +145,6 @@ ActiveRecord::Schema.define(version: 2019_08_15_222240) do
     t.datetime "updated_at", null: false
     t.jsonb "breadcrumb"
     t.boolean "archived", default: false
-    t.integer "created_by_id"
     t.jsonb "cached_attributes", default: {}
     t.integer "template_id"
     t.datetime "archived_at"
