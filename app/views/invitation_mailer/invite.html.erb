@@ -3,17 +3,17 @@
 </div>
 
 <div class='p'>
-  <%= @application.invite_message %>
+  <%= @mail_helper.invite_message %>
   <br/>
 
   <div class='email-link'>
-    <%= link_to @application.invite_cta, @application.invite_url %>
+    <%= link_to @mail_helper.invite_cta, @mail_helper.invite_url %>
   </div>
 </div>
 
-<% if @application.support_message.present? %>
+<% if @mail_helper.support_message.present? %>
   <div class='p'>
-    <%= @application.support_message %>
+    <%= @mail_helper.support_message %>
   </div>
 <% end %>
 

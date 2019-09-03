@@ -3,9 +3,9 @@ class InvitationMailer < ApplicationMailer
     @user = User.find(user_id)
     invited_by = User.find(invited_by_id)
     invited_to = invited_to_type == Role::SHAPE_ADMIN.to_s.titleize ? invited_to_type : invited_to_type.safe_constantize.find(invited_to_id)
-    invite_info_klass = application.present? ? MailerHelper::Application : MailerHelper::Shape
+    mail_helper_klass = application.present? ? MailerHelper::Application : MailerHelper::Shape
 
-    @application = invite_info_klass.new(
+    @mail_helper = mail_helper_klass.new(
       application: application,
       invited_to: invited_to,
       invited_to_type: invited_to_type,
@@ -14,9 +14,9 @@ class InvitationMailer < ApplicationMailer
     )
 
     mail to: @user.email,
-         subject: @application.invite_subject,
+         subject: @mail_helper.invite_subject,
          users: [@user],
-         from: @application.invite_from_email
+         from: @mail_helper.invite_from_email
   end
 
   private
