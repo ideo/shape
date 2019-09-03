@@ -1,17 +1,13 @@
 <div class='p'>
-  Hello<%= " #{@user.name}" if @user.name.present?%>,
+  Hello<%= " #{@user.name}" if @user.name.present? %>,
 </div>
 
 <div class='p'>
-  <% if @application.default? %>
-    <%= @invited_by.name %> has invited you to join<%= @org_name ? " #{@org_name}'s" : '' %> "<%= @invited_to_name %>"<%= @org_name ? ' group ' : '' %>on Shape.
-  <% else %>
-    You've been invited to join <%= @org_name %>'s <%= @application_name %> account <% if @group_name.present? %>to view <%= @group_name %>’s results<% end %>. To view your results, please click on the button below.
-  <% end %>
+  <%= @application.invite_message %>
   <br/>
 
   <div class='email-link'>
-    <%= link_to @application.invite_cta(@invited_to_type), @url %>
+    <%= link_to @application.invite_cta, @url %>
   </div>
 </div>
 

@@ -17,8 +17,7 @@ class ApplicationMailer < ActionMailer::Base
       # in a worker that emails all admins, and there are no admins left
       return
     end
-    @application_name = @application.name
-    @application_logo = @application.invite_url
+    @application ||= MailerHelper::Shape.new
     args.delete :users
     super(args)
   rescue ActiveRecord::RecordNotFound

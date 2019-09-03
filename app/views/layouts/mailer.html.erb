@@ -8,8 +8,8 @@
     <div class="email-wrapper">
       <div class="email-inner">
         <div class="email-header">
-          <a class="email-header__logo" href="<%= ENV['BASE_HOST']%>" title="<%= @application_name %>">
-            <img alt="<%= @application_name %>" src="<%= @application_logo %>" />
+          <a class="email-header__logo" href="<%= ENV['BASE_HOST']%>" title="<%= @application.name %>">
+            <img alt="<%= @application.name %>" src="<%= @application.logo_url %>" />
           </a>
         </div>
 
@@ -20,7 +20,7 @@
 
         <div class="email-footer">
           <div class="email-footer__why">
-            You are receiving this email because you have an account or have been invited to <%= @application_name %>.
+            You are receiving this email because you have an account or have been invited to <%= @application.branding_byline %>.
           </div>
 
           <div>

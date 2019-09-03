@@ -4,6 +4,7 @@
 #
 #  id         :bigint(8)        not null, primary key
 #  email      :string
+#  invite_cta :string
 #  invite_url :string
 #  logo_url   :string
 #  name       :string
