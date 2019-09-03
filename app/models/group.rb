@@ -12,7 +12,6 @@
 #  type                         :string
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
-#  created_by_id                :integer
 #  current_shared_collection_id :integer
 #  filestack_file_id            :integer
 #  network_id                   :string
