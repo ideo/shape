@@ -59,7 +59,6 @@ class CollectionCreator extends React.Component {
   get shouldCreateAsMasterTemplate() {
     const { type } = this.props
     const { viewingCollection } = uiStore
-    debugger
     return type === 'template' || viewingCollection.isMasterTemplate
   }
 

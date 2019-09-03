@@ -12,7 +12,7 @@ module Templateable
                optional: true
 
     after_create :add_template_tag, if: :master_template?, unless: :child_of_a_master_template?
-    after_create :add_template_instance_tag, if: :templated?
+    after_create :add_template_instance_tag, if: :templated?, unless: :child_of_a_master_template?
   end
 
   def profile_template?
