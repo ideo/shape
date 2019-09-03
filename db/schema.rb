@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_26_184216) do
+ActiveRecord::Schema.define(version: 2019_08_22_221612) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -645,15 +645,6 @@ ActiveRecord::Schema.define(version: 2019_08_26_184216) do
     t.datetime "created_at", null: false
     t.boolean "subscribed", default: true
     t.index ["user_id", "comment_thread_id"], name: "by_users_comment_thread", unique: true
-  end
-
-  create_table "votes", force: :cascade do |t|
-    t.string "votable_type"
-    t.bigint "votable_id"
-    t.bigint "user_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["votable_type", "votable_id", "user_id"], name: "index_votes_on_votable_type_and_votable_id_and_user_id", unique: true
   end
 
   add_foreign_key "collections", "organizations"
