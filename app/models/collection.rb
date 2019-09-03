@@ -339,7 +339,7 @@ class Collection < ApplicationRecord
 
     # check if we are cloning a template inside a template instance;
     # - this means we should likewise turn the template dup into its own instance
-    if master_template? && !child_of_a_master_template? && building_template_instance
+    if master_template? && building_template_instance
       builder = CollectionTemplateBuilder.new(
         parent: parent,
         template: self,
@@ -359,12 +359,6 @@ class Collection < ApplicationRecord
     c.tag_list = tag_list
     # copy roles from parent (i.e. where it's being placed)
     c.roles_anchor_collection_id = parent.roles_anchor.id
-
-    if child_of_a_master_template?
-      # collections created within a master template is treated as a template
-      # instances should treat them as collections
-      c.master_template = false
-    end
 
     # copy organization_id from the collection this is being moved into
     # NOTE: parent is only nil in Colab import -- perhaps we should clean up any Colab import specific code?
