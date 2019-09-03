@@ -281,11 +281,7 @@ class CollectionCover extends React.Component {
 
   get hasUseTemplateButton() {
     const { collection } = this.props
-    return (
-      collection.isTemplated ||
-      collection.isMasterTemplate ||
-      collection.isUsableTemplate
-    )
+    return collection.isMasterTemplate && collection.isUsableTemplate
   }
 
   get useTemplateButton() {
