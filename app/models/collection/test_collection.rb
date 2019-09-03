@@ -149,6 +149,7 @@ class Collection
     def test_audience_closed!
       # Never close a test or notify, if paid audiences are still open
       return if any_paid_audiences_open?
+
       # in the case a paid test was running, and the last paid audience closed
       if gives_incentive?
         # notify the editors
@@ -156,6 +157,7 @@ class Collection
       end
       # Never close a test that still has link sharing enabled
       return if link_sharing_enabled?
+
       # Otherwise close the test
       close!
     end
@@ -163,6 +165,7 @@ class Collection
     def still_accepting_answers?
       return true if live?
       return false if test_closed_at.nil?
+
       closed? && 10.minutes.ago < test_closed_at
     end
 
@@ -177,6 +180,7 @@ class Collection
     # This gets called by template update worker when you launch
     def update_submissions_launch_status
       return unless master_template? && live?
+
       parent_submission_box.submissions_collection.collections.each do |submission|
         update_submission_launch_status(submission)
       end
@@ -188,6 +192,7 @@ class Collection
                         .in_collection(submission)
                         .find_by(template_id: id)
       return unless launchable_test.present?
+
       if launchable_test.is_a?(Collection::TestDesign)
         launchable_test = launchable_test.test_collection
       end
@@ -207,6 +212,7 @@ class Collection
     def close_all_submissions_tests!
       test_ids = parent_submission_box.submissions_collection.collections.map do |c|
         next unless c.try(:submission_attrs).try(:[], 'test_status') == 'live'
+
         c.submission_attrs['launchable_test_id']
       end.compact
 
@@ -219,6 +225,7 @@ class Collection
     # note that `test_completed?` is independent from this
     def launchable?
       return false unless draft? || closed?
+
       # is this in a submission? If so, am I tied to a test template, and is that one launched?
       if inside_a_submission?
         return false unless submission_test_launchable?
@@ -228,6 +235,7 @@ class Collection
       end
       # standalone tests otherwise don't really have any restrictions
       return true unless collection_to_test_id.present?
+
       # lastly -- make sure there is not another live in-collection test for the same collection
       collection_to_test.live_test_collection.blank?
     end
@@ -287,6 +295,7 @@ class Collection
 
     def can_reopen?
       return false unless launchable? && test_completed?
+
       test_design.present? || submission_box_template_test?
     end
 
@@ -320,6 +329,7 @@ class Collection
       if test_design.present?
         return test_design.question_items
       end
+
       prelaunch_question_items
     end
 
@@ -385,6 +395,7 @@ class Collection
 
     def aasm_event_failed(event, current_state = '')
       return if errors.present?
+
       message = "You can't #{event} because the feedback is #{current_state}"
       errors.add(:base, message)
     end
@@ -445,6 +456,7 @@ class Collection
       # since we're placing things at the front one by one, we reverse the order
       media_question_items.reverse.map do |media_item|
         next unless media_item.cards_linked_to_this_item.empty?
+
         CollectionCard::Link.create(
           parent: self,
           item_id: media_item.id,
@@ -473,6 +485,7 @@ class Collection
       audience = Audience.find_by(price_per_response: 0)
       # e.g. in unit tests
       return unless audience.present?
+
       test_audiences.find_or_create_by(
         audience_id: audience.id,
         status: :closed,
@@ -501,6 +514,7 @@ class Collection
       # so we need to ensure that the question_finish is always at the end
       item = items.find_by(question_type: Item::QuestionItem.question_types[:question_finish])
       return unless item.present?
+
       card = item.parent_collection_card
       card.update_column(:order, 9999)
       reorder_cards!
@@ -594,6 +608,7 @@ class Collection
         user: user,
       )
       return true if purchaser.success?
+
       errors.add(:base, purchaser.message) if purchaser.message.present?
       false
     end
@@ -635,6 +650,7 @@ class Collection
       test_design_card_builder = build_test_design_collection_card(initiated_by)
       transaction do
         return false unless test_design_card_builder.create
+
         self.test_design = test_design_card_builder.collection_card.record
         self.template_id = nil # Moves association to the TestDesign
         # move all the cards into the test design collection
@@ -657,6 +673,7 @@ class Collection
 
     def move_legend_item_to_third_spot
       return unless legend_item.present?
+
       legend_card = legend_item.parent_collection_card
       legend_card.update(order: 2)
       legend_card.increment_card_orders!

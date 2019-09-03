@@ -16,11 +16,13 @@ module PaidTests
 
     def self.months_with_purchases
       return [] if Payment.count.zero?
+
       first_month = Payment.order(created_at: :asc).first.created_at.beginning_of_month.to_date
       last_month = Payment.order(created_at: :desc).first.created_at.end_of_month.to_date
       months = []
       (first_month..last_month).each do |date|
         next unless date.day == 1
+
         months << date.strftime('%B %Y')
       end
       months

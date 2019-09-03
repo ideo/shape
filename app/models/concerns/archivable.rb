@@ -66,6 +66,7 @@ module Archivable
       # e.g. by archiving a Collection we should really be archiving its parent card
       return archive_as_object.try(:archive!)
     end
+
     run_callbacks :archive do
       archive_with_relations!(batch: "#{self.class}_#{id}")
     end
@@ -79,6 +80,7 @@ module Archivable
     if archive_as_object.present?
       return archive_as_object.try(:unarchive!)
     end
+
     run_callbacks :unarchive do
       # NOTE: unarchiving the batch will also unarchive "self"
       unarchive_batch!
@@ -95,6 +97,7 @@ module Archivable
   def unarchive_batch!
     # legacy items did not have archive_batch -- don't want to unarchive all of them!
     return if archive_batch.blank?
+
     # unarchive all Cards/Items/Collections that match this archive_batch
     [CollectionCard, Collection, Item].each do |model|
       model
@@ -116,9 +119,11 @@ module Archivable
 
   def restorable_parent
     return nil if restorable?
+
     potential_parent = parent
     while potential_parent
       return potential_parent if potential_parent.restorable?
+
       potential_parent = potential_parent.parent
     end
   end
@@ -131,6 +136,7 @@ module Archivable
 
   def archive_relations!(batch)
     return unless self.class.archive_with.present?
+
     self.class.archive_with.each do |relation|
       related = try(relation)
       if related.is_a? ActiveRecord::Relation

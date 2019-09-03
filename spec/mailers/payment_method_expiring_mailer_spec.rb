@@ -1,7 +1,7 @@
 require 'rails_helper'
 
-def format_currency(x)
-  format('$%.2f', x.round(2))
+def format_currency(amount)
+  format('$%.2f', amount.round(2))
 end
 
 RSpec.describe PaymentMethodExpiringMailer, type: :mailer do
@@ -35,7 +35,11 @@ RSpec.describe PaymentMethodExpiringMailer, type: :mailer do
       mail = PaymentMethodExpiringMailer.notify(organization.id, payment_method.id)
       expect(mail.body.encoded).to include("Shape default payment method is expiring soon for #{organization.name}")
       expect(mail.body.encoded).to include('thebrand ending in 4321: EXPIRING')
-      expect(mail.body.encoded).to include("Next monthly charge: #{format_currency(organization.active_users_count * Organization::PRICE_PER_USER)}")
+      expect(mail.body.encoded).to include(
+        "Next monthly charge: #{format_currency(
+          organization.active_users_count * Organization::PRICE_PER_USER,
+        )}",
+      )
       expect(mail.body.encoded).to include("Next statement date: #{Time.now.utc.end_of_month.to_s(:mdy)}")
       expect(mail.body.encoded).to include("Go to billing: #{root_url}billing")
     end

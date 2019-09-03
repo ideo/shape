@@ -40,13 +40,13 @@ class NotificationMailer < ApplicationMailer
       subject += "#{comment_count} new comments"
     end
     if comment_count.positive? & notification_count.positive?
-      subject += " and "
+      subject += ' and '
     end
     if notification_count.positive?
       subject += "#{notification_count} new notifications"
     end
 
-    subject += " on Shape"
+    subject += ' on Shape'
 
     subject
   end

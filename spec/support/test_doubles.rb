@@ -1,9 +1,9 @@
 module TestDoubles
   def network_organization_doubles(network_organization: default_network_organization_double)
     allow_any_instance_of(
-      Organization
+      Organization,
     ).to receive(:network_organization).and_return(
-      network_organization
+      network_organization,
     )
   end
 

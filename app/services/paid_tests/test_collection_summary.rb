@@ -1,6 +1,5 @@
 module PaidTests
   class TestCollectionSummary
-
     def initialize(test_collection:, start_time:, end_time:)
       @test_collection = test_collection
       @start_time = start_time
@@ -15,7 +14,7 @@ module PaidTests
         arel_paid_at.eq(nil)
         .or(
           arel_paid_at.gt(@end_time),
-        )
+        ),
       ).sum(&:amount_earned)
     end
 
@@ -33,12 +32,12 @@ module PaidTests
 
     def paid_survey_responses
       @paid_survey_responses ||= @test_collection
-        .survey_responses
-        .joins(:test_audience)
-        .includes(:test_audience)
-        .merge(
-          TestAudience.paid
-        )
+                                 .survey_responses
+                                 .joins(:test_audience)
+                                 .includes(:test_audience)
+                                 .merge(
+                                   TestAudience.paid,
+                                 )
     end
   end
 end

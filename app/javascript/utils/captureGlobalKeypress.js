@@ -113,6 +113,13 @@ const captureGlobalKeypress = e => {
       // because it's not, we just have to call it on any selected card
       card.API_archive()
       break
+    case 'Escape':
+      // save on sec happens only when user clicks the title textarea
+      const { editingCardCover } = uiStore
+      if (editingCardCover) {
+        uiStore.update('editingCardCover', null)
+      }
+      break
     default:
       break
   }

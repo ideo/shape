@@ -26,7 +26,6 @@ import OverdueBanner from '~/ui/layout/OverdueBanner'
 import routeToLogin from '~/utils/routeToLogin'
 import CreateOrgPage from '~/ui/pages/CreateOrgPage'
 import { Helmet } from 'react-helmet'
-
 // more global way to do this?
 pluralize.addPluralRule(/canvas$/i, 'canvases')
 
@@ -169,7 +168,6 @@ class CollectionPage extends React.Component {
       uiStore.popupSnackbar({ message })
     }
     uiStore.update('dragTargets', [])
-    this.restoreWindowScrollPosition()
   }
 
   restoreWindowScrollPosition() {
@@ -178,9 +176,17 @@ class CollectionPage extends React.Component {
     const linkedBreadCrumbTrail = previousViewingRecord
       ? uiStore.linkedBreadcrumbTrailForRecord(previousViewingRecord)
       : []
-    const isComingFromViewingRecordBreadcrumb = _.find(linkedBreadCrumbTrail, {
+    let isComingFromViewingRecordBreadcrumb = _.find(linkedBreadCrumbTrail, {
       id: collection.id,
     })
+    if (
+      collection.isUserCollection &&
+      previousViewingRecord &&
+      previousViewingRecord.inMyCollection
+    ) {
+      // we went from a record in my collection -> My Collection
+      isComingFromViewingRecordBreadcrumb = true
+    }
     const {
       toPathScrollY,
       history,
@@ -196,6 +202,7 @@ class CollectionPage extends React.Component {
       action === 'POP' ||
       isComingFromViewingRecordBreadcrumb ||
       returningFromSearch
+
     if (shouldScrollToOriginalPosition) {
       scroll.scrollTo(originalScrollY, { duration: 200 })
     } else {
@@ -488,7 +495,8 @@ class CollectionPage extends React.Component {
       // Pass in BCT state so grid will re-render when open/closed
       blankContentToolState,
       // to trigger a re-render
-      movingCardIds: uiStore.isMovingCards ? [...uiStore.movingCardIds] : [],
+      movingCardIds: [...uiStore.movingCardIds],
+      isMovingCards: uiStore.isMovingCards,
     }
 
     // submissions_collection will only exist for submission boxes

@@ -44,6 +44,7 @@ class Callbacks::IdeoNetworkController < ApplicationController
   def users_roles
     role = find_included('roles')[:attributes]
     return unless role[:resource_type] == 'Group'
+
     group = Group.find_by(network_id: role[:resource_id])
     user = User.find_by(uid: users_role_params[:user_uid])
 
@@ -102,6 +103,7 @@ class Callbacks::IdeoNetworkController < ApplicationController
     organization = find_included('organizations').try(:[], :attributes)
     return if organization.blank?
     return if Group.find_by(network_id: group_params[:id]).present?
+
     Group.create(name: group_params[:name],
                  organization_id: organization[:external_id],
                  network_id: group_params[:id])

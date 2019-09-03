@@ -39,6 +39,7 @@ module HasFilestackFile
 
   def filestack_file_duplicate!(object)
     return object if filestack_file.blank?
+
     object.filestack_file = filestack_file.duplicate!
     object
   end

@@ -74,6 +74,7 @@ module Resourceable
   def reanchor_if_no_roles!
     return unless item_or_collection?
     return unless parent.present? && roles.empty? && roles_anchor_collection_id.nil?
+
     # sort of a catch for items to automatically inherit parent roles_anchor if no roles exist
     # generally should only be after create
     reanchor!
@@ -81,6 +82,7 @@ module Resourceable
 
   def roles_anchor_resource_identifier
     return resource_identifier if roles_anchor_collection_id.nil?
+
     "Collection_#{roles_anchor_collection_id}"
   end
 
@@ -90,6 +92,7 @@ module Resourceable
 
   def includes_all_roles?(resource)
     return false unless item_or_collection? && resource.item_or_collection?
+
     %i[viewers editors].each do |role_name|
       my_role = send(role_name)
       their_role = resource.send(role_name)
@@ -105,6 +108,7 @@ module Resourceable
   def anchored_roles(viewing_organization_id: organization_id)
     return roles if is_a?(Group)
     return [] if common_viewable? && viewing_organization_id != organization_id
+
     roles_anchor.roles
   end
 
@@ -114,6 +118,7 @@ module Resourceable
 
   def can_edit?(user_or_group)
     return true if user_or_group.has_cached_role?(Role::SUPER_ADMIN)
+
     raise_role_name_not_set(:edit_role) if self.class.edit_role.blank?
     user_or_group.has_role_by_identifier?(self.class.edit_role, roles_anchor_resource_identifier)
   end
@@ -121,6 +126,7 @@ module Resourceable
   def can_edit_content?(user_or_group)
     return true if can_edit?(user_or_group)
     return false if self.class.content_edit_role.blank?
+
     user_or_group.has_role_by_identifier?(self.class.content_edit_role, roles_anchor_resource_identifier)
   end
 
@@ -128,6 +134,7 @@ module Resourceable
     return true if common_viewable?
     return true if can_edit?(user_or_group)
     return true if can_edit_content?(user_or_group)
+
     raise_role_name_not_set(:view_role) if self.class.view_role.blank?
     user_or_group.has_role_by_identifier?(self.class.view_role, roles_anchor_resource_identifier)
   end
@@ -170,6 +177,7 @@ module Resourceable
   # # get all [role] users, both individual and via group, for this item/collection
   def role_user_ids(role_name)
     return unless editable_and_viewable?
+
     UsersRole
       .joins(:role)
       .where(Role.arel_table[:resource_identifier].eq(roles_anchor_resource_identifier))
@@ -180,6 +188,7 @@ module Resourceable
 
   def role_group_ids(role_name)
     return unless editable_and_viewable?
+
     GroupsRole
       .joins(:role)
       .where(Role.arel_table[:resource_identifier].eq(roles_anchor_resource_identifier))
@@ -210,6 +219,7 @@ module Resourceable
     unanchor!
     # special case for QuestionItems because they don't really retain any roles
     return unless respond_to? :question_items
+
     question_items.each(&:reanchor!)
   end
 
@@ -221,6 +231,7 @@ module Resourceable
   def reanchor!(parent: self.parent, propagate: false)
     anchor_id = parent&.roles_anchor&.id
     return unless anchor_id
+
     update_columns(roles_anchor_collection_id: anchor_id, updated_at: Time.current)
     # now that its reanchored, cache private = false
     self.class.where(id: id).update_all(%(
@@ -247,6 +258,7 @@ module Resourceable
 
   def private?
     return false if parent&.is_a?(Collection::UserCollection)
+
     # NOTE: this will return the cached value if found
     Roles::Inheritance.new(parent).private_child?(self)
   end
@@ -262,6 +274,7 @@ module Resourceable
   def inherit_roles_from_parent!(parent = self.parent)
     return false unless requires_roles?
     return false unless parent.present?
+
     roles.destroy_all
     if parent.is_a? Collection::SubmissionsCollection
       role_parent = parent.submission_box

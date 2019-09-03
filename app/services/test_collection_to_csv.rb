@@ -28,6 +28,7 @@ class TestCollectionToCsv < SimpleService
         answerable_questions.each do |q|
           answer = response.question_answers.select { |qa| qa.question_id == q.id }.first
           next unless answer.present?
+
           row << (answer.answer_text || answer.answer_number)
         end
         csv << row

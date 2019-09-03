@@ -54,6 +54,7 @@ module Breadcrumbable
   # Returns an array of breadcrumb items that this user has permissions to see
   def breadcrumb_viewable_by(user = nil)
     return [] if user.blank? || breadcrumb.nil?
+
     breadcrumb_for_user(user).viewable
   end
 
@@ -78,6 +79,7 @@ module Breadcrumbable
   # Loads all children and recalculates all at once
   def recalculate_breadcrumb_tree!(force_sync: false)
     return recalculate_breadcrumb! unless is_a?(Collection)
+
     # start with self
     recalculate_breadcrumb!
     num = all_child_collections.count + all_child_items.count
@@ -95,6 +97,7 @@ module Breadcrumbable
 
   def within_collection_or_self?(collection)
     return true if collection == self
+
     breadcrumb.include?(collection.id)
   end
 
@@ -127,8 +130,10 @@ module Breadcrumbable
 
   def record_unsubscribed?(record, user)
     return false if record.comment_thread.nil?
+
     users_thread = record.comment_thread.users_thread_for(user)
     return false if users_thread.nil?
+
     !users_thread.subscribed
   end
 end

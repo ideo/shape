@@ -72,30 +72,37 @@ class User < ApplicationRecord
          :rememberable, :validatable, :omniauthable,
          omniauth_providers: [:ideo]
 
-  acts_as_taggable_on(Audience::DEMOGRAPHIC_TAGS)
-
+  has_many :users_roles, dependent: :destroy
+  has_many :roles_for_collections,
+           -> { where(resource_type: 'Collection') },
+           through: :users_roles,
+           source: :role,
+           class_name: 'Role'
   has_many :collections,
-           through: :roles,
+           through: :roles_for_collections,
            source: :resource,
            source_type: 'Collection'
+  has_many :roles_for_groups,
+           -> { where(resource_type: 'Group') },
+           through: :users_roles,
+           source: :role,
+           class_name: 'Role'
   has_many :groups,
            -> { active },
-           through: :roles,
+           through: :roles_for_groups,
            source: :resource,
            source_type: 'Group'
   has_many :current_org_groups,
            ->(u) { active.where(organization_id: u.current_organization_id) },
-           through: :roles,
+           through: :roles_for_groups,
            source: :resource,
            source_type: 'Group'
+  has_many :organizations, -> { distinct }, through: :groups
+
   has_many :users_threads, dependent: :destroy
   has_many :comment_threads,
            through: :users_threads
-
-  has_many :organizations, -> { distinct }, through: :groups
-  has_many :users_roles, dependent: :destroy
   has_many :comments, foreign_key: :author_id
-
   has_many :activities_as_actor, class_name: 'Activity', inverse_of: :actor, foreign_key: :actor_id
   has_many :activities_as_subject, through: :activity_subjects, class_name: 'Activity'
   has_many :activity_subjects, as: :subject
@@ -157,7 +164,9 @@ class User < ApplicationRecord
   searchkick callbacks: false, word_start: %i[name handle email]
   after_commit :reindex
   alias searchkick_reindex reindex
-  scope :search_import, -> { where(status: %i[active pending]) }
+  scope :search_import, -> do
+    where(status: %i[active pending]).includes(:application)
+  end
 
   def search_data
     {
@@ -166,6 +175,13 @@ class User < ApplicationRecord
       email: email_search_tokens,
       status: status,
       organization_ids: organization_ids,
+      application_bot: application_bot?,
+    }
+  end
+
+  def new_search_data
+    {
+      application_bot: application_bot?,
     }
   end
 
@@ -174,6 +190,7 @@ class User < ApplicationRecord
     if application_bot?
       return application.organizations
     end
+
     organizations_through_groups
   end
 
@@ -197,6 +214,7 @@ class User < ApplicationRecord
 
   def reindex(force: false)
     return unless should_reindex? || force
+
     Searchkick.callbacks(:async) do
       searchkick_reindex
     end
@@ -262,7 +280,7 @@ class User < ApplicationRecord
     user = Hashie::Mash.new(
       uid: auth.uid,
       type: auth.extra.raw_info.type,
-      email:  auth.info.email,
+      email: auth.info.email,
       phone: auth.extra.raw_info.phone,
       first_name: auth.info.first_name,
       last_name: auth.info.last_name,
@@ -334,11 +352,13 @@ class User < ApplicationRecord
 
   def switch_to_organization(organization = nil)
     return if current_organization_id == organization&.id
+
     if organization.blank?
       self.current_organization = self.current_user_collection = nil
     else
       org_user_collection = current_user_collection(organization.id)
       return unless org_user_collection.present?
+
       self.current_user_collection = org_user_collection
       self.current_organization = organization
     end
@@ -349,6 +369,7 @@ class User < ApplicationRecord
   # overrides retrieval of belongs_to relation
   def current_user_collection(org_id = current_organization_id)
     return nil unless org_id
+
     type = bot_user? ? 'Application' : 'User'
     user_collection = collections.find_by(organization_id: org_id, type: "Collection::#{type}Collection")
     if user_collection.nil? && has_cached_role?(Role::SUPER_ADMIN)
@@ -403,7 +424,7 @@ class User < ApplicationRecord
       .joins(:activity)
       .where(Activity.arel_table[:organization_id].eq(
                current_organization_id,
-      ))
+             ))
       .where(
         user: self,
         read: false,
@@ -426,6 +447,7 @@ class User < ApplicationRecord
     uc = current_user_collection
     # e.g. SuperAdmin doesn't always have a user collection
     return false unless uc.present?
+
     @in_my_collection ||= (
       uc.collections_and_linked_collections.select(:id, :name) + uc.items_and_linked_items.select(:id, :name)
     ).map(&:resource_identifier)
@@ -452,8 +474,10 @@ class User < ApplicationRecord
 
   def generate_network_auth_token
     return unless limited?
+
     nu = network_user
     return unless nu.present?
+
     nu.generate_auth_token.first.try(:authentication_token)
   rescue JsonApiClient::Errors::NotAuthorized
     # shouldn't happen since we are already escaping `unless limited?`
@@ -470,14 +494,17 @@ class User < ApplicationRecord
 
   def incentive_due_date
     return if incentive_owed_account_balance.zero?
+
     lines = Accounting::Query.lines_for_account(incentive_owed_account, code: :incentive_owed, order: :desc)
     first_line_owed = nil
     # Iterate through lines to find when the balance was last zero
     lines.each do |line|
       break if line.balance.zero?
+
       first_line_owed = line
     end
     return if first_line_owed.blank?
+
     first_line_owed.created_at + TestAudience::PAYMENT_WAITING_PERIOD
   end
 
@@ -490,9 +517,11 @@ class User < ApplicationRecord
     return true if current_organization.blank? ||
                    current_organization.terms_version.blank? ||
                    current_organization.terms_text_item.blank?
+
     user_accepted_version = org_terms_accepted_versions.try(:[], current_organization_id.to_s)
     if user_accepted_version
       return true if user_accepted_version == current_organization.terms_version
+
       return 'outdated'
     end
     false
@@ -511,6 +540,7 @@ class User < ApplicationRecord
   def last_active_at_in_org(org_id)
     date_string = last_active_at[org_id.to_s]
     return if date_string.nil?
+
     Time.parse(date_string)
   end
 
@@ -539,16 +569,19 @@ class User < ApplicationRecord
 
   def update_products_mailing_list_subscription(subscribed: mailing_list)
     return if skip_network_actions?
+
     MailingListSubscriptionWorker.perform_async(id, :products_mailing_list, subscribed)
   end
 
   def update_shape_circle_subscription(subscribed: shape_circle_member)
     return if skip_network_actions?
+
     MailingListSubscriptionWorker.perform_async(id, :shape_circle, subscribed)
   end
 
   def update_shape_user_list_subscription(subscribed: true)
     return if skip_network_actions?
+
     MailingListSubscriptionWorker.perform_async(id, :shape_users, subscribed)
   end
 

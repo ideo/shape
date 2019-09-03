@@ -53,7 +53,8 @@ RSpec.describe CollectionCardDuplicator, type: :service do
         create(
           :data_item,
           :report_type_record,
-          parent_collection: from_collection)
+          parent_collection: from_collection,
+        )
       end
       let(:legend_item) { data_item.legend_item }
       let(:duplicated_data_items) do

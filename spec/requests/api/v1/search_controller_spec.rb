@@ -379,5 +379,45 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
       get(path, params: { query: @user.first_name })
       expect(json['data'].select { |d| d['type'] == 'groups' }.count).to be 3
     end
+
+    context 'with application bot user' do
+      let!(:application) { create(:application, user: other_user) }
+
+      it 'returns them in regular (typeahead) search' do
+        get(path, params: { query: other_user.first_name })
+        expect(json['data'].first['id'].to_i).to eq(other_user.id)
+      end
+    end
+
+    context 'searching a collection' do
+      let!(:collection) { create(:collection) }
+      before do
+        @user.add_role(Role::EDITOR, collection)
+        similar_user.add_role(Role::EDITOR, collection)
+      end
+      let(:path_with_collection) do
+        "#{path}?resource_id=#{collection.id}&resource_type=Collection"
+      end
+      let(:json_user_ids) do
+        json['data']
+          .first['relationships']['users']['data']
+          .map { |json| json['id'].to_i }
+      end
+
+      it 'returns user with role' do
+        get(path_with_collection, params: { query: @user.first_name })
+        expect(json_user_ids).to match_array([@user.id, similar_user.id])
+      end
+
+      context 'with application bot user' do
+        let!(:application) { create(:application, user: similar_user) }
+        before { User.reindex }
+
+        it 'does not return application user' do
+          get(path_with_collection, params: { query: @user.first_name })
+          expect(json_user_ids).to eq([@user.id])
+        end
+      end
+    end
   end
 end

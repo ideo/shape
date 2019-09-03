@@ -5,6 +5,7 @@ class NotifyBillingChanges
 
   def call
     return unless context.billable_users_count.positive? && new_active_users_count.positive?
+
     notify
   end
 

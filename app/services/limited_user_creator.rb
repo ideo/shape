@@ -16,8 +16,10 @@ class LimitedUserCreator < SimpleService
 
   def call
     return false unless validate_contact_info
+
     find_or_create_network_user
     return false unless @network_user.present?
+
     if @network_user.errors.present?
       @errors = @network_user.errors
       return false
@@ -48,6 +50,7 @@ class LimitedUserCreator < SimpleService
     # https://github.com/floere/phony/issues/8
     # return phone if Phony.plausible?(phone)
     return phone if phone.length >= 9 && phone.length <= 14
+
     @errors << 'Contact information invalid'
     false
   end
@@ -96,6 +99,7 @@ class LimitedUserCreator < SimpleService
 
   def create_test_audience_invitation(user)
     return unless @date_of_participation.present?
+
     # this is a unique case where there was no test_audience but we want to record
     # when we last contacted them
     ta = TestAudienceInvitation.find_or_create_by(user: user, test_audience: nil)

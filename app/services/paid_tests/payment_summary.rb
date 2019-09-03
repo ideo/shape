@@ -8,6 +8,7 @@ module PaidTests
 
     def amount
       return BigDecimal(@payment.amount.to_s) if within_timeframe?
+
       BigDecimal('0.0')
     end
 

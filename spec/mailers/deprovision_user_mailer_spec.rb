@@ -13,11 +13,16 @@ RSpec.describe DeprovisionUserMailer, type: :mailer do
     end
 
     it 'renders the subject' do
-      expect(mail.subject).to eql("[User Deprovisioned] #{user.email} has been deprovisioned, organization #{group.organization.name} has no organization admin")
+      expect(mail.subject).to eql(
+        "[User Deprovisioned] #{user.email} has been deprovisioned,"\
+        " organization #{group.organization.name} has no organization admin",
+      )
     end
 
     it 'renders the body' do
-      expect(mail.body.encoded).to include("#{user.email} was deprovisioned, and now the organization: \"#{group.organization.name}\" has no organization admin.")
+      expect(mail.body.encoded).to include(
+        "#{user.email} was deprovisioned, and now the organization: \"#{group.organization.name}\" has no organization admin.",
+      )
       expect(mail.body.encoded).to include('The org is probably in a somewhat broken state.')
     end
   end
@@ -36,7 +41,10 @@ RSpec.describe DeprovisionUserMailer, type: :mailer do
     end
 
     it 'renders the body' do
-      expect(mail.body.encoded).to include("#{user.email} was deprovisioned, and now the group: \"#{group.name}\" has no admin.  No organization admins were available to set as new group admins.")
+      expect(mail.body.encoded).to include(
+        "#{user.email} was deprovisioned, and now the group: \"#{group.name}\" has no admin. "\
+        ' No organization admins were available to set as new group admins.',
+      )
       expect(mail.body.encoded).to include('The group is probably in a somewhat broken state.')
     end
   end
@@ -51,12 +59,19 @@ RSpec.describe DeprovisionUserMailer, type: :mailer do
     end
 
     it 'renders the subject' do
-      expect(mail.subject).to eql("[User Deprovisioned] #{user.email} has been deprovisioned, collection #{collection.name} in #{collection.organization.name} organization, set org admins as editors")
+      expect(mail.subject).to eql(
+        "[User Deprovisioned] #{user.email} has been deprovisioned, "\
+        "collection #{collection.name} in #{collection.organization.name} organization, set org admins as editors",
+      )
     end
 
     it 'renders the body' do
-      expect(mail.body.encoded).to include("#{user.email} was deprovisioned, and now the collection: \"#{collection.name}\" has no primary editor.")
-      expect(mail.body.encoded).to include('The org admin group for the collection organization has been added as editor on the collection.')
+      expect(mail.body.encoded).to include(
+        "#{user.email} was deprovisioned, and now the collection: \"#{collection.name}\" has no primary editor.",
+      )
+      expect(mail.body.encoded).to include(
+        'The org admin group for the collection organization has been added as editor on the collection.',
+      )
       expect(mail.body.encoded).to include('The collection may not have any active editors.')
     end
   end

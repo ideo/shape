@@ -5,6 +5,7 @@ class UrlExists
 
   def call
     return false if @url.blank?
+
     success_codes.include?(get_url_code)
   end
 

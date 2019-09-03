@@ -290,7 +290,10 @@ class Header extends React.Component {
               style={{ minHeight: v.headerHeight }}
             >
               <Box style={{ paddingRight: '12px' }}>
-                <PlainLink to={routingStore.pathTo('homepage')}>
+                <PlainLink
+                  to={routingStore.pathTo('homepage')}
+                  onClick={routingStore.clearHomepageScrollState}
+                >
                   <Logo />
                 </PlainLink>
               </Box>

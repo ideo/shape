@@ -58,14 +58,14 @@ export const CircledIcon = styled.button`
   justify-content: center;
   position: relative;
   width: 32px;
-  ${props =>
-    props.active && `background-color: ${v.colors.commonMedium};`} &:hover {
+  ${props => props.active && `background-color: ${v.colors.commonMedium};`}
+  &:hover {
     background-color: ${v.colors.commonMedium};
   }
 
   .icon {
     height: 20px;
-    width: 20px;
+    width: 32px;
   }
 `
 CircledIcon.displayName = 'StyledCircledIcon'

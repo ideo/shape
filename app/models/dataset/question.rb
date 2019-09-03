@@ -95,6 +95,7 @@ class Dataset
 
     def question_type
       return self[:question_type] if self[:question_type].present?
+
       question_item&.question_type
     end
 
@@ -110,11 +111,13 @@ class Dataset
 
     def org_grouping
       return false if groupings.nil?
+
       groupings.find { |grouping| grouping['type'] == 'Organization' }
     end
 
     def test_audience_grouping
       return false if groupings.nil?
+
       groupings.find { |grouping| grouping['type'] == 'Organization' }
       groupings.find { |grouping| grouping['type'] == 'TestAudience' }
     end

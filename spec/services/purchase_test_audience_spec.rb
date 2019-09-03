@@ -18,7 +18,7 @@ describe PurchaseTestAudience, type: :service do
           ':[]': payment_errors,
           full_messages: payment_errors,
         ),
-      )
+      ),
     )
   end
   let(:test_collection) { create(:test_collection) }
@@ -26,7 +26,7 @@ describe PurchaseTestAudience, type: :service do
   let(:sample_size) { 10 }
   let(:test_audience_params) do
     audiences
-    .each_with_object({}) do |audience, h|
+      .each_with_object({}) do |audience, h|
       h[audience.id] = {
         selected: true,
         sample_size: sample_size,

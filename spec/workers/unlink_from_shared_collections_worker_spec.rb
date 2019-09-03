@@ -41,7 +41,7 @@ RSpec.describe UnlinkFromSharedCollectionsWorker, type: :worker do
 
     it 'should remove group links' do
       expect(
-        group.current_shared_collection.link_collection_cards.count
+        group.current_shared_collection.link_collection_cards.count,
       ).to eq(1)
       UnlinkFromSharedCollectionsWorker.new.perform(
         users.map(&:id),
@@ -50,7 +50,7 @@ RSpec.describe UnlinkFromSharedCollectionsWorker, type: :worker do
         [],
       )
       expect(
-        group.current_shared_collection.link_collection_cards.count
+        group.current_shared_collection.link_collection_cards.count,
       ).to eq(0)
     end
   end

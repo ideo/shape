@@ -13,9 +13,9 @@ FactoryBot.define do
             'type' => 'unstyled',
             'depth' => 0,
             'entityRanges' => [],
-            'inlineStyleRanges' => []
-          }
-        ]
+            'inlineStyleRanges' => [],
+          },
+        ],
       }
     end
 
@@ -31,9 +31,9 @@ FactoryBot.define do
             data: {
               mention: {
                 id: "#{mention.id}__users",
-                name: '@username'
-              }
-            }
+                name: '@username',
+              },
+            },
           }
         end
       end
@@ -44,9 +44,9 @@ FactoryBot.define do
             data: {
               mention: {
                 id: "#{mention.id}__groups",
-                name: '@groupname'
-              }
-            }
+                name: '@groupname',
+              },
+            },
           }
         end
       end

@@ -211,4 +211,8 @@ class SerializableCollection < BaseJsonSerializer
   attribute :inherited_default_group_id do
     @object.inherited_default_group_id.to_s
   end
+
+  attribute :cache_key do
+    Digest::MD5.hexdigest(@object.cache_key(@card_order || 'order', @current_user.try(:id)))
+  end
 end

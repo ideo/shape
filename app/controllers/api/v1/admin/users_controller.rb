@@ -28,11 +28,11 @@ class Api::V1::Admin::UsersController < Api::V1::Admin::BaseController
   end
 
   def search
-    audience = Audience.find(params[:audience_id])
-    audience_tags = audience.base_tags.map(&:name)
+    # TODO: replace with updated user -> audience relation
+    # audience = Audience.find(params[:audience_id])
+    # audience_tags = audience.base_tags.map(&:name)
 
-    users = User.tagged_with(audience_tags)
-                .feedback_contact_yes
+    users = User.feedback_contact_yes
                 .left_joins(:test_audience_invitations)
                 .select('users.*, MAX(test_audience_invitations.created_at) AS date_of_participation')
                 .group('users.id')
