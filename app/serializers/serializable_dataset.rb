@@ -24,9 +24,9 @@ class SerializableDataset < BaseJsonSerializer
     if @object.order.blank? || @object.order.zero? || @object.style.blank?
       @object.style
     else
-      style = @object.style
-      style['fill'] = '#000000'
-      style
+      @object.style.symbolize_keys.merge(
+        fill: '#000000',
+      )
     end
   end
 end
