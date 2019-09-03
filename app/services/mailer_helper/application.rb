@@ -1,7 +1,6 @@
 module MailerHelper
   class Application < Base
-    delegate :name, :email, :logo_url,
-             :invite_url, :invite_cta,
+    delegate :name, :email, :logo_url, :invite_cta,
              to: :@application
 
     # Note: some of these methods are specific to Creative Difference,
@@ -24,6 +23,10 @@ module MailerHelper
 
     def branding_byline
       "#{name} and Shape"
+    end
+
+    def invite_url
+      "#{application.invite_url}?redirect=#{CGI.escape(shape_invite_url)}"
     end
 
     private

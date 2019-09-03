@@ -1,13 +1,14 @@
 module MailerHelper
   class Base
 
-    attr_reader :invited_to, :invited_to_type, :invited_by
+    attr_reader :invited_to, :invited_to_type, :invited_by, :application, :user
 
-    def initialize(application: nil, invited_to_type: nil, invited_to: nil, invited_by: nil)
+    def initialize(application: nil, invited_to_type: nil, invited_to: nil, invited_by: nil, user: nil)
       @invited_to = invited_to
       @invited_to_type = invited_to_type
       @invited_by = invited_by
       @application = application
+      @user = user
     end
 
     def invite_subject; end
@@ -20,6 +21,16 @@ module MailerHelper
 
     def invite_from_email
       "#{name} <#{email}>"
+    end
+
+    def shape_invite_url
+      if user&.pending?
+        router.accept_invitation_url(
+          token: user.invitation_token,
+        )
+      else
+        router.frontend_url_for(invited_to)
+      end
     end
 
     def default?

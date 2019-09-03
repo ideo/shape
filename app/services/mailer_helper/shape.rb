@@ -21,7 +21,7 @@ module MailerHelper
     end
 
     def invite_url
-      router.frontend_url_for(invited_to)
+      shape_invite_url
     end
 
     def invite_cta
