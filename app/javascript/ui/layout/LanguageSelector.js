@@ -6,14 +6,16 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 @inject('apiStore')
 @observer
 class LanguageSelector extends React.Component {
-  handleChange = ev => {
+  handleChange = async ev => {
     const { apiStore } = this.props
     const { currentUser } = apiStore
     const language = ev.target.value
     currentUser.language = language
-    currentUser.API_updateCurrentUser({
+    await currentUser.API_updateCurrentUser({
       language,
     })
+    // NOTE: simple way to do this for now
+    window.location.reload()
   }
 
   get languageSelected() {
