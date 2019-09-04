@@ -767,6 +767,13 @@ class Collection < ApplicationRecord
     parents.where(master_template: true).any?
   end
 
+  def template_a_child_of_a_master_template?
+    return false unless template_id.present?
+
+    template = Collection.find(template_id)
+    template.parents.where(master_template: true).any?
+  end
+
   def inside_a_template_instance?
     return true if templated?
 

@@ -151,6 +151,10 @@ class SerializableCollection < BaseJsonSerializer
     @object.child_of_a_master_template?
   end
 
+  attribute :is_template_a_child_of_a_master_template do
+    @object.template_a_child_of_a_master_template?
+  end
+
   attribute :template_num_instances do
     if @object.master_template?
       @object.templated_collections.active.count
