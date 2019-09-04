@@ -161,15 +161,23 @@ module Roles
       @added_users.each do |user|
         # skip people who have opted out
         next unless user.notify_through_email
-        application = @object.created_by.application if @object.created_by.application_bot?
+
         InvitationMailer.invite(
           user_id: user.id,
           invited_by_id: @invited_by.id,
           invited_to_type: @object.class.base_class.name,
           invited_to_id: @object.id,
-          application: application,
+          application: object_application,
         ).deliver_later
       end
+    end
+
+    def object_application
+      return unless @object.respond_to?(:created_by) &&
+                    @object.created_by.present? &&
+                    @object.created_by.application_bot?
+
+      @object.created_by.application
     end
 
     def valid_object_and_role_name?
