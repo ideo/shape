@@ -5,7 +5,7 @@ import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
 import PaperAirplane from '~/ui/test_collections/PaperAirplane'
 import { ModalCloseButton } from '~/ui/global/modals/Modal'
-import { TextButton, FormButton } from '~/ui/global/styled/forms'
+import { FormButton, TextButton } from '~/ui/global/styled/buttons'
 import {
   DisplayText,
   SpecialDisplayHeading,

@@ -19,7 +19,7 @@ import DataTargetSelect from '~/ui/reporting/DataTargetSelect'
 import v from '~/utils/variables'
 import trackError from '~/utils/trackError'
 import OrganicGridPng from '~/assets/organic_grid_black.png'
-import { StyledDataItemCover } from './StyledDataItemCover'
+import { StyledDataItemCover } from '~/ui/grid/covers/data-item/StyledDataItemCover'
 
 const GraphKey = styled.span`
   background: url(${OrganicGridPng});
@@ -295,7 +295,6 @@ class DataItemCoverCollectionsItems extends React.Component {
       uiStore.removeNewCard(item.id)
       this.toggleEditing()
     }
-
     return (
       <StyledDataItemCover
         className="cancelGridClick"

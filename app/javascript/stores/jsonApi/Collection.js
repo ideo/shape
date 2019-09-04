@@ -925,7 +925,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
           cancel()
           uiStore.reselectCardIds(cardIds)
           uiStore.openMoveMenu({
-            from: this.id,
+            from: this,
             cardAction,
           })
         },

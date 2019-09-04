@@ -8,9 +8,9 @@ import { Grid, Hidden, MenuItem } from '@material-ui/core'
 
 import trackError from '~/utils/trackError'
 import isEmail from '~/utils/isEmail'
+import { FormButton } from '~/ui/global/styled/buttons'
 import {
   Checkbox,
-  FormButton,
   FormActionsContainer,
   Select,
 } from '~/ui/global/styled/forms'

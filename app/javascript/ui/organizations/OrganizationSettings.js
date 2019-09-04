@@ -2,11 +2,11 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observable, action, runInAction } from 'mobx'
 import FormControl from '@material-ui/core/FormControl'
 
+import { FormButton } from '~/ui/global/styled/buttons'
 import {
   Checkbox,
   LabelContainer,
   LabelTextStandalone,
-  FormButton,
 } from '~/ui/global/styled/forms'
 import { Heading2, SmallHelperText } from '~/ui/global/styled/typography'
 import TagEditor from '~/ui/pages/shared/TagEditor'
