@@ -413,7 +413,7 @@ export default class UiStore {
     // cardAction can be 'move', 'link', 'duplicate', 'useTemplate'
     this.cardAction = cardAction
     if (this.cardAction === 'useTemplate') {
-      const fromCover = !!context && context === ACTION_SOURCES.COVER
+      const fromCover = context === ACTION_SOURCES.COVER
       if (fromCover) {
         const { parent_collection_card, name } = from
         const { id } = parent_collection_card
