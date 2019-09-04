@@ -145,6 +145,7 @@ ActiveRecord::Schema.define(version: 2019_08_15_222240) do
     t.datetime "updated_at", null: false
     t.jsonb "breadcrumb"
     t.boolean "archived", default: false
+    t.integer "created_by_id"
     t.jsonb "cached_attributes", default: {}
     t.integer "template_id"
     t.datetime "archived_at"
@@ -361,7 +362,6 @@ ActiveRecord::Schema.define(version: 2019_08_15_222240) do
     t.jsonb "autojoin_emails", default: []
     t.string "type"
     t.string "network_id"
-    t.integer "created_by_id"
     t.index ["autojoin_emails"], name: "index_groups_on_autojoin_emails", using: :gin
     t.index ["handle"], name: "index_groups_on_handle"
     t.index ["network_id"], name: "index_groups_on_network_id"
