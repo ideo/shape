@@ -130,6 +130,9 @@ gem 'ideo-translation', git: 'https://github.com/ideo/ideo-translation.git'
 
 gem 'slack-ruby-client'
 
+# Text helper to provide possessive strings
+gem 'possessive'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: %i[mri mingw x64_mingw]

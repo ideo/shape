@@ -1,15 +1,21 @@
 <div class='p'>
-  Hello<%= " #{@user.name}" if @user.name.present?%>,
+  Hello<%= " #{@user.name}" if @user.name.present? %>,
 </div>
 
 <div class='p'>
-  <%= @invited_by.name %> has invited you to join<%= @org_name ? " #{@org_name}'s" : '' %> "<%= @invited_to_name %>"<%= @org_name ? ' group ' : '' %>on Shape.
+  <%= @mail_helper.invite_message %>
   <br/>
 
   <div class='email-link'>
-    <%= link_to "Join #{@invited_to_type}", @url %>
+    <%= link_to @mail_helper.invite_cta, @mail_helper.invite_url %>
   </div>
 </div>
+
+<% if @mail_helper.support_message.present? %>
+  <div class='p'>
+    <%= @mail_helper.support_message %>
+  </div>
+<% end %>
 
 <div class='p'>
   Or copy and paste this link into your browser: <%= @url %>
