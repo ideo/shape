@@ -186,4 +186,16 @@ class Api::V1::BaseController < ApplicationController
     @organization = Organization.friendly.find(slug)
     authorize! :read, @organization
   end
+
+  def set_locale
+    if params[:locale] && I18n.available_locales.include?(params[:locale].to_sym)
+      I18n.locale = params[:locale]
+    else
+      I18n.locale = default_locale
+    end
+  end
+
+  def default_locale
+    I18n.default_locale
+  end
 end

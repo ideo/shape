@@ -9,6 +9,7 @@
 #  domain_whitelist                      :jsonb
 #  has_payment_method                    :boolean          default(FALSE), not null
 #  in_app_billing                        :boolean          default(TRUE), not null
+#  language_default                      :string
 #  name                                  :string
 #  overdue_at                            :datetime
 #  sent_high_charges_high_email          :boolean          default(FALSE), not null
@@ -411,6 +412,10 @@ class Organization < ApplicationRecord
     return 'No payment method' if payment_method.blank?
 
     (network_default_payment_method.created_at.to_date - created_at.to_date).to_i
+  end
+
+  def language_default
+    self[:language_default] || 'en'
   end
 
   private
