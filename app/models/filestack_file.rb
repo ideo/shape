@@ -23,6 +23,8 @@ class FilestackFile < ApplicationRecord
   after_create :process_image, if: :image?
   after_destroy :delete_on_filestack, unless: :url_being_used?
 
+  attr_accessor :original_item_id
+
   TOKEN_EXPIRATION = 1.hour
 
   amoeba do

@@ -205,231 +205,201 @@ describe Collection, type: :model do
     end
   end
 
-  describe '#duplicate!' do
-    let!(:user) { create(:user) }
-    let!(:parent_collection_user) { create(:user) }
-    let!(:collection_user) { create(:user) }
-    let!(:parent_collection) { create(:collection) }
-    let(:organization) { parent_collection.organization }
-    let!(:collection) do
-      create(:collection, num_cards: 3, tag_list: %w[Prototype Other], organization: organization)
-    end
-    let!(:parent_collection_card) do
-      create(:collection_card_collection, parent: parent_collection, collection: collection)
-    end
-    let(:copy_parent_card) { false }
-    let(:parent) { collection.parent }
-    let(:duplicate) do
-      dupe = collection.duplicate!(
-        for_user: user,
-        copy_parent_card: copy_parent_card,
-        parent: parent,
-      )
-      # Necessary because AR-relationship is cached
-      user.roles.reload
-      user.reset_cached_roles!
-      dupe
-    end
-
-    it 'does not duplicate if no flag passed' do
-      expect(duplicate.parent_collection_card).to be_nil
-    end
-
-    context 'with archived collection' do
-      let!(:collection) { create(:collection, num_cards: 3, archived: true, tag_list: %w[Prototype Other]) }
-
-      it 'creates a duplicate that is not archived' do
-        expect(collection.archived?).to be true
-        expect(duplicate.archived?).to be false
-      end
-    end
-
-    context 'with shared_with_organization' do
-      before do
-        collection.update(shared_with_organization: true)
-      end
-
-      it 'nullifies shared_with_organization' do
-        expect(collection.shared_with_organization?).to be true
-        expect(duplicate.shared_with_organization?).to be false
-      end
-    end
-
-    context 'without user' do
-      let(:duplicate_without_user) do
-        dupe = collection.duplicate!(
-          copy_parent_card: true,
-          parent: parent,
-        )
-        user.roles.reload
-        user.reset_cached_roles!
-        dupe
-      end
-
-      it 'clones the collection' do
-        expect { duplicate_without_user }.to change(Collection, :count).by(1)
-      end
-
-      it 'clones all the collection cards' do
-        expect(CollectionCardDuplicationWorker).to receive(:perform_async).with(
-          collection.collection_cards.map(&:id),
-          instance_of(Integer),
-          nil,
-          false,
-          false,
-        )
-        duplicate_without_user
-      end
-
-      it 'clones all roles from parent collection - but not user' do
-        expect(duplicate_without_user.editors[:users].map(&:email)).to match(
-          parent.editors[:users].map(&:email),
-        )
-        expect(duplicate_without_user.can_edit?(user)).to be false
-      end
-    end
-
-    context 'with copy_parent_card true' do
-      let!(:copy_parent_card) { true }
-
-      it 'creates duplicate with parent_collection as its parent' do
-        expect(duplicate.id).not_to eq(collection.id)
-        expect(duplicate.parent).to eq parent_collection
-      end
-
-      it 'creates duplicate with organization_id matching parent' do
-        expect(duplicate.organization_id).to eq parent_collection.organization_id
-      end
-    end
-
-    context 'with editor role' do
-      before do
-        user.add_role(Role::EDITOR, parent)
-        user.add_role(Role::EDITOR, collection)
-        parent_collection_user.add_role(Role::EDITOR, parent)
-        collection_user.add_role(Role::EDITOR, collection)
-        collection.items.each do |item|
-          user.add_role(Role::EDITOR, item)
-        end
-        collection.reload
-      end
-
-      it 'clones the collection' do
-        expect { duplicate }.to change(Collection, :count).by(1)
-        expect(collection.id).not_to eq(duplicate.id)
-      end
-
-      it 'references the current collection as cloned_from' do
-        expect(duplicate.cloned_from).to eq(collection)
-      end
-
-      it 'clones all the collection cards' do
-        expect(CollectionCardDuplicationWorker).to receive(:perform_async).with(
-          collection.collection_cards.map(&:id),
-          instance_of(Integer),
-          user.id,
-          false,
-          false,
-        )
-        collection.duplicate!(for_user: user)
-      end
-
-      it 'clones all roles from parent collection' do
-        expect(duplicate.editors[:users].map(&:email)).to match(parent.editors[:users].map(&:email))
-        expect(duplicate.can_edit?(user)).to be true
-      end
-
-      it 'clones all roles on items' do
-        expect(duplicate.items.all? { |item| item.can_edit?(user) }).to be true
-      end
-
-      it 'clones tag list' do
-        expect(duplicate.tag_list).to match_array collection.tag_list
-      end
-    end
-
-    context 'with system_collection and synchronous settings' do
-      let(:instance_double) do
-        double('CollectionCardDuplicationWorker')
-      end
-
-      before do
-        allow(CollectionCardDuplicationWorker).to receive(:new).and_return(instance_double)
-        allow(instance_double).to receive(:perform).and_return true
-      end
-
-      it 'should call synchronously' do
-        expect(CollectionCardDuplicationWorker).to receive(:new)
-        expect(instance_double).to receive(:perform).with(
-          anything,
-          anything,
-          anything,
-          true,
-          true,
-        )
-        collection.duplicate!(for_user: user, system_collection: true, synchronous: true)
-      end
-    end
-
-    context 'with a subcollection inside the system-generated getting started collection' do
-      let(:parent_collection) { create(:global_collection) }
-      let!(:subcollection) { create(:collection, num_cards: 2, parent_collection: collection, organization: organization) }
-      let(:duplicate) do
-        collection.duplicate!(
-          for_user: user,
-          copy_parent_card: copy_parent_card,
-          parent: parent,
-          system_collection: true,
-          synchronous: true,
-        )
-      end
-      let(:shell_collection) { duplicate.collections.first }
-
-      before do
-        organization.update(getting_started_collection: parent_collection)
-        duplicate
-      end
-
-      it 'should mark the duplicate child collection as a getting_started_shell' do
-        expect(shell_collection.getting_started_shell).to be true
-      end
-
-      it 'should not create any collection cards in the child collection' do
-        expect(shell_collection.cloned_from).to eq subcollection
-        expect(shell_collection.cloned_from.collection_cards.count).to eq 2
-        expect(shell_collection.collection_cards.count).to eq 0
-      end
-    end
-
-    context 'with external records' do
-      let!(:external_records) do
-        [
-          create(:external_record, externalizable: collection, external_id: '100'),
-          create(:external_record, externalizable: collection, external_id: '101'),
-        ]
-      end
-
-      it 'duplicates external records' do
-        expect(collection.external_records.reload.size).to eq(2)
-        expect {
-          duplicate
-        }.to change(ExternalRecord, :count).by(2)
-
-        expect(duplicate.external_records.pluck(:external_id)).to match_array(
-          %w[100 101],
-        )
-      end
-    end
-
-    context 'with submission_attrs' do
-      let!(:collection) { create(:collection, :submission) }
-
-      it 'clears out submission_attrs' do
-        expect(collection.submission?).to be true
-        expect(duplicate.submission?).to be false
-      end
-    end
-  end
+  # describe '#duplicate!' do
+  #   let!(:user) { create(:user) }
+  #   let!(:parent_collection_user) { create(:user) }
+  #   let!(:collection_user) { create(:user) }
+  #   let!(:parent_collection) { create(:collection) }
+  #   let(:organization) { parent_collection.organization }
+  #   let!(:collection) do
+  #     create(:collection, num_cards: 3, tag_list: %w[Prototype Other], organization: organization)
+  #   end
+  #   let!(:parent_collection_card) do
+  #     create(:collection_card_collection, parent: parent_collection, collection: collection)
+  #   end
+  #   let(:copy_parent_card) { false }
+  #   let(:parent) { collection.parent }
+  #   let(:duplicate) do
+  #     dupe = collection.duplicate!(
+  #       for_user: user,
+  #       copy_parent_card: copy_parent_card,
+  #       parent: parent,
+  #     )
+  #     # Necessary because AR-relationship is cached
+  #     user.roles.reload
+  #     user.reset_cached_roles!
+  #     dupe
+  #   end
+  #
+  #   it 'does not duplicate if no flag passed' do
+  #     expect(duplicate.parent_collection_card).to be_nil
+  #   end
+  #
+  #   context 'with archived collection' do
+  #     let!(:collection) { create(:collection, num_cards: 3, archived: true, tag_list: %w[Prototype Other]) }
+  #
+  #     it 'creates a duplicate that is not archived' do
+  #       expect(collection.archived?).to be true
+  #       expect(duplicate.archived?).to be false
+  #     end
+  #   end
+  #
+  #   context 'with shared_with_organization' do
+  #     before do
+  #       collection.update(shared_with_organization: true)
+  #     end
+  #
+  #     it 'nullifies shared_with_organization' do
+  #       expect(collection.shared_with_organization?).to be true
+  #       expect(duplicate.shared_with_organization?).to be false
+  #     end
+  #   end
+  #
+  #   context 'without user' do
+  #     let(:duplicate_without_user) do
+  #       dupe = collection.duplicate!(
+  #         copy_parent_card: true,
+  #         parent: parent,
+  #       )
+  #       user.roles.reload
+  #       user.reset_cached_roles!
+  #       dupe
+  #     end
+  #
+  #     it 'clones the collection' do
+  #       expect { duplicate_without_user }.to change(Collection, :count).by(1)
+  #     end
+  #
+  #     it 'clones all the collection cards' do
+  #       expect(CollectionCardDuplicationWorker).to receive(:perform_async).with(
+  #         collection.collection_cards.map(&:id),
+  #         instance_of(Integer),
+  #         nil,
+  #         false,
+  #         false,
+  #       )
+  #       duplicate_without_user
+  #     end
+  #
+  #     it 'clones all roles from parent collection - but not user' do
+  #       expect(duplicate_without_user.editors[:users].map(&:email)).to match(
+  #         parent.editors[:users].map(&:email),
+  #       )
+  #       expect(duplicate_without_user.can_edit?(user)).to be false
+  #     end
+  #   end
+  #
+  #   context 'with copy_parent_card true' do
+  #     let!(:copy_parent_card) { true }
+  #
+  #     it 'creates duplicate with parent_collection as its parent' do
+  #       expect(duplicate.id).not_to eq(collection.id)
+  #       expect(duplicate.parent).to eq parent_collection
+  #     end
+  #
+  #     it 'creates duplicate with organization_id matching parent' do
+  #       expect(duplicate.organization_id).to eq parent_collection.organization_id
+  #     end
+  #   end
+  #
+  #   context 'with editor role' do
+  #     before do
+  #       user.add_role(Role::EDITOR, parent)
+  #       user.add_role(Role::EDITOR, collection)
+  #       parent_collection_user.add_role(Role::EDITOR, parent)
+  #       collection_user.add_role(Role::EDITOR, collection)
+  #       collection.items.each do |item|
+  #         user.add_role(Role::EDITOR, item)
+  #       end
+  #       collection.reload
+  #     end
+  #
+  #     it 'clones the collection' do
+  #       expect { duplicate }.to change(Collection, :count).by(1)
+  #       expect(collection.id).not_to eq(duplicate.id)
+  #     end
+  #
+  #     it 'references the current collection as cloned_from' do
+  #       expect(duplicate.cloned_from).to eq(collection)
+  #     end
+  #
+  #     it 'clones all the collection cards' do
+  #       expect(CollectionCardDuplicationWorker).to receive(:perform_async).with(
+  #         collection.collection_cards.map(&:id),
+  #         instance_of(Integer),
+  #         user.id,
+  #         false,
+  #         false,
+  #       )
+  #       collection.duplicate!(for_user: user)
+  #     end
+  #
+  #     it 'clones all roles from parent collection' do
+  #       expect(duplicate.editors[:users].map(&:email)).to match(parent.editors[:users].map(&:email))
+  #       expect(duplicate.can_edit?(user)).to be true
+  #     end
+  #
+  #     it 'clones all roles on items' do
+  #       expect(duplicate.items.all? { |item| item.can_edit?(user) }).to be true
+  #     end
+  #
+  #     it 'clones tag list' do
+  #       expect(duplicate.tag_list).to match_array collection.tag_list
+  #     end
+  #   end
+  #
+  #   context 'with system_collection and synchronous settings' do
+  #     let(:instance_double) do
+  #       double('CollectionCardDuplicationWorker')
+  #     end
+  #
+  #     before do
+  #       allow(CollectionCardDuplicationWorker).to receive(:new).and_return(instance_double)
+  #       allow(instance_double).to receive(:perform).and_return true
+  #     end
+  #
+  #     it 'should call synchronously' do
+  #       expect(CollectionCardDuplicationWorker).to receive(:new)
+  #       expect(instance_double).to receive(:perform).with(
+  #         anything,
+  #         anything,
+  #         anything,
+  #         true,
+  #         true,
+  #       )
+  #       collection.duplicate!(for_user: user, system_collection: true, synchronous: true)
+  #     end
+  #   end
+  #
+  #   context 'with external records' do
+  #     let!(:external_records) do
+  #       [
+  #         create(:external_record, externalizable: collection, external_id: '100'),
+  #         create(:external_record, externalizable: collection, external_id: '101'),
+  #       ]
+  #     end
+  #
+  #     it 'duplicates external records' do
+  #       expect(collection.external_records.reload.size).to eq(2)
+  #       expect {
+  #         duplicate
+  #       }.to change(ExternalRecord, :count).by(2)
+  #
+  #       expect(duplicate.external_records.pluck(:external_id)).to match_array(
+  #         %w[100 101],
+  #       )
+  #     end
+  #   end
+  #
+  #   context 'with submission_attrs' do
+  #     let!(:collection) { create(:collection, :submission) }
+  #
+  #     it 'clears out submission_attrs' do
+  #       expect(collection.submission?).to be true
+  #       expect(duplicate.submission?).to be false
+  #     end
+  #   end
+  # end
 
   describe '#copy_all_cards_into!' do
     let(:source_collection) { create(:collection, num_cards: 3) }

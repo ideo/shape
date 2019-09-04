@@ -149,16 +149,18 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   before_action :check_valid_duplication, only: %i[duplicate]
   def duplicate
-    collection_card_duplicator = CollectionCardDuplicator.new(
+    collection_card_duplicator = CardDuplicator::Service.new(
       to_collection: @to_collection,
       cards: @cards,
       for_user: current_user,
+      placement: json_api_params[:placement],
     )
-    collection_card_duplicator.duplicate_current_cards(@from_collection)
+    collection_card_duplicator.call
     # TODO: test this
-    render jsonapi: @to_collection.reload,
-           include: Collection.default_relationships_for_api,
-           expose: { current_record: @to_collection }
+    head :no_content
+    # render jsonapi: @to_collection.reload,
+    #        include: Collection.default_relationships_for_api,
+    #        expose: { current_record: @to_collection }
   end
 
   private
@@ -192,6 +194,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     return unless user_signed_in?
     # ids_only does not need to precache roles
     return if ids_only
+
     # precache roles because these will be referred to in the serializers (e.g. can_edit?)
     current_user.precache_roles_for(
       [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],
@@ -236,6 +239,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def load_and_authorize_linking_collections
     @from_collection = Collection.find(json_api_params[:from_id])
     @cards = ordered_cards
+    # help optimize subsequent call to `authorize! :read` on each card
+    current_user.precache_roles_for(
+      [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],
+      @cards.map(&:record).compact,
+    )
     @cards.each do |card|
       authorize! :read, card
     end

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Templateable, type: :concern do
+describe Templateable, type: :concern, only: true do
   describe '#profile_template?' do
     let(:organization) { create(:organization) }
     let(:profile_template) { organization.profile_template }

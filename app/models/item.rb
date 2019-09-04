@@ -118,6 +118,13 @@ class Item < ApplicationRecord
   after_commit :reindex_parent_collection, unless: :destroyed?
   after_commit :update_parent_collection_if_needed, unless: :destroyed?
 
+  enum report_type: {
+    report_type_collections_and_items: 0,
+    report_type_network_app_metric: 1,
+    report_type_record: 2,
+    report_type_question_item: 3,
+  }
+
   amoeba do
     enable
     recognize []

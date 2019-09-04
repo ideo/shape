@@ -31,13 +31,11 @@ module Templateable
   def setup_templated_collection(for_user:, collection:)
     # important that this is first so that the collection knows it is "templated"
     collection.update(template: self)
-    collection_cards.each do |cc|
-      cc.duplicate!(
-        for_user: for_user,
-        parent: collection,
-        building_template_instance: true,
-      )
-    end
+    copy_all_cards_into!(
+      collection,
+      for_user: for_user,
+      building_template_instance: true,
+    )
   end
 
   # This gets called upon:

@@ -20,33 +20,33 @@ RSpec.describe CollectionCardDuplicator, type: :service do
 
     # NOTE: This test is very similar to collection_cards_controller_spec#duplicate
     # As a result this test suite is kept pretty sparse to not repeat everything from there
-    it 'duplicates cards from one collection to the other' do
-      expect(moving_cards.map(&:parent_id).uniq).to match_array [from_collection.id]
-      new_cards = service.call
-
-      first_cards = to_collection.reload.collection_cards.first(2)
-      # newly created cards should be duplicates
-      expect(first_cards).to match_array new_cards
-      expect(first_cards.map(&:item)).not_to match_array moving_cards.map(&:item)
-      # names should match, in same order
-      expect(first_cards.map(&:item).map(&:name)).to eq moving_cards.map(&:item).map(&:name)
-      expect(to_collection.collection_cards.first.primary?).to be true
-      expect(to_collection.collection_cards.count).to eq 5
-    end
-
-    context 'when to_collection is a foamcore board' do
-      let!(:to_collection) { create(:board_collection, num_cards: 3, add_editors: [user]) }
-      let(:new_cards) { service.call }
-      let(:target_empty_row) { to_collection.empty_row_for_moving_cards }
-
-      it 'sets row of duplicated cards 2 rows after the last non-blank row' do
-        new_cards.each_with_index do |card, index|
-          expect(card.parent_id).to eq to_collection.id
-          expect(card.row).to eq target_empty_row
-          expect(card.col).to eq index
-        end
-      end
-    end
+    # it 'duplicates cards from one collection to the other' do
+    #   expect(moving_cards.map(&:parent_id).uniq).to match_array [from_collection.id]
+    #   new_cards = service.call
+    #
+    #   first_cards = to_collection.reload.collection_cards.first(2)
+    #   # newly created cards should be duplicates
+    #   expect(first_cards).to match_array new_cards
+    #   expect(first_cards.map(&:item)).not_to match_array moving_cards.map(&:item)
+    #   # names should match, in same order
+    #   expect(first_cards.map(&:item).map(&:name)).to eq moving_cards.map(&:item).map(&:name)
+    #   expect(to_collection.collection_cards.first.primary?).to be true
+    #   expect(to_collection.collection_cards.count).to eq 5
+    # end
+    #
+    # context 'when to_collection is a foamcore board' do
+    #   let!(:to_collection) { create(:board_collection, num_cards: 3, add_editors: [user]) }
+    #   let(:new_cards) { service.call }
+    #   let(:target_empty_row) { to_collection.empty_row_for_moving_cards }
+    #
+    #   it 'sets row of duplicated cards 2 rows after the last non-blank row' do
+    #     new_cards.each_with_index do |card, index|
+    #       expect(card.parent_id).to eq to_collection.id
+    #       expect(card.row).to eq target_empty_row
+    #       expect(card.col).to eq index
+    #     end
+    #   end
+    # end
 
     context 'with data items that have legends' do
       let!(:data_item) do

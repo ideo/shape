@@ -1,13 +1,13 @@
 require 'rails_helper'
 
-RSpec.describe PopulateGettingStartedShellCollection, type: :service do
+RSpec.describe PopulateGettingStartedShellCollection, type: :service, only: true do
   let(:user) { create(:user) }
   let(:organization) { create(:organization) }
   let(:getting_started_collection) do
     create(:global_collection, num_cards: 3, record_type: :collection, organization: organization)
   end
   let(:shape_tutorial) { getting_started_collection.collections.first }
-  let!(:shape_use_cases) { create(:collection, parent_collection: shape_tutorial) }
+  let!(:shape_use_cases) { create(:collection, name: 'Use Cases', parent_collection: shape_tutorial) }
   let!(:shape_use_cases_cards) { create_list(:collection_card_text, 3, parent: shape_use_cases) }
   let(:user_shape_tutorial) { user.current_user_collection.collections.find_by(cloned_from: shape_tutorial) }
   let(:user_shape_use_cases) { user_shape_tutorial.collections.first }
@@ -20,6 +20,7 @@ RSpec.describe PopulateGettingStartedShellCollection, type: :service do
   end
 
   before do
+    shape_tutorial.update(name: 'Shape Tutorial')
     organization.update(getting_started_collection: getting_started_collection)
     organization.setup_user_membership_and_collections(user, synchronous: true)
   end
@@ -46,12 +47,10 @@ RSpec.describe PopulateGettingStartedShellCollection, type: :service do
     end
 
     it 'passes appropriate options to CollectionCardDuplicator' do
-      expect(CollectionCardDuplicator).to receive(:call).with(
+      expect(CardDuplicator::Service).to receive(:call).with(
         to_collection: user_shape_use_cases,
         cards: shape_use_cases.collection_cards,
         placement: 'beginning',
-        for_user: user,
-        system_collection: true,
       )
       service.call
     end

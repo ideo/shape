@@ -52,8 +52,6 @@ class CollectionCard < ApplicationRecord
   # for the purpose of accepting these params via deserializable
   attr_accessor :external_id
   attr_accessor :card_type
-  # temporary attr stored in DuplicateCollectionCards service
-  attr_accessor :cloned_from_id
 
   before_validation :assign_order, if: :assign_order?
   before_validation :ensure_width_and_height
@@ -228,6 +226,11 @@ class CollectionCard < ApplicationRecord
     return nil if record.blank?
 
     record.class.base_class.name.underscore.to_sym
+  end
+
+  def cloned_from
+    return nil unless cloned_from_id.present?
+    CollectionCard.find(cloned_from_id)
   end
 
   def primary?

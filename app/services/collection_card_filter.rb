@@ -1,5 +1,5 @@
 class CollectionCardFilter < SimpleService
-  def initialize(collection:, user:, filters:, application: nil, ids_only: false)
+  def initialize(collection:, user:, filters: {}, application: nil, ids_only: false)
     @collection_order = nil
     @collection = collection
     @user = user
@@ -20,6 +20,7 @@ class CollectionCardFilter < SimpleService
     end
     filter_external_id
     return @cards.pluck(:id) if @ids_only
+
     @cards
   end
 

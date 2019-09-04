@@ -408,25 +408,20 @@ class Collection < ApplicationRecord
     target_collection,
     placement: 'beginning',
     synchronous: false,
-    system_collection: false
+    for_user: nil,
+    building_template_instance: false
   )
-    cards = placement != 'end' ? collection_cards.reverse : collection_cards
-    duplicates = []
-    cards.each do |card|
-      # ensures single copy, if existing copies already exist it will skip those
-      existing_records = target_collection.collection_cards.map(&:record)
-      next if existing_records.select { |r| r.cloned_from == card.record }.present?
+    duplicator = CardDuplicator::Service.call(
+      cards: collection_cards,
+      placement: placement,
+      to_collection: target_collection,
+      synchronous: synchronous,
+      for_user: for_user,
+      building_template_instance: building_template_instance,
+    )
 
-      duplicates << card.duplicate!(
-        parent: target_collection,
-        placement: placement,
-        synchronous: synchronous,
-        # can allow copies to continue even if the user can't view the original content
-        system_collection: system_collection,
-      )
-    end
     # return the set of created duplicates
-    CollectionCard.where(id: duplicates.pluck(:id))
+    duplicator.duplicated_cards
   end
 
   # NOTE: this refers to the first level of children
@@ -546,7 +541,7 @@ class Collection < ApplicationRecord
     queue_update_template_instances
   end
 
-  def enable_org_view_access_if_allowed(parent)
+  def enable_org_view_access_if_allowed(parent = self.parent)
     # If parent is user collection, allow primary group to see it
     # As long as it isn't the 'Getting Started' collection
     return false unless parent.is_a?(Collection::UserCollection) &&
@@ -554,7 +549,7 @@ class Collection < ApplicationRecord
 
     # collections created in My Collection always get unanchored
     unanchor_and_inherit_roles_from_anchor!
-    organization.primary_group.add_role(Role::VIEWER, self).try(:persisted?)
+    organization.primary_group&.add_role(Role::VIEWER, self).try(:persisted?)
   end
 
   def reindex_sync
@@ -611,6 +606,13 @@ class Collection < ApplicationRecord
     # https://github.com/rails/rails/pull/32563
     self.cached_attributes ||= {}
     self.cached_attributes['cached_card_count'] = collection_cards.count
+    # update without callbacks/timestamps
+    update_column :cached_attributes, cached_attributes
+  end
+
+  def mark_as_getting_started_shell!
+    self.cached_attributes ||= {}
+    self.cached_attributes['getting_started_shell'] = true
     # update without callbacks/timestamps
     update_column :cached_attributes, cached_attributes
   end
