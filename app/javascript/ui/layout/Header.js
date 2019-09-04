@@ -9,6 +9,7 @@ import Breadcrumb from '~/ui/layout/Breadcrumb'
 import CornerPositioned from '~/ui/global/CornerPositioned'
 import Logo from '~/ui/layout/Logo'
 import PlainLink from '~/ui/global/PlainLink'
+import LanguageSelector from '~/ui/layout/LanguageSelector'
 import GlobalSearch from '~/ui/layout/GlobalSearch'
 import ActionMenu from '~/ui/grid/ActionMenu'
 import ArrowIcon from '~/ui/icons/ArrowIcon'
@@ -229,6 +230,7 @@ class Header extends React.Component {
               </button>
 
               <Box>
+                // todo: where does LanguageSelector appear?
                 <GlobalSearch open className="search-bar" />
               </Box>
             </Flex>
@@ -347,6 +349,7 @@ class Header extends React.Component {
               </Box>
 
               <Box flex align="center" style={{ marginLeft: '8px' }}>
+                <LanguageSelector />
                 <Hidden xsDown>
                   <GlobalSearch className="search-bar" />
                 </Hidden>

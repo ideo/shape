@@ -472,7 +472,7 @@ ActiveRecord::Schema.define(version: 2019_09_04_204944) do
     t.jsonb "autojoin_domains", default: []
     t.bigint "terms_text_item_id"
     t.integer "terms_version"
-    t.string "language_default"
+    t.string "language_default", default: "en"
     t.index ["autojoin_domains"], name: "index_organizations_on_autojoin_domains", using: :gin
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end
@@ -620,7 +620,7 @@ ActiveRecord::Schema.define(version: 2019_09_04_204944) do
     t.boolean "shape_circle_member", default: false
     t.jsonb "terms_accepted_data", default: {}
     t.jsonb "last_active_at", default: {}
-    t.string "language_default"
+    t.string "language"
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"

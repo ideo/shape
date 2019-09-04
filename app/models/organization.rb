@@ -9,7 +9,7 @@
 #  domain_whitelist                      :jsonb
 #  has_payment_method                    :boolean          default(FALSE), not null
 #  in_app_billing                        :boolean          default(TRUE), not null
-#  language_default                      :string
+#  language_default                      :string           default("en")
 #  name                                  :string
 #  overdue_at                            :datetime
 #  sent_high_charges_high_email          :boolean          default(FALSE), not null
@@ -415,7 +415,7 @@ class Organization < ApplicationRecord
   end
 
   def language_default
-    self[:language_default] || 'en'
+    language_default_in_database
   end
 
   private

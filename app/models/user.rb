@@ -12,7 +12,7 @@
 #  first_name                  :string
 #  handle                      :string
 #  invitation_token            :string
-#  language_default            :string
+#  language                    :string
 #  last_active_at              :jsonb
 #  last_name                   :string
 #  last_notification_mail_sent :datetime
@@ -547,8 +547,8 @@ class User < ApplicationRecord
     Time.parse(date_string)
   end
 
-  def language_default
-    self.language_default || self.current_organization.language_default
+  def language
+    language_in_database || current_organization&.language_default
   end
 
   private

@@ -4,6 +4,7 @@ class Api::V1::BaseController < ApplicationController
   before_action :check_api_authentication!
   before_action :check_cancel_sync
   before_action :check_page_param
+  before_action :set_locale
 
   respond_to :json
 
@@ -188,14 +189,10 @@ class Api::V1::BaseController < ApplicationController
   end
 
   def set_locale
-    if params[:locale] && I18n.available_locales.include?(params[:locale].to_sym)
-      I18n.locale = params[:locale]
+    if user_signed_in?
+      I18n.locale = current_user.language
     else
-      I18n.locale = default_locale
+      I18n.locale = I18n.default_locale
     end
-  end
-
-  def default_locale
-    I18n.default_locale
   end
 end
