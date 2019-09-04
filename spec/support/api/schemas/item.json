@@ -32,7 +32,7 @@
     "common_viewable": { "type": ["boolean", "null"] },
     "archived": { "type": ["boolean", "null"] },
     "is_restorable": { "type": ["boolean", "null"] },
-    "inherited_default_group_id": { "type": ["string"] }
+    "default_group_id": { "type": ["string", "null"] }
   },
   "required": ["class_type"]
 }
