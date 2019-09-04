@@ -2,8 +2,7 @@ module Breadcrumbable
   extend ActiveSupport::Concern
 
   included do
-    after_create :recalculate_breadcrumb!, if: :calculate_breadcrumb?
-    before_update :calculate_breadcrumb
+    before_save :calculate_breadcrumb
   end
 
   class_methods do
@@ -58,7 +57,7 @@ module Breadcrumbable
     breadcrumb_for_user(user).viewable
   end
 
-  # really just an alias for save since before_update will call calculate_breadcrumb
+  # really just an alias for save since before_save will call calculate_breadcrumb
   def recalculate_breadcrumb!
     save
   end
@@ -122,10 +121,6 @@ module Breadcrumbable
       self,
       user,
     )
-  end
-
-  def calculate_breadcrumb?
-    breadcrumb.blank?
   end
 
   def record_unsubscribed?(record, user)
