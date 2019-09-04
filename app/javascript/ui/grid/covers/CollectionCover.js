@@ -13,11 +13,13 @@ import { CardHeading } from '~/ui/global/styled/typography'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
-import { FormButton, RoundPill } from '~/ui/global/styled/forms'
+import { FormButton } from '~/ui/global/styled/buttons'
+import { RoundPill } from '~/ui/global/styled/forms'
 import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import { routingStore } from '~/stores'
+import { ACTION_SOURCES } from '~/enums/actionEnums'
 
 const IconHolder = styled.span`
   display: inline-block;
@@ -37,6 +39,18 @@ const LaunchButton = FormButton.extend`
   }
 `
 LaunchButton.displayName = 'LaunchButton'
+
+const CardButtonWrapper = styled.div`
+  margin-left: calc(50% - ${v.buttonSizes.header.width / 2}px);
+  padding-bottom: 4px;
+`
+CardButtonWrapper.displayName = 'CardButtonWrapper'
+
+const UseTemplateButton = FormButton.extend`
+  border-color: white;
+  color: white;
+`
+UseTemplateButton.displayName = 'UseTemplateButton'
 
 const StyledCollectionCover = styled.div`
   width: 100%;
@@ -144,7 +158,7 @@ function namePartTooLong(fullName) {
   return parts.some(part => part.length > 14)
 }
 
-@inject('uiStore')
+@inject('uiStore', 'apiStore')
 @observer
 class CollectionCover extends React.Component {
   get hasIcon() {
@@ -194,6 +208,17 @@ class CollectionCover extends React.Component {
       )
     }
     return <span style={{ hyphens }}>{collection.name}</span>
+  }
+
+  openMoveMenuForTemplate = async e => {
+    const { collection, uiStore, apiStore } = this.props
+    // load additional data needed for moving template from card cover, ie. parent_collection_card
+    await apiStore.fetch('collections', collection.id)
+    uiStore.openMoveMenu({
+      from: collection,
+      cardAction: 'useTemplate',
+      context: ACTION_SOURCES.COVER,
+    })
   }
 
   get hasCollectionScore() {
@@ -252,6 +277,28 @@ class CollectionCover extends React.Component {
       >
         {buttonText}
       </LaunchButton>
+    )
+  }
+
+  get hasUseTemplateButton() {
+    const { collection } = this.props
+    return collection.isMasterTemplate && collection.isUsableTemplate
+  }
+
+  get useTemplateButton() {
+    return (
+      <CardButtonWrapper>
+        <UseTemplateButton
+          width={v.buttonSizes.header.width}
+          fontSize={v.buttonSizes.header.fontSize}
+          color={'transparent'}
+          onClick={this.openMoveMenuForTemplate}
+          data-cy="CollectionCoverFormButton"
+          className="CollectionCoverFormButton"
+        >
+          Use Template
+        </UseTemplateButton>
+      </CardButtonWrapper>
     )
   }
 
@@ -347,11 +394,13 @@ class CollectionCover extends React.Component {
                       {this.name}
                     </PlainLink>
                   </Dotdotdot>
+                  {this.button}
                 </PositionedCardHeading>
               </div>
               <div className="bottom">
                 {this.launchTestButton}
                 {this.collectionScore}
+                {this.hasUseTemplateButton && this.useTemplateButton}
                 {!this.hasLaunchTestButton && (
                   <Dotdotdot clamp={this.hasCollectionScore ? 2 : 3}>
                     {cover.text}

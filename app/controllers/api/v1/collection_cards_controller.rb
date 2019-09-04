@@ -378,6 +378,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
           :mimetype,
           docinfo: {},
         ],
+        data_items_datasets_attributes: [
+          :order,
+          :selected,
+          :dataset_id,
+        ],
         datasets_attributes: [
           :identifier,
           :description,
@@ -388,6 +393,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
           :measure,
           :timeframe,
           :chart_type,
+          :tiers,
           :data_source_type,
           :data_source_id,
           style: {},

@@ -4,7 +4,8 @@ import FormControlLabel from '@material-ui/core/FormControlLabel'
 import styled from 'styled-components'
 
 import Tooltip from '~/ui/global/Tooltip'
-import { Checkbox, FormButton } from '~/ui/global/styled/forms'
+import { FormButton } from '~/ui/global/styled/buttons'
+import { Checkbox } from '~/ui/global/styled/forms'
 import v from '~/utils/variables'
 
 const CenteredContainer = styled.div`
