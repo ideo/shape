@@ -179,10 +179,7 @@ class PageHeader extends React.Component {
       icon = <ProfileIcon />
     } else if (record.isProfileCollection) {
       icon = <SystemIcon />
-    } else if (
-      record.isTemplated &&
-      !record.is_template_a_child_of_a_master_template
-    ) {
+    } else if (record.isTemplated && !record.isSubTemplate) {
       icon = <TemplateIcon circled />
     } else if (record.isSubmissionBox) {
       icon = <SubmissionBoxIconLg />
