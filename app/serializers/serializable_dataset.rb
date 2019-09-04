@@ -6,7 +6,7 @@ class SerializableDataset < BaseJsonSerializer
              :order, :selected, :style,
              :data_items_datasets_id,
              :test_collection_id,
-             :data_source_id, :data_source_type, :groupings
+             :data_source_id, :data_source_type, :groupings, :tiers
 
   belongs_to :data_source
 end

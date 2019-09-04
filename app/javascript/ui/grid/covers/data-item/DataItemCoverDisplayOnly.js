@@ -67,7 +67,7 @@ class DataItemCoverDisplayOnly extends React.Component {
     if (item.isReportTypeQuestionItem) {
       return this.questionItemTitleAndDescription
     } else {
-      return <Heading3 color={this.fillColor}>{item.name}</Heading3>
+      return <Heading3>{item.name}</Heading3>
     }
   }
 

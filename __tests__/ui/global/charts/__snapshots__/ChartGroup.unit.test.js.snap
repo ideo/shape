@@ -2205,11 +2205,6 @@ exports[`ChartGroup renders snapshot 1`] = `
         />,
       }
     }
-    domainPadding={
-      Object {
-        "y": 80,
-      }
-    }
     groupComponent={<g />}
     padding={
       Object {
@@ -4442,6 +4437,7 @@ exports[`ChartGroup renders snapshot 1`] = `
           responsive={true}
         />
       }
+      dependentAxis={false}
       fixLabelOverlap={false}
       gridComponent={
         <LineSegment
@@ -4455,6 +4451,7 @@ exports[`ChartGroup renders snapshot 1`] = `
         />
       }
       offsetY={13}
+      orientation="bottom"
       scale="linear"
       standalone={true}
       style={
