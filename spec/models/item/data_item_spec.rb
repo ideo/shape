@@ -49,13 +49,48 @@ RSpec.describe Item::DataItem, type: :model do
   describe '#duplicate' do
     let(:collection) { create(:collection) }
     let!(:data_item) { create(:data_item, :report_type_record) }
+    let(:dataset) { data_item.datasets.first }
 
-    it 'should not duplicate the dataset' do
+    it 'does duplicate the dataset' do
+      expect(dataset.data_items.size).to eq(1)
       expect do
         data_item.duplicate!(
           parent: collection,
         )
-      end.to change(Dataset, :count).by 0
+      end.to change(Dataset, :count).by(1)
+    end
+
+    context 'if dataset is linked to multiple data items' do
+      let!(:data_item_two) { create(:data_item, :report_type_record) }
+      before do
+        data_item_two.data_items_datasets.first.update(
+          dataset_id: dataset.id,
+        )
+      end
+
+      it 'links / does not duplicate the dataset' do
+        expect(dataset.data_items.size).to eq(2)
+        expect do
+          data_item.duplicate!(
+            parent: collection,
+          )
+        end.not_to change(Dataset, :count)
+      end
+    end
+
+    context 'if dataset was created by application' do
+      before do
+        dataset.update(application: create(:application))
+      end
+
+      it 'links / does not duplicate the dataset' do
+        expect(dataset.data_items.size).to eq(1)
+        expect do
+          data_item.duplicate!(
+            parent: collection,
+          )
+        end.not_to change(Dataset, :count)
+      end
     end
   end
 

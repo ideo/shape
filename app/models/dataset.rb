@@ -75,6 +75,16 @@ class Dataset < ApplicationRecord
     "#{object.class.base_class.name}-#{object.id}"
   end
 
+  def link_when_duplicating?
+    # Link (instead of duplicating)
+    # If a dataset was created by an application,
+    # or has more than one data item
+    return true if application.present? || data_items.count > 1
+
+    # Otherwise, it can be duplicated
+    false
+  end
+
   def grouping
     # NOTE: support for multiple groupings is TBD
     groupings.first

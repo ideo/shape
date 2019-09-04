@@ -174,7 +174,7 @@ class CollectionCard < ApplicationRecord
 
     # Nullify is_cover if the collection going into already has a cover or
     # should specifically not have a cover.
-    cc.is_cover = false if parent.cached_cover.try(:[], 'no_cover') == true
+    cc.is_cover = false if parent.cached_cover.try(:[], :no_cover) == true
     cc.is_cover = false if parent.collection_cards.is_cover.count.positive?
 
     unless shallow || link?

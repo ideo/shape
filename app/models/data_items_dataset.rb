@@ -31,12 +31,10 @@ class DataItemsDataset < ApplicationRecord
     exclude_association :data_item
 
     customize(lambda { |orig_data_items_dataset, dup_data_items_dataset|
-      # if a dataset only has more than one data item, duplicate it
-      if dup_data_items_dataset.dataset.data_items.count > 1
-        new_dataset = orig_data_items_dataset.dataset.amoeba_dup
-      # otherwise, just link it.
-      else
+      if dup_data_items_dataset.dataset.link_when_duplicating?
         new_dataset = orig_data_items_dataset.dataset
+      else
+        new_dataset = orig_data_items_dataset.dataset.amoeba_dup
       end
       dup_data_items_dataset.dataset = new_dataset
     })
