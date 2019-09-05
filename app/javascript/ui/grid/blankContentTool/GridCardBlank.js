@@ -359,7 +359,6 @@ class GridCardBlank extends React.Component {
       image_contain: this.props.defaultShowWholeImage,
     }
 
-    debugger
     // apply nested attrs
     Object.assign(attrs, nested)
     const card = new CollectionCard(attrs, apiStore)
