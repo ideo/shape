@@ -46,13 +46,15 @@ describe Organization, type: :model do
   end
 
   context 'callbacks' do
-    let(:organization) { create(:organization) }
+    let(:organization) { create(:organization, name: 'Something Long to Test Longer Org Slugs') }
+    let(:org_handle) { organization.name.parameterize.slice(0, 36) }
+    let(:org_short_handle) { organization.name.parameterize.slice(0, 28) }
 
     describe '#initialize_primary_group' do
       it 'should create primary group with same name as org' do
         expect(organization.primary_group.persisted?).to be true
         expect(organization.primary_group.name).to eq(organization.name)
-        expect(organization.primary_group.handle).to eq(organization.name.parameterize)
+        expect(organization.primary_group.handle).to eq(org_handle)
       end
     end
 
@@ -60,8 +62,7 @@ describe Organization, type: :model do
       it 'should create guest group with same name as org + Guests' do
         expect(organization.guest_group.persisted?).to be true
         expect(organization.guest_group.name).to eq("#{organization.name} Guests")
-        slug = "#{organization.name.parameterize}-guest".slice(0, 36)
-        expect(organization.guest_group.handle).to eq(slug)
+        expect(organization.guest_group.handle).to eq("#{org_short_handle}-guests")
       end
     end
 
@@ -69,8 +70,7 @@ describe Organization, type: :model do
       it 'should create admin group with same name as org + Admins' do
         expect(organization.admin_group.persisted?).to be true
         expect(organization.admin_group.name).to eq("#{organization.name} Admins")
-        slug = "#{organization.name.parameterize}-admins".slice(0, 36)
-        expect(organization.admin_group.handle).to eq(slug)
+        expect(organization.admin_group.handle).to eq("#{org_short_handle}-admins")
       end
     end
 

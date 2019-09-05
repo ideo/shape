@@ -217,11 +217,11 @@ class Organization < ApplicationRecord
   end
 
   def guest_group_handle
-    "#{handle}-guest"
+    "#{handle.slice(0, 28)}-guests"
   end
 
   def admin_group_handle
-    "#{handle}-admins"
+    "#{handle.slice(0, 28)}-admins"
   end
 
   # NOTE: even if none of these work it will fallback to handle-UUID
