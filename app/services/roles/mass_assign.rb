@@ -167,8 +167,17 @@ module Roles
           invited_by_id: @invited_by.id,
           invited_to_type: @object.class.base_class.name,
           invited_to_id: @object.id,
+          application: object_application,
         ).deliver_later
       end
+    end
+
+    def object_application
+      return unless @object.respond_to?(:created_by) &&
+                    @object.created_by.present? &&
+                    @object.created_by.application_bot?
+
+      @object.created_by.application
     end
 
     def valid_object_and_role_name?

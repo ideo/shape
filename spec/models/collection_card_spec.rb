@@ -183,11 +183,13 @@ RSpec.describe CollectionCard, type: :model do
     let!(:collection_card) { create(:collection_card_text) }
     let(:shallow) { false }
     let(:duplicate_linked_records) { false }
+    let(:parent) { collection_card.parent }
     let(:placement) { 'end' }
     let(:system_collection) { false }
     let(:duplicate) do
       collection_card.duplicate!(
         for_user: user,
+        parent: parent,
         shallow: shallow,
         placement: placement,
         duplicate_linked_records: duplicate_linked_records,
@@ -210,6 +212,43 @@ RSpec.describe CollectionCard, type: :model do
     it 'should not call increment_card_orders!' do
       expect_any_instance_of(CollectionCard).not_to receive(:increment_card_orders!)
       duplicate
+    end
+
+    context 'when copying into a collection with no cover set' do
+      let(:parent) { create(:collection, cached_cover: { 'no_cover': true }) }
+
+      before do
+        collection_card.update(is_cover: true)
+      end
+
+      it 'should nullify the is cover attribute' do
+        expect(duplicate.is_cover).to be false
+      end
+    end
+
+    context 'when copying into a collection with an existing cover' do
+      let(:parent) { create(:collection, cached_cover: { 'no_cover': true }) }
+      let(:cover) { create(:collection_card, parent: parent, is_cover: true) }
+
+      before do
+        collection_card.update(is_cover: true)
+      end
+
+      it 'should nullify the is cover attribute' do
+        expect(duplicate.is_cover).to be false
+      end
+    end
+
+    context 'when copying a cover card into a collection' do
+      let(:parent) { create(:collection) }
+
+      before do
+        collection_card.update(is_cover: true)
+      end
+
+      it 'should keep the is_cover attribute' do
+        expect(duplicate.is_cover).to be true
+      end
     end
 
     context 'without user' do
@@ -568,11 +607,13 @@ RSpec.describe CollectionCard, type: :model do
       let(:user) { create(:user) }
 
       it 'should archive all cards in the query' do
-        expect_any_instance_of(Collection).to receive(:touch)
         expect do
           collection_cards.archive_all!(user_id: user.id)
-        end.to change(CollectionCard.active, :count).by(collection_cards.count * -1)
-        expect(collection.reload.collection_cards).to eq []
+          collection.reload
+        end.to change(CollectionCard.active, :count)
+          .by(collection_cards.count * -1)
+          .and(change(collection, :updated_at))
+        expect(collection.collection_cards).to eq []
       end
 
       it 'should call the CollectionCardArchiveWorker' do

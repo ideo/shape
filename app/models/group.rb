@@ -62,6 +62,7 @@ class Group < ApplicationRecord
   belongs_to :current_shared_collection,
              class_name: 'Collection',
              optional: true
+  belongs_to :created_by, class_name: 'User', optional: true
   has_many :groups_threads
 
   has_many :activities_as_subject, through: :activity_subjects, class_name: 'Activity'

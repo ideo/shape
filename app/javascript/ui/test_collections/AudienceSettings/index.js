@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { runInAction, observable, action, computed } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
-import { FormButton } from '~/ui/global/styled/forms'
+import { FormButton } from '~/ui/global/styled/buttons'
 import AudienceSettingsWidget from '~/ui/test_collections/AudienceSettings/AudienceSettingsWidget'
 // import TestAudience from '~/stores/jsonApi/TestAudience'
 import FeedbackTermsModal from '~/ui/test_collections/FeedbackTermsModal'

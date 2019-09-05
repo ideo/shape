@@ -26,6 +26,11 @@ module TestDoubles
   end
 
   def default_network_organization_double
-    double('NetworkApi::Organization', id: 'network-org-123')
+    double(
+      'NetworkApi::Organization',
+      id: 'network-org-123',
+      'name=': true,
+      save: true,
+    )
   end
 end

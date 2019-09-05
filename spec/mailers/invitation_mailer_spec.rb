@@ -5,12 +5,14 @@ RSpec.describe InvitationMailer, type: :mailer do
     let(:user) { create(:user, :pending) }
     let(:invited_by) { create(:user) }
     let(:organization) { create(:organization) }
+    let(:application) { nil }
     let(:mail) do
       InvitationMailer.invite(
         user_id: user.id,
         invited_by_id: invited_by.id,
         invited_to_type: invited_to.class.name,
         invited_to_id: invited_to.id,
+        application: application,
       )
     end
 
@@ -71,9 +73,37 @@ RSpec.describe InvitationMailer, type: :mailer do
       end
 
       it 'renders the body' do
-        expect(mail.body.encoded).to match(
-          "#{invited_by.name} has invited you to join #{organization.name}'s \"#{invited_to.name}\" group",
+        expect(mail.text_part.body).to match(
+          "#{invited_by.name} has invited you to join #{organization.name.possessive} \"#{invited_to.name}\" group",
         )
+      end
+
+      context 'with an application' do
+        let(:application) do
+          create(
+            :application,
+            name: 'Creative Difference',
+            invite_cta: 'View Your Results',
+            invite_url: 'https://creativedifference.ideo.com/shape',
+            email: 'help@ideocreativedifference.com',
+            logo_url: 'https://creativedifference.ideo.com/logo.png',
+          )
+        end
+
+        it 'sets the from to creative difference' do
+          expect(mail.from).to eq(['help@ideocreativedifference.com'])
+        end
+
+        it 'sets the invite url to creative difference' do
+          expect(mail.text_part.body).to match('https://creativedifference.ideo.com/shape')
+        end
+
+        it 'adds support message' do
+          expect(mail.text_part.body).to match(
+            'If you have any questions about the features on the dashboard feel free to contact' \
+            ' the Creative Difference team at help@ideocreativedifference.com.',
+          )
+        end
       end
     end
 

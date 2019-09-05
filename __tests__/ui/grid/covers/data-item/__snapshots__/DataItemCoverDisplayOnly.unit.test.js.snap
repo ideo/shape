@@ -38,6 +38,7 @@ exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
           ],
           "description": "The degree to which there is alignment about a meaningful change that leadership and employees want to make in the world.",
           "identifier": "purpose",
+          "max_domain": 60,
           "measure": "Purpose",
           "name": "purpose",
           "order": 0,
@@ -46,6 +47,20 @@ exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
             "dashWidth": 2,
             "fill": "#EFEFEF",
           },
+          "tiers": Array [
+            Object {
+              "name": "Novice",
+              "value": 0,
+            },
+            Object {
+              "name": "Learning",
+              "value": 20,
+            },
+            Object {
+              "name": "Expert",
+              "value": 40,
+            },
+          ],
           "timeframe": "month",
         },
         Object {
@@ -66,6 +81,7 @@ exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
           ],
           "description": "The degree to which there is alignment about a meaningful change that leadership and employees want to make in the world.",
           "identifier": "purpose",
+          "max_domain": 60,
           "measure": "95th Percentile",
           "name": "purpose",
           "order": 1,
@@ -74,6 +90,20 @@ exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
             "dashWidth": 2,
             "fill": "#EFEFEF",
           },
+          "tiers": Array [
+            Object {
+              "name": "Novice",
+              "value": 0,
+            },
+            Object {
+              "name": "Learning",
+              "value": 20,
+            },
+            Object {
+              "name": "Expert",
+              "value": 40,
+            },
+          ],
           "timeframe": "month",
         },
       ],
@@ -121,9 +151,7 @@ exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
   <styled.div>
     <styled.div>
       <styled.div>
-        <StyledHeading3
-          color="#000000"
-        >
+        <StyledHeading3>
           Data Item
         </StyledHeading3>
       </styled.div>
@@ -166,6 +194,7 @@ exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
             ],
             "description": "The degree to which there is alignment about a meaningful change that leadership and employees want to make in the world.",
             "identifier": "purpose",
+            "max_domain": 60,
             "measure": "Purpose",
             "name": "purpose",
             "order": 0,
@@ -174,6 +203,20 @@ exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
               "dashWidth": 2,
               "fill": "#EFEFEF",
             },
+            "tiers": Array [
+              Object {
+                "name": "Novice",
+                "value": 0,
+              },
+              Object {
+                "name": "Learning",
+                "value": 20,
+              },
+              Object {
+                "name": "Expert",
+                "value": 40,
+              },
+            ],
             "timeframe": "month",
           },
           Object {
@@ -194,6 +237,7 @@ exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
             ],
             "description": "The degree to which there is alignment about a meaningful change that leadership and employees want to make in the world.",
             "identifier": "purpose",
+            "max_domain": 60,
             "measure": "95th Percentile",
             "name": "purpose",
             "order": 1,
@@ -202,6 +246,20 @@ exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
               "dashWidth": 2,
               "fill": "#EFEFEF",
             },
+            "tiers": Array [
+              Object {
+                "name": "Novice",
+                "value": 0,
+              },
+              Object {
+                "name": "Learning",
+                "value": 20,
+              },
+              Object {
+                "name": "Expert",
+                "value": 40,
+              },
+            ],
             "timeframe": "month",
           },
         ],

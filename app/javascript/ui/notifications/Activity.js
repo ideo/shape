@@ -5,7 +5,7 @@ import pluralize from 'pluralize'
 import styled from 'styled-components'
 
 import { Anchor } from '~/ui/global/styled/typography'
-import { FormButton } from '~/ui/global/styled/forms'
+import { FormButton } from '~/ui/global/styled/buttons'
 import Link from '~/ui/global/Link'
 import { apiStore, uiStore, routingStore } from '~/stores'
 import v from '~/utils/variables'

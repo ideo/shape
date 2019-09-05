@@ -2,11 +2,8 @@ import PropTypes from 'prop-types'
 import { FormControlLabel, Grid } from '@material-ui/core'
 import styled from 'styled-components'
 
-import {
-  FormActionsContainer,
-  TextButton,
-  Checkbox,
-} from '~/ui/global/styled/forms'
+import { TextButton } from '~/ui/global/styled/buttons'
+import { FormActionsContainer, Checkbox } from '~/ui/global/styled/forms'
 import { ConfirmText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 import Dialog from './Dialog'

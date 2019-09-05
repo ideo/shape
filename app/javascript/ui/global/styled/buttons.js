@@ -123,3 +123,65 @@ export const NamedActionButton = styled.button`
     width: 30px;
   }
 `
+/* eslint-disable no-nested-ternary */
+/** @component */
+export const FormButton = styled.button`
+  width: ${props => (props.width ? props.width : 183)}px;
+  text-transform: uppercase;
+  font-family: ${v.fonts.sans};
+  font-size: ${props => (props.fontSize ? props.fontSize : 1)}rem;
+  font-weight: ${v.weights.medium};
+  letter-spacing: 0.09375rem;
+  height: 40px;
+  cursor: pointer;
+  border-radius: 20px;
+  color: ${props => {
+    switch (props.color) {
+      case v.colors.transparent:
+        return v.colors.black
+      default:
+        return 'white'
+    }
+  }};
+  background-color: ${props => props.color};
+  border: ${props =>
+    props.color === v.colors.transparent
+      ? `1px solid ${v.colors.black}`
+      : 'none'};
+  transition: all 0.3s;
+  &:hover,
+  &:focus {
+    background-color: ${props =>
+      props.disabledHover
+        ? props.color
+        : props.color === v.colors.primaryDark
+        ? v.colors.primaryDarkest
+        : v.colors.commonDark};
+  }
+  ${props =>
+    props.disabled &&
+    `background-color: transparent;
+      border: 1px solid ${props.overrideOutlineColor || v.colors.commonMedium};
+      color:  ${props.overrideOutlineColor || v.colors.commonMedium};
+      cursor: initial;
+      &:hover, &:focus {
+        background-color: transparent;
+      }
+    `};
+`
+FormButton.displayName = 'FormButton'
+FormButton.defaultProps = {
+  color: v.colors.black,
+}
+
+/** @component */
+export const TextButton = styled.button`
+  text-transform: uppercase;
+  font-family: ${v.fonts.sans};
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: 0.09375rem;
+  cursor: pointer;
+  max-width: ${props => (props.maxWidth ? `${props.maxWidth}px` : 'none')};
+`
+TextButton.displayName = 'StyledTextButton'

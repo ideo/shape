@@ -2,14 +2,13 @@ import PropTypes from 'prop-types'
 import { action, observable } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import parameterize from 'parameterize'
+import { FormButton, TextButton } from '~/ui/global/styled/buttons'
 import { SmallHelperText } from '~/ui/global/styled/typography'
 import {
-  FormButton,
   FieldContainer,
   FormActionsContainer,
   Label,
   ImageField,
-  TextButton,
   TextField,
 } from '~/ui/global/styled/forms'
 import { uiStore } from '~/stores'

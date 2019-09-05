@@ -388,7 +388,8 @@ class MovableGridCard extends React.PureComponent {
       // cancel for links within the card as these should handle their own routing
       (e.target.tagName === 'A' && e.target.href) ||
       formTags.includes(e.target.tagName) ||
-      record.type === 'Item::DataItem'
+      record.type === 'Item::DataItem' ||
+      e.target.className.match(/CollectionCoverFormButton/)
     ) {
       return
     }

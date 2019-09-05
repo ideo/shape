@@ -188,6 +188,10 @@ describe Collection, type: :model do
     describe '#reindex_sync' do
       let(:collection) { create(:collection) }
 
+      before do
+        allow(Searchkick).to receive(:callbacks).and_call_original
+      end
+
       it 'should get called on create' do
         expect(Searchkick).to receive(:callbacks).with(true)
         collection.save

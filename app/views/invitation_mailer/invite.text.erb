@@ -1,5 +1,7 @@
 Hello<%= " #{@user.name}" if @user.name.present?%>,
 
-<%= @invited_by.name %> has invited you to join<%= @org_name ? " #{@org_name}'s" : '' %> "<%= @invited_to_name %>"<%= @org_name ? ' group ' : '' %>on Shape.
+<%= @mail_helper.invite_message %>
 
-<%= @url %>
+<%= @mail_helper.support_message if @mail_helper.support_message.present? %>
+
+<%= @mail_helper.invite_url %>

@@ -37,7 +37,8 @@ class LinkToSharedCollectionsWorker
   private
 
   def create_link(object, collection)
-    if object.parent_application_collection.present?
+    if object.respond_to?(:parent_application_collection) &&
+       object.parent_application_collection.present?
       object = object.parent_application_collection
     end
     CollectionCard::Link.create(
