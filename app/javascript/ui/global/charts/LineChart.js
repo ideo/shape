@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { VictoryLine } from 'victory'
+import v from '~/utils/variables'
 
 import ChartTooltip from '~/ui/global/charts/ChartTooltip'
 import {
@@ -24,7 +25,7 @@ const chartStyle = dataset => {
   const { style } = dataset
   return {
     data: {
-      stroke: (style && style.fill) || '#000000',
+      stroke: (style && style.fill) || v.colors.black,
       strokeWidth: 3,
       strokeDasharray: lineChartDashWithForOrder({
         order: dataset.order,
