@@ -4,7 +4,7 @@ import Dialog from './Dialog'
 import { DisplayText } from '../styled/typography'
 import v from '~/utils/variables'
 class AlertDialog extends React.PureComponent {
-  componentWillReceiveProps({ fadeOutTime, open }) {
+  UNSAFE_componentWillReceiveProps({ fadeOutTime, open }) {
     if (open !== 'info') return
     if (fadeOutTime) {
       this.timeout = setTimeout(() => {

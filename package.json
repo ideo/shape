@@ -124,7 +124,7 @@
     "mime-types": "^2.1.19",
     "mobx": "^4.4.0",
     "mobx-localstorage": "^1.0.0",
-    "mobx-react": "^5.0.0",
+    "mobx-react": "^5.4.4",
     "mobx-react-router": "^4.0.4",
     "moment-mini": "^2.19.4",
     "page-metadata-parser": "^1.1.2",
@@ -136,12 +136,12 @@
     "query-string": "5.1.0",
     "quill-cursors": "^2.1.0",
     "quill-delta": "^4.2.0",
-    "react": "^16.9.0",
+    "react": "16.8.6",
     "react-autosize-textarea": "^3.0.3",
     "react-copy-to-clipboard": "^5.0.1",
     "react-docgen": "^2.21.0",
     "react-docgen-typescript": "^1.9.1",
-    "react-dom": "^16.9.0",
+    "react-dom": "16.8.6",
     "react-dotdotdot": "^1.2.3",
     "react-flip-move": "~2.10.0",
     "react-headroom": "^2.2.2",
@@ -166,7 +166,7 @@
     "react-window-size-listener": "^1.2.1",
     "reflexbox": "^3.0.1",
     "regenerator-runtime": "^0.13.2",
-    "styled-components": "^3.2.1",
+    "styled-components": "^3.4.5",
     "styled-loaders-react": "ideo/styled-loaders-react",
     "svg-react-loader": "^0.4.5",
     "ts-jest": "^23.1.4",
@@ -178,7 +178,7 @@
   },
   "devDependencies": {
     "cypress": "3.4.1",
-    "cypress-cucumber-preprocessor": "ideo/cypress-cucumber-preprocessor#453f89e",
+    "cypress-cucumber-preprocessor": "^1.16.0",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.14.0",
     "enzyme-to-json": "^3.3.3",
@@ -210,7 +210,8 @@
     "webpack-dev-server": "^3.7.1"
   },
   "resolutions": {
-    "@cypress/browserify-preprocessor": "1.0.3",
+    "react": "16.8.6",
+    "react-dom": "16.8.6",
     "react-draggable": "git+https://git@github.com/ideo/react-draggable.git#3.0.5-beta.1"
   }
 }

@@ -56,7 +56,7 @@ class EditableName extends React.Component {
   }
 
   // navigating between collections may trigger this instead of didMount
-  componentWillReceiveProps({ name }) {
+  UNSAFE_componentWillReceiveProps({ name }) {
     this.setName(name)
   }
 

@@ -11,7 +11,7 @@ class ManagePaymentMethods extends React.Component {
   @observable
   loaded = false
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.loadInvoices()
   }
 

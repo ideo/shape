@@ -114,7 +114,7 @@ class MovableGridCard extends React.PureComponent {
     }, v.touchDeviceHoldToDragTime)
   }
 
-  componentWillReceiveProps({ position }) {
+  UNSAFE_componentWillReceiveProps({ position }) {
     if (this.state.dragging || this.unmounted) {
       return
     }
