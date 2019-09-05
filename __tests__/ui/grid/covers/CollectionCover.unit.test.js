@@ -118,4 +118,17 @@ describe('CollectionCover', () => {
       expect(component.numberOfLinesForDescription).toEqual(2)
     })
   })
+
+  describe('with template whose a child of a master template', () => {
+    beforeEach(() => {
+      props.collection.isSubTemplate = true
+      props.collection.isUsableTemplate = true
+      wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
+      component = wrapper.instance()
+    })
+
+    it('does not show use template button', () => {
+      expect(wrapper.find('CardButtonWrapper').exists()).toBeFalsy()
+    })
+  })
 })

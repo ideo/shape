@@ -122,6 +122,22 @@ describe('PageHeader', () => {
     })
   })
 
+  describe('with template whose a child of a master template', () => {
+    beforeEach(() => {
+      props.record = fakeCollection
+      props.record.isSubTemplate = true
+      wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
+    })
+
+    it('should not show the template icon', () => {
+      expect(wrapper.find('TemplateIcon').exists()).toBeFalsy()
+    })
+
+    it('should not show the Use Template button', () => {
+      expect(wrapper.find('FormButton').length).toBe(0)
+    })
+  })
+
   describe('with a TestCollection', () => {
     beforeEach(() => {
       props.record = fakeCollection

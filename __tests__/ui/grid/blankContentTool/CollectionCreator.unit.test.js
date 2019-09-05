@@ -115,7 +115,36 @@ describe('MovableGridCard', () => {
         )
       })
     })
+
+    describe('when a collection is Template', () => {
+      beforeEach(() => {
+        props.type = 'template'
+        props.createCard.mockClear()
+        wrapper = shallow(<CollectionCreator {...props} />)
+        component = wrapper.instance()
+      })
+
+      it('creates a template collection', () => {
+        component.createCollection(e)
+        expect(component.shouldCreateAsMasterTemplate).toBeTruthy()
+      })
+    })
+
+    describe('when a viewing collection is a master template', () => {
+      beforeEach(() => {
+        props.uiStore.viewingCollection.isMasterTemplate = true
+        props.createCard.mockClear()
+        wrapper = shallow(<CollectionCreator {...props} />)
+        component = wrapper.instance()
+      })
+
+      it('creates a template collection', () => {
+        component.createCollection(e)
+        expect(component.shouldCreateAsMasterTemplate).toBeTruthy()
+      })
+    })
   })
+
   describe('afterCreate', () => {
     describe('when collection is any collection', () => {
       it('pushes an event to google tag manager', () => {
