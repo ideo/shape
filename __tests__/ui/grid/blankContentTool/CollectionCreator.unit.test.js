@@ -2,9 +2,16 @@ import CollectionCreator from '~/ui/grid/blankContentTool/CollectionCreator'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import googleTagManager from '~/vendor/googleTagManager'
 import { routingStore } from '~/stores'
+import fakeUiStore from '#/mocks/fakeUiStore'
 
 jest.mock('../../../../app/javascript/vendor/googleTagManager')
 jest.mock('../../../../app/javascript/stores')
+const uiStore = fakeUiStore
+
+uiStore.viewingCollection = {
+  id: 3,
+  isMasterTemplate: false,
+}
 
 const e = { preventDefault: jest.fn() }
 let wrapper, props, component
@@ -15,6 +22,7 @@ describe('MovableGridCard', () => {
       type: 'collection',
       createCard: jest.fn(),
       closeBlankContentTool: jest.fn(),
+      uiStore: fakeUiStore,
     }
     props.createCard.mockClear()
     wrapper = shallow(<CollectionCreator {...props} />)
