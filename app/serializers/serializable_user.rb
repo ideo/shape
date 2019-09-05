@@ -3,7 +3,7 @@ class SerializableUser < BaseJsonSerializer
   attributes :first_name, :last_name, :email,
              :created_at, :status,
              :handle, :shape_circle_member,
-             :language
+             :locale
 
   attribute :pic_url_square do
     @object.picture || 'https://s3-us-west-2.amazonaws.com/assets.shape.space/user-avatar.png'

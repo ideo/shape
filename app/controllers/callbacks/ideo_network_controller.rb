@@ -202,7 +202,7 @@ class Callbacks::IdeoNetworkController < ApplicationController
       :email,
       :picture,
       :username,
-      :language,
+      :locale,
     )
   end
 

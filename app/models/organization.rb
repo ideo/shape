@@ -6,10 +6,10 @@
 #  active_users_count                    :integer          default(0), not null
 #  autojoin_domains                      :jsonb
 #  deactivated                           :boolean          default(FALSE), not null
+#  default_locale                        :string           default("en")
 #  domain_whitelist                      :jsonb
 #  has_payment_method                    :boolean          default(FALSE), not null
 #  in_app_billing                        :boolean          default(TRUE), not null
-#  language_default                      :string           default("en")
 #  name                                  :string
 #  overdue_at                            :datetime
 #  sent_high_charges_high_email          :boolean          default(FALSE), not null
@@ -414,8 +414,8 @@ class Organization < ApplicationRecord
     (network_default_payment_method.created_at.to_date - created_at.to_date).to_i
   end
 
-  def language_default
-    language_default_in_database
+  def default_locale
+    default_locale_in_database
   end
 
   private

@@ -12,12 +12,12 @@
 #  first_name                  :string
 #  handle                      :string
 #  invitation_token            :string
-#  language                    :string
 #  last_active_at              :jsonb
 #  last_name                   :string
 #  last_notification_mail_sent :datetime
 #  last_sign_in_at             :datetime
 #  last_sign_in_ip             :inet
+#  locale                      :string
 #  mailing_list                :boolean          default(FALSE)
 #  network_data                :jsonb
 #  notify_through_email        :boolean          default(TRUE)
@@ -62,7 +62,7 @@ class User < ApplicationRecord
                  :picture,
                  :picture_medium,
                  :picture_large,
-                 :language_default
+                 :default_locale
 
   store_accessor :terms_accepted_data,
                  :terms_accepted,
@@ -322,12 +322,12 @@ class User < ApplicationRecord
   end
 
   def update_from_network_profile(params)
-    %i[first_name last_name email picture picture_large language_default].each do |field|
+    %i[first_name last_name email picture picture_large default_locale].each do |field|
       send("#{field}=", params[field]) if params[field].present?
     end
     self.handle = params[:username] if params[:username].present?
     save
-    I18n.locale = user_params[:language_default] if params[:language_default].present?
+    I18n.locale = user_params[:default_locale] if params[:default_locale].present?
   end
 
   def generate_handle
@@ -547,8 +547,8 @@ class User < ApplicationRecord
     Time.parse(date_string)
   end
 
-  def language
-    language_in_database || current_organization&.language_default
+  def locale
+    locale_in_database || current_organization&.default_locale
   end
 
   private

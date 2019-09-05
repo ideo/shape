@@ -190,7 +190,7 @@ class Api::V1::BaseController < ApplicationController
 
   def set_locale
     if user_signed_in?
-      I18n.locale = current_user.language
+      I18n.locale = current_user.locale
     else
       I18n.locale = I18n.default_locale
     end

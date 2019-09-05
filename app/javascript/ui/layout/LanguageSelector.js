@@ -9,25 +9,25 @@ class LanguageSelector extends React.Component {
   handleChange = async ev => {
     const { apiStore } = this.props
     const { currentUser } = apiStore
-    const language = ev.target.value
-    currentUser.language = language
+    const locale = ev.target.value
+    currentUser.locale = locale
     await currentUser.API_updateCurrentUser({
-      language,
+      locale,
     })
     // NOTE: simple way to do this for now
     window.location.reload()
   }
 
-  get languageSelected() {
+  get localeSelected() {
     const { apiStore } = this.props
     const { currentUser } = apiStore
-    const { language } = currentUser
-    return language
+    const { locale } = currentUser
+    return locale
   }
 
   render() {
     return (
-      <Select value={this.languageSelected} onChange={this.handleChange}>
+      <Select value={this.localeSelected} onChange={this.handleChange}>
         <MenuItem key="en" value={'en'}>
           <DisplayText>EN</DisplayText>
         </MenuItem>
