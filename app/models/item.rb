@@ -244,10 +244,6 @@ class Item < ApplicationRecord
     nil
   end
 
-  def name
-    translated_name || name_in_database
-  end
-
   def generate_name
     # overridden by TextItem / FileItem
     true
