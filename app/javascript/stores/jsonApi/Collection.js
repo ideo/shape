@@ -551,11 +551,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     _.each(updates, update => {
       updatesByCardId[update.card.id] = update
     })
-    let minOrder = _.minBy(updates, 'order')
-    minOrder = minOrder ? minOrder.order : 0
-    let maxOrder = _.maxBy(updates, 'order')
-    maxOrder = maxOrder ? maxOrder.order : 0
-    const moveOrder = _.min([minOrder, maxOrder])
+    const orders = _.map(updates, update => update.order)
+    const minOrder = _.min(orders)
+    const maxOrder = _.max(orders)
+    // min...max is range of cards you are moving
 
     // Apply all updates to in-memory cards
     _.each(this.collection_cards, card => {
@@ -567,9 +566,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         _.forEach(allowedAttrs, (value, key) => {
           card[key] = value
         })
-      } else if (moveOrder && card.order >= moveOrder) {
+      } else if (card.order >= minOrder) {
         // make sure this card gets bumped out of the way of our moving ones
-        card.order += maxOrder
+        card.order += maxOrder + 1
       }
       // force the grid to immediately observe that things have changed
       card.updated_at = new Date()

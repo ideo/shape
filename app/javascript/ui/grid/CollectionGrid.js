@@ -268,6 +268,10 @@ class CollectionGrid extends React.Component {
     })
   }
 
+  calculateOrderForMovingCard = (order, index) => {
+    return Math.ceil(order) + index
+  }
+
   onDragOrResizeStop = (cardId, dragType) => {
     const { hoveringOver, cards } = this.state
     const placeholder = _.find(cards, { cardType: 'placeholder' }) || {}
@@ -333,7 +337,7 @@ class CollectionGrid extends React.Component {
         // and API_batchUpdateCards will properly set/reorder it amongst the collection
         const sortedCards = _.sortBy(movingCards, 'order')
         _.each(sortedCards, (card, idx) => {
-          const sortedOrder = order + (idx + 1) * 0.1
+          const sortedOrder = this.calculateOrderForMovingCard(order, idx)
           updates.push({
             card,
             order: sortedOrder,
@@ -540,7 +544,7 @@ class CollectionGrid extends React.Component {
         cards,
         c => _.includes(rowPortion, c.id) && c.position.y === row
       )
-      let near = _.last(cardsInRow)
+      let near = _.last(_.sortBy(cardsInRow, 'order'))
       if (!near && row > 0) {
         // there is the case where the "nearest" card is sticking down from the previous row
         // [ 1  1  2  3 ]
