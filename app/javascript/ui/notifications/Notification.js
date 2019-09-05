@@ -70,7 +70,7 @@ const ButtonContainer = styled.div`
 class Notification extends React.Component {
   @observable
   fadeInProgress = true
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     const { notification } = this.props
     const { activity } = notification
     const targetType = pluralTypeName(activity.target_type)

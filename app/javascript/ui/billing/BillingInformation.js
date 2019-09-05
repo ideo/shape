@@ -132,7 +132,7 @@ class BillingInformation extends React.Component {
   @observable
   loaded = false
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.load()
   }
 

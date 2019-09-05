@@ -23,7 +23,7 @@ class TagEditor extends React.Component {
     this.initTags(props.record[props.tagField])
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.initTags(nextProps.record[nextProps.tagField])
   }
 

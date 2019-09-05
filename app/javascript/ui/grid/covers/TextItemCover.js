@@ -64,7 +64,7 @@ class TextItemCover extends React.Component {
     this.setState({ item })
   }
 
-  componentWillReceiveProps({ height }) {
+  UNSAFE_componentWillReceiveProps({ height }) {
     this.checkTextAreaHeight(height)
   }
 
@@ -235,7 +235,7 @@ class TextItemCover extends React.Component {
         style={{
           height: 'calc(100% - 30px)',
         }}
-        class="cancelGridClick"
+        className="cancelGridClick"
         onClick={this.handleClick}
         isEditing={isEditing}
         hasTitleText={hasTitleText}
