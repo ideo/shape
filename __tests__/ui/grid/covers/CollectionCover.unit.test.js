@@ -17,7 +17,7 @@ const fakeEvent = {
   metaKey: null,
 }
 
-let wrapper
+let wrapper, component
 describe('CollectionCover', () => {
   beforeEach(() => {
     props.collection = {
@@ -25,6 +25,7 @@ describe('CollectionCover', () => {
       is_inside_a_submission: false,
     }
     wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
+    component = wrapper.instance()
   })
 
   it('renders snapshot', () => {
@@ -52,6 +53,7 @@ describe('CollectionCover', () => {
         .children()
         .text()
     ).toContain(cover.text)
+    expect(component.numberOfLinesForDescription).toEqual(3)
   })
 
   it('does not render the launch test button if not in a submission', () => {
@@ -105,10 +107,15 @@ describe('CollectionCover', () => {
       props.collection.isMasterTemplate = true
       props.collection.isUsableTemplate = true
       wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
+      component = wrapper.instance()
     })
 
     it('shows the use template button for master templates', () => {
       expect(wrapper.find('CardButtonWrapper').exists()).toBeTruthy()
+    })
+
+    it('reduces the number of lines for the description', () => {
+      expect(component.numberOfLinesForDescription).toEqual(2)
     })
   })
 })
