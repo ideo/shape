@@ -52,6 +52,7 @@ ActiveRecord::Schema.define(version: 2019_08_22_221612) do
     t.text "token"
     t.bigint "application_id"
     t.bigint "organization_id"
+    t.bigint "created_by_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["application_id", "organization_id"], name: "index_api_tokens_on_app_id_org_id"

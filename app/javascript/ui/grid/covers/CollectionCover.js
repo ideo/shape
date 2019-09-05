@@ -285,6 +285,20 @@ class CollectionCover extends React.Component {
     return collection.isMasterTemplate && collection.isUsableTemplate
   }
 
+  get numberOfLinesForDescription() {
+    const { uiStore } = this.props
+    // these buttons take up space so we reduce # of lines
+    const reduced = this.hasUseTemplateButton || this.hasCollectionScore
+    if (reduced) {
+      // in smaller layout you can really only fit 1 line
+      if (uiStore.gridSettings.layoutSize === 3) {
+        return 1
+      }
+      return 2
+    }
+    return 3
+  }
+
   get useTemplateButton() {
     return (
       <CardButtonWrapper>
@@ -402,7 +416,7 @@ class CollectionCover extends React.Component {
                 {this.collectionScore}
                 {this.hasUseTemplateButton && this.useTemplateButton}
                 {!this.hasLaunchTestButton && (
-                  <Dotdotdot clamp={this.hasCollectionScore ? 2 : 3}>
+                  <Dotdotdot clamp={this.numberOfLinesForDescription}>
                     {cover.text}
                   </Dotdotdot>
                 )}

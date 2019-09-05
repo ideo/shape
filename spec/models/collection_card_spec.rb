@@ -568,11 +568,13 @@ RSpec.describe CollectionCard, type: :model do
       let(:user) { create(:user) }
 
       it 'should archive all cards in the query' do
-        expect_any_instance_of(Collection).to receive(:touch)
         expect do
           collection_cards.archive_all!(user_id: user.id)
-        end.to change(CollectionCard.active, :count).by(collection_cards.count * -1)
-        expect(collection.reload.collection_cards).to eq []
+          collection.reload
+        end.to change(CollectionCard.active, :count)
+          .by(collection_cards.count * -1)
+          .and(change(collection, :updated_at))
+        expect(collection.collection_cards).to eq []
       end
 
       it 'should call the CollectionCardArchiveWorker' do
