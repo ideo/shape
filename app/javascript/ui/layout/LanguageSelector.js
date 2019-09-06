@@ -37,6 +37,9 @@ class LanguageSelector extends React.Component {
   }
 
   render() {
+    // guard for anonymous / public pages -- language selector won't really work
+    if (!this.props.apiStore.currentUser) return null
+
     return (
       <Select
         disableUnderline

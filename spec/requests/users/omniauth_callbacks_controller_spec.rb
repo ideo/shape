@@ -1,6 +1,14 @@
 require 'rails_helper'
 
 describe Users::OmniauthCallbacksController, type: :request do
+  let(:network_user) { double('network_user') }
+
+  before do
+    allow(network_user).to receive(:update)
+    allow(network_user).to receive(:locale)
+    allow(NetworkApi::User).to receive(:find).with(user.uid).and_return([network_user])
+  end
+
   describe 'POST #ideo' do
     let!(:organization) { create(:organization) }
     let!(:user) { build(:user) }
