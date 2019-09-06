@@ -53,7 +53,7 @@ class AdminNewQueryRow extends React.Component {
                 width: '35px',
                 backgroundColor: v.colors.commonLight,
               }}
-              innerRef={this.textFieldRef}
+              ref={this.textFieldRef}
             />
           </Flex>
         </NewQueryRowItem>

@@ -27,7 +27,7 @@ const StyledPaddedCover = styled(PaddedCardCover)`
       : v.colors.white};
 `
 
-const StyledReadMore = ShowMoreButton.extend`
+const StyledReadMore = styled(ShowMoreButton)`
   z-index: ${v.zIndex.gridCard};
   position: absolute;
   bottom: 0;
@@ -64,7 +64,7 @@ class TextItemCover extends React.Component {
     this.setState({ item })
   }
 
-  UNSAFE_componentWillReceiveProps({ height }) {
+  componentWillReceiveProps({ height }) {
     this.checkTextAreaHeight(height)
   }
 

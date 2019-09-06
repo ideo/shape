@@ -294,71 +294,69 @@ exports[`BillingInformation in app billing enabled still within trial renders tr
           </Box>
         </div>
       </Block>
-      <React.Fragment>
-        <Block
-          title="Current Monthly Rate"
+      <Block
+        title="Current Monthly Rate"
+      >
+        <FancyDollarAmount>
+          0
+        </FancyDollarAmount>
+        <Box
+          my={25}
         >
-          <FancyDollarAmount>
-            0
-          </FancyDollarAmount>
-          <Box
-            my={25}
-          >
-            $5.00
-            /person per month
-          </Box>
-          <styled.div>
-            Total monthly rate does not include people covered by free trial conditions.
-          </styled.div>
-        </Block>
-        <Block
-          title="Current Billing Period"
+          $5.00
+          /person per month
+        </Box>
+        <styled.div>
+          Total monthly rate does not include people covered by free trial conditions.
+        </styled.div>
+      </Block>
+      <Block
+        title="Current Billing Period"
+      >
+        <WithStyles(Grid)
+          container={true}
+          justify="space-between"
+          spacing={16}
         >
           <WithStyles(Grid)
-            container={true}
-            justify="space-between"
-            spacing={16}
+            item={true}
           >
-            <WithStyles(Grid)
-              item={true}
-            >
-              <styled.span>
-                Start date:
-              </styled.span>
-            </WithStyles(Grid)>
-            <WithStyles(Grid)
-              item={true}
-            >
-              01/01/2015
-            </WithStyles(Grid)>
+            <styled.span>
+              Start date:
+            </styled.span>
           </WithStyles(Grid)>
           <WithStyles(Grid)
-            container={true}
-            justify="space-between"
-            spacing={16}
+            item={true}
           >
-            <WithStyles(Grid)
-              item={true}
-            >
-              <styled.span>
-                End date:
-              </styled.span>
-            </WithStyles(Grid)>
-            <WithStyles(Grid)
-              item={true}
-            >
-              01/31/2015
-            </WithStyles(Grid)>
+            01/01/2015
           </WithStyles(Grid)>
-          <FreeTrial
-            trialEndsAt="01/01/2022"
-            trialLabel="Free trials used"
-            trialTitle="FREE TRIAL"
-            trialUsersCount={10}
-            trialsUsedCount={5}
-          />
-        </Block>
-      </React.Fragment>
+        </WithStyles(Grid)>
+        <WithStyles(Grid)
+          container={true}
+          justify="space-between"
+          spacing={16}
+        >
+          <WithStyles(Grid)
+            item={true}
+          >
+            <styled.span>
+              End date:
+            </styled.span>
+          </WithStyles(Grid)>
+          <WithStyles(Grid)
+            item={true}
+          >
+            01/31/2015
+          </WithStyles(Grid)>
+        </WithStyles(Grid)>
+        <FreeTrial
+          trialEndsAt="01/01/2022"
+          trialLabel="Free trials used"
+          trialTitle="FREE TRIAL"
+          trialUsersCount={10}
+          trialsUsedCount={5}
+        />
+      </Block>
     </WithStyles(Grid)>
   </Section>
 </styled.div>
@@ -395,64 +393,62 @@ exports[`BillingInformation in app billing enabled trial expired renders without
           />
         </WithStyles(Grid)>
       </Block>
-      <React.Fragment>
-        <Block
-          title="Current Monthly Rate"
+      <Block
+        title="Current Monthly Rate"
+      >
+        <FancyDollarAmount>
+          100
+        </FancyDollarAmount>
+        <Box
+          my={25}
         >
-          <FancyDollarAmount>
-            100
-          </FancyDollarAmount>
-          <Box
-            my={25}
-          >
-            $5.00
-            /person per month
-          </Box>
-          <styled.div>
-            Total monthly rate does not include people covered by free trial conditions.
-          </styled.div>
-        </Block>
-        <Block
-          title="Current Billing Period"
+          $5.00
+          /person per month
+        </Box>
+        <styled.div>
+          Total monthly rate does not include people covered by free trial conditions.
+        </styled.div>
+      </Block>
+      <Block
+        title="Current Billing Period"
+      >
+        <WithStyles(Grid)
+          container={true}
+          justify="space-between"
+          spacing={16}
         >
           <WithStyles(Grid)
-            container={true}
-            justify="space-between"
-            spacing={16}
+            item={true}
           >
-            <WithStyles(Grid)
-              item={true}
-            >
-              <styled.span>
-                Start date:
-              </styled.span>
-            </WithStyles(Grid)>
-            <WithStyles(Grid)
-              item={true}
-            >
-              01/01/2015
-            </WithStyles(Grid)>
+            <styled.span>
+              Start date:
+            </styled.span>
           </WithStyles(Grid)>
           <WithStyles(Grid)
-            container={true}
-            justify="space-between"
-            spacing={16}
+            item={true}
           >
-            <WithStyles(Grid)
-              item={true}
-            >
-              <styled.span>
-                End date:
-              </styled.span>
-            </WithStyles(Grid)>
-            <WithStyles(Grid)
-              item={true}
-            >
-              01/31/2015
-            </WithStyles(Grid)>
+            01/01/2015
           </WithStyles(Grid)>
-        </Block>
-      </React.Fragment>
+        </WithStyles(Grid)>
+        <WithStyles(Grid)
+          container={true}
+          justify="space-between"
+          spacing={16}
+        >
+          <WithStyles(Grid)
+            item={true}
+          >
+            <styled.span>
+              End date:
+            </styled.span>
+          </WithStyles(Grid)>
+          <WithStyles(Grid)
+            item={true}
+          >
+            01/31/2015
+          </WithStyles(Grid)>
+        </WithStyles(Grid)>
+      </Block>
     </WithStyles(Grid)>
   </Section>
 </styled.div>
@@ -489,64 +485,62 @@ exports[`BillingInformation in app billing enabled with freemium users are over 
           />
         </WithStyles(Grid)>
       </Block>
-      <React.Fragment>
-        <Block
-          title="Current Monthly Rate"
+      <Block
+        title="Current Monthly Rate"
+      >
+        <FancyDollarAmount>
+          30
+        </FancyDollarAmount>
+        <Box
+          my={25}
         >
-          <FancyDollarAmount>
-            30
-          </FancyDollarAmount>
-          <Box
-            my={25}
-          >
-            $5.00
-            /person per month
-          </Box>
-          <styled.div>
-            Total monthly rate does not include people covered by free trial conditions.
-          </styled.div>
-        </Block>
-        <Block
-          title="Current Billing Period"
+          $5.00
+          /person per month
+        </Box>
+        <styled.div>
+          Total monthly rate does not include people covered by free trial conditions.
+        </styled.div>
+      </Block>
+      <Block
+        title="Current Billing Period"
+      >
+        <WithStyles(Grid)
+          container={true}
+          justify="space-between"
+          spacing={16}
         >
           <WithStyles(Grid)
-            container={true}
-            justify="space-between"
-            spacing={16}
+            item={true}
           >
-            <WithStyles(Grid)
-              item={true}
-            >
-              <styled.span>
-                Start date:
-              </styled.span>
-            </WithStyles(Grid)>
-            <WithStyles(Grid)
-              item={true}
-            >
-              01/01/2015
-            </WithStyles(Grid)>
+            <styled.span>
+              Start date:
+            </styled.span>
           </WithStyles(Grid)>
           <WithStyles(Grid)
-            container={true}
-            justify="space-between"
-            spacing={16}
+            item={true}
           >
-            <WithStyles(Grid)
-              item={true}
-            >
-              <styled.span>
-                End date:
-              </styled.span>
-            </WithStyles(Grid)>
-            <WithStyles(Grid)
-              item={true}
-            >
-              01/31/2015
-            </WithStyles(Grid)>
+            01/01/2015
           </WithStyles(Grid)>
-        </Block>
-      </React.Fragment>
+        </WithStyles(Grid)>
+        <WithStyles(Grid)
+          container={true}
+          justify="space-between"
+          spacing={16}
+        >
+          <WithStyles(Grid)
+            item={true}
+          >
+            <styled.span>
+              End date:
+            </styled.span>
+          </WithStyles(Grid)>
+          <WithStyles(Grid)
+            item={true}
+          >
+            01/31/2015
+          </WithStyles(Grid)>
+        </WithStyles(Grid)>
+      </Block>
     </WithStyles(Grid)>
   </Section>
 </styled.div>
@@ -583,71 +577,69 @@ exports[`BillingInformation in app billing enabled with freemium users not over 
           />
         </WithStyles(Grid)>
       </Block>
-      <React.Fragment>
-        <Block
-          title="Current Monthly Rate"
+      <Block
+        title="Current Monthly Rate"
+      >
+        <FancyDollarAmount>
+          0
+        </FancyDollarAmount>
+        <Box
+          my={25}
         >
-          <FancyDollarAmount>
-            0
-          </FancyDollarAmount>
-          <Box
-            my={25}
-          >
-            $5.00
-            /person per month
-          </Box>
-          <styled.div>
-            Total monthly rate does not include people covered by free trial conditions.
-          </styled.div>
-        </Block>
-        <Block
-          title="Current Billing Period"
+          $5.00
+          /person per month
+        </Box>
+        <styled.div>
+          Total monthly rate does not include people covered by free trial conditions.
+        </styled.div>
+      </Block>
+      <Block
+        title="Current Billing Period"
+      >
+        <WithStyles(Grid)
+          container={true}
+          justify="space-between"
+          spacing={16}
         >
           <WithStyles(Grid)
-            container={true}
-            justify="space-between"
-            spacing={16}
+            item={true}
           >
-            <WithStyles(Grid)
-              item={true}
-            >
-              <styled.span>
-                Start date:
-              </styled.span>
-            </WithStyles(Grid)>
-            <WithStyles(Grid)
-              item={true}
-            >
-              01/01/2015
-            </WithStyles(Grid)>
+            <styled.span>
+              Start date:
+            </styled.span>
           </WithStyles(Grid)>
           <WithStyles(Grid)
-            container={true}
-            justify="space-between"
-            spacing={16}
+            item={true}
           >
-            <WithStyles(Grid)
-              item={true}
-            >
-              <styled.span>
-                End date:
-              </styled.span>
-            </WithStyles(Grid)>
-            <WithStyles(Grid)
-              item={true}
-            >
-              01/31/2015
-            </WithStyles(Grid)>
+            01/01/2015
           </WithStyles(Grid)>
-          <FreeTrial
-            trialEndsAt={null}
-            trialLabel="Free users"
-            trialTitle="FREE"
-            trialUsersCount={5}
-            trialsUsedCount={3}
-          />
-        </Block>
-      </React.Fragment>
+        </WithStyles(Grid)>
+        <WithStyles(Grid)
+          container={true}
+          justify="space-between"
+          spacing={16}
+        >
+          <WithStyles(Grid)
+            item={true}
+          >
+            <styled.span>
+              End date:
+            </styled.span>
+          </WithStyles(Grid)>
+          <WithStyles(Grid)
+            item={true}
+          >
+            01/31/2015
+          </WithStyles(Grid)>
+        </WithStyles(Grid)>
+        <FreeTrial
+          trialEndsAt={null}
+          trialLabel="Free users"
+          trialTitle="FREE"
+          trialUsersCount={5}
+          trialsUsedCount={3}
+        />
+      </Block>
     </WithStyles(Grid)>
   </Section>
 </styled.div>
@@ -731,71 +723,69 @@ exports[`BillingInformation in app billing enabled within trial, exceeded trial 
           </Box>
         </div>
       </Block>
-      <React.Fragment>
-        <Block
-          title="Current Monthly Rate"
+      <Block
+        title="Current Monthly Rate"
+      >
+        <FancyDollarAmount>
+          475
+        </FancyDollarAmount>
+        <Box
+          my={25}
         >
-          <FancyDollarAmount>
-            475
-          </FancyDollarAmount>
-          <Box
-            my={25}
-          >
-            $5.00
-            /person per month
-          </Box>
-          <styled.div>
-            Total monthly rate does not include people covered by free trial conditions.
-          </styled.div>
-        </Block>
-        <Block
-          title="Current Billing Period"
+          $5.00
+          /person per month
+        </Box>
+        <styled.div>
+          Total monthly rate does not include people covered by free trial conditions.
+        </styled.div>
+      </Block>
+      <Block
+        title="Current Billing Period"
+      >
+        <WithStyles(Grid)
+          container={true}
+          justify="space-between"
+          spacing={16}
         >
           <WithStyles(Grid)
-            container={true}
-            justify="space-between"
-            spacing={16}
+            item={true}
           >
-            <WithStyles(Grid)
-              item={true}
-            >
-              <styled.span>
-                Start date:
-              </styled.span>
-            </WithStyles(Grid)>
-            <WithStyles(Grid)
-              item={true}
-            >
-              01/01/2015
-            </WithStyles(Grid)>
+            <styled.span>
+              Start date:
+            </styled.span>
           </WithStyles(Grid)>
           <WithStyles(Grid)
-            container={true}
-            justify="space-between"
-            spacing={16}
+            item={true}
           >
-            <WithStyles(Grid)
-              item={true}
-            >
-              <styled.span>
-                End date:
-              </styled.span>
-            </WithStyles(Grid)>
-            <WithStyles(Grid)
-              item={true}
-            >
-              01/31/2015
-            </WithStyles(Grid)>
+            01/01/2015
           </WithStyles(Grid)>
-          <FreeTrial
-            trialEndsAt="01/01/2022"
-            trialLabel="Free trials used"
-            trialTitle="FREE TRIAL"
-            trialUsersCount={5}
-            trialsUsedCount={5}
-          />
-        </Block>
-      </React.Fragment>
+        </WithStyles(Grid)>
+        <WithStyles(Grid)
+          container={true}
+          justify="space-between"
+          spacing={16}
+        >
+          <WithStyles(Grid)
+            item={true}
+          >
+            <styled.span>
+              End date:
+            </styled.span>
+          </WithStyles(Grid)>
+          <WithStyles(Grid)
+            item={true}
+          >
+            01/31/2015
+          </WithStyles(Grid)>
+        </WithStyles(Grid)>
+        <FreeTrial
+          trialEndsAt="01/01/2022"
+          trialLabel="Free trials used"
+          trialTitle="FREE TRIAL"
+          trialUsersCount={5}
+          trialsUsedCount={5}
+        />
+      </Block>
     </WithStyles(Grid)>
   </Section>
 </styled.div>

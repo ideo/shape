@@ -29,7 +29,7 @@ const IconHolder = styled.span`
   width: 27px;
 `
 
-const LaunchButton = FormButton.extend`
+const LaunchButton = styled(FormButton)`
   font-size: 0.9rem;
   padding: 0 1rem;
   width: auto;
@@ -46,7 +46,7 @@ const CardButtonWrapper = styled.div`
 `
 CardButtonWrapper.displayName = 'CardButtonWrapper'
 
-const UseTemplateButton = FormButton.extend`
+const UseTemplateButton = styled(FormButton)`
   border-color: white;
   color: white;
 `
@@ -135,7 +135,7 @@ const StyledCardContent = styled.div`
 `
 StyledCardContent.displayName = 'StyledCardContent'
 
-const PositionedCardHeading = CardHeading.extend`
+const PositionedCardHeading = styled(CardHeading)`
   bottom: 0;
   position: absolute;
 `

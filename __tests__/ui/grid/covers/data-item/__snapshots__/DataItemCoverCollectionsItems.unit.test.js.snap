@@ -6,39 +6,37 @@ exports[`DataItemCover renders snapshot 1`] = `
   data-cy="DataItemCover"
   editing={false}
 >
-  <React.Fragment>
-    <StyledHeading3>
-      <span>
-        participants
-      </span>
-    </StyledHeading3>
-    <styled.h1
-      className="count"
-      data-cy="DataReport-count"
-    />
-    <SmallHelperText
-      color="#120f0e"
+  <StyledHeading3>
+    <span>
+      participants
+    </span>
+  </StyledHeading3>
+  <Styled(Heading1)
+    className="count"
+    data-cy="DataReport-count"
+  />
+  <SmallHelperText
+    color="#120f0e"
+  >
+    <span
+      className="titleAndControls"
     >
+      within 
+      the 
       <span
-        className="titleAndControls"
+        className="editableMetric"
       >
-        within 
-        the 
-        <span
-          className="editableMetric"
-        >
-          <DataTargetButton
-            editable={false}
-            onClick={[Function]}
-            targetCollection={null}
-          />
-        </span>
-         
-        <span>
-          ever
-        </span>
+        <DataTargetButton
+          editable={false}
+          onClick={[Function]}
+          targetCollection={null}
+        />
       </span>
-    </SmallHelperText>
-  </React.Fragment>
+       
+      <span>
+        ever
+      </span>
+    </span>
+  </SmallHelperText>
 </StyledDataItemCover>
 `;

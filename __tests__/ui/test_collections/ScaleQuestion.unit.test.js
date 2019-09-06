@@ -1,6 +1,6 @@
 import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
 import { fakeQuestionItem, fakeQuestionAnswer } from '#/mocks/data'
-import shallowWithTheme from '#/shallowWithTheme'
+import { shallowWithTheme } from '#/renderWithTheme'
 
 let wrapper, props, theme
 const fakeEv = {
@@ -54,10 +54,9 @@ describe('ScaleQuestion', () => {
       })
 
       it('should set the question border to editing theme color', () => {
-        expect(wrapper.find('Question')).toHaveStyleRule(
-          'border-color',
-          theme.borderColorEditing
-        )
+        // NOTE: some of these used to use `toHaveStyleRule` but with styled components v4
+        // those tests no longer seem to work on inner shallow rendered components
+        expect(wrapper.find('Question').props().editing).toBe(true)
       })
     })
 
@@ -65,29 +64,33 @@ describe('ScaleQuestion', () => {
       beforeEach(() => {
         props.questionAnswer = fakeQuestionAnswer
         props.questionAnswer.answer_number = 2
-        wrapper = shallow(<ScaleQuestion {...props} />)
+        wrapper = shallowWithTheme(<ScaleQuestion {...props} />, theme)
       })
 
       it('should set the emoji opacity to 1', () => {
-        expect(wrapper.find('EmojiButton').at(1)).toHaveStyleRule(
-          'opacity',
-          '1'
-        )
+        expect(
+          wrapper
+            .find('EmojiButton')
+            .at(1) // 2nd answer
+            .props().selected
+        ).toBe(true)
       })
     })
 
     describe('when a answer is not selected', () => {
       beforeEach(() => {
         props.questionAnswer = fakeQuestionAnswer
-        props.questionAnswer.answer_number = 3
-        wrapper = shallow(<ScaleQuestion {...props} />)
+        props.questionAnswer.answer_number = null
+        wrapper = shallowWithTheme(<ScaleQuestion {...props} />, theme)
       })
 
       it('should set the emoji opacity to 0.2', () => {
-        expect(wrapper.find('EmojiButton').at(0)).toHaveStyleRule(
-          'opacity',
-          '0.2'
-        )
+        expect(
+          wrapper
+            .find('EmojiButton')
+            .find({ selected: true })
+            .exists()
+        ).toBe(false)
       })
     })
 
@@ -95,7 +98,7 @@ describe('ScaleQuestion', () => {
       beforeEach(() => {
         props.question.question_type = 'question_category_satisfaction'
         props.question.content = undefined
-        wrapper = shallow(<ScaleQuestion {...props} />)
+        wrapper = shallowWithTheme(<ScaleQuestion {...props} />, theme)
       })
 
       it('should have editable input field if no content', () => {
@@ -111,7 +114,7 @@ describe('ScaleQuestion', () => {
           props.question.question_description =
             'How satisfied are you with your current'
           props.editable = false
-          wrapper = shallow(<ScaleQuestion {...props} />)
+          wrapper = shallowWithTheme(<ScaleQuestion {...props} />, theme)
         })
 
         it('should have text, and not editable input field', () => {
@@ -134,7 +137,7 @@ describe('ScaleQuestion', () => {
         beforeEach(() => {
           props.question.question_type = 'question_category_satisfaction'
           props.question.content = 'magic wand'
-          wrapper = shallow(<ScaleQuestion {...props} />)
+          wrapper = shallowWithTheme(<ScaleQuestion {...props} />, theme)
         })
 
         it('should render content', () => {

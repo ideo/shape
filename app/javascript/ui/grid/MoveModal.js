@@ -83,7 +83,11 @@ class MoveModal extends React.Component {
 
   get moveMessage() {
     const { uiStore } = this.props
-    const { cardAction, templateName } = uiStore
+    const { cardAction } = uiStore
+    let { templateName } = uiStore
+    if (templateName && templateName.length > 25) {
+      templateName = templateName.slice(0, 22) + '...'
+    }
     const amount = uiStore.movingCardIds.length
     const cardsString = amount > 1 ? `cards` : `card`
     let message = ''
