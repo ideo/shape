@@ -1,7 +1,18 @@
+import PropTypes from 'prop-types'
 import { Select } from '~/ui/global/styled/forms'
 import { MenuItem } from '@material-ui/core'
-import { DisplayText } from '~/ui/global/styled/typography'
+import { SmallHelperText } from '~/ui/global/styled/typography'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import v from '~/utils/variables'
+
+const SelectText = ({ children }) => (
+  <SmallHelperText fontWeight={v.weights.medium} color={v.colors.black}>
+    {children}
+  </SmallHelperText>
+)
+SelectText.propTypes = {
+  children: PropTypes.node.isRequired,
+}
 
 @inject('apiStore')
 @observer
@@ -27,18 +38,22 @@ class LanguageSelector extends React.Component {
 
   render() {
     return (
-      <Select value={this.localeSelected} onChange={this.handleChange}>
+      <Select
+        disableUnderline
+        value={this.localeSelected}
+        onChange={this.handleChange}
+      >
         <MenuItem key="en" value={'en'}>
-          <DisplayText>EN</DisplayText>
+          <SelectText>EN</SelectText>
         </MenuItem>
         <MenuItem key="es" value={'es'}>
-          <DisplayText>ES</DisplayText>
+          <SelectText>ES</SelectText>
         </MenuItem>
         <MenuItem key="ja" value={'ja'}>
-          <DisplayText>JP</DisplayText>
+          <SelectText>日本語</SelectText>
         </MenuItem>
         <MenuItem key="zh_cn" value={'zh_cn'}>
-          <DisplayText>CH</DisplayText>
+          <SelectText>中文</SelectText>
         </MenuItem>
       </Select>
     )
