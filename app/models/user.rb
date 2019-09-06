@@ -61,8 +61,7 @@ class User < ApplicationRecord
   store_accessor :network_data,
                  :picture,
                  :picture_medium,
-                 :picture_large,
-                 :locale
+                 :picture_large
 
   store_accessor :terms_accepted_data,
                  :terms_accepted,
@@ -272,7 +271,7 @@ class User < ApplicationRecord
     end
     user.first_name = attrs.first_name
     user.last_name = attrs.last_name
-    %w[picture picture_medium picture_large locale].each do |field|
+    %w[picture picture_medium picture_large].each do |field|
       user.network_data[field] = attrs.try(:extra).try(field)
     end
 
@@ -576,8 +575,9 @@ class User < ApplicationRecord
   end
 
   def update_profile_locale
+    # NOTE: should be in a worker to offload external network call 
     nu = network_user
-    nu.locale = locale
+    nu.locale = locale_in_database
     nu.save
   end
 
