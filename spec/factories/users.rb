@@ -16,8 +16,7 @@ FactoryBot.define do
       {
         picture: 'https://a3-images.myspacecdn.com/images03/1/240e42b5d9ce48a78983961e7fcb3c39/600x600.jpg',
         picture_medium: 'https://img.com/medium',
-        picture_large: 'https://img.com/large',
-        locale: 'en',
+        picture_large: 'https://img.com/large'
       }
     end
     terms_accepted true
