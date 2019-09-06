@@ -327,7 +327,6 @@ class User < ApplicationRecord
     end
     self.handle = params[:username] if params[:username].present?
     save
-    I18n.locale = user_params[:locale] if params[:locale].present?
   end
 
   def generate_handle
@@ -578,6 +577,7 @@ class User < ApplicationRecord
     # NOTE: should be in a worker to offload external network call
     nu = network_user
     return unless nu.present?
+    return if nu.locale == locale_in_database
 
     nu.update(locale: locale_in_database)
   end

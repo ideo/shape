@@ -157,17 +157,42 @@ describe User, type: :model do
       end
     end
 
-    describe '#update_profile_locale' do
+    context 'network user callbacks' do
       let(:network_user) { double('network_user') }
 
       before do
         allow(network_user).to receive(:update)
+        allow(network_user).to receive(:locale)
+        expect(NetworkApi::User).to receive(:find).with(user.uid).and_return([network_user])
       end
 
-      it 'should call the network to update the locale' do
-        expect(NetworkApi::User).to receive(:find).with(user.uid).and_return([network_user])
-        expect(network_user).to receive(:update).with(locale: 'es')
-        user.update(locale: 'es')
+      describe '#update_profile_locale' do
+        it 'should call the network to update the locale' do
+          expect(network_user).to receive(:update).with(locale: 'es')
+          user.update(locale: 'es')
+        end
+      end
+
+      describe '#update_from_network_profile' do
+        let(:params) do
+          {
+            first_name: 'Bob',
+            last_name: 'Smith',
+            email: 'bob@smith.com',
+            picture: 'http://new.img.url',
+            picture_large: 'http://new.img.url/large',
+            locale: 'es',
+            username: 'bob-smith',
+          }
+        end
+
+        it 'should update the local params based on network attributes' do
+          user.update_from_network_profile(params)
+          %i[first_name last_name email picture picture_large locale].each do |field|
+            expect(user.send(field)).to eq params[field]
+          end
+          expect(user.handle).to eq params[:username]
+        end
       end
     end
   end

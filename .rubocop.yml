@@ -32,6 +32,7 @@ AllCops:
     - 'app/views/**/*'
     - 'bin/**/*'
     - 'spec/support/api/**/*'
+    - 'spec/support/api/schemas/*.json'
     - 'spec/fixtures/**/*'
     - 'vendor/bundle/**/*'
     - 'node_modules/**/*'
