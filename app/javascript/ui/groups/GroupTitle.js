@@ -5,11 +5,8 @@ import styled from 'styled-components'
 import Grid from '@material-ui/core/Grid'
 import { Row, RowItem } from '~/ui/global/styled/layout'
 import { SubduedTitle, Heading2 } from '~/ui/global/styled/typography'
-import {
-  FormButton,
-  StyledAutosizeInput,
-  EditAvatarButton,
-} from '~/ui/global/styled/forms'
+import { FormButton } from '~/ui/global/styled/buttons'
+import { StyledAutosizeInput, EditAvatarButton } from '~/ui/global/styled/forms'
 import Avatar from '~/ui/global/Avatar'
 import EditPencilIcon from '~/ui/icons/EditPencilIcon'
 import FilestackUpload from '~/utils/FilestackUpload'
@@ -30,7 +27,7 @@ const StyledTitleItem = styled(Grid)`
   padding-left: 14px;
 `
 
-const StyledHeading2 = Heading2.extend`
+const StyledHeading2 = styled(Heading2)`
   margin-bottom: 0;
 `
 StyledHeading2.displayName = 'StyledHeading2'

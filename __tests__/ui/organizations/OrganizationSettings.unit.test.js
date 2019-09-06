@@ -1,7 +1,8 @@
 import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
-import { LabelContainer, FormButton } from '~/ui/global/styled/forms'
+import { FormButton } from '~/ui/global/styled/buttons'
+import { LabelContainer } from '~/ui/global/styled/forms'
 import TextEditor from '~/ui/global/TextEditor'
 
 let wrapper, apiStore, routingStore, uiStore, props, organization, component

@@ -6,7 +6,7 @@ import { observe, observable, runInAction } from 'mobx'
 import styled from 'styled-components'
 
 import { Checkbox } from '~/ui/global/styled/forms'
-import SearchButton from '~/ui/global/SearchButton'
+import ExpandableSearchInput from '~/ui/global/ExpandableSearchInput'
 
 const StyledFormControlLabel = styled(FormControlLabel)`
   &.wrapper {
@@ -103,7 +103,7 @@ class GlobalSearch extends React.Component {
     const { routingStore } = this.props
     return (
       <div>
-        <SearchButton
+        <ExpandableSearchInput
           background="white"
           defaultOpen={routingStore.pathContains('/search')}
           open={this.open}

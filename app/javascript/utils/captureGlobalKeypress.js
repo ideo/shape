@@ -68,9 +68,8 @@ const captureGlobalKeypress = e => {
         return false
       }
       if (metaKey || ctrlKey) {
-        const { id: viewingCollectionId } = viewingCollection
         uiStore.openMoveMenu({
-          from: viewingCollectionId, // CTRL+X: Move
+          from: viewingCollection, // CTRL+X: Move
           cardAction: 'move',
         })
       }
@@ -80,9 +79,8 @@ const captureGlobalKeypress = e => {
         return false
       }
       if (metaKey || ctrlKey) {
-        const { id: viewingCollectionId } = viewingCollection
         uiStore.openMoveMenu({
-          from: viewingCollectionId, // CTRL+C: Duplicate
+          from: viewingCollection, // CTRL+C: Duplicate
           cardAction: 'duplicate',
         })
       }
@@ -119,6 +117,13 @@ const captureGlobalKeypress = e => {
       // see note in CollectionCard model -- this could really be a static method;
       // because it's not, we just have to call it on any selected card
       card.API_archive()
+      break
+    case 'Escape':
+      // save on sec happens only when user clicks the title textarea
+      const { editingCardCover } = uiStore
+      if (editingCardCover) {
+        uiStore.update('editingCardCover', null)
+      }
       break
     default:
       break

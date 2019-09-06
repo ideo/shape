@@ -533,7 +533,7 @@ class GridCard extends React.Component {
         data-order={card.order}
         data-cy="GridCard"
         onContextMenu={this.openContextMenu}
-        innerRef={c => (this.gridCardRef = c)}
+        ref={c => (this.gridCardRef = c)}
         onMouseLeave={this.closeContextMenu}
         selected={this.isSelected || this.props.hoveringOver}
       >

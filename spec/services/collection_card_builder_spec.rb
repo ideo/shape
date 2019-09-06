@@ -285,43 +285,85 @@ RSpec.describe CollectionCardBuilder, type: :service do
       end
 
       context 'when item is a data item' do
-        let(:builder) do
-          CollectionCardBuilder.new(
-            params: params.merge(
-              item_attributes: {
-                type: 'Item::DataItem',
-                report_type: 'report_type_collections_and_items',
-                datasets_attributes: {
-                  0 => {
-                    chart_type: 'area',
-                    measure: 'participants',
-                    timeframe: 'ever',
-                    type: 'Dataset::CollectionsAndItems',
-                  },
-                  1 => {
-                    chart_type: 'line',
-                    measure: 'viewers',
-                    timeframe: 'ever',
-                    type: 'Dataset::CollectionsAndItems',
+        context 'and there are data_items_datasets_attributes in params' do
+          let(:datasets) { create_list(:dataset, 2, :with_cached_data) }
+          let(:builder) do
+            CollectionCardBuilder.new(
+              params: params.merge(
+                item_attributes: {
+                  type: 'Item::DataItem',
+                  report_type: 'report_type_collections_and_items',
+                  data_items_datasets_attributes: {
+                    0 => {
+                      order: 0,
+                      selected: true,
+                      dataset_id: datasets[0].id,
+                    },
+                    1 => {
+                      order: 1,
+                      selected: false,
+                      dataset_id: datasets[1].id,
+                    },
                   },
                 },
-              },
-            ),
-            parent_collection: parent,
-            user: user,
-          )
+              ),
+              parent_collection: parent,
+              user: user,
+            )
+          end
+
+          it 'links datasets' do
+            expect {
+              builder.create
+            }.to change(DataItemsDataset, :count).by(2)
+
+            item = builder.collection_card.item
+
+            expect(item.datasets.count).to eq 2
+            expect(item.datasets.first).to eq datasets[0]
+            expect(item.datasets.last).to eq datasets[1]
+          end
         end
 
-        before do
-          builder.create
-        end
+        context 'and there are datasets_attributes in params' do
+          let(:builder) do
+            CollectionCardBuilder.new(
+              params: params.merge(
+                item_attributes: {
+                  type: 'Item::DataItem',
+                  report_type: 'report_type_collections_and_items',
+                  datasets_attributes: {
+                    0 => {
+                      chart_type: 'area',
+                      measure: 'participants',
+                      timeframe: 'ever',
+                      type: 'Dataset::CollectionsAndItems',
+                    },
+                    1 => {
+                      chart_type: 'line',
+                      measure: 'viewers',
+                      timeframe: 'ever',
+                      type: 'Dataset::CollectionsAndItems',
+                    },
+                  },
+                },
+              ),
+              parent_collection: parent,
+              user: user,
+            )
+          end
 
-        it 'should create a linked dataset' do
-          item = builder.collection_card.item
+          before do
+            builder.create
+          end
 
-          expect(item.datasets.count).to eq 2
-          expect(item.datasets.first.measure).to eq 'participants'
-          expect(item.datasets.last.measure).to eq 'viewers'
+          it 'creates datasets' do
+            item = builder.collection_card.item
+
+            expect(item.datasets.count).to eq 2
+            expect(item.datasets.first.measure).to eq 'participants'
+            expect(item.datasets.last.measure).to eq 'viewers'
+          end
         end
       end
     end

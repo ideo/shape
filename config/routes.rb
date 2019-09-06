@@ -205,6 +205,7 @@ Rails.application.routes.draw do
     post 'ideo_network/users' => 'ideo_network#users'
     post 'ideo_network/groups' => 'ideo_network#groups'
     post 'ideo_network/users_roles' => 'ideo_network#users_roles'
+    post 'slack/event' => 'slack#event'
   end
 
   resources :reports, only: %i[show]

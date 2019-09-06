@@ -96,6 +96,7 @@ Feature: Undo actions
     When I click the down arrow on the MDL snackbar
     And I wait for "@apiGetCollectionCards" to finish
     And I wait for "@apiMoveCollectionCards" to finish
+    And I wait for 1 second
     Then I should see a collection card named "Hello World"
     Then I should see a "TextItemCover" in the first card
     Then I should see the value "Testing" in the first text item

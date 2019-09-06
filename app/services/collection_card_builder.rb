@@ -94,9 +94,7 @@ class CollectionCardBuilder
             @parent_collection.queue_update_template_instances
           end
 
-          if @datasets_params.present?
-            create_and_link_datasets
-          end
+          create_datasets if @datasets_params.present?
         end
       end
     end
@@ -111,7 +109,7 @@ class CollectionCardBuilder
     )
   end
 
-  def create_and_link_datasets
+  def create_datasets
     @datasets_params.to_h.values.each do |dataset_params|
       @collection_card.item.create_dataset(dataset_params)
     end

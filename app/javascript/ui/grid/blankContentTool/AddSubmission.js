@@ -7,7 +7,7 @@ import { StyledGridCard } from '~/ui/grid/shared'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import Collection from '~/stores/jsonApi/Collection'
 
-const StyledAddSubmission = StyledGridCard.extend`
+const StyledAddSubmission = styled(StyledGridCard)`
   background: transparent;
   cursor: auto;
   position: relative;

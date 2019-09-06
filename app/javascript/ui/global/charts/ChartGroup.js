@@ -71,9 +71,7 @@ class ChartGroup extends React.Component {
 
   get secondaryDatasetsWithData() {
     const { secondaryDatasets } = this.props.dataItem
-    return secondaryDatasets().filter(
-      dataset => dataset.order !== 0 && dataset.data.length > 0
-    )
+    return secondaryDatasets().filter(dataset => dataset.data.length > 0)
   }
 
   get primaryDatasetBarChart() {
@@ -155,6 +153,35 @@ class ChartGroup extends React.Component {
     }
   }
 
+  get tierAxis() {
+    const { tiers } = this.primaryDataset
+    if (!tiers.length) return
+    return (
+      <VictoryAxis
+        dependentAxis
+        orientation="left"
+        tickValues={tiers.map(t => t.value)}
+        tickFormat={tiers.map(t => t.name)}
+        offsetX={40}
+        style={{
+          axis: {
+            stroke: 'transparent',
+          },
+          grid: { stroke: 'black', strokeWidth: 0.5, strokeDasharray: [1, 1] },
+          ticks: { padding: 10 },
+        }}
+        tickLabelComponent={
+          <VictoryLabel
+            textAnchor="start"
+            verticalAnchor="end"
+            dy={-5}
+            style={{ fill: v.colors.commonDarkest, fontSize: '20px' }}
+          />
+        }
+      ></VictoryAxis>
+    )
+  }
+
   get chartAxis() {
     let tickLabelStyle = {}
     if (this.isSmallChartStyle) {
@@ -206,6 +233,8 @@ class ChartGroup extends React.Component {
     // transform properties on SVG
     return this.primaryDatasetValues.length > 1 ? (
       <VictoryAxis
+        dependentAxis={false}
+        orientation="bottom"
         tickLabelComponent={
           <TickLabel
             fontSize={tickLabelStyle.fontSize}
@@ -223,6 +252,7 @@ class ChartGroup extends React.Component {
       />
     ) : (
       <VictoryAxis
+        dependentAxis={false}
         axisLabelComponent={<TickLabel fontSize={tickLabelStyle.fontSize} />}
         style={this.chartAxisStyle}
         tickFormat={t => null}
@@ -304,18 +334,19 @@ class ChartGroup extends React.Component {
             {this.renderedDatasets.map(dataset => dataset)}
           </VictoryGroup>
           {this.chartAxis}
+          {this.tierAxis}
         </VictoryChart>
       )
     }
     return (
       <VictoryChart
         theme={victoryTheme}
-        domainPadding={{ y: 80 }}
         padding={{ top: 0, left: 0, right: 0, bottom: 0 }}
         containerComponent={<VictoryVoronoiContainer />}
       >
         {this.renderedDatasets.map(dataset => dataset)}
         {this.chartAxis}
+        {this.tierAxis}
       </VictoryChart>
     )
   }

@@ -16,7 +16,8 @@ class InvitationMailerPreview < ActionMailer::Preview
       user_id: u.id,
       invited_by_id: User.second.id,
       invited_to_type: 'Group',
-      invited_to_id: Group.first.id,
+      invited_to_id: Group.last.id,
+      application: Application.first,
     )
   end
 end

@@ -21,7 +21,7 @@ describe('AddAudienceModal', () => {
   })
 
   it('validates form when inputting name', () => {
-    let submitButton = wrapper.find('StyledFormButton')
+    let submitButton = wrapper.find('FormButton')
     expect(submitButton.exists()).toBeTruthy()
     expect(submitButton.props()['disabled']).toBeTruthy()
 
@@ -44,7 +44,7 @@ describe('AddAudienceModal', () => {
     const genX = 'Age Gen X (born 1965-1980)'
     wrapper.find(`StyledCheckboxSelectOption[value="${genX}"]`)
     ageMenu.simulate('change', { target: { value: [genX] } })
-    submitButton = wrapper.find('StyledFormButton')
+    submitButton = wrapper.find('FormButton')
     expect(submitButton.props()['disabled']).toBeFalsy()
   })
 
@@ -86,7 +86,7 @@ describe('AddAudienceModal', () => {
   })
 
   it('runs a post-save callback', async () => {
-    const submitButton = wrapper.find('StyledFormButton')
+    const submitButton = wrapper.find('FormButton')
     const nameField = wrapper.find('#audienceName')
 
     nameField.simulate('change', { target: { value: 'Test Audience' } })

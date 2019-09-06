@@ -8,6 +8,7 @@ FactoryBot.define do
     name { Faker::Team.name }
     handle { Faker::Internet.unique.slug }
     network_id { SecureRandom.hex }
+    created_by factory: :user
 
     after(:create) do |group, evaluator|
       if evaluator.add_admins.present?

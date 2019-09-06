@@ -13,6 +13,7 @@
 #  measure          :string
 #  question_type    :string
 #  style            :jsonb
+#  tiers            :jsonb
 #  timeframe        :integer
 #  total            :integer
 #  type             :string
@@ -73,6 +74,16 @@ class Dataset < ApplicationRecord
 
   def self.identifier_for_object(object)
     "#{object.class.base_class.name}-#{object.id}"
+  end
+
+  def link_when_duplicating?
+    # Link (instead of duplicating)
+    # If a dataset was created by an application,
+    # or has more than one data item
+    return true if application.present? || data_items.count > 1
+
+    # Otherwise, it can be duplicated
+    false
   end
 
   def grouping

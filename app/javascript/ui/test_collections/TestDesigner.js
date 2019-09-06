@@ -32,7 +32,7 @@ const TopBorder = styled.div`
     display: none;
   }
 `
-const BottomBorder = TopBorder.extend`
+const BottomBorder = styled(TopBorder)`
   border-radius: 0 0 7px 7px;
 `
 

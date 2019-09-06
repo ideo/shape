@@ -4,7 +4,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
 <styled.div
   data-empty-space-click={true}
   height={NaN}
-  innerRef={[Function]}
   onScroll={[Function]}
   width={988.0701754385965}
 >

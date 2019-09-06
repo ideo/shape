@@ -14,14 +14,14 @@ exports[`MovableGridCard renders snapshot 1`] = `
       placeholder="Collection name"
       value=""
     />
-    <StyledFormButton
+    <FormButton
       color="#120f0e"
       data-cy="CollectionCreatorFormButton"
       disabled={false}
       width={125}
     >
       Add
-    </StyledFormButton>
+    </FormButton>
   </form>
 </styled.div>
 `;

@@ -263,6 +263,12 @@ class CoverImageSelector extends React.Component {
     this.handleTitleSave()
   }
 
+  handleKeyDown = e => {
+    if (e.key === 'Escape') {
+      this.handleTitleSave()
+    }
+  }
+
   async clearCover() {
     const { apiStore, card } = this.props
     if (card.record.internalType === 'collections') {
@@ -332,6 +338,7 @@ class CoverImageSelector extends React.Component {
           onBlur={this.handleTitleSave}
           onClick={this.handleInputClick}
           className={'edit-cover-text'}
+          onKeyDown={this.handleKeyDown}
         />
       </div>
     )

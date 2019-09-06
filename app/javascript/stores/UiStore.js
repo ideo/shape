@@ -5,7 +5,7 @@ import { observable, action, runInAction, computed } from 'mobx'
 import routeToLogin from '~/utils/routeToLogin'
 import sleep from '~/utils/sleep'
 import v from '~/utils/variables'
-import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
+import { POPUP_ACTION_TYPES, ACTION_SOURCES } from '~/enums/actionEnums'
 
 export default class UiStore {
   // store this for usage by other components
@@ -403,7 +403,8 @@ export default class UiStore {
   }
 
   @action
-  openMoveMenu({ from: fromCollectionId, cardAction = 'move' }) {
+  openMoveMenu({ from, cardAction = 'move', context = null }) {
+    const { id: fromCollectionId } = from
     this.dismissedMoveHelper = false
     this.pageMenuOpen = false
     this.closeCardMenu()
@@ -412,13 +413,21 @@ export default class UiStore {
     // cardAction can be 'move', 'link', 'duplicate', 'useTemplate'
     this.cardAction = cardAction
     if (this.cardAction === 'useTemplate') {
-      // fake the selected card to trigger the menu open,
-      // because we aren't really moving an existing card
-      const { name, parent_collection_card } = this.viewingCollection
-      const { id } = parent_collection_card
-      this.movingCardIds.replace([id])
-      // store the name e.g. "CoLab Prototype in transit"
-      this.templateName = name
+      const fromCover = context === ACTION_SOURCES.COVER
+      if (fromCover) {
+        const { parent_collection_card, name } = from
+        const { id } = parent_collection_card
+        // selected card is the card whose cover was selected
+        this.movingCardIds.replace([id])
+        this.templateName = name
+      } else {
+        const { name, parent_collection_card } = this.viewingCollection
+        // fake the selected card to trigger the menu open,
+        // because we aren't really moving an existing card
+        this.movingCardIds.replace([parent_collection_card.id])
+        // store the name e.g. "CoLab Prototype in transit"
+        this.templateName = name
+      }
     } else {
       this.movingCardIds.replace([...this.selectedCardIds])
       this.deselectCards()
