@@ -1,6 +1,7 @@
+import styled from 'styled-components'
 import { StyledIcon } from './Icon'
 
-const StyledCollectionIcon = StyledIcon.extend`
+const StyledCollectionIcon = styled(StyledIcon)`
   .st0 {
     fill: black;
   }

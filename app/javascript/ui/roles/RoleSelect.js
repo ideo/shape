@@ -1,3 +1,4 @@
+import styled from 'styled-components'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
@@ -16,7 +17,7 @@ const minRowStyle = {
   minWidth: '110px',
 }
 
-const DisplayTextPadded = DisplayText.extend`
+const DisplayTextPadded = styled(DisplayText)`
   /* match the padding of MuiSelect */
   padding: 6px 0 7px;
   display: inline-block;

@@ -28,7 +28,7 @@ describe('ImageItemCover', () => {
 
   describe('when contain prop is true', () => {
     beforeEach(() => {
-      wrapper.setProps({ contain: true, ...props })
+      wrapper = mount(<ImageItemCover {...props} contain />)
     })
 
     it('will render the background as contained if passed in as prop', () => {

@@ -20,7 +20,7 @@ class CommentEntryForm extends React.Component {
     this.focusTextArea(this.props.expanded)
   }
 
-  UNSAFE_componentWillReceiveProps({ expanded }) {
+  componentWillReceiveProps({ expanded }) {
     this.focusTextArea(expanded)
     // NOTE: maybe preferred to leave written + unsent messages in the comment box?
     // if (!expanded) this.resetEditorState()

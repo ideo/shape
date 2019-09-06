@@ -72,7 +72,7 @@ export class BreadcrumbItem extends React.Component {
       <Fragment key={path}>
         <StyledBreadcrumbItem
           data-cy="Breadcrumb"
-          innerRef={this.props.forwardedRef}
+          ref={this.props.forwardedRef}
           currentlyDraggedOn={!!showDrag}
           isLast={isLast}
         >

@@ -160,23 +160,31 @@ class ScaleQuestion extends React.Component {
     )
   }
 
+  get question() {
+    const { question, editing } = this.props
+    const { question_description } = question
+    return (
+      <Question editing={editing}>
+        {this.hasEditableCategory ? (
+          this.renderEditableCategory(question_description)
+        ) : (
+          <DisplayText color={v.colors.white}>
+            {question_description}
+            {/* editable category questions have question.content */}
+            {question.content ? ` ${question.content}?` : ''}
+          </DisplayText>
+        )}
+      </Question>
+    )
+  }
+
   render() {
     const { question, editing, questionAnswer } = this.props
-    const { question_type, question_description } = question
+    const { question_type } = question
     const emojis = emojiSeriesForQuestionType(question_type)
     return (
       <div style={{ width: '100%' }}>
-        <Question editing={editing}>
-          {this.hasEditableCategory ? (
-            this.renderEditableCategory(question_description)
-          ) : (
-            <DisplayText color={v.colors.white}>
-              {question_description}
-              {/* editable category questions have question.content */}
-              {question.content ? ` ${question.content}?` : ''}
-            </DisplayText>
-          )}
-        </Question>
+        {this.question}
         <Scale>
           <SmallHelperText>select your response below</SmallHelperText>
           <EmojiHolder data-cy="ScaleEmojiHolder">

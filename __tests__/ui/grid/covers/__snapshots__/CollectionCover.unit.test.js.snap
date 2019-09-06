@@ -19,7 +19,7 @@ exports[`CollectionCover renders snapshot 1`] = `
       <div
         className="top"
       >
-        <styled.h1>
+        <Styled(CardHeading)>
           <Dotdotdot
             clamp={3}
             tagName="div"
@@ -43,7 +43,7 @@ exports[`CollectionCover renders snapshot 1`] = `
               </span>
             </PlainLink>
           </Dotdotdot>
-        </styled.h1>
+        </Styled(CardHeading)>
       </div>
       <div
         className="bottom"

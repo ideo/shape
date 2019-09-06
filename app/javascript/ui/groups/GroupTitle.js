@@ -27,7 +27,7 @@ const StyledTitleItem = styled(Grid)`
   padding-left: 14px;
 `
 
-const StyledHeading2 = Heading2.extend`
+const StyledHeading2 = styled(Heading2)`
   margin-bottom: 0;
 `
 StyledHeading2.displayName = 'StyledHeading2'

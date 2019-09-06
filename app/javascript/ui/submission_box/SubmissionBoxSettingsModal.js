@@ -25,7 +25,7 @@ import Modal from '~/ui/global/modals/Modal'
 import RecordSearch from '~/ui/global/RecordSearch'
 import v from '~/utils/variables'
 
-const SubmissionBoxRow = Row.extend`
+const SubmissionBoxRow = styled(Row)`
   cursor: pointer;
   font-family: ${v.fonts.sans};
   transition: background-color 0.3s;
@@ -37,7 +37,7 @@ const SubmissionBoxRow = Row.extend`
     background: ${v.colors.primaryLight};
   }
 `
-const SubmissionBoxRowText = RowItemLeft.extend`
+const SubmissionBoxRowText = styled(RowItemLeft)`
   padding-top: 0.75rem;
 `
 

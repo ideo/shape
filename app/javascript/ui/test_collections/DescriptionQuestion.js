@@ -1,3 +1,4 @@
+import styled from 'styled-components'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -5,7 +6,7 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { SmallHelperText } from '~/ui/global/styled/typography'
 import { TextInputHolder, TextInput } from './shared'
 
-const StyledSmallText = SmallHelperText.extend`
+const StyledSmallText = styled(SmallHelperText)`
   color: ${props => props.theme.questionText};
   margin-left: calc(100% - 35px);
 `

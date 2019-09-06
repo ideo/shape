@@ -79,10 +79,17 @@ describe('PageWithApiWrapper', () => {
   describe('render', () => {
     const fakeCollection = { id: 123 }
     const FakeComponent = () => <div />
+    const fakeApiStore = {
+      ...apiStore,
+      request: jest
+        .fn()
+        .mockReturnValue(Promise.resolve({ data: fakeCollection })),
+    }
     beforeEach(() => {
       wrapper = shallow(
         <PageWithApiWrapper.wrappedComponent
           {...props}
+          apiStore={fakeApiStore}
           render={collection => <FakeComponent collection={collection} />}
         />
       )
