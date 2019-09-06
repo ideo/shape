@@ -62,7 +62,7 @@ class User < ApplicationRecord
                  :picture,
                  :picture_medium,
                  :picture_large,
-                 :default_locale
+                 :locale
 
   store_accessor :terms_accepted_data,
                  :terms_accepted,
@@ -134,6 +134,7 @@ class User < ApplicationRecord
   after_save :update_profile_names, if: :saved_change_to_name?
   after_save :update_shape_circle_subscription, if: :saved_change_to_shape_circle_member?
   after_save :update_products_mailing_list_subscription, if: :saved_change_to_mailing_list?
+  after_save :update_profile_locale, if: :saved_change_to_locale?
   after_create :update_shape_user_list_subscription, if: :active?
   after_update :update_shape_user_list_subscription_after_update, if: :saved_change_to_status?
 
@@ -271,7 +272,7 @@ class User < ApplicationRecord
     end
     user.first_name = attrs.first_name
     user.last_name = attrs.last_name
-    %w[picture picture_medium picture_large].each do |field|
+    %w[picture picture_medium picture_large locale].each do |field|
       user.network_data[field] = attrs.try(:extra).try(field)
     end
 
@@ -322,12 +323,12 @@ class User < ApplicationRecord
   end
 
   def update_from_network_profile(params)
-    %i[first_name last_name email picture picture_large default_locale].each do |field|
+    %i[first_name last_name email picture picture_large locale].each do |field|
       send("#{field}=", params[field]) if params[field].present?
     end
     self.handle = params[:username] if params[:username].present?
     save
-    I18n.locale = user_params[:default_locale] if params[:default_locale].present?
+    I18n.locale = user_params[:locale] if params[:locale].present?
   end
 
   def generate_handle
@@ -572,6 +573,12 @@ class User < ApplicationRecord
       # call full update rather than update_all which skips callbacks
       profile.update(name: name)
     end
+  end
+
+  def update_profile_locale
+    nu = network_user
+    nu.locale = locale
+    nu.save
   end
 
   def update_products_mailing_list_subscription(subscribed: mailing_list)

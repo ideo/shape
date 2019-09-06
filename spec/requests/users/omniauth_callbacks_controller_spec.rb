@@ -157,6 +157,7 @@ describe Users::OmniauthCallbacksController, type: :request do
               picture: picture,
               picture_medium: "#{picture}_md",
               picture_large: "#{picture}_lg",
+              locale: 'en',
             },
           },
         )
