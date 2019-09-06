@@ -249,9 +249,6 @@ class User < ApplicationRecord
         # Users see terms on the Network, so we can mark them as accepted
         user.terms_accepted = true
       end
-      user.first_name = attrs[:first_name]
-      user.last_name = attrs[:last_name]
-      user.phone = attrs[:phone]
       user.invitation_token = nil
       user.password = Devise.friendly_token(40)
       user.password_confirmation = user.password
@@ -260,8 +257,12 @@ class User < ApplicationRecord
     end
 
     # Update user on every auth
+    user.first_name = attrs.first_name
+    user.last_name = attrs.last_name
     user.email = attrs.email
     user.phone = attrs.phone
+    user.locale = attrs.locale
+
     unless user.limited?
       if attrs.present?
         user.handle = attrs.username
@@ -269,8 +270,6 @@ class User < ApplicationRecord
         user.generate_handle
       end
     end
-    user.first_name = attrs.first_name
-    user.last_name = attrs.last_name
     %w[picture picture_medium picture_large].each do |field|
       user.network_data[field] = attrs.try(:extra).try(field)
     end
@@ -284,6 +283,7 @@ class User < ApplicationRecord
       type: auth.extra.raw_info.type,
       email: auth.info.email,
       phone: auth.extra.raw_info.phone,
+      locale: auth.extra.raw_info.locale,
       first_name: auth.info.first_name,
       last_name: auth.info.last_name,
       username: auth.info.username,
@@ -547,6 +547,8 @@ class User < ApplicationRecord
   end
 
   def locale
+    return locale_change.last if locale_changed?
+
     locale_in_database || current_organization&.default_locale
   end
 
@@ -577,9 +579,9 @@ class User < ApplicationRecord
     # NOTE: should be in a worker to offload external network call
     nu = network_user
     return unless nu.present?
-    return if nu.locale == locale_in_database
+    return if nu.locale == locale
 
-    nu.update(locale: locale_in_database)
+    nu.update(locale: locale)
   end
 
   def update_products_mailing_list_subscription(subscribed: mailing_list)

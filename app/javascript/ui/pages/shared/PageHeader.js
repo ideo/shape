@@ -387,9 +387,6 @@ class PageHeader extends React.Component {
                   )}
                   {this.collectionTypeOrInheritedTags}
                 </div>
-                <Flex style={{ position: 'relative', top: '5px' }}>
-                  <LanguageSelector />
-                </Flex>
                 <HeaderButtonContainer>
                   {this.renderTemplateButton}
                   {this.renderRestoreButton}
@@ -397,6 +394,12 @@ class PageHeader extends React.Component {
                   {this.renderJoinCollectionButton}
                   {this.renderTestUi}
                 </HeaderButtonContainer>
+              </Flex>
+
+              <Flex
+                style={{ position: 'relative', top: '15px', height: '33px' }}
+              >
+                <LanguageSelector />
               </Flex>
             </StyledTitleAndRoles>
           </div>
