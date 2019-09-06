@@ -1,11 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ImageItemCover renders snapshot 1`] = `
-<React.Fragment>
+<Fragment>
   <StyledImageCover
     contain={false}
     onClick={[Function]}
     url="http://fake.url/img"
   />
-</React.Fragment>
+</Fragment>
 `;

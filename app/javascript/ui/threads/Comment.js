@@ -25,7 +25,7 @@ import Linkify from 'linkifyjs/react'
 import mention from 'linkifyjs/plugins/mention'
 mention(linkify)
 
-const StyledComment = StyledCommentInput.extend`
+const StyledComment = styled(StyledCommentInput)`
   ${showOnHoverCss};
   ${hideOnHoverCss};
   padding: 10px;

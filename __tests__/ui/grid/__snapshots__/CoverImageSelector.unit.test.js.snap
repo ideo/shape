@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`CoverImageSelector renders snapshot 1`] = `
-<React.Fragment>
+<Fragment>
   <CardActionHolder
     active={false}
     className="show-on-hover"
@@ -13,5 +13,5 @@ exports[`CoverImageSelector renders snapshot 1`] = `
   >
     <EditPencilIconLarge />
   </CardActionHolder>
-</React.Fragment>
+</Fragment>
 `;

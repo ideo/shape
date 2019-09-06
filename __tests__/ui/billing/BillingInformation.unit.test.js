@@ -1,5 +1,4 @@
 import BillingInformation from '~/ui/billing/BillingInformation'
-import { shallow } from 'enzyme'
 import Loader from '~/ui/layout/Loader'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 

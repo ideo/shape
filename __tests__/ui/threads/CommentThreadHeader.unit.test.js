@@ -3,7 +3,7 @@ import CommentThreadHeader, {
 } from '~/ui/threads/CommentThreadHeader'
 
 import { fakeThread } from '#/mocks/data'
-import v, { ITEM_TYPES } from '~/utils/variables'
+import { ITEM_TYPES } from '~/utils/variables'
 import { routingStore, uiStore } from '~/stores'
 
 jest.mock('../../../app/javascript/stores')
@@ -171,7 +171,7 @@ describe('CommentThreadHeader', () => {
 
       it('should render the follow icon in dark color', () => {
         const holder = wrapper.find(FollowHolder)
-        expect(holder).toHaveStyleRule('color', v.colors.commonLight)
+        expect(holder.props().isFollowed).toBe(true)
       })
 
       it('should call API_unsubscribe when clicking', () => {
@@ -201,7 +201,7 @@ describe('CommentThreadHeader', () => {
 
       it('should render the follow icon in dark color', () => {
         const holder = wrapper.find(FollowHolder)
-        expect(holder).toHaveStyleRule('color', v.colors.secondaryLight)
+        expect(holder.props().isFollowed).toBe(false)
       })
 
       it('should call API_subscribe when clicking', () => {

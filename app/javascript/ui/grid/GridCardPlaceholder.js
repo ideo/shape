@@ -1,7 +1,8 @@
+import styled from 'styled-components'
 import v from '~/utils/variables'
 import { StyledGridCard } from './shared'
 
-const GridCardPlaceholder = StyledGridCard.extend`
+const GridCardPlaceholder = styled(StyledGridCard)`
   background: ${v.colors.primaryLight};
 `
 

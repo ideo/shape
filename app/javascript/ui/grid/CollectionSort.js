@@ -10,7 +10,7 @@ import v from '~/utils/variables'
 const StyledGrid = styled.div``
 StyledGrid.displayName = 'StyledGrid'
 
-const ExplanationText = DisplayText.extend`
+const ExplanationText = styled(DisplayText)`
   color: ${v.colors.commonMedium};
 `
 

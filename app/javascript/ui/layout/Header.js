@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import styled from 'styled-components'
 import { Fragment } from 'react'
 import { observable, action, computed } from 'mobx'
@@ -266,6 +267,14 @@ class Header extends React.Component {
       ? CornerPositioned
       : styled.div``
 
+    let breadcrumbKey = ''
+    if (record) {
+      breadcrumbKey = `${record.identifier}_${record.breadcrumbSize}_${_.map(
+        uiStore.linkedBreadcrumbTrail,
+        'id'
+      )}`
+    }
+
     return (
       <Fragment>
         <style
@@ -315,7 +324,7 @@ class Header extends React.Component {
                           record={record}
                           isHomepage={uiStore.isViewingHomepage}
                           // re-mount every time the record / breadcrumb changes
-                          key={`${record.identifier}_${record.breadcrumbSize}`}
+                          key={breadcrumbKey}
                           // force props update if windowWidth changes
                           windowWidth={uiStore.windowWidth}
                           containerWidth={this.maxBreadcrumbContainerWidth}

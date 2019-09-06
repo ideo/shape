@@ -29,14 +29,14 @@ function roleArticle(nextWord) {
 
 const MAX_ACTORS = 3
 
-export const ActivityText = styled.p`
+export const ActivityText = styled.div`
   color: ${v.colors.commonLight};
   font-family: ${v.fonts.sans};
   font-size: 1rem;
   line-height: 1.25;
   margin-bottom: 0;
 `
-const ActivityButton = styled.button`
+const ActivityButton = styled.div`
   display: block;
   text-align: left;
 `
