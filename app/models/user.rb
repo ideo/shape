@@ -133,9 +133,9 @@ class User < ApplicationRecord
   after_save :update_profile_names, if: :saved_change_to_name?
   after_save :update_shape_circle_subscription, if: :saved_change_to_shape_circle_member?
   after_save :update_products_mailing_list_subscription, if: :saved_change_to_mailing_list?
-  after_save :update_profile_locale, if: :saved_change_to_locale?
   after_create :update_shape_user_list_subscription, if: :active?
   after_update :update_shape_user_list_subscription_after_update, if: :saved_change_to_status?
+  after_update :update_profile_locale, if: :saved_change_to_locale?
 
   delegate :balance, to: :incentive_owed_account, prefix: true
   delegate :balance, to: :incentive_paid_account, prefix: true
@@ -575,10 +575,11 @@ class User < ApplicationRecord
   end
 
   def update_profile_locale
-    # NOTE: should be in a worker to offload external network call 
+    # NOTE: should be in a worker to offload external network call
     nu = network_user
-    nu.locale = locale_in_database
-    nu.save
+    return unless nu.present?
+
+    nu.update(locale: locale_in_database)
   end
 
   def update_products_mailing_list_subscription(subscribed: mailing_list)

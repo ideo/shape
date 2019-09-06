@@ -156,6 +156,20 @@ describe User, type: :model do
         end
       end
     end
+
+    describe '#update_profile_locale' do
+      let(:network_user) { double('network_user') }
+
+      before do
+        allow(network_user).to receive(:update)
+      end
+
+      it 'should call the network to update the locale' do
+        expect(NetworkApi::User).to receive(:find).with(user.uid).and_return([network_user])
+        expect(network_user).to receive(:update).with(locale: 'es')
+        user.update(locale: 'es')
+      end
+    end
   end
 
   describe '#add_role' do
