@@ -64,7 +64,7 @@ describe('ScaleQuestion', () => {
       beforeEach(() => {
         props.questionAnswer = fakeQuestionAnswer
         props.questionAnswer.answer_number = 2
-        wrapper = shallowWithTheme(<ScaleQuestion {...props} />, theme)
+        wrapper = shallow(<ScaleQuestion {...props} />)
       })
 
       it('should set the emoji opacity to 1', () => {
@@ -81,7 +81,7 @@ describe('ScaleQuestion', () => {
       beforeEach(() => {
         props.questionAnswer = fakeQuestionAnswer
         props.questionAnswer.answer_number = null
-        wrapper = shallowWithTheme(<ScaleQuestion {...props} />, theme)
+        wrapper = shallow(<ScaleQuestion {...props} />)
       })
 
       it('should set the emoji opacity to 0.2', () => {
@@ -98,7 +98,7 @@ describe('ScaleQuestion', () => {
       beforeEach(() => {
         props.question.question_type = 'question_category_satisfaction'
         props.question.content = undefined
-        wrapper = shallowWithTheme(<ScaleQuestion {...props} />, theme)
+        wrapper = shallow(<ScaleQuestion {...props} />)
       })
 
       it('should have editable input field if no content', () => {
@@ -114,7 +114,7 @@ describe('ScaleQuestion', () => {
           props.question.question_description =
             'How satisfied are you with your current'
           props.editable = false
-          wrapper = shallowWithTheme(<ScaleQuestion {...props} />, theme)
+          wrapper = shallow(<ScaleQuestion {...props} />)
         })
 
         it('should have text, and not editable input field', () => {
@@ -137,7 +137,7 @@ describe('ScaleQuestion', () => {
         beforeEach(() => {
           props.question.question_type = 'question_category_satisfaction'
           props.question.content = 'magic wand'
-          wrapper = shallowWithTheme(<ScaleQuestion {...props} />, theme)
+          wrapper = shallow(<ScaleQuestion {...props} />)
         })
 
         it('should render content', () => {
