@@ -65,6 +65,9 @@ class Group < ApplicationRecord
   belongs_to :created_by, class_name: 'User', optional: true
   has_many :groups_threads
 
+  has_many :granted_subgroups
+  has_many :subgroups, through: :granted_subgroups
+
   has_many :activities_as_subject, through: :activity_subjects, class_name: 'Activity'
   has_many :activity_subjects, as: :subject
 

@@ -97,6 +97,10 @@ class User < ApplicationRecord
            through: :roles_for_groups,
            source: :resource,
            source_type: 'Group'
+
+  # has_many :current_org_parent_groups,
+  # user.current_org_groups.map(&:parent_groups).pluck(:id)
+
   has_many :organizations, -> { distinct }, through: :groups
 
   has_many :users_threads, dependent: :destroy
