@@ -122,12 +122,15 @@ class CoverImageSelector extends React.Component {
   loading = false
   @observable
   cardTitle = ''
+  @observable
+  cardSubtitle = ''
 
   componentDidMount() {
     const { card, uiStore } = this.props
     const { record } = card
-    const { name } = record
+    const { name, cover } = record
     this.cardTitle = name || record.url
+    this.cardSubtitle = !!cover ? cover.text : ''
     // TODO don't like how id name is in two separate places
     runInAction(() => {
       this.parentCard = document.getElementById(`gridCard-${card.id}`)
@@ -235,11 +238,17 @@ class CoverImageSelector extends React.Component {
     this.cardTitle = ev.target.value
   }
 
+  @action
+  changeSubtitle = ev => {
+    this.cardSubtitle = ev.target.value
+  }
+
   handleTitleSave = ev => {
     const { card, uiStore } = this.props
     const { record } = card
     uiStore.setEditingCardCover(null)
     record.API_updateName(this.cardTitle)
+    record.API_updateSubtitle(this.cardSubtitle)
   }
 
   handleInputKeys = ev => {
@@ -344,6 +353,26 @@ class CoverImageSelector extends React.Component {
     )
   }
 
+  renderEditSubtitleInput(subtitle) {
+    // max length 144 matches StyledEditableName's max length
+    return (
+      <div>
+        <TextareaAutosize
+          maxRows={3}
+          maxLength={144}
+          value={subtitle}
+          placeholder={'untitled'}
+          onChange={this.changeSubtitle}
+          onKeyPress={this.handleInputKeys}
+          onBlur={this.handleTitleSave}
+          onClick={this.handleInputClick}
+          className={'edit-cover-text'}
+          onKeyDown={this.handleKeyDown}
+        />
+      </div>
+    )
+  }
+
   renderInner() {
     const { uiStore } = this.props
     const { gridSettings } = uiStore
@@ -371,6 +400,10 @@ class CoverImageSelector extends React.Component {
                   onSelect={this.onFilterOptionSelect}
                 />
               )}
+              <StyledEditTitle>
+                <h3>Subtitle</h3>
+                {this.renderEditSubtitleInput(this.cardSubtitle)}
+              </StyledEditTitle>
             </div>
           )}
           <CloseButton

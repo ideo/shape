@@ -56,6 +56,10 @@ class SerializableCollection < BaseJsonSerializer
     @object.cached_cover || {}
   end
 
+  attribute :subtitle do
+    @object&.cached_cover&.dig(:text) || ''
+  end
+
   attribute :test_scores do
     @object.cached_test_scores || {}
   end

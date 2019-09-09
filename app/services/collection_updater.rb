@@ -36,7 +36,10 @@ class CollectionUpdater < SimpleService
   attr_reader :organization, :parent_card, :created_by
 
   def assign_attributes
-    @collection.attributes = @attributes
+    cover_hash = @collection.cache_cover.to_h
+    cover_hash[:text] = @attributes[:subtitle]
+    @collection.attributes = @attributes.except(:subtitle)
+    @collection.cached_cover = cover_hash
     @collection.update_cached_tag_lists
     # always touch the updated timestamp even though we may just be updating the related cards
     @collection.updated_at = Time.now
