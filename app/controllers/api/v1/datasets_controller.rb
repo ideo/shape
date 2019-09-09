@@ -114,6 +114,7 @@ class Api::V1::DatasetsController < Api::V1::BaseController
       :chart_type,
       :data_source_type,
       :data_source_id,
+      :external_id,
       style: {},
       tiers: %i[
         value
