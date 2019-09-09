@@ -310,6 +310,7 @@ class Collection < ApplicationRecord
     [
       :created_by,
       :organization,
+      :translations,
       parent_collection_card: %i[parent],
       roles: %i[users groups resource],
     ]

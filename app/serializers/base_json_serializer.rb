@@ -8,4 +8,16 @@ class BaseJsonSerializer < JSONAPI::Serializable::Resource
   attribute :class_type, if: -> { @object.class.method_defined?(:type) } do
     @object.type || @object.class.name
   end
+
+  def translated_value(attr)
+    if default_locale? || !@object.respond_to?("translated_#{attr}")
+      @object.send(attr)
+    else
+      @object.send("translated_#{attr}").presence || @object.send(attr)
+    end
+  end
+
+  def default_locale?
+    I18n.locale == I18n.default_locale
+  end
 end

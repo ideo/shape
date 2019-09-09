@@ -2,11 +2,16 @@ class SerializableCollection < BaseJsonSerializer
   include SerializedExternalId
   type 'collections'
 
-  attributes :created_at, :updated_at, :name,
+  attributes :created_at, :updated_at,
              :master_template, :template_id,
              :submission_box_type, :submission_box_id, :submission_template_id,
              :test_status, :collection_to_test_id, :hide_submissions, :submissions_enabled,
              :anyone_can_view, :anyone_can_join, :cover_type, :archived
+
+
+  attribute :name do
+    translated_value(:name)
+  end
 
   has_many :roles do
     data do
