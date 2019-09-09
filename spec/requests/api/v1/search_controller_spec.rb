@@ -344,6 +344,7 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
     let!(:similar_user) do
       create(:user, add_to_org: organization, first_name: @user.first_name)
     end
+    let!(:subgroup) { create(:group, organization: organization) }
     let(:path) { '/api/v1/search/users_and_groups' }
 
     before do
@@ -417,6 +418,34 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
           get(path_with_collection, params: { query: @user.first_name })
           expect(json_user_ids).to eq([@user.id])
         end
+      end
+    end
+
+    context 'searching a group' do
+      let!(:group) { create(:group, organization: organization, add_admins: [@user, similar_user, subgroup]) }
+
+      let(:path_with_group) do
+        "#{path}?resource_id=#{group.id}&resource_type=Group"
+      end
+      let(:json_user_ids) do
+        json['data']
+          .first['relationships']['users']['data']
+          .map { |json| json['id'].to_i }
+      end
+      let(:json_group_ids) do
+        json['data']
+          .first['relationships']['groups']['data']
+          .map { |json| json['id'].to_i }
+      end
+
+      it 'returns user with role' do
+        get(path_with_group, params: { query: @user.first_name })
+        expect(json_user_ids).to match_array([@user.id, similar_user.id])
+      end
+
+      it 'returns group with role' do
+        get(path_with_group, params: { query: subgroup.name })
+        expect(json_group_ids).to match_array([subgroup.id])
       end
     end
   end

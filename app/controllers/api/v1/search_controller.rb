@@ -125,32 +125,24 @@ class Api::V1::SearchController < Api::V1::BaseController
     if status == 'pending'
       search_opts[:order] << { email: :asc }
     end
-    if @resource.is_a?(Group)
-      search_opts[:index_name] = [User]
-      search_opts[:where] = {
-        status: status,
-        application_bot: false,
-        _id: @resource.user_ids,
+    search_opts[:where] = {
+      _or: [
+        {
+          _type: 'user',
+          _id: @resource.search_user_ids,
+          status: status,
+          application_bot: false,
+        },
+      ],
+    }
+    if status == 'active'
+      search_opts[:index_name] << Group
+      search_opts[:where][:_or] << {
+        _type: 'group',
+        _id: @resource.search_group_ids,
       }
-    else
-      search_opts[:where] = {
-        _or: [
-          {
-            _type: 'user',
-            _id: @resource.search_user_ids,
-            status: status,
-            application_bot: false,
-          },
-        ],
-      }
-      if status == 'active'
-        search_opts[:index_name] << Group
-        search_opts[:where][:_or] << {
-          _type: 'group',
-          _id: @resource.search_group_ids,
-        }
-      end
     end
+    # end
 
     results = Search.new(search_opts).search(@query)
 

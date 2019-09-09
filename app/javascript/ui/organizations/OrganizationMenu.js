@@ -177,7 +177,6 @@ class OrganizationMenu extends React.Component {
         ownerType="groups"
         fixedRole={fixedRole}
         title="Members:"
-        addCallout="Add people:"
       />
     )
   }

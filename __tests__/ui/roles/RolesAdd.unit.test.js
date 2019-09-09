@@ -57,9 +57,9 @@ describe('RolesAdd', () => {
         wrapper = mount(<RolesAdd {...props} ownerType="groups" />)
       })
 
-      it('should call apiStore to search users only', () => {
+      it('should call apiStore to search users and groups', () => {
         wrapper.instance()._autocompleteSearch('person', jest.fn())
-        expect(apiStore.searchUsers).toHaveBeenCalledWith('person')
+        expect(apiStore.searchUsersAndGroups).toHaveBeenCalledWith('person')
       })
     })
 
@@ -68,7 +68,7 @@ describe('RolesAdd', () => {
         wrapper = mount(<RolesAdd {...props} ownerType="collections" />)
       })
 
-      it('should call apiStore to search users only', () => {
+      it('should call apiStore to search users and groups', () => {
         wrapper.instance()._autocompleteSearch('person', jest.fn())
         expect(apiStore.searchUsersAndGroups).toHaveBeenCalledWith('person')
       })
