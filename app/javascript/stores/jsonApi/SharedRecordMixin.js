@@ -66,8 +66,11 @@ const SharedRecordMixin = superclass =>
       }
       const data = this.toJsonApi()
       // see collection_updater.rb for deserialization
-      data.attributes.hardcoded_subtitle = hardcodedSubtitle
-      this.cover.hardcoded_subtitle = hardcodedSubtitle
+      if (hardcodedSubtitle !== this.subtitle) {
+        data.attributes.hardcoded_subtitle = hardcodedSubtitle
+        this.cover.hardcoded_subtitle = hardcodedSubtitle
+      }
+
       data.attributes.subtitle_hidden = subtitleHidden
       this.cover.subtitle_hidden = subtitleHidden
       // cancel sync so that name edits don't roundtrip and interfere with your <input>

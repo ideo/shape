@@ -269,7 +269,7 @@ class CoverImageSelector extends React.Component {
     const { record } = card
     const { name, cover } = record
     this.cardTitle = name || record.url
-    this.hardcodedSubtitle = cover.hardcoded_subtitle
+    this.hardcodedSubtitle = record.subtitle
     this.subtitleHidden = cover.subtitle_hidden
     ev.preventDefault()
     this.populateAllOptions()
