@@ -97,6 +97,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
         end
 
         it 'should create a link card' do
+          expect_any_instance_of(CollectionCard).to receive(:increment_card_orders!)
           expect(builder.create).to be true
           expect(builder.collection_card.link?).to be true
           expect(builder.collection_card.collection).to eq collection

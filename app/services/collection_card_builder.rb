@@ -47,6 +47,7 @@ class CollectionCardBuilder
 
         post_creation_record_update if @collection_card.primary?
 
+        @collection_card.increment_card_orders!
         if @parent_collection.master_template?
           # we just added a template card, so update the instances
           @parent_collection.queue_update_template_instances
@@ -68,7 +69,6 @@ class CollectionCardBuilder
     end
     @collection_card.parent.cache_cover! if @collection_card.should_update_parent_collection_cover?
     @collection_card.update_collection_cover if @collection_card.is_cover
-    @collection_card.increment_card_orders!
     add_external_record
     record.reload
     # will also cache roles identifier and update breadcrumb
