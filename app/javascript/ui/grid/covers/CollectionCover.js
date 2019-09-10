@@ -363,7 +363,6 @@ class CollectionCover extends React.Component {
     } = this.props
     const { subtitle } = collection
     const { gridW, gutter } = uiStore.gridSettings
-    console.log(subtitle)
 
     return (
       <StyledCollectionCover

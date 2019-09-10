@@ -43,7 +43,11 @@ const SharedRecordMixin = superclass =>
     }
 
     @action
-    API_updateNameAndCover({ name, subtitle = '', subtitleHidden = false }) {
+    API_updateNameAndCover({
+      name,
+      hardcodedSubtitle = '',
+      subtitleHidden = false,
+    }) {
       const previousName = this.name
       this.name = name
       if (name !== previousName) {
@@ -62,14 +66,10 @@ const SharedRecordMixin = superclass =>
       }
       const data = this.toJsonApi()
       // see collection_updater.rb for deserialization
-      if (subtitle) {
-        data.attributes.hardcoded_subtitle = subtitle
-        this.cover.hardcoded_subtitle = subtitle
-      }
-      if (subtitleHidden) {
-        data.attributes.subtitle_hidden = subtitleHidden
-        this.cover.subtitle_hidden = subtitleHidden
-      }
+      data.attributes.hardcoded_subtitle = hardcodedSubtitle
+      this.cover.hardcoded_subtitle = hardcodedSubtitle
+      data.attributes.subtitle_hidden = subtitleHidden
+      this.cover.subtitle_hidden = subtitleHidden
       // cancel sync so that name edits don't roundtrip and interfere with your <input>
       data.cancel_sync = true
       return this.apiStore.request(this.baseApiPath, 'PATCH', { data })

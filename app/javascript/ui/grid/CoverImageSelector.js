@@ -125,10 +125,6 @@ class CoverImageSelector extends React.Component {
   componentDidMount() {
     const { card, uiStore } = this.props
     const { record } = card
-    const { name, cover, hardcoded_subtitle } = record
-    this.cardTitle = name || record.url
-    this.hardcodedSubtitle = hardcoded_subtitle
-    this.subtitleHidden = cover.subtitle_hidden
     // TODO don't like how id name is in two separate places
     runInAction(() => {
       this.parentCard = document.getElementById(`gridCard-${card.id}`)
@@ -251,7 +247,7 @@ class CoverImageSelector extends React.Component {
     const { record } = card
     record.API_updateNameAndCover({
       name: this.cardTitle,
-      subtitle: this.hardcodedSubtitle,
+      hardcodedSubtitle: this.hardcodedSubtitle,
       subtitleHidden: this.subtitleHidden,
     })
   }
@@ -270,6 +266,11 @@ class CoverImageSelector extends React.Component {
   handleClick = ev => {
     const { card, uiStore } = this.props
     const { id } = card
+    const { record } = card
+    const { name, cover } = record
+    this.cardTitle = name || record.url
+    this.hardcodedSubtitle = cover.hardcoded_subtitle
+    this.subtitleHidden = cover.subtitle_hidden
     ev.preventDefault()
     this.populateAllOptions()
     uiStore.setEditingCardCover(id)
@@ -336,14 +337,14 @@ class CoverImageSelector extends React.Component {
     return !!thumbnail_url
   }
 
-  renderEditTitleInput(title) {
+  renderEditTitleInput() {
     // max length 144 matches StyledEditableName's max length
     return (
       <div>
         <TextareaAutosize
           maxRows={3}
           maxLength={144}
-          value={title}
+          value={this.cardTitle}
           placeholder={'untitled'}
           onChange={this.changeTitle}
           onKeyPress={this.handleInputKeys}
@@ -355,14 +356,14 @@ class CoverImageSelector extends React.Component {
     )
   }
 
-  renderEditSubtitleInput(subtitle) {
+  renderEditSubtitleInput() {
     // max length 144 matches StyledEditableName's max length
     return (
       <div>
         <TextareaAutosize
           maxRows={3}
           maxLength={144}
-          value={subtitle}
+          value={this.hardcodedSubtitle}
           placeholder={'default'}
           onChange={this.changeHardcodedSubtitle}
           onKeyPress={this.handleInputKeys}
@@ -386,7 +387,7 @@ class CoverImageSelector extends React.Component {
             <div>
               <StyledEditTitle>
                 <h3>Title</h3>
-                {this.renderEditTitleInput(this.cardTitle)}
+                {this.renderEditTitleInput()}
               </StyledEditTitle>
               <h3>Cover Image</h3>
               <QuickOptionSelector
@@ -406,7 +407,7 @@ class CoverImageSelector extends React.Component {
                 <div>
                   <h3>Subtitle</h3>
                   <StyledEditTitle>
-                    {this.renderEditSubtitleInput(this.hardcodedSubtitle)}
+                    {this.renderEditSubtitleInput()}
                   </StyledEditTitle>
                   <LabelContainer
                     labelPlacement={'end'}
