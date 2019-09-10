@@ -1,22 +1,23 @@
 class SerializableItem < BaseJsonSerializer
   include SerializedExternalId
   type 'items'
-  attributes :url, :thumbnail_url, :icon_url, :question_type,
-             :data_source_type, :data_source_id, :data_settings,
-             :previous_thumbnail_urls, :legend_item_id,
-             :question_title, :question_description, :archived
-
-  attribute :name do
-    translated_value(:name)
-  end
-
-  attribute :content do
-    translated_value(:content)
-  end
-
-  attribute :data_content do
-    translated_value(:data_content)
-  end
+  attributes(
+    :name,
+    :content,
+    :data_content,
+    :url,
+    :thumbnail_url,
+    :icon_url,
+    :question_type,
+    :data_source_type,
+    :data_source_id,
+    :data_settings,
+    :previous_thumbnail_urls,
+    :legend_item_id,
+    :question_title,
+    :question_description,
+    :archived,
+  )
 
   has_many :roles do
     data do

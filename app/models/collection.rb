@@ -83,6 +83,9 @@ class Collection < ApplicationRecord
                     confirmable: true,
                     fallbacks_for_empty_translations: true
 
+  # has to come after `translates_custom`
+  include Translatable
+
   store_accessor :cached_attributes,
                  :cached_cover,
                  :cached_tag_list,
