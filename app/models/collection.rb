@@ -844,6 +844,11 @@ class Collection < ApplicationRecord
     parents.find_by(type: 'Collection::ApplicationCollection')
   end
 
+  def inside_an_application_collection?
+    is_a?(Collection::ApplicationCollection) ||
+      parent_application_collection.present?
+  end
+
   # =================================
   # <--- end boolean checks
 

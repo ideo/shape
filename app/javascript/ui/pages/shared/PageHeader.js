@@ -396,11 +396,13 @@ class PageHeader extends React.Component {
                 </HeaderButtonContainer>
               </Flex>
 
-              <Flex
-                style={{ position: 'relative', top: '15px', height: '33px' }}
-              >
-                <LanguageSelector />
-              </Flex>
+              {record.show_language_selector && (
+                <Flex
+                  style={{ position: 'relative', top: '15px', height: '33px' }}
+                >
+                  <LanguageSelector />
+                </Flex>
+              )}
             </StyledTitleAndRoles>
           </div>
         </MaxWidthContainer>

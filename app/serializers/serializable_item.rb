@@ -46,6 +46,10 @@ class SerializableItem < BaseJsonSerializer
     @object.private?
   end
 
+  attribute :show_language_selector do
+    @object.parent&.inside_an_application_collection?
+  end
+
   attribute :filestack_file_url do
     @object.filestack_file_signed_url
   end
