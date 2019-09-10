@@ -161,14 +161,15 @@ describe User, type: :model do
       let(:network_user) { double('network_user') }
 
       before do
-        allow(network_user).to receive(:update)
         allow(network_user).to receive(:locale)
         expect(NetworkApi::User).to receive(:find).with(user.uid).and_return([network_user])
       end
 
       describe '#update_profile_locale' do
         it 'should call the network to update the locale' do
-          expect(network_user).to receive(:update).with(locale: 'es')
+          expect(NetworkUserUpdateWorker).to receive(:perform_async).with(
+            user.id, :locale
+          )
           user.update(locale: 'es')
         end
       end

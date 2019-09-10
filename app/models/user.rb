@@ -135,7 +135,7 @@ class User < ApplicationRecord
   after_save :update_products_mailing_list_subscription, if: :saved_change_to_mailing_list?
   after_create :update_shape_user_list_subscription, if: :active?
   after_update :update_shape_user_list_subscription_after_update, if: :saved_change_to_status?
-  after_update :update_profile_locale, if: :saved_change_to_locale?
+  after_update :update_profile_locale, if: :should_update_network_user_locale?
 
   delegate :balance, to: :incentive_owed_account, prefix: true
   delegate :balance, to: :incentive_paid_account, prefix: true
@@ -471,16 +471,14 @@ class User < ApplicationRecord
   end
 
   def network_user
-    NetworkApi::User.find(uid).first
+    @network_user ||= NetworkApi::User.find(uid).first
   end
 
   def generate_network_auth_token
     return unless limited?
+    return unless network_user.present?
 
-    nu = network_user
-    return unless nu.present?
-
-    nu.generate_auth_token.first.try(:authentication_token)
+    network_user.generate_auth_token.first.try(:authentication_token)
   rescue JsonApiClient::Errors::NotAuthorized
     # shouldn't happen since we are already escaping `unless limited?`
     nil
@@ -575,13 +573,14 @@ class User < ApplicationRecord
     end
   end
 
-  def update_profile_locale
-    # NOTE: should be in a worker to offload external network call
-    nu = network_user
-    return unless nu.present?
-    return if nu.locale == locale
+  def should_update_network_user_locale?
+    saved_change_to_locale? &&
+      network_user.present? &&
+      network_user.locale != locale
+  end
 
-    nu.update(locale: locale)
+  def update_profile_locale
+    NetworkUserUpdateWorker.perform_async(id, :locale)
   end
 
   def update_products_mailing_list_subscription(subscribed: mailing_list)
