@@ -20,6 +20,7 @@ import EditPencilIconLarge from '~/ui/icons/EditPencilIconLarge'
 import TextareaAutosize from 'react-autosize-textarea'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import PropTypes from 'prop-types'
+import { Checkbox, LabelContainer } from '~/ui/global/styled/forms'
 
 const removeOption = {
   type: 'remove',
@@ -53,13 +54,7 @@ const TopRightHolderWrapper = styled.div`
   opacity: 0.9;
   align-items: stretch;
   background: ${v.colors.primaryLight};
-  padding-bottom: ${props => (props.hasMaxHeight ? 0 : 16)}px;
-  ${props =>
-    props.hasMaxHeight &&
-    `
-    height: 100%;
-    max-height: ${v.defaultGridSettings.gridH}px;
-  `}
+  min-height: ${v.defaultGridSettings.gridH}px;
 `
 TopRightHolderWrapper.displayName = 'TopRightHolderWrapper'
 
@@ -80,7 +75,7 @@ const StyledEditTitle = styled.div`
   div {
     flex: 3 1 auto;
     border-bottom: 1px solid ${v.colors.black};
-    max-width: 200px;
+    max-width: 316px;
     textarea {
       width: 100%;
       background: transparent;
@@ -123,14 +118,17 @@ class CoverImageSelector extends React.Component {
   @observable
   cardTitle = ''
   @observable
-  cardSubtitle = ''
+  hardcodedSubtitle = '' // overrides cover text set by text items
+  @observable
+  subtitleHidden = false
 
   componentDidMount() {
     const { card, uiStore } = this.props
     const { record } = card
-    const { name, cover } = record
+    const { name, cover, hardcoded_subtitle } = record
     this.cardTitle = name || record.url
-    this.cardSubtitle = !!cover ? cover.text : ''
+    this.hardcodedSubtitle = hardcoded_subtitle
+    this.subtitleHidden = cover.subtitle_hidden
     // TODO don't like how id name is in two separate places
     runInAction(() => {
       this.parentCard = document.getElementById(`gridCard-${card.id}`)
@@ -239,20 +237,29 @@ class CoverImageSelector extends React.Component {
   }
 
   @action
-  changeSubtitle = ev => {
-    this.cardSubtitle = ev.target.value
+  changeHardcodedSubtitle = ev => {
+    this.hardcodedSubtitle = ev.target.value
+  }
+
+  @action
+  onToggleSubtitleCheckbox = async e => {
+    this.subtitleHidden = !this.subtitleHidden
   }
 
   handleTitleSave = ev => {
-    const { card, uiStore } = this.props
+    const { card } = this.props
     const { record } = card
-    uiStore.setEditingCardCover(null)
-    record.API_updateName(this.cardTitle)
-    record.API_updateSubtitle(this.cardSubtitle)
+    record.API_updateNameAndCover({
+      name: this.cardTitle,
+      subtitle: this.hardcodedSubtitle,
+      subtitleHidden: this.subtitleHidden,
+    })
   }
 
   handleInputKeys = ev => {
-    if (ev.key === 'Enter') this.handleTitleSave(ev)
+    if (ev.key === 'Enter') {
+      this.handleClose()
+    }
   }
 
   handleInputClick = ev => {
@@ -269,13 +276,9 @@ class CoverImageSelector extends React.Component {
   }
 
   handleClose = ev => {
+    const { uiStore } = this.props
     this.handleTitleSave()
-  }
-
-  handleKeyDown = e => {
-    if (e.key === 'Escape') {
-      this.handleTitleSave()
-    }
+    uiStore.setEditingCardCover(null)
   }
 
   async clearCover() {
@@ -344,10 +347,9 @@ class CoverImageSelector extends React.Component {
           placeholder={'untitled'}
           onChange={this.changeTitle}
           onKeyPress={this.handleInputKeys}
-          onBlur={this.handleTitleSave}
           onClick={this.handleInputClick}
           className={'edit-cover-text'}
-          onKeyDown={this.handleKeyDown}
+          className={'selectorTitleInput'}
         />
       </div>
     )
@@ -361,25 +363,24 @@ class CoverImageSelector extends React.Component {
           maxRows={3}
           maxLength={144}
           value={subtitle}
-          placeholder={'untitled'}
-          onChange={this.changeSubtitle}
+          placeholder={'default'}
+          onChange={this.changeHardcodedSubtitle}
           onKeyPress={this.handleInputKeys}
-          onBlur={this.handleTitleSave}
           onClick={this.handleInputClick}
           className={'edit-cover-text'}
-          onKeyDown={this.handleKeyDown}
+          className={'selectorSubtitleInput'}
         />
       </div>
     )
   }
 
   renderInner() {
-    const { uiStore } = this.props
+    const { uiStore, card } = this.props
+    const { record } = card
     const { gridSettings } = uiStore
-    const { gridH, gridW } = gridSettings
-    const isDefaultGridSize = gridH === v.defaultGridSettings.gridH
+    const { gridW } = gridSettings
     return (
-      <TopRightHolderWrapper maxWidth={gridW} hasMaxHeight={isDefaultGridSize}>
+      <TopRightHolderWrapper maxWidth={gridW}>
         <TopRightHolder data-cy="EditCoverOptions">
           {!this.loading && (
             <div>
@@ -400,10 +401,29 @@ class CoverImageSelector extends React.Component {
                   onSelect={this.onFilterOptionSelect}
                 />
               )}
-              <StyledEditTitle>
-                <h3>Subtitle</h3>
-                {this.renderEditSubtitleInput(this.cardSubtitle)}
-              </StyledEditTitle>
+              <SmallBreak />
+              {record.isCollection && (
+                <div>
+                  <h3>Subtitle</h3>
+                  <StyledEditTitle>
+                    {this.renderEditSubtitleInput(this.hardcodedSubtitle)}
+                  </StyledEditTitle>
+                  <LabelContainer
+                    labelPlacement={'end'}
+                    control={
+                      <Checkbox
+                        onChange={this.onToggleSubtitleCheckbox}
+                        checked={this.subtitleHidden}
+                      />
+                    }
+                    label={
+                      <div style={{ maxWidth: '582px', paddingTop: '15px' }}>
+                        Hide subtitle
+                      </div>
+                    }
+                  ></LabelContainer>
+                </div>
+              )}
             </div>
           )}
           <CloseButton

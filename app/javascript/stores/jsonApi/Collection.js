@@ -46,7 +46,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     'submission_template_id',
     'submission_box_type',
     'collection_to_test_id',
-    'subtitle',
   ]
 
   @computed
@@ -980,6 +979,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     }
   }
 
+  get subtitle() {
+    const { cover } = this
+    if (cover.subtitle_hidden) {
+      return ''
+    }
+    return cover.hardcoded_subtitle ? cover.hardcoded_subtitle : cover.text
+  }
+
   // NOTE: this is only used as a Cypress test method, to simulate card resizing
   API_updateCard({ card, updates, undoMessage } = {}) {
     // this works a little differently than the typical "undo" snapshot...
@@ -1000,15 +1007,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     data.cancel_sync = true
     const apiPath = `collections/${this.id}`
     return this.apiStore.request(apiPath, 'PATCH', { data })
-  }
-
-  @action
-  API_updateSubtitle(subtitle) {
-    this.subtitle = subtitle
-    const data = this.toJsonApi()
-    // cancel sync so that name edits don't roundtrip and interfere with your <input>
-    data.cancel_sync = true
-    return this.apiStore.request(this.baseApiPath, 'PATCH', { data })
   }
 }
 

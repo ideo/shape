@@ -361,8 +361,9 @@ class CollectionCover extends React.Component {
       textItem,
       cardId,
     } = this.props
-    const { cover } = collection
+    const { subtitle } = collection
     const { gridW, gutter } = uiStore.gridSettings
+    console.log(subtitle)
 
     return (
       <StyledCollectionCover
@@ -416,7 +417,7 @@ class CollectionCover extends React.Component {
                 {this.hasUseTemplateButton && this.useTemplateButton}
                 {!this.hasLaunchTestButton && (
                   <Dotdotdot clamp={this.numberOfLinesForDescription}>
-                    {cover.text}
+                    {subtitle}
                   </Dotdotdot>
                 )}
               </div>

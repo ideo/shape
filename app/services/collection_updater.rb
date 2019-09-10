@@ -37,8 +37,9 @@ class CollectionUpdater < SimpleService
 
   def assign_attributes
     cover_hash = @collection.cache_cover.to_h
-    cover_hash[:text] = @attributes[:subtitle]
-    @collection.attributes = @attributes.except(:subtitle)
+    cover_hash[:hardcoded_subtitle] = @attributes[:hardcoded_subtitle]
+    cover_hash[:subtitle_hidden] = @attributes[:subtitle_hidden]
+    @collection.attributes = @attributes.except(:hardcoded_subtitle, :subtitle_hidden)
     @collection.cached_cover = cover_hash
     @collection.update_cached_tag_lists
     # always touch the updated timestamp even though we may just be updating the related cards

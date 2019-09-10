@@ -87,7 +87,7 @@ class PageHeader extends React.Component {
   updateRecordName = name => {
     const { record } = this.props
     // method exists on Item and Collection
-    record.API_updateName(name)
+    record.API_updateNameAndCover({ name })
   }
 
   handleTitleClick = () => {

@@ -231,7 +231,8 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :joinable_group_id,
       :cover_type,
       :default_group_id,
-      :subtitle,
+      :hardcoded_subtitle,
+      :subtitle_hidden,
       collection_cards_attributes: %i[id order width height row col],
     ]
   end

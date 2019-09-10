@@ -36,13 +36,14 @@ export const handleMouseDownSelection = e => {
 
 const saveCardBeforeExit = () => {
   const { activeElement } = document
+  // don't read from active element, instead query for title and subtitle text box value...
   const { value } = activeElement
   // this should always be the value of the active text area
   if (!!value) {
     const { editingCardCover } = uiStore
     const card = apiStore.find('collection_cards', editingCardCover)
     const { record } = card
-    record.API_updateName(value)
+    record.API_updateNameAndCover({ name: value })
   }
 }
 

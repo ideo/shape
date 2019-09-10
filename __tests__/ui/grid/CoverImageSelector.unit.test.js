@@ -25,6 +25,10 @@ describe('CoverImageSelector', () => {
       collection_cards: [
         { id: 1, record: { id: 1, name: '', filestack_file_url: '' } },
       ],
+      cover: {
+        hardcoded_subtitle: 'Lorem ipsum hardcoded',
+        subtitle_hidden: false,
+      },
     }
     collection = fakeCollection
     const requestResult = { data: collection }

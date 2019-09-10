@@ -42,22 +42,34 @@ const SharedRecordMixin = superclass =>
       return this.routingStore.pathTo('homepage')
     }
 
-    API_updateName(name) {
+    @action
+    API_updateNameAndCover({ name, subtitle = '', subtitleHidden = false }) {
       const previousName = this.name
       this.name = name
-      this.pushUndo({
-        snapshot: { name: previousName },
-        message: `${this.className} name edit undone`,
-        actionType: POPUP_ACTION_TYPES.SNACKBAR,
-        redirectTo: { internalType: null, id: null }, // we don't need to redirect when undoing a cover title edit
-        redoAction: {
-          message: `${this.className} name edit redone`,
-          apiCall: () =>
-            // re-call the same function
-            this.API_updateName(name),
-        },
-      })
+      if (name !== previousName) {
+        this.pushUndo({
+          snapshot: { name: previousName },
+          message: `${this.className} name edit undone`,
+          actionType: POPUP_ACTION_TYPES.SNACKBAR,
+          redirectTo: { internalType: null, id: null }, // we don't need to redirect when undoing a cover title edit
+          redoAction: {
+            message: `${this.className} name edit redone`,
+            apiCall: () =>
+              // re-call the same function
+              this.API_updateName(name),
+          },
+        })
+      }
       const data = this.toJsonApi()
+      // see collection_updater.rb for deserialization
+      if (subtitle) {
+        data.attributes.hardcoded_subtitle = subtitle
+        this.cover.hardcoded_subtitle = subtitle
+      }
+      if (subtitleHidden) {
+        data.attributes.subtitle_hidden = subtitleHidden
+        this.cover.subtitle_hidden = subtitleHidden
+      }
       // cancel sync so that name edits don't roundtrip and interfere with your <input>
       data.cancel_sync = true
       return this.apiStore.request(this.baseApiPath, 'PATCH', { data })
