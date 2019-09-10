@@ -47,7 +47,7 @@ class SerializableItem < BaseJsonSerializer
   end
 
   attribute :show_language_selector do
-    @object.parent&.inside_an_application_collection?
+    @object.parent&.inside_an_application_collection? || false
   end
 
   attribute :filestack_file_url do
