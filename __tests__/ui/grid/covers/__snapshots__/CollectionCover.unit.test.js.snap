@@ -53,7 +53,9 @@ exports[`CollectionCover renders snapshot 1`] = `
           tagName="div"
           truncationChar="…"
           useNativeClamp={true}
-        />
+        >
+          Lorem ipsum blockchain boogie
+        </Dotdotdot>
       </div>
     </div>
   </StyledCardContent>
