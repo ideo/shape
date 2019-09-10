@@ -353,7 +353,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         external_id
         cover_type
         submissions_enabled
-      ],
+      ].concat(Collection.globalize_attribute_names),
       item_attributes: [
         :id,
         :type,
@@ -398,7 +398,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
             column
           ],
         ],
-      ],
+      ].concat(Item.globalize_attribute_names),
     ]
   end
 
