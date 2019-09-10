@@ -1,3 +1,4 @@
+import styled from 'styled-components'
 import { observable, action } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 // import styled from 'styled-components'
@@ -7,7 +8,7 @@ import InlineLoader from '~/ui/layout/InlineLoader'
 import RefreshIcon from '~/ui/icons/RefreshIcon'
 import v from '~/utils/variables'
 
-const StyledCommentThreadLoader = TextButton.extend`
+const StyledCommentThreadLoader = styled(TextButton)`
   height: 80px;
   position: relative;
   margin-bottom: 5px;

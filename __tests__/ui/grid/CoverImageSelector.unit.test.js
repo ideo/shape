@@ -52,7 +52,8 @@ describe('CoverImageSelector', () => {
       const newProps = { ...props, ...opts }
       wrapper = shallow(<CoverImageSelector.wrappedComponent {...newProps} />)
       component = wrapper.instance()
-      innerWrapper = shallow(component.renderInner())
+      const Inner = () => component.renderInner()
+      innerWrapper = shallow(<Inner />)
     }
     rerender()
   })

@@ -5,7 +5,6 @@ import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 
 import { Heading3 } from '~/ui/global/styled/typography'
-import v from '~/utils/variables'
 
 const props = {}
 const fakeEv = { preventDefault: jest.fn() }
@@ -91,7 +90,7 @@ describe('DataItemCover', () => {
       it('should show the measure select', () => {
         expect(
           wrapper
-            .find('.metric-measure MeasureSelect')
+            .find('.metric-measure')
             .dive()
             .find('StyledSelect')
             .props().value
@@ -99,13 +98,7 @@ describe('DataItemCover', () => {
       })
 
       it('should show data properties in hover editing style', () => {
-        expect(wrapper.find('StyledDataItemCover')).toHaveStyleRule(
-          'background-color',
-          v.colors.primaryLight,
-          {
-            modifier: '.editableMetric',
-          }
-        )
+        expect(wrapper.find('StyledDataItemCover').props().editing).toBe(true)
       })
     })
   })

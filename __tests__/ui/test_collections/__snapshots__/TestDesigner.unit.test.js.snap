@@ -7017,7 +7017,7 @@ exports[`TestDesigner renders snapshot 1`] = `
           </styled.div>
         </styled.div>
       </FlipMovePropConverter>
-      <styled.div />
+      <Styled(styled.div) />
     </div>
     <div
       className="settings-column"

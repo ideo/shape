@@ -23,7 +23,7 @@ export const QuestionSpacingContainer = styled.div`
   ${QuestionSpacing};
 `
 
-const QuestionTextWithSpacing = QuestionText.extend`
+const QuestionTextWithSpacing = styled(QuestionText)`
   ${QuestionSpacing};
 `
 QuestionTextWithSpacing.displayName = 'QuestionTextWithSpacing'

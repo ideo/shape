@@ -56,7 +56,7 @@ class EditableName extends React.Component {
   }
 
   // navigating between collections may trigger this instead of didMount
-  UNSAFE_componentWillReceiveProps({ name }) {
+  componentWillReceiveProps({ name }) {
     this.setName(name)
   }
 
@@ -152,7 +152,7 @@ class EditableName extends React.Component {
       <StyledName className="styled-name">
         <Heading1
           data-cy="EditableNameHeading"
-          innerRef={ref => {
+          ref={ref => {
             this.textRef = ref
           }}
           onClick={canEdit ? this.startEditingName : null}

@@ -3,7 +3,7 @@ import PopoutMenu from '~/ui/global/PopoutMenu'
 const fakeMenuItems = [
   { name: 'Do Stuff', iconRight: <div className="icon" />, onClick: jest.fn() },
   {
-    name: 'Do Stuff',
+    name: 'Do Stuff-1',
     iconLeft: <div className="icon" />,
     onClick: jest.fn(),
     noBorder: true,
@@ -25,7 +25,7 @@ describe('PopoutMenu', () => {
     beforeEach(() => {
       props.menuItems = [...fakeMenuItems]
       props.menuItems.forEach(item => item.onClick.mockClear())
-      wrapper = shallow(<PopoutMenu {...props} />)
+      wrapper = mount(<PopoutMenu {...props} />)
       menuItem = wrapper.find('StyledMenuItem')
     })
 

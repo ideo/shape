@@ -7,7 +7,7 @@ import Box from '~shared/components/atoms/Box'
 @inject('networkStore')
 @observer
 class BillingStatement extends React.Component {
-  UNSAFE_componentWillMount() {
+  componentWillMount() {
     this.load()
   }
 

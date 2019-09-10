@@ -55,7 +55,7 @@ const OptionImage = styled.img`
   }
 `
 
-const ConfirmOption = ConfirmText.extend`
+const ConfirmOption = styled(ConfirmText)`
   color: black;
   display: block;
   margin: 0 auto 70px;
@@ -65,7 +65,7 @@ const ConfirmOption = ConfirmText.extend`
   }
 `
 
-const OptionsButton = TextButton.extend`
+const OptionsButton = styled(TextButton)`
   color: ${v.colors.black};
   font-size: 0.75rem;
 `

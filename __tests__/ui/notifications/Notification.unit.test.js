@@ -24,6 +24,9 @@ describe('Notification', () => {
   })
 
   describe('componentWillMount', () => {
+    beforeEach(() => {
+      wrapper = mount(<Notification {...props} />)
+    })
     it('should call apiStore.fetch to get the activity target, and set the target', () => {
       expect(apiStore.fetch).toHaveBeenCalledWith(
         'collections',
@@ -55,7 +58,7 @@ describe('Notification', () => {
   describe('render', () => {
     describe('with the alert style type', () => {
       beforeEach(() => {
-        wrapper.setProps({ styleType: 'alert', ...props })
+        wrapper = mount(<Notification {...props} styleType="alert" />)
       })
 
       it('should show a close button rather then notification button', () => {
