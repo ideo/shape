@@ -432,6 +432,39 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         expect(item['attributes']['url']).to eq('https://www.youtube.com/watch?v=4r7wHMg5Yjg')
       end
     end
+
+    context 'with translated attributes' do
+      let(:params_with_translated_attrs) do
+        json_api_params(
+          'collection_cards',
+          order: 1,
+          parent_id: collection.id,
+          item_attributes: {
+            type: 'Item::TextItem',
+            name: 'Something great',
+            translated_name_es: 'Algo genial',
+            content: "Isn't this a cool widget?",
+            translated_content_es: '¿No es este un widget genial?',
+          },
+        )
+      end
+
+      it 'returns a 200' do
+        post(path, params: params_with_translated_attrs)
+        expect(response.status).to eq(200)
+      end
+
+      it 'returns item with attrs' do
+        post(path, params: params_with_translated_attrs)
+        json_item = json_included_objects_of_type('items').first
+        expect(json_item['attributes']['name']).to eq('Something great')
+        expect(json_item['attributes']['content']).to eq("Isn't this a cool widget?")
+
+        item = Item.find(json_item['id'])
+        expect(item.translated_name_es).to eq('Algo genial')
+        expect(item.translated_content_es).to eq('¿No es este un widget genial?')
+      end
+    end
   end
 
   describe 'PATCH #archive' do
