@@ -21,6 +21,7 @@ import { FormButton } from '~/ui/global/styled/buttons'
 import { SubduedHeading1 } from '~/ui/global/styled/typography'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
+import LanguageSelector from '~/ui/layout/LanguageSelector'
 import v from '~/utils/variables'
 import routeToLogin from '~/utils/routeToLogin'
 import { ACTION_SOURCES } from '~/enums/actionEnums'
@@ -394,6 +395,14 @@ class PageHeader extends React.Component {
                   {this.renderTestUi}
                 </HeaderButtonContainer>
               </Flex>
+
+              {record.show_language_selector && (
+                <Flex
+                  style={{ position: 'relative', top: '15px', height: '33px' }}
+                >
+                  <LanguageSelector />
+                </Flex>
+              )}
             </StyledTitleAndRoles>
           </div>
         </MaxWidthContainer>

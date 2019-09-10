@@ -151,6 +151,14 @@ RSpec.configure do |config|
     Rails.application.load_seed
   end
 
+  config.before(:each, skip_frontend_render: true) do
+    # NOTE: not doing any normal rendering of the index page because we defer to Cypress for those,
+    # and they make for slow request specs
+    allow_any_instance_of(
+      HomeController,
+    ).to receive(:render).and_return 'rendered.'
+  end
+
   config.after(:each) do
     DatabaseCleaner.clean
     Warden.test_reset!
