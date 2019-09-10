@@ -175,7 +175,7 @@ class ChartGroup extends React.Component {
             textAnchor="start"
             verticalAnchor="end"
             dy={-5}
-            style={{ fill: v.colors.commonDarkest, fontSize: '20px' }}
+            style={{ fill: v.colors.black, fontSize: '24px' }}
           />
         }
       ></VictoryAxis>
