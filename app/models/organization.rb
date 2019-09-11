@@ -6,6 +6,7 @@
 #  active_users_count                    :integer          default(0), not null
 #  autojoin_domains                      :jsonb
 #  deactivated                           :boolean          default(FALSE), not null
+#  default_locale                        :string           default("en")
 #  domain_whitelist                      :jsonb
 #  has_payment_method                    :boolean          default(FALSE), not null
 #  in_app_billing                        :boolean          default(TRUE), not null

@@ -17,6 +17,7 @@
 #  last_notification_mail_sent :datetime
 #  last_sign_in_at             :datetime
 #  last_sign_in_ip             :inet
+#  locale                      :string
 #  mailing_list                :boolean          default(FALSE)
 #  network_data                :jsonb
 #  notify_through_email        :boolean          default(TRUE)
