@@ -104,7 +104,6 @@ describe('CollectionCover', () => {
 
   describe('with template', () => {
     beforeEach(() => {
-      props.collection.isMasterTemplate = true
       props.collection.isUsableTemplate = true
       wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
       component = wrapper.instance()
@@ -119,10 +118,9 @@ describe('CollectionCover', () => {
     })
   })
 
-  describe('with template whose a child of a master template', () => {
+  describe('with unusable template (e.g. child of a master template)', () => {
     beforeEach(() => {
-      props.collection.isSubTemplate = true
-      props.collection.isUsableTemplate = true
+      props.collection.isUsableTemplate = false
       wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
       component = wrapper.instance()
     })

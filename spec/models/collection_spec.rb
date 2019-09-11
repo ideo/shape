@@ -764,8 +764,8 @@ describe Collection, type: :model do
   end
 
   describe 'child of a master template' do
-    let(:parent) {create(:collection, master_template: true)}
-    let(:child) {create(:collection, parent_collection: parent)}
+    let(:parent) { create(:collection, master_template: true) }
+    let(:child) { create(:collection, parent_collection: parent) }
 
     it 'should have a child_of_a_master_template = true' do
       expect(child.child_of_a_master_template?).to be true
@@ -773,10 +773,10 @@ describe Collection, type: :model do
   end
 
   describe 'template_a_child_of_a_master_template of a master template' do
-    let(:parent) {create(:collection, master_template: true)}
-    let(:child) {create(:collection, parent_collection: parent)}
-    let(:instance_of_parent) {create(:collection, template_id: parent.id)}
-    let(:instance_of_child) {create(:collection, template_id: child.id)}
+    let(:parent) { create(:collection, master_template: true) }
+    let(:child) { create(:collection, parent_collection: parent) }
+    let(:instance_of_parent) { create(:collection, template_id: parent.id) }
+    let(:instance_of_child) { create(:collection, template_id: child.id) }
 
     it 'template instance of parent master template should not be a child of a master template' do
       expect(instance_of_parent.template_a_child_of_a_master_template?).to be false

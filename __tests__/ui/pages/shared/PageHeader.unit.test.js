@@ -126,6 +126,7 @@ describe('PageHeader', () => {
     beforeEach(() => {
       props.record = fakeCollection
       props.record.isSubTemplate = true
+      props.record.isUsableTemplate = false
       wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
     })
 

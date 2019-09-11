@@ -339,7 +339,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     // you also don't use test templates, since duplicating them or
     // creating them within another template is the way to do that
     return (
-      !!this.isMasterTemplate &&
+      this.isMasterTemplate &&
+      !this.isSubTemplate &&
       !this.isProfileTemplate &&
       !this.is_submission_box_template &&
       !this.isTestDesign &&

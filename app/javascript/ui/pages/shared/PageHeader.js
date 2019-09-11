@@ -310,7 +310,7 @@ class PageHeader extends React.Component {
 
   get renderTemplateButton() {
     const { record } = this.props
-    if (record.isSubTemplate || !record.isUsableTemplate) return null
+    if (!record.isUsableTemplate) return null
     return (
       <FormButton
         width="160"
