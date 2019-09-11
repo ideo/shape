@@ -65,7 +65,7 @@ const Action = styled.button`
   }
 `
 
-const TestAction = Action.extend`
+const TestAction = styled(Action)`
   height: 32px;
   margin-top: -7px;
   vertical-align: top;

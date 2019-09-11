@@ -1,3 +1,4 @@
+import styled from 'styled-components'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 
@@ -5,7 +6,7 @@ import { ActivityContainer } from '~/ui/global/styled/layout'
 import { ActivityText } from '~/ui/notifications/Activity'
 import Notification from '~/ui/notifications/Notification'
 
-const NoActivityText = ActivityText.extend`
+const NoActivityText = styled(ActivityText)`
   padding: 1.25rem;
   padding: 1rem;
 `

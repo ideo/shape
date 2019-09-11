@@ -36,7 +36,9 @@ describe('QuickOptionSelector', () => {
       onSelect: jest.fn(),
     }
     rerender = () => {
-      wrapper = shallow(<QuickOptionSelector {...props} />)
+      // NOTE: in latest version of jest-styled-components, mount must be used
+      // if you want to test `toHaveStyleRule` of anything on `wrapper.find(...)`
+      wrapper = mount(<QuickOptionSelector {...props} />)
     }
     rerender()
   })

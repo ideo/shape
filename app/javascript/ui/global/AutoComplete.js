@@ -24,7 +24,7 @@ const SearchIconContainer = styled.span`
     width: 22px;
   }
 `
-const LoadingContainer = SearchIconContainer.extend`
+const LoadingContainer = styled(SearchIconContainer)`
   left: auto;
   top: 0;
   right: 30px;

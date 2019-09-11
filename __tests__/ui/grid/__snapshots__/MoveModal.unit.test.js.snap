@@ -10,83 +10,81 @@ exports[`MoveModal renders snapshot 1`] = `
     }
     open={true}
   >
-    <React.Fragment>
-      <StyledSnackbarContent
-        action={
-          Array [
-            <styled.span>
-              <Tooltip
-                classes={
-                  Object {
-                    "tooltip": "Tooltip",
-                  }
+    <StyledSnackbarContent
+      action={
+        Array [
+          <ForwardRef(styled.span)>
+            <Tooltip
+              classes={
+                Object {
+                  "tooltip": "Tooltip",
                 }
-                placement="top"
-                title="Place at top"
+              }
+              placement="top"
+              title="Place at top"
+            >
+              <button
+                data-cy="MoveModalArrow-up"
+                onClick={[Function]}
               >
-                <button
-                  data-cy="MoveModalArrow-up"
-                  onClick={[Function]}
-                >
-                  <ArrowIcon
-                    direction="up"
-                  />
-                </button>
-              </Tooltip>
-            </styled.span>,
-            <styled.span>
-              <Tooltip
-                classes={
-                  Object {
-                    "tooltip": "Tooltip",
-                  }
+                <ArrowIcon
+                  direction="up"
+                />
+              </button>
+            </Tooltip>
+          </ForwardRef(styled.span)>,
+          <ForwardRef(styled.span)>
+            <Tooltip
+              classes={
+                Object {
+                  "tooltip": "Tooltip",
                 }
-                placement="top"
-                title="Place at bottom"
+              }
+              placement="top"
+              title="Place at bottom"
+            >
+              <button
+                data-cy="MoveModalArrow-down"
+                onClick={[Function]}
               >
-                <button
-                  data-cy="MoveModalArrow-down"
-                  onClick={[Function]}
-                >
-                  <ArrowIcon
-                    direction="down"
-                  />
-                </button>
-              </Tooltip>
-            </styled.span>,
-            <styled.span>
-              <Tooltip
-                classes={
-                  Object {
-                    "tooltip": "Tooltip",
-                  }
+                <ArrowIcon
+                  direction="down"
+                />
+              </button>
+            </Tooltip>
+          </ForwardRef(styled.span)>,
+          <ForwardRef(styled.span)>
+            <Tooltip
+              classes={
+                Object {
+                  "tooltip": "Tooltip",
                 }
-                placement="top"
-                title="Cancel"
+              }
+              placement="top"
+              title="Cancel"
+            >
+              <button
+                onClick={[Function]}
               >
-                <button
-                  onClick={[Function]}
-                >
-                  <CloseIcon />
-                </button>
-              </Tooltip>
-            </styled.span>,
-          ]
+                <CloseIcon />
+              </button>
+            </Tooltip>
+          </ForwardRef(styled.span)>,
+        ]
+      }
+      classes={
+        Object {
+          "root": "SnackbarContent",
         }
-        classes={
-          Object {
-            "root": "SnackbarContent",
-          }
-        }
-        message={
-          <StyledSnackbarText
-            id="message-id"
-          >
-            0 card in transit
-          </StyledSnackbarText>
-        }
-      />
-    </React.Fragment>
+      }
+      message={
+        <ForwardRef(styled.span)
+          id="message-id"
+        >
+          0 card in transit
+        </ForwardRef(styled.span)>
+      }
+    />
   </StyledSnackbar>
 </div>
 `;

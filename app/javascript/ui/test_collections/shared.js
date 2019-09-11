@@ -39,7 +39,7 @@ QuestionText.defaultProps = {
   fontSizeEm: 1,
 }
 
-export const TextInputHolder = StyledCommentTextarea.extend`
+export const TextInputHolder = styled(StyledCommentTextarea)`
   color: white;
   padding: 6px;
   width: calc(100% - 12px);
@@ -50,7 +50,7 @@ export const TextInputHolder = StyledCommentTextarea.extend`
   transition: background-color 0.2s;
 `
 
-export const TextResponseHolder = StyledCommentTextarea.extend`
+export const TextResponseHolder = styled(StyledCommentTextarea)`
   position: relative;
   background-color: ${props => props.theme.responseHolder};
   padding: 6px;

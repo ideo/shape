@@ -120,12 +120,7 @@ describe('LinkItemCover', () => {
 
               const limit = breakpoint.maxTitle * height
               it(`should clamp the name down to ${limit} characters`, () => {
-                expect(
-                  wrapper
-                    .find('.name')
-                    .dive()
-                    .text().length
-                ).toEqual(limit)
+                expect(wrapper.find('.name').text().length).toEqual(limit)
               })
             })
           })

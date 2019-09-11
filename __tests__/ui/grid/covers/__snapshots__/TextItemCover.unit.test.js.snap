@@ -2,7 +2,7 @@
 
 exports[`TextItemCover renders snapshot 1`] = `
 <Styled(styled.div)
-  class="cancelGridClick"
+  className="cancelGridClick"
   data-cy="TextItemCover"
   dragging={false}
   hasTitleText={false}

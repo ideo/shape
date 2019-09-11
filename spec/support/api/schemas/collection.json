@@ -37,6 +37,7 @@
     "is_submission_box_template": { "type": ["boolean"] },
     "is_submission_box_template_test": { "type": ["boolean"] },
     "is_inside_a_submission": { "type": ["boolean"] },
+    "show_language_selector": { "type": ["boolean"] },
     "submission_attrs": { "type": ["object", "null"] },
     "launchable": { "type": ["boolean", "null"] },
     "gives_incentive": { "type": ["boolean", "null"] },

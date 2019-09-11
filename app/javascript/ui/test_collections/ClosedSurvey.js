@@ -34,7 +34,7 @@ const StyledSurvey = styled.div`
   max-width: 580px; /* responsive but constrain media QuestionCards to 420px tall */
 `
 
-const LearnMoreLink = LoudDisplayLink.extend`
+const LearnMoreLink = styled(LoudDisplayLink)`
   font-size: 0.75rem;
   letter-spacing: 2px;
   color: ${v.colors.white};
