@@ -65,8 +65,13 @@ class Group < ApplicationRecord
   belongs_to :created_by, class_name: 'User', optional: true
   has_many :groups_threads
 
-  has_many :granted_subgroups
-  has_many :subgroups, through: :granted_subgroups
+  has_many :group_hierarchies, foreign_key: 'parent_group_id'
+  has_many :subgroups, class_name: 'Group', through: :group_hierarchies
+
+  # TODO: This seems weird
+  # Why does subgroup_membership link a group to a parent group and not a subgroup?
+  has_many :subgroup_memberships, class_name: 'GroupHierarchy', foreign_key: 'subgroup_id'
+  has_many :parent_groups, class_name: 'Group', through: :subgroup_memberships
 
   has_many :activities_as_subject, through: :activity_subjects, class_name: 'Activity'
   has_many :activity_subjects, as: :subject

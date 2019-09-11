@@ -20,8 +20,52 @@ RSpec.describe Group, type: :model do
     expect(group.current_shared_collection).to be_truthy
   end
 
-  context 'associations' do
+  context 'associations', only: true do
     it { should belong_to :filestack_file }
+    it { should have_many :group_hierarchies }
+    it { should have_many :subgroups }
+    it { should have_many :subgroup_memberships }
+    it { should have_many :parent_groups }
+
+    context 'with GroupHierarchy' do
+      let(:group1) { create(:group) }
+      let(:group2) { create(:group) }
+      let(:group3) { create(:group) }
+
+      let!(:group_hierarchy) do
+        create(
+          :group_hierarchy,
+          parent_group: group1,
+          granted_by: group2,
+          subgroup: group3,
+        )
+      end
+
+      let!(:group_hierarchy2) do
+        create(
+          :group_hierarchy,
+          parent_group: group2,
+          granted_by: group2,
+          subgroup: group3,
+        )
+      end
+
+      describe '#parent_groups' do
+        it 'returns associated parent groups' do
+          expect(group3.parent_groups).to include(group1)
+          expect(group3.parent_groups).to include(group2)
+          expect(group1.parent_groups).to be_empty
+        end
+      end
+
+      describe '#subgroups' do
+        it 'returns associated subgroups' do
+          expect(group1.subgroups).to include(group3)
+          expect(group2.subgroups).to include(group3)
+          expect(group3.subgroups).to be_empty
+        end
+      end
+    end
   end
 
   context 'is primary group' do
