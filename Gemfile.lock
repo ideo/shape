@@ -7,9 +7,9 @@ GIT
 
 GIT
   remote: https://github.com/ideo/ideo-translation.git
-  revision: 87bd4c0dff5023ef93676c3ba7960c5934e238ff
+  revision: da16f57269a6e12a08a5f7f83162cdaee747ec51
   specs:
-    ideo-translation (1.0.10)
+    ideo-translation (1.0.12)
       aws-sdk-translate (~> 1.17)
       globalize (~> 5.2.0)
       globalize-accessors (~> 0.2.1)
