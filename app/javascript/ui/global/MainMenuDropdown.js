@@ -197,7 +197,7 @@ class MainMenuDropdown extends React.Component {
       bottom: [
         { name: 'New Organization', onClick: this.handleNewOrg },
         { name: 'Contact Support', onClick: this.handleZendesk },
-        { name: 'Terms of Use', onClick: this.handleTerms },
+        { name: 'IDEO Products Terms', onClick: this.handleTerms },
         { name: 'Privacy Policy', onClick: this.handlePrivacy },
       ],
     }
