@@ -11,7 +11,6 @@ import QuickOptionSelector from '~/ui/global/QuickOptionSelector'
 import SingleCrossIcon from '~/ui/icons/SingleCrossIcon'
 import UploadIcon from '~/ui/icons/UploadIcon'
 import XIcon from '~/ui/icons/XIcon'
-import { SmallBreak } from '~/ui/global/styled/layout'
 import v, { ITEM_TYPES } from '~/utils/variables'
 // This must be imported last, or else it leads to a cryptic
 // circular dependency issue
@@ -64,7 +63,6 @@ const TopRightHolder = styled.div`
 
 const StyledEditTitle = styled.div`
   display: flex;
-  margin-bottom: 0.75rem;
   h3 {
     flex: 1;
     margin-right: 10px;
@@ -92,6 +90,11 @@ const StyledEditTitle = styled.div`
 `
 
 StyledEditTitle.displayName = 'StyledEditTitle'
+
+export const MediumBreak = styled.div`
+  display: block;
+  margin-bottom: 0.75rem;
+`
 
 const filterOptions = [
   {
@@ -406,12 +409,13 @@ class CardCoverEditor extends React.Component {
                 <h3>Title</h3>
                 {this.renderEditTitleInput()}
               </StyledEditTitle>
+              <MediumBreak />
               <h3>Cover Image</h3>
               <QuickOptionSelector
                 options={toJS(this.imageOptions)}
                 onSelect={this.onImageOptionSelect}
               />
-              <SmallBreak />
+              <MediumBreak />
               <h3>Cover effects</h3>
               {this.showFilters && (
                 <QuickOptionSelector
@@ -419,7 +423,7 @@ class CardCoverEditor extends React.Component {
                   onSelect={this.onFilterOptionSelect}
                 />
               )}
-              <SmallBreak />
+              <MediumBreak />
               {record.isCollection && (
                 <div>
                   <h3>Subtitle</h3>

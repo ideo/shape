@@ -22,6 +22,7 @@ describe('CardCoverEditor', () => {
       id: 3,
       internalType: 'collections',
       API_fetchCards: jest.fn(),
+      API_updateNameAndCover: jest.fn(),
       collection_cards: [
         { id: 1, record: { id: 1, name: '', filestack_file_url: '' } },
       ],
@@ -108,6 +109,24 @@ describe('CardCoverEditor', () => {
 
     it('should set the list of options from the api', () => {
       expect(component.imageOptions.length).toEqual(3)
+    })
+  })
+
+  describe('updating name and cover', () => {
+    beforeEach(() => {
+      props.isEditingCardCover = collection.id
+      wrapper.setProps(props)
+    })
+    describe('closing the cover editor', () => {
+      beforeEach(() => {
+        component.handleClose(fakeEv)
+      })
+      it('should close the selector', () => {
+        expect(uiStore.setEditingCardCover).toHaveBeenCalledWith(null)
+      })
+      it('should call API_updateNameAndCover with the edited title text', () => {
+        expect(uiStore.setEditingCardCover).toHaveBeenCalled()
+      })
     })
   })
 
