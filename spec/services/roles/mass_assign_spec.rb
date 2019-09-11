@@ -59,6 +59,18 @@ RSpec.describe Roles::MassAssign, type: :service do
       assign_role.call
     end
 
+    # this was to cover an edge case that was breaking
+    context 'trying to upgrade and can already edit' do
+      before do
+        users.first.add_role(Role::VIEWER, object)
+        users.first.add_role(Role::SUPER_ADMIN)
+      end
+
+      it 'returns true' do
+        expect(assign_role.call).to be true
+      end
+    end
+
     context 'given pending users' do
       let!(:users) { create_list(:user, 3, :pending) }
 

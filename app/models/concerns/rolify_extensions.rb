@@ -173,7 +173,12 @@ module RolifyExtensions
 
   def upgrade_to_edit_role(resource)
     return unless is_a?(User) || is_a?(Group)
-    return true if resource.can_edit? self
+
+    if resource.can_edit? self
+      return Role.for_resource(resource)
+                 .where(name: resource.class.edit_role)
+                 .first
+    end
 
     other_roles = Role
                   .for_resource(resource)

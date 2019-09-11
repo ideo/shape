@@ -93,16 +93,40 @@ module Resourceable
   def includes_all_roles?(resource)
     return false unless item_or_collection? && resource.item_or_collection?
 
+    mine = flattened_user_and_group_role_ids
+    theirs = resource.flattened_user_and_group_role_ids
+
     %i[viewers editors].each do |role_name|
-      my_role = send(role_name)
-      their_role = resource.send(role_name)
+      my_role = mine[role_name]
+      their_role = theirs[role_name]
       %i[users groups].each do |role_owner|
-        mine = my_role.try(:[], role_owner).pluck(:id)
-        theirs = their_role.try(:[], role_owner).pluck(:id)
-        return false unless (mine & theirs) == theirs
+        my_ids = my_role.try(:[], role_owner) || []
+        their_ids = their_role.try(:[], role_owner) || []
+        return false unless (their_ids & my_ids).sort == their_ids.sort
       end
     end
+
     true
+  end
+
+  def flattened_user_and_group_role_ids
+    list = anchored_roles
+           .includes(:users, :groups)
+           .pluck(User.arel_table[:id], Group.arel_table[:id], Role.arel_table[:name])
+    result = HashWithIndifferentAccess.new
+    list.each do |user_id, group_id, role_name|
+      role_name = role_name.pluralize.to_sym
+      result[role_name] ||= {}
+      if user_id
+        result[role_name][:users] ||= []
+        result[role_name][:users] |= [user_id]
+      end
+      if group_id
+        result[role_name][:groups] ||= []
+        result[role_name][:groups] |= [group_id]
+      end
+    end
+    result
   end
 
   def anchored_roles(viewing_organization_id: organization_id)
