@@ -24,6 +24,10 @@ const StyledMarkdown = styled(ReactMarkdown)`
 `
 StyledMarkdown.displayName = 'StyledMarkdown'
 
+const TableOfContents = styled.ol`
+  margin-bottom: 1em;
+`
+
 const StyledTitle = styled(DisplayText)`
   font-weight: ${v.weights.medium};
   text-transform: uppercase;
@@ -74,7 +78,26 @@ class TermsPage extends React.PureComponent {
 
   get tableOfContents() {
     const toc = {
+      '1. Definitions': '1--definitions',
       '2. Accounts and Registration': '2--accounts-and-registration',
+      '3. Payment': '3--payment',
+      '4. Terminating your account: Initial Access Period and Ongoing Access Period':
+        '4--terminating-your-account--initial-access-period-and-ongoing-access-period',
+      '5. Modification of TOU': '5--modification-of-tou',
+      '6. Eligibility': '6--eligibility',
+      '7. User Content': '7--user-content',
+      '8. Grant and Restrictions on Use': '8--grant-and-restrictions-on-use',
+      '9. Communications with the Site Administrator':
+        '9--communications-with-the-site-administrator',
+      '10. Acceptable Use Policy': '10--acceptable-use-policy',
+      '11. Trademark Information': '11--trademark-information',
+      '12. Third Party Sites, Services and/or Resources':
+        '12--third-party-sites--services-and-or-resources',
+      '13. Disclaimer': '13--disclaimer',
+      '14. Liability': '14--liability',
+      '15. Governing Law and Jurisdiction':
+        '15--governing-law-and-jurisdiction',
+      '16. General Provisions': '16--general-provisions',
     }
     const items = []
     _.each(toc, (anchor, title) => {
@@ -96,8 +119,10 @@ class TermsPage extends React.PureComponent {
           source={termsIntroMarkdown}
           renderers={{ heading: HeadingRenderer }}
         />
-
-        <ol>{this.tableOfContents}</ol>
+        <TableOfContents>
+          <p>Table of Contents</p>
+          {this.tableOfContents}
+        </TableOfContents>
         <StyledMarkdown
           source={termsMarkdown}
           renderers={{ heading: HeadingRenderer }}
