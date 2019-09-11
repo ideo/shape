@@ -57,6 +57,12 @@ Metrics/AbcSize:
   # a Float.
   Max: 35
 
+Naming/PredicateName:
+  # because of methods like `has_role?` we don't want to enforce 'has_' prefix
+  NamePrefixBlacklist:
+    - 'is_'
+    - 'have_'
+
 # Trailing commas make for clearer diffs because the last line won't appear
 # to have been changed, as it would if it lacked a comma and had one added.
 Style/TrailingCommaInArguments:
