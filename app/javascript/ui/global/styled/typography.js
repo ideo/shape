@@ -154,12 +154,14 @@ SubText.displayName = 'StyledSubText'
 /** @component */
 export const SmallHelperText = styled.span`
   color: ${props => props.color};
+  ${props => props.fontWeight && `font-weight: ${props.fontWeight};`}
   font-family: ${v.fonts.sans};
   font-size: 0.75rem;
 `
 SmallHelperText.displayName = 'SmallHelperText'
 SmallHelperText.propTypes = {
   color: PropTypes.oneOf(Object.values(v.colors)),
+  fontWeight: PropTypes.oneOf(Object.values(v.weights)),
 }
 SmallHelperText.defaultProps = {
   color: v.colors.commonMedium,

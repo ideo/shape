@@ -310,6 +310,25 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         post(path, params: params)
       end
 
+      context 'with a link card' do
+        let!(:linked_collection) { create(:collection) }
+        let(:raw_params) do
+          {
+            order: 1,
+            parent_id: collection.id,
+            collection_id: linked_collection.id,
+            card_type: 'link',
+          }
+        end
+
+        it 'should create a link card' do
+          post(path, params: params)
+          expect(CollectionCard.find(json['data']['id']).parent).to eq(collection)
+          linked_id = json['data']['relationships']['record']['data']['id']
+          expect(Collection.find(linked_id)).to eq linked_collection
+        end
+      end
+
       context 'broadcasting updates' do
         context 'with a text item' do
           let(:item_attributes) do

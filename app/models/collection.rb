@@ -83,6 +83,9 @@ class Collection < ApplicationRecord
                     confirmable: true,
                     fallbacks_for_empty_translations: true
 
+  # has to come after `translates_custom`
+  include Translatable
+
   store_accessor :cached_attributes,
                  :cached_cover,
                  :cached_tag_list,
@@ -310,6 +313,7 @@ class Collection < ApplicationRecord
     [
       :created_by,
       :organization,
+      :translations,
       parent_collection_card: %i[parent],
       roles: %i[users groups resource],
     ]
@@ -838,6 +842,11 @@ class Collection < ApplicationRecord
 
   def parent_application_collection
     parents.find_by(type: 'Collection::ApplicationCollection')
+  end
+
+  def inside_an_application_collection?
+    is_a?(Collection::ApplicationCollection) ||
+      parent_application_collection.present?
   end
 
   # =================================

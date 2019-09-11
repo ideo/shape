@@ -8,6 +8,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
            add_editors: [user])
   end
   let(:user) { create(:user) }
+  let(:card_type) { 'primary' }
   let(:params) do
     {
       order: 1,
@@ -17,18 +18,22 @@ RSpec.describe CollectionCardBuilder, type: :service do
       col: 2,
     }
   end
+  let(:full_params) do
+    params.merge(
+      collection_attributes: {
+        name: 'Cool Collection',
+      },
+    )
+  end
 
   describe '#create' do
     context 'success creating card with collection' do
       let(:builder) do
         CollectionCardBuilder.new(
-          params: params.merge(
-            collection_attributes: {
-              name: 'Cool Collection',
-            },
-          ),
+          params: full_params,
           parent_collection: parent,
           user: user,
+          type: card_type,
         )
       end
       let(:collection) { builder.collection_card.collection }
@@ -82,6 +87,21 @@ RSpec.describe CollectionCardBuilder, type: :service do
         expect(builder.create).to be true
         expect(builder.collection_card.row).to eq nil
         expect(builder.collection_card.col).to eq nil
+      end
+
+      context 'with card_type == "link"' do
+        let(:card_type) { 'link' }
+        let!(:collection) { create(:collection, organization: organization) }
+        let(:full_params) do
+          params.merge(collection_id: collection.id)
+        end
+
+        it 'should create a link card' do
+          expect_any_instance_of(CollectionCard).to receive(:increment_card_orders!)
+          expect(builder.create).to be true
+          expect(builder.collection_card.link?).to be true
+          expect(builder.collection_card.collection).to eq collection
+        end
       end
 
       describe 'creating card with collection in UserCollection' do

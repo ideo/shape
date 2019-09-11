@@ -1,6 +1,13 @@
 require 'rails_helper'
 
 describe Users::OmniauthCallbacksController, type: :request do
+  let(:network_user) { double('network_user') }
+
+  before do
+    allow(network_user).to receive(:locale)
+    allow(NetworkApi::User).to receive(:find).with(user.uid).and_return([network_user])
+  end
+
   describe 'POST #ideo' do
     let!(:organization) { create(:organization) }
     let!(:user) { build(:user) }
@@ -47,9 +54,9 @@ describe Users::OmniauthCallbacksController, type: :request do
       expect(User.find_by_uid(user.uid)).not_to be_nil
     end
 
-    context 'pending user is an admin of current organization' do
+    context 'pending user is an admin of current organization', skip_frontend_render: true do
+      let!(:organization) { create(:organization) }
       let!(:pending_user) do
-        organization = create(:organization)
         create(:user, :pending, current_organization: organization)
       end
 
@@ -157,6 +164,7 @@ describe Users::OmniauthCallbacksController, type: :request do
               picture: picture,
               picture_medium: "#{picture}_md",
               picture_large: "#{picture}_lg",
+              locale: 'en',
             },
           },
         )

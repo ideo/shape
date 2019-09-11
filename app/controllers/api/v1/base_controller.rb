@@ -4,6 +4,7 @@ class Api::V1::BaseController < ApplicationController
   before_action :check_api_authentication!
   before_action :check_cancel_sync
   before_action :check_page_param
+  before_action :set_locale
 
   respond_to :json
 
@@ -185,5 +186,13 @@ class Api::V1::BaseController < ApplicationController
     slug = params[:id] if !slug && controller_name == 'organizations'
     @organization = Organization.friendly.find(slug)
     authorize! :read, @organization
+  end
+
+  def set_locale
+    if user_signed_in?
+      I18n.locale = current_user.locale
+    else
+      I18n.locale = I18n.default_locale
+    end
   end
 end
