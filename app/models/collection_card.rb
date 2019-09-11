@@ -49,8 +49,9 @@ class CollectionCard < ApplicationRecord
 
   # this really is only appropriate for CollectionCard::Primary but defined globally here
   accepts_nested_attributes_for :collection, :item
-  # for the purpose of accepting this param via deserializable
+  # for the purpose of accepting these params via deserializable
   attr_accessor :external_id
+  attr_accessor :card_type
 
   before_validation :assign_order, if: :assign_order?
   before_validation :ensure_width_and_height
@@ -113,6 +114,7 @@ class CollectionCard < ApplicationRecord
       record: [
         :filestack_file,
         :datasets,
+        :translations,
         collection_cover_items: :datasets,
       ],
     ]
