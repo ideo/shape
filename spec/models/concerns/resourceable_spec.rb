@@ -302,4 +302,45 @@ describe Resourceable, type: :concern do
       end
     end
   end
+
+  describe '#includes_all_roles?' do
+    let!(:users) { create_list(:user, 3) }
+    let!(:groups) { create_list(:group, 3) }
+    let!(:parent_collection) { create(:collection, add_editors: groups, add_viewers: users) }
+    let!(:collection) do
+      create(:collection, parent_collection: parent_collection, add_editors: groups, add_viewers: users)
+    end
+    subject { collection.includes_all_roles?(parent_collection) }
+
+    context 'with matching subset' do
+      it 'should return true if the roles match' do
+        expect(subject).to be true
+      end
+
+      context 'regardless of order' do
+        before do
+          users.each do |user|
+            user.remove_role(Role::VIEWER, collection)
+          end
+          users.third.add_role(Role::VIEWER, collection)
+          users.first.add_role(Role::VIEWER, collection)
+          users.second.add_role(Role::VIEWER, collection)
+        end
+
+        it 'should return true if the roles match' do
+          expect(subject).to be true
+        end
+      end
+    end
+
+    context 'with private subset' do
+      before do
+        groups.first.remove_role(Role::EDITOR, collection)
+      end
+
+      it 'should return false' do
+        expect(subject).to be false
+      end
+    end
+  end
 end

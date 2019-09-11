@@ -232,7 +232,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :cover_type,
       :default_group_id,
       collection_cards_attributes: %i[id order width height row col],
-    ]
+    ].concat(Collection.globalize_attribute_names)
   end
 
   def log_organization_view_activity

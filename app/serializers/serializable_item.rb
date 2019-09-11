@@ -1,11 +1,23 @@
 class SerializableItem < BaseJsonSerializer
   include SerializedExternalId
   type 'items'
-  attributes :name, :content, :data_content,
-             :url, :thumbnail_url, :icon_url, :question_type,
-             :data_source_type, :data_source_id, :data_settings,
-             :previous_thumbnail_urls, :legend_item_id,
-             :question_title, :question_description, :archived
+  attributes(
+    :name,
+    :content,
+    :data_content,
+    :url,
+    :thumbnail_url,
+    :icon_url,
+    :question_type,
+    :data_source_type,
+    :data_source_id,
+    :data_settings,
+    :previous_thumbnail_urls,
+    :legend_item_id,
+    :question_title,
+    :question_description,
+    :archived,
+  )
 
   has_many :roles do
     data do
@@ -32,6 +44,10 @@ class SerializableItem < BaseJsonSerializer
 
   attribute :is_private do
     @object.private?
+  end
+
+  attribute :show_language_selector do
+    @object.parent&.inside_an_application_collection? || false
   end
 
   attribute :filestack_file_url do

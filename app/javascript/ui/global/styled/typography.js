@@ -69,7 +69,7 @@ export const DisplayText = styled.span`
 `
 DisplayText.displayName = 'StyledDisplayText'
 
-export const NumberListText = DisplayText.extend`
+export const NumberListText = styled(DisplayText)`
   display: inline-block;
   font-weight: ${v.weights.medium};
   min-width: 25px;
@@ -99,7 +99,7 @@ export const SubduedHeading1 = styled.h1`
 SubduedHeading1.displayName = 'SubduedHeading1'
 
 /** @component */
-export const SubduedText = DisplayText.extend`
+export const SubduedText = styled(DisplayText)`
   color: ${v.colors.commonDark};
 `
 SubduedText.displayName = 'SubduedText'
@@ -114,7 +114,7 @@ export const DisplayLink = styled.a`
 `
 DisplayLink.displayName = 'StyledDisplayLink'
 
-export const LoudDisplayLink = DisplayLink.extend`
+export const LoudDisplayLink = styled(DisplayLink)`
   text-transform: uppercase;
   text-decoration: none;
   font-weight: ${v.weights.medium};
@@ -154,18 +154,20 @@ SubText.displayName = 'StyledSubText'
 /** @component */
 export const SmallHelperText = styled.span`
   color: ${props => props.color};
+  ${props => props.fontWeight && `font-weight: ${props.fontWeight};`}
   font-family: ${v.fonts.sans};
   font-size: 0.75rem;
 `
 SmallHelperText.displayName = 'SmallHelperText'
 SmallHelperText.propTypes = {
   color: PropTypes.oneOf(Object.values(v.colors)),
+  fontWeight: PropTypes.oneOf(Object.values(v.weights)),
 }
 SmallHelperText.defaultProps = {
   color: v.colors.commonMedium,
 }
 
-export const SmallActionText = SmallHelperText.extend`
+export const SmallActionText = styled(SmallHelperText)`
   color: white;
   font-weight: 500;
   letter-spacing: 2.25px;
@@ -198,7 +200,7 @@ export const CardHeadingCss = css`
     padding: 0;
   }
 `
-export const CardHeading = Heading1.extend`
+export const CardHeading = styled(Heading1)`
   ${CardHeadingCss};
 `
 CardHeading.displayName = 'CardHeading'
@@ -212,7 +214,7 @@ export const TextItemHeading1Css = css`
   }
 `
 
-export const HugeNumber = Heading1.extend`
+export const HugeNumber = styled(Heading1)`
   font-size: 4.5rem;
   font-weight: ${v.weights.book};
   line-height: 3.75rem;

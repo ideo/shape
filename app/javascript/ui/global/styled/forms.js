@@ -106,7 +106,7 @@ export const TextField = styled.input`
 TextField.displayName = 'StyledTextField'
 
 /** @component */
-export const BctTextField = TextField.extend`
+export const BctTextField = styled(TextField)`
   background: ${v.colors.commonLight};
 `
 BctTextField.displayName = 'BctTextField'

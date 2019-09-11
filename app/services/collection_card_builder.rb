@@ -43,61 +43,65 @@ class CollectionCardBuilder
     # TODO: rollback transaction if these later actions fail; add errors, return false
     CollectionCard.transaction do
       @collection_card.save.tap do |result|
-        if result
-          record = @collection_card.record
-          record.inherit_roles_anchor_from_parent!
-          if @collection_card.record_type == :collection
-            # NOTE: should items created in My Collection get this access as well?
-            # this will change the roles_anchor, which will get re-cached later
-            record.enable_org_view_access_if_allowed(@parent_collection)
-            record.update(created_by: @user) if @user.present?
-          end
-          @collection_card.parent.cache_cover! if @collection_card.should_update_parent_collection_cover?
-          @collection_card.update_collection_cover if @collection_card.is_cover
-          @collection_card.increment_card_orders!
-          add_external_record
-          record.reload
-          # will also cache roles identifier and update breadcrumb
-          record.save
+        return false unless result
 
-          if record.is_a?(Item::FileItem) && record.video?
-            record.transcode!
-          end
+        post_creation_record_update if @collection_card.primary?
 
-          # If this is a live test collection...
-          if @parent_collection.test_collection? &&
-             @parent_collection.live_or_was_launched? &&
-             record.is_a?(Item::QuestionItem)
-
-            test_collection = @parent_collection.test_collection
-
-            # If this is a new scale question, create response graphs
-            if record.scale_question?
-              record.create_response_graph(
-                parent_collection: test_collection,
-                initiated_by: @user,
-              )
-            elsif record.question_open?
-              record.create_open_response_collection(
-                parent_collection: test_collection,
-                initiated_by: @user,
-              )
-            end
-          end
-
-          if @parent_collection.is_a? Collection::SubmissionsCollection
-            @parent_collection.follow_submission_box(@user)
-          end
-
-          if @parent_collection.master_template?
-            # we just added a template card, so update the instances
-            @parent_collection.queue_update_template_instances
-          end
-
-          create_datasets if @datasets_params.present?
+        @collection_card.increment_card_orders!
+        if @parent_collection.master_template?
+          # we just added a template card, so update the instances
+          @parent_collection.queue_update_template_instances
         end
+
+        create_datasets if @datasets_params.present?
       end
     end
+  end
+
+  def post_creation_record_update
+    record = @collection_card.record
+    record.inherit_roles_anchor_from_parent!
+    if @collection_card.record_type == :collection
+      # NOTE: should items created in My Collection get this access as well?
+      # this will change the roles_anchor, which will get re-cached later
+      record.enable_org_view_access_if_allowed(@parent_collection)
+      record.update(created_by: @user) if @user.present?
+    end
+    @collection_card.parent.cache_cover! if @collection_card.should_update_parent_collection_cover?
+    @collection_card.update_collection_cover if @collection_card.is_cover
+    add_external_record
+    record.reload
+    # will also cache roles identifier and update breadcrumb
+    record.save
+
+    if record.is_a?(Item::FileItem) && record.video?
+      record.transcode!
+    end
+
+    # If this is a live test collection...
+    if @parent_collection.test_collection? &&
+       @parent_collection.live_or_was_launched? &&
+       record.is_a?(Item::QuestionItem)
+
+      test_collection = @parent_collection.test_collection
+
+      # If this is a new scale question, create response graphs
+      if record.scale_question?
+        record.create_response_graph(
+          parent_collection: test_collection,
+          initiated_by: @user,
+        )
+      elsif record.question_open?
+        record.create_open_response_collection(
+          parent_collection: test_collection,
+          initiated_by: @user,
+        )
+      end
+    end
+
+    return unless @parent_collection.is_a? Collection::SubmissionsCollection
+
+    @parent_collection.follow_submission_box(@user)
   end
 
   def add_external_record

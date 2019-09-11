@@ -41,7 +41,7 @@ class QuillContentConverter < SimpleService
     if element.name == 'text' &&
        (!element.parent || element.parent.name != 'a')
       process_text_tag(element)
-    elsif %w[h1 h2 h3].include?(element.name)
+    elsif %w[h1 h2 h3 h5].include?(element.name)
       process_header(element)
     elsif element.name == 'a'
       process_link(element)
@@ -52,7 +52,7 @@ class QuillContentConverter < SimpleService
 
   def write_current_string(element)
     # Need to add a newline if the next element is not a header
-    @current_string += "\n" unless %w[h1 h2 h3 img].include?(element.name)
+    @current_string += "\n" unless %w[h1 h2 h3 h5 img].include?(element.name)
     @quill_ops.push(insert: @current_string)
     @current_string = ''
   end

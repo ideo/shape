@@ -32,7 +32,7 @@ import BctButtonBox from './BctButtonBox'
 import BctButtonRotation from './BctButtonRotation'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 
-const StyledGridCardBlank = StyledGridCard.extend`
+const StyledGridCardBlank = styled(StyledGridCard)`
   background-color: transparent;
   cursor: auto;
   position: relative;

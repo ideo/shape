@@ -17,6 +17,7 @@
 #  last_notification_mail_sent :datetime
 #  last_sign_in_at             :datetime
 #  last_sign_in_ip             :inet
+#  locale                      :string
 #  mailing_list                :boolean          default(FALSE)
 #  network_data                :jsonb
 #  notify_through_email        :boolean          default(TRUE)
@@ -134,6 +135,7 @@ class User < ApplicationRecord
   after_save :update_products_mailing_list_subscription, if: :saved_change_to_mailing_list?
   after_create :update_shape_user_list_subscription, if: :active?
   after_update :update_shape_user_list_subscription_after_update, if: :saved_change_to_status?
+  after_update :update_profile_locale, if: :should_update_network_user_locale?
 
   delegate :balance, to: :incentive_owed_account, prefix: true
   delegate :balance, to: :incentive_paid_account, prefix: true
@@ -247,9 +249,6 @@ class User < ApplicationRecord
         # Users see terms on the Network, so we can mark them as accepted
         user.terms_accepted = true
       end
-      user.first_name = attrs[:first_name]
-      user.last_name = attrs[:last_name]
-      user.phone = attrs[:phone]
       user.invitation_token = nil
       user.password = Devise.friendly_token(40)
       user.password_confirmation = user.password
@@ -258,8 +257,14 @@ class User < ApplicationRecord
     end
 
     # Update user on every auth
+    user.first_name = attrs.first_name
+    user.last_name = attrs.last_name
     user.email = attrs.email
     user.phone = attrs.phone
+    if attrs.try(:locale)
+      user.locale = attrs.locale
+    end
+
     unless user.limited?
       if attrs.present?
         user.handle = attrs.username
@@ -267,8 +272,6 @@ class User < ApplicationRecord
         user.generate_handle
       end
     end
-    user.first_name = attrs.first_name
-    user.last_name = attrs.last_name
     %w[picture picture_medium picture_large].each do |field|
       user.network_data[field] = attrs.try(:extra).try(field)
     end
@@ -282,6 +285,7 @@ class User < ApplicationRecord
       type: auth.extra.raw_info.type,
       email: auth.info.email,
       phone: auth.extra.raw_info.phone,
+      locale: auth.extra.raw_info.locale,
       first_name: auth.info.first_name,
       last_name: auth.info.last_name,
       username: auth.info.username,
@@ -320,7 +324,7 @@ class User < ApplicationRecord
   end
 
   def update_from_network_profile(params)
-    %i[first_name last_name email picture picture_large].each do |field|
+    %i[first_name last_name email picture picture_large locale].each do |field|
       send("#{field}=", params[field]) if params[field].present?
     end
     self.handle = params[:username] if params[:username].present?
@@ -469,16 +473,14 @@ class User < ApplicationRecord
   end
 
   def network_user
-    NetworkApi::User.find(uid).first
+    @network_user ||= NetworkApi::User.find(uid).first
   end
 
   def generate_network_auth_token
     return unless limited?
+    return unless network_user.present?
 
-    nu = network_user
-    return unless nu.present?
-
-    nu.generate_auth_token.first.try(:authentication_token)
+    network_user.generate_auth_token.first.try(:authentication_token)
   rescue JsonApiClient::Errors::NotAuthorized
     # shouldn't happen since we are already escaping `unless limited?`
     nil
@@ -544,6 +546,12 @@ class User < ApplicationRecord
     Time.parse(date_string)
   end
 
+  def locale
+    return locale_change.last if locale_changed?
+
+    locale_in_database || current_organization&.default_locale
+  end
+
   private
 
   def email_required?
@@ -565,6 +573,16 @@ class User < ApplicationRecord
       # call full update rather than update_all which skips callbacks
       profile.update(name: name)
     end
+  end
+
+  def should_update_network_user_locale?
+    saved_change_to_locale? &&
+      network_user.present? &&
+      network_user.locale != locale
+  end
+
+  def update_profile_locale
+    NetworkUserUpdateWorker.perform_async(id, :locale)
   end
 
   def update_products_mailing_list_subscription(subscribed: mailing_list)
