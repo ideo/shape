@@ -20,7 +20,7 @@ RSpec.describe Group, type: :model do
     expect(group.current_shared_collection).to be_truthy
   end
 
-  context 'associations', only: true do
+  context 'associations' do
     it { should belong_to :filestack_file }
     it { should have_many :group_hierarchies }
     it { should have_many :subgroups }
