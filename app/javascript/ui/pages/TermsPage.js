@@ -1,6 +1,8 @@
+import _ from 'lodash'
 import ReactMarkdown from 'react-markdown'
 import ReactQuill from 'react-quill'
 import styled from 'styled-components'
+import { scroller, Element as ScrollElement } from 'react-scroll'
 
 import { apiStore } from '~/stores'
 import {
@@ -12,7 +14,7 @@ import {
 import v from '~/utils/variables'
 import LoggedOutBasicHeader from '~/ui/layout/LoggedOutBasicHeader'
 import PageContainer from '~/ui/layout/PageContainer'
-import termsMarkdown from '~/markdown/TermsOfUse'
+import { termsIntroMarkdown, termsMarkdown } from '~/markdown/TermsOfUse'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
 
 const StyledMarkdown = styled(ReactMarkdown)`
@@ -47,12 +49,59 @@ const StyledSeal = styled.div`
   margin-bottom: 10px;
 `
 
+// copied from https://github.com/rexxars/react-markdown/issues/69
+function flatten(text, child) {
+  return typeof child === 'string'
+    ? text + child
+    : React.Children.toArray(child.props.children).reduce(flatten, text)
+}
+
+function HeadingRenderer(opts) {
+  const children = React.Children.toArray(opts.children)
+  const text = children.reduce(flatten, '')
+  const slug = text.toLowerCase().replace(/\W/g, '-')
+  return React.createElement('h' + opts.level, { id: slug }, opts.children)
+}
+
 class TermsPage extends React.PureComponent {
+  scrollToAnchor = anchor => () => {
+    scroller.scrollTo(anchor, {
+      duration: 1000,
+      smooth: true,
+      offset: -50,
+    })
+  }
+
+  get tableOfContents() {
+    const toc = {
+      '2. Accounts and Registration': '2--accounts-and-registration',
+    }
+    const items = []
+    _.each(toc, (anchor, title) => {
+      items.push(
+        <li key={anchor}>
+          <button onClick={this.scrollToAnchor(anchor)}>{title}</button>
+        </li>
+      )
+    })
+    return items
+  }
+
   render() {
     let inner
     inner = (
       <div>
-        <StyledMarkdown source={termsMarkdown} />
+        <ScrollElement name="top" />
+        <StyledMarkdown
+          source={termsIntroMarkdown}
+          renderers={{ heading: HeadingRenderer }}
+        />
+
+        <ol>{this.tableOfContents}</ol>
+        <StyledMarkdown
+          source={termsMarkdown}
+          renderers={{ heading: HeadingRenderer }}
+        />
       </div>
     )
     if (this.props.location.pathname !== '/terms') {
