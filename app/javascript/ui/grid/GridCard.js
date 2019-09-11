@@ -5,7 +5,7 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import ContainImage from '~/ui/grid/ContainImage'
 import CoverImageToggle from '~/ui/grid/CoverImageToggle'
-import CoverImageSelector from '~/ui/grid/CoverImageSelector'
+import CardCoverEditor from '~/ui/grid/CardCoverEditor'
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
 import CoverRenderer from '~/ui/grid/CoverRenderer'
 
@@ -201,7 +201,7 @@ class GridCard extends React.Component {
       >
         {record.isDownloadable && <Download record={record} />}
         {record.canSetACover && (
-          <CoverImageSelector
+          <CardCoverEditor
             card={card}
             parentRef={this.gridCardRef}
             isEditingCardCover={this.isEditingCardCover}

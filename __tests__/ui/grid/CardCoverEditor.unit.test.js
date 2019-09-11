@@ -1,4 +1,4 @@
-import CoverImageSelector from '~/ui/grid/CoverImageSelector'
+import CardCoverEditor from '~/ui/grid/CardCoverEditor'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import FilestackUpload from '~/utils/FilestackUpload'
 import fakeApiStore from '#/mocks/fakeApiStore'
@@ -15,7 +15,7 @@ let rerender
 const fakeEv = { preventDefault: jest.fn() }
 let component, wrapper, innerWrapper
 
-describe('CoverImageSelector', () => {
+describe('CardCoverEditor', () => {
   beforeEach(() => {
     card = fakeCollectionCard
     card.record = {
@@ -50,7 +50,7 @@ describe('CoverImageSelector', () => {
     }
     rerender = (opts = {}) => {
       const newProps = { ...props, ...opts }
-      wrapper = shallow(<CoverImageSelector.wrappedComponent {...newProps} />)
+      wrapper = shallow(<CardCoverEditor.wrappedComponent {...newProps} />)
       component = wrapper.instance()
       const Inner = () => component.renderInner()
       innerWrapper = shallow(<Inner />)

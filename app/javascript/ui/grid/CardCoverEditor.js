@@ -108,7 +108,7 @@ const filterOptions = [
 
 @inject('apiStore', 'uiStore')
 @observer
-class CoverImageSelector extends React.Component {
+class CardCoverEditor extends React.Component {
   @observable
   imageOptions = []
   @observable
@@ -135,6 +135,28 @@ class CoverImageSelector extends React.Component {
         this.props.uiStore.removeNewCard(record.id)
       }
     })
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.isEditingCardCover !== this.props.isEditingCardCover) {
+      const { card } = this.props
+      const { record } = card
+
+      if (
+        record.name === this.cardTitle &&
+        record.subtitle === this.hardcodedSubtitle &&
+        record.cover.subtitle_hidden === this.subtitleHidden
+      ) {
+        return
+      }
+
+      // only update when there are changes
+      record.API_updateNameAndCover({
+        name: this.cardTitle,
+        hardcodedSubtitle: this.hardcodedSubtitle,
+        subtitleHidden: this.subtitleHidden,
+      })
+    }
   }
 
   @action
@@ -242,18 +264,14 @@ class CoverImageSelector extends React.Component {
     this.subtitleHidden = !this.subtitleHidden
   }
 
-  handleTitleSave = ev => {
-    const { card } = this.props
-    const { record } = card
-    record.API_updateNameAndCover({
-      name: this.cardTitle,
-      hardcodedSubtitle: this.hardcodedSubtitle,
-      subtitleHidden: this.subtitleHidden,
-    })
+  handleInputKeyPress = ev => {
+    if (ev.key === 'Enter') {
+      this.handleClose()
+    }
   }
 
-  handleInputKeys = ev => {
-    if (ev.key === 'Enter') {
+  handleInputKeyDown = ev => {
+    if (ev.key === 'Escape') {
       this.handleClose()
     }
   }
@@ -278,7 +296,6 @@ class CoverImageSelector extends React.Component {
 
   handleClose = ev => {
     const { uiStore } = this.props
-    this.handleTitleSave()
     uiStore.setEditingCardCover(null)
   }
 
@@ -347,10 +364,10 @@ class CoverImageSelector extends React.Component {
           value={this.cardTitle}
           placeholder={'untitled'}
           onChange={this.changeTitle}
-          onKeyPress={this.handleInputKeys}
+          onKeyPress={this.handleInputKeyPress}
           onClick={this.handleInputClick}
-          className={'edit-cover-text'}
-          className={'selectorTitleInput'}
+          onKeyDown={this.handleInputKeyDown}
+          className={'edit-cover-title'}
         />
       </div>
     )
@@ -366,10 +383,10 @@ class CoverImageSelector extends React.Component {
           value={this.hardcodedSubtitle}
           placeholder={'default'}
           onChange={this.changeHardcodedSubtitle}
-          onKeyPress={this.handleInputKeys}
+          onKeyPress={this.handleInputKeyPress}
           onClick={this.handleInputClick}
-          className={'edit-cover-text'}
-          className={'selectorSubtitleInput'}
+          onKeyDown={this.handleInputKeyDown}
+          className={'edit-cover-subtitle'}
         />
       </div>
     )
@@ -457,14 +474,14 @@ class CoverImageSelector extends React.Component {
   }
 }
 
-CoverImageSelector.propTypes = {
+CardCoverEditor.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   isEditingCardCover: PropTypes.bool.isRequired,
 }
 
-CoverImageSelector.wrappedComponent.propTypes = {
+CardCoverEditor.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
-export default CoverImageSelector
+export default CardCoverEditor
