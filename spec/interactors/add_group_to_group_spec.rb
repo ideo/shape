@@ -13,9 +13,9 @@ RSpec.describe AddGroupToGroup, type: :service do
   end
 
   describe '#call' do
-    let(:subgroup) { build_stubbed(:group) }
-    let(:parent_group) { build_stubbed(:group) }
-    let(:interactor) { AddGroupToGroup.call(subgroup: build(:group), parent_group: build(:group)) }
+    let(:subgroup) { create(:group) }
+    let(:parent_group) { create(:group) }
+    let(:interactor) { AddGroupToGroup.call(subgroup: subgroup, parent_group: parent_group) }
 
     it 'calls the organized interactors' do
       expect(GrantParentAccessToSubgroup).to receive(:call!).and_return(:success)

@@ -13,6 +13,8 @@ class GrantGrandparentsAccessToSubgroup
 
   def relate_grandparents_to_subgroup
     grandparents = GroupHierarchy.where(subgroup_id: parent_group.id).map(&:parent_group)
+    # We want to no-op here instead of context.fail!
+    return if grandparents.empty?
 
     grandparents.each do |grandparent|
       GroupHierarchy.create(
