@@ -171,8 +171,9 @@ RSpec.describe CollectionCard, type: :model do
       end
 
       it 'should not touch its collection if filter attribute did not change' do
+        card.update(filter: 'transparent_gray')
         expect do
-          card.update(height: 2)
+          card.update(filter: 'transparent_gray', updated_at: Time.current)
         end.not_to change(card.collection, :updated_at)
       end
     end

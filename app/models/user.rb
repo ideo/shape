@@ -261,7 +261,9 @@ class User < ApplicationRecord
     user.last_name = attrs.last_name
     user.email = attrs.email
     user.phone = attrs.phone
-    user.locale = attrs.locale
+    if attrs.try(:locale)
+      user.locale = attrs.locale
+    end
 
     unless user.limited?
       if attrs.present?

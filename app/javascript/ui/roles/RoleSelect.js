@@ -76,14 +76,13 @@ class RoleSelect extends React.Component {
       iconName = 'Hidden'
       prompt += ` This change will break permission inheritance from ${parentName}.`
       prompt += ` New people added to ${parentName} will no longer get access to "${record.name}".`
-      // confirmText = 'Continue'
     }
 
     uiStore.confirm({
       prompt,
       confirmText,
       iconName,
-      onConfirm: () => this.deleteRole(false),
+      onConfirm: () => this.deleteRole({ isSwitching: false, becomesPrivate }),
     })
   }
 
@@ -98,13 +97,14 @@ class RoleSelect extends React.Component {
     onCreate([entity], roleName, { isSwitching })
   }
 
-  deleteRole = (isSwitching = true) => {
+  deleteRole = ({ isSwitching = true, becomesPrivate = false } = {}) => {
     const { role, entity } = this.props
     const organizationChange =
       this.resourceType === 'organization' && entity.isCurrentUser
     return this.props.onDelete(role, entity, {
       isSwitching,
       organizationChange,
+      becomesPrivate,
     })
   }
 
