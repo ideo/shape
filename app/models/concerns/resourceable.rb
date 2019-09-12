@@ -90,6 +90,7 @@ module Resourceable
     roles_anchor_resource_identifier == resource.roles_anchor_resource_identifier
   end
 
+  # returns true if resource's roles are equal to (or more inclusive than) self
   def includes_all_roles?(resource)
     return false unless item_or_collection? && resource.item_or_collection?
 
@@ -256,13 +257,8 @@ module Resourceable
     anchor_id = parent&.roles_anchor&.id
     return unless anchor_id
 
+    unmark_as_private!
     update_columns(roles_anchor_collection_id: anchor_id, updated_at: Time.current)
-    # now that its reanchored, cache private = false
-    self.class.where(id: id).update_all(%(
-      cached_attributes = jsonb_set(
-        cached_attributes, '{cached_inheritance}', '{"private": false, "updated_at": "#{Time.current}"}'::jsonb
-      )
-    ))
     roles.destroy_all
     return unless propagate && is_a?(Collection)
 
@@ -272,6 +268,34 @@ module Resourceable
         .where(roles_anchor_collection_id: id)
         .update_all(roles_anchor_collection_id: anchor_id, updated_at: Time.current)
     end
+  end
+
+  def mark_as_private!(value = true)
+    # slightly convoluted way of writing a jsonb_set update on self (#update won't work here)
+    settings = { 'private': value, 'updated_at': Time.current }
+    self.class.where(id: id).update_all(%(
+      cached_attributes = jsonb_set(
+        cached_attributes, '{cached_inheritance}', '#{settings.to_json}'::jsonb
+      )
+    ))
+    # make sure to set this in memory as well (saves having to do a `reload`)
+    self.cached_inheritance = settings.as_json
+  end
+
+  def unmark_as_private!
+    mark_as_private!(false)
+  end
+
+  def reanchor_if_incorrect_anchor!(parent: self.parent)
+    # we've seen a roles anchor be set incorrectly, e.g. Collection X -> parent -> grandparent
+    # even though `parent` has roles, `X` is somehow anchored to the grandparent;
+    # may have been the result of a previous bug in add_role that was erroring out during role propagation...
+    return false unless roles_anchor_collection_id.present? &&
+                        parent.roles_anchor_collection_id.nil? &&
+                        roles_anchor_collection_id != parent.id
+
+    reanchor!(parent: parent, propagate: true)
+    true
   end
 
   def remove_all_viewer_roles

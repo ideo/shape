@@ -71,6 +71,7 @@ describe('RoleSelect', () => {
 
     it('should call onDelete with the role and user/group', () => {
       expect(props.onDelete).toHaveBeenCalledWith(props.role, props.entity, {
+        becomesPrivate: false,
         isSwitching: true,
         organizationChange: false,
       })
@@ -89,8 +90,23 @@ describe('RoleSelect', () => {
 
       it('should pass the organizationChange option to the onDelete', () => {
         expect(props.onDelete).toHaveBeenCalledWith(props.role, props.entity, {
+          becomesPrivate: false,
           isSwitching: true,
           organizationChange: true,
+        })
+      })
+    })
+
+    describe('when confirming that record will become private', () => {
+      beforeEach(() => {
+        component.deleteRole({ becomesPrivate: true })
+      })
+
+      it('should pass the becomesPrivate option to the onDelete', () => {
+        expect(props.onDelete).toHaveBeenCalledWith(props.role, props.entity, {
+          becomesPrivate: true,
+          isSwitching: true,
+          organizationChange: false,
         })
       })
     })
