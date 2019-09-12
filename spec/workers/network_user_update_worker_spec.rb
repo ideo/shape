@@ -12,14 +12,9 @@ describe NetworkUserUpdateWorker, type: :worker do
   end
 
   describe '#perform' do
-    it 'should update the network user locale' do
+    it 'should update the network user' do
       expect(network_user).to receive(:update).with(locale: 'es')
-      subject.perform(user.id, locale: 'es')
-    end
-
-    it 'should update the network user terms_accepted_version' do
-      expect(network_user).to receive(:update).with(terms_accepted_version: Rails.configuration.terms_version)
-      subject.perform(user.id, terms_accepted_version: Rails.configuration.terms_version)
+      subject.perform(user.id, :locale)
     end
   end
 end
