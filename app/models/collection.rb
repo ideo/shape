@@ -651,17 +651,18 @@ class Collection < ApplicationRecord
       test_details = "launchable=#{launchable?}&can_reopen=#{can_reopen?}"
     end
 
-    "#{jsonapi_cache_key}" \
-      "/#{ActiveRecord::Migrator.current_version}" \
-      "/#{ENV['HEROKU_RELEASE_VERSION']}" \
-      "/order_#{card_order}" \
-      "/cards_#{collection_cards.maximum(:updated_at).to_i}" \
-      "/#{test_details}" \
-      "/#{getting_started_shell}" \
-      "/#{organization.updated_at}" \
-      "/user_id_#{user_id}" \
-      "/current_locale_#{I18n.locale}"
-      "/roles_#{anchored_roles.maximum(:updated_at).to_i}"
+    %(#{jsonapi_cache_key}
+      /#{ActiveRecord::Migrator.current_version}
+      /#{ENV['HEROKU_RELEASE_VERSION']}
+      /order_#{card_order}
+      /cards_#{collection_cards.maximum(:updated_at).to_i}
+      /#{test_details}
+      /gs_#{getting_started_shell}
+      /org_#{organization.updated_at}
+      /user_id_#{user_id}
+      /locale_#{I18n.locale}
+      /roles_#{anchored_roles.maximum(:updated_at).to_i}
+    ).gsub(/\s+/, '')
   end
 
   def jsonapi_type_name

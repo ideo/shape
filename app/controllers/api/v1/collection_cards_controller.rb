@@ -213,8 +213,13 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def load_and_authorize_moving_collections
-    @from_collection = Collection.find(json_api_params[:from_id])
     @cards = ordered_cards
+    if json_api_params[:from_id]
+      @from_collection = Collection.find(json_api_params[:from_id])
+    else
+      # parent collection can be implied
+      @from_collection = @cards.first.parent
+    end
     @to_collection = Collection.find(json_api_params[:to_id])
     @cards.primary.each do |card|
       authorize! :move, card
