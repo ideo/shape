@@ -33,6 +33,9 @@ class DefaultCollectionCover < SimpleService
       item_id_text: text[:item_id],
       item_id_media: media[:item_id],
       no_cover: @no_cover,
+      # these next values only get set in CollectionUpdater
+      hardcoded_subtitle: nil,
+      subtitle_hidden: nil,
     }
     # This cover type uses a separate text item, so remove all text properties
     # from the cover
