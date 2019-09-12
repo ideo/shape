@@ -988,6 +988,22 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     }
   }
 
+  get subtitle() {
+    const { cover } = this
+    if (cover.subtitle_hidden) {
+      return ''
+    }
+    return cover.hardcoded_subtitle || cover.text
+  }
+
+  get subtitleHidden() {
+    const { cover } = this
+    if (cover && cover.subtitle_hidden) {
+      return cover
+    }
+    return false
+  }
+
   // NOTE: this is only used as a Cypress test method, to simulate card resizing
   API_updateCard({ card, updates, undoMessage } = {}) {
     // this works a little differently than the typical "undo" snapshot...

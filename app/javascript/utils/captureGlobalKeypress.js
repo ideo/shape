@@ -27,23 +27,10 @@ export const handleMouseDownSelection = e => {
     uiStore.deselectCards()
     uiStore.onEmptySpaceClick(e)
     uiStore.closeBlankContentTool()
-    saveCardBeforeExit()
     uiStore.update('editingCardCover', null)
     return 'emptySpace'
   }
   return false
-}
-
-const saveCardBeforeExit = () => {
-  const { activeElement } = document
-  const { value } = activeElement
-  // this should always be the value of the active text area
-  if (!!value) {
-    const { editingCardCover } = uiStore
-    const card = apiStore.find('collection_cards', editingCardCover)
-    const { record } = card
-    record.API_updateName(value)
-  }
 }
 
 const captureGlobalKeypress = e => {
@@ -55,7 +42,8 @@ const captureGlobalKeypress = e => {
     _.intersection(activeElement.classList, [
       'ql-editor',
       'public-DraftEditor-content',
-      'edit-cover-text',
+      'edit-cover-title',
+      'edit-cover-subtitle',
     ]).length > 0
 
   if (shouldNormalKeyPressBeAllowed) return false

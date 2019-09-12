@@ -11,7 +11,6 @@ import QuickOptionSelector from '~/ui/global/QuickOptionSelector'
 import SingleCrossIcon from '~/ui/icons/SingleCrossIcon'
 import UploadIcon from '~/ui/icons/UploadIcon'
 import XIcon from '~/ui/icons/XIcon'
-import { SmallBreak } from '~/ui/global/styled/layout'
 import v, { ITEM_TYPES } from '~/utils/variables'
 // This must be imported last, or else it leads to a cryptic
 // circular dependency issue
@@ -20,6 +19,7 @@ import EditPencilIconLarge from '~/ui/icons/EditPencilIconLarge'
 import TextareaAutosize from 'react-autosize-textarea'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import PropTypes from 'prop-types'
+import { Checkbox, LabelContainer } from '~/ui/global/styled/forms'
 
 const removeOption = {
   type: 'remove',
@@ -53,13 +53,7 @@ const TopRightHolderWrapper = styled.div`
   opacity: 0.9;
   align-items: stretch;
   background: ${v.colors.primaryLight};
-  padding-bottom: ${props => (props.hasMaxHeight ? 0 : 16)}px;
-  ${props =>
-    props.hasMaxHeight &&
-    `
-    height: 100%;
-    max-height: ${v.defaultGridSettings.gridH}px;
-  `}
+  min-height: ${v.defaultGridSettings.gridH}px;
 `
 TopRightHolderWrapper.displayName = 'TopRightHolderWrapper'
 
@@ -69,7 +63,6 @@ const TopRightHolder = styled.div`
 
 const StyledEditTitle = styled.div`
   display: flex;
-  margin-bottom: 0.75rem;
   h3 {
     flex: 1;
     margin-right: 10px;
@@ -80,7 +73,7 @@ const StyledEditTitle = styled.div`
   div {
     flex: 3 1 auto;
     border-bottom: 1px solid ${v.colors.black};
-    max-width: 200px;
+    max-width: 316px;
     textarea {
       width: 100%;
       background: transparent;
@@ -98,6 +91,11 @@ const StyledEditTitle = styled.div`
 
 StyledEditTitle.displayName = 'StyledEditTitle'
 
+export const MediumBreak = styled.div`
+  display: block;
+  margin-bottom: 0.75rem;
+`
+
 const filterOptions = [
   {
     type: 'nothing',
@@ -113,7 +111,7 @@ const filterOptions = [
 
 @inject('apiStore', 'uiStore')
 @observer
-class CoverImageSelector extends React.Component {
+class CardCoverEditor extends React.Component {
   @observable
   imageOptions = []
   @observable
@@ -122,12 +120,14 @@ class CoverImageSelector extends React.Component {
   loading = false
   @observable
   cardTitle = ''
+  @observable
+  hardcodedSubtitle = '' // overrides cover text set by text items
+  @observable
+  subtitleHidden = false
 
   componentDidMount() {
     const { card, uiStore } = this.props
     const { record } = card
-    const { name } = record
-    this.cardTitle = name || record.url
     // TODO don't like how id name is in two separate places
     runInAction(() => {
       this.parentCard = document.getElementById(`gridCard-${card.id}`)
@@ -138,6 +138,28 @@ class CoverImageSelector extends React.Component {
         this.props.uiStore.removeNewCard(record.id)
       }
     })
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.isEditingCardCover !== this.props.isEditingCardCover) {
+      const { card } = this.props
+      const { record } = card
+
+      if (
+        record.name === this.cardTitle &&
+        record.subtitle === this.hardcodedSubtitle &&
+        record.subtitleHidden === this.subtitleHidden
+      ) {
+        return
+      }
+
+      // only update when there are changes
+      record.API_updateNameAndCover({
+        name: this.cardTitle,
+        hardcodedSubtitle: this.hardcodedSubtitle,
+        subtitleHidden: this.subtitleHidden,
+      })
+    }
   }
 
   @action
@@ -235,15 +257,26 @@ class CoverImageSelector extends React.Component {
     this.cardTitle = ev.target.value
   }
 
-  handleTitleSave = ev => {
-    const { card, uiStore } = this.props
-    const { record } = card
-    uiStore.setEditingCardCover(null)
-    record.API_updateName(this.cardTitle)
+  @action
+  changeHardcodedSubtitle = ev => {
+    this.hardcodedSubtitle = ev.target.value
   }
 
-  handleInputKeys = ev => {
-    if (ev.key === 'Enter') this.handleTitleSave(ev)
+  @action
+  onToggleSubtitleCheckbox = async e => {
+    this.subtitleHidden = !this.subtitleHidden
+  }
+
+  handleInputKeyPress = ev => {
+    if (ev.key === 'Enter') {
+      this.handleClose()
+    }
+  }
+
+  handleInputKeyDown = ev => {
+    if (ev.key === 'Escape') {
+      this.handleClose()
+    }
   }
 
   handleInputClick = ev => {
@@ -254,19 +287,19 @@ class CoverImageSelector extends React.Component {
   handleClick = ev => {
     const { card, uiStore } = this.props
     const { id } = card
+    const { record } = card
+    const { name } = record
+    this.cardTitle = name || record.url
+    this.hardcodedSubtitle = record.subtitle
+    this.subtitleHidden = record.subtitleHidden
     ev.preventDefault()
     this.populateAllOptions()
     uiStore.setEditingCardCover(id)
   }
 
   handleClose = ev => {
-    this.handleTitleSave()
-  }
-
-  handleKeyDown = e => {
-    if (e.key === 'Escape') {
-      this.handleTitleSave()
-    }
+    const { uiStore } = this.props
+    uiStore.setEditingCardCover(null)
   }
 
   async clearCover() {
@@ -324,52 +357,94 @@ class CoverImageSelector extends React.Component {
     return !!thumbnail_url
   }
 
-  renderEditTitleInput(title) {
+  renderEditTitleInput() {
     // max length 144 matches StyledEditableName's max length
     return (
       <div>
         <TextareaAutosize
           maxRows={3}
           maxLength={144}
-          value={title}
+          value={this.cardTitle}
           placeholder={'untitled'}
           onChange={this.changeTitle}
-          onKeyPress={this.handleInputKeys}
-          onBlur={this.handleTitleSave}
+          onKeyPress={this.handleInputKeyPress}
           onClick={this.handleInputClick}
-          className={'edit-cover-text'}
-          onKeyDown={this.handleKeyDown}
+          onKeyDown={this.handleInputKeyDown}
+          className={'edit-cover-title'}
+        />
+      </div>
+    )
+  }
+
+  renderEditSubtitleInput() {
+    // max length 144 matches StyledEditableName's max length
+    return (
+      <div>
+        <TextareaAutosize
+          maxRows={3}
+          maxLength={144}
+          value={this.hardcodedSubtitle}
+          placeholder={'default'}
+          onChange={this.changeHardcodedSubtitle}
+          onKeyPress={this.handleInputKeyPress}
+          onClick={this.handleInputClick}
+          onKeyDown={this.handleInputKeyDown}
+          className={'edit-cover-subtitle'}
         />
       </div>
     )
   }
 
   renderInner() {
-    const { uiStore } = this.props
+    const { uiStore, card } = this.props
+    const { record } = card
     const { gridSettings } = uiStore
-    const { gridH, gridW } = gridSettings
-    const isDefaultGridSize = gridH === v.defaultGridSettings.gridH
+    const { gridW } = gridSettings
     return (
-      <TopRightHolderWrapper maxWidth={gridW} hasMaxHeight={isDefaultGridSize}>
+      <TopRightHolderWrapper maxWidth={gridW}>
         <TopRightHolder data-cy="EditCoverOptions">
           {!this.loading && (
             <div>
               <StyledEditTitle>
                 <h3>Title</h3>
-                {this.renderEditTitleInput(this.cardTitle)}
+                {this.renderEditTitleInput()}
               </StyledEditTitle>
+              <MediumBreak />
               <h3>Cover Image</h3>
               <QuickOptionSelector
                 options={toJS(this.imageOptions)}
                 onSelect={this.onImageOptionSelect}
               />
-              <SmallBreak />
+              <MediumBreak />
               <h3>Cover effects</h3>
               {this.showFilters && (
                 <QuickOptionSelector
                   options={filterOptions}
                   onSelect={this.onFilterOptionSelect}
                 />
+              )}
+              <MediumBreak />
+              {record.isCollection && (
+                <div>
+                  <h3>Subtitle</h3>
+                  <StyledEditTitle>
+                    {this.renderEditSubtitleInput()}
+                  </StyledEditTitle>
+                  <LabelContainer
+                    labelPlacement={'end'}
+                    control={
+                      <Checkbox
+                        onChange={this.onToggleSubtitleCheckbox}
+                        checked={this.subtitleHidden}
+                      />
+                    }
+                    label={
+                      <div style={{ maxWidth: '582px', paddingTop: '15px' }}>
+                        Hide subtitle
+                      </div>
+                    }
+                  ></LabelContainer>
+                </div>
               )}
             </div>
           )}
@@ -403,14 +478,16 @@ class CoverImageSelector extends React.Component {
   }
 }
 
-CoverImageSelector.propTypes = {
+CardCoverEditor.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   isEditingCardCover: PropTypes.bool.isRequired,
 }
 
-CoverImageSelector.wrappedComponent.propTypes = {
+CardCoverEditor.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
-export default CoverImageSelector
+CardCoverEditor.displayName = 'CardCoverEditor'
+
+export default CardCoverEditor

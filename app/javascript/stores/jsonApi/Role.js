@@ -49,6 +49,7 @@ class Role extends BaseRecord {
         name: this.name,
       },
       is_switching: opts.isSwitching,
+      mark_private: opts.becomesPrivate,
     }
     if (entity.internalType === 'groups') {
       params.group_ids = [entity.id]

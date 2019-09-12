@@ -20,6 +20,7 @@ const fakeEvent = {
 let wrapper, component
 describe('CollectionCover', () => {
   beforeEach(() => {
+    fakeCollection.subtitle = cover.text
     props.collection = {
       ...fakeCollection,
       is_inside_a_submission: false,

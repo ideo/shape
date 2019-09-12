@@ -36,10 +36,27 @@ class CollectionUpdater < SimpleService
   attr_reader :organization, :parent_card, :created_by
 
   def assign_attributes
-    @collection.attributes = @attributes
+    cover_hash = @collection.cache_cover.to_h
+    cover_hash[:hardcoded_subtitle] = @attributes[:hardcoded_subtitle]
+    cover_hash[:subtitle_hidden] = @attributes[:subtitle_hidden]
+    clean_collection_card_attributes
+    @collection.attributes = @attributes.except(:hardcoded_subtitle, :subtitle_hidden)
+    @collection.cached_cover = cover_hash
     @collection.update_cached_tag_lists
     # always touch the updated timestamp even though we may just be updating the related cards
     @collection.updated_at = Time.now
+  end
+
+  def clean_collection_card_attributes
+    return unless @attributes[:collection_cards_attributes].present? &&
+                  @attributes[:collection_cards_attributes].is_a?(Array)
+
+    # remove any card_ids that are not valid from our attrs array
+    card_ids = @attributes[:collection_cards_attributes].map { |c| c[:id] }
+    found_ids = @collection.collection_cards.where(id: card_ids).pluck(:id)
+    @attributes[:collection_cards_attributes].select! do |card_attr|
+      found_ids.include?(card_attr[:id])
+    end
   end
 
   def cache_collection_cover_if_needed
