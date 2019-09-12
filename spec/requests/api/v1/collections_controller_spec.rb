@@ -635,6 +635,13 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         )
         patch(path)
       end
+
+      it 'unmarks private setting' do
+        collection.update(cached_inheritance: { private: true })
+        patch(path)
+        collection.reload
+        expect(collection.cached_inheritance['private']).to be false
+      end
     end
   end
 end
