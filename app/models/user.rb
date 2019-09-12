@@ -248,6 +248,8 @@ class User < ApplicationRecord
         user.status = User.statuses[:active]
         # Users see terms on the Network, so we can mark them as accepted
         user.terms_accepted = true
+        # somehow this doesn't get accepted...
+        NetworkUserUpdateWorker.perform_async(user.id, terms_accepted_version: Rails.configuration.terms_version)
       end
       user.invitation_token = nil
       user.password = Devise.friendly_token(40)
@@ -582,7 +584,7 @@ class User < ApplicationRecord
   end
 
   def update_profile_locale
-    NetworkUserUpdateWorker.perform_async(id, :locale)
+    NetworkUserUpdateWorker.perform_async(id, locale: locale)
   end
 
   def update_products_mailing_list_subscription(subscribed: mailing_list)

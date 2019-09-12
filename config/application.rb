@@ -46,6 +46,9 @@ module Shape
     # for serving gzipped assets
     config.middleware.use Rack::Deflater
 
+    # ideo products terms version
+    config.terms_version = 1
+
     # https://github.com/globalize/globalize#i18n-fallbacks-for-empty-translations
     config.i18n.fallbacks = [I18n.default_locale]
   end
