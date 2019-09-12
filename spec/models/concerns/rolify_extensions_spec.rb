@@ -191,6 +191,19 @@ describe RolifyExtensions, type: :concern do
     end
   end
 
+  describe '#remove_role' do
+    let(:group) { create(:group, organization: organization) }
+    let(:other_group) { create(:group, organization: organization) }
+
+    context 'when removing a group from another group' do
+      it 'calls the group removal service' do
+        expect(RemoveGroupFromGroup).to receive(:call)
+        group.add_role(Role::MEMBER, other_group)
+        group.remove_role(Role::MEMBER, other_group)
+      end
+    end
+  end
+
   describe '#upgrade_to_edit_role' do
     before do
       user.add_role(Role::CONTENT_EDITOR, collection)

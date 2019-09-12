@@ -144,6 +144,10 @@ module RolifyExtensions
     if is_a?(User)
       role.users.destroy(self)
     elsif is_a?(Group)
+      if resource.is_a? Group
+        # destroy connections between group (resource) and other group (self)
+        RemoveGroupFromGroup.call(parent_group: resource, subgroup: self)
+      end
       role.groups.destroy(self)
     else
       raise "RolifyExtension: Unsupported model '#{self.class.name}' for remove_role"
