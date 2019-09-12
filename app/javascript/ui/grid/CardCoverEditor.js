@@ -488,4 +488,6 @@ CardCoverEditor.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
+CardCoverEditor.displayName = 'CardCoverEditor'
+
 export default CardCoverEditor

@@ -200,7 +200,7 @@ class GridCard extends React.Component {
         zoomLevel={zoomLevel}
       >
         {record.isDownloadable && <Download record={record} />}
-        {record.canSetACover && (
+        {record.canSetACover && this.canEditCard && (
           <CardCoverEditor
             card={card}
             parentRef={this.gridCardRef}
