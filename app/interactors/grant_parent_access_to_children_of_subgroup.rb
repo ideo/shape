@@ -22,8 +22,7 @@ class GrantParentAccessToChildrenOfSubgroup
         subgroup: child_group,
       )
     end
-    context.fail!(
-      message: 'Failed to relate parent to children of subgroup',
-    ) if parent_group.subgroups.empty?
+
+    context.fail!(message: 'Failed to relate parent to children of subgroup') if parent_group.subgroups.empty?
   end
 end

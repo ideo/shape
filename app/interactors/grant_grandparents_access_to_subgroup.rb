@@ -16,14 +16,18 @@ class GrantGrandparentsAccessToSubgroup
 
     grandparents.each do |grandparent|
       GroupHierarchy.create(
-          parent_group: grandparent,
-          granted_by: parent_group,
-          subgroup: subgroup,
-        )
+        parent_group: grandparent,
+        granted_by: parent_group,
+        subgroup: subgroup,
+      )
     end
 
-    context.fail!(
-      message: 'Failed to relate some grandparent(s) to subgroup',
-    ) if grandparents.any? { |grandparent| !grandparent.subgroups.include?(subgroup) }
+    context.fail!(message: error_message) unless grandparents.any? do |grandparent|
+      !grandparent.subgroups.include?(subgroup)
+    end
+  end
+
+  def error_message
+    'Failed to relate some grandparent(s) to subgroup'
   end
 end

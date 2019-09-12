@@ -18,8 +18,6 @@ class GrantParentAccessToSubgroup
       subgroup: context.subgroup,
     )
 
-    context.fail!(
-      message: relation.errors.full_messages.join(", ")
-    ) if !relation.persisted?
+    context.fail!(message: relation.errors.full_messages.join(', ')) unless relation.persisted?
   end
 end

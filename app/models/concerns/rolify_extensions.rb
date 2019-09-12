@@ -129,10 +129,6 @@ module RolifyExtensions
     role
   end
 
-  def update_group_hierarchies_for_group(group)
-
-  end
-
   def remove_role(role_name, resource = nil)
     # anchored items/collections aren't allowed to have their own roles, you need to unanchor them first
     return false if resource&.roles_anchor_collection_id.present?
