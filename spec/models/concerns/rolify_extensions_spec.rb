@@ -166,6 +166,15 @@ describe RolifyExtensions, type: :concern do
       expect(collection.can_edit?(user)).to be true
     end
 
+    context 'when adding a group to another group' do
+      let(:other_group) { create(:group, organization: organization) }
+
+      it 'calls the group hierachy service' do
+        expect(AddGroupToGroup).to receive(:call)
+        group.add_role(Role::MEMBER, other_group)
+      end
+    end
+
     context 'with roles_anchor already set' do
       let!(:collection) { create(:collection, organization: organization, roles_anchor_collection_id: 99) }
 

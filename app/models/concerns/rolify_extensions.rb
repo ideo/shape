@@ -118,12 +118,19 @@ module RolifyExtensions
       role.users << self
     elsif is_a?(Group)
       role.groups << self
+      if resource.is_a?(Group)
+        AddGroupToGroup.call(parent_group: resource, subgroup: self)
+      end
     else
       raise "RolifyExtension: Unsupported model '#{self.class.name}' for add_role"
     end
     sync_groups_after_adding(role) if is_a?(User)
     after_role_update(role, :add)
     role
+  end
+
+  def update_group_hierarchies_for_group(group)
+
   end
 
   def remove_role(role_name, resource = nil)
