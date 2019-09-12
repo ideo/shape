@@ -660,6 +660,7 @@ class Collection < ApplicationRecord
       "/#{getting_started_shell}" \
       "/#{organization.updated_at}" \
       "/user_id_#{user_id}" \
+      "/current_locale_#{I18n.locale}"
       "/roles_#{anchored_roles.maximum(:updated_at).to_i}"
   end
 
