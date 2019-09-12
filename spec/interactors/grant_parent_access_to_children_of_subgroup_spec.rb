@@ -4,8 +4,8 @@ RSpec.describe GrantParentAccessToChildrenOfSubgroup, type: :service do
   describe '#call' do
     let(:subgroup) { create(:group) }
     let(:parent_group) { create(:group) }
-    let(:group_a) { create(:group) }
-    let(:group_b) { create(:group) }
+    let(:child_group_a) { create(:group) }
+    let(:child_group_b) { create(:group) }
     let(:fake_context) { { parent_group: parent_group, subgroup: subgroup } }
     let(:service_call) { GrantParentAccessToChildrenOfSubgroup.call(fake_context) }
 
@@ -21,14 +21,14 @@ RSpec.describe GrantParentAccessToChildrenOfSubgroup, type: :service do
         :group_hierarchy,
         parent_group: subgroup,
         granted_by: subgroup,
-        subgroup: group_a,
+        subgroup: child_group_a,
       )
 
       create(
         :group_hierarchy,
         parent_group: subgroup,
         granted_by: subgroup,
-        subgroup: group_b,
+        subgroup: child_group_b,
       )
     end
 
@@ -42,13 +42,13 @@ RSpec.describe GrantParentAccessToChildrenOfSubgroup, type: :service do
       end
 
       it 'retains relationships between subgroup and child groups' do
-        expect(subgroup.subgroups).to include(group_a)
-        expect(subgroup.subgroups).to include(group_b)
+        expect(subgroup.subgroups).to include(child_group_a)
+        expect(subgroup.subgroups).to include(child_group_b)
       end
 
       it 'creates a relationship between the parent group and children of the subgroup' do
-        expect(parent_group.subgroups).to include(group_a)
-        expect(parent_group.subgroups).to include(group_b)
+        expect(parent_group.subgroups).to include(child_group_a)
+        expect(parent_group.subgroups).to include(child_group_b)
       end
     end
 

@@ -2,7 +2,7 @@ class GrantParentAccessToChildrenOfSubgroup
   include Interactor::Organizer
   include Interactor::Schema
 
-  schema :subgroup, :parent_group, :adopted_children
+  schema :subgroup, :parent_group
   delegate :parent_group, :subgroup, to: :context
 
   def call
@@ -15,8 +15,8 @@ class GrantParentAccessToChildrenOfSubgroup
     # We want to no-op here instead of context.fail!
     return if subgroup.subgroups.empty?
 
-    subgroup.subgroups.map do |child_group|
-      GroupHierarchy.create!(
+    subgroup.subgroups.each do |child_group|
+      GroupHierarchy.create(
         parent_group: parent_group,
         granted_by: subgroup,
         subgroup: child_group,
