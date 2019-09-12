@@ -81,6 +81,10 @@ Style/PercentLiteralDelimiters:
     '%w': '[]'
     '%W': '[]'
 
+Style/AsciiComments:
+  AllowedChars:
+    - '∆'
+
 Style/AndOr:
   # `and` and `or` banned only in conditionals (conditionals), or completely (always).
   EnforcedStyle: 'always'
