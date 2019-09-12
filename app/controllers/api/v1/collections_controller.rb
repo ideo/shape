@@ -102,6 +102,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def restore_permissions
     Roles::MergeToChild.call(parent: @collection.parent, child: @collection)
+    @collection.unmark_as_private!
     render_collection
     # no error case needed... ?
   end

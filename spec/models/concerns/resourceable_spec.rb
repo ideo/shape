@@ -303,6 +303,61 @@ describe Resourceable, type: :concern do
     end
   end
 
+  describe '#reanchor!' do
+    let(:collection) { create(:collection, add_editors: [user]) }
+    let(:subcollection) { create(:collection, num_cards: 1, parent_collection: collection) }
+    let(:item) { subcollection.items.first }
+    before do
+      # subcollection has no roles
+      subcollection.unanchor!
+      item.update(roles_anchor_collection: subcollection)
+    end
+
+    it 'should update the roles anchor back to the parent for itself' do
+      expect(subcollection.can_view?(user)).to be false
+      expect(subcollection.roles_anchor).to eq subcollection
+      subcollection.reanchor!
+      expect(subcollection.can_view?(user)).to be true
+      expect(subcollection.roles_anchor).to eq collection
+    end
+
+    it 'should remove the private setting' do
+      subcollection.update(cached_inheritance: { private: true })
+      subcollection.reanchor!
+      expect(subcollection.cached_inheritance['private']).to be false
+    end
+
+    it 'should update the roles anchor for children if propagate: true' do
+      expect(item.can_view?(user)).to be false
+      expect(item.roles_anchor).to eq subcollection
+      subcollection.reanchor!(propagate: true)
+      item.reload
+      expect(item.can_view?(user)).to be true
+      expect(item.roles_anchor).to eq collection
+    end
+  end
+
+  describe '#reanchor_if_incorrect_anchor!' do
+    let(:grandparent) { create(:collection, add_viewers: [user]) }
+    let(:parent) { create(:collection, parent_collection: grandparent, add_editors: [user]) }
+    let(:collection) { create(:collection, parent_collection: parent) }
+    before do
+      # collection should never be anchored to the grandparent if parent is unanchored
+      collection.update(roles_anchor_collection: grandparent)
+    end
+
+    it 'should fix any incorrect anchor assignments' do
+      # before
+      expect(collection.can_edit?(user)).to be false
+      inheritance = Roles::Inheritance.new(parent)
+      expect(inheritance.inherit_from_parent?(collection)).to be false
+      # after
+      collection.reanchor_if_incorrect_anchor!
+      expect(collection.can_edit?(user)).to be true
+      expect(collection.roles_anchor).to eq parent
+    end
+  end
+
   describe '#includes_all_roles?' do
     let!(:users) { create_list(:user, 3) }
     let!(:groups) { create_list(:group, 3) }
