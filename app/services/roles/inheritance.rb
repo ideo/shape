@@ -38,7 +38,7 @@ module Roles
       end
 
       # otherwise we only compute cached_inheritance if not already set.
-      # if private was previously set to true, we don't override that here
+      # e.g. will preserve having intentionally marked/unmarked as private
       if cached.blank?
         value = !inherit_from_parent?(child)
         child.mark_as_private!(value)
