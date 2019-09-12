@@ -48,7 +48,8 @@ class CollectionUpdater < SimpleService
   end
 
   def clean_collection_card_attributes
-    return unless @attributes[:collection_cards_attributes].present?
+    return unless @attributes[:collection_cards_attributes].present? &&
+                  @attributes[:collection_cards_attributes].is_a?(Array)
 
     # remove any card_ids that are not valid from our attrs array
     card_ids = @attributes[:collection_cards_attributes].map { |c| c[:id] }

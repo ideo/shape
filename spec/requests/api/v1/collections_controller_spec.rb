@@ -509,12 +509,12 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         json_api_params(
           'collections',
           raw_params.merge(
-            collection_cards_attributes: {
+            collection_cards_attributes: [{
               id: collection_card.id,
               width: 3,
               row: 4,
               col: 5,
-            },
+            }],
           ),
         )
       end
