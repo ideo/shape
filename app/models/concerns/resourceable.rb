@@ -257,9 +257,8 @@ module Resourceable
     anchor_id = parent&.roles_anchor&.id
     return unless anchor_id
 
-    update_columns(roles_anchor_collection_id: anchor_id, updated_at: Time.current)
-    # now that its reanchored, cache private = false
     unmark_as_private!
+    update_columns(roles_anchor_collection_id: anchor_id, updated_at: Time.current)
     roles.destroy_all
     return unless propagate && is_a?(Collection)
 
@@ -273,13 +272,14 @@ module Resourceable
 
   def mark_as_private!(value = true)
     # slightly convoluted way of writing a jsonb_set update on self (#update won't work here)
+    settings = { 'private': value, 'updated_at': Time.current }
     self.class.where(id: id).update_all(%(
       cached_attributes = jsonb_set(
-        cached_attributes, '{cached_inheritance}', '{"private": #{value}, "updated_at": "#{Time.current}"}'::jsonb
+        cached_attributes, '{cached_inheritance}', '#{settings.to_json}'::jsonb
       )
     ))
-    touch
-    reload
+    # make sure to set this in memory as well (saves having to do a `reload`)
+    self.cached_inheritance = settings.as_json
   end
 
   def unmark_as_private!
@@ -293,7 +293,6 @@ module Resourceable
     return false unless roles_anchor_collection_id.present? &&
                         parent.roles_anchor_collection_id.nil? &&
                         roles_anchor_collection_id != parent.id
-
 
     reanchor!(parent: parent, propagate: true)
     true
