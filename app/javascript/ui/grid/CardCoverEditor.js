@@ -148,7 +148,7 @@ class CardCoverEditor extends React.Component {
       if (
         record.name === this.cardTitle &&
         record.subtitle === this.hardcodedSubtitle &&
-        record.cover.subtitle_hidden === this.subtitleHidden
+        record.subtitleHidden === this.subtitleHidden
       ) {
         return
       }
@@ -288,10 +288,10 @@ class CardCoverEditor extends React.Component {
     const { card, uiStore } = this.props
     const { id } = card
     const { record } = card
-    const { name, cover } = record
+    const { name } = record
     this.cardTitle = name || record.url
     this.hardcodedSubtitle = record.subtitle
-    this.subtitleHidden = cover.subtitle_hidden
+    this.subtitleHidden = record.subtitleHidden
     ev.preventDefault()
     this.populateAllOptions()
     uiStore.setEditingCardCover(id)
