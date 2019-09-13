@@ -3,4 +3,8 @@ class RemoveGroupFromGroup
   include Interactor::Schema
 
   schema :subgroup, :parent_group
+
+  organize(
+    RevokeMembershipToGroup,
+  )
 end

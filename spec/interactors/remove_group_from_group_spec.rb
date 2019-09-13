@@ -5,9 +5,7 @@ RSpec.describe RemoveGroupFromGroup, type: :service do
   describe '#organized' do
     it 'organizes all of the related interactors ' do
       expect(RemoveGroupFromGroup.organized).to eq([
-        # GrantParentAccessToSubgroup,
-        # GrantParentAccessToChildrenOfSubgroup,
-        # GrantGrandparentsAccessToSubgroup,
+        RevokeMembershipToGroup,
       ])
     end
   end
@@ -17,10 +15,16 @@ RSpec.describe RemoveGroupFromGroup, type: :service do
     let(:parent_group) { create(:group) }
     let(:interactor) { RemoveGroupFromGroup.call(subgroup: subgroup, parent_group: parent_group) }
 
+    before do
+      GroupHierarchy.create(
+        parent_group: parent_group,
+        granted_by: parent_group,
+        subgroup: subgroup
+      )
+    end
+
     it 'calls the organized interactors' do
-      expect(GrantParentAccessToSubgroup).to receive(:call!).and_return(:success)
-      expect(GrantParentAccessToChildrenOfSubgroup).to receive(:call!).and_return(:success)
-      expect(GrantGrandparentsAccessToSubgroup).to receive(:call!).and_return(:success)
+      expect(RevokeMembershipToGroup).to receive(:call!).and_return(:success)
       interactor
     end
 
