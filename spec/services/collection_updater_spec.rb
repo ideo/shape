@@ -64,7 +64,8 @@ RSpec.describe CollectionUpdater, type: :service do
         {
           name: 'My new name',
           collection_cards_attributes: [
-            { id: first_card.id, order: 3, width: 3 },
+            # send id as string to mimic front-end
+            { id: first_card.id.to_s, order: 3, width: 3 },
             { id: '991919', order: 1, width: 1 },
           ],
         }

@@ -401,10 +401,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get isSubTemplate() {
     // a subtemplate is a collection or a template within a template or an instance of it
-    return (
-      (this.master_template && this.child_of_a_master_template) ||
-      this.is_template_a_child_of_a_master_template
-    )
+    return this.is_subtemplate_or_instance
   }
 
   get isUserProfile() {

@@ -115,14 +115,13 @@ class PageHeader extends React.Component {
 
   get collectionIcon() {
     const { record } = this.props
-    if (record.isSubTemplate) return null
     if (record.isProfileTemplate) {
       return (
         <IconHolder align="left">
           <FilledProfileIcon />
         </IconHolder>
       )
-    } else if (record.isMasterTemplate) {
+    } else if (record.isMasterTemplate && !record.isSubTemplate) {
       return (
         <IconHolder align="left">
           <TemplateIcon circled filled />

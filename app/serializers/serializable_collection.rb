@@ -159,12 +159,8 @@ class SerializableCollection < BaseJsonSerializer
       @inside_a_submission
   end
 
-  attribute :child_of_a_master_template do
-    @object.child_of_a_master_template?
-  end
-
-  attribute :is_template_a_child_of_a_master_template do
-    @object.template_a_child_of_a_master_template?
+  attribute :is_subtemplate_or_instance do
+    @object.subtemplate? || @object.subtemplate_instance?
   end
 
   attribute :show_language_selector do
