@@ -6,6 +6,26 @@ Then('I should see a collection card named {string}', name => {
     .should('be.visible')
 })
 
+Then(
+  'I should see a collection card named {string} with a subtitle {string}',
+  (name, subtitle) => {
+    cy.locateWith('CollectionCover', name)
+      .last()
+      .should('be.visible')
+    cy.locateWith('CollectionCover', subtitle)
+      .last()
+      .should('be.visible')
+  }
+)
+
+Then('I should not see a collection card with subtitle {string}', subtitle => {
+  cy.get(`[class="bottom"]`)
+    .children()
+    .last()
+    .invoke('text')
+    .should('not.eq', subtitle)
+})
+
 Then('I should see {string} in a {string}', (text, el) => {
   cy.locateDataOrClassWith(el, text).should('be.visible')
 })
