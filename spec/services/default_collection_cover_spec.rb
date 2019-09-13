@@ -25,6 +25,22 @@ RSpec.describe DefaultCollectionCover, type: :service do
         collection_cover
       end
 
+      context 'with hardcoded settings that were previously set' do
+        before do
+          collection.update(
+            cached_cover: {
+              hardcoded_subtitle: 'My description.',
+              subtitle_hidden: true,
+            },
+          )
+        end
+
+        it 'preserves hardcoded settings when calculating the cover' do
+          expect(collection_cover['hardcoded_subtitle']).to eq 'My description.'
+          expect(collection_cover['subtitle_hidden']).to be true
+        end
+      end
+
       context 'after archiving the cover item' do
         before do
           # for this test we want to check how the cached_cover gets set/updated
