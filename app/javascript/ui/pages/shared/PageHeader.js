@@ -121,7 +121,7 @@ class PageHeader extends React.Component {
           <FilledProfileIcon />
         </IconHolder>
       )
-    } else if (record.isMasterTemplate) {
+    } else if (record.isMasterTemplate && !record.isSubTemplate) {
       return (
         <IconHolder align="left">
           <TemplateIcon circled filled />
@@ -176,7 +176,7 @@ class PageHeader extends React.Component {
       icon = <ProfileIcon />
     } else if (record.isProfileCollection) {
       icon = <SystemIcon />
-    } else if (record.isTemplated) {
+    } else if (record.isTemplated && !record.isSubTemplate) {
       icon = <TemplateIcon circled />
     } else if (record.isSubmissionBox) {
       icon = <SubmissionBoxIconLg />

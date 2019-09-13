@@ -52,10 +52,11 @@ class CollectionUpdater < SimpleService
                   @attributes[:collection_cards_attributes].is_a?(Array)
 
     # remove any card_ids that are not valid from our attrs array
+    # e.g. if they have been archived they will not show up in @collection.collection_cards
     card_ids = @attributes[:collection_cards_attributes].map { |c| c[:id] }
     found_ids = @collection.collection_cards.where(id: card_ids).pluck(:id)
     @attributes[:collection_cards_attributes].select! do |card_attr|
-      found_ids.include?(card_attr[:id])
+      found_ids.include?(card_attr[:id].to_i)
     end
   end
 

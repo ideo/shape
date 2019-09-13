@@ -105,7 +105,6 @@ describe('CollectionCover', () => {
 
   describe('with template', () => {
     beforeEach(() => {
-      props.collection.isMasterTemplate = true
       props.collection.isUsableTemplate = true
       wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
       component = wrapper.instance()
@@ -117,6 +116,18 @@ describe('CollectionCover', () => {
 
     it('reduces the number of lines for the description', () => {
       expect(component.numberOfLinesForDescription).toEqual(2)
+    })
+  })
+
+  describe('with unusable template (e.g. child of a master template)', () => {
+    beforeEach(() => {
+      props.collection.isUsableTemplate = false
+      wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
+      component = wrapper.instance()
+    })
+
+    it('does not show use template button', () => {
+      expect(wrapper.find('CardButtonWrapper').exists()).toBeFalsy()
     })
   })
 })

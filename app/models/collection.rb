@@ -767,9 +767,19 @@ class Collection < ApplicationRecord
   end
 
   def inside_a_master_template?
-    return true if master_template?
+    master_template? || child_of_a_master_template?
+  end
 
+  def child_of_a_master_template?
     parents.where(master_template: true).any?
+  end
+
+  def subtemplate?
+    master_template? && child_of_a_master_template?
+  end
+
+  def subtemplate_instance?
+    templated? && template.subtemplate?
   end
 
   def inside_a_template_instance?

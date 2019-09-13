@@ -6,7 +6,8 @@
     "cypress-ci": "./node_modules/.bin/cypress run",
     "lint": "./node_modules/.bin/eslint",
     "styleguide": "yarn styleguidist server",
-    "test": "jest --watch"
+    "test": "jest --watch",
+    "test:debug": "node --inspect node_modules/.bin/jest --runInBand --watch"
   },
   "engines": {
     "node": "^8.15.0",

@@ -159,6 +159,10 @@ class SerializableCollection < BaseJsonSerializer
       @inside_a_submission
   end
 
+  attribute :is_subtemplate_or_instance do
+    @object.subtemplate? || @object.subtemplate_instance?
+  end
+
   attribute :show_language_selector do
     @object.inside_an_application_collection?
   end
@@ -169,6 +173,10 @@ class SerializableCollection < BaseJsonSerializer
     else
       0
     end
+  end
+
+  attribute :show_language_selector do
+    @object.inside_an_application_collection?
   end
 
   attribute :launchable, if: -> { @object.test_collection? } do
