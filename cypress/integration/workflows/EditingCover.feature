@@ -7,7 +7,7 @@ Feature: Group membership
     And I type "Subtitle" in the subtitle textarea
     And I click the 'EditCoverCloseBtn'
     And I wait for "@apiUpdateCollection" to finish
-    Then I should see a collection card named "Title" with a subtitle "Subtitle"
+    Then I should see a collection card title "Title" with a subtitle "Subtitle"
 
     When I click the "CardAction-edit cover"
     And I should see a 'EditCoverOptions'

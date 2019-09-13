@@ -7,14 +7,16 @@ Then('I should see a collection card named {string}', name => {
 })
 
 Then(
-  'I should see a collection card named {string} with a subtitle {string}',
-  (name, subtitle) => {
-    cy.locateWith('CollectionCover', name)
-      .last()
-      .should('be.visible')
-    cy.locateWith('CollectionCover', subtitle)
-      .last()
-      .should('be.visible')
+  'I should see a collection card title {string} with a subtitle {string}',
+  (title, subtitle) => {
+    cy.locateDataOrClass('CollectionCover').within(cover => {
+      cy.contains(title)
+        .last()
+        .should('be.visible')
+      cy.contains(subtitle)
+        .last()
+        .should('be.visible')
+    })
   }
 )
 
