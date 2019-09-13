@@ -142,7 +142,7 @@ class CardCoverEditor extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps.isEditingCardCover !== this.props.isEditingCardCover) {
-      const { card } = this.props
+      const { card, handleAfterEdit } = this.props
       const { record } = card
 
       if (
@@ -159,6 +159,8 @@ class CardCoverEditor extends React.Component {
         hardcodedSubtitle: this.hardcodedSubtitle,
         subtitleHidden: this.subtitleHidden,
       })
+
+      handleAfterEdit(this.hardcodedSubtitle)
     }
   }
 
@@ -480,6 +482,7 @@ class CardCoverEditor extends React.Component {
 
 CardCoverEditor.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
+  handleAfterEdit: PropTypes.func.isRequired,
   isEditingCardCover: PropTypes.bool.isRequired,
 }
 

@@ -984,7 +984,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (cover.subtitle_hidden) {
       return ''
     }
-    return cover.hardcoded_subtitle || cover.text
+    return cover.hardcoded_subtitle || cover.text || ''
   }
 
   // NOTE: this is only used as a Cypress test method, to simulate card resizing

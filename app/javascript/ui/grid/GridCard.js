@@ -42,6 +42,13 @@ import {
 class GridCard extends React.Component {
   @observable
   menuItemCount = 1
+
+  constructor(props) {
+    super(props)
+    this.state = {}
+    this.cardCoverEditorCallback = this.cardCoverEditorCallback.bind(this)
+  }
+
   get canEditCard() {
     const {
       isSharedCollection,
@@ -164,6 +171,11 @@ class GridCard extends React.Component {
     return null
   }
 
+  cardCoverEditorCallback() {
+    // rerender the component after card cover has been edited
+    this.setState(this.state)
+  }
+
   renderPin() {
     const { card } = this.props
     const hoverClass = card.isPinnedAndLocked ? 'show-on-hover' : ''
@@ -203,6 +215,7 @@ class GridCard extends React.Component {
         {record.canSetACover && this.canEditCard && (
           <CardCoverEditor
             card={card}
+            handleAfterEdit={this.cardCoverEditorCallback}
             parentRef={this.gridCardRef}
             isEditingCardCover={this.isEditingCardCover}
           />
@@ -441,8 +454,9 @@ class GridCard extends React.Component {
       handleClick,
       isBoardCollection,
       testCollectionCard,
+      record,
+      cardType,
     } = this.props
-    let { record, cardType } = this.props
 
     let nestedTextItem = null
     if (this.coverItem && record.cover_type === 'cover_type_text_and_media') {
