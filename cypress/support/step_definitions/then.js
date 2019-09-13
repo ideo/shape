@@ -21,7 +21,8 @@ Then(
 )
 
 Then('I should not see a collection card with subtitle {string}', subtitle => {
-  cy.get(`[class="bottom"]`)
+  cy.locateDataOrClass('CollectionCover')
+    .find('.bottom')
     .children()
     .last()
     .invoke('text')
