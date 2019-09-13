@@ -65,7 +65,7 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   attribute :cover do
-    @object.cached_cover || {}
+    @object.cached_cover || DefaultCollectionCover.defaults
   end
 
   attribute :test_scores do

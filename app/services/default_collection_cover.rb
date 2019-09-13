@@ -14,6 +14,15 @@ class DefaultCollectionCover < SimpleService
     new(collection).cover_text(text_item)
   end
 
+  # used by SerializableCollection, to make these keys observable on the frontend
+  def self.defaults
+    {
+      text: '',
+      hardcoded_subtitle: '',
+      subtitle_hidden: false,
+    }
+  end
+
   def call
     # If this collection has items set as its cover,
     # they are included as data in the collection serializer

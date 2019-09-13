@@ -101,6 +101,7 @@ class RoutingStore extends RouterStore {
     uiStore.update('organizationMenuPage', null)
     uiStore.update('rolesMenuOpen', null)
     uiStore.setViewingRecord(null)
+    uiStore.setEditingCardCover(null)
     uiStore.closeDialog()
   }
 

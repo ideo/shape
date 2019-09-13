@@ -128,12 +128,12 @@ class CardCoverEditor extends React.Component {
   componentDidMount() {
     const { card, uiStore } = this.props
     const { record } = card
-    // TODO don't like how id name is in two separate places
+    this.setObservableInputs()
     runInAction(() => {
+      // this references the id in GridCard.js
       this.parentCard = document.getElementById(`gridCard-${card.id}`)
-
       if (uiStore.isNewCard(record.id) && record.isLink) {
-        this.populateAllOptions()
+        this.populateAllImageOptions()
         uiStore.setEditingCardCover(card.id)
         this.props.uiStore.removeNewCard(record.id)
       }
@@ -195,7 +195,7 @@ class CardCoverEditor extends React.Component {
     )
   }
 
-  async populateAllOptions() {
+  async populateAllImageOptions() {
     const { record } = this.props.card
     this.setLoading(true)
     const imageOptionsAll = await this.fetchOptions()
@@ -287,19 +287,23 @@ class CardCoverEditor extends React.Component {
   handleClick = ev => {
     const { card, uiStore } = this.props
     const { id } = card
-    const { record } = card
-    const { name } = record
-    this.cardTitle = name || record.url
-    this.hardcodedSubtitle = record.subtitle
-    this.subtitleHidden = record.subtitleHidden
     ev.preventDefault()
-    this.populateAllOptions()
+    this.setObservableInputs()
+    this.populateAllImageOptions()
     uiStore.setEditingCardCover(id)
   }
 
   handleClose = ev => {
     const { uiStore } = this.props
     uiStore.setEditingCardCover(null)
+  }
+
+  setObservableInputs = () => {
+    const { record } = this.props.card
+    const { name } = record
+    this.cardTitle = name || record.url
+    this.hardcodedSubtitle = record.subtitle
+    this.subtitleHidden = record.subtitleHidden
   }
 
   async clearCover() {
@@ -472,6 +476,7 @@ class CardCoverEditor extends React.Component {
           <EditPencilIconLarge />
         </CardActionHolder>
         {isEditingCardCover &&
+          this.parentCard &&
           ReactDOM.createPortal(this.renderInner(), this.parentCard)}
       </Fragment>
     )
