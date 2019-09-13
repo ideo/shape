@@ -6,5 +6,6 @@ class RemoveGroupFromGroup
 
   organize(
     RevokeMembershipToGroup,
+    RemoveChildrenOfSubgroup,
   )
 end
