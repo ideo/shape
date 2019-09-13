@@ -4,11 +4,20 @@
   * Docs to Markdown version 1.0β17
   * Wed Sep 11 2019 12:55:31 GMT-0700 (PDT)
   * Source doc: https://docs.google.com/a/ideo.com/open?id=1UIHVUhAxYd0LYClztcEMxml5zQFNKKj-ma4NsSaJ7Yo
+
+  ************************************
+  ************************************
+  DEV NOTES for importing a new version of the doc:
+  1. Use the above plugin to get the document converted to Markdown
+  2. Ensure all headers are standard format, e.g. ## 2. Accounts and Registration
+  3. Ensure all back to top links are: [**Back to top**](#top)
+  4. Remove "IDEO PRODUCTS TERMS OF USE" at the top (it gets rendered in TermsPage)
+  5. Remove Table of Contents (it gets rendered in TermsPage)
+  6. If TOC has changed in the document, need to update TermsPage accordingly
+  ************************************
 */
 
 export const termsIntroMarkdown = `
-
-## IDEO PRODUCTS TERMS OF USE
 
 IDEO LP and/or any of its related, affiliated or subsidiary companies (“**IDEO**”) owns and/or operates the internet sites located at creativedifference.com and Shape.space along with the related websites, platforms, networks, applications, and other services provided by IDEO (collectively the “**Sites**”). By accessing, browsing the Sites, registering for an account on the Sites, or taking the Creative Difference assessment (“**Assessment**”), you (“**you**” or the “**User**”) agree to these Terms of Use (“**TOU**”), incorporating the IDEO Privacy & Cookie Policy (“**Privacy Policy**”). For clarity, the Sites include the Shape Platform, the Assessment and Dashboard (all defined below).
 
@@ -140,7 +149,7 @@ If you are the Team Leader and you have signed up for Creative Difference, You m
 
 While we will be sad to see you go, you may cancel auto-renewal on your access at any time during the Ongoing Access Period by contacting us at [productsupport@ideo.com](mailto:productsupport@ideo.com)  in which case your dashboard access will continue until the end of that month before terminating. For clarity, if you cancel, you still may be charged for the current billing period.
 
-If you are not a Team Leader and wish to have any information or Contribution removed from the Site, please refer to our [Privacy & Cookie Policy](https://challenges.openideo.com/content/openideo-privacy-cookie-policy).
+If you are not a Team Leader and wish to have any information or Contribution removed from the Site, please refer to our [Privacy & Cookie Policy](https://www.ideo.com/privacy).
 
 Upon any termination, discontinuation or cancellation of the Sites or your account, all provisions of this TOU which by their nature should survive will survive, including, without limitation, ownership provisions, warranty disclaimers, limitations of liability, and dispute resolution provisions.
 
@@ -165,7 +174,7 @@ Children (persons under the age of 13) are not eligible to use the Sites in any 
 
 ## 7. User Content
 
-Certain features of the Sites permit you and/or members of your team to submit content (“**Contribution(s)**”) to the Sites.  Contributions, including any personally identifiable information, are voluntary and subject to the [Privacy & Cookie Policy](https://challenges.openideo.com/content/openideo-privacy-cookie-policy). Contributions include, but are not limited to, all copyrighted content created, or owned, by a User of Shape and used within an Org including but not limited to postings and communication from and between Users of the Shape Platform within an Org.
+Certain features of the Sites permit you and/or members of your team to submit content (“**Contribution(s)**”) to the Sites.  Contributions, including any personally identifiable information, are voluntary and subject to the [Privacy & Cookie Policy](https://www.ideo.com/privacy). Contributions include, but are not limited to, all copyrighted content created, or owned, by a User of Shape and used within an Org including but not limited to postings and communication from and between Users of the Shape Platform within an Org.
 
 You retain ownership to your Contributions. Unless prohibited by applicable privacy laws, You grant to IDEO an unrestricted, perpetual, irrevocable, sub-licensable, non-exclusive fully-paid up and royalty-free worldwide license to display, copy, modify, create derivative work, publicly perform or otherwise use or exploit any Contributions or other materials you or team’s Users submit on the Sites in order to provide and facilitate your use of the Assessment, Shape, and related services to you and to update, improve, and maintain the Sites.
 
@@ -173,7 +182,7 @@ You represent and warrant that you have all legal right and authority to grant I
 
 IDEO retains the right to review, edit or delete from the Sites any Contribution that IDEO, in its sole discretion considers illegal, offensive or otherwise inappropriate.
 
-For Creative Difference, if you are a Team Leader with access to and control of your team members, in inviting such team members to use the Sites to complete an Assessment you must ensure that you have complied with applicable privacy laws in giving IDEO access to their personal data including their Contributions as set out in the [Privacy & Cookie Policy](https://challenges.openideo.com/content/openideo-privacy-cookie-policy) which may include obtaining their consent to the same.
+For Creative Difference, if you are a Team Leader with access to and control of your team members, in inviting such team members to use the Sites to complete an Assessment you must ensure that you have complied with applicable privacy laws in giving IDEO access to their personal data including their Contributions as set out in the [Privacy & Cookie Policy](https://www.ideo.com/privacy) which may include obtaining their consent to the same.
 
 NOTWITHSTANDING THE FOREGOING, IF YOU HAVE ENTERED INTO A SEPARATE SERVICES AGREEMENT WITH IDEO, THE OWNERSHIP PROVISIONS IN THAT AGREEMENT SHALL TAKE PRECEDENCE OVER THIS SECTION 7.
 

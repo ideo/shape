@@ -35,7 +35,7 @@ describe('MainMenuDropdown', () => {
       'Settings',
       'Contact Support',
       'Billing',
-      'IDEO Products Terms',
+      'Terms of Use',
       'Privacy Policy',
     ]
     props.uiStore.alert.mockClear()

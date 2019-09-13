@@ -26,6 +26,13 @@ StyledMarkdown.displayName = 'StyledMarkdown'
 
 const TableOfContents = styled.ol`
   margin-bottom: 1em;
+  li {
+    margin-bottom: 0.33rem;
+  }
+  button {
+    color: #06c;
+    text-decoration: underline;
+  }
 `
 
 const StyledTitle = styled(DisplayText)`
@@ -120,7 +127,9 @@ class TermsPage extends React.PureComponent {
           renderers={{ heading: HeadingRenderer }}
         />
         <TableOfContents>
-          <p>Table of Contents</p>
+          <p>
+            <strong>Table of Contents</strong>
+          </p>
           {this.tableOfContents}
         </TableOfContents>
         <StyledMarkdown
@@ -152,7 +161,7 @@ class TermsPage extends React.PureComponent {
         <PageContainer>
           <Heading1>Terms and Privacy</Heading1>
           {loggedIn && <OverdueBanner />}
-          <StyledTitle>Shape Terms of Use</StyledTitle>
+          <StyledTitle>IDEO Products Terms of Use</StyledTitle>
           <StyledLink href="https://www.ideo.com/privacy" target="_blank">
             Privacy Policy
           </StyledLink>
