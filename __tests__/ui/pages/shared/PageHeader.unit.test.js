@@ -10,7 +10,6 @@ describe('PageHeader', () => {
     const uiStore = fakeUiStore
     const routingStore = fakeRoutingStore
     fakeCollection.isNormalCollection = true
-    fakeCollection.breadcrumb = [{ id: 12 }]
     props = {
       record: { ...fakeCollection },
       isHomepage: false,
@@ -87,8 +86,8 @@ describe('PageHeader', () => {
       component.updateRecordName('hello')
     })
 
-    it('should call API_updateName on the record', () => {
-      expect(props.record.API_updateName).toHaveBeenCalled()
+    it('should call API_updateNameAndCover on the record', () => {
+      expect(props.record.API_updateNameAndCover).toHaveBeenCalled()
     })
   })
 
@@ -114,11 +113,28 @@ describe('PageHeader', () => {
     it('should show the Use Template button', () => {
       expect(
         wrapper
-          .find('HeaderFormButton')
+          .find('FormButton')
           .children()
           .first()
           .text()
       ).toEqual('Use Template')
+    })
+  })
+
+  describe('with template whose a child of a master template', () => {
+    beforeEach(() => {
+      props.record = fakeCollection
+      props.record.isSubTemplate = true
+      props.record.isUsableTemplate = false
+      wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
+    })
+
+    it('should not show the template icon', () => {
+      expect(wrapper.find('TemplateIcon').exists()).toBeFalsy()
+    })
+
+    it('should not show the Use Template button', () => {
+      expect(wrapper.find('FormButton').length).toBe(0)
     })
   })
 
@@ -154,7 +170,7 @@ describe('PageHeader', () => {
     it('should render the restore button', () => {
       expect(
         wrapper
-          .find('HeaderFormButton')
+          .find('FormButton')
           .children()
           .first()
           .text()

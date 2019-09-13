@@ -7,9 +7,11 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
     let!(:users_to_add) { [user] }
     let(:groups_to_add) { create_list(:group, 1) }
     let!(:collection_to_link) { create(:collection, organization: organization) }
+    let(:item_to_link) { nil }
     let(:existing_link) { nil }
 
     before do
+      allow(CollectionCard::Link).to receive(:create).and_call_original
       # TODO: why is this needed?
       if existing_link
         user.current_shared_collection.link_collection_cards.push(existing_link)
@@ -17,8 +19,8 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
       LinkToSharedCollectionsWorker.new.perform(
         users_to_add.map(&:id),
         groups_to_add.map(&:id),
-        [collection_to_link.id],
-        [],
+        [collection_to_link&.id].compact,
+        [item_to_link&.id].compact,
       )
     end
 
@@ -84,6 +86,23 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
       it 'should add the link at the first position' do
         link = user.current_shared_collection.collection_cards.first
         expect(link.collection_id).to eq application_collection.id
+      end
+    end
+
+    context 'when the link is an item' do
+      let!(:collection_to_link) { nil }
+      let!(:parent_collection) { create(:collection, organization: organization) }
+      let!(:item_to_link) { create(:text_item, parent_collection: parent_collection) }
+
+      it 'calls CollectionCard::Link with item id' do
+        expect(CollectionCard::Link).to have_received(:create).with(
+          parent: anything,
+          item_id: item_to_link.id,
+          collection_id: nil,
+          width: 1,
+          height: 1,
+          order: instance_of(Integer),
+        ).exactly(3).times
       end
     end
 

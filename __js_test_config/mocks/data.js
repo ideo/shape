@@ -61,6 +61,7 @@ export const fakeAreaChartDataset = {
   timeframe: 'month',
   chart_type: 'area',
   order: 0,
+  tiers: [],
   data: [
     { date: '2018-07-10', value: 10 },
     { date: '2018-08-10', value: 25 },
@@ -78,6 +79,7 @@ export const fakeBarChartDataset = {
   order: 0,
   total: 10,
   max_domain: 95,
+  tiers: [],
   data: [
     { column: 1, value: 5, percentage: 50, type: 'question_context' },
     { column: 2, value: 0, percentage: 0, type: 'question_context' },
@@ -119,6 +121,12 @@ export const creativeDifferenceQualityDataset = {
     fill: '#EFEFEF',
     dashWidth: 2,
   },
+  max_domain: 60,
+  tiers: [
+    { value: 0, name: 'Novice' },
+    { value: 20, name: 'Learning' },
+    { value: 40, name: 'Expert' },
+  ],
   data: [
     { date: '2018-07-10', value: 10 },
     { date: '2018-08-10', value: 25 },
@@ -139,6 +147,7 @@ export const fakeDatasetAttrs = {
   test_collection_id: null,
   timeframe: 'ever',
   total: 1,
+  tiers: []
 }
 
 export const fakeDataset = {
@@ -369,6 +378,8 @@ export const fakeCollection = {
     image_url: 'http://fake.url.net',
     text: 'Lorem ipsum blockchain boogie',
     name: 'Proto-typo',
+    hardcoded_subtitle: 'Lorem ipsum hardcoded',
+    subtitle_hidden: false,
   },
   links: {
     self: 'https://www.shape.space/ideo/collections/1',
@@ -382,7 +393,7 @@ export const fakeCollection = {
   cardIdsWithinRectangle: jest.fn().mockReturnValue([]),
   API_archive: jest.fn(),
   API_updateCard: jest.fn(),
-  API_updateName: jest.fn(),
+  API_updateNameAndCover: jest.fn(),
   API_getNextAvailableTest: jest.fn(),
   API_clearCollectionCover: jest.fn(),
   API_fetchCards: jest.fn().mockReturnValue(Promise.resolve({})),

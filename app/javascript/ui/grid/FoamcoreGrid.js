@@ -13,16 +13,16 @@ import { objectsEqual } from '~/utils/objectUtils'
 
 // When you have attributes that will change a lot,
 // it's a performance gain to use `styled.div.attrs`
-const BlankCard = styled.div.attrs({
-  style: ({ x, y, h, w, zoomLevel, draggedOn }) => ({
+const BlankCard = styled.div.attrs(({ x, y, h, w, zoomLevel, draggedOn }) => ({
+  style: {
     height: `${h}px`,
     left: `${x}px`,
     top: `${y}px`,
     transform: `scale(${1 / zoomLevel})`,
     width: `${w}px`,
     cursor: 'pointer',
-  }),
-})`
+  },
+}))`
   background-color: ${props => {
     if (props.blocked) {
       return v.colors.alert
@@ -1186,7 +1186,7 @@ class FoamcoreGrid extends React.Component {
       <Grid
         data-empty-space-click
         onScroll={this.handleScroll}
-        innerRef={ref => {
+        ref={ref => {
           this.gridRef = ref
         }}
         width={gridSize.width}

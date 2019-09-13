@@ -11,7 +11,6 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
   dragging={false}
   draggingMultiple={false}
   id="gridCard-11"
-  innerRef={[Function]}
   onContextMenu={[Function]}
   onMouseLeave={[Function]}
   selected={true}
@@ -49,7 +48,7 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
           "API_selectDatasetsWithIdentifier": [MockFunction],
           "API_unselectDatasetsWithIdentifier": [MockFunction],
           "API_updateCard": [MockFunction],
-          "API_updateName": [MockFunction],
+          "API_updateNameAndCover": [MockFunction],
           "anyone_can_join": false,
           "anyone_can_view": false,
           "assign": [MockFunction],
@@ -473,8 +472,10 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
           ],
           "confirmEdit": [MockFunction],
           "cover": Object {
+            "hardcoded_subtitle": "Lorem ipsum hardcoded",
             "image_url": "http://fake.url.net",
             "name": "Proto-typo",
+            "subtitle_hidden": false,
             "text": "Lorem ipsum blockchain boogie",
           },
           "create": [MockFunction],
@@ -969,7 +970,7 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
             "API_selectDatasetsWithIdentifier": [MockFunction],
             "API_unselectDatasetsWithIdentifier": [MockFunction],
             "API_updateCard": [MockFunction],
-            "API_updateName": [MockFunction],
+            "API_updateNameAndCover": [MockFunction],
             "anyone_can_join": false,
             "anyone_can_view": false,
             "assign": [MockFunction],
@@ -1393,8 +1394,10 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
             ],
             "confirmEdit": [MockFunction],
             "cover": Object {
+              "hardcoded_subtitle": "Lorem ipsum hardcoded",
               "image_url": "http://fake.url.net",
               "name": "Proto-typo",
+              "subtitle_hidden": false,
               "text": "Lorem ipsum blockchain boogie",
             },
             "create": [MockFunction],
@@ -1878,12 +1881,13 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
           "API_selectDatasetsWithIdentifier": [MockFunction],
           "API_unselectDatasetsWithIdentifier": [MockFunction],
           "API_updateCard": [MockFunction],
-          "API_updateName": [MockFunction],
+          "API_updateNameAndCover": [MockFunction],
           "anyone_can_join": false,
           "anyone_can_view": false,
           "assign": [MockFunction],
           "assignRef": [MockFunction],
           "breadcrumb": Array [],
+          "canSetACover": true,
           "can_edit": true,
           "can_edit_content": false,
           "can_view": true,
@@ -2302,8 +2306,10 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
           ],
           "confirmEdit": [MockFunction],
           "cover": Object {
+            "hardcoded_subtitle": "Lorem ipsum hardcoded",
             "image_url": "http://fake.url.net",
             "name": "Proto-typo",
+            "subtitle_hidden": false,
             "text": "Lorem ipsum blockchain boogie",
           },
           "create": [MockFunction],
@@ -2358,7 +2364,7 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
               "API_selectDatasetsWithIdentifier": [MockFunction],
               "API_unselectDatasetsWithIdentifier": [MockFunction],
               "API_updateCard": [MockFunction],
-              "API_updateName": [MockFunction],
+              "API_updateNameAndCover": [MockFunction],
               "anyone_can_join": false,
               "anyone_can_view": false,
               "assign": [MockFunction],
@@ -2782,8 +2788,10 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
               ],
               "confirmEdit": [MockFunction],
               "cover": Object {
+                "hardcoded_subtitle": "Lorem ipsum hardcoded",
                 "image_url": "http://fake.url.net",
                 "name": "Proto-typo",
+                "subtitle_hidden": false,
                 "text": "Lorem ipsum blockchain boogie",
               },
               "create": [MockFunction],
@@ -3666,12 +3674,13 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
         "API_selectDatasetsWithIdentifier": [MockFunction],
         "API_unselectDatasetsWithIdentifier": [MockFunction],
         "API_updateCard": [MockFunction],
-        "API_updateName": [MockFunction],
+        "API_updateNameAndCover": [MockFunction],
         "anyone_can_join": false,
         "anyone_can_view": false,
         "assign": [MockFunction],
         "assignRef": [MockFunction],
         "breadcrumb": Array [],
+        "canSetACover": true,
         "can_edit": true,
         "can_edit_content": false,
         "can_view": true,
@@ -4090,8 +4099,10 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
         ],
         "confirmEdit": [MockFunction],
         "cover": Object {
+          "hardcoded_subtitle": "Lorem ipsum hardcoded",
           "image_url": "http://fake.url.net",
           "name": "Proto-typo",
+          "subtitle_hidden": false,
           "text": "Lorem ipsum blockchain boogie",
         },
         "create": [MockFunction],
@@ -4146,7 +4157,7 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
             "API_selectDatasetsWithIdentifier": [MockFunction],
             "API_unselectDatasetsWithIdentifier": [MockFunction],
             "API_updateCard": [MockFunction],
-            "API_updateName": [MockFunction],
+            "API_updateNameAndCover": [MockFunction],
             "anyone_can_join": false,
             "anyone_can_view": false,
             "assign": [MockFunction],
@@ -4570,8 +4581,10 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
             ],
             "confirmEdit": [MockFunction],
             "cover": Object {
+              "hardcoded_subtitle": "Lorem ipsum hardcoded",
               "image_url": "http://fake.url.net",
               "name": "Proto-typo",
+              "subtitle_hidden": false,
               "text": "Lorem ipsum blockchain boogie",
             },
             "create": [MockFunction],
@@ -5450,7 +5463,6 @@ exports[`GridCard when selected renders snapshot 1`] = `
   dragging={false}
   draggingMultiple={false}
   id="gridCard-11"
-  innerRef={[Function]}
   onContextMenu={[Function]}
   onMouseLeave={[Function]}
   selected={true}
@@ -5488,7 +5500,7 @@ exports[`GridCard when selected renders snapshot 1`] = `
           "API_selectDatasetsWithIdentifier": [MockFunction],
           "API_unselectDatasetsWithIdentifier": [MockFunction],
           "API_updateCard": [MockFunction],
-          "API_updateName": [MockFunction],
+          "API_updateNameAndCover": [MockFunction],
           "anyone_can_join": false,
           "anyone_can_view": false,
           "assign": [MockFunction],
@@ -5912,8 +5924,10 @@ exports[`GridCard when selected renders snapshot 1`] = `
           ],
           "confirmEdit": [MockFunction],
           "cover": Object {
+            "hardcoded_subtitle": "Lorem ipsum hardcoded",
             "image_url": "http://fake.url.net",
             "name": "Proto-typo",
+            "subtitle_hidden": false,
             "text": "Lorem ipsum blockchain boogie",
           },
           "create": [MockFunction],
@@ -6408,7 +6422,7 @@ exports[`GridCard when selected renders snapshot 1`] = `
             "API_selectDatasetsWithIdentifier": [MockFunction],
             "API_unselectDatasetsWithIdentifier": [MockFunction],
             "API_updateCard": [MockFunction],
-            "API_updateName": [MockFunction],
+            "API_updateNameAndCover": [MockFunction],
             "anyone_can_join": false,
             "anyone_can_view": false,
             "assign": [MockFunction],
@@ -6832,8 +6846,10 @@ exports[`GridCard when selected renders snapshot 1`] = `
             ],
             "confirmEdit": [MockFunction],
             "cover": Object {
+              "hardcoded_subtitle": "Lorem ipsum hardcoded",
               "image_url": "http://fake.url.net",
               "name": "Proto-typo",
+              "subtitle_hidden": false,
               "text": "Lorem ipsum blockchain boogie",
             },
             "create": [MockFunction],
@@ -7317,12 +7333,13 @@ exports[`GridCard when selected renders snapshot 1`] = `
           "API_selectDatasetsWithIdentifier": [MockFunction],
           "API_unselectDatasetsWithIdentifier": [MockFunction],
           "API_updateCard": [MockFunction],
-          "API_updateName": [MockFunction],
+          "API_updateNameAndCover": [MockFunction],
           "anyone_can_join": false,
           "anyone_can_view": false,
           "assign": [MockFunction],
           "assignRef": [MockFunction],
           "breadcrumb": Array [],
+          "canSetACover": true,
           "can_edit": true,
           "can_edit_content": false,
           "can_view": true,
@@ -7741,8 +7758,10 @@ exports[`GridCard when selected renders snapshot 1`] = `
           ],
           "confirmEdit": [MockFunction],
           "cover": Object {
+            "hardcoded_subtitle": "Lorem ipsum hardcoded",
             "image_url": "http://fake.url.net",
             "name": "Proto-typo",
+            "subtitle_hidden": false,
             "text": "Lorem ipsum blockchain boogie",
           },
           "create": [MockFunction],
@@ -7797,7 +7816,7 @@ exports[`GridCard when selected renders snapshot 1`] = `
               "API_selectDatasetsWithIdentifier": [MockFunction],
               "API_unselectDatasetsWithIdentifier": [MockFunction],
               "API_updateCard": [MockFunction],
-              "API_updateName": [MockFunction],
+              "API_updateNameAndCover": [MockFunction],
               "anyone_can_join": false,
               "anyone_can_view": false,
               "assign": [MockFunction],
@@ -8221,8 +8240,10 @@ exports[`GridCard when selected renders snapshot 1`] = `
               ],
               "confirmEdit": [MockFunction],
               "cover": Object {
+                "hardcoded_subtitle": "Lorem ipsum hardcoded",
                 "image_url": "http://fake.url.net",
                 "name": "Proto-typo",
+                "subtitle_hidden": false,
                 "text": "Lorem ipsum blockchain boogie",
               },
               "create": [MockFunction],
@@ -9105,12 +9126,13 @@ exports[`GridCard when selected renders snapshot 1`] = `
         "API_selectDatasetsWithIdentifier": [MockFunction],
         "API_unselectDatasetsWithIdentifier": [MockFunction],
         "API_updateCard": [MockFunction],
-        "API_updateName": [MockFunction],
+        "API_updateNameAndCover": [MockFunction],
         "anyone_can_join": false,
         "anyone_can_view": false,
         "assign": [MockFunction],
         "assignRef": [MockFunction],
         "breadcrumb": Array [],
+        "canSetACover": true,
         "can_edit": true,
         "can_edit_content": false,
         "can_view": true,
@@ -9529,8 +9551,10 @@ exports[`GridCard when selected renders snapshot 1`] = `
         ],
         "confirmEdit": [MockFunction],
         "cover": Object {
+          "hardcoded_subtitle": "Lorem ipsum hardcoded",
           "image_url": "http://fake.url.net",
           "name": "Proto-typo",
+          "subtitle_hidden": false,
           "text": "Lorem ipsum blockchain boogie",
         },
         "create": [MockFunction],
@@ -9585,7 +9609,7 @@ exports[`GridCard when selected renders snapshot 1`] = `
             "API_selectDatasetsWithIdentifier": [MockFunction],
             "API_unselectDatasetsWithIdentifier": [MockFunction],
             "API_updateCard": [MockFunction],
-            "API_updateName": [MockFunction],
+            "API_updateNameAndCover": [MockFunction],
             "anyone_can_join": false,
             "anyone_can_view": false,
             "assign": [MockFunction],
@@ -10009,8 +10033,10 @@ exports[`GridCard when selected renders snapshot 1`] = `
             ],
             "confirmEdit": [MockFunction],
             "cover": Object {
+              "hardcoded_subtitle": "Lorem ipsum hardcoded",
               "image_url": "http://fake.url.net",
               "name": "Proto-typo",
+              "subtitle_hidden": false,
               "text": "Lorem ipsum blockchain boogie",
             },
             "create": [MockFunction],
@@ -10889,7 +10915,6 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
   dragging={false}
   draggingMultiple={false}
   id="gridCard-11"
-  innerRef={[Function]}
   onContextMenu={[Function]}
   onMouseLeave={[Function]}
   selected={false}
@@ -10926,7 +10951,7 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
           "API_selectDatasetsWithIdentifier": [MockFunction],
           "API_unselectDatasetsWithIdentifier": [MockFunction],
           "API_updateCard": [MockFunction],
-          "API_updateName": [MockFunction],
+          "API_updateNameAndCover": [MockFunction],
           "anyone_can_join": false,
           "anyone_can_view": false,
           "assign": [MockFunction],
@@ -11350,8 +11375,10 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
           ],
           "confirmEdit": [MockFunction],
           "cover": Object {
+            "hardcoded_subtitle": "Lorem ipsum hardcoded",
             "image_url": "http://fake.url.net",
             "name": "Proto-typo",
+            "subtitle_hidden": false,
             "text": "Lorem ipsum blockchain boogie",
           },
           "create": [MockFunction],
@@ -11854,7 +11881,7 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
             "API_selectDatasetsWithIdentifier": [MockFunction],
             "API_unselectDatasetsWithIdentifier": [MockFunction],
             "API_updateCard": [MockFunction],
-            "API_updateName": [MockFunction],
+            "API_updateNameAndCover": [MockFunction],
             "anyone_can_join": false,
             "anyone_can_view": false,
             "assign": [MockFunction],
@@ -12278,8 +12305,10 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
             ],
             "confirmEdit": [MockFunction],
             "cover": Object {
+              "hardcoded_subtitle": "Lorem ipsum hardcoded",
               "image_url": "http://fake.url.net",
               "name": "Proto-typo",
+              "subtitle_hidden": false,
               "text": "Lorem ipsum blockchain boogie",
             },
             "create": [MockFunction],
@@ -12790,7 +12819,7 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
             "API_selectDatasetsWithIdentifier": [MockFunction],
             "API_unselectDatasetsWithIdentifier": [MockFunction],
             "API_updateCard": [MockFunction],
-            "API_updateName": [MockFunction],
+            "API_updateNameAndCover": [MockFunction],
             "anyone_can_join": false,
             "anyone_can_view": false,
             "assign": [MockFunction],
@@ -13214,8 +13243,10 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
             ],
             "confirmEdit": [MockFunction],
             "cover": Object {
+              "hardcoded_subtitle": "Lorem ipsum hardcoded",
               "image_url": "http://fake.url.net",
               "name": "Proto-typo",
+              "subtitle_hidden": false,
               "text": "Lorem ipsum blockchain boogie",
             },
             "create": [MockFunction],
@@ -13699,7 +13730,7 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
           "API_selectDatasetsWithIdentifier": [MockFunction],
           "API_unselectDatasetsWithIdentifier": [MockFunction],
           "API_updateCard": [MockFunction],
-          "API_updateName": [MockFunction],
+          "API_updateNameAndCover": [MockFunction],
           "anyone_can_join": false,
           "anyone_can_view": false,
           "assign": [MockFunction],
@@ -14123,8 +14154,10 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
           ],
           "confirmEdit": [MockFunction],
           "cover": Object {
+            "hardcoded_subtitle": "Lorem ipsum hardcoded",
             "image_url": "http://fake.url.net",
             "name": "Proto-typo",
+            "subtitle_hidden": false,
             "text": "Lorem ipsum blockchain boogie",
           },
           "create": [MockFunction],
@@ -14177,7 +14210,7 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
               "API_selectDatasetsWithIdentifier": [MockFunction],
               "API_unselectDatasetsWithIdentifier": [MockFunction],
               "API_updateCard": [MockFunction],
-              "API_updateName": [MockFunction],
+              "API_updateNameAndCover": [MockFunction],
               "anyone_can_join": false,
               "anyone_can_view": false,
               "assign": [MockFunction],
@@ -14601,8 +14634,10 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
               ],
               "confirmEdit": [MockFunction],
               "cover": Object {
+                "hardcoded_subtitle": "Lorem ipsum hardcoded",
                 "image_url": "http://fake.url.net",
                 "name": "Proto-typo",
+                "subtitle_hidden": false,
                 "text": "Lorem ipsum blockchain boogie",
               },
               "create": [MockFunction],
@@ -15485,7 +15520,7 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
         "API_selectDatasetsWithIdentifier": [MockFunction],
         "API_unselectDatasetsWithIdentifier": [MockFunction],
         "API_updateCard": [MockFunction],
-        "API_updateName": [MockFunction],
+        "API_updateNameAndCover": [MockFunction],
         "anyone_can_join": false,
         "anyone_can_view": false,
         "assign": [MockFunction],
@@ -15909,8 +15944,10 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
         ],
         "confirmEdit": [MockFunction],
         "cover": Object {
+          "hardcoded_subtitle": "Lorem ipsum hardcoded",
           "image_url": "http://fake.url.net",
           "name": "Proto-typo",
+          "subtitle_hidden": false,
           "text": "Lorem ipsum blockchain boogie",
         },
         "create": [MockFunction],
@@ -15963,7 +16000,7 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
             "API_selectDatasetsWithIdentifier": [MockFunction],
             "API_unselectDatasetsWithIdentifier": [MockFunction],
             "API_updateCard": [MockFunction],
-            "API_updateName": [MockFunction],
+            "API_updateNameAndCover": [MockFunction],
             "anyone_can_join": false,
             "anyone_can_view": false,
             "assign": [MockFunction],
@@ -16387,8 +16424,10 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
             ],
             "confirmEdit": [MockFunction],
             "cover": Object {
+              "hardcoded_subtitle": "Lorem ipsum hardcoded",
               "image_url": "http://fake.url.net",
               "name": "Proto-typo",
+              "subtitle_hidden": false,
               "text": "Lorem ipsum blockchain boogie",
             },
             "create": [MockFunction],
@@ -17267,7 +17306,6 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
   dragging={false}
   draggingMultiple={false}
   id="gridCard-11"
-  innerRef={[Function]}
   onContextMenu={[Function]}
   onMouseLeave={[Function]}
   selected={false}
@@ -17324,7 +17362,7 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
             "API_selectDatasetsWithIdentifier": [MockFunction],
             "API_unselectDatasetsWithIdentifier": [MockFunction],
             "API_updateCard": [MockFunction],
-            "API_updateName": [MockFunction],
+            "API_updateNameAndCover": [MockFunction],
             "anyone_can_join": false,
             "anyone_can_view": false,
             "assign": [MockFunction],
@@ -17748,8 +17786,10 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
             ],
             "confirmEdit": [MockFunction],
             "cover": Object {
+              "hardcoded_subtitle": "Lorem ipsum hardcoded",
               "image_url": "http://fake.url.net",
               "name": "Proto-typo",
+              "subtitle_hidden": false,
               "text": "Lorem ipsum blockchain boogie",
             },
             "create": [MockFunction],
@@ -18260,7 +18300,7 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
             "API_selectDatasetsWithIdentifier": [MockFunction],
             "API_unselectDatasetsWithIdentifier": [MockFunction],
             "API_updateCard": [MockFunction],
-            "API_updateName": [MockFunction],
+            "API_updateNameAndCover": [MockFunction],
             "anyone_can_join": false,
             "anyone_can_view": false,
             "assign": [MockFunction],
@@ -18684,8 +18724,10 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
             ],
             "confirmEdit": [MockFunction],
             "cover": Object {
+              "hardcoded_subtitle": "Lorem ipsum hardcoded",
               "image_url": "http://fake.url.net",
               "name": "Proto-typo",
+              "subtitle_hidden": false,
               "text": "Lorem ipsum blockchain boogie",
             },
             "create": [MockFunction],
@@ -19169,7 +19211,7 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
           "API_selectDatasetsWithIdentifier": [MockFunction],
           "API_unselectDatasetsWithIdentifier": [MockFunction],
           "API_updateCard": [MockFunction],
-          "API_updateName": [MockFunction],
+          "API_updateNameAndCover": [MockFunction],
           "anyone_can_join": false,
           "anyone_can_view": false,
           "assign": [MockFunction],
@@ -19593,8 +19635,10 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
           ],
           "confirmEdit": [MockFunction],
           "cover": Object {
+            "hardcoded_subtitle": "Lorem ipsum hardcoded",
             "image_url": "http://fake.url.net",
             "name": "Proto-typo",
+            "subtitle_hidden": false,
             "text": "Lorem ipsum blockchain boogie",
           },
           "create": [MockFunction],
@@ -19647,7 +19691,7 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
               "API_selectDatasetsWithIdentifier": [MockFunction],
               "API_unselectDatasetsWithIdentifier": [MockFunction],
               "API_updateCard": [MockFunction],
-              "API_updateName": [MockFunction],
+              "API_updateNameAndCover": [MockFunction],
               "anyone_can_join": false,
               "anyone_can_view": false,
               "assign": [MockFunction],
@@ -20071,8 +20115,10 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
               ],
               "confirmEdit": [MockFunction],
               "cover": Object {
+                "hardcoded_subtitle": "Lorem ipsum hardcoded",
                 "image_url": "http://fake.url.net",
                 "name": "Proto-typo",
+                "subtitle_hidden": false,
                 "text": "Lorem ipsum blockchain boogie",
               },
               "create": [MockFunction],
@@ -20955,7 +21001,7 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
         "API_selectDatasetsWithIdentifier": [MockFunction],
         "API_unselectDatasetsWithIdentifier": [MockFunction],
         "API_updateCard": [MockFunction],
-        "API_updateName": [MockFunction],
+        "API_updateNameAndCover": [MockFunction],
         "anyone_can_join": false,
         "anyone_can_view": false,
         "assign": [MockFunction],
@@ -21379,8 +21425,10 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
         ],
         "confirmEdit": [MockFunction],
         "cover": Object {
+          "hardcoded_subtitle": "Lorem ipsum hardcoded",
           "image_url": "http://fake.url.net",
           "name": "Proto-typo",
+          "subtitle_hidden": false,
           "text": "Lorem ipsum blockchain boogie",
         },
         "create": [MockFunction],
@@ -21433,7 +21481,7 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
             "API_selectDatasetsWithIdentifier": [MockFunction],
             "API_unselectDatasetsWithIdentifier": [MockFunction],
             "API_updateCard": [MockFunction],
-            "API_updateName": [MockFunction],
+            "API_updateNameAndCover": [MockFunction],
             "anyone_can_join": false,
             "anyone_can_view": false,
             "assign": [MockFunction],
@@ -21857,8 +21905,10 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
             ],
             "confirmEdit": [MockFunction],
             "cover": Object {
+              "hardcoded_subtitle": "Lorem ipsum hardcoded",
               "image_url": "http://fake.url.net",
               "name": "Proto-typo",
+              "subtitle_hidden": false,
               "text": "Lorem ipsum blockchain boogie",
             },
             "create": [MockFunction],
@@ -22737,7 +22787,6 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
   dragging={false}
   draggingMultiple={false}
   id="gridCard-11"
-  innerRef={[Function]}
   onContextMenu={[Function]}
   onMouseLeave={[Function]}
   selected={false}
@@ -22774,7 +22823,7 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
           "API_selectDatasetsWithIdentifier": [MockFunction],
           "API_unselectDatasetsWithIdentifier": [MockFunction],
           "API_updateCard": [MockFunction],
-          "API_updateName": [MockFunction],
+          "API_updateNameAndCover": [MockFunction],
           "anyone_can_join": false,
           "anyone_can_view": false,
           "assign": [MockFunction],
@@ -23198,8 +23247,10 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
           ],
           "confirmEdit": [MockFunction],
           "cover": Object {
+            "hardcoded_subtitle": "Lorem ipsum hardcoded",
             "image_url": "http://fake.url.net",
             "name": "Proto-typo",
+            "subtitle_hidden": false,
             "text": "Lorem ipsum blockchain boogie",
           },
           "create": [MockFunction],
@@ -23695,7 +23746,7 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
             "API_selectDatasetsWithIdentifier": [MockFunction],
             "API_unselectDatasetsWithIdentifier": [MockFunction],
             "API_updateCard": [MockFunction],
-            "API_updateName": [MockFunction],
+            "API_updateNameAndCover": [MockFunction],
             "anyone_can_join": false,
             "anyone_can_view": false,
             "assign": [MockFunction],
@@ -24119,8 +24170,10 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
             ],
             "confirmEdit": [MockFunction],
             "cover": Object {
+              "hardcoded_subtitle": "Lorem ipsum hardcoded",
               "image_url": "http://fake.url.net",
               "name": "Proto-typo",
+              "subtitle_hidden": false,
               "text": "Lorem ipsum blockchain boogie",
             },
             "create": [MockFunction],
@@ -24604,12 +24657,13 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
           "API_selectDatasetsWithIdentifier": [MockFunction],
           "API_unselectDatasetsWithIdentifier": [MockFunction],
           "API_updateCard": [MockFunction],
-          "API_updateName": [MockFunction],
+          "API_updateNameAndCover": [MockFunction],
           "anyone_can_join": false,
           "anyone_can_view": false,
           "assign": [MockFunction],
           "assignRef": [MockFunction],
           "breadcrumb": Array [],
+          "canSetACover": true,
           "can_edit": true,
           "can_edit_content": false,
           "can_view": true,
@@ -25028,8 +25082,10 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
           ],
           "confirmEdit": [MockFunction],
           "cover": Object {
+            "hardcoded_subtitle": "Lorem ipsum hardcoded",
             "image_url": "http://fake.url.net",
             "name": "Proto-typo",
+            "subtitle_hidden": false,
             "text": "Lorem ipsum blockchain boogie",
           },
           "create": [MockFunction],
@@ -25083,7 +25139,7 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
               "API_selectDatasetsWithIdentifier": [MockFunction],
               "API_unselectDatasetsWithIdentifier": [MockFunction],
               "API_updateCard": [MockFunction],
-              "API_updateName": [MockFunction],
+              "API_updateNameAndCover": [MockFunction],
               "anyone_can_join": false,
               "anyone_can_view": false,
               "assign": [MockFunction],
@@ -25507,8 +25563,10 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
               ],
               "confirmEdit": [MockFunction],
               "cover": Object {
+                "hardcoded_subtitle": "Lorem ipsum hardcoded",
                 "image_url": "http://fake.url.net",
                 "name": "Proto-typo",
+                "subtitle_hidden": false,
                 "text": "Lorem ipsum blockchain boogie",
               },
               "create": [MockFunction],
@@ -26391,12 +26449,13 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
         "API_selectDatasetsWithIdentifier": [MockFunction],
         "API_unselectDatasetsWithIdentifier": [MockFunction],
         "API_updateCard": [MockFunction],
-        "API_updateName": [MockFunction],
+        "API_updateNameAndCover": [MockFunction],
         "anyone_can_join": false,
         "anyone_can_view": false,
         "assign": [MockFunction],
         "assignRef": [MockFunction],
         "breadcrumb": Array [],
+        "canSetACover": true,
         "can_edit": true,
         "can_edit_content": false,
         "can_view": true,
@@ -26815,8 +26874,10 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
         ],
         "confirmEdit": [MockFunction],
         "cover": Object {
+          "hardcoded_subtitle": "Lorem ipsum hardcoded",
           "image_url": "http://fake.url.net",
           "name": "Proto-typo",
+          "subtitle_hidden": false,
           "text": "Lorem ipsum blockchain boogie",
         },
         "create": [MockFunction],
@@ -26870,7 +26931,7 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
             "API_selectDatasetsWithIdentifier": [MockFunction],
             "API_unselectDatasetsWithIdentifier": [MockFunction],
             "API_updateCard": [MockFunction],
-            "API_updateName": [MockFunction],
+            "API_updateNameAndCover": [MockFunction],
             "anyone_can_join": false,
             "anyone_can_view": false,
             "assign": [MockFunction],
@@ -27294,8 +27355,10 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
             ],
             "confirmEdit": [MockFunction],
             "cover": Object {
+              "hardcoded_subtitle": "Lorem ipsum hardcoded",
               "image_url": "http://fake.url.net",
               "name": "Proto-typo",
+              "subtitle_hidden": false,
               "text": "Lorem ipsum blockchain boogie",
             },
             "create": [MockFunction],
@@ -28174,7 +28237,6 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
   dragging={false}
   draggingMultiple={false}
   id="gridCard-11"
-  innerRef={[Function]}
   onContextMenu={[Function]}
   onMouseLeave={[Function]}
   selected={false}
@@ -28231,7 +28293,7 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
             "API_selectDatasetsWithIdentifier": [MockFunction],
             "API_unselectDatasetsWithIdentifier": [MockFunction],
             "API_updateCard": [MockFunction],
-            "API_updateName": [MockFunction],
+            "API_updateNameAndCover": [MockFunction],
             "anyone_can_join": false,
             "anyone_can_view": false,
             "assign": [MockFunction],
@@ -28655,8 +28717,10 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
             ],
             "confirmEdit": [MockFunction],
             "cover": Object {
+              "hardcoded_subtitle": "Lorem ipsum hardcoded",
               "image_url": "http://fake.url.net",
               "name": "Proto-typo",
+              "subtitle_hidden": false,
               "text": "Lorem ipsum blockchain boogie",
             },
             "create": [MockFunction],
@@ -29167,7 +29231,7 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
             "API_selectDatasetsWithIdentifier": [MockFunction],
             "API_unselectDatasetsWithIdentifier": [MockFunction],
             "API_updateCard": [MockFunction],
-            "API_updateName": [MockFunction],
+            "API_updateNameAndCover": [MockFunction],
             "anyone_can_join": false,
             "anyone_can_view": false,
             "assign": [MockFunction],
@@ -29591,8 +29655,10 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
             ],
             "confirmEdit": [MockFunction],
             "cover": Object {
+              "hardcoded_subtitle": "Lorem ipsum hardcoded",
               "image_url": "http://fake.url.net",
               "name": "Proto-typo",
+              "subtitle_hidden": false,
               "text": "Lorem ipsum blockchain boogie",
             },
             "create": [MockFunction],
@@ -30076,12 +30142,13 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
           "API_selectDatasetsWithIdentifier": [MockFunction],
           "API_unselectDatasetsWithIdentifier": [MockFunction],
           "API_updateCard": [MockFunction],
-          "API_updateName": [MockFunction],
+          "API_updateNameAndCover": [MockFunction],
           "anyone_can_join": false,
           "anyone_can_view": false,
           "assign": [MockFunction],
           "assignRef": [MockFunction],
           "breadcrumb": Array [],
+          "canSetACover": true,
           "can_edit": true,
           "can_edit_content": false,
           "can_view": true,
@@ -30500,8 +30567,10 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
           ],
           "confirmEdit": [MockFunction],
           "cover": Object {
+            "hardcoded_subtitle": "Lorem ipsum hardcoded",
             "image_url": "http://fake.url.net",
             "name": "Proto-typo",
+            "subtitle_hidden": false,
             "text": "Lorem ipsum blockchain boogie",
           },
           "create": [MockFunction],
@@ -30554,7 +30623,7 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
               "API_selectDatasetsWithIdentifier": [MockFunction],
               "API_unselectDatasetsWithIdentifier": [MockFunction],
               "API_updateCard": [MockFunction],
-              "API_updateName": [MockFunction],
+              "API_updateNameAndCover": [MockFunction],
               "anyone_can_join": false,
               "anyone_can_view": false,
               "assign": [MockFunction],
@@ -30978,8 +31047,10 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
               ],
               "confirmEdit": [MockFunction],
               "cover": Object {
+                "hardcoded_subtitle": "Lorem ipsum hardcoded",
                 "image_url": "http://fake.url.net",
                 "name": "Proto-typo",
+                "subtitle_hidden": false,
                 "text": "Lorem ipsum blockchain boogie",
               },
               "create": [MockFunction],
@@ -31862,12 +31933,13 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
         "API_selectDatasetsWithIdentifier": [MockFunction],
         "API_unselectDatasetsWithIdentifier": [MockFunction],
         "API_updateCard": [MockFunction],
-        "API_updateName": [MockFunction],
+        "API_updateNameAndCover": [MockFunction],
         "anyone_can_join": false,
         "anyone_can_view": false,
         "assign": [MockFunction],
         "assignRef": [MockFunction],
         "breadcrumb": Array [],
+        "canSetACover": true,
         "can_edit": true,
         "can_edit_content": false,
         "can_view": true,
@@ -32286,8 +32358,10 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
         ],
         "confirmEdit": [MockFunction],
         "cover": Object {
+          "hardcoded_subtitle": "Lorem ipsum hardcoded",
           "image_url": "http://fake.url.net",
           "name": "Proto-typo",
+          "subtitle_hidden": false,
           "text": "Lorem ipsum blockchain boogie",
         },
         "create": [MockFunction],
@@ -32340,7 +32414,7 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
             "API_selectDatasetsWithIdentifier": [MockFunction],
             "API_unselectDatasetsWithIdentifier": [MockFunction],
             "API_updateCard": [MockFunction],
-            "API_updateName": [MockFunction],
+            "API_updateNameAndCover": [MockFunction],
             "anyone_can_join": false,
             "anyone_can_view": false,
             "assign": [MockFunction],
@@ -32764,8 +32838,10 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
             ],
             "confirmEdit": [MockFunction],
             "cover": Object {
+              "hardcoded_subtitle": "Lorem ipsum hardcoded",
               "image_url": "http://fake.url.net",
               "name": "Proto-typo",
+              "subtitle_hidden": false,
               "text": "Lorem ipsum blockchain boogie",
             },
             "create": [MockFunction],
@@ -33644,7 +33720,6 @@ exports[`GridCard with item as editor renders snapshot 1`] = `
   dragging={false}
   draggingMultiple={false}
   id="gridCard-10"
-  innerRef={[Function]}
   onContextMenu={[Function]}
   onMouseLeave={[Function]}
   selected={false}
@@ -34239,7 +34314,6 @@ exports[`GridCard with item as viewer renders snapshot 1`] = `
   dragging={false}
   draggingMultiple={false}
   id="gridCard-10"
-  innerRef={[Function]}
   onContextMenu={[Function]}
   onMouseLeave={[Function]}
   selected={false}
@@ -34698,7 +34772,6 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
   dragging={false}
   draggingMultiple={false}
   id="gridCard-11"
-  innerRef={[Function]}
   onContextMenu={[Function]}
   onMouseLeave={[Function]}
   selected={false}
@@ -34736,7 +34809,7 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
           "API_selectDatasetsWithIdentifier": [MockFunction],
           "API_unselectDatasetsWithIdentifier": [MockFunction],
           "API_updateCard": [MockFunction],
-          "API_updateName": [MockFunction],
+          "API_updateNameAndCover": [MockFunction],
           "anyone_can_join": false,
           "anyone_can_view": false,
           "assign": [MockFunction],
@@ -35160,8 +35233,10 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
           ],
           "confirmEdit": [MockFunction],
           "cover": Object {
+            "hardcoded_subtitle": "Lorem ipsum hardcoded",
             "image_url": "http://fake.url.net",
             "name": "Proto-typo",
+            "subtitle_hidden": false,
             "text": "Lorem ipsum blockchain boogie",
           },
           "create": [MockFunction],
@@ -35665,7 +35740,7 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
             "API_selectDatasetsWithIdentifier": [MockFunction],
             "API_unselectDatasetsWithIdentifier": [MockFunction],
             "API_updateCard": [MockFunction],
-            "API_updateName": [MockFunction],
+            "API_updateNameAndCover": [MockFunction],
             "anyone_can_join": false,
             "anyone_can_view": false,
             "assign": [MockFunction],
@@ -36089,8 +36164,10 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
             ],
             "confirmEdit": [MockFunction],
             "cover": Object {
+              "hardcoded_subtitle": "Lorem ipsum hardcoded",
               "image_url": "http://fake.url.net",
               "name": "Proto-typo",
+              "subtitle_hidden": false,
               "text": "Lorem ipsum blockchain boogie",
             },
             "create": [MockFunction],
@@ -36600,7 +36677,7 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
             "API_selectDatasetsWithIdentifier": [MockFunction],
             "API_unselectDatasetsWithIdentifier": [MockFunction],
             "API_updateCard": [MockFunction],
-            "API_updateName": [MockFunction],
+            "API_updateNameAndCover": [MockFunction],
             "anyone_can_join": false,
             "anyone_can_view": false,
             "assign": [MockFunction],
@@ -37024,8 +37101,10 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
             ],
             "confirmEdit": [MockFunction],
             "cover": Object {
+              "hardcoded_subtitle": "Lorem ipsum hardcoded",
               "image_url": "http://fake.url.net",
               "name": "Proto-typo",
+              "subtitle_hidden": false,
               "text": "Lorem ipsum blockchain boogie",
             },
             "create": [MockFunction],
@@ -37509,12 +37588,13 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
           "API_selectDatasetsWithIdentifier": [MockFunction],
           "API_unselectDatasetsWithIdentifier": [MockFunction],
           "API_updateCard": [MockFunction],
-          "API_updateName": [MockFunction],
+          "API_updateNameAndCover": [MockFunction],
           "anyone_can_join": false,
           "anyone_can_view": false,
           "assign": [MockFunction],
           "assignRef": [MockFunction],
           "breadcrumb": Array [],
+          "canSetACover": true,
           "can_edit": true,
           "can_edit_content": false,
           "can_view": true,
@@ -37933,8 +38013,10 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
           ],
           "confirmEdit": [MockFunction],
           "cover": Object {
+            "hardcoded_subtitle": "Lorem ipsum hardcoded",
             "image_url": "http://fake.url.net",
             "name": "Proto-typo",
+            "subtitle_hidden": false,
             "text": "Lorem ipsum blockchain boogie",
           },
           "create": [MockFunction],
@@ -37989,7 +38071,7 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
               "API_selectDatasetsWithIdentifier": [MockFunction],
               "API_unselectDatasetsWithIdentifier": [MockFunction],
               "API_updateCard": [MockFunction],
-              "API_updateName": [MockFunction],
+              "API_updateNameAndCover": [MockFunction],
               "anyone_can_join": false,
               "anyone_can_view": false,
               "assign": [MockFunction],
@@ -38413,8 +38495,10 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
               ],
               "confirmEdit": [MockFunction],
               "cover": Object {
+                "hardcoded_subtitle": "Lorem ipsum hardcoded",
                 "image_url": "http://fake.url.net",
                 "name": "Proto-typo",
+                "subtitle_hidden": false,
                 "text": "Lorem ipsum blockchain boogie",
               },
               "create": [MockFunction],
@@ -39297,12 +39381,13 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
         "API_selectDatasetsWithIdentifier": [MockFunction],
         "API_unselectDatasetsWithIdentifier": [MockFunction],
         "API_updateCard": [MockFunction],
-        "API_updateName": [MockFunction],
+        "API_updateNameAndCover": [MockFunction],
         "anyone_can_join": false,
         "anyone_can_view": false,
         "assign": [MockFunction],
         "assignRef": [MockFunction],
         "breadcrumb": Array [],
+        "canSetACover": true,
         "can_edit": true,
         "can_edit_content": false,
         "can_view": true,
@@ -39721,8 +39806,10 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
         ],
         "confirmEdit": [MockFunction],
         "cover": Object {
+          "hardcoded_subtitle": "Lorem ipsum hardcoded",
           "image_url": "http://fake.url.net",
           "name": "Proto-typo",
+          "subtitle_hidden": false,
           "text": "Lorem ipsum blockchain boogie",
         },
         "create": [MockFunction],
@@ -39777,7 +39864,7 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
             "API_selectDatasetsWithIdentifier": [MockFunction],
             "API_unselectDatasetsWithIdentifier": [MockFunction],
             "API_updateCard": [MockFunction],
-            "API_updateName": [MockFunction],
+            "API_updateNameAndCover": [MockFunction],
             "anyone_can_join": false,
             "anyone_can_view": false,
             "assign": [MockFunction],
@@ -40201,8 +40288,10 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
             ],
             "confirmEdit": [MockFunction],
             "cover": Object {
+              "hardcoded_subtitle": "Lorem ipsum hardcoded",
               "image_url": "http://fake.url.net",
               "name": "Proto-typo",
+              "subtitle_hidden": false,
               "text": "Lorem ipsum blockchain boogie",
             },
             "create": [MockFunction],

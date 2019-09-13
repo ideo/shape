@@ -121,6 +121,26 @@ RSpec.describe LimitedUserCreator, type: :service do
       end
     end
 
+    context 'with spaces in the email' do
+      let(:contact_info) { '  mary@make.com    ' }
+      let(:user_info) {
+        {
+          first_name: 'Limited',
+          last_name: 'User',
+        }
+      }
+
+      it 'should create a user with the additional fields' do
+        expect(NetworkApi::User).to receive(:create).with(
+          email: 'mary@make.com',
+          first_name: user_info[:first_name],
+          last_name: user_info[:last_name],
+          limited_user: true,
+        )
+        LimitedUserCreator.call(contact_info: contact_info, user_info: user_info)
+      end
+    end
+
     context 'with date of participation' do
       let(:contact_info) { 'mary@make.com' }
       let(:date_of_participation) { Time.now - 1.day }

@@ -5,7 +5,7 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import ContainImage from '~/ui/grid/ContainImage'
 import CoverImageToggle from '~/ui/grid/CoverImageToggle'
-import CoverImageSelector from '~/ui/grid/CoverImageSelector'
+import CardCoverEditor from '~/ui/grid/CardCoverEditor'
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
 import CoverRenderer from '~/ui/grid/CoverRenderer'
 
@@ -200,8 +200,8 @@ class GridCard extends React.Component {
         zoomLevel={zoomLevel}
       >
         {record.isDownloadable && <Download record={record} />}
-        {record.canSetACover && (
-          <CoverImageSelector
+        {record.canSetACover && this.canEditCard && (
+          <CardCoverEditor
             card={card}
             parentRef={this.gridCardRef}
             isEditingCardCover={this.isEditingCardCover}
@@ -533,7 +533,7 @@ class GridCard extends React.Component {
         data-order={card.order}
         data-cy="GridCard"
         onContextMenu={this.openContextMenu}
-        innerRef={c => (this.gridCardRef = c)}
+        ref={c => (this.gridCardRef = c)}
         onMouseLeave={this.closeContextMenu}
         selected={this.isSelected || this.props.hoveringOver}
       >

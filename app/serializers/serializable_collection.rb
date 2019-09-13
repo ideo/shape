@@ -1,12 +1,24 @@
 class SerializableCollection < BaseJsonSerializer
   include SerializedExternalId
   type 'collections'
-
-  attributes :created_at, :updated_at, :name,
-             :master_template, :template_id,
-             :submission_box_type, :submission_box_id, :submission_template_id,
-             :test_status, :collection_to_test_id, :hide_submissions, :submissions_enabled,
-             :anyone_can_view, :anyone_can_join, :cover_type, :archived
+  attributes(
+    :name,
+    :created_at,
+    :updated_at,
+    :master_template,
+    :template_id,
+    :submission_box_type,
+    :submission_box_id,
+    :submission_template_id,
+    :test_status,
+    :collection_to_test_id,
+    :hide_submissions,
+    :submissions_enabled,
+    :anyone_can_view,
+    :anyone_can_join,
+    :cover_type,
+    :archived,
+  )
 
   has_many :roles do
     data do
@@ -53,7 +65,7 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   attribute :cover do
-    @object.cached_cover || {}
+    @object.cached_cover || DefaultCollectionCover.defaults
   end
 
   attribute :test_scores do
@@ -147,12 +159,24 @@ class SerializableCollection < BaseJsonSerializer
       @inside_a_submission
   end
 
+  attribute :is_subtemplate_or_instance do
+    @object.subtemplate? || @object.subtemplate_instance?
+  end
+
+  attribute :show_language_selector do
+    @object.inside_an_application_collection?
+  end
+
   attribute :template_num_instances do
     if @object.master_template?
       @object.templated_collections.active.count
     else
       0
     end
+  end
+
+  attribute :show_language_selector do
+    @object.inside_an_application_collection?
   end
 
   attribute :launchable, if: -> { @object.test_collection? } do
@@ -208,11 +232,11 @@ class SerializableCollection < BaseJsonSerializer
     @object.try(:restorable_parent)
   end
 
-  attribute :inherited_default_group_id do
-    @object.inherited_default_group_id.to_s
+  attribute :default_group_id do
+    @object.default_group_id.to_s
   end
 
-  attribute :cache_key do
+  attribute :cache_key, if: -> { @object == @current_record } do
     Digest::MD5.hexdigest(@object.cache_key(@card_order || 'order', @current_user.try(:id)))
   end
 end

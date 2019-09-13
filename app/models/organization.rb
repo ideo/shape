@@ -6,6 +6,7 @@
 #  active_users_count                    :integer          default(0), not null
 #  autojoin_domains                      :jsonb
 #  deactivated                           :boolean          default(FALSE), not null
+#  default_locale                        :string           default("en")
 #  domain_whitelist                      :jsonb
 #  has_payment_method                    :boolean          default(FALSE), not null
 #  in_app_billing                        :boolean          default(TRUE), not null
@@ -217,11 +218,11 @@ class Organization < ApplicationRecord
   end
 
   def guest_group_handle
-    "#{handle}-guest"
+    "#{handle.slice(0, 28)}-guests"
   end
 
   def admin_group_handle
-    "#{handle}-admins"
+    "#{handle.slice(0, 28)}-admins"
   end
 
   # NOTE: even if none of these work it will fallback to handle-UUID
@@ -411,6 +412,10 @@ class Organization < ApplicationRecord
     return 'No payment method' if payment_method.blank?
 
     (network_default_payment_method.created_at.to_date - created_at.to_date).to_i
+  end
+
+  def default_locale
+    default_locale_in_database
   end
 
   private

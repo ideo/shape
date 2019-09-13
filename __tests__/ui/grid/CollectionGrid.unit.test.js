@@ -65,4 +65,37 @@ describe('CollectionGrid', () => {
     // it does re-render with a change to cardProperties
     expect(wrapper.find('MovableGridCard').length).toBe(1)
   })
+
+  describe('calculateOrderForMovingCard', () => {
+    describe('moving to first card position (0 index)', () => {
+      it('returns an integer', () => {
+        const locationOfTargetPlaceholder = -0.5
+        expect(
+          wrapper
+            .instance()
+            .calculateOrderForMovingCard(locationOfTargetPlaceholder, 0)
+        ).toBe(0)
+        expect(
+          wrapper
+            .instance()
+            .calculateOrderForMovingCard(locationOfTargetPlaceholder, 1)
+        ).toBe(1)
+      })
+    })
+    describe('moving to last card position in collection', () => {
+      it('returns an integer', () => {
+        const locationOfTargetPlaceholder = 3.5
+        expect(
+          wrapper
+            .instance()
+            .calculateOrderForMovingCard(locationOfTargetPlaceholder, 0)
+        ).toBe(4)
+        expect(
+          wrapper
+            .instance()
+            .calculateOrderForMovingCard(locationOfTargetPlaceholder, 1)
+        ).toBe(5)
+      })
+    })
+  })
 })

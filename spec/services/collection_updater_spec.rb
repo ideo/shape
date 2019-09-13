@@ -8,7 +8,7 @@ RSpec.describe CollectionUpdater, type: :service do
 
     context 'with valid attributes' do
       let(:attributes) do
-        { name: 'My new name', collection_cards_attributes: { id: first_card.id, order: 3, width: 3 } }
+        { name: 'My new name', collection_cards_attributes: [{ id: first_card.id, order: 3, width: 3 }] }
       end
 
       it 'assigns and saves attributes onto the collection' do
@@ -47,9 +47,42 @@ RSpec.describe CollectionUpdater, type: :service do
       end
     end
 
+    context 'with subtitle values' do
+      let(:attributes) do
+        { hardcoded_subtitle: 'my cool description', subtitle_hidden: false }
+      end
+
+      it 'saves subtitle' do
+        expect(collection.cached_cover).to be nil
+        CollectionUpdater.call(collection, attributes)
+        expect(collection.cached_cover['hardcoded_subtitle']).to eq attributes[:hardcoded_subtitle]
+      end
+    end
+
+    context 'with invalid card id' do
+      let(:attributes) do
+        {
+          name: 'My new name',
+          collection_cards_attributes: [
+            # send id as string to mimic front-end
+            { id: first_card.id.to_s, order: 3, width: 3 },
+            { id: '991919', order: 1, width: 1 },
+          ],
+        }
+      end
+
+      it 'ignores missing card and assigns and saves attributes onto the collection' do
+        CollectionUpdater.call(collection, attributes)
+        expect(collection.name).to eq attributes[:name]
+        first_card.reload
+        expect(first_card.order).to eq 3
+        expect(first_card.width).to eq 3
+      end
+    end
+
     context 'with a master template' do
       let(:attributes) do
-        { name: 'My new name', collection_to_test_id: 999, collection_cards_attributes: { id: first_card.id } }
+        { name: 'My new name', collection_to_test_id: 999, collection_cards_attributes: [{ id: first_card.id }] }
       end
 
       before do

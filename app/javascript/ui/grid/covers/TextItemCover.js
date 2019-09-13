@@ -27,7 +27,7 @@ const StyledPaddedCover = styled(PaddedCardCover)`
       : v.colors.white};
 `
 
-const StyledReadMore = ShowMoreButton.extend`
+const StyledReadMore = styled(ShowMoreButton)`
   z-index: ${v.zIndex.gridCard};
   position: absolute;
   bottom: 0;
@@ -235,7 +235,7 @@ class TextItemCover extends React.Component {
         style={{
           height: 'calc(100% - 30px)',
         }}
-        class="cancelGridClick"
+        className="cancelGridClick"
         onClick={this.handleClick}
         isEditing={isEditing}
         hasTitleText={hasTitleText}

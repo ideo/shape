@@ -17,12 +17,15 @@ import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
 import { StyledHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
+import { FormButton } from '~/ui/global/styled/buttons'
 import { SubduedHeading1 } from '~/ui/global/styled/typography'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
-import { FormButton } from '~/ui/global/styled/forms'
 import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
+import LanguageSelector from '~/ui/layout/LanguageSelector'
 import v from '~/utils/variables'
 import routeToLogin from '~/utils/routeToLogin'
+import { ACTION_SOURCES } from '~/enums/actionEnums'
+
 /* global IdeoSSO */
 
 const IconHolder = styled.span`
@@ -43,16 +46,6 @@ const IconHolder = styled.span`
   }
 `
 
-const HeaderFormButton = FormButton.extend`
-  margin-top: 10px;
-  font-size: 0.825rem;
-`
-HeaderFormButton.displayName = 'HeaderFormButton'
-HeaderFormButton.defaultProps = {
-  'data-cy': 'HeaderFormButton',
-  color: v.colors.black,
-}
-
 const LiveTestIndicator = styled.span`
   display: inline-block;
   color: ${v.colors.alert};
@@ -63,6 +56,10 @@ const LiveTestIndicator = styled.span`
   letter-spacing: 1px;
   margin-left: 0.25rem;
   padding-top: 1.33rem;
+`
+
+const HeaderButtonContainer = styled.span`
+  margin-top: 10px;
 `
 
 @inject('uiStore')
@@ -91,7 +88,7 @@ class PageHeader extends React.Component {
   updateRecordName = name => {
     const { record } = this.props
     // method exists on Item and Collection
-    record.API_updateName(name)
+    record.API_updateNameAndCover({ name })
   }
 
   handleTitleClick = () => {
@@ -107,11 +104,12 @@ class PageHeader extends React.Component {
     record.restore()
   }
 
-  openMoveMenuForTemplate = () => {
+  openMoveMenuForTemplate = e => {
     const { record, uiStore } = this.props
     uiStore.openMoveMenu({
-      from: record.id,
+      from: record,
       cardAction: 'useTemplate',
+      context: ACTION_SOURCES.HEADER,
     })
   }
 
@@ -123,7 +121,7 @@ class PageHeader extends React.Component {
           <FilledProfileIcon />
         </IconHolder>
       )
-    } else if (record.isMasterTemplate) {
+    } else if (record.isMasterTemplate && !record.isSubTemplate) {
       return (
         <IconHolder align="left">
           <TemplateIcon circled filled />
@@ -178,7 +176,7 @@ class PageHeader extends React.Component {
       icon = <ProfileIcon />
     } else if (record.isProfileCollection) {
       icon = <SystemIcon />
-    } else if (record.isTemplated) {
+    } else if (record.isTemplated && !record.isSubTemplate) {
       icon = <TemplateIcon circled />
     } else if (record.isSubmissionBox) {
       icon = <SubmissionBoxIconLg />
@@ -207,14 +205,16 @@ class PageHeader extends React.Component {
       return (
         <Fragment>
           <CopyToClipboard text={record.publicTestURL} onCopy={() => null}>
-            <HeaderFormButton
-              width="140"
+            <FormButton
+              width={v.buttonSizes.header.width}
               color={v.colors.transparent}
               onClick={() =>
                 uiStore.popupSnackbar({
                   message: 'Test link copied',
                 })
               }
+              fontSize={v.buttonSizes.header.fontSize}
+              data-cy="HeaderFormButton"
             >
               <span
                 style={{
@@ -234,7 +234,7 @@ class PageHeader extends React.Component {
               >
                 Get Link
               </span>
-            </HeaderFormButton>
+            </FormButton>
           </CopyToClipboard>
           {this.renderStopFeebackButton}
         </Fragment>
@@ -246,25 +246,29 @@ class PageHeader extends React.Component {
     const { record, uiStore } = this.props
     if (record.can_edit_content && record.isClosedTest) {
       return (
-        <HeaderFormButton
+        <FormButton
           onClick={record.reopenTest}
           color={v.colors.transparent}
           width="200"
           disabled={uiStore.launchButtonLoading}
+          fontSize={v.buttonSizes.header.fontSize}
+          data-cy="HeaderFormButton"
         >
           Re-open Feedback
-        </HeaderFormButton>
+        </FormButton>
       )
     }
     if (this.isCurrentlyHiddenSubmission) {
       return (
-        <HeaderFormButton
+        <FormButton
           color={v.colors.alert}
           onClick={record.API_submitSubmission}
           disabled={uiStore.launchButtonLoading}
+          fontSize={v.buttonSizes.header.fontSize}
+          data-cy="HeaderFormButton"
         >
           Submit
-        </HeaderFormButton>
+        </FormButton>
       )
     }
     return null
@@ -274,13 +278,15 @@ class PageHeader extends React.Component {
     const { record } = this.props
     if (!record.isPublicJoinable) return null
     return (
-      <HeaderFormButton
+      <FormButton
         style={{ marginLeft: '1rem' }}
         color={v.colors.primaryDarkest}
         onClick={() => routeToLogin({ redirect: record.frontend_url })}
+        fontSize={v.buttonSizes.header.fontSize}
+        data-cy="HeaderFormButton"
       >
         Join
-      </HeaderFormButton>
+      </FormButton>
     )
   }
 
@@ -289,13 +295,15 @@ class PageHeader extends React.Component {
     if (!record.can_edit) return null
     if (!record.is_restorable) return null
     return (
-      <HeaderFormButton
+      <FormButton
         style={{ marginLeft: '1rem' }}
         color={v.colors.primaryDarkest}
         onClick={this.handleRestore}
+        fontSize={v.buttonSizes.header.fontSize}
+        data-cy="HeaderFormButton"
       >
         Restore
-      </HeaderFormButton>
+      </FormButton>
     )
   }
 
@@ -303,13 +311,15 @@ class PageHeader extends React.Component {
     const { record } = this.props
     if (!record.isUsableTemplate) return null
     return (
-      <HeaderFormButton
+      <FormButton
         width="160"
         color={v.colors.primaryDark}
         onClick={this.openMoveMenuForTemplate}
+        fontSize={v.buttonSizes.header.fontSize}
+        data-cy="HeaderFormButton"
       >
         Use Template
-      </HeaderFormButton>
+      </FormButton>
     )
   }
 
@@ -317,14 +327,16 @@ class PageHeader extends React.Component {
     const { record, uiStore } = this.props
     if (record.can_edit_content && !record.is_test_locked) {
       return (
-        <HeaderFormButton
+        <FormButton
           width="170"
           color={v.colors.transparent}
           onClick={record.closeTest}
           disabled={uiStore.launchButtonLoading}
+          fontSize={v.buttonSizes.header.fontSize}
+          data-cy="HeaderFormButton"
         >
           Stop Feedback
-        </HeaderFormButton>
+        </FormButton>
       )
     }
     return null
@@ -375,12 +387,22 @@ class PageHeader extends React.Component {
                   )}
                   {this.collectionTypeOrInheritedTags}
                 </div>
-                {this.renderTemplateButton}
-                {this.renderRestoreButton}
-                {this.renderLaunchTestButton}
-                {this.renderJoinCollectionButton}
-                {this.renderTestUi}
+                <HeaderButtonContainer>
+                  {this.renderTemplateButton}
+                  {this.renderRestoreButton}
+                  {this.renderLaunchTestButton}
+                  {this.renderJoinCollectionButton}
+                  {this.renderTestUi}
+                </HeaderButtonContainer>
               </Flex>
+
+              {record.show_language_selector && (
+                <Flex
+                  style={{ position: 'relative', top: '15px', height: '33px' }}
+                >
+                  <LanguageSelector />
+                </Flex>
+              )}
             </StyledTitleAndRoles>
           </div>
         </MaxWidthContainer>

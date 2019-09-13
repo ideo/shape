@@ -73,6 +73,8 @@ class Item
     validates :report_type, presence: true
     after_create :create_legend_item, if: :create_legend_item?
 
+    accepts_nested_attributes_for :data_items_datasets
+
     enum report_type: {
       report_type_collections_and_items: 0,
       report_type_network_app_metric: 1,

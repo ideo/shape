@@ -1,10 +1,11 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 
-import { BctTextField, FormButton } from '~/ui/global/styled/forms'
+import { FormButton } from '~/ui/global/styled/buttons'
+import { BctTextField } from '~/ui/global/styled/forms'
 import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
 import v, { KEYS } from '~/utils/variables'
-import { routingStore } from '~/stores'
+import { routingStore, uiStore } from '~/stores'
 import googleTagManager from '~/vendor/googleTagManager'
 
 class CollectionCreator extends React.Component {
@@ -39,14 +40,14 @@ class CollectionCreator extends React.Component {
   createCollection = e => {
     e.preventDefault()
     if (!this.state.inputText) return
-    const { createCard, type } = this.props
+    const { createCard } = this.props
 
     createCard(
       {
         // `collection` is the collection being created within the card
         collection_attributes: {
           name: this.state.inputText,
-          master_template: type === 'template',
+          master_template: this.shouldCreateAsMasterTemplate,
           type: this.dbType,
         },
       },
@@ -54,6 +55,12 @@ class CollectionCreator extends React.Component {
         afterCreate: this.afterCreate,
       }
     )
+  }
+
+  get shouldCreateAsMasterTemplate() {
+    const { type } = this.props
+    const { viewingCollection } = uiStore
+    return type === 'template' || viewingCollection.isMasterTemplate
   }
 
   get dbType() {

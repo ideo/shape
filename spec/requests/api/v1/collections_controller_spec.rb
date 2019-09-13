@@ -77,6 +77,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     let!(:collection) do
       create(:collection, num_cards: 5, add_viewers: [user], parent_collection: parent_collection)
     end
+    let(:created_by) { collection.created_by }
     let(:path) { "/api/v1/collections/#{collection.id}" }
 
     it 'returns a 200' do
@@ -141,24 +142,27 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       let(:collection_cards_json) { json_included_objects_of_type('collection_cards') }
       let(:items_json) { json_included_objects_of_type('items') }
       let(:users_json) { json_included_objects_of_type('users') }
+      let(:viewer) { user }
 
-      before do
-        collection.items.each { |item| user.add_role(Role::VIEWER, item) }
-      end
-
-      it 'includes viewers' do
+      it 'includes viewer and created by' do
         get(path)
-        expect(users_json.map { |u| u['id'].to_i }).to match_array([user.id])
+        expect(users_json.map { |u| u['id'].to_i }).to match_array(
+          [viewer.id, created_by.id],
+        )
       end
 
       context 'with editor' do
-        let!(:collection) do
-          create(:collection, num_cards: 5, add_editors: [user])
+        let(:editor) { create(:user) }
+
+        before do
+          editor.add_role(Role::EDITOR, collection)
         end
 
-        it 'includes only editors' do
+        it 'includes viewer and editor' do
           get(path)
-          expect(users_json.map { |u| u['id'].to_i }).to match_array([user.id])
+          expect(users_json.map { |u| u['id'].to_i }).to match_array(
+            [editor.id, viewer.id, created_by.id],
+          )
         end
       end
     end
@@ -245,7 +249,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       before do
         GlobalTranslation.create(
           value_en: {
-            'CD-QUALITIES-PURPOSE': 'Purpose',
+            'CD.QUALITIES.PURPOSE': 'Purpose',
           },
         )
       end
@@ -253,7 +257,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       context 'matching variables' do
         before do
           collection.update(
-            name: '{{CD-QUALITIES-PURPOSE}} is my name',
+            name: '{{CD.QUALITIES.PURPOSE}} is my name',
           )
         end
 
@@ -268,14 +272,14 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       context 'non-matching variables' do
         before do
           collection.update(
-            name: '{{CD-SOMETHING-ELSE}} is my name',
+            name: '{{CD.SOMETHING.ELSE}} is my name',
           )
         end
 
         it 'leaves them in-place' do
           get(path)
           expect(json['data']['attributes']['name']).to eq(
-            '{{CD-SOMETHING-ELSE}} is my name',
+            '{{CD.SOMETHING.ELSE}} is my name',
           )
         end
       end
@@ -505,12 +509,12 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         json_api_params(
           'collections',
           raw_params.merge(
-            collection_cards_attributes: {
+            collection_cards_attributes: [{
               id: collection_card.id,
               width: 3,
               row: 4,
               col: 5,
-            },
+            }],
           ),
         )
       end
@@ -630,6 +634,13 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
           child: collection,
         )
         patch(path)
+      end
+
+      it 'unmarks private setting' do
+        collection.update(cached_inheritance: { private: true })
+        patch(path)
+        collection.reload
+        expect(collection.cached_inheritance['private']).to be false
       end
     end
   end

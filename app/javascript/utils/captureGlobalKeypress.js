@@ -27,23 +27,10 @@ export const handleMouseDownSelection = e => {
     uiStore.deselectCards()
     uiStore.onEmptySpaceClick(e)
     uiStore.closeBlankContentTool()
-    saveCardBeforeExit()
     uiStore.update('editingCardCover', null)
     return 'emptySpace'
   }
   return false
-}
-
-const saveCardBeforeExit = () => {
-  const { activeElement } = document
-  const { value } = activeElement
-  // this should always be the value of the active text area
-  if (!!value) {
-    const { editingCardCover } = uiStore
-    const card = apiStore.find('collection_cards', editingCardCover)
-    const { record } = card
-    record.API_updateName(value)
-  }
 }
 
 const captureGlobalKeypress = e => {
@@ -56,7 +43,8 @@ const captureGlobalKeypress = e => {
       'ql-editor',
       'ql-container',
       'public-DraftEditor-content',
-      'edit-cover-text',
+      'edit-cover-title',
+      'edit-cover-subtitle',
     ]).length > 0
 
   if (shouldNormalKeyPressBeAllowed) return false
@@ -68,9 +56,8 @@ const captureGlobalKeypress = e => {
         return false
       }
       if (metaKey || ctrlKey) {
-        const { id: viewingCollectionId } = viewingCollection
         uiStore.openMoveMenu({
-          from: viewingCollectionId, // CTRL+X: Move
+          from: viewingCollection, // CTRL+X: Move
           cardAction: 'move',
         })
       }
@@ -80,9 +67,8 @@ const captureGlobalKeypress = e => {
         return false
       }
       if (metaKey || ctrlKey) {
-        const { id: viewingCollectionId } = viewingCollection
         uiStore.openMoveMenu({
-          from: viewingCollectionId, // CTRL+C: Duplicate
+          from: viewingCollection, // CTRL+C: Duplicate
           cardAction: 'duplicate',
         })
       }
@@ -119,6 +105,13 @@ const captureGlobalKeypress = e => {
       // see note in CollectionCard model -- this could really be a static method;
       // because it's not, we just have to call it on any selected card
       card.API_archive()
+      break
+    case 'Escape':
+      // save on sec happens only when user clicks the title textarea
+      const { editingCardCover } = uiStore
+      if (editingCardCover) {
+        uiStore.update('editingCardCover', null)
+      }
       break
     default:
       break

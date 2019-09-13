@@ -32,6 +32,7 @@ AllCops:
     - 'app/views/**/*'
     - 'bin/**/*'
     - 'spec/support/api/**/*'
+    - 'spec/support/api/schemas/*.json'
     - 'spec/fixtures/**/*'
     - 'vendor/bundle/**/*'
     - 'node_modules/**/*'
@@ -56,6 +57,12 @@ Metrics/AbcSize:
   # a Float.
   Max: 35
 
+Naming/PredicateName:
+  # because of methods like `has_role?` we don't want to enforce 'has_' prefix
+  NamePrefixBlacklist:
+    - 'is_'
+    - 'have_'
+
 # Trailing commas make for clearer diffs because the last line won't appear
 # to have been changed, as it would if it lacked a comma and had one added.
 Style/TrailingCommaInArguments:
@@ -73,6 +80,10 @@ Style/PercentLiteralDelimiters:
     # indicated with `[]` not `()`.
     '%w': '[]'
     '%W': '[]'
+
+Style/AsciiComments:
+  AllowedChars:
+    - '∆'
 
 Style/AndOr:
   # `and` and `or` banned only in conditionals (conditionals), or completely (always).

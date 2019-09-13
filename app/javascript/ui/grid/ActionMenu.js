@@ -55,9 +55,13 @@ class ActionMenu extends React.Component {
 
   openMoveMenu = cardAction => {
     const { card, onMoveMenu, uiStore } = this.props
+    let { viewingCollection } = uiStore
+    if (!viewingCollection) {
+      viewingCollection = card.record.parent ? card.record.parent.id : null
+    }
     if (onMoveMenu) onMoveMenu({ type: cardAction })
     uiStore.selectCardId(card.id)
-    uiStore.openMoveMenu({ from: this.movingFromCollectionId, cardAction })
+    uiStore.openMoveMenu({ from: viewingCollection, cardAction })
   }
 
   closeCardMenu = () => {
@@ -342,7 +346,7 @@ ActionMenu.propTypes = {
   wrapperClassName: PropTypes.string,
   location: PropTypes.string.isRequired,
   menuOpen: PropTypes.bool.isRequired,
-  canView: PropTypes.bool.isRequired,
+  canView: PropTypes.bool,
   canEdit: PropTypes.bool.isRequired,
   canReplace: PropTypes.bool,
   submissionBox: PropTypes.bool,
@@ -367,6 +371,7 @@ ActionMenu.defaultProps = {
   wrapperClassName: 'card-menu',
   onMoveMenu: null,
   afterArchive: null,
+  canView: true,
   canReplace: false,
   submissionBox: false,
   testCollectionCard: false,

@@ -109,10 +109,17 @@ class Api::V1::DatasetsController < Api::V1::BaseController
       :max_domain,
       :measure,
       :timeframe,
+      :identifier,
+      :data_source_id,
       :chart_type,
       :data_source_type,
       :data_source_id,
+      :external_id,
       style: {},
+      tiers: %i[
+        value
+        name
+      ],
       cached_data: %i[
         value
         date

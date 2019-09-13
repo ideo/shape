@@ -28,20 +28,20 @@ module Roles
       return false if @parent.nil? || child.common_viewable?
 
       cached = child.cached_inheritance
+
+      # special case, fix any messed up records
+      child.reanchor_if_incorrect_anchor!(parent: @parent)
+
       if child.same_roles_anchor? @parent
-        if cached.nil? || cached['private']
-          child.cached_inheritance = { private: false, updated_at: Time.current }
-          child.save
-        end
+        child.unmark_as_private! if cached.blank? || cached['private']
         return false
       end
-      max_updated = [@parent.roles.maximum(:updated_at) || 1.year.ago, child.roles.maximum(:updated_at) || 1.year.ago].max
-      if !cached || !cached['updated_at'] || cached['updated_at'].to_time.to_i < max_updated.to_i
-        child.cached_inheritance = {
-          updated_at: max_updated,
-          private: !inherit_from_parent?(child),
-        }
-        child.save
+
+      # otherwise we only compute cached_inheritance if not already set.
+      # e.g. will preserve having intentionally marked/unmarked as private
+      if cached.blank?
+        value = !inherit_from_parent?(child)
+        child.mark_as_private!(value)
       end
       child.cached_inheritance['private']
     end

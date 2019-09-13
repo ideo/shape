@@ -2,7 +2,8 @@ class LimitedUserCreator < SimpleService
   attr_accessor :limited_user, :errors, :created
 
   def initialize(contact_info:, user_info: {}, date_of_participation: nil)
-    @contact_info = contact_info
+    # IMPORTANT! clean up contact info whitespaces
+    @contact_info = contact_info.gsub(/\s+/, '')
     @user_info = user_info
     @date_of_participation = date_of_participation
     @email = nil
@@ -18,14 +19,17 @@ class LimitedUserCreator < SimpleService
     return false unless validate_contact_info
 
     find_or_create_network_user
-    return false unless @network_user.present?
+    unless @network_user.present?
+      @errors << 'Unable to save user'
+      return false
+    end
 
     if @network_user.errors.present?
-      @errors = @network_user.errors
+      @errors = @network_user.errors.full_messages
       return false
     end
     saved = create_user(@network_user)
-    @errors = @limited_user.errors
+    @errors = @limited_user.errors.full_messages
     saved
   end
 
@@ -60,7 +64,10 @@ class LimitedUserCreator < SimpleService
     params[:email] = @email if @email
     params[:phone] = @phone if @phone
 
-    return false if params.empty?
+    if params.empty?
+      @errors << 'No contact information entered'
+      return false
+    end
 
     if ENV['IDEO_SSO_ENV'] == 'production' && !Rails.env.production? && ENV['SHAPE_APP'] != 'production'
       # if using prod SSO environment but not on shape-production,

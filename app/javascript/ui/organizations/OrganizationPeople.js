@@ -2,7 +2,8 @@ import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import { FormSpacer, TextButton } from '~/ui/global/styled/forms'
+import { TextButton } from '~/ui/global/styled/buttons'
+import { FormSpacer } from '~/ui/global/styled/forms'
 import { Row, RowItemRight } from '~/ui/global/styled/layout'
 import {
   Heading3,

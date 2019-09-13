@@ -76,14 +76,14 @@ const FixedActivityLogWrapper = styled.div`
   z-index: ${v.zIndex.activityLog};
 `
 
-const SelectedArea = styled.div.attrs({
-  style: ({ coords }) => ({
+const SelectedArea = styled.div.attrs(({ coords }) => ({
+  style: {
     left: `${coords.left}px`,
     top: `${coords.top}px`,
     height: `${coords.height}px`,
     width: `${coords.width}px`,
-  }),
-})`
+  },
+}))`
   background-color: rgba(192, 219, 222, 0.4);
   position: absolute;
   z-index: ${v.zIndex.clickWrapper};

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import FlipMove from 'react-flip-move'
 import Rnd from 'react-rnd'
-import styled, { keyframes } from 'styled-components'
+import styled, { css, keyframes } from 'styled-components'
 
 import { uiStore } from '~/stores'
 import v from '~/utils/variables'
@@ -34,28 +34,30 @@ const StyledResizeIcon = styled.div`
   }
 `
 
-const bounceAnim = zoomLevel => keyframes`
+const bounce = zoomLevel => keyframes`
   50% {
     transform: scaleX(${1.125 / zoomLevel}) scaleY(${1.125 / zoomLevel});
   }
 `
+const bounceAnim = props => css`
+  ${bounce(props.zoomLevel)} 0.25s ease-out;
+`
 
-const InnerCardWrapper = styled.div.attrs({
-  style: ({ width, height, transition, transform }) => ({
-    transition,
-    transform,
-    height: `${height}px`,
-    width: `${width}px`,
-  }),
-})`
+const InnerCardWrapper = styled.div.attrs(
+  ({ width, height, transition, transform, zoomLevel, animatedBounce }) => ({
+    style: {
+      transition,
+      transform,
+      height: `${height}px`,
+      width: `${width}px`,
+    },
+    animation: animatedBounce ? bounceAnim : 'none',
+  })
+)`
+  animation: ${props => props.animation};
   transform-origin: left top;
   backface-visibility: hidden;
   font-smoothing: subpixel-antialiased;
-  ${props =>
-    props.animatedBounce &&
-    `
-    animation: ${bounceAnim(props.zoomLevel)} 0.25s ease-out;
-    `};
   @media print {
     page-break-inside: avoid;
     page-break-after: always;
@@ -388,7 +390,8 @@ class MovableGridCard extends React.PureComponent {
       // cancel for links within the card as these should handle their own routing
       (e.target.tagName === 'A' && e.target.href) ||
       formTags.includes(e.target.tagName) ||
-      record.type === 'Item::DataItem'
+      record.type === 'Item::DataItem' ||
+      e.target.className.match(/CollectionCoverFormButton/)
     ) {
       return
     }
@@ -676,7 +679,7 @@ class MovableGridCard extends React.PureComponent {
         dragging={!moveComplete}
         zIndex={_zIndex}
         onClick={this.handleWrapperClick}
-        innerRef={c => (this.gridCardRef = c)}
+        ref={c => (this.gridCardRef = c)}
         moving={mdlPlaceholder}
         hidden={shouldHide}
         // for mdlPlaceholder

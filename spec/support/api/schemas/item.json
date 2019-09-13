@@ -26,13 +26,14 @@
     "data_source_type": { "type": ["string", "null"] },
     "data_source_id": { "type": ["number", "null"] },
     "is_private": { "type": ["boolean"] },
+    "show_language_selector": { "type": ["boolean"] },
     "has_replaced_media": { "type": ["boolean"] },
     "pending_transcoding": { "type": ["boolean"] },
     "legend_item_id": { "type": ["number", "null"] },
     "common_viewable": { "type": ["boolean", "null"] },
     "archived": { "type": ["boolean", "null"] },
     "is_restorable": { "type": ["boolean", "null"] },
-    "inherited_default_group_id": { "type": ["string"] }
+    "default_group_id": { "type": ["string", "null"] }
   },
   "required": ["class_type"]
 }

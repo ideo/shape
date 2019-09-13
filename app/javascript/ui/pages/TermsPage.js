@@ -22,12 +22,12 @@ const StyledMarkdown = styled(ReactMarkdown)`
 `
 StyledMarkdown.displayName = 'StyledMarkdown'
 
-const StyledTitle = DisplayText.extend`
+const StyledTitle = styled(DisplayText)`
   font-weight: ${v.weights.medium};
   text-transform: uppercase;
 `
 
-const StyledLink = DisplayLink.extend`
+const StyledLink = styled(DisplayLink)`
   text-transform: uppercase;
   margin-left: 80px;
   margin-bottom: 30px;

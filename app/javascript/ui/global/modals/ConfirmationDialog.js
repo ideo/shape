@@ -2,11 +2,8 @@ import PropTypes from 'prop-types'
 import { FormControlLabel, Grid } from '@material-ui/core'
 import styled from 'styled-components'
 
-import {
-  FormActionsContainer,
-  TextButton,
-  Checkbox,
-} from '~/ui/global/styled/forms'
+import { TextButton } from '~/ui/global/styled/buttons'
+import { FormActionsContainer, Checkbox } from '~/ui/global/styled/forms'
 import { ConfirmText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 import Dialog from './Dialog'
@@ -58,7 +55,7 @@ const OptionImage = styled.img`
   }
 `
 
-const ConfirmOption = ConfirmText.extend`
+const ConfirmOption = styled(ConfirmText)`
   color: black;
   display: block;
   margin: 0 auto 70px;
@@ -68,7 +65,7 @@ const ConfirmOption = ConfirmText.extend`
   }
 `
 
-const OptionsButton = TextButton.extend`
+const OptionsButton = styled(TextButton)`
   color: ${v.colors.black};
   font-size: 0.75rem;
 `

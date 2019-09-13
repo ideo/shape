@@ -49,8 +49,9 @@ class CollectionCard < ApplicationRecord
 
   # this really is only appropriate for CollectionCard::Primary but defined globally here
   accepts_nested_attributes_for :collection, :item
-  # for the purpose of accepting this param via deserializable
+  # for the purpose of accepting these params via deserializable
   attr_accessor :external_id
+  attr_accessor :card_type
 
   before_validation :assign_order, if: :assign_order?
   before_validation :ensure_width_and_height
@@ -102,9 +103,9 @@ class CollectionCard < ApplicationRecord
     # propagate to STI models
     propagate
     nullify :templated_from_id
-    nullify :is_cover
     # don't recognize any relations, easiest way to turn them all off
     recognize []
+
   end
 
   def self.default_relationships_for_api
@@ -113,6 +114,7 @@ class CollectionCard < ApplicationRecord
       record: [
         :filestack_file,
         :datasets,
+        :translations,
         collection_cover_items: :datasets,
       ],
     ]
@@ -171,6 +173,11 @@ class CollectionCard < ApplicationRecord
     elsif placement.is_a? Integer
       cc.order = placement
     end
+
+    # Nullify is_cover if the collection going into already has a cover or
+    # should specifically not have a cover.
+    cc.is_cover = false if parent.cached_cover.try(:[], 'no_cover') == true
+    cc.is_cover = false if parent.collection_cards.is_cover.count.positive?
 
     unless shallow || link?
       opts = {

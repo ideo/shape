@@ -37,6 +37,8 @@
     "is_submission_box_template": { "type": ["boolean"] },
     "is_submission_box_template_test": { "type": ["boolean"] },
     "is_inside_a_submission": { "type": ["boolean"] },
+    "is_subtemplate_or_instance": { "type": ["boolean"] },
+    "show_language_selector": { "type": ["boolean"] },
     "submission_attrs": { "type": ["object", "null"] },
     "launchable": { "type": ["boolean", "null"] },
     "gives_incentive": { "type": ["boolean", "null"] },
@@ -48,7 +50,7 @@
     "archived": { "type": ["boolean", "null"] },
     "has_link_sharing": { "type": ["boolean", "null"] },
     "is_restorable": { "type": ["boolean", "null"] },
-    "inherited_default_group_id": { "type": ["string"] },
+    "default_group_id": { "type": ["string", "null"] },
     "cache_key": { "type": ["string"] }
   },
   "required": ["name", "class_type", "created_at", "cover"]

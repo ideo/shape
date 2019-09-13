@@ -78,6 +78,7 @@ class Api::V1::UsersController < Api::V1::BaseController
       end
       render jsonapi: creator.limited_user
     else
+      logger.info "** ERROR CREATING LIMITED USER #{creator.errors.inspect} **"
       render json: { errors: creator.errors }, status: :unprocessable_entity
     end
   end
@@ -120,6 +121,7 @@ class Api::V1::UsersController < Api::V1::BaseController
       :feedback_contact_preference,
       :feedback_terms_accepted,
       :respondent_terms_accepted,
+      :locale,
       age_list: [],
       children_age_list: [],
       country_list: [],

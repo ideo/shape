@@ -340,7 +340,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     // you also don't use test templates, since duplicating them or
     // creating them within another template is the way to do that
     return (
-      !!this.isMasterTemplate &&
+      this.isMasterTemplate &&
+      !this.isSubTemplate &&
       !this.isProfileTemplate &&
       !this.is_submission_box_template &&
       !this.isTestDesign &&
@@ -397,6 +398,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get isTemplated() {
     return !!this.template_id
+  }
+
+  get isSubTemplate() {
+    // a subtemplate is a collection or a template within a template or an instance of it
+    return this.is_subtemplate_or_instance
   }
 
   get isUserProfile() {
@@ -552,11 +558,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     _.each(updates, update => {
       updatesByCardId[update.card.id] = update
     })
-    let minOrder = _.minBy(updates, 'order')
-    minOrder = minOrder ? minOrder.order : 0
-    let maxOrder = _.maxBy(updates, 'order')
-    maxOrder = maxOrder ? maxOrder.order : 0
-    const moveOrder = _.min([minOrder, maxOrder])
+    const orders = _.map(updates, update => update.order)
+    const minOrder = _.min(orders)
+    const maxOrder = _.max(orders)
+    // min...max is range of cards you are moving
 
     // Apply all updates to in-memory cards
     _.each(this.collection_cards, card => {
@@ -568,9 +573,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         _.forEach(allowedAttrs, (value, key) => {
           card[key] = value
         })
-      } else if (moveOrder && card.order >= moveOrder) {
+      } else if (card.order >= minOrder) {
         // make sure this card gets bumped out of the way of our moving ones
-        card.order += maxOrder
+        card.order += maxOrder + 1
       }
       // force the grid to immediately observe that things have changed
       card.updated_at = new Date()
@@ -930,7 +935,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
           cancel()
           uiStore.reselectCardIds(cardIds)
           uiStore.openMoveMenu({
-            from: this.id,
+            from: this,
             cardAction,
           })
         },
@@ -983,6 +988,22 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         blankType: type,
       })
     }
+  }
+
+  get subtitle() {
+    const { cover } = this
+    if (cover.subtitle_hidden) {
+      return ''
+    }
+    return cover.hardcoded_subtitle || cover.text || ''
+  }
+
+  get subtitleHidden() {
+    const { cover } = this
+    if (cover && cover.subtitle_hidden) {
+      return cover
+    }
+    return false
   }
 
   // NOTE: this is only used as a Cypress test method, to simulate card resizing

@@ -1,4 +1,4 @@
-import CoverImageSelector from '~/ui/grid/CoverImageSelector'
+import CardCoverEditor from '~/ui/grid/CardCoverEditor'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import FilestackUpload from '~/utils/FilestackUpload'
 import fakeApiStore from '#/mocks/fakeApiStore'
@@ -15,16 +15,21 @@ let rerender
 const fakeEv = { preventDefault: jest.fn() }
 let component, wrapper, innerWrapper
 
-describe('CoverImageSelector', () => {
+describe('CardCoverEditor', () => {
   beforeEach(() => {
     card = fakeCollectionCard
     card.record = {
       id: 3,
       internalType: 'collections',
       API_fetchCards: jest.fn(),
+      API_updateNameAndCover: jest.fn(),
       collection_cards: [
         { id: 1, record: { id: 1, name: '', filestack_file_url: '' } },
       ],
+      cover: {
+        hardcoded_subtitle: 'Lorem ipsum hardcoded',
+        subtitle_hidden: false,
+      },
     }
     collection = fakeCollection
     const requestResult = { data: collection }
@@ -46,9 +51,10 @@ describe('CoverImageSelector', () => {
     }
     rerender = (opts = {}) => {
       const newProps = { ...props, ...opts }
-      wrapper = shallow(<CoverImageSelector.wrappedComponent {...newProps} />)
+      wrapper = shallow(<CardCoverEditor.wrappedComponent {...newProps} />)
       component = wrapper.instance()
-      innerWrapper = shallow(component.renderInner())
+      const Inner = () => component.renderInner()
+      innerWrapper = shallow(<Inner />)
     }
     rerender()
   })
@@ -103,6 +109,24 @@ describe('CoverImageSelector', () => {
 
     it('should set the list of options from the api', () => {
       expect(component.imageOptions.length).toEqual(3)
+    })
+  })
+
+  describe('updating name and cover', () => {
+    beforeEach(() => {
+      props.isEditingCardCover = collection.id
+      wrapper.setProps(props)
+    })
+    describe('closing the cover editor', () => {
+      beforeEach(() => {
+        component.handleClose(fakeEv)
+      })
+      it('should close the selector', () => {
+        expect(uiStore.setEditingCardCover).toHaveBeenCalledWith(null)
+      })
+      it('should call API_updateNameAndCover with the edited title text', () => {
+        expect(uiStore.setEditingCardCover).toHaveBeenCalled()
+      })
     })
   })
 

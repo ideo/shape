@@ -31,7 +31,11 @@ class DataItemsDataset < ApplicationRecord
     exclude_association :data_item
 
     customize(lambda { |orig_data_items_dataset, dup_data_items_dataset|
-      new_dataset = orig_data_items_dataset.dataset.amoeba_dup
+      if dup_data_items_dataset.dataset.link_when_duplicating?
+        new_dataset = orig_data_items_dataset.dataset
+      else
+        new_dataset = orig_data_items_dataset.dataset.amoeba_dup
+      end
       dup_data_items_dataset.dataset = new_dataset
     })
   end

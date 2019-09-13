@@ -83,6 +83,9 @@ class Collection < ApplicationRecord
                     confirmable: true,
                     fallbacks_for_empty_translations: true
 
+  # has to come after `translates_custom`
+  include Translatable
+
   store_accessor :cached_attributes,
                  :cached_cover,
                  :cached_tag_list,
@@ -310,6 +313,7 @@ class Collection < ApplicationRecord
     [
       :created_by,
       :organization,
+      :translations,
       parent_collection_card: %i[parent],
       roles: %i[users groups resource],
     ]
@@ -647,16 +651,18 @@ class Collection < ApplicationRecord
       test_details = "launchable=#{launchable?}&can_reopen=#{can_reopen?}"
     end
 
-    "#{jsonapi_cache_key}" \
-      "/#{ActiveRecord::Migrator.current_version}" \
-      "/#{ENV['HEROKU_RELEASE_VERSION']}" \
-      "/order_#{card_order}" \
-      "/cards_#{collection_cards.maximum(:updated_at).to_i}" \
-      "/#{test_details}" \
-      "/#{getting_started_shell}" \
-      "/#{organization.updated_at}" \
-      "/user_id_#{user_id}" \
-      "/roles_#{anchored_roles.maximum(:updated_at).to_i}"
+    %(#{jsonapi_cache_key}
+      /#{ActiveRecord::Migrator.current_version}
+      /#{ENV['HEROKU_RELEASE_VERSION']}
+      /order_#{card_order}
+      /cards_#{collection_cards.maximum(:updated_at).to_i}
+      /#{test_details}
+      /gs_#{getting_started_shell}
+      /org_#{organization.updated_at}
+      /user_id_#{user_id}
+      /locale_#{I18n.locale}
+      /roles_#{anchored_roles.maximum(:updated_at).to_i}
+    ).gsub(/\s+/, '')
   end
 
   def jsonapi_type_name
@@ -737,9 +743,10 @@ class Collection < ApplicationRecord
     last_non_blank_row + 2
   end
 
-  # This is the default group ID inherited from the roles anchor
-  def inherited_default_group_id
-    roles_anchor.default_group_id
+  def default_group_id
+    return self[:default_group_id] if self[:default_group_id].present? || roles_anchor == self
+
+    roles_anchor&.default_group_id
   end
 
   # =================================
@@ -760,9 +767,19 @@ class Collection < ApplicationRecord
   end
 
   def inside_a_master_template?
-    return true if master_template?
+    master_template? || child_of_a_master_template?
+  end
 
+  def child_of_a_master_template?
     parents.where(master_template: true).any?
+  end
+
+  def subtemplate?
+    master_template? && child_of_a_master_template?
+  end
+
+  def subtemplate_instance?
+    templated? && template.subtemplate?
   end
 
   def inside_a_template_instance?
@@ -837,6 +854,11 @@ class Collection < ApplicationRecord
 
   def parent_application_collection
     parents.find_by(type: 'Collection::ApplicationCollection')
+  end
+
+  def inside_an_application_collection?
+    is_a?(Collection::ApplicationCollection) ||
+      parent_application_collection.present?
   end
 
   # =================================

@@ -32,7 +32,7 @@ import BctButtonBox from './BctButtonBox'
 import BctButtonRotation from './BctButtonRotation'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 
-const StyledGridCardBlank = StyledGridCard.extend`
+const StyledGridCardBlank = styled(StyledGridCard)`
   background-color: transparent;
   cursor: auto;
   position: relative;
@@ -358,6 +358,7 @@ class GridCardBlank extends React.Component {
       parent_id: parent.id,
       image_contain: this.props.defaultShowWholeImage,
     }
+
     // apply nested attrs
     Object.assign(attrs, nested)
     const card = new CollectionCard(attrs, apiStore)

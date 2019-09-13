@@ -5,7 +5,7 @@ import pluralize from 'pluralize'
 import styled from 'styled-components'
 
 import { Anchor } from '~/ui/global/styled/typography'
-import { FormButton } from '~/ui/global/styled/forms'
+import { FormButton } from '~/ui/global/styled/buttons'
 import Link from '~/ui/global/Link'
 import { apiStore, uiStore, routingStore } from '~/stores'
 import v from '~/utils/variables'
@@ -29,14 +29,14 @@ function roleArticle(nextWord) {
 
 const MAX_ACTORS = 3
 
-export const ActivityText = styled.p`
+export const ActivityText = styled.div`
   color: ${v.colors.commonLight};
   font-family: ${v.fonts.sans};
   font-size: 1rem;
   line-height: 1.25;
   margin-bottom: 0;
 `
-const ActivityButton = styled.button`
+const ActivityButton = styled.div`
   display: block;
   text-align: left;
 `

@@ -269,19 +269,33 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
 
     context 'for a user' do
       let(:remove_viewer) { viewers.first }
-      let(:params) do
+      let(:raw_params) do
         {
           role: { name: 'viewer' },
           user_ids: [remove_viewer.id],
           is_switching: false,
-        }.to_json
+        }
       end
+      let(:params) { raw_params.to_json }
       let(:role) { collection.roles.find_by(name: Role::VIEWER) }
       let(:path) { "/api/v1/collections/#{collection.id}/roles/#{role.id}" }
 
       it 'returns a 204 no_content' do
         delete(path, params: params)
         expect(response.status).to eq(204)
+      end
+
+      context 'with mark_private param' do
+        let(:params) do
+          raw_params.merge(mark_private: true).to_json
+        end
+
+        it 'marks the collection as private' do
+          expect(collection.cached_inheritance).to be nil
+          delete(path, params: params)
+          expect(response.status).to eq(204)
+          expect(collection.reload.cached_inheritance['private']).to be true
+        end
       end
 
       context 'with cards/children' do

@@ -322,6 +322,25 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         post(path, params: params)
       end
 
+      context 'with a link card' do
+        let!(:linked_collection) { create(:collection) }
+        let(:raw_params) do
+          {
+            order: 1,
+            parent_id: collection.id,
+            collection_id: linked_collection.id,
+            card_type: 'link',
+          }
+        end
+
+        it 'should create a link card' do
+          post(path, params: params)
+          expect(CollectionCard.find(json['data']['id']).parent).to eq(collection)
+          linked_id = json['data']['relationships']['record']['data']['id']
+          expect(Collection.find(linked_id)).to eq linked_collection
+        end
+      end
+
       context 'broadcasting updates' do
         context 'with a text item' do
           let(:item_attributes) do
@@ -442,6 +461,39 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         post(path, params: params_with_video_item)
         item = json_included_objects_of_type('items').first
         expect(item['attributes']['url']).to eq('https://www.youtube.com/watch?v=4r7wHMg5Yjg')
+      end
+    end
+
+    context 'with translated attributes' do
+      let(:params_with_translated_attrs) do
+        json_api_params(
+          'collection_cards',
+          order: 1,
+          parent_id: collection.id,
+          item_attributes: {
+            type: 'Item::TextItem',
+            name: 'Something great',
+            translated_name_es: 'Algo genial',
+            content: "Isn't this a cool widget?",
+            translated_content_es: '¿No es este un widget genial?',
+          },
+        )
+      end
+
+      it 'returns a 200' do
+        post(path, params: params_with_translated_attrs)
+        expect(response.status).to eq(200)
+      end
+
+      it 'returns item with attrs' do
+        post(path, params: params_with_translated_attrs)
+        json_item = json_included_objects_of_type('items').first
+        expect(json_item['attributes']['name']).to eq('Something great')
+        expect(json_item['attributes']['content']).to eq("Isn't this a cool widget?")
+
+        item = Item.find(json_item['id'])
+        expect(item.translated_name_es).to eq('Algo genial')
+        expect(item.translated_content_es).to eq('¿No es este un widget genial?')
       end
     end
   end
@@ -634,6 +686,21 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       it 'returns a 204' do
         patch(path, params: params)
         expect(response.status).to eq(204)
+      end
+
+      context 'even if from_id param is absent' do
+        let(:raw_params) do
+          {
+            to_id: to_collection.id,
+            collection_card_ids: moving_cards.map(&:id),
+            placement: 'beginning',
+          }
+        end
+
+        it 'returns a 204' do
+          patch(path, params: params)
+          expect(response.status).to eq(204)
+        end
       end
     end
 

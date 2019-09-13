@@ -37,14 +37,20 @@ class Role < ApplicationRecord
 
   scopify
 
+  # -- resource roles
   VIEWER = :viewer
   EDITOR = :editor
   CONTENT_EDITOR = :content_editor
   MEMBER = :member
   ADMIN = :admin
-  SHAPE_ADMIN = :shape_admin
-  SUPER_ADMIN = :super_admin
+
+  # -- special roles
+  # application user e.g. the CD bot user, provides org level access
   APPLICATION_USER = :application_user
+  # shape admin has access to the /admin section e.g. for administering feedback
+  SHAPE_ADMIN = :shape_admin
+  # super admin has view/edit access to everything
+  SUPER_ADMIN = :super_admin
 
   amoeba do
     enable

@@ -17,14 +17,16 @@ const fakeEvent = {
   metaKey: null,
 }
 
-let wrapper
+let wrapper, component
 describe('CollectionCover', () => {
   beforeEach(() => {
+    fakeCollection.subtitle = cover.text
     props.collection = {
       ...fakeCollection,
       is_inside_a_submission: false,
     }
     wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
+    component = wrapper.instance()
   })
 
   it('renders snapshot', () => {
@@ -52,6 +54,7 @@ describe('CollectionCover', () => {
         .children()
         .text()
     ).toContain(cover.text)
+    expect(component.numberOfLinesForDescription).toEqual(3)
   })
 
   it('does not render the launch test button if not in a submission', () => {
@@ -63,6 +66,10 @@ describe('CollectionCover', () => {
       .find('[data-cy="collection-cover-link"]')
       .simulate('click', fakeEvent)
     expect(props.uiStore.showPermissionsAlert).not.toHaveBeenCalled()
+  })
+
+  it('does not show the cover button', () => {
+    expect(wrapper.find('CardButtonWrapper').exists()).toBeFalsy()
   })
 
   describe('with a launchable submission test', () => {
@@ -93,6 +100,34 @@ describe('CollectionCover', () => {
         .find('[data-cy="collection-cover-link"]')
         .simulate('click', fakeEvent)
       expect(props.uiStore.showPermissionsAlert).toHaveBeenCalled()
+    })
+  })
+
+  describe('with template', () => {
+    beforeEach(() => {
+      props.collection.isUsableTemplate = true
+      wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
+      component = wrapper.instance()
+    })
+
+    it('shows the use template button for master templates', () => {
+      expect(wrapper.find('CardButtonWrapper').exists()).toBeTruthy()
+    })
+
+    it('reduces the number of lines for the description', () => {
+      expect(component.numberOfLinesForDescription).toEqual(2)
+    })
+  })
+
+  describe('with unusable template (e.g. child of a master template)', () => {
+    beforeEach(() => {
+      props.collection.isUsableTemplate = false
+      wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
+      component = wrapper.instance()
+    })
+
+    it('does not show use template button', () => {
+      expect(wrapper.find('CardButtonWrapper').exists()).toBeFalsy()
     })
   })
 })

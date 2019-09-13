@@ -65,6 +65,8 @@ class Item < ApplicationRecord
                     :translated_data_content,
                     confirmable: true,
                     fallbacks_for_empty_translations: true
+  # has to come after `translates_custom`
+  include Translatable
 
   store_accessor :cached_attributes,
                  :cached_tag_list,
@@ -75,7 +77,9 @@ class Item < ApplicationRecord
                  :pending_transcoding_uuid,
                  :common_viewable
 
-  attr_accessor :datasets_attributes
+  # So that we can assign these params in collection card builder
+  # We have assignment logic instead of using nested attributes
+  attr_accessor :datasets_attributes, :data_items_datasets_attributes
 
   # The card that 'holds' this item and determines its breadcrumb
   has_one :parent_collection_card,
@@ -303,9 +307,10 @@ class Item < ApplicationRecord
     'items'
   end
 
-  def inherited_default_group_id
-    # if roles_anchor is itself, it will not have a default_group_id
-    roles_anchor.try(:default_group_id)
+  def default_group_id
+    return self[:default_group_id] if self[:default_group_id].present? || roles_anchor == self
+
+    roles_anchor&.default_group_id
   end
 
   private

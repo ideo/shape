@@ -13,7 +13,7 @@ import {
   FooterBreak,
   FooterArea,
 } from '~/ui/global/styled/layout'
-import SearchButton from '~/ui/global/SearchButton'
+import ExpandableSearchInput from '~/ui/global/ExpandableSearchInput'
 import Panel from '~/ui/global/Panel'
 import RolesAdd from '~/ui/roles/RolesAdd'
 import RoleSelect from '~/ui/roles/RoleSelect'
@@ -325,7 +325,7 @@ class RolesMenu extends React.Component {
         />
         <StyledHeaderRow align="flex-end">
           <Heading3>{title}</Heading3>
-          <SearchButton
+          <ExpandableSearchInput
             value={this.state.searchText}
             onChange={this.handleSearchChange}
             onClear={this.clearSearch}
@@ -346,7 +346,7 @@ class RolesMenu extends React.Component {
                 onCreateUsers={this.onCreateUsers}
                 ownerType={ownerType}
                 addableGroups={editableGroups}
-                defaultGroupId={record.inherited_default_group_id}
+                defaultGroupId={record.default_group_id}
               />
             </FooterArea>
           </Fragment>

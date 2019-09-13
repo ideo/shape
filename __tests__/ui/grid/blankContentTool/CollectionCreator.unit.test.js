@@ -2,9 +2,16 @@ import CollectionCreator from '~/ui/grid/blankContentTool/CollectionCreator'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import googleTagManager from '~/vendor/googleTagManager'
 import { routingStore } from '~/stores'
+import fakeUiStore from '#/mocks/fakeUiStore'
 
 jest.mock('../../../../app/javascript/vendor/googleTagManager')
 jest.mock('../../../../app/javascript/stores')
+const uiStore = fakeUiStore
+
+uiStore.viewingCollection = {
+  id: 3,
+  isMasterTemplate: false,
+}
 
 const e = { preventDefault: jest.fn() }
 let wrapper, props, component
@@ -15,6 +22,7 @@ describe('MovableGridCard', () => {
       type: 'collection',
       createCard: jest.fn(),
       closeBlankContentTool: jest.fn(),
+      uiStore: fakeUiStore,
     }
     props.createCard.mockClear()
     wrapper = shallow(<CollectionCreator {...props} />)
@@ -107,7 +115,36 @@ describe('MovableGridCard', () => {
         )
       })
     })
+
+    describe('when a collection is Template', () => {
+      beforeEach(() => {
+        props.type = 'template'
+        props.createCard.mockClear()
+        wrapper = shallow(<CollectionCreator {...props} />)
+        component = wrapper.instance()
+      })
+
+      it('creates a template collection', () => {
+        component.createCollection(e)
+        expect(component.shouldCreateAsMasterTemplate).toBeTruthy()
+      })
+    })
+
+    describe('when a viewing collection is a master template', () => {
+      beforeEach(() => {
+        props.uiStore.viewingCollection.isMasterTemplate = true
+        props.createCard.mockClear()
+        wrapper = shallow(<CollectionCreator {...props} />)
+        component = wrapper.instance()
+      })
+
+      it('creates a template collection', () => {
+        component.createCollection(e)
+        expect(component.shouldCreateAsMasterTemplate).toBeTruthy()
+      })
+    })
   })
+
   describe('afterCreate', () => {
     describe('when collection is any collection', () => {
       it('pushes an event to google tag manager', () => {

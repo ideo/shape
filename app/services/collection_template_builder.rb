@@ -94,6 +94,8 @@ class CollectionTemplateBuilder
   def created_template_name
     if creating_a_submission?
       "#{@created_by.first_name}'s #{@template.name}"
+    elsif @template.child_of_a_master_template?
+      "#{@template.name}"
     else
       "My #{@template.name}"
     end
