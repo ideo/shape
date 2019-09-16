@@ -17,7 +17,7 @@ class RemoveChildrenOfSubgroup
 
     GroupHierarchy
       .where(
-        parent_group: subgroup,
+        parent_group: parent_group,
         granted_by: subgroup,
       ).destroy_all
   end

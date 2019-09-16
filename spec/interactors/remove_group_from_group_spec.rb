@@ -7,6 +7,7 @@ RSpec.describe RemoveGroupFromGroup, type: :service do
       expect(RemoveGroupFromGroup.organized).to eq([
         RevokeMembershipToGroup,
         RemoveChildrenOfSubgroup,
+        RemoveGrandparentToChildGroupRelations,
       ])
     end
   end
@@ -27,6 +28,7 @@ RSpec.describe RemoveGroupFromGroup, type: :service do
     it 'calls the organized interactors' do
       expect(RevokeMembershipToGroup).to receive(:call!).and_return(:success)
       expect(RemoveChildrenOfSubgroup).to receive(:call!).and_return(:success)
+      expect(RemoveGrandparentToChildGroupRelations).to receive(:call!).and_return(:success)
       interactor
     end
 
