@@ -355,12 +355,12 @@ ActiveRecord::Schema.define(version: 2019_09_10_190757) do
 
   create_table "group_hierarchies", force: :cascade do |t|
     t.bigint "parent_group_id"
-    t.bigint "granted_by_id"
+    t.jsonb "path", default: "{}", null: false
     t.bigint "subgroup_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["granted_by_id"], name: "index_group_hierarchies_on_granted_by_id"
     t.index ["parent_group_id"], name: "index_group_hierarchies_on_parent_group_id"
+    t.index ["path"], name: "index_group_hierarchies_on_path", using: :gin
     t.index ["subgroup_id"], name: "index_group_hierarchies_on_subgroup_id"
   end
 
