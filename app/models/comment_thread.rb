@@ -7,12 +7,11 @@
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  organization_id :bigint(8)
-#  parent_id       :bigint(8)
 #  record_id       :integer
 #
 # Indexes
 #
-#  index_comment_threads_on_parent_id  (parent_id)
+#  index_comment_threads_on_record_and_org  (record_id,record_type,organization_id) UNIQUE
 #
 
 class CommentThread < ApplicationRecord
@@ -24,14 +23,13 @@ class CommentThread < ApplicationRecord
   # optional relation gives way to inherit_record_organization_id
   belongs_to :organization, optional: true
   before_validation :inherit_record_organization_id, on: :create
+  validates :record_id, uniqueness: { scope: %i[organization_id record_type] }
 
   has_many :comments,
            -> { order(created_at: :asc) },
            dependent: :destroy
-  has_many :children, class_name: 'CommentThread', foreign_key: 'parent_id'
   has_many :users_threads, dependent: :destroy
   has_many :groups_threads, dependent: :destroy
-  belongs_to :parent, class_name: 'CommentThread', optional: true
 
   after_update :update_firestore_users_threads
 

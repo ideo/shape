@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_16_230844) do
+ActiveRecord::Schema.define(version: 2019_09_09_225940) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -196,8 +196,7 @@ ActiveRecord::Schema.define(version: 2019_09_16_230844) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "organization_id"
-    t.bigint "parent_id"
-    t.index ["parent_id"], name: "index_comment_threads_on_parent_id"
+    t.index ["record_id", "record_type", "organization_id"], name: "index_comment_threads_on_record_and_org", unique: true
   end
 
   create_table "comments", force: :cascade do |t|
