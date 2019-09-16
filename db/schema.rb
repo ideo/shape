@@ -355,7 +355,7 @@ ActiveRecord::Schema.define(version: 2019_09_10_190757) do
 
   create_table "group_hierarchies", force: :cascade do |t|
     t.bigint "parent_group_id"
-    t.jsonb "path", default: "{}", null: false
+    t.jsonb "path"
     t.bigint "subgroup_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

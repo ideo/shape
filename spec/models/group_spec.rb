@@ -36,7 +36,7 @@ RSpec.describe Group, type: :model do
         create(
           :group_hierarchy,
           parent_group: group1,
-          granted_by: group2,
+          path: [group1, group2, group3].map(&:id),
           subgroup: group3,
         )
       end
@@ -45,7 +45,7 @@ RSpec.describe Group, type: :model do
         create(
           :group_hierarchy,
           parent_group: group2,
-          granted_by: group2,
+          path: [group2, group3].map(&:id),
           subgroup: group3,
         )
       end

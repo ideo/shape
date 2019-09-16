@@ -1,8 +1,7 @@
 class GrantParentAccessToSubgroup
-  include Interactor::Organizer
-  include Interactor::Schema
+  include Interactor
 
-  schema :subgroup, :parent_group
+  require_in_context :subgroup, :parent_group
   delegate :parent_group, :subgroup, to: :context
 
   def call
@@ -12,12 +11,14 @@ class GrantParentAccessToSubgroup
   private
 
   def create_group_hierarchy
-    relation = GroupHierarchy.create(
+    context.new_hierarchy = GroupHierarchy.create(
       parent_group: context.parent_group,
-      granted_by: context.parent_group,
+      path: [context.parent_group, context.subgroup].map(&:id),
       subgroup: context.subgroup,
     )
 
-    context.fail!(message: relation.errors.full_messages.join(', ')) unless relation.persisted?
+    context.fail!(
+      message: context.new_hierarchy.errors.full_messages.join(', ')
+    ) unless context.new_hierarchy.persisted?
   end
 end

@@ -15,49 +15,49 @@ RSpec.describe RemoveGrandparentToChildGroupRelations, type: :service do
       before do
         GroupHierarchy.create(
           parent_group: parent_group,
-          granted_by: parent_group,
+          path: [parent_group.id, subgroup.id],
           subgroup: subgroup,
         )
 
         GroupHierarchy.create(
           parent_group: subgroup,
-          granted_by: subgroup,
+          path: [subgroup.id, child_group_a.id],
           subgroup: child_group_a,
         )
 
         GroupHierarchy.create(
           parent_group: subgroup,
-          granted_by: subgroup,
+          path: [subgroup.id, child_group_b.id],
           subgroup: child_group_b,
         )
 
         GroupHierarchy.create(
           parent_group: parent_group,
-          granted_by: subgroup,
+          path: [parent_group.id, subgroup.id, child_group_a.id],
           subgroup: child_group_a,
         )
 
         GroupHierarchy.create(
           parent_group: parent_group,
-          granted_by: subgroup,
+          path: [parent_group.id, subgroup.id, child_group_b.id],
           subgroup: child_group_b,
         )
 
         GroupHierarchy.create(
           parent_group: grand_parent_group,
-          granted_by: parent_group,
+          path: [grand_parent_group.id, parent_group.id, subgroup],
           subgroup: subgroup,
         )
 
         GroupHierarchy.create(
           parent_group: grand_parent_group,
-          granted_by: parent_group,
+          path: [grand_parent_group.id, parent_group.id, subgroup.id, child_group_a.id],
           subgroup: child_group_a,
         )
 
         GroupHierarchy.create(
           parent_group: grand_parent_group,
-          granted_by: parent_group,
+          path: [grand_parent_group.id, parent_group.id, subgroup.id, child_group_b.id],
           subgroup: child_group_b,
         )
       end
@@ -67,6 +67,9 @@ RSpec.describe RemoveGrandparentToChildGroupRelations, type: :service do
 
       it 'destroys relationships between ancestors of the subgroup and children of subgroup' do
         expect { interactor }.to change { GroupHierarchy.count }.from(8).to(3)
+
+        expect(subgroup.subgroups).to include(child_group_a)
+        expect(subgroup.subgroups).to include(child_group_b)
 
         expect(parent_group.subgroups).to_not include(child_group_a)
         expect(parent_group.subgroups).to_not include(child_group_b)

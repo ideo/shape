@@ -1,9 +1,8 @@
 class GrantParentAccessToChildrenOfSubgroup
-  include Interactor::Organizer
-  include Interactor::Schema
+  include Interactor
 
-  schema :subgroup, :parent_group
-  delegate :parent_group, :subgroup, to: :context
+  require_in_context :subgroup, :parent_group, :new_hierarchy
+  delegate_to_context :parent_group, :subgroup, :new_hierarchy
 
   def call
     relate_parent_to_children_of_subgroup
@@ -15,12 +14,21 @@ class GrantParentAccessToChildrenOfSubgroup
     # We want to no-op here instead of context.fail!
     return if subgroup.subgroups.empty?
 
-    subgroup.subgroups.each do |child_group|
-      GroupHierarchy.create(
-        parent_group: parent_group,
-        granted_by: subgroup,
-        subgroup: child_group,
-      )
+    links_to_descendants = GroupHierarchy.where(parent_group_id: subgroup.id)
+    links_to_ancestors = GroupHierarchy.where(subgroup_id: parent_group.id)
+
+    links_to_ancestors.each do |ancestor|
+      p 'ancestor'
+      p ancestor
+      p "subgroup #{subgroup}"
+      ancestor.extend_path_to(subgroup)
+
+      links_to_descendants.each do |descendant|
+        ancestor.extend_path_to(descendant)
+      end
+    end
+    links_to_descendants.each do |descendant|
+      new_hierarchy.extend_path_to(descendant)
     end
 
     context.fail!(message: 'Failed to relate parent to children of subgroup') if parent_group.subgroups.empty?

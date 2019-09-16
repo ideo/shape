@@ -2,41 +2,27 @@ require 'rails_helper'
 
 RSpec.describe GrantParentAccessToChildrenOfSubgroup, type: :service do
   describe '#call' do
-    let(:subgroup) { create(:group) }
-    let(:parent_group) { create(:group) }
-    let(:child_group_a) { create(:group) }
-    let(:child_group_b) { create(:group) }
-    let(:fake_context) { { parent_group: parent_group, subgroup: subgroup } }
-    let(:service_call) { GrantParentAccessToChildrenOfSubgroup.call(fake_context) }
-
-    before do
+    let!(:child_group_a) { create(:group) }
+    let!(:child_group_b) { create(:group) }
+    let!(:subgroup) { create(:group, add_subgroups: [child_group_a, child_group_b]) }
+    let!(:parent_group) { create(:group) }
+    let(:new_hierarchy) do
       create(
         :group_hierarchy,
         parent_group: parent_group,
-        granted_by: parent_group,
         subgroup: subgroup,
       )
-
-      create(
-        :group_hierarchy,
-        parent_group: subgroup,
-        granted_by: subgroup,
-        subgroup: child_group_a,
-      )
-
-      create(
-        :group_hierarchy,
-        parent_group: subgroup,
-        granted_by: subgroup,
-        subgroup: child_group_b,
-      )
     end
+    let!(:grandparent_group) { create(:group, add_subgroups: [parent_group]) }
+
+    let(:fake_context) do
+      { parent_group: parent_group, subgroup: subgroup, new_hierarchy: new_hierarchy }
+    end
+    let(:service_call) { GrantParentAccessToChildrenOfSubgroup.call(fake_context) }
 
     context 'when successful' do
       before { service_call }
-      # describe '#success?' do
-      #   it { expect(service_call.success?).to eq true }
-      # end
+
       it 'retains relationship between parent group and subgroup' do
         expect(parent_group.subgroups).to include(subgroup)
       end
@@ -50,13 +36,12 @@ RSpec.describe GrantParentAccessToChildrenOfSubgroup, type: :service do
         expect(parent_group.subgroups).to include(child_group_a)
         expect(parent_group.subgroups).to include(child_group_b)
       end
-    end
 
-    # describe 'when it failure' do
-    #   let(:service_call) { GrantParentAccessToSubgroup.call({}) }
-    #   describe '#success?' do
-    #     it { expect(service_call.success?).to eq false }
-    #   end
-    # end
+      it 'connects ancestors of the parent group to children of the subgroup' do
+        expect(grandparent_group.subgroups).to include(child_group_a)
+        expect(grandparent_group.subgroups).to include(child_group_b)
+        expect(grandparent_group.subgroups).to include(subgroup)
+      end
+    end
   end
 end

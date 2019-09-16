@@ -5,8 +5,6 @@ RSpec.describe RemoveGroupFromGroup, type: :service do
   describe '#organized' do
     it 'organizes all of the related interactors ' do
       expect(RemoveGroupFromGroup.organized).to eq([
-        RevokeMembershipToGroup,
-        RemoveChildrenOfSubgroup,
         RemoveGrandparentToChildGroupRelations,
       ])
     end

@@ -18,6 +18,31 @@
 
 class GroupHierarchy < ApplicationRecord
   belongs_to :parent_group, class_name: 'Group'
-  belongs_to :granted_by, class_name: 'Group'
   belongs_to :subgroup, class_name: 'Group'
+
+  before_create :set_default_path
+
+  def extend_path_to(extension)
+    if extension.is_a? GroupHierarchy
+      extended_path = extension.path.drop(1)
+    elsif extension.is_a? Group
+      extended_path = [extension.id]
+    else
+      # die!
+      return false
+    end
+
+    GroupHierarchy.create(
+      parent_group: parent_group,
+      path: path + extended_path,
+      subgroup_id: extended_path.last,
+    )
+  end
+
+  def set_default_path
+    p "path is #{path}"
+    return path if path.present?
+
+    self.path = [parent_group, subgroup].map(&:id)
+  end
 end
