@@ -25,7 +25,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def create
     card_params = collection_card_params
     # CollectionCardBuilder type expects 'primary' or 'link'
-    card_type = card_params.delete(:card_type) || 'primary'
+    card_type = card_params.delete(:card_type) == 'CollectionCard::Link' ? 'link' : 'primary'
 
     builder = CollectionCardBuilder.new(params: card_params,
                                         type: card_type,
