@@ -178,6 +178,8 @@ group :test do
   gem 'vcr'
   gem 'webmock'
   gem 'timecop'
+  gem "simplecov"
+  gem 'codecov', :require => false
   gem 'jsonapi_spec_helpers'
 end
 

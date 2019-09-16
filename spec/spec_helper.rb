@@ -13,6 +13,29 @@
 # it.
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
+
+if RUBY_VERSION >= "1.9"
+  require "simplecov"
+  require 'codecov'
+
+  SimpleCov.formatters = [SimpleCov::Formatter::Codecov]
+  SimpleCov.coverage_dir('coverage/server')
+
+  SimpleCov.start do
+    add_filter 'spec/channels'
+    add_filter 'spec/factories'
+    add_filter 'spec/fixtures'
+    add_filter 'spec/interactors'
+    add_filter 'spec/mailers'
+    add_filter 'spec/models'
+    add_filter 'spec/requests'
+    add_filter 'spec/services'
+    add_filter 'spec/support'
+    add_filter 'spec/workers'
+    minimum_coverage(78.48)
+  end
+end
+
 RSpec.configure do |config|
   if ENV['CRYSTALBALL'] == 'true'
     require 'crystalball'

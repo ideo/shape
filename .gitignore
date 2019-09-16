@@ -43,3 +43,6 @@ cypress/videos
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+
+# codecov and istanbul coverage
+coverage/*

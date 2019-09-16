@@ -12382,7 +12382,7 @@ react-tag-autocomplete@^5.5.1:
   resolved "https://registry.yarnpkg.com/react-tag-autocomplete/-/react-tag-autocomplete-5.5.1.tgz#6b3f253d3d69eb546925118cdf43138a9aafe113"
   integrity sha512-/x6izH2OUySduXfJ9pgb3B2IirkE8w9+JEC1TF4QyPvyLTQ2tDFf4hlvTmK7iGEo+ll7oRZbtEHScLDI5YvvEQ==
 
-react-test-renderer@^16.0.0-0, react-test-renderer@^16.8.0:
+react-test-renderer@^16.0.0-0, react-test-renderer@^16.9.0:
   version "16.9.0"
   resolved "https://registry.yarnpkg.com/react-test-renderer/-/react-test-renderer-16.9.0.tgz#7ed657a374af47af88f66f33a3ef99c9610c8ae9"
   integrity sha512-R62stB73qZyhrJo7wmCW9jgl/07ai+YzvouvCXIJLBkRlRqLx4j9RqcLEAfNfU3OxTGucqR2Whmn3/Aad6L3hQ==
