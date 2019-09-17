@@ -33,7 +33,7 @@ RSpec.describe GroupHierarchy, type: :model do
         it 'includes the parent group preceding the subgroup in the array order' do
           expect(group_hierarchy.path).to eq([parent_group, subgroup].map(&:id))
           expect(
-            group_hierarchy.extend_path_to(child_group).path
+            group_hierarchy.extend_path_to(child_group).path,
           ).to eq([parent_group, subgroup, child_group].map(&:id))
         end
       end
@@ -41,7 +41,7 @@ RSpec.describe GroupHierarchy, type: :model do
       context 'with another hierarchy' do
         it 'merges a child hierarchy into its own path' do
           expect(
-            group_hierarchy.extend_path_to(child_hierarchy).path
+            group_hierarchy.extend_path_to(child_hierarchy).path,
           ).to eq([parent_group, subgroup, child_group].map(&:id))
         end
       end

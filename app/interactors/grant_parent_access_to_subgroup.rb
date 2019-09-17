@@ -17,8 +17,8 @@ class GrantParentAccessToSubgroup
       subgroup: context.subgroup,
     )
 
-    context.fail!(
-      message: context.new_hierarchy.errors.full_messages.join(', ')
-    ) unless context.new_hierarchy.persisted?
+    unless context.new_hierarchy.persisted?
+      context.fail!(message: context.new_hierarchy.errors.full_messages.join(', '))
+    end
   end
 end

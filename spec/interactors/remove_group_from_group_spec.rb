@@ -18,7 +18,7 @@ RSpec.describe RemoveGroupFromGroup, type: :service do
     before do
       GroupHierarchy.create(
         parent_group: parent_group,
-        subgroup: subgroup
+        subgroup: subgroup,
       )
     end
 
