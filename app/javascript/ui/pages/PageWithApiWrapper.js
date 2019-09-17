@@ -112,15 +112,16 @@ class PageWithApiWrapper extends React.Component {
         const { data } = res
         const { id } = match.params
 
-        if (id && id.toString() === this.fetchId) {
+        if (id && id.toString() === this.fetchId && _.isString(data.name)) {
+          const name = data.name.replace(/[^\x00-\x7F]/g, '')
           // Update URL so collections and items have slug with id and name
           history.replaceState(
             // state object
             {},
             // title: ignored by some browsers
-            data.name,
+            name,
             // URL, stripping non-ASCII characters
-            `${data.id}-${_.kebabCase(data.name.replace(/[^\x00-\x7F]/g, ''))}`
+            `${data.id}-${_.kebabCase(name)}`
           )
         }
 

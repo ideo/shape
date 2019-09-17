@@ -40,11 +40,13 @@
 }
 
 .ql-clipboard {
-  left: -100000px;
+  // https://github.com/quilljs/quill/issues/1374#issuecomment-520296215
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  display: none;
   height: 1px;
   overflow-y: hidden;
-  position: absolute;
-  top: 50%;
 
   p {
     margin: 0;

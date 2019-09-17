@@ -271,6 +271,10 @@ export const QuillStyleWrapper = styled.div`
       margin-top: 0.85rem;
     }
 
+    a {
+      color: ${v.colors.ctaPrimary};
+    }
+
     @keyframes blink-animation {
       to {
         visibility: hidden;
