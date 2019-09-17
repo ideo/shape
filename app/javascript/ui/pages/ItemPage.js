@@ -17,8 +17,17 @@ import { Helmet } from 'react-helmet'
 
 const ItemPageContainer = styled.div`
   background: white;
-  min-height: 75vh;
   position: relative;
+  min-height: 75vh;
+  /* for IE: https://stackoverflow.com/a/31915203/260495 --> */
+  align-items: stretch;
+  display: flex;
+  &::after {
+    height: 75vh;
+    content: '';
+    visibility: hidden;
+  }
+  /* ---- */
 `
 ItemPageContainer.displayName = 'ItemPageContainer'
 
@@ -165,12 +174,10 @@ class ItemPage extends React.Component {
             replacingId === item.parent_collection_card.id ? (
               <GridCardBlank parent={item.parent} afterCreate={this.reroute} />
             ) : (
-              <div>
-                {this.content}
-                <MoveModal />
-              </div>
+              this.content
             )}
           </PageContainer>
+          <MoveModal />
         </ItemPageContainer>
       </Fragment>
     )
