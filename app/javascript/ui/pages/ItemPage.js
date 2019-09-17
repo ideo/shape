@@ -17,17 +17,8 @@ import { Helmet } from 'react-helmet'
 
 const ItemPageContainer = styled.div`
   background: white;
-  position: relative;
   min-height: 75vh;
-  /* for IE: https://stackoverflow.com/a/31915203/260495 --> */
-  align-items: stretch;
-  display: flex;
-  &::after {
-    height: 75vh;
-    content: '';
-    visibility: hidden;
-  }
-  /* ---- */
+  position: relative;
 `
 ItemPageContainer.displayName = 'ItemPageContainer'
 
