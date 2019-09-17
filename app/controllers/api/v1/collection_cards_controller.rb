@@ -222,7 +222,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     end
     @to_collection = Collection.find(json_api_params[:to_id])
     @cards.primary.each do |card|
-      authorize! :edit, card
+      authorize! :move, card
     end
     @cards.link.each do |card|
       authorize! :read, card

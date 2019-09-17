@@ -631,6 +631,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       context 'but with edit access to the from_collection' do
         it 'returns a 204' do
           patch(path, params: params)
+          expect(moving_cards.first.can_edit?(user)).to be false
           expect(response.status).to eq(204)
         end
       end
