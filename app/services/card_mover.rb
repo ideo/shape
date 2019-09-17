@@ -117,7 +117,12 @@ class CardMover
       # parent_id will already be set for existing_cards but no harm to indicate
       card.assign_attributes(parent_id: @to_collection.id, order: i)
       # Currently any cards created in master_templates become pinned
-      card.assign_attributes(pinned: true) if @to_collection.master_template?
+      if @to_collection.master_template?
+        card.assign_attributes(pinned: true)
+      else
+        # TODO: add test for this -- is this the right logic?
+        card.assign_attributes(pinned: false)
+      end
       if card.changed?
         @should_update_to_cover ||= card.should_update_parent_collection_cover?
         card.save

@@ -55,6 +55,12 @@ const captureGlobalKeypress = e => {
         return false
       }
       if (metaKey || ctrlKey) {
+        const { selectedCardIds } = uiStore
+        if (!selectedCardIds || !selectedCardIds.length) {
+          return false
+        }
+        const card = apiStore.find('collection_cards', selectedCardIds[0])
+        card.reselectOnlyEditableCards(selectedCardIds)
         uiStore.openMoveMenu({
           from: viewingCollection, // CTRL+X: Move
           cardAction: 'move',
