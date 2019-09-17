@@ -4,6 +4,7 @@ import { toJS } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import Delta from 'quill-delta'
 import ReactQuill, { Quill } from 'react-quill'
+// NOTE: quill-cursors injects a bunch of .ql-xx related styles into the <head>
 import QuillCursors from 'quill-cursors'
 import styled from 'styled-components'
 
