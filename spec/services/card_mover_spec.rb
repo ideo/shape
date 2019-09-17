@@ -169,6 +169,45 @@ RSpec.describe CardMover, type: :service do
           ])
         end
       end
+
+      context 'with pinned cards in a collection' do
+        before do
+          # update first 2 cards to be pinned
+          from_collection.reload.collection_cards.limit(2).update_all(pinned: true)
+        end
+
+        it 'should assign all cards as not pinned' do
+          card_mover.call
+          expect(to_collection.reload.collection_cards.map(&:pinned)).to eq([
+              false,
+              false,
+              false,
+              false,
+              false,
+              false,
+          ])
+        end
+      end
+
+      context 'with pinned cards in a master template' do
+        before do
+          # update first 2 cards to be pinned
+          to_collection.master_template = true
+          from_collection.reload.collection_cards.limit(2).update_all(pinned: false)
+        end
+
+        it 'should assign all cards as pinned' do
+          card_mover.call
+          expect(to_collection.reload.collection_cards.map(&:pinned)).to eq([
+              true,
+              true,
+              true,
+              true,
+              true,
+              true,
+          ])
+        end
+      end
     end
 
     context 'with card_action "link"' do

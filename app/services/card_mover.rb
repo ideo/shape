@@ -116,14 +116,13 @@ class CardMover
     @to_collection_cards.map.with_index do |card, i|
       # parent_id will already be set for existing_cards but no harm to indicate
       card.assign_attributes(parent_id: @to_collection.id, order: i)
-      # Currently any cards created in master_templates become pinned
       if @to_collection.templated? && @to_collection == @from_collection
         # pinned cards within template instance stay pinned
         card.assign_attributes(pinned: false) unless card.pinned?
       elsif @to_collection.master_template?
+        # currently any cards created in master_templates become pinned
         card.assign_attributes(pinned: true)
       else
-        # TODO: add test for this -- is this the right logic?
         card.assign_attributes(pinned: false)
       end
       if card.changed?
