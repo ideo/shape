@@ -8,6 +8,5 @@ class AddGroupToGroup
   organize(
     GrantParentAccessToSubgroup,
     GrantParentAccessToChildrenOfSubgroup,
-    GrantGrandparentsAccessToSubgroup,
   )
 end

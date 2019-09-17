@@ -7,7 +7,6 @@ RSpec.describe AddGroupToGroup, type: :service do
       expect(AddGroupToGroup.organized).to eq([
         GrantParentAccessToSubgroup,
         GrantParentAccessToChildrenOfSubgroup,
-        GrantGrandparentsAccessToSubgroup,
       ])
     end
   end
@@ -20,7 +19,6 @@ RSpec.describe AddGroupToGroup, type: :service do
     it 'calls the organized interactors' do
       expect(GrantParentAccessToSubgroup).to receive(:call!).and_return(:success)
       expect(GrantParentAccessToChildrenOfSubgroup).to receive(:call!).and_return(:success)
-      expect(GrantGrandparentsAccessToSubgroup).to receive(:call!).and_return(:success)
       interactor
     end
 

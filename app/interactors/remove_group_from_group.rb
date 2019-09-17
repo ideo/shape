@@ -5,8 +5,6 @@ class RemoveGroupFromGroup
   schema :subgroup, :parent_group
 
   organize(
-    RevokeMembershipToGroup,
-    RemoveChildrenOfSubgroup,
     RemoveGrandparentToChildGroupRelations,
   )
 end

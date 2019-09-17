@@ -18,14 +18,11 @@ RSpec.describe RemoveGroupFromGroup, type: :service do
     before do
       GroupHierarchy.create(
         parent_group: parent_group,
-        granted_by: parent_group,
         subgroup: subgroup
       )
     end
 
     it 'calls the organized interactors' do
-      expect(RevokeMembershipToGroup).to receive(:call!).and_return(:success)
-      expect(RemoveChildrenOfSubgroup).to receive(:call!).and_return(:success)
       expect(RemoveGrandparentToChildGroupRelations).to receive(:call!).and_return(:success)
       interactor
     end

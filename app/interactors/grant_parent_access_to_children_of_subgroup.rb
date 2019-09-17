@@ -18,9 +18,6 @@ class GrantParentAccessToChildrenOfSubgroup
     links_to_ancestors = GroupHierarchy.where(subgroup_id: parent_group.id)
 
     links_to_ancestors.each do |ancestor|
-      p 'ancestor'
-      p ancestor
-      p "subgroup #{subgroup}"
       ancestor.extend_path_to(subgroup)
 
       links_to_descendants.each do |descendant|

@@ -28,7 +28,6 @@ class GroupHierarchy < ApplicationRecord
     elsif extension.is_a? Group
       extended_path = [extension.id]
     else
-      # die!
       return false
     end
 
@@ -40,7 +39,6 @@ class GroupHierarchy < ApplicationRecord
   end
 
   def set_default_path
-    p "path is #{path}"
     return path if path.present?
 
     self.path = [parent_group, subgroup].map(&:id)
