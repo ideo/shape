@@ -1,13 +1,25 @@
 import PropTypes from 'prop-types'
 import { runInAction } from 'mobx'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import { EditorState, ContentState, convertToRaw } from 'draft-js'
 import { get } from 'lodash'
 
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
 import { CommentForm, CommentEnterButton } from '~/ui/global/styled/forms'
-import CommentInput from './CommentInput'
+import CommentInput from '~/ui/threads/CommentInput'
+import styled from 'styled-components'
+import v from '~/utils/variables.js'
 
+const CommentInputWrapper = styled.div`
+  ${props =>
+    props.replying &&
+    `
+    border-left: 8px solid ${v.colors.secondaryDarkest};
+  `};
+`
+
+@inject('uiStore')
+@observer
 class CommentEntryForm extends React.Component {
   editorHeight = null
   state = {
@@ -109,18 +121,22 @@ class CommentEntryForm extends React.Component {
 
   render() {
     const { expanded } = this.props
+    const { replyingToCommentId } = this.props.uiStore
     if (!expanded) return ''
 
     return (
       <CommentForm onSubmit={this.handleSubmit}>
-        <div className="textarea-input">
+        <CommentInputWrapper
+          className="textarea-input"
+          replying={!!replyingToCommentId}
+        >
           <CommentInput
             editorState={this.state.editorState}
             onChange={this.handleInputChange}
             handleSubmit={this.handleSubmit}
             setEditor={this.setEditor}
           />
-        </div>
+        </CommentInputWrapper>
         <CommentEnterButton focused={this.state.focused}>
           <ReturnArrowIcon />
         </CommentEnterButton>
@@ -134,6 +150,10 @@ CommentEntryForm.propTypes = {
   afterSubmit: PropTypes.func.isRequired,
   onHeightChange: PropTypes.func.isRequired,
   thread: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+
+CommentEntryForm.wrappedComponent.propTypes = {
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default CommentEntryForm

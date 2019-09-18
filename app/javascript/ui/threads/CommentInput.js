@@ -11,7 +11,7 @@ import { uiStore } from '~/stores'
 import {
   StyledCommentInput,
   CustomMentionSuggestion,
-} from './CustomCommentMentions'
+} from '~/ui/threads/CustomCommentMentions'
 
 const positionSuggestions = ({ decoratorRect, state, props }) => {
   let transform

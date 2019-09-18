@@ -5,10 +5,10 @@ import styled, { css } from 'styled-components'
 
 import v from '~/utils/variables'
 import hexToRgba from '~/utils/hexToRgba'
-import Comment from './Comment'
-import CommentEntryForm from './CommentEntryForm'
-import CommentThreadLoader from './CommentThreadLoader'
-import CommentThreadHeader from './CommentThreadHeader'
+import Comment from '~/ui/threads/Comment'
+import CommentEntryForm from '~/ui/threads/CommentEntryForm'
+import CommentThreadLoader from '~/ui/threads/CommentThreadLoader'
+import CommentThreadHeader from '~/ui/threads/CommentThreadHeader'
 
 export const threadTitleCss = css`
   position: relative;
