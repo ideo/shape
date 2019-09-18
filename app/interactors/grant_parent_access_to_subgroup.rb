@@ -11,7 +11,7 @@ class GrantParentAccessToSubgroup
   private
 
   def create_group_hierarchy
-    context.new_hierarchy = GroupHierarchy.create(
+    context.new_hierarchy = GroupHierarchy.find_or_create_by(
       parent_group: context.parent_group,
       path: [context.parent_group, context.subgroup].map(&:id),
       subgroup: context.subgroup,

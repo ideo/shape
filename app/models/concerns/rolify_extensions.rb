@@ -21,8 +21,8 @@ module RolifyExtensions
 
   def role_via_org_groups(name, resource_identifier)
     if is_a?(User)
-      # groups the user is a member/admin of via roles
-      related_group_ids = group_ids
+      # groups the user is a member/admin of via roles or subgroup memberships
+      related_group_ids = all_group_ids
     elsif is_a?(Group)
       # groups the group is a subgroup of via hierarchies
       related_group_ids = parent_group_ids

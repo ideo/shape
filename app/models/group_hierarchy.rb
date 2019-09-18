@@ -3,7 +3,7 @@
 # Table name: group_hierarchies
 #
 #  id              :bigint(8)        not null, primary key
-#  path            :jsonb            not null
+#  path            :jsonb
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  parent_group_id :bigint(8)
@@ -31,7 +31,7 @@ class GroupHierarchy < ApplicationRecord
       return false
     end
 
-    GroupHierarchy.create(
+    GroupHierarchy.find_or_create_by(
       parent_group: parent_group,
       path: path + extended_path,
       subgroup_id: extended_path.last,

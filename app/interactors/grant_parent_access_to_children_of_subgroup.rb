@@ -11,9 +11,6 @@ class GrantParentAccessToChildrenOfSubgroup
   private
 
   def relate_parent_to_children_of_subgroup
-    # We want to no-op here instead of context.fail!
-    return if subgroup.subgroups.empty?
-
     links_to_descendants = GroupHierarchy.where(parent_group_id: subgroup.id)
     links_to_ancestors = GroupHierarchy.where(subgroup_id: parent_group.id)
 

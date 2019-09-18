@@ -67,7 +67,7 @@ class CollectionCardFilter < SimpleService
     return if @user.has_cached_role?(Role::SUPER_ADMIN)
 
     # always include the Common Resource group as it may grant you access
-    group_ids = @user.current_org_group_ids + @user.current_org_parent_group_ids + [Shape::COMMON_RESOURCE_GROUP_ID]
+    group_ids = @user.all_current_org_group_ids + [Shape::COMMON_RESOURCE_GROUP_ID]
     resource_identifier_sql = %(
       CASE WHEN COALESCE(
         items.roles_anchor_collection_id,

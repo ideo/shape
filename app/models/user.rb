@@ -92,12 +92,15 @@ class User < ApplicationRecord
            through: :roles_for_groups,
            source: :resource,
            source_type: 'Group'
+  has_many :parent_groups,
+           -> { distinct },
+            through: :groups,
+            source: :parent_groups
   has_many :current_org_groups,
            ->(u) { active.where(organization_id: u.current_organization_id) },
            through: :roles_for_groups,
            source: :resource,
            source_type: 'Group'
-
   has_many :current_org_parent_groups,
            -> { distinct },
             through: :current_org_groups,
@@ -394,10 +397,18 @@ class User < ApplicationRecord
     groups.where(organization_id: organization.id).pluck(:id)
   end
 
+  def all_group_ids
+    (group_ids + parent_group_ids).uniq
+  end
+
+  def all_current_org_group_ids
+    (current_org_group_ids + current_org_parent_group_ids).uniq
+  end
+
   def role_via_current_org_groups(name, resource_identifier)
     Role.where(name: name, resource_identifier: resource_identifier)
         .joins(:groups_roles)
-        .where(GroupsRole.arel_table[:group_id].in(current_org_group_ids + current_org_parent_group_ids))
+        .where(GroupsRole.arel_table[:group_id].in(all_current_org_group_ids))
   end
 
   def current_org_groups_and_special_groups
@@ -405,7 +416,7 @@ class User < ApplicationRecord
       return current_organization.groups
     end
 
-    groups = current_org_groups.to_a
+    groups = Group.where(id: all_current_org_group_ids).to_a
     return [] if groups.blank?
 
     organization = current_organization
@@ -531,10 +542,6 @@ class User < ApplicationRecord
     self.org_terms_accepted_versions ||= {}
     self.org_terms_accepted_versions[current_organization_id.to_s] = current_organization.terms_version
     save
-  end
-
-  def current_terms_accepted?
-    terms_accepted && current_org_terms_accepted
   end
 
   def last_active_at_in_org(org_id)
