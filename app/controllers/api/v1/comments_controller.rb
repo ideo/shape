@@ -12,7 +12,7 @@ class Api::V1::CommentsController < Api::V1::BaseController
 
   def create
     parent_id = comment_params[:parent_id] || nil
-    parent = Comment.find parent_id || nil
+    parent = Comment.find parent_id unless parent_id.nil?
     @comment = CommentCreator.call(
       comment_thread: @comment_thread,
       # NOTE: comment_params is coming through blank so we access this directly
@@ -53,7 +53,7 @@ class Api::V1::CommentsController < Api::V1::BaseController
   private
 
   def comment_params
-    params.require(:comment).permit(
+    params.permit(
       :message,
       :parent_id,
       :draftjs_data,
