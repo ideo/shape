@@ -167,7 +167,7 @@ class ChartGroup extends React.Component {
           axis: {
             stroke: 'transparent',
           },
-          grid: { stroke: 'black', strokeWidth: 0.5, strokeDasharray: [1, 1] },
+          grid: { stroke: 'black', strokeWidth: 0.8, strokeDasharray: [1, 1] },
           ticks: { padding: 10 },
         }}
         tickLabelComponent={
@@ -175,7 +175,7 @@ class ChartGroup extends React.Component {
             textAnchor="start"
             verticalAnchor="end"
             dy={-5}
-            style={{ fill: v.colors.black, fontSize: '24px' }}
+            style={{ fill: v.colors.black, fontSize: '20px' }}
           />
         }
       ></VictoryAxis>
@@ -277,7 +277,10 @@ class ChartGroup extends React.Component {
     let modifiedChartType = dataset.chart_type
     // Secondary datasets to primary area type datasets should use line charts
     // instead of default area charts.
-    if (dataset !== this.primaryDataset && this.primaryDataset.chart_type === 'area') {
+    if (
+      dataset !== this.primaryDataset &&
+      this.primaryDataset.chart_type === 'area'
+    ) {
       modifiedChartType = 'line'
     }
     const dashWidth = index * 2
@@ -347,7 +350,7 @@ class ChartGroup extends React.Component {
     return (
       <VictoryChart
         theme={victoryTheme}
-        padding={{ top: 0, left: 0, right: 0, bottom: 0 }}
+        padding={{ top: 0, left: 0, right: 0, bottom: 8 }}
         containerComponent={<VictoryVoronoiContainer />}
       >
         {this.renderedDatasets.map(dataset => dataset)}
