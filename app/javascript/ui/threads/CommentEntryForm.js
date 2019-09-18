@@ -96,16 +96,18 @@ class CommentEntryForm extends React.Component {
   }
 
   handleSubmit = e => {
-    e.preventDefault()
-
+    const { replyingToCommentId } = this.props.uiStore
     const content = this.state.editorState.getCurrentContent()
     const message = content.getPlainText()
+
+    e.preventDefault()
     // don't allow submit of empty comment
     if (!message) return
 
     const rawData = {
       message,
       draftjs_data: convertToRaw(content),
+      parent_id: replyingToCommentId,
     }
 
     const { thread } = this.props

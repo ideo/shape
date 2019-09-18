@@ -11,6 +11,8 @@ class Comment extends BaseRecord {
   static type = 'comments'
   static endpoint = apiUrl('comments')
 
+  attributesForAPI = ['parent_id', 'message']
+
   @observable
   unread = false
 
