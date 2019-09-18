@@ -13,7 +13,7 @@ module RolifyExtensions
       if is_a?(User)
         h[key] = role.present? || role_via_org_groups(role_name, resource_identifier).present?
       elsif is_a?(Group)
-        h[key] = role.present?
+        h[key] = role.present? || role_via_org_groups(role_name, resource_identifier).present?
       else
         raise "RolifyExtension: Unsupported model '#{self.class.name}' for cached_roles_by_identifier"
       end

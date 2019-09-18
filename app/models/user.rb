@@ -98,8 +98,11 @@ class User < ApplicationRecord
            source: :resource,
            source_type: 'Group'
 
-  # has_many :current_org_parent_groups,
-  # user.current_org_groups.map(&:parent_groups).pluck(:id)
+  has_many :current_org_parent_groups,
+            ->(user) { user.current_org_groups.map(&:parent_groups) },
+            through: :roles_for_groups,
+            source: :resource,
+            source_type: 'Group'
 
   has_many :organizations, -> { distinct }, through: :groups
 
@@ -401,7 +404,7 @@ class User < ApplicationRecord
   def role_via_current_org_groups(name, resource_identifier)
     Role.where(name: name, resource_identifier: resource_identifier)
         .joins(:groups_roles)
-        .where(GroupsRole.arel_table[:group_id].in(current_org_group_ids))
+        .where(GroupsRole.arel_table[:group_id].in(current_org_group_ids + current_org_parent_group_ids))
   end
 
   def current_org_groups_and_special_groups
