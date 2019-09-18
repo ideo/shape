@@ -10,15 +10,26 @@ module RolifyExtensions
         name: role_name,
         resource_identifier: resource_identifier,
       ).first
-      if is_a?(User)
+      if is_a?(User) || is_a?(Group)
         h[key] = role.present? || role_via_org_groups(role_name, resource_identifier).present?
-      elsif is_a?(Group)
-        h[key] = role.present?
       else
         raise "RolifyExtension: Unsupported model '#{self.class.name}' for cached_roles_by_identifier"
       end
     end
     @has_role_by_identifier[[role_name.to_s, resource_identifier]]
+  end
+
+  def role_via_org_groups(name, resource_identifier)
+    if is_a?(User)
+      # groups the user is a member/admin of via roles
+      related_group_ids = group_ids
+    elsif is_a?(Group)
+      # groups the group is a subgroup of via hierarchies
+      related_group_ids = parent_group_ids
+    end
+    Role.where(name: name, resource_identifier: resource_identifier)
+        .joins(:groups_roles)
+        .where(GroupsRole.arel_table[:group_id].in(related_group_ids))
   end
 
   def precache_roles_for(role_names, resources)
