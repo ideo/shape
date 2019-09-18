@@ -114,17 +114,22 @@ class CardMover
 
     # Reorder all cards based on order of joined_cards
     @to_collection_cards.map.with_index do |card, i|
-      # parent_id will already be set for existing_cards but no harm to indicate
-      card.assign_attributes(parent_id: @to_collection.id, order: i)
-      if @to_collection.templated? && @to_collection == @from_collection
-        # pinned cards within template instance stay pinned
-        card.assign_attributes(pinned: false) unless card.pinned?
-      elsif @to_collection.master_template?
-        # currently any cards created in master_templates become pinned
-        card.assign_attributes(pinned: true)
-      else
-        card.assign_attributes(pinned: false)
+      card.assign_attributes(order: i)
+
+      if @moving_cards.include?(card)
+        # assign new parent
+        card.assign_attributes(parent_id: @to_collection.id)
+        if @to_collection.templated? && @to_collection == @from_collection
+          # pinned cards within template instance stay pinned
+          card.assign_attributes(pinned: card.pinned)
+        elsif @to_collection.master_template?
+          # currently any cards created in master_templates become pinned
+          card.assign_attributes(pinned: true)
+        else
+          card.assign_attributes(pinned: false)
+        end
       end
+
       if card.changed?
         @should_update_to_cover ||= card.should_update_parent_collection_cover?
         card.save

@@ -150,7 +150,7 @@ RSpec.describe CardMover, type: :service do
         ])
       end
 
-      context 'with pinned cards' do
+      context 'with pinned cards that already exist in to_collection' do
         before do
           # update first 2 cards to be pinned
           to_collection.reload.collection_cards.limit(2).update_all(pinned: true)
@@ -170,42 +170,32 @@ RSpec.describe CardMover, type: :service do
         end
       end
 
-      context 'with pinned cards in a collection' do
+      context 'with pinned cards in the from_collection' do
         before do
           # update first 2 cards to be pinned
           from_collection.reload.collection_cards.limit(2).update_all(pinned: true)
         end
 
-        it 'should assign all cards as not pinned' do
-          card_mover.call
-          expect(to_collection.reload.collection_cards.map(&:pinned)).to eq([
-              false,
-              false,
-              false,
-              false,
-              false,
-              false,
-          ])
-        end
-      end
-
-      context 'with pinned cards in a master template' do
-        before do
-          # update first 2 cards to be pinned
-          to_collection.master_template = true
-          from_collection.reload.collection_cards.limit(2).update_all(pinned: false)
+        context 'moving into a normal collection' do
+          it 'should unpin all cards' do
+            card_mover.call
+            to_collection.reload
+            expect(to_collection.collection_cards.count).to eq 6
+            expect(to_collection.collection_cards.none?(&:pinned?)).to be true
+          end
         end
 
-        it 'should assign all cards as pinned' do
-          card_mover.call
-          expect(to_collection.reload.collection_cards.map(&:pinned)).to eq([
-              true,
-              true,
-              true,
-              true,
-              true,
-              true,
-          ])
+        context 'moving into a master template' do
+          before do
+            to_collection.update(master_template: true)
+          end
+
+          it 'should pin all cards if moving to a normal collection' do
+            card_mover.call
+            to_collection.reload
+            expect(to_collection.collection_cards.count).to eq 6
+            expect(to_collection.collection_cards.all?(&:pinned?)).to be true
+          end
         end
       end
     end
