@@ -162,6 +162,8 @@ group :development do
   gem 'better_errors'
   gem 'binding_of_caller'
   gem 'derailed_benchmarks'
+  gem 'rails-erd'
+  gem 'railroady'
   gem 'guard', require: false
   gem 'guard-rspec', require: false
   gem 'rubocop', require: false

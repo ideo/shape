@@ -132,6 +132,7 @@ GEM
       xpath (>= 2.0, < 4.0)
     childprocess (0.9.0)
       ffi (~> 1.0, >= 1.0.11)
+    choice (0.2.0)
     coderay (1.1.2)
     concurrent-ruby (1.1.5)
     connection_pool (2.2.1)
@@ -392,6 +393,7 @@ GEM
     rack-rewrite (1.5.1)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
+    railroady (1.5.3)
     rails (5.2.3)
       actioncable (= 5.2.3)
       actionmailer (= 5.2.3)
@@ -412,6 +414,11 @@ GEM
     rails-dom-testing (2.0.3)
       activesupport (>= 4.2.0)
       nokogiri (>= 1.6)
+    rails-erd (1.6.0)
+      activerecord (>= 4.2)
+      activesupport (>= 4.2)
+      choice (~> 0.2.0)
+      ruby-graphviz (~> 1.2)
     rails-html-sanitizer (1.0.4)
       loofah (~> 2.2, >= 2.2.2)
     railties (5.2.3)
@@ -473,6 +480,7 @@ GEM
       rainbow (>= 2.2.2, < 4.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 1.7)
+    ruby-graphviz (1.2.4)
     ruby-progressbar (1.10.1)
     ruby_dep (1.5.0)
     rubyzip (1.2.3)
@@ -636,8 +644,10 @@ DEPENDENCIES
   puma (~> 3.12)
   rack-cors (~> 1.0.1)
   rack-rewrite (~> 1.5)
+  railroady
   rails (~> 5.2)
   rails-controller-testing
+  rails-erd
   redis
   redis-mutex (~> 4.0.1)
   roadie-rails (~> 1.3)
