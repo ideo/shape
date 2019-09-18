@@ -274,8 +274,14 @@ class ChartGroup extends React.Component {
 
   renderDataset = (dataset, index, total) => {
     const { simpleDateTooltip, width, height } = this.props
+    let modifiedChartType = dataset.chart_type
+    // Secondary datasets to primary area type datasets should use line charts
+    // instead of default area charts.
+    if (dataset !== this.primaryDataset && this.primaryDataset.chart_type === 'area') {
+      modifiedChartType = 'line'
+    }
     const dashWidth = index * 2
-    switch (dataset.chart_type) {
+    switch (modifiedChartType) {
       case DATASET_CHART_TYPES.AREA:
         return AreaChart({
           dataset,
