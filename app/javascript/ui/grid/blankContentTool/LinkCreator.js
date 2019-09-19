@@ -148,7 +148,7 @@ class LinkCreator extends React.Component {
     }
     if (meta.shapeLink) {
       attrs = {
-        card_type: 'CollectionCard::Link',
+        card_type: 'link',
       }
       attrs[`${meta.recordType}_id`] = meta.recordId
     }
