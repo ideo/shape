@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import { computed } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled, { css } from 'styled-components'
+import { Element as ScrollElement } from 'react-scroll'
 
 import v from '~/utils/variables'
 import hexToRgba from '~/utils/hexToRgba'
@@ -23,10 +24,13 @@ export const threadTitleCss = css`
     ${v.colors.secondaryDark} 80%,
     ${hexToRgba(v.colors.secondaryDark, 0)} 100%
   );
-  padding-top: 10px;
+  &:hover {
+    background: ${v.colors.secondaryDark2};
+  }
+  padding: 5px 10px;
   text-align: left;
   font-family: ${v.fonts.sans};
-  font-weight: 500;
+  font-weight: 400;
   font-size: 0.75rem;
 `
 
@@ -60,6 +64,8 @@ export const ThumbnailHolder = styled.span`
   flex-shrink: 0;
   height: 50px;
   width: 50px;
+  position: relative;
+  bottom: 5px;
   img,
   svg {
     flex-shrink: 0;
@@ -81,10 +87,11 @@ class CommentThread extends React.Component {
   @computed
   get comments() {
     const { expanded, thread } = this.props
-    let { comments } = thread
+    const { comments } = thread
     // for un-expanded thread, only take the unread comments
     if (!expanded) {
-      comments = thread.latestUnreadComments
+      // comments = thread.latestUnreadComments
+      return []
     }
     return comments
   }
@@ -134,17 +141,20 @@ class CommentThread extends React.Component {
         <button className="title" onClick={this.props.onClick}>
           <CommentThreadHeader thread={thread} />
         </button>
-        <StyledCommentsWrapper
-          clickable={unexpandedClickable}
-          className="comments"
-          onClick={unexpandedClickable ? this.props.onClick : () => true}
-        >
-          {thread.hasMore && expanded && (
-            <CommentThreadLoader thread={thread} />
-          )}
-          {this.renderComments()}
-        </StyledCommentsWrapper>
-        {!uiStore.replyingToCommentId && this.renderCommentEntryForm()}
+        <div style={{ padding: '0 10px' }}>
+          <StyledCommentsWrapper
+            clickable={unexpandedClickable}
+            className="comments"
+            onClick={unexpandedClickable ? this.props.onClick : () => true}
+          >
+            {thread.hasMore && expanded && (
+              <CommentThreadLoader thread={thread} />
+            )}
+            {this.renderComments()}
+            <ScrollElement name="bottom-of-comments" />
+          </StyledCommentsWrapper>
+          {!uiStore.replyingToCommentId && this.renderCommentEntryForm()}
+        </div>
       </StyledCommentThread>
     )
   }

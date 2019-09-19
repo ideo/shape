@@ -146,8 +146,6 @@ export const ActivityContainer = styled.div`
   overflow-x: hidden;
   margin-bottom: 10px;
   height: 100%;
-  padding-left: 10px;
-  padding-right: 10px;
   position: relative;
 `
 ActivityContainer.displayName = 'ActivityContainer'

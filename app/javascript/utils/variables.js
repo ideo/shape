@@ -136,6 +136,8 @@ export default {
     secondaryLight: '#73808f',
     secondaryMedium: '#5a6a7c',
     secondaryDark: '#3f526a',
+    // TODO: slightly different from secondaryDark, is that intended or not?
+    secondaryDark2: '#4A5B71',
     secondaryDarkest: '#242d37',
     tertiaryMedium: '#de8f74',
     tertiaryDark: '#c43a31',

@@ -1,11 +1,11 @@
+// import _ from 'lodash'
 import { Fragment } from 'react'
 import PropTypes from 'prop-types'
-import { computed, observable, observe, runInAction } from 'mobx'
+import { computed, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Element as ScrollElement, scroller } from 'react-scroll'
 import VisibilitySensor from 'react-visibility-sensor'
 import FlipMove from 'react-flip-move'
-import _ from 'lodash'
 import pluralize from 'pluralize'
 import styled from 'styled-components'
 import Truncator from 'react-truncator'
@@ -39,6 +39,8 @@ const JumpButton = styled.button`
   width: calc(100% - 140px);
 `
 
+const CommentThreadDrawer = styled.div``
+
 @inject('apiStore', 'uiStore')
 @observer
 class CommentThreadContainer extends React.Component {
@@ -66,65 +68,65 @@ class CommentThreadContainer extends React.Component {
       this.loadingThreads = props.loadingThreads
     })
 
-    this.disposers = {}
-    this.disposers.expanded = observe(
-      props.uiStore,
-      'expandedThreadKey',
-      change => {
-        if (change.newValue) {
-          this.handleExpandedThreadChange(change.newValue, change.oldValue)
-          const { expandedThread } = this
-          if (!expandedThread) return
-          this.disposers.expandedComments = expandedThread.comments.observe(
-            commentChange => {
-              const lastComment = _.last(expandedThread.comments)
-              // if last comment is unpersisted it means I just added it; scroll me down
-              if (
-                this.bottomOfExpandedThread ||
-                (lastComment && !lastComment.persisted)
-              ) {
-                this.scrollToTopOfNextThread(expandedThread, { duration: 0 })
-              }
-            }
-          )
-        }
-      }
-    )
-    this.disposers.currentThreads = observe(
-      props.apiStore,
-      'currentThreads',
-      change => {
-        const { expandedThread } = this
-        if (!expandedThread) return
-        const oldThreads = change.oldValue
-        const newThreads = change.newValue
-        const oldIdx = oldThreads.indexOf(expandedThread)
-        const newIdx = newThreads.indexOf(expandedThread)
-        // if it didn't exist before, thread was newly created
-        if (oldIdx === -1) return
-        if (oldIdx !== newIdx) {
-          const top = document.getElementsByName(`thread-${oldIdx}`)[0]
-            .offsetTop
-          this.prevScrollPosition = this.containerDiv.scrollTop - top
-        } else if (
-          this.containerDiv.scrollTop === 0 &&
-          this.prevScrollPosition
-        ) {
-          const top = document.getElementsByName(`thread-${newIdx}`)[0]
-            .offsetTop
-          this.containerDiv.scrollTop = this.prevScrollPosition + top
-          this.prevScrollPosition = 0
-        }
-      }
-    )
+    // this.disposers = {}
+    // this.disposers.expanded = observe(
+    //   props.uiStore,
+    //   'expandedThreadKey',
+    //   change => {
+    //     if (change.newValue) {
+    //       this.handleExpandedThreadChange(change.newValue, change.oldValue)
+    //       const { expandedThread } = this
+    //       if (!expandedThread) return
+    //       this.disposers.expandedComments = expandedThread.comments.observe(
+    //         commentChange => {
+    //           const lastComment = _.last(expandedThread.comments)
+    //           // if last comment is unpersisted it means I just added it; scroll me down
+    //           if (
+    //             this.bottomOfExpandedThread ||
+    //             (lastComment && !lastComment.persisted)
+    //           ) {
+    //             this.scrollToTopOfNextThread(expandedThread, { duration: 0 })
+    //           }
+    //         }
+    //       )
+    //     }
+    //   }
+    // )
+    // this.disposers.currentThreads = observe(
+    //   props.apiStore,
+    //   'currentThreads',
+    //   change => {
+    //     const { expandedThread } = this
+    //     if (!expandedThread) return
+    //     const oldThreads = change.oldValue
+    //     const newThreads = change.newValue
+    //     const oldIdx = oldThreads.indexOf(expandedThread)
+    //     const newIdx = newThreads.indexOf(expandedThread)
+    //     // if it didn't exist before, thread was newly created
+    //     if (oldIdx === -1) return
+    //     if (oldIdx !== newIdx) {
+    //       const top = document.getElementsByName(`thread-${oldIdx}`)[0]
+    //         .offsetTop
+    //       this.prevScrollPosition = this.containerDiv.scrollTop - top
+    //     } else if (
+    //       this.containerDiv.scrollTop === 0 &&
+    //       this.prevScrollPosition
+    //     ) {
+    //       const top = document.getElementsByName(`thread-${newIdx}`)[0]
+    //         .offsetTop
+    //       this.containerDiv.scrollTop = this.prevScrollPosition + top
+    //       this.prevScrollPosition = 0
+    //     }
+    //   }
+    // )
   }
 
-  componentDidMount() {
-    const hasCurrentThread = this.jumpToCurrentThread()
-    if (!hasCurrentThread) {
-      this.scrollToBottom()
-    }
-  }
+  // componentDidMount() {
+  //   const hasCurrentThread = this.jumpToCurrentThread()
+  //   if (!hasCurrentThread) {
+  //     this.scrollToBottom()
+  //   }
+  // }
 
   componentDidUpdate() {
     const { loadingThreads } = this.props
@@ -142,10 +144,10 @@ class CommentThreadContainer extends React.Component {
     }
   }
 
-  componentWillUnmount() {
-    // cancel the observers
-    _.each(this.disposers, disposer => disposer())
-  }
+  // componentWillUnmount() {
+  //   // cancel the observers
+  //   _.each(this.disposers, disposer => disposer())
+  // }
 
   handleVisibilityChange = i => isVisible => {
     runInAction(() => {
@@ -171,11 +173,10 @@ class CommentThreadContainer extends React.Component {
     }
   }
 
-  handleExpandedThreadChange = async (expandedThreadKey, prevKey) => {
-    const thread = this.threads.filter(t => t.key === expandedThreadKey)[0]
+  handleExpandedThreadChange = async thread => {
+    // const thread = this.threads.filter(t => t.key === expandedThreadKey)[0]
+
     if (!thread) return
-    // no change
-    if (thread.id && expandedThreadKey === prevKey) return
     // don't try to load comments of our newly constructed threads
     if (thread.persisted) {
       runInAction(() => {
@@ -190,7 +191,8 @@ class CommentThreadContainer extends React.Component {
       }
     }
     // scroll again after any more comments have loaded
-    this.scrollToTopOfNextThread(thread)
+    // this.scrollToTopOfNextThread(thread)
+    scroller.scrollTo('bottom-of-comments', this.scrollOpts)
   }
 
   get threads() {
@@ -254,8 +256,11 @@ class CommentThreadContainer extends React.Component {
   expandThread = thread => () => {
     const { uiStore } = this.props
     const { key } = thread
-    this.scrollToTopOfNextThread(thread)
+    // this.scrollToTopOfNextThread(thread)
+
+    // TODO: save current scroll position, for when you close the expandedThread?
     uiStore.expandThread(key, { reset: false })
+    this.handleExpandedThreadChange(thread)
   }
 
   scrollToTopOfThread = thread => {
@@ -264,6 +269,10 @@ class CommentThreadContainer extends React.Component {
       ...this.scrollOpts,
       delay: 0,
     })
+  }
+
+  scrollToTop = () => {
+    scroller.scrollTo('top', { ...this.scrollOpts, duration: 0 })
   }
 
   scrollToTopOfNextThread = (
@@ -310,14 +319,20 @@ class CommentThreadContainer extends React.Component {
     return true
   }
 
+  closeCurrentThread = () => {
+    const { uiStore } = this.props
+    uiStore.expandThread(null)
+  }
+
   loadMorePages = () => {
     const { apiStore, uiStore } = this.props
     uiStore.expandThread(null)
     apiStore.loadNextThreadPage()
   }
 
-  renderThreads = () =>
-    this.threads.map((thread, i) => (
+  renderThreads = () => {
+    if (!!this.expandedThread) return null
+    return this.threads.map((thread, i) => (
       <ScrollElement name={`thread-${i}`} key={thread.key}>
         <VisibilitySensor
           offset={{
@@ -327,9 +342,9 @@ class CommentThreadContainer extends React.Component {
           containment={this.containerDiv}
           onChange={this.handleVisibilityChange(i)}
         >
+          {/* TODO: this is really just a clickable header now, never expanded */}
           <CommentThread
             thread={thread}
-            expanded={this.isExpanded(thread.key)}
             onClick={this.expandThread(thread)}
             afterSubmit={this.afterSubmit(thread)}
             onEditorHeightChange={() =>
@@ -339,31 +354,107 @@ class CommentThreadContainer extends React.Component {
         </VisibilitySensor>
       </ScrollElement>
     ))
+  }
+
+  renderExpandedThread() {
+    const thread = this.expandedThread
+    if (!thread) return null
+
+    return (
+      <CommentThreadDrawer>
+        <CommentThread
+          thread={thread}
+          expanded
+          onClick={this.expandThread(thread)}
+          afterSubmit={this.afterSubmit(thread)}
+          onEditorHeightChange={() => null}
+        />
+      </CommentThreadDrawer>
+    )
+  }
+
+  renderJumpButton() {
+    const { uiStore, parentWidth } = this.props
+    // const hideJumpButton = this.showJumpToThreadButton ? 'visible' : 'hidden'
+    const hideJumpButton = false
+
+    let goBackText = `Go to ${uiStore.viewingRecord &&
+      uiStore.viewingRecord.name}`
+    if (this.expandedThread) {
+      goBackText = 'Go Back'
+    }
+
+    return (
+      <JumpButton
+        hide={hideJumpButton}
+        onClick={this.closeCurrentThread}
+        className="jumpToThread"
+      >
+        <SmallActionText style={{ textAlign: 'center' }}>
+          <GoIconContainer>
+            <GoIcon />
+          </GoIconContainer>
+          <Truncator
+            text={goBackText}
+            key="jumpbutton"
+            overrideWidth={parentWidth > 600 ? parentWidth : parentWidth - 90}
+            overrideStyle={{ display: 'inline-block' }}
+          />
+        </SmallActionText>
+      </JumpButton>
+    )
+  }
+
+  animation = ({ type = 'enter', reverse = false } = {}) => {
+    const { parentWidth } = this.props
+    let from = 0
+    let to = 0
+    if (type === 'enter') {
+      from = parentWidth
+      to = 0
+      if (reverse) {
+        from = -1 * parentWidth
+        to = 0
+      }
+    } else {
+      from = 0
+      to = parentWidth
+      if (reverse) {
+        from = 0
+        to = -1 * parentWidth
+      }
+    }
+    return {
+      from: {
+        transform: `translateX(${from}px)`,
+      },
+      to: {
+        transform: `translateX(${to}px)`,
+      },
+    }
+  }
 
   render() {
-    const { apiStore, uiStore, parentWidth } = this.props
-    const hideJumpButton = this.showJumpToThreadButton ? 'visible' : 'hidden'
+    const { apiStore, uiStore } = this.props
+    // const animation = {
+    //   from: {
+    //     transform: `translateX(${parentWidth}px)`,
+    //   },
+    //   to: {
+    //     transform: `translateX(0)`,
+    //   },
+    // }
+    // const leaveAnimation = {
+    //   from: {
+    //     transform: `translateX(0)`,
+    //   },
+    //   to: {
+    //     transform: `translateX(-${parentWidth}px)`,
+    //   },
+    // }
     return (
       <Fragment>
-        <JumpButton
-          hide={hideJumpButton}
-          onClick={this.jumpToCurrentThread}
-          className="jumpToThread"
-        >
-          <SmallActionText style={{ textAlign: 'center' }}>
-            <GoIconContainer>
-              <GoIcon />
-            </GoIconContainer>
-            <Truncator
-              text={`
-                Go to ${uiStore.viewingRecord && uiStore.viewingRecord.name}
-              `}
-              key="jumpbutton"
-              overrideWidth={parentWidth > 600 ? parentWidth : parentWidth - 90}
-              overrideStyle={{ display: 'inline-block' }}
-            />
-          </SmallActionText>
-        </JumpButton>
+        {this.renderJumpButton()}
         <div
           style={{
             position: 'absolute',
@@ -384,29 +475,31 @@ class CommentThreadContainer extends React.Component {
           moving={uiStore.activityLogMoving}
           id={this.scrollOpts.containerId}
         >
+          <ScrollElement name="top" />
           <div id="ctc-older-threads">
-            {apiStore.hasOlderThreads && (
+            {apiStore.hasOlderThreads && !this.expandedThread && (
               <ShowMoreButton darkBg onClick={this.loadMorePages}>
                 Load older threads...
               </ShowMoreButton>
             )}
           </div>
           {this.loadingThreads && <InlineLoader fixed background="none" />}
-          <FlipMove disableAllAnimations={!!uiStore.expandedThreadKey}>
+          <FlipMove
+            appearAnimation={null}
+            enterAnimation={this.animation({ type: 'enter', reverse: true })}
+            leaveAnimation={this.animation({ type: 'leave', reverse: true })}
+          >
             {this.renderThreads()}
           </FlipMove>
-          <ScrollElement name={`thread-${this.threads.length}`}>
-            <VisibilitySensor
-              partialVisibility
-              containment={this.containerDiv}
-              onChange={this.handleVisibilityChange(this.threads.length)}
-            >
-              {/* placeholder so that "bottomOfExpandedThread" will get triggered */}
-              <div
-                style={{ height: '5px', position: 'relative', top: '-10px' }}
-              />
-            </VisibilitySensor>
-          </ScrollElement>
+          <FlipMove
+            // "wrapperless" mode
+            typeName={null}
+            appearAnimation={this.animation({ type: 'enter' })}
+            enterAnimation={this.animation({ type: 'enter' })}
+            leaveAnimation={this.animation({ type: 'leave' })}
+          >
+            {this.renderExpandedThread()}
+          </FlipMove>
         </ActivityContainer>
       </Fragment>
     )
