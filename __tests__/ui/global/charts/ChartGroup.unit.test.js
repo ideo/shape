@@ -22,16 +22,10 @@ describe('ChartGroup', () => {
         order: 1,
         chart_type: 'line',
       },
-      {
-        ...fakeAreaChartDataset,
-        order: 2,
-        chart_type: 'bar',
-      },
     ]
     dataItem.primaryDataset = fakeAreaChartDataset
     dataItem.secondaryDatasets.mockReturnValue([
       dataItem.datasets[1],
-      dataItem.datasets[2],
     ])
     props.dataItem = dataItem
     props.simpleDateTooltip = true
@@ -48,7 +42,6 @@ describe('ChartGroup', () => {
     expect(chart.exists()).toBe(true)
     expect(chart.find('VictoryArea').exists()).toBe(true)
     expect(chart.find('VictoryLine').exists()).toBe(true)
-    expect(chart.find('VictoryBar').exists()).toBe(true)
     expect(chart.find('VictoryAxis').exists()).toBe(true)
   })
 
@@ -62,6 +55,28 @@ describe('ChartGroup', () => {
     expect(label).toEqual('Dec')
     label = wrapper.instance().monthlyXAxisText('2018-12-31')
     expect(label).toEqual('Dec')
+  })
+
+  describe('secondary dataset of an area chart',
+    () => {
+    beforeEach(() => {
+      dataItem.datasets = [
+        {
+          ...fakeAreaChartDataset,
+          order: 2,
+          chart_type: 'bar',
+        },
+      ]
+      dataItem.primaryDataset = fakeAreaChartDataset
+      dataItem.secondaryDatasets.mockReturnValue([
+        dataItem.datasets[1],
+      ])
+    })
+
+    it('should render as a line chart always', () => {
+      const chart = wrapper.find('VictoryChart')
+      expect(chart.find('VictoryLine').exists()).toBe(true)
+    })
   })
 
   describe('with a single data point in values', () => {
