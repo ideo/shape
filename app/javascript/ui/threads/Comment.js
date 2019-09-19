@@ -144,6 +144,22 @@ class Comment extends React.Component {
     return !isEmpty(toJS(this.props.comment.draftjs_data))
   }
 
+  handleCommentBodyClick = e => {
+    const { isReply } = this.props
+    const { editing } = this.state
+    // filters out other click handlers nested inside the body
+    if (
+      e.target.closest('.test-reply-comment') ||
+      e.target.closest('.test-edit-comment') ||
+      e.target.closest('.test-delete-comment') ||
+      editing ||
+      isReply
+    ) {
+      return
+    }
+    this.handleReplyClick()
+  }
+
   handleReplyClick = () => {
     const { comment, uiStore } = this.props
     const { replyingToCommentId } = uiStore
@@ -285,10 +301,16 @@ class Comment extends React.Component {
   render() {
     const { comment, apiStore, isReply } = this.props
     const { author, unread, persisted, created_at } = comment
+    // NOTE: not sure if this is a solution for delete returning undefined author
+    if (!author) return null
     const isCurrentUserComment = apiStore.currentUserId === author.id
 
     return (
-      <StyledComment unread={unread} isReply={isReply}>
+      <StyledComment
+        unread={unread}
+        isReply={isReply}
+        onClick={this.handleCommentBodyClick}
+      >
         <InlineRow align="center">
           <Avatar
             title={author.name}
@@ -330,14 +352,16 @@ class Comment extends React.Component {
                           <EditPencilIcon />
                         </ActionButton>
                       </Tooltip>
-                      <Tooltip placement="top" title="delete comment">
-                        <ActionButton
-                          onClick={this.handleDeleteClick}
-                          className="test-delete-comment"
-                        >
-                          <TrashIconLg />
-                        </ActionButton>
-                      </Tooltip>
+                      {comment.replies.length < 1 && (
+                        <Tooltip placement="top" title="delete comment">
+                          <ActionButton
+                            onClick={this.handleDeleteClick}
+                            className="test-delete-comment"
+                          >
+                            <TrashIconLg />
+                          </ActionButton>
+                        </Tooltip>
+                      )}
                     </React.Fragment>
                   )}
                 </StyledCommentActions>

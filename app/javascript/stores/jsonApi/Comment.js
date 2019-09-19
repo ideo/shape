@@ -11,7 +11,7 @@ class Comment extends BaseRecord {
   static type = 'comments'
   static endpoint = apiUrl('comments')
 
-  attributesForAPI = ['parent_id', 'message']
+  attributesForAPI = ['message', 'parent_id', 'draftjs_data']
 
   @observable
   unread = false
@@ -49,10 +49,23 @@ class Comment extends BaseRecord {
   API_destroy = async () => {
     try {
       await this.destroy()
-      const thread = apiStore.find('comment_threads', this.comment_thread_id)
-      runInAction(() => {
-        _.remove(thread.comments, comment => comment.id === this.id)
-      })
+      const { parent_id } = this
+      if (!parent_id) {
+        const thread = apiStore.find('comment_threads', this.comment_thread_id)
+        runInAction(() => {
+          _.remove(thread.comments, comment => comment.id === this.id)
+        })
+      } else {
+        const thread = apiStore.find('comment_threads', this.comment_thread_id)
+        const { comments } = thread
+        const parent = _.find(
+          comments,
+          comment => comment.id === parent_id.toString()
+        )
+        runInAction(() => {
+          _.remove(parent.replies, comment => comment.id === this.id.toString())
+        })
+      }
     } catch (e) {
       console.error(e)
       uiStore.defaultAlertError()

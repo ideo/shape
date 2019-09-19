@@ -104,10 +104,11 @@ class CommentThread extends React.Component {
       commentsList.push(
         <Comment key={comment.id || `comment-new-${i}`} comment={comment} />
       )
+      // fixme: there's a key conflict if thread in
       _.each(comment.replies, (child, i) => {
         commentsList.push(
           <Comment
-            key={child.id || `comment-reply-new-${i}`}
+            key={`reply-${child.id}` || `reply-new-${i}`}
             comment={child}
             isReply={true}
           />
@@ -124,6 +125,7 @@ class CommentThread extends React.Component {
     const { thread, expanded } = this.props
     return (
       <CommentEntryForm
+        key={'comment-entry-form'}
         expanded={expanded}
         thread={thread}
         afterSubmit={this.props.afterSubmit}
