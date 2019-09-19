@@ -6,7 +6,8 @@
     "author_id": { "type": "integer" },
     "draftjs_data": { "type": ["object", "null"] },
     "created_at": { "type": "date" },
-    "updated_at": { "type": "date" }
+    "updated_at": { "type": "date" },
+    "parent": { "type": ["object", "null"] }
   },
   "required": ["message", "updated_at"]
 }

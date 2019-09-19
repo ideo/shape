@@ -1,5 +1,5 @@
+import _ from 'lodash'
 import { observable, action, runInAction } from 'mobx'
-import { remove } from 'lodash'
 
 import trackError from '~/utils/trackError'
 import { apiUrl } from '~/utils/url'
@@ -15,6 +15,15 @@ class Comment extends BaseRecord {
 
   @observable
   unread = false
+  @observable
+  replies = []
+
+  constructor(...args) {
+    super(...args)
+    runInAction(() => {
+      this.replies.replace(this.children)
+    })
+  }
 
   @action
   markAsUnread() {
@@ -30,12 +39,19 @@ class Comment extends BaseRecord {
     return this.updated_at > this.created_at
   }
 
+  @action
+  importReply(reply) {
+    let sortedReplies = _.union(this.replies, [reply])
+    sortedReplies = _.sortBy(sortedReplies, ['created_at'])
+    this.replies.replace(sortedReplies)
+  }
+
   API_destroy = async () => {
     try {
       await this.destroy()
       const thread = apiStore.find('comment_threads', this.comment_thread_id)
       runInAction(() => {
-        remove(thread.comments, comment => comment.id === this.id)
+        _.remove(thread.comments, comment => comment.id === this.id)
       })
     } catch (e) {
       console.error(e)

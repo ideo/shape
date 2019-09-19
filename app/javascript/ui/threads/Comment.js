@@ -1,5 +1,6 @@
 import { isEmpty } from 'lodash'
 import { toJS, runInAction } from 'mobx'
+import PropTypes from 'prop-types'
 import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import { EditorState, convertFromRaw, convertToRaw } from 'draft-js'
 import styled from 'styled-components'
@@ -146,10 +147,10 @@ class Comment extends React.Component {
   handleReplyClick = () => {
     const { comment, uiStore } = this.props
     const { replyingToCommentId } = uiStore
-    if (!!replyingToCommentId) {
+    const { id } = comment
+    if (replyingToCommentId === id) {
       uiStore.setReplyingToComment(null)
     } else {
-      const { id } = comment
       uiStore.setReplyingToComment(id)
     }
   }
@@ -282,12 +283,12 @@ class Comment extends React.Component {
   }
 
   render() {
-    const { comment, apiStore } = this.props
-    const { author, unread, parent, persisted, created_at } = comment
+    const { comment, apiStore, isReply } = this.props
+    const { author, unread, persisted, created_at } = comment
     const isCurrentUserComment = apiStore.currentUserId === author.id
 
     return (
-      <StyledComment unread={unread} isReply={parent}>
+      <StyledComment unread={unread} isReply={isReply}>
         <InlineRow align="center">
           <Avatar
             title={author.name}
@@ -311,14 +312,16 @@ class Comment extends React.Component {
                 <StyledCommentActions className="show-on-hover">
                   {persisted && isCurrentUserComment && (
                     <React.Fragment>
-                      <Tooltip placement="top" title="reply to comment">
-                        <ActionButton
-                          onClick={this.handleReplyClick}
-                          className="test-reply-comment"
-                        >
-                          <CalloutBoxIcon />
-                        </ActionButton>
-                      </Tooltip>
+                      {!isReply && (
+                        <Tooltip placement="top" title="reply to comment">
+                          <ActionButton
+                            onClick={this.handleReplyClick}
+                            className="test-reply-comment"
+                          >
+                            <CalloutBoxIcon />
+                          </ActionButton>
+                        </Tooltip>
+                      )}
                       <Tooltip placement="top" title="edit comment">
                         <ActionButton
                           onClick={this.handleEditClick}
@@ -356,8 +359,13 @@ class Comment extends React.Component {
   }
 }
 
+Comment.defaultProps = {
+  isReply: false,
+}
+
 Comment.propTypes = {
   comment: MobxPropTypes.objectOrObservableObject.isRequired,
+  isReply: PropTypes.bool,
 }
 
 Comment.wrappedComponent.propTypes = {

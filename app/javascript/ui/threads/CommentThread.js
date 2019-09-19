@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import { computed } from 'mobx'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled, { css } from 'styled-components'
 
 import v from '~/utils/variables'
@@ -9,6 +9,7 @@ import Comment from '~/ui/threads/Comment'
 import CommentEntryForm from '~/ui/threads/CommentEntryForm'
 import CommentThreadLoader from '~/ui/threads/CommentThreadLoader'
 import CommentThreadHeader from '~/ui/threads/CommentThreadHeader'
+import _ from 'lodash'
 
 export const threadTitleCss = css`
   position: relative;
@@ -74,6 +75,7 @@ const StyledCommentsWrapper = styled.div`
 `
 StyledCommentsWrapper.displayName = 'StyledCommentsWrapper'
 
+@inject('uiStore')
 @observer
 class CommentThread extends React.Component {
   @computed
@@ -87,13 +89,44 @@ class CommentThread extends React.Component {
     return comments
   }
 
-  renderComments = () =>
-    this.comments.map((comment, i) => (
-      <Comment key={comment.id || `comment-new-${i}`} comment={comment} />
-    ))
+  renderComments = () => {
+    const { uiStore } = this.props
+    if (!this.comments || this.comments.length <= 0) return []
+    const commentsList = []
+    _.each(this.comments, (comment, i) => {
+      commentsList.push(
+        <Comment key={comment.id || `comment-new-${i}`} comment={comment} />
+      )
+      _.each(comment.replies, (child, i) => {
+        commentsList.push(
+          <Comment
+            key={child.id || `comment-reply-new-${i}`}
+            comment={child}
+            isReply={true}
+          />
+        )
+      })
+      if (uiStore.replyingToCommentId === comment.id) {
+        commentsList.push(this.renderCommentEntryForm())
+      }
+    })
+    return commentsList
+  }
+
+  renderCommentEntryForm() {
+    const { thread, expanded } = this.props
+    return (
+      <CommentEntryForm
+        expanded={expanded}
+        thread={thread}
+        afterSubmit={this.props.afterSubmit}
+        onHeightChange={this.props.onEditorHeightChange}
+      />
+    )
+  }
 
   render() {
-    const { thread, expanded } = this.props
+    const { thread, expanded, uiStore } = this.props
     const unexpandedClickable = !expanded
 
     return (
@@ -111,12 +144,7 @@ class CommentThread extends React.Component {
           )}
           {this.renderComments()}
         </StyledCommentsWrapper>
-        <CommentEntryForm
-          expanded={expanded}
-          thread={thread}
-          afterSubmit={this.props.afterSubmit}
-          onHeightChange={this.props.onEditorHeightChange}
-        />
+        {!uiStore.replyingToCommentId && this.renderCommentEntryForm()}
       </StyledCommentThread>
     )
   }
@@ -128,6 +156,9 @@ CommentThread.propTypes = {
   afterSubmit: PropTypes.func.isRequired,
   onEditorHeightChange: PropTypes.func.isRequired,
   thread: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+CommentThread.wrappedComponent.propTypes = {
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default CommentThread
