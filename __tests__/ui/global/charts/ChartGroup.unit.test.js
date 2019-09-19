@@ -24,9 +24,7 @@ describe('ChartGroup', () => {
       },
     ]
     dataItem.primaryDataset = fakeAreaChartDataset
-    dataItem.secondaryDatasets.mockReturnValue([
-      dataItem.datasets[1],
-    ])
+    dataItem.secondaryDatasets.mockReturnValue([dataItem.datasets[1]])
     props.dataItem = dataItem
     props.simpleDateTooltip = true
     render = () => (wrapper = shallow(<ChartGroup {...props} />))
@@ -57,8 +55,7 @@ describe('ChartGroup', () => {
     expect(label).toEqual('Dec')
   })
 
-  describe('secondary dataset of an area chart',
-    () => {
+  describe('secondary dataset of an area chart', () => {
     beforeEach(() => {
       dataItem.datasets = [
         {
@@ -68,9 +65,7 @@ describe('ChartGroup', () => {
         },
       ]
       dataItem.primaryDataset = fakeAreaChartDataset
-      dataItem.secondaryDatasets.mockReturnValue([
-        dataItem.datasets[1],
-      ])
+      dataItem.secondaryDatasets.mockReturnValue([dataItem.datasets[1]])
     })
 
     it('should render as a line chart always', () => {
