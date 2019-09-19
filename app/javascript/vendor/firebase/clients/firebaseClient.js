@@ -47,8 +47,6 @@ export class FirebaseClient {
   }
 
   startListening() {
-    return false
-
     if (!apiStore.currentUserId) return
     this.listenForUsersThreads(apiStore.currentUserId)
     this.listenForUserNotifications(apiStore.currentUserId)
