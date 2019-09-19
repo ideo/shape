@@ -1,12 +1,13 @@
 import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import styled from 'styled-components'
+import styled, { ThemeProvider } from 'styled-components'
 
 import { ActivityContainer } from '~/ui/global/styled/layout'
 import Emoji from '~/ui/icons/Emoji'
 import {
   EmojiMessageContainer,
   SurveyClosed,
+  styledTestTheme,
 } from '~/ui/test_collections/shared'
 import { DisplayText } from '~/ui/global/styled/typography'
 import TestSurveyResponder from '~/ui/test_collections/TestSurveyResponder'
@@ -79,23 +80,25 @@ class InlineCollectionTest extends React.Component {
           <StyledTestHeader>
             <CommentThreadHeader record={collection} />
           </StyledTestHeader>
-          <SurveyClosed>
-            <DisplayText>Thank you for stopping by!</DisplayText>
-            <br />
-            <br />
-            <DisplayText>
-              Feedback on {collection.name} is finished.
-            </DisplayText>
-            <Tooltip
-              classes={{ tooltip: 'Tooltip' }}
-              title="Feedback finished"
-              placement="bottom"
-            >
-              <EmojiMessageContainer>
-                <Emoji name="Timer clock" symbol="⏲️" />
-              </EmojiMessageContainer>
-            </Tooltip>
-          </SurveyClosed>
+          <ThemeProvider theme={styledTestTheme('secondary')}>
+            <SurveyClosed>
+              <DisplayText>Thank you for stopping by!</DisplayText>
+              <br />
+              <br />
+              <DisplayText>
+                Feedback on {collection.name} is finished.
+              </DisplayText>
+              <Tooltip
+                classes={{ tooltip: 'Tooltip' }}
+                title="Feedback finished"
+                placement="bottom"
+              >
+                <EmojiMessageContainer>
+                  <Emoji name="Timer clock" symbol="⏲️" />
+                </EmojiMessageContainer>
+              </Tooltip>
+            </SurveyClosed>
+          </ThemeProvider>
         </div>
       )
     }
