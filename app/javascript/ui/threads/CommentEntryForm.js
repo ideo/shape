@@ -96,7 +96,8 @@ class CommentEntryForm extends React.Component {
   }
 
   handleSubmit = e => {
-    const { replyingToCommentId } = this.props.uiStore
+    const { uiStore } = this.props
+    const { replyingToCommentId } = uiStore
     const content = this.state.editorState.getCurrentContent()
     const message = content.getPlainText()
 
@@ -122,9 +123,9 @@ class CommentEntryForm extends React.Component {
   }
 
   render() {
-    const { expanded } = this.props
-    const { replyingToCommentId } = this.props.uiStore
-    if (!expanded) return ''
+    const { uiStore, expanded } = this.props
+    const { replyingToCommentId } = uiStore
+    if (!expanded) return null
 
     return (
       <CommentForm onSubmit={this.handleSubmit}>

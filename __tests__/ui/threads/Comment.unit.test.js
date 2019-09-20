@@ -1,6 +1,7 @@
 import Comment from '~/ui/threads/Comment'
 import { fakeComment, fakeUser } from '#/mocks/data'
-import { apiStore, uiStore } from '~/stores'
+import fakeApiStore from '#/mocks/fakeApiStore'
+import fakeUiStore from '#/mocks/fakeUiStore'
 
 jest.mock('../../../app/javascript/stores')
 
@@ -8,6 +9,8 @@ let wrapper, props, rerender
 describe('Comment', () => {
   beforeEach(() => {
     props = {
+      apiStore: fakeApiStore(),
+      uiStore: fakeUiStore,
       comment: {
         ...fakeComment,
         persisted: true,
@@ -60,7 +63,7 @@ describe('Comment', () => {
 
   describe('when user is comment author', () => {
     beforeEach(() => {
-      apiStore.currentUserId = '1'
+      props.apiStore.currentUserId = '1'
     })
 
     it('renders an edit button', () => {
@@ -94,14 +97,14 @@ describe('Comment', () => {
       it('deletes the comment', () => {
         const deleteButton = wrapper.find('.test-delete-comment').first()
         deleteButton.simulate('click')
-        expect(uiStore.confirm).toHaveBeenCalled()
+        expect(props.uiStore.confirm).toHaveBeenCalled()
       })
     })
   })
 
   describe('when user is not the comment author', () => {
     beforeEach(() => {
-      apiStore.currentUserId = '1'
+      props.apiStore.currentUserId = '1'
       props.comment.author = { ...fakeUser, id: '9' }
       rerender(props)
     })
