@@ -14,10 +14,11 @@ describe('Comment', () => {
       comment: {
         ...fakeComment,
         persisted: true,
+        replies: [fakeComment, fakeComment, fakeComment],
       },
     }
     rerender = props => {
-      wrapper = shallow(<Comment {...props} />)
+      wrapper = shallow(<Comment.wrappedComponent {...props} />)
     }
     rerender(props)
   })
@@ -64,6 +65,8 @@ describe('Comment', () => {
   describe('when user is comment author', () => {
     beforeEach(() => {
       props.apiStore.currentUserId = '1'
+      props.comment.replies = []
+      rerender(props)
     })
 
     it('renders an edit button', () => {
