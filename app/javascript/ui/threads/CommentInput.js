@@ -13,29 +13,7 @@ import {
   CustomMentionSuggestion,
 } from '~/ui/threads/CustomCommentMentions'
 
-const positionSuggestions = ({ decoratorRect, state, props }) => {
-  let transform
-  let transition
-  let top = '-36px'
-
-  if (state.isActive && props.suggestions.length > 0) {
-    transform = `scaleY(1)`
-    transition = 'all 0.25s cubic-bezier(.3,1.2,.2,1)'
-    const { y } = uiStore.activityLogPosition
-    top = `${decoratorRect.top - (y + 45 * (props.suggestions.length + 1))}px`
-  } else if (state.isActive) {
-    transform = 'scaleY(0)'
-    transition = 'all 0.25s cubic-bezier(.3,1,.2,1)'
-  }
-
-  return {
-    transform,
-    transition,
-    top,
-  }
-}
-
-@inject('apiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class CommentInput extends React.Component {
   @observable
@@ -52,9 +30,33 @@ class CommentInput extends React.Component {
     this.props.setEditor(null, { unset: true })
   }
 
+  positionSuggestions = ({ decoratorRect, state, props }) => {
+    const { suggestions } = props
+    const { isActive } = state
+    let transform
+    let transition
+    let top = '-36px'
+
+    if (isActive && suggestions.length > 0) {
+      transform = `scaleY(1)`
+      transition = 'all 0.25s cubic-bezier(.3,1.2,.2,1)'
+      const { y } = uiStore.activityLogPosition
+      top = `${decoratorRect.top - (y + 45 * (suggestions.length + 1))}px`
+    } else if (isActive) {
+      transform = 'scaleY(0)'
+      transition = 'all 0.25s cubic-bezier(.3,1,.2,1)'
+    }
+
+    return {
+      transform,
+      transition,
+      top,
+    }
+  }
+
   initMentionPlugin() {
     this.mentionPlugin = createMentionPlugin({
-      positionSuggestions,
+      positionSuggestions: this.positionSuggestions,
       // treat the entire "@xyz" as an all-or-nothing token
       entityMutability: 'IMMUTABLE',
     })
@@ -78,9 +80,9 @@ class CommentInput extends React.Component {
     if (!e.shiftKey && !this.suggestionsOpen) {
       // submit message
       this.props.handleSubmit(e)
-      return 'handled'
+      this.props.uiStore.setReplyingToComment(null)
     }
-    return 'not-handled'
+    return
   }
 
   @action
@@ -128,6 +130,7 @@ class CommentInput extends React.Component {
           editorState={editorState}
           onChange={onChange}
           handleReturn={this.handleReturn}
+          onBlur={this.handleReturn}
           plugins={plugins}
           placeholder="Add comment"
           ref={element => {
@@ -155,6 +158,7 @@ CommentInput.propTypes = {
 }
 CommentInput.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 CommentInput.displayName = 'CommentInput'

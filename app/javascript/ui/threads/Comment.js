@@ -310,6 +310,7 @@ class Comment extends React.Component {
         unread={unread}
         isReply={isReply}
         onClick={this.handleCommentBodyClick}
+        onBlur={this.handleSubmit}
       >
         <InlineRow align="center">
           <Avatar
