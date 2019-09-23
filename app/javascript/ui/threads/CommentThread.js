@@ -173,6 +173,10 @@ CommentThread.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
+CommentThread.defaultProps = {
+  expanded: false,
+}
+
 CommentThread.displayName = 'CommentThread'
 
 export default CommentThread
