@@ -13,7 +13,7 @@ describe('CommentEntryForm', () => {
       onHeightChange: jest.fn(),
       thread: fakeThread,
     }
-    wrapper = shallow(<CommentEntryForm {...props} />)
+    wrapper = shallow(<CommentEntryForm.wrappedComponent {...props} />)
     fakeThread.API_saveComment.mockClear()
   })
 
@@ -22,7 +22,7 @@ describe('CommentEntryForm', () => {
   })
 
   it('renders the CommentInputWrapper', () => {
-    expect(wrapper.find('CommentInputWrapper').exists()).toBeTruthy()
+    expect(wrapper.find('StyledCommentInputWrapper').exists()).toBeTruthy()
   })
 
   describe('when not expanded', () => {
@@ -31,7 +31,7 @@ describe('CommentEntryForm', () => {
     })
 
     it('does not render the CommentInputWrapper', () => {
-      expect(wrapper.find('CommentInputWrapper').exists()).toBeFalsy()
+      expect(wrapper.find('StyledCommentInputWrapper').exists()).toBeFalsy()
     })
   })
 })

@@ -10,13 +10,14 @@ import CommentInput from '~/ui/threads/CommentInput'
 import styled from 'styled-components'
 import v from '~/utils/variables.js'
 
-const CommentInputWrapper = styled.div`
+const StyledCommentInputWrapper = styled.div`
   ${props =>
     props.replying &&
     `
     border-left: 8px solid ${v.colors.secondaryDarkest};
   `};
 `
+StyledCommentInputWrapper.displayName = 'StyledCommentInputWrapper'
 
 @inject('uiStore')
 @observer
@@ -129,7 +130,7 @@ class CommentEntryForm extends React.Component {
 
     return (
       <CommentForm onSubmit={this.handleSubmit}>
-        <CommentInputWrapper
+        <StyledCommentInputWrapper
           className="textarea-input"
           replying={!!replyingToCommentId}
         >
@@ -139,7 +140,7 @@ class CommentEntryForm extends React.Component {
             handleSubmit={this.handleSubmit}
             setEditor={this.setEditor}
           />
-        </CommentInputWrapper>
+        </StyledCommentInputWrapper>
         <CommentEnterButton focused={this.state.focused}>
           <ReturnArrowIcon />
         </CommentEnterButton>
