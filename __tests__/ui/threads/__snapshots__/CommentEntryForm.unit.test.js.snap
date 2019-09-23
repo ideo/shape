@@ -2368,6 +2368,7 @@ exports[`CommentEntryForm renders snapshot 1`] = `
       "popupSnackbar": [MockFunction],
       "removeEmptySpaceClickHandler": [MockFunction],
       "removeNewCard": [MockFunction],
+      "replyingToCommentId": false,
       "resetSelectionAndBCT": [MockFunction],
       "rolesMenuOpen": false,
       "scrollToBottom": [MockFunction],
