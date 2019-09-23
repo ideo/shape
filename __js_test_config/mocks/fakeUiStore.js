@@ -40,7 +40,7 @@ const fakeUiStore = {
     x: 0,
     y: 0,
     offsetX: 0,
-    offsetY: 0
+    offsetY: 0,
   },
   openBlankContentTool: jest.fn(),
   closeBlankContentTool: jest.fn(),
@@ -103,11 +103,14 @@ const fakeUiStore = {
   showPermissionsAlert: jest.fn(),
   gridHeightFor: jest.fn().mockReturnValue(250),
   performActionAfterRoute: jest.fn(),
-  linkedBreadcrumbTrailForRecord: jest.fn().mockImplementation(x => x.breadcrumb),
+  linkedBreadcrumbTrailForRecord: jest
+    .fn()
+    .mockImplementation(x => x.breadcrumb),
   addEmptySpaceClickHandler: jest.fn(),
   removeEmptySpaceClickHandler: jest.fn(),
   setEditingCardCover: jest.fn(),
   adminAudienceMenuOpen: false,
+  replyingToCommentId: false,
 }
 
 export default fakeUiStore

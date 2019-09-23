@@ -159,4 +159,6 @@ CommentEntryForm.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
+CommentEntryForm.displayName = 'CommentEntryForm'
+
 export default CommentEntryForm
