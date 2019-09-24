@@ -111,6 +111,7 @@ const fakeUiStore = {
   setEditingCardCover: jest.fn(),
   adminAudienceMenuOpen: false,
   replyingToCommentId: false,
+  setReplyingToComment: jest.fn()
 }
 
 export default fakeUiStore

@@ -5,6 +5,10 @@ import fakeUiStore from '#/mocks/fakeUiStore'
 
 jest.mock('../../../app/javascript/stores')
 
+const fakeEvent = {
+  target: { closest: jest.fn() },
+}
+
 let wrapper, props, rerender
 describe('Comment', () => {
   beforeEach(() => {
@@ -16,6 +20,7 @@ describe('Comment', () => {
         persisted: true,
         replies: [fakeComment, fakeComment, fakeComment],
       },
+      isReply: false,
     }
     rerender = props => {
       wrapper = shallow(<Comment.wrappedComponent {...props} />)
@@ -62,11 +67,34 @@ describe('Comment', () => {
     })
   })
 
+  it('sets replying to comment id when clicked', () => {
+    wrapper.simulate('click', fakeEvent)
+    expect(props.uiStore.setReplyingToComment).toHaveBeenCalledWith(
+      props.comment.id
+    )
+  })
+
+  it('sets replying to comment id when reply button is clicked', () => {
+    wrapper.find('.test-reply-comment').simulate('click', fakeEvent)
+    expect(props.uiStore.setReplyingToComment).toHaveBeenCalledWith(
+      props.comment.id
+    )
+  })
+
+  describe('if a comment is a reply', () => {
+    beforeEach(() => {
+      props.isReply = true
+      rerender(props)
+    })
+
+    it('should not have a reply button', () => {
+      expect(wrapper.find('.test-reply-comment').exists()).toBeFalsy()
+    })
+  })
+
   describe('when user is comment author', () => {
     beforeEach(() => {
       props.apiStore.currentUserId = '1'
-      props.comment.replies = []
-      rerender(props)
     })
 
     it('renders an edit button', () => {
@@ -92,15 +120,26 @@ describe('Comment', () => {
       })
     })
 
-    it('renders a delete button', () => {
-      expect(wrapper.find('.test-delete-comment').exists()).toBe(true)
+    it('does not render a delete button', () => {
+      expect(wrapper.find('.test-delete-comment').exists()).toBe(false)
     })
 
-    describe('on click delete', () => {
-      it('deletes the comment', () => {
-        const deleteButton = wrapper.find('.test-delete-comment').first()
-        deleteButton.simulate('click')
-        expect(props.uiStore.confirm).toHaveBeenCalled()
+    describe('when a comment has no replies', () => {
+      beforeEach(() => {
+        props.comment.replies = []
+        rerender(props)
+      })
+
+      it('renders a delete button', () => {
+        expect(wrapper.find('.test-delete-comment').exists()).toBe(true)
+      })
+
+      describe('on click delete', () => {
+        it('deletes the comment', () => {
+          const deleteButton = wrapper.find('.test-delete-comment').first()
+          deleteButton.simulate('click')
+          expect(props.uiStore.confirm).toHaveBeenCalled()
+        })
       })
     })
   })

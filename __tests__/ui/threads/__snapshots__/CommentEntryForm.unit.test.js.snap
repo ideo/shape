@@ -29,8 +29,8 @@ exports[`CommentEntryForm renders snapshot 1`] = `
                 "replaceData": [Function],
               },
               "blockMap": Immutable.OrderedMap {
-                "fg63c": Immutable.Record {
-                  "key": "fg63c",
+                "18kt7": Immutable.Record {
+                  "key": "18kt7",
                   "type": "unstyled",
                   "text": "",
                   "characterList": Immutable.List [],
@@ -39,17 +39,17 @@ exports[`CommentEntryForm renders snapshot 1`] = `
                 },
               },
               "selectionBefore": Immutable.Record {
-                "anchorKey": "fg63c",
+                "anchorKey": "18kt7",
                 "anchorOffset": 0,
-                "focusKey": "fg63c",
+                "focusKey": "18kt7",
                 "focusOffset": 0,
                 "isBackward": false,
                 "hasFocus": false,
               },
               "selectionAfter": Immutable.Record {
-                "anchorKey": "fg63c",
+                "anchorKey": "18kt7",
                 "anchorOffset": 0,
-                "focusKey": "fg63c",
+                "focusKey": "18kt7",
                 "focusOffset": 0,
                 "isBackward": false,
                 "hasFocus": false,
@@ -57,7 +57,7 @@ exports[`CommentEntryForm renders snapshot 1`] = `
             },
             "decorator": null,
             "directionMap": Immutable.OrderedMap {
-              "fg63c": "LTR",
+              "18kt7": "LTR",
             },
             "forceSelection": false,
             "inCompositionMode": false,
@@ -66,15 +66,15 @@ exports[`CommentEntryForm renders snapshot 1`] = `
             "nativelyRenderedContent": null,
             "redoStack": Immutable.Stack [],
             "selection": Immutable.Record {
-              "anchorKey": "fg63c",
+              "anchorKey": "18kt7",
               "anchorOffset": 0,
-              "focusKey": "fg63c",
+              "focusKey": "18kt7",
               "focusOffset": 0,
               "isBackward": false,
               "hasFocus": false,
             },
             "treeMap": Immutable.OrderedMap {
-              "fg63c": Immutable.List [
+              "18kt7": Immutable.List [
                 Immutable.Record {
                   "start": 0,
                   "end": 0,
