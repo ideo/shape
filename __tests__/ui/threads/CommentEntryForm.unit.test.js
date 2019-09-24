@@ -1,7 +1,6 @@
 import CommentEntryForm from '~/ui/threads/CommentEntryForm'
 import { fakeThread } from '#/mocks/data'
 import fakeUiStore from '#/mocks/fakeUiStore'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 let wrapper, props
 describe('CommentEntryForm', () => {
@@ -15,10 +14,6 @@ describe('CommentEntryForm', () => {
     }
     wrapper = shallow(<CommentEntryForm.wrappedComponent {...props} />)
     fakeThread.API_saveComment.mockClear()
-  })
-
-  it('renders snapshot', () => {
-    expectTreeToMatchSnapshot(wrapper)
   })
 
   it('renders the CommentInputWrapper', () => {
