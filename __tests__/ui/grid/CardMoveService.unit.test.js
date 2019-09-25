@@ -36,21 +36,6 @@ describe('CardMoveService', () => {
       })
     })
 
-    describe('moving pinned items out of a template', () => {
-      it('should return an error message', () => {
-        const message = service.moveErrors({
-          viewingCollection: {
-            isMasterTemplate: false,
-            can_edit_content: true,
-          },
-          movingFromCollection: { isMasterTemplate: true },
-          cardAction: 'move',
-        })
-        expect(message).toEqual(
-          "You can't move pinned template items out of a template"
-        )
-      })
-    })
     describe('trying to create a template inside another template', () => {
       it('should return an error message', () => {
         const message = service.moveErrors({
