@@ -105,6 +105,7 @@ class CoverRenderer extends React.Component {
           width={card.maxWidth}
           height={card.maxHeight}
           collection={record}
+          subtitle={record.subtitle}
           dragging={dragging}
           searchResult={searchResult}
           inSubmissionsCollection={

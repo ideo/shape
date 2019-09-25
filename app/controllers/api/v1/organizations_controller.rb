@@ -89,9 +89,13 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
       :domain_whitelist,
       :deactivated,
       :terms_text_item_id,
+      :default_locale,
       filestack_file_attributes: Group.filestack_file_attributes_whitelist,
     ]
-    params_allowed << :in_app_billing if current_user.has_role?(Role::SUPER_ADMIN)
+    # If super admin or application (bot) user, we allow toggling billing
+    if current_user.has_role?(Role::SUPER_ADMIN) || current_application.present?
+      params_allowed << :in_app_billing
+    end
     params.require(:organization).permit(params_allowed)
   end
 end

@@ -740,7 +740,7 @@ class CollectionGrid extends React.Component {
   @action
   positionCards = (collectionCards = [], opts = {}) => {
     // even though hidden cards are not loaded by default in the API, we still filter here because
-    // it's possible that some hidden cards were loaded in memory via the CoverImageSelector
+    // it's possible that some hidden cards were loaded in memory via the CardCoverEditor
     const cards = [...collectionCards].filter(c => !c.hidden)
     const {
       collection,

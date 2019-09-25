@@ -249,7 +249,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       before do
         GlobalTranslation.create(
           value_en: {
-            'CD-QUALITIES-PURPOSE': 'Purpose',
+            'CD.QUALITIES.PURPOSE': 'Purpose',
           },
         )
       end
@@ -257,7 +257,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       context 'matching variables' do
         before do
           collection.update(
-            name: '{{CD-QUALITIES-PURPOSE}} is my name',
+            name: '{{CD.QUALITIES.PURPOSE}} is my name',
           )
         end
 
@@ -272,14 +272,14 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       context 'non-matching variables' do
         before do
           collection.update(
-            name: '{{CD-SOMETHING-ELSE}} is my name',
+            name: '{{CD.SOMETHING.ELSE}} is my name',
           )
         end
 
         it 'leaves them in-place' do
           get(path)
           expect(json['data']['attributes']['name']).to eq(
-            '{{CD-SOMETHING-ELSE}} is my name',
+            '{{CD.SOMETHING.ELSE}} is my name',
           )
         end
       end
@@ -509,12 +509,12 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         json_api_params(
           'collections',
           raw_params.merge(
-            collection_cards_attributes: {
+            collection_cards_attributes: [{
               id: collection_card.id,
               width: 3,
               row: 4,
               col: 5,
-            },
+            }],
           ),
         )
       end
@@ -634,6 +634,13 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
           child: collection,
         )
         patch(path)
+      end
+
+      it 'unmarks private setting' do
+        collection.update(cached_inheritance: { private: true })
+        patch(path)
+        collection.reload
+        expect(collection.cached_inheritance['private']).to be false
       end
     end
   end

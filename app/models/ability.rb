@@ -64,11 +64,15 @@ class Ability
           !collection_card.system_required?
       end
       can :move, CollectionCard do |collection_card|
-        collection_card.can_edit?(user) ||
-          collection_card.parent.can_edit_content?(user)
+        !collection_card.pinned_and_locked? &&
+          (
+            collection_card.can_edit?(user) ||
+              collection_card.parent.can_edit_content?(user)
+          )
       end
       can :manage, CollectionCard do |collection_card|
-        collection_card.can_edit?(user)
+        !collection_card.pinned_and_locked? &&
+          collection_card.can_edit?(user)
       end
 
       can :create, Item

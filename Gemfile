@@ -32,7 +32,7 @@ gem 'uglifier', '>= 1.3.0'
 gem 'jbuilder', '~> 2.5'
 
 # Devise for auth
-gem 'devise', '~> 4.6.0'
+gem 'devise', '~> 4.7.1'
 gem 'omniauth-ideo', git: 'https://github.com/ideo/omniauth-ideo.git'
 
 # Consumer for IDEO Network JSON APIs
@@ -132,6 +132,8 @@ gem 'slack-ruby-client'
 
 # Text helper to provide possessive strings
 gem 'possessive'
+
+gem 'activerecord-import'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

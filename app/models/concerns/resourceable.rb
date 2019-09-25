@@ -90,19 +90,44 @@ module Resourceable
     roles_anchor_resource_identifier == resource.roles_anchor_resource_identifier
   end
 
+  # returns true if resource's roles are equal to (or more inclusive than) self
   def includes_all_roles?(resource)
     return false unless item_or_collection? && resource.item_or_collection?
 
+    mine = flattened_user_and_group_role_ids
+    theirs = resource.flattened_user_and_group_role_ids
+
     %i[viewers editors].each do |role_name|
-      my_role = send(role_name)
-      their_role = resource.send(role_name)
+      my_role = mine[role_name]
+      their_role = theirs[role_name]
       %i[users groups].each do |role_owner|
-        mine = my_role.try(:[], role_owner).pluck(:id)
-        theirs = their_role.try(:[], role_owner).pluck(:id)
-        return false unless (mine & theirs) == theirs
+        my_ids = my_role.try(:[], role_owner) || []
+        their_ids = their_role.try(:[], role_owner) || []
+        return false unless (their_ids & my_ids).sort == their_ids.sort
       end
     end
+
     true
+  end
+
+  def flattened_user_and_group_role_ids
+    list = anchored_roles
+           .includes(:users, :groups)
+           .pluck(User.arel_table[:id], Group.arel_table[:id], Role.arel_table[:name])
+    result = HashWithIndifferentAccess.new
+    list.each do |user_id, group_id, role_name|
+      role_name = role_name.pluralize.to_sym
+      result[role_name] ||= {}
+      if user_id
+        result[role_name][:users] ||= []
+        result[role_name][:users] |= [user_id]
+      end
+      if group_id
+        result[role_name][:groups] ||= []
+        result[role_name][:groups] |= [group_id]
+      end
+    end
+    result
   end
 
   def anchored_roles(viewing_organization_id: organization_id)
@@ -232,13 +257,8 @@ module Resourceable
     anchor_id = parent&.roles_anchor&.id
     return unless anchor_id
 
+    unmark_as_private!
     update_columns(roles_anchor_collection_id: anchor_id, updated_at: Time.current)
-    # now that its reanchored, cache private = false
-    self.class.where(id: id).update_all(%(
-      cached_attributes = jsonb_set(
-        cached_attributes, '{cached_inheritance}', '{"private": false, "updated_at": "#{Time.current}"}'::jsonb
-      )
-    ))
     roles.destroy_all
     return unless propagate && is_a?(Collection)
 
@@ -248,6 +268,34 @@ module Resourceable
         .where(roles_anchor_collection_id: id)
         .update_all(roles_anchor_collection_id: anchor_id, updated_at: Time.current)
     end
+  end
+
+  def mark_as_private!(value = true)
+    # slightly convoluted way of writing a jsonb_set update on self (#update won't work here)
+    settings = { 'private': value, 'updated_at': Time.current }
+    self.class.where(id: id).update_all(%(
+      cached_attributes = jsonb_set(
+        cached_attributes, '{cached_inheritance}', '#{settings.to_json}'::jsonb
+      )
+    ))
+    # make sure to set this in memory as well (saves having to do a `reload`)
+    self.cached_inheritance = settings.as_json
+  end
+
+  def unmark_as_private!
+    mark_as_private!(false)
+  end
+
+  def reanchor_if_incorrect_anchor!(parent: self.parent)
+    # we've seen a roles anchor be set incorrectly, e.g. Collection X -> parent -> grandparent
+    # even though `parent` has roles, `X` is somehow anchored to the grandparent;
+    # may have been the result of a previous bug in add_role that was erroring out during role propagation...
+    return false unless roles_anchor_collection_id.present? &&
+                        parent.roles_anchor_collection_id.nil? &&
+                        roles_anchor_collection_id != parent.id
+
+    reanchor!(parent: parent, propagate: true)
+    true
   end
 
   def remove_all_viewer_roles

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`CoverImageSelector renders snapshot 1`] = `
+exports[`CardCoverEditor renders snapshot 1`] = `
 <Fragment>
   <CardActionHolder
     active={false}

@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 import v from '~/utils/variables'
 
-const StyledContainer = styled.main`
+const StyledPageContainer = styled.div`
   display: block;
   margin: 0 auto;
   ${props =>
@@ -16,13 +16,13 @@ const StyledContainer = styled.main`
 `
 
 const PageContainer = ({ children, fullWidth, padding }) => (
-  <StyledContainer
+  <StyledPageContainer
     data-empty-space-click
     fullWidth={fullWidth}
     padding={padding}
   >
     {children}
-  </StyledContainer>
+  </StyledPageContainer>
 )
 
 PageContainer.propTypes = {

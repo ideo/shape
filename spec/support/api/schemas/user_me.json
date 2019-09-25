@@ -6,6 +6,7 @@
     "current_user_collection_id": { "type": ["string", "null"] },
     "email": { "type": "string" },
     "first_name": { "type": "string" },
+    "locale": { "type": "string" },
     "handle": { "type": "string" },
     "last_name": { "type": "string" },
     "pic_url_square": { "type": "string" },

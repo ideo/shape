@@ -54,9 +54,16 @@ class ActionMenu extends React.Component {
 
   openMoveMenu = cardAction => {
     const { card, onMoveMenu, uiStore } = this.props
-    const { viewingCollection } = uiStore
+    let { viewingCollection } = uiStore
+    if (!viewingCollection) {
+      viewingCollection = card.record.parent ? card.record.parent.id : null
+    }
     if (onMoveMenu) onMoveMenu({ type: cardAction })
     uiStore.selectCardId(card.id)
+    if (cardAction === 'move') {
+      const { selectedCardIds } = uiStore
+      card.reselectOnlyEditableCards(selectedCardIds)
+    }
     uiStore.openMoveMenu({ from: viewingCollection, cardAction })
   }
 

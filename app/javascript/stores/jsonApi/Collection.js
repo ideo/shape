@@ -339,7 +339,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     // you also don't use test templates, since duplicating them or
     // creating them within another template is the way to do that
     return (
-      !!this.isMasterTemplate &&
+      this.isMasterTemplate &&
+      !this.isSubTemplate &&
       !this.isProfileTemplate &&
       !this.is_submission_box_template &&
       !this.isTestDesign &&
@@ -396,6 +397,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get isTemplated() {
     return !!this.template_id
+  }
+
+  get isSubTemplate() {
+    // a subtemplate is a collection or a template within a template or an instance of it
+    return this.is_subtemplate_or_instance
   }
 
   get isUserProfile() {
@@ -977,6 +983,22 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         blankType: type,
       })
     }
+  }
+
+  get subtitle() {
+    const { cover } = this
+    if (cover.subtitle_hidden) {
+      return ''
+    }
+    return cover.hardcoded_subtitle || cover.text || ''
+  }
+
+  get subtitleHidden() {
+    const { cover } = this
+    if (cover && cover.subtitle_hidden) {
+      return cover
+    }
+    return false
   }
 
   // NOTE: this is only used as a Cypress test method, to simulate card resizing

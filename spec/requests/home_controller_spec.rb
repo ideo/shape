@@ -1,14 +1,6 @@
 require 'rails_helper'
 
-describe HomeController, type: :request do
-  before do
-    # NOTE: not doing any normal rendering of the index page because we defer to Cypress for those,
-    # and they make for slow request specs
-    allow_any_instance_of(
-      HomeController,
-    ).to receive(:render).and_return 'rendered.'
-  end
-
+describe HomeController, skip_frontend_render: true, type: :request do
   describe 'GET #index' do
     let(:path) { '/' }
 
