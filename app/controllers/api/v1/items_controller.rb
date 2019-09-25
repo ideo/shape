@@ -87,19 +87,21 @@ class Api::V1::ItemsController < Api::V1::BaseController
 
   def item_params
     params.require(:item).permit(
-      :type,
-      :name,
-      :external_id,
-      :content,
-      { data_content: {} },
-      :url,
-      :image,
-      :archived,
-      :tag_list,
-      :thumbnail_url,
-      :legend_item_id,
-      :legend_search_source,
-      filestack_file_attributes: Item.filestack_file_attributes_whitelist,
+      [
+        :type,
+        :name,
+        :external_id,
+        :content,
+        { data_content: {} },
+        :url,
+        :image,
+        :archived,
+        :tag_list,
+        :thumbnail_url,
+        :legend_item_id,
+        :legend_search_source,
+        filestack_file_attributes: Item.filestack_file_attributes_whitelist,
+      ].concat(Item.globalize_attribute_names),
     )
   end
 

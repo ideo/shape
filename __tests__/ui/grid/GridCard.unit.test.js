@@ -214,6 +214,10 @@ describe('GridCard', () => {
         expect(wrapper.find('SelectionCircle').exists()).toBe(true)
         expect(wrapper.find('GridCardHotspot').exists()).toBe(false)
       })
+
+      it('does not render CardCoverEditor', () => {
+        expect(wrapper.find('CardCoverEditor').exists()).toBe(false)
+      })
     })
 
     describe('as editor', () => {
@@ -234,6 +238,17 @@ describe('GridCard', () => {
       it('renders selection circle and hotspot', () => {
         expect(wrapper.find('SelectionCircle').exists()).toBe(true)
         expect(wrapper.find('GridCardHotspot').exists()).toBe(true)
+      })
+
+      describe('if record.canSetACover = true', () => {
+        beforeEach(() => {
+          props.record.canSetACover = true
+          rerender()
+        })
+
+        it('renders CardCoverEditor', () => {
+          expect(wrapper.find('CardCoverEditor').exists()).toBe(true)
+        })
       })
     })
 

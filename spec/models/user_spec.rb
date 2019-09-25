@@ -156,6 +156,46 @@ describe User, type: :model do
         end
       end
     end
+
+    context 'network user callbacks' do
+      let(:network_user) { double('network_user') }
+
+      before do
+        allow(network_user).to receive(:locale)
+        expect(NetworkApi::User).to receive(:find).with(user.uid).and_return([network_user])
+      end
+
+      describe '#update_profile_locale' do
+        it 'should call the network to update the locale' do
+          expect(NetworkUserUpdateWorker).to receive(:perform_async).with(
+            user.id, :locale
+          )
+          user.update(locale: 'es')
+        end
+      end
+
+      describe '#update_from_network_profile' do
+        let(:params) do
+          {
+            first_name: 'Bob',
+            last_name: 'Smith',
+            email: 'bob@smith.com',
+            picture: 'http://new.img.url',
+            picture_large: 'http://new.img.url/large',
+            locale: 'es',
+            username: 'bob-smith',
+          }
+        end
+
+        it 'should update the local params based on network attributes' do
+          user.update_from_network_profile(params)
+          %i[first_name last_name email picture picture_large locale].each do |field|
+            expect(user.send(field)).to eq params[field]
+          end
+          expect(user.handle).to eq params[:username]
+        end
+      end
+    end
   end
 
   describe '#add_role' do
@@ -220,23 +260,25 @@ describe User, type: :model do
             picture: 'http://pic.url.net',
             picture_medium: 'http://pic.url.net/med',
             picture_large: 'http://pic.url.net/lg',
+            locale: 'es',
           },
         },
       )
     end
-    let(:from_omniauth) { User.from_omniauth(auth) }
+    let(:omniauth_user) { User.from_omniauth(auth) }
 
     context 'with existing user' do
       let!(:existing_user) { create(:user, provider: 'ideo', uid: '123') }
 
       it 'updates existing user if found' do
-        expect(from_omniauth.id).to eq existing_user.id
-        expect(from_omniauth.email).to eq auth.info.email
-        expect(from_omniauth.first_name).to eq auth.info.first_name
-        expect(from_omniauth.last_name).to eq auth.info.last_name
-        expect(from_omniauth.picture).to eq auth.extra.raw_info.picture
-        expect(from_omniauth.picture_medium).to eq auth.extra.raw_info.picture_medium
-        expect(from_omniauth.picture_large).to eq auth.extra.raw_info.picture_large
+        expect(omniauth_user.id).to eq existing_user.id
+        expect(omniauth_user.email).to eq auth.info.email
+        expect(omniauth_user.first_name).to eq auth.info.first_name
+        expect(omniauth_user.last_name).to eq auth.info.last_name
+        expect(omniauth_user.picture).to eq auth.extra.raw_info.picture
+        expect(omniauth_user.picture_medium).to eq auth.extra.raw_info.picture_medium
+        expect(omniauth_user.picture_large).to eq auth.extra.raw_info.picture_large
+        expect(omniauth_user.locale).to eq auth.extra.raw_info.locale
       end
     end
 
@@ -244,13 +286,13 @@ describe User, type: :model do
       let!(:email_matching_user) { create(:user, :pending, email: auth.info.email) }
 
       it 'finds matching user' do
-        expect(from_omniauth.id).to eq email_matching_user.id
+        expect(omniauth_user.id).to eq email_matching_user.id
       end
     end
 
     context 'without existing user' do
       it 'sets up new user record' do
-        expect(from_omniauth.new_record?).to be true
+        expect(omniauth_user.new_record?).to be true
       end
     end
 
@@ -276,11 +318,11 @@ describe User, type: :model do
       end
 
       it 'saves the phone number' do
-        expect(from_omniauth.phone).to eq phone
+        expect(omniauth_user.phone).to eq phone
       end
 
       it 'marks the user as limited' do
-        expect(from_omniauth.limited?).to be true
+        expect(omniauth_user.limited?).to be true
       end
     end
   end

@@ -11,8 +11,8 @@ module Templateable
                class_name: 'Collection',
                optional: true
 
-    after_create :add_template_tag, if: :master_template?
-    after_create :add_template_instance_tag, if: :templated?
+    after_create :add_template_tag, if: :master_template?, unless: :subtemplate?
+    after_create :add_template_instance_tag, if: :templated?, unless: :subtemplate_instance?
   end
 
   def profile_template?

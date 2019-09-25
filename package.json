@@ -6,7 +6,8 @@
     "cypress-ci": "./node_modules/.bin/cypress run",
     "lint": "./node_modules/.bin/eslint",
     "styleguide": "yarn styleguidist server",
-    "test": "jest --watch"
+    "test": "jest --watch",
+    "test:debug": "node --inspect node_modules/.bin/jest --runInBand --watch"
   },
   "engines": {
     "node": "^8.15.0",
@@ -86,7 +87,7 @@
     "@sentry/browser": "^5.4.0",
     "@sentry/webpack-plugin": "^1.6.2",
     "actioncable": "^5.2.0",
-    "axios": "^0.18.0",
+    "axios": "^0.18.1",
     "babel-engine-plugin": "^0.2.1",
     "babel-eslint": "^10.0.0",
     "babel-jest": "^24.8.0",
@@ -169,7 +170,7 @@
     "regenerator-runtime": "^0.13.2",
     "styled-components": "^4.3.2",
     "styled-loaders-react": "1.0.1",
-    "svg-react-loader": "^0.4.5",
+    "svg-react-loader": "^0.4.6",
     "ts-jest": "^23.1.4",
     "ts-loader": "4.2.0",
     "typescript": "2.8.3",
@@ -183,7 +184,7 @@
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.14.0",
     "enzyme-to-json": "^3.3.3",
-    "eslint": "^4.16.0",
+    "eslint": "^4.18.2",
     "eslint-config-prettier": "^4.3.0",
     "eslint-import-resolver-babel-module": "^5.0.0",
     "eslint-plugin-compat": "^3.1.1",

@@ -62,6 +62,9 @@ class Api::V1::RolesController < Api::V1::BaseController
       ),
     )
     if service.call
+      if root_object_params[:mark_private]
+        record.mark_as_private!
+      end
       head :no_content
     else
       render_api_errors remove_roles.errors

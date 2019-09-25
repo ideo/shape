@@ -154,12 +154,14 @@ SubText.displayName = 'StyledSubText'
 /** @component */
 export const SmallHelperText = styled.span`
   color: ${props => props.color};
+  ${props => props.fontWeight && `font-weight: ${props.fontWeight};`}
   font-family: ${v.fonts.sans};
   font-size: 0.75rem;
 `
 SmallHelperText.displayName = 'SmallHelperText'
 SmallHelperText.propTypes = {
   color: PropTypes.oneOf(Object.values(v.colors)),
+  fontWeight: PropTypes.oneOf(Object.values(v.weights)),
 }
 SmallHelperText.defaultProps = {
   color: v.colors.commonMedium,
@@ -269,6 +271,10 @@ export const QuillStyleWrapper = styled.div`
       margin-top: 0.85rem;
     }
 
+    a {
+      color: ${v.colors.ctaPrimary};
+    }
+
     @keyframes blink-animation {
       to {
         visibility: hidden;
@@ -276,6 +282,9 @@ export const QuillStyleWrapper = styled.div`
     }
 
     .ql-container {
+      /* this overrides quill-cursors "display: flex" which was breaking IE */
+      display: block;
+
       ${props => (props.notEditing ? '' : 'overflow: visible !important;')};
       ${props =>
         props.notEditing && props.hasTitleText

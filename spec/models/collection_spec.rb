@@ -763,6 +763,34 @@ describe Collection, type: :model do
     end
   end
 
+  describe 'child of a master template' do
+    let(:parent) { create(:collection, master_template: true) }
+    let(:child) { create(:collection, parent_collection: parent) }
+
+    it 'should have a child_of_a_master_template = true' do
+      expect(child.child_of_a_master_template?).to be true
+    end
+  end
+
+  describe 'subtemplate instance' do
+    let(:parent) { create(:collection, master_template: true) }
+    let(:child) { create(:collection, master_template: true, parent_collection: parent) }
+    let(:instance_of_parent) { create(:collection, template_id: parent.id) }
+    let(:instance_of_child) { create(:collection, template_id: child.id) }
+
+    it 'direct template instance should not be a subtemplate instance' do
+      expect(instance_of_parent.templated?).to be true
+      expect(parent.subtemplate?).to be false
+      expect(instance_of_parent.subtemplate_instance?).to be false
+    end
+
+    it 'template instance of child should be a subtemplate instance' do
+      expect(instance_of_child.templated?).to be true
+      expect(child.subtemplate?).to be true
+      expect(instance_of_child.subtemplate_instance?).to be true
+    end
+  end
+
   # Caching methods
   context 'caching and stored attributes' do
     describe '#cache_key' do

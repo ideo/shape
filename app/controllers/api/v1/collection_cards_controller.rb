@@ -24,12 +24,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def create
     card_params = collection_card_params
-    type = card_params.delete(:type) || 'primary'
-
     # CollectionCardBuilder type expects 'primary' or 'link'
-    type = 'link' if type == 'CollectionCard::Link'
+    card_type = card_params.delete(:card_type) || 'primary'
+
     builder = CollectionCardBuilder.new(params: card_params,
-                                        type: type,
+                                        type: card_type,
                                         parent_collection: @collection,
                                         user: current_user)
 
@@ -214,8 +213,13 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def load_and_authorize_moving_collections
-    @from_collection = Collection.find(json_api_params[:from_id])
     @cards = ordered_cards
+    if json_api_params[:from_id]
+      @from_collection = Collection.find(json_api_params[:from_id])
+    else
+      # parent collection can be implied
+      @from_collection = @cards.first.parent
+    end
     @to_collection = Collection.find(json_api_params[:to_id])
     @cards.primary.each do |card|
       authorize! :move, card
@@ -353,7 +357,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         external_id
         cover_type
         submissions_enabled
-      ],
+      ].concat(Collection.globalize_attribute_names),
       item_attributes: [
         :id,
         :type,
@@ -404,7 +408,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
             column
           ],
         ],
-      ],
+      ].concat(Item.globalize_attribute_names),
     ]
   end
 
@@ -419,12 +423,12 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       parent_id
       collection_id
       item_id
-      type
       image_contain
       is_cover
       filter
       hidden
       show_replace
+      card_type
     ]
     # Allow pinning, replacing if this is an application/bot user
     attrs << :pinned if current_application.present?

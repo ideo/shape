@@ -171,8 +171,9 @@ RSpec.describe CollectionCard, type: :model do
       end
 
       it 'should not touch its collection if filter attribute did not change' do
+        card.update(filter: 'transparent_gray')
         expect do
-          card.update(height: 2)
+          card.update(filter: 'transparent_gray', updated_at: Time.current)
         end.not_to change(card.collection, :updated_at)
       end
     end
@@ -461,38 +462,64 @@ RSpec.describe CollectionCard, type: :model do
     end
   end
 
-  describe '#increment_card_orders!' do
+  context 'card order' do
     let(:collection) { create(:collection) }
     let!(:collection_card_list) { create_list(:collection_card, 5, parent: collection) }
     let(:collection_cards) { collection.collection_cards }
 
-    before do
-      # Make sure cards are in sequential order
-      collection.reorder_cards!
-    end
-
-    it 'should increment all orders by 1' do
-      collection_cards.first.increment_card_orders!
-      order_arr = collection_cards.map(&:reload).map(&:order)
-      expect(order_arr).to match_array([0, 2, 3, 4, 5])
-    end
-
-    it 'should return true if success' do
-      expect(collection_cards.first.increment_card_orders!).to be true
-    end
-
-    context 'with another card created at same order as existing' do
-      let(:second_card_order) { collection.collection_cards[1].order }
-      let!(:dupe_card) do
-        create(:collection_card, parent: collection, order: second_card_order)
+    describe '#increment_card_orders!' do
+      before do
+        # Make sure cards are in sequential order
+        collection.reorder_cards!
       end
 
-      it 'should increment all cards by 1, and leave dupe card' do
-        expect(dupe_card.order).to eq(second_card_order)
-        dupe_card.increment_card_orders!
-        order_array = collection_cards.map(&:reload).map(&:order)
-        expect(dupe_card.reload.order).to eq(1)
-        expect(order_array).to match_array([0, 2, 3, 4, 5])
+      it 'should increment all orders by 1' do
+        collection_cards.first.increment_card_orders!
+        order_arr = collection_cards.map(&:reload).map(&:order)
+        expect(order_arr).to match_array([0, 2, 3, 4, 5])
+      end
+
+      it 'should return true if success' do
+        expect(collection_cards.first.increment_card_orders!).to be true
+      end
+
+      context 'with another card created at same order as existing' do
+        let(:second_card_order) { collection.collection_cards[1].order }
+        let!(:dupe_card) do
+          create(:collection_card, parent: collection, order: second_card_order)
+        end
+
+        it 'should increment all cards by 1, and leave dupe card' do
+          expect(dupe_card.order).to eq(second_card_order)
+          dupe_card.increment_card_orders!
+          order_array = collection_cards.map(&:reload).map(&:order)
+          expect(dupe_card.reload.order).to eq(1)
+          expect(order_array).to match_array([0, 2, 3, 4, 5])
+        end
+      end
+    end
+
+    describe '#reorder_cards!' do
+      before do
+        collection_cards[2].update(pinned: true, order: 99)
+        collection_cards[0].update(order: 2)
+        collection_cards[3].update(order: 3)
+        collection_cards[4].update(order: 4)
+        collection_cards[1].update(order: 10)
+      end
+
+      it 'reorders cards sequentially, always putting pinned cards first' do
+        collection.reorder_cards!
+        collection.reload
+        expect(collection.collection_cards.pluck(:id, :order)).to eq(
+          [
+            [collection_cards[2].id, 0],
+            [collection_cards[0].id, 1],
+            [collection_cards[3].id, 2],
+            [collection_cards[4].id, 3],
+            [collection_cards[1].id, 4],
+          ],
+        )
       end
     end
   end

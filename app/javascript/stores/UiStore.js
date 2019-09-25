@@ -403,8 +403,8 @@ export default class UiStore {
   }
 
   @action
-  openMoveMenu({ from, cardAction = 'move', context = null }) {
-    const { id: fromCollectionId } = from
+  openMoveMenu({ from = null, cardAction = 'move', context = null }) {
+    const fromCollectionId = from ? from.id : null
     this.dismissedMoveHelper = false
     this.pageMenuOpen = false
     this.closeCardMenu()
