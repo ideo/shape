@@ -79,6 +79,8 @@ ThumbnailHolder.displayName = 'ThumbnailHolder'
 const ViewMore = styled.div`
   border-left: 8px solid ${v.colors.secondaryDarkest};
   font-size: 12px;
+  font-family: ${v.fonts.sans};
+  font-weight: ${v.weights.book};
   background: ${v.colors.secondaryMedium};
   color: ${v.colors.commonDark};
   padding: 1px 0px 1px 10px;
@@ -110,9 +112,6 @@ class CommentThread extends React.Component {
   }
 
   viewMoreReplies = comment => {
-    const { id, parent_id } = comment
-    const parent = parent ? parent_id : id
-    // todo: calculate pagination param based on parent comment replies that are shown
     comment.API_fetchReplies()
   }
 

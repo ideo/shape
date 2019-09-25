@@ -14,8 +14,9 @@ class Api::V1::CommentsController < Api::V1::BaseController
 
   def replies
     parent_id = params[:id]
+    page = params[:page]
     parent = Comment.find parent_id
-    paginated_replies = parent.replies_by_page.includes(:author).page(@page)
+    paginated_replies = parent.replies_by_page(page: page).includes(:author)
     render jsonapi: paginated_replies, include: [
       :author,
     ]
