@@ -5,6 +5,7 @@
 #  id                :bigint(8)        not null, primary key
 #  draftjs_data      :jsonb
 #  message           :text
+#  replies_count     :integer          default(0)
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  author_id         :integer
@@ -24,7 +25,7 @@ class Comment < ApplicationRecord
   has_many :children, class_name: 'Comment', foreign_key: 'parent_id'
   belongs_to :comment_thread, touch: true
   belongs_to :author, class_name: 'User'
-  belongs_to :parent, class_name: 'Comment', optional: true
+  belongs_to :parent, class_name: 'Comment', optional: true, counter_cache: :replies_count
 
   validates :message, presence: true
 
@@ -71,5 +72,9 @@ class Comment < ApplicationRecord
 
   def can_edit?(user)
     author.id == user.id
+  end
+
+  def replies_by_page(page: 1)
+    children.page(page).per(25)
   end
 end

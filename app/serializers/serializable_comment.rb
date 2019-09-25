@@ -1,7 +1,7 @@
 class SerializableComment < BaseJsonSerializer
   type 'comments'
   attributes :message, :created_at, :updated_at, :comment_thread_id,
-             :author_id, :draftjs_data, :parent_id
+             :author_id, :draftjs_data, :parent_id, :replies_count
   belongs_to :author
   belongs_to :parent
   has_many :children do

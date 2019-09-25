@@ -12,6 +12,16 @@ class Api::V1::CommentsController < Api::V1::BaseController
     ]
   end
 
+  def replies
+    parent_id = params[:id]
+    page = params[:page]
+    parent = Comment.find parent_id
+    paginated_replies = parent.replies_by_page(page: page).includes(:author)
+    render jsonapi: paginated_replies, include: [
+      :author,
+    ]
+  end
+
   def create
     parent_id = comment_params[:parent_id] || nil
     parent = Comment.find parent_id unless parent_id.nil?

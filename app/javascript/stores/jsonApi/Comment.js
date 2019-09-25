@@ -17,6 +17,8 @@ class Comment extends BaseRecord {
   unread = false
   @observable
   replies = []
+  @observable
+  repliesPage = null
 
   constructor(...args) {
     super(...args)
@@ -86,6 +88,20 @@ class Comment extends BaseRecord {
       .catch(err => {
         trackError(err, { name: 'comment:update' })
       })
+  }
+
+  async API_fetchReplies() {
+    const replyPage = this.replyPage ? this.replyPage + 1 : 1
+    const apiPath = `comments/${this.id}/replies?page=${replyPage}`
+    const res = await this.apiStore.request(apiPath)
+    const { data } = res
+    runInAction(() => {
+      if (data.length > 0) {
+        const mergedComments = _.union(this.replies, data)
+        this.replies.replace(_.sortBy(mergedComments, ['created_at']))
+        this.replyPage = replyPage
+      }
+    })
   }
 }
 

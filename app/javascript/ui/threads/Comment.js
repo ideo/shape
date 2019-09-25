@@ -144,23 +144,25 @@ class Comment extends React.Component {
     return !isEmpty(toJS(this.props.comment.draftjs_data))
   }
 
-  handleCommentBodyClick = e => {
-    const { isReply } = this.props
+  handleClick = e => {
+    const { viewMoreReplies, isReply, comment } = this.props
     const { editing } = this.state
     // filters out other click handlers nested inside the body
     if (
       e.target.closest('.test-reply-comment') ||
       e.target.closest('.test-edit-comment') ||
       e.target.closest('.test-delete-comment') ||
-      editing ||
-      isReply
+      editing
     ) {
       return
     }
-    this.handleReplyClick()
+    if (!isReply) {
+      this.toggleReply()
+    }
+    viewMoreReplies(comment)
   }
 
-  handleReplyClick = () => {
+  toggleReply = () => {
     const { comment, uiStore } = this.props
     const { replyingToCommentId } = uiStore
     const { id } = comment
@@ -309,8 +311,8 @@ class Comment extends React.Component {
       <StyledComment
         unread={unread}
         isReply={isReply}
-        onClick={this.handleCommentBodyClick}
         onBlur={this.handleSubmit}
+        onClick={this.handleClick}
       >
         <InlineRow align="center">
           <Avatar
@@ -338,7 +340,7 @@ class Comment extends React.Component {
                       {!isReply && (
                         <Tooltip placement="top" title="reply to comment">
                           <ActionButton
-                            onClick={this.handleReplyClick}
+                            onClick={this.toggleReply}
                             className="test-reply-comment"
                           >
                             <CalloutBoxIcon />
@@ -386,11 +388,13 @@ class Comment extends React.Component {
 
 Comment.defaultProps = {
   isReply: false,
+  viewMoreReplies: null,
 }
 
 Comment.propTypes = {
   comment: MobxPropTypes.objectOrObservableObject.isRequired,
   isReply: PropTypes.bool,
+  viewMoreReplies: PropTypes.func,
 }
 
 Comment.wrappedComponent.propTypes = {
