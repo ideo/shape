@@ -21,6 +21,7 @@ class GrantParentAccessToChildrenOfSubgroup
         ancestor.extend_path_to(descendant)
       end
     end
+
     links_to_descendants.each do |descendant|
       new_hierarchy.extend_path_to(descendant)
     end

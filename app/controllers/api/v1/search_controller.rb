@@ -142,7 +142,6 @@ class Api::V1::SearchController < Api::V1::BaseController
         _id: @resource.search_group_ids,
       }
     end
-    # end
 
     results = Search.new(search_opts).search(@query)
 

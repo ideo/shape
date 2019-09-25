@@ -4,7 +4,6 @@ class AddGroupToGroup
 
   schema :subgroup, :parent_group, :new_hierarchy
 
-  # Maybe change GrantXAccessToY => RelateXToY
   organize(
     GrantParentAccessToSubgroup,
     GrantParentAccessToChildrenOfSubgroup,

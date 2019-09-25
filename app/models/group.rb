@@ -68,7 +68,6 @@ class Group < ApplicationRecord
   has_many :group_hierarchies, foreign_key: 'parent_group_id'
   has_many :subgroups, class_name: 'Group', through: :group_hierarchies
 
-  # TODO: Why does subgroup_membership link a group to a parent group and not a subgroup?
   has_many :subgroup_memberships, class_name: 'GroupHierarchy', foreign_key: 'subgroup_id'
   has_many :parent_groups, class_name: 'Group', through: :subgroup_memberships
 
