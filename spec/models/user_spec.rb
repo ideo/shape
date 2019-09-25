@@ -441,6 +441,15 @@ describe User, type: :model do
       end
     end
 
+    describe '#current_org_parent_groups' do
+      let(:parent_group) do
+        create(:group, organization: org, add_subgroups: [group_in_org_member])
+      end
+      it 'returns the parent groups of the current org groups' do
+        expect(user.current_org_parent_groups).to match_array([parent_group])
+      end
+    end
+
     describe '#current_org_groups_and_special_groups' do
       let(:admin) { create(:user) }
       let(:guest) { create(:user) }
