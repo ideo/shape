@@ -87,6 +87,15 @@ class Comment extends BaseRecord {
         trackError(err, { name: 'comment:update' })
       })
   }
+
+  async API_fetchReplies({ page = 1 } = {}) {
+    const apiPath = `comments/${this.id}/replies?page=${page}`
+    const res = await this.apiStore.request(apiPath)
+    const { data } = res
+    runInAction(() => {
+      this.replies.replace(_.sortBy(data, ['created_at']))
+    })
+  }
 }
 
 Comment.defaults = {

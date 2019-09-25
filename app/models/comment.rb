@@ -73,4 +73,8 @@ class Comment < ApplicationRecord
   def can_edit?(user)
     author.id == user.id
   end
+
+  def replies_by_page(page: 1)
+    children.page(page).per(25)
+  end
 end

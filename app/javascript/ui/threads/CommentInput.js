@@ -80,7 +80,6 @@ class CommentInput extends React.Component {
     if (!e.shiftKey && !this.suggestionsOpen) {
       // submit message
       this.props.handleSubmit(e)
-      this.props.uiStore.setReplyingToComment(null)
     }
     return
   }

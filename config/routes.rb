@@ -127,7 +127,11 @@ Rails.application.routes.draw do
         end
         resources :roles, only: %i[destroy]
       end
-      resources :comments
+      resources :comments do
+        member do
+          get 'replies'
+        end
+      end
       resources :comment_threads, only: %i[index show create subscribe unsubscribe] do
         resources :comments, only: %i[index create]
         member do

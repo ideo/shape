@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { computed } from 'mobx'
+import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled, { css } from 'styled-components'
 import { Element as ScrollElement } from 'react-scroll'
@@ -76,6 +76,14 @@ export const ThumbnailHolder = styled.span`
 `
 ThumbnailHolder.displayName = 'ThumbnailHolder'
 
+const ViewMore = styled.div`
+  border-left: 8px solid ${v.colors.secondaryDarkest};
+  font-size: 12px;
+  background: ${v.colors.secondaryMedium};
+  color: ${v.colors.commonDark};
+  padding: 1px 0px 1px 10px;
+`
+
 const StyledCommentsWrapper = styled.div`
   cursor: ${props => (props.clickable ? 'pointer' : 'auto')};
 `
@@ -84,16 +92,28 @@ StyledCommentsWrapper.displayName = 'StyledCommentsWrapper'
 @inject('uiStore')
 @observer
 class CommentThread extends React.Component {
-  @computed
-  get comments() {
-    const { expanded, thread } = this.props
+  @observable
+  comments = []
+
+  componentDidMount() {
+    const { thread } = this.props
     const { comments } = thread
+    // todo: where should we place this logic now that replies are a thing
     // for un-expanded thread, only take the unread comments
-    if (!expanded) {
-      // comments = thread.latestUnreadComments
-      return []
-    }
-    return comments
+    // if (!expanded) {
+    // comments = thread.latestUnreadComments
+    // return []
+    // }
+    runInAction(() => {
+      this.comments = comments
+    })
+  }
+
+  viewMoreReplies = comment => {
+    const { id, parent_id } = comment
+    const parent = parent ? parent_id : id
+    // todo: calculate pagination param based on parent comment replies that are shown
+    comment.API_fetchReplies()
   }
 
   renderComments = () => {
@@ -102,15 +122,35 @@ class CommentThread extends React.Component {
     const commentsList = []
     _.each(this.comments, (comment, i) => {
       commentsList.push(
-        <Comment key={comment.id || `comment-new-${i}`} comment={comment} />
+        <Comment
+          key={comment.id || `comment-new-${i}`}
+          comment={comment}
+          viewMoreReplies={this.viewMoreReplies}
+        />
       )
-      // fixme: there's a key conflict if thread in
+      // total replies count minus observable replies length
+      const hiddenRepliesCount = comment.replies_count - comment.replies.length
+      if (hiddenRepliesCount > 0) {
+        commentsList.push(
+          <ViewMore
+            key={'view-more-replies'}
+            onClick={() => {
+              this.viewMoreReplies(comment)
+            }}
+          >
+            View {hiddenRepliesCount} more
+          </ViewMore>
+        )
+      }
       _.each(comment.replies, (child, i) => {
         commentsList.push(
           <Comment
             key={`reply-${child.id}` || `reply-new-${i}`}
             comment={child}
             isReply={true}
+            viewMoreReplies={() => {
+              this.viewMoreReplies(comment)
+            }}
           />
         )
       })
