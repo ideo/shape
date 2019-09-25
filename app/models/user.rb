@@ -398,11 +398,12 @@ class User < ApplicationRecord
   end
 
   def all_group_ids
-    (group_ids + parent_group_ids).uniq
+    # always include the Common Resource group as it may grant you access
+    (group_ids + parent_group_ids + [Shape::COMMON_RESOURCE_GROUP_ID]).uniq
   end
 
   def all_current_org_group_ids
-    (current_org_group_ids + current_org_parent_group_ids).uniq
+    (current_org_group_ids + current_org_parent_group_ids + [Shape::COMMON_RESOURCE_GROUP_ID]).uniq
   end
 
   def role_via_current_org_groups(name, resource_identifier)

@@ -575,8 +575,9 @@ describe User, type: :model do
       end
     end
 
-    context 'with active user who has not accepted terms' do
-      let(:user) { create(:user, terms_accepted: false) }
+    context 'with active user who has not accepted their org terms' do
+      let(:organization) { create(:organization, terms_version: 2, terms_text_item: create(:text_item))}
+      let(:user) { create(:user, terms_accepted: false, current_organization: organization) }
 
       it 'allows read only access to content' do
         expect(ability).not_to be_able_to(:create, Collection.new)
