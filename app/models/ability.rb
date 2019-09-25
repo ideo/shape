@@ -71,8 +71,9 @@ class Ability
           )
       end
       can :manage, CollectionCard do |collection_card|
-        !collection_card.pinned_and_locked? &&
-          collection_card.can_edit?(user)
+        collection_card.can_edit?(user) &&
+          (user.application_bot? ||
+          !collection_card.pinned_and_locked?)
       end
 
       can :create, Item
@@ -84,7 +85,8 @@ class Ability
       end
       can :manage, Item do |item|
         item.can_edit?(user) &&
-          !item.pinned_and_locked?
+          (user.application_bot? ||
+          !item.pinned_and_locked?)
       end
 
       can :create, CommentThread
