@@ -3,9 +3,9 @@
 # Table name: comments
 #
 #  id                :bigint(8)        not null, primary key
-#  comments_count    :integer          default(0)
 #  draftjs_data      :jsonb
 #  message           :text
+#  replies_count     :integer          default(0)
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  author_id         :integer

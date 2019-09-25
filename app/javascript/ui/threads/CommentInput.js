@@ -80,8 +80,9 @@ class CommentInput extends React.Component {
     if (!e.shiftKey && !this.suggestionsOpen) {
       // submit message
       this.props.handleSubmit(e)
+      return 'handled'
     }
-    return
+    return 'not-handled'
   }
 
   @action
