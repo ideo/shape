@@ -1,13 +1,26 @@
 import PropTypes from 'prop-types'
 import { runInAction } from 'mobx'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import { EditorState, ContentState, convertToRaw } from 'draft-js'
 import { get } from 'lodash'
 
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
 import { CommentForm, CommentEnterButton } from '~/ui/global/styled/forms'
-import CommentInput from './CommentInput'
+import CommentInput from '~/ui/threads/CommentInput'
+import styled from 'styled-components'
+import v from '~/utils/variables.js'
 
+const StyledCommentInputWrapper = styled.div`
+  ${props =>
+    props.replying &&
+    `
+    border-left: 8px solid ${v.colors.secondaryDarkest};
+  `};
+`
+StyledCommentInputWrapper.displayName = 'StyledCommentInputWrapper'
+
+@inject('uiStore')
+@observer
 class CommentEntryForm extends React.Component {
   editorHeight = null
   state = {
@@ -84,16 +97,19 @@ class CommentEntryForm extends React.Component {
   }
 
   handleSubmit = e => {
-    e.preventDefault()
-
+    const { uiStore } = this.props
+    const { replyingToCommentId } = uiStore
     const content = this.state.editorState.getCurrentContent()
     const message = content.getPlainText()
+
+    e.preventDefault()
     // don't allow submit of empty comment
     if (!message) return
 
     const rawData = {
       message,
       draftjs_data: convertToRaw(content),
+      parent_id: replyingToCommentId,
     }
 
     const { thread } = this.props
@@ -108,19 +124,23 @@ class CommentEntryForm extends React.Component {
   }
 
   render() {
-    const { expanded } = this.props
-    if (!expanded) return ''
+    const { uiStore, expanded } = this.props
+    const { replyingToCommentId } = uiStore
+    if (!expanded) return null
 
     return (
       <CommentForm onSubmit={this.handleSubmit}>
-        <div className="textarea-input">
+        <StyledCommentInputWrapper
+          className="textarea-input"
+          replying={!!replyingToCommentId}
+        >
           <CommentInput
             editorState={this.state.editorState}
             onChange={this.handleInputChange}
             handleSubmit={this.handleSubmit}
             setEditor={this.setEditor}
           />
-        </div>
+        </StyledCommentInputWrapper>
         <CommentEnterButton focused={this.state.focused}>
           <ReturnArrowIcon />
         </CommentEnterButton>
@@ -135,5 +155,11 @@ CommentEntryForm.propTypes = {
   onHeightChange: PropTypes.func.isRequired,
   thread: MobxPropTypes.objectOrObservableObject.isRequired,
 }
+
+CommentEntryForm.wrappedComponent.propTypes = {
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+
+CommentEntryForm.displayName = 'CommentEntryForm'
 
 export default CommentEntryForm

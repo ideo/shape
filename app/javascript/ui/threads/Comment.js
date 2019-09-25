@@ -1,6 +1,7 @@
 import { isEmpty } from 'lodash'
 import { toJS, runInAction } from 'mobx'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import PropTypes from 'prop-types'
+import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import { EditorState, convertFromRaw, convertToRaw } from 'draft-js'
 import styled from 'styled-components'
 
@@ -11,10 +12,10 @@ import { CommentEnterButton } from '~/ui/global/styled/forms'
 import Moment from '~/ui/global/Moment'
 import Avatar from '~/ui/global/Avatar'
 import { StyledCommentInput } from './CustomCommentMentions'
-import { apiStore, uiStore } from '~/stores'
 // NOTE: this is the only usage of TrashIconLg -- TrashXl looks a tiny bit off if used here
 import TrashIconLg from '~/ui/icons/TrashIconLg'
 import EditPencilIcon from '~/ui/icons/EditPencilIcon'
+import CalloutBoxIcon from '~/ui/icons/CalloutBoxIcon'
 import { showOnHoverCss, hideOnHoverCss } from '~/ui/grid/shared'
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
 import XIcon from '~/ui/icons/XIcon'
@@ -30,9 +31,10 @@ const StyledComment = styled(StyledCommentInput)`
   ${hideOnHoverCss};
   padding: 10px;
   margin-bottom: 5px;
+  border-left: ${props =>
+    props.isReply ? `8px solid ${v.colors.secondaryDarkest}` : `none`};
   background: ${props =>
     props.unread ? v.colors.secondaryLight : v.colors.secondaryMedium};
-
   transition: background 1s 0.5s ease;
 
   &:last-child {
@@ -107,6 +109,8 @@ const EditedIndicator = styled.span`
 `
 EditedIndicator.displayName = 'EditedIndicator'
 
+@inject('apiStore', 'uiStore')
+@observer
 class Comment extends React.Component {
   constructor(props) {
     super(props)
@@ -140,13 +144,40 @@ class Comment extends React.Component {
     return !isEmpty(toJS(this.props.comment.draftjs_data))
   }
 
+  handleCommentBodyClick = e => {
+    const { isReply } = this.props
+    const { editing } = this.state
+    // filters out other click handlers nested inside the body
+    if (
+      e.target.closest('.test-reply-comment') ||
+      e.target.closest('.test-edit-comment') ||
+      e.target.closest('.test-delete-comment') ||
+      editing ||
+      isReply
+    ) {
+      return
+    }
+    this.handleReplyClick()
+  }
+
+  handleReplyClick = () => {
+    const { comment, uiStore } = this.props
+    const { replyingToCommentId } = uiStore
+    const { id } = comment
+    if (replyingToCommentId === id) {
+      uiStore.setReplyingToComment(null)
+    } else {
+      uiStore.setReplyingToComment(id)
+    }
+  }
+
   handleEditClick = () => {
     this.setState({ editing: true })
     this.focusTextArea()
   }
 
   handleDeleteClick = () => {
-    const { comment } = this.props
+    const { comment, uiStore } = this.props
     uiStore.confirm({
       iconName: 'Alert',
       prompt:
@@ -268,12 +299,19 @@ class Comment extends React.Component {
   }
 
   render() {
-    const { comment } = this.props
-    const { author } = comment
-    const isCurrentUserComment = apiStore.currentUserId === comment.author.id
+    const { comment, apiStore, isReply } = this.props
+    const { author, unread, persisted, created_at } = comment
+    // NOTE: not sure if this is a solution for delete returning undefined author
+    if (!author) return null
+    const isCurrentUserComment = apiStore.currentUserId === author.id
 
     return (
-      <StyledComment unread={comment.unread}>
+      <StyledComment
+        unread={unread}
+        isReply={isReply}
+        onClick={this.handleCommentBodyClick}
+        onBlur={this.handleSubmit}
+      >
         <InlineRow align="center">
           <Avatar
             title={author.name}
@@ -282,7 +320,7 @@ class Comment extends React.Component {
             className="author-img"
           />
           <DisplayText className="author" color={v.colors.white}>
-            {comment.author.name}
+            {author.name}
           </DisplayText>
           <FlexPushRight>
             {!this.state.editing && (
@@ -292,11 +330,21 @@ class Comment extends React.Component {
                     isCurrentUserComment ? 'hide-on-hover' : ''
                   }`}
                 >
-                  <Moment date={comment.created_at} />
+                  <Moment date={created_at} />
                 </Timestamp>
                 <StyledCommentActions className="show-on-hover">
-                  {comment.persisted && isCurrentUserComment && (
+                  {persisted && isCurrentUserComment && (
                     <React.Fragment>
+                      {!isReply && (
+                        <Tooltip placement="top" title="reply to comment">
+                          <ActionButton
+                            onClick={this.handleReplyClick}
+                            className="test-reply-comment"
+                          >
+                            <CalloutBoxIcon />
+                          </ActionButton>
+                        </Tooltip>
+                      )}
                       <Tooltip placement="top" title="edit comment">
                         <ActionButton
                           onClick={this.handleEditClick}
@@ -305,14 +353,16 @@ class Comment extends React.Component {
                           <EditPencilIcon />
                         </ActionButton>
                       </Tooltip>
-                      <Tooltip placement="top" title="delete comment">
-                        <ActionButton
-                          onClick={this.handleDeleteClick}
-                          className="test-delete-comment"
-                        >
-                          <TrashIconLg />
-                        </ActionButton>
-                      </Tooltip>
+                      {comment.replies.length < 1 && (
+                        <Tooltip placement="top" title="delete comment">
+                          <ActionButton
+                            onClick={this.handleDeleteClick}
+                            className="test-delete-comment"
+                          >
+                            <TrashIconLg />
+                          </ActionButton>
+                        </Tooltip>
+                      )}
                     </React.Fragment>
                   )}
                 </StyledCommentActions>
@@ -334,8 +384,18 @@ class Comment extends React.Component {
   }
 }
 
+Comment.defaultProps = {
+  isReply: false,
+}
+
 Comment.propTypes = {
   comment: MobxPropTypes.objectOrObservableObject.isRequired,
+  isReply: PropTypes.bool,
+}
+
+Comment.wrappedComponent.propTypes = {
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default Comment

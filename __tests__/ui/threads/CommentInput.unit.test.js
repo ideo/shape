@@ -1,11 +1,13 @@
 import CommentInput from '~/ui/threads/CommentInput'
 import fakeApiStore from '#/mocks/fakeApiStore'
+import fakeUiStore from '#/mocks/fakeUiStore'
 import { EditorState } from 'draft-js'
 
-let wrapper, props, apiStore, component
+let wrapper, props, uiStore, apiStore, component
 describe('CommentInput', () => {
   beforeEach(() => {
     apiStore = fakeApiStore()
+    uiStore = fakeUiStore
 
     props = {
       onChange: jest.fn(),
@@ -14,6 +16,7 @@ describe('CommentInput', () => {
       handleReturn: jest.fn(),
       setEditor: jest.fn(),
       editorState: EditorState.createEmpty(),
+      uiStore,
       apiStore,
     }
     wrapper = shallow(<CommentInput.wrappedComponent {...props} />)

@@ -140,9 +140,12 @@ class CommentThread extends BaseRecord {
 
   @action
   importComments(data, { created = false, read = false } = {}) {
-    let newComments = _.union(this.comments.toJS(), data)
+    const newParentComments = _.filter(data, c => !c.parent_id)
+    const newReplies = _.filter(data, c => c.parent_id)
+    let newComments = _.union(this.comments.toJS(), newParentComments)
     // after we're done creating the temp comment, clear out any prev temp ones
     if (!created) newComments = _.filter(newComments, c => c.persisted)
+
     data.forEach(comment => {
       const { users_thread } = this
       if (
@@ -153,6 +156,11 @@ class CommentThread extends BaseRecord {
       ) {
         comment.markAsUnread()
       }
+    })
+
+    newReplies.forEach(reply => {
+      parent = _.find(newComments, { id: reply.parent_id.toString() })
+      parent.importReply(reply)
     })
     newComments = _.sortBy(newComments, ['created_at'])
     this.comments.replace(newComments)

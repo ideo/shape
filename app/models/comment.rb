@@ -9,18 +9,22 @@
 #  updated_at        :datetime         not null
 #  author_id         :integer
 #  comment_thread_id :integer
+#  parent_id         :bigint(8)
 #
 # Indexes
 #
 #  index_comments_on_comment_thread_id  (comment_thread_id)
+#  index_comments_on_parent_id          (parent_id)
 #
 
 class Comment < ApplicationRecord
   include Firestoreable
 
   paginates_per 50
+  has_many :children, class_name: 'Comment', foreign_key: 'parent_id'
   belongs_to :comment_thread, touch: true
   belongs_to :author, class_name: 'User'
+  belongs_to :parent, class_name: 'Comment', optional: true
 
   validates :message, presence: true
 

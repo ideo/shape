@@ -193,6 +193,8 @@ export default class UiStore {
   linkedInMyCollection = false
   @observable
   editingCardCover = null
+  @observable
+  replyingToCommentId = null
 
   @action
   toggleEditingCardId(cardId) {
@@ -206,6 +208,11 @@ export default class UiStore {
   @action
   setEditingCardCover(editingCardCoverId) {
     this.editingCardCover = editingCardCoverId
+  }
+
+  @action
+  setReplyingToComment(replyingToCommentId) {
+    this.replyingToCommentId = replyingToCommentId
   }
 
   @action
