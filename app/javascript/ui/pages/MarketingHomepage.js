@@ -127,10 +127,10 @@ class MarketingPage extends React.Component {
             </Box>
           </MarketingFlex>
 
-          { this.state.content.pricing && (
+          {this.state.content.pricing && (
             <Pricing
               pageName="workshop"
-              {...this.state.content.pricing.content_blocks[0]}
+              {...this.state.content.pricing.blocks[0]}
             />
           )}
         </MarketingBack>

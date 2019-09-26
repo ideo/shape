@@ -1,10 +1,10 @@
-import React from 'react'
 import styled from 'styled-components'
 import { Box } from 'reflexbox'
 import v from '~/utils/variables'
 
 import {
   MarketingH1,
+  MarketingH1Bold,
   MarketingH2,
   MarketingContent,
   MarketingFlex,
@@ -14,11 +14,8 @@ import {
 /**
  * Price Section - SubText Component
  */
-const SubText = styled(MarketingContent)`
-  margin-top: 14px;
-  margin-bottom: 18px;
-  max-width: 849px;
-  width: 100%;
+const SubText = styled(MarketingH2)`
+  text-transform: none;
 `
 
 /**
@@ -70,8 +67,9 @@ const Unit = styled.p`
 /**
  * Price Card - Button Component
  */
-const CTAButton = styled.button`
+const CTAButton = styled.a`
   margin: 10px 0;
+  box-sizing: border-box;
   display: block;
   background-color: ${v.colors.caution};
   border-radius: 4px;
@@ -166,12 +164,14 @@ const PriceCard = (props) => {
 
 const Pricing = (props) => (
   <MarketingFlex column align="center" px={24}>
-    <MarketingH1 align="center">
+    <MarketingH1Bold align="center">
       {props.title}
-    </MarketingH1>
-    <SubText align="center">
-      {props.subtext}
-    </SubText>
+    </MarketingH1Bold>
+    <Box w={[1, 1, 900]} mt={[20, 40, 40]}>
+      <SubText align="center">
+        {props.subtext}
+      </SubText>
+    </Box>
     <Box flex column={[true, true, false]} justify="center" mt={40} mb={31}>
       {props.pricing_cards.map((card, index) => (
         <PriceCard

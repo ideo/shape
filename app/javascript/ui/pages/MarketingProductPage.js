@@ -13,9 +13,19 @@ import {
 import { DisplayText } from '~/ui/global/styled/typography'
 import MarketingMenu from '~/ui/marketing/MarketingMenu'
 import ContentBlock from '~/ui/marketing/ContentBlock'
+import { Pricing } from '~/ui/marketing/Pricing'
 import marketingFirebaseClient from '~/vendor/firebase/clients/marketingFirebaseClient'
 import ReactPlayer from 'react-player'
 import PageFooter from '~/ui/marketing/PageFooter.js'
+
+import styled from 'styled-components'
+import v from '~/utils/variables'
+
+const Subtitle = styled(DisplayText)`
+  font-size: 18px;
+  line-height: 25px;
+  text-align: center;
+`
 
 class MarketingProductPage extends React.Component {
   constructor(props) {
@@ -60,8 +70,8 @@ class MarketingProductPage extends React.Component {
           </Box>
         </MarketingFlex>
         <MarketingFlex align="center" justify="center" wrap w={1}>
-          <Box w={[1, 0.6, 0.32]} mt={44} pr={[3, 0, 0]} pl={[3, 0, 0]}>
-            <DisplayText>{hero.videoCaption}</DisplayText>
+          <Box w={[590, 0.6, 0.32]} mt={44} pr={[3, 0, 0]} pl={[3, 0, 0]}>
+            <Subtitle>{hero.videoCaption}</Subtitle>
           </Box>
         </MarketingFlex>
       </Fragment>
@@ -78,17 +88,19 @@ class MarketingProductPage extends React.Component {
   render() {
     const { location } = this.props
     const { content, footer } = this.state
+    if (!content) return <div/>
     const { hero } = content
+    console.log('sdfjk', content)
     return (
       <Fragment>
         <MarketingBack>
           <MarketingMenu location={location} />
-          <MarketingFlex align="center" justify="center" wrap w={1}>
-            <Box w={1} mt={34} pr={[3, 0, 0]} pl={[3, 0, 0]}>
+          <MarketingFlex column align="center" justify="center" wrap w={1}>
+            <Box w={590} mt={34} pr={[3, 0, 0]} pl={[3, 0, 0]}>
               <MarketingH1Bold>{hero && hero.title}</MarketingH1Bold>
             </Box>
-            <Box w={[1, 0.6, 0.32]} mt={44} pr={[3, 0, 0]} pl={[3, 0, 0]}>
-              <DisplayText>{hero && hero.subTitle}</DisplayText>
+            <Box w={[1, 0.6, 590]} mt={44} pr={[3, 0, 0]} pl={[3, 0, 0]}>
+              <Subtitle>{hero && hero.subTitle}</Subtitle>
             </Box>
           </MarketingFlex>
           {this.renderVideoPlayer}
@@ -103,6 +115,12 @@ class MarketingProductPage extends React.Component {
                   imageUrl={block.imageUrl}
                 />
               ))}
+              {content.pricing && (
+                <Pricing
+                  pageName="open-innovation"
+                  {...content.pricing}
+                />
+              )}
             </Box>
           </MarketingFlex>
         </MarketingBack>

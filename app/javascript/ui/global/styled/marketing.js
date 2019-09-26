@@ -102,6 +102,7 @@ export const MarketingH1 = styled(Heading1)`
   font-size: 24px;
   font-family: ${v.fonts.sans};
   letter-spacing: 0px;
+  line-height: 38px;
   white-space: normal;
   text-align: center;
   margin-bottom: 0;
