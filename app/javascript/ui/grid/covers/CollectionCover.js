@@ -85,7 +85,7 @@ const calcSectionWidth = props => {
 }
 
 const calcSectionHeight = props => {
-  if (props.isTextItem) return '160px;'
+  if (props.isTextItem) return 'auto;'
   if (props.height > 1) {
     return `calc(50% - ${pad + props.gutter / 2}px)`
   }
