@@ -4,7 +4,7 @@ RSpec.describe InvitationMailer, type: :mailer do
   describe '#invite' do
     let(:user) { create(:user, :pending) }
     let(:invited_by) { create(:user) }
-    let(:organization) { create(:organization) }
+    let(:organization) { create(:organization_without_groups) }
     let(:application) { nil }
     let(:mail) do
       InvitationMailer.invite(
@@ -17,7 +17,7 @@ RSpec.describe InvitationMailer, type: :mailer do
     end
 
     context 'with a collection' do
-      let(:invited_to) { create(:collection) }
+      let(:invited_to) { create(:collection, organization: organization) }
 
       it 'renders the headers' do
         expect(mail.subject).to eq("Your invitation to \"#{invited_to.name}\" on Shape")
@@ -122,8 +122,10 @@ RSpec.describe InvitationMailer, type: :mailer do
         expect(mail.to).to eq([user.email])
       end
 
-      it 'renders the body' do
+      it 'renders the body with invite URL' do
+        helper = MailerHelper::Base.new(user: user)
         expect(mail.body.encoded).to match("#{invited_by.name} has invited you to join \"#{invited_to_type}\"")
+        expect(mail.body.encoded).to match("Or copy and paste this link into your browser: #{helper.shape_invite_url}")
       end
     end
   end

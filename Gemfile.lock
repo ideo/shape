@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideo/ideo-translation.git
-  revision: da16f57269a6e12a08a5f7f83162cdaee747ec51
+  revision: 65d8ef8325fb5086f363442a68be327734e0fb7c
   specs:
     ideo-translation (1.0.12)
       aws-sdk-translate (~> 1.17)
@@ -71,6 +71,8 @@ GEM
       activemodel (= 5.2.3)
       activesupport (= 5.2.3)
       arel (>= 9.0)
+    activerecord-import (1.0.2)
+      activerecord (>= 3.2)
     activestorage (5.2.3)
       actionpack (= 5.2.3)
       activerecord (= 5.2.3)
@@ -95,8 +97,8 @@ GEM
     autoprefixer-rails (8.2.0)
       execjs
     aws-eventstream (1.0.3)
-    aws-partitions (1.211.0)
-    aws-sdk-core (3.67.0)
+    aws-partitions (1.218.0)
+    aws-sdk-core (3.68.0)
       aws-eventstream (~> 1.0, >= 1.0.2)
       aws-partitions (~> 1.0)
       aws-sigv4 (~> 1.1)
@@ -268,7 +270,7 @@ GEM
     hashie (3.5.7)
     heapy (0.1.4)
     highline (2.0.2)
-    httparty (0.17.0)
+    httparty (0.17.1)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
     i18n (1.6.0)
@@ -337,7 +339,7 @@ GEM
     mimemagic (0.3.3)
     mini_mime (1.0.1)
     mini_portile2 (2.4.0)
-    minitest (5.11.3)
+    minitest (5.12.0)
     money (6.13.3)
       i18n (>= 0.6.4, <= 2)
     msgpack (1.2.4)
@@ -583,6 +585,7 @@ DEPENDENCIES
   aasm (~> 5.0)
   action-cable-testing
   active_record_query_trace
+  activerecord-import
   acts-as-taggable-on (~> 6.0.0)
   amoeba
   annotate

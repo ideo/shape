@@ -624,6 +624,26 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     let(:params_at_end) { raw_params.merge(placement: 'end').to_json }
     let(:params) { raw_params.to_json }
 
+    context 'with edit access' do
+      let(:to_collection) { create(:collection, add_editors: [user]) }
+      it 'should be successful' do
+        patch(path, params: params)
+        expect(response.status).to eq(204)
+      end
+
+      context 'with pinned_and_locked cards' do
+        before do
+          # pinned outside of a master_template == pinned_and_locked
+          moving_cards.first.update(pinned: true)
+        end
+
+        it 'returns a 401' do
+          patch(path, params: params)
+          expect(response.status).to eq(401)
+        end
+      end
+    end
+
     context 'without content editor access for to_collection' do
       let(:to_collection) { create(:collection) }
 
@@ -643,6 +663,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       context 'but with edit access to the from_collection' do
         it 'returns a 204' do
           patch(path, params: params)
+          expect(moving_cards.first.can_edit?(user)).to be false
           expect(response.status).to eq(204)
         end
       end

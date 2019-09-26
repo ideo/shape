@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import * as Sentry from '@sentry/browser'
 
 export default function trackError(err, opts = {}) {
@@ -10,7 +11,7 @@ export default function trackError(err, opts = {}) {
     opts.source || 'Any',
     opts.message || err.message,
     opts.name || err.name,
-    err.stack ? err.stack.split('\n') : ''
+    _.isString(err.stack) ? err.stack.split('\n') : ''
   )
   if (process.env.SENTRY_DSN) {
     Sentry.withScope(scope => {

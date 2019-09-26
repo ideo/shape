@@ -165,12 +165,10 @@ class ItemPage extends React.Component {
             replacingId === item.parent_collection_card.id ? (
               <GridCardBlank parent={item.parent} afterCreate={this.reroute} />
             ) : (
-              <div>
-                {this.content}
-                <MoveModal />
-              </div>
+              this.content
             )}
           </PageContainer>
+          <MoveModal />
         </ItemPageContainer>
       </Fragment>
     )

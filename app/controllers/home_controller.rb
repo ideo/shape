@@ -56,9 +56,14 @@ class HomeController < ApplicationController
   def store_redirect_param
     return if params[:redirect].blank?
 
-    redirect_uri = params.require(:redirect)
+    redirect_uri = clean_redirect
     store_location_for :user, redirect_uri
     load_redirect_organization_from_url(redirect_uri)
+  end
+
+  def clean_redirect
+    # clean non-ASCII URLs e.g. shape.space/ideo/items/123-c∆
+    params.require(:redirect).chars.select(&:ascii_only?).join
   end
 
   def set_omniauth_state

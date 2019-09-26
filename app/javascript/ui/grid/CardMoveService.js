@@ -124,14 +124,6 @@ export default class CardMoveService {
     if (!viewingCollection.can_edit_content) {
       return 'You only have view access to this collection. Would you like to keep moving the cards?'
     } else if (
-      // don't allow moving cards from templates to non-templates
-      cardAction === 'move' &&
-      movingFromCollection &&
-      movingFromCollection.isMasterTemplate &&
-      !viewingCollection.isMasterTemplate
-    ) {
-      return "You can't move pinned template items out of a template"
-    } else if (
       cardAction === 'useTemplate' &&
       viewingCollection.isMasterTemplate
     ) {
