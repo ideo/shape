@@ -38,9 +38,9 @@ Feature: Undo actions
     When I click the "CardAction-edit cover"
     Then I should see a 'EditCoverOptions'
 
-    When I type "Undo" in the textarea
+    When I type "Undo" in the title textarea
     And I undo with CTRL+Z
-    And I type "New Title" in the textarea
+    And I type "New Title" in the title textarea
     And I click the 'EditCoverCloseBtn'
     And I wait for "@apiUpdateCollection" to finish
     Then I should see a collection card named "New Title"

@@ -118,13 +118,8 @@ When('I undo with CTRL+Z', () => {
 // ----------------------
 // Editing cards
 // ----------------------
-When('I type {string} in the textarea', string => {
-  cy.get('textarea')
-    .first()
-    .clear()
-    .wait(25)
-    .type(string)
-    .wait(25)
+When('I type {string} in the {word} textarea', (string, type) => {
+  cy.get(`.edit-cover-${type}`).typeInTextarea(string)
 })
 
 When('I close the snackbar', () => {
