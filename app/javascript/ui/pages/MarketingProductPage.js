@@ -19,7 +19,6 @@ import ReactPlayer from 'react-player'
 import PageFooter from '~/ui/marketing/PageFooter.js'
 
 import styled from 'styled-components'
-import v from '~/utils/variables'
 
 const Subtitle = styled(DisplayText)`
   font-size: 18px;
