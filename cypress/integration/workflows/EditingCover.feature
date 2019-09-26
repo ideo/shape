@@ -1,4 +1,4 @@
-Feature: Group membership
+Feature: Editing Cover
   Scenario: Adding an existing org member to a group and removing them
     Given I login and visit My Collection
     When I click the "CardAction-edit cover"
