@@ -130,7 +130,6 @@ class CommentInput extends React.Component {
           editorState={editorState}
           onChange={onChange}
           handleReturn={this.handleReturn}
-          onBlur={this.handleReturn}
           plugins={plugins}
           placeholder="Add comment"
           ref={element => {
