@@ -232,19 +232,19 @@ export const StyledGridCardInner = styled.div`
     `
   overflow: hidden;
   `} z-index: 1;
-  /*
-  // related to userSelectHack from Rnd / Draggable
-  // disable blue text selection on Draggables
-  // https://github.com/bokuweb/react-rnd/issues/199
-  */
-  *::selection {
-    background: transparent;
-  }
-
   ${props =>
     !props.isText &&
     `
-      /*disable text highlighting*/
+      /*
+      // related to userSelectHack from Rnd / Draggable
+      // disable blue text selection on Draggables
+      // https://github.com/bokuweb/react-rnd/issues/199
+
+      // TODO: always disable this, even for text, while anything is being dragged?
+      */
+      *::selection {
+        background: transparent;
+      }
       user-select: none;
     `}
 
