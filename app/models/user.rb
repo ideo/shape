@@ -406,7 +406,7 @@ class User < ApplicationRecord
 
   def current_org_groups_and_special_groups
     if has_cached_role?(Role::SUPER_ADMIN)
-      return current_organization.groups
+      return current_organization.groups.not_global
     end
 
     groups = current_org_groups.to_a
