@@ -1,8 +1,8 @@
-// import PropTypes from 'prop-types'
+import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { observable, action } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
 
 import { apiStore, routingStore, uiStore } from '~/stores'
@@ -13,6 +13,36 @@ import FollowIcon from '~/ui/icons/FollowIcon'
 import TextIcon from '~/ui/icons/TextIcon'
 import Tooltip from '~/ui/global/Tooltip'
 import v, { ITEM_TYPES } from '~/utils/variables'
+import hexToRgba from '~/utils/hexToRgba'
+
+export const threadTitleCss = css`
+  position: ${props => (props.sticky ? 'sticky' : 'relative')};
+  top: 0;
+  z-index: ${v.zIndex.commentHeader};
+  display: block;
+  width: 100%;
+  background-color: ${v.colors.secondaryDark};
+  background: linear-gradient(
+    ${v.colors.secondaryDark} 0,
+    ${v.colors.secondaryDark} 80%,
+    ${hexToRgba(v.colors.secondaryDark, 0)} 100%
+  );
+  &:hover {
+    background: ${v.colors.secondaryDark};
+  }
+  padding: 5px 10px;
+  text-align: left;
+  font-family: ${v.fonts.sans};
+  font-weight: 400;
+  font-size: 0.75rem;
+`
+
+const StyledHeaderWrapper = styled.div`
+  ${threadTitleCss};
+`
+const StyledHeaderButton = styled.button`
+  ${threadTitleCss};
+`
 
 const StyledLink = styled(Link)`
   margin-right: 8px;
@@ -223,28 +253,34 @@ class CommentThreadHeader extends React.Component {
   }
 
   render() {
-    const { thread } = this.props
-
+    const { thread, sticky, onClick } = this.props
+    // Wrapper will render a button or div depending on onClick presence
+    let Wrapper = StyledHeaderWrapper
+    if (onClick) {
+      Wrapper = StyledHeaderButton
+    }
     return (
-      <StyledHeader lines={this.titleLines}>
-        {this.renderThumbnail()}
-        <Dotdotdot clamp={2}>
-          <span
-            className="name"
-            ref={r => {
-              this.title = r
-            }}
-          >
-            {this.record.name}
-          </span>
-        </Dotdotdot>
-        {thread && (
-          <Fragment>
-            {this.renderUnreadCount()}
-            {this.renderFollow()}
-          </Fragment>
-        )}
-      </StyledHeader>
+      <Wrapper sticky={sticky} onClick={onClick}>
+        <StyledHeader lines={this.titleLines}>
+          {this.renderThumbnail()}
+          <Dotdotdot clamp={2}>
+            <span
+              className="name"
+              ref={r => {
+                this.title = r
+              }}
+            >
+              {this.record.name}
+            </span>
+          </Dotdotdot>
+          {thread && (
+            <Fragment>
+              {this.renderUnreadCount()}
+              {this.renderFollow()}
+            </Fragment>
+          )}
+        </StyledHeader>
+      </Wrapper>
     )
   }
 }
@@ -252,10 +288,14 @@ class CommentThreadHeader extends React.Component {
 CommentThreadHeader.propTypes = {
   thread: MobxPropTypes.objectOrObservableObject,
   record: MobxPropTypes.objectOrObservableObject,
+  sticky: PropTypes.bool,
+  onClick: PropTypes.func,
 }
 CommentThreadHeader.defaultProps = {
   thread: null,
   record: null,
+  sticky: false,
+  onClick: null,
 }
 
 export default CommentThreadHeader

@@ -444,7 +444,10 @@ class ApiStore extends jsonapi(datxCollection) {
   @computed
   get currentThreads() {
     return _.filter(
-      _.sortBy(this.findAll('comment_threads'), t => moment(t.updated_at)),
+      // sort by DESC order
+      _.reverse(
+        _.sortBy(this.findAll('comment_threads'), t => moment(t.updated_at))
+      ),
       t => {
         // don't include any new records that are being constructed
         if (!t.record || !t.record.id) return false

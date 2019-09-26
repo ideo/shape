@@ -17,36 +17,40 @@ class CommentEntryForm extends React.Component {
   }
 
   componentDidMount() {
-    this.focusTextArea(this.props.expanded)
+    this.focusTextArea()
   }
 
-  componentWillReceiveProps({ expanded }) {
-    this.focusTextArea(expanded)
-    // NOTE: maybe preferred to leave written + unsent messages in the comment box?
-    // if (!expanded) this.resetEditorState()
-  }
+  // componentWillReceiveProps({ expanded }) {
+  //   this.focusTextArea()
+  //   // NOTE: maybe preferred to leave written + unsent messages in the comment box?
+  //   // if (!expanded) this.resetEditorState()
+  // }
 
   componentWillUnmount() {
     this.editor = null
   }
 
-  focusTextArea = expanded => {
+  focusTextArea = () => {
     // NOTE: draft-js-plugins need timeout, even with 0 delay, see:
     // https://github.com/draft-js-plugins/draft-js-plugins/issues/800#issuecomment-315950836
     setTimeout(() => {
-      if (!expanded || !this.editor) return
+      if (!this.editor) return
       this.editor.focus()
     })
   }
 
   handleInputChange = editorState => {
     if (this.state.updating) return
-    this.handleHeightChange()
     const focused = editorState.getSelection().getHasFocus()
-    this.setState({
-      editorState,
-      focused,
-    })
+    this.setState(
+      {
+        editorState,
+        focused,
+      },
+      () => {
+        this.handleHeightChange()
+      }
+    )
   }
 
   handleHeightChange = () => {
@@ -71,7 +75,7 @@ class CommentEntryForm extends React.Component {
     }
     if (this.editor) return
     this.editor = editor
-    this.focusTextArea(this.props.expanded)
+    this.focusTextArea()
   }
 
   resetEditorState() {
@@ -108,9 +112,6 @@ class CommentEntryForm extends React.Component {
   }
 
   render() {
-    const { expanded } = this.props
-    if (!expanded) return ''
-
     return (
       <CommentForm onSubmit={this.handleSubmit}>
         <div className="textarea-input">
@@ -130,7 +131,6 @@ class CommentEntryForm extends React.Component {
 }
 
 CommentEntryForm.propTypes = {
-  expanded: PropTypes.bool.isRequired,
   afterSubmit: PropTypes.func.isRequired,
   onHeightChange: PropTypes.func.isRequired,
   thread: MobxPropTypes.objectOrObservableObject.isRequired,

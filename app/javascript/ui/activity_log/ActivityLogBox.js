@@ -231,6 +231,7 @@ class ActivityLogBox extends React.Component {
     <CommentThreadContainer
       parentWidth={this.position.w}
       loadingThreads={this.props.apiStore.loadingThreads}
+      expandedThreadKey={this.props.uiStore.expandedThreadKey}
     />
   )
 
