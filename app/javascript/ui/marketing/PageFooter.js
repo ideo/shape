@@ -17,20 +17,21 @@ import poweredByIdeo from '~/assets/Powered-by-IDEO-Inverted.png'
 import SubscribeEmail from '~/ui/marketing/SubscribeEmail'
 class PageFooter extends React.PureComponent {
   render() {
-    const {
-      mailingList,
-    } = this.props.content
+    const { mailingList } = this.props.content
     return (
       <MarketingFooter>
         <ScrollElement name="FooterAnchor" />
         <MarketingFlex align="center" justify="center" wrap w={1}>
-          <Box flex align="space-between" w={1} style={{maxWidth: '1000px'}}>
-            <Box w={1/2} style={{ textAlign: 'left' }}>
+          <Box flex align="space-between" w={1} style={{ maxWidth: '1000px' }}>
+            <Box w={1 / 2} style={{ textAlign: 'left' }}>
               <MarketingContent color="white">
                 For general inquiries, reach us at:
               </MarketingContent>
 
-              <InvertMarketingLinkMail fontSize={18} href="mailto:hello@shape.space">
+              <InvertMarketingLinkMail
+                fontSize={18}
+                href="mailto:hello@shape.space"
+              >
                 hello@shape.space
               </InvertMarketingLinkMail>
 
@@ -38,14 +39,17 @@ class PageFooter extends React.PureComponent {
                 For technical support, contact:
               </MarketingContent>
 
-              <InvertMarketingLinkMail fontSize={18} href="mailto:support@shape.space">
+              <InvertMarketingLinkMail
+                fontSize={18}
+                href="mailto:support@shape.space"
+              >
                 support@shape.space
               </InvertMarketingLinkMail>
             </Box>
 
-            <Box w={1/2} justify="flex-end">
+            <Box w={1 / 2} justify="flex-end">
               <Box mt={(0, 5)} wrap>
-                <InvertedFixedWidth style={{textAlign: 'left'}}>
+                <InvertedFixedWidth style={{ textAlign: 'left' }}>
                   {mailingList}
                 </InvertedFixedWidth>
               </Box>

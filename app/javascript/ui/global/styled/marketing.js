@@ -397,3 +397,10 @@ export function MarketingFlex(props) {
     </ReflexProvider>
   )
 }
+
+export const Card = styled.div`
+  border-radius: 8px;
+  box-shadow: 0 3px 10px 0 rgba(0, 0, 0, 0.08);
+  background-color: white;
+  border: solid 1px rgba(0, 0, 0, 0.1);
+`
