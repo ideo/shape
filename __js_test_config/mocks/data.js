@@ -521,6 +521,7 @@ export const fakeComment = {
   },
   created_at: new Date('2019-05-09T03:18:00'),
   updated_at: new Date('2019-05-09T03:18:00'),
+  API_fetchReplies: jest.fn().mockReturnValue(Promise.resolve({}))
 }
 export const fakeThread = {
   id: '1',
@@ -540,6 +541,7 @@ export const fakeThread = {
   API_subscribe: jest.fn().mockReturnValue(Promise.resolve({})),
   API_unsubscribe: jest.fn().mockReturnValue(Promise.resolve({})),
 }
+
 export const fakeActivity = {
   id: '1',
   type: 'activities',

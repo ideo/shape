@@ -21,6 +21,7 @@ describe('Comment', () => {
         replies: [fakeComment, fakeComment, fakeComment],
       },
       isReply: false,
+      viewMoreReplies: jest.fn(),
     }
     rerender = props => {
       wrapper = shallow(<Comment.wrappedComponent {...props} />)

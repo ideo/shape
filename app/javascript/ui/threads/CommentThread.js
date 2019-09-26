@@ -86,6 +86,8 @@ const ViewMore = styled.div`
   padding: 1px 0px 1px 10px;
 `
 
+ViewMore.displayName = 'ViewMore'
+
 const StyledCommentsWrapper = styled.div`
   cursor: ${props => (props.clickable ? 'pointer' : 'auto')};
 `
@@ -128,7 +130,9 @@ class CommentThread extends React.Component {
         />
       )
       // total replies count minus observable replies length
-      const hiddenRepliesCount = comment.replies_count - comment.replies.length
+      const repliesLength =
+        comment.replies && comment.replies.length ? comment.replies.length : 0
+      const hiddenRepliesCount = comment.replies_count - repliesLength
       if (hiddenRepliesCount > 0) {
         commentsList.push(
           <ViewMore

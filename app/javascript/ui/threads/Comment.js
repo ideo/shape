@@ -402,4 +402,6 @@ Comment.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
+Comment.displayName = 'Comment'
+
 export default Comment
