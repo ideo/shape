@@ -284,13 +284,16 @@ MarketingHeavyCTA.displayName = 'StyledMarketingHeavyCTA'
 
 /** @component */
 export const MarketingContent = styled.div`
-  color: black;
+  color: ${props => props.color};
   letter-spacing: -0.2px;
   font-size: 18px;
   font-family: ${v.fonts.sans};
   font-weight: ${v.weights.book};
 `
 MarketingContent.displayName = 'StyledMarketingContent'
+MarketingContent.defaultProps = {
+  color: 'black',
+}
 
 /** @component */
 export const InvertedCentered = styled(MarketingContent)`
@@ -329,11 +332,15 @@ InvertMarketingLink.displayName = 'StyledInvertMarketingLink'
 export const InvertMarketingLinkMail = styled(Anchor)`
   color: ${v.colors.commonLightest};
   letter-spacing: -0.2px;
-  font-size: 32px;
-  font-family: ${v.fonts.serif};
-  margin-bottom: 68px;
+  font-size: ${props => props.fontSize}px;
+  font-family: ${props =>
+    props.fontSize == 32 ? v.fonts.serif : v.fonts.sans};
+  margin-bottom: ${props => (props.fontSize == 32 ? 68 : 20)}px;
   display: inline-block;
 `
+InvertMarketingLinkMail.defaultProps = {
+  fontSize: 32,
+}
 InvertMarketingLinkMail.displayName = 'StyledInvertMarketingLinkMail'
 
 /** @component */
