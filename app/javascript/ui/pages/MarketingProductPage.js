@@ -88,7 +88,7 @@ class MarketingProductPage extends React.Component {
   render() {
     const { location } = this.props
     const { content, footer } = this.state
-    if (!content) return <div/>
+    if (!content) return <div />
     const { hero } = content
     console.log('sdfjk', content)
     return (
@@ -116,10 +116,7 @@ class MarketingProductPage extends React.Component {
                 />
               ))}
               {content.pricing && (
-                <Pricing
-                  pageName="open-innovation"
-                  {...content.pricing}
-                />
+                <Pricing pageName="open-innovation" {...content.pricing} />
               )}
             </Box>
           </MarketingFlex>

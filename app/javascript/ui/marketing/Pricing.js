@@ -1,14 +1,14 @@
 import styled from 'styled-components'
+import PropTypes from 'prop-types'
 import { Box } from 'reflexbox'
 import v from '~/utils/variables'
 
 import {
-  MarketingH1,
   MarketingH1Bold,
   MarketingH2,
   MarketingContent,
   MarketingFlex,
-  Card
+  Card,
 } from '~/ui/global/styled/marketing.js'
 
 /**
@@ -96,7 +96,9 @@ const Description = styled(MarketingContent)`
   margin-bottom: 0;
   max-width: 100%;
 
-  ul, li, p {
+  ul,
+  li,
+  p {
     text-align: left;
   }
 
@@ -117,17 +119,8 @@ const Description = styled(MarketingContent)`
  * Price Card - Main Component
  */
 
-
-const PriceCard = (props) => {
-  const {
-    title,
-    price,
-    price_unit,
-    index,
-    button,
-    description,
-    pageName,
-  } = props
+const PriceCard = props => {
+  const { title, price, price_unit, button, description } = props
   return (
     <PriceCardBase>
       <MarketingFlex justify="center" px={40} py={40}>
@@ -142,10 +135,7 @@ const PriceCard = (props) => {
             <div dangerouslySetInnerHTML={{ __html: price_unit }} />
           </Unit>
           <Box mt={[0, 0, 0]} mb={[20, 20, 20]} w={[1, 1, 1]}>
-            <CTAButton
-              variant={'solid-yellow'}
-              href={button.link}
-            >
+            <CTAButton variant={'solid-yellow'} href={button.link}>
               {button.text}
             </CTAButton>
           </Box>
@@ -157,20 +147,25 @@ const PriceCard = (props) => {
     </PriceCardBase>
   )
 }
+PriceCard.propTypes = {
+  title: PropTypes.string.isRequired,
+  price: PropTypes.number,
+  price_unit: PropTypes.string.isRequired,
+  button: PropTypes.shapeOf({
+    link: PropTypes.string,
+  }).isRequired,
+  description: PropTypes.string.isRequired,
+}
 
 /**
  * Pricing Section - Main Component
  */
 
-const Pricing = (props) => (
+const Pricing = props => (
   <MarketingFlex column align="center" px={24}>
-    <MarketingH1Bold align="center">
-      {props.title}
-    </MarketingH1Bold>
+    <MarketingH1Bold align="center">{props.title}</MarketingH1Bold>
     <Box w={[1, 1, 900]} mt={[20, 40, 40]}>
-      <SubText align="center">
-        {props.subtext}
-      </SubText>
+      <SubText align="center">{props.subtext}</SubText>
     </Box>
     <Box flex column={[true, true, false]} justify="center" mt={40} mb={31}>
       {props.pricing_cards.map((card, index) => (
@@ -188,5 +183,14 @@ const Pricing = (props) => (
     </Box>
   </MarketingFlex>
 )
+Pricing.propTypes = {
+  title: PropTypes.string.isRequired,
+  subtext: PropTypes.string.isRequired,
+  pricing_cards: PropTypes.array,
+  pageName: PropTypes.string.isRequired,
+}
+Pricing.defaultProps = {
+  pricing_cards: [],
+}
 
 export { Pricing, PriceCard }
