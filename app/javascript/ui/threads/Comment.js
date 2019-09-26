@@ -174,7 +174,9 @@ class Comment extends React.Component {
   }
 
   handleEditClick = () => {
+    const { uiStore } = this.props
     this.setState({ editing: true })
+    uiStore.setReplyingToComment(null)
     this.focusTextArea()
   }
 
@@ -311,7 +313,6 @@ class Comment extends React.Component {
       <StyledComment
         unread={unread}
         isReply={isReply}
-        onBlur={this.handleSubmit}
         onClick={this.handleClick}
       >
         <InlineRow align="center">
