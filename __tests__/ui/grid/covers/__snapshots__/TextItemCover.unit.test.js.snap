@@ -21,6 +21,7 @@ exports[`TextItemCover renders snapshot 1`] = `
   >
     <Quill
       modules={Object {}}
+      onChangeSelection={[Function]}
       readOnly={true}
       theme={null}
       value={

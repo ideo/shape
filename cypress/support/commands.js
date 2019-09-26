@@ -247,6 +247,19 @@ Cypress.Commands.add(
   }
 )
 
+Cypress.Commands.add(
+  'typeInTextarea',
+  { prevSubject: true },
+  (subject, string) => {
+    return cy
+      .wrap(subject)
+      .clear()
+      .wait(25)
+      .type(string)
+      .wait(25)
+  }
+)
+
 // NOTE: https://stackoverflow.com/a/47537751/260495
 // this hack is what allows cypress + fetch to work together, otherwise it doesn't
 // work to use cy.wait(@route)

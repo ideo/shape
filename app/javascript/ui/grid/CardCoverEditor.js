@@ -369,12 +369,12 @@ class CardCoverEditor extends React.Component {
           maxRows={3}
           maxLength={144}
           value={this.cardTitle}
-          placeholder={'untitled'}
+          placeholder="untitled"
           onChange={this.changeTitle}
           onKeyPress={this.handleInputKeyPress}
           onClick={this.handleInputClick}
           onKeyDown={this.handleInputKeyDown}
-          className={'edit-cover-title'}
+          className="edit-cover-title"
         />
       </div>
     )
@@ -388,12 +388,12 @@ class CardCoverEditor extends React.Component {
           maxRows={3}
           maxLength={144}
           value={this.hardcodedSubtitle}
-          placeholder={'default'}
+          placeholder="default"
           onChange={this.changeHardcodedSubtitle}
           onKeyPress={this.handleInputKeyPress}
           onClick={this.handleInputClick}
           onKeyDown={this.handleInputKeyDown}
-          className={'edit-cover-subtitle'}
+          className="edit-cover-subtitle"
         />
       </div>
     )

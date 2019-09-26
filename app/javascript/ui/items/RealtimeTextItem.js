@@ -84,9 +84,7 @@ const StyledContainer = styled.div`
       position: fixed;
       z-index: 10000;
     }
-  `} *::selection {
-    background: highlight !important;
-  }
+  `}
 `
 
 @observer
