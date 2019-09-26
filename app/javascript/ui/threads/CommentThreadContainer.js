@@ -191,10 +191,6 @@ class CommentThreadContainer extends React.Component {
     })
   }
 
-  afterSubmit = thread => () => {
-    this.scrollToBottom()
-  }
-
   isExpanded = key => {
     const { uiStore } = this.props
     return uiStore.expandedThreadKey === key
@@ -212,6 +208,13 @@ class CommentThreadContainer extends React.Component {
     const { apiStore, uiStore } = this.props
     uiStore.expandThread(null)
     apiStore.loadNextThreadPage()
+  }
+
+  scrollToBottomUnlessReplying = () => {
+    const { uiStore } = this.props
+    // don't scroll to bottom for replies
+    if (uiStore.replyingToCommentId) return
+    this.scrollToBottom()
   }
 
   renderThreads = () => {
@@ -235,8 +238,8 @@ class CommentThreadContainer extends React.Component {
         <CommentThread
           thread={thread}
           expanded
-          afterSubmit={this.afterSubmit(thread)}
-          onEditorHeightChange={this.scrollToBottom}
+          afterSubmit={this.scrollToBottomUnlessReplying}
+          onEditorHeightChange={this.scrollToBottomUnlessReplying}
         />
       </CommentThreadDrawer>
     )
