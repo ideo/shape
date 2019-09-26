@@ -20,7 +20,7 @@ class OrganizationBuilder
       setup_user_membership_and_collections
       create_application_organization if @user.application_bot?
       if @full_setup
-        create_templates
+        create_templates if !@user.application_bot?
         # this check is for running Cypress, don't create real Network orgs for every test org
         return true if @user.email == 'cypress-test@ideo.com'
 
@@ -42,8 +42,12 @@ class OrganizationBuilder
   private
 
   def update_primary_group!
-    @organization.primary_group.attributes = @params
+    @organization.primary_group.attributes = group_params
     @organization.primary_group.save!
+  end
+
+  def group_params
+    @params.except(:in_app_billing)
   end
 
   def add_role

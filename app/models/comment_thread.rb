@@ -25,8 +25,8 @@ class CommentThread < ApplicationRecord
   before_validation :inherit_record_organization_id, on: :create
   validates :record_id, uniqueness: { scope: %i[organization_id record_type] }
 
-  has_many :comments,
-           -> { order(created_at: :asc) },
+  # only get top_level comments
+  has_many :comments, -> { where(parent_id: nil).order(created_at: :asc) },
            dependent: :destroy
   has_many :users_threads, dependent: :destroy
   has_many :groups_threads, dependent: :destroy

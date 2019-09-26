@@ -1,20 +1,30 @@
 import Comment from '~/ui/threads/Comment'
 import { fakeComment, fakeUser } from '#/mocks/data'
-import { apiStore, uiStore } from '~/stores'
+import fakeApiStore from '#/mocks/fakeApiStore'
+import fakeUiStore from '#/mocks/fakeUiStore'
 
 jest.mock('../../../app/javascript/stores')
+
+const fakeEvent = {
+  target: { closest: jest.fn() },
+}
 
 let wrapper, props, rerender
 describe('Comment', () => {
   beforeEach(() => {
     props = {
+      apiStore: fakeApiStore(),
+      uiStore: fakeUiStore,
       comment: {
         ...fakeComment,
         persisted: true,
+        replies: [fakeComment, fakeComment, fakeComment],
       },
+      isReply: false,
+      viewMoreReplies: jest.fn(),
     }
     rerender = props => {
-      wrapper = shallow(<Comment {...props} />)
+      wrapper = shallow(<Comment.wrappedComponent {...props} />)
     }
     rerender(props)
   })
@@ -58,9 +68,34 @@ describe('Comment', () => {
     })
   })
 
+  it('sets replying to comment id when clicked', () => {
+    wrapper.simulate('click', fakeEvent)
+    expect(props.uiStore.setReplyingToComment).toHaveBeenCalledWith(
+      props.comment.id
+    )
+  })
+
+  it('sets replying to comment id when reply button is clicked', () => {
+    wrapper.find('.test-reply-comment').simulate('click', fakeEvent)
+    expect(props.uiStore.setReplyingToComment).toHaveBeenCalledWith(
+      props.comment.id
+    )
+  })
+
+  describe('if a comment is a reply', () => {
+    beforeEach(() => {
+      props.isReply = true
+      rerender(props)
+    })
+
+    it('should not have a reply button', () => {
+      expect(wrapper.find('.test-reply-comment').exists()).toBeFalsy()
+    })
+  })
+
   describe('when user is comment author', () => {
     beforeEach(() => {
-      apiStore.currentUserId = '1'
+      props.apiStore.currentUserId = '1'
     })
 
     it('renders an edit button', () => {
@@ -86,22 +121,33 @@ describe('Comment', () => {
       })
     })
 
-    it('renders a delete button', () => {
-      expect(wrapper.find('.test-delete-comment').exists()).toBe(true)
+    it('does not render a delete button', () => {
+      expect(wrapper.find('.test-delete-comment').exists()).toBe(false)
     })
 
-    describe('on click delete', () => {
-      it('deletes the comment', () => {
-        const deleteButton = wrapper.find('.test-delete-comment').first()
-        deleteButton.simulate('click')
-        expect(uiStore.confirm).toHaveBeenCalled()
+    describe('when a comment has no replies', () => {
+      beforeEach(() => {
+        props.comment.replies = []
+        rerender(props)
+      })
+
+      it('renders a delete button', () => {
+        expect(wrapper.find('.test-delete-comment').exists()).toBe(true)
+      })
+
+      describe('on click delete', () => {
+        it('deletes the comment', () => {
+          const deleteButton = wrapper.find('.test-delete-comment').first()
+          deleteButton.simulate('click')
+          expect(props.uiStore.confirm).toHaveBeenCalled()
+        })
       })
     })
   })
 
   describe('when user is not the comment author', () => {
     beforeEach(() => {
-      apiStore.currentUserId = '1'
+      props.apiStore.currentUserId = '1'
       props.comment.author = { ...fakeUser, id: '9' }
       rerender(props)
     })

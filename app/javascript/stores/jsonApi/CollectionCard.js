@@ -23,6 +23,7 @@ class CollectionCard extends BaseRecord {
     'collection_attributes',
     'item_attributes',
     'image_contain',
+    'card_type',
     'is_cover',
     'hidden',
     'filter',

@@ -24,6 +24,7 @@ export const fakeCollectionCard = {
   reference: false,
   image_contain: false,
   beginReplacing: jest.fn(),
+  reselectOnlyEditableCards: jest.fn(),
   API_create: jest.fn(),
   API_archive: jest.fn(),
   API_linkToMyCollection: jest.fn(),
@@ -520,6 +521,7 @@ export const fakeComment = {
   },
   created_at: new Date('2019-05-09T03:18:00'),
   updated_at: new Date('2019-05-09T03:18:00'),
+  API_fetchReplies: jest.fn().mockReturnValue(Promise.resolve({}))
 }
 export const fakeThread = {
   id: '1',
@@ -539,6 +541,7 @@ export const fakeThread = {
   API_subscribe: jest.fn().mockReturnValue(Promise.resolve({})),
   API_unsubscribe: jest.fn().mockReturnValue(Promise.resolve({})),
 }
+
 export const fakeActivity = {
   id: '1',
   type: 'activities',

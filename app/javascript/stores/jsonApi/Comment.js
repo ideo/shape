@@ -1,5 +1,5 @@
+import _ from 'lodash'
 import { observable, action, runInAction } from 'mobx'
-import { remove } from 'lodash'
 
 import trackError from '~/utils/trackError'
 import { apiUrl } from '~/utils/url'
@@ -11,8 +11,21 @@ class Comment extends BaseRecord {
   static type = 'comments'
   static endpoint = apiUrl('comments')
 
+  attributesForAPI = ['message', 'parent_id', 'draftjs_data']
+
   @observable
   unread = false
+  @observable
+  replies = []
+  @observable
+  repliesPage = null
+
+  constructor(...args) {
+    super(...args)
+    runInAction(() => {
+      this.replies.replace(this.children)
+    })
+  }
 
   @action
   markAsUnread() {
@@ -28,13 +41,33 @@ class Comment extends BaseRecord {
     return this.updated_at > this.created_at
   }
 
+  @action
+  importReply(reply) {
+    let sortedReplies = _.union(this.replies, [reply])
+    sortedReplies = _.sortBy(sortedReplies, ['created_at'])
+    this.replies.replace(sortedReplies)
+  }
+
   API_destroy = async () => {
     try {
       await this.destroy()
-      const thread = apiStore.find('comment_threads', this.comment_thread_id)
-      runInAction(() => {
-        remove(thread.comments, comment => comment.id === this.id)
-      })
+      const { parent_id } = this
+      if (!parent_id) {
+        const thread = apiStore.find('comment_threads', this.comment_thread_id)
+        runInAction(() => {
+          _.remove(thread.comments, comment => comment.id === this.id)
+        })
+      } else {
+        const thread = apiStore.find('comment_threads', this.comment_thread_id)
+        const { comments } = thread
+        const parent = _.find(
+          comments,
+          comment => comment.id === parent_id.toString()
+        )
+        runInAction(() => {
+          _.remove(parent.replies, comment => comment.id === this.id.toString())
+        })
+      }
     } catch (e) {
       console.error(e)
       uiStore.defaultAlertError()
@@ -55,6 +88,20 @@ class Comment extends BaseRecord {
       .catch(err => {
         trackError(err, { name: 'comment:update' })
       })
+  }
+
+  async API_fetchReplies() {
+    const replyPage = this.replyPage ? this.replyPage + 1 : 1
+    const apiPath = `comments/${this.id}/replies?page=${replyPage}`
+    const res = await this.apiStore.request(apiPath)
+    const { data } = res
+    runInAction(() => {
+      if (data.length > 0) {
+        const mergedComments = _.union(this.replies, data)
+        this.replies.replace(_.sortBy(mergedComments, ['created_at']))
+        this.replyPage = replyPage
+      }
+    })
   }
 }
 

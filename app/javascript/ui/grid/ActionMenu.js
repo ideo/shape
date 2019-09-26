@@ -60,6 +60,10 @@ class ActionMenu extends React.Component {
     }
     if (onMoveMenu) onMoveMenu({ type: cardAction })
     uiStore.selectCardId(card.id)
+    if (cardAction === 'move') {
+      const { selectedCardIds } = uiStore
+      card.reselectOnlyEditableCards(selectedCardIds)
+    }
     uiStore.openMoveMenu({ from: viewingCollection, cardAction })
   }
 
