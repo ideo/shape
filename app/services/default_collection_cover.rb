@@ -30,6 +30,7 @@ class DefaultCollectionCover < SimpleService
 
     media = media_item(cover_media_item_card)
     text = media_item(first_text_item_card)
+    existing_cover = @collection.cached_cover || {}
     cover = {
       # NOTE: image_url should only be used on the frontend for video items, e.g. a youtube image url
       image_url: media[:content],
@@ -42,9 +43,9 @@ class DefaultCollectionCover < SimpleService
       item_id_text: text[:item_id],
       item_id_media: media[:item_id],
       no_cover: @no_cover,
-      # these next values only get set in CollectionUpdater
-      hardcoded_subtitle: nil,
-      subtitle_hidden: nil,
+      # these next values can get modified in CollectionUpdater
+      hardcoded_subtitle: existing_cover['hardcoded_subtitle'],
+      subtitle_hidden: existing_cover['subtitle_hidden'],
     }
     # This cover type uses a separate text item, so remove all text properties
     # from the cover

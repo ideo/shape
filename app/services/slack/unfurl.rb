@@ -41,13 +41,17 @@ module Slack
         process_url = "https://process.filestackapi.com/#{ENV['FILESTACK_API_KEY']}/resize=width:300/"
         image_url = "#{process_url}/#{image_handle}"
       end
+      cover_text = ''
+      unless cover['subtitle_hidden']
+        cover_text = cover['hardcoded_subtitle'] || cover['text'] || ''
+      end
       {
         mrkdwn_in: %w[text pretext],
         author_name: 'Shape',
         author_icon: 'https://s3-us-west-2.amazonaws.com/assets.shape.space/logo-no-text_2x-sq.png',
         color: '#5698ae',
         title: record.name,
-        text: cover['text'] || '',
+        text: cover_text,
         title_link: url,
         image_url: image_url,
       }

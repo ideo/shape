@@ -271,6 +271,10 @@ export const QuillStyleWrapper = styled.div`
       margin-top: 0.85rem;
     }
 
+    a {
+      color: ${v.colors.ctaPrimary};
+    }
+
     @keyframes blink-animation {
       to {
         visibility: hidden;
@@ -278,6 +282,9 @@ export const QuillStyleWrapper = styled.div`
     }
 
     .ql-container {
+      /* this overrides quill-cursors "display: flex" which was breaking IE */
+      display: block;
+
       ${props => (props.notEditing ? '' : 'overflow: visible !important;')};
       ${props =>
         props.notEditing && props.hasTitleText

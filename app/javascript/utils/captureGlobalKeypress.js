@@ -48,49 +48,63 @@ const captureGlobalKeypress = e => {
 
   if (shouldNormalKeyPressBeAllowed) return false
   const { code, metaKey, ctrlKey, shiftKey } = e
-  const { viewingCollection } = uiStore
+  const { selectedCardIds, viewingCollection } = uiStore
   switch (code) {
+    // CTRL+X: Move
     case 'KeyX':
       if (!viewingCollection) {
         return false
       }
       if (metaKey || ctrlKey) {
-        uiStore.openMoveMenu({
-          from: viewingCollection, // CTRL+X: Move
-          cardAction: 'move',
+        if (!selectedCardIds.length) {
+          return false
+        }
+        const card = apiStore.find('collection_cards', selectedCardIds[0])
+        if (card) {
+          card.reselectOnlyEditableCards(selectedCardIds)
+        }
+        viewingCollection.confirmEdit({
+          onConfirm: () => {
+            uiStore.openMoveMenu({
+              from: viewingCollection,
+              cardAction: 'move',
+            })
+          },
         })
       }
       break
+    // CTRL+C: Duplicate
     case 'KeyC':
       if (!viewingCollection) {
         return false
       }
       if (metaKey || ctrlKey) {
         uiStore.openMoveMenu({
-          from: viewingCollection, // CTRL+C: Duplicate
+          from: viewingCollection,
           cardAction: 'duplicate',
         })
       }
       break
+    // CTRL+V: Place (Paste)
     case 'KeyV':
       if (metaKey || ctrlKey) {
-        // CTRL+V: Place
         // MoveModal will listen to this value and then set it to false
         uiStore.update('pastingCards', true)
       }
       break
     case 'KeyZ':
+      // CTRL+Shift+Z: Redo
       if (shiftKey && (metaKey || ctrlKey)) {
-        undoStore.handleRedoKeyPress() // CTRL+Shift+Z: Redo
+        undoStore.handleRedoKeyPress()
         break
       }
+      // CTRL+Z: Undo
       if (metaKey || ctrlKey) {
-        undoStore.handleUndoKeypress() // CTRL+Z: Undo
+        undoStore.handleUndoKeypress()
       }
       break
     case 'Backspace':
     case 'Delete':
-      const { selectedCardIds } = uiStore
       if (!selectedCardIds || !selectedCardIds.length) {
         return false
       }

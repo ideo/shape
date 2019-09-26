@@ -150,7 +150,7 @@ RSpec.describe CardMover, type: :service do
         ])
       end
 
-      context 'with pinned cards' do
+      context 'with pinned cards that already exist in to_collection' do
         before do
           # update first 2 cards to be pinned
           to_collection.reload.collection_cards.limit(2).update_all(pinned: true)
@@ -167,6 +167,35 @@ RSpec.describe CardMover, type: :service do
             moving_cards[0].id,
             original_cards[1].id,
           ])
+        end
+      end
+
+      context 'with pinned cards in the from_collection' do
+        before do
+          # update first 2 cards to be pinned
+          from_collection.reload.collection_cards.limit(2).update_all(pinned: true)
+        end
+
+        context 'moving into a normal collection' do
+          it 'should unpin all cards' do
+            card_mover.call
+            to_collection.reload
+            expect(to_collection.collection_cards.count).to eq 6
+            expect(to_collection.collection_cards.none?(&:pinned?)).to be true
+          end
+        end
+
+        context 'moving into a master template' do
+          before do
+            to_collection.update(master_template: true)
+          end
+
+          it 'should pin all cards if moving to a normal collection' do
+            card_mover.call
+            to_collection.reload
+            expect(to_collection.collection_cards.count).to eq 6
+            expect(to_collection.collection_cards.all?(&:pinned?)).to be true
+          end
         end
       end
     end
