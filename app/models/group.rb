@@ -87,6 +87,7 @@ class Group < ApplicationRecord
   scope :search_import, -> { where(archived: false) }
   # includes global groups
   scope :viewable_in_org, ->(id) { where(organization_id: [nil, id]) }
+  scope :not_global, -> { where(type: nil) }
 
   def search_data
     {

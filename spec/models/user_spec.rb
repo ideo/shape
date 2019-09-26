@@ -498,11 +498,13 @@ describe User, type: :model do
       end
 
       context 'with super admin role' do
+        let(:common_resource) { create(:global_group, organization: org) }
         let(:super_admin) { create(:user, :super_admin, add_to_org: org) }
 
-        it 'shows all org groups' do
+        it 'shows all org groups, except global groups' do
           # 3 org groups and 2 more groups created above
           expect(super_admin.current_org_groups_and_special_groups.length).to be 5
+          expect(super_admin.current_org_groups_and_special_groups).not_to include(common_resource)
         end
       end
     end
