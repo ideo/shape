@@ -13,7 +13,7 @@ import { MarketingFlex } from '~/ui/global/styled/marketing.js'
 import { scroller } from 'react-scroll'
 import { browserHistory } from '~/ui/MarketingRoutes'
 
-const NavLink = styled.button`
+const NavLink = styled.a`
   font-weight: ${v.weights.medium};
   font-family: ${v.fonts.sans};
   font-size: 12px;
@@ -23,6 +23,7 @@ const NavLink = styled.button`
   padding: 6px 12px;
   cursor: pointer;
   text-transform: uppercase;
+  text-decoration: none;
 }
 `
 
@@ -138,8 +139,14 @@ const MobileLinks = ({ isHome }) => {
       </Box>
 
       <Box>
-        <NavLink align="left" onClick={handleScrollToFooter}>
+        <NavLink align="left" href="/product/pricing">
           PRICING
+        </NavLink>
+      </Box>
+
+      <Box>
+        <NavLink align="left" href="/product/open-innovation">
+          OPEN INNOVATION
         </NavLink>
       </Box>
 
@@ -200,7 +207,10 @@ class MarketingMenu extends React.PureComponent {
                   <NavLink onClick={() => handleScrollToContent(isHome)}>
                     Product
                   </NavLink>
-                  <NavLink onClick={handleScrollToFooter}>Pricing</NavLink>
+                  <NavLink href="/product/pricing">Pricing</NavLink>
+                  <NavLink href="/product/open-innovation">
+                    Open Innovation
+                  </NavLink>
                 </MarketingFlex>
               </Box>
 

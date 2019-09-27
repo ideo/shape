@@ -102,6 +102,7 @@ export const MarketingH1 = styled(Heading1)`
   font-size: 24px;
   font-family: ${v.fonts.sans};
   letter-spacing: 0px;
+  line-height: 38px;
   white-space: normal;
   text-align: center;
   margin-bottom: 0;
@@ -284,13 +285,16 @@ MarketingHeavyCTA.displayName = 'StyledMarketingHeavyCTA'
 
 /** @component */
 export const MarketingContent = styled.div`
-  color: black;
+  color: ${props => props.color};
   letter-spacing: -0.2px;
   font-size: 18px;
   font-family: ${v.fonts.sans};
   font-weight: ${v.weights.book};
 `
 MarketingContent.displayName = 'StyledMarketingContent'
+MarketingContent.defaultProps = {
+  color: 'black',
+}
 
 /** @component */
 export const InvertedCentered = styled(MarketingContent)`
@@ -329,11 +333,15 @@ InvertMarketingLink.displayName = 'StyledInvertMarketingLink'
 export const InvertMarketingLinkMail = styled(Anchor)`
   color: ${v.colors.commonLightest};
   letter-spacing: -0.2px;
-  font-size: 32px;
-  font-family: ${v.fonts.serif};
-  margin-bottom: 68px;
+  font-size: ${props => props.fontSize}px;
+  font-family: ${props =>
+    props.fontSize == 32 ? v.fonts.serif : v.fonts.sans};
+  margin-bottom: ${props => (props.fontSize == 32 ? 68 : 20)}px;
   display: inline-block;
 `
+InvertMarketingLinkMail.defaultProps = {
+  fontSize: 32,
+}
 InvertMarketingLinkMail.displayName = 'StyledInvertMarketingLinkMail'
 
 /** @component */
@@ -390,3 +398,10 @@ export function MarketingFlex(props) {
     </ReflexProvider>
   )
 }
+
+export const Card = styled.div`
+  border-radius: 8px;
+  box-shadow: 0 3px 10px 0 rgba(0, 0, 0, 0.08);
+  background-color: white;
+  border: solid 1px rgba(0, 0, 0, 0.1);
+`

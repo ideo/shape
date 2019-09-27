@@ -18,6 +18,7 @@ import {
 import MarketingMenu from '~/ui/marketing/MarketingMenu'
 import ContentBlock from '~/ui/marketing/ContentBlock'
 import marketingFirebaseClient from '~/vendor/firebase/clients/marketingFirebaseClient'
+import { Pricing } from '~/ui/marketing/Pricing'
 import ReactPlayer from 'react-player'
 import PageFooter from '~/ui/marketing/PageFooter.js'
 import { hasKeyValueParam } from '~/utils/paramUtils.js'
@@ -69,6 +70,8 @@ class MarketingPage extends React.Component {
     const videoPlayingButtonText = !videoPlaying
       ? hero && hero.watchVideoButton
       : hero && hero.closeVideoButton
+
+    console.log('tsak;lf', this.state)
     return (
       <Fragment>
         <MarketingBack>
@@ -123,6 +126,13 @@ class MarketingPage extends React.Component {
               ))}
             </Box>
           </MarketingFlex>
+
+          {this.state.content.pricing && (
+            <Pricing
+              pageName="workshop"
+              {...this.state.content.pricing.blocks[0]}
+            />
+          )}
         </MarketingBack>
 
         <PageFooter content={footer} />
