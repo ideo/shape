@@ -6,6 +6,7 @@ import { Element as ScrollElement, scroller } from 'react-scroll'
 import pluralize from 'pluralize'
 import styled from 'styled-components'
 import Truncator from 'react-truncator'
+import VisibilitySensor from 'react-visibility-sensor'
 
 import { ActivityContainer } from '~/ui/global/styled/layout'
 import GoIcon from '~/ui/icons/GoIcon'
@@ -217,6 +218,14 @@ class CommentThreadContainer extends React.Component {
     this.scrollToBottom()
   }
 
+  handleBottomVisibility = isVisible => {
+    const { expandedThread } = this
+    // if we reached the bottom and we're viewing an expanded thread
+    if (isVisible && expandedThread) {
+      expandedThread.API_markViewed()
+    }
+  }
+
   renderThreads = () => {
     if (!!this.expandedThread) return null
     return this.threads.map((thread, i) => (
@@ -317,7 +326,9 @@ class CommentThreadContainer extends React.Component {
               </ShowMoreButton>
             )}
           </div>
-          <ScrollElement name="bottom" />
+          <VisibilitySensor onChange={this.handleBottomVisibility}>
+            <ScrollElement name="bottom" />
+          </VisibilitySensor>
         </ActivityContainer>
       </Fragment>
     )

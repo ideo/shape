@@ -399,43 +399,43 @@ class ApiStore extends jsonapi(datxCollection) {
   async findOrBuildCommentThread(record) {
     let thread = this.findThreadForRecord(record)
     this.clearUnpersistedThreads()
-    if (!thread) {
-      // first search for it via API
-      try {
+    // first search for it via API
+    try {
+      if (!thread) {
         // comment threads are unique by org_id so we pass that along
         const identifier = `${record.className}/${record.id}?organization_id=${this.currentUserOrganizationId}`
         const res = await this.request(
           `comment_threads/find_by_record/${identifier}`,
           'GET'
         )
-        if (res.data && res.data.id) {
-          thread = res.data
-          // make sure to fetch the first page of comments
-          thread.API_fetchComments()
-        } else {
-          // if still not found, set up a new empty record
-          thread = new CommentThread(
-            {
-              record_id: record.id,
-              record_type: record.className,
-              // set this for saving...
-              organization_id: this.currentUserOrganizationId,
-              updated_at: new Date(),
-            },
-            this
-          )
-          thread.addReference('record', record, {
-            model: record.className === 'Collection' ? Collection : Item,
-            type: ReferenceType.TO_ONE,
-          })
-          this.add(thread)
-        }
-      } catch (e) {
-        trackError(e, {
-          source: 'findOrBuildCommentThread',
-          name: 'fetchThreads',
-        })
+        if (res.data && res.data.id) thread = res.data
       }
+      if (thread) {
+        // make sure to fetch the first page of comments
+        thread.API_fetchComments()
+      } else {
+        // if still not found, set up a new empty record
+        thread = new CommentThread(
+          {
+            record_id: record.id,
+            record_type: record.className,
+            // set this for saving...
+            organization_id: this.currentUserOrganizationId,
+            updated_at: new Date(),
+          },
+          this
+        )
+        thread.addReference('record', record, {
+          model: record.className === 'Collection' ? Collection : Item,
+          type: ReferenceType.TO_ONE,
+        })
+        this.add(thread)
+      }
+    } catch (e) {
+      trackError(e, {
+        source: 'findOrBuildCommentThread',
+        name: 'fetchThreads',
+      })
     }
     this.setCurrentPageThreadKey(thread.key)
     return thread

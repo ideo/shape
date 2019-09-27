@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { observable, action, runInAction } from 'mobx'
+import { observable, computed, action, runInAction } from 'mobx'
 
 import trackError from '~/utils/trackError'
 import { apiUrl } from '~/utils/url'
@@ -14,36 +14,46 @@ class Comment extends BaseRecord {
   attributesForAPI = ['message', 'parent_id', 'draftjs_data']
 
   @observable
-  unread = false
-  @observable
   replies = []
   @observable
-  repliesPage = null
+  replyPage = null
 
   constructor(...args) {
     super(...args)
     runInAction(() => {
-      this.replies.replace(this.children)
+      // import the first 3 that get included by the serializer
+      this.importReplies(this.children)
     })
   }
 
-  @action
-  markAsUnread() {
-    this.unread = true
+  get parentComment() {
+    // ....
   }
 
-  @action
-  markAsRead() {
-    this.unread = false
+  @computed
+  get unread() {
+    const { thread } = this
+    const { users_thread } = thread
+    return (
+      // written by someone else
+      this.author_id.toString() !== this.apiStore.currentUserId.toString() &&
+      // more recently than my last_viewed_at timestamp
+      users_thread &&
+      this.updated_at > users_thread.last_viewed_at
+    )
   }
 
   get wasEdited() {
     return this.updated_at > this.created_at
   }
 
+  get thread() {
+    return apiStore.find('comment_threads', this.comment_thread_id)
+  }
+
   @action
-  importReply(reply) {
-    let sortedReplies = _.union(this.replies, [reply])
+  importReplies(replies = []) {
+    let sortedReplies = _.union(this.replies, replies)
     sortedReplies = _.sortBy(sortedReplies, ['created_at'])
     this.replies.replace(sortedReplies)
   }
@@ -51,14 +61,12 @@ class Comment extends BaseRecord {
   API_destroy = async () => {
     try {
       await this.destroy()
-      const { parent_id } = this
+      const { thread, parent_id } = this
       if (!parent_id) {
-        const thread = apiStore.find('comment_threads', this.comment_thread_id)
         runInAction(() => {
           _.remove(thread.comments, comment => comment.id === this.id)
         })
       } else {
-        const thread = apiStore.find('comment_threads', this.comment_thread_id)
         const { comments } = thread
         const parent = _.find(
           comments,
@@ -91,14 +99,18 @@ class Comment extends BaseRecord {
   }
 
   async API_fetchReplies() {
+    const { thread } = this
+    // async mark the thread as viewed any time you fetch replies
+    thread.API_markViewed()
+    // don't fetch any replies unless you need to
+    if (this.replies_count <= this.replies.length) return
     const replyPage = this.replyPage ? this.replyPage + 1 : 1
     const apiPath = `comments/${this.id}/replies?page=${replyPage}`
     const res = await this.apiStore.request(apiPath)
     const { data } = res
     runInAction(() => {
       if (data.length > 0) {
-        const mergedComments = _.union(this.replies, data)
-        this.replies.replace(_.sortBy(mergedComments, ['created_at']))
+        this.importReplies(data)
         this.replyPage = replyPage
       }
     })

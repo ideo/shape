@@ -70,6 +70,9 @@ class CommentThread extends BaseRecord {
 
   // use next param to get the "next page" of comments
   async API_fetchComments({ next = false } = {}) {
+    // always fire an async request to markViewed
+    this.API_markViewed()
+
     const page = next ? this.links.next : 1
     // if we had previously loaded additional pages, return it to the state
     // where we just have the first page worth of comments
@@ -79,11 +82,9 @@ class CommentThread extends BaseRecord {
     const apiPath = `comment_threads/${this.id}/comments?page=${page}`
     const res = await this.apiStore.request(apiPath, 'GET')
     runInAction(() => {
-      // simulate backend effect
-      this.comments.forEach(comment => comment.markAsRead())
       this.links = res.links
     })
-    this.importComments(res.data, { read: true })
+    this.importComments(res.data)
   }
 
   async API_saveComment(commentData) {
@@ -112,6 +113,8 @@ class CommentThread extends BaseRecord {
       model: User,
       type: ReferenceType.TO_ONE,
     })
+    // also store the author_id to simulate the serializer
+    comment.author_id = this.apiStore.currentUserId
     this.importComments([comment], { created: true })
     // this will create the comment in the API
     this.uiStore.trackEvent('create', this.record)
@@ -120,9 +123,9 @@ class CommentThread extends BaseRecord {
 
   API_markViewed() {
     const apiPath = `comment_threads/${this.id}/view`
-    // simulate backend effect
-    this.comments.forEach(comment => comment.markAsRead())
+    // this.comments.forEach(comment => comment.markAsRead())
     if (this.users_thread) {
+      // simulate backend effect
       this.users_thread.unread_count = 0
     }
     return this.apiStore.request(apiPath, 'POST')
@@ -139,28 +142,16 @@ class CommentThread extends BaseRecord {
   }
 
   @action
-  importComments(data, { created = false, read = false } = {}) {
+  importComments(data, { created = false } = {}) {
     const newParentComments = _.filter(data, c => !c.parent_id)
     const newReplies = _.filter(data, c => c.parent_id)
     let newComments = _.union(this.comments.toJS(), newParentComments)
     // after we're done creating the temp comment, clear out any prev temp ones
     if (!created) newComments = _.filter(newComments, c => c.persisted)
 
-    data.forEach(comment => {
-      const { users_thread } = this
-      if (
-        !read &&
-        comment.author_id !== this.apiStore.currentUserId &&
-        users_thread &&
-        comment.updated_at > users_thread.last_viewed_at
-      ) {
-        comment.markAsUnread()
-      }
-    })
-
     newReplies.forEach(reply => {
       parent = _.find(newComments, { id: reply.parent_id.toString() })
-      parent.importReply(reply)
+      if (parent) parent.importReplies([reply])
     })
     newComments = _.sortBy(newComments, ['created_at'])
     this.comments.replace(newComments)

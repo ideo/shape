@@ -4,23 +4,11 @@ import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
-import v from '~/utils/variables'
 import Comment from '~/ui/threads/Comment'
 import CommentEntryForm from '~/ui/threads/CommentEntryForm'
 import CommentThreadLoader from '~/ui/threads/CommentThreadLoader'
 import CommentThreadHeader from '~/ui/threads/CommentThreadHeader'
-
-const ViewMore = styled.div`
-  border-left: 8px solid ${v.colors.secondaryDarkest};
-  font-size: 12px;
-  font-family: ${v.fonts.sans};
-  font-weight: ${v.weights.book};
-  background: ${v.colors.secondaryMedium};
-  color: ${v.colors.commonDark};
-  padding: 1px 0px 1px 10px;
-`
-
-ViewMore.displayName = 'ViewMore'
+import CommentReplies from '~/ui/threads/CommentReplies'
 
 const StyledCommentsWrapper = styled.div`
   margin-top: 5px;
@@ -47,58 +35,29 @@ class CommentThread extends React.Component {
     })
   }
 
-  viewMoreReplies = comment => {
-    comment.API_fetchReplies()
-  }
-
   renderComments = () => {
     const { uiStore } = this.props
     if (!this.comments || this.comments.length <= 0) return []
     const commentsList = []
     _.each(this.comments, (comment, i) => {
       commentsList.push(
-        <Comment
-          key={comment.id || `comment-new-${i}`}
-          comment={comment}
-          viewMoreReplies={this.viewMoreReplies}
-        />
+        <Comment key={comment.id || `comment-new-${i}`} comment={comment} />
       )
-      // total replies count minus observable replies length
-      const repliesLength =
-        comment.replies && comment.replies.length ? comment.replies.length : 0
-      const hiddenRepliesCount = comment.replies_count - repliesLength
-      if (hiddenRepliesCount > 0) {
+      if (comment.id) {
         commentsList.push(
-          <ViewMore
-            key={'view-more-replies'}
-            onClick={() => {
-              this.viewMoreReplies(comment)
-            }}
-          >
-            View {hiddenRepliesCount} more
-          </ViewMore>
-        )
-      }
-      _.each(comment.replies, (child, i) => {
-        commentsList.push(
-          <Comment
-            key={`reply-${child.id}` || `reply-new-${i}`}
-            comment={child}
-            isReply={true}
-            viewMoreReplies={() => {
-              this.viewMoreReplies(comment)
-            }}
+          <CommentReplies
+            key={`comment-replies-${comment.id}`}
+            comment={comment}
+            commentEntryForm={this.renderCommentEntryForm}
+            replying={uiStore.replyingToCommentId === comment.id}
           />
         )
-      })
-      if (uiStore.replyingToCommentId === comment.id) {
-        commentsList.push(this.renderCommentEntryForm())
       }
     })
     return commentsList
   }
 
-  renderCommentEntryForm() {
+  renderCommentEntryForm = () => {
     const { thread } = this.props
     return (
       <CommentEntryForm
@@ -122,6 +81,7 @@ class CommentThread extends React.Component {
             {thread.hasMore && <CommentThreadLoader thread={thread} />}
             {this.renderComments()}
           </StyledCommentsWrapper>
+          {/* render the top level entry form */}
           {!uiStore.replyingToCommentId && this.renderCommentEntryForm()}
         </div>
       </div>

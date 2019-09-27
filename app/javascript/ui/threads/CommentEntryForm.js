@@ -11,11 +11,9 @@ import styled from 'styled-components'
 import v from '~/utils/variables.js'
 
 const StyledCommentInputWrapper = styled.div`
-  ${props =>
-    props.replying &&
-    `
-    border-left: 8px solid ${v.colors.secondaryDarkest};
-  `};
+  background: ${v.colors.secondaryMedium};
+  font-family: ${v.fonts.sans};
+  padding: 10px;
 `
 StyledCommentInputWrapper.displayName = 'StyledCommentInputWrapper'
 
@@ -74,7 +72,8 @@ class CommentEntryForm extends React.Component {
 
     if (!newEditorHeight) return
 
-    if (this.editorHeight !== newEditorHeight) {
+    // only call if this.editorHeight was going from an existing value to some new value
+    if (this.editorHeight && this.editorHeight !== newEditorHeight) {
       this.props.onHeightChange()
     }
 
@@ -128,15 +127,9 @@ class CommentEntryForm extends React.Component {
   }
 
   render() {
-    const { uiStore } = this.props
-    const { replyingToCommentId } = uiStore
-
     return (
       <CommentForm onSubmit={this.handleSubmit}>
-        <StyledCommentInputWrapper
-          className="textarea-input"
-          replying={!!replyingToCommentId}
-        >
+        <StyledCommentInputWrapper>
           <CommentInput
             editorState={this.state.editorState}
             onChange={this.handleInputChange}

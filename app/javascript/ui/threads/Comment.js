@@ -30,9 +30,16 @@ const StyledComment = styled(StyledCommentInput)`
   ${showOnHoverCss};
   ${hideOnHoverCss};
   padding: 10px;
-  margin-bottom: 5px;
-  border-left: ${props =>
-    props.isReply ? `8px solid ${v.colors.secondaryDarkest}` : `none`};
+  ${props =>
+    props.isReply &&
+    `
+    border-bottom: 1px solid ${v.colors.secondaryDark};
+  `}
+  ${props =>
+    !props.isReply &&
+    `
+    border-bottom: 5px solid ${v.colors.secondaryDark};
+  `}
   background: ${props =>
     props.unread ? v.colors.secondaryLight : v.colors.secondaryMedium};
   transition: background 1s 0.5s ease;
@@ -144,8 +151,25 @@ class Comment extends React.Component {
     return !isEmpty(toJS(this.props.comment.draftjs_data))
   }
 
+  // will return itself if it is a parent comment
+  get parentComment() {
+    const { apiStore, comment, isReply } = this.props
+    if (isReply) {
+      // when clicking a reply, you are replying to the parent
+      return apiStore.find('comments', comment.parent_id)
+    } else {
+      return comment
+    }
+  }
+
+  viewMoreReplies = () => {
+    const { parentComment } = this
+    // only fetch more on click if we haven't loaded the first page
+    if (parentComment.replyPage) return
+    parentComment.API_fetchReplies()
+  }
+
   handleClick = e => {
-    const { viewMoreReplies, isReply, comment } = this.props
     const { editing } = this.state
     // filters out other click handlers nested inside the body
     if (
@@ -156,16 +180,14 @@ class Comment extends React.Component {
     ) {
       return
     }
-    if (!isReply) {
-      this.toggleReply()
-    }
-    viewMoreReplies(comment)
+    this.toggleReply()
+    this.viewMoreReplies()
   }
 
   toggleReply = () => {
-    const { comment, uiStore } = this.props
+    const { uiStore } = this.props
     const { replyingToCommentId } = uiStore
-    const { id } = comment
+    const { id } = this.parentComment
     if (replyingToCommentId === id) {
       uiStore.setReplyingToComment(null)
     } else {
@@ -308,7 +330,7 @@ class Comment extends React.Component {
     // NOTE: not sure if this is a solution for delete returning undefined author
     if (!author) return null
     const isCurrentUserComment = apiStore.currentUserId === author.id
-
+    const hideTimestampOnHover = isCurrentUserComment || !isReply
     return (
       <StyledComment
         unread={unread}
@@ -330,13 +352,13 @@ class Comment extends React.Component {
               <React.Fragment>
                 <Timestamp
                   className={`timestamp ${
-                    isCurrentUserComment ? 'hide-on-hover' : ''
+                    hideTimestampOnHover ? 'hide-on-hover' : ''
                   }`}
                 >
                   <Moment date={created_at} />
                 </Timestamp>
                 <StyledCommentActions className="show-on-hover">
-                  {persisted && isCurrentUserComment && (
+                  {persisted && (
                     <React.Fragment>
                       {!isReply && (
                         <Tooltip placement="top" title="reply to comment">
@@ -348,23 +370,27 @@ class Comment extends React.Component {
                           </ActionButton>
                         </Tooltip>
                       )}
-                      <Tooltip placement="top" title="edit comment">
-                        <ActionButton
-                          onClick={this.handleEditClick}
-                          className="test-edit-comment"
-                        >
-                          <EditPencilIcon />
-                        </ActionButton>
-                      </Tooltip>
-                      {comment.replies.length < 1 && (
-                        <Tooltip placement="top" title="delete comment">
-                          <ActionButton
-                            onClick={this.handleDeleteClick}
-                            className="test-delete-comment"
-                          >
-                            <TrashIconLg />
-                          </ActionButton>
-                        </Tooltip>
+                      {isCurrentUserComment && (
+                        <React.Fragment>
+                          <Tooltip placement="top" title="edit comment">
+                            <ActionButton
+                              onClick={this.handleEditClick}
+                              className="test-edit-comment"
+                            >
+                              <EditPencilIcon />
+                            </ActionButton>
+                          </Tooltip>
+                          {comment.replies.length < 1 && (
+                            <Tooltip placement="top" title="delete comment">
+                              <ActionButton
+                                onClick={this.handleDeleteClick}
+                                className="test-delete-comment"
+                              >
+                                <TrashIconLg />
+                              </ActionButton>
+                            </Tooltip>
+                          )}
+                        </React.Fragment>
                       )}
                     </React.Fragment>
                   )}
@@ -389,13 +415,11 @@ class Comment extends React.Component {
 
 Comment.defaultProps = {
   isReply: false,
-  viewMoreReplies: null,
 }
 
 Comment.propTypes = {
   comment: MobxPropTypes.objectOrObservableObject.isRequired,
   isReply: PropTypes.bool,
-  viewMoreReplies: PropTypes.func,
 }
 
 Comment.wrappedComponent.propTypes = {
