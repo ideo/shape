@@ -5,6 +5,7 @@ import styled from 'styled-components'
 
 import v from '~/utils/variables'
 import Comment from '~/ui/threads/Comment'
+import { Element as ScrollElement } from 'react-scroll'
 
 const ViewMore = styled.div`
   cursor: pointer;
@@ -52,6 +53,9 @@ class CommentReplies extends React.Component {
         />
       )
     })
+
+    commentsList.push(<ScrollElement name={`${comment.id}-replies-bottom`} />)
+
     if (replying) {
       // render the reply level entry form
       commentsList.push(commentEntryForm())

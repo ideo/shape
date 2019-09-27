@@ -24,6 +24,8 @@ import CommentInput from './CommentInput'
 import * as linkify from 'linkifyjs'
 import Linkify from 'linkifyjs/react'
 import mention from 'linkifyjs/plugins/mention'
+import { scroller } from 'react-scroll'
+
 mention(linkify)
 
 const StyledComment = styled(StyledCommentInput)`
@@ -191,6 +193,10 @@ class Comment extends React.Component {
     if (replyingToCommentId === id) {
       uiStore.setReplyingToComment(null)
     } else {
+      scroller.scrollTo(`${id}-replies-bottom`, {
+        ...v.commentScrollOpts,
+        offset: -240,
+      })
       uiStore.setReplyingToComment(id)
     }
   }

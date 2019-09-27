@@ -225,4 +225,11 @@ export default {
     gridW: 253,
     gridH: 200,
   },
+
+  commentScrollOpts: {
+    containerId: 'ctc-content',
+    delay: 0,
+    duration: 350,
+    smooth: true,
+  },
 }

@@ -16,6 +16,7 @@ import { SmallActionText } from '~/ui/global/styled/typography'
 import { ShowMoreButton } from '~/ui/global/styled/forms'
 import CommentThread from '~/ui/threads/CommentThread'
 import CommentThreadHeader from '~/ui/threads/CommentThreadHeader'
+import v from '~/utils/variables'
 
 function pluralTypeName(name) {
   return pluralize(name).toLowerCase()
@@ -48,13 +49,6 @@ class CommentThreadContainer extends React.Component {
   bottomOfExpandedThread = false
   @observable
   loadingThreads = false
-
-  scrollOpts = {
-    containerId: 'ctc-content',
-    delay: 0,
-    duration: 350,
-    smooth: true,
-  }
 
   constructor(props) {
     super(props)
@@ -109,7 +103,7 @@ class CommentThreadContainer extends React.Component {
   }
 
   get containerDiv() {
-    return document.getElementById(this.scrollOpts.containerId)
+    return document.getElementById(v.commentScrollOpts.containerId)
   }
 
   get expandedThread() {
@@ -157,18 +151,18 @@ class CommentThreadContainer extends React.Component {
   scrollToTopOfThread = thread => {
     const idx = this.threads.indexOf(thread)
     scroller.scrollTo(`thread-${idx}`, {
-      ...this.scrollOpts,
+      ...v.commentScrollOpts,
       delay: 0,
     })
   }
 
   scrollToTop = () => {
-    scroller.scrollTo('top', { ...this.scrollOpts, duration: 0 })
+    scroller.scrollTo('top', { ...v.commentScrollOpts, duration: 0 })
   }
 
   scrollToTopOfNextThread = (
     thread,
-    { duration = this.scrollOpts.duration } = {}
+    { duration = v.commentScrollOpts.duration } = {}
   ) => {
     const idx = this.threads.indexOf(thread)
     const nextIdx = idx + 1
@@ -178,7 +172,7 @@ class CommentThreadContainer extends React.Component {
       // may have switched pages at some point e.g. on load of ?open=xxx
       if (this.props.uiStore.activityLogPage !== 'comments') return
       scroller.scrollTo(`thread-${nextIdx}`, {
-        ...this.scrollOpts,
+        ...v.commentScrollOpts,
         duration,
         offset: -1 * this.contentHeight(),
       })
@@ -187,7 +181,7 @@ class CommentThreadContainer extends React.Component {
 
   scrollToBottom = () => {
     scroller.scrollTo('bottom', {
-      ...this.scrollOpts,
+      ...v.commentScrollOpts,
       delay: 0,
     })
   }
@@ -313,7 +307,7 @@ class CommentThreadContainer extends React.Component {
         </div>
         <ActivityContainer
           moving={uiStore.activityLogMoving}
-          id={this.scrollOpts.containerId}
+          id={v.commentScrollOpts.containerId}
         >
           <ScrollElement name="top" />
           {this.loadingThreads && <InlineLoader fixed background="none" />}
