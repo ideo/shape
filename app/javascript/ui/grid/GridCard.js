@@ -27,8 +27,7 @@ import SelectionCircle from '~/ui/grid/SelectionCircle'
 import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
 import Tooltip from '~/ui/global/Tooltip'
 import { routingStore, uiStore } from '~/stores'
-import v, { ITEM_TYPES, EVENT_SOURCE_TYPES } from '~/utils/variables'
-import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
+import v, { ITEM_TYPES } from '~/utils/variables'
 import ReplaceCardButton from '~/ui/grid/ReplaceCardButton'
 import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
 import {
@@ -37,6 +36,7 @@ import {
   StyledGridCardInner,
   StyledTopRightActions,
 } from './shared'
+import TextActionMenu from '~/ui/grid/TextActionMenu'
 
 @observer
 class GridCard extends React.Component {
@@ -233,6 +233,7 @@ class GridCard extends React.Component {
             <SelectionCircle cardId={card.id} />
           </CardActionHolder>
         )}
+        <TextActionMenu card={card} />
         <ActionMenu
           location={this.location}
           className="show-on-hover"
@@ -244,7 +245,7 @@ class GridCard extends React.Component {
           direction={uiStore.cardMenuOpen.direction}
           offsetPosition={this.offsetPosition}
           menuOpen={menuOpen}
-          onOpen={this.openMenu}
+          onOpen={this.openActionMenu}
           onLeave={this.closeMenu}
           testCollectionCard={testCollectionCard}
           menuItemsCount={this.getMenuItemsCount}
@@ -277,28 +278,14 @@ class GridCard extends React.Component {
     this.menuItemCount = count
   }
 
-  openMenu = (ev, { x = 0, y = 0 } = {}) => {
-    const { menuItemCount, props } = this
-    const { card } = props
+  openActionMenu = ev => {
+    const { menuItemCount } = this
+    const { card } = this.props
 
-    // use util method to dynamically move the component on open
-    const positionOffset = calculatePopoutMenuOffset(
-      ev,
-      EVENT_SOURCE_TYPES.GRID_CARD,
-      menuItemCount
-    )
-    const { offsetX, offsetY } = positionOffset
-
-    if (this.props.menuOpen) {
-      uiStore.closeCardMenu()
-    } else {
-      uiStore.openCardMenu(card.id, {
-        x,
-        y,
-        offsetX,
-        offsetY,
-      })
-    }
+    uiStore.openContextMenu(ev, {
+      card,
+      menuItemCount,
+    })
   }
 
   openContextMenu = ev => {
@@ -312,7 +299,10 @@ class GridCard extends React.Component {
 
     // this is responsible for making fixed: false
 
-    this.openMenu(ev, { x, y })
+    const { menuItemCount, props } = this
+    const { card } = props
+
+    uiStore.openContextMenu(ev, { x, y, card, menuItemCount })
     return false
   }
 

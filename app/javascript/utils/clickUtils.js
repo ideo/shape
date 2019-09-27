@@ -28,6 +28,7 @@ const calculatePopoutMenuOffset = (e, eventSource, popoutMenuItemCount = 1) => {
   let bottomOffset
 
   // todo: add orgMenu, etc. if necessary since offsets may differ per component
+  // TODO: move this responsibility for callin this from GridCard to the UiStore#openCardMenu
   switch (eventSource) {
     case EVENT_SOURCE_TYPES.AUDIENCE_SETTINGS:
       const topOffsetMaxValue = -230 // never exceed click position
@@ -50,6 +51,12 @@ const calculatePopoutMenuOffset = (e, eventSource, popoutMenuItemCount = 1) => {
       rightOffset = -INITIAL_OFFSET_X + 20
       topOffset = -totalHeight - INITIAL_OFFSET_Y
       bottomOffset = 0
+      break
+    case EVENT_SOURCE_TYPES.TEXT_EDITOR:
+      leftOffset = totalWidth - INITIAL_OFFSET_X - INITIAL_OFFSET_X
+      rightOffset = 20
+      topOffset = -totalHeight - INITIAL_OFFSET_Y
+      bottomOffset = -20
       break
     case EVENT_SOURCE_TYPES.GRID_CARD:
     default:

@@ -80,6 +80,7 @@ export const EVENT_SOURCE_TYPES = {
   AUDIENCE_SETTINGS: 'audienceSettings',
   PAGE_MENU: 'pageMenu',
   BCT_MENU: 'bctMenu',
+  TEXT_EDITOR: 'textEditor',
 }
 
 // warning: don't change, modify component based offsets instead. see: clickUtils::calculatePopoutMenuOffset

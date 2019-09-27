@@ -181,10 +181,12 @@ class TextItemCover extends React.Component {
 
   renderEditing() {
     const { item } = this.state
-    const { initialFontTag } = this.props
+    const { initialFontTag, cardId } = this.props
     if (!item) return ''
+
     return (
       <RealtimeTextItem
+        cardId={cardId}
         item={item}
         currentUserId={apiStore.currentUser.id}
         onExpand={item.id ? this.expand : null}
@@ -197,7 +199,7 @@ class TextItemCover extends React.Component {
   }
 
   renderDefault() {
-    const { item } = this.props
+    const { item, cardId } = this.props
     const textData = item.toJSON().data_content
     const quillProps = {
       // ref is used to get the height of the div in checkTextAreaHeight
@@ -205,8 +207,9 @@ class TextItemCover extends React.Component {
         this.quillEditor = c
       },
       readOnly: true,
-      onChangeSelection: (range, selection, editor) =>
-        console.log(range, selection, editor),
+      onChangeSelection: (range, selection, editor) => {
+        uiStore.selectTextRangeForCard({ range, id: cardId })
+      },
       theme: null,
     }
 
