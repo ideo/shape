@@ -9,6 +9,7 @@ import CommentEntryForm from '~/ui/threads/CommentEntryForm'
 import CommentThreadLoader from '~/ui/threads/CommentThreadLoader'
 import CommentThreadHeader from '~/ui/threads/CommentThreadHeader'
 import CommentReplies from '~/ui/threads/CommentReplies'
+import { Element as ScrollElement } from 'react-scroll'
 
 const StyledCommentsWrapper = styled.div`
   margin-top: 5px;
@@ -40,8 +41,13 @@ class CommentThread extends React.Component {
     if (!this.comments || this.comments.length <= 0) return []
     const commentsList = []
     _.each(this.comments, (comment, i) => {
+      const expanded = uiStore.replyingToCommentId === comment.id
       commentsList.push(
-        <Comment key={comment.id || `comment-new-${i}`} comment={comment} />
+        <Comment
+          key={comment.id || `comment-new-${i}`}
+          comment={comment}
+          expanded={expanded}
+        />
       )
       if (comment.id) {
         commentsList.push(
@@ -53,9 +59,16 @@ class CommentThread extends React.Component {
       }
 
       // render the reply level entry form when replying
-      if (uiStore.replyingToCommentId === comment.id) {
+      if (expanded) {
         commentsList.push(this.renderCommentEntryForm())
       }
+
+      commentsList.push(
+        <ScrollElement
+          key={`${comment.id}-replies-bottom`}
+          name={`${comment.id}-replies-bottom`}
+        />
+      )
     })
     return commentsList
   }
