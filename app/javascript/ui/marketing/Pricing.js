@@ -151,7 +151,7 @@ PriceCard.propTypes = {
   title: PropTypes.string.isRequired,
   price: PropTypes.number,
   price_unit: PropTypes.string.isRequired,
-  button: PropTypes.shapeOf({
+  button: PropTypes.shape({
     link: PropTypes.string,
   }).isRequired,
   description: PropTypes.string.isRequired,
