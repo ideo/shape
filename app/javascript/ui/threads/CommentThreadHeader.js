@@ -22,14 +22,6 @@ export const threadTitleCss = css`
   display: block;
   width: 100%;
   background-color: ${v.colors.secondaryDark};
-  background: linear-gradient(
-    ${v.colors.secondaryDark} 0,
-    ${v.colors.secondaryDark} 80%,
-    ${hexToRgba(v.colors.secondaryDark, 0)} 100%
-  );
-  &:hover {
-    background: ${v.colors.secondaryDark};
-  }
   padding: 5px 10px;
   text-align: left;
   font-family: ${v.fonts.sans};
@@ -39,9 +31,17 @@ export const threadTitleCss = css`
 
 const StyledHeaderWrapper = styled.div`
   ${threadTitleCss};
+  background: linear-gradient(
+    ${v.colors.secondaryDark} 0,
+    ${v.colors.secondaryDark} 80%,
+    ${hexToRgba(v.colors.secondaryDark, 0)} 100%
+  );
 `
 const StyledHeaderButton = styled.button`
   ${threadTitleCss};
+  &:hover {
+    background: ${v.colors.secondaryMedium};
+  }
 `
 
 const StyledLink = styled(Link)`
