@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
@@ -21,6 +20,8 @@ ViewMore.displayName = 'ViewMore'
 
 const StyledCommentReplies = styled.div`
   border-left: 8px solid ${v.colors.secondaryDarkest};
+  margin-top: -4px;
+  margin-bottom: 4px;
 `
 StyledCommentReplies.displayName = 'StyledCommentReplies'
 
@@ -31,7 +32,7 @@ class CommentReplies extends React.Component {
   }
 
   render() {
-    const { comment, replying, commentEntryForm } = this.props
+    const { comment } = this.props
     const commentsList = []
     // total replies count minus observable replies length
     const repliesLength =
@@ -53,22 +54,13 @@ class CommentReplies extends React.Component {
         />
       )
     })
-
     commentsList.push(<ScrollElement name={`${comment.id}-replies-bottom`} />)
-
-    if (replying) {
-      // render the reply level entry form
-      commentsList.push(commentEntryForm())
-    }
-
     return <StyledCommentReplies>{commentsList}</StyledCommentReplies>
   }
 }
 
 CommentReplies.propTypes = {
   comment: MobxPropTypes.objectOrObservableObject.isRequired,
-  replying: PropTypes.bool.isRequired,
-  commentEntryForm: PropTypes.func.isRequired,
 }
 
 export default CommentReplies

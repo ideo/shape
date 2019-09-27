@@ -48,10 +48,13 @@ class CommentThread extends React.Component {
           <CommentReplies
             key={`comment-replies-${comment.id}`}
             comment={comment}
-            commentEntryForm={this.renderCommentEntryForm}
-            replying={uiStore.replyingToCommentId === comment.id}
           />
         )
+      }
+
+      // render the reply level entry form when replying
+      if (uiStore.replyingToCommentId === comment.id) {
+        commentsList.push(this.renderCommentEntryForm())
       }
     })
     return commentsList
