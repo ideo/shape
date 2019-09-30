@@ -300,7 +300,6 @@ class RolesMenu extends React.Component {
   render() {
     const {
       record,
-      addCallout,
       canEdit,
       ownerType,
       title,
@@ -339,7 +338,6 @@ class RolesMenu extends React.Component {
             </Row>
             <FooterArea>
               <RolesAdd
-                title={addCallout}
                 roleTypes={addRoleTypes}
                 roleLabels={submissionBox ? { viewer: 'participant' } : {}}
                 onCreateRoles={this.createRoles}
@@ -363,7 +361,6 @@ RolesMenu.propTypes = {
   ownerType: PropTypes.string.isRequired,
   fixedRole: PropTypes.string,
   title: PropTypes.string,
-  addCallout: PropTypes.string,
   submissionBox: PropTypes.bool,
 }
 RolesMenu.wrappedComponent.propTypes = {
@@ -374,7 +371,6 @@ RolesMenu.defaultProps = {
   canEdit: false,
   fixedRole: null,
   title: 'Shared with',
-  addCallout: 'Add groups or people:',
   submissionBox: false,
 }
 
