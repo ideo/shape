@@ -50,6 +50,7 @@ const JumpButton = styled.button`
     }
   }
 `
+JumpButton.displayName = 'JumpButton'
 
 @inject('apiStore', 'uiStore')
 @observer

@@ -3,11 +3,11 @@
   "properties": {
     "message": { "type": "string" },
     "comment_thread_id": { "type": "integer" },
-    "author_id": { "type": "integer" },
+    "author_id": { "type": "string" },
     "draftjs_data": { "type": ["object", "null"] },
     "created_at": { "type": "date" },
     "updated_at": { "type": "date" },
-    "parent_id": { "type": ["integer", "null"] },
+    "parent_id": { "type": ["string", "null"] },
     "replies_count": {"type": ["integer", "null"]}
   },
   "required": ["message", "updated_at"]

@@ -31,6 +31,7 @@ class CommentThread extends React.Component {
           <CommentReplies
             key={`comment-replies-${comment.id}`}
             comment={comment}
+            expanded={expanded}
           />
         )
       }

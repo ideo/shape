@@ -6,6 +6,7 @@ import { apiUrl } from '~/utils/url'
 
 import BaseRecord from './BaseRecord'
 import { apiStore, uiStore } from '~/stores'
+import v from '~/utils/variables'
 
 class Comment extends BaseRecord {
   static type = 'comments'
@@ -24,10 +25,6 @@ class Comment extends BaseRecord {
       // import the first 3 that get included by the serializer
       this.importReplies(this.children)
     })
-  }
-
-  get parentComment() {
-    // ....
   }
 
   @computed
@@ -99,20 +96,31 @@ class Comment extends BaseRecord {
   }
 
   async API_fetchReplies() {
-    const { thread } = this
-    // async mark the thread as viewed any time you fetch replies
-    thread.API_markViewed()
+    const { uiStore, thread } = this
+    // make sure this comment is expanded
+    uiStore.setReplyingToComment(this.id)
     // don't fetch any replies unless you need to
-    if (this.replies_count <= this.replies.length) return
-    const replyPage = this.replyPage ? this.replyPage + 1 : 1
-    const apiPath = `comments/${this.id}/replies?page=${replyPage}`
-    const res = await this.apiStore.request(apiPath)
-    const { data } = res
-    runInAction(() => {
-      if (data.length > 0) {
-        this.importReplies(data)
-        this.replyPage = replyPage
-      }
+    if (this.replies_count > this.replies.length) {
+      const replyPage = this.replyPage ? this.replyPage + 1 : 1
+      const apiPath = `comments/${this.id}/replies?page=${replyPage}`
+      const res = await this.apiStore.request(apiPath)
+      const { data } = res
+      runInAction(() => {
+        if (data.length > 0) {
+          this.importReplies(data)
+          this.replyPage = replyPage
+        }
+      })
+    }
+    // mark the thread as viewed any time you fetch replies
+    // NOTE: this await helps give a buffer for the scroll to happen after render of replies
+    await thread.API_markViewed()
+    // now scroll to the bottom of replies...
+    uiStore.scroller.scrollTo(`${this.id}-replies-bottom`, {
+      ...v.commentScrollOpts,
+      offset:
+        -1 *
+        document.getElementById(v.commentScrollOpts.containerId).clientHeight,
     })
   }
 }
