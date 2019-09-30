@@ -39,10 +39,16 @@ const GoIconContainer = styled.button`
 
 const JumpButton = styled.button`
   left: 100px;
+  top: 12px;
   min-height: 20px;
   position: relative;
   text-align: center;
   width: calc(100% - 140px);
+  &:hover {
+    span {
+      color: ${v.colors.commonMedium};
+    }
+  }
 `
 
 @inject('apiStore', 'uiStore')
@@ -330,7 +336,11 @@ class CommentThreadContainer extends React.Component {
           {this.renderExpandedThread()}
           <div id="ctc-older-threads">
             {apiStore.hasOlderThreads && !this.expandedThread && (
-              <ShowMoreButton darkBg onClick={this.loadMorePages}>
+              <ShowMoreButton
+                darkBg
+                onClick={this.loadMorePages}
+                style={{ marginTop: '20px' }}
+              >
                 Load older threads...
               </ShowMoreButton>
             )}
