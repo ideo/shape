@@ -4,6 +4,9 @@ import PropTypes from 'prop-types'
 import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import { EditorState, convertFromRaw, convertToRaw } from 'draft-js'
 import styled from 'styled-components'
+import * as linkify from 'linkifyjs'
+import Linkify from 'linkifyjs/react'
+import mention from 'linkifyjs/plugins/mention'
 
 import v from '~/utils/variables'
 import { DisplayText } from '~/ui/global/styled/typography'
@@ -21,10 +24,6 @@ import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
 import XIcon from '~/ui/icons/XIcon'
 import Tooltip from '~/ui/global/Tooltip'
 import CommentInput from './CommentInput'
-import * as linkify from 'linkifyjs'
-import Linkify from 'linkifyjs/react'
-import mention from 'linkifyjs/plugins/mention'
-import { scroller } from 'react-scroll'
 
 mention(linkify)
 
@@ -136,12 +135,6 @@ class Comment extends React.Component {
     document.addEventListener('keydown', this.handleEscape, false)
   }
 
-  componentDidUpdate(prevProps) {
-    if (!this.props.expanded && prevProps.expanded) {
-      this.collapseReplies()
-    }
-  }
-
   componentWillUnmount() {
     this.editor = null
     document.removeEventListener('keydown', this.handleEscape, false)
@@ -159,6 +152,13 @@ class Comment extends React.Component {
     return !isEmpty(toJS(this.props.comment.draftjs_data))
   }
 
+  get isActive() {
+    const { uiStore } = this.props
+    const { replyingToCommentId } = uiStore
+    const { id } = this.parentComment
+    return replyingToCommentId === id
+  }
+
   // will return itself if it is a parent comment
   get parentComment() {
     const { apiStore, comment, isReply } = this.props
@@ -172,9 +172,8 @@ class Comment extends React.Component {
 
   expandReplies = () => {
     const { parentComment } = this
-    // only fetch more on click if we haven't loaded the first page
-    if (parentComment.replyPage) return
-    parentComment.API_fetchReplies()
+    // this will have the side effect of setting uiStore.replyingToCommentId
+    return parentComment.API_fetchReplies()
   }
 
   collapseReplies = () => {
@@ -186,7 +185,8 @@ class Comment extends React.Component {
   }
 
   handleClick = e => {
-    const { isReply, comment, uiStore } = this.props
+    const { parentComment } = this
+    const { uiStore } = this.props
     const { editing } = this.state
     // filters out other click handlers nested inside the body
     if (
@@ -198,9 +198,9 @@ class Comment extends React.Component {
       return
     }
     // we clicked some parent comment outside of our current comment/replies
-    if (!isReply && uiStore.replyingToCommentId !== comment.id) {
+    if (!this.isActive) {
       uiStore.setReplyingToComment(null)
-      if (isEmpty(comment.replies)) {
+      if (isEmpty(parentComment.replies)) {
         return
       }
     }
@@ -210,24 +210,10 @@ class Comment extends React.Component {
 
   toggleReply = () => {
     const { uiStore } = this.props
-    const { replyingToCommentId } = uiStore
-    const { id } = this.parentComment
-    if (replyingToCommentId === id) {
-      this.collapseReplies()
+    if (this.isActive) {
       uiStore.setReplyingToComment(null)
     } else {
       this.expandReplies()
-      // used to wait for other replies to collapse
-      setTimeout(() => {
-        scroller.scrollTo(`${id}-replies-bottom`, {
-          ...v.commentScrollOpts,
-          offset:
-            -1 *
-            document.getElementById(v.commentScrollOpts.containerId)
-              .clientHeight,
-        })
-      }, 100)
-      uiStore.setReplyingToComment(id)
     }
   }
 

@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { animateScroll } from 'react-scroll'
+import { scroller, animateScroll } from 'react-scroll'
 import { observable, action, runInAction, computed } from 'mobx'
 
 import routeToLogin from '~/utils/routeToLogin'
@@ -10,6 +10,7 @@ import { POPUP_ACTION_TYPES, ACTION_SOURCES } from '~/enums/actionEnums'
 export default class UiStore {
   // store this for usage by other components
   scroll = animateScroll
+  scroller = scroller
   defaultBCTState = {
     order: null,
     width: null,

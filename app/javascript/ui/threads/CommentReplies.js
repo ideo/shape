@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
@@ -30,12 +31,23 @@ class CommentReplies extends React.Component {
     this.props.comment.API_fetchReplies()
   }
 
+  get replies() {
+    const { comment, expanded } = this.props
+    if (expanded) {
+      return comment.replies
+    } else {
+      return comment.replies.slice(-3)
+    }
+  }
+
   render() {
-    const { comment } = this.props
+    const { comment, expanded } = this.props
+    const { replies } = this
     const commentsList = []
     // total replies count minus observable replies length
-    const repliesLength =
-      comment.replies && comment.replies.length ? comment.replies.length : 0
+    const repliesLength = expanded
+      ? comment.replies.length
+      : this.replies.length
     const hiddenRepliesCount = comment.replies_count - repliesLength
     if (hiddenRepliesCount > 0) {
       commentsList.push(
@@ -44,7 +56,7 @@ class CommentReplies extends React.Component {
         </ViewMore>
       )
     }
-    _.each(comment.replies, (child, i) => {
+    _.each(replies, (child, i) => {
       commentsList.push(
         <Comment
           key={`reply-${child.id}` || `reply-new-${i}`}
@@ -59,6 +71,7 @@ class CommentReplies extends React.Component {
 
 CommentReplies.propTypes = {
   comment: MobxPropTypes.objectOrObservableObject.isRequired,
+  expanded: PropTypes.bool.isRequired,
 }
 
 export default CommentReplies

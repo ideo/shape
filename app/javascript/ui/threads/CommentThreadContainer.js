@@ -38,6 +38,8 @@ const JumpButton = styled.button`
   width: calc(100% - 140px);
 `
 
+JumpButton.displayName = 'JumpButton'
+
 const CommentThreadDrawer = styled.div``
 
 @inject('apiStore', 'uiStore')
