@@ -122,6 +122,7 @@ class CommentThread extends BaseRecord {
   }
 
   API_markViewed() {
+    if (!this.persisted) return false
     const apiPath = `comment_threads/${this.id}/view`
     // this.comments.forEach(comment => comment.markAsRead())
     if (this.users_thread) {

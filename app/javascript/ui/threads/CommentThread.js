@@ -1,8 +1,6 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import styled from 'styled-components'
 
 import Comment from '~/ui/threads/Comment'
 import CommentEntryForm from '~/ui/threads/CommentEntryForm'
@@ -11,36 +9,15 @@ import CommentThreadHeader from '~/ui/threads/CommentThreadHeader'
 import CommentReplies from '~/ui/threads/CommentReplies'
 import { Element as ScrollElement } from 'react-scroll'
 
-const StyledCommentsWrapper = styled.div`
-  margin-top: 5px;
-`
-StyledCommentsWrapper.displayName = 'StyledCommentsWrapper'
-
 @inject('uiStore')
 @observer
 class CommentThread extends React.Component {
-  @observable
-  comments = []
-
-  componentDidMount() {
-    const { thread } = this.props
-    const { comments } = thread
-    // TODO: where should we place this logic now that replies are a thing
-    // for un-expanded thread, only take the unread comments
-    // if (!expanded) {
-    // comments = thread.latestUnreadComments
-    // return []
-    // }
-    runInAction(() => {
-      this.comments = comments
-    })
-  }
-
   renderComments = () => {
-    const { uiStore } = this.props
-    if (!this.comments || this.comments.length <= 0) return []
+    const { thread, uiStore } = this.props
+    const { comments } = thread
+    if (!comments || comments.length <= 0) return []
     const commentsList = []
-    _.each(this.comments, (comment, i) => {
+    _.each(comments, (comment, i) => {
       const expanded = uiStore.replyingToCommentId === comment.id
       commentsList.push(
         <Comment
@@ -91,15 +68,12 @@ class CommentThread extends React.Component {
     return (
       <div>
         <CommentThreadHeader thread={thread} sticky />
-        {/* TODO: this `0 10px` is because we moved that out of the overall ActivityContainer */}
-        <div style={{ padding: '0 10px' }}>
-          <StyledCommentsWrapper className="comments">
-            {thread.hasMore && <CommentThreadLoader thread={thread} />}
-            {this.renderComments()}
-          </StyledCommentsWrapper>
-          {/* render the top level entry form */}
-          {!uiStore.replyingToCommentId && this.renderCommentEntryForm()}
+        <div className="comments">
+          {thread.hasMore && <CommentThreadLoader thread={thread} />}
+          {this.renderComments()}
         </div>
+        {/* render the top level entry form */}
+        {!uiStore.replyingToCommentId && this.renderCommentEntryForm()}
       </div>
     )
   }
