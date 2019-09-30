@@ -421,7 +421,7 @@ class User < ApplicationRecord
       return current_organization.groups.not_global
     end
 
-    groups = Group.where(id: all_current_org_group_ids).to_a
+    groups = Group.where(id: all_current_org_group_ids).not_global.to_a
     return [] if groups.blank?
 
     organization = current_organization
