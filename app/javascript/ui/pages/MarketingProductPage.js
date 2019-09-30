@@ -89,36 +89,43 @@ class MarketingProductPage extends React.Component {
     const { content, footer } = this.state
     if (!content) return <div />
     const { hero } = content
-    console.log('sdfjk', content)
+
     return (
       <Fragment>
         <MarketingBack>
           <MarketingMenu location={location} />
-          <MarketingFlex column align="center" justify="center" wrap w={1}>
-            <Box w={590} mt={34} pr={[3, 0, 0]} pl={[3, 0, 0]}>
-              <MarketingH1Bold>{hero && hero.title}</MarketingH1Bold>
-            </Box>
-            <Box w={[1, 0.6, 590]} mt={44} pr={[3, 0, 0]} pl={[3, 0, 0]}>
-              <Subtitle>{hero && hero.subTitle}</Subtitle>
-            </Box>
-          </MarketingFlex>
-          {this.renderVideoPlayer}
-          <MarketingFlex align="center" justify="center" wrap w={1}>
-            <Box w={1} justify="center">
-              <ScrollElement name="ContentAnchor" />
-              {this.sortedBlocks.map((block, i) => (
-                <ContentBlock
-                  order={i + 1}
-                  title={block.title}
-                  content={block.content}
-                  imageUrl={block.imageUrl}
-                />
-              ))}
-              {content.pricing && (
-                <Pricing pageName="open-innovation" {...content.pricing} />
-              )}
-            </Box>
-          </MarketingFlex>
+          {this.page === 'pricing' && content.blocks && (
+            <Pricing pageName={this.page} {...content.blocks[0]} />
+          )}
+          {this.page !== 'pricing' && (
+            <Fragment>
+              <MarketingFlex column align="center" justify="center" wrap w={1}>
+                <Box w={590} mt={34} pr={[3, 0, 0]} pl={[3, 0, 0]}>
+                  <MarketingH1Bold>{hero && hero.title}</MarketingH1Bold>
+                </Box>
+                <Box w={[1, 0.6, 590]} mt={44} pr={[3, 0, 0]} pl={[3, 0, 0]}>
+                  <Subtitle>{hero && hero.subTitle}</Subtitle>
+                </Box>
+              </MarketingFlex>
+              {this.renderVideoPlayer}
+              <MarketingFlex align="center" justify="center" wrap w={1}>
+                <Box w={1} justify="center">
+                  <ScrollElement name="ContentAnchor" />
+                  {this.sortedBlocks.map((block, i) => (
+                      <ContentBlock
+                        order={i + 1}
+                        title={block.title}
+                        content={block.content}
+                        imageUrl={block.imageUrl}
+                      />
+                  ))}
+                </Box>
+                {content.pricing && (
+                  <Pricing pageName={this.page} {...content.pricing} />
+                )}
+              </MarketingFlex>
+            </Fragment>
+          )}
         </MarketingBack>
         <PageFooter content={footer} />
       </Fragment>
