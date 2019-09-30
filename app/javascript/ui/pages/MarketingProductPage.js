@@ -112,12 +112,12 @@ class MarketingProductPage extends React.Component {
                 <Box w={1} justify="center">
                   <ScrollElement name="ContentAnchor" />
                   {this.sortedBlocks.map((block, i) => (
-                      <ContentBlock
-                        order={i + 1}
-                        title={block.title}
-                        content={block.content}
-                        imageUrl={block.imageUrl}
-                      />
+                    <ContentBlock
+                      order={i + 1}
+                      title={block.title}
+                      content={block.content}
+                      imageUrl={block.imageUrl}
+                    />
                   ))}
                 </Box>
                 {content.pricing && (
