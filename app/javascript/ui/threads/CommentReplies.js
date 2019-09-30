@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
@@ -20,17 +19,19 @@ ViewMore.displayName = 'ViewMore'
 
 const StyledCommentReplies = styled.div`
   border-left: 8px solid ${v.colors.secondaryDarkest};
+  margin-top: -4px;
+  margin-bottom: 4px;
 `
 StyledCommentReplies.displayName = 'StyledCommentReplies'
 
 @observer
 class CommentReplies extends React.Component {
-  viewMoreReplies = () => {
+  expandReplies = () => {
     this.props.comment.API_fetchReplies()
   }
 
   render() {
-    const { comment, replying, commentEntryForm } = this.props
+    const { comment } = this.props
     const commentsList = []
     // total replies count minus observable replies length
     const repliesLength =
@@ -38,7 +39,7 @@ class CommentReplies extends React.Component {
     const hiddenRepliesCount = comment.replies_count - repliesLength
     if (hiddenRepliesCount > 0) {
       commentsList.push(
-        <ViewMore key={'view-more-replies'} onClick={this.viewMoreReplies}>
+        <ViewMore key={'view-more-replies'} onClick={this.expandReplies}>
           View {hiddenRepliesCount} more
         </ViewMore>
       )
@@ -52,19 +53,12 @@ class CommentReplies extends React.Component {
         />
       )
     })
-    if (replying) {
-      // render the reply level entry form
-      commentsList.push(commentEntryForm())
-    }
-
     return <StyledCommentReplies>{commentsList}</StyledCommentReplies>
   }
 }
 
 CommentReplies.propTypes = {
   comment: MobxPropTypes.objectOrObservableObject.isRequired,
-  replying: PropTypes.bool.isRequired,
-  commentEntryForm: PropTypes.func.isRequired,
 }
 
 export default CommentReplies

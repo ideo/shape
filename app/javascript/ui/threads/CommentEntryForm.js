@@ -14,6 +14,12 @@ const StyledCommentInputWrapper = styled.div`
   background: ${v.colors.secondaryMedium};
   font-family: ${v.fonts.sans};
   padding: 10px;
+  ${props =>
+    props.replying &&
+    `
+      border-left: 8px solid ${v.colors.secondaryDarkest};
+      margin-top: -2px;
+    `};
 `
 StyledCommentInputWrapper.displayName = 'StyledCommentInputWrapper'
 
@@ -127,9 +133,10 @@ class CommentEntryForm extends React.Component {
   }
 
   render() {
+    const { uiStore } = this.props
     return (
       <CommentForm onSubmit={this.handleSubmit}>
-        <StyledCommentInputWrapper>
+        <StyledCommentInputWrapper replying={!!uiStore.replyingToCommentId}>
           <CommentInput
             editorState={this.state.editorState}
             onChange={this.handleInputChange}
@@ -145,10 +152,15 @@ class CommentEntryForm extends React.Component {
   }
 }
 
+CommentEntryForm.defaultProps = {
+  replying: false,
+}
+
 CommentEntryForm.propTypes = {
   afterSubmit: PropTypes.func.isRequired,
   onHeightChange: PropTypes.func.isRequired,
   thread: MobxPropTypes.objectOrObservableObject.isRequired,
+  replying: PropTypes.bool,
 }
 
 CommentEntryForm.wrappedComponent.propTypes = {

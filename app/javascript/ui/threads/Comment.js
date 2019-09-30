@@ -24,6 +24,8 @@ import CommentInput from './CommentInput'
 import * as linkify from 'linkifyjs'
 import Linkify from 'linkifyjs/react'
 import mention from 'linkifyjs/plugins/mention'
+import { scroller } from 'react-scroll'
+
 mention(linkify)
 
 const StyledComment = styled(StyledCommentInput)`
@@ -134,6 +136,12 @@ class Comment extends React.Component {
     document.addEventListener('keydown', this.handleEscape, false)
   }
 
+  componentDidUpdate(prevProps) {
+    if (!this.props.expanded && prevProps.expanded) {
+      this.collapseReplies()
+    }
+  }
+
   componentWillUnmount() {
     this.editor = null
     document.removeEventListener('keydown', this.handleEscape, false)
@@ -162,14 +170,23 @@ class Comment extends React.Component {
     }
   }
 
-  viewMoreReplies = () => {
+  expandReplies = () => {
     const { parentComment } = this
     // only fetch more on click if we haven't loaded the first page
     if (parentComment.replyPage) return
     parentComment.API_fetchReplies()
   }
 
+  collapseReplies = () => {
+    const { comment } = this.props
+    runInAction(() => {
+      comment.replies.replace(comment.replies.slice(-3))
+      comment.replyPage = null
+    })
+  }
+
   handleClick = e => {
+    const { isReply, comment, uiStore } = this.props
     const { editing } = this.state
     // filters out other click handlers nested inside the body
     if (
@@ -180,8 +197,15 @@ class Comment extends React.Component {
     ) {
       return
     }
+    // we clicked some parent comment outside of our current comment/replies
+    if (!isReply && uiStore.replyingToCommentId !== comment.id) {
+      uiStore.setReplyingToComment(null)
+      if (isEmpty(comment.replies)) {
+        return
+      }
+    }
+
     this.toggleReply()
-    this.viewMoreReplies()
   }
 
   toggleReply = () => {
@@ -189,16 +213,30 @@ class Comment extends React.Component {
     const { replyingToCommentId } = uiStore
     const { id } = this.parentComment
     if (replyingToCommentId === id) {
+      this.collapseReplies()
       uiStore.setReplyingToComment(null)
     } else {
+      this.expandReplies()
+      // used to wait for other replies to collapse
+      setTimeout(() => {
+        scroller.scrollTo(`${id}-replies-bottom`, {
+          ...v.commentScrollOpts,
+          offset:
+            -1 *
+            document.getElementById(v.commentScrollOpts.containerId)
+              .clientHeight,
+        })
+      }, 100)
       uiStore.setReplyingToComment(id)
     }
   }
 
   handleEditClick = () => {
-    const { uiStore } = this.props
+    const { uiStore, isReply } = this.props
     this.setState({ editing: true })
-    uiStore.setReplyingToComment(null)
+    if (!isReply) {
+      uiStore.setReplyingToComment(null)
+    }
     this.focusTextArea()
   }
 
@@ -415,11 +453,13 @@ class Comment extends React.Component {
 
 Comment.defaultProps = {
   isReply: false,
+  expanded: false,
 }
 
 Comment.propTypes = {
   comment: MobxPropTypes.objectOrObservableObject.isRequired,
   isReply: PropTypes.bool,
+  expanded: PropTypes.bool,
 }
 
 Comment.wrappedComponent.propTypes = {
