@@ -95,8 +95,8 @@ class User < ApplicationRecord
            source_type: 'Group'
   has_many :parent_groups,
            -> { distinct },
-            through: :groups,
-            source: :parent_groups
+           through: :groups,
+           source: :parent_groups
   has_many :current_org_groups,
            ->(u) { active.where(organization_id: u.current_organization_id) },
            through: :roles_for_groups,
@@ -104,8 +104,8 @@ class User < ApplicationRecord
            source_type: 'Group'
   has_many :current_org_parent_groups,
            -> { distinct },
-            through: :current_org_groups,
-            source: :parent_groups
+           through: :current_org_groups,
+           source: :parent_groups
 
   has_many :organizations, -> { distinct }, through: :groups
 
