@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_24_174615) do
+ActiveRecord::Schema.define(version: 2019_09_25_184346) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -354,6 +354,17 @@ ActiveRecord::Schema.define(version: 2019_09_24_174615) do
   create_table "global_translations", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "group_hierarchies", force: :cascade do |t|
+    t.bigint "parent_group_id"
+    t.jsonb "path"
+    t.bigint "subgroup_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["parent_group_id"], name: "index_group_hierarchies_on_parent_group_id"
+    t.index ["path"], name: "index_group_hierarchies_on_path", using: :gin
+    t.index ["subgroup_id"], name: "index_group_hierarchies_on_subgroup_id"
   end
 
   create_table "groups", force: :cascade do |t|

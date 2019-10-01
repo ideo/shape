@@ -22,25 +22,35 @@ function pluralTypeName(name) {
   return pluralize(name).toLowerCase()
 }
 
-const GoIconContainer = styled.span`
+const GoIconContainer = styled.button`
+  position: absolute;
+  left: 5px;
   display: inline-block;
-  margin-right: 8px;
+  margin: 5px;
   vertical-align: middle;
-  width: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: ${v.colors.secondaryMedium};
+  &:hover {
+    background: ${v.colors.secondaryLight};
+  }
 `
 
 const JumpButton = styled.button`
   left: 100px;
+  top: 12px;
   min-height: 20px;
   position: relative;
   text-align: center;
-  visibility: ${props => props.hide};
   width: calc(100% - 140px);
+  &:hover {
+    span {
+      color: ${v.colors.commonMedium};
+    }
+  }
 `
-
 JumpButton.displayName = 'JumpButton'
-
-const CommentThreadDrawer = styled.div``
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -76,6 +86,7 @@ class CommentThreadContainer extends React.Component {
 
   handleExpandedThreadChange = async thread => {
     if (!thread) return
+
     // don't try to load comments of our newly constructed threads
     if (thread.persisted) {
       runInAction(() => {
@@ -238,45 +249,44 @@ class CommentThreadContainer extends React.Component {
     const thread = this.expandedThread
     if (!thread) return null
 
+    console.log('renderExpandedThread', thread.record.name)
+
     return (
-      <CommentThreadDrawer>
-        <CommentThread
-          thread={thread}
-          expanded
-          afterSubmit={this.scrollToBottomUnlessReplying}
-          onEditorHeightChange={this.scrollToBottomUnlessReplying}
-        />
-      </CommentThreadDrawer>
+      <CommentThread
+        thread={thread}
+        expanded
+        afterSubmit={this.scrollToBottomUnlessReplying}
+        onEditorHeightChange={this.scrollToBottomUnlessReplying}
+      />
+    )
+  }
+
+  renderGoBackButton() {
+    if (!this.expandedThread) return null
+
+    return (
+      <GoIconContainer onClick={this.closeCurrentThread}>
+        <GoIcon />
+      </GoIconContainer>
     )
   }
 
   renderJumpButton() {
+    const { expandedThread } = this
     const { uiStore, parentWidth } = this.props
-    // const hideJumpButton = this.showJumpToThreadButton ? 'visible' : 'hidden'
-    const hideJumpButton = false
+    const { viewingRecord } = uiStore
+    const showJumpButton =
+      viewingRecord &&
+      !viewingRecord.isUserCollection &&
+      (!expandedThread || expandedThread.record !== viewingRecord)
 
-    let goBackText = `Go to ${uiStore.viewingRecord &&
-      uiStore.viewingRecord.name}`
-    if (this.expandedThread) {
-      goBackText = 'Go Back'
-    }
+    if (!showJumpButton) return null
 
     return (
-      <JumpButton
-        hide={hideJumpButton}
-        onClick={
-          this.expandedThread
-            ? this.closeCurrentThread
-            : this.jumpToCurrentThread
-        }
-        className="jumpToThread"
-      >
+      <JumpButton onClick={this.jumpToCurrentThread} className="jumpToThread">
         <SmallActionText style={{ textAlign: 'center' }}>
-          <GoIconContainer>
-            <GoIcon />
-          </GoIconContainer>
           <Truncator
-            text={goBackText}
+            text={`Go to ${uiStore.viewingRecord.name}`}
             key="jumpbutton"
             overrideWidth={parentWidth > 600 ? parentWidth : parentWidth - 90}
             overrideStyle={{ display: 'inline-block' }}
@@ -286,28 +296,38 @@ class CommentThreadContainer extends React.Component {
     )
   }
 
+  renderHeader() {
+    return (
+      <div
+        style={{
+          position: 'absolute',
+          top: '32px',
+          zIndex: 500,
+          width: '100%',
+        }}
+      >
+        {this.renderGoBackButton()}
+        {this.renderJumpButton()}
+        {this.trackedNotifications.map(notification => (
+          <Notification
+            notification={notification}
+            key={notification.id}
+            styleType="alert"
+          />
+        ))}
+      </div>
+    )
+  }
+
   render() {
     const { apiStore, uiStore } = this.props
     return (
       <Fragment>
-        <div
-          style={{
-            position: 'absolute',
-            top: '32px',
-            zIndex: 500,
-            width: '100%',
-          }}
-        >
-          {this.renderJumpButton()}
-          {this.trackedNotifications.map(notification => (
-            <Notification
-              notification={notification}
-              key={notification.id}
-              styleType="alert"
-            />
-          ))}
-        </div>
+        {this.renderHeader()}
+
         <ActivityContainer
+          // bigger margin top because of the back button...
+          style={{ marginTop: '35px' }}
           moving={uiStore.activityLogMoving}
           id={v.commentScrollOpts.containerId}
         >
@@ -317,7 +337,11 @@ class CommentThreadContainer extends React.Component {
           {this.renderExpandedThread()}
           <div id="ctc-older-threads">
             {apiStore.hasOlderThreads && !this.expandedThread && (
-              <ShowMoreButton darkBg onClick={this.loadMorePages}>
+              <ShowMoreButton
+                darkBg
+                onClick={this.loadMorePages}
+                style={{ marginTop: '20px' }}
+              >
                 Load older threads...
               </ShowMoreButton>
             )}

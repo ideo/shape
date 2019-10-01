@@ -50,7 +50,7 @@ describe RolifyExtensions, type: :concern do
       end
     end
 
-    context 'with group' do
+    context 'with a user in a group' do
       let!(:group) { create(:group, organization: organization) }
 
       before do
@@ -62,14 +62,48 @@ describe RolifyExtensions, type: :concern do
         expect(has_viewer_role).to be false
       end
 
-      it 'returns true if user has role through group' do
+      it 'returns true if user has viewer role through group' do
         group.add_role(Role::VIEWER, collection)
         expect(has_viewer_role).to be true
         expect(has_editor_role).to be false
       end
 
-      it 'returns true if user has role through group' do
+      it 'returns true if user has editor role through group' do
         group.add_role(Role::EDITOR, collection)
+        expect(has_editor_role).to be true
+        expect(has_viewer_role).to be false
+      end
+    end
+
+    context 'with a group in a group' do
+      let!(:group) { create(:group, organization: organization) }
+      let!(:parent_group) do
+        create(:group, organization: organization, add_subgroups: [group])
+      end
+      let(:has_editor_role) do
+        group.has_role_by_identifier?(Role::EDITOR, collection.roles_anchor_resource_identifier)
+      end
+      let(:has_viewer_role) do
+        group.has_role_by_identifier?(Role::VIEWER, collection.roles_anchor_resource_identifier)
+      end
+
+      before do
+        group.add_role(Role::MEMBER, parent_group)
+      end
+
+      it 'returns false if group does not have role' do
+        expect(has_editor_role).to be false
+        expect(has_viewer_role).to be false
+      end
+
+      it 'returns true if group has viewer role through parent group' do
+        parent_group.add_role(Role::VIEWER, collection)
+        expect(has_viewer_role).to be true
+        expect(has_editor_role).to be false
+      end
+
+      it 'returns true if group has editor role through parent group' do
+        parent_group.add_role(Role::EDITOR, collection)
         expect(has_editor_role).to be true
         expect(has_viewer_role).to be false
       end
@@ -166,6 +200,15 @@ describe RolifyExtensions, type: :concern do
       expect(collection.can_edit?(user)).to be true
     end
 
+    context 'when adding a group to another group' do
+      let(:other_group) { create(:group, organization: organization) }
+
+      it 'calls the group hierachy service' do
+        expect(AddGroupToGroup).to receive(:call)
+        group.add_role(Role::MEMBER, other_group)
+      end
+    end
+
     context 'with roles_anchor already set' do
       let!(:collection) { create(:collection, organization: organization, roles_anchor_collection_id: 99) }
 
@@ -178,6 +221,19 @@ describe RolifyExtensions, type: :concern do
         expect {
           user.add_role(Role::EDITOR, collection)
         }.to not_change(Role, :count)
+      end
+    end
+  end
+
+  describe '#remove_role' do
+    let(:group) { create(:group, organization: organization) }
+    let(:other_group) { create(:group, organization: organization) }
+
+    context 'when removing a group from another group' do
+      it 'calls the group removal service' do
+        expect(RemoveGroupFromGroup).to receive(:call)
+        group.add_role(Role::MEMBER, other_group)
+        group.remove_role(Role::MEMBER, other_group)
       end
     end
   end

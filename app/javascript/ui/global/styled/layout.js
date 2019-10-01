@@ -147,6 +147,8 @@ export const ActivityContainer = styled.div`
   margin-bottom: 10px;
   height: 100%;
   position: relative;
+  /* NOTE: this padding is because we moved that out of the overall ActivityContainer */
+  padding: 0 10px;
 `
 ActivityContainer.displayName = 'ActivityContainer'
 

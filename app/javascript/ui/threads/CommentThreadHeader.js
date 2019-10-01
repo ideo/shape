@@ -1,17 +1,19 @@
 import PropTypes from 'prop-types'
-import { Fragment } from 'react'
+// import { Fragment } from 'react'
+import { Flex } from 'reflexbox'
 import { observable, action } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled, { css } from 'styled-components'
-import Dotdotdot from 'react-dotdotdot'
 
 import { apiStore, routingStore, uiStore } from '~/stores'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import CommentIconFilled from '~/ui/icons/CommentIconFilled'
 import Link from '~/ui/global/Link'
+import Moment from '~/ui/global/Moment'
+import Tooltip from '~/ui/global/Tooltip'
+import { SubduedTitle } from '~/ui/global/styled/typography'
 import FollowIcon from '~/ui/icons/FollowIcon'
 import TextIcon from '~/ui/icons/TextIcon'
-import Tooltip from '~/ui/global/Tooltip'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import hexToRgba from '~/utils/hexToRgba'
 
@@ -22,15 +24,7 @@ export const threadTitleCss = css`
   display: block;
   width: 100%;
   background-color: ${v.colors.secondaryDark};
-  background: linear-gradient(
-    ${v.colors.secondaryDark} 0,
-    ${v.colors.secondaryDark} 80%,
-    ${hexToRgba(v.colors.secondaryDark, 0)} 100%
-  );
-  &:hover {
-    background: ${v.colors.secondaryDark};
-  }
-  padding: 5px 10px;
+  padding: 5px 0px;
   text-align: left;
   font-family: ${v.fonts.sans};
   font-weight: 400;
@@ -39,9 +33,18 @@ export const threadTitleCss = css`
 
 const StyledHeaderWrapper = styled.div`
   ${threadTitleCss};
+  background: linear-gradient(
+    ${v.colors.secondaryDark} 0,
+    ${v.colors.secondaryDark} 80%,
+    ${hexToRgba(v.colors.secondaryDark, 0)} 100%
+  );
+  padding-bottom: 24px;
 `
 const StyledHeaderButton = styled.button`
   ${threadTitleCss};
+  &:hover {
+    background: ${v.colors.secondaryMedium};
+  }
 `
 
 const StyledLink = styled(Link)`
@@ -51,6 +54,7 @@ const StyledLink = styled(Link)`
 const StyledHeader = styled.div`
   align-items: center;
   display: flex;
+  justify-content: space-between;
   height: ${props => (props.lines === 1 ? 50 : 70)}px;
 
   .timestamp {
@@ -58,6 +62,9 @@ const StyledHeader = styled.div`
   }
 
   .name {
+    /* align to bottom */
+    margin-top: auto;
+    margin-left: 5px;
     font-size: 1.25rem;
     line-height: 1.5rem;
   }
@@ -185,12 +192,17 @@ class CommentThreadHeader extends React.Component {
   renderThumbnail() {
     const { record } = this
     let content
-    const iconPadding = this.titleLines === 1 ? 12 : 0
+    const iconTop = this.titleLines === 1 ? 18 : 9
+    const thumbnailStyle = {
+      position: 'relative',
+      top: `${iconTop}px`,
+      left: '5px',
+    }
     if (record.internalType === 'items') {
       if (record.type === ITEM_TYPES.TEXT) {
         content = (
-          <div style={{ paddingTop: `${iconPadding}px` }}>
-            <TextIcon viewBox="0 0 70 70" />
+          <div style={thumbnailStyle}>
+            <TextIcon viewBox="-10 0 70 70" />
           </div>
         )
       } else {
@@ -198,7 +210,7 @@ class CommentThreadHeader extends React.Component {
       }
     } else {
       content = (
-        <div style={{ paddingTop: `${iconPadding}px` }}>
+        <div style={thumbnailStyle}>
           <CollectionIcon viewBox="50 50 170 170" />
         </div>
       )
@@ -262,8 +274,9 @@ class CommentThreadHeader extends React.Component {
     return (
       <Wrapper sticky={sticky} onClick={onClick}>
         <StyledHeader lines={this.titleLines}>
-          {this.renderThumbnail()}
-          <Dotdotdot clamp={2}>
+          {/* left side */}
+          <Flex style={{ height: '50px', overflow: 'hidden' }}>
+            {this.renderThumbnail()}
             <span
               className="name"
               ref={r => {
@@ -272,12 +285,17 @@ class CommentThreadHeader extends React.Component {
             >
               {this.record.name}
             </span>
-          </Dotdotdot>
+          </Flex>
+
+          {/* right side */}
           {thread && (
-            <Fragment>
+            <Flex style={{ marginBottom: 'auto' }}>
+              <SubduedTitle>
+                <Moment date={thread.updated_at} />
+              </SubduedTitle>
               {this.renderUnreadCount()}
               {this.renderFollow()}
-            </Fragment>
+            </Flex>
           )}
         </StyledHeader>
       </Wrapper>

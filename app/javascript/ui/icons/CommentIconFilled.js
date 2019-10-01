@@ -2,63 +2,37 @@ import Icon from './Icon'
 
 const CommentIcon = () => (
   <Icon fill>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
-      <defs>
-        <path
-          id="a"
-          d="M42.4 6.1c2 0 3.7 1.5 3.7 3.5v22.5c0 1.9-1.7 3.5-3.7 3.5H24.2L13 44.8c-.3.2-.6.4-1 .4-.2 0-.5 0-.7-.1-.6-.3-.9-.8-.9-1.4v-8H8c-2 0-3.7-1.5-3.7-3.5V9.5C4.3 7.6 6 6.1 8 6.1h34.4z"
-        />
-      </defs>
-      <use
-        xlinkHref="#a"
-        overflow="visible"
+    <svg
+      width="13"
+      height="10"
+      viewBox="0 0 13 10"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
         fillRule="evenodd"
         clipRule="evenodd"
+        d="M2.00806 0H11.3686C11.9244 0 12.3766 0.396333 12.3766 0.884335V6.65678C12.3766 7.14478 11.9244 7.54112 11.3686 7.54112H6.4121L3.36375 9.90833C3.28483 9.97034 3.1869 10 3.08783 10C3.02561 10 2.96312 9.98921 2.90436 9.96225C2.75286 9.89485 2.65609 9.75196 2.65609 9.59558V7.54112H2.00806C1.45218 7.54112 1 7.14478 1 6.65678V0.884335C1 0.396333 1.45218 0 2.00806 0Z"
       />
-      <clipPath id="b">
-        <use xlinkHref="#a" overflow="visible" />
-      </clipPath>
-      <g clipPath="url(#b)">
-        <defs>
-          <path id="c" d="M-47.4-13.5H66.4v117.2H-47.4z" />
-        </defs>
-        <use xlinkHref="#c" overflow="visible" />
-        <g className="st1">
-          <defs>
-            <path id="d" d="M4 6.1h44.1v39.1H4z" />
-          </defs>
-          <use xlinkHref="#d" overflow="visible" />
-          <clipPath id="e">
-            <use xlinkHref="#d" overflow="visible" />
-          </clipPath>
-          <path clipPath="url(#e)" d="M-14-13.5h78.5v78.1H-14z" />
-        </g>
-        <g className="st1">
-          <defs>
-            <path id="f" d="M-46 2.8h95.4v97.6H-46z" />
-          </defs>
-          <use
-            xlinkHref="#f"
-            overflow="visible"
-            fillRule="evenodd"
-            clipRule="evenodd"
-          />
-          <clipPath id="g">
-            <use xlinkHref="#f" overflow="visible" />
-          </clipPath>
-          <g clipPath="url(#g)">
-            <defs>
-              <path id="h" d="M4 6.1h44.1v39.1H4z" />
-            </defs>
-            <use xlinkHref="#h" overflow="visible" />
-            <clipPath id="i">
-              <use xlinkHref="#h" overflow="visible" />
-            </clipPath>
-            <path clipPath="url(#i)" d="M-64.4-16.7H67.8V120H-64.4z" />
-          </g>
-        </g>
+      <mask
+        id="mask0"
+        mask-type="alpha"
+        maskUnits="userSpaceOnUse"
+        x="1"
+        y="0"
+        width="12"
+        height="10"
+      >
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M2.00806 0H11.3686C11.9244 0 12.3766 0.396333 12.3766 0.884335V6.65678C12.3766 7.14478 11.9244 7.54112 11.3686 7.54112H6.4121L3.36375 9.90833C3.28483 9.97034 3.1869 10 3.08783 10C3.02561 10 2.96312 9.98921 2.90436 9.96225C2.75286 9.89485 2.65609 9.75196 2.65609 9.59558V7.54112H2.00806C1.45218 7.54112 1 7.14478 1 6.65678V0.884335C1 0.396333 1.45218 0 2.00806 0Z"
+          fill="white"
+        />
+      </mask>
+      <g mask="url(#mask0)">
+        <rect x="-8" y="-7" width="30" height="30" />
       </g>
-    </svg>
+    </svg>{' '}
   </Icon>
 )
 

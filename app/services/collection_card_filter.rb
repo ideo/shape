@@ -14,10 +14,13 @@ class CollectionCardFilter < SimpleService
     apply_hidden
     if @user && @collection.can_view?(@user)
       filter_for_user
-    else
+    elsif @collection.anyone_can_view? || @collection.anyone_can_join?
       filter_for_public
+    elsif @filters[:external_id].present? && @application.present?
+      filter_external_id
+    else
+      return []
     end
-    filter_external_id
     @cards
   end
 
@@ -66,8 +69,7 @@ class CollectionCardFilter < SimpleService
     # Do no filtering if user is super admin
     return if @user.has_cached_role?(Role::SUPER_ADMIN)
 
-    # always include the Common Resource group as it may grant you access
-    group_ids = @user.current_org_group_ids + [Shape::COMMON_RESOURCE_GROUP_ID]
+    group_ids = @user.all_current_org_group_ids
     resource_identifier_sql = %(
       CASE WHEN COALESCE(
         items.roles_anchor_collection_id,
@@ -145,8 +147,6 @@ class CollectionCardFilter < SimpleService
   end
 
   def filter_external_id
-    return if @filters[:external_id].blank? || @application.blank?
-
     join_sql = %(
       INNER JOIN external_records ON external_records.externalizable_id = COALESCE(collection_cards.item_id, collection_cards.collection_id)
     )
