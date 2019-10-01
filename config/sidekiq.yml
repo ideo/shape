@@ -8,9 +8,9 @@
   - [searchkick, 4]
   - [default, 2]
   - [low, 1]
-:enabled: true
 
 # Sidekiq scheduler setup, shared amongst all environments
+:enabled: <%= ENV["SIDEKIQ_SCHEDULER_DISABLED"].blank? %>
 default_schedule: &default_schedule
   searchkick_reindex_worker:
     every: '1m'
