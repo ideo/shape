@@ -886,6 +886,17 @@ export default class UiStore {
     this.scroll.scrollTo(position)
   }
 
+  scrollToBottomOfComments(commentId = null) {
+    let { bottom } = v.commentScrollOpts
+    if (commentId) bottom = `${commentId}-replies-bottom`
+    this.scroller.scrollTo(bottom, {
+      ...v.commentScrollOpts,
+      offset:
+        -1 *
+        document.getElementById(v.commentScrollOpts.containerId).clientHeight,
+    })
+  }
+
   @action
   updateLinkedBreadcrumbTrail = ({
     breadcrumb,

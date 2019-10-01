@@ -296,7 +296,6 @@ class CommentThreadContainer extends React.Component {
           moving={uiStore.activityLogMoving}
           id={v.commentScrollOpts.containerId}
         >
-          <ScrollElement name="ctc-top" />
           {this.loadingThreads && <InlineLoader fixed background="none" />}
           {this.renderThreads()}
           {this.renderExpandedThread()}
@@ -312,7 +311,7 @@ class CommentThreadContainer extends React.Component {
             )}
           </div>
           <VisibilitySensor onChange={this.handleBottomVisibility}>
-            <ScrollElement name="ctc-bottom" />
+            <ScrollElement name={v.commentScrollOpts.bottom} />
           </VisibilitySensor>
         </ActivityContainer>
       </Fragment>

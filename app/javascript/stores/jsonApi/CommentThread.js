@@ -1,6 +1,5 @@
 import { observable, action, computed, runInAction } from 'mobx'
 import _ from 'lodash'
-import v from '~/utils/variables'
 import { ReferenceType } from 'datx'
 
 import { apiUrl } from '~/utils/url'
@@ -20,15 +19,6 @@ class CommentThread extends BaseRecord {
   comments = []
   @observable
   links = {}
-  @computed
-  get viewingCommentThread() {
-    const { uiStore } = this
-    return (
-      uiStore.activityLogOpen &&
-      uiStore.activityLogPage === 'comments' &&
-      uiStore.expandedThreadKey === this.key
-    )
-  }
 
   @computed
   get key() {
@@ -138,7 +128,6 @@ class CommentThread extends BaseRecord {
   API_markViewed() {
     if (!this.persisted) return false
     const apiPath = `comment_threads/${this.id}/view`
-    // this.comments.forEach(comment => comment.markAsRead())
     if (this.users_thread) {
       // simulate backend effect
       this.users_thread.unread_count = 0
@@ -163,13 +152,15 @@ class CommentThread extends BaseRecord {
     const mergedComments = _.union(this.comments.toJS(), newParentComments)
     let newComments = mergedComments
     if (!created) {
+      // after we're done creating the temp comment, clear out any prev temp ones
       newComments = _.filter(mergedComments, c => c.persisted)
-      const canMarkParentAsRead =
-        !_.isEmpty(newParentComments) && _.isEmpty(newReplies)
-      if (canMarkParentAsRead) {
-        // when parent comments
-        this.markAsRead()
-      }
+
+      // const canMarkParentAsRead =
+      //   !_.isEmpty(newParentComments) && _.isEmpty(newReplies)
+      // if (canMarkParentAsRead) {
+      //   // when parent comments
+      //   this.markAsRead()
+      // }
     }
 
     this.comments.replace(_.sortBy(newComments, ['created_at']))
@@ -183,6 +174,15 @@ class CommentThread extends BaseRecord {
     })
   }
 
+  get viewingCommentThread() {
+    const { uiStore } = this
+    return (
+      uiStore.activityLogOpen &&
+      uiStore.activityLogPage === 'comments' &&
+      uiStore.expandedThreadKey === this.key
+    )
+  }
+
   markAsRead = async () => {
     const { uiStore } = this
     // don't mark as read if coment thread is not currently in view or user is replying
@@ -190,15 +190,7 @@ class CommentThread extends BaseRecord {
       return
     }
     await this.API_markViewed()
-    const newestComment = _.last(this.comments)
-    uiStore.scroller.scrollTo(`${newestComment.id}-replies-bottom`, {
-      ...v.commentScrollOpts,
-      offset:
-        -1 *
-          document.getElementById(v.commentScrollOpts.containerId)
-            .clientHeight +
-        50,
-    })
+    uiStore.scrollToBottomOfComments()
   }
 }
 

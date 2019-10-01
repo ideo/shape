@@ -228,6 +228,7 @@ export default {
 
   commentScrollOpts: {
     containerId: 'ctc-content',
+    bottom: 'ctc-bottom',
     delay: 0,
     duration: 350,
     smooth: true,

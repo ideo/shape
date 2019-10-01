@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import v from '~/utils/variables'
 import { observable, computed, action, runInAction } from 'mobx'
 
 import trackError from '~/utils/trackError'
@@ -32,7 +31,7 @@ class Comment extends BaseRecord {
     const { thread } = this
     const { users_thread } = thread
     return (
-      // written by someone else
+      // comment was written by someone else
       this.author_id.toString() !== this.apiStore.currentUserId.toString() &&
       // more recently than my last_viewed_at timestamp
       users_thread &&
@@ -53,7 +52,6 @@ class Comment extends BaseRecord {
     let sortedReplies = _.union(this.replies, replies)
     sortedReplies = _.sortBy(sortedReplies, ['created_at'])
     this.replies.replace(sortedReplies)
-    this.markAsRead()
   }
 
   API_destroy = async () => {
@@ -110,25 +108,21 @@ class Comment extends BaseRecord {
         if (data.length > 0) {
           this.importReplies(data)
           this.replyPage = replyPage
+          this.markThreadAsRead()
         }
       })
     }
   }
 
-  markAsRead = async () => {
+  markThreadAsRead = () => {
     const { uiStore } = this
     if (!uiStore.activityLogOpen) return
-    const { id, thread } = this
-    await thread.API_markViewed()
-    // only scroll if replying to the same parent comment
-    if (!uiStore.replyingToCommentId || uiStore.replyingToCommentId !== this.id)
-      return
-    uiStore.scroller.scrollTo(`${id}-replies-bottom`, {
-      ...v.commentScrollOpts,
-      offset:
-        -1 *
-        document.getElementById(v.commentScrollOpts.containerId).clientHeight,
-    })
+    // const { id, thread } = this
+    return this.thread.API_markViewed()
+    // // only scroll if replying to the same parent comment
+    // if (!uiStore.replyingToCommentId || uiStore.replyingToCommentId !== this.id)
+    //   return
+    // uiStore.scrollToBottomOfComments(id)
   }
 }
 
