@@ -1,5 +1,6 @@
 import { observable, action, computed, runInAction } from 'mobx'
 import _ from 'lodash'
+import v from '~/utils/variables'
 import { ReferenceType } from 'datx'
 
 import { apiUrl } from '~/utils/url'
@@ -142,7 +143,8 @@ class CommentThread extends BaseRecord {
   }
 
   @action
-  importComments(data, { created = false } = {}) {
+  async importComments(data, { created = false } = {}) {
+    const { uiStore } = this
     const newParentComments = _.filter(data, c => !c.parent_id)
     const newReplies = _.filter(data, c => c.parent_id)
     let newComments = _.union(this.comments.toJS(), newParentComments)
@@ -155,6 +157,30 @@ class CommentThread extends BaseRecord {
     })
     newComments = _.sortBy(newComments, ['created_at'])
     this.comments.replace(newComments)
+    if (
+      !created &&
+      !_.isEmpty(newParentComments) &&
+      _.isEmpty(newReplies) &&
+      !uiStore.replyingToCommentId
+    ) {
+      // mark incoming parent comments as read when not replying
+      this.markAsRead()
+    }
+  }
+
+  markAsRead = async () => {
+    const { uiStore } = this
+    if (!uiStore.activityLogOpen) return
+    await this.API_markViewed()
+    const newestComment = _.last(this.comments)
+    uiStore.scroller.scrollTo(`${newestComment.id}-replies-bottom`, {
+      ...v.commentScrollOpts,
+      offset:
+        -1 *
+          document.getElementById(v.commentScrollOpts.containerId)
+            .clientHeight +
+        50,
+    })
   }
 }
 

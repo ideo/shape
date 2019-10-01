@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import v from '~/utils/variables'
 import { observable, computed, action, runInAction } from 'mobx'
 
 import trackError from '~/utils/trackError'
@@ -6,7 +7,6 @@ import { apiUrl } from '~/utils/url'
 
 import BaseRecord from './BaseRecord'
 import { apiStore, uiStore } from '~/stores'
-import v from '~/utils/variables'
 
 class Comment extends BaseRecord {
   static type = 'comments'
@@ -53,6 +53,7 @@ class Comment extends BaseRecord {
     let sortedReplies = _.union(this.replies, replies)
     sortedReplies = _.sortBy(sortedReplies, ['created_at'])
     this.replies.replace(sortedReplies)
+    this.markAsRead()
   }
 
   API_destroy = async () => {
@@ -96,7 +97,7 @@ class Comment extends BaseRecord {
   }
 
   async API_fetchReplies() {
-    const { uiStore, thread } = this
+    const { uiStore } = this
     // make sure this comment is expanded
     uiStore.setReplyingToComment(this.id)
     // don't fetch any replies unless you need to
@@ -112,11 +113,17 @@ class Comment extends BaseRecord {
         }
       })
     }
-    // mark the thread as viewed any time you fetch replies
-    // NOTE: this await helps give a buffer for the scroll to happen after render of replies
+  }
+
+  markAsRead = async () => {
+    const { uiStore } = this
+    if (!uiStore.activityLogOpen) return
+    const { id, thread } = this
     await thread.API_markViewed()
-    // now scroll to the bottom of replies...
-    uiStore.scroller.scrollTo(`${this.id}-replies-bottom`, {
+    // only scroll if replying to the same parent comment
+    if (!uiStore.replyingToCommentId || uiStore.replyingToCommentId !== this.id)
+      return
+    uiStore.scroller.scrollTo(`${id}-replies-bottom`, {
       ...v.commentScrollOpts,
       offset:
         -1 *
