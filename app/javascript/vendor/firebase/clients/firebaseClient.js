@@ -22,6 +22,7 @@ if (process.env.GOOGLE_CLOUD_BROWSER_KEY) {
 
 export class FirebaseClient {
   subscribedThreadIds = []
+  failedThreadIds = []
   loadedThreadIds = []
   constructor() {
     this.listeners = []
@@ -151,6 +152,7 @@ export class FirebaseClient {
     const threadId = usersThread.comment_thread_id
     // check if we're already listening for this thread
     if (this.subscribedThreadIds.indexOf(threadId) > -1) return
+    if (this.failedThreadIds.indexOf(threadId) > -1) return
     apiStore.update('loadingThreads', true)
     const threadUid = threadId.toString()
     const firestoreThread = db.collection('comment_threads').doc(threadUid)
@@ -194,6 +196,7 @@ export class FirebaseClient {
       })
       .catch(e => {
         // comment_thread document does not exist
+        this.failedThreadIds.push(threadId)
         this.escapeLoader()
       })
   }
