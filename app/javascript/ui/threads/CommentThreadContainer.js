@@ -161,39 +161,8 @@ class CommentThreadContainer extends React.Component {
     uiStore.expandThread(null)
   }
 
-  scrollToTopOfThread = thread => {
-    const idx = this.threads.indexOf(thread)
-    scroller.scrollTo(`thread-${idx}`, {
-      ...v.commentScrollOpts,
-      delay: 0,
-    })
-  }
-
-  scrollToTop = () => {
-    scroller.scrollTo('top', { ...v.commentScrollOpts, duration: 0 })
-  }
-
-  scrollToTopOfNextThread = (
-    thread,
-    { duration = v.commentScrollOpts.duration } = {}
-  ) => {
-    const idx = this.threads.indexOf(thread)
-    const nextIdx = idx + 1
-    // have to wait for this thread to expand so the next one is actually lower,
-    // then we can scroll down to the top of the next thread.
-    setTimeout(() => {
-      // may have switched pages at some point e.g. on load of ?open=xxx
-      if (this.props.uiStore.activityLogPage !== 'comments') return
-      scroller.scrollTo(`thread-${nextIdx}`, {
-        ...v.commentScrollOpts,
-        duration,
-        offset: -1 * this.contentHeight(),
-      })
-    }, 50)
-  }
-
   scrollToBottom = () => {
-    scroller.scrollTo('bottom', {
+    scroller.scrollTo('ctc-bottom', {
       ...v.commentScrollOpts,
       delay: 0,
     })
@@ -329,7 +298,7 @@ class CommentThreadContainer extends React.Component {
           moving={uiStore.activityLogMoving}
           id={v.commentScrollOpts.containerId}
         >
-          <ScrollElement name="top" />
+          <ScrollElement name="ctc-top" />
           {this.loadingThreads && <InlineLoader fixed background="none" />}
           {this.renderThreads()}
           {this.renderExpandedThread()}
@@ -345,7 +314,7 @@ class CommentThreadContainer extends React.Component {
             )}
           </div>
           <VisibilitySensor onChange={this.handleBottomVisibility}>
-            <ScrollElement name="bottom" />
+            <ScrollElement name="ctc-bottom" />
           </VisibilitySensor>
         </ActivityContainer>
       </Fragment>
