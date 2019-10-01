@@ -205,8 +205,7 @@ class TextItemCover extends React.Component {
         this.quillEditor = c
       },
       readOnly: true,
-      onChangeSelection: (range, selection, editor) =>
-        console.log(range, selection, editor),
+      onChangeSelection: (range, selection, editor) => {},
       theme: null,
     }
 

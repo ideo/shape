@@ -11,6 +11,7 @@
 #  identifier       :string
 #  max_domain       :integer
 #  measure          :string
+#  name             :string
 #  question_type    :string
 #  style            :jsonb
 #  tiers            :jsonb
@@ -94,7 +95,7 @@ class Dataset < ApplicationRecord
   # Implement in each sub-class
 
   def name
-    identifier
+    self[:name] || identifier
   end
 
   def title; end
