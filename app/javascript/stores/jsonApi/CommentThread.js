@@ -40,6 +40,10 @@ class CommentThread extends BaseRecord {
     }`
   }
 
+  get containerId() {
+    return `ct-container-${this.key}`
+  }
+
   // don't want @computed here... for some reason this seemed to actually
   // break the observability (probably because it's on a related record?)
   get unreadCount() {

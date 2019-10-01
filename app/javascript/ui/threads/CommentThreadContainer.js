@@ -84,26 +84,6 @@ class CommentThreadContainer extends React.Component {
     }
   }
 
-  handleExpandedThreadChange = async thread => {
-    if (!thread) return
-
-    // don't try to load comments of our newly constructed threads
-    if (thread.persisted) {
-      runInAction(() => {
-        this.loadingThreads = true
-      })
-      try {
-        await thread.API_fetchComments()
-      } finally {
-        runInAction(() => {
-          this.loadingThreads = false
-        })
-      }
-    }
-    // scroll again after any more comments have loaded
-    this.scrollToBottom()
-  }
-
   get threads() {
     const { apiStore } = this.props
     // double check to filter out ones you've just unsubscribed from
@@ -148,17 +128,35 @@ class CommentThreadContainer extends React.Component {
     return h
   }
 
-  expandThread = thread => () => {
+  expandThread = thread => async () => {
+    if (!thread) return
     const { uiStore } = this.props
 
     this.prevScrollPosition = this.containerDiv.scrollTop
     uiStore.expandThread(thread.key, { reset: false })
-    this.handleExpandedThreadChange(thread)
+
+    // don't try to load comments of our newly constructed threads
+    if (thread.persisted) {
+      runInAction(() => {
+        this.loadingThreads = true
+      })
+      try {
+        await thread.API_fetchComments()
+      } finally {
+        runInAction(() => {
+          this.loadingThreads = false
+        })
+      }
+    }
+    // scroll again after any more comments have loaded
+    this.scrollToBottom()
   }
 
   closeCurrentThread = () => {
-    const { uiStore } = this.props
+    const { uiStore, updateContainerSize } = this.props
     uiStore.expandThread(null)
+    // reset back to whatever it was
+    updateContainerSize({ reset: true })
   }
 
   scrollToBottom = () => {
@@ -217,13 +215,13 @@ class CommentThreadContainer extends React.Component {
   renderExpandedThread() {
     const thread = this.expandedThread
     if (!thread) return null
-
     return (
       <CommentThread
         thread={thread}
-        expanded
+        commentCount={thread.comments.length}
         afterSubmit={this.scrollToBottomUnlessReplying}
         onEditorHeightChange={this.scrollToBottomUnlessReplying}
+        updateContainerSize={this.props.updateContainerSize}
       />
     )
   }
@@ -326,6 +324,7 @@ CommentThreadContainer.propTypes = {
   parentWidth: PropTypes.number.isRequired,
   loadingThreads: PropTypes.bool.isRequired,
   expandedThreadKey: PropTypes.string,
+  updateContainerSize: PropTypes.func.isRequired,
 }
 CommentThreadContainer.defaultProps = {
   expandedThreadKey: null,

@@ -98,18 +98,22 @@ class ActivityLogBox extends React.Component {
   @action
   componentDidMount() {
     const { uiStore } = this.props
-    const existingPosition = localStorage.getItem(POSITION_KEY) || {}
     const existingPage = localStorage.getItem(PAGE_KEY)
     uiStore.update('activityLogPage', existingPage || 'comments')
-    this.position.y = existingPosition.y || DEFAULT.y
-    this.position.w = existingPosition.w || DEFAULT.w
-    this.position.h = existingPosition.h || DEFAULT.h
-    this.position.x = existingPosition.x || this.defaultX
+    this.resetPosition()
   }
 
   componentWillUnmount() {
     // cancel the observer
     this.disposer()
+  }
+
+  resetPosition = () => {
+    const existingPosition = localStorage.getItem(POSITION_KEY) || {}
+    this.position.y = existingPosition.y || DEFAULT.y
+    this.position.w = existingPosition.w || DEFAULT.w
+    this.position.h = existingPosition.h || DEFAULT.h
+    this.position.x = existingPosition.x || this.defaultX
   }
 
   get currentPage() {
@@ -140,13 +144,27 @@ class ActivityLogBox extends React.Component {
   }
 
   @action
-  updatePosition({ x, y, w = this.position.w, h = this.position.h }) {
+  updatePosition = ({
+    x = this.position.x,
+    y = this.position.y,
+    w = this.position.w,
+    h = this.position.h,
+    temporary = false,
+    reset = false,
+  }) => {
     if (y < 0) return
+    if (reset) {
+      this.resetPosition()
+      return
+    }
     this.position.x = x
     this.position.y = y
     this.position.w = w
     this.position.h = h
-    localStorage.setItem(POSITION_KEY, this.position)
+    if (!temporary) {
+      localStorage.setItem(POSITION_KEY, this.position)
+    }
+    return this.position
   }
 
   @action
@@ -232,6 +250,7 @@ class ActivityLogBox extends React.Component {
       parentWidth={this.position.w}
       loadingThreads={this.props.apiStore.loadingThreads}
       expandedThreadKey={this.props.uiStore.expandedThreadKey}
+      updateContainerSize={this.updatePosition}
     />
   )
 

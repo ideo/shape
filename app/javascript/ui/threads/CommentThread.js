@@ -12,6 +12,28 @@ import { Element as ScrollElement } from 'react-scroll'
 @inject('uiStore')
 @observer
 class CommentThread extends React.Component {
+  componentDidMount() {
+    this.updateContainerSize()
+  }
+
+  componentDidUpdate(prevProps) {
+    const { commentCount } = this.props
+    if (commentCount > prevProps.commentCount) {
+      this.updateContainerSize()
+    }
+  }
+
+  updateContainerSize() {
+    const { thread } = this.props
+    const div = document.getElementById(thread.containerId)
+    if (div && div.scrollHeight) {
+      this.props.updateContainerSize({
+        h: div.scrollHeight + 100,
+        temporary: true,
+      })
+    }
+  }
+
   renderComments = () => {
     const { thread, uiStore } = this.props
     const { comments } = thread
@@ -67,7 +89,7 @@ class CommentThread extends React.Component {
     const { thread, uiStore } = this.props
 
     return (
-      <div>
+      <div id={thread.containerId}>
         <CommentThreadHeader thread={thread} sticky />
         <div className="comments">
           {thread.hasMore && <CommentThreadLoader thread={thread} />}
@@ -84,13 +106,11 @@ CommentThread.propTypes = {
   afterSubmit: PropTypes.func.isRequired,
   onEditorHeightChange: PropTypes.func.isRequired,
   thread: MobxPropTypes.objectOrObservableObject.isRequired,
+  commentCount: PropTypes.number.isRequired,
+  updateContainerSize: PropTypes.func.isRequired,
 }
 CommentThread.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-}
-
-CommentThread.defaultProps = {
-  expanded: false,
 }
 
 CommentThread.displayName = 'CommentThread'
