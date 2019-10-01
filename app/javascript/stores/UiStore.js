@@ -145,8 +145,6 @@ export default class UiStore {
   emptySpaceClickHandlers = new Set()
 
   // Comments + Threads
-  @observable
-  commentsOpen = false
   // marked by thread.key (so it works for new records as well)
   @observable
   expandedThreadKey = null

@@ -20,6 +20,15 @@ class CommentThread extends BaseRecord {
   comments = []
   @observable
   links = {}
+  @computed
+  get viewingCommentThread() {
+    const { uiStore } = this
+    return (
+      uiStore.activityLogOpen &&
+      uiStore.activityLogPage === 'comments' &&
+      uiStore.expandedThreadKey === this.key
+    )
+  }
 
   @computed
   get key() {
@@ -145,33 +154,37 @@ class CommentThread extends BaseRecord {
 
   @action
   async importComments(data, { created = false } = {}) {
-    const { uiStore } = this
     const newParentComments = _.filter(data, c => !c.parent_id)
     const newReplies = _.filter(data, c => c.parent_id)
-    let newComments = _.union(this.comments.toJS(), newParentComments)
-    // after we're done creating the temp comment, clear out any prev temp ones
-    if (!created) newComments = _.filter(newComments, c => c.persisted)
+    const mergedComments = _.union(this.comments.toJS(), newParentComments)
+    let newComments = mergedComments
+    if (!created) {
+      newComments = _.filter(mergedComments, c => c.persisted)
+      const canMarkParentAsRead =
+        !_.isEmpty(newParentComments) && _.isEmpty(newReplies)
+      if (canMarkParentAsRead) {
+        // when parent comments
+        this.markAsRead()
+      }
+    }
 
-    newReplies.forEach(reply => {
-      parent = _.find(newComments, { id: reply.parent_id.toString() })
+    this.comments.replace(_.sortBy(newComments, ['created_at']))
+    this.importRepliesFromParentComments(newReplies, newComments)
+  }
+
+  async importRepliesFromParentComments(replies, comments) {
+    replies.forEach(reply => {
+      parent = _.find(comments, { id: reply.parent_id.toString() })
       if (parent) parent.importReplies([reply])
     })
-    newComments = _.sortBy(newComments, ['created_at'])
-    this.comments.replace(newComments)
-    if (
-      !created &&
-      !_.isEmpty(newParentComments) &&
-      _.isEmpty(newReplies) &&
-      !uiStore.replyingToCommentId
-    ) {
-      // mark incoming parent comments as read when not replying
-      this.markAsRead()
-    }
   }
 
   markAsRead = async () => {
     const { uiStore } = this
-    if (!uiStore.activityLogOpen) return
+    // don't mark as read if coment thread is not currently in view or user is replying
+    if (!this.viewingCommentThread || uiStore.replyingToCommentId) {
+      return
+    }
     await this.API_markViewed()
     const newestComment = _.last(this.comments)
     uiStore.scroller.scrollTo(`${newestComment.id}-replies-bottom`, {

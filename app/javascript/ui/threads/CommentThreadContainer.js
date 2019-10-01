@@ -249,8 +249,6 @@ class CommentThreadContainer extends React.Component {
     const thread = this.expandedThread
     if (!thread) return null
 
-    console.log('renderExpandedThread', thread.record.name)
-
     return (
       <CommentThread
         thread={thread}
