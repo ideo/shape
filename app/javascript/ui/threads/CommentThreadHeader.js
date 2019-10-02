@@ -170,6 +170,7 @@ class CommentThreadHeader extends React.Component {
       ev.stopPropagation()
     }
     const { thread } = this.props
+
     if (!thread.persisted) return
 
     const { users_thread } = thread
