@@ -109,9 +109,11 @@ class ContentBlock extends React.PureComponent {
 
           <Box w={[null, 0.09]} order={3} />
 
-          <Box w={[1, 0.54]} order={[2, order % 2 === 1 ? 4 : 2]}>
-            <ImageDisplay src={imageUrl} alt={title} />
-          </Box>
+          {imageUrl && (
+            <Box w={[1, 0.54]} order={[2, order % 2 === 1 ? 4 : 2]}>
+              <ImageDisplay src={imageUrl} alt={title} />
+            </Box>
+          )}
 
           <Box w={[null, 0.08]} order={4} />
         </MarketingFlex>
