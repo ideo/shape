@@ -12,12 +12,15 @@ class TextActionMenu extends React.Component {
       {
         name: 'Comment',
         iconRight: <CommentIcon />,
-        onClick: this.addComment, // addCommentToCard?
+        onClick: this.addComment,
       },
     ]
 
     return actions
   }
+
+  // TODO: implement in next ticket
+  addComment = () => null
 
   handleMouseLeave = () => {
     const { uiStore } = this.props
