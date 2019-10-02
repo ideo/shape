@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
-import { EditorState, ContentState, convertToRaw } from 'draft-js'
+import { EditorState, convertToRaw } from 'draft-js'
 import { get } from 'lodash'
 
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
@@ -35,12 +35,6 @@ class CommentEntryForm extends React.Component {
   componentDidMount() {
     this.focusTextArea()
   }
-
-  // componentWillReceiveProps({ expanded }) {
-  //   this.focusTextArea()
-  //   // NOTE: maybe preferred to leave written + unsent messages in the comment box?
-  //   // if (!expanded) this.resetEditorState()
-  // }
 
   componentWillUnmount() {
     this.editor = null
@@ -95,15 +89,6 @@ class CommentEntryForm extends React.Component {
     this.focusTextArea()
   }
 
-  resetEditorState() {
-    this.setState({
-      editorState: EditorState.push(
-        this.state.editorState,
-        ContentState.createFromText('')
-      ),
-    })
-  }
-
   handleSubmit = e => {
     const { uiStore } = this.props
     const { replyingToCommentId } = uiStore
@@ -121,21 +106,31 @@ class CommentEntryForm extends React.Component {
     }
 
     const { thread } = this.props
-    this.setState({ updating: true }, async () => {
-      this.resetEditorState()
-      await thread.API_saveComment(rawData)
-      this.props.afterSubmit()
-      this.setState({ updating: false })
-    })
+    this.setState(
+      {
+        updating: true,
+        editorState: EditorState.createEmpty(),
+      },
+      async () => {
+        await thread.API_saveComment(rawData)
+        this.props.afterSubmit()
+        this.setState({ updating: false }, () => {
+          this.focusTextArea()
+        })
+      }
+    )
   }
 
   render() {
+    const { editorState, updating } = this.state
     const { uiStore } = this.props
+
     return (
       <CommentForm onSubmit={this.handleSubmit}>
         <StyledCommentInputWrapper replying={!!uiStore.replyingToCommentId}>
           <CommentInput
-            editorState={this.state.editorState}
+            disabled={updating}
+            editorState={editorState}
             onChange={this.handleInputChange}
             handleSubmit={this.handleSubmit}
             setEditor={this.setEditor}

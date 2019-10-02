@@ -187,10 +187,13 @@ class CommentThreadContainer extends React.Component {
     apiStore.loadNextThreadPage()
   }
 
-  scrollToBottomOfComment = () => {
+  scrollToBottomOfThread = () => {
     const { uiStore } = this.props
-    // scroll to bottom of comments
-    uiStore.scrollToBottomOfComments(uiStore.replyingToCommentId)
+    const { replyingToCommentId } = uiStore
+    // if replyingToCommentId is present, it will scroll to the bottom of those replies
+    uiStore.scrollToBottomOfComments(replyingToCommentId, {
+      duration: 0,
+    })
   }
 
   handleBottomVisibility = isVisible => {
@@ -220,8 +223,8 @@ class CommentThreadContainer extends React.Component {
       <CommentThread
         thread={thread}
         commentCount={thread.comments.length}
-        afterSubmit={this.scrollToBottomOfComment}
-        onEditorHeightChange={this.scrollToBottomOfComment}
+        afterSubmit={this.scrollToBottomOfThread}
+        onEditorHeightChange={this.scrollToBottomOfThread}
         updateContainerSize={this.props.updateContainerSize}
       />
     )

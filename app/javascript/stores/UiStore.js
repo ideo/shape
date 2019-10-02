@@ -886,7 +886,7 @@ export default class UiStore {
     this.scroll.scrollTo(position)
   }
 
-  scrollToBottomOfComments(commentId = null) {
+  scrollToBottomOfComments(commentId = null, scrollOpts = {}) {
     let { bottom } = v.commentScrollOpts
     let offset = 0
     if (commentId) {
@@ -897,6 +897,7 @@ export default class UiStore {
     }
     this.scroller.scrollTo(bottom, {
       ...v.commentScrollOpts,
+      ...scrollOpts,
       offset: offset,
     })
   }

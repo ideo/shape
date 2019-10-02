@@ -10,6 +10,7 @@ describe('CommentInput', () => {
     uiStore = fakeUiStore
 
     props = {
+      disabled: false,
       onChange: jest.fn(),
       onOpenSuggestions: jest.fn(),
       onCloseSuggestions: jest.fn(),

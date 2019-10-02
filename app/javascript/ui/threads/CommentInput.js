@@ -2,7 +2,6 @@ import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { observable, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-// import { EditorState, convertToRaw } from 'draft-js'
 import Editor from 'draft-js-plugins-editor'
 import createMentionPlugin from 'draft-js-mention-plugin'
 import createLinkifyPlugin from 'draft-js-linkify-plugin'
@@ -119,7 +118,7 @@ class CommentInput extends React.Component {
   }
 
   render() {
-    const { onChange, editorState } = this.props
+    const { onChange, editorState, disabled } = this.props
     const { MentionSuggestions } = this.mentionPlugin
     MentionSuggestions.displayName = 'MentionSuggestions'
     const plugins = [this.mentionPlugin, this.linkifyPlugin]
@@ -127,6 +126,7 @@ class CommentInput extends React.Component {
     return (
       <StyledCommentInput editing onClick={this.focus}>
         <Editor
+          readOnly={disabled}
           editorState={editorState}
           onChange={onChange}
           handleReturn={this.handleReturn}
@@ -154,10 +154,14 @@ CommentInput.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   setEditor: PropTypes.func.isRequired,
   editorState: MobxPropTypes.objectOrObservableObject.isRequired,
+  disabled: PropTypes.bool,
 }
 CommentInput.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+CommentInput.defaultProps = {
+  disabled: false,
 }
 
 CommentInput.displayName = 'CommentInput'
