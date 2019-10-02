@@ -283,7 +283,7 @@ export const QuillStyleWrapper = styled.div`
 
     .ql-container {
       /* this overrides quill-cursors "display: flex" which was breaking IE */
-      display: block;
+      display: ${props => (props.fullPageView ? 'block' : 'flex')};
 
       ${props => (props.notEditing ? '' : 'overflow: visible !important;')};
       ${props =>
