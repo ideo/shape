@@ -9,7 +9,7 @@ describe('CommentReplies', () => {
   beforeEach(() => {
     props = {
       comment,
-      expanded: false,
+      repliesLength: comment.replies.length,
     }
     wrapper = shallow(<CommentReplies {...props} />)
   })
@@ -25,20 +25,21 @@ describe('CommentReplies', () => {
       }
 
       props.comment = comment
+      props.repliesLength = comment.replies.length
       wrapper = shallow(<CommentReplies {...props} />)
     })
 
     it('should render the view more component with the right amount of comments left', () => {
       expect(wrapper.find('ViewMore').exists()).toBeTruthy()
       expect(wrapper.find('ViewMore').text()).toEqual(
-        `View ${repliesCount - comment.replies.length} more`
+        `View ${repliesCount - props.repliesLength} more`
       )
     })
 
     it('should render the view more component with the right amount of comments left', () => {
       expect(wrapper.find('ViewMore').exists()).toBeTruthy()
       expect(wrapper.find('ViewMore').text()).toEqual(
-        `View ${repliesCount - comment.replies.length} more`
+        `View ${repliesCount - props.repliesLength} more`
       )
     })
 
