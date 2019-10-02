@@ -194,6 +194,8 @@ export default class UiStore {
   editingCardCover = null
   @observable
   replyingToCommentId = null
+  @observable
+  commentThreadBottomVisible = null
 
   @action
   toggleEditingCardId(cardId) {
@@ -801,6 +803,11 @@ export default class UiStore {
       if (reset) this.expandedThreadKey = null
     }
     this.expandedThreadKey = key
+  }
+
+  @action
+  setCommentThreadBottomVisible(isVisible) {
+    this.commentThreadBottomVisible = isVisible
   }
 
   // after performing an action (event), track following the record for notifications

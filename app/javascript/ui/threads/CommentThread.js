@@ -18,9 +18,10 @@ class CommentThread extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { commentCount } = this.props
+    const { commentCount, handleScrollOnCommentUpdate } = this.props
     if (commentCount > prevProps.commentCount) {
       this.updateContainerSize()
+      handleScrollOnCommentUpdate()
     }
   }
 
@@ -109,6 +110,7 @@ CommentThread.propTypes = {
   thread: MobxPropTypes.objectOrObservableObject.isRequired,
   commentCount: PropTypes.number.isRequired,
   updateContainerSize: PropTypes.func.isRequired,
+  handleScrollOnCommentUpdate: PropTypes.func.isRequired,
 }
 CommentThread.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
