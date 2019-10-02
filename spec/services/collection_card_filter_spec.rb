@@ -68,7 +68,6 @@ RSpec.describe CollectionCardFilter, type: :service do
       )
     end
 
-
     context 'as a viewer' do
       let!(:user) { viewer }
 
@@ -180,15 +179,21 @@ RSpec.describe CollectionCardFilter, type: :service do
       end
     end
 
-    context 'with no user (#filter_for_public)' do
-      before do
-        collection.update(anyone_can_view: true)
+    context 'with no user' do
+      it 'returns no visible cards' do
+        expect(subject).to match_array([])
       end
 
-      it 'returns all cards with same role as collection' do
-        expect(subject).to match_array(
-          [visible_card_1, visible_card_2],
-        )
+      context 'anyone_can_view' do
+        before do
+          collection.update(anyone_can_view: true)
+        end
+
+        it 'returns all cards with same role as collection' do
+          expect(subject).to match_array(
+            [visible_card_1, visible_card_2],
+          )
+        end
       end
     end
 
@@ -209,6 +214,7 @@ RSpec.describe CollectionCardFilter, type: :service do
 
     context 'with external_id filter' do
       let!(:application) { create(:application) }
+      let(:user) { create(:user, :application_bot, application: application) }
       let!(:external_record) do
         create(
           :external_record,
@@ -219,6 +225,10 @@ RSpec.describe CollectionCardFilter, type: :service do
       end
       let!(:filters) do
         { external_id: 'creative-difference-card' }
+      end
+      before do
+        # make sure application_bot can view the collection
+        user.add_role(Role::VIEWER, collection)
       end
 
       it 'returns card that has collection with external id' do
