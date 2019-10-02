@@ -888,12 +888,16 @@ export default class UiStore {
 
   scrollToBottomOfComments(commentId = null) {
     let { bottom } = v.commentScrollOpts
-    if (commentId) bottom = `${commentId}-replies-bottom`
+    let offset = 0
+    if (commentId) {
+      bottom = `${commentId}-replies-bottom`
+      offset =
+        -1 *
+        document.getElementById(v.commentScrollOpts.containerId).clientHeight
+    }
     this.scroller.scrollTo(bottom, {
       ...v.commentScrollOpts,
-      offset:
-        -1 *
-        document.getElementById(v.commentScrollOpts.containerId).clientHeight,
+      offset: offset,
     })
   }
 

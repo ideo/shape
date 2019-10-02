@@ -161,6 +161,7 @@ class ActivityLogBox extends React.Component {
     this.position.y = y
     this.position.w = w
     this.position.h = h
+    // note: account for smaller window sizes
     if (!temporary) {
       localStorage.setItem(POSITION_KEY, this.position)
     }
@@ -197,7 +198,6 @@ class ActivityLogBox extends React.Component {
   handleClose = ev => {
     const { uiStore } = this.props
     uiStore.update('activityLogOpen', false)
-    uiStore.expandThread(null)
   }
 
   handleNotifications = ev => {

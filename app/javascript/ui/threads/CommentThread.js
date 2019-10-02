@@ -14,6 +14,7 @@ import { Element as ScrollElement } from 'react-scroll'
 class CommentThread extends React.Component {
   componentDidMount() {
     this.updateContainerSize()
+    this.props.uiStore.scrollToBottomOfComments()
   }
 
   componentDidUpdate(prevProps) {

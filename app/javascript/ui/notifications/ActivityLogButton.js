@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types'
 import { observer } from 'mobx-react'
 import styled from 'styled-components'
-import _ from 'lodash'
 
 import CommentIcon from '~/ui/icons/CommentIcon'
 import { apiStore, uiStore } from '~/stores'
@@ -42,16 +41,6 @@ class ActivityLogButton extends React.Component {
   toggleActivityLog = async () => {
     const val = !uiStore.activityLogOpen
     uiStore.update('activityLogOpen', val)
-    const thread = await apiStore.findThreadForRecord(uiStore.viewingRecord)
-    const newestComment = _.last(thread.comments)
-    uiStore.scroller.scrollTo(`${newestComment.id}-replies-bottom`, {
-      ...v.commentScrollOpts,
-      offset:
-        -1 *
-          document.getElementById(v.commentScrollOpts.containerId)
-            .clientHeight +
-        50,
-    })
   }
 
   handleClick = ev => {

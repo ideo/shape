@@ -208,12 +208,14 @@ class Comment extends React.Component {
     this.toggleReply()
   }
 
-  toggleReply = () => {
+  toggleReply = async () => {
     const { uiStore } = this.props
     if (this.isActive) {
       uiStore.setReplyingToComment(null)
     } else {
-      this.expandReplies()
+      const { parentComment } = this
+      await this.expandReplies()
+      uiStore.scrollToBottomOfComments(parentComment.id)
     }
   }
 

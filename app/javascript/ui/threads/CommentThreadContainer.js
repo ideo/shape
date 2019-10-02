@@ -149,7 +149,7 @@ class CommentThreadContainer extends React.Component {
       }
     }
     // scroll again after any more comments have loaded
-    this.scrollToBottom()
+    uiStore.scrollToBottomOfComments()
   }
 
   closeCurrentThread = () => {
@@ -157,13 +157,6 @@ class CommentThreadContainer extends React.Component {
     uiStore.expandThread(null)
     // reset back to whatever it was
     updateContainerSize({ reset: true })
-  }
-
-  scrollToBottom = () => {
-    scroller.scrollTo('ctc-bottom', {
-      ...v.commentScrollOpts,
-      delay: 0,
-    })
   }
 
   isExpanded = key => {
@@ -185,11 +178,10 @@ class CommentThreadContainer extends React.Component {
     apiStore.loadNextThreadPage()
   }
 
-  scrollToBottomUnlessReplying = () => {
+  scrollToBottomOfComment = () => {
     const { uiStore } = this.props
-    // don't scroll to bottom for replies
-    if (uiStore.replyingToCommentId) return
-    this.scrollToBottom()
+    // scroll to bottom of comments
+    uiStore.scrollToBottomOfComments(uiStore.replyingToCommentId)
   }
 
   handleBottomVisibility = isVisible => {
@@ -219,8 +211,8 @@ class CommentThreadContainer extends React.Component {
       <CommentThread
         thread={thread}
         commentCount={thread.comments.length}
-        afterSubmit={this.scrollToBottomUnlessReplying}
-        onEditorHeightChange={this.scrollToBottomUnlessReplying}
+        afterSubmit={this.scrollToBottomOfComment}
+        onEditorHeightChange={this.scrollToBottomOfComment}
         updateContainerSize={this.props.updateContainerSize}
       />
     )

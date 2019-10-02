@@ -154,13 +154,6 @@ class CommentThread extends BaseRecord {
     if (!created) {
       // after we're done creating the temp comment, clear out any prev temp ones
       newComments = _.filter(mergedComments, c => c.persisted)
-
-      // const canMarkParentAsRead =
-      //   !_.isEmpty(newParentComments) && _.isEmpty(newReplies)
-      // if (canMarkParentAsRead) {
-      //   // when parent comments
-      //   this.markAsRead()
-      // }
     }
 
     this.comments.replace(_.sortBy(newComments, ['created_at']))
@@ -172,25 +165,6 @@ class CommentThread extends BaseRecord {
       parent = _.find(comments, { id: reply.parent_id.toString() })
       if (parent) parent.importReplies([reply])
     })
-  }
-
-  get viewingCommentThread() {
-    const { uiStore } = this
-    return (
-      uiStore.activityLogOpen &&
-      uiStore.activityLogPage === 'comments' &&
-      uiStore.expandedThreadKey === this.key
-    )
-  }
-
-  markAsRead = async () => {
-    const { uiStore } = this
-    // don't mark as read if coment thread is not currently in view or user is replying
-    if (!this.viewingCommentThread || uiStore.replyingToCommentId) {
-      return
-    }
-    await this.API_markViewed()
-    uiStore.scrollToBottomOfComments()
   }
 }
 

@@ -117,12 +117,7 @@ class Comment extends BaseRecord {
   markThreadAsRead = () => {
     const { uiStore } = this
     if (!uiStore.activityLogOpen) return
-    // const { id, thread } = this
     return this.thread.API_markViewed()
-    // // only scroll if replying to the same parent comment
-    // if (!uiStore.replyingToCommentId || uiStore.replyingToCommentId !== this.id)
-    //   return
-    // uiStore.scrollToBottomOfComments(id)
   }
 }
 
