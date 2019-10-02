@@ -233,7 +233,6 @@ class GridCard extends React.Component {
             <SelectionCircle cardId={card.id} />
           </CardActionHolder>
         )}
-        <TextActionMenu card={card} />
         <ActionMenu
           location={this.location}
           className="show-on-hover"
@@ -527,6 +526,9 @@ class GridCard extends React.Component {
         onMouseLeave={this.closeContextMenu}
         selected={this.isSelected || this.props.hoveringOver}
       >
+        <StyledTopRightActions>
+          <TextActionMenu card={card} />
+        </StyledTopRightActions>
         {canEditCollection &&
           showHotEdge &&
           (!card.isPinnedAndLocked || lastPinnedCard) && (
