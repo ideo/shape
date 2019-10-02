@@ -13,15 +13,27 @@ import { Element as ScrollElement } from 'react-scroll'
 @observer
 class CommentThread extends React.Component {
   componentDidMount() {
+    const { uiStore } = this.props
     this.updateContainerSize()
-    this.props.uiStore.scrollToBottomOfComments()
+    uiStore.setReplyingToComment(null)
+    uiStore.scrollToBottomOfComments()
   }
 
   componentDidUpdate(prevProps) {
-    const { commentCount, handleScrollOnCommentUpdate } = this.props
+    const {
+      uiStore,
+      thread,
+      commentCount,
+      handleScrollOnCommentUpdate,
+    } = this.props
     if (commentCount > prevProps.commentCount) {
       this.updateContainerSize()
       handleScrollOnCommentUpdate()
+    }
+    if (thread.id !== prevProps.thread.id) {
+      // when switching between threads
+      this.updateContainerSize()
+      uiStore.setReplyingToComment(null)
     }
   }
 

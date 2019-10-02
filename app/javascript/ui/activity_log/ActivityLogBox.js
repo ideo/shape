@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import Rnd from 'react-rnd'
 import localStorage from 'mobx-localstorage'
 import { observe, runInAction, action } from 'mobx'
@@ -15,7 +16,7 @@ import CommentThreadContainer from '~/ui/threads/CommentThreadContainer'
 import v from '~/utils/variables'
 
 const MIN_WIDTH = 319
-const MIN_HEIGHT = 400
+const MIN_HEIGHT = 200
 const MAX_WIDTH = 800
 const MAX_HEIGHT = 800
 const HEADER_HEIGHT = 35
@@ -116,6 +117,11 @@ class ActivityLogBox extends React.Component {
     this.position.x = existingPosition.x || this.defaultX
   }
 
+  storedPosition(attr) {
+    const existingPosition = localStorage.getItem(POSITION_KEY) || {}
+    return existingPosition[attr]
+  }
+
   get currentPage() {
     const { uiStore } = this.props
     return uiStore.activityLogPage
@@ -160,10 +166,12 @@ class ActivityLogBox extends React.Component {
     this.position.x = x
     this.position.y = y
     this.position.w = w
-    this.position.h = h
-    // note: account for smaller window sizes
     if (!temporary) {
+      this.position.h = h
       localStorage.setItem(POSITION_KEY, this.position)
+    } else {
+      // temporarily set this, but don't store it in localStorage
+      this.position.h = _.min([this.storedPosition('h'), h])
     }
     return this.position
   }

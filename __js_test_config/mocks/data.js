@@ -526,6 +526,7 @@ export const fakeComment = {
 }
 export const fakeThread = {
   id: '1',
+  persisted: true,
   record: fakeCollection,
   key: 'collection-1',
   unread_count: 2,
