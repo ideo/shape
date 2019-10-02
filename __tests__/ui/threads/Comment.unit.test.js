@@ -68,18 +68,14 @@ describe('Comment', () => {
     })
   })
 
-  it('sets replying to comment id when clicked', () => {
+  it('fetches replies (which will set replying to comment) when component is clicked', () => {
     wrapper.simulate('click', fakeEvent)
-    expect(props.uiStore.setReplyingToComment).toHaveBeenCalledWith(
-      props.comment.id
-    )
+    expect(props.comment.API_fetchReplies).toHaveBeenCalled()
   })
 
-  it('sets replying to comment id when reply button is clicked', () => {
+  it('fetches replies (which will set replying to comment) when reply button clicked', () => {
     wrapper.find('.test-reply-comment').simulate('click', fakeEvent)
-    expect(props.uiStore.setReplyingToComment).toHaveBeenCalledWith(
-      props.comment.id
-    )
+    expect(props.comment.API_fetchReplies).toHaveBeenCalled()
   })
 
   describe('if a comment is a reply', () => {

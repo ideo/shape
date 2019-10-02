@@ -1,4 +1,3 @@
-// import { scroller } from 'react-scroll'
 import CommentThreadContainer from '~/ui/threads/CommentThreadContainer'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
@@ -6,34 +5,22 @@ import { fakeCollection } from '#/mocks/data'
 
 jest.mock('react-scroll')
 
-let wrapper, props, component, apiStore, uiStore
+let wrapper, props, component, apiStore, uiStore, currentThread
 describe('CommentThreadContainer', () => {
   beforeEach(() => {
     apiStore = fakeApiStore()
     uiStore = fakeUiStore
+    uiStore.viewingRecord = fakeCollection
 
     props = {
       uiStore,
       apiStore,
       loadingThreads: false,
+      updateContainerSize: () => null,
     }
     wrapper = shallow(<CommentThreadContainer.wrappedComponent {...props} />)
     component = wrapper.instance()
   })
-
-  // TODO: Remove if we for sure don't want to keep componentDidMount
-  // TODO: Or fix this test if we want that scroll behavior
-  // describe('componentDidMount', () => {
-  //   it('should scroll to bottom if no threads are expanded', () => {
-  //     expect(scroller.scrollTo).toHaveBeenCalledWith(
-  //       `thread-${apiStore.currentThreads.length}`,
-  //       {
-  //         ...component.scrollOpts,
-  //         delay: 0,
-  //       }
-  //     )
-  //   })
-  // })
 
   describe('componentDidUpdate', () => {
     it('should set loadingThreads true', () => {
@@ -41,7 +28,7 @@ describe('CommentThreadContainer', () => {
       expect(component.loadingThreads).toEqual(true)
     })
 
-    it('should set loadingThreads false and scrollToTopOfNextThread if expanded', () => {
+    it('should set loadingThreads false and expandedThread if expanded', () => {
       wrapper.setProps({
         loadingThreads: false,
         uiStore: {
@@ -56,11 +43,16 @@ describe('CommentThreadContainer', () => {
     })
   })
 
-  it('renders a CommentThread for each of apiStore.currentThreads', () => {
-    expect(wrapper.find('CommentThread').exists()).toBeTruthy()
-    expect(wrapper.find('CommentThread').length).toEqual(
+  it('renders a CommentThreadHeader for each of apiStore.currentThreads', () => {
+    expect(wrapper.find('CommentThreadHeader').exists()).toBeTruthy()
+    expect(wrapper.find('CommentThreadHeader').length).toEqual(
       apiStore.currentThreads.length
     )
+  })
+
+  it('renders the jump button to jump to the current thread', () => {
+    expect(component.showJumpButton).toBe(true)
+    expect(wrapper.find('JumpButton').exists()).toBe(true)
   })
 
   it('can toggle a thread being expanded', () => {
@@ -112,18 +104,31 @@ describe('CommentThreadContainer', () => {
     })
   })
 
-  describe('when on page of expanded thread in view', () => {
+  describe('when on page of expanded thread', () => {
     beforeEach(() => {
-      component.visibileThreads = {
-        get: jest.fn().mockReturnValue(true),
-      }
-      uiStore.viewingRecord = fakeCollection
+      currentThread = apiStore.currentThreads[0]
+      currentThread.record = fakeCollection
+      wrapper.setProps({
+        loadingThreads: false,
+        uiStore: {
+          ...fakeUiStore,
+          viewingRecord: fakeCollection,
+          expandedThreadKey: currentThread.key,
+        },
+      })
+      wrapper.update()
+      component = wrapper.instance()
     })
 
-    // TODO: Delete if we are no longer using showJumpToThreadButton
-    // TODO: Figure out what we actually want to be testing here (text of button?)
-    // it('should not show the jump button', () => {
-    //   expect(component.showJumpToThreadButton).toBe(false)
-    // })
+    it('should render a CommentThread for the thread', () => {
+      const commentThread = wrapper.find('CommentThread')
+      expect(commentThread.length).toEqual(1)
+      expect(commentThread.props().thread).toEqual(currentThread)
+    })
+
+    it('should not show the jump button', () => {
+      expect(component.showJumpButton).toBe(false)
+      expect(wrapper.find('JumpButton').exists()).toBe(false)
+    })
   })
 })

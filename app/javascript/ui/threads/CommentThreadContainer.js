@@ -2,7 +2,7 @@ import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { Element as ScrollElement, scroller } from 'react-scroll'
+import { Element as ScrollElement } from 'react-scroll'
 import pluralize from 'pluralize'
 import styled from 'styled-components'
 import Truncator from 'react-truncator'
@@ -71,7 +71,11 @@ class CommentThreadContainer extends React.Component {
 
   componentDidUpdate(prevProps) {
     const { expandedThreadKey, loadingThreads } = this.props
-    if (!expandedThreadKey && prevProps.expandedThreadKey) {
+    if (
+      !expandedThreadKey &&
+      prevProps.expandedThreadKey &&
+      this.containerDiv
+    ) {
       // we just closed a thread, so jump back to the prevScrollPosition
       this.containerDiv.scrollTop = this.prevScrollPosition
       // and reset the stored value
@@ -97,6 +101,11 @@ class CommentThreadContainer extends React.Component {
 
   get containerDiv() {
     return document.getElementById(v.commentScrollOpts.containerId)
+  }
+
+  get containerDivScrollTop() {
+    const { containerDiv } = this
+    return containerDiv ? containerDiv.scrollTop : 0
   }
 
   get expandedThread() {
@@ -132,7 +141,7 @@ class CommentThreadContainer extends React.Component {
     if (!thread) return
     const { uiStore } = this.props
 
-    this.prevScrollPosition = this.containerDiv.scrollTop
+    this.prevScrollPosition = this.containerDivScrollTop
     uiStore.expandThread(thread.key, { reset: false })
 
     // don't try to load comments of our newly constructed threads
@@ -228,17 +237,23 @@ class CommentThreadContainer extends React.Component {
     )
   }
 
-  renderJumpButton() {
+  get showJumpButton() {
     const { expandedThread } = this
-    const { uiStore, parentWidth } = this.props
+    const { uiStore } = this.props
     const { viewingRecord } = uiStore
-    const showJumpButton =
+    // show the jump button if we're not on viewingRecord's expanded thread
+    return (
       viewingRecord &&
       !viewingRecord.isUserCollection &&
       (!expandedThread || expandedThread.record !== viewingRecord)
+    )
+  }
 
+  renderJumpButton() {
+    const { showJumpButton } = this
     if (!showJumpButton) return null
 
+    const { uiStore, parentWidth } = this.props
     return (
       <JumpButton onClick={this.jumpToCurrentThread} className="jumpToThread">
         <SmallActionText style={{ textAlign: 'center' }}>

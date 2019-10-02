@@ -98,6 +98,7 @@ const fakeUiStore = {
   setSnoozeChecked: jest.fn(),
   scrollToTop: jest.fn(),
   scrollToBottom: jest.fn(),
+  scrollToBottomOfComments: jest.fn(),
   scrollToBottomOfModal: jest.fn(),
   popupSnackbar: jest.fn(),
   showPermissionsAlert: jest.fn(),

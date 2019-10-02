@@ -519,6 +519,7 @@ export const fakeComment = {
     ],
     entityMap: {},
   },
+  replies: [],
   created_at: new Date('2019-05-09T03:18:00'),
   updated_at: new Date('2019-05-09T03:18:00'),
   API_fetchReplies: jest.fn().mockReturnValue(Promise.resolve({}))

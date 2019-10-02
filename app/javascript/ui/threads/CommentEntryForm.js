@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types'
-import { runInAction } from 'mobx'
 import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import { EditorState, ContentState, convertToRaw } from 'draft-js'
 import { get } from 'lodash'
@@ -122,14 +121,12 @@ class CommentEntryForm extends React.Component {
     }
 
     const { thread } = this.props
-    thread.API_saveComment(rawData).then(() => {
+    this.setState({ updating: true }, async () => {
+      this.resetEditorState()
+      await thread.API_saveComment(rawData)
       this.props.afterSubmit()
       this.setState({ updating: false })
     })
-    runInAction(() => {
-      this.setState({ updating: true })
-    })
-    this.resetEditorState()
   }
 
   render() {
