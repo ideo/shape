@@ -2,6 +2,7 @@ import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import { uiStore } from '~/stores'
 
 import v from '~/utils/variables'
 import Comment from '~/ui/threads/Comment'
@@ -27,27 +28,23 @@ StyledCommentReplies.displayName = 'StyledCommentReplies'
 
 @observer
 class CommentReplies extends React.Component {
+  componentDidUpdate(prevProps) {
+    // repliesLength is a prop for this component to force rerender when comment.replies.length changes
+    const { repliesLength, comment } = this.props
+    const { replyPage } = comment
+    if (prevProps.repliesLength < repliesLength && replyPage === 1) {
+      uiStore.scrollToBottomOfComments(this.props.comment.id)
+    }
+  }
+
   expandReplies = () => {
     this.props.comment.API_fetchReplies()
   }
 
-  get replies() {
-    const { comment, expanded } = this.props
-    if (expanded) {
-      return comment.replies
-    } else {
-      return comment.replies.slice(-3)
-    }
-  }
-
   render() {
-    const { comment, expanded } = this.props
-    const { replies } = this
+    const { comment, repliesLength } = this.props
     const commentsList = []
     // total replies count minus observable replies length
-    const repliesLength = expanded
-      ? comment.replies.length
-      : this.replies.length
     const hiddenRepliesCount = comment.replies_count - repliesLength
     if (hiddenRepliesCount > 0) {
       commentsList.push(
@@ -56,7 +53,7 @@ class CommentReplies extends React.Component {
         </ViewMore>
       )
     }
-    _.each(replies, (child, i) => {
+    _.each(comment.replies, (child, i) => {
       commentsList.push(
         <Comment
           key={`reply-${child.id}` || `reply-new-${i}`}
@@ -71,7 +68,7 @@ class CommentReplies extends React.Component {
 
 CommentReplies.propTypes = {
   comment: MobxPropTypes.objectOrObservableObject.isRequired,
-  expanded: PropTypes.bool.isRequired,
+  repliesLength: PropTypes.number.isRequired,
 }
 
 export default CommentReplies
