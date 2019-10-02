@@ -561,6 +561,10 @@ export default class UiStore {
     return this.windowWidth && this.windowWidth >= v.responsive.largeBreakpoint
   }
 
+  get isAndroid() {
+    return /(android)/i.test(navigator.userAgent)
+  }
+
   // NOTE: because we aren't tracking a difference between "closed" and null,
   // OrgMenu will always default back to "People & Groups" while in the process of closing/fading
   @computed

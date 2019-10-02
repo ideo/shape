@@ -289,18 +289,18 @@ class GridCard extends React.Component {
   }
 
   openContextMenu = ev => {
+    const { menuItemCount, props } = this
+    const { card } = props
+
     ev.preventDefault()
     // for some reason, Android treats long-press as right click
-    if (uiStore.isMobile) return false
+    if (uiStore.isAndroid) return false
 
     const rect = this.gridCardRef.getBoundingClientRect()
     const x = ev.clientX - rect.left - rect.width * 0.95
     const y = ev.clientY - rect.top - 15
 
     // this is responsible for making fixed: false
-
-    const { menuItemCount, props } = this
-    const { card } = props
 
     uiStore.openContextMenu(ev, { x, y, card, menuItemCount })
     return false
