@@ -50,8 +50,12 @@ class CommentEntryForm extends React.Component {
   }
 
   handleInputChange = editorState => {
+    const { uiStore } = this.props
+    const { replyingToCommentId } = uiStore
     if (this.state.updating) return
-    const focused = editorState.getSelection().getHasFocus()
+    const editorSelection = editorState.getSelection()
+    const focused = editorSelection.getHasFocus()
+    const appendingToInput = editorSelection.getFocusOffset() > 0
     this.setState(
       {
         editorState,
@@ -61,6 +65,9 @@ class CommentEntryForm extends React.Component {
         this.handleHeightChange()
       }
     )
+    if (appendingToInput && replyingToCommentId) {
+      uiStore.scrollToBottomOfComments(replyingToCommentId)
+    }
   }
 
   handleHeightChange = () => {
