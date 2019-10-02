@@ -373,7 +373,7 @@ export default class UiStore {
     )
     const { offsetX, offsetY } = positionOffset
 
-    if (this.cardMenuOpen.id) {
+    if (this.cardMenuOpen.id && !this.textMenuOpenForCard(card.id)) {
       this.closeCardMenu()
     } else {
       this.update('cardMenuOpen', {
