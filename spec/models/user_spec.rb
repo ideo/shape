@@ -483,6 +483,15 @@ describe User, type: :model do
       end
     end
 
+    describe '#current_org_parent_groups' do
+      let(:parent_group) do
+        create(:group, organization: org, add_subgroups: [group_in_org_member])
+      end
+      it 'returns the parent groups of the current org groups' do
+        expect(user.current_org_parent_groups).to match_array([parent_group])
+      end
+    end
+
     describe '#current_org_groups_and_special_groups' do
       let(:admin) { create(:user) }
       let(:guest) { create(:user) }
@@ -619,8 +628,9 @@ describe User, type: :model do
       end
     end
 
-    context 'with active user who has not accepted terms' do
-      let(:user) { create(:user, terms_accepted: false) }
+    context 'with active user who has not accepted their org terms' do
+      let(:organization) { create(:organization, terms_version: 2, terms_text_item: create(:text_item))}
+      let(:user) { create(:user, terms_accepted: false, current_organization: organization) }
 
       it 'allows read only access to content' do
         expect(ability).not_to be_able_to(:create, Collection.new)

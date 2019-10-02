@@ -85,7 +85,7 @@ class RolesAdd extends React.Component {
 
     const { ownerType } = this.props
     let searchMethod = 'searchUsersAndGroups'
-    if (ownerType === 'groups' || ownerType === 'shapeAdmins') {
+    if (ownerType === 'shapeAdmins') {
       searchMethod = 'searchUsers'
     }
     apiStore[searchMethod](term)
@@ -500,14 +500,15 @@ RolesAdd.propTypes = {
   onCreateRoles: PropTypes.func.isRequired,
   onCreateUsers: PropTypes.func.isRequired,
   ownerType: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
   addableGroups: MobxPropTypes.arrayOrObservableArray,
+  title: PropTypes.string,
   defaultGroupId: PropTypes.string,
 }
 RolesAdd.defaultProps = {
   roleLabels: {},
   addableGroups: [],
   defaultGroupId: '',
+  title: 'Add groups or people:',
 }
 
 export default RolesAdd
