@@ -201,8 +201,8 @@ class CommentThreadContainer extends React.Component {
   handleScrollOnCommentUpdate = async () => {
     if (!this.isBottomVisible) return
     const { expandedThread } = this
-    await expandedThread.API_markViewed()
-    this.props.uiStore.scrollToBottomOfComments()
+    expandedThread.API_markViewed()
+    this.scrollToBottomOfThread()
   }
 
   handleBottomVisibility = async isVisible => {
@@ -347,7 +347,6 @@ CommentThreadContainer.propTypes = {
   loadingThreads: PropTypes.bool.isRequired,
   expandedThreadKey: PropTypes.string,
   updateContainerSize: PropTypes.func.isRequired,
-  handleScrollOnCommentUpdate: PropTypes.func.isRequired,
 }
 CommentThreadContainer.defaultProps = {
   expandedThreadKey: null,

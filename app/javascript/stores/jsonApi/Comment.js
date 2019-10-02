@@ -98,6 +98,7 @@ class Comment extends BaseRecord {
     const { uiStore } = this
     // make sure this comment is expanded
     uiStore.setReplyingToComment(this.id)
+    this.markThreadAsRead()
     // don't fetch any replies unless you need to
     if (this.replies_count > this.replies.length) {
       const replyPage = this.replyPage ? this.replyPage + 1 : 1
@@ -108,7 +109,6 @@ class Comment extends BaseRecord {
         if (data.length > 0) {
           this.importReplies(data)
           this.replyPage = replyPage
-          this.markThreadAsRead()
         }
       })
     }

@@ -7,7 +7,7 @@ describe Api::V1::CommentsController, type: :request, json: true, auth: true do
       create(:item_comment_thread, num_comments: 3, add_followers: [user])
     end
     let(:users_thread) { user.users_threads.first }
-    let(:path) { "/api/v1/comment_threads/#{comment_thread.id}/comments" }
+    let(:path) { "/api/v1/comment_threads/#{comment_thread.id}/comments?per_page=2" }
 
     before do
       user.add_role(Role::VIEWER, comment_thread.record)
@@ -18,9 +18,13 @@ describe Api::V1::CommentsController, type: :request, json: true, auth: true do
       expect(response.status).to eq(200)
     end
 
-    it 'marks thread as read' do
+    it 'gets the most recent comments' do
       get(path)
-      expect(users_thread.reload.last_viewed_at).not_to be nil
+      # getting 2 per page
+      expect(json['data'].count).to be 2
+      retrieved_ids = json['data'].map { |comment| comment['id'].to_i }.sort
+      last_two_comments = comment_thread.comments.order(created_at: :desc).first(2)
+      expect(retrieved_ids).to eq last_two_comments.map(&:id).sort
     end
   end
 

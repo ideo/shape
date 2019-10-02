@@ -3,9 +3,11 @@ class Api::V1::CommentsController < Api::V1::BaseController
   load_and_authorize_resource :comment_thread, only: %i[index create]
   load_and_authorize_resource :comment, only: %i[destroy update]
   def index
-    # mark comments as read
-    # @comment_thread.viewed_by!(current_user)
-    paginated_comments = @comment_thread.comments.includes(:author).page(@page)
+    paginated_comments = @comment_thread
+      .comments
+      .includes(:author)
+      .page(@page)
+      .per(per_page)
     render jsonapi: paginated_comments, include: [
       :author,
       children: :author,
@@ -62,6 +64,11 @@ class Api::V1::CommentsController < Api::V1::BaseController
   end
 
   private
+
+  def per_page
+    # use passed in param, default to COMMENTS_PER_PAGE, max out at 100
+    [(params[:per_page] || Comment::COMMENTS_PER_PAGE).to_i, 100].min
+  end
 
   def comment_attributes
     %i[

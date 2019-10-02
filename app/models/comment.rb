@@ -21,14 +21,14 @@
 class Comment < ApplicationRecord
   include Firestoreable
 
-  COMMENTS_PER_PAGE = 50
+  COMMENTS_PER_PAGE = 25
   REPLIES_PER_PAGE = 25
 
   paginates_per COMMENTS_PER_PAGE
   has_many :children,
-    -> { order(created_at: :desc) },
-    class_name: 'Comment',
-    foreign_key: 'parent_id'
+           -> { order(created_at: :desc) },
+           class_name: 'Comment',
+           foreign_key: 'parent_id'
   belongs_to :comment_thread, touch: true
   belongs_to :author, class_name: 'User'
   belongs_to :parent, class_name: 'Comment', optional: true, counter_cache: :replies_count

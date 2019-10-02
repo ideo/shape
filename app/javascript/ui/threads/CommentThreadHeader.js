@@ -170,6 +170,8 @@ class CommentThreadHeader extends React.Component {
       ev.stopPropagation()
     }
     const { thread } = this.props
+    if (!thread.persisted) return
+
     const { users_thread } = thread
     if (users_thread) users_thread.unsubscribedFromEmail = false
     const subscribed = users_thread ? users_thread.currentSubscribed : false
