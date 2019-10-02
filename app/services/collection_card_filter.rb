@@ -12,19 +12,32 @@ class CollectionCardFilter < SimpleService
     initialize_cards
     apply_order
     apply_hidden
-    if @user && @collection.can_view?(@user)
-      filter_for_user
-    elsif @collection.anyone_can_view? || @collection.anyone_can_join?
+
+    if public_collection? && user_does_not_have_access?
       filter_for_public
-    elsif @filters[:external_id].present? && @application.present?
-      filter_external_id
+    elsif @user.present?
+      filter_for_user
     else
       return []
     end
+
+    # API should always have user (e.g. application_bot) present
+    if @filters[:external_id].present? && @application.present?
+      filter_external_id
+    end
+
     @cards
   end
 
   private
+
+  def public_collection?
+    @collection.anyone_can_view? || @collection.anyone_can_join?
+  end
+
+  def user_does_not_have_access?
+    !@user || !@collection.can_view?(@user)
+  end
 
   def initialize_cards
     if @collection.is_a?(Collection::Board)
