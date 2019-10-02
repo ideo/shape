@@ -61,6 +61,8 @@ class CommentThreadContainer extends React.Component {
   bottomOfExpandedThread = false
   @observable
   loadingThreads = false
+  @observable
+  isBottomVisible = false
 
   constructor(props) {
     super(props)
@@ -196,12 +198,22 @@ class CommentThreadContainer extends React.Component {
     })
   }
 
-  handleBottomVisibility = isVisible => {
+  handleScrollOnCommentUpdate = async () => {
+    if (!this.isBottomVisible) return
+    const { expandedThread } = this
+    await expandedThread.API_markViewed()
+    this.props.uiStore.scrollToBottomOfComments()
+  }
+
+  handleBottomVisibility = async isVisible => {
     const { expandedThread } = this
     // if we reached the bottom and we're viewing an expanded thread
     if (isVisible && expandedThread) {
-      expandedThread.API_markViewed()
+      await expandedThread.API_markViewed()
     }
+    runInAction(() => {
+      this.isBottomVisible = isVisible
+    })
   }
 
   renderThreads = () => {
@@ -226,6 +238,7 @@ class CommentThreadContainer extends React.Component {
         afterSubmit={this.scrollToBottomOfThread}
         onEditorHeightChange={this.scrollToBottomOfThread}
         updateContainerSize={this.props.updateContainerSize}
+        handleScrollOnCommentUpdate={this.handleScrollOnCommentUpdate}
       />
     )
   }
@@ -334,6 +347,7 @@ CommentThreadContainer.propTypes = {
   loadingThreads: PropTypes.bool.isRequired,
   expandedThreadKey: PropTypes.string,
   updateContainerSize: PropTypes.func.isRequired,
+  handleScrollOnCommentUpdate: PropTypes.func.isRequired,
 }
 CommentThreadContainer.defaultProps = {
   expandedThreadKey: null,
