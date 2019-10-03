@@ -5,11 +5,13 @@ import styled from 'styled-components'
 import v from '~/utils/variables'
 import ExpandIcon from '~/ui/icons/ExpandIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
+import CommentIcon from '../icons/CommentIcon'
 import ReactQuill from 'react-quill'
 
 // see: https://github.com/zenoamaro/react-quill/issues/188#issuecomment-445272662
 const icons = ReactQuill.Quill.import('ui/icons')
 icons['link'] = () => ReactDOMServer.renderToString(<LinkIcon />)
+icons['comment'] = () => ReactDOMServer.renderToString(<CommentIcon />)
 
 const StyledButton = styled.button`
   color: ${v.colors.commonDark};
@@ -57,6 +59,9 @@ const TextItemToolbar = props => (
       <StyledButton onClick={props.highlightText}>SUB</StyledButton>
       <StyledButton onClick={props.unhighlightText}>deSUB</StyledButton>
 
+      <StyledButton onClick={props.onComment}>
+        <CommentIcon />
+      </StyledButton>
       {props.onExpand && (
         <IconButton onClick={props.onExpand} className="ql-expand">
           <ExpandIcon />
@@ -69,9 +74,11 @@ TextItemToolbar.propTypes = {
   onExpand: PropTypes.func,
   highlightText: PropTypes.func.isRequired,
   unhighlightText: PropTypes.func.isRequired,
+  onComment: PropTypes.func,
 }
 TextItemToolbar.defaultProps = {
   onExpand: null,
+  onComment: null,
 }
 
 export default TextItemToolbar

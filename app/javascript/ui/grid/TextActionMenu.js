@@ -19,8 +19,9 @@ class TextActionMenu extends React.Component {
     return actions
   }
 
-  // TODO: implement in next ticket
-  addComment = () => null
+  addComment = () => {
+    console.log('clicked comment button')
+  }
 
   handleMouseLeave = () => {
     const { uiStore } = this.props

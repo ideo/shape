@@ -89,7 +89,7 @@ const StyledContainer = styled.div`
   `}
 `
 
-@inject('uiStore')
+@inject('uiStore', 'apiStore')
 @observer
 class RealtimeTextItem extends React.Component {
   channelName = 'ItemRealtimeChannel'
@@ -500,6 +500,16 @@ class RealtimeTextItem extends React.Component {
     const { quillEditor } = this
     quillEditor.format('commentHighlight', false, 'user')
     quillEditor.format('highlightClass', false, 'user')
+
+  onComment = async e => {
+    e.preventDefault()
+    // const { target } = e
+    // const { apiStore, uiStore } = this.props
+
+    // activate Activity thread
+    // const thread = await apiStore.findOrBuildCommentThread(target)
+
+    // uiStore.expandThread(thread.key)
   }
 
   render() {
@@ -539,6 +549,7 @@ class RealtimeTextItem extends React.Component {
               onExpand={onExpand}
               highlightText={this.highlightText}
               unhighlightText={this.unhighlightText}
+              onComment={this.onComment}
             />
           )}
           <CloseButton
