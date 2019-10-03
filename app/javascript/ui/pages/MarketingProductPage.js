@@ -53,7 +53,6 @@ class MarketingProductPage extends React.Component {
     const {
       content: { hero },
     } = this.state
-    console.log('dfa', hero && hero.videoUrl)
     if (!hero || !hero.videoUrl) return ''
     return (
       <Fragment>
