@@ -25,7 +25,7 @@ class Comment < ApplicationRecord
   REPLIES_PER_PAGE = 25
 
   paginates_per COMMENTS_PER_PAGE
-  has_many :children,
+  has_many :replies,
            -> { order(created_at: :desc) },
            class_name: 'Comment',
            foreign_key: 'parent_id'
@@ -83,6 +83,6 @@ class Comment < ApplicationRecord
   end
 
   def replies_by_page(page: 1)
-    children.page(page).per(REPLIES_PER_PAGE)
+    replies.page(page).per(REPLIES_PER_PAGE)
   end
 end

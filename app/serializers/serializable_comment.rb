@@ -13,9 +13,9 @@ class SerializableComment < BaseJsonSerializer
     @object.parent_id.to_s
   end
 
-  has_many :children do
+  has_many :latest_replies do
     data do
-      @object.children.first 3
+      @object.replies.first 3
     end
   end
 end

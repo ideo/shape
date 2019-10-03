@@ -7,6 +7,7 @@ describe Api::V1::CommentsController, type: :request, json: true, auth: true do
       create(:item_comment_thread, num_comments: 3, add_followers: [user])
     end
     let(:users_thread) { user.users_threads.first }
+    let(:last_two_comments) { comment_thread.comments.order(created_at: :desc).first(2) }
     let(:path) { "/api/v1/comment_threads/#{comment_thread.id}/comments?per_page=2" }
 
     context 'without access to the record' do
@@ -31,8 +32,19 @@ describe Api::V1::CommentsController, type: :request, json: true, auth: true do
         # getting 2 per page
         expect(json['data'].count).to be 2
         retrieved_ids = json['data'].map { |comment| comment['id'].to_i }.sort
-        last_two_comments = comment_thread.comments.order(created_at: :desc).first(2)
         expect(retrieved_ids).to eq last_two_comments.map(&:id).sort
+      end
+
+      context 'with replies' do
+        let(:comment) { comment_thread.comments.last }
+        let!(:replies) { create_list(:comment, 2, parent: comment) }
+
+        it 'gets the latest replies in the comment' do
+          get(path)
+          json_comment = json['data'].select { |c| c['id'] == comment.id.to_s }.first
+          latest_replies = json_comment['relationships']['latest_replies']['data']
+          expect(latest_replies.map { |c| c['id'].to_i }).to match_array(replies.map(&:id))
+        end
       end
     end
   end

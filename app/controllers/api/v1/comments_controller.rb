@@ -10,7 +10,7 @@ class Api::V1::CommentsController < Api::V1::BaseController
                          .per(per_page)
     render jsonapi: paginated_comments, include: [
       :author,
-      children: :author,
+      latest_replies: :author,
     ]
   end
 

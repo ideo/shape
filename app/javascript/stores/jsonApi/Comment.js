@@ -22,7 +22,7 @@ class Comment extends BaseRecord {
     super(...args)
     runInAction(() => {
       // import the first 3 that get included by the serializer
-      this.importReplies(this.children)
+      this.importReplies(this.latest_replies)
     })
   }
 
