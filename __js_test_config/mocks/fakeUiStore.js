@@ -111,6 +111,7 @@ const fakeUiStore = {
   setEditingCardCover: jest.fn(),
   adminAudienceMenuOpen: false,
   actionMenuOpenForCard: jest.fn(true).mockImplementation(x => false),
+  textMenuOpenForCard: jest.fn(true).mockImplementation(x => false),
 }
 
 export default fakeUiStore
