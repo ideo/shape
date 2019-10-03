@@ -117,11 +117,6 @@ class ActivityLogBox extends React.Component {
     this.position.x = existingPosition.x || this.defaultX
   }
 
-  storedPosition(attr) {
-    const existingPosition = localStorage.getItem(POSITION_KEY) || {}
-    return existingPosition[attr]
-  }
-
   get currentPage() {
     const { uiStore } = this.props
     return uiStore.activityLogPage
@@ -151,27 +146,28 @@ class ActivityLogBox extends React.Component {
 
   @action
   updatePosition = ({
-    x = this.position.x,
-    y = this.position.y,
-    w = this.position.w,
-    h = this.position.h,
+    x = null,
+    y = null,
+    w = null,
+    h = null,
     temporary = false,
     reset = false,
   }) => {
+    const existingPosition = localStorage.getItem(POSITION_KEY) || {}
     if (y < 0) return
     if (reset) {
       this.resetPosition()
       return
     }
-    this.position.x = x
-    this.position.y = y
-    this.position.w = w
+    this.position.x = x || existingPosition.x || this.position.x
+    this.position.y = y || existingPosition.y || this.position.y
+    this.position.w = w || existingPosition.w || this.position.w
+    this.position.h = h || existingPosition.h || this.position.h
     if (!temporary) {
-      this.position.h = h
       localStorage.setItem(POSITION_KEY, this.position)
     } else {
       // temporarily set this, but don't store it in localStorage
-      this.position.h = _.min([this.storedPosition('h'), h])
+      this.position.h = _.min([existingPosition.h, h])
     }
     return this.position
   }
