@@ -30,6 +30,8 @@ class Comment < ApplicationRecord
            class_name: 'Comment',
            foreign_key: 'parent_id'
   belongs_to :comment_thread, touch: true
+  delegate :can_view?, to: :comment_thread
+
   belongs_to :author, class_name: 'User'
   belongs_to :parent, class_name: 'Comment', optional: true, counter_cache: :replies_count
 

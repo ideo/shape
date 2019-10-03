@@ -9,22 +9,72 @@ describe Api::V1::CommentsController, type: :request, json: true, auth: true do
     let(:users_thread) { user.users_threads.first }
     let(:path) { "/api/v1/comment_threads/#{comment_thread.id}/comments?per_page=2" }
 
-    before do
-      user.add_role(Role::VIEWER, comment_thread.record)
+    context 'without access to the record' do
+      it 'returns a 401' do
+        get(path)
+        expect(response.status).to eq(401)
+      end
     end
 
-    it 'returns a 200' do
-      get(path)
-      expect(response.status).to eq(200)
+    context 'with access to the record' do
+      before do
+        user.add_role(Role::VIEWER, comment_thread.record)
+      end
+
+      it 'returns a 200' do
+        get(path)
+        expect(response.status).to eq(200)
+      end
+
+      it 'gets the most recent comments' do
+        get(path)
+        # getting 2 per page
+        expect(json['data'].count).to be 2
+        retrieved_ids = json['data'].map { |comment| comment['id'].to_i }.sort
+        last_two_comments = comment_thread.comments.order(created_at: :desc).first(2)
+        expect(retrieved_ids).to eq last_two_comments.map(&:id).sort
+      end
+    end
+  end
+
+  describe 'GET #replies' do
+    let!(:comment) { create(:comment) }
+    let!(:replies) { create_list(:comment, 3, parent: comment) }
+    let(:path) { "/api/v1/comments/#{comment.id}/replies" }
+
+    context 'without access to the record' do
+      it 'returns a 401' do
+        get(path)
+        expect(response.status).to eq(401)
+      end
     end
 
-    it 'gets the most recent comments' do
-      get(path)
-      # getting 2 per page
-      expect(json['data'].count).to be 2
-      retrieved_ids = json['data'].map { |comment| comment['id'].to_i }.sort
-      last_two_comments = comment_thread.comments.order(created_at: :desc).first(2)
-      expect(retrieved_ids).to eq last_two_comments.map(&:id).sort
+    context 'with access to the record' do
+      before do
+        user.add_role(Role::VIEWER, comment.comment_thread.record)
+      end
+
+      it 'returns a 200' do
+        get(path)
+        expect(response.status).to eq(200)
+      end
+
+      it 'gets the most recent replies' do
+        get(path)
+        expect(json['data'].count).to be 3
+        expect(json['data'].first['attributes']).to match_json_schema('comment')
+        retrieved_ids = json['data'].map { |comment| comment['id'].to_i }
+        expect(retrieved_ids).to match_array replies.map(&:id)
+      end
+
+      context 'with pagination' do
+        let(:path) { "/api/v1/comments/#{comment.id}/replies?page=2" }
+
+        it 'gets the next page (which is empty)' do
+          get(path)
+          expect(json['data'].count).to be 0
+        end
+      end
     end
   end
 
@@ -81,24 +131,35 @@ describe Api::V1::CommentsController, type: :request, json: true, auth: true do
 
   describe 'DELETE #destroy' do
     let!(:comment_thread) { create(:item_comment_thread) }
-    let!(:comment) { create(:comment, comment_thread: comment_thread, author: user) }
     let(:path) { "/api/v1/comments/#{comment.id}" }
 
     before do
       user.add_role(Role::EDITOR, comment_thread.record)
     end
 
-    it 'deletes the comment' do
-      expect {
+    context 'when user is not comment author' do
+      let!(:comment) { create(:comment, comment_thread: comment_thread) }
+
+      it 'returns a 401' do
         delete(path)
-      }.to change(Comment, :count).from(1).to(0)
-      expect(response.status).to eq(204)
+        expect(response.status).to eq(401)
+      end
+    end
+
+    context 'when user is comment author' do
+      let!(:comment) { create(:comment, comment_thread: comment_thread, author: user) }
+
+      it 'deletes the comment' do
+        expect {
+          delete(path)
+        }.to change(Comment, :count).from(1).to(0)
+        expect(response.status).to eq(204)
+      end
     end
   end
 
   describe 'PATCH #update' do
     let!(:comment_thread) { create(:item_comment_thread) }
-    let!(:comment) { create(:comment, comment_thread: comment_thread, author: user) }
     let(:path) { "/api/v1/comments/#{comment.id}" }
     let(:params) {
       json_api_params(
@@ -107,19 +168,28 @@ describe Api::V1::CommentsController, type: :request, json: true, auth: true do
       )
     }
 
-    before do
-      user.add_role(Role::EDITOR, comment_thread.record)
+    context 'when user is not comment author' do
+      let!(:comment) { create(:comment, comment_thread: comment_thread) }
+
+      it 'returns a 401' do
+        patch(path, params: params)
+        expect(response.status).to eq(401)
+      end
     end
 
-    it 'returns a 200' do
-      patch(path, params: params)
-      expect(response.status).to eq(200)
-    end
+    context 'when user is comment author' do
+      let!(:comment) { create(:comment, comment_thread: comment_thread, author: user) }
 
-    it 'updates the content' do
-      expect(comment.message).not_to eq('edited comment')
-      patch(path, params: params)
-      expect(comment.reload.message).to eq('edited comment')
+      it 'returns a 200' do
+        patch(path, params: params)
+        expect(response.status).to eq(200)
+      end
+
+      it 'updates the content' do
+        expect(comment.message).not_to eq('edited comment')
+        patch(path, params: params)
+        expect(comment.reload.message).to eq('edited comment')
+      end
     end
   end
 end

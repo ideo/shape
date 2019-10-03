@@ -20,6 +20,8 @@ class CommentThread < ApplicationRecord
 
   belongs_to :record,
              polymorphic: true
+  delegate :can_view?, to: :record
+
   # optional relation gives way to inherit_record_organization_id
   belongs_to :organization, optional: true
   before_validation :inherit_record_organization_id, on: :create
@@ -109,7 +111,7 @@ class CommentThread < ApplicationRecord
     return false if record.archived?
 
     # anyone who can view the record can contribute to the comment thread
-    record.can_view?(user)
+    can_view?(user)
   end
 
   def serialized_for_firestore

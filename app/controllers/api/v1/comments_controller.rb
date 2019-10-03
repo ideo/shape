@@ -14,11 +14,9 @@ class Api::V1::CommentsController < Api::V1::BaseController
     ]
   end
 
+  before_action :load_and_authorize_comment, only: %i[replies]
   def replies
-    parent_id = params[:id]
-    page = params[:page]
-    parent = Comment.find parent_id
-    paginated_replies = parent.replies_by_page(page: page).includes(:author)
+    paginated_replies = @comment.replies_by_page(page: @page).includes(:author)
     render jsonapi: paginated_replies, include: %i[
       author
       parent
@@ -65,6 +63,11 @@ class Api::V1::CommentsController < Api::V1::BaseController
   end
 
   private
+
+  def load_and_authorize_comment
+    @comment = Comment.find params[:id]
+    authorize! :read, @comment
+  end
 
   def per_page
     # use passed in param, default to COMMENTS_PER_PAGE, max out at 100
