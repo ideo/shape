@@ -515,7 +515,7 @@ class RealtimeTextItem extends React.Component {
             size={fullPageView ? 'lg' : 'sm'}
           />
         </DockedToolbar>
-        <QuillStyleWrapper>
+        <QuillStyleWrapper fullPageView={fullPageView}>
           <ReactQuill
             {...quillProps}
             value={this.dataContent}
