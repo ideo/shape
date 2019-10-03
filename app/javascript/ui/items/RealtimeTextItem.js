@@ -502,7 +502,13 @@ class RealtimeTextItem extends React.Component {
     quillEditor.format('highlightClass', false, 'user')
 
   onComment = async e => {
+    const { uiStore } = this.props
     e.preventDefault()
+    console.log('clicking comment button in realtime text item', e)
+    uiStore.update('activityLogOpen', true)
+    // How to get proper target for this?
+    // fetch card using card id and use that to get record for thread?
+    uiStore.expandThread(null)
     // const { target } = e
     // const { apiStore, uiStore } = this.props
 
