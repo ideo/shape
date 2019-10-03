@@ -1,65 +1,81 @@
 import PropTypes from 'prop-types'
 import { Element as ScrollElement } from 'react-scroll'
 import { Box } from 'reflexbox'
+import styled from 'styled-components'
+
+import v from '~/utils/variables'
 import {
   MarketingFooter,
   InvertMarketingLink,
-  InvertMarketingH1,
-  InvertMarketingH1Bold,
   InvertMarketingLinkMail,
-  MarketingCallToAction,
   MarketingFlex,
+  MarketingContent,
   ResponsivePadInlineBlock,
   DesktopSpacer,
   Center,
-  InvertedCentered,
   InvertedFixedWidth,
 } from '~/ui/global/styled/marketing.js'
 
 import poweredByIdeo from '~/assets/Powered-by-IDEO-Inverted.png'
 import SubscribeEmail from '~/ui/marketing/SubscribeEmail'
+
+const ResponsiveFooterHolder = styled(Box)`
+  flex-direction: column;
+
+  @media only screen and (min-width: ${v.responsive.medBreakpoint}px) {
+    flex-direction: row;
+  }
+`
+ResponsiveFooterHolder.displayName = 'ResponsiveFooterHolder'
+
 class PageFooter extends React.PureComponent {
   render() {
-    const {
-      header,
-      subHeader,
-      buttonText,
-      contactHeader,
-      mailingList,
-    } = this.props.content
+    const { mailingList } = this.props.content
     return (
       <MarketingFooter>
         <ScrollElement name="FooterAnchor" />
         <MarketingFlex align="center" justify="center" wrap w={1}>
-          <Box w={1} mb={[10, '4px']}>
-            <InvertMarketingH1Bold>{header}</InvertMarketingH1Bold>
-          </Box>
-          <Box w={1}>
-            <InvertMarketingH1>{subHeader}</InvertMarketingH1>
-          </Box>
-          <Box w={1} pt={[46, 65]} pb={[46, 74]} mb={[10, 0]}>
-            <a className="get-early-access-footer" href="/sign_up">
-              <MarketingCallToAction>{buttonText}</MarketingCallToAction>
-            </a>
-          </Box>
+          <ResponsiveFooterHolder
+            flex
+            align={['center', 'center', 'space-between']}
+            w={1}
+            style={{ maxWidth: '1000px' }}
+          >
+            <Box w={1 / 2} style={{ textAlign: 'left' }}>
+              <MarketingContent color="white">
+                For general inquiries, reach us at:
+              </MarketingContent>
 
-          <ResponsivePadInlineBlock>
-            <InvertedCentered>{contactHeader}</InvertedCentered>
-          </ResponsivePadInlineBlock>
+              <InvertMarketingLinkMail
+                fontSize={18}
+                href="mailto:hello@shape.space"
+              >
+                hello@shape.space
+              </InvertMarketingLinkMail>
 
-          <Box w={1}>
-            <InvertMarketingLinkMail href="mailto:hello@shape.space">
-              hello@shape.space
-            </InvertMarketingLinkMail>
-          </Box>
+              <MarketingContent color="white">
+                For technical support, contact:
+              </MarketingContent>
 
-          <Box w={1} mt={(0, 5)} wrap>
-            <InvertedFixedWidth>{mailingList}</InvertedFixedWidth>
-          </Box>
+              <InvertMarketingLinkMail
+                fontSize={18}
+                href="mailto:support@shape.space"
+              >
+                support@shape.space
+              </InvertMarketingLinkMail>
+            </Box>
 
-          <Box w={1} mt={[8, 0]}>
-            <SubscribeEmail />
-          </Box>
+            <Box w={1 / 2} justify="flex-end">
+              <Box mt={(0, 5)} wrap>
+                <InvertedFixedWidth style={{ textAlign: 'left' }}>
+                  {mailingList}
+                </InvertedFixedWidth>
+              </Box>
+              <Box mt={[8, 0]}>
+                <SubscribeEmail />
+              </Box>
+            </Box>
+          </ResponsiveFooterHolder>
 
           <Box w={1}>
             <InvertMarketingLink

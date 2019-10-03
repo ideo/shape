@@ -98,6 +98,7 @@ const fakeUiStore = {
   setSnoozeChecked: jest.fn(),
   scrollToTop: jest.fn(),
   scrollToBottom: jest.fn(),
+  scrollToBottomOfComments: jest.fn(),
   scrollToBottomOfModal: jest.fn(),
   popupSnackbar: jest.fn(),
   showPermissionsAlert: jest.fn(),
@@ -112,6 +113,8 @@ const fakeUiStore = {
   adminAudienceMenuOpen: false,
   actionMenuOpenForCard: jest.fn(true).mockImplementation(x => false),
   textMenuOpenForCard: jest.fn(true).mockImplementation(x => false),
+  replyingToCommentId: false,
+  setReplyingToComment: jest.fn()
 }
 
 export default fakeUiStore

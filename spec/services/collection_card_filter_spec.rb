@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe CollectionCardFilter, type: :service do
-  describe '#viewable_by' do
+  describe '#call (Collection#collection_cards_viewable_by)' do
     let(:user) { nil }
     let(:editor) { create(:user) }
     let(:viewer) { create(:user) }
@@ -16,7 +16,8 @@ RSpec.describe CollectionCardFilter, type: :service do
       create(:collection,
              organization: organization,
              num_cards: 5,
-             record_type: :collection)
+             record_type: :collection,
+             add_viewers: [viewer])
     end
     let(:filters) { {} }
     let(:application) { nil }
@@ -27,8 +28,6 @@ RSpec.describe CollectionCardFilter, type: :service do
     let(:private_card) { cards[3] }
     let!(:archived_card) { cards[4] }
     before do
-      # Add viewer to group
-      viewer.add_role(Role::VIEWER, group)
       # And group to collection
       group.add_role(Role::VIEWER, collection)
 
@@ -69,68 +68,6 @@ RSpec.describe CollectionCardFilter, type: :service do
       )
     end
 
-    context 'regular collection' do
-      let!(:filters) do
-        {
-          page: 2,
-        }
-      end
-
-      it 'filters by given page/per_page' do
-        # Default per_page is made to be at least 50,
-        # so best way to test is to make sure we didn't receive any cards -- though not ideal
-        expect(subject).to be_empty
-      end
-    end
-
-    context 'with board collection' do
-      before do
-        collection.update(type: 'Collection::Board')
-
-        cards.each_with_index do |card, i|
-          card.update(
-            row: 1,
-            col: i + 1,
-          )
-        end
-      end
-      let!(:filters) do
-        {
-          rows: [0, 1],
-          cols: [2, 3],
-        }
-      end
-
-      it 'filters by row/col' do
-        # Must re-instantiate subject so we can cast board to right class
-        cc_filter = CollectionCardFilter.call(
-          collection: collection.becomes(Collection::Board),
-          user: user,
-          filters: filters,
-        )
-        expect(cc_filter).to eq(
-          [
-            visible_card_2,
-          ],
-        )
-      end
-    end
-
-    context 'with an archived collection' do
-      before do
-        collection.archive!
-        # put this card in a different batch
-        visible_card_2.update(archive_batch: 'xyz')
-      end
-
-      it 'should return all cards archived in the same batch as parent' do
-        expect(subject.size).to eq 2
-        expect(subject).to match_array(
-          [visible_card_1, archived_card],
-        )
-      end
-    end
-
     context 'as a viewer' do
       let!(:user) { viewer }
 
@@ -140,23 +77,63 @@ RSpec.describe CollectionCardFilter, type: :service do
         )
       end
 
-      context 'with external_id filter' do
-        let!(:application) { create(:application) }
-        let!(:external_record) do
-          create(
-            :external_record,
-            external_id: 'creative-difference-card',
-            externalizable: visible_card_2.record,
-            application: application,
-          )
-        end
+      context 'regular collection' do
         let!(:filters) do
-          { external_id: 'creative-difference-card' }
+          {
+            page: 2,
+          }
         end
 
-        it 'returns card that has collection with external id' do
+        it 'filters by given page/per_page' do
+          # Default per_page is made to be at least 50,
+          # so best way to test is to make sure we didn't receive any cards -- though not ideal
+          expect(subject).to be_empty
+        end
+      end
+
+      context 'with board collection' do
+        before do
+          collection.update(type: 'Collection::Board')
+
+          cards.each_with_index do |card, i|
+            card.update(
+              row: 1,
+              col: i + 1,
+            )
+          end
+        end
+        let!(:filters) do
+          {
+            rows: [0, 1],
+            cols: [2, 3],
+          }
+        end
+
+        it 'filters by row/col' do
+          # Must re-instantiate subject so we can cast board to right class
+          cc_filter = CollectionCardFilter.call(
+            collection: collection.becomes(Collection::Board),
+            user: user,
+            filters: filters,
+          )
+          expect(cc_filter).to eq(
+            [
+              visible_card_2,
+            ],
+          )
+        end
+      end
+
+      context 'with an archived collection' do
+        before do
+          collection.reload.archive!
+          # put this card in a different batch
+          visible_card_2.update(archive_batch: 'xyz')
+        end
+
+        it 'should return all cards archived in the same batch as parent' do
           expect(subject).to match_array(
-            [visible_card_2],
+            [visible_card_1],
           )
         end
       end
@@ -202,11 +179,21 @@ RSpec.describe CollectionCardFilter, type: :service do
       end
     end
 
-    context 'with no user (#filter_for_public)' do
-      it 'returns all cards with same role as collection' do
-        expect(subject).to match_array(
-          [visible_card_1, visible_card_2],
-        )
+    context 'with no user' do
+      it 'returns no visible cards' do
+        expect(subject).to match_array([])
+      end
+
+      context 'anyone_can_view' do
+        before do
+          collection.update(anyone_can_view: true)
+        end
+
+        it 'returns all cards with same role as collection' do
+          expect(subject).to match_array(
+            [visible_card_1, visible_card_2],
+          )
+        end
       end
     end
 
@@ -227,6 +214,7 @@ RSpec.describe CollectionCardFilter, type: :service do
 
     context 'with external_id filter' do
       let!(:application) { create(:application) }
+      let(:user) { create(:user, :application_bot, application: application) }
       let!(:external_record) do
         create(
           :external_record,
@@ -238,11 +226,38 @@ RSpec.describe CollectionCardFilter, type: :service do
       let!(:filters) do
         { external_id: 'creative-difference-card' }
       end
+      before do
+        # make sure application_bot can view the collection
+        user.add_role(Role::VIEWER, collection)
+      end
 
       it 'returns card that has collection with external id' do
         expect(subject).to match_array(
           [visible_card_2],
         )
+      end
+    end
+
+    context 'with groups' do
+      let(:user) { create(:user, current_organization: organization) }
+      let!(:child_group) { create(:group, organization: organization) }
+      let!(:group) { create(:group, organization: organization, add_subgroups: [child_group]) }
+      before do
+        group.add_role(Role::VIEWER, private_card.record)
+      end
+
+      it 'returns no visible cards when user is not a viewer or member of any group' do
+        expect(collection.can_view?(user)).to be false
+        expect(subject).to match_array([])
+      end
+
+      context 'when user is a(ny) member of a group that is a subgroup of another group' do
+        let!(:child_group) { create(:group, organization: organization, add_members: [user]) }
+
+        it 'returns all cards that the farthest away ancestor group can view' do
+          expect(collection.can_view?(user)).to be true
+          expect(subject).to match_array([visible_card_1, visible_card_2, private_card])
+        end
       end
     end
   end

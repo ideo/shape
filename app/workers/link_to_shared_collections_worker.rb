@@ -37,16 +37,21 @@ class LinkToSharedCollectionsWorker
   private
 
   def create_link(object, collection)
+    width = 1
+    height = 1
     if object.respond_to?(:parent_application_collection) &&
        object.parent_application_collection.present?
-      object = object.parent_application_collection
+      # link to the org collection within the root application collection
+      object = object.parent_application_collection.collections.first
+      width = 3
+      height = 2
     end
     CollectionCard::Link.create(
       parent: collection,
       item_id: (object.is_a?(Item) ? object.id : nil),
       collection_id: (object.is_a?(Collection) ? object.id : nil),
-      width: 1,
-      height: 1,
+      width: width,
+      height: height,
       order: card_order(object, collection),
     )
   end

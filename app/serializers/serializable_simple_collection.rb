@@ -34,6 +34,11 @@ class SerializableSimpleCollection < BaseJsonSerializer
     @current_ability.can?(:edit, @object)
   end
 
+  attribute :can_view do
+    # intentionally not using ability so `anyone_can_view?` does not return true
+    @current_user ? @object.can_view?(@current_user) : false
+  end
+
   has_one :parent_collection_card
   has_many :collection_cards
 end

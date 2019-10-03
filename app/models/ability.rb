@@ -102,7 +102,10 @@ class Ability
         audience.can_edit?(user)
       end
 
-      can %i[read manage], Comment do |comment|
+      can :read, Comment do |comment|
+        comment.can_view?(user)
+      end
+      can :manage, Comment do |comment|
         comment.can_edit?(user)
       end
 
@@ -129,6 +132,6 @@ class Ability
 
     # don't allow any of the editing actions unless you've accepted terms
     # (i.e. user becomes view-only)
-    cannot :modify, :all unless user.current_terms_accepted?
+    cannot :modify, :all unless user.current_org_terms_accepted
   end
 end
