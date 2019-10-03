@@ -234,7 +234,7 @@ class CommentThreadContainer extends React.Component {
     return (
       <CommentThread
         thread={thread}
-        commentCount={thread.comments.length}
+        commentCount={thread.visibleCommentsAndRepliesCount}
         afterSubmit={this.scrollToBottomOfThread}
         onEditorHeightChange={this.scrollToBottomOfThread}
         updateContainerSize={this.props.updateContainerSize}

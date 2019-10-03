@@ -30,6 +30,9 @@ class Comment extends BaseRecord {
   get unread() {
     const { thread } = this
     const { users_thread } = thread
+
+    // check if this comment was deleted
+    if (!this.apiStore) return false
     return (
       // comment was written by someone else
       this.author_id.toString() !== this.apiStore.currentUserId.toString() &&
@@ -69,6 +72,8 @@ class Comment extends BaseRecord {
           comment => comment.id === parent_id.toString()
         )
         runInAction(() => {
+          // simulate new cached count in backend
+          parent.replies_count -= 1
           _.remove(parent.replies, comment => comment.id === this.id.toString())
         })
       }

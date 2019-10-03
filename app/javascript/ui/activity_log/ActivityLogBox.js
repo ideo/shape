@@ -26,7 +26,7 @@ const DEFAULT = {
   x: 0,
   y: 180,
   w: MIN_WIDTH + 100,
-  h: MIN_HEIGHT,
+  h: MIN_HEIGHT + 200,
 }
 
 export const POSITION_KEY = 'ActivityLog:position'

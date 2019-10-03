@@ -26,8 +26,9 @@ class CommentThread extends React.Component {
       commentCount,
       handleScrollOnCommentUpdate,
     } = this.props
-    if (commentCount > prevProps.commentCount) {
+    if (commentCount !== prevProps.commentCount) {
       this.updateContainerSize()
+      // this scroll only happens when you're at the bottom of the thread
       handleScrollOnCommentUpdate()
     }
     if (thread.id !== prevProps.thread.id) {

@@ -65,13 +65,15 @@ class Api::V1::BaseController < ApplicationController
     # check for pagination being enabled
     return unless (current_page = collection.try(:current_page))
 
+    total = collection.total_pages
+    last_page = total.zero? || collection.last_page?
     # NOTE: we are not following JSONAPI format, instead
     # just returning the page number rather than absolute URL
     {
       first: 1,
-      last: collection.total_pages,
+      last: total,
       prev: collection.first_page? ? nil : current_page - 1,
-      next: collection.last_page? ? nil : current_page + 1,
+      next: last_page ? nil : current_page + 1,
     }
   end
 

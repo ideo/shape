@@ -4,10 +4,10 @@ class Api::V1::CommentsController < Api::V1::BaseController
   load_and_authorize_resource :comment, only: %i[destroy update]
   def index
     paginated_comments = @comment_thread
-      .comments
-      .includes(:author)
-      .page(@page)
-      .per(per_page)
+                         .comments
+                         .includes(:author)
+                         .page(@page)
+                         .per(per_page)
     render jsonapi: paginated_comments, include: [
       :author,
       children: :author,

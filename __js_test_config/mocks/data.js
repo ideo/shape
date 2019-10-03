@@ -537,7 +537,6 @@ export const fakeThread = {
       return this.subscribed
     },
   },
-  latestUnreadComments: [fakeComment, fakeComment],
   API_saveComment: jest.fn().mockReturnValue(Promise.resolve({})),
   API_fetchComments: jest.fn().mockReturnValue(Promise.resolve({})),
   API_subscribe: jest.fn().mockReturnValue(Promise.resolve({})),

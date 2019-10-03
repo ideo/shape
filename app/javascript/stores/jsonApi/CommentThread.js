@@ -42,16 +42,13 @@ class CommentThread extends BaseRecord {
     return users_thread.unread_count
   }
 
-  @computed
-  get latestUnreadComments() {
-    const { users_thread } = this
-    if (!users_thread) return []
-    if (users_thread.unread_count === 0) return []
-    // get latest 3
-    let comments = this.comments.slice(-3)
-    // only return ones that are unread
-    comments = _.filter(comments, comment => comment.unread)
-    return comments
+  // returns visible comments and their replies to help compute the height of the container
+  get visibleCommentsAndRepliesCount() {
+    let count = this.comments.length
+    _.each(this.comments, comment => {
+      count += comment.replies.length
+    })
+    return count
   }
 
   @computed
@@ -155,7 +152,6 @@ class CommentThread extends BaseRecord {
       // after we're done creating the temp comment, clear out any prev temp ones
       newComments = _.filter(mergedComments, c => c.persisted)
     }
-
     this.comments.replace(_.sortBy(newComments, ['created_at']))
     this.importRepliesFromParentComments(newReplies, newComments)
   }
