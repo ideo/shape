@@ -1,9 +1,10 @@
 class CommentCreator < SimpleService
-  def initialize(comment_thread:, message:, draftjs_data:, author:)
+  def initialize(comment_thread:, message:, draftjs_data:, author:, parent: nil)
     @comment_thread = comment_thread
     @message = message
     @draftjs_data = draftjs_data
     @author = author
+    @parent = parent
     @comment = nil
   end
 
@@ -20,6 +21,7 @@ class CommentCreator < SimpleService
       message: @message,
       draftjs_data: @draftjs_data,
       author: @author,
+      parent: @parent,
     )
   end
 end
