@@ -66,7 +66,8 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
 
       it 'should add the link at the first position' do
         link = user.current_shared_collection.collection_cards.first
-        expect(link.collection_id).to eq application_collection.id
+        # link to the org collection within the root application collection
+        expect(link.collection_id).to eq application_collection.collections.first.id
       end
     end
 
@@ -85,7 +86,8 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
 
       it 'should add the link at the first position' do
         link = user.current_shared_collection.collection_cards.first
-        expect(link.collection_id).to eq application_collection.id
+        # link to the org collection within the root application collection
+        expect(link.collection_id).to eq application_collection.collections.first.id
       end
     end
 
