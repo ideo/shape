@@ -91,8 +91,8 @@ class ContentBlock extends React.PureComponent {
       <StyledHtmlImage key={title.toString()} order={order}>
         <MarketingFlex
           w={1}
-          mt={4}
-          mb={4}
+          mt={[4, 1, 1]}
+          mb={[4, 1, 1]}
           align={[
             'flex-start',
             this.props.order % 2 === 1 ? 'flex-start' : 'flex-end',
@@ -100,20 +100,27 @@ class ContentBlock extends React.PureComponent {
           justify="space-evenly"
           wrap
         >
-          <Box w={[null, 0.08]} order={1} />
-
-          <Box w={[1, 0.21]} order={[4, order % 2 === 1 ? 2 : 4]}>
+          <Box
+            w={[1, 1, 0.21]}
+            pl={[50, 50, 0]}
+            pr={[50, 50, 0]}
+            mb={[0, 20, 20]}
+            mt={[0, 0, 50]}
+            mb={[40, 0, 20]}
+            order={[0, 0, 1]}
+          >
             <Title>{title}</Title>
             {<StyledInnerHTML dangerouslySetInnerHTML={{ __html: html }} />}
           </Box>
-
-          <Box w={[null, 0.09]} order={3} />
-
-          <Box w={[1, 0.54]} order={[2, order % 2 === 1 ? 4 : 2]}>
+          <Box
+            w={[1, 1, 0.54]}
+            pl={[10, 10, 0]}
+            pr={[10, 10, 0]}
+            mt={[0, 40, 40]}
+            order={[1, 1, order % 2 === 0 ? 0 : 3]}
+          >
             <ImageDisplay src={imageUrl} alt={title} />
           </Box>
-
-          <Box w={[null, 0.08]} order={4} />
         </MarketingFlex>
       </StyledHtmlImage>
     )
