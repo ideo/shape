@@ -407,6 +407,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "addShapeAdminUsers": [MockFunction],
                     "checkCurrentOrg": [MockFunction],
                     "checkInMyCollection": [MockFunction],
+                    "collapseReplies": [MockFunction],
                     "collections": Array [],
                     "createTemplateInstance": [MockFunction],
                     "currentOrgSlug": "org-slug",
@@ -421,6 +422,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "users_thread": Object {
                           "subscribed": true,
                         },
+                        "visibleCommentsAndRepliesCount": 0,
                       },
                       Object {
                         "comments": Array [],
@@ -432,6 +434,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "users_thread": Object {
                           "subscribed": true,
                         },
+                        "visibleCommentsAndRepliesCount": 0,
                       },
                     ],
                     "currentUser": Object {
@@ -2776,6 +2779,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "addShapeAdminUsers": [MockFunction],
                     "checkCurrentOrg": [MockFunction],
                     "checkInMyCollection": [MockFunction],
+                    "collapseReplies": [MockFunction],
                     "collections": Array [],
                     "createTemplateInstance": [MockFunction],
                     "currentOrgSlug": "org-slug",
@@ -2790,6 +2794,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "users_thread": Object {
                           "subscribed": true,
                         },
+                        "visibleCommentsAndRepliesCount": 0,
                       },
                       Object {
                         "comments": Array [],
@@ -2801,6 +2806,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "users_thread": Object {
                           "subscribed": true,
                         },
+                        "visibleCommentsAndRepliesCount": 0,
                       },
                     ],
                     "currentUser": Object {
@@ -5144,6 +5150,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "addShapeAdminUsers": [MockFunction],
                     "checkCurrentOrg": [MockFunction],
                     "checkInMyCollection": [MockFunction],
+                    "collapseReplies": [MockFunction],
                     "collections": Array [],
                     "createTemplateInstance": [MockFunction],
                     "currentOrgSlug": "org-slug",
@@ -5158,6 +5165,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "users_thread": Object {
                           "subscribed": true,
                         },
+                        "visibleCommentsAndRepliesCount": 0,
                       },
                       Object {
                         "comments": Array [],
@@ -5169,6 +5177,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "users_thread": Object {
                           "subscribed": true,
                         },
+                        "visibleCommentsAndRepliesCount": 0,
                       },
                     ],
                     "currentUser": Object {
@@ -7180,6 +7189,7 @@ exports[`TestDesigner renders snapshot 1`] = `
               "addShapeAdminUsers": [MockFunction],
               "checkCurrentOrg": [MockFunction],
               "checkInMyCollection": [MockFunction],
+              "collapseReplies": [MockFunction],
               "collections": Array [],
               "createTemplateInstance": [MockFunction],
               "currentOrgSlug": "org-slug",
@@ -7194,6 +7204,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                   "users_thread": Object {
                     "subscribed": true,
                   },
+                  "visibleCommentsAndRepliesCount": 0,
                 },
                 Object {
                   "comments": Array [],
@@ -7205,6 +7216,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                   "users_thread": Object {
                     "subscribed": true,
                   },
+                  "visibleCommentsAndRepliesCount": 0,
                 },
               ],
               "currentUser": Object {

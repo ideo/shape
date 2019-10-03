@@ -151,7 +151,9 @@ describe('ActivityLogBox', () => {
 
     describe('when just the x and y are given', () => {
       beforeEach(() => {
-        component.position = { x: 10, y: 15, w: 1, h: 2 }
+        // first store the values
+        component.updatePosition({ x: 10, y: 15, w: 1, h: 2 })
+        // then update
         pos = { x: 5, y: 5 }
         component.updatePosition(pos)
       })
