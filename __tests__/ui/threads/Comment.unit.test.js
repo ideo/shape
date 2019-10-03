@@ -18,7 +18,9 @@ describe('Comment', () => {
       comment: {
         ...fakeComment,
         persisted: true,
+        // comment_thread api loads last 3 comments initially
         replies: [fakeComment, fakeComment, fakeComment],
+        replies_count: 25,
       },
       isReply: false,
       viewMoreReplies: jest.fn(),
@@ -69,13 +71,14 @@ describe('Comment', () => {
   })
 
   it('fetches replies (which will set replying to comment) when component is clicked', () => {
-    wrapper.simulate('click', fakeEvent)
-    expect(props.comment.API_fetchReplies).toHaveBeenCalled()
+    // StyledComment is the outer component
+    wrapper.find('StyledComment').simulate('click', fakeEvent)
+    expect(props.comment.expandAndFetchReplies).toHaveBeenCalled()
   })
 
   it('fetches replies (which will set replying to comment) when reply button clicked', () => {
     wrapper.find('.test-reply-comment').simulate('click', fakeEvent)
-    expect(props.comment.API_fetchReplies).toHaveBeenCalled()
+    expect(props.comment.expandAndFetchReplies).toHaveBeenCalled()
   })
 
   describe('if a comment is a reply', () => {
@@ -86,6 +89,10 @@ describe('Comment', () => {
 
     it('should not have a reply button', () => {
       expect(wrapper.find('.test-reply-comment').exists()).toBeFalsy()
+    })
+
+    it('should not render CommentReplies', () => {
+      expect(wrapper.find('CommentReplies').exists()).toBeFalsy()
     })
   })
 
@@ -152,6 +159,31 @@ describe('Comment', () => {
     })
     it('does not render a delete button', () => {
       expect(wrapper.find('.test-delete-comment').exists()).toBe(false)
+    })
+  })
+
+  describe('with no replies', () => {
+    beforeEach(() => {
+      rerender({
+        ...props,
+        comment: { ...props.comment, replies: [], repliesCount: 0 },
+      })
+    })
+
+    it('should not render CommentReplies', () => {
+      expect(wrapper.find('CommentReplies').exists()).toBeFalsy()
+    })
+  })
+
+  describe('with expanded subthread', () => {
+    beforeEach(() => {
+      rerender({ ...props, expanded: true })
+    })
+
+    it('should render one parent comment and CommentReplies', () => {
+      expect(wrapper.find('CommentReplies').props().comment).toEqual(
+        props.comment
+      )
     })
   })
 })

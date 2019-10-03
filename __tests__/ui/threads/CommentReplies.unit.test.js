@@ -46,7 +46,7 @@ describe('CommentReplies', () => {
     describe('clicking on a parent thread', () => {
       it('should fetch remaining replies', () => {
         wrapper.instance().expandReplies()
-        expect(props.comment.API_fetchReplies).toHaveBeenCalled()
+        expect(props.comment.expandAndFetchReplies).toHaveBeenCalled()
       })
     })
   })

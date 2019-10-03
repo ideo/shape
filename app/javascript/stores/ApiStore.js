@@ -140,11 +140,14 @@ class ApiStore extends jsonapi(datxCollection) {
     return currentUser.current_user_collection_id
   }
 
+  get currentOrganization() {
+    return this.currentUser.current_organization
+  }
+
   @computed
   get currentOrgIsDeactivated() {
     if (!this.currentUser) return false
-    const org =
-      this.currentUserOrganization || this.currentUser.current_organization
+    const org = this.currentUserOrganization || this.currentOrganization
     if (!org) return false
     return org.deactivated
   }
@@ -458,6 +461,20 @@ class ApiStore extends jsonapi(datxCollection) {
     )
   }
 
+  get replyingToComment() {
+    const { uiStore } = this
+    if (!uiStore.replyingToCommentId) return null
+    return this.find('comments', uiStore.replyingToCommentId)
+  }
+
+  collapseReplies() {
+    const { uiStore, replyingToComment } = this
+    if (replyingToComment) {
+      replyingToComment.resetReplies()
+      uiStore.setReplyingToComment(null)
+    }
+  }
+
   async fetchNotifications() {
     const res = await this.fetchAll('notifications')
     return res.data
@@ -703,10 +720,6 @@ class ApiStore extends jsonapi(datxCollection) {
       })
     }
     return org
-  }
-
-  get currentOrganization() {
-    return this.currentUser.current_organization
   }
 
   // default action for updating any basic apiStore value

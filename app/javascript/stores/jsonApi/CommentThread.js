@@ -116,6 +116,12 @@ class CommentThread extends BaseRecord {
     })
     // also store the author_id to simulate the serializer
     comment.author_id = this.apiStore.currentUserId
+    if (commentData.parent_id) {
+      const parent = this.apiStore.find('comments', commentData.parent_id)
+      if (parent) {
+        parent.replies_count += 1
+      }
+    }
     this.importComments([comment], { created: true })
     // this will create the comment in the API
     this.uiStore.trackEvent('create', this.record)
@@ -159,7 +165,10 @@ class CommentThread extends BaseRecord {
   async importRepliesFromParentComments(replies, comments) {
     replies.forEach(reply => {
       parent = _.find(comments, { id: reply.parent_id.toString() })
-      if (parent) parent.importReplies([reply])
+      if (parent) {
+        // NOTE: could check if this is a "new" reply, and bump replies_count
+        parent.importReplies([reply])
+      }
     })
   }
 }

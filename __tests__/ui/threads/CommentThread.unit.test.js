@@ -1,6 +1,7 @@
 import CommentThread from '~/ui/threads/CommentThread'
 import { fakeThread, fakeComment } from '#/mocks/data'
 import fakeUiStore from '#/mocks/fakeUiStore'
+import fakeApiStore from '#/mocks/fakeApiStore'
 
 let wrapper, props
 describe('CommentThread', () => {
@@ -8,6 +9,7 @@ describe('CommentThread', () => {
     props = {
       thread: fakeThread,
       uiStore: fakeUiStore,
+      apiStore: fakeApiStore(),
       afterSubmit: jest.fn(),
       onEditorHeightChange: jest.fn(),
       updateContainerSize: jest.fn(),
@@ -32,16 +34,12 @@ describe('CommentThread', () => {
   })
 
   describe('with comments with subthread', () => {
-    let comments, repliesCount
+    let comments
     beforeEach(() => {
-      repliesCount = 25
       comments = [
         {
           ...fakeComment,
           persisted: true,
-          // comment_thread api loads last 3 comments initially
-          replies: [fakeComment, fakeComment, fakeComment],
-          replies_count: repliesCount,
         },
       ]
       const thread = {
@@ -53,9 +51,8 @@ describe('CommentThread', () => {
       wrapper = shallow(<CommentThread.wrappedComponent {...props} />)
     })
 
-    it('should render one parent comment and CommentReplies', () => {
+    it('should render the parent comment', () => {
       expect(wrapper.find('Comment').length).toEqual(1)
-      expect(wrapper.find('CommentReplies').length).toEqual(1)
     })
   })
 })

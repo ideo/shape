@@ -6,22 +6,21 @@ import Comment from '~/ui/threads/Comment'
 import CommentEntryForm from '~/ui/threads/CommentEntryForm'
 import CommentThreadLoader from '~/ui/threads/CommentThreadLoader'
 import CommentThreadHeader from '~/ui/threads/CommentThreadHeader'
-import CommentReplies from '~/ui/threads/CommentReplies'
 import { Element as ScrollElement } from 'react-scroll'
 
-@inject('uiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class CommentThread extends React.Component {
   componentDidMount() {
-    const { uiStore } = this.props
+    const { apiStore, uiStore } = this.props
     this.updateContainerSize()
-    uiStore.setReplyingToComment(null)
+    apiStore.collapseReplies()
     uiStore.scrollToBottomOfComments()
   }
 
   componentDidUpdate(prevProps) {
     const {
-      uiStore,
+      apiStore,
       thread,
       commentCount,
       handleScrollOnCommentUpdate,
@@ -34,7 +33,7 @@ class CommentThread extends React.Component {
     if (thread.id !== prevProps.thread.id) {
       // when switching between threads
       this.updateContainerSize()
-      uiStore.setReplyingToComment(null)
+      apiStore.collapseReplies()
     }
   }
 
@@ -63,15 +62,6 @@ class CommentThread extends React.Component {
           expanded={expanded}
         />
       )
-      if (comment.id) {
-        commentsList.push(
-          <CommentReplies
-            key={`comment-replies-${comment.id}`}
-            comment={comment}
-            repliesLength={comment.replies.length}
-          />
-        )
-      }
 
       // render the reply level entry form when replying
       if (expanded) {
@@ -126,6 +116,7 @@ CommentThread.propTypes = {
   handleScrollOnCommentUpdate: PropTypes.func.isRequired,
 }
 CommentThread.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 

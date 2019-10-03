@@ -52,9 +52,20 @@ class Comment extends BaseRecord {
 
   @action
   importReplies(replies = []) {
+    const { uiStore } = this
     let sortedReplies = _.union(this.replies, replies)
     sortedReplies = _.sortBy(sortedReplies, ['created_at'])
     this.replies.replace(sortedReplies)
+    if (uiStore.replyingToCommentId !== this.id) {
+      // slice back down to last 3
+      this.resetReplies()
+    }
+  }
+
+  @action
+  resetReplies() {
+    this.replyPage = null
+    this.replies = this.replies.slice(-3)
   }
 
   API_destroy = async () => {
@@ -99,11 +110,21 @@ class Comment extends BaseRecord {
       })
   }
 
-  async API_fetchReplies() {
+  async expandAndFetchReplies() {
     const { uiStore } = this
+    const previousReplyingToId = uiStore.replyingToCommentId
+    const justExpanded = previousReplyingToId !== this.id
     // make sure this comment is expanded
     uiStore.setReplyingToComment(this.id)
     this.markThreadAsRead()
+    await this.API_fetchReplies()
+    if (justExpanded) {
+      // if we're newly expanding, scroll to bottom
+      uiStore.scrollToBottomOfComments(this.id)
+    }
+  }
+
+  async API_fetchReplies() {
     // don't fetch any replies unless you need to
     if (this.replies_count > this.replies.length) {
       const replyPage = this.replyPage ? this.replyPage + 1 : 1

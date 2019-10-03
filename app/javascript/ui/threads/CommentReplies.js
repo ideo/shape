@@ -1,8 +1,6 @@
 import _ from 'lodash'
-import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import { uiStore } from '~/stores'
 
 import v from '~/utils/variables'
 import Comment from '~/ui/threads/Comment'
@@ -28,24 +26,15 @@ StyledCommentReplies.displayName = 'StyledCommentReplies'
 
 @observer
 class CommentReplies extends React.Component {
-  componentDidUpdate(prevProps) {
-    // repliesLength is a prop for this component to force rerender when comment.replies.length changes
-    const { repliesLength, comment } = this.props
-    const { replyPage } = comment
-    if (prevProps.repliesLength < repliesLength && replyPage === 1) {
-      uiStore.scrollToBottomOfComments(this.props.comment.id)
-    }
-  }
-
   expandReplies = () => {
-    this.props.comment.API_fetchReplies()
+    this.props.comment.expandAndFetchReplies()
   }
 
   render() {
-    const { comment, repliesLength } = this.props
+    const { comment } = this.props
     const commentsList = []
-    // total replies count minus observable replies length
-    const hiddenRepliesCount = comment.replies_count - repliesLength
+    // total replies count minus visible replies length
+    const hiddenRepliesCount = comment.replies_count - comment.replies.length
     if (hiddenRepliesCount > 0) {
       commentsList.push(
         <ViewMore key={'view-more-replies'} onClick={this.expandReplies}>
@@ -68,7 +57,6 @@ class CommentReplies extends React.Component {
 
 CommentReplies.propTypes = {
   comment: MobxPropTypes.objectOrObservableObject.isRequired,
-  repliesLength: PropTypes.number.isRequired,
 }
 
 export default CommentReplies
