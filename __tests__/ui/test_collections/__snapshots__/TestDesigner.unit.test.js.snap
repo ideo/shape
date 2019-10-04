@@ -407,6 +407,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "addShapeAdminUsers": [MockFunction],
                     "checkCurrentOrg": [MockFunction],
                     "checkInMyCollection": [MockFunction],
+                    "collapseReplies": [MockFunction],
                     "collections": Array [],
                     "createTemplateInstance": [MockFunction],
                     "currentOrgSlug": "org-slug",
@@ -421,6 +422,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "users_thread": Object {
                           "subscribed": true,
                         },
+                        "visibleCommentsAndRepliesCount": 0,
                       },
                       Object {
                         "comments": Array [],
@@ -432,6 +434,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "users_thread": Object {
                           "subscribed": true,
                         },
+                        "visibleCommentsAndRepliesCount": 0,
                       },
                     ],
                     "currentUser": Object {
@@ -597,9 +600,11 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "popupSnackbar": [MockFunction],
                       "removeEmptySpaceClickHandler": [MockFunction],
                       "removeNewCard": [MockFunction],
+                      "replyingToCommentId": false,
                       "resetSelectionAndBCT": [MockFunction],
                       "rolesMenuOpen": false,
                       "scrollToBottom": [MockFunction],
+                      "scrollToBottomOfComments": [MockFunction],
                       "scrollToBottomOfModal": [MockFunction],
                       "scrollToTop": [MockFunction],
                       "searchText": "",
@@ -607,6 +612,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "selectedAreaEnabled": false,
                       "selectedCardIds": Array [],
                       "setEditingCardCover": [MockFunction],
+                      "setReplyingToComment": [MockFunction],
                       "setSelectedArea": [MockFunction],
                       "setSnoozeChecked": [MockFunction],
                       "setViewingRecord": [MockFunction],
@@ -2773,6 +2779,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "addShapeAdminUsers": [MockFunction],
                     "checkCurrentOrg": [MockFunction],
                     "checkInMyCollection": [MockFunction],
+                    "collapseReplies": [MockFunction],
                     "collections": Array [],
                     "createTemplateInstance": [MockFunction],
                     "currentOrgSlug": "org-slug",
@@ -2787,6 +2794,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "users_thread": Object {
                           "subscribed": true,
                         },
+                        "visibleCommentsAndRepliesCount": 0,
                       },
                       Object {
                         "comments": Array [],
@@ -2798,6 +2806,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "users_thread": Object {
                           "subscribed": true,
                         },
+                        "visibleCommentsAndRepliesCount": 0,
                       },
                     ],
                     "currentUser": Object {
@@ -2963,9 +2972,11 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "popupSnackbar": [MockFunction],
                       "removeEmptySpaceClickHandler": [MockFunction],
                       "removeNewCard": [MockFunction],
+                      "replyingToCommentId": false,
                       "resetSelectionAndBCT": [MockFunction],
                       "rolesMenuOpen": false,
                       "scrollToBottom": [MockFunction],
+                      "scrollToBottomOfComments": [MockFunction],
                       "scrollToBottomOfModal": [MockFunction],
                       "scrollToTop": [MockFunction],
                       "searchText": "",
@@ -2973,6 +2984,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "selectedAreaEnabled": false,
                       "selectedCardIds": Array [],
                       "setEditingCardCover": [MockFunction],
+                      "setReplyingToComment": [MockFunction],
                       "setSelectedArea": [MockFunction],
                       "setSnoozeChecked": [MockFunction],
                       "setViewingRecord": [MockFunction],
@@ -5138,6 +5150,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "addShapeAdminUsers": [MockFunction],
                     "checkCurrentOrg": [MockFunction],
                     "checkInMyCollection": [MockFunction],
+                    "collapseReplies": [MockFunction],
                     "collections": Array [],
                     "createTemplateInstance": [MockFunction],
                     "currentOrgSlug": "org-slug",
@@ -5152,6 +5165,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "users_thread": Object {
                           "subscribed": true,
                         },
+                        "visibleCommentsAndRepliesCount": 0,
                       },
                       Object {
                         "comments": Array [],
@@ -5163,6 +5177,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "users_thread": Object {
                           "subscribed": true,
                         },
+                        "visibleCommentsAndRepliesCount": 0,
                       },
                     ],
                     "currentUser": Object {
@@ -5328,9 +5343,11 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "popupSnackbar": [MockFunction],
                       "removeEmptySpaceClickHandler": [MockFunction],
                       "removeNewCard": [MockFunction],
+                      "replyingToCommentId": false,
                       "resetSelectionAndBCT": [MockFunction],
                       "rolesMenuOpen": false,
                       "scrollToBottom": [MockFunction],
+                      "scrollToBottomOfComments": [MockFunction],
                       "scrollToBottomOfModal": [MockFunction],
                       "scrollToTop": [MockFunction],
                       "searchText": "",
@@ -5338,6 +5355,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "selectedAreaEnabled": false,
                       "selectedCardIds": Array [],
                       "setEditingCardCover": [MockFunction],
+                      "setReplyingToComment": [MockFunction],
                       "setSelectedArea": [MockFunction],
                       "setSnoozeChecked": [MockFunction],
                       "setViewingRecord": [MockFunction],
@@ -7171,6 +7189,7 @@ exports[`TestDesigner renders snapshot 1`] = `
               "addShapeAdminUsers": [MockFunction],
               "checkCurrentOrg": [MockFunction],
               "checkInMyCollection": [MockFunction],
+              "collapseReplies": [MockFunction],
               "collections": Array [],
               "createTemplateInstance": [MockFunction],
               "currentOrgSlug": "org-slug",
@@ -7185,6 +7204,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                   "users_thread": Object {
                     "subscribed": true,
                   },
+                  "visibleCommentsAndRepliesCount": 0,
                 },
                 Object {
                   "comments": Array [],
@@ -7196,6 +7216,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                   "users_thread": Object {
                     "subscribed": true,
                   },
+                  "visibleCommentsAndRepliesCount": 0,
                 },
               ],
               "currentUser": Object {
@@ -7361,9 +7382,11 @@ exports[`TestDesigner renders snapshot 1`] = `
                 "popupSnackbar": [MockFunction],
                 "removeEmptySpaceClickHandler": [MockFunction],
                 "removeNewCard": [MockFunction],
+                "replyingToCommentId": false,
                 "resetSelectionAndBCT": [MockFunction],
                 "rolesMenuOpen": false,
                 "scrollToBottom": [MockFunction],
+                "scrollToBottomOfComments": [MockFunction],
                 "scrollToBottomOfModal": [MockFunction],
                 "scrollToTop": [MockFunction],
                 "searchText": "",
@@ -7371,6 +7394,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                 "selectedAreaEnabled": false,
                 "selectedCardIds": Array [],
                 "setEditingCardCover": [MockFunction],
+                "setReplyingToComment": [MockFunction],
                 "setSelectedArea": [MockFunction],
                 "setSnoozeChecked": [MockFunction],
                 "setViewingRecord": [MockFunction],

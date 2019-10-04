@@ -56,7 +56,8 @@ export const Heading3 = styled.h3`
 Heading3.displayName = 'StyledHeading3'
 
 export const DisplayTextCss = css`
-  color: ${props => props.color || v.colors.black};
+  color: ${props =>
+    props.theme.descriptionText || props.color || v.colors.black};
   font-weight: ${v.weights.book};
   font-family: ${v.fonts.sans};
   font-size: 1rem;
@@ -283,7 +284,7 @@ export const QuillStyleWrapper = styled.div`
 
     .ql-container {
       /* this overrides quill-cursors "display: flex" which was breaking IE */
-      display: block;
+      display: ${props => (props.fullPageView ? 'block' : 'flex')};
 
       ${props => (props.notEditing ? '' : 'overflow: visible !important;')};
       ${props =>

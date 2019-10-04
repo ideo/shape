@@ -1,133 +1,125 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { computed } from 'mobx'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import styled, { css } from 'styled-components'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
-import v from '~/utils/variables'
-import hexToRgba from '~/utils/hexToRgba'
-import Comment from './Comment'
-import CommentEntryForm from './CommentEntryForm'
-import CommentThreadLoader from './CommentThreadLoader'
-import CommentThreadHeader from './CommentThreadHeader'
+import Comment from '~/ui/threads/Comment'
+import CommentEntryForm from '~/ui/threads/CommentEntryForm'
+import CommentThreadLoader from '~/ui/threads/CommentThreadLoader'
+import CommentThreadHeader from '~/ui/threads/CommentThreadHeader'
+import { Element as ScrollElement } from 'react-scroll'
 
-export const threadTitleCss = css`
-  position: relative;
-  top: 0;
-  z-index: ${v.zIndex.commentHeader};
-  display: block;
-  width: 100%;
-  background-color: ${v.colors.secondaryDark};
-  background: linear-gradient(
-    ${v.colors.secondaryDark} 0,
-    ${v.colors.secondaryDark} 80%,
-    ${hexToRgba(v.colors.secondaryDark, 0)} 100%
-  );
-  padding-top: 10px;
-  text-align: left;
-  font-family: ${v.fonts.sans};
-  font-weight: 500;
-  font-size: 0.75rem;
-`
-
-const StyledCommentThread = styled.div`
-  .title {
-    ${threadTitleCss};
-    /* NOTE: 'sticky' is not fully browser supported */
-    ${props =>
-      props.expanded &&
-      `
-      position: sticky;
-    `};
-  }
-  .comments {
-    margin-top: 5px;
-    ${props =>
-      (!props.expanded || props.hasMore) &&
-      `
-      z-index: 0;
-      position: relative;
-      top: -40px;
-      overflow: hidden;
-      margin-bottom: -40px;
-      min-height: 40px;
-    `};
-  }
-`
-
-export const ThumbnailHolder = styled.span`
-  display: block;
-  flex-shrink: 0;
-  height: 50px;
-  width: 50px;
-  img,
-  svg {
-    flex-shrink: 0;
-    height: 100%;
-    object-fit: cover;
-    width: 100%;
-  }
-`
-ThumbnailHolder.displayName = 'ThumbnailHolder'
-
-const StyledCommentsWrapper = styled.div`
-  cursor: ${props => (props.clickable ? 'pointer' : 'auto')};
-`
-StyledCommentsWrapper.displayName = 'StyledCommentsWrapper'
-
+@inject('apiStore', 'uiStore')
 @observer
 class CommentThread extends React.Component {
-  @computed
-  get comments() {
-    const { expanded, thread } = this.props
-    let { comments } = thread
-    // for un-expanded thread, only take the unread comments
-    if (!expanded) {
-      comments = thread.latestUnreadComments
-    }
-    return comments
+  componentDidMount() {
+    const { apiStore, uiStore } = this.props
+    this.updateContainerSize()
+    apiStore.collapseReplies()
+    uiStore.scrollToBottomOfComments()
   }
 
-  renderComments = () =>
-    this.comments.map((comment, i) => (
-      <Comment key={comment.id || `comment-new-${i}`} comment={comment} />
-    ))
+  componentDidUpdate(prevProps) {
+    const {
+      apiStore,
+      thread,
+      commentCount,
+      handleScrollOnCommentUpdate,
+    } = this.props
+    if (commentCount !== prevProps.commentCount) {
+      this.updateContainerSize()
+      // this scroll only happens when you're at the bottom of the thread
+      handleScrollOnCommentUpdate()
+    }
+    if (thread.id !== prevProps.thread.id) {
+      // when switching between threads
+      this.updateContainerSize()
+      apiStore.collapseReplies()
+    }
+  }
+
+  updateContainerSize() {
+    const { thread } = this.props
+    const div = document.getElementById(thread.containerId)
+    if (div && div.scrollHeight) {
+      this.props.updateContainerSize({
+        h: div.scrollHeight + 100,
+        temporary: true,
+      })
+    }
+  }
+
+  renderComments = () => {
+    const { thread, uiStore } = this.props
+    const { comments } = thread
+    if (!comments || comments.length <= 0) return []
+    const commentsList = []
+    _.each(comments, (comment, i) => {
+      const expanded = uiStore.replyingToCommentId === comment.id
+      commentsList.push(
+        <Comment
+          key={comment.id || `comment-new-${i}`}
+          comment={comment}
+          expanded={expanded}
+        />
+      )
+
+      // render the reply level entry form when replying
+      if (expanded) {
+        commentsList.push(this.renderCommentEntryForm())
+      }
+
+      commentsList.push(
+        <ScrollElement
+          key={`${comment.id}-replies-bottom`}
+          name={`${comment.id}-replies-bottom`}
+        />
+      )
+    })
+    return commentsList
+  }
+
+  renderCommentEntryForm = () => {
+    const { thread } = this.props
+    return (
+      <CommentEntryForm
+        key={'comment-entry-form'}
+        thread={thread}
+        afterSubmit={this.props.afterSubmit}
+        onHeightChange={this.props.onEditorHeightChange}
+      />
+    )
+  }
 
   render() {
-    const { thread, expanded } = this.props
-    const unexpandedClickable = !expanded
+    const { thread, uiStore } = this.props
 
     return (
-      <StyledCommentThread hasMore={thread.hasMore} expanded={expanded}>
-        <button className="title" onClick={this.props.onClick}>
-          <CommentThreadHeader thread={thread} />
-        </button>
-        <StyledCommentsWrapper
-          clickable={unexpandedClickable}
-          className="comments"
-          onClick={unexpandedClickable ? this.props.onClick : () => true}
-        >
-          {thread.hasMore && expanded && (
-            <CommentThreadLoader thread={thread} />
-          )}
+      <div id={thread.containerId}>
+        <CommentThreadHeader thread={thread} sticky />
+        <div className="comments">
+          {thread.hasMore && <CommentThreadLoader thread={thread} />}
           {this.renderComments()}
-        </StyledCommentsWrapper>
-        <CommentEntryForm
-          expanded={expanded}
-          thread={thread}
-          afterSubmit={this.props.afterSubmit}
-          onHeightChange={this.props.onEditorHeightChange}
-        />
-      </StyledCommentThread>
+        </div>
+        {/* render the top level entry form */}
+        {!uiStore.replyingToCommentId && this.renderCommentEntryForm()}
+      </div>
     )
   }
 }
 
 CommentThread.propTypes = {
-  expanded: PropTypes.bool.isRequired,
-  onClick: PropTypes.func.isRequired,
   afterSubmit: PropTypes.func.isRequired,
   onEditorHeightChange: PropTypes.func.isRequired,
   thread: MobxPropTypes.objectOrObservableObject.isRequired,
+  commentCount: PropTypes.number.isRequired,
+  updateContainerSize: PropTypes.func.isRequired,
+  handleScrollOnCommentUpdate: PropTypes.func.isRequired,
 }
+CommentThread.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+
+CommentThread.displayName = 'CommentThread'
 
 export default CommentThread

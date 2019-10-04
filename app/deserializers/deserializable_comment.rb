@@ -1,0 +1,2 @@
+class DeserializableComment < BaseJsonDeserializer
+end

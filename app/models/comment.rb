@@ -5,22 +5,35 @@
 #  id                :bigint(8)        not null, primary key
 #  draftjs_data      :jsonb
 #  message           :text
+#  replies_count     :integer          default(0)
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  author_id         :integer
 #  comment_thread_id :integer
+#  parent_id         :bigint(8)
 #
 # Indexes
 #
 #  index_comments_on_comment_thread_id  (comment_thread_id)
+#  index_comments_on_parent_id          (parent_id)
 #
 
 class Comment < ApplicationRecord
   include Firestoreable
 
-  paginates_per 50
+  COMMENTS_PER_PAGE = 25
+  REPLIES_PER_PAGE = 25
+
+  paginates_per COMMENTS_PER_PAGE
+  has_many :replies,
+           -> { order(created_at: :desc) },
+           class_name: 'Comment',
+           foreign_key: 'parent_id'
   belongs_to :comment_thread, touch: true
+  delegate :can_view?, to: :comment_thread
+
   belongs_to :author, class_name: 'User'
+  belongs_to :parent, class_name: 'Comment', optional: true, counter_cache: :replies_count
 
   validates :message, presence: true
 
@@ -67,5 +80,9 @@ class Comment < ApplicationRecord
 
   def can_edit?(user)
     author.id == user.id
+  end
+
+  def replies_by_page(page: 1)
+    replies.page(page).per(REPLIES_PER_PAGE)
   end
 end
