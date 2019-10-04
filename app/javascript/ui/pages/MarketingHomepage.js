@@ -71,7 +71,6 @@ class MarketingPage extends React.Component {
       ? hero && hero.watchVideoButton
       : hero && hero.closeVideoButton
 
-    console.log('tsak;lf', this.state)
     return (
       <Fragment>
         <MarketingBack>
