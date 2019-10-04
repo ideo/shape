@@ -1,20 +1,23 @@
 import RealtimeTextItem from '~/ui/items/RealtimeTextItem'
 import { fakeTextItem, fakeActionCableUser, fakeUser } from '#/mocks/data'
+import fakeUiStore from '#/mocks/fakeUiStore'
 import Delta from 'quill-delta'
 
 const props = {
   item: fakeTextItem,
   currentUserId: '1',
+  cardId: '1',
   onCancel: jest.fn(),
   onExpand: jest.fn(),
   fullPageView: false,
   fullyLoaded: true,
+  uiStore: fakeUiStore,
 }
 
 let wrapper, component
 describe('TextItem', () => {
   beforeEach(() => {
-    wrapper = shallow(<RealtimeTextItem {...props} />)
+    wrapper = shallow(<RealtimeTextItem.wrappedComponent {...props} />)
     component = wrapper.instance()
   })
 
@@ -27,7 +30,7 @@ describe('TextItem', () => {
   describe('can view', () => {
     beforeEach(() => {
       props.item.can_edit = false
-      wrapper = shallow(<RealtimeTextItem {...props} />)
+      wrapper = shallow(<RealtimeTextItem.wrappedComponent {...props} />)
     })
 
     it('does not render the TextItemToolbar', () => {
@@ -68,7 +71,7 @@ describe('TextItem', () => {
     beforeEach(() => {
       props.item.can_edit_content = true
       props.item.parentPath = '/collections/99'
-      wrapper = shallow(<RealtimeTextItem {...props} />)
+      wrapper = shallow(<RealtimeTextItem.wrappedComponent {...props} />)
     })
 
     it('renders the Quill editor', () => {

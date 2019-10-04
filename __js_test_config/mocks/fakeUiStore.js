@@ -111,6 +111,8 @@ const fakeUiStore = {
   removeEmptySpaceClickHandler: jest.fn(),
   setEditingCardCover: jest.fn(),
   adminAudienceMenuOpen: false,
+  actionMenuOpenForCard: jest.fn(true).mockImplementation(x => false),
+  textMenuOpenForCard: jest.fn(true).mockImplementation(x => false),
   replyingToCommentId: false,
   setReplyingToComment: jest.fn()
 }

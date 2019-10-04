@@ -4,8 +4,9 @@ import { observable, action, runInAction, computed } from 'mobx'
 
 import routeToLogin from '~/utils/routeToLogin'
 import sleep from '~/utils/sleep'
-import v from '~/utils/variables'
+import v, { EVENT_SOURCE_TYPES } from '~/utils/variables'
 import { POPUP_ACTION_TYPES, ACTION_SOURCES } from '~/enums/actionEnums'
+import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 
 export default class UiStore {
   // store this for usage by other components
@@ -35,6 +36,8 @@ export default class UiStore {
   blankContentToolState = { ...this.defaultBCTState }
   @observable
   cardMenuOpen = { ...this.defaultCardMenuState }
+  @observable
+  selectedTextRangeForCard = {}
   @computed
   get cardMenuOpenAndPositioned() {
     const { cardMenuOpen } = this
@@ -347,24 +350,85 @@ export default class UiStore {
     this.dialogConfig.open = null
   }
 
+  cardHasSelectedTextRange(cardId) {
+    return (
+      this.selectedTextRangeForCard.id === cardId &&
+      this.selectedTextRangeForCard.range &&
+      this.selectedTextRangeForCard.range.length > 0
+    )
+  }
+
   @action
-  openCardMenu(id, opts = {}) {
-    const { x = 0, y = 0, offsetX = 0, offsetY = 0 } = opts
-    this.update('cardMenuOpen', {
-      id,
-      x,
-      y,
-      offsetX,
-      offsetY,
-    })
-    if (this.selectedCardIds.length && this.selectedCardIds.indexOf(id) < 0) {
-      // deselect all cards when card menu is opened on a non-selected card
-      this.selectedCardIds.replace([])
+  openContextMenu = (
+    ev,
+    { x = 0, y = 0, card = {}, menuItemCount = 1 } = {}
+  ) => {
+    let eventType = EVENT_SOURCE_TYPES.GRID_CARD
+    let numberOfMenuItems = menuItemCount
+
+    const targetingTextEditor = ev.target.closest('.ql-editor')
+
+    if (targetingTextEditor && this.cardHasSelectedTextRange(card.id)) {
+      eventType = EVENT_SOURCE_TYPES.TEXT_EDITOR
+      numberOfMenuItems = 1 // or however many we end up with in TextActionMenu
+    }
+
+    // use util method to dynamically move the component on open
+    const positionOffset = calculatePopoutMenuOffset(
+      ev,
+      eventType,
+      numberOfMenuItems
+    )
+    const { offsetX, offsetY } = positionOffset
+
+    if (this.cardMenuOpen.id && !this.textMenuOpenForCard(card.id)) {
+      this.closeCardMenu()
+    } else {
+      this.update('cardMenuOpen', {
+        id: card.id,
+        x,
+        y,
+        offsetX,
+        offsetY,
+        menuType: eventType,
+      })
+
+      if (
+        this.selectedCardIds.length &&
+        this.selectedCardIds.indexOf(card.id) < 0
+      ) {
+        // deselect all cards when card menu is opened on a non-selected card
+        this.selectedCardIds.replace([])
+      }
     }
   }
 
   closeCardMenu() {
     this.update('cardMenuOpen', { ...this.defaultCardMenuState })
+  }
+
+  actionMenuOpenForCard(id) {
+    return (
+      this.cardMenuOpen.id === id &&
+      this.cardMenuOpen.menuType === EVENT_SOURCE_TYPES.GRID_CARD
+    )
+  }
+
+  textMenuOpenForCard(id) {
+    return (
+      this.cardMenuOpen.id === id &&
+      this.cardMenuOpen.menuType === EVENT_SOURCE_TYPES.TEXT_EDITOR
+    )
+  }
+
+  @action
+  selectTextRangeForCard({ id, range }) {
+    // Only open text action menu if you have text selected
+    if (range && range.length > 0) {
+      this.cardMenuOpen.menuType = EVENT_SOURCE_TYPES.TEXT_EDITOR
+    }
+
+    this.selectedTextRangeForCard = { id, range }
   }
 
   // TODO: rename this function to be clear it is show or reroute??
@@ -503,6 +567,10 @@ export default class UiStore {
   @computed
   get isLargeBreakpoint() {
     return this.windowWidth && this.windowWidth >= v.responsive.largeBreakpoint
+  }
+
+  get isAndroid() {
+    return /(android)/i.test(navigator.userAgent)
   }
 
   // NOTE: because we aren't tracking a difference between "closed" and null,

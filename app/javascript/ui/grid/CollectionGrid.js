@@ -1016,7 +1016,6 @@ class CollectionGrid extends React.Component {
       const isHoveringOver =
         hoveringOver && hoveringOver.card && hoveringOver.card.id === card.id
       const isHoldingOver = isHoveringOver && hoveringOver.holdingOver
-      const { cardMenuOpen } = uiStore
       if (_.isEmpty(card.position)) return
       const shouldHide = card.isBeingMultiMoved || card.isBeingMoved
       grid.push(
@@ -1042,7 +1041,7 @@ class CollectionGrid extends React.Component {
           onResizeStop={this.onResizeStop}
           routeTo={routingStore.routeTo}
           parent={collection}
-          menuOpen={cardMenuOpen.id === card.id}
+          menuOpen={uiStore.actionMenuOpenForCard(card.id)}
           lastPinnedCard={
             card.isPinnedAndLocked && i === this.state.cards.length - 1
           }
