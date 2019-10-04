@@ -142,6 +142,7 @@ export default {
     tertiaryDark: '#c43a31',
     ctaPrimary: '#00a0e0',
     alert: '#d66742',
+    highlight: '#f8ed81',
     caution: '#fcf113',
     offset: '#6a7c7e',
     placeholderGray: '#bcbcbc',
@@ -196,13 +197,9 @@ export default {
   },
 
   quillDefaults: {
-    formats: ['link', 'header'],
+    formats: ['link', 'header', 'commentHighlight', 'highlightClass'],
     modules: {
-      toolbar: [
-        // header: false means "normal" i.e. no formatting
-        [{ header: [3, false] }],
-        ['link'],
-      ],
+      toolbar: null,
     },
   },
 

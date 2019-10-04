@@ -52,6 +52,11 @@ const TextItemToolbar = props => (
       <StyledButton className="ql-link">
         <LinkIcon />
       </StyledButton>
+
+      {/* FOR TESTING ONLY */}
+      <StyledButton onClick={props.highlightText}>SUB</StyledButton>
+      <StyledButton onClick={props.unhighlightText}>deSUB</StyledButton>
+
       {props.onExpand && (
         <IconButton onClick={props.onExpand} className="ql-expand">
           <ExpandIcon />
@@ -62,6 +67,8 @@ const TextItemToolbar = props => (
 )
 TextItemToolbar.propTypes = {
   onExpand: PropTypes.func,
+  highlightText: PropTypes.func.isRequired,
+  unhighlightText: PropTypes.func.isRequired,
 }
 TextItemToolbar.defaultProps = {
   onExpand: null,

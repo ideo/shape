@@ -11,6 +11,7 @@ import styled from 'styled-components'
 import ChannelManager from '~/utils/ChannelManager'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import QuillLink from '~/ui/global/QuillLink'
+import QuillTextHighlighter from '~/ui/global/QuillTextHighlighter'
 import { QuillStyleWrapper } from '~/ui/global/styled/typography'
 import TextItemToolbar from '~/ui/items/TextItemToolbar'
 import { routingStore } from '~/stores'
@@ -19,6 +20,7 @@ import v from '~/utils/variables'
 Quill.debug('error')
 Quill.register('modules/cursors', QuillCursors)
 Quill.register('formats/link', QuillLink)
+Quill.register(QuillTextHighlighter)
 
 const FULL_PAGE_TOP_PADDING = '2rem'
 const DockedToolbar = styled.div`
@@ -375,6 +377,17 @@ class RealtimeTextItem extends React.Component {
     })
   }
 
+  get cardId() {
+    const { item, cardId } = this.props
+    if (cardId) {
+      return cardId
+    } else if (item.parent_collection_card) {
+      return item.parent_collection_card.id
+    } else {
+      return null
+    }
+  }
+
   handleTextChange = (_content, delta, source, _editor) => {
     if (source === 'user') {
       // This adjustment is made so that the currently-selected
@@ -389,8 +402,10 @@ class RealtimeTextItem extends React.Component {
   }
 
   handleSelectionChange = (range, source, editor) => {
-    // Should we just make this item.parent_collection_card.id?
-    const { cardId, uiStore } = this.props
+    const { cardId } = this
+    if (!cardId) return
+
+    const { uiStore } = this.props
     uiStore.selectTextRangeForCard({ range, id: cardId })
 
     if (source === 'user') {
@@ -399,7 +414,6 @@ class RealtimeTextItem extends React.Component {
   }
 
   handleBlur = (range, source, editor) => {
-    const { fullPageView } = this.props
     // Check if something is being linked, which causes a blur event
     const linker = this.quillEditor.container.querySelector(
       '.ql-tooltip:not(.ql-hidden)'
@@ -407,15 +421,6 @@ class RealtimeTextItem extends React.Component {
     if (linker) {
       // if the linker is open then we don't want to trigger blur/cancel
       return
-    }
-    if (!fullPageView) {
-      setTimeout(() => {
-        const selection = editor.getSelection()
-        if (!selection) {
-          // we actually did blur, and not copy/paste which can also trigger onBlur
-          this.cancel()
-        }
-      }, 100)
     }
   }
 
@@ -485,6 +490,18 @@ class RealtimeTextItem extends React.Component {
     }
   }
 
+  highlightText = e => {
+    const { quillEditor } = this
+    quillEditor.format('commentHighlight', 'new', 'user')
+    quillEditor.format('highlightClass', true, 'user')
+  }
+
+  unhighlightText = e => {
+    const { quillEditor } = this
+    quillEditor.format('commentHighlight', false, 'user')
+    quillEditor.format('highlightClass', false, 'user')
+  }
+
   render() {
     const { item, onExpand, fullPageView, containerRef } = this.props
     // item is not fully loaded yet, e.g. from a CommentThread
@@ -516,7 +533,14 @@ class RealtimeTextItem extends React.Component {
         fullPageView={fullPageView}
       >
         <DockedToolbar fullPageView={fullPageView}>
-          {canEdit && <TextItemToolbar onExpand={onExpand} />}
+          {canEdit && (
+            <TextItemToolbar
+              quillEditor={this.quillEditor}
+              onExpand={onExpand}
+              highlightText={this.highlightText}
+              unhighlightText={this.unhighlightText}
+            />
+          )}
           <CloseButton
             data-cy="TextItemClose"
             className="ql-close"
@@ -541,7 +565,7 @@ RealtimeTextItem.displayName = 'RealtimeTextItem'
 RealtimeTextItem.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   currentUserId: PropTypes.string.isRequired,
-  cardId: PropTypes.string.isRequired,
+  cardId: PropTypes.string,
   onCancel: PropTypes.func.isRequired,
   fullyLoaded: PropTypes.bool.isRequired,
   onExpand: PropTypes.func,

@@ -28,7 +28,8 @@ class Comment < ApplicationRecord
   has_many :replies,
            -> { order(created_at: :desc) },
            class_name: 'Comment',
-           foreign_key: 'parent_id'
+           foreign_key: 'parent_id',
+           dependent: :destroy
   belongs_to :comment_thread, touch: true
   delegate :can_view?, to: :comment_thread
 

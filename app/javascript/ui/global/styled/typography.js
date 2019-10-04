@@ -276,6 +276,13 @@ export const QuillStyleWrapper = styled.div`
       color: ${v.colors.ctaPrimary};
     }
 
+    /* NOTE: this is our test of custom highlights */
+    sub {
+      vertical-align: baseline;
+      font-size: inherit;
+      background: ${v.colors.highlight};
+    }
+
     @keyframes blink-animation {
       to {
         visibility: hidden;
