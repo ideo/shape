@@ -512,6 +512,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "shapeAdminUsers": Array [],
                     "sync": [MockFunction sync],
                     "uiStore": Object {
+                      "actionMenuOpenForCard": [MockFunction],
                       "activityLogMoving": false,
                       "activityLogOpen": false,
                       "activityLogPage": "comments",
@@ -618,6 +619,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "setViewingRecord": [MockFunction],
                       "showPermissionsAlert": [MockFunction],
                       "stopDragging": [MockFunction],
+                      "textMenuOpenForCard": [MockFunction],
                       "toggleEditingCardId": [MockFunction],
                       "trackEvent": [MockFunction],
                       "trackedRecords": Object {},
@@ -2884,6 +2886,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "shapeAdminUsers": Array [],
                     "sync": [MockFunction sync],
                     "uiStore": Object {
+                      "actionMenuOpenForCard": [MockFunction],
                       "activityLogMoving": false,
                       "activityLogOpen": false,
                       "activityLogPage": "comments",
@@ -2990,6 +2993,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "setViewingRecord": [MockFunction],
                       "showPermissionsAlert": [MockFunction],
                       "stopDragging": [MockFunction],
+                      "textMenuOpenForCard": [MockFunction],
                       "toggleEditingCardId": [MockFunction],
                       "trackEvent": [MockFunction],
                       "trackedRecords": Object {},
@@ -5255,6 +5259,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "shapeAdminUsers": Array [],
                     "sync": [MockFunction sync],
                     "uiStore": Object {
+                      "actionMenuOpenForCard": [MockFunction],
                       "activityLogMoving": false,
                       "activityLogOpen": false,
                       "activityLogPage": "comments",
@@ -5361,6 +5366,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "setViewingRecord": [MockFunction],
                       "showPermissionsAlert": [MockFunction],
                       "stopDragging": [MockFunction],
+                      "textMenuOpenForCard": [MockFunction],
                       "toggleEditingCardId": [MockFunction],
                       "trackEvent": [MockFunction],
                       "trackedRecords": Object {},
@@ -7294,6 +7300,7 @@ exports[`TestDesigner renders snapshot 1`] = `
               "shapeAdminUsers": Array [],
               "sync": [MockFunction sync],
               "uiStore": Object {
+                "actionMenuOpenForCard": [MockFunction],
                 "activityLogMoving": false,
                 "activityLogOpen": false,
                 "activityLogPage": "comments",
@@ -7400,6 +7407,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                 "setViewingRecord": [MockFunction],
                 "showPermissionsAlert": [MockFunction],
                 "stopDragging": [MockFunction],
+                "textMenuOpenForCard": [MockFunction],
                 "toggleEditingCardId": [MockFunction],
                 "trackEvent": [MockFunction],
                 "trackedRecords": Object {},

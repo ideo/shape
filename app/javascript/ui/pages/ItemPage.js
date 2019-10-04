@@ -14,6 +14,7 @@ import RealtimeTextItem from '~/ui/items/RealtimeTextItem'
 import VideoItem from '~/ui/items/VideoItem'
 import { ITEM_TYPES } from '~/utils/variables'
 import { Helmet } from 'react-helmet'
+import TextActionMenu from '../grid/TextActionMenu'
 
 const ItemPageContainer = styled.div`
   background: white;
@@ -76,16 +77,34 @@ class ItemPage extends React.Component {
     }
   }
 
+  // Should this get attached to PageContainer?
+  // It's on GridCard already but this.content doesn't return a grid card
+  openContextMenu = ev => {
+    ev.preventDefault()
+    const { item, uiStore } = this.props
+    const { parent_collection_card } = item
+
+    uiStore.openContextMenu(ev, {
+      // Totally arbitrary X/Y coordinates
+      x: 100,
+      y: 100,
+      card: parent_collection_card,
+      menuItemCount: 1, // Until we change the text action menu
+    })
+  }
+
   // could be smarter or broken out once we want to do different things per type
   get content() {
     const { apiStore } = this.props
     const { item } = this.state
+
     // similar function as in GridCard, could extract?
     switch (item.type) {
       case ITEM_TYPES.TEXT:
         return (
           <RealtimeTextItem
             onCancel={this.cancel}
+            cardId={item.parent_collection_card.id}
             item={item}
             currentUserId={apiStore.currentUserId}
             fullPageView
@@ -159,8 +178,9 @@ class ItemPage extends React.Component {
         <Helmet title={item.pageTitle} />
         <PageHeader record={item} />
         <ArchivedBanner />
-        <ItemPageContainer>
+        <ItemPageContainer onContextMenu={this.openContextMenu}>
           <PageContainer {...containerProps}>
+            <TextActionMenu card={item.parent_collection_card} />
             {item.parent_collection_card &&
             replacingId === item.parent_collection_card.id ? (
               <GridCardBlank parent={item.parent} afterCreate={this.reroute} />
