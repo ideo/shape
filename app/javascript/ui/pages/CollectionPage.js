@@ -26,6 +26,7 @@ import OverdueBanner from '~/ui/layout/OverdueBanner'
 import routeToLogin from '~/utils/routeToLogin'
 import CreateOrgPage from '~/ui/pages/CreateOrgPage'
 import { Helmet } from 'react-helmet'
+
 // more global way to do this?
 pluralize.addPluralRule(/canvas$/i, 'canvases')
 
