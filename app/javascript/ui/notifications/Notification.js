@@ -90,6 +90,7 @@ class Notification extends React.Component {
             name: 'Unknown',
             internalType: targetType,
           })
+          trackError(err, { name: 'Notification:Mount' })
         })
     } else {
       activity.setTarget(target)
