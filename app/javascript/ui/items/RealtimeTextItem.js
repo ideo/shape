@@ -389,6 +389,7 @@ class RealtimeTextItem extends React.Component {
   }
 
   handleSelectionChange = (range, source, editor) => {
+    // Should we just make this item.parent_collection_card.id?
     const { cardId, uiStore } = this.props
     uiStore.selectTextRangeForCard({ range, id: cardId })
 
