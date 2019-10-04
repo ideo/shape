@@ -80,12 +80,14 @@ const ImageDisplay = styled.img`
   max-width: 100%;
   max-height: 100%;
   height: auto;
-  box-shadow: 0px 2px 16px ${v.colors.commonMedium};
+  ${props => props.shadow && (`
+    box-shadow: 0px 2px 16px ${v.colors.commonMedium};
+  `)}
 `
 
 class ContentBlock extends React.PureComponent {
   render() {
-    const { order, title, content, imageUrl } = this.props
+    const { order, title, content, imageUrl, imageShadow} = this.props
     const html = `${content}` // needed due to https://reactjs.org/docs/jsx-in-depth.html#string-literals
     return (
       <StyledHtmlImage key={title.toString()} order={order}>
@@ -119,7 +121,11 @@ class ContentBlock extends React.PureComponent {
             mt={[0, 40, 40]}
             order={[1, 1, order % 2 === 0 ? 0 : 3]}
           >
-            <ImageDisplay src={imageUrl} alt={title} />
+            <ImageDisplay
+              src={imageUrl}
+              alt={title}
+              shadow={imageShadow}
+            />
           </Box>
         </MarketingFlex>
       </StyledHtmlImage>
@@ -132,6 +138,10 @@ ContentBlock.propTypes = {
   title: PropTypes.string.isRequired,
   content: PropTypes.string.isRequired,
   imageUrl: PropTypes.string.isRequired,
+  imageShadow: PropTypes.bool,
+}
+ContentBlock.defaultProps = {
+  imageShadow: true,
 }
 
 export default ContentBlock
