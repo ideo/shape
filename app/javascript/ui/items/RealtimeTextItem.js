@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { toJS } from 'mobx'
-import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import Delta from 'quill-delta'
 import ReactQuill, { Quill } from 'react-quill'
 // NOTE: quill-cursors injects a bunch of .ql-xx related styles into the <head>
@@ -87,7 +87,6 @@ const StyledContainer = styled.div`
   `}
 `
 
-@inject('uiStore')
 @observer
 class RealtimeTextItem extends React.Component {
   channelName = 'ItemRealtimeChannel'
@@ -389,10 +388,6 @@ class RealtimeTextItem extends React.Component {
   }
 
   handleSelectionChange = (range, source, editor) => {
-    // Should we just make this item.parent_collection_card.id?
-    const { cardId, uiStore } = this.props
-    uiStore.selectTextRangeForCard({ range, id: cardId })
-
     if (source === 'user') {
       this.sendCursor()
     }
@@ -532,12 +527,9 @@ class RealtimeTextItem extends React.Component {
   }
 }
 
-RealtimeTextItem.displayName = 'RealtimeTextItem'
-
 RealtimeTextItem.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   currentUserId: PropTypes.string.isRequired,
-  cardId: PropTypes.string.isRequired,
   onCancel: PropTypes.func.isRequired,
   fullyLoaded: PropTypes.bool.isRequired,
   onExpand: PropTypes.func,
