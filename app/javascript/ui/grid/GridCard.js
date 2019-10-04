@@ -299,8 +299,6 @@ class GridCard extends React.Component {
     const x = ev.clientX - rect.left - rect.width * 0.95
     const y = ev.clientY - rect.top - 15
 
-    // this is responsible for making fixed: false
-
     uiStore.openContextMenu(ev, { x, y, card, menuItemCount })
     return false
   }

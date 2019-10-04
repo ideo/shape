@@ -486,7 +486,7 @@ class RealtimeTextItem extends React.Component {
   }
 
   render() {
-    const { item, onExpand, fullPageView } = this.props
+    const { item, onExpand, fullPageView, containerRef } = this.props
     // item is not fully loaded yet, e.g. from a CommentThread
     if (!item.data_content) return null
 
@@ -510,7 +510,11 @@ class RealtimeTextItem extends React.Component {
     }
 
     return (
-      <StyledContainer className="no-drag" fullPageView={fullPageView}>
+      <StyledContainer
+        ref={c => (containerRef ? containerRef(c) : null)}
+        className="no-drag"
+        fullPageView={fullPageView}
+      >
         <DockedToolbar fullPageView={fullPageView}>
           {canEdit && <TextItemToolbar onExpand={onExpand} />}
           <CloseButton
@@ -543,11 +547,14 @@ RealtimeTextItem.propTypes = {
   onExpand: PropTypes.func,
   fullPageView: PropTypes.bool,
   initialFontTag: PropTypes.oneOf(['H1', 'H3', 'P']),
+  containerRef: PropTypes.func,
 }
 RealtimeTextItem.defaultProps = {
   onExpand: null,
   fullPageView: false,
   initialFontTag: 'P',
+  cardId: null,
+  containerRef: null,
 }
 
 export default RealtimeTextItem

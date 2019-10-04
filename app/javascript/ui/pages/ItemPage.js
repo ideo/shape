@@ -1,6 +1,7 @@
 import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import { Helmet } from 'react-helmet'
 
 import ArchivedBanner from '~/ui/layout/ArchivedBanner'
 import FilePreview from '~/ui/grid/covers/FilePreview'
@@ -13,8 +14,7 @@ import PageHeader from '~/ui/pages/shared/PageHeader'
 import RealtimeTextItem from '~/ui/items/RealtimeTextItem'
 import VideoItem from '~/ui/items/VideoItem'
 import { ITEM_TYPES } from '~/utils/variables'
-import { Helmet } from 'react-helmet'
-import TextActionMenu from '../grid/TextActionMenu'
+import TextActionMenu from '~/ui/grid/TextActionMenu'
 
 const ItemPageContainer = styled.div`
   background: white;
@@ -31,6 +31,7 @@ class ItemPage extends React.Component {
     // e.g. updateItem method
     item: null,
   }
+  containerRef = React.createRef()
 
   componentDidMount() {
     this.onAPILoad()
@@ -84,10 +85,15 @@ class ItemPage extends React.Component {
     const { item, uiStore } = this.props
     const { parent_collection_card } = item
 
+    const rect = this.containerRef.getBoundingClientRect()
+    const x = ev.clientX - rect.left
+    const y = ev.clientY - rect.top
+
+    console.log(rect)
+
     uiStore.openContextMenu(ev, {
-      // Totally arbitrary X/Y coordinates
-      x: 100,
-      y: 100,
+      x,
+      y,
       card: parent_collection_card,
       menuItemCount: 1, // Until we change the text action menu
     })
@@ -103,6 +109,7 @@ class ItemPage extends React.Component {
       case ITEM_TYPES.TEXT:
         return (
           <RealtimeTextItem
+            containerRef={c => (this.containerRef = c)}
             onCancel={this.cancel}
             cardId={item.parent_collection_card.id}
             item={item}
