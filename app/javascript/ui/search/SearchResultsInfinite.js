@@ -77,6 +77,14 @@ class SearchResultsInfinite extends React.Component {
     this.markFirstVisible(first)
   }
 
+  openMenu = cardId => () => {
+    uiStore.openCardMenu(cardId)
+  }
+
+  closeMenu = () => {
+    uiStore.closeCardMenu()
+  }
+
   handleVisibilityChange = index => isVisible => {
     this.setVisible(index, isVisible)
     this.computeFirstVisible()

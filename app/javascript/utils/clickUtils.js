@@ -51,12 +51,6 @@ const calculatePopoutMenuOffset = (e, eventSource, popoutMenuItemCount = 1) => {
       topOffset = -totalHeight - INITIAL_OFFSET_Y
       bottomOffset = 0
       break
-    case EVENT_SOURCE_TYPES.TEXT_EDITOR:
-      leftOffset = totalWidth - INITIAL_OFFSET_X - INITIAL_OFFSET_X
-      rightOffset = 20
-      topOffset = -totalHeight - INITIAL_OFFSET_Y
-      bottomOffset = -20
-      break
     case EVENT_SOURCE_TYPES.GRID_CARD:
     default:
       leftOffset = totalWidth - INITIAL_OFFSET_X
