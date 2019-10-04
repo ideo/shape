@@ -4,7 +4,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import CommentIcon from '../icons/CommentIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 
-@inject('uiStore')
+@inject('uiStore', 'apiStore')
 @observer
 class TextActionMenu extends React.Component {
   get menuItems() {
@@ -19,8 +19,15 @@ class TextActionMenu extends React.Component {
     return actions
   }
 
-  addComment = () => {
-    console.log('clicked comment button')
+  addComment = async () => {
+    const { apiStore, uiStore, card } = this.props
+    const { record } = card
+    console.log('clicked comment button', card, record)
+    uiStore.update('activityLogOpen', true)
+
+    const thread = await apiStore.findOrBuildCommentThread(record)
+    console.log(thread)
+    uiStore.expandThread(thread.key)
   }
 
   handleMouseLeave = () => {
