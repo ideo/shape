@@ -1,36 +1,45 @@
+import { EditorState, ContentState } from 'draft-js'
 import CommentEntryForm from '~/ui/threads/CommentEntryForm'
 import { fakeThread } from '#/mocks/data'
+import fakeUiStore from '#/mocks/fakeUiStore'
 
-let wrapper, props
+let wrapper, component, props
+const ev = { preventDefault: () => null }
 describe('CommentEntryForm', () => {
   beforeEach(() => {
     props = {
+      uiStore: fakeUiStore,
       expanded: true,
       afterSubmit: jest.fn(),
       onHeightChange: jest.fn(),
       thread: fakeThread,
     }
-    wrapper = shallow(<CommentEntryForm {...props} />)
+    wrapper = shallow(<CommentEntryForm.wrappedComponent {...props} />)
+    component = wrapper.instance()
     fakeThread.API_saveComment.mockClear()
   })
 
-  describe('when not expanded', () => {
-    beforeEach(() => {
-      wrapper.setProps({ ...props, expanded: false })
-    })
-
-    it('does not render the CommentInput box', () => {
-      expect(wrapper.find('CommentInput').exists()).toBeFalsy()
-    })
+  it('renders the CommentInputWrapper', () => {
+    expect(wrapper.find('StyledCommentInputWrapper').exists()).toBeTruthy()
   })
 
-  describe('when expanded', () => {
-    beforeEach(() => {
-      wrapper.setProps({ ...props, expanded: true })
+  describe('handleSubmit', () => {
+    describe('with no message', () => {
+      it('does not call API_saveComment', () => {
+        component.handleSubmit(ev)
+        expect(fakeThread.API_saveComment).not.toHaveBeenCalled()
+      })
     })
-
-    it('renders the CommentInput box', () => {
-      expect(wrapper.find('CommentInput').exists()).toBeTruthy()
+    describe('with a message', () => {
+      it('calls API_saveComment', () => {
+        wrapper.setState({
+          editorState: EditorState.createWithContent(
+            ContentState.createFromText('foo!')
+          ),
+        })
+        component.handleSubmit(ev)
+        expect(fakeThread.API_saveComment).toHaveBeenCalled()
+      })
     })
   })
 })

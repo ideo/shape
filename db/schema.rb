@@ -206,7 +206,10 @@ ActiveRecord::Schema.define(version: 2019_10_01_195956) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.jsonb "draftjs_data"
+    t.bigint "parent_id"
+    t.integer "replies_count", default: 0
     t.index ["comment_thread_id"], name: "index_comments_on_comment_thread_id"
+    t.index ["parent_id"], name: "index_comments_on_parent_id"
   end
 
   create_table "data_items_datasets", force: :cascade do |t|

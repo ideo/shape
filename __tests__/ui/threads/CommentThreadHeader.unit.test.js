@@ -9,7 +9,6 @@ import { routingStore, uiStore } from '~/stores'
 jest.mock('../../../app/javascript/stores')
 
 let wrapper, props
-
 const fakeEv = { preventDefault: jest.fn(), stopPropagation: jest.fn() }
 
 describe('CommentThreadHeader', () => {
@@ -157,6 +156,8 @@ describe('CommentThreadHeader', () => {
         thread: fakeThread,
       }
       wrapper = shallow(<CommentThreadHeader {...props} />)
+      props.thread.API_subscribe.mockClear()
+      props.thread.API_unsubscribe.mockClear()
       button = wrapper
         .find(FollowHolder)
         .find('span[role="button"]')
@@ -212,6 +213,24 @@ describe('CommentThreadHeader', () => {
       it('should set user_thread subscribed to true when clicking', () => {
         button.simulate('click', fakeEv)
         expect(props.thread.users_thread.subscribed).toBe(true)
+      })
+
+      describe('with unpersisted thread', () => {
+        beforeEach(() => {
+          props = {
+            thread: { ...fakeThread, persisted: false },
+          }
+          wrapper = shallow(<CommentThreadHeader {...props} />)
+          button = wrapper
+            .find(FollowHolder)
+            .find('span[role="button"]')
+            .first()
+        })
+
+        it('should not call API_subscribe when clicking', () => {
+          button.simulate('click', fakeEv)
+          expect(props.thread.API_subscribe).not.toHaveBeenCalled()
+        })
       })
     })
 

@@ -3,6 +3,38 @@ require 'rails_helper'
 describe Api::V1::UsersController, type: :request, json: true, auth: true, create_org: true do
   let(:user) { @user }
 
+  describe 'GET #index' do
+    let(:path) { api_v1_users_path }
+
+    it 'returns 401' do
+      get(path)
+      expect(response.status).to eq(401)
+    end
+
+    context 'with Application API Token', auth: false, create_org: false do
+      let!(:api_token) { create(:api_token) }
+      let!(:user) { api_token.application_user }
+      let!(:matching_user) { create(:user, uid: 'user-with-uid-123') }
+
+      it 'returns 200' do
+        get(path, headers: headers_with_token(api_token.token))
+        expect(json['data'].size).to eq(User.count)
+      end
+
+      it 'matches User schema' do
+        get(
+          path,
+          params: { filter: { uid: 'user-with-uid-123' } },
+          headers: headers_with_token(api_token.token),
+        )
+        expect(json['data'].size).to eq(1)
+        user_json = json['data'].first
+        expect(user_json['id']).to eq(matching_user.id.to_s)
+        expect(user_json['attributes']).to match_json_schema('user')
+      end
+    end
+  end
+
   describe 'GET #show' do
     let(:path) { "/api/v1/users/#{user.id}" }
 

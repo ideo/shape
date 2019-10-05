@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { animateScroll } from 'react-scroll'
+import { scroller, animateScroll } from 'react-scroll'
 import { observable, action, runInAction, computed } from 'mobx'
 
 import routeToLogin from '~/utils/routeToLogin'
@@ -10,6 +10,7 @@ import { POPUP_ACTION_TYPES, ACTION_SOURCES } from '~/enums/actionEnums'
 export default class UiStore {
   // store this for usage by other components
   scroll = animateScroll
+  scroller = scroller
   defaultBCTState = {
     order: null,
     width: null,
@@ -144,8 +145,6 @@ export default class UiStore {
   emptySpaceClickHandlers = new Set()
 
   // Comments + Threads
-  @observable
-  commentsOpen = false
   // marked by thread.key (so it works for new records as well)
   @observable
   expandedThreadKey = null
@@ -193,6 +192,10 @@ export default class UiStore {
   linkedInMyCollection = false
   @observable
   editingCardCover = null
+  @observable
+  replyingToCommentId = null
+  @observable
+  commentThreadBottomVisible = null
 
   @action
   toggleEditingCardId(cardId) {
@@ -206,6 +209,11 @@ export default class UiStore {
   @action
   setEditingCardCover(editingCardCoverId) {
     this.editingCardCover = editingCardCoverId
+  }
+
+  @action
+  setReplyingToComment(replyingToCommentId) {
+    this.replyingToCommentId = replyingToCommentId
   }
 
   @action
@@ -797,6 +805,11 @@ export default class UiStore {
     this.expandedThreadKey = key
   }
 
+  @action
+  setCommentThreadBottomVisible(isVisible) {
+    this.commentThreadBottomVisible = isVisible
+  }
+
   // after performing an action (event), track following the record for notifications
   trackEvent(event, record) {
     this.trackRecord(record.identifier)
@@ -878,6 +891,22 @@ export default class UiStore {
 
   scrollToPosition(position) {
     this.scroll.scrollTo(position)
+  }
+
+  scrollToBottomOfComments(commentId = null, scrollOpts = {}) {
+    let { bottom } = v.commentScrollOpts
+    let offset = 0
+    if (commentId) {
+      bottom = `${commentId}-replies-bottom`
+      offset =
+        -1 *
+        document.getElementById(v.commentScrollOpts.containerId).clientHeight
+    }
+    this.scroller.scrollTo(bottom, {
+      ...v.commentScrollOpts,
+      ...scrollOpts,
+      offset: offset,
+    })
   }
 
   @action

@@ -325,7 +325,11 @@ class PageHeader extends React.Component {
 
   get renderStopFeebackButton() {
     const { record, uiStore } = this.props
-    if (record.can_edit_content && !record.is_test_locked) {
+    if (
+      record.can_edit_content &&
+      !record.is_test_locked &&
+      record.isLiveTest
+    ) {
       return (
         <FormButton
           width="170"

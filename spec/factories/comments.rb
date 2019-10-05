@@ -1,6 +1,7 @@
 FactoryBot.define do
   factory :comment do
     author
+    comment_thread factory: :item_comment_thread
     message { Faker::Simpsons.quote }
     draftjs_data do
       {

@@ -16,7 +16,8 @@ class Api::V1::CommentThreadsController < Api::V1::BaseController
   def view
     # mark comments as read
     @comment_thread.viewed_by!(current_user)
-    head :no_content
+    # return the users_thread with an updated timestamp
+    render jsonapi: @comment_thread, include: %i[users_thread]
   end
 
   before_action :build_thread_and_authorize_record, only: %i[create]

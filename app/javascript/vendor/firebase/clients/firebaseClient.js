@@ -22,6 +22,7 @@ if (process.env.GOOGLE_CLOUD_BROWSER_KEY) {
 
 export class FirebaseClient {
   subscribedThreadIds = []
+  failedThreadIds = []
   loadedThreadIds = []
   constructor() {
     this.listeners = []
@@ -151,14 +152,16 @@ export class FirebaseClient {
     const threadId = usersThread.comment_thread_id
     // check if we're already listening for this thread
     if (this.subscribedThreadIds.indexOf(threadId) > -1) return
+    if (this.failedThreadIds.indexOf(threadId) > -1) return
     apiStore.update('loadingThreads', true)
-    this.subscribedThreadIds.push(threadId)
     const threadUid = threadId.toString()
     const firestoreThread = db.collection('comment_threads').doc(threadUid)
     firestoreThread
       // get() to ensure document exists before listening, otherwise firestore throws errors
       .get()
       .then(doc => {
+        // only mark as subscribed once we confirm it exists
+        this.subscribedThreadIds.push(threadId)
         this.commentThreadsListener = firestoreThread.onSnapshot(
           threadDoc => {
             const thread = apiStore.syncFromFirestore(threadDoc.data())
@@ -193,6 +196,7 @@ export class FirebaseClient {
       })
       .catch(e => {
         // comment_thread document does not exist
+        this.failedThreadIds.push(threadId)
         this.escapeLoader()
       })
   }
@@ -207,9 +211,10 @@ export class FirebaseClient {
     if (!apiStore.loadingThreads) return
     if (this.loadedThreadIds.length === this.subscribedThreadIds.length) {
       apiStore.update('loadingThreads', false)
+    } else {
+      // just in case there was an issue loading all the threads, escape the loader after 5s
+      this.escapeLoader(5000)
     }
-    // just in case there was an issue loading all the threads, escape the loader after 5s
-    this.escapeLoader(5000)
   }
 }
 

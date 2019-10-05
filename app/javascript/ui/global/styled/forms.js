@@ -361,11 +361,6 @@ export const CommentForm = styled.form`
     ${v.colors.secondaryDark} 10%,
     ${v.colors.secondaryDark} 100%
   );
-  .textarea-input {
-    background: ${v.colors.secondaryMedium};
-    font-family: ${v.fonts.sans};
-    padding: 10px;
-  }
 `
 CommentForm.displayName = 'CommentForm'
 

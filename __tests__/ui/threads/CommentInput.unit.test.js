@@ -1,19 +1,23 @@
 import CommentInput from '~/ui/threads/CommentInput'
 import fakeApiStore from '#/mocks/fakeApiStore'
+import fakeUiStore from '#/mocks/fakeUiStore'
 import { EditorState } from 'draft-js'
 
-let wrapper, props, apiStore, component
+let wrapper, props, uiStore, apiStore, component
 describe('CommentInput', () => {
   beforeEach(() => {
     apiStore = fakeApiStore()
+    uiStore = fakeUiStore
 
     props = {
+      disabled: false,
       onChange: jest.fn(),
       onOpenSuggestions: jest.fn(),
       onCloseSuggestions: jest.fn(),
       handleReturn: jest.fn(),
       setEditor: jest.fn(),
       editorState: EditorState.createEmpty(),
+      uiStore,
       apiStore,
     }
     wrapper = shallow(<CommentInput.wrappedComponent {...props} />)

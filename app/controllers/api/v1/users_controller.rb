@@ -1,6 +1,13 @@
 class Api::V1::UsersController < Api::V1::BaseController
   before_action :authenticate_user!, only: %i[update_current_user accept_current_org_terms]
   skip_before_action :check_api_authentication!, only: %i[me update_current_user accept_current_org_terms create_limited_user]
+
+  before_action :require_application_bot!, only: %i[index]
+  before_action :load_and_filter_index, only: %i[index]
+  def index
+    render jsonapi: @users
+  end
+
   load_and_authorize_resource only: %i[show]
   def show
     render jsonapi: @user, include: [
