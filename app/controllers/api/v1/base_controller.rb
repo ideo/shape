@@ -120,6 +120,12 @@ class Api::V1::BaseController < ApplicationController
     head(:unauthorized)
   end
 
+  def require_application_bot!
+    return if current_user&.application_bot?
+
+    head(:unauthorized)
+  end
+
   def current_ability
     return @current_ability if @current_ability.present?
 
