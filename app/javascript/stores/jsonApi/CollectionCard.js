@@ -91,6 +91,13 @@ class CollectionCard extends BaseRecord {
     return null
   }
 
+  get canEdit() {
+    return (
+      (this.link && this.can_edit_parent) ||
+      (this.record && this.record.can_edit)
+    )
+  }
+
   // This sets max W/H based on number of visible columns. Used by Grid + CollectionCover.
   // e.g. "maxWidth" might temporarily be 2 cols even though this card.width == 4
   @action
@@ -218,10 +225,7 @@ class CollectionCard extends BaseRecord {
     const { uiStore } = this
     const filteredCardIds = this.apiStore
       .findAll('collection_cards')
-      .filter(
-        card =>
-          cardIds.indexOf(card.id) > -1 && (card.record && card.record.can_edit)
-      )
+      .filter(card => cardIds.indexOf(card.id) > -1 && card.canEdit)
       .map(card => card.id)
     const removedCount = uiStore.selectedCardIds.length - filteredCardIds.length
     uiStore.reselectCardIds(filteredCardIds)
