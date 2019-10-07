@@ -59,6 +59,7 @@ const fakeApiStore = ({
     linkCards: jest.fn(),
     duplicateCards: jest.fn(),
     checkInMyCollection: jest.fn(),
+    collapseReplies: jest.fn(),
     unreadActivityCount: 0,
 
     usersThreadPagesToLoad: 1,
@@ -101,6 +102,7 @@ const fakeApiStore = ({
         users_thread: {
           subscribed: true,
         },
+        visibleCommentsAndRepliesCount: 0,
       },
       {
         id: '2',
@@ -110,6 +112,7 @@ const fakeApiStore = ({
         users_thread: {
           subscribed: true,
         },
+        visibleCommentsAndRepliesCount: 0,
       },
     ],
     collections: [],

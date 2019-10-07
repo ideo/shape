@@ -393,7 +393,7 @@ const breakpoints = [40, 52, 64]
 
 export function MarketingFlex(props) {
   return (
-    <ReflexProvider space={space} breakpoints={breakpoints}>
+    <ReflexProvider cspace={space} breakpoints={breakpoints}>
       <Flex {...props} />
     </ReflexProvider>
   )

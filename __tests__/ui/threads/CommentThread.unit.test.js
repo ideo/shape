@@ -1,23 +1,24 @@
 import CommentThread from '~/ui/threads/CommentThread'
-import { fakeThread } from '#/mocks/data'
+import { fakeThread, fakeComment } from '#/mocks/data'
+import fakeUiStore from '#/mocks/fakeUiStore'
+import fakeApiStore from '#/mocks/fakeApiStore'
 
 let wrapper, props
 describe('CommentThread', () => {
   beforeEach(() => {
     props = {
-      expanded: false,
-      onClick: jest.fn(),
+      thread: fakeThread,
+      uiStore: fakeUiStore,
+      apiStore: fakeApiStore(),
       afterSubmit: jest.fn(),
       onEditorHeightChange: jest.fn(),
-      thread: fakeThread,
+      updateContainerSize: jest.fn(),
     }
-    wrapper = shallow(<CommentThread {...props} />)
+    wrapper = shallow(<CommentThread.wrappedComponent {...props} />)
   })
 
   it('renders a CommentThreadHeader with the thread', () => {
-    expect(wrapper.find('CommentThreadHeader').props().thread).toEqual(
-      props.thread
-    )
+    expect(wrapper.find('CommentThreadHeader').exists()).toBeTruthy()
   })
 
   it('renders a CommentEntryForm', () => {
@@ -28,36 +29,30 @@ describe('CommentThread', () => {
     )
   })
 
-  describe('with unexpanded thread', () => {
-    it('renders unread comments if thread is unexpanded', () => {
-      // fakeThread has 2 latestUnreadComments
-      expect(wrapper.find('Comment').length).toEqual(
-        props.thread.latestUnreadComments.length
-      )
-    })
-
-    it('makes the StyledCommentsWrapper clickable', () => {
-      const styledWrapper = wrapper.find('StyledCommentsWrapper').get(0)
-      expect(styledWrapper.props.clickable).toBeTruthy()
-      styledWrapper.props.onClick()
-      // should call the function passed in to CommentThread
-      expect(props.onClick).toHaveBeenCalled()
-    })
+  it('renders all the comments', () => {
+    expect(wrapper.find('Comment').length).toEqual(props.thread.comments.length)
   })
 
-  describe('with expanded thread', () => {
+  describe('with comments with subthread', () => {
+    let comments
     beforeEach(() => {
-      props = {
-        ...props,
-        expanded: true,
+      comments = [
+        {
+          ...fakeComment,
+          persisted: true,
+        },
+      ]
+      const thread = {
+        ...fakeThread,
+        comments: comments,
       }
-      wrapper = shallow(<CommentThread {...props} />)
+
+      props.thread = thread
+      wrapper = shallow(<CommentThread.wrappedComponent {...props} />)
     })
 
-    it('renders all the comments if thread is expanded', () => {
-      expect(wrapper.find('Comment').length).toEqual(
-        props.thread.comments.length
-      )
+    it('should render the parent comment', () => {
+      expect(wrapper.find('Comment').length).toEqual(1)
     })
   })
 })

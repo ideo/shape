@@ -519,11 +519,15 @@ export const fakeComment = {
     ],
     entityMap: {},
   },
+  replies: [],
   created_at: new Date('2019-05-09T03:18:00'),
   updated_at: new Date('2019-05-09T03:18:00'),
+  API_fetchReplies: jest.fn().mockReturnValue(Promise.resolve({})),
+  expandAndFetchReplies: jest.fn().mockReturnValue(Promise.resolve({}))
 }
 export const fakeThread = {
   id: '1',
+  persisted: true,
   record: fakeCollection,
   key: 'collection-1',
   unread_count: 2,
@@ -534,12 +538,13 @@ export const fakeThread = {
       return this.subscribed
     },
   },
-  latestUnreadComments: [fakeComment, fakeComment],
+  visibleCommentsAndRepliesCount: 1,
   API_saveComment: jest.fn().mockReturnValue(Promise.resolve({})),
   API_fetchComments: jest.fn().mockReturnValue(Promise.resolve({})),
   API_subscribe: jest.fn().mockReturnValue(Promise.resolve({})),
   API_unsubscribe: jest.fn().mockReturnValue(Promise.resolve({})),
 }
+
 export const fakeActivity = {
   id: '1',
   type: 'activities',

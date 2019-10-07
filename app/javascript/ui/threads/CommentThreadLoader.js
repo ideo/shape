@@ -9,7 +9,7 @@ import RefreshIcon from '~/ui/icons/RefreshIcon'
 import v from '~/utils/variables'
 
 const StyledCommentThreadLoader = styled(TextButton)`
-  height: 80px;
+  height: 40px;
   position: relative;
   margin-bottom: 5px;
   background: ${props =>
@@ -52,7 +52,7 @@ class CommentThreadLoader extends React.Component {
           disabled={this.loading}
           onClick={this.loadMore}
         >
-          <div className="text">
+          <div>
             <span className="refreshIcon">
               <RefreshIcon />
             </span>

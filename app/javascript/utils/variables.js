@@ -133,8 +133,8 @@ export default {
     primaryMediumDark: '#86b2b7',
     primaryDark: '#5698ae',
     primaryDarkest: '#35889e',
-    secondaryLight: '#73808f',
-    secondaryMedium: '#5a6a7c',
+    secondaryLight: '#5a6a7c',
+    secondaryMedium: '#4a5b71',
     secondaryDark: '#3f526a',
     secondaryDarkest: '#242d37',
     tertiaryMedium: '#de8f74',
@@ -224,5 +224,13 @@ export default {
     gutter: 14,
     gridW: 253,
     gridH: 200,
+  },
+
+  commentScrollOpts: {
+    containerId: 'ctc-content',
+    bottom: 'ctc-bottom',
+    delay: 0,
+    duration: 350,
+    smooth: true,
   },
 }

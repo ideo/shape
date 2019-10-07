@@ -117,6 +117,7 @@ class MarketingProductPage extends React.Component {
                       title={block.title}
                       content={block.content}
                       imageUrl={block.imageUrl}
+                      imageShadow={block.imageShadow}
                     />
                   ))}
                 </Box>

@@ -103,6 +103,7 @@ class Activity extends React.PureComponent {
     if (_.includes(['commented', 'mentioned'], action)) {
       const thread = await apiStore.findOrBuildCommentThread(target)
       uiStore.expandThread(thread.key)
+      // todo: needs source comment in order to navigate to on highlight, notification, email, etc
     }
   }
 

@@ -40,7 +40,7 @@ const fakeUiStore = {
     x: 0,
     y: 0,
     offsetX: 0,
-    offsetY: 0
+    offsetY: 0,
   },
   openBlankContentTool: jest.fn(),
   closeBlankContentTool: jest.fn(),
@@ -98,16 +98,21 @@ const fakeUiStore = {
   setSnoozeChecked: jest.fn(),
   scrollToTop: jest.fn(),
   scrollToBottom: jest.fn(),
+  scrollToBottomOfComments: jest.fn(),
   scrollToBottomOfModal: jest.fn(),
   popupSnackbar: jest.fn(),
   showPermissionsAlert: jest.fn(),
   gridHeightFor: jest.fn().mockReturnValue(250),
   performActionAfterRoute: jest.fn(),
-  linkedBreadcrumbTrailForRecord: jest.fn().mockImplementation(x => x.breadcrumb),
+  linkedBreadcrumbTrailForRecord: jest
+    .fn()
+    .mockImplementation(x => x.breadcrumb),
   addEmptySpaceClickHandler: jest.fn(),
   removeEmptySpaceClickHandler: jest.fn(),
   setEditingCardCover: jest.fn(),
   adminAudienceMenuOpen: false,
+  replyingToCommentId: false,
+  setReplyingToComment: jest.fn()
 }
 
 export default fakeUiStore

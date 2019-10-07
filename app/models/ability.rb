@@ -102,7 +102,10 @@ class Ability
         audience.can_edit?(user)
       end
 
-      can %i[read manage], Comment do |comment|
+      can :read, Comment do |comment|
+        comment.can_view?(user)
+      end
+      can :manage, Comment do |comment|
         comment.can_edit?(user)
       end
 

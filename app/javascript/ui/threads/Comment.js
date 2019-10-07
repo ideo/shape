@@ -1,8 +1,13 @@
-import { isEmpty } from 'lodash'
+import _ from 'lodash'
+import { Fragment } from 'react'
 import { toJS, runInAction } from 'mobx'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import PropTypes from 'prop-types'
+import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import { EditorState, convertFromRaw, convertToRaw } from 'draft-js'
 import styled from 'styled-components'
+import * as linkify from 'linkifyjs'
+import Linkify from 'linkifyjs/react'
+import mention from 'linkifyjs/plugins/mention'
 
 import v from '~/utils/variables'
 import { DisplayText } from '~/ui/global/styled/typography'
@@ -10,29 +15,36 @@ import { InlineRow } from '~/ui/global/styled/layout'
 import { CommentEnterButton } from '~/ui/global/styled/forms'
 import Moment from '~/ui/global/Moment'
 import Avatar from '~/ui/global/Avatar'
-import { StyledCommentInput } from './CustomCommentMentions'
-import { apiStore, uiStore } from '~/stores'
 // NOTE: this is the only usage of TrashIconLg -- TrashXl looks a tiny bit off if used here
 import TrashIconLg from '~/ui/icons/TrashIconLg'
 import EditPencilIcon from '~/ui/icons/EditPencilIcon'
+import CalloutBoxIcon from '~/ui/icons/CalloutBoxIcon'
 import { showOnHoverCss, hideOnHoverCss } from '~/ui/grid/shared'
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
 import XIcon from '~/ui/icons/XIcon'
 import Tooltip from '~/ui/global/Tooltip'
-import CommentInput from './CommentInput'
-import * as linkify from 'linkifyjs'
-import Linkify from 'linkifyjs/react'
-import mention from 'linkifyjs/plugins/mention'
+import CommentInput from '~/ui/threads/CommentInput'
+import CommentReplies from '~/ui/threads/CommentReplies'
+import { StyledCommentInput } from '~/ui/threads/CustomCommentMentions'
+
 mention(linkify)
 
 const StyledComment = styled(StyledCommentInput)`
   ${showOnHoverCss};
   ${hideOnHoverCss};
   padding: 10px;
-  margin-bottom: 5px;
+  ${props =>
+    props.isReply &&
+    `
+    border-bottom: 1px solid ${v.colors.secondaryDark};
+  `}
+  ${props =>
+    !props.isReply &&
+    `
+    border-bottom: 5px solid ${v.colors.secondaryDark};
+  `}
   background: ${props =>
     props.unread ? v.colors.secondaryLight : v.colors.secondaryMedium};
-
   transition: background 1s 0.5s ease;
 
   &:last-child {
@@ -51,6 +63,7 @@ const StyledComment = styled(StyledCommentInput)`
     word-wrap: break-word;
   }
 `
+StyledComment.displayName = 'StyledComment'
 
 export const StyledCommentActions = styled.div`
   align-items: center;
@@ -107,6 +120,8 @@ const EditedIndicator = styled.span`
 `
 EditedIndicator.displayName = 'EditedIndicator'
 
+@inject('apiStore', 'uiStore')
+@observer
 class Comment extends React.Component {
   constructor(props) {
     super(props)
@@ -137,16 +152,74 @@ class Comment extends React.Component {
   }
 
   isDraftJSComment() {
-    return !isEmpty(toJS(this.props.comment.draftjs_data))
+    return !_.isEmpty(toJS(this.props.comment.draftjs_data))
+  }
+
+  get isActive() {
+    const { uiStore } = this.props
+    const { replyingToCommentId } = uiStore
+    const { id } = this.parentComment
+    return replyingToCommentId === id
+  }
+
+  // will return itself if it is a parent comment
+  get parentComment() {
+    const { apiStore, comment, isReply } = this.props
+    if (isReply) {
+      // when clicking a reply, you are replying to the parent
+      return apiStore.find('comments', comment.parent_id)
+    } else {
+      return comment
+    }
+  }
+
+  collapseReplies = () => {
+    const { apiStore } = this.props
+    apiStore.collapseReplies()
+  }
+
+  handleClick = e => {
+    const { parentComment } = this
+    const { editing } = this.state
+    // filters out other click handlers nested inside the body
+    if (
+      e.target.closest('.test-reply-comment') ||
+      e.target.closest('.test-edit-comment') ||
+      e.target.closest('.test-delete-comment') ||
+      editing
+    ) {
+      return
+    }
+    // we clicked some parent comment outside of our current comment/replies
+    if (!this.isActive) {
+      this.collapseReplies()
+      if (_.isEmpty(parentComment.replies)) {
+        return
+      }
+    }
+    this.toggleReply()
+  }
+
+  toggleReply = async () => {
+    if (this.isActive) {
+      this.collapseReplies()
+    } else {
+      const { parentComment } = this
+      parentComment.expandAndFetchReplies()
+    }
   }
 
   handleEditClick = () => {
+    const { isReply } = this.props
     this.setState({ editing: true })
+    if (!isReply) {
+      this.collapseReplies()
+    }
     this.focusTextArea()
   }
 
   handleDeleteClick = () => {
-    const { comment } = this.props
+    const { comment, uiStore } = this.props
     uiStore.confirm({
       iconName: 'Alert',
       prompt:
@@ -241,7 +314,7 @@ class Comment extends React.Component {
     const { comment } = this.props
 
     return (
-      <React.Fragment>
+      <div className="message">
         {!this.state.editing && (
           <div>
             {this.formatCommentMessage(comment.message)}
@@ -263,79 +336,136 @@ class Comment extends React.Component {
             </EditEnterButton>
           </StyledForm>
         )}
-      </React.Fragment>
+      </div>
     )
+  }
+
+  renderHeaderAndButtons() {
+    const { comment, apiStore, isReply } = this.props
+    const { author, persisted, created_at } = comment
+    const isCurrentUserComment = apiStore.currentUserId === author.id
+    const hideTimestampOnHover = isCurrentUserComment || !isReply
+
+    return (
+      <InlineRow align="center">
+        <Avatar
+          title={author.name}
+          url={author.pic_url_square}
+          linkToCollectionId={author.user_profile_collection_id}
+          className="author-img"
+        />
+        <DisplayText className="author" color={v.colors.white}>
+          {author.name}
+        </DisplayText>
+        <FlexPushRight>
+          {!this.state.editing && (
+            <Fragment>
+              <Timestamp
+                className={`timestamp ${
+                  hideTimestampOnHover ? 'hide-on-hover' : ''
+                }`}
+              >
+                <Moment date={created_at} />
+              </Timestamp>
+              <StyledCommentActions className="show-on-hover">
+                {persisted && (
+                  <Fragment>
+                    {!isReply && (
+                      <Tooltip placement="top" title="reply to comment">
+                        <ActionButton
+                          onClick={this.toggleReply}
+                          className="test-reply-comment"
+                        >
+                          <CalloutBoxIcon />
+                        </ActionButton>
+                      </Tooltip>
+                    )}
+                    {isCurrentUserComment && (
+                      <Fragment>
+                        <Tooltip placement="top" title="edit comment">
+                          <ActionButton
+                            onClick={this.handleEditClick}
+                            className="test-edit-comment"
+                          >
+                            <EditPencilIcon />
+                          </ActionButton>
+                        </Tooltip>
+                        {comment.replies.length < 1 && (
+                          <Tooltip placement="top" title="delete comment">
+                            <ActionButton
+                              onClick={this.handleDeleteClick}
+                              className="test-delete-comment"
+                            >
+                              <TrashIconLg />
+                            </ActionButton>
+                          </Tooltip>
+                        )}
+                      </Fragment>
+                    )}
+                  </Fragment>
+                )}
+              </StyledCommentActions>
+            </Fragment>
+          )}
+          {this.state.editing && (
+            <StyledCommentActions>
+              <CancelEditButton onClick={this.handleCancelEditClick}>
+                <XIcon />
+              </CancelEditButton>
+            </StyledCommentActions>
+          )}
+        </FlexPushRight>
+      </InlineRow>
+    )
+  }
+
+  renderReplies() {
+    const { comment, isReply } = this.props
+    // only render replies if this comment is a persisted parent comment with replies
+    if (!comment.id || isReply || !comment.replies.length) {
+      return null
+    }
+    return <CommentReplies comment={comment} />
   }
 
   render() {
-    const { comment } = this.props
-    const { author } = comment
-    const isCurrentUserComment = apiStore.currentUserId === comment.author.id
-
+    const { comment, isReply } = this.props
+    const { author, unread } = comment
+    // NOTE: not sure if this is a solution for delete returning undefined author
+    if (!author) return null
     return (
-      <StyledComment unread={comment.unread}>
-        <InlineRow align="center">
-          <Avatar
-            title={author.name}
-            url={author.pic_url_square}
-            linkToCollectionId={author.user_profile_collection_id}
-            className="author-img"
-          />
-          <DisplayText className="author" color={v.colors.white}>
-            {comment.author.name}
-          </DisplayText>
-          <FlexPushRight>
-            {!this.state.editing && (
-              <React.Fragment>
-                <Timestamp
-                  className={`timestamp ${
-                    isCurrentUserComment ? 'hide-on-hover' : ''
-                  }`}
-                >
-                  <Moment date={comment.created_at} />
-                </Timestamp>
-                <StyledCommentActions className="show-on-hover">
-                  {comment.persisted && isCurrentUserComment && (
-                    <React.Fragment>
-                      <Tooltip placement="top" title="edit comment">
-                        <ActionButton
-                          onClick={this.handleEditClick}
-                          className="test-edit-comment"
-                        >
-                          <EditPencilIcon />
-                        </ActionButton>
-                      </Tooltip>
-                      <Tooltip placement="top" title="delete comment">
-                        <ActionButton
-                          onClick={this.handleDeleteClick}
-                          className="test-delete-comment"
-                        >
-                          <TrashIconLg />
-                        </ActionButton>
-                      </Tooltip>
-                    </React.Fragment>
-                  )}
-                </StyledCommentActions>
-              </React.Fragment>
-            )}
-            {this.state.editing && (
-              <StyledCommentActions>
-                <CancelEditButton onClick={this.handleCancelEditClick}>
-                  <XIcon />
-                </CancelEditButton>
-              </StyledCommentActions>
-            )}
-          </FlexPushRight>
-        </InlineRow>
+      <Fragment>
+        <StyledComment
+          unread={unread}
+          isReply={isReply}
+          onClick={this.handleClick}
+        >
+          {this.renderHeaderAndButtons()}
+          {this.renderMessage()}
+        </StyledComment>
 
-        <div className="message">{this.renderMessage()}</div>
-      </StyledComment>
+        {this.renderReplies()}
+      </Fragment>
     )
   }
+}
+
+Comment.defaultProps = {
+  isReply: false,
+  expanded: false,
 }
 
 Comment.propTypes = {
   comment: MobxPropTypes.objectOrObservableObject.isRequired,
+  isReply: PropTypes.bool,
+  expanded: PropTypes.bool,
 }
+
+Comment.wrappedComponent.propTypes = {
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+
+Comment.displayName = 'Comment'
 
 export default Comment

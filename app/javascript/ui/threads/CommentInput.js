@@ -2,7 +2,6 @@ import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { observable, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-// import { EditorState, convertToRaw } from 'draft-js'
 import Editor from 'draft-js-plugins-editor'
 import createMentionPlugin from 'draft-js-mention-plugin'
 import createLinkifyPlugin from 'draft-js-linkify-plugin'
@@ -11,31 +10,9 @@ import { uiStore } from '~/stores'
 import {
   StyledCommentInput,
   CustomMentionSuggestion,
-} from './CustomCommentMentions'
+} from '~/ui/threads/CustomCommentMentions'
 
-const positionSuggestions = ({ decoratorRect, state, props }) => {
-  let transform
-  let transition
-  let top = '-36px'
-
-  if (state.isActive && props.suggestions.length > 0) {
-    transform = `scaleY(1)`
-    transition = 'all 0.25s cubic-bezier(.3,1.2,.2,1)'
-    const { y } = uiStore.activityLogPosition
-    top = `${decoratorRect.top - (y + 45 * (props.suggestions.length + 1))}px`
-  } else if (state.isActive) {
-    transform = 'scaleY(0)'
-    transition = 'all 0.25s cubic-bezier(.3,1,.2,1)'
-  }
-
-  return {
-    transform,
-    transition,
-    top,
-  }
-}
-
-@inject('apiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class CommentInput extends React.Component {
   @observable
@@ -52,9 +29,33 @@ class CommentInput extends React.Component {
     this.props.setEditor(null, { unset: true })
   }
 
+  positionSuggestions = ({ decoratorRect, state, props }) => {
+    const { suggestions } = props
+    const { isActive } = state
+    let transform
+    let transition
+    let top = '-36px'
+
+    if (isActive && suggestions.length > 0) {
+      transform = `scaleY(1)`
+      transition = 'all 0.25s cubic-bezier(.3,1.2,.2,1)'
+      const { y } = uiStore.activityLogPosition
+      top = `${decoratorRect.top - (y + 45 * (suggestions.length + 1))}px`
+    } else if (isActive) {
+      transform = 'scaleY(0)'
+      transition = 'all 0.25s cubic-bezier(.3,1,.2,1)'
+    }
+
+    return {
+      transform,
+      transition,
+      top,
+    }
+  }
+
   initMentionPlugin() {
     this.mentionPlugin = createMentionPlugin({
-      positionSuggestions,
+      positionSuggestions: this.positionSuggestions,
       // treat the entire "@xyz" as an all-or-nothing token
       entityMutability: 'IMMUTABLE',
     })
@@ -117,7 +118,7 @@ class CommentInput extends React.Component {
   }
 
   render() {
-    const { onChange, editorState } = this.props
+    const { onChange, editorState, disabled } = this.props
     const { MentionSuggestions } = this.mentionPlugin
     MentionSuggestions.displayName = 'MentionSuggestions'
     const plugins = [this.mentionPlugin, this.linkifyPlugin]
@@ -125,6 +126,7 @@ class CommentInput extends React.Component {
     return (
       <StyledCommentInput editing onClick={this.focus}>
         <Editor
+          readOnly={disabled}
           editorState={editorState}
           onChange={onChange}
           handleReturn={this.handleReturn}
@@ -152,9 +154,14 @@ CommentInput.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   setEditor: PropTypes.func.isRequired,
   editorState: MobxPropTypes.objectOrObservableObject.isRequired,
+  disabled: PropTypes.bool,
 }
 CommentInput.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+CommentInput.defaultProps = {
+  disabled: false,
 }
 
 CommentInput.displayName = 'CommentInput'

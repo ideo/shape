@@ -141,14 +141,14 @@ export const MaxWidthContainer = styled.div`
 MaxWidthContainer.displayName = 'MaxWidthContainer'
 
 export const ActivityContainer = styled.div`
-  margin-top: 12px;
+  margin-top: 20px;
   overflow-y: ${props => (props.moving ? 'hidden' : 'scroll')};
   overflow-x: hidden;
   margin-bottom: 10px;
   height: 100%;
-  padding-left: 10px;
-  padding-right: 10px;
   position: relative;
+  /* NOTE: this padding is because we moved that out of the overall ActivityContainer */
+  padding: 0 10px;
 `
 ActivityContainer.displayName = 'ActivityContainer'
 

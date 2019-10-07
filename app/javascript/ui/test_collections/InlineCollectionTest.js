@@ -1,23 +1,18 @@
 import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import styled from 'styled-components'
+import { ThemeProvider } from 'styled-components'
 
 import { ActivityContainer } from '~/ui/global/styled/layout'
 import Emoji from '~/ui/icons/Emoji'
 import {
   EmojiMessageContainer,
   SurveyClosed,
+  styledTestTheme,
 } from '~/ui/test_collections/shared'
 import { DisplayText } from '~/ui/global/styled/typography'
 import TestSurveyResponder from '~/ui/test_collections/TestSurveyResponder'
 import Tooltip from '~/ui/global/Tooltip'
 import CommentThreadHeader from '~/ui/threads/CommentThreadHeader'
-import { threadTitleCss } from '~/ui/threads/CommentThread'
-
-const StyledTestHeader = styled.div`
-  ${threadTitleCss};
-  position: sticky;
-`
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -76,26 +71,26 @@ class InlineCollectionTest extends React.Component {
             because it is no longer the "live" test collection.
             So as a fallback, the header here just displays the actual collection being tested
           */}
-          <StyledTestHeader>
-            <CommentThreadHeader record={collection} />
-          </StyledTestHeader>
-          <SurveyClosed>
-            <DisplayText>Thank you for stopping by!</DisplayText>
-            <br />
-            <br />
-            <DisplayText>
-              Feedback on {collection.name} is finished.
-            </DisplayText>
-            <Tooltip
-              classes={{ tooltip: 'Tooltip' }}
-              title="Feedback finished"
-              placement="bottom"
-            >
-              <EmojiMessageContainer>
-                <Emoji name="Timer clock" symbol="⏲️" />
-              </EmojiMessageContainer>
-            </Tooltip>
-          </SurveyClosed>
+          <CommentThreadHeader record={collection} sticky />
+          <ThemeProvider theme={styledTestTheme('secondary')}>
+            <SurveyClosed>
+              <DisplayText>Thank you for stopping by!</DisplayText>
+              <br />
+              <br />
+              <DisplayText>
+                Feedback on {collection.name} is finished.
+              </DisplayText>
+              <Tooltip
+                classes={{ tooltip: 'Tooltip' }}
+                title="Feedback finished"
+                placement="bottom"
+              >
+                <EmojiMessageContainer>
+                  <Emoji name="Timer clock" symbol="⏲️" />
+                </EmojiMessageContainer>
+              </Tooltip>
+            </SurveyClosed>
+          </ThemeProvider>
         </div>
       )
     }
@@ -107,9 +102,7 @@ class InlineCollectionTest extends React.Component {
       return (
         <div>
           {testCollection && (
-            <StyledTestHeader>
-              <CommentThreadHeader record={testCollection} />
-            </StyledTestHeader>
+            <CommentThreadHeader record={testCollection} sticky />
           )}
           <TestSurveyResponder
             collection={testCollection}
