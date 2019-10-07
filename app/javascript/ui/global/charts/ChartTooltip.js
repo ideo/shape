@@ -72,7 +72,7 @@ class ChartTooltip extends React.PureComponent {
     const { cardArea } = this.props
     if (cardArea === 1) {
       return {
-        tooltip: '14px',
+        tooltip: '20px',
         label: '20px',
       }
     }
@@ -99,6 +99,7 @@ class ChartTooltip extends React.PureComponent {
   render() {
     const {
       alwaysShowLabels,
+      cardArea,
       data,
       datum,
       displayTicks,
@@ -117,7 +118,7 @@ class ChartTooltip extends React.PureComponent {
         <VictoryTooltip
           {...this.props}
           theme={theme}
-          cornerRadius={2}
+          cornerRadius={cardArea === 1 ? 4 : 2}
           flyoutComponent={displayTicks ? <DotFlyout /> : <Flyout />}
           dx={dx * 5}
           dy={0}
