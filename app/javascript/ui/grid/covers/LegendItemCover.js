@@ -34,6 +34,7 @@ const PlusIconContainer = styled.span`
 
 const StyledLegendItem = styled.div`
   border-top: 2px solid #000;
+  overflow-y: scroll;
   padding: 12px 15px 12px 10px;
 `
 
