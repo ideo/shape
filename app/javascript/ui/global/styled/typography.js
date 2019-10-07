@@ -222,13 +222,7 @@ export const HugeNumber = styled(Heading1)`
 `
 
 export const QuillStyleWrapper = styled.div`
-  ${props => {
-    let margin = 40
-    if (props.smallGrid) margin = 20
-    return props.notEditing && props.hasTitleText
-      ? `height: calc(100% - ${margin}px); margin-top: ${margin}px;`
-      : 'height: 100%;'
-  }}
+  height: 100%;
 
   .quill {
     height: 100%;
@@ -287,10 +281,6 @@ export const QuillStyleWrapper = styled.div`
       display: ${props => (props.fullPageView ? 'block' : 'flex')};
 
       ${props => (props.notEditing ? '' : 'overflow: visible !important;')};
-      ${props =>
-        props.notEditing && props.hasTitleText
-          ? 'justify-content: flex-end;'
-          : ''};
     }
 
     .ql-cursor {
@@ -304,10 +294,6 @@ export const QuillStyleWrapper = styled.div`
     .ql-editor {
       overflow-x: hidden;
       ${props => (props.notEditing ? 'overflow-y: hidden;' : '')};
-      ${props =>
-        props.notEditing && props.hasTitleText
-          ? 'display: block; height: auto; flex: initial;'
-          : ''};
     }
   }
 `
