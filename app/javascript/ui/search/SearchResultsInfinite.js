@@ -158,7 +158,6 @@ class SearchResultsInfinite extends React.Component {
                   card={card}
                   cardType={result.internalType}
                   record={result}
-                  cardId={card.id}
                   menuOpen={uiStore.cardMenuOpen.id === card.id}
                   // NOTE: this will have to get modified when we eventually
                   // turn off item routing for videos and images
