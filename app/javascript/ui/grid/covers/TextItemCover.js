@@ -207,8 +207,12 @@ class TextItemCover extends React.Component {
         this.quillEditor = c
       },
       readOnly: true,
-      onChangeSelection: (range, selection, editor) => {
-        uiStore.selectTextRangeForCard({ range, id: cardId })
+      onChangeSelection: (range, source, editor) => {
+        uiStore.selectTextRangeForCard({
+          range,
+          editor,
+          cardId,
+        })
       },
       theme: null,
     }

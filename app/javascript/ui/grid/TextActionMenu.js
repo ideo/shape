@@ -20,14 +20,10 @@ class TextActionMenu extends React.Component {
   }
 
   addComment = async () => {
-    const { apiStore, uiStore, card } = this.props
+    const { apiStore, card } = this.props
     const { record } = card
-    console.log('clicked comment button', card, record)
-    uiStore.update('activityLogOpen', true)
 
-    const thread = await apiStore.findOrBuildCommentThread(record)
-    console.log(thread)
-    uiStore.expandThread(thread.key)
+    apiStore.openCurrentThreadToCommentOn(record)
   }
 
   handleMouseLeave = () => {

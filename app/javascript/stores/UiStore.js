@@ -152,6 +152,8 @@ export default class UiStore {
   @observable
   expandedThreadKey = null
   @observable
+  commentingOnRecord = null
+  @observable
   editingName = false
   @observable
   trackedRecords = new Map()
@@ -422,13 +424,19 @@ export default class UiStore {
   }
 
   @action
-  selectTextRangeForCard({ id, range }) {
+  selectTextRangeForCard({ range, editor, cardId }) {
+    if (!cardId) return
+    if (!range || !range.length) return
+
+    const { index, length } = range
     // Only open text action menu if you have text selected
     if (range && range.length > 0) {
       this.cardMenuOpen.menuType = EVENT_SOURCE_TYPES.TEXT_EDITOR
     }
 
-    this.selectedTextRangeForCard = { id, range }
+    const textContent = editor.getText(index, length)
+
+    this.selectedTextRangeForCard = { cardId, range, textContent }
   }
 
   // TODO: rename this function to be clear it is show or reroute??

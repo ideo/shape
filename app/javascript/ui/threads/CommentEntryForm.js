@@ -128,6 +128,33 @@ class CommentEntryForm extends React.Component {
     )
   }
 
+  handleBlur = e => {
+    console.log(e.relatedTarget)
+    const { relatedTarget } = e
+    if (
+      relatedTarget &&
+      relatedTarget.getAttribute('data-attr-comment-button')
+    ) {
+      return
+    }
+
+    const { uiStore } = this.props
+    uiStore.update('commentingOnRecord', null)
+  }
+
+  get renderSubjectOfComment() {
+    const { uiStore } = this.props
+    const { textContent } = uiStore.selectedTextRangeForCard
+    if (!uiStore.commentingOnRecord) return
+
+    console.log('preview: ', textContent)
+    if (textContent) {
+      return <div>{textContent}</div>
+    } else {
+      // information about the item/collection
+    }
+  }
+
   render() {
     const { editorState, updating } = this.state
     const { uiStore } = this.props
@@ -135,15 +162,20 @@ class CommentEntryForm extends React.Component {
     return (
       <CommentForm onSubmit={this.handleSubmit}>
         <StyledCommentInputWrapper replying={!!uiStore.replyingToCommentId}>
+          {this.renderSubjectOfComment}
           <CommentInput
             disabled={updating}
             editorState={editorState}
             onChange={this.handleInputChange}
             handleSubmit={this.handleSubmit}
             setEditor={this.setEditor}
+            onBlur={this.handleBlur}
           />
         </StyledCommentInputWrapper>
-        <CommentEnterButton focused={this.state.focused}>
+        <CommentEnterButton
+          data-attr-comment-button
+          focused={this.state.focused}
+        >
           <ReturnArrowIcon />
         </CommentEnterButton>
       </CommentForm>

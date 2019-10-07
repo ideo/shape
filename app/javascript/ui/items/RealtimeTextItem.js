@@ -403,11 +403,16 @@ class RealtimeTextItem extends React.Component {
 
   handleSelectionChange = (range, source, editor) => {
     const { cardId } = this
+    const { uiStore } = this.props
+
     if (!cardId) return
 
-    const { uiStore } = this.props
-    uiStore.selectTextRangeForCard({ range, id: cardId })
-
+    uiStore.selectTextRangeForCard({
+      range,
+      editor,
+      cardId,
+    })
+    // also store editor.getContents(range) for later reference
     if (source === 'user') {
       this.sendCursor()
     }
@@ -500,22 +505,15 @@ class RealtimeTextItem extends React.Component {
     const { quillEditor } = this
     quillEditor.format('commentHighlight', false, 'user')
     quillEditor.format('highlightClass', false, 'user')
+  }
 
   onComment = async e => {
-    const { uiStore } = this.props
+    const { apiStore, item } = this.props
     e.preventDefault()
-    console.log('clicking comment button in realtime text item', e)
-    uiStore.update('activityLogOpen', true)
-    // How to get proper target for this?
-    // fetch card using card id and use that to get record for thread?
-    uiStore.expandThread(null)
-    // const { target } = e
-    // const { apiStore, uiStore } = this.props
 
-    // activate Activity thread
-    // const thread = await apiStore.findOrBuildCommentThread(target)
-
-    // uiStore.expandThread(thread.key)
+    apiStore.openCurrentThreadToCommentOn(item)
+    // find text selection
+    // prepopulate comment entry form with text
   }
 
   render() {
