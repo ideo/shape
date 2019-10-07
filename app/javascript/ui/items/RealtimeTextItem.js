@@ -15,9 +15,11 @@ import { QuillStyleWrapper } from '~/ui/global/styled/typography'
 import TextItemToolbar from '~/ui/items/TextItemToolbar'
 import { routingStore } from '~/stores'
 import v from '~/utils/variables'
+import QuillClipboard from '~/ui/global/QuillClipboard'
 
 Quill.debug('error')
 Quill.register('modules/cursors', QuillCursors)
+Quill.register('modules/cursors', QuillClipboard)
 Quill.register('formats/link', QuillLink)
 
 const FULL_PAGE_TOP_PADDING = '2rem'
@@ -379,8 +381,9 @@ class RealtimeTextItem extends React.Component {
       // This adjustment is made so that the currently-selected
       // header size is preserved on new lines
       this.adjustHeaderSizeIfNewline(delta)
-      const cursors = this.quillEditor.getModule('cursors')
-      cursors.clearCursors()
+      // FIXME: throws an error when pasting
+      // const cursors = this.quillEditor.getModule('cursors')
+      // cursors.clearCursors()
 
       this.combineAwaitingDeltas(delta)
       this.sendCombinedDelta()
