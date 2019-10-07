@@ -55,15 +55,28 @@ class ChartTooltip extends React.PureComponent {
   }
 
   get xOffset() {
-    const { x } = this.props
+    const { cardArea, x } = this.props
+    // Right now data cards can only be 2x2 or 1x1
+    const cardWidth = cardArea === 4 ? 2 : 1
+    // The point when the tooltip should be moved over from the left side
+    // of the chart. Value is set by what visually works
+    const lowerThreshold = 25
+    //  A general average of the radius of the tooltip that works across
+    //  all the charts
+    const avgTooltipRadius = 10
     // Ratio is the general amount between x's to move them toward center
-    const ratio = 6
-    if (x < 52) {
-      return 10 - x / ratio
+    // The smaller charts need to be pushed over more, hence the smaller ratio
+    const ratio = cardArea === 1 ? 0.1 : 6
+    if (x < lowerThreshold) {
+      return avgTooltipRadius - x + 1 / ratio
     }
-    if (x > 398) {
-      const diff = 450 - x
-      return -(10 - diff / ratio)
+    // The point when the tooltip should be moved over from the right side
+    // of the chart. Value is set by what visually works
+    const upperThreshold = 100
+    const pxWidth = 175 * cardWidth
+    if (x >= pxWidth + upperThreshold) {
+      const relativeRadius = avgTooltipRadius / (cardWidth / 2)
+      return -relativeRadius
     }
     return 0
   }
