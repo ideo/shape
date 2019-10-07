@@ -245,7 +245,6 @@ class TextItemCover extends React.Component {
       >
         <QuillStyleWrapper
           notEditing={!isEditing}
-          hasTitleText={hasTitleText}
           smallGrid={uiStore.isSmallGrid}
         >
           {this.state.loading && <InlineLoader />}
