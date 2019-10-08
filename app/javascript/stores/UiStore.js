@@ -907,15 +907,19 @@ export default class UiStore {
     const { selectedTextRangeForCard, currentQuillEditor } = this
     const { range } = selectedTextRangeForCard
     if (currentQuillEditor && range && range.length) {
-      // NOTE: This sort of works... however it also needs to save the text item
-      // otherwise the removal of the highlight won't persist
-      currentQuillEditor.formatText(
+      const delta = currentQuillEditor.formatText(
         range.index,
         range.length,
         'commentHighlight',
         false,
         'user'
       )
+      // for some reason currentQuillEditor.editor's get methods are still the old version
+      // doing so below to force the record's data_content to reflect the updates that we want
+      this.commentingOnRecord.data_content.ops = delta.ops
+      this.commentingOnRecord.data_content.version =
+        this.commentingOnRecord.data_content.version + 1
+      this.commentingOnRecord.save()
     }
     this.selectedTextRangeForCard = { ...this.defaultSelectedTextRange }
   }
