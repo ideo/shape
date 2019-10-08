@@ -59,9 +59,9 @@ class PageFooter extends React.PureComponent {
 
               <InvertMarketingLinkMail
                 fontSize={18}
-                href="mailto:support@shape.space"
+                href="mailto:help@shape.space"
               >
-                support@shape.space
+                help@shape.space
               </InvertMarketingLinkMail>
             </Box>
 
