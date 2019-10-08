@@ -355,18 +355,6 @@ class Comment extends React.Component {
     )
   }
 
-  renderIndicator() {
-    const { comment } = this.props
-    return (
-      <div>
-        <div>X</div>
-        <div>X</div>
-        <div>{comment.status}</div>
-        <button onClick={this.toggleResolve}>r</button>
-      </div>
-    )
-  }
-
   renderHeaderAndButtons() {
     const { comment, apiStore, isReply } = this.props
     const { author, persisted, created_at } = comment
@@ -467,7 +455,6 @@ class Comment extends React.Component {
           isReply={isReply}
           onClick={this.handleClick}
         >
-          {!isReply && this.renderIndicator()}
           {this.renderHeaderAndButtons()}
           {this.renderMessage()}
         </StyledComment>
