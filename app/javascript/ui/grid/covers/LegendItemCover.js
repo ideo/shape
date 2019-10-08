@@ -124,6 +124,12 @@ class LegendItemCover extends React.Component {
     return entity.test_collection_id && !hasGroupings
   }
 
+  rendersAsLine(selectedDataset, isPrimary) {
+    if (selectedDataset.chart_type === 'line') return true
+    if (selectedDataset.chart_type === 'area' && !isPrimary) return true
+    return false
+  }
+
   /*
    * Unique dataset and whether selected or not
    */
@@ -316,10 +322,10 @@ class LegendItemCover extends React.Component {
 
   renderSelectedDataset = ({ dataset, order }) => {
     if (!dataset) return ''
-    const { identifier, name, style, chart_type } = dataset
+    const { identifier, name, style } = dataset
     const primary = order === 0
     let icon
-    if (chart_type === 'line') {
+    if (this.rendersAsLine(dataset, primary)) {
       icon = (
         <LineChartIcon
           color={(style && style.fill) || '#000000'}
