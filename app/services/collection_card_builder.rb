@@ -32,9 +32,8 @@ class CollectionCardBuilder
   private
 
   def next_card_order
-    return 0 if @parent_collection.cached_last_card_order.blank?
-
-    @parent_collection.cached_last_card_order + 1
+    last_card_order = cached_last_card_order || collection_cards.maximum(:order)
+    last_card_order + 1
   end
 
   def hide_helper_for_user
