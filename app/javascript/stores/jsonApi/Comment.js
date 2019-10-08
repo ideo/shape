@@ -11,7 +11,7 @@ class Comment extends BaseRecord {
   static type = 'comments'
   static endpoint = apiUrl('comments')
 
-  attributesForAPI = ['message', 'parent_id', 'draftjs_data']
+  attributesForAPI = ['message', 'parent_id', 'draftjs_data', 'status']
 
   @observable
   replies = []

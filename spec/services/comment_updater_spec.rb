@@ -76,6 +76,7 @@ RSpec.describe CommentUpdater, type: :service do
     CommentUpdater.new(
       comment: comment,
       message: message,
+      status: :open,
       draftjs_data: {
         'blocks' => [{
           'key' => 'a0te4',

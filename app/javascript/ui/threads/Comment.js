@@ -209,6 +209,21 @@ class Comment extends React.Component {
     }
   }
 
+  toggleResolve = async () => {
+    const { comment } = this.props
+    const { status } = comment
+    let newStatus = status
+    if (status === 'open') {
+      newStatus = 'closed'
+    } else if (status === 'closed') {
+      newStatus = 'reopened'
+    } else if (status === 'reopened') {
+      newStatus = 'closed'
+    }
+    comment.status = newStatus
+    await comment.save()
+  }
+
   handleEditClick = () => {
     const { isReply } = this.props
     this.setState({ editing: true })
@@ -340,6 +355,18 @@ class Comment extends React.Component {
     )
   }
 
+  renderIndicator() {
+    const { comment } = this.props
+    return (
+      <div>
+        <div>X</div>
+        <div>X</div>
+        <div>{comment.status}</div>
+        <button onClick={this.toggleResolve}>r</button>
+      </div>
+    )
+  }
+
   renderHeaderAndButtons() {
     const { comment, apiStore, isReply } = this.props
     const { author, persisted, created_at } = comment
@@ -440,6 +467,7 @@ class Comment extends React.Component {
           isReply={isReply}
           onClick={this.handleClick}
         >
+          {!isReply && this.renderIndicator()}
           {this.renderHeaderAndButtons()}
           {this.renderMessage()}
         </StyledComment>
