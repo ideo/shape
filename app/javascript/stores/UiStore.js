@@ -36,8 +36,13 @@ export default class UiStore {
   blankContentToolState = { ...this.defaultBCTState }
   @observable
   cardMenuOpen = { ...this.defaultCardMenuState }
+  defaultSelectedTextRange = {
+    range: null,
+    textContent: null,
+    cardId: null,
+  }
   @observable
-  selectedTextRangeForCard = {}
+  selectedTextRangeForCard = { ...this.defaultSelectedTextRange }
   @computed
   get cardMenuOpenAndPositioned() {
     const { cardMenuOpen } = this
@@ -217,11 +222,6 @@ export default class UiStore {
   }
 
   @action
-  setReplyingToComment(replyingToCommentId) {
-    this.replyingToCommentId = replyingToCommentId
-  }
-
-  @action
   startDragging(cardId) {
     this.dragging = true
     if (
@@ -352,14 +352,6 @@ export default class UiStore {
     this.dialogConfig.open = null
   }
 
-  cardHasSelectedTextRange(cardId) {
-    return (
-      this.selectedTextRangeForCard.id === cardId &&
-      this.selectedTextRangeForCard.range &&
-      this.selectedTextRangeForCard.range.length > 0
-    )
-  }
-
   @action
   openContextMenu = (
     ev,
@@ -369,7 +361,6 @@ export default class UiStore {
     let numberOfMenuItems = menuItemCount
 
     const targetingTextEditor = ev.target.closest('.ql-editor')
-
     if (targetingTextEditor && this.cardHasSelectedTextRange(card.id)) {
       eventType = EVENT_SOURCE_TYPES.TEXT_EDITOR
       numberOfMenuItems = 1 // or however many we end up with in TextActionMenu
@@ -383,25 +374,25 @@ export default class UiStore {
     )
     const { offsetX, offsetY } = positionOffset
 
-    if (this.cardMenuOpen.id && !this.textMenuOpenForCard(card.id)) {
-      this.closeCardMenu()
-    } else {
-      this.update('cardMenuOpen', {
-        id: card.id,
-        x,
-        y,
-        offsetX,
-        offsetY,
-        menuType: eventType,
-      })
+    // if (this.cardMenuOpen.id && !this.textMenuOpenForCard(card.id)) {
+    //   this.closeCardMenu()
+    // } else {
+    // }
+    this.update('cardMenuOpen', {
+      id: card.id,
+      x,
+      y,
+      offsetX,
+      offsetY,
+      menuType: eventType,
+    })
 
-      if (
-        this.selectedCardIds.length &&
-        this.selectedCardIds.indexOf(card.id) < 0
-      ) {
-        // deselect all cards when card menu is opened on a non-selected card
-        this.selectedCardIds.replace([])
-      }
+    if (
+      this.selectedCardIds.length &&
+      this.selectedCardIds.indexOf(card.id) < 0
+    ) {
+      // deselect all cards when card menu is opened on a non-selected card
+      this.selectedCardIds.replace([])
     }
   }
 
@@ -421,22 +412,6 @@ export default class UiStore {
       this.cardMenuOpen.id === id &&
       this.cardMenuOpen.menuType === EVENT_SOURCE_TYPES.TEXT_EDITOR
     )
-  }
-
-  @action
-  selectTextRangeForCard({ range, editor, cardId }) {
-    if (!cardId) return
-    if (!range || !range.length) return
-
-    const { index, length } = range
-    // Only open text action menu if you have text selected
-    if (range && range.length > 0) {
-      this.cardMenuOpen.menuType = EVENT_SOURCE_TYPES.TEXT_EDITOR
-    }
-
-    const textContent = editor.getText(index, length)
-
-    this.selectedTextRangeForCard = { cardId, range, textContent }
   }
 
   // TODO: rename this function to be clear it is show or reroute??
@@ -675,7 +650,7 @@ export default class UiStore {
   openBlankContentTool(options = {}) {
     const { viewingCollection } = this
     this.deselectCards()
-    this.closeCardMenu(false)
+    this.closeCardMenu()
     this.blankContentToolState = {
       ...this.defaultBCTState,
       order: 0,
@@ -884,6 +859,45 @@ export default class UiStore {
   @action
   setCommentThreadBottomVisible(isVisible) {
     this.commentThreadBottomVisible = isVisible
+  }
+
+  @action
+  setReplyingToComment(replyingToCommentId) {
+    this.replyingToCommentId = replyingToCommentId
+  }
+
+  @action
+  setCommentingOnRecord(record) {
+    if (!record) {
+      this.resetSelectedTextRange()
+    }
+    this.commentingOnRecord = record
+  }
+
+  cardHasSelectedTextRange(comparingCardId) {
+    const { cardId, range } = this.selectedTextRangeForCard
+    return cardId === comparingCardId && range && range.length > 0
+  }
+
+  @action
+  selectTextRangeForCard({ range, editor, cardId }) {
+    if (!cardId || !range || !range.length) {
+      return
+    }
+
+    const { index, length } = range
+    // Only open text action menu if you have text selected
+    if (range && range.length > 0) {
+      this.cardMenuOpen.menuType = EVENT_SOURCE_TYPES.TEXT_EDITOR
+    }
+
+    const textContent = editor.getText(index, length)
+    this.selectedTextRangeForCard = { range, textContent, cardId }
+  }
+
+  @action
+  resetSelectedTextRange() {
+    this.selectedTextRangeForCard = { ...this.defaultSelectedTextRange }
   }
 
   // after performing an action (event), track following the record for notifications

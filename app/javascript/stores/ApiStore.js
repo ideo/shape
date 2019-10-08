@@ -407,15 +407,14 @@ class ApiStore extends jsonapi(datxCollection) {
     const thread = this.findThreadForRecord(viewingRecord)
     uiStore.update('activityLogOpen', true)
     uiStore.expandThread(thread.key)
-
-    uiStore.update('commentingOnRecord', record)
+    uiStore.setCommentingOnRecord(record)
 
     return thread
   }
 
   async findOrBuildCommentThread(record) {
-    let thread = this.findThreadForRecord(record)
     this.clearUnpersistedThreads()
+    let thread = this.findThreadForRecord(record)
     // first search for it via API
     try {
       if (!thread) {

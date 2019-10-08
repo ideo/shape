@@ -79,13 +79,14 @@ class CommentThread extends React.Component {
   }
 
   renderCommentEntryForm = () => {
-    const { thread } = this.props
+    const { thread, uiStore } = this.props
     return (
       <CommentEntryForm
         key={'comment-entry-form'}
         thread={thread}
         afterSubmit={this.props.afterSubmit}
         onHeightChange={this.props.onEditorHeightChange}
+        commentingOnRecord={uiStore.commentingOnRecord}
       />
     )
   }

@@ -299,7 +299,15 @@ class GridCard extends React.Component {
     const x = ev.clientX - rect.left - rect.width * 0.95
     const y = ev.clientY - rect.top - 15
 
-    uiStore.openContextMenu(ev, { x, y, card, menuItemCount })
+    ev.persist()
+    let delay = 0
+    if (card.record.isText) {
+      // delay so that contextMenu can determine whether you right-clicked and selected text
+      delay = 200
+    }
+    setTimeout(() => {
+      uiStore.openContextMenu(ev, { x, y, card, menuItemCount })
+    }, delay)
     return false
   }
 

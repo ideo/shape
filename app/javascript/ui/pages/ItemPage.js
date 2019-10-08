@@ -89,8 +89,6 @@ class ItemPage extends React.Component {
     const x = ev.clientX - rect.left
     const y = ev.clientY - rect.top
 
-    console.log(rect)
-
     uiStore.openContextMenu(ev, {
       x,
       y,

@@ -27,6 +27,7 @@ export const handleMouseDownSelection = e => {
     uiStore.deselectCards()
     uiStore.onEmptySpaceClick(e)
     uiStore.closeBlankContentTool()
+    uiStore.closeCardMenu()
     uiStore.update('editingCardCover', null)
     return 'emptySpace'
   }

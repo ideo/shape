@@ -36,6 +36,13 @@ class CommentEntryForm extends React.Component {
     this.focusTextArea()
   }
 
+  componentDidUpdate(prevProps) {
+    if (!prevProps.commentingOnRecord && this.props.commentingOnRecord) {
+      // if a new commentingOnRecord was just set
+      this.focusTextArea()
+    }
+  }
+
   componentWillUnmount() {
     this.editor = null
   }
@@ -129,7 +136,6 @@ class CommentEntryForm extends React.Component {
   }
 
   handleBlur = e => {
-    console.log(e.relatedTarget)
     const { relatedTarget } = e
     if (
       relatedTarget &&
@@ -139,7 +145,7 @@ class CommentEntryForm extends React.Component {
     }
 
     const { uiStore } = this.props
-    uiStore.update('commentingOnRecord', null)
+    uiStore.setCommentingOnRecord(null)
   }
 
   get renderSubjectOfComment() {
@@ -147,7 +153,6 @@ class CommentEntryForm extends React.Component {
     const { textContent } = uiStore.selectedTextRangeForCard
     if (!uiStore.commentingOnRecord) return
 
-    console.log('preview: ', textContent)
     if (textContent) {
       return <div>{textContent}</div>
     } else {
@@ -191,11 +196,16 @@ CommentEntryForm.propTypes = {
   afterSubmit: PropTypes.func.isRequired,
   onHeightChange: PropTypes.func.isRequired,
   thread: MobxPropTypes.objectOrObservableObject.isRequired,
+  commentingOnRecord: MobxPropTypes.objectOrObservableObject,
   replying: PropTypes.bool,
 }
 
 CommentEntryForm.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+
+CommentEntryForm.defaultProps = {
+  commentingOnRecord: null,
 }
 
 CommentEntryForm.displayName = 'CommentEntryForm'
