@@ -55,10 +55,6 @@ const TextItemToolbar = props => (
         <LinkIcon />
       </StyledButton>
 
-      {/* FOR TESTING ONLY */}
-      <StyledButton onClick={props.highlightText}>SUB</StyledButton>
-      <StyledButton onClick={props.unhighlightText}>deSUB</StyledButton>
-
       <StyledButton onClick={props.onComment}>
         <CommentIcon />
       </StyledButton>
@@ -72,8 +68,6 @@ const TextItemToolbar = props => (
 )
 TextItemToolbar.propTypes = {
   onExpand: PropTypes.func,
-  highlightText: PropTypes.func.isRequired,
-  unhighlightText: PropTypes.func.isRequired,
   onComment: PropTypes.func,
 }
 TextItemToolbar.defaultProps = {

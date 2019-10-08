@@ -40,6 +40,7 @@ export default class UiStore {
     range: null,
     textContent: null,
     cardId: null,
+    quillEditor: null,
   }
   @observable
   selectedTextRangeForCard = { ...this.defaultSelectedTextRange }
@@ -869,6 +870,8 @@ export default class UiStore {
   @action
   setCommentingOnRecord(record) {
     if (!record) {
+      // TODO: have some reference to the quillEditor in question...
+      // and also take the current quillEditor and unhighlightText...
       this.resetSelectedTextRange()
     }
     this.commentingOnRecord = record
@@ -880,7 +883,7 @@ export default class UiStore {
   }
 
   @action
-  selectTextRangeForCard({ range, editor, cardId }) {
+  selectTextRangeForCard({ range, quillEditor, cardId }) {
     if (!cardId || !range || !range.length) {
       return
     }
@@ -891,12 +894,29 @@ export default class UiStore {
       this.cardMenuOpen.menuType = EVENT_SOURCE_TYPES.TEXT_EDITOR
     }
 
-    const textContent = editor.getText(index, length)
-    this.selectedTextRangeForCard = { range, textContent, cardId }
+    const textContent = quillEditor.getText(index, length)
+    this.selectedTextRangeForCard = { range, quillEditor, textContent, cardId }
+  }
+
+  get currentQuillEditor() {
+    return this.selectedTextRangeForCard.quillEditor
   }
 
   @action
   resetSelectedTextRange() {
+    const { selectedTextRangeForCard, currentQuillEditor } = this
+    const { range } = selectedTextRangeForCard
+    if (currentQuillEditor && range && range.length) {
+      // NOTE: This sort of works... however it also needs to save the text item
+      // otherwise the removal of the highlight won't persist
+      currentQuillEditor.formatText(
+        range.index,
+        range.length,
+        'commentHighlight',
+        false,
+        'user'
+      )
+    }
     this.selectedTextRangeForCard = { ...this.defaultSelectedTextRange }
   }
 

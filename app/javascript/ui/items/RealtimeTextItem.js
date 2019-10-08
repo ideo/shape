@@ -402,14 +402,14 @@ class RealtimeTextItem extends React.Component {
   }
 
   handleSelectionChange = (range, source, editor) => {
-    const { cardId } = this
+    const { cardId, quillEditor } = this
     const { uiStore } = this.props
 
     if (!cardId) return
 
     uiStore.selectTextRangeForCard({
       range,
-      editor,
+      quillEditor,
       cardId,
     })
     // also store editor.getContents(range) for later reference
@@ -495,25 +495,11 @@ class RealtimeTextItem extends React.Component {
     }
   }
 
-  highlightText = e => {
-    const { quillEditor } = this
-    quillEditor.format('commentHighlight', 'new', 'user')
-    quillEditor.format('highlightClass', true, 'user')
-  }
-
-  unhighlightText = e => {
-    const { quillEditor } = this
-    quillEditor.format('commentHighlight', false, 'user')
-    quillEditor.format('highlightClass', false, 'user')
-  }
-
   onComment = async e => {
     const { apiStore, item } = this.props
     e.preventDefault()
 
     apiStore.openCurrentThreadToCommentOn(item)
-    // find text selection
-    // prepopulate comment entry form with text
   }
 
   render() {

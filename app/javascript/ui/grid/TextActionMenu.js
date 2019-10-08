@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
-import CommentIcon from '../icons/CommentIcon'
+import CommentIcon from '~/ui/icons/CommentIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 
 @inject('uiStore', 'apiStore')

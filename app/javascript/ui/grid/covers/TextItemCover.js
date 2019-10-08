@@ -163,11 +163,11 @@ class TextItemCover extends React.Component {
   }
 
   checkTextAreaHeight = height => {
-    if (!this.quillEditor) return
+    if (!this.reactQuillRef) return
     if (this.props.hideReadMore) return
     // The height of the editor is constrained to the container,
     // we must get the .ql-editor div to calculate text height
-    const qlEditor = this.quillEditor.editingArea.getElementsByClassName(
+    const qlEditor = this.reactQuillRef.editingArea.getElementsByClassName(
       'ql-editor'
     )[0]
     const textAreaHeight = qlEditor ? qlEditor.scrollHeight : 0
@@ -177,6 +177,13 @@ class TextItemCover extends React.Component {
     } else {
       this.setState({ readMore: false })
     }
+  }
+
+  get quillEditor() {
+    const { reactQuillRef } = this
+    if (!reactQuillRef) return
+
+    return reactQuillRef.getEditor()
   }
 
   renderEditing() {
@@ -204,13 +211,14 @@ class TextItemCover extends React.Component {
     const quillProps = {
       // ref is used to get the height of the div in checkTextAreaHeight
       ref: c => {
-        this.quillEditor = c
+        this.reactQuillRef = c
       },
       readOnly: true,
       onChangeSelection: (range, source, editor) => {
+        const { quillEditor } = this
         uiStore.selectTextRangeForCard({
           range,
-          editor,
+          quillEditor,
           cardId,
         })
       },
