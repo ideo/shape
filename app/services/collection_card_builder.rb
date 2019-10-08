@@ -32,7 +32,7 @@ class CollectionCardBuilder
   private
 
   def next_card_order
-    last_card_order = cached_last_card_order || collection_cards.maximum(:order)
+    last_card_order = @parent_collection.cached_last_card_order || @parent_collection.collection_cards.maximum(:order)
     last_card_order + 1
   end
 
