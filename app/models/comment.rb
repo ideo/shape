@@ -6,6 +6,7 @@
 #  draftjs_data      :jsonb
 #  message           :text
 #  replies_count     :integer          default(0)
+#  status            :integer          default("open")
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  author_id         :integer
@@ -37,6 +38,12 @@ class Comment < ApplicationRecord
   belongs_to :parent, class_name: 'Comment', optional: true, counter_cache: :replies_count
 
   validates :message, presence: true
+
+  enum status: {
+    open: 0,
+    closed: 1,
+    reopened: 2,
+  }
 
   def mentions
     mentions = {

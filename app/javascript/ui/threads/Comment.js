@@ -209,6 +209,21 @@ class Comment extends React.Component {
     }
   }
 
+  toggleResolve = async () => {
+    const { comment } = this.props
+    const { status } = comment
+    let newStatus = status
+    if (status === 'open') {
+      newStatus = 'closed'
+    } else if (status === 'closed') {
+      newStatus = 'reopened'
+    } else if (status === 'reopened') {
+      newStatus = 'closed'
+    }
+    comment.status = newStatus
+    await comment.save()
+  }
+
   handleEditClick = () => {
     const { isReply } = this.props
     this.setState({ editing: true })

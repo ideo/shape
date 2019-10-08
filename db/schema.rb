@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_25_184346) do
+ActiveRecord::Schema.define(version: 2019_10_07_233341) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -208,6 +208,7 @@ ActiveRecord::Schema.define(version: 2019_09_25_184346) do
     t.jsonb "draftjs_data"
     t.bigint "parent_id"
     t.integer "replies_count", default: 0
+    t.integer "status", default: 0
     t.index ["comment_thread_id"], name: "index_comments_on_comment_thread_id"
     t.index ["parent_id"], name: "index_comments_on_parent_id"
   end

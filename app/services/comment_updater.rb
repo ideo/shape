@@ -1,7 +1,8 @@
 class CommentUpdater < SimpleService
-  def initialize(comment:, message:, draftjs_data:)
+  def initialize(comment:, message:, status:, draftjs_data:)
     @comment = comment
     @message = message
+    @status = status
     @draftjs_data = draftjs_data
     @previous_mentions = comment.mentions
   end
@@ -23,6 +24,7 @@ class CommentUpdater < SimpleService
 
   def update_comment
     @comment.message = @message
+    @comment.status = @status
     @comment.draftjs_data = @draftjs_data
   end
 

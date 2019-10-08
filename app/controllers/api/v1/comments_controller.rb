@@ -52,6 +52,7 @@ class Api::V1::CommentsController < Api::V1::BaseController
     success = CommentUpdater.call(
       comment: @comment,
       message: comment_params[:message],
+      status: comment_params[:status],
       draftjs_data: comment_params[:draftjs_data],
     )
 
@@ -78,6 +79,7 @@ class Api::V1::CommentsController < Api::V1::BaseController
     %i[
       message
       parent_id
+      status
     ].concat([draftjs_data: {}])
   end
 
