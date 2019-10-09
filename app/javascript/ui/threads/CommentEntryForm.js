@@ -8,6 +8,7 @@ import { CommentForm, CommentEnterButton } from '~/ui/global/styled/forms'
 import CommentInput from '~/ui/threads/CommentInput'
 import styled from 'styled-components'
 import v from '~/utils/variables.js'
+import Thumbnail from '~/ui/threads/Thumbnail'
 
 const StyledCommentInputWrapper = styled.div`
   background: ${v.colors.secondaryMedium};
@@ -154,7 +155,13 @@ class CommentEntryForm extends React.Component {
     if (!uiStore.commentingOnRecord) return
 
     if (textContent) {
-      return <div>{textContent}</div>
+      return (
+        <div>
+          {/* how to get titlelines/ CommentThreadHeader#countLines from here? */}
+          <Thumbnail record={uiStore.commentingOnRecord} iconTop={1} />
+          {textContent}
+        </div>
+      )
     } else {
       // information about the item/collection
     }
