@@ -6,16 +6,14 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled, { css } from 'styled-components'
 
 import { apiStore, routingStore, uiStore } from '~/stores'
-import CollectionIcon from '~/ui/icons/CollectionIcon'
 import CommentIconFilled from '~/ui/icons/CommentIconFilled'
-import Link from '~/ui/global/Link'
 import Moment from '~/ui/global/Moment'
 import Tooltip from '~/ui/global/Tooltip'
 import { SubduedTitle } from '~/ui/global/styled/typography'
 import FollowIcon from '~/ui/icons/FollowIcon'
-import TextIcon from '~/ui/icons/TextIcon'
-import v, { ITEM_TYPES } from '~/utils/variables'
+import v from '~/utils/variables'
 import hexToRgba from '~/utils/hexToRgba'
+import Thumbnail from '~/ui/threads/Thumbnail'
 
 export const threadTitleCss = css`
   position: ${props => (props.sticky ? 'sticky' : 'relative')};
@@ -45,10 +43,6 @@ const StyledHeaderButton = styled.button`
   &:hover {
     background: ${v.colors.secondaryMedium};
   }
-`
-
-const StyledLink = styled(Link)`
-  margin-right: 8px;
 `
 
 const StyledHeader = styled.div`
@@ -192,42 +186,6 @@ class CommentThreadHeader extends React.Component {
     }
   }
 
-  renderThumbnail() {
-    const { record } = this
-    let content
-    const iconTop = this.titleLines === 1 ? 18 : 9
-    const thumbnailStyle = {
-      position: 'relative',
-      top: `${iconTop}px`,
-      left: '5px',
-    }
-    if (record.internalType === 'items') {
-      if (record.type === ITEM_TYPES.TEXT) {
-        content = (
-          <div style={thumbnailStyle}>
-            <TextIcon viewBox="-10 0 70 70" />
-          </div>
-        )
-      } else {
-        content = <img src={record.filestack_file_url} alt="Text" />
-      }
-    } else {
-      content = (
-        <div style={thumbnailStyle}>
-          <CollectionIcon viewBox="50 50 170 170" />
-        </div>
-      )
-      if (record.cover.image_url) {
-        content = <img src={record.cover.image_url} alt={record.name} />
-      }
-    }
-    return (
-      <StyledLink to={this.objectLink()}>
-        <ThumbnailHolder>{content}</ThumbnailHolder>
-      </StyledLink>
-    )
-  }
-
   renderUnreadCount = () => {
     const { thread } = this.props
     if (!thread.unreadCount) return null
@@ -279,7 +237,10 @@ class CommentThreadHeader extends React.Component {
         <StyledHeader lines={this.titleLines}>
           {/* left side */}
           <Flex style={{ height: '50px', overflow: 'hidden' }}>
-            {this.renderThumbnail()}
+            <Thumbnail
+              record={this.record}
+              iconTop={this.titleLines === 1 ? 18 : 9}
+            />
             <span
               className="name"
               ref={r => {
