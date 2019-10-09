@@ -3,6 +3,7 @@
 exports[`LegendItemCover renders snapshot 1`] = `
 <styled.div
   data-cy="LegendItemCover"
+  hasSearchInterface={true}
 >
   <Styled(StyledHeading3)>
     My Cool Item
