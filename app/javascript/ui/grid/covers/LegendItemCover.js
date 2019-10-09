@@ -37,7 +37,7 @@ const StyledLegendItem = styled.div`
   ${props =>
     props.hasSearchInterface
       ? `
-    overflow: hidden;
+    overflow: visible;
   `
       : `
     overflow-y: scroll;
