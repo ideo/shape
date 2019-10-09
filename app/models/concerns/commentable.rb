@@ -15,6 +15,10 @@ module Commentable
     comment_threads.where(organization_id: organization_id).first
   end
 
+  def resolved_count
+    comment_thread&.comments&.select{|c| c.closed?}&.count
+  end
+
   def remove_comment_followers!
     return unless comment_threads.any?
 

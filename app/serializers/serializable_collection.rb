@@ -18,6 +18,7 @@ class SerializableCollection < BaseJsonSerializer
     :anyone_can_join,
     :cover_type,
     :archived,
+    :resolved_count,
   )
 
   has_many :roles do
