@@ -109,7 +109,6 @@ class ItemPage extends React.Component {
           <RealtimeTextItem
             containerRef={c => (this.containerRef = c)}
             onCancel={this.cancel}
-            cardId={item.parent_collection_card.id}
             item={item}
             currentUserId={apiStore.currentUserId}
             fullPageView
@@ -185,7 +184,10 @@ class ItemPage extends React.Component {
         <ArchivedBanner />
         <ItemPageContainer onContextMenu={this.openContextMenu}>
           <PageContainer {...containerProps}>
-            <TextActionMenu card={item.parent_collection_card} />
+            {item.parent_collection_card && (
+              <TextActionMenu card={item.parent_collection_card} />
+            )}
+
             {item.parent_collection_card &&
             replacingId === item.parent_collection_card.id ? (
               <GridCardBlank parent={item.parent} afterCreate={this.reroute} />

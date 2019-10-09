@@ -853,6 +853,8 @@ export default class UiStore {
       this.update('activityLogPage', 'comments')
       // reset it first, that way if it's expanded offscreen, it will get re-opened/scrolled to
       if (reset) this.expandedThreadKey = null
+    } else {
+      this.setCommentingOnRecord(null)
     }
     this.expandedThreadKey = key
   }
@@ -865,6 +867,7 @@ export default class UiStore {
   @action
   setReplyingToComment(replyingToCommentId) {
     this.replyingToCommentId = replyingToCommentId
+    this.setCommentingOnRecord(null)
   }
 
   @action
@@ -875,6 +878,14 @@ export default class UiStore {
     }
     // NOTE: this must be evaluated last since selectedTextRangeForCard is based on it?
     this.commentingOnRecord = record
+  }
+
+  isCommentingOnTextRange() {
+    const { commentingOnRecord } = this
+    const card = commentingOnRecord.parent_collection_card
+    if (!commentingOnRecord || !card) return false
+
+    return this.cardHasSelectedTextRange(card.id)
   }
 
   cardHasSelectedTextRange(comparingCardId) {

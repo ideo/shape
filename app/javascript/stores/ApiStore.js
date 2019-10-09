@@ -423,7 +423,9 @@ class ApiStore extends jsonapi(datxCollection) {
           `comment_threads/find_by_record/${identifier}`,
           'GET'
         )
-        if (res.data && res.data.id) thread = res.data
+        if (res.data && res.data.id) {
+          thread = res.data
+        }
       }
       if (thread) {
         // make sure to fetch the first page of comments

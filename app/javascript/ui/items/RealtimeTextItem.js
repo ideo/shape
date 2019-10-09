@@ -380,10 +380,8 @@ class RealtimeTextItem extends React.Component {
   }
 
   get cardId() {
-    const { item, cardId } = this.props
-    if (cardId) {
-      return cardId
-    } else if (item.parent_collection_card) {
+    const { item } = this.props
+    if (item.parent_collection_card) {
       return item.parent_collection_card.id
     } else {
       return null
@@ -587,7 +585,6 @@ RealtimeTextItem.displayName = 'RealtimeTextItem'
 RealtimeTextItem.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   currentUserId: PropTypes.string.isRequired,
-  cardId: PropTypes.string,
   onCancel: PropTypes.func.isRequired,
   fullyLoaded: PropTypes.bool.isRequired,
   onExpand: PropTypes.func,
@@ -599,7 +596,6 @@ RealtimeTextItem.defaultProps = {
   onExpand: null,
   fullPageView: false,
   initialFontTag: 'P',
-  cardId: null,
   containerRef: null,
 }
 

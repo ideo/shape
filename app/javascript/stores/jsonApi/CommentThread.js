@@ -5,6 +5,8 @@ import { ReferenceType } from 'datx'
 import { apiUrl } from '~/utils/url'
 import BaseRecord from './BaseRecord'
 import Comment from './Comment'
+import Item from './Item'
+import Collection from './Collection'
 import UsersThread from './UsersThread'
 import User from './User'
 
@@ -89,6 +91,7 @@ class CommentThread extends BaseRecord {
   }
 
   async API_saveComment(commentData) {
+    const { apiStore, uiStore } = this
     if (!this.persisted) {
       // if there's no id, then first we have to create the comment_thread
       await this.API_create()
@@ -103,29 +106,57 @@ class CommentThread extends BaseRecord {
     // can just call this without awaiting the result
     this.API_markViewed()
     // make sure we're following this thread in our activity log
-    this.apiStore.addCurrentCommentThread(this.id)
+    apiStore.addCurrentCommentThread(this.id)
     // simulate the updated_at update so that the thread will move to most recent
     this.updated_at = new Date()
+
+    const { commentingOnRecord } = uiStore
+    if (commentingOnRecord) {
+      commentData.subject_id = commentingOnRecord.id
+      commentData.subject_type = commentingOnRecord.type
+    }
+
     // dynamically set the endpoint to belong to this thread
     Comment.endpoint = apiUrl(`comment_threads/${this.id}/comments`)
     // create an unsaved comment so that we can see it immediately
-    const comment = new Comment(commentData, this.apiStore)
-    comment.addReference('author', this.apiStore.currentUser, {
+    const comment = new Comment(commentData, apiStore)
+    comment.addReference('author', apiStore.currentUser, {
       model: User,
       type: ReferenceType.TO_ONE,
     })
+    if (commentingOnRecord) {
+      comment.addReference('subject', commentingOnRecord, {
+        model: commentingOnRecord.isCollection ? Collection : Item,
+        type: ReferenceType.TO_ONE,
+      })
+    }
+
     // also store the author_id to simulate the serializer
-    comment.author_id = this.apiStore.currentUserId
+    comment.author_id = apiStore.currentUserId
     if (commentData.parent_id) {
-      const parent = this.apiStore.find('comments', commentData.parent_id)
+      const parent = apiStore.find('comments', commentData.parent_id)
       if (parent) {
         parent.replies_count += 1
       }
     }
+
     this.importComments([comment], { created: true })
+    uiStore.trackEvent('create', this.record)
     // this will create the comment in the API
-    this.uiStore.trackEvent('create', this.record)
-    return comment.save()
+    await comment.save()
+
+    console.log(
+      comment.persisted,
+      comment.id,
+      uiStore.isCommentingOnTextRange()
+    )
+    if (comment.persisted && uiStore.isCommentingOnTextRange()) {
+      console.log('comment persisted', comment.id)
+      commentingOnRecord.API_persistHighlight(comment.id)
+    }
+    uiStore.setCommentingOnRecord(null)
+
+    return comment
   }
 
   API_markViewed() {

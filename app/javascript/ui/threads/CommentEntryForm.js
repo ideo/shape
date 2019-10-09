@@ -8,7 +8,7 @@ import { CommentForm, CommentEnterButton } from '~/ui/global/styled/forms'
 import CommentInput from '~/ui/threads/CommentInput'
 import styled from 'styled-components'
 import v from '~/utils/variables.js'
-import Thumbnail from '~/ui/threads/Thumbnail'
+import CommentSubject from '~/ui/threads/CommentSubject'
 
 const StyledCommentInputWrapper = styled.div`
   background: ${v.colors.secondaryMedium};
@@ -137,6 +137,9 @@ class CommentEntryForm extends React.Component {
   }
 
   handleBlur = e => {
+    // maybe not the right place to do this...
+    return
+
     const { relatedTarget } = e
     if (
       relatedTarget &&
@@ -156,11 +159,10 @@ class CommentEntryForm extends React.Component {
 
     if (textContent) {
       return (
-        <div>
-          {/* how to get titlelines/ CommentThreadHeader#countLines from here? */}
-          <Thumbnail record={uiStore.commentingOnRecord} iconTop={1} />
-          {textContent}
-        </div>
+        <CommentSubject
+          record={uiStore.commentingOnRecord}
+          textContent={textContent}
+        />
       )
     } else {
       // information about the item/collection

@@ -25,7 +25,7 @@ export const ThumbnailHolder = styled.span`
 `
 ThumbnailHolder.displayName = 'ThumbnailHolder'
 
-class Thumbnail extends React.Component {
+class CommentThumbnail extends React.Component {
   objectLink() {
     const { record } = this.props
 
@@ -73,14 +73,14 @@ class Thumbnail extends React.Component {
   }
 }
 
-Thumbnail.propTypes = {
+CommentThumbnail.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   iconTop: PropTypes.number,
 }
 
-Thumbnail.defaultProps = {
+CommentThumbnail.defaultProps = {
   record: null,
   iconTop: 1,
 }
 
-export default Thumbnail
+export default CommentThumbnail

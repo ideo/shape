@@ -10,6 +10,7 @@ class Api::V1::CommentsController < Api::V1::BaseController
                          .per(per_page)
     render jsonapi: paginated_comments, include: [
       :author,
+      :subject,
       latest_replies: :author,
     ]
   end
@@ -30,6 +31,8 @@ class Api::V1::CommentsController < Api::V1::BaseController
       comment_thread: @comment_thread,
       message: comment_params[:message],
       draftjs_data: comment_params[:draftjs_data],
+      subject_id: comment_params[:subject_id],
+      subject_type: comment_params[:subject_type],
       author: current_user,
       parent: parent,
     )
@@ -80,6 +83,8 @@ class Api::V1::CommentsController < Api::V1::BaseController
       message
       parent_id
       status
+      subject_id
+      subject_type
     ].concat([draftjs_data: {}])
   end
 
