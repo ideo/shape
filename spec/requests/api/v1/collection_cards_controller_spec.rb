@@ -905,6 +905,21 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         )
         post(path, params: params)
       end
+
+      context 'even if from_id param is absent' do
+        let(:raw_params) do
+          {
+            to_id: to_collection.id,
+            collection_card_ids: moving_cards.map(&:id),
+            placement: 'beginning',
+          }
+        end
+
+        it 'returns a 204' do
+          post(path, params: params)
+          expect(response.status).to eq(204)
+        end
+      end
     end
   end
 

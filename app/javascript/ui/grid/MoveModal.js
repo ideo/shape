@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -74,11 +73,6 @@ class MoveModal extends React.Component {
 
   handleMoveToEnd = () => {
     CardMoveService.moveCards('end')
-  }
-
-  get selectedMovingCard() {
-    const { uiStore, apiStore } = this.props
-    return apiStore.find('collection_cards', _.last(uiStore.movingCardIds))
   }
 
   get moveMessage() {

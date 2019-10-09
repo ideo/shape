@@ -17,7 +17,7 @@ import styled from 'styled-components'
 const stripTags = str => str.replace(/(<([^>]+)>)/gi, '')
 
 const StyledPaddedCover = styled(PaddedCardCover)`
-  border-bottom: ${props =>
+  border-top: ${props =>
     !props.isEditing && props.hasTitleText ? '2px solid black' : 'none'};
   background: ${props =>
     (!props.isEditing && !props.dragging && props.hasTitleText) ||
@@ -261,7 +261,6 @@ class TextItemCover extends React.Component {
       >
         <QuillStyleWrapper
           notEditing={!isEditing}
-          hasTitleText={hasTitleText}
           smallGrid={uiStore.isSmallGrid}
         >
           {this.state.loading && <InlineLoader />}
