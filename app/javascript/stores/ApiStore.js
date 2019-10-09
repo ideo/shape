@@ -401,17 +401,13 @@ class ApiStore extends jsonapi(datxCollection) {
 
   openCurrentThreadToCommentOn(record) {
     const { uiStore } = this
-    const { viewingRecord, currentQuillEditor } = uiStore
+    const { viewingRecord } = uiStore
     if (!viewingRecord) return
 
     const thread = this.findThreadForRecord(viewingRecord)
-    if (currentQuillEditor) {
-      currentQuillEditor.format('commentHighlight', 'new', 'user')
-    }
     uiStore.update('activityLogOpen', true)
     uiStore.expandThread(thread.key)
     uiStore.setCommentingOnRecord(record)
-
     return thread
   }
 
