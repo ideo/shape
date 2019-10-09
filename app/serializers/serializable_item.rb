@@ -17,6 +17,7 @@ class SerializableItem < BaseJsonSerializer
     :question_title,
     :question_description,
     :archived,
+    :resolved_count
   )
 
   has_many :roles do
@@ -28,6 +29,7 @@ class SerializableItem < BaseJsonSerializer
   has_one :parent_collection_card
   has_one :parent
   belongs_to :data_source
+  has_many :comments
 
   attribute :tag_list do
     @object.cached_tag_list || []
