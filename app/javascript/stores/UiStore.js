@@ -918,7 +918,6 @@ export default class UiStore {
           false,
           'user'
         )
-        this.commentingOnRecord.save()
       }
     }
   }
