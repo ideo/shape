@@ -313,10 +313,6 @@ class Item < ApplicationRecord
     roles_anchor&.default_group_id
   end
 
-  def resolved_count
-    comment_thread&.resolved_count
-  end
-
   private
 
   def name_present?

@@ -153,10 +153,6 @@ class CommentThread < ApplicationRecord
     toggle_subscribed(false, user)
   end
 
-  def resolved_count
-    comments.select{|c| c.closed?}.count
-  end
-
   private
 
   def inherit_record_organization_id

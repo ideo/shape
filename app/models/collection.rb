@@ -868,10 +868,6 @@ class Collection < ApplicationRecord
       parent_application_collection.present?
   end
 
-  def resolved_count
-    comment_thread&.resolved_count
-  end
-
   # =================================
   # <--- end boolean checks
 
