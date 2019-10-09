@@ -9,9 +9,9 @@ import v from '~/utils/variables'
 const styles = {
   tooltip: {
     backgroundColor: v.colors.black,
-    fontSize: '0.75rem',
+    fontSize: '0.9rem',
     fontFamily: v.fonts.sans,
-    borderRadius: 0,
+    borderRadius: '3px',
     margin: '8px 0',
   },
 }

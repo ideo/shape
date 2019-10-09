@@ -146,6 +146,7 @@ class Api::V1::RolesController < Api::V1::BaseController
         groups = groups.none
       end
     else
+      # ensure groups are within the org
       groups = groups.viewable_in_org(current_organization.id)
     end
 

@@ -140,11 +140,14 @@ class ApiStore extends jsonapi(datxCollection) {
     return currentUser.current_user_collection_id
   }
 
+  get currentOrganization() {
+    return this.currentUser.current_organization
+  }
+
   @computed
   get currentOrgIsDeactivated() {
     if (!this.currentUser) return false
-    const org =
-      this.currentUserOrganization || this.currentUser.current_organization
+    const org = this.currentUserOrganization || this.currentOrganization
     if (!org) return false
     return org.deactivated
   }
@@ -399,43 +402,43 @@ class ApiStore extends jsonapi(datxCollection) {
   async findOrBuildCommentThread(record) {
     let thread = this.findThreadForRecord(record)
     this.clearUnpersistedThreads()
-    if (!thread) {
-      // first search for it via API
-      try {
+    // first search for it via API
+    try {
+      if (!thread) {
         // comment threads are unique by org_id so we pass that along
         const identifier = `${record.className}/${record.id}?organization_id=${this.currentUserOrganizationId}`
         const res = await this.request(
           `comment_threads/find_by_record/${identifier}`,
           'GET'
         )
-        if (res.data && res.data.id) {
-          thread = res.data
-          // make sure to fetch the first page of comments
-          thread.API_fetchComments()
-        } else {
-          // if still not found, set up a new empty record
-          thread = new CommentThread(
-            {
-              record_id: record.id,
-              record_type: record.className,
-              // set this for saving...
-              organization_id: this.currentUserOrganizationId,
-              updated_at: new Date(),
-            },
-            this
-          )
-          thread.addReference('record', record, {
-            model: record.className === 'Collection' ? Collection : Item,
-            type: ReferenceType.TO_ONE,
-          })
-          this.add(thread)
-        }
-      } catch (e) {
-        trackError(e, {
-          source: 'findOrBuildCommentThread',
-          name: 'fetchThreads',
-        })
+        if (res.data && res.data.id) thread = res.data
       }
+      if (thread) {
+        // make sure to fetch the first page of comments
+        thread.API_fetchComments()
+      } else {
+        // if still not found, set up a new empty record
+        thread = new CommentThread(
+          {
+            record_id: record.id,
+            record_type: record.className,
+            // set this for saving...
+            organization_id: this.currentUserOrganizationId,
+            updated_at: new Date(),
+          },
+          this
+        )
+        thread.addReference('record', record, {
+          model: record.className === 'Collection' ? Collection : Item,
+          type: ReferenceType.TO_ONE,
+        })
+        this.add(thread)
+      }
+    } catch (e) {
+      trackError(e, {
+        source: 'findOrBuildCommentThread',
+        name: 'fetchThreads',
+      })
     }
     this.setCurrentPageThreadKey(thread.key)
     return thread
@@ -444,7 +447,10 @@ class ApiStore extends jsonapi(datxCollection) {
   @computed
   get currentThreads() {
     return _.filter(
-      _.sortBy(this.findAll('comment_threads'), t => moment(t.updated_at)),
+      // sort by DESC order
+      _.reverse(
+        _.sortBy(this.findAll('comment_threads'), t => moment(t.updated_at))
+      ),
       t => {
         // don't include any new records that are being constructed
         if (!t.record || !t.record.id) return false
@@ -453,6 +459,20 @@ class ApiStore extends jsonapi(datxCollection) {
         return this.currentCommentThreadIds.indexOf(t.id) > -1
       }
     )
+  }
+
+  get replyingToComment() {
+    const { uiStore } = this
+    if (!uiStore.replyingToCommentId) return null
+    return this.find('comments', uiStore.replyingToCommentId)
+  }
+
+  collapseReplies() {
+    const { uiStore, replyingToComment } = this
+    if (replyingToComment) {
+      replyingToComment.resetReplies()
+      uiStore.setReplyingToComment(null)
+    }
   }
 
   async fetchNotifications() {
@@ -700,10 +720,6 @@ class ApiStore extends jsonapi(datxCollection) {
       })
     }
     return org
-  }
-
-  get currentOrganization() {
-    return this.currentUser.current_organization
   }
 
   // default action for updating any basic apiStore value

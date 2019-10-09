@@ -41,6 +41,7 @@ class LinkToSharedCollectionsWorker
     height = 1
     if object.respond_to?(:parent_application_collection) &&
        object.parent_application_collection.present?
+      # link to the org collection within the root application collection
       object = object.parent_application_collection.collections.first
       width = 3
       height = 2

@@ -38,7 +38,7 @@ class ActivityLogButton extends React.Component {
     return apiStore.unreadActivityCount
   }
 
-  toggleActivityLog = () => {
+  toggleActivityLog = async () => {
     const val = !uiStore.activityLogOpen
     uiStore.update('activityLogOpen', val)
   }

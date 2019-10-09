@@ -808,7 +808,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       }
       // omit the extra wording for close and reopen
       // for reopen: what if there are actually incomplete questions... ?
-      if (_.includes(['close', 'reopen'], actionName)) prompt = errorMessages
+      if (_.includes(['close', 'reopen'], actionName))
+        prompt = errorMessages.toString()
       uiStore.popupAlert({
         prompt,
         fadeOutTime: 10 * 1000,

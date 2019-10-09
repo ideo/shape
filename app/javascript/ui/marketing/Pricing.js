@@ -126,7 +126,10 @@ const PriceCard = props => {
       <MarketingFlex justify="center" px={40} py={40}>
         <Box flex column align="center" justify="flex-start" w={275}>
           <Box mb={[10, 10, 10]}>
-            <MarketingH2 align="center" style={{ fontWeight: 500 }}>
+            <MarketingH2
+              align="center"
+              style={{ textTransform: 'none', fontWeight: 500 }}
+            >
               {title}
             </MarketingH2>
           </Box>
@@ -162,7 +165,7 @@ PriceCard.propTypes = {
  */
 
 const Pricing = props => (
-  <MarketingFlex column align="center" px={24}>
+  <MarketingFlex column align="center" px={24} mt={40}>
     <MarketingH1Bold align="center">{props.title}</MarketingH1Bold>
     <Box w={[1, 1, 900]} mt={[20, 40, 40]}>
       <SubText align="center">{props.subtext}</SubText>

@@ -56,7 +56,8 @@ export const Heading3 = styled.h3`
 Heading3.displayName = 'StyledHeading3'
 
 export const DisplayTextCss = css`
-  color: ${props => props.color || v.colors.black};
+  color: ${props =>
+    props.theme.descriptionText || props.color || v.colors.black};
   font-weight: ${v.weights.book};
   font-family: ${v.fonts.sans};
   font-size: 1rem;
@@ -221,13 +222,7 @@ export const HugeNumber = styled(Heading1)`
 `
 
 export const QuillStyleWrapper = styled.div`
-  ${props => {
-    let margin = 40
-    if (props.smallGrid) margin = 20
-    return props.notEditing && props.hasTitleText
-      ? `height: calc(100% - ${margin}px); margin-top: ${margin}px;`
-      : 'height: 100%;'
-  }}
+  height: 100%;
 
   .quill {
     height: 100%;
@@ -283,13 +278,9 @@ export const QuillStyleWrapper = styled.div`
 
     .ql-container {
       /* this overrides quill-cursors "display: flex" which was breaking IE */
-      display: block;
+      display: ${props => (props.fullPageView ? 'block' : 'flex')};
 
       ${props => (props.notEditing ? '' : 'overflow: visible !important;')};
-      ${props =>
-        props.notEditing && props.hasTitleText
-          ? 'justify-content: flex-end;'
-          : ''};
     }
 
     .ql-cursor {
@@ -303,10 +294,6 @@ export const QuillStyleWrapper = styled.div`
     .ql-editor {
       overflow-x: hidden;
       ${props => (props.notEditing ? 'overflow-y: hidden;' : '')};
-      ${props =>
-        props.notEditing && props.hasTitleText
-          ? 'display: block; height: auto; flex: initial;'
-          : ''};
     }
   }
 `

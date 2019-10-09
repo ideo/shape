@@ -1,6 +1,9 @@
 import PropTypes from 'prop-types'
 import { Element as ScrollElement } from 'react-scroll'
 import { Box } from 'reflexbox'
+import styled from 'styled-components'
+
+import v from '~/utils/variables'
 import {
   MarketingFooter,
   InvertMarketingLink,
@@ -15,6 +18,16 @@ import {
 
 import poweredByIdeo from '~/assets/Powered-by-IDEO-Inverted.png'
 import SubscribeEmail from '~/ui/marketing/SubscribeEmail'
+
+const ResponsiveFooterHolder = styled(Box)`
+  flex-direction: column;
+
+  @media only screen and (min-width: ${v.responsive.medBreakpoint}px) {
+    flex-direction: row;
+  }
+`
+ResponsiveFooterHolder.displayName = 'ResponsiveFooterHolder'
+
 class PageFooter extends React.PureComponent {
   render() {
     const { mailingList } = this.props.content
@@ -22,7 +35,12 @@ class PageFooter extends React.PureComponent {
       <MarketingFooter>
         <ScrollElement name="FooterAnchor" />
         <MarketingFlex align="center" justify="center" wrap w={1}>
-          <Box flex align="space-between" w={1} style={{ maxWidth: '1000px' }}>
+          <ResponsiveFooterHolder
+            flex
+            align={['center', 'center', 'space-between']}
+            w={1}
+            style={{ maxWidth: '1000px' }}
+          >
             <Box w={1 / 2} style={{ textAlign: 'left' }}>
               <MarketingContent color="white">
                 For general inquiries, reach us at:
@@ -41,9 +59,9 @@ class PageFooter extends React.PureComponent {
 
               <InvertMarketingLinkMail
                 fontSize={18}
-                href="mailto:support@shape.space"
+                href="mailto:help@shape.space"
               >
-                support@shape.space
+                help@shape.space
               </InvertMarketingLinkMail>
             </Box>
 
@@ -57,7 +75,7 @@ class PageFooter extends React.PureComponent {
                 <SubscribeEmail />
               </Box>
             </Box>
-          </Box>
+          </ResponsiveFooterHolder>
 
           <Box w={1}>
             <InvertMarketingLink

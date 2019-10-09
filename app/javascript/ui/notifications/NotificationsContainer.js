@@ -32,7 +32,10 @@ class NotificationsContainer extends React.Component {
     const { uiStore } = this.props
     const { notifications } = this
     return (
-      <ActivityContainer moving={uiStore.activityLogMoving}>
+      <ActivityContainer
+        style={{ padding: '0 10px' }}
+        moving={uiStore.activityLogMoving}
+      >
         {notifications.map(notification => (
           <Notification notification={notification} key={notification.id} />
         ))}
