@@ -19,7 +19,7 @@ import QuillClipboard from '~/ui/global/QuillClipboard'
 
 Quill.debug('error')
 Quill.register('modules/cursors', QuillCursors)
-Quill.register('modules/cursors', QuillClipboard)
+Quill.register('modules/customClipboard', QuillClipboard)
 Quill.register('formats/link', QuillLink)
 
 const FULL_PAGE_TOP_PADDING = '2rem'
@@ -116,8 +116,6 @@ class RealtimeTextItem extends React.Component {
     }, 1250)
 
     if (!this.reactQuillRef) return
-    const { editor } = this.reactQuillRef
-    this.overrideHeadersFromClipboard(editor)
     this.initQuillRefsAndData({ initSnapshot: true })
     setTimeout(() => {
       this.quillEditor.focus()
@@ -354,26 +352,10 @@ class RealtimeTextItem extends React.Component {
     } else if (lastOp.attributes.header) {
       return
     } else {
-      lastOp.attributes.header = prevHeader
+      // remove lastOp, which is a `retain: 1` and causes the newline to be <p>
+      // NOTE: mutating this delta seems to automatically apply the change?
+      delta.ops.pop()
     }
-    this.quillEditor.updateContents(delta)
-  }
-
-  remapHeaderToH1 = (node, delta) => {
-    delta.map(op => {
-      if (!op.attributes) op.attributes = { header: 1 }
-      op.attributes.header = 1
-      return op
-    })
-    return delta
-  }
-
-  overrideHeadersFromClipboard = editor => {
-    // change all header attributes to H1, e.g. when copy/pasting
-    const headers = ['H1', 'H2', 'H3', 'H4', 'H5', 'H6']
-    headers.forEach(header => {
-      editor.clipboard.addMatcher(header, this.remapHeaderToH1)
-    })
   }
 
   handleTextChange = (_content, delta, source, _editor) => {
@@ -381,9 +363,8 @@ class RealtimeTextItem extends React.Component {
       // This adjustment is made so that the currently-selected
       // header size is preserved on new lines
       this.adjustHeaderSizeIfNewline(delta)
-      // FIXME: throws an error when pasting
-      // const cursors = this.quillEditor.getModule('cursors')
-      // cursors.clearCursors()
+      const cursors = this.quillEditor.getModule('cursors')
+      cursors.clearCursors()
 
       this.combineAwaitingDeltas(delta)
       this.sendCombinedDelta()
@@ -500,6 +481,7 @@ class RealtimeTextItem extends React.Component {
       onBlur: this.handleBlur,
       readOnly: !canEdit,
       modules: {
+        customClipboard: true,
         toolbar: canEdit ? '#quill-toolbar' : null,
         cursors: {
           hideDelayMs: 3000,
