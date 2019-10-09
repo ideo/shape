@@ -69,13 +69,13 @@ class OrganizationBuilder
   def create_network_organization
     @organization.create_network_organization(@user)
   rescue JsonApiClient::Errors::ApiError
-    raise ActiveRecord::Rollback
+    raise ActiveRecord::Rollback unless Rails.env.development?
   end
 
   def create_network_subscription
     @organization.create_network_subscription
   rescue JsonApiClient::Errors::ApiError
-    raise ActiveRecord::Rollback
+    raise ActiveRecord::Rollback unless Rails.env.development?
   end
 
   def create_application_organization

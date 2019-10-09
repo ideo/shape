@@ -16,7 +16,6 @@ exports[`TextItemCover renders snapshot 1`] = `
   }
 >
   <styled.div
-    hasTitleText={false}
     notEditing={true}
   >
     <Quill

@@ -34,6 +34,7 @@ const PlusIconContainer = styled.span`
 
 const StyledLegendItem = styled.div`
   border-top: 2px solid #000;
+  overflow-y: scroll;
   padding: 12px 15px 12px 10px;
 `
 
@@ -121,6 +122,12 @@ class LegendItemCover extends React.Component {
     // Uses test comparison API if it references a test collection,
     // and does not have any groupings
     return entity.test_collection_id && !hasGroupings
+  }
+
+  rendersAsLine(selectedDataset, isPrimary) {
+    if (selectedDataset.chart_type === 'line') return true
+    if (selectedDataset.chart_type === 'area' && !isPrimary) return true
+    return false
   }
 
   /*
@@ -315,10 +322,10 @@ class LegendItemCover extends React.Component {
 
   renderSelectedDataset = ({ dataset, order }) => {
     if (!dataset) return ''
-    const { identifier, name, style, chart_type } = dataset
+    const { identifier, name, style } = dataset
     const primary = order === 0
     let icon
-    if (chart_type === 'line') {
+    if (this.rendersAsLine(dataset, primary)) {
       icon = (
         <LineChartIcon
           color={(style && style.fill) || '#000000'}
