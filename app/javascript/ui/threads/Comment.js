@@ -27,8 +27,6 @@ import CommentInput from '~/ui/threads/CommentInput'
 import CommentReplies from '~/ui/threads/CommentReplies'
 import CommentSubject from '~/ui/threads/CommentSubject'
 import { StyledCommentInput } from '~/ui/threads/CustomCommentMentions'
-import CheckIcon from '~/ui/icons/CheckIcon'
-import ReopenIcon from '~/ui/icons/ReopenIcon'
 
 mention(linkify)
 
@@ -122,44 +120,6 @@ const EditedIndicator = styled.span`
   padding-left: 10px;
 `
 EditedIndicator.displayName = 'EditedIndicator'
-
-const CommentHighlightData = styled.div`
-  height: 71px;
-  padding: 15px;
-`
-CommentHighlightData.displayName = 'CommentHighlightData'
-
-const CommentHighlightTextWrapper = styled.div`
-  color: ${v.colors.commonLight};
-  max-height: 56px;
-`
-CommentHighlightTextWrapper.displayName = 'CommentHighlightTextWrapper'
-
-const CommentHighlightText = styled(DisplayText)`
-  color: ${v.colors.commonLight};
-  display: block;
-  font-size: 16px;
-  font-style: italic;
-  position: relative;
-  word-wrap: break-word;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-`
-CommentHighlightText.displayName = 'CommentHighlightText'
-
-const ResolveIconHolder = styled.div`
-  color: ${v.colors.commonLight};
-  background: ${v.colors.secondaryDarkest};
-  position: relative;
-  float: right;
-  border-radius: 8px;
-  width: 16px;
-  height: 16px;
-  top: 3px;
-  left: 9px;
-`
-ResolveIconHolder.displayName = 'ResolveIconHolder'
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -363,22 +323,6 @@ class Comment extends React.Component {
       <Linkify tagName="p" options={options}>
         {message}
       </Linkify>
-    )
-  }
-
-  renderCommentHighlightData() {
-    const { comment } = this.props
-    const { message, status } = comment
-    // this will render highlight iconm, message and resolve button
-    return (
-      <CommentHighlightData>
-        <CommentHighlightTextWrapper>
-          <CommentHighlightText>{message}</CommentHighlightText>
-        </CommentHighlightTextWrapper>
-        <ResolveIconHolder>
-          {status === 'closed' ? <ReopenIcon /> : <CheckIcon />}
-        </ResolveIconHolder>
-      </CommentHighlightData>
     )
   }
 

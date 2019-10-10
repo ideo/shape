@@ -7,6 +7,7 @@
 #  message           :text
 #  replies_count     :integer          default(0)
 #  status            :integer
+#  subject_type      :string
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  author_id         :integer

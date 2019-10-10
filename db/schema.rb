@@ -209,6 +209,8 @@ ActiveRecord::Schema.define(version: 2019_10_09_212511) do
     t.bigint "parent_id"
     t.integer "replies_count", default: 0
     t.integer "status"
+    t.integer "subject_id"
+    t.string "subject_type"
     t.index ["comment_thread_id"], name: "index_comments_on_comment_thread_id"
     t.index ["parent_id"], name: "index_comments_on_parent_id"
     t.index ["subject_id", "subject_type"], name: "index_comments_on_subject_id_and_subject_type"
