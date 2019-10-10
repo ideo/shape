@@ -33,9 +33,13 @@
 
 class Dataset < ApplicationRecord
   include Externalizable
+  include Resourceable
   belongs_to :organization, optional: true
   belongs_to :data_source, polymorphic: true, optional: true
   belongs_to :application, optional: true
+
+  resourceable roles: [Role::VIEWER],
+               view_role: Role::VIEWER
 
   has_many :data_items_datasets, dependent: :destroy, inverse_of: :dataset
 
@@ -119,6 +123,9 @@ class Dataset < ApplicationRecord
   def data_items_datasets_id
     cached_data_items_datasets&.id
   end
+
+  # Added so that this is compatible with rolify
+  def roles_anchor_collection_id; end
 
   private
 
