@@ -13,7 +13,7 @@ import { SubduedTitle } from '~/ui/global/styled/typography'
 import FollowIcon from '~/ui/icons/FollowIcon'
 import v from '~/utils/variables'
 import hexToRgba from '~/utils/hexToRgba'
-import Thumbnail from '~/ui/threads/Thumbnail'
+import CommentThumbnail from '~/ui/threads/CommentThumbnail'
 
 export const threadTitleCss = css`
   position: ${props => (props.sticky ? 'sticky' : 'relative')};
@@ -86,21 +86,6 @@ const StyledHeader = styled.div`
   }
 `
 StyledHeader.displayName = 'StyledHeader'
-
-export const ThumbnailHolder = styled.span`
-  display: block;
-  flex-shrink: 0;
-  height: 50px;
-  width: 50px;
-  img,
-  svg {
-    flex-shrink: 0;
-    height: 100%;
-    object-fit: cover;
-    width: 100%;
-  }
-`
-ThumbnailHolder.displayName = 'ThumbnailHolder'
 
 export const FollowHolder = styled.span`
   color: ${props =>
@@ -237,7 +222,7 @@ class CommentThreadHeader extends React.Component {
         <StyledHeader lines={this.titleLines}>
           {/* left side */}
           <Flex style={{ height: '50px', overflow: 'hidden' }}>
-            <Thumbnail
+            <CommentThumbnail
               record={this.record}
               iconTop={this.titleLines === 1 ? 18 : 9}
             />

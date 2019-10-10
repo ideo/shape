@@ -25,6 +25,7 @@ import XIcon from '~/ui/icons/XIcon'
 import Tooltip from '~/ui/global/Tooltip'
 import CommentInput from '~/ui/threads/CommentInput'
 import CommentReplies from '~/ui/threads/CommentReplies'
+import CommentSubject from '~/ui/threads/CommentSubject'
 import { StyledCommentInput } from '~/ui/threads/CustomCommentMentions'
 import CheckIcon from '~/ui/icons/CheckIcon'
 import ReopenIcon from '~/ui/icons/ReopenIcon'
@@ -411,6 +412,13 @@ class Comment extends React.Component {
     )
   }
 
+  renderSubjectOfComment() {
+    const { comment } = this.props
+    if (!comment.subject) return null
+
+    return <CommentSubject record={comment.subject} />
+  }
+
   renderHeaderAndButtons() {
     const { comment, apiStore, isReply } = this.props
     const { author, persisted, created_at } = comment
@@ -511,7 +519,7 @@ class Comment extends React.Component {
           isReply={isReply}
           onClick={this.handleClick}
         >
-          {!isReply && comment.status && this.renderCommentHighlightData()}
+          {this.renderSubjectOfComment()}
           {this.renderHeaderAndButtons()}
           {this.renderMessage()}
         </StyledComment>

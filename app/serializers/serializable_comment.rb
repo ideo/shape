@@ -4,6 +4,7 @@ class SerializableComment < BaseJsonSerializer
              :draftjs_data, :replies_count, :status
   belongs_to :author
   belongs_to :parent
+  belongs_to :subject
 
   attribute :author_id do
     @object.author_id.to_s

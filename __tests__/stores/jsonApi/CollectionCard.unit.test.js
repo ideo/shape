@@ -25,6 +25,24 @@ beforeEach(() => {
 })
 
 describe('CollectionCard', () => {
+  describe('canEdit', () => {
+    it('returns true if card is a link and you can edit the parent', () => {
+      collectionCard.link = true
+      collectionCard.can_edit_parent = true
+      expect(collectionCard.canEdit).toBeTruthy()
+      collectionCard.can_edit_parent = false
+      expect(collectionCard.canEdit).toBeFalsy()
+    })
+
+    it('returns true if card is not a link and you can edit the record', () => {
+      collectionCard.link = false
+      collectionCard.record = { can_edit: true }
+      expect(collectionCard.canEdit).toBeTruthy()
+      collectionCard.record = { can_edit: false }
+      expect(collectionCard.canEdit).toBeFalsy()
+    })
+  })
+
   describe('API_create', () => {
     describe('when Link (with no name) or Data item', () => {
       beforeEach(() => {

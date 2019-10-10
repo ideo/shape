@@ -12,11 +12,13 @@
 #  author_id         :integer
 #  comment_thread_id :integer
 #  parent_id         :bigint(8)
+#  subject_id        :integer
 #
 # Indexes
 #
-#  index_comments_on_comment_thread_id  (comment_thread_id)
-#  index_comments_on_parent_id          (parent_id)
+#  index_comments_on_comment_thread_id            (comment_thread_id)
+#  index_comments_on_parent_id                    (parent_id)
+#  index_comments_on_subject_id_and_subject_type  (subject_id,subject_type)
 #
 
 class Comment < ApplicationRecord
@@ -36,6 +38,9 @@ class Comment < ApplicationRecord
 
   belongs_to :author, class_name: 'User'
   belongs_to :parent, class_name: 'Comment', optional: true, counter_cache: :replies_count
+  belongs_to :subject,
+             optional: true,
+             polymorphic: true
 
   validates :message, presence: true
 

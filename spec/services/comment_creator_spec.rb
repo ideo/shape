@@ -5,6 +5,8 @@ RSpec.describe CommentCreator, type: :service do
     let(:comment_thread) { create(:item_comment_thread) }
     let(:message) { 'This is my message to you.' }
     let(:author) { create(:user) }
+    let(:subject_id) { nil }
+    let(:subject_type) { nil }
     let(:draftjs_data) do
       {
         'blocks' =>
@@ -21,6 +23,8 @@ RSpec.describe CommentCreator, type: :service do
         message: message,
         draftjs_data: draftjs_data,
         author: author,
+        subject_id: subject_id,
+        subject_type: subject_type,
       }
     end
     let(:comment_creator) { CommentCreator.new(comment_attributes) }
@@ -63,6 +67,17 @@ RSpec.describe CommentCreator, type: :service do
 
           reply_comment = CommentCreator.new(comment_attributes.merge(parent: comment)).call
           expect(reply_comment.parent).to eq comment
+        end
+      end
+
+      context 'with a comment subject' do
+        let(:item) { create(:text_item) }
+        let(:subject_id) { item.id }
+        let(:subject_type) { item.class.name }
+
+        it 'creates a comment linked to the subject' do
+          comment = comment_creator.call
+          expect(comment.subject).to eq item
         end
       end
     end

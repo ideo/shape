@@ -214,12 +214,6 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def load_and_authorize_moving_collections
     @cards = ordered_cards
-    if json_api_params[:from_id]
-      @from_collection = Collection.find(json_api_params[:from_id])
-    else
-      # parent collection can be implied
-      @from_collection = @cards.first.parent
-    end
     @to_collection = Collection.find(json_api_params[:to_id])
     @cards.primary.each do |card|
       authorize! :move, card
@@ -228,17 +222,28 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       authorize! :read, card
     end
     authorize! :edit_content, @to_collection
+    load_from_collection
   end
 
   # almost the same as above but needs to authorize read access for each card's record
   def load_and_authorize_linking_collections
-    @from_collection = Collection.find(json_api_params[:from_id])
     @cards = ordered_cards
     @cards.each do |card|
       authorize! :read, card
     end
     @to_collection = Collection.find(json_api_params[:to_id])
     authorize! :edit_content, @to_collection
+    load_from_collection
+  end
+
+  def load_from_collection
+    if json_api_params[:from_id]
+      @from_collection = Collection.find(json_api_params[:from_id])
+    else
+      # parent collection can be implied if from_id is not present
+      # NOTE: link/duplicate actions could probably be refactored to not load @from_collection
+      @from_collection = @cards.first.parent
+    end
   end
 
   def load_and_authorize_replacing_card

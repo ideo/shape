@@ -233,6 +233,21 @@ class Item extends SharedRecordMixin(BaseRecord) {
   API_pingCollection() {
     return this.apiStore.request(`items/${this.id}/ping_collection`)
   }
+
+  API_persistHighlight(comment_id) {
+    _.each(this.data_content.ops, op => {
+      if (
+        op.attributes &&
+        (op.attributes.commentHighlight === 'new' ||
+          op.attributes['data-comment-id'] === 'new')
+      ) {
+        console.log('we found a "new" comment')
+        op.attributes = { commentHighlight: comment_id }
+      }
+    })
+    console.log('persisting!!!!', this.data_content)
+    this.save()
+  }
 }
 
 Item.defaults = {

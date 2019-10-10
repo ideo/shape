@@ -300,12 +300,14 @@ class RealtimeTextItem extends React.Component {
     return onCancel({ item, ev, route })
   }
 
-  setItemDataContent() {
+  setItemDataContent(fullContent = null) {
     const { item } = this.props
     const { quillEditor } = this
     item.content = quillEditor.root.innerHTML
+    const delta = fullContent || quillEditor.getContents()
+    this.removeNewHighlights(delta)
     item.data_content = {
-      ...quillEditor.getContents(),
+      ...delta,
       version: this.version,
     }
     return item
@@ -378,10 +380,8 @@ class RealtimeTextItem extends React.Component {
   }
 
   get cardId() {
-    const { item, cardId } = this.props
-    if (cardId) {
-      return cardId
-    } else if (item.parent_collection_card) {
+    const { item } = this.props
+    if (item.parent_collection_card) {
       return item.parent_collection_card.id
     } else {
       return null
@@ -441,6 +441,22 @@ class RealtimeTextItem extends React.Component {
     })
   }
 
+  removeNewHighlights = delta => {
+    let justAddedHighlight = false
+    _.each(delta.ops, op => {
+      // don't persist any unpersisted comment highlights
+      if (
+        op.attributes &&
+        (op.attributes.commentHighlight === 'new' ||
+          op.attributes['data-comment-id'] === 'new')
+      ) {
+        justAddedHighlight = true
+        delete op['attributes']
+      }
+    })
+    return justAddedHighlight
+  }
+
   _sendCombinedDelta = () => {
     if (!this.combinedDelta.length() || this.currentlySending) {
       if (this.currentlySending && !this.currentlySendingCheck) {
@@ -454,7 +470,13 @@ class RealtimeTextItem extends React.Component {
     }
 
     this.currentlySending = true
+    const justAddedHighlight = this.removeNewHighlights(this.combinedDelta)
+    if (justAddedHighlight) {
+      return
+    }
+
     const full_content = this.contentSnapshot.compose(this.combinedDelta)
+
     // NOTE: will get rejected if this.version < server saved version,
     // in which case the handleReceivedDelta error will try to resend
     this.socketSend('delta', {
@@ -466,10 +488,7 @@ class RealtimeTextItem extends React.Component {
     this.sendCursor()
 
     // persist the change locally e.g. when we close the text box
-    this.props.item.data_content = {
-      ...full_content,
-      version: this.version,
-    }
+    this.setItemDataContent({ ...full_content })
 
     // now that we have sent off our data, we can clear out what's in our buffer;
     // our combinedDelta won't clear out until we know it has successfully sent
@@ -566,7 +585,6 @@ RealtimeTextItem.displayName = 'RealtimeTextItem'
 RealtimeTextItem.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   currentUserId: PropTypes.string.isRequired,
-  cardId: PropTypes.string,
   onCancel: PropTypes.func.isRequired,
   fullyLoaded: PropTypes.bool.isRequired,
   onExpand: PropTypes.func,
@@ -578,7 +596,6 @@ RealtimeTextItem.defaultProps = {
   onExpand: null,
   fullPageView: false,
   initialFontTag: 'P',
-  cardId: null,
   containerRef: null,
 }
 

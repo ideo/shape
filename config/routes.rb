@@ -117,7 +117,7 @@ Rails.application.routes.draw do
         resources :audiences, only: %i[index]
       end
       delete 'sessions' => 'sessions#destroy'
-      resources :users, except: :index do
+      resources :users do
         collection do
           get 'me'
           post 'create_from_emails'
