@@ -6,7 +6,7 @@
 #  draftjs_data      :jsonb
 #  message           :text
 #  replies_count     :integer          default(0)
-#  status            :integer          default("open")
+#  status            :integer
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  author_id         :integer

@@ -208,7 +208,7 @@ ActiveRecord::Schema.define(version: 2019_10_07_233341) do
     t.jsonb "draftjs_data"
     t.bigint "parent_id"
     t.integer "replies_count", default: 0
-    t.integer "status", default: 0
+    t.integer "status"
     t.index ["comment_thread_id"], name: "index_comments_on_comment_thread_id"
     t.index ["parent_id"], name: "index_comments_on_parent_id"
   end
