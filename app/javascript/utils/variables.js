@@ -197,7 +197,7 @@ export default {
   },
 
   quillDefaults: {
-    formats: ['link', 'header', 'commentHighlight', 'highlightClass'],
+    formats: ['link', 'header', 'commentHighlight'],
     modules: {
       toolbar: null,
     },

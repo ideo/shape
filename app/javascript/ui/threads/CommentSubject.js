@@ -1,18 +1,35 @@
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
-import { Flex } from 'reflexbox'
+import styled from 'styled-components'
 
 import CommentThumbnail from '~/ui/threads/CommentThumbnail'
+import v from '~/utils/variables'
+
+const StyledCommentSubject = styled.div`
+  display: flex;
+  font-family: ${v.fonts.sans};
+  font-style: italic;
+  color: ${v.colors.commonMedium};
+`
 
 class CommentSubject extends React.Component {
-  render() {
+  get textContent() {
     const { record, textContent } = this.props
+    if (!textContent) {
+      return record.name
+    }
+
+    // also truncate textContent to a reasonable limit?
+    return `${textContent}...`
+  }
+
+  render() {
+    const { record } = this.props
     return (
-      <Flex>
-        {/* how to get titlelines/ CommentThreadHeader#countLines from here? */}
+      <StyledCommentSubject>
         <CommentThumbnail record={record} iconTop={1} />
-        {textContent}
-      </Flex>
+        {this.textContent}
+      </StyledCommentSubject>
     )
   }
 }

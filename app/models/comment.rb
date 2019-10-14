@@ -70,6 +70,21 @@ class Comment < ApplicationRecord
     )
   end
 
+  def text_highlight
+    return unless subject.present? && subject.is_a?(Item::TextItem)
+
+    highlight = ''
+    Hashie::Mash.new(subject.data_content).ops.each do |op|
+      comment_id = op.attributes&.commentHighlight
+      if comment_id && comment_id.to_s == id.to_s
+        highlight += " #{op.insert}"
+      end
+    end
+    highlight.gsub('\n', ' ')
+             .gsub(/\s+/, ' ')
+             .strip
+  end
+
   def serialized_for_firestore
     renderer = JSONAPI::Serializable::Renderer.new
     renderer.render(

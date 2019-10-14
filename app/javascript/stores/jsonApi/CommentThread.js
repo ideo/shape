@@ -152,7 +152,7 @@ class CommentThread extends BaseRecord {
     )
     if (comment.persisted && uiStore.isCommentingOnTextRange()) {
       console.log('comment persisted', comment.id)
-      commentingOnRecord.API_persistHighlight(comment.id)
+      await commentingOnRecord.API_persistHighlight(comment.id)
     }
     uiStore.setCommentingOnRecord(null)
 

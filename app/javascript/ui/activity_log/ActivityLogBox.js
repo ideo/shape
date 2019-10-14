@@ -201,6 +201,7 @@ class ActivityLogBox extends React.Component {
 
   handleClose = ev => {
     const { uiStore } = this.props
+    uiStore.setCommentingOnRecord(null)
     uiStore.update('activityLogOpen', false)
   }
 

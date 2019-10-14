@@ -1,11 +1,11 @@
 import _ from 'lodash'
 import { apiStore, uiStore, undoStore } from '~/stores'
 
-const quillEditorClick = e => {
-  const quillSelectors =
-    '.quill, .ql-close, .ql-toolbar, .ql-container, .ql-editor, .ql-clipboard, .quill-toolbar, .ql-formats, .ql-header, .ql-link, .ql-stroke'
-  return e.target.closest(quillSelectors)
-}
+// const quillEditorClick = e => {
+//   const quillSelectors =
+//     '.quill, .ql-close, .ql-toolbar, .ql-container, .ql-editor, .ql-clipboard, .quill-toolbar, .ql-formats, .ql-header, .ql-link, .ql-stroke'
+//   return e.target.closest(quillSelectors)
+// }
 
 const emptySpaceClick = e => {
   const { target } = e
@@ -15,13 +15,13 @@ const emptySpaceClick = e => {
 }
 
 export const handleMouseDownSelection = e => {
-  const { textEditingItem } = uiStore
+  // const { textEditingItem } = uiStore
+  // const outsideQuillMouseDown = !quillEditorClick(e) && textEditingItem
+  // if (outsideQuillMouseDown) {
+  //   // if we clicked outside the quill editor...
+  //   uiStore.update('textEditingItem', null)
+  // }
   const emptySpaceMouseDown = emptySpaceClick(e)
-  const outsideQuillMouseDown = !quillEditorClick(e) && textEditingItem
-  if (outsideQuillMouseDown) {
-    // if we clicked outside the quill editor...
-    uiStore.update('textEditingItem', null)
-  }
   if (emptySpaceMouseDown) {
     // if we clicked an empty space...
     uiStore.deselectCards()

@@ -9,6 +9,7 @@
     "updated_at": { "type": "date" },
     "parent_id": { "type": ["string", "null"] },
     "status": { "type": ["string", "null"] },
+    "text_highlight": { "type": ["string", "null"] },
     "replies_count": {"type": ["integer", "null"]}
   },
   "required": ["message", "updated_at"]

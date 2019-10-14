@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { observable } from 'mobx'
+import { action, observable } from 'mobx'
 import { ReferenceType } from 'datx'
 
 import { apiUrl } from '~/utils/url'
@@ -219,6 +219,10 @@ class Item extends SharedRecordMixin(BaseRecord) {
   API_updateWithoutSync({ cancel_sync } = {}) {
     const { apiStore } = this
     const data = this.toJsonApi()
+    if (this.isText && data.attributes.data_content) {
+      // scrub new highlights before saving
+      this.removeNewHighlights(data.attributes.data_content)
+    }
     // Turn off syncing when saving the item to not reload the page
     if (cancel_sync) data.cancel_sync = true
     return apiStore
@@ -234,6 +238,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.request(`items/${this.id}/ping_collection`)
   }
 
+  @action
   API_persistHighlight(comment_id) {
     _.each(this.data_content.ops, op => {
       if (
@@ -241,12 +246,26 @@ class Item extends SharedRecordMixin(BaseRecord) {
         (op.attributes.commentHighlight === 'new' ||
           op.attributes['data-comment-id'] === 'new')
       ) {
-        console.log('we found a "new" comment')
         op.attributes = { commentHighlight: comment_id }
       }
     })
-    console.log('persisting!!!!', this.data_content)
-    this.save()
+    this.API_updateWithoutSync()
+  }
+
+  removeNewHighlights = (delta = this.data_content) => {
+    let justAddedHighlight = false
+    _.each(delta.ops, op => {
+      // don't persist any unpersisted comment highlights
+      if (
+        op.attributes &&
+        (op.attributes.commentHighlight === 'new' ||
+          op.attributes['data-comment-id'] === 'new')
+      ) {
+        justAddedHighlight = true
+        delete op['attributes']
+      }
+    })
+    return justAddedHighlight
   }
 }
 

@@ -140,22 +140,8 @@ class TextItemCover extends React.Component {
       return
     }
     // save final updates and broadcast to collection
-    item.API_updateWithoutSync()
+    item.API_updateWithoutSync({ cancel_sync: true })
 
-    // TODO figure out why ref wasn't working
-    // eslint-disable-next-line react/no-find-dom-node
-    const node = ReactDOM.findDOMNode(this)
-    node.scrollTop = 0
-  }
-
-  save = async (item, { cancel_sync = true } = {}) => {
-    this.setState({ loading: true })
-    await item.API_updateWithoutSync({ cancel_sync })
-    this.clearTextEditingItem()
-    if (this.unmounted) {
-      return
-    }
-    this.setState({ loading: false, item })
     // TODO figure out why ref wasn't working
     // eslint-disable-next-line react/no-find-dom-node
     const node = ReactDOM.findDOMNode(this)

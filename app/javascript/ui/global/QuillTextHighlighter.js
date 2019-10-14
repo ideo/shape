@@ -9,29 +9,23 @@ const dataAttributor = new Parchment.Attributor.Attribute(
 )
 Quill.register(dataAttributor)
 
-// TODO: probably won't use this....
-// class formatter does work well to persist formatting on newlines (better than inline)
-const HighlightClass = new Parchment.Attributor.Class(
-  'highlightClass',
-  'highlighted',
-  {
-    scope: Parchment.Scope.BLOCK,
-  }
-)
-Quill.register(HighlightClass, true)
-// ------
-
 class QuillTextHighlighter extends Inline {
   static create(value) {
     // NOTE: highlight uses <sub> as its HTML element
     const node = document.createElement('sub')
-    dataAttributor.add(node, value)
+    if (value) {
+      dataAttributor.add(node, value)
+    } else {
+      dataAttributor.remove(node)
+    }
 
     // add onClick handler...
-    node.onclick = e => {
-      e.preventDefault()
-      // apiStore.find('comments', value)
-      // console.log('here i am...', dataAttributor.value(node))
+    if (value) {
+      node.onclick = e => {
+        e.preventDefault()
+        // apiStore.find('comments', value)
+        console.log('here i am...', dataAttributor.value(node))
+      }
     }
     return node
   }

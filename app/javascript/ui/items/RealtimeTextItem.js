@@ -305,7 +305,6 @@ class RealtimeTextItem extends React.Component {
     const { quillEditor } = this
     item.content = quillEditor.root.innerHTML
     const delta = fullContent || quillEditor.getContents()
-    this.removeNewHighlights(delta)
     item.data_content = {
       ...delta,
       version: this.version,
@@ -396,6 +395,12 @@ class RealtimeTextItem extends React.Component {
       const cursors = this.quillEditor.getModule('cursors')
       cursors.clearCursors()
 
+      // if (this.newlineIndicesForDelta(delta).length) {
+      //   console.log(1, this.quillEditor.getFormat())
+      //   this.quillEditor.format('commentHighlight', false)
+      //   console.log(2, this.quillEditor.getFormat())
+      // }
+
       this.combineAwaitingDeltas(delta)
       this.sendCombinedDelta()
     }
@@ -418,17 +423,6 @@ class RealtimeTextItem extends React.Component {
     }
   }
 
-  handleBlur = (range, source, editor) => {
-    // Check if something is being linked, which causes a blur event
-    const linker = this.quillEditor.container.querySelector(
-      '.ql-tooltip:not(.ql-hidden)'
-    )
-    if (linker) {
-      // if the linker is open then we don't want to trigger blur/cancel
-      return
-    }
-  }
-
   combineAwaitingDeltas = delta => {
     this.combinedDelta = this.combinedDelta.compose(delta)
     this.bufferDelta = this.bufferDelta.compose(delta)
@@ -439,22 +433,6 @@ class RealtimeTextItem extends React.Component {
     this.socketSend('cursor', {
       range: this.quillEditor.getSelection(),
     })
-  }
-
-  removeNewHighlights = delta => {
-    let justAddedHighlight = false
-    _.each(delta.ops, op => {
-      // don't persist any unpersisted comment highlights
-      if (
-        op.attributes &&
-        (op.attributes.commentHighlight === 'new' ||
-          op.attributes['data-comment-id'] === 'new')
-      ) {
-        justAddedHighlight = true
-        delete op['attributes']
-      }
-    })
-    return justAddedHighlight
   }
 
   _sendCombinedDelta = () => {
@@ -469,12 +447,18 @@ class RealtimeTextItem extends React.Component {
       return false
     }
 
+    const { item } = this.props
     this.currentlySending = true
-    const justAddedHighlight = this.removeNewHighlights(this.combinedDelta)
+    const contentWithNewHighlights = this.contentSnapshot.compose(
+      this.combinedDelta
+    )
+    // persist the change locally e.g. when we close the text box
+    this.setItemDataContent({ ...contentWithNewHighlights })
+
+    const justAddedHighlight = item.removeNewHighlights(this.combinedDelta)
     if (justAddedHighlight) {
       return
     }
-
     const full_content = this.contentSnapshot.compose(this.combinedDelta)
 
     // NOTE: will get rejected if this.version < server saved version,
@@ -486,9 +470,6 @@ class RealtimeTextItem extends React.Component {
       current_user_id: this.props.currentUserId,
     })
     this.sendCursor()
-
-    // persist the change locally e.g. when we close the text box
-    this.setItemDataContent({ ...full_content })
 
     // now that we have sent off our data, we can clear out what's in our buffer;
     // our combinedDelta won't clear out until we know it has successfully sent
@@ -535,7 +516,6 @@ class RealtimeTextItem extends React.Component {
       theme: 'snow',
       onChange: this.handleTextChange,
       onChangeSelection: this.handleSelectionChange,
-      onBlur: this.handleBlur,
       readOnly: !canEdit,
       modules: {
         toolbar: canEdit ? '#quill-toolbar' : null,
@@ -553,13 +533,7 @@ class RealtimeTextItem extends React.Component {
       >
         <DockedToolbar fullPageView={fullPageView}>
           {canEdit && (
-            <TextItemToolbar
-              quillEditor={this.quillEditor}
-              onExpand={onExpand}
-              highlightText={this.highlightText}
-              unhighlightText={this.unhighlightText}
-              onComment={this.onComment}
-            />
+            <TextItemToolbar onExpand={onExpand} onComment={this.onComment} />
           )}
           <CloseButton
             data-cy="TextItemClose"

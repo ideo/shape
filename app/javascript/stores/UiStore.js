@@ -914,27 +914,27 @@ export default class UiStore {
   }
 
   toggleCommentHighlight(record) {
-    const { currentQuillEditor } = this
-    if (!currentQuillEditor) return
-    if (record) {
-      currentQuillEditor.format('commentHighlight', 'new', 'user')
-    } else {
-      const { selectedTextRangeForCard } = this
-      const { range } = selectedTextRangeForCard
-      if (currentQuillEditor && range && range.length) {
-        currentQuillEditor.formatText(
-          range.index,
-          range.length,
-          'commentHighlight',
-          false,
-          'user'
-        )
-      }
-    }
+    const { currentQuillEditor, selectedTextRangeForCard } = this
+    const { range } = selectedTextRangeForCard
+    if (!currentQuillEditor || !range || !range.length) return
+
+    // if no record then un-highlight
+    const val = record ? 'new' : false
+    currentQuillEditor.formatText(
+      range.index,
+      range.length,
+      'commentHighlight',
+      val,
+      'user'
+    )
   }
 
   @action
   resetSelectedTextRange() {
+    const prevRecord = this.commentingOnRecord
+    if (prevRecord && prevRecord.isText) {
+      prevRecord.removeNewHighlights()
+    }
     this.selectedTextRangeForCard = { ...this.defaultSelectedTextRange }
   }
 

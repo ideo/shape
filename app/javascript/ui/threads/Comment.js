@@ -180,6 +180,7 @@ class Comment extends React.Component {
   }
 
   handleClick = e => {
+    const { uiStore } = this.props
     const { parentComment } = this
     const { editing } = this.state
     // filters out other click handlers nested inside the body
@@ -193,6 +194,7 @@ class Comment extends React.Component {
     }
     // we clicked some parent comment outside of our current comment/replies
     if (!this.isActive) {
+      uiStore.setCommentingOnRecord(null)
       this.collapseReplies()
       if (_.isEmpty(parentComment.replies)) {
         return
@@ -360,7 +362,12 @@ class Comment extends React.Component {
     const { comment } = this.props
     if (!comment.subject) return null
 
-    return <CommentSubject record={comment.subject} />
+    return (
+      <CommentSubject
+        record={comment.subject}
+        textContent={comment.text_highlight}
+      />
+    )
   }
 
   renderHeaderAndButtons() {
