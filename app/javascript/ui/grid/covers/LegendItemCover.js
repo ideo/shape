@@ -34,7 +34,14 @@ const PlusIconContainer = styled.span`
 
 const StyledLegendItem = styled.div`
   border-top: 2px solid #000;
-  overflow-y: scroll;
+  ${props =>
+    props.hasSearchInterface
+      ? `
+    overflow: visible;
+  `
+      : `
+    overflow-y: scroll;
+  `}
   padding: 12px 15px 12px 10px;
 `
 
@@ -357,7 +364,12 @@ class LegendItemCover extends React.Component {
     const { comparisonMenuOpen } = this.state
     let order = -1
     return (
-      <StyledLegendItem data-cy="LegendItemCover">
+      <StyledLegendItem
+        data-cy="LegendItemCover"
+        hasSearchInterface={
+          item.legend_search_source === 'search_test_collections'
+        }
+      >
         <StyledLegendTitle>{item.name}</StyledLegendTitle>
         {this.datasets({ selected: true }).map(dataset =>
           this.renderSelectedDataset({
