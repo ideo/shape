@@ -1,5 +1,5 @@
 class SerializableLegendItem < SerializableItem
-  attribute :legend_search_source
+  attributes :legend_search_source, :style
 
   has_many :datasets do
     data do
