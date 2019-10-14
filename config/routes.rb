@@ -58,7 +58,14 @@ Rails.application.routes.draw do
           end
         end
       end
-      resources :datasets, only: %i[index show create update destroy]
+      resources :datasets, only: %i[index show create update destroy] do
+        resources :roles, only: %i[index create destroy] do
+          collection do
+            delete '', action: 'destroy'
+            get 'will_become_private'
+          end
+        end
+      end
       resources :test_collections, only: %i[show] do
         member do
           get 'validate_launch'

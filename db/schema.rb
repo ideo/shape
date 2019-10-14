@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_01_195956) do
+ActiveRecord::Schema.define(version: 2019_10_14_212029) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -245,6 +245,8 @@ ActiveRecord::Schema.define(version: 2019_10_01_195956) do
     t.integer "application_id"
     t.jsonb "tiers", default: []
     t.string "name"
+    t.boolean "anyone_can_view", default: true
+    t.index ["anyone_can_view"], name: "index_datasets_on_anyone_can_view"
     t.index ["data_source_type", "data_source_id"], name: "index_datasets_on_data_source_type_and_data_source_id"
     t.index ["organization_id"], name: "index_datasets_on_organization_id"
   end

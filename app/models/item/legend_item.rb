@@ -69,7 +69,7 @@ class Item
     end
 
     def datasets_viewable_by(user)
-      datasets.viewable_by(user, user.current_organization).map do |dataset|
+      datasets.viewable_by_user(user).map do |dataset|
         dataset.cached_data_items_datasets = data_items_datasets_by_dataset_id[dataset.id]
         dataset
       end

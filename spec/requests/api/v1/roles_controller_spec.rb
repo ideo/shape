@@ -249,6 +249,42 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
         end
       end
     end
+
+    context 'on a dataset' do
+      let!(:application) { create(:application, add_orgs: [organization]) }
+      let!(:dataset) do
+        create(
+          :dataset,
+          :with_cached_data,
+          organization: organization,
+          application: application,
+        )
+      end
+      let(:path) { "/api/v1/datasets/#{dataset.id}/roles" }
+      let!(:role_name) { Role::VIEWER.to_s }
+      before do
+        user.update(application: application)
+      end
+
+      it 'returns a 204 no_content' do
+        post(path, params: params)
+        expect(response.status).to eq(204)
+      end
+
+      it 'adds role to dataset' do
+        expect(Roles::MassAssign).to receive(:new).with(
+          hash_including(
+            object: dataset,
+            users: users,
+            role_name: Role::VIEWER.to_s,
+            propagate_to_children: true,
+            new_role: true,
+            invited_by: user,
+          ),
+        )
+        post(path, params: params)
+      end
+    end
   end
 
   describe 'DELETE #destroy', create_org: true do

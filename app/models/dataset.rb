@@ -3,6 +3,7 @@
 # Table name: datasets
 #
 #  id               :bigint(8)        not null, primary key
+#  anyone_can_view  :boolean          default(TRUE)
 #  cached_data      :jsonb
 #  chart_type       :integer
 #  data_source_type :string
@@ -27,6 +28,7 @@
 #
 # Indexes
 #
+#  index_datasets_on_anyone_can_view                      (anyone_can_view)
 #  index_datasets_on_data_source_type_and_data_source_id  (data_source_type,data_source_id)
 #  index_datasets_on_organization_id                      (organization_id)
 #
@@ -52,6 +54,20 @@ class Dataset < ApplicationRecord
 
   scope :question_items, -> { where(type: 'Dataset::Question') }
   scope :without_groupings, -> { where("groupings = '[]'") }
+  scope :anyone_can_view, -> { where(anyone_can_view: true) }
+  scope :viewable_by_user, ->(user) {
+    group_ids = user.all_current_org_group_ids
+
+    joined = all.where(anyone_can_view: false)
+                .left_joins(roles: %i[users_roles groups_roles])
+
+    anyone_can_view
+      .union(
+        joined.where(UsersRole.arel_table[:user_id].eq(user.id)).or(
+          joined.where(GroupsRole.arel_table[:group_id].in(group_ids)),
+        ),
+      ).distinct
+  }
 
   attr_accessor :cached_data_items_datasets
 
