@@ -15,22 +15,35 @@ const ResolveIconHolder = styled.div`
   height: 16px;
   top: 3px;
   left: 9px;
+  cursor: pointer;
 `
 ResolveIconHolder.displayName = 'ResolveIconHolder'
 
 import CommentThumbnail from '~/ui/threads/CommentThumbnail'
 
 class CommentSubject extends React.Component {
+  handleResolve = e => {
+    e.preventDefault()
+    // TODO: should toggle comment state from open||reopened->closed, closed->reopened
+  }
+  renderResolveButton = () => {
+    // TODO: add status in props so the whole component rerenders
+    const status = 'opened' // fixme: remove once done
+    if (!status) return null
+    return (
+      <ResolveIconHolder onClick={this.handleResolve}>
+        {status !== 'closed' ? <CheckIcon /> : <ReopenIcon />}
+      </ResolveIconHolder>
+    )
+  }
   render() {
     const { record, textContent } = this.props
-    const status = 'closed' // FIXME: remove once record.comment is a thing
     return (
       <Flex>
         {/* how to get titlelines/ CommentThreadHeader#countLines from here? */}
         <CommentThumbnail record={record} iconTop={1} />
         {textContent}
-        /*FIXME: will render a huge icon, fix styling*/
-        {status === 'closed' ? <ReopenIcon /> : <CheckIcon />}
+        {this.renderResolveButton()}
       </Flex>
     )
   }
