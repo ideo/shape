@@ -95,7 +95,7 @@ class Dataset < ApplicationRecord
   # Implement in each sub-class
 
   def name
-    identifier
+    self[:name] || identifier
   end
 
   def title; end

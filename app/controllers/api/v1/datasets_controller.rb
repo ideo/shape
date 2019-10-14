@@ -104,6 +104,7 @@ class Api::V1::DatasetsController < Api::V1::BaseController
   def dataset_params
     params.require(:dataset).permit(
       :type,
+      :name,
       :identifier,
       :description,
       :max_domain,

@@ -13,7 +13,7 @@ import {
 import { Checkbox } from '~/ui/global/styled/forms'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import { Row, RowItemLeft } from '~/ui/global/styled/layout'
-import { ThumbnailHolder } from '~/ui/threads/CommentThread'
+import { ThumbnailHolder } from '~/ui/threads/CommentThreadHeader'
 import { BctButton } from '~/ui/grid/shared'
 import AlertIcon from '~/ui/icons/AlertIcon'
 import AddTextIcon from '~/ui/icons/AddTextIcon'
