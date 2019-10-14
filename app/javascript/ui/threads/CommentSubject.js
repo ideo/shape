@@ -6,6 +6,7 @@ import CheckIcon from '~/ui/icons/CheckIcon'
 import ReopenIcon from '~/ui/icons/ReopenIcon'
 import CommentThumbnail from '~/ui/threads/CommentThumbnail'
 import v from '~/utils/variables'
+import Tooltip from '~/ui/global/Tooltip'
 
 const ResolveIconHolder = styled.div`
   color: ${v.colors.commonLight};
@@ -39,19 +40,16 @@ class CommentSubject extends React.Component {
     return `${textContent}...`
   }
 
-  handleResolve = e => {
-    e.preventDefault()
-    // TODO: should toggle comment state from open||reopened->closed, closed->reopened
-  }
-
   renderResolveButton = () => {
-    // TODO: add status in props so the whole component rerenders
-    const status = 'opened' // fixme: remove once done
+    const { status, handleResolveButtonClick } = this.props
     if (!status) return null
+    const isResolved = status === 'resolved'
     return (
-      <ResolveIconHolder onClick={this.handleResolve}>
-        {status !== 'closed' ? <CheckIcon /> : <ReopenIcon />}
-      </ResolveIconHolder>
+      <Tooltip title={!isResolved ? 'resolve' : 're-open'} placement="top">
+        <ResolveIconHolder onClick={handleResolveButtonClick}>
+          {!isResolved ? <CheckIcon /> : <ReopenIcon />}
+        </ResolveIconHolder>
+      </Tooltip>
     )
   }
 
@@ -70,11 +68,14 @@ class CommentSubject extends React.Component {
 CommentSubject.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   textContent: PropTypes.string,
+  status: PropTypes.string,
+  handleResolveButtonClick: PropTypes.func.isRequired,
 }
 
 CommentSubject.defaultProps = {
   record: null,
   textContent: null,
+  status: null,
 }
 
 export default CommentSubject

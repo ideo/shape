@@ -216,12 +216,12 @@ class Comment extends React.Component {
     const { comment } = this.props
     const { status } = comment
     let newStatus = status
-    if (status === 'open') {
-      newStatus = 'closed'
-    } else if (status === 'closed') {
+    if (status === 'opened') {
+      newStatus = 'resolved'
+    } else if (status === 'resolved') {
       newStatus = 'reopened'
     } else if (status === 'reopened') {
-      newStatus = 'closed'
+      newStatus = 'resolved'
     }
     comment.status = newStatus
     await comment.save()
@@ -307,6 +307,17 @@ class Comment extends React.Component {
     this.initializeEditorState()
   }
 
+  handleResolveButtonClick = async e => {
+    e.preventDefault()
+    const { comment } = this.props
+    if (comment.status === 'opened' || comment.status === 'reopened') {
+      comment.status = 'resolved'
+    } else if (comment.status === 'resolved') {
+      comment.status = 'reopened'
+    }
+    await comment.save()
+  }
+
   formatCommentMessage(message) {
     const options = {
       format: {
@@ -360,12 +371,15 @@ class Comment extends React.Component {
 
   renderSubjectOfComment() {
     const { comment } = this.props
+    const { status } = comment
     if (!comment.subject) return null
 
     return (
       <CommentSubject
+        status={status}
         record={comment.subject}
         textContent={comment.text_highlight}
+        handleResolveButtonClick={this.handleResolveButtonClick}
       />
     )
   }

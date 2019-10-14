@@ -47,7 +47,7 @@ class Comment < ApplicationRecord
 
   enum status: {
     opened: 0,
-    closed: 1,
+    resolved: 1,
     reopened: 2,
   }
 
