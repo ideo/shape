@@ -188,6 +188,7 @@ class Comment extends React.Component {
       e.target.closest('.test-reply-comment') ||
       e.target.closest('.test-edit-comment') ||
       e.target.closest('.test-delete-comment') ||
+      e.target.closest('.resolve-comment') ||
       editing
     ) {
       return

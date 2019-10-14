@@ -42,6 +42,7 @@ class Comment < ApplicationRecord
   belongs_to :subject,
              optional: true,
              polymorphic: true
+  after_create :reopen_parent_after_reply!, if: :parent_is_resolved?
 
   validates :message, presence: true
 
@@ -113,5 +114,18 @@ class Comment < ApplicationRecord
 
   def replies_by_page(page: 1)
     replies.page(page).per(REPLIES_PER_PAGE)
+  end
+
+  def reopen_parent_after_reply!
+    CommentUpdater.call(
+      comment: parent,
+      message: parent.message,
+      status: :reopened,
+      draftjs_data: parent.draftjs_data,
+    )
+  end
+
+  def parent_is_resolved?
+    parent&.resolved?
   end
 end

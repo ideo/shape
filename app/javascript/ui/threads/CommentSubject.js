@@ -46,7 +46,10 @@ class CommentSubject extends React.Component {
     const isResolved = status === 'resolved'
     return (
       <Tooltip title={!isResolved ? 'resolve' : 're-open'} placement="top">
-        <ResolveIconHolder onClick={handleResolveButtonClick}>
+        <ResolveIconHolder
+          onClick={handleResolveButtonClick}
+          className="resolve-comment"
+        >
           {!isResolved ? <CheckIcon /> : <ReopenIcon />}
         </ResolveIconHolder>
       </Tooltip>

@@ -134,9 +134,13 @@ class CommentThread extends BaseRecord {
     // also store the author_id to simulate the serializer
     comment.author_id = apiStore.currentUserId
     if (commentData.parent_id) {
+      // will trigger rerender for parent comments that just got a reply
       const parent = apiStore.find('comments', commentData.parent_id)
       if (parent) {
         parent.replies_count += 1
+        if (parent.status === 'resolved') {
+          parent.status = 'reopened'
+        }
       }
     }
 
