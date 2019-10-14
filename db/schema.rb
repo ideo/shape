@@ -208,7 +208,7 @@ ActiveRecord::Schema.define(version: 2019_10_09_212511) do
     t.jsonb "draftjs_data"
     t.bigint "parent_id"
     t.integer "replies_count", default: 0
-    t.integer "status", default: 0
+    t.integer "status"
     t.integer "subject_id"
     t.string "subject_type"
     t.index ["comment_thread_id"], name: "index_comments_on_comment_thread_id"
@@ -248,6 +248,7 @@ ActiveRecord::Schema.define(version: 2019_10_09_212511) do
     t.jsonb "groupings", default: []
     t.integer "application_id"
     t.jsonb "tiers", default: []
+    t.string "name"
     t.index ["data_source_type", "data_source_id"], name: "index_datasets_on_data_source_type_and_data_source_id"
     t.index ["organization_id"], name: "index_datasets_on_organization_id"
   end

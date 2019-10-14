@@ -9,10 +9,11 @@ class CommentUpdater < SimpleService
 
   def call
     update_comment
-
+    status_changed_to_resolved = update_comment_status
     if @comment.save
       @comment.store_in_firestore
       create_edited_activity
+      create_resolved_activity if status_changed_to_resolved
       create_mention_notifications
       return true
     end
@@ -24,8 +25,15 @@ class CommentUpdater < SimpleService
 
   def update_comment
     @comment.message = @message
-    @comment.status = @status
     @comment.draftjs_data = @draftjs_data
+  end
+
+  def update_comment_status
+    if @comment.status != @status
+      @comment.status = @status
+      return true if @status == :resolved
+    end
+    false
   end
 
   def create_edited_activity
@@ -33,6 +41,15 @@ class CommentUpdater < SimpleService
       actor: @comment.author,
       target: @comment.comment_thread.record,
       action: :edited_comment,
+      content: @comment.message,
+    )
+  end
+
+  def create_resolved_activity
+    ActivityAndNotificationBuilder.call(
+      actor: @comment.author,
+      target: @comment.comment_thread.record,
+      action: :resolved_comment,
       content: @comment.message,
     )
   end

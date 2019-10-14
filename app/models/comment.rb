@@ -6,7 +6,7 @@
 #  draftjs_data      :jsonb
 #  message           :text
 #  replies_count     :integer          default(0)
-#  status            :integer          default("open")
+#  status            :integer
 #  subject_type      :string
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
@@ -46,7 +46,7 @@ class Comment < ApplicationRecord
   validates :message, presence: true
 
   enum status: {
-    open: 0,
+    opened: 0,
     closed: 1,
     reopened: 2,
   }
