@@ -57,7 +57,7 @@ gem 'appsignal'
 gem 'amoeba'
 
 # Background processing
-gem 'sidekiq'
+gem 'sidekiq', '~> 6'
 gem 'sidekiq-scheduler'
 
 # ElasticSearch wrapper
@@ -81,7 +81,7 @@ gem 'roadie-rails', '~> 1.3'
 gem 'httparty'
 
 # Redis in-memory caching
-gem 'redis'
+gem 'redis', '~> 4.1'
 
 # memcache
 gem 'dalli', '~> 2.7'
