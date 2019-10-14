@@ -53,7 +53,11 @@ class CommentThumbnail extends React.Component {
           </div>
         )
       } else {
-        content = <img src={record.filestack_file_url} alt="Text" />
+        let imageSource = ''
+        if (record.thumbnail_url) imageSource = record.thumbnail_url
+        if (record.filestack_file_url) imageSource = record.filestack_file_url
+
+        content = <img src={imageSource} alt={record.name} />
       }
     } else {
       content = (
