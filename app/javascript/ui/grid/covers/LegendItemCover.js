@@ -76,6 +76,7 @@ const AreaChartIcon = styled.span`
   height: 100%;
   background-color: ${props => props.color};
 `
+AreaChartIcon.displayName = 'AreaChartIcon'
 
 const DatasetIconWrapper = styled.span`
   display: inline-block;
