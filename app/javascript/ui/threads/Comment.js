@@ -364,6 +364,7 @@ class Comment extends React.Component {
 
     return (
       <CommentSubject
+        status={comment.status}
         record={comment.subject}
         textContent={comment.text_highlight}
       />

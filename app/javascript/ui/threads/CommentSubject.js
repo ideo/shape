@@ -45,9 +45,9 @@ class CommentSubject extends React.Component {
   }
 
   renderResolveButton = () => {
-    // TODO: add status in props so the whole component rerenders
-    const status = 'opened' // fixme: remove once done
+    const { status } = this.props
     if (!status) return null
+
     return (
       <ResolveIconHolder onClick={this.handleResolve}>
         {status !== 'closed' ? <CheckIcon /> : <ReopenIcon />}
@@ -70,11 +70,13 @@ class CommentSubject extends React.Component {
 CommentSubject.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   textContent: PropTypes.string,
+  status: PropTypes.string,
 }
 
 CommentSubject.defaultProps = {
   record: null,
   textContent: null,
+  status: null,
 }
 
 export default CommentSubject
