@@ -12,7 +12,14 @@ Quill.register(dataAttributor)
 class QuillTextHighlighter extends Inline {
   static create(value) {
     // NOTE: highlight uses <sub> as its HTML element
-    const node = document.createElement('sub')
+    let node = document.createElement('sub')
+    let disabled = false
+    if (value.indexOf('-resolved') > -1) {
+      // quill ops with -resolved will get no highlight
+      disabled = true
+      node = document.createElement('span')
+    }
+
     if (value) {
       dataAttributor.add(node, value)
     } else {
@@ -20,7 +27,7 @@ class QuillTextHighlighter extends Inline {
     }
 
     // add onClick handler...
-    if (value) {
+    if (value && !disabled) {
       node.onclick = e => {
         e.preventDefault()
         // apiStore.find('comments', value)
@@ -37,6 +44,6 @@ class QuillTextHighlighter extends Inline {
 }
 
 QuillTextHighlighter.blotName = 'commentHighlight'
-QuillTextHighlighter.tagName = ['sub']
+QuillTextHighlighter.tagName = ['sub', 'span']
 
 export default QuillTextHighlighter
