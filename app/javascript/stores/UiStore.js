@@ -871,12 +871,13 @@ export default class UiStore {
   }
 
   @action
-  setCommentingOnRecord(record) {
-    this.toggleCommentHighlight(record)
+  setCommentingOnRecord(record, { persisted = false } = {}) {
+    if (!persisted) {
+      this.toggleCommentHighlight(record)
+    }
     if (!record) {
       this.resetSelectedTextRange()
     }
-    // NOTE: this must be evaluated last since selectedTextRangeForCard is based on it?
     this.commentingOnRecord = record
   }
 
@@ -914,7 +915,11 @@ export default class UiStore {
   }
 
   toggleCommentHighlight(record) {
-    const { currentQuillEditor, selectedTextRangeForCard } = this
+    const {
+      currentQuillEditor,
+      commentingOnRecord,
+      selectedTextRangeForCard,
+    } = this
     const { range } = selectedTextRangeForCard
     if (!currentQuillEditor || !range || !range.length) return
 
@@ -924,15 +929,21 @@ export default class UiStore {
       range.index,
       range.length,
       'commentHighlight',
-      val,
-      'user'
+      val
     )
+    const currentRecord = record || commentingOnRecord
+    if (currentRecord && currentRecord.isText) {
+      // store any highlight changes on the item.data_content,
+      // particularly if this highlight was triggered externally e.g. TextActionMenu
+      currentRecord.data_content = currentQuillEditor.getContents()
+    }
   }
 
   @action
   resetSelectedTextRange() {
     const prevRecord = this.commentingOnRecord
     if (prevRecord && prevRecord.isText) {
+      console.log('dc2', [...prevRecord.data_content.ops])
       prevRecord.removeNewHighlights()
     }
     this.selectedTextRangeForCard = { ...this.defaultSelectedTextRange }

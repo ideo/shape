@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { action, observable } from 'mobx'
+import { action, runInAction, observable } from 'mobx'
 import { ReferenceType } from 'datx'
 
 import { apiUrl } from '~/utils/url'
@@ -17,6 +17,8 @@ class Item extends SharedRecordMixin(BaseRecord) {
   // starts null before it is loaded
   @observable
   inMyCollection = null
+  @observable
+  fullyLoaded = null
 
   attributesForAPI = [
     'type',
@@ -239,17 +241,24 @@ class Item extends SharedRecordMixin(BaseRecord) {
   }
 
   @action
-  API_persistHighlight(comment_id) {
+  async API_persistHighlight(comment_id) {
+    this.fullyLoaded = false
     _.each(this.data_content.ops, op => {
       if (
         op.attributes &&
         (op.attributes.commentHighlight === 'new' ||
           op.attributes['data-comment-id'] === 'new')
       ) {
-        op.attributes = { commentHighlight: comment_id }
+        op.attributes = {
+          commentHighlight: comment_id,
+          'data-comment-id': comment_id,
+        }
       }
     })
-    this.API_updateWithoutSync()
+    await this.API_updateWithoutSync({ cancel_sync: true })
+    // this is needed to reset the RealtimeTextItem with our new data_content
+    runInAction(() => (this.fullyLoaded = true))
+    return
   }
 
   removeNewHighlights = (delta = this.data_content) => {

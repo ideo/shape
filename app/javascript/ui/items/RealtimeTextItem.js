@@ -177,10 +177,10 @@ class RealtimeTextItem extends React.Component {
     this.setState({ disconnected: false })
   }
 
-  channelDisconnected = () => {
+  channelDisconnected = (message = 'Disconnected from channel') => {
     if (this.unmounted) return
     // TODO: do anything here? try to reconnect?
-    console.warn('Disconnected from channel')
+    console.warn(message)
     const { fullPageView } = this.props
     if (!fullPageView) {
       // this will cancel you out of the editor back to view-only mode
@@ -303,8 +303,10 @@ class RealtimeTextItem extends React.Component {
   setItemDataContent(fullContent = null) {
     const { item } = this.props
     const { quillEditor } = this
-    item.content = quillEditor.root.innerHTML
-    const delta = fullContent || quillEditor.getContents()
+    if (quillEditor) {
+      item.content = quillEditor.root.innerHTML
+    }
+    const delta = fullContent || (quillEditor && quillEditor.getContents())
     item.data_content = {
       ...delta,
       version: this.version,
@@ -439,10 +441,12 @@ class RealtimeTextItem extends React.Component {
     if (!this.combinedDelta.length() || this.currentlySending) {
       if (this.currentlySending && !this.currentlySendingCheck) {
         this.currentlySendingCheck = setTimeout(() => {
-          // if we are stuck 10s in this `currentlySending` mode it means our socketSends are
+          // if we are stuck 15s in this `currentlySending` mode it means our socketSends are
           // silently failing... we've probably been unsubscribed and it's throwing a backend error
-          if (this.currentlySending) this.channelDisconnected()
-        }, 10 * 1000)
+          if (this.currentlySending) {
+            this.channelDisconnected('stuck for 15s')
+          }
+        }, 15 * 1000)
       }
       return false
     }
@@ -455,10 +459,7 @@ class RealtimeTextItem extends React.Component {
     // persist the change locally e.g. when we close the text box
     this.setItemDataContent({ ...contentWithNewHighlights })
 
-    const justAddedHighlight = item.removeNewHighlights(this.combinedDelta)
-    if (justAddedHighlight) {
-      return
-    }
+    item.removeNewHighlights(this.combinedDelta)
     const full_content = this.contentSnapshot.compose(this.combinedDelta)
 
     // NOTE: will get rejected if this.version < server saved version,
