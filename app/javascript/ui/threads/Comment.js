@@ -213,21 +213,6 @@ class Comment extends React.Component {
     }
   }
 
-  toggleResolve = async () => {
-    const { comment } = this.props
-    const { status } = comment
-    let newStatus = status
-    if (status === 'opened') {
-      newStatus = 'resolved'
-    } else if (status === 'resolved') {
-      newStatus = 'reopened'
-    } else if (status === 'reopened') {
-      newStatus = 'resolved'
-    }
-    comment.status = newStatus
-    await comment.save()
-  }
-
   handleEditClick = () => {
     const { isReply } = this.props
     this.setState({ editing: true })
@@ -308,15 +293,22 @@ class Comment extends React.Component {
     this.initializeEditorState()
   }
 
-  handleResolveButtonClick = async e => {
+  handleBlur = e => {
+    // FIXME: CommentInput requires onBlur prop
+    return
+  }
+
+  handleResolveButtonClick = e => {
     e.preventDefault()
     const { comment } = this.props
-    if (comment.status === 'opened' || comment.status === 'reopened') {
-      comment.status = 'resolved'
-    } else if (comment.status === 'resolved') {
-      comment.status = 'reopened'
+    const { status } = comment
+    let newStatus = status
+    if (status === 'opened' || status === 'reopened') {
+      newStatus = 'resolved'
+    } else if (status === 'resolved') {
+      newStatus = 'reopened'
     }
-    await comment.save()
+    comment.API_resolveComment(newStatus)
   }
 
   formatCommentMessage(message) {
@@ -360,6 +352,7 @@ class Comment extends React.Component {
               onChange={this.handleInputChange}
               handleSubmit={this.handleSubmit}
               setEditor={this.setEditor}
+              onBlur={this.handleBlur}
             />
             <EditEnterButton focused>
               <ReturnArrowIcon />

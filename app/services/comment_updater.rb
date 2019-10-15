@@ -1,8 +1,7 @@
 class CommentUpdater < SimpleService
-  def initialize(comment:, message:, status:, draftjs_data:)
+  def initialize(comment:, message:, draftjs_data:)
     @comment = comment
     @message = message
-    @status = status
     @draftjs_data = draftjs_data
     @previous_mentions = comment.mentions
   end
@@ -12,7 +11,6 @@ class CommentUpdater < SimpleService
     if @comment.save
       @comment.store_in_firestore
       create_edited_activity
-      create_resolved_activity if @comment.resolved?
       create_mention_notifications
       return true
     end
@@ -24,7 +22,6 @@ class CommentUpdater < SimpleService
 
   def update_comment
     @comment.message = @message
-    @comment.status = @status
     @comment.draftjs_data = @draftjs_data
   end
 
@@ -33,15 +30,6 @@ class CommentUpdater < SimpleService
       actor: @comment.author,
       target: @comment.comment_thread.record,
       action: :edited_comment,
-      content: @comment.message,
-    )
-  end
-
-  def create_resolved_activity
-    ActivityAndNotificationBuilder.call(
-      actor: @comment.author,
-      target: @comment.comment_thread.record,
-      action: :resolved_comment,
       content: @comment.message,
     )
   end

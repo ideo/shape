@@ -130,6 +130,7 @@ Rails.application.routes.draw do
       resources :comments do
         member do
           get 'replies'
+          patch 'resolve'
         end
       end
       resources :comment_threads, only: %i[index show create subscribe unsubscribe] do

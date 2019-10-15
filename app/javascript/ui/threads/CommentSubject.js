@@ -42,7 +42,6 @@ class CommentSubject extends React.Component {
 
   renderResolveButton = () => {
     const { status, handleResolveButtonClick } = this.props
-    if (!status) return null
     const isResolved = status === 'resolved'
     return (
       <Tooltip title={!isResolved ? 'resolve' : 're-open'} placement="top">
@@ -57,12 +56,12 @@ class CommentSubject extends React.Component {
   }
 
   render() {
-    const { record } = this.props
+    const { record, status } = this.props
     return (
       <StyledCommentSubject>
         <CommentThumbnail record={record} iconTop={1} />
         {this.textContent}
-        {this.renderResolveButton()}
+        {status && this.renderResolveButton()}
       </StyledCommentSubject>
     )
   }
@@ -72,13 +71,14 @@ CommentSubject.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   textContent: PropTypes.string,
   status: PropTypes.string,
-  handleResolveButtonClick: PropTypes.func.isRequired,
+  handleResolveButtonClick: PropTypes.func,
 }
 
 CommentSubject.defaultProps = {
   record: null,
   textContent: null,
   status: null,
+  handleResolveButtonClick: null,
 }
 
 export default CommentSubject
