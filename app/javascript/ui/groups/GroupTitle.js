@@ -12,6 +12,7 @@ import EditPencilIcon from '~/ui/icons/EditPencilIcon'
 import FilestackUpload from '~/utils/FilestackUpload'
 import v from '~/utils/variables'
 import { uiStore } from '~/stores'
+import { GroupIconContainer } from '~/ui/groups/styles'
 
 const StyledTitleGrid = styled(Grid)`
   align-self: baseline;
@@ -133,6 +134,16 @@ class GroupTitle extends React.Component {
     )
   }
 
+  renderGroupIcon() {
+    const { group } = this.props
+    if (!group.icon_url) return
+    return (
+      <GroupIconContainer width="25px" marginLeft="12px">
+        <img src={group.icon_url} alt={`${group.name} Icon`} />
+      </GroupIconContainer>
+    )
+  }
+
   render() {
     const { group } = this.props
     return (
@@ -146,6 +157,7 @@ class GroupTitle extends React.Component {
               title={group.name}
               url={group.filestack_file_url}
               className="groupAvatar"
+              clickable={true}
               size={50}
             />
           </EditAvatarButton>
@@ -155,7 +167,10 @@ class GroupTitle extends React.Component {
             {this.editing ? (
               this.renderAutosize(group.name, 1.5, this.updateGroupName)
             ) : (
-              <StyledHeading2>{group.name}</StyledHeading2>
+              <StyledHeading2>
+                {group.name}
+                {this.renderGroupIcon()}
+              </StyledHeading2>
             )}
           </StyledTitleItem>
           <StyledTitleItem item>
