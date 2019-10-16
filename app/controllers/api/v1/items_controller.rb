@@ -100,6 +100,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
         :thumbnail_url,
         :legend_item_id,
         :legend_search_source,
+        :style,
         filestack_file_attributes: Item.filestack_file_attributes_whitelist,
       ].concat(Item.globalize_attribute_names),
     )
