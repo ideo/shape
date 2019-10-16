@@ -201,7 +201,7 @@ class PopoutMenu extends React.Component {
 
             return (
               <StyledMenuItem
-                key={`${name}-${id || ''}`}
+                key={`${name}-${id || i}`}
                 noBorder={item.noBorder}
                 loading={loading}
                 wrapperClassName={wrapperClassName}
