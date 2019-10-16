@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { Flyout, VictoryTooltip } from 'victory'
 
 import v from '~/utils/variables'
-import { theme } from '~/ui/test_collections/shared'
+import { victoryTheme } from '~/ui/global/charts/ChartUtils'
 
 const DotFlyout = props => (
   <g>
@@ -130,7 +130,7 @@ class ChartTooltip extends React.PureComponent {
       <g>
         <VictoryTooltip
           {...this.props}
-          theme={theme}
+          theme={victoryTheme}
           cornerRadius={cardArea === 1 ? 4 : 2}
           flyoutComponent={displayTicks ? <DotFlyout /> : <Flyout />}
           dx={dx * 5}

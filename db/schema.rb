@@ -246,6 +246,8 @@ ActiveRecord::Schema.define(version: 2019_10_15_192616) do
     t.integer "application_id"
     t.jsonb "tiers", default: []
     t.string "name"
+    t.boolean "anyone_can_view", default: true
+    t.index ["anyone_can_view"], name: "index_datasets_on_anyone_can_view"
     t.index ["data_source_type", "data_source_id"], name: "index_datasets_on_data_source_type_and_data_source_id"
     t.index ["organization_id"], name: "index_datasets_on_organization_id"
   end
@@ -446,6 +448,7 @@ ActiveRecord::Schema.define(version: 2019_10_15_192616) do
     t.integer "report_type"
     t.integer "legend_item_id"
     t.integer "legend_search_source"
+    t.jsonb "style"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
     t.index ["created_at"], name: "index_items_on_created_at"
