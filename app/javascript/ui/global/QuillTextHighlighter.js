@@ -1,4 +1,5 @@
 import { Quill } from 'react-quill'
+import { apiStore } from '~/stores'
 
 const Inline = Quill.import('blots/inline')
 const Parchment = Quill.import('parchment')
@@ -21,9 +22,13 @@ class QuillTextHighlighter extends Inline {
 
     // add onClick handler...
     if (value) {
-      node.onclick = e => {
+      node.onclick = async e => {
         e.preventDefault()
-        // apiStore.find('comments', value)
+        console.log(value)
+        const comment = await apiStore.find('comments', value)
+        console.log('comment subject record', comment.subject)
+        console.log('comment thread record', comment.thread.record)
+        apiStore.openCurrentThreadToCommentOn(comment.subject)
         console.log('here i am...', dataAttributor.value(node))
       }
     }

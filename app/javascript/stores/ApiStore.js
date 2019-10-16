@@ -405,9 +405,11 @@ class ApiStore extends jsonapi(datxCollection) {
     if (!viewingRecord) return
 
     const thread = this.findThreadForRecord(viewingRecord)
+
     uiStore.update('activityLogOpen', true)
     uiStore.expandThread(thread.key)
     uiStore.setCommentingOnRecord(record)
+
     return thread
   }
 
