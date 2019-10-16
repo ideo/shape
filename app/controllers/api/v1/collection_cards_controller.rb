@@ -405,6 +405,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
           :tiers,
           :data_source_type,
           :data_source_id,
+          :anyone_can_view,
           style: {},
           cached_data: %i[
             value

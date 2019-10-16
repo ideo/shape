@@ -69,7 +69,20 @@ class Item
       'Legend'
     end
 
+    def datasets_viewable_by(user)
+      datasets.viewable_by_user(user).map do |dataset|
+        dataset.cached_data_items_datasets = data_items_datasets_by_dataset_id[dataset.id]
+        dataset
+      end
+    end
+
     private
+
+    def data_items_datasets_by_dataset_id
+      @data_items_datasets_by_dataset_id ||= data_items_datasets.each_with_object({}) do |data_items_dataset, h|
+        h[data_items_dataset.dataset_id] = data_items_dataset
+      end
+    end
 
     def set_default_search_source
       self.legend_search_source = :search_test_collections

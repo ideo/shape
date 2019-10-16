@@ -245,6 +245,8 @@ ActiveRecord::Schema.define(version: 2019_10_14_230812) do
     t.integer "application_id"
     t.jsonb "tiers", default: []
     t.string "name"
+    t.boolean "anyone_can_view", default: true
+    t.index ["anyone_can_view"], name: "index_datasets_on_anyone_can_view"
     t.index ["data_source_type", "data_source_id"], name: "index_datasets_on_data_source_type_and_data_source_id"
     t.index ["organization_id"], name: "index_datasets_on_organization_id"
   end

@@ -3,13 +3,7 @@ class SerializableLegendItem < SerializableItem
 
   has_many :datasets do
     data do
-      @object.data_items_datasets.map do |data_items_datasets|
-        dataset = data_items_datasets.dataset
-        next if dataset.blank?
-
-        dataset.cached_data_items_datasets = data_items_datasets
-        dataset
-      end.compact.uniq
+      @object.datasets_viewable_by(@current_user)
     end
   end
 end
