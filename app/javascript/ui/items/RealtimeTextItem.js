@@ -465,7 +465,6 @@ class RealtimeTextItem extends React.Component {
       full_content,
       current_user_id: this.props.currentUserId,
     })
-    console.log('sending!', this.combinedDelta.ops)
     this.sendCursor()
 
     // now that we have sent off our data, we can clear out what's in our buffer;

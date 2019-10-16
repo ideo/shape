@@ -1,11 +1,11 @@
 import _ from 'lodash'
 import { apiStore, uiStore, undoStore } from '~/stores'
 
-// const quillEditorClick = e => {
-//   const quillSelectors =
-//     '.quill, .ql-close, .ql-toolbar, .ql-container, .ql-editor, .ql-clipboard, .quill-toolbar, .ql-formats, .ql-header, .ql-link, .ql-stroke'
-//   return e.target.closest(quillSelectors)
-// }
+const quillEditorClick = e => {
+  const quillSelectors =
+    '.quill, .ql-close, .ql-toolbar, .ql-container, .ql-editor, .ql-clipboard, .quill-toolbar, .ql-formats, .ql-header, .ql-link, .ql-stroke'
+  return e.target.closest(quillSelectors)
+}
 
 const emptySpaceClick = e => {
   const { target } = e
@@ -15,14 +15,22 @@ const emptySpaceClick = e => {
 }
 
 export const handleMouseDownSelection = e => {
-  // const { textEditingItem } = uiStore
-  // const outsideQuillMouseDown = !quillEditorClick(e) && textEditingItem
-  // if (outsideQuillMouseDown) {
-  //   // if we clicked outside the quill editor...
-  //   uiStore.update('textEditingItem', null)
-  // }
   const emptySpaceMouseDown = emptySpaceClick(e)
+  const { textEditingItem } = uiStore
+  const outsideQuillMouseDown = !quillEditorClick(e) && textEditingItem
   if (emptySpaceMouseDown) {
+    if (outsideQuillMouseDown) {
+      // if we clicked outside the quill editor...
+      const editing = uiStore.textEditingItem
+      if (editing && uiStore.commentingOnRecord === editing) {
+        uiStore.setCommentingOnRecord(null)
+      }
+      // we need a tiny delay so that the highlight gets properly unset
+      // before kicking out of the textEditingItem
+      setTimeout(() => {
+        uiStore.update('textEditingItem', null)
+      })
+    }
     // if we clicked an empty space...
     uiStore.deselectCards()
     uiStore.onEmptySpaceClick(e)

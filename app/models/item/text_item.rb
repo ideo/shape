@@ -121,9 +121,10 @@ class Item
       }
     end
 
+    # TODO: better universal way of handling this?
+    # perhaps separate data_content (just ops...) from version/last_10
     def data_content=(new_content = {})
-      puts "updating data_content"
-      super((self.data_content || {}).merge(new_content))
+      super((data_content || {}).merge(new_content))
     end
 
     private

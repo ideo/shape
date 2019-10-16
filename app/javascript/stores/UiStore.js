@@ -935,7 +935,10 @@ export default class UiStore {
     if (currentRecord && currentRecord.isText) {
       // store any highlight changes on the item.data_content,
       // particularly if this highlight was triggered externally e.g. TextActionMenu
-      currentRecord.data_content = currentQuillEditor.getContents()
+      currentRecord.data_content = {
+        ...currentRecord.data_content,
+        ...currentQuillEditor.getContents(),
+      }
     }
   }
 
