@@ -132,17 +132,6 @@ class CommentThreadHeader extends React.Component {
     return this.props.record
   }
 
-  objectLink() {
-    const { record } = this
-
-    if (record.internalType === 'collections') {
-      return routingStore.pathTo('collections', record.id)
-    } else if (record.internalType === 'items') {
-      return routingStore.pathTo('items', record.id)
-    }
-    return routingStore.pathTo('homepage')
-  }
-
   toggleSubscribe = ev => {
     if (ev) {
       ev.preventDefault()
@@ -225,7 +214,8 @@ class CommentThreadHeader extends React.Component {
           {/* left side */}
           <Flex style={{ height: '50px', overflow: 'hidden' }}>
             <CommentThumbnail
-              record={this.record}
+              threadRecord={thread.record}
+              subjectRecord={this.record}
               iconTop={this.titleLines === 1 ? 18 : 9}
             />
             <span

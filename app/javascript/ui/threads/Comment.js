@@ -360,12 +360,14 @@ class Comment extends React.Component {
 
   renderSubjectOfComment() {
     const { comment } = this.props
+
     if (!comment.subject) return null
 
     return (
       <CommentSubject
+        threadRecord={comment.thread.record}
+        subjectRecord={comment.subject}
         status={comment.status}
-        record={comment.subject}
         textContent={comment.text_highlight}
       />
     )

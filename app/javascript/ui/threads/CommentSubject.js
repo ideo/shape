@@ -30,9 +30,9 @@ const StyledCommentSubject = styled.div`
 
 class CommentSubject extends React.Component {
   get textContent() {
-    const { record, textContent } = this.props
+    const { threadRecord, textContent } = this.props
     if (!textContent) {
-      return record.name
+      return threadRecord.name
     }
 
     // also truncate textContent to a reasonable limit?
@@ -56,10 +56,15 @@ class CommentSubject extends React.Component {
   }
 
   render() {
-    const { record } = this.props
+    const { subjectRecord, threadRecord } = this.props
+
     return (
       <StyledCommentSubject>
-        <CommentThumbnail record={record} iconTop={1} />
+        <CommentThumbnail
+          subjectRecord={subjectRecord}
+          threadRecord={threadRecord}
+          iconTop={1}
+        />
         {this.textContent}
         {this.renderResolveButton()}
       </StyledCommentSubject>
@@ -68,13 +73,13 @@ class CommentSubject extends React.Component {
 }
 
 CommentSubject.propTypes = {
-  record: MobxPropTypes.objectOrObservableObject.isRequired,
+  subjectRecord: MobxPropTypes.objectOrObservableObject.isRequired,
+  threadRecord: MobxPropTypes.objectOrObservableObject.isRequired,
   textContent: PropTypes.string,
   status: PropTypes.string,
 }
 
 CommentSubject.defaultProps = {
-  record: null,
   textContent: null,
   status: null,
 }
