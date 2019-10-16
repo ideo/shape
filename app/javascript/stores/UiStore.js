@@ -943,7 +943,6 @@ export default class UiStore {
   resetSelectedTextRange() {
     const prevRecord = this.commentingOnRecord
     if (prevRecord && prevRecord.isText) {
-      console.log('dc2', [...prevRecord.data_content.ops])
       prevRecord.removeNewHighlights()
     }
     this.selectedTextRangeForCard = { ...this.defaultSelectedTextRange }

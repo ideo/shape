@@ -22,6 +22,8 @@ Quill.register('modules/cursors', QuillCursors)
 Quill.register('formats/link', QuillLink)
 Quill.register(QuillTextHighlighter)
 
+const Keyboard = Quill.import('modules/keyboard')
+
 const FULL_PAGE_TOP_PADDING = '2rem'
 const DockedToolbar = styled.div`
   background: white;
@@ -334,7 +336,6 @@ class RealtimeTextItem extends React.Component {
     // Check if user added newline
     // And if so, set their default text size if provided
     const newlineOpIndices = this.newlineIndicesForDelta(delta)
-
     // Return if there wasn't a specified header size in previous newline operation
     const prevHeaderSizeOp = delta.ops[_.last(newlineOpIndices)]
     if (!prevHeaderSizeOp.attributes || !prevHeaderSizeOp.attributes.header) {
@@ -396,12 +397,6 @@ class RealtimeTextItem extends React.Component {
       this.adjustHeaderSizeIfNewline(delta)
       const cursors = this.quillEditor.getModule('cursors')
       cursors.clearCursors()
-
-      // if (this.newlineIndicesForDelta(delta).length) {
-      //   console.log(1, this.quillEditor.getFormat())
-      //   this.quillEditor.format('commentHighlight', false)
-      //   console.log(2, this.quillEditor.getFormat())
-      // }
 
       this.combineAwaitingDeltas(delta)
       this.sendCombinedDelta()
@@ -470,6 +465,7 @@ class RealtimeTextItem extends React.Component {
       full_content,
       current_user_id: this.props.currentUserId,
     })
+    console.log('sending!', this.combinedDelta.ops)
     this.sendCursor()
 
     // now that we have sent off our data, we can clear out what's in our buffer;
@@ -503,6 +499,52 @@ class RealtimeTextItem extends React.Component {
     apiStore.openCurrentThreadToCommentOn(item)
   }
 
+  get keyBindings() {
+    const endOfHighlight = (range, context) => {
+      if (!context.format || !context.format.commentHighlight) {
+        return false
+      }
+      const nextFormat = this.quillEditor.getFormat(range.index + 1)
+      if (nextFormat && nextFormat.commentHighlight) {
+        return false
+      }
+      return true
+    }
+    const insertText = (index, char) => {
+      this.quillEditor.insertText(
+        index,
+        char,
+        { commentHighlight: false },
+        'user'
+      )
+      this.quillEditor.setSelection(index + 1)
+    }
+    return {
+      enter: {
+        key: Keyboard.keys.ENTER,
+        handler: (range, context) => {
+          if (endOfHighlight(range, context)) {
+            insertText(range.index, '\n')
+          } else {
+            // propagate to quill default newline behavior
+            return true
+          }
+        },
+      },
+      space: {
+        key: 32,
+        handler: (range, context) => {
+          if (endOfHighlight(range, context)) {
+            insertText(range.index, ' ')
+          } else {
+            // propagate to quill default newline behavior
+            return true
+          }
+        },
+      },
+    }
+  }
+
   render() {
     const { item, onExpand, fullPageView, containerRef } = this.props
     // item is not fully loaded yet, e.g. from a CommentThread
@@ -522,6 +564,9 @@ class RealtimeTextItem extends React.Component {
         toolbar: canEdit ? '#quill-toolbar' : null,
         cursors: {
           hideDelayMs: 3000,
+        },
+        keyboard: {
+          bindings: this.keyBindings,
         },
       },
     }

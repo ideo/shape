@@ -1,7 +1,7 @@
 class Api::V1::ItemsController < Api::V1::BaseController
-  deserializable_resource :item, class: DeserializableItem, only: %i[create update]
+  deserializable_resource :item, class: DeserializableItem, only: %i[create update highlight]
   load_and_authorize_resource :collection_card, only: :create
-  load_and_authorize_resource except: %i[update in_my_collection]
+  load_and_authorize_resource except: %i[update highlight in_my_collection]
 
   before_action :load_and_filter_index, only: %i[index]
   def index
@@ -35,6 +35,22 @@ class Api::V1::ItemsController < Api::V1::BaseController
       else
         broadcaster.call
       end
+      # cancel_sync means we don't want to render the item JSON
+      return if @cancel_sync
+
+      render jsonapi: @item, expose: { current_record: @item }
+    else
+      render_api_errors @item.errors
+    end
+  end
+
+  before_action :load_and_authorize_item_highlight, only: %i[highlight]
+  def highlight
+    @item.attributes = item_params
+    if TextItemHighlighter.call(item: @item, user: current_user)
+      log_item_activity(:edited) if log_activity?
+      broadcaster = CollectionUpdateBroadcaster.new(@item.parent, current_user)
+      broadcaster.text_item_updated(@item)
       # cancel_sync means we don't want to render the item JSON
       return if @cancel_sync
 
@@ -85,6 +101,11 @@ class Api::V1::ItemsController < Api::V1::BaseController
     authorize! :edit_content, @item
   end
 
+  def load_and_authorize_item_highlight
+    @item = Item.find(params[:id])
+    authorize! :read, @item
+  end
+
   def item_params
     params.require(:item).permit(
       [
@@ -103,6 +124,13 @@ class Api::V1::ItemsController < Api::V1::BaseController
         filestack_file_attributes: Item.filestack_file_attributes_whitelist,
       ].concat(Item.globalize_attribute_names),
     )
+  end
+
+  def item_content_params
+    params.require(:item).permit([
+      :content,
+      { data_content: {} },
+    ])
   end
 
   def log_item_activity(activity)

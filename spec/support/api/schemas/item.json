@@ -33,7 +33,8 @@
     "common_viewable": { "type": ["boolean", "null"] },
     "archived": { "type": ["boolean", "null"] },
     "is_restorable": { "type": ["boolean", "null"] },
-    "default_group_id": { "type": ["string", "null"] }
+    "default_group_id": { "type": ["string", "null"] },
+    "resolved_count": { "type": ["number", "null"] }
   },
   "required": ["class_type"]
 }

@@ -208,6 +208,8 @@ CardHeading.displayName = 'CardHeading'
 
 export const TextItemHeading1Css = css`
   ${CardHeadingCss};
+  /* need to preserve spaces in text items */
+  white-space: pre-wrap;
 
   && {
     color: ${v.colors.black};

@@ -55,22 +55,30 @@ class Item
 
     # build up a plaintext string of all the text content, with elements separated by pipes "|"
     # e.g. "Mission Statement | How might we do x..."
-    def plain_content(only_first_line: false, splitter: ' | ')
+    def plain_content(only_first_line: false, splitter: ' | ', data_content: self.data_content)
       ops = HashWithIndifferentAccess.new(data_content).try(:[], :ops)
       return '' unless ops.present?
+
       text = ''
-      ops.each_with_index do |data, i|
+      ops.each do |data|
         # strip out escaped strings e.g. "&lt;strong&gt;" if someone typed raw HTML
         # strip out extra whitespaces/newlines
         t = StripTags.new(data[:insert]).call
         # sometimes the data['insert'] is just a newline, ignore
-        next if t.empty?
+        # next if t.empty?
         return t if only_first_line
 
-        text += splitter if i.positive?
-        text += t
+        text += t.gsub(/\n+/, splitter).gsub(/\s+/, ' ')
       end
       CGI.unescapeHTML(text)
+    end
+
+    def plain_content_was
+      plain_content(data_content: data_content_was)
+    end
+
+    def plain_content_changed?
+      plain_content_was != plain_content
     end
 
     def threadlocked_transform_realtime_delta(user, data)
@@ -111,6 +119,11 @@ class Item
         version: full_content['version'],
         last_10: full_content['last_10'].as_json,
       }
+    end
+
+    def data_content=(new_content = {})
+      puts "updating data_content"
+      super((self.data_content || {}).merge(new_content))
     end
 
     private

@@ -17,8 +17,6 @@ class Item extends SharedRecordMixin(BaseRecord) {
   // starts null before it is loaded
   @observable
   inMyCollection = null
-  @observable
-  fullyLoaded = null
 
   attributesForAPI = [
     'type',
@@ -218,7 +216,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return _.find(this.primaryDataset.data_source_id, { type: 'Collection' })
   }
 
-  API_updateWithoutSync({ cancel_sync } = {}) {
+  API_updateWithoutSync({ cancel_sync = false, highlight = false } = {}) {
     const { apiStore } = this
     const data = this.toJsonApi()
     if (this.isText && data.attributes.data_content) {
@@ -227,8 +225,10 @@ class Item extends SharedRecordMixin(BaseRecord) {
     }
     // Turn off syncing when saving the item to not reload the page
     if (cancel_sync) data.cancel_sync = true
+    let endpoint = `items/${this.id}`
+    if (highlight) endpoint += '/highlight'
     return apiStore
-      .request(`items/${this.id}`, 'PATCH', {
+      .request(endpoint, 'PATCH', {
         data,
       })
       .catch(err => {
@@ -255,7 +255,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
         }
       }
     })
-    await this.API_updateWithoutSync({ cancel_sync: true })
+    await this.API_updateWithoutSync({ cancel_sync: true, highlight: true })
     // this is needed to reset the RealtimeTextItem with our new data_content
     runInAction(() => (this.fullyLoaded = true))
     return

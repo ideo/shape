@@ -50,6 +50,7 @@ Rails.application.routes.draw do
           patch 'archive'
           get 'in_my_collection'
           patch 'restore_permissions'
+          patch 'highlight'
         end
         resources :roles, only: %i[index create destroy] do
           collection do
