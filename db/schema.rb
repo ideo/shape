@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_14_212029) do
+ActiveRecord::Schema.define(version: 2019_10_14_230812) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -446,6 +446,7 @@ ActiveRecord::Schema.define(version: 2019_10_14_212029) do
     t.integer "report_type"
     t.integer "legend_item_id"
     t.integer "legend_search_source"
+    t.jsonb "style"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
     t.index ["created_at"], name: "index_items_on_created_at"
