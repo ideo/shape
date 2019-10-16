@@ -141,7 +141,6 @@ gem 'active_record_union'
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
-  # Adds support for Capybara system testing and selenium driver
   gem 'action-cable-testing'
   gem 'active_record_query_trace'
   gem 'capybara', '~> 2.13'
@@ -154,7 +153,6 @@ group :development, :test do
   gem 'pry-rails'
   gem 'rails-controller-testing'
   gem 'rspec-rails', '~> 3.7'
-  gem 'selenium-webdriver'
 end
 
 group :development do
