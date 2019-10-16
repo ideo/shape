@@ -62,7 +62,6 @@ Rails.application.routes.draw do
         resources :roles, only: %i[index create destroy] do
           collection do
             delete '', action: 'destroy'
-            get 'will_become_private'
           end
         end
       end
