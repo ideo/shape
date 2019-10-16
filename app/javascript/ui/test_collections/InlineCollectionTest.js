@@ -74,10 +74,12 @@ class InlineCollectionTest extends React.Component {
           <CommentThreadHeader record={collection} sticky />
           <ThemeProvider theme={styledTestTheme('secondary')}>
             <SurveyClosed>
-              <DisplayText>Thank you for stopping by!</DisplayText>
+              <DisplayText color="white">
+                Thank you for stopping by!
+              </DisplayText>
               <br />
               <br />
-              <DisplayText>
+              <DisplayText color="white">
                 Feedback on {collection.name} is finished.
               </DisplayText>
               <Tooltip
