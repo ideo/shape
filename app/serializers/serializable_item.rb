@@ -17,7 +17,7 @@ class SerializableItem < BaseJsonSerializer
     :question_title,
     :question_description,
     :archived,
-    :resolved_count
+    :unresolved_count
   )
 
   has_many :roles do

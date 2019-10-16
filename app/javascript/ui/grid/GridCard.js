@@ -23,6 +23,7 @@ import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
 import RequiredCollectionIcon from '~/ui/icons/RequiredCollectionIcon'
 import RestoreIcon from '~/ui/icons/RestoreIcon'
 import PinnedIcon from '~/ui/icons/PinnedIcon'
+import CommentIconFilled from '~/ui/icons/CommentIconFilled'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
 import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
 import Tooltip from '~/ui/global/Tooltip'
@@ -137,6 +138,24 @@ class GridCard extends React.Component {
         iconAmount={iconAmount}
       >
         {icon}
+      </StyledBottomLeftIcon>
+    )
+  }
+
+  get renderCommentNotificationIcon() {
+    const { record } = this.props
+    if (!record.unresolved_count) return null
+
+    return (
+      <StyledBottomLeftIcon>
+        <Tooltip title="Add Comment" placement="bottom">
+          <span>
+            <span>{record.unresolved_count}</span>
+            <span style={{ color: v.colors.alert }}>
+              <CommentIconFilled />
+            </span>
+          </span>
+        </Tooltip>
       </StyledBottomLeftIcon>
     )
   }
@@ -552,6 +571,7 @@ class GridCard extends React.Component {
           !record.archived &&
           this.renderTopRightActions()}
         {this.renderIcon}
+        {this.renderCommentNotificationIcon}
         {this.renderHidden}
         {/* onClick placed here so it's separate from hotspot click */}
         <StyledGridCardInner

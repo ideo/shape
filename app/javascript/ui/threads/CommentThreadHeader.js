@@ -171,9 +171,11 @@ class CommentThreadHeader extends React.Component {
     }
   }
 
+  // TODO: extract to individual component
   renderUnreadCount = () => {
     const { thread } = this.props
     if (!thread.unreadCount) return null
+
     return (
       <span className={`unread ${thread.unreadCount && 'show-unread'}`}>
         <span className="inner">
