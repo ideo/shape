@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_01_195956) do
+ActiveRecord::Schema.define(version: 2019_10_15_212000) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -128,6 +128,15 @@ ActiveRecord::Schema.define(version: 2019_10_01_195956) do
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
     t.index ["templated_from_id"], name: "index_collection_cards_on_templated_from_id"
     t.index ["type"], name: "index_collection_cards_on_type"
+  end
+
+  create_table "collection_filters", force: :cascade do |t|
+    t.integer "filter_type"
+    t.string "text"
+    t.bigint "collection_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["collection_id"], name: "index_collection_filters_on_collection_id"
   end
 
   create_table "collection_translations", force: :cascade do |t|
@@ -606,6 +615,16 @@ ActiveRecord::Schema.define(version: 2019_10_01_195956) do
     t.datetime "closed_at"
     t.index ["audience_id"], name: "index_test_audiences_on_audience_id"
     t.index ["test_collection_id"], name: "index_test_audiences_on_test_collection_id"
+  end
+
+  create_table "user_collection_filters", force: :cascade do |t|
+    t.boolean "selected", default: true
+    t.bigint "collection_filter_id"
+    t.bigint "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["collection_filter_id"], name: "index_user_collection_filters_on_collection_filter_id"
+    t.index ["user_id"], name: "index_user_collection_filters_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|

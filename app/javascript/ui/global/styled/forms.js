@@ -141,19 +141,20 @@ ImageField.displayName = 'StyledImageField'
 /** @component */
 export const Pill = styled(Chip)`
   &.pill {
-    padding: 7px;
+    padding: 2px 7px;
     margin: 5px;
     font-weight: ${v.weights.medium};
     font-family: ${v.fonts.sans};
     font-size: 1rem;
     justify-content: flex-start;
-    background-color: ${v.colors.commonLightest};
+    height: 28px;
+    background-color: ${v.colors.commonMediumTint};
     border-radius: 0;
   }
 
   &.avatar {
-    height: 38px;
-    width: 38px;
+    height: 28px;
+    width: 28px;
   }
 `
 Pill.displayName = 'StyledPill'

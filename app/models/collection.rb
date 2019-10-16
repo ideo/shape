@@ -174,6 +174,7 @@ class Collection < ApplicationRecord
            source: :item,
            class_name: 'Item::DataItem',
            through: :primary_collection_cards
+  has_many :collection_filters
 
   delegate :parent, :pinned, :pinned?, :pinned_and_locked?,
            to: :parent_collection_card, allow_nil: true
@@ -304,6 +305,7 @@ class Collection < ApplicationRecord
       :collection_cover_items,
       :test_audiences,
       :restorable_parent,
+      :collection_filters,
       roles: %i[pending_users users groups resource],
     ]
   end

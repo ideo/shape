@@ -8,6 +8,8 @@ import CopyToClipboard from 'react-copy-to-clipboard'
 import EditableName from '~/ui/pages/shared/EditableName'
 import RolesModal from '~/ui/roles/RolesModal'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
+import FilterBar from '~/ui/pages/FilterBar'
+import FilterIcon from '~/ui/icons/FilterIcon'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import HiddenIconButton from '~/ui/icons/HiddenIconButton'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
@@ -62,6 +64,14 @@ const HeaderButtonContainer = styled.span`
   margin-top: 10px;
 `
 
+const FilterIconHolder = styled.div`
+  align-self: flex-end;
+  height: 40px;
+  margin-bottom: -20px;
+  margin-right: 10px;
+  width: 35px;
+`
+
 @inject('uiStore')
 @observer
 class PageHeader extends React.Component {
@@ -102,6 +112,11 @@ class PageHeader extends React.Component {
     ev.preventDefault()
     const { record } = this.props
     record.restore()
+  }
+
+  handleFilterClick = ev => {
+    ev.preventDefault()
+    console.log('filter click')
   }
 
   openMoveMenuForTemplate = e => {
@@ -355,7 +370,11 @@ class PageHeader extends React.Component {
     const rolesRecord = uiStore.rolesMenuOpen ? uiStore.rolesMenuOpen : record
 
     return (
-      <StyledHeader pageHeader data-empty-space-click>
+      <StyledHeader
+        pageHeader
+        data-empty-space-click
+        bottomPadding={record.isCollection ? 0.2 : 1.875}
+      >
         <MaxWidthContainer>
           <RolesModal record={rolesRecord} open={!!uiStore.rolesMenuOpen} />
           <div>
@@ -400,6 +419,14 @@ class PageHeader extends React.Component {
                 </HeaderButtonContainer>
               </Flex>
 
+              {record.isCollection && this.canEdit && (
+                <FilterIconHolder align="flex-end">
+                  <button onClick={this.handleFilterClick}>
+                    <FilterIcon />
+                  </button>
+                </FilterIconHolder>
+              )}
+
               {record.show_language_selector && (
                 <Flex
                   style={{ position: 'relative', top: '15px', height: '33px' }}
@@ -408,6 +435,12 @@ class PageHeader extends React.Component {
                 </Flex>
               )}
             </StyledTitleAndRoles>
+            {record.isCollection && (
+              <FilterBar
+                filters={record.collection_filters}
+                canEdit={this.canEdit}
+              />
+            )}
           </div>
         </MaxWidthContainer>
         <TagEditorModal
