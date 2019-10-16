@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { RouterStore } from 'mobx-react-router'
 import { computed, observable, action } from 'mobx'
 import queryString from 'query-string'
@@ -10,7 +11,13 @@ class RoutingStore extends RouterStore {
   previousPageBeforeSearch = null
   routingTo = { type: null, id: null }
 
-  slug = () => apiStore.currentOrgSlug
+  get slug() {
+    const { currentOrgSlug } = apiStore
+    if (currentOrgSlug) return currentOrgSlug
+    if (!this.location) return ''
+
+    return _.first(_.compact(this.location.pathname.split('/')))
+  }
 
   @observable
   scrollStates = {} // collection page scroll states
@@ -55,14 +62,15 @@ class RoutingStore extends RouterStore {
   }
 
   pathTo = (type, id = null, params = {}) => {
+    const { slug } = this
     switch (type) {
       case 'collections':
-        return `/${this.slug()}/collections/${id}`
+        return `/${slug}/collections/${id}`
       case 'items':
-        return `/${this.slug()}/items/${id}`
+        return `/${slug}/items/${id}`
       case 'search':
         // `id` means query in this case
-        const path = `/${this.slug()}/search`
+        const path = `/${slug}/search`
         const queryString = id ? `?q=${encodeURIComponent(id)}` : ''
         if (queryString.length > 0) {
           return `${path}${queryString}&${stringifyUrlParams(params)}`
@@ -72,7 +80,7 @@ class RoutingStore extends RouterStore {
         return '/admin'
       case 'homepage':
       default:
-        return `/${this.slug()}`
+        return `/${slug}`
     }
   }
 
