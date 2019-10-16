@@ -17,6 +17,7 @@
 #  name                       :string
 #  question_type              :integer
 #  report_type                :integer
+#  style                      :jsonb
 #  thumbnail_url              :string
 #  type                       :string
 #  unarchived_at              :datetime

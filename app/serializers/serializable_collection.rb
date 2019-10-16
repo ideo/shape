@@ -93,8 +93,7 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   attribute :can_view do
-    # intentionally not using ability so `anyone_can_view?` does not return true
-    @current_user ? @object.can_view?(@current_user) : false
+    @current_ability.can?(:read, @object)
   end
 
   attribute :can_edit do

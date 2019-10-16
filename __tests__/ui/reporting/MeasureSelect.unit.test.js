@@ -1,13 +1,13 @@
 import MeasureSelect from '~/ui/reporting/MeasureSelect'
 import { SelectOption } from '~/ui/global/styled/forms'
-import { fakeItem, fakeDataset } from '#/mocks/data'
+import { fakeDataItem, fakeDataset } from '#/mocks/data'
 
 const props = {}
 let wrapper
 describe('MeasureSelect', () => {
   beforeEach(() => {
     props.item = {
-      ...fakeItem,
+      ...fakeDataItem,
       datasets: [fakeDataset],
       primaryDataset: fakeDataset,
     }
