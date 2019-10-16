@@ -1,5 +1,5 @@
 class Api::V1::CommentsController < Api::V1::BaseController
-  deserializable_resource :comment, class: DeserializableComment, only: %i[create update]
+  deserializable_resource :comment, class: DeserializableComment, only: %i[create update resolve]
   load_and_authorize_resource :comment_thread, only: %i[index create]
   load_and_authorize_resource :comment, only: %i[destroy update]
   def index
@@ -15,7 +15,7 @@ class Api::V1::CommentsController < Api::V1::BaseController
     ]
   end
 
-  before_action :load_and_authorize_comment, only: %i[replies]
+  before_action :load_and_authorize_comment, only: %i[replies resolve]
   def replies
     paginated_replies = @comment.replies_by_page(page: @page).includes(:author)
     render jsonapi: paginated_replies, include: %i[
@@ -55,8 +55,21 @@ class Api::V1::CommentsController < Api::V1::BaseController
     success = CommentUpdater.call(
       comment: @comment,
       message: comment_params[:message],
-      status: comment_params[:status],
       draftjs_data: comment_params[:draftjs_data],
+    )
+
+    if success
+      render jsonapi: @comment
+    else
+      render_api_errors @comment.errors
+    end
+  end
+
+  def resolve
+    success = CommentResolver.call(
+      comment: @comment,
+      user: current_user,
+      status: comment_params[:status],
     )
 
     if success

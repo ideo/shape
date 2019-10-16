@@ -16,7 +16,7 @@ module Commentable
   end
 
   def resolved_count
-    comment_thread&.comments&.select{|c| c.closed?}&.count
+    comment_thread&.comments&.select{|c| c.resolved?}&.count
   end
 
   def remove_comment_followers!

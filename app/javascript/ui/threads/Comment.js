@@ -188,6 +188,7 @@ class Comment extends React.Component {
       e.target.closest('.test-reply-comment') ||
       e.target.closest('.test-edit-comment') ||
       e.target.closest('.test-delete-comment') ||
+      e.target.closest('.resolve-comment') ||
       editing
     ) {
       return
@@ -210,21 +211,6 @@ class Comment extends React.Component {
       const { parentComment } = this
       parentComment.expandAndFetchReplies()
     }
-  }
-
-  toggleResolve = async () => {
-    const { comment } = this.props
-    const { status } = comment
-    let newStatus = status
-    if (status === 'open') {
-      newStatus = 'closed'
-    } else if (status === 'closed') {
-      newStatus = 'reopened'
-    } else if (status === 'reopened') {
-      newStatus = 'closed'
-    }
-    comment.status = newStatus
-    await comment.save()
   }
 
   handleEditClick = () => {
@@ -307,6 +293,24 @@ class Comment extends React.Component {
     this.initializeEditorState()
   }
 
+  handleBlur = e => {
+    // FIXME: CommentInput requires onBlur prop
+    return
+  }
+
+  handleResolveButtonClick = e => {
+    e.preventDefault()
+    const { comment } = this.props
+    const { status } = comment
+    let newStatus = status
+    if (status === 'opened' || status === 'reopened') {
+      newStatus = 'resolved'
+    } else if (status === 'resolved') {
+      newStatus = 'reopened'
+    }
+    comment.API_resolveComment(newStatus)
+  }
+
   formatCommentMessage(message) {
     const options = {
       format: {
@@ -348,6 +352,7 @@ class Comment extends React.Component {
               onChange={this.handleInputChange}
               handleSubmit={this.handleSubmit}
               setEditor={this.setEditor}
+              onBlur={this.handleBlur}
             />
             <EditEnterButton focused>
               <ReturnArrowIcon />
@@ -360,12 +365,15 @@ class Comment extends React.Component {
 
   renderSubjectOfComment() {
     const { comment } = this.props
+    const { status } = comment
     if (!comment.subject) return null
 
     return (
       <CommentSubject
+        status={status}
         record={comment.subject}
         textContent={comment.text_highlight}
+        handleResolveButtonClick={this.handleResolveButtonClick}
       />
     )
   }
