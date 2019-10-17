@@ -57,7 +57,8 @@ class LinkToSharedCollectionsWorker
   end
 
   def card_order(object, collection)
-    return -1 if object.is_a?(Collection::ApplicationCollection)
+    # If sharing C∆/App collection, always put it at the beginning of your 'My Collection'
+    return -1 if object.parent_application_collection.present?
 
     collection.collection_cards.count
   end
