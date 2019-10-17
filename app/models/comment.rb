@@ -76,7 +76,7 @@ class Comment < ApplicationRecord
 
     highlight = ''
     Hashie::Mash.new(subject.data_content).ops.each do |op|
-      comment_id = op.attributes&.commentHighlight
+      comment_id = op.attributes&.commentHighlight || op.attributes&.commentHighlightResolved
       if comment_id && comment_id.to_s == id.to_s
         highlight += " #{op.insert}"
       end

@@ -153,7 +153,7 @@ class CommentThread extends BaseRecord {
       // set this now as it won't have be present until the text item has saved
       comment.text_highlight = uiStore.selectedTextRangeForCard.textContent
       // don't have to "await" this
-      commentingOnRecord.API_persistHighlight(comment.id)
+      await commentingOnRecord.API_persistHighlight(comment.id)
     }
     uiStore.setCommentingOnRecord(null, { persisted: true })
 

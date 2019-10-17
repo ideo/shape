@@ -1,49 +1,70 @@
 import { Quill } from 'react-quill'
 
 const Inline = Quill.import('blots/inline')
-const Parchment = Quill.import('parchment')
+// const Parchment = Quill.import('parchment')
 
-const dataAttributor = new Parchment.Attributor.Attribute(
-  'data-comment-id',
-  'data-comment-id'
-)
-Quill.register(dataAttributor)
+// const dataAttributor = new Parchment.Attributor.Attribute(
+//   'data-comment-id',
+//   'data-comment-id'
+// )
+// Quill.register(dataAttributor)
+//
+// const dataAttributorResolved = new Parchment.Attributor.Attribute(
+//   'data-resolved-comment-id',
+//   'data-resolved-comment-id'
+// )
+// Quill.register(dataAttributorResolved)
+//
+// const highlightStyleAttributor = new Parchment.Attributor.Class(
+//   'highlight',
+//   'highlighted'
+// )
+// Quill.register(highlightStyleAttributor)
 
-class QuillTextHighlighter extends Inline {
+export class QuillInlineData extends Inline {
   static create(value) {
-    // NOTE: highlight uses <sub> as its HTML element
-    let node = document.createElement('sub')
-    let disabled = false
-    if (value.indexOf('-resolved') > -1) {
-      // quill ops with -resolved will get no highlight
-      disabled = true
-      node = document.createElement('span')
-    }
+    const node = super.create()
+    node.setAttribute(this.attribute, value)
+    return node
+  }
 
-    if (value) {
-      dataAttributor.add(node, value)
+  static formats(domNode) {
+    return domNode.getAttribute(this.attribute) || true
+  }
+
+  format(name, value) {
+    if (name === 'commentHighlight' && value) {
+      this.domNode.setAttribute(this.constructor.attribute, value)
     } else {
-      dataAttributor.remove(node)
+      super.format(name, value)
     }
+  }
 
-    // add onClick handler...
-    if (value && !disabled) {
+  formats() {
+    const formats = super.formats()
+    formats[this.blotName] = this.constructor.formats(this.domNode)
+    return formats
+  }
+}
+
+export class QuillHighlighter extends QuillInlineData {
+  static create(value) {
+    const node = super.create(value)
+    if (value) {
       node.onclick = e => {
         e.preventDefault()
-        // apiStore.find('comments', value)
-        console.log('here i am...', dataAttributor.value(node))
+        console.log('clicked highlight', QuillHighlighter.formats(node))
       }
     }
     return node
   }
-
-  static formats(node) {
-    // preserve data attribute if already set
-    return dataAttributor.value(node)
-  }
 }
 
-QuillTextHighlighter.blotName = 'commentHighlight'
-QuillTextHighlighter.tagName = ['sub', 'span']
+QuillHighlighter.blotName = 'commentHighlight'
+QuillHighlighter.tagName = 'sub'
+QuillHighlighter.attribute = 'data-comment-id'
 
-export default QuillTextHighlighter
+// export class QuillHighlightResolver extends QuillInlineData {}
+// QuillHighlightResolver.blotName = 'commentHighlightResolved'
+// QuillHighlightResolver.tagName = 'span'
+// QuillHighlightResolver.attributor = dataAttributorResolved

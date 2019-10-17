@@ -248,7 +248,7 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
     let(:params) do
       json_api_params(
         'items',
-        data_content: highlighted_data_content,
+        quill_data: highlighted_data_content,
       )
     end
     let(:broadcaster) { double('broadcaster') }
@@ -264,9 +264,9 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
     end
 
     it 'updates the content' do
-      expect(item.data_content['ops']).to eq(data_content['ops'])
+      expect(item.ops).to eq(data_content['ops'])
       patch(path, params: params)
-      expect(item.reload.data_content['ops']).to eq(highlighted_data_content['ops'])
+      expect(item.reload.ops).to eq(highlighted_data_content['ops'])
     end
 
     it 'preserves the data_content.version' do

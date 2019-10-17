@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { action, runInAction, observable } from 'mobx'
+import { action, observable } from 'mobx'
 import { ReferenceType } from 'datx'
 
 import { apiUrl } from '~/utils/url'
@@ -22,7 +22,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
     'type',
     'name',
     'content',
-    'data_content',
+    'quill_data',
     'url',
     'image',
     'archived',
@@ -216,12 +216,17 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return _.find(this.primaryDataset.data_source_id, { type: 'Collection' })
   }
 
-  API_updateWithoutSync({ cancel_sync = false, highlight = false } = {}) {
+  API_updateWithoutSync({
+    cancel_sync = false,
+    quill_data = null,
+    highlight = false,
+  } = {}) {
     const { apiStore } = this
     const data = this.toJsonApi()
-    if (this.isText && data.attributes.data_content) {
-      // scrub new highlights before saving
-      this.removeNewHighlights(data.attributes.data_content)
+    if (this.isText && data.attributes.quill_data) {
+      if (quill_data) {
+        data.attributes.quill_data = quill_data
+      }
     }
     // Turn off syncing when saving the item to not reload the page
     if (cancel_sync) data.cancel_sync = true
@@ -242,26 +247,26 @@ class Item extends SharedRecordMixin(BaseRecord) {
 
   @action
   async API_persistHighlight(comment_id) {
-    this.fullyLoaded = false
-    _.each(this.data_content.ops, op => {
-      if (
-        op.attributes &&
-        (op.attributes.commentHighlight === 'new' ||
-          op.attributes['data-comment-id'] === 'new')
-      ) {
+    const { currentQuillEditor } = this.uiStore
+    if (!currentQuillEditor) return
+
+    const delta = currentQuillEditor.getContents()
+    _.each(delta.ops, op => {
+      if (op.attributes && op.attributes.commentHighlight === 'new') {
         op.attributes = {
           commentHighlight: comment_id,
-          'data-comment-id': comment_id,
         }
       }
     })
-    await this.API_updateWithoutSync({ cancel_sync: true, highlight: true })
-    // this is needed to reset the RealtimeTextItem with our new data_content
-    runInAction(() => (this.fullyLoaded = true))
+    await this.API_updateWithoutSync({
+      cancel_sync: true,
+      quill_data: delta,
+      highlight: true,
+    })
     return
   }
 
-  removeNewHighlights = (delta = this.data_content) => {
+  removeNewHighlights = (delta = this.quill_data) => {
     let justAddedHighlight = false
     _.each(delta.ops, op => {
       // don't persist any unpersisted comment highlights
@@ -276,12 +281,24 @@ class Item extends SharedRecordMixin(BaseRecord) {
     })
     return justAddedHighlight
   }
+
+  hasHighlightFormatting = (delta = this.quill_data) => {
+    let found = false
+    _.each(delta.ops, op => {
+      // could include commentHighlight === false
+      if (op.attributes && _.keys(op.attributes, 'commentHighlight')) {
+        found = true
+      }
+    })
+    return found
+  }
 }
 
 Item.defaults = {
-  data_content: '',
+  quill_data: { ops: [] },
   can_edit: false,
   thumbnail_url: '',
+  version: 0,
 }
 Item.refDefaults = {
   roles: {

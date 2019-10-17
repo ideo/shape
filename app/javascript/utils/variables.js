@@ -197,7 +197,12 @@ export default {
   },
 
   quillDefaults: {
-    formats: ['link', 'header', 'commentHighlight'],
+    formats: [
+      'link',
+      'header',
+      'commentHighlight',
+      // 'commentHighlightResolved'
+    ],
     modules: {
       toolbar: null,
     },

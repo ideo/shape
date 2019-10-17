@@ -4,7 +4,8 @@ class SerializableItem < BaseJsonSerializer
   attributes(
     :name,
     :content,
-    :data_content,
+    :quill_data,
+    :version,
     :url,
     :thumbnail_url,
     :icon_url,

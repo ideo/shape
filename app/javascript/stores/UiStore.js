@@ -883,8 +883,9 @@ export default class UiStore {
 
   isCommentingOnTextRange() {
     const { commentingOnRecord } = this
+    if (!commentingOnRecord) return false
     const card = commentingOnRecord.parent_collection_card
-    if (!commentingOnRecord || !card) return false
+    if (!card) return false
 
     return this.cardHasSelectedTextRange(card.id)
   }
@@ -929,15 +930,23 @@ export default class UiStore {
       range.index,
       range.length,
       'commentHighlight',
-      val
+      val,
+      'api'
     )
+
     const currentRecord = record || commentingOnRecord
     if (currentRecord && currentRecord.isText) {
-      // store any highlight changes on the item.data_content,
-      // particularly if this highlight was triggered externally e.g. TextActionMenu
-      currentRecord.data_content = {
-        ...currentRecord.data_content,
-        ...currentQuillEditor.getContents(),
+      if (
+        this.textEditingItem !== currentRecord &&
+        this.viewingRecord !== currentRecord
+      ) {
+        // store any highlight changes on the item.quill_data for editors that aren't editing
+        // e.g. if this highlight was triggered externally by TextActionMenu
+        console.log(
+          'applying new quill_data.....',
+          currentQuillEditor.getContents()
+        )
+        currentRecord.quill_data = currentQuillEditor.getContents()
       }
     }
   }

@@ -113,7 +113,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
         :name,
         :external_id,
         :content,
-        { data_content: {} },
+        { quill_data: {} },
         :url,
         :image,
         :archived,
@@ -130,7 +130,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
   def item_content_params
     params.require(:item).permit([
       :content,
-      { data_content: {} },
+      { quill_data: {} },
     ])
   end
 
