@@ -203,6 +203,7 @@ StyledCardWrapper.defaultProps = {
   zIndex: 1,
 }
 
+// TODO: make this a component or convert to wrapper?
 export const StyledBottomLeftIcon = styled.div`
   position: absolute;
   z-index: ${v.zIndex.gridCard};

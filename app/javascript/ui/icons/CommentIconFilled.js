@@ -1,6 +1,6 @@
 import Icon from './Icon'
 
-const CommentIconFilled = () => (
+const CommentIconFilled = ({ text, textColor } = {}) => (
   <Icon fill>
     <svg
       width="13"
@@ -30,6 +30,9 @@ const CommentIconFilled = () => (
         />
       </mask>
       <g mask="url(#mask0)">
+        <text textAnchor="middle" x="50%" y="50%" dominantBaseline="middle">
+          {text}
+        </text>
         <rect x="-8" y="-7" width="30" height="30" />
       </g>
     </svg>{' '}

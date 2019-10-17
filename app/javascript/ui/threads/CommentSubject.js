@@ -27,6 +27,7 @@ const StyledCommentSubject = styled.div`
   font-style: italic;
   color: ${v.colors.commonMedium};
 `
+StyledCommentSubject.displayName = 'StyledCommentSubject'
 
 class CommentSubject extends React.Component {
   get textContent() {

@@ -23,11 +23,10 @@ import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
 import RequiredCollectionIcon from '~/ui/icons/RequiredCollectionIcon'
 import RestoreIcon from '~/ui/icons/RestoreIcon'
 import PinnedIcon from '~/ui/icons/PinnedIcon'
-import CommentIconFilled from '~/ui/icons/CommentIconFilled'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
 import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
 import Tooltip from '~/ui/global/Tooltip'
-import { routingStore, uiStore } from '~/stores'
+import { routingStore, uiStore, apiStore } from '~/stores'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import ReplaceCardButton from '~/ui/grid/ReplaceCardButton'
 import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
@@ -38,6 +37,7 @@ import {
   StyledTopRightActions,
 } from './shared'
 import TextActionMenu from '~/ui/grid/TextActionMenu'
+import UnreadCount from '../threads/UnreadCount'
 
 @observer
 class GridCard extends React.Component {
@@ -142,19 +142,15 @@ class GridCard extends React.Component {
     )
   }
 
+  // TODO: connect this to renderIcon or pull renderIcon out to out solo component with StyledBottomLeftIcon
   get renderCommentNotificationIcon() {
     const { record } = this.props
     if (!record.unresolved_count) return null
 
     return (
-      <StyledBottomLeftIcon>
+      <StyledBottomLeftIcon onClick={this.handleClick} data-unreadComment>
         <Tooltip title="Add Comment" placement="bottom">
-          <span>
-            <span>{record.unresolved_count}</span>
-            <span style={{ color: v.colors.alert }}>
-              <CommentIconFilled />
-            </span>
-          </span>
+          <UnreadCount count={record.unresolved_count} />
         </Tooltip>
       </StyledBottomLeftIcon>
     )
@@ -382,6 +378,13 @@ class GridCard extends React.Component {
     const { card, dragging, record } = this.props
     if (dragging) return
     if (uiStore.captureKeyboardGridClick(e, card.id)) {
+      return
+    }
+    // TODO: what should this actual condition be?
+    if (e.target) {
+      e.preventDefault()
+      console.log(e.target)
+      apiStore.openCurrentThreadToCommentOn(record)
       return
     }
     if (record.type === ITEM_TYPES.LINK) {
