@@ -1,4 +1,3 @@
-import Chip from '@material-ui/core/Chip'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import MuiSelect from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'
@@ -136,28 +135,6 @@ export const ImageField = styled.span`
   }
 `
 ImageField.displayName = 'StyledImageField'
-
-// TODO research if we can get these styles working without extra className
-/** @component */
-export const Pill = styled(Chip)`
-  &.pill {
-    padding: 2px 7px;
-    margin: 5px;
-    font-weight: ${v.weights.medium};
-    font-family: ${v.fonts.sans};
-    font-size: 1rem;
-    justify-content: flex-start;
-    height: 28px;
-    background-color: ${v.colors.commonMediumTint};
-    border-radius: 0;
-  }
-
-  &.avatar {
-    height: 28px;
-    width: 28px;
-  }
-`
-Pill.displayName = 'StyledPill'
 
 export const RoundPill = styled.div`
   background-color: ${v.colors.commonLight};

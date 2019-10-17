@@ -29,13 +29,15 @@ export default styled.div`
 
   .react-tags__selected-tag {
     display: inline-block;
-    box-sizing: border-box;
-    margin: 0 6px 6px 0;
-    padding: 10px 12px;
+    margin: 5px;
+    padding: 2px 7px;
     background: ${props =>
-      props.tagColor === 'white' ? 'white' : v.colors.commonLight};
+      props.tagColor === 'white' ? 'white' : v.colors.commonMediumTint};
     /* match the font styles */
     font-size: inherit;
+    font-weight: ${v.weights.medium};
+    font-family: ${v.fonts.sans};
+    height: 32px;
     line-height: inherit;
     &:after {
       content: '×';

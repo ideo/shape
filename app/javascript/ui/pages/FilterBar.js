@@ -17,21 +17,13 @@ class FilterBar extends React.Component {
       icon: filter.filter_type === 'tag' ? <TagIcon /> : <SearchIconRight />,
     }))
   }
-
-  onDelete = ev => {
-    console.log('dete', ev)
-  }
-
-  handleShowAll = ev => {
-    console.log('dete', ev)
-  }
-
   render() {
+    const { onDelete, onShowAll } = this.props
     return (
       <Flex align="center">
-        <PillList itemList={this.formattedPills} onItemDelete={this.onDelete} />
+        <PillList itemList={this.formattedPills} onItemDelete={onDelete} />
         <Box>
-          <button onClick={this.handleShowAll}>
+          <button onClick={onShowAll}>
             <SubduedText>Show all</SubduedText>
           </button>
         </Box>
@@ -41,13 +33,10 @@ class FilterBar extends React.Component {
 }
 
 FilterBar.propTypes = {
-  filters: MobxPropTypes.arrayOrObservableArray,
-  canEdit: PropTypes.bool,
-}
-
-FilterBar.defaultProps = {
-  filters: [],
-  canEdit: false,
+  filters: MobxPropTypes.arrayOrObservableArray.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onSelect: PropTypes.func.isRequired,
+  onShowAll: PropTypes.func.isRequired,
 }
 
 export default FilterBar
