@@ -145,13 +145,7 @@ class CommentThread extends BaseRecord {
     // this will create the comment in the API
     await comment.save()
 
-    console.log(
-      comment.persisted,
-      comment.id,
-      uiStore.isCommentingOnTextRange()
-    )
     if (comment.persisted && uiStore.isCommentingOnTextRange()) {
-      console.log('comment persisted', comment.id)
       await commentingOnRecord.API_persistHighlight(comment.id)
     }
     uiStore.setCommentingOnRecord(null)

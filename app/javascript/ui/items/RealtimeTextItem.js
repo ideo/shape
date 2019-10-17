@@ -395,12 +395,6 @@ class RealtimeTextItem extends React.Component {
       const cursors = this.quillEditor.getModule('cursors')
       cursors.clearCursors()
 
-      // if (this.newlineIndicesForDelta(delta).length) {
-      //   console.log(1, this.quillEditor.getFormat())
-      //   this.quillEditor.format('commentHighlight', false)
-      //   console.log(2, this.quillEditor.getFormat())
-      // }
-
       this.combineAwaitingDeltas(delta)
       this.sendCombinedDelta()
     }

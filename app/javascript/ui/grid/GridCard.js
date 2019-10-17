@@ -383,7 +383,7 @@ class GridCard extends React.Component {
     // TODO: what should this actual condition be?
     if (e.target) {
       e.preventDefault()
-      console.log(e.target)
+
       apiStore.openCurrentThreadToCommentOn(record)
       return
     }

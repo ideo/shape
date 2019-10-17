@@ -24,12 +24,10 @@ class QuillTextHighlighter extends Inline {
     if (value) {
       node.onclick = async e => {
         e.preventDefault()
-        console.log(value)
+
         const comment = await apiStore.find('comments', value)
-        console.log('comment subject record', comment.subject)
-        console.log('comment thread record', comment.thread.record)
+
         apiStore.openCurrentThreadToCommentOn(comment.subject)
-        console.log('here i am...', dataAttributor.value(node))
       }
     }
     return node
