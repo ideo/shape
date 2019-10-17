@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
 import CloseIcon from '~/ui/icons/CloseIcon'
+import { Checkbox } from '~/ui/global/styled/forms'
 import { DisplayText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 
@@ -48,13 +49,17 @@ const SymbolHolder = styled.span`
 `
 
 const Pill = props => {
-  const { label, symbol, onDelete } = props.tag || props
+  const { label, selectable, selected, onSelect, symbol, onDelete } =
+    props.tag || props
   let { deleteIcon } = props.tag || props
   if (props.tag && !props.tag.deleteIcon) {
     deleteIcon = <CloseIcon />
   }
   return (
     <PillWrapper>
+      {selectable && (
+        <Checkbox checked={selected} onChange={onSelect} value="yes" />
+      )}
       <SymbolHolder>{symbol}</SymbolHolder>
       <DisplayText>{label}</DisplayText>
       {onDelete && (
@@ -72,6 +77,9 @@ Pill.propTypes = {
   onDelete: PropTypes.func,
   deleteIcon: PropTypes.node,
   tag: PropTypes.node,
+  selectable: PropTypes.bool,
+  selected: PropTypes.bool,
+  onSelect: PropTypes.func,
 }
 
 Pill.defaultProps = {
@@ -79,6 +87,9 @@ Pill.defaultProps = {
   onDelete: null,
   deleteIcon: <CloseIcon />,
   tag: null,
+  selectable: false,
+  selected: false,
+  onSelect: null,
 }
 
 export default Pill

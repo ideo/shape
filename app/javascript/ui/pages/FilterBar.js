@@ -15,8 +15,12 @@ class FilterBar extends React.Component {
       id: filter.id,
       name: filter.text,
       icon: filter.filter_type === 'tag' ? <TagIcon /> : <SearchIconRight />,
+      selectable: true,
+      selected: filter.selected,
+      onSelect: this.onTagSelect,
     }))
   }
+
   render() {
     const { onDelete, onShowAll } = this.props
     return (

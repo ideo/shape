@@ -22,6 +22,9 @@ class FilterSearchModal extends React.Component {
       label: filter.text,
       symbol: filter.filter_type === 'tag' ? <TagIcon /> : <SearchIconRight />,
       onDelete: this.onRemoveTag,
+      selectable: true,
+      selected: filter.selected,
+      onSelect: this.onTagSelect,
     }))
   }
 
@@ -35,6 +38,10 @@ class FilterSearchModal extends React.Component {
 
   onRemoveTag = tag => {
     console.log('remove tag', tag)
+  }
+
+  onTagSelect = tag => {
+    console.log('select tag', tag)
   }
 
   render() {
