@@ -76,6 +76,7 @@ const AreaChartIcon = styled.span`
   height: 100%;
   background-color: ${props => props.color};
 `
+AreaChartIcon.displayName = 'AreaChartIcon'
 
 const DatasetIconWrapper = styled.span`
   display: inline-block;
@@ -340,7 +341,13 @@ class LegendItemCover extends React.Component {
         />
       )
     } else {
-      const color = style && style.fill ? style.fill : colorScale[order]
+      const { item } = this.props
+      const itemStyle = item.style
+      let color = style && style.fill ? style.fill : colorScale[order]
+      // Style on the item itself should aways override dataset style.
+      if (itemStyle && itemStyle.fill) {
+        color = itemStyle.fill
+      }
       icon = <AreaChartIcon color={color} />
     }
     return (
