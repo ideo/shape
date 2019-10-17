@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types'
 
 import Dialog from './Dialog'
-import { DisplayText } from '../styled/typography'
+import { DisplayText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
+
 class AlertDialog extends React.PureComponent {
   componentWillReceiveProps({ fadeOutTime, open }) {
     if (open !== 'info') return
@@ -34,9 +35,9 @@ class AlertDialog extends React.PureComponent {
       <Dialog {...modalProps}>
         <div>
           <p>{prompt}</p>
-          <DisplayText color={v.colors.white} onClick={this.handleClose}>
-            OK
-          </DisplayText>
+          <button onClick={this.handleClose}>
+            <DisplayText color={v.colors.white}>OK</DisplayText>
+          </button>
         </div>
       </Dialog>
     )
