@@ -146,7 +146,7 @@ const MobileLinks = ({ isHome }) => {
 
       <Box>
         <NavLink align="left" href="/product/open-innovation">
-          OPEN INNOVATION
+          CHALLENGES AND OPEN INNOVATION
         </NavLink>
       </Box>
 
@@ -209,7 +209,7 @@ class MarketingMenu extends React.PureComponent {
                   </NavLink>
                   <NavLink href="/product/pricing">Pricing</NavLink>
                   <NavLink href="/product/open-innovation">
-                    Open Innovation
+                    CHALLENGES AND OPEN INNOVATION
                   </NavLink>
                 </MarketingFlex>
               </Box>
