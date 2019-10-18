@@ -2,15 +2,16 @@
 #
 # Table name: applications
 #
-#  id         :bigint(8)        not null, primary key
-#  email      :string
-#  invite_cta :string
-#  invite_url :string
-#  logo_url   :string
-#  name       :string
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  user_id    :bigint(8)
+#  id             :bigint(8)        not null, primary key
+#  email          :string
+#  group_icon_url :string
+#  invite_cta     :string
+#  invite_url     :string
+#  logo_url       :string
+#  name           :string
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  user_id        :bigint(8)
 #
 # Indexes
 #

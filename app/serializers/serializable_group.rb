@@ -1,7 +1,7 @@
 class SerializableGroup < BaseJsonSerializer
   include SerializedExternalId
   type 'groups'
-  attributes :name, :handle, :organization_id
+  attributes :name, :handle, :organization_id, :icon_url
   has_many :roles
 
   attribute :is_primary do

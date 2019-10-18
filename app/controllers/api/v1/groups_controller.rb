@@ -25,6 +25,7 @@ class Api::V1::GroupsController < Api::V1::BaseController
     external_id = params[:group].delete(:external_id)
     @group.organization ||= current_organization
     @group.created_by = current_user
+    @group.application = current_application
     if external_id.present? && current_user.application
       @group.external_records.build(
         external_id: external_id,
@@ -83,10 +84,12 @@ class Api::V1::GroupsController < Api::V1::BaseController
       # the user doesn't have to be an admin on it
       @groups = Group.where(organization_id: current_organization.id)
                      .order(name: :asc)
+                     .includes(:application)
     else
       @groups = current_user.groups
                             .where(organization_id: current_organization.id)
                             .order(name: :asc)
+                            .includes(:application)
     end
   end
 

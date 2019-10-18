@@ -102,6 +102,9 @@ const DatasetText = styled(SmallHelperText)`
   text-overflow: ellipsis;
   width: 240px;
   white-space: nowrap;
+  @media only screen and (max-width: ${v.responsive.largeBreakpoint}px) {
+    width: 200px;
+  }
 `
 
 @inject('apiStore', 'uiStore')
