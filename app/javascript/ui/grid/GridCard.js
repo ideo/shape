@@ -465,7 +465,6 @@ class GridCard extends React.Component {
           uiStore.textEditingItem !== record &&
           !record.archived &&
           this.renderTopRightActions()}
-        {/* should we keep this.renderHidden here?*/}
         <BottomLeftCardIcons
           card={card}
           cardType={cardType}

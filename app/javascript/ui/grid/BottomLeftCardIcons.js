@@ -20,28 +20,23 @@ export const StyledIconsWrapper = styled.div`
   left: 0.25rem;
   z-index: ${v.zIndex.gridCard};
   color: ${v.colors.commonMedium};
-  ${'' /*  change this since we will determine width by icons rendered */}
-  width: ${props => (props.iconAmount === 2 ? 75 : 45)}px;
   height: 45px;
   display: flex;
 `
 StyledIconsWrapper.displayName = 'StyledIconsWrapper'
 
 export const StyledIconWrapper = styled.div`
-  /* LinkIcon appears larger than CollectionIcon so we need to make it smaller */
-  ${props =>
-    props.small &&
-    `
-    width: 18px;
-    height: 18px;
-    bottom: 0.75rem;
-    ${'' /*  change this since we will determine position by icons rendered */}
-    left: ${props.iconPos === 2 ? 3.25 : 0.75}rem;
-  `};
+  width: 45px;
 `
 StyledIconWrapper.displayName = 'StyledIconWrapper'
 
-// SmallStyledIconWrapper for link and hidden icons
+/* LinkIcon (and HiddenIcon) appears larger than CollectionIcon so we need to make it smaller */
+export const StyledSmallIconWrapper = styled.div`
+  width: 18px;
+  height: 18px;
+  bottom: 0.75rem;
+`
+StyledSmallIconWrapper.displayName = 'StyledSmallIconWrapper'
 
 const LockedPinnedCardIcon = () => (
   <Tooltip title="pinned" placement="top">
@@ -70,33 +65,59 @@ class CardIcon extends React.Component {
     const icons = []
 
     if (card.isPinnedInTemplate) {
-      icons.push(<PinnedCardIcon />)
+      icons.push(
+        <StyledIconWrapper>
+          <PinnedCardIcon />
+        </StyledIconWrapper>
+      )
     }
 
     if (cardType === 'collections') {
       if (card.link) {
-        icons.push(<LinkedCollectionIcon />)
+        icons.push(
+          <StyledIconWrapper>
+            <LinkedCollectionIcon />
+          </StyledIconWrapper>
+        )
       } else if (record.isRequired) {
         const type = record.isMasterTemplate ? 'template' : 'collection'
         icons.push(
-          <Tooltip title={`required ${type}`} placement="top">
-            <div>
-              <RequiredCollectionIcon />
-            </div>
-          </Tooltip>
+          <StyledIconWrapper>
+            <Tooltip title={`required ${type}`} placement="top">
+              <div>
+                <RequiredCollectionIcon />
+              </div>
+            </Tooltip>
+          </StyledIconWrapper>
         )
       } else if (record.isBoard) {
-        icons.push(<FoamcoreBoardIcon />)
+        icons.push(
+          <StyledIconWrapper>
+            <FoamcoreBoardIcon />
+          </StyledIconWrapper>
+        )
       } else {
-        icons.push(<CollectionIcon />)
+        icons.push(
+          <StyledIconWrapper>
+            <CollectionIcon />
+          </StyledIconWrapper>
+        )
       }
     } else if (card.link) {
       // TODO: // Need to wrap this in a small wrapper
-      icons.push(<LinkIcon />)
+      icons.push(
+        <StyledSmallIconWrapper>
+          <LinkIcon />
+        </StyledSmallIconWrapper>
+      )
     }
 
     if (card.isPinnedAndLocked) {
-      icons.push(<LockedPinnedCardIcon card={card} />)
+      icons.push(
+        <StyledIconWrapper>
+          <LockedPinnedCardIcon card={card} />
+        </StyledIconWrapper>
+      )
     }
 
     if (
@@ -107,14 +128,17 @@ class CardIcon extends React.Component {
       icons.push(
         <HiddenIconButton
           clickable={record.can_edit && record.is_private}
-          size="sm"
+          size="lg" // What is this doing?
           record={record}
           IconWrapper={({ children }) => (
-            // Need to wrap this in a small wrapper
-            <StyledIconWrapper>{children}</StyledIconWrapper>
+            <StyledSmallIconWrapper>{children}</StyledSmallIconWrapper>
           )}
         />
       )
+    }
+
+    if (record.unresolved_count && record.unresolved_count > 0) {
+      icons.push(<UnreadCountCardIcon count={record.unresolved_count} />)
     }
 
     if (!icons) return []
@@ -126,11 +150,7 @@ class CardIcon extends React.Component {
     return (
       // needs to handle the same click otherwise clicking the icon does nothing
       <StyledIconsWrapper>
-        {this.icons.map((icon, index) => {
-          return (
-            <StyledIconWrapper key={`icon-${index}`}>{icon}</StyledIconWrapper>
-          )
-        })}
+        {this.icons.map((icon, index) => icon)}
       </StyledIconsWrapper>
     )
   }

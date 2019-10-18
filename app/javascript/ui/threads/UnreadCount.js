@@ -5,16 +5,17 @@ import v from '~/utils/variables'
 import CommentIconFilled from '~/ui/icons/CommentIconFilled'
 
 const CommentIconWrapper = styled.div`
-  color: ${v.colors.alert};
-  ${'' /* Height and width of rectangle are being set in the icon? */}
-  height: ${props => (props.size === 'small' ? 16 : 32)}px;
-  width: ${props => (props.size === 'small' ? 16 : 32)}px;
   margin-left: 8px;
   margin-top: 5px;
+  color: ${v.colors.alert};
+  width: 18px;
   svg {
-    margin-left: 4px;
     height: 100%;
     width: 100%;
+
+    text {
+      color: ${v.colors.white};
+    }
   }
 `
 
