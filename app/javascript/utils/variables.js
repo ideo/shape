@@ -87,6 +87,9 @@ export const EVENT_SOURCE_TYPES = {
 export const INITIAL_OFFSET_X = 20
 export const INITIAL_OFFSET_Y = 90
 
+export const quillSelectors =
+  '.quill, .ql-close, .ql-toolbar, .ql-container, .ql-editor, .ql-clipboard, .quill-toolbar, .ql-formats, .ql-header, .ql-link, .ql-stroke'
+
 export default {
   headerHeight: 50,
   maxWidth: 1320,
@@ -197,12 +200,7 @@ export default {
   },
 
   quillDefaults: {
-    formats: [
-      'link',
-      'header',
-      'commentHighlight',
-      // 'commentHighlightResolved'
-    ],
+    formats: ['link', 'header', 'commentHighlight', 'commentHighlightResolved'],
     modules: {
       toolbar: null,
     },

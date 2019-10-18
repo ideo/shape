@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { scroller, animateScroll } from 'react-scroll'
-import { observable, action, runInAction, computed } from 'mobx'
+import { toJS, observable, action, runInAction, computed } from 'mobx'
 
 import routeToLogin from '~/utils/routeToLogin'
 import sleep from '~/utils/sleep'
@@ -929,8 +929,10 @@ export default class UiStore {
     currentQuillEditor.formatText(
       range.index,
       range.length,
-      'commentHighlight',
-      val,
+      {
+        commentHighlight: val,
+        commentHighlightResolved: false,
+      },
       'api'
     )
 
@@ -942,11 +944,12 @@ export default class UiStore {
       ) {
         // store any highlight changes on the item.quill_data for editors that aren't editing
         // e.g. if this highlight was triggered externally by TextActionMenu
-        console.log(
-          'applying new quill_data.....',
-          currentQuillEditor.getContents()
-        )
         currentRecord.quill_data = currentQuillEditor.getContents()
+      } else {
+        // if we're removing "new" highlights, bring back any ones that might have existed..
+        if (!val) {
+          currentQuillEditor.setContents(toJS(currentRecord.quill_data))
+        }
       }
     }
   }

@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { action, observable } from 'mobx'
+import { observable } from 'mobx'
 import { ReferenceType } from 'datx'
 
 import { apiUrl } from '~/utils/url'
@@ -216,22 +216,14 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return _.find(this.primaryDataset.data_source_id, { type: 'Collection' })
   }
 
-  API_updateWithoutSync({
-    cancel_sync = false,
-    quill_data = null,
-    highlight = false,
-  } = {}) {
+  API_updateWithoutSync({ cancel_sync = false, highlight = false } = {}) {
     const { apiStore } = this
     const data = this.toJsonApi()
-    if (this.isText && data.attributes.quill_data) {
-      if (quill_data) {
-        data.attributes.quill_data = quill_data
-      }
-    }
     // Turn off syncing when saving the item to not reload the page
     if (cancel_sync) data.cancel_sync = true
     let endpoint = `items/${this.id}`
     if (highlight) endpoint += '/highlight'
+
     return apiStore
       .request(endpoint, 'PATCH', {
         data,
@@ -245,36 +237,31 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.request(`items/${this.id}/ping_collection`)
   }
 
-  @action
-  async API_persistHighlight(comment_id) {
-    const { currentQuillEditor } = this.uiStore
-    if (!currentQuillEditor) return
-
-    const delta = currentQuillEditor.getContents()
+  async API_persistHighlight({ commentId, delta } = {}) {
+    // pick up "new" highlights that are currently in our quillEditor
     _.each(delta.ops, op => {
       if (op.attributes && op.attributes.commentHighlight === 'new') {
         op.attributes = {
-          commentHighlight: comment_id,
+          // replace them with persisted comment id
+          commentHighlight: commentId,
         }
       }
     })
+    // now set this local quill_data to have the new highlight + commentId
+    this.quill_data = delta
     await this.API_updateWithoutSync({
       cancel_sync: true,
-      quill_data: delta,
       highlight: true,
     })
     return
   }
 
+  // NOTE: this may be unnecessary now, based on how we now clear out new highlights
   removeNewHighlights = (delta = this.quill_data) => {
     let justAddedHighlight = false
     _.each(delta.ops, op => {
       // don't persist any unpersisted comment highlights
-      if (
-        op.attributes &&
-        (op.attributes.commentHighlight === 'new' ||
-          op.attributes['data-comment-id'] === 'new')
-      ) {
+      if (op.attributes && op.attributes.commentHighlight === 'new') {
         justAddedHighlight = true
         delete op['attributes']
       }

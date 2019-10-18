@@ -13,7 +13,7 @@ import { CloseButton } from '~/ui/global/styled/buttons'
 import QuillLink from '~/ui/global/QuillLink'
 import {
   QuillHighlighter,
-  // QuillHighlightResolver,
+  QuillHighlightResolver,
 } from '~/ui/global/QuillTextHighlighter'
 import { QuillStyleWrapper } from '~/ui/global/styled/typography'
 import TextItemToolbar from '~/ui/items/TextItemToolbar'
@@ -26,7 +26,7 @@ Quill.register('modules/cursors', QuillCursors)
 Quill.register('modules/customClipboard', QuillClipboard)
 Quill.register('formats/link', QuillLink)
 Quill.register(QuillHighlighter)
-// Quill.register(QuillHighlightResolver)
+Quill.register(QuillHighlightResolver)
 
 const Keyboard = Quill.import('modules/keyboard')
 
@@ -103,7 +103,7 @@ class RealtimeTextItem extends React.Component {
   channelName = 'ItemRealtimeChannel'
   state = { disconnected: false }
   saveTimer = null
-  // version = null
+  focused = false
   currentlySending = false
   currentlySendingCheck = null
   combinedDelta = new Delta()
@@ -256,7 +256,7 @@ class RealtimeTextItem extends React.Component {
         this.sendCombinedDelta()
       }
     }
-    this.sendCursor()
+    if (this.focused) this.sendCursor()
   }
 
   applyIncomingDelta(remoteDelta) {
@@ -480,10 +480,13 @@ class RealtimeTextItem extends React.Component {
   }
 
   handleFocus = e => {
-    const { uiStore } = this.props
+    const { item, uiStore } = this.props
+    this.focused = true
     // any time the text editor receives focus...
     // you are effectively "leaving" commenting, should clear out commentingOnRecord
-    uiStore.setCommentingOnRecord(null)
+    if (uiStore.commentingOnRecord === item) {
+      uiStore.setCommentingOnRecord(null)
+    }
   }
 
   onComment = async e => {
@@ -557,6 +560,9 @@ class RealtimeTextItem extends React.Component {
       onChange: this.handleTextChange,
       onChangeSelection: this.handleSelectionChange,
       onFocus: this.handleFocus,
+      onBlur: e => {
+        this.focused = false
+      },
       readOnly: !canEdit,
       modules: {
         customClipboard: true,

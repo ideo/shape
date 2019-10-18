@@ -1,25 +1,13 @@
 import { Quill } from 'react-quill'
 
 const Inline = Quill.import('blots/inline')
-// const Parchment = Quill.import('parchment')
 
-// const dataAttributor = new Parchment.Attributor.Attribute(
-//   'data-comment-id',
-//   'data-comment-id'
-// )
-// Quill.register(dataAttributor)
-//
-// const dataAttributorResolved = new Parchment.Attributor.Attribute(
-//   'data-resolved-comment-id',
-//   'data-resolved-comment-id'
-// )
-// Quill.register(dataAttributorResolved)
-//
-// const highlightStyleAttributor = new Parchment.Attributor.Class(
-//   'highlight',
-//   'highlighted'
-// )
-// Quill.register(highlightStyleAttributor)
+/* NOTE: we tried Parchment.Attributor.Attribute to set data attributes,
+ * but it was giving us all sorts of weird formatting issues. (creating an extra <span>)
+ * For whatever reason, domNode.get/setAttribute works better.
+ * This is somewhat based on the LinkBlot example:
+ * https://github.com/quilljs/parchment#example
+ */
 
 export class QuillInlineData extends Inline {
   static create(value) {
@@ -33,7 +21,7 @@ export class QuillInlineData extends Inline {
   }
 
   format(name, value) {
-    if (name === 'commentHighlight' && value) {
+    if (name === this.constructor.blotName && value) {
       this.domNode.setAttribute(this.constructor.attribute, value)
     } else {
       super.format(name, value)
@@ -64,7 +52,7 @@ QuillHighlighter.blotName = 'commentHighlight'
 QuillHighlighter.tagName = 'sub'
 QuillHighlighter.attribute = 'data-comment-id'
 
-// export class QuillHighlightResolver extends QuillInlineData {}
-// QuillHighlightResolver.blotName = 'commentHighlightResolved'
-// QuillHighlightResolver.tagName = 'span'
-// QuillHighlightResolver.attributor = dataAttributorResolved
+export class QuillHighlightResolver extends QuillInlineData {}
+QuillHighlightResolver.blotName = 'commentHighlightResolved'
+QuillHighlightResolver.tagName = 'span'
+QuillHighlightResolver.attribute = 'data-resolved-comment-id'

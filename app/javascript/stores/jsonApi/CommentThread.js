@@ -148,16 +148,32 @@ class CommentThread extends BaseRecord {
     uiStore.trackEvent('create', this.record)
     // this will create the comment in the API
     await comment.save()
-
-    if (comment.persisted && uiStore.isCommentingOnTextRange()) {
-      // set this now as it won't have be present until the text item has saved
-      comment.text_highlight = uiStore.selectedTextRangeForCard.textContent
-      // don't have to "await" this
-      await commentingOnRecord.API_persistHighlight(comment.id)
-    }
-    uiStore.setCommentingOnRecord(null, { persisted: true })
+    this.afterCommentCreate(comment)
 
     return comment
+  }
+
+  async afterCommentCreate(comment) {
+    const { uiStore } = this
+    const { commentingOnRecord, currentQuillEditor } = uiStore
+    if (
+      comment.persisted &&
+      uiStore.isCommentingOnTextRange() &&
+      currentQuillEditor
+    ) {
+      // set this now as it won't be present until the text item has saved
+      comment.text_highlight = uiStore.selectedTextRangeForCard.textContent
+      // capture contents so that we can now safely set commentingOnRecord to false (???)
+      const delta = currentQuillEditor.getContents()
+      uiStore.setCommentingOnRecord(null, { persisted: true })
+      await commentingOnRecord.API_persistHighlight({
+        commentId: comment.id,
+        delta,
+      })
+    } else {
+      // just clear this out; e.g. you commented on a record but not a highlight
+      uiStore.setCommentingOnRecord(null)
+    }
   }
 
   API_markViewed() {
