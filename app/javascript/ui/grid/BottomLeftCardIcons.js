@@ -59,7 +59,7 @@ UnreadCountCardIcon.propTypes = {
   count: PropTypes.number.isRequired,
 }
 
-class CardIcon extends React.Component {
+class BottomLeftCardIcons extends React.Component {
   get icons() {
     const { card, cardType, record } = this.props
     const icons = []
@@ -138,7 +138,11 @@ class CardIcon extends React.Component {
     }
 
     if (record.unresolved_count && record.unresolved_count > 0) {
-      icons.push(<UnreadCountCardIcon count={record.unresolved_count} />)
+      icons.push(
+        <Tooltip title="Add comment" placement="top">
+          <UnreadCountCardIcon count={record.unresolved_count} />
+        </Tooltip>
+      )
     }
 
     if (!icons) return []
@@ -156,10 +160,10 @@ class CardIcon extends React.Component {
   }
 }
 
-CardIcon.propTypes = {
+BottomLeftCardIcons.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   cardType: PropTypes.string.isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
-export default CardIcon
+export default BottomLeftCardIcons

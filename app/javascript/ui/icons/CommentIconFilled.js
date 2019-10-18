@@ -30,11 +30,11 @@ const CommentIconFilled = ({ text, textColor } = {}) => (
         />
       </mask>
       <g mask="url(#mask0)">
-        <text textAnchor="middle" x="50%" y="50%" dominantBaseline="middle">
-          {text}
-        </text>
         <rect x="-8" y="-7" width="30" height="30" />
       </g>
+      <text textAnchor="middle" x="50%" y="50%" dominantBaseline="middle">
+        {text}
+      </text>
     </svg>{' '}
   </Icon>
 )

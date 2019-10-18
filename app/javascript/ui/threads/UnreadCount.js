@@ -14,6 +14,7 @@ const CommentIconWrapper = styled.div`
     width: 100%;
 
     text {
+      font-size: 0.5rem;
       color: ${v.colors.white};
     }
   }

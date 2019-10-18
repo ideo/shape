@@ -75,12 +75,6 @@ export const FollowHolder = styled.span`
   width: 15px;
 `
 
-const StyledUnreadCountWrapper = styled.span`
-  svg {
-    ${'' /* margin-left: 4px; */}
-  }
-`
-
 @observer
 class CommentThreadHeader extends React.Component {
   @observable
@@ -148,11 +142,7 @@ class CommentThreadHeader extends React.Component {
     const { thread } = this.props
     if (!thread.unreadCount) return null
 
-    return (
-      <StyledUnreadCountWrapper>
-        <UnreadCount count={thread.unreadCount} size={'small'} />
-      </StyledUnreadCountWrapper>
-    )
+    return <UnreadCount count={thread.unreadCount} size={'small'} />
   }
 
   renderFollow = () => {

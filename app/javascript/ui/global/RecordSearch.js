@@ -19,9 +19,7 @@ class RecordSearch extends React.Component {
   constructor(props) {
     super(props)
     this.debouncedSearch = _.debounce((term, callback) => {
-      console.log({ term })
       if (!term) {
-        console.log('no term')
         callback()
         return
       }
@@ -38,7 +36,6 @@ class RecordSearch extends React.Component {
             : callback(formatCollections(records))
         )
         .catch(e => {
-          console.log(e, 'error in promise')
           trackError(e)
         })
     }, 350)
@@ -47,7 +44,6 @@ class RecordSearch extends React.Component {
   componentDidMount() {
     const { initialLoadAmount } = this.props
     if (initialLoadAmount > 0) {
-      console.log('blank debounded search')
       this.debouncedSearch(' ')
     }
   }
