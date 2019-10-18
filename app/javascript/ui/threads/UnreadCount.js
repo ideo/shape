@@ -20,23 +20,20 @@ const CommentIconWrapper = styled.div`
   }
 `
 
-const UnreadCount = ({ count, size }) => {
+const UnreadCount = ({ count }) => {
   if (!count) return null
 
   return (
-    <CommentIconWrapper size={size}>
+    <CommentIconWrapper>
       <CommentIconFilled text={count} textColor={v.colors.white} />
     </CommentIconWrapper>
   )
 }
 
 UnreadCount.propTypes = {
-  count: PropTypes.string.isRequired,
-  size: PropTypes.string,
+  count: PropTypes.number.isRequired,
 }
 
-UnreadCount.defaultProps = {
-  size: 'small',
-}
+UnreadCount.displayName = 'UnreadCount'
 
 export default UnreadCount

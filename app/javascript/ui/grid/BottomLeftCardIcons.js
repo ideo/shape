@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
@@ -13,6 +14,7 @@ import { Tooltip } from '@material-ui/core'
 import v from '~/utils/variables'
 import UnreadCount from '~/ui/threads/UnreadCount'
 import HiddenIconButton from '../icons/HiddenIconButton'
+import { apiStore } from '~/stores/'
 
 export const StyledIconsWrapper = styled.div`
   position: absolute;
@@ -50,16 +52,19 @@ const PinnedCardIcon = () => (
   </Tooltip>
 )
 
-const UnreadCountCardIcon = ({ count }) => (
-  <Tooltip title="Add Comment" placement="bottom">
-    <UnreadCount count={count} />
-  </Tooltip>
-)
-UnreadCountCardIcon.propTypes = {
-  count: PropTypes.number.isRequired,
-}
-
 class BottomLeftCardIcons extends React.Component {
+  handleUnreadIconClick = e => {
+    // TODO: what should this actual condition be?
+    console.log('handleUnreadIconClick in BottomLeftCardIcons')
+    e.preventDefault()
+    if (e.target) {
+      debugger
+      const { record } = this.props
+      apiStore.openCurrentThreadToCommentOn(record)
+      return
+    }
+  }
+
   get icons() {
     const { card, cardType, record } = this.props
     const icons = []
@@ -140,7 +145,10 @@ class BottomLeftCardIcons extends React.Component {
     if (record.unresolved_count && record.unresolved_count > 0) {
       icons.push(
         <Tooltip title="Add comment" placement="top">
-          <UnreadCountCardIcon count={record.unresolved_count} />
+          <UnreadCount
+            onClick={this.handleUnreadIconClick}
+            count={record.unresolved_count}
+          />
         </Tooltip>
       )
     }
@@ -154,7 +162,9 @@ class BottomLeftCardIcons extends React.Component {
     return (
       // needs to handle the same click otherwise clicking the icon does nothing
       <StyledIconsWrapper>
-        {this.icons.map((icon, index) => icon)}
+        {this.icons.map((icon, index) => (
+          <Fragment key={index}>{icon}</Fragment>
+        ))}
       </StyledIconsWrapper>
     )
   }

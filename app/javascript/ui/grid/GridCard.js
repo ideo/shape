@@ -267,17 +267,11 @@ class GridCard extends React.Component {
 
   handleClick = e => {
     const { card, dragging, record } = this.props
+    console.log('handleClick in Gridcard')
     if (dragging) return
     if (uiStore.captureKeyboardGridClick(e, card.id)) {
       return
     }
-    // TODO: what should this actual condition be?
-    // if (e.target) {
-    //   e.preventDefault()
-
-    //   apiStore.openCurrentThreadToCommentOn(record)
-    //   return
-    // }
     if (record.type === ITEM_TYPES.LINK) {
       this.linkOffsite(record.url)
       return
@@ -465,12 +459,7 @@ class GridCard extends React.Component {
           uiStore.textEditingItem !== record &&
           !record.archived &&
           this.renderTopRightActions()}
-        <BottomLeftCardIcons
-          card={card}
-          cardType={cardType}
-          onClick={this.handleClick}
-          record={record}
-        />
+        <BottomLeftCardIcons card={card} cardType={cardType} record={record} />
         {/* onClick placed here so it's separate from hotspot click */}
         <StyledGridCardInner
           onClick={this.handleClick}
