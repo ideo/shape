@@ -4,6 +4,7 @@
 #
 #  id                :bigint(8)        not null, primary key
 #  draftjs_data      :jsonb
+#  edited            :boolean          default(FALSE)
 #  message           :text
 #  replies_count     :integer          default(0)
 #  status            :integer
