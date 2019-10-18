@@ -23,17 +23,6 @@ class SerializableDataset < BaseJsonSerializer
 
   belongs_to :data_source
 
-  # TODO: FIX FOR C∆
-  # attribute :chart_type do
-  #   if @object.order.blank? || @object.order.zero?
-  #     @object.chart_type
-  #   else
-  #     # For C∆ charts - if there's more than one chart,
-  #     # force secondary charts to be line type chart
-  #     'line'
-  #   end
-  # end
-
   attribute :style do
     if @object.order.blank? || @object.order.zero? || @object.style.blank?
       @object.style

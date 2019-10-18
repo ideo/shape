@@ -3,6 +3,7 @@
 exports[`LegendItemCover renders snapshot 1`] = `
 <styled.div
   data-cy="LegendItemCover"
+  hasSearchInterface={true}
 >
   <Styled(StyledHeading3)>
     My Cool Item
@@ -11,7 +12,7 @@ exports[`LegendItemCover renders snapshot 1`] = `
     key="dataset-dataset"
   >
     <styled.span>
-      <styled.span
+      <AreaChartIcon
         color="#de8f74"
       />
     </styled.span>
@@ -25,7 +26,7 @@ exports[`LegendItemCover renders snapshot 1`] = `
     key="dataset-undefined"
   >
     <styled.span>
-      <styled.span
+      <AreaChartIcon
         color="#c0dbde"
       />
     </styled.span>

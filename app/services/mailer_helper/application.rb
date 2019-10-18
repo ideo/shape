@@ -38,10 +38,7 @@ module MailerHelper
     end
 
     def group_name
-      invited_to_name
-        .sub(/C∆\s+-\s+/, '')
-        .sub(/\s+Admins/, '')
-        .sub(/\s+Members/, '')
+      invited_to_name.sub(/\s+Creative\s+Difference\s+Admins/, '')
     end
 
     def org_name

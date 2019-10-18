@@ -4,7 +4,7 @@ RSpec.describe MailerHelper::Application, type: :service do
   delegate :url_helpers, to: 'Rails.application.routes'
   before { network_organization_doubles }
   let(:organization) { create(:organization, name: 'Company') }
-  let(:group) { create(:group, name: 'C∆ - Business Unit Admins', organization: organization) }
+  let(:group) { create(:group, name: 'Business Unit Creative Difference Admins', organization: organization) }
   let(:invited_to) { group }
   let(:application) do
     create(

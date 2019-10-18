@@ -120,6 +120,7 @@ class GroupModify extends React.Component {
           title={this.editingGroup.name}
           url={this.editingGroup.filestack_file_url}
           size={100}
+          clickable={true}
         />
       )
     }

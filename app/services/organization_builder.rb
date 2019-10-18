@@ -20,7 +20,7 @@ class OrganizationBuilder
       setup_user_membership_and_collections
       create_application_organization if @user.application_bot?
       if @full_setup
-        create_templates if !@user.application_bot?
+        create_templates
         # this check is for running Cypress, don't create real Network orgs for every test org
         return true if @user.email == 'cypress-test@ideo.com'
 
@@ -63,7 +63,7 @@ class OrganizationBuilder
     OrganizationTemplates.call(@organization, @user)
     # call this additionally to create the UserProfile and Getting Started after the templates have been created
     # TODO: ensure that the user template creator doesn't get called at this point
-    @organization.setup_user_membership(@user)
+    @organization.setup_user_membership(@user) unless @user.application_bot?
   end
 
   def create_network_organization

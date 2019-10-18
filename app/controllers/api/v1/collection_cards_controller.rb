@@ -379,6 +379,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         :legend_item_id,
         :legend_search_source,
         data_content: {},
+        style: {},
         filestack_file_attributes: [
           :url,
           :handle,
@@ -405,6 +406,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
           :tiers,
           :data_source_type,
           :data_source_id,
+          :anyone_can_view,
           style: {},
           cached_data: %i[
             value

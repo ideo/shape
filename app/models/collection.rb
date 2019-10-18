@@ -91,6 +91,7 @@ class Collection < ApplicationRecord
                  :cached_tag_list,
                  :cached_owned_tag_list,
                  :cached_card_count,
+                 :cached_last_card_order,
                  :submission_attrs,
                  :getting_started_shell,
                  :awaiting_first_user_content,
@@ -624,6 +625,7 @@ class Collection < ApplicationRecord
     # not using the store_accessor directly here because of:
     # https://github.com/rails/rails/pull/32563
     self.cached_attributes ||= {}
+    self.cached_attributes['cached_last_card_order'] = collection_cards.maximum(:order)
     self.cached_attributes['cached_card_count'] = collection_cards.count
     # update without callbacks/timestamps
     update_column :cached_attributes, cached_attributes
@@ -860,6 +862,8 @@ class Collection < ApplicationRecord
   end
 
   def parent_application_collection
+    return self if is_a?(Collection::ApplicationCollection)
+
     parents.find_by(type: 'Collection::ApplicationCollection')
   end
 
