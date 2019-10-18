@@ -43,19 +43,10 @@ module Roles
       assign_role_to_groups
       add_editors_as_comment_thread_followers
       add_group_members_as_comment_thread_followers
-      if @new_role
-        link_to_shared_collections
-        link_to_connected_organization_collection
-      end
+      link_to_shared_collections if @new_role
       add_roles_to_children if @propagate_to_children
       create_activities_and_notifications if newly_invited?
       failed_users.blank? && failed_groups.blank?
-
-      # If you're invited to a group, that has application and was created by application bot
-      # Then call link to shared collection, on this group's first collection that has application on it
-      # group -> application -> app org (+ org from group) -> application collection
-
-
     end
 
     private
@@ -163,27 +154,6 @@ module Roles
         group_ids,
         collections_to_link,
         items_to_link,
-      )
-    end
-
-    # C∆ uses this to link you to an organization collection
-    # if you've been added to a org group
-    def link_to_connected_organization_collection
-      return unless @object.is_a?(Group) && @object.application.present?
-
-      app_org_collection_id = @object.application
-                                     .application_organizations
-                                     .find_by(organization_id: @object.organization_id)
-                                     &.root_collection_id
-
-      return if app_org_collection_id.blank?
-
-      LinkToSharedCollectionsWorker.perform_async(
-        shared_user_ids,
-        # NOTE: group_ids method here excludes Primary group
-        [],
-        [app_org_collection_id],
-        [],
       )
     end
 
