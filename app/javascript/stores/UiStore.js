@@ -847,10 +847,17 @@ export default class UiStore {
   // --- BCT + GridCard properties />
 
   @action
+  expandAndOpenThread(key) {
+    // make sure the activityLog is open
+    this.activityLogOpen = true
+    this.expandThread(key)
+  }
+
+  @action
   expandThread(key, { reset = false } = {}) {
     if (key) {
       // when we expand a thread we also want it to set the ActivityLog to Comments
-      this.update('activityLogPage', 'comments')
+      this.activityLogPage = 'comments'
       // reset it first, that way if it's expanded offscreen, it will get re-opened/scrolled to
       if (reset) this.expandedThreadKey = null
     } else {

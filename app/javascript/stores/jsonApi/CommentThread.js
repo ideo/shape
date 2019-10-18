@@ -80,7 +80,9 @@ class CommentThread extends BaseRecord {
     // if we had previously loaded additional pages, return it to the state
     // where we just have the first page worth of comments
     if (page === 1 && this.comments.length > PER_PAGE) {
-      this.comments.replace(this.comments.toJS().slice(PER_PAGE * -1))
+      runInAction(() => {
+        this.comments.replace(this.comments.toJS().slice(PER_PAGE * -1))
+      })
     }
     const apiPath = `comment_threads/${this.id}/comments?page=${page}`
     const res = await this.apiStore.request(apiPath, 'GET')

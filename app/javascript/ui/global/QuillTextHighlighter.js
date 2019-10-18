@@ -1,6 +1,6 @@
 import { Quill } from 'react-quill'
 
-const Inline = Quill.import('blots/inline')
+import { apiStore } from '~/stores'
 
 /* NOTE: we tried Parchment.Attributor.Attribute to set data attributes,
  * but it was giving us all sorts of weird formatting issues. (creating an extra <span>)
@@ -8,6 +8,8 @@ const Inline = Quill.import('blots/inline')
  * This is somewhat based on the LinkBlot example:
  * https://github.com/quilljs/parchment#example
  */
+
+const Inline = Quill.import('blots/inline')
 
 export class QuillInlineData extends Inline {
   static create(value) {
@@ -39,9 +41,10 @@ export class QuillHighlighter extends QuillInlineData {
   static create(value) {
     const node = super.create(value)
     if (value) {
-      node.onclick = e => {
+      node.onclick = async e => {
         e.preventDefault()
-        console.log('clicked highlight', QuillHighlighter.formats(node))
+        const commentId = QuillHighlighter.formats(node)
+        apiStore.openCommentFromHighlight(commentId)
       }
     }
     return node

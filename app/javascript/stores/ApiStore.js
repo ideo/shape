@@ -405,10 +405,41 @@ class ApiStore extends jsonapi(datxCollection) {
     if (!viewingRecord) return
 
     const thread = this.findThreadForRecord(viewingRecord)
-    uiStore.update('activityLogOpen', true)
-    uiStore.expandThread(thread.key)
+    uiStore.expandAndOpenThread(thread.key)
     uiStore.setCommentingOnRecord(record)
     return thread
+  }
+
+  async openCommentFromHighlight(commentId) {
+    const { uiStore } = this
+
+    const comment = this.find('comments', commentId)
+    let thread = null
+    if (comment) {
+      thread = this.find('comment_threads', comment.comment_thread_id)
+    }
+
+    if (!thread) {
+      try {
+        const res = await this.request(
+          `comment_threads/find_by_comment/${commentId}`,
+          'GET'
+        )
+        if (res.data && res.data.id) {
+          thread = res.data
+        }
+      } catch (e) {
+        trackError(e, {
+          source: 'openCommentFromHighlight',
+          message: `commentId: ${commentId}`,
+        })
+      }
+    }
+    if (!thread) return false
+
+    uiStore.expandAndOpenThread(thread.key)
+    await thread.API_fetchComments()
+    uiStore.scrollToBottomOfComments(commentId)
   }
 
   async findOrBuildCommentThread(record) {

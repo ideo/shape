@@ -172,6 +172,8 @@ class Item
     private
 
     def scrub_data_attrs
+      return unless ops.present?
+
       new_ops = ops.map do |op|
         attrs = op['attributes']
         attrs.delete('undefined') if attrs && attrs['undefined'].present?
