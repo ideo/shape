@@ -203,28 +203,6 @@ StyledCardWrapper.defaultProps = {
   zIndex: 1,
 }
 
-// TODO: make this a component or convert to wrapper?
-export const StyledBottomLeftIcon = styled.div`
-  position: absolute;
-  z-index: ${v.zIndex.gridCard};
-  left: 0.25rem;
-  bottom: 0;
-  color: ${v.colors.commonMedium};
-  width: ${props => (props.iconAmount === 2 ? 75 : 45)}px;
-  height: 45px;
-  display: flex;
-  /* LinkIcon appears larger than CollectionIcon so we need to make it smaller */
-  ${props =>
-    props.small &&
-    `
-    width: 18px;
-    height: 18px;
-    bottom: 0.75rem;
-    left: ${props.iconPos === 2 ? 3.25 : 0.75}rem;
-  `};
-`
-StyledBottomLeftIcon.displayName = 'StyledBottomLeftIcon'
-
 export const StyledGridCardInner = styled.div`
   position: relative;
   height: 100%;

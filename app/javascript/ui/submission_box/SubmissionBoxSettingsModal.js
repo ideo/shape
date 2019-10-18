@@ -13,7 +13,7 @@ import {
 import { Checkbox } from '~/ui/global/styled/forms'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import { Row, RowItemLeft } from '~/ui/global/styled/layout'
-import { ThumbnailHolder } from '~/ui/threads/CommentThread'
+import { ThumbnailHolder } from '~/ui/threads/CommentThumbnail'
 import { BctButton } from '~/ui/grid/shared'
 import AlertIcon from '~/ui/icons/AlertIcon'
 import AddTextIcon from '~/ui/icons/AddTextIcon'
@@ -183,6 +183,7 @@ class SubmissionBoxSettingsModal extends React.Component {
       { name: 'file', Icon: AddFileIcon },
     ]
     const type = _.find(types, t => t.name === typeName)
+
     return (
       <SubmissionBoxRow
         key={type.name}
@@ -224,6 +225,7 @@ class SubmissionBoxSettingsModal extends React.Component {
     let template
     if (submission_template_id) {
       template = apiStore.find('collections', submission_template_id)
+      console.log(template)
     }
     if (template) {
       return this.submissionBoxRowForTemplate(template)
