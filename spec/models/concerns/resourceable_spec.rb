@@ -341,20 +341,43 @@ describe Resourceable, type: :concern do
     let(:grandparent) { create(:collection, add_viewers: [user]) }
     let(:parent) { create(:collection, parent_collection: grandparent, add_editors: [user]) }
     let(:collection) { create(:collection, parent_collection: parent) }
-    before do
-      # collection should never be anchored to the grandparent if parent is unanchored
-      collection.update(roles_anchor_collection: grandparent)
+
+    context 'anchored to grandparent' do
+      before do
+        # collection should never be anchored to the grandparent if parent is unanchored
+        collection.update(roles_anchor_collection: grandparent)
+      end
+      it 'should fix any incorrect anchor assignments' do
+        # before
+        expect(collection.can_edit?(user)).to be false
+        inheritance = Roles::Inheritance.new(parent)
+        expect(inheritance.inherit_from_parent?(collection)).to be false
+        # after
+        collection.reanchor_if_incorrect_anchor!
+        expect(collection.can_edit?(user)).to be true
+        expect(collection.roles_anchor).to eq parent
+      end
     end
 
-    it 'should fix any incorrect anchor assignments' do
-      # before
-      expect(collection.can_edit?(user)).to be false
-      inheritance = Roles::Inheritance.new(parent)
-      expect(inheritance.inherit_from_parent?(collection)).to be false
-      # after
-      collection.reanchor_if_incorrect_anchor!
-      expect(collection.can_edit?(user)).to be true
-      expect(collection.roles_anchor).to eq parent
+    context 'anchor not in breadcrumb' do
+      let(:grandparent) { create(:collection, add_editors: [user]) }
+      let(:parent) { create(:collection, parent_collection: grandparent, roles_anchor_collection: grandparent) }
+      let(:other_collection) { create(:collection, add_viewers: [user]) }
+
+      before do
+        # collection should never be anchored outside of its breadcrumb trail
+        collection.update(roles_anchor_collection: other_collection)
+      end
+      it 'should fix any incorrect anchor assignments' do
+        # before
+        expect(collection.can_edit?(user)).to be false
+        inheritance = Roles::Inheritance.new(parent)
+        expect(inheritance.inherit_from_parent?(collection)).to be false
+        # after
+        collection.reanchor_if_incorrect_anchor!
+        expect(collection.can_edit?(user)).to be true
+        expect(collection.roles_anchor).to eq parent.roles_anchor
+      end
     end
   end
 
