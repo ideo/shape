@@ -274,28 +274,6 @@ RSpec.describe Roles::MassAssign, type: :service do
           expect(LinkToSharedCollectionsWorker).to receive(:perform_async).once
           assign_role.call
         end
-
-        context 'when group has an application' do
-          let!(:application_organization) do
-            create(
-              :application_organization,
-              organization: object.organization,
-            )
-          end
-          before do
-            object.update(application: application_organization.application)
-          end
-
-          it 'links the app org collection to user collection' do
-            expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
-              users.map(&:id),
-              [],
-              [application_organization.root_collection_id],
-              [],
-            )
-            assign_role.call
-          end
-        end
       end
     end
 
