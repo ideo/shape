@@ -157,7 +157,7 @@ class GroupTitle extends React.Component {
               title={group.name}
               url={group.filestack_file_url}
               className="groupAvatar"
-              clickable={true}
+              clickable={this.editing}
               size={50}
             />
           </EditAvatarButton>
