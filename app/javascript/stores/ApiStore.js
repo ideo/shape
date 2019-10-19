@@ -418,7 +418,6 @@ class ApiStore extends jsonapi(datxCollection) {
     if (comment) {
       thread = this.find('comment_threads', comment.comment_thread_id)
     }
-
     if (!thread) {
       try {
         const res = await this.request(
@@ -439,6 +438,7 @@ class ApiStore extends jsonapi(datxCollection) {
 
     uiStore.expandAndOpenThread(thread.key)
     await thread.API_fetchComments()
+    uiStore.setReplyingToComment(commentId)
     uiStore.scrollToBottomOfComments(commentId)
   }
 
@@ -500,9 +500,18 @@ class ApiStore extends jsonapi(datxCollection) {
         // don't include any new records that are being constructed
         if (!t.record || !t.record.id) return false
         // include the current page thread even if you're not following
-        if (t.key === this.currentPageThreadKey) return true
+        if (this.alwaysShowCurrentThread(t.key)) {
+          return true
+        }
         return this.currentCommentThreadIds.indexOf(t.id) > -1
       }
+    )
+  }
+
+  alwaysShowCurrentThread(key) {
+    return (
+      key === this.currentPageThreadKey ||
+      key === this.uiStore.expandedThreadKey
     )
   }
 

@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { scroller, animateScroll } from 'react-scroll'
-import { toJS, observable, action, runInAction, computed } from 'mobx'
+import { observable, action, runInAction, computed } from 'mobx'
 
 import routeToLogin from '~/utils/routeToLogin'
 import sleep from '~/utils/sleep'
@@ -44,6 +44,8 @@ export default class UiStore {
   }
   @observable
   selectedTextRangeForCard = { ...this.defaultSelectedTextRange }
+  // stored in case we ever need to reset the text
+  quillSnapshot = {}
   @computed
   get cardMenuOpenAndPositioned() {
     const { cardMenuOpen } = this
@@ -697,7 +699,10 @@ export default class UiStore {
       // -- also helps with the setup of SubmissionBox where you can close the bottom BCT
       this.openBlankContentTool()
     } else {
-      this.blankContentToolState = { ...this.defaultBCTState }
+      // don't over-eagerly set this observable if it's already closed
+      if (this.blankContentToolIsOpen) {
+        this.blankContentToolState = { ...this.defaultBCTState }
+      }
     }
   }
 
@@ -729,6 +734,11 @@ export default class UiStore {
     return this.viewingRecord && this.viewingRecord.internalType === 'items'
       ? this.viewingRecord
       : null
+  }
+
+  get isEditingText() {
+    const { textEditingItem, viewingItem } = this
+    return textEditingItem || (viewingItem && viewingItem.isText)
   }
 
   get isViewingHomepage() {
@@ -914,6 +924,15 @@ export default class UiStore {
       this.cardMenuOpen.menuType = EVENT_SOURCE_TYPES.TEXT_EDITOR
     }
 
+    // if it's already set...
+    if (
+      this.selectedTextRangeForCard.range &&
+      this.selectedTextRangeForCard.range.length
+    ) {
+      // turn off any previous highlights
+      this.toggleCommentHighlight(null)
+    }
+
     const textContent = quillEditor.getText(index, length)
     this.selectedTextRangeForCard = { range, quillEditor, textContent, cardId }
   }
@@ -953,9 +972,14 @@ export default class UiStore {
         // e.g. if this highlight was triggered externally by TextActionMenu
         currentRecord.quill_data = currentQuillEditor.getContents()
       } else {
-        // if we're removing "new" highlights, bring back any ones that might have existed..
+        // if we're removing "new" highlights, bring back any ones that might have existed
         if (!val) {
-          currentQuillEditor.setContents(toJS(currentRecord.quill_data))
+          if (!_.isEmpty(this.quillSnapshot)) {
+            // preserve the current selection
+            const selection = currentQuillEditor.getSelection()
+            currentQuillEditor.setContents(this.quillSnapshot)
+            currentQuillEditor.setSelection(selection)
+          }
         }
       }
     }

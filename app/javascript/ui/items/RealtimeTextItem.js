@@ -169,6 +169,7 @@ class RealtimeTextItem extends React.Component {
 
     if (!initSnapshot) return
     this.contentSnapshot = this.quillEditor.getContents()
+    this.updateUiStoreSnapshot()
   }
 
   get version() {
@@ -270,7 +271,7 @@ class RealtimeTextItem extends React.Component {
       // make sure our local editor is up to date with changes.
       this.quillEditor.updateContents(remoteDeltaWithLocalChanges, 'silent')
       // persist local changes
-      this.setItemQuillData()
+      this.updateUiStoreSnapshot()
     }
 
     if (this.combinedDelta.length()) {
@@ -315,16 +316,27 @@ class RealtimeTextItem extends React.Component {
   }
 
   @action
-  setItemQuillData(fullContent = null) {
-    const { item } = this.props
+  setItemQuillData() {
+    const { item, uiStore } = this.props
     const { quillEditor } = this
-    if (quillEditor) {
-      item.content = quillEditor.root.innerHTML
+    if (!quillEditor) {
+      return
     }
-    const delta = fullContent || (quillEditor && quillEditor.getContents())
 
+    // just like in uiStore... revert to snapshot to reset highlights
+    quillEditor.setContents(uiStore.quillSnapshot)
+
+    item.content = quillEditor.root.innerHTML
+    const delta = quillEditor.getContents()
     item.quill_data = new Delta(delta)
     return item
+  }
+
+  updateUiStoreSnapshot(fullContent = null) {
+    const { uiStore } = this.props
+    const { quillEditor } = this
+    const delta = fullContent || (quillEditor && quillEditor.getContents())
+    uiStore.update('quillSnapshot', delta)
   }
 
   get headerSize() {
@@ -364,16 +376,20 @@ class RealtimeTextItem extends React.Component {
     if (!prevHeader) return
 
     // Apply previous line's header size to last operation
-    const lastOp = _.last(delta.ops)
+    let newDelta = new Delta(delta)
+    const lastOp = _.last(newDelta.ops)
     if (!lastOp.attributes) {
       lastOp.attributes = { header: prevHeader }
     } else if (lastOp.attributes.header) {
       return
     } else {
       // remove lastOp, which is a `retain: 1` and causes the newline to be <p>
-      // NOTE: mutating this delta seems to automatically apply the change?
-      delta.ops.pop()
+      newDelta = new Delta({ ops: [newDelta.ops[0], newDelta.ops[1]] })
+        .retain(1)
+        .delete(1)
     }
+    this.quillEditor.updateContents(newDelta, 'api')
+    return newDelta
   }
 
   get cardId() {
@@ -389,11 +405,16 @@ class RealtimeTextItem extends React.Component {
     if (source !== 'user') return
     // This adjustment is made so that the currently-selected
     // header size is preserved on new lines
-    this.adjustHeaderSizeIfNewline(delta)
+
+    let newDelta = new Delta(delta)
+    const adjustedDelta = this.adjustHeaderSizeIfNewline(delta)
+    if (adjustedDelta) {
+      newDelta = newDelta.compose(adjustedDelta)
+    }
     const cursors = this.quillEditor.getModule('cursors')
     cursors.clearCursors()
 
-    this.combineAwaitingDeltas(delta)
+    this.combineAwaitingDeltas(newDelta)
     this.sendCombinedDelta()
   }
 
@@ -443,7 +464,7 @@ class RealtimeTextItem extends React.Component {
     this.currentlySending = true
     const full_content = this.contentSnapshot.compose(this.combinedDelta)
     // persist the change locally e.g. when we close the text box
-    this.setItemQuillData({ ...full_content })
+    this.updateUiStoreSnapshot(full_content)
 
     // NOTE: will get rejected if this.version < server saved version,
     // in which case the handleReceivedDelta error will try to resend
@@ -481,6 +502,7 @@ class RealtimeTextItem extends React.Component {
 
   handleFocus = e => {
     const { item, uiStore } = this.props
+    if (this.focused) return
     this.focused = true
     // any time the text editor receives focus...
     // you are effectively "leaving" commenting, should clear out commentingOnRecord
@@ -548,7 +570,9 @@ class RealtimeTextItem extends React.Component {
   render() {
     const { item, onExpand, fullPageView, containerRef } = this.props
     // item is not fully loaded yet, e.g. from a CommentThread
-    if (!item.quill_data) return null
+    if (!item.quill_data) {
+      return null
+    }
 
     const { canEdit } = this
     const quillProps = {
@@ -596,7 +620,7 @@ class RealtimeTextItem extends React.Component {
         <QuillStyleWrapper fullPageView={fullPageView}>
           <ReactQuill
             {...quillProps}
-            value={this.quillData}
+            defaultValue={this.quillData}
             onKeyDown={this.handleKeyDown}
           />
         </QuillStyleWrapper>

@@ -15,8 +15,8 @@ const emptySpaceClick = e => {
 
 export const handleMouseDownSelection = e => {
   const emptySpaceMouseDown = emptySpaceClick(e)
-  const { textEditingItem } = uiStore
-  const outsideQuillMouseDown = !quillEditorClick(e) && textEditingItem
+  const { isEditingText } = uiStore
+  const outsideQuillMouseDown = !quillEditorClick(e) && isEditingText
   if (emptySpaceMouseDown) {
     if (outsideQuillMouseDown) {
       uiStore.setCommentingOnRecord(null)
