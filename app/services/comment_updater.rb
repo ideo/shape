@@ -23,6 +23,7 @@ class CommentUpdater < SimpleService
   def update_comment
     @comment.message = @message
     @comment.draftjs_data = @draftjs_data
+    @comment.edited = true unless @comment.edited?
   end
 
   def create_edited_activity

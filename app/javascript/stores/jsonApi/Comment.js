@@ -50,7 +50,7 @@ class Comment extends BaseRecord {
   }
 
   get wasEdited() {
-    return this.updated_at > this.created_at
+    return this.edited
   }
 
   get thread() {
