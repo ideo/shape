@@ -145,6 +145,11 @@ class CommentThread extends BaseRecord {
     // this will create the comment in the API
     await comment.save()
 
+    if (commentingOnRecord) {
+      comment.last_unresolved_comment_id = comment.id
+      commentingOnRecord.unresolved_count++
+    }
+
     if (comment.persisted && uiStore.isCommentingOnTextRange()) {
       await commentingOnRecord.API_persistHighlight(comment.id)
     }

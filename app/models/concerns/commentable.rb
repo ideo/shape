@@ -20,6 +20,10 @@ module Commentable
     comments.opened.count
   end
 
+  def last_unresolved_comment_id
+    comments.opened.last&.id
+  end
+
   def remove_comment_followers!
     return unless comment_threads.any?
 

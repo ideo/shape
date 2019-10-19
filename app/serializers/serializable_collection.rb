@@ -19,6 +19,7 @@ class SerializableCollection < BaseJsonSerializer
     :cover_type,
     :archived,
     :unresolved_count,
+    :last_unresolved_comment_id,
   )
 
   has_many :roles do

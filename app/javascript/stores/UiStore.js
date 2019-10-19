@@ -866,6 +866,7 @@ export default class UiStore {
 
   @action
   setReplyingToComment(replyingToCommentId) {
+    console.log('setting commnet to reply: ', replyingToCommentId)
     this.replyingToCommentId = replyingToCommentId
     this.setCommentingOnRecord(null)
   }
@@ -882,8 +883,10 @@ export default class UiStore {
 
   isCommentingOnTextRange() {
     const { commentingOnRecord } = this
+    if (!commentingOnRecord) return false
+
     const card = commentingOnRecord.parent_collection_card
-    if (!commentingOnRecord || !card) return false
+    if (!card) return false
 
     return this.cardHasSelectedTextRange(card.id)
   }

@@ -14,7 +14,7 @@ import { Tooltip } from '@material-ui/core'
 import v from '~/utils/variables'
 import UnreadCount from '~/ui/threads/UnreadCount'
 import HiddenIconButton from '../icons/HiddenIconButton'
-import { apiStore } from '~/stores/'
+import { apiStore, uiStore } from '~/stores/'
 
 export const StyledIconsWrapper = styled.div`
   position: absolute;
@@ -54,15 +54,14 @@ const PinnedCardIcon = () => (
 
 class BottomLeftCardIcons extends React.Component {
   handleUnreadIconClick = e => {
-    // TODO: what should this actual condition be?
     console.log('handleUnreadIconClick in BottomLeftCardIcons')
     e.preventDefault()
-    if (e.target) {
-      debugger
-      const { record } = this.props
-      apiStore.openCurrentThreadToCommentOn(record)
-      return
-    }
+
+    const { record } = this.props
+    console.log({ record })
+    apiStore.openCurrentThreadToCommentOn(record)
+    uiStore.setReplyingToComment(record.last_unresolved_comment_id)
+    return
   }
 
   get icons() {
@@ -145,10 +144,9 @@ class BottomLeftCardIcons extends React.Component {
     if (record.unresolved_count && record.unresolved_count > 0) {
       icons.push(
         <Tooltip title="Add comment" placement="top">
-          <UnreadCount
-            onClick={this.handleUnreadIconClick}
-            count={record.unresolved_count}
-          />
+          <button onClick={this.handleUnreadIconClick}>
+            <UnreadCount count={record.unresolved_count} />
+          </button>
         </Tooltip>
       )
     }
