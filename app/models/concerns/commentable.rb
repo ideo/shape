@@ -16,8 +16,12 @@ module Commentable
     comment_threads.where(organization_id: organization_id).first
   end
 
-  def resolved_count
-    comment_thread&.comments&.select{|c| c.resolved?}&.count
+  def unresolved_count
+    comments.opened.count
+  end
+
+  def last_unresolved_comment_id
+    comments.opened.last&.id
   end
 
   def remove_comment_followers!
