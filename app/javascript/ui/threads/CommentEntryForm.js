@@ -137,19 +137,26 @@ class CommentEntryForm extends React.Component {
   }
 
   get renderSubjectOfComment() {
-    const { uiStore } = this.props
+    const { uiStore, thread } = this.props
     const { textContent } = uiStore.selectedTextRangeForCard
-    if (!uiStore.commentingOnRecord) return
+
+    if (!uiStore.commentingOnRecord) return null
 
     if (textContent) {
       return (
         <CommentSubject
-          record={uiStore.commentingOnRecord}
+          subjectRecord={uiStore.commentingOnRecord}
           textContent={textContent}
+          threadRecord={thread.record}
         />
       )
     } else {
-      // information about the item/collection
+      return (
+        <CommentSubject
+          subjectRecord={uiStore.commentingOnRecord}
+          threadRecord={thread.record}
+        />
+      )
     }
   }
 

@@ -407,6 +407,7 @@ class ApiStore extends jsonapi(datxCollection) {
     const thread = this.findThreadForRecord(viewingRecord)
     uiStore.expandAndOpenThread(thread.key)
     uiStore.setCommentingOnRecord(record)
+
     return thread
   }
 

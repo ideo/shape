@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types'
-import { Fragment } from 'react'
 import { observable, action } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
@@ -12,31 +11,25 @@ import CoverRenderer from '~/ui/grid/CoverRenderer'
 import Activity from '~/stores/jsonApi/Activity'
 import ActionMenu from '~/ui/grid/ActionMenu'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
-import CollectionIcon from '~/ui/icons/CollectionIcon'
+
 import EditButton from '~/ui/reporting/EditButton'
 import { NamedActionButton } from '~/ui/global/styled/buttons'
 import FullScreenIcon from '~/ui/icons/FullScreenIcon'
-import LinkIcon from '~/ui/icons/LinkIcon'
-import HiddenIconButton from '~/ui/icons/HiddenIconButton'
+
 import Download from '~/ui/grid/Download'
-import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
-import RequiredCollectionIcon from '~/ui/icons/RequiredCollectionIcon'
 import RestoreIcon from '~/ui/icons/RestoreIcon'
-import PinnedIcon from '~/ui/icons/PinnedIcon'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
 import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
-import Tooltip from '~/ui/global/Tooltip'
 import { routingStore, uiStore } from '~/stores'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import ReplaceCardButton from '~/ui/grid/ReplaceCardButton'
-import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
 import {
   StyledGridCard,
-  StyledBottomLeftIcon,
   StyledGridCardInner,
   StyledTopRightActions,
 } from './shared'
 import TextActionMenu from '~/ui/grid/TextActionMenu'
+import BottomLeftCardIcons from '~/ui/grid/BottomLeftCardIcons'
 
 @observer
 class GridCard extends React.Component {
@@ -85,93 +78,6 @@ class GridCard extends React.Component {
       return v.colors.commonMedium
     }
     return v.colors.commonMedium
-  }
-
-  get renderIcon() {
-    const { card, record, cardType } = this.props
-    let icon
-    let small = false
-    let iconAmount = 1
-    if (cardType === 'collections') {
-      if (card.link) {
-        icon = <LinkedCollectionIcon />
-      } else if (record.isRequired) {
-        const type = record.isMasterTemplate ? 'template' : 'collection'
-        icon = (
-          <Tooltip title={`required ${type}`} placement="top">
-            <div>
-              <RequiredCollectionIcon />
-            </div>
-          </Tooltip>
-        )
-      } else if (record.isBoard) {
-        icon = <FoamcoreBoardIcon />
-      } else {
-        icon = <CollectionIcon />
-      }
-
-      if (card.isPinned) {
-        icon = (
-          <Fragment>
-            {!card.isPinnedAndLocked && this.renderPin()}
-            {icon}
-            {card.isPinnedAndLocked && this.renderPin()}
-          </Fragment>
-        )
-        iconAmount = 2
-      }
-    } else if (card.link) {
-      small = true
-      icon = <LinkIcon />
-    } else if (card.isPinned) {
-      icon = this.renderPin()
-    }
-
-    if (!icon) return ''
-
-    return (
-      // needs to handle the same click otherwise clicking the icon does nothing
-      <StyledBottomLeftIcon
-        small={small}
-        onClick={this.handleClick}
-        iconAmount={iconAmount}
-      >
-        {icon}
-      </StyledBottomLeftIcon>
-    )
-  }
-
-  get renderHidden() {
-    const { record } = this.props
-    const { isItem } = this
-    if (
-      record.is_private ||
-      (record.isSubmission && record.submission_attrs.hidden)
-    ) {
-      return (
-        <HiddenIconButton
-          clickable={record.can_edit && record.is_private}
-          size="sm"
-          record={record}
-          IconWrapper={({ children }) => (
-            <StyledBottomLeftIcon small iconAmount={1} iconPos={isItem ? 1 : 2}>
-              {children}
-            </StyledBottomLeftIcon>
-          )}
-        />
-      )
-    }
-    return null
-  }
-
-  renderPin() {
-    const { card } = this.props
-    const hoverClass = card.isPinnedAndLocked ? 'show-on-hover' : ''
-    return (
-      <Tooltip title="pinned" placement="top">
-        <PinnedIcon className={hoverClass} locked={card.isPinnedAndLocked} />
-      </Tooltip>
-    )
   }
 
   get isEditingCardCover() {
@@ -361,6 +267,7 @@ class GridCard extends React.Component {
 
   handleClick = e => {
     const { card, dragging, record } = this.props
+    console.log('handleClick in Gridcard')
     if (dragging) return
     if (uiStore.captureKeyboardGridClick(e, card.id)) {
       return
@@ -497,6 +404,7 @@ class GridCard extends React.Component {
   render() {
     const {
       card,
+      cardType,
       record,
       canEditCollection,
       dragging,
@@ -551,8 +459,7 @@ class GridCard extends React.Component {
           uiStore.textEditingItem !== record &&
           !record.archived &&
           this.renderTopRightActions()}
-        {this.renderIcon}
-        {this.renderHidden}
+        <BottomLeftCardIcons card={card} cardType={cardType} record={record} />
         {/* onClick placed here so it's separate from hotspot click */}
         <StyledGridCardInner
           onClick={this.handleClick}

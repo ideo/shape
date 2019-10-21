@@ -1,5 +1,4 @@
 import { Quill } from 'react-quill'
-
 import { apiStore } from '~/stores'
 
 /* NOTE: we tried Parchment.Attributor.Attribute to set data attributes,

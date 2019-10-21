@@ -38,35 +38,41 @@ ThumbnailHolder.displayName = 'ThumbnailHolder'
 
 class CommentThumbnail extends React.Component {
   objectLink() {
-    const { record } = this.props
+    const { threadRecord } = this.props
 
-    if (record.internalType === 'collections') {
-      return routingStore.pathTo('collections', record.id)
-    } else if (record.internalType === 'items') {
-      return routingStore.pathTo('items', record.id)
+    if (threadRecord.internalType === 'collections') {
+      return routingStore.pathTo('collections', threadRecord.id)
+    } else if (threadRecord.internalType === 'items') {
+      return routingStore.pathTo('items', threadRecord.id)
     }
     return routingStore.pathTo('homepage')
   }
 
   render() {
-    const { record, iconTop, useSubjectIcon } = this.props
+    const { subjectRecord, iconTop, useSubjectIcon } = this.props
     let content
     const thumbnailStyle = {
       position: 'relative',
       top: `${iconTop}px`,
       left: '5px',
     }
-    if (record.internalType === 'items') {
-      if (record.type === ITEM_TYPES.TEXT && useSubjectIcon) {
+    if (subjectRecord.internalType === 'items') {
+      if (subjectRecord.type === ITEM_TYPES.TEXT && useSubjectIcon) {
         content = <SubjectDisplayText>T</SubjectDisplayText>
-      } else if (record.type === ITEM_TYPES.TEXT) {
+      } else if (subjectRecord.type === ITEM_TYPES.TEXT) {
         content = (
           <div style={thumbnailStyle}>
             <TextIcon viewBox="-10 0 70 70" />
           </div>
         )
       } else {
-        content = <img src={record.filestack_file_url} alt="Text" />
+        let imageSource = ''
+        if (subjectRecord.thumbnail_url)
+          imageSource = subjectRecord.thumbnail_url
+        if (subjectRecord.filestack_file_url)
+          imageSource = subjectRecord.filestack_file_url
+
+        content = <img src={imageSource} alt={subjectRecord.name} />
       }
     } else {
       content = (
@@ -74,8 +80,10 @@ class CommentThumbnail extends React.Component {
           <CollectionIcon viewBox="50 50 170 170" />
         </div>
       )
-      if (record.cover.image_url) {
-        content = <img src={record.cover.image_url} alt={record.name} />
+      if (subjectRecord.cover.image_url) {
+        content = (
+          <img src={subjectRecord.cover.image_url} alt={subjectRecord.name} />
+        )
       }
     }
     return (
@@ -87,13 +95,13 @@ class CommentThumbnail extends React.Component {
 }
 
 CommentThumbnail.propTypes = {
-  record: MobxPropTypes.objectOrObservableObject.isRequired,
+  subjectRecord: MobxPropTypes.objectOrObservableObject.isRequired,
+  threadRecord: MobxPropTypes.objectOrObservableObject.isRequired,
   iconTop: PropTypes.number,
   useSubjectIcon: PropTypes.bool.isRequired,
 }
 
 CommentThumbnail.defaultProps = {
-  record: null,
   iconTop: 1,
 }
 

@@ -6,7 +6,6 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled, { css } from 'styled-components'
 
 import { apiStore, routingStore, uiStore } from '~/stores'
-import CommentIconFilled from '~/ui/icons/CommentIconFilled'
 import Moment from '~/ui/global/Moment'
 import Tooltip from '~/ui/global/Tooltip'
 import { SubduedTitle } from '~/ui/global/styled/typography'
@@ -14,6 +13,7 @@ import FollowIcon from '~/ui/icons/FollowIcon'
 import v from '~/utils/variables'
 import hexToRgba from '~/utils/hexToRgba'
 import CommentThumbnail from '~/ui/threads/CommentThumbnail'
+import UnreadCount from './UnreadCount'
 
 export const threadTitleCss = css`
   position: ${props => (props.sticky ? 'sticky' : 'relative')};
@@ -61,28 +61,6 @@ const StyledHeader = styled.div`
     margin-left: 5px;
     font-size: 1.25rem;
     line-height: 1.5rem;
-  }
-  .unread {
-    color: ${v.colors.alert};
-    display: flex;
-    flex-basis: content;
-    height: 12px;
-    width: ${props => (props.lines === 1 ? 20 : 25)}px;
-    margin-left: 8px;
-    margin-top: 5px;
-    svg {
-      margin-left: 4px;
-      height: 100%;
-      width: 100%;
-    }
-    .inner {
-      display: flex;
-      opacity: 0;
-      transition: opacity 1s 2s ease;
-    }
-    &.show-unread .inner {
-      opacity: 1;
-    }
   }
 `
 StyledHeader.displayName = 'StyledHeader'
@@ -132,17 +110,6 @@ class CommentThreadHeader extends React.Component {
     return this.props.record
   }
 
-  objectLink() {
-    const { record } = this
-
-    if (record.internalType === 'collections') {
-      return routingStore.pathTo('collections', record.id)
-    } else if (record.internalType === 'items') {
-      return routingStore.pathTo('items', record.id)
-    }
-    return routingStore.pathTo('homepage')
-  }
-
   toggleSubscribe = ev => {
     if (ev) {
       ev.preventDefault()
@@ -174,14 +141,8 @@ class CommentThreadHeader extends React.Component {
   renderUnreadCount = () => {
     const { thread } = this.props
     if (!thread.unreadCount) return null
-    return (
-      <span className={`unread ${thread.unreadCount && 'show-unread'}`}>
-        <span className="inner">
-          {thread.unreadCount}
-          <CommentIconFilled />
-        </span>
-      </span>
-    )
+
+    return <UnreadCount count={thread.unreadCount} size={'small'} />
   }
 
   renderFollow = () => {
@@ -223,7 +184,8 @@ class CommentThreadHeader extends React.Component {
           {/* left side */}
           <Flex style={{ height: '50px', overflow: 'hidden' }}>
             <CommentThumbnail
-              record={this.record}
+              threadRecord={thread.record}
+              subjectRecord={this.record}
               iconTop={this.titleLines === 1 ? 18 : 9}
               useSubjectIcon={false}
             />

@@ -883,6 +883,7 @@ export default class UiStore {
 
   @action
   setReplyingToComment(replyingToCommentId) {
+    console.log('setting commnet to reply: ', replyingToCommentId)
     this.replyingToCommentId = replyingToCommentId
     this.setCommentingOnRecord(null)
   }
