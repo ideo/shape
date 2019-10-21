@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import { Flex } from 'reflexbox'
-import { observable, runInAction } from 'mobx'
+import { computed, observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import pluralize from 'pluralize'
 
@@ -14,6 +14,7 @@ class CollectionFilter extends React.Component {
   @observable
   currentFilterLookupType = null
 
+  @computed
   get tagFilters() {
     const {
       collection: { collection_filters },
@@ -21,6 +22,7 @@ class CollectionFilter extends React.Component {
     return collection_filters.filter(filter => filter.filter_type === 'tag')
   }
 
+  @computed
   get searchFilters() {
     const {
       collection: { collection_filters },
@@ -48,8 +50,9 @@ class CollectionFilter extends React.Component {
     collection.API_destroyCollectionFilter(filter)
   }
 
-  onSelectFilter = ev => {
-    console.log('select', ev)
+  onSelectFilter = tag => {
+    const filter = apiStore.find('collection_filters', tag.id)
+    filter.API_toggleSelected(tag.selected)
   }
 
   onShowAll = ev => {

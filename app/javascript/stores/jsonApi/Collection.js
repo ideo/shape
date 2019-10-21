@@ -9,9 +9,10 @@ import googleTagManager from '~/vendor/googleTagManager'
 import { apiStore } from '~/stores'
 import { apiUrl } from '~/utils/url'
 
-import CardMoveService from '~/ui/grid/CardMoveService'
 import BaseRecord from './BaseRecord'
+import CardMoveService from '~/ui/grid/CardMoveService'
 import CollectionCard from './CollectionCard'
+import CollectionFilter from './CollectionFilter'
 import Role from './Role'
 import TestAudience from './TestAudience'
 import SharedRecordMixin from './SharedRecordMixin'
@@ -1055,6 +1056,11 @@ Collection.refDefaults = {
   },
   test_audiences: {
     model: TestAudience,
+    type: ReferenceType.TO_MANY,
+    defaultValue: [],
+  },
+  collection_filters: {
+    model: CollectionFilter,
     type: ReferenceType.TO_MANY,
     defaultValue: [],
   },

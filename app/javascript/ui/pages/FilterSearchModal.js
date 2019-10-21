@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import ReactTags from 'react-tag-autocomplete'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import SearchIconRight from '~/ui/icons/SearchIconRight'
 import TagIcon from '~/ui/icons/TagIcon'
@@ -8,6 +9,7 @@ import Modal from '~/ui/global/modals/Modal'
 import Pill from '~/ui/global/Pill'
 import StyledReactTags from '~/ui/pages/shared/StyledReactTags'
 
+@observer
 class FilterSearchModal extends React.Component {
   constructor(props) {
     super(props)
@@ -75,7 +77,7 @@ class FilterSearchModal extends React.Component {
 }
 
 FilterSearchModal.propTypes = {
-  filters: PropTypes.array.isRequired,
+  filters: MobxPropTypes.arrayOrObservableArray.isRequired,
   onCreateTag: PropTypes.func.isRequired,
   onRemoveTag: PropTypes.func.isRequired,
   onSelectTag: PropTypes.func.isRequired,

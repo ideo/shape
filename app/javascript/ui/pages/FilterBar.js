@@ -10,6 +10,7 @@ import { SubduedText } from '~/ui/global/styled/typography'
 @observer
 class FilterBar extends React.Component {
   get formattedPills() {
+    const { onSelect } = this.props
     const { filters } = this.props
     return filters.map(filter => ({
       id: filter.id,
@@ -17,7 +18,7 @@ class FilterBar extends React.Component {
       icon: filter.filter_type === 'tag' ? <TagIcon /> : <SearchIconRight />,
       selectable: true,
       selected: filter.selected,
-      onSelect: this.onTagSelect,
+      onSelect: onSelect,
     }))
   }
 

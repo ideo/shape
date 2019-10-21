@@ -58,7 +58,13 @@ const Pill = props => {
   return (
     <PillWrapper>
       {selectable && (
-        <Checkbox checked={selected} onChange={onSelect} value="yes" />
+        <Checkbox
+          checked={selected}
+          onChange={ev => {
+            onSelect(props.tag || props)
+          }}
+          value="yes"
+        />
       )}
       <SymbolHolder>{symbol}</SymbolHolder>
       <DisplayText>{label}</DisplayText>
@@ -80,6 +86,7 @@ Pill.propTypes = {
   selectable: PropTypes.bool,
   selected: PropTypes.bool,
   onSelect: PropTypes.func,
+  id: PropTypes.string,
 }
 
 Pill.defaultProps = {
@@ -90,6 +97,7 @@ Pill.defaultProps = {
   selectable: false,
   selected: false,
   onSelect: null,
+  id: null,
 }
 
 export default Pill

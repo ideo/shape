@@ -53,7 +53,11 @@ class PillList extends React.Component {
               key={item.name || item.id || item.email}
               symbol={avatar}
               label={item.name}
+              id={item.id}
               onDelete={this.handleDelete(item)}
+              selectable={item.selectable}
+              selected={item.selected}
+              onSelect={item.onSelect}
             />
           )
         })}

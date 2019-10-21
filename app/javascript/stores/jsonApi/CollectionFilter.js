@@ -6,6 +6,11 @@ class CollectionFilter extends BaseRecord {
   static endpoint = apiUrl('collection_filters')
 
   attributesForAPI = ['filter_type', 'text', 'selected']
+
+  API_toggleSelected(selected) {
+    const action = selected ? 'unselect' : 'select'
+    this.apiStore.request(`collection_filters/${this.id}/${action}`, 'POST')
+  }
 }
 
 export default CollectionFilter

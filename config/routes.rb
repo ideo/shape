@@ -133,7 +133,12 @@ Rails.application.routes.draw do
           get 'replies'
         end
       end
-      resources :collection_filters, only: %i[update destroy]
+      resources :collection_filters, only: %i[update] do
+        member do
+          post 'select'
+          post 'unselect'
+        end
+      end
       resources :comment_threads, only: %i[index show create subscribe unsubscribe] do
         resources :comments, only: %i[index create]
         member do
