@@ -61,7 +61,7 @@ class CommentSubject extends React.Component {
   }
 
   render() {
-    const { subjectRecord, threadRecord } = this.props
+    const { subjectRecord, threadRecord, status } = this.props
     return (
       <StyledCommentSubject>
         <CommentThumbnail

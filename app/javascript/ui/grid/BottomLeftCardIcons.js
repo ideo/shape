@@ -54,11 +54,9 @@ const PinnedCardIcon = () => (
 
 class BottomLeftCardIcons extends React.Component {
   handleUnreadIconClick = e => {
-    console.log('handleUnreadIconClick in BottomLeftCardIcons')
     e.preventDefault()
 
     const { record } = this.props
-    console.log({ record })
     apiStore.openCurrentThreadToCommentOn(record)
     uiStore.setReplyingToComment(record.last_unresolved_comment_id)
     return

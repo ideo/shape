@@ -267,7 +267,6 @@ class GridCard extends React.Component {
 
   handleClick = e => {
     const { card, dragging, record } = this.props
-    console.log('handleClick in Gridcard')
     if (dragging) return
     if (uiStore.captureKeyboardGridClick(e, card.id)) {
       return

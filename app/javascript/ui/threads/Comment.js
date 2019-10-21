@@ -370,9 +370,9 @@ class Comment extends React.Component {
 
     return (
       <CommentSubject
+        threadRecord={comment.thread.record}
+        subjectRecord={comment.subject}
         status={status}
-        record={comment.subject}
-        textContent={comment.text_highlight}
         handleResolveButtonClick={this.handleResolveButtonClick}
       />
     )
