@@ -248,6 +248,9 @@ RSpec.describe Roles::MassAssign, type: :service do
                  parent: object.current_shared_collection,
                  collection: linked_collection)
         end
+        before do
+          allow(LinkToSharedCollectionsWorker).to receive(:perform_async).and_call_original
+        end
 
         it 'should link all the group\'s shared collection cards' do
           expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
@@ -264,6 +267,11 @@ RSpec.describe Roles::MassAssign, type: :service do
             thread_ids,
             users.map(&:id),
           )
+          assign_role.call
+        end
+
+        it 'does not link app org collection to user collection' do
+          expect(LinkToSharedCollectionsWorker).to receive(:perform_async).once
           assign_role.call
         end
       end

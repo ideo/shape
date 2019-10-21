@@ -862,6 +862,8 @@ class Collection < ApplicationRecord
   end
 
   def parent_application_collection
+    return self if is_a?(Collection::ApplicationCollection)
+
     parents.find_by(type: 'Collection::ApplicationCollection')
   end
 
