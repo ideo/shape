@@ -26,16 +26,20 @@ class CollectionFilter extends React.Component {
     return collection_filters.filter(filter => filter.filter_type === 'search')
   }
 
-  onDelete = ev => {
+  onCreateFilter = ev => {
+    console.log('create', ev)
+  }
+
+  onDeleteFilter = ev => {
     console.log('delete', ev)
+  }
+
+  onSelectFilter = ev => {
+    console.log('select', ev)
   }
 
   onShowAll = ev => {
     console.log('show-all', ev)
-  }
-
-  onSelect = ev => {
-    console.log('select', ev)
   }
 
   openSearchModal = filterType => () => {
@@ -56,8 +60,8 @@ class CollectionFilter extends React.Component {
         {isFilterBarActive && (
           <FilterBar
             filters={collection_filters}
-            onDelete={this.onDelete}
-            onSelect={this.onSelect}
+            onDelete={this.onDeleteFilter}
+            onSelect={this.onSelectFilter}
             onShowAll={this.onShowAll}
           />
         )}
@@ -74,8 +78,9 @@ class CollectionFilter extends React.Component {
               ? [...this.tagFilters]
               : [...this.searchFilters]
           }
-          onCreateTag={this.onCreateTag}
-          onRemoveTag={this.onRemoveTag}
+          onCreateTag={this.onCreateFilter}
+          onRemoveTag={this.onDeleteFilter}
+          onSelectTag={this.onSelectFilter}
           onModalClose={this.openSearchModal(null)}
           filterType={this.currentFilterLookupType}
           modalOpen={!!this.currentFilterLookupType}

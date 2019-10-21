@@ -33,15 +33,15 @@ class FilterSearchModal extends React.Component {
   }
 
   onNewTag = tag => {
-    console.log('new tag', tag)
+    this.props.onCreateTag(tag)
   }
 
   onRemoveTag = tag => {
-    console.log('remove tag', tag)
+    this.props.onRemoveTag(tag)
   }
 
   onTagSelect = tag => {
-    console.log('select tag', tag)
+    this.props.onSelectTag(tag)
   }
 
   render() {
@@ -74,6 +74,7 @@ FilterSearchModal.propTypes = {
   filters: PropTypes.array.isRequired,
   onCreateTag: PropTypes.func.isRequired,
   onRemoveTag: PropTypes.func.isRequired,
+  onSelectTag: PropTypes.func.isRequired,
   onModalClose: PropTypes.func,
   filterType: PropTypes.oneOf(['Tags', 'Search Term', null]),
   modalOpen: PropTypes.bool,
