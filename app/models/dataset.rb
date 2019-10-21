@@ -112,6 +112,13 @@ class Dataset < ApplicationRecord
     groupings.first
   end
 
+  def group
+    # see note above about only currently supporting one grouping
+    return nil unless grouping.present? && grouping['type'] == 'Group'
+
+    Group.find(grouping['id'])
+  end
+
   # Implement in each sub-class
 
   def name

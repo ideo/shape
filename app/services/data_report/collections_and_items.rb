@@ -5,10 +5,11 @@ module DataReport
     def initialize(dataset:)
       @dataset = dataset
       @record = dataset.data_source
-      @data = nil
+      @data = []
       @single_value = nil
       @is_single_value = false
       @query = nil
+      @group = dataset.group
     end
 
     def call
@@ -51,7 +52,7 @@ module DataReport
       @query = generate_base_query
       return [] unless @query
 
-      @query = filtered_query
+      filter_query
     end
 
     def collections_and_items_report_dataset
@@ -104,7 +105,7 @@ module DataReport
       end
     end
 
-    def filtered_query
+    def filter_query
       if @record.is_a?(Collection)
         collection_opts = { collection_id: @record.id }
         if measure_queries_activities?
@@ -121,25 +122,31 @@ module DataReport
                        activities.target_id = items.id and
                        activities.target_type = 'Item'))
                   .where(%(items.breadcrumb @> ':collection_id'), collection_opts)
-          Activity.from("(#{collections.to_sql} UNION #{items.to_sql}) AS activities")
+          @query = Activity.from(
+            "(#{collections.to_sql} UNION #{items.to_sql}) AS activities",
+          )
+          if @group.present?
+            # limit actor_id to users in the selected group
+            @query = @query.where(actor_id: @group.user_ids)
+          end
         elsif measure == 'collections'
-          @query.where(%(breadcrumb @> ':collection_id' or
+          @query = @query.where(%(breadcrumb @> ':collection_id' or
                          id = :collection_id),
-                       collection_opts)
+                                collection_opts)
         elsif measure == 'items'
-          @query.where(%(breadcrumb @> ':collection_id'),
-                       collection_opts)
+          @query = @query.where(%(breadcrumb @> ':collection_id'),
+                                collection_opts)
         end
+
+        return @query
+      end
+
+      # if not querying activities; by default, within entire org
+      if measure == 'items'
+        @query = @query.joins(parent_collection_card: :parent)
+                       .where('collections.organization_id = ?', organization_id)
       else
-        # default, within entire org
-        if measure == 'items'
-          @query
-            .joins(parent_collection_card: :parent)
-            .where('collections.organization_id = ?', organization_id)
-        else
-          @query
-            .where(organization_id: organization_id)
-        end
+        @query = @query.where(organization_id: organization_id)
       end
     end
 
@@ -165,7 +172,7 @@ module DataReport
       earliest = @query.select("min(#{sql_table}.created_at)").to_a.first.min
       return unless earliest.present?
 
-      min = [earliest, 6.months.ago].max
+      min = [earliest, 12.months.ago].max
       case measure
       when 'participants', 'viewers'
         count = 'count(distinct(actor_id))'

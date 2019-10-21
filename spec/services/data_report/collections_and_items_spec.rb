@@ -271,6 +271,39 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
           # the rest are more recent
           expect(values.last[:value]).to eq 8
         end
+
+        context 'with a group filter' do
+          # just to make sure it works properly, actor should include members of subgroups
+          let!(:subgroup) { create(:group, organization: organization, add_members: [actor]) }
+          let!(:group) { create(:group, add_subgroups: [subgroup]) }
+          let!(:other_group) { create(:group) }
+
+          context 'with a participant within the group' do
+            before do
+              dataset.update(
+                groupings: [{ type: 'Group', id: group.id }],
+              )
+            end
+            it 'should count the activities by the group participants' do
+              values = report.call
+              # should just be the record of our one actor
+              expect(values.count).to eq 1
+              expect(values.first[:value]).to eq 1
+            end
+          end
+
+          context 'with no participants within the group' do
+            before do
+              dataset.update(
+                groupings: [{ type: 'Group', id: other_group.id }],
+              )
+            end
+            it 'should not return any activities' do
+              values = report.call
+              expect(values.count).to eq 0
+            end
+          end
+        end
       end
 
       context 'with a viewer measure and a timeframe' do
