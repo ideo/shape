@@ -6,17 +6,15 @@ import CheckIcon from '~/ui/icons/CheckIcon'
 import ReopenIcon from '~/ui/icons/ReopenIcon'
 import CommentThumbnail from '~/ui/threads/CommentThumbnail'
 import v from '~/utils/variables'
+import Tooltip from '~/ui/global/Tooltip'
 
 const ResolveIconHolder = styled.div`
   color: ${v.colors.commonLight};
   background: ${v.colors.secondaryDarkest};
   position: relative;
-  float: right;
   border-radius: 8px;
   width: 16px;
   height: 16px;
-  top: 3px;
-  left: 9px;
   cursor: pointer;
 `
 ResolveIconHolder.displayName = 'ResolveIconHolder'
@@ -24,8 +22,15 @@ ResolveIconHolder.displayName = 'ResolveIconHolder'
 const StyledCommentSubject = styled.div`
   display: flex;
   font-family: ${v.fonts.sans};
-  font-style: italic;
   color: ${v.colors.commonMedium};
+  padding-top: 10px;
+  overflow-x: hidden;
+`
+
+const CommentTextContent = styled.div`
+  flex: 1;
+  font-style: italic;
+  word-wrap: break-word;
 `
 StyledCommentSubject.displayName = 'StyledCommentSubject'
 
@@ -40,34 +45,33 @@ class CommentSubject extends React.Component {
     return `${textContent}...`
   }
 
-  handleResolve = e => {
-    e.preventDefault()
-    // TODO: should toggle comment state from open||reopened->closed, closed->reopened
-  }
-
   renderResolveButton = () => {
-    const { status } = this.props
-    if (!status) return null
-
+    const { status, handleResolveButtonClick } = this.props
+    const isResolved = status === 'resolved'
     return (
-      <ResolveIconHolder onClick={this.handleResolve}>
-        {status !== 'closed' ? <CheckIcon /> : <ReopenIcon />}
-      </ResolveIconHolder>
+      <Tooltip title={!isResolved ? 'resolve' : 're-open'} placement="top">
+        <ResolveIconHolder
+          onClick={handleResolveButtonClick}
+          className="resolve-comment"
+        >
+          {!isResolved ? <CheckIcon /> : <ReopenIcon />}
+        </ResolveIconHolder>
+      </Tooltip>
     )
   }
 
   render() {
     const { subjectRecord, threadRecord } = this.props
-
     return (
       <StyledCommentSubject>
         <CommentThumbnail
           subjectRecord={subjectRecord}
           threadRecord={threadRecord}
           iconTop={1}
+          useSubjectIcon={true}
         />
-        {this.textContent}
-        {this.renderResolveButton()}
+        <CommentTextContent>{this.textContent}</CommentTextContent>
+        {status && this.renderResolveButton()}
       </StyledCommentSubject>
     )
   }
@@ -78,11 +82,13 @@ CommentSubject.propTypes = {
   threadRecord: MobxPropTypes.objectOrObservableObject.isRequired,
   textContent: PropTypes.string,
   status: PropTypes.string,
+  handleResolveButtonClick: PropTypes.func,
 }
 
 CommentSubject.defaultProps = {
   textContent: null,
   status: null,
+  handleResolveButtonClick: null,
 }
 
 export default CommentSubject

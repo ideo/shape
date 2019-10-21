@@ -4,6 +4,7 @@
 #
 #  id                :bigint(8)        not null, primary key
 #  draftjs_data      :jsonb
+#  edited            :boolean          default(FALSE)
 #  message           :text
 #  replies_count     :integer          default(0)
 #  status            :integer
@@ -42,12 +43,13 @@ class Comment < ApplicationRecord
   belongs_to :subject,
              optional: true,
              polymorphic: true
+  after_create :reopen_parent_after_reply!, if: :parent_is_resolved?
 
   validates :message, presence: true
 
   enum status: {
     opened: 0,
-    closed: 1,
+    resolved: 1,
     reopened: 2,
   }
 
@@ -75,7 +77,7 @@ class Comment < ApplicationRecord
 
     highlight = ''
     Hashie::Mash.new(subject.data_content).ops.each do |op|
-      comment_id = op.attributes&.commentHighlight
+      comment_id = op.attributes&.commentHighlight || op.attributes&.commentHighlightResolved
       if comment_id && comment_id.to_s == id.to_s
         highlight += " #{op.insert}"
       end
@@ -113,5 +115,18 @@ class Comment < ApplicationRecord
 
   def replies_by_page(page: 1)
     replies.page(page).per(REPLIES_PER_PAGE)
+  end
+
+  def reopen_parent_after_reply!
+    CommentUpdater.call(
+      comment: parent,
+      message: parent.message,
+      status: :reopened,
+      draftjs_data: parent.draftjs_data,
+    )
+  end
+
+  def parent_is_resolved?
+    parent&.resolved?
   end
 end

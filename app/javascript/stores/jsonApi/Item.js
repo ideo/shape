@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { action, observable } from 'mobx'
+import { observable } from 'mobx'
 import { ReferenceType } from 'datx'
 
 import { apiUrl } from '~/utils/url'
@@ -22,7 +22,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
     'type',
     'name',
     'content',
-    'data_content',
+    'quill_data',
     'url',
     'image',
     'archived',
@@ -216,17 +216,16 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return _.find(this.primaryDataset.data_source_id, { type: 'Collection' })
   }
 
-  API_updateWithoutSync({ cancel_sync } = {}) {
+  API_updateWithoutSync({ cancel_sync = false, highlight = false } = {}) {
     const { apiStore } = this
     const data = this.toJsonApi()
-    if (this.isText && data.attributes.data_content) {
-      // scrub new highlights before saving
-      this.removeNewHighlights(data.attributes.data_content)
-    }
     // Turn off syncing when saving the item to not reload the page
     if (cancel_sync) data.cancel_sync = true
+    let endpoint = `items/${this.id}`
+    if (highlight) endpoint += '/highlight'
+
     return apiStore
-      .request(`items/${this.id}`, 'PATCH', {
+      .request(endpoint, 'PATCH', {
         data,
       })
       .catch(err => {
@@ -238,41 +237,55 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.request(`items/${this.id}/ping_collection`)
   }
 
-  @action
-  API_persistHighlight(comment_id) {
-    _.each(this.data_content.ops, op => {
-      if (
-        op.attributes &&
-        (op.attributes.commentHighlight === 'new' ||
-          op.attributes['data-comment-id'] === 'new')
-      ) {
-        op.attributes = { commentHighlight: comment_id }
+  async API_persistHighlight({ commentId, delta } = {}) {
+    // pick up "new" highlights that are currently in our quillEditor
+    _.each(delta.ops, op => {
+      if (op.attributes && op.attributes.commentHighlight === 'new') {
+        op.attributes = {
+          // replace them with persisted comment id
+          commentHighlight: commentId,
+        }
       }
     })
-    this.API_updateWithoutSync()
+    // now set this local quill_data to have the new highlight + commentId
+    this.quill_data = delta
+    await this.API_updateWithoutSync({
+      cancel_sync: true,
+      highlight: true,
+    })
+    return
   }
 
-  removeNewHighlights = (delta = this.data_content) => {
+  // NOTE: this may be unnecessary now, based on how we now clear out new highlights
+  removeNewHighlights = (delta = this.quill_data) => {
     let justAddedHighlight = false
     _.each(delta.ops, op => {
       // don't persist any unpersisted comment highlights
-      if (
-        op.attributes &&
-        (op.attributes.commentHighlight === 'new' ||
-          op.attributes['data-comment-id'] === 'new')
-      ) {
+      if (op.attributes && op.attributes.commentHighlight === 'new') {
         justAddedHighlight = true
         delete op['attributes']
       }
     })
     return justAddedHighlight
   }
+
+  hasHighlightFormatting = (delta = this.quill_data) => {
+    let found = false
+    _.each(delta.ops, op => {
+      // could include commentHighlight === false
+      if (op.attributes && _.keys(op.attributes, 'commentHighlight')) {
+        found = true
+      }
+    })
+    return found
+  }
 }
 
 Item.defaults = {
-  data_content: '',
+  quill_data: { ops: [] },
   can_edit: false,
   thumbnail_url: '',
+  version: 0,
 }
 Item.refDefaults = {
   roles: {

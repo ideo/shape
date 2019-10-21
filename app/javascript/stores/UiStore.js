@@ -44,6 +44,8 @@ export default class UiStore {
   }
   @observable
   selectedTextRangeForCard = { ...this.defaultSelectedTextRange }
+  // stored in case we ever need to reset the text
+  quillSnapshot = {}
   @computed
   get cardMenuOpenAndPositioned() {
     const { cardMenuOpen } = this
@@ -697,7 +699,10 @@ export default class UiStore {
       // -- also helps with the setup of SubmissionBox where you can close the bottom BCT
       this.openBlankContentTool()
     } else {
-      this.blankContentToolState = { ...this.defaultBCTState }
+      // don't over-eagerly set this observable if it's already closed
+      if (this.blankContentToolIsOpen) {
+        this.blankContentToolState = { ...this.defaultBCTState }
+      }
     }
   }
 
@@ -729,6 +734,11 @@ export default class UiStore {
     return this.viewingRecord && this.viewingRecord.internalType === 'items'
       ? this.viewingRecord
       : null
+  }
+
+  get isEditingText() {
+    const { textEditingItem, viewingItem } = this
+    return textEditingItem || (viewingItem && viewingItem.isText)
   }
 
   get isViewingHomepage() {
@@ -847,10 +857,17 @@ export default class UiStore {
   // --- BCT + GridCard properties />
 
   @action
+  expandAndOpenThread(key) {
+    // make sure the activityLog is open
+    this.activityLogOpen = true
+    this.expandThread(key)
+  }
+
+  @action
   expandThread(key, { reset = false } = {}) {
     if (key) {
       // when we expand a thread we also want it to set the ActivityLog to Comments
-      this.update('activityLogPage', 'comments')
+      this.activityLogPage = 'comments'
       // reset it first, that way if it's expanded offscreen, it will get re-opened/scrolled to
       if (reset) this.expandedThreadKey = null
     } else {
@@ -872,19 +889,19 @@ export default class UiStore {
   }
 
   @action
-  setCommentingOnRecord(record) {
-    this.toggleCommentHighlight(record)
+  setCommentingOnRecord(record, { persisted = false } = {}) {
+    if (!persisted) {
+      this.toggleCommentHighlight(record)
+    }
     if (!record) {
       this.resetSelectedTextRange()
     }
-    // NOTE: this must be evaluated last since selectedTextRangeForCard is based on it?
     this.commentingOnRecord = record
   }
 
   isCommentingOnTextRange() {
     const { commentingOnRecord } = this
     if (!commentingOnRecord) return false
-
     const card = commentingOnRecord.parent_collection_card
     if (!card) return false
 
@@ -908,6 +925,15 @@ export default class UiStore {
       this.cardMenuOpen.menuType = EVENT_SOURCE_TYPES.TEXT_EDITOR
     }
 
+    // if it's already set...
+    if (
+      this.selectedTextRangeForCard.range &&
+      this.selectedTextRangeForCard.range.length
+    ) {
+      // turn off any previous highlights
+      this.toggleCommentHighlight(null)
+    }
+
     const textContent = quillEditor.getText(index, length)
     this.selectedTextRangeForCard = { range, quillEditor, textContent, cardId }
   }
@@ -917,7 +943,11 @@ export default class UiStore {
   }
 
   toggleCommentHighlight(record) {
-    const { currentQuillEditor, selectedTextRangeForCard } = this
+    const {
+      currentQuillEditor,
+      commentingOnRecord,
+      selectedTextRangeForCard,
+    } = this
     const { range } = selectedTextRangeForCard
     if (!currentQuillEditor || !range || !range.length) return
 
@@ -926,10 +956,34 @@ export default class UiStore {
     currentQuillEditor.formatText(
       range.index,
       range.length,
-      'commentHighlight',
-      val,
-      'user'
+      {
+        commentHighlight: val,
+        commentHighlightResolved: false,
+      },
+      'api'
     )
+
+    const currentRecord = record || commentingOnRecord
+    if (currentRecord && currentRecord.isText) {
+      if (
+        this.textEditingItem !== currentRecord &&
+        this.viewingRecord !== currentRecord
+      ) {
+        // store any highlight changes on the item.quill_data for editors that aren't editing
+        // e.g. if this highlight was triggered externally by TextActionMenu
+        currentRecord.quill_data = currentQuillEditor.getContents()
+      } else {
+        // if we're removing "new" highlights, bring back any ones that might have existed
+        if (!val) {
+          if (!_.isEmpty(this.quillSnapshot)) {
+            // preserve the current selection
+            const selection = currentQuillEditor.getSelection()
+            currentQuillEditor.setContents(this.quillSnapshot)
+            currentQuillEditor.setSelection(selection)
+          }
+        }
+      }
+    }
   }
 
   @action

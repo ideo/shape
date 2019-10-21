@@ -1,45 +1,60 @@
 import { Quill } from 'react-quill'
 import { apiStore } from '~/stores'
 
+/* NOTE: we tried Parchment.Attributor.Attribute to set data attributes,
+ * but it was giving us all sorts of weird formatting issues. (creating an extra <span>)
+ * For whatever reason, domNode.get/setAttribute works better.
+ * This is somewhat based on the LinkBlot example:
+ * https://github.com/quilljs/parchment#example
+ */
+
 const Inline = Quill.import('blots/inline')
-const Parchment = Quill.import('parchment')
 
-const dataAttributor = new Parchment.Attributor.Attribute(
-  'data-comment-id',
-  'data-comment-id'
-)
-Quill.register(dataAttributor)
-
-class QuillTextHighlighter extends Inline {
+export class QuillInlineData extends Inline {
   static create(value) {
-    // NOTE: highlight uses <sub> as its HTML element
-    const node = document.createElement('sub')
-    if (value) {
-      dataAttributor.add(node, value)
-    } else {
-      dataAttributor.remove(node)
-    }
+    const node = super.create()
+    node.setAttribute(this.attribute, value)
+    return node
+  }
 
-    // add onClick handler...
+  static formats(domNode) {
+    return domNode.getAttribute(this.attribute) || true
+  }
+
+  format(name, value) {
+    if (name === this.constructor.blotName && value) {
+      this.domNode.setAttribute(this.constructor.attribute, value)
+    } else {
+      super.format(name, value)
+    }
+  }
+
+  formats() {
+    const formats = super.formats()
+    formats[this.blotName] = this.constructor.formats(this.domNode)
+    return formats
+  }
+}
+
+export class QuillHighlighter extends QuillInlineData {
+  static create(value) {
+    const node = super.create(value)
     if (value) {
       node.onclick = async e => {
         e.preventDefault()
-
-        const comment = await apiStore.find('comments', value)
-
-        apiStore.openCurrentThreadToCommentOn(comment.subject)
+        const commentId = QuillHighlighter.formats(node)
+        apiStore.openCommentFromHighlight(commentId)
       }
     }
     return node
   }
-
-  static formats(node) {
-    // preserve data attribute if already set
-    return dataAttributor.value(node)
-  }
 }
 
-QuillTextHighlighter.blotName = 'commentHighlight'
-QuillTextHighlighter.tagName = ['sub']
+QuillHighlighter.blotName = 'commentHighlight'
+QuillHighlighter.tagName = 'sub'
+QuillHighlighter.attribute = 'data-comment-id'
 
-export default QuillTextHighlighter
+export class QuillHighlightResolver extends QuillInlineData {}
+QuillHighlightResolver.blotName = 'commentHighlightResolved'
+QuillHighlightResolver.tagName = 'span'
+QuillHighlightResolver.attribute = 'data-resolved-comment-id'

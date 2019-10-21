@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_09_212511) do
+ActiveRecord::Schema.define(version: 2019_10_18_203725) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -211,6 +211,7 @@ ActiveRecord::Schema.define(version: 2019_10_09_212511) do
     t.integer "status"
     t.integer "subject_id"
     t.string "subject_type"
+    t.boolean "edited", default: false
     t.index ["comment_thread_id"], name: "index_comments_on_comment_thread_id"
     t.index ["parent_id"], name: "index_comments_on_parent_id"
     t.index ["subject_id", "subject_type"], name: "index_comments_on_subject_id_and_subject_type"
@@ -249,6 +250,8 @@ ActiveRecord::Schema.define(version: 2019_10_09_212511) do
     t.integer "application_id"
     t.jsonb "tiers", default: []
     t.string "name"
+    t.boolean "anyone_can_view", default: true
+    t.index ["anyone_can_view"], name: "index_datasets_on_anyone_can_view"
     t.index ["data_source_type", "data_source_id"], name: "index_datasets_on_data_source_type_and_data_source_id"
     t.index ["organization_id"], name: "index_datasets_on_organization_id"
   end
@@ -448,6 +451,7 @@ ActiveRecord::Schema.define(version: 2019_10_09_212511) do
     t.integer "report_type"
     t.integer "legend_item_id"
     t.integer "legend_search_source"
+    t.jsonb "style"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
     t.index ["created_at"], name: "index_items_on_created_at"

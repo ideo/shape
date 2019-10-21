@@ -57,7 +57,7 @@ gem 'appsignal'
 gem 'amoeba'
 
 # Background processing
-gem 'sidekiq'
+gem 'sidekiq', '~> 6'
 gem 'sidekiq-scheduler'
 
 # ElasticSearch wrapper
@@ -81,7 +81,7 @@ gem 'roadie-rails', '~> 1.3'
 gem 'httparty'
 
 # Redis in-memory caching
-gem 'redis'
+gem 'redis', '~> 4.1'
 
 # memcache
 gem 'dalli', '~> 2.7'
@@ -135,10 +135,14 @@ gem 'possessive'
 
 gem 'activerecord-import'
 
+# Helper for writing union queries
+gem 'active_record_union'
+
+gem 'schmooze', require: false
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
-  # Adds support for Capybara system testing and selenium driver
   gem 'action-cable-testing'
   gem 'active_record_query_trace'
   gem 'capybara', '~> 2.13'
@@ -151,7 +155,6 @@ group :development, :test do
   gem 'pry-rails'
   gem 'rails-controller-testing'
   gem 'rspec-rails', '~> 3.7'
-  gem 'selenium-webdriver'
 end
 
 group :development do

@@ -136,22 +136,6 @@ class CommentEntryForm extends React.Component {
     )
   }
 
-  handleBlur = e => {
-    // maybe not the right place to do this...
-    return
-
-    const { relatedTarget } = e
-    if (
-      relatedTarget &&
-      relatedTarget.getAttribute('data-attr-comment-button')
-    ) {
-      return
-    }
-
-    const { uiStore } = this.props
-    uiStore.setCommentingOnRecord(null)
-  }
-
   get renderSubjectOfComment() {
     const { uiStore, thread } = this.props
     const { textContent } = uiStore.selectedTextRangeForCard
@@ -190,7 +174,6 @@ class CommentEntryForm extends React.Component {
             onChange={this.handleInputChange}
             handleSubmit={this.handleSubmit}
             setEditor={this.setEditor}
-            onBlur={this.handleBlur}
           />
         </StyledCommentInputWrapper>
         <CommentEnterButton

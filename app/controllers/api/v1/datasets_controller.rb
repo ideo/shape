@@ -104,6 +104,7 @@ class Api::V1::DatasetsController < Api::V1::BaseController
   def dataset_params
     params.require(:dataset).permit(
       :type,
+      :name,
       :identifier,
       :description,
       :max_domain,
@@ -115,6 +116,7 @@ class Api::V1::DatasetsController < Api::V1::BaseController
       :data_source_type,
       :data_source_id,
       :external_id,
+      :anyone_can_view,
       style: {},
       tiers: %i[
         value

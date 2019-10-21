@@ -15,8 +15,10 @@ class CommentCreator < SimpleService
     @parent = parent
     @comment = nil
     @subject = nil
+    @status = nil
     if subject_type.present?
       @subject = subject_type.safe_constantize&.find_by_id(subject_id)
+      @status = :opened
     end
   end
 
@@ -35,6 +37,7 @@ class CommentCreator < SimpleService
       author: @author,
       subject: @subject,
       parent: @parent,
+      status: @status,
     )
   end
 end

@@ -100,7 +100,7 @@ class TextItemCover extends React.Component {
     // store item content for later undo action
     item.pushUndo({
       snapshot: {
-        data_content: this.state.item.data_content,
+        quill_data: this.state.item.quill_data,
       },
       message: 'Text undone!',
       redirectTo: uiStore.viewingCollection,
@@ -193,7 +193,7 @@ class TextItemCover extends React.Component {
 
   renderDefault() {
     const { item, cardId } = this.props
-    const textData = item.toJSON().data_content
+    const textData = item.toJSON().quill_data
     const quillProps = {
       // ref is used to get the height of the div in checkTextAreaHeight
       ref: c => {
@@ -217,9 +217,9 @@ class TextItemCover extends React.Component {
   get hasTitleText() {
     const { props } = this
     const { item } = props
-    const { data_content } = item
+    const { quill_data } = item
     let hasTitle = false
-    _.each(data_content.ops, op => {
+    _.each(quill_data.ops, op => {
       if (op.attributes && op.attributes.header === 5) {
         hasTitle = true
       }

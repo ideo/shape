@@ -5,11 +5,22 @@ import styled from 'styled-components'
 import Link from '~/ui/global/Link'
 import TextIcon from '~/ui/icons/TextIcon'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
-import { ITEM_TYPES } from '~/utils/variables'
+import v, { ITEM_TYPES } from '~/utils/variables'
 
 const StyledLink = styled(Link)`
   margin-right: 8px;
 `
+
+const SubjectDisplayText = styled.span`
+  color: ${v.colors.secondaryDark};
+  background: ${v.colors.highlight};
+  font-family: Gotham;
+  font-size: 24px;
+  font-weight: 500;
+  padding: 12px 16px 12px 16px;
+  border-radius: 2px;
+`
+
 export const ThumbnailHolder = styled.span`
   display: block;
   flex-shrink: 0;
@@ -38,7 +49,7 @@ class CommentThumbnail extends React.Component {
   }
 
   render() {
-    const { subjectRecord, iconTop } = this.props
+    const { subjectRecord, iconTop, useSubjectIcon } = this.props
     let content
     const thumbnailStyle = {
       position: 'relative',
@@ -46,7 +57,9 @@ class CommentThumbnail extends React.Component {
       left: '5px',
     }
     if (subjectRecord.internalType === 'items') {
-      if (subjectRecord.type === ITEM_TYPES.TEXT) {
+      if (subjectRecord.type === ITEM_TYPES.TEXT && useSubjectIcon) {
+        content = <SubjectDisplayText>T</SubjectDisplayText>
+      } else if (subjectRecord.type === ITEM_TYPES.TEXT) {
         content = (
           <div style={thumbnailStyle}>
             <TextIcon viewBox="-10 0 70 70" />
@@ -85,6 +98,7 @@ CommentThumbnail.propTypes = {
   subjectRecord: MobxPropTypes.objectOrObservableObject.isRequired,
   threadRecord: MobxPropTypes.objectOrObservableObject.isRequired,
   iconTop: PropTypes.number,
+  useSubjectIcon: PropTypes.bool.isRequired,
 }
 
 CommentThumbnail.defaultProps = {

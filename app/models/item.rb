@@ -17,6 +17,7 @@
 #  name                       :string
 #  question_type              :integer
 #  report_type                :integer
+#  style                      :jsonb
 #  thumbnail_url              :string
 #  type                       :string
 #  unarchived_at              :datetime
@@ -76,6 +77,11 @@ class Item < ApplicationRecord
                  :cached_inheritance,
                  :pending_transcoding_uuid,
                  :common_viewable
+
+  store_accessor :data_content,
+                 :ops,
+                 :version,
+                 :last_10
 
   # So that we can assign these params in collection card builder
   # We have assignment logic instead of using nested attributes
@@ -312,6 +318,8 @@ class Item < ApplicationRecord
 
     roles_anchor&.default_group_id
   end
+
+  def quill_data; end
 
   private
 

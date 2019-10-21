@@ -4,7 +4,8 @@
     "class_type": { "type": "string" },
     "name": { "type": ["string", "null"] },
     "content": { "type": ["string", "null"] },
-    "data_content": { "type": "object" },
+    "quill_data": { "type": ["object", "null"] },
+    "version": { "type": ["number", "null"] },
     "data_settings": { "type": ["object", "null"] },
     "url": { "type": ["string", "null"] },
     "thumbnail_url": { "type": ["string", "null"] },
@@ -33,7 +34,8 @@
     "common_viewable": { "type": ["boolean", "null"] },
     "archived": { "type": ["boolean", "null"] },
     "is_restorable": { "type": ["boolean", "null"] },
-    "default_group_id": { "type": ["string", "null"] }
+    "default_group_id": { "type": ["string", "null"] },
+    "resolved_count": { "type": ["number", "null"] }
   },
   "required": ["class_type"]
 }

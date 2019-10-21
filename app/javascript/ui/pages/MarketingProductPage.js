@@ -13,6 +13,7 @@ import {
 import { DisplayText } from '~/ui/global/styled/typography'
 import MarketingMenu from '~/ui/marketing/MarketingMenu'
 import ContentBlock from '~/ui/marketing/ContentBlock'
+import Stats from '~/ui/marketing/Stats'
 import { Pricing } from '~/ui/marketing/Pricing'
 import marketingFirebaseClient from '~/vendor/firebase/clients/marketingFirebaseClient'
 import ReactPlayer from 'react-player'
@@ -121,6 +122,15 @@ class MarketingProductPage extends React.Component {
                     />
                   ))}
                 </Box>
+                {content.stats && (
+                  <Stats
+                    title={content.stats.title}
+                    subtext=""
+                    banner_image={null}
+                    banner_images={content.stats.banner_images}
+                    stats={content.stats.stats}
+                  />
+                )}
                 {content.pricing && (
                   <Pricing pageName={this.page} {...content.pricing} />
                 )}

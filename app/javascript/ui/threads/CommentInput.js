@@ -156,7 +156,7 @@ CommentInput.propTypes = {
   setEditor: PropTypes.func.isRequired,
   editorState: MobxPropTypes.objectOrObservableObject.isRequired,
   disabled: PropTypes.bool,
-  onBlur: PropTypes.func.isRequired,
+  onBlur: PropTypes.func,
 }
 CommentInput.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -164,6 +164,7 @@ CommentInput.wrappedComponent.propTypes = {
 }
 CommentInput.defaultProps = {
   disabled: false,
+  onBlur: () => null,
 }
 
 CommentInput.displayName = 'CommentInput'

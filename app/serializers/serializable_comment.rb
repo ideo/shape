@@ -7,7 +7,8 @@ class SerializableComment < BaseJsonSerializer
              :draftjs_data,
              :replies_count,
              :status,
-             :text_highlight
+             :text_highlight,
+             :edited
 
   belongs_to :author
   belongs_to :parent

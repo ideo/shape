@@ -2,6 +2,7 @@ class Api::V1::RolesController < Api::V1::BaseController
   load_resource :collection
   load_resource :item
   load_resource :group
+  load_resource :dataset
 
   before_action :authorize_view_record, only: :index
   # All roles that exist on this resource (collection, item or group)
@@ -12,14 +13,14 @@ class Api::V1::RolesController < Api::V1::BaseController
   end
 
   before_action :authorize_manage_record, :check_freemium_limit, only: :create
-  # Create role(s) on this resource (collection, item or group)
+  # Create role(s) on this resource (collection, item, group or dataset)
   # Params:
   # - role: { name: 'editor' }
   # - user_ids: array of of users that you want to assign
   # - group_ids: array of group ids that you want to assign
   # Returns:
   # - array of roles successfully created, including users with that role
-  # /[collections/items/groups]/:id/roles
+  # /[collections/items/groups/datasets]/:id/roles
   def create
     is_switching = root_object_params[:is_switching]
     service = Roles::MassAssign.new(
@@ -160,7 +161,7 @@ class Api::V1::RolesController < Api::V1::BaseController
   end
 
   def record
-    @collection || @item || @group || @role.resource
+    @collection || @item || @group || @dataset || @role.resource
   end
 
   def send_invites_bool

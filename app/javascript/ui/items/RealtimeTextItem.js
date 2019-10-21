@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { toJS } from 'mobx'
+import { action, toJS } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import Delta from 'quill-delta'
 import ReactQuill, { Quill } from 'react-quill'
@@ -11,16 +11,24 @@ import styled from 'styled-components'
 import ChannelManager from '~/utils/ChannelManager'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import QuillLink from '~/ui/global/QuillLink'
-import QuillTextHighlighter from '~/ui/global/QuillTextHighlighter'
+import {
+  QuillHighlighter,
+  QuillHighlightResolver,
+} from '~/ui/global/QuillTextHighlighter'
 import { QuillStyleWrapper } from '~/ui/global/styled/typography'
 import TextItemToolbar from '~/ui/items/TextItemToolbar'
 import { routingStore } from '~/stores'
 import v from '~/utils/variables'
+import QuillClipboard from '~/ui/global/QuillClipboard'
 
 Quill.debug('error')
 Quill.register('modules/cursors', QuillCursors)
+Quill.register('modules/customClipboard', QuillClipboard)
 Quill.register('formats/link', QuillLink)
-Quill.register(QuillTextHighlighter)
+Quill.register(QuillHighlighter)
+Quill.register(QuillHighlightResolver)
+
+const Keyboard = Quill.import('modules/keyboard')
 
 const FULL_PAGE_TOP_PADDING = '2rem'
 const DockedToolbar = styled.div`
@@ -95,7 +103,7 @@ class RealtimeTextItem extends React.Component {
   channelName = 'ItemRealtimeChannel'
   state = { disconnected: false }
   saveTimer = null
-  version = null
+  focused = false
   currentlySending = false
   currentlySendingCheck = null
   combinedDelta = new Delta()
@@ -117,8 +125,6 @@ class RealtimeTextItem extends React.Component {
     }, 1250)
 
     if (!this.reactQuillRef) return
-    const { editor } = this.reactQuillRef
-    this.overrideHeadersFromClipboard(editor)
     this.initQuillRefsAndData({ initSnapshot: true })
     setTimeout(() => {
       this.quillEditor.focus()
@@ -162,9 +168,12 @@ class RealtimeTextItem extends React.Component {
     this.quillEditor = this.reactQuillRef.getEditor()
 
     if (!initSnapshot) return
-    const { item } = this.props
-    this.version = item.data_content.version || 0
     this.contentSnapshot = this.quillEditor.getContents()
+    this.updateUiStoreSnapshot()
+  }
+
+  get version() {
+    return this.props.item.version
   }
 
   createCursor({ id, name }) {
@@ -177,10 +186,10 @@ class RealtimeTextItem extends React.Component {
     this.setState({ disconnected: false })
   }
 
-  channelDisconnected = () => {
+  channelDisconnected = (message = 'Disconnected from channel') => {
     if (this.unmounted) return
     // TODO: do anything here? try to reconnect?
-    console.warn('Disconnected from channel')
+    console.warn(message)
     const { fullPageView } = this.props
     if (!fullPageView) {
       // this will cancel you out of the editor back to view-only mode
@@ -210,22 +219,23 @@ class RealtimeTextItem extends React.Component {
   }
 
   handleReceivedDelta = ({ current_editor, data }) => {
-    const { currentUserId } = this.props
+    const { item, currentUserId } = this.props
 
     // update our local version number
     if (data.version) {
       if (!data.error && data.last_10) {
-        const diff = data.version - this.version
+        const diff = data.version - item.version
         if (diff > 0) {
           _.each(data.last_10, previous => {
             const delta = new Delta(previous.delta)
-            if (previous.version > this.version) {
+            if (previous.version > item.version) {
               if (previous.editor_id !== currentUserId) {
                 this.applyIncomingDelta(delta)
               }
               // update for later sending appropriately composed version to be saved
               this.contentSnapshot = this.contentSnapshot.compose(delta)
-              this.version = previous.version
+              // set our local item.version to match the realtime data we got
+              item.version = previous.version
             }
           })
         }
@@ -247,7 +257,7 @@ class RealtimeTextItem extends React.Component {
         this.sendCombinedDelta()
       }
     }
-    this.sendCursor()
+    if (this.focused) this.sendCursor()
   }
 
   applyIncomingDelta(remoteDelta) {
@@ -261,7 +271,7 @@ class RealtimeTextItem extends React.Component {
       // make sure our local editor is up to date with changes.
       this.quillEditor.updateContents(remoteDeltaWithLocalChanges, 'silent')
       // persist local changes
-      this.setItemDataContent()
+      this.updateUiStoreSnapshot()
     }
 
     if (this.combinedDelta.length()) {
@@ -276,19 +286,24 @@ class RealtimeTextItem extends React.Component {
     return item.can_edit_content && fullyLoaded && !disconnected
   }
 
-  get dataContent() {
+  get quillData() {
     const { item } = this.props
-    const dataContent = toJS(item.data_content)
+    const quillData = toJS(item.quill_data)
     // Set initial font size - if text item is blank,
     // and user has chosen a h* tag (e.g. h1)
     // (p tag does not require any ops changes)
-    if (dataContent.ops.length === 0 && this.headerSize) {
-      dataContent.ops.push({
+    if (
+      quillData &&
+      quillData.ops &&
+      quillData.ops.length === 0 &&
+      this.headerSize
+    ) {
+      quillData.ops.push({
         insert: '\n',
         attributes: { header: this.headerSize },
       })
     }
-    return dataContent
+    return quillData
   }
 
   cancel = (ev, { route = true } = {}) => {
@@ -296,20 +311,32 @@ class RealtimeTextItem extends React.Component {
     // NOTE: cancel also means "save current text"!
     // event is passed through because TextItemCover uses it
     if (!this.canEdit) return onCancel({ item: this.props.item, ev, route })
-    const item = this.setItemDataContent()
+    const item = this.setItemQuillData()
     return onCancel({ item, ev, route })
   }
 
-  setItemDataContent(fullContent = null) {
-    const { item } = this.props
+  @action
+  setItemQuillData() {
+    const { item, uiStore } = this.props
     const { quillEditor } = this
-    item.content = quillEditor.root.innerHTML
-    const delta = fullContent || quillEditor.getContents()
-    item.data_content = {
-      ...delta,
-      version: this.version,
+    if (!quillEditor) {
+      return
     }
+
+    // just like in uiStore... revert to snapshot to reset highlights
+    quillEditor.setContents(uiStore.quillSnapshot)
+
+    item.content = quillEditor.root.innerHTML
+    const delta = quillEditor.getContents()
+    item.quill_data = new Delta(delta)
     return item
+  }
+
+  updateUiStoreSnapshot(fullContent = null) {
+    const { uiStore } = this.props
+    const { quillEditor } = this
+    const delta = fullContent || (quillEditor && quillEditor.getContents())
+    uiStore.update('quillSnapshot', delta)
   }
 
   get headerSize() {
@@ -332,7 +359,6 @@ class RealtimeTextItem extends React.Component {
     // Check if user added newline
     // And if so, set their default text size if provided
     const newlineOpIndices = this.newlineIndicesForDelta(delta)
-
     // Return if there wasn't a specified header size in previous newline operation
     const prevHeaderSizeOp = delta.ops[_.last(newlineOpIndices)]
     if (!prevHeaderSizeOp.attributes || !prevHeaderSizeOp.attributes.header) {
@@ -350,32 +376,20 @@ class RealtimeTextItem extends React.Component {
     if (!prevHeader) return
 
     // Apply previous line's header size to last operation
-    const lastOp = _.last(delta.ops)
+    let newDelta = new Delta(delta)
+    const lastOp = _.last(newDelta.ops)
     if (!lastOp.attributes) {
       lastOp.attributes = { header: prevHeader }
     } else if (lastOp.attributes.header) {
       return
     } else {
-      lastOp.attributes.header = prevHeader
+      // remove lastOp, which is a `retain: 1` and causes the newline to be <p>
+      newDelta = new Delta({ ops: [newDelta.ops[0], newDelta.ops[1]] })
+        .retain(1)
+        .delete(1)
     }
-    this.quillEditor.updateContents(delta)
-  }
-
-  remapHeaderToH1 = (node, delta) => {
-    delta.map(op => {
-      if (!op.attributes) op.attributes = { header: 1 }
-      op.attributes.header = 1
-      return op
-    })
-    return delta
-  }
-
-  overrideHeadersFromClipboard = editor => {
-    // change all header attributes to H1, e.g. when copy/pasting
-    const headers = ['H1', 'H2', 'H3', 'H4', 'H5', 'H6']
-    headers.forEach(header => {
-      editor.clipboard.addMatcher(header, this.remapHeaderToH1)
-    })
+    this.quillEditor.updateContents(newDelta, 'api')
+    return newDelta
   }
 
   get cardId() {
@@ -388,16 +402,20 @@ class RealtimeTextItem extends React.Component {
   }
 
   handleTextChange = (_content, delta, source, _editor) => {
-    if (source === 'user') {
-      // This adjustment is made so that the currently-selected
-      // header size is preserved on new lines
-      this.adjustHeaderSizeIfNewline(delta)
-      const cursors = this.quillEditor.getModule('cursors')
-      cursors.clearCursors()
+    if (source !== 'user') return
+    // This adjustment is made so that the currently-selected
+    // header size is preserved on new lines
 
-      this.combineAwaitingDeltas(delta)
-      this.sendCombinedDelta()
+    let newDelta = new Delta(delta)
+    const adjustedDelta = this.adjustHeaderSizeIfNewline(delta)
+    if (adjustedDelta) {
+      newDelta = newDelta.compose(adjustedDelta)
     }
+    const cursors = this.quillEditor.getModule('cursors')
+    cursors.clearCursors()
+
+    this.combineAwaitingDeltas(newDelta)
+    this.sendCombinedDelta()
   }
 
   handleSelectionChange = (range, source, editor) => {
@@ -433,27 +451,20 @@ class RealtimeTextItem extends React.Component {
     if (!this.combinedDelta.length() || this.currentlySending) {
       if (this.currentlySending && !this.currentlySendingCheck) {
         this.currentlySendingCheck = setTimeout(() => {
-          // if we are stuck 10s in this `currentlySending` mode it means our socketSends are
+          // if we are stuck 15s in this `currentlySending` mode it means our socketSends are
           // silently failing... we've probably been unsubscribed and it's throwing a backend error
-          if (this.currentlySending) this.channelDisconnected()
-        }, 10 * 1000)
+          if (this.currentlySending) {
+            this.channelDisconnected('stuck for 15s')
+          }
+        }, 15 * 1000)
       }
       return false
     }
 
-    const { item } = this.props
     this.currentlySending = true
-    const contentWithNewHighlights = this.contentSnapshot.compose(
-      this.combinedDelta
-    )
-    // persist the change locally e.g. when we close the text box
-    this.setItemDataContent({ ...contentWithNewHighlights })
-
-    const justAddedHighlight = item.removeNewHighlights(this.combinedDelta)
-    if (justAddedHighlight) {
-      return
-    }
     const full_content = this.contentSnapshot.compose(this.combinedDelta)
+    // persist the change locally e.g. when we close the text box
+    this.updateUiStoreSnapshot(full_content)
 
     // NOTE: will get rejected if this.version < server saved version,
     // in which case the handleReceivedDelta error will try to resend
@@ -489,6 +500,17 @@ class RealtimeTextItem extends React.Component {
     }
   }
 
+  handleFocus = e => {
+    const { item, uiStore } = this.props
+    if (this.focused) return
+    this.focused = true
+    // any time the text editor receives focus...
+    // you are effectively "leaving" commenting, should clear out commentingOnRecord
+    if (uiStore.commentingOnRecord === item) {
+      uiStore.setCommentingOnRecord(null)
+    }
+  }
+
   onComment = async e => {
     const { apiStore, item } = this.props
     e.preventDefault()
@@ -496,10 +518,61 @@ class RealtimeTextItem extends React.Component {
     apiStore.openCurrentThreadToCommentOn(item)
   }
 
+  get keyBindings() {
+    const endOfHighlight = (range, context) => {
+      if (!context.format || !context.format.commentHighlight) {
+        return false
+      }
+      const nextFormat = this.quillEditor.getFormat(range.index + 1)
+      if (nextFormat && nextFormat.commentHighlight) {
+        return false
+      }
+      return true
+    }
+    const insertText = (index, char) => {
+      this.quillEditor.insertText(
+        index,
+        char,
+        {
+          commentHighlight: false,
+          'data-comment-id': null,
+        },
+        'user'
+      )
+      this.quillEditor.setSelection(index + 1)
+    }
+    return {
+      enter: {
+        key: Keyboard.keys.ENTER,
+        handler: (range, context) => {
+          if (endOfHighlight(range, context)) {
+            insertText(range.index, '\n')
+          } else {
+            // propagate to quill default newline behavior
+            return true
+          }
+        },
+      },
+      space: {
+        key: 32,
+        handler: (range, context) => {
+          if (endOfHighlight(range, context)) {
+            insertText(range.index, ' ')
+          } else {
+            // propagate to quill default newline behavior
+            return true
+          }
+        },
+      },
+    }
+  }
+
   render() {
     const { item, onExpand, fullPageView, containerRef } = this.props
     // item is not fully loaded yet, e.g. from a CommentThread
-    if (!item.data_content) return null
+    if (!item.quill_data) {
+      return null
+    }
 
     const { canEdit } = this
     const quillProps = {
@@ -510,11 +583,19 @@ class RealtimeTextItem extends React.Component {
       theme: 'snow',
       onChange: this.handleTextChange,
       onChangeSelection: this.handleSelectionChange,
+      onFocus: this.handleFocus,
+      onBlur: e => {
+        this.focused = false
+      },
       readOnly: !canEdit,
       modules: {
+        customClipboard: true,
         toolbar: canEdit ? '#quill-toolbar' : null,
         cursors: {
           hideDelayMs: 3000,
+        },
+        keyboard: {
+          bindings: this.keyBindings,
         },
       },
     }
@@ -539,7 +620,7 @@ class RealtimeTextItem extends React.Component {
         <QuillStyleWrapper fullPageView={fullPageView}>
           <ReactQuill
             {...quillProps}
-            value={this.dataContent}
+            defaultValue={this.quillData}
             onKeyDown={this.handleKeyDown}
           />
         </QuillStyleWrapper>
@@ -565,6 +646,10 @@ RealtimeTextItem.defaultProps = {
   fullPageView: false,
   initialFontTag: 'P',
   containerRef: null,
+}
+RealtimeTextItem.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default RealtimeTextItem

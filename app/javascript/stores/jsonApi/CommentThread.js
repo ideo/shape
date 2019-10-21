@@ -80,7 +80,9 @@ class CommentThread extends BaseRecord {
     // if we had previously loaded additional pages, return it to the state
     // where we just have the first page worth of comments
     if (page === 1 && this.comments.length > PER_PAGE) {
-      this.comments.replace(this.comments.toJS().slice(PER_PAGE * -1))
+      runInAction(() => {
+        this.comments.replace(this.comments.toJS().slice(PER_PAGE * -1))
+      })
     }
     const apiPath = `comment_threads/${this.id}/comments?page=${page}`
     const res = await this.apiStore.request(apiPath, 'GET')
@@ -134,9 +136,13 @@ class CommentThread extends BaseRecord {
     // also store the author_id to simulate the serializer
     comment.author_id = apiStore.currentUserId
     if (commentData.parent_id) {
+      // will trigger rerender for parent comments that just got a reply
       const parent = apiStore.find('comments', commentData.parent_id)
       if (parent) {
         parent.replies_count += 1
+        if (parent.status === 'resolved') {
+          parent.status = 'reopened'
+        }
       }
     }
 
@@ -144,18 +150,32 @@ class CommentThread extends BaseRecord {
     uiStore.trackEvent('create', this.record)
     // this will create the comment in the API
     await comment.save()
-
-    if (commentingOnRecord) {
-      comment.last_unresolved_comment_id = comment.id
-      commentingOnRecord.unresolved_count++
-    }
-
-    if (comment.persisted && uiStore.isCommentingOnTextRange()) {
-      await commentingOnRecord.API_persistHighlight(comment.id)
-    }
-    uiStore.setCommentingOnRecord(null)
+    this.afterCommentCreate(comment)
 
     return comment
+  }
+
+  async afterCommentCreate(comment) {
+    const { uiStore } = this
+    const { commentingOnRecord, currentQuillEditor } = uiStore
+    if (
+      comment.persisted &&
+      uiStore.isCommentingOnTextRange() &&
+      currentQuillEditor
+    ) {
+      // set this now as it won't be present until the text item has saved
+      comment.text_highlight = uiStore.selectedTextRangeForCard.textContent
+      // capture contents so that we can now safely set commentingOnRecord to false (???)
+      const delta = currentQuillEditor.getContents()
+      uiStore.setCommentingOnRecord(null, { persisted: true })
+      await commentingOnRecord.API_persistHighlight({
+        commentId: comment.id,
+        delta,
+      })
+    } else {
+      // just clear this out; e.g. you commented on a record but not a highlight
+      uiStore.setCommentingOnRecord(null)
+    }
   }
 
   API_markViewed() {

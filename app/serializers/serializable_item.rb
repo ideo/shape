@@ -4,7 +4,8 @@ class SerializableItem < BaseJsonSerializer
   attributes(
     :name,
     :content,
-    :data_content,
+    :quill_data,
+    :version,
     :url,
     :thumbnail_url,
     :icon_url,
@@ -17,8 +18,7 @@ class SerializableItem < BaseJsonSerializer
     :question_title,
     :question_description,
     :archived,
-    :unresolved_count,
-    :last_unresolved_comment_id,
+    :resolved_count,
   )
 
   has_many :roles do

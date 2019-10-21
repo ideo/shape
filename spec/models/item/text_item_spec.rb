@@ -7,7 +7,7 @@ RSpec.describe Item::TextItem, type: :model do
         ops: [
           { insert: "How might we do &lt;b&gt;X&lt;/b&gt;\n\n" },
           { insert: "\n", attributes: { header: 3 } },
-          { insert: "\What if we were to do that thing?\n" },
+          { insert: "What if we were to do that thing?\n" },
         ],
       }
     end
@@ -64,7 +64,7 @@ RSpec.describe Item::TextItem, type: :model do
       describe '#transform_realtime_delta' do
         let(:result) do
           text_item.transform_realtime_delta(
-            user,
+            user: user,
             delta: data.delta,
             version: data.version,
             full_content: data.full_content,
@@ -92,6 +92,52 @@ RSpec.describe Item::TextItem, type: :model do
               error: 'locked',
             )
           end
+        end
+      end
+
+      describe '#quill_data=' do
+        let(:data_content) { { ops: [{ insert: 'hello!' }] } }
+        let!(:text_item) { create(:text_item, version: 1, data_content: data_content) }
+
+        context 'with no change' do
+          it 'should not perform a realtime / version update' do
+            # set it to the same thing again
+            expect(text_item.version).to eq 1
+            text_item.quill_data = data_content
+            text_item.save
+            expect(text_item.version).to eq 1
+          end
+        end
+
+        context 'with a change' do
+          it 'should perform a realtime / version update' do
+            # set it to the same thing again
+            expect(text_item.version).to eq 1
+            expect(text_item.last_10).to be nil
+            text_item.quill_data = { ops: [{ insert: 'goodbye.' }] }
+            text_item.save
+            expect(text_item.version).to eq 2
+            expect(text_item.last_10.count).to eq 1
+          end
+        end
+      end
+
+      describe '#scrub_data_attrs' do
+        let(:quill_data) do
+          {
+            ops: [
+              { insert: 'part 1', attributes: { commentHighlight: '999', 'data-comment-id': '999' } },
+              { insert: 'part 2', attributes: { 'data-comment-id': '999' } },
+            ],
+          }
+        end
+        let!(:text_item) { create(:text_item, version: 1) }
+
+        it 'should scrub any attributes that have data-comment-id with no commentHighlight' do
+          text_item.quill_data = quill_data
+          text_item.save
+          expect(text_item.ops.first['attributes']['data-comment-id'].present?).to be true
+          expect(text_item.ops.second['attributes']['data-comment-id'].present?).to be false
         end
       end
     end

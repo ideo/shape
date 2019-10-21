@@ -287,7 +287,7 @@ class CollectionPage extends React.Component {
       }
       if (data.data && data.data.item) {
         const { item } = data.data
-        if (item && item.data_content) {
+        if (item && item.quill_data) {
           this.handleTextItemUpdate(item, data.current_editor)
           return
         }
@@ -308,7 +308,7 @@ class CollectionPage extends React.Component {
       ) {
         return
       }
-      localItem.data_content = item.data_content
+      localItem.quill_data = item.quill_data
     } else {
       // we don't have the item, it must be a new card that we need to fetch
       this.reloadData()

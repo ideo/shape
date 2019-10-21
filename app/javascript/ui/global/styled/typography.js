@@ -56,8 +56,7 @@ export const Heading3 = styled.h3`
 Heading3.displayName = 'StyledHeading3'
 
 export const DisplayTextCss = css`
-  color: ${props =>
-    props.theme.descriptionText || props.color || v.colors.black};
+  color: ${props => props.color || v.colors.black};
   font-weight: ${v.weights.book};
   font-family: ${v.fonts.sans};
   font-size: 1rem;
@@ -208,6 +207,8 @@ CardHeading.displayName = 'CardHeading'
 
 export const TextItemHeading1Css = css`
   ${CardHeadingCss};
+  /* need to preserve spaces in text items */
+  white-space: pre-wrap;
 
   && {
     color: ${v.colors.black};
@@ -271,7 +272,8 @@ export const QuillStyleWrapper = styled.div`
     }
 
     /* NOTE: this is our test of custom highlights */
-    sub {
+    sub,
+    span.highlighted-on {
       vertical-align: baseline;
       font-size: inherit;
       background: ${v.colors.highlight};

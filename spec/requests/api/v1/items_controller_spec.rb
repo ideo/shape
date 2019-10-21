@@ -223,6 +223,108 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
     end
   end
 
+  describe 'PATCH #highlight' do
+    let(:data_content) do
+      {
+        ops: [{ insert: "Welcome to\nthis text." }],
+        version: 10,
+      }.as_json
+    end
+    let(:highlighted_data_content) do
+      {
+        ops: [
+          { insert: 'Welcome to' },
+          { insert: "\n" },
+          { insert: 'this text.', attributes: { commentHighlight: '999' } },
+        ],
+      }.as_json
+    end
+    let!(:item) { create(:text_item, data_content: data_content, add_viewers: [user]) }
+    let!(:parent) { create(:collection) }
+    let!(:parent_collection_card) do
+      create(:collection_card_text, item: item, parent: parent)
+    end
+    let(:path) { "/api/v1/items/#{item.id}/highlight" }
+    let(:params) do
+      json_api_params(
+        'items',
+        quill_data: highlighted_data_content,
+      )
+    end
+    let(:broadcaster) { double('broadcaster') }
+
+    before do
+      allow(CollectionUpdateBroadcaster).to receive(:new).and_return(broadcaster)
+      allow(broadcaster).to receive(:text_item_updated).and_return(true)
+    end
+
+    it 'returns a 200' do
+      patch(path, params: params)
+      expect(response.status).to eq(200)
+    end
+
+    it 'updates the content' do
+      expect(item.ops).to eq(data_content['ops'])
+      patch(path, params: params)
+      expect(item.reload.ops).to eq(highlighted_data_content['ops'])
+    end
+
+    it 'preserves the data_content.version' do
+      expect(item.data_content['version']).to eq(10)
+      patch(path, params: params)
+      expect(item.reload.data_content['version']).to eq(10)
+    end
+
+    it 'creates an activity' do
+      expect(ActivityAndNotificationBuilder).to receive(:call).with(
+        actor: @user,
+        target: item,
+        action: :edited,
+        content: anything,
+      )
+      patch(path, params: params)
+    end
+
+    it 'broadcasts individual text updates' do
+      expect(broadcaster).to receive(:text_item_updated).with(
+        item,
+      )
+      patch(path, params: params)
+    end
+
+    context 'with cancel_sync == true' do
+      let(:params) do
+        json_api_params(
+          'items',
+          { content: 'The wheels on the bus...' },
+          cancel_sync: true,
+        )
+      end
+
+      it 'returns a 204 no content' do
+        patch(path, params: params)
+        expect(response.status).to eq(204)
+      end
+    end
+
+    context 'trying to edit item content with only view access' do
+      let(:highlighted_data_content) do
+        {
+          ops: [
+            { insert: 'Changing the text.' },
+            { insert: "\n" },
+            { insert: 'this text.', attributes: { commentHighlight: '999' } },
+          ],
+        }.as_json
+      end
+
+      it 'returns a 422' do
+        patch(path, params: params)
+        expect(response.status).to eq(422)
+      end
+    end
+  end
+
   describe 'POST #duplicate', create_org: true do
     let!(:item) { create(:text_item, add_editors: [user]) }
     let(:path) { "/api/v1/items/#{item.id}/duplicate" }

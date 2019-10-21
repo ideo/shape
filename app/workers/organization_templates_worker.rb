@@ -11,7 +11,7 @@ class OrganizationTemplatesWorker
     create_profile_template
     create_profile_collection
     create_org_getting_started_collection
-    create_user_getting_started_collection
+    create_user_getting_started_collection unless @user.application_bot?
   rescue ActiveRecord::RecordNotFound
     # org was already deleted, e.g. in a test
     false

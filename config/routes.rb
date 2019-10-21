@@ -50,6 +50,7 @@ Rails.application.routes.draw do
           patch 'archive'
           get 'in_my_collection'
           patch 'restore_permissions'
+          patch 'highlight'
         end
         resources :roles, only: %i[index create destroy] do
           collection do
@@ -58,7 +59,13 @@ Rails.application.routes.draw do
           end
         end
       end
-      resources :datasets, only: %i[index show create update destroy]
+      resources :datasets, only: %i[index show create update destroy] do
+        resources :roles, only: %i[index create destroy] do
+          collection do
+            delete '', action: 'destroy'
+          end
+        end
+      end
       resources :test_collections, only: %i[show] do
         member do
           get 'validate_launch'
@@ -130,6 +137,7 @@ Rails.application.routes.draw do
       resources :comments do
         member do
           get 'replies'
+          patch 'resolve'
         end
       end
       resources :comment_threads, only: %i[index show create subscribe unsubscribe] do
@@ -141,6 +149,7 @@ Rails.application.routes.draw do
         end
         collection do
           get 'find_by_record/:record_type/:record_id', action: 'find_by_record'
+          get 'find_by_comment/:comment_id', action: 'find_by_comment'
         end
       end
       resources :notifications, only: %i[index show update] do

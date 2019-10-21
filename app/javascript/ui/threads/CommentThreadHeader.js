@@ -187,6 +187,7 @@ class CommentThreadHeader extends React.Component {
               threadRecord={thread.record}
               subjectRecord={this.record}
               iconTop={this.titleLines === 1 ? 18 : 9}
+              useSubjectIcon={false}
             />
             <span
               className="name"

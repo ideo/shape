@@ -17,6 +17,7 @@
 #  name                       :string
 #  question_type              :integer
 #  report_type                :integer
+#  style                      :jsonb
 #  thumbnail_url              :string
 #  type                       :string
 #  unarchived_at              :datetime
@@ -45,6 +46,11 @@ class Item
     before_validation :rename_if_name_was_default, on: :update
     has_one :question_answer, inverse_of: :open_response_item
 
+    before_save :scrub_data_attrs
+    before_save :perform_realtime_update, if: :quill_data_changed?
+
+    attr_accessor :quill_data_was
+
     def import_plaintext_content(text)
       self.data_content = QuillContentConverter.new(text).text_to_quill_ops
     end
@@ -55,22 +61,37 @@ class Item
 
     # build up a plaintext string of all the text content, with elements separated by pipes "|"
     # e.g. "Mission Statement | How might we do x..."
-    def plain_content(only_first_line: false, splitter: ' | ')
+    def plain_content(only_first_line: false, splitter: ' | ', data_content: self.data_content)
       ops = HashWithIndifferentAccess.new(data_content).try(:[], :ops)
       return '' unless ops.present?
+
       text = ''
-      ops.each_with_index do |data, i|
+      ops.each do |data|
         # strip out escaped strings e.g. "&lt;strong&gt;" if someone typed raw HTML
         # strip out extra whitespaces/newlines
         t = StripTags.new(data[:insert]).call
-        # sometimes the data['insert'] is just a newline, ignore
-        next if t.empty?
         return t if only_first_line
 
-        text += splitter if i.positive?
         text += t
       end
+      text = text.strip.gsub(/\n+/, splitter).gsub(/\s+/, ' ')
       CGI.unescapeHTML(text)
+    end
+
+    def plain_content_was
+      plain_content(data_content: data_content_was)
+    end
+
+    def plain_content_changed?
+      plain_content_was != plain_content
+    end
+
+    def save_and_broadcast_quill_data(user, data)
+      # update delta with transformed one
+      new_data = threadlocked_transform_realtime_delta(user, Mashie.new(data))
+      # new_data may include an error message
+      received_changes(new_data, user)
+      CollectionUpdateBroadcaster.new(parent, user).text_item_updated(self)
     end
 
     def threadlocked_transform_realtime_delta(user, data)
@@ -78,7 +99,7 @@ class Item
       lock_name = "rt_text_id_#{id}"
       RedisMutex.with_lock(lock_name, block: 0) do
         transform_realtime_delta(
-          user,
+          user: user,
           delta: data.delta,
           version: data.version,
           full_content: data.full_content,
@@ -89,8 +110,8 @@ class Item
       { error: 'locked', version: data_content['version'].to_i }
     end
 
-    def transform_realtime_delta(user, delta:, version:, full_content:)
-      saved_version = data_content['version'].to_i
+    def transform_realtime_delta(user: nil, delta:, version:, full_content:)
+      saved_version = self.version.to_i
 
       if version.to_i < saved_version
         # error needs to alert the frontend to the latest version
@@ -100,11 +121,16 @@ class Item
       new_version = saved_version + 1
       full_content['version'] = new_version
       full_content['last_10'] = data_content['last_10'] || []
-      full_content['last_10'] << { delta: delta, version: new_version, editor_id: user.id.to_s }
+      full_content['last_10'] << {
+        delta: delta,
+        version: new_version,
+        editor_id: user ? user.id.to_s : 'api',
+      }
       full_content['last_10'] = full_content['last_10'].last(10)
       # NOTE: is a "full update" too heavy here for performance, or ok?
       # it basically means it's calling a few related updates on the parent / cards
       # update_column(:data_content, full_content)
+      # -- this is the only place a text_item's data_content should get directly updated
       update(data_content: full_content)
       {
         delta: delta.as_json,
@@ -113,7 +139,48 @@ class Item
       }
     end
 
+    def quill_data
+      { ops: ops }.as_json
+    end
+
+    def quill_data=(new_data = {})
+      # like AM::Dirty, store previous to later know if `quill_data_changed?`
+      self.quill_data_was = Mashie.new(ops: data_content_in_database['ops'])
+      # set the new ops
+      self.ops = Mashie.new(new_data).ops
+    end
+
+    def quill_data_changed?
+      return false unless quill_data_was.present?
+
+      quill_data_was.to_json != quill_data.to_json
+    end
+
+    def perform_realtime_update
+      # determine the diff that we just applied
+      delta = QuillSchmoozer.diff(quill_data_was, quill_data)
+      data = Mashie.new(
+        delta: delta,
+        version: version,
+        full_content: quill_data,
+      )
+      # NOTE: there is the edge case where another realtime update came through
+      # faster than this one, technically we should retry...
+      save_and_broadcast_quill_data(nil, data)
+    end
+
     private
+
+    def scrub_data_attrs
+      return unless ops.present?
+
+      new_ops = ops.map do |op|
+        attrs = op['attributes']
+        attrs.delete('undefined') if attrs && attrs['undefined'].present?
+        op
+      end
+      self.ops = new_ops
+    end
 
     # on_create callback
     def generate_name
