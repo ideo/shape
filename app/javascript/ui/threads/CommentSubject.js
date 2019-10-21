@@ -12,12 +12,9 @@ const ResolveIconHolder = styled.div`
   color: ${v.colors.commonLight};
   background: ${v.colors.secondaryDarkest};
   position: relative;
-  float: right;
   border-radius: 8px;
   width: 16px;
   height: 16px;
-  top: 3px;
-  left: 9px;
   cursor: pointer;
 `
 ResolveIconHolder.displayName = 'ResolveIconHolder'
@@ -25,8 +22,15 @@ ResolveIconHolder.displayName = 'ResolveIconHolder'
 const StyledCommentSubject = styled.div`
   display: flex;
   font-family: ${v.fonts.sans};
-  font-style: italic;
   color: ${v.colors.commonMedium};
+  padding-top: 10px;
+  overflow-x: hidden;
+`
+
+const CommentTextContent = styled.div`
+  flex: 1;
+  font-style: italic;
+  word-wrap: break-word;
 `
 
 class CommentSubject extends React.Component {
@@ -59,8 +63,8 @@ class CommentSubject extends React.Component {
     const { record, status } = this.props
     return (
       <StyledCommentSubject>
-        <CommentThumbnail record={record} iconTop={1} />
-        {this.textContent}
+        <CommentThumbnail record={record} useSubjectIcon={true} />
+        <CommentTextContent>{this.textContent}</CommentTextContent>
         {status && this.renderResolveButton()}
       </StyledCommentSubject>
     )
