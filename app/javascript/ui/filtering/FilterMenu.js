@@ -54,7 +54,7 @@ class FilterMenu extends React.Component {
 
     return (
       <Box ml={'auto'}>
-        <FilterIconHolder align="flex-end" filterBarActive={isFilterBarActive}>
+        <FilterIconHolder filterBarActive={isFilterBarActive}>
           <button onClick={this.handleFilterClick}>
             <FilterIcon />
           </button>
