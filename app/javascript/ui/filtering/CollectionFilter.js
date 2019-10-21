@@ -32,6 +32,7 @@ class CollectionFilter extends React.Component {
 
   onCreateFilter = tag => {
     const { collection } = this.props
+    if (!this.currentFilterLookupType) return
     const backendFilterType = pluralize
       .singular(this.currentFilterLookupType)
       .toLowerCase()
@@ -44,10 +45,12 @@ class CollectionFilter extends React.Component {
     collection.API_createCollectionFilter(filter)
   }
 
-  onDeleteFilter = async tag => {
+  onDeleteFilter = tag => {
     const { collection } = this.props
     const filter = apiStore.find('collection_filters', tag.id)
-    collection.API_destroyCollectionFilter(filter)
+    if (filter) {
+      collection.API_destroyCollectionFilter(filter)
+    }
   }
 
   onSelectFilter = tag => {

@@ -385,6 +385,7 @@ export const fakeCollection = {
   links: {
     self: 'https://www.shape.space/ideo/collections/1',
   },
+  collection_filters: [],
   card_order: 'order',
   collection_cards: fakeCards,
   sortedCards: fakeCards,
@@ -400,6 +401,8 @@ export const fakeCollection = {
   API_fetchCards: jest.fn().mockReturnValue(Promise.resolve({})),
   API_batchUpdateCards: jest.fn().mockReturnValue(Promise.resolve({})),
   API_batchUpdateCardsWithUndo: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_createCollectionFilter: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_destroyCollectionFilter: jest.fn().mockReturnValue(Promise.resolve({})),
   API_selectDatasetsWithIdentifier: jest
     .fn()
     .mockReturnValue(Promise.resolve({})),
@@ -592,4 +595,12 @@ export const fakeTestCollection = {
   name: 'Test Collection',
   test_launched_at: new Date('2019-05-09T03:18:00'),
   test_audiences: [fakeTestAudience],
+}
+
+export const fakeCollectionFilter = {
+  id: '1',
+  filter_type: 'tag',
+  text: 'plants',
+  selected: true,
+  API_toggleSelected: jest.fn().mockReturnValue(Promise.resolve({})),
 }
