@@ -16,7 +16,10 @@
 
 class CollectionFilter < ApplicationRecord
   belongs_to :collection
-  has_many :user_collection_filters
+  # TODO should we destroy the user filters in a worker? they will never
+  # show up in the UI after their collection_filter is destroyed
+  has_many :user_collection_filters,
+           dependent: :destroy
 
   enum filter_type: {
     tag: 0,

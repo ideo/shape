@@ -16,16 +16,20 @@ class FilterSearchModal extends React.Component {
   get filtersFormattedAsTags() {
     // TODO shared with FilterBar
     const { filters } = this.props
-    return filters.map(filter => ({
-      id: filter.id,
-      name: filter.text,
-      label: filter.text,
-      symbol: filter.filter_type === 'tag' ? <TagIcon /> : <SearchIconRight />,
-      onDelete: this.onRemoveTag,
-      selectable: true,
-      selected: filter.selected,
-      onSelect: this.onTagSelect,
-    }))
+    return filters.map(filter => {
+      const tag = {
+        id: filter.id,
+        name: filter.text,
+        label: filter.text,
+        symbol:
+          filter.filter_type === 'tag' ? <TagIcon /> : <SearchIconRight />,
+        selectable: true,
+        selected: filter.selected,
+        onSelect: this.onTagSelect,
+      }
+      tag.onDelete = this.onRemoveTag(tag)
+      return tag
+    })
   }
 
   handleModalClose = ev => {
@@ -36,7 +40,7 @@ class FilterSearchModal extends React.Component {
     this.props.onCreateTag(tag)
   }
 
-  onRemoveTag = tag => {
+  onRemoveTag = tag => ev => {
     this.props.onRemoveTag(tag)
   }
 

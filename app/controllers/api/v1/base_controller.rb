@@ -110,6 +110,7 @@ class Api::V1::BaseController < ApplicationController
            include: include,
            expose: {
              current_record: @collection,
+             current_user: current_user,
            }
   end
 

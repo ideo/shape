@@ -664,6 +664,23 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     })
   }
 
+  API_createCollectionFilter(params) {
+    return this.apiStore.request(
+      `collections/${this.id}/collection_filters/`,
+      'POST',
+      {
+        ...params,
+      }
+    )
+  }
+
+  API_destroyCollectionFilter(filter) {
+    return this.apiStore.request(
+      `collections/${this.id}/collection_filters/${filter.id}`,
+      'DELETE'
+    )
+  }
+
   API_selectDatasetsWithIdentifier({ identifier }) {
     return this.apiStore.request(
       `collections/${this.id}/datasets/select`,

@@ -7,8 +7,10 @@ class SerializableCollectionFilter < BaseJsonSerializer
 
   attribute :selected do
     # TODO maybe get current_user here and check that it's selected?
-    true
+    user_filter = UserCollectionFilter.find_by(
+      user_id: @current_user.id,
+      collection_filter_id: @object.id,
+    )
+    user_filter.present? ? user_filter.selected : true
   end
-
-  belongs_to :collection
 end

@@ -43,6 +43,7 @@ Rails.application.routes.draw do
             post 'unselect'
           end
         end
+        resources :collection_filters, only: %i[create update destroy]
       end
       resources :items do
         member do
@@ -132,6 +133,7 @@ Rails.application.routes.draw do
           get 'replies'
         end
       end
+      resources :collection_filters, only: %i[update destroy]
       resources :comment_threads, only: %i[index show create subscribe unsubscribe] do
         resources :comments, only: %i[index create]
         member do
