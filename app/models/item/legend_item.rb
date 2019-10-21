@@ -73,7 +73,7 @@ class Item
       datasets.viewable_by_user(user).map do |dataset|
         dataset.cached_data_items_datasets = data_items_datasets_by_dataset_id[dataset.id]
         dataset
-      end
+      end.sort_by(&:order)
     end
 
     private

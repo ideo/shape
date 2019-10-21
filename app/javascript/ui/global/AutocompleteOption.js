@@ -8,6 +8,7 @@ import { DisplayText, SubText } from '~/ui/global/styled/typography'
 import { SelectOption } from '~/ui/global/styled/forms'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import Avatar from '~/ui/global/Avatar'
+import { GroupIconContainer } from '~/ui/groups/styles'
 
 const AvatarHolder = styled.span`
   height: 60px;
@@ -49,6 +50,16 @@ class AutocompleteOption extends React.Component {
     return <AvatarHolder>{content}</AvatarHolder>
   }
 
+  renderGroupIcon() {
+    const entity = this.props.data.data
+    if (!entity || entity.internalType !== 'groups' || !entity.icon_url) return
+    return (
+      <GroupIconContainer>
+        <img src={entity.icon_url} />
+      </GroupIconContainer>
+    )
+  }
+
   render() {
     const { children, isFocused, data, onFocus } = this.props
     let content = children
@@ -64,7 +75,10 @@ class AutocompleteOption extends React.Component {
           </span>
           <RowItemLeft>
             <div>
-              <DisplayText>{name}</DisplayText>
+              <DisplayText>
+                {name}
+                {this.renderGroupIcon()}
+              </DisplayText>
               <br />
               {entity.email && <SubText compact>{entity.email}</SubText>}
             </div>

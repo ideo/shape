@@ -62,6 +62,7 @@ class Avatar extends React.Component {
       title,
       linkToCollectionId,
       responsive,
+      clickable,
     } = this.props
     const renderAvatar = (
       <StyledAvatar
@@ -71,7 +72,9 @@ class Avatar extends React.Component {
         src={this.url}
         imgProps={{ onError: this.onError }}
         onClick={this.handleClick}
-        cursor={linkToCollectionId || displayName ? 'pointer' : 'initial'}
+        cursor={
+          linkToCollectionId || displayName || clickable ? 'pointer' : 'initial'
+        }
         responsive={responsive ? 1 : 0}
       />
     )
@@ -99,6 +102,7 @@ Avatar.propTypes = {
   displayName: PropTypes.bool,
   linkToCollectionId: PropTypes.string,
   responsive: PropTypes.bool,
+  clickable: PropTypes.bool,
 }
 Avatar.defaultProps = {
   url:
@@ -109,6 +113,7 @@ Avatar.defaultProps = {
   displayName: false,
   linkToCollectionId: null,
   responsive: true,
+  clickable: false,
 }
 
 export default Avatar

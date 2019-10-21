@@ -77,6 +77,7 @@ ActiveRecord::Schema.define(version: 2019_10_18_203725) do
     t.string "invite_cta"
     t.string "email"
     t.string "logo_url"
+    t.string "group_icon_url"
     t.index ["user_id"], name: "index_applications_on_user_id"
   end
 
@@ -390,6 +391,7 @@ ActiveRecord::Schema.define(version: 2019_10_18_203725) do
     t.string "type"
     t.string "network_id"
     t.integer "created_by_id"
+    t.integer "application_id"
     t.index ["autojoin_emails"], name: "index_groups_on_autojoin_emails", using: :gin
     t.index ["handle"], name: "index_groups_on_handle"
     t.index ["network_id"], name: "index_groups_on_network_id"
