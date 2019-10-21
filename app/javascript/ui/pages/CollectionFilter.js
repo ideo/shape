@@ -52,11 +52,16 @@ class CollectionFilter extends React.Component {
 
   onSelectFilter = tag => {
     const filter = apiStore.find('collection_filters', tag.id)
-    filter.API_toggleSelected(tag.selected)
+    filter.API_toggleSelected(!tag.selected)
   }
 
   onShowAll = ev => {
-    console.log('show-all', ev)
+    const {
+      collection: { collection_filters },
+    } = this.props
+    collection_filters.forEach(filter => {
+      filter.API_toggleSelected(false)
+    })
   }
 
   openSearchModal = filterType => () => {

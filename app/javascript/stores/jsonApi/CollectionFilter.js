@@ -8,7 +8,7 @@ class CollectionFilter extends BaseRecord {
   attributesForAPI = ['filter_type', 'text', 'selected']
 
   API_toggleSelected(selected) {
-    const action = selected ? 'unselect' : 'select'
+    const action = selected ? 'select' : 'unselect'
     this.apiStore.request(`collection_filters/${this.id}/${action}`, 'POST')
   }
 }
