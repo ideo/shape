@@ -65,6 +65,12 @@ const StyledHeader = styled.div`
 `
 StyledHeader.displayName = 'StyledHeader'
 
+const UnreadCountWrapper = styled.div`
+  position: relative;
+  left: 5px;
+  top: 5px;
+`
+
 export const FollowHolder = styled.span`
   color: ${props =>
     props.isFollowed ? v.colors.commonLight : v.colors.secondaryLight};
@@ -142,7 +148,11 @@ class CommentThreadHeader extends React.Component {
     const { thread } = this.props
     if (!thread.unreadCount) return null
 
-    return <UnreadCount count={thread.unreadCount} size={'small'} />
+    return (
+      <UnreadCountWrapper>
+        <UnreadCount count={thread.unreadCount} size={'small'} />
+      </UnreadCountWrapper>
+    )
   }
 
   renderFollow = () => {

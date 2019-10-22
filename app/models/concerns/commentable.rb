@@ -17,7 +17,7 @@ module Commentable
   end
 
   def unresolved_count
-    comments.opened.count
+    comments.where.not(status: :resolved).count
   end
 
   def last_unresolved_comment_id

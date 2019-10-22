@@ -2,6 +2,7 @@ import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import _ from 'lodash'
 
 import RequiredCollectionIcon from '~/ui/icons/RequiredCollectionIcon'
 import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
@@ -51,6 +52,13 @@ const PinnedCardIcon = () => (
     <PinnedIcon />
   </Tooltip>
 )
+
+const UnreadButton = styled.button`
+  position: relative;
+  ${props => props.hasNoOtherIcons && `left: 8px;`}
+  top: 30%;
+  height: 40%;
+`
 
 class BottomLeftCardIcons extends React.Component {
   handleUnreadIconClick = e => {
@@ -139,12 +147,17 @@ class BottomLeftCardIcons extends React.Component {
       )
     }
 
+    const hasNoOtherIcons = _.isEmpty(icons)
+
     if (record.unresolved_count && record.unresolved_count > 0) {
       icons.push(
         <Tooltip title="Add comment" placement="top">
-          <button onClick={this.handleUnreadIconClick}>
-            <UnreadCount count={record.unresolved_count} />
-          </button>
+          <UnreadButton
+            onClick={this.handleUnreadIconClick}
+            hasNoOtherIcons={hasNoOtherIcons}
+          >
+            <UnreadCount count={record.unresolved_count} size={'large'} />
+          </UnreadButton>
         </Tooltip>
       )
     }

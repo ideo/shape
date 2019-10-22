@@ -906,7 +906,9 @@ export default class UiStore {
       const prevHighlightNode = document.querySelector(
         `sub[data-comment-id="${previousReplyingToCommentId}"]`
       )
-      prevHighlightNode.classList.remove('highlightActive')
+      if (prevHighlightNode) {
+        prevHighlightNode.classList.remove('highlightActive')
+      }
     }
     activeHighlightNode = document.querySelector(
       `sub[data-comment-id="${replyingToCommentId}"]`
