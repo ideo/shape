@@ -477,6 +477,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return data
   }
 
+  get collectionFilterQuery() {
+    const activeFilters = this.collection_filters
+      .filter(filter => filter.selected)
+      .map(filter =>
+        filter.filter_type === 'tag' ? `#${filter.text}` : filter.text
+      )
+    if (activeFilters.length === 0) return {}
+    return { q: activeFilters.join(' ') }
+  }
+
   async API_fetchCards({
     page = 1,
     per_page = null,
@@ -492,6 +502,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       page,
       per_page,
     }
+    Object.assign(params, this.collectionFilterQuery)
     if (!params.per_page) {
       // NOTE: If this is a Board, per_page will be ignored in favor of default 16x16 rows/cols
       params.per_page = this.recordsPerPage

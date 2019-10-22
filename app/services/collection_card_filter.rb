@@ -52,10 +52,29 @@ class CollectionCardFilter < SimpleService
       # ensure per_page is between 50 and 200
       per_page = [@filters[:per_page].to_i, CollectionCard::DEFAULT_PER_PAGE].max
       per_page = [per_page, 200].min
-      @cards = @collection.collection_cards_by_page(
-        page: @filters[:page],
-        per_page: per_page,
-      )
+      if @filters[:q].present?
+        where_clause = {
+          parent_id: @collection.id,
+          archived: false,
+        }
+        results = Search.new(
+          index_name: [Item, Collection],
+          where: where_clause,
+          per_page: per_page,
+          page: @filters[:page],
+        ).search(@filters[:q])
+        item_ids = results.hits.select { |r| r['_type'] == 'item' }.map { |r| r['_id'] }
+        collection_ids = results.hits.select { |r| r['_type'] == 'collection' }.map { |r| r['_id'] }
+
+        cc = CollectionCard.arel_table
+        @cards =  CollectionCard
+          .where(cc[:collection_id].in(collection_ids).or(cc[:item_id].in(item_ids)))
+      else
+        @cards = @collection.collection_cards_by_page(
+          page: @filters[:page],
+          per_page: per_page,
+        )
+      end
     end
 
     if @collection.archived? && @collection.archive_batch.present?

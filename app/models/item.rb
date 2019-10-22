@@ -162,6 +162,7 @@ class Item < ApplicationRecord
       content: search_content,
       # NOTE: could change this back to defer to parent if we ever remove item roles
       user_ids: search_user_ids,
+      parent_id: parent&.id,
       group_ids: search_group_ids,
       organization_id: organization_id,
       archived: archived,

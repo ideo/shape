@@ -252,6 +252,7 @@ class Collection < ApplicationRecord
       organization_id: organization_id,
       user_ids: search_user_ids,
       group_ids: search_group_ids,
+      parent_id: parent&.id,
       parent_ids: parent_ids,
       activity_dates: activity_dates.empty? ? nil : activity_dates,
       created_at: created_at,
