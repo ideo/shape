@@ -3,6 +3,7 @@
 # Table name: datasets
 #
 #  id               :bigint(8)        not null, primary key
+#  anyone_can_view  :boolean          default(TRUE)
 #  cached_data      :jsonb
 #  chart_type       :integer
 #  data_source_type :string
@@ -27,6 +28,7 @@
 #
 # Indexes
 #
+#  index_datasets_on_anyone_can_view                      (anyone_can_view)
 #  index_datasets_on_data_source_type_and_data_source_id  (data_source_type,data_source_id)
 #  index_datasets_on_organization_id                      (organization_id)
 #

@@ -1,5 +1,5 @@
 class SerializableDataItem < SerializableItem
-  attributes :data_settings, :report_type, :title, :description
+  attributes :data_settings, :report_type, :title, :description, :style
 
   # Don't `data_content` as this duplicates `datasets` for DataItem
   attribute :data_content do

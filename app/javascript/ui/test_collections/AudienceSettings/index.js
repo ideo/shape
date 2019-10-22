@@ -6,7 +6,6 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import { FormButton } from '~/ui/global/styled/buttons'
 import AudienceSettingsWidget from '~/ui/test_collections/AudienceSettings/AudienceSettingsWidget'
-// import TestAudience from '~/stores/jsonApi/TestAudience'
 import FeedbackTermsModal from '~/ui/test_collections/FeedbackTermsModal'
 import ConfirmPriceModal from '~/ui/test_collections/ConfirmPriceModal'
 import v from '~/utils/variables'
