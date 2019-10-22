@@ -70,6 +70,8 @@ class Dataset < ApplicationRecord
   }
 
   attr_accessor :cached_data_items_datasets
+  # start_date_limit can be temp overridden to extend past imposed 12 month limit
+  attr_accessor :start_date_limit
 
   delegate :order, :selected,
            to: :cached_data_items_datasets,

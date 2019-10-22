@@ -53,6 +53,11 @@ class Activity < ApplicationRecord
   scope :where_content, -> {
     where(action: content_actions, target_type: 'Item')
   }
+  scope :join_actors_in_group, ->(group) {
+    joins(actor: [users_roles: :role])
+      .where(Role.arel_table[:resource_identifier]
+      .in(group.identifiers))
+  }
 
   # add explicit values so it's not tied to the order of the array
   enum action: {

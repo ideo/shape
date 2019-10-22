@@ -53,6 +53,7 @@ module DataReport
       return [] unless @query
 
       filter_query
+      filter_query_for_group_actors if @group.present?
     end
 
     def collections_and_items_report_dataset
@@ -92,7 +93,7 @@ module DataReport
       case measure
       when 'participants'
         Activity.in_org(organization_id).where_participated
-      when 'viewers'
+      when 'viewers', 'views'
         Activity.in_org(organization_id).where_viewed
       when 'activity'
         Activity.in_org(organization_id).where_active
@@ -108,6 +109,11 @@ module DataReport
     def filter_query
       if @record.is_a?(Collection)
         collection_opts = { collection_id: @record.id }
+        if measure == 'views'
+          @query = @query.where(target: @record)
+          return
+        end
+
         if measure_queries_activities?
           collections = @query
                         .joins(%(join collections on
@@ -125,10 +131,6 @@ module DataReport
           @query = Activity.from(
             "(#{collections.to_sql} UNION #{items.to_sql}) AS activities",
           )
-          if @group.present?
-            # limit actor_id to users in the selected group
-            @query = @query.where(actor_id: @group.user_ids)
-          end
         elsif measure == 'collections'
           @query = @query.where(%(breadcrumb @> ':collection_id' or
                          id = :collection_id),
@@ -150,6 +152,11 @@ module DataReport
       end
     end
 
+    def filter_query_for_group_actors
+      # limit actor_id to users in the selected group
+      @query = @query.join_actors_in_group(@group)
+    end
+
     def measure_queries_activities?
       !%w[collections items records].include?(measure)
     end
@@ -167,15 +174,21 @@ module DataReport
       end
     end
 
+    def start_date_limit
+      @dataset.start_date_limit || 12.months.ago
+    end
+
     def calculate_timeframe_values
       sql_table = query_table.table_name
       earliest = @query.select("min(#{sql_table}.created_at)").to_a.first.min
       return unless earliest.present?
 
-      min = [earliest, 12.months.ago].max
+      min = [earliest, start_date_limit].max
       case measure
       when 'participants', 'viewers'
         count = 'count(distinct(actor_id))'
+      when 'views'
+        count = 'count(distinct(id))'
       when 'activity', 'content', 'collections', 'items'
         count = 'count(*)'
       else
@@ -234,7 +247,7 @@ module DataReport
         value = @query
                 .select(:actor_id)
                 .distinct
-      when 'activity', 'content', 'collections', 'items'
+      when 'activity', 'content', 'collections', 'items', 'views'
         value = @query
       else
         return
@@ -251,7 +264,11 @@ module DataReport
       else
         identifier = "Org/#{organization_id}"
       end
-      "Dataset::#{identifier}::#{measure}::#{Date.today}"
+      key = "Dataset::#{identifier}::#{measure}"
+      if @group.present?
+        key = "#{key}::Group/#{@group.id}"
+      end
+      "#{key}::#{Date.today}"
     end
   end
 end
