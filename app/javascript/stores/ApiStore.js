@@ -523,10 +523,10 @@ class ApiStore extends jsonapi(datxCollection) {
     return this.find('comments', uiStore.replyingToCommentId)
   }
 
-  collapseReplies() {
+  async collapseReplies() {
     const { uiStore, replyingToComment } = this
     if (replyingToComment) {
-      replyingToComment.resetReplies()
+      await replyingToComment.resetReplies()
       uiStore.setReplyingToComment(null)
     }
   }

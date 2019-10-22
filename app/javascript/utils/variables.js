@@ -145,7 +145,8 @@ export default {
     tertiaryDark: '#c43a31',
     ctaPrimary: '#00a0e0',
     alert: '#d66742',
-    highlight: '#f8ed81',
+    highlightActive: '#f8ed81',
+    highlightInactive: '#fbf4b3',
     caution: '#fcf113',
     offset: '#6a7c7e',
     placeholderGray: '#bcbcbc',
@@ -200,7 +201,13 @@ export default {
   },
 
   quillDefaults: {
-    formats: ['link', 'header', 'commentHighlight', 'commentHighlightResolved'],
+    formats: [
+      'link',
+      'header',
+      'commentHighlight',
+      'commentHighlightResolved',
+      'highlight',
+    ],
     modules: {
       toolbar: null,
     },

@@ -13,7 +13,7 @@ const StyledLink = styled(Link)`
 
 const SubjectDisplayText = styled.span`
   color: ${v.colors.secondaryDark};
-  background: ${v.colors.highlight};
+  background: ${v.colors.highlightActive};
   font-family: Gotham;
   font-size: 24px;
   font-weight: 500;

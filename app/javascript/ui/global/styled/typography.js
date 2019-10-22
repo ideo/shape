@@ -272,11 +272,14 @@ export const QuillStyleWrapper = styled.div`
     }
 
     /* NOTE: this is our test of custom highlights */
-    sub,
-    span.highlighted-on {
+    sub {
       vertical-align: baseline;
       font-size: inherit;
-      background: ${v.colors.highlight};
+      background: ${v.colors.highlightInactive};
+    }
+
+    sub.highlightActive {
+      background: ${v.colors.highlightActive};
     }
 
     @keyframes blink-animation {

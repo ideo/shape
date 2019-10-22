@@ -512,10 +512,11 @@ class RealtimeTextItem extends React.Component {
   }
 
   onComment = async e => {
-    const { apiStore, uiStore, item } = this.props
     e.preventDefault()
+    const { apiStore, uiStore, item } = this.props
+    const { range } = uiStore.selectedTextRangeForCard
     // prevent commenting without a selected range
-    if (!uiStore.selectedTextRangeForCard.range) return
+    if (!(range && range.length > 0)) return
     apiStore.openCurrentThreadToCommentOn(item)
   }
 

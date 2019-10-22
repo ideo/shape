@@ -883,8 +883,36 @@ export default class UiStore {
 
   @action
   setReplyingToComment(replyingToCommentId) {
+    if (
+      !!replyingToCommentId &&
+      this.replyingToCommentId !== replyingToCommentId
+    ) {
+      this.toggleCommentHighlightActive(
+        this.replyingToCommentId,
+        replyingToCommentId
+      )
+      this.setCommentingOnRecord(null)
+    }
     this.replyingToCommentId = replyingToCommentId
-    this.setCommentingOnRecord(null)
+  }
+
+  toggleCommentHighlightActive(
+    previousReplyingToCommentId,
+    replyingToCommentId
+  ) {
+    let activeHighlightNode = null
+    if (!!previousReplyingToCommentId) {
+      // when something else was previously active, remove active
+      const prevHighlightNode = document.querySelector(
+        `sub[data-comment-id="${previousReplyingToCommentId}"]`
+      )
+      prevHighlightNode.classList.remove('highlightActive')
+    }
+    activeHighlightNode = document.querySelector(
+      `sub[data-comment-id="${replyingToCommentId}"]`
+    )
+    if (!activeHighlightNode) return
+    activeHighlightNode.classList.add('highlightActive')
   }
 
   @action
@@ -922,15 +950,6 @@ export default class UiStore {
     // Only open text action menu if you have text selected
     if (range && range.length > 0) {
       this.cardMenuOpen.menuType = EVENT_SOURCE_TYPES.TEXT_EDITOR
-    }
-
-    // if it's already set...
-    if (
-      this.selectedTextRangeForCard.range &&
-      this.selectedTextRangeForCard.range.length
-    ) {
-      // turn off any previous highlights
-      this.toggleCommentHighlight(null)
     }
 
     const textContent = quillEditor.getText(index, length)
