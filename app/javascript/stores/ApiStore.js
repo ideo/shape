@@ -226,7 +226,7 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   // TODO rename searchRecords?
-  searchCollections(params) {
+  searchCollections(params = {}) {
     const defaultParams = { query: '' }
     return this.request(
       `organizations/${this.currentOrgSlug}/search?${queryString.stringify(
@@ -501,20 +501,6 @@ class ApiStore extends jsonapi(datxCollection) {
     const all = [...acc, ...res.data]
     if (links.last === page) return all
     return this.fetchAllPages(url, page + 1, all)
-  }
-
-  async fetchUsableTemplates() {
-    let q = `#template`
-    q = _.trim(q)
-      .replace(/\s/g, '+')
-      .replace(/#/g, '%23')
-    // TODO: pagination?
-    const templates = await this.fetchAllPages(
-      `organizations/${this.currentOrgSlug}/search?query=${q}&per_page=50`
-    )
-    runInAction(() => {
-      this.usableTemplates = templates.filter(c => c.isUsableTemplate)
-    })
   }
 
   async archiveCards({ cardIds, collection, undoable = true }) {
