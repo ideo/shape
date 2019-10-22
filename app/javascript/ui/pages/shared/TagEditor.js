@@ -1,11 +1,21 @@
 import PropTypes from 'prop-types'
 import { action, observable } from 'mobx'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 import ReactTags from 'react-tag-autocomplete'
 
 import StyledReactTags from './StyledReactTags'
 
+const tagsInCommon = (records, tagField) => {
+  const tags = []
+  records.forEach(record => {
+    if (record[tagField] && record[tagField].length > 0)
+      tags.push(record[tagField])
+  })
+  return _.intersection(tags)
+}
+
+@inject('apiStore')
 @observer
 class TagEditor extends React.Component {
   @observable
@@ -16,19 +26,24 @@ class TagEditor extends React.Component {
   constructor(props) {
     super(props)
     this.saveTags = _.debounce(this._saveTags, 1000)
-    if (!props.record[props.tagField]) {
-      // should be some kind of error if tagField doesn't exist
-      props.record[props.tagField] = []
-    }
-    this.initTags(props.record[props.tagField])
+    this.initTagFields(props.records, props.tagField)
   }
 
   componentWillReceiveProps(nextProps) {
-    this.initTags(nextProps.record[nextProps.tagField])
+    this.initTagFields(nextProps.records, nextProps.tagField)
   }
 
   componentWillUnmount() {
     this.saveTags.flush()
+  }
+
+  initTagFields(records, tagField) {
+    records.forEach(record => {
+      // should be some kind of error if tagField doesn't exist
+      if (!record[tagField]) record[tagField] = []
+    })
+    // Init with tags that are shared across all records
+    this.initTags(tagsInCommon(records, tagField))
   }
 
   @action
@@ -41,9 +56,23 @@ class TagEditor extends React.Component {
   }
 
   _saveTags = async () => {
-    const { record, tagField, afterSave } = this.props
-    record[tagField] = _.map([...this.tags], t => t.name).join(',')
-    await record.patch()
+    const { records, tagField, afterSave, apiStore } = this.props
+    const tagList = _.map([...this.tags], t => t.name).join(',')
+    const itemIds = []
+    const collectionIds = []
+    records.forEach(record => {
+      record[tagField] = tagList
+      if (record.internalType === 'items') {
+        itemIds.push(record.id)
+      } else if (record.internalType === 'collections') {
+        collectionIds.push(record.id)
+      }
+    })
+    await apiStore.request(`tags/bulk_update`, {
+      tag_list: tagList,
+      item_ids: itemIds,
+      collection_ids: collectionIds,
+    })
     if (afterSave) afterSave()
   }
 
@@ -76,12 +105,13 @@ class TagEditor extends React.Component {
     this.saveTags()
   }
 
-  readOnlyTags = () => {
-    const { record, tagField } = this.props
-    if (!record[tagField].length) {
+  readonlyTags = () => {
+    const { records, tagField } = this.props
+    const tags = tagsInCommon(records, tagField)
+    if (tags.length === 0) {
       return 'No tags added.'
     }
-    const inner = record[tagField].map(tag => (
+    const inner = tags.map(tag => (
       <div key={tag} className="react-tags__selected-tag read-only">
         <span className="react-tags__selected-tag-name">{tag}</span>
       </div>
@@ -94,7 +124,7 @@ class TagEditor extends React.Component {
 
     return (
       <StyledReactTags tagColor={tagColor}>
-        {!canEdit && this.readOnlyTags()}
+        {!canEdit && this.readonlyTags()}
         {canEdit && (
           <ReactTags
             tags={[...this.tags]}
@@ -112,8 +142,8 @@ class TagEditor extends React.Component {
   }
 }
 
-TagEditor.propTypes = {
-  record: MobxPropTypes.objectOrObservableObject.isRequired,
+TagEditor.wrappedComponent.propTypes = {
+  records: PropTypes.arrayOf(MobxPropTypes.objectOrObservableObject).isRequired,
   canEdit: PropTypes.bool,
   tagField: PropTypes.string.isRequired,
   tagColor: PropTypes.string,
@@ -121,7 +151,7 @@ TagEditor.propTypes = {
   validate: PropTypes.string,
   afterSave: PropTypes.func,
 }
-TagEditor.defaultProps = {
+TagEditor.wrappedComponent.defaultProps = {
   canEdit: false,
   tagColor: 'gray',
   placeholder: 'Add new tags, separated by comma or pressing enter.',

@@ -170,6 +170,8 @@ Rails.application.routes.draw do
 
       resources :audiences, only: %i[index show create]
 
+      post 'tags/bulk_update' => 'tags#bulk_update'
+
       namespace :admin do
         resources :users, only: %i[index destroy create] do
           collection do

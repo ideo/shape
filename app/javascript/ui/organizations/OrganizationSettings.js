@@ -139,7 +139,7 @@ class OrganizationSettings extends React.Component {
           canEdit
           validate="domain"
           placeholder="Please enter domains with the following format: domain.com"
-          record={this.organization}
+          records={[this.organization]}
           tagField="domain_whitelist"
           tagColor="white"
         />

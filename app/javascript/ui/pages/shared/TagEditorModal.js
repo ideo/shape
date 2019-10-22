@@ -19,7 +19,7 @@ class TagEditorModal extends React.Component {
         <TagEditor
           canEdit={canEdit}
           placeholder="Add new tags, separated by comma or pressing enter."
-          record={record}
+          records={[record]}
           tagField="tag_list"
         />
       </Modal>
