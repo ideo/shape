@@ -74,6 +74,16 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
       end
     end
 
+    context 'with a foamcore collection inside' do
+      let!(:foamcore_child) { create(:board_collection, master_template: true, parent_collection: template) }
+      let(:foamcore_instance) { instance.collections.first }
+
+      it 'should create an instance of the foamcore master template' do
+        expect(foamcore_instance.templated?).to be true
+        expect(foamcore_instance.is_a?(Collection::Board)).to be true
+      end
+    end
+
     context 'without a proper template' do
       let(:template) { create(:collection) }
 

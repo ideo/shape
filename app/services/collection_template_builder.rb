@@ -70,6 +70,7 @@ class CollectionTemplateBuilder
       name: created_template_name,
       organization_id: @parent.organization.id,
       created_by_id: @created_by.id,
+      type: @template.type,
     }.merge(@raw_collection_params)
   end
 
@@ -95,7 +96,7 @@ class CollectionTemplateBuilder
     if creating_a_submission?
       "#{@created_by.first_name}'s #{@template.name}"
     elsif @template.child_of_a_master_template?
-      "#{@template.name}"
+      @template.name
     else
       "My #{@template.name}"
     end
