@@ -59,7 +59,13 @@ Rails.application.routes.draw do
           end
         end
       end
-      resources :datasets, only: %i[index show create update destroy]
+      resources :datasets, only: %i[index show create update destroy] do
+        resources :roles, only: %i[index create destroy] do
+          collection do
+            delete '', action: 'destroy'
+          end
+        end
+      end
       resources :test_collections, only: %i[show] do
         member do
           get 'validate_launch'
@@ -113,7 +119,7 @@ Rails.application.routes.draw do
 
         get 'search', to: 'search#search'
         resources :collections, only: %i[create]
-        resources :groups, only: %i[index create]
+        resources :groups, only: %i[index create update]
         resources :users, only: %i[index]
         resources :audiences, only: %i[index]
       end

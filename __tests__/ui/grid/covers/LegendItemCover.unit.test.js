@@ -39,6 +39,22 @@ describe('LegendItemCover', () => {
     expect(selectedMeasure.exists()).toBe(true)
   })
 
+  describe('when it has style', () => {
+    beforeEach(() => {
+      props.item.primaryDataset.style = { fill: 'red' }
+      props.item.style = { fill: 'blue' }
+      render()
+    })
+
+    it('should override dataset fill style with its own', () => {
+      const fillColor = wrapper
+        .find('AreaChartIcon')
+        .first()
+        .props().color
+      expect(fillColor).toEqual('blue')
+    })
+  })
+
   describe('unselect', () => {
     const getUnselect = () => {
       return wrapper

@@ -11,7 +11,6 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema.define(version: 2019_10_15_212000) do
-
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "plpgsql"
@@ -77,6 +76,7 @@ ActiveRecord::Schema.define(version: 2019_10_15_212000) do
     t.string "invite_cta"
     t.string "email"
     t.string "logo_url"
+    t.string "group_icon_url"
     t.index ["user_id"], name: "index_applications_on_user_id"
   end
 
@@ -254,6 +254,8 @@ ActiveRecord::Schema.define(version: 2019_10_15_212000) do
     t.integer "application_id"
     t.jsonb "tiers", default: []
     t.string "name"
+    t.boolean "anyone_can_view", default: true
+    t.index ["anyone_can_view"], name: "index_datasets_on_anyone_can_view"
     t.index ["data_source_type", "data_source_id"], name: "index_datasets_on_data_source_type_and_data_source_id"
     t.index ["organization_id"], name: "index_datasets_on_organization_id"
   end
@@ -392,6 +394,7 @@ ActiveRecord::Schema.define(version: 2019_10_15_212000) do
     t.string "type"
     t.string "network_id"
     t.integer "created_by_id"
+    t.integer "application_id"
     t.index ["autojoin_emails"], name: "index_groups_on_autojoin_emails", using: :gin
     t.index ["handle"], name: "index_groups_on_handle"
     t.index ["network_id"], name: "index_groups_on_network_id"
@@ -453,6 +456,7 @@ ActiveRecord::Schema.define(version: 2019_10_15_212000) do
     t.integer "report_type"
     t.integer "legend_item_id"
     t.integer "legend_search_source"
+    t.jsonb "style"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
     t.index ["created_at"], name: "index_items_on_created_at"

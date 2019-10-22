@@ -290,9 +290,14 @@ module Resourceable
     # we've seen a roles anchor be set incorrectly, e.g. Collection X -> parent -> grandparent
     # even though `parent` has roles, `X` is somehow anchored to the grandparent;
     # may have been the result of a previous bug in add_role that was erroring out during role propagation...
-    return false unless roles_anchor_collection_id.present? &&
-                        parent.roles_anchor_collection_id.nil? &&
-                        roles_anchor_collection_id != parent.id
+    return false unless roles_anchor_collection_id.present?
+
+    not_anchored_to_parent_roles = (
+      parent.roles_anchor_collection_id.nil? &&
+      roles_anchor_collection_id != parent.id
+    )
+    anchor_not_in_breadcrumb = !breadcrumb.include?(roles_anchor_collection_id)
+    return false unless not_anchored_to_parent_roles || anchor_not_in_breadcrumb
 
     reanchor!(parent: parent, propagate: true)
     true

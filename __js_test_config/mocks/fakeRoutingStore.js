@@ -6,7 +6,7 @@ const fakeRoutingStore = {
   goToPath: jest.fn(),
   updatePreviousPageBeforeSearch: jest.fn(),
   leaveSearch: jest.fn(),
-  slug: jest.fn().mockReturnValue('org-slug'),
+  slug: 'org-slug',
   location: {
     pathname: '/xyz',
     search: '',
