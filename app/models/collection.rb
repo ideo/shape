@@ -256,6 +256,7 @@ class Collection < ApplicationRecord
       created_at: created_at,
       updated_at: updated_at,
       archived: archived,
+      master_template: master_template,
     }
   end
 
@@ -263,8 +264,7 @@ class Collection < ApplicationRecord
   # Collection.reindex(:new_search_data) to only reindex those fields (more efficiently)
   def new_search_data
     {
-      tags: all_tag_names,
-      archived: archived,
+      master_template: master_template,
     }
   end
 
