@@ -1,9 +1,9 @@
-class CollectionCardsAddRemoveTag
+class CollectionCardsAddRemoveTagWorker
   include Sidekiq::Worker
 
   # Possible actions are add and remove
 
-  def perform(collection_card_ids, tag, action)
+  def perform(collection_card_ids, tag, action, user_id)
     collection_cards = CollectionCard.where(id: collection_card_ids)
     action = action.to_sym
 
@@ -20,6 +20,9 @@ class CollectionCardsAddRemoveTag
     end
 
     # Touch parent collection to bust cache
-    collection_cards.first.parent.touch
+    parent_collection = collection_cards.first.parent
+    parent_collection.touch
+    # Notify other people collection has updated
+    CollectionUpdateBroadcaster.call(parent_collection, User.find(user_id))
   end
 end

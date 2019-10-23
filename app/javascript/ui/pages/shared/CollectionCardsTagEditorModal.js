@@ -21,16 +21,14 @@ const StyledDisplayText = styled(DisplayText)`
 class CollectionCardsTagEditorModal extends React.Component {
   get title() {
     const { cards } = this.props
-    if (cards.length <= 1) {
-      return <StyledHeading2>Tags</StyledHeading2>
-    } else {
-      return (
-        <Fragment>
-          <StyledHeading2>Tags</StyledHeading2>
-          <StyledDisplayText>({cards.length} Items Selected)</StyledDisplayText>
-        </Fragment>
-      )
-    }
+    return (
+      <Fragment>
+        <StyledHeading2>Tags</StyledHeading2>
+        <StyledDisplayText>
+          ({cards.length} Item{cards.length > 1 && 's'} Selected)
+        </StyledDisplayText>
+      </Fragment>
+    )
   }
 
   render() {
