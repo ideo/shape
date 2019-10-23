@@ -37,9 +37,12 @@ StyledCommentSubject.displayName = 'StyledCommentSubject'
 class CommentSubject extends React.Component {
   get textContent() {
     const { threadRecord, subjectRecord, textContent } = this.props
-    if (subjectRecord && !textContent) {
+    if (textContent) {
+      return textContent
+    }
+    if (subjectRecord) {
       return subjectRecord.name
-    } else if (threadRecord && !textContent) {
+    } else if (threadRecord) {
       return threadRecord.name
     }
 

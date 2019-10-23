@@ -128,6 +128,15 @@ class RealtimeTextItem extends React.Component {
     this.initQuillRefsAndData({ initSnapshot: true })
     setTimeout(() => {
       this.quillEditor.focus()
+      const { uiStore } = this.props
+      // note: didMount seems to clear the transient highlight, manually re-add it again
+      // will cause a subtle flickering effect when clicking into a text-item's highlight
+      const activeHighlightNode = document.querySelector(
+        `sub[data-comment-id="${uiStore.replyingToCommentId}"]`
+      )
+      if (activeHighlightNode) {
+        activeHighlightNode.classList.add('highlightActive')
+      }
     }, 100)
   }
 
@@ -138,6 +147,14 @@ class RealtimeTextItem extends React.Component {
   }
 
   componentWillUnmount() {
+    const { uiStore } = this.props
+    // remove manually added transient highlight
+    const activeHighlightNode = document.querySelector(
+      `sub[data-comment-id="${uiStore.replyingToCommentId}"]`
+    )
+    if (activeHighlightNode) {
+      activeHighlightNode.classList.remove('highlightActive')
+    }
     this.sendCombinedDelta.flush()
     this.unmounted = true
     // this will set the datx item to have the right data, but do not want to route back
