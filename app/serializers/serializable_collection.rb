@@ -22,7 +22,7 @@ class SerializableCollection < BaseJsonSerializer
 
   has_many :roles do
     data do
-      @object.anchored_roles(viewing_organization_id: @current_user.current_organization_id)
+      @object.anchored_roles(viewing_organization_id: @current_user&.current_organization_id)
     end
   end
 
