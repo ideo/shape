@@ -73,7 +73,7 @@ class Api::V1::CommentsController < Api::V1::BaseController
     )
 
     if success
-      render jsonapi: @comment
+      render jsonapi: @comment, include: :subject
     else
       render_api_errors @comment.errors
     end

@@ -278,6 +278,10 @@ export const QuillStyleWrapper = styled.div`
       background: ${v.colors.highlightInactive};
     }
 
+    sub[data-comment-id='new'] {
+      background: ${v.colors.highlightActive};
+    }
+
     sub.highlightActive {
       background: ${v.colors.highlightActive};
     }
