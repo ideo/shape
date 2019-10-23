@@ -9,7 +9,10 @@ class CollectionFilter extends BaseRecord {
 
   API_toggleSelected(selected) {
     const action = selected ? 'select' : 'unselect'
-    this.apiStore.request(`collection_filters/${this.id}/${action}`, 'POST')
+    return this.apiStore.request(
+      `collection_filters/${this.id}/${action}`,
+      'POST'
+    )
   }
 }
 

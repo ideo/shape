@@ -120,6 +120,10 @@ describe('CollectionFilter', () => {
           selected: false,
         })
       })
+
+      it('should refetch collection cards', () => {
+        expect(props.collection.API_fetchCards).toHaveBeenCalled()
+      })
     })
 
     describe('with the filter type set to tags', () => {
@@ -170,6 +174,10 @@ describe('CollectionFilter', () => {
           props.collection.API_destroyCollectionFilter
         ).toHaveBeenCalledWith(filter)
       })
+
+      it('should refetch collection cards', () => {
+        expect(props.collection.API_fetchCards).toHaveBeenCalled()
+      })
     })
 
     describe('if the tag does not match a filter', () => {
@@ -204,6 +212,10 @@ describe('CollectionFilter', () => {
       it('should call API_toggleSelected with selected desired state', () => {
         expect(filter.API_toggleSelected).toHaveBeenCalledWith(true)
       })
+
+      it('should refetch collection cards', () => {
+        expect(props.collection.API_fetchCards).toHaveBeenCalled()
+      })
     })
   })
 
@@ -223,6 +235,10 @@ describe('CollectionFilter', () => {
         expect(filter.API_toggleSelected).toHaveBeenCalledWith(false)
         expect(filter.API_toggleSelected).toHaveBeenCalledWith(false)
       })
+    })
+
+    it('should refetch collection cards', () => {
+      expect(props.collection.API_fetchCards).toHaveBeenCalled()
     })
   })
 })

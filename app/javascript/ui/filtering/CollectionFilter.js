@@ -4,7 +4,7 @@ import { computed, observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import pluralize from 'pluralize'
 
-import { apiStore } from '~/stores'
+import { apiStore, uiStore } from '~/stores'
 import FilterBar from './FilterBar'
 import FilterMenu from './FilterMenu'
 import FilterSearchModal from './FilterSearchModal'
@@ -30,40 +30,72 @@ class CollectionFilter extends React.Component {
     return collection_filters.filter(filter => filter.filter_type === 'search')
   }
 
-  onCreateFilter = tag => {
-    const { collection } = this.props
-    if (!this.currentFilterLookupType) return
-    const backendFilterType = pluralize
-      .singular(this.currentFilterLookupType)
-      .toLowerCase()
-      .split(' ')[0]
-    const filter = {
-      text: tag.name,
-      filter_type: backendFilterType,
-      selected: false,
+  /*
+   * This method is a decorator that wraps any changes in the collection filters
+   * and sets up a loader, and fetches the collection cards after the filter
+   * change has happened. It should be used for all methods that change filters
+   * that required a collection card reload
+   */
+  async onFilterChange(fn) {
+    uiStore.update('isLoading', true)
+    try {
+      const result = await fn()
+      const { collection } = this.props
+      // Refetch the cards now that the filters have changed
+      runInAction(() => {
+        collection.storedCacheKey = null
+      })
+      await collection.API_fetchCards({ page: 1 })
+      return result
+    } catch (e) {
+      throw e
+    } finally {
+      uiStore.update('isLoading', false)
     }
-    collection.API_createCollectionFilter(filter)
   }
 
-  onDeleteFilter = tag => {
-    const { collection } = this.props
-    const filter = apiStore.find('collection_filters', tag.id)
-    if (filter) {
-      collection.API_destroyCollectionFilter(filter)
-    }
+  onCreateFilter = async tag => {
+    return this.onFilterChange(async () => {
+      const { collection } = this.props
+      if (!this.currentFilterLookupType) return
+      const backendFilterType = pluralize
+        .singular(this.currentFilterLookupType)
+        .toLowerCase()
+        .split(' ')[0]
+      const filter = {
+        text: tag.name,
+        filter_type: backendFilterType,
+        selected: false,
+      }
+      return collection.API_createCollectionFilter(filter)
+    })
   }
 
-  onSelectFilter = tag => {
-    const filter = apiStore.find('collection_filters', tag.id)
-    filter.API_toggleSelected(!tag.selected)
+  onDeleteFilter = async tag => {
+    return this.onFilterChange(async () => {
+      const { collection } = this.props
+      const filter = apiStore.find('collection_filters', tag.id)
+      if (filter) {
+        return collection.API_destroyCollectionFilter(filter)
+      }
+    })
+  }
+
+  onSelectFilter = async tag => {
+    return this.onFilterChange(async () => {
+      const filter = apiStore.find('collection_filters', tag.id)
+      return filter.API_toggleSelected(!tag.selected)
+    })
   }
 
   onShowAll = ev => {
-    const {
-      collection: { collection_filters },
-    } = this.props
-    collection_filters.forEach(filter => {
-      filter.API_toggleSelected(false)
+    return this.onFilterChange(() => {
+      const {
+        collection: { collection_filters },
+      } = this.props
+      collection_filters.forEach(filter => {
+        filter.API_toggleSelected(false)
+      })
     })
   }
 
