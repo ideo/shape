@@ -13,7 +13,7 @@ export const PillWrapper = styled.div`
   text-decoration: none;
   padding: 2px 7px;
   outline: none;
-  margin: 5px;
+  margin: 8px;
   font-weight: ${v.weights.medium};
   font-family: ${v.fonts.sans};
   font-size: 1rem;
@@ -26,6 +26,10 @@ export const PillWrapper = styled.div`
   border: none;
   background-color: ${v.colors.commonMediumTint};
   align-items: center;
+
+  &:first-of-type {
+    margin-left: 0;
+  }
 
   &.avatar {
     height: 28px;
