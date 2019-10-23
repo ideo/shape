@@ -207,6 +207,11 @@ Select.displayName = 'StyledSelect'
 
 /** @component */
 export const Checkbox = styled(MuiCheckbox)`
+  && {
+    margin-right: 10px;
+    width: 28px;
+  }
+
   &.checkbox--error {
     color: ${v.colors.alert};
   }

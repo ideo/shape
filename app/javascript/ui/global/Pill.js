@@ -59,6 +59,8 @@ const Pill = props => {
     <PillWrapper>
       {selectable && (
         <Checkbox
+          style={{ marginRight: '6px' }}
+          color="primary"
           checked={selected}
           onChange={ev => {
             onSelect(props.tag || props)
