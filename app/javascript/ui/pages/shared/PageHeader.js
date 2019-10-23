@@ -368,7 +368,7 @@ class PageHeader extends React.Component {
       >
         <MaxWidthContainer>
           <RolesModal record={rolesRecord} open={!!uiStore.rolesMenuOpen} />
-          <div>
+          <div style={{ minHeight: '72px' }}>
             <StyledTitleAndRoles
               data-empty-space-click
               className={record.isCurrentUserProfile ? 'user-profile' : ''}
@@ -418,7 +418,7 @@ class PageHeader extends React.Component {
                 </Flex>
               )}
             </StyledTitleAndRoles>
-            {record.isCollection && (
+            {(record.isRegularCollection || record.isSubmissionsCollection) && (
               <CollectionFilter collection={record} canEdit={this.canEdit} />
             )}
           </div>

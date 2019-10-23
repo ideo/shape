@@ -256,6 +256,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return true
   }
 
+  get isRegularCollection() {
+    return this.type === 'Collection' && !this.isBoard
+  }
+
   get isUserCollection() {
     return this.type === 'Collection::UserCollection'
   }
