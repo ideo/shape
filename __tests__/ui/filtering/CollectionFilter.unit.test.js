@@ -37,7 +37,7 @@ describe('CollectionFilter', () => {
     describe('with the current filter type not set', () => {
       it('should ensure the modal is not open', () => {
         const FilterSearchModal = wrapper.find('FilterSearchModal')
-        expect(FilterSearchModal.props().modalOpen).toBe(false)
+        expect(FilterSearchModal.exists()).toBe(false)
       })
     })
 
