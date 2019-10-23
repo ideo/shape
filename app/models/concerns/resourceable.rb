@@ -47,9 +47,12 @@ module Resourceable
       end
     end
 
+    def identifiers
+      select(:id).map(&:resource_identifier)
+    end
+
     # really meant to be used on an AR Relation, where `select` is just the relevant records
     def user_ids
-      identifiers = select(:id).map(&:resource_identifier)
       UsersRole
         .joins(:role)
         .where(Role.arel_table[:resource_identifier].in(identifiers))
