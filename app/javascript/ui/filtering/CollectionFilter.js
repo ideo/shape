@@ -107,6 +107,7 @@ class CollectionFilter extends React.Component {
 
   render() {
     const {
+      collection,
       collection: { collection_filters },
       canEdit,
     } = this.props
@@ -117,6 +118,9 @@ class CollectionFilter extends React.Component {
         {isFilterBarActive && (
           <FilterBar
             filters={collection_filters}
+            totalResults={
+              !uiStore.isLoading && collection.collection_cards.length
+            }
             onDelete={this.onDeleteFilter}
             onSelect={this.onSelectFilter}
             onShowAll={this.onShowAll}

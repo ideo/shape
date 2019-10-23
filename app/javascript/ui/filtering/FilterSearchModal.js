@@ -127,7 +127,7 @@ class FilterSearchModal extends React.Component {
           </StyledReactTags>
           <br />
           {this.searchResultCount !== null && (
-            <SubduedText>{this.searchResultCount} results total</SubduedText>
+            <SubduedText>{this.searchResultCount} Results</SubduedText>
           )}
         </div>
       </Modal>

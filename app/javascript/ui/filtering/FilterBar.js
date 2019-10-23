@@ -1,3 +1,5 @@
+import _ from 'lodash'
+import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Box, Flex } from 'reflexbox'
@@ -22,16 +24,28 @@ class FilterBar extends React.Component {
     }))
   }
 
+  get anyFiltersSelected() {
+    const { filters } = this.props
+    return _.some(filters, 'selected')
+  }
+
   render() {
-    const { onDelete, onShowAll } = this.props
+    const { onDelete, onShowAll, totalResults } = this.props
     return (
       <Flex align="center">
         <PillList itemList={this.formattedPills} onItemDelete={onDelete} />
-        <Box>
-          <button onClick={onShowAll}>
-            <SubduedText>Show all</SubduedText>
-          </button>
-        </Box>
+        {_.isNumber(totalResults) && this.anyFiltersSelected && (
+          <Fragment>
+            <Box mr={'25px'} ml={'5px'}>
+              <SubduedText>{totalResults} Results</SubduedText>
+            </Box>
+            <Box>
+              <button onClick={onShowAll}>
+                <SubduedText>Show all</SubduedText>
+              </button>
+            </Box>
+          </Fragment>
+        )}
       </Flex>
     )
   }
@@ -39,6 +53,8 @@ class FilterBar extends React.Component {
 
 FilterBar.propTypes = {
   filters: MobxPropTypes.arrayOrObservableArray.isRequired,
+  totalResults: PropTypes.oneOfType([PropTypes.bool, PropTypes.number])
+    .isRequired,
   onDelete: PropTypes.func.isRequired,
   onSelect: PropTypes.func.isRequired,
   onShowAll: PropTypes.func.isRequired,
