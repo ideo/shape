@@ -1,19 +1,23 @@
 import PageHeader from '~/ui/pages/shared/PageHeader'
 import fakeUiStore from '#/mocks/fakeUiStore'
+import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
-import { fakeTextItem, fakeCollection } from '#/mocks/data'
+import { fakeTextItem, fakeCollection, fakeCollectionCard } from '#/mocks/data'
 
 describe('PageHeader', () => {
   let wrapper, component, props
 
   beforeEach(() => {
     const uiStore = fakeUiStore
+    const apiStore = fakeApiStore()
+    apiStore.selectedCards = [fakeCollectionCard]
     const routingStore = fakeRoutingStore
     fakeCollection.isNormalCollection = true
     props = {
       record: { ...fakeCollection },
       isHomepage: false,
       uiStore,
+      apiStore,
       routingStore,
     }
 

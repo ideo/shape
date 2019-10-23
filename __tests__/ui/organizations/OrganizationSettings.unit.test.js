@@ -34,10 +34,9 @@ describe('OrganizationSettings', () => {
     })
 
     it('renders the page with TagEditor for domain whitelist', () => {
-      expect(wrapper.find('TagEditor').props().record).toEqual(organization)
-      expect(wrapper.find('TagEditor').props().tagField).toEqual(
-        'domain_whitelist'
-      )
+      const tagEditor = wrapper.find('inject-TagEditor-with-apiStore')
+      expect(tagEditor.props().records).toEqual([organization])
+      expect(tagEditor.props().tagField).toEqual('domain_whitelist')
     })
 
     it('should render a checkbox to add custom terms', () => {

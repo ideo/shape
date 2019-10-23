@@ -8,7 +8,7 @@ describe('CollectionCardsTagEditor', () => {
     collection = fakeCollection
     const cards = [fakeCollectionCard]
     cards[0].record = collection
-    const apiStore = fakeApiStore
+    const apiStore = fakeApiStore()
     props = { cards, apiStore, canEdit: true }
 
     wrapper = shallow(<CollectionCardsTagEditor.wrappedComponent {...props} />)

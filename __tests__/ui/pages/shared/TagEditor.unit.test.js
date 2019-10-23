@@ -8,7 +8,7 @@ describe('TagEditor', () => {
     records = [fakeCollection]
     afterAddTag = jest.fn()
     afterRemoveTag = jest.fn()
-    const apiStore = fakeApiStore
+    const apiStore = fakeApiStore()
     props = {
       records,
       afterAddTag,
