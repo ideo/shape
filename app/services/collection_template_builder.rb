@@ -1,5 +1,5 @@
 # Use a MasterTemplate to build a new Collection
-class CollectionTemplateBuilder
+class CollectionTemplateBuilder < SimpleService
   attr_reader :collection, :errors
 
   def initialize(
@@ -44,6 +44,10 @@ class CollectionTemplateBuilder
       @collection.errors.add(:base, 'Can only build a template instance from a master template')
       return false
     end
+    if @parent.inside_a_master_template?
+      @collection.errors.add(:base, 'Can not create template instances inside of master templates')
+      return false
+    end
 
     # NOTE: Any issue with creating the template instance in a different org from the template?
     @collection = @template.templated_collections.create(collection_params)
@@ -69,7 +73,7 @@ class CollectionTemplateBuilder
     {
       name: created_template_name,
       organization_id: @parent.organization.id,
-      created_by_id: @created_by.id,
+      created_by_id: @created_by&.id,
       type: @template.type,
     }.merge(@raw_collection_params)
   end
@@ -144,7 +148,7 @@ class CollectionTemplateBuilder
 
   def follow_submission_box
     comment_thread = @parent.submission_box.comment_thread
-    return if comment_thread.nil?
+    return if comment_thread.nil? || @created_by.nil?
 
     users_thread = comment_thread.users_thread_for(@created_by)
     return if users_thread.present?
@@ -153,7 +157,7 @@ class CollectionTemplateBuilder
   end
 
   def add_external_record
-    return unless @external_id.present? && @created_by.application.present?
+    return unless @external_id.present? && @created_by&.application.present?
 
     @collection.add_external_id(
       @external_id,

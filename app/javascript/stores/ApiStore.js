@@ -555,8 +555,15 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   async moveCards(data, { undoSnapshot = {} } = {}) {
-    // trigger card_mover in backend
-    const res = await this.request('collection_cards/move', 'PATCH', data)
+    let res
+    try {
+      // trigger card_mover in backend
+      res = await this.request('collection_cards/move', 'PATCH', data)
+    } catch (e) {
+      // throw to be caught by CardMoveService
+      throw e
+      return
+    }
     const toCollection = this.find('collections', data.to_id)
     // revert data if undoing card move
     if (!_.isEmpty(undoSnapshot)) {
@@ -618,7 +625,14 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   async duplicateCards(data) {
-    const res = await this.request('collection_cards/duplicate', 'POST', data)
+    let res
+    try {
+      res = await this.request('collection_cards/duplicate', 'POST', data)
+    } catch (e) {
+      // throw to be caught by CardMoveService
+      throw e
+      return
+    }
     const collection = this.find('collections', data.to_id)
     this.undoStore.pushUndoAction({
       message: 'Duplicate undone',

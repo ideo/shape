@@ -123,8 +123,11 @@ class CardMover
           # pinned cards within template instance stay pinned
           card.assign_attributes(pinned: card.pinned)
         elsif @to_collection.master_template?
-          # currently any cards created in master_templates become pinned
+          # any cards created in master_templates become pinned
           card.assign_attributes(pinned: true)
+          if card.collection.present?
+            card.collection.convert_to_template!
+          end
         else
           card.assign_attributes(pinned: false)
         end

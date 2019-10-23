@@ -186,15 +186,26 @@ RSpec.describe CardMover, type: :service do
         end
 
         context 'moving into a master template' do
+          let!(:child_collection) do
+            create(:collection, parent_collection: from_collection, num_cards: 2, record_type: :collection)
+          end
+          let!(:child_subcollection_cards) do
+            create_list(:collection_card_text, 2, parent: child_collection.collections.first)
+          end
           before do
             to_collection.update(master_template: true)
           end
 
-          it 'should pin all cards if moving to a normal collection' do
+          it 'should pin all cards if moving from a normal collection' do
             card_mover.call
             to_collection.reload
-            expect(to_collection.collection_cards.count).to eq 6
+            expect(to_collection.collection_cards.count).to eq 7
             expect(to_collection.collection_cards.all?(&:pinned?)).to be true
+            subcollection = to_collection.collections.first
+            expect(subcollection.collection_cards.all?(&:pinned)).to be true
+            # subcollection should now be a subtemplate
+            expect(subcollection.master_template?).to be true
+            expect(subcollection.collections.first.master_template?).to be true
           end
         end
       end
