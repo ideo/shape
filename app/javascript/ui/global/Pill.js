@@ -27,8 +27,10 @@ export const PillWrapper = styled.div`
   background-color: ${v.colors.commonMediumTint};
   align-items: center;
 
-  &:first-of-type {
-    margin-left: 0;
+  @media only screen and (min-width: ${v.responsive.medBreakpoint}px) {
+    &:first-of-type {
+      margin-left: 0;
+    }
   }
 
   &.avatar {

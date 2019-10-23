@@ -114,7 +114,7 @@ class CollectionFilter extends React.Component {
     const isFilterBarActive =
       collection_filters && collection_filters.length > 0
     return (
-      <Flex>
+      <Flex align="flex-end">
         {isFilterBarActive && (
           <FilterBar
             filters={collection_filters}
