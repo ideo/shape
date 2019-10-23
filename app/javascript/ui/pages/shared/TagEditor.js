@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types'
-import { action, observable } from 'mobx'
+import { action, observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 import ReactTags from 'react-tag-autocomplete'
 
+import Pill from '~/ui/global/Pill'
 import StyledReactTags from './StyledReactTags'
 
 @observer
@@ -31,13 +32,20 @@ class TagEditor extends React.Component {
     this.saveTags.flush()
   }
 
+  createFormattedTag(id, label) {
+    const tag = {
+      id,
+      label,
+      name: label,
+    }
+    tag.onDelete = this.handleDelete(id)
+    return tag
+  }
+
   @action
   initTags = tags => {
     // `id` is used by react-tag-autocomplete, but otherwise doesn't hold any meaning
-    this.tags = _.map([...tags], (t, i) => ({
-      id: i,
-      name: t,
-    }))
+    this.tags = _.map([...tags], (t, i) => this.createFormattedTag(i, t))
   }
 
   _saveTags = async () => {
@@ -48,9 +56,10 @@ class TagEditor extends React.Component {
   }
 
   @action
-  handleAddition = tag => {
+  handleAddition = tagData => {
     const { validate } = this.props
-    tag.name = tag.name.trim()
+    tagData.name = tagData.name.trim()
+    const tag = this.createFormattedTag(tagData.id, tagData.name)
     this.error = ''
     if (validate === 'domain') {
       const matches = tag.name.match(/([a-z])([a-z0-9]+\.)*[a-z0-9]+\.[a-z.]+/g)
@@ -71,9 +80,11 @@ class TagEditor extends React.Component {
   }
 
   @action
-  handleDelete = i => {
-    this.tags.remove(this.tags[i])
-    this.saveTags()
+  handleDelete = i => ev => {
+    runInAction(() => {
+      this.tags.remove(this.tags[i])
+      this.saveTags()
+    })
   }
 
   readOnlyTags = () => {
@@ -92,6 +103,7 @@ class TagEditor extends React.Component {
   render() {
     const { canEdit, placeholder, tagColor } = this.props
 
+    console.log('render tags', [...this.tags])
     return (
       <StyledReactTags tagColor={tagColor}>
         {!canEdit && this.readOnlyTags()}
@@ -103,6 +115,7 @@ class TagEditor extends React.Component {
             placeholder={placeholder}
             handleAddition={this.handleAddition}
             handleDelete={this.handleDelete}
+            tagComponent={Pill}
             allowNew
           />
         )}

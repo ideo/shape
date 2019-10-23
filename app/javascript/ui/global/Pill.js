@@ -66,7 +66,7 @@ const Pill = props => {
           value="yes"
         />
       )}
-      <SymbolHolder>{symbol}</SymbolHolder>
+      {symbol && <SymbolHolder>{symbol}</SymbolHolder>}
       <DisplayText>{label}</DisplayText>
       {onDelete && (
         <DeleteIconHolder>
