@@ -142,6 +142,10 @@ class OrganizationSettings extends React.Component {
     }
   }
 
+  afterAddRemoveDomainTag = () => {
+    this.organization.save()
+  }
+
   render() {
     return (
       <div>
@@ -158,8 +162,8 @@ class OrganizationSettings extends React.Component {
           records={[this.organization]}
           tagField="domain_whitelist"
           tagColor="white"
-          afterAddTag={() => this.organization.save}
-          afterRemoveTag={() => this.organization.save}
+          afterAddTag={this.afterAddRemoveDomainTag}
+          afterRemoveTag={this.afterAddRemoveDomainTag}
         />
         <br />
         <Heading2>Terms of Use</Heading2>

@@ -63,7 +63,7 @@ class TagEditor extends React.Component {
 
     // If a validateTag function is provided, validate tag
     if (validateTag) {
-      const { tag, error } = validateTag(tag.name)
+      const { tag, error } = validateTag(newTag.name)
       if (error) {
         this.error = error
         return
