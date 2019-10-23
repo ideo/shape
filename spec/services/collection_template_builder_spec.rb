@@ -69,8 +69,8 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
     context 'when parent is a master_template' do
       let(:parent) { create(:collection, master_template: true) }
 
-      it 'should pin the collection instance' do
-        expect(instance.parent_collection_card.pinned?).to be true
+      it 'should not create an instance' do
+        expect(builder.call).to be false
       end
     end
 
