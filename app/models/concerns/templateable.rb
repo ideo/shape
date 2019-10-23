@@ -66,6 +66,9 @@ module Templateable
 
   def update_template_instances
     templated_collections.active.each do |instance|
+      # this is an erroneous case, should not exist (and could lead to issues)
+      next if instance.inside_a_master_template?
+
       move_cards_deleted_from_master_template(instance)
       add_cards_from_master_template(instance)
       # important that update gets called after add, that way
@@ -86,6 +89,10 @@ module Templateable
       if [Collection::TestCollection, Collection::TestDesign].include?(instance.class)
         next unless card.card_question_type.present?
       end
+      # ABORT: should not allow duplicating a template instance in this manner;
+      # this could lead to infinite loops. (similar to note above)
+      next if card.record.try(:templated?)
+
       card.duplicate!(
         for_user: instance.created_by,
         parent: instance,
@@ -258,5 +265,13 @@ module Templateable
   # is this collection made from a template?
   def templated?
     template_id.present?
+  end
+
+  def convert_to_template!
+    all_child_collections.update_all(master_template: true, template_id: nil)
+    CollectionCard
+      .where(parent_id: [id] + all_child_collections.pluck(:id))
+      .update_all(pinned: true)
+    update(master_template: true, template_id: nil)
   end
 end

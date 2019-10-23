@@ -106,12 +106,36 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
             add_editors: [current_user],
           )
         end
+        before do
+          batch_reindex(Collection)
+        end
 
         it 'returns only the amount for the page' do
           get(path, params: { query: 'shared name', per_page: 2 })
           expect(json['data'].size).to eq(2)
           expect(json['meta']['page']).to eq(1)
           expect(json['links']['last']).to eq(2)
+        end
+      end
+
+      context 'with master_template param' do
+        let!(:templates) do
+          create_list(
+            :collection,
+            2,
+            organization: organization,
+            master_template: true,
+            add_viewers: [current_user],
+          )
+        end
+        before do
+          batch_reindex(Collection)
+        end
+
+        it 'only finds template collections' do
+          get(path, params: { master_template: true })
+          expect(json['data'].size).to eq(2)
+          expect(json['data'].map { |d| d['id'].to_i }).to match_array(templates.map(&:id))
         end
       end
 

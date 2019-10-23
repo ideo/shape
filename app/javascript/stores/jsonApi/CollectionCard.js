@@ -235,8 +235,6 @@ class CollectionCard extends BaseRecord {
   // Only show archive popup if this is a collection that has cards
   // Don't show if empty collection, or just link card / item card(s)
   get shouldShowArchiveWarning() {
-    if (this.parentCollection.isMasterTemplate)
-      return this.parentCollection.shouldShowEditWarning
     return _.some(
       this.selectedCards,
       card =>
@@ -322,7 +320,7 @@ class CollectionCard extends BaseRecord {
         let iconName = 'Trash'
         let snoozeChecked = null
         let onToggleSnoozeDialog = null
-        if (collection.isMasterTemplate) {
+        if (collection.isMasterTemplate && collection.shouldShowEditWarning) {
           ;({
             snoozeChecked,
             prompt,
