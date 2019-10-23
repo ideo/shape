@@ -76,6 +76,13 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     render json: current_user.in_my_collection?(@collection)
   end
 
+  def direct_children_tag_list
+    all_tag_lists = @collection.collection_cards.map { |cc| cc.record.tags }.flatten
+    all_tags = all_tag_lists.map(&:name)
+
+    render json: all_tags
+  end
+
   before_action :load_and_authorize_set_submission_box_template, only: %i[set_submission_box_template]
   def set_submission_box_template
     setter = SubmissionBoxTemplateSetter.new(

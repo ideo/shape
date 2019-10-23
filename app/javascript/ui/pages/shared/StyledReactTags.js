@@ -91,7 +91,6 @@ export default styled.div`
   }
 
   .react-tags__suggestions {
-    position: absolute;
     top: 100%;
     left: 0;
     width: 100%;

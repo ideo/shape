@@ -1,18 +1,41 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import ReactTags from 'react-tag-autocomplete'
+import { observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import SearchIconRight from '~/ui/icons/SearchIconRight'
 import TagIcon from '~/ui/icons/TagIcon'
 
+import { apiStore, uiStore } from '~/stores'
+import { SubduedText } from '~/ui/global/styled/typography'
 import Modal from '~/ui/global/modals/Modal'
 import Pill from '~/ui/global/Pill'
 import StyledReactTags from '~/ui/pages/shared/StyledReactTags'
 
 @observer
 class FilterSearchModal extends React.Component {
+  @observable
+  tagNames = []
+  @observable
+  searchResultCount = null
+
   constructor(props) {
     super(props)
+    this.debouncedTermSearch = _.debounce(this._autocompleteTermSearch, 400)
+  }
+
+  async componentDidMount() {
+    const results = await this.getCollectionTagList()
+    runInAction(() => {
+      this.tagNames = results
+    })
+  }
+
+  get formattedSuggestions() {
+    const { filterType } = this.props
+    if (filterType === 'Search Term') return []
+    return _.uniq(this.tagNames).map(tag => ({ id: null, name: tag }))
   }
 
   get filtersFormattedAsTags() {
@@ -34,6 +57,21 @@ class FilterSearchModal extends React.Component {
     })
   }
 
+  getCollectionTagList() {
+    const { viewingCollection } = uiStore
+    const apiPath = `collections/${viewingCollection.id}/direct_children_tag_list`
+    return apiStore.requestJson(apiPath)
+  }
+
+  _autocompleteTermSearch = async term => {
+    const { viewingCollection } = uiStore
+    const apiPath = `collections/${viewingCollection.id}/collection_cards?q=${term}`
+    const result = await apiStore.request(apiPath)
+    runInAction(() => {
+      this.searchResultCount = result.data.length
+    })
+  }
+
   handleModalClose = ev => {
     this.props.onModalClose()
   }
@@ -50,6 +88,19 @@ class FilterSearchModal extends React.Component {
     this.props.onSelectTag(tag)
   }
 
+  onInputChange = text => {
+    const { filterType } = this.props
+    if (filterType === 'Search Term') {
+      if (text.length < 4) {
+        runInAction(() => {
+          this.searchResultCount = null
+        })
+      } else {
+        return this.debouncedTermSearch(text)
+      }
+    }
+  }
+
   render() {
     const { filterType, modalOpen } = this.props
     if (!modalOpen || !filterType) return null
@@ -59,18 +110,26 @@ class FilterSearchModal extends React.Component {
 
     return (
       <Modal title={title} onClose={this.handleModalClose} open={modalOpen}>
-        <StyledReactTags>
-          <ReactTags
-            tags={this.filtersFormattedAsTags}
-            allowBackspace={false}
-            delimiterChars={[',']}
-            placeholder={placeholder}
-            handleAddition={this.onNewTag}
-            handleDelete={this.onRemoveTag}
-            tagComponent={Pill}
-            allowNew
-          />
-        </StyledReactTags>
+        <div style={{ height: '140px' }}>
+          <StyledReactTags>
+            <ReactTags
+              tags={this.filtersFormattedAsTags}
+              suggestions={this.formattedSuggestions}
+              allowBackspace={false}
+              delimiterChars={[',']}
+              placeholder={placeholder}
+              handleAddition={this.onNewTag}
+              handleDelete={this.onRemoveTag}
+              handleInputChange={this.onInputChange}
+              tagComponent={Pill}
+              allowNew
+            />
+          </StyledReactTags>
+          <br />
+          {this.searchResultCount !== null && (
+            <SubduedText>{this.searchResultCount} results total</SubduedText>
+          )}
+        </div>
       </Modal>
     )
   }

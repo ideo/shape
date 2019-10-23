@@ -22,6 +22,7 @@ Rails.application.routes.draw do
       resources :collections do
         member do
           get 'in_my_collection'
+          get 'direct_children_tag_list'
           post 'clear_collection_cover'
           patch 'submit'
           patch 'restore_permissions'

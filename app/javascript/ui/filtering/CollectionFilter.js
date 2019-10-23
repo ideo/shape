@@ -129,19 +129,21 @@ class CollectionFilter extends React.Component {
             onFilterBySearch={this.openSearchModal('Search Term')}
           />
         )}
-        <FilterSearchModal
-          filters={
-            this.currentFilterLookupType === 'Tags'
-              ? [...this.tagFilters]
-              : [...this.searchFilters]
-          }
-          onCreateTag={this.onCreateFilter}
-          onRemoveTag={this.onDeleteFilter}
-          onSelectTag={this.onSelectFilter}
-          onModalClose={this.openSearchModal(null)}
-          filterType={this.currentFilterLookupType}
-          modalOpen={!!this.currentFilterLookupType}
-        />
+        {!!this.currentFilterLookupType && (
+          <FilterSearchModal
+            filters={
+              this.currentFilterLookupType === 'Tags'
+                ? [...this.tagFilters]
+                : [...this.searchFilters]
+            }
+            onCreateTag={this.onCreateFilter}
+            onRemoveTag={this.onDeleteFilter}
+            onSelectTag={this.onSelectFilter}
+            onModalClose={this.openSearchModal(null)}
+            filterType={this.currentFilterLookupType}
+            modalOpen={!!this.currentFilterLookupType}
+          />
+        )}
       </Flex>
     )
   }
