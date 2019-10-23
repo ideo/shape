@@ -88,6 +88,8 @@ Rails.application.routes.draw do
           patch 'move'
           patch 'archive'
           patch 'unarchive'
+          patch 'add_tag'
+          patch 'remove_tag'
           get 'unarchive_from_email'
           post 'link'
           post 'duplicate'
@@ -169,8 +171,6 @@ Rails.application.routes.draw do
       end
 
       resources :audiences, only: %i[index show create]
-
-      post 'tags/bulk_update' => 'tags#bulk_update'
 
       namespace :admin do
         resources :users, only: %i[index destroy create] do

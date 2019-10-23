@@ -305,6 +305,15 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   @computed
+  get selectedCards() {
+    const { uiStore } = this
+    const { selectedCardIds } = uiStore
+    return this.findAll('collection_cards').filter(
+      card => selectedCardIds.indexOf(card.id) > -1 && card.canEdit
+    )
+  }
+
+  @computed
   get unreadNotifications() {
     return _.reverse(
       _.sortBy(
