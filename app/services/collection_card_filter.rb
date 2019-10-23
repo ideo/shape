@@ -54,8 +54,17 @@ class CollectionCardFilter < SimpleService
       per_page = [per_page, 200].min
       if @filters[:q].present?
         where_clause = {
-          parent_id: @collection.id,
           archived: false,
+          _or: [
+            {
+              _type: 'item',
+              _id: @collection.items_and_linked_items.map(&:id),
+            },
+            {
+              _type: 'collection',
+              _id: @collection.collections_and_linked_collections.map(&:id),
+            },
+          ]
         }
         results = Search.new(
           index_name: [Item, Collection],
@@ -63,12 +72,14 @@ class CollectionCardFilter < SimpleService
           per_page: per_page,
           page: @filters[:page],
         ).search(@filters[:q])
-        item_ids = results.hits.select { |r| r['_type'] == 'item' }.map { |r| r['_id'] }
-        collection_ids = results.hits.select { |r| r['_type'] == 'collection' }.map { |r| r['_id'] }
-
+        item_ids = results.results.select{|r| r.is_a?(Item)}.map(&:id)
+        collection_ids = results.results.select{|r| r.is_a?(Collection)}.map(&:id)
         cc = CollectionCard.arel_table
-        @cards =  CollectionCard
-          .where(cc[:collection_id].in(collection_ids).or(cc[:item_id].in(item_ids)))
+        @cards = @collection.collection_cards.where(
+           cc[:collection_id].in(collection_ids).or(
+             cc[:item_id].in(item_ids)
+           )
+        )
       else
         @cards = @collection.collection_cards_by_page(
           page: @filters[:page],
