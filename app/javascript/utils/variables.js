@@ -146,7 +146,7 @@ export default {
     ctaPrimary: '#00a0e0',
     alert: '#d66742',
     highlightActive: '#f8ed81',
-    highlightInactive: '#fbf4b3',
+    highlightInactive: '#fbf9dc',
     caution: '#fcf113',
     offset: '#6a7c7e',
     placeholderGray: '#bcbcbc',

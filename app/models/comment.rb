@@ -44,6 +44,7 @@ class Comment < ApplicationRecord
              optional: true,
              polymorphic: true
   after_create :reopen_parent_after_reply!, if: :parent_is_resolved?
+  after_destroy :scrub_highlight_from_subject
 
   validates :message, presence: true
 
@@ -128,5 +129,9 @@ class Comment < ApplicationRecord
 
   def parent_is_resolved?
     parent&.resolved?
+  end
+
+  def scrub_highlight_from_subject
+    TextItemHighlightUpdater.call(self, nil)
   end
 end
