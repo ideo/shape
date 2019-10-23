@@ -103,7 +103,6 @@ class TagEditor extends React.Component {
   render() {
     const { canEdit, placeholder, tagColor } = this.props
 
-    console.log('render tags', [...this.tags])
     return (
       <StyledReactTags tagColor={tagColor}>
         {!canEdit && this.readOnlyTags()}
