@@ -28,27 +28,12 @@ RSpec.describe Group, type: :model do
     it { should have_many :parent_groups }
 
     context 'with GroupHierarchy' do
-      let(:group1) { create(:group) }
-      let(:group2) { create(:group) }
-      let(:group3) { create(:group) }
-
-      let!(:group_hierarchy) do
-        create(
-          :group_hierarchy,
-          parent_group: group1,
-          path: [group1, group2, group3].map(&:id),
-          subgroup: group3,
-        )
-      end
-
-      let!(:group_hierarchy2) do
-        create(
-          :group_hierarchy,
-          parent_group: group2,
-          path: [group2, group3].map(&:id),
-          subgroup: group3,
-        )
-      end
+      let(:group1_users) { create_list(:user, 2) }
+      let(:group2_users) { create_list(:user, 2) }
+      let(:group3_users) { create_list(:user, 3) }
+      let!(:group1) { create(:group, add_members: group1_users, add_subgroups: [group2, group3]) }
+      let!(:group2) { create(:group, add_members: group2_users, add_subgroups: [group3]) }
+      let!(:group3) { create(:group, add_members: group3_users) }
 
       describe '#parent_groups' do
         it 'returns associated parent groups' do
@@ -60,9 +45,24 @@ RSpec.describe Group, type: :model do
 
       describe '#subgroups' do
         it 'returns associated subgroups' do
+          expect(group1.subgroups).to include(group2)
           expect(group1.subgroups).to include(group3)
           expect(group2.subgroups).to include(group3)
           expect(group3.subgroups).to be_empty
+        end
+      end
+
+      describe '#user_ids' do
+        it 'should return the user_ids of the group itself and subgroups' do
+          expect(group1.user_ids).to match_array(
+            (group1_users + group2_users + group3_users).pluck(:id),
+          )
+          expect(group2.user_ids).to match_array(
+            (group2_users + group3_users).pluck(:id),
+          )
+          expect(group3.user_ids).to match_array(
+            group3_users.pluck(:id),
+          )
         end
       end
     end

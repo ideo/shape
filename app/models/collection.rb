@@ -100,6 +100,7 @@ class Collection < ApplicationRecord
 
   # validations
   validates :name, presence: true
+  validate :prevent_template_instance_inside_master_template
 
   # callbacks
   before_validation :inherit_parent_organization_id, on: :create
@@ -256,6 +257,7 @@ class Collection < ApplicationRecord
       created_at: created_at,
       updated_at: updated_at,
       archived: archived,
+      master_template: master_template,
     }
   end
 
@@ -263,8 +265,7 @@ class Collection < ApplicationRecord
   # Collection.reindex(:new_search_data) to only reindex those fields (more efficiently)
   def new_search_data
     {
-      tags: all_tag_names,
-      archived: archived,
+      master_template: master_template,
     }
   end
 
@@ -357,6 +358,11 @@ class Collection < ApplicationRecord
     end
     # Clones collection and all embedded items/collections
     c = amoeba_dup
+    if parent.master_template?
+      # when duplicating into a master_template, this collection should be a subtemplate
+      c.template_id = nil
+      c.master_template = true
+    end
     # clear out cached submission_attrs
     c.cached_attributes.delete 'submission_attrs'
     c.cloned_from = self
@@ -494,7 +500,7 @@ class Collection < ApplicationRecord
         card.item.reload.recalculate_breadcrumb!
       elsif card.collection_id.present?
         # this method will run the async worker if there are >50 children
-        card.collection.recalculate_breadcrumb_tree!
+        card.collection.reload.recalculate_breadcrumb_tree!
       end
     end
   end
@@ -934,5 +940,11 @@ class Collection < ApplicationRecord
     return if joinable_group.blank?
 
     joinable_group.add_role(Role::VIEWER, self)
+  end
+
+  def prevent_template_instance_inside_master_template
+    return unless templated? && inside_a_master_template?
+
+    errors.add(:base, "can't be an instance inside a template")
   end
 end

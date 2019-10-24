@@ -78,6 +78,10 @@ class Api::V1::SearchController < Api::V1::BaseController
       where_clause[:archived] = true
     end
 
+    if params[:master_template].present?
+      where_clause[:master_template] = params[:master_template]
+    end
+
     # super_admin has access to everything regardless of user/group_ids
     unless current_user.has_cached_role?(Role::SUPER_ADMIN)
       where_clause[:_or] = [

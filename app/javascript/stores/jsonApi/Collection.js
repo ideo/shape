@@ -947,13 +947,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     }
     uiStore.update('movingIntoCollection', toCollection)
 
-    await CardMoveService.moveCards('beginning', {
+    const success = await CardMoveService.moveCards('beginning', {
       to_id: toCollection.id.toString(),
       from_id: this.id.toString(),
       collection_card_ids: cardIds,
     })
     uiStore.update('multiMoveCardIds', [])
     uiStore.update('movingIntoCollection', null)
+    if (!success) return false
 
     // Explicitly remove cards from this collection so front-end updates
     if (cardAction === 'move') {

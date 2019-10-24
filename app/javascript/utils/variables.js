@@ -175,6 +175,8 @@ export default {
   zIndex: {
     aboveClickWrapper: 501,
     clickWrapper: 500,
+    commentMentions: 255,
+    commentHeader: 252,
     activityLog: 251,
     // NOTE: if globalHeader is > pageHeader
     // then it will also be above the EditableName ClickWrapper
@@ -186,8 +188,6 @@ export default {
     cardHovering: 160,
     gridCard: 150,
     gridCardTop: 151,
-    commentMentions: 100,
-    commentHeader: 10,
     itemClose: 10,
     floatOverContent: 2,
     gridCardBg: 1,
