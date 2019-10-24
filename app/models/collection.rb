@@ -761,6 +761,10 @@ class Collection < ApplicationRecord
     roles_anchor&.default_group_id
   end
 
+  def collection?
+    true
+  end
+
   # =================================
   # Various boolean queries/checks
   # - many are related to test collections and submission_boxes
