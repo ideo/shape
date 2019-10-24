@@ -765,6 +765,10 @@ class Collection < ApplicationRecord
     true
   end
 
+  def item?
+    false
+  end
+
   # =================================
   # Various boolean queries/checks
   # - many are related to test collections and submission_boxes

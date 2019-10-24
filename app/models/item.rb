@@ -319,6 +319,10 @@ class Item < ApplicationRecord
     true
   end
 
+  def collection?
+    false
+  end
+
   private
 
   def name_present?
