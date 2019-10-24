@@ -62,14 +62,49 @@ RSpec.describe CardMover, type: :service do
         end
       end
 
-      it 'should recalculate breadcrumbs' do
-        card = moving_cards.first
-        card.item.recalculate_breadcrumb!
-        expect {
+      context 'with item breadcrumbs' do
+        it 'should recalculate breadcrumbs' do
+          card = moving_cards.first
+          card.item.recalculate_breadcrumb!
+          expect {
+            card_mover.call
+          }.to change(card.item, :breadcrumb)
+          # double check that breadcrumb is showing the new collection
+          expect(card.item.breadcrumb.first).to eq to_collection.id
+        end
+      end
+
+      context 'with subcollection breadcrumbs' do
+        let!(:child_collection) do
+          create(
+            :collection,
+            parent_collection: from_collection,
+            num_cards: 2,
+            record_type: :collection,
+            roles_anchor_collection: nil,
+            add_editors: [user],
+          )
+        end
+
+        before do
+          moving_cards.reload
+        end
+
+        it 'should recalculate breadcrumbs' do
+          expect {
+            card_mover.call
+            child_collection.reload
+          }.to change(child_collection, :breadcrumb)
+          # double check that breadcrumb is showing the new collection
+          expect(child_collection.breadcrumb.first).to eq to_collection.id
+        end
+
+        it 'should calculate correct roles_anchor' do
           card_mover.call
-        }.to change(card.item, :breadcrumb)
-        # double check that breadcrumb is showing the new collection
-        expect(card.item.breadcrumb.first).to eq to_collection.id
+          child_collection.reload
+          expect(child_collection.roles_anchor_collection_id).to eq to_collection.id
+          expect(child_collection.collections.first.roles_anchor_collection_id).to eq to_collection.id
+        end
       end
 
       context 'with private record' do
@@ -80,7 +115,6 @@ RSpec.describe CardMover, type: :service do
           record.unanchor_and_inherit_roles_from_anchor!
           user.remove_role(Role::EDITOR, record)
           card.record.update(cached_inheritance: { private: true })
-          puts "card.record #{card.record.cached_inheritance}"
         end
 
         it 'should not assign permissions' do

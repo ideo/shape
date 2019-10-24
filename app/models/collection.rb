@@ -500,7 +500,7 @@ class Collection < ApplicationRecord
         card.item.reload.recalculate_breadcrumb!
       elsif card.collection_id.present?
         # this method will run the async worker if there are >50 children
-        card.collection.recalculate_breadcrumb_tree!
+        card.collection.reload.recalculate_breadcrumb_tree!
       end
     end
   end
