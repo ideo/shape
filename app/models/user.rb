@@ -172,6 +172,7 @@ class User < ApplicationRecord
   end
 
   # Searchkick Config
+  # NOTE: if you change these settings e.g. word_start you must do User.reindex
   searchkick callbacks: false, word_start: %i[name handle email]
   after_commit :reindex
   alias searchkick_reindex reindex

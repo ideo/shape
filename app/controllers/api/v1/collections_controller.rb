@@ -153,7 +153,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def load_and_authorize_set_submission_box_template
     @submission_box = Collection.find(json_api_params[:box_id])
-    authorize! :edit, @submission_box
+    authorize! :edit_content, @submission_box
     return true if json_api_params[:template_card_id].blank?
 
     @template_card = CollectionCard.find(json_api_params[:template_card_id])

@@ -128,6 +128,9 @@ class RealtimeTextItem extends React.Component {
     this.initQuillRefsAndData({ initSnapshot: true })
     setTimeout(() => {
       this.quillEditor.focus()
+      // fix for undo clearing out all text
+      // https://github.com/zenoamaro/react-quill/issues/511
+      this.quillEditor.history.clear()
     }, 100)
   }
 

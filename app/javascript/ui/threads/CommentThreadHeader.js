@@ -18,7 +18,7 @@ import UnreadCount from './UnreadCount'
 export const threadTitleCss = css`
   position: ${props => (props.sticky ? 'sticky' : 'relative')};
   top: 0;
-  z-index: ${v.zIndex.commentMentions + v.zIndex.commentHeader};
+  z-index: ${v.zIndex.commentHeader};
   display: block;
   width: 100%;
   background-color: ${v.colors.secondaryDark};

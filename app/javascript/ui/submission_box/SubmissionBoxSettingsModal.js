@@ -353,7 +353,7 @@ class SubmissionBoxSettingsModal extends React.Component {
             onSearch={this.onSearch}
             initialLoadAmount={25}
             searchFilter={this.searchFilter}
-            searchTags={['template']}
+            searchParams={{ master_template: true }}
           />
           <br />
           {this.itemRows}

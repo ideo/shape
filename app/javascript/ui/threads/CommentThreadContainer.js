@@ -290,7 +290,6 @@ class CommentThreadContainer extends React.Component {
         style={{
           position: 'absolute',
           top: '32px',
-          zIndex: 500,
           width: '100%',
         }}
       >
