@@ -26,7 +26,7 @@ class FilterSearchModal extends React.Component {
   }
 
   async componentDidMount() {
-    const results = await this.getCollectionTagList()
+    const results = await this.getOrganizationTagList()
     runInAction(() => {
       this.tagNames = results
     })
@@ -58,8 +58,8 @@ class FilterSearchModal extends React.Component {
   }
 
   getCollectionTagList() {
-    const { viewingCollection } = uiStore
-    const apiPath = `collections/${viewingCollection.id}/direct_children_tag_list`
+    const { currentUserOrganizationId } = apiStore
+    const apiPath = `organizations/${currentUserOrganizationId}/tags`
     return apiStore.requestJson(apiPath)
   }
 
