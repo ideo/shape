@@ -138,7 +138,7 @@ module Resourceable
   end
 
   def item_or_collection?
-    is_a?(Item) || is_a?(Collection)
+    item? || collection?
   end
 
   def can_edit?(user_or_group)

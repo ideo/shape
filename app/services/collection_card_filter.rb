@@ -64,7 +64,7 @@ class CollectionCardFilter < SimpleService
               _type: 'collection',
               _id: @collection.collections_and_linked_collections.map(&:id),
             },
-          ]
+          ],
         }
         results = Search.new(
           index_name: [Item, Collection],
@@ -72,13 +72,13 @@ class CollectionCardFilter < SimpleService
           per_page: per_page,
           page: @filters[:page],
         ).search(@filters[:q])
-        item_ids = results.results.select{|r| r.is_a?(Item)}.map(&:id)
-        collection_ids = results.results.select{|r| r.is_a?(Collection)}.map(&:id)
+        item_ids = results.results.select(&:item?).map(&:id)
+        collection_ids = results.results.select(&:collection?).map(&:id)
         cc = CollectionCard.arel_table
         @cards = @collection.collection_cards.where(
-           cc[:collection_id].in(collection_ids).or(
-             cc[:item_id].in(item_ids)
-           )
+          cc[:collection_id].in(collection_ids).or(
+            cc[:item_id].in(item_ids),
+          ),
         )
       else
         @cards = @collection.collection_cards_by_page(
