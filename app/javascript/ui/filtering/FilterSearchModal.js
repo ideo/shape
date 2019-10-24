@@ -109,8 +109,13 @@ class FilterSearchModal extends React.Component {
     const placeholder = `enter ${filterType.toLowerCase()} here`
 
     return (
-      <Modal title={title} onClose={this.handleModalClose} open={modalOpen}>
-        <div style={{ height: '140px' }}>
+      <Modal
+        title={title}
+        onClose={this.handleModalClose}
+        open={modalOpen}
+        scrollVisible
+      >
+        <div style={{ paddingBottom: '20px' }}>
           <StyledReactTags>
             <ReactTags
               tags={this.filtersFormattedAsTags}

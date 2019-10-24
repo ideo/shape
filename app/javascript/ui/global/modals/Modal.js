@@ -19,12 +19,17 @@ const StyledDialog = styled(Dialog)`
     border-left: 17px solid ${v.colors.black};
     max-width: 760px;
     width: 100%;
+
     @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
       border-left: 0px;
       height: 100%;
       margin: 0;
       max-height: 100%;
     }
+  }
+
+  .modal__scroll-visible {
+    overflow-y: visible;
   }
 `
 
@@ -155,15 +160,17 @@ class Modal extends React.Component {
       title,
       disableBackdropClick,
       noScroll,
+      scrollVisible,
     } = this.props
     let wrappedTitle = title
     if (typeof title === 'string') {
       wrappedTitle = <StyledHeading2>{title}</StyledHeading2>
     }
+    const scrollVisibleClass = scrollVisible ? 'modal__scroll-visible' : ''
     // TODO progamatically set disableAutoFocus
     return (
       <StyledDialog
-        classes={{ paper: 'modal__paper' }}
+        classes={{ paper: [`modal__paper ${scrollVisibleClass}`] }}
         disableAutoFocus
         open={open}
         onClose={this.handleclose}
@@ -214,6 +221,7 @@ Modal.propTypes = {
   onBack: PropTypes.func,
   disableBackdropClick: PropTypes.bool,
   noScroll: PropTypes.bool,
+  scrollVisible: PropTypes.bool,
 }
 
 Modal.defaultProps = {
@@ -223,6 +231,7 @@ Modal.defaultProps = {
   onBack: null,
   disableBackdropClick: false,
   noScroll: false,
+  scrollVisible: false,
 }
 
 export default Modal

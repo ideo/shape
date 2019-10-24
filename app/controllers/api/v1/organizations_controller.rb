@@ -77,6 +77,17 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
     render jsonapi: admin_users
   end
 
+  def tags
+    tags = ActsAsTaggableOn::Tag
+      .where(
+        'organization_ids @> ?',
+        @organization.id.to_s
+      )
+      .limit(1000)
+      .order('taggings_count desc')
+    render json: tags.map(&:name)
+  end
+
   private
 
   def load_user_organizations
