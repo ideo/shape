@@ -57,7 +57,7 @@ class FilterSearchModal extends React.Component {
     })
   }
 
-  getCollectionTagList() {
+  getOrganizationTagList() {
     const { currentUserOrganizationId } = apiStore
     const apiPath = `organizations/${currentUserOrganizationId}/tags`
     return apiStore.requestJson(apiPath)
