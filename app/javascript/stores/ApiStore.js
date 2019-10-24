@@ -403,7 +403,11 @@ class ApiStore extends jsonapi(datxCollection) {
     const { uiStore } = this
     const { viewingRecord } = uiStore
     if (!viewingRecord) return
-
+    if (viewingRecord.isUserCollection) {
+      uiStore.alert('Commenting not available from My Collection')
+      uiStore.setCommentingOnRecord(null)
+      return
+    }
     const thread = this.findThreadForRecord(viewingRecord)
     uiStore.expandAndOpenThread(thread.key)
   }
