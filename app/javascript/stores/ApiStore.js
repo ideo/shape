@@ -399,21 +399,24 @@ class ApiStore extends jsonapi(datxCollection) {
     this.setCurrentPageThreadKey(null)
   }
 
-  openCurrentThreadToCommentOn(record) {
+  expandAndOpenThreadForRecord(record) {
     const { uiStore } = this
     const { viewingRecord } = uiStore
     if (!viewingRecord) return
 
     const thread = this.findThreadForRecord(viewingRecord)
     uiStore.expandAndOpenThread(thread.key)
+  }
+
+  openCurrentThreadToCommentOn(record) {
+    const { uiStore } = this
+    this.expandAndOpenThreadForRecord(record)
     if (uiStore.commentingOnRecord !== record) {
       // when previous thread is not the same as the current thread
       this.collapseReplies()
       uiStore.scrollToBottomOfComments()
     }
     uiStore.setCommentingOnRecord(record)
-
-    return thread
   }
 
   async openCommentFromHighlight(commentId) {

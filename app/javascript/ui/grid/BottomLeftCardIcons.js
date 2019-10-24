@@ -15,7 +15,7 @@ import { Tooltip } from '@material-ui/core'
 import v from '~/utils/variables'
 import UnreadCount from '~/ui/threads/UnreadCount'
 import HiddenIconButton from '../icons/HiddenIconButton'
-import { apiStore, uiStore } from '~/stores/'
+import { apiStore } from '~/stores/'
 
 export const StyledIconsWrapper = styled.div`
   position: absolute;
@@ -63,11 +63,10 @@ const UnreadButton = styled.button`
 class BottomLeftCardIcons extends React.Component {
   handleUnreadIconClick = e => {
     e.preventDefault()
-
     const { record } = this.props
-    apiStore.openCurrentThreadToCommentOn(record)
-    uiStore.setReplyingToComment(record.last_unresolved_comment_id)
-    return
+    apiStore.expandAndOpenThreadForRecord(record)
+    const comment = apiStore.find('comments', record.last_unresolved_comment_id)
+    comment.expandAndFetchReplies()
   }
 
   get icons() {

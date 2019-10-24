@@ -128,13 +128,15 @@ class RealtimeTextItem extends React.Component {
     this.initQuillRefsAndData({ initSnapshot: true })
     setTimeout(() => {
       this.quillEditor.focus()
-      // note: didMount seems to clear the transient highlight, manually re-add it again
-      // will cause a subtle flickering effect when clicking into a text-item's highlight
-      this.reapplyActiveHighlight()
     }, 100)
   }
 
   componentDidUpdate(prevProps) {
+    setTimeout(() => {
+      // note: didUpdate seems to clear the transient highlight, manually re-add it again
+      // will cause a subtle flickering effect when clicking into a text-item's highlight
+      this.reapplyActiveHighlight()
+    }, 100)
     const initSnapshot = !prevProps.fullyLoaded && this.props.fullyLoaded
     // if we just "fully loaded" then make sure to update this.contentSnapshot and version
     this.initQuillRefsAndData({ initSnapshot })
