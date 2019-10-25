@@ -502,8 +502,7 @@ describe Collection::TestCollection, type: :model do
       # all the default cards + 4 incomplete
       expect(test_collection.items.count).to eq 8
       # all the default cards only (minus media because it gets removed)
-      defaults = Collection::TestCollection.default_question_types.map(&:to_s) - %w[question_media]
-      expect(test_collection.complete_question_items.map(&:question_type)).to match_array(defaults)
+      expect(test_collection.complete_question_cards & extra_question_cards).to be_empty
     end
   end
 
@@ -647,7 +646,7 @@ describe Collection::TestCollection, type: :model do
     let(:parent_collection) { create(:collection) }
     let!(:live_test_collection) do
       create(:test_collection,
-             test_status: :live,
+             :launched,
              parent_collection: parent_collection,
              collection_to_test: parent_collection)
     end

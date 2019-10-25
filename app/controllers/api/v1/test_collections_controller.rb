@@ -95,7 +95,7 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
 
   def render_test_collection
     included = Collection.default_relationships_for_api
-    included << :test_design
+    included << :test_results_collection
     render_collection(include: included)
   end
 

@@ -63,10 +63,6 @@ class Item
 
     after_create :create_question_dataset
 
-    after_commit :notify_test_design_of_creation,
-                 on: :create,
-                 if: :notify_test_design_collection_of_creation?
-
     after_update :update_test_open_responses_collection,
                  if: :update_test_open_responses_collection?
 
@@ -214,7 +210,7 @@ class Item
       (points * 100.0 / total).round
     end
 
-    def create_response_graph(parent_collection:, initiated_by:, legend_item: nil)
+    def find_or_create_response_graph(parent_collection:, initiated_by:, legend_item: nil)
       return if !scale_question? || test_data_item.present?
 
       legend_item ||= parent_collection.legend_item
@@ -247,7 +243,7 @@ class Item
       builder.collection_card
     end
 
-    def create_open_response_collection(parent_collection:, initiated_by:)
+    def find_or_create_open_response_collection(parent_collection:, initiated_by:)
       return if !question_open? || test_open_responses_collection.present?
 
       builder = CollectionCardBuilder.new(
@@ -299,13 +295,13 @@ class Item
       )
     end
 
-    def notify_test_design_collection_of_creation?
-      parent.is_a?(Collection::TestDesign)
-    end
-
-    def notify_test_design_of_creation
-      parent.question_item_created(self)
-    end
+    # def test_collection_is_live?
+    #   parent.is_a?(Collection::TestCollection) && parent.live?
+    # end
+    #
+    # def notify_test_collection_of_creation
+    #   parent.question_item_created(self)
+    # end
 
     def update_test_open_responses_collection?
       saved_change_to_content? && test_open_responses_collection.present?

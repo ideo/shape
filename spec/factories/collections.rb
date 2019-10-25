@@ -77,6 +77,19 @@ FactoryBot.define do
         end
       end
 
+      trait :launched do
+        after(:create) do |collection|
+          collection.create_test_results_collection(
+            name: collection.name,
+            organization: collection.organization,
+            created_by: collection.created_by,
+            roles_anchor_collection: collection.roles_anchor,
+          )
+          # do this after_create so that it doesn't get confused when creating questions
+          collection.update(test_status: :live)
+        end
+      end
+
       trait :completed do
         after(:create) do |collection|
           media_question = collection.question_items.detect(&:question_media?)
@@ -137,11 +150,13 @@ FactoryBot.define do
         end
       end
 
-      if evaluator.parent_collection
+      parent_collection = evaluator.parent_collection
+      parent_collection ||= create(:collection) if collection.is_a?(Collection::TestCollection)
+      if parent_collection
         collection.parent_collection_card = build(
           :collection_card,
-          parent: evaluator.parent_collection,
-          order: evaluator.parent_collection.collection_cards.count,
+          parent: parent_collection,
+          order: parent_collection.collection_cards.count,
           width: 1,
           height: 1,
           pinned: evaluator.pin_cards,

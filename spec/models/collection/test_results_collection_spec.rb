@@ -94,6 +94,11 @@ describe Collection::TestResultsCollection, type: :model do
               'Collection::TestCollection',
             ],
           )
+          expect(
+            test_results_collection
+            .collection_cards
+            .map(&:order),
+          ).to eq([0, 1, 2, 3, 4, 5])
         end
       end
     end

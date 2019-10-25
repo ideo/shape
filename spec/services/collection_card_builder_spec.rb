@@ -196,7 +196,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
         expect(builder.create).to be true
       end
 
-      context 'with test design collection' do
+      context 'with test collections' do
         let(:test_collection) { create(:test_collection, :completed) }
         let(:parent_collection) { test_collection }
         before do
@@ -233,14 +233,13 @@ RSpec.describe CollectionCardBuilder, type: :service do
             before do
               test_collection.launch!(initiated_by: user)
             end
-            let!(:parent_collection) { test_collection.test_design }
 
             it 'creates data item and legend' do
               expect(test_collection.live?).to be true
               expect do
                 builder.create
               end.to change(Item::DataItem, :count).by(1)
-              expect(test_collection.legend_item).not_to be_nil
+              expect(test_collection.test_results_collection.legend_item).not_to be_nil
             end
           end
         end
@@ -273,7 +272,6 @@ RSpec.describe CollectionCardBuilder, type: :service do
             before do
               test_collection.launch!(initiated_by: user)
             end
-            let!(:parent_collection) { test_collection.test_design }
 
             it 'creates open response collection' do
               expect(test_collection.live?).to be true

@@ -64,6 +64,7 @@ class Collection
 
     has_many :survey_responses, dependent: :destroy
     has_one :test_results_collection, inverse_of: :test_collection
+    delegate :datasets, to: :test_results_collection, allow_nil: true
 
     has_many :question_items,
              -> { questions },
@@ -75,9 +76,6 @@ class Collection
              -> { paid },
              class_name: 'TestAudience'
     belongs_to :collection_to_test, class_name: 'Collection', optional: true
-
-    has_many :datasets,
-             through: :data_items
 
     before_create :setup_default_status_and_questions, unless: :cloned_from_present?
     after_create :add_test_tag
@@ -503,22 +501,6 @@ class Collection
       test_audiences.paid.sum(:sample_size)
     end
 
-
-    # MOVED FROM TEST DESIGN
-
-    def question_item_created(question_item)
-      if question_item.question_open?
-        # Create open response collection for this new question item
-        test_results_collection.create_open_response_collections(
-          open_question_items: [question_item],
-        )
-      elsif question_item.question_media?
-        test_results_collection.create_media_item_link(
-          media_question_items: [question_item],
-        )
-      end
-    end
-
     def answerable_complete_question_items
       complete_question_items(answerable_only: true)
     end
@@ -574,7 +556,11 @@ class Collection
         return true
       end
       update_cached_submission_status(parent_submission) if inside_a_submission?
-      create_test_results_collection_and_move_inside!(initiated_by: initiated_by) unless reopening
+      unless reopening
+        create_test_results_collection_and_move_inside!(initiated_by: initiated_by)
+      end
+      # this finds_or_creates corresponding graphs/response collections
+      test_results_collection.initialize_cards!
       update(test_launched_at: Time.current, test_closed_at: nil)
       TestCollectionMailer.notify_launch(id).deliver_later if gives_incentive? && ENV['ENABLE_ZENDESK_FOR_TEST_LAUNCH']
     end
@@ -590,7 +576,7 @@ class Collection
       end
     end
 
-    def create_test_results_collection_and_move_inside!(initiated_by:)
+    def create_test_results_collection_and_move_inside!(initiated_by: nil)
       create_test_results_collection(
         name: name,
         organization: organization,
@@ -604,6 +590,7 @@ class Collection
       test_results_collection.reload
       CollectionCardBuilder.new(
         params: {
+          order: 999,
           collection_id: id,
         },
         parent_collection: test_results_collection,

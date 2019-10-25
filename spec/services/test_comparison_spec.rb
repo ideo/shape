@@ -9,8 +9,9 @@ RSpec.describe TestComparison do
            parent_collection: test_parent,
            roles_anchor_collection: test_parent)
   end
+  let(:test_results_collection) { test_collection.test_results_collection }
   let(:test_data_item) do
-    test_collection.data_items.report_type_question_item.first
+    test_results_collection.data_items.report_type_question_item.first
   end
   let(:comparison_collection) do
     create(:test_collection,
@@ -18,8 +19,9 @@ RSpec.describe TestComparison do
            parent_collection: test_parent,
            roles_anchor_collection: test_parent)
   end
+  let(:comparison_results_collection) { comparison_collection.test_results_collection }
   let(:comparison_data_item) do
-    comparison_collection.data_items.report_type_question_item.first
+    comparison_results_collection.data_items.report_type_question_item.first
   end
 
   before do
@@ -59,10 +61,10 @@ RSpec.describe TestComparison do
         )
       end
       let(:not_matching_question_data_item) do
-        not_matching_question_item.create_response_graph(
-          parent_collection: test_collection,
+        not_matching_question_item.find_or_create_response_graph(
+          parent_collection: test_results_collection,
           initiated_by: user,
-          legend_item: test_collection.legend_item,
+          legend_item: test_results_collection.legend_item,
         ).record
       end
 
@@ -135,7 +137,7 @@ RSpec.describe TestComparison do
 
     context 'with an empty dataset' do
       let!(:empty_dataset) { create(:empty_dataset, data_source: comparison_collection) }
-      let(:data_items) { test_collection.data_items }
+      let(:data_items) { test_results_collection.data_items }
 
       before do
         data_items.each do |di|

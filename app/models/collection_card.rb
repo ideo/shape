@@ -290,6 +290,12 @@ class CollectionCard < ApplicationRecord
     true
   end
 
+  def move_to_order(to_order)
+    increment_card_orders!(to_order)
+    update(order: to_order)
+    parent.reorder_cards!
+  end
+
   # gets called by API collection_cards_controller
   def self.archive_all!(user_id:)
     # should only ever be used on a subset of cards, e.g. not `all`!

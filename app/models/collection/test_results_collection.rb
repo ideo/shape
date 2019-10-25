@@ -61,6 +61,9 @@
 class Collection
   class TestResultsCollection < Collection
     belongs_to :test_collection, class_name: 'Collection::TestCollection'
+    has_many :datasets,
+             through: :data_items
+
     delegate :can_reopen?,
              :launchable?,
              :live_or_was_launched?,
@@ -73,8 +76,6 @@ class Collection
              :test_audiences,
              :question_items,
              to: :test_collection
-
-    after_create :initialize_cards!
 
     # TODO: revisit what should happen when you archive results or the test
     # after_commit :close_test, if: :archived_on_previous_save?
@@ -109,7 +110,7 @@ class Collection
     def create_open_response_collections(open_question_items: nil, initiated_by: nil)
       open_question_items ||= question_items.question_open
       open_question_items.map do |open_question|
-        open_question.create_open_response_collection(
+        open_question.find_or_create_open_response_collection(
           parent_collection: self,
           initiated_by: initiated_by,
         )
@@ -122,7 +123,7 @@ class Collection
       question_items
         .select(&:scale_question?)
         .each_with_index do |question, i|
-        data_item_card = question.create_response_graph(
+        data_item_card = question.find_or_create_response_graph(
           parent_collection: self,
           initiated_by: initiated_by,
           legend_item: legend,
@@ -164,8 +165,7 @@ class Collection
       return unless legend_item.present?
 
       legend_card = legend_item.parent_collection_card
-      legend_card.update(order: 2)
-      legend_card.increment_card_orders!
+      legend_card.move_to_order(2)
     end
   end
 end

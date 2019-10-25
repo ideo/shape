@@ -93,13 +93,13 @@ class CollectionCardBuilder
 
       # If this is a new scale question, create response graphs
       if record.scale_question?
-        record.create_response_graph(
-          parent_collection: test_collection,
+        record.find_or_create_response_graph(
+          parent_collection: test_collection.test_results_collection,
           initiated_by: @user,
         )
       elsif record.question_open?
-        record.create_open_response_collection(
-          parent_collection: test_collection,
+        record.find_or_create_open_response_collection(
+          parent_collection: test_collection.test_results_collection,
           initiated_by: @user,
         )
       end
