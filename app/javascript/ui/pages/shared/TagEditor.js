@@ -125,6 +125,8 @@ class TagEditor extends React.Component {
   }
 }
 
+TagEditor.displayName = 'TagEditor'
+
 TagEditor.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }

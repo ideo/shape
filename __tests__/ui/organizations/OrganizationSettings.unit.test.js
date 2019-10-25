@@ -1,4 +1,5 @@
 import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
+import TagEditor from '~/ui/pages/shared/TagEditor.js'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import { FormButton } from '~/ui/global/styled/buttons'
@@ -34,7 +35,7 @@ describe('OrganizationSettings', () => {
     })
 
     it('renders the page with TagEditor for domain whitelist', () => {
-      const tagEditor = wrapper.find('inject-TagEditor-with-apiStore')
+      const tagEditor = wrapper.find(TagEditor)
       expect(tagEditor.props().records).toEqual([organization])
       expect(tagEditor.props().tagField).toEqual('domain_whitelist')
     })

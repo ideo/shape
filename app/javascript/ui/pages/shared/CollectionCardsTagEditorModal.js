@@ -12,7 +12,7 @@ const StyledHeading2 = styled(Heading2)`
 `
 
 const StyledDisplayText = styled(DisplayText)`
-  margin-left: 5px;
+  margin-left: 0.31rem;
   margin-bottom: 0.15rem;
 `
 
