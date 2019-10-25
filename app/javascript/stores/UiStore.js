@@ -870,7 +870,7 @@ export default class UiStore {
   }
 
   scrollToBottomOfModal() {
-    if (!this.modalContentRef) return
+    if (!this.modalContentRef || !this.modalContentRef.current) return
     const node = this.modalContentRef.current
     node.scrollTop = node.scrollHeight
   }

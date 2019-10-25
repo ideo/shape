@@ -72,7 +72,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     end
   end
 
-  before_action :load_and_authorize_cards, only: %i[archive unarchive unarchive_from_email]
+  before_action :load_and_authorize_cards, only: %i[archive unarchive unarchive_from_email add_tag remove_tag]
   after_action :broadcast_collection_archive_updates, only: %i[archive unarchive unarchive_from_email]
   def archive
     @collection_cards.archive_all!(user_id: current_user.id)
@@ -95,6 +95,26 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       @collection.unarchive_cards!(@collection_cards, {})
     end
     redirect_to frontend_url_for(@collection).to_s
+  end
+
+  def add_tag
+    CollectionCardsAddRemoveTagWorker.perform_async(
+      @collection_cards.map(&:id),
+      json_api_params[:tag],
+      :add,
+      current_user.id,
+    )
+    head :no_content
+  end
+
+  def remove_tag
+    CollectionCardsAddRemoveTagWorker.perform_async(
+      @collection_cards.map(&:id),
+      json_api_params[:tag],
+      :remove,
+      current_user.id,
+    )
+    head :no_content
   end
 
   before_action :load_and_authorize_replacing_card, only: %i[replace]
