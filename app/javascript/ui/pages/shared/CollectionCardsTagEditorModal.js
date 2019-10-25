@@ -7,10 +7,6 @@ import CollectionCardsTagEditor from '~/ui/pages/shared/CollectionCardsTagEditor
 import Modal from '~/ui/global/modals/Modal'
 import { Heading2, DisplayText } from '~/ui/global/styled/typography'
 
-const StyledHeading2 = styled(Heading2)`
-  margin-bottom: 0.35rem;
-`
-
 const StyledDisplayText = styled(DisplayText)`
   margin-left: 0.31rem;
   margin-bottom: 0.15rem;
@@ -23,7 +19,7 @@ class CollectionCardsTagEditorModal extends React.Component {
     const { cards } = this.props
     return (
       <Fragment>
-        <StyledHeading2>Tags</StyledHeading2>
+        <Heading2 mb="0.35rem">Tags</Heading2>
         <StyledDisplayText>
           ({cards.length} Item{cards.length > 1 && 's'} Selected)
         </StyledDisplayText>
