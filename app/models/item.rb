@@ -315,10 +315,6 @@ class Item < ApplicationRecord
     roles_anchor&.default_group_id
   end
 
-  def item?
-    true
-  end
-
   private
 
   def name_present?
