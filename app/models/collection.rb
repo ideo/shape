@@ -661,7 +661,7 @@ class Collection < ApplicationRecord
 
   def cache_key(card_order = 'order', user_id = nil)
     test_details = ''
-    if test_collection?
+    if test_or_test_results_collection?
       # make sure these details factor into caching
       test_details = "launchable=#{launchable?}&can_reopen=#{can_reopen?}"
     end
@@ -770,7 +770,11 @@ class Collection < ApplicationRecord
   # - could perhaps be moved into a helper module?
   # =================================
   def test_collection?
-    is_a?(Collection::TestCollection) || is_a?(Collection::TestDesign)
+    is_a?(Collection::TestCollection)
+  end
+
+  def test_or_test_results_collection?
+    test_collection? || is_a?(Collection::TestResultsCollection)
   end
 
   def board_collection?

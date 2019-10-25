@@ -9,9 +9,9 @@ describe Collection::TestCollection, type: :model do
 
   context 'associations' do
     it { should have_many :survey_responses }
-    it { should have_many :prelaunch_question_items }
+    it { should have_many :question_items }
     it { should have_many :test_audiences }
-    it { should have_one :test_design }
+    it { should have_one :test_results_collection }
     it { should belong_to :collection_to_test }
   end
 
@@ -24,6 +24,15 @@ describe Collection::TestCollection, type: :model do
       it 'should create the default setup with its attached cards and items' do
         expect(test_collection.collection_cards.count).to eq 4
         expect(test_collection.items.count).to eq 4
+
+        expect(
+          test_collection
+          .collection_cards
+          .map(&:card_question_type)
+          .map(&:to_sym),
+        ).to eq(
+          Collection::TestCollection.default_question_types,
+        )
       end
 
       it 'sets up the anchored roles on the items' do
@@ -132,9 +141,9 @@ describe Collection::TestCollection, type: :model do
         expect(duplicate.draft?).to be true
       end
 
-      it 'has prelaunch question items' do
+      it 'has question items' do
         expect(
-          duplicate.prelaunch_question_items.pluck(:question_type),
+          duplicate.question_items.pluck(:question_type),
         ).to match_array(
           test_collection.question_items.pluck(:question_type),
         )
@@ -159,7 +168,7 @@ describe Collection::TestCollection, type: :model do
         expect(test_collection.live?).to be true
       end
 
-      it 'only copies test design' do
+      it 'always reset its test status to draft' do
         expect do
           duplicate
         end.to change(Collection, :count).by(1)
@@ -172,9 +181,9 @@ describe Collection::TestCollection, type: :model do
         expect(test_collection.items.first.roles_anchor).to eq test_parent
       end
 
-      it 'has prelaunch question items' do
+      it 'has question items' do
         expect(
-          duplicate.prelaunch_question_items.pluck(:question_type),
+          duplicate.question_items.pluck(:question_type),
         ).to match_array(
           test_collection.question_items.pluck(:question_type),
         )
@@ -206,9 +215,9 @@ describe Collection::TestCollection, type: :model do
           expect(duplicate.draft?).to be true
         end
 
-        it 'has prelaunch question items' do
+        it 'has question items' do
           expect(
-            duplicate.prelaunch_question_items.pluck(:question_type),
+            duplicate.question_items.pluck(:question_type),
           ).to match_array(
             test_collection.question_items.pluck(:question_type),
           )
@@ -241,9 +250,9 @@ describe Collection::TestCollection, type: :model do
     end
   end
 
-  context 'if template instance' do
-    let(:template) { create(:collection, master_template: true) }
-    let(:parent_collection) { create(:collection) }
+  context 'if template instance inside a submission' do
+    let(:template) { create(:test_collection, master_template: true) }
+    let(:parent_collection) { create(:collection, :submission) }
     let!(:test_template_instance) do
       create(:test_collection,
              :completed,
@@ -251,22 +260,15 @@ describe Collection::TestCollection, type: :model do
              collection_to_test: parent_collection,
              template: template)
     end
-    before do
-      test_template_instance.launch!(initiated_by: user)
-      expect(test_template_instance.live?).to be true
+
+    it 'is launchable if the template is live' do
+      allow(template).to receive(:live?).and_return(true)
+      expect(test_template_instance.launchable?).to eq(true)
     end
 
-    it 'moves templated_from to TestDesign' do
-      expect(test_template_instance.template).to be_nil
-      expect(
-        test_template_instance.test_design.template,
-      ).to eq(template)
-    end
-
-    it 'keeps collection_to_test on TestCollection' do
-      expect(
-        test_template_instance.collection_to_test,
-      ).to eq(parent_collection)
+    it 'is not launchable if the template is live' do
+      allow(template).to receive(:live?).and_return(false)
+      expect(test_template_instance.launchable?).to eq(false)
     end
   end
 
@@ -276,79 +278,22 @@ describe Collection::TestCollection, type: :model do
     context 'launching a test' do
       describe '#launch!' do
         context 'with valid draft collection (default status)' do
-          it 'should create a TestDesign collection and move the questions into it' do
-            expect(test_collection.test_design.present?).to be false
-            expect(test_collection.errors).to match_array([])
+          it 'should create a TestResults collection and move itself into it' do
+            expect(test_collection.test_results_collection.present?).to be false
             # call launch!
+            original_parent_card = test_collection.parent_collection_card
             expect(test_collection.launch!(initiated_by: user)).to be true
-            expect(test_collection.test_design.created_by).to eq user
-            expect(test_collection.test_design.present?).to be true
-            # should have moved the default question cards into there
-            expect(
-              test_collection
-              .test_design
-              .collection_cards
-              .map(&:card_question_type)
-              .map(&:to_sym),
-            ).to eq(
-              Collection::TestCollection.default_question_types,
-            )
-            expect(
-              test_collection.test_design.collection_cards.map(&:order),
-            ).to eq([0, 1, 2, 3])
-            # now the test_collection should have the chart item, test design in that order
-            expect(
-              test_collection
-              .collection_cards
-              .reload
-              .map(&:record)
-              .map(&:class),
-            ).to eq(
-              [
-                Item::VideoItem,
-                Item::DataItem,
-                Item::LegendItem,
-                Collection::TestDesign,
-              ],
-            )
-          end
-
-          context 'with more scaled questions' do
-            let!(:scale_questions) { create_list(:question_item, 2, parent_collection: test_collection) }
-            let(:legend_item) { test_collection.items.legend_items.first }
-
-            it 'should create a LegendItem at the 3rd spot (order == 2)' do
-              expect(test_collection.launch!(initiated_by: user)).to be true
-              expect(legend_item.parent_collection_card.order).to eq 2
-              expect(
-                test_collection
-                .collection_cards
-                .reload
-                .map { |card| card.record.class },
-              ).to eq(
-                [
-                  Item::VideoItem,
-                  Item::DataItem,
-                  Item::LegendItem,
-                  Item::DataItem,
-                  Item::DataItem,
-                  Collection::TestDesign,
-                ],
-              )
-            end
+            test_results_collection = test_collection.test_results_collection
+            expect(test_results_collection.present?).to be true
+            expect(test_results_collection.created_by).to eq user
+            # should have moved itself into the TRC
+            expect(original_parent_card.collection).to eq test_results_collection
+            expect(test_collection.reload.parent).to eq test_results_collection
           end
 
           it 'should update the status to "live"' do
             expect(test_collection.launch!(initiated_by: user)).to be true
             expect(test_collection.live?).to be true
-          end
-
-          it 'should create a chart item for each scale question' do
-            expect do
-              test_collection.launch!(initiated_by: user)
-            end.to change(
-              Item::DataItem, :count
-            ).by(test_collection.question_items.select { |q| q.question_context? || q.question_useful? }.size)
           end
 
           context 'with test audiences' do
@@ -368,38 +313,6 @@ describe Collection::TestCollection, type: :model do
 
             it 'returns gives_incentive_for test_audience = true' do
               expect(test_collection.gives_incentive_for?(test_audience.id)).to be true
-            end
-          end
-
-          context 'with open response questions' do
-            let!(:test_collection) { create(:test_collection, :open_response_questions) }
-
-            it 'creates a TestOpenResponse collection for each item' do
-              expect do
-                test_collection.launch!(initiated_by: user)
-              end.to change(
-                Collection::TestOpenResponses, :count
-              ).by(test_collection.question_items.size)
-
-              expect(
-                test_collection
-                  .test_design
-                  .question_items
-                  .all?(&:test_open_responses_collection),
-              ).to be true
-            end
-          end
-
-          context 'with media questions' do
-            let!(:test_collection) { create(:test_collection) }
-
-            it 'creates a media item link for each media item' do
-              test_collection.launch!(initiated_by: user)
-              expect(
-                test_collection
-                  .items
-                  .count,
-              ).to equal 4
             end
           end
 
@@ -438,26 +351,14 @@ describe Collection::TestCollection, type: :model do
             end
           end
 
-          context 'with media questions' do
-            # "completed" will have one video item
-            let!(:test_collection) { create(:test_collection, :completed) }
-            let(:first_card) { test_collection.collection_cards.first }
-
-            it 'creates a media item link for the media item' do
-              test_collection.launch!(initiated_by: user)
-              expect(first_card.is_a?(CollectionCard::Link)).to be true
-              expect(first_card.item).to eq test_collection.test_design.items.first
-            end
-          end
-
           describe '#serialized_for_test_survey' do
             before do
               test_collection.launch!(initiated_by: user)
             end
 
-            it 'should output its collection_cards from the test_design child collection' do
+            it 'should output its collection_cards as question cards' do
               data = test_collection.serialized_for_test_survey
-              card_ids = test_collection.test_design.collection_cards.map(&:id).map(&:to_s)
+              card_ids = test_collection.complete_question_cards.map(&:id).map(&:to_s)
               expect(data[:data][:relationships][:question_cards][:data].map { |i| i[:id] }).to match_array(card_ids)
             end
           end
@@ -572,18 +473,37 @@ describe Collection::TestCollection, type: :model do
           test_collection.reopen!(initiated_by: user)
         end
       end
+    end
+  end
 
-      describe '#serialized_for_test_survey' do
-        before do
-          test_collection.launch!(initiated_by: user)
-        end
+  describe '#complete_question_cards' do
+    let!(:test_collection) { create(:test_collection, :completed, parent_collection: create(:collection)) }
+    let!(:extra_question_cards) do
+      create_list(:collection_card_question, 4, parent: test_collection)
+    end
+    before do
+      test_collection.launch!(initiated_by: create(:user))
 
-        it 'should output its collection_cards from the test_design child collection' do
-          data = test_collection.serialized_for_test_survey
-          card_ids = test_collection.test_design.collection_cards.map(&:id).map(&:to_s)
-          expect(data[:data][:relationships][:question_cards][:data].map { |i| i[:id] }).to match_array(card_ids)
-        end
-      end
+      card = extra_question_cards.first
+      # incomplete because it doesn't have content
+      card.item.update(question_type: :question_open)
+      card = extra_question_cards.second
+      # incomplete because it doesn't have content
+      card.item.update(question_type: :question_category_satisfaction)
+      card = extra_question_cards.third
+      # incomplete because it doesn't have a type
+      card.item.update(question_type: nil)
+      card = extra_question_cards.fourth
+      # incomplete because it doesn't have media
+      card.item.update(question_type: :question_media)
+    end
+
+    it 'should only get completed question cards' do
+      # all the default cards + 4 incomplete
+      expect(test_collection.items.count).to eq 8
+      # all the default cards only (minus media because it gets removed)
+      defaults = Collection::TestCollection.default_question_types.map(&:to_s) - %w[question_media]
+      expect(test_collection.complete_question_items.map(&:question_type)).to match_array(defaults)
     end
   end
 
@@ -593,7 +513,6 @@ describe Collection::TestCollection, type: :model do
     let!(:test_collection) do
       create(:test_collection, :completed, master_template: true, parent_collection: submission_template)
     end
-    let!(:test_instance) { create(:test_collection, template: test_collection) }
     let(:submission) { create(:collection, :submission, parent_collection: submission_box.submissions_collection) }
     let(:submission_test) { create(:test_collection, :completed, template: test_collection, parent_collection: submission) }
 
@@ -604,10 +523,13 @@ describe Collection::TestCollection, type: :model do
 
     describe '#launch!' do
       context 'with valid draft collection (default status)' do
-        it 'should launch without creating a TestDesign collection' do
+        # for testing UpdateTemplateInstancesWorker below
+        let!(:test_instance) { create(:test_collection, template: test_collection) }
+
+        it 'should launch without creating a TestResults collection' do
           expect(test_collection.launch!(initiated_by: user)).to be true
           expect(test_collection.test_status).to eq 'live'
-          expect(test_collection.test_design.present?).to be false
+          expect(test_collection.test_results_collection.present?).to be false
         end
 
         it 'should call the UpdateTemplateInstancesWorker if there are any instances' do

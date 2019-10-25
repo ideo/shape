@@ -299,8 +299,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.type === 'Collection::TestDesign'
   }
 
-  get isTestCollectionOrTestDesign() {
-    return this.isTestCollection || this.isTestDesign
+  get isTestResultsCollection() {
+    return this.type === 'Collection::TestResultsCollection'
+  }
+
+  get isTestCollectionOrResults() {
+    return this.isTestCollection || this.isTestResultsCollection
   }
 
   get isBoard() {
@@ -343,24 +347,15 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       !this.isSubTemplate &&
       !this.isProfileTemplate &&
       !this.is_submission_box_template &&
-      !this.isTestDesign &&
+      !this.isTestResultsCollection &&
       !this.isTestCollection
-    )
-  }
-
-  get requiresTestDesigner() {
-    // this determines if it should display the TestDesigner in CollectionPage,
-    return (
-      this.isTestDesign ||
-      (this.isTestCollection && this.test_status === 'draft') ||
-      this.is_submission_box_template_test
     )
   }
 
   get launchableTestId() {
     if (this.isTestCollection) {
       return this.id
-    } else if (this.isTestDesign) {
+    } else if (this.isTestResultsCollection) {
       return this.test_collection_id
     } else if (this.submission_attrs) {
       return this.submission_attrs.launchable_test_id

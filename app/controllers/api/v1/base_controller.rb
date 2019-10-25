@@ -31,6 +31,7 @@ class Api::V1::BaseController < ApplicationController
       'Collection::Global': SerializableCollection,
       'Collection::TestCollection': SerializableCollection,
       'Collection::TestDesign': SerializableCollection,
+      'Collection::TestResultsCollection': SerializableCollection,
       'Collection::TestOpenResponses': SerializableCollection,
       'Collection::SubmissionBox': SerializableCollection,
       'Collection::SubmissionsCollection': SerializableSubmissionsCollection,

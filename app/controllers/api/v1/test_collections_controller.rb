@@ -12,7 +12,7 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
   end
 
   def validate_launch
-    if @test_collection.completed_and_launchable?
+    if @test_collection.valid_and_launchable?
       render json: :ok
     else
       render_api_errors @test_collection.errors

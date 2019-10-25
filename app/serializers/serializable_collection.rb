@@ -42,7 +42,7 @@ class SerializableCollection < BaseJsonSerializer
   belongs_to :organization
   belongs_to :created_by
   has_many :test_audiences
-  has_one :test_design
+  has_one :test_results_collection
 
   attribute :organization_id do
     @object.organization_id.to_s
@@ -178,11 +178,11 @@ class SerializableCollection < BaseJsonSerializer
     @object.inside_an_application_collection?
   end
 
-  attribute :launchable, if: -> { @object.test_collection? } do
+  attribute :launchable, if: -> { @object.test_or_test_results_collection? } do
     @object.launchable?
   end
 
-  attribute :gives_incentive, if: -> { @object.test_collection? } do
+  attribute :gives_incentive, if: -> { @object.test_or_test_results_collection? } do
     @object.gives_incentive?
   end
 
@@ -195,7 +195,7 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   attribute :num_survey_responses do
-    @object.test_collection? ? @object.survey_responses.size : 0
+    @object.is_a?(Collection::TestCollection) ? @object.survey_responses.size : 0
   end
 
   attribute :max_row_index do

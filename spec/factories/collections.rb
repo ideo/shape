@@ -39,11 +39,7 @@ FactoryBot.define do
       end
     end
 
-    factory :test_design, class: Collection::TestDesign do
-      transient do
-        record_type :question
-      end
-    end
+    factory :test_results_collection, class: Collection::TestResultsCollection
     factory :test_collection, class: Collection::TestCollection do
       transient do
         record_type :question
@@ -52,7 +48,7 @@ FactoryBot.define do
 
       trait :answerable_questions do
         after(:create) do |collection|
-          collection.prelaunch_question_items.each do |item|
+          collection.question_items.each do |item|
             item.update(question_type: :question_context)
           end
         end
@@ -60,7 +56,7 @@ FactoryBot.define do
 
       trait :open_response_questions do
         after(:create) do |collection|
-          collection.prelaunch_question_items.each_with_index do |item, index|
+          collection.question_items.each_with_index do |item, index|
             item.update(question_type: :question_open, content: "Item #{index}")
           end
         end
@@ -83,14 +79,14 @@ FactoryBot.define do
 
       trait :completed do
         after(:create) do |collection|
-          media_question = collection.prelaunch_question_items.detect(&:question_media?)
+          media_question = collection.question_items.detect(&:question_media?)
           media_question&.update(
             type: 'Item::VideoItem',
             url: 'something',
             thumbnail_url: 'something',
             question_type: nil,
           )
-          description_question = collection.prelaunch_question_items.detect(&:question_description?)
+          description_question = collection.question_items.detect(&:question_description?)
           description_question&.update(content: 'something')
         end
       end
