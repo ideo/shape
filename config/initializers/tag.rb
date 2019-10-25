@@ -2,11 +2,13 @@
 # `organization_id` to the Tag
 class ActsAsTaggableOn::Tagging
   after_save do
-    organization_id = taggable.organization_id
+    if taggable.respond_to?(:organization_id)
+      organization_id = taggable.organization_id
 
-    unless tag.organization_ids.include?(organization_id)
-      tag.organization_ids = tag.organization_ids << organization_id
-      tag.save
+      unless tag.organization_ids.include?(organization_id)
+        tag.organization_ids = tag.organization_ids << organization_id
+        tag.save
+      end
     end
   end
 end
