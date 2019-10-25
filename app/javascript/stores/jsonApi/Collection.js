@@ -365,7 +365,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   @computed
   get launchableTestStatus() {
-    if (this.isTestCollectionOrTestDesign) {
+    if (this.isTestCollectionOrResults) {
       return this.test_status
     }
     if (!this.submission_attrs) return null

@@ -186,7 +186,7 @@ class SerializableCollection < BaseJsonSerializer
     @object.gives_incentive?
   end
 
-  attribute :test_collection_id, if: -> { @object.is_a?(Collection::TestDesign) } do
+  attribute :test_collection_id, if: -> { @object.is_a?(Collection::TestResultsCollection) } do
     @object.test_collection.id.to_s
   end
 
