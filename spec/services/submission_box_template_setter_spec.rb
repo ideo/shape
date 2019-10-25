@@ -2,10 +2,11 @@ require 'rails_helper'
 
 RSpec.describe SubmissionBoxTemplateSetter, type: :service do
   let(:user) { create(:user) }
+  let(:viewer) { create(:user) }
   let(:template_collection) { create(:collection) }
   let(:template) { create(:collection, master_template: true, add_viewers: [user]) }
   let(:template_card) { create(:collection_card_collection, collection: template, width: 2) }
-  let(:submission_box) { create(:submission_box, add_editors: [user]) }
+  let(:submission_box) { create(:submission_box, add_editors: [user], add_viewers: [viewer] )}
   let(:submissions_collection) { submission_box.submissions_collection }
   let(:template_setter) do
     SubmissionBoxTemplateSetter.new(
