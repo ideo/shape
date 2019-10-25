@@ -24,7 +24,9 @@ Feature: Creating an "in-collection" Test Collection
     Then I should see "Get Link" in a "HeaderFormButton"
     Then I should see "Stop Feedback" in a "HeaderFormButton"
 
+    When I navigate to the collection named "Cypress Test Feedback Design" via the "CollectionCover"
     # NOTE: seemingly no way to test clipboard copying in cypress (i.e. "Get Link")
+    # this is used in the "visit current Test URL" below
     When I capture the current URL
     And I visit the current Test URL
     And I wait for "@apiGetCollection" to finish

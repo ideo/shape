@@ -745,15 +745,23 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (this.submission_attrs) {
       collection = await this._fetchSubmissionTest()
     }
-    if (_.includes(['launch', 'reopen'], actionName)) {
-      if (collection.checkLaunchability()) {
-        // called with 'this' so that we know if the submission is calling it
-        return this.API_performTestAction(actionName, audiences)
+    if (
+      _.includes(['launch', 'reopen'], actionName) &&
+      collection.checkLaunchability()
+    ) {
+      // called with 'this' so that we know if the submission is calling it
+      await this.API_performTestAction(actionName, audiences)
+      if (actionName === 'launch') {
+        console.log(collection, collection.test_results_collection.id)
+        this.routingStore.routeTo(
+          'collections',
+          collection.test_results_collection.id
+        )
       }
-      return false
+    } else if (actionName === 'close') {
+      // e.g. for close
+      return this.API_performTestAction(actionName)
     }
-    // e.g. for close
-    return this.API_performTestAction(actionName)
   }
 
   trackTestAction = actionName => {

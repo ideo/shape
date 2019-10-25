@@ -33,10 +33,13 @@ Feature: Creating a Test Collection
     Then I should see "Get Link" in a "HeaderFormButton"
     Then I should see "Stop Feedback" in a "HeaderFormButton"
 
+    When I navigate to the collection named "Test Prototype Feedback Design" via the "CollectionCover"
+
   Scenario: Filling out a test
-    Given I logout
     # NOTE: seemingly no way to test clipboard copying in cypress (i.e. "Get Link")
+    # this is used in the "visit current Test URL" below
     When I capture the current URL
+    Given I logout
     And I visit the current Test URL
     Then I should see a "StandaloneTestSurvey"
     Then I should see a question with "WelcomeQuestionEmojiHolder" and 1 emojis
