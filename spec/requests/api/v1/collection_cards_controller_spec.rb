@@ -1151,6 +1151,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
     context 'with record and collection content edit access' do
       before do
+        collection.unanchor_and_inherit_roles_from_anchor!
         editor.add_role(Role::EDITOR, collection_card.item)
         editor.add_role(Role::EDITOR, collection)
         user.add_role(Role::CONTENT_EDITOR, collection_card.item)
@@ -1212,7 +1213,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       context 'with question item params' do
-        let(:collection) { create(:test_collection, organization: organization) }
+        let!(:collection) { create(:test_collection, organization: organization) }
         # will be question_useful by default
         let(:collection_card) { create(:collection_card_question, parent: collection) }
         let(:raw_params) do
