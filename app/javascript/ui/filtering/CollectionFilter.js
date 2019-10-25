@@ -93,9 +93,9 @@ class CollectionFilter extends React.Component {
       const {
         collection: { collection_filters },
       } = this.props
-      collection_filters.forEach(filter => {
-        filter.API_toggleSelected(false)
-      })
+      return Promise.all(
+        collection_filters.map(filter => filter.API_toggleSelected(false))
+      )
     })
   }
 

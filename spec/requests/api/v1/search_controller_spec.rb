@@ -275,7 +275,7 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
 
       it 'returns collection that matches name search' do
         get(path, params: { query: find_collection.name })
-        expect(json['data'].size).to eq(2)
+        expect(json['data'].size).to eq(1)
         expect(json['data'].first['id'].to_i).to eq(find_collection.id)
       end
     end

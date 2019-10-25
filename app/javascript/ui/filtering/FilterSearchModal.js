@@ -26,7 +26,7 @@ class FilterSearchModal extends React.Component {
   }
 
   async componentDidMount() {
-    const results = await this.getCollectionTagList()
+    const results = await this.getOrganizationTagList()
     runInAction(() => {
       this.tagNames = results
     })
@@ -57,9 +57,9 @@ class FilterSearchModal extends React.Component {
     })
   }
 
-  getCollectionTagList() {
-    const { viewingCollection } = uiStore
-    const apiPath = `collections/${viewingCollection.id}/direct_children_tag_list`
+  getOrganizationTagList() {
+    const { currentUserOrganizationId } = apiStore
+    const apiPath = `organizations/${currentUserOrganizationId}/tags`
     return apiStore.requestJson(apiPath)
   }
 
@@ -109,8 +109,13 @@ class FilterSearchModal extends React.Component {
     const placeholder = `enter ${filterType.toLowerCase()} here`
 
     return (
-      <Modal title={title} onClose={this.handleModalClose} open={modalOpen}>
-        <div style={{ height: '140px' }}>
+      <Modal
+        title={title}
+        onClose={this.handleModalClose}
+        open={modalOpen}
+        scrollVisible
+      >
+        <div style={{ paddingBottom: '20px' }}>
           <StyledReactTags>
             <ReactTags
               tags={this.filtersFormattedAsTags}

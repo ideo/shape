@@ -116,6 +116,7 @@ Rails.application.routes.draw do
           get 'check_payments'
           get 'my_collection'
           get 'admin_users'
+          get 'tags'
         end
 
         get 'search', to: 'search#search'

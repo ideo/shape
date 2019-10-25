@@ -23,6 +23,7 @@ describe('FilterSearchModal', () => {
       modalOpen: false,
     }
     uiStore.viewingCollection = { id: '3' }
+    apiStore.currentUserOrganizationId = '1'
     rerender = function() {
       wrapper = shallow(<FilterSearchModal {...props} />)
       return wrapper
@@ -37,8 +38,9 @@ describe('FilterSearchModal', () => {
       rerender()
     })
 
-    it('should load the current collections direct tag list', () => {
+    it('should load the current organizations tag list', () => {
       expect(apiStore.requestJson).toHaveBeenCalled()
+      expect(apiStore.requestJson).toHaveBeenCalledWith(`organizations/1/tags`)
     })
 
     it('should set the tagNames', () => {

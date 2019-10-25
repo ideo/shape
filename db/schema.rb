@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_15_212000) do
+ActiveRecord::Schema.define(version: 2019_10_24_211521) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -593,6 +593,7 @@ ActiveRecord::Schema.define(version: 2019_10_15_212000) do
   create_table "tags", id: :serial, force: :cascade do |t|
     t.string "name"
     t.integer "taggings_count", default: 0
+    t.jsonb "organization_ids", default: []
     t.index ["name"], name: "index_tags_on_name", unique: true
   end
 
