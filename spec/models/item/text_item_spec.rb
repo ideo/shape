@@ -127,7 +127,7 @@ RSpec.describe Item::TextItem, type: :model do
           {
             ops: [
               { insert: 'part 1', attributes: { commentHighlight: '999', 'data-comment-id': '999' } },
-              { insert: 'part 2', attributes: { 'data-comment-id': '999' } },
+              { insert: 'part 2', attributes: { undefined: '999' } },
             ],
           }
         end
@@ -135,8 +135,9 @@ RSpec.describe Item::TextItem, type: :model do
 
         it 'should scrub any attributes that have data-comment-id with no commentHighlight' do
           text_item.quill_data = quill_data
+          text_item.save
           expect(text_item.ops.first['attributes']['data-comment-id'].present?).to be true
-          expect(text_item.ops.second['attributes']['data-comment-id'].present?).to be false
+          expect(text_item.ops.second['attributes'].length).to be 0
         end
       end
     end

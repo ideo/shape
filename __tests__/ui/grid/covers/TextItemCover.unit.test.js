@@ -19,6 +19,12 @@ const props = {
 const e = {
   stopPropagation: jest.fn(),
 }
+const fakeReactQuillRef = {
+  editingArea: {
+    getElementsByClassName: jest.fn().mockReturnValue([{ scrollHeight: 500 }]),
+  },
+  getEditor: jest.fn(),
+}
 
 let wrapper, component
 describe('TextItemCover', () => {
@@ -38,13 +44,7 @@ describe('TextItemCover', () => {
 
   it('renders Read More if text height exceeds the viewable area', () => {
     const inst = wrapper.instance()
-    inst.quillEditor = {
-      editingArea: {
-        getElementsByClassName: jest
-          .fn()
-          .mockReturnValue([{ scrollHeight: 500 }]),
-      },
-    }
+    inst.reactQuillRef = fakeReactQuillRef
     inst.componentDidMount()
     // force re-render to pick up state update
     wrapper.update()
@@ -54,7 +54,8 @@ describe('TextItemCover', () => {
 
   it('does not render Read More if text height fits within the viewable area', () => {
     const inst = wrapper.instance()
-    inst.quillEditor = {
+    inst.reactQuillRef = {
+      ...fakeReactQuillRef,
       editingArea: {
         getElementsByClassName: jest
           .fn()

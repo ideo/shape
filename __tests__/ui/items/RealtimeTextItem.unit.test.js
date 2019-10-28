@@ -49,8 +49,8 @@ describe('TextItem', () => {
 
     describe('with someone else editing', () => {
       beforeEach(() => {
-        wrapper.instance().version = 1
-        wrapper.instance().channelReceivedData({
+        const inst = wrapper.instance()
+        inst.channelReceivedData({
           current_editor: fakeActionCableUser,
           data: {
             num_viewers: 2,
@@ -114,7 +114,8 @@ describe('TextItem', () => {
     }
 
     beforeEach(() => {
-      component.version = 1
+      props.item = { ...fakeTextItem, version: 1 }
+      wrapper = shallow(<RealtimeTextItem.wrappedComponent {...props} />)
     })
 
     it('combines and buffers input text changes', () => {

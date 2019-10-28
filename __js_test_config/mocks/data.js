@@ -235,6 +235,7 @@ export const fakeTextItem = {
   toJSON: jest.fn().mockReturnValue(fakeTextItemAttrs),
   pushUndo: jest.fn(),
   quill_data: jest.fn().mockReturnValue(fakeQuillData),
+  version: 1,
   ...fakeJsonApiAttrs,
 }
 export const fakeVideoItemAttrs = {
