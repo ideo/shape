@@ -1,4 +1,4 @@
-import TagEditor from '~/ui/pages/shared/TagEditor'
+import TagEditor, { tagsInCommon } from '~/ui/pages/shared/TagEditor'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import { fakeCollection } from '#/mocks/data'
 
@@ -28,5 +28,26 @@ describe('TagEditor', () => {
     expect(wrapper.find('ReactTags').props().tags[0].name).toEqual(
       records[0].tag_list[0]
     )
+  })
+
+  describe('tagsInCommon', () => {
+    let records
+    beforeEach(() => {
+      records = [
+        { tag_list: ['bananas', 'apples'] },
+        { tag_list: ['peaches', 'bananas'] },
+      ]
+    })
+
+    it('returns tags in common across records', () => {
+      expect(tagsInCommon(records, 'tag_list')).toEqual(
+        expect.arrayContaining(['bananas'])
+      )
+    })
+
+    it('returns no intersection if a record has no tags', () => {
+      records[0].tag_list = []
+      expect(tagsInCommon(records, 'tag_list')).toEqual([])
+    })
   })
 })

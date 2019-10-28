@@ -6,11 +6,12 @@ import ReactTags from 'react-tag-autocomplete'
 
 import StyledReactTags from './StyledReactTags'
 
-const tagsInCommon = (records, tagField) => {
+export const tagsInCommon = (records, tagField) => {
   const tags = []
   records.forEach(record => {
-    if (record[tagField] && record[tagField].length > 0)
-      tags.push(record[tagField])
+    // Include records with and without tags,
+    // because they are used to find if records share tags in common
+    tags.push(record[tagField])
   })
   // Intersection needs each array as separate arguments,
   // which is why apply is used
