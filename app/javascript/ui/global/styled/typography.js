@@ -41,6 +41,7 @@ export const Heading2 = styled.h2`
   font-weight: ${v.weights.medium};
   letter-spacing: 0.14375rem;
   color: ${v.colors.black};
+  ${props => props.mb && `margin-bottom: ${props.mb};`}
 `
 Heading2.displayName = 'Heading2'
 

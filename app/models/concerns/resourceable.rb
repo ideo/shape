@@ -316,7 +316,8 @@ module Resourceable
     true
   end
 
-  def remove_all_viewer_roles
+  def remove_all_viewer_roles!
+    unanchor_and_inherit_roles_from_anchor!
     (viewers[:users] + viewers[:groups]).each do |viewer|
       viewer.remove_role(Role::VIEWER, self)
     end
