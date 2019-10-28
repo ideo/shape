@@ -1,4 +1,4 @@
-import { computed, runInAction } from 'mobx'
+import { computed, runInAction, toJS } from 'mobx'
 import { Model, initModelRef, setModelMetaKey } from 'datx'
 import { jsonapi, modelToJsonApi } from 'datx-jsonapi'
 import _ from 'lodash'
@@ -88,7 +88,7 @@ class BaseRecord extends jsonapi(Model) {
   toJsonApi() {
     const data = modelToJsonApi(this)
     if (this.attributesForAPI) {
-      data.attributes = _.pick(data.attributes, this.attributesForAPI)
+      data.attributes = toJS(_.pick(data.attributes, this.attributesForAPI))
     }
     delete data.relationships
     return data

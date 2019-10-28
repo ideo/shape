@@ -1,6 +1,7 @@
 import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import { Helmet } from 'react-helmet'
 
 import ArchivedBanner from '~/ui/layout/ArchivedBanner'
 import FilePreview from '~/ui/grid/covers/FilePreview'
@@ -13,7 +14,7 @@ import PageHeader from '~/ui/pages/shared/PageHeader'
 import RealtimeTextItem from '~/ui/items/RealtimeTextItem'
 import VideoItem from '~/ui/items/VideoItem'
 import { ITEM_TYPES } from '~/utils/variables'
-import { Helmet } from 'react-helmet'
+import TextActionMenu from '~/ui/grid/TextActionMenu'
 
 const ItemPageContainer = styled.div`
   background: white;
@@ -30,6 +31,7 @@ class ItemPage extends React.Component {
     // e.g. updateItem method
     item: null,
   }
+  containerRef = React.createRef()
 
   componentDidMount() {
     this.onAPILoad()
@@ -53,12 +55,6 @@ class ItemPage extends React.Component {
     })
   }
 
-  updateItem = dataContent => {
-    const { item } = this.state
-    item.data_content = dataContent
-    this.setState({ item })
-  }
-
   save = (item, { cancel_sync = true } = {}) =>
     item.API_updateWithoutSync({ cancel_sync })
 
@@ -76,20 +72,41 @@ class ItemPage extends React.Component {
     }
   }
 
+  // Should this get attached to PageContainer?
+  // It's on GridCard already but this.content doesn't return a grid card
+  openContextMenu = ev => {
+    ev.preventDefault()
+    const { item, uiStore } = this.props
+    const { parent_collection_card } = item
+
+    const rect = this.containerRef.getBoundingClientRect()
+    const x = ev.clientX - rect.left
+    const y = ev.clientY - rect.top
+
+    uiStore.openContextMenu(ev, {
+      x,
+      y,
+      card: parent_collection_card,
+      menuItemCount: 1, // Until we change the text action menu
+    })
+  }
+
   // could be smarter or broken out once we want to do different things per type
   get content() {
     const { apiStore } = this.props
     const { item } = this.state
+
     // similar function as in GridCard, could extract?
     switch (item.type) {
       case ITEM_TYPES.TEXT:
         return (
           <RealtimeTextItem
+            containerRef={c => (this.containerRef = c)}
             onCancel={this.cancel}
             item={item}
             currentUserId={apiStore.currentUserId}
             fullPageView
-            // this is important so we have the right data_content snapshot
+            // this is important so we have the right quill_data snapshot
             fullyLoaded={item.fullyLoaded}
           />
         )
@@ -119,21 +136,6 @@ class ItemPage extends React.Component {
     routingStore.routeTo('items', card.record.id)
   }
 
-  updateItemName = name => {
-    const { item } = this.state
-    item.name = name
-    item.save()
-    const { uiStore } = this.props
-    uiStore.trackEvent('update', item)
-  }
-
-  saveText = (content, dataContent) => {
-    const { item } = this.state
-    item.content = content
-    item.data_content = dataContent
-    item.API_updateWithoutSync({ cancel_sync: true })
-  }
-
   render() {
     const { uiStore } = this.props
     const { item } = this.state
@@ -159,8 +161,12 @@ class ItemPage extends React.Component {
         <Helmet title={item.pageTitle} />
         <PageHeader record={item} />
         <ArchivedBanner />
-        <ItemPageContainer>
+        <ItemPageContainer onContextMenu={this.openContextMenu}>
           <PageContainer {...containerProps}>
+            {item.parent_collection_card && (
+              <TextActionMenu card={item.parent_collection_card} />
+            )}
+
             {item.parent_collection_card &&
             replacingId === item.parent_collection_card.id ? (
               <GridCardBlank parent={item.parent} afterCreate={this.reroute} />

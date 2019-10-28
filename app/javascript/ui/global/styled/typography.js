@@ -208,6 +208,8 @@ CardHeading.displayName = 'CardHeading'
 
 export const TextItemHeading1Css = css`
   ${CardHeadingCss};
+  /* need to preserve spaces in text items */
+  white-space: pre-wrap;
 
   && {
     color: ${v.colors.black};
@@ -268,6 +270,21 @@ export const QuillStyleWrapper = styled.div`
 
     a {
       color: ${v.colors.ctaPrimary};
+    }
+
+    /* NOTE: this is our test of custom highlights */
+    sub {
+      vertical-align: baseline;
+      font-size: inherit;
+      background: ${v.colors.highlightInactive};
+    }
+
+    sub[data-comment-id='new'] {
+      background: ${v.colors.highlightActive};
+    }
+
+    sub.highlightActive {
+      background: ${v.colors.highlightActive};
     }
 
     @keyframes blink-animation {
