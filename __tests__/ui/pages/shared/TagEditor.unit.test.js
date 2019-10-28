@@ -31,18 +31,22 @@ describe('TagEditor', () => {
   })
 
   describe('tagsInCommon', () => {
-    it('returns tags in common across records', () => {
-      const records = [
+    let records
+    beforeEach(() => {
+      records = [
         { tag_list: ['bananas', 'apples'] },
         { tag_list: ['peaches', 'bananas'] },
       ]
+    })
+
+    it('returns tags in common across records', () => {
       expect(tagsInCommon(records, 'tag_list')).toEqual(
         expect.arrayContaining(['bananas'])
       )
+    })
 
-      // Alter so first record is empty
+    it('returns no intersection if a record has no tags', () => {
       records[0].tag_list = []
-
       expect(tagsInCommon(records, 'tag_list')).toEqual([])
     })
   })
