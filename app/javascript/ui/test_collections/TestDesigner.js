@@ -1,11 +1,13 @@
 import _ from 'lodash'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled, { ThemeProvider } from 'styled-components'
+import { Fragment } from 'react'
 import FlipMove from 'react-flip-move'
 import pluralize from 'pluralize'
 import googleTagManager from '~/vendor/googleTagManager'
 
 import v, { ITEM_TYPES } from '~/utils/variables'
+import { Heading3 } from '~/ui/global/styled/typography'
 import QuestionSelectHolder from '~/ui/test_collections/QuestionSelectHolder'
 import {
   TestQuestionHolder,
@@ -36,6 +38,12 @@ const BottomBorder = styled(TopBorder)`
   border-radius: 0 0 7px 7px;
 `
 
+const Section = styled.div`
+  border-top: 1px solid ${v.colors.black};
+  margin-top: 1rem;
+  padding-top: 0.3rem;
+`
+
 const TestQuestionFlexWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -49,6 +57,8 @@ const TestQuestionFlexWrapper = styled.div`
     width: 100%;
   }
 `
+
+const SECTIONS = ['intro', 'ideas', 'outro']
 
 const OuterContainer = styled.div`
   display: flex;
@@ -76,6 +86,12 @@ const OuterContainer = styled.div`
     }
   }
 `
+
+const userEditableQuestionType = questionType => {
+  return ['media', 'question_media', 'question_description'].includes(
+    questionType
+  )
+}
 
 @observer
 class TestDesigner extends React.Component {
@@ -110,6 +126,16 @@ class TestDesigner extends React.Component {
   get numResponses() {
     const { collection } = this.props
     return collection.num_survey_responses
+  }
+
+  get cardsBySection() {
+    const { collection } = this.props
+    const sections = {}
+    SECTIONS.forEach(section => (sections[section] = []))
+    collection.sortedCards.forEach(card => {
+      if (sections[card.section_type]) sections[card.section_type].push(card)
+    })
+    return sections
   }
 
   // This shows a dialog immediately
@@ -169,11 +195,11 @@ class TestDesigner extends React.Component {
     })
   }
 
-  handleNew = (card, addBefore) => () => {
+  handleNew = (card, sectionType, addBefore) => () => {
     this.confirmActionIfResponsesExist({
       action: () => {
         const order = addBefore ? card.order - 0.5 : card.order + 1
-        const createdCard = this.createNewQuestionCard({ order })
+        const createdCard = this.createNewQuestionCard({ order, sectionType })
 
         if (createdCard) this.trackQuestionCreation()
       },
@@ -263,6 +289,7 @@ class TestDesigner extends React.Component {
   createNewQuestionCard = async ({
     replacingCard,
     order,
+    sectionType,
     questionType = '',
   }) => {
     const { collection } = this.props
@@ -271,6 +298,7 @@ class TestDesigner extends React.Component {
         type: ITEM_TYPES.QUESTION,
         question_type: questionType,
       },
+      section_type: replacingCard ? replacingCard.section_type : sectionType,
       order: replacingCard ? replacingCard.order : order,
       parent_id: collection.id,
     }
@@ -284,8 +312,11 @@ class TestDesigner extends React.Component {
     return card.API_create()
   }
 
-  renderHotEdge(card, addBefore = false) {
-    return <QuestionHotEdge onAdd={this.handleNew(card, addBefore)} />
+  renderHotEdge(card, sectionType, addBefore = false) {
+    if (!this.canEdit) return
+    return (
+      <QuestionHotEdge onAdd={this.handleNew(card, sectionType, addBefore)} />
+    )
   }
 
   renderTestTypeForm() {
@@ -335,58 +366,73 @@ class TestDesigner extends React.Component {
     )
   }
 
+  renderCard = card => {
+    const { collection } = this.props
+    const item = card.record
+    return (
+      <Fragment>
+        <QuestionSelectHolder
+          card={card}
+          canEdit={this.canEdit}
+          handleSelectChange={this.handleSelectChange}
+          handleTrash={this.handleTrash}
+        />
+        <TestQuestionHolder
+          editing
+          userEditable={userEditableQuestionType(item.question_type)}
+        >
+          <TestQuestion
+            editing
+            parent={collection}
+            card={card}
+            item={item}
+            order={card.order}
+            canEdit={this.canEditQuestions}
+          />
+        </TestQuestionHolder>
+      </Fragment>
+    )
+  }
+
+  renderSections() {
+    return _.map(this.cardsBySection, (cards, section) => (
+      <Fragment>
+        <Section key={`section-${section}`}>
+          <Heading3>{section}</Heading3>
+        </Section>
+        <TopBorder />
+        {cards.length === 0 && (
+          <TestQuestionFlexWrapper className="card">
+            {this.renderHotEdge({ order: 0 }, section, true)}
+          </TestQuestionFlexWrapper>
+        )}
+        {cards.map((card, i) => {
+          // blank item can occur briefly while the placeholder card/item is being replaced
+          if (!card.record) return null
+          return (
+            <FlipMove appearAnimation="fade" key={card.id}>
+              <TestQuestionFlexWrapper className={`card ${card.id}`}>
+                {i === 0 && this.renderHotEdge(card, section, true)}
+                {this.renderCard(card)}
+                {card.card_question_type !== 'question_finish' &&
+                  this.renderHotEdge(card, section)}
+              </TestQuestionFlexWrapper>
+            </FlipMove>
+          )
+        })}
+        <BottomBorder />
+      </Fragment>
+    ))
+  }
+
   render() {
     const { collection } = this.props
-    const cardCount = collection.sortedCards.length
-    const inner = collection.sortedCards.map((card, i) => {
-      let position
-      const item = card.record
-      // blank item can occur briefly while the placeholder card/item is being replaced
-      if (!item) return null
-      if (i === 0) position = 'question_beginning'
-      if (i === cardCount - 1) position = 'question_end'
-      const userEditable = [
-        'media',
-        'question_media',
-        'question_description',
-      ].includes(item.question_type)
-      return (
-        <FlipMove appearAnimation="fade" key={card.id}>
-          <TestQuestionFlexWrapper className={`card ${card.id}`}>
-            {i === 0 && this.canEdit && this.renderHotEdge(card, true)}
-            <QuestionSelectHolder
-              card={card}
-              canEdit={this.canEdit}
-              handleSelectChange={this.handleSelectChange}
-              handleTrash={this.handleTrash}
-            />
-            <TestQuestionHolder editing userEditable={userEditable}>
-              <TestQuestion
-                editing
-                parent={collection}
-                card={card}
-                item={item}
-                position={position}
-                order={card.order}
-                canEdit={this.canEditQuestions}
-              />
-            </TestQuestionHolder>
-            {this.canEdit &&
-              card.card_question_type !== 'question_finish' &&
-              this.renderHotEdge(card)}
-          </TestQuestionFlexWrapper>
-        </FlipMove>
-      )
-    })
-
     return (
       <ThemeProvider theme={this.styledTheme}>
         <OuterContainer>
           <div className={'design-column'}>
             <h3>Feedback Design</h3>
-            <TopBorder />
-            {inner}
-            <BottomBorder />
+            {this.renderSections()}
           </div>
           <div className={'settings-column'}>
             <h3>Feedback Settings</h3>

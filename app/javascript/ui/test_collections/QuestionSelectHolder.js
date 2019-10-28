@@ -79,14 +79,18 @@ const QuestionSelectHolder = ({
         >
           {TEST_COLLECTION_SELECT_OPTIONS.map(optGroup => {
             const options = []
+            optGroup.values.sort(optionSort).forEach(opt => {
+              if (opt.sections.includes(card.section_type)) options.push(opt)
+            })
+            // Don't show this category if there aren't any options
+            if (options.length === 0) return
             if (optGroup.category) {
-              options.push({
+              options.unshift({
                 value: '',
                 label: optGroup.category,
                 category: true,
               })
             }
-            optGroup.values.sort(optionSort).forEach(opt => options.push(opt))
             return options.map(opt => questionSelectOption(opt))
           })}
         </Select>
@@ -110,6 +114,7 @@ QuestionSelectHolder.propTypes = {
     isPinnedAndLocked: PropTypes.bool,
     order: PropTypes.number.isRequired,
     card_question_type: PropTypes.string.isRequired,
+    section_type: PropTypes.string.isRequired,
   }).isRequired, // specify or use MobxPropTypes?
   canEdit: PropTypes.bool.isRequired,
   handleSelectChange: PropTypes.func.isRequired,

@@ -340,6 +340,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :filter,
       :show_replace,
       :order,
+      :section_type,
     )
   end
 
@@ -436,6 +437,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       hidden
       show_replace
       card_type
+      section_type
     ]
     # Allow pinning, replacing if this is an application/bot user
     attrs << :pinned if current_application.present?

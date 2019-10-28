@@ -27,6 +27,7 @@ class CollectionCard extends BaseRecord {
     'is_cover',
     'hidden',
     'filter',
+    'section_type',
   ]
 
   batchUpdateAttributes = ['id', 'order', 'width', 'height', 'row', 'col']
@@ -287,6 +288,18 @@ class CollectionCard extends BaseRecord {
   get isDragCardMaster() {
     const { uiStore } = this
     return uiStore.dragCardMaster === this.id
+  }
+
+  get introSection() {
+    return this.section_type === 'intro'
+  }
+
+  get ideasSection() {
+    return this.section_type === 'ideas'
+  }
+
+  get outroSection() {
+    return this.section_type === 'outro'
   }
 
   async API_archiveSelf({ undoable = true } = {}) {

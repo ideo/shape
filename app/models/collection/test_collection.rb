@@ -135,13 +135,12 @@ class Collection
       set test_status: :draft
     end
 
-    def self.default_question_types
-      %i[
-        question_media
-        question_description
-        question_useful
-        question_finish
-      ]
+    def self.default_question_types_by_section
+      {
+        intro: [],
+        idea: %i[question_media question_description question_useful],
+        outro: %i[question_finish],
+      }
     end
 
     # Used so that we can interchangably call this on TestCollection and TestDesign
@@ -372,15 +371,20 @@ class Collection
     end
 
     def setup_default_status_and_questions
+      order = 0
+
       self.class
-          .default_question_types
-          .each_with_index do |question_type, i|
-        primary_collection_cards.build(
-          order: i,
-          item: Item::QuestionItem.new(
-            question_type: question_type,
-          ),
-        )
+          .default_question_types_by_section
+          .each do |section_type, question_types|
+        question_types.each do |question_type|
+          primary_collection_cards.build(
+            order: order += 1,
+            section_type: section_type,
+            item: Item::QuestionItem.new(
+              question_type: question_type,
+            ),
+          )
+        end
       end
     end
 

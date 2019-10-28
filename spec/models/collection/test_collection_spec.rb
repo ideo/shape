@@ -31,7 +31,7 @@ describe Collection::TestCollection, type: :model do
           .map(&:card_question_type)
           .map(&:to_sym),
         ).to eq(
-          Collection::TestCollection.default_question_types,
+          Collection::TestCollection.default_question_types_by_section.values,
         )
       end
 

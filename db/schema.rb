@@ -10,7 +10,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_15_192616) do
+ActiveRecord::Schema.define(version: 2019_10_28_205029) do
+
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "plpgsql"
@@ -122,6 +123,7 @@ ActiveRecord::Schema.define(version: 2019_10_15_192616) do
     t.boolean "show_replace", default: true
     t.integer "row"
     t.integer "col"
+    t.integer "section_type"
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["order", "row", "col"], name: "index_collection_cards_on_order_and_row_and_col"
