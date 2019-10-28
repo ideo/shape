@@ -128,6 +128,44 @@ describe Api::V1::CommentThreadsController, type: :request, json: true, auth: tr
     end
   end
 
+  describe 'GET #find_by_comment', only: true do
+    let(:record_type) { 'Item' }
+    let(:record_id) { comment_thread.record_id }
+    let!(:comment_thread) { create(:item_comment_thread, num_comments: 1) }
+    let(:comment) { comment_thread.comments.first }
+    let(:comment_id) { comment.id }
+    let(:path) { "/api/v1/comment_threads/find_by_comment/#{comment_id}" }
+
+    before do
+      # default to user `current_organization` when none is passed in
+      user.update(current_organization_id: comment_thread.organization_id)
+      user.add_role(Role::EDITOR, comment_thread.record)
+      get(path)
+    end
+
+    context 'with valid record' do
+      it 'returns a 200' do
+        expect(response.status).to eq(200)
+      end
+
+      it 'matches JSON schema' do
+        expect(json['data']['attributes']).to match_json_schema('comment_thread')
+        expect(json['data']['id']).to eq(comment_thread.id.to_s)
+      end
+    end
+
+    context 'without valid record' do
+      let(:comment_id) { 999_999 }
+
+      it 'returns a 200' do
+        expect(response.status).to eq(200)
+      end
+      it 'returns nil' do
+        expect(json['data']).to be nil
+      end
+    end
+  end
+
   describe 'POST #create' do
     let(:path) { '/api/v1/comment_threads' }
     let(:collection) { create(:collection) }

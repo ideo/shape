@@ -36,8 +36,16 @@ export default class UiStore {
   blankContentToolState = { ...this.defaultBCTState }
   @observable
   cardMenuOpen = { ...this.defaultCardMenuState }
+  defaultSelectedTextRange = {
+    range: null,
+    textContent: null,
+    cardId: null,
+    quillEditor: null,
+  }
   @observable
-  selectedTextRangeForCard = {}
+  selectedTextRangeForCard = { ...this.defaultSelectedTextRange }
+  // stored in case we ever need to reset the text
+  quillSnapshot = {}
   @computed
   get cardMenuOpenAndPositioned() {
     const { cardMenuOpen } = this
@@ -152,6 +160,8 @@ export default class UiStore {
   @observable
   expandedThreadKey = null
   @observable
+  commentingOnRecord = null
+  @observable
   editingName = false
   @observable
   trackedRecords = new Map()
@@ -212,11 +222,6 @@ export default class UiStore {
   @action
   setEditingCardCover(editingCardCoverId) {
     this.editingCardCover = editingCardCoverId
-  }
-
-  @action
-  setReplyingToComment(replyingToCommentId) {
-    this.replyingToCommentId = replyingToCommentId
   }
 
   @action
@@ -350,14 +355,6 @@ export default class UiStore {
     this.dialogConfig.open = null
   }
 
-  cardHasSelectedTextRange(cardId) {
-    return (
-      this.selectedTextRangeForCard.id === cardId &&
-      this.selectedTextRangeForCard.range &&
-      this.selectedTextRangeForCard.range.length > 0
-    )
-  }
-
   @action
   openContextMenu = (
     ev,
@@ -367,7 +364,6 @@ export default class UiStore {
     let numberOfMenuItems = menuItemCount
 
     const targetingTextEditor = ev.target.closest('.ql-editor')
-
     if (targetingTextEditor && this.cardHasSelectedTextRange(card.id)) {
       eventType = EVENT_SOURCE_TYPES.TEXT_EDITOR
       numberOfMenuItems = 1 // or however many we end up with in TextActionMenu
@@ -381,25 +377,25 @@ export default class UiStore {
     )
     const { offsetX, offsetY } = positionOffset
 
-    if (this.cardMenuOpen.id && !this.textMenuOpenForCard(card.id)) {
-      this.closeCardMenu()
-    } else {
-      this.update('cardMenuOpen', {
-        id: card.id,
-        x,
-        y,
-        offsetX,
-        offsetY,
-        menuType: eventType,
-      })
+    // if (this.cardMenuOpen.id && !this.textMenuOpenForCard(card.id)) {
+    //   this.closeCardMenu()
+    // } else {
+    // }
+    this.update('cardMenuOpen', {
+      id: card.id,
+      x,
+      y,
+      offsetX,
+      offsetY,
+      menuType: eventType,
+    })
 
-      if (
-        this.selectedCardIds.length &&
-        this.selectedCardIds.indexOf(card.id) < 0
-      ) {
-        // deselect all cards when card menu is opened on a non-selected card
-        this.selectedCardIds.replace([])
-      }
+    if (
+      this.selectedCardIds.length &&
+      this.selectedCardIds.indexOf(card.id) < 0
+    ) {
+      // deselect all cards when card menu is opened on a non-selected card
+      this.selectedCardIds.replace([])
     }
   }
 
@@ -419,16 +415,6 @@ export default class UiStore {
       this.cardMenuOpen.id === id &&
       this.cardMenuOpen.menuType === EVENT_SOURCE_TYPES.TEXT_EDITOR
     )
-  }
-
-  @action
-  selectTextRangeForCard({ id, range }) {
-    // Only open text action menu if you have text selected
-    if (range && range.length > 0) {
-      this.cardMenuOpen.menuType = EVENT_SOURCE_TYPES.TEXT_EDITOR
-    }
-
-    this.selectedTextRangeForCard = { id, range }
   }
 
   // TODO: rename this function to be clear it is show or reroute??
@@ -667,7 +653,7 @@ export default class UiStore {
   openBlankContentTool(options = {}) {
     const { viewingCollection } = this
     this.deselectCards()
-    this.closeCardMenu(false)
+    this.closeCardMenu()
     this.blankContentToolState = {
       ...this.defaultBCTState,
       order: 0,
@@ -713,7 +699,10 @@ export default class UiStore {
       // -- also helps with the setup of SubmissionBox where you can close the bottom BCT
       this.openBlankContentTool()
     } else {
-      this.blankContentToolState = { ...this.defaultBCTState }
+      // don't over-eagerly set this observable if it's already closed
+      if (this.blankContentToolIsOpen) {
+        this.blankContentToolState = { ...this.defaultBCTState }
+      }
     }
   }
 
@@ -745,6 +734,11 @@ export default class UiStore {
     return this.viewingRecord && this.viewingRecord.internalType === 'items'
       ? this.viewingRecord
       : null
+  }
+
+  get isEditingText() {
+    const { textEditingItem, viewingItem } = this
+    return textEditingItem || (viewingItem && viewingItem.isText)
   }
 
   get isViewingHomepage() {
@@ -863,12 +857,21 @@ export default class UiStore {
   // --- BCT + GridCard properties />
 
   @action
+  expandAndOpenThread(key) {
+    // make sure the activityLog is open
+    this.activityLogOpen = true
+    this.expandThread(key)
+  }
+
+  @action
   expandThread(key, { reset = false } = {}) {
     if (key) {
       // when we expand a thread we also want it to set the ActivityLog to Comments
-      this.update('activityLogPage', 'comments')
+      this.activityLogPage = 'comments'
       // reset it first, that way if it's expanded offscreen, it will get re-opened/scrolled to
       if (reset) this.expandedThreadKey = null
+    } else {
+      this.setCommentingOnRecord(null)
     }
     this.expandedThreadKey = key
   }
@@ -876,6 +879,140 @@ export default class UiStore {
   @action
   setCommentThreadBottomVisible(isVisible) {
     this.commentThreadBottomVisible = isVisible
+  }
+
+  @action
+  setReplyingToComment(replyingToCommentId) {
+    if (
+      !!replyingToCommentId &&
+      this.replyingToCommentId !== replyingToCommentId
+    ) {
+      this.toggleCommentHighlightActive(
+        this.replyingToCommentId,
+        replyingToCommentId
+      )
+      this.setCommentingOnRecord(null)
+    }
+    this.replyingToCommentId = replyingToCommentId
+  }
+
+  toggleCommentHighlightActive(
+    previousReplyingToCommentId,
+    replyingToCommentId
+  ) {
+    let activeHighlightNode = null
+    if (!!previousReplyingToCommentId) {
+      // when something else was previously active, remove active
+      const prevHighlightNode = document.querySelector(
+        `sub[data-comment-id="${previousReplyingToCommentId}"]`
+      )
+      if (prevHighlightNode) {
+        prevHighlightNode.classList.remove('highlightActive')
+      }
+    }
+    activeHighlightNode = document.querySelector(
+      `sub[data-comment-id="${replyingToCommentId}"]`
+    )
+    if (!activeHighlightNode) return
+    activeHighlightNode.classList.add('highlightActive')
+  }
+
+  @action
+  setCommentingOnRecord(record, { persisted = false } = {}) {
+    if (!persisted) {
+      this.toggleCommentHighlight(record)
+    }
+    if (!record) {
+      this.resetSelectedTextRange()
+    }
+    this.commentingOnRecord = record
+  }
+
+  isCommentingOnTextRange() {
+    const { commentingOnRecord } = this
+    if (!commentingOnRecord) return false
+    const card = commentingOnRecord.parent_collection_card
+    if (!card) return false
+
+    return this.cardHasSelectedTextRange(card.id)
+  }
+
+  cardHasSelectedTextRange(comparingCardId) {
+    const { cardId, range } = this.selectedTextRangeForCard
+    return cardId === comparingCardId && range && range.length > 0
+  }
+
+  @action
+  selectTextRangeForCard({ range, quillEditor, cardId }) {
+    if (!cardId || !range || !range.length) {
+      return
+    }
+
+    const { index, length } = range
+    // Only open text action menu if you have text selected
+    if (range && range.length > 0) {
+      this.cardMenuOpen.menuType = EVENT_SOURCE_TYPES.TEXT_EDITOR
+    }
+
+    const textContent = quillEditor.getText(index, length)
+    this.selectedTextRangeForCard = { range, quillEditor, textContent, cardId }
+  }
+
+  get currentQuillEditor() {
+    return this.selectedTextRangeForCard.quillEditor
+  }
+
+  toggleCommentHighlight(record) {
+    const {
+      currentQuillEditor,
+      commentingOnRecord,
+      selectedTextRangeForCard,
+    } = this
+    const { range } = selectedTextRangeForCard
+    if (!currentQuillEditor || !range || !range.length) return
+
+    // if no record then un-highlight
+    const val = record ? 'new' : false
+    currentQuillEditor.formatText(
+      range.index,
+      range.length,
+      {
+        commentHighlight: val,
+        commentHighlightResolved: false,
+      },
+      'api'
+    )
+
+    const currentRecord = record || commentingOnRecord
+    if (currentRecord && currentRecord.isText) {
+      if (
+        this.textEditingItem !== currentRecord &&
+        this.viewingRecord !== currentRecord
+      ) {
+        // store any highlight changes on the item.quill_data for editors that aren't editing
+        // e.g. if this highlight was triggered externally by TextActionMenu
+        currentRecord.quill_data = currentQuillEditor.getContents()
+      } else {
+        // if we're removing "new" highlights, bring back any ones that might have existed
+        if (!val) {
+          if (!_.isEmpty(this.quillSnapshot)) {
+            // preserve the current selection
+            const selection = currentQuillEditor.getSelection()
+            currentQuillEditor.setContents(this.quillSnapshot)
+            currentQuillEditor.setSelection(selection)
+          }
+        }
+      }
+    }
+  }
+
+  @action
+  resetSelectedTextRange() {
+    const prevRecord = this.commentingOnRecord
+    if (prevRecord && prevRecord.isText) {
+      prevRecord.removeNewHighlights()
+    }
+    this.selectedTextRangeForCard = { ...this.defaultSelectedTextRange }
   }
 
   // after performing an action (event), track following the record for notifications

@@ -8,6 +8,9 @@ const SharedRecordMixin = superclass =>
   class extends superclass {
     @observable
     forceMenuDisabled = false
+    @observable
+    fullyLoaded = null
+    highlightedRange = null
 
     @action
     disableMenu() {

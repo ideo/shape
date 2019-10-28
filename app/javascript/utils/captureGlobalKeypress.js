@@ -1,9 +1,8 @@
 import _ from 'lodash'
 import { apiStore, uiStore, undoStore } from '~/stores'
+import { quillSelectors } from '~/utils/variables'
 
 const quillEditorClick = e => {
-  const quillSelectors =
-    '.quill, .ql-close, .ql-toolbar, .ql-container, .ql-editor, .ql-clipboard, .quill-toolbar, .ql-formats, .ql-header, .ql-link, .ql-stroke'
   return e.target.closest(quillSelectors)
 }
 
@@ -15,18 +14,23 @@ const emptySpaceClick = e => {
 }
 
 export const handleMouseDownSelection = e => {
-  const { textEditingItem } = uiStore
   const emptySpaceMouseDown = emptySpaceClick(e)
-  const outsideQuillMouseDown = !quillEditorClick(e) && textEditingItem
-  if (outsideQuillMouseDown) {
-    // if we clicked outside the quill editor...
-    uiStore.update('textEditingItem', null)
-  }
+  const { isEditingText } = uiStore
+  const outsideQuillMouseDown = !quillEditorClick(e) && isEditingText
   if (emptySpaceMouseDown) {
+    if (outsideQuillMouseDown) {
+      uiStore.setCommentingOnRecord(null)
+      // we need a tiny delay so that the highlight gets properly unset
+      // before kicking out of the textEditingItem
+      setTimeout(() => {
+        uiStore.update('textEditingItem', null)
+      })
+    }
     // if we clicked an empty space...
     uiStore.deselectCards()
     uiStore.onEmptySpaceClick(e)
     uiStore.closeBlankContentTool()
+    uiStore.closeCardMenu()
     uiStore.update('editingCardCover', null)
     return 'emptySpace'
   }

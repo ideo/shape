@@ -3,6 +3,7 @@ module Commentable
 
   included do
     has_many :comment_threads, as: :record, dependent: :destroy
+    has_many :comments, as: :subject
 
     after_commit :update_comment_threads_in_firestore, unless: :destroyed?
     if included_modules.include?(Archivable)
@@ -13,6 +14,14 @@ module Commentable
   def comment_thread
     # replacement for former has_one relationship, find the "main" comment_thread
     comment_threads.where(organization_id: organization_id).first
+  end
+
+  def unresolved_count
+    comments.where.not(status: :resolved).count
+  end
+
+  def last_unresolved_comment_id
+    comments.opened.last&.id
   end
 
   def remove_comment_followers!

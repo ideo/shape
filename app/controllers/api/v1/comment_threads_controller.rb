@@ -41,6 +41,15 @@ class Api::V1::CommentThreadsController < Api::V1::BaseController
     end
   end
 
+  before_action :load_and_authorize_thread_by_comment, only: %i[find_by_comment]
+  def find_by_comment
+    if @comment_thread
+      render jsonapi: @comment_thread, include: thread_relations
+    else
+      render jsonapi: nil
+    end
+  end
+
   def subscribe
     if @comment_thread.subscribe!(current_user)
       render jsonapi: @comment_thread, include: thread_relations
@@ -82,6 +91,14 @@ class Api::V1::CommentThreadsController < Api::V1::BaseController
     return false unless @comment_thread.present?
 
     authorize! :read, @comment_thread.record
+  end
+
+  def load_and_authorize_thread_by_comment
+    @comment = Comment.find_by_id(params[:comment_id])
+    return false unless @comment.present?
+
+    authorize! :read, @comment
+    @comment_thread = @comment.comment_thread
   end
 
   def build_thread_and_authorize_record

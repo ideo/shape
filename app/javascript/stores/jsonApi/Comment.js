@@ -11,7 +11,14 @@ class Comment extends BaseRecord {
   static type = 'comments'
   static endpoint = apiUrl('comments')
 
-  attributesForAPI = ['message', 'parent_id', 'draftjs_data']
+  attributesForAPI = [
+    'message',
+    'parent_id',
+    'draftjs_data',
+    'status',
+    'subject_id',
+    'subject_type',
+  ]
 
   @observable
   replies = []
@@ -43,7 +50,7 @@ class Comment extends BaseRecord {
   }
 
   get wasEdited() {
-    return this.updated_at > this.created_at
+    return this.edited
   }
 
   get thread() {
@@ -97,6 +104,7 @@ class Comment extends BaseRecord {
   API_updateWithoutSync = rawData => {
     this.message = rawData.message
     this.draftjs_data = rawData.draftjs_data
+    this.status = rawData.status
 
     const data = this.toJsonApi()
     // Turn off syncing when saving the comment to not reload the page
@@ -108,6 +116,16 @@ class Comment extends BaseRecord {
       .catch(err => {
         trackError(err, { name: 'comment:update' })
       })
+  }
+
+  API_resolveComment = status => {
+    this.status = status
+    const data = this.toJsonApi()
+    // Turn off syncing when saving the comment to not reload the page
+    data.cancel_sync = true
+    return apiStore.request(`comments/${this.id}/resolve`, 'PATCH', {
+      data,
+    })
   }
 
   async expandAndFetchReplies() {

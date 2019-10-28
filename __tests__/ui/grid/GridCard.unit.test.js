@@ -129,15 +129,6 @@ describe('GridCard', () => {
         rerender()
       })
 
-      it('renders the link icon', () => {
-        expect(
-          wrapper
-            .find('StyledGridCard')
-            .find('LinkIcon')
-            .exists()
-        ).toBe(true)
-      })
-
       it('calls storeLinkedBreadcrumb on handleClick', () => {
         wrapper.instance().handleClick({})
         expect(uiStore.update).toHaveBeenCalledWith(
@@ -165,19 +156,6 @@ describe('GridCard', () => {
         expect(wrapper.find('ContainImage').exists()).toBeTruthy()
       })
     })
-
-    describe('with a private item', () => {
-      beforeEach(() => {
-        props.card.record = { ...fakeTextItem, is_private: true }
-        props.record = props.card.record
-        props.cardType = 'items'
-        rerender()
-      })
-
-      it('renders a HiddenIconButton', () => {
-        expect(wrapper.find('HiddenIconButton').exists()).toBeTruthy()
-      })
-    })
   })
   // -------------------
   // <--- end 'with item'
@@ -197,11 +175,11 @@ describe('GridCard', () => {
         expectTreeToMatchSnapshot(wrapper)
       })
 
-      it('renders the collection icon', () => {
+      it('renders the bottom left card icons', () => {
         expect(
           wrapper
             .find('StyledGridCard')
-            .find('CollectionIcon')
+            .find('BottomLeftCardIcons')
             .exists()
         ).toBe(true)
       })
@@ -284,22 +262,6 @@ describe('GridCard', () => {
 
       it('does not render ActionMenu', () => {
         expect(wrapper.find('ActionMenu').exists()).toBe(false)
-      })
-    })
-
-    describe('as reference', () => {
-      beforeEach(() => {
-        props.card.link = true
-        rerender()
-      })
-
-      it('has linked collection icon', () => {
-        expect(
-          wrapper
-            .find('StyledGridCard')
-            .find('LinkedCollectionIcon')
-            .exists()
-        ).toBe(true)
       })
     })
   })

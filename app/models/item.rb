@@ -78,6 +78,11 @@ class Item < ApplicationRecord
                  :pending_transcoding_uuid,
                  :common_viewable
 
+  store_accessor :data_content,
+                 :ops,
+                 :version,
+                 :last_10
+
   # So that we can assign these params in collection card builder
   # We have assignment logic instead of using nested attributes
   attr_accessor :datasets_attributes, :data_items_datasets_attributes
@@ -313,6 +318,8 @@ class Item < ApplicationRecord
 
     roles_anchor&.default_group_id
   end
+
+  def quill_data; end
 
   private
 

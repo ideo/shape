@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import ReactRouterPropTypes from 'react-router-prop-types'
+import { runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { animateScroll as scroll } from 'react-scroll'
 
@@ -32,7 +33,7 @@ class PageWithApiWrapper extends React.Component {
       const data = apiStore.find(fetchType, cachedFetchId)
       if (data) {
         // mark as !fullyLoaded until we re-fetch the latest data
-        data.fullyLoaded = false
+        runInAction(() => (data.fullyLoaded = false))
         this.setState({ data })
       }
     }
@@ -125,7 +126,7 @@ class PageWithApiWrapper extends React.Component {
           )
         }
 
-        data.fullyLoaded = true
+        runInAction(() => (data.fullyLoaded = true))
         this.setState({ data })
       })
       .catch(err => {
