@@ -302,7 +302,7 @@ class Collection
         duplicate.collection_to_test = args[:parent]
       elsif !parent.master_template? && !args[:parent].master_template?
         # Prefix with 'Copy' if it isn't still within a template
-        duplicate.name = "Copy of #{name}"
+        duplicate.name = "Copy of #{name}".gsub(' Feedback Design', '')
       end
       duplicate.save
       duplicate
@@ -521,8 +521,6 @@ class Collection
       complete_question_items.collect(&:parent_collection_card)
     end
 
-    # <---- MOVED FROM TEST DESIGN
-
     private
 
     def attempt_to_purchase_test_audiences!(user:, test_audience_params: nil)
@@ -576,7 +574,7 @@ class Collection
       end
     end
 
-    def create_test_results_collection_and_move_inside!(initiated_by: nil)
+    def create_test_results_collection_and_move_inside!(initiated_by: created_by)
       create_test_results_collection(
         name: name,
         organization: organization,
@@ -588,14 +586,15 @@ class Collection
       # pick up parent_collection_card relationship
       reload
       test_results_collection.reload
-      CollectionCardBuilder.new(
+      CollectionCardBuilder.create(
         params: {
           order: 999,
           collection_id: id,
         },
         parent_collection: test_results_collection,
         user: initiated_by,
-      ).create
+      )
+      test_results_collection
     end
 
     def close_test_after_archive

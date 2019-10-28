@@ -39,7 +39,7 @@ RSpec.describe Item::QuestionItem, type: :model do
       let(:test_collection) { create(:test_collection, :completed, add_editors: [user], add_viewers: [user2]) }
       let(:question_card) do
         # use builder so that it actually handles the right permissions
-        builder = CollectionCardBuilder.new(
+        CollectionCardBuilder.create(
           params: {
             item_attributes: {
               type: 'Item::QuestionItem',
@@ -48,8 +48,6 @@ RSpec.describe Item::QuestionItem, type: :model do
           },
           parent_collection: test_collection,
         )
-        builder.create
-        builder.collection_card
       end
       let(:question_item) { question_card.item }
 

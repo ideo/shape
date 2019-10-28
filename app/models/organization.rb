@@ -354,14 +354,14 @@ class Organization < ApplicationRecord
     user_getting_started.update_attributes(type: nil)
     user_getting_started = user_getting_started.becomes(Collection)
 
-    CollectionCardBuilder.new(
+    CollectionCardBuilder.create(
       params: {
         order: 0,
         collection_id: user_getting_started.id,
       },
       parent_collection: user_collection,
       user: user,
-    ).create
+    )
     user_collection.reorder_cards!
     user_getting_started
   end

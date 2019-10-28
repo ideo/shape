@@ -137,6 +137,39 @@ class Collection
       complete_question_items.collect(&:parent_collection_card)
     end
 
+    ###########
+    def migrate!
+      tc = Collection.find(test_collection_id)
+      # error case
+      return if tc.blank?
+
+      to_test_id = tc.collection_to_test_id
+      becomes(Collection::TestCollection).update(
+        type: 'Collection::TestCollection',
+        test_collection_id: nil,
+        collection_to_test_id: to_test_id,
+      )
+      tc.update(
+        type: 'Collection::TestResultsCollection',
+        test_collection_id: id,
+        collection_to_test_id: nil,
+      )
+
+      [SurveyResponse, TestAudience].each do |klass|
+        klass.where(test_collection_id: tc.id).update_all(test_collection_id: id)
+      end
+
+      return unless inside_a_submission?
+
+      Collection
+        .where("cached_attributes->'submission_attrs'->>'launchable_test_id' = '#{tc.id}'")
+        .find_each do |submission|
+          submission.submission_attrs['launchable_test_id'] = id
+          submission.save
+        end
+    end
+    ###########
+
     private
 
     def close_test

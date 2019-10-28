@@ -14,7 +14,10 @@ class CollectionCardBuilder
     @collection_card = parent_collection.send("#{type}_collection_cards").build(@params)
     @errors = @collection_card.errors
     @user = user
+  end
 
+  def self.create(*args)
+    new(*args).create
   end
 
   def create
@@ -23,6 +26,7 @@ class CollectionCardBuilder
       # capture this here before `save` is called at which point the accessor will be nil
       @external_id = @collection_card.record.external_id
       create_collection_card
+      @collection_card
     else
       @collection_card.errors.add(:record, "can't be blank")
       false
