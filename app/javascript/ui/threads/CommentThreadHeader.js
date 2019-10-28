@@ -194,12 +194,14 @@ class CommentThreadHeader extends React.Component {
         <StyledHeader lines={this.titleLines}>
           {/* left side */}
           <Flex style={{ height: '50px', overflow: 'hidden' }}>
-            <CommentThumbnail
-              threadRecord={thread.record}
-              subjectRecord={this.record}
-              iconTop={this.titleLines === 1 ? 18 : 9}
-              useSubjectIcon={false}
-            />
+            {thread && (
+              <CommentThumbnail
+                threadRecord={thread.record}
+                subjectRecord={this.record}
+                iconTop={this.titleLines === 1 ? 18 : 9}
+                useSubjectIcon={false}
+              />
+            )}
             <span
               className="name"
               ref={r => {

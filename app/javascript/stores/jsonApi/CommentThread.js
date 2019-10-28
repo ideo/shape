@@ -158,6 +158,12 @@ class CommentThread extends BaseRecord {
   async afterCommentCreate(comment) {
     const { uiStore } = this
     const { commentingOnRecord, currentQuillEditor } = uiStore
+    if (comment.persisted && commentingOnRecord.isCollection) {
+      // increment unresolved count by 1 for collection cover to get recent count
+      commentingOnRecord.unresolved_count =
+        commentingOnRecord.unresolved_count + 1
+      return
+    }
     if (
       comment.persisted &&
       uiStore.isCommentingOnTextRange() &&

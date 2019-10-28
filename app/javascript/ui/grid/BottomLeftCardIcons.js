@@ -113,7 +113,6 @@ class BottomLeftCardIcons extends React.Component {
         )
       }
     } else if (card.link) {
-      // TODO: // Need to wrap this in a small wrapper
       icons.push(
         <StyledSmallIconWrapper>
           <LinkIcon />
@@ -133,7 +132,6 @@ class BottomLeftCardIcons extends React.Component {
       record.is_private ||
       (record.isSubmission && record.submission_attrs.hidden)
     ) {
-      // TODO: handle edgecase for size and children
       icons.push(
         <HiddenIconButton
           clickable={record.can_edit && record.is_private}

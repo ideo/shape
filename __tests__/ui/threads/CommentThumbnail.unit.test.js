@@ -86,12 +86,12 @@ describe('CommentThumbnail', () => {
 
     beforeEach(() => {
       props.subjectRecord = itemRecord
+      props.threadRecord = itemRecord
       rerender()
     })
 
     it('should be a link to the item', () => {
-      // FIXME: props are different
-      // expect(routingStore.pathTo).toHaveBeenCalledWith('items', 2)
+      expect(routingStore.pathTo).toHaveBeenCalledWith('items', 2)
     })
 
     it('should render the filestack file url', () => {

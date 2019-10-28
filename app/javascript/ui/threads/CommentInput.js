@@ -118,7 +118,7 @@ class CommentInput extends React.Component {
   }
 
   render() {
-    const { onChange, onBlur, editorState, disabled } = this.props
+    const { onChange, editorState, disabled } = this.props
     const { MentionSuggestions } = this.mentionPlugin
     MentionSuggestions.displayName = 'MentionSuggestions'
     const plugins = [this.mentionPlugin, this.linkifyPlugin]
@@ -129,7 +129,6 @@ class CommentInput extends React.Component {
           readOnly={disabled}
           editorState={editorState}
           onChange={onChange}
-          onBlur={onBlur}
           handleReturn={this.handleReturn}
           plugins={plugins}
           placeholder="Add comment"
@@ -156,7 +155,6 @@ CommentInput.propTypes = {
   setEditor: PropTypes.func.isRequired,
   editorState: MobxPropTypes.objectOrObservableObject.isRequired,
   disabled: PropTypes.bool,
-  onBlur: PropTypes.func,
 }
 CommentInput.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -164,7 +162,6 @@ CommentInput.wrappedComponent.propTypes = {
 }
 CommentInput.defaultProps = {
   disabled: false,
-  onBlur: () => null,
 }
 
 CommentInput.displayName = 'CommentInput'

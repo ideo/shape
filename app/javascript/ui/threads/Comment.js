@@ -291,11 +291,6 @@ class Comment extends React.Component {
     this.initializeEditorState()
   }
 
-  handleBlur = e => {
-    // FIXME: CommentInput requires onBlur prop
-    return
-  }
-
   handleResolveButtonClick = e => {
     e.preventDefault()
     const { comment } = this.props
@@ -350,7 +345,6 @@ class Comment extends React.Component {
               onChange={this.handleInputChange}
               handleSubmit={this.handleSubmit}
               setEditor={this.setEditor}
-              onBlur={this.handleBlur}
             />
             <EditEnterButton focused>
               <ReturnArrowIcon />
