@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
-import CommentIcon from '../icons/CommentIcon'
+import CommentIcon from '~/ui/icons/CommentIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 
-@inject('uiStore')
+@inject('uiStore', 'apiStore')
 @observer
 class TextActionMenu extends React.Component {
   get menuItems() {
@@ -19,8 +19,13 @@ class TextActionMenu extends React.Component {
     return actions
   }
 
-  // TODO: implement in next ticket
-  addComment = () => null
+  addComment = async () => {
+    const { apiStore, uiStore, card } = this.props
+    const { record } = card
+
+    apiStore.openCurrentThreadToCommentOn(record)
+    uiStore.closeCardMenu()
+  }
 
   handleMouseLeave = () => {
     const { uiStore } = this.props

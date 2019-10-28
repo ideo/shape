@@ -78,6 +78,7 @@ class Activity < ApplicationRecord
     archived_from_template: 14,
     viewed: 15,
     edited_comment: 16,
+    resolved_comment: 17,
   }
 
   def self.participant_actions
