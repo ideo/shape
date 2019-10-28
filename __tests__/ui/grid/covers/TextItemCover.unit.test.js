@@ -125,7 +125,7 @@ describe('TextItemCover', () => {
       expect(item.pushUndo).toHaveBeenCalledWith({
         message: 'Text undone!',
         redirectTo: null,
-        snapshot: { data_content: item.data_content },
+        snapshot: { quill_data: item.quill_data },
         actionType: POPUP_ACTION_TYPES.SNACKBAR,
       })
     })

@@ -60,6 +60,9 @@ const fakeApiStore = ({
     duplicateCards: jest.fn(),
     checkInMyCollection: jest.fn(),
     collapseReplies: jest.fn(),
+    openCurrentThreadToCommentOn: jest.fn(),
+    expandAndOpenThreadForRecord: jest.fn(),
+    alwaysShowCurrentThread: jest.fn(),
     unreadActivityCount: 0,
 
     usersThreadPagesToLoad: 1,

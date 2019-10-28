@@ -135,7 +135,6 @@ RSpec.describe Item::TextItem, type: :model do
 
         it 'should scrub any attributes that have data-comment-id with no commentHighlight' do
           text_item.quill_data = quill_data
-          text_item.save
           expect(text_item.ops.first['attributes']['data-comment-id'].present?).to be true
           expect(text_item.ops.second['attributes']['data-comment-id'].present?).to be false
         end

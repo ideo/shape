@@ -1,6 +1,7 @@
 import RealtimeTextItem from '~/ui/items/RealtimeTextItem'
 import { fakeTextItem, fakeActionCableUser, fakeUser } from '#/mocks/data'
 import fakeUiStore from '#/mocks/fakeUiStore'
+import fakeApiStore from '#/mocks/fakeApiStore'
 import Delta from 'quill-delta'
 
 const props = {
@@ -12,6 +13,7 @@ const props = {
   fullPageView: false,
   fullyLoaded: true,
   uiStore: fakeUiStore,
+  apiStore: fakeApiStore(),
 }
 
 let wrapper, component

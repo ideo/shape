@@ -37,15 +37,7 @@ export const fakeTextItemAttrs = {
   internalType: 'items',
   name: 'My Cool Item',
   can_view: true,
-  data_content: {
-    ops: [
-      {
-        insert:
-          'This is the content for the item and it contains multiple sentences. Like this one.',
-      },
-    ],
-    version: 1,
-  },
+  quill_data: fakeQuillData,
   breadcrumb: [['collections', 1, 'Some collection'], ['items', 1, 'my item']],
   parentPath: '/',
   can_edit: false,
@@ -54,6 +46,9 @@ export const fakeTextItemAttrs = {
   fullyLoaded: true,
   parent_collection_card: { ...fakeCollectionCard },
 }
+
+export const fakeQuillOp = {insert: "hello world \n"}
+export const fakeQuillData = {ops: [fakeQuillOp]}
 
 export const fakeAreaChartDataset = {
   identifier: 'question',
@@ -92,7 +87,7 @@ export const fakeBarChartDataset = {
 export const fakeDataItemCollectionsItemsAttrs = {
   ...fakeTextItemAttrs,
   type: 'Item::DataItem',
-  data_content: null,
+  quill_data: null,
   report_type: 'report_type_collections_and_items',
   isReportTypeCollectionsItems: true,
   isReportTypeNetworkAppMetric: false,
@@ -162,7 +157,7 @@ export const fakeDataset = {
 export const fakeDataItemRecordAttrs = {
   ...fakeTextItemAttrs,
   type: 'Item::DataItem',
-  data_content: null,
+  quill_data: null,
   datasets: [fakeDataset],
   name: 'Data Item',
   report_type: 'report_type_record',
@@ -239,6 +234,7 @@ export const fakeTextItem = {
   getRecordType: jest.fn().mockReturnValue('items'),
   toJSON: jest.fn().mockReturnValue(fakeTextItemAttrs),
   pushUndo: jest.fn(),
+  quill_data: jest.fn().mockReturnValue(fakeQuillData),
   ...fakeJsonApiAttrs,
 }
 export const fakeVideoItemAttrs = {

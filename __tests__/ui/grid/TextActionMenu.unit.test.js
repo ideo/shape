@@ -1,13 +1,15 @@
 import _ from 'lodash'
 import TextActionMenu from '~/ui/grid/TextActionMenu'
 import fakeUiStore from '#/mocks/fakeUiStore'
-import { fakeCollectionCard, fakeThread } from '#/mocks/data'
+import fakeApiStore from '#/mocks/fakeApiStore'
+import { fakeCollectionCard } from '#/mocks/data'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 const props = {
   card: fakeCollectionCard,
   offsetPosition: { x: 0, y: 0 }, // Not sure we need to test this
   uiStore: fakeUiStore,
+  apiStore: fakeApiStore(),
 }
 let wrapper, actions, component
 
@@ -31,11 +33,10 @@ describe('TextActionMenu', () => {
 
     it('calls addComment on comment action', () => {
       component.addComment()
-      expect(fakeThread.API_saveComment).toHaveBeenCalled()
-      // ...
-      // Should this simulate click on comment
-      // And test if component.addComment is called?
-      // I guess that's more so re-testing what is already in PopoutMenu test
+      expect(
+        component.props.apiStore.openCurrentThreadToCommentOn
+      ).toHaveBeenCalled()
+      expect(component.props.uiStore.closeCardMenu).toHaveBeenCalled()
     })
   })
 

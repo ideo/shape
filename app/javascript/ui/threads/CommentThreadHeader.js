@@ -13,7 +13,7 @@ import FollowIcon from '~/ui/icons/FollowIcon'
 import v from '~/utils/variables'
 import hexToRgba from '~/utils/hexToRgba'
 import CommentThumbnail from '~/ui/threads/CommentThumbnail'
-import UnreadCount from './UnreadCount'
+import UnreadCount from '~/ui/threads/UnreadCount.js'
 
 export const threadTitleCss = css`
   position: ${props => (props.sticky ? 'sticky' : 'relative')};
@@ -70,6 +70,7 @@ const UnreadCountWrapper = styled.div`
   left: 5px;
   top: 5px;
 `
+UnreadCountWrapper.displayName = 'UnreadCountWrapper'
 
 export const FollowHolder = styled.span`
   color: ${props =>

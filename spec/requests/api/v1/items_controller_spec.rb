@@ -269,10 +269,10 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
       expect(item.reload.ops).to eq(highlighted_data_content['ops'])
     end
 
-    it 'preserves the data_content.version' do
+    it 'updates the data_content.version' do
       expect(item.data_content['version']).to eq(10)
       patch(path, params: params)
-      expect(item.reload.data_content['version']).to eq(10)
+      expect(item.reload.data_content['version']).to eq(11)
     end
 
     it 'creates an activity' do

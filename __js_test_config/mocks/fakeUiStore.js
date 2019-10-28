@@ -114,7 +114,9 @@ const fakeUiStore = {
   actionMenuOpenForCard: jest.fn(true).mockImplementation(x => false),
   textMenuOpenForCard: jest.fn(true).mockImplementation(x => false),
   replyingToCommentId: false,
-  setReplyingToComment: jest.fn()
+  setReplyingToComment: jest.fn(),
+  setCommentingOnRecord: jest.fn(),
+  selectedTextRangeForCard: jest.fn()
 }
 
 export default fakeUiStore

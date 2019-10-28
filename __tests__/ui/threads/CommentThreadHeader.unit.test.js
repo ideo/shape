@@ -3,7 +3,6 @@ import CommentThreadHeader, {
 } from '~/ui/threads/CommentThreadHeader'
 
 import { fakeThread } from '#/mocks/data'
-import { ITEM_TYPES } from '~/utils/variables'
 import { routingStore, uiStore } from '~/stores'
 
 jest.mock('../../../app/javascript/stores')
@@ -28,8 +27,7 @@ describe('CommentThreadHeader', () => {
         wrapper = shallow(<CommentThreadHeader {...props} />)
       })
       it('should render the unreadCount', () => {
-        expect(wrapper.find('.unread.show-unread').exists()).toBeTruthy()
-        expect(wrapper.find('CommentIcon').exists()).toBeTruthy()
+        expect(wrapper.find('UnreadCountWrapper').exists()).toBeTruthy()
       })
     })
 
@@ -41,7 +39,7 @@ describe('CommentThreadHeader', () => {
         wrapper = shallow(<CommentThreadHeader {...props} />)
       })
       it('should not render the unreadCount', () => {
-        expect(wrapper.find('.unread.show-unread').exists()).toBeFalsy()
+        expect(wrapper.find('UnreadCountWrapper').exists()).toBeFalsy()
       })
     })
 
@@ -69,29 +67,8 @@ describe('CommentThreadHeader', () => {
           setThreadRecord(collectionRecord)
         })
 
-        it('should be a link to the collection', () => {
-          expect(routingStore.pathTo).toHaveBeenCalledWith('collections', 5)
-        })
-
-        it('should render the collection icon', () => {
-          expect(
-            wrapper.find('ThumbnailHolder CollectionIcon').exists()
-          ).toBeTruthy()
-        })
-
-        describe('with a collection with a cover image', () => {
-          beforeEach(() => {
-            setThreadRecord({
-              ...collectionRecord,
-              ...{ cover: { image_url: 'hello' } },
-            })
-          })
-
-          it('should render the filestack file url', () => {
-            expect(wrapper.find('ThumbnailHolder img').props().src).toEqual(
-              'hello'
-            )
-          })
+        it('should render the CommentThumbnail', () => {
+          expect(wrapper.find('CommentThumbnail').exists()).toBeTruthy()
         })
       })
 
@@ -106,26 +83,8 @@ describe('CommentThreadHeader', () => {
           setThreadRecord(itemRecord)
         })
 
-        it('should be a link to the item', () => {
-          expect(routingStore.pathTo).toHaveBeenCalledWith('items', 2)
-        })
-
-        it('should render the filestack file url', () => {
-          expect(wrapper.find('ThumbnailHolder img').props().src).toEqual(
-            'http://url'
-          )
-        })
-
-        describe('with a text item', () => {
-          beforeEach(() => {
-            setThreadRecord({ ...itemRecord, type: ITEM_TYPES.TEXT })
-          })
-
-          it('should render the TextIcon', () => {
-            expect(
-              wrapper.find('ThumbnailHolder TextIcon').exists()
-            ).toBeTruthy()
-          })
+        it('should render the CommentThumbnail', () => {
+          expect(wrapper.find('CommentThumbnail').exists()).toBeTruthy()
         })
       })
     })
@@ -134,6 +93,7 @@ describe('CommentThreadHeader', () => {
   describe('with a record', () => {
     beforeEach(() => {
       props = {
+        thread: fakeThread,
         record: fakeThread.record,
       }
       wrapper = shallow(<CommentThreadHeader {...props} />)
@@ -141,11 +101,6 @@ describe('CommentThreadHeader', () => {
 
     it('should render the StyledHeader', () => {
       expect(wrapper.find('StyledHeader').exists()).toBeTruthy()
-    })
-
-    it('should not render the timestamp or unreadCount', () => {
-      expect(wrapper.find('Moment').exists()).toBeFalsy()
-      expect(wrapper.find('CommentIcon').exists()).toBeFalsy()
     })
   })
 

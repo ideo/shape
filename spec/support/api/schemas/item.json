@@ -35,7 +35,8 @@
     "archived": { "type": ["boolean", "null"] },
     "is_restorable": { "type": ["boolean", "null"] },
     "default_group_id": { "type": ["string", "null"] },
-    "resolved_count": { "type": ["number", "null"] }
+    "unresolved_count": { "type": ["number"] },
+    "last_unresolved_comment_id": { "type": ["number", "null"] }
   },
   "required": ["class_type"]
 }

@@ -10,7 +10,8 @@
     "parent_id": { "type": ["string", "null"] },
     "status": { "type": ["string", "null"] },
     "text_highlight": { "type": ["string", "null"] },
-    "replies_count": {"type": ["integer", "null"]}
+    "replies_count": {"type": ["integer", "null"]},
+    "edited": {"type": ["boolean"]}
   },
   "required": ["message", "updated_at"]
 }

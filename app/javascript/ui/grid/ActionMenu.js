@@ -305,7 +305,6 @@ class ActionMenu extends React.Component {
       items = _.reject(items, { name: 'Add to My Collection' })
       items = _.reject(items, { name: 'Sharing' })
     }
-
     // items.unshift(_.find(actions, { name: 'Comment' }))
 
     return items
