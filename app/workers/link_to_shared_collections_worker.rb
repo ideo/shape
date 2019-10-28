@@ -14,6 +14,11 @@ class LinkToSharedCollectionsWorker
         # Don't create any links if object was created by user
         next if object.try(:created_by_id) == entity.id
 
+        if within_application_collection?(object)
+          # If linking a C∆ collection, only share the org collection
+          object = object.parent_application_collection.collections.first
+        end
+
         org_id = object.organization_id
         if entity.is_a?(User)
           shared = entity.current_shared_collection(org_id)
@@ -36,13 +41,15 @@ class LinkToSharedCollectionsWorker
 
   private
 
+  def within_application_collection?(object)
+    object.respond_to?(:parent_application_collection) &&
+      object.parent_application_collection.present?
+  end
+
   def create_link(object, collection)
     width = 1
     height = 1
-    if object.respond_to?(:parent_application_collection) &&
-       object.parent_application_collection.present?
-      # link to the org collection within the root application collection
-      object = object.parent_application_collection.collections.first
+    if within_application_collection?(object)
       width = 3
       height = 2
     end
@@ -57,8 +64,12 @@ class LinkToSharedCollectionsWorker
   end
 
   def card_order(object, collection)
-    return -1 if object.is_a?(Collection::ApplicationCollection)
-
-    collection.collection_cards.count
+    # If sharing C∆/App collection, always put it at the beginning of your 'My Collection'
+    if within_application_collection?(object)
+      # Use -10 because 'getting started' content is often beforehand
+      -10
+    else
+      collection.collection_cards.count
+    end
   end
 end

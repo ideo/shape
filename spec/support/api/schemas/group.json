@@ -9,7 +9,8 @@
     "is_admin": { "type": "boolean" },
     "can_edit": { "type": "boolean" },
     "filestack_file_url": { "type": ["string", "null"] },
-    "organization_id": { "type": "integer" }
+    "organization_id": { "type": "integer" },
+    "icon_url": { "type": ["string", "null"] }
   },
   "required": ["name"]
 }

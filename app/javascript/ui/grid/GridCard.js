@@ -24,9 +24,9 @@ import RequiredCollectionIcon from '~/ui/icons/RequiredCollectionIcon'
 import RestoreIcon from '~/ui/icons/RestoreIcon'
 import PinnedIcon from '~/ui/icons/PinnedIcon'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
-import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
+import CollectionCardsTagEditorModal from '~/ui/pages/shared/CollectionCardsTagEditorModal'
 import Tooltip from '~/ui/global/Tooltip'
-import { routingStore, uiStore } from '~/stores'
+import { routingStore, uiStore, apiStore } from '~/stores'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import ReplaceCardButton from '~/ui/grid/ReplaceCardButton'
 import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
@@ -486,6 +486,15 @@ class GridCard extends React.Component {
     }
   }
 
+  get cardsForTagging() {
+    if (apiStore.selectedCards.length > 0) {
+      return apiStore.selectedCards
+    } else {
+      const { card } = this.props
+      return [card]
+    }
+  }
+
   render() {
     const {
       card,
@@ -566,9 +575,9 @@ class GridCard extends React.Component {
           )}
           {this.renderCover}
         </StyledGridCardInner>
-        <TagEditorModal
+        <CollectionCardsTagEditorModal
+          cards={this.cardsForTagging}
           canEdit={this.canEditCard}
-          record={record}
           open={tagEditorOpen}
         />
       </StyledGridCard>

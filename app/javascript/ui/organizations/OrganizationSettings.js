@@ -1,6 +1,7 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observable, action, runInAction } from 'mobx'
 import FormControl from '@material-ui/core/FormControl'
+import _ from 'lodash'
 
 import { FormButton } from '~/ui/global/styled/buttons'
 import {
@@ -126,6 +127,25 @@ class OrganizationSettings extends React.Component {
     )
   }
 
+  validateDomainTag(domain) {
+    let error = null
+    let tag = null
+    const matches = domain.match(/([a-z])([a-z0-9]+\.)*[a-z0-9]+\.[a-z.]+/g)
+    if (!matches) {
+      error = 'Invalid domain. Please use the format: domain.com'
+    } else {
+      tag = _.first(matches)
+    }
+    return {
+      tag: tag,
+      error: error,
+    }
+  }
+
+  afterAddRemoveDomainTag = () => {
+    this.organization.save()
+  }
+
   render() {
     return (
       <div>
@@ -137,11 +157,13 @@ class OrganizationSettings extends React.Component {
 
         <TagEditor
           canEdit
-          validate="domain"
+          validateTag={this.validateDomainTag}
           placeholder="Please enter domains with the following format: domain.com"
-          record={this.organization}
+          records={[this.organization]}
           tagField="domain_whitelist"
           tagColor="white"
+          afterAddTag={this.afterAddRemoveDomainTag}
+          afterRemoveTag={this.afterAddRemoveDomainTag}
         />
         <br />
         <Heading2>Terms of Use</Heading2>

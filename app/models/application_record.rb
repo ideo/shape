@@ -15,6 +15,6 @@ class ApplicationRecord < ActiveRecord::Base
   end
 
   def skip_network_actions?
-    Rails.env.development? || ENV['CYPRESS'].present?
+    Rails.env.development? || ENV['CYPRESS'].present? || ENV['SKIP_NETWORK_ACTIONS'].present?
   end
 end

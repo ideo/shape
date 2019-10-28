@@ -11,10 +11,24 @@ import {
   SubduedText,
 } from '~/ui/global/styled/typography'
 import TrashIcon from '~/ui/icons/TrashIconXl'
+import { GroupIconContainer } from '~/ui/groups/styles'
 
 const RemoveIconHolder = styled.button`
   width: 16px;
 `
+
+const renderGroup = group => {
+  return (
+    <DisplayText>
+      {group.name}
+      {group.icon_url && (
+        <GroupIconContainer>
+          <img src={group.icon_url} />
+        </GroupIconContainer>
+      )}
+    </DisplayText>
+  )
+}
 
 @observer
 class OrganizationPeople extends React.Component {
@@ -27,7 +41,7 @@ class OrganizationPeople extends React.Component {
     return groups.map(group => (
       <Row key={group.id}>
         <button className="groupEdit" onClick={this.props.onGroupRoles(group)}>
-          <DisplayText>{group.name}</DisplayText>
+          {renderGroup(group)}
         </button>
         {group.can_edit && (
           <RemoveIconHolder onClick={this.props.onGroupRemove(group)}>
@@ -57,10 +71,10 @@ class OrganizationPeople extends React.Component {
               className="orgEdit"
               onClick={this.props.onGroupRoles(primaryGroup)}
             >
-              <DisplayText>{primaryGroup.name}</DisplayText>
+              {renderGroup(primaryGroup)}
             </button>
           )}
-          {!orgMember && <DisplayText>{primaryGroup.name}</DisplayText>}
+          {!orgMember && renderGroup(primaryGroup)}
         </Row>
         {showGuests && (
           <Row>
@@ -68,7 +82,7 @@ class OrganizationPeople extends React.Component {
               className="orgEdit"
               onClick={this.props.onGroupRoles(guestGroup)}
             >
-              <DisplayText>{guestGroup.name}</DisplayText>
+              {renderGroup(guestGroup)}
             </button>
           </Row>
         )}
@@ -78,7 +92,7 @@ class OrganizationPeople extends React.Component {
               className="orgEdit"
               onClick={this.props.onGroupRoles(adminGroup)}
             >
-              <DisplayText>{adminGroup.name}</DisplayText>
+              {renderGroup(adminGroup)}
             </button>
           </Row>
         )}

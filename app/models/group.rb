@@ -12,6 +12,7 @@
 #  type                         :string
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
+#  application_id               :integer
 #  created_by_id                :integer
 #  current_shared_collection_id :integer
 #  filestack_file_id            :integer
@@ -59,6 +60,7 @@ class Group < ApplicationRecord
 
   # so far the only "org optional" group is the "Common Resource" group
   belongs_to :organization, optional: true
+  belongs_to :application, optional: true
   belongs_to :current_shared_collection,
              class_name: 'Collection',
              optional: true
@@ -116,6 +118,16 @@ class Group < ApplicationRecord
 
   def role_ids
     roles_from_users.pluck(:id)
+  end
+
+  def self.identifiers
+    # override resourceable method so that identifiers includes all subgroups
+    includes(:subgroups).map { |g| [g] + g.subgroups }.flatten.uniq.map(&:resource_identifier)
+  end
+
+  def identifiers
+    # uses the above method to get all subgroup identifiers for this group
+    Group.where(id: id).identifiers
   end
 
   # Roles where this group is an editor/viewer of a collection/item
@@ -189,6 +201,10 @@ class Group < ApplicationRecord
     else
       'https://s3-us-west-2.amazonaws.com/assets.shape.space/group-avatar.png'
     end
+  end
+
+  def icon_url
+    application&.group_icon_url
   end
 
   private
