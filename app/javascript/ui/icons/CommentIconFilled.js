@@ -36,7 +36,8 @@ const CommentIconFilled = ({ text, textColor } = {}) => (
       <text
         textAnchor="middle"
         x="50%"
-        y="45%"
+        y="50%"
+        dy="-0.1em"
         fontSize=".45em"
         dominantBaseline="middle"
         fill={v.colors.commonLight}
