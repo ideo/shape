@@ -108,6 +108,7 @@
     "draft-js-mention-plugin": "^3.0.4",
     "draft-js-plugins-editor": "^2.0.8",
     "element-matches-polyfill": "^1.0.0",
+    "fetch-mock": "^7.5.1",
     "file-loader": "^4.0.0",
     "filestack-js": "^0.11.2",
     "firebase": "^5.0.4",

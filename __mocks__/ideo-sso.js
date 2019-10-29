@@ -1,4 +1,4 @@
 export default {
-  baseApiUrl: '',
-  profileUrl: '',
+  baseApiUrl: 'ideosso.com',
+  profileUrl: 'ideosso.com',
 }

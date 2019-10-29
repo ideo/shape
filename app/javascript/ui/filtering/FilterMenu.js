@@ -55,7 +55,7 @@ class FilterMenu extends React.Component {
     return (
       <Box ml={'auto'}>
         <FilterIconHolder filterBarActive={isFilterBarActive}>
-          <button onClick={this.handleFilterClick}>
+          <button onClick={this.handleFilterClick} data-cy="filterMenu-button">
             <FilterIcon />
           </button>
         </FilterIconHolder>

@@ -364,5 +364,6 @@ PopoutMenu.defaultProps = {
   hideDotMenu: false,
   location: null,
 }
+PopoutMenu.displayName = 'PopoutMenu'
 
 export default PopoutMenu
