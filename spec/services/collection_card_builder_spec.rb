@@ -26,6 +26,22 @@ RSpec.describe CollectionCardBuilder, type: :service do
     )
   end
 
+  describe '.call' do
+    let(:options) do
+      {
+        params: full_params,
+        parent_collection: parent,
+        user: user,
+        type: card_type,
+      }
+    end
+
+    it 'should return the CollectionCard' do
+      result = CollectionCardBuilder.call(options)
+      expect(result.is_a?(CollectionCard)).to be true
+    end
+  end
+
   describe '#create' do
     context 'success creating card with collection' do
       let(:builder) do

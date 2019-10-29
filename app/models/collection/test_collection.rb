@@ -302,7 +302,7 @@ class Collection
         duplicate.collection_to_test = args[:parent]
       elsif !parent.master_template? && !args[:parent].master_template?
         # Prefix with 'Copy' if it isn't still within a template
-        duplicate.name = "Copy of #{name}".gsub(' Feedback Design', '')
+        duplicate.name = "Copy of #{name}".gsub(" #{FEEDBACK_DESIGN_SUFFIX}", '')
       end
       duplicate.save
       duplicate
@@ -586,7 +586,7 @@ class Collection
       # pick up parent_collection_card relationship
       reload
       test_results_collection.reload
-      CollectionCardBuilder.create(
+      CollectionCardBuilder.call(
         params: {
           order: 999,
           collection_id: id,

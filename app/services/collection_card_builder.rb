@@ -16,8 +16,10 @@ class CollectionCardBuilder
     @user = user
   end
 
-  def self.create(*args)
-    new(*args).create
+  def self.call(*args)
+    service = new(*args)
+    service.create
+    service.collection_card
   end
 
   def create
@@ -26,7 +28,6 @@ class CollectionCardBuilder
       # capture this here before `save` is called at which point the accessor will be nil
       @external_id = @collection_card.record.external_id
       create_collection_card
-      @collection_card
     else
       @collection_card.errors.add(:record, "can't be blank")
       false

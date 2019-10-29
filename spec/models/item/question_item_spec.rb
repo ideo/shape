@@ -39,7 +39,7 @@ RSpec.describe Item::QuestionItem, type: :model do
       let(:test_collection) { create(:test_collection, :completed, add_editors: [user], add_viewers: [user2]) }
       let(:question_card) do
         # use builder so that it actually handles the right permissions
-        CollectionCardBuilder.create(
+        CollectionCardBuilder.call(
           params: {
             item_attributes: {
               type: 'Item::QuestionItem',
