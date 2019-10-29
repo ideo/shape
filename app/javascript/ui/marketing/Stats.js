@@ -155,7 +155,13 @@ const Stats = props => (
       </Box>
     </StatsBannerImages>
     <MarketingFlex justify="center" mt={25}>
-      <Box style={{ maxWidth: 1200 }} flex w={1} justify="space-between">
+      <Box
+        style={{ maxWidth: 1200 }}
+        flex
+        w={1}
+        align="flex-start"
+        justify="space-between"
+      >
         {props.stats.map((stat, index) => (
           <Stat
             key={index.toString()}

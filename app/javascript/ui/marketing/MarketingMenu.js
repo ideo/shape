@@ -280,7 +280,7 @@ class MarketingMenu extends React.PureComponent {
 
   render() {
     const { width } = this.state
-    const isMobile = width <= v.responsive.smallBreakpoint
+    const isMobile = width <= v.responsive.medBreakpoint
 
     return (
       <MenuWrapper>
