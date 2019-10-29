@@ -1,5 +1,5 @@
 import TestDesigner from '~/ui/test_collections/TestDesigner'
-import { fakeCollection } from '#/mocks/data'
+import { fakeCollection, fakeCollectionCard } from '#/mocks/data'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
@@ -16,6 +16,9 @@ describe('TestDesigner', () => {
     }
     // very basic way to turn fakeCollection into a "test collection"
     props.collection.collection_cards[0].card_question_type = 'question_useful'
+    props.collection.collection_cards.forEach(
+      card => (card.section_type = 'ideas')
+    )
     props.collection.apiStore = fakeApiStore({
       requestResult: { data: { id: 99, name: 'Parent Collection' } },
     })
@@ -30,18 +33,6 @@ describe('TestDesigner', () => {
   it('renders TestQuestions for each card', () => {
     expect(wrapper.find('TestQuestion').length).toEqual(
       fakeCollection.collection_cards.length
-    )
-  })
-
-  it('passes position props for beginning and end', () => {
-    expect(wrapper.find('TestQuestion').get(0).props.position).toEqual(
-      'question_beginning'
-    )
-    expect(wrapper.find('TestQuestion').get(1).props.position).toEqual(
-      undefined
-    )
-    expect(wrapper.find('TestQuestion').get(2).props.position).toEqual(
-      'question_end'
     )
   })
 
@@ -114,7 +105,6 @@ describe('TestDesigner', () => {
       })
     })
 
-    describe('handleNew', () => {})
     describe('trackQuestionCreation', () => {
       it('pushes an event to google tag manager', () => {
         component.trackQuestionCreation()
