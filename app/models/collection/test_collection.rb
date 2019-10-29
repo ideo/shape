@@ -579,12 +579,25 @@ class Collection
     end
 
     def create_test_results_collection_and_move_inside!(initiated_by: created_by)
+      if roles_anchor == self
+        results_roles_anchor = nil
+      else
+        # we're anchored above, so the results can be as well
+        results_roles_anchor = roles_anchor
+      end
       create_test_results_collection(
         name: name,
         organization: organization,
         created_by: initiated_by,
-        roles_anchor_collection: roles_anchor,
+        roles_anchor_collection: results_roles_anchor,
       )
+
+      if results_roles_anchor.nil?
+        roles.each do |role|
+          role.update(resource: test_results_collection)
+        end
+      end
+
       update(name: "#{name} #{FEEDBACK_DESIGN_SUFFIX}")
       parent_collection_card.update(collection_id: test_results_collection.id)
       # pick up parent_collection_card relationship
