@@ -1,6 +1,6 @@
 import Icon from './Icon'
 
-const CommentIcon = () => (
+const CommentIconFilled = ({ text, textColor } = {}) => (
   <Icon fill>
     <svg
       width="13"
@@ -32,8 +32,11 @@ const CommentIcon = () => (
       <g mask="url(#mask0)">
         <rect x="-8" y="-7" width="30" height="30" />
       </g>
+      <text textAnchor="middle" x="50%" y="42%" dominantBaseline="middle">
+        {text}
+      </text>
     </svg>{' '}
   </Icon>
 )
 
-export default CommentIcon
+export default CommentIconFilled

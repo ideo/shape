@@ -7,7 +7,7 @@ class StripTags
   def call
     strip_encoded_tags
     strip_html
-    strip_whitespace
+    squeeze_whitespace
   end
 
   private
@@ -22,8 +22,8 @@ class StripTags
     @string = sanitizer.sanitize(@string)
   end
 
-  def strip_whitespace
-    @string = @string.squeeze(' ').strip
+  def squeeze_whitespace
+    @string = @string.squeeze(" \n").gsub(/\n(\s|\n)+/, "\n")
   end
 
   def sanitizer

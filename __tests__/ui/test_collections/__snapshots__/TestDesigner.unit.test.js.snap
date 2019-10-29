@@ -90,14 +90,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "can_view": true,
-                  "data_content": Object {
-                    "ops": Array [
-                      Object {
-                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                      },
-                    ],
-                    "version": 1,
-                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -131,6 +123,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
+                  "quill_data": undefined,
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -151,14 +144,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "can_view": true,
-                  "data_content": Object {
-                    "ops": Array [
-                      Object {
-                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                      },
-                    ],
-                    "version": 1,
-                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -192,6 +177,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
+                  "quill_data": undefined,
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -238,14 +224,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                     "can_edit": false,
                     "can_view": true,
-                    "data_content": Object {
-                      "ops": Array [
-                        Object {
-                          "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                        },
-                      ],
-                      "version": 1,
-                    },
                     "fullyLoaded": true,
                     "id": "1",
                     "inherited_tag_list": Array [],
@@ -279,6 +257,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "update": [MockFunction],
                       "width": 1,
                     },
+                    "quill_data": undefined,
                     "type": "Item::TextItem",
                   },
                   "maxWidth": 1,
@@ -299,14 +278,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                     "can_edit": false,
                     "can_view": true,
-                    "data_content": Object {
-                      "ops": Array [
-                        Object {
-                          "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                        },
-                      ],
-                      "version": 1,
-                    },
                     "fullyLoaded": true,
                     "id": "1",
                     "inherited_tag_list": Array [],
@@ -340,6 +311,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "update": [MockFunction],
                       "width": 1,
                     },
+                    "quill_data": undefined,
                     "type": "Item::TextItem",
                   },
                   "save": [MockFunction],
@@ -366,14 +338,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "can_view": true,
-                  "data_content": Object {
-                    "ops": Array [
-                      Object {
-                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                      },
-                    ],
-                    "version": 1,
-                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -407,6 +371,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
+                  "quill_data": undefined,
                   "type": "Item::TextItem",
                 }
               }
@@ -431,6 +396,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                   "apiStore": Object {
                     "add": [MockFunction add],
                     "addShapeAdminUsers": [MockFunction],
+                    "alwaysShowCurrentThread": [MockFunction],
                     "checkCurrentOrg": [MockFunction],
                     "checkInMyCollection": [MockFunction],
                     "collapseReplies": [MockFunction],
@@ -492,6 +458,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "slug": "org-slug",
                     },
                     "duplicateCards": [MockFunction],
+                    "expandAndOpenThreadForRecord": [MockFunction],
                     "fetch": [MockFunction fetch] {
                       "calls": Array [
                         Array [
@@ -524,6 +491,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "loadNextThreadPage": [MockFunction],
                     "loadingThreads": false,
                     "moveCards": [MockFunction],
+                    "openCurrentThreadToCommentOn": [MockFunction],
                     "recentNotifications": Map {},
                     "removeAll": [MockFunction removeAll],
                     "removeShapeAdminUser": [MockFunction],
@@ -538,6 +506,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "shapeAdminUsers": Array [],
                     "sync": [MockFunction sync],
                     "uiStore": Object {
+                      "actionMenuOpenForCard": [MockFunction],
                       "activityLogMoving": false,
                       "activityLogOpen": false,
                       "activityLogPage": "comments",
@@ -637,6 +606,8 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "selectCardId": [MockFunction],
                       "selectedAreaEnabled": false,
                       "selectedCardIds": Array [],
+                      "selectedTextRangeForCard": [MockFunction],
+                      "setCommentingOnRecord": [MockFunction],
                       "setEditingCardCover": [MockFunction],
                       "setReplyingToComment": [MockFunction],
                       "setSelectedArea": [MockFunction],
@@ -644,6 +615,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "setViewingRecord": [MockFunction],
                       "showPermissionsAlert": [MockFunction],
                       "stopDragging": [MockFunction],
+                      "textMenuOpenForCard": [MockFunction],
                       "toggleEditingCardId": [MockFunction],
                       "trackEvent": [MockFunction],
                       "trackedRecords": Object {},
@@ -699,14 +671,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -740,6 +704,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -760,14 +725,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -801,6 +758,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -835,14 +793,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -876,6 +826,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -896,14 +847,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -937,6 +880,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -971,14 +915,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -1012,6 +948,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -1032,14 +969,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -1073,6 +1002,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -1185,14 +1115,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -1226,6 +1148,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -1246,14 +1169,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -1287,6 +1202,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -1321,14 +1237,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -1362,6 +1270,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -1382,14 +1291,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -1423,6 +1324,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -1457,14 +1359,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -1498,6 +1392,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -1518,14 +1413,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -1559,6 +1446,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -1628,14 +1516,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -1669,6 +1549,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -1689,14 +1570,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -1730,6 +1603,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -1764,14 +1638,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -1805,6 +1671,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -1825,14 +1692,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -1866,6 +1725,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -1900,14 +1760,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -1941,6 +1793,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -1961,14 +1814,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -2002,6 +1847,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -2059,14 +1905,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -2100,6 +1938,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -2120,14 +1959,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -2161,6 +1992,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -2195,14 +2027,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -2236,6 +2060,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -2256,14 +2081,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -2297,6 +2114,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -2331,14 +2149,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -2372,6 +2182,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -2392,14 +2203,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -2433,6 +2236,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -2505,14 +2309,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "can_view": true,
-                  "data_content": Object {
-                    "ops": Array [
-                      Object {
-                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                      },
-                    ],
-                    "version": 1,
-                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -2546,6 +2342,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
+                  "quill_data": undefined,
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -2566,14 +2363,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "can_view": true,
-                  "data_content": Object {
-                    "ops": Array [
-                      Object {
-                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                      },
-                    ],
-                    "version": 1,
-                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -2607,6 +2396,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
+                  "quill_data": undefined,
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -2653,14 +2443,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                     "can_edit": false,
                     "can_view": true,
-                    "data_content": Object {
-                      "ops": Array [
-                        Object {
-                          "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                        },
-                      ],
-                      "version": 1,
-                    },
                     "fullyLoaded": true,
                     "id": "1",
                     "inherited_tag_list": Array [],
@@ -2694,6 +2476,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "update": [MockFunction],
                       "width": 1,
                     },
+                    "quill_data": undefined,
                     "type": "Item::TextItem",
                   },
                   "maxWidth": 1,
@@ -2714,14 +2497,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                     "can_edit": false,
                     "can_view": true,
-                    "data_content": Object {
-                      "ops": Array [
-                        Object {
-                          "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                        },
-                      ],
-                      "version": 1,
-                    },
                     "fullyLoaded": true,
                     "id": "1",
                     "inherited_tag_list": Array [],
@@ -2755,6 +2530,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "update": [MockFunction],
                       "width": 1,
                     },
+                    "quill_data": undefined,
                     "type": "Item::TextItem",
                   },
                   "save": [MockFunction],
@@ -2781,14 +2557,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "can_view": true,
-                  "data_content": Object {
-                    "ops": Array [
-                      Object {
-                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                      },
-                    ],
-                    "version": 1,
-                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -2822,6 +2590,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
+                  "quill_data": undefined,
                   "type": "Item::TextItem",
                 }
               }
@@ -2846,6 +2615,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                   "apiStore": Object {
                     "add": [MockFunction add],
                     "addShapeAdminUsers": [MockFunction],
+                    "alwaysShowCurrentThread": [MockFunction],
                     "checkCurrentOrg": [MockFunction],
                     "checkInMyCollection": [MockFunction],
                     "collapseReplies": [MockFunction],
@@ -2907,6 +2677,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "slug": "org-slug",
                     },
                     "duplicateCards": [MockFunction],
+                    "expandAndOpenThreadForRecord": [MockFunction],
                     "fetch": [MockFunction fetch] {
                       "calls": Array [
                         Array [
@@ -2939,6 +2710,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "loadNextThreadPage": [MockFunction],
                     "loadingThreads": false,
                     "moveCards": [MockFunction],
+                    "openCurrentThreadToCommentOn": [MockFunction],
                     "recentNotifications": Map {},
                     "removeAll": [MockFunction removeAll],
                     "removeShapeAdminUser": [MockFunction],
@@ -2953,6 +2725,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "shapeAdminUsers": Array [],
                     "sync": [MockFunction sync],
                     "uiStore": Object {
+                      "actionMenuOpenForCard": [MockFunction],
                       "activityLogMoving": false,
                       "activityLogOpen": false,
                       "activityLogPage": "comments",
@@ -3052,6 +2825,8 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "selectCardId": [MockFunction],
                       "selectedAreaEnabled": false,
                       "selectedCardIds": Array [],
+                      "selectedTextRangeForCard": [MockFunction],
+                      "setCommentingOnRecord": [MockFunction],
                       "setEditingCardCover": [MockFunction],
                       "setReplyingToComment": [MockFunction],
                       "setSelectedArea": [MockFunction],
@@ -3059,6 +2834,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "setViewingRecord": [MockFunction],
                       "showPermissionsAlert": [MockFunction],
                       "stopDragging": [MockFunction],
+                      "textMenuOpenForCard": [MockFunction],
                       "toggleEditingCardId": [MockFunction],
                       "trackEvent": [MockFunction],
                       "trackedRecords": Object {},
@@ -3114,14 +2890,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -3155,6 +2923,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -3175,14 +2944,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -3216,6 +2977,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -3250,14 +3012,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -3291,6 +3045,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -3311,14 +3066,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -3352,6 +3099,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -3386,14 +3134,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -3427,6 +3167,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -3447,14 +3188,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -3488,6 +3221,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -3600,14 +3334,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -3641,6 +3367,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -3661,14 +3388,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -3702,6 +3421,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -3736,14 +3456,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -3777,6 +3489,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -3797,14 +3510,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -3838,6 +3543,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -3872,14 +3578,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -3913,6 +3611,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -3933,14 +3632,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -3974,6 +3665,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -4043,14 +3735,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -4084,6 +3768,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -4104,14 +3789,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -4145,6 +3822,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -4179,14 +3857,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -4220,6 +3890,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -4240,14 +3911,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -4281,6 +3944,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -4315,14 +3979,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -4356,6 +4012,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -4376,14 +4033,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -4417,6 +4066,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -4474,14 +4124,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -4515,6 +4157,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -4535,14 +4178,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -4576,6 +4211,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -4610,14 +4246,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -4651,6 +4279,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -4671,14 +4300,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -4712,6 +4333,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -4746,14 +4368,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -4787,6 +4401,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -4807,14 +4422,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -4848,6 +4455,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -4920,14 +4528,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "can_view": true,
-                  "data_content": Object {
-                    "ops": Array [
-                      Object {
-                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                      },
-                    ],
-                    "version": 1,
-                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -4961,6 +4561,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
+                  "quill_data": undefined,
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -4981,14 +4582,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "can_view": true,
-                  "data_content": Object {
-                    "ops": Array [
-                      Object {
-                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                      },
-                    ],
-                    "version": 1,
-                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -5022,6 +4615,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
+                  "quill_data": undefined,
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -5068,14 +4662,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                     "can_edit": false,
                     "can_view": true,
-                    "data_content": Object {
-                      "ops": Array [
-                        Object {
-                          "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                        },
-                      ],
-                      "version": 1,
-                    },
                     "fullyLoaded": true,
                     "id": "1",
                     "inherited_tag_list": Array [],
@@ -5109,6 +4695,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "update": [MockFunction],
                       "width": 1,
                     },
+                    "quill_data": undefined,
                     "type": "Item::TextItem",
                   },
                   "maxWidth": 1,
@@ -5129,14 +4716,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                     ],
                     "can_edit": false,
                     "can_view": true,
-                    "data_content": Object {
-                      "ops": Array [
-                        Object {
-                          "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                        },
-                      ],
-                      "version": 1,
-                    },
                     "fullyLoaded": true,
                     "id": "1",
                     "inherited_tag_list": Array [],
@@ -5170,6 +4749,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "update": [MockFunction],
                       "width": 1,
                     },
+                    "quill_data": undefined,
                     "type": "Item::TextItem",
                   },
                   "save": [MockFunction],
@@ -5196,14 +4776,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "can_view": true,
-                  "data_content": Object {
-                    "ops": Array [
-                      Object {
-                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                      },
-                    ],
-                    "version": 1,
-                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -5237,6 +4809,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
+                  "quill_data": undefined,
                   "type": "Item::TextItem",
                 }
               }
@@ -5261,6 +4834,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                   "apiStore": Object {
                     "add": [MockFunction add],
                     "addShapeAdminUsers": [MockFunction],
+                    "alwaysShowCurrentThread": [MockFunction],
                     "checkCurrentOrg": [MockFunction],
                     "checkInMyCollection": [MockFunction],
                     "collapseReplies": [MockFunction],
@@ -5322,6 +4896,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "slug": "org-slug",
                     },
                     "duplicateCards": [MockFunction],
+                    "expandAndOpenThreadForRecord": [MockFunction],
                     "fetch": [MockFunction fetch] {
                       "calls": Array [
                         Array [
@@ -5354,6 +4929,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "loadNextThreadPage": [MockFunction],
                     "loadingThreads": false,
                     "moveCards": [MockFunction],
+                    "openCurrentThreadToCommentOn": [MockFunction],
                     "recentNotifications": Map {},
                     "removeAll": [MockFunction removeAll],
                     "removeShapeAdminUser": [MockFunction],
@@ -5368,6 +4944,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "shapeAdminUsers": Array [],
                     "sync": [MockFunction sync],
                     "uiStore": Object {
+                      "actionMenuOpenForCard": [MockFunction],
                       "activityLogMoving": false,
                       "activityLogOpen": false,
                       "activityLogPage": "comments",
@@ -5467,6 +5044,8 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "selectCardId": [MockFunction],
                       "selectedAreaEnabled": false,
                       "selectedCardIds": Array [],
+                      "selectedTextRangeForCard": [MockFunction],
+                      "setCommentingOnRecord": [MockFunction],
                       "setEditingCardCover": [MockFunction],
                       "setReplyingToComment": [MockFunction],
                       "setSelectedArea": [MockFunction],
@@ -5474,6 +5053,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "setViewingRecord": [MockFunction],
                       "showPermissionsAlert": [MockFunction],
                       "stopDragging": [MockFunction],
+                      "textMenuOpenForCard": [MockFunction],
                       "toggleEditingCardId": [MockFunction],
                       "trackEvent": [MockFunction],
                       "trackedRecords": Object {},
@@ -5529,14 +5109,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -5570,6 +5142,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -5590,14 +5163,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -5631,6 +5196,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -5665,14 +5231,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -5706,6 +5264,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -5726,14 +5285,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -5767,6 +5318,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -5801,14 +5353,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -5842,6 +5386,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -5862,14 +5407,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -5903,6 +5440,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -6015,14 +5553,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -6056,6 +5586,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -6076,14 +5607,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -6117,6 +5640,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -6151,14 +5675,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -6192,6 +5708,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -6212,14 +5729,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -6253,6 +5762,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -6287,14 +5797,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -6328,6 +5830,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -6348,14 +5851,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -6389,6 +5884,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -6458,14 +5954,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -6499,6 +5987,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -6519,14 +6008,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -6560,6 +6041,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -6594,14 +6076,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -6635,6 +6109,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -6655,14 +6130,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -6696,6 +6163,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -6730,14 +6198,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -6771,6 +6231,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -6791,14 +6252,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                             ],
                             "can_edit": false,
                             "can_view": true,
-                            "data_content": Object {
-                              "ops": Array [
-                                Object {
-                                  "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                                },
-                              ],
-                              "version": 1,
-                            },
                             "fullyLoaded": true,
                             "id": "1",
                             "inherited_tag_list": Array [],
@@ -6832,6 +6285,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
+                            "quill_data": undefined,
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -6889,14 +6343,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -6930,6 +6376,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -6950,14 +6397,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -6991,6 +6430,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -7025,14 +6465,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -7066,6 +6498,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -7086,14 +6519,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -7127,6 +6552,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -7161,14 +6587,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -7202,6 +6620,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -7222,14 +6641,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                         ],
                         "can_edit": false,
                         "can_view": true,
-                        "data_content": Object {
-                          "ops": Array [
-                            Object {
-                              "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                            },
-                          ],
-                          "version": 1,
-                        },
                         "fullyLoaded": true,
                         "id": "1",
                         "inherited_tag_list": Array [],
@@ -7263,6 +6674,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
+                        "quill_data": undefined,
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -7348,6 +6760,7 @@ exports[`TestDesigner renders snapshot 1`] = `
             "apiStore": Object {
               "add": [MockFunction add],
               "addShapeAdminUsers": [MockFunction],
+              "alwaysShowCurrentThread": [MockFunction],
               "checkCurrentOrg": [MockFunction],
               "checkInMyCollection": [MockFunction],
               "collapseReplies": [MockFunction],
@@ -7409,6 +6822,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                 "slug": "org-slug",
               },
               "duplicateCards": [MockFunction],
+              "expandAndOpenThreadForRecord": [MockFunction],
               "fetch": [MockFunction fetch] {
                 "calls": Array [
                   Array [
@@ -7441,6 +6855,7 @@ exports[`TestDesigner renders snapshot 1`] = `
               "loadNextThreadPage": [MockFunction],
               "loadingThreads": false,
               "moveCards": [MockFunction],
+              "openCurrentThreadToCommentOn": [MockFunction],
               "recentNotifications": Map {},
               "removeAll": [MockFunction removeAll],
               "removeShapeAdminUser": [MockFunction],
@@ -7455,6 +6870,7 @@ exports[`TestDesigner renders snapshot 1`] = `
               "shapeAdminUsers": Array [],
               "sync": [MockFunction sync],
               "uiStore": Object {
+                "actionMenuOpenForCard": [MockFunction],
                 "activityLogMoving": false,
                 "activityLogOpen": false,
                 "activityLogPage": "comments",
@@ -7554,6 +6970,8 @@ exports[`TestDesigner renders snapshot 1`] = `
                 "selectCardId": [MockFunction],
                 "selectedAreaEnabled": false,
                 "selectedCardIds": Array [],
+                "selectedTextRangeForCard": [MockFunction],
+                "setCommentingOnRecord": [MockFunction],
                 "setEditingCardCover": [MockFunction],
                 "setReplyingToComment": [MockFunction],
                 "setSelectedArea": [MockFunction],
@@ -7561,6 +6979,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                 "setViewingRecord": [MockFunction],
                 "showPermissionsAlert": [MockFunction],
                 "stopDragging": [MockFunction],
+                "textMenuOpenForCard": [MockFunction],
                 "toggleEditingCardId": [MockFunction],
                 "trackEvent": [MockFunction],
                 "trackedRecords": Object {},
@@ -7616,14 +7035,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "can_view": true,
-                  "data_content": Object {
-                    "ops": Array [
-                      Object {
-                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                      },
-                    ],
-                    "version": 1,
-                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -7657,6 +7068,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
+                  "quill_data": undefined,
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -7677,14 +7089,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "can_view": true,
-                  "data_content": Object {
-                    "ops": Array [
-                      Object {
-                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                      },
-                    ],
-                    "version": 1,
-                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -7718,6 +7122,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
+                  "quill_data": undefined,
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -7752,14 +7157,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "can_view": true,
-                  "data_content": Object {
-                    "ops": Array [
-                      Object {
-                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                      },
-                    ],
-                    "version": 1,
-                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -7793,6 +7190,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
+                  "quill_data": undefined,
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -7813,14 +7211,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "can_view": true,
-                  "data_content": Object {
-                    "ops": Array [
-                      Object {
-                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                      },
-                    ],
-                    "version": 1,
-                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -7854,6 +7244,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
+                  "quill_data": undefined,
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -7888,14 +7279,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "can_view": true,
-                  "data_content": Object {
-                    "ops": Array [
-                      Object {
-                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                      },
-                    ],
-                    "version": 1,
-                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -7929,6 +7312,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
+                  "quill_data": undefined,
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -7949,14 +7333,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "can_view": true,
-                  "data_content": Object {
-                    "ops": Array [
-                      Object {
-                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                      },
-                    ],
-                    "version": 1,
-                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -7990,6 +7366,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
+                  "quill_data": undefined,
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -8102,14 +7479,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       ],
                       "can_edit": false,
                       "can_view": true,
-                      "data_content": Object {
-                        "ops": Array [
-                          Object {
-                            "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                          },
-                        ],
-                        "version": 1,
-                      },
                       "fullyLoaded": true,
                       "id": "1",
                       "inherited_tag_list": Array [],
@@ -8143,6 +7512,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "update": [MockFunction],
                         "width": 1,
                       },
+                      "quill_data": undefined,
                       "type": "Item::TextItem",
                     },
                     "maxWidth": 1,
@@ -8163,14 +7533,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       ],
                       "can_edit": false,
                       "can_view": true,
-                      "data_content": Object {
-                        "ops": Array [
-                          Object {
-                            "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                          },
-                        ],
-                        "version": 1,
-                      },
                       "fullyLoaded": true,
                       "id": "1",
                       "inherited_tag_list": Array [],
@@ -8204,6 +7566,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "update": [MockFunction],
                         "width": 1,
                       },
+                      "quill_data": undefined,
                       "type": "Item::TextItem",
                     },
                     "save": [MockFunction],
@@ -8238,14 +7601,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       ],
                       "can_edit": false,
                       "can_view": true,
-                      "data_content": Object {
-                        "ops": Array [
-                          Object {
-                            "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                          },
-                        ],
-                        "version": 1,
-                      },
                       "fullyLoaded": true,
                       "id": "1",
                       "inherited_tag_list": Array [],
@@ -8279,6 +7634,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "update": [MockFunction],
                         "width": 1,
                       },
+                      "quill_data": undefined,
                       "type": "Item::TextItem",
                     },
                     "maxWidth": 1,
@@ -8299,14 +7655,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       ],
                       "can_edit": false,
                       "can_view": true,
-                      "data_content": Object {
-                        "ops": Array [
-                          Object {
-                            "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                          },
-                        ],
-                        "version": 1,
-                      },
                       "fullyLoaded": true,
                       "id": "1",
                       "inherited_tag_list": Array [],
@@ -8340,6 +7688,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "update": [MockFunction],
                         "width": 1,
                       },
+                      "quill_data": undefined,
                       "type": "Item::TextItem",
                     },
                     "save": [MockFunction],
@@ -8374,14 +7723,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       ],
                       "can_edit": false,
                       "can_view": true,
-                      "data_content": Object {
-                        "ops": Array [
-                          Object {
-                            "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                          },
-                        ],
-                        "version": 1,
-                      },
                       "fullyLoaded": true,
                       "id": "1",
                       "inherited_tag_list": Array [],
@@ -8415,6 +7756,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "update": [MockFunction],
                         "width": 1,
                       },
+                      "quill_data": undefined,
                       "type": "Item::TextItem",
                     },
                     "maxWidth": 1,
@@ -8435,14 +7777,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       ],
                       "can_edit": false,
                       "can_view": true,
-                      "data_content": Object {
-                        "ops": Array [
-                          Object {
-                            "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                          },
-                        ],
-                        "version": 1,
-                      },
                       "fullyLoaded": true,
                       "id": "1",
                       "inherited_tag_list": Array [],
@@ -8476,6 +7810,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "update": [MockFunction],
                         "width": 1,
                       },
+                      "quill_data": undefined,
                       "type": "Item::TextItem",
                     },
                     "save": [MockFunction],
@@ -8545,14 +7880,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       ],
                       "can_edit": false,
                       "can_view": true,
-                      "data_content": Object {
-                        "ops": Array [
-                          Object {
-                            "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                          },
-                        ],
-                        "version": 1,
-                      },
                       "fullyLoaded": true,
                       "id": "1",
                       "inherited_tag_list": Array [],
@@ -8586,6 +7913,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "update": [MockFunction],
                         "width": 1,
                       },
+                      "quill_data": undefined,
                       "type": "Item::TextItem",
                     },
                     "maxWidth": 1,
@@ -8606,14 +7934,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       ],
                       "can_edit": false,
                       "can_view": true,
-                      "data_content": Object {
-                        "ops": Array [
-                          Object {
-                            "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                          },
-                        ],
-                        "version": 1,
-                      },
                       "fullyLoaded": true,
                       "id": "1",
                       "inherited_tag_list": Array [],
@@ -8647,6 +7967,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "update": [MockFunction],
                         "width": 1,
                       },
+                      "quill_data": undefined,
                       "type": "Item::TextItem",
                     },
                     "save": [MockFunction],
@@ -8681,14 +8002,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       ],
                       "can_edit": false,
                       "can_view": true,
-                      "data_content": Object {
-                        "ops": Array [
-                          Object {
-                            "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                          },
-                        ],
-                        "version": 1,
-                      },
                       "fullyLoaded": true,
                       "id": "1",
                       "inherited_tag_list": Array [],
@@ -8722,6 +8035,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "update": [MockFunction],
                         "width": 1,
                       },
+                      "quill_data": undefined,
                       "type": "Item::TextItem",
                     },
                     "maxWidth": 1,
@@ -8742,14 +8056,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       ],
                       "can_edit": false,
                       "can_view": true,
-                      "data_content": Object {
-                        "ops": Array [
-                          Object {
-                            "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                          },
-                        ],
-                        "version": 1,
-                      },
                       "fullyLoaded": true,
                       "id": "1",
                       "inherited_tag_list": Array [],
@@ -8783,6 +8089,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "update": [MockFunction],
                         "width": 1,
                       },
+                      "quill_data": undefined,
                       "type": "Item::TextItem",
                     },
                     "save": [MockFunction],
@@ -8817,14 +8124,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       ],
                       "can_edit": false,
                       "can_view": true,
-                      "data_content": Object {
-                        "ops": Array [
-                          Object {
-                            "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                          },
-                        ],
-                        "version": 1,
-                      },
                       "fullyLoaded": true,
                       "id": "1",
                       "inherited_tag_list": Array [],
@@ -8858,6 +8157,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "update": [MockFunction],
                         "width": 1,
                       },
+                      "quill_data": undefined,
                       "type": "Item::TextItem",
                     },
                     "maxWidth": 1,
@@ -8878,14 +8178,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                       ],
                       "can_edit": false,
                       "can_view": true,
-                      "data_content": Object {
-                        "ops": Array [
-                          Object {
-                            "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                          },
-                        ],
-                        "version": 1,
-                      },
                       "fullyLoaded": true,
                       "id": "1",
                       "inherited_tag_list": Array [],
@@ -8919,6 +8211,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "update": [MockFunction],
                         "width": 1,
                       },
+                      "quill_data": undefined,
                       "type": "Item::TextItem",
                     },
                     "save": [MockFunction],
@@ -8976,14 +8269,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "can_view": true,
-                  "data_content": Object {
-                    "ops": Array [
-                      Object {
-                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                      },
-                    ],
-                    "version": 1,
-                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -9017,6 +8302,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
+                  "quill_data": undefined,
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -9037,14 +8323,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "can_view": true,
-                  "data_content": Object {
-                    "ops": Array [
-                      Object {
-                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                      },
-                    ],
-                    "version": 1,
-                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -9078,6 +8356,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
+                  "quill_data": undefined,
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -9112,14 +8391,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "can_view": true,
-                  "data_content": Object {
-                    "ops": Array [
-                      Object {
-                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                      },
-                    ],
-                    "version": 1,
-                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -9153,6 +8424,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
+                  "quill_data": undefined,
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -9173,14 +8445,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "can_view": true,
-                  "data_content": Object {
-                    "ops": Array [
-                      Object {
-                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                      },
-                    ],
-                    "version": 1,
-                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -9214,6 +8478,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
+                  "quill_data": undefined,
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -9248,14 +8513,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "can_view": true,
-                  "data_content": Object {
-                    "ops": Array [
-                      Object {
-                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                      },
-                    ],
-                    "version": 1,
-                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -9289,6 +8546,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
+                  "quill_data": undefined,
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -9309,14 +8567,6 @@ exports[`TestDesigner renders snapshot 1`] = `
                   ],
                   "can_edit": false,
                   "can_view": true,
-                  "data_content": Object {
-                    "ops": Array [
-                      Object {
-                        "insert": "This is the content for the item and it contains multiple sentences. Like this one.",
-                      },
-                    ],
-                    "version": 1,
-                  },
                   "fullyLoaded": true,
                   "id": "1",
                   "inherited_tag_list": Array [],
@@ -9350,6 +8600,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
+                  "quill_data": undefined,
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],

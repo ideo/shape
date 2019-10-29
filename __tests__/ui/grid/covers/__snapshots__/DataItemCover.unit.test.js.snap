@@ -21,7 +21,6 @@ exports[`DataItemCover renders snapshot 1`] = `
         ],
         "can_edit": false,
         "can_view": true,
-        "data_content": null,
         "data_settings": Object {
           "d_measure": "participants",
           "d_timeframe": "month",
@@ -104,6 +103,7 @@ exports[`DataItemCover renders snapshot 1`] = `
           "timeframe": "ever",
           "total": 1,
         },
+        "quill_data": null,
         "report_type": "report_type_collections_and_items",
         "type": "Item::DataItem",
       },
@@ -126,7 +126,6 @@ exports[`DataItemCover renders snapshot 1`] = `
       ],
       "can_edit": false,
       "can_view": true,
-      "data_content": null,
       "data_settings": Object {
         "d_measure": "participants",
         "d_timeframe": "month",
@@ -209,6 +208,7 @@ exports[`DataItemCover renders snapshot 1`] = `
         "timeframe": "ever",
         "total": 1,
       },
+      "quill_data": null,
       "report_type": "report_type_collections_and_items",
       "type": "Item::DataItem",
     }
