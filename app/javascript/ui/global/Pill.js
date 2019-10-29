@@ -86,11 +86,11 @@ const Pill = props => {
 }
 
 Pill.propTypes = {
-  label: PropTypes.string.isRequired,
+  label: PropTypes.string,
   symbol: PropTypes.node,
   onDelete: PropTypes.func,
   deleteIcon: PropTypes.node,
-  tag: PropTypes.node,
+  tag: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   selectable: PropTypes.bool,
   selected: PropTypes.bool,
   onSelect: PropTypes.func,
@@ -98,6 +98,7 @@ Pill.propTypes = {
 }
 
 Pill.defaultProps = {
+  label: '',
   symbol: null,
   onDelete: null,
   deleteIcon: <CloseIcon />,

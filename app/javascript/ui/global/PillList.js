@@ -50,7 +50,7 @@ class PillList extends React.Component {
           // This could be a user, a group or an unregistered user
           return (
             <Pill
-              key={item.name || item.id || item.email}
+              key={item.id || item.name || item.email}
               symbol={avatar}
               label={item.name}
               id={item.id}
