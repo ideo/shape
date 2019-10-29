@@ -4,7 +4,6 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 import ReactTags from 'react-tag-autocomplete'
 
-import Pill from '~/ui/global/Pill'
 import StyledReactTags from './StyledReactTags'
 
 export const tagsInCommon = (records, tagField) => {
@@ -43,16 +42,6 @@ class TagEditor extends React.Component {
     })
     // Init with tags that are shared across all records
     this.initTags(tagsInCommon(records, tagField))
-  }
-
-  createFormattedTag(id, label) {
-    const tag = {
-      id,
-      label,
-      name: label,
-    }
-    tag.onDelete = this.handleDelete(id)
-    return tag
   }
 
   @action
@@ -128,7 +117,6 @@ class TagEditor extends React.Component {
             placeholder={placeholder}
             handleAddition={this.handleAddition}
             handleDelete={this.handleDelete}
-            tagComponent={Pill}
             allowNew
           />
         )}

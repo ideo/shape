@@ -126,6 +126,7 @@ class TextItemCover extends React.Component {
     }
   }
 
+  // cancel should only ever be called for editors, since it is canceling out of edit view
   cancel = async ({ item, ev } = {}) => {
     if (this.unmounted) {
       return
