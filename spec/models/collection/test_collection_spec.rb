@@ -677,4 +677,32 @@ describe Collection::TestCollection, type: :model do
       ])
     end
   end
+
+  context 'creating a test in a collection with its own roles', only: true do
+    let(:my_collection) { create(:user_collection, add_editors: [user]) }
+    let(:test_collection) do
+      create(:test_collection, :completed, parent_collection: my_collection, add_editors: [user])
+    end
+    let(:test_results_collection) { test_collection.test_results_collection }
+    let(:launch) do
+      test_collection.launch!(initiated_by: user)
+    end
+
+    it 'assigns its roles to the test results collection' do
+      expect {
+        launch
+      }.to change(test_collection.roles, :count).by(-1)
+      expect(test_collection.roles).to be_empty
+      expect(test_results_collection.roles).not_to be_empty
+    end
+
+    it 'anchors itself to the test results collection' do
+      expect {
+        launch
+      }.to change(test_collection, :roles_anchor_collection_id)
+      expect(test_collection.roles_anchor).to eq test_results_collection
+      expect(test_collection.can_edit?(user)).to be true
+      expect(test_results_collection.can_edit?(user)).to be true
+    end
+  end
 end
