@@ -5,6 +5,8 @@ import { ReferenceType } from 'datx'
 import { apiUrl } from '~/utils/url'
 import BaseRecord from './BaseRecord'
 import Comment from './Comment'
+import Item from './Item'
+import Collection from './Collection'
 import UsersThread from './UsersThread'
 import User from './User'
 
@@ -78,7 +80,9 @@ class CommentThread extends BaseRecord {
     // if we had previously loaded additional pages, return it to the state
     // where we just have the first page worth of comments
     if (page === 1 && this.comments.length > PER_PAGE) {
-      this.comments.replace(this.comments.toJS().slice(PER_PAGE * -1))
+      runInAction(() => {
+        this.comments.replace(this.comments.toJS().slice(PER_PAGE * -1))
+      })
     }
     const apiPath = `comment_threads/${this.id}/comments?page=${page}`
     const res = await this.apiStore.request(apiPath, 'GET')
@@ -89,6 +93,7 @@ class CommentThread extends BaseRecord {
   }
 
   async API_saveComment(commentData) {
+    const { apiStore, uiStore } = this
     if (!this.persisted) {
       // if there's no id, then first we have to create the comment_thread
       await this.API_create()
@@ -103,29 +108,80 @@ class CommentThread extends BaseRecord {
     // can just call this without awaiting the result
     this.API_markViewed()
     // make sure we're following this thread in our activity log
-    this.apiStore.addCurrentCommentThread(this.id)
+    apiStore.addCurrentCommentThread(this.id)
     // simulate the updated_at update so that the thread will move to most recent
     this.updated_at = new Date()
+
+    const { commentingOnRecord } = uiStore
+    if (commentingOnRecord) {
+      commentData.subject_id = commentingOnRecord.id
+      commentData.subject_type = commentingOnRecord.type
+    }
+
     // dynamically set the endpoint to belong to this thread
     Comment.endpoint = apiUrl(`comment_threads/${this.id}/comments`)
     // create an unsaved comment so that we can see it immediately
-    const comment = new Comment(commentData, this.apiStore)
-    comment.addReference('author', this.apiStore.currentUser, {
+    const comment = new Comment(commentData, apiStore)
+    comment.addReference('author', apiStore.currentUser, {
       model: User,
       type: ReferenceType.TO_ONE,
     })
+    if (commentingOnRecord) {
+      comment.addReference('subject', commentingOnRecord, {
+        model: commentingOnRecord.isCollection ? Collection : Item,
+        type: ReferenceType.TO_ONE,
+      })
+    }
+
     // also store the author_id to simulate the serializer
-    comment.author_id = this.apiStore.currentUserId
+    comment.author_id = apiStore.currentUserId
     if (commentData.parent_id) {
-      const parent = this.apiStore.find('comments', commentData.parent_id)
+      // will trigger rerender for parent comments that just got a reply
+      const parent = apiStore.find('comments', commentData.parent_id)
       if (parent) {
         parent.replies_count += 1
+        if (parent.status === 'resolved') {
+          parent.status = 'reopened'
+        }
       }
     }
+
     this.importComments([comment], { created: true })
+    uiStore.trackEvent('create', this.record)
     // this will create the comment in the API
-    this.uiStore.trackEvent('create', this.record)
-    return comment.save()
+    await comment.save()
+    this.afterCommentCreate(comment)
+
+    return comment
+  }
+
+  async afterCommentCreate(comment) {
+    const { uiStore } = this
+    const { commentingOnRecord, currentQuillEditor } = uiStore
+    if (comment.persisted && commentingOnRecord.isCollection) {
+      // increment unresolved count by 1 for collection cover to get recent count
+      commentingOnRecord.unresolved_count =
+        commentingOnRecord.unresolved_count + 1
+      return
+    }
+    if (
+      comment.persisted &&
+      uiStore.isCommentingOnTextRange() &&
+      currentQuillEditor
+    ) {
+      // set this now as it won't be present until the text item has saved
+      comment.text_highlight = uiStore.selectedTextRangeForCard.textContent
+      // capture contents so that we can now safely set commentingOnRecord to false (???)
+      const delta = currentQuillEditor.getContents()
+      uiStore.setCommentingOnRecord(null, { persisted: true })
+      await commentingOnRecord.API_persistHighlight({
+        commentId: comment.id,
+        delta,
+      })
+    } else {
+      // just clear this out; e.g. you commented on a record but not a highlight
+      uiStore.setCommentingOnRecord(null)
+    }
   }
 
   API_markViewed() {

@@ -22,7 +22,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
     'type',
     'name',
     'content',
-    'data_content',
+    'quill_data',
     'url',
     'image',
     'archived',
@@ -216,13 +216,16 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return _.find(this.primaryDataset.data_source_id, { type: 'Collection' })
   }
 
-  API_updateWithoutSync({ cancel_sync } = {}) {
+  API_updateWithoutSync({ cancel_sync = false, highlight = false } = {}) {
     const { apiStore } = this
     const data = this.toJsonApi()
     // Turn off syncing when saving the item to not reload the page
     if (cancel_sync) data.cancel_sync = true
+    let endpoint = `items/${this.id}`
+    if (highlight) endpoint += '/highlight'
+
     return apiStore
-      .request(`items/${this.id}`, 'PATCH', {
+      .request(endpoint, 'PATCH', {
         data,
       })
       .catch(err => {
@@ -233,12 +236,56 @@ class Item extends SharedRecordMixin(BaseRecord) {
   API_pingCollection() {
     return this.apiStore.request(`items/${this.id}/ping_collection`)
   }
+
+  async API_persistHighlight({ commentId, delta } = {}) {
+    // pick up "new" highlights that are currently in our quillEditor
+    _.each(delta.ops, op => {
+      if (op.attributes && op.attributes.commentHighlight === 'new') {
+        op.attributes = {
+          // replace them with persisted comment id
+          commentHighlight: commentId,
+        }
+      }
+    })
+    // now set this local quill_data to have the new highlight + commentId
+    this.quill_data = delta
+    await this.API_updateWithoutSync({
+      cancel_sync: true,
+      highlight: true,
+    })
+    return
+  }
+
+  // NOTE: this may be unnecessary now, based on how we now clear out new highlights
+  removeNewHighlights = (delta = this.quill_data) => {
+    let justAddedHighlight = false
+    _.each(delta.ops, op => {
+      // don't persist any unpersisted comment highlights
+      if (op.attributes && op.attributes.commentHighlight === 'new') {
+        justAddedHighlight = true
+        delete op['attributes']
+      }
+    })
+    return justAddedHighlight
+  }
+
+  hasHighlightFormatting = (delta = this.quill_data) => {
+    let found = false
+    _.each(delta.ops, op => {
+      // could include commentHighlight === false
+      if (op.attributes && _.keys(op.attributes, 'commentHighlight')) {
+        found = true
+      }
+    })
+    return found
+  }
 }
 
 Item.defaults = {
-  data_content: '',
+  quill_data: { ops: [] },
   can_edit: false,
   thumbnail_url: '',
+  version: 0,
 }
 Item.refDefaults = {
   roles: {

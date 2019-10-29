@@ -163,6 +163,6 @@ Then(
 
 Then('I should see {int} active user(s)', num => {
   cy.locateDataOrClass('.MuiCollapse-wrapperInner')
-    .children()
+    .children('div')
     .should('have.length', num)
 })

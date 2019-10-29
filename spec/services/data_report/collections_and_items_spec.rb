@@ -132,8 +132,10 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
       before do
         create_list(:activity, 1, target: parent_collection, action: :created, created_at: 2.months.ago, organization: organization)
         create_list(:activity, 5, target: parent_collection, action: :viewed, created_at: 2.months.ago, organization: organization)
-        # same actor did this activity twice
+        # same actor edited twice
         create_list(:activity, 2, target: child_collection, action: :edited, actor: actor, organization: organization)
+        # same actor viewed three times
+        create_list(:activity, 3, target: child_collection, action: :viewed, actor: actor, organization: organization)
         create_list(:activity, 4, target: child_collection, action: :viewed, organization: organization)
         create_list(:activity, 3, target: child_child_collection, action: :edited, organization: organization)
         create_list(:activity, 3, target: child_child_collection, action: :viewed, organization: organization)
@@ -168,16 +170,18 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
         end
       end
 
-      context 'with a viewers measure' do
+      context 'calculating viewers' do
         let(:dataset_params) do
           {
             data_source: parent_collection,
             measure: 'viewers',
           }
         end
+        before do
+        end
 
         it 'calculates the number of viewers in the collection, child collections, and items in those collections' do
-          expect(report.single_value).to eq 14
+          expect(report.single_value).to eq 15
         end
 
         context 'with child data source' do
@@ -189,7 +193,22 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
           end
 
           it 'calculates the number of viewers in a child collection, and the items in that collection' do
-            expect(report.single_value).to eq 9
+            expect(report.single_value).to eq 10
+          end
+        end
+
+        context 'with views measure' do
+          let(:dataset_params) do
+            {
+              data_source: child_collection,
+              measure: 'views',
+            }
+          end
+
+          it 'calculates the number of views (not unique by actor)' do
+            # should only count views of this exact collection (4 + 3 created above), not subcollections
+            expect(child_collection.activities.where_viewed.count).to eq 7
+            expect(report.single_value).to eq 7
           end
         end
 
@@ -271,6 +290,39 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
           # the rest are more recent
           expect(values.last[:value]).to eq 8
         end
+
+        context 'with a group filter' do
+          # just to make sure it works properly, actor should include members of subgroups
+          let!(:subgroup) { create(:group, organization: organization, add_members: [actor]) }
+          let!(:group) { create(:group, add_subgroups: [subgroup]) }
+          let!(:other_group) { create(:group) }
+
+          context 'with a participant within the group' do
+            before do
+              dataset.update(
+                groupings: [{ type: 'Group', id: group.id }],
+              )
+            end
+            it 'should count the activities by the group participants' do
+              values = report.call
+              # should just be the record of our one actor
+              expect(values.count).to eq 1
+              expect(values.first[:value]).to eq 1
+            end
+          end
+
+          context 'with no participants within the group' do
+            before do
+              dataset.update(
+                groupings: [{ type: 'Group', id: other_group.id }],
+              )
+            end
+            it 'should not return any activities' do
+              values = report.call
+              expect(values.count).to eq 0
+            end
+          end
+        end
       end
 
       context 'with a viewer measure and a timeframe' do
@@ -287,7 +339,7 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
           # we created one activity in the first month
           expect(values.first[:value]).to eq 5
           # the rest are more recent
-          expect(values.last[:value]).to eq 9
+          expect(values.last[:value]).to eq 10
         end
       end
 

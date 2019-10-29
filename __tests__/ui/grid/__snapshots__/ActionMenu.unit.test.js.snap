@@ -12,6 +12,11 @@ exports[`ActionMenu as editor renders snapshot 1`] = `
   menuItems={
     Array [
       Object {
+        "iconRight": <CommentIcon />,
+        "name": "Comment",
+        "onClick": [Function],
+      },
+      Object {
         "iconRight": <DuplicateIcon />,
         "name": "Duplicate",
         "onClick": [Function],

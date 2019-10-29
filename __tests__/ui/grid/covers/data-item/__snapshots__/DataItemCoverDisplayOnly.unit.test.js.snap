@@ -18,7 +18,6 @@ exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
       ],
       "can_edit": false,
       "can_view": true,
-      "data_content": null,
       "datasets": Array [
         Object {
           "chart_type": "area",
@@ -143,6 +142,7 @@ exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
         "width": 1,
       },
       "primaryDataset": [MockFunction],
+      "quill_data": null,
       "report_type": "report_type_record",
       "secondaryDatasets": [MockFunction],
       "type": "Item::DataItem",
@@ -175,7 +175,6 @@ exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
         ],
         "can_edit": false,
         "can_view": true,
-        "data_content": null,
         "datasets": Array [
           Object {
             "chart_type": "area",
@@ -300,6 +299,7 @@ exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
           "width": 1,
         },
         "primaryDataset": [MockFunction],
+        "quill_data": null,
         "report_type": "report_type_record",
         "secondaryDatasets": [MockFunction],
         "type": "Item::DataItem",

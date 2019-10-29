@@ -24,11 +24,15 @@ class RecordSearch extends React.Component {
         return
       }
       const tags = props.searchTags.map(tag => `#${tag}`).join(' ')
-      props.apiStore
-        .searchCollections({
+      const params = _.merge(
+        {
           query: `${tags} ${term}`,
           per_page: 30,
-        })
+        },
+        props.searchParams
+      )
+      props.apiStore
+        .searchCollections(params)
         .then(res => res.data.filter(props.searchFilter))
         .then(records =>
           props.onSearch
@@ -70,6 +74,7 @@ RecordSearch.propTypes = {
   initialLoadAmount: PropTypes.number,
   searchFilter: PropTypes.func,
   searchTags: PropTypes.arrayOf(PropTypes.string),
+  searchParams: MobxPropTypes.objectOrObservableObject,
 }
 
 RecordSearch.wrappedComponent.propTypes = {
@@ -81,6 +86,7 @@ RecordSearch.defaultProps = {
   initialLoadAmount: 0,
   searchFilter: r => r,
   searchTags: [],
+  searchParams: null,
 }
 
 export default RecordSearch

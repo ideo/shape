@@ -41,6 +41,7 @@ export const Heading2 = styled.h2`
   font-weight: ${v.weights.medium};
   letter-spacing: 0.14375rem;
   color: ${v.colors.black};
+  ${props => props.mb && `margin-bottom: ${props.mb};`}
 `
 Heading2.displayName = 'Heading2'
 
@@ -207,6 +208,8 @@ CardHeading.displayName = 'CardHeading'
 
 export const TextItemHeading1Css = css`
   ${CardHeadingCss};
+  /* need to preserve spaces in text items */
+  white-space: pre-wrap;
 
   && {
     color: ${v.colors.black};
@@ -267,6 +270,21 @@ export const QuillStyleWrapper = styled.div`
 
     a {
       color: ${v.colors.ctaPrimary};
+    }
+
+    /* NOTE: this is our test of custom highlights */
+    sub {
+      vertical-align: baseline;
+      font-size: inherit;
+      background: ${v.colors.highlightInactive};
+    }
+
+    sub[data-comment-id='new'] {
+      background: ${v.colors.highlightActive};
+    }
+
+    sub.highlightActive {
+      background: ${v.colors.highlightActive};
     }
 
     @keyframes blink-animation {

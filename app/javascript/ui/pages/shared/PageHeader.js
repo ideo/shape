@@ -16,7 +16,7 @@ import SystemIcon from '~/ui/icons/SystemIcon'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
 import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
-import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
+import CollectionCardsTagEditorModal from '~/ui/pages/shared/CollectionCardsTagEditorModal'
 import { StyledHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import { FormButton } from '~/ui/global/styled/buttons'
 import { SubduedHeading1 } from '~/ui/global/styled/typography'
@@ -63,7 +63,7 @@ const HeaderButtonContainer = styled.span`
   margin-top: 10px;
 `
 
-@inject('uiStore')
+@inject('uiStore', 'apiStore')
 @observer
 class PageHeader extends React.Component {
   @observable
@@ -352,6 +352,15 @@ class PageHeader extends React.Component {
     return null
   }
 
+  get cardsForTagging() {
+    const { apiStore, record } = this.props
+    if (apiStore.selectedCards.length > 0) {
+      return apiStore.selectedCards
+    } else {
+      return [record.parent]
+    }
+  }
+
   render() {
     const { record, uiStore } = this.props
     const tagEditorOpen =
@@ -423,9 +432,9 @@ class PageHeader extends React.Component {
             )}
           </div>
         </MaxWidthContainer>
-        <TagEditorModal
+        <CollectionCardsTagEditorModal
           canEdit={this.canEdit}
-          record={record}
+          cards={this.cardsForTagging}
           open={tagEditorOpen}
         />
       </StyledHeader>
@@ -438,6 +447,7 @@ PageHeader.propTypes = {
 }
 
 PageHeader.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 

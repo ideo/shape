@@ -62,14 +62,49 @@ RSpec.describe CardMover, type: :service do
         end
       end
 
-      it 'should recalculate breadcrumbs' do
-        card = moving_cards.first
-        card.item.recalculate_breadcrumb!
-        expect {
+      context 'with item breadcrumbs' do
+        it 'should recalculate breadcrumbs' do
+          card = moving_cards.first
+          card.item.recalculate_breadcrumb!
+          expect {
+            card_mover.call
+          }.to change(card.item, :breadcrumb)
+          # double check that breadcrumb is showing the new collection
+          expect(card.item.breadcrumb.first).to eq to_collection.id
+        end
+      end
+
+      context 'with subcollection breadcrumbs' do
+        let!(:child_collection) do
+          create(
+            :collection,
+            parent_collection: from_collection,
+            num_cards: 2,
+            record_type: :collection,
+            roles_anchor_collection: nil,
+            add_editors: [user],
+          )
+        end
+
+        before do
+          moving_cards.reload
+        end
+
+        it 'should recalculate breadcrumbs' do
+          expect {
+            card_mover.call
+            child_collection.reload
+          }.to change(child_collection, :breadcrumb)
+          # double check that breadcrumb is showing the new collection
+          expect(child_collection.breadcrumb.first).to eq to_collection.id
+        end
+
+        it 'should calculate correct roles_anchor' do
           card_mover.call
-        }.to change(card.item, :breadcrumb)
-        # double check that breadcrumb is showing the new collection
-        expect(card.item.breadcrumb.first).to eq to_collection.id
+          child_collection.reload
+          expect(child_collection.roles_anchor_collection_id).to eq to_collection.id
+          expect(child_collection.collections.first.roles_anchor_collection_id).to eq to_collection.id
+        end
       end
 
       context 'with private record' do
@@ -80,7 +115,6 @@ RSpec.describe CardMover, type: :service do
           record.unanchor_and_inherit_roles_from_anchor!
           user.remove_role(Role::EDITOR, record)
           card.record.update(cached_inheritance: { private: true })
-          puts "card.record #{card.record.cached_inheritance}"
         end
 
         it 'should not assign permissions' do
@@ -186,15 +220,26 @@ RSpec.describe CardMover, type: :service do
         end
 
         context 'moving into a master template' do
+          let!(:child_collection) do
+            create(:collection, parent_collection: from_collection, num_cards: 2, record_type: :collection)
+          end
+          let!(:child_subcollection_cards) do
+            create_list(:collection_card_text, 2, parent: child_collection.collections.first)
+          end
           before do
             to_collection.update(master_template: true)
           end
 
-          it 'should pin all cards if moving to a normal collection' do
+          it 'should pin all cards if moving from a normal collection' do
             card_mover.call
             to_collection.reload
-            expect(to_collection.collection_cards.count).to eq 6
+            expect(to_collection.collection_cards.count).to eq 7
             expect(to_collection.collection_cards.all?(&:pinned?)).to be true
+            subcollection = to_collection.collections.first
+            expect(subcollection.collection_cards.all?(&:pinned)).to be true
+            # subcollection should now be a subtemplate
+            expect(subcollection.master_template?).to be true
+            expect(subcollection.collections.first.master_template?).to be true
           end
         end
       end

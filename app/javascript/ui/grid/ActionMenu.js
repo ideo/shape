@@ -10,6 +10,7 @@ import DuplicateIcon from '~/ui/icons/DuplicateIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import MoveIcon from '~/ui/icons/MoveIcon'
 import ReplaceIcon from '~/ui/icons/ReplaceIcon'
+import CommentIcon from '~/ui/icons/CommentIcon'
 import PrintIcon from '~/ui/icons/PrintIcon'
 import SharingIcon from '~/ui/icons/SharingIcon'
 import SubmissionBoxIconSm from '~/ui/icons/SubmissionBoxIconSm'
@@ -17,7 +18,7 @@ import PopoutMenu from '~/ui/global/PopoutMenu'
 import TagIcon from '~/ui/icons/TagIcon'
 import TrashIconXl from '~/ui/icons/TrashIconXl'
 
-@inject('uiStore')
+@inject('uiStore', 'apiStore')
 @observer
 class ActionMenu extends React.Component {
   @observable
@@ -146,6 +147,14 @@ class ActionMenu extends React.Component {
     return uiStore.viewingCollection.id
   }
 
+  addComment = async () => {
+    const { apiStore, uiStore, card } = this.props
+    const { record } = card
+
+    apiStore.openCurrentThreadToCommentOn(record)
+    uiStore.closeCardMenu()
+  }
+
   get menuItems() {
     const {
       canView,
@@ -160,6 +169,11 @@ class ActionMenu extends React.Component {
     const { record } = card
 
     const actions = [
+      {
+        name: 'Comment',
+        iconRight: <CommentIcon />,
+        onClick: this.addComment,
+      },
       {
         name: 'Duplicate',
         iconRight: <DuplicateIcon />,
@@ -184,14 +198,14 @@ class ActionMenu extends React.Component {
         onClick: this.showRolesMenu,
       },
       {
-        name: 'Delete',
-        iconRight: <TrashIconXl />,
-        onClick: this.archiveCard,
-      },
-      {
         name: 'Replace',
         iconRight: <ReplaceIcon />,
         onClick: this.replaceCard,
+      },
+      {
+        name: 'Delete',
+        iconRight: <TrashIconXl />,
+        onClick: this.archiveCard,
       },
     ]
     actions.forEach(actionItem => {
@@ -221,7 +235,12 @@ class ActionMenu extends React.Component {
         items = _.reject(items, { name: 'Move' })
       }
     } else {
-      const viewActions = ['Link', 'Add to My Collection', 'Download']
+      const viewActions = [
+        'Comment',
+        'Link',
+        'Add to My Collection',
+        'Download',
+      ]
       if (canView) {
         viewActions.unshift('Duplicate')
       }
@@ -286,6 +305,7 @@ class ActionMenu extends React.Component {
       items = _.reject(items, { name: 'Add to My Collection' })
       items = _.reject(items, { name: 'Sharing' })
     }
+    // items.unshift(_.find(actions, { name: 'Comment' }))
 
     return items
   }
@@ -346,6 +366,7 @@ ActionMenu.propTypes = {
 }
 ActionMenu.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 ActionMenu.displayName = 'ActionMenu'
 
