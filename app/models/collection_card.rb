@@ -115,6 +115,7 @@ class CollectionCard < ApplicationRecord
         :filestack_file,
         :datasets,
         :translations,
+        :parent_collection_card,
         collection_cover_items: :datasets,
       ],
     ]

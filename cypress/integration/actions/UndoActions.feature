@@ -32,6 +32,7 @@ Feature: Undo actions
 
     # Testing undoing resizing collections, rename, and navigations
     When I create a normal collection named "Hello World"
+    And I wait for 1 second
     And I resize the last card to 2x2
     Then I should see the last of 3 cards as 2x2
 

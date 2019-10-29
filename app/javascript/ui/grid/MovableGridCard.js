@@ -626,6 +626,7 @@ class MovableGridCard extends React.PureComponent {
     let _zIndex = 1
     if (!moveComplete) _zIndex = cardDragging
     if (uiStore.cardMenuOpen.id === card.id) {
+      // TODO: decouple context menus from GridCard so they can have their own z-index?
       _zIndex = aboveClickWrapper
     }
     let transform = `translateZ(0) scale(${1 / zoomLevel})`

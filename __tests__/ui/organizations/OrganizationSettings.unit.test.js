@@ -1,4 +1,5 @@
 import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
+import TagEditor from '~/ui/pages/shared/TagEditor.js'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import { FormButton } from '~/ui/global/styled/buttons'
@@ -34,10 +35,9 @@ describe('OrganizationSettings', () => {
     })
 
     it('renders the page with TagEditor for domain whitelist', () => {
-      expect(wrapper.find('TagEditor').props().record).toEqual(organization)
-      expect(wrapper.find('TagEditor').props().tagField).toEqual(
-        'domain_whitelist'
-      )
+      const tagEditor = wrapper.find(TagEditor)
+      expect(tagEditor.props().records).toEqual([organization])
+      expect(tagEditor.props().tagField).toEqual('domain_whitelist')
     })
 
     it('should render a checkbox to add custom terms', () => {

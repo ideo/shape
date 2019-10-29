@@ -26,6 +26,7 @@ import OverdueBanner from '~/ui/layout/OverdueBanner'
 import routeToLogin from '~/utils/routeToLogin'
 import CreateOrgPage from '~/ui/pages/CreateOrgPage'
 import { Helmet } from 'react-helmet'
+
 // more global way to do this?
 pluralize.addPluralRule(/canvas$/i, 'canvases')
 
@@ -286,7 +287,7 @@ class CollectionPage extends React.Component {
       }
       if (data.data && data.data.item) {
         const { item } = data.data
-        if (item && item.data_content) {
+        if (item && item.quill_data) {
           this.handleTextItemUpdate(item, data.current_editor)
           return
         }
@@ -307,7 +308,7 @@ class CollectionPage extends React.Component {
       ) {
         return
       }
-      localItem.data_content = item.data_content
+      localItem.quill_data = item.quill_data
     } else {
       // we don't have the item, it must be a new card that we need to fetch
       this.reloadData()
