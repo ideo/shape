@@ -166,7 +166,7 @@ class Modal extends React.Component {
     // TODO progamatically set disableAutoFocus
     return (
       <StyledDialog
-        classes={{ paper: [`modal__paper ${scrollVisibleClass}`] }}
+        classes={{ paper: `modal__paper ${scrollVisibleClass}` }}
         disableAutoFocus
         open={open}
         onClose={this.handleclose}

@@ -1,5 +1,4 @@
 import TagEditor, { tagsInCommon } from '~/ui/pages/shared/TagEditor'
-import fakeApiStore from '#/mocks/fakeApiStore'
 import { fakeCollection } from '#/mocks/data'
 
 let wrapper, props, records, afterAddTag, afterRemoveTag
@@ -8,16 +7,14 @@ describe('TagEditor', () => {
     records = [fakeCollection]
     afterAddTag = jest.fn()
     afterRemoveTag = jest.fn()
-    const apiStore = fakeApiStore()
     props = {
       records,
       afterAddTag,
       afterRemoveTag,
-      apiStore,
       canEdit: true,
       tagField: 'tag_list',
     }
-    wrapper = shallow(<TagEditor.wrappedComponent {...props} />)
+    wrapper = shallow(<TagEditor {...props} />)
   })
 
   it('renders ReactTags with records[tagField]', () => {
