@@ -1,11 +1,24 @@
 import PropTypes from 'prop-types'
-import { action, observable, runInAction } from 'mobx'
+import { action, observable } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+
 import _ from 'lodash'
 import ReactTags from 'react-tag-autocomplete'
 
 import Pill from '~/ui/global/Pill'
 import StyledReactTags from './StyledReactTags'
+
+export const tagsInCommon = (records, tagField) => {
+  const tags = []
+  records.forEach(record => {
+    // Include records with and without tags,
+    // because they are used to find if records share tags in common
+    tags.push(record[tagField])
+  })
+  // Intersection needs each array as separate arguments,
+  // which is why apply is used
+  return _.intersection.apply(null, tags)
+}
 
 @observer
 class TagEditor extends React.Component {
@@ -16,20 +29,20 @@ class TagEditor extends React.Component {
 
   constructor(props) {
     super(props)
-    this.saveTags = _.debounce(this._saveTags, 1000)
-    if (!props.record[props.tagField]) {
-      // should be some kind of error if tagField doesn't exist
-      props.record[props.tagField] = []
-    }
-    this.initTags(props.record[props.tagField])
+    this.initTagFields(props.records, props.tagField)
   }
 
   componentWillReceiveProps(nextProps) {
-    this.initTags(nextProps.record[nextProps.tagField])
+    this.initTagFields(nextProps.records, nextProps.tagField)
   }
 
-  componentWillUnmount() {
-    this.saveTags.flush()
+  initTagFields(records, tagField) {
+    records.forEach(record => {
+      // should be some kind of error if tagField doesn't exist
+      if (!record[tagField]) record[tagField] = []
+    })
+    // Init with tags that are shared across all records
+    this.initTags(tagsInCommon(records, tagField))
   }
 
   createFormattedTag(id, label) {
@@ -43,58 +56,57 @@ class TagEditor extends React.Component {
   }
 
   @action
-  initTags = tags => {
+  initTags = tagArray => {
     // `id` is used by react-tag-autocomplete, but otherwise doesn't hold any meaning
-    this.tags = _.map([...tags], (t, i) => this.createFormattedTag(i, t))
-  }
-
-  _saveTags = async () => {
-    const { record, tagField, afterSave } = this.props
-    record[tagField] = _.map([...this.tags], t => t.name).join(',')
-    await record.patch()
-    if (afterSave) afterSave()
+    this.tags = _.map([...tagArray], (t, i) => this.createFormattedTag(i, t))
   }
 
   @action
   handleAddition = tagData => {
-    const { validate } = this.props
+    const { validateTag, records, tagField, afterAddTag } = this.props
     tagData.name = tagData.name.trim()
-    const tag = this.createFormattedTag(tagData.id, tagData.name)
+    const newTag = this.createFormattedTag(tagData.id, tagData.name)
     this.error = ''
-    if (validate === 'domain') {
-      const matches = tag.name.match(/([a-z])([a-z0-9]+\.)*[a-z0-9]+\.[a-z.]+/g)
-      if (!matches) {
-        this.error = 'Invalid domain. Please use the format: domain.com'
+
+    // Return if tag is a duplicate
+    if (this.tags.find(t => t.name === newTag.name)) return
+
+    // If a validateTag function is provided, validate tag
+    if (validateTag) {
+      const { tag, error } = validateTag(newTag.name)
+      if (error) {
+        this.error = error
         return
+      } else {
+        newTag.name = tag
       }
-      tag.name = _.first(matches)
     }
-    const found = this.tags.find(t => t.name === tag.name)
-    if (!found) {
-      this.tags.push(tag)
-      this.saveTags()
-    } else {
-      // tag already exists, don't add to the list.
-      // Any error/message in the UI needed?
-    }
+    this.tags.push(newTag)
+    records.forEach(record => {
+      record[tagField].push(newTag.name)
+    })
+    afterAddTag(newTag.name)
   }
 
   @action
-  handleDelete = i => ev => {
-    runInAction(() => {
-      this.tags.remove(this.tags[i])
-      this.saveTags()
+  handleDelete = tagIndex => () => {
+    const { records, tagField, afterRemoveTag } = this.props
+    const tag = this.tags[tagIndex]
+    this.tags.remove(tag)
+    records.forEach(record => {
+      record[tagField].remove(tag.name)
     })
+    afterRemoveTag(tag.name)
   }
 
-  readOnlyTags = () => {
-    const { record, tagField } = this.props
-    if (!record[tagField].length) {
+  // This is displayed instead of the tag input if the user cannot edit the tags
+  readonlyTags = () => {
+    if (this.tags.length === 0) {
       return 'No tags added.'
     }
-    const inner = record[tagField].map(tag => (
-      <div key={tag} className="react-tags__selected-tag read-only">
-        <span className="react-tags__selected-tag-name">{tag}</span>
+    const inner = this.tags.map(tag => (
+      <div key={tag.id} className="react-tags__selected-tag read-only">
+        <span className="react-tags__selected-tag-name">{tag.name}</span>
       </div>
     ))
     return <div className="react-tags__selected">{inner}</div>
@@ -105,7 +117,7 @@ class TagEditor extends React.Component {
 
     return (
       <StyledReactTags tagColor={tagColor}>
-        {!canEdit && this.readOnlyTags()}
+        {!canEdit && this.readonlyTags()}
         {canEdit && (
           <ReactTags
             tags={[...this.tags]}
@@ -124,21 +136,24 @@ class TagEditor extends React.Component {
   }
 }
 
+TagEditor.displayName = 'TagEditor'
+
 TagEditor.propTypes = {
-  record: MobxPropTypes.objectOrObservableObject.isRequired,
-  canEdit: PropTypes.bool,
+  records: PropTypes.arrayOf(MobxPropTypes.objectOrObservableObject).isRequired,
+  afterAddTag: PropTypes.func.isRequired,
+  afterRemoveTag: PropTypes.func.isRequired,
   tagField: PropTypes.string.isRequired,
+  canEdit: PropTypes.bool,
   tagColor: PropTypes.string,
   placeholder: PropTypes.string,
-  validate: PropTypes.string,
-  afterSave: PropTypes.func,
+  validateTag: PropTypes.func,
 }
+
 TagEditor.defaultProps = {
   canEdit: false,
   tagColor: 'gray',
   placeholder: 'Add new tags, separated by comma or pressing enter.',
-  validate: null,
-  afterSave: null,
+  validateTag: null,
 }
 
 export default TagEditor

@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import ActionMenu from '~/ui/grid/ActionMenu'
 import fakeUiStore from '#/mocks/fakeUiStore'
+import fakeApiStore from '#/mocks/fakeApiStore'
 import { fakeCollection, fakeCollectionCard } from '#/mocks/data'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
@@ -13,6 +14,7 @@ const props = {
   canEdit: false,
   canReplace: false,
   menuOpen: false,
+  apiStore: fakeApiStore(),
 }
 
 let wrapper, allActions, actions, component
@@ -20,6 +22,7 @@ describe('ActionMenu', () => {
   describe('as editor', () => {
     beforeEach(() => {
       allActions = [
+        'Comment',
         'Duplicate',
         'Move',
         'Link',
@@ -116,6 +119,7 @@ describe('ActionMenu', () => {
   describe('as content editor with pinned card', () => {
     beforeEach(() => {
       actions = [
+        'Comment',
         'Duplicate',
         'Link',
         'Add to My Collection',
@@ -138,7 +142,14 @@ describe('ActionMenu', () => {
 
   describe('as viewer', () => {
     beforeEach(() => {
-      actions = ['Duplicate', 'Link', 'Add to My Collection', 'Tags', 'Sharing']
+      actions = [
+        'Comment',
+        'Duplicate',
+        'Link',
+        'Add to My Collection',
+        'Tags',
+        'Sharing',
+      ]
       wrapper = shallow(
         <ActionMenu.wrappedComponent
           {...props}
@@ -177,7 +188,7 @@ describe('ActionMenu', () => {
 
   describe('as editor of a system required record', () => {
     beforeEach(() => {
-      actions = ['Move', 'Link', 'Add to My Collection', 'Sharing']
+      actions = ['Comment', 'Move', 'Link', 'Add to My Collection', 'Sharing']
       props.card.record.system_required = true
       props.card.isPinnedAndLocked = false
       wrapper = shallow(
@@ -198,6 +209,7 @@ describe('ActionMenu', () => {
   describe('as editor of a record that you can move', () => {
     beforeEach(() => {
       actions = [
+        'Comment',
         'Duplicate',
         'Move',
         'Link',
@@ -245,8 +257,9 @@ describe('ActionMenu', () => {
 
     it('should only render tags and sharing', () => {
       const popout = wrapper.find('PopoutMenu').at(0)
-      expect(popout.props().menuItems.length).toEqual(2)
+      expect(popout.props().menuItems.length).toEqual(3)
       expect(_.map(popout.props().menuItems, i => i.name)).toEqual([
+        'Comment',
         'Download',
         'Tags',
       ])

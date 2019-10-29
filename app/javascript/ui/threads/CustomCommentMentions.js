@@ -136,10 +136,8 @@ export const StyledCommentInput = styled.div`
 `
 
 export const CustomMentionSuggestion = props => {
-  const {
-    mention, // eslint-disable-line react/prop-types
-    ...parentProps
-  } = props
+  // eslint-disable-next-line no-unused-vars
+  const { mention, isFocused, searchValue, ...parentProps } = props
 
   return (
     <div {...parentProps}>

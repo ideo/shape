@@ -100,7 +100,7 @@ class TextItemCover extends React.Component {
     // store item content for later undo action
     item.pushUndo({
       snapshot: {
-        data_content: this.state.item.data_content,
+        quill_data: this.state.item.quill_data,
       },
       message: 'Text undone!',
       redirectTo: uiStore.viewingCollection,
@@ -140,22 +140,8 @@ class TextItemCover extends React.Component {
       return
     }
     // save final updates and broadcast to collection
-    item.API_updateWithoutSync()
+    item.API_updateWithoutSync({ cancel_sync: true })
 
-    // TODO figure out why ref wasn't working
-    // eslint-disable-next-line react/no-find-dom-node
-    const node = ReactDOM.findDOMNode(this)
-    node.scrollTop = 0
-  }
-
-  save = async (item, { cancel_sync = true } = {}) => {
-    this.setState({ loading: true })
-    await item.API_updateWithoutSync({ cancel_sync })
-    this.clearTextEditingItem()
-    if (this.unmounted) {
-      return
-    }
-    this.setState({ loading: false, item })
     // TODO figure out why ref wasn't working
     // eslint-disable-next-line react/no-find-dom-node
     const node = ReactDOM.findDOMNode(this)
@@ -163,11 +149,11 @@ class TextItemCover extends React.Component {
   }
 
   checkTextAreaHeight = height => {
-    if (!this.quillEditor) return
+    if (!this.reactQuillRef) return
     if (this.props.hideReadMore) return
     // The height of the editor is constrained to the container,
     // we must get the .ql-editor div to calculate text height
-    const qlEditor = this.quillEditor.editingArea.getElementsByClassName(
+    const qlEditor = this.reactQuillRef.editingArea.getElementsByClassName(
       'ql-editor'
     )[0]
     const textAreaHeight = qlEditor ? qlEditor.scrollHeight : 0
@@ -179,12 +165,21 @@ class TextItemCover extends React.Component {
     }
   }
 
+  get quillEditor() {
+    const { reactQuillRef } = this
+    if (!reactQuillRef) return
+
+    return reactQuillRef.getEditor()
+  }
+
   renderEditing() {
     const { item } = this.state
-    const { initialFontTag } = this.props
+    const { initialFontTag, cardId } = this.props
     if (!item) return ''
+
     return (
       <RealtimeTextItem
+        cardId={cardId}
         item={item}
         currentUserId={apiStore.currentUser.id}
         onExpand={item.id ? this.expand : null}
@@ -197,15 +192,22 @@ class TextItemCover extends React.Component {
   }
 
   renderDefault() {
-    const { item } = this.props
-    const textData = item.toJSON().data_content
+    const { item, cardId } = this.props
+    const textData = item.toJSON().quill_data
     const quillProps = {
       // ref is used to get the height of the div in checkTextAreaHeight
       ref: c => {
-        this.quillEditor = c
+        this.reactQuillRef = c
       },
       readOnly: true,
-      onChangeSelection: (range, selection, editor) => null,
+      onChangeSelection: (range, source, editor) => {
+        const { quillEditor } = this
+        uiStore.selectTextRangeForCard({
+          range,
+          quillEditor,
+          cardId,
+        })
+      },
       theme: null,
     }
 
@@ -215,9 +217,9 @@ class TextItemCover extends React.Component {
   get hasTitleText() {
     const { props } = this
     const { item } = props
-    const { data_content } = item
+    const { quill_data } = item
     let hasTitle = false
-    _.each(data_content.ops, op => {
+    _.each(quill_data.ops, op => {
       if (op.attributes && op.attributes.header === 5) {
         hasTitle = true
       }

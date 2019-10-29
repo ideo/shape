@@ -65,10 +65,6 @@ const StyledDialogTitle = styled(DialogTitle)`
   }
 `
 
-const StyledHeading2 = styled(Heading2)`
-  margin-bottom: 0.35rem;
-`
-
 export const ModalCloseButton = styled.button`
   cursor: pointer;
   display: block;
@@ -164,7 +160,7 @@ class Modal extends React.Component {
     } = this.props
     let wrappedTitle = title
     if (typeof title === 'string') {
-      wrappedTitle = <StyledHeading2>{title}</StyledHeading2>
+      wrappedTitle = <Heading2 mb="0.35rem">{title}</Heading2>
     }
     const scrollVisibleClass = scrollVisible ? 'modal__scroll-visible' : ''
     // TODO progamatically set disableAutoFocus

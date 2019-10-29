@@ -594,6 +594,62 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
   end
 
+  describe 'PATCH #add_tag' do
+    let!(:collection_cards) { create_list(:collection_card_collection, 3, parent: collection) }
+    let(:path) { '/api/v1/collection_cards/add_tag' }
+    let(:raw_params) do
+      {
+        card_ids: collection_cards.map(&:id),
+        tag: 'cats',
+      }
+    end
+    let(:params) { raw_params.to_json }
+
+    before do
+      allow(CollectionCardsAddRemoveTagWorker).to receive(:perform_async)
+    end
+
+    it 'calls CollectionCardsAddRemoveTagWorker' do
+      expect(
+        CollectionCardsAddRemoveTagWorker,
+      ).to receive(:perform_async).with(
+        contain_exactly(*collection_cards.map(&:id)),
+        'cats',
+        :add,
+        user.id,
+      )
+      patch(path, params: params)
+    end
+  end
+
+  describe 'PATCH #remove_tag' do
+    let!(:collection_cards) { create_list(:collection_card_collection, 3, parent: collection) }
+    let(:path) { '/api/v1/collection_cards/remove_tag' }
+    let(:raw_params) do
+      {
+        card_ids: collection_cards.map(&:id),
+        tag: 'parrots',
+      }
+    end
+    let(:params) { raw_params.to_json }
+
+    before do
+      allow(CollectionCardsAddRemoveTagWorker).to receive(:perform_async)
+    end
+
+    it 'calls CollectionCardsAddRemoveTagWorker' do
+      expect(
+        CollectionCardsAddRemoveTagWorker,
+      ).to receive(:perform_async).with(
+        contain_exactly(*collection_cards.map(&:id)),
+        'parrots',
+        :remove,
+        user.id,
+      )
+      patch(path, params: params)
+    end
+  end
+
   describe 'PATCH #move' do
     let!(:from_collection) do
       create(:collection, organization: to_collection.organization, num_cards: 3, add_editors: [user])

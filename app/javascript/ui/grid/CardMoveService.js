@@ -110,6 +110,7 @@ export default class CardMoveService {
         // we actually want to reselect the cards at this point
         uiStore.reselectCardIds(data.collection_card_ids)
       }
+      return true
     } catch (e) {
       uiStore.update('isLoadingMoveAction', false)
       let message = 'You cannot move a collection within itself.'
@@ -117,6 +118,7 @@ export default class CardMoveService {
         message = e.error[0]
       }
       uiStore.alert(message)
+      return false
     }
   }
 

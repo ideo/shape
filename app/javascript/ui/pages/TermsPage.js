@@ -144,7 +144,7 @@ class TermsPage extends React.PureComponent {
         readOnly: true,
         theme: null,
       }
-      const textData = organization.terms_text_item.toJSON().data_content
+      const textData = organization.terms_text_item.toJSON().quill_data
       inner = (
         <div>
           <StyledTitle>{organization.name} Terms of Use</StyledTitle>

@@ -91,10 +91,11 @@ Cypress.Commands.add('createCard', cardType => {
       cy.get('.ql-editor')
         .first()
         .type('Testing')
+      cy.wait(300)
       cy.locate('TextItemClose')
         .first()
         .click({ force: true })
-      cy.wait('@apiCreateCollectionCard')
+      cy.wait('@apiUpdateItem')
       cy.wait(50)
       break
     case 'data':

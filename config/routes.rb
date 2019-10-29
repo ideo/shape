@@ -52,6 +52,7 @@ Rails.application.routes.draw do
           patch 'archive'
           get 'in_my_collection'
           patch 'restore_permissions'
+          patch 'highlight'
         end
         resources :roles, only: %i[index create destroy] do
           collection do
@@ -90,6 +91,8 @@ Rails.application.routes.draw do
           patch 'move'
           patch 'archive'
           patch 'unarchive'
+          patch 'add_tag'
+          patch 'remove_tag'
           get 'unarchive_from_email'
           post 'link'
           post 'duplicate'
@@ -139,6 +142,7 @@ Rails.application.routes.draw do
       resources :comments do
         member do
           get 'replies'
+          patch 'resolve'
         end
       end
       resources :collection_filters, only: %i[update] do
@@ -156,6 +160,7 @@ Rails.application.routes.draw do
         end
         collection do
           get 'find_by_record/:record_type/:record_id', action: 'find_by_record'
+          get 'find_by_comment/:comment_id', action: 'find_by_comment'
         end
       end
       resources :notifications, only: %i[index show update] do
