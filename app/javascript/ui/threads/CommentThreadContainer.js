@@ -96,7 +96,7 @@ class CommentThreadContainer extends React.Component {
     // as well as keeping the current page thread available
     return apiStore.currentThreads.filter(
       t =>
-        t.key === apiStore.currentPageThreadKey ||
+        apiStore.alwaysShowCurrentThread(t.key) ||
         (t.users_thread && t.users_thread.subscribed)
     )
   }
@@ -290,7 +290,6 @@ class CommentThreadContainer extends React.Component {
         style={{
           position: 'absolute',
           top: '32px',
-          zIndex: 500,
           width: '100%',
         }}
       >

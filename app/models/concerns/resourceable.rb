@@ -47,9 +47,12 @@ module Resourceable
       end
     end
 
+    def identifiers
+      select(:id).map(&:resource_identifier)
+    end
+
     # really meant to be used on an AR Relation, where `select` is just the relevant records
     def user_ids
-      identifiers = select(:id).map(&:resource_identifier)
       UsersRole
         .joins(:role)
         .where(Role.arel_table[:resource_identifier].in(identifiers))
@@ -235,9 +238,14 @@ module Resourceable
 
   # Should either be called on a new record, or in MassAssign where it properly modifies children roles
   def unanchor_and_inherit_roles_from_anchor!
+    previous_anchor_id = roles_anchor.id
     # NOTE: these next two steps have to happen back to back
     inherit_roles_from_parent!(roles_anchor)
     unanchor!
+    return unless is_a?(Collection)
+
+    # ensure that any existing children are also updated accordingly
+    reanchor_children!(from: previous_anchor_id, to: id)
     # special case for QuestionItems because they don't really retain any roles
     return unless respond_to? :question_items
 
@@ -254,15 +262,20 @@ module Resourceable
     return unless anchor_id
 
     unmark_as_private!
+    # could be self or whatever this was anchored to
     update_columns(roles_anchor_collection_id: anchor_id, updated_at: Time.current)
     roles.destroy_all
     return unless propagate && is_a?(Collection)
 
+    reanchor_children!(to: anchor_id)
+  end
+
+  def reanchor_children!(from: id, to: roles_anchor.id)
     [Item, Collection].each do |klass|
       klass
         .in_collection(self)
-        .where(roles_anchor_collection_id: id)
-        .update_all(roles_anchor_collection_id: anchor_id, updated_at: Time.current)
+        .where(roles_anchor_collection_id: from)
+        .update_all(roles_anchor_collection_id: to, updated_at: Time.current)
     end
   end
 
@@ -299,7 +312,8 @@ module Resourceable
     true
   end
 
-  def remove_all_viewer_roles
+  def remove_all_viewer_roles!
+    unanchor_and_inherit_roles_from_anchor!
     (viewers[:users] + viewers[:groups]).each do |viewer|
       viewer.remove_role(Role::VIEWER, self)
     end

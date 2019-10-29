@@ -227,7 +227,7 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   // TODO rename searchRecords?
-  searchCollections(params) {
+  searchCollections(params = {}) {
     const defaultParams = { query: '' }
     return this.request(
       `organizations/${this.currentOrgSlug}/search?${queryString.stringify(
@@ -303,6 +303,15 @@ class ApiStore extends jsonapi(datxCollection) {
     })
     thread.importComments(comments)
     this.addCurrentCommentThread(thread.id)
+  }
+
+  @computed
+  get selectedCards() {
+    const { uiStore } = this
+    const { selectedCardIds } = uiStore
+    return this.findAll('collection_cards').filter(
+      card => selectedCardIds.indexOf(card.id) > -1 && card.canEdit
+    )
   }
 
   @computed
@@ -400,9 +409,65 @@ class ApiStore extends jsonapi(datxCollection) {
     this.setCurrentPageThreadKey(null)
   }
 
+  expandAndOpenThreadForRecord(record) {
+    const { uiStore } = this
+    const { viewingRecord } = uiStore
+    if (!viewingRecord) return
+    if (viewingRecord.isUserCollection) {
+      uiStore.alert('Commenting not available from My Collection')
+      uiStore.setCommentingOnRecord(null)
+      return
+    }
+    const thread = this.findThreadForRecord(viewingRecord)
+    uiStore.expandAndOpenThread(thread.key)
+  }
+
+  openCurrentThreadToCommentOn(record) {
+    const { uiStore } = this
+    this.expandAndOpenThreadForRecord(record)
+    if (uiStore.commentingOnRecord !== record) {
+      // when previous thread is not the same as the current thread
+      this.collapseReplies()
+      uiStore.scrollToBottomOfComments()
+    }
+    uiStore.setCommentingOnRecord(record)
+  }
+
+  async openCommentFromHighlight(commentId) {
+    const { uiStore } = this
+
+    const comment = this.find('comments', commentId)
+    let thread = null
+    if (comment) {
+      thread = this.find('comment_threads', comment.comment_thread_id)
+    }
+    if (!thread) {
+      try {
+        const res = await this.request(
+          `comment_threads/find_by_comment/${commentId}`,
+          'GET'
+        )
+        if (res.data && res.data.id) {
+          thread = res.data
+        }
+      } catch (e) {
+        trackError(e, {
+          source: 'openCommentFromHighlight',
+          message: `commentId: ${commentId}`,
+        })
+      }
+    }
+    if (!thread) return false
+
+    uiStore.expandAndOpenThread(thread.key)
+    await thread.API_fetchComments()
+    uiStore.setReplyingToComment(commentId)
+    uiStore.scrollToBottomOfComments(commentId)
+  }
+
   async findOrBuildCommentThread(record) {
-    let thread = this.findThreadForRecord(record)
     this.clearUnpersistedThreads()
+    let thread = this.findThreadForRecord(record)
     // first search for it via API
     try {
       if (!thread) {
@@ -412,7 +477,9 @@ class ApiStore extends jsonapi(datxCollection) {
           `comment_threads/find_by_record/${identifier}`,
           'GET'
         )
-        if (res.data && res.data.id) thread = res.data
+        if (res.data && res.data.id) {
+          thread = res.data
+        }
       }
       if (thread) {
         // make sure to fetch the first page of comments
@@ -456,9 +523,18 @@ class ApiStore extends jsonapi(datxCollection) {
         // don't include any new records that are being constructed
         if (!t.record || !t.record.id) return false
         // include the current page thread even if you're not following
-        if (t.key === this.currentPageThreadKey) return true
+        if (this.alwaysShowCurrentThread(t.key)) {
+          return true
+        }
         return this.currentCommentThreadIds.indexOf(t.id) > -1
       }
+    )
+  }
+
+  alwaysShowCurrentThread(key) {
+    return (
+      key === this.currentPageThreadKey ||
+      key === this.uiStore.expandedThreadKey
     )
   }
 
@@ -468,10 +544,10 @@ class ApiStore extends jsonapi(datxCollection) {
     return this.find('comments', uiStore.replyingToCommentId)
   }
 
-  collapseReplies() {
+  async collapseReplies() {
     const { uiStore, replyingToComment } = this
     if (replyingToComment) {
-      replyingToComment.resetReplies()
+      await replyingToComment.resetReplies()
       uiStore.setReplyingToComment(null)
     }
   }
@@ -502,20 +578,6 @@ class ApiStore extends jsonapi(datxCollection) {
     const all = [...acc, ...res.data]
     if (links.last === page) return all
     return this.fetchAllPages(url, page + 1, all)
-  }
-
-  async fetchUsableTemplates() {
-    let q = `#template`
-    q = _.trim(q)
-      .replace(/\s/g, '+')
-      .replace(/#/g, '%23')
-    // TODO: pagination?
-    const templates = await this.fetchAllPages(
-      `organizations/${this.currentOrgSlug}/search?query=${q}&per_page=50`
-    )
-    runInAction(() => {
-      this.usableTemplates = templates.filter(c => c.isUsableTemplate)
-    })
   }
 
   async archiveCards({ cardIds, collection, undoable = true }) {
@@ -570,8 +632,15 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   async moveCards(data, { undoSnapshot = {} } = {}) {
-    // trigger card_mover in backend
-    const res = await this.request('collection_cards/move', 'PATCH', data)
+    let res
+    try {
+      // trigger card_mover in backend
+      res = await this.request('collection_cards/move', 'PATCH', data)
+    } catch (e) {
+      // throw to be caught by CardMoveService
+      throw e
+      return
+    }
     const toCollection = this.find('collections', data.to_id)
     // revert data if undoing card move
     if (!_.isEmpty(undoSnapshot)) {
@@ -633,7 +702,14 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   async duplicateCards(data) {
-    const res = await this.request('collection_cards/duplicate', 'POST', data)
+    let res
+    try {
+      res = await this.request('collection_cards/duplicate', 'POST', data)
+    } catch (e) {
+      // throw to be caught by CardMoveService
+      throw e
+      return
+    }
     const collection = this.find('collections', data.to_id)
     this.undoStore.pushUndoAction({
       message: 'Duplicate undone',

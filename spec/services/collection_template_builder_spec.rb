@@ -69,8 +69,18 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
     context 'when parent is a master_template' do
       let(:parent) { create(:collection, master_template: true) }
 
-      it 'should pin the collection instance' do
-        expect(instance.parent_collection_card.pinned?).to be true
+      it 'should not create an instance' do
+        expect(builder.call).to be false
+      end
+    end
+
+    context 'with a foamcore collection inside' do
+      let!(:foamcore_child) { create(:board_collection, master_template: true, parent_collection: template) }
+      let(:foamcore_instance) { instance.collections.first }
+
+      it 'should create an instance of the foamcore master template' do
+        expect(foamcore_instance.templated?).to be true
+        expect(foamcore_instance.is_a?(Collection::Board)).to be true
       end
     end
 
@@ -148,6 +158,50 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
         expect(test_instance.is_a?(Collection::TestCollection)).to be true
         # test should point to the new instance parent
         expect(test_instance.collection_to_test).to eq(instance)
+      end
+    end
+
+    context 'with potential recursive loop' do
+      let!(:collection) { create(:collection, master_template: true, num_cards: 2, pin_cards: true) }
+      let!(:other_collection) { create(:collection) }
+
+      before do
+        Sidekiq::Testing.inline!
+        ENV['SKIP_NETWORK_ACTIONS'] = 'true'
+
+        CollectionTemplateBuilder.call(
+          parent: other_collection,
+          template: collection,
+        )
+        c1 = CollectionTemplateBuilder.call(
+          parent: other_collection,
+          template: collection,
+        )
+        # cheat and move this one inside the parent anyway, to simulate bad issue
+        c1.parent_collection_card.update(parent: collection, pinned: true)
+      end
+
+      after do
+        Sidekiq::Testing.fake!
+        ENV['SKIP_NETWORK_ACTIONS'] = nil
+      end
+
+      it 'does not allow building the template inside itself' do
+        attempt = CollectionTemplateBuilder.call(
+          parent: collection,
+          template: collection,
+        )
+        expect(attempt).to be false
+      end
+
+      it 'does not get stuck creating multiple instances of itself' do
+        # NOTE: the fix is the reuslt of a guard clause in templateable#add_cards_from_master_template
+        collection.reload.update_template_instances
+        templates_created = Collection.in_collection(other_collection).where(template: collection)
+        expect(templates_created.count).to eq 2
+        # should not end up creating more instances every time you call update_template_instances
+        collection.reload.update_template_instances
+        expect(templates_created.count).to eq 2
       end
     end
   end

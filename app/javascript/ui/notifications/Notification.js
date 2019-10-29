@@ -70,7 +70,10 @@ const ButtonContainer = styled.div`
 class Notification extends React.Component {
   @observable
   fadeInProgress = true
-  componentWillMount() {
+
+  @action
+  componentDidMount() {
+    this.fadeInProgress = false
     const { notification } = this.props
     const { activity } = notification
     const targetType = pluralTypeName(activity.target_type)
@@ -83,17 +86,15 @@ class Notification extends React.Component {
         })
         .catch(err => {
           // Create a fake target in this strange usecase to remove loading
-          activity.setTarget({ name: 'Unknown', internalType: targetType })
+          activity.setTarget({
+            name: 'Unknown',
+            internalType: targetType,
+          })
           trackError(err, { name: 'Notification:Mount' })
         })
     } else {
       activity.setTarget(target)
     }
-  }
-
-  @action
-  componentDidMount() {
-    this.fadeInProgress = false
   }
 
   updateRead() {

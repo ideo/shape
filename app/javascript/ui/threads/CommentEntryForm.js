@@ -8,6 +8,7 @@ import { CommentForm, CommentEnterButton } from '~/ui/global/styled/forms'
 import CommentInput from '~/ui/threads/CommentInput'
 import styled from 'styled-components'
 import v from '~/utils/variables.js'
+import CommentSubject from '~/ui/threads/CommentSubject'
 
 const StyledCommentInputWrapper = styled.div`
   background: ${v.colors.secondaryMedium};
@@ -34,6 +35,13 @@ class CommentEntryForm extends React.Component {
 
   componentDidMount() {
     this.focusTextArea()
+  }
+
+  componentDidUpdate(prevProps) {
+    if (!prevProps.commentingOnRecord && this.props.commentingOnRecord) {
+      // if a new commentingOnRecord was just set
+      this.focusTextArea()
+    }
   }
 
   componentWillUnmount() {
@@ -128,6 +136,30 @@ class CommentEntryForm extends React.Component {
     )
   }
 
+  get renderSubjectOfComment() {
+    const { uiStore, thread } = this.props
+    const { textContent } = uiStore.selectedTextRangeForCard
+
+    if (!uiStore.commentingOnRecord) return null
+
+    if (textContent) {
+      return (
+        <CommentSubject
+          subjectRecord={uiStore.commentingOnRecord}
+          textContent={textContent}
+          threadRecord={thread.record}
+        />
+      )
+    } else {
+      return (
+        <CommentSubject
+          subjectRecord={uiStore.commentingOnRecord}
+          threadRecord={thread.record}
+        />
+      )
+    }
+  }
+
   render() {
     const { editorState, updating } = this.state
     const { uiStore } = this.props
@@ -135,6 +167,7 @@ class CommentEntryForm extends React.Component {
     return (
       <CommentForm onSubmit={this.handleSubmit}>
         <StyledCommentInputWrapper replying={!!uiStore.replyingToCommentId}>
+          {this.renderSubjectOfComment}
           <CommentInput
             disabled={updating}
             editorState={editorState}
@@ -143,7 +176,10 @@ class CommentEntryForm extends React.Component {
             setEditor={this.setEditor}
           />
         </StyledCommentInputWrapper>
-        <CommentEnterButton focused={this.state.focused}>
+        <CommentEnterButton
+          data-attr-comment-button
+          focused={this.state.focused}
+        >
           <ReturnArrowIcon />
         </CommentEnterButton>
       </CommentForm>
@@ -159,11 +195,16 @@ CommentEntryForm.propTypes = {
   afterSubmit: PropTypes.func.isRequired,
   onHeightChange: PropTypes.func.isRequired,
   thread: MobxPropTypes.objectOrObservableObject.isRequired,
+  commentingOnRecord: MobxPropTypes.objectOrObservableObject,
   replying: PropTypes.bool,
 }
 
 CommentEntryForm.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+
+CommentEntryForm.defaultProps = {
+  commentingOnRecord: null,
 }
 
 CommentEntryForm.displayName = 'CommentEntryForm'

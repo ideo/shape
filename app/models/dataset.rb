@@ -70,6 +70,8 @@ class Dataset < ApplicationRecord
   }
 
   attr_accessor :cached_data_items_datasets
+  # start_date_limit can be temp overridden to extend past imposed 12 month limit
+  attr_accessor :start_date_limit
 
   delegate :order, :selected,
            to: :cached_data_items_datasets,
@@ -110,6 +112,13 @@ class Dataset < ApplicationRecord
   def grouping
     # NOTE: support for multiple groupings is TBD
     groupings.first
+  end
+
+  def group
+    # see note above about only currently supporting one grouping
+    return nil unless grouping.present? && grouping['type'] == 'Group'
+
+    Group.find(grouping['id'])
   end
 
   # Implement in each sub-class

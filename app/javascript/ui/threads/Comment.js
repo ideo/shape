@@ -25,6 +25,7 @@ import XIcon from '~/ui/icons/XIcon'
 import Tooltip from '~/ui/global/Tooltip'
 import CommentInput from '~/ui/threads/CommentInput'
 import CommentReplies from '~/ui/threads/CommentReplies'
+import CommentSubject from '~/ui/threads/CommentSubject'
 import { StyledCommentInput } from '~/ui/threads/CustomCommentMentions'
 
 mention(linkify)
@@ -186,6 +187,7 @@ class Comment extends React.Component {
       e.target.closest('.test-reply-comment') ||
       e.target.closest('.test-edit-comment') ||
       e.target.closest('.test-delete-comment') ||
+      e.target.closest('.resolve-comment') ||
       editing
     ) {
       return
@@ -289,6 +291,19 @@ class Comment extends React.Component {
     this.initializeEditorState()
   }
 
+  handleResolveButtonClick = e => {
+    e.preventDefault()
+    const { comment } = this.props
+    const { status } = comment
+    let newStatus = status
+    if (status === 'opened' || status === 'reopened') {
+      newStatus = 'resolved'
+    } else if (status === 'resolved') {
+      newStatus = 'reopened'
+    }
+    comment.API_resolveComment(newStatus)
+  }
+
   formatCommentMessage(message) {
     const options = {
       format: {
@@ -337,6 +352,22 @@ class Comment extends React.Component {
           </StyledForm>
         )}
       </div>
+    )
+  }
+
+  renderSubjectOfComment() {
+    const { comment } = this.props
+    const { status } = comment
+    if (!comment.subject) return null
+
+    return (
+      <CommentSubject
+        threadRecord={comment.thread.record}
+        subjectRecord={comment.subject}
+        textContent={comment.text_highlight}
+        status={status}
+        handleResolveButtonClick={this.handleResolveButtonClick}
+      />
     )
   }
 
@@ -440,6 +471,7 @@ class Comment extends React.Component {
           isReply={isReply}
           onClick={this.handleClick}
         >
+          {this.renderSubjectOfComment()}
           {this.renderHeaderAndButtons()}
           {this.renderMessage()}
         </StyledComment>

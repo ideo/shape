@@ -120,6 +120,16 @@ class Group < ApplicationRecord
     roles_from_users.pluck(:id)
   end
 
+  def self.identifiers
+    # override resourceable method so that identifiers includes all subgroups
+    includes(:subgroups).map { |g| [g] + g.subgroups }.flatten.uniq.map(&:resource_identifier)
+  end
+
+  def identifiers
+    # uses the above method to get all subgroup identifiers for this group
+    Group.where(id: id).identifiers
+  end
+
   # Roles where this group is an editor/viewer of a collection/item
   def roles_to_resources
     Role

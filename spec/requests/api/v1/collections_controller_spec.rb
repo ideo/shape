@@ -644,4 +644,43 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       end
     end
   end
+
+  describe 'POST #set_submission_box_template' do
+    let!(:submission_box) { create(:submission_box) }
+    let(:path) { '/api/v1/collections/set_submission_box_template' }
+    let(:params) do
+      {
+        box_id: submission_box.id,
+        submission_box_type: :text,
+      }.to_json
+    end
+
+    context 'without edit access to the collection' do
+      it 'returns a 401' do
+        post(path, params: params)
+        expect(response.status).to eq(401)
+      end
+    end
+
+    context 'with edit access to the collection' do
+      let!(:submission_box) { create(:submission_box, add_editors: [user]) }
+
+      it 'returns a 200' do
+        post(path, params: params)
+        expect(response.status).to eq(200)
+      end
+
+      context 'even when pinned_and_locked' do
+        let!(:parent_collection_card) do
+          create(:collection_card, collection: submission_box, pinned: true)
+        end
+
+        it 'returns a 200' do
+          expect(submission_box.pinned_and_locked?).to be true
+          post(path, params: params)
+          expect(response.status).to eq(200)
+        end
+      end
+    end
+  end
 end
