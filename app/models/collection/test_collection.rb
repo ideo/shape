@@ -137,9 +137,9 @@ class Collection
 
     def self.default_question_types_by_section
       {
-        intro: [],
-        idea: %i[question_media question_description question_useful],
-        outro: %i[question_finish],
+        intro: %i[question_category_satisfaction],
+        ideas: %i[question_media question_description question_clarity question_excitement question_useful question_open],
+        outro: %i[question_open question_finish],
       }
     end
 
@@ -371,7 +371,7 @@ class Collection
     end
 
     def setup_default_status_and_questions
-      order = 0
+      order = -1
 
       self.class
           .default_question_types_by_section

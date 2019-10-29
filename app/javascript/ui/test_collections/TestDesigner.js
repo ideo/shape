@@ -6,8 +6,8 @@ import FlipMove from 'react-flip-move'
 import pluralize from 'pluralize'
 import googleTagManager from '~/vendor/googleTagManager'
 
+import { LargerH3 } from '~/ui/global/styled/typography'
 import v, { ITEM_TYPES } from '~/utils/variables'
-import { Heading3 } from '~/ui/global/styled/typography'
 import QuestionSelectHolder from '~/ui/test_collections/QuestionSelectHolder'
 import {
   TestQuestionHolder,
@@ -40,8 +40,8 @@ const BottomBorder = styled(TopBorder)`
 
 const Section = styled.div`
   border-top: 1px solid ${v.colors.black};
-  margin-top: 1rem;
-  padding-top: 0.3rem;
+  margin: 1.25rem 0 -1.25rem 0;
+  padding-top: 0.5rem;
 `
 
 const TestQuestionFlexWrapper = styled.div`
@@ -60,8 +60,14 @@ const TestQuestionFlexWrapper = styled.div`
 
 const SECTIONS = ['intro', 'ideas', 'outro']
 
+const sectionTitle = section => {
+  if (section === 'ideas') return 'Idea(s)'
+  return section
+}
+
 const OuterContainer = styled.div`
   display: flex;
+  margin-bottom: 50px;
 
   .design-column {
     flex: 1 0 0;
@@ -398,7 +404,7 @@ class TestDesigner extends React.Component {
     return _.map(this.cardsBySection, (cards, section) => (
       <Fragment>
         <Section key={`section-${section}`}>
-          <Heading3>{section}</Heading3>
+          <LargerH3>{sectionTitle(section)}</LargerH3>
         </Section>
         <TopBorder />
         {cards.length === 0 && (
@@ -431,11 +437,11 @@ class TestDesigner extends React.Component {
       <ThemeProvider theme={this.styledTheme}>
         <OuterContainer>
           <div className={'design-column'}>
-            <h3>Feedback Design</h3>
+            <LargerH3>Feedback Design</LargerH3>
             {this.renderSections()}
           </div>
           <div className={'settings-column'}>
-            <h3>Feedback Settings</h3>
+            <LargerH3>Feedback Settings</LargerH3>
             {this.renderTestTypeForm()}
             <AudienceSettings testCollection={collection} />
           </div>

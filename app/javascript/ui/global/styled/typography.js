@@ -55,6 +55,13 @@ export const Heading3 = styled.h3`
 `
 Heading3.displayName = 'StyledHeading3'
 
+/** @component */
+export const LargerH3 = styled(Heading3)`
+  font-size: 1rem;
+  letter-spacing: 0.0975rem;
+`
+LargerH3.displayName = 'StyledLargerH3'
+
 export const DisplayTextCss = css`
   color: ${props => props.color || v.colors.black};
   font-weight: ${v.weights.book};
