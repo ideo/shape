@@ -802,8 +802,8 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
       it 're-assigns permissions' do
         patch(path, params: params)
-        expect(moving_cards.first.record.editors[:users].last).to eq editor
-        expect(moving_cards.first.record.viewers[:users].last).to eq viewer
+        expect(moving_cards.first.record.editors[:users].include?(editor)).to be true
+        expect(moving_cards.first.record.viewers[:users].include?(viewer)).to be true
       end
 
       it 'broadcasts collection updates' do

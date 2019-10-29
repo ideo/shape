@@ -202,7 +202,9 @@ describe Collection::TestCollection, type: :model do
       end
 
       it 'renames it to Copy of {name}' do
-        expect(duplicate.name).to eq("Copy of #{test_collection.name}")
+        duplicate_name = "Copy of #{test_collection.name}"
+                         .gsub(" #{Collection::TestCollection::FEEDBACK_DESIGN_SUFFIX}", '')
+        expect(duplicate.name).to eq(duplicate_name)
       end
 
       it 'no longer has a test_collection' do
@@ -233,10 +235,6 @@ describe Collection::TestCollection, type: :model do
 
         it 'does not have any responses' do
           expect(duplicate.survey_responses.count).to eq(0)
-        end
-
-        it 'renames it to Copy of {name}' do
-          expect(duplicate.name).to eq("Copy of #{test_collection.name}")
         end
       end
 
