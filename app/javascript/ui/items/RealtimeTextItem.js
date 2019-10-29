@@ -104,6 +104,7 @@ class RealtimeTextItem extends React.Component {
   state = { disconnected: false }
   saveTimer = null
   focused = false
+  canceled = false
   currentlySending = false
   currentlySendingCheck = null
   combinedDelta = new Delta()
@@ -146,7 +147,6 @@ class RealtimeTextItem extends React.Component {
   }
 
   componentWillUnmount() {
-    this.sendCombinedDelta.flush()
     this.unmounted = true
     // this will set the datx item to have the right data, but do not want to route back
     this.cancel(null, { route: false })
@@ -325,7 +325,11 @@ class RealtimeTextItem extends React.Component {
   }
 
   cancel = (ev, { route = true } = {}) => {
+    if (this.canceled) return
     const { onCancel } = this.props
+    // mark this as it may get called again from unmount, only want to cancel once
+    this.canceled = true
+    this.sendCombinedDelta.flush()
     // NOTE: cancel also means "save current text"!
     // event is passed through because TextItemCover uses it
     if (!this.canEdit) return onCancel({ item: this.props.item, ev, route })
@@ -338,7 +342,7 @@ class RealtimeTextItem extends React.Component {
     const { item, uiStore } = this.props
     const { quillEditor } = this
     if (!quillEditor) {
-      return
+      return item
     }
 
     // just like in uiStore... revert to snapshot to reset highlights
