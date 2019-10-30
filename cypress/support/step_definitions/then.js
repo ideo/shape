@@ -134,8 +134,7 @@ Then(
   'I should see a question with {string} and {int} emojis',
   (selector, count) => {
     cy.locateDataOrClass(selector)
-      .find('[data-cy="ScaleEmojiBtn"]')
-      .children()
+      .find('.emoji')
       .should('have.length', count)
   }
 )

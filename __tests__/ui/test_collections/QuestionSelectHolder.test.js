@@ -12,6 +12,7 @@ describe('TestDesigner', () => {
       canEdit: true,
     }
     props.card.card_question_type = 'question_useful'
+    props.card.section_type = 'ideas'
     wrapper = shallow(<QuestionSelectHolder {...props} />)
   })
 
@@ -27,7 +28,6 @@ describe('TestDesigner', () => {
 
   it('renders the question options alphabetically', () => {
     const select = wrapper.find('StyledSelect StyledSelectOption')
-
     expect(select.get(2).props.value).toEqual('question_description')
     expect(select.get(3).props.value).toEqual('question_media')
   })

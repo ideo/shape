@@ -223,14 +223,20 @@ class TestQuestion extends React.Component {
     }
   }
 
-  render() {
+  get questionIdentifier() {
     const { card, item } = this.props
+    if (item.question_description || item.content) {
+      return 'question-' + (item.question_description || item.content)
+    }
+    return card.card_question_type
+  }
+
+  render() {
+    const { card } = this.props
     return (
       <QuestionHolder
         empty={!card.card_question_type}
-        data-cy={`question-${kebabCase(
-          item.question_description || item.content
-        )}`}
+        data-cy={kebabCase(this.questionIdentifier)}
       >
         {this.renderQuestion()}
       </QuestionHolder>

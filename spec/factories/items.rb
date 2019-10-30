@@ -82,7 +82,7 @@ FactoryBot.define do
           width: 1,
           height: 1,
         }
-        attrs[:section_type] = 'idea' if item.is_a?(Item::QuestionItem)
+        attrs[:section_type] = :ideas if item.is_a?(Item::QuestionItem)
         item.parent_collection_card = build(:collection_card, attrs)
       end
     end

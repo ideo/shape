@@ -91,6 +91,21 @@ describe Collection::TestCollection, type: :model do
         expect(test_collection.gives_incentive_for?(test_audience.id)).to be false
       end
     end
+
+    describe '#archive_idea_questions' do
+      let(:collection_to_test) { create(:collection) }
+
+      it 'archives media and description if collection to test added' do
+        idea_cards = test_collection.idea_cards
+        non_idea_cards = test_collection.collection_cards - idea_cards
+        expect(idea_cards.all?(&:archived?)).to be false
+        test_collection.update(collection_to_test: collection_to_test)
+        idea_cards.each(&:reload)
+        non_idea_cards.each(&:reload)
+        expect(idea_cards.all?(&:archived?)).to be true
+        expect(non_idea_cards.all?(&:archived?)).to be false
+      end
+    end
   end
 
   describe '#create_uniq_survey_response' do

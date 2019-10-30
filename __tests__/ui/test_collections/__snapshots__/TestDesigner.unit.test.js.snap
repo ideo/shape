@@ -21,25 +21,25 @@ exports[`TestDesigner renders snapshot 1`] = `
       <StyledLargerH3>
         Feedback Design
       </StyledLargerH3>
-      <styled.div
-        key="section-intro"
-      >
-        <StyledLargerH3>
+      <StyledSection>
+        <StyledLargerH3
+          data-cy="section-title"
+        >
           intro
         </StyledLargerH3>
-      </styled.div>
+      </StyledSection>
       <styled.div />
       <styled.div
         className="card"
       />
       <Styled(styled.div) />
-      <styled.div
-        key="section-ideas"
-      >
-        <StyledLargerH3>
+      <StyledSection>
+        <StyledLargerH3
+          data-cy="section-title"
+        >
           Idea(s)
         </StyledLargerH3>
-      </styled.div>
+      </StyledSection>
       <styled.div />
       <FlipMovePropConverter
         appearAnimation="fade"
@@ -6699,13 +6699,13 @@ exports[`TestDesigner renders snapshot 1`] = `
         </styled.div>
       </FlipMovePropConverter>
       <Styled(styled.div) />
-      <styled.div
-        key="section-outro"
-      >
-        <StyledLargerH3>
+      <StyledSection>
+        <StyledLargerH3
+          data-cy="section-title"
+        >
           outro
         </StyledLargerH3>
-      </styled.div>
+      </StyledSection>
       <styled.div />
       <styled.div
         className="card"
