@@ -106,12 +106,13 @@ class Api::V1::BaseController < ApplicationController
   def render_collection(include: nil)
     # include collection_cards for UI to receive any updates
     include ||= Collection.default_relationships_for_api
+    exposables = {
+      current_record: @collection,
+    }
+    exposables[:current_user] = current_user unless current_user.nil?
     render jsonapi: @collection,
            include: include,
-           expose: {
-             current_record: @collection,
-             current_user: current_user,
-           }
+           expose: exposables
   end
 
   def check_api_authentication!

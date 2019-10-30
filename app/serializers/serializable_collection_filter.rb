@@ -10,6 +10,6 @@ class SerializableCollectionFilter < BaseJsonSerializer
       user_id: @current_user.id,
       collection_filter_id: @object.id,
     )
-    user_filter.present? ? user_filter.selected : true
+    user_filter.present? ? user_filter.selected : false
   end
 end
