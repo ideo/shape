@@ -13,7 +13,7 @@ import FollowIcon from '~/ui/icons/FollowIcon'
 import v from '~/utils/variables'
 import hexToRgba from '~/utils/hexToRgba'
 import CommentThumbnail from '~/ui/threads/CommentThumbnail'
-import UnreadCount from '~/ui/threads/UnreadCount.js'
+import UnresolvedCount from '~/ui/threads/UnresolvedCount'
 
 export const threadTitleCss = css`
   position: ${props => (props.sticky ? 'sticky' : 'relative')};
@@ -151,7 +151,7 @@ class CommentThreadHeader extends React.Component {
 
     return (
       <UnreadCountWrapper>
-        <UnreadCount count={thread.unreadCount} size={'small'} />
+        <UnresolvedCount count={thread.unreadCount} size={'small'} />
       </UnreadCountWrapper>
     )
   }
