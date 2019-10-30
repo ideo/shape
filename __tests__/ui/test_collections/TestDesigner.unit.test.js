@@ -1,5 +1,5 @@
 import TestDesigner from '~/ui/test_collections/TestDesigner'
-import { fakeCollection, fakeCollectionCard } from '#/mocks/data'
+import { fakeCollection } from '#/mocks/data'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 

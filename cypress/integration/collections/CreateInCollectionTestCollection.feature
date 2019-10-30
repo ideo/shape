@@ -36,6 +36,8 @@ Feature: Creating an "in-collection" Test Collection
     Then I should see "Stop Feedback" in a "HeaderFormButton"
 
     When I navigate to the collection named "Cypress Test Feedback Design" via the "CollectionCover"
+    # For some reason the await API response is not actually awaiting here, so the 1 second delay is needed
+    And I wait for 1 second
 
     # NOTE: seemingly no way to test clipboard copying in cypress (i.e. "Get Link")
     # this is used in the "visit current Test URL" below
