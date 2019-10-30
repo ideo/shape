@@ -1,4 +1,5 @@
 import Icon from './Icon'
+import v from '~/utils/variables'
 
 const CommentIconFilled = ({ text, textColor } = {}) => (
   <Icon fill>
@@ -32,7 +33,17 @@ const CommentIconFilled = ({ text, textColor } = {}) => (
       <g mask="url(#mask0)">
         <rect x="-8" y="-7" width="30" height="30" />
       </g>
-      <text textAnchor="middle" x="50%" y="42%" dominantBaseline="middle">
+      <text
+        textAnchor="middle"
+        x="50%"
+        y="50%"
+        dy="-0.1em"
+        fontSize=".45em"
+        dominantBaseline="middle"
+        fill={v.colors.commonLight}
+        fontFamily="Gotham"
+        fontWeight="500"
+      >
         {text}
       </text>
     </svg>{' '}

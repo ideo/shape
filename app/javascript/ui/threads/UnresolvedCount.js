@@ -10,17 +10,10 @@ const CommentIconWrapper = styled.div`
   svg {
     height: ${props => (props.size === 'small' ? 100 : 120)}%;
     width: ${props => (props.size === 'small' ? 100 : 120)}%;
-
-    text {
-      font-family: Gotham;
-      font-size: 40%;
-      font-weight: 500;
-      color: ${v.colors.commonLight};
-    }
   }
 `
 
-const UnreadCount = ({ count, size }) => {
+const UnresolvedCount = ({ count, size }) => {
   if (!count) return null
   const unreadText = count < 100 ? count : `99+`
 
@@ -31,15 +24,15 @@ const UnreadCount = ({ count, size }) => {
   )
 }
 
-UnreadCount.propTypes = {
+UnresolvedCount.propTypes = {
   count: PropTypes.number.isRequired,
   size: PropTypes.string,
 }
 
-UnreadCount.defaultProps = {
+UnresolvedCount.defaultProps = {
   size: 'small',
 }
 
-UnreadCount.displayName = 'UnreadCount'
+UnresolvedCount.displayName = 'UnresolvedCount'
 
-export default UnreadCount
+export default UnresolvedCount
