@@ -226,6 +226,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
           let(:builder) do
             CollectionCardBuilder.new(
               params: params.merge(
+                section_type: :ideas,
                 item_attributes: {
                   type: 'Item::QuestionItem',
                   question_type: :question_clarity,
@@ -264,6 +265,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
           let(:builder) do
             CollectionCardBuilder.new(
               params: params.merge(
+                section_type: :ideas,
                 item_attributes: {
                   type: 'Item::QuestionItem',
                   question_type: :question_open,

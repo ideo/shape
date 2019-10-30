@@ -41,6 +41,7 @@ RSpec.describe Item::QuestionItem, type: :model do
         # use builder so that it actually handles the right permissions
         CollectionCardBuilder.call(
           params: {
+            section_type: :ideas,
             item_attributes: {
               type: 'Item::QuestionItem',
               question_type: :question_useful,
