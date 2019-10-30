@@ -544,17 +544,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     let!(:collection_cards) { create_list(:collection_card_collection, 3, parent: collection) }
     let(:path) { '/api/v1/collection_cards/unarchive' }
     let(:raw_params) do
-      {
-        card_ids: collection_cards.map(&:id),
-        collection_snapshot: {
-          id: collection.id,
-          attributes: {
-            collection_cards_attributes: collection_cards.map do |card|
-              { id: card.id, order: 0, width: 2, height: 1 }
-            end,
-          },
-        },
-      }
+      { card_ids: collection_cards.map(&:id) }
     end
     let(:params) { raw_params.to_json }
 
@@ -569,7 +559,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
-    context 'with record edit access' do
+    context 'with record edit access', only: true do
       before do
         allow(Collection).to receive(:find).and_return(collection)
       end
@@ -590,6 +580,42 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           user,
         )
         patch(path, params: params)
+      end
+
+      context 'with snapshot' do
+        let(:unarchiving_card) { collection.collection_cards.first }
+        let(:raw_params) do
+          {
+            card_ids: [unarchiving_card.id],
+            collection_snapshot: {
+              id: collection.id,
+              attributes: {
+                collection_cards_attributes: [
+                  { id: unarchiving_card.id, order: 0, width: 2, height: 1 },
+                ],
+              },
+            },
+          }
+        end
+
+        it 'restores cards to their former attributes' do
+          expect(unarchiving_card.active?).to be true
+          expect(unarchiving_card.width).to eq 1
+          expect(collection.collection_cards.first).to eq unarchiving_card
+          # now archive
+          unarchiving_card.archive!
+          collection.reload
+          expect(unarchiving_card.active?).to be false
+          expect(collection.collection_cards.first).not_to eq unarchiving_card
+          # now unarchive
+          patch(path, params: params)
+          collection.reload
+          unarchiving_card.reload
+          # should be mapped to snapshot
+          expect(unarchiving_card.active?).to be true
+          expect(unarchiving_card.width).to eq 2
+          expect(collection.collection_cards.first).to eq unarchiving_card
+        end
       end
     end
   end

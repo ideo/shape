@@ -60,8 +60,11 @@
 #
 
 class Collection
-  class TestDesign < Collection
+  class TestResultsCollection < Collection
     belongs_to :test_collection, class_name: 'Collection::TestCollection'
+    has_many :datasets,
+             through: :data_items
+
     delegate :can_reopen?,
              :launchable?,
              :live_or_was_launched?,
@@ -72,76 +75,98 @@ class Collection
              :purchased?,
              :link_sharing?,
              :test_audiences,
+             :question_items,
              to: :test_collection
 
-    after_commit :close_test, if: :archived_on_previous_save?
-
-    has_many :question_items,
-             -> { questions },
-             source: :item,
-             class_name: 'Item::QuestionItem',
-             through: :primary_collection_cards
-
-    has_many :survey_responses, through: :test_collection
-
-    COLLECTION_SUFFIX = ' Feedback Design'.freeze
-
-    def self.generate_name(name)
-      "#{name}#{COLLECTION_SUFFIX}"
-    end
+    # TODO: revisit what should happen when you archive results or the test
+    # after_commit :close_test, if: :archived_on_previous_save?
+    # has_many :question_items,
+    #          -> { questions },
+    #          source: :item,
+    #          class_name: 'Item::QuestionItem',
+    #          through: :primary_collection_cards
 
     def duplicate!(**args)
-      duplicate = super(args)
-      return duplicate unless duplicate.persisted?
-
-      duplicate = duplicate.becomes(Collection::TestCollection)
-      duplicate.update(
-        test_collection_id: nil,
-        type: 'Collection::TestCollection',
-        # Don't set this to be a master template if the parent is a template
-        master_template: parent.master_template? ? false : master_template,
-      )
-      # Had to reload otherwise AASM gets into weird state
-      duplicate.reload
+      # TODO: double check is the right thing to do here...
+      test_collection.duplicate!(args)
     end
 
-    def question_item_created(question_item)
-      if question_item.question_open?
-        # Create open response collection for this new question item
-        test_collection.create_open_response_collections(
-          open_question_items: [question_item],
-        )
-      elsif question_item.question_media?
-        test_collection.create_media_item_link(
-          media_question_items: [question_item],
+    def initialize_cards!
+      transaction do
+        create_open_response_collections(initiated_by: created_by)
+        create_response_graphs(initiated_by: created_by)
+        create_media_item_link
+        # might not need this next step?
+        test_collection.cache_cover!
+      end
+      reorder_cards!
+      move_legend_item_to_third_spot
+      true
+    end
+
+    def legend_item
+      items.legend_items.first
+    end
+
+    def create_open_response_collections(open_question_items: nil, initiated_by: nil)
+      open_question_items ||= question_items.question_open
+      open_question_items.map do |open_question|
+        open_question.find_or_create_open_response_collection(
+          parent_collection: self,
+          initiated_by: initiated_by,
         )
       end
     end
 
-    def answerable_complete_question_items
-      complete_question_items(answerable_only: true)
-    end
-
-    def complete_question_items(answerable_only: false)
-      # This is for the purpose of finding all completed items to display in the survey
-      # i.e. omitting any unfinished/blanks
-      questions = answerable_only ? question_items.answerable : items
-      questions.reject do |i|
-        i.is_a?(Item::QuestionItem) && i.question_type.blank? ||
-          i.question_type == 'question_open' && i.content.blank? ||
-          i.question_type == 'question_category_satisfaction' && i.content.blank? ||
-          i.question_type == 'question_media'
+    def create_response_graphs(initiated_by:)
+      legend = nil
+      graphs = []
+      question_items
+        .select(&:scale_question?)
+        .each_with_index do |question, i|
+        data_item_card = question.find_or_create_response_graph(
+          parent_collection: self,
+          initiated_by: initiated_by,
+          legend_item: legend,
+        )
+        legend = data_item_card.item.legend_item if i.zero?
+        graphs << data_item_card
+        test_audiences.each do |test_audience|
+          data_item = data_item_card.item
+          question.create_test_audience_dataset(test_audience, data_item)
+        end
       end
+
+      graphs
     end
 
-    def complete_question_cards
-      complete_question_items.collect(&:parent_collection_card)
+    def create_media_item_link(media_question_items: nil)
+      media_question_items ||= test_collection.items.reject { |i| i.type == 'Item::QuestionItem' }
+      # since we're placing things at the front one by one, we reverse the order
+      media_question_items.reverse.map do |media_item|
+        next unless media_item.cards_linked_to_this_item.empty?
+
+        CollectionCard::Link.create(
+          parent: self,
+          item_id: media_item.id,
+          width: 1,
+          height: 2,
+          order: -1,
+        )
+      end
     end
 
     private
 
     def close_test
       test_collection.close! if test_collection.live?
+    end
+
+    def move_legend_item_to_third_spot
+      return unless legend_item.present?
+
+      legend_card = legend_item.parent_collection_card
+      legend_card.move_to_order(2)
     end
   end
 end
