@@ -157,9 +157,9 @@ const MobileLinks = ({ isHome }) => {
       </Box>
 
       <Box>
-        <a href="/login" rel="noopener noreferrer">
-          <NavLink align="left">Login</NavLink>
-        </a>
+        <NavLink href="/login" align="left">
+          Login
+        </NavLink>
       </Box>
     </MarketingFlex>
   )
