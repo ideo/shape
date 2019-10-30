@@ -7,17 +7,29 @@ Feature: Creating a Test Collection
     When I navigate to the collection named "Test Prototype" via the "CollectionCover"
     And I wait for "@apiGetOrganizationAudiences" to finish
     Then I should see "Test Prototype" in a "EditableNameHeading"
+    # verify existence of all three sections
+    Then I should see "intro" in a "section-title"
+    Then I should see "Idea(s)" in a "section-title"
+    Then I should see "outro" in a "section-title"
     # verify the existence of the default questions
-    Then I should see "Photo/Video" in a "QuestionSelectOption"
-    Then I should see "Description" in a "QuestionSelectOption"
-    Then I should see "Useful" in a "QuestionSelectOption"
+    Then I should see "Category Satisfaction" in a "QuestionSelectOption-category-satisfaction"
+    Then I should see "Photo/Video" in a "QuestionSelectOption-photo-video"
+    Then I should see "Description" in a "QuestionSelectOption-description"
+    Then I should see "Clear" in a "QuestionSelectOption-clear"
+    Then I should see "Exciting" in a "QuestionSelectOption-exciting"
+    Then I should see "Useful" in a "QuestionSelectOption-useful"
+    Then I should see 2 "QuestionSelectOption-open-response"
+    Then I should see "Open Response" in a "QuestionSelectOption-open-response"
     Then I should see "End of Survey" in a ".DisplayText"
 
     # Scenario: Setting up the questions and launching the test
+    When I enter "solutions{enter}" as my category
     When I add a link URL
-    And I fill "DescriptionQuestionText" with some text
+    And I fill the 1st "DescriptionQuestionText" with "That's my fun concept"
+    And I fill the 2nd "DescriptionQuestionText" with "What do you think?"
+    And I fill the 3rd "DescriptionQuestionText" with "Anything else?"
     And I wait for "@apiUpdateItem" to finish
-    And I add an open response question
+    And I add an open response question at position 8
     And I click the "audienceCheckbox-share-via-link"
     # Share Via Link makes an API call to "open" when you check the checkbox
     And I wait for "@apiUpdateTestAudience" to finish
@@ -46,8 +58,10 @@ Feature: Creating a Test Collection
     When I click the last "WelcomeQuestionEmojiButton"
     Then I should see a question with "TermsEmojiHolder" and 2 emojis
     When I accept the feedback survey terms
+    Then I should see a question with "question-how-satisfied-are-you-with-your-current" and 4 emojis
+    When I click the last "ScaleEmojiBtn"
     Then I should see "Why Coding Needs" in a "GridCard"
-    Then I should see a question with "ScaleEmojiHolder" and 4 emojis
+    Then I should see a question with "question-what-do-you-think" and 4 emojis
     When I click the last "ScaleEmojiBtn"
     And I wait for "@apiCreateSurveyResponse" to finish
     And I wait for "@apiCreateQuestionAnswer" to finish

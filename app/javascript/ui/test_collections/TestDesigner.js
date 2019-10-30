@@ -43,6 +43,7 @@ const Section = styled.div`
   margin: 1.25rem 0 -1.25rem 0;
   padding-top: 0.5rem;
 `
+Section.displayName = 'StyledSection'
 
 const TestQuestionFlexWrapper = styled.div`
   display: flex;
@@ -402,9 +403,9 @@ class TestDesigner extends React.Component {
 
   renderSections() {
     return _.map(this.cardsBySection, (cards, section) => (
-      <Fragment>
-        <Section key={`section-${section}`}>
-          <LargerH3>{sectionTitle(section)}</LargerH3>
+      <Fragment key={`section-${section}`}>
+        <Section>
+          <LargerH3 data-cy="section-title">{sectionTitle(section)}</LargerH3>
         </Section>
         <TopBorder />
         {cards.length === 0 && (

@@ -154,6 +154,7 @@ class ScaleQuestion extends React.Component {
           onChange={this.handleInputChange}
           onKeyPress={this.handleKeyPress}
           onBlur={this.stopEditingIfContent}
+          data-cy="category-satisfaction-input"
         />
         ?
       </DisplayText>

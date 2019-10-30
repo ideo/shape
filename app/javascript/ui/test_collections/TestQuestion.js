@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import { kebabCase } from 'lodash'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
@@ -223,9 +224,14 @@ class TestQuestion extends React.Component {
   }
 
   render() {
-    const { card } = this.props
+    const { card, item } = this.props
     return (
-      <QuestionHolder empty={!card.card_question_type}>
+      <QuestionHolder
+        empty={!card.card_question_type}
+        data-cy={`question-${kebabCase(
+          item.question_description || item.content
+        )}`}
+      >
         {this.renderQuestion()}
       </QuestionHolder>
     )

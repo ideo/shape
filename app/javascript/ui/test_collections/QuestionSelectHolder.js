@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import { kebabCase } from 'lodash'
 import v, { TEST_COLLECTION_SELECT_OPTIONS } from '~/utils/variables'
 import { Select, SelectOption } from '~/ui/global/styled/forms'
 import { DisplayText, NumberListText } from '~/ui/global/styled/typography'
@@ -47,7 +48,7 @@ const questionSelectOption = opt => {
       disabled={!value}
       value={value}
     >
-      <span data-cy="QuestionSelectOption">{label}</span>
+      <span data-cy={`QuestionSelectOption-${kebabCase(label)}`}>{label}</span>
     </SelectOption>
   )
 }

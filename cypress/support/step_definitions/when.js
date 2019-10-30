@@ -163,6 +163,13 @@ When('I fill {string} with {string}', (string, url) => {
     .type(url)
 })
 
+When('I fill the {word} {string} with {string}', (num, element, string) => {
+  cy.locateDataOrClass(element)
+    .eq(parseInt(num) - 1)
+    .click()
+    .type(string)
+})
+
 When('I add a test email for {string}', string => {
   cy.locateDataOrClass(string)
     .first()
@@ -170,7 +177,14 @@ When('I add a test email for {string}', string => {
     .type('name@example.com')
 })
 
-When('I add an open response question', () => {
+When('I enter {string} as my category', string => {
+  cy.locate('category-satisfaction-input')
+    .first()
+    .click()
+    .type(string)
+})
+
+When('I add an open response question at position {int}', position => {
   cy.locate('QuestionHotEdgeButton')
     .last()
     .click()
@@ -178,13 +192,13 @@ When('I add an open response question', () => {
   // have to wait for the flipmove fade-in
   cy.wait(FLIPMOVE_DELAY + 500)
   cy.locateDataOrClass('.SelectHolderContainer')
-    .eq(3)
+    .eq(position)
     .find('.select')
     .click()
-  cy.locateWith('QuestionSelectOption', 'Open Response')
-    .first()
-    .click()
   cy.wait(FLIPMOVE_DELAY)
+  cy.locateDataOrClass('QuestionSelectOption-open-response')
+    .last()
+    .click()
   cy.wait('@apiArchiveCollectionCards')
   cy.wait('@apiCreateCollectionCard')
   // have to wait for the flipmove fade-in

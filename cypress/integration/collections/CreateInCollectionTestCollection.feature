@@ -9,8 +9,8 @@ Feature: Creating an "in-collection" Test Collection
     When I click the "Radio-collection"
     And I wait for '@apiArchiveCollectionCards' to finish
     And I wait for '@apiUpdateCollection' to finish
-    Then I should see 1 "QuestionSelectOption"
-    Then I should see "Useful" in a "QuestionSelectOption"
+    Then I should see 1 "QuestionSelectOption-useful"
+    Then I should see "Useful" in a "QuestionSelectOption-useful"
     Then I should see "End of Survey" in a ".DisplayText"
 
     # Launch the test
