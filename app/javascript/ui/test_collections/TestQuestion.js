@@ -17,6 +17,7 @@ import { QuestionText } from '~/ui/test_collections/shared'
 import { apiStore, uiStore } from '~/stores'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
 import QuestionAnswer from '~/stores/jsonApi/QuestionAnswer'
+import SingleChoiceQuestion from './SingleChoiceQuestion'
 
 const QuestionHolder = styled.div`
   display: flex;
@@ -109,6 +110,7 @@ class TestQuestion extends React.Component {
     } = this.props
 
     let inner
+
     switch (card.card_question_type) {
       case 'question_useful':
       case 'question_clarity':
@@ -214,6 +216,17 @@ class TestQuestion extends React.Component {
             givesIncentive={this.givesIncentive}
             numberOfQuestions={numberOfQuestions}
             onAnswer={this.handleQuestionAnswer}
+          />
+        )
+      case 'question_single_choice':
+        return (
+          <SingleChoiceQuestion
+            onAnswer={this.handleQuestionAnswer}
+            questionText={'Why so serious?'}
+            choices={[
+              { label: 'Choice A', value: '0', disabled: false },
+              { label: 'Choice B', value: '1', disabled: false },
+            ]}
           />
         )
 

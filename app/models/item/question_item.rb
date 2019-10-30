@@ -103,7 +103,7 @@ class Item
       question_different: 9,
       question_category_satisfaction: 10,
       question_single_choice: 11,
-      question_multiple_choice: 12
+      question_multiple_choice: 12,
     }
 
     def self.question_type_categories
