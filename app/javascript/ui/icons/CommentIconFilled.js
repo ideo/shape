@@ -1,5 +1,4 @@
 import Icon from './Icon'
-import v from '~/utils/variables'
 
 const CommentIconFilled = ({ text, textColor } = {}) => (
   <Icon fill>
@@ -37,10 +36,9 @@ const CommentIconFilled = ({ text, textColor } = {}) => (
         textAnchor="middle"
         x="50%"
         y="50%"
-        dy="-0.1em"
+        dy="0.17em"
         fontSize=".45em"
-        dominantBaseline="middle"
-        fill={v.colors.commonLight}
+        fill="#f2f1ee" // IE11 wants this to be specified
         fontFamily="Gotham"
         fontWeight="500"
       >
