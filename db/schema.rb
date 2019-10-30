@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_18_203725) do
+ActiveRecord::Schema.define(version: 2019_10_30_214422) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -526,6 +526,13 @@ ActiveRecord::Schema.define(version: 2019_10_18_203725) do
     t.index ["user_id"], name: "index_payments_on_user_id"
   end
 
+  create_table "question_answer_choices", force: :cascade do |t|
+    t.integer "question_choice_id"
+    t.integer "question_answer_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "question_answers", force: :cascade do |t|
     t.bigint "survey_response_id"
     t.bigint "question_id"
@@ -535,6 +542,16 @@ ActiveRecord::Schema.define(version: 2019_10_18_203725) do
     t.datetime "updated_at", null: false
     t.integer "open_response_item_id"
     t.index ["survey_response_id", "question_id"], name: "index_question_answers_on_survey_response_id_and_question_id", unique: true
+  end
+
+  create_table "question_choices", force: :cascade do |t|
+    t.text "text"
+    t.integer "order"
+    t.integer "value"
+    t.boolean "archived"
+    t.integer "question_item_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "roles", force: :cascade do |t|

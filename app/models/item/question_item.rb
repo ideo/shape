@@ -61,6 +61,8 @@ class Item
     # TODO: Deprecate once migrating to datasets
     has_one :test_data_item, class_name: 'Item::DataItem', as: :data_source
 
+    has_many :question_choices
+
     after_create :create_question_dataset
 
     after_commit :notify_test_design_of_creation,
@@ -100,6 +102,8 @@ class Item
       question_excitement: 8,
       question_different: 9,
       question_category_satisfaction: 10,
+      question_single_choice: 11,
+      question_multiple_choice: 12
     }
 
     def self.question_type_categories
@@ -120,6 +124,8 @@ class Item
           question_category_satisfaction
           question_context
           question_open
+          question_single_choice
+          question_multiple_choice
         ],
       }
     end
