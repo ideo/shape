@@ -6,7 +6,7 @@ class ActsAsTaggableOn::Tagging
       organization_id = taggable.organization_id
 
       unless tag.organization_ids.include?(organization_id)
-        tag.organization_ids = tag.organization_ids << organization_id
+        tag.organization_ids << organization_id
         tag.save
       end
     end
