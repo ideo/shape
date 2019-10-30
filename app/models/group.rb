@@ -21,6 +21,7 @@
 #
 # Indexes
 #
+#  index_groups_on_archive_batch    (archive_batch)
 #  index_groups_on_autojoin_emails  (autojoin_emails) USING gin
 #  index_groups_on_handle           (handle)
 #  index_groups_on_network_id       (network_id)

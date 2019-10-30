@@ -32,6 +32,7 @@
 #
 # Indexes
 #
+#  index_items_on_archive_batch                        (archive_batch)
 #  index_items_on_breadcrumb                           (breadcrumb) USING gin
 #  index_items_on_cloned_from_id                       (cloned_from_id)
 #  index_items_on_created_at                           (created_at)

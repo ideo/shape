@@ -364,11 +364,10 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def collection_snapshot_params
-    return {} if json_api_params[:collection_snapshot].nil?
+    attrs = json_api_params[:collection_snapshot].try(:[], :attributes)
+    return {} if attrs.nil?
 
-    json_api_params[:collection_snapshot].permit(:attributes).permit(
-      collection_cards_attributes: %i[id order width height row col],
-    )
+    attrs.permit(collection_cards_attributes: %i[id order width height row col])
   end
 
   def collection_card_nested_attributes

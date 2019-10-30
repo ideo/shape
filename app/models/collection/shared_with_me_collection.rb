@@ -41,6 +41,7 @@
 #
 # Indexes
 #
+#  index_collections_on_archive_batch               (archive_batch)
 #  index_collections_on_breadcrumb                  (breadcrumb) USING gin
 #  index_collections_on_cached_test_scores          (cached_test_scores) USING gin
 #  index_collections_on_cloned_from_id              (cloned_from_id)
