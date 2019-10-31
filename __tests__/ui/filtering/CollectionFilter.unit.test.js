@@ -120,10 +120,6 @@ describe('CollectionFilter', () => {
           selected: false,
         })
       })
-
-      it('should refetch collection cards', () => {
-        expect(props.collection.API_fetchCards).toHaveBeenCalled()
-      })
     })
 
     describe('with the filter type set to tags', () => {
