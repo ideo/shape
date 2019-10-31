@@ -64,6 +64,8 @@ class Item
     has_many :question_choices
 
     after_create :create_question_dataset
+    after_create :add_default_question_choices,
+                 if: :question_choices_customizable?
 
     after_commit :notify_test_design_of_creation,
                  on: :create,
@@ -305,6 +307,16 @@ class Item
       )
     end
 
+    def add_default_question_choices
+      (0..3).each do |i|
+        self.question_choices.create(
+          text: "Option #{i + 1}",
+          value: i,
+          order: i,
+        )
+      end
+    end
+
     def notify_test_design_collection_of_creation?
       parent.is_a?(Collection::TestDesign)
     end
@@ -315,6 +327,10 @@ class Item
 
     def update_test_open_responses_collection?
       saved_change_to_content? && test_open_responses_collection.present?
+    end
+
+    def question_choices_customizable?
+      question_single_choice? || question_multiple_choice?
     end
 
     def update_test_open_responses_collection

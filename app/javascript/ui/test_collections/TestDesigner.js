@@ -369,6 +369,7 @@ class TestDesigner extends React.Component {
                 position={position}
                 order={card.order}
                 canEdit={this.canEditQuestions}
+                question_choices={item.question_choices}
               />
             </TestQuestionHolder>
             {this.canEdit &&

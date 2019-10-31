@@ -13,5 +13,7 @@
 #
 
 class QuestionChoice < ApplicationRecord
-  belongs_to :question, class_name: 'Item::QuestionItem'
+  belongs_to :question,
+             class_name: 'Item::QuestionItem',
+             foreign_key: 'question_item_id'
 end

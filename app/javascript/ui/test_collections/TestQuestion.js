@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import CustomizableQuestion from '~/ui/test_collections/CustomizableQuestion'
 import GridCard from '~/ui/grid/GridCard'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import DescriptionQuestion from '~/ui/test_collections/DescriptionQuestion'
@@ -103,6 +104,7 @@ class TestQuestion extends React.Component {
       item,
       editing,
       questionAnswer,
+      question_choices,
       canEdit,
       surveyResponse,
       numberOfQuestions,
@@ -122,6 +124,17 @@ class TestQuestion extends React.Component {
             editing={editing}
             questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}
+          />
+        )
+      case 'question_single_choice':
+      case 'question_multiple_choice':
+        return (
+          <CustomizableQuestion
+            question={item}
+            editing={editing}
+            questionAnswer={questionAnswer}
+            onAnswer={this.handleQuestionAnswer}
+            question_choices={question_choices}
           />
         )
       case 'media':
@@ -244,6 +257,7 @@ TestQuestion.propTypes = {
   afterQuestionAnswered: PropTypes.func,
   canEdit: PropTypes.bool,
   numberOfQuestions: PropTypes.number,
+  question_choices: MobxPropTypes.arrayOrObservableArray,
 }
 
 TestQuestion.defaultProps = {
@@ -253,6 +267,7 @@ TestQuestion.defaultProps = {
   afterQuestionAnswered: null,
   canEdit: false,
   numberOfQuestions: null,
+  question_choices: [],
 }
 
 export default TestQuestion

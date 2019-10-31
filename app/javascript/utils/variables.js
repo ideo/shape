@@ -66,6 +66,8 @@ export const TEST_COLLECTION_SELECT_OPTIONS = [
       },
       { value: 'question_context', label: 'Context Setting' },
       { value: 'question_open', label: 'Open Response' },
+      { value: 'question_single_choice', label: 'Single Choice' },
+      { value: 'question_multiple_choice', label: 'Multiple Choice' },
     ],
   },
 ]
