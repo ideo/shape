@@ -28,6 +28,7 @@
 #
 # Indexes
 #
+#  index_collection_cards_on_archive_batch          (archive_batch)
 #  index_collection_cards_on_collection_id          (collection_id)
 #  index_collection_cards_on_item_id                (item_id)
 #  index_collection_cards_on_order_and_row_and_col  (order,row,col)
@@ -386,16 +387,8 @@ class CollectionCard < ApplicationRecord
 
   def card_question_type
     return nil unless parent.is_a?(Collection::TestCollection) || parent.is_a?(Collection::TestDesign)
-    return nil unless item.present?
 
-    case item.type
-    when 'Item::QuestionItem'
-      return item.question_type
-    when 'Item::TextItem'
-      return 'question_description'
-    when 'Item::FileItem', 'Item::VideoItem', 'Item::LinkItem'
-      return 'question_media'
-    end
+    item&.question_type
   end
 
   def update_collection_cover

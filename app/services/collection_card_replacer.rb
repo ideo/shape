@@ -5,6 +5,7 @@ class CollectionCardReplacer
   def initialize(replacing_card:, params:)
     @replacing_card = replacing_card
     @item = @replacing_card.item
+    @image_contain = params[:image_contain]
     @attrs = params[:item_attributes]
     @errors = nil
   end
@@ -16,6 +17,7 @@ class CollectionCardReplacer
       @errors = @replacing_card.errors
       return false
     end
+    @replacing_card.update(image_contain: @image_contain)
     # now capture errors on the item
     @errors = @item.errors
     assign_item_attributes

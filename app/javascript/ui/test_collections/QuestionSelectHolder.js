@@ -109,7 +109,7 @@ QuestionSelectHolder.propTypes = {
     isPinnedInTemplate: PropTypes.bool,
     isPinnedAndLocked: PropTypes.bool,
     order: PropTypes.number.isRequired,
-    card_question_type: PropTypes.string.isRequired,
+    card_question_type: PropTypes.string,
   }).isRequired, // specify or use MobxPropTypes?
   canEdit: PropTypes.bool.isRequired,
   handleSelectChange: PropTypes.func.isRequired,

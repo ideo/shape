@@ -20,22 +20,6 @@ import AudienceSettings from '~/ui/test_collections/AudienceSettings'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 
-// TODO: have first and last TestQuestionFlexWrapper replace BottomBorder/TopBorder
-const TopBorder = styled.div`
-  background-color: ${props => props.theme.borderColorEditing};
-  border-radius: 7px 7px 0 0;
-  height: 16px;
-  margin-left: 314px;
-  width: 374px;
-
-  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
-    display: none;
-  }
-`
-const BottomBorder = styled(TopBorder)`
-  border-radius: 0 0 7px 7px;
-`
-
 const TestQuestionFlexWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -360,7 +344,11 @@ class TestDesigner extends React.Component {
               handleSelectChange={this.handleSelectChange}
               handleTrash={this.handleTrash}
             />
-            <TestQuestionHolder editing userEditable={userEditable}>
+            <TestQuestionHolder
+              position={position}
+              editing
+              userEditable={userEditable}
+            >
               <TestQuestion
                 editing
                 parent={collection}
@@ -384,9 +372,7 @@ class TestDesigner extends React.Component {
         <OuterContainer>
           <div className={'design-column'}>
             <h3>Feedback Design</h3>
-            <TopBorder />
             {inner}
-            <BottomBorder />
           </div>
           <div className={'settings-column'}>
             <h3>Feedback Settings</h3>

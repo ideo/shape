@@ -32,10 +32,12 @@
 #
 # Indexes
 #
+#  index_items_on_archive_batch                        (archive_batch)
 #  index_items_on_breadcrumb                           (breadcrumb) USING gin
 #  index_items_on_cloned_from_id                       (cloned_from_id)
 #  index_items_on_created_at                           (created_at)
 #  index_items_on_data_source_type_and_data_source_id  (data_source_type,data_source_id)
+#  index_items_on_question_type                        (question_type)
 #  index_items_on_roles_anchor_collection_id           (roles_anchor_collection_id)
 #  index_items_on_type                                 (type)
 #
@@ -71,8 +73,6 @@ class Item < ApplicationRecord
 
   store_accessor :cached_attributes,
                  :cached_tag_list,
-                 :cached_filestack_file_url,
-                 :cached_filestack_file_info,
                  :previous_thumbnail_urls,
                  :cached_inheritance,
                  :pending_transcoding_uuid,
@@ -123,6 +123,21 @@ class Item < ApplicationRecord
   after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
   after_commit :reindex_parent_collection, unless: :destroyed?
   after_commit :update_parent_collection_if_needed, unless: :destroyed?
+
+  # declared in Item so that media (e.g. Files/Links) can utilize this
+  enum question_type: {
+    question_context: 0,
+    question_useful: 1,
+    question_open: 2,
+    question_idea_placeholder: 4,
+    question_description: 5,
+    question_finish: 6,
+    question_clarity: 7,
+    question_excitement: 8,
+    question_different: 9,
+    question_category_satisfaction: 10,
+    question_idea: 11,
+  }
 
   amoeba do
     enable

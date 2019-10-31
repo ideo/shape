@@ -53,9 +53,9 @@ const RoundAddButton = styled.button`
 
 const HotAreaButton = styled.button`
   box-sizing: border-box;
-  height: 40px;
+  height: 25px;
   position: absolute;
-  top: -10px;
+  top: 10px;
   width: 100%;
   z-index: 901;
 `

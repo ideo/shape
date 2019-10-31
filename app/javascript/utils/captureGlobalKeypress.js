@@ -48,6 +48,7 @@ const captureGlobalKeypress = e => {
       'public-DraftEditor-content',
       'edit-cover-title',
       'edit-cover-subtitle',
+      'test-designer-text-input',
     ]).length > 0
 
   if (shouldNormalKeyPressBeAllowed) return false

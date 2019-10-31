@@ -32,10 +32,12 @@
 #
 # Indexes
 #
+#  index_items_on_archive_batch                        (archive_batch)
 #  index_items_on_breadcrumb                           (breadcrumb) USING gin
 #  index_items_on_cloned_from_id                       (cloned_from_id)
 #  index_items_on_created_at                           (created_at)
 #  index_items_on_data_source_type_and_data_source_id  (data_source_type,data_source_id)
+#  index_items_on_question_type                        (question_type)
 #  index_items_on_roles_anchor_collection_id           (roles_anchor_collection_id)
 #  index_items_on_type                                 (type)
 #
@@ -85,24 +87,12 @@ class Item
       )
     }
 
-    enum question_type: {
-      question_context: 0,
-      question_useful: 1,
-      question_open: 2,
-      question_media: 4,
-      question_description: 5,
-      question_finish: 6,
-      question_clarity: 7,
-      question_excitement: 8,
-      question_different: 9,
-      question_category_satisfaction: 10,
-    }
-
     def self.question_type_categories
       {
         idea_content: %i[
           question_description
           question_media
+          question_idea
         ],
         scaled_rating: %i[
           question_context
@@ -121,7 +111,12 @@ class Item
     end
 
     def self.unanswerable_question_types
-      %i[question_media question_description question_finish]
+      %i[
+        question_media
+        question_description
+        question_finish
+        question_idea
+      ]
     end
 
     def self.question_title_and_description(question_type = nil)

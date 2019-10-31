@@ -32,10 +32,12 @@
 #
 # Indexes
 #
+#  index_items_on_archive_batch                        (archive_batch)
 #  index_items_on_breadcrumb                           (breadcrumb) USING gin
 #  index_items_on_cloned_from_id                       (cloned_from_id)
 #  index_items_on_created_at                           (created_at)
 #  index_items_on_data_source_type_and_data_source_id  (data_source_type,data_source_id)
+#  index_items_on_question_type                        (question_type)
 #  index_items_on_roles_anchor_collection_id           (roles_anchor_collection_id)
 #  index_items_on_type                                 (type)
 #
@@ -48,14 +50,6 @@ class Item
 
     def image_url
       filestack_file_url
-    end
-
-    # TODO: may get rid of this since we're returning the related filestack record?
-    def cache_attributes
-      if cached_filestack_file_url != filestack_file_url
-        self.cached_filestack_file_url = filestack_file_url
-      end
-      super
     end
 
     def requires_roles?

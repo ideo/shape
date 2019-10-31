@@ -2,6 +2,9 @@ import TestQuestion from '~/ui/test_collections/TestQuestion'
 import { fakeCollection, fakeItemCard, fakeQuestionItem } from '#/mocks/data'
 
 let wrapper, props
+const rerender = () => {
+  wrapper = shallow(<TestQuestion.wrappedComponent {...props} />)
+}
 describe('TestQuestion', () => {
   beforeEach(() => {
     props = {
@@ -10,13 +13,14 @@ describe('TestQuestion', () => {
       item: fakeQuestionItem,
       editing: true,
       numberOfQuestions: 4,
+      apiStore: {},
     }
   })
 
   describe('with "useful" type', () => {
     beforeEach(() => {
       props.card.card_question_type = 'question_useful'
-      wrapper = shallow(<TestQuestion {...props} />)
+      rerender()
     })
 
     it('renders ScaleQuestion', () => {
@@ -24,25 +28,25 @@ describe('TestQuestion', () => {
     })
   })
 
-  describe('with "media" type', () => {
+  describe('with "idea" type', () => {
     beforeEach(() => {
-      props.card.card_question_type = 'question_media'
-      wrapper = shallow(<TestQuestion {...props} />)
+      props.card.card_question_type = 'question_idea'
+      rerender()
     })
 
-    it('renders GridCardBlank to insert media', () => {
-      expect(wrapper.find('GridCardBlank').exists()).toBeTruthy()
+    it('renders IdeaQuestion', () => {
+      expect(wrapper.find('IdeaQuestion').exists()).toBeTruthy()
     })
   })
 
   describe('with "description" type', () => {
     beforeEach(() => {
       props.card.card_question_type = 'question_description'
-      wrapper = shallow(<TestQuestion {...props} />)
+      rerender()
     })
 
-    it('renders DescriptionQuestion', () => {
-      expect(wrapper.find('DescriptionQuestion').props().item).toEqual(
+    it('renders QuestionContentEditor', () => {
+      expect(wrapper.find('QuestionContentEditor').props().item).toEqual(
         props.item
       )
     })
@@ -52,10 +56,10 @@ describe('TestQuestion', () => {
     beforeEach(() => {
       props.parent.gives_incentive = true
       props.card.card_question_type = 'question_finish'
-      wrapper = shallow(<TestQuestion {...props} />)
+      rerender()
     })
 
-    it('renders DescriptionQuestion', () => {
+    it('renders QuestionContentEditor', () => {
       const finishQuestion = wrapper.find('FinishQuestion')
       expect(finishQuestion.props().givesIncentive).toEqual(
         props.parent.gives_incentive
