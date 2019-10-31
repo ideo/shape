@@ -5,7 +5,7 @@
 #  id                    :bigint(8)        not null, primary key
 #  answer_number         :integer
 #  answer_text           :text
-#  selected_choice_ids   :jsonb
+#  selected_choice_ids   :jsonb            not null
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
 #  open_response_item_id :integer

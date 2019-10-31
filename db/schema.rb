@@ -526,13 +526,6 @@ ActiveRecord::Schema.define(version: 2019_10_31_202704) do
     t.index ["user_id"], name: "index_payments_on_user_id"
   end
 
-  create_table "question_answer_choices", force: :cascade do |t|
-    t.integer "question_choice_id"
-    t.integer "question_answer_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "question_answers", force: :cascade do |t|
     t.bigint "survey_response_id"
     t.bigint "question_id"
@@ -541,7 +534,7 @@ ActiveRecord::Schema.define(version: 2019_10_31_202704) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "open_response_item_id"
-    t.jsonb "selected_choice_ids"
+    t.jsonb "selected_choice_ids", default: [], null: false
     t.index ["survey_response_id", "question_id"], name: "index_question_answers_on_survey_response_id_and_question_id", unique: true
   end
 
