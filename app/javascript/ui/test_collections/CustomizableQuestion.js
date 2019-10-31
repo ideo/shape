@@ -137,43 +137,12 @@ class CustomizableQuestion extends React.Component {
     question.save()
   }
 
-  renderEditableCategory = questionText => {
-    const { editing, questionContent } = this.state
-    if (!editing)
-      return (
-        <DisplayText
-          color={v.colors.white}
-          onClick={this.startEditing}
-          alt={`${questionText} ${questionContent}?`}
-        >
-          {questionText}
-          <div className="editable-text">{questionContent}</div>?
-        </DisplayText>
-      )
-    return (
-      <DisplayText color={v.colors.white}>
-        {questionText}
-        <EditableInput
-          type="text"
-          placeholder="type your category here"
-          value={questionContent}
-          onChange={this.handleInputChange}
-          onKeyPress={this.handleKeyPress}
-          onBlur={this.stopEditingIfContent}
-        />
-        ?
-      </DisplayText>
-    )
-  }
-
   get question() {
     const { question, editing } = this.props
-    const { question_description } = question
     const { questionContent } = this.state
     return (
       <Question editing={editing}>
         <DisplayText color={v.colors.white}>
-          {question.content}
           <EditableInput
             type="text"
             placeholder="write question here"
@@ -183,6 +152,17 @@ class CustomizableQuestion extends React.Component {
             onBlur={this.stopEditingIfContent}
           />
         </DisplayText>
+        <br />
+        <SmallHelperText
+          color="rgba(255, 255, 255, 0.5)"
+          style={{ marginLeft: '8px' }}
+        >
+          {question.question_type === 'question_multiple_choice' ? (
+            <span>please select all options that apply</span>
+          ) : (
+            <span>please select one option</span>
+          )}
+        </SmallHelperText>
       </Question>
     )
   }
