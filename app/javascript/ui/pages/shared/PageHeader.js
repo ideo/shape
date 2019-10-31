@@ -421,7 +421,12 @@ class PageHeader extends React.Component {
 
               {record.show_language_selector && (
                 <Flex
-                  style={{ position: 'relative', top: '15px', height: '33px' }}
+                  style={{
+                    position: 'relative',
+                    top: '22px',
+                    right: '60px',
+                    height: '33px',
+                  }}
                 >
                   <LanguageSelector />
                 </Flex>
