@@ -107,7 +107,6 @@ class PageHeader extends React.Component {
 
   handleFilterClick = ev => {
     ev.preventDefault()
-    console.log('filter click')
   }
 
   openMoveMenuForTemplate = e => {
