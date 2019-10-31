@@ -395,7 +395,7 @@ class CollectionCard < ApplicationRecord
     when 'Item::TextItem'
       return 'question_description'
     when 'Item::FileItem', 'Item::VideoItem', 'Item::LinkItem'
-      return 'question_media'
+      return 'question_idea'
     end
   end
 

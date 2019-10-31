@@ -97,6 +97,7 @@ class Item
       question_excitement: 8,
       question_different: 9,
       question_category_satisfaction: 10,
+      question_idea: 11,
     }
 
     def self.question_type_categories
@@ -104,6 +105,7 @@ class Item
         idea_content: %i[
           question_description
           question_media
+          question_idea
         ],
         scaled_rating: %i[
           question_context
@@ -122,7 +124,12 @@ class Item
     end
 
     def self.unanswerable_question_types
-      %i[question_media question_description question_finish]
+      %i[
+        question_media
+        question_description
+        question_finish
+        question_idea
+      ]
     end
 
     def self.question_title_and_description(question_type = nil)

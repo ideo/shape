@@ -15,7 +15,7 @@ Feature: Creating a Test Collection
 
     # Scenario: Setting up the questions and launching the test
     When I add a link URL
-    And I fill "DescriptionQuestionText" with some text
+    And I fill "QuestionContentEditorText" with some text
     And I wait for "@apiUpdateItem" to finish
     And I add an open response question
     And I click the "audienceCheckbox-share-via-link"

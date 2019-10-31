@@ -72,8 +72,6 @@ class Item < ApplicationRecord
 
   store_accessor :cached_attributes,
                  :cached_tag_list,
-                 :cached_filestack_file_url,
-                 :cached_filestack_file_info,
                  :previous_thumbnail_urls,
                  :cached_inheritance,
                  :pending_transcoding_uuid,

@@ -298,6 +298,7 @@ class CardCoverEditor extends React.Component {
     uiStore.setEditingCardCover(null)
   }
 
+  @action
   setObservableInputs = () => {
     const { record } = this.props.card
     const { name } = record

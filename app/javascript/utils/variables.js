@@ -45,7 +45,8 @@ export const TEST_COLLECTION_SELECT_OPTIONS = [
     category: 'Idea Content',
     values: [
       { value: 'question_description', label: 'Description' },
-      { value: 'question_media', label: 'Photo/Video' },
+      { value: 'question_media', label: 'Media (OLD)' },
+      { value: 'question_idea', label: 'Idea' },
     ],
   },
   {

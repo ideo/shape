@@ -190,7 +190,7 @@ When('I add an open response question', () => {
   // have to wait for the flipmove fade-in
   cy.wait(FLIPMOVE_DELAY)
 
-  cy.locate('DescriptionQuestionText')
+  cy.locate('QuestionContentEditorText')
     .last()
     .click()
     .type('What do you think about pizza?')
