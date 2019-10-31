@@ -24,7 +24,7 @@ const StyledCommentSubject = styled.div`
   font-family: ${v.fonts.sans};
   color: ${v.colors.commonMedium};
   padding-top: 10px;
-  overflow-x: hidden;
+  overflow: hidden;
 `
 
 const CommentTextContent = styled.div`

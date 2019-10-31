@@ -24,7 +24,7 @@ class SerializableCollection < BaseJsonSerializer
 
   has_many :roles do
     data do
-      @object.anchored_roles(viewing_organization_id: @current_user.current_organization_id)
+      @object.anchored_roles(viewing_organization_id: @current_user&.current_organization_id)
     end
   end
 
@@ -45,6 +45,7 @@ class SerializableCollection < BaseJsonSerializer
   belongs_to :created_by
   has_many :test_audiences
   has_one :test_results_collection
+  has_many :collection_filters
 
   attribute :organization_id do
     @object.organization_id.to_s

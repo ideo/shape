@@ -389,6 +389,7 @@ export const MarketingShapeLogo = styled.img.attrs({
 MarketingShapeLogo.displayName = 'StyledMarketingShapeLogo'
 
 const space = [0, 8, 16, 32, 64]
+// These breakpoints are based on REMs, e.g., 52*16 = 832px
 const breakpoints = [40, 52, 64]
 
 export function MarketingFlex(props) {

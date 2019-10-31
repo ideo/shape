@@ -1,0 +1,2 @@
+class DeserializableCollectionFilter < BaseJsonDeserializer
+end

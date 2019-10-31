@@ -162,6 +162,7 @@ class CommentThread extends BaseRecord {
       // increment unresolved count by 1 for collection cover to get recent count
       commentingOnRecord.unresolved_count =
         commentingOnRecord.unresolved_count + 1
+      uiStore.setCommentingOnRecord(null)
       return
     }
     if (

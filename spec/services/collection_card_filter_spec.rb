@@ -147,6 +147,24 @@ RSpec.describe CollectionCardFilter, type: :service do
           )
         end
       end
+
+      context 'with a filter query' do
+        let!(:filters) { { q: 'plant', page: 1 } }
+
+        before do
+          visible_card_1.record.update(
+            name: 'a plant'
+          )
+          Collection.reindex
+          Collection.searchkick_index.refresh
+        end
+
+        it 'should only return the cards that match the filter query' do
+          expect(subject).to match_array(
+            [visible_card_1,]
+          )
+        end
+      end
     end
 
     context 'as an editor' do
