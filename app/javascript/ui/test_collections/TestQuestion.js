@@ -226,4 +226,6 @@ TestQuestion.defaultProps = {
   numberOfQuestions: null,
 }
 
+TestQuestion.displayName = 'TestQuestion'
+
 export default TestQuestion

@@ -67,7 +67,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "update": [MockFunction],
             "width": 1,
           },
-          "quill_data": undefined,
+          "quill_data": Object {
+            "ops": Array [
+              Object {
+                "insert": "hello world 
+",
+              },
+            ],
+          },
           "type": "Item::TextItem",
         },
         "maxWidth": 1,
@@ -129,7 +136,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "update": [MockFunction],
             "width": 1,
           },
-          "quill_data": undefined,
+          "quill_data": Object {
+            "ops": Array [
+              Object {
+                "insert": "hello world 
+",
+              },
+            ],
+          },
           "type": "Item::TextItem",
         },
         "save": [MockFunction],
@@ -254,7 +268,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -316,7 +337,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -382,7 +410,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -444,7 +479,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -510,7 +552,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -572,7 +621,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -719,7 +775,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -781,7 +844,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -847,7 +917,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -909,7 +986,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -975,7 +1059,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -1037,7 +1128,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -1139,7 +1237,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -1201,7 +1306,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -1267,7 +1379,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -1329,7 +1448,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -1395,7 +1521,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -1457,7 +1590,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -1546,7 +1686,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -1608,7 +1755,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -1674,7 +1828,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -1736,7 +1897,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -1802,7 +1970,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -1864,7 +2039,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -1940,7 +2122,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
           "update": [MockFunction],
           "width": 1,
         },
-        "quill_data": undefined,
+        "quill_data": Object {
+          "ops": Array [
+            Object {
+              "insert": "hello world 
+",
+            },
+          ],
+        },
         "type": "Item::TextItem",
       }
     }
@@ -2011,7 +2200,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "update": [MockFunction],
             "width": 1,
           },
-          "quill_data": undefined,
+          "quill_data": Object {
+            "ops": Array [
+              Object {
+                "insert": "hello world 
+",
+              },
+            ],
+          },
           "type": "Item::TextItem",
         },
         "maxWidth": 1,
@@ -2073,7 +2269,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "update": [MockFunction],
             "width": 1,
           },
-          "quill_data": undefined,
+          "quill_data": Object {
+            "ops": Array [
+              Object {
+                "insert": "hello world 
+",
+              },
+            ],
+          },
           "type": "Item::TextItem",
         },
         "save": [MockFunction],
@@ -2198,7 +2401,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -2260,7 +2470,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -2326,7 +2543,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -2388,7 +2612,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -2454,7 +2685,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -2516,7 +2754,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -2663,7 +2908,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -2725,7 +2977,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -2791,7 +3050,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -2853,7 +3119,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -2919,7 +3192,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -2981,7 +3261,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -3083,7 +3370,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -3145,7 +3439,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -3211,7 +3512,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -3273,7 +3581,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -3339,7 +3654,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -3401,7 +3723,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -3490,7 +3819,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -3552,7 +3888,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -3618,7 +3961,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -3680,7 +4030,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -3746,7 +4103,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -3808,7 +4172,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -3884,7 +4255,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
           "update": [MockFunction],
           "width": 1,
         },
-        "quill_data": undefined,
+        "quill_data": Object {
+          "ops": Array [
+            Object {
+              "insert": "hello world 
+",
+            },
+          ],
+        },
         "type": "Item::TextItem",
       }
     }
@@ -3955,7 +4333,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "update": [MockFunction],
             "width": 1,
           },
-          "quill_data": undefined,
+          "quill_data": Object {
+            "ops": Array [
+              Object {
+                "insert": "hello world 
+",
+              },
+            ],
+          },
           "type": "Item::TextItem",
         },
         "maxWidth": 1,
@@ -4017,7 +4402,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "update": [MockFunction],
             "width": 1,
           },
-          "quill_data": undefined,
+          "quill_data": Object {
+            "ops": Array [
+              Object {
+                "insert": "hello world 
+",
+              },
+            ],
+          },
           "type": "Item::TextItem",
         },
         "save": [MockFunction],
@@ -4142,7 +4534,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -4204,7 +4603,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -4270,7 +4676,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -4332,7 +4745,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -4398,7 +4818,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -4460,7 +4887,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -4607,7 +5041,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -4669,7 +5110,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -4735,7 +5183,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -4797,7 +5252,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -4863,7 +5325,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -4925,7 +5394,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -5027,7 +5503,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -5089,7 +5572,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -5155,7 +5645,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -5217,7 +5714,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -5283,7 +5787,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -5345,7 +5856,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -5434,7 +5952,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -5496,7 +6021,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -5562,7 +6094,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -5624,7 +6163,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -5690,7 +6236,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -5752,7 +6305,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -5828,7 +6388,14 @@ exports[`CollectionGrid renders snapshot 1`] = `
           "update": [MockFunction],
           "width": 1,
         },
-        "quill_data": undefined,
+        "quill_data": Object {
+          "ops": Array [
+            Object {
+              "insert": "hello world 
+",
+            },
+          ],
+        },
         "type": "Item::TextItem",
       }
     }

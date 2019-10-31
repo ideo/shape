@@ -38,8 +38,8 @@ describe('TextItemCover', () => {
     expectTreeToMatchSnapshot(wrapper)
   })
 
-  it('renders Quill with item.data_content', () => {
-    expect(wrapper.find('Quill').props().value).toBe(item.data_content)
+  it('renders Quill with item.quill_data', () => {
+    expect(wrapper.find('Quill').props().value).toBe(item.quill_data)
   })
 
   it('renders Read More if text height exceeds the viewable area', () => {

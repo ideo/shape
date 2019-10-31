@@ -47,13 +47,14 @@ class PillList extends React.Component {
             avatar = <PillIconHolder>{item.icon}</PillIconHolder>
           }
 
+          const identifier = item.name || item.id || item.email
           // This could be a user, a group or an unregistered user
           return (
             <Pill
-              key={item.name || item.id || item.email}
+              key={identifier}
               symbol={avatar}
-              label={item.name}
-              id={item.id}
+              label={item.name || identifier}
+              id={item.id || identifier}
               onDelete={this.handleDelete(item)}
               selectable={item.selectable}
               selected={item.selected}

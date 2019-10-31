@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import QuestionSelectHolder from '~/ui/test_collections/QuestionSelectHolder'
 import { fakeCollectionCard } from '#/mocks/data'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
@@ -26,9 +27,17 @@ describe('TestDesigner', () => {
     )
   })
 
-  it('renders the question options alphabetically', () => {
+  it('renders the question options', () => {
     const select = wrapper.find('StyledSelect StyledSelectOption')
-    expect(select.get(2).props.value).toEqual('question_description')
-    expect(select.get(3).props.value).toEqual('question_idea')
+    const values = _.compact(select.map(n => n.props().value))
+    expect(values).toEqual([
+      'question_description',
+      'question_clarity',
+      'question_different',
+      'question_excitement',
+      'question_useful',
+      'question_open',
+      'question_media',
+    ])
   })
 })

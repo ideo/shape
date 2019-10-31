@@ -4,11 +4,12 @@ exports[`TestDesigner renders snapshot 1`] = `
 <ThemeProvider
   theme={
     Object {
-      "backgroundColor": "#5698ae",
-      "backgroundColorEditable": "#9ec1cc",
+      "backgroundColor": "#35889e",
+      "backgroundColorEditable": "#4a5b71",
       "borderColor": "#9ec1cc",
-      "borderColorEditing": "#c6c1bf",
+      "borderColorEditing": "#9ec1cc",
       "descriptionText": "#f5f4f3",
+      "placeholder": "#9ec1cc",
       "questionText": "#5698ae",
       "responseHolder": "#f5f4f3",
     }
@@ -28,11 +29,9 @@ exports[`TestDesigner renders snapshot 1`] = `
           intro
         </StyledLargerH3>
       </StyledSection>
-      <styled.div />
       <styled.div
         className="card"
       />
-      <Styled(styled.div) />
       <StyledSection>
         <StyledLargerH3
           data-cy="section-title"
@@ -40,7 +39,6 @@ exports[`TestDesigner renders snapshot 1`] = `
           Idea(s)
         </StyledLargerH3>
       </StyledSection>
-      <styled.div />
       <FlipMovePropConverter
         appearAnimation="fade"
         delay={0}
@@ -123,7 +121,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -177,7 +182,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -191,6 +203,8 @@ exports[`TestDesigner renders snapshot 1`] = `
           />
           <styled.div
             editing={true}
+            firstCard={true}
+            lastCard={false}
             userEditable={false}
           >
             <TestQuestion
@@ -257,7 +271,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "update": [MockFunction],
                       "width": 1,
                     },
-                    "quill_data": undefined,
+                    "quill_data": Object {
+                      "ops": Array [
+                        Object {
+                          "insert": "hello world 
+",
+                        },
+                      ],
+                    },
                     "type": "Item::TextItem",
                   },
                   "maxWidth": 1,
@@ -311,7 +332,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "update": [MockFunction],
                       "width": 1,
                     },
-                    "quill_data": undefined,
+                    "quill_data": Object {
+                      "ops": Array [
+                        Object {
+                          "insert": "hello world 
+",
+                        },
+                      ],
+                    },
                     "type": "Item::TextItem",
                   },
                   "save": [MockFunction],
@@ -371,7 +399,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 }
               }
@@ -707,7 +742,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -761,7 +803,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -829,7 +878,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -883,7 +939,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -951,7 +1014,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -1005,7 +1075,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -1154,7 +1231,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -1208,7 +1292,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -1276,7 +1367,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -1330,7 +1428,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -1398,7 +1503,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -1452,7 +1564,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -1556,7 +1675,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -1610,7 +1736,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -1678,7 +1811,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -1732,7 +1872,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -1800,7 +1947,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -1854,7 +2008,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -1945,7 +2106,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -1999,7 +2167,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -2067,7 +2242,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -2121,7 +2303,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -2189,7 +2378,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -2243,7 +2439,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -2349,7 +2552,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -2403,7 +2613,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -2417,6 +2634,8 @@ exports[`TestDesigner renders snapshot 1`] = `
           />
           <styled.div
             editing={true}
+            firstCard={false}
+            lastCard={false}
             userEditable={false}
           >
             <TestQuestion
@@ -2483,7 +2702,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "update": [MockFunction],
                       "width": 1,
                     },
-                    "quill_data": undefined,
+                    "quill_data": Object {
+                      "ops": Array [
+                        Object {
+                          "insert": "hello world 
+",
+                        },
+                      ],
+                    },
                     "type": "Item::TextItem",
                   },
                   "maxWidth": 1,
@@ -2537,7 +2763,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "update": [MockFunction],
                       "width": 1,
                     },
-                    "quill_data": undefined,
+                    "quill_data": Object {
+                      "ops": Array [
+                        Object {
+                          "insert": "hello world 
+",
+                        },
+                      ],
+                    },
                     "type": "Item::TextItem",
                   },
                   "save": [MockFunction],
@@ -2597,7 +2830,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 }
               }
@@ -2933,7 +3173,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -2987,7 +3234,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -3055,7 +3309,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -3109,7 +3370,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -3177,7 +3445,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -3231,7 +3506,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -3380,7 +3662,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -3434,7 +3723,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -3502,7 +3798,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -3556,7 +3859,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -3624,7 +3934,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -3678,7 +3995,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -3782,7 +4106,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -3836,7 +4167,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -3904,7 +4242,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -3958,7 +4303,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -4026,7 +4378,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -4080,7 +4439,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -4171,7 +4537,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -4225,7 +4598,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -4293,7 +4673,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -4347,7 +4734,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -4415,7 +4809,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -4469,7 +4870,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -4575,7 +4983,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -4629,7 +5044,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -4643,6 +5065,8 @@ exports[`TestDesigner renders snapshot 1`] = `
           />
           <styled.div
             editing={true}
+            firstCard={false}
+            lastCard={true}
             userEditable={false}
           >
             <TestQuestion
@@ -4709,7 +5133,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "update": [MockFunction],
                       "width": 1,
                     },
-                    "quill_data": undefined,
+                    "quill_data": Object {
+                      "ops": Array [
+                        Object {
+                          "insert": "hello world 
+",
+                        },
+                      ],
+                    },
                     "type": "Item::TextItem",
                   },
                   "maxWidth": 1,
@@ -4763,7 +5194,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                       "update": [MockFunction],
                       "width": 1,
                     },
-                    "quill_data": undefined,
+                    "quill_data": Object {
+                      "ops": Array [
+                        Object {
+                          "insert": "hello world 
+",
+                        },
+                      ],
+                    },
                     "type": "Item::TextItem",
                   },
                   "save": [MockFunction],
@@ -4823,7 +5261,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 }
               }
@@ -5159,7 +5604,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -5213,7 +5665,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -5281,7 +5740,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -5335,7 +5801,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -5403,7 +5876,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -5457,7 +5937,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -5606,7 +6093,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -5660,7 +6154,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -5728,7 +6229,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -5782,7 +6290,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -5850,7 +6365,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -5904,7 +6426,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -6008,7 +6537,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -6062,7 +6598,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -6130,7 +6673,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -6184,7 +6734,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -6252,7 +6809,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "maxWidth": 1,
@@ -6306,7 +6870,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                               "update": [MockFunction],
                               "width": 1,
                             },
-                            "quill_data": undefined,
+                            "quill_data": Object {
+                              "ops": Array [
+                                Object {
+                                  "insert": "hello world 
+",
+                                },
+                              ],
+                            },
                             "type": "Item::TextItem",
                           },
                           "save": [MockFunction],
@@ -6397,7 +6968,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -6451,7 +7029,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -6519,7 +7104,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -6573,7 +7165,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -6641,7 +7240,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "maxWidth": 1,
@@ -6695,7 +7301,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                           "update": [MockFunction],
                           "width": 1,
                         },
-                        "quill_data": undefined,
+                        "quill_data": Object {
+                          "ops": Array [
+                            Object {
+                              "insert": "hello world 
+",
+                            },
+                          ],
+                        },
                         "type": "Item::TextItem",
                       },
                       "save": [MockFunction],
@@ -6719,7 +7332,6 @@ exports[`TestDesigner renders snapshot 1`] = `
           </styled.div>
         </styled.div>
       </FlipMovePropConverter>
-      <Styled(styled.div) />
       <StyledSection>
         <StyledLargerH3
           data-cy="section-title"
@@ -6727,11 +7339,9 @@ exports[`TestDesigner renders snapshot 1`] = `
           outro
         </StyledLargerH3>
       </StyledSection>
-      <styled.div />
       <styled.div
         className="card"
       />
-      <Styled(styled.div) />
     </div>
     <div
       className="settings-column"
@@ -7092,7 +7702,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -7146,7 +7763,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -7214,7 +7838,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -7268,7 +7899,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -7336,7 +7974,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -7390,7 +8035,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -7539,7 +8191,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "update": [MockFunction],
                         "width": 1,
                       },
-                      "quill_data": undefined,
+                      "quill_data": Object {
+                        "ops": Array [
+                          Object {
+                            "insert": "hello world 
+",
+                          },
+                        ],
+                      },
                       "type": "Item::TextItem",
                     },
                     "maxWidth": 1,
@@ -7593,7 +8252,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "update": [MockFunction],
                         "width": 1,
                       },
-                      "quill_data": undefined,
+                      "quill_data": Object {
+                        "ops": Array [
+                          Object {
+                            "insert": "hello world 
+",
+                          },
+                        ],
+                      },
                       "type": "Item::TextItem",
                     },
                     "save": [MockFunction],
@@ -7661,7 +8327,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "update": [MockFunction],
                         "width": 1,
                       },
-                      "quill_data": undefined,
+                      "quill_data": Object {
+                        "ops": Array [
+                          Object {
+                            "insert": "hello world 
+",
+                          },
+                        ],
+                      },
                       "type": "Item::TextItem",
                     },
                     "maxWidth": 1,
@@ -7715,7 +8388,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "update": [MockFunction],
                         "width": 1,
                       },
-                      "quill_data": undefined,
+                      "quill_data": Object {
+                        "ops": Array [
+                          Object {
+                            "insert": "hello world 
+",
+                          },
+                        ],
+                      },
                       "type": "Item::TextItem",
                     },
                     "save": [MockFunction],
@@ -7783,7 +8463,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "update": [MockFunction],
                         "width": 1,
                       },
-                      "quill_data": undefined,
+                      "quill_data": Object {
+                        "ops": Array [
+                          Object {
+                            "insert": "hello world 
+",
+                          },
+                        ],
+                      },
                       "type": "Item::TextItem",
                     },
                     "maxWidth": 1,
@@ -7837,7 +8524,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "update": [MockFunction],
                         "width": 1,
                       },
-                      "quill_data": undefined,
+                      "quill_data": Object {
+                        "ops": Array [
+                          Object {
+                            "insert": "hello world 
+",
+                          },
+                        ],
+                      },
                       "type": "Item::TextItem",
                     },
                     "save": [MockFunction],
@@ -7941,7 +8635,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "update": [MockFunction],
                         "width": 1,
                       },
-                      "quill_data": undefined,
+                      "quill_data": Object {
+                        "ops": Array [
+                          Object {
+                            "insert": "hello world 
+",
+                          },
+                        ],
+                      },
                       "type": "Item::TextItem",
                     },
                     "maxWidth": 1,
@@ -7995,7 +8696,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "update": [MockFunction],
                         "width": 1,
                       },
-                      "quill_data": undefined,
+                      "quill_data": Object {
+                        "ops": Array [
+                          Object {
+                            "insert": "hello world 
+",
+                          },
+                        ],
+                      },
                       "type": "Item::TextItem",
                     },
                     "save": [MockFunction],
@@ -8063,7 +8771,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "update": [MockFunction],
                         "width": 1,
                       },
-                      "quill_data": undefined,
+                      "quill_data": Object {
+                        "ops": Array [
+                          Object {
+                            "insert": "hello world 
+",
+                          },
+                        ],
+                      },
                       "type": "Item::TextItem",
                     },
                     "maxWidth": 1,
@@ -8117,7 +8832,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "update": [MockFunction],
                         "width": 1,
                       },
-                      "quill_data": undefined,
+                      "quill_data": Object {
+                        "ops": Array [
+                          Object {
+                            "insert": "hello world 
+",
+                          },
+                        ],
+                      },
                       "type": "Item::TextItem",
                     },
                     "save": [MockFunction],
@@ -8185,7 +8907,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "update": [MockFunction],
                         "width": 1,
                       },
-                      "quill_data": undefined,
+                      "quill_data": Object {
+                        "ops": Array [
+                          Object {
+                            "insert": "hello world 
+",
+                          },
+                        ],
+                      },
                       "type": "Item::TextItem",
                     },
                     "maxWidth": 1,
@@ -8239,7 +8968,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                         "update": [MockFunction],
                         "width": 1,
                       },
-                      "quill_data": undefined,
+                      "quill_data": Object {
+                        "ops": Array [
+                          Object {
+                            "insert": "hello world 
+",
+                          },
+                        ],
+                      },
                       "type": "Item::TextItem",
                     },
                     "save": [MockFunction],
@@ -8330,7 +9066,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -8384,7 +9127,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -8452,7 +9202,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -8506,7 +9263,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -8574,7 +9338,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -8628,7 +9399,14 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],

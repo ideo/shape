@@ -32,6 +32,9 @@ export const fakeCollectionCard = {
   ...fakeJsonApiAttrs,
 }
 
+export const fakeQuillOp = {insert: "hello world \n"}
+export const fakeQuillData = {ops: [fakeQuillOp]}
+
 export const fakeTextItemAttrs = {
   id: '1',
   type: 'Item::TextItem',
@@ -47,9 +50,6 @@ export const fakeTextItemAttrs = {
   fullyLoaded: true,
   parent_collection_card: { ...fakeCollectionCard },
 }
-
-export const fakeQuillOp = {insert: "hello world \n"}
-export const fakeQuillData = {ops: [fakeQuillOp]}
 
 export const fakeAreaChartDataset = {
   identifier: 'question',
@@ -235,7 +235,6 @@ export const fakeTextItem = {
   getRecordType: jest.fn().mockReturnValue('items'),
   toJSON: jest.fn().mockReturnValue(fakeTextItemAttrs),
   pushUndo: jest.fn(),
-  quill_data: jest.fn().mockReturnValue(fakeQuillData),
   version: 1,
   ...fakeJsonApiAttrs,
 }

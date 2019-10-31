@@ -33,7 +33,10 @@ IdeaQuestion.propTypes = {
   // parent is the parent collection
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
   card: MobxPropTypes.objectOrObservableObject.isRequired,
-  canEdit: PropTypes.bool.isRequired,
+  canEdit: PropTypes.bool,
+}
+IdeaQuestion.defaultProps = {
+  canEdit: false,
 }
 IdeaQuestion.displayName = 'IdeaQuestion'
 

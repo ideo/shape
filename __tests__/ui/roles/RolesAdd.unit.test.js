@@ -89,13 +89,13 @@ describe('RolesAdd', () => {
 
       beforeEach(() => {
         userDataNew = {
-          id: 3,
+          id: '3',
           name: 'Mo',
           email: 'Mo@mo.com',
           internalType: 'users',
         }
         userDataExisting = {
-          id: 4,
+          id: '4',
           name: 't',
           email: 't@t.t',
           internalType: 'users',
@@ -158,7 +158,7 @@ describe('RolesAdd', () => {
       it('should map groups with handle as the value', () => {
         const searchableItems = [
           {
-            id: 3,
+            id: '3',
             name: 'groupname',
             handle: 'group-name',
             internalType: 'groups',
@@ -175,7 +175,7 @@ describe('RolesAdd', () => {
     describe('with users', () => {
       it('should map users with email as the value', () => {
         const searchableItems = [
-          { id: 3, name: 'user', email: 'user@u.com', internalType: 'users' },
+          { id: '3', name: 'user', email: 'user@u.com', internalType: 'users' },
         ]
         expect(wrapper.instance().mapItems(searchableItems)[0]).toEqual({
           value: 'user@u.com',
@@ -216,8 +216,8 @@ describe('RolesAdd', () => {
       component = wrapper.instance()
       unregisteredUsers = [{ email: 'name@name.com' }, { email: 'mo@mo.com' }]
       registeredUsers = [
-        { id: 4, email: 'm@ideo.com', name: 'm' },
-        { id: 3, email: 't@ideo.com', name: 't' },
+        { id: '4', email: 'm@ideo.com', name: 'm' },
+        { id: '3', email: 't@ideo.com', name: 't' },
       ]
     })
 
@@ -225,7 +225,7 @@ describe('RolesAdd', () => {
       beforeEach(() => {
         component.selectedUsers = unregisteredUsers
         props.onCreateUsers.mockReturnValue(
-          Promise.resolve({ data: [{ id: 1 }] })
+          Promise.resolve({ data: [{ id: '1' }] })
         )
       })
 
@@ -241,7 +241,7 @@ describe('RolesAdd', () => {
       it('should send the new users to be created with selected role', done => {
         component.handleSave().then(() => {
           expect(props.onCreateRoles).toHaveBeenCalledWith(
-            [{ id: 1 }],
+            [{ id: '1' }],
             'viewer',
             defaultOpts
           )

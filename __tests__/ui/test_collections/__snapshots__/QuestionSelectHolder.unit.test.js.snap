@@ -73,40 +73,6 @@ exports[`TestDesigner renders snapshot 1`] = `
     <StyledSelectOption
       classes={
         Object {
-          "root": "selectOption",
-          "selected": "selected",
-        }
-      }
-      disabled={false}
-      key="question_idea"
-      value="question_idea"
-    >
-      <span
-        data-cy="QuestionSelectOption-idea"
-      >
-        Idea
-      </span>
-    </StyledSelectOption>
-    <StyledSelectOption
-      classes={
-        Object {
-          "root": "selectOption",
-          "selected": "selected",
-        }
-      }
-      disabled={false}
-      key="question_idea_placeholder"
-      value="question_idea_placeholder"
-    >
-      <span
-        data-cy="QuestionSelectOption-idea-pl"
-      >
-        Idea (pl)
-      </span>
-    </StyledSelectOption>
-    <StyledSelectOption
-      classes={
-        Object {
           "root": "category",
           "selected": "selected",
         }
@@ -221,6 +187,23 @@ exports[`TestDesigner renders snapshot 1`] = `
         data-cy="QuestionSelectOption-open-response"
       >
         Open Response
+      </span>
+    </StyledSelectOption>
+    <StyledSelectOption
+      classes={
+        Object {
+          "root": "selectOption",
+          "selected": "selected",
+        }
+      }
+      disabled={false}
+      key="question_media"
+      value="question_media"
+    >
+      <span
+        data-cy="QuestionSelectOption-photo-video"
+      >
+        Photo/Video
       </span>
     </StyledSelectOption>
   </StyledSelect>
