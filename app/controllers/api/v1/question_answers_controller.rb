@@ -28,6 +28,7 @@ class Api::V1::QuestionAnswersController < Api::V1::BaseController
       :answer_text,
       :answer_number,
       :question_id,
+      :selected_choice_ids
     )
   end
 
@@ -35,6 +36,7 @@ class Api::V1::QuestionAnswersController < Api::V1::BaseController
     params.require(:question_answer).permit(
       :answer_text,
       :answer_number,
+      :selected_choice_ids,
     )
   end
 

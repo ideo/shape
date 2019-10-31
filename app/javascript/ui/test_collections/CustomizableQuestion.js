@@ -4,10 +4,9 @@ import styled from 'styled-components'
 import AutosizeInput from 'react-input-autosize'
 import { debounce } from 'lodash'
 
-import { Checkbox, Radio } from '~/ui/global/styled/forms'
-import Tooltip from '~/ui/global/Tooltip'
 import { DisplayText, SmallHelperText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
+import CustomizableQuestionChoice from '~/ui/test_collections/CustomizableQuestionChoice'
 
 const Question = styled.div`
   border-color: ${props =>
@@ -25,43 +24,11 @@ const Question = styled.div`
     display: inline-block;
   }
   &:hover .editable-text {
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: ${v.colors.white};
+    opacity: 0.5;
   }
 `
 Question.displayName = 'Question'
-
-const Scale = styled.div`
-  background-color: ${props => props.theme.responseHolder};
-  box-sizing: border-box;
-  padding: 7px 13px;
-  width: 100%;
-`
-
-const ChoicesHolder = styled.div`
-  background-color: ${props => props.theme.responseHolder};
-  box-sizing: border-box;
-  padding: 7px 0;
-`
-
-const ChoiceHolder = styled.div`
-  background: ${v.colors.commonLight};
-  padding: 12px 17px;
-  vertical-align: baseline;
-
-  &:hover {
-    background: white;
-  }
-`
-const Choice = ({ choice, question }) => (
-  <ChoiceHolder>
-    {question.question_type === 'question_single_choice' ? (
-      <Radio checked={false} onChange={() => {}} value="yes" />
-    ) : (
-      <Checkbox checked={false} onChange={() => {}} value="yes" />
-    )}
-    <DisplayText color={v.colors.commonDark}>{choice.text}</DisplayText>
-  </ChoiceHolder>
-)
 
 const EditableInput = styled(AutosizeInput)`
   input {
@@ -78,11 +45,18 @@ const EditableInput = styled(AutosizeInput)`
       outline: 0;
     }
     &::placeholder {
-      color: rgba(255, 255, 255, 0.5);
+      color: ${v.colors.white};
+      opacity: 0.5;
     }
   }
 `
 EditableInput.displayName = 'EditableInput'
+
+const ChoicesHolder = styled.div`
+  background-color: ${props => props.theme.responseHolder};
+  box-sizing: border-box;
+  padding: 7px 0;
+`
 
 @observer
 class CustomizableQuestion extends React.Component {
@@ -99,9 +73,9 @@ class CustomizableQuestion extends React.Component {
     )
   }
 
-  vote = number => ev => {
+  handleAnswerSelection = choice => ev => {
     ev.preventDefault()
-    this.props.onAnswer({ number })
+    this.props.onAnswer({ choice })
   }
 
   get hasEditableCategory() {
@@ -154,8 +128,8 @@ class CustomizableQuestion extends React.Component {
         </DisplayText>
         <br />
         <SmallHelperText
-          color="rgba(255, 255, 255, 0.5)"
-          style={{ marginLeft: '8px' }}
+          color={v.colors.white}
+          style={{ marginLeft: '8px', opacity: '0.5' }}
         >
           {question.question_type === 'question_multiple_choice' ? (
             <span>please select all options that apply</span>
@@ -168,14 +142,20 @@ class CustomizableQuestion extends React.Component {
   }
 
   render() {
-    const { question, editing, questionAnswer, question_choices } = this.props
+    const { question, questionAnswer, question_choices } = this.props
     const { question_type } = question
     return (
       <div style={{ width: '100%' }}>
         {this.question}
         <ChoicesHolder>
-          {question_choices.map(choice => (
-            <Choice choice={choice} question={question} />
+          {question_choices.map((choice, index) => (
+            <CustomizableQuestionChoice
+              choice={choice}
+              questionType={question_type}
+              questionAnswer={questionAnswer}
+              onChange={this.handleAnswerSelection(choice)}
+              key={`question-${question.id}-choice-${index}`}
+            />
           ))}
         </ChoicesHolder>
       </div>

@@ -56,6 +56,7 @@ class TestQuestion extends React.Component {
       afterQuestionAnswered,
     } = this.props
     const { text, number } = answer
+
     let { surveyResponse, questionAnswer } = this.props
     // components should never trigger this when editing, but double-check here
     if (editing) return
@@ -76,6 +77,7 @@ class TestQuestion extends React.Component {
           question_id: item.id,
           answer_text: text,
           answer_number: number,
+          selected_choice_ids: [],
         },
         apiStore
       )
@@ -88,6 +90,7 @@ class TestQuestion extends React.Component {
       await questionAnswer.API_update({
         answer_text: text,
         answer_number: number,
+        selected_choice_ids: [],
       })
     }
     afterQuestionAnswered(card)
@@ -104,11 +107,15 @@ class TestQuestion extends React.Component {
       item,
       editing,
       questionAnswer,
-      question_choices,
+      // question_choices,
       canEdit,
       surveyResponse,
       numberOfQuestions,
     } = this.props
+    const question_choices = [
+      { text: 'Choice A', value: '0' },
+      { text: 'Choice B', value: '1' },
+    ]
 
     let inner
     switch (card.card_question_type) {

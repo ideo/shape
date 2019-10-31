@@ -1,6 +1,6 @@
 class SerializableQuestionAnswer < BaseJsonSerializer
   type 'question_answers'
-  attributes :answer_text, :answer_number
+  attributes :answer_text, :answer_number, :selected_choice_ids
   attribute :question_id do
     # TODO: global stringify of _ids?
     @object.question_id.to_s
