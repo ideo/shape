@@ -123,6 +123,7 @@ ActiveRecord::Schema.define(version: 2019_10_31_165716) do
     t.boolean "show_replace", default: true
     t.integer "row"
     t.integer "col"
+    t.integer "section_type"
     t.index ["archive_batch"], name: "index_collection_cards_on_archive_batch"
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"

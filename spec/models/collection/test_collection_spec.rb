@@ -6,6 +6,9 @@ describe Collection::TestCollection, type: :model do
   let(:test_collection) do
     create(:test_collection, parent_collection: test_parent, roles_anchor_collection: test_parent)
   end
+  let(:num_default_questions) do
+    Collection::TestCollection.default_question_types_by_section.values.flatten.size
+  end
 
   context 'associations' do
     it { should have_many :survey_responses }
@@ -17,21 +20,25 @@ describe Collection::TestCollection, type: :model do
 
   context 'callbacks' do
     describe '#setup_default_status_and_questions' do
+      let(:sections_and_card_types) do
+        test_collection.collection_cards.each_with_object({}) do |collection_card, h|
+          h[collection_card.section_type.to_sym] ||= []
+          h[collection_card.section_type.to_sym] << collection_card.card_question_type.to_sym
+        end
+      end
+
       it 'should set the test_status to "draft"' do
         expect(test_collection.test_status).to eq 'draft'
       end
 
       it 'should create the default setup with its attached cards and items' do
-        expect(test_collection.collection_cards.count).to eq 4
-        expect(test_collection.items.count).to eq 4
+        expect(test_collection.collection_cards.count).to eq(num_default_questions)
+        expect(test_collection.items.count).to eq(num_default_questions)
 
         expect(
-          test_collection
-          .collection_cards
-          .map(&:card_question_type)
-          .map(&:to_sym),
+          sections_and_card_types,
         ).to eq(
-          Collection::TestCollection.default_question_types,
+          Collection::TestCollection.default_question_types_by_section,
         )
       end
 
@@ -82,6 +89,21 @@ describe Collection::TestCollection, type: :model do
 
       it 'returns gives_incentive_for test_audience = false' do
         expect(test_collection.gives_incentive_for?(test_audience.id)).to be false
+      end
+    end
+
+    describe '#archive_idea_questions' do
+      let(:collection_to_test) { create(:collection) }
+
+      it 'archives media and description if collection to test added' do
+        idea_cards = test_collection.idea_cards
+        non_idea_cards = test_collection.collection_cards - idea_cards
+        expect(idea_cards.all?(&:archived?)).to be false
+        test_collection.update(collection_to_test: collection_to_test)
+        idea_cards.each(&:reload)
+        non_idea_cards.each(&:reload)
+        expect(idea_cards.all?(&:archived?)).to be true
+        expect(non_idea_cards.all?(&:archived?)).to be false
       end
     end
   end
@@ -164,6 +186,7 @@ describe Collection::TestCollection, type: :model do
 
       before do
         test_collection.launch!(initiated_by: user)
+        expect(test_collection.errors.size).to eq(0)
         test_collection.reload
         expect(test_collection.live?).to be true
       end
@@ -303,7 +326,7 @@ describe Collection::TestCollection, type: :model do
                 test_collection.launch!(initiated_by: user)
               end.to change(
                 Dataset::Question, :count
-              ).by(2)
+              ).by(num_default_questions - 1) # Default questions, minus the finish question
               expect(Dataset::Question.last.groupings).to eq(
                 [{ 'id' => test_audience.id, 'type' => 'TestAudience' }],
               )
@@ -370,7 +393,9 @@ describe Collection::TestCollection, type: :model do
 
           it 'returns false with test_status errors' do
             expect(test_collection.launch!(initiated_by: user)).to be false
-            expect(test_collection.errors).to match_array(["You can't launch because the feedback is live"])
+            expect(test_collection.errors).to match_array(
+              ["You can't launch because the feedback is live"]
+            )
           end
         end
       end
@@ -498,7 +523,7 @@ describe Collection::TestCollection, type: :model do
 
     it 'should only get completed question cards' do
       # all the default cards + 4 incomplete
-      expect(test_collection.items.count).to eq 8
+      expect(test_collection.items.count).to eq(num_default_questions + 4)
       # all the default cards only (minus media because it gets removed)
       expect(test_collection.complete_question_cards & extra_question_cards).to be_empty
     end
@@ -672,8 +697,10 @@ describe Collection::TestCollection, type: :model do
     it 'returns false with test_status errors' do
       expect(test_collection.launch!(initiated_by: user)).to be false
       expect(test_collection.errors).to match_array([
-        'Please add an image or video for your idea to question 1',
-        'Please add your idea description to question 2',
+        'Please add your category to question 1',
+        'Please add an image or video for your idea to question 2',
+        'Please add your idea description to question 3',
+        'Please add your open response to question 7 and 8',
       ])
     end
   end

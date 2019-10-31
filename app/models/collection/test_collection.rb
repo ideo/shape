@@ -83,6 +83,7 @@ class Collection
     after_create :add_child_roles
     after_create :setup_link_sharing_test_audience, unless: :collection_to_test
     after_update :touch_test_results_collection, if: :saved_change_to_test_status?
+    after_update :archive_idea_questions, if: :now_in_collection_test_with_default_cards?
     after_commit :close_test_after_archive, if: :archived_on_previous_save?
 
     FEEDBACK_DESIGN_SUFFIX = 'Feedback Design'.freeze
@@ -136,13 +137,12 @@ class Collection
       set test_status: :draft
     end
 
-    def self.default_question_types
-      %i[
-        question_media
-        question_description
-        question_useful
-        question_finish
-      ]
+    def self.default_question_types_by_section
+      {
+        intro: %i[question_category_satisfaction],
+        ideas: %i[question_media question_description question_clarity question_excitement question_useful question_open],
+        outro: %i[question_open question_finish],
+      }
     end
 
     # Used so that we can interchangably call this on TestCollection and TestDesign
@@ -373,15 +373,20 @@ class Collection
     end
 
     def setup_default_status_and_questions
+      order = -1
+
       self.class
-          .default_question_types
-          .each_with_index do |question_type, i|
-        primary_collection_cards.build(
-          order: i,
-          item: Item::QuestionItem.new(
-            question_type: question_type,
-          ),
-        )
+          .default_question_types_by_section
+          .each do |section_type, question_types|
+        question_types.each do |question_type|
+          primary_collection_cards.build(
+            order: order += 1,
+            section_type: section_type,
+            item: Item::QuestionItem.new(
+              question_type: question_type,
+            ),
+          )
+        end
       end
     end
 
@@ -465,6 +470,32 @@ class Collection
       incomplete_question_items.destroy_all
     end
 
+    def answerable_complete_question_items
+      complete_question_items(answerable_only: true)
+    end
+
+    def complete_question_items(answerable_only: false)
+      # This is for the purpose of finding all completed items to display in the survey
+      # i.e. omitting any unfinished/blanks
+      questions = answerable_only ? question_items.answerable : items
+      questions.reject do |i|
+        i.is_a?(Item::QuestionItem) && i.question_type.blank? ||
+          i.question_type == 'question_open' && i.content.blank? ||
+          i.question_type == 'question_category_satisfaction' && i.content.blank? ||
+          i.question_type == 'question_media'
+      end
+    end
+
+    def complete_question_cards
+      complete_question_items.collect(&:parent_collection_card)
+    end
+
+    def idea_cards
+      collection_cards.includes(:item).select do |card|
+        %w[question_media question_description].include?(card.card_question_type)
+      end
+    end
+
     def cloned_from_present?
       cloned_from.present?
     end
@@ -500,26 +531,6 @@ class Collection
 
     def paid_audiences_sample_size
       test_audiences.paid.sum(:sample_size)
-    end
-
-    def answerable_complete_question_items
-      complete_question_items(answerable_only: true)
-    end
-
-    def complete_question_items(answerable_only: false)
-      # This is for the purpose of finding all completed items to display in the survey
-      # i.e. omitting any unfinished/blanks
-      questions = answerable_only ? question_items.answerable : items
-      questions.reject do |i|
-        i.is_a?(Item::QuestionItem) && i.question_type.blank? ||
-          i.question_type == 'question_open' && i.content.blank? ||
-          i.question_type == 'question_category_satisfaction' && i.content.blank? ||
-          i.question_type == 'question_media'
-      end
-    end
-
-    def complete_question_cards
-      complete_question_items.collect(&:parent_collection_card)
     end
 
     private
@@ -613,6 +624,21 @@ class Collection
 
     def close_test_after_archive
       close! if live?
+    end
+
+    def now_in_collection_test_with_default_cards?
+      saved_change_to_collection_to_test_id? &&
+        collection_to_test_id.present? &&
+        only_default_cards?
+    end
+
+    def only_default_cards?
+      collection_cards.map { |card| card.record&.question_type } == self.class.default_question_types_by_section.values.flatten.map(&:to_s)
+    end
+
+    def archive_idea_questions
+      idea_cards.each(&:archive!)
+      touch
     end
   end
 end

@@ -23,6 +23,7 @@ export const fakeCollectionCard = {
   item: {},
   reference: false,
   image_contain: false,
+  section_type: null,
   beginReplacing: jest.fn(),
   reselectOnlyEditableCards: jest.fn(),
   API_create: jest.fn(),

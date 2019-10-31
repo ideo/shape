@@ -92,6 +92,11 @@ FactoryBot.define do
 
       trait :completed do
         after(:create) do |collection|
+          category_satisfaction_question = collection.question_items.detect(&:question_category_satisfaction?)
+          category_satisfaction_question&.update(content: 'solutions')
+          collection.question_items.select(&:question_open?).each do |open_response|
+            open_response.update(content: 'What do you think?')
+          end
           media_question = collection.question_items.detect(&:question_media?)
           media_question&.update(
             type: 'Item::VideoItem',

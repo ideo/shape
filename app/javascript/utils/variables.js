@@ -39,24 +39,38 @@ export const DATA_MEASURES = [
 
 export const TEST_COLLECTION_SELECT_OPTIONS = [
   {
-    values: [{ value: '', label: 'select question type' }],
+    values: [
+      {
+        value: '',
+        label: 'select question type',
+        sections: ['intro', 'ideas', 'outro'],
+      },
+    ],
   },
   {
     category: 'Idea Content',
     values: [
-      { value: 'question_description', label: 'Description' },
+      {
+        value: 'question_description',
+        label: 'Description',
+        sections: ['ideas'],
+      },
       // TODO: these won't actually be in the dropdown once there's the carousel
-      { value: 'question_idea_placeholder', label: 'Idea (pl)' },
-      { value: 'question_idea', label: 'Idea' },
+      {
+        value: 'question_idea_placeholder',
+        label: 'Idea (pl)',
+        sections: ['ideas'],
+      },
+      { value: 'question_idea', label: 'Idea', sections: ['ideas'] },
     ],
   },
   {
     category: 'Scaled Rating',
     values: [
-      { value: 'question_clarity', label: 'Clear' },
-      { value: 'question_different', label: 'Different' },
-      { value: 'question_excitement', label: 'Exciting' },
-      { value: 'question_useful', label: 'Useful' },
+      { value: 'question_clarity', label: 'Clear', sections: ['ideas'] },
+      { value: 'question_different', label: 'Different', sections: ['ideas'] },
+      { value: 'question_excitement', label: 'Exciting', sections: ['ideas'] },
+      { value: 'question_useful', label: 'Useful', sections: ['ideas'] },
     ],
   },
   {
@@ -65,9 +79,18 @@ export const TEST_COLLECTION_SELECT_OPTIONS = [
       {
         value: 'question_category_satisfaction',
         label: 'Category Satisfaction',
+        sections: ['intro'],
       },
-      { value: 'question_context', label: 'Context Setting' },
-      { value: 'question_open', label: 'Open Response' },
+      {
+        value: 'question_context',
+        label: 'Context Setting',
+        sections: ['intro'],
+      },
+      {
+        value: 'question_open',
+        label: 'Open Response',
+        sections: ['intro', 'ideas', 'outro'],
+      },
     ],
   },
 ]

@@ -4,9 +4,10 @@ describe Testable, type: :concern do
   context 'with scored collections' do
     let(:collection) { create(:collection, :submission) }
     let(:test_collection) { create(:test_collection, collection_to_test: collection, test_status: :live) }
-    let(:useful_question) { test_collection.question_items.where(question_type: :question_useful).first }
-    let(:clarity_question_card) { create(:collection_card_question, parent: test_collection) }
-    let(:clarity_question) { clarity_question_card.item }
+    let(:useful_question) { test_collection.question_items.question_useful.first }
+    let(:clarity_question) { test_collection.question_items.question_clarity.first }
+    let(:cat_sat_question) { test_collection.question_items.question_category_satisfaction.first }
+    let(:excitement_question) { test_collection.question_items.question_excitement.first }
     let(:survey_responses) { create_list(:survey_response, 3, test_collection: test_collection, status: :completed) }
 
     before do
@@ -16,6 +17,8 @@ describe Testable, type: :concern do
       survey_responses.each_with_index do |sr, i|
         sr.question_answers.create(question: useful_question, answer_number: i + 1)
         sr.question_answers.create(question: clarity_question, answer_number: i + 2)
+        sr.question_answers.create(question: cat_sat_question, answer_number: i + 1)
+        sr.question_answers.create(question: excitement_question, answer_number: i + 1)
       end
     end
 
@@ -30,7 +33,9 @@ describe Testable, type: :concern do
         expect(collection.collect_test_scores).to eq(
           'question_useful' => 33,
           'question_clarity' => 67,
-          'total' => 50,
+          'question_category_satisfaction' => 33,
+          'question_excitement' => 33,
+          'total' => 41,
         )
       end
     end
@@ -40,6 +45,8 @@ describe Testable, type: :concern do
         create(:collection, cached_test_scores: {
                  'question_useful' => 50,
                  'question_clarity' => 10,
+                 'question_category_satisfaction' => 5,
+                 'question_excitement' => 75,
                  'total' => 30,
                })
       end
@@ -51,6 +58,8 @@ describe Testable, type: :concern do
             'question_useful' => 33,
             'question_clarity' => 70,
             'question_different' => 20,
+            'question_category_satisfaction' => 24,
+            'question_excitement' => 10,
             'total' => 41,
           },
         )
@@ -59,6 +68,8 @@ describe Testable, type: :concern do
       it 'should return the highest scoring collections in order' do
         expect(Collection.order_by_score('question_useful').first).to eq other_scored_collection
         expect(Collection.order_by_score('question_clarity').first).to eq collection
+        expect(Collection.order_by_score('question_excitement').first).to eq other_scored_collection
+        expect(Collection.order_by_score('question_category_satisfaction').first).to eq collection
         expect(Collection.order_by_score('total').first).to eq collection
         # nulls should go last
         expect(Collection.order_by_score('question_different').first).to eq collection
@@ -76,7 +87,9 @@ describe Testable, type: :concern do
         expect(collection.cached_test_scores).to eq(
           'question_useful' => 33,
           'question_clarity' => 67,
-          'total' => 50,
+          'question_category_satisfaction' => 33,
+          'question_excitement' => 33,
+          'total' => 41,
         )
       end
     end

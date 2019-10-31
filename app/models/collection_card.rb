@@ -15,6 +15,7 @@
 #  order             :integer          not null
 #  pinned            :boolean          default(FALSE)
 #  row               :integer
+#  section_type      :integer
 #  show_replace      :boolean          default(TRUE)
 #  type              :string
 #  unarchived_at     :datetime
@@ -73,8 +74,9 @@ class CollectionCard < ApplicationRecord
   validates :row,
             numericality: { greater_than_or_equal_to: 0 },
             if: :parent_board_collection?
+  validates :section_type, presence: true, if: :parent_test_collection?
 
-  delegate :board_collection?,
+  delegate :board_collection?, :test_collection?,
            to: :parent,
            prefix: true,
            allow_nil: true
@@ -97,6 +99,13 @@ class CollectionCard < ApplicationRecord
   enum filter: {
     nothing: 0,
     transparent_gray: 1,
+  }
+
+  enum section_type: {
+    intro: 0,
+    ideas: 1,
+    outro: 2,
+    custom: 3,
   }
 
   amoeba do

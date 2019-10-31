@@ -18,13 +18,15 @@ describe Collection::TestResultsCollection, type: :model do
   context 'callbacks' do
     describe '#initialize_cards!' do
       it 'should create a chart item for each scale question' do
-        count = test_collection.question_items.select { |q| q.question_context? || q.question_useful? }.size
+        count = test_collection.question_items.select(&:scale_question?).size
         expect {
           launch
         }.to change(
           Item::DataItem, :count
         ).by(count)
-        expect(test_results_collection.items.where(type: 'Item::DataItem').size).to eq count
+        expect(
+          test_results_collection.items.where(type: 'Item::DataItem').size,
+        ).to eq(count)
       end
 
       context 'with open response questions' do
@@ -48,15 +50,22 @@ describe Collection::TestResultsCollection, type: :model do
       end
 
       context 'with media questions' do
-        let!(:test_collection) { create(:test_collection) }
+        before do
+          test_collection.launch!(initiated_by: user)
+        end
 
         it 'creates a media item link for each media item' do
-          test_collection.launch!(initiated_by: user)
           expect(
+            test_results_collection
+              .items
+              .where(type: 'Item::LinkItem')
+              .size,
+          ).to equal(
             test_collection
               .items
-              .count,
-          ).to equal 4
+              .where(question_type: :question_media)
+              .size,
+          )
         end
       end
 
@@ -91,6 +100,11 @@ describe Collection::TestResultsCollection, type: :model do
               'Item::LegendItem',
               'Item::DataItem',
               'Item::DataItem',
+              'Item::DataItem',
+              'Item::DataItem',
+              'Item::DataItem',
+              'Collection::TestOpenResponses',
+              'Collection::TestOpenResponses',
               'Collection::TestCollection',
             ],
           )
@@ -98,7 +112,7 @@ describe Collection::TestResultsCollection, type: :model do
             test_results_collection
             .collection_cards
             .map(&:order),
-          ).to eq([0, 1, 2, 3, 4, 5])
+          ).to eq(0.upto(10).to_a)
         end
       end
     end
