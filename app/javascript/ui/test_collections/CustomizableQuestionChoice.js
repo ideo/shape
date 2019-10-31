@@ -15,31 +15,26 @@ const ChoiceHolder = styled.div`
     background: white;
   }
 `
+
 class CustomizableQuestionChoice extends React.Component {
-  get isChecked() {
-    const { questionAnswer, choice } = this.props
-
-    if (!questionAnswer) return false
-
-    return questionAnswer.selected_choice_ids.includes(choice.id)
-  }
-
   render() {
-    const { choice, questionType, onChange } = this.props
+    const { choice, questionType, onChange, isChecked, disabled } = this.props
 
     return (
       <ChoiceHolder>
         {questionType === 'question_single_choice' ? (
           <Radio
-            checked={this.isChecked}
-            onChange={onChange}
+            disabled={disabled}
+            checked={isChecked}
+            onClick={onChange}
             value={choice.value}
             color="primary"
           />
         ) : (
           <Checkbox
-            checked={this.isChecked}
-            onChange={onChange}
+            disabled={disabled}
+            checked={isChecked}
+            onClick={onChange}
             value={choice.value}
             color="primary"
           />
@@ -55,10 +50,13 @@ CustomizableQuestionChoice.propTypes = {
   questionType: PropTypes.string.isRequired,
   choice: MobxPropTypes.objectOrObservableObject.isRequired,
   questionAnswer: MobxPropTypes.objectOrObservableObject,
+  isChecked: PropTypes.bool,
+  disabled: PropTypes.bool.isRequired,
 }
 
 CustomizableQuestionChoice.defaultProps = {
   questionAnswer: null,
+  isChecked: false,
 }
 
 export default CustomizableQuestionChoice
