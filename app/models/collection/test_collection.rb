@@ -140,7 +140,7 @@ class Collection
     def self.default_question_types_by_section
       {
         intro: %i[question_category_satisfaction],
-        ideas: %i[question_media question_description question_clarity question_excitement question_useful question_open],
+        ideas: %i[question_idea_placeholder question_clarity question_excitement question_useful question_open],
         outro: %i[question_open question_finish],
       }
     end

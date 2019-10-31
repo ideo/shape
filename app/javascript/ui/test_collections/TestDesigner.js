@@ -340,7 +340,7 @@ class TestDesigner extends React.Component {
     )
   }
 
-  renderCard = (card, position) => {
+  renderCard = (card, firstCard, lastCard) => {
     const { collection } = this.props
     const item = card.record
     return (
@@ -353,7 +353,8 @@ class TestDesigner extends React.Component {
         />
         <TestQuestionHolder
           editing
-          position={position}
+          firstCard={firstCard}
+          lastCard={lastCard}
           userEditable={userEditableQuestionType(item.question_type)}
         >
           <TestQuestion
@@ -382,16 +383,17 @@ class TestDesigner extends React.Component {
         )}
         {cards.map((card, i) => {
           // blank item can occur briefly while the placeholder card/item is being replaced
-          let position
+          let firstCard = false
+          let lastCard = false
           if (!card.record) return null
           const cardCount = cards.length
-          if (i === 0) position = 'question_beginning'
-          if (i === cardCount - 1) position = 'question_end'
+          if (i === 0) firstCard = true
+          if (i === cardCount - 1) lastCard = true
           return (
             <FlipMove appearAnimation="fade" key={card.id}>
               <TestQuestionFlexWrapper className={`card ${card.id}`}>
                 {i === 0 && this.renderHotEdge(card, section, true)}
-                {this.renderCard(card, position)}
+                {this.renderCard(card, firstCard, lastCard)}
                 {card.card_question_type !== 'question_finish' &&
                   this.renderHotEdge(card, section)}
               </TestQuestionFlexWrapper>

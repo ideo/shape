@@ -99,16 +99,18 @@ export const TestQuestionHolder = styled.div`
 
   ${props =>
     props.editing &&
-    props.position === 'question_beginning' &&
+    props.firstCard &&
     `
-    border-radius: 7px 7px 0 0;
+    border-top-right-radius: 7px;
+    border-top-left-radius: 7px;
   `}
   ${props =>
     props.editing &&
-    props.position === 'question_end' &&
+    props.lastCard &&
     `
     border-bottom-width: 10px;
-    border-radius: 0 0 7px 7px;
+    border-bottom-right-radius: 7px;
+    border-bottom-left-radius: 7px;
   `}
   /* this responsive resize only factors into the edit state */
   ${props =>
