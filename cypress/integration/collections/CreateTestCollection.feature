@@ -13,8 +13,7 @@ Feature: Creating a Test Collection
     Then I should see "outro" in a "section-title"
     # verify the existence of the default questions
     Then I should see "Category Satisfaction" in a "QuestionSelectOption-category-satisfaction"
-    Then I should see "Photo/Video" in a "QuestionSelectOption-photo-video"
-    Then I should see "Description" in a "QuestionSelectOption-description"
+    Then I should see "Idea" in a ".DisplayText"
     Then I should see "Clear" in a "QuestionSelectOption-clear"
     Then I should see "Exciting" in a "QuestionSelectOption-exciting"
     Then I should see "Useful" in a "QuestionSelectOption-useful"
@@ -24,12 +23,14 @@ Feature: Creating a Test Collection
 
     # Scenario: Setting up the questions and launching the test
     When I enter "solutions{enter}" as my category
+    # adding the link should automatically fill out the idea title/content
     When I add a link URL
-    And I fill the 1st "QuestionContentEditorText" with "That's my fun concept"
-    And I fill the 2nd "QuestionContentEditorText" with "What do you think?"
-    And I fill the 3rd "QuestionContentEditorText" with "Would you buy it?"
     And I wait for "@apiUpdateItem" to finish
-    And I add an open response question at position 8 with "Any questions or concerns?"
+    # 3rd and 4th are after the first 2 content editors inside the Idea
+    And I fill the 3rd "QuestionContentEditorText" with "What do you think?"
+    And I fill the 4th "QuestionContentEditorText" with "Would you buy it?"
+    # -- no need to add an additional open response, default already has two
+    And I add an open response question with "Any questions or concerns?"
     And I click the "audienceCheckbox-share-via-link"
     # Share Via Link makes an API call to "open" when you check the checkbox
     And I wait for "@apiUpdateTestAudience" to finish

@@ -17,8 +17,8 @@ Feature: Creating an "in-collection" Test Collection
     Then I should see "Useful" in a "QuestionSelectOption-useful"
     Then I should see "End of Survey" in a ".DisplayText"
     When I enter "solutions{enter}" as my category
-    And I fill the 1st "DescriptionQuestionText" with "What do you think?"
-    And I fill the 2nd "DescriptionQuestionText" with "Would you buy it?"
+    And I fill the 1st "QuestionContentEditorText" with "What do you think?"
+    And I fill the 2nd "QuestionContentEditorText" with "Would you buy it?"
     And I wait for "@apiUpdateItem" to finish
 
     # Launch the test

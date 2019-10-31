@@ -147,6 +147,8 @@ When('I add a link URL', () => {
   )
   cy.locate('LinkCreatorFormButton').click()
   cy.wait('@apiReplaceCollectionCard')
+  // wait for card to reappear with the link media
+  cy.wait(FLIPMOVE_DELAY)
 })
 
 When('I fill the last {string} with some text', string => {
@@ -184,35 +186,32 @@ When('I enter {string} as my category', string => {
     .type(string)
 })
 
-When(
-  'I add an open response question at position {int} with {string}',
-  (position, text) => {
-    cy.locate('QuestionHotEdgeButton')
-      .last()
-      .click()
-    cy.wait('@apiCreateCollectionCard')
-    // have to wait for the flipmove fade-in
-    cy.wait(FLIPMOVE_DELAY + 500)
-    cy.locateDataOrClass('.SelectHolderContainer')
-      .eq(position)
-      .find('.select')
-      .click()
-    cy.wait(FLIPMOVE_DELAY)
-    cy.locateDataOrClass('QuestionSelectOption-open-response')
-      .last()
-      .click()
-    cy.wait('@apiArchiveCollectionCards')
-    cy.wait('@apiCreateCollectionCard')
-    // have to wait for the flipmove fade-in
-    cy.wait(FLIPMOVE_DELAY)
+// NOTE: this just adds an open response in the "last" spot
+When('I add an open response question with {string}', text => {
+  cy.locate('QuestionHotEdgeButton')
+    .last()
+    .click()
+  cy.wait('@apiCreateCollectionCard')
+  // have to wait for the flipmove fade-in
+  cy.wait(FLIPMOVE_DELAY + 500)
+  cy.locateDataOrClass('QuestionSelectOption-customizable')
+    .last()
+    .click()
+  cy.wait(FLIPMOVE_DELAY)
+  cy.locateDataOrClass('QuestionSelectOption-open-response')
+    .last()
+    .click()
+  cy.wait('@apiArchiveCollectionCards')
+  cy.wait('@apiCreateCollectionCard')
+  // have to wait for the flipmove fade-in
+  cy.wait(FLIPMOVE_DELAY)
 
-    cy.locate('QuestionContentEditorText')
-      .last()
-      .click()
-      .type(text)
-    cy.wait('@apiUpdateItem')
-  }
-)
+  cy.locate('QuestionContentEditorText')
+    .last()
+    .click()
+    .type(text)
+  cy.wait('@apiUpdateItem')
+})
 
 When('I accept the feedback survey terms', () => {
   cy.locate('AcceptFeedbackTerms')
