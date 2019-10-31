@@ -2,8 +2,8 @@ import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import AutosizeInput from 'react-input-autosize'
-import { debounce } from 'lodash'
 
+import { debounce, remove } from 'lodash'
 import { DisplayText, SmallHelperText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 import CustomizableQuestionChoice from '~/ui/test_collections/CustomizableQuestionChoice'
@@ -66,6 +66,7 @@ class CustomizableQuestion extends React.Component {
       editing: !props.question.content,
       // shouldn't be null otherwise the <input> will complain
       questionContent: props.question.content || '',
+      selected_choice_ids: [],
     }
     this.debouncedUpdateQuestionContent = debounce(
       this.updateQuestionContent,
@@ -74,8 +75,22 @@ class CustomizableQuestion extends React.Component {
   }
 
   handleAnswerSelection = choice => ev => {
+    const { questionAnswer } = this.props
+    let selected_choice_ids = !questionAnswer
+      ? []
+      : questionAnswer.selected_choice_ids
+
+    console.log({ selected_choice_ids })
     ev.preventDefault()
-    this.props.onAnswer({ choice })
+    console.log(choice)
+    if (selected_choice_ids.includes(choice.id)) {
+      // If we already have the Id selected, remove it
+      selected_choice_ids = remove(selected_choice_ids, id => id == choice.id)
+    } else {
+      selected_choice_ids.push(choice.id)
+    }
+    console.log(selected_choice_ids)
+    this.props.onAnswer({ selected_choice_ids })
   }
 
   get hasEditableCategory() {

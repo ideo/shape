@@ -6,6 +6,7 @@ class SerializableSimpleItem < BaseJsonSerializer
              :archived
 
   belongs_to :filestack_file
+  has_many :question_choices
 
   attribute :filestack_file_url do
     @object.filestack_file_signed_url
