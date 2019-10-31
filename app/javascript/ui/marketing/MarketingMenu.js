@@ -225,9 +225,7 @@ class MarketingMenu extends React.PureComponent {
               <Box w={15 / 32}>
                 <MarketingFlex align="center" justify="flex-end">
                   <NavLink onClick={handleScrollToFooter}>Contact</NavLink>
-                  <a href="/login" rel="noopener noreferrer">
-                    <NavLink>Login</NavLink>
-                  </a>
+                  <NavLink href="/login">Login</NavLink>
                 </MarketingFlex>
               </Box>
             </MarketingFlex>
