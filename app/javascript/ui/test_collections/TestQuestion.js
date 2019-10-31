@@ -13,12 +13,12 @@ import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
 import TermsQuestion from '~/ui/test_collections/TermsQuestion'
 import WelcomeQuestion from '~/ui/test_collections/WelcomeQuestion'
 import IdeaQuestion from '~/ui/test_collections/IdeaQuestion'
+import MediaQuestion from '~/ui/test_collections/MediaQuestion'
 import { QuestionText } from '~/ui/test_collections/shared'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
 import QuestionAnswer from '~/stores/jsonApi/QuestionAnswer'
 
 const QuestionHolder = styled.div`
-  display: flex;
   ${props => props.empty && 'margin-bottom: -6px;'};
 `
 
@@ -110,8 +110,9 @@ class TestQuestion extends React.Component {
             onAnswer={this.handleQuestionAnswer}
           />
         )
+      case 'question_media':
+        return <MediaQuestion card={card} parent={parent} canEdit={canEdit} />
       case 'question_idea':
-      case 'question_idea_placeholder':
         return <IdeaQuestion card={card} parent={parent} canEdit={canEdit} />
       case 'question_description':
         if (editing) {

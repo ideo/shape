@@ -395,8 +395,6 @@ class CollectionCard < ApplicationRecord
   end
 
   def card_question_type
-    return nil unless parent.is_a?(Collection::TestCollection) || parent.is_a?(Collection::TestDesign)
-
     item&.question_type
   end
 

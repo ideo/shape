@@ -129,7 +129,7 @@ class Item < ApplicationRecord
     question_context: 0,
     question_useful: 1,
     question_open: 2,
-    question_idea_placeholder: 4,
+    question_media: 4,
     question_description: 5,
     question_finish: 6,
     question_clarity: 7,

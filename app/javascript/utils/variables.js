@@ -55,13 +55,6 @@ export const TEST_COLLECTION_SELECT_OPTIONS = [
         label: 'Description',
         sections: ['ideas'],
       },
-      // TODO: these won't actually be in the dropdown once there's the carousel
-      {
-        value: 'question_idea_placeholder',
-        label: 'Idea (pl)',
-        sections: ['ideas'],
-      },
-      { value: 'question_idea', label: 'Idea', sections: ['ideas'] },
     ],
   },
   {
@@ -89,6 +82,12 @@ export const TEST_COLLECTION_SELECT_OPTIONS = [
       {
         value: 'question_open',
         label: 'Open Response',
+        sections: ['intro', 'ideas', 'outro'],
+      },
+      {
+        value: 'question_media',
+        label: 'Photo/Video',
+        // check on final AC...
         sections: ['intro', 'ideas', 'outro'],
       },
     ],

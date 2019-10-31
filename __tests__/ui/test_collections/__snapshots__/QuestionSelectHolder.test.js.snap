@@ -78,13 +78,30 @@ exports[`TestDesigner renders snapshot 1`] = `
         }
       }
       disabled={false}
-      key="question_media"
-      value="question_media"
+      key="question_idea"
+      value="question_idea"
     >
       <span
-        data-cy="QuestionSelectOption-photo-video"
+        data-cy="QuestionSelectOption-idea"
       >
-        Photo/Video
+        Idea
+      </span>
+    </StyledSelectOption>
+    <StyledSelectOption
+      classes={
+        Object {
+          "root": "selectOption",
+          "selected": "selected",
+        }
+      }
+      disabled={false}
+      key="question_idea_placeholder"
+      value="question_idea_placeholder"
+    >
+      <span
+        data-cy="QuestionSelectOption-idea-pl"
+      >
+        Idea (pl)
       </span>
     </StyledSelectOption>
     <StyledSelectOption

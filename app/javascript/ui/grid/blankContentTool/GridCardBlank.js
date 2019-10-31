@@ -378,8 +378,7 @@ class GridCardBlank extends React.Component {
     if (testCollectionCard) {
       const { record } = testCollectionCard
       const item_attributes = {
-        // convert this card into an "idea"
-        question_type: 'question_idea',
+        question_type: record.question_type,
       }
       if (record.name) item_attributes.name = record.name
       if (record.content) item_attributes.content = record.content

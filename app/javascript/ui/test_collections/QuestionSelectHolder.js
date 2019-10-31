@@ -53,19 +53,15 @@ const questionSelectOption = opt => {
   )
 }
 
-const QuestionSelectHolder = ({
-  card,
-  canEdit,
-  handleSelectChange,
-  handleTrash,
-}) => {
+const dropdownOrQuestionText = ({ card, handleSelectChange, canEdit }) => {
   const blank = !card.card_question_type
-  return (
-    <SelectHolderContainer>
-      <NumberListText>{card.order + 1}.</NumberListText>
-      {card.card_question_type === 'question_finish' ? (
-        <DisplayText>End of Survey</DisplayText>
-      ) : (
+  switch (card.card_question_type) {
+    case 'question_finish':
+      return <DisplayText>End of Survey</DisplayText>
+    case 'question_idea':
+      return <DisplayText>Idea</DisplayText>
+    default:
+      return (
         <Select
           classes={{
             root: 'select fixedWidth',
@@ -95,7 +91,20 @@ const QuestionSelectHolder = ({
             return options.map(opt => questionSelectOption(opt))
           })}
         </Select>
-      )}
+      )
+  }
+}
+
+const QuestionSelectHolder = ({
+  card,
+  canEdit,
+  handleSelectChange,
+  handleTrash,
+}) => {
+  return (
+    <SelectHolderContainer>
+      <NumberListText>{card.order + 1}.</NumberListText>
+      {dropdownOrQuestionText({ card, handleSelectChange, canEdit })}
       {canEdit && card.card_question_type !== 'question_finish' && (
         <TrashButton onClick={() => handleTrash(card)}>
           <TrashIcon />
