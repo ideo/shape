@@ -559,7 +559,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
-    context 'with record edit access' do
+    context 'with record edit access', only: true do
       before do
         allow(Collection).to receive(:find).and_return(collection)
       end
