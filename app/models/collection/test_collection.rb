@@ -139,9 +139,20 @@ class Collection
 
     def self.default_question_types_by_section
       {
-        intro: %i[question_category_satisfaction],
-        ideas: %i[question_idea_placeholder question_clarity question_excitement question_useful question_open],
-        outro: %i[question_open question_finish],
+        intro: %i[
+          question_category_satisfaction
+        ],
+        ideas: %i[
+          question_idea
+          question_clarity
+          question_excitement
+          question_useful
+          question_open
+        ],
+        outro: %i[
+          question_open
+          question_finish
+        ],
       }
     end
 
@@ -251,16 +262,23 @@ class Collection
 
     def questions_valid?
       complete = true
+      unless incomplete_idea_items.count.zero?
+        errors.add(:base,
+                   'Please add your idea content to question ' +
+                   incomplete_idea_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
+        complete = false
+      end
+
       unless incomplete_media_items.count.zero?
         errors.add(:base,
-                   'Please add an image or video for your idea to question ' +
+                   'Please add an image or video to question ' +
                    incomplete_media_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
         complete = false
       end
 
       unless incomplete_description_items.count.zero?
         errors.add(:base,
-                   'Please add your idea description to question ' +
+                   'Please add your description to question ' +
                    incomplete_description_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
         complete = false
       end
@@ -437,6 +455,14 @@ class Collection
       ).where(question_type: :question_media)
     end
 
+    def incomplete_idea_items
+      # TODO: this just checks if it hasn't been transformed into media
+      # however it doesn't really check the name/content (or if media was unselected)
+      question_items.joins(
+        :parent_collection_card,
+      ).where(question_type: :question_idea)
+    end
+
     def incomplete_description_items
       question_items
         .joins(
@@ -492,7 +518,7 @@ class Collection
 
     def idea_cards
       collection_cards.includes(:item).select do |card|
-        %w[question_media question_description].include?(card.card_question_type)
+        %w[question_idea].include?(card.card_question_type)
       end
     end
 

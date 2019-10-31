@@ -95,7 +95,7 @@ describe Collection::TestCollection, type: :model do
     describe '#archive_idea_questions' do
       let(:collection_to_test) { create(:collection) }
 
-      it 'archives media and description if collection to test added' do
+      it 'archives idea cards if collection to test added' do
         idea_cards = test_collection.idea_cards
         non_idea_cards = test_collection.collection_cards - idea_cards
         expect(idea_cards.all?(&:archived?)).to be false
@@ -322,11 +322,12 @@ describe Collection::TestCollection, type: :model do
             let!(:test_audience) { create(:test_audience, audience: audience, test_collection: test_collection, price_per_response: 4.50) }
 
             it 'should create test audience datasets for each question' do
+              scale_question_num = test_collection.question_items.scale_questions.count
               expect do
                 test_collection.launch!(initiated_by: user)
               end.to change(
                 Dataset::Question, :count
-              ).by(num_default_questions - 1) # Default questions, minus the finish question
+              ).by(scale_question_num * 2) # All scale questions get one dataset + one more for the org
               expect(Dataset::Question.last.groupings).to eq(
                 [{ 'id' => test_audience.id, 'type' => 'TestAudience' }],
               )
@@ -698,9 +699,8 @@ describe Collection::TestCollection, type: :model do
       expect(test_collection.launch!(initiated_by: user)).to be false
       expect(test_collection.errors).to match_array([
         'Please add your category to question 1',
-        'Please add an image or video for your idea to question 2',
-        'Please add your idea description to question 3',
-        'Please add your open response to question 7 and 8',
+        'Please add your idea content to question 2',
+        'Please add your open response to question 6 and 7',
       ])
     end
   end
