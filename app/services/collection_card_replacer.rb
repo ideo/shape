@@ -17,7 +17,7 @@ class CollectionCardReplacer
       @errors = @replacing_card.errors
       return false
     end
-    @replacing_card.update(image_contain: @image_contain)
+    @replacing_card.update(image_contain: @image_contain) unless @image_contain.nil?
     # now capture errors on the item
     @errors = @item.errors
     assign_item_attributes
