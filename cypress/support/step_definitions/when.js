@@ -149,9 +149,9 @@ When('I add a link URL', () => {
   cy.wait('@apiReplaceCollectionCard')
 })
 
-When('I fill {string} with some text', string => {
+When('I fill the last {string} with some text', string => {
   cy.locateDataOrClass(string)
-    .first()
+    .last()
     .click()
     .type('Let me introduce my lovely prototype.')
 })
@@ -163,6 +163,13 @@ When('I fill {string} with {string}', (string, url) => {
     .type(url)
 })
 
+When('I fill the {word} {string} with {string}', (num, element, string) => {
+  cy.locateDataOrClass(element)
+    .eq(parseInt(num) - 1)
+    .click()
+    .type(string)
+})
+
 When('I add a test email for {string}', string => {
   cy.locateDataOrClass(string)
     .first()
@@ -170,32 +177,42 @@ When('I add a test email for {string}', string => {
     .type('name@example.com')
 })
 
-When('I add an open response question', () => {
-  cy.locate('QuestionHotEdgeButton')
-    .last()
-    .click()
-  cy.wait('@apiCreateCollectionCard')
-  // have to wait for the flipmove fade-in
-  cy.wait(FLIPMOVE_DELAY + 500)
-  cy.locateDataOrClass('.SelectHolderContainer')
-    .eq(3)
-    .find('.select')
-    .click()
-  cy.locateWith('QuestionSelectOption', 'Open Response')
+When('I enter {string} as my category', string => {
+  cy.locate('category-satisfaction-input')
     .first()
     .click()
-  cy.wait(FLIPMOVE_DELAY)
-  cy.wait('@apiArchiveCollectionCards')
-  cy.wait('@apiCreateCollectionCard')
-  // have to wait for the flipmove fade-in
-  cy.wait(FLIPMOVE_DELAY)
-
-  cy.locate('DescriptionQuestionText')
-    .last()
-    .click()
-    .type('What do you think about pizza?')
-  cy.wait('@apiUpdateItem')
+    .type(string)
 })
+
+When(
+  'I add an open response question at position {int} with {string}',
+  (position, text) => {
+    cy.locate('QuestionHotEdgeButton')
+      .last()
+      .click()
+    cy.wait('@apiCreateCollectionCard')
+    // have to wait for the flipmove fade-in
+    cy.wait(FLIPMOVE_DELAY + 500)
+    cy.locateDataOrClass('.SelectHolderContainer')
+      .eq(position)
+      .find('.select')
+      .click()
+    cy.wait(FLIPMOVE_DELAY)
+    cy.locateDataOrClass('QuestionSelectOption-open-response')
+      .last()
+      .click()
+    cy.wait('@apiArchiveCollectionCards')
+    cy.wait('@apiCreateCollectionCard')
+    // have to wait for the flipmove fade-in
+    cy.wait(FLIPMOVE_DELAY)
+
+    cy.locate('DescriptionQuestionText')
+      .last()
+      .click()
+      .type(text)
+    cy.wait('@apiUpdateItem')
+  }
+)
 
 When('I accept the feedback survey terms', () => {
   cy.locate('AcceptFeedbackTerms')

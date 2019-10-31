@@ -15,6 +15,7 @@
 #  order             :integer          not null
 #  pinned            :boolean          default(FALSE)
 #  row               :integer
+#  section_type      :integer
 #  show_replace      :boolean          default(TRUE)
 #  type              :string
 #  unarchived_at     :datetime

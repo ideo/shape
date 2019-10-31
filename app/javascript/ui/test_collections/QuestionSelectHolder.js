@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import { kebabCase } from 'lodash'
 import v, { TEST_COLLECTION_SELECT_OPTIONS } from '~/utils/variables'
 import { Select, SelectOption } from '~/ui/global/styled/forms'
 import { DisplayText, NumberListText } from '~/ui/global/styled/typography'
@@ -47,7 +48,7 @@ const questionSelectOption = opt => {
       disabled={!value}
       value={value}
     >
-      <span data-cy="QuestionSelectOption">{label}</span>
+      <span data-cy={`QuestionSelectOption-${kebabCase(label)}`}>{label}</span>
     </SelectOption>
   )
 }
@@ -79,14 +80,18 @@ const QuestionSelectHolder = ({
         >
           {TEST_COLLECTION_SELECT_OPTIONS.map(optGroup => {
             const options = []
+            optGroup.values.sort(optionSort).forEach(opt => {
+              if (opt.sections.includes(card.section_type)) options.push(opt)
+            })
+            // Don't show this category if there aren't any options
+            if (options.length === 0) return
             if (optGroup.category) {
-              options.push({
+              options.unshift({
                 value: '',
                 label: optGroup.category,
                 category: true,
               })
             }
-            optGroup.values.sort(optionSort).forEach(opt => options.push(opt))
             return options.map(opt => questionSelectOption(opt))
           })}
         </Select>
@@ -110,6 +115,7 @@ QuestionSelectHolder.propTypes = {
     isPinnedAndLocked: PropTypes.bool,
     order: PropTypes.number.isRequired,
     card_question_type: PropTypes.string.isRequired,
+    section_type: PropTypes.string.isRequired,
   }).isRequired, // specify or use MobxPropTypes?
   canEdit: PropTypes.bool.isRequired,
   handleSelectChange: PropTypes.func.isRequired,

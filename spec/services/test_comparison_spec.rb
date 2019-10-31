@@ -9,6 +9,7 @@ RSpec.describe TestComparison do
            parent_collection: test_parent,
            roles_anchor_collection: test_parent)
   end
+  let(:num_scale_questions) { test_collection.question_items.scale_questions.size }
   let(:test_results_collection) { test_collection.test_results_collection }
   let(:test_data_item) do
     test_results_collection.data_items.report_type_question_item.first
@@ -42,7 +43,7 @@ RSpec.describe TestComparison do
     it 'adds datasets from comparison to test collection data items' do
       expect(test_data_item.datasets.size).to eq(2)
       expect(test_data_item.datasets).not_to include(comparison_data_item.datasets.first)
-      expect { add }.to change(DataItemsDataset, :count).by(1)
+      expect { add }.to change(DataItemsDataset, :count).by(num_scale_questions)
       test_data_item.datasets.reload
       expect(test_data_item.datasets).to include(comparison_data_item.datasets.first)
       expect(test_data_item.datasets.size).to eq(3)
@@ -129,7 +130,7 @@ RSpec.describe TestComparison do
     it 'removes datasets from test collection data items' do
       expect(test_data_item.datasets.size).to eq(3)
       expect(test_data_item.datasets).to include(comparison_data_item.datasets.first)
-      expect { remove }.to change(DataItemsDataset, :count).by(-1)
+      expect { remove }.to change(DataItemsDataset, :count).by(-num_scale_questions)
       test_data_item.datasets.reload
       expect(test_data_item.datasets).not_to include(comparison_data_item.datasets.first)
       expect(test_data_item.datasets.size).to eq(2)
@@ -148,7 +149,7 @@ RSpec.describe TestComparison do
       it 'removes empty datasets' do
         expect {
           remove
-        }.to change(DataItemsDataset, :count).by(-2)
+        }.to change(DataItemsDataset, :count).by(-2 * num_scale_questions)
         data_items.each do |di|
           expect(di.datasets).not_to include(empty_dataset)
         end
