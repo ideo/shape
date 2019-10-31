@@ -41,7 +41,8 @@ class TestQuestion extends React.Component {
       afterQuestionAnswered,
       apiStore,
     } = this.props
-    const { text, number } = answer
+    const { text, number, selected_choice_ids } = answer
+    console.log(answer)
     let { surveyResponse, questionAnswer } = this.props
     // components should never trigger this when editing, but double-check here
     if (editing) return
@@ -62,6 +63,7 @@ class TestQuestion extends React.Component {
           question_id: item.id,
           answer_text: text,
           answer_number: number,
+          selected_choice_ids,
         },
         apiStore
       )
@@ -71,9 +73,11 @@ class TestQuestion extends React.Component {
       // needs to be attached in order to provide the session_uid
       if (surveyResponse) questionAnswer.survey_response = surveyResponse
       // update values on existing answer and save
+      console.log('updating QA with selected: ', selected_choice_ids)
       await questionAnswer.API_update({
         answer_text: text,
         answer_number: number,
+        selected_choice_ids,
       })
     }
     afterQuestionAnswered(card)
@@ -90,7 +94,6 @@ class TestQuestion extends React.Component {
       item,
       editing,
       questionAnswer,
-      question_choices,
       canEdit,
       surveyResponse,
       numberOfQuestions,
@@ -120,7 +123,7 @@ class TestQuestion extends React.Component {
             editing={editing}
             questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}
-            question_choices={question_choices}
+            question_choices={item.question_choices}
           />
         )
       case 'media':

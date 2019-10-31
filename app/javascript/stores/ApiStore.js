@@ -31,6 +31,7 @@ import TestAudience from './jsonApi/TestAudience'
 import User from './jsonApi/User'
 import UsersThread from './jsonApi/UsersThread'
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
+import QuestionChoice from './jsonApi/QuestionChoice'
 
 class ApiStore extends jsonapi(datxCollection) {
   @observable
@@ -858,6 +859,7 @@ ApiStore.types = [
   Notification,
   Organization,
   QuestionAnswer,
+  QuestionChoice,
   Role,
   SurveyResponse,
   TestAudience,

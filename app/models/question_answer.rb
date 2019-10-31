@@ -5,6 +5,7 @@
 #  id                    :bigint(8)        not null, primary key
 #  answer_number         :integer
 #  answer_text           :text
+#  selected_choice_ids   :jsonb            not null
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
 #  open_response_item_id :integer
@@ -25,8 +26,6 @@ class QuestionAnswer < ApplicationRecord
              class_name: 'Item::TextItem',
              inverse_of: :question_answer,
              optional: true
-  has_many :question_answer_choices
-  has_many :question_choices, through: :question_answer_choices
 
   delegate :completed?, to: :survey_response, prefix: true
 

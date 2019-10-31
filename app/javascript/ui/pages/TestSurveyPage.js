@@ -7,6 +7,8 @@ import DialogWrapper from '~/ui/global/modals/DialogWrapper'
 import Logo from '~/ui/layout/Logo'
 import TestSurveyResponder from '~/ui/test_collections/TestSurveyResponder'
 import RespondentBanner from '~/ui/test_collections/RespondentBanner'
+import { MuiThemeProvider } from '@material-ui/core/styles'
+import MuiTheme from '~/ui/theme'
 
 const StyledBg = styled.div`
   background: #e3edee;
@@ -68,19 +70,24 @@ class TestSurveyPage extends React.Component {
     if (!this.loadedCurrentUser || !this.collection) return ''
     return (
       <React.Fragment>
-        <StyledBg>
-          {this.currentUser ? (
-            <RespondentBanner user={this.currentUser} />
-          ) : null}
-          <LogoWrapper>
-            <Logo withText width={83} />
-          </LogoWrapper>
-          <DialogWrapper />
+        <MuiThemeProvider theme={MuiTheme}>
+          <StyledBg>
+            {this.currentUser ? (
+              <RespondentBanner user={this.currentUser} />
+            ) : null}
+            <LogoWrapper>
+              <Logo withText width={83} />
+            </LogoWrapper>
+            <DialogWrapper />
 
-          <StyledSurvey data-cy="StandaloneTestSurvey">
-            <TestSurveyResponder collection={this.collection} editing={false} />
-          </StyledSurvey>
-        </StyledBg>
+            <StyledSurvey data-cy="StandaloneTestSurvey">
+              <TestSurveyResponder
+                collection={this.collection}
+                editing={false}
+              />
+            </StyledSurvey>
+          </StyledBg>
+        </MuiThemeProvider>
       </React.Fragment>
     )
   }

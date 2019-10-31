@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_31_165716) do
+ActiveRecord::Schema.define(version: 2019_10_31_202704) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -556,6 +556,7 @@ ActiveRecord::Schema.define(version: 2019_10_31_165716) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "open_response_item_id"
+    t.jsonb "selected_choice_ids", default: [], null: false
     t.index ["survey_response_id", "question_id"], name: "index_question_answers_on_survey_response_id_and_question_id", unique: true
   end
 

@@ -334,6 +334,7 @@ class Collection
         'Collection::TestCollection': SerializableTestCollection,
         # 'Collection::TestDesign': SerializableSimpleCollection,
         FilestackFile: SerializableFilestackFile,
+        QuestionChoice: SerializableQuestionChoice,
       )
     end
 
@@ -341,7 +342,7 @@ class Collection
       {
         question_cards: [
           :parent,
-          record: [:filestack_file],
+          record: [:filestack_file, :question_choices],
         ],
       }
     end
