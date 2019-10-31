@@ -109,9 +109,8 @@ class TestQuestion extends React.Component {
             onAnswer={this.handleQuestionAnswer}
           />
         )
-      case 'media':
-      case 'question_media':
       case 'question_idea':
+      case 'question_idea_placeholder':
         return <IdeaQuestion card={card} parent={parent} canEdit={canEdit} />
       case 'question_description':
         if (editing) {

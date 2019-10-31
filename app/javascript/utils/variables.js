@@ -45,7 +45,8 @@ export const TEST_COLLECTION_SELECT_OPTIONS = [
     category: 'Idea Content',
     values: [
       { value: 'question_description', label: 'Description' },
-      { value: 'question_media', label: 'Media (OLD)' },
+      // TODO: these won't actually be in the dropdown once there's the carousel
+      { value: 'question_idea_placeholder', label: 'Idea (pl)' },
       { value: 'question_idea', label: 'Idea' },
     ],
   },

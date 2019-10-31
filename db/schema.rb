@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_30_230157) do
+ActiveRecord::Schema.define(version: 2019_10_31_165716) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -462,6 +462,7 @@ ActiveRecord::Schema.define(version: 2019_10_30_230157) do
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
     t.index ["created_at"], name: "index_items_on_created_at"
     t.index ["data_source_type", "data_source_id"], name: "index_items_on_data_source_type_and_data_source_id"
+    t.index ["question_type"], name: "index_items_on_question_type"
     t.index ["roles_anchor_collection_id"], name: "index_items_on_roles_anchor_collection_id"
     t.index ["type"], name: "index_items_on_type"
   end

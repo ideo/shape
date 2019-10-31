@@ -33,7 +33,7 @@ class IdeaQuestion extends React.Component {
     const { card, parent, canEdit, uiStore } = this.props
     const { record } = card
     const showBCT =
-      record.type === 'Item::QuestionItem' ||
+      record.question_type === 'question_idea_placeholder' ||
       uiStore.blankContentToolState.replacingId === card.id
     let inner
     if (showBCT) {

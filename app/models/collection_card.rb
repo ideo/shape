@@ -387,16 +387,8 @@ class CollectionCard < ApplicationRecord
 
   def card_question_type
     return nil unless parent.is_a?(Collection::TestCollection) || parent.is_a?(Collection::TestDesign)
-    return nil unless item.present?
 
-    case item.type
-    when 'Item::QuestionItem'
-      return item.question_type
-    when 'Item::TextItem'
-      return 'question_description'
-    when 'Item::FileItem', 'Item::VideoItem', 'Item::LinkItem'
-      return 'question_idea'
-    end
+    item&.question_type
   end
 
   def update_collection_cover

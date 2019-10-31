@@ -377,14 +377,17 @@ class GridCardBlank extends React.Component {
     Object.assign(attrs, nested)
     if (testCollectionCard) {
       const { record } = testCollectionCard
-      const merged_item_attributes = {}
-      if (record.name) merged_item_attributes.name = record.name
-      if (record.content) merged_item_attributes.content = record.content
+      const item_attributes = {
+        // convert this card into an "idea"
+        question_type: 'question_idea',
+      }
+      if (record.name) item_attributes.name = record.name
+      if (record.content) item_attributes.content = record.content
       const existingAttrs = {
         order: testCollectionCard.order,
         item_attributes: {
           ...attrs.item_attributes,
-          ...merged_item_attributes,
+          ...item_attributes,
         },
       }
       Object.assign(attrs, existingAttrs)
