@@ -15,6 +15,7 @@
 #  order             :integer          not null
 #  pinned            :boolean          default(FALSE)
 #  row               :integer
+#  section_type      :integer
 #  show_replace      :boolean          default(TRUE)
 #  type              :string
 #  unarchived_at     :datetime
@@ -28,6 +29,7 @@
 #
 # Indexes
 #
+#  index_collection_cards_on_archive_batch          (archive_batch)
 #  index_collection_cards_on_collection_id          (collection_id)
 #  index_collection_cards_on_item_id                (item_id)
 #  index_collection_cards_on_order_and_row_and_col  (order,row,col)
@@ -72,8 +74,9 @@ class CollectionCard < ApplicationRecord
   validates :row,
             numericality: { greater_than_or_equal_to: 0 },
             if: :parent_board_collection?
+  validates :section_type, presence: true, if: :parent_test_collection?
 
-  delegate :board_collection?,
+  delegate :board_collection?, :test_collection?,
            to: :parent,
            prefix: true,
            allow_nil: true
@@ -96,6 +99,13 @@ class CollectionCard < ApplicationRecord
   enum filter: {
     nothing: 0,
     transparent_gray: 1,
+  }
+
+  enum section_type: {
+    intro: 0,
+    ideas: 1,
+    outro: 2,
+    custom: 3,
   }
 
   amoeba do
@@ -292,6 +302,12 @@ class CollectionCard < ApplicationRecord
     true
   end
 
+  def move_to_order(to_order)
+    increment_card_orders!(to_order)
+    update(order: to_order)
+    parent.reorder_cards!
+  end
+
   # gets called by API collection_cards_controller
   def self.archive_all!(user_id:)
     # should only ever be used on a subset of cards, e.g. not `all`!
@@ -380,17 +396,7 @@ class CollectionCard < ApplicationRecord
   end
 
   def card_question_type
-    return nil unless parent.is_a?(Collection::TestCollection) || parent.is_a?(Collection::TestDesign)
-    return nil unless item.present?
-
-    case item.type
-    when 'Item::QuestionItem'
-      return item.question_type
-    when 'Item::TextItem'
-      return 'question_description'
-    when 'Item::FileItem', 'Item::VideoItem', 'Item::LinkItem'
-      return 'question_media'
-    end
+    item&.question_type
   end
 
   def update_collection_cover

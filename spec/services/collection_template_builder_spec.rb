@@ -138,7 +138,7 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
                master_template: true,
                collection_to_test: template)
       end
-      let(:template_card) { create(:collection_card_collection, collection: test_collection) }
+      let(:template_card) { test_collection.parent_collection_card }
       before do
         template.collection_cards << template_card
         template.reload

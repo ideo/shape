@@ -13,7 +13,7 @@ import PinnedIcon from '~/ui/icons/PinnedIcon'
 
 import { Tooltip } from '@material-ui/core'
 import v from '~/utils/variables'
-import UnreadCount from '~/ui/threads/UnreadCount'
+import UnresolvedCount from '~/ui/threads/UnresolvedCount'
 import HiddenIconButton from '../icons/HiddenIconButton'
 import { apiStore } from '~/stores/'
 
@@ -53,7 +53,7 @@ const PinnedCardIcon = () => (
   </Tooltip>
 )
 
-const UnreadButton = styled.button`
+const UnresolvedButton = styled.button`
   position: relative;
   ${props => props.hasNoOtherIcons && `left: 8px;`}
   top: 30%;
@@ -149,12 +149,12 @@ class BottomLeftCardIcons extends React.Component {
     if (record.unresolved_count && record.unresolved_count > 0) {
       icons.push(
         <Tooltip title="Add comment" placement="top">
-          <UnreadButton
+          <UnresolvedButton
             onClick={this.handleUnreadIconClick}
             hasNoOtherIcons={hasNoOtherIcons}
           >
-            <UnreadCount count={record.unresolved_count} size={'large'} />
-          </UnreadButton>
+            <UnresolvedCount count={record.unresolved_count} size={'large'} />
+          </UnresolvedButton>
         </Tooltip>
       )
     }

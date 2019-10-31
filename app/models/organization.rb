@@ -330,42 +330,6 @@ class Organization < ApplicationRecord
     user_collection
   end
 
-  # NOTE: can remove this legacy method once all orgs are migrated
-  def find_or_create_user_getting_started_collection(user, synchronous: false)
-    return if getting_started_collection.blank?
-
-    user_collection = user.current_user_collection(id)
-    # should find it even if you had archived it
-    existing = Collection.find_by(
-      created_by: user,
-      organization: self,
-      cloned_from: getting_started_collection,
-    )
-    return existing if existing.present?
-
-    user_getting_started = getting_started_collection.duplicate!(
-      for_user: user,
-      parent: user_collection,
-      system_collection: true,
-      synchronous: synchronous,
-    )
-
-    # Change from Collection::Global to regular colleciton
-    user_getting_started.update_attributes(type: nil)
-    user_getting_started = user_getting_started.becomes(Collection)
-
-    CollectionCardBuilder.new(
-      params: {
-        order: 0,
-        collection_id: user_getting_started.id,
-      },
-      parent_collection: user_collection,
-      user: user,
-    ).create
-    user_collection.reorder_cards!
-    user_getting_started
-  end
-
   def check_email_domains_and_join_org_group(user)
     if matches_domain_whitelist?(user)
       # add them as an org member

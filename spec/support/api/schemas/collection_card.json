@@ -19,7 +19,8 @@
     "is_cover": { "type": "boolean" },
     "filter": { "type": "string" },
     "hidden": { "type": "boolean" },
-    "updated_at": { "type": "date" }
+    "updated_at": { "type": "date" },
+    "section_type": { "type": ["string", "null"] }
   },
   "required": ["order", "width", "height", "class_type", "link", "updated_at"]
 }

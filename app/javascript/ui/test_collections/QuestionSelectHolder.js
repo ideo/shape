@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import { kebabCase } from 'lodash'
 import v, { TEST_COLLECTION_SELECT_OPTIONS } from '~/utils/variables'
 import { Select, SelectOption } from '~/ui/global/styled/forms'
 import { DisplayText, NumberListText } from '~/ui/global/styled/typography'
@@ -47,24 +48,20 @@ const questionSelectOption = opt => {
       disabled={!value}
       value={value}
     >
-      <span data-cy="QuestionSelectOption">{label}</span>
+      <span data-cy={`QuestionSelectOption-${kebabCase(label)}`}>{label}</span>
     </SelectOption>
   )
 }
 
-const QuestionSelectHolder = ({
-  card,
-  canEdit,
-  handleSelectChange,
-  handleTrash,
-}) => {
+const dropdownOrQuestionText = ({ card, handleSelectChange, canEdit }) => {
   const blank = !card.card_question_type
-  return (
-    <SelectHolderContainer>
-      <NumberListText>{card.order + 1}.</NumberListText>
-      {card.card_question_type === 'question_finish' ? (
-        <DisplayText>End of Survey</DisplayText>
-      ) : (
+  switch (card.card_question_type) {
+    case 'question_finish':
+      return <DisplayText>End of Survey</DisplayText>
+    case 'question_idea':
+      return <DisplayText>Idea</DisplayText>
+    default:
+      return (
         <Select
           classes={{
             root: 'select fixedWidth',
@@ -79,18 +76,35 @@ const QuestionSelectHolder = ({
         >
           {TEST_COLLECTION_SELECT_OPTIONS.map(optGroup => {
             const options = []
+            optGroup.values.sort(optionSort).forEach(opt => {
+              if (opt.sections.includes(card.section_type)) options.push(opt)
+            })
+            // Don't show this category if there aren't any options
+            if (options.length === 0) return
             if (optGroup.category) {
-              options.push({
+              options.unshift({
                 value: '',
                 label: optGroup.category,
                 category: true,
               })
             }
-            optGroup.values.sort(optionSort).forEach(opt => options.push(opt))
             return options.map(opt => questionSelectOption(opt))
           })}
         </Select>
-      )}
+      )
+  }
+}
+
+const QuestionSelectHolder = ({
+  card,
+  canEdit,
+  handleSelectChange,
+  handleTrash,
+}) => {
+  return (
+    <SelectHolderContainer>
+      <NumberListText>{card.order + 1}.</NumberListText>
+      {dropdownOrQuestionText({ card, handleSelectChange, canEdit })}
       {canEdit && card.card_question_type !== 'question_finish' && (
         <TrashButton onClick={() => handleTrash(card)}>
           <TrashIcon />
@@ -109,7 +123,8 @@ QuestionSelectHolder.propTypes = {
     isPinnedInTemplate: PropTypes.bool,
     isPinnedAndLocked: PropTypes.bool,
     order: PropTypes.number.isRequired,
-    card_question_type: PropTypes.string.isRequired,
+    card_question_type: PropTypes.string,
+    section_type: PropTypes.string.isRequired,
   }).isRequired, // specify or use MobxPropTypes?
   canEdit: PropTypes.bool.isRequired,
   handleSelectChange: PropTypes.func.isRequired,

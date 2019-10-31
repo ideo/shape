@@ -9,9 +9,10 @@ import googleTagManager from '~/vendor/googleTagManager'
 import { apiStore } from '~/stores'
 import { apiUrl } from '~/utils/url'
 
-import CardMoveService from '~/ui/grid/CardMoveService'
 import BaseRecord from './BaseRecord'
+import CardMoveService from '~/ui/grid/CardMoveService'
 import CollectionCard from './CollectionCard'
+import CollectionFilter from './CollectionFilter'
 import Role from './Role'
 import TestAudience from './TestAudience'
 import SharedRecordMixin from './SharedRecordMixin'
@@ -255,6 +256,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return true
   }
 
+  get isRegularCollection() {
+    return this.type === 'Collection' && !this.isBoard
+  }
+
   get isUserCollection() {
     return this.type === 'Collection::UserCollection'
   }
@@ -299,8 +304,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.type === 'Collection::TestDesign'
   }
 
-  get isTestCollectionOrTestDesign() {
-    return this.isTestCollection || this.isTestDesign
+  get isTestResultsCollection() {
+    return this.type === 'Collection::TestResultsCollection'
+  }
+
+  get isTestCollectionOrResults() {
+    return this.isTestCollection || this.isTestResultsCollection
   }
 
   get isBoard() {
@@ -343,24 +352,15 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       !this.isSubTemplate &&
       !this.isProfileTemplate &&
       !this.is_submission_box_template &&
-      !this.isTestDesign &&
+      !this.isTestResultsCollection &&
       !this.isTestCollection
-    )
-  }
-
-  get requiresTestDesigner() {
-    // this determines if it should display the TestDesigner in CollectionPage,
-    return (
-      this.isTestDesign ||
-      (this.isTestCollection && this.test_status === 'draft') ||
-      this.is_submission_box_template_test
     )
   }
 
   get launchableTestId() {
     if (this.isTestCollection) {
       return this.id
-    } else if (this.isTestDesign) {
+    } else if (this.isTestResultsCollection) {
       return this.test_collection_id
     } else if (this.submission_attrs) {
       return this.submission_attrs.launchable_test_id
@@ -370,7 +370,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   @computed
   get launchableTestStatus() {
-    if (this.isTestCollectionOrTestDesign) {
+    if (this.isTestCollectionOrResults) {
       return this.test_status
     }
     if (!this.submission_attrs) return null
@@ -476,6 +476,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return data
   }
 
+  get collectionFilterQuery() {
+    const activeFilters = this.collection_filters
+      .filter(filter => filter.selected)
+      .map(filter =>
+        filter.filter_type === 'tag' ? `#${filter.text}` : filter.text
+      )
+    if (activeFilters.length === 0) return {}
+    return { q: activeFilters.join(' ') }
+  }
+
   async API_fetchCards({
     page = 1,
     per_page = null,
@@ -491,6 +501,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       page,
       per_page,
     }
+    Object.assign(params, this.collectionFilterQuery)
     if (!params.per_page) {
       // NOTE: If this is a Board, per_page will be ignored in favor of default 16x16 rows/cols
       params.per_page = this.recordsPerPage
@@ -664,6 +675,23 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     })
   }
 
+  API_createCollectionFilter(params) {
+    return this.apiStore.request(
+      `collections/${this.id}/collection_filters/`,
+      'POST',
+      {
+        ...params,
+      }
+    )
+  }
+
+  API_destroyCollectionFilter(filter) {
+    return this.apiStore.request(
+      `collections/${this.id}/collection_filters/${filter.id}`,
+      'DELETE'
+    )
+  }
+
   API_selectDatasetsWithIdentifier({ identifier }) {
     return this.apiStore.request(
       `collections/${this.id}/datasets/select`,
@@ -750,15 +778,23 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (this.submission_attrs) {
       collection = await this._fetchSubmissionTest()
     }
-    if (_.includes(['launch', 'reopen'], actionName)) {
-      if (collection.checkLaunchability()) {
-        // called with 'this' so that we know if the submission is calling it
-        return this.API_performTestAction(actionName, audiences)
+    if (
+      _.includes(['launch', 'reopen'], actionName) &&
+      collection.checkLaunchability()
+    ) {
+      // called with 'this' so that we know if the submission is calling it
+      await this.API_performTestAction(actionName, audiences)
+      if (actionName === 'launch') {
+        console.log(collection, collection.test_results_collection.id)
+        this.routingStore.routeTo(
+          'collections',
+          collection.test_results_collection.id
+        )
       }
-      return false
+    } else if (actionName === 'close') {
+      // e.g. for close
+      return this.API_performTestAction(actionName)
     }
-    // e.g. for close
-    return this.API_performTestAction(actionName)
   }
 
   trackTestAction = actionName => {
@@ -1039,6 +1075,11 @@ Collection.refDefaults = {
   },
   test_audiences: {
     model: TestAudience,
+    type: ReferenceType.TO_MANY,
+    defaultValue: [],
+  },
+  collection_filters: {
+    model: CollectionFilter,
     type: ReferenceType.TO_MANY,
     defaultValue: [],
   },

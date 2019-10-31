@@ -343,9 +343,23 @@ class GridCardBlank extends React.Component {
     })
   }
 
+  get replacingTestCollectionMedia() {
+    const { testCollectionCard } = this.props
+    if (!testCollectionCard) return false
+    const { record } = testCollectionCard
+    return record && record.type !== 'Item::QuestionItem'
+  }
+
   createCard = (nested = {}, options = {}) => {
     const { replacingId } = this
-    const { afterCreate, parent, apiStore, uiStore } = this.props
+    const {
+      afterCreate,
+      parent,
+      testCollectionCard,
+      defaultShowWholeImage,
+      apiStore,
+      uiStore,
+    } = this.props
     const { order, row, col, width, height } = uiStore.blankContentToolState
     const isReplacing = !!replacingId
     const attrs = {
@@ -356,11 +370,28 @@ class GridCardBlank extends React.Component {
       col,
       // `parent` is the collection this card belongs to
       parent_id: parent.id,
-      image_contain: this.props.defaultShowWholeImage,
+      image_contain: defaultShowWholeImage,
     }
 
     // apply nested attrs
     Object.assign(attrs, nested)
+    if (testCollectionCard) {
+      const { record } = testCollectionCard
+      const item_attributes = {
+        question_type: record.question_type,
+      }
+      if (record.name) item_attributes.name = record.name
+      if (record.content) item_attributes.content = record.content
+      const existingAttrs = {
+        order: testCollectionCard.order,
+        item_attributes: {
+          ...attrs.item_attributes,
+          ...item_attributes,
+        },
+      }
+      Object.assign(attrs, existingAttrs)
+    }
+
     const card = new CollectionCard(attrs, apiStore)
     card.parent = parent // Assign parent so store can get access to it
     this.setState({ loading: true }, async () => {
@@ -403,10 +434,10 @@ class GridCardBlank extends React.Component {
   }
 
   closeBlankContentTool = () => {
-    const { uiStore } = this.props
+    const { testCollectionCard, preselected, uiStore } = this.props
     if (
-      uiStore.blankContentToolState.emptyCollection &&
-      !this.props.preselected
+      testCollectionCard ||
+      (uiStore.blankContentToolState.emptyCollection && !preselected)
     ) {
       this.setState({ creating: null })
       // have to re-create the DropPane
@@ -676,11 +707,16 @@ class GridCardBlank extends React.Component {
   render() {
     const { testCollectionCard, uiStore, parent } = this.props
     const { gridSettings, blankContentToolState } = uiStore
+    const { creating } = this.state
     const { isBoard } = parent
     let { gridW, gridH } = gridSettings
     if (isBoard) {
       ;({ gridW, gridH } = v.defaultGridSettings)
     }
+    const showCloseButton =
+      !this.emptyState &&
+      (!testCollectionCard || creating || this.replacingTestCollectionMedia)
+
     return (
       <StyledGridCardBlank boxShadow={isBoard}>
         <StyledGridCardInner
@@ -691,7 +727,7 @@ class GridCardBlank extends React.Component {
           {this.renderInner()}
         </StyledGridCardInner>
         {this.state.loading && <InlineLoader />}
-        {!this.emptyState && !testCollectionCard && (
+        {showCloseButton && (
           <CloseButton onClick={this.closeBlankContentTool} />
         )}
       </StyledGridCardBlank>
@@ -705,7 +741,7 @@ GridCardBlank.propTypes = {
   afterCreate: PropTypes.func,
   preselected: PropTypes.string,
   replacingId: PropTypes.string,
-  testCollectionCard: PropTypes.bool,
+  testCollectionCard: MobxPropTypes.objectOrObservableObject,
   defaultShowWholeImage: PropTypes.bool,
 }
 GridCardBlank.wrappedComponent.propTypes = {
@@ -716,7 +752,7 @@ GridCardBlank.defaultProps = {
   afterCreate: null,
   preselected: null,
   replacingId: null,
-  testCollectionCard: false,
+  testCollectionCard: null,
   defaultShowWholeImage: false,
 }
 
