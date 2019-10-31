@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import AutosizeInput from 'react-input-autosize'
 
 import { debounce, remove } from 'lodash'
 import { DisplayText, SmallHelperText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 import CustomizableQuestionChoice from '~/ui/test_collections/CustomizableQuestionChoice'
+import { TextInput, TextResponseHolder } from '~/ui/test_collections/shared'
 
 const Question = styled.div`
   border-color: ${props =>
@@ -30,13 +30,19 @@ const Question = styled.div`
 `
 Question.displayName = 'Question'
 
-const EditableInput = styled(AutosizeInput)`
-  input {
+const EditableInputHolder = styled(TextResponseHolder)`
+  background-color: rgba(255, 255, 255, 0);
+  padding: 0;
+`
+EditableInputHolder.displayName = 'EditableInputHolder'
+
+const EditableInput = styled(TextInput)`
+  && {
     background-color: rgba(255, 255, 255, 0);
     border: 0;
     color: white;
     padding: 2px 3px;
-    margin: -1px 2px -1px 5px;
+    margin: -1px 2px -4px 5px;
     font-size: 16px;
     font-family: ${v.fonts.sans};
     font-size: 1rem;
@@ -50,7 +56,6 @@ const EditableInput = styled(AutosizeInput)`
     }
   }
 `
-EditableInput.displayName = 'EditableInput'
 
 const ChoicesHolder = styled.div`
   background-color: ${props => props.theme.responseHolder};
@@ -132,16 +137,18 @@ class CustomizableQuestion extends React.Component {
     return (
       <Question editing={editing}>
         <DisplayText color={v.colors.white}>
-          <EditableInput
-            type="text"
-            placeholder="write question here"
-            value={questionContent}
-            onChange={this.handleInputChange}
-            onKeyPress={this.handleKeyPress}
-            onBlur={this.stopEditingIfContent}
-          />
+          <EditableInputHolder>
+            <EditableInput
+              onChange={this.handleInputChange}
+              onKeyPress={this.handleKeyPress}
+              onBlur={this.stopEditingIfContent}
+              value={questionContent}
+              type="questionText"
+              placeholder="write question here"
+              data-cy="CustomizableQuestionTextInput"
+            />
+          </EditableInputHolder>
         </DisplayText>
-        <br />
         <SmallHelperText
           color={v.colors.white}
           style={{ marginLeft: '8px', opacity: '0.5' }}
