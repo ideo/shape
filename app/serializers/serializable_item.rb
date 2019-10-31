@@ -28,7 +28,10 @@ class SerializableItem < BaseJsonSerializer
     end
   end
 
-  has_many :question_choices
+  has_many :question_choices do
+    @object.try(:question_choices)
+  end
+
   has_one :parent_collection_card
   has_one :parent
   belongs_to :data_source
