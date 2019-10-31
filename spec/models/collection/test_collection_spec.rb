@@ -678,7 +678,7 @@ describe Collection::TestCollection, type: :model do
     end
   end
 
-  context 'creating a test in a collection with its own roles', only: true do
+  context 'creating a test in a collection with its own roles' do
     let(:my_collection) { create(:user_collection, add_editors: [user]) }
     let(:test_collection) do
       create(:test_collection, :completed, parent_collection: my_collection, add_editors: [user])
