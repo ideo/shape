@@ -14,6 +14,7 @@ import Activity from './jsonApi/Activity'
 import Audience from './jsonApi/Audience'
 import Collection from './jsonApi/Collection'
 import CollectionCard from './jsonApi/CollectionCard'
+import CollectionFilter from './jsonApi/CollectionFilter'
 import DataItemsDataset from './jsonApi/DataItemsDataset'
 import Dataset from './jsonApi/Dataset'
 import Comment from './jsonApi/Comment'
@@ -840,6 +841,7 @@ ApiStore.types = [
   Audience,
   Collection,
   CollectionCard,
+  CollectionFilter,
   Comment,
   CommentThread,
   Dataset,

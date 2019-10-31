@@ -200,6 +200,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def load_collection_cards
     filter_params = params[:filter].present? ? params[:filter] : params
+    filter_params.merge(q: params[:q]) if params[:q].present?
     @collection_cards = CollectionCardFilter
                         .call(
                           collection: @collection,

@@ -1,9 +1,11 @@
 import PropTypes from 'prop-types'
-import { action, observable } from 'mobx'
-import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { action, observable, runInAction } from 'mobx'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+
 import _ from 'lodash'
 import ReactTags from 'react-tag-autocomplete'
 
+import Pill from '~/ui/global/Pill'
 import StyledReactTags from './StyledReactTags'
 
 export const tagsInCommon = (records, tagField) => {
@@ -18,7 +20,6 @@ export const tagsInCommon = (records, tagField) => {
   return _.intersection.apply(null, tags)
 }
 
-@inject('apiStore')
 @observer
 class TagEditor extends React.Component {
   @observable
@@ -44,19 +45,27 @@ class TagEditor extends React.Component {
     this.initTags(tagsInCommon(records, tagField))
   }
 
-  @action
-  initTags = tagArray => {
-    // `id` is used by react-tag-autocomplete, but otherwise doesn't hold any meaning
-    this.tags = _.map([...tagArray], (t, i) => ({
-      id: i,
-      name: t,
-    }))
+  createFormattedTag(id, label) {
+    const tag = {
+      id,
+      label,
+      name: label,
+    }
+    tag.onDelete = this.handleDelete(id)
+    return tag
   }
 
   @action
-  handleAddition = newTag => {
+  initTags = tagArray => {
+    // `id` is used by react-tag-autocomplete, but otherwise doesn't hold any meaning
+    this.tags = _.map([...tagArray], (t, i) => this.createFormattedTag(i, t))
+  }
+
+  @action
+  handleAddition = tagData => {
     const { validateTag, records, tagField, afterAddTag } = this.props
-    newTag.name = newTag.name.trim()
+    tagData.name = tagData.name.trim()
+    const newTag = this.createFormattedTag(tagData.id, tagData.name)
     this.error = ''
 
     // Return if tag is a duplicate
@@ -80,12 +89,14 @@ class TagEditor extends React.Component {
   }
 
   @action
-  handleDelete = tagIndex => {
+  handleDelete = tagIndex => () => {
     const { records, tagField, afterRemoveTag } = this.props
     const tag = this.tags[tagIndex]
-    this.tags.remove(tag)
-    records.forEach(record => {
-      record[tagField].remove(tag.name)
+    runInAction(() => {
+      this.tags.remove(tag)
+      records.forEach(record => {
+        record[tagField].remove(tag.name)
+      })
     })
     afterRemoveTag(tag.name)
   }
@@ -117,6 +128,7 @@ class TagEditor extends React.Component {
             placeholder={placeholder}
             handleAddition={this.handleAddition}
             handleDelete={this.handleDelete}
+            tagComponent={Pill}
             allowNew
           />
         )}
@@ -127,10 +139,6 @@ class TagEditor extends React.Component {
 }
 
 TagEditor.displayName = 'TagEditor'
-
-TagEditor.wrappedComponent.propTypes = {
-  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-}
 
 TagEditor.propTypes = {
   records: PropTypes.arrayOf(MobxPropTypes.objectOrObservableObject).isRequired,
