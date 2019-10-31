@@ -5,7 +5,7 @@ module Breadcrumb
 
     def initialize(object, user)
       @object = object
-      @user = user
+      @user = user || User.new
     end
 
     def viewable
