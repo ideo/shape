@@ -33,22 +33,32 @@ class OpenQuestion extends React.Component {
   constructor(props) {
     super(props)
     const { questionAnswer } = props
-    this.save = _.debounce(this._save, 1000)
+    this.saveAnswer = _.debounce(this._saveAnswer, 1000)
     this.state = {
       response: questionAnswer ? questionAnswer.answer_text : '',
       focused: false,
     }
   }
 
-  _save = () => {
-    const { item } = this.props
-    item.save()
+  _saveAnswer = () => {
+    const { onAnswer } = this.props
+    onAnswer({ text: this.state.response, skipScrolling: true })
   }
 
   handleResponse = ev => {
-    this.setState({
-      response: ev.target.value,
-    })
+    const { questionAnswer } = this.props
+
+    this.setState(
+      {
+        response: ev.target.value,
+      },
+      () => {
+        if (!questionAnswer || questionAnswer.answer_text.length === 0) {
+          return
+        }
+        this.saveAnswer()
+      }
+    )
   }
 
   handleSubmit = ev => {
