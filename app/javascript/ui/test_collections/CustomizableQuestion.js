@@ -9,6 +9,7 @@ import v from '~/utils/variables'
 import CustomizableQuestionChoice from '~/ui/test_collections/CustomizableQuestionChoice'
 import ArrowIcon from '../icons/ArrowIcon'
 import { TextEnterButton, TextResponseHolder } from './shared'
+import { runInAction } from 'mobx'
 
 const Question = styled.div`
   border-color: ${props =>
@@ -86,6 +87,7 @@ class CustomizableQuestion extends React.Component {
 
     this.props.onAnswer({
       selected_choice_ids: this.state.selected_choice_ids,
+      skipScrolling: this.isAnswerSavedinDB,
     })
 
     this.setState({ hasSubmittedAnswer: true })
@@ -112,10 +114,18 @@ class CustomizableQuestion extends React.Component {
     }
 
     this.setState({ selected_choice_ids }, () => {
-      if (this.isSingleChoiceQuestion) {
+      if (this.isSingleChoiceQuestion || this.isAnswerSavedinDB) {
         this.submitAnswer()
       }
     })
+  }
+
+  get isAnswerSavedinDB() {
+    const { questionAnswer } = this.props
+    if (questionAnswer) {
+      return questionAnswer.selected_choice_ids.length > 0
+    }
+    return false
   }
 
   updateSingleChoiceIds(selected_choice_ids, choice) {
@@ -129,7 +139,9 @@ class CustomizableQuestion extends React.Component {
       // Keep ids that we don't already have
       return selected_choice_ids.filter(id => id != choice.id)
     } else {
-      selected_choice_ids.push(choice.id)
+      runInAction(() => {
+        selected_choice_ids.push(choice.id)
+      })
       return selected_choice_ids
     }
   }
