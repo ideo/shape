@@ -21,6 +21,7 @@
 #  submissions_enabled        :boolean          default(TRUE)
 #  test_closed_at             :datetime
 #  test_launched_at           :datetime
+#  test_show_media            :boolean          default(TRUE)
 #  test_status                :integer
 #  type                       :string
 #  unarchived_at              :datetime
@@ -261,42 +262,21 @@ class Collection
     end
 
     def questions_valid?
-      complete = true
-      unless incomplete_idea_items.count.zero?
-        errors.add(:base,
-                   'Please add your idea content to question ' +
-                   incomplete_idea_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
-        complete = false
+      incomplete_items = incomplete_question_items
+
+      return true if incomplete_items.blank?
+
+      shown_idea_error = false
+
+      incomplete_items.each do |item|
+        if item.question_idea?
+          next if shown_idea_error
+          shown_idea_error = true
+        end
+        errors.add(:base, "Please add #{item.incomplete_description} to question #{item.parent_collection_card.order + 1}")
       end
 
-      unless incomplete_media_items.count.zero?
-        errors.add(:base,
-                   'Please add an image or video to question ' +
-                   incomplete_media_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
-        complete = false
-      end
-
-      unless incomplete_description_items.count.zero?
-        errors.add(:base,
-                   'Please add your description to question ' +
-                   incomplete_description_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
-        complete = false
-      end
-
-      unless incomplete_category_satisfaction_items.count.zero?
-        errors.add(:base,
-                   'Please add your category to question ' +
-                   incomplete_category_satisfaction_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
-        complete = false
-      end
-
-      unless incomplete_open_response_items.count.zero?
-        errors.add(:base,
-                   'Please add your open response to question ' +
-                   incomplete_open_response_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
-        complete = false
-      end
-      complete
+      false
     end
 
     def valid_and_launchable?
@@ -448,52 +428,16 @@ class Collection
       reorder_cards!
     end
 
-    # Return array of incomplete media items, with index of item
-    def incomplete_media_items
-      question_items.joins(
-        :parent_collection_card,
-      ).where(question_type: :question_media)
-    end
-
-    def incomplete_idea_items
-      # TODO: this just checks if it hasn't been transformed into media
-      # however it doesn't really check the name/content (or if media was unselected)
-      question_items.joins(
-        :parent_collection_card,
-      ).where(question_type: :question_idea)
-    end
-
-    def incomplete_description_items
-      question_items
-        .joins(
-          :parent_collection_card,
-        ).where(question_type: :question_description, content: [nil, ''])
-    end
-
-    def incomplete_category_satisfaction_items
-      question_items
-        .joins(
-          :parent_collection_card,
-        ).where(question_type: :question_category_satisfaction, content: [nil, ''])
-    end
-
-    def incomplete_open_response_items
-      question_items
-        .joins(
-          :parent_collection_card,
-        ).where(question_type: :question_open, content: [nil, ''])
-    end
-
-    # Returns the question cards that are in the blank default state
     def incomplete_question_items
-      question_items
-        .joins(
-          :parent_collection_card,
-        ).where(question_type: nil, filestack_file_id: nil, url: nil)
+      question_items.joins(
+        :parent_collection_card,
+      ).select(&:question_item_incomplete?)
     end
 
-    def remove_incomplete_question_items
-      incomplete_question_items.destroy_all
+    def remove_empty_question_items
+      incomplete_question_items.select do |item|
+        item.question_item.blank?
+      end.each(&:destroy)
     end
 
     def answerable_complete_question_items
@@ -504,12 +448,7 @@ class Collection
       # This is for the purpose of finding all completed items to display in the survey
       # i.e. omitting any unfinished/blanks
       questions = answerable_only ? question_items.answerable : items
-      questions.reject do |i|
-        i.is_a?(Item::QuestionItem) && i.question_type.blank? ||
-          i.question_type == 'question_open' && i.content.blank? ||
-          i.question_type == 'question_category_satisfaction' && i.content.blank? ||
-          i.question_type == 'question_media'
-      end
+      questions.reject(&:question_item_incomplete?)
     end
 
     def complete_question_cards
@@ -577,7 +516,7 @@ class Collection
 
     def post_launch_setup!(initiated_by: nil, reopening: false)
       # remove the "blanks"
-      remove_incomplete_question_items
+      remove_empty_question_items
       if submission_box_template_test?
         parent_submission_box_template.update(
           submission_attrs: {

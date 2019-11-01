@@ -8,7 +8,7 @@ import googleTagManager from '~/vendor/googleTagManager'
 
 import { LargerH3 } from '~/ui/global/styled/typography'
 import v, { ITEM_TYPES } from '~/utils/variables'
-import QuestionSelectHolder from '~/ui/test_collections/QuestionSelectHolder'
+import QuestionLeftSide from '~/ui/test_collections/QuestionLeftSide'
 import {
   TestQuestionHolder,
   styledTestTheme,
@@ -126,15 +126,24 @@ class TestDesigner extends React.Component {
     )
   }
 
-  get cardsBySection() {
+  get visibleCardsWithSection() {
     const { collection } = this.props
+    return collection.sortedCards.filter(
+      card => !card.hidden && card.section_type
+    )
+  }
+
+  get cardsBySection() {
     const sections = {}
     SECTIONS.forEach(section => (sections[section] = []))
-    collection.sortedCards.forEach(card => {
-      if (sections[card.section_type] && !card.hidden)
-        sections[card.section_type].push(card)
+    this.visibleCardsWithSection.forEach(card => {
+      if (sections[card.section_type]) sections[card.section_type].push(card)
     })
     return sections
+  }
+
+  cardNumber = card => {
+    return this.visibleCardsWithSection.indexOf(card) + 1
   }
 
   // This shows a dialog immediately
@@ -210,6 +219,14 @@ class TestDesigner extends React.Component {
     googleTagManager.push({
       event: 'formSubmission',
       formType: `Create ${ITEM_TYPES.QUESTION}`,
+    })
+  }
+
+  handleToggleShowMedia = e => {
+    const { collection } = this.props
+    this.confirmEdit(() => {
+      collection.test_show_media = !collection.test_show_media
+      collection.save()
     })
   }
 
@@ -353,13 +370,16 @@ class TestDesigner extends React.Component {
     const item = card.record
     return (
       <Fragment>
-        <QuestionSelectHolder
+        <QuestionLeftSide
           card={card}
           canEdit={this.canEdit}
           handleSelectChange={this.handleSelectChange}
           handleTrash={this.handleTrash}
           createNewQuestionCard={this.createNewQuestionCard}
           ideaCards={this.ideaCards}
+          showMedia={collection.test_show_media}
+          handleToggleShowMedia={this.handleToggleShowMedia}
+          cardNumber={this.cardNumber(card)}
         />
         <TestQuestionHolder
           editing

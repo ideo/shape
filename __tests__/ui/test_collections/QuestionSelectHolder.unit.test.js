@@ -1,10 +1,10 @@
 import _ from 'lodash'
-import QuestionSelectHolder from '~/ui/test_collections/QuestionSelectHolder'
+import QuestionSelector from '~/ui/test_collections/QuestionSelector'
 import { fakeCollectionCard } from '#/mocks/data'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 let wrapper, props
-describe('TestDesigner', () => {
+describe('QuestionSelector', () => {
   beforeEach(() => {
     props = {
       card: fakeCollectionCard,
@@ -14,7 +14,7 @@ describe('TestDesigner', () => {
     }
     props.card.card_question_type = 'question_useful'
     props.card.section_type = 'ideas'
-    wrapper = shallow(<QuestionSelectHolder {...props} />)
+    wrapper = shallow(<QuestionSelector {...props} />)
   })
 
   it('renders snapshot', () => {
