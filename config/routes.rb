@@ -19,6 +19,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :activities, only: %i[create]
+      resources :question_choices, only: %i[update]
       resources :collections do
         member do
           get 'in_my_collection'
