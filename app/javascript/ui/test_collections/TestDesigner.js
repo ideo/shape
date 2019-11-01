@@ -119,12 +119,20 @@ class TestDesigner extends React.Component {
     return collection.num_survey_responses
   }
 
+  get ideaCards() {
+    const { collection } = this.props
+    return collection.sortedCards.filter(
+      card => card.card_question_type === 'question_idea'
+    )
+  }
+
   get cardsBySection() {
     const { collection } = this.props
     const sections = {}
     SECTIONS.forEach(section => (sections[section] = []))
     collection.sortedCards.forEach(card => {
-      if (sections[card.section_type]) sections[card.section_type].push(card)
+      if (sections[card.section_type] && !card.hidden)
+        sections[card.section_type].push(card)
     })
     return sections
   }
@@ -350,6 +358,8 @@ class TestDesigner extends React.Component {
           canEdit={this.canEdit}
           handleSelectChange={this.handleSelectChange}
           handleTrash={this.handleTrash}
+          createNewQuestionCard={this.createNewQuestionCard}
+          ideaCards={this.ideaCards}
         />
         <TestQuestionHolder
           editing

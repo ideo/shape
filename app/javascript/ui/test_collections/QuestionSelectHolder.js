@@ -5,6 +5,7 @@ import { Select, SelectOption } from '~/ui/global/styled/forms'
 import { DisplayText, NumberListText } from '~/ui/global/styled/typography'
 import TrashIcon from '~/ui/icons/TrashIcon'
 import PinnedIcon from '~/ui/icons/PinnedIcon'
+import IdeaQuestionsControls from '~/ui/test_collections/IdeaQuestionsControls'
 import styled from 'styled-components'
 
 const SelectHolderContainer = styled.div`
@@ -53,13 +54,28 @@ const questionSelectOption = opt => {
   )
 }
 
-const dropdownOrQuestionText = ({ card, handleSelectChange, canEdit }) => {
+const dropdownOrQuestionText = ({
+  card,
+  handleSelectChange,
+  canEdit,
+  handleTrash,
+  createNewQuestionCard,
+  ideaCards,
+}) => {
   const blank = !card.card_question_type
   switch (card.card_question_type) {
     case 'question_finish':
       return <DisplayText>End of Survey</DisplayText>
     case 'question_idea':
-      return <DisplayText>Idea</DisplayText>
+      return (
+        <IdeaQuestionsControls
+          currentIdeaCardId={card.id}
+          ideaCards={ideaCards}
+          canEdit={canEdit}
+          handleTrash={handleTrash}
+          createNewQuestionCard={createNewQuestionCard}
+        />
+      )
     default:
       return (
         <Select
@@ -100,16 +116,28 @@ const QuestionSelectHolder = ({
   canEdit,
   handleSelectChange,
   handleTrash,
+  createNewQuestionCard,
+  ideaCards,
 }) => {
   return (
     <SelectHolderContainer>
       <NumberListText>{card.order + 1}.</NumberListText>
-      {dropdownOrQuestionText({ card, handleSelectChange, canEdit })}
-      {canEdit && card.card_question_type !== 'question_finish' && (
-        <TrashButton onClick={() => handleTrash(card)}>
-          <TrashIcon />
-        </TrashButton>
-      )}
+      {dropdownOrQuestionText({
+        card,
+        handleSelectChange,
+        canEdit,
+        handleTrash,
+        createNewQuestionCard,
+        ideaCards,
+      })}
+      {canEdit &&
+        !['question_finish', 'question_idea'].includes(
+          card.card_question_type
+        ) && (
+          <TrashButton onClick={() => handleTrash(card)}>
+            <TrashIcon />
+          </TrashButton>
+        )}
       <div style={{ color: v.colors.commonMedium }}>
         {card.isPinnedAndLocked && <PinnedIcon locked />}
         {card.isPinnedInTemplate && <PinnedIcon />}
@@ -129,6 +157,8 @@ QuestionSelectHolder.propTypes = {
   canEdit: PropTypes.bool.isRequired,
   handleSelectChange: PropTypes.func.isRequired,
   handleTrash: PropTypes.func.isRequired,
+  createNewQuestionCard: PropTypes.func.isRequired,
+  ideaCards: PropTypes.array.isRequired,
 }
 
 export default QuestionSelectHolder

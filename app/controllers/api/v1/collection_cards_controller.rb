@@ -361,6 +361,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :filter,
       :show_replace,
       :order,
+      :hidden,
       :section_type,
     )
   end
