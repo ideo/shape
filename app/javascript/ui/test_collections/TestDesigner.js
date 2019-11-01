@@ -186,10 +186,10 @@ class TestDesigner extends React.Component {
     })
   }
 
-  handleNew = (card, sectionType, addBefore) => () => {
+  handleNew = ({ card, sectionType, addBefore } = {}) => () => {
     this.confirmActionIfResponsesExist({
       action: () => {
-        const order = addBefore ? card.order - 0.5 : card.order + 1
+        const order = addBefore ? card.order : card.order + 1
         const createdCard = this.createNewQuestionCard({ order, sectionType })
 
         if (createdCard) this.trackQuestionCreation()
@@ -286,10 +286,18 @@ class TestDesigner extends React.Component {
     return card.API_create()
   }
 
-  renderHotEdge(card, sectionType, addBefore = false) {
+  renderHotEdge({
+    card,
+    sectionType,
+    addBefore = false,
+    lastCard = false,
+  } = {}) {
     if (!this.canEdit) return
     return (
-      <QuestionHotEdge onAdd={this.handleNew(card, sectionType, addBefore)} />
+      <QuestionHotEdge
+        lastCard={lastCard}
+        onAdd={this.handleNew({ card, sectionType, addBefore })}
+      />
     )
   }
 
@@ -371,14 +379,20 @@ class TestDesigner extends React.Component {
   }
 
   renderSections() {
-    return _.map(this.cardsBySection, (cards, section) => (
-      <Fragment key={`section-${section}`}>
+    return _.map(this.cardsBySection, (cards, sectionType) => (
+      <Fragment key={`section-${sectionType}`}>
         <Section>
-          <LargerH3 data-cy="section-title">{sectionTitle(section)}</LargerH3>
+          <LargerH3 data-cy="section-title">
+            {sectionTitle(sectionType)}
+          </LargerH3>
         </Section>
         {cards.length === 0 && (
           <TestQuestionFlexWrapper className="card">
-            {this.renderHotEdge({ order: 0 }, section, true)}
+            {this.renderHotEdge({
+              card: { order: 0 },
+              sectionType,
+              addBefore: true,
+            })}
           </TestQuestionFlexWrapper>
         )}
         {cards.map((card, i) => {
@@ -392,10 +406,11 @@ class TestDesigner extends React.Component {
           return (
             <FlipMove appearAnimation="fade" key={card.id}>
               <TestQuestionFlexWrapper className={`card ${card.id}`}>
-                {i === 0 && this.renderHotEdge(card, section, true)}
+                {i === 0 &&
+                  this.renderHotEdge({ card, sectionType, addBefore: true })}
                 {this.renderCard(card, firstCard, lastCard)}
                 {card.card_question_type !== 'question_finish' &&
-                  this.renderHotEdge(card, section)}
+                  this.renderHotEdge({ card, sectionType, lastCard })}
               </TestQuestionFlexWrapper>
             </FlipMove>
           )
