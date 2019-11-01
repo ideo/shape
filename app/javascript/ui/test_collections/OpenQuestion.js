@@ -102,7 +102,7 @@ class OpenQuestion extends React.Component {
               focused={this.state.focused}
               data-cy="OpenQuestionTextButton"
             >
-              <ArrowIcon />
+              <ArrowIcon rotation={90} />
             </TextEnterButton>
           </TextResponseHolder>
         </form>

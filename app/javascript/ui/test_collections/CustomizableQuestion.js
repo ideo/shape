@@ -1,12 +1,13 @@
 import PropTypes from 'prop-types'
+import { debounce } from 'lodash'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
-import { debounce, remove } from 'lodash'
-import { DisplayText, SmallHelperText } from '~/ui/global/styled/typography'
-import v from '~/utils/variables'
+import ArrowIcon from '../icons/ArrowIcon'
 import CustomizableQuestionChoice from '~/ui/test_collections/CustomizableQuestionChoice'
-import { TextInput, TextResponseHolder } from '~/ui/test_collections/shared'
+import { DisplayText, SmallHelperText } from '~/ui/global/styled/typography'
+import { TextInput, TextEnterButton, TextResponseHolder } from './shared'
+import v from '~/utils/variables'
 
 const Question = styled.div`
   border-color: ${props =>
@@ -72,30 +73,74 @@ class CustomizableQuestion extends React.Component {
       // shouldn't be null otherwise the <input> will complain
       questionContent: props.question.content || '',
       selected_choice_ids: [],
+      hasSubmittedAnswer: false,
     }
     this.debouncedUpdateQuestionContent = debounce(
       this.updateQuestionContent,
-      1000
+      250
     )
+  }
+
+  submitAnswer = () => {
+    const { editing } = this.props
+    if (editing) return
+
+    this.props.onAnswer({
+      selected_choice_ids: this.state.selected_choice_ids,
+      hasSubmittedAnswer: true,
+    })
   }
 
   handleAnswerSelection = choice => ev => {
     const { questionAnswer } = this.props
-    let selected_choice_ids = !questionAnswer
-      ? []
-      : questionAnswer.selected_choice_ids
+    let selected_choice_ids = this.hasSubmittedAnswer
+      ? questionAnswer.selected_choice_ids
+      : this.state.selected_choice_ids
 
-    console.log({ selected_choice_ids })
     ev.preventDefault()
-    console.log(choice)
+
+    if (this.isSingleChoiceQuestion) {
+      selected_choice_ids = this.updateSingleChoiceIds(
+        selected_choice_ids,
+        choice
+      )
+    } else {
+      selected_choice_ids = this.updateMultipleChoiceIds(
+        selected_choice_ids,
+        choice
+      )
+    }
+
+    this.setState({ selected_choice_ids })
+
+    if (this.isSingleChoiceQuestion) {
+      this.submitAnswer()
+    }
+  }
+
+  updateSingleChoiceIds(selected_choice_ids, choice) {
+    if (selected_choice_ids.includes(choice.id)) return []
+
+    return [choice.id]
+  }
+
+  updateMultipleChoiceIds(selected_choice_ids, choice) {
     if (selected_choice_ids.includes(choice.id)) {
-      // If we already have the Id selected, remove it
-      selected_choice_ids = remove(selected_choice_ids, id => id == choice.id)
+      // Keep ids that we don't already have
+      return selected_choice_ids.filter(id => id != choice.id)
     } else {
       selected_choice_ids.push(choice.id)
+      return selected_choice_ids
     }
-    console.log(selected_choice_ids)
-    this.props.onAnswer({ selected_choice_ids })
+  }
+
+  get isSingleChoiceQuestion() {
+    const { question } = this.props
+    return question.question_type === 'question_single_choice'
+  }
+
+  isChoiceSelected = choice => {
+    return this.state.selected_choice_ids.includes(choice.id)
   }
 
   get hasEditableCategory() {
@@ -164,7 +209,7 @@ class CustomizableQuestion extends React.Component {
   }
 
   render() {
-    const { question, questionAnswer, question_choices } = this.props
+    const { question, questionAnswer, editing, question_choices } = this.props
     const { question_type } = question
     return (
       <div style={{ width: '100%' }}>
@@ -172,6 +217,8 @@ class CustomizableQuestion extends React.Component {
         <ChoicesHolder>
           {question_choices.map((choice, index) => (
             <CustomizableQuestionChoice
+              disabled={editing}
+              isChecked={this.isChoiceSelected(choice)}
               choice={choice}
               questionType={question_type}
               questionAnswer={questionAnswer}
@@ -180,6 +227,13 @@ class CustomizableQuestion extends React.Component {
             />
           ))}
         </ChoicesHolder>
+        <TextResponseHolder style={{ padding: '20px' }}>
+          {!this.isSingleChoiceQuestion && (
+            <TextEnterButton onClick={this.submitAnswer}>
+              <ArrowIcon rotation={90} />
+            </TextEnterButton>
+          )}
+        </TextResponseHolder>
       </div>
     )
   }

@@ -42,7 +42,6 @@ class TestQuestion extends React.Component {
       apiStore,
     } = this.props
     const { text, number, selected_choice_ids } = answer
-    console.log(answer)
     let { surveyResponse, questionAnswer } = this.props
     // components should never trigger this when editing, but double-check here
     if (editing) return
@@ -73,7 +72,6 @@ class TestQuestion extends React.Component {
       // needs to be attached in order to provide the session_uid
       if (surveyResponse) questionAnswer.survey_response = surveyResponse
       // update values on existing answer and save
-      console.log('updating QA with selected: ', selected_choice_ids)
       await questionAnswer.API_update({
         answer_text: text,
         answer_number: number,

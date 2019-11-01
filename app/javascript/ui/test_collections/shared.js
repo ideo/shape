@@ -176,10 +176,6 @@ export const TextEnterButton = styled.button`
     width: 50%;
   }
 
-  svg {
-    transform: rotate(180deg);
-  }
-
   &:hover {
     filter: brightness(90%);
   }
