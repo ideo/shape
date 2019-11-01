@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import { debounce } from 'lodash'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { action } from 'mobx'
 import styled from 'styled-components'
 
 import ArrowIcon from '../icons/ArrowIcon'
@@ -138,6 +139,19 @@ class CustomizableQuestion extends React.Component {
     if (event.key === 'Enter') this.stopEditingIfContent()
   }
 
+  handleCreateChoice = () => {
+    const { question, editing } = this.props
+    if (!editing) return
+    question.API_createQuestionChoice({})
+  }
+
+  @action
+  onDeleteChoice = choice => {
+    const { question, editing } = this.props
+    if (!editing) return
+    question.API_destroyQuestionChoice(choice)
+  }
+
   startEditing = () => {
     this.setState({ editing: true })
   }
@@ -206,7 +220,8 @@ class CustomizableQuestion extends React.Component {
                 questionAnswer={questionAnswer}
                 onChange={this.handleAnswerSelection(choice)}
                 key={`question-${question.id}-choice-${index}`}
-                canEdit={editing}
+                editing={editing}
+                onDelete={this.onDeleteChoice}
               />
             ))}
         </ChoicesHolder>

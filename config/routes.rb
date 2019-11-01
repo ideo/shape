@@ -61,6 +61,7 @@ Rails.application.routes.draw do
             get 'will_become_private'
           end
         end
+        resources :question_choices, only: %i[create destroy]
       end
       resources :datasets, only: %i[index show create update destroy] do
         resources :roles, only: %i[index create destroy] do

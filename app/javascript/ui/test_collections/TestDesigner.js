@@ -164,6 +164,10 @@ class TestDesigner extends React.Component {
     }
   }
 
+  onAddQuestionChoice = question => {
+    question.API_createQuestionChoice({})
+  }
+
   handleSelectChange = replacingCard => ev => {
     // If test is already launched, and this isn't a blank card,
     // confirm they want to change the type
@@ -350,6 +354,8 @@ class TestDesigner extends React.Component {
           canEdit={this.canEdit}
           handleSelectChange={this.handleSelectChange}
           handleTrash={this.handleTrash}
+          canAddChoice={item.isCustomizableQuestionType}
+          onAddChoice={this.onAddQuestionChoice}
         />
         <TestQuestionHolder
           editing

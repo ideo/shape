@@ -2,7 +2,9 @@ import PropTypes from 'prop-types'
 import { kebabCase } from 'lodash'
 import v, { TEST_COLLECTION_SELECT_OPTIONS } from '~/utils/variables'
 import { Select, SelectOption } from '~/ui/global/styled/forms'
+import { NamedActionButton } from '~/ui/global/styled/buttons'
 import { DisplayText, NumberListText } from '~/ui/global/styled/typography'
+import PlusIcon from '~/ui/icons/PlusIcon'
 import TrashIcon from '~/ui/icons/TrashIcon'
 import PinnedIcon from '~/ui/icons/PinnedIcon'
 import styled from 'styled-components'
@@ -100,6 +102,8 @@ const QuestionSelectHolder = ({
   canEdit,
   handleSelectChange,
   handleTrash,
+  canAddChoice,
+  onAddChoice,
 }) => {
   return (
     <SelectHolderContainer>
@@ -114,6 +118,17 @@ const QuestionSelectHolder = ({
         {card.isPinnedAndLocked && <PinnedIcon locked />}
         {card.isPinnedInTemplate && <PinnedIcon />}
       </div>
+      {canAddChoice && (
+        <div style={{ marginLeft: '15px' }}>
+          <NamedActionButton
+            onClick={() => onAddChoice(card.record)}
+            svgSize={{ width: '20px', height: '20px' }}
+          >
+            <PlusIcon />
+            Option
+          </NamedActionButton>
+        </div>
+      )}
     </SelectHolderContainer>
   )
 }
@@ -129,6 +144,13 @@ QuestionSelectHolder.propTypes = {
   canEdit: PropTypes.bool.isRequired,
   handleSelectChange: PropTypes.func.isRequired,
   handleTrash: PropTypes.func.isRequired,
+  canAddChoice: PropTypes.bool,
+  onAddChoice: PropTypes.func,
+}
+
+QuestionSelectHolder.defaultProps = {
+  canAddChoice: false,
+  onAddChoice: null,
 }
 
 export default QuestionSelectHolder

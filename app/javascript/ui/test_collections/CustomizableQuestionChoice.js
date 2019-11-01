@@ -7,6 +7,7 @@ import styled from 'styled-components'
 import { Checkbox, Radio } from '~/ui/global/styled/forms'
 import { DisplayText } from '~/ui/global/styled/typography'
 import { TextInput } from '~/ui/test_collections/shared'
+import TrashIcon from '~/ui/icons/TrashIcon'
 import v from '~/utils/variables'
 
 const ChoiceHolder = styled.div`
@@ -17,6 +18,13 @@ const ChoiceHolder = styled.div`
   &:hover {
     background: white;
   }
+`
+
+const IconHolder = styled.button`
+  display: inline-block;
+  height: 27px;
+  vertical-align: bottom;
+  width: 22px;
 `
 
 @observer
@@ -32,8 +40,8 @@ class CustomizableQuestionChoice extends React.Component {
   }
 
   handleLabelClick = ev => {
-    const { canEdit, onChange } = this.props
-    if (!canEdit) return onChange(ev)
+    const { editing, onChange } = this.props
+    if (!editing) return onChange(ev)
   }
 
   @action
@@ -43,15 +51,20 @@ class CustomizableQuestionChoice extends React.Component {
     this.debouncedSaveChoice()
   }
 
+  handleDelete = ev => {
+    const { choice, onDelete } = this.props
+    onDelete(choice)
+  }
+
   render() {
-    const { choice, questionType, onChange, isChecked, canEdit } = this.props
+    const { choice, questionType, onChange, isChecked, editing } = this.props
 
     return (
       <ChoiceHolder>
         {questionType === 'question_single_choice' ? (
           <Radio
             id={`option-${choice.id}`}
-            disabled={canEdit}
+            disabled={editing}
             checked={isChecked}
             onClick={onChange}
             value={choice.value}
@@ -59,14 +72,18 @@ class CustomizableQuestionChoice extends React.Component {
           />
         ) : (
           <Checkbox
-            disabled={canEdit}
+            disabled={editing}
             checked={isChecked}
             onClick={onChange}
             value={choice.value}
             color="primary"
           />
         )}
-        <label htmlFor={`option-${choice.id}`} onClick={this.handleLabelClick}>
+        <label
+          htmlFor={`option-${choice.id}`}
+          onClick={this.handleLabelClick}
+          style={{ width: 'calc(100% - 55px', display: 'inline-block' }}
+        >
           <DisplayText color={v.colors.commonDark}>
             <TextInput
               onChange={this.handleInputChange}
@@ -74,11 +91,16 @@ class CustomizableQuestionChoice extends React.Component {
               type="questionText"
               placeholder="write question here"
               data-cy="CustomizableQuestionTextInput"
-              disabled={!canEdit}
+              disabled={!editing}
               inline
             />
           </DisplayText>
         </label>
+        {editing && (
+          <IconHolder onClick={this.handleDelete}>
+            <TrashIcon />
+          </IconHolder>
+        )}
       </ChoiceHolder>
     )
   }
@@ -91,16 +113,15 @@ CustomizableQuestionChoice.propTypes = {
   questionAnswer: MobxPropTypes.objectOrObservableObject,
   isChecked: PropTypes.bool,
   editing: PropTypes.bool,
-  canEdit: PropTypes.bool,
-  onTextEditChange: PropTypes.func,
+  onDelete: PropTypes.func,
 }
 
 CustomizableQuestionChoice.defaultProps = {
   questionAnswer: null,
   isChecked: false,
   editing: false,
-  canEdit: false,
-  onTextEditChange: () => {},
+  editing: false,
+  onDelete: () => {},
 }
 
 export default CustomizableQuestionChoice
