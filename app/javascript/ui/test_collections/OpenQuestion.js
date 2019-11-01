@@ -46,11 +46,18 @@ class OpenQuestion extends React.Component {
   }
 
   handleResponse = ev => {
+    const { questionAnswer } = this.props
+
     this.setState(
       {
         response: ev.target.value,
       },
-      () => this.saveAnswer()
+      () => {
+        if (!questionAnswer || questionAnswer.answer_text.length === 0) {
+          return
+        }
+        this.saveAnswer()
+      }
     )
   }
 
