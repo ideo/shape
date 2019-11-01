@@ -64,11 +64,14 @@ const ChoicesHolder = styled.div`
 class CustomizableQuestion extends React.Component {
   constructor(props) {
     super(props)
+    const choice_ids = props.questionAnswer
+      ? props.questionAnswer.selected_choice_ids
+      : []
     this.state = {
       editing: !props.question.content,
       // shouldn't be null otherwise the <input> will complain
       questionContent: props.question.content || '',
-      selected_choice_ids: [],
+      selected_choice_ids: choice_ids,
       hasSubmittedAnswer: false,
     }
     this.debouncedUpdateQuestionContent = debounce(
@@ -83,8 +86,9 @@ class CustomizableQuestion extends React.Component {
 
     this.props.onAnswer({
       selected_choice_ids: this.state.selected_choice_ids,
-      hasSubmittedAnswer: true,
     })
+
+    this.setState({ hasSubmittedAnswer: true })
   }
 
   handleAnswerSelection = choice => ev => {
@@ -107,11 +111,11 @@ class CustomizableQuestion extends React.Component {
       )
     }
 
-    this.setState({ selected_choice_ids })
-
-    if (this.isSingleChoiceQuestion) {
-      this.submitAnswer()
-    }
+    this.setState({ selected_choice_ids }, () => {
+      if (this.isSingleChoiceQuestion) {
+        this.submitAnswer()
+      }
+    })
   }
 
   updateSingleChoiceIds(selected_choice_ids, choice) {
@@ -221,8 +225,8 @@ class CustomizableQuestion extends React.Component {
             />
           ))}
         </ChoicesHolder>
-        <TextResponseHolder style={{ padding: '20px' }}>
-          {!this.isSingleChoiceQuestion && (
+        <TextResponseHolder>
+          {!this.isSingleChoiceQuestion && !this.state.hasSubmittedAnswer && (
             <TextEnterButton onClick={this.submitAnswer}>
               <ArrowIcon rotation={90} />
             </TextEnterButton>
