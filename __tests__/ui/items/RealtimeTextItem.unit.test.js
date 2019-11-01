@@ -99,9 +99,6 @@ describe('TextItem', () => {
     const helloWorldAloha = new Delta({
       ops: [{ insert: 'Hello, World. Aloha.' }],
     })
-    // const loremHelloWorldAloha = new Delta({
-    //   ops: [{ insert: 'Lorem. Hello, World. Aloha.' }],
-    // })
     const error = {
       // current user
       current_editor: { id: '1' },

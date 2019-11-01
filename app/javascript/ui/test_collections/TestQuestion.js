@@ -243,4 +243,6 @@ TestQuestion.defaultProps = {
   question_choices: [],
 }
 
+TestQuestion.displayName = 'TestQuestion'
+
 export default TestQuestion

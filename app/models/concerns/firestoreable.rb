@@ -17,7 +17,7 @@ module Firestoreable
     'Item::ChartItem': SerializableSimpleItem,
     'Item::DataItem': SerializableSimpleItem,
     'Item::LegendItem': SerializableLegendItem,
-    'Collection::ApplicationCollection': SerializableCollection,
+    'Collection::ApplicationCollection': SerializableSimpleCollection,
     'Collection::Global': SerializableSimpleCollection,
     'Collection::Board': SerializableSimpleCollection,
     'Collection::UserCollection': SerializableSimpleCollection,

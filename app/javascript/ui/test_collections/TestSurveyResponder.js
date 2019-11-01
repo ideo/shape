@@ -20,6 +20,7 @@ import ClosedSurvey from '~/ui/test_collections/ClosedSurvey'
 
 const UNANSWERABLE_QUESTION_TYPES = [
   'question_media',
+  'question_idea',
   'question_description',
   'question_finish',
   'question_recontact',

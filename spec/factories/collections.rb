@@ -97,12 +97,14 @@ FactoryBot.define do
           collection.question_items.select(&:question_open?).each do |open_response|
             open_response.update(content: 'What do you think?')
           end
-          media_question = collection.question_items.detect(&:question_media?)
-          media_question&.update(
+          idea_question = collection.question_items.detect(&:question_idea?)
+          idea_question&.update(
             type: 'Item::VideoItem',
+            name: 'Video',
+            content: 'A cool video about something.',
             url: 'something',
             thumbnail_url: 'something',
-            question_type: nil,
+            question_type: :question_idea,
           )
           description_question = collection.question_items.detect(&:question_description?)
           description_question&.update(content: 'something')

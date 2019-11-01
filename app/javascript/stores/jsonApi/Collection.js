@@ -785,7 +785,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       // called with 'this' so that we know if the submission is calling it
       await this.API_performTestAction(actionName, audiences)
       if (actionName === 'launch') {
-        console.log(collection, collection.test_results_collection.id)
         this.routingStore.routeTo(
           'collections',
           collection.test_results_collection.id
